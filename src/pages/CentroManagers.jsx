@@ -103,6 +103,16 @@ const isTrainerMatch = (mTrainer, targetTrainer) => {
   return false;
 };
 
+// Normaliza el estado de un manager para evitar fallos por mayúsculas/minúsculas o espacios
+export const normalizeManagerEstado = (estado) => {
+  const s = String(estado || '').trim().toUpperCase();
+  if (s.includes('GRADUA')) return 'Graduado';
+  if (s.includes('DESERT')) return 'Desertor';
+  if (s.includes('ARCHIV')) return 'Archivado';
+  if (s.includes('ACTIV') || s.includes('EN_JUEGO') || s === 'SI') return 'Activo';
+  return estado ? String(estado).trim() : 'Activo';
+};
+
 export default function CentroManagers() {
   const { currentUser } = useAuth();
   const { showToast } = useUI();
@@ -165,7 +175,14 @@ export default function CentroManagers() {
       // 1. Tomar todos los INITIAL_MANAGERS y reemplazar con los cambios de Firestore si existen
       const mergedManagers = INITIAL_MANAGERS.map(initM => {
         const fromFirestore = firestoreMap.get(String(initM.id));
-        return fromFirestore ? { ...initM, ...fromFirestore } : initM;
+        if (!fromFirestore) return initM;
+        const merged = { ...initM, ...fromFirestore };
+        // Si Firestore tiene el estado vacío, preservar el estado del catálogo inicial
+        const fsEstado = (fromFirestore.estado || '').trim();
+        if (!fsEstado && initM.estado) {
+          merged.estado = initM.estado;
+        }
+        return merged;
       });
 
       // 2. Agregar managers nuevos creados en Firestore que no estén en el catálogo inicial
@@ -179,6 +196,7 @@ export default function CentroManagers() {
       // Mapear y normalizar
       const normalized = mergedManagers.map(m => ({
         ...m,
+        estado: normalizeManagerEstado(m.estado),
         entrenador: normalizeTrainer(m.entrenador),
         coordinador: normalizeCoordinator(m.coordinador),
         sede: normalizeSede(m.sede)
@@ -191,7 +209,10 @@ export default function CentroManagers() {
       const saved = localStorage.getItem('cpsl_managers_data_v3');
       if (saved) {
         const parsed = JSON.parse(saved);
-        setManagers(parsed);
+        setManagers(parsed.map(m => ({
+          ...m,
+          estado: normalizeManagerEstado(m.estado)
+        })));
       }
       setIsLoadingData(false);
     });
@@ -454,7 +475,7 @@ export default function CentroManagers() {
       if (filterSede && mSede !== normalizeSede(filterSede)) return false;
 
       // 4. Filtro Estado (Todos / Activo / Graduado / Desertor)
-      if (statusFilter !== 'Todos' && m.estado !== statusFilter) return false;
+      if (statusFilter !== 'Todos' && normalizeManagerEstado(m.estado) !== statusFilter) return false;
 
       // 5. Búsqueda texto
       if (search.trim()) {
@@ -473,16 +494,11 @@ export default function CentroManagers() {
 
   const groupTeams = useMemo(() => {
     const userSede = normalizeSede(currentUser?.sede);
-    const baseList = managers.filter(m => {
+
+    // 1. Filtrar managers visibles según permisos de rol y filtros de cabecera (Sede, Entrenador)
+    const visibleManagers = managers.filter(m => {
       if (!m.equipo) return false;
       const mSede = normalizeSede(m.sede);
-
-      // Filtro Activos / Archivo en Grupales
-      if (groupLifecycleFilter === 'Activos') {
-        if (m.estado === 'Desertor' || m.estado === 'Graduado' || m.estado === 'Archivado') return false;
-      } else if (groupLifecycleFilter === 'Archivo') {
-        if (m.estado === 'Activo') return false;
-      }
 
       // Permisos base de rol
       if (viewAsTrainer) {
@@ -516,20 +532,28 @@ export default function CentroManagers() {
       return true;
     });
 
+    // 2. Agrupar managers en equipos identificando miembros activos vs archivo
     const teams = {};
-    baseList.forEach(m => {
+    visibleManagers.forEach(m => {
       const key = `${normalizeSede(m.sede)}_${m.equipo}`;
       if (!teams[key]) {
         teams[key] = {
           sede: normalizeSede(m.sede),
           equipo: m.equipo,
           numEquipo: m.numEquipo,
-          managers: [],
+          allMembers: [],
+          activeMembers: [],
           entrenadores: new Set(),
           lastDate: ''
         };
       }
-      teams[key].managers.push(m);
+      teams[key].allMembers.push(m);
+
+      const normSt = normalizeManagerEstado(m.estado);
+      if (normSt === 'Activo') {
+        teams[key].activeMembers.push(m);
+      }
+
       if (m.entrenador) {
         parseTrainersList(m.entrenador).forEach(t => teams[key].entrenadores.add(t));
       }
@@ -538,16 +562,35 @@ export default function CentroManagers() {
       }
     });
 
-    let list = Object.values(teams).map(t => {
-      const asistieron = t.managers.filter(m => m.llamadaAsistio === 'SI').length;
-      const noAsistieron = t.managers.filter(m => m.llamadaAsistio === 'NO').length;
-      const total = t.managers.length;
+    // 3. Filtrar según ciclo de vida del equipo:
+    // 'Activos': ÚNICAMENTE equipos que tienen miembros activos vigentes. Los equipos cerrados/históricos (como Lobos, Sinchi Runa, Kairu) quedan excluidos.
+    // 'Archivo': Equipos donde todos sus integrantes se graduaron, desertaron o fueron archivados.
+    // 'Todos': Todos los equipos registrados.
+    const rawTeamList = Object.values(teams);
+    const filteredByLifecycle = rawTeamList.filter(t => {
+      const isTeamActive = t.activeMembers.length > 0;
+      if (groupLifecycleFilter === 'Activos') {
+        return isTeamActive;
+      } else if (groupLifecycleFilter === 'Archivo') {
+        return !isTeamActive;
+      }
+      return true;
+    });
+
+    // 4. Mapear cada equipo para su visualización y métricas
+    let list = filteredByLifecycle.map(t => {
+      const isTeamActive = t.activeMembers.length > 0;
+      const displayManagers = (groupLifecycleFilter === 'Activos') ? t.activeMembers : t.allMembers;
+
+      const asistieron = displayManagers.filter(m => m.llamadaAsistio === 'SI').length;
+      const noAsistieron = displayManagers.filter(m => m.llamadaAsistio === 'NO').length;
+      const total = displayManagers.length;
       const pct = total > 0 ? Math.round((asistieron / total) * 100) : 0;
-      const hasCall = t.managers.some(m => m.llamadaAsistio === 'SI' || m.llamadaAsistio === 'NO');
+      const hasCall = displayManagers.some(m => m.llamadaAsistio === 'SI' || m.llamadaAsistio === 'NO');
       const entrenadoresArr = Array.from(t.entrenadores);
       const entrenadorUnico = entrenadoresArr.length === 1 ? entrenadoresArr[0] : (entrenadoresArr.join(', ') || 'Sin Asignar');
-      const capitanes = t.managers.filter(m => (m.rol || '').toLowerCase().includes('capitan'));
-      const managersOnly = t.managers.filter(m => !(m.rol || '').toLowerCase().includes('capitan'));
+      const capitanes = displayManagers.filter(m => (m.rol || '').toLowerCase().includes('capitan'));
+      const managersOnly = displayManagers.filter(m => !(m.rol || '').toLowerCase().includes('capitan'));
 
       let statusType = 'Pendiente';
       if (hasCall) {
@@ -558,6 +601,7 @@ export default function CentroManagers() {
 
       return {
         ...t,
+        managers: displayManagers,
         entrenadorUnico,
         entrenadoresArr,
         capitanes,
@@ -567,11 +611,12 @@ export default function CentroManagers() {
         total,
         pct,
         hasCall,
-        statusType
+        statusType,
+        isTeamActive
       };
     });
 
-    // Filtro por término de búsqueda en Grupales
+    // 5. Filtro por término de búsqueda en Grupales
     if (search.trim()) {
       const q = search.toLowerCase();
       list = list.filter(t => {
@@ -581,7 +626,7 @@ export default function CentroManagers() {
       });
     }
 
-    // Filtro por estado de conexión
+    // 6. Filtro por estado de conexión
     if (groupFilterStatus === 'Completos') return list.filter(t => t.statusType === 'Completo');
     if (groupFilterStatus === 'Parciales') return list.filter(t => t.statusType === 'Parcial' || t.statusType === 'Ausente');
     if (groupFilterStatus === 'Pendientes') return list.filter(t => t.statusType === 'Pendiente');
@@ -603,9 +648,9 @@ export default function CentroManagers() {
       const normSede = normalizeSede(sedeName);
       const sedeManagers = managers.filter(m => normalizeSede(m.sede) === normSede);
       const total = sedeManagers.length;
-      const activos = sedeManagers.filter(m => m.estado === 'Activo').length;
-      const graduados = sedeManagers.filter(m => m.estado === 'Graduado').length;
-      const desertores = sedeManagers.filter(m => m.estado === 'Desertor').length;
+      const activos = sedeManagers.filter(m => normalizeManagerEstado(m.estado) === 'Activo').length;
+      const graduados = sedeManagers.filter(m => normalizeManagerEstado(m.estado) === 'Graduado').length;
+      const desertores = sedeManagers.filter(m => normalizeManagerEstado(m.estado) === 'Desertor').length;
       const pctGrad = total > 0 ? Math.round((graduados / total) * 100) : 0;
 
       // Equipos y llamadas
@@ -650,9 +695,9 @@ export default function CentroManagers() {
     let list = allTrainerNames.map(trainerName => {
       const trainerManagers = managers.filter(m => isTrainerMatch(m.entrenador, trainerName));
       const total = trainerManagers.length;
-      const activos = trainerManagers.filter(m => m.estado === 'Activo').length;
-      const graduados = trainerManagers.filter(m => m.estado === 'Graduado').length;
-      const desertores = trainerManagers.filter(m => m.estado === 'Desertor').length;
+      const activos = trainerManagers.filter(m => normalizeManagerEstado(m.estado) === 'Activo').length;
+      const graduados = trainerManagers.filter(m => normalizeManagerEstado(m.estado) === 'Graduado').length;
+      const desertores = trainerManagers.filter(m => normalizeManagerEstado(m.estado) === 'Desertor').length;
       
       const equipos = [...new Set(trainerManagers.map(m => m.equipo).filter(Boolean))];
       const sedes = [...new Set(trainerManagers.map(m => normalizeSede(m.sede)).filter(Boolean))];
@@ -695,9 +740,9 @@ export default function CentroManagers() {
     if (!trainerName) return null;
     const trainerManagers = managers.filter(m => isTrainerMatch(m.entrenador, trainerName));
     const total = trainerManagers.length;
-    const activos = trainerManagers.filter(m => m.estado === 'Activo').length;
-    const graduados = trainerManagers.filter(m => m.estado === 'Graduado').length;
-    const desertores = trainerManagers.filter(m => m.estado === 'Desertor').length;
+    const activos = trainerManagers.filter(m => normalizeManagerEstado(m.estado) === 'Activo').length;
+    const graduados = trainerManagers.filter(m => normalizeManagerEstado(m.estado) === 'Graduado').length;
+    const desertores = trainerManagers.filter(m => normalizeManagerEstado(m.estado) === 'Desertor').length;
     const equipos = [...new Set(trainerManagers.map(m => m.equipo).filter(Boolean))];
     const sedes = [...new Set(trainerManagers.map(m => normalizeSede(m.sede)).filter(Boolean))];
     const asistieron = trainerManagers.filter(m => m.llamadaAsistio === 'SI').length;
@@ -748,9 +793,9 @@ export default function CentroManagers() {
       : managers;
 
     const total = baseList.length;
-    const graduados = baseList.filter(m => m.estado === 'Graduado').length;
-    const desertores = baseList.filter(m => m.estado === 'Desertor').length;
-    const activos = baseList.filter(m => m.estado === 'Activo').length;
+    const graduados = baseList.filter(m => normalizeManagerEstado(m.estado) === 'Graduado').length;
+    const desertores = baseList.filter(m => normalizeManagerEstado(m.estado) === 'Desertor').length;
+    const activos = baseList.filter(m => normalizeManagerEstado(m.estado) === 'Activo').length;
     const pct = total > 0 ? Math.round((graduados / total) * 100) : 0;
     return { total, graduados, desertores, activos, pct };
   }, [managers, viewAsTrainer, canViewAll, canViewOwnSede, currentTrainerName, currentUser]);
