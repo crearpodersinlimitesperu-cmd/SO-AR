@@ -448,6 +448,8 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
       isOptional: isOptional,
       periodicity: periodicity,
       createdBy: currentUser.email,
+      assignedByName: currentUser?.name || currentUser?.displayName || currentUser?.email || 'Dirección',
+      assignedByEmail: currentUser?.email || '',
       assignedToEmails: assignedEmails,
       assignedRoles: assignedRolesList.length > 0 ? assignedRolesList : (newTask.assignedRoles || []),
       assignedSede: computedSede,
