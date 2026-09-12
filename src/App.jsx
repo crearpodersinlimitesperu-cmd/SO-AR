@@ -429,6 +429,8 @@ function App() {
             </PrivateRoute>
           } />
           <Route path="/causa-vende" element={<Navigate to="/vende-sin-vender" replace />} />
+          <Route path="/actividadcoordinadores" element={<Navigate to="/auditoria-kpis" replace />} />
+          <Route path="/coordinadores-nodus" element={<Navigate to="/auditoria-kpis" replace />} />
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
