@@ -641,17 +641,45 @@ export default function CentroManagers() {
     // 4. Mapear cada equipo para su visualización y métricas
     let list = filteredByLifecycle.map(t => {
       const isTeamActive = t.activeMembers.length > 0;
-      const displayManagers = (groupLifecycleFilter === 'Activos') ? t.activeMembers : t.allMembers;
 
-      const asistieron = displayManagers.filter(m => m.llamadaAsistio === 'SI').length;
-      const noAsistieron = displayManagers.filter(m => m.llamadaAsistio === 'NO').length;
-      const total = displayManagers.length;
-      const pct = total > 0 ? Math.round((asistieron / total) * 100) : 0;
-      const hasCall = displayManagers.some(m => m.llamadaAsistio === 'SI' || m.llamadaAsistio === 'NO');
-      const entrenadoresArr = Array.from(t.entrenadores);
-      const entrenadorUnico = entrenadoresArr.length === 1 ? entrenadoresArr[0] : (entrenadoresArr.join(', ') || 'Sin Asignar');
+      // Desglose determinista de Capitanes (Activos y No Activos)
+      const allCapitanes = t.allMembers.filter(m => (m.rol || '').toLowerCase().includes('capitan'));
+      const capActivos = allCapitanes.filter(m => normalizeManagerEstado(m.estado) === 'Activo').length;
+      const capNoActivos = allCapitanes.filter(m => normalizeManagerEstado(m.estado) !== 'Activo').length;
+      const capTotal = allCapitanes.length;
+
+      // Desglose determinista de Managers (Activos y No Activos)
+      const allManagersOnly = t.allMembers.filter(m => !(m.rol || '').toLowerCase().includes('capitan'));
+      const mngActivos = allManagersOnly.filter(m => normalizeManagerEstado(m.estado) === 'Activo').length;
+      const mngNoActivos = allManagersOnly.filter(m => normalizeManagerEstado(m.estado) !== 'Activo').length;
+      const mngTotal = allManagersOnly.length;
+
+      // Totales del equipo
+      const totalActivos = capActivos + mngActivos;
+      const totalNoActivos = capNoActivos + mngNoActivos;
+      const totalMiembros = t.allMembers.length;
+
+      // Ordenar integrantes del equipo: primero Activos, luego Inactivos
+      const displayManagers = [...t.allMembers].sort((a, b) => {
+        const aAct = normalizeManagerEstado(a.estado) === 'Activo' ? 0 : 1;
+        const bAct = normalizeManagerEstado(b.estado) === 'Activo' ? 0 : 1;
+        return aAct - bAct;
+      });
+
       const capitanes = displayManagers.filter(m => (m.rol || '').toLowerCase().includes('capitan'));
       const managersOnly = displayManagers.filter(m => !(m.rol || '').toLowerCase().includes('capitan'));
+
+      // Evaluación de llamadas grupales enfocada en los miembros activos
+      const activeList = t.allMembers.filter(m => normalizeManagerEstado(m.estado) === 'Activo');
+      const targetEvaluation = activeList.length > 0 ? activeList : t.allMembers;
+      const asistieron = targetEvaluation.filter(m => m.llamadaAsistio === 'SI').length;
+      const noAsistieron = targetEvaluation.filter(m => m.llamadaAsistio === 'NO').length;
+      const total = targetEvaluation.length;
+      const pct = total > 0 ? Math.round((asistieron / total) * 100) : 0;
+      const hasCall = targetEvaluation.some(m => m.llamadaAsistio === 'SI' || m.llamadaAsistio === 'NO');
+
+      const entrenadoresArr = Array.from(t.entrenadores);
+      const entrenadorUnico = entrenadoresArr.length === 1 ? entrenadoresArr[0] : (entrenadoresArr.join(', ') || 'Sin Asignar');
 
       let statusType = 'Pendiente';
       if (hasCall) {
@@ -673,7 +701,17 @@ export default function CentroManagers() {
         pct,
         hasCall,
         statusType,
-        isTeamActive
+        isTeamActive,
+        // Métricas de composición activa vs inactiva
+        capActivos,
+        capNoActivos,
+        capTotal,
+        mngActivos,
+        mngNoActivos,
+        mngTotal,
+        totalActivos,
+        totalNoActivos,
+        totalMiembros
       };
     });
 
@@ -700,7 +738,23 @@ export default function CentroManagers() {
     let totalMngrs = groupTeams.reduce((acc, t) => acc + t.total, 0);
     let totalAsist = groupTeams.reduce((acc, t) => acc + t.asistieron, 0);
     let avgPct = totalMngrs > 0 ? Math.round((totalAsist / totalMngrs) * 100) : 0;
-    return { totalEq, conLlamada, totalMngrs, totalAsist, avgPct };
+
+    let totalCapActivos = groupTeams.reduce((acc, t) => acc + (t.capActivos || 0), 0);
+    let totalCapNoActivos = groupTeams.reduce((acc, t) => acc + (t.capNoActivos || 0), 0);
+    let totalMngActivos = groupTeams.reduce((acc, t) => acc + (t.mngActivos || 0), 0);
+    let totalMngNoActivos = groupTeams.reduce((acc, t) => acc + (t.mngNoActivos || 0), 0);
+
+    return { 
+      totalEq, 
+      conLlamada, 
+      totalMngrs, 
+      totalAsist, 
+      avgPct,
+      totalCapActivos,
+      totalCapNoActivos,
+      totalMngActivos,
+      totalMngNoActivos
+    };
   }, [groupTeams]);
 
   // Estadísticas por Sede (Tab: Sedes)
@@ -2424,12 +2478,38 @@ export default function CentroManagers() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             
             {/* KPI BAR GRUPAL */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
               <div style={{ background: bgCard, borderRadius: '12px', padding: '1.2rem', border: `1px solid ${borderLight}`, display: 'flex', alignItems: 'center', gap: '1rem', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
                 <div style={{ background: '#fef3c7', padding: '0.8rem', borderRadius: '10px', color: '#d97706' }}><Users size={24} /></div>
                 <div>
                   <div style={{ fontSize: '1.4rem', fontWeight: 800, color: textDark }}>{groupStats.totalEq}</div>
                   <div style={{ fontSize: '0.75rem', color: textMuted, fontWeight: 600 }}>Equipos ({groupLifecycleFilter})</div>
+                </div>
+              </div>
+              <div style={{ background: bgCard, borderRadius: '12px', padding: '1.2rem', border: `1px solid ${borderLight}`, display: 'flex', alignItems: 'center', gap: '1rem', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                <div style={{ background: '#fefce8', padding: '0.8rem', borderRadius: '10px', color: '#b45309' }}><Crown size={24} /></div>
+                <div>
+                  <div style={{ fontSize: '1.3rem', fontWeight: 800, color: '#854d0e', display: 'flex', alignItems: 'baseline', gap: '0.3rem' }}>
+                    <span>{groupStats.totalCapActivos}</span>
+                    <span style={{ fontSize: '0.78rem', color: textMuted, fontWeight: 600 }}>activos</span>
+                    {groupStats.totalCapNoActivos > 0 && (
+                      <span style={{ fontSize: '0.75rem', color: '#dc2626', fontWeight: 700 }}>• {groupStats.totalCapNoActivos} inact.</span>
+                    )}
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: textMuted, fontWeight: 600 }}>Capitanes ({groupStats.totalCapActivos + groupStats.totalCapNoActivos})</div>
+                </div>
+              </div>
+              <div style={{ background: bgCard, borderRadius: '12px', padding: '1.2rem', border: `1px solid ${borderLight}`, display: 'flex', alignItems: 'center', gap: '1rem', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                <div style={{ background: '#dbeafe', padding: '0.8rem', borderRadius: '10px', color: '#2563eb' }}><ShieldCheck size={24} /></div>
+                <div>
+                  <div style={{ fontSize: '1.3rem', fontWeight: 800, color: '#1d4ed8', display: 'flex', alignItems: 'baseline', gap: '0.3rem' }}>
+                    <span>{groupStats.totalMngActivos}</span>
+                    <span style={{ fontSize: '0.78rem', color: textMuted, fontWeight: 600 }}>activos</span>
+                    {groupStats.totalMngNoActivos > 0 && (
+                      <span style={{ fontSize: '0.75rem', color: '#dc2626', fontWeight: 700 }}>• {groupStats.totalMngNoActivos} inact.</span>
+                    )}
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: textMuted, fontWeight: 600 }}>Managers ({groupStats.totalMngActivos + groupStats.totalMngNoActivos})</div>
                 </div>
               </div>
               <div style={{ background: bgCard, borderRadius: '12px', padding: '1.2rem', border: `1px solid ${borderLight}`, display: 'flex', alignItems: 'center', gap: '1rem', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
@@ -2440,17 +2520,10 @@ export default function CentroManagers() {
                 </div>
               </div>
               <div style={{ background: bgCard, borderRadius: '12px', padding: '1.2rem', border: `1px solid ${borderLight}`, display: 'flex', alignItems: 'center', gap: '1rem', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-                <div style={{ background: '#dbeafe', padding: '0.8rem', borderRadius: '10px', color: '#2563eb' }}><PhoneCall size={24} /></div>
-                <div>
-                  <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#2563eb' }}>{groupStats.avgPct}%</div>
-                  <div style={{ fontSize: '0.75rem', color: textMuted, fontWeight: 600 }}>Asistencia Promedio</div>
-                </div>
-              </div>
-              <div style={{ background: bgCard, borderRadius: '12px', padding: '1.2rem', border: `1px solid ${borderLight}`, display: 'flex', alignItems: 'center', gap: '1rem', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
                 <div style={{ background: '#f3e8ff', padding: '0.8rem', borderRadius: '10px', color: '#7c3aed' }}><Award size={24} /></div>
                 <div>
                   <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#7c3aed' }}>{groupStats.totalAsist} / {groupStats.totalMngrs}</div>
-                  <div style={{ fontSize: '0.75rem', color: textMuted, fontWeight: 600 }}>Integrantes Conectados</div>
+                  <div style={{ fontSize: '0.75rem', color: textMuted, fontWeight: 600 }}>Integrantes Conectados ({groupStats.avgPct}%)</div>
                 </div>
               </div>
             </div>
@@ -2632,9 +2705,85 @@ export default function CentroManagers() {
                       </div>
 
                       {/* FECHA ULTIMA LLAMADA */}
-                      <div style={{ fontSize: '0.78rem', color: t.lastDate ? '#2563eb' : textMuted, background: '#f8fafc', padding: '0.4rem 0.8rem', borderRadius: '6px', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.4rem', border: `1px solid ${borderLight}` }}>
+                      <div style={{ fontSize: '0.78rem', color: t.lastDate ? '#2563eb' : textMuted, background: '#f8fafc', padding: '0.4rem 0.8rem', borderRadius: '6px', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.4rem', border: `1px solid ${borderLight}` }}>
                         <Calendar size={14} />
                         {t.lastDate ? <span>Última llamada: <strong>{t.lastDate}</strong></span> : <span>Sin llamadas grupales registradas aún</span>}
+                      </div>
+
+                      {/* COMPOSICIÓN DEL EQUIPO: CAPITANES Y MANAGERS (ACTIVOS Y NO ACTIVOS) */}
+                      <div style={{
+                        background: '#ffffff',
+                        border: `1px solid ${borderLight}`,
+                        borderRadius: '10px',
+                        padding: '0.65rem 0.8rem',
+                        marginBottom: '1rem',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '0.45rem',
+                        boxShadow: '0 1px 2px rgba(0,0,0,0.02)'
+                      }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.5rem' }}>
+                          {/* Tarjeta Capitanes */}
+                          <div style={{
+                            background: '#fefce8',
+                            border: '1px solid #fef08a',
+                            borderRadius: '8px',
+                            padding: '0.45rem 0.65rem',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '0.2rem'
+                          }}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                              <span style={{ fontSize: '0.74rem', fontWeight: 800, color: '#854d0e', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                                <Crown size={12} color="#b45309" /> Capitanes ({t.capTotal})
+                              </span>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.73rem' }}>
+                              <span style={{ color: '#15803d', fontWeight: 700 }}>
+                                🟢 {t.capActivos} activo{t.capActivos !== 1 ? 's' : ''}
+                              </span>
+                              <span style={{ color: textMuted }}>•</span>
+                              <span style={{ color: t.capNoActivos > 0 ? '#b91c1c' : textMuted, fontWeight: t.capNoActivos > 0 ? 700 : 500 }}>
+                                ⚪ {t.capNoActivos} no activo{t.capNoActivos !== 1 ? 's' : ''}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Tarjeta Managers */}
+                          <div style={{
+                            background: '#eff6ff',
+                            border: '1px solid #bfdbfe',
+                            borderRadius: '8px',
+                            padding: '0.45rem 0.65rem',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '0.2rem'
+                          }}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                              <span style={{ fontSize: '0.74rem', fontWeight: 800, color: '#1e40af', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                                <Users size={12} color="#2563eb" /> Managers ({t.mngTotal})
+                              </span>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.73rem' }}>
+                              <span style={{ color: '#15803d', fontWeight: 700 }}>
+                                🟢 {t.mngActivos} activo{t.mngActivos !== 1 ? 's' : ''}
+                              </span>
+                              <span style={{ color: textMuted }}>•</span>
+                              <span style={{ color: t.mngNoActivos > 0 ? '#b91c1c' : textMuted, fontWeight: t.mngNoActivos > 0 ? 700 : 500 }}>
+                                ⚪ {t.mngNoActivos} no activo{t.mngNoActivos !== 1 ? 's' : ''}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Fila Total Equipo */}
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.73rem', color: textMuted, paddingTop: '0.25rem', borderTop: `1px dashed ${borderLight}` }}>
+                          <span>Total Equipo: <strong style={{ color: textDark }}>{t.totalMiembros} integrante{t.totalMiembros !== 1 ? 's' : ''}</strong></span>
+                          <span>
+                            <strong style={{ color: '#16a34a' }}>{t.totalActivos} activos</strong>
+                            {t.totalNoActivos > 0 && <span> • <strong style={{ color: '#dc2626' }}>{t.totalNoActivos} no activos</strong></span>}
+                          </span>
+                        </div>
                       </div>
 
                       {/* LISTA DETALLADA DE INTEGRANTES DEL EQUIPO */}
@@ -2644,13 +2793,52 @@ export default function CentroManagers() {
                         {t.capitanes.map(m => {
                           const isAsistio = m.llamadaAsistio === 'SI';
                           const isNoAsistio = m.llamadaAsistio === 'NO';
+                          const normEstado = normalizeManagerEstado(m.estado);
+                          const isActivo = normEstado === 'Activo';
+
                           return (
-                            <div key={m.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.55rem 0.8rem', background: '#fefce8', border: '1px solid #fef08a', borderRadius: '8px', fontSize: '0.85rem' }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                            <div key={m.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.55rem 0.8rem', background: '#fefce8', border: '1px solid #fef08a', borderRadius: '8px', fontSize: '0.85rem', opacity: isActivo ? 1 : 0.78 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
                                 <span style={{ background: '#fef08a', color: '#854d0e', padding: '0.1rem 0.35rem', borderRadius: '4px', fontSize: '0.68rem', fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: '0.15rem' }}>
                                   <Crown size={11} color="#854d0e" /> Capitán
                                 </span>
                                 <span style={{ fontWeight: 700, color: '#713f12' }}>{m.nombre}</span>
+
+                                {/* Badge de Estado o Selector si tiene permiso */}
+                                {canChangeStatus ? (
+                                  <select
+                                    value={normEstado}
+                                    onChange={e => handleUpdateManagerField(m.id, 'estado', e.target.value)}
+                                    title="Cambiar estado del capitán"
+                                    style={{
+                                      padding: '0.12rem 0.35rem',
+                                      borderRadius: '4px',
+                                      border: `1px solid ${isActivo ? '#86efac' : normEstado === 'Graduado' ? '#7dd3fc' : '#fca5a5'}`,
+                                      background: isActivo ? '#dcfce7' : normEstado === 'Graduado' ? '#e0f2fe' : '#fee2e2',
+                                      color: isActivo ? '#15803d' : normEstado === 'Graduado' ? '#0369a1' : '#b91c1c',
+                                      fontWeight: 700,
+                                      fontSize: '0.68rem',
+                                      cursor: 'pointer'
+                                    }}
+                                  >
+                                    <option value="Activo">🟢 Activo</option>
+                                    <option value="Graduado">🎓 Graduado</option>
+                                    <option value="Desertor">🔴 Desertor</option>
+                                  </select>
+                                ) : (
+                                  <span style={{
+                                    fontSize: '0.68rem',
+                                    fontWeight: 700,
+                                    padding: '0.1rem 0.4rem',
+                                    borderRadius: '4px',
+                                    background: isActivo ? '#dcfce7' : normEstado === 'Graduado' ? '#e0f2fe' : normEstado === 'Desertor' ? '#fee2e2' : '#f1f5f9',
+                                    color: isActivo ? '#15803d' : normEstado === 'Graduado' ? '#0369a1' : normEstado === 'Desertor' ? '#b91c1c' : '#475569',
+                                    border: `1px solid ${isActivo ? '#86efac' : normEstado === 'Graduado' ? '#7dd3fc' : normEstado === 'Desertor' ? '#fca5a5' : '#cbd5e1'}`
+                                  }}>
+                                    {isActivo ? '🟢 Activo' : normEstado === 'Desertor' ? '🔴 Desertor' : normEstado === 'Graduado' ? '🎓 Graduado' : '⚪ ' + (m.estado || 'No Activo')}
+                                  </span>
+                                )}
+
                                 {m.telefono && (
                                   <a href={`${getWhatsAppUrl(m.telefono, m.sede || filterSede)}`} target="_blank" rel="noreferrer" title="Contactar por WhatsApp" style={{ color: '#10b981', textDecoration: 'none' }}>
                                     📱
@@ -2678,14 +2866,52 @@ export default function CentroManagers() {
                         {t.managersOnly.map(m => {
                           const isAsistio = m.llamadaAsistio === 'SI';
                           const isNoAsistio = m.llamadaAsistio === 'NO';
+                          const normEstado = normalizeManagerEstado(m.estado);
+                          const isActivo = normEstado === 'Activo';
                           const pillBg = isAsistio ? '#ecfdf5' : isNoAsistio ? '#fef2f2' : '#f8fafc';
                           const pillBorder = isAsistio ? '#a7f3d0' : isNoAsistio ? '#fecaca' : borderLight;
                           const pillText = isAsistio ? '#065f46' : isNoAsistio ? '#991b1b' : textDark;
 
                           return (
-                            <div key={m.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.5rem 0.8rem', background: pillBg, border: `1px solid ${pillBorder}`, borderRadius: '8px', fontSize: '0.85rem' }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <div key={m.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.5rem 0.8rem', background: pillBg, border: `1px solid ${pillBorder}`, borderRadius: '8px', fontSize: '0.85rem', opacity: isActivo ? 1 : 0.78 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', flexWrap: 'wrap' }}>
                                 <span style={{ fontWeight: 600, color: pillText }}>{m.nombre}</span>
+
+                                {/* Badge de Estado o Selector si tiene permiso */}
+                                {canChangeStatus ? (
+                                  <select
+                                    value={normEstado}
+                                    onChange={e => handleUpdateManagerField(m.id, 'estado', e.target.value)}
+                                    title="Cambiar estado del manager"
+                                    style={{
+                                      padding: '0.12rem 0.35rem',
+                                      borderRadius: '4px',
+                                      border: `1px solid ${isActivo ? '#86efac' : normEstado === 'Graduado' ? '#7dd3fc' : '#fca5a5'}`,
+                                      background: isActivo ? '#dcfce7' : normEstado === 'Graduado' ? '#e0f2fe' : '#fee2e2',
+                                      color: isActivo ? '#15803d' : normEstado === 'Graduado' ? '#0369a1' : '#b91c1c',
+                                      fontWeight: 700,
+                                      fontSize: '0.68rem',
+                                      cursor: 'pointer'
+                                    }}
+                                  >
+                                    <option value="Activo">🟢 Activo</option>
+                                    <option value="Graduado">🎓 Graduado</option>
+                                    <option value="Desertor">🔴 Desertor</option>
+                                  </select>
+                                ) : (
+                                  <span style={{
+                                    fontSize: '0.68rem',
+                                    fontWeight: 700,
+                                    padding: '0.1rem 0.4rem',
+                                    borderRadius: '4px',
+                                    background: isActivo ? '#dcfce7' : normEstado === 'Graduado' ? '#e0f2fe' : normEstado === 'Desertor' ? '#fee2e2' : '#f1f5f9',
+                                    color: isActivo ? '#15803d' : normEstado === 'Graduado' ? '#0369a1' : normEstado === 'Desertor' ? '#b91c1c' : '#475569',
+                                    border: `1px solid ${isActivo ? '#86efac' : normEstado === 'Graduado' ? '#7dd3fc' : normEstado === 'Desertor' ? '#fca5a5' : '#cbd5e1'}`
+                                  }}>
+                                    {isActivo ? '🟢 Activo' : normEstado === 'Desertor' ? '🔴 Desertor' : normEstado === 'Graduado' ? '🎓 Graduado' : '⚪ ' + (m.estado || 'No Activo')}
+                                  </span>
+                                )}
+
                                 {m.telefono && (
                                   <a href={`${getWhatsAppUrl(m.telefono, m.sede || filterSede)}`} target="_blank" rel="noreferrer" title="Contactar por WhatsApp" style={{ color: '#10b981', textDecoration: 'none' }}>
                                     📱
