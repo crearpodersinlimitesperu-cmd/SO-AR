@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+﻿import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../services/firebase';
 import { collection, query, limit, getDocs, where, getCountFromServer } from 'firebase/firestore';
@@ -15,8 +15,10 @@ import {
   crmGenealogyAgent, 
   SEDES_CATALOG, 
   normalizeSedeName, 
-  cleanEnrolador 
+  cleanEnrolador,
+  findGraduadoLineage 
 } from '../services/crmGenealogyAgent';
+import nodusEnroladosFallback from '../data/nodusEnroladosRecords.json';
 
 export default function CRMBaseMaster() {
   const navigate = useNavigate();
@@ -35,6 +37,13 @@ export default function CRMBaseMaster() {
   const [copiedAudit, setCopiedAudit] = useState(false);
   const [agentAuditReport, setAgentAuditReport] = useState(null);
   const [runningAgentAudit, setRunningAgentAudit] = useState(false);
+  const [selectedLineageFilter, setSelectedLineageFilter] = useState('ALL');
+  const [expandedTrayectoria, setExpandedTrayectoria] = useState({});
+
+  const toggleTrayectoria = (e, imoName) => {
+    e.stopPropagation();
+    setExpandedTrayectoria(prev => ({ ...prev, [imoName]: !prev[imoName] }));
+  };
 
   useEffect(() => {
     if (!hasAccess) return;
@@ -89,9 +98,42 @@ export default function CRMBaseMaster() {
           normalizedSede: normalizeSedeName(item.sede || item.ciudad)
         });
       });
-      setData(docs);
+      if (docs.length > 0) {
+        setData(docs);
+      } else if (nodusEnroladosFallback && nodusEnroladosFallback.length > 0) {
+        const fallbackDocs = nodusEnroladosFallback.map((item, idx) => ({
+          id: 'nodus_' + idx,
+          nombreCompleto: item.nombre,
+          dni: item.dni || item.documento || '',
+          telefono: item.telefono || '',
+          email: item.email || '',
+          sede: item.equipo && item.equipo.includes('LIMA') ? 'Lima' : (item.sede || 'Lima'),
+          estadoC1: (item.asistencia && item.asistencia.includes('Asist')) || (item.llamada1 && item.llamada1.includes('Confirmado')) ? 'SENTADO' : ((item.desertor && item.desertor !== '-') ? 'DESERTOR' : 'PENDIENTE'),
+          coordinadora: item.coordinador || 'Sin Asignar',
+          imoEnrolador: item.imo || 'INSCRIPCION DIRECTA CORPORATIVA',
+          equipo: item.equipo || 'EQUIPO 30 - LIMA CICLO 1 V',
+          normalizedSede: 'Lima'
+        }));
+        setData(fallbackDocs);
+      }
     } catch (e) {
       console.warn("Aviso cargando participantes Firestore:", e);
+      if (nodusEnroladosFallback && nodusEnroladosFallback.length > 0) {
+        const fallbackDocs = nodusEnroladosFallback.map((item, idx) => ({
+          id: 'nodus_' + idx,
+          nombreCompleto: item.nombre,
+          dni: item.dni || item.documento || '',
+          telefono: item.telefono || '',
+          email: item.email || '',
+          sede: item.equipo && item.equipo.includes('LIMA') ? 'Lima' : (item.sede || 'Lima'),
+          estadoC1: (item.asistencia && item.asistencia.includes('Asist')) || (item.llamada1 && item.llamada1.includes('Confirmado')) ? 'SENTADO' : ((item.desertor && item.desertor !== '-') ? 'DESERTOR' : 'PENDIENTE'),
+          coordinadora: item.coordinador || 'Sin Asignar',
+          imoEnrolador: item.imo || 'INSCRIPCION DIRECTA CORPORATIVA',
+          equipo: item.equipo || 'EQUIPO 30 - LIMA CICLO 1 V',
+          normalizedSede: 'Lima'
+        }));
+        setData(fallbackDocs);
+      }
     }
   };
 
@@ -287,18 +329,34 @@ export default function CRMBaseMaster() {
       grouped[enrolador].push(p);
     });
 
-    const arr = Object.keys(grouped).map(key => ({
-      imoName: key,
-      participants: grouped[key],
-      totalSentados: grouped[key].filter(p => (p.estadoC1 || '').toUpperCase().includes('SENTADO')).length,
-      totalPendientes: grouped[key].filter(p => (p.estadoC1 || '').toUpperCase().includes('PENDIENTE')).length,
-      hasDuplicates: grouped[key].some(p => agentAnalysis.duplicateIdsSet.has(p.id))
-    }));
+    let arr = Object.keys(grouped).map(key => {
+      const lineage = findGraduadoLineage(key);
+      return {
+        imoName: key,
+        participants: grouped[key],
+        totalSentados: grouped[key].filter(p => (p.estadoC1 || '').toUpperCase().includes('SENTADO')).length,
+        totalPendientes: grouped[key].filter(p => (p.estadoC1 || '').toUpperCase().includes('PENDIENTE')).length,
+        hasDuplicates: grouped[key].some(p => agentAnalysis.duplicateIdsSet.has(p.id)),
+        lineage: lineage || null,
+        equipoOriginal: lineage && lineage.equipoOriginal ? 'E' + lineage.equipoOriginal : null,
+        totalRoles: lineage ? lineage.totalParticipaciones : 0
+      };
+    });
+
+    // Filtro por Linaje
+    if (selectedLineageFilter === 'GRADUADOS_ONLY') {
+      arr = arr.filter(node => node.lineage !== null);
+    } else if (selectedLineageFilter === 'WITH_SERVICE') {
+      arr = arr.filter(node => node.lineage && node.lineage.totalParticipaciones > 0);
+    } else if (selectedLineageFilter.startsWith('E')) {
+      const targetEq = selectedLineageFilter.toUpperCase();
+      arr = arr.filter(node => node.equipoOriginal === targetEq);
+    }
 
     // Ordenar: mayor cantidad de participantes primero
     arr.sort((a, b) => b.participants.length - a.participants.length);
     return arr;
-  }, [agentAnalysis, searchTerm, filterDuplicatesOnly]);
+  }, [agentAnalysis, searchTerm, filterDuplicatesOnly, selectedLineageFilter]);
 
   const toggleNode = (imoName) => {
     setExpandedNodes(prev => ({ ...prev, [imoName]: !prev[imoName] }));
@@ -508,21 +566,118 @@ export default function CRMBaseMaster() {
         {/* CONTENIDO 1: ÁRBOL GENEALÓGICO */}
         {activeTab === 'tree' && (
           <div style={{ background: bgCard, border: `1px solid ${borderSubtle}`, borderRadius: '12px', overflow: 'hidden' }}>
+            
+            {/* BANNER DE CRUCE GENEALOGICO DE GRADUADOS LIMA */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.8rem', padding: '1rem', background: 'rgba(212,175,55,0.04)', borderBottom: `1px solid ${borderSubtle}` }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.7rem' }}>
+                <Award size={24} color={gold} />
+                <div>
+                  <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', color: gold, fontWeight: 800 }}>IMOs con Linaje Verificado</div>
+                  <div style={{ fontSize: '1.25rem', fontWeight: 800, color: textMain }}>
+                    {agentAuditReport?.lineageAudit?.imosGraduadosActivos || 57} LÃ­deres
+                  </div>
+                  <div style={{ fontSize: '0.7rem', color: textMuted }}>Graduados CPSL activos en Nodus</div>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.7rem' }}>
+                <Sparkles size={24} color="#34d399" />
+                <div>
+                  <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', color: '#34d399', fontWeight: 800 }}>Enrolados Graduados</div>
+                  <div style={{ fontSize: '1.25rem', fontWeight: 800, color: textMain }}>
+                    {agentAuditReport?.lineageAudit?.participantesGraduadosActivos || 73} Participantes
+                  </div>
+                  <div style={{ fontSize: '0.7rem', color: textMuted }}>Reentrenamiento / MaestrÃ­a</div>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.7rem' }}>
+                <TrendingUp size={24} color="#818cf8" />
+                <div>
+                  <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', color: '#818cf8', fontWeight: 800 }}>Generaciones LÃ­deres</div>
+                  <div style={{ fontSize: '1rem', fontWeight: 800, color: textMain }}>
+                    E26 (13) â€¢ E27 (11) â€¢ E25 (7)
+                  </div>
+                  <div style={{ fontSize: '0.7rem', color: textMuted }}>LÃ­deres de red por promociÃ³n</div>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.7rem' }}>
+                <Database size={24} color="#38bdf8" />
+                <div>
+                  <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', color: '#38bdf8', fontWeight: 800 }}>Base HistÃ³rica Lima</div>
+                  <div style={{ fontSize: '1.25rem', fontWeight: 800, color: textMain }}>
+                    399 Creadores
+                  </div>
+                  <div style={{ fontSize: '0.7rem', color: textMuted }}>E4 a E39 (Graduados Oficial)</div>
+                </div>
+              </div>
+            </div>
+
+            {/* BARRA DE BUSQUEDA Y FILTROS DEL ARBOL */}
             <div style={{ padding: '1.2rem', borderBottom: `1px solid ${borderSubtle}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-              <div style={{ position: 'relative', width: '100%', maxWidth: '550px' }}>
+              <div style={{ position: 'relative', width: '100%', maxWidth: '500px' }}>
                 <Search size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: textMuted }} />
                 <input 
                   type="text" 
-                  placeholder="Buscar por DNI, Nombre, Teléfono, Correo, Sede, Equipo, Coordinadora o IMO..." 
+                  placeholder="Buscar por DNI, Nombre, TelÃ©fono, Correo, Sede, Equipo, Coordinadora o IMO..." 
                   value={searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
                   style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 2.8rem', background: bgInput, border: `1px solid ${borderSubtle}`, color: textMain, borderRadius: '8px', fontSize: '0.9rem', outline: 'none' }}
                 />
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <span style={{ fontSize: '0.8rem', color: gold, fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                    <Award size={14} /> Linaje:
+                  </span>
+                  <select
+                    value={selectedLineageFilter}
+                    onChange={e => setSelectedLineageFilter(e.target.value)}
+                    style={{
+                      background: bgInput,
+                      border: `1px solid ${borderSubtle}`,
+                      color: textMain,
+                      padding: '0.45rem 0.8rem',
+                      borderRadius: '8px',
+                      fontSize: '0.8rem',
+                      fontWeight: 600,
+                      outline: 'none',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <option value="ALL">Todos los Linajes (Global)</option>
+                    <option value="GRADUADOS_ONLY">â­ Solo IMOs Graduados (CPSL Lima)</option>
+                    <option value="WITH_SERVICE">ðŸ‘” Solo con Servicio (M / C / Q / A)</option>
+                    <optgroup label="Filtrar por Equipo Original">
+                      <option value="E27">Equipo 27 (11 IMOs)</option>
+                      <option value="E26">Equipo 26 (13 IMOs)</option>
+                      <option value="E25">Equipo 25 (7 IMOs)</option>
+                      <option value="E24">Equipo 24 (6 IMOs)</option>
+                      <option value="E23">Equipo 23 (3 IMOs)</option>
+                      <option value="E22">Equipo 22 (4 IMOs)</option>
+                      <option value="E21">Equipo 21 (2 IMOs)</option>
+                      <option value="E20">Equipo 20 (1 IMO)</option>
+                      <option value="E19">Equipo 19 (2 IMOs)</option>
+                      <option value="E18">Equipo 18 (2 IMOs)</option>
+                      <option value="E17">Equipo 17 (3 IMOs)</option>
+                      <option value="E16">Equipo 16</option>
+                      <option value="E15">Equipo 15 (1 IMO)</option>
+                      <option value="E13">Equipo 13 (2 IMOs)</option>
+                      <option value="E11">Equipo 11 (1 IMO)</option>
+                      <option value="E10">Equipo 10 (1 IMO)</option>
+                      <option value="E8">Equipo 8</option>
+                      <option value="E7">Equipo 7</option>
+                      <option value="E6">Equipo 6</option>
+                      <option value="E5">Equipo 5</option>
+                      <option value="E4">Equipo 4</option>
+                    </optgroup>
+                  </select>
+                </div>
+
                 <div style={{ fontSize: '0.85rem', color: textMuted }}>
-                  Mostrando red en: <strong style={{ color: gold }}>{selectedSedeObj.flag} {selectedSedeObj.label}</strong>
+                  Sede: <strong style={{ color: gold }}>{selectedSedeObj.flag} {selectedSedeObj.label}</strong>
                 </div>
 
                 <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: textMuted, fontSize: '0.85rem', cursor: 'pointer' }}>
@@ -532,7 +687,7 @@ export default function CRMBaseMaster() {
                     onChange={e => setFilterDuplicatesOnly(e.target.checked)} 
                     style={{ accentColor: '#f43f5e', cursor: 'pointer' }}
                   />
-                  Mostrar solo nodos con duplicados
+                  Solo duplicados
                 </label>
               </div>
             </div>
@@ -541,12 +696,12 @@ export default function CRMBaseMaster() {
               {loading ? (
                 <div style={{ padding: '4rem', textAlign: 'center', color: textMuted }}>
                   <RefreshCw size={32} style={{ display: 'block', margin: '0 auto 1rem', animation: 'spin 1s linear infinite' }} />
-                  Estructurando Árbol Genealógico Multi-Sede y cruzando con Nodus...
+                  Estructurando Ãrbol GenealÃ³gico Multi-Sede y cruzando con Graduados Nodus...
                 </div>
               ) : treeData.length === 0 ? (
                 <div style={{ padding: '4rem', textAlign: 'center', color: textMuted }}>
                   <Users size={40} style={{ margin: '0 auto 1rem', display: 'block', opacity: 0.4 }} />
-                  No se encontraron conexiones genealógicas para <strong>{selectedSedeObj.label}</strong> con los filtros actuales.
+                  No se encontraron conexiones genealÃ³gicas para <strong>{selectedSedeObj.label}</strong> con los filtros actuales.
                 </div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -556,7 +711,7 @@ export default function CRMBaseMaster() {
 
                     return (
                       <div key={node.imoName} style={{ border: `1px solid ${borderSubtle}`, borderRadius: '8px', overflow: 'hidden', background: 'rgba(255,255,255,0.01)' }}>
-                        {/* RAÍZ DEL IMO */}
+                        {/* RAIZ DEL IMO */}
                         <div 
                           onClick={() => toggleNode(node.imoName)}
                           style={{ padding: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', background: isExpanded ? 'rgba(255,255,255,0.04)' : 'transparent', transition: 'background 0.2s', flexWrap: 'wrap', gap: '0.8rem' }}
@@ -567,23 +722,97 @@ export default function CRMBaseMaster() {
                             </div>
                             {isDirecto ? (
                               <ShieldCheck size={20} color="#3b82f6" />
+                            ) : node.lineage ? (
+                              <Award size={22} color={gold} />
                             ) : (
-                              <Award size={20} color={gold} />
+                              <Award size={20} color={textMuted} />
                             )}
                             <div>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
                                 <h3 style={{ margin: 0, fontSize: '1rem', color: isDirecto ? '#93c5fd' : textMain }}>
                                   {node.imoName}
                                 </h3>
+
+                                {/* BADGES DE LINAJE Y SERVICIO HISTORICO */}
+                                {node.lineage && (
+                                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', flexWrap: 'wrap' }}>
+                                    <span style={{ 
+                                      background: 'linear-gradient(135deg, rgba(212,175,55,0.25), rgba(245,158,11,0.15))', 
+                                      border: '1px solid rgba(245,158,11,0.5)', 
+                                      color: '#fbbf24', 
+                                      padding: '0.15rem 0.5rem', 
+                                      borderRadius: '6px', 
+                                      fontSize: '0.72rem', 
+                                      fontWeight: 800,
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      gap: '0.2rem'
+                                    }}>
+                                      ðŸŽ“ Orig: {node.equipoOriginal} (Lima)
+                                    </span>
+
+                                    {node.lineage.rolesSummary?.manager > 0 && (
+                                      <span style={{ background: 'rgba(245,158,11,0.12)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.3)', padding: '0.1rem 0.4rem', borderRadius: '6px', fontSize: '0.68rem', fontWeight: 700 }}>
+                                        ðŸ‘” Manager ({node.lineage.rolesSummary.manager})
+                                      </span>
+                                    )}
+                                    {node.lineage.rolesSummary?.coordinador > 0 && (
+                                      <span style={{ background: 'rgba(168,85,247,0.12)', color: '#c084fc', border: '1px solid rgba(168,85,247,0.3)', padding: '0.1rem 0.4rem', borderRadius: '6px', fontSize: '0.68rem', fontWeight: 700 }}>
+                                        ðŸ§­ Coord ({node.lineage.rolesSummary.coordinador})
+                                      </span>
+                                    )}
+                                    {node.lineage.rolesSummary?.staff > 0 && (
+                                      <span style={{ background: 'rgba(6,182,212,0.12)', color: '#22d3ee', border: '1px solid rgba(6,182,212,0.3)', padding: '0.1rem 0.4rem', borderRadius: '6px', fontSize: '0.68rem', fontWeight: 700 }}>
+                                        âš¡ Quantum ({node.lineage.rolesSummary.staff})
+                                      </span>
+                                    )}
+                                    {node.lineage.rolesSummary?.aliado > 0 && (
+                                      <span style={{ background: 'rgba(16,185,129,0.12)', color: '#34d399', border: '1px solid rgba(16,185,129,0.3)', padding: '0.1rem 0.4rem', borderRadius: '6px', fontSize: '0.68rem', fontWeight: 700 }}>
+                                        ðŸ¤ Aliado ({node.lineage.rolesSummary.aliado})
+                                      </span>
+                                    )}
+                                  </div>
+                                )}
+
                                 {node.hasDuplicates && (
                                   <span style={{ background: 'rgba(244,63,94,0.15)', color: '#fb7185', padding: '0.15rem 0.5rem', borderRadius: '10px', fontSize: '0.65rem', fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
                                     <AlertTriangle size={10} /> Duplicado detectado
                                   </span>
                                 )}
                               </div>
-                              <div style={{ fontSize: '0.75rem', color: textMuted, marginTop: '0.15rem' }}>
-                                {isDirecto ? 'Asignación Directa / Mesa de Control' : 'Líder de Red (IMO)'}
+
+                              <div style={{ fontSize: '0.75rem', color: textMuted, marginTop: '0.2rem', display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                <span>{isDirecto ? 'AsignaciÃ³n Directa / Mesa de Control' : 'LÃ­der de Red (IMO)'}</span>
+                                {node.lineage && node.lineage.totalParticipaciones > 0 && (
+                                  <button 
+                                    type="button"
+                                    onClick={(e) => toggleTrayectoria(e, node.imoName)}
+                                    style={{ 
+                                      background: 'none', 
+                                      border: 'none', 
+                                      color: '#38bdf8', 
+                                      cursor: 'pointer', 
+                                      fontSize: '0.72rem', 
+                                      textDecoration: 'underline',
+                                      padding: 0
+                                    }}
+                                  >
+                                    {expandedTrayectoria[node.imoName] ? 'Ocultar Trayectoria' : 'Ver Trayectoria (' + node.lineage.totalParticipaciones + ' servicios)'}
+                                  </button>
+                                )}
                               </div>
+
+                              {/* HISTORIAL EXPANDIDO DE EDICIONES */}
+                              {expandedTrayectoria[node.imoName] && node.lineage?.participaciones?.length > 0 && (
+                                <div style={{ marginTop: '0.4rem', padding: '0.4rem 0.6rem', background: 'rgba(0,0,0,0.3)', borderRadius: '6px', fontSize: '0.72rem', color: '#e2e8f0', display: 'flex', gap: '0.4rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                                  <strong style={{ color: gold }}>Historial CPSL:</strong>
+                                  {node.lineage.participaciones.map((part, pIdx) => (
+                                    <span key={pIdx} style={{ background: 'rgba(255,255,255,0.06)', padding: '0.1rem 0.35rem', borderRadius: '4px', border: `1px solid ${borderSubtle}` }}>
+                                      {part.edicion}: {part.rolLabel}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
                             </div>
                           </div>
 
@@ -617,12 +846,30 @@ export default function CRMBaseMaster() {
                                 <tbody>
                                   {node.participants.map((p, idx) => {
                                     const isDup = agentAnalysis.duplicateIdsSet.has(p.id);
+                                    const pLineage = findGraduadoLineage(p.nombreCompleto || p.nombre);
+
                                     return (
                                       <tr key={p.id} style={{ borderBottom: idx === node.participants.length - 1 ? 'none' : `1px solid ${borderSubtle}`, background: isDup ? 'rgba(244,63,94,0.05)' : 'transparent' }}>
                                         <td style={{ padding: '0.75rem 1rem' }}>
-                                          <div style={{ fontWeight: 600, color: isDup ? '#fda4af' : '#e2e8f0', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                                            {p.nombreCompleto || p.nombre}
+                                          <div style={{ fontWeight: 600, color: isDup ? '#fda4af' : '#e2e8f0', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
+                                            <span>{p.nombreCompleto || p.nombre}</span>
                                             {isDup && <span style={{ fontSize: '0.65rem', background: '#f43f5e', color: '#fff', padding: '0.1rem 0.4rem', borderRadius: '4px' }}>DUPLICADO</span>}
+                                            {pLineage && (
+                                              <span style={{ 
+                                                background: 'rgba(139,92,246,0.18)', 
+                                                color: '#c4b5fd', 
+                                                border: '1px solid rgba(139,92,246,0.4)', 
+                                                padding: '0.1rem 0.45rem', 
+                                                borderRadius: '6px', 
+                                                fontSize: '0.68rem', 
+                                                fontWeight: 700,
+                                                display: 'inline-flex',
+                                                alignItems: 'center',
+                                                gap: '0.2rem'
+                                              }} title={'Graduado de Equipo ' + pLineage.equipoOriginal + (pLineage.ultimoRol ? ' | Ãšltimo rol: ' + pLineage.ultimoRol : '')}>
+                                                ðŸŽ“ Graduado E{pLineage.equipoOriginal}
+                                              </span>
+                                            )}
                                           </div>
                                           <div style={{ fontSize: '0.7rem', color: textMuted, marginTop: '0.15rem' }}>DNI: {p.dni || p.documento || '-'}</div>
                                         </td>
@@ -630,7 +877,7 @@ export default function CRMBaseMaster() {
                                           {getSedeBadge(p.sede || p.ciudad)}
                                         </td>
                                         <td style={{ padding: '0.75rem 1rem' }}>
-                                          <div style={{ fontSize: '0.85rem', color: '#cbd5e1' }}>{p.telefono || p.celular || 'Sin teléfono'}</div>
+                                          <div style={{ fontSize: '0.85rem', color: '#cbd5e1' }}>{p.telefono || p.celular || 'Sin telÃ©fono'}</div>
                                           <div style={{ fontSize: '0.75rem', color: textMuted }}>{p.email || p.correo || 'Sin correo'}</div>
                                         </td>
                                         <td style={{ padding: '0.75rem 1rem' }}>
@@ -655,9 +902,7 @@ export default function CRMBaseMaster() {
             </div>
           </div>
         )}
-
-        {/* CONTENIDO 2: AUDITORÍA DE DUPLICADOS */}
-        {activeTab === 'duplicates' && (
+{activeTab === 'duplicates' && (
           <div style={{ background: bgCard, border: `1px solid ${borderSubtle}`, borderRadius: '12px', padding: '1.5rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
               <div>
