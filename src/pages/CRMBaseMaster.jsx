@@ -161,13 +161,36 @@ export default function CRMBaseMaster() {
       list = list.filter(p => agentAnalysis.duplicateIdsSet.has(p.id));
     }
 
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      list = list.filter(p => 
-        (p.nombreCompleto || '').toLowerCase().includes(term) ||
-        (p.dni || '').toLowerCase().includes(term) ||
-        (p.imoEnrolador || '').toLowerCase().includes(term)
-      );
+    if (searchTerm && searchTerm.trim()) {
+      const rawTerm = searchTerm.toLowerCase().trim();
+      const term = rawTerm.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      const cleanPhoneTerm = rawTerm.replace(/[^0-9]/g, '');
+
+      list = list.filter(p => {
+        const nom = (p.nombreCompleto || p.nombre || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        const dni = (p.dni || p.documento || '').toLowerCase();
+        const imo = (p.imoEnrolador || p.imo || p.enrolador || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        const cleanImo = cleanEnroladorName(p.imoEnrolador).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        const email = (p.email || p.correo || '').toLowerCase();
+        const phone = (p.telefono || p.celular || p.phone || '').replace(/[^0-9]/g, '');
+        const sede = (p.sede || p.ciudad || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        const equipo = (p.equipo || p.equipoNumero || p.team || '').toLowerCase();
+        const coord = (p.coordinadora || p.coordinador || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        const estado = (p.estadoC1 || p.estado || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+        return (
+          nom.includes(term) ||
+          dni.includes(term) ||
+          imo.includes(term) ||
+          cleanImo.includes(term) ||
+          email.includes(term) ||
+          (cleanPhoneTerm.length >= 3 && phone.includes(cleanPhoneTerm)) ||
+          sede.includes(term) ||
+          equipo.includes(term) ||
+          coord.includes(term) ||
+          estado.includes(term)
+        );
+      });
     }
 
     const grouped = {};
@@ -310,7 +333,7 @@ export default function CRMBaseMaster() {
                 <Search size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: textMuted }} />
                 <input 
                   type="text" 
-                  placeholder="Buscar por DNI, Nombre de IMO o Enrolado..." 
+                  placeholder="Buscar por DNI, Nombre, Teléfono, Correo, Sede, Equipo, Coordinadora o IMO..." 
                   value={searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
                   style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 2.8rem', background: bgInput, border: `1px solid ${borderSubtle}`, color: textMain, borderRadius: '8px', fontSize: '0.9rem', outline: 'none' }}
