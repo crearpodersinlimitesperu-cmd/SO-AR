@@ -1,8 +1,8 @@
-﻿import React, { useState, useEffect } from 'react';
+﻿﻿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
-import { canAccessMonitorVuelos, canAccessSistemaCartas } from '../config/permissions';
+import { canAccessMonitorVuelos, canAccessSistemaCartas, canAccessPagosSemanalesDrive } from '../config/permissions';
 import {
   Plane,
   FileText,
@@ -402,6 +402,19 @@ const OFICIAL_LETTERS = [
     vuelos: ['LA 1437', 'AV 108', 'LA 1449']
   },
 
+  {
+    id: 'carpeta-pagos-semanales-lima',
+    entrenador: 'Gerencia de Lima (JosÃ© SÃ¡nchez)',
+    rol: 'Gerente de Sede',
+    equipo: 'PAGOS SEMANALES LIMA',
+    sede: 'Lima',
+    url: 'https://drive.google.com/drive/folders/1c3wkWITxPTdtvZ41o-MTcftRPkQtmpgi?usp=drive_link',
+    badge: 'PAGOS SEMANALES LIMA',
+    fecha: 'Acceso Exclusivo Gerente',
+    descripcion: 'Carpeta oficial de liquidaciÃ³n y pagos semanales restringida exclusivamente para el Gerente de Lima.',
+    vuelos: [],
+    soloGerenteLima: true
+  },
   // SEDE QUITO
   {
     id: 'carta-mike-boada-uio',
@@ -827,6 +840,10 @@ export default function MonitorVuelosCartas() {
 
   // Filtro de cartas según Sede seleccionada y búsqueda
   const filteredLetters = OFICIAL_LETTERS.filter(l => {
+    // Si la carta o recurso es exclusivo para Gerente de Lima
+    if (l.soloGerenteLima && !canAccessPagosSemanalesDrive(currentUser)) {
+      return false;
+    }
     if (selectedSede !== 'TODAS') {
       if (l.sede.toLowerCase() !== selectedSede.toLowerCase()) return false;
     }
