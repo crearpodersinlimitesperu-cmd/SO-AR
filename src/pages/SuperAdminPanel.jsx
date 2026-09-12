@@ -124,10 +124,8 @@ function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, curre
   }).length;
 
   const pct = myTasks.length > 0 ? Math.round((completed / myTasks.length) * 100) : 0;
-  const canonicalRole = normalizeRole(person.role);
   const roleColor = ROLE_COLORS[canonicalRole] || '#6b7280';
   const isInactive = person.isActive === false || person.status === 'inactive' || person.active === false;
-  const normalizedSedeName = normalizeSede(person.sede);
 
   // Selector de WhatsApp seguro y canónico: reutiliza la misma función que
   // ya usa el resto de la app (phoneUtils.getWhatsAppUrl), probando los distintos
