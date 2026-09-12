@@ -206,12 +206,47 @@ export function AuthProvider({ children }) {
   };
 
   const buildUserObject = (user, foundUser, normalizedEmail) => {
-    const canonicalRole = normalizeRole(foundUser.role);
+    // 0. Respaldo fidedigno contra el catálogo oficial corporativo para erradicar colapsos de cargos
+    const officialProfile = findUserByAnyEmail(normalizedEmail) || (foundUser?.email ? findUserByAnyEmail(foundUser.email) : null);
+    
+    let canonicalRole = normalizeRole(officialProfile?.role || foundUser.role);
     const isSuperAdmin = isSuperAdminEmail(normalizedEmail) || isSuperAdminEmail(foundUser.email);
+    const isDualTrainer = DUAL_ROLE_TRAINER_EMAILS.includes(normalizedEmail);
+    const isOfficialCoord = Boolean(
+      officialProfile && ['coord_c1', 'coord_maestria', 'director_maestria'].includes(canonicalRole)
+    );
 
-    let assignedRoles = [canonicalRole];
-    if (foundUser.roles && foundUser.roles.length > 0) {
-      assignedRoles = foundUser.roles.map(r => normalizeRole(r));
+    let assignedRoles = [];
+
+    if (officialProfile) {
+      // Si el usuario existe en el catálogo corporativo maestro, sus roles oficiales mandan
+      const baseOfficialRoles = (officialProfile.roles || [officialProfile.role]).map(r => normalizeRole(r));
+      assignedRoles = [...baseOfficialRoles];
+
+      // Inyectar dual role autorizado de entrenador si aplica
+      if (isDualTrainer && !assignedRoles.includes('entrenador')) {
+        assignedRoles.push('entrenador');
+      }
+
+      // Si es un coordinador oficial de sede, purgar categóricamente roles cruzados espurios
+      if (isOfficialCoord) {
+        assignedRoles = assignedRoles.filter(r => r !== 'coordinador');
+        if (!isDualTrainer) {
+          assignedRoles = assignedRoles.filter(r => r !== 'entrenador');
+        }
+        if (!officialProfile.roles || !officialProfile.roles.includes('manager')) {
+          assignedRoles = assignedRoles.filter(r => r !== 'manager');
+        }
+      }
+    } else {
+      // Usuario sin perfil en catálogo oficial
+      assignedRoles = [canonicalRole];
+      if (foundUser.roles && foundUser.roles.length > 0) {
+        assignedRoles = foundUser.roles.map(r => normalizeRole(r));
+      }
+      if (isDualTrainer && !assignedRoles.includes('entrenador')) {
+        assignedRoles.push('entrenador');
+      }
     }
 
     // Filtrar roles inválidos (null = roles que no son del sistema, como 'student')
@@ -224,11 +259,12 @@ export function AuthProvider({ children }) {
       if (!assignedRoles.includes('consolidado')) assignedRoles.push('consolidado');
     }
 
-    // 🔥 GOBERNANZA: Si es un Entrenador Dual (ej. Andres Gomez) y por base de datos no tiene
-    // el array de roles, se inyecta obligatoriamente 'entrenador' para activar el selector.
-    if (DUAL_ROLE_TRAINER_EMAILS.includes(normalizedEmail)) {
-      if (!assignedRoles.includes('entrenador')) {
-        assignedRoles.push('entrenador');
+    // Asegurar que no quede 'coordinador' administrativo si el usuario tiene un cargo específico
+    const hasSpecificRole = assignedRoles.some(r => ['coord_c1', 'coord_maestria', 'director_maestria', 'gerente', 'cfo', 'direccion'].includes(r));
+    if (hasSpecificRole) {
+      // Únicamente la cuenta oficial de coordinación administrativa puede tener 'coordinador'
+      if (normalizedEmail !== 'coordinacion.administrativa@crearpsl.net') {
+        assignedRoles = assignedRoles.filter(r => r !== 'coordinador');
       }
     }
 
