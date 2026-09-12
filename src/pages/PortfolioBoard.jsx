@@ -256,7 +256,7 @@ export default function PortfolioBoard() {
         let ciclosReales = [
           { 
             id: 1, 
-            name: ${selectedSede} - Convocatoria C1 (Base Asignada Nodus), 
+            name: `${selectedSede} - Convocatoria C1 (Base Asignada Nodus)`, 
             progress: progress || 0, 
             health: health, 
             date: new Date().toLocaleDateString('es-ES', { month: 'short', day: 'numeric', year: 'numeric' }), 
@@ -2141,4 +2141,5 @@ ${coord.coachingFeedback}`;
     </div>
   );
 }
+
 
