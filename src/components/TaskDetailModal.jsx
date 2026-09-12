@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { 
   X, CheckCircle2, Clock, Calendar, AlertCircle, 
   ExternalLink, Link as LinkIcon, Plus, Trash2, Edit3,
-  Send, Sparkles, User, FileText, Check, ShieldCheck,
+  Send, Sparkles, User, FileText, Check, ShieldCheck, ShieldAlert,
   TrendingUp, RefreshCw, UploadCloud, Paperclip, FileCheck,
   FolderPlus, Loader2, UserPlus, MessageSquare,
   Users, UserCheck, CheckSquare, Square
@@ -13,7 +13,7 @@ import { useUI } from '../context/UIContext';
 import { getFlagForSede } from '../utils/flags';
 import { uploadEvidenceDocument } from '../services/googleDriveService';
 import { celebrateVictory } from '../utils/neuroFeedback';
-import { usersData } from '../data/usersData';
+import { usersData, isForeignTask } from '../data/usersData';
 const getCountdown = (deadlineIso) => {
   if (!deadlineIso) return { label: 'Sin fecha límite', color: '#9ca3af', bg: 'rgba(156,163,175,0.12)', border: '#9ca3af', overdue: false };
   const deadline = new Date(deadlineIso).getTime();
@@ -298,6 +298,7 @@ export default function TaskDetailModal({
   const userEmail = (currentUser?.email || '').toLowerCase().trim();
   const taskCreatorEmail = (task.createdBy || '').toLowerCase().trim();
   const isCreator = Boolean(taskCreatorEmail && userEmail === taskCreatorEmail);
+  const isForeign = isForeignTask(task, currentUser);
 
   // Formateo de asignados
   // Formateo de asignados y lÃ³gica de avance colaborativo
@@ -479,6 +480,10 @@ export default function TaskDetailModal({
 
   // Alternar estado completada
   const handleToggleCompleted = () => {
+    if (isForeign && !isCompleted && !currentUser?.isSuperAdmin) {
+      showToast('⚠️ No puedes completar esta tarea porque pertenece a otra sede y no te fue asignada.', 'warning');
+      return;
+    }
     const nextCompleted = !isCompleted;
     setIsCompleted(nextCompleted);
     if (nextCompleted && progress < 100) {
@@ -594,12 +599,12 @@ export default function TaskDetailModal({
                 fontWeight: 800,
                 padding: '0.2rem 0.6rem',
                 borderRadius: '12px',
-                background: isCreator ? 'rgba(41, 171, 226, 0.2)' : 'rgba(255, 193, 7, 0.2)',
-                color: isCreator ? 'var(--crear-cyan)' : '#ffc107',
-                border: `1px solid ${isCreator ? 'rgba(41, 171, 226, 0.45)' : 'rgba(255, 193, 7, 0.45)'}`,
+                background: isForeign ? 'rgba(239, 68, 68, 0.2)' : isCreator ? 'rgba(41, 171, 226, 0.2)' : 'rgba(255, 193, 7, 0.2)',
+                color: isForeign ? '#f87171' : isCreator ? 'var(--crear-cyan)' : '#ffc107',
+                border: `1px solid ${isForeign ? 'rgba(239, 68, 68, 0.45)' : isCreator ? 'rgba(41, 171, 226, 0.45)' : 'rgba(255, 193, 7, 0.45)'}`,
                 letterSpacing: '0.5px'
               }}>
-                {isCreator ? '→ TÚ ASIGNASTE ESTA TAREA' : '← TE ASIGNARON ESTA TAREA'}
+                {isForeign ? '📍 TAREA DE OTRA SEDE / NO ASIGNADA A TI' : isCreator ? '→ TÚ ASIGNASTE ESTA TAREA' : '← TE ASIGNARON ESTA TAREA'}
               </span>
 
               {task.priority && (
@@ -616,7 +621,7 @@ export default function TaskDetailModal({
                 </span>
               )}
 
-              {task.sede && (
+              {(task.assignedSede || task.sede) && (
                 <span style={{
                   fontSize: '0.72rem',
                   fontWeight: 700,
@@ -626,10 +631,32 @@ export default function TaskDetailModal({
                   color: 'var(--crear-gold)',
                   border: '1px solid rgba(212, 175, 55, 0.25)'
                 }}>
-                  {getFlagForSede(task.sede)} {task.sede}
+                  {getFlagForSede(task.assignedSede || task.sede)} {task.assignedSede || task.sede}
                 </span>
               )}
             </div>
+
+            {/* BANNER PREVENTIVO SI ES TAREA FORÁNEA */}
+            {isForeign && (
+              <div style={{
+                marginBottom: '0.8rem',
+                background: 'rgba(239, 68, 68, 0.1)',
+                border: '1px solid rgba(239, 68, 68, 0.35)',
+                borderRadius: '8px',
+                padding: '0.65rem 0.85rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.6rem',
+                color: '#fca5a5',
+                fontSize: '0.78rem',
+                lineHeight: 1.4
+              }}>
+                <ShieldAlert size={18} color="#ef4444" style={{ flexShrink: 0 }} />
+                <div>
+                  <strong style={{ color: '#ffffff' }}>Atención de Gobernanza:</strong> Esta tarea pertenece a <strong>Sede {task.assignedSede || task.sede || 'Externa'}</strong> y no fue creada ni asignada a ti. La visualizas en modo de supervisión para no interferir con las operaciones de esa sede.
+                </div>
+              </div>
+            )}
 
             {/* TÍTULO DE LA TAREA */}
             <h2 style={{
@@ -1762,23 +1789,31 @@ export default function TaskDetailModal({
             <button
               type="button"
               onClick={isMultiAssignee && myAssigneeEntry ? handleToggleMyPart : handleToggleCompleted}
+              disabled={isForeign && !currentUser?.isSuperAdmin}
               style={{
                 padding: '0.55rem 1rem',
                 borderRadius: '8px',
                 fontSize: '0.85rem',
                 fontWeight: 700,
-                cursor: 'pointer',
+                cursor: (isForeign && !currentUser?.isSuperAdmin) ? 'not-allowed' : 'pointer',
+                opacity: (isForeign && !currentUser?.isSuperAdmin) ? 0.6 : 1,
                 border: `1px solid ${
                   (isMultiAssignee && myAssigneeEntry ? myCompleted : isCompleted) 
                     ? 'rgba(239, 68, 68, 0.4)' 
-                    : 'rgba(16, 185, 129, 0.4)'
+                    : isForeign
+                      ? 'rgba(239, 68, 68, 0.4)'
+                      : 'rgba(16, 185, 129, 0.4)'
                 }`,
                 background: (isMultiAssignee && myAssigneeEntry ? myCompleted : isCompleted) 
                   ? 'rgba(239, 68, 68, 0.15)' 
-                  : 'rgba(16, 185, 129, 0.18)',
+                  : isForeign
+                    ? 'rgba(239, 68, 68, 0.12)'
+                    : 'rgba(16, 185, 129, 0.18)',
                 color: (isMultiAssignee && myAssigneeEntry ? myCompleted : isCompleted) 
                   ? '#f87171' 
-                  : '#10b981',
+                  : isForeign
+                    ? '#fca5a5'
+                    : '#10b981',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.4rem',
@@ -1788,7 +1823,7 @@ export default function TaskDetailModal({
               <CheckCircle2 size={16} />
               {isMultiAssignee && myAssigneeEntry 
                 ? (myCompleted ? 'Reabrir Mi Parte' : 'Marcar Mi Parte Completada')
-                : (isCompleted ? 'Reabrir Tarea' : 'Marcar Completada')}
+                : (isCompleted ? 'Reabrir Tarea' : isForeign ? 'Completar Bloqueado (Otra Sede)' : 'Marcar Completada')}
             </button>
             {isCreator && onEditTaskParams && (
               <button
@@ -1866,3 +1901,4 @@ export default function TaskDetailModal({
     </div>
   );
 }
+
