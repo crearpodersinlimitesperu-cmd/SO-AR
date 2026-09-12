@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import { initializeApp } from 'firebase/app';
 import { getFirestore, doc, setDoc } from 'firebase/firestore';
+import { usersToImport } from '../src/data/usersToImport.js';
 
 // Cargar variables de entorno
 dotenv.config();
@@ -114,17 +115,44 @@ async function syncQTSheet() {
       }
 
       const uid = 'qt_' + cleanId(name);
-      const userRef = doc(db, 'users', uid);
       
-      await setDoc(userRef, {
+      // 1. Guardar en la colección especializada qt_directory
+      const qtRef = doc(db, 'qt_directory', uid);
+      await setDoc(qtRef, {
         id: uid,
-        name: name,
+        index: updatedCount + 1,
+        nombre: name,
         role: 'qt',
+        roles: ['qt'],
         sede: sede,
+        email: email,
         emails: [email],
         updatedAt: new Date().toISOString(),
         source: 'qtSyncDaemon'
       }, { merge: true });
+
+      // 2. Verificar si el usuario ya es personal oficial corporativo o directivo en usersToImport
+      const officialUser = usersToImport.find(u => 
+        (u.email && u.email.toLowerCase() === email) ||
+        (u.name && u.name.toLowerCase() === name.toLowerCase())
+      );
+
+      // Si es directivo/coordinador oficial, NO sobreescribir su rol como 'qt' en users para evitar colapsos
+      const isOfficialStaff = officialUser && officialUser.role !== 'qt';
+
+      if (!isOfficialStaff) {
+        const userRef = doc(db, 'users', uid);
+        await setDoc(userRef, {
+          id: uid,
+          name: name,
+          role: 'qt',
+          roles: ['qt'],
+          sede: sede,
+          emails: [email],
+          updatedAt: new Date().toISOString(),
+          source: 'qtSyncDaemon'
+        }, { merge: true });
+      }
       
       updatedCount++;
     }
