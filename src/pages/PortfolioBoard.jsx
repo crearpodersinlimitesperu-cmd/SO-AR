@@ -946,19 +946,19 @@ export default function PortfolioBoard() {
                         <tr style={{ background: bgLight, borderBottom: `1px solid ${borderLight}` }}>
                           <td colSpan="5" style={{ padding: '1.5rem', borderLeft: `4px solid ${p.health === 'good' ? '#10b981' : p.health === 'warning' ? '#f59e0b' : '#ef4444'}` }}>
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem' }}>
-                              <div style={{ background: bgCard, padding: '1rem', borderRadius: '8px', border: 1px solid  }}>
+                              <div style={{ background: bgCard, padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
                                 <div style={{ fontSize: '0.7rem', color: textMuted, textTransform: 'uppercase', fontWeight: 700 }}>Cartera Asignada</div>
                                 <div style={{ fontSize: '1.2rem', fontWeight: 800, color: textDark }}>{p.details.totalParticipantes} <span style={{ fontSize: '0.75rem', fontWeight: 500, color: textMuted }}>prospectos</span></div>
                               </div>
-                              <div style={{ background: bgCard, padding: '1rem', borderRadius: '8px', border: 1px solid  }}>
+                              <div style={{ background: bgCard, padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
                                 <div style={{ fontSize: '0.7rem', color: textMuted, textTransform: 'uppercase', fontWeight: 700 }}>Confirmados a Sala</div>
                                 <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#10b981' }}>{p.details.totalEnrolados} <span style={{ fontSize: '0.75rem', fontWeight: 500, color: textMuted }}>enrolados</span></div>
                               </div>
-                              <div style={{ background: bgCard, padding: '1rem', borderRadius: '8px', border: 1px solid  }}>
+                              <div style={{ background: bgCard, padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
                                 <div style={{ fontSize: '0.7rem', color: textMuted, textTransform: 'uppercase', fontWeight: 700 }}>En GestiÃ³n TelefÃ³nica</div>
                                 <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#3b82f6' }}>{p.details.totalEnGestion} <span style={{ fontSize: '0.75rem', fontWeight: 500, color: textMuted }}>contactos</span></div>
                               </div>
-                              <div style={{ background: bgCard, padding: '1rem', borderRadius: '8px', border: 1px solid  }}>
+                              <div style={{ background: bgCard, padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
                                 <div style={{ fontSize: '0.7rem', color: textMuted, textTransform: 'uppercase', fontWeight: 700 }}>Pendientes por Llamar</div>
                                 <div style={{ fontSize: '1.2rem', fontWeight: 800, color: p.details.totalSinContactar > 0 ? '#f59e0b' : '#10b981' }}>{p.details.totalSinContactar} <span style={{ fontSize: '0.75rem', fontWeight: 500, color: textMuted }}>base virgen</span></div>
                               </div>
@@ -2141,5 +2141,6 @@ ${coord.coachingFeedback}`;
     </div>
   );
 }
+
 
 
