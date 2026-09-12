@@ -242,5 +242,53 @@ Permite a directores, coordinadores y managers auditar en tiempo real el avance 
 
 ---
 
+## 9. ðŸ¤– Agente 9: Centinela de Seguimiento a Metas y Llamadas Nodus (Efectivo, Real y Confiable)
+
+### 9.1. MisiÃ³n Operativa y Problema Resuelto
+* **Problema:** En el panel `/metas`, las metas de liderazgo y operativas ("Managers - MJ - CreaciÃ³n", "Managers - MJ - RelaciÃ³n", "Sentados en Sala") aparecÃ­an en `0 de 8` o `0 de 10` (0%) debido a que no existÃ­a un agente que alimentara y auditara automÃ¡ticamente el avance a partir de los datos vivos de Nodus y las llamadas de coordinadoras y entrenadores.
+* **MisiÃ³n:** Establecer un agente centinela 100% efectivo, real y confiable, sin alucinaciones, que audita en tiempo real cada meta contra las fuentes de Nodus (`nodus_coordinadores_c1c2`, `managersData.js`, `kpisEntrenadoresData.json`, `SEGUIMIENTO_EQUIPOS.json`), deduplica registros mediante hashing matemÃ¡tico y permite la sincronizaciÃ³n instantÃ¡nea con rollup automÃ¡tico hacia la meta global del ciclo.
+
+### 9.2. Arquitectura de Confiabilidad y Hashing Anti-Redundancia
+* **Protocolo de Unicidad Determinista:**
+  Para evitar duplicados y contar gestiones mÃºltiples como un solo resultado operativo, se implementÃ³ el algoritmo SHA-256:
+  ```text
+  hash = sha256(tipo_registro + ":" + sede + ":" + escuadra + ":" + id_entidad + ":" + fecha + ":" + etapa)
+  ```
+* **Mapeo de Metas vs. Fuentes Reales de Nodus:**
+  1. **Managers CreaciÃ³n (MJ):**
+     * Fuente: `managersData.js` (`managers_directory`).
+     * DetecciÃ³n Lima Equipo 30: 10 Managers activos registrados y asignados a sus respectivos entrenadores.
+  2. **Managers RelaciÃ³n (MJ):**
+     * Fuente: `managersData.js` (`managers_directory`).
+     * DetecciÃ³n Lima Equipo 30: 8 Managers de relaciÃ³n activos.
+  3. **Llamadas y Gestiones de Seguimiento:**
+     * Fuente: `kpisEntrenadoresData.json` (5,402 llamadas en total; 215 llamadas especÃ­ficas para Lima Equipo 30) y `nodus_coordinadores_c1c2` (249 gestiones: 105 confirmados, 22 por confirmar, 122 no asisten).
+  4. **Sentados en Sala:**
+     * Fuente: `SEGUIMIENTO_EQUIPOS.json` y `kpisLima.json`.
+     * DetecciÃ³n Lima Equipo 30: 94 sentados que culminaron sala con 49.7% de efectividad de sala.
+
+### 9.3. Componentes Implementados
+* **`src/services/goalsSentinelAgent.js`:**
+  * Motor analÃ­tico para la aplicaciÃ³n web.
+  * Funciones exportadas: `auditSingleGoal(goal, parentGoal, context)`, `auditAllGoals(goals, parentsMap, context)`, `generateEntityHash(type, id, date, payload)`.
+  * Calcula discrepancias, semÃ¡foros (`AL_DIA`, `PENDIENTE_SYNC`, `DESACTUALIZADO`, `EN_RIESGO`), efectividad de llamadas y genera el plan de actualizaciÃ³n.
+* **`scripts/nodusGoalsSentinelAgent.mjs`:**
+  * Script autÃ³nomo ejecutable vÃ­a Node.js / CLI / GitHub Actions.
+  * Conecta a Firebase Admin SDK con Service Account, inspecciona la colecciÃ³n `goals`, detecta discrepancias contra Nodus y realiza la actualizaciÃ³n en lote registrando la bitÃ¡cora en `goals_sentinel_audits`.
+* **`src/pages/GoalsBoard.jsx` (UI Integrada):**
+  * **CÃ¡psula del Agente en Cada Meta:** Inserta un badge de auditorÃ­a en tiempo real con el estado de avance detectado en Nodus y el botÃ³n de acciÃ³n rÃ¡pida `âš¡ Sincronizar Avance Real (X/Target)`.
+  * **BotÃ³n de Cabecera:** `ðŸ¤– Agente Centinela Nodus` con indicador de estado y contador de metas pendientes.
+  * **Consola Interactiva del Agente Centinela (`showSentinelModal`):**
+    * Tarjetas de mÃ©tricas globales (Metas Evaluadas, Metas al DÃ­a, Pendientes, Total Llamadas).
+    * BotÃ³n maestro `ðŸš€ Sincronizar Todas las Metas con Nodus`.
+    * Tabla interactiva con desglose de discrepancias, hashes anti-duplicados y botÃ³n individual por meta.
+  * **Rollup AutomÃ¡tico:** Al sincronizar cualquier meta, `performRollUp` recalcula automÃ¡ticamente el promedio ponderado de la meta padre ("Meta Global del Ciclo").
+
+### 9.4. BitÃ¡cora de AuditorÃ­a en Firestore
+* **ColecciÃ³n:** `goals_sentinel_audits`.
+* **Campos Registrados:** `goalId`, `goalTitle`, `sede`, `teamNum`, `syncedBy`, `syncedAt`, `previousValue`, `newValue`, `progress`, `auditHash`, `sources`.
+
+---
+
 > 📜 **Mandato de la Caja Negra:**
 > Esta Caja Negra es la fuente viva de verdad de CPSL y Causa OS. Debe consultarse antes de cualquier cambio de arquitectura y actualizarse de inmediato tras cada nueva funcionalidad, regla o descubrimiento operativo.
