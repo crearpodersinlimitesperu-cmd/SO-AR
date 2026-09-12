@@ -7,13 +7,14 @@ import { useCycles } from '../context/CyclesContext';
 import { useUI } from '../context/UIContext';
 
 import { roles } from '../data/checklistData';
-import { usersData, normalizeRole, normalizeSede, ROLE_COLORS, ROLE_DISPLAY_NAMES, getRoleDisplayName } from '../data/usersData';
+import { usersData, normalizeRole, normalizeSede, OPERATIONAL_SEDES, isForeignTask, ROLE_COLORS, ROLE_DISPLAY_NAMES, getRoleDisplayName } from '../data/usersData';
 import { calculateAutomaticDeadline } from '../utils/soarDates';
-import { ArrowLeft, Target, Link as LinkIcon, Edit3, Clock, ShieldAlert, Users, Sparkles } from 'lucide-react';
+import { ArrowLeft, Target, Link as LinkIcon, Edit3, Clock, ShieldAlert, Users, Sparkles, MapPin } from 'lucide-react';
 import TaskAssignmentModal from '../components/TaskAssignmentModal';
 import TaskCollaborationModal from '../components/TaskCollaborationModal';
 import LearningReflectionModal from '../components/LearningReflectionModal';
 import TaskCompletionChoiceModal from '../components/TaskCompletionChoiceModal';
+import ForeignTaskWarningModal from '../components/ForeignTaskWarningModal';
 import NewExcellenceModal from '../components/NewExcellenceModal';
 import SyncHistoryModal from '../components/SyncHistoryModal';
 import TaskDetailModal from '../components/TaskDetailModal';
@@ -84,6 +85,16 @@ export default function ChecklistBoard() {
   }, [searchParams]);
 
   const { currentUser } = useAuth();
+  const [foreignTaskForWarning, setForeignTaskForWarning] = useState(null);
+  const userSedeNorm = currentUser?.sede ? normalizeSede(currentUser.sede) : null;
+  const [selectedSedeFilter, setSelectedSedeFilter] = useState(() => {
+    // Si el usuario tiene una sede operativa (ej. Lima), filtramos por su sede por defecto
+    if (userSedeNorm && userSedeNorm !== 'Sede Global') {
+      return userSedeNorm;
+    }
+    return 'all';
+  });
+
   const { tasks, toggleTask, updateTaskDetails, inviteCollaborator, syncTasksToGoogle, updateIndividualProgress, acceptCollaboration, rejectCollaboration } = useChecklist();
   const { currentCycle, currentStage } = useCycles();
   const { showPrompt } = useUI();
@@ -118,9 +129,24 @@ export default function ChecklistBoard() {
     const isCollaborator = t.collaborators?.some(c => c.toLowerCase() === userEmailCom || c.toLowerCase() === userEmailNet);
     const isMyCreation = t.createdBy?.toLowerCase() === userEmailCom || t.createdBy?.toLowerCase() === userEmailNet;
 
-    // SuperAdmin o Dirección tienen visibilidad completa
+    // SuperAdmin o Dirección tienen visibilidad de supervisión pero respetando el filtro de sede seleccionado
     if (currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.appRole === 'direccion') {
-      return normalizeRole(t.role) === roleId || isAssigned || isCollaborator || isMyCreation;
+      const matchesRole = normalizeRole(t.role) === roleId || isAssigned || isCollaborator || isMyCreation;
+      if (!matchesRole) return false;
+
+      // Si tiene seleccionado un filtro de sede específico (ej. 'Lima')
+      if (selectedSedeFilter && selectedSedeFilter !== 'all') {
+        const taskSede = t.assignedSede || t.sede;
+        // Si la tarea tiene sede específica que no coincide con la sede seleccionada,
+        // no se muestra en este tablero A MENOS que esté explícitamente asignada al usuario o creada por él
+        if (taskSede && taskSede !== 'Global' && taskSede !== 'Sede Global') {
+          const normTaskSede = normalizeSede(taskSede);
+          if (normTaskSede !== selectedSedeFilter && !isAssigned && !isMyCreation && !isCollaborator) {
+            return false;
+          }
+        }
+      }
+      return true;
     }
 
     // 1. GOBERNANZA DE DELEGACIÓN NOMINAL:
@@ -245,9 +271,33 @@ export default function ChecklistBoard() {
       return;
     }
 
+    // GOBERNANZA: Si la tarea pertenece a otra sede y no la asignó ni se la asignaron a él:
+    // Mostrar advertencia obligatoria y no permitir completarla de manera directa
+    if (isForeignTask(task, currentUser)) {
+      setForeignTaskForWarning(task);
+      return;
+    }
+
     // Si la tarea se está completando: permitir elegir en 1 clic
     // si desea solo completarla a máxima velocidad o compartir su experiencia
     setTaskForCompletionChoice(task);
+  };
+
+  const handleForceCompleteForeignTask = async (task) => {
+    if (!task) return;
+    try {
+      setProcessingTasks(prev => new Set(prev).add(task.id));
+      await toggleTask(task.id, false);
+      celebrateVictory();
+    } catch (err) {
+      console.error("Error al forzar completado de tarea ajena:", err);
+    } finally {
+      setProcessingTasks(prev => {
+        const next = new Set(prev);
+        next.delete(task.id);
+        return next;
+      });
+    }
   };
 
   const handleExecuteCompleteOnly = async (task) => {
@@ -328,11 +378,43 @@ export default function ChecklistBoard() {
 
       <div className="glass-panel" style={{ padding: '2rem', marginBottom: '2rem' }}>
         <h1 className="text-gold uppercase" style={{ fontSize: '1.8rem', margin: '0 0 0.5rem 0' }}>{role.name}</h1>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-          <p className={filterParam ? "text-blue" : "text-muted"} style={{ margin: 0, fontWeight: filterParam ? 'bold' : 'normal' }}>
-            {viewTitle}
-          </p>
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+          <div>
+            <p className={filterParam ? "text-blue" : "text-muted"} style={{ margin: 0, fontWeight: filterParam ? 'bold' : 'normal' }}>
+              {viewTitle}
+            </p>
+            {/* SELECTOR DE SEDE PARA SUPERADMIN / DIRECCIÓN */}
+            {(currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.appRole === 'direccion') && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.4rem', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>📍 Filtrar por Sede:</span>
+                <select
+                  value={selectedSedeFilter}
+                  onChange={(e) => setSelectedSedeFilter(e.target.value)}
+                  style={{
+                    background: 'rgba(15, 23, 42, 0.9)',
+                    border: '1px solid rgba(255, 183, 3, 0.45)',
+                    color: '#f8fafc',
+                    padding: '0.25rem 0.6rem',
+                    borderRadius: '6px',
+                    fontSize: '0.78rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    outline: 'none'
+                  }}
+                >
+                  {userSedeNorm && userSedeNorm !== 'Sede Global' && (
+                    <option value={userSedeNorm}>📍 Mi Sede ({userSedeNorm})</option>
+                  )}
+                  <option value="all">🌐 Todas las Sedes (SuperAdmin)</option>
+                  {OPERATIONAL_SEDES.map(s => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                  <option value="Global">Sede Global / Institucional</option>
+                </select>
+              </div>
+            )}
+          </div>
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
             {filterParam && (
               <button onClick={() => setSearchParams({})} style={{ background: 'none', border: '1px solid rgba(255,255,255,0.2)', color: 'var(--text-muted)', padding: '0.3rem 0.8rem', borderRadius: '4px', fontSize: '0.8rem', cursor: 'pointer' }}>
                 Limpiar Filtro
@@ -577,8 +659,11 @@ export default function ChecklistBoard() {
             )}
           </div>
         ) : (
-          activeTasks.map(task => (
-            <div key={task.id} className="glass-panel hover-glow" style={{ padding: '1.5rem', borderLeft: `4px solid ${getPriorityColor(task.priority)}`, opacity: task.completed ? 0.6 : 1, transition: 'all 0.3s' }}>
+          activeTasks.map(task => {
+            const isForeign = isForeignTask(task, currentUser);
+            const taskSede = task.assignedSede || task.sede;
+            return (
+            <div key={task.id} className="glass-panel hover-glow" style={{ padding: '1.5rem', borderLeft: `4px solid ${isForeign ? '#ef4444' : getPriorityColor(task.priority)}`, opacity: task.completed ? 0.6 : 1, transition: 'all 0.3s' }}>
               
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
                 <div style={{ flex: 1, display: 'flex', gap: '1rem' }}>
@@ -590,6 +675,35 @@ export default function ChecklistBoard() {
                     style={{ width: '20px', height: '20px', cursor: processingTasks.has(task.id) ? 'wait' : 'pointer', marginTop: '3px', opacity: processingTasks.has(task.id) ? 0.5 : 1 }}
                   />
                   <div>
+                    {isForeign && (
+                      <div style={{ marginBottom: '0.45rem', display: 'flex', gap: '0.4rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                        <span style={{
+                          fontSize: '0.72rem',
+                          fontWeight: 800,
+                          color: '#f87171',
+                          background: 'rgba(239, 68, 68, 0.15)',
+                          border: '1px solid rgba(239, 68, 68, 0.35)',
+                          padding: '2px 8px',
+                          borderRadius: '6px',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}>
+                          📍 Sede {taskSede || 'Externa'} • Tarea de Otra Sede
+                        </span>
+                        <span style={{
+                          fontSize: '0.72rem',
+                          fontWeight: 700,
+                          color: '#f59e0b',
+                          background: 'rgba(245, 158, 11, 0.12)',
+                          border: '1px solid rgba(245, 158, 11, 0.3)',
+                          padding: '2px 7px',
+                          borderRadius: '6px'
+                        }}>
+                          ⚠️ No asignada a ti
+                        </span>
+                      </div>
+                    )}
                     <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1rem' }}>
                       <h3 
                         className={task.completed ? 'text-muted' : 'text-white'} 
@@ -694,7 +808,7 @@ export default function ChecklistBoard() {
                       );
                     })()}
 
-                    {/* MOSTRAR QUIÉN ASIGNÓ LA TAREA (COLOR POR ROL) */}
+                    {/* MOSTRAR QUIÉN ASIGNÓ LA TAREA (COLOR POR ROL Y SEDE) */}
                     {task.createdBy && (task.assignedToEmail || (task.assignedToEmails && task.assignedToEmails.length > 0)) && (() => {
                       const creator = usersData.find(u => u.email === task.createdBy);
                       // Solo mostramos 'Delegado por' si el creador no es uno de los asignados
@@ -703,17 +817,37 @@ export default function ChecklistBoard() {
                         const cRole = normalizeRole(creator.role);
                         const roleColor = ROLE_COLORS[cRole] || '#6b7280';
                         const roleName = ROLE_DISPLAY_NAMES[cRole] || creator.role;
+                        const creatorSede = creator.sede ? normalizeSede(creator.sede) : (task.assignedSede || task.sede);
                         return (
-                          <div style={{ marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.75rem' }}>
+                          <div style={{ marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.75rem', flexWrap: 'wrap' }}>
                             <span style={{ color: 'var(--text-muted)' }}>Asignado por:</span>
                             <span style={{ padding: '0.15rem 0.4rem', borderRadius: '4px', background: `${roleColor}15`, color: roleColor, border: `1px solid ${roleColor}40`, fontWeight: 'bold' }}>
                               {roleName} ({creator.name.split(' ')[0]})
                             </span>
+                            {creatorSede && creatorSede !== 'Sede Global' && (
+                              <span style={{ color: '#f59e0b', fontSize: '0.72rem', fontWeight: 600 }}>
+                                • Sede {creatorSede}
+                              </span>
+                            )}
                           </div>
                         );
                       }
                       return null;
                     })()}
+
+                    {task.assignedByName && !task.createdBy && (
+                      <div style={{ marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.75rem', flexWrap: 'wrap' }}>
+                        <span style={{ color: 'var(--text-muted)' }}>Asignado por:</span>
+                        <span style={{ padding: '0.15rem 0.4rem', borderRadius: '4px', background: 'rgba(255,255,255,0.08)', color: '#fff', border: '1px solid rgba(255,255,255,0.2)', fontWeight: 'bold' }}>
+                          {task.assignedByName}
+                        </span>
+                        {(task.assignedSede || task.sede) && (
+                          <span style={{ color: '#f59e0b', fontSize: '0.72rem', fontWeight: 600 }}>
+                            • Sede {task.assignedSede || task.sede}
+                          </span>
+                        )}
+                      </div>
+                    )}
 
                     {(task.notes || task.description || task.comments || task.evidenceUrl) && (
                       <div style={{ marginTop: '0.8rem', padding: '0.75rem 0.85rem', background: 'rgba(0,0,0,0.3)', borderRadius: '6px', fontSize: '0.82rem', borderLeft: '3px solid var(--crear-gold)' }}>
@@ -905,7 +1039,8 @@ export default function ChecklistBoard() {
                 </div>
               )}
             </div>
-          ))
+            );
+          })
         )}
       </div>
 
@@ -924,6 +1059,15 @@ export default function ChecklistBoard() {
         onClose={() => setShowCollabModal(false)}
         task={selectedTaskForCollab}
         onSendInvitation={inviteCollaborator}
+      />
+
+      {/* MODAL DE ADVERTENCIA PARA TAREAS DE OTRA SEDE / NO ASIGNADAS */}
+      <ForeignTaskWarningModal
+        isOpen={Boolean(foreignTaskForWarning)}
+        task={foreignTaskForWarning}
+        currentUser={currentUser}
+        onClose={() => setForeignTaskForWarning(null)}
+        onForceComplete={handleForceCompleteForeignTask}
       />
 
       {/* MODAL DE ELECCIÓN RÁPIDA: COMPLETAR TAREA VS COMPARTIR EXPERIENCIA */}
@@ -975,3 +1119,4 @@ export default function ChecklistBoard() {
     </div>
   );
 }
+
