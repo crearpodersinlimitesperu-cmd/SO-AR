@@ -1557,6 +1557,7 @@ export default function GoalsBoard() {
               <FileSpreadsheet size={16} />
               <span>{syncingLima ? 'Sincronizando...' : 'Sincronizar Graduados Lima'}</span>
             </button>
+          )}
 
           {/* BOTÃ“N AGENTE CENTINELA DE METAS Y LLAMADAS NODUS */}
           <button
@@ -1621,7 +1622,6 @@ export default function GoalsBoard() {
               );
             })()}
           </button>
-          )}
 
           {currentUser?.appRole === 'gerente' && (
             <div style={{ display: 'flex', gap: '1rem' }}>
