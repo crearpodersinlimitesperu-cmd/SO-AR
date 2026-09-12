@@ -313,13 +313,13 @@ Permite a directores, coordinadores y managers auditar en tiempo real el avance 
   - `MEX` (Ciudad de México): Aeropuerto Internacional Benito Juárez.
   - `MDE` (Medellín): Aeropuerto Internacional José María Córdova.
   - `CUN` (Cancún), `MIA` (Miami), `IAH` (Houston), `SAN` (San Diego), `MAD` (Madrid).
-* **Logística Asignada Automáticamente por Sede:**
-  - **Guayaquil:** Hotel Wyndham Guayaquil (Puerto Santa Ana) | Chofer asignado con cartel CPSL en arribos Olmedo GYE.
-  - **Quito:** Fortaleza Cuántica / Swissôtel Quito | Chofer asignado con cartel CPSL en UIO.
-  - **Cuenca:** Hotel Oro Verde Cuenca | Traslado coordinado en aeropuerto CUE.
-  - **Lima:** Hotel Jose Antonio Deluxe Miraflores | Chofer asignado en arribos internacionales LIM.
-  - **Medellín:** Hotel Dann Carlton Belfort Medellín | Arribos MDE.
-  - **México:** Hotel Fiesta Americana Reforma | Arribos MEX.
+* **Logística Asignada por Sede (Depuración y Verificación Estricta):**
+  - **Lima:** Hotel José Antonio Deluxe Miraflores (Calle Bellavista 133, Miraflores) | Chofer asignado en arribos Jorge Chávez LIM. *(Verificado mediante comprobantes oficiales en Drive)*.
+  - **Quito:** CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito) | Chofer asignado con cartel CPSL en UIO. *(Sede propia oficial, retirado Swissôtel)*.
+  - **Guayaquil:** Sede Guayaquil (Hospedaje por coordinar con Dirección de Sede) | Bienvenida y traslado en aeropuerto GYE. *(Retirado Wyndham por ser dato no registrado en Drive)*.
+  - **Cuenca:** Sede Cuenca (Hospedaje por coordinar con Dirección de Sede) | Traslado coordinado en aeropuerto CUE. *(Retirado Oro Verde por ser dato no registrado en Drive)*.
+  - **Medellín:** Sede Medellín (Hospedaje por coordinar con Dirección de Sede) | Traslado en arribos MDE. *(Retirado Dann Carlton por ser dato no registrado en Drive)*.
+  - **México:** Sede Ciudad de México (Hospedaje por coordinar con Dirección de Sede) | Arribos MEX. *(Retirado Fiesta Americana por ser dato no registrado en Drive)*.
 * **Normalización de Entrenadores:**
   El motor resuelve nombres formales y variantes de archivo (`Mike Boada` ➔ `Michael Andrés Boada Rubiano`, `Mauricio Pérez`, `Elmer Andrés Idrobo`, `Lourdes Patiño`, `Ana Monroy`, `Juan Ángel Arreola`, `Alonso Solares`, `Leandro Brunis`, `Mildred Muñoz`, `Carlos Brunis`, `Diego Bravo`, `Fernando Aragón`, `Ernesto Díaz Pabón`, `Cirilo Martínez`, etc.).
 
