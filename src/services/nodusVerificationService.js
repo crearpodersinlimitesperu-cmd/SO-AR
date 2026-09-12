@@ -10,7 +10,7 @@
 
 import baseRecords from '../data/nodusEnroladosRecords.json';
 import { db } from './firebase';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, collection, onSnapshot } from 'firebase/firestore';
 
 // Función para normalizar texto (sin tildes, sin puntuación innecesaria, mayúsculas)
 export const normText = (s) => {
@@ -24,36 +24,36 @@ export const normText = (s) => {
     .trim();
 };
 
-// Normalizar teléfonos a los últimos 9 dígitos
-export const normPhone = (s) => {
-  if (!s) return '';
-  const digits = String(s).replace(/\D/g, '');
-  if (digits.length >= 9) return digits.slice(-9);
+// Normalizar teléfono (extraer los últimos 9 dígitos para Perú o los dígitos puros)
+export const normPhone = (p) => {
+  if (!p) return '';
+  const digits = String(p).replace(/\D/g, '');
+  if (digits.length >= 9) {
+    return digits.slice(-9);
+  }
   return digits;
 };
 
-// Inicializar el diccionario maestro con los registros base
+// Mapa en memoria para indexación O(1) de participantes Nodus
 const masterMap = new Map();
 
-function indexRecord(r) {
-  if (!r) return;
-  const nameNorm = normText(r.nombre || `${r.nombres || ''} ${r.apellidos || ''}`);
-  if (nameNorm) {
-    masterMap.set(nameNorm, r);
-    // Invertir nombres para cruzar formatos "APELLIDO NOMBRE" vs "NOMBRE APELLIDO"
-    const parts = nameNorm.split(' ');
-    if (parts.length >= 2) {
-      const inverted = `${parts.slice(-2).join(' ')} ${parts.slice(0, -2).join(' ')}`.trim();
-      if (!masterMap.has(inverted)) masterMap.set(inverted, r);
-    }
+// Helper para indexar un registro Nodus en el mapa maestro
+function indexRecord(rec) {
+  if (!rec) return;
+
+  // 1. Clave por nombre normalizado completo
+  if (rec.nombreNorm) {
+    masterMap.set(rec.nombreNorm, rec);
   }
-  const phone = normPhone(r.telefono || r.celular);
-  if (phone) {
-    masterMap.set(`TEL_${phone}`, r);
+
+  // 2. Clave por teléfono normalizado
+  if (rec.telefonoNorm && rec.telefonoNorm.length >= 7) {
+    masterMap.set(`TEL_${rec.telefonoNorm}`, rec);
   }
-  const email = (r.email || '').toLowerCase().trim();
-  if (email && email.includes('@')) {
-    masterMap.set(`EMAIL_${email}`, r);
+
+  // 3. Clave por email
+  if (rec.email && rec.email.includes('@')) {
+    masterMap.set(`EMAIL_${rec.email.toLowerCase().trim()}`, rec);
   }
 }
 
@@ -66,7 +66,29 @@ export function initNodusRealtimeListener(onUpdateCallback) {
   if (isListening) return;
   isListening = true;
 
+  const processParticipante = (p, equipoNombre) => {
+    const fullName = (p.n || `${p.nombres || ''} ${p.apellidos || ''}`).trim();
+    if (!fullName && !p.telefono && !p.t) return;
+    const rec = {
+      nombre: fullName,
+      nombreNorm: normText(fullName),
+      email: p.email || p.e || '',
+      telefono: p.telefono || p.t || '',
+      telefonoNorm: normPhone(p.telefono || p.t),
+      coordinador: p.coordinador || p.c || '',
+      imo: p.imo || '',
+      llamada1: p.llamada1 || p.l1 || '',
+      llamada2: p.llamada2 || p.l2 || '',
+      asistencia: p.asistencia || p.a || '',
+      desertor: p.desertor || p.d || '',
+      pago: p.pago || p.p || '',
+      equipo: equipoNombre || ''
+    };
+    indexRecord(rec);
+  };
+
   try {
+    // 1. Escuchar documento raíz 'latest'
     const docRef = doc(db, 'nodus_coordinadores_c1c2', 'latest');
     onSnapshot(docRef, (docSnap) => {
       if (docSnap.exists()) {
@@ -74,24 +96,7 @@ export function initNodusRealtimeListener(onUpdateCallback) {
         if (Array.isArray(data.equiposReporte)) {
           data.equiposReporte.forEach(eq => {
             if (Array.isArray(eq.participantes)) {
-              eq.participantes.forEach(p => {
-                const rec = {
-                  nombre: `${p.nombres || ''} ${p.apellidos || ''}`.trim(),
-                  nombreNorm: normText(`${p.nombres || ''} ${p.apellidos || ''}`),
-                  email: p.email || '',
-                  telefono: p.telefono || '',
-                  telefonoNorm: normPhone(p.telefono),
-                  coordinador: p.coordinador || '',
-                  imo: p.imo || '',
-                  llamada1: p.llamada1 || '',
-                  llamada2: p.llamada2 || '',
-                  asistencia: p.asistencia || '',
-                  desertor: p.desertor || '',
-                  pago: p.pago || '',
-                  equipo: eq.equipoNombre || ''
-                };
-                indexRecord(rec);
-              });
+              eq.participantes.forEach(p => processParticipante(p, eq.equipoNombre));
             }
           });
           if (typeof onUpdateCallback === 'function') {
@@ -101,6 +106,22 @@ export function initNodusRealtimeListener(onUpdateCallback) {
       }
     }, (err) => {
       console.warn('Lectura Firestore nodus_coordinadores_c1c2 usando caché local:', err?.message);
+    });
+
+    // 2. Escuchar subcolección 'equipos' (persistencia desacoplada para evitar límite de 1MB)
+    const colRef = collection(db, 'nodus_coordinadores_c1c2', 'latest', 'equipos');
+    onSnapshot(colRef, (colSnap) => {
+      colSnap.forEach(docSnap => {
+        const eq = docSnap.data();
+        if (Array.isArray(eq.participantes)) {
+          eq.participantes.forEach(p => processParticipante(p, eq.equipoNombre));
+        }
+      });
+      if (typeof onUpdateCallback === 'function') {
+        onUpdateCallback(masterMap.size);
+      }
+    }, (err) => {
+      console.warn('Lectura subcolección equipos nodus usando caché local:', err?.message);
     });
   } catch (e) {
     console.warn('Error inicializando listener de Nodus:', e);
@@ -153,7 +174,21 @@ export function findParticipantInNodus(enrolado, imoNombre = '') {
  * Evalúa el cruce de verificación para un Enrolado individual
  */
 export function evaluateEnroladoVerification(enrolado, imoNombre = '', imoEquipo = '') {
-  const nodusRec = findParticipantInNodus(enrolado, imoNombre);
+  // 1. Buscar en índice maestro de Nodus
+  // 2. Si aún no está en el índice maestro, verificar si el enrolado ya trae sus datos de Nodus incrustados
+  const nodusRec = findParticipantInNodus(enrolado, imoNombre) || (
+    (enrolado?.llamada1 || enrolado?.asistenciaNodus || enrolado?.desertor || enrolado?.pago) ? {
+      nombre: enrolado.nombre,
+      telefono: enrolado.telefono,
+      coordinador: enrolado.coordinadora_nombre || '',
+      llamada1: enrolado.llamada1 || '',
+      llamada2: enrolado.llamada2 || '',
+      asistencia: enrolado.asistenciaNodus || '',
+      desertor: enrolado.desertor || '',
+      pago: enrolado.pago || '',
+      equipo: imoEquipo || ''
+    } : null
+  );
 
   const imoSaysAsiste = Boolean(enrolado.asistencia);
   const imoSaysContacto = Boolean(enrolado.contacto);
@@ -198,13 +233,21 @@ export function evaluateEnroladoVerification(enrolado, imoNombre = '', imoEquipo
   const l2 = normText(nodusRec.llamada2 || '');
   const asist = normText(nodusRec.asistencia || '');
   const des = normText(nodusRec.desertor || '');
+  const pago = normText(nodusRec.pago || '');
 
   const coordConfirmado =
     l1.includes('CONFIRM') ||
     l2.includes('CONFIRM') ||
     asist.includes('ASIST') ||
     asist.includes('SENTAD') ||
-    asist.includes('SI');
+    asist.includes('SI') ||
+    l1.includes('ASIST') ||
+    l2.includes('ASIST') ||
+    l1.includes('PAG') ||
+    l2.includes('PAG') ||
+    asist.includes('PAG') ||
+    pago.includes('SI') ||
+    pago.includes('PAG');
 
   const coordDesercion =
     des.includes('SI') ||
@@ -440,3 +483,4 @@ export function getGlobalNodusStats(missions, getEnroladosList) {
     totalRegistrosNodus: masterMap.size
   };
 }
+
