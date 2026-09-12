@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+﻿import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Target, Sparkles, AlertCircle, CheckCircle2, Clock, 
   RefreshCw, Trophy, Search, X, ExternalLink, ChevronRight,
@@ -1149,7 +1149,7 @@ export default function FuturosImposiblesView({
                           {evaluacion.etiqueta} ({evaluacion.puntaje}/100)
                         </span>
                       </div>
-                      <div style={{ fontSize: '0.82rem', color: textMuted, lineHeight: 1.4 }}>
+                      <div style={{ fontSize: '0.82rem', color: textMuted, lineHeight: 1.5, whiteSpace: 'pre-line' }}>
                         {evaluacion.observaciones}
                       </div>
                     </div>
