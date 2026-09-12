@@ -287,7 +287,7 @@ export default function GoalsBoard() {
         updatedAt: new Date().toISOString()
       });
       await performRollUp(goal.id, newProgress);
-      showToast(Avance sincronizado con Ã©xito desde Reportes: ${totalOk} OK (${newProgress}%)., 'success');
+      showToast('Avance sincronizado con exito desde Reportes: ' + totalOk + ' OK (' + newProgress + '%).', 'success');
     } catch (err) {
       console.error(err);
       showToast('Error al sincronizar avance con reportes.', 'error');
@@ -300,9 +300,9 @@ export default function GoalsBoard() {
     try {
       const SHEET_ID = '1l93lhINfZtthELjOwBodoUEgk_d6A8gTb9hPGO6cOe4';
       const GID_ALIADOS = '488639774';
-      const url = https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID_ALIADOS};
+      const url = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:csv&gid=' + GID_ALIADOS;
       const res = await fetch(url);
-      if (!res.ok) throw new Error(HTTP ${res.status});
+      if (!res.ok) throw new Error('HTTP ' + res.status);
       const csvText = await res.text();
 
       const lines = csvText.split(/\r?\n/).filter(l => l.trim().length > 0);
@@ -426,7 +426,7 @@ export default function GoalsBoard() {
           updatedAt: new Date().toISOString()
         });
         await performRollUp(limaGoal.id, newProgress);
-        showToast(Metas de Lima sincronizadas: ${totalOk} Aliados confirmados (${newProgress}%). Joyce: ${coordStats.JOYCE.ok}, Diana: ${coordStats.DIANA.ok}., 'success');
+        showToast('Metas de Lima sincronizadas: ' + totalOk + ' Aliados confirmados (' + newProgress + '%). Joyce: ' + coordStats.JOYCE.ok + ', Diana: ' + coordStats.DIANA.ok + '.', 'success');
       } else {
         const limaCycle = goals.find(g => normalizeSede(g.sede || '') === 'Lima' && g.scope === 'CICLO');
         const newRef = doc(collection(db, 'goals'));
@@ -450,7 +450,7 @@ export default function GoalsBoard() {
         if (limaCycle) {
           await performRollUp(newRef.id, newProgress);
         }
-        showToast(Meta Aliados (Lima) creada y sincronizada: ${totalOk} confirmados (${newProgress}%), 'success');
+        showToast('Meta Aliados (Lima) creada y sincronizada: ' + totalOk + ' confirmados (' + newProgress + '%)', 'success');
       }
     } catch (e) {
       console.error('Error sincronizando hoja de Lima:', e);
@@ -466,7 +466,7 @@ export default function GoalsBoard() {
       try {
         const SHEET_ID = '1l93lhINfZtthELjOwBodoUEgk_d6A8gTb9hPGO6cOe4';
         const GID_ALIADOS = '488639774';
-        const url = https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID_ALIADOS};
+        const url = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?tqx=out:csv&gid=' + GID_ALIADOS;
         const res = await fetch(url);
         if (res.ok) {
           const csvText = await res.text();
@@ -720,7 +720,7 @@ export default function GoalsBoard() {
       // Roll-up hacia metas superiores
       await performRollUp(goalId, newProgress);
 
-      showToast(`¡Meta dividida y asignada con éxito a ${assignedList.length} coordinadoras!`, 'success');
+      showToast(`¡Meta dividida y asignada con exito a ${assignedList.length} coordinadoras!`, 'success');
     } catch (err) {
       console.error(err);
       showToast('Error al guardar la asignación de meta.', 'error');
@@ -1416,7 +1416,7 @@ export default function GoalsBoard() {
               </button>
             </div>
 
-            {/* Subheader MÃ©tricas */}
+            {/* Subheader Metricas */}
             <div style={{
               padding: '0.75rem 1.5rem',
               background: 'rgba(255,255,255,0.02)',
@@ -1450,7 +1450,7 @@ export default function GoalsBoard() {
               </button>
             </div>
 
-            {/* Filtros de BÃºsqueda */}
+            {/* Filtros de Busqueda */}
             <div style={{
               padding: '0.75rem 1.5rem',
               display: 'flex',
