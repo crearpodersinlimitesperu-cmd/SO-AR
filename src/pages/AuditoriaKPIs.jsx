@@ -431,6 +431,69 @@ export default function AuditoriaKPIs({ defaultTab }) {
         console.warn("Aviso: No se pudo leer collection 'reports':", err);
       }
 
+      // 1.1 Cargar reportes individuales de MisKPIs (Firestore 'kpi_reports' y respaldo local)
+      try {
+        let kpiReportsSnap = null;
+        try {
+          kpiReportsSnap = await getDocs(query(collection(db, 'kpi_reports'), orderBy('createdAt', 'desc'), limit(500)));
+        } catch (_) {}
+
+        let kpiList = [];
+        if (kpiReportsSnap && !kpiReportsSnap.empty) {
+          kpiList = kpiReportsSnap.docs.map(d => ({
+            id: d.id,
+            ...d.data(),
+            createdAt: d.data().createdAt?.toDate ? d.data().createdAt.toDate().toISOString() : d.data().createdAt
+          }));
+        }
+
+        // Combinar con reportes locales de cpsl_kpi_reports_v1
+        const localKpi = getLocalReports();
+        const existingKpiIds = new Set(kpiList.map(k => k.id));
+        localKpi.forEach(lr => {
+          if (lr && lr.id && !existingKpiIds.has(lr.id) && !lr.id.startsWith('kpi_seed_')) {
+            kpiList.push(lr);
+          }
+        });
+
+        kpiList.forEach(r => {
+          if (!r || r.id?.startsWith('kpi_seed_')) return;
+          const data = r.data || {};
+          const dynamicMetrics = [];
+          Object.entries(data).forEach(([k, v]) => {
+            if (typeof v === 'number' || typeof v === 'string') {
+              dynamicMetrics.push({ label: k.replace(/([A-Z])/g, ' $1').replace(/_/g, ' '), value: String(v) });
+            }
+          });
+
+          const isRev = r.status === 'reviewed' || !!r.reviewedBy;
+          const personName = r.targetUserName || r.userName || 'Coordinador';
+          const personSede = r.targetUserSede || r.userSede || 'Lima';
+
+          allData.push({
+            id: r.id,
+            userName: personName,
+            coordinator: personName,
+            submittedBy: r.submittedBy || r.userName,
+            sede: personSede,
+            stage: r.targetRole === 'coord_maestria' ? 'MJ' : 'C1',
+            role: r.targetRole || r.role || 'coord_c1',
+            status: isRev ? 'reviewed' : (r.status || 'pending'),
+            reviewedBy: r.reviewedBy || null,
+            reviewedAt: r.reviewedAt || null,
+            createdAt: r.createdAt || new Date().toISOString(),
+            dynamicMetrics,
+            customMetas: r.customMetas || null,
+            statusPills: [],
+            tipoReporte: r.targetRoleName || r.roleName || 'Reporte de KPIs Individuales',
+            data,
+            rawContent: [personName, personSede, r.targetRoleName || r.roleName]
+          });
+        });
+      } catch (err) {
+        console.warn("Aviso al cargar 'kpi_reports' en AuditoriaKPIs:", err);
+      }
+
       // 2. Cargar snapshot de Nodus
       const nodusRef = doc(db, 'nodus_kpis_sincronizados', 'latest_snapshot');
       const nodusSnap = await getDocResilient(nodusRef);
@@ -546,17 +609,39 @@ export default function AuditoriaKPIs({ defaultTab }) {
   const handleMarkAsReviewed = (reportId) => handleToggleReviewed(reportId, 'pending');
 
   // Helpers de visualización
+  const resolveTargetForMetric = (label, customMetas = {}) => {
+    const l = (label || '').toLowerCase();
+    if (l.includes('asistencia')) return { target: customMetas.asistencia ?? 95, isInverse: false };
+    if (l.includes('retencion') || l.includes('desercion')) return { target: customMetas.retencion ?? 10, isInverse: true };
+    if (l.includes('conversion c1') || l.includes('c1 a c2')) return { target: customMetas.conversionC1C2 ?? 50, isInverse: false };
+    if (l.includes('c2 a mj') || l.includes('movimiento')) return { target: customMetas.conversionC2MJ ?? 70, isInverse: false };
+    if (l.includes('breakthrough')) return { target: customMetas.declaracionBreakthrough ?? 90, isInverse: false };
+    if (l.includes('aliados')) return { target: customMetas.declaracionAliados ?? 40, isInverse: false };
+    if (l.includes('rotas')) return { target: customMetas.palabrasRotas ?? 5, isInverse: true };
+    if (l.includes('eficiencia') || l.includes('gestion')) return { target: customMetas.eficienciaGestion ?? 100, isInverse: false };
+    return null;
+  };
+
+  // Helpers de visualizaciÃ³n con soporte de metas individuales
   const renderC1Data = (report = {}) => {
-    const data = report;
+    const data = report.data || report;
+    const customMetas = report.customMetas || {};
     return (
       <div style={{ marginTop: '1rem' }}>
+        {report.customMetas && (
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.75rem', color: 'var(--crear-gold, #f59e0b)', background: 'rgba(245, 158, 11, 0.08)', padding: '0.2rem 0.6rem', borderRadius: '6px', marginBottom: '0.8rem', border: '1px solid rgba(245, 158, 11, 0.25)' }}>
+            <Target size={14} /> Evaluado con metas personalizadas individuales para {report.userName || 'esta persona'}
+          </div>
+        )}
         {data.dynamicMetrics && data.dynamicMetrics.length > 0 && (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
             {data.dynamicMetrics.map((m, i) => {
                const numericVal = parseFloat(String(m.value).replace(/[^0-9.]/g, '')) || 0;
-               const isInverse = m.label.toLowerCase().includes('rotas') || m.label.toLowerCase().includes('desercion');
+               const resolved = resolveTargetForMetric(m.label, customMetas);
+               const isInverse = resolved ? resolved.isInverse : (m.label.toLowerCase().includes('rotas') || m.label.toLowerCase().includes('desercion'));
+               const target = resolved ? resolved.target : (numericVal > 0 ? numericVal : 1);
                return (
-                 <KPIMetric key={i} label={m.label} value={m.value} actual={numericVal} target={numericVal > 0 ? numericVal : 1} isInverse={isInverse} />
+                 <KPIMetric key={i} label={m.label} value={m.value} actual={numericVal} target={target} isInverse={isInverse} />
                );
             })}
           </div>
@@ -589,28 +674,54 @@ export default function AuditoriaKPIs({ defaultTab }) {
 
   const renderMaestriaData = (report = {}) => {
     const data = report.data || report;
+    const custom = report.customMetas || {};
     return (
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
-        <KPIMetric label="Graduados Viaje" value={data.graduadosViaje || 0} target={1} actual={parseInt(data.graduadosViaje || 0)} />
-        <KPIMetric label="Sentados FDS1" value={data.sentadosFDS1 || 0} target={1} actual={parseInt(data.sentadosFDS1 || 0)} />
-        <KPIMetric label="Sentados FDS2" value={data.sentadosFDS2 || 0} target={1} actual={parseInt(data.sentadosFDS2 || 0)} />
-        <KPIMetric label="Sentados FDS3" value={data.sentadosFDS3 || 0} target={1} actual={parseInt(data.sentadosFDS3 || 0)} />
-        <KPIMetric label="Deserción FDS1-2" value={`${data.desercion1 || 0}%`} target={10} actual={parseFloat(data.desercion1 || 0)} isInverse />
-        <KPIMetric label="Deserción FDS2-3" value={`${data.desercion2 || 0}%`} target={10} actual={parseFloat(data.desercion2 || 0)} isInverse />
-        <KPIMetric label="Efec. Enrol." value={`${data.efectividadEnrolamiento || 0}%`} target={90} actual={parseFloat(data.efectividadEnrolamiento || 0)} />
-        <KPIMetric label="Cump. FI" value={`${data.cumplimientoFI || 0}%`} target={80} actual={parseFloat(data.cumplimientoFI || 0)} />
-        <KPIMetric label="Conv. Aliados" value={`${data.conversionAliados || 0}%`} target={1} actual={parseFloat(data.conversionAliados || 0)} />
+      <div style={{ marginTop: '1rem' }}>
+        {report.customMetas && (
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.75rem', color: '#a78bfa', background: 'rgba(167, 139, 250, 0.08)', padding: '0.2rem 0.6rem', borderRadius: '6px', marginBottom: '0.8rem', border: '1px solid rgba(167, 139, 250, 0.25)' }}>
+            <Target size={14} /> Evaluado con metas personalizadas de Maestría para {report.userName || 'esta persona'}
+          </div>
+        )}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '1rem' }}>
+          {data.asistenciaMJ !== undefined && (
+            <KPIMetric label="Asistencia MJ" value={`${data.asistenciaMJ}%`} target={custom.asistenciaMJ ?? 90} actual={parseFloat(data.asistenciaMJ || 0)} />
+          )}
+          {data.retencionMJ !== undefined && (
+            <KPIMetric label="Retención MJ" value={`${data.retencionMJ}%`} target={custom.retencionMJ ?? 8} actual={parseFloat(data.retencionMJ || 0)} isInverse />
+          )}
+          {data.enroladosPorIMO !== undefined && (
+            <KPIMetric label="Enrolados por IMO" value={data.enroladosPorIMO} target={custom.enroladosPorIMO ?? 3.0} actual={parseFloat(data.enroladosPorIMO || 0)} />
+          )}
+          {data.conversionALider !== undefined && (
+            <KPIMetric label="Conv. a Líder" value={`${data.conversionALider}%`} target={custom.conversionALider ?? 60} actual={parseFloat(data.conversionALider || 0)} />
+          )}
+          <KPIMetric label="Graduados Viaje" value={data.graduadosViaje || 0} target={1} actual={parseInt(data.graduadosViaje || 0)} />
+          <KPIMetric label="Sentados FDS1" value={data.sentadosFDS1 || 0} target={1} actual={parseInt(data.sentadosFDS1 || 0)} />
+          <KPIMetric label="Sentados FDS2" value={data.sentadosFDS2 || 0} target={1} actual={parseInt(data.sentadosFDS2 || 0)} />
+          <KPIMetric label="Sentados FDS3" value={data.sentadosFDS3 || 0} target={1} actual={parseInt(data.sentadosFDS3 || 0)} />
+          <KPIMetric label="Deserción FDS1-2" value={`${data.desercion1 || 0}%`} target={10} actual={parseFloat(data.desercion1 || 0)} isInverse />
+          <KPIMetric label="Deserción FDS2-3" value={`${data.desercion2 || 0}%`} target={10} actual={parseFloat(data.desercion2 || 0)} isInverse />
+          <KPIMetric label="Efec. Enrol." value={`${data.efectividadEnrolamiento || 0}%`} target={90} actual={parseFloat(data.efectividadEnrolamiento || 0)} />
+          <KPIMetric label="Cump. FI" value={`${data.cumplimientoFI || 0}%`} target={80} actual={parseFloat(data.cumplimientoFI || 0)} />
+          <KPIMetric label="Conv. Aliados" value={`${data.conversionAliados || 0}%`} target={1} actual={parseFloat(data.conversionAliados || 0)} />
+        </div>
       </div>
     );
   };
 
   const renderQTData = (report = {}) => {
     const data = report.data || report;
+    const custom = report.customMetas || {};
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem' }}>
+        {report.customMetas && (
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.75rem', color: '#f472b6', background: 'rgba(244, 114, 182, 0.08)', padding: '0.2rem 0.6rem', borderRadius: '6px', border: '1px solid rgba(244, 114, 182, 0.25)' }}>
+            <Target size={14} /> Evaluado con metas personalizadas de Quantum Team para {report.userName || 'esta persona'}
+          </div>
+        )}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
-          <KPIMetric label="Efectividad Llamadas" value={`${data.efectividadLlamadas || 0}%`} target={60} actual={parseFloat(data.efectividadLlamadas || 0)} />
-          <KPIMetric label="Futuros Imposibles" value={data.futurosImposibles || 0} target={2} actual={parseFloat(data.futurosImposibles || 0)} />
+          <KPIMetric label="Efectividad Llamadas" value={`${data.efectividadLlamadas || 0}%`} target={custom.efectividadLlamadas ?? 60} actual={parseFloat(data.efectividadLlamadas || 0)} />
+          <KPIMetric label="Futuros Imposibles" value={data.futurosImposibles || 0} target={custom.futurosImposibles ?? 2} actual={parseFloat(data.futurosImposibles || 0)} />
         </div>
         {data.resolucionQuiebres && (
           <div style={{ background: 'var(--bg-card, rgba(0,0,0,0.2))', padding: '1rem', borderRadius: '8px', border: '1px solid var(--border-subtle, rgba(255,255,255,0.1))' }}>
