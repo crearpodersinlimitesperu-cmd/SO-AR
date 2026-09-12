@@ -1,4 +1,4 @@
-import puppeteer from 'puppeteer-extra';
+﻿import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import 'dotenv/config';
 import fs from 'fs';
@@ -7,6 +7,7 @@ import { initializeApp, getApps } from "firebase/app";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
 import { NodusDataScientistAgent } from './nodusDataScientistAgent.mjs';
 import { NodusHrSentinelAgent } from './nodusHrSentinelAgent.mjs';
+import { NodusFIAgent } from './nodusFIAgent.mjs';
 
 puppeteer.use(StealthPlugin());
 
@@ -859,6 +860,26 @@ export async function runMultiAgentSync() {
     }
 
     console.log("\n=======================================================");
+        // =========================================================================
+    // AGENTE 6: AUDITOR CENTINELA DE FUTUROS IMPOSIBLES (FIs) POST-PFD
+    // =========================================================================
+    console.log("\nðŸŽ¯ [Agente 6 - Futuros Imposibles] Activando auditorÃ­a de metas post-PFD...");
+    try {
+      const fiAgent = new NodusFIAgent();
+      const dataModulePath = path.join(__dirname, '../src/data/nodusFuturosImposiblesData.js');
+      if (fs.existsSync(dataModulePath)) {
+        const rawJs = fs.readFileSync(dataModulePath, 'utf8');
+        const jsonMatch = rawJs.match(/export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES\s*=\s*(\[[\s\S]*?\]);/);
+        if (jsonMatch) {
+          const participantesFI = JSON.parse(jsonMatch[1]);
+          const fiDiag = await fiAgent.runAudit(participantesFI);
+          console.log("âœ… [Agente 6 - Futuros Imposibles] AuditorÃ­a de metas completada con Ã©xito.");
+        }
+      }
+    } catch (fiErr) {
+      console.error("âš ï¸ [Agente 6 - Futuros Imposibles] Error no bloqueante en auditorÃ­a de FIs:", fiErr.message);
+    }
+
     console.log("✨ PIPELINE MULTI-AGENTE COMPLETADO EXITOSAMENTE");
     console.log(`   Coordinadores: ${normalized.coordinadores.length}`);
     console.log(`   Gestiones Totales: ${normalized.totales.totalGestiones}`);
