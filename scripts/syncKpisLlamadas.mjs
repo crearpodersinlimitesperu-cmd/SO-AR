@@ -1,4 +1,4 @@
-import { google } from 'googleapis';
+﻿import { google } from 'googleapis';
 import { initializeApp, cert, getApps } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import fs from 'fs';
@@ -398,6 +398,52 @@ export async function syncKpisLlamadas() {
       actualizadoEl: new Date().toISOString()
     });
   }
+
+  // 3. Sincronizar todos los pagos realizados hacia liquidaciones_pagos (sin redundancia, ID idempotente)
+  console.log('Sincronizando pagos realizados de la planilla hacia liquidaciones_pagos...');
+  let pagosSincronizados = 0;
+  for (const kpi of kpis) {
+    if (!kpi.pagadoLlamadas || kpi.pagadoLlamadas <= 0) continue;
+    const trainerName = kpi.entrenador;
+    const trainerSlug = slug(trainerName);
+    const docId = `sheet_pago__${trainerSlug}`;
+    const pagoRef = db.collection('liquidaciones_pagos').doc(docId);
+
+    // Calcular sede representativa del entrenador si tiene managers asociados
+    const tNorm = normalizeTrainerName(trainerName);
+    const mgrs = trainerManagersMap[tNorm]?.managers || [];
+    const sedesCount = {};
+    mgrs.forEach(m => {
+      const s = m.sede || 'Global';
+      sedesCount[s] = (sedesCount[s] || 0) + 1;
+    });
+    const primarySede = Object.keys(sedesCount).sort((a, b) => sedesCount[b] - sedesCount[a])[0] || 'Multi-Sede';
+
+    batch.set(pagoRef, {
+      equipoKey: docId,
+      equipo: `Planilla Llamadas (${trainerName})`,
+      numEquipo: '',
+      sede: primarySede,
+      entrenador: trainerName,
+      montoUSD: kpi.montoTotal || (kpi.pagadoLlamadas * 25),
+      llamadasAlPagar: kpi.totalLlamadas || 0,
+      llamadasPagadas: kpi.pagadoLlamadas,
+      llamadasPendientes: kpi.pendienteLlamadas,
+      montoPendienteUSD: kpi.pendienteLlamadas * 25,
+      porcentajePagado: kpi.porcentajePagado,
+      motivo: 'planilla_oficial_sheets',
+      estado: 'pagado',
+      fechaPago: '2026-09-01',
+      pagadoPorNombre: 'Planilla Oficial (Google Sheets)',
+      pagadoPorEmail: 'planilla.oficial@crearpsl.net',
+      fuente: 'sheet_llamados',
+      urlPlanilla: 'https://docs.google.com/spreadsheets/d/1lWAHh1PSAKu9eU6DOBxZExrHMbCYc3f2Sr8GdghNxD0/edit?usp=drive_link',
+      updatedAt: new Date().toISOString()
+    }, { merge: true });
+
+    pagosSincronizados++;
+  }
+  console.log(`Pagos realizados sincronizados a liquidaciones_pagos: ${pagosSincronizados} (sin duplicados, ID deterministico).`);
 
   // --- NUEVA LÓGICA: Sincronizar hacia managers_directory ---
   console.log('Sincronizando managersSheet1 hacia managers_directory...');
