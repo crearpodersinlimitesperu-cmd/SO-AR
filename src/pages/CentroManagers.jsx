@@ -165,18 +165,27 @@ export default function CentroManagers() {
     const unsubscribe = onSnapshot(collection(db, 'managers_directory'), (querySnapshot) => {
       const firestoreManagers = [];
       querySnapshot.forEach((doc) => {
-        firestoreManagers.push({ id: doc.id, ...doc.data() });
+        const data = doc.data() || {};
+        firestoreManagers.push({
+          ...data,
+          id: data.id ?? doc.id,
+          docId: doc.id
+        });
       });
 
-      // Merge inteligente: Mapear por ID
+      // Merge inteligente: Mapear por ID (acepta tanto el id interno como el docId)
       const firestoreMap = new Map();
-      firestoreManagers.forEach(m => firestoreMap.set(String(m.id), m));
+      firestoreManagers.forEach(m => {
+        firestoreMap.set(String(m.id), m);
+        if (m.docId) firestoreMap.set(String(m.docId), m);
+      });
 
       // 1. Tomar todos los INITIAL_MANAGERS y reemplazar con los cambios de Firestore si existen
       const mergedManagers = INITIAL_MANAGERS.map(initM => {
         const fromFirestore = firestoreMap.get(String(initM.id));
         if (!fromFirestore) return initM;
         const merged = { ...initM, ...fromFirestore };
+        if (fromFirestore.docId) merged.docId = fromFirestore.docId;
         // Si Firestore tiene el estado vacío, preservar el estado del catálogo inicial
         const fsEstado = (fromFirestore.estado || '').trim();
         if (!fsEstado && initM.estado) {
@@ -1288,41 +1297,89 @@ export default function CentroManagers() {
       showToast("Acceso restringido: cerrar un equipo para liquidación está reservado a Coordinación de Maestría del Juego y Dirección de Maestría.", "warning");
       return;
     }
-    const miembros = managers.filter(m => normalizeSede(m.sede) === team.sede && m.equipo === team.equipo);
-    if (miembros.length === 0) return;
+    const targetSede = normalizeSede(team.sede);
+    const targetEquipo = (team.equipo || '').trim().toUpperCase();
+
+    // Obtener miembros del equipo de manera robusta
+    let miembros = [];
+    if (Array.isArray(team.allMembers) && team.allMembers.length > 0) {
+      miembros = team.allMembers;
+    } else if (Array.isArray(team.managers) && team.managers.length > 0) {
+      miembros = team.managers;
+    } else {
+      miembros = managers.filter(m => 
+        normalizeSede(m.sede) === targetSede && 
+        (m.equipo || '').trim().toUpperCase() === targetEquipo
+      );
+    }
+
+    if (miembros.length === 0) {
+      showToast(`No se encontraron integrantes para el equipo ${team.equipo}`, 'warning');
+      return;
+    }
 
     try {
       const batch = writeBatch(db);
       const nowISO = new Date().toISOString();
+      const userName = currentUser?.name || currentUser?.displayName || 'Coordinador';
+      const userEmail = currentUser?.email || '';
+
       miembros.forEach(m => {
-        const docRef = doc(db, 'managers_directory', m.id.toString());
-        batch.update(docRef, {
+        // Usar m.docId si existe (ID real de Firestore), o m.id.toString()
+        const docKey = (m.docId || m.id).toString();
+        const docRef = doc(db, 'managers_directory', docKey);
+        
+        // Payload limpio con merge: true para que cree el documento si no existe o actualice si existe
+        const payload = {
+          ...m,
           cierreLiquidacionActivo: true,
           cierreLiquidacionFecha: nowISO,
-          cierreLiquidacionPorNombre: currentUser?.name || '',
-          cierreLiquidacionPorEmail: currentUser?.email || ''
+          cierreLiquidacionPorNombre: userName,
+          cierreLiquidacionPorEmail: userEmail
+        };
+
+        // Eliminar valores undefined para evitar rechazo estricto de Firestore
+        Object.keys(payload).forEach(k => {
+          if (payload[k] === undefined) delete payload[k];
         });
+
+        batch.set(docRef, payload, { merge: true });
       });
+
       await batch.commit();
 
-      setManagers(prev => prev.map(m => (normalizeSede(m.sede) === team.sede && m.equipo === team.equipo)
-        ? { ...m, cierreLiquidacionActivo: true, cierreLiquidacionFecha: nowISO, cierreLiquidacionPorNombre: currentUser?.name || '', cierreLiquidacionPorEmail: currentUser?.email || '' }
-        : m
-      ));
+      // Actualizar estado local inmediatamente
+      setManagers(prev => prev.map(m => {
+        const isMatch = normalizeSede(m.sede) === targetSede && 
+                        (m.equipo || '').trim().toUpperCase() === targetEquipo;
+        return isMatch
+          ? { 
+              ...m, 
+              cierreLiquidacionActivo: true, 
+              cierreLiquidacionFecha: nowISO, 
+              cierreLiquidacionPorNombre: userName, 
+              cierreLiquidacionPorEmail: userEmail 
+            }
+          : m;
+      }));
 
-      recordAuditEvent({
-        action: 'CIERRE_EQUIPO_LIQUIDACION',
-        email: currentUser?.email || '',
-        name: currentUser?.name || '',
-        role: currentUser?.appRole || '',
-        sede: team.sede,
-        details: `Equipo ${team.equipo} (${team.sede}) marcado como cerrado (graduados/desertores) para liquidación por ${currentUser?.name || currentUser?.email}`
-      });
+      try {
+        recordAuditEvent({
+          action: 'CIERRE_EQUIPO_LIQUIDACION',
+          email: userEmail,
+          name: userName,
+          role: currentUser?.appRole || '',
+          sede: team.sede,
+          details: `Equipo ${team.equipo} (${team.sede}) marcado como cerrado (graduados/desertores) para liquidación por ${userName}`
+        });
+      } catch (auditErr) {
+        console.warn('Error registrando auditoría de cierre:', auditErr);
+      }
 
       showToast(`Equipo ${team.equipo} cerrado — pasará a "Pendientes de pago" en Liquidación aunque no llegue a 7 llamadas.`, 'success');
     } catch (err) {
       console.error('Error cerrando equipo para liquidación:', err);
-      showToast('No se pudo marcar el equipo como cerrado. Intenta de nuevo.', 'error');
+      showToast(`No se pudo marcar el equipo como cerrado: ${err.message || 'Error de conexión'}`, 'error');
     }
   };
 
@@ -2354,7 +2411,7 @@ export default function CentroManagers() {
                         cambiar Graduado/Desertor (mismo permiso, mismo actor: "el
                         coordinador dice se graduaron o desertaron, se liquida"). */}
                     {canChangeStatus && (() => {
-                      const yaCerrado = t.managers.some(m => m.cierreLiquidacionActivo);
+                      const yaCerrado = (t.allMembers || t.managers || []).some(m => m.cierreLiquidacionActivo);
                       return yaCerrado ? (
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 0.7rem', marginBottom: '0.6rem', background: '#dcfce7', border: '1px solid #86efac', borderRadius: '8px', fontSize: '0.75rem', color: '#15803d', fontWeight: 700 }}>
                           <CheckCircle size={14} /> Cerrado para liquidación
