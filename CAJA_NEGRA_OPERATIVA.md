@@ -197,5 +197,50 @@ curl -X POST \
 
 ---
 
+
+## 8. Avance de Llamadas de Equipos en Tablero de Metas (/metas)
+
+### 8.1. Proposito y Arquitectura
+Permite a directores, coordinadores y managers auditar en tiempo real el avance de gestiones telefonicas de las coordinadoras y managers para cada meta operativa (ej. "Sentados (Px) - Capitulo 1", Equipo 30 Lima) sin abandonar la vista de metas de Causa OS.
+
+### 8.2. Componentes Implementados (src/pages/GoalsBoard.jsx)
+1. **Badge Interactivo en Tarjeta de Meta (team-calls-progress-badge)**:
+   - Se activa automaticamente al detectar metas ligadas a un equipo o sede (ej. EQUIPO 30 en Lima).
+   - Muestra de un vistazo: Total de Gestiones, Confirmados OK (con badge verde esmeralda), Por Confirmar (ambar), porcentaje de efectividad global y nomina de coordinadoras involucradas.
+   - Al hacer clic abre el modal integral de auditoria.
+
+2. **Modal Integral de Auditoria (showTeamCallsModal)**:
+   - **Encabezado Inteligente:** Muestra el equipo activo, la sede y la meta asociada. Incluye un selector desplegable para alternar dinamicamente entre cualquier equipo de la sede (Equipo 30, Equipo 29, Equipo 28, etc.).
+   - **Tira de KPIs en Tiempo Real:** 
+     - TOTAL GESTIONES: Volumen global de llamadas registradas en Nodus.
+     - CONFIRMADOS (OK): Contactos que respondieron positivamente y asistiran.
+     - POR CONFIRMAR: Participantes en seguimiento activo.
+     - NO CONTESTA: Rezagados pendientes de reintento.
+     - COORDINADORAS: Cantidad de coordinadoras activas en la escuadra.
+   - **Pestana 1 - Desglose por Coordinadora:**
+     - Tarjetas nominales individuales (ej. Diana, Joyce).
+     - Metricas desglosadas (Llamadas, Confirmados, Por Confirmar, No Contesta).
+     - Barra de distribucion cromatica visual (% efectividad).
+   - **Pestana 2 - Reportes Oficiales:**
+     - Bitacora cronologica de reportes guardados en Firestore (coordinator_reports).
+     - Detalle de nuevos OK, rezagados OK y notas de coordinacion.
+   - **Pestana 3 - Managers del Equipo:**
+     - Directorio de managers vinculados a la escuadra desde managers_directory.
+     - Entrenadores asignados, telefonos y estado operativo.
+   - **Sincronizacion Directa de Avance:**
+     - Boton Sincronizar Confirmados: Actualiza currentValue en la coleccion goals, calcula el progreso y ejecuta performRollUp hacia las metas globales.
+
+### 8.3. Sincronizacion en Tiempo Real y Fuentes de Datos
+* **Firestore:** Coleccion nodus_coordinadores_c1c2 (documento latest) y managers_directory.
+* **Fallback Seguro:** src/data/nodusFallbackData.json en caso de latencia o desconexion offline.
+
+### 8.4. Proxima Fase: Agente Autonomo de Llamadas de Entrenadores a Managers
+* **Identificador:** Agente 8 (nodusCoachesCallsSentinelAgent.mjs).
+* **Proposito:** Automatizar la extraccion y cruce de llamadas de entrenadores a sus managers en Nodus, previniendo redundancias con un hash de unicidad:
+  hash = sha256(coach_id + manager_id + fecha + etapa)
+* **Destino:** Coleccion Firestore coaches_calls_log y enlace al CRM.
+
+---
+
 > 📜 **Mandato de la Caja Negra:**
 > Esta Caja Negra es la fuente viva de verdad de CPSL y Causa OS. Debe consultarse antes de cualquier cambio de arquitectura y actualizarse de inmediato tras cada nueva funcionalidad, regla o descubrimiento operativo.
