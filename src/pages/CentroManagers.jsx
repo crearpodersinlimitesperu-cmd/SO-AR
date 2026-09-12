@@ -40,11 +40,10 @@ import {
   Sparkles, ToggleLeft, ToggleRight, Archive, RotateCcw, X,
   Edit3, Trash2, UserPlus, Shield, Crown, Check, CheckSquare, Square,
   ShieldCheck, Lock, AlertTriangle, Target, ArrowUpDown, ArrowUp, ArrowDown,
-  BarChart3, GitMerge, ArrowRight, FileSpreadsheet, ExternalLink
+  BarChart3, GitMerge, ArrowRight
 } from 'lucide-react';
 import CMJDashboard from '../components/CMJDashboard';
 import KPIsEntrenadoresLlamadas from '../components/KPIsEntrenadoresLlamadas';
-import defaultKpisData from '../data/kpisEntrenadoresData.json';
 import { auditAndDeduplicateManagers } from '../services/dataIntegrityAgent';
 
 
@@ -322,14 +321,13 @@ export default function CentroManagers() {
 
   // UI State
   const [activeTab, setActiveTab] = useState(initialTab);
-  const [search, setSearch] = useState(initialSearchQuery);
-  const [filterSede, setFilterSede] = useState(initialSedeQuery ? normalizeSede(initialSedeQuery) : '');
-  const [statusFilter, setStatusFilter] = useState('Todos'); // 'Todos' | 'Activo' | 'Graduado' | 'Desertor'
-  // Liquidacion Sub-Tabs y Filtros
   const [liquidacionSubTab, setLiquidacionSubTab] = useState('planilla_sheets'); // 'planilla_sheets' | 'equipos_nodus' | 'consolidado'
   const [sheetSearch, setSheetSearch] = useState('');
   const [sheetSedeFilter, setSheetSedeFilter] = useState('Todas');
-  const [sheetStatusFilter, setSheetStatusFilter] = useState('todos'); // 'todos' | 'con_saldo' | 'liquidados'
+  const [sheetStatusFilter, setSheetStatusFilter] = useState('todos');
+  const [search, setSearch] = useState(initialSearchQuery);
+  const [filterSede, setFilterSede] = useState(initialSedeQuery ? normalizeSede(initialSedeQuery) : '');
+  const [statusFilter, setStatusFilter] = useState('Todos'); // 'Todos' | 'Activo' | 'Graduado' | 'Desertor'
 
   // Estadísticas por Entrenador (Tab: Entrenadores)
   const allTrainerNames = useMemo(() => {
@@ -1275,8 +1273,94 @@ export default function CentroManagers() {
     return teams;
   }, [managers]);
 
+  const liquidacionData = useMemo(() => {
+    if (!canViewLiquidacion) return { pendientes: [], pagados: [], enCamino: [], totalPendienteUSD: 0, totalPagadoUSD: 0 };
+
+    const porEquipo = {};
+    llamadasHistorial.forEach(r => {
+      if (!r.equipoKey) return;
+      if (!porEquipo[r.equipoKey]) porEquipo[r.equipoKey] = [];
+      porEquipo[r.equipoKey].push(r);
+    });
+
+    const pendientes = [];
+    const pagados = [];
+    // (09/09/2026) "En camino a la meta" (5 o 6 de 7 llamadas, a 1-2 de activar el pago por
+    // ese disparador) para que la pantalla se lea como un pipeline financiero real. No
+    // incluye el disparador de cierre manual porque ese es binario (cerrado o no) — no hay
+    // un "casi cerrado" que mostrar ahí.
+    const enCamino = [];
+
+    // Unión de equipos candidatos: los que tienen llamadas registradas + los que el
+    // coordinador cerró manualmente aunque no lleguen a 7 llamadas.
+    const todosLosEquipoKeys = new Set([...Object.keys(porEquipo), ...Object.keys(equiposParaLiquidacion)]);
+
+    todosLosEquipoKeys.forEach((equipoKey) => {
+      const registros = porEquipo[equipoKey] || [];
+      const count = registros.length;
+      const sorted = [...registros].sort((a, b) => (a.fecha || '').localeCompare(b.fecha || ''));
+      const ultimoLlamada = sorted[sorted.length - 1];
+      const infoEquipo = equiposParaLiquidacion[equipoKey];
+      const cierreManual = infoEquipo?.cierreManual || null;
+
+      const cumpleLlamadas = count >= 7;
+      const cumpleCierre = !!cierreManual;
+
+      if (!cumpleLlamadas && !cumpleCierre) {
+        if ((count === 5 || count === 6) && ultimoLlamada) {
+          enCamino.push({
+            equipoKey,
+            equipo: ultimoLlamada.equipo,
+            numEquipo: ultimoLlamada.numEquipo,
+            sede: ultimoLlamada.sede,
+            entrenador: ultimoLlamada.entrenador || 'Sin Asignar',
+            totalLlamadas: count,
+            faltan: 7 - count
+          });
+        }
+        return; // Todavía no llega a la meta de 7 llamadas ni fue cerrado manualmente
+      }
+
+      // Datos del equipo: preferir el historial de llamadas (más completo); si el equipo
+      // se cerró manualmente sin ninguna llamada registrada, usar equiposParaLiquidacion.
+      const equipo = ultimoLlamada?.equipo || infoEquipo?.equipo || equipoKey;
+      const numEquipo = ultimoLlamada?.numEquipo || infoEquipo?.numEquipo || '';
+      const sede = ultimoLlamada?.sede || infoEquipo?.sede || '';
+      const entrenador = ultimoLlamada?.entrenador || Array.from(infoEquipo?.entrenadores || []).join(', ') || 'Sin Asignar';
+      const septimo = sorted[6]; // La llamada #7 (índice 6) es la que dispara el pago, si aplica
+      const pago = liquidacionesPagos[equipoKey];
+
+      const item = {
+        equipoKey,
+        equipo,
+        numEquipo,
+        sede,
+        entrenador,
+        totalLlamadas: count,
+        fechaAlcanzo7: septimo?.fecha || '',
+        montoUSD: 400,
+        motivo: cumpleLlamadas ? 'llamadas' : 'cierre_manual',
+        cierreManual
+      };
+
+      if (pago && pago.estado === 'pagado') {
+        pagados.push({ ...item, pagadoPorNombre: pago.pagadoPorNombre, pagadoPorEmail: pago.pagadoPorEmail, fechaPago: pago.fechaPago });
+      } else {
+        pendientes.push(item);
+      }
+    });
+
+    pendientes.sort((a, b) => (a.fechaAlcanzo7 || a.cierreManual?.fecha || '').localeCompare(b.fechaAlcanzo7 || b.cierreManual?.fecha || ''));
+    pagados.sort((a, b) => (b.fechaPago || '').localeCompare(a.fechaPago || ''));
+    enCamino.sort((a, b) => b.totalLlamadas - a.totalLlamadas);
+
+    const totalPendienteUSD = pendientes.length * 400;
+    const totalPagadoUSD = pagados.length * 400;
+
+    return { pendientes, pagados, enCamino, totalPendienteUSD, totalPagadoUSD };
+  }, [llamadasHistorial, liquidacionesPagos, equiposParaLiquidacion, canViewLiquidacion]);
   // Planilla Oficial de Llamados (Google Sheets: 1lWAHh1PSAKu9eU6DOBxZExrHMbCYc3f2Sr8GdghNxD0)
-  // Extraccion e integracion idempotente de pagos realizados a entrenadores sin duplicados
+  // Extracción e integración idempotente de pagos realizados a entrenadores sin duplicados
   const planillaPagosList = useMemo(() => {
     if (!canViewLiquidacion) return [];
     const rawKpis = defaultKpisData?.kpis || [];
@@ -1289,7 +1373,7 @@ export default function CentroManagers() {
       const tSlug = String(k.entrenador).toLowerCase().trim().replace(/[^a-z0-9]/g, '_');
       seenSlugs.add(tSlug);
 
-      const firestoreDoc = liquidacionesPagos[sheet_pago__${tSlug}] || liquidacionesPagos[tSlug];
+      const firestoreDoc = liquidacionesPagos['sheet_pago__' + tSlug] || liquidacionesPagos[tSlug];
       const metaSede = TRAINER_METADATA[k.entrenador]?.primarySede;
       const detalleSede = defaultKpisData?.llamadosDetalle?.find(m => m.entrenador === k.entrenador)?.sede;
       const sede = metaSede || detalleSede || firestoreDoc?.sede || 'Multi-Sede';
@@ -1386,93 +1470,6 @@ export default function CentroManagers() {
       totalEntrenadores: planillaPagosList.length
     };
   }, [planillaPagosList]);
-
-  const liquidacionData = useMemo(() => {
-    if (!canViewLiquidacion) return { pendientes: [], pagados: [], enCamino: [], totalPendienteUSD: 0, totalPagadoUSD: 0 };
-
-    const porEquipo = {};
-    llamadasHistorial.forEach(r => {
-      if (!r.equipoKey) return;
-      if (!porEquipo[r.equipoKey]) porEquipo[r.equipoKey] = [];
-      porEquipo[r.equipoKey].push(r);
-    });
-
-    const pendientes = [];
-    const pagados = [];
-    // (09/09/2026) "En camino a la meta" (5 o 6 de 7 llamadas, a 1-2 de activar el pago por
-    // ese disparador) para que la pantalla se lea como un pipeline financiero real. No
-    // incluye el disparador de cierre manual porque ese es binario (cerrado o no) — no hay
-    // un "casi cerrado" que mostrar ahí.
-    const enCamino = [];
-
-    // Unión de equipos candidatos: los que tienen llamadas registradas + los que el
-    // coordinador cerró manualmente aunque no lleguen a 7 llamadas.
-    const todosLosEquipoKeys = new Set([...Object.keys(porEquipo), ...Object.keys(equiposParaLiquidacion)]);
-
-    todosLosEquipoKeys.forEach((equipoKey) => {
-      const registros = porEquipo[equipoKey] || [];
-      const count = registros.length;
-      const sorted = [...registros].sort((a, b) => (a.fecha || '').localeCompare(b.fecha || ''));
-      const ultimoLlamada = sorted[sorted.length - 1];
-      const infoEquipo = equiposParaLiquidacion[equipoKey];
-      const cierreManual = infoEquipo?.cierreManual || null;
-
-      const cumpleLlamadas = count >= 7;
-      const cumpleCierre = !!cierreManual;
-
-      if (!cumpleLlamadas && !cumpleCierre) {
-        if ((count === 5 || count === 6) && ultimoLlamada) {
-          enCamino.push({
-            equipoKey,
-            equipo: ultimoLlamada.equipo,
-            numEquipo: ultimoLlamada.numEquipo,
-            sede: ultimoLlamada.sede,
-            entrenador: ultimoLlamada.entrenador || 'Sin Asignar',
-            totalLlamadas: count,
-            faltan: 7 - count
-          });
-        }
-        return; // Todavía no llega a la meta de 7 llamadas ni fue cerrado manualmente
-      }
-
-      // Datos del equipo: preferir el historial de llamadas (más completo); si el equipo
-      // se cerró manualmente sin ninguna llamada registrada, usar equiposParaLiquidacion.
-      const equipo = ultimoLlamada?.equipo || infoEquipo?.equipo || equipoKey;
-      const numEquipo = ultimoLlamada?.numEquipo || infoEquipo?.numEquipo || '';
-      const sede = ultimoLlamada?.sede || infoEquipo?.sede || '';
-      const entrenador = ultimoLlamada?.entrenador || Array.from(infoEquipo?.entrenadores || []).join(', ') || 'Sin Asignar';
-      const septimo = sorted[6]; // La llamada #7 (índice 6) es la que dispara el pago, si aplica
-      const pago = liquidacionesPagos[equipoKey];
-
-      const item = {
-        equipoKey,
-        equipo,
-        numEquipo,
-        sede,
-        entrenador,
-        totalLlamadas: count,
-        fechaAlcanzo7: septimo?.fecha || '',
-        montoUSD: 400,
-        motivo: cumpleLlamadas ? 'llamadas' : 'cierre_manual',
-        cierreManual
-      };
-
-      if (pago && pago.estado === 'pagado') {
-        pagados.push({ ...item, pagadoPorNombre: pago.pagadoPorNombre, pagadoPorEmail: pago.pagadoPorEmail, fechaPago: pago.fechaPago });
-      } else {
-        pendientes.push(item);
-      }
-    });
-
-    pendientes.sort((a, b) => (a.fechaAlcanzo7 || a.cierreManual?.fecha || '').localeCompare(b.fechaAlcanzo7 || b.cierreManual?.fecha || ''));
-    pagados.sort((a, b) => (b.fechaPago || '').localeCompare(a.fechaPago || ''));
-    enCamino.sort((a, b) => b.totalLlamadas - a.totalLlamadas);
-
-    const totalPendienteUSD = pendientes.length * 400;
-    const totalPagadoUSD = pagados.length * 400;
-
-    return { pendientes, pagados, enCamino, totalPendienteUSD, totalPagadoUSD };
-  }, [llamadasHistorial, liquidacionesPagos, equiposParaLiquidacion, canViewLiquidacion]);
 
   const handleMarcarPagado = async (item) => {
     if (!canViewLiquidacion) return;
@@ -3359,6 +3356,7 @@ export default function CentroManagers() {
           )
         )}
 
+        {/* LIQUIDACIÓN DE ENTRENADORES (02/09/2026, rediseño 09/09/2026) — solo José Sánchez y Elizabeth Escobar */}
         {/* LIQUIDACIÓN DE ENTRENADORES Y PAGOS OFICIALES (Actualizado 12/09/2026 - Solo José Sánchez y Directores) */}
         {activeTab === 'liquidacion' && canViewLiquidacion && (
           <div>
