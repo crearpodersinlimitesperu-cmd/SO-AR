@@ -12,6 +12,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { doc, collection, setDoc, addDoc } from 'firebase/firestore';
 import { db, getDocResilient } from '../services/firebase';
 import { OPERATIONAL_SEDES, normalizeSede, usersData, normalizeRole } from '../data/usersData';
+import { SEDES_FDS_PRICING, getSedePricing, formatCurrencyAmount } from '../data/sedesPricingData';
 import nodusFallbackData from '../data/nodusFallbackData.json';
 import ResourceCapacityView from '../components/ResourceCapacityView';
 
@@ -150,6 +151,16 @@ export default function PortfolioBoard() {
   // Estado para datos del Predictor de Inteligencia Nodus
   const [predictorData, setPredictorData] = useState(null);
   const [hrSentinelData, setHrSentinelData] = useState(null);
+  const [customPricing, setCustomPricing] = useState(() => {
+    try {
+      const saved = localStorage.getItem('nodus_custom_fds_pricing');
+      return saved ? JSON.parse(saved) : {};
+    } catch (e) {
+      return {};
+    }
+  });
+  const [showPricingModal, setShowPricingModal] = useState(false);
+  const [tempPricing, setTempPricing] = useState({});
 
   const isGlobalPortfolioRole = (() => {
     if (currentUser?.isSuperAdmin) return true;
@@ -294,9 +305,8 @@ export default function PortfolioBoard() {
 
     // SÃ­ntesis Cuantitativa de Inteligencia Predictiva Multisede (EmpÃ­rica y Certificada)
   const predictorMatrixData = useMemo(() => {
-    const list = coordinadoresRaw && coordinadoresRaw.length > 0 
-      ? coordinadoresRaw 
-      : (nodusFallbackData?.coordinadores || []);
+    const list = coordinadoresRaw || [];
+    if (!list.length && !predictorData) return null;
 
     const defaultProspectosPorSede = {
       'Quito': 114,
@@ -311,6 +321,7 @@ export default function PortfolioBoard() {
 
     for (const sede of OPERATIONAL_SEDES) {
       const sedeCoords = list.filter(c => normalizeSede(c.sede) === sede);
+      const pricing = getSedePricing(sede, customPricing);
       
       let totalLlamadas = 0;
       let totalConfirmados = 0;
@@ -357,7 +368,12 @@ export default function PortfolioBoard() {
 
       const prospectosSinPago = remoteSede?.prospectosSinPago || defaultProspectosPorSede[sede] || 40;
       const recuperablesEstimados = Math.round(prospectosSinPago * 0.165);
-      const ingresoRecuperableUSD = recuperablesEstimados * 360;
+      
+      // CÃ¡lculo REAL con precio de FDS de la sede
+      const precioFdsC1 = pricing.precioFdsC1;
+      const ingresoRecuperableLocal = recuperablesEstimados * precioFdsC1;
+      const ingresoRecuperableUSD = Math.round(ingresoRecuperableLocal / pricing.tasaCambioUSD);
+      const carteraTotalLocal = prospectosSinPago * precioFdsC1;
 
       const volFactor = Math.min(100, Math.round((totalConfirmados / Math.max(1, sedeCoords.length * 30)) * 100));
       const scoreSalud = Math.min(100, Math.max(20, Math.round(
@@ -386,7 +402,13 @@ export default function PortfolioBoard() {
         riesgoDesercionFDS,
         prospectosSinPago,
         recuperablesEstimados,
+        precioFdsC1,
+        moneda: pricing.moneda,
+        simbolo: pricing.simbolo,
+        nombreMoneda: pricing.nombreMoneda,
+        ingresoRecuperableLocal,
         ingresoRecuperableUSD,
+        carteraTotalLocal,
         scoreSalud,
         semaforo,
         etaCumplimiento
@@ -404,7 +426,7 @@ export default function PortfolioBoard() {
     const totalNoInteresa = allSedesValues.reduce((a, b) => a + b.totalNoInteresa, 0);
     const totalProspectosSinPago = allSedesValues.reduce((a, b) => a + b.prospectosSinPago, 0);
     const totalRecuperables = Math.round(totalProspectosSinPago * 0.165);
-    const totalIngresoRecuperableUSD = totalRecuperables * 360;
+    const totalIngresoRecuperableUSD = allSedesValues.reduce((a, b) => a + (b.ingresoRecuperableUSD || 0), 0);
 
     const contactadasGlobal = totalConfirmados + totalNoInteresa + totalPorConfirmar;
     const tasaConversionGlobal = contactadasGlobal > 0 
@@ -433,6 +455,11 @@ export default function PortfolioBoard() {
       riesgoDesercionFDS: riesgoGlobal,
       prospectosSinPago: totalProspectosSinPago,
       recuperablesEstimados: totalRecuperables,
+      precioFdsC1: null,
+      moneda: 'USD',
+      simbolo: '$',
+      nombreMoneda: 'USD Consolidado',
+      ingresoRecuperableLocal: totalIngresoRecuperableUSD,
       ingresoRecuperableUSD: totalIngresoRecuperableUSD,
       scoreSalud: scoreSaludGlobal,
       semaforo: scoreSaludGlobal >= 75 ? 'EXCELENTE' : scoreSaludGlobal >= 50 ? 'ESTABLE' : 'ALERTA',
@@ -443,7 +470,7 @@ export default function PortfolioBoard() {
       sedes: sedesMap,
       global: globalPred
     };
-  }, [coordinadoresRaw, predictorData]);
+  }, [coordinadoresRaw, predictorData, customPricing]);
 
   // Extraer mÃ©tricas predictivas segÃºn la sede seleccionada o Global
   const activePrediction = useMemo(() => {
@@ -663,21 +690,29 @@ export default function PortfolioBoard() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
                   <div>
                     <span style={{ fontSize: '0.75rem', fontWeight: 800, color: textMuted, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                      RecaudaciÃ³n Proyectada
+                      RecaudaciÃ³n Proyectada {activePrediction?.precioFdsC1 ? `(FDS C1: ${activePrediction?.simbolo || '$'}${activePrediction?.precioFdsC1?.toLocaleString('en-US')})` : ''}
                     </span>
-                    <h3 style={{ fontSize: '2.2rem', fontWeight: 900, color: '#2563eb', margin: '0.2rem 0' }}>
-                      ${(activePrediction?.ingresoRecuperableUSD || 24840).toLocaleString('en-US')}
-                    </h3>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.35rem', marginTop: '0.2rem' }}>
+                      <h3 style={{ fontSize: '2.1rem', fontWeight: 900, color: '#2563eb', margin: 0 }}>
+                        {activePrediction?.simbolo || '$'}
+                        {(activePrediction?.ingresoRecuperableLocal != null ? activePrediction.ingresoRecuperableLocal : (activePrediction?.ingresoRecuperableUSD || 0)).toLocaleString('en-US')}
+                      </h3>
+                      <span style={{ fontSize: '0.85rem', fontWeight: 800, color: '#2563eb', background: 'rgba(37, 99, 235, 0.1)', padding: '0.15rem 0.45rem', borderRadius: '6px' }}>
+                        {activePrediction?.moneda || 'USD'}
+                      </span>
+                    </div>
                   </div>
                   <div style={{ padding: '0.75rem', borderRadius: '12px', background: '#eff6ff', color: '#2563eb' }}>
                     <DollarSign size={28} />
                   </div>
                 </div>
                 <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#1d4ed8', marginBottom: '0.5rem' }}>
-                  {activePrediction?.prospectosSinPago || 417} prospectos sin pago ({activePrediction?.recuperablesEstimados || 69} recuperables)
+                  {activePrediction?.prospectosSinPago || 0} prospectos sin pago ({activePrediction?.recuperablesEstimados || 0} recuperables)
                 </div>
                 <p style={{ fontSize: '0.75rem', color: textMuted, margin: 0, lineHeight: '1.4' }}>
-                  Potencial financiero recuperable con automatizaciÃ³n de contacto en las primeras 48h.
+                  {activePrediction?.sede === 'GLOBAL'
+                    ? 'Consolidado multisede en USD sumando el precio oficial de FDS C1 de cada sede.'
+                    : `Calculado con el precio de FDS C1 de ${activePrediction?.sede || 'la sede'} (${activePrediction?.simbolo || '$'}${activePrediction?.precioFdsC1?.toLocaleString('en-US') || 0} ${activePrediction?.moneda || ''}). Cartera total: ${activePrediction?.simbolo || '$'}${activePrediction?.carteraTotalLocal?.toLocaleString('en-US') || 0}.`}
                 </p>
               </div>
 
@@ -717,14 +752,25 @@ export default function PortfolioBoard() {
                     Comparativa cuantitativa de confirmados, conversiÃ³n, riesgo y score de salud por sede operativa
                   </p>
                 </div>
-                {selectedSede !== 'GLOBAL' && (
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                   <button 
-                    onClick={() => setSelectedSede('GLOBAL')}
-                    style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', borderRadius: '6px', border: `1px solid ${borderLight}`, background: '#f8fafc', color: textDark, cursor: 'pointer', fontWeight: 600 }}
+                    onClick={() => {
+                      setTempPricing({ ...customPricing });
+                      setShowPricingModal(true);
+                    }}
+                    style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', borderRadius: '6px', border: '1px solid #2563eb', background: '#eff6ff', color: '#2563eb', cursor: 'pointer', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.35rem' }}
                   >
-                    Ver Vista Consolidada Global
+                    âš™ï¸ Tarifas FDS C1
                   </button>
-                )}
+                  {selectedSede !== 'GLOBAL' && (
+                    <button 
+                      onClick={() => setSelectedSede('GLOBAL')}
+                      style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', borderRadius: '6px', border: `1px solid ${borderLight}`, background: '#f8fafc', color: textDark, cursor: 'pointer', fontWeight: 600 }}
+                    >
+                      Ver Vista Consolidada Global
+                    </button>
+                  )}
+                </div>
               </div>
 
               <div style={{ overflowX: 'auto' }}>
@@ -732,6 +778,7 @@ export default function PortfolioBoard() {
                   <thead>
                     <tr style={{ borderBottom: `2px solid ${borderLight}`, color: textMuted, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                       <th style={{ padding: '0.75rem 1rem', fontWeight: 700 }}>Sede Operativa</th>
+                      <th style={{ padding: '0.75rem 1rem', fontWeight: 700 }}>Precio FDS C1</th>
                       <th style={{ padding: '0.75rem 1rem', fontWeight: 700 }}>Confirmados</th>
                       <th style={{ padding: '0.75rem 1rem', fontWeight: 700 }}>Tasa ConversiÃ³n</th>
                       <th style={{ padding: '0.75rem 1rem', fontWeight: 700 }}>Riesgo DeserciÃ³n</th>
@@ -764,6 +811,11 @@ export default function PortfolioBoard() {
                               </span>
                             )}
                           </td>
+                          <td style={{ padding: '1rem', color: textDark, fontWeight: 700, fontSize: '0.85rem' }}>
+                            <span style={{ background: 'rgba(37, 99, 235, 0.08)', color: '#2563eb', padding: '0.2rem 0.5rem', borderRadius: '6px' }}>
+                              {s.simbolo}{s.precioFdsC1?.toLocaleString('en-US')} {s.moneda}
+                            </span>
+                          </td>
                           <td style={{ padding: '1rem', color: '#10b981', fontWeight: 700 }}>
                             {s.totalConfirmados.toLocaleString('en-US')}
                           </td>
@@ -774,10 +826,16 @@ export default function PortfolioBoard() {
                             {s.riesgoDesercionFDS}%
                           </td>
                           <td style={{ padding: '1rem', color: '#2563eb', fontWeight: 700 }}>
-                            {s.prospectosSinPago}
+                            <div>{s.prospectosSinPago}</div>
+                            <div style={{ fontSize: '0.7rem', color: textMuted }}>({s.recuperablesEstimados} recup.)</div>
                           </td>
-                          <td style={{ padding: '1rem', color: textDark, fontWeight: 700 }}>
-                            ${(s.ingresoRecuperableUSD || 0).toLocaleString('en-US')}
+                          <td style={{ padding: '1rem' }}>
+                            <div style={{ fontWeight: 800, color: '#2563eb', fontSize: '0.95rem' }}>
+                              {s.simbolo}{(s.ingresoRecuperableLocal != null ? s.ingresoRecuperableLocal : 0).toLocaleString('en-US')} {s.moneda}
+                            </div>
+                            <div style={{ fontSize: '0.7rem', color: textMuted }}>
+                              â‰ˆ ${(s.ingresoRecuperableUSD || 0).toLocaleString('en-US')} USD
+                            </div>
                           </td>
                           <td style={{ padding: '1rem' }}>
                             <span style={{ 
@@ -1885,6 +1943,188 @@ ${coord.coachingFeedback}`;
         ) : viewMode === 'resources' ? (
           <ResourceCapacityView selectedSede={selectedSede} hrSentinelData={hrSentinelData} />
         ) : null}
+      {/* MODAL CONFIGURACIÃ“N DE TARIFAS FDS CAPÃTULO 1 */}
+      {showPricingModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(15, 23, 42, 0.75)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          padding: '1rem'
+        }}>
+          <div style={{
+            background: '#ffffff',
+            borderRadius: '16px',
+            width: '100%',
+            maxWidth: '650px',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+            border: '1px solid #e2e8f0',
+            overflow: 'hidden'
+          }}>
+            <div style={{
+              background: '#1e293b',
+              color: '#ffffff',
+              padding: '1.25rem 1.5rem',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  âš™ï¸ Tarifas Oficiales FDS CapÃ­tulo 1 por Sede
+                </h3>
+                <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.75rem', color: '#94a3b8' }}>
+                  Define el valor de matrÃ­cula de FDS C1 para el cÃ¡lculo exacto de recaudaciÃ³n.
+                </p>
+              </div>
+              <button
+                onClick={() => setShowPricingModal(false)}
+                style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '0.25rem' }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div style={{ padding: '1.5rem', maxHeight: '65vh', overflowY: 'auto' }}>
+              <div style={{ background: '#f8fafc', padding: '0.75rem 1rem', borderRadius: '8px', border: '1px solid #e2e8f0', marginBottom: '1.25rem', fontSize: '0.8rem', color: '#475569', lineHeight: '1.4' }}>
+                ðŸ’¡ <strong>Precios confirmados:</strong> Lima estÃ¡ certificado en <strong>S/. 900 Soles</strong>. Si los gerentes de otras sedes actualizan sus tarifas, modifÃ­calas aquÃ­ para recalcular las proyecciones en tiempo real.
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                {OPERATIONAL_SEDES.map(sede => {
+                  const base = SEDES_FDS_PRICING[sede] || { moneda: 'USD', simbolo: '$', precioFdsC1: 250 };
+                  const currentVal = tempPricing[sede]?.precioFdsC1 ?? (customPricing[sede]?.precioFdsC1 ?? base.precioFdsC1);
+
+                  return (
+                    <div
+                      key={sede}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '0.75rem 1rem',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '10px',
+                        background: '#ffffff'
+                      }}
+                    >
+                      <div>
+                        <div style={{ fontWeight: 800, fontSize: '0.9rem', color: '#0f172a' }}>{sede}</div>
+                        <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                          Moneda: <strong>{base.moneda}</strong> ({base.simbolo})
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <span style={{ fontWeight: 700, color: '#64748b' }}>{base.simbolo}</span>
+                        <input
+                          type="number"
+                          value={currentVal}
+                          onChange={(e) => {
+                            const val = parseFloat(e.target.value) || 0;
+                            setTempPricing(prev => ({
+                              ...prev,
+                              [sede]: { precioFdsC1: val }
+                            }));
+                          }}
+                          style={{
+                            width: '130px',
+                            padding: '0.4rem 0.6rem',
+                            border: '1px solid #cbd5e1',
+                            borderRadius: '6px',
+                            fontWeight: 700,
+                            fontSize: '0.9rem',
+                            color: '#0f172a',
+                            textAlign: 'right'
+                          }}
+                        />
+                        <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b', width: '35px' }}>
+                          {base.moneda}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div style={{
+              background: '#f8fafc',
+              borderTop: '1px solid #e2e8f0',
+              padding: '1rem 1.5rem',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <button
+                onClick={() => {
+                  localStorage.removeItem('nodus_custom_fds_pricing');
+                  setCustomPricing({});
+                  setTempPricing({});
+                  setShowPricingModal(false);
+                }}
+                style={{
+                  background: 'transparent',
+                  border: '1px solid #cbd5e1',
+                  color: '#64748b',
+                  padding: '0.45rem 0.9rem',
+                  borderRadius: '6px',
+                  fontSize: '0.8rem',
+                  fontWeight: 600,
+                  cursor: 'pointer'
+                }}
+              >
+                Restablecer Predeterminados
+              </button>
+
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <button
+                  onClick={() => setShowPricingModal(false)}
+                  style={{
+                    background: '#e2e8f0',
+                    border: 'none',
+                    color: '#475569',
+                    padding: '0.45rem 0.9rem',
+                    borderRadius: '6px',
+                    fontSize: '0.8rem',
+                    fontWeight: 600,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={() => {
+                    const merged = { ...customPricing, ...tempPricing };
+                    localStorage.setItem('nodus_custom_fds_pricing', JSON.stringify(merged));
+                    setCustomPricing(merged);
+                    setShowPricingModal(false);
+                  }}
+                  style={{
+                    background: '#2563eb',
+                    border: 'none',
+                    color: '#ffffff',
+                    padding: '0.45rem 1.2rem',
+                    borderRadius: '6px',
+                    fontSize: '0.8rem',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Guardar y Recalcular
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       </main>
     </div>
   );
