@@ -47,6 +47,7 @@ import {
 import CMJDashboard from '../components/CMJDashboard';
 import KPIsEntrenadoresLlamadas from '../components/KPIsEntrenadoresLlamadas';
 import { auditAndDeduplicateManagers } from '../services/dataIntegrityAgent';
+import defaultKpisData from '../data/kpisEntrenadoresData.json';
 
 
 const SEDE_COLORS = {
@@ -1365,7 +1366,7 @@ export default function CentroManagers() {
   // Extracción e integración idempotente de pagos realizados a entrenadores sin duplicados
   const planillaPagosList = useMemo(() => {
     if (!canViewLiquidacion) return [];
-    const rawKpis = defaultKpisData?.kpis || [];
+    const rawKpis = (typeof defaultKpisData !== 'undefined' && defaultKpisData?.kpis) ? defaultKpisData.kpis : [];
     const result = [];
     const seenSlugs = new Set();
 
@@ -1377,7 +1378,7 @@ export default function CentroManagers() {
 
       const firestoreDoc = liquidacionesPagos['sheet_pago__' + tSlug] || liquidacionesPagos[tSlug];
       const metaSede = TRAINER_METADATA[k.entrenador]?.primarySede;
-      const detalleSede = defaultKpisData?.llamadosDetalle?.find(m => m.entrenador === k.entrenador)?.sede;
+      const detalleSede = (typeof defaultKpisData !== 'undefined' && defaultKpisData?.llamadosDetalle) ? defaultKpisData.llamadosDetalle.find(m => m.entrenador === k.entrenador)?.sede : null;
       const sede = metaSede || detalleSede || firestoreDoc?.sede || 'Multi-Sede';
 
       result.push({
