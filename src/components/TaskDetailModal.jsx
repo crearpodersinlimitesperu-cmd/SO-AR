@@ -1260,7 +1260,7 @@ export default function TaskDetailModal({
                     gap: '0.4rem'
                   }}
                 >
-                  <Plus size={14} /> + Adjuntar Evidencia
+                  <Plus size={14} /> Adjuntar Evidencia
                 </button>
               )}
             </div>
