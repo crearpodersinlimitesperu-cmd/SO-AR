@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
@@ -24,7 +24,8 @@ import {
   Car,
   FolderOpen,
   Calendar,
-  Globe
+  Globe,
+  FileSpreadsheet
 } from 'lucide-react';
 
 // Configuración de las 6 Sedes Operativas Oficiales
@@ -41,16 +42,22 @@ const SEDES_CONFIG = [
 // Carpetas Oficiales de Google Drive
 const DRIVE_REPOSITORIES = [
   {
-    name: 'Vuelos y Documentación Entrenadores Multi-Sede',
-    desc: 'Carpetas organizadas por sede (Cuenca, Quito, Guayaquil, Medellín, México, Lima) con itinerarios, pases de abordar y documentos oficiales.',
+    name: 'Vuelos y DocumentaciÃ³n Entrenadores Multi-Sede',
+    desc: 'Carpetas organizadas por sede (Cuenca, Quito, Guayaquil, MedellÃ­n, MÃ©xico, Lima) con itinerarios, pases de abordar y documentos oficiales.',
     url: 'https://drive.google.com/drive/folders/1oi7mUG619dQ2ZVzHzUyO5Xkwti-jgDFl?usp=drive_link',
-    badge: 'Multi-Sede Ecuador / Colombia / México'
+    badge: 'Multi-Sede Ecuador / Colombia / MÃ©xico'
   },
   {
-    name: 'Pasajes, Facturas y Logística Aérea General',
-    desc: '331+ boletos de avión LATAM/Avianca/Copa, facturas de hospedaje y comprobantes de traslado de todas las sedes.',
+    name: 'Pasajes, Facturas y LogÃ­stica AÃ©rea General',
+    desc: '331+ boletos de aviÃ³n LATAM/Avianca/Copa, facturas de hospedaje y comprobantes de traslado de todas las sedes.',
     url: 'https://drive.google.com/drive/folders/1i60YXyxRrFP1LxmXUVuHK5eRyeUBzR0r?usp=drive_link',
     badge: 'Facturas & Tickets Oficiales'
+  },
+  {
+    name: 'Planilla Oficial: LLAMADOS MANAGERS (Entrenadores y Sedes)',
+    desc: 'Matriz de asignaciÃ³n de llamados, control de tarifas, graduados y desertores sincronizada automÃ¡ticamente con Causa OS.',
+    url: 'https://docs.google.com/spreadsheets/d/1lWAHh1PSAKu9eU6DOBxZExrHMbCYc3f2Sr8GdghNxD0/edit?usp=drive_link',
+    badge: 'Google Sheets Sincronizado'
   }
 ];
 
@@ -1519,6 +1526,28 @@ export default function MonitorVuelosCartas() {
               >
                 <FolderOpen size={16} />
                 <span>Drive: Facturas y Pasajes Generales</span>
+                <ExternalLink size={13} />
+              </a>
+              <a
+                href={DRIVE_REPOSITORIES[2].url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-secondary"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '9px 16px',
+                  fontSize: '0.85rem',
+                  textDecoration: 'none',
+                  borderRadius: '10px',
+                  fontWeight: 700,
+                  borderColor: 'rgba(16, 185, 129, 0.4)',
+                  color: '#10b981'
+                }}
+              >
+                <FileSpreadsheet size={16} />
+                <span>Hoja: LLAMADOS MANAGERS</span>
                 <ExternalLink size={13} />
               </a>
             </div>
