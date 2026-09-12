@@ -1,4 +1,4 @@
-﻿import { getWhatsAppUrl } from '../utils/phoneUtils';
+﻿﻿import { getWhatsAppUrl } from '../utils/phoneUtils';
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -17,7 +17,8 @@ import {
   canWriteNotaSeguimiento,
   canViewAllNotasSeguimiento,
   canReplyNotaSeguimiento,
-  canViewKPIsLlamadas
+  canViewKPIsLlamadas,
+  canAccessPagosSemanalesDrive
 } from '../config/permissions';
 import { 
   INITIAL_MANAGERS, 
@@ -34,6 +35,7 @@ import { db } from '../services/firebase';
 import { collection, getDocs, doc, addDoc, setDoc, updateDoc, deleteDoc, writeBatch, onSnapshot, serverTimestamp, query, where, arrayUnion } from 'firebase/firestore';
 import CountryFlag from '../components/CountryFlag';
 import { 
+  FolderOpen,
   Users, PhoneCall, CheckCircle, XCircle, Calendar, Plus, PlusCircle,
   Search, Filter, Award, Building, UserCheck, Clock, 
   ChevronLeft, ChevronRight, DollarSign, Layers, ArrowLeft,
@@ -3398,6 +3400,32 @@ export default function CentroManagers() {
               >
                 <FileSpreadsheet size={17} /> Abrir Planilla Oficial en Google Sheets <ExternalLink size={15} />
               </a>
+
+              {canAccessPagosSemanalesDrive(currentUser) && (
+                <a
+                  href="https://drive.google.com/drive/folders/1c3wkWITxPTdtvZ41o-MTcftRPkQtmpgi?usp=drive_link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Acceso restringido: Solo para el Gerente de Lima y DirecciÃ³n"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    padding: '0.6rem 1.15rem',
+                    background: '#0284c7',
+                    color: '#ffffff',
+                    borderRadius: '10px',
+                    fontWeight: 700,
+                    fontSize: '0.85rem',
+                    textDecoration: 'none',
+                    boxShadow: '0 3px 8px rgba(2,132,199,0.35)',
+                    transition: 'all 0.2s',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  <FolderOpen size={17} /> Carpeta Pagos Semanales (Gerente Lima) <ExternalLink size={15} />
+                </a>
+              )}
             </div>
 
             {/* SUB-NAVEGACIÓN DE PESTAÑAS DENTRO DE LIQUIDACIÓN */}
