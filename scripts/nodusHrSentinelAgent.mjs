@@ -1,4 +1,4 @@
-/**
+﻿/**
  * =========================================================================
  * AGENTE 5: CENTINELA DE TALENTO HUMANO Y DESEMPEÑO (NodusHrSentinelAgent)
  * =========================================================================
@@ -115,6 +115,16 @@ export class NodusHrSentinelAgent {
         gestiones,
         coberturaPct: cobertura,
         confirmados,
+        confirmadosC1: c.confirmadosC1 || 0,
+        confirmadosC2: c.confirmadosC2 || 0,
+        sentadosC1: c.sentadosC1 || 0,
+        sentadosC2: c.sentadosC2 || 0,
+        sentadosTotal: c.sentadosTotal || (c.sentadosC1 || 0) + (c.sentadosC2 || 0) || c.asistieron || 0,
+        gestionesC1: c.gestionesC1 || 0,
+        gestionesC2: c.gestionesC2 || 0,
+        porConfirmar: c.porConfirmar || 0,
+        noInteresa: c.noInteresa || 0,
+        devolucion: c.devolucion || 0,
         noContesta,
         ultGestion: c.ultGestion,
         ultConexion: c.ultConexion,
