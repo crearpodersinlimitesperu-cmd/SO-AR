@@ -109,6 +109,62 @@ export const OPERATIONAL_SEDES = [
   'M\u00E9xico'
 ];
 
+/**
+ * Determina si una tarea pertenece a otra sede o fue asignada nominalmente a terceros,
+ * y no fue creada ni asignada al usuario actual (es ajena / foránea).
+ */
+export const isForeignTask = (task, currentUser) => {
+  if (!currentUser || !task) return false;
+
+  const userEmail = (currentUser?.email || '').toLowerCase().trim();
+  const userEmailCom = userEmail.replace('@crearpsl.net', '@crearpsl.com');
+  const userEmailNet = userEmail.replace('@crearpsl.com', '@crearpsl.net');
+
+  // 1. ¿Está asignada al usuario directamente?
+  const isAssigned = (Array.isArray(task.assignedToEmails) && task.assignedToEmails.some(e => {
+    const el = (e || '').toLowerCase().trim();
+    return el === userEmail || el === userEmailCom || el === userEmailNet;
+  })) || (task.assignedToEmail && (() => {
+    const el = task.assignedToEmail.toLowerCase().trim();
+    return el === userEmail || el === userEmailCom || el === userEmailNet;
+  })());
+
+  if (isAssigned) return false;
+
+  // 2. ¿Es colaborador aceptado?
+  const isCollaborator = Array.isArray(task.collaborators) && task.collaborators.some(c => {
+    const cl = (typeof c === 'string' ? c : c?.email || '').toLowerCase().trim();
+    return cl === userEmail || cl === userEmailCom || cl === userEmailNet;
+  });
+
+  if (isCollaborator) return false;
+
+  // 3. ¿La creó o la asignó él?
+  const creatorEmail = (task.createdBy || '').toLowerCase().trim();
+  const isMyCreation = creatorEmail && (creatorEmail === userEmail || creatorEmail === userEmailCom || creatorEmail === userEmailNet);
+
+  if (isMyCreation) return false;
+
+  // 4. Si el usuario no la creó ni se la asignaron a él:
+  // ¿Pertenece a otra sede distinta a la suya?
+  const taskSede = task.assignedSede || task.sede;
+  const userSede = currentUser?.sede;
+
+  if (taskSede && taskSede !== 'Global' && taskSede !== 'Sede Global') {
+    if (userSede && userSede !== 'Sede Global' && normalizeSede(taskSede) !== normalizeSede(userSede)) {
+      return true; // Es de otra sede y no la asignó ni se la asignaron
+    }
+  }
+
+  // 5. ¿O fue asignada específicamente a otros destinatarios nominales y no al usuario?
+  const hasSpecificAssignees = (Array.isArray(task.assignedToEmails) && task.assignedToEmails.length > 0) || Boolean(task.assignedToEmail);
+  if (hasSpecificAssignees && !isAssigned) {
+    return true; // Asignada nominalmente a terceros
+  }
+
+  return false;
+};
+
 export const ROLE_DISPLAY_NAMES = {
   coord_c1: 'Coordinador Capítulo 1 y 2 (C1 / C2)',
   coordinador_c1c2: 'Coordinador Capítulo 1 y 2 (C1 / C2)',
@@ -186,6 +242,7 @@ export const findUserByAnyEmail = (searchEmail) => {
     return false;
   }) || null;
 };
+
 
 
 
