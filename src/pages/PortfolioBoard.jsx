@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { doc } from 'firebase/firestore';
 import { db, getDocResilient } from '../services/firebase';
 import { OPERATIONAL_SEDES, normalizeSede } from '../data/usersData';
+import ResourceCapacityView from '../components/ResourceCapacityView';
 
 export default function PortfolioBoard() {
   const { currentUser } = useAuth();
@@ -780,21 +781,9 @@ export default function PortfolioBoard() {
               </div>
             </div>
           </div>
-        ) : (
-          /* =========================================================================
-             VISTA 3: CAPACIDAD DE RECURSOS (EXISTENTE)
-             ========================================================================= */
-          <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '4rem 2rem', textAlign: 'center', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-            <ShieldCheck size={48} color="#94a3b8" style={{ margin: '0 auto 1.5rem', display: 'block' }} />
-            <h2 style={{ fontSize: '1.5rem', color: textDark, fontWeight: 800, marginBottom: '0.75rem' }}>Capacidad de Recursos</h2>
-            <p style={{ color: textMuted, maxWidth: '500px', margin: '0 auto 2rem', lineHeight: '1.6' }}>
-              Esta vista de asignación de capacidad de entrenadores, coordinadores y salas está actualmente en desarrollo para la sede {selectedSede}.
-            </p>
-            <button onClick={() => setViewMode('active')} style={{ padding: '0.75rem 1.5rem', borderRadius: '8px', background: textDark, color: '#fff', fontWeight: 700, border: 'none', cursor: 'pointer', fontSize: '0.9rem' }}>
-              Volver a Ciclos Activos
-            </button>
-          </div>
-        )}
+        ) : viewMode === 'resources' ? (
+          <ResourceCapacityView selectedSede={selectedSede} hrSentinelData={hrSentinelData} />
+        ) : null}
       </main>
     </div>
   );
