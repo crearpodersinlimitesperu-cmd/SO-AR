@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+﻿import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useCycles } from '../context/CyclesContext';
 import {
@@ -203,56 +203,69 @@ export default function PortfolioBoard() {
         }
 
         let totalEnrolados = 0;
-        let totalDesertores = 0;
+        let totalBajasReales = 0;
+        let totalEnGestion = 0;
         let totalParticipantes = 0;
-        
+        let totalSinContactar = 0;
+
         if (selectedSede === 'GLOBAL') {
           if (data && data.totales) {
             totalEnrolados = data.totales.totalConfirmados || 0;
-            totalDesertores = data.totales.totalNoInteresa || 0;
+            totalBajasReales = data.totales.totalNoInteresa || 0;
+            totalEnGestion = (data.totales.totalNoContesta || 0) + (data.totales.totalPorConfirmar || 0);
             totalParticipantes = data.totales.totalAsignados || 1;
+            totalSinContactar = Math.max(0, totalParticipantes - (data.totales.totalGestiones || 0));
           } else {
             const list = (data && data.coordinadores) || nodusFallbackData?.coordinadores || [];
             totalEnrolados = list.reduce((acc, c) => acc + Number(c.estados?.confirmado ?? c.confirmados ?? ((c.confirmadosC1 || 0) + (c.confirmadosC2 || 0)) ?? 0), 0);
-            totalDesertores = list.reduce((acc, c) => acc + Number(c.estados?.noInteresa ?? c.noInteresa ?? 0), 0);
+            totalBajasReales = list.reduce((acc, c) => acc + Number(c.estados?.noInteresa ?? c.noInteresa ?? 0), 0);
+            totalEnGestion = list.reduce((acc, c) => acc + Number((c.estados?.noContesta || 0) + (c.estados?.porConfirmar || 0)), 0);
             totalParticipantes = list.reduce((acc, c) => acc + Number(c.asignados || 0), 0) || 1;
+            const gest = list.reduce((acc, c) => acc + Number(c.estados?.llamadas || c.gestiones || 0), 0);
+            totalSinContactar = Math.max(0, totalParticipantes - gest);
           }
         } else {
           if (data && data.sedes) {
             const sedeData = data.sedes.find(s => normalizeSede(s.sede) === normalizeSede(selectedSede));
             if (sedeData) {
               totalEnrolados = sedeData.confirmadosTotal || 0;
-              totalDesertores = (sedeData.noContestaTotal || 0) + (sedeData.porConfirmarTotal || 0);
+              totalBajasReales = sedeData.noInteresaTotal || 0;
+              totalEnGestion = (sedeData.noContestaTotal || 0) + (sedeData.porConfirmarTotal || 0);
               totalParticipantes = sedeData.asignadosTotal || 1;
+              totalSinContactar = Math.max(0, totalParticipantes - (sedeData.gestionesTotal || 0));
             }
           }
           if (!totalEnrolados && !totalParticipantes) {
             const list = ((data && data.coordinadores) || nodusFallbackData?.coordinadores || []).filter(c => normalizeSede(c.sede) === normalizeSede(selectedSede));
             totalEnrolados = list.reduce((acc, c) => acc + Number(c.estados?.confirmado ?? c.confirmados ?? ((c.confirmadosC1 || 0) + (c.confirmadosC2 || 0)) ?? 0), 0);
-            totalDesertores = list.reduce((acc, c) => acc + Number(c.estados?.noContesta ?? c.noContesta ?? 0), 0);
+            totalBajasReales = list.reduce((acc, c) => acc + Number(c.estados?.noInteresa ?? c.noInteresa ?? 0), 0);
+            totalEnGestion = list.reduce((acc, c) => acc + Number((c.estados?.noContesta || 0) + (c.estados?.porConfirmar || 0)), 0);
             totalParticipantes = list.reduce((acc, c) => acc + Number(c.asignados || 0), 0) || 1;
+            const gest = list.reduce((acc, c) => acc + Number(c.estados?.llamadas || c.gestiones || 0), 0);
+            totalSinContactar = Math.max(0, totalParticipantes - gest);
           }
         }
 
-        const desercionRate = totalParticipantes > 0 ? (totalDesertores / totalParticipantes) * 100 : 0;
+        const bajaRate = totalParticipantes > 0 ? (totalBajasReales / totalParticipantes) * 100 : 0;
         let health = 'good';
-        if (desercionRate > 15) health = 'warning';
-        if (desercionRate > 30) health = 'critical';
+        if (totalSinContactar > (totalParticipantes * 0.5)) health = 'warning';
+        if (bajaRate > 25) health = 'critical';
 
         const progress = Math.min(100, Math.round((totalEnrolados / totalParticipantes) * 100));
 
         let ciclosReales = [
           { 
             id: 1, 
-            name: `${selectedSede} - Consolidado Nodus (Datos Reales)`, 
+            name: ${selectedSede} - Convocatoria C1 (Base Asignada Nodus), 
             progress: progress || 0, 
             health: health, 
             date: new Date().toLocaleDateString('es-ES', { month: 'short', day: 'numeric', year: 'numeric' }), 
-            action: health === 'critical' ? 'IntervenciÃ³n Urgente' : 'Ver Detalles',
+            action: totalSinContactar > 50 ? 'Acelerar Llamadas' : 'Ver Desglose',
             details: {
               totalEnrolados: totalEnrolados,
-              totalDesertores: totalDesertores,
-              tasaDesercion: desercionRate.toFixed(1),
+              totalBajas: totalBajasReales,
+              totalEnGestion: totalEnGestion,
+              totalSinContactar: totalSinContactar,
               totalParticipantes: totalParticipantes
             }
           }
@@ -933,23 +946,22 @@ export default function PortfolioBoard() {
                         <tr style={{ background: bgLight, borderBottom: `1px solid ${borderLight}` }}>
                           <td colSpan="5" style={{ padding: '1.5rem', borderLeft: `4px solid ${p.health === 'good' ? '#10b981' : p.health === 'warning' ? '#f59e0b' : '#ef4444'}` }}>
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem' }}>
-                              <div style={{ background: bgCard, padding: '1rem', borderRadius: '8px', border: `1px solid ${borderLight}` }}>
-                                <div style={{ fontSize: '0.7rem', color: textMuted, textTransform: 'uppercase', fontWeight: 700 }}>Total Participantes</div>
-                                <div style={{ fontSize: '1.2rem', fontWeight: 800, color: textDark }}>{p.details.totalParticipantes}</div>
+                              <div style={{ background: bgCard, padding: '1rem', borderRadius: '8px', border: 1px solid  }}>
+                                <div style={{ fontSize: '0.7rem', color: textMuted, textTransform: 'uppercase', fontWeight: 700 }}>Cartera Asignada</div>
+                                <div style={{ fontSize: '1.2rem', fontWeight: 800, color: textDark }}>{p.details.totalParticipantes} <span style={{ fontSize: '0.75rem', fontWeight: 500, color: textMuted }}>prospectos</span></div>
                               </div>
-                              <div style={{ background: bgCard, padding: '1rem', borderRadius: '8px', border: `1px solid ${borderLight}` }}>
-                                <div style={{ fontSize: '0.7rem', color: textMuted, textTransform: 'uppercase', fontWeight: 700 }}>Total Enrolados</div>
-                                <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#10b981' }}>{p.details.totalEnrolados}</div>
+                              <div style={{ background: bgCard, padding: '1rem', borderRadius: '8px', border: 1px solid  }}>
+                                <div style={{ fontSize: '0.7rem', color: textMuted, textTransform: 'uppercase', fontWeight: 700 }}>Confirmados a Sala</div>
+                                <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#10b981' }}>{p.details.totalEnrolados} <span style={{ fontSize: '0.75rem', fontWeight: 500, color: textMuted }}>enrolados</span></div>
                               </div>
-                              <div style={{ background: bgCard, padding: '1rem', borderRadius: '8px', border: `1px solid ${borderLight}` }}>
-                                <div style={{ fontSize: '0.7rem', color: textMuted, textTransform: 'uppercase', fontWeight: 700 }}>Deserciones FDS</div>
-                                <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#ef4444' }}>{p.details.totalDesertores}</div>
+                              <div style={{ background: bgCard, padding: '1rem', borderRadius: '8px', border: 1px solid  }}>
+                                <div style={{ fontSize: '0.7rem', color: textMuted, textTransform: 'uppercase', fontWeight: 700 }}>En GestiÃ³n TelefÃ³nica</div>
+                                <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#3b82f6' }}>{p.details.totalEnGestion} <span style={{ fontSize: '0.75rem', fontWeight: 500, color: textMuted }}>contactos</span></div>
                               </div>
-                              <div style={{ background: bgCard, padding: '1rem', borderRadius: '8px', border: `1px solid ${borderLight}` }}>
-                                <div style={{ fontSize: '0.7rem', color: textMuted, textTransform: 'uppercase', fontWeight: 700 }}>Tasa de Deserción</div>
-                                <div style={{ fontSize: '1.2rem', fontWeight: 800, color: p.health === 'good' ? '#10b981' : p.health === 'warning' ? '#f59e0b' : '#ef4444' }}>{p.details.tasaDesercion}%</div>
+                              <div style={{ background: bgCard, padding: '1rem', borderRadius: '8px', border: 1px solid  }}>
+                                <div style={{ fontSize: '0.7rem', color: textMuted, textTransform: 'uppercase', fontWeight: 700 }}>Pendientes por Llamar</div>
+                                <div style={{ fontSize: '1.2rem', fontWeight: 800, color: p.details.totalSinContactar > 0 ? '#f59e0b' : '#10b981' }}>{p.details.totalSinContactar} <span style={{ fontSize: '0.75rem', fontWeight: 500, color: textMuted }}>base virgen</span></div>
                               </div>
-                            </div>
                           </td>
                         </tr>
                       )}
@@ -2129,3 +2141,4 @@ ${coord.coachingFeedback}`;
     </div>
   );
 }
+
