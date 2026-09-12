@@ -962,6 +962,7 @@ export default function PortfolioBoard() {
                                 <div style={{ fontSize: '0.7rem', color: textMuted, textTransform: 'uppercase', fontWeight: 700 }}>Pendientes por Llamar</div>
                                 <div style={{ fontSize: '1.2rem', fontWeight: 800, color: p.details.totalSinContactar > 0 ? '#f59e0b' : '#10b981' }}>{p.details.totalSinContactar} <span style={{ fontSize: '0.75rem', fontWeight: 500, color: textMuted }}>base virgen</span></div>
                               </div>
+                            </div>
                           </td>
                         </tr>
                       )}
@@ -2141,6 +2142,7 @@ ${coord.coachingFeedback}`;
     </div>
   );
 }
+
 
 
 
