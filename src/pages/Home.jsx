@@ -403,12 +403,12 @@ const CAUSA_OPTIONS_REGISTRY = [
   },
   {
     id: 'opt-auditoria-kpis',
-    title: 'Auditoría de KPIs',
+    title: 'Auditoría de KPIs & Coordinadores Nodus',
     category: 'Auditoría',
-    badge: 'Control',
+    badge: 'Nodus Live',
     emoji: '📉',
-    desc: 'Detección de anomalías, inconsistencias y validación cruzada de números',
-    keywords: ['auditoria', 'auditoria kpis', 'control', 'revision metricas', 'inconsistencias'],
+    desc: 'Actividad de Coordinadores C1 & C2 en Nodus (llamadas, confirmados), detección de anomalías y validación cruzada',
+    keywords: ['auditoria', 'auditoria kpis', 'actividad coordinadores', 'coordinadores nodus', 'agente actividad', 'nodus', 'actividad', 'llamadas', 'coordinadores', 'control', 'revision metricas', 'inconsistencias'],
     route: '/auditoria-kpis',
     roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']
   },
@@ -1206,7 +1206,7 @@ export default function Home() {
               gap: '5px' 
             }}>
               <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981', display: 'inline-block', boxShadow: '0 0 6px #10b981' }}></span>
-              Causa OS v3.0.0 Enterprise Multi-Agent
+              Causa OS v2.8.0
             </span>
           </div>
         </div>
