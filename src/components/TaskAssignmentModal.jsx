@@ -24,6 +24,8 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
 
   
   const [isRecurring, setIsRecurring] = useState(false);
+  const [isOptional, setIsOptional] = useState(false);
+  const [periodicity, setPeriodicity] = useState('UNICA'); // UNICA, DIARIA, SEMANAL, POR_CICLO
   const [recurrence, setRecurrence] = useState({
     cycle: 'TODOS',
     phase: 'PRE',
@@ -36,6 +38,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
     deadlineDate: getTodayStr(),
     deadlineTime: '18:00',
     assignedToEmails: [],
+    assignedRoles: [],
     assignedSede: currentUser?.sede || '',
     priority: '🟡 AMARILLO'
   });
@@ -102,15 +105,35 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
     const finalTime = newTask.deadlineTime || '18:00';
     const deadlineISO = new Date(`${finalDate}T${finalTime}:00`).toISOString();
     
+    const assignedEmails = canAssignSpecific ? (newTask.assignedToEmails?.length > 0 ? newTask.assignedToEmails : [currentUser?.email]) : (prefilledUser?.email ? [prefilledUser.email] : [currentUser?.email]);
+
+    // Inicializar mapa de seguimiento individual en una sola tarjeta:
+    const assigneeProgress = {};
+    assignedEmails.forEach(email => {
+      const u = usersData.find(usr => usr.email?.toLowerCase() === email.toLowerCase());
+      assigneeProgress[email] = {
+        name: u?.name || email,
+        role: u?.role || finalRole || 'colaborador',
+        sede: u?.sede || newTask.assignedSede || currentUser?.sede || 'Global',
+        completed: false,
+        completedAt: null,
+        progress: 0
+      };
+    });
+
     const taskData = {
       task: newTask.title.trim(),
       role: finalRole,
       deadline: deadlineISO,
       priority: newTask.priority,
       isCritical: newTask.priority === '🔴 ROJO',
+      isOptional: isOptional,
+      periodicity: periodicity,
       createdBy: currentUser.email,
-      assignedToEmails: canAssignSpecific ? (newTask.assignedToEmails?.length > 0 ? newTask.assignedToEmails : [currentUser?.email]) : (prefilledUser?.email ? [prefilledUser.email] : [currentUser?.email]),
-      assignedSede: canAssignSpecific ? (newTask.assignedSede || currentUser?.sede || 'Global') : (prefilledUser?.sede || currentUser?.sede || 'Global')
+      assignedToEmails: assignedEmails,
+      assignedRoles: newTask.assignedRoles || [],
+      assignedSede: canAssignSpecific ? (newTask.assignedSede || currentUser?.sede || 'Global') : (prefilledUser?.sede || currentUser?.sede || 'Global'),
+      assigneeProgress: assigneeProgress
     };
 
     if (isRecurring) {
@@ -213,6 +236,57 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
             </div>
           </div>
           
+          {/* ASIGNACIÓN A VARIAS ÁREAS DE UNA SOLA VEZ */}
+          <div style={{ gridColumn: '1 / -1', background: 'rgba(255,255,255,0.03)', padding: '0.8rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <div style={{ fontSize: '0.75rem', fontWeight: 'bold', color: 'var(--crear-gold)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              ⚡ Asignar a Varias Áreas de una sola vez:
+            </div>
+            <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+              {[
+                { id: 'gerentes', label: '🏢 Todos los Gerentes', filter: u => normalizeRole(u.role) === 'gerente' },
+                { id: 'c1', label: '🌟 Coordinadores C1', filter: u => normalizeRole(u.role) === 'coord_c1' },
+                { id: 'mj', label: '🏆 Coordinadores MJ', filter: u => ['coord_maestria', 'coordinador_mj'].includes(normalizeRole(u.role)) },
+                { id: 'qt', label: '⚡ Quantum Team', filter: u => normalizeRole(u.role) === 'qt' },
+                { id: 'finanzas', label: '📊 Finanzas / Contabilidad', filter: u => ['cfo', 'finanzas', 'asistente_impuestos_quito'].includes(normalizeRole(u.role)) },
+                { id: 'th', label: '👥 Talento Humano', filter: u => ['talento_humano', 'director_th'].includes(normalizeRole(u.role)) }
+              ].map(area => {
+                const matchingEmails = usersData.filter(area.filter).map(u => u.email);
+                const isAllSelected = matchingEmails.length > 0 && matchingEmails.every(em => newTask.assignedToEmails?.includes(em));
+                return (
+                  <button
+                    key={area.id}
+                    type="button"
+                    onClick={() => {
+                      if (isAllSelected) {
+                        setNewTask(prev => ({
+                          ...prev,
+                          assignedToEmails: prev.assignedToEmails.filter(em => !matchingEmails.includes(em))
+                        }));
+                      } else {
+                        setNewTask(prev => ({
+                          ...prev,
+                          assignedToEmails: [...new Set([...(prev.assignedToEmails || []), ...matchingEmails])]
+                        }));
+                      }
+                    }}
+                    style={{
+                      padding: '0.3rem 0.6rem',
+                      borderRadius: '6px',
+                      fontSize: '0.75rem',
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                      background: isAllSelected ? 'var(--crear-gold)' : 'rgba(255,255,255,0.06)',
+                      color: isAllSelected ? '#000000' : 'var(--text-heading)',
+                      border: `1px solid ${isAllSelected ? 'var(--crear-gold)' : 'rgba(255,255,255,0.15)'}`
+                    }}
+                  >
+                    {isAllSelected ? '✓ ' : '+ '} {area.label} ({matchingEmails.length})
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
             <div>
               <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.3rem' }}>Asignar a Rol:</label>
@@ -379,6 +453,42 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                   <input type="time" value={newTask.deadlineTime} onChange={e => setNewTask({...newTask, deadlineTime: e.target.value})} className="input-field" style={{ width: '100%' }} required disabled={isSubmitting} />
                 </div>
               </div>
+            </div>
+
+            {/* OPCIONES ADICIONALES: OPCIONALES Y PERIÓDICAS */}
+            <div style={{ gridColumn: '1 / -1', display: 'flex', gap: '1rem', flexWrap: 'wrap', padding: '0.8rem', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.78rem', color: 'var(--text-heading)', cursor: 'pointer' }}>
+                <input 
+                  type="checkbox" 
+                  checked={isOptional} 
+                  onChange={e => setIsOptional(e.target.checked)} 
+                  style={{ accentColor: 'var(--crear-gold)' }}
+                />
+                <span>✨ Tarea Opcional / Recomendada (No bloqueante)</span>
+              </label>
+              
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.78rem', color: 'var(--text-heading)', cursor: 'pointer' }}>
+                <input 
+                  type="checkbox" 
+                  checked={periodicity !== 'UNICA'} 
+                  onChange={e => setPeriodicity(e.target.checked ? 'DIARIA' : 'UNICA')} 
+                  style={{ accentColor: 'var(--crear-cyan)' }}
+                />
+                <span>🔄 Tarea Periódica / Recurrente</span>
+              </label>
+
+              {periodicity !== 'UNICA' && (
+                <select
+                  value={periodicity}
+                  onChange={e => setPeriodicity(e.target.value)}
+                  className="input-field"
+                  style={{ padding: '0.2rem 0.6rem', fontSize: '0.75rem', borderColor: 'var(--crear-cyan)' }}
+                >
+                  <option value="DIARIA">Frecuencia: Diaria</option>
+                  <option value="SEMANAL">Frecuencia: Semanal</option>
+                  <option value="POR_CICLO">Frecuencia: Por Cada Ciclo Operativo</option>
+                </select>
+              )}
             </div>
           </div>
           
