@@ -1,4 +1,4 @@
-﻿import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import { db, auth } from '../services/firebase';
 import { collection, onSnapshot, doc, updateDoc, setDoc, writeBatch, addDoc, query, where, orderBy, limit, getDocs, getDoc } from 'firebase/firestore';
 import { checklistData } from '../data/checklistData';
@@ -24,6 +24,124 @@ const formatDeadlineEs = (iso) => {
   } catch (e) {
     return iso;
   }
+};
+
+// Genera una plantilla de correo HTML institucional, moderna y responsiva
+// con detalles completos de la tarea, botón de acceso directo e indicaciones
+// paso a paso de inicio de sesión en Causa OS (clave para colaboradores nuevos o sin conexión).
+const buildTaskEmailHtml = ({
+  taskTitle,
+  notes,
+  deadline,
+  assignedSede,
+  priority,
+  assignedByName,
+  recipientName,
+  recipientEmail,
+  isUpdate = false
+}) => {
+  const greetingName = recipientName || 'Colaborador';
+  const cleanNotes = (notes || '').trim();
+  const safeAssigner = assignedByName || 'Dirección / Supervisión';
+  const headerTitle = isUpdate ? 'Tarea Actualizada' : 'Nueva Tarea Asignada';
+  const subtitle = isUpdate 
+    ? `Se ha modificado una tarea que tienes asignada en la plataforma operativa <strong>Causa OS</strong>.`
+    : `Se te ha asignado una responsabilidad operativa en la plataforma <strong>Causa OS</strong>.`;
+
+  return `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1e293b; max-width: 620px; margin: 0 auto; border: 1px solid #cbd5e1; border-radius: 12px; overflow: hidden; background-color: #ffffff; box-shadow: 0 4px 12px rgba(0,0,0,0.06);">
+      <!-- Cabecera Institucional -->
+      <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 24px; text-align: center; border-bottom: 3px solid #f59e0b;">
+        <span style="display: inline-block; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #fbbf24; font-weight: 700; margin-bottom: 6px;">CREAR PODER SIN LÍMITES</span>
+        <h1 style="margin: 0; font-size: 22px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px;">📋 ${headerTitle}</h1>
+        <p style="margin: 6px 0 0 0; font-size: 13px; color: #94a3b8;">Sistema Operativo Causa OS</p>
+      </div>
+
+      <div style="padding: 26px 28px; background-color: #ffffff;">
+        <p style="font-size: 15px; margin-top: 0; line-height: 1.5;">Hola <strong>${greetingName}</strong>,</p>
+        <p style="font-size: 14.5px; color: #475569; line-height: 1.5; margin-bottom: 20px;">${subtitle}</p>
+
+        <!-- Tarjeta de Detalle de la Tarea -->
+        <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 18px 20px; margin-bottom: 22px;">
+          <div style="margin-bottom: 12px;">
+            <span style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: #64748b; letter-spacing: 0.5px;">Tarea asignada:</span>
+            <div style="font-size: 17px; font-weight: 700; color: #0f172a; margin-top: 4px; line-height: 1.35;">${taskTitle}</div>
+          </div>
+
+          <table style="width: 100%; border-collapse: collapse; font-size: 13.5px; margin-top: 10px;">
+            <tbody>
+              <tr>
+                <td style="padding: 6px 0; color: #64748b; width: 130px; font-weight: 600;">👤 Asignado por:</td>
+                <td style="padding: 6px 0; color: #0f172a; font-weight: 700;">${safeAssigner}</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; color: #64748b; font-weight: 600;">⏰ Fecha límite:</td>
+                <td style="padding: 6px 0; color: #dc2626; font-weight: 700;">${formatDeadlineEs(deadline)}</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; color: #64748b; font-weight: 600;">📍 Sede / Área:</td>
+                <td style="padding: 6px 0; color: #0f172a;">${assignedSede || 'Global'}</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; color: #64748b; font-weight: 600;">🚨 Prioridad:</td>
+                <td style="padding: 6px 0; color: #0f172a; font-weight: 600;">${priority || 'Normal'}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          ${cleanNotes ? `
+          <div style="background-color: #0f172a; color: #f8fafc; border-left: 4px solid #f59e0b; padding: 14px 16px; margin-top: 14px; border-radius: 6px;">
+            <strong style="color: #fbbf24; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px;">📝 Notas e Instrucciones Específicas:</strong>
+            <span style="white-space: pre-wrap; font-size: 13.5px; line-height: 1.5; color: #f1f5f9;">${cleanNotes}</span>
+          </div>
+          ` : ''}
+        </div>
+
+        <!-- Botón de Acción Principal -->
+        <div style="text-align: center; margin: 26px 0 28px 0;">
+          <a href="https://centro-operativo-cpsl.web.app" style="background-color: #2563eb; color: #ffffff; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 15px; display: inline-block; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.35);">
+            🚀 Ingresar a Causa OS
+          </a>
+        </div>
+
+        <!-- Bloque de Indicaciones de Acceso Paso a Paso (Para colaboradores nuevos o sin conexión) -->
+        <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-left: 4px solid #22c55e; border-radius: 8px; padding: 16px 18px; margin: 20px 0;">
+          <h3 style="margin: 0 0 10px 0; color: #15803d; font-size: 14px; font-weight: 700;">
+            📌 Indicaciones para ingresar a la plataforma:
+          </h3>
+          <ol style="margin: 0; padding-left: 18px; color: #166534; font-size: 13px; line-height: 1.6;">
+            <li style="margin-bottom: 5px;">
+              <strong>Acceso al enlace:</strong> Haz clic en el botón superior o ingresa directamente a <a href="https://centro-operativo-cpsl.web.app" style="color: #1d4ed8; font-weight: 600; text-decoration: underline;">https://centro-operativo-cpsl.web.app</a> (disponible desde PC o celular).
+            </li>
+            <li style="margin-bottom: 5px;">
+              <strong>Inicio de sesión:</strong> Haz clic en el botón <strong>"Continuar con Google"</strong> y selecciona tu cuenta corporativa institucional (<strong>${recipientEmail}</strong>).
+            </li>
+            <li style="margin-bottom: 5px;">
+              <strong>Matriz de tareas:</strong> En tu pantalla principal verás tu checklist con esta tarea lista para revisión.
+            </li>
+            <li>
+              <strong>Seguimiento y cierre:</strong> Podrás registrar comentarios, reportar porcentaje de avance y adjuntar evidencias para marcarla como completada.
+            </li>
+          </ol>
+        </div>
+
+        <p style="font-size: 12.5px; color: #64748b; line-height: 1.5; margin-top: 24px; border-top: 1px solid #f1f5f9; padding-top: 14px;">
+          📅 <em>Se adjuntó una invitación de calendario (.ics) a este correo para que puedas agendar el vencimiento de esta tarea directamente en tu Google Calendar o aplicación de agenda.</em>
+        </p>
+
+        <p style="font-size: 13px; color: #334155; margin: 16px 0 0 0;">
+          Atentamente,<br/>
+          <strong>Equipo de Coordinación y Dirección</strong><br/>
+          <span style="font-size: 12px; color: #64748b;">CREAR Poder Sin Límites</span>
+        </p>
+      </div>
+
+      <!-- Pie de página -->
+      <div style="background-color: #f8fafc; border-top: 1px solid #e2e8f0; padding: 14px 20px; text-align: center; font-size: 11px; color: #94a3b8;">
+        Este es un mensaje automático del Sistema Operativo Causa OS. Si tienes dudas con tus credenciales o acceso, contacta a Soporte / Dirección de CREAR.
+      </div>
+    </div>
+  `;
 };
 
 export function ChecklistProvider({ children }) {
@@ -307,28 +425,27 @@ export function ChecklistProvider({ children }) {
             created_at: new Date().toISOString()
           });
 
-          // 2. Notificación por Correo (Vía Firebase Trigger Email Extension)
+          // 2. Notificación por Correo (Vía Firebase Trigger Email Extension / mailerDaemon)
+          const u = usersData.find(usr => usr.email?.toLowerCase() === cleanEmail);
+          const recipientName = u?.name || cleanEmail;
+          const assignerName = cleanData.assignedByName || currentUser?.displayName || currentUser?.name || currentUser?.email || 'Dirección CREAR';
+
           const mailRef = doc(collection(db, 'mail'));
           batch.set(mailRef, {
             to: [cleanEmail],
             message: {
-              subject: `NUEVA TAREA ASIGNADA CAUSA OS: ${cleanData.task || cleanData.title}`,
-              html: `
-                <h2>Hola, se te ha asignado una nueva tarea en Causa OS</h2>
-                <p><strong>Tarea:</strong> ${cleanData.task || cleanData.title}</p>
-                ${noteSnippet ? `
-                <div style="background-color: #0f172a; color: #f8fafc; border-left: 4px solid #f59e0b; padding: 12px 16px; margin: 12px 0; border-radius: 6px;">
-                  <strong style="color: #fbbf24;">📝 Notas / Instrucciones:</strong><br/>
-                  <span style="white-space: pre-wrap; font-size: 14px; line-height: 1.45;">${noteSnippet}</span>
-                </div>
-                ` : ''}
-                <p><strong>⏰ Fecha límite:</strong> ${formatDeadlineEs(cleanData.deadline)}</p>
-                <p><strong>Sede:</strong> ${cleanData.assignedSede || 'Global'}</p>
-                <p><strong>Prioridad:</strong> ${cleanData.priority || 'Normal'}</p>
-                <p>Por favor, ingresa a la plataforma para revisarla y marcarla como completada cuando esté lista.</p>
-                <br/>
-                <p><em>Equipo CREAR PODER SIN LÍMITES</em></p>
-              `
+              subject: `📋 NUEVA TAREA ASIGNADA: ${cleanData.task || cleanData.title} — Causa OS`,
+              html: buildTaskEmailHtml({
+                taskTitle: cleanData.task || cleanData.title,
+                notes: noteSnippet,
+                deadline: cleanData.deadline,
+                assignedSede: cleanData.assignedSede || 'Global',
+                priority: cleanData.priority || 'Normal',
+                assignedByName: assignerName,
+                recipientName,
+                recipientEmail: cleanEmail,
+                isUpdate: false
+              })
             },
             // (04/09/2026) José pidió que estos correos incluyan el botón de
             // "Añadir al calendario" de Gmail/Outlook — mailerDaemon.js arma
@@ -338,7 +455,7 @@ export function ChecklistProvider({ children }) {
               taskId: customId,
               title: cleanData.task || cleanData.title,
               deadline: cleanData.deadline || null,
-              description: `Tarea Causa OS — Sede: ${cleanData.assignedSede || 'Global'}. Prioridad: ${cleanData.priority || 'Normal'}.${noteSnippet ? ' \nNotas: ' + noteSnippet : ''}`
+              description: `Tarea Causa OS — Sede: ${cleanData.assignedSede || 'Global'}. Asignado por: ${assignerName}. Prioridad: ${cleanData.priority || 'Normal'}.${noteSnippet ? ' \nNotas: ' + noteSnippet : ''}`
             }
           });
         });
@@ -412,33 +529,32 @@ export function ChecklistProvider({ children }) {
         });
 
         // 2. Notificación por Correo
+        const u = usersData.find(usr => usr.email?.toLowerCase() === cleanEmail);
+        const recipientName = u?.name || cleanEmail;
+        const assignerName = cleanUpdatedData.assignedByName || currentUser?.displayName || currentUser?.name || currentUser?.email || 'Dirección CREAR';
+
         const mailRef = doc(collection(db, 'mail'));
         batch.set(mailRef, {
           to: [cleanEmail],
           message: {
-            subject: `NUEVA TAREA ASIGNADA CAUSA OS: ${cleanUpdatedData.task || currentTask.task}`,
-            html: `
-                <h2>Hola, se te ha asignado una tarea en Causa OS</h2>
-                <p><strong>Tarea:</strong> ${cleanUpdatedData.task || currentTask.task}</p>
-                ${activeNote ? `
-                <div style="background-color: #0f172a; color: #f8fafc; border-left: 4px solid #f59e0b; padding: 12px 16px; margin: 12px 0; border-radius: 6px;">
-                  <strong style="color: #fbbf24;">📝 Notas / Instrucciones:</strong><br/>
-                  <span style="white-space: pre-wrap; font-size: 14px; line-height: 1.45;">${activeNote}</span>
-                </div>
-                ` : ''}
-                <p><strong>⏰ Fecha límite:</strong> ${formatDeadlineEs(cleanUpdatedData.deadline || currentTask.deadline)}</p>
-                <p><strong>Sede:</strong> ${cleanUpdatedData.assignedSede || currentTask.assignedSede || 'Global'}</p>
-                <p><strong>Prioridad:</strong> ${cleanUpdatedData.priority || currentTask.priority || 'Normal'}</p>
-                <p>Por favor, ingresa a la plataforma para revisarla.</p>
-                <br/>
-                <p><em>Equipo CREAR PODER SIN LÍMITES</em></p>
-              `
+            subject: `📋 NUEVA TAREA ASIGNADA: ${cleanUpdatedData.task || currentTask.task} — Causa OS`,
+            html: buildTaskEmailHtml({
+              taskTitle: cleanUpdatedData.task || currentTask.task,
+              notes: activeNote,
+              deadline: cleanUpdatedData.deadline || currentTask.deadline,
+              assignedSede: cleanUpdatedData.assignedSede || currentTask.assignedSede || 'Global',
+              priority: cleanUpdatedData.priority || currentTask.priority || 'Normal',
+              assignedByName: assignerName,
+              recipientName,
+              recipientEmail: cleanEmail,
+              isUpdate: false
+            })
           },
           calendarEvent: {
             taskId: taskId,
             title: cleanUpdatedData.task || currentTask.task,
             deadline: cleanUpdatedData.deadline || currentTask.deadline || null,
-            description: `Tarea Causa OS — Sede: ${cleanUpdatedData.assignedSede || currentTask.assignedSede || 'Global'}. Prioridad: ${cleanUpdatedData.priority || currentTask.priority || 'Normal'}.${activeNote ? ' \nNotas: ' + activeNote : ''}`
+            description: `Tarea Causa OS — Sede: ${cleanUpdatedData.assignedSede || currentTask.assignedSede || 'Global'}. Asignado por: ${assignerName}. Prioridad: ${cleanUpdatedData.priority || currentTask.priority || 'Normal'}.${activeNote ? ' \nNotas: ' + activeNote : ''}`
           }
         });
       });
@@ -462,33 +578,32 @@ export function ChecklistProvider({ children }) {
           });
 
           // 2. Notificación por Correo
+          const u = usersData.find(usr => usr.email?.toLowerCase() === cleanEmail);
+          const recipientName = u?.name || cleanEmail;
+          const assignerName = cleanUpdatedData.assignedByName || currentUser?.displayName || currentUser?.name || currentUser?.email || 'Dirección CREAR';
+
           const mailRef = doc(collection(db, 'mail'));
           batch.set(mailRef, {
             to: [cleanEmail],
             message: {
-              subject: `TAREA ACTUALIZADA CAUSA OS: ${cleanUpdatedData.task || currentTask.task}`,
-              html: `
-                <h2>Hola, se actualizó una tarea que tienes asignada en Causa OS</h2>
-                <p><strong>Tarea:</strong> ${cleanUpdatedData.task || currentTask.task}</p>
-                ${activeNote ? `
-                <div style="background-color: #0f172a; color: #f8fafc; border-left: 4px solid #f59e0b; padding: 12px 16px; margin: 12px 0; border-radius: 6px;">
-                  <strong style="color: #fbbf24;">📝 Notas / Instrucciones:</strong><br/>
-                  <span style="white-space: pre-wrap; font-size: 14px; line-height: 1.45;">${activeNote}</span>
-                </div>
-                ` : ''}
-                <p><strong>⏰ Fecha límite:</strong> ${formatDeadlineEs(cleanUpdatedData.deadline || currentTask.deadline)}</p>
-                <p><strong>Sede:</strong> ${cleanUpdatedData.assignedSede || currentTask.assignedSede || 'Global'}</p>
-                <p><strong>Prioridad:</strong> ${cleanUpdatedData.priority || currentTask.priority || 'Normal'}</p>
-                <p>Revisa los cambios en la plataforma.</p>
-                <br/>
-                <p><em>Equipo CREAR PODER SIN LÍMITES</em></p>
-              `
+              subject: `📋 TAREA ACTUALIZADA: ${cleanUpdatedData.task || currentTask.task} — Causa OS`,
+              html: buildTaskEmailHtml({
+                taskTitle: cleanUpdatedData.task || currentTask.task,
+                notes: activeNote,
+                deadline: cleanUpdatedData.deadline || currentTask.deadline,
+                assignedSede: cleanUpdatedData.assignedSede || currentTask.assignedSede || 'Global',
+                priority: cleanUpdatedData.priority || currentTask.priority || 'Normal',
+                assignedByName: assignerName,
+                recipientName,
+                recipientEmail: cleanEmail,
+                isUpdate: true
+              })
             },
             calendarEvent: {
               taskId: taskId,
               title: cleanUpdatedData.task || currentTask.task,
               deadline: cleanUpdatedData.deadline || currentTask.deadline || null,
-              description: `Tarea Causa OS — Sede: ${cleanUpdatedData.assignedSede || currentTask.assignedSede || 'Global'}. Prioridad: ${cleanUpdatedData.priority || currentTask.priority || 'Normal'}.${activeNote ? ' \nNotas: ' + activeNote : ''}`
+              description: `Tarea Causa OS — Sede: ${cleanUpdatedData.assignedSede || currentTask.assignedSede || 'Global'}. Actualizado por: ${assignerName}. Prioridad: ${cleanUpdatedData.priority || currentTask.priority || 'Normal'}.${activeNote ? ' \nNotas: ' + activeNote : ''}`
             }
           });
         });
