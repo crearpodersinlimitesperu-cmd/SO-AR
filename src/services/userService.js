@@ -23,14 +23,20 @@ export async function getVerifiedUser(email) {
       const official = findUserByAnyEmail(normalizedEmail);
       let role = userDoc.role;
       let roles = Array.isArray(userDoc.roles) ? [...userDoc.roles] : (role ? [role] : []);
+      let name = userDoc.name || userDoc.displayName;
       if (official) {
         role = official.role || role;
         if (official.roles && official.roles.length > 0) {
           roles = official.roles;
         }
+        if (official.name && (!name || name.toLowerCase().trim() === 'redes sociales' || name.toLowerCase().trim() === 'staff_redessociales')) {
+          name = official.name;
+        }
       }
       return {
         ...userDoc,
+        name: name || userDoc.name,
+        displayName: name || userDoc.displayName || userDoc.name,
         email: userDoc.email || normalizedEmail,
         role: role,
         roles: roles,
@@ -145,14 +151,21 @@ export async function getAllCompanyUsers() {
       const candidateKeys = emailKeysOf(uData);
       const existingIdx = candidateKeys.size > 0 ? findExistingIndex(candidateKeys) : -1;
       
-      // Respaldo contra catálogo fidedigno oficial para prevenir colapsos de cargos
+      // Respaldo contra catálogo fidedigno oficial para prevenir colapsos de cargos y nombres genéricos
       const primaryEmail = deriveEmail(uData);
       const officialProfile = primaryEmail ? findUserByAnyEmail(primaryEmail) : null;
       let finalRole = uData.role;
       let finalRoles = Array.isArray(uData.roles) ? [...uData.roles] : (uData.role ? [uData.role] : []);
       let finalSede = uData.sede;
+      let finalName = uData.name || uData.displayName;
 
       if (officialProfile) {
+        // Prevenir nombres genéricos de buzón o alias (ej. 'redes sociales' -> 'Alex Zapata')
+        const currentLower = (finalName || '').toLowerCase().trim();
+        if (officialProfile.name && (!finalName || currentLower === 'redes sociales' || currentLower === 'staff_redessociales' || currentLower === 'marketing')) {
+          finalName = officialProfile.name;
+        }
+
         // El catálogo oficial corporativo es la máxima fuente de verdad contra colapsos
         finalRole = officialProfile.role || finalRole;
         if (!finalSede || finalSede === 'Global') {
@@ -194,6 +207,8 @@ export async function getAllCompanyUsers() {
 
       const enrichedUser = {
         ...uData,
+        name: finalName || uData.name,
+        displayName: finalName || uData.displayName || uData.name,
         role: finalRole || uData.role,
         roles: finalRoles.length > 0 ? finalRoles : (finalRole ? [finalRole] : []),
         sede: finalSede || uData.sede
@@ -203,6 +218,8 @@ export async function getAllCompanyUsers() {
         allUsers[existingIdx] = withCanonicalEmail({
           ...allUsers[existingIdx],
           ...enrichedUser,
+          name: finalName || allUsers[existingIdx].name,
+          displayName: finalName || allUsers[existingIdx].displayName,
           role: finalRole,
           roles: finalRoles,
           sede: finalSede

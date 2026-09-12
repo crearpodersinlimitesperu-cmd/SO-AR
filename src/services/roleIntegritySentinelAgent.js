@@ -132,11 +132,23 @@ export async function runRoleIntegrityAuditAndHeal(options = { dryRun: false }) 
         }
       }
 
+      // 3. SANEAMIENTO DE IDENTIDAD: Corregir alias genéricos a colaboradores reales
+      let targetName = uData.name || uData.displayName;
+      if (email === 'redessociales@crearpsl.net' && targetName !== 'Alex Zapata') {
+        targetName = 'Alex Zapata';
+        needsUpdate = true;
+        issues.push("Nombre corregido a persona real: 'Alex Zapata'");
+      } else if (officialProfile?.name && (!targetName || targetName.toLowerCase().trim() === 'redes sociales')) {
+        targetName = officialProfile.name;
+        needsUpdate = true;
+        issues.push(`Nombre corregido desde catálogo oficial: '${officialProfile.name}'`);
+      }
+
       if (needsUpdate) {
         auditReport.rolesRepaired++;
         auditReport.healedUsers.push({
           docId,
-          name: name || email,
+          name: targetName || name || email,
           email,
           previousRole: uData.role,
           repairedRole: targetRole,
@@ -145,11 +157,16 @@ export async function runRoleIntegrityAuditAndHeal(options = { dryRun: false }) 
         });
 
         if (!options.dryRun) {
-          batch.update(doc(db, 'users', docId), {
+          const updatePayload = {
             role: targetRole,
             roles: targetRoles,
             rolesAuditDate: new Date().toISOString()
-          });
+          };
+          if (targetName && targetName !== uData.name) {
+            updatePayload.name = targetName;
+            updatePayload.displayName = targetName;
+          }
+          batch.update(doc(db, 'users', docId), updatePayload);
           pendingUpdates++;
         }
       }

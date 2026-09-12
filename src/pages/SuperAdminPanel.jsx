@@ -42,6 +42,7 @@ const ROLE_LABELS = {
   entrenador: 'Entrenadores (Coaches)',
   entrenador_llamadas: 'Entrenadores de Llamadas',
   participante: 'Participantes',
+  marketing: 'Marketing',
 };
 
 const ROLE_COLORS = {
@@ -64,7 +65,8 @@ const ROLE_COLORS = {
   talento_humano: '#06b6d4',
   legal: '#a855f7',
   técnico_sst: '#14b8a6',
-  participante: '#9ca3af'
+  participante: '#9ca3af',
+  marketing: '#ec4899'
 };
 
 
@@ -1135,6 +1137,40 @@ export default function SuperAdminPanel() {
       fixRole();
     }
   }, [currentUser]);
+
+  // Saneamiento y sincronización de identidad de Alex Zapata (redes sociales -> Alex Zapata)
+  useEffect(() => {
+    const healAlexZapata = async () => {
+      try {
+        const { collection, query, where, getDocs, updateDoc, doc, setDoc } = await import('firebase/firestore');
+        const q = query(collection(db, 'users'), where('email', '==', 'redessociales@crearpsl.net'));
+        const snap = await getDocs(q);
+        snap.forEach(async (d) => {
+          const data = d.data();
+          if (data.name !== 'Alex Zapata' || data.displayName !== 'Alex Zapata') {
+            await updateDoc(doc(db, 'users', d.id), {
+              name: 'Alex Zapata',
+              displayName: 'Alex Zapata'
+            });
+            console.log("Nombre de Alex Zapata sincronizado en Firestore (users).");
+          }
+        });
+
+        // Asegurar consistencia en user_profiles
+        const profileRef = doc(db, 'user_profiles', 'redessociales@crearpsl.net');
+        await setDoc(profileRef, {
+          name: 'Alex Zapata',
+          displayName: 'Alex Zapata',
+          email: 'redessociales@crearpsl.net',
+          role: 'marketing',
+          sede: 'Global'
+        }, { merge: true });
+      } catch (err) {
+        console.warn("Saneamiento de perfil Alex Zapata:", err);
+      }
+    };
+    healAlexZapata();
+  }, []);
 
   useEffect(() => {
     let isMounted = true;

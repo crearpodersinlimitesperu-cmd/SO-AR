@@ -138,7 +138,8 @@ export const ROLE_DISPLAY_NAMES = {
   tecnico_sst: 'Seguridad y Salud (SST)',
   entrenador: 'Entrenador (Coach)',
   entrenador_llamadas: 'Entrenador de Llamadas',
-  participante: 'Participantes'
+  participante: 'Participantes',
+  marketing: 'Marketing'
 };
 
 export const getRoleDisplayName = (role) => {
@@ -174,6 +175,7 @@ export const ROLE_COLORS = {
   tecnico_sst: '#14b8a6',
   entrenador: '#fbbf24',
   entrenador_llamadas: '#38bdf8',
+  marketing: '#ec4899',
   // student: eliminado — no es un rol del sistema SO-AR
 };
 
