@@ -2,10 +2,12 @@
 // Agente Supervisor de Integridad y Calidad de Datos (Managers, Equipos y Nodus)
 // Asegura datos reales, consistencia operativa, trazabilidad y cero duplicados en la base de datos.
 
-import { db } from '../firebase';
+import { db } from './firebase';
 import { collection, getDocs, doc, writeBatch, deleteDoc } from 'firebase/firestore';
-import { normalizeSede, normalizeManagerEstado, normalizeTrainer, normalizeCoordinator } from '../utils/userUtils';
+import { normalizeTrainer, normalizeCoordinator } from '../data/managersData';
+import { normalizeSede } from '../data/usersData';
 import { recordAuditEvent } from './auditService';
+
 
 /**
  * Normaliza una cadena de texto eliminando tildes, espacios redundantes y convirtiendo a minúsculas.
