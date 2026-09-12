@@ -16,13 +16,12 @@
  */
 
 import nodusFallback from '../data/nodusFallbackData.json';
-import managersFallback from '../data/managersData.js';
+import { INITIAL_MANAGERS } from '../data/managersData.js';
 import kpisLimaFallback from '../data/kpisLima.json';
 
-// Si managersData exporta { INITIAL_MANAGERS }, extraer arreglo seguro
+// Extraer arreglo seguro de managers oficiales
 const getManagersList = () => {
-  if (Array.isArray(managersFallback)) return managersFallback;
-  if (managersFallback && Array.isArray(managersFallback.INITIAL_MANAGERS)) return managersFallback.INITIAL_MANAGERS;
+  if (Array.isArray(INITIAL_MANAGERS)) return INITIAL_MANAGERS;
   return [];
 };
 
