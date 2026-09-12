@@ -15,6 +15,7 @@ import { OPERATIONAL_SEDES, normalizeSede, usersData, normalizeRole } from '../d
 import { SEDES_FDS_PRICING, getSedePricing, formatCurrencyAmount } from '../data/sedesPricingData';
 import nodusFallbackData from '../data/nodusFallbackData.json';
 import ResourceCapacityView from '../components/ResourceCapacityView';
+import FuturosImposiblesView from '../components/FuturosImposiblesView';
 
 export const KNOWN_COORDINATORS = {
   'MARIBEL': { formalName: 'Maribel Catota', email: 'viviana.catota@crearpsl.net', role: 'coord_c1', sede: 'Cuenca' },
@@ -134,7 +135,7 @@ export default function PortfolioBoard() {
   const [toastMessage, setToastMessage] = useState(null);
 
   useEffect(() => {
-    if (tabParam && ['predictor', 'active', 'resources', 'rrhh_sentinel'].includes(tabParam)) {
+    if (tabParam && ['predictor', 'active', 'resources', 'rrhh_sentinel', 'futuros_imposibles'].includes(tabParam)) {
       setViewMode(tabParam);
     }
   }, [tabParam]);
@@ -585,6 +586,23 @@ export default function PortfolioBoard() {
               }}
             >
               <ShieldAlert size={16} /> Centinela RRHH
+            </button>
+            <button 
+              onClick={() => handleTabChange('futuros_imposibles')} 
+              style={{ 
+                padding: '0.5rem 1rem', 
+                borderRadius: '8px', 
+                border: viewMode === 'futuros_imposibles' ? '1px solid #10b981' : `1px solid ${borderLight}`, 
+                background: viewMode === 'futuros_imposibles' ? 'rgba(16, 185, 129, 0.18)' : 'transparent', 
+                color: viewMode === 'futuros_imposibles' ? '#10b981' : textMuted, 
+                fontWeight: 700, 
+                cursor: 'pointer', 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '0.4rem' 
+              }}
+            >
+              <Target size={16} /> Futuros Imposibles (IA)
             </button>
           </div>
         </div>
@@ -1955,6 +1973,14 @@ ${coord.coachingFeedback}`;
 
         ) : viewMode === 'resources' ? (
           <ResourceCapacityView selectedSede={selectedSede} hrSentinelData={hrSentinelData} />
+        ) : viewMode === 'futuros_imposibles' ? (
+          <FuturosImposiblesView 
+            selectedSede={selectedSede}
+            borderLight={borderLight}
+            bgCard={bgCard}
+            textDark={textDark}
+            textMuted={textMuted}
+          />
         ) : null}
       {/* MODAL CONFIGURACIÃ“N DE TARIFAS FDS CAPÃTULO 1 */}
       {showPricingModal && (
