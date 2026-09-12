@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
+﻿import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import { useUI } from './context/UIContext'
 import './index.css'
@@ -316,6 +316,8 @@ function App() {
               <PortfolioBoard />
             </RoleRoute>
           } />
+          <Route path="/portfolio" element={<Navigate to="/portafolio" replace />} />
+          <Route path="/pmo" element={<Navigate to="/portafolio" replace />} />
 
           <Route path="/estrategia" element={
             <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria']} requireSuperAdmin={false}>
