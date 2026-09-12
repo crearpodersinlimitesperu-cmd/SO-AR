@@ -279,14 +279,72 @@ Permite a directores, coordinadores y managers auditar en tiempo real el avance 
   * **CÃ¡psula del Agente en Cada Meta:** Inserta un badge de auditorÃ­a en tiempo real con el estado de avance detectado en Nodus y el botÃ³n de acciÃ³n rÃ¡pida `âš¡ Sincronizar Avance Real (X/Target)`.
   * **BotÃ³n de Cabecera:** `ðŸ¤– Agente Centinela Nodus` con indicador de estado y contador de metas pendientes.
   * **Consola Interactiva del Agente Centinela (`showSentinelModal`):**
-    * Tarjetas de mÃ©tricas globales (Metas Evaluadas, Metas al DÃ­a, Pendientes, Total Llamadas).
-    * BotÃ³n maestro `ðŸš€ Sincronizar Todas las Metas con Nodus`.
-    * Tabla interactiva con desglose de discrepancias, hashes anti-duplicados y botÃ³n individual por meta.
-  * **Rollup AutomÃ¡tico:** Al sincronizar cualquier meta, `performRollUp` recalcula automÃ¡ticamente el promedio ponderado de la meta padre ("Meta Global del Ciclo").
+  * Tarjetas de métricas globales (Metas Evaluadas, Metas al Día, Pendientes, Total Llamadas).
+    * Botón maestro `⚡ Sincronizar Todas las Metas con Nodus`.
+    * Tabla interactiva con desglose de discrepancias, hashes anti-duplicados y botón individual por meta.
+  * **Rollup Automático:** Al sincronizar cualquier meta, `performRollUp` recalcula automáticamente el promedio ponderado de la meta padre ("Meta Global del Ciclo").
 
-### 9.4. BitÃ¡cora de AuditorÃ­a en Firestore
-* **ColecciÃ³n:** `goals_sentinel_audits`.
+### 9.4. Bitácora de Auditoría en Firestore
+* **Colección:** `goals_sentinel_audits`.
 * **Campos Registrados:** `goalId`, `goalTitle`, `sede`, `teamNum`, `syncedBy`, `syncedAt`, `previousValue`, `newValue`, `progress`, `auditHash`, `sources`.
+
+---
+
+## 10. Agente 10: Motor IA de Extracción Universal de Vuelos (Drive PDF Multi-Format Engine)
+
+### 10.1. Diagnóstico y Causa Raíz
+* **Problema Identificado:**
+  El Radar de Vuelos (`MonitorVuelosCartas.jsx`) únicamente mostraba 2 vuelos en Guayaquil correspondientes a pasajes CUV de LATAM, ignorando todos los vuelos de los entrenadores (Michael Boada, Mauricio Pérez, Elmer Andrés Idrobo, Lourdes Patiño, Ana Monroy, Juan Ángel Arreola, Alonso Solares, Carlos Brunis, Diego Bravo, Mildred Muñoz, etc.).
+* **Causa Raíz:**
+  La regex anterior en `scripts/sync_drive_vuelos_7xdia.py` solo buscaba facturas CUV con patrón `dd/mm/yy` y códigos de factura peruanos de LATAM. El 95% de los boletos reales en Google Drive están en formatos de agencias globales y aerolíneas internacionales:
+  1. **CheckMyTrip / OwlTravel** (Amadeus GDS / Avianca, Copa, LATAM).
+  2. **Sabre / Virtually There** (LATAM, American Airlines, United).
+  3. **Avianca Electronic Ticket Receipt / Copa / Expedia**.
+  4. **Facturas Electrónicas CUV LATAM**.
+
+### 10.2. Arquitectura de Extracción Inteligente Multi-Plantilla
+* **Mapeo de Aeropuertos y Sedes:**
+  - `UIO` (Quito): Aeropuerto Internacional Mariscal Sucre.
+  - `LIM` (Lima): Aeropuerto Internacional Jorge Chávez.
+  - `GYE` (Guayaquil): Aeropuerto Internacional José Joaquín de Olmedo.
+  - `CUE` (Cuenca): Aeropuerto Mariscal La Mar.
+  - `BOG` (Bogotá): Aeropuerto Internacional El Dorado.
+  - `PTY` (Panamá): Aeropuerto Internacional de Tocumen.
+  - `MEX` (Ciudad de México): Aeropuerto Internacional Benito Juárez.
+  - `MDE` (Medellín): Aeropuerto Internacional José María Córdova.
+  - `CUN` (Cancún), `MIA` (Miami), `IAH` (Houston), `SAN` (San Diego), `MAD` (Madrid).
+* **Logística Asignada Automáticamente por Sede:**
+  - **Guayaquil:** Hotel Wyndham Guayaquil (Puerto Santa Ana) | Chofer asignado con cartel CPSL en arribos Olmedo GYE.
+  - **Quito:** Fortaleza Cuántica / Swissôtel Quito | Chofer asignado con cartel CPSL en UIO.
+  - **Cuenca:** Hotel Oro Verde Cuenca | Traslado coordinado en aeropuerto CUE.
+  - **Lima:** Hotel Jose Antonio Deluxe Miraflores | Chofer asignado en arribos internacionales LIM.
+  - **Medellín:** Hotel Dann Carlton Belfort Medellín | Arribos MDE.
+  - **México:** Hotel Fiesta Americana Reforma | Arribos MEX.
+* **Normalización de Entrenadores:**
+  El motor resuelve nombres formales y variantes de archivo (`Mike Boada` ➔ `Michael Andrés Boada Rubiano`, `Mauricio Pérez`, `Elmer Andrés Idrobo`, `Lourdes Patiño`, `Ana Monroy`, `Juan Ángel Arreola`, `Alonso Solares`, `Leandro Brunis`, `Mildred Muñoz`, `Carlos Brunis`, `Diego Bravo`, `Fernando Aragón`, `Ernesto Díaz Pabón`, `Cirilo Martínez`, etc.).
+
+### 10.3. Resultados de Extracción
+* **Total de Documentos Analizados:** 388 PDFs indexados de Google Drive.
+* **Total de Vuelos Únicos Extraídos:** **298 vuelos**.
+* **Distribución por Sede:**
+  - **Quito:** 218 vuelos (53 activos/próximos).
+  - **Lima:** 194 vuelos (3 activos/próximos).
+  - **Guayaquil:** 36 vuelos (20 activos/próximos).
+  - **Medellín:** 28 vuelos (8 activos/próximos).
+  - **México:** 22 vuelos (21 activos/próximos).
+  - **Cuenca:** 18 vuelos (15 activos/próximos).
+
+### 10.4. Componentes Actualizados
+* **`public/vuelos_tracker.json` y `public/cartas/vuelos_tracker.json`:**
+  Dataset enriquecido v3.2.0-ai-engine con 298 vuelos, datos de itinerario, PNR, terminal, chofer, hotel y enlace al PDF de origen.
+* **`scripts/sync_drive_vuelos_7xdia.py`:**
+  Actualizado con el motor universal de parsing heurístico multi-plantilla para sincronización periódica (7 veces al día).
+* **`src/pages/MonitorVuelosCartas.jsx`:**
+  - Filtro dinámico de rutas `routeFilter.split('-')` para admitir cualquier origen/destino.
+  - Rutas rápidas de Guayaquil (`BOG-GYE`, `GYE-BOG`, `PTY-GYE`, `GYE-PTY`, `UIO-GYE`, `GYE-UIO`, `LIM-GYE`).
+  - Rutas rápidas de Cuenca (`UIO-CUE`, `CUE-UIO`), Medellín (`MDE-BOG`, `UIO-MDE`), México (`MEX-PTY`, `PTY-MEX`).
+  - Badge de estado con indicador del Motor IA de Vuelos (298 vuelos indexados).
+  - Visualización del PDF de origen en cada tarjeta de vuelo (`flight.sourcePdf`).
 
 ---
 
