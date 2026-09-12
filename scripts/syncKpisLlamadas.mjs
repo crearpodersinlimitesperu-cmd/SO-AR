@@ -138,12 +138,12 @@ export async function syncKpisLlamadas() {
     const isGraduado = graduadoVal.includes('GRADUAD') || graduadoVal === 'SI' || graduadoVal === 'X';
     const isDesertor = desertorVal.includes('DESERT') || desertorVal === 'SI' || desertorVal === 'X';
 
-    let estado = 'EN_JUEGO';
+    let estado = 'Activo';
     if (isGraduado) {
-      estado = 'GRADUADO';
+      estado = 'Graduado';
       totalGraduados++;
     } else if (isDesertor) {
-      estado = 'DESERTOR';
+      estado = 'Desertor';
       totalDesertores++;
     } else {
       totalActivos++;
@@ -171,7 +171,7 @@ export async function syncKpisLlamadas() {
       estado,
       isGraduado,
       isDesertor,
-      isActivo: estado === 'EN_JUEGO'
+      isActivo: estado === 'Activo'
     };
 
     managersSheet1.push(managerObj);
@@ -283,7 +283,7 @@ export async function syncKpisLlamadas() {
       agosto: parseInt(r[23] || '0', 10) || 0,
       septiembre: parseInt(r[24] || '0', 10) || 0,
       octubre: parseInt(r[25] || '0', 10) || 0,
-      estado: sheet1Meta.estado || 'EN_JUEGO',
+      estado: sheet1Meta.estado || 'Activo',
       isGraduado: !!sheet1Meta.isGraduado,
       isDesertor: !!sheet1Meta.isDesertor,
       telefono: sheet1Meta.telefono || '',
