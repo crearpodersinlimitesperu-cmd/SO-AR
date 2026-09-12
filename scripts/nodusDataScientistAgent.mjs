@@ -357,10 +357,13 @@ export class NodusDataScientistAgent {
         ? Math.max(5, Math.min(45, Math.round(((totalConfirmados - totalSentados) / totalConfirmados) * 1000) / 10))
         : (fdsData?.tasaDesercionFDS || 20.3);
 
-      // Potencial de recaudaciÃ³n
+      // Potencial de recaudaciÃ³n REAL con precio oficial FDS C1 de la sede
+      const pricing = SEDES_FDS_PRICING[sede] || { moneda: 'USD', simbolo: '$', precioFdsC1: 250, tasaUSD: 1.0 };
       const prospectosCount = prosps.length;
       const recuperablesEstimados = Math.round(prospectosCount * CONVERSION_PROSPECTO_BASE);
-      const ingresoRecuperableUSD = recuperablesEstimados * TICKET_PROMEDIO_USD;
+      const ingresoRecuperableLocal = recuperablesEstimados * pricing.precioFdsC1;
+      const ingresoRecuperableUSD = Math.round(ingresoRecuperableLocal / pricing.tasaUSD);
+      const carteraTotalLocal = prospectosCount * pricing.precioFdsC1;
 
       // Score de Salud Predictiva (0 a 100)
       const convScore = Math.min(100, tasaConversion);
@@ -385,7 +388,12 @@ export class NodusDataScientistAgent {
         riesgoDesercionFDS: riesgoFDS,
         prospectosSinPago: prospectosCount,
         recuperablesEstimados,
+        precioFdsC1: pricing.precioFdsC1,
+        moneda: pricing.moneda,
+        simbolo: pricing.simbolo,
+        ingresoRecuperableLocal,
         ingresoRecuperableUSD,
+        carteraTotalLocal,
         scoreSalud,
         semaforo,
         etaCumplimiento: totalConfirmados > 50 ? 'En Ritmo (ProyecciÃ³n 100% alcanzable)' : 'Requiere aceleraciÃ³n de llamadas'
@@ -412,7 +420,7 @@ export class NodusDataScientistAgent {
 
     const totalProspectosSinPago = prospectos.length;
     const totalRecuperablesGlobal = Math.round(totalProspectosSinPago * CONVERSION_PROSPECTO_BASE);
-    const totalIngresoRecuperableUSD = totalRecuperablesGlobal * TICKET_PROMEDIO_USD;
+    const totalIngresoRecuperableUSD = Object.values(sedesPredictions).reduce((acc, s) => acc + (s.ingresoRecuperableUSD || 0), 0);
 
     const scoreSaludGlobal = Math.min(100, Math.max(20, Math.round(
       (Math.min(100, tasaConversionGlobal) * 0.4) +
