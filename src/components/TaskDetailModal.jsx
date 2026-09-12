@@ -1760,7 +1760,6 @@ export default function TaskDetailModal({
           {/* BOTÓN COMPLETAR O REABRIR */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
             <button
-            <button
               type="button"
               onClick={isMultiAssignee && myAssigneeEntry ? handleToggleMyPart : handleToggleCompleted}
               style={{
