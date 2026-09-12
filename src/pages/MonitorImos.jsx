@@ -2,7 +2,7 @@
 import { useNavigate } from 'react-router-dom';
 import { collection, query, orderBy, onSnapshot, deleteDoc, doc, writeBatch, addDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
-import { Search, Filter, X, ShieldCheck, AlertTriangle, PhoneCall, CheckCircle } from 'lucide-react';
+import { Search, Filter, X, ShieldCheck, AlertTriangle, PhoneCall, CheckCircle, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { normalizeSede } from '../data/usersData';
 import {
@@ -25,6 +25,44 @@ export default function MonitorImos() {
   const [filterNodus, setFilterNodus] = useState('todos');
   const [viewMode, setViewMode] = useState('imos'); // 'imos' | 'enrolados'
   const [nodusSyncTick, setNodusSyncTick] = useState(0);
+  // Estado de ordenamiento para la Vista por IMOs
+  const [imoSortField, setImoSortField] = useState('nombre'); // 'nombre' | 'equipo' | 'avance' | 'confirmados' | 'estado' | 'conexion' | 'ubicacion' | 'nodus'
+  const [imoSortDirection, setImoSortDirection] = useState('asc'); // 'asc' | 'desc'
+  const [expandAll, setExpandAll] = useState(false);
+
+  // Estado de ordenamiento para la Lista Plana
+  const [enroladoSortField, setEnroladoSortField] = useState('nombre'); // 'nombre' | 'telefono' | 'imo' | 'equipo' | 'coordinacion' | 'asistencia' | 'nodus'
+  const [enroladoSortDirection, setEnroladoSortDirection] = useState('asc'); // 'asc' | 'desc'
+
+  const handleSortImo = (field) => {
+    if (imoSortField === field) {
+      setImoSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      setImoSortField(field);
+      const defaultDesc = ['avance', 'confirmados', 'conexion'].includes(field);
+      setImoSortDirection(defaultDesc ? 'desc' : 'asc');
+    }
+  };
+
+  const handleSortEnrolado = (field) => {
+    if (enroladoSortField === field) {
+      setEnroladoSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      setEnroladoSortField(field);
+      const defaultDesc = ['asistencia'].includes(field);
+      setEnroladoSortDirection(defaultDesc ? 'desc' : 'asc');
+    }
+  };
+
+  const handleToggleExpand = (missionId) => {
+    if (expandAll) {
+      setExpandAll(false);
+      setExpandedImo(missionId);
+    } else {
+      setExpandedImo(prev => prev === missionId ? null : missionId);
+    }
+  };
+
   const navigate = useNavigate();
 
   const formatDate = (ts) => {
@@ -389,6 +427,148 @@ export default function MonitorImos() {
     });
     return Array.from(seen.values());
   }, [filteredMissions, searchTerm]);
+
+  // Misiones filtradas y ordenadas dinámicamente según columna seleccionada
+  const sortedMissions = useMemo(() => {
+    const list = [...filteredMissions];
+    list.sort((a, b) => {
+      let comparison = 0;
+      switch (imoSortField) {
+        case 'nombre': {
+          const nameA = cleanSearchStr(a.imoNombre || a.imo_nombre || a.nombre);
+          const nameB = cleanSearchStr(b.imoNombre || b.imo_nombre || b.nombre);
+          comparison = nameA.localeCompare(nameB, 'es', { numeric: true });
+          break;
+        }
+        case 'equipo': {
+          const eqA = cleanSearchStr(normalizeEquipoName(a.equipo));
+          const eqB = cleanSearchStr(normalizeEquipoName(b.equipo));
+          comparison = eqA.localeCompare(eqB, 'es');
+          break;
+        }
+        case 'avance': {
+          const enrA = getEnroladosList(a);
+          const enrB = getEnroladosList(b);
+          const progA = enrA.length > 0 ? (enrA.filter(e => e.asistencia).length / enrA.length) * 100 : 0;
+          const progB = enrB.length > 0 ? (enrB.filter(e => e.asistencia).length / enrB.length) * 100 : 0;
+          comparison = progA - progB;
+          break;
+        }
+        case 'confirmados': {
+          const enrA = getEnroladosList(a);
+          const enrB = getEnroladosList(b);
+          const confA = enrA.filter(e => e.asistencia).length;
+          const confB = enrB.filter(e => e.asistencia).length;
+          comparison = confA !== confB ? confA - confB : enrA.length - enrB.length;
+          break;
+        }
+        case 'estado': {
+          const enrA = getEnroladosList(a);
+          const enrB = getEnroladosList(b);
+          const isCompA = enrA.length > 0 && enrA.every(e => e.asistencia);
+          const isCompB = enrB.length > 0 && enrB.every(e => e.asistencia);
+          comparison = (isCompA ? 1 : 0) - (isCompB ? 1 : 0);
+          break;
+        }
+        case 'conexion': {
+          const getTime = (m) => {
+            const ts = m.updatedAt || m.createdAt;
+            if (!ts) return 0;
+            if (ts.toMillis) return ts.toMillis();
+            if (ts.toDate) return ts.toDate().getTime();
+            const d = new Date(ts).getTime();
+            return isNaN(d) ? 0 : d;
+          };
+          comparison = getTime(a) - getTime(b);
+          break;
+        }
+        case 'ubicacion': {
+          const ubA = cleanSearchStr(getUbicacion(a));
+          const ubB = cleanSearchStr(getUbicacion(b));
+          comparison = ubA.localeCompare(ubB, 'es');
+          break;
+        }
+        case 'nodus': {
+          const enrA = getEnroladosList(a);
+          const enrB = getEnroladosList(b);
+          const summA = evaluateMissionVerification(a, enrA);
+          const summB = evaluateMissionVerification(b, enrB);
+          const rank = {
+            'VERIFICADO_OK': 4,
+            'PARCIAL': 3,
+            'PENDIENTE_COORD': 2,
+            'DISCREPANCIA': 1
+          };
+          comparison = (rank[summA.overallStatus] || 0) - (rank[summB.overallStatus] || 0);
+          break;
+        }
+        default:
+          comparison = 0;
+      }
+      return imoSortDirection === 'asc' ? comparison : -comparison;
+    });
+    return list;
+  }, [filteredMissions, imoSortField, imoSortDirection, nodusSyncTick]);
+
+  // Lista plana de enrolados filtrada y ordenada por columna seleccionada
+  const sortedUniqueEnroladosList = useMemo(() => {
+    const list = [...uniqueEnroladosList];
+    list.sort((a, b) => {
+      let comparison = 0;
+      switch (enroladoSortField) {
+        case 'nombre': {
+          const nomA = cleanSearchStr(a.nombre || a.enrolado || a.name);
+          const nomB = cleanSearchStr(b.nombre || b.enrolado || b.name);
+          comparison = nomA.localeCompare(nomB, 'es', { numeric: true });
+          break;
+        }
+        case 'telefono': {
+          const telA = String(a.telefono || '').replace(/\D/g, '');
+          const telB = String(b.telefono || '').replace(/\D/g, '');
+          comparison = telA.localeCompare(telB);
+          break;
+        }
+        case 'imo': {
+          const imoA = cleanSearchStr(a.imoNombre);
+          const imoB = cleanSearchStr(b.imoNombre);
+          comparison = imoA.localeCompare(imoB, 'es');
+          break;
+        }
+        case 'equipo': {
+          const eqA = cleanSearchStr(a.equipo);
+          const eqB = cleanSearchStr(b.equipo);
+          comparison = eqA.localeCompare(eqB, 'es');
+          break;
+        }
+        case 'coordinacion': {
+          const coA = cleanSearchStr(a.coordinadora_nombre);
+          const coB = cleanSearchStr(b.coordinadora_nombre);
+          comparison = coA.localeCompare(coB, 'es');
+          break;
+        }
+        case 'asistencia': {
+          comparison = (a.asistencia ? 1 : 0) - (b.asistencia ? 1 : 0);
+          break;
+        }
+        case 'nodus': {
+          const evalA = evaluateEnroladoVerification(a, a.imoNombre, a.equipo);
+          const evalB = evaluateEnroladoVerification(b, b.imoNombre, b.equipo);
+          const rank = {
+            'VERIFICADO_OK': 3,
+            'PENDIENTE': 2,
+            'DISCREPANCIA': 1
+          };
+          comparison = (rank[evalA.status] || 0) - (rank[evalB.status] || 0);
+          break;
+        }
+        default:
+          comparison = 0;
+      }
+      return enroladoSortDirection === 'asc' ? comparison : -comparison;
+    });
+    return list;
+  }, [uniqueEnroladosList, enroladoSortField, enroladoSortDirection, nodusSyncTick]);
+
 
   const totalEnroladosCount = uniqueEnroladosList.length;
 
@@ -852,7 +1032,7 @@ export default function MonitorImos() {
               cursor: 'pointer'
             }}
           >
-            📋 Lista Plana ({totalEnroladosCount} Enrolamientos)
+            📋 Lista Plana ({uniqueEnroladosList.length} Enrolamientos)
           </button>
         </div>
 
@@ -1111,29 +1291,267 @@ export default function MonitorImos() {
             </div>
           </div>
 
+          {/* Barra de Control de Ordenamiento Lista Plana */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '1rem',
+            flexWrap: 'wrap',
+            gap: '0.75rem',
+            background: 'rgba(56, 189, 248, 0.04)',
+            padding: '0.6rem 0.85rem',
+            borderRadius: '8px',
+            border: '1px solid rgba(56, 189, 248, 0.15)'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', color: '#e2e8f0', fontSize: '0.82rem', fontWeight: 600 }}>
+                <ArrowUpDown size={14} color="#38bdf8" /> Organizado por:
+              </span>
+              <span style={{
+                color: '#38bdf8',
+                fontWeight: 700,
+                fontSize: '0.8rem',
+                background: 'rgba(56, 189, 248, 0.12)',
+                padding: '3px 9px',
+                borderRadius: '5px',
+                border: '1px solid rgba(56, 189, 248, 0.3)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}>
+                {enroladoSortField === 'nombre' && 'Enrolado / Prospecto'}
+                {enroladoSortField === 'telefono' && 'Teléfono'}
+                {enroladoSortField === 'imo' && 'IMO Responsable'}
+                {enroladoSortField === 'equipo' && 'Equipo'}
+                {enroladoSortField === 'coordinacion' && 'Coordinador/a'}
+                {enroladoSortField === 'asistencia' && 'Confirmación IMO'}
+                {enroladoSortField === 'nodus' && 'Validación Nodus'}
+                <span style={{ fontSize: '0.75rem', opacity: 0.85 }}>
+                  ({enroladoSortDirection === 'asc' ? 'Ascendente ↑' : 'Descendente ↓'})
+                </span>
+              </span>
+              <span style={{ fontSize: '0.74rem', color: '#64748b' }}>
+                • Clic en cualquier encabezado para alternar orden
+              </span>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => handleSortEnrolado('imo')}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '5px 12px',
+                borderRadius: '6px',
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                background: enroladoSortField === 'imo' ? 'rgba(56, 189, 248, 0.25)' : 'rgba(255, 255, 255, 0.05)',
+                border: enroladoSortField === 'imo' ? '1px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.15)',
+                color: enroladoSortField === 'imo' ? '#38bdf8' : '#cbd5e1',
+                cursor: 'pointer',
+                transition: 'all 0.2s'
+              }}
+              title="Organizar prospectos agrupados por IMO responsable"
+            >
+              👤 Organizar por IMO
+            </button>
+          </div>
+
           <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse', minWidth: '980px' }}>
             <thead>
               <tr style={{ borderBottom: '2px solid rgba(56, 189, 248, 0.4)', background: 'rgba(56, 189, 248, 0.05)' }}>
                 <th style={{ padding: '0.85rem', color: '#38bdf8', fontSize: '0.82rem', width: '45px' }}>#</th>
-                <th style={{ padding: '0.85rem', color: '#38bdf8', fontSize: '0.82rem' }}>Enrolado / Prospecto</th>
-                <th style={{ padding: '0.85rem', color: '#38bdf8', fontSize: '0.82rem' }}>Teléfono</th>
-                <th style={{ padding: '0.85rem', color: '#38bdf8', fontSize: '0.82rem' }}>IMO Responsable</th>
-                <th style={{ padding: '0.85rem', color: '#38bdf8', fontSize: '0.82rem' }}>Equipo</th>
-                <th style={{ padding: '0.85rem', color: '#38bdf8', fontSize: '0.82rem' }}>Coordinador/a</th>
-                <th style={{ padding: '0.85rem', color: '#38bdf8', fontSize: '0.82rem' }}>Confirmación IMO</th>
-                <th style={{ padding: '0.85rem', color: '#38bdf8', fontSize: '0.82rem' }}>Validación Nodus</th>
+
+                {/* Enrolado / Prospecto */}
+                <th
+                  onClick={() => handleSortEnrolado('nombre')}
+                  style={{
+                    padding: '0.85rem',
+                    color: enroladoSortField === 'nombre' ? '#fff' : '#38bdf8',
+                    fontSize: '0.82rem',
+                    cursor: 'pointer',
+                    userSelect: 'none',
+                    background: enroladoSortField === 'nombre' ? 'rgba(56, 189, 248, 0.12)' : 'transparent',
+                    borderBottom: enroladoSortField === 'nombre' ? '2px solid #38bdf8' : 'none',
+                    transition: 'all 0.2s'
+                  }}
+                  title="Clic para organizar alfabéticamente por Enrolado"
+                >
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    <span>Enrolado / Prospecto</span>
+                    {enroladoSortField === 'nombre' ? (
+                      enroladoSortDirection === 'asc' ? <ArrowUp size={13} color="#38bdf8" /> : <ArrowDown size={13} color="#38bdf8" />
+                    ) : (
+                      <ArrowUpDown size={12} style={{ opacity: 0.35 }} />
+                    )}
+                  </div>
+                </th>
+
+                {/* Teléfono */}
+                <th
+                  onClick={() => handleSortEnrolado('telefono')}
+                  style={{
+                    padding: '0.85rem',
+                    color: enroladoSortField === 'telefono' ? '#fff' : '#38bdf8',
+                    fontSize: '0.82rem',
+                    cursor: 'pointer',
+                    userSelect: 'none',
+                    background: enroladoSortField === 'telefono' ? 'rgba(56, 189, 248, 0.12)' : 'transparent',
+                    borderBottom: enroladoSortField === 'telefono' ? '2px solid #38bdf8' : 'none',
+                    transition: 'all 0.2s'
+                  }}
+                  title="Clic para organizar por Teléfono"
+                >
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    <span>Teléfono</span>
+                    {enroladoSortField === 'telefono' ? (
+                      enroladoSortDirection === 'asc' ? <ArrowUp size={13} color="#38bdf8" /> : <ArrowDown size={13} color="#38bdf8" />
+                    ) : (
+                      <ArrowUpDown size={12} style={{ opacity: 0.35 }} />
+                    )}
+                  </div>
+                </th>
+
+                {/* IMO Responsable */}
+                <th
+                  onClick={() => handleSortEnrolado('imo')}
+                  style={{
+                    padding: '0.85rem',
+                    color: enroladoSortField === 'imo' ? '#fff' : '#38bdf8',
+                    fontSize: '0.82rem',
+                    cursor: 'pointer',
+                    userSelect: 'none',
+                    background: enroladoSortField === 'imo' ? 'rgba(56, 189, 248, 0.12)' : 'transparent',
+                    borderBottom: enroladoSortField === 'imo' ? '2px solid #38bdf8' : 'none',
+                    transition: 'all 0.2s'
+                  }}
+                  title="Clic para organizar por IMO Responsable"
+                >
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    <span>IMO Responsable</span>
+                    {enroladoSortField === 'imo' ? (
+                      enroladoSortDirection === 'asc' ? <ArrowUp size={13} color="#38bdf8" /> : <ArrowDown size={13} color="#38bdf8" />
+                    ) : (
+                      <ArrowUpDown size={12} style={{ opacity: 0.35 }} />
+                    )}
+                  </div>
+                </th>
+
+                {/* Equipo */}
+                <th
+                  onClick={() => handleSortEnrolado('equipo')}
+                  style={{
+                    padding: '0.85rem',
+                    color: enroladoSortField === 'equipo' ? '#fff' : '#38bdf8',
+                    fontSize: '0.82rem',
+                    cursor: 'pointer',
+                    userSelect: 'none',
+                    background: enroladoSortField === 'equipo' ? 'rgba(56, 189, 248, 0.12)' : 'transparent',
+                    borderBottom: enroladoSortField === 'equipo' ? '2px solid #38bdf8' : 'none',
+                    transition: 'all 0.2s'
+                  }}
+                  title="Clic para organizar por Equipo"
+                >
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    <span>Equipo</span>
+                    {enroladoSortField === 'equipo' ? (
+                      enroladoSortDirection === 'asc' ? <ArrowUp size={13} color="#38bdf8" /> : <ArrowDown size={13} color="#38bdf8" />
+                    ) : (
+                      <ArrowUpDown size={12} style={{ opacity: 0.35 }} />
+                    )}
+                  </div>
+                </th>
+
+                {/* Coordinador/a */}
+                <th
+                  onClick={() => handleSortEnrolado('coordinacion')}
+                  style={{
+                    padding: '0.85rem',
+                    color: enroladoSortField === 'coordinacion' ? '#fff' : '#38bdf8',
+                    fontSize: '0.82rem',
+                    cursor: 'pointer',
+                    userSelect: 'none',
+                    background: enroladoSortField === 'coordinacion' ? 'rgba(56, 189, 248, 0.12)' : 'transparent',
+                    borderBottom: enroladoSortField === 'coordinacion' ? '2px solid #38bdf8' : 'none',
+                    transition: 'all 0.2s'
+                  }}
+                  title="Clic para organizar por Coordinador/a"
+                >
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    <span>Coordinador/a</span>
+                    {enroladoSortField === 'coordinacion' ? (
+                      enroladoSortDirection === 'asc' ? <ArrowUp size={13} color="#38bdf8" /> : <ArrowDown size={13} color="#38bdf8" />
+                    ) : (
+                      <ArrowUpDown size={12} style={{ opacity: 0.35 }} />
+                    )}
+                  </div>
+                </th>
+
+                {/* Confirmación IMO */}
+                <th
+                  onClick={() => handleSortEnrolado('asistencia')}
+                  style={{
+                    padding: '0.85rem',
+                    color: enroladoSortField === 'asistencia' ? '#fff' : '#38bdf8',
+                    fontSize: '0.82rem',
+                    cursor: 'pointer',
+                    userSelect: 'none',
+                    background: enroladoSortField === 'asistencia' ? 'rgba(56, 189, 248, 0.12)' : 'transparent',
+                    borderBottom: enroladoSortField === 'asistencia' ? '2px solid #38bdf8' : 'none',
+                    transition: 'all 0.2s'
+                  }}
+                  title="Clic para organizar por Confirmación de Asistencia"
+                >
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    <span>Confirmación IMO</span>
+                    {enroladoSortField === 'asistencia' ? (
+                      enroladoSortDirection === 'asc' ? <ArrowUp size={13} color="#38bdf8" /> : <ArrowDown size={13} color="#38bdf8" />
+                    ) : (
+                      <ArrowUpDown size={12} style={{ opacity: 0.35 }} />
+                    )}
+                  </div>
+                </th>
+
+                {/* Validación Nodus */}
+                <th
+                  onClick={() => handleSortEnrolado('nodus')}
+                  style={{
+                    padding: '0.85rem',
+                    color: enroladoSortField === 'nodus' ? '#fff' : '#38bdf8',
+                    fontSize: '0.82rem',
+                    cursor: 'pointer',
+                    userSelect: 'none',
+                    background: enroladoSortField === 'nodus' ? 'rgba(56, 189, 248, 0.12)' : 'transparent',
+                    borderBottom: enroladoSortField === 'nodus' ? '2px solid #38bdf8' : 'none',
+                    transition: 'all 0.2s'
+                  }}
+                  title="Clic para organizar por Validación Nodus"
+                >
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    <span>Validación Nodus</span>
+                    {enroladoSortField === 'nodus' ? (
+                      enroladoSortDirection === 'asc' ? <ArrowUp size={13} color="#38bdf8" /> : <ArrowDown size={13} color="#38bdf8" />
+                    ) : (
+                      <ArrowUpDown size={12} style={{ opacity: 0.35 }} />
+                    )}
+                  </div>
+                </th>
+
                 <th style={{ padding: '0.85rem', color: '#38bdf8', fontSize: '0.82rem', textAlign: 'right' }}>Acción</th>
               </tr>
             </thead>
             <tbody>
-              {uniqueEnroladosList.length === 0 ? (
+              {sortedUniqueEnroladosList.length === 0 ? (
                 <tr>
                   <td colSpan={9} style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>
                     No se encontraron enrolamientos con los filtros seleccionados.
                   </td>
                 </tr>
               ) : (
-                uniqueEnroladosList.map((enr, idx) => {
+                sortedUniqueEnroladosList.map((enr, idx) => {
+
                   const evalRes = evaluateEnroladoVerification(enr, enr.imoNombre, enr.equipo);
                   return (
                     <tr key={enr.id || `enr_${idx}`} style={{
@@ -1219,28 +1637,302 @@ export default function MonitorImos() {
         </div>
       ) : (
         <div className="glass-panel" style={{ padding: '1.5rem', overflowX: 'auto', border: '1px solid rgba(255,255,255,0.08)' }}>
+        {/* Barra de Control de Ordenamiento y Visualización por IMOs */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '1rem',
+          flexWrap: 'wrap',
+          gap: '0.75rem',
+          background: 'rgba(255,255,255,0.02)',
+          padding: '0.6rem 0.85rem',
+          borderRadius: '8px',
+          border: '1px solid rgba(255,255,255,0.06)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', color: '#e2e8f0', fontSize: '0.82rem', fontWeight: 600 }}>
+              <ArrowUpDown size={14} color="#38bdf8" /> Organizado por:
+            </span>
+            <span style={{
+              color: '#38bdf8',
+              fontWeight: 700,
+              fontSize: '0.8rem',
+              background: 'rgba(56, 189, 248, 0.12)',
+              padding: '3px 9px',
+              borderRadius: '5px',
+              border: '1px solid rgba(56, 189, 248, 0.3)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px'
+            }}>
+              {imoSortField === 'nombre' && 'IMO (Nombre)'}
+              {imoSortField === 'equipo' && 'Equipo'}
+              {imoSortField === 'avance' && 'Avance IMO (%)'}
+              {imoSortField === 'confirmados' && 'Confirmados IMO'}
+              {imoSortField === 'estado' && 'Estado (Completado/Progreso)'}
+              {imoSortField === 'conexion' && 'Última Conexión'}
+              {imoSortField === 'ubicacion' && 'Ubicación'}
+              {imoSortField === 'nodus' && 'Validación Nodus'}
+              <span style={{ fontSize: '0.75rem', opacity: 0.85 }}>
+                ({imoSortDirection === 'asc' ? 'Ascendente ↑' : 'Descendente ↓'})
+              </span>
+            </span>
+            <span style={{ fontSize: '0.74rem', color: '#64748b' }}>
+              • Clic en cualquier encabezado para alternar orden
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <button
+              type="button"
+              onClick={() => setExpandAll(prev => !prev)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '5px 12px',
+                borderRadius: '6px',
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                background: expandAll ? 'rgba(56, 189, 248, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+                border: expandAll ? '1px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.15)',
+                color: expandAll ? '#38bdf8' : '#cbd5e1',
+                cursor: 'pointer',
+                transition: 'all 0.2s'
+              }}
+              title="Expandir o contraer todas las listas de enrolados de cada IMO"
+            >
+              {expandAll ? '🔼 Colapsar Todos' : '🔽 Desplegar Todos los IMOs'}
+            </button>
+          </div>
+        </div>
+
         <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse', minWidth: '950px' }}>
           <thead>
             <tr style={{ borderBottom: '2px solid rgba(255, 183, 3, 0.3)' }}>
-              <th style={{ padding: '1rem', color: 'var(--crear-gold)', fontSize: '0.85rem' }}>IMO (Nombre)</th>
-              <th style={{ padding: '1rem', color: 'var(--crear-gold)', fontSize: '0.85rem' }}>Equipo</th>
-              <th style={{ padding: '1rem', color: 'var(--crear-gold)', fontSize: '0.85rem' }}>Avance IMO</th>
-              <th style={{ padding: '1rem', color: 'var(--crear-gold)', fontSize: '0.85rem' }}>Confirmados IMO</th>
-              <th style={{ padding: '1rem', color: 'var(--crear-gold)', fontSize: '0.85rem' }}>Estado</th>
-              <th style={{ padding: '1rem', color: 'var(--crear-gold)', fontSize: '0.85rem' }}>Última Conexión</th>
-              <th style={{ padding: '1rem', color: 'var(--crear-gold)', fontSize: '0.85rem' }}>Ubicación</th>
-              <th style={{ padding: '1rem', color: 'var(--crear-gold)', fontSize: '0.85rem' }}>Validación Nodus (Llamadas)</th>
-              <th style={{ padding: '1rem', color: 'var(--crear-gold)', fontSize: '0.85rem', textAlign: 'right' }}>Acciones</th>
+              {/* IMO (Nombre) */}
+              <th
+                onClick={() => handleSortImo('nombre')}
+                style={{
+                  padding: '0.9rem 1rem',
+                  color: imoSortField === 'nombre' ? '#38bdf8' : 'var(--crear-gold)',
+                  fontSize: '0.85rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  userSelect: 'none',
+                  background: imoSortField === 'nombre' ? 'rgba(56, 189, 248, 0.08)' : 'transparent',
+                  borderBottom: imoSortField === 'nombre' ? '2px solid #38bdf8' : 'none',
+                  transition: 'background 0.2s, color 0.2s'
+                }}
+                title="Clic para organizar alfabéticamente por Nombre de IMO"
+              >
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                  <span>IMO (Nombre)</span>
+                  {imoSortField === 'nombre' ? (
+                    imoSortDirection === 'asc' ? <ArrowUp size={14} color="#38bdf8" /> : <ArrowDown size={14} color="#38bdf8" />
+                  ) : (
+                    <ArrowUpDown size={13} style={{ opacity: 0.35 }} />
+                  )}
+                </div>
+              </th>
+
+              {/* Equipo */}
+              <th
+                onClick={() => handleSortImo('equipo')}
+                style={{
+                  padding: '0.9rem 1rem',
+                  color: imoSortField === 'equipo' ? '#38bdf8' : 'var(--crear-gold)',
+                  fontSize: '0.85rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  userSelect: 'none',
+                  background: imoSortField === 'equipo' ? 'rgba(56, 189, 248, 0.08)' : 'transparent',
+                  borderBottom: imoSortField === 'equipo' ? '2px solid #38bdf8' : 'none',
+                  transition: 'background 0.2s, color 0.2s'
+                }}
+                title="Clic para organizar por Equipo"
+              >
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                  <span>Equipo</span>
+                  {imoSortField === 'equipo' ? (
+                    imoSortDirection === 'asc' ? <ArrowUp size={14} color="#38bdf8" /> : <ArrowDown size={14} color="#38bdf8" />
+                  ) : (
+                    <ArrowUpDown size={13} style={{ opacity: 0.35 }} />
+                  )}
+                </div>
+              </th>
+
+              {/* Avance IMO */}
+              <th
+                onClick={() => handleSortImo('avance')}
+                style={{
+                  padding: '0.9rem 1rem',
+                  color: imoSortField === 'avance' ? '#38bdf8' : 'var(--crear-gold)',
+                  fontSize: '0.85rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  userSelect: 'none',
+                  background: imoSortField === 'avance' ? 'rgba(56, 189, 248, 0.08)' : 'transparent',
+                  borderBottom: imoSortField === 'avance' ? '2px solid #38bdf8' : 'none',
+                  transition: 'background 0.2s, color 0.2s'
+                }}
+                title="Clic para organizar por Porcentaje de Avance"
+              >
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                  <span>Avance IMO</span>
+                  {imoSortField === 'avance' ? (
+                    imoSortDirection === 'asc' ? <ArrowUp size={14} color="#38bdf8" /> : <ArrowDown size={14} color="#38bdf8" />
+                  ) : (
+                    <ArrowUpDown size={13} style={{ opacity: 0.35 }} />
+                  )}
+                </div>
+              </th>
+
+              {/* Confirmados IMO */}
+              <th
+                onClick={() => handleSortImo('confirmados')}
+                style={{
+                  padding: '0.9rem 1rem',
+                  color: imoSortField === 'confirmados' ? '#38bdf8' : 'var(--crear-gold)',
+                  fontSize: '0.85rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  userSelect: 'none',
+                  background: imoSortField === 'confirmados' ? 'rgba(56, 189, 248, 0.08)' : 'transparent',
+                  borderBottom: imoSortField === 'confirmados' ? '2px solid #38bdf8' : 'none',
+                  transition: 'background 0.2s, color 0.2s'
+                }}
+                title="Clic para organizar por Cantidad de Confirmados"
+              >
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                  <span>Confirmados IMO</span>
+                  {imoSortField === 'confirmados' ? (
+                    imoSortDirection === 'asc' ? <ArrowUp size={14} color="#38bdf8" /> : <ArrowDown size={14} color="#38bdf8" />
+                  ) : (
+                    <ArrowUpDown size={13} style={{ opacity: 0.35 }} />
+                  )}
+                </div>
+              </th>
+
+              {/* Estado */}
+              <th
+                onClick={() => handleSortImo('estado')}
+                style={{
+                  padding: '0.9rem 1rem',
+                  color: imoSortField === 'estado' ? '#38bdf8' : 'var(--crear-gold)',
+                  fontSize: '0.85rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  userSelect: 'none',
+                  background: imoSortField === 'estado' ? 'rgba(56, 189, 248, 0.08)' : 'transparent',
+                  borderBottom: imoSortField === 'estado' ? '2px solid #38bdf8' : 'none',
+                  transition: 'background 0.2s, color 0.2s'
+                }}
+                title="Clic para organizar por Estado (Completados / En Progreso)"
+              >
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                  <span>Estado</span>
+                  {imoSortField === 'estado' ? (
+                    imoSortDirection === 'asc' ? <ArrowUp size={14} color="#38bdf8" /> : <ArrowDown size={14} color="#38bdf8" />
+                  ) : (
+                    <ArrowUpDown size={13} style={{ opacity: 0.35 }} />
+                  )}
+                </div>
+              </th>
+
+              {/* Última Conexión */}
+              <th
+                onClick={() => handleSortImo('conexion')}
+                style={{
+                  padding: '0.9rem 1rem',
+                  color: imoSortField === 'conexion' ? '#38bdf8' : 'var(--crear-gold)',
+                  fontSize: '0.85rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  userSelect: 'none',
+                  background: imoSortField === 'conexion' ? 'rgba(56, 189, 248, 0.08)' : 'transparent',
+                  borderBottom: imoSortField === 'conexion' ? '2px solid #38bdf8' : 'none',
+                  transition: 'background 0.2s, color 0.2s'
+                }}
+                title="Clic para organizar por Última Conexión"
+              >
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                  <span>Última Conexión</span>
+                  {imoSortField === 'conexion' ? (
+                    imoSortDirection === 'asc' ? <ArrowUp size={14} color="#38bdf8" /> : <ArrowDown size={14} color="#38bdf8" />
+                  ) : (
+                    <ArrowUpDown size={13} style={{ opacity: 0.35 }} />
+                  )}
+                </div>
+              </th>
+
+              {/* Ubicación */}
+              <th
+                onClick={() => handleSortImo('ubicacion')}
+                style={{
+                  padding: '0.9rem 1rem',
+                  color: imoSortField === 'ubicacion' ? '#38bdf8' : 'var(--crear-gold)',
+                  fontSize: '0.85rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  userSelect: 'none',
+                  background: imoSortField === 'ubicacion' ? 'rgba(56, 189, 248, 0.08)' : 'transparent',
+                  borderBottom: imoSortField === 'ubicacion' ? '2px solid #38bdf8' : 'none',
+                  transition: 'background 0.2s, color 0.2s'
+                }}
+                title="Clic para organizar por Ubicación / IP"
+              >
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                  <span>Ubicación</span>
+                  {imoSortField === 'ubicacion' ? (
+                    imoSortDirection === 'asc' ? <ArrowUp size={14} color="#38bdf8" /> : <ArrowDown size={14} color="#38bdf8" />
+                  ) : (
+                    <ArrowUpDown size={13} style={{ opacity: 0.35 }} />
+                  )}
+                </div>
+              </th>
+
+              {/* Validación Nodus (Llamadas) */}
+              <th
+                onClick={() => handleSortImo('nodus')}
+                style={{
+                  padding: '0.9rem 1rem',
+                  color: imoSortField === 'nodus' ? '#38bdf8' : 'var(--crear-gold)',
+                  fontSize: '0.85rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  userSelect: 'none',
+                  background: imoSortField === 'nodus' ? 'rgba(56, 189, 248, 0.08)' : 'transparent',
+                  borderBottom: imoSortField === 'nodus' ? '2px solid #38bdf8' : 'none',
+                  transition: 'background 0.2s, color 0.2s'
+                }}
+                title="Clic para organizar por Validación Nodus (Llamadas)"
+              >
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                  <span>Validación Nodus (Llamadas)</span>
+                  {imoSortField === 'nodus' ? (
+                    imoSortDirection === 'asc' ? <ArrowUp size={14} color="#38bdf8" /> : <ArrowDown size={14} color="#38bdf8" />
+                  ) : (
+                    <ArrowUpDown size={13} style={{ opacity: 0.35 }} />
+                  )}
+                </div>
+              </th>
+
+              {/* Acciones */}
+              <th style={{ padding: '0.9rem 1rem', color: 'var(--crear-gold)', fontSize: '0.85rem', textAlign: 'right' }}>
+                Acciones
+              </th>
             </tr>
           </thead>
           <tbody>
-            {filteredMissions.length === 0 ? (
+            {sortedMissions.length === 0 ? (
               <tr>
                 <td colSpan={9} style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>
                   {missions.length === 0 ? 'No hay misiones de IMOs registradas actualmente.' : 'Ningún IMO o enrolado coincide con los filtros aplicados.'}
                 </td>
               </tr>
-            ) : filteredMissions.map((m) => {
+            ) : sortedMissions.map((m) => {
               const enroladosList = getEnroladosList(m);
               const totalEnrolled = enroladosList.length;
               let contacted = 0;
@@ -1256,7 +1948,8 @@ export default function MonitorImos() {
 
               const progreso = totalEnrolled > 0 ? Math.round((assisted / totalEnrolled) * 100) : 0;
               const isCompleted = totalEnrolled > 0 && assisted === totalEnrolled;
-              const isExpanded = expandedImo === m.id || (Boolean(searchTerm.trim()) && filteredMissions.length <= 4);
+              const isExpanded = expandAll || expandedImo === m.id || (Boolean(searchTerm.trim()) && filteredMissions.length <= 4);
+
 
               return (
                 <React.Fragment key={m.id}>
@@ -1300,7 +1993,7 @@ export default function MonitorImos() {
                     {/* Insignia Reactiva de Validación Automática Nodus */}
                     <td style={{ padding: '1rem' }}>
                       <div
-                        onClick={() => setExpandedImo(isExpanded ? null : m.id)}
+                        onClick={() => handleToggleExpand(m.id)}
                         title={nodusSummary.tooltip}
                         style={{
                           display: 'inline-flex',
@@ -1324,7 +2017,7 @@ export default function MonitorImos() {
 
                     <td style={{ padding: '1rem', textAlign: 'right' }}>
                       <button
-                        onClick={() => setExpandedImo(isExpanded ? null : m.id)}
+                        onClick={() => handleToggleExpand(m.id)}
                         style={{
                           background: isExpanded ? 'rgba(56, 189, 248, 0.15)' : 'transparent',
                           color: isExpanded ? '#38bdf8' : 'var(--crear-blue)',
