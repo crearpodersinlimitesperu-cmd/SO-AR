@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCycles } from '../context/CyclesContext';
 import { useUI } from '../context/UIContext';
+import { useTheme } from '../context/ThemeContext';
 import {
   Sparkles, Download, ArrowLeft, RefreshCw, Plus, Trash2,
-  Copy, Image as ImageIcon, Sliders, Eye, Terminal, Check,
-  Calendar, Zap, CheckCircle2, MapPin, Globe, Award
+  Copy, Sliders, Eye, Terminal, Check,
+  Calendar, Zap, CheckCircle2, Award, X
 } from 'lucide-react';
 
 // Preset 1: Próximas Fechas de Enrolamiento (Octubre para sedes que ya cerraron Septiembre)
@@ -69,6 +70,35 @@ export default function GeneradorFlyer() {
   const { showToast } = useUI();
   const canvasRef = useRef(null);
 
+  // Safe fallback for ThemeContext
+  let activeTheme = 'dark';
+  try {
+    const themeContext = useTheme();
+    if (themeContext?.activeTheme) activeTheme = themeContext.activeTheme;
+  } catch (e) {
+    activeTheme = 'dark';
+  }
+
+  const isLight = activeTheme === 'light';
+
+  // Tokens de estilo consistentes con Causa OS
+  const themeStyles = {
+    bgPage: isLight ? '#f8fafc' : '#060d19',
+    cardBg: isLight ? 'rgba(255, 255, 255, 0.95)' : 'rgba(11, 23, 44, 0.85)',
+    cardBorder: isLight ? 'rgba(217, 119, 6, 0.28)' : 'rgba(255, 193, 7, 0.25)',
+    cardShadow: isLight ? '0 10px 30px rgba(0,0,0,0.06)' : '0 16px 40px rgba(0,0,0,0.5)',
+    rowBg: isLight ? '#ffffff' : 'rgba(15, 28, 52, 0.75)',
+    rowBorder: isLight ? 'rgba(226, 232, 240, 0.9)' : 'rgba(255, 255, 255, 0.08)',
+    textTitle: isLight ? '#0f172a' : '#ffffff',
+    textMuted: isLight ? '#64748b' : '#94a3b8',
+    inputBg: isLight ? '#f1f5f9' : 'rgba(6, 14, 28, 0.85)',
+    inputBorder: isLight ? 'rgba(203, 213, 225, 0.8)' : 'rgba(255, 255, 255, 0.12)',
+    inputColor: isLight ? '#0f172a' : '#ffffff',
+    goldAccent: '#FFC107',
+    goldHover: '#FFD54F',
+    goldSubtle: isLight ? 'rgba(217, 119, 6, 0.12)' : 'rgba(255, 193, 7, 0.15)'
+  };
+
   // Estados del flyer
   const [programa, setPrograma] = useState('CAPÍTULO UNO');
   const [outline, setOutline] = useState('UNO');
@@ -97,7 +127,6 @@ export default function GeneradorFlyer() {
     ];
 
     const nuevasSedes = sedesConfig.map(sc => {
-      // Filtrar eventos de Capítulo 1 futuros para esta sede
       const c1Events = events.filter(e => {
         const evName = (e.nombre || e.name || '').toUpperCase();
         const evSede = (e.sede || e.place || e.sedeTag || '').toUpperCase();
@@ -122,7 +151,6 @@ export default function GeneradorFlyer() {
         };
       }
 
-      // Si no hay evento futuro, mantener el valor actual o próximo ciclo
       const actual = sedes.find(s => s.id === sc.id);
       return actual || { id: sc.id, ciudad: sc.ciudad, fechas: 'Próximamente', activo: true };
     });
@@ -143,7 +171,6 @@ export default function GeneradorFlyer() {
     }
   };
 
-  // Sincronizar contorno cuando cambia el programa si tiene patrón "CAPÍTULO X"
   const handleProgramaChange = (val) => {
     setPrograma(val);
     const upper = val.toUpperCase().trim();
@@ -169,10 +196,9 @@ export default function GeneradorFlyer() {
 
   const addSede = () => {
     const newId = 'sede_' + Date.now();
-    setSedes(prev => [...prev, { id: newId, ciudad: 'Nueva Sede', fechas: 'Próximamente', activo: true }]);
+    setSedes(prev => [...prev, { id: newId, ciudad: 'Nueva Sede', fechas: 'Próximamente', activo: true, equipo: '' }]);
   };
 
-  // Helper para cargar imagen
   const loadImage = (src) => {
     return new Promise((resolve, reject) => {
       const img = new Image();
@@ -190,6 +216,7 @@ export default function GeneradorFlyer() {
 
     try {
       const canvas = canvasRef.current;
+      if (!canvas) return;
       canvas.width = 1080;
       canvas.height = 1920;
       const ctx = canvas.getContext('2d');
@@ -202,7 +229,7 @@ export default function GeneradorFlyer() {
 
       await document.fonts.ready;
 
-      // 1. Fondo csmico
+      // 1. Fondo cósmico
       ctx.clearRect(0, 0, 1080, 1920);
       ctx.drawImage(bgImg, 0, 0, 1080, 1920);
 
@@ -234,7 +261,7 @@ export default function GeneradorFlyer() {
       ctx.strokeText(outline, 540, 565);
       ctx.restore();
 
-      // 5. Ttulo Principal con resplandor dorado (Primer Plano)
+      // 5. Título Principal con resplandor dorado (Primer Plano)
       ctx.save();
       ctx.font = '800 49px "Montserrat", sans-serif';
       if ('letterSpacing' in ctx) ctx.letterSpacing = '10px';
@@ -252,7 +279,7 @@ export default function GeneradorFlyer() {
       ctx.shadowBlur = 15;
       ctx.fillText(programa, 540, 565);
 
-      // Texto slido frontal
+      // Texto sólido frontal
       ctx.shadowBlur = 0;
       ctx.fillText(programa, 540, 565);
       ctx.restore();
@@ -266,7 +293,7 @@ export default function GeneradorFlyer() {
       activeSedes.forEach((s, idx) => {
         const y = startY + idx * step;
 
-        // Nombre de la Ciudad (dorado/mbar)
+        // Nombre de la Ciudad (dorado/ámbar)
         ctx.save();
         ctx.font = '700 41px "Montserrat", sans-serif';
         if ('letterSpacing' in ctx) ctx.letterSpacing = '1.5px';
@@ -291,7 +318,7 @@ export default function GeneradorFlyer() {
         ctx.restore();
       });
 
-      // 7. Banderas Metlicas Circulares Oficiales
+      // 7. Banderas Metálicas Circulares Oficiales
       const flagsW = 445;
       const flagsH = (flagsImg.height / flagsImg.width) * flagsW;
       ctx.drawImage(flagsImg, 540 - flagsW / 2, 1685, flagsW, flagsH);
@@ -327,168 +354,391 @@ export default function GeneradorFlyer() {
     }
   };
 
+  const activeSedesList = sedes.filter(s => s.activo);
+
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-16">
+    <div style={{
+      minHeight: '100vh',
+      backgroundColor: themeStyles.bgPage,
+      color: themeStyles.textTitle,
+      fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+      padding: '1.5rem 2rem 4rem 2rem'
+    }}>
       
       {/* Canvas oculto para exportar a 1080x1920 */}
-      <canvas ref={canvasRef} className="hidden" />
+      <canvas ref={canvasRef} style={{ display: 'none' }} />
 
-      {/* HEADER */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-panel p-6 rounded-2xl border border-yellow-500/20">
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => navigate('/')}
-            className="p-2.5 rounded-xl bg-gray-800/80 hover:bg-gray-700 text-gray-300 hover:text-white transition-all border border-gray-700"
-            title="Volver al panel"
-          >
-            <ArrowLeft size={20} />
-          </button>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-yellow-500/10 text-yellow-400 border border-yellow-500/30">
-                Oficial CREAR Poder sin Límites
-              </span>
-              <span className="text-xs text-gray-400 font-semibold">&bull; Capítulos Uno de Cada Sede</span>
+      <div style={{ maxWidth: '1440px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
+
+        {/* HEADER COCKPIT DE ALTO NIVEL */}
+        <header style={{
+          background: themeStyles.cardBg,
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          border: `1px solid ${themeStyles.cardBorder}`,
+          borderRadius: '20px',
+          padding: '1.25rem 1.75rem',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '1.25rem',
+          boxShadow: themeStyles.cardShadow
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem' }}>
+            <button
+              onClick={() => navigate('/')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                padding: '0.55rem 0.95rem',
+                background: isLight ? '#ffffff' : 'rgba(255, 255, 255, 0.06)',
+                border: `1px solid ${themeStyles.rowBorder}`,
+                borderRadius: '12px',
+                color: themeStyles.textTitle,
+                cursor: 'pointer',
+                fontWeight: 600,
+                fontSize: '0.85rem',
+                transition: 'all 0.2s'
+              }}
+              title="Volver al inicio"
+            >
+              <ArrowLeft size={16} /> Inicio
+            </button>
+
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.2rem' }}>
+                <span style={{
+                  fontSize: '0.68rem',
+                  fontWeight: 800,
+                  textTransform: 'uppercase',
+                  letterSpacing: '1px',
+                  padding: '0.2rem 0.65rem',
+                  borderRadius: '20px',
+                  background: 'rgba(255, 193, 7, 0.15)',
+                  color: '#f59e0b',
+                  border: '1px solid rgba(255, 193, 7, 0.35)'
+                }}>
+                  OFICIAL CREAR PODER SIN LÍMITES
+                </span>
+                <span style={{ fontSize: '0.78rem', color: themeStyles.textMuted, fontWeight: 600 }}>
+                  &bull; Capítulos Uno de Cada Sede
+                </span>
+              </div>
+
+              <h1 style={{
+                fontSize: '1.45rem',
+                fontWeight: 800,
+                color: themeStyles.textTitle,
+                margin: 0,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                letterSpacing: '-0.3px'
+              }}>
+                <Sparkles size={22} style={{ color: '#f59e0b' }} />
+                Generador de Flyers Oficiales HD
+              </h1>
+              <p style={{ fontSize: '0.82rem', color: themeStyles.textMuted, margin: '0.2rem 0 0 0' }}>
+                Modifica únicamente las fechas de los Capítulos Uno más próximos para que la gente pueda enrolarse.
+              </p>
             </div>
-            <h1 className="text-2xl font-black text-white mt-1 flex items-center gap-2">
-              <Sparkles className="text-yellow-400" size={24} />
-              Generador de Flyers Oficiales HD
-            </h1>
-            <p className="text-xs text-gray-400">
-              Modifica únicamente las fechas de los Capítulos Uno más próximos para que la gente pueda enrolarse.
-            </p>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+            <button
+              onClick={sincronizarConCalendario}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                padding: '0.6rem 1.2rem',
+                borderRadius: '12px',
+                background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(217, 119, 6, 0.25) 100%)',
+                border: '1px solid rgba(245, 158, 11, 0.5)',
+                color: '#f59e0b',
+                fontWeight: 700,
+                fontSize: '0.82rem',
+                cursor: 'pointer',
+                boxShadow: '0 0 16px rgba(245, 158, 11, 0.25)',
+                transition: 'all 0.2s'
+              }}
+              title="Obtener fechas de los próximos Capítulos 1 directamente del calendario oficial de Causa OS"
+            >
+              <Zap size={15} style={{ fill: '#f59e0b' }} /> Sincronizar Calendario Causa OS
+            </button>
+
+            <button
+              onClick={() => setShowCliModal(true)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.45rem',
+                padding: '0.6rem 1rem',
+                borderRadius: '12px',
+                background: isLight ? '#ffffff' : 'rgba(255, 255, 255, 0.05)',
+                border: `1px solid ${themeStyles.rowBorder}`,
+                color: themeStyles.textMuted,
+                fontWeight: 600,
+                fontSize: '0.82rem',
+                cursor: 'pointer'
+              }}
+            >
+              <Terminal size={15} /> Bot CLI
+            </button>
+          </div>
+        </header>
+
+        {/* ESTRATEGIA DE ENROLAMIENTO SEGMENTADA */}
+        <div style={{
+          background: themeStyles.cardBg,
+          backdropFilter: 'blur(12px)',
+          border: `1px solid ${themeStyles.rowBorder}`,
+          borderRadius: '16px',
+          padding: '0.85rem 1.25rem',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '1rem',
+          boxShadow: '0 4px 15px rgba(0,0,0,0.03)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.82rem', color: themeStyles.textTitle, fontWeight: 700 }}>
+            <Calendar size={17} style={{ color: '#f59e0b' }} />
+            <span>Estrategia de Enrolamiento:</span>
+          </div>
+
+          <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+            <button
+              onClick={() => aplicarPreset('enrolamiento')}
+              style={{
+                padding: '0.45rem 1rem',
+                borderRadius: '10px',
+                fontSize: '0.8rem',
+                fontWeight: 700,
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                transition: 'all 0.2s',
+                background: presetActivo === 'enrolamiento' ? 'linear-gradient(135deg, #FFC107 0%, #d97706 100%)' : (isLight ? '#f1f5f9' : 'rgba(255, 255, 255, 0.05)'),
+                color: presetActivo === 'enrolamiento' ? '#000000' : themeStyles.textMuted,
+                boxShadow: presetActivo === 'enrolamiento' ? '0 0 14px rgba(255, 193, 7, 0.4)' : 'none'
+              }}
+            >
+              {presetActivo === 'enrolamiento' && <CheckCircle2 size={14} />}
+              Próximo Enrolamiento (Oficial)
+            </button>
+
+            <button
+              onClick={() => aplicarPreset('inmediato')}
+              style={{
+                padding: '0.45rem 1rem',
+                borderRadius: '10px',
+                fontSize: '0.8rem',
+                fontWeight: 700,
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                transition: 'all 0.2s',
+                background: presetActivo === 'inmediato' ? 'linear-gradient(135deg, #FFC107 0%, #d97706 100%)' : (isLight ? '#f1f5f9' : 'rgba(255, 255, 255, 0.05)'),
+                color: presetActivo === 'inmediato' ? '#000000' : themeStyles.textMuted,
+                boxShadow: presetActivo === 'inmediato' ? '0 0 14px rgba(255, 193, 7, 0.4)' : 'none'
+              }}
+            >
+              {presetActivo === 'inmediato' && <CheckCircle2 size={14} />}
+              Ciclo Inmediato (Septiembre)
+            </button>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <button
-            onClick={sincronizarConCalendario}
-            className="px-3.5 py-2 rounded-xl bg-yellow-500/15 hover:bg-yellow-500/25 text-yellow-400 font-bold text-xs border border-yellow-500/40 flex items-center gap-1.5 transition-all shadow-[0_0_15px_rgba(234,179,8,0.2)]"
-            title="Obtener fechas de los próximos Capítulos 1 directamente del calendario oficial de Causa OS"
-          >
-            <Zap size={14} className="text-yellow-400 fill-yellow-400" /> Sincronizar Calendario Causa OS
-          </button>
-          <button
-            onClick={() => setShowCliModal(true)}
-            className="px-3 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white font-semibold text-xs border border-gray-700 flex items-center gap-1.5 transition-all"
-          >
-            <Terminal size={14} /> Bot CLI
-          </button>
-        </div>
-      </div>
+        {/* GRID DE 2 COLUMNAS: ESTUDIO DE CONTROL (IZQUIERDA) + PREVIEW FLYER STICKY (DERECHA) */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'minmax(0, 1.25fr) minmax(380px, 420px)',
+          gap: '2rem',
+          alignItems: 'start'
+        }}>
 
-      {/* SELECTOR RÁPIDO DE PRESETS DE ENROLAMIENTO */}
-      <div className="glass-panel p-4 rounded-2xl border border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <div className="flex items-center gap-2 text-xs text-gray-300">
-          <Calendar size={16} className="text-yellow-400" />
-          <span className="font-bold">Estrategia de Enrolamiento:</span>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            onClick={() => aplicarPreset('enrolamiento')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
-              presetActivo === 'enrolamiento'
-                ? 'bg-yellow-500 text-black shadow-[0_0_12px_rgba(234,179,8,0.4)]'
-                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-            }`}
-          >
-            {presetActivo === 'enrolamiento' && <CheckCircle2 size={13} />}
-            Próximo Enrolamiento (Oficial)
-          </button>
-
-          <button
-            onClick={() => aplicarPreset('inmediato')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
-              presetActivo === 'inmediato'
-                ? 'bg-yellow-500 text-black shadow-[0_0_12px_rgba(234,179,8,0.4)]'
-                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-            }`}
-          >
-            {presetActivo === 'inmediato' && <CheckCircle2 size={13} />}
-            Ciclo Inmediato (Septiembre)
-          </button>
-        </div>
-      </div>
-
-      {/* GRID PRINCIPAL: CONTROLES + PREVIEW EXACTO */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-
-        {/* COLUMNA IZQUIERDA: CONTROLES */}
-        <div className="lg:col-span-6 space-y-5">
-          
-          {/* Tarjeta de Fechas por Sede - Diseño Premium Causa OS */}
-          <div 
-            className="p-6 rounded-2xl border space-y-4"
-            style={{
-              background: 'radial-gradient(ellipse at top left, #172033 0%, #090d16 100%)',
-              borderColor: 'rgba(245, 158, 11, 0.28)',
-              boxShadow: '0 12px 36px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.05)'
-            }}
-          >
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-800/80">
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="p-1.5 rounded-lg bg-yellow-500/15 border border-yellow-500/30 text-yellow-400">
-                    <Award size={18} />
-                  </span>
-                  <h3 className="text-sm font-black text-yellow-400 uppercase tracking-widest font-mono">
-                    Calendario Oficial de Capítulos Uno
-                  </h3>
+          {/* COLUMNA IZQUIERDA: CONTROLES EDITORIALES */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            
+            {/* CARD 1: CALENDARIO DE SEDES */}
+            <div style={{
+              background: themeStyles.cardBg,
+              backdropFilter: 'blur(16px)',
+              WebkitBackdropFilter: 'blur(16px)',
+              border: `1px solid ${themeStyles.cardBorder}`,
+              borderRadius: '20px',
+              padding: '1.5rem',
+              boxShadow: themeStyles.cardShadow
+            }}>
+              {/* Card Header */}
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: '1rem',
+                paddingBottom: '1rem',
+                borderBottom: `1px solid ${themeStyles.rowBorder}`,
+                marginBottom: '1.25rem'
+              }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                    <span style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: '28px',
+                      height: '28px',
+                      borderRadius: '8px',
+                      background: 'rgba(255, 193, 7, 0.15)',
+                      color: '#f59e0b',
+                      border: '1px solid rgba(255, 193, 7, 0.35)'
+                    }}>
+                      <Award size={16} />
+                    </span>
+                    <h2 style={{
+                      fontSize: '0.95rem',
+                      fontWeight: 800,
+                      color: '#f59e0b',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.8px',
+                      margin: 0
+                    }}>
+                      Calendario Oficial de Capítulos Uno
+                    </h2>
+                  </div>
+                  <p style={{ fontSize: '0.78rem', color: themeStyles.textMuted, margin: 0 }}>
+                    Control de fechas por ciudad, heráldica de equipos y visibilidad en flyer oficial.
+                  </p>
                 </div>
-                <p className="text-[11px] text-gray-400 mt-1">
-                  Control editorial de fechas por ciudad, heráldica de equipos y visibilidad en flyer oficial.
-                </p>
-              </div>
 
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-yellow-500/10 text-yellow-300 border border-yellow-500/20">
-                  {sedes.filter(s => s.activo).length} de {sedes.length} Visibles
-                </span>
-                <button
-                  onClick={addSede}
-                  className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-yellow-500/20 to-amber-500/20 text-yellow-400 hover:from-yellow-500/30 hover:to-amber-500/30 border border-yellow-500/40 text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all"
-                >
-                  <Plus size={14} /> Nueva Sede
-                </button>
-              </div>
-            </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                  <span style={{
+                    fontSize: '0.72rem',
+                    fontWeight: 700,
+                    padding: '0.3rem 0.75rem',
+                    borderRadius: '20px',
+                    background: 'rgba(245, 158, 11, 0.12)',
+                    color: '#f59e0b',
+                    border: '1px solid rgba(245, 158, 11, 0.3)'
+                  }}>
+                    {sedes.filter(s => s.activo).length} de {sedes.length} Visibles
+                  </span>
 
-            <div className="space-y-2.5 max-h-[440px] overflow-y-auto pr-1">
-              {sedes.map((s) => {
-                const flag = getCountryFlag(s.ciudad);
-                return (
-                  <div
-                    key={s.id}
-                    className={`p-3.5 rounded-xl border transition-all duration-200 ${
-                      s.activo 
-                        ? 'bg-slate-900/90 border-amber-500/30 shadow-md shadow-black/40' 
-                        : 'bg-black/40 border-gray-900/80 opacity-40 hover:opacity-70'
-                    }`}
+                  <button
+                    onClick={addSede}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.35rem',
+                      padding: '0.45rem 0.85rem',
+                      borderRadius: '10px',
+                      background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(217, 119, 6, 0.3) 100%)',
+                      border: '1px solid rgba(245, 158, 11, 0.45)',
+                      color: '#f59e0b',
+                      fontWeight: 700,
+                      fontSize: '0.78rem',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s'
+                    }}
                   >
-                    <div className="flex items-center gap-3">
-                      {/* Switch interactivo de visibilidad */}
+                    <Plus size={14} /> Nueva Sede
+                  </button>
+                </div>
+              </div>
+
+              {/* Lista de Filas de Sedes */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+                {sedes.map((s) => {
+                  const flag = getCountryFlag(s.ciudad);
+                  return (
+                    <div
+                      key={s.id}
+                      style={{
+                        background: s.activo ? themeStyles.rowBg : (isLight ? '#f1f5f9' : 'rgba(10, 18, 33, 0.4)'),
+                        border: s.activo ? `1px solid ${themeStyles.cardBorder}` : `1px solid ${themeStyles.rowBorder}`,
+                        borderRadius: '14px',
+                        padding: '0.85rem 1.1rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '1rem',
+                        opacity: s.activo ? 1 : 0.45,
+                        transition: 'all 0.25s',
+                        boxShadow: s.activo ? '0 4px 12px rgba(0,0,0,0.1)' : 'none'
+                      }}
+                    >
+                      {/* Switch iOS Style de Visibilidad */}
                       <button
                         type="button"
                         onClick={() => toggleSedeActiva(s.id)}
-                        className={`w-9 h-5 flex items-center rounded-full p-0.5 transition-colors cursor-pointer flex-shrink-0 ${
-                          s.activo ? 'bg-yellow-500 justify-end' : 'bg-gray-800 justify-start'
-                        }`}
+                        style={{
+                          width: '42px',
+                          height: '24px',
+                          borderRadius: '24px',
+                          background: s.activo ? '#f59e0b' : (isLight ? '#cbd5e1' : '#334155'),
+                          border: 'none',
+                          padding: '2px',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: s.activo ? 'flex-end' : 'flex-start',
+                          transition: 'background 0.25s ease',
+                          flexShrink: 0
+                        }}
                         title={s.activo ? 'Visible en Flyer (Clic para ocultar)' : 'Oculto (Clic para mostrar)'}
                       >
-                        <div className="bg-slate-950 w-4 h-4 rounded-full shadow-md" />
+                        <div style={{
+                          width: '20px',
+                          height: '20px',
+                          borderRadius: '50%',
+                          background: '#ffffff',
+                          boxShadow: '0 2px 4px rgba(0,0,0,0.3)'
+                        }} />
                       </button>
 
                       {/* Bandera y Ciudad */}
-                      <div className="flex items-center gap-2 w-32 sm:w-36 flex-shrink-0">
-                        <span className="text-lg select-none" title={`Región ${s.ciudad}`}>{flag}</span>
-                        <div className="flex-1 min-w-0">
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', width: '170px', flexShrink: 0 }}>
+                        <div style={{
+                          fontSize: '1.25rem',
+                          width: '34px',
+                          height: '34px',
+                          borderRadius: '50%',
+                          background: isLight ? '#f8fafc' : 'rgba(255, 255, 255, 0.06)',
+                          border: `1px solid ${themeStyles.rowBorder}`,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0
+                        }}>
+                          {flag}
+                        </div>
+
+                        <div style={{ flex: 1, minWidth: 0 }}>
                           <input
                             type="text"
                             value={s.ciudad}
                             disabled={!s.activo}
                             onChange={(e) => updateSede(s.id, 'ciudad', e.target.value)}
                             placeholder="Ciudad"
-                            className="w-full bg-transparent border-b border-gray-700 focus:border-yellow-400 text-xs font-black text-yellow-300 focus:outline-none py-0.5 tracking-wide"
+                            style={{
+                              width: '100%',
+                              background: 'transparent',
+                              border: 'none',
+                              borderBottom: '1px solid rgba(245, 158, 11, 0.35)',
+                              color: s.activo ? '#f59e0b' : themeStyles.textMuted,
+                              fontWeight: 800,
+                              fontSize: '0.88rem',
+                              outline: 'none',
+                              padding: '2px 0',
+                              letterSpacing: '0.3px'
+                            }}
                           />
                           <input
                             type="text"
@@ -496,15 +746,32 @@ export default function GeneradorFlyer() {
                             disabled={!s.activo}
                             onChange={(e) => updateSede(s.id, 'equipo', e.target.value)}
                             placeholder="Ej: Equipo 31"
-                            className="w-full bg-transparent text-[10px] text-gray-400 placeholder-gray-600 focus:text-yellow-200 focus:outline-none"
+                            style={{
+                              width: '100%',
+                              background: 'transparent',
+                              border: 'none',
+                              color: themeStyles.textMuted,
+                              fontSize: '0.72rem',
+                              outline: 'none',
+                              padding: '2px 0'
+                            }}
                           />
                         </div>
                       </div>
 
-                      {/* Fechas de Capítulo */}
-                      <div className="flex-1 relative">
-                        <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-gray-500">
-                          <Calendar size={13} />
+                      {/* Campo Fechas de Capítulo */}
+                      <div style={{ flex: 1, position: 'relative' }}>
+                        <div style={{
+                          position: 'absolute',
+                          left: '12px',
+                          top: '50%',
+                          transform: 'translateY(-50%)',
+                          color: '#f59e0b',
+                          pointerEvents: 'none',
+                          display: 'flex',
+                          alignItems: 'center'
+                        }}>
+                          <Calendar size={14} />
                         </div>
                         <input
                           type="text"
@@ -512,229 +779,544 @@ export default function GeneradorFlyer() {
                           disabled={!s.activo}
                           onChange={(e) => updateSede(s.id, 'fechas', e.target.value)}
                           placeholder="Fechas (ej: 18, 19 y 20 de septiembre)"
-                          className="w-full bg-black/60 border border-gray-800/90 focus:border-yellow-400 rounded-lg pl-8 pr-3 py-1.5 text-xs font-semibold text-slate-100 placeholder-gray-600 focus:outline-none transition-colors"
+                          style={{
+                            width: '100%',
+                            boxSizing: 'border-box',
+                            background: themeStyles.inputBg,
+                            border: `1px solid ${themeStyles.inputBorder}`,
+                            borderRadius: '10px',
+                            padding: '0.6rem 0.85rem 0.6rem 2.2rem',
+                            color: themeStyles.inputColor,
+                            fontWeight: 600,
+                            fontSize: '0.82rem',
+                            outline: 'none',
+                            transition: 'border-color 0.2s'
+                          }}
                         />
                       </div>
 
-                      {/* Botón eliminar */}
+                      {/* Botón Eliminar */}
                       <button
                         onClick={() => removeSede(s.id)}
-                        className="text-gray-600 hover:text-red-400 p-1.5 rounded-lg hover:bg-red-500/10 transition-all flex-shrink-0"
+                        style={{
+                          background: 'transparent',
+                          border: 'none',
+                          color: isLight ? '#94a3b8' : '#64748b',
+                          cursor: 'pointer',
+                          padding: '0.4rem',
+                          borderRadius: '8px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          transition: 'color 0.2s',
+                          flexShrink: 0
+                        }}
                         title="Eliminar sede"
+                        onMouseEnter={(e) => e.currentTarget.style.color = '#ef4444'}
+                        onMouseLeave={(e) => e.currentTarget.style.color = isLight ? '#94a3b8' : '#64748b'}
                       >
-                        <Trash2 size={15} />
+                        <Trash2 size={16} />
                       </button>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Tarjeta de Títulos y Jerarquía Visual */}
-          <div className="glass-panel p-5 rounded-2xl border border-gray-800 space-y-4">
-            <h3 className="text-sm font-black text-yellow-400 uppercase tracking-wider flex items-center gap-2">
-              <Sliders size={16} /> Título y Marca de Agua
-            </h3>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-[11px] font-bold text-gray-300 uppercase mb-1">
-                  Título Principal (Frente)
-                </label>
-                <input
-                  type="text"
-                  value={programa}
-                  onChange={(e) => handleProgramaChange(e.target.value)}
-                  placeholder="CAPÍTULO UNO"
-                  className="w-full bg-black/60 border border-gray-700 rounded-xl px-3.5 py-2 text-xs font-bold text-yellow-400 focus:border-yellow-400 focus:outline-none uppercase"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-bold text-gray-300 uppercase mb-1">
-                  Marca de Agua Contorno (Fondo)
-                </label>
-                <input
-                  type="text"
-                  value={outline}
-                  onChange={(e) => setOutline(e.target.value)}
-                  placeholder="UNO"
-                  className="w-full bg-black/60 border border-gray-700 rounded-xl px-3.5 py-2 text-xs font-bold text-gray-300 focus:border-yellow-400 focus:outline-none uppercase"
-                />
+                  );
+                })}
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-[11px] font-bold text-gray-300 uppercase mb-1">
-                  Subtítulo Superior
-                </label>
-                <input
-                  type="text"
-                  value={eyebrow}
-                  onChange={(e) => setEyebrow(e.target.value)}
-                  placeholder="FECHAS"
-                  className="w-full bg-black/60 border border-gray-700 rounded-xl px-3.5 py-2 text-xs font-semibold text-white focus:border-yellow-400 focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-bold text-gray-300 uppercase mb-1">
-                  Hashtag Inferior
-                </label>
-                <input
-                  type="text"
-                  value={hashtag}
-                  onChange={(e) => setHashtag(e.target.value)}
-                  placeholder="#SOYCREADOR"
-                  className="w-full bg-black/60 border border-gray-700 rounded-xl px-3.5 py-2 text-xs font-semibold text-white focus:border-yellow-400 focus:outline-none"
-                />
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-        {/* COLUMNA DERECHA: PREVIEW IDÉNTICO AL ORIGINAL */}
-        <div className="lg:col-span-6 flex flex-col items-center">
-          <div className="w-full flex justify-between items-center mb-3 max-w-[360px]">
-            <span className="text-xs font-bold text-gray-300 uppercase flex items-center gap-1.5">
-              <Eye size={14} className="text-yellow-400" /> Previsualización Fiel (9:16)
-            </span>
-            <span className="text-[10px] px-2.5 py-1 bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 rounded-full font-bold">
-              1080 x 1920 HD
-            </span>
-          </div>
-
-          {/* MOCKUP VERTICAL CINEMÁTICO 100% FIEL (SIN CAJAS NI BORDES) */}
-          <div
-            className="w-full max-w-[360px] h-[640px] rounded-3xl overflow-hidden shadow-[0_25px_70px_rgba(0,0,0,0.95)] border border-white/10 relative flex flex-col justify-between select-none"
-            style={{
-              backgroundImage: "url('/flyer_earth_bg_1080.png')",
-              backgroundSize: '100% 100%',
-              backgroundPosition: 'center bottom',
-              backgroundColor: '#010308',
-              fontFamily: "'Montserrat', sans-serif"
-            }}
-          >
-            {/* TOP LOGO OFICIAL */}
-            <div className="pt-7 flex justify-center">
-              <img
-                src="/logo_crear_blanco.png"
-                alt="CREAR Poder sin límites"
-                className="w-[64px] h-auto object-contain"
-              />
-            </div>
-
-            {/* EYEBROW & MAIN TITLE */}
-            <div className="text-center relative -mt-3">
-              <p className="text-[8px] font-light tracking-[0.42em] pl-[0.42em] text-white/80 uppercase mb-1 drop-shadow">
-                {eyebrow}
-              </p>
-              
-              <div className="relative flex items-center justify-center">
-                {/* Outline Watermark (Fondo) */}
-                <span
-                  className="absolute font-black tracking-[0.18em] pl-[0.18em] text-transparent select-none pointer-events-none"
-                  style={{
-                    fontSize: '56px',
-                    WebkitTextStroke: '1px rgba(255, 255, 255, 0.12)'
-                  }}
-                >
-                  {outline}
-                </span>
-
-                {/* Título Principal con Halo Luminous */}
-                <h2
-                  className="relative z-10 text-[16px] font-black tracking-[0.20em] pl-[0.20em] text-white uppercase whitespace-nowrap"
-                  style={{
-                    textShadow: '0 0 10px rgba(255, 240, 200, 0.9), 0 0 20px rgba(245, 180, 70, 0.5), 0 2px 4px rgba(0, 0, 0, 0.9)'
-                  }}
-                >
-                  {programa}
+            {/* CARD 2: BRANDING, TEXTOS Y MARCA DE AGUA */}
+            <div style={{
+              background: themeStyles.cardBg,
+              backdropFilter: 'blur(16px)',
+              WebkitBackdropFilter: 'blur(16px)',
+              border: `1px solid ${themeStyles.cardBorder}`,
+              borderRadius: '20px',
+              padding: '1.5rem',
+              boxShadow: themeStyles.cardShadow
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
+                <Sliders size={18} style={{ color: '#f59e0b' }} />
+                <h2 style={{
+                  fontSize: '0.95rem',
+                  fontWeight: 800,
+                  color: '#f59e0b',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.8px',
+                  margin: 0
+                }}>
+                  Personalización Editorial y Jerarquía Visual
                 </h2>
               </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.2rem' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 700, color: themeStyles.textMuted, textTransform: 'uppercase', marginBottom: '0.4rem' }}>
+                    Título Principal (Frente)
+                  </label>
+                  <input
+                    type="text"
+                    value={programa}
+                    onChange={(e) => handleProgramaChange(e.target.value)}
+                    placeholder="CAPÍTULO UNO"
+                    style={{
+                      width: '100%',
+                      boxSizing: 'border-box',
+                      background: themeStyles.inputBg,
+                      border: `1px solid ${themeStyles.inputBorder}`,
+                      borderRadius: '10px',
+                      padding: '0.65rem 0.95rem',
+                      color: '#f59e0b',
+                      fontWeight: 800,
+                      fontSize: '0.85rem',
+                      outline: 'none',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px'
+                    }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 700, color: themeStyles.textMuted, textTransform: 'uppercase', marginBottom: '0.4rem' }}>
+                    Marca de Agua Contorno (Fondo)
+                  </label>
+                  <input
+                    type="text"
+                    value={outline}
+                    onChange={(e) => setOutline(e.target.value)}
+                    placeholder="UNO"
+                    style={{
+                      width: '100%',
+                      boxSizing: 'border-box',
+                      background: themeStyles.inputBg,
+                      border: `1px solid ${themeStyles.inputBorder}`,
+                      borderRadius: '10px',
+                      padding: '0.65rem 0.95rem',
+                      color: themeStyles.textTitle,
+                      fontWeight: 800,
+                      fontSize: '0.85rem',
+                      outline: 'none',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px'
+                    }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 700, color: themeStyles.textMuted, textTransform: 'uppercase', marginBottom: '0.4rem' }}>
+                    Subtítulo Superior
+                  </label>
+                  <input
+                    type="text"
+                    value={eyebrow}
+                    onChange={(e) => setEyebrow(e.target.value)}
+                    placeholder="FECHAS"
+                    style={{
+                      width: '100%',
+                      boxSizing: 'border-box',
+                      background: themeStyles.inputBg,
+                      border: `1px solid ${themeStyles.inputBorder}`,
+                      borderRadius: '10px',
+                      padding: '0.65rem 0.95rem',
+                      color: themeStyles.inputColor,
+                      fontWeight: 600,
+                      fontSize: '0.85rem',
+                      outline: 'none',
+                      textTransform: 'uppercase'
+                    }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.74rem', fontWeight: 700, color: themeStyles.textMuted, textTransform: 'uppercase', marginBottom: '0.4rem' }}>
+                    Hashtag Inferior
+                  </label>
+                  <input
+                    type="text"
+                    value={hashtag}
+                    onChange={(e) => setHashtag(e.target.value)}
+                    placeholder="#SOYCREADOR"
+                    style={{
+                      width: '100%',
+                      boxSizing: 'border-box',
+                      background: themeStyles.inputBg,
+                      border: `1px solid ${themeStyles.inputBorder}`,
+                      borderRadius: '10px',
+                      padding: '0.65rem 0.95rem',
+                      color: themeStyles.inputColor,
+                      fontWeight: 600,
+                      fontSize: '0.85rem',
+                      outline: 'none'
+                    }}
+                  />
+                </div>
+              </div>
             </div>
 
-            {/* LISTA FLOTANTE DE CIUDADES Y FECHAS (SIN CAJAS, ESTILO ORIGINAL) */}
-            <div className="flex flex-col items-center justify-center space-y-3.5 my-auto px-4">
-              {sedes.filter(s => s.activo).map(s => (
-                <div key={s.id} className="text-center">
-                  <p
-                    className="text-[13.5px] font-bold text-[#f29e2e] leading-tight"
-                    style={{
-                      textShadow: '0 0 10px rgba(242, 164, 59, 0.45), 0 1px 4px rgba(0,0,0,0.8)'
-                    }}
-                  >
-                    {s.ciudad}
+          </div>
+
+          {/* COLUMNA DERECHA: PREVISUALIZADOR MOCKUP STICKY */}
+          <div style={{
+            position: 'sticky',
+            top: '1.5rem',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '1rem'
+          }}>
+            {/* Header del Mockup */}
+            <div style={{
+              width: '100%',
+              maxWidth: '380px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: '0 0.5rem'
+            }}>
+              <span style={{
+                fontSize: '0.74rem',
+                fontWeight: 800,
+                color: themeStyles.textTitle,
+                textTransform: 'uppercase',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                letterSpacing: '0.5px'
+              }}>
+                <Eye size={15} style={{ color: '#f59e0b' }} /> Previsualización Fiel (9:16)
+              </span>
+              <span style={{
+                fontSize: '0.68rem',
+                fontWeight: 800,
+                padding: '0.2rem 0.65rem',
+                borderRadius: '20px',
+                background: 'rgba(245, 158, 11, 0.15)',
+                color: '#f59e0b',
+                border: '1px solid rgba(245, 158, 11, 0.35)'
+              }}>
+                1080 × 1920 HD
+              </span>
+            </div>
+
+            {/* SMARTPHONE CINEMÁTICO REALISTA CON BEZEL METÁLICO */}
+            <div style={{
+              position: 'relative',
+              width: '100%',
+              maxWidth: '380px',
+              height: '675px',
+              borderRadius: '34px',
+              padding: '10px',
+              background: 'linear-gradient(145deg, #2a3b5c, #0d1527)',
+              boxShadow: '0 25px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(245, 158, 11, 0.15)',
+              border: '1px solid rgba(255, 193, 7, 0.3)'
+            }}>
+              {/* Notch superior del smartphone */}
+              <div style={{
+                position: 'absolute',
+                top: '18px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: '90px',
+                height: '14px',
+                background: '#050a14',
+                borderRadius: '12px',
+                zIndex: 40,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px'
+              }}>
+                <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#1e293b' }} />
+                <div style={{ width: '32px', height: '3px', borderRadius: '3px', background: '#1e293b' }} />
+              </div>
+
+              {/* Pantalla Interna del Flyer (Aspecto 9:16) */}
+              <div style={{
+                width: '100%',
+                height: '100%',
+                borderRadius: '26px',
+                overflow: 'hidden',
+                position: 'relative',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                backgroundImage: "url('/flyer_earth_bg_1080.png')",
+                backgroundSize: '100% 100%',
+                backgroundPosition: 'center bottom',
+                backgroundColor: '#010308',
+                fontFamily: "'Montserrat', sans-serif",
+                userSelect: 'none'
+              }}>
+                
+                {/* 1. TOP LOGO OFICIAL CREAR */}
+                <div style={{ paddingTop: '2.5rem', display: 'flex', justifyContent: 'center' }}>
+                  <img
+                    src="/logo_crear_blanco.png"
+                    alt="CREAR Poder sin límites"
+                    style={{ width: '68px', height: 'auto', objectFit: 'contain' }}
+                  />
+                </div>
+
+                {/* 2. EYEBROW & MAIN TITLE */}
+                <div style={{ textAlign: 'center', position: 'relative', marginTop: '-0.5rem' }}>
+                  <p style={{
+                    fontSize: '9px',
+                    fontWeight: 300,
+                    letterSpacing: '0.42em',
+                    paddingLeft: '0.42em',
+                    color: 'rgba(255, 255, 255, 0.85)',
+                    textTransform: 'uppercase',
+                    margin: '0 0 4px 0',
+                    textShadow: '0 1px 4px rgba(0,0,0,0.8)'
+                  }}>
+                    {eyebrow}
                   </p>
-                  <p
-                    className="text-[10px] font-light text-white tracking-wide mt-0.5"
+                  
+                  <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {/* Outline Watermark (Fondo) */}
+                    <span style={{
+                      position: 'absolute',
+                      fontWeight: 900,
+                      letterSpacing: '0.18em',
+                      paddingLeft: '0.18em',
+                      color: 'transparent',
+                      userSelect: 'none',
+                      pointerEvents: 'none',
+                      fontSize: '58px',
+                      WebkitTextStroke: '1px rgba(255, 255, 255, 0.15)'
+                    }}>
+                      {outline}
+                    </span>
+
+                    {/* Título Principal con Halo Luminous */}
+                    <h2 style={{
+                      position: 'relative',
+                      zIndex: 10,
+                      fontSize: '17px',
+                      fontWeight: 900,
+                      letterSpacing: '0.20em',
+                      paddingLeft: '0.20em',
+                      color: '#ffffff',
+                      textTransform: 'uppercase',
+                      whiteSpace: 'nowrap',
+                      margin: 0,
+                      textShadow: '0 0 10px rgba(255, 240, 200, 0.95), 0 0 20px rgba(245, 180, 70, 0.6), 0 2px 4px rgba(0, 0, 0, 0.9)'
+                    }}>
+                      {programa}
+                    </h2>
+                  </div>
+                </div>
+
+                {/* 3. LISTA FLOTANTE DE CIUDADES Y FECHAS (ESTILO ORIGINAL FIEL) */}
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: activeSedesList.length > 5 ? '0.65rem' : '0.95rem',
+                  margin: 'auto 0',
+                  padding: '0 1.5rem'
+                }}>
+                  {activeSedesList.map(s => (
+                    <div key={s.id} style={{ textAlign: 'center' }}>
+                      <p style={{
+                        fontSize: activeSedesList.length > 5 ? '13px' : '14.5px',
+                        fontWeight: 700,
+                        color: '#f29e2e',
+                        lineHeight: 1.15,
+                        margin: 0,
+                        textShadow: '0 0 10px rgba(242, 164, 59, 0.45), 0 1px 4px rgba(0,0,0,0.8)'
+                      }}>
+                        {s.ciudad}
+                      </p>
+                      <p style={{
+                        fontSize: activeSedesList.length > 5 ? '9.5px' : '10.5px',
+                        fontWeight: 300,
+                        color: '#ffffff',
+                        letterSpacing: '0.3px',
+                        margin: '2px 0 0 0',
+                        textShadow: '0 0 8px rgba(255, 255, 255, 0.35), 0 1px 4px rgba(0,0,0,0.9)'
+                      }}>
+                        {s.fechas}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* 4. BANDERAS METÁLICAS Y HASHTAG (FONDO INFERIOR) */}
+                <div style={{
+                  paddingBottom: '1.75rem',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}>
+                  <img
+                    src="/flags_badges_hd.png"
+                    alt="Banderas Oficiales"
                     style={{
-                      textShadow: '0 0 8px rgba(255, 255, 255, 0.35), 0 1px 4px rgba(0,0,0,0.9)'
+                      width: '155px',
+                      height: 'auto',
+                      objectFit: 'contain',
+                      filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.9))'
                     }}
-                  >
-                    {s.fechas}
+                  />
+                  <p style={{
+                    fontSize: '8px',
+                    fontWeight: 400,
+                    letterSpacing: '0.38em',
+                    paddingLeft: '0.38em',
+                    color: 'rgba(255, 255, 255, 0.95)',
+                    margin: 0,
+                    textShadow: '0 1px 4px rgba(0,0,0,0.9)'
+                  }}>
+                    {hashtag}
                   </p>
                 </div>
-              ))}
+
+              </div>
             </div>
 
-            {/* BANDERAS METÁLICAS Y HASHTAG (FONDO INFERIOR) */}
-            <div className="pb-6 flex flex-col items-center gap-2.5">
-              <img
-                src="/flags_badges_hd.png"
-                alt="Banderas Oficiales"
-                className="w-[148px] h-auto object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]"
-              />
-              <p
-                className="text-[7.5px] font-normal tracking-[0.38em] pl-[0.38em] text-white/90 drop-shadow"
+            {/* BOTÓN DE DESCARGA EJECUTIVO */}
+            <div style={{ width: '100%', maxWidth: '380px' }}>
+              <button
+                onClick={descargarFlyerHD}
+                disabled={descargando}
+                style={{
+                  width: '100%',
+                  padding: '0.9rem 1.25rem',
+                  background: 'linear-gradient(135deg, #FFC107 0%, #FF9800 100%)',
+                  color: '#000000',
+                  fontWeight: 900,
+                  fontSize: '0.88rem',
+                  borderRadius: '14px',
+                  border: 'none',
+                  cursor: descargando ? 'not-allowed' : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.6rem',
+                  boxShadow: '0 0 25px rgba(255, 193, 7, 0.45)',
+                  transition: 'all 0.2s',
+                  opacity: descargando ? 0.6 : 1
+                }}
               >
-                {hashtag}
+                <Download size={18} />
+                {descargando ? 'Generando 1080x1920 HD...' : 'Descargar Flyer Oficial (1080×1920 PNG)'}
+              </button>
+              <p style={{ fontSize: '0.72rem', color: themeStyles.textMuted, textAlign: 'center', margin: '0.5rem 0 0 0' }}>
+                Formato 9:16 listo para Instagram Stories, Estados de WhatsApp y Redes Oficiales.
               </p>
             </div>
 
           </div>
 
-          {/* BOTÓN DE DESCARGA */}
-          <button
-            onClick={descargarFlyerHD}
-            disabled={descargando}
-            className="mt-5 w-full max-w-[360px] py-3.5 px-4 bg-gradient-to-r from-yellow-500 to-amber-600 text-black font-black rounded-xl hover:scale-105 active:scale-95 transition-all shadow-[0_0_25px_rgba(245,158,11,0.45)] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 text-sm"
-          >
-            <Download size={18} /> {descargando ? 'Generando 1080x1920...' : 'Descargar Flyer Oficial en 1080x1920 (PNG)'}
-          </button>
         </div>
 
       </div>
 
       {/* MODAL CLI PUPPETEER BOT */}
       {showCliModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="glass-panel p-6 rounded-2xl max-w-lg w-full border border-yellow-500/30 space-y-4">
-            <h3 className="text-xl font-bold text-yellow-400 flex items-center gap-2">
-              <Terminal size={22} /> Bot Autónomo de Flyers (Puppeteer)
-            </h3>
-            <p className="text-sm text-gray-300">
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 10000,
+          background: 'rgba(0, 0, 0, 0.85)',
+          backdropFilter: 'blur(8px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '1rem'
+        }}>
+          <div style={{
+            background: themeStyles.cardBg,
+            border: `1px solid ${themeStyles.cardBorder}`,
+            borderRadius: '20px',
+            maxWidth: '540px',
+            width: '100%',
+            padding: '1.75rem',
+            boxShadow: '0 25px 60px rgba(0,0,0,0.7)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1rem'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{
+                fontSize: '1.1rem',
+                fontWeight: 800,
+                color: '#f59e0b',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                margin: 0
+              }}>
+                <Terminal size={20} /> Bot Autónomo de Flyers (Puppeteer)
+              </h3>
+              <button
+                onClick={() => setShowCliModal(false)}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: themeStyles.textMuted,
+                  cursor: 'pointer',
+                  padding: '4px'
+                }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <p style={{ fontSize: '0.82rem', color: themeStyles.textMuted, margin: 0, lineHeight: 1.5 }}>
               También puedes generar el flyer automáticamente con fidelidad 100% desde la terminal o integrarlo en pipelines automáticos de mensajería usando el script de Node.js:
             </p>
-            <div className="bg-black/90 p-4 rounded-xl font-mono text-xs text-green-400 border border-gray-800 select-all overflow-x-auto">
+
+            <div style={{
+              background: '#040914',
+              padding: '1rem',
+              borderRadius: '12px',
+              fontFamily: 'monospace',
+              fontSize: '0.82rem',
+              color: '#34d399',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              userSelect: 'all',
+              overflowX: 'auto'
+            }}>
               node scripts/generar_flyer.mjs --programa="CAPÍTULO UNO"
             </div>
-            <div className="flex justify-end gap-3 pt-2">
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', paddingTop: '0.5rem' }}>
               <button
                 onClick={() => {
                   navigator.clipboard.writeText('node scripts/generar_flyer.mjs --programa="CAPÍTULO UNO"');
                   showToast?.('Comando copiado al portapapeles', 'info');
                 }}
-                className="btn-secondary text-xs flex items-center gap-1.5"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  padding: '0.55rem 1rem',
+                  borderRadius: '10px',
+                  background: isLight ? '#f1f5f9' : 'rgba(255, 255, 255, 0.08)',
+                  border: `1px solid ${themeStyles.rowBorder}`,
+                  color: themeStyles.textTitle,
+                  fontWeight: 600,
+                  fontSize: '0.8rem',
+                  cursor: 'pointer'
+                }}
               >
                 <Copy size={14} /> Copiar Comando
               </button>
+
               <button
                 onClick={() => setShowCliModal(false)}
-                className="btn-primary bg-yellow-500 text-black font-bold text-xs"
+                style={{
+                  padding: '0.55rem 1.25rem',
+                  borderRadius: '10px',
+                  background: 'linear-gradient(135deg, #FFC107 0%, #d97706 100%)',
+                  border: 'none',
+                  color: '#000000',
+                  fontWeight: 800,
+                  fontSize: '0.8rem',
+                  cursor: 'pointer'
+                }}
               >
                 Entendido
               </button>
