@@ -10,14 +10,16 @@ import { normalizeRole, normalizeSede, OPERATIONAL_SEDES } from '../data/usersDa
 import { getAllCompanyUsers } from '../services/userService';
 import { openOrCreateDirectMessage } from '../services/googleChatService';
 import { getWhatsAppUrl } from '../utils/phoneUtils';
-import { Globe, Building2, Users, ArrowLeft, ChevronDown, ChevronRight, Eye, CheckCircle2, Clock, AlertTriangle, TrendingUp, UserCheck, FileText, Search, X, PlusCircle, Mail, MessageCircle } from 'lucide-react';
+import { Globe, Building2, Users, ArrowLeft, ChevronDown, ChevronRight, Eye, CheckCircle2, Clock, AlertTriangle, TrendingUp, UserCheck, FileText, Search, X, PlusCircle, Mail, MessageCircle, ShieldCheck, RefreshCw } from 'lucide-react';
 import { getFlagForSede } from '../utils/flags';
 import UserProfileModal from '../components/UserProfileModal';
 import IAAuditor from '../components/IAAuditor';
 import TaskAssignmentModal from '../components/TaskAssignmentModal';
 import { getAllAuditLogs, recordAuditEvent, getAllUserConnections } from '../services/auditService';
+import { runRoleIntegrityAuditAndHeal } from '../services/roleIntegritySentinelAgent';
 
 import { USERS_TO_IMPORT } from '../data/usersToImport';
+
 
 const ROLE_LABELS = {
   direccion: 'Dirección Global',
@@ -37,6 +39,8 @@ const ROLE_LABELS = {
   talento_humano: 'Talento Humano',
   legal: 'Legal / Jurídico',
   técnico_sst: 'Seguridad y Salud (SST)',
+  entrenador: 'Entrenadores (Coaches)',
+  entrenador_llamadas: 'Entrenadores de Llamadas',
   participante: 'Participantes',
 };
 
@@ -51,6 +55,8 @@ const ROLE_COLORS = {
   coord_maestria: '#8b5cf6',
   capitan: '#22c55e',
   manager: '#10b981',
+  entrenador: '#f59e0b',
+  entrenador_llamadas: '#38bdf8',
   qt: '#ec4899',
   coordinador: '#0ea5e9',
   finanzas: '#6b7280',
@@ -60,6 +66,7 @@ const ROLE_COLORS = {
   técnico_sst: '#14b8a6',
   participante: '#9ca3af'
 };
+
 
 const ALL_SEDES = [...OPERATIONAL_SEDES, 'Sede Global'];
 
@@ -965,13 +972,15 @@ function RoleView({ tasks, navigate, onSelectUser, onAssignTask, userConnections
     { id: 'direccion', label: 'Dirección Global' },
     { id: 'cfo', label: 'CFO (Chief Financial Officer)' },
     { id: 'gerente', label: 'Gerentes de Sede' },
-    { id: 'director_maestria', label: 'Directores de Maestría' },
-    { id: 'coordinador_c1c2', label: 'Coordinadores C1/C2' },
-    { id: 'coordinador_mj', label: 'Coordinadores de Maestría' },
+    { id: 'director_maestria', aliases: ['director_mj'], label: 'Directores de Maestría' },
+    { id: 'coord_c1', aliases: ['coordinador_c1c2', 'coord_c1', 'coord_c2', 'coordinador_c1', 'coordinador_c2'], label: 'Coordinadores C1/C2' },
+    { id: 'coord_maestria', aliases: ['coordinador_mj', 'coord_maestria', 'coordinador_maestria'], label: 'Coordinadores de Maestría' },
     { id: 'capitan', label: 'Capitanes' },
     { id: 'manager', label: 'Managers' },
+    { id: 'entrenador', aliases: ['entrenador'], label: 'Entrenadores (Coaches)' },
+    { id: 'entrenador_llamadas', aliases: ['entrenador_llamadas'], label: 'Entrenadores de Llamadas' },
     { id: 'qt', label: 'Quantum Team' },
-    { id: 'coordinador', label: 'Coordinación Administrativa' },
+    { id: 'coordinador', aliases: ['coordinador_administrativo'], label: 'Coordinación Administrativa' },
     { id: 'finanzas', label: 'Finanzas' },
     { id: 'asistente_impuestos_quito', label: 'Impuestos / Tributaria' },
     { id: 'talento_humano', label: 'Talento Humano' },
@@ -980,8 +989,13 @@ function RoleView({ tasks, navigate, onSelectUser, onAssignTask, userConnections
     { id: 'participante', label: 'Participantes' },
   ];
 
-  const listedRoleIds = new Set(roles.map(r => r.id));
-  const unlistedRoles = [...new Set((realUsersData || []).map(u => u.role).filter(r => r && !listedRoleIds.has(r)))];
+  const allKnownIds = new Set();
+  roles.forEach(r => {
+    allKnownIds.add(r.id);
+    (r.aliases || []).forEach(a => allKnownIds.add(a));
+  });
+
+  const unlistedRoles = [...new Set((realUsersData || []).map(u => normalizeRole(u.role)).filter(r => r && !allKnownIds.has(r)))];
   const allDisplayRoles = [
     ...roles,
     ...unlistedRoles.map(r => ({ id: r, label: ROLE_LABELS[r] || r }))
@@ -990,7 +1004,12 @@ function RoleView({ tasks, navigate, onSelectUser, onAssignTask, userConnections
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
       {allDisplayRoles.map(role => {
-        const members = (realUsersData || []).filter(u => u.role === role.id || normalizeRole(u.role) === role.id);
+        const members = (realUsersData || []).filter(u => {
+          const canonical = normalizeRole(u.role);
+          if (canonical === role.id || u.role === role.id) return true;
+          if (role.aliases && (role.aliases.includes(canonical) || role.aliases.includes(u.role))) return true;
+          return false;
+        });
         if (members.length === 0) return null;
         const roleColor = ROLE_COLORS[role.id] || '#6b7280';
         return (
@@ -1066,6 +1085,35 @@ export default function SuperAdminPanel() {
       setIsSyncing(false);
     }
   };
+
+  const [isHealingRoles, setIsHealingRoles] = useState(false);
+  const [roleAuditModalData, setRoleAuditModalData] = useState(null);
+
+  const handleRunRoleIntegrityAgent = async () => {
+    try {
+      setIsHealingRoles(true);
+      showToast("🛡️ Agente Supervisor de Roles analizando la base de datos...", "info");
+      const report = await runRoleIntegrityAuditAndHeal({ dryRun: false });
+      if (report.status === 'success') {
+        const refreshed = await getAllCompanyUsers();
+        setRealUsersData(refreshed);
+        setRoleAuditModalData(report);
+        if (report.rolesRepaired > 0) {
+          showToast(`✅ Se sanaron y restauraron ${report.rolesRepaired} cargos alterados o duplicados sin colapsos.`, "success");
+        } else {
+          showToast(`✅ Integridad de roles perfecta: ${report.totalUsersScanned} usuarios analizados, cero colapsos.`, "success");
+        }
+      } else {
+        showToast("Error en auditoría de roles: " + (report.error || 'Error desconocido'), "error");
+      }
+    } catch (err) {
+      console.error(err);
+      showToast("Error ejecutando agente de roles: " + err.message, "error");
+    } finally {
+      setIsHealingRoles(false);
+    }
+  };
+
 
   // HOTFIX temporal para corregir el rol de José Sánchez en la base de datos
   useEffect(() => {
@@ -1158,15 +1206,28 @@ export default function SuperAdminPanel() {
           <p className="text-muted" style={{ margin: 0 }}>Visibilidad total del sistema Causa OS en todas las sedes y roles.</p>
         </div>
         {currentUser?.isSuperAdmin && (
-          <button 
-            onClick={handleManualSync}
-            disabled={isSyncing}
-            className="btn-primary" 
-            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1.2rem', background: isSyncing ? '#6b7280' : 'linear-gradient(135deg, #10b981, #047857)', color: '#fff', border: 'none', borderRadius: '8px', cursor: isSyncing ? 'not-allowed' : 'pointer' }}>
-            <Globe size={18} />
-            {isSyncing ? 'Sincronizando Nodus...' : 'Extraer Nodus'}
-          </button>
+          <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'center' }}>
+            <button 
+              onClick={handleRunRoleIntegrityAgent}
+              disabled={isHealingRoles}
+              className="btn-secondary" 
+              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1.2rem', background: isHealingRoles ? '#6b7280' : 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', border: '1px solid #38bdf8', borderRadius: '8px', cursor: isHealingRoles ? 'not-allowed' : 'pointer', fontWeight: 'bold' }}
+              title="Supervisa en línea que los roles no estén alterados, perdidos, inválidos ni colapsados en Coordinación Administrativa"
+            >
+              <ShieldCheck size={18} />
+              {isHealingRoles ? 'Sanando Roles...' : '🛡️ Integridad de Roles'}
+            </button>
+            <button 
+              onClick={handleManualSync}
+              disabled={isSyncing}
+              className="btn-primary" 
+              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1.2rem', background: isSyncing ? '#6b7280' : 'linear-gradient(135deg, #10b981, #047857)', color: '#fff', border: 'none', borderRadius: '8px', cursor: isSyncing ? 'not-allowed' : 'pointer' }}>
+              <Globe size={18} />
+              {isSyncing ? 'Sincronizando Nodus...' : 'Extraer Nodus'}
+            </button>
+          </div>
         )}
+
       </div>
 
       <TaskAssignmentModal
@@ -1308,6 +1369,85 @@ export default function SuperAdminPanel() {
         </>
       )}
 
+      {/* Modal del Agente de Integridad de Roles */}
+      {roleAuditModalData && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+          backgroundColor: 'rgba(0,0,0,0.75)', zIndex: 9999,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem'
+        }}>
+          <div className="glass-panel" style={{
+            maxWidth: '650px', width: '100%', maxHeight: '85vh', overflowY: 'auto',
+            background: '#0f172a', border: '1px solid #38bdf8', padding: '1.5rem', borderRadius: '12px'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.2rem', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '0.8rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                <ShieldCheck size={24} color="#38bdf8" />
+                <h3 style={{ margin: 0, color: '#38bdf8', fontSize: '1.2rem' }}>Informe de Integridad de Roles</h3>
+              </div>
+              <button onClick={() => setRoleAuditModalData(null)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}>
+                <X size={20} />
+              </button>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.8rem', marginBottom: '1.2rem' }}>
+              <div style={{ background: 'rgba(255,255,255,0.05)', padding: '0.8rem', borderRadius: '8px', textAlign: 'center' }}>
+                <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: '#f8fafc' }}>{roleAuditModalData.totalUsersScanned}</div>
+                <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Total Escaneados</div>
+              </div>
+              <div style={{ background: 'rgba(56, 189, 248, 0.1)', padding: '0.8rem', borderRadius: '8px', textAlign: 'center', border: '1px solid rgba(56, 189, 248, 0.3)' }}>
+                <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: '#38bdf8' }}>{roleAuditModalData.rolesRepaired}</div>
+                <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Cargos Sanados</div>
+              </div>
+              <div style={{ background: 'rgba(34, 197, 94, 0.1)', padding: '0.8rem', borderRadius: '8px', textAlign: 'center', border: '1px solid rgba(34, 197, 94, 0.3)' }}>
+                <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: '#22c55e' }}>{roleAuditModalData.duplicatesRemoved}</div>
+                <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Depurados</div>
+              </div>
+            </div>
+
+            {roleAuditModalData.rolesRepaired === 0 ? (
+              <div style={{ padding: '1.5rem', textAlign: 'center', background: 'rgba(34, 197, 94, 0.08)', borderRadius: '8px', border: '1px solid rgba(34, 197, 94, 0.2)', marginBottom: '1.2rem' }}>
+                <CheckCircle2 size={32} color="#22c55e" style={{ margin: '0 auto 0.5rem auto' }} />
+                <p style={{ margin: 0, fontWeight: 'bold', color: '#22c55e' }}>¡Estructura de Roles Impecable!</p>
+                <p style={{ margin: '0.3rem 0 0 0', fontSize: '0.85rem', color: '#94a3b8' }}>Todos los roles coinciden con el catálogo operativo. Cero colapsos indebidos.</p>
+              </div>
+            ) : (
+              <div style={{ marginBottom: '1.2rem' }}>
+                <h4 style={{ fontSize: '0.9rem', color: '#f8fafc', marginBottom: '0.6rem' }}>Detalle de Colaboradores Reparados en Línea:</h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', maxHeight: '240px', overflowY: 'auto' }}>
+                  {roleAuditModalData.healedUsers.map((u, idx) => (
+                    <div key={idx} style={{ background: 'rgba(255,255,255,0.03)', padding: '0.6rem 0.8rem', borderRadius: '6px', borderLeft: '3px solid #38bdf8' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontWeight: 'bold', fontSize: '0.85rem', color: '#f8fafc' }}>{u.name}</span>
+                        <span style={{ fontSize: '0.75rem', color: '#38bdf8', background: 'rgba(56, 189, 248, 0.15)', padding: '0.1rem 0.4rem', borderRadius: '4px' }}>
+                          {ROLE_LABELS[u.repairedRole] || u.repairedRole}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '0.2rem' }}>{u.email}</div>
+                      <ul style={{ margin: '0.3rem 0 0 0', paddingLeft: '1.2rem', fontSize: '0.72rem', color: '#cbd5e1' }}>
+                        {u.issues.map((iss, i) => (
+                          <li key={i}>{iss}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1rem' }}>
+              <button 
+                onClick={() => setRoleAuditModalData(null)}
+                className="btn-primary"
+                style={{ padding: '0.5rem 1.2rem', background: '#38bdf8', color: '#0f172a', fontWeight: 'bold', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
+              >
+                Entendido
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Modal de Perfil de Usuario Completo */}
       {showUserModal && selectedUser && (
         <UserProfileModal
@@ -1317,6 +1457,7 @@ export default function SuperAdminPanel() {
           allTasks={tasks}
         />
       )}
+
     </div>
   );
 }
