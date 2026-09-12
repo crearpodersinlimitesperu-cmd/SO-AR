@@ -1,7 +1,8 @@
 import { db } from './firebase';
-import { doc, getDoc, setDoc, collection, getDocs, query, where } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, arrayUnion, collection, getDocs, query, where } from 'firebase/firestore';
 import { usersData, normalizeRole, findUserByAnyEmail } from '../data/usersData';
 import { DUAL_ROLE_TRAINER_EMAILS } from '../config/permissions';
+import { recordAuditEvent } from './auditService';
 
 
 /**
@@ -205,13 +206,23 @@ export async function getAllCompanyUsers() {
       // Deduplicar y limpiar roles
       finalRoles = Array.from(new Set(finalRoles.filter(r => r && r !== 'undefined' && r !== 'null' && r !== 'student')));
 
+      const isUserActive = uData.isActive !== false && uData.status !== 'inactive' && uData.active !== false;
+
       const enrichedUser = {
         ...uData,
         name: finalName || uData.name,
         displayName: finalName || uData.displayName || uData.name,
         role: finalRole || uData.role,
         roles: finalRoles.length > 0 ? finalRoles : (finalRole ? [finalRole] : []),
-        sede: finalSede || uData.sede
+        sede: finalSede || uData.sede,
+        status: isUserActive ? 'active' : 'inactive',
+        active: isUserActive,
+        isActive: isUserActive,
+        deactivatedAt: uData.deactivatedAt || null,
+        deactivatedBy: uData.deactivatedBy || null,
+        deactivationReason: uData.deactivationReason || null,
+        deactivationNotes: uData.deactivationNotes || null,
+        statusHistory: Array.isArray(uData.statusHistory) ? uData.statusHistory : []
       };
 
       if (existingIdx !== -1) {
@@ -222,7 +233,17 @@ export async function getAllCompanyUsers() {
           displayName: finalName || allUsers[existingIdx].displayName,
           role: finalRole,
           roles: finalRoles,
-          sede: finalSede
+          sede: finalSede,
+          status: isUserActive ? 'active' : 'inactive',
+          active: isUserActive,
+          isActive: isUserActive,
+          deactivatedAt: uData.deactivatedAt || allUsers[existingIdx].deactivatedAt || null,
+          deactivatedBy: uData.deactivatedBy || allUsers[existingIdx].deactivatedBy || null,
+          deactivationReason: uData.deactivationReason || allUsers[existingIdx].deactivationReason || null,
+          deactivationNotes: uData.deactivationNotes || allUsers[existingIdx].deactivationNotes || null,
+          statusHistory: Array.isArray(uData.statusHistory) && uData.statusHistory.length > 0
+            ? uData.statusHistory
+            : (allUsers[existingIdx].statusHistory || [])
         });
         return;
       }
@@ -282,4 +303,130 @@ export async function getAllCompanyUsers() {
   });
 
   return allUsers;
+}
+
+/**
+ * Actualiza el estado activo/inactivo de un colaborador con trazabilidad completa.
+ * REGLA INSTITUCIONAL:
+ * 1. Actualiza en la colección 'users'.
+ * 2. Registra evento oficial en 'audit_logs' para consulta de SuperAdmin y Talento Humano.
+ * 3. Registra entrada en la bitácora de 'user_profiles'.
+ */
+export async function setUserActiveStatus(targetUser, { isActive, reason = '', notes = '', effectiveDate = '', performedBy = {} }) {
+  if (!targetUser || (!targetUser.email && !targetUser.id)) {
+    throw new Error('Usuario inválido para actualizar estado');
+  }
+
+  const normalizedEmail = (targetUser.email || targetUser.emails?.[0] || '').toLowerCase().trim();
+  const timestamp = new Date().toISOString();
+  const actionType = isActive ? 'USER_REACTIVATED' : 'USER_DEACTIVATED';
+  const actionLabel = isActive ? 'REACTIVACIÓN' : 'DESACTIVACIÓN';
+
+  const historyEntry = {
+    action: actionType,
+    status: isActive ? 'active' : 'inactive',
+    reason: reason || (isActive ? 'Reactivación de cuenta' : 'Baja de personal'),
+    notes: notes || '',
+    effectiveDate: effectiveDate || timestamp.split('T')[0],
+    performedBy: {
+      name: performedBy.name || 'Administrador',
+      email: performedBy.email || '',
+      role: performedBy.appRole || performedBy.role || 'superadmin'
+    },
+    timestamp
+  };
+
+  const updatePayload = {
+    isActive: Boolean(isActive),
+    active: Boolean(isActive),
+    status: isActive ? 'active' : 'inactive',
+    ...(isActive ? {
+      reactivatedAt: timestamp,
+      reactivatedBy: historyEntry.performedBy,
+      deactivatedAt: null,
+      deactivationReason: null,
+      deactivationNotes: null
+    } : {
+      deactivatedAt: timestamp,
+      deactivatedBy: historyEntry.performedBy,
+      deactivationReason: reason || 'Baja de personal',
+      deactivationNotes: notes || ''
+    }),
+    updatedAt: timestamp
+  };
+
+  // 1. Actualizar o crear en la colección 'users'
+  let targetDocId = targetUser.id;
+
+  if (!targetDocId || targetUser.source === 'local_registry') {
+    const q1 = query(collection(db, 'users'), where('email', '==', normalizedEmail));
+    const snap1 = await getDocs(q1);
+    if (!snap1.empty) {
+      targetDocId = snap1.docs[0].id;
+    } else {
+      targetDocId = targetUser.uid || normalizedEmail.replace(/[^a-zA-Z0-9_-]/g, '_');
+    }
+  }
+
+  const userDocRef = doc(db, 'users', targetDocId);
+  const existingDoc = await getDoc(userDocRef);
+
+  if (existingDoc.exists()) {
+    const existingData = existingDoc.data();
+    const existingHistory = Array.isArray(existingData.statusHistory) ? existingData.statusHistory : [];
+    await updateDoc(userDocRef, {
+      ...updatePayload,
+      statusHistory: [...existingHistory, historyEntry]
+    });
+  } else {
+    await setDoc(userDocRef, {
+      ...targetUser,
+      ...updatePayload,
+      id: targetDocId,
+      email: normalizedEmail,
+      statusHistory: [historyEntry],
+      createdAt: timestamp
+    }, { merge: true });
+  }
+
+  // 2. Registrar evento formal de trazabilidad en audit_logs
+  try {
+    await recordAuditEvent({
+      email: performedBy.email || 'admin@crearpsl.net',
+      name: performedBy.name || 'Talento Humano / SuperAdmin',
+      role: performedBy.appRole || performedBy.role || 'superadmin',
+      sede: performedBy.sede || 'Global',
+      action: actionType,
+      details: `${actionLabel} de colaborador: ${targetUser.name || normalizedEmail} (${normalizedEmail}) - Cargo: ${targetUser.role || 'N/A'}, Sede: ${targetUser.sede || 'Global'}. Motivo: ${reason || 'N/A'}. Notas: ${notes || 'Sin notas adicionales'}. Fecha efectiva: ${effectiveDate || 'Inmediata'}. Ejecutado por: ${performedBy.name || performedBy.email}.`
+    });
+  } catch (auditErr) {
+    console.warn("Error al registrar auditoría de estado:", auditErr);
+  }
+
+  // 3. Registrar nota en user_profiles para consulta en Bitácora del usuario
+  try {
+    const profileRef = doc(db, 'user_profiles', normalizedEmail);
+    const noteEntry = {
+      id: 'status_note_' + Date.now(),
+      text: `[${actionLabel} DE COLABORADOR] ${isActive ? 'Cuenta reactivada' : 'Cuenta desactivada / Baja'}. Motivo: ${reason || 'N/A'}. Observaciones: ${notes || 'N/A'}. Fecha efectiva: ${effectiveDate || 'Inmediata'}.`,
+      authorName: performedBy.name || 'Talento Humano / SuperAdmin',
+      authorEmail: performedBy.email || '',
+      createdAt: timestamp,
+      isSystemAudit: true
+    };
+    await setDoc(profileRef, {
+      notes: arrayUnion(noteEntry),
+      status: isActive ? 'active' : 'inactive',
+      isActive: Boolean(isActive),
+      updatedAt: timestamp
+    }, { merge: true });
+  } catch (profileErr) {
+    console.warn("No se pudo agregar nota en user_profiles:", profileErr);
+  }
+
+  return {
+    ...targetUser,
+    ...updatePayload,
+    statusHistory: [...(targetUser.statusHistory || []), historyEntry]
+  };
 }

@@ -3,7 +3,8 @@ import { useState, useEffect } from 'react';
 import { 
   X, User, CheckCircle2, Clock, AlertTriangle, 
   FileText, Link2, Plus, Trash2, ExternalLink, Calendar, 
-  Building2, Mail, Shield, PlusCircle, CheckSquare, Eye
+  Building2, Mail, Shield, PlusCircle, CheckSquare, Eye,
+  UserX, UserCheck, ShieldAlert
 } from 'lucide-react';
 import { db } from '../services/firebase';
 import { doc, onSnapshot, setDoc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
@@ -12,9 +13,10 @@ import { useChecklist } from '../context/ChecklistContext';
 import { normalizeRole, normalizeSede, getRoleDisplayName } from '../data/usersData';
 import { useUI } from '../context/UIContext';
 import { useNavigate } from 'react-router-dom';
-import { isSuperAdminEmail, canSimulate } from '../config/permissions';
+import { isSuperAdminEmail, canSimulate, canManageUserStatus } from '../config/permissions';
 import { getFlagForSede } from '../utils/flags';
 import TaskAssignmentModal from './TaskAssignmentModal';
+import UserStatusModal from './UserStatusModal';
 
 const ROLE_LABELS = {
   gerente: 'Gerente de Sede',
@@ -69,11 +71,21 @@ function formatBirthdayNoYear(cumpleanos) {
   return `${dia} de ${MESES_ES[mesIdx]}`;
 }
 
-export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] }) {
+export default function UserProfileModal({ isOpen, onClose, user, allTasks = [], onStatusUpdated }) {
   const { currentUser, originalAdminUser, simulateUser } = useAuth();
   const navigate = useNavigate();
   const { toggleTask } = useChecklist();
   const { showToast } = useUI();
+
+  const [targetUser, setTargetUser] = useState(user);
+  useEffect(() => {
+    setTargetUser(user);
+  }, [user]);
+
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const u = targetUser || user;
+  const isInactive = u?.isActive === false || u?.status === 'inactive' || u?.active === false;
+  const canManageStatus = canManageUserStatus(currentUser);
 
   const [activeTab, setActiveTab] = useState('tasks'); // 'tasks' | 'notes' | 'documents'
   const [profileData, setProfileData] = useState({ notes: [], documents: [] });
@@ -428,6 +440,38 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
                       </span>
                     );
                   })}
+                  {isInactive ? (
+                    <span style={{
+                      padding: '0.3rem 0.8rem',
+                      borderRadius: '9999px',
+                      fontSize: '0.78rem',
+                      fontWeight: 700,
+                      background: 'rgba(239, 68, 68, 0.2)',
+                      color: '#ef4444',
+                      border: '1px solid rgba(239, 68, 68, 0.6)',
+                      boxShadow: '0 2px 8px rgba(239, 68, 68, 0.25)',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.35rem'
+                    }}>
+                      🔴 INACTIVO / BAJA
+                    </span>
+                  ) : (
+                    <span style={{
+                      padding: '0.3rem 0.8rem',
+                      borderRadius: '9999px',
+                      fontSize: '0.78rem',
+                      fontWeight: 700,
+                      background: 'rgba(34, 197, 94, 0.15)',
+                      color: '#22c55e',
+                      border: '1px solid rgba(34, 197, 94, 0.4)',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.35rem'
+                    }}>
+                      🟢 ACTIVO
+                    </span>
+                  )}
                 </div>
 
                 <div style={{ display: 'flex', gap: '1.2rem', marginTop: '0.6rem', fontSize: '0.85rem', color: 'var(--text-muted)', flexWrap: 'wrap' }}>
@@ -623,6 +667,115 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
                 </span>
               )}
             </div>
+
+            {/* Banner de Estado y Trazabilidad de Colaborador */}
+            {isInactive ? (
+              <div style={{
+                marginTop: '0.8rem',
+                padding: '0.9rem 1.1rem',
+                borderRadius: '10px',
+                background: 'rgba(239, 68, 68, 0.12)',
+                border: '1px solid rgba(239, 68, 68, 0.45)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: '0.8rem'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.7rem' }}>
+                  <UserX size={24} style={{ color: '#ef4444', flexShrink: 0, marginTop: '2px' }} />
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: '0.95rem', fontWeight: 'bold', color: '#fca5a5' }}>
+                        🔴 Colaborador Inactivo / Dado de Baja
+                      </span>
+                      {u.deactivationReason && (
+                        <span style={{
+                          fontSize: '0.75rem',
+                          background: 'rgba(239, 68, 68, 0.25)',
+                          color: '#fca5a5',
+                          padding: '1px 7px',
+                          borderRadius: '4px',
+                          fontWeight: 600
+                        }}>
+                          {u.deactivationReason}
+                        </span>
+                      )}
+                    </div>
+                    <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: '#fca5a5' }}>
+                      {u.deactivatedAt && `Fecha: ${u.deactivatedAt.slice(0, 10)}`}
+                      {u.deactivatedBy?.name && ` • Registrado por: ${u.deactivatedBy.name}`}
+                    </p>
+                    {u.deactivationNotes && (
+                      <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.78rem', color: '#e2e8f0', fontStyle: 'italic', background: 'rgba(0,0,0,0.2)', padding: '4px 8px', borderRadius: '4px' }}>
+                        "{u.deactivationNotes}"
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {canManageStatus && (
+                  <button
+                    onClick={() => setShowStatusModal(true)}
+                    style={{
+                      padding: '0.45rem 1rem',
+                      borderRadius: '8px',
+                      border: 'none',
+                      background: 'linear-gradient(135deg, #22c55e, #16a34a)',
+                      color: '#ffffff',
+                      fontWeight: 'bold',
+                      fontSize: '0.82rem',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.4rem',
+                      boxShadow: '0 2px 8px rgba(34, 197, 94, 0.3)'
+                    }}
+                  >
+                    <UserCheck size={16} /> Reactivar Colaborador
+                  </button>
+                )}
+              </div>
+            ) : canManageStatus ? (
+              <div style={{
+                marginTop: '0.8rem',
+                padding: '0.6rem 1rem',
+                borderRadius: '10px',
+                background: 'rgba(255, 255, 255, 0.02)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: '0.6rem'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <Shield size={16} color="#38bdf8" />
+                  <span style={{ fontSize: '0.82rem', color: '#94a3b8' }}>
+                    Estado laboral: <strong style={{ color: '#22c55e' }}>🟢 Activo en Operaciones</strong>
+                  </span>
+                </div>
+                <button
+                  onClick={() => setShowStatusModal(true)}
+                  style={{
+                    padding: '0.35rem 0.85rem',
+                    borderRadius: '6px',
+                    border: '1px solid rgba(239, 68, 68, 0.4)',
+                    background: 'rgba(239, 68, 68, 0.08)',
+                    color: '#f87171',
+                    fontWeight: 600,
+                    fontSize: '0.78rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.4rem'
+                  }}
+                  title="Dar de baja, registrar renuncia o salida de este colaborador"
+                >
+                  <UserX size={14} /> Desactivar Colaborador (Baja)
+                </button>
+              </div>
+            ) : null}
 
             {/* Botón de Simulación — SOLO Super Administradores */}
             {canSimulate(currentUser, originalAdminUser) && (
@@ -1011,6 +1164,22 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
           }} 
           prefilledUser={user}
           taskToEdit={taskToEdit}
+        />
+      )}
+
+      {/* Modal de Cambio de Estado y Trazabilidad (Baja / Reactivación) */}
+      {showStatusModal && (
+        <UserStatusModal
+          isOpen={showStatusModal}
+          onClose={() => setShowStatusModal(false)}
+          user={u}
+          onStatusUpdated={(updated) => {
+            setTargetUser(updated);
+            if (onStatusUpdated) {
+              onStatusUpdated(updated);
+            }
+            showToast(`Estado de colaborador actualizado: ${updated.isActive ? 'Activo' : 'Inactivo'}`, 'success');
+          }}
         />
       )}
     </>

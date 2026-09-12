@@ -797,3 +797,31 @@ export const isGerenteLima = (currentUser) => {
 export const canAccessPagosSemanalesDrive = (currentUser) => {
   return isGerenteLima(currentUser);
 };
+
+/**
+ * Verifica si el usuario actual tiene permisos para dar de baja, desactivar o reactivar colaboradores.
+ * REGLA INSTITUCIONAL:
+ * Permitido exclusivamente para:
+ * 1. Super Administradores (isSuperAdmin === true o en SUPER_ADMIN_EMAILS como José Sánchez).
+ * 2. Dirección Global (roles: direccion, cfo, cco, ceo).
+ * 3. Talento Humano (rol: talento_humano, email: talento.humano@crearpsl.net o rol de RRHH).
+ */
+export const canManageUserStatus = (currentUser) => {
+  if (!currentUser) return false;
+  if (currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email)) return true;
+  if (isDireccionRole(currentUser.appRole) || currentUser.isDireccion) return true;
+
+  const role = (currentUser.appRole || currentUser.role || '').toLowerCase();
+  const roles = Array.isArray(currentUser.roles) ? currentUser.roles.map(r => String(r).toLowerCase()) : [];
+
+  if (role === 'talento_humano' || role === 'director_th' || roles.includes('talento_humano') || roles.includes('director_th')) {
+    return true;
+  }
+
+  const email = (currentUser.email || '').trim().toLowerCase();
+  if (email === 'talento.humano@crearpsl.net' || email.includes('talento.humano') || email.includes('rrhh')) {
+    return true;
+  }
+
+  return false;
+};

@@ -454,7 +454,7 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Gestión integral de usuarios, asignación de roles, permisos y configuración del sistema',
     keywords: ['superadmin', 'centro de mando', 'administracion', 'usuarios', 'roles', 'permisos'],
     route: '/superadmin',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria', 'talento_humano']
   },
   {
     id: 'opt-sedes',
@@ -573,7 +573,7 @@ const MODULE_REGISTRY = [
   { id: 'excelencia', label: 'Excelencia Operativa', emoji: '👑', route: '/excelencia', roles: EXEC_ROLES },
   { id: 'mis-kpis', label: 'Mis KPIs', emoji: '📊', route: '/mis-kpis', roles: KPI_ROLES },
   { id: 'directorio-qt', label: 'Directorio QT', emoji: '⚡', route: '/directorio-qt', roles: DIRECTORIO_QT_ROLES },
-  { id: 'superadmin', label: 'Centro de Mando', emoji: '🌐', route: '/superadmin', roles: EXEC_ROLES },
+  { id: 'superadmin', label: 'Centro de Mando', emoji: '🌐', route: '/superadmin', roles: [...EXEC_ROLES, 'talento_humano'] },
   // Antes era null (abierto a todos). Corregido: Directivos + Gerentes únicamente
   // según la Matriz Oficial, fila "Calendario Global" (08/09/2026).
   { id: 'calendario-global', label: 'Calendario Global Maestro', emoji: '📅', external: 'calendario-global', roles: EXEC_ROLES },
@@ -1673,7 +1673,7 @@ export default function Home() {
                   </button>
                 )}
 
-                {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) && (
+                {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria', 'talento_humano']) && (
                   <button onClick={() => { setShowToolsDropdown(false); navigate('/superadmin'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
                     🌐 Centro de Mando
                   </button>
@@ -1797,7 +1797,7 @@ export default function Home() {
             </button>
           )}
 
-          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) && (
+          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria', 'talento_humano']) && (
             <button onClick={() => navigate('/superadmin')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #8b5cf6, #29abe2)', color: 'white', border: 'none' }}>
               🌐 Centro de Mando
             </button>
@@ -2023,7 +2023,7 @@ export default function Home() {
               >
                 🎯 Mis Metas
               </button>
-              {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) && (
+              {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria', 'talento_humano']) && (
                 <>
                   <button
                     className="btn-secondary hover-glow"

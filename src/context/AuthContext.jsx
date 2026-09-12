@@ -448,6 +448,13 @@ export function AuthProvider({ children }) {
         foundUser.uid = user.uid; // Asegurar que tenga el UID correcto
       }
 
+      // 🚫 VALIDACIÓN DE ESTADO ACTIVO / INACTIVO (Trazabilidad y Control de Acceso)
+      if (foundUser.isActive === false || foundUser.status === 'inactive' || foundUser.active === false) {
+        await auth.signOut();
+        const reason = foundUser.deactivationReason ? ` (Motivo: ${foundUser.deactivationReason})` : '';
+        throw new Error(`ACCESO DENEGADO: Tu cuenta de colaborador se encuentra desactivada${reason}. Comunícate con Talento Humano o SuperAdmin.`);
+      }
+
       // Normalizar el registro usando el esquema canónico (Hito 1)
       let canonicalUser = normalizeUserRecord(foundUser, 'login');
 
@@ -550,6 +557,15 @@ export function AuthProvider({ children }) {
           }
 
           if (foundUser) {
+            // 🚫 VALIDACIÓN DE ESTADO ACTIVO / INACTIVO (Trazabilidad y Control de Acceso)
+            if (foundUser.isActive === false || foundUser.status === 'inactive' || foundUser.active === false) {
+              console.warn("Usuario desactivado intentando acceder a la sesión:", normalizedEmail);
+              await signOut(auth);
+              setCurrentUser(null);
+              setLoading(false);
+              return;
+            }
+
             let canonicalUser = normalizeUserRecord(foundUser, 'onAuthStateChanged');
             
             // 🕵️‍♂️ AGENTE ONLINE: Validar y sanar multiroles 

@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { 
   Target, X, Zap, Calendar, Clock, Search, Users, CheckSquare, 
   Square, UserCheck, ShieldAlert, Award, LayoutGrid, Sliders, 
@@ -10,6 +10,7 @@ import { useUI } from '../context/UIContext';
 import { getAssignableRoles } from '../config/permissions';
 import { usersData, normalizeRole, normalizeSede, OPERATIONAL_SEDES, getRoleDisplayName } from '../data/usersData';
 import { recordAuditEvent } from '../services/auditService';
+import { getAllCompanyUsers } from '../services/userService';
 
 export const OPERATIONAL_AREAS = [
   {
@@ -152,6 +153,20 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
   const [showAdvancedLite, setShowAdvancedLite] = useState(false);
   const liteDropdownRef = useRef(null);
 
+  const [activeUsersList, setActiveUsersList] = useState(usersData);
+
+  useEffect(() => {
+    let isMounted = true;
+    getAllCompanyUsers().then(users => {
+      if (isMounted && Array.isArray(users) && users.length > 0) {
+        setActiveUsersList(users);
+      }
+    }).catch(err => {
+      console.warn("Error cargando usuarios en TaskAssignmentModal:", err);
+    });
+    return () => { isMounted = false; };
+  }, []);
+
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (liteDropdownRef.current && !liteDropdownRef.current.contains(e.target)) {
@@ -266,8 +281,11 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
   // Filtrado de usuarios segÃºn Ã¡rea, sede y buscador de texto
   const activeArea = OPERATIONAL_AREAS.find(a => a.id === selectedAreaId) || OPERATIONAL_AREAS[0];
 
-  const visibleUsers = usersData.filter(u => {
-    // 1. Si hay texto en el buscador: BÃºsqueda global en toda la organizaciÃ³n
+  const visibleUsers = activeUsersList.filter(u => {
+    // Excluir colaboradores dados de baja / inactivos
+    if (u.isActive === false || u.status === 'inactive' || u.active === false) return false;
+
+    // 1. Si hay texto en el buscador: Búsqueda global en toda la organización
     if (isSearching) {
       const q = stripAccents(searchQuery);
       const name = stripAccents(u.name);
@@ -287,7 +305,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
       return true;
     }
 
-    // 2. Si no hay texto en el buscador: aplicar pestaÃ±as de Ã¡rea y sede
+    // 2. Si no hay texto en el buscador: aplicar pestañas de área y sede
     if (!activeArea.filter(u)) return false;
     
     if (selectedSedeFilter && normalizeSede(u.sede) !== selectedSedeFilter) {
@@ -297,7 +315,10 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
     return true;
   });
 
-  const filteredLiteUsers = usersData.filter(u => {
+  const filteredLiteUsers = activeUsersList.filter(u => {
+    // Excluir colaboradores dados de baja / inactivos
+    if (u.isActive === false || u.status === 'inactive' || u.active === false) return false;
+
     if (!liteSearch.trim()) return true;
     const q = stripAccents(liteSearch);
     const name = stripAccents(u.name);

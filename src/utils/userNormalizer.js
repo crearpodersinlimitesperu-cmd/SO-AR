@@ -136,8 +136,14 @@ export const normalizeUserRecord = (data, source = 'unknown') => {
     activeRole: activeRole,
     sede: nSede,
     sedeTag: nSede.substring(0, 3).toUpperCase(),
-    status: data.status || (data.active === false ? 'inactive' : 'active'),
-    active: data.active !== false,
+    status: data.status || (data.active === false || data.isActive === false ? 'inactive' : 'active'),
+    active: data.active !== false && data.isActive !== false && data.status !== 'inactive',
+    isActive: data.active !== false && data.isActive !== false && data.status !== 'inactive',
+    deactivatedAt: data.deactivatedAt || null,
+    deactivatedBy: data.deactivatedBy || null,
+    deactivationReason: data.deactivationReason || null,
+    deactivationNotes: data.deactivationNotes || null,
+    statusHistory: Array.isArray(data.statusHistory) ? data.statusHistory : [],
     isSuperAdmin: nRoles.includes('direccion') || nRoles.includes('superadmin') || data.isSuperAdmin === true,
     isDireccion: nRoles.includes('direccion') || data.isDireccion === true,
     isGerente: nRoles.includes('gerente') || data.isGerente === true,
@@ -158,6 +164,7 @@ export const mergeUserRecords = (existing, incoming) => {
 
   const mergedEmails = [...new Set([...e.emails, ...i.emails])];
   const mergedRoles = [...new Set([...e.roles, ...i.roles])];
+  const isInactive = e.status === 'inactive' || i.status === 'inactive' || e.isActive === false || i.isActive === false || e.active === false || i.active === false;
 
   return {
     ...e,
@@ -171,8 +178,14 @@ export const mergeUserRecords = (existing, incoming) => {
     roles: mergedRoles,
     activeRole: e.activeRole !== 'miembro' ? e.activeRole : i.activeRole,
     sede: e.sede !== 'Global' ? e.sede : i.sede,
-    status: e.status === 'active' || i.status === 'active' ? 'active' : 'inactive',
-    active: e.active || i.active,
+    status: isInactive ? 'inactive' : 'active',
+    active: !isInactive,
+    isActive: !isInactive,
+    deactivatedAt: e.deactivatedAt || i.deactivatedAt || null,
+    deactivatedBy: e.deactivatedBy || i.deactivatedBy || null,
+    deactivationReason: e.deactivationReason || i.deactivationReason || null,
+    deactivationNotes: e.deactivationNotes || i.deactivationNotes || null,
+    statusHistory: [...(e.statusHistory || []), ...(i.statusHistory || [])],
     isSuperAdmin: e.isSuperAdmin || i.isSuperAdmin,
     isDireccion: e.isDireccion || i.isDireccion,
     isGerente: e.isGerente || i.isGerente,

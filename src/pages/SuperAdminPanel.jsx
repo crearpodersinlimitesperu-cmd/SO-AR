@@ -124,9 +124,12 @@ function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, curre
   }).length;
 
   const pct = myTasks.length > 0 ? Math.round((completed / myTasks.length) * 100) : 0;
-  const roleColor = ROLE_COLORS[canonicalRole] || ROLE_COLORS[person.role] || '#6b7280';
-  // WhatsApp: los QT sincronizados desde la hoja de Google ya traen whatsappUrl listo
-  // (ver qtSheetService.js); para otros registros se arma con la misma utilidad que
+  const canonicalRole = normalizeRole(person.role);
+  const roleColor = ROLE_COLORS[canonicalRole] || '#6b7280';
+  const isInactive = person.isActive === false || person.status === 'inactive' || person.active === false;
+  const normalizedSedeName = normalizeSede(person.sede);
+
+  // Selector de WhatsApp seguro y canónico: reutiliza la misma función que
   // ya usa el resto de la app (phoneUtils.getWhatsAppUrl), probando los distintos
   // nombres de campo de teléfono que existen según la colección de origen.
   const whatsappUrl = person.whatsappUrl || getWhatsAppUrl(person.whatsapp || person.phone || person.telefono, person.sede);
@@ -136,7 +139,10 @@ function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, curre
       className="glass-panel hover-glow"
       onClick={() => onSelectUser && onSelectUser(person)}
       style={{
-        padding: '1rem 1.2rem', borderLeft: `4px solid ${roleColor}`,
+        padding: '1rem 1.2rem', 
+        borderLeft: isInactive ? '4px solid #ef4444' : `4px solid ${roleColor}`,
+        opacity: isInactive ? 0.75 : 1,
+        background: isInactive ? 'rgba(239, 68, 68, 0.05)' : undefined,
         cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between'
       }}
     >
@@ -146,8 +152,8 @@ function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, curre
             width: '42px',
             height: '42px',
             borderRadius: '50%',
-            background: 'rgba(255,255,255,0.08)',
-            border: '1px solid rgba(255,255,255,0.15)',
+            background: isInactive ? 'rgba(239, 68, 68, 0.15)' : 'rgba(255,255,255,0.08)',
+            border: isInactive ? '1px solid rgba(239, 68, 68, 0.3)' : '1px solid rgba(255,255,255,0.15)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -158,9 +164,24 @@ function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, curre
           <div style={{ transform: 'scale(1.2)' }}>{getFlagForSede(person.sede)}</div>
         </div>
         <div>
-          <h4 style={{ margin: 0, fontSize: '0.95rem', color: 'var(--text-heading)' }}>{person.name}</h4>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
+            <h4 style={{ margin: 0, fontSize: '0.95rem', color: isInactive ? '#cbd5e1' : 'var(--text-heading)' }}>{person.name}</h4>
+            {isInactive && (
+              <span style={{
+                fontSize: '0.68rem',
+                color: '#fff',
+                background: '#ef4444',
+                padding: '1px 6px',
+                borderRadius: '4px',
+                fontWeight: 700,
+                letterSpacing: '0.3px'
+              }} title={person.deactivationReason ? `Motivo: ${person.deactivationReason}` : 'Colaborador inactivo'}>
+                INACTIVO
+              </span>
+            )}
+          </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '2px', flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '0.78rem', color: roleColor, fontWeight: 600 }}>
+            <span style={{ fontSize: '0.78rem', color: isInactive ? '#94a3b8' : roleColor, fontWeight: 600 }}>
               {ROLE_LABELS[canonicalRole] || person.role}
             </span>
             {person.sede && (
@@ -526,6 +547,8 @@ function AuditLogView() {
             }}
           >
             <option value="TODAS" style={{ color: 'black' }}>🔍 Todas las Acciones</option>
+            <option value="USER_DEACTIVATED" style={{ color: 'black' }}>🚫 USER_DEACTIVATED (Bajas de Colaboradores)</option>
+            <option value="USER_REACTIVATED" style={{ color: 'black' }}>✅ USER_REACTIVATED (Reactivaciones)</option>
             <option value="LOGIN" style={{ color: 'black' }}>🟢 LOGIN (Inicios de sesión reales)</option>
             <option value="CAMBIO_ROL" style={{ color: 'black' }}>🔄 CAMBIO_ROL (Permisos)</option>
             <option value="SIMULACION_ADMIN" style={{ color: 'black' }}>🎭 SIMULACION_ADMIN (Super Admin)</option>
@@ -1045,11 +1068,13 @@ export default function SuperAdminPanel() {
   const navigate = useNavigate();
   const { tasks } = useChecklist();
   const { currentStage } = useCycles();
-  const [activeView, setActiveView] = useState((currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion' || currentUser?.appRole === 'director_maestria') ? 'global' : 'sede');
+  const canAccessGlobal = currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion' || currentUser?.appRole === 'director_maestria' || currentUser?.appRole === 'talento_humano' || (currentUser?.roles || []).includes('talento_humano');
+  const [activeView, setActiveView] = useState(canAccessGlobal ? 'global' : 'sede');
   const [selectedUser, setSelectedUser] = useState(null);
   const [assignUser, setAssignUser] = useState(null);
   const [showUserModal, setShowUserModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('ALL'); // 'ALL' | 'ACTIVE' | 'INACTIVE'
   const [userConnections, setUserConnections] = useState({});
   const [realUsersData, setRealUsersData] = useState([]);
   const [usersLoading, setUsersLoading] = useState(true);
@@ -1221,7 +1246,14 @@ export default function SuperAdminPanel() {
     transition: 'all 0.2s',
   });
 
-  const searchFilteredUsers = searchTerm.trim() ? (realUsersData || []).filter(u => {
+  const displayedUsersData = (realUsersData || []).filter(u => {
+    const isInactive = u.isActive === false || u.status === 'inactive' || u.active === false;
+    if (statusFilter === 'ACTIVE') return !isInactive;
+    if (statusFilter === 'INACTIVE') return isInactive;
+    return true;
+  });
+
+  const searchFilteredUsers = searchTerm.trim() ? displayedUsersData.filter(u => {
     const term = searchTerm.toLowerCase().trim();
     const nameMatch = u.name?.toLowerCase().includes(term);
     const emailMatch = u.email?.toLowerCase().includes(term);
@@ -1272,8 +1304,10 @@ export default function SuperAdminPanel() {
         prefilledUser={assignUser}
       />
 
-      <div className="glass-panel" style={{ padding: '0.8rem 1.2rem', marginBottom: '1.5rem', border: '1px solid var(--border-subtle)' }}>
+      <div className="glass-panel" style={{ padding: '0.8rem 1.2rem', marginBottom: '1.5rem', border: '1px solid var(--border-subtle)', display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
         <div style={{
+          flex: 1,
+          minWidth: '260px',
           display: 'flex',
           alignItems: 'center',
           gap: '0.75rem',
@@ -1306,6 +1340,29 @@ export default function SuperAdminPanel() {
               <X size={14} />
             </button>
           )}
+        </div>
+
+        {/* Selector de Filtro de Estado (Bajas / Activos) */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)', fontWeight: 600 }}>Estado:</span>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            style={{
+              background: 'rgba(255,255,255,0.06)',
+              color: statusFilter === 'INACTIVE' ? '#ef4444' : statusFilter === 'ACTIVE' ? '#22c55e' : 'var(--text-heading)',
+              border: '1px solid var(--border-subtle)',
+              padding: '0.45rem 0.8rem',
+              borderRadius: '8px',
+              fontSize: '0.85rem',
+              fontWeight: 600,
+              cursor: 'pointer'
+            }}
+          >
+            <option value="ALL" style={{ color: 'black' }}>👥 Todos ({realUsersData.length})</option>
+            <option value="ACTIVE" style={{ color: 'black' }}>🟢 Solo Activos ({realUsersData.filter(u => !(u.isActive === false || u.status === 'inactive' || u.active === false)).length})</option>
+            <option value="INACTIVE" style={{ color: 'black' }}>🔴 Solo Inactivos / Bajas ({realUsersData.filter(u => u.isActive === false || u.status === 'inactive' || u.active === false).length})</option>
+          </select>
         </div>
       </div>
 
@@ -1349,26 +1406,26 @@ export default function SuperAdminPanel() {
         /* Vistas normales por pestañas */
         <>
           <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
-            {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion' || currentUser?.appRole === 'director_maestria') && (
+            {canAccessGlobal && (
               <button style={tabStyle('global')} onClick={() => setActiveView('global')}>🌐 Global</button>
             )}
             <button style={tabStyle('sede')} onClick={() => setActiveView('sede')}>🏢 Por Sede</button>
-            {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion' || currentUser?.appRole === 'director_maestria') && (
+            {canAccessGlobal && (
               <button style={tabStyle('rol')} onClick={() => setActiveView('rol')}>👥 Por Rol</button>
             )}
-            {currentUser?.isSuperAdmin && (
+            {(currentUser?.isSuperAdmin || currentUser?.appRole === 'talento_humano' || (currentUser?.roles || []).includes('talento_humano')) && (
               <button style={tabStyle('auditoria')} onClick={() => setActiveView('auditoria')}>🛡️ Auditoría</button>
             )}
             {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion') && (
               <button style={tabStyle('sugerencias')} onClick={() => setActiveView('sugerencias')}>💡 Buzón Sugerencias</button>
             )}
           </div>
-          {activeView === 'global' && <GlobalView tasks={tasks} navigate={navigate} realUsersData={realUsersData} />}
+          {activeView === 'global' && <GlobalView tasks={tasks} navigate={navigate} realUsersData={displayedUsersData} />}
           {activeView === 'sede' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <p className="text-muted text-sm" style={{ marginBottom: '0.5rem' }}>Clic en una sede para expandir y ver el detalle de cada persona y su avance operativo.</p>
               {ALL_SEDES.filter(sede => {
-                if (currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion' || currentUser?.appRole === 'director_maestria') return true;
+                if (canAccessGlobal) return true;
                 return normalizeSede(currentUser?.sede) === sede;
               }).map(sede => (
                 <SedeBlock
@@ -1380,7 +1437,7 @@ export default function SuperAdminPanel() {
                   onAssignTask={setAssignUser}
                   currentUser={currentUser}
                   userConnections={userConnections}
-                  realUsersData={realUsersData}
+                  realUsersData={displayedUsersData}
                 />
               ))}
             </div>
@@ -1393,7 +1450,7 @@ export default function SuperAdminPanel() {
               onAssignTask={setAssignUser}
               currentUser={currentUser}
               userConnections={userConnections}
-              realUsersData={realUsersData}
+              realUsersData={displayedUsersData}
             />
           )}
           {activeView === 'auditoria' && (
@@ -1491,6 +1548,10 @@ export default function SuperAdminPanel() {
           onClose={() => setShowUserModal(false)}
           user={selectedUser}
           allTasks={tasks}
+          onStatusUpdated={(updated) => {
+            setRealUsersData(prev => prev.map(u => (u.id === updated.id || u.email?.toLowerCase() === updated.email?.toLowerCase()) ? { ...u, ...updated } : u));
+            setSelectedUser(prev => ({ ...prev, ...updated }));
+          }}
         />
       )}
 
