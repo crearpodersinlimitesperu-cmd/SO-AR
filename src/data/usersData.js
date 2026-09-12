@@ -35,10 +35,15 @@ export const normalizeRole = (role) => {
   if (r === 'cfo' || r.includes('jefa financiera') || r.includes('jefe financiero')) return 'cfo';
   if (r.includes('facturacion') || r.includes('contador lima') || r.includes('contador medellin') || r.includes('finanzas')) return 'finanzas';
   
-  // Coordinacion Administrativa
-  if (r === 'coordinadora administrativa' || r === 'coordinador administrativo' || r === 'coordinador' || r === 'coordinadora' || r.includes('coordinacion administrativa')) return 'coordinador';
+  // Coordinacion Administrativa Estricta (solo si es explícitamente administrativa)
+  if (r === 'coordinadora administrativa' || r === 'coordinador administrativo' || r.includes('coordinacion administrativa') || r.includes('coordinador administrativo') || r.includes('coordinadora administrativa')) return 'coordinador';
   
-  // Talento Humano
+  // Coordinador genérico: si se pasa solo 'coordinador' o 'coordinadora', proteger para que no se colapse
+  if (r === 'coordinador' || r === 'coordinadora') {
+    // Si no tiene especificador, se preserva como 'coordinador_c1c2' por ser el rol base de operaciones de sede
+    return 'coord_c1';
+  }
+
   if (r.includes('talento humano')) return 'talento_humano';
   
   // Legal
@@ -133,7 +138,7 @@ export const ROLE_DISPLAY_NAMES = {
   tecnico_sst: 'Seguridad y Salud (SST)',
   entrenador: 'Entrenador (Coach)',
   entrenador_llamadas: 'Entrenador de Llamadas',
-  student: 'Participantes', student: '#6b7280', // student: eliminado — no es un rol del sistema SO-AR (es un rol interno de CREAR)
+  participante: 'Participantes'
 };
 
 export const getRoleDisplayName = (role) => {
@@ -187,4 +192,5 @@ export const findUserByAnyEmail = (searchEmail) => {
     return false;
   }) || null;
 };
+
 
