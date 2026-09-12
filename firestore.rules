@@ -1,4 +1,4 @@
-rules_version = '2';
+﻿rules_version = '2';
 // ============================================================================
 // firestore.rules — SO-AR / centro-operativo-cpsl
 // Auditada línea por línea contra el uso real de Firestore en el código (26/08/2026):
@@ -276,11 +276,21 @@ service cloud.firestore {
     // info solo la debo de ver yo y Elizabeth Escobar" — debe coincidir con
     // LIQUIDACION_ENTRENADORES_EMAILS en src/config/permissions.js; si esa lista
     // cambia hay que actualizar AMBOS lugares. Restaurado junto con lo de arriba.
+    // ========================================================================
+    // LIQUIDACIONES_PAGOS: registro de pagos liquidados a entrenadores.
+    // REGLA ESTRICTA (pedido explicito de Jose, 12/09/2026):
+    // 'solo visible para mi y directores'
+    // Coincide con canViewLiquidacionEntrenadores en src/config/permissions.js.
+    // ========================================================================
     match /liquidaciones_pagos/{document} {
-      allow read, write: if isAuthenticated() && email() in [
-        'jose.sanchez@crearpsl.net',
-        'contabilidad.global@crearpsl.net'
-      ];
+      allow read, write: if isAuthenticated() && (
+        isSuperAdmin() ||
+        effectiveRole() in ['direccion', 'cfo', 'ceo', 'cco', 'director_maestria'] ||
+        email() in [
+          'jose.sanchez@crearpsl.net',
+          'contabilidad.global@crearpsl.net'
+        ]
+      );
     }
 
     // ⚠️ MISMO HALLAZGO (08/09/2026): estas 7 colecciones aparecían documentadas en
@@ -423,15 +433,20 @@ service cloud.firestore {
     // KPIs de Entrenadores de Llamadas — REGLA ESTRICTA: solo directores y José
     // Sánchez / SuperAdmin.
     match /kpis_entrenadores_llamadas/{document=**} {
-      allow read: if isSuperAdmin() || email() == 'jose.sanchez@crearpsl.net' || email() in [
-        'emely.leon@crearpsl.net',
-        'fer.aragon@crearpsl.net',
-        'andres.gomez@crearpsl.net',
-        'gomeznueve@gmail.com',
-        'contabilidad.global@crearpsl.net',
-        'leandro.brunis@crearpsl.net',
-        'paul.sosa@crearpsl.net'
-      ];
+      allow read: if isAuthenticated() && (
+        isSuperAdmin() ||
+        effectiveRole() in ['direccion', 'cfo', 'ceo', 'cco', 'director_maestria'] ||
+        email() == 'jose.sanchez@crearpsl.net' ||
+        email() in [
+          'emely.leon@crearpsl.net',
+          'fer.aragon@crearpsl.net',
+          'andres.gomez@crearpsl.net',
+          'gomeznueve@gmail.com',
+          'contabilidad.global@crearpsl.net',
+          'leandro.brunis@crearpsl.net',
+          'paul.sosa@crearpsl.net'
+        ]
+      );
       allow write: if isSuperAdmin() || email() == 'jose.sanchez@crearpsl.net';
     }
 
