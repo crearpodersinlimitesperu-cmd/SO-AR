@@ -218,26 +218,42 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
   const assignableRoles = getAssignableRoles(currentUser);
   const canAssignSpecific = true; // Habilitado para todos por solicitud institucional
 
+  const stripAccents = (str) => {
+    return (str || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+  };
+
+  const isSearching = searchQuery.trim().length > 0;
+
   // Filtrado de usuarios según área, sede y buscador de texto
   const activeArea = OPERATIONAL_AREAS.find(a => a.id === selectedAreaId) || OPERATIONAL_AREAS[0];
 
   const visibleUsers = usersData.filter(u => {
-    // 1. Filtro por Área
-    if (!activeArea.filter(u)) return false;
-    
-    // 2. Filtro por Sede
-    if (selectedSedeFilter && normalizeSede(u.sede) !== selectedSedeFilter) {
-      return false;
+    // 1. Si hay texto en el buscador: Búsqueda global en toda la organización
+    if (isSearching) {
+      const q = stripAccents(searchQuery);
+      const name = stripAccents(u.name);
+      const email = stripAccents(u.email);
+      const roleName = stripAccents(getRoleDisplayName(u.role));
+      const sede = stripAccents(normalizeSede(u.sede));
+      const rawRole = stripAccents(u.role);
+
+      const match = name.includes(q) || email.includes(q) || roleName.includes(q) || sede.includes(q) || rawRole.includes(q);
+      if (!match) return false;
+
+      // Si además el usuario seleccionó un filtro de sede explícito, aplicarlo
+      if (selectedSedeFilter && normalizeSede(u.sede) !== selectedSedeFilter) {
+        if (!name.includes(q) && !email.includes(q)) {
+          return false;
+        }
+      }
+      return true;
     }
 
-    // 3. Filtro por Búsqueda de Texto
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase().trim();
-      const name = (u.name || '').toLowerCase();
-      const email = (u.email || '').toLowerCase();
-      const roleName = (getRoleDisplayName(u.role) || '').toLowerCase();
-      const sede = (normalizeSede(u.sede) || '').toLowerCase();
-      return name.includes(q) || email.includes(q) || roleName.includes(q) || sede.includes(q);
+    // 2. Si no hay texto en el buscador: aplicar pestañas de área y sede
+    if (!activeArea.filter(u)) return false;
+    
+    if (selectedSedeFilter && normalizeSede(u.sede) !== selectedSedeFilter) {
+      return false;
     }
 
     return true;
@@ -781,70 +797,111 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
               gap: '0.65rem'
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.4rem' }}>
-                <div style={{ fontSize: '0.76rem', fontWeight: 800, color: 'var(--crear-cyan)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                  <Users size={15} />
-                  <span>Explorar Áreas y Seleccionar Colaboradores Individuales:</span>
+                <div style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--crear-gold)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <Search size={15} />
+                  <span>🔍 Buscador Rápido (escribe y haz clic para ir agregando):</span>
                 </div>
-                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-                  Mostrando <strong style={{ color: '#ffffff' }}>{visibleUsers.length}</strong> colaboradores
+                <div style={{ fontSize: '0.7rem', color: isSearching ? 'var(--crear-cyan)' : 'var(--text-muted)' }}>
+                  {isSearching 
+                    ? `Encontrados: ${visibleUsers.length} en toda la organización` 
+                    : `Total disponibles: ${visibleUsers.length}`}
                 </div>
               </div>
 
-              {/* 4.1 PESTAÑAS DE ÁREAS */}
-              <div style={{ display: 'flex', gap: '0.35rem', overflowX: 'auto', paddingBottom: '4px' }}>
-                {OPERATIONAL_AREAS.map(area => {
-                  const isAreaActive = selectedAreaId === area.id;
-                  const areaUsers = usersData.filter(area.filter);
-                  const selectedCountInArea = areaUsers.filter(u => newTask.assignedToEmails?.some(em => em.toLowerCase() === u.email?.toLowerCase())).length;
-
-                  return (
-                    <button
-                      key={area.id}
-                      type="button"
-                      onClick={() => setSelectedAreaId(area.id)}
-                      style={{
-                        flexShrink: 0,
-                        padding: '0.3rem 0.6rem',
-                        borderRadius: '6px',
-                        fontSize: '0.72rem',
-                        fontWeight: isAreaActive ? 700 : 500,
-                        cursor: 'pointer',
-                        background: isAreaActive ? 'linear-gradient(135deg, rgba(255, 215, 0, 0.25) 0%, rgba(255, 215, 0, 0.08) 100%)' : 'rgba(255, 255, 255, 0.04)',
-                        border: `1px solid ${isAreaActive ? 'var(--crear-gold)' : 'rgba(255, 255, 255, 0.1)'}`,
-                        color: isAreaActive ? 'var(--crear-gold)' : 'var(--text-muted)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.3rem'
-                      }}
-                    >
-                      <span>{area.icon}</span>
-                      <span>{area.shortLabel || area.label}</span>
-                      {selectedCountInArea > 0 && (
-                        <span style={{
-                          background: 'var(--crear-gold)',
-                          color: '#000000',
-                          borderRadius: '10px',
-                          padding: '0 5px',
-                          fontSize: '0.62rem',
-                          fontWeight: 900
-                        }}>
-                          {selectedCountInArea}
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
+              {/* 4.1 BARRA DE BÚSQUEDA DESTACADA */}
+              <div style={{ position: 'relative' }}>
+                <Search size={15} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: isSearching ? 'var(--crear-gold)' : 'var(--text-muted)' }} />
+                <input
+                  type="text"
+                  placeholder="Buscar por nombre, cargo o sede (ej. Karol, Alex, Erika, Finanzas, Quito)..."
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  className="input-field"
+                  style={{
+                    width: '100%',
+                    paddingLeft: '32px',
+                    paddingRight: '28px',
+                    paddingTop: '0.5rem',
+                    paddingBottom: '0.5rem',
+                    fontSize: '0.8rem',
+                    borderRadius: '8px',
+                    border: isSearching ? '1.5px solid var(--crear-gold)' : '1px solid rgba(255, 255, 255, 0.15)',
+                    background: isSearching ? 'rgba(255, 215, 0, 0.06)' : 'rgba(255, 255, 255, 0.03)',
+                    color: '#ffffff'
+                  }}
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery('')}
+                    style={{
+                      position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)',
+                      background: 'rgba(255,255,255,0.15)', border: 'none', color: '#ffffff', borderRadius: '50%', width: '18px', height: '18px', cursor: 'pointer', fontSize: '0.7rem', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                    }}
+                    title="Limpiar búsqueda"
+                  >
+                    ✕
+                  </button>
+                )}
               </div>
 
-              {/* 4.2 FILTRO DE SEDE Y BUSCADOR */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.5rem', alignItems: 'center' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                  <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', flexShrink: 0 }}>📍 Sede:</span>
+              {/* 4.2 FILTROS POR ÁREAS Y SEDE */}
+              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', gap: '0.3rem', overflowX: 'auto', flex: 1, minWidth: '240px', paddingBottom: '2px' }}>
+                  {OPERATIONAL_AREAS.map(area => {
+                    const isAreaActive = !isSearching && selectedAreaId === area.id;
+                    const areaUsers = usersData.filter(area.filter);
+                    const selectedCountInArea = areaUsers.filter(u => newTask.assignedToEmails?.some(em => em.toLowerCase() === u.email?.toLowerCase())).length;
+
+                    return (
+                      <button
+                        key={area.id}
+                        type="button"
+                        onClick={() => {
+                          setSelectedAreaId(area.id);
+                          if (searchQuery) setSearchQuery('');
+                        }}
+                        style={{
+                          flexShrink: 0,
+                          padding: '0.25rem 0.55rem',
+                          borderRadius: '6px',
+                          fontSize: '0.7rem',
+                          fontWeight: isAreaActive ? 700 : 500,
+                          cursor: 'pointer',
+                          background: isAreaActive ? 'linear-gradient(135deg, rgba(255, 215, 0, 0.25) 0%, rgba(255, 215, 0, 0.08) 100%)' : 'rgba(255, 255, 255, 0.04)',
+                          border: `1px solid ${isAreaActive ? 'var(--crear-gold)' : 'rgba(255, 255, 255, 0.1)'}`,
+                          color: isAreaActive ? 'var(--crear-gold)' : 'var(--text-muted)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.25rem'
+                        }}
+                      >
+                        <span>{area.icon}</span>
+                        <span>{area.shortLabel || area.label}</span>
+                        {selectedCountInArea > 0 && (
+                          <span style={{
+                            background: 'var(--crear-gold)',
+                            color: '#000000',
+                            borderRadius: '10px',
+                            padding: '0 4px',
+                            fontSize: '0.6rem',
+                            fontWeight: 900
+                          }}>
+                            {selectedCountInArea}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', flexShrink: 0 }}>
+                  <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>📍 Sede:</span>
                   <select
                     value={selectedSedeFilter}
                     onChange={e => setSelectedSedeFilter(e.target.value)}
                     className="input-field"
-                    style={{ padding: '0.25rem 0.5rem', fontSize: '0.72rem', width: '100%' }}
+                    style={{ padding: '0.25rem 0.45rem', fontSize: '0.7rem', minWidth: '120px' }}
                   >
                     <option value="">Todas las Sedes</option>
                     {OPERATIONAL_SEDES.map(s => (
@@ -852,36 +909,12 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                     ))}
                   </select>
                 </div>
-
-                <div style={{ position: 'relative' }}>
-                  <Search size={14} style={{ position: 'absolute', left: '8px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-                  <input
-                    type="text"
-                    placeholder="Buscar persona (ej. Karol, Erika, Emily)..."
-                    value={searchQuery}
-                    onChange={e => setSearchQuery(e.target.value)}
-                    className="input-field"
-                    style={{ width: '100%', paddingLeft: '26px', paddingRight: '20px', fontSize: '0.72rem' }}
-                  />
-                  {searchQuery && (
-                    <button
-                      type="button"
-                      onClick={() => setSearchQuery('')}
-                      style={{
-                        position: 'absolute', right: '6px', top: '50%', transform: 'translateY(-50%)',
-                        background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.75rem'
-                      }}
-                    >
-                      ✕
-                    </button>
-                  )}
-                </div>
               </div>
 
               {/* ACCIONES DE SELECCIÓN VISIBLE */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.7rem', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '0.35rem' }}>
                 <span style={{ color: 'var(--text-muted)' }}>
-                  {activeArea.label} {selectedSedeFilter ? `• Sede ${selectedSedeFilter}` : ''}
+                  {isSearching ? `🔍 Búsqueda: "${searchQuery}"` : activeArea.label} {selectedSedeFilter ? `• Sede ${selectedSedeFilter}` : ''}
                 </span>
                 <div style={{ display: 'flex', gap: '0.4rem' }}>
                   <button
@@ -1277,3 +1310,4 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
     </div>
   );
 }
+
