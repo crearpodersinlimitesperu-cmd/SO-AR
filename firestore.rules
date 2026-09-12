@@ -1,4 +1,4 @@
-﻿rules_version = '2';
+rules_version = '2';
 // ============================================================================
 // firestore.rules — SO-AR / centro-operativo-cpsl
 // Auditada línea por línea contra el uso real de Firestore en el código (26/08/2026):
