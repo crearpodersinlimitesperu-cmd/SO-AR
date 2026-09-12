@@ -1,6 +1,7 @@
 import { db } from './firebase';
 import { doc, getDoc, setDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import { usersData, normalizeRole, findUserByAnyEmail } from '../data/usersData';
+import { DUAL_ROLE_TRAINER_EMAILS } from '../config/permissions';
 
 
 /**
@@ -17,21 +18,23 @@ export async function getVerifiedUser(email) {
     
     const [snapshot1, snapshot2] = await Promise.all([getDocs(q1), getDocs(q2)]);
     
-    if (!snapshot1.empty) {
-      const userDoc = snapshot1.docs[0].data();
+    if (!snapshot1.empty || !snapshot2.empty) {
+      const userDoc = (!snapshot1.empty ? snapshot1.docs[0] : snapshot2.docs[0]).data();
+      const official = findUserByAnyEmail(normalizedEmail);
+      let role = userDoc.role;
+      let roles = Array.isArray(userDoc.roles) ? [...userDoc.roles] : (role ? [role] : []);
+      if (official) {
+        role = official.role || role;
+        if (official.roles && official.roles.length > 0) {
+          roles = official.roles;
+        }
+      }
       return {
         ...userDoc,
         email: userDoc.email || normalizedEmail,
-        appRole: normalizeRole(userDoc.role)
-      };
-    }
-
-    if (!snapshot2.empty) {
-      const userDoc = snapshot2.docs[0].data();
-      return {
-        ...userDoc,
-        email: userDoc.email || normalizedEmail,
-        appRole: normalizeRole(userDoc.role)
+        role: role,
+        roles: roles,
+        appRole: normalizeRole(role)
       };
     }
 
@@ -150,18 +153,38 @@ export async function getAllCompanyUsers() {
       let finalSede = uData.sede;
 
       if (officialProfile) {
-        // Si en Firestore está como 'coordinador' genérico o ausente, restaurar su cargo específico
-        if (!finalRole || finalRole === 'coordinador' || finalRole === 'coordinadora' || finalRole === 'miembro' || finalRole === 'colaborador') {
-          finalRole = officialProfile.role;
-        }
+        // El catálogo oficial corporativo es la máxima fuente de verdad contra colapsos
+        finalRole = officialProfile.role || finalRole;
         if (!finalSede || finalSede === 'Global') {
           finalSede = officialProfile.sede || finalSede;
         }
-        if (officialProfile.role && !finalRoles.includes(officialProfile.role)) {
-          finalRoles.push(officialProfile.role);
+
+        const canonicalOfficial = normalizeRole(officialProfile.role);
+        const isOfficialCoord = ['coord_c1', 'coord_maestria', 'director_maestria'].includes(canonicalOfficial);
+        const isDualTrainer = primaryEmail ? DUAL_ROLE_TRAINER_EMAILS.includes(primaryEmail.toLowerCase()) : false;
+
+        // Iniciar roles desde los definidos en el perfil oficial
+        const officialRolesSet = new Set(
+          (officialProfile.roles || [officialProfile.role]).map(r => normalizeRole(r))
+        );
+
+        // Si es entrenador dual autorizado por gobernanza, asegurar rol entrenador
+        if (isDualTrainer) officialRolesSet.add('entrenador');
+
+        // Purgar categóricamente roles prohibidos para coordinadores
+        if (isOfficialCoord) {
+          officialRolesSet.delete('coordinador');
+          if (!isDualTrainer) officialRolesSet.delete('entrenador');
+          if (!officialProfile.roles || !officialProfile.roles.includes('manager')) {
+            officialRolesSet.delete('manager');
+          }
         }
-        // Si es coordinador específico, purgar el 'coordinador' administrativo genérico
-        if (officialProfile.role === 'coord_c1' || officialProfile.role === 'coord_maestria' || officialProfile.role === 'director_maestria') {
+
+        finalRoles = Array.from(officialRolesSet);
+      } else {
+        // Si no tiene perfil oficial, purgar 'coordinador' genérico si tiene cargo operativo específico
+        const normRoles = finalRoles.map(r => normalizeRole(r));
+        if (normRoles.includes('coord_c1') || normRoles.includes('coord_maestria') || normRoles.includes('director_maestria')) {
           finalRoles = finalRoles.filter(r => r !== 'coordinador');
         }
       }
@@ -177,7 +200,13 @@ export async function getAllCompanyUsers() {
       };
 
       if (existingIdx !== -1) {
-        allUsers[existingIdx] = withCanonicalEmail({ ...enrichedUser, ...allUsers[existingIdx] });
+        allUsers[existingIdx] = withCanonicalEmail({
+          ...allUsers[existingIdx],
+          ...enrichedUser,
+          role: finalRole,
+          roles: finalRoles,
+          sede: finalSede
+        });
         return;
       }
       allUsers.push(withCanonicalEmail({ id: docSnap.id, ...enrichedUser }));
@@ -217,7 +246,8 @@ export async function getAllCompanyUsers() {
         allUsers.push(withCanonicalEmail({
           id: docSnap.id,
           ...qtData,
-          role: qtData.role || 'qt'
+          role: qtData.role || 'qt',
+          roles: [qtData.role || 'qt']
         }));
       }
     });
