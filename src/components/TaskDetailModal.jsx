@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { 
   X, CheckCircle2, Clock, Calendar, AlertCircle, 
   ExternalLink, Link as LinkIcon, Plus, Trash2, Edit3,
   Send, Sparkles, User, FileText, Check, ShieldCheck,
   TrendingUp, RefreshCw, UploadCloud, Paperclip, FileCheck,
-  FolderPlus, Loader2, UserPlus, MessageSquare
+  FolderPlus, Loader2, UserPlus, MessageSquare,
+  Users, UserCheck, CheckSquare, Square
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useChecklist } from '../context/ChecklistContext';
@@ -12,7 +13,7 @@ import { useUI } from '../context/UIContext';
 import { getFlagForSede } from '../utils/flags';
 import { uploadEvidenceDocument } from '../services/googleDriveService';
 import { celebrateVictory } from '../utils/neuroFeedback';
-
+import { usersData } from '../data/usersData';
 const getCountdown = (deadlineIso) => {
   if (!deadlineIso) return { label: 'Sin fecha límite', color: '#9ca3af', bg: 'rgba(156,163,175,0.12)', border: '#9ca3af', overdue: false };
   const deadline = new Date(deadlineIso).getTime();
@@ -75,8 +76,14 @@ export default function TaskDetailModal({
   const { showToast } = useUI();
 
   // Estados locales editables para avances y evidencias
+  // Estados locales editables para avances y evidencias
   const [progress, setProgress] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
+
+  // Estados de seguimiento colaborativo (avance general vs individual)
+  const [assigneeProgressMap, setAssigneeProgressMap] = useState({});
+  const [myProgress, setMyProgress] = useState(0);
+  const [myCompleted, setMyCompleted] = useState(false);
   const [evidencesList, setEvidencesList] = useState([]);
   const [newEvidenceUrl, setNewEvidenceUrl] = useState('');
   const [newEvidenceTitle, setNewEvidenceTitle] = useState('');
@@ -103,6 +110,51 @@ export default function TaskDetailModal({
       
       setProgress(initialProgress);
       setIsCompleted(task.completed === true || task.status === 'Completada' || initialProgress === 100);
+
+      // Normalizar lista de asignados y mapa de progreso individual
+      const rawAssigned = Array.isArray(task.assignedToEmails) && task.assignedToEmails.length > 0
+        ? task.assignedToEmails
+        : (task.assignedToEmail ? [task.assignedToEmail] : []);
+
+      const uEmail = (currentUser?.email || '').toLowerCase().trim();
+      const normalizeEm = (e) => (e || '').toLowerCase().trim().replace('@crearpls.com', '@crearpsl.net');
+
+      const existingMap = task.assigneeProgress || {};
+      const newMap = {};
+      let foundMyProgress = initialProgress;
+      let foundMyCompleted = task.completed === true || initialProgress === 100;
+
+      rawAssigned.forEach(email => {
+        const clean = (email || '').toLowerCase().trim();
+        const existingKey = Object.keys(existingMap).find(k => 
+          k.toLowerCase().trim() === clean || normalizeEm(k) === normalizeEm(clean)
+        );
+        const u = usersData.find(usr => usr.email?.toLowerCase() === clean);
+        const entry = existingKey ? existingMap[existingKey] : null;
+
+        const entryProg = typeof entry?.progress === 'number'
+          ? entry.progress
+          : (entry?.completed ? 100 : (task.completed ? 100 : 0));
+        const entryComp = entry?.completed === true || entryProg === 100;
+
+        newMap[clean] = {
+          name: entry?.name || u?.name || (resolveAssigneeName ? resolveAssigneeName(clean) : clean),
+          role: entry?.role || u?.role || '',
+          sede: entry?.sede || u?.sede || task.sede || 'Global',
+          completed: entryComp,
+          completedAt: entry?.completedAt || null,
+          progress: entryProg
+        };
+
+        if (clean === uEmail || normalizeEm(clean) === normalizeEm(uEmail)) {
+          foundMyProgress = entryProg;
+          foundMyCompleted = entryComp;
+        }
+      });
+
+      setAssigneeProgressMap(newMap);
+      setMyProgress(foundMyProgress);
+      setMyCompleted(foundMyCompleted);
 
       // Normalizar lista de evidencias existentes (soporte para array `evidences` y campo legacy `evidenceUrl`)
       let list = [];
@@ -248,7 +300,20 @@ export default function TaskDetailModal({
   const isCreator = Boolean(taskCreatorEmail && userEmail === taskCreatorEmail);
 
   // Formateo de asignados
-  const assignedList = task.assignedToEmails || (task.assignedToEmail ? [task.assignedToEmail] : []);
+  // Formateo de asignados y lÃ³gica de avance colaborativo
+  const assignedList = useMemo(() => {
+    if (!task) return [];
+    if (Array.isArray(task.assignedToEmails) && task.assignedToEmails.length > 0) {
+      return task.assignedToEmails;
+    }
+    if (task.assignedToEmail) {
+      return [task.assignedToEmail];
+    }
+    return [];
+  }, [task]);
+
+  const isMultiAssignee = assignedList.length > 1;
+
   const getDisplayName = (email) => {
     if (resolveAssigneeName && typeof resolveAssigneeName === 'function') {
       return resolveAssigneeName(email);
@@ -257,8 +322,48 @@ export default function TaskDetailModal({
   };
 
   const countdown = getCountdown(task.deadline);
+  const normalizeEm = (e) => (e || '').toLowerCase().trim().replace('@crearpls.com', '@crearpsl.net');
 
-  // Selector rápido de porcentajes
+  // Identificar si el usuario actual es uno de los asignados
+  const myEmailKey = useMemo(() => {
+    return Object.keys(assigneeProgressMap).find(k => 
+      k.toLowerCase().trim() === userEmail || normalizeEm(k) === normalizeEm(userEmail)
+    ) || null;
+  }, [assigneeProgressMap, userEmail]);
+
+  const myAssigneeEntry = myEmailKey ? assigneeProgressMap[myEmailKey] : null;
+
+  // Lista estructurada de colaboradores para renderizado
+  const collaboratorsList = useMemo(() => {
+    return Object.entries(assigneeProgressMap).map(([email, info]) => {
+      const isMe = email.toLowerCase().trim() === userEmail || normalizeEm(email) === normalizeEm(userEmail);
+      return {
+        email,
+        name: info.name || (resolveAssigneeName ? resolveAssigneeName(email) : email),
+        role: info.role || '',
+        sede: info.sede || 'Global',
+        completed: info.completed === true || info.progress === 100,
+        completedAt: info.completedAt || null,
+        progress: typeof info.progress === 'number' ? info.progress : (info.completed ? 100 : 0),
+        isMe
+      };
+    });
+  }, [assigneeProgressMap, userEmail, resolveAssigneeName]);
+
+  const totalAssigneesCount = collaboratorsList.length;
+  const completedAssigneesCount = useMemo(() => {
+    return collaboratorsList.filter(c => c.completed).length;
+  }, [collaboratorsList]);
+
+  // CÃ¡lculo del avance general del equipo en tiempo real
+  const computedOverallProgress = useMemo(() => {
+    if (!isMultiAssignee) return progress;
+    if (totalAssigneesCount === 0) return progress;
+    const sum = collaboratorsList.reduce((acc, c) => acc + c.progress, 0);
+    return Math.round(sum / totalAssigneesCount);
+  }, [isMultiAssignee, totalAssigneesCount, collaboratorsList, progress]);
+
+  // Selector rÃ¡pido de porcentaje para tarea individual
   const handleSetQuickProgress = (val) => {
     setProgress(val);
     if (val === 100) {
@@ -268,6 +373,53 @@ export default function TaskDetailModal({
     }
   };
 
+  // Selector de avance individual del usuario actual
+  const handleSetMyProgress = (val) => {
+    setMyProgress(val);
+    const isDone = val === 100;
+    setMyCompleted(isDone);
+
+    if (myEmailKey) {
+      setAssigneeProgressMap(prev => ({
+        ...prev,
+        [myEmailKey]: {
+          ...(prev[myEmailKey] || {}),
+          progress: val,
+          completed: isDone,
+          completedAt: isDone ? (prev[myEmailKey]?.completedAt || new Date().toISOString()) : null
+        }
+      }));
+    }
+  };
+
+  const handleToggleMyPart = () => {
+    const nextVal = myCompleted ? 0 : 100;
+    handleSetMyProgress(nextVal);
+  };
+
+  // Alternar avance de un colaborador (para creadores o coordinadores)
+  const handleToggleCollaboratorStatus = (collabEmail) => {
+    if (!isCreator) return;
+    setAssigneeProgressMap(prev => {
+      const entry = prev[collabEmail] || {};
+      const nextDone = !entry.completed;
+      const nextProg = nextDone ? 100 : 0;
+      const updated = {
+        ...prev,
+        [collabEmail]: {
+          ...entry,
+          completed: nextDone,
+          progress: nextProg,
+          completedAt: nextDone ? new Date().toISOString() : null
+        }
+      };
+      if (collabEmail === myEmailKey) {
+        setMyProgress(nextProg);
+        setMyCompleted(nextDone);
+      }
+      return updated;
+    });
+  };
   // Agregar una nueva evidencia
   const handleAddEvidenceItem = () => {
     const trimmedUrl = newEvidenceUrl.trim();
@@ -337,32 +489,55 @@ export default function TaskDetailModal({
   };
 
   // Guardar todos los cambios en Firestore
+  // Guardar todos los cambios en Firestore
   const handleSaveAll = async () => {
     setIsSaving(true);
     try {
       const mainEvidenceUrl = evidencesList.length > 0 ? evidencesList[0].url : '';
       const latestComment = notesList.length > 0 ? notesList[0].text : (task.comments || '');
 
+      const finalOverall = isMultiAssignee ? computedOverallProgress : progress;
+      const allDone = isMultiAssignee 
+        ? (totalAssigneesCount > 0 && Object.values(assigneeProgressMap).every(v => v.completed === true || v.progress === 100))
+        : isCompleted;
+
+      const finalCompleted = allDone || finalOverall === 100;
+
+      // Registrar avance en la bitÃ¡cora de notas si el usuario actual avanzÃ³
+      let updatedNotesList = [...notesList];
+      if (isMultiAssignee && myAssigneeEntry) {
+        const autoNote = {
+          id: `note_auto_${Date.now()}`,
+          text: `Avance individual registrado por ${myAssigneeEntry.name}: ${myProgress}%. Avance general del equipo: ${finalOverall}%.`,
+          createdAt: new Date().toISOString(),
+          authorName: currentUser?.displayName || currentUser?.name || currentUser?.email || 'Usuario',
+          authorEmail: currentUser?.email || '',
+          progressPercentage: finalOverall
+        };
+        updatedNotesList = [autoNote, ...updatedNotesList];
+      }
+
       const updates = {
-        progressPercentage: progress,
-        completed: isCompleted,
-        status: isCompleted ? 'Completada' : (progress > 0 ? 'En progreso' : 'Pendiente'),
+        progressPercentage: finalOverall,
+        completed: finalCompleted,
+        status: finalCompleted ? 'Completada' : (finalOverall > 0 ? 'En progreso' : 'Pendiente'),
+        assigneeProgress: isMultiAssignee ? assigneeProgressMap : (task.assigneeProgress || {}),
         evidenceUrl: mainEvidenceUrl,
         evidence_url: mainEvidenceUrl,
         evidences: evidencesList,
         comments: latestComment,
         notes: task.notes || task.description || task.comments || '',
         description: task.description || task.notes || task.comments || '',
-        progressNotes: notesList,
+        progressNotes: updatedNotesList,
         lastUpdated: new Date().toISOString(),
         lastUpdatedBy: currentUser?.email || ''
       };
 
       await updateTaskDetails(task.id, updates);
-      if (isCompleted || progress === 100) {
+      if (finalCompleted || (myAssigneeEntry && myProgress === 100) || (!isMultiAssignee && progress === 100)) {
         celebrateVictory();
       }
-      showToast('🎉 ¡Tarea actualizada y avances guardados exitosamente!', 'success');
+      showToast('ðŸŽ‰ Â¡Tarea actualizada y avances guardados exitosamente!', 'success');
       onClose();
     } catch (err) {
       console.error('Error guardando avances:', err);
@@ -371,7 +546,6 @@ export default function TaskDetailModal({
       setIsSaving(false);
     }
   };
-
   return (
     <div style={{
       position: 'fixed',
@@ -617,104 +791,442 @@ export default function TaskDetailModal({
           )}
 
           {/* 1. SECCIÓN DE AVANCE (%) */}
+          {/* 1. SECCIÃ“N DE AVANCE (%) */}
           <div style={{
             background: 'rgba(255, 255, 255, 0.02)',
-            border: '1px solid rgba(41, 171, 226, 0.2)',
-            borderRadius: '12px',
-            padding: '1.2rem'
+            border: '1px solid rgba(41, 171, 226, 0.25)',
+            borderRadius: '14px',
+            padding: '1.25rem',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1.2rem'
           }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                <TrendingUp size={18} style={{ color: 'var(--crear-cyan)' }} />
-                <h3 style={{ margin: 0, fontSize: '0.98rem', fontWeight: 700, color: '#ffffff' }}>
-                  Porcentaje de Avance
-                </h3>
-              </div>
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{
-                  fontSize: '1.4rem',
-                  fontWeight: 900,
-                  color: progress === 100 ? '#10b981' : (progress >= 50 ? 'var(--crear-cyan)' : 'var(--crear-gold)')
+            {isMultiAssignee ? (
+              <>
+                {/* 1.1 AVANCE GENERAL DEL EQUIPO (COLABORATIVO) */}
+                <div style={{
+                  background: 'linear-gradient(135deg, rgba(41, 171, 226, 0.1) 0%, rgba(13, 21, 45, 0.7) 100%)',
+                  border: '1px solid rgba(41, 171, 226, 0.35)',
+                  borderRadius: '12px',
+                  padding: '1.1rem'
                 }}>
-                  {progress}%
-                </span>
-                <span style={{
-                  fontSize: '0.72rem',
-                  padding: '2px 8px',
-                  borderRadius: '10px',
-                  background: isCompleted ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255, 193, 7, 0.15)',
-                  color: isCompleted ? '#10b981' : '#facc15',
-                  border: `1px solid ${isCompleted ? 'rgba(16, 185, 129, 0.3)' : 'rgba(255, 193, 7, 0.3)'}`,
-                  fontWeight: 700
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <Users size={18} style={{ color: 'var(--crear-cyan)' }} />
+                      <div>
+                        <div style={{ fontSize: '0.98rem', fontWeight: 800, color: '#ffffff', letterSpacing: '0.2px' }}>
+                          Avance General de la Tarea
+                        </div>
+                        <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+                          {completedAssigneesCount} de {totalAssigneesCount} colaboradores completaron su parte
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span style={{
+                        fontSize: '1.5rem',
+                        fontWeight: 900,
+                        color: computedOverallProgress === 100 ? '#10b981' : (computedOverallProgress >= 50 ? 'var(--crear-cyan)' : 'var(--crear-gold)')
+                      }}>
+                        {computedOverallProgress}%
+                      </span>
+                      <span style={{
+                        fontSize: '0.72rem',
+                        padding: '2px 8px',
+                        borderRadius: '10px',
+                        background: computedOverallProgress === 100 ? 'rgba(16, 185, 129, 0.15)' : (computedOverallProgress > 0 ? 'rgba(41, 171, 226, 0.15)' : 'rgba(255, 193, 7, 0.15)'),
+                        color: computedOverallProgress === 100 ? '#10b981' : (computedOverallProgress > 0 ? 'var(--crear-cyan)' : '#facc15'),
+                        border: `1px solid ${computedOverallProgress === 100 ? 'rgba(16, 185, 129, 0.3)' : (computedOverallProgress > 0 ? 'rgba(41, 171, 226, 0.3)' : 'rgba(255, 193, 7, 0.3)')}`,
+                        fontWeight: 700
+                      }}>
+                        {computedOverallProgress === 100 ? 'COMPLETADA' : (computedOverallProgress > 0 ? 'EN PROCESO' : 'PENDIENTE')}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Barra visual de progreso global */}
+                  <div style={{
+                    width: '100%',
+                    height: '10px',
+                    background: 'rgba(255, 255, 255, 0.08)',
+                    borderRadius: '6px',
+                    overflow: 'hidden',
+                    marginBottom: '0.75rem',
+                    boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.5)'
+                  }}>
+                    <div style={{
+                      height: '100%',
+                      width: `${computedOverallProgress}%`,
+                      background: computedOverallProgress === 100 
+                        ? 'linear-gradient(90deg, #10b981, #34d399)' 
+                        : 'linear-gradient(90deg, #29abe2, #d4af37)',
+                      transition: 'width 0.35s ease-out'
+                    }} />
+                  </div>
+
+                  {/* Métrica explicativa del impacto */}
+                  <div style={{
+                    fontSize: '0.76rem',
+                    color: '#e2e8f0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.45rem',
+                    background: 'rgba(0, 0, 0, 0.3)',
+                    padding: '0.45rem 0.75rem',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(255, 255, 255, 0.06)'
+                  }}>
+                    <Sparkles size={14} style={{ color: 'var(--crear-gold)', flexShrink: 0 }} />
+                    <span>
+                      {myAssigneeEntry ? (
+                        <>
+                          Con <strong>{totalAssigneesCount} colaboradores</strong>, cada uno representa <strong>{(100 / totalAssigneesCount).toFixed(1)}%</strong>. Tu avance individual de <strong style={{ color: 'var(--crear-cyan)' }}>{myProgress}%</strong> aporta <strong style={{ color: '#ffffff' }}>{(myProgress / totalAssigneesCount).toFixed(1)}%</strong> al avance general.
+                        </>
+                      ) : (
+                        <>
+                          Promedio global de <strong>{totalAssigneesCount} colaboradores asignados</strong> (peso equitativo de {(100 / totalAssigneesCount).toFixed(1)}% por colaborador).
+                        </>
+                      )}
+                    </span>
+                  </div>
+                </div>
+
+                {/* 1.2 MI AVANCE INDIVIDUAL (SI EL USUARIO ACTUAL ESTÃ ASIGNADO) */}
+                {myAssigneeEntry && (
+                  <div style={{
+                    background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%)',
+                    border: '1px solid rgba(212, 175, 55, 0.35)',
+                    borderRadius: '12px',
+                    padding: '1.1rem'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem', flexWrap: 'wrap', gap: '0.4rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                        <TrendingUp size={17} style={{ color: 'var(--crear-gold)' }} />
+                        <span style={{ fontSize: '0.94rem', fontWeight: 800, color: '#ffffff' }}>
+                          Mi Avance Individual ({myAssigneeEntry.name || 'TÃº'})
+                        </span>
+                        <span style={{
+                          fontSize: '0.68rem',
+                          fontWeight: 800,
+                          padding: '0.15rem 0.45rem',
+                          borderRadius: '6px',
+                          background: 'rgba(212, 175, 55, 0.2)',
+                          color: 'var(--crear-gold)',
+                          border: '1px solid rgba(212, 175, 55, 0.4)'
+                        }}>
+                          TÃš
+                        </span>
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <span style={{
+                          fontSize: '1.35rem',
+                          fontWeight: 900,
+                          color: myProgress === 100 ? '#10b981' : (myProgress >= 50 ? 'var(--crear-cyan)' : 'var(--crear-gold)')
+                        }}>
+                          {myProgress}%
+                        </span>
+                        <span style={{
+                          fontSize: '0.7rem',
+                          padding: '2px 8px',
+                          borderRadius: '10px',
+                          background: myProgress === 100 ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255, 193, 7, 0.15)',
+                          color: myProgress === 100 ? '#10b981' : '#facc15',
+                          border: `1px solid ${myProgress === 100 ? 'rgba(16, 185, 129, 0.3)' : 'rgba(255, 193, 7, 0.3)'}`,
+                          fontWeight: 700
+                        }}>
+                          {myProgress === 100 ? 'COMPLETASTE TU PARTE' : (myProgress > 0 ? 'EN PROCESO' : 'PENDIENTE')}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Barra visual de mi progreso */}
+                    <div style={{
+                      width: '100%',
+                      height: '8px',
+                      background: 'rgba(255, 255, 255, 0.08)',
+                      borderRadius: '5px',
+                      overflow: 'hidden',
+                      marginBottom: '0.9rem'
+                    }}>
+                      <div style={{
+                        height: '100%',
+                        width: `${myProgress}%`,
+                        background: myProgress === 100 
+                          ? 'linear-gradient(90deg, #10b981, #34d399)' 
+                          : 'linear-gradient(90deg, #d4af37, #29abe2)',
+                        transition: 'width 0.3s ease-out'
+                      }} />
+                    </div>
+
+                    {/* Botones de selecciÃ³n rÃ¡pida y slider */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '0.4rem' }}>
+                        {[0, 25, 50, 75, 100].map(val => (
+                          <button
+                            key={val}
+                            type="button"
+                            onClick={() => handleSetMyProgress(val)}
+                            style={{
+                              padding: '0.45rem 0.2rem',
+                              borderRadius: '6px',
+                              fontSize: '0.78rem',
+                              fontWeight: myProgress === val ? 800 : 600,
+                              cursor: 'pointer',
+                              border: `1px solid ${myProgress === val ? 'var(--crear-gold)' : 'rgba(255,255,255,0.1)'}`,
+                              background: myProgress === val ? 'rgba(212, 175, 55, 0.25)' : 'rgba(255,255,255,0.03)',
+                              color: myProgress === val ? '#ffffff' : 'var(--text-muted)',
+                              transition: 'all 0.15s ease'
+                            }}
+                          >
+                            {val === 100 ? 'âœ… 100%' : `${val}%`}
+                          </button>
+                        ))}
+                      </div>
+
+                      <input 
+                        type="range"
+                        min="0"
+                        max="100"
+                        step="5"
+                        value={myProgress}
+                        onChange={(e) => handleSetMyProgress(parseInt(e.target.value, 10))}
+                        style={{
+                          width: '100%',
+                          cursor: 'pointer',
+                          accentColor: 'var(--crear-gold)'
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* 1.3 DESGLOSE DEL AVANCE DE LOS DEMÃS COLABORADORES */}
+                <div style={{
+                  background: 'rgba(0, 0, 0, 0.25)',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  borderRadius: '12px',
+                  padding: '0.9rem 1rem'
                 }}>
-                  {isCompleted ? 'COMPLETADA' : (progress > 0 ? 'EN PROCESO' : 'PENDIENTE')}
-                </span>
-              </div>
-            </div>
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '0.75rem',
+                    flexWrap: 'wrap',
+                    gap: '0.4rem'
+                  }}>
+                    <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#ffffff', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                      <Users size={14} style={{ color: 'var(--crear-cyan)' }} />
+                      Avance de los demÃ¡s colaboradores ({collaboratorsList.length}):
+                    </span>
+                    <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                      {completedAssigneesCount} de {totalAssigneesCount} completaron
+                    </span>
+                  </div>
 
-            {/* Barra visual de progreso */}
-            <div style={{
-              width: '100%',
-              height: '10px',
-              background: 'rgba(255, 255, 255, 0.08)',
-              borderRadius: '6px',
-              overflow: 'hidden',
-              marginBottom: '1rem',
-              boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.5)'
-            }}>
-              <div style={{
-                height: '100%',
-                width: `${progress}%`,
-                background: progress === 100 
-                  ? 'linear-gradient(90deg, #10b981, #34d399)' 
-                  : 'linear-gradient(90deg, #29abe2, #d4af37)',
-                transition: 'width 0.35s ease-out'
-              }} />
-            </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem', maxHeight: '180px', overflowY: 'auto' }}>
+                    {collaboratorsList.map(c => {
+                      const isCompletedC = c.completed || c.progress === 100;
+                      return (
+                        <div 
+                          key={c.email}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            padding: '0.45rem 0.65rem',
+                            borderRadius: '8px',
+                            background: c.isMe ? 'rgba(41, 171, 226, 0.1)' : 'rgba(255, 255, 255, 0.02)',
+                            border: `1px solid ${c.isMe ? 'rgba(41, 171, 226, 0.35)' : 'rgba(255, 255, 255, 0.05)'}`,
+                            fontSize: '0.8rem'
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', minWidth: 0, flex: 1 }}>
+                            <div style={{
+                              width: '24px',
+                              height: '24px',
+                              borderRadius: '50%',
+                              background: isCompletedC ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255, 255, 255, 0.08)',
+                              color: isCompletedC ? '#10b981' : '#ffffff',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: '0.7rem',
+                              fontWeight: 700,
+                              flexShrink: 0
+                            }}>
+                              {isCompletedC ? 'âœ“' : c.name.charAt(0).toUpperCase()}
+                            </div>
 
-            {/* Botones de selección rápida y slider */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '0.4rem' }}>
-                {[0, 25, 50, 75, 100].map(val => (
-                  <button
-                    key={val}
-                    type="button"
-                    onClick={() => handleSetQuickProgress(val)}
-                    style={{
-                      padding: '0.45rem 0.2rem',
-                      borderRadius: '6px',
-                      fontSize: '0.78rem',
-                      fontWeight: progress === val ? 800 : 600,
-                      cursor: 'pointer',
-                      border: `1px solid ${progress === val ? 'var(--crear-cyan)' : 'rgba(255,255,255,0.1)'}`,
-                      background: progress === val ? 'rgba(41, 171, 226, 0.25)' : 'rgba(255,255,255,0.03)',
-                      color: progress === val ? '#ffffff' : 'var(--text-muted)',
-                      transition: 'all 0.15s ease'
-                    }}
-                  >
-                    {val === 100 ? '✅ 100%' : `${val}%`}
-                  </button>
-                ))}
-              </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, flex: 1 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                <span style={{
+                                  color: c.isMe ? 'var(--crear-cyan)' : '#ffffff',
+                                  fontWeight: c.isMe ? 800 : 600,
+                                  whiteSpace: 'nowrap',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis'
+                                }}>
+                                  {c.name}
+                                </span>
+                                {c.isMe && (
+                                  <span style={{ fontSize: '0.65rem', color: 'var(--crear-gold)', fontWeight: 800 }}>(TÃº)</span>
+                                )}
+                              </div>
+                              {c.sede && (
+                                <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
+                                  {c.sede} {c.role ? `â€¢ ${c.role}` : ''}
+                                </span>
+                              )}
+                            </div>
+                          </div>
 
-              {/* Slider interactivo */}
-              <input 
-                type="range"
-                min="0"
-                max="100"
-                step="5"
-                value={progress}
-                onChange={(e) => handleSetQuickProgress(parseInt(e.target.value, 10))}
-                style={{
+                          {/* Mini barra y porcentaje individual */}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexShrink: 0, marginLeft: '0.5rem' }}>
+                            <div style={{
+                              width: '60px',
+                              height: '6px',
+                              background: 'rgba(255, 255, 255, 0.08)',
+                              borderRadius: '3px',
+                              overflow: 'hidden'
+                            }}>
+                              <div style={{
+                                height: '100%',
+                                width: `${c.progress}%`,
+                                background: isCompletedC ? '#10b981' : (c.progress > 0 ? 'var(--crear-cyan)' : 'transparent'),
+                                transition: 'width 0.3s ease-out'
+                              }} />
+                            </div>
+                            <span style={{
+                              minWidth: '34px',
+                              textAlign: 'right',
+                              fontWeight: 700,
+                              fontSize: '0.78rem',
+                              color: isCompletedC ? '#10b981' : (c.progress > 0 ? 'var(--crear-cyan)' : 'var(--text-muted)')
+                            }}>
+                              {c.progress}%
+                            </span>
+
+                            {isCreator && (
+                              <button
+                                type="button"
+                                onClick={() => handleToggleCollaboratorStatus(c.email)}
+                                title={c.completed ? 'Marcar pendiente' : 'Marcar completado'}
+                                style={{
+                                  background: 'none',
+                                  border: 'none',
+                                  cursor: 'pointer',
+                                  color: c.completed ? '#10b981' : 'var(--text-muted)',
+                                  padding: '0 2px'
+                                }}
+                              >
+                                {c.completed ? <CheckSquare size={14} /> : <Square size={14} />}
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </>
+            ) : (
+              /* CASO INDIVIDUAL (1 SOLO ASIGNADO O ASIGNACIÃ“N DIRECTA) */
+              <>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <TrendingUp size={18} style={{ color: 'var(--crear-cyan)' }} />
+                    <h3 style={{ margin: 0, fontSize: '0.98rem', fontWeight: 700, color: '#ffffff' }}>
+                      Porcentaje de Avance
+                    </h3>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span style={{
+                      fontSize: '1.4rem',
+                      fontWeight: 900,
+                      color: progress === 100 ? '#10b981' : (progress >= 50 ? 'var(--crear-cyan)' : 'var(--crear-gold)')
+                    }}>
+                      {progress}%
+                    </span>
+                    <span style={{
+                      fontSize: '0.72rem',
+                      padding: '2px 8px',
+                      borderRadius: '10px',
+                      background: isCompleted ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255, 193, 7, 0.15)',
+                      color: isCompleted ? '#10b981' : '#facc15',
+                      border: `1px solid ${isCompleted ? 'rgba(16, 185, 129, 0.3)' : 'rgba(255, 193, 7, 0.3)'}`,
+                      fontWeight: 700
+                    }}>
+                      {isCompleted ? 'COMPLETADA' : (progress > 0 ? 'EN PROCESO' : 'PENDIENTE')}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Barra visual de progreso */}
+                <div style={{
                   width: '100%',
-                  cursor: 'pointer',
-                  accentColor: 'var(--crear-cyan)'
-                }}
-              />
-            </div>
-          </div>
+                  height: '10px',
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  borderRadius: '6px',
+                  overflow: 'hidden',
+                  marginBottom: '1rem',
+                  boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.5)'
+                }}>
+                  <div style={{
+                    height: '100%',
+                    width: `${progress}%`,
+                    background: progress === 100 
+                      ? 'linear-gradient(90deg, #10b981, #34d399)' 
+                      : 'linear-gradient(90deg, #29abe2, #d4af37)',
+                    transition: 'width 0.35s ease-out'
+                  }} />
+                </div>
 
+                {/* Botones de selecciÃ³n rÃ¡pida y slider */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '0.4rem' }}>
+                    {[0, 25, 50, 75, 100].map(val => (
+                      <button
+                        key={val}
+                        type="button"
+                        onClick={() => handleSetQuickProgress(val)}
+                        style={{
+                          padding: '0.45rem 0.2rem',
+                          borderRadius: '6px',
+                          fontSize: '0.78rem',
+                          fontWeight: progress === val ? 800 : 600,
+                          cursor: 'pointer',
+                          border: `1px solid ${progress === val ? 'var(--crear-cyan)' : 'rgba(255,255,255,0.1)'}`,
+                          background: progress === val ? 'rgba(41, 171, 226, 0.25)' : 'rgba(255,255,255,0.03)',
+                          color: progress === val ? '#ffffff' : 'var(--text-muted)',
+                          transition: 'all 0.15s ease'
+                        }}
+                      >
+                        {val === 100 ? 'âœ… 100%' : `${val}%`}
+                      </button>
+                    ))}
+                  </div>
+
+                  <input 
+                    type="range"
+                    min="0"
+                    max="100"
+                    step="5"
+                    value={progress}
+                    onChange={(e) => handleSetQuickProgress(parseInt(e.target.value, 10))}
+                    style={{
+                      width: '100%',
+                      cursor: 'pointer',
+                      accentColor: 'var(--crear-cyan)'
+                    }}
+                  />
+                </div>
+              </>
+            )}
+          </div>
           {/* 2. SECCIÓN DE ADJUNTAR Y VER EVIDENCIAS */}
           <div style={{
             background: 'rgba(255, 255, 255, 0.02)',
@@ -1248,17 +1760,26 @@ export default function TaskDetailModal({
           {/* BOTÓN COMPLETAR O REABRIR */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
             <button
+            <button
               type="button"
-              onClick={handleToggleCompleted}
+              onClick={isMultiAssignee && myAssigneeEntry ? handleToggleMyPart : handleToggleCompleted}
               style={{
                 padding: '0.55rem 1rem',
                 borderRadius: '8px',
                 fontSize: '0.85rem',
                 fontWeight: 700,
                 cursor: 'pointer',
-                border: `1px solid ${isCompleted ? 'rgba(239, 68, 68, 0.4)' : 'rgba(16, 185, 129, 0.4)'}`,
-                background: isCompleted ? 'rgba(239, 68, 68, 0.15)' : 'rgba(16, 185, 129, 0.18)',
-                color: isCompleted ? '#f87171' : '#10b981',
+                border: `1px solid ${
+                  (isMultiAssignee && myAssigneeEntry ? myCompleted : isCompleted) 
+                    ? 'rgba(239, 68, 68, 0.4)' 
+                    : 'rgba(16, 185, 129, 0.4)'
+                }`,
+                background: (isMultiAssignee && myAssigneeEntry ? myCompleted : isCompleted) 
+                  ? 'rgba(239, 68, 68, 0.15)' 
+                  : 'rgba(16, 185, 129, 0.18)',
+                color: (isMultiAssignee && myAssigneeEntry ? myCompleted : isCompleted) 
+                  ? '#f87171' 
+                  : '#10b981',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.4rem',
@@ -1266,9 +1787,10 @@ export default function TaskDetailModal({
               }}
             >
               <CheckCircle2 size={16} />
-              {isCompleted ? 'Reabrir Tarea' : 'Marcar Completada'}
+              {isMultiAssignee && myAssigneeEntry 
+                ? (myCompleted ? 'Reabrir Mi Parte' : 'Marcar Mi Parte Completada')
+                : (isCompleted ? 'Reabrir Tarea' : 'Marcar Completada')}
             </button>
-
             {isCreator && onEditTaskParams && (
               <button
                 type="button"

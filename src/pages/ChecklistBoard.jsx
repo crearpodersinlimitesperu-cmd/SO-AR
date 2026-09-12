@@ -749,8 +749,9 @@ export default function ChecklistBoard() {
                     {task.assigneeProgress && Object.keys(task.assigneeProgress).length > 0 && (() => {
                       const entries = Object.entries(task.assigneeProgress);
                       const total = entries.length;
-                      const completedCount = entries.filter(([_, v]) => v.completed).length;
-                      const percent = total > 0 ? Math.round((completedCount / total) * 100) : 0;
+                      const completedCount = entries.filter(([_, v]) => v.completed === true || v.progress === 100).length;
+                      const sumProgress = entries.reduce((acc, [_, v]) => acc + (typeof v.progress === 'number' ? v.progress : (v.completed ? 100 : 0)), 0);
+                      const percent = total > 0 ? Math.round(sumProgress / total) : 0;
                       const myEmail = currentUser?.email?.toLowerCase();
                       const myEntry = entries.find(([email]) => email.toLowerCase() === myEmail || email.toLowerCase().replace('@crearpsl.com','@crearpsl.net') === myEmail?.replace('@crearpsl.com','@crearpsl.net'));
                       const myProgress = myEntry ? myEntry[1] : null;
@@ -827,11 +828,11 @@ export default function ChecklistBoard() {
                                     fontWeight: 'bold',
                                     padding: '0.15rem 0.4rem',
                                     borderRadius: '4px',
-                                    background: prog.completed ? 'rgba(34,197,94,0.2)' : 'rgba(245,158,11,0.15)',
-                                    color: prog.completed ? '#22c55e' : '#f59e0b',
+                                    background: (prog.completed || prog.progress === 100) ? 'rgba(34,197,94,0.2)' : 'rgba(245,158,11,0.15)',
+                                    color: (prog.completed || prog.progress === 100) ? '#22c55e' : (typeof prog.progress === 'number' && prog.progress > 0 ? 'var(--crear-cyan)' : '#f59e0b'),
                                     whiteSpace: 'nowrap'
                                   }}>
-                                    {prog.completed ? '✓ Listo' : '⏳ Pendiente'}
+                                    {prog.completed || prog.progress === 100 ? '✓ Listo' : (typeof prog.progress === 'number' && prog.progress > 0 ? `${prog.progress}%` : '⏳ Pendiente')}
                                   </span>
                                 </div>
                               );

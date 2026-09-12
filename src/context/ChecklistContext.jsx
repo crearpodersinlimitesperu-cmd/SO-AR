@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+﻿import { createContext, useContext, useState, useEffect } from 'react';
 import { db, auth } from '../services/firebase';
 import { collection, onSnapshot, doc, updateDoc, setDoc, writeBatch, addDoc, query, where, orderBy, limit, getDocs, getDoc } from 'firebase/firestore';
 import { checklistData } from '../data/checklistData';
@@ -851,12 +851,16 @@ export function ChecklistProvider({ children }) {
 
       // Si todos los asignados completaron, marcar la tarjeta general como completada
       const allKeys = Object.keys(currentProgress);
-      const allCompleted = allKeys.length > 0 && allKeys.every(k => currentProgress[k].completed === true);
-      const anyCompleted = allKeys.some(k => currentProgress[k].completed === true);
+      const allCompleted = allKeys.length > 0 && allKeys.every(k => currentProgress[k].completed === true || currentProgress[k].progress === 100);
+      const anyCompleted = allKeys.some(k => currentProgress[k].completed === true || currentProgress[k].progress > 0);
 
       const totalItems = allKeys.length;
-      const completedItems = allKeys.filter(k => currentProgress[k].completed === true).length;
-      const overallPercent = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : (isCompleted ? 100 : 0);
+      const sumProgress = allKeys.reduce((acc, k) => {
+        const item = currentProgress[k];
+        const val = typeof item.progress === 'number' ? item.progress : (item.completed ? 100 : 0);
+        return acc + val;
+      }, 0);
+      const overallPercent = totalItems > 0 ? Math.round(sumProgress / totalItems) : (isCompleted ? 100 : 0);
 
       await updateDoc(taskRef, {
         assigneeProgress: currentProgress,
