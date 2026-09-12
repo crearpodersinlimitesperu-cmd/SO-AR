@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCycles } from '../context/CyclesContext';
@@ -1206,7 +1206,7 @@ export default function Home() {
               gap: '5px' 
             }}>
               <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981', display: 'inline-block', boxShadow: '0 0 6px #10b981' }}></span>
-              Causa OS v2.8.0
+              Causa OS v3.0.0 Enterprise Multi-Agent
             </span>
           </div>
         </div>
