@@ -12,8 +12,6 @@ import {
   Legend, CartesianGrid, Cell, PieChart, Pie, ComposedChart, Line
 } from 'recharts';
 import { useTheme } from '../context/ThemeContext';
-import ThemeSelector from './ThemeSelector';
-import ZenModeSelector from './ZenModeSelector';
 import nodusFallbackData from '../data/nodusFallbackData.json';
 import { usersData, OPERATIONAL_SEDES } from '../data/usersData';
 import './NodusCoordinadoresC1C2Dashboard.css';
@@ -886,9 +884,6 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
         </div>
 
         <div className="nodus-header-right">
-          <ThemeSelector compact={false} />
-          <ZenModeSelector />
-
           <div className="nodus-sync-indicator">
             <span className="nodus-pulse-dot" />
             <span>Sincronizado: <strong style={{ color: '#10b981' }}>{timeSinceSync}</strong></span>
@@ -1700,4 +1695,5 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
     </div>
   );
 }
+
 
