@@ -1,4 +1,4 @@
-/**
+﻿/**
  * AGENTE CENTINELA DE INTELIGENCIA ARTIFICIAL &bull; AUDITOR DE FUTUROS IMPOSIBLES (FIs)
  * Módulo de Inteligencia Operativa y Diagnóstico Predictivo - Causa OS / NODUS CREAR
  * 
