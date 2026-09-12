@@ -169,6 +169,29 @@ service cloud.firestore {
         : u.role;
     }
 
+    // Lista de correos institucionales de Coordinadores de Maestría del Juego (CMJ)
+    // para acceso infalible sin depender exclusivamente del lookup de users/{uid}
+    function isCMJEmail() {
+      return isAuthenticated() && email() in [
+        'linid.valencia@crearpsl.net',
+        'linid.valencia@crearpsl.com',
+        'alonso.solares@crearpsl.net',
+        'alonso.solares@crearpsl.com',
+        'kerly.carrillo@crearpsl.net',
+        'kerly.carrillo@crearpsl.com',
+        'mauricio.ramirez@crearpsl.net',
+        'mauricio.ramirez@crearpsl.com',
+        'erika.gavilanez@crearpsl.net',
+        'erika.gavilanez@crearpsl.com',
+        'leyla.pasquel@crearpsl.net',
+        'leyla.pasquel@crearpsl.com',
+        'juan.reinoso@crearpsl.net',
+        'juan.reinoso@crearpsl.com',
+        'josue.vera@crearpsl.net',
+        'josue.vera@crearpsl.com'
+      ];
+    }
+
     // (29/08/2026) MJ_CALENDARS: el rol operativo del usuario (coord_maestria,
     // director_maestria, etc.) no viaja en el token de autenticación ni se
     // puede inferir de una lista fija de correos como isGerenteODireccion().
@@ -184,7 +207,7 @@ service cloud.firestore {
     // el selector de rol de Home.jsx sí tenga efecto real aquí — ver comentario arriba.
     function callerRole() {
       return isAuthenticated() &&
-        effectiveRole() in ['coord_maestria', 'director_maestria'];
+        (isCMJEmail() || effectiveRole() in ['coord_maestria', 'director_maestria', 'coordinador_mj']);
     }
 
     // (08/09/2026) CALLER SEDE — para el enforcement real de "SOLO SU SEDE" en
@@ -199,15 +222,10 @@ service cloud.firestore {
 
     // (02/09/2026) MANAGERS_DIRECTORY: mismo patrón que callerRole() (users/{uid}.data.role)
     // para permitir que Coordinación/Dirección de Maestría gestionen el directorio de
-    // managers sin abrir la escritura a cualquier autenticado. Antes de este cambio,
-    // "allow read, write: if isAuthenticated()" permitía a CUALQUIER usuario logueado
-    // (incluyendo los entrenadores de correo personal agregados el 02/09/2026) crear,
-    // borrar o modificar cualquier campo de cualquier manager. Confirmado explícitamente
-    // por José antes de tocar firestore.rules.
-    // (07/09/2026) Ahora usa effectiveRole() — ver comentario en callerRole() arriba.
+    // managers sin abrir la escritura a cualquier autenticado.
     function canManageManagers() {
       return isAuthenticated() &&
-        effectiveRole() in ['coord_maestria', 'director_maestria', 'coordinador_mj'];
+        (isCMJEmail() || effectiveRole() in ['coord_maestria', 'director_maestria', 'coordinador_mj']);
     }
 
     // MJ_CALENDARS (29/08/2026): calendarios de Maestría del Juego por equipo
@@ -215,7 +233,7 @@ service cloud.firestore {
     // Confirmado explícitamente por José antes de tocar firestore.rules.
     match /mj_calendars/{calendarId} {
       allow read: if isAuthenticated();
-      allow write: if isSuperAdmin() || isGerenteODireccion() || callerRole();
+      allow write: if isSuperAdmin() || isGerenteODireccion() || callerRole() || isCMJEmail();
     }
 
     // ⚠️ HALLAZGO REAL (08/09/2026), encontrado al implementar la Fase 2 de la
@@ -529,6 +547,17 @@ service cloud.firestore {
       match /sessions/{sessionId} {
         allow read, write: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());
       }
+
+      match /copilot_chats/{chatId} {
+        allow read, write: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());
+      }
+    }
+
+    // Trazabilidad de Auditoría Financiera (CAUSA OS Finanzas)
+    match /finanzas_audit_trail/{docId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if isSuperAdmin();
     }
 
     // CRM Nodus (Participants)
