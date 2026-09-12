@@ -5,9 +5,10 @@ import { collection, onSnapshot, addDoc, updateDoc, doc, query, where, orderBy, 
 import { useAuth } from '../context/AuthContext';
 import { useCycles } from '../context/CyclesContext';
 import { useUI } from '../context/UIContext';
-import { ArrowLeft, Target, Settings, GitMerge, Users, UserPlus, Award, CheckCircle2, Plus, Edit3, Calendar, Clock, Sparkles, Check, FileSpreadsheet, Eye, RefreshCw, X, Search, Filter } from 'lucide-react';
+import { ArrowLeft, Target, Settings, GitMerge, Users, UserPlus, Award, CheckCircle2, Plus, Edit3, Calendar, Clock, Sparkles, Check, FileSpreadsheet, Eye, RefreshCw, X, Search, Filter, PhoneCall, ChevronRight, Phone, MessageSquare, BarChart2, TrendingUp, UserCheck, Shield } from 'lucide-react';
 import GoalDivisionModal from '../components/GoalDivisionModal';
 import { normalizeSede } from '../data/usersData';
+import nodusFallbackData from '../data/nodusFallbackData.json';
 
 export default function GoalsBoard() {
   const { currentUser } = useAuth();
@@ -89,6 +90,15 @@ export default function GoalsBoard() {
   const [limaRespFilter, setLimaRespFilter] = useState('ALL');
   const [limaStatusFilter, setLimaStatusFilter] = useState('ALL');
 
+  // Estado para llamadas de Nodus por equipo y auditoria en tiempo real
+  const [nodusData, setNodusData] = useState(nodusFallbackData);
+  const [managersList, setManagersList] = useState([]);
+  const [showTeamCallsModal, setShowTeamCallsModal] = useState(false);
+  const [selectedGoalForTeamCalls, setSelectedGoalForTeamCalls] = useState(null);
+  const [selectedTeamCallsData, setSelectedTeamCallsData] = useState(null);
+  const [teamCallsFilterTeam, setTeamCallsFilterTeam] = useState('');
+  const [teamCallsActiveTab, setTeamCallsActiveTab] = useState('coordinadoras');
+
 
   useEffect(() => {
     // Cargar caché local inmediato si existe
@@ -153,6 +163,8 @@ export default function GoalsBoard() {
   useEffect(() => {
     let unsubMJ = () => {};
     let unsubRep = () => {};
+    let unsubNodus = () => {};
+    let unsubManagers = () => {};
     try {
       unsubMJ = onSnapshot(collection(db, 'mj_calendars'), (snap) => {
         setMjCalendars(snap.docs.map(d => ({ id: d.id, ...d.data() })));
@@ -163,10 +175,33 @@ export default function GoalsBoard() {
         setCoordinatorReports(snap.docs.map(d => ({ id: d.id, ...d.data() })));
       }, (err) => console.warn("Error leyendo reports en GoalsBoard:", err));
     } catch (e) {
+      // Listener en tiempo real a Nodus Coordinadores C1/C2
+      const nodusDocRef = doc(db, 'nodus_coordinadores_c1c2', 'latest');
+      unsubNodus = onSnapshot(nodusDocRef, (snap) => {
+        if (snap.exists()) {
+          const d = snap.data();
+          if (d && Array.isArray(d.coordinadores) && d.coordinadores.length > 0) {
+            setNodusData(d);
+          }
+        }
+      }, (err) => {
+        console.warn('Realtime listener nodus_coordinadores_c1c2 (usando fallback):', err.message);
+      });
+
+      // Listener a managers_directory
+      const qManagers = query(collection(db, 'managers_directory'), limit(300));
+      unsubManagers = onSnapshot(qManagers, (snap) => {
+        if (!snap.empty) {
+          setManagersList(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+        }
+      }, (err) => console.warn('Listener managers_directory:', err));
+
       console.warn("Error iniciando listeners adicionales:", e);
     }
     return () => {
       unsubMJ();
+      unsubNodus();
+      unsubManagers();
       unsubRep();
     };
   }, []);
@@ -554,6 +589,138 @@ export default function GoalsBoard() {
     }
   };
 
+  // Extraer y resolver los datos de llamadas de Nodus para una meta y su equipo
+  const getTeamCallsData = (goal, parentGoal, forcedTeam = null) => {
+    if (!goal) return null;
+    
+    const goalSede = normalizeSede(goal.sede || parentGoal?.sede || currentUser?.sede || 'Lima');
+    
+    // Deteccion automatica del equipo
+    let targetTeam = forcedTeam;
+    if (!targetTeam) {
+      const fullText = `${goal.title || ''} ${parentGoal?.title || ''} ${goal.cyclePhase || ''} ${currentCycle?.name || ''}`;
+      const match = fullText.match(/(?:Equipo|E)\s*(\d+|[A-Za-z0-9]+)/i);
+      if (match) {
+        targetTeam = `EQUIPO ${match[1]}`.toUpperCase();
+      } else {
+        if (goalSede === 'Lima') targetTeam = 'EQUIPO 30';
+        else if (goalSede === 'Quito') targetTeam = 'EQUIPO 119';
+        else if (goalSede === 'Guayaquil') targetTeam = 'EQUIPO 24';
+        else if (goalSede === 'Cuenca') targetTeam = 'EQUIPO 23';
+        else targetTeam = 'EQUIPO 30';
+      }
+    }
+
+    const cleanTargetTeam = targetTeam.replace(/\s+/g, '').toUpperCase();
+    
+    // Coordinadores de la sede en Nodus
+    const allCoords = nodusData?.coordinadores || nodusFallbackData?.coordinadores || [];
+    const sedeCoords = allCoords.filter(c => normalizeSede(c.sede || '') === goalSede);
+    
+    // Lista de todos los equipos disponibles para esta sede
+    const availableTeams = Array.from(
+      new Set(
+        sedeCoords.flatMap(c => (c.equipos || []).map(e => (e.equipo || '').toUpperCase().trim())).filter(Boolean)
+      )
+    ).sort((a, b) => {
+      const numA = parseInt(a.replace(/\D/g, ''), 10) || 0;
+      const numB = parseInt(b.replace(/\D/g, ''), 10) || 0;
+      return numB - numA;
+    });
+
+    const matchingCoords = [];
+    let totalLlamadas = 0;
+    let totalConfirmados = 0;
+    let totalPorConfirmar = 0;
+    let totalNoContesta = 0;
+    let totalSiguiente = 0;
+    let totalAsistieron = 0;
+
+    sedeCoords.forEach(c => {
+      const eqMatch = (c.equipos || []).find(e => (e.equipo || '').replace(/\s+/g, '').toUpperCase() === cleanTargetTeam);
+      if (eqMatch) {
+        const llamadas = Number(eqMatch.llamadas) || 0;
+        const confirmado = Number(eqMatch.confirmado) || 0;
+        const porConfirmar = Number(eqMatch.porConfirmar) || 0;
+        const noContesta = Number(eqMatch.noContesta) || 0;
+        const siguiente = Number(eqMatch.siguiente) || 0;
+        const asistieron = Number(eqMatch.asistieron) || 0;
+
+        totalLlamadas += llamadas;
+        totalConfirmados += confirmado;
+        totalPorConfirmar += porConfirmar;
+        totalNoContesta += noContesta;
+        totalSiguiente += siguiente;
+        totalAsistieron += asistieron;
+
+        matchingCoords.push({
+          nombre: c.nombre,
+          nombreCompleto: c.nombreCompleto || c.nombre,
+          email: c.email || '',
+          rol: c.rol || 'Coordinador C1 / C2',
+          sede: c.sede || goalSede,
+          llamadas,
+          confirmados: confirmado,
+          porConfirmar,
+          noContesta,
+          siguiente,
+          asistieron,
+          efectividadPct: llamadas > 0 ? Math.round((confirmado / llamadas) * 100) : 0,
+          ultGestion: c.ultGestion || ''
+        });
+      }
+    });
+
+    const efectividadGlobal = totalLlamadas > 0 ? Math.round((totalConfirmados / totalLlamadas) * 100) : 0;
+
+    const sedeReports = coordinatorReports.filter(r => 
+      normalizeSede(r.sede || '') === goalSede && 
+      (r.type === 'Llamadas' || r.type === 'ReporteSentadosSala' || !r.type)
+    );
+
+    const teamManagers = managersList.filter(m => {
+      const mSede = normalizeSede(m.sede || '');
+      const mEq = String(m.numEquipo || m.equipo || '').toUpperCase().replace(/\s+/g, '');
+      return mSede === goalSede && (mEq === cleanTargetTeam || mEq.includes(cleanTargetTeam.replace('EQUIPO', '')));
+    });
+
+    return {
+      goalId: goal.id,
+      goalTitle: goal.title,
+      sede: goalSede,
+      teamName: targetTeam,
+      availableTeams,
+      totalLlamadas,
+      totalConfirmados,
+      totalPorConfirmar,
+      totalNoContesta,
+      totalSiguiente,
+      totalAsistieron,
+      efectividadGlobal,
+      coordinadoresList: matchingCoords,
+      sedeReports,
+      teamManagers
+    };
+  };
+
+  const handleOpenTeamCallsModal = (goal, parentGoal = null, forcedTeam = null) => {
+    const pGoal = parentGoal || goals.find(g => g.id === goal.parentId);
+    const data = getTeamCallsData(goal, pGoal, forcedTeam);
+    setSelectedGoalForTeamCalls(goal);
+    setSelectedTeamCallsData(data);
+    setTeamCallsFilterTeam(data ? data.teamName : '');
+    setTeamCallsActiveTab('coordinadoras');
+    setShowTeamCallsModal(true);
+  };
+
+  const handleTeamCallsChangeTeam = (newTeam) => {
+    if (!selectedGoalForTeamCalls) return;
+    const pGoal = goals.find(g => g.id === selectedGoalForTeamCalls.parentId);
+    const data = getTeamCallsData(selectedGoalForTeamCalls, pGoal, newTeam);
+    setSelectedTeamCallsData(data);
+    setTeamCallsFilterTeam(newTeam);
+  };
+
   const handleWizardChange = (stageId, field, value) => {
     setWizardData(prev => ({
       ...prev,
@@ -889,6 +1056,71 @@ export default function GoalsBoard() {
             </p>
 
             {/* AVANCE AUTOMÁTICO DESDE REPORTES DE COORDINADORAS */}
+            {/* AVANCE EN LLAMADAS DEL EQUIPO ACTUAL (INTERACTIVO AL DAR CLIC) */}
+            {(() => {
+              const teamCalls = getTeamCallsData(goal, parentGoal);
+              if (!teamCalls || teamCalls.totalLlamadas === 0) return null;
+
+              return (
+                <div
+                  onClick={() => handleOpenTeamCallsModal(goal, parentGoal)}
+                  role="button"
+                  tabIndex={0}
+                  className="team-calls-progress-badge"
+                  style={{
+                    marginTop: '0.65rem',
+                    padding: '0.55rem 0.85rem',
+                    borderRadius: '10px',
+                    background: 'linear-gradient(135deg, rgba(14, 165, 233, 0.12) 0%, rgba(16, 185, 129, 0.1) 100%)',
+                    border: '1px solid rgba(14, 165, 233, 0.35)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: '0.75rem',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
+                  }}
+                  title="Clic para ver el desglose detallado de llamadas del equipo actual"
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{
+                      width: '28px', height: '28px', borderRadius: '7px',
+                      background: 'rgba(14, 165, 233, 0.22)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      color: '#38bdf8', flexShrink: 0
+                    }}>
+                      <PhoneCall size={15} />
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                        <span>Llamadas {teamCalls.teamName}:</span>
+                        <span style={{ color: '#38bdf8', fontWeight: 800 }}>{teamCalls.totalLlamadas} gestiones</span>
+                        <span style={{ color: '#10b981', background: 'rgba(16, 185, 129, 0.18)', padding: '1px 6px', borderRadius: '4px', fontSize: '0.74rem', fontWeight: 700 }}>
+                          âœ“ {teamCalls.totalConfirmados} Confirmados
+                        </span>
+                        {teamCalls.totalPorConfirmar > 0 && (
+                          <span style={{ color: '#f59e0b', background: 'rgba(245, 158, 11, 0.18)', padding: '1px 6px', borderRadius: '4px', fontSize: '0.74rem', fontWeight: 700 }}>
+                            â³ {teamCalls.totalPorConfirmar} Por confirmar
+                          </span>
+                        )}
+                        <span style={{ fontSize: '0.72rem', color: 'var(--crear-gold)', fontWeight: 700 }}>
+                          ({teamCalls.efectividadGlobal}% efectividad)
+                        </span>
+                      </div>
+                      <div style={{ fontSize: '0.72rem', color: '#94a3b8', marginTop: '2px' }}>
+                        {teamCalls.coordinadoresList.length} coordinadoras activas ({teamCalls.coordinadoresList.map(c => c.nombre).join(', ')}) â€¢ <span style={{ color: '#38bdf8', textDecoration: 'underline' }}>Clic para ver detalles nominales</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '3px', color: '#38bdf8', fontSize: '0.78rem', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                    <span>Ver detalle</span>
+                    <ChevronRight size={14} />
+                  </div>
+                </div>
+              );
+            })()}
+
             {repSummary && !goal.sentadosReportados && (
               <div style={{ marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
                 <span style={{ fontSize: '0.75rem', color: '#10b981', background: 'rgba(16, 185, 129, 0.12)', padding: '3px 8px', borderRadius: '6px', border: '1px solid rgba(16, 185, 129, 0.25)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
@@ -1583,6 +1815,519 @@ export default function GoalsBoard() {
                 className="btn-secondary"
                 onClick={() => setShowLimaModal(false)}
                 style={{ padding: '0.4rem 1rem', fontSize: '0.85rem' }}
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL DETALLADO DE AVANCE Y AUDITORÃA DE LLAMADAS DEL EQUIPO */}
+      {showTeamCallsModal && selectedTeamCallsData && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.85)',
+          backdropFilter: 'blur(8px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 99999,
+          padding: '1rem'
+        }}>
+          <div style={{
+            background: '#0a1128',
+            border: '1px solid rgba(14, 165, 233, 0.35)',
+            borderRadius: '16px',
+            width: '100%',
+            maxWidth: '920px',
+            maxHeight: '90vh',
+            display: 'flex',
+            flexDirection: 'column',
+            boxShadow: '0 25px 60px rgba(0, 0, 0, 0.7), 0 0 40px rgba(14, 165, 233, 0.2)',
+            overflow: 'hidden'
+          }}>
+            {/* Modal Header */}
+            <div style={{
+              padding: '1.25rem 1.5rem',
+              borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+              background: 'linear-gradient(90deg, rgba(14, 165, 233, 0.15) 0%, rgba(16, 185, 129, 0.08) 100%)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '1rem'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <div style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '10px',
+                  background: 'rgba(14, 165, 233, 0.2)',
+                  border: '1px solid rgba(14, 165, 233, 0.4)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#38bdf8'
+                }}>
+                  <PhoneCall size={22} />
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#fff', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    Avance de Llamadas: {selectedTeamCallsData.teamName}
+                    <span style={{ fontSize: '0.75rem', background: 'rgba(14, 165, 233, 0.2)', color: '#38bdf8', padding: '2px 8px', borderRadius: '6px', border: '1px solid rgba(14, 165, 233, 0.3)' }}>
+                      Sede {selectedTeamCallsData.sede}
+                    </span>
+                  </h3>
+                  <p style={{ margin: '2px 0 0 0', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                    Meta: <strong>{selectedTeamCallsData.goalTitle}</strong> â€¢ AuditorÃ­a de llamadas y confirmaciones en tiempo real
+                  </p>
+                </div>
+              </div>
+
+              {/* Selector de Equipo y Boton Cerrar */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                {selectedTeamCallsData.availableTeams.length > 0 && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Cambiar Equipo:</span>
+                    <select
+                      value={teamCallsFilterTeam}
+                      onChange={(e) => handleTeamCallsChangeTeam(e.target.value)}
+                      style={{
+                        background: '#0f172a',
+                        border: '1px solid rgba(14, 165, 233, 0.4)',
+                        color: '#38bdf8',
+                        padding: '0.35rem 0.6rem',
+                        borderRadius: '6px',
+                        fontSize: '0.8rem',
+                        fontWeight: 700
+                      }}
+                    >
+                      {selectedTeamCallsData.availableTeams.map(t => (
+                        <option key={t} value={t}>{t}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setShowTeamCallsModal(false)}
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    color: '#94a3b8',
+                    padding: '0.4rem',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                  title="Cerrar modal"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+            </div>
+
+            {/* KPI Cards Strip */}
+            <div style={{
+              padding: '1rem 1.5rem',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+              gap: '0.75rem',
+              background: 'rgba(0, 0, 0, 0.3)',
+              borderBottom: '1px solid rgba(255, 255, 255, 0.06)'
+            }}>
+              <div style={{ background: 'rgba(14, 165, 233, 0.08)', border: '1px solid rgba(14, 165, 233, 0.25)', padding: '0.75rem', borderRadius: '10px' }}>
+                <div style={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: 600 }}>TOTAL GESTIONES</div>
+                <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#38bdf8', marginTop: '2px' }}>
+                  {selectedTeamCallsData.totalLlamadas.toLocaleString()}
+                </div>
+                <div style={{ fontSize: '0.68rem', color: '#64748b', marginTop: '2px' }}>Llamadas del equipo</div>
+              </div>
+
+              <div style={{ background: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.25)', padding: '0.75rem', borderRadius: '10px' }}>
+                <div style={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: 600 }}>CONFIRMADOS (OK)</div>
+                <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#10b981', marginTop: '2px' }}>
+                  {selectedTeamCallsData.totalConfirmados.toLocaleString()}
+                </div>
+                <div style={{ fontSize: '0.68rem', color: '#10b981', marginTop: '2px' }}>{selectedTeamCallsData.efectividadGlobal}% efectividad</div>
+              </div>
+
+              <div style={{ background: 'rgba(245, 158, 11, 0.08)', border: '1px solid rgba(245, 158, 11, 0.25)', padding: '0.75rem', borderRadius: '10px' }}>
+                <div style={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: 600 }}>POR CONFIRMAR</div>
+                <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#f59e0b', marginTop: '2px' }}>
+                  {selectedTeamCallsData.totalPorConfirmar.toLocaleString()}
+                </div>
+                <div style={{ fontSize: '0.68rem', color: '#f59e0b', marginTop: '2px' }}>En seguimiento</div>
+              </div>
+
+              <div style={{ background: 'rgba(148, 163, 184, 0.08)', border: '1px solid rgba(148, 163, 184, 0.25)', padding: '0.75rem', borderRadius: '10px' }}>
+                <div style={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: 600 }}>NO CONTESTA</div>
+                <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#cbd5e1', marginTop: '2px' }}>
+                  {selectedTeamCallsData.totalNoContesta.toLocaleString()}
+                </div>
+                <div style={{ fontSize: '0.68rem', color: '#94a3b8', marginTop: '2px' }}>Rezagados</div>
+              </div>
+
+              <div style={{ background: 'rgba(168, 85, 247, 0.08)', border: '1px solid rgba(168, 85, 247, 0.25)', padding: '0.75rem', borderRadius: '10px' }}>
+                <div style={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: 600 }}>COORDINADORAS</div>
+                <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#c084fc', marginTop: '2px' }}>
+                  {selectedTeamCallsData.coordinadoresList.length}
+                </div>
+                <div style={{ fontSize: '0.68rem', color: '#a855f7', marginTop: '2px' }}>Activas en {selectedTeamCallsData.teamName}</div>
+              </div>
+            </div>
+
+            {/* Navigation Tabs */}
+            <div style={{
+              display: 'flex',
+              gap: '0.5rem',
+              padding: '0.75rem 1.5rem',
+              borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+              background: 'rgba(0, 0, 0, 0.2)'
+            }}>
+              <button
+                type="button"
+                onClick={() => setTeamCallsActiveTab('coordinadoras')}
+                style={{
+                  background: teamCallsActiveTab === 'coordinadoras' ? 'rgba(14, 165, 233, 0.2)' : 'transparent',
+                  border: teamCallsActiveTab === 'coordinadoras' ? '1px solid #0ea5e9' : '1px solid transparent',
+                  color: teamCallsActiveTab === 'coordinadoras' ? '#38bdf8' : '#94a3b8',
+                  padding: '0.45rem 0.9rem',
+                  borderRadius: '8px',
+                  fontSize: '0.82rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+              >
+                <Users size={14} /> Desglose por Coordinadora ({selectedTeamCallsData.coordinadoresList.length})
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setTeamCallsActiveTab('reportes')}
+                style={{
+                  background: teamCallsActiveTab === 'reportes' ? 'rgba(16, 185, 129, 0.2)' : 'transparent',
+                  border: teamCallsActiveTab === 'reportes' ? '1px solid #10b981' : '1px solid transparent',
+                  color: teamCallsActiveTab === 'reportes' ? '#34d399' : '#94a3b8',
+                  padding: '0.45rem 0.9rem',
+                  borderRadius: '8px',
+                  fontSize: '0.82rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+              >
+                <FileSpreadsheet size={14} /> Reportes Oficiales ({selectedTeamCallsData.sedeReports.length})
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setTeamCallsActiveTab('managers')}
+                style={{
+                  background: teamCallsActiveTab === 'managers' ? 'rgba(168, 85, 247, 0.2)' : 'transparent',
+                  border: teamCallsActiveTab === 'managers' ? '1px solid #a855f7' : '1px solid transparent',
+                  color: teamCallsActiveTab === 'managers' ? '#c084fc' : '#94a3b8',
+                  padding: '0.45rem 0.9rem',
+                  borderRadius: '8px',
+                  fontSize: '0.82rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+              >
+                <Award size={14} /> Managers del Equipo ({selectedTeamCallsData.teamManagers.length})
+              </button>
+            </div>
+
+            {/* Modal Body / Tab Content */}
+            <div style={{ flex: 1, overflowY: 'auto', padding: '1.25rem 1.5rem' }}>
+              {/* TAB 1: COORDINADORAS */}
+              {teamCallsActiveTab === 'coordinadoras' && (
+                <div>
+                  <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                      GestiÃ³n individual de llamadas registradas para <strong>{selectedTeamCallsData.teamName}</strong>:
+                    </span>
+                    <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 600 }}>
+                      Sincronizado con Nodus CRM & Causa OS
+                    </span>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '1rem' }}>
+                    {selectedTeamCallsData.coordinadoresList.map((coord, idx) => {
+                      return (
+                        <div
+                          key={idx}
+                          style={{
+                            background: 'rgba(255, 255, 255, 0.03)',
+                            border: '1px solid rgba(255, 255, 255, 0.08)',
+                            borderRadius: '12px',
+                            padding: '1.1rem',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '0.75rem',
+                            boxShadow: '0 4px 15px rgba(0,0,0,0.2)'
+                          }}
+                        >
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                              <div style={{
+                                width: '38px',
+                                height: '38px',
+                                borderRadius: '10px',
+                                background: 'linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: '#fff',
+                                fontWeight: 800,
+                                fontSize: '0.9rem'
+                              }}>
+                                {coord.nombre.slice(0, 2).toUpperCase()}
+                              </div>
+                              <div>
+                                <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#f8fafc' }}>
+                                  {coord.nombreCompleto || coord.nombre}
+                                </div>
+                                <div style={{ fontSize: '0.72rem', color: 'var(--crear-blue)', fontWeight: 600 }}>
+                                  {coord.rol} â€¢ {coord.sede}
+                                </div>
+                              </div>
+                            </div>
+
+                            <span style={{
+                              fontSize: '0.8rem',
+                              fontWeight: 800,
+                              padding: '3px 8px',
+                              borderRadius: '6px',
+                              background: 'rgba(16, 185, 129, 0.15)',
+                              color: '#10b981',
+                              border: '1px solid rgba(16, 185, 129, 0.3)'
+                            }}>
+                              {coord.efectividadPct}% Efectividad
+                            </span>
+                          </div>
+
+                          {/* MÃ©tricas individuales */}
+                          <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(4, 1fr)',
+                            gap: '0.5rem',
+                            background: 'rgba(0, 0, 0, 0.25)',
+                            padding: '0.6rem',
+                            borderRadius: '8px',
+                            textAlign: 'center'
+                          }}>
+                            <div>
+                              <div style={{ fontSize: '0.65rem', color: '#94a3b8' }}>LLAMADAS</div>
+                              <div style={{ fontSize: '1rem', fontWeight: 800, color: '#38bdf8' }}>{coord.llamadas}</div>
+                            </div>
+                            <div>
+                              <div style={{ fontSize: '0.65rem', color: '#94a3b8' }}>CONFIRMADOS</div>
+                              <div style={{ fontSize: '1rem', fontWeight: 800, color: '#10b981' }}>{coord.confirmados}</div>
+                            </div>
+                            <div>
+                              <div style={{ fontSize: '0.65rem', color: '#94a3b8' }}>POR CONF.</div>
+                              <div style={{ fontSize: '1rem', fontWeight: 800, color: '#f59e0b' }}>{coord.porConfirmar}</div>
+                            </div>
+                            <div>
+                              <div style={{ fontSize: '0.65rem', color: '#94a3b8' }}>NO CONTESTA</div>
+                              <div style={{ fontSize: '1rem', fontWeight: 800, color: '#cbd5e1' }}>{coord.noContesta}</div>
+                            </div>
+                          </div>
+
+                          {/* Barra Visual de DistribuciÃ³n */}
+                          <div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: '#94a3b8', marginBottom: '4px' }}>
+                              <span>DistribuciÃ³n de Respuestas:</span>
+                              <span>{coord.confirmados} de {coord.llamadas} OK</span>
+                            </div>
+                            <div style={{ height: '8px', background: 'rgba(255,255,255,0.06)', borderRadius: '4px', overflow: 'hidden', display: 'flex' }}>
+                              <div style={{ width: `${coord.llamadas > 0 ? (coord.confirmados / coord.llamadas) * 100 : 0}%`, background: '#10b981' }} title={`Confirmados: ${coord.confirmados}`} />
+                              <div style={{ width: `${coord.llamadas > 0 ? (coord.porConfirmar / coord.llamadas) * 100 : 0}%`, background: '#f59e0b' }} title={`Por Confirmar: ${coord.porConfirmar}`} />
+                              <div style={{ width: `${coord.llamadas > 0 ? (coord.noContesta / coord.llamadas) * 100 : 0}%`, background: '#64748b' }} title={`No Contesta: ${coord.noContesta}`} />
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 2: REPORTES OFICIALES */}
+              {teamCallsActiveTab === 'reportes' && (
+                <div>
+                  {selectedTeamCallsData.sedeReports.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '2.5rem', color: 'var(--text-muted)' }}>
+                      <FileSpreadsheet size={40} style={{ margin: '0 auto 0.75rem auto', opacity: 0.4 }} />
+                      <p>No se registran reportes oficiales manuales aÃºn para esta sede.</p>
+                    </div>
+                  ) : (
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+                      <thead>
+                        <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', textAlign: 'left', color: 'var(--text-muted)' }}>
+                          <th style={{ padding: '0.6rem 0.5rem' }}>Fecha / Hora</th>
+                          <th style={{ padding: '0.6rem 0.5rem' }}>Coordinadora</th>
+                          <th style={{ padding: '0.6rem 0.5rem' }}>Tipo</th>
+                          <th style={{ padding: '0.6rem 0.5rem' }}>Nuevos OK</th>
+                          <th style={{ padding: '0.6rem 0.5rem' }}>Rezagados OK</th>
+                          <th style={{ padding: '0.6rem 0.5rem' }}>Total OK</th>
+                          <th style={{ padding: '0.6rem 0.5rem' }}>Observaciones</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {selectedTeamCallsData.sedeReports.map((rep, idx) => {
+                          const dt = rep.created_at ? new Date(rep.created_at).toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' }) : '-';
+                          const d = rep.data || {};
+                          return (
+                            <tr key={idx} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', background: idx % 2 === 0 ? 'rgba(255,255,255,0.01)' : 'transparent' }}>
+                              <td style={{ padding: '0.6rem 0.5rem', color: '#94a3b8' }}>{dt}</td>
+                              <td style={{ padding: '0.6rem 0.5rem', fontWeight: 600, color: '#f8fafc' }}>{rep.submitted_by || '-'}</td>
+                              <td style={{ padding: '0.6rem 0.5rem' }}>
+                                <span style={{ fontSize: '0.72rem', background: 'rgba(14, 165, 233, 0.15)', color: '#38bdf8', padding: '2px 6px', borderRadius: '4px' }}>
+                                  {rep.type || 'Llamadas'}
+                                </span>
+                              </td>
+                              <td style={{ padding: '0.6rem 0.5rem', color: '#10b981', fontWeight: 700 }}>{d.nuevos_OK || 0}</td>
+                              <td style={{ padding: '0.6rem 0.5rem', color: '#f59e0b', fontWeight: 700 }}>{d.rezagados_OK || 0}</td>
+                              <td style={{ padding: '0.6rem 0.5rem', color: 'var(--crear-gold)', fontWeight: 800 }}>{d.totalOk || d.sentados || 0}</td>
+                              <td style={{ padding: '0.6rem 0.5rem', color: '#94a3b8', fontSize: '0.8rem', maxWidth: '240px' }}>
+                                {d.observaciones || rep.observaciones || '-'}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  )}
+                </div>
+              )}
+
+              {/* TAB 3: MANAGERS DEL EQUIPO */}
+              {teamCallsActiveTab === 'managers' && (
+                <div>
+                  {selectedTeamCallsData.teamManagers.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '2.5rem', color: 'var(--text-muted)' }}>
+                      <Award size={40} style={{ margin: '0 auto 0.75rem auto', opacity: 0.4 }} />
+                      <p>No se encontraron managers registrados explÃ­citamente con {selectedTeamCallsData.teamName} en esta sede.</p>
+                      <span style={{ fontSize: '0.75rem' }}>Los participantes inscritos se gestionan directamente en la pestaÃ±a de coordinadoras.</span>
+                    </div>
+                  ) : (
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+                      <thead>
+                        <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', textAlign: 'left', color: 'var(--text-muted)' }}>
+                          <th style={{ padding: '0.6rem 0.5rem' }}>Manager</th>
+                          <th style={{ padding: '0.6rem 0.5rem' }}>Rol</th>
+                          <th style={{ padding: '0.6rem 0.5rem' }}>Entrenador Asignado</th>
+                          <th style={{ padding: '0.6rem 0.5rem' }}>TelÃ©fono</th>
+                          <th style={{ padding: '0.6rem 0.5rem' }}>Estado</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {selectedTeamCallsData.teamManagers.map((mgr, idx) => (
+                          <tr key={idx} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                            <td style={{ padding: '0.6rem 0.5rem', fontWeight: 600, color: '#f8fafc' }}>{mgr.nombre}</td>
+                            <td style={{ padding: '0.6rem 0.5rem' }}>
+                              <span style={{ fontSize: '0.72rem', background: 'rgba(168, 85, 247, 0.15)', color: '#c084fc', padding: '2px 6px', borderRadius: '4px' }}>
+                                {mgr.rol || 'MANAGER'}
+                              </span>
+                            </td>
+                            <td style={{ padding: '0.6rem 0.5rem', color: 'var(--crear-gold)', fontWeight: 600 }}>{mgr.entrenador || 'Sin asignar'}</td>
+                            <td style={{ padding: '0.6rem 0.5rem', color: '#94a3b8' }}>{mgr.telefono || '-'}</td>
+                            <td style={{ padding: '0.6rem 0.5rem' }}>
+                              <span style={{
+                                fontSize: '0.72rem',
+                                fontWeight: 700,
+                                padding: '2px 6px',
+                                borderRadius: '4px',
+                                background: mgr.estado === 'Activo' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                                color: mgr.estado === 'Activo' ? '#10b981' : '#ef4444'
+                              }}>
+                                {mgr.estado || 'Activo'}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div style={{
+              padding: '1rem 1.5rem',
+              borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+              background: 'rgba(0, 0, 0, 0.4)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '1rem'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
+                  Avance Actual de la Meta: <strong>{selectedGoalForTeamCalls?.currentValue || 0}</strong> de <strong>{selectedGoalForTeamCalls?.targetValue || 0}</strong>
+                </span>
+                {canManageGoals && selectedTeamCallsData.totalConfirmados > 0 && (
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      try {
+                        const targetVal = Number(selectedGoalForTeamCalls?.targetValue || 1);
+                        const newPct = Math.min(100, Math.round((selectedTeamCallsData.totalConfirmados / targetVal) * 100));
+                        await updateDoc(doc(db, 'goals', selectedGoalForTeamCalls.id), {
+                          currentValue: selectedTeamCallsData.totalConfirmados,
+                          progress: newPct,
+                          updatedAt: new Date().toISOString()
+                        });
+                        await performRollUp(selectedGoalForTeamCalls.id, newPct);
+                        showToast(`âš¡ Meta sincronizada con ${selectedTeamCallsData.totalConfirmados} confirmados (${newPct}%).`, 'success');
+                        setShowTeamCallsModal(false);
+                      } catch (err) {
+                        showToast('Error sincronizando avance: ' + err.message, 'error');
+                      }
+                    }}
+                    style={{
+                      background: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)',
+                      border: '1px solid #38bdf8',
+                      color: '#fff',
+                      padding: '0.4rem 0.8rem',
+                      borderRadius: '8px',
+                      fontSize: '0.78rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}
+                  >
+                    <Sparkles size={13} /> Sincronizar Confirmados ({selectedTeamCallsData.totalConfirmados}/{selectedGoalForTeamCalls?.targetValue})
+                  </button>
+                )}
+              </div>
+
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={() => setShowTeamCallsModal(false)}
+                style={{ padding: '0.45rem 1.2rem', fontSize: '0.85rem' }}
               >
                 Cerrar
               </button>
