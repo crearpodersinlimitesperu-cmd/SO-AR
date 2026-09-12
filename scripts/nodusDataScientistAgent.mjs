@@ -21,9 +21,9 @@ export function normalizeSedeName(raw) {
   if (s.includes('quito')) return 'Quito';
   if (s.includes('cuenca')) return 'Cuenca';
   if (s.includes('guayaquil') || s.includes('gye')) return 'Guayaquil';
-  if (s.includes('medellin')) return 'Medellin';
+  if (s.includes('medellin')) return 'MedellÃ­n';
   if (s.includes('lima')) return 'Lima';
-  if (s.includes('mexico') || s.includes('cdmx')) return 'CDMX';
+  if (s.includes('mex') || s.includes('cdmx')) return 'MÃ©xico';
   return raw.trim();
 }
 
@@ -331,51 +331,53 @@ export class NodusDataScientistAgent {
     const TICKET_PROMEDIO_USD = 360; // Ticket promedio de matrícula C1/C2
     const CONVERSION_PROSPECTO_BASE = 0.165; // Tasa de conversión promedio estimada (16.5%)
 
-    // 1. CÁLCULOS POR SEDE
+        // 1. CÃLCULOS POR SEDE
     const sedesPredictions = {};
-    const sedesList = ['Quito', 'Cuenca', 'Guayaquil', 'Medellin', 'Lima', 'CDMX'];
+    const sedesList = ['Lima', 'Quito', 'Cuenca', 'Guayaquil', 'MedellÃ­n', 'MÃ©xico'];
 
     for (const sede of sedesList) {
       const coords = coordinadoresPorSede[sede] || [];
       const prosps = prospectosPorSede[sede] || [];
 
-      const totalLlamadas = coords.reduce((acc, c) => acc + (c.llamadas || 0), 0);
-      const totalConfirmados = coords.reduce((acc, c) => acc + (c.confirmados || 0), 0);
-      const totalNoContesta = coords.reduce((acc, c) => acc + (c.noContesta || 0), 0);
-      const totalPorConfirmar = coords.reduce((acc, c) => acc + (c.porConfirmar || 0), 0);
-      const totalNoInteresa = coords.reduce((acc, c) => acc + (c.noInteresa || 0), 0);
+      const totalLlamadas = coords.reduce((acc, c) => acc + Number(c.gestiones || c.llamadas || 0), 0);
+      const totalConfirmados = coords.reduce((acc, c) => acc + Number(c.estados?.confirmado ?? c.confirmados ?? ((c.confirmadosC1 || 0) + (c.confirmadosC2 || 0)) ?? 0), 0);
+      const totalSentados = coords.reduce((acc, c) => acc + Number(c.sentadosTotal ?? c.asistieron ?? ((c.sentadosC1 || 0) + (c.sentadosC2 || 0)) ?? 0), 0);
+      const totalNoContesta = coords.reduce((acc, c) => acc + Number(c.estados?.noContesta ?? c.noContesta ?? 0), 0);
+      const totalPorConfirmar = coords.reduce((acc, c) => acc + Number(c.estados?.porConfirmar ?? c.porConfirmar ?? 0), 0);
+      const totalNoInteresa = coords.reduce((acc, c) => acc + Number(c.estados?.noInteresa ?? c.noInteresa ?? 0), 0);
 
-      // Tasa de conversión empírica
+      // Tasa de conversiÃ³n empÃ­rica
       const llamadasContactadas = totalConfirmados + totalNoInteresa + totalPorConfirmar;
-      const tasaConversion = llamadasContactadas > 0 ? (totalConfirmados / llamadasContactadas) * 100 : 0;
+      const tasaConversion = llamadasContactadas > 0 
+        ? (totalConfirmados / llamadasContactadas) * 100 
+        : (totalLlamadas > 0 ? (totalConfirmados / totalLlamadas) * 100 : 0);
 
-      // Riesgo de deserción FDS: Ponderación de desinterés y pendientes
-      const baseRiesgo = llamadasContactadas > 0
-        ? ((totalNoInteresa * 1.0 + totalPorConfirmar * 0.4 + totalNoContesta * 0.2) / (totalLlamadas || 1)) * 100
-        : fdsData.tasaDesercionFDS;
-      const riesgoFDS = Math.min(100, Math.max(5, parseFloat(baseRiesgo.toFixed(1))));
+      // Riesgo de deserciÃ³n FDS: PonderaciÃ³n de desinterÃ©s y retenciÃ³n
+      const riesgoFDS = totalConfirmados > 0
+        ? Math.max(5, Math.min(45, Math.round(((totalConfirmados - totalSentados) / totalConfirmados) * 1000) / 10))
+        : (fdsData?.tasaDesercionFDS || 20.3);
 
-      // Potencial de recaudación
+      // Potencial de recaudaciÃ³n
       const prospectosCount = prosps.length;
       const recuperablesEstimados = Math.round(prospectosCount * CONVERSION_PROSPECTO_BASE);
       const ingresoRecuperableUSD = recuperablesEstimados * TICKET_PROMEDIO_USD;
 
       // Score de Salud Predictiva (0 a 100)
-      const convScore = Math.min(100, tasaConversion * 1.5);
+      const convScore = Math.min(100, tasaConversion);
       const retScore = Math.max(0, 100 - riesgoFDS);
-      const volScore = Math.min(100, (totalConfirmados / (coords.length * 15 || 1)) * 100);
-      const scoreSalud = Math.round((convScore * 0.4) + (retScore * 0.4) + (volScore * 0.2));
+      const volScore = Math.min(100, (totalConfirmados / Math.max(1, coords.length * 30)) * 100);
+      const scoreSalud = Math.min(100, Math.max(20, Math.round((convScore * 0.4) + (retScore * 0.4) + (volScore * 0.2))));
 
       let semaforo = 'ESTABLE';
-      if (scoreSalud >= 80) semaforo = 'EXCELENTE';
-      else if (scoreSalud < 60 && scoreSalud >= 40) semaforo = 'ALERTA';
-      else if (scoreSalud < 40) semaforo = 'CRITICO';
+      if (scoreSalud >= 75) semaforo = 'EXCELENTE';
+      else if (scoreSalud < 50) semaforo = 'ALERTA';
 
       sedesPredictions[sede] = {
         sede,
         totalCoordinadores: coords.length,
         totalLlamadas,
         totalConfirmados,
+        totalSentados,
         totalNoContesta,
         totalPorConfirmar,
         totalNoInteresa,
@@ -386,30 +388,37 @@ export class NodusDataScientistAgent {
         ingresoRecuperableUSD,
         scoreSalud,
         semaforo,
-        etaCumplimiento: totalConfirmados > 50 ? 'En Ritmo (Proyección 100% alcanzable)' : 'Requiere aceleración de llamadas'
+        etaCumplimiento: totalConfirmados > 50 ? 'En Ritmo (ProyecciÃ³n 100% alcanzable)' : 'Requiere aceleraciÃ³n de llamadas'
       };
     }
 
-    // 2. CÁLCULO GLOBAL CONSOLIDADO
-    const totalLlamadasGlobal = totales.totalGestiones || coordinadores.reduce((a, b) => a + (b.llamadas || 0), 0);
-    const totalConfirmadosGlobal = totales.totalConfirmados || coordinadores.reduce((a, b) => a + (b.confirmados || 0), 0);
-    const totalNoContestaGlobal = totales.totalNoContesta || coordinadores.reduce((a, b) => a + (b.noContesta || 0), 0);
-    const totalPorConfirmarGlobal = totales.totalPorConfirmar || coordinadores.reduce((a, b) => a + (b.porConfirmar || 0), 0);
-    const totalNoInteresaGlobal = totales.totalNoInteresa || coordinadores.reduce((a, b) => a + (b.noInteresa || 0), 0);
+    // Aliases para compatibilidad histÃ³rica
+    if (sedesPredictions['MÃ©xico']) sedesPredictions['CDMX'] = sedesPredictions['MÃ©xico'];
+    if (sedesPredictions['MedellÃ­n']) sedesPredictions['Medellin'] = sedesPredictions['MedellÃ­n'];
+
+    // 2. CÃLCULO GLOBAL CONSOLIDADO
+    const totalLlamadasGlobal = totales.totalGestiones || coordinadores.reduce((a, c) => a + Number(c.gestiones || c.llamadas || 0), 0);
+    const totalConfirmadosGlobal = totales.totalConfirmados || coordinadores.reduce((a, c) => a + Number(c.estados?.confirmado ?? c.confirmados ?? ((c.confirmadosC1 || 0) + (c.confirmadosC2 || 0)) ?? 0), 0);
+    const totalSentadosGlobal = totales.totalSentados || coordinadores.reduce((a, c) => a + Number(c.sentadosTotal ?? c.asistieron ?? ((c.sentadosC1 || 0) + (c.sentadosC2 || 0)) ?? 0), 0);
+    const totalNoContestaGlobal = totales.totalNoContesta || coordinadores.reduce((a, c) => a + Number(c.estados?.noContesta ?? c.noContesta ?? 0), 0);
+    const totalPorConfirmarGlobal = totales.totalPorConfirmar || coordinadores.reduce((a, c) => a + Number(c.estados?.porConfirmar ?? c.porConfirmar ?? 0), 0);
+    const totalNoInteresaGlobal = totales.totalNoInteresa || coordinadores.reduce((a, c) => a + Number(c.estados?.noInteresa ?? c.noInteresa ?? 0), 0);
 
     const contactadasGlobal = totalConfirmadosGlobal + totalNoInteresaGlobal + totalPorConfirmarGlobal;
     const tasaConversionGlobal = contactadasGlobal > 0 ? (totalConfirmadosGlobal / contactadasGlobal) * 100 : 0;
-    const riesgoFDSGlobal = fdsData.tasaDesercionFDS || 23.7;
+    const riesgoFDSGlobal = totalConfirmadosGlobal > 0
+      ? Math.max(5, Math.min(45, Math.round(((totalConfirmadosGlobal - totalSentadosGlobal) / totalConfirmadosGlobal) * 1000) / 10))
+      : (fdsData.tasaDesercionFDS || 23.7);
 
     const totalProspectosSinPago = prospectos.length;
     const totalRecuperablesGlobal = Math.round(totalProspectosSinPago * CONVERSION_PROSPECTO_BASE);
     const totalIngresoRecuperableUSD = totalRecuperablesGlobal * TICKET_PROMEDIO_USD;
 
-    const scoreSaludGlobal = Math.round(
-      (Math.min(100, tasaConversionGlobal * 1.5) * 0.4) +
+    const scoreSaludGlobal = Math.min(100, Math.max(20, Math.round(
+      (Math.min(100, tasaConversionGlobal) * 0.4) +
       ((100 - riesgoFDSGlobal) * 0.4) +
-      (Math.min(100, (totalConfirmadosGlobal / (coordinadores.length * 15 || 1)) * 100) * 0.2)
-    );
+      (Math.min(100, (totalConfirmadosGlobal / Math.max(1, coordinadores.length * 30)) * 100) * 0.2)
+    )));
 
     const globalPrediction = {
       totalCoordinadores: coordinadores.length,
