@@ -1,6 +1,7 @@
-﻿import { db } from './firebase';
+import { db } from './firebase';
 import { collection, getDocs, doc, writeBatch } from 'firebase/firestore';
 import { usersData, normalizeRole, findUserByAnyEmail, ROLE_DISPLAY_NAMES } from '../data/usersData';
+import { DUAL_ROLE_TRAINER_EMAILS } from '../config/permissions';
 
 /**
  * AGENTE SUPERVISOR DE INTEGRIDAD Y COHERENCIA DE ROLES EN LÍNEA (Causa OS Sentinel)
@@ -87,6 +88,21 @@ export async function runRoleIntegrityAuditAndHeal(options = { dryRun: false }) 
           targetRoles = targetRoles.filter(r => r !== 'coordinador');
           needsUpdate = true;
           issues.push("Rol genérico 'coordinador' purgado para evitar colapso administrativo");
+        }
+
+        // Si es coordinador oficial y NO es dual trainer, PURGAR 'entrenador' espurio
+        const isDualTrainer = email ? DUAL_ROLE_TRAINER_EMAILS.includes(email.toLowerCase()) : false;
+        if (canonicalOfficial === 'coord_c1' || canonicalOfficial === 'coord_maestria' || canonicalOfficial === 'director_maestria') {
+          if (!isDualTrainer && targetRoles.includes('entrenador')) {
+            targetRoles = targetRoles.filter(r => r !== 'entrenador');
+            needsUpdate = true;
+            issues.push("Rol 'entrenador' espurio purgado de coordinador");
+          }
+          if ((!officialProfile.roles || !officialProfile.roles.includes('manager')) && targetRoles.includes('manager')) {
+            targetRoles = targetRoles.filter(r => r !== 'manager');
+            needsUpdate = true;
+            issues.push("Rol 'manager' espurio purgado de coordinador");
+          }
         }
       } else {
         // Para usuarios no encontrados en catálogo estático:
