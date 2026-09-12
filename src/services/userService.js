@@ -1,7 +1,7 @@
-// Servicio de Directorio y Gestión de Usuarios para Producción
 import { db } from './firebase';
 import { doc, getDoc, setDoc, collection, getDocs, query, where } from 'firebase/firestore';
-import { usersData, normalizeRole } from '../data/usersData';
+import { usersData, normalizeRole, findUserByAnyEmail } from '../data/usersData';
+
 
 /**
  * Busca y verifica un usuario en Firestore por email.
@@ -141,12 +141,48 @@ export async function getAllCompanyUsers() {
       const uData = docSnap.data();
       const candidateKeys = emailKeysOf(uData);
       const existingIdx = candidateKeys.size > 0 ? findExistingIndex(candidateKeys) : -1;
+      
+      // Respaldo contra catálogo fidedigno oficial para prevenir colapsos de cargos
+      const primaryEmail = deriveEmail(uData);
+      const officialProfile = primaryEmail ? findUserByAnyEmail(primaryEmail) : null;
+      let finalRole = uData.role;
+      let finalRoles = Array.isArray(uData.roles) ? [...uData.roles] : (uData.role ? [uData.role] : []);
+      let finalSede = uData.sede;
+
+      if (officialProfile) {
+        // Si en Firestore está como 'coordinador' genérico o ausente, restaurar su cargo específico
+        if (!finalRole || finalRole === 'coordinador' || finalRole === 'coordinadora' || finalRole === 'miembro' || finalRole === 'colaborador') {
+          finalRole = officialProfile.role;
+        }
+        if (!finalSede || finalSede === 'Global') {
+          finalSede = officialProfile.sede || finalSede;
+        }
+        if (officialProfile.role && !finalRoles.includes(officialProfile.role)) {
+          finalRoles.push(officialProfile.role);
+        }
+        // Si es coordinador específico, purgar el 'coordinador' administrativo genérico
+        if (officialProfile.role === 'coord_c1' || officialProfile.role === 'coord_maestria' || officialProfile.role === 'director_maestria') {
+          finalRoles = finalRoles.filter(r => r !== 'coordinador');
+        }
+      }
+
+      // Deduplicar y limpiar roles
+      finalRoles = Array.from(new Set(finalRoles.filter(r => r && r !== 'undefined' && r !== 'null' && r !== 'student')));
+
+      const enrichedUser = {
+        ...uData,
+        role: finalRole || uData.role,
+        roles: finalRoles.length > 0 ? finalRoles : (finalRole ? [finalRole] : []),
+        sede: finalSede || uData.sede
+      };
+
       if (existingIdx !== -1) {
-        allUsers[existingIdx] = withCanonicalEmail({ ...uData, ...allUsers[existingIdx] });
+        allUsers[existingIdx] = withCanonicalEmail({ ...enrichedUser, ...allUsers[existingIdx] });
         return;
       }
-      allUsers.push(withCanonicalEmail({ id: docSnap.id, ...uData }));
+      allUsers.push(withCanonicalEmail({ id: docSnap.id, ...enrichedUser }));
     });
+
 
     // Agregar QT (y, cuando la persona ya existe como "users", rellenar sus campos
     // de contacto de QT en vez de descartarlos).
