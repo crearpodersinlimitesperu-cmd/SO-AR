@@ -40,7 +40,7 @@ import {
   Sparkles, ToggleLeft, ToggleRight, Archive, RotateCcw, X,
   Edit3, Trash2, UserPlus, Shield, Crown, Check, CheckSquare, Square,
   ShieldCheck, Lock, AlertTriangle, Target, ArrowUpDown, ArrowUp, ArrowDown,
-  BarChart3, GitMerge
+  BarChart3, GitMerge, ArrowRight
 } from 'lucide-react';
 import CMJDashboard from '../components/CMJDashboard';
 import KPIsEntrenadoresLlamadas from '../components/KPIsEntrenadoresLlamadas';
@@ -419,7 +419,8 @@ export default function CentroManagers() {
     sourceTeam: '',
     targetTeam: '',
     isMerging: false,
-    confirmedWarning: false
+    confirmedWarning: false,
+    reassignCoach: true
   });
 
   // Modal del Supervisor de Datos e Idoneidad Nodus
@@ -1711,16 +1712,81 @@ export default function CentroManagers() {
     setEditTeamModal(null);
   };
 
-  // FUSIÓN DE EQUIPOS (Unir varios equipos con advertencia)
-  const handleOpenMergeTeams = () => {
-    const defaultSede = filterSede || (OPERATIONAL_SEDES.includes(normalizeSede(currentUser?.sede)) ? normalizeSede(currentUser?.sede) : OPERATIONAL_SEDES[0]);
+  // Extrae y consolida todos los equipos operativos de una sede (con miembros, conteos, capitanes y coaches)
+  const getTeamsForSede = (sedeName) => {
+    const norm = normalizeSede(sedeName);
+    const teamMap = {};
+
+    managers.forEach(m => {
+      if (normalizeSede(m.sede) !== norm) return;
+      const cleanEquipo = (m.equipo || '').trim();
+      const cleanNum = m.numEquipo ? String(m.numEquipo).trim() : '';
+      
+      // Identificador clave único del equipo en la sede
+      const teamKey = cleanEquipo || (cleanNum ? `Equipo #${cleanNum}` : 'Sin Equipo');
+      if (teamKey === 'Sin Equipo') return;
+
+      if (!teamMap[teamKey]) {
+        teamMap[teamKey] = {
+          key: teamKey,
+          equipo: cleanEquipo,
+          numEquipo: cleanNum,
+          sede: norm,
+          members: [],
+          capitanes: [],
+          entrenadores: new Set(),
+          coordinador: m.coordinador || ''
+        };
+      }
+
+      teamMap[teamKey].members.push(m);
+      if (cleanNum && !teamMap[teamKey].numEquipo) {
+        teamMap[teamKey].numEquipo = cleanNum;
+      }
+      if (m.coordinador && !teamMap[teamKey].coordinador) {
+        teamMap[teamKey].coordinador = m.coordinador;
+      }
+      if (m.entrenador) {
+        parseTrainersList(m.entrenador).forEach(t => teamMap[teamKey].entrenadores.add(t));
+      }
+      if ((m.rol || '').toLowerCase().includes('capitan')) {
+        teamMap[teamKey].capitanes.push(m.nombre || 'Capitán');
+      }
+    });
+
+    return Object.values(teamMap).map(t => {
+      const coachList = Array.from(t.entrenadores).join(', ') || 'Sin Coach';
+      const capitanList = t.capitanes.length > 0 ? ` (Cap: ${t.capitanes.slice(0, 2).join(', ')})` : '';
+      const displayName = t.equipo ? `${t.equipo} ${t.numEquipo ? '(#' + t.numEquipo + ')' : ''}` : `Equipo #${t.numEquipo}`;
+      return {
+        ...t,
+        membersCount: t.members.length,
+        coachList,
+        displayName,
+        label: `${displayName} — ${t.members.length} integrante(s) — Coach: ${coachList}${capitanList}`
+      };
+    }).sort((a, b) => a.displayName.localeCompare(b.displayName));
+  };
+
+  // FUSIÓN DE EQUIPOS (Unir varios equipos con advertencia y trazabilidad)
+  const handleOpenMergeTeams = (preselectedTeam = null) => {
+    const defaultSede = preselectedTeam?.sede || filterSede || (OPERATIONAL_SEDES.includes(normalizeSede(currentUser?.sede)) ? normalizeSede(currentUser?.sede) : OPERATIONAL_SEDES[0]);
+    
+    let initialSource = '';
+    if (preselectedTeam) {
+      const cleanEq = (preselectedTeam.equipo || '').trim();
+      const cleanNum = preselectedTeam.numEquipo ? String(preselectedTeam.numEquipo).trim() : '';
+      initialSource = cleanEq || (cleanNum ? `Equipo #${cleanNum}` : '');
+    }
+
     setMergeModal({
       isOpen: true,
       sede: defaultSede,
-      sourceTeam: '',
+      sourceTeam: initialSource,
       targetTeam: '',
       isMerging: false,
-      confirmedWarning: false
+      confirmedWarning: false,
+      reassignCoach: true
     });
   };
 
@@ -1732,64 +1798,68 @@ export default function CentroManagers() {
       return showToast("El equipo origen y el equipo destino deben ser diferentes.", "error");
     }
     if (!mergeModal.confirmedWarning) {
-      return showToast("Debes confirmar haber leído la advertencia antes de proceder con la fusión.", "warning");
+      return showToast("Debes confirmar haber verificado los equipos antes de proceder con la unión.", "warning");
     }
 
     try {
       setMergeModal(prev => ({ ...prev, isMerging: true }));
       const normSede = normalizeSede(mergeModal.sede);
-      const sourceName = mergeModal.sourceTeam.trim();
-      const targetName = mergeModal.targetTeam.trim();
+      const teamsInSede = getTeamsForSede(normSede);
+      const sourceTeamObj = teamsInSede.find(t => t.key === mergeModal.sourceTeam);
+      const targetTeamObj = teamsInSede.find(t => t.key === mergeModal.targetTeam);
 
-      // Obtener todos los integrantes del equipo origen
-      const sourceMembers = managers.filter(m => 
-        normalizeSede(m.sede) === normSede && (m.equipo || '').trim().toUpperCase() === sourceName.toUpperCase()
-      );
-
-      if (sourceMembers.length === 0) {
-        showToast(`No se encontraron integrantes en el equipo origen "${sourceName}".`, "error");
+      if (!sourceTeamObj || !targetTeamObj) {
+        showToast("No se encontraron los datos completos de los equipos seleccionados.", "error");
         setMergeModal(prev => ({ ...prev, isMerging: false }));
         return;
       }
 
-      // Buscar configuración del equipo destino
-      const targetRef = managers.find(m => 
-        normalizeSede(m.sede) === normSede && (m.equipo || '').trim().toUpperCase() === targetName.toUpperCase()
-      );
+      const sourceMembers = sourceTeamObj.members;
+      if (!sourceMembers || sourceMembers.length === 0) {
+        showToast(`No se encontraron integrantes activos en el equipo origen "${sourceTeamObj.displayName}".`, "error");
+        setMergeModal(prev => ({ ...prev, isMerging: false }));
+        return;
+      }
 
-      const targetNum = targetRef?.numEquipo || '';
-      const targetCoord = targetRef?.coordinador || '';
-      const targetTrainer = targetRef?.entrenador || '';
+      // Configuración consolidada del equipo receptor
+      const targetName = targetTeamObj.equipo || (targetTeamObj.numEquipo ? `Equipo #${targetTeamObj.numEquipo}` : targetTeamObj.key);
+      const targetNum = targetTeamObj.numEquipo || '';
+      const targetCoord = targetTeamObj.coordinador || '';
+      const targetTrainer = targetTeamObj.coachList !== 'Sin Coach' ? targetTeamObj.coachList : '';
 
       const batch = writeBatch(db);
       sourceMembers.forEach(m => {
         const docKey = String(m.docId || m.id);
         const docRef = doc(db, 'managers_directory', docKey);
-        batch.set(docRef, {
-          ...m,
+        
+        const updatePayload = {
           equipo: targetName,
           numEquipo: targetNum,
-          coordinador: targetCoord || m.coordinador,
-          entrenador: targetTrainer || m.entrenador,
-          tieneEntrenador: (targetTrainer || m.entrenador) ? 'Si' : 'No',
-          mergedFrom: sourceName,
+          coordinador: targetCoord || m.coordinador || '',
+          mergedFrom: sourceTeamObj.displayName,
           mergedAt: new Date().toISOString()
-        }, { merge: true });
+        };
+
+        if (mergeModal.reassignCoach && targetTrainer) {
+          updatePayload.entrenador = targetTrainer;
+          updatePayload.tieneEntrenador = 'Si';
+        }
+
+        batch.set(docRef, updatePayload, { merge: true });
       });
 
       await batch.commit();
 
-      // Actualizar estado local
+      // Actualizar estado local reactivo inmediatamente
       setManagers(prev => prev.map(m => {
-        const isSource = normalizeSede(m.sede) === normSede && (m.equipo || '').trim().toUpperCase() === sourceName.toUpperCase();
+        const isSource = sourceMembers.some(sm => String(sm.docId || sm.id) === String(m.docId || m.id));
         if (isSource) {
           return {
             ...m,
             equipo: targetName,
             numEquipo: targetNum,
-            coordinador: targetCoord || m.coordinador,
-            entrenador: targetTrainer || m.entrenador,
-            tieneEntrenador: (targetTrainer || m.entrenador) ? 'Si' : 'No'
+            coordinador: targetCoord || m.coordinador || '',
+            ...(mergeModal.reassignCoach && targetTrainer ? { entrenador: targetTrainer, tieneEntrenador: 'Si' } : {})
           };
         }
         return m;
@@ -1798,11 +1868,11 @@ export default function CentroManagers() {
       recordAuditEvent({
         action: 'FUSION_EQUIPOS_OPERATIVOS',
         user: currentUser?.email || currentUser?.name || 'Usuario',
-        details: `Fusión de equipos en ${normSede}: "${sourceName}" fusionado hacia "${targetName}". ${sourceMembers.length} integrantes transferidos permanentemente.`
+        details: `Fusión de equipos en ${normSede}: "${sourceTeamObj.displayName}" (${sourceMembers.length} integrantes) transferidos permanentemente hacia "${targetTeamObj.displayName}".`
       });
 
-      showToast(`¡Fusión completada! Se transfirieron ${sourceMembers.length} integrantes de "${sourceName}" hacia "${targetName}".`, "success");
-      setMergeModal({ isOpen: false, sede: '', sourceTeam: '', targetTeam: '', isMerging: false, confirmedWarning: false });
+      showToast(`¡Fusión completada! Se transfirieron ${sourceMembers.length} integrantes de "${sourceTeamObj.displayName}" hacia "${targetTeamObj.displayName}".`, "success");
+      setMergeModal({ isOpen: false, sede: '', sourceTeam: '', targetTeam: '', isMerging: false, confirmedWarning: false, reassignCoach: true });
 
     } catch (e) {
       console.error("Error al fusionar equipos:", e);
@@ -2129,6 +2199,16 @@ export default function CentroManagers() {
                   }} title="Limpiar Filtros de Búsqueda y Ordenamiento" style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', padding: '0.55rem 0.8rem', borderRadius: '6px', border: `1px solid ${borderLight}`, background: 'transparent', color: textMuted, fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}>
                     <RotateCcw size={14} /> Restaurar Filtros
                   </button>
+
+                {(userCanAdd || userCanAssign || canChangeStatus) && (
+                  <button
+                    onClick={() => handleOpenMergeTeams()}
+                    title="Unir varios equipos consolidando capitanes, managers y avances"
+                    style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.6rem 1rem', borderRadius: '6px', border: '1px solid #f59e0b', background: 'rgba(245, 158, 11, 0.1)', color: '#d97706', fontWeight: 700, cursor: 'pointer', fontSize: '0.82rem', whiteSpace: 'nowrap' }}
+                  >
+                    <GitMerge size={16} /> 🔀 Unir Equipos
+                  </button>
+                )}
 
                 {userCanAdd && (
                   <button onClick={() => setShowModal(true)} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.6rem 1.2rem', borderRadius: '6px', border: 'none', background: '#3b82f6', color: '#fff', fontWeight: 600, cursor: 'pointer', boxShadow: '0 2px 4px rgba(59,130,246,0.3)' }}>
@@ -2500,17 +2580,28 @@ export default function CentroManagers() {
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                             <h3 style={{ margin: 0, color: textDark, fontSize: '1.15rem', display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 800 }}>
                               <CountryFlag sede={t.sede} />
-                              {t.equipo} {t.numEquipo ? `(#${t.numEquipo})` : ''}
+                              {t.equipo || 'Equipo'} {t.numEquipo ? `(#${t.numEquipo})` : ''}
                             </h3>
-                            {userCanAdd && (
-                              <button
-                                onClick={() => handleOpenEditTeam(t)}
-                                title="Editar Equipo y Miembros"
-                                style={{ background: '#f1f5f9', border: `1px solid ${borderLight}`, color: '#2563eb', padding: '0.25rem 0.5rem', borderRadius: '6px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}
-                              >
-                                <Edit3 size={12} /> Editar
-                              </button>
-                            )}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                              {(userCanAdd || userCanAssign || canChangeStatus) && (
+                                <button
+                                  onClick={() => handleOpenMergeTeams(t)}
+                                  title={`Unir / Fusionar el equipo ${t.equipo || '#' + t.numEquipo} con otro equipo`}
+                                  style={{ background: '#fffbeb', border: '1px solid #fde68a', color: '#b45309', padding: '0.25rem 0.5rem', borderRadius: '6px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}
+                                >
+                                  <GitMerge size={12} /> Unir
+                                </button>
+                              )}
+                              {userCanAdd && (
+                                <button
+                                  onClick={() => handleOpenEditTeam(t)}
+                                  title="Editar Equipo y Miembros"
+                                  style={{ background: '#f1f5f9', border: `1px solid ${borderLight}`, color: '#2563eb', padding: '0.25rem 0.5rem', borderRadius: '6px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}
+                                >
+                                  <Edit3 size={12} /> Editar
+                                </button>
+                              )}
+                            </div>
                           </div>
                           
                           {/* LISTA DE ENTRENADORES ASIGNADOS */}
@@ -2641,10 +2732,32 @@ export default function CentroManagers() {
                     })()}
 
                     {/* BOTONES DE ACCION DEL EQUIPO */}
-                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                      <button onClick={() => openGroupModal(t)} style={{ flex: 1, padding: '0.65rem', borderRadius: '8px', border: 'none', background: '#d97706', color: '#fff', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', boxShadow: '0 2px 4px rgba(217,119,6,0.2)' }}>
+                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                      <button onClick={() => openGroupModal(t)} style={{ flex: '1 1 130px', padding: '0.65rem', borderRadius: '8px', border: 'none', background: '#d97706', color: '#fff', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', boxShadow: '0 2px 4px rgba(217,119,6,0.2)' }}>
                         <PhoneCall size={16} /> Llamada Grupal
                       </button>
+                      {(userCanAdd || userCanAssign || canChangeStatus) && (
+                        <button
+                          onClick={() => handleOpenMergeTeams(t)}
+                          title={`Unir / Fusionar el equipo ${t.equipo || '#' + t.numEquipo} con otro equipo`}
+                          style={{
+                            padding: '0.65rem 0.85rem',
+                            borderRadius: '8px',
+                            border: '1px solid #f59e0b',
+                            background: '#fffbeb',
+                            color: '#b45309',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '0.4rem',
+                            boxShadow: '0 1px 2px rgba(245,158,11,0.1)'
+                          }}
+                        >
+                          <GitMerge size={16} /> Unir Equipo
+                        </button>
+                      )}
                       {userCanAdd && (
                         <button
                           onClick={() => setDeleteConfirm({ type: 'team', sede: t.sede, equipo: t.equipo, name: t.equipo })}
@@ -4229,135 +4342,199 @@ export default function CentroManagers() {
         );
       })()}
 
-      {/* MODAL: UNIR EQUIPOS (FUSIÓN CON ADVERTENCIA) */}
+      {/* MODAL: UNIR EQUIPOS (FUSIÓN CON ADVERTENCIA Y PREVIEW) */}
       {mergeModal.isOpen && (() => {
         const sedeNorm = normalizeSede(mergeModal.sede);
-        const teamsInSede = Array.from(new Set(
-          managers
-            .filter(m => normalizeSede(m.sede) === sedeNorm && m.equipo)
-            .map(m => m.equipo.trim())
-        )).sort();
+        const teamsInSede = getTeamsForSede(sedeNorm);
+        const sourceTeamObj = teamsInSede.find(t => t.key === mergeModal.sourceTeam);
+        const targetTeamObj = teamsInSede.find(t => t.key === mergeModal.targetTeam);
 
         return (
           <div style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.75)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: '1rem' }}>
-            <div style={{ background: '#ffffff', borderRadius: '16px', maxWidth: '580px', width: '100%', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-              <div style={{ padding: '1.25rem 1.5rem', background: '#0f172a', color: '#fff', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                  <GitMerge size={20} color="#f59e0b" />
-                  <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800 }}>Unir Equipos (Fusión Operativa)</h3>
+            <div style={{ background: '#ffffff', borderRadius: '16px', maxWidth: '680px', width: '100%', maxHeight: '92vh', display: 'flex', flexDirection: 'column', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+              
+              {/* HEADER MODAL */}
+              <div style={{ padding: '1.25rem 1.5rem', background: '#0f172a', color: '#fff', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(245, 158, 11, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <GitMerge size={20} color="#f59e0b" />
+                  </div>
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: '#f8fafc' }}>Unir Equipos (Fusión Operativa)</h3>
+                    <p style={{ margin: 0, fontSize: '0.78rem', color: '#94a3b8' }}>Transfiere integrantes de un equipo origen hacia un equipo destino consolidando avances</p>
+                  </div>
                 </div>
-                <button onClick={() => setMergeModal(prev => ({ ...prev, isOpen: false }))} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '0.2rem' }}>
+                <button onClick={() => setMergeModal(prev => ({ ...prev, isOpen: false }))} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '0.3rem', borderRadius: '6px' }}>
                   <X size={20} />
                 </button>
               </div>
 
-              <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                {/* ADVERTENCIA CRÍTICA */}
-                <div style={{ background: '#fffbeb', border: '2px solid #f59e0b', borderRadius: '10px', padding: '1rem', display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
-                  <AlertTriangle size={24} color="#d97706" style={{ flexShrink: 0, marginTop: '2px' }} />
+              {/* CONTENIDO SCROLLABLE */}
+              <div style={{ padding: '1.5rem', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                
+                {/* ADVERTENCIA INFORMATIVA */}
+                <div style={{ background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: '10px', padding: '0.9rem 1rem', display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
+                  <AlertTriangle size={22} color="#d97706" style={{ flexShrink: 0, marginTop: '2px' }} />
                   <div>
-                    <h4 style={{ margin: '0 0 0.35rem 0', color: '#b45309', fontSize: '0.92rem', fontWeight: 800 }}>⚠️ ADVERTENCIA CRÍTICA DE OPERACIÓN</h4>
-                    <p style={{ margin: 0, fontSize: '0.82rem', color: '#78350f', lineHeight: 1.45 }}>
-                      Esta acción <strong>reasignará permanentemente</strong> a todos los managers y capitanes del <strong>Equipo Origen</strong> hacia el <strong>Equipo Destino</strong> en la base de datos de Firestore.
-                      El equipo origen quedará sin integrantes activos y el equipo destino sumará a todos los colaboradores manteniendo su trazabilidad e historial.
+                    <h4 style={{ margin: '0 0 0.25rem 0', color: '#92400e', fontSize: '0.88rem', fontWeight: 800 }}>Transferencia Definitiva en Base de Datos</h4>
+                    <p style={{ margin: 0, fontSize: '0.8rem', color: '#78350f', lineHeight: 1.45 }}>
+                      Todos los integrantes del <strong>Equipo Origen</strong> serán reasignados al <strong>Equipo Destino</strong> en Firestore. El equipo origen quedará libre y el equipo destino sumará a todos los colaboradores con registro de auditoría.
                     </p>
                   </div>
                 </div>
 
-                {/* SELECTORES */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1rem' }}>
-                  <div>
-                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
-                      Sede Operativa:
+                {/* SELECTOR DE SEDE */}
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                    Sede Operativa:
+                  </label>
+                  <select
+                    value={mergeModal.sede}
+                    onChange={e => setMergeModal(prev => ({ ...prev, sede: e.target.value, sourceTeam: '', targetTeam: '' }))}
+                    disabled={!canViewAll && !canViewOwnSede}
+                    style={{ width: '100%', padding: '0.65rem', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.88rem', background: '#f8fafc', fontWeight: 600, color: '#1e293b' }}
+                  >
+                    {OPERATIONAL_SEDES.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+
+                {/* SELECTORES DE EQUIPOS EN COLUMNAS */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
+                  
+                  {/* EQUIPO ORIGEN */}
+                  <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '10px', padding: '1rem' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.82rem', fontWeight: 800, color: '#dc2626', marginBottom: '0.5rem' }}>
+                      <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#dc2626', display: 'inline-block' }}></span>
+                      1. Equipo Origen (A vaciar):
                     </label>
                     <select
-                      value={mergeModal.sede}
-                      onChange={e => setMergeModal(prev => ({ ...prev, sede: e.target.value, sourceTeam: '', targetTeam: '' }))}
-                      disabled={!canViewAll && !canViewOwnSede}
-                      style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.88rem', background: '#f8fafc' }}
+                      value={mergeModal.sourceTeam}
+                      onChange={e => setMergeModal(prev => ({ ...prev, sourceTeam: e.target.value }))}
+                      style={{ width: '100%', padding: '0.65rem', borderRadius: '8px', border: '1px solid #f87171', fontSize: '0.85rem', background: '#fff', fontWeight: 600, color: '#1e293b' }}
                     >
-                      {OPERATIONAL_SEDES.map(s => <option key={s} value={s}>{s}</option>)}
+                      <option value="">-- Seleccionar Equipo Origen --</option>
+                      {teamsInSede.map(t => (
+                        <option key={t.key} value={t.key} disabled={t.key === mergeModal.targetTeam}>
+                          {t.label}
+                        </option>
+                      ))}
                     </select>
+
+                    {/* PREVIEW ORIGEN */}
+                    {sourceTeamObj && (
+                      <div style={{ marginTop: '0.75rem', background: '#fff', padding: '0.75rem', borderRadius: '8px', border: '1px solid #fee2e2' }}>
+                        <div style={{ fontSize: '0.78rem', color: '#991b1b', fontWeight: 700, marginBottom: '0.4rem', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.3rem' }}>
+                          <span>👥 {sourceTeamObj.membersCount} integrante(s) a transferir</span>
+                          <span>Coach: {sourceTeamObj.coachList}</span>
+                        </div>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem', maxHeight: '110px', overflowY: 'auto' }}>
+                          {sourceTeamObj.members.map((m, i) => (
+                            <span key={i} style={{ background: '#fee2e2', color: '#991b1b', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.72rem', fontWeight: 600 }}>
+                              {(m.rol || '').toLowerCase().includes('capitan') ? '👑 ' : ''}{m.nombre}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                    <div>
-                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#dc2626', marginBottom: '0.35rem' }}>
-                        1. Equipo Origen (A disolver):
-                      </label>
-                      <select
-                        value={mergeModal.sourceTeam}
-                        onChange={e => setMergeModal(prev => ({ ...prev, sourceTeam: e.target.value }))}
-                        style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: '1px solid #f87171', fontSize: '0.85rem', background: '#fff' }}
-                      >
-                        <option value="">-- Seleccionar origen --</option>
-                        {teamsInSede.map(t => (
-                          <option key={t} value={t} disabled={t === mergeModal.targetTeam}>{t}</option>
-                        ))}
-                      </select>
-                    </div>
+                  {/* EQUIPO DESTINO */}
+                  <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '10px', padding: '1rem' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.82rem', fontWeight: 800, color: '#16a34a', marginBottom: '0.5rem' }}>
+                      <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#16a34a', display: 'inline-block' }}></span>
+                      2. Equipo Destino (Receptor):
+                    </label>
+                    <select
+                      value={mergeModal.targetTeam}
+                      onChange={e => setMergeModal(prev => ({ ...prev, targetTeam: e.target.value }))}
+                      style={{ width: '100%', padding: '0.65rem', borderRadius: '8px', border: '1px solid #86efac', fontSize: '0.85rem', background: '#fff', fontWeight: 600, color: '#1e293b' }}
+                    >
+                      <option value="">-- Seleccionar Equipo Destino --</option>
+                      {teamsInSede.map(t => (
+                        <option key={t.key} value={t.key} disabled={t.key === mergeModal.sourceTeam}>
+                          {t.label}
+                        </option>
+                      ))}
+                    </select>
 
-                    <div>
-                      <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#16a34a', marginBottom: '0.35rem' }}>
-                        2. Equipo Destino (Receptor):
-                      </label>
-                      <select
-                        value={mergeModal.targetTeam}
-                        onChange={e => setMergeModal(prev => ({ ...prev, targetTeam: e.target.value }))}
-                        style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: '1px solid #86efac', fontSize: '0.85rem', background: '#fff' }}
-                      >
-                        <option value="">-- Seleccionar destino --</option>
-                        {teamsInSede.map(t => (
-                          <option key={t} value={t} disabled={t === mergeModal.sourceTeam}>{t}</option>
-                        ))}
-                      </select>
-                    </div>
+                    {/* PREVIEW DESTINO */}
+                    {targetTeamObj && (
+                      <div style={{ marginTop: '0.75rem', background: '#fff', padding: '0.75rem', borderRadius: '8px', border: '1px solid #dcfce7' }}>
+                        <div style={{ fontSize: '0.78rem', color: '#166534', fontWeight: 700, marginBottom: '0.4rem', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.3rem' }}>
+                          <span>👥 {targetTeamObj.membersCount} integrantes actuales</span>
+                          <span>Coach: {targetTeamObj.coachList}</span>
+                        </div>
+                        {sourceTeamObj && (
+                          <div style={{ padding: '0.5rem', background: '#dcfce7', borderRadius: '6px', fontSize: '0.78rem', color: '#14532d', fontWeight: 700 }}>
+                            ✨ Resultado: El equipo receptor pasará a tener <strong>{sourceTeamObj.membersCount + targetTeamObj.membersCount} integrantes</strong> en total.
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
 
+                {/* OPCIÓN DE ASIGNAR COACH DESTINO */}
+                {targetTeamObj && targetTeamObj.coachList !== 'Sin Coach' && (
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', background: '#f8fafc', padding: '0.65rem 0.9rem', borderRadius: '8px', border: '1px solid #e2e8f0', cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      checked={mergeModal.reassignCoach}
+                      onChange={e => setMergeModal(prev => ({ ...prev, reassignCoach: e.target.checked }))}
+                      style={{ cursor: 'pointer', width: '16px', height: '16px' }}
+                    />
+                    <span style={{ fontSize: '0.82rem', color: '#334155', fontWeight: 600 }}>
+                      Asignar automáticamente al Coach receptor (<strong>{targetTeamObj.coachList}</strong>) a los {sourceTeamObj?.membersCount || 0} integrantes transferidos.
+                    </span>
+                  </label>
+                )}
+
                 {/* CHECKBOX DE CONFIRMACIÓN */}
-                <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.6rem', background: '#f1f5f9', padding: '0.75rem 1rem', borderRadius: '8px', cursor: 'pointer', border: '1px solid #e2e8f0' }}>
+                <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.6rem', background: '#fffbeb', padding: '0.8rem 1rem', borderRadius: '8px', cursor: 'pointer', border: '1px solid #fef08a' }}>
                   <input
                     type="checkbox"
                     checked={mergeModal.confirmedWarning}
                     onChange={e => setMergeModal(prev => ({ ...prev, confirmedWarning: e.target.checked }))}
-                    style={{ marginTop: '0.2rem', cursor: 'pointer', width: '16px', height: '16px' }}
+                    style={{ marginTop: '0.2rem', cursor: 'pointer', width: '17px', height: '17px' }}
                   />
-                  <span style={{ fontSize: '0.8rem', color: '#1e293b', fontWeight: 600 }}>
-                    Entiendo la advertencia y confirmo que deseo transferir todos los integrantes del equipo origen hacia el equipo destino.
+                  <span style={{ fontSize: '0.82rem', color: '#78350f', fontWeight: 700 }}>
+                    Confirmo que he verificado los equipos y deseo transferir todos los integrantes del equipo origen permanentemente hacia el equipo destino.
                   </span>
                 </label>
 
-                {/* ACCIONES */}
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '0.5rem' }}>
-                  <button
-                    onClick={() => setMergeModal(prev => ({ ...prev, isOpen: false }))}
-                    style={{ padding: '0.6rem 1.2rem', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#fff', color: '#475569', fontWeight: 700, cursor: 'pointer' }}
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    onClick={handleExecuteMergeTeams}
-                    disabled={!mergeModal.confirmedWarning || !mergeModal.sourceTeam || !mergeModal.targetTeam || mergeModal.isMerging}
-                    style={{
-                      padding: '0.6rem 1.4rem',
-                      borderRadius: '8px',
-                      border: 'none',
-                      background: (!mergeModal.confirmedWarning || !mergeModal.sourceTeam || !mergeModal.targetTeam || mergeModal.isMerging) ? '#94a3b8' : '#d97706',
-                      color: '#fff',
-                      fontWeight: 800,
-                      cursor: (!mergeModal.confirmedWarning || !mergeModal.sourceTeam || !mergeModal.targetTeam || mergeModal.isMerging) ? 'not-allowed' : 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.4rem',
-                      boxShadow: '0 4px 6px -1px rgba(217,119,6,0.3)'
-                    }}
-                  >
-                    <GitMerge size={16} />
-                    {mergeModal.isMerging ? 'Fusionando equipos...' : 'Ejecutar Fusión'}
-                  </button>
-                </div>
               </div>
+
+              {/* FOOTER ACCIONES */}
+              <div style={{ padding: '1rem 1.5rem', background: '#f8fafc', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', flexShrink: 0 }}>
+                <button
+                  onClick={() => setMergeModal(prev => ({ ...prev, isOpen: false }))}
+                  style={{ padding: '0.65rem 1.2rem', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#fff', color: '#475569', fontWeight: 700, cursor: 'pointer' }}
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleExecuteMergeTeams}
+                  disabled={!mergeModal.confirmedWarning || !mergeModal.sourceTeam || !mergeModal.targetTeam || mergeModal.isMerging}
+                  style={{
+                    padding: '0.65rem 1.5rem',
+                    borderRadius: '8px',
+                    border: 'none',
+                    background: (!mergeModal.confirmedWarning || !mergeModal.sourceTeam || !mergeModal.targetTeam || mergeModal.isMerging) ? '#cbd5e1' : '#d97706',
+                    color: (!mergeModal.confirmedWarning || !mergeModal.sourceTeam || !mergeModal.targetTeam || mergeModal.isMerging) ? '#94a3b8' : '#ffffff',
+                    fontWeight: 800,
+                    fontSize: '0.88rem',
+                    cursor: (!mergeModal.confirmedWarning || !mergeModal.sourceTeam || !mergeModal.targetTeam || mergeModal.isMerging) ? 'not-allowed' : 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    boxShadow: (!mergeModal.confirmedWarning || !mergeModal.sourceTeam || !mergeModal.targetTeam || mergeModal.isMerging) ? 'none' : '0 4px 6px -1px rgba(217,119,6,0.3)'
+                  }}
+                >
+                  <GitMerge size={18} />
+                  {mergeModal.isMerging ? 'Uniendo Equipos en Firestore...' : 'Confirmar y Unir Equipos'}
+                </button>
+              </div>
+
             </div>
           </div>
         );
