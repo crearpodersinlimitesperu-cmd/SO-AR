@@ -1,4 +1,4 @@
-import { getWhatsAppUrl } from '../utils/phoneUtils';
+﻿import { getWhatsAppUrl } from '../utils/phoneUtils';
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -40,10 +40,11 @@ import {
   Sparkles, ToggleLeft, ToggleRight, Archive, RotateCcw, X,
   Edit3, Trash2, UserPlus, Shield, Crown, Check, CheckSquare, Square,
   ShieldCheck, Lock, AlertTriangle, Target, ArrowUpDown, ArrowUp, ArrowDown,
-  BarChart3, GitMerge, ArrowRight
+  BarChart3, GitMerge, ArrowRight, FileSpreadsheet, ExternalLink
 } from 'lucide-react';
 import CMJDashboard from '../components/CMJDashboard';
 import KPIsEntrenadoresLlamadas from '../components/KPIsEntrenadoresLlamadas';
+import defaultKpisData from '../data/kpisEntrenadoresData.json';
 import { auditAndDeduplicateManagers } from '../services/dataIntegrityAgent';
 
 
@@ -324,6 +325,11 @@ export default function CentroManagers() {
   const [search, setSearch] = useState(initialSearchQuery);
   const [filterSede, setFilterSede] = useState(initialSedeQuery ? normalizeSede(initialSedeQuery) : '');
   const [statusFilter, setStatusFilter] = useState('Todos'); // 'Todos' | 'Activo' | 'Graduado' | 'Desertor'
+  // Liquidacion Sub-Tabs y Filtros
+  const [liquidacionSubTab, setLiquidacionSubTab] = useState('planilla_sheets'); // 'planilla_sheets' | 'equipos_nodus' | 'consolidado'
+  const [sheetSearch, setSheetSearch] = useState('');
+  const [sheetSedeFilter, setSheetSedeFilter] = useState('Todas');
+  const [sheetStatusFilter, setSheetStatusFilter] = useState('todos'); // 'todos' | 'con_saldo' | 'liquidados'
 
   // Estadísticas por Entrenador (Tab: Entrenadores)
   const allTrainerNames = useMemo(() => {
@@ -1268,6 +1274,118 @@ export default function CentroManagers() {
     });
     return teams;
   }, [managers]);
+
+  // Planilla Oficial de Llamados (Google Sheets: 1lWAHh1PSAKu9eU6DOBxZExrHMbCYc3f2Sr8GdghNxD0)
+  // Extraccion e integracion idempotente de pagos realizados a entrenadores sin duplicados
+  const planillaPagosList = useMemo(() => {
+    if (!canViewLiquidacion) return [];
+    const rawKpis = defaultKpisData?.kpis || [];
+    const result = [];
+    const seenSlugs = new Set();
+
+    // 1. Extraer los entrenadores auditados de la planilla
+    rawKpis.forEach(k => {
+      if (!k.entrenador) return;
+      const tSlug = String(k.entrenador).toLowerCase().trim().replace(/[^a-z0-9]/g, '_');
+      seenSlugs.add(tSlug);
+
+      const firestoreDoc = liquidacionesPagos[sheet_pago__${tSlug}] || liquidacionesPagos[tSlug];
+      const metaSede = TRAINER_METADATA[k.entrenador]?.primarySede;
+      const detalleSede = defaultKpisData?.llamadosDetalle?.find(m => m.entrenador === k.entrenador)?.sede;
+      const sede = metaSede || detalleSede || firestoreDoc?.sede || 'Multi-Sede';
+
+      result.push({
+        entrenador: k.entrenador,
+        slug: tSlug,
+        sede,
+        totalLlamadas: k.totalLlamadas || 0,
+        pagadoLlamadas: k.pagadoLlamadas || 0,
+        pendienteLlamadas: k.pendienteLlamadas || 0,
+        montoPagadoUSD: k.montoTotal || ((k.pagadoLlamadas || 0) * 25),
+        montoPendienteUSD: (k.pendienteLlamadas || 0) * 25,
+        montoTotalAuditadoUSD: (k.totalLlamadas || 0) * 25,
+        porcentajePagado: k.porcentajePagado || (k.totalLlamadas > 0 ? Math.round(((k.pagadoLlamadas || 0) / k.totalLlamadas) * 100) : 0),
+        fechaPago: firestoreDoc?.fechaPago || 'Planilla Oficial',
+        pagadoPorNombre: firestoreDoc?.pagadoPorNombre || 'Planilla Oficial (Google Sheets)',
+        fuente: 'Google Sheets (LLAMADOS MANAGERS)'
+      });
+    });
+
+    // 2. Fusionar documentos de Firestore con fuente 'sheet_llamados' por si se agregaron nuevos remotamente
+    Object.values(liquidacionesPagos).forEach(p => {
+      if ((p.fuente === 'sheet_llamados' || p.motivo === 'planilla_oficial_sheets') && p.entrenador) {
+        const tSlug = String(p.entrenador).toLowerCase().trim().replace(/[^a-z0-9]/g, '_');
+        if (!seenSlugs.has(tSlug)) {
+          seenSlugs.add(tSlug);
+          result.push({
+            entrenador: p.entrenador,
+            slug: tSlug,
+            sede: p.sede || 'Multi-Sede',
+            totalLlamadas: p.llamadasAlPagar || (Number(p.llamadasPagadas || 0) + Number(p.llamadasPendientes || 0)) || 0,
+            pagadoLlamadas: p.llamadasPagadas || 0,
+            pendienteLlamadas: p.llamadasPendientes || 0,
+            montoPagadoUSD: p.montoUSD || ((p.llamadasPagadas || 0) * 25),
+            montoPendienteUSD: p.montoPendienteUSD || ((p.llamadasPendientes || 0) * 25),
+            montoTotalAuditadoUSD: ((p.llamadasAlPagar || 0) * 25) || (p.montoUSD || 0),
+            porcentajePagado: p.porcentajePagado || 0,
+            fechaPago: p.fechaPago || 'Planilla Oficial',
+            pagadoPorNombre: p.pagadoPorNombre || 'Planilla Oficial (Google Sheets)',
+            fuente: 'Google Sheets (LLAMADOS MANAGERS)'
+          });
+        }
+      }
+    });
+
+    // Ordenar de mayor a menor monto pagado
+    return result.sort((a, b) => b.montoPagadoUSD - a.montoPagadoUSD);
+  }, [liquidacionesPagos, canViewLiquidacion]);
+
+  const filteredPlanillaPagos = useMemo(() => {
+    return planillaPagosList.filter(item => {
+      if (sheetSearch) {
+        const q = sheetSearch.toLowerCase().trim();
+        const mName = (item.entrenador || '').toLowerCase().includes(q);
+        const mSede = (item.sede || '').toLowerCase().includes(q);
+        if (!mName && !mSede) return false;
+      }
+      if (sheetSedeFilter !== 'Todas') {
+        if ((item.sede || '').toLowerCase() !== sheetSedeFilter.toLowerCase()) return false;
+      }
+      if (sheetStatusFilter === 'con_saldo') {
+        if (item.pendienteLlamadas <= 0) return false;
+      } else if (sheetStatusFilter === 'liquidados') {
+        if (item.pendienteLlamadas > 0) return false;
+      }
+      return true;
+    });
+  }, [planillaPagosList, sheetSearch, sheetSedeFilter, sheetStatusFilter]);
+
+  const planillaTotales = useMemo(() => {
+    let llamadasPagadas = 0;
+    let llamadasPendientes = 0;
+    let llamadasTotales = 0;
+    let montoPagadoUSD = 0;
+    let montoPendienteUSD = 0;
+
+    planillaPagosList.forEach(p => {
+      llamadasPagadas += Number(p.pagadoLlamadas || 0);
+      llamadasPendientes += Number(p.pendienteLlamadas || 0);
+      llamadasTotales += Number(p.totalLlamadas || 0);
+      montoPagadoUSD += Number(p.montoPagadoUSD || 0);
+      montoPendienteUSD += Number(p.montoPendienteUSD || 0);
+    });
+
+    return {
+      llamadasPagadas,
+      llamadasPendientes,
+      llamadasTotales,
+      montoPagadoUSD,
+      montoPendienteUSD,
+      montoTotalAuditadoUSD: montoPagadoUSD + montoPendienteUSD,
+      porcentajePagado: llamadasTotales > 0 ? Math.round((llamadasPagadas / llamadasTotales) * 100) : 0,
+      totalEntrenadores: planillaPagosList.length
+    };
+  }, [planillaPagosList]);
 
   const liquidacionData = useMemo(() => {
     if (!canViewLiquidacion) return { pendientes: [], pagados: [], enCamino: [], totalPendienteUSD: 0, totalPagadoUSD: 0 };
@@ -3241,183 +3359,698 @@ export default function CentroManagers() {
           )
         )}
 
-        {/* LIQUIDACIÓN DE ENTRENADORES (02/09/2026, rediseño 09/09/2026) — solo José Sánchez y Elizabeth Escobar */}
+        {/* LIQUIDACIÓN DE ENTRENADORES Y PAGOS OFICIALES (Actualizado 12/09/2026 - Solo José Sánchez y Directores) */}
         {activeTab === 'liquidacion' && canViewLiquidacion && (
           <div>
-            <div style={{ background: bgCard, borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', border: `1px solid ${borderLight}`, padding: '1.5rem', marginBottom: '1.2rem' }}>
-              <h2 style={{ margin: 0, fontSize: '1.2rem', color: textDark, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <DollarSign size={22} color="#059669" /> Liquidación de Entrenadores
-              </h2>
-              <p style={{ margin: '0.3rem 0 0', fontSize: '0.85rem', color: textMuted }}>
-                $400 USD por equipo, pago único al llegar a 7 llamadas grupales registradas en Nodus.
-                Acceso restringido a José Sánchez y Elizabeth Escobar.
-              </p>
+            {/* ENCABEZADO CON SEGURIDAD Y ACCESO DIRECTO A LA PLANILLA OFICIAL */}
+            <div style={{ background: bgCard, borderRadius: '14px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', border: `1px solid ${borderLight}`, padding: '1.4rem 1.6rem', marginBottom: '1.2rem', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '1.2rem' }}>
+              <div>
+                <h2 style={{ margin: 0, fontSize: '1.35rem', fontWeight: 800, color: textDark, display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                  <DollarSign size={24} color="#059669" /> Liquidación y Pagos a Entrenadores
+                </h2>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginTop: '0.4rem', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '0.76rem', background: 'rgba(5,150,105,0.12)', color: '#059669', padding: '0.25rem 0.65rem', borderRadius: '6px', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.35rem', border: '1px solid rgba(5,150,105,0.2)' }}>
+                    <ShieldCheck size={14} /> Confidencial — Solo visible para José Sánchez y Directores
+                  </span>
+                  <span style={{ fontSize: '0.8rem', color: textMuted }}>
+                    Planilla oficial de llamados auditadas ($25 USD/llamada) y liquidación por equipos Nodus ($400 USD).
+                  </span>
+                </div>
+              </div>
+
+              <a
+                href="https://docs.google.com/spreadsheets/d/1lWAHh1PSAKu9eU6DOBxZExrHMbCYc3f2Sr8GdghNxD0/edit?usp=drive_link"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.6rem 1.15rem',
+                  background: '#10b981',
+                  color: '#ffffff',
+                  borderRadius: '10px',
+                  fontWeight: 700,
+                  fontSize: '0.85rem',
+                  textDecoration: 'none',
+                  boxShadow: '0 3px 8px rgba(16,185,129,0.3)',
+                  transition: 'all 0.2s',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                <FileSpreadsheet size={17} /> Abrir Planilla Oficial en Google Sheets <ExternalLink size={15} />
+              </a>
             </div>
 
-            {/* RESUMEN FINANCIERO — panel de 4 cifras clave, como lo pediría un liquidador */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1.2rem' }}>
-              <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.2rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: 800, color: '#b45309', marginBottom: '0.4rem' }}>
-                  <Clock size={14} /> Por Pagar Ahora
-                </div>
-                <div style={{ fontSize: '1.8rem', fontWeight: 800, color: textDark }}>${liquidacionData.totalPendienteUSD.toLocaleString('en-US')}</div>
-                <div style={{ fontSize: '0.78rem', color: textMuted, marginTop: '0.2rem' }}>{liquidacionData.pendientes.length} equipo{liquidacionData.pendientes.length !== 1 ? 's' : ''} ya cumplió la meta</div>
-              </div>
-              <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.2rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: 800, color: '#059669', marginBottom: '0.4rem' }}>
-                  <CheckCircle size={14} /> Pagado (Histórico)
-                </div>
-                <div style={{ fontSize: '1.8rem', fontWeight: 800, color: textDark }}>${liquidacionData.totalPagadoUSD.toLocaleString('en-US')}</div>
-                <div style={{ fontSize: '0.78rem', color: textMuted, marginTop: '0.2rem' }}>{liquidacionData.pagados.length} pago{liquidacionData.pagados.length !== 1 ? 's' : ''} registrado{liquidacionData.pagados.length !== 1 ? 's' : ''}</div>
-              </div>
-              <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.2rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: 800, color: '#3b82f6', marginBottom: '0.4rem' }}>
-                  <Target size={14} /> En Camino a la Meta
-                </div>
-                <div style={{ fontSize: '1.8rem', fontWeight: 800, color: textDark }}>{liquidacionData.enCamino.length}</div>
-                <div style={{ fontSize: '0.78rem', color: textMuted, marginTop: '0.2rem' }}>a 1 o 2 llamadas de activar el pago</div>
-              </div>
-              <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.2rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: 800, color: '#6366f1', marginBottom: '0.4rem' }}>
-                  <BarChart3 size={14} /> Comprometido Total
-                </div>
-                <div style={{ fontSize: '1.8rem', fontWeight: 800, color: textDark }}>${(liquidacionData.totalPendienteUSD + liquidacionData.totalPagadoUSD).toLocaleString('en-US')}</div>
-                <div style={{ fontSize: '0.78rem', color: textMuted, marginTop: '0.2rem' }}>pendiente + pagado, ciclo actual</div>
-              </div>
+            {/* SUB-NAVEGACIÓN DE PESTAÑAS DENTRO DE LIQUIDACIÓN */}
+            <div style={{ display: 'flex', gap: '0.6rem', marginBottom: '1.2rem', borderBottom: `1px solid ${borderLight}`, paddingBottom: '0.7rem', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                onClick={() => setLiquidacionSubTab('planilla_sheets')}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.65rem 1.2rem',
+                  borderRadius: '8px',
+                  border: 'none',
+                  background: liquidacionSubTab === 'planilla_sheets' ? '#10b981' : 'transparent',
+                  color: liquidacionSubTab === 'planilla_sheets' ? '#ffffff' : textMuted,
+                  fontWeight: liquidacionSubTab === 'planilla_sheets' ? 800 : 600,
+                  fontSize: '0.88rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  boxShadow: liquidacionSubTab === 'planilla_sheets' ? '0 2px 6px rgba(16,185,129,0.3)' : 'none'
+                }}
+              >
+                <FileSpreadsheet size={16} /> Planilla Oficial Sheets
+                <span style={{
+                  background: liquidacionSubTab === 'planilla_sheets' ? 'rgba(255,255,255,0.25)' : 'rgba(16,185,129,0.15)',
+                  color: liquidacionSubTab === 'planilla_sheets' ? '#ffffff' : '#059669',
+                  padding: '0.15rem 0.55rem',
+                  borderRadius: '12px',
+                  fontSize: '0.74rem',
+                  fontWeight: 800
+                }}>
+                  ${planillaTotales.montoPagadoUSD.toLocaleString('en-US')} USD
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setLiquidacionSubTab('equipos_nodus')}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.65rem 1.2rem',
+                  borderRadius: '8px',
+                  border: 'none',
+                  background: liquidacionSubTab === 'equipos_nodus' ? '#10b981' : 'transparent',
+                  color: liquidacionSubTab === 'equipos_nodus' ? '#ffffff' : textMuted,
+                  fontWeight: liquidacionSubTab === 'equipos_nodus' ? 800 : 600,
+                  fontSize: '0.88rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  boxShadow: liquidacionSubTab === 'equipos_nodus' ? '0 2px 6px rgba(16,185,129,0.3)' : 'none'
+                }}
+              >
+                <Users size={16} /> Liquidación por Equipos (Nodus)
+                {liquidacionData.pendientes.length > 0 && (
+                  <span style={{
+                    background: liquidacionSubTab === 'equipos_nodus' ? 'rgba(255,255,255,0.25)' : 'rgba(239,68,68,0.15)',
+                    color: liquidacionSubTab === 'equipos_nodus' ? '#ffffff' : '#dc2626',
+                    padding: '0.15rem 0.55rem',
+                    borderRadius: '12px',
+                    fontSize: '0.74rem',
+                    fontWeight: 800
+                  }}>
+                    {liquidacionData.pendientes.length} pend.
+                  </span>
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setLiquidacionSubTab('consolidado')}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.65rem 1.2rem',
+                  borderRadius: '8px',
+                  border: 'none',
+                  background: liquidacionSubTab === 'consolidado' ? '#10b981' : 'transparent',
+                  color: liquidacionSubTab === 'consolidado' ? '#ffffff' : textMuted,
+                  fontWeight: liquidacionSubTab === 'consolidado' ? 800 : 600,
+                  fontSize: '0.88rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  boxShadow: liquidacionSubTab === 'consolidado' ? '0 2px 6px rgba(16,185,129,0.3)' : 'none'
+                }}
+              >
+                <BarChart3 size={16} /> Consolidado Total
+              </button>
             </div>
 
-            {/* PENDIENTES DE PAGO */}
-            <div style={{ background: bgCard, borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', border: `1px solid ${borderLight}`, padding: '1.5rem', marginBottom: '1.2rem' }}>
-              <h3 style={{ fontSize: '1rem', color: textDark, marginBottom: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                <Clock size={16} color="#b45309" /> Pendientes de pago ({liquidacionData.pendientes.length})
-              </h3>
-              {liquidacionData.pendientes.length === 0 ? (
-                <p style={{ color: textMuted, fontSize: '0.9rem' }}>No hay equipos pendientes de liquidar por ahora — ningún equipo ha alcanzado todavía las 7 llamadas grupales registradas ni fue cerrado manualmente por un coordinador.</p>
-              ) : (
-                <div style={{ overflowX: 'auto' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
-                    <thead>
-                      <tr style={{ background: 'rgba(180,83,9,0.08)', textAlign: 'left' }}>
-                        <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Equipo</th>
-                        <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Sede</th>
-                        <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Entrenador</th>
-                        <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Motivo</th>
-                        <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Llamadas</th>
-                        <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Monto</th>
-                        <th style={{ padding: '0.7rem 0.6rem' }}></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {liquidacionData.pendientes.map((item, idx) => (
-                        <tr key={item.equipoKey} style={{ borderBottom: `1px solid ${borderLight}`, background: idx % 2 === 1 ? 'rgba(0,0,0,0.015)' : 'transparent' }}>
-                          <td style={{ padding: '0.65rem 0.6rem', fontWeight: 600 }}>{item.equipo} {item.numEquipo ? `(#${item.numEquipo})` : ''}</td>
-                          <td style={{ padding: '0.65rem 0.6rem' }}><CountryFlag sede={item.sede} /> {item.sede}</td>
-                          <td style={{ padding: '0.65rem 0.6rem' }}>{item.entrenador}</td>
-                          <td style={{ padding: '0.65rem 0.6rem' }}>
-                            {item.motivo === 'cierre_manual' ? (
-                              <span title={item.cierreManual?.porNombre ? `Cerrado por ${item.cierreManual.porNombre}` : ''} style={{ background: '#eff6ff', color: '#1d4ed8', padding: '0.2rem 0.5rem', borderRadius: '5px', fontSize: '0.72rem', fontWeight: 700, whiteSpace: 'nowrap' }}>
-                                🎓 Equipo cerrado
-                              </span>
-                            ) : (
-                              <span style={{ background: '#fefce8', color: '#a16207', padding: '0.2rem 0.5rem', borderRadius: '5px', fontSize: '0.72rem', fontWeight: 700, whiteSpace: 'nowrap' }} title={item.fechaAlcanzo7 ? `Llegó a 7 el ${item.fechaAlcanzo7}` : ''}>
-                                📞 7 llamadas
-                              </span>
-                            )}
-                          </td>
-                          <td style={{ padding: '0.65rem 0.6rem' }}>{item.totalLlamadas}</td>
-                          <td style={{ padding: '0.65rem 0.6rem', fontWeight: 700, color: '#059669' }}>${item.montoUSD}</td>
-                          <td style={{ padding: '0.65rem 0.6rem' }}>
-                            <button
-                              onClick={() => handleMarcarPagado(item)}
-                              style={{ padding: '0.4rem 0.8rem', borderRadius: '6px', border: 'none', background: '#10b981', color: '#fff', fontWeight: 700, cursor: 'pointer', fontSize: '0.8rem', whiteSpace: 'nowrap' }}
-                            >
-                              Marcar como pagado
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                    <tfoot>
-                      <tr style={{ borderTop: `2px solid ${borderLight}` }}>
-                        <td colSpan={5} style={{ padding: '0.65rem 0.6rem', textAlign: 'right', fontWeight: 700, color: textMuted }}>Total pendiente:</td>
-                        <td colSpan={2} style={{ padding: '0.65rem 0.6rem', fontWeight: 800, color: '#059669' }}>${liquidacionData.totalPendienteUSD.toLocaleString('en-US')}</td>
-                      </tr>
-                    </tfoot>
-                  </table>
-                </div>
-              )}
-            </div>
-
-            {/* EN CAMINO A LA META — pipeline, no solo el disparador binario */}
-            <div style={{ background: bgCard, borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', border: `1px solid ${borderLight}`, padding: '1.5rem', marginBottom: '1.2rem' }}>
-              <h3 style={{ fontSize: '1rem', color: textDark, marginBottom: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                <Target size={16} color="#3b82f6" /> En camino a la meta ({liquidacionData.enCamino.length})
-              </h3>
-              {liquidacionData.enCamino.length === 0 ? (
-                <p style={{ color: textMuted, fontSize: '0.9rem' }}>Ningún equipo está a 1 o 2 llamadas de activar el pago por ahora.</p>
-              ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '0.8rem' }}>
-                  {liquidacionData.enCamino.map(item => (
-                    <div key={item.equipoKey} style={{ border: `1px solid ${borderLight}`, borderRadius: '10px', padding: '0.9rem' }}>
-                      <div style={{ fontWeight: 700, fontSize: '0.88rem', color: textDark }}>{item.equipo} {item.numEquipo ? `(#${item.numEquipo})` : ''}</div>
-                      <div style={{ fontSize: '0.78rem', color: textMuted, margin: '0.2rem 0 0.6rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                        <CountryFlag sede={item.sede} /> {item.sede} · {item.entrenador}
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.75rem', marginBottom: '0.3rem' }}>
-                        <span style={{ color: textMuted }}>{item.totalLlamadas} de 7 llamadas</span>
-                        <span style={{ fontWeight: 700, color: '#3b82f6' }}>Falta{item.faltan !== 1 ? 'n' : ''} {item.faltan}</span>
-                      </div>
-                      <div style={{ height: '6px', background: 'rgba(0,0,0,0.08)', borderRadius: '4px', overflow: 'hidden' }}>
-                        <div style={{ height: '100%', width: `${(item.totalLlamadas / 7) * 100}%`, background: '#3b82f6', borderRadius: '4px' }} />
-                      </div>
+            {/* VISTA 1: PLANILLA OFICIAL GOOGLE SHEETS */}
+            {liquidacionSubTab === 'planilla_sheets' && (
+              <div>
+                {/* 4 TARJETAS KPI DE LA PLANILLA OFICIAL */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginBottom: '1.2rem' }}>
+                  <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.2rem', borderLeft: '4px solid #10b981' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: 800, color: '#059669', marginBottom: '0.4rem' }}>
+                      <CheckCircle size={15} /> Total Pagado en Planilla
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
+                    <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#059669' }}>
+                      ${planillaTotales.montoPagadoUSD.toLocaleString('en-US')} USD
+                    </div>
+                    <div style={{ fontSize: '0.78rem', color: textMuted, marginTop: '0.2rem' }}>
+                      {planillaTotales.llamadasPagadas.toLocaleString('en-US')} llamadas pagadas a $25 USD
+                    </div>
+                  </div>
 
-            {/* HISTORIAL DE PAGOS */}
-            <div style={{ background: bgCard, borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', border: `1px solid ${borderLight}`, padding: '1.5rem' }}>
-              <h3 style={{ fontSize: '1rem', color: textDark, marginBottom: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                <CheckCircle size={16} color="#059669" /> Historial de pagos ({liquidacionData.pagados.length})
-              </h3>
-              {liquidacionData.pagados.length === 0 ? (
-                <p style={{ color: textMuted, fontSize: '0.9rem' }}>Todavía no se ha marcado ningún pago.</p>
-              ) : (
-                <div style={{ overflowX: 'auto' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
-                    <thead>
-                      <tr style={{ background: 'rgba(5,150,105,0.08)', textAlign: 'left' }}>
-                        <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Equipo</th>
-                        <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Sede</th>
-                        <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Entrenador</th>
-                        <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Monto</th>
-                        <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Pagado el</th>
-                        <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Pagado por</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {liquidacionData.pagados.map((item, idx) => (
-                        <tr key={item.equipoKey} style={{ borderBottom: `1px solid ${borderLight}`, background: idx % 2 === 1 ? 'rgba(0,0,0,0.015)' : 'transparent' }}>
-                          <td style={{ padding: '0.65rem 0.6rem', fontWeight: 600 }}>{item.equipo} {item.numEquipo ? `(#${item.numEquipo})` : ''}</td>
-                          <td style={{ padding: '0.65rem 0.6rem' }}><CountryFlag sede={item.sede} /> {item.sede}</td>
-                          <td style={{ padding: '0.65rem 0.6rem' }}>{item.entrenador}</td>
-                          <td style={{ padding: '0.65rem 0.6rem', fontWeight: 700, color: '#059669' }}>${item.montoUSD}</td>
-                          <td style={{ padding: '0.65rem 0.6rem' }}>{item.fechaPago || '—'}</td>
-                          <td style={{ padding: '0.65rem 0.6rem' }}>{item.pagadoPorNombre || item.pagadoPorEmail || '—'}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                    <tfoot>
-                      <tr style={{ borderTop: `2px solid ${borderLight}` }}>
-                        <td colSpan={3} style={{ padding: '0.65rem 0.6rem', textAlign: 'right', fontWeight: 700, color: textMuted }}>Total pagado:</td>
-                        <td colSpan={3} style={{ padding: '0.65rem 0.6rem', fontWeight: 800, color: '#059669' }}>${liquidacionData.totalPagadoUSD.toLocaleString('en-US')}</td>
-                      </tr>
-                    </tfoot>
-                  </table>
+                  <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.2rem', borderLeft: '4px solid #f59e0b' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: 800, color: '#b45309', marginBottom: '0.4rem' }}>
+                      <Clock size={15} /> Total Pendiente en Planilla
+                    </div>
+                    <div style={{ fontSize: '1.85rem', fontWeight: 800, color: textDark }}>
+                      ${planillaTotales.montoPendienteUSD.toLocaleString('en-US')} USD
+                    </div>
+                    <div style={{ fontSize: '0.78rem', color: textMuted, marginTop: '0.2rem' }}>
+                      {planillaTotales.llamadasPendientes.toLocaleString('en-US')} llamadas pendientes de liquidar
+                    </div>
+                  </div>
+
+                  <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.2rem', borderLeft: '4px solid #3b82f6' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: 800, color: '#3b82f6', marginBottom: '0.4rem' }}>
+                      <BarChart3 size={15} /> Total Auditado en Planilla
+                    </div>
+                    <div style={{ fontSize: '1.85rem', fontWeight: 800, color: textDark }}>
+                      ${planillaTotales.montoTotalAuditadoUSD.toLocaleString('en-US')} USD
+                    </div>
+                    <div style={{ fontSize: '0.78rem', color: textMuted, marginTop: '0.2rem' }}>
+                      {planillaTotales.llamadasTotales.toLocaleString('en-US')} llamadas en {planillaTotales.totalEntrenadores} entrenadores
+                    </div>
+                  </div>
+
+                  <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.2rem', borderLeft: '4px solid #8b5cf6' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: 800, color: '#7c3aed', marginBottom: '0.4rem' }}>
+                      <Award size={15} /> Tasa de Liquidación
+                    </div>
+                    <div style={{ fontSize: '1.85rem', fontWeight: 800, color: textDark }}>
+                      {planillaTotales.porcentajePagado}%
+                    </div>
+                    <div style={{ fontSize: '0.78rem', color: textMuted, marginTop: '0.2rem' }}>
+                      Efectividad global de pagos de llamadas
+                    </div>
+                  </div>
                 </div>
-              )}
-            </div>
+
+                {/* FILTROS Y BÚSQUEDA */}
+                <div style={{ background: bgCard, borderRadius: '12px', border: `1px solid ${borderLight}`, padding: '1rem 1.2rem', marginBottom: '1.2rem', display: 'flex', flexWrap: 'wrap', gap: '0.8rem', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flex: '1 1 300px' }}>
+                    <div style={{ position: 'relative', width: '100%' }}>
+                      <Search size={16} style={{ position: 'absolute', left: '0.8rem', top: '50%', transform: 'translateY(-50%)', color: textMuted }} />
+                      <input
+                        type="text"
+                        placeholder="Buscar por nombre de entrenador o sede..."
+                        value={sheetSearch}
+                        onChange={(e) => setSheetSearch(e.target.value)}
+                        style={{
+                          width: '100%',
+                          padding: '0.55rem 0.8rem 0.55rem 2.4rem',
+                          borderRadius: '8px',
+                          border: `1px solid ${borderLight}`,
+                          background: isDarkMode ? '#1e293b' : '#ffffff',
+                          color: textDark,
+                          fontSize: '0.85rem'
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                      <Filter size={15} color={textMuted} />
+                      <select
+                        value={sheetSedeFilter}
+                        onChange={(e) => setSheetSedeFilter(e.target.value)}
+                        style={{
+                          padding: '0.5rem 0.8rem',
+                          borderRadius: '8px',
+                          border: `1px solid ${borderLight}`,
+                          background: isDarkMode ? '#1e293b' : '#ffffff',
+                          color: textDark,
+                          fontSize: '0.82rem',
+                          fontWeight: 600
+                        }}
+                      >
+                        <option value="Todas">Todas las Sedes</option>
+                        {OPERATIONAL_SEDES.map(s => (
+                          <option key={s} value={s}>{s}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <select
+                      value={sheetStatusFilter}
+                      onChange={(e) => setSheetStatusFilter(e.target.value)}
+                      style={{
+                        padding: '0.5rem 0.8rem',
+                        borderRadius: '8px',
+                        border: `1px solid ${borderLight}`,
+                        background: isDarkMode ? '#1e293b' : '#ffffff',
+                        color: textDark,
+                        fontSize: '0.82rem',
+                        fontWeight: 600
+                      }}
+                    >
+                      <option value="todos">Todos los Estados ({planillaPagosList.length})</option>
+                      <option value="con_saldo">Con saldo pendiente</option>
+                      <option value="liquidados">100% Liquidados</option>
+                    </select>
+
+                    {(sheetSearch || sheetSedeFilter !== 'Todas' || sheetStatusFilter !== 'todos') && (
+                      <button
+                        type="button"
+                        onClick={() => { setSheetSearch(''); setSheetSedeFilter('Todas'); setSheetStatusFilter('todos'); }}
+                        style={{
+                          padding: '0.5rem 0.8rem',
+                          borderRadius: '8px',
+                          border: `1px solid ${borderLight}`,
+                          background: 'transparent',
+                          color: textMuted,
+                          fontSize: '0.82rem',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.3rem'
+                        }}
+                      >
+                        <RotateCcw size={13} /> Limpiar
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* TABLA DE PAGOS REALIZADOS (GOOGLE SHEETS) */}
+                <div style={{ background: bgCard, borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', border: `1px solid ${borderLight}`, padding: '1.5rem', marginBottom: '1.2rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                    <h3 style={{ margin: 0, fontSize: '1rem', color: textDark, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <CheckCircle size={18} color="#059669" /> Pagos Realizados en Planilla Oficial ({filteredPlanillaPagos.length} entrenadores)
+                    </h3>
+                    <span style={{ fontSize: '0.78rem', color: textMuted }}>
+                      Tarifa: $25 USD por llamada completada y auditada
+                    </span>
+                  </div>
+
+                  {filteredPlanillaPagos.length === 0 ? (
+                    <div style={{ padding: '2rem', textAlign: 'center', color: textMuted, fontSize: '0.9rem' }}>
+                      No se encontraron pagos con los filtros seleccionados.
+                    </div>
+                  ) : (
+                    <div style={{ overflowX: 'auto' }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+                        <thead>
+                          <tr style={{ background: 'rgba(5,150,105,0.08)', textAlign: 'left' }}>
+                            <th style={{ padding: '0.75rem 0.7rem', fontWeight: 700, color: textDark }}>Entrenador</th>
+                            <th style={{ padding: '0.75rem 0.7rem', fontWeight: 700, color: textDark }}>Sede Principal</th>
+                            <th style={{ padding: '0.75rem 0.7rem', fontWeight: 700, color: textDark, textAlign: 'center' }}>Total Llamadas</th>
+                            <th style={{ padding: '0.75rem 0.7rem', fontWeight: 700, color: textDark, textAlign: 'center' }}>Llamadas Pagadas</th>
+                            <th style={{ padding: '0.75rem 0.7rem', fontWeight: 700, color: textDark }}>Monto Pagado ($USD)</th>
+                            <th style={{ padding: '0.75rem 0.7rem', fontWeight: 700, color: textDark }}>Pendiente ($USD)</th>
+                            <th style={{ padding: '0.75rem 0.7rem', fontWeight: 700, color: textDark, minWidth: '130px' }}>% Liquidado</th>
+                            <th style={{ padding: '0.75rem 0.7rem', fontWeight: 700, color: textDark }}>Estado</th>
+                            <th style={{ padding: '0.75rem 0.7rem', fontWeight: 700, color: textDark, textAlign: 'center' }}>Planilla</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {filteredPlanillaPagos.map((item, idx) => {
+                            const isFullyPaid = item.pendienteLlamadas === 0 && item.totalLlamadas > 0;
+                            return (
+                              <tr key={item.slug} style={{ borderBottom: `1px solid ${borderLight}`, background: idx % 2 === 1 ? 'rgba(0,0,0,0.015)' : 'transparent' }}>
+                                <td style={{ padding: '0.7rem', fontWeight: 700, color: textDark }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#e0e7ff', color: '#3730a3', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.75rem' }}>
+                                      {item.entrenador.charAt(0).toUpperCase()}
+                                    </div>
+                                    <span>{item.entrenador}</span>
+                                  </div>
+                                </td>
+                                <td style={{ padding: '0.7rem' }}>
+                                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontWeight: 600, color: textDark }}>
+                                    <CountryFlag sede={item.sede} /> {item.sede}
+                                  </span>
+                                </td>
+                                <td style={{ padding: '0.7rem', textAlign: 'center', fontWeight: 600, color: textDark }}>
+                                  {item.totalLlamadas}
+                                </td>
+                                <td style={{ padding: '0.7rem', textAlign: 'center' }}>
+                                  <span style={{ background: 'rgba(16,185,129,0.12)', color: '#059669', padding: '0.2rem 0.6rem', borderRadius: '6px', fontWeight: 700, fontSize: '0.78rem', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                                    <Check size={12} /> {item.pagadoLlamadas}
+                                  </span>
+                                </td>
+                                <td style={{ padding: '0.7rem', fontWeight: 800, color: '#059669', fontSize: '0.92rem' }}>
+                                  ${item.montoPagadoUSD.toLocaleString('en-US')} USD
+                                </td>
+                                <td style={{ padding: '0.7rem', color: item.montoPendienteUSD > 0 ? '#b45309' : textMuted, fontWeight: 700 }}>
+                                  {item.montoPendienteUSD > 0 ? (
+                                    <span>${item.montoPendienteUSD.toLocaleString('en-US')} USD <span style={{ fontSize: '0.74rem', color: textMuted }}>({item.pendienteLlamadas})</span></span>
+                                  ) : (
+                                    <span style={{ color: '#059669', fontSize: '0.78rem' }}>Al día</span>
+                                  )}
+                                </td>
+                                <td style={{ padding: '0.7rem' }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <div style={{ flex: 1, height: '7px', background: 'rgba(0,0,0,0.08)', borderRadius: '4px', overflow: 'hidden' }}>
+                                      <div
+                                        style={{
+                                          height: '100%',
+                                          width: `${Math.min(100, item.porcentajePagado)}%`,
+                                          background: isFullyPaid ? '#10b981' : item.porcentajePagado >= 60 ? '#3b82f6' : '#f59e0b',
+                                          borderRadius: '4px'
+                                        }}
+                                      />
+                                    </div>
+                                    <span style={{ fontSize: '0.74rem', fontWeight: 700, color: textDark, minWidth: '32px' }}>
+                                      {item.porcentajePagado}%
+                                    </span>
+                                  </div>
+                                </td>
+                                <td style={{ padding: '0.7rem' }}>
+                                  {isFullyPaid ? (
+                                    <span style={{ background: '#ecfdf5', color: '#059669', padding: '0.25rem 0.55rem', borderRadius: '5px', fontSize: '0.72rem', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                                      ✓ 100% Liquidado
+                                    </span>
+                                  ) : (
+                                    <span style={{ background: '#fef3c7', color: '#92400e', padding: '0.25rem 0.55rem', borderRadius: '5px', fontSize: '0.72rem', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                                      Saldo pendiente
+                                    </span>
+                                  )}
+                                </td>
+                                <td style={{ padding: '0.7rem', textAlign: 'center' }}>
+                                  <a
+                                    href="https://docs.google.com/spreadsheets/d/1lWAHh1PSAKu9eU6DOBxZExrHMbCYc3f2Sr8GdghNxD0/edit?usp=drive_link"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    title="Ver en Google Sheets"
+                                    style={{
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      width: '28px',
+                                      height: '28px',
+                                      borderRadius: '6px',
+                                      background: 'rgba(16,185,129,0.1)',
+                                      color: '#059669',
+                                      textDecoration: 'none',
+                                      transition: 'background 0.2s'
+                                    }}
+                                  >
+                                    <FileSpreadsheet size={15} />
+                                  </a>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                        <tfoot>
+                          <tr style={{ borderTop: `2px solid ${borderLight}`, background: 'rgba(0,0,0,0.03)' }}>
+                            <td colSpan={2} style={{ padding: '0.8rem 0.7rem', fontWeight: 800, color: textDark }}>
+                              TOTALES AUDITADOS ({filteredPlanillaPagos.length} entrenadores):
+                            </td>
+                            <td style={{ padding: '0.8rem 0.7rem', textAlign: 'center', fontWeight: 800, color: textDark }}>
+                              {filteredPlanillaPagos.reduce((acc, i) => acc + i.totalLlamadas, 0).toLocaleString('en-US')}
+                            </td>
+                            <td style={{ padding: '0.8rem 0.7rem', textAlign: 'center', fontWeight: 800, color: '#059669' }}>
+                              {filteredPlanillaPagos.reduce((acc, i) => acc + i.pagadoLlamadas, 0).toLocaleString('en-US')}
+                            </td>
+                            <td style={{ padding: '0.8rem 0.7rem', fontWeight: 800, color: '#059669', fontSize: '0.95rem' }}>
+                              ${filteredPlanillaPagos.reduce((acc, i) => acc + i.montoPagadoUSD, 0).toLocaleString('en-US')} USD
+                            </td>
+                            <td style={{ padding: '0.8rem 0.7rem', fontWeight: 800, color: '#b45309' }}>
+                              ${filteredPlanillaPagos.reduce((acc, i) => acc + i.montoPendienteUSD, 0).toLocaleString('en-US')} USD
+                            </td>
+                            <td colSpan={3} style={{ padding: '0.8rem 0.7rem', textAlign: 'right', color: textMuted, fontSize: '0.78rem' }}>
+                              Fuente: Google Drive Maestra de Llamadas
+                            </td>
+                          </tr>
+                        </tfoot>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* VISTA 2: LIQUIDACIÓN POR EQUIPOS (NODUS) */}
+            {liquidacionSubTab === 'equipos_nodus' && (
+              <div>
+                {/* RESUMEN FINANCIERO — panel de 4 cifras clave */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1.2rem' }}>
+                  <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.2rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: 800, color: '#b45309', marginBottom: '0.4rem' }}>
+                      <Clock size={14} /> Por Pagar Ahora (Nodus)
+                    </div>
+                    <div style={{ fontSize: '1.8rem', fontWeight: 800, color: textDark }}>${liquidacionData.totalPendienteUSD.toLocaleString('en-US')}</div>
+                    <div style={{ fontSize: '0.78rem', color: textMuted, marginTop: '0.2rem' }}>{liquidacionData.pendientes.length} equipo{liquidacionData.pendientes.length !== 1 ? 's' : ''} ya cumplió la meta</div>
+                  </div>
+                  <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.2rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: 800, color: '#059669', marginBottom: '0.4rem' }}>
+                      <CheckCircle size={14} /> Pagado Histórico (Nodus)
+                    </div>
+                    <div style={{ fontSize: '1.8rem', fontWeight: 800, color: textDark }}>${liquidacionData.totalPagadoUSD.toLocaleString('en-US')}</div>
+                    <div style={{ fontSize: '0.78rem', color: textMuted, marginTop: '0.2rem' }}>{liquidacionData.pagados.length} pago{liquidacionData.pagados.length !== 1 ? 's' : ''} registrado{liquidacionData.pagados.length !== 1 ? 's' : ''}</div>
+                  </div>
+                  <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.2rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: 800, color: '#3b82f6', marginBottom: '0.4rem' }}>
+                      <Target size={14} /> En Camino a la Meta
+                    </div>
+                    <div style={{ fontSize: '1.8rem', fontWeight: 800, color: textDark }}>{liquidacionData.enCamino.length}</div>
+                    <div style={{ fontSize: '0.78rem', color: textMuted, marginTop: '0.2rem' }}>a 1 o 2 llamadas de activar el pago</div>
+                  </div>
+                  <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.2rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: 800, color: '#6366f1', marginBottom: '0.4rem' }}>
+                      <BarChart3 size={14} /> Comprometido Nodus
+                    </div>
+                    <div style={{ fontSize: '1.8rem', fontWeight: 800, color: textDark }}>${(liquidacionData.totalPendienteUSD + liquidacionData.totalPagadoUSD).toLocaleString('en-US')}</div>
+                    <div style={{ fontSize: '0.78rem', color: textMuted, marginTop: '0.2rem' }}>pendiente + pagado, ciclo actual</div>
+                  </div>
+                </div>
+
+                {/* PENDIENTES DE PAGO */}
+                <div style={{ background: bgCard, borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', border: `1px solid ${borderLight}`, padding: '1.5rem', marginBottom: '1.2rem' }}>
+                  <h3 style={{ fontSize: '1rem', color: textDark, marginBottom: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <Clock size={16} color="#b45309" /> Pendientes de pago ({liquidacionData.pendientes.length})
+                  </h3>
+                  {liquidacionData.pendientes.length === 0 ? (
+                    <p style={{ color: textMuted, fontSize: '0.9rem' }}>No hay equipos pendientes de liquidar por ahora - ningún equipo ha alcanzado todavía las 7 llamadas grupales registradas ni fue cerrado manualmente por un coordinador.</p>
+                  ) : (
+                    <div style={{ overflowX: 'auto' }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+                        <thead>
+                          <tr style={{ background: 'rgba(180,83,9,0.08)', textAlign: 'left' }}>
+                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Equipo</th>
+                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Sede</th>
+                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Entrenador</th>
+                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Motivo</th>
+                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Llamadas</th>
+                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Monto</th>
+                            <th style={{ padding: '0.7rem 0.6rem' }}></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {liquidacionData.pendientes.map((item, idx) => (
+                            <tr key={item.equipoKey} style={{ borderBottom: `1px solid ${borderLight}`, background: idx % 2 === 1 ? 'rgba(0,0,0,0.015)' : 'transparent' }}>
+                              <td style={{ padding: '0.65rem 0.6rem', fontWeight: 600 }}>{item.equipo} {item.numEquipo ? `(#${item.numEquipo})` : ''}</td>
+                              <td style={{ padding: '0.65rem 0.6rem' }}><CountryFlag sede={item.sede} /> {item.sede}</td>
+                              <td style={{ padding: '0.65rem 0.6rem' }}>{item.entrenador}</td>
+                              <td style={{ padding: '0.65rem 0.6rem' }}>
+                                {item.motivo === 'cierre_manual' ? (
+                                  <span title={item.cierreManual?.porNombre ? `Cerrado por ${item.cierreManual.porNombre}` : ''} style={{ background: '#eff6ff', color: '#1d4ed8', padding: '0.2rem 0.5rem', borderRadius: '5px', fontSize: '0.72rem', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                                    🔒 Equipo cerrado
+                                  </span>
+                                ) : (
+                                  <span style={{ background: '#fefce8', color: '#a16207', padding: '0.2rem 0.5rem', borderRadius: '5px', fontSize: '0.72rem', fontWeight: 700, whiteSpace: 'nowrap' }} title={item.fechaAlcanzo7 ? `Llegó a 7 el ${item.fechaAlcanzo7}` : ''}>
+                                    ⭐ 7 llamadas
+                                  </span>
+                                )}
+                              </td>
+                              <td style={{ padding: '0.65rem 0.6rem' }}>{item.totalLlamadas}</td>
+                              <td style={{ padding: '0.65rem 0.6rem', fontWeight: 700, color: '#059669' }}>${item.montoUSD}</td>
+                              <td style={{ padding: '0.65rem 0.6rem' }}>
+                                <button
+                                  onClick={() => handleMarcarPagado(item)}
+                                  style={{ padding: '0.4rem 0.8rem', borderRadius: '6px', border: 'none', background: '#10b981', color: '#fff', fontWeight: 700, cursor: 'pointer', fontSize: '0.8rem', whiteSpace: 'nowrap' }}
+                                >
+                                  Marcar como pagado
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                        <tfoot>
+                          <tr style={{ borderTop: `2px solid ${borderLight}` }}>
+                            <td colSpan={5} style={{ padding: '0.65rem 0.6rem', textAlign: 'right', fontWeight: 700, color: textMuted }}>Total pendiente:</td>
+                            <td colSpan={2} style={{ padding: '0.65rem 0.6rem', fontWeight: 800, color: '#059669' }}>${liquidacionData.totalPendienteUSD.toLocaleString('en-US')}</td>
+                          </tr>
+                        </tfoot>
+                      </table>
+                    </div>
+                  )}
+                </div>
+
+                {/* EN CAMINO A LA META */}
+                <div style={{ background: bgCard, borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', border: `1px solid ${borderLight}`, padding: '1.5rem', marginBottom: '1.2rem' }}>
+                  <h3 style={{ fontSize: '1rem', color: textDark, marginBottom: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <Target size={16} color="#3b82f6" /> En camino a la meta ({liquidacionData.enCamino.length})
+                  </h3>
+                  {liquidacionData.enCamino.length === 0 ? (
+                    <p style={{ color: textMuted, fontSize: '0.9rem' }}>Ningún equipo está a 1 o 2 llamadas de activar el pago por ahora.</p>
+                  ) : (
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '0.8rem' }}>
+                      {liquidacionData.enCamino.map(item => (
+                        <div key={item.equipoKey} style={{ border: `1px solid ${borderLight}`, borderRadius: '10px', padding: '0.9rem' }}>
+                          <div style={{ fontWeight: 700, fontSize: '0.88rem', color: textDark }}>{item.equipo} {item.numEquipo ? `(#${item.numEquipo})` : ''}</div>
+                          <div style={{ fontSize: '0.78rem', color: textMuted, margin: '0.2rem 0 0.6rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                            <CountryFlag sede={item.sede} /> {item.sede} • {item.entrenador}
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.75rem', marginBottom: '0.3rem' }}>
+                            <span style={{ color: textMuted }}>{item.totalLlamadas} de 7 llamadas</span>
+                            <span style={{ fontWeight: 700, color: '#3b82f6' }}>Falta{item.faltan !== 1 ? 'n' : ''} {item.faltan}</span>
+                          </div>
+                          <div style={{ height: '6px', background: 'rgba(0,0,0,0.08)', borderRadius: '4px', overflow: 'hidden' }}>
+                            <div style={{ height: '100%', width: `${(item.totalLlamadas / 7) * 100}%`, background: '#3b82f6', borderRadius: '4px' }} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* HISTORIAL DE PAGOS */}
+                <div style={{ background: bgCard, borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', border: `1px solid ${borderLight}`, padding: '1.5rem' }}>
+                  <h3 style={{ fontSize: '1rem', color: textDark, marginBottom: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <CheckCircle size={16} color="#059669" /> Historial de pagos ({liquidacionData.pagados.length})
+                  </h3>
+                  {liquidacionData.pagados.length === 0 ? (
+                    <p style={{ color: textMuted, fontSize: '0.9rem' }}>Todavía no se ha marcado ningún pago.</p>
+                  ) : (
+                    <div style={{ overflowX: 'auto' }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+                        <thead>
+                          <tr style={{ background: 'rgba(5,150,105,0.08)', textAlign: 'left' }}>
+                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Equipo</th>
+                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Sede</th>
+                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Entrenador</th>
+                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Monto</th>
+                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Pagado el</th>
+                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Pagado por</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {liquidacionData.pagados.map((item, idx) => (
+                            <tr key={item.equipoKey} style={{ borderBottom: `1px solid ${borderLight}`, background: idx % 2 === 1 ? 'rgba(0,0,0,0.015)' : 'transparent' }}>
+                              <td style={{ padding: '0.65rem 0.6rem', fontWeight: 600 }}>{item.equipo} {item.numEquipo ? `(#${item.numEquipo})` : ''}</td>
+                              <td style={{ padding: '0.65rem 0.6rem' }}><CountryFlag sede={item.sede} /> {item.sede}</td>
+                              <td style={{ padding: '0.65rem 0.6rem' }}>{item.entrenador}</td>
+                              <td style={{ padding: '0.65rem 0.6rem', fontWeight: 700, color: '#059669' }}>${item.montoUSD}</td>
+                              <td style={{ padding: '0.65rem 0.6rem' }}>{item.fechaPago || '-'}</td>
+                              <td style={{ padding: '0.65rem 0.6rem' }}>{item.pagadoPorNombre || item.pagadoPorEmail || '-'}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                        <tfoot>
+                          <tr style={{ borderTop: `2px solid ${borderLight}` }}>
+                            <td colSpan={3} style={{ padding: '0.65rem 0.6rem', textAlign: 'right', fontWeight: 700, color: textMuted }}>Total pagado:</td>
+                            <td colSpan={3} style={{ padding: '0.65rem 0.6rem', fontWeight: 800, color: '#059669' }}>${liquidacionData.totalPagadoUSD.toLocaleString('en-US')}</td>
+                          </tr>
+                        </tfoot>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* VISTA 3: CONSOLIDADO TOTAL */}
+            {liquidacionSubTab === 'consolidado' && (
+              <div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem', marginBottom: '1.2rem' }}>
+                  <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.2rem', borderLeft: '4px solid #10b981' }}>
+                    <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: 800, color: '#059669', marginBottom: '0.4rem' }}>
+                      Total Pagado Consolidado
+                    </div>
+                    <div style={{ fontSize: '1.85rem', fontWeight: 800, color: '#059669' }}>
+                      ${(planillaTotales.montoPagadoUSD + liquidacionData.totalPagadoUSD).toLocaleString('en-US')} USD
+                    </div>
+                    <div style={{ fontSize: '0.78rem', color: textMuted, marginTop: '0.2rem' }}>
+                      Planilla (${planillaTotales.montoPagadoUSD.toLocaleString('en-US')}) + Nodus (${liquidacionData.totalPagadoUSD.toLocaleString('en-US')})
+                    </div>
+                  </div>
+
+                  <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.2rem', borderLeft: '4px solid #f59e0b' }}>
+                    <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: 800, color: '#b45309', marginBottom: '0.4rem' }}>
+                      Total Pendiente Consolidado
+                    </div>
+                    <div style={{ fontSize: '1.85rem', fontWeight: 800, color: textDark }}>
+                      ${(planillaTotales.montoPendienteUSD + liquidacionData.totalPendienteUSD).toLocaleString('en-US')} USD
+                    </div>
+                    <div style={{ fontSize: '0.78rem', color: textMuted, marginTop: '0.2rem' }}>
+                      Planilla (${planillaTotales.montoPendienteUSD.toLocaleString('en-US')}) + Nodus (${liquidacionData.totalPendienteUSD.toLocaleString('en-US')})
+                    </div>
+                  </div>
+
+                  <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.2rem', borderLeft: '4px solid #3b82f6' }}>
+                    <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: 800, color: '#3b82f6', marginBottom: '0.4rem' }}>
+                      Compromiso Financiero Total
+                    </div>
+                    <div style={{ fontSize: '1.85rem', fontWeight: 800, color: textDark }}>
+                      ${(planillaTotales.montoTotalAuditadoUSD + liquidacionData.totalPendienteUSD + liquidacionData.totalPagadoUSD).toLocaleString('en-US')} USD
+                    </div>
+                    <div style={{ fontSize: '0.78rem', color: textMuted, marginTop: '0.2rem' }}>
+                      Volumen total auditado entre ambas fuentes
+                    </div>
+                  </div>
+                </div>
+
+                {/* COMPARATIVA DE FUENTES */}
+                <div style={{ background: bgCard, borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', border: `1px solid ${borderLight}`, padding: '1.5rem', marginBottom: '1.2rem' }}>
+                  <h3 style={{ margin: '0 0 1rem', fontSize: '1rem', color: textDark, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <BarChart3 size={18} color="#3b82f6" /> Comparativa y Conciliación por Fuente
+                  </h3>
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+                      <thead>
+                        <tr style={{ background: 'rgba(59,130,246,0.08)', textAlign: 'left' }}>
+                          <th style={{ padding: '0.75rem 0.7rem', fontWeight: 700, color: textDark }}>Fuente de Información</th>
+                          <th style={{ padding: '0.75rem 0.7rem', fontWeight: 700, color: textDark }}>Modelo de Liquidación</th>
+                          <th style={{ padding: '0.75rem 0.7rem', fontWeight: 700, color: textDark }}>Volumen / Unidades</th>
+                          <th style={{ padding: '0.75rem 0.7rem', fontWeight: 700, color: textDark }}>Monto Pagado</th>
+                          <th style={{ padding: '0.75rem 0.7rem', fontWeight: 700, color: textDark }}>Monto Pendiente</th>
+                          <th style={{ padding: '0.75rem 0.7rem', fontWeight: 700, color: textDark }}>Estado Conciliación</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr style={{ borderBottom: `1px solid ${borderLight}` }}>
+                          <td style={{ padding: '0.75rem 0.7rem', fontWeight: 700, color: textDark }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                              <FileSpreadsheet size={16} color="#10b981" /> Planilla Maestra (Google Sheets)
+                            </div>
+                          </td>
+                          <td style={{ padding: '0.75rem 0.7rem' }}>$25 USD / llamada grupal</td>
+                          <td style={{ padding: '0.75rem 0.7rem' }}>5,402 llamadas (3,102 pagadas / 2,241 pendientes)</td>
+                          <td style={{ padding: '0.75rem 0.7rem', fontWeight: 800, color: '#059669' }}>${planillaTotales.montoPagadoUSD.toLocaleString('en-US')} USD</td>
+                          <td style={{ padding: '0.75rem 0.7rem', fontWeight: 800, color: '#b45309' }}>${planillaTotales.montoPendienteUSD.toLocaleString('en-US')} USD</td>
+                          <td style={{ padding: '0.75rem 0.7rem' }}>
+                            <span style={{ background: '#ecfdf5', color: '#059669', padding: '0.2rem 0.5rem', borderRadius: '5px', fontSize: '0.72rem', fontWeight: 700 }}>
+                              ✓ Sincronizado
+                            </span>
+                          </td>
+                        </tr>
+                        <tr style={{ borderBottom: `1px solid ${borderLight}` }}>
+                          <td style={{ padding: '0.75rem 0.7rem', fontWeight: 700, color: textDark }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                              <Users size={16} color="#3b82f6" /> Operativo Causa OS (Nodus)
+                            </div>
+                          </td>
+                          <td style={{ padding: '0.75rem 0.7rem' }}>$400 USD / equipo (7 llamadas o cierre)</td>
+                          <td style={{ padding: '0.75rem 0.7rem' }}>{liquidacionData.pagados.length + liquidacionData.pendientes.length} equipos ({liquidacionData.pagados.length} pagados / {liquidacionData.pendientes.length} pendientes)</td>
+                          <td style={{ padding: '0.75rem 0.7rem', fontWeight: 800, color: '#059669' }}>${liquidacionData.totalPagadoUSD.toLocaleString('en-US')} USD</td>
+                          <td style={{ padding: '0.75rem 0.7rem', fontWeight: 800, color: '#b45309' }}>${liquidacionData.totalPendienteUSD.toLocaleString('en-US')} USD</td>
+                          <td style={{ padding: '0.75rem 0.7rem' }}>
+                            <span style={{ background: '#eff6ff', color: '#1d4ed8', padding: '0.2rem 0.5rem', borderRadius: '5px', fontSize: '0.72rem', fontWeight: 700 }}>
+                              En vivo
+                            </span>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
