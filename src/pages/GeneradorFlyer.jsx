@@ -6,7 +6,7 @@ import { useUI } from '../context/UIContext';
 import {
   Sparkles, Download, ArrowLeft, RefreshCw, Plus, Trash2,
   Copy, Image as ImageIcon, Sliders, Eye, Terminal, Check,
-  Calendar, Zap, CheckCircle2
+  Calendar, Zap, CheckCircle2, MapPin, Globe, Award
 } from 'lucide-react';
 
 // Preset 1: Próximas Fechas de Enrolamiento (Octubre para sedes que ya cerraron Septiembre)
@@ -33,6 +33,15 @@ const MESES = [
   'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
   'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
 ];
+
+function getCountryFlag(ciudad = '') {
+  const c = ciudad.toLowerCase();
+  if (c.includes('lima') || c.includes('arequipa') || c.includes('trujillo') || c.includes('cusco') || c.includes('peru') || c.includes('perú')) return '🇵🇪';
+  if (c.includes('quito') || c.includes('guayaquil') || c.includes('cuenca') || c.includes('ecuador')) return '🇪🇨';
+  if (c.includes('medell') || c.includes('bogot') || c.includes('cali') || c.includes('colombia')) return '🇨🇴';
+  if (c.includes('méx') || c.includes('mex') || c.includes('guadalajara') || c.includes('monterrey')) return '🇲🇽';
+  return '🌐';
+}
 
 function formatEventDates(startStr, endStr) {
   if (!startStr) return '';
@@ -407,72 +416,118 @@ export default function GeneradorFlyer() {
         {/* COLUMNA IZQUIERDA: CONTROLES */}
         <div className="lg:col-span-6 space-y-5">
           
-          {/* Tarjeta de Fechas por Sede */}
-          <div className="glass-panel p-5 rounded-2xl border border-gray-800 space-y-4">
-            <div className="flex items-center justify-between">
+          {/* Tarjeta de Fechas por Sede - Diseño Premium Causa OS */}
+          <div 
+            className="p-6 rounded-2xl border space-y-4"
+            style={{
+              background: 'radial-gradient(ellipse at top left, #172033 0%, #090d16 100%)',
+              borderColor: 'rgba(245, 158, 11, 0.28)',
+              boxShadow: '0 12px 36px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.05)'
+            }}
+          >
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-800/80">
               <div>
-                <h3 className="text-sm font-black text-yellow-400 uppercase tracking-wider flex items-center gap-2">
-                  <Calendar size={16} /> Fechas de Capítulos Uno por Sede
-                </h3>
-                <p className="text-[11px] text-gray-400 mt-0.5">
-                  Edita la fecha de cualquier sede. El diseño mantiene la tipografía y posición original sin cajas.
+                <div className="flex items-center gap-2">
+                  <span className="p-1.5 rounded-lg bg-yellow-500/15 border border-yellow-500/30 text-yellow-400">
+                    <Award size={18} />
+                  </span>
+                  <h3 className="text-sm font-black text-yellow-400 uppercase tracking-widest font-mono">
+                    Calendario Oficial de Capítulos Uno
+                  </h3>
+                </div>
+                <p className="text-[11px] text-gray-400 mt-1">
+                  Control editorial de fechas por ciudad, heráldica de equipos y visibilidad en flyer oficial.
                 </p>
               </div>
-              <button
-                onClick={addSede}
-                className="px-2.5 py-1.5 rounded-lg bg-yellow-500/15 text-yellow-400 hover:bg-yellow-500/25 border border-yellow-500/30 text-xs font-bold flex items-center gap-1 transition-all"
-              >
-                <Plus size={14} /> Agregar Sede
-              </button>
+
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-yellow-500/10 text-yellow-300 border border-yellow-500/20">
+                  {sedes.filter(s => s.activo).length} de {sedes.length} Visibles
+                </span>
+                <button
+                  onClick={addSede}
+                  className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-yellow-500/20 to-amber-500/20 text-yellow-400 hover:from-yellow-500/30 hover:to-amber-500/30 border border-yellow-500/40 text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all"
+                >
+                  <Plus size={14} /> Nueva Sede
+                </button>
+              </div>
             </div>
 
-            <div className="space-y-2.5 max-h-[420px] overflow-y-auto pr-1">
-              {sedes.map((s) => (
-                <div
-                  key={s.id}
-                  className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${
-                    s.activo ? 'bg-gray-900/80 border-gray-700' : 'bg-gray-950/40 border-gray-900 opacity-50'
-                  }`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={s.activo}
-                    onChange={() => toggleSedeActiva(s.id)}
-                    className="accent-yellow-500 w-4 h-4 cursor-pointer rounded"
-                    title={s.activo ? 'Desactivar de flyer' : 'Activar en flyer'}
-                  />
-                  <div className="w-28 flex-shrink-0">
-                    <input
-                      type="text"
-                      value={s.ciudad}
-                      disabled={!s.activo}
-                      onChange={(e) => updateSede(s.id, 'ciudad', e.target.value)}
-                      placeholder="Ciudad"
-                      className="w-full bg-black/60 border border-gray-700 rounded-lg px-2.5 py-1.5 text-xs font-bold text-yellow-400 focus:border-yellow-400 focus:outline-none"
-                    />
-                    {s.equipo && (
-                      <span className="block text-[9px] text-gray-400 mt-0.5 pl-0.5">
-                        {s.equipo}
-                      </span>
-                    )}
-                  </div>
-                  <input
-                    type="text"
-                    value={s.fechas}
-                    disabled={!s.activo}
-                    onChange={(e) => updateSede(s.id, 'fechas', e.target.value)}
-                    placeholder="Fechas (ej: 18, 19 y 20 de septiembre)"
-                    className="flex-1 bg-black/60 border border-gray-700 rounded-lg px-3 py-1.5 text-xs font-medium text-white focus:border-yellow-400 focus:outline-none"
-                  />
-                  <button
-                    onClick={() => removeSede(s.id)}
-                    className="text-gray-500 hover:text-red-400 p-1 transition-all"
-                    title="Eliminar sede"
+            <div className="space-y-2.5 max-h-[440px] overflow-y-auto pr-1">
+              {sedes.map((s) => {
+                const flag = getCountryFlag(s.ciudad);
+                return (
+                  <div
+                    key={s.id}
+                    className={`p-3.5 rounded-xl border transition-all duration-200 ${
+                      s.activo 
+                        ? 'bg-slate-900/90 border-amber-500/30 shadow-md shadow-black/40' 
+                        : 'bg-black/40 border-gray-900/80 opacity-40 hover:opacity-70'
+                    }`}
                   >
-                    <Trash2 size={15} />
-                  </button>
-                </div>
-              ))}
+                    <div className="flex items-center gap-3">
+                      {/* Switch interactivo de visibilidad */}
+                      <button
+                        type="button"
+                        onClick={() => toggleSedeActiva(s.id)}
+                        className={`w-9 h-5 flex items-center rounded-full p-0.5 transition-colors cursor-pointer flex-shrink-0 ${
+                          s.activo ? 'bg-yellow-500 justify-end' : 'bg-gray-800 justify-start'
+                        }`}
+                        title={s.activo ? 'Visible en Flyer (Clic para ocultar)' : 'Oculto (Clic para mostrar)'}
+                      >
+                        <div className="bg-slate-950 w-4 h-4 rounded-full shadow-md" />
+                      </button>
+
+                      {/* Bandera y Ciudad */}
+                      <div className="flex items-center gap-2 w-32 sm:w-36 flex-shrink-0">
+                        <span className="text-lg select-none" title={`Región ${s.ciudad}`}>{flag}</span>
+                        <div className="flex-1 min-w-0">
+                          <input
+                            type="text"
+                            value={s.ciudad}
+                            disabled={!s.activo}
+                            onChange={(e) => updateSede(s.id, 'ciudad', e.target.value)}
+                            placeholder="Ciudad"
+                            className="w-full bg-transparent border-b border-gray-700 focus:border-yellow-400 text-xs font-black text-yellow-300 focus:outline-none py-0.5 tracking-wide"
+                          />
+                          <input
+                            type="text"
+                            value={s.equipo || ''}
+                            disabled={!s.activo}
+                            onChange={(e) => updateSede(s.id, 'equipo', e.target.value)}
+                            placeholder="Ej: Equipo 31"
+                            className="w-full bg-transparent text-[10px] text-gray-400 placeholder-gray-600 focus:text-yellow-200 focus:outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Fechas de Capítulo */}
+                      <div className="flex-1 relative">
+                        <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-gray-500">
+                          <Calendar size={13} />
+                        </div>
+                        <input
+                          type="text"
+                          value={s.fechas}
+                          disabled={!s.activo}
+                          onChange={(e) => updateSede(s.id, 'fechas', e.target.value)}
+                          placeholder="Fechas (ej: 18, 19 y 20 de septiembre)"
+                          className="w-full bg-black/60 border border-gray-800/90 focus:border-yellow-400 rounded-lg pl-8 pr-3 py-1.5 text-xs font-semibold text-slate-100 placeholder-gray-600 focus:outline-none transition-colors"
+                        />
+                      </div>
+
+                      {/* Botón eliminar */}
+                      <button
+                        onClick={() => removeSede(s.id)}
+                        className="text-gray-600 hover:text-red-400 p-1.5 rounded-lg hover:bg-red-500/10 transition-all flex-shrink-0"
+                        title="Eliminar sede"
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
