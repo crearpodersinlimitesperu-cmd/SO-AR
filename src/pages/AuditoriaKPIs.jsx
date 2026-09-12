@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
@@ -747,6 +747,25 @@ export default function AuditoriaKPIs({ defaultTab }) {
     <div style={{ maxWidth: activeTab === 'coordinadores_nodus' ? '1420px' : '1080px', margin: '0 auto', padding: '1.5rem 1rem', transition: 'max-width 0.3s ease' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          <button
+            onClick={() => navigate('/portafolio?tab=rrhh_sentinel')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              background: 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%)',
+              color: '#ffffff',
+              fontWeight: 700,
+              padding: '0.55rem 1.1rem',
+              borderRadius: '8px',
+              border: 'none',
+              cursor: 'pointer',
+              boxShadow: '0 2px 6px rgba(37, 99, 235, 0.35)',
+              fontSize: '0.85rem'
+            }}
+          >
+            <ArrowLeft size={16} /> Volver a Portafolio PMO (Centinela RRHH)
+          </button>
           <button onClick={() => navigate('/gerente')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <ArrowLeft size={16} /> Volver a Causa OS
           </button>
