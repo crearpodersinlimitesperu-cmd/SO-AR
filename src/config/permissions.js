@@ -1,4 +1,4 @@
-﻿// Configuración centralizada de permisos y roles administrativos
+﻿﻿// Configuración centralizada de permisos y roles administrativos
 // Este archivo es la ÚNICA fuente de verdad para emails con privilegios elevados.
 // Cualquier cambio de SuperAdmin se hace AQUÍ, no disperso en el código.
 
@@ -775,5 +775,25 @@ export const canAccessCampusInteractivo = (currentUser) => {
   return checkModuleAccess(currentUser, 'campus_interactivo').hasAccess;
 };
 
+/**
+ * Verifica si el usuario actual es Gerente de Lima, SuperAdmin o DirecciÃ³n autorizada.
+ * Solicitud directa: "https://drive.google.com/drive/folders/1c3wkWITxPTdtvZ41o-MTcftRPkQtmpgi?usp=drive_link esto es solo para el gerente de lima"
+ */
+export const isGerenteLima = (currentUser) => {
+  if (!currentUser) return false;
+  const email = (currentUser.email || '').trim().toLowerCase();
+  if (email === 'jose.sanchez@crearpsl.net') return true;
+  if (currentUser.isSuperAdmin || isSuperAdminEmail(email)) return true;
 
+  const role = (currentUser.appRole || currentUser.role || '').toLowerCase();
+  const roles = Array.isArray(currentUser.roles) ? currentUser.roles.map(r => String(r).toLowerCase()) : [];
+  const sede = (currentUser.sede || '').toLowerCase();
+  const isLima = sede === 'lima' || sede === 'pe' || sede.includes('lima');
+  const isGer = role === 'gerente' || currentUser.isGerente || roles.includes('gerente');
 
+  return isLima && isGer;
+};
+
+export const canAccessPagosSemanalesDrive = (currentUser) => {
+  return isGerenteLima(currentUser);
+};
