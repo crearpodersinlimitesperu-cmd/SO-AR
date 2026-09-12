@@ -1,4 +1,4 @@
-// Configuración centralizada de permisos y roles administrativos
+﻿// Configuración centralizada de permisos y roles administrativos
 // Este archivo es la ÚNICA fuente de verdad para emails con privilegios elevados.
 // Cualquier cambio de SuperAdmin se hace AQUÍ, no disperso en el código.
 
@@ -265,21 +265,40 @@ export const DUAL_ROLE_TRAINER_EMAILS = [
 ];
 
 /**
- * Emails autorizados a ver la pestaña "Liquidación de Entrenadores" (pago de $400
- * por equipo al llegar a 7 llamadas grupales registradas).
- * REGLA ESTRICTA (pedido explícito de José, 02/09/2026):
- * "esta info solo la debo de ver yo y Elizabeth Escobar" — únicamente estos dos
- * correos, sin excepción automática para otros SuperAdmin ni Dirección.
+ * Emails o roles autorizados a ver la pestaÃ±a 'LiquidaciÃ³n de Entrenadores' (auditorÃ­a financiera,
+ * pagos realizados extraÃ­dos de la planilla de llamados, $77,550 USD pagados y pagos por equipo Nodus).
+ * REGLA ESTRICTA (pedido explÃ­cito de JosÃ©, 12/09/2026):
+ * 'de aqui extraer todos los pagos realizados y agregarlos a liquidacion sin rendudar y que se pueda revisar solo visible para mi y directores'
+ * Ãšnicamente SuperAdmin (JosÃ© SÃ¡nchez / Armando PilacuÃ¡n / Paul Sosa), el email de JosÃ© SÃ¡nchez
+ * ('jose.sanchez@crearpsl.net'), roles de DirecciÃ³n (director_maestria, direccion, ceo, cco, cfo),
+ * y el email contable autorizado (Elizabeth Escobar / contabilidad.global@crearpsl.net).
+ * NO pueden verlo coordinadores, entrenadores, gerentes de sede operativos, capitanes ni participantes.
  */
 export const LIQUIDACION_ENTRENADORES_EMAILS = [
-  'jose.sanchez@crearpsl.net',        // José Sánchez
+  'jose.sanchez@crearpsl.net',        // JosÃ© SÃ¡nchez
   'contabilidad.global@crearpsl.net', // Elizabeth Escobar (CFO)
 ];
 
 export const canViewLiquidacionEntrenadores = (currentUser) => {
   if (!currentUser) return false;
   const email = (currentUser.email || '').trim().toLowerCase();
-  return LIQUIDACION_ENTRENADORES_EMAILS.includes(email);
+
+  // 'yo' / SuperAdmin
+  if (email === 'jose.sanchez@crearpsl.net') return true;
+  if (currentUser.isSuperAdmin || isSuperAdminEmail(email)) return true;
+
+  // 'directores'
+  if (currentUser.isDireccion) return true;
+  const role = (currentUser.appRole || currentUser.role || '').toLowerCase();
+  const roles = (currentUser.roles || []).map(r => String(r).toLowerCase());
+
+  if (isDireccionRole(role) || role === 'director_maestria') return true;
+  if (roles.some(r => isDireccionRole(r) || r === 'director_maestria')) return true;
+
+  // Finanzas / CFO autorizado
+  if (LIQUIDACION_ENTRENADORES_EMAILS.includes(email)) return true;
+
+  return false;
 };
 
 /**
