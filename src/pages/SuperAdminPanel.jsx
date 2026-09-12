@@ -268,9 +268,9 @@ function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, curre
             {person.email && (
               <>
                 <a
-                  href={`mailto:${person.email}`}
+                  href={`mailto:${person.email}?subject=${encodeURIComponent('Acceso a la plataforma Causa OS — CREAR Poder Sin Límites')}&body=${encodeURIComponent(`Hola ${person.name || 'Colaborador'},\n\nTe comparto las indicaciones para ingresar a la plataforma operativa Causa OS:\n\n1. Ingresa al enlace: https://centro-operativo-cpsl.web.app\n2. Haz clic en "Continuar con Google" e inicia sesión con tu correo corporativo (${person.email}).\n3. En tu panel principal encontrarás tus tareas asignadas y objetivos operativos para reportar avance y evidencias.\n\nSaludos cordiales,\n${currentUser?.name || 'Dirección CREAR'}`)}`}
                   onClick={(e) => e.stopPropagation()}
-                  title={`Enviar correo a ${person.email}`}
+                  title={`Enviar correo con indicaciones de acceso a ${person.email}`}
                   className="hover-glow"
                   style={{
                     width: '28px',
