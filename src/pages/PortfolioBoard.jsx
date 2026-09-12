@@ -1,22 +1,147 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useCycles } from '../context/CyclesContext';
-import { 
-  Briefcase, TrendingUp, AlertCircle, CheckCircle2, ChevronRight, Activity, 
-  Clock, ShieldCheck, Box, ArrowLeft, Loader2, Sparkles, DollarSign, 
-  Users, PhoneCall, AlertTriangle, Target, RefreshCw, BarChart2, ShieldAlert
+import {
+  Briefcase, TrendingUp, AlertCircle, CheckCircle2, ChevronRight, Activity,
+  Clock, ShieldCheck, Box, ArrowLeft, Loader2, Sparkles, DollarSign,
+  Users, PhoneCall, AlertTriangle, Target, RefreshCw, BarChart2, ShieldAlert,
+  Award, CheckSquare, Plus, ExternalLink, Send, X, Trophy, Filter, ArrowUpDown,
+  Search, UserCheck
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { doc } from 'firebase/firestore';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { doc, collection, setDoc, addDoc } from 'firebase/firestore';
 import { db, getDocResilient } from '../services/firebase';
-import { OPERATIONAL_SEDES, normalizeSede } from '../data/usersData';
+import { OPERATIONAL_SEDES, normalizeSede, usersData, normalizeRole } from '../data/usersData';
+import nodusFallbackData from '../data/nodusFallbackData.json';
 import ResourceCapacityView from '../components/ResourceCapacityView';
+
+export const KNOWN_COORDINATORS = {
+  'MARIBEL': { formalName: 'Maribel Catota', email: 'viviana.catota@crearpsl.net', role: 'coord_c1', sede: 'Cuenca' },
+  'JOAO': { formalName: 'Joao Alfonso Trujillo', email: 'alfonso.trujillo@crearpsl.net', role: 'coord_c1', sede: 'Cuenca' },
+  'JUAN FERNANDO': { formalName: 'Juan Fernando Reinoso', email: 'juan.reinoso@crearpsl.net', role: 'coord_maestria', sede: 'Cuenca' },
+  'EVELYN PAULINA': { formalName: 'Pauly Cedillo (Evelyn)', email: 'evelyn.cedillo@crearpsl.net', role: 'coord_c1', sede: 'Cuenca' },
+  'DIANA MACAS': { formalName: 'Diana Macas', email: 'diana.macas@crearpsl.net', role: 'coord_c1', sede: 'Guayaquil' },
+  'BRENDA RODRIGUEZ': { formalName: 'Brenda Rodriguez', email: 'brenda.rodriguez@crearpsl.net', role: 'coord_c1', sede: 'Guayaquil' },
+  'JONATHAN LA ROSA': { formalName: 'Jonathan La Rosa', email: 'jonathan.larosa@crearpsl.net', role: 'coord_c1', sede: 'Guayaquil' },
+  'JORGE': { formalName: 'Jorge Washington Ramírez', email: 'jorge.ramirez@crearpsl.net', role: 'coord_c1', sede: 'Guayaquil' },
+  'JOYCE': { formalName: 'Joyce Marin', email: 'joyce.marin@crearpsl.net', role: 'coord_c1', sede: 'Lima' },
+  'DIANA': { formalName: 'Diana Moscoso', email: 'diana.moscoso@crearpsl.net', role: 'coord_c1', sede: 'Lima' },
+  'LEYLA': { formalName: 'Leyla Ochoa', email: 'rouz1414@gmail.com', role: 'coord_c1', sede: 'Lima' },
+  'VALENTINA RODRIGUEZ': { formalName: 'Valentina Rodriguez', email: 'valentina.r@crearpsl.net', role: 'coord_c1', sede: 'Medellín' },
+  'DAVID GONZALEZ': { formalName: 'David Gonzalez', email: 'david.gonzalez@crearpsl.net', role: 'coord_c1', sede: 'Medellín' },
+  'JUAN SEBASTIAN SOTO': { formalName: 'Juan Sebastian Soto', email: 'juansebastian.soto@crearpsl.net', role: 'coord_c1', sede: 'Medellín' },
+  'NAOMI': { formalName: 'Naomi Zamora', email: 'naomi.zamora@crearpsl.net', role: 'coord_c1', sede: 'México' },
+  'ADRIANNA': { formalName: 'Adrianna Campuzano', email: 'adrianna@crearpsl.net', role: 'coord_c1', sede: 'Quito' },
+  'LILIANA': { formalName: 'Liliana Cubillo', email: 'liliana.cubillo@crearpsl.net', role: 'coord_c1', sede: 'Quito' },
+  'KARLA': { formalName: 'Karla Aguirre', email: 'katherine.aguirre@crearpsl.net', role: 'coord_c1', sede: 'Quito' },
+  'ADAMS': { formalName: 'Adams (Coordinación)', email: 'coordinacion.quito@crearpsl.net', role: 'coord_c1', sede: 'Quito' },
+  'DANIELA': { formalName: 'Daniela Villa', email: 'dayapamae.villarodriguez14@gmail.com', role: 'coord_c1', sede: 'Quito' },
+  'DANNA': { formalName: 'Dayana Zambrano', email: 'dayizambrano24@gmail.com', role: 'coord_c1', sede: 'Quito' },
+  'MARCELA': { formalName: 'Marcela Robbys', email: 'marobel.studio@gmail.com', role: 'coord_c1', sede: 'Quito' }
+};
+
+export const GERENTES_POR_SEDE = {
+  'Cuenca': { name: 'July León', email: 'emely.leon@crearpsl.net' },
+  'Guayaquil': { name: 'Josué Vera', email: 'josue.vera@crearpsl.net' },
+  'Lima': { name: 'José Sánchez', email: 'jose.sanchez@crearpsl.net' },
+  'Medellín': { name: 'Yurany González', email: 'yurany.gonzalez@crearpsl.net' },
+  'México': { name: 'Nora Zamora', email: 'nora.zamora@crearpsl.net' },
+  'Quito': { name: 'Emily Campuzano / Freddy Sosa', email: 'emily.campuzano@crearpsl.net' }
+};
+
+function formatRoleLabel(role) {
+  const norm = normalizeRole(role);
+  if (norm === 'coord_c1') return 'Coordinador C1 / C2';
+  if (norm === 'coord_maestria') return 'Coordinador MJ';
+  if (norm === 'gerente') return 'Gerente de Sede';
+  if (norm === 'qt') return 'Quantum Team';
+  if (norm === 'capitan') return 'Capitán';
+  if (norm === 'director_maestria') return 'Director Maestría';
+  return 'Coordinador Operativo';
+}
+
+function resolveCausaUser(rawName, sede) {
+  const clean = (s) => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+  const rawClean = clean(rawName);
+
+  for (const [key, val] of Object.entries(KNOWN_COORDINATORS)) {
+    const keyClean = clean(key);
+    if (rawClean === keyClean || rawClean.includes(keyClean) || keyClean.includes(rawClean)) {
+      return {
+        formalName: val.formalName,
+        email: val.email,
+        role: val.role || 'coord_c1',
+        roleLabel: formatRoleLabel(val.role || 'coord_c1'),
+        sede: val.sede || sede || 'Sin Sede',
+        nodusName: rawName
+      };
+    }
+  }
+
+  if (Array.isArray(usersData)) {
+    const match = usersData.find(u => {
+      const uName = clean(u.name || u.displayName);
+      return uName && (uName.includes(rawClean) || rawClean.includes(uName));
+    });
+    if (match) {
+      return {
+        formalName: match.name || match.displayName || rawName,
+        email: match.email || (Array.isArray(match.emails) ? match.emails[0] : `${rawClean}@crearpsl.net`),
+        role: match.role || 'coord_c1',
+        roleLabel: formatRoleLabel(match.role || 'coord_c1'),
+        sede: normalizeSede(match.sede || sede),
+        nodusName: rawName
+      };
+    }
+  }
+
+  return {
+    formalName: rawName.charAt(0).toUpperCase() + rawName.slice(1).toLowerCase(),
+    email: `${rawClean.replace(/\s+/g, '.')}@crearpsl.net`,
+    role: 'coord_c1',
+    roleLabel: 'Coordinador C1 / C2',
+    sede: normalizeSede(sede),
+    nodusName: rawName
+  };
+}
 
 export default function PortfolioBoard() {
   const { currentUser } = useAuth();
   const { events } = useCycles();
   const navigate = useNavigate();
-  const [viewMode, setViewMode] = useState('predictor'); // Por defecto en el Predictor Data Science
+    const [searchParams, setSearchParams] = useSearchParams();
+  const tabParam = searchParams.get('tab');
+  const [viewMode, setViewMode] = useState(tabParam || 'predictor');
+  const [coordinadoresRaw, setCoordinadoresRaw] = useState([]);
+
+  // Estados de control para Centinela RRHH y Ranking
+  const [rankingFilter, setRankingFilter] = useState('ALL'); // ALL, CRITICO, REZAGO, OPTIMO
+  const [rankingSort, setRankingSort] = useState('salud'); // salud, cobertura, confirmados, sentados, asignados
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCoordForTask, setSelectedCoordForTask] = useState(null);
+  const [taskModalOpen, setTaskModalOpen] = useState(false);
+  const [taskForm, setTaskForm] = useState({
+    title: '',
+    description: '',
+    assignedToEmail: '',
+    assignedToName: '',
+    assignedRole: 'gerente',
+    priority: 'urgent',
+    dueDate: ''
+  });
+  const [isSavingTask, setIsSavingTask] = useState(false);
+  const [toastMessage, setToastMessage] = useState(null);
+
+  useEffect(() => {
+    if (tabParam && ['predictor', 'active', 'resources', 'rrhh_sentinel'].includes(tabParam)) {
+      setViewMode(tabParam);
+    }
+  }, [tabParam]);
+
+  const handleTabChange = (mode) => {
+    setViewMode(mode);
+    setSearchParams({ tab: mode });
+  };
   const [loading, setLoading] = useState(true);
   const [portfolio, setPortfolio] = useState([]);
   const [stats, setStats] = useState({ activos: 0, tiempo: 0, atrasado: 0, critico: 0 });
@@ -55,8 +180,13 @@ export default function PortfolioBoard() {
         const docRef = doc(db, 'nodus_coordinadores_c1c2', 'latest');
         const docSnap = await getDocResilient(docRef);
         
-        if (docSnap.exists()) {
+                if (docSnap.exists()) {
           const data = docSnap.data();
+          if (Array.isArray(data.coordinadores) && data.coordinadores.length > 0) {
+            setCoordinadoresRaw(data.coordinadores);
+          } else if (nodusFallbackData?.coordinadores) {
+            setCoordinadoresRaw(nodusFallbackData.coordinadores);
+          }
           let totalEnrolados = 0;
           let totalDesertores = 0;
           let totalParticipantes = 0;
@@ -195,7 +325,7 @@ export default function PortfolioBoard() {
             </div>
             
             <button 
-              onClick={() => setViewMode('predictor')} 
+              onClick={() => handleTabChange('predictor')} 
               style={{ 
                 padding: '0.5rem 1rem', 
                 borderRadius: '8px', 
@@ -212,7 +342,7 @@ export default function PortfolioBoard() {
               <Sparkles size={16} /> Predictor Data Science
             </button>
             <button 
-              onClick={() => setViewMode('active')} 
+              onClick={() => handleTabChange('active')} 
               style={{ 
                 padding: '0.5rem 1rem', 
                 borderRadius: '8px', 
@@ -226,7 +356,7 @@ export default function PortfolioBoard() {
               Ciclos Activos
             </button>
             <button 
-              onClick={() => setViewMode('resources')} 
+              onClick={() => handleTabChange('resources')} 
               style={{ 
                 padding: '0.5rem 1rem', 
                 borderRadius: '8px', 
@@ -240,7 +370,7 @@ export default function PortfolioBoard() {
               Capacidad de Recursos
             </button>
             <button 
-              onClick={() => setViewMode('rrhh_sentinel')} 
+              onClick={() => handleTabChange('rrhh_sentinel')} 
               style={{ 
                 padding: '0.5rem 1rem', 
                 borderRadius: '8px', 
@@ -609,10 +739,33 @@ export default function PortfolioBoard() {
           </div>
         ) : viewMode === 'rrhh_sentinel' ? (
           /* =========================================================================
-             VISTA 4: CENTINELA DE RRHH & INACTIVIDAD DE COORDINADORES
+             VISTA 4: CENTINELA DE RRHH & INTEGRIDAD OPERATIVA NODUS (RANKING & TAREAS)
              ========================================================================= */
           <div>
-            {/* ENCABEZADO Y ALINEACIÓN DE TALENTO HUMANO */}
+            {/* TOAST DE CONFIRMACIÓN */}
+            {toastMessage && (
+              <div style={{
+                position: 'fixed',
+                bottom: '2rem',
+                right: '2rem',
+                background: toastMessage.type === 'success' ? '#10b981' : '#ef4444',
+                color: '#fff',
+                padding: '0.85rem 1.5rem',
+                borderRadius: '10px',
+                boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.25)',
+                fontWeight: 700,
+                fontSize: '0.9rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.6rem',
+                zIndex: 10000
+              }}>
+                <CheckCircle2 size={18} />
+                {toastMessage.text}
+              </div>
+            )}
+
+            {/* ENCABEZADO Y ACCESO A NODUS */}
             <div style={{ 
               background: '#fff', 
               border: `1px solid ${borderLight}`, 
@@ -623,20 +776,20 @@ export default function PortfolioBoard() {
               alignItems: 'center', 
               flexWrap: 'wrap', 
               gap: '1rem',
-              marginBottom: '2rem',
+              marginBottom: '1.5rem',
               boxShadow: '0 2px 4px rgba(0,0,0,0.03)'
             }}>
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
                   <span style={{ background: '#fee2e2', color: '#dc2626', padding: '0.25rem 0.75rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 800 }}>
-                    SUPERVISIÓN AUTOMÁTICA DE TALENTO HUMANO
+                    CENTINELA RRHH &bull; INTEGRIDAD OPERATIVA NODUS
                   </span>
                   <span style={{ fontSize: '0.85rem', color: textMuted }}>
-                    &bull; Detección Temprana de Inactividad y Deserción Operativa
+                    &bull; Supervisión Profunda de Sentados en Sala (C1 vs C2) y Desempeño
                   </span>
                 </div>
                 <p style={{ margin: 0, fontSize: '0.85rem', color: textMuted }}>
-                  El Centinela de RRHH evalúa el ritmo de llamadas, contactos y cuellos de botella de cada coordinador en Nodus y notifica directamente a los Gerentes de Sede en Causa OS.
+                  Cruce directo entre identificadores de Nodus y roles de Causa OS. Monitoreo de integridad de salas, contactabilidad y asignación directa de tareas de coaching para Gerentes.
                 </p>
               </div>
               <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
@@ -661,126 +814,910 @@ export default function PortfolioBoard() {
               </div>
             </div>
 
-            {/* 4 CARDS DE AUDITORÍA DE TALENTO HUMANO */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.25rem', marginBottom: '2rem' }}>
-              <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.25rem', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
-                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: textMuted, textTransform: 'uppercase' }}>Salud Operativa Global</div>
-                <div style={{ fontSize: '2rem', fontWeight: 900, color: (hrSentinelData?.resumenGlobal?.tasaSaludOperativa || 80) >= 70 ? '#10b981' : '#f59e0b', margin: '0.2rem 0' }}>
-                  {hrSentinelData?.resumenGlobal?.tasaSaludOperativa || 82}%
-                </div>
-                <div style={{ fontSize: '0.8rem', color: textMuted }}>Coordinadores con ritmo activo de gestión</div>
-              </div>
+            {/* CÁLCULO DINÁMICO DE DATOS DE COORDINADORES */}
+            {(() => {
+              // 1. Mapeo y fusión con datos cuantitativos de C1/C2 y diagnóstico RRHH
+              const rawList = coordinadoresRaw.length > 0 
+                ? coordinadoresRaw 
+                : (nodusFallbackData?.coordinadores || []);
 
-              <div style={{ background: bgCard, border: '1px solid #fecaca', borderRadius: '12px', padding: '1.25rem', boxShadow: '0 2px 4px rgba(239,68,68,0.05)' }}>
-                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#dc2626', textTransform: 'uppercase' }}>🚨 Inactividad Crítica (0 Llamadas)</div>
-                <div style={{ fontSize: '2rem', fontWeight: 900, color: '#dc2626', margin: '0.2rem 0' }}>
-                  {hrSentinelData?.resumenGlobal?.criticos || 0}
-                </div>
-                <div style={{ fontSize: '0.8rem', color: '#b91c1c' }}>Requieren intervención 1:1 inmediata del Gerente</div>
-              </div>
+              const critList = hrSentinelData?.enAlertaCritica || [];
+              const medList = hrSentinelData?.enAlertaMedia || [];
+              const optList = hrSentinelData?.desempenoOptimo || [];
 
-              <div style={{ background: bgCard, border: '1px solid #fed7aa', borderRadius: '12px', padding: '1.25rem', boxShadow: '0 2px 4px rgba(245,158,11,0.05)' }}>
-                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#d97706', textTransform: 'uppercase' }}>⚠️ Alerta de Rezago (&lt; 35% Cobertura)</div>
-                <div style={{ fontSize: '2rem', fontWeight: 900, color: '#d97706', margin: '0.2rem 0' }}>
-                  {hrSentinelData?.resumenGlobal?.alertaMedia || 0}
-                </div>
-                <div style={{ fontSize: '0.8rem', color: '#b45309' }}>En riesgo de no cubrir la base a tiempo</div>
-              </div>
+              const clean = (s) => (s || '').toUpperCase().trim();
 
-              <div style={{ background: bgCard, border: '1px solid #bbf7d0', borderRadius: '12px', padding: '1.25rem', boxShadow: '0 2px 4px rgba(16,185,129,0.05)' }}>
-                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#16a34a', textTransform: 'uppercase' }}>🟢 Desempeño Óptimo</div>
-                <div style={{ fontSize: '2rem', fontWeight: 900, color: '#16a34a', margin: '0.2rem 0' }}>
-                  {hrSentinelData?.resumenGlobal?.optimos || 0}
-                </div>
-                <div style={{ fontSize: '0.8rem', color: '#15803d' }}>Cumpliendo metas de confirmación</div>
-              </div>
-            </div>
+              const mergedList = rawList.map((c, idx) => {
+                const cName = clean(c.nombre);
+                const userMeta = resolveCausaUser(c.nombre, c.sede);
 
-            {/* TABLA DIAGNÓSTICA DE COORDINADORES EN RIESGO */}
-            <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.5rem', marginBottom: '2rem', boxShadow: '0 2px 4px rgba(0,0,0,0.04)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+                const foundCrit = critList.find(a => clean(a.nombre) === cName);
+                const foundMed = medList.find(a => clean(a.nombre) === cName);
+                const foundOpt = optList.find(a => clean(a.nombre) === cName);
+
+                const asignados = c.asignados || 0;
+                const gestiones = c.gestiones || 0;
+                const coberturaPct = c.coberturaPct || (asignados > 0 ? Math.round((gestiones / asignados) * 100) : 0);
+                const confirmadosC1 = c.confirmadosC1 || 0;
+                const confirmadosC2 = c.confirmadosC2 || 0;
+                const confirmados = c.confirmados || (confirmadosC1 + confirmadosC2);
+                const sentadosC1 = c.sentadosC1 || 0;
+                const sentadosC2 = c.sentadosC2 || 0;
+                const sentadosTotal = c.sentadosTotal || (sentadosC1 + sentadosC2) || c.asistieron || 0;
+                const gestionesC1 = c.gestionesC1 || 0;
+                const gestionesC2 = c.gestionesC2 || 0;
+                const noContesta = c.noContesta || 0;
+                const porConfirmar = c.porConfirmar || 0;
+                const noInteresa = c.noInteresa || 0;
+                const devolucion = c.devolucion || 0;
+
+                let nivelRiesgo = 'OPTIMO';
+                let motivo = '';
+                let coachingFeedback = '';
+
+                if (foundCrit) {
+                  nivelRiesgo = 'CRITICO';
+                  motivo = foundCrit.motivo;
+                  coachingFeedback = foundCrit.coachingFeedback;
+                } else if (foundMed) {
+                  nivelRiesgo = 'MEDIO';
+                  motivo = foundMed.motivo;
+                  coachingFeedback = foundMed.coachingFeedback;
+                } else if (foundOpt) {
+                  nivelRiesgo = 'OPTIMO';
+                  motivo = foundOpt.motivo;
+                  coachingFeedback = foundOpt.coachingFeedback;
+                } else {
+                  if (asignados > 0 && gestiones === 0) {
+                    nivelRiesgo = 'CRITICO';
+                    motivo = `Sin llamadas registradas con ${asignados} asignados (0% cobertura). Inactividad total en Nodus.`;
+                    coachingFeedback = `Pauta RRHH: Intervención inmediata 1:1 del Gerente de Sede para descartar bloqueo técnico o falta de inducción.`;
+                  } else if (asignados > 10 && coberturaPct < 35) {
+                    nivelRiesgo = 'CRITICO';
+                    motivo = `Ritmo crítico de cobertura (${coberturaPct}% con ${asignados} prospectos). Base en alto riesgo de pérdida.`;
+                    coachingFeedback = `Pauta RRHH: Reasignar 50% de la base y programar sesión de destrabe telefónico con el Gerente.`;
+                  } else if (gestiones > 5 && (noContesta / gestiones) > 0.55) {
+                    nivelRiesgo = 'MEDIO';
+                    motivo = `Fricción severa de contacto: ${noContesta} llamadas en No Contesta (${Math.round((noContesta / gestiones) * 100)}%).`;
+                    coachingFeedback = `Pauta RRHH: Ajustar franja de llamadas (18:00 a 21:00) y activar plantilla de reactivación por WhatsApp.`;
+                  } else if (coberturaPct < 60) {
+                    nivelRiesgo = 'MEDIO';
+                    motivo = `Avance por debajo de la meta de velocidad operativa (${coberturaPct}% de cobertura).`;
+                    coachingFeedback = `Pauta RRHH: Check-in matutino de 15 minutos para garantizar ritmo de 30 llamadas diarias.`;
+                  } else {
+                    nivelRiesgo = 'OPTIMO';
+                    motivo = `Excelente ritmo de avance (${coberturaPct}% de cobertura, ${confirmados} confirmaciones logradas).`;
+                    coachingFeedback = `Pauta RRHH: Reconocimiento público en canal de sede. Ritmo sólido para llenar la sala.`;
+                  }
+                }
+
+                return {
+                  id: `coord_${idx}_${c.nombre}`,
+                  nodusName: c.nombre,
+                  formalName: userMeta.formalName,
+                  formalRole: userMeta.roleLabel,
+                  role: userMeta.role,
+                  email: userMeta.email,
+                  sede: c.sede || userMeta.sede,
+                  asignados,
+                  gestiones,
+                  coberturaPct,
+                  confirmados,
+                  confirmadosC1,
+                  confirmadosC2,
+                  sentadosC1,
+                  sentadosC2,
+                  sentadosTotal,
+                  gestionesC1,
+                  gestionesC2,
+                  noContesta,
+                  porConfirmar,
+                  noInteresa,
+                  devolucion,
+                  nivelRiesgo,
+                  motivo,
+                  coachingFeedback
+                };
+              });
+
+              // Filtro por Sede seleccionada
+              const sedeList = selectedSede === 'GLOBAL'
+                ? mergedList
+                : mergedList.filter(c => normalizeSede(c.sede) === normalizeSede(selectedSede));
+
+              // Conteos KPI
+              const totalCoords = sedeList.length;
+              const criticosList = sedeList.filter(c => c.nivelRiesgo === 'CRITICO');
+              const rezagosList = sedeList.filter(c => c.nivelRiesgo === 'MEDIO');
+              const optimosList = sedeList.filter(c => c.nivelRiesgo === 'OPTIMO');
+              const saludPct = totalCoords > 0 ? Math.round((optimosList.length / totalCoords) * 100) : 100;
+
+              // Filtrado por tab y búsqueda
+              let displayList = [...sedeList];
+              if (rankingFilter === 'CRITICO') displayList = displayList.filter(c => c.nivelRiesgo === 'CRITICO');
+              if (rankingFilter === 'REZAGO') displayList = displayList.filter(c => c.nivelRiesgo === 'MEDIO');
+              if (rankingFilter === 'OPTIMO') displayList = displayList.filter(c => c.nivelRiesgo === 'OPTIMO');
+
+              if (searchTerm.trim()) {
+                const q = searchTerm.toLowerCase();
+                displayList = displayList.filter(c => 
+                  c.formalName.toLowerCase().includes(q) ||
+                  c.nodusName.toLowerCase().includes(q) ||
+                  c.email.toLowerCase().includes(q) ||
+                  c.sede.toLowerCase().includes(q)
+                );
+              }
+
+              // Ordenamiento
+              displayList.sort((a, b) => {
+                if (rankingSort === 'salud') {
+                  const order = { 'OPTIMO': 1, 'MEDIO': 2, 'CRITICO': 3 };
+                  if (order[a.nivelRiesgo] !== order[b.nivelRiesgo]) {
+                    return order[a.nivelRiesgo] - order[b.nivelRiesgo];
+                  }
+                  return b.coberturaPct - a.coberturaPct || b.confirmados - a.confirmados;
+                }
+                if (rankingSort === 'cobertura') return b.coberturaPct - a.coberturaPct;
+                if (rankingSort === 'confirmados') return b.confirmados - a.confirmados;
+                if (rankingSort === 'sentados') return b.sentadosTotal - a.sentadosTotal;
+                if (rankingSort === 'asignados') return b.asignados - a.asignados;
+                return 0;
+              });
+
+              const handleOpenTask = (coord) => {
+                setSelectedCoordForTask(coord);
+                const gerente = GERENTES_POR_SEDE[coord.sede] || { name: `Gerente de ${coord.sede}`, email: 'gerencia@crearpsl.net' };
+                const defaultEmail = coord.nivelRiesgo === 'CRITICO' ? gerente.email : coord.email;
+                const defaultName = coord.nivelRiesgo === 'CRITICO' ? gerente.name : coord.formalName;
+                const defaultRole = coord.nivelRiesgo === 'CRITICO' ? 'gerente' : coord.role;
+                const todayPlusTwo = new Date(Date.now() + 2 * 86400000).toISOString().split('T')[0];
+
+                const desc = `DIAGNÓSTICO OPERATIVO NODUS:
+• Coordinador Causa OS: ${coord.formalName} (ID Nodus: ${coord.nodusName})
+• Sede: ${coord.sede} | Rol Causa OS: ${coord.formalRole}
+• Correo Corporativo: ${coord.email}
+• Base Asignada: ${coord.asignados} prospectos
+• Gestiones Realizadas: ${coord.gestiones} llamadas (${coord.coberturaPct}% cobertura)
+• Integridad de Sala (Sentados): C1 = ${coord.sentadosC1} | C2 = ${coord.sentadosC2} (Total: ${coord.sentadosTotal} sentados en sala)
+• Confirmados: C1 = ${coord.confirmadosC1} | C2 = ${coord.confirmadosC2} (Total: ${coord.confirmados} confirmados)
+• Fricción Telefónica: No Contesta = ${coord.noContesta} | Por Confirmar = ${coord.porConfirmar} | No Interesa = ${coord.noInteresa}
+• Diagnóstico Empírico: ${coord.motivo}
+
+PAUTA DE COACHING Y LIDERAZGO (RRHH):
+${coord.coachingFeedback}`;
+
+                setTaskForm({
+                  title: `[Centinela RRHH] Intervención Operativa & Coaching: ${coord.formalName} (${coord.sede})`,
+                  description: desc,
+                  assignedToEmail: defaultEmail,
+                  assignedToName: defaultName,
+                  assignedRole: defaultRole,
+                  priority: coord.nivelRiesgo === 'CRITICO' ? 'urgent' : coord.nivelRiesgo === 'MEDIO' ? 'high' : 'medium',
+                  dueDate: todayPlusTwo
+                });
+
+                setTaskModalOpen(true);
+              };
+
+              return (
                 <div>
-                  <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: textDark, margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <AlertTriangle color="#ef4444" size={20} /> Diagnóstico de Talento Humano y Pautas de Coaching
-                  </h3>
-                  <p style={{ fontSize: '0.8rem', color: textMuted, margin: 0 }}>
-                    Coordinadores evaluados con foco en la sede <strong>{selectedSede}</strong>
-                  </p>
-                </div>
-              </div>
+                  {/* 4 CARDS DE AUDITORÍA Y SALUD OPERATIVA */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.25rem', marginBottom: '1.5rem' }}>
+                    <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.25rem', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+                      <div style={{ fontSize: '0.75rem', fontWeight: 800, color: textMuted, textTransform: 'uppercase' }}>Salud Operativa Global</div>
+                      <div style={{ fontSize: '2rem', fontWeight: 900, color: saludPct >= 70 ? '#10b981' : '#f59e0b', margin: '0.2rem 0' }}>
+                        {saludPct}%
+                      </div>
+                      <div style={{ fontSize: '0.8rem', color: textMuted }}>
+                        {optimosList.length} de {totalCoords} coordinadores con ritmo activo ({selectedSede})
+                      </div>
+                    </div>
 
-              <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '850px' }}>
-                  <thead>
-                    <tr style={{ borderBottom: `2px solid ${borderLight}`, color: textMuted, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                      <th style={{ padding: '0.8rem', fontWeight: 700 }}>Coordinador</th>
-                      <th style={{ padding: '0.8rem', fontWeight: 700 }}>Sede</th>
-                      <th style={{ padding: '0.8rem', fontWeight: 700 }}>Avance</th>
-                      <th style={{ padding: '0.8rem', fontWeight: 700 }}>Estado Operativo</th>
-                      <th style={{ padding: '0.8rem', fontWeight: 700 }}>Diagnóstico Empírico</th>
-                      <th style={{ padding: '0.8rem', fontWeight: 700 }}>Recomendación de Liderazgo (RRHH)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {(() => {
-                      const allAlerts = [
-                        ...(hrSentinelData?.enAlertaCritica || []),
-                        ...(hrSentinelData?.enAlertaMedia || [])
-                      ];
-                      const scoped = selectedSede === 'GLOBAL'
-                        ? allAlerts
-                        : allAlerts.filter(a => normalizeSede(a.sede) === normalizeSede(selectedSede));
+                    <div style={{ background: bgCard, border: '1px solid #fecaca', borderRadius: '12px', padding: '1.25rem', boxShadow: '0 2px 4px rgba(239,68,68,0.05)' }}>
+                      <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#dc2626', textTransform: 'uppercase' }}>🚨 Inactividad Crítica</div>
+                      <div style={{ fontSize: '2rem', fontWeight: 900, color: '#dc2626', margin: '0.2rem 0' }}>
+                        {criticosList.length}
+                      </div>
+                      <div style={{ fontSize: '0.8rem', color: '#b91c1c' }}>Requieren intervención 1:1 inmediata del Gerente</div>
+                    </div>
 
-                      if (scoped.length === 0) {
-                        return (
-                          <tr>
-                            <td colSpan="6" style={{ padding: '3rem', textAlign: 'center', color: '#16a34a', fontWeight: 600 }}>
-                              🎉 ¡Excelente! No se registran coordinadores con inactividad crítica o rezagos en {selectedSede}.
-                            </td>
+                    <div style={{ background: bgCard, border: '1px solid #fed7aa', borderRadius: '12px', padding: '1.25rem', boxShadow: '0 2px 4px rgba(245,158,11,0.05)' }}>
+                      <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#d97706', textTransform: 'uppercase' }}>⚠️ Alerta de Rezago</div>
+                      <div style={{ fontSize: '2rem', fontWeight: 900, color: '#d97706', margin: '0.2rem 0' }}>
+                        {rezagosList.length}
+                      </div>
+                      <div style={{ fontSize: '0.8rem', color: '#b45309' }}>En riesgo de no cubrir su base a tiempo</div>
+                    </div>
+
+                    <div style={{ background: bgCard, border: '1px solid #bbf7d0', borderRadius: '12px', padding: '1.25rem', boxShadow: '0 2px 4px rgba(16,185,129,0.05)' }}>
+                      <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#16a34a', textTransform: 'uppercase' }}>🟢 Desempeño Óptimo</div>
+                      <div style={{ fontSize: '2rem', fontWeight: 900, color: '#16a34a', margin: '0.2rem 0' }}>
+                        {optimosList.length}
+                      </div>
+                      <div style={{ fontSize: '0.8rem', color: '#15803d' }}>Cumpliendo metas de confirmación y ritmo</div>
+                    </div>
+                  </div>
+
+                  {/* BARRA DE CONTROL DE RANKING Y FILTROS */}
+                  <div style={{ 
+                    background: bgCard, 
+                    border: `1px solid ${borderLight}`, 
+                    borderRadius: '12px', 
+                    padding: '1rem 1.25rem', 
+                    marginBottom: '1.5rem', 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center', 
+                    flexWrap: 'wrap', 
+                    gap: '1rem' 
+                  }}>
+                    {/* Botones de Filtro por Estado */}
+                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                      <span style={{ fontSize: '0.75rem', fontWeight: 800, color: textMuted, textTransform: 'uppercase', marginRight: '0.2rem' }}>
+                        FILTRAR POR:
+                      </span>
+                      <button
+                        onClick={() => setRankingFilter('ALL')}
+                        style={{
+                          padding: '0.4rem 0.8rem',
+                          borderRadius: '6px',
+                          border: rankingFilter === 'ALL' ? '1px solid #3b82f6' : `1px solid ${borderLight}`,
+                          background: rankingFilter === 'ALL' ? 'rgba(59, 130, 246, 0.15)' : 'transparent',
+                          color: rankingFilter === 'ALL' ? '#38bdf8' : textDark,
+                          fontSize: '0.8rem',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.3rem'
+                        }}
+                      >
+                        <Trophy size={14} /> Todos ({totalCoords})
+                      </button>
+                      <button
+                        onClick={() => setRankingFilter('CRITICO')}
+                        style={{
+                          padding: '0.4rem 0.8rem',
+                          borderRadius: '6px',
+                          border: rankingFilter === 'CRITICO' ? '1px solid #ef4444' : `1px solid ${borderLight}`,
+                          background: rankingFilter === 'CRITICO' ? 'rgba(239, 68, 68, 0.15)' : 'transparent',
+                          color: rankingFilter === 'CRITICO' ? '#ef4444' : textDark,
+                          fontSize: '0.8rem',
+                          fontWeight: 700,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        🚨 Críticos ({criticosList.length})
+                      </button>
+                      <button
+                        onClick={() => setRankingFilter('REZAGO')}
+                        style={{
+                          padding: '0.4rem 0.8rem',
+                          borderRadius: '6px',
+                          border: rankingFilter === 'REZAGO' ? '1px solid #f59e0b' : `1px solid ${borderLight}`,
+                          background: rankingFilter === 'REZAGO' ? 'rgba(245, 158, 11, 0.15)' : 'transparent',
+                          color: rankingFilter === 'REZAGO' ? '#f59e0b' : textDark,
+                          fontSize: '0.8rem',
+                          fontWeight: 700,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        ⚠️ Rezagos ({rezagosList.length})
+                      </button>
+                      <button
+                        onClick={() => setRankingFilter('OPTIMO')}
+                        style={{
+                          padding: '0.4rem 0.8rem',
+                          borderRadius: '6px',
+                          border: rankingFilter === 'OPTIMO' ? '1px solid #10b981' : `1px solid ${borderLight}`,
+                          background: rankingFilter === 'OPTIMO' ? 'rgba(16, 185, 129, 0.15)' : 'transparent',
+                          color: rankingFilter === 'OPTIMO' ? '#10b981' : textDark,
+                          fontSize: '0.8rem',
+                          fontWeight: 700,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        🟢 Óptimos ({optimosList.length})
+                      </button>
+                    </div>
+
+                    {/* Controles de Búsqueda y Orden */}
+                    <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                      <div style={{ position: 'relative' }}>
+                        <Search size={14} style={{ position: 'absolute', left: '0.6rem', top: '50%', transform: 'translateY(-50%)', color: textMuted }} />
+                        <input
+                          type="text"
+                          placeholder="Buscar coordinador o sede..."
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                          style={{
+                            padding: '0.4rem 0.8rem 0.4rem 2rem',
+                            borderRadius: '6px',
+                            border: `1px solid ${borderLight}`,
+                            background: bgCard,
+                            color: textDark,
+                            fontSize: '0.8rem',
+                            width: '200px'
+                          }}
+                        />
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                        <ArrowUpDown size={14} style={{ color: textMuted }} />
+                        <select
+                          value={rankingSort}
+                          onChange={(e) => setRankingSort(e.target.value)}
+                          style={{
+                            padding: '0.4rem 0.8rem',
+                            borderRadius: '6px',
+                            border: `1px solid ${borderLight}`,
+                            background: bgCard,
+                            color: textDark,
+                            fontSize: '0.8rem',
+                            fontWeight: 700,
+                            cursor: 'pointer'
+                          }}
+                        >
+                          <option value="salud">Ordenar: Salud Operativa</option>
+                          <option value="cobertura">Ordenar: % Cobertura</option>
+                          <option value="confirmados">Ordenar: Confirmados (C1+C2)</option>
+                          <option value="sentados">Ordenar: Sentados en Sala</option>
+                          <option value="asignados">Ordenar: Asignados</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* TABLA COMPLETA DE RANKING & INTEGRIDAD OPERATIVA */}
+                  <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.25rem', marginBottom: '2rem', boxShadow: '0 2px 4px rgba(0,0,0,0.04)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+                      <div>
+                        <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: textDark, margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <Award color="#f59e0b" size={20} /> Ranking General &bull; Integridad de Llamados y Asignación de Tareas
+                        </h3>
+                        <p style={{ fontSize: '0.8rem', color: textMuted, margin: 0 }}>
+                          {displayList.length} coordinadores visualizados en <strong>{selectedSede}</strong> &bull; Cruzado con roles Causa OS y Nodus
+                        </p>
+                      </div>
+                    </div>
+
+                    <div style={{ overflowX: 'auto' }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '1080px' }}>
+                        <thead>
+                          <tr style={{ borderBottom: `2px solid ${borderLight}`, color: textMuted, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                            <th style={{ padding: '0.8rem', fontWeight: 700, width: '60px' }}># Rank</th>
+                            <th style={{ padding: '0.8rem', fontWeight: 700, width: '220px' }}>Coordinador & Rol Causa OS</th>
+                            <th style={{ padding: '0.8rem', fontWeight: 700, width: '90px' }}>Sede</th>
+                            <th style={{ padding: '0.8rem', fontWeight: 700, width: '180px' }}>Integridad Sala (Sentados C1/C2)</th>
+                            <th style={{ padding: '0.8rem', fontWeight: 700, width: '180px' }}>Embudo & Contactabilidad</th>
+                            <th style={{ padding: '0.8rem', fontWeight: 700, width: '110px' }}>Estado</th>
+                            <th style={{ padding: '0.8rem', fontWeight: 700 }}>Diagnóstico & Pauta RRHH</th>
+                            <th style={{ padding: '0.8rem', fontWeight: 700, textAlign: 'center', width: '130px' }}>Acción</th>
                           </tr>
-                        );
-                      }
+                        </thead>
+                        <tbody>
+                          {displayList.length === 0 ? (
+                            <tr>
+                              <td colSpan="8" style={{ padding: '3rem', textAlign: 'center', color: textMuted, fontWeight: 600 }}>
+                                No se encontraron coordinadores bajo los criterios seleccionados.
+                              </td>
+                            </tr>
+                          ) : (
+                            displayList.map((item, idx) => {
+                              const rankMedal = idx === 0 ? '🥇 #1' : idx === 1 ? '🥈 #2' : idx === 2 ? '🥉 #3' : `#${idx + 1}`;
+                              const isCrit = item.nivelRiesgo === 'CRITICO';
+                              const isMed = item.nivelRiesgo === 'MEDIO';
 
-                      return scoped.map((item, idx) => (
-                        <tr key={idx} style={{ borderBottom: `1px solid ${borderLight}`, background: item.nivelRiesgo === 'CRITICO' ? 'rgba(239,68,68,0.03)' : 'transparent' }}>
-                          <td style={{ padding: '1rem 0.8rem', fontWeight: 700, color: textDark }}>
-                            {item.nombre}
-                          </td>
-                          <td style={{ padding: '1rem 0.8rem', fontSize: '0.85rem' }}>
-                            <span style={{ background: 'rgba(255, 255, 255, 0.08)', padding: '0.2rem 0.6rem', borderRadius: '4px', fontWeight: 600, color: textDark }}>
-                              {item.sede}
-                            </span>
-                          </td>
-                          <td style={{ padding: '1rem 0.8rem', fontSize: '0.85rem' }}>
-                            <div style={{ fontWeight: 700 }}>{item.gestiones} / {item.asignados} ({item.coberturaPct}%)</div>
-                            <div style={{ fontSize: '0.75rem', color: textMuted }}>✅ {item.confirmados} confirmados</div>
-                          </td>
-                          <td style={{ padding: '1rem 0.8rem' }}>
-                            <span style={{
-                              background: item.nivelRiesgo === 'CRITICO' ? 'rgba(239, 68, 68, 0.18)' : 'rgba(245, 158, 11, 0.18)',
-                              color: item.nivelRiesgo === 'CRITICO' ? '#ef4444' : '#fbbf24',
-                              padding: '0.25rem 0.6rem',
-                              borderRadius: '4px',
-                              fontSize: '0.75rem',
-                              fontWeight: 800
+                              return (
+                                <tr 
+                                  key={item.id} 
+                                  style={{ 
+                                    borderBottom: `1px solid ${borderLight}`, 
+                                    background: isCrit ? 'rgba(239, 68, 68, 0.04)' : isMed ? 'rgba(245, 158, 11, 0.02)' : 'transparent',
+                                    transition: 'background 0.2s ease'
+                                  }}
+                                >
+                                  {/* # RANK */}
+                                  <td style={{ padding: '1rem 0.8rem', fontWeight: 800, fontSize: '0.9rem', color: idx < 3 ? '#f59e0b' : textMuted }}>
+                                    {rankMedal}
+                                  </td>
+
+                                  {/* COORDINADOR & ROL CAUSA OS */}
+                                  <td style={{ padding: '1rem 0.8rem' }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
+                                        <span style={{ fontWeight: 800, color: textDark, fontSize: '0.9rem' }}>
+                                          {item.formalName}
+                                        </span>
+                                      </div>
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
+                                        <span style={{ 
+                                          background: item.formalRole.includes('Maestría') || item.formalRole.includes('MJ') ? 'rgba(168, 85, 247, 0.15)' : 'rgba(59, 130, 246, 0.15)', 
+                                          color: item.formalRole.includes('Maestría') || item.formalRole.includes('MJ') ? '#c084fc' : '#60a5fa', 
+                                          padding: '0.15rem 0.5rem', 
+                                          borderRadius: '4px', 
+                                          fontSize: '0.7rem', 
+                                          fontWeight: 700 
+                                        }}>
+                                          {item.formalRole}
+                                        </span>
+                                      </div>
+                                      <div style={{ fontSize: '0.72rem', color: textMuted }}>
+                                        <span style={{ color: '#d97706', fontWeight: 600 }}>Nodus: {item.nodusName}</span> &bull; {item.email}
+                                      </div>
+                                    </div>
+                                  </td>
+
+                                  {/* SEDE */}
+                                  <td style={{ padding: '1rem 0.8rem', fontSize: '0.85rem' }}>
+                                    <span style={{ background: 'rgba(255, 255, 255, 0.08)', padding: '0.25rem 0.6rem', borderRadius: '4px', fontWeight: 700, color: textDark }}>
+                                      {item.sede}
+                                    </span>
+                                  </td>
+
+                                  {/* INTEGRIDAD SALA (SENTADOS C1 VS C2) */}
+                                  <td style={{ padding: '1rem 0.8rem' }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                                      <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap' }}>
+                                        <span style={{ background: 'rgba(16, 185, 129, 0.18)', color: '#10b981', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 800 }}>
+                                          C1: {item.sentadosC1}
+                                        </span>
+                                        <span style={{ background: 'rgba(59, 130, 246, 0.18)', color: '#38bdf8', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 800 }}>
+                                          C2: {item.sentadosC2}
+                                        </span>
+                                      </div>
+                                      <div style={{ fontSize: '0.75rem', fontWeight: 700, color: textDark }}>
+                                        Total Sentados: {item.sentadosTotal}
+                                      </div>
+                                      <div style={{ fontSize: '0.7rem', color: textMuted }}>
+                                        ✅ {item.confirmadosC1} conf. C1 &bull; {item.confirmadosC2} conf. C2
+                                      </div>
+                                    </div>
+                                  </td>
+
+                                  {/* EMBUDO & CONTACTABILIDAD */}
+                                  <td style={{ padding: '1rem 0.8rem' }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: 700 }}>
+                                        <span>{item.gestiones} / {item.asignados}</span>
+                                        <span style={{ color: item.coberturaPct >= 70 ? '#10b981' : item.coberturaPct >= 35 ? '#f59e0b' : '#ef4444' }}>
+                                          {item.coberturaPct}%
+                                        </span>
+                                      </div>
+                                      {/* Barra de progreso */}
+                                      <div style={{ width: '100%', height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '3px', overflow: 'hidden' }}>
+                                        <div style={{ 
+                                          width: `${Math.min(100, item.coberturaPct)}%`, 
+                                          height: '100%', 
+                                          background: item.coberturaPct >= 70 ? '#10b981' : item.coberturaPct >= 35 ? '#f59e0b' : '#ef4444' 
+                                        }} />
+                                      </div>
+                                      <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap', fontSize: '0.68rem', color: textMuted }}>
+                                        <span>⚠️ NC: {item.noContesta}</span>
+                                        <span>⏳ Pend: {item.porConfirmar}</span>
+                                        <span>❌ NoInt: {item.noInteresa}</span>
+                                      </div>
+                                    </div>
+                                  </td>
+
+                                  {/* ESTADO OPERATIVO */}
+                                  <td style={{ padding: '1rem 0.8rem' }}>
+                                    <span style={{
+                                      background: isCrit ? 'rgba(239, 68, 68, 0.18)' : isMed ? 'rgba(245, 158, 11, 0.18)' : 'rgba(16, 185, 129, 0.18)',
+                                      color: isCrit ? '#ef4444' : isMed ? '#fbbf24' : '#34d399',
+                                      padding: '0.25rem 0.6rem',
+                                      borderRadius: '4px',
+                                      fontSize: '0.72rem',
+                                      fontWeight: 800,
+                                      display: 'inline-block'
+                                    }}>
+                                      {isCrit ? '🚨 CRÍTICO' : isMed ? '⚠️ REZAGO' : '🟢 ÓPTIMO'}
+                                    </span>
+                                  </td>
+
+                                  {/* DIAGNÓSTICO & PAUTA RRHH */}
+                                  <td style={{ padding: '1rem 0.8rem', fontSize: '0.78rem' }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                                      <div style={{ color: textDark, fontWeight: 500 }}>
+                                        {item.motivo}
+                                      </div>
+                                      <div style={{ 
+                                        color: isCrit ? '#f87171' : isMed ? '#fbbf24' : '#38bdf8', 
+                                        background: 'rgba(255, 255, 255, 0.04)', 
+                                        padding: '0.4rem 0.6rem', 
+                                        borderRadius: '6px', 
+                                        border: `1px solid ${borderLight}` 
+                                      }}>
+                                        {item.coachingFeedback}
+                                      </div>
+                                    </div>
+                                  </td>
+
+                                  {/* ACCIÓN: CONVERTIR EN TAREA */}
+                                  <td style={{ padding: '1rem 0.8rem', textAlign: 'center' }}>
+                                    <button
+                                      onClick={() => handleOpenTask(item)}
+                                      style={{
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '0.35rem',
+                                        background: isCrit 
+                                          ? 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)' 
+                                          : isMed 
+                                            ? 'linear-gradient(135deg, #d97706 0%, #b45309 100%)' 
+                                            : 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+                                        color: '#fff',
+                                        padding: '0.45rem 0.8rem',
+                                        borderRadius: '6px',
+                                        fontSize: '0.75rem',
+                                        fontWeight: 800,
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        boxShadow: isCrit ? '0 2px 6px rgba(220, 38, 38, 0.4)' : '0 2px 4px rgba(0,0,0,0.2)',
+                                        whiteSpace: 'nowrap'
+                                      }}
+                                    >
+                                      <Send size={12} /> ⚡ Tarea
+                                    </button>
+                                  </td>
+                                </tr>
+                              );
+                            })
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  {/* MODAL PARA CONVERTIR EN TAREA EN CAUSA OS */}
+                  {taskModalOpen && selectedCoordForTask && (
+                    <div style={{
+                      position: 'fixed',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      backgroundColor: 'rgba(15, 23, 42, 0.85)',
+                      backdropFilter: 'blur(4px)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      zIndex: 9999,
+                      padding: '1rem'
+                    }}>
+                      <div style={{
+                        background: '#1e293b',
+                        borderRadius: '16px',
+                        width: '100%',
+                        maxWidth: '680px',
+                        maxHeight: '90vh',
+                        overflowY: 'auto',
+                        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        color: '#f8fafc'
+                      }}>
+                        {/* Header Modal */}
+                        <div style={{
+                          padding: '1.25rem 1.5rem',
+                          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          background: '#0f172a',
+                          borderTopLeftRadius: '16px',
+                          borderTopRightRadius: '16px'
+                        }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                            <div style={{
+                              background: '#fee2e2',
+                              color: '#dc2626',
+                              width: '36px',
+                              height: '36px',
+                              borderRadius: '10px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
                             }}>
-                              {item.nivelRiesgo === 'CRITICO' ? '🚨 CRÍTICO' : '⚠️ REZAGO'}
-                            </span>
-                          </td>
-                          <td style={{ padding: '1rem 0.8rem', fontSize: '0.8rem', color: textDark, maxWidth: '250px' }}>
-                            {item.motivo}
-                          </td>
-                          <td style={{ padding: '1rem 0.8rem', fontSize: '0.8rem', color: '#0369a1', background: 'rgba(2, 132, 199, 0.04)', borderRadius: '6px', maxWidth: '300px' }}>
-                            {item.coachingFeedback}
-                          </td>
-                        </tr>
-                      ));
-                    })()}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+                              <ShieldAlert size={20} />
+                            </div>
+                            <div>
+                              <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: '#f8fafc' }}>
+                                Convertir Alerta en Tarea Asignada (Causa OS)
+                              </h3>
+                              <p style={{ margin: 0, fontSize: '0.78rem', color: '#94a3b8' }}>
+                                Intervención operativa &bull; {selectedCoordForTask.formalName} ({selectedCoordForTask.sede})
+                              </p>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => setTaskModalOpen(false)}
+                            style={{
+                              background: 'transparent',
+                              border: 'none',
+                              color: '#94a3b8',
+                              cursor: 'pointer',
+                              padding: '0.3rem',
+                              borderRadius: '6px'
+                            }}
+                          >
+                            <X size={20} />
+                          </button>
+                        </div>
+
+                        {/* Body Modal */}
+                        <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                          {/* Asignado A */}
+                          <div>
+                            <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#e2e8f0', marginBottom: '0.4rem' }}>
+                              Asignado Principal (Responsable de Ejecución):
+                            </label>
+                            {(() => {
+                              const gerenteSede = GERENTES_POR_SEDE[selectedCoordForTask.sede] || { name: `Gerente de ${selectedCoordForTask.sede}`, email: 'gerencia@crearpsl.net' };
+                              return (
+                                <select
+                                  value={taskForm.assignedToEmail}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    let name = val;
+                                    let role = 'gerente';
+                                    if (val === selectedCoordForTask.email) {
+                                      name = selectedCoordForTask.formalName;
+                                      role = selectedCoordForTask.role;
+                                    } else if (val === gerenteSede.email) {
+                                      name = gerenteSede.name;
+                                      role = 'gerente';
+                                    } else if (val === 'andres.gomez@crearpsl.net') {
+                                      name = 'Andrés Gómez';
+                                      role = 'direccion';
+                                    }
+                                    setTaskForm(prev => ({
+                                      ...prev,
+                                      assignedToEmail: val,
+                                      assignedToName: name,
+                                      assignedRole: role
+                                    }));
+                                  }}
+                                  style={{
+                                    width: '100%',
+                                    padding: '0.65rem 0.85rem',
+                                    borderRadius: '8px',
+                                    border: '1px solid #475569',
+                                    fontSize: '0.85rem',
+                                    fontWeight: 600,
+                                    background: '#0f172a',
+                                    color: '#f8fafc'
+                                  }}
+                                >
+                                  <option value={gerenteSede.email}>
+                                    🏛️ Gerente de Sede: {gerenteSede.name} ({gerenteSede.email})
+                                  </option>
+                                  <option value={selectedCoordForTask.email}>
+                                    👤 Coordinador: {selectedCoordForTask.formalName} ({selectedCoordForTask.email})
+                                  </option>
+                                  <option value="andres.gomez@crearpsl.net">
+                                    🏢 Dirección General: Andrés Gómez (andres.gomez@crearpsl.net)
+                                  </option>
+                                </select>
+                              );
+                            })()}
+                          </div>
+
+                          {/* Título de la Tarea */}
+                          <div>
+                            <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#e2e8f0', marginBottom: '0.4rem' }}>
+                              Título de la Tarea:
+                            </label>
+                            <input
+                              type="text"
+                              value={taskForm.title}
+                              onChange={(e) => setTaskForm(prev => ({ ...prev, title: e.target.value }))}
+                              style={{
+                                width: '100%',
+                                padding: '0.65rem 0.85rem',
+                                borderRadius: '8px',
+                                border: '1px solid #475569',
+                                fontSize: '0.85rem',
+                                background: '#0f172a',
+                                color: '#f8fafc',
+                                boxSizing: 'border-box'
+                              }}
+                            />
+                          </div>
+
+                          {/* Prioridad y Fecha Límite */}
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                            <div>
+                              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#e2e8f0', marginBottom: '0.4rem' }}>
+                                Prioridad de Intervención:
+                              </label>
+                              <select
+                                value={taskForm.priority}
+                                onChange={(e) => setTaskForm(prev => ({ ...prev, priority: e.target.value }))}
+                                style={{
+                                  width: '100%',
+                                  padding: '0.65rem 0.85rem',
+                                  borderRadius: '8px',
+                                  border: '1px solid #475569',
+                                  fontSize: '0.85rem',
+                                  fontWeight: 700,
+                                  background: '#0f172a',
+                                  color: taskForm.priority === 'urgent' ? '#ef4444' : taskForm.priority === 'high' ? '#f59e0b' : '#38bdf8'
+                                }}
+                              >
+                                <option value="urgent">🚨 Urgente (Intervención Inmediata)</option>
+                                <option value="high">⚠️ Alta (Rezago Operativo)</option>
+                                <option value="medium">🔵 Media (Seguimiento Rutinario)</option>
+                              </select>
+                            </div>
+                            <div>
+                              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#e2e8f0', marginBottom: '0.4rem' }}>
+                                Fecha Límite (Due Date):
+                              </label>
+                              <input
+                                type="date"
+                                value={taskForm.dueDate}
+                                onChange={(e) => setTaskForm(prev => ({ ...prev, dueDate: e.target.value }))}
+                                style={{
+                                  width: '100%',
+                                  padding: '0.65rem 0.85rem',
+                                  borderRadius: '8px',
+                                  border: '1px solid #475569',
+                                  fontSize: '0.85rem',
+                                  background: '#0f172a',
+                                  color: '#f8fafc',
+                                  boxSizing: 'border-box'
+                                }}
+                              />
+                            </div>
+                          </div>
+
+                          {/* Detalle Diagnóstico y Pauta */}
+                          <div>
+                            <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#e2e8f0', marginBottom: '0.4rem' }}>
+                              Diagnóstico Operativo Nodus & Pauta de Coaching RRHH:
+                            </label>
+                            <textarea
+                              rows={7}
+                              value={taskForm.description}
+                              onChange={(e) => setTaskForm(prev => ({ ...prev, description: e.target.value }))}
+                              style={{
+                                width: '100%',
+                                padding: '0.75rem',
+                                borderRadius: '8px',
+                                border: '1px solid #475569',
+                                fontSize: '0.78rem',
+                                lineHeight: '1.45',
+                                fontFamily: 'monospace',
+                                background: '#0f172a',
+                                color: '#e2e8f0',
+                                boxSizing: 'border-box'
+                              }}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Footer Modal */}
+                        <div style={{
+                          padding: '1rem 1.5rem',
+                          borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+                          display: 'flex',
+                          justifyContent: 'flex-end',
+                          gap: '0.75rem',
+                          background: '#0f172a',
+                          borderBottomLeftRadius: '16px',
+                          borderBottomRightRadius: '16px'
+                        }}>
+                          <button
+                            onClick={() => setTaskModalOpen(false)}
+                            disabled={isSavingTask}
+                            style={{
+                              padding: '0.6rem 1.2rem',
+                              borderRadius: '8px',
+                              border: '1px solid #475569',
+                              background: 'transparent',
+                              color: '#cbd5e1',
+                              fontWeight: 600,
+                              cursor: 'pointer',
+                              fontSize: '0.85rem'
+                            }}
+                          >
+                            Cancelar
+                          </button>
+                          <button
+                            onClick={async () => {
+                              if (!taskForm.title || !taskForm.assignedToEmail) {
+                                alert('Por favor completa el título y el responsable.');
+                                return;
+                              }
+
+                              try {
+                                setIsSavingTask(true);
+                                const taskId = `task_rrhh_${Date.now()}`;
+                                
+                                await setDoc(doc(db, 'tasks', taskId), {
+                                  id: taskId,
+                                  task: taskForm.title,
+                                  title: taskForm.title,
+                                  description: taskForm.description,
+                                  priority: taskForm.priority,
+                                  status: 'Pendiente',
+                                  completed: false,
+                                  dueDate: taskForm.dueDate,
+                                  assignedTo: [taskForm.assignedToName],
+                                  assignedToEmail: taskForm.assignedToEmail,
+                                  assignedToEmails: [taskForm.assignedToEmail],
+                                  assignedSede: selectedCoordForTask?.sede || selectedSede,
+                                  role: taskForm.assignedRole || 'gerente',
+                                  source: 'Centinela RRHH / Nodus',
+                                  createdAt: new Date().toISOString(),
+                                  updatedAt: new Date().toISOString(),
+                                  metadata: {
+                                    nodusName: selectedCoordForTask?.nodusName,
+                                    sentadosC1: selectedCoordForTask?.sentadosC1,
+                                    sentadosC2: selectedCoordForTask?.sentadosC2,
+                                    confirmados: selectedCoordForTask?.confirmados,
+                                    coberturaPct: selectedCoordForTask?.coberturaPct,
+                                    nivelRiesgo: selectedCoordForTask?.nivelRiesgo
+                                  }
+                                });
+
+                                await addDoc(collection(db, 'notifications'), {
+                                  userId: taskForm.assignedToEmail,
+                                  title: `🚨 Tarea RRHH: ${taskForm.title}`,
+                                  message: `Se ha asignado una tarea de intervención operativa y coaching para la sede ${selectedCoordForTask?.sede}.`,
+                                  type: 'task_assigned',
+                                  taskId: taskId,
+                                  read: false,
+                                  createdAt: new Date().toISOString()
+                                });
+
+                                setToastMessage({
+                                  type: 'success',
+                                  text: `¡Tarea asignada con éxito a ${taskForm.assignedToName} en Causa OS!`
+                                });
+                                setTaskModalOpen(false);
+
+                                setTimeout(() => {
+                                  setToastMessage(null);
+                                }, 3500);
+
+                              } catch (err) {
+                                console.error('Error al crear tarea de RRHH:', err);
+                                alert('Error al guardar la tarea en Causa OS: ' + err.message);
+                              } finally {
+                                setIsSavingTask(false);
+                              }
+                            }}
+                            disabled={isSavingTask}
+                            style={{
+                              padding: '0.6rem 1.4rem',
+                              borderRadius: '8px',
+                              border: 'none',
+                              background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
+                              color: '#fff',
+                              fontWeight: 700,
+                              cursor: isSavingTask ? 'not-allowed' : 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.5rem',
+                              boxShadow: '0 4px 6px -1px rgba(220, 38, 38, 0.3)',
+                              fontSize: '0.85rem'
+                            }}
+                          >
+                            {isSavingTask ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+                            {isSavingTask ? 'Asignando en Causa OS...' : 'Crear Tarea en Causa OS'}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
           </div>
+
         ) : viewMode === 'resources' ? (
           <ResourceCapacityView selectedSede={selectedSede} hrSentinelData={hrSentinelData} />
         ) : null}
