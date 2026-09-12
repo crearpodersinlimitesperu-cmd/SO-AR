@@ -10,7 +10,7 @@ import { normalizeRole, normalizeSede, OPERATIONAL_SEDES } from '../data/usersDa
 import { getAllCompanyUsers } from '../services/userService';
 import { openOrCreateDirectMessage } from '../services/googleChatService';
 import { getWhatsAppUrl } from '../utils/phoneUtils';
-import { Globe, Building2, Users, ArrowLeft, ChevronDown, ChevronRight, Eye, CheckCircle2, Clock, AlertTriangle, TrendingUp, UserCheck, FileText, Search, X, PlusCircle, Mail, MessageCircle, ShieldCheck, RefreshCw } from 'lucide-react';
+import { Globe, Building2, Users, ArrowLeft, ArrowUp, ChevronDown, ChevronRight, Eye, CheckCircle2, Clock, AlertTriangle, TrendingUp, UserCheck, FileText, Search, X, PlusCircle, Mail, MessageCircle, ShieldCheck, RefreshCw } from 'lucide-react';
 import { getFlagForSede } from '../utils/flags';
 import UserProfileModal from '../components/UserProfileModal';
 import IAAuditor from '../components/IAAuditor';
@@ -1227,6 +1227,26 @@ export default function SuperAdminPanel() {
     return () => { isMounted = false; };
   }, [currentUser]);
 
+  const [showFloatingNav, setShowFloatingNav] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+      setShowFloatingNav(scrollY > 250);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+
   const handleOpenUserModal = (user) => {
     setSelectedUser(user);
     setShowUserModal(true);
@@ -1460,6 +1480,41 @@ export default function SuperAdminPanel() {
         </>
       )}
 
+      {/* Barra de pie de página con accesos rápidos */}
+      <div style={{
+        marginTop: '3.5rem',
+        marginBottom: '2rem',
+        padding: '1.5rem',
+        borderTop: '1px solid var(--border-subtle)',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: '1rem',
+        color: 'var(--text-muted)',
+        fontSize: '0.85rem'
+      }}>
+        <div>
+          <span>Panel Super Admin — Sistema Operativo Causa OS</span>
+        </div>
+        <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'center' }}>
+          <button
+            onClick={() => navigate('/home')}
+            className="btn-secondary"
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', fontSize: '0.85rem' }}
+          >
+            <ArrowLeft size={16} /> Volver al Inicio
+          </button>
+          <button
+            onClick={scrollToTop}
+            className="btn-primary"
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1.1rem', fontSize: '0.85rem', background: 'var(--crear-gold)', color: '#000', fontWeight: 'bold' }}
+          >
+            <ArrowUp size={16} /> Ir arriba
+          </button>
+        </div>
+      </div>
+
       {/* Modal del Agente de Integridad de Roles */}
       {roleAuditModalData && (
         <div style={{
@@ -1551,6 +1606,76 @@ export default function SuperAdminPanel() {
             setSelectedUser(prev => ({ ...prev, ...updated }));
           }}
         />
+      )}
+
+      {/* Botonera Flotante Rápida para Scroll e Inicio */}
+      {showFloatingNav && !showUserModal && !roleAuditModalData && !assignUser && (
+        <div
+          style={{
+            position: 'fixed',
+            bottom: '24px',
+            right: '24px',
+            zIndex: 9000,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            background: 'rgba(15, 23, 42, 0.92)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            border: '1px solid rgba(212, 175, 55, 0.45)',
+            borderRadius: '50px',
+            padding: '6px 10px',
+            boxShadow: '0 8px 30px rgba(0, 0, 0, 0.6), 0 0 15px rgba(212, 175, 55, 0.2)',
+            maxWidth: 'calc(100vw - 32px)'
+          }}
+        >
+          <button
+            onClick={() => navigate('/home')}
+            className="hover-glow"
+            title="Salir y regresar al Inicio de Causa OS"
+            style={{
+              background: 'rgba(255, 255, 255, 0.08)',
+              color: '#f8fafc',
+              border: '1px solid rgba(255, 255, 255, 0.15)',
+              borderRadius: '24px',
+              padding: '8px 14px',
+              fontSize: '0.82rem',
+              fontWeight: '600',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            <ArrowLeft size={15} />
+            <span>Volver al Inicio</span>
+          </button>
+
+          <button
+            onClick={scrollToTop}
+            className="hover-glow"
+            title="Subir al inicio de la página"
+            style={{
+              background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+              color: '#0f172a',
+              border: 'none',
+              borderRadius: '24px',
+              padding: '8px 14px',
+              fontSize: '0.82rem',
+              fontWeight: '800',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              transition: 'all 0.2s ease',
+              boxShadow: '0 2px 10px rgba(245, 158, 11, 0.4)'
+            }}
+          >
+            <ArrowUp size={15} />
+            <span>Ir arriba</span>
+          </button>
+        </div>
       )}
 
     </div>
