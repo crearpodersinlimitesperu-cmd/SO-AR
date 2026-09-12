@@ -1,4 +1,4 @@
-﻿﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
@@ -816,15 +816,13 @@ export default function MonitorVuelosCartas() {
       if (!originMatch && !destMatch) return false;
     }
 
-    // Filtros rápidos de ruta
-    if (routeFilter === 'UIO-LIM' && !(f.route.origin === 'UIO' && f.route.destination === 'LIM')) return false;
-    if (routeFilter === 'LIM-UIO' && !(f.route.origin === 'LIM' && f.route.destination === 'UIO')) return false;
-    if (routeFilter === 'LIM-GYE' && !(f.route.origin === 'LIM' && f.route.destination === 'GYE')) return false;
-    if (routeFilter === 'GYE-UIO' && !(f.route.origin === 'GYE' && f.route.destination === 'UIO')) return false;
-    if (routeFilter === 'UIO-GYE' && !(f.route.origin === 'UIO' && f.route.destination === 'GYE')) return false;
-    if (routeFilter === 'BOG-LIM' && !(f.route.origin === 'BOG' && f.route.destination === 'LIM')) return false;
-    if (routeFilter === 'MDE-LIM' && !(f.route.origin === 'MDE' && f.route.destination === 'LIM')) return false;
-    if (routeFilter === 'MEX-LIM' && !(f.route.origin === 'MEX' && f.route.destination === 'LIM')) return false;
+    // Filtros rápidos de ruta dinámicos
+    if (routeFilter && routeFilter !== 'ALL') {
+      const parts = routeFilter.split('-');
+      if (parts.length === 2) {
+        if (f.route?.origin !== parts[0] || f.route?.destination !== parts[1]) return false;
+      }
+    }
 
     if (searchFilter.trim()) {
       const q = searchFilter.toLowerCase().trim();
@@ -863,47 +861,59 @@ export default function MonitorVuelosCartas() {
   const getDynamicQuickRoutes = () => {
     if (selectedSede === 'Quito') {
       return [
-        { id: 'ALL', label: 'Todos los Vuelos en Quito' },
-        { id: 'UIO-LIM', label: 'Quito ➔ Lima (UIO → LIM)' },
-        { id: 'LIM-UIO', label: 'Lima ➔ Quito (LIM → UIO)' },
-        { id: 'GYE-UIO', label: 'Guayaquil ➔ Quito (GYE → UIO)' },
-        { id: 'UIO-GYE', label: 'Quito ➔ Guayaquil (UIO → GYE)' }
+        { id: 'ALL', label: 'Todos en Quito' },
+        { id: 'UIO-LIM', label: 'Quito ➔ Lima' },
+        { id: 'LIM-UIO', label: 'Lima ➔ Quito' },
+        { id: 'UIO-GYE', label: 'Quito ➔ GYE' },
+        { id: 'GYE-UIO', label: 'GYE ➔ Quito' },
+        { id: 'UIO-CUE', label: 'Quito ➔ Cuenca' },
+        { id: 'CUE-UIO', label: 'Cuenca ➔ Quito' },
+        { id: 'BOG-UIO', label: 'Bogotá ➔ Quito' }
       ];
     }
     if (selectedSede === 'Guayaquil') {
       return [
-        { id: 'ALL', label: 'Todos los Vuelos en Guayaquil' },
-        { id: 'GYE-UIO', label: 'Guayaquil ➔ Quito (GYE → UIO)' },
-        { id: 'UIO-GYE', label: 'Quito ➔ Guayaquil (UIO → GYE)' },
-        { id: 'LIM-GYE', label: 'Lima ➔ Guayaquil (LIM → GYE)' }
+        { id: 'ALL', label: 'Todos en Guayaquil' },
+        { id: 'BOG-GYE', label: 'Bogotá ➔ GYE' },
+        { id: 'GYE-BOG', label: 'GYE ➔ Bogotá' },
+        { id: 'PTY-GYE', label: 'Panamá ➔ GYE' },
+        { id: 'GYE-PTY', label: 'GYE ➔ Panamá' },
+        { id: 'GYE-UIO', label: 'GYE ➔ Quito' },
+        { id: 'UIO-GYE', label: 'Quito ➔ GYE' },
+        { id: 'LIM-GYE', label: 'Lima ➔ GYE' }
       ];
     }
     if (selectedSede === 'Medellín') {
       return [
-        { id: 'ALL', label: 'Todos los Vuelos en Medellín' },
-        { id: 'MDE-LIM', label: 'Medellín ➔ Lima (MDE → LIM)' },
-        { id: 'BOG-LIM', label: 'Bogotá / Conexión ➔ Lima' }
+        { id: 'ALL', label: 'Todos en Medellín' },
+        { id: 'MDE-BOG', label: 'Medellín ➔ Bogotá' },
+        { id: 'UIO-MDE', label: 'Quito ➔ Medellín' },
+        { id: 'MDE-LIM', label: 'Medellín ➔ Lima' }
       ];
     }
     if (selectedSede === 'México') {
       return [
-        { id: 'ALL', label: 'Todos los Vuelos en México' },
-        { id: 'MEX-LIM', label: 'México ➔ Lima (MEX → LIM)' }
+        { id: 'ALL', label: 'Todos en México' },
+        { id: 'MEX-PTY', label: 'México ➔ Panamá' },
+        { id: 'PTY-MEX', label: 'Panamá ➔ México' },
+        { id: 'MEX-LIM', label: 'México ➔ Lima' }
       ];
     }
     if (selectedSede === 'Cuenca') {
       return [
-        { id: 'ALL', label: 'Todos los Vuelos en Cuenca' }
+        { id: 'ALL', label: 'Todos en Cuenca' },
+        { id: 'UIO-CUE', label: 'Quito ➔ Cuenca' },
+        { id: 'CUE-UIO', label: 'Cuenca ➔ Quito' }
       ];
     }
     return [
       { id: 'ALL', label: `Todos los Vuelos (${flightsList.length})` },
-      { id: 'UIO-LIM', label: 'Quito ➔ Lima (UIO → LIM)' },
-      { id: 'LIM-UIO', label: 'Lima ➔ Quito (LIM → UIO)' },
-      { id: 'GYE-UIO', label: 'Guayaquil ➔ Quito (GYE → UIO)' },
-      { id: 'LIM-GYE', label: 'Lima ➔ Guayaquil (LIM → GYE)' },
-      { id: 'BOG-LIM', label: 'Bogotá ➔ Lima (BOG → LIM)' },
-      { id: 'MEX-LIM', label: 'México ➔ Lima (MEX → LIM)' }
+      { id: 'UIO-LIM', label: 'Quito ➔ Lima' },
+      { id: 'LIM-UIO', label: 'Lima ➔ Quito' },
+      { id: 'GYE-UIO', label: 'GYE ➔ Quito' },
+      { id: 'LIM-GYE', label: 'Lima ➔ GYE' },
+      { id: 'BOG-LIM', label: 'Bogotá ➔ Lima' },
+      { id: 'MEX-LIM', label: 'México ➔ Lima' }
     ];
   };
 
@@ -1215,7 +1225,7 @@ export default function MonitorVuelosCartas() {
                   gap: '5px'
                 }}>
                   <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#34d399', display: 'inline-block' }}></span>
-                  Drive Sync (7x/día)
+                  🤖 Motor IA Vuelos ({trackerData?.totalFlightsIndexed || flightsList.length} Indexados · Multi-Sede)
                 </span>
                 <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                   Sincronizado: <span style={{ color: '#fff' }}>{new Date(trackerData?.updatedAt || Date.now()).toLocaleTimeString()}</span>
@@ -1392,6 +1402,25 @@ export default function MonitorVuelosCartas() {
                           <span>Destino: <strong>{flight.logistics?.destination || 'Hotel de Sede'}</strong></span>
                         </div>
                       </div>
+
+                      {flight.sourcePdf && (
+                        <div style={{
+                          marginTop: '8px',
+                          fontSize: '0.72rem',
+                          color: '#94a3b8',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '5px',
+                          background: 'rgba(255,255,255,0.02)',
+                          padding: '4px 8px',
+                          borderRadius: '6px',
+                          border: '1px solid rgba(255,255,255,0.04)'
+                        }}>
+                          <FileText size={12} color="var(--crear-gold)" />
+                          <span style={{ color: '#64748b' }}>PDF:</span>
+                          <span style={{ color: '#cbd5e1', wordBreak: 'break-all' }}>{flight.sourcePdf}</span>
+                        </div>
+                      )}
                     </div>
 
                     {/* Acciones Rápidas */}
