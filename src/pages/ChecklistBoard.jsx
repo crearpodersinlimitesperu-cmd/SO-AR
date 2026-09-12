@@ -9,7 +9,7 @@ import { useUI } from '../context/UIContext';
 import { roles } from '../data/checklistData';
 import { usersData, normalizeRole, normalizeSede, OPERATIONAL_SEDES, isForeignTask, ROLE_COLORS, ROLE_DISPLAY_NAMES, getRoleDisplayName } from '../data/usersData';
 import { calculateAutomaticDeadline } from '../utils/soarDates';
-import { ArrowLeft, Target, Link as LinkIcon, Edit3, Clock, ShieldAlert, Users, Sparkles, MapPin } from 'lucide-react';
+import { ArrowLeft, Target, Link as LinkIcon, Edit3, Clock, ShieldAlert, Users, Sparkles, MapPin, Search, X } from 'lucide-react';
 import TaskAssignmentModal from '../components/TaskAssignmentModal';
 import TaskCollaborationModal from '../components/TaskCollaborationModal';
 import LearningReflectionModal from '../components/LearningReflectionModal';
@@ -94,6 +94,7 @@ export default function ChecklistBoard() {
     }
     return 'all';
   });
+  const [searchQuery, setSearchQuery] = useState('');
 
   const { tasks, toggleTask, updateTaskDetails, inviteCollaborator, syncTasksToGoogle, updateIndividualProgress, acceptCollaboration, rejectCollaboration } = useChecklist();
   const { currentCycle, currentStage } = useCycles();
@@ -245,6 +246,33 @@ export default function ChecklistBoard() {
   } else if (statusFilter === 'completed') {
     activeTasks = scopedTasks.filter(t => t.completed || t.status === 'Completada');
   }
+
+  // Filtrado en tiempo real por término de búsqueda (ignora acentos y mayúsculas/minúsculas)
+  if (searchQuery.trim()) {
+    const norm = (str) => (str || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const qNorm = norm(searchQuery.trim());
+
+    activeTasks = activeTasks.filter(t => {
+      const taskText = norm(t.task || t.title);
+      const notesText = norm(t.notes || t.description || t.comments);
+      const goalText = norm(t.associatedGoal);
+      const roleText = norm(t.role);
+      const sedeText = norm(t.assignedSede || t.sede);
+      const priorityText = norm(t.priority);
+      const assignedText = norm(t.assignedToEmail || (Array.isArray(t.assignedToEmails) ? t.assignedToEmails.join(' ') : ''));
+      const creatorText = norm(t.assignedByName || t.createdBy);
+
+      return taskText.includes(qNorm) ||
+             notesText.includes(qNorm) ||
+             goalText.includes(qNorm) ||
+             roleText.includes(qNorm) ||
+             sedeText.includes(qNorm) ||
+             priorityText.includes(qNorm) ||
+             assignedText.includes(qNorm) ||
+             creatorText.includes(qNorm);
+    });
+  }
+
   activeTasks = sortByDeadline([...activeTasks]);
 
   // El progreso siempre refleja el completamiento de la fase / ámbito actual
@@ -415,8 +443,15 @@ export default function ChecklistBoard() {
             )}
           </div>
           <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
-            {filterParam && (
-              <button onClick={() => setSearchParams({})} style={{ background: 'none', border: '1px solid rgba(255,255,255,0.2)', color: 'var(--text-muted)', padding: '0.3rem 0.8rem', borderRadius: '4px', fontSize: '0.8rem', cursor: 'pointer' }}>
+            {(filterParam || searchQuery.trim()) && (
+              <button 
+                type="button"
+                onClick={() => {
+                  setSearchParams({});
+                  setSearchQuery('');
+                }} 
+                style={{ background: 'none', border: '1px solid rgba(255,255,255,0.2)', color: 'var(--text-muted)', padding: '0.3rem 0.8rem', borderRadius: '4px', fontSize: '0.8rem', cursor: 'pointer' }}
+              >
                 Limpiar Filtro
               </button>
             )}
@@ -627,12 +662,111 @@ export default function ChecklistBoard() {
             </span>
           </button>
         </div>
+
+        {/* BUSCADOR DE TAREAS */}
+        <div style={{
+          marginTop: '1.25rem',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.75rem',
+          background: 'rgba(0, 0, 0, 0.25)',
+          padding: '0.65rem 1rem',
+          borderRadius: '10px',
+          border: '1px solid rgba(255, 255, 255, 0.12)',
+          boxShadow: 'inset 0 1px 3px rgba(0, 0, 0, 0.3)',
+          transition: 'all 0.2s ease'
+        }}>
+          <Search size={18} color={searchQuery ? "var(--crear-gold, #f59e0b)" : "var(--text-muted, #94a3b8)"} />
+          <input
+            type="text"
+            placeholder="🔍 Buscar tarea por nombre, notas, asignado, sede o prioridad..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{
+              flex: 1,
+              background: 'transparent',
+              border: 'none',
+              color: '#ffffff',
+              fontSize: '0.92rem',
+              outline: 'none'
+            }}
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery('')}
+              style={{
+                background: 'rgba(255, 255, 255, 0.12)',
+                border: 'none',
+                color: 'var(--text-muted, #94a3b8)',
+                borderRadius: '50%',
+                width: '22px',
+                height: '22px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer'
+              }}
+              title="Limpiar búsqueda"
+            >
+              <X size={13} />
+            </button>
+          )}
+        </div>
+
+        {searchQuery.trim() && (
+          <div style={{
+            marginTop: '0.65rem',
+            fontSize: '0.82rem',
+            color: 'var(--crear-cyan, #06b6d4)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '0.5rem'
+          }}>
+            <span>
+              Mostrando <strong>{activeTasks.length}</strong> {activeTasks.length === 1 ? 'tarea encontrada' : 'tareas encontradas'} para "<strong>{searchQuery}</strong>"
+            </span>
+            <button
+              type="button"
+              onClick={() => setSearchQuery('')}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--crear-gold, #f59e0b)',
+                textDecoration: 'underline',
+                cursor: 'pointer',
+                fontSize: '0.8rem',
+                padding: 0
+              }}
+            >
+              Borrar búsqueda
+            </button>
+          </div>
+        )}
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         {activeTasks.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '3rem 1.5rem', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.06)' }}>
-            {statusFilter === 'pending' && completedCount > 0 ? (
+            {searchQuery.trim() ? (
+              <>
+                <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>🔍</div>
+                <h3 style={{ color: '#fff', margin: '0 0 0.5rem' }}>No se encontraron tareas</h3>
+                <p className="text-muted" style={{ margin: '0 0 1rem', fontSize: '0.9rem' }}>
+                  No hay tareas que coincidan con "<strong>{searchQuery}</strong>" en esta fase o filtro.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  className="btn-secondary"
+                  style={{ fontSize: '0.85rem', padding: '0.5rem 1rem' }}
+                >
+                  Limpiar búsqueda
+                </button>
+              </>
+            ) : statusFilter === 'pending' && completedCount > 0 ? (
               <>
                 <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>🎉</div>
                 <h3 style={{ color: '#fff', margin: '0 0 0.5rem' }}>¡Todas las tareas pendientes de esta fase están completadas!</h3>
