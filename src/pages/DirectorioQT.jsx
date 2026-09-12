@@ -13,6 +13,7 @@ import {
   isDireccionRole, 
   isNonOperationalDirector 
 } from '../config/permissions';
+import { normalizeRole } from '../data/usersData';
 import CountryFlag from '../components/CountryFlag';
 import { 
   Users, 
@@ -48,6 +49,7 @@ export default function DirectorioQT() {
   const navigate = useNavigate();
   
   const userSede = normalizeQTSede(currentUser?.sede || '');
+  const isQTGlobalCoordinator = isGlobalQTCoordinator(currentUser);
 
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -106,7 +108,9 @@ export default function DirectorioQT() {
 
   // Filtrado reactivo
   const filteredMembers = useMemo(() => {
-    const userRole = currentUser?.appRole || '';
+    const rawRole = currentUser?.appRole || '';
+    const userRole = normalizeRole(rawRole);
+    const userRoles = (currentUser?.roles || []).map(r => normalizeRole(r));
     
     // Si es superadmin, dirección (operativa o no), o gerente
     const isSuper = currentUser?.isSuperAdmin || userRole === 'director_maestria' || isDireccionRole(userRole) || currentUser?.email === 'jose.sanchez@crearpsl.net' || currentUser?.email === 'armando.pilacuan@gmail.com';
@@ -115,6 +119,8 @@ export default function DirectorioQT() {
     // Usamos las nuevas banderas de permisos
     const isQTGlobal = isGlobalQTCoordinator(currentUser);
     const hasQT = hasQTPrivileges(currentUser);
+    const isSedeCoordinator = ['coord_c1', 'coord_maestria', 'director_maestria'].includes(userRole) ||
+                              userRoles.includes('coord_c1') || userRoles.includes('coord_maestria');
     
     return members.filter(m => {
       // 0. Reglas de Jerarquía Corporativa
@@ -124,8 +130,8 @@ export default function DirectorioQT() {
       if (!isSuper && !isQTGlobal && !isGerente) {
         if (isGlobalUser) {
           // Global users see everything
-        } else if (['coord_c1', 'coord_c2', 'coordinador_c1c2'].includes(userRole)) {
-          // Coordinador C1/C2: solo su sede (+ Coordinador Global) según Matriz
+        } else if (isSedeCoordinator) {
+          // Coordinadores operativos de sede (C1/C2 o Maestría): ven su sede (+ Coordinador Global de QT)
           const isTargetQTGlobal = m.sede === 'Global' || m.email?.toLowerCase().includes('brunis') || m.email?.toLowerCase().includes('cardenas');
           if (m.sede !== userSede && !isTargetQTGlobal) return false;
         } else if (hasQT) {
@@ -304,12 +310,12 @@ export default function DirectorioQT() {
             }}
           >
             <option value="Todas" style={{ background: '#0d152d', color: '#ffffff' }}>Todas las Sedes Permitidas</option>
-            {(!currentUser || currentUser.isSuperAdmin || currentUser.appRole === 'director_maestria' || currentUser.appRole === 'direccion' || currentUser.appRole === 'gerente' || userSede === 'Quito') && <option value="Quito" style={{ background: '#0d152d', color: '#ffffff' }}>Quito</option>}
-            {(!currentUser || currentUser.isSuperAdmin || currentUser.appRole === 'director_maestria' || currentUser.appRole === 'direccion' || currentUser.appRole === 'gerente' || userSede === 'Guayaquil') && <option value="Guayaquil" style={{ background: '#0d152d', color: '#ffffff' }}>Guayaquil</option>}
-            {(!currentUser || currentUser.isSuperAdmin || currentUser.appRole === 'director_maestria' || currentUser.appRole === 'direccion' || currentUser.appRole === 'gerente' || userSede === 'Cuenca') && <option value="Cuenca" style={{ background: '#0d152d', color: '#ffffff' }}>Cuenca</option>}
-            {(!currentUser || currentUser.isSuperAdmin || currentUser.appRole === 'director_maestria' || currentUser.appRole === 'direccion' || currentUser.appRole === 'gerente' || userSede === 'Lima') && <option value="Lima" style={{ background: '#0d152d', color: '#ffffff' }}>Lima</option>}
-            {(!currentUser || currentUser.isSuperAdmin || currentUser.appRole === 'director_maestria' || currentUser.appRole === 'direccion' || currentUser.appRole === 'gerente' || userSede === 'Medellín') && <option value="Medellín" style={{ background: '#0d152d', color: '#ffffff' }}>Medellín</option>}
-            {(!currentUser || currentUser.isSuperAdmin || currentUser.appRole === 'director_maestria' || currentUser.appRole === 'direccion' || currentUser.appRole === 'gerente' || userSede === 'México') && <option value="México" style={{ background: '#0d152d', color: '#ffffff' }}>México</option>}
+            {(!currentUser || currentUser.isSuperAdmin || isQTGlobalCoordinator || currentUser.appRole === 'director_maestria' || currentUser.appRole === 'direccion' || currentUser.appRole === 'gerente' || userSede === 'Quito') && <option value="Quito" style={{ background: '#0d152d', color: '#ffffff' }}>Quito</option>}
+            {(!currentUser || currentUser.isSuperAdmin || isQTGlobalCoordinator || currentUser.appRole === 'director_maestria' || currentUser.appRole === 'direccion' || currentUser.appRole === 'gerente' || userSede === 'Guayaquil') && <option value="Guayaquil" style={{ background: '#0d152d', color: '#ffffff' }}>Guayaquil</option>}
+            {(!currentUser || currentUser.isSuperAdmin || isQTGlobalCoordinator || currentUser.appRole === 'director_maestria' || currentUser.appRole === 'direccion' || currentUser.appRole === 'gerente' || userSede === 'Cuenca') && <option value="Cuenca" style={{ background: '#0d152d', color: '#ffffff' }}>Cuenca</option>}
+            {(!currentUser || currentUser.isSuperAdmin || isQTGlobalCoordinator || currentUser.appRole === 'director_maestria' || currentUser.appRole === 'direccion' || currentUser.appRole === 'gerente' || userSede === 'Lima') && <option value="Lima" style={{ background: '#0d152d', color: '#ffffff' }}>Lima</option>}
+            {(!currentUser || currentUser.isSuperAdmin || isQTGlobalCoordinator || currentUser.appRole === 'director_maestria' || currentUser.appRole === 'direccion' || currentUser.appRole === 'gerente' || userSede === 'Medellín') && <option value="Medellín" style={{ background: '#0d152d', color: '#ffffff' }}>Medellín</option>}
+            {(!currentUser || currentUser.isSuperAdmin || isQTGlobalCoordinator || currentUser.appRole === 'director_maestria' || currentUser.appRole === 'direccion' || currentUser.appRole === 'gerente' || userSede === 'México') && <option value="México" style={{ background: '#0d152d', color: '#ffffff' }}>México</option>}
           </select>
 
           {/* Filtro Experiencia */}
