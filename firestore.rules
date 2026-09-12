@@ -133,7 +133,8 @@ service cloud.firestore {
       return isAuthenticated() &&
         request.resource.data.diff(resource.data).affectedKeys().hasOnly([
           'completed', 'status', 'completions', 'progress', 'progressPercentage',
-          'evidence_url', 'evidenceUrl', 'date', 'googleSynced', 'evidences', 'comments', 'progressNotes', 'authorEmail'
+          'evidence_url', 'evidenceUrl', 'date', 'googleSynced', 'evidences', 'comments', 'progressNotes', 'authorEmail',
+          'notes', 'description', 'lastUpdated', 'lastUpdatedBy'
         ]);
     }
 

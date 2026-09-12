@@ -34,6 +34,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
 
   const [newTask, setNewTask] = useState({
     title: '',
+    notes: '',
     role: currentUser?.appRole || 'gerente',
     deadlineDate: getTodayStr(),
     deadlineTime: '18:00',
@@ -59,6 +60,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
         }
         setNewTask({
           title: taskToEdit.task || taskToEdit.title || '',
+          notes: taskToEdit.notes || taskToEdit.description || taskToEdit.comments || (Array.isArray(taskToEdit.progressNotes) && taskToEdit.progressNotes[0]?.text) || '',
           role: normalizeRole(taskToEdit.role) || taskToEdit.role || currentUser?.appRole || 'gerente',
           deadlineDate: dDate,
           deadlineTime: dTime,
@@ -69,6 +71,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
       } else if (prefilledUser) {
         setNewTask({
           title: '',
+          notes: '',
           role: normalizeRole(prefilledUser.role) || prefilledUser.role || currentUser?.appRole || 'gerente',
           deadlineDate: getTodayStr(),
           deadlineTime: '18:00',
@@ -121,8 +124,13 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
       };
     });
 
+    const trimmedNotes = (newTask.notes || '').trim();
+
     const taskData = {
       task: newTask.title.trim(),
+      notes: trimmedNotes,
+      description: trimmedNotes,
+      comments: trimmedNotes,
       role: finalRole,
       deadline: deadlineISO,
       priority: newTask.priority,
@@ -135,6 +143,39 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
       assignedSede: canAssignSpecific ? (newTask.assignedSede || currentUser?.sede || 'Global') : (prefilledUser?.sede || currentUser?.sede || 'Global'),
       assigneeProgress: assigneeProgress
     };
+
+    if (trimmedNotes) {
+      if (taskToEdit && Array.isArray(taskToEdit.progressNotes) && taskToEdit.progressNotes.length > 0) {
+        const existingNotes = [...taskToEdit.progressNotes];
+        const initialNoteIndex = existingNotes.findIndex(n => n.isInitialNote || n.id === 'note_initial');
+        if (initialNoteIndex >= 0) {
+          existingNotes[initialNoteIndex] = {
+            ...existingNotes[initialNoteIndex],
+            text: trimmedNotes,
+            updatedAt: new Date().toISOString()
+          };
+          taskData.progressNotes = existingNotes;
+        } else {
+          taskData.progressNotes = [{
+            id: `note_${Date.now()}`,
+            text: trimmedNotes,
+            createdAt: new Date().toISOString(),
+            authorName: currentUser?.name || currentUser?.displayName || currentUser?.email || 'Asignador',
+            authorEmail: currentUser?.email || '',
+            isInitialNote: true
+          }, ...existingNotes];
+        }
+      } else {
+        taskData.progressNotes = [{
+          id: `note_${Date.now()}`,
+          text: trimmedNotes,
+          createdAt: new Date().toISOString(),
+          authorName: currentUser?.name || currentUser?.displayName || currentUser?.email || 'Asignador',
+          authorEmail: currentUser?.email || '',
+          isInitialNote: true
+        }];
+      }
+    }
 
     if (isRecurring) {
       taskData.isRecurringTemplate = true;
@@ -156,6 +197,8 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
           details: {
             taskId: taskToEdit ? taskToEdit.id : null,
             taskTitle: newTask.title.trim(),
+            hasNotes: !!trimmedNotes,
+            notesSnippet: trimmedNotes ? trimmedNotes.substring(0, 100) : '',
             assignedRole: finalRole,
             assignedEmails: taskData.assignedToEmails,
             priority: newTask.priority,
@@ -169,10 +212,12 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
       onClose();
       setNewTask({
         title: '',
+        notes: '',
         role: currentUser?.appRole || 'gerente',
         deadlineDate: getTodayStr(),
         deadlineTime: '18:00',
         assignedToEmails: [],
+        assignedRoles: [],
         assignedSede: currentUser?.sede || '',
         priority: '🟡 AMARILLO'
       });
@@ -187,7 +232,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
       display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem'
     }}>
       <div className="glass-panel" style={{ 
-        width: '100%', maxWidth: '600px', padding: '2rem', 
+        width: '100%', maxWidth: '620px', maxHeight: '92vh', overflowY: 'auto', padding: '1.8rem', 
         position: 'relative', border: '1px solid var(--crear-gold)' 
       }}>
         <button 
@@ -452,6 +497,74 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                 <div>
                   <input type="time" value={newTask.deadlineTime} onChange={e => setNewTask({...newTask, deadlineTime: e.target.value})} className="input-field" style={{ width: '100%' }} required disabled={isSubmitting} />
                 </div>
+              </div>
+            </div>
+
+            {/* 📝 NOTAS / INSTRUCCIONES DE LA TAREA */}
+            <div style={{ gridColumn: '1 / -1' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+                <label style={{ fontSize: '0.78rem', color: 'var(--crear-gold)', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  📝 Notas / Instrucciones de la Tarea:
+                </label>
+                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                  Opcional • Se notificará al colaborador
+                </span>
+              </div>
+              <textarea
+                rows={3}
+                placeholder="Escribe aquí las instrucciones específicas, acuerdos, contexto o detalles para quien realice la tarea..."
+                value={newTask.notes}
+                onChange={e => setNewTask({ ...newTask, notes: e.target.value })}
+                className="input-field"
+                style={{
+                  width: '100%',
+                  minHeight: '76px',
+                  resize: 'vertical',
+                  padding: '0.65rem 0.8rem',
+                  borderRadius: '8px',
+                  fontSize: '0.82rem',
+                  lineHeight: '1.45',
+                  background: 'rgba(0, 0, 0, 0.3)',
+                  border: '1px solid rgba(255, 215, 0, 0.35)',
+                  color: '#ffffff',
+                  fontFamily: 'inherit'
+                }}
+                disabled={isSubmitting}
+              />
+              {/* Sugerencias Rápidas para Notas */}
+              <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', marginTop: '0.4rem' }}>
+                {[
+                  '⚡ Prioritario para este ciclo',
+                  '📞 Coordinar llamada con el equipo',
+                  '📎 Adjuntar comprobante / link de Drive',
+                  '⚠️ Validar antes de cierre operativo'
+                ].map((chip) => (
+                  <button
+                    key={chip}
+                    type="button"
+                    onClick={() => {
+                      setNewTask(prev => {
+                        const current = (prev.notes || '').trim();
+                        const addition = chip.replace(/^[^\w\s]+/, '').trim();
+                        const newText = current ? `${current}\n• ${addition}` : `• ${addition}`;
+                        return { ...prev, notes: newText };
+                      });
+                    }}
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      border: '1px dashed rgba(255, 215, 0, 0.35)',
+                      color: 'var(--crear-gold)',
+                      borderRadius: '12px',
+                      padding: '0.2rem 0.55rem',
+                      fontSize: '0.7rem',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease'
+                    }}
+                    title="Haz clic para agregar a las notas"
+                  >
+                    + {chip}
+                  </button>
+                ))}
               </div>
             </div>
 

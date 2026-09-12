@@ -715,10 +715,17 @@ export default function ChecklistBoard() {
                       return null;
                     })()}
 
-                    {(task.comments || task.evidenceUrl) && (
-                      <div style={{ marginTop: '0.8rem', padding: '0.8rem', background: 'rgba(0,0,0,0.2)', borderRadius: '6px', fontSize: '0.85rem' }}>
-                        {task.comments && <p className="text-muted" style={{ margin: '0 0 0.5rem 0' }}>💬 {task.comments}</p>}
-                        {task.evidenceUrl && <a href={task.evidenceUrl} target="_blank" rel="noreferrer" className="text-gold" style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', textDecoration: 'none' }}><LinkIcon size={12}/> Evidencia Adjunta</a>}
+                    {(task.notes || task.description || task.comments || task.evidenceUrl) && (
+                      <div style={{ marginTop: '0.8rem', padding: '0.75rem 0.85rem', background: 'rgba(0,0,0,0.3)', borderRadius: '6px', fontSize: '0.82rem', borderLeft: '3px solid var(--crear-gold)' }}>
+                        {(task.notes || task.description || task.comments) && (
+                          <div style={{ margin: '0 0 0.4rem 0', color: 'rgba(255,255,255,0.9)', whiteSpace: 'pre-wrap', lineHeight: '1.4' }}>
+                            <strong style={{ color: 'var(--crear-gold)', display: 'block', fontSize: '0.72rem', textTransform: 'uppercase', marginBottom: '0.2rem' }}>
+                              📝 Nota / Instrucciones:
+                            </strong>
+                            {task.notes || task.description || task.comments}
+                          </div>
+                        )}
+                        {task.evidenceUrl && <a href={task.evidenceUrl} target="_blank" rel="noreferrer" className="text-gold" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', textDecoration: 'none', fontSize: '0.75rem', marginTop: '0.2rem' }}><LinkIcon size={12}/> Evidencia Adjunta</a>}
                       </div>
                     )}
 

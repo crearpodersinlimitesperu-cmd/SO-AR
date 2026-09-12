@@ -291,12 +291,17 @@ export function ChecklistProvider({ children }) {
       if (emailsToNotify.length > 0 && !cleanData.isRecurringTemplate) {
         emailsToNotify.forEach(email => {
           const cleanEmail = sanitizeEmail(email);
+          const noteSnippet = cleanData.notes ? cleanData.notes.trim() : '';
+          const notifMsg = noteSnippet
+            ? `Se te asignó en ${cleanData.assignedSede || 'Global'}: "${cleanData.task || cleanData.title}". Nota: ${noteSnippet.substring(0, 80)}${noteSnippet.length > 80 ? '...' : ''}`
+            : `Se te ha asignado una nueva tarea urgente en la sede ${cleanData.assignedSede || 'Global'}.`;
+
           // 1. Notificación In-App
           const notifRef = doc(collection(db, 'notifications'));
           batch.set(notifRef, {
             userId: cleanEmail,
             title: cleanData.task || cleanData.title,
-            message: `Se te ha asignado una nueva tarea urgente en la sede ${cleanData.assignedSede || 'Global'}.`,
+            message: notifMsg,
             read: false,
             taskId: customId,
             created_at: new Date().toISOString()
@@ -311,6 +316,12 @@ export function ChecklistProvider({ children }) {
               html: `
                 <h2>Hola, se te ha asignado una nueva tarea en Causa OS</h2>
                 <p><strong>Tarea:</strong> ${cleanData.task || cleanData.title}</p>
+                ${noteSnippet ? `
+                <div style="background-color: #0f172a; color: #f8fafc; border-left: 4px solid #f59e0b; padding: 12px 16px; margin: 12px 0; border-radius: 6px;">
+                  <strong style="color: #fbbf24;">📝 Notas / Instrucciones:</strong><br/>
+                  <span style="white-space: pre-wrap; font-size: 14px; line-height: 1.45;">${noteSnippet}</span>
+                </div>
+                ` : ''}
                 <p><strong>⏰ Fecha límite:</strong> ${formatDeadlineEs(cleanData.deadline)}</p>
                 <p><strong>Sede:</strong> ${cleanData.assignedSede || 'Global'}</p>
                 <p><strong>Prioridad:</strong> ${cleanData.priority || 'Normal'}</p>
@@ -327,7 +338,7 @@ export function ChecklistProvider({ children }) {
               taskId: customId,
               title: cleanData.task || cleanData.title,
               deadline: cleanData.deadline || null,
-              description: `Tarea Causa OS — Sede: ${cleanData.assignedSede || 'Global'}. Prioridad: ${cleanData.priority || 'Normal'}.`
+              description: `Tarea Causa OS — Sede: ${cleanData.assignedSede || 'Global'}. Prioridad: ${cleanData.priority || 'Normal'}.${noteSnippet ? ' \nNotas: ' + noteSnippet : ''}`
             }
           });
         });
@@ -377,18 +388,24 @@ export function ChecklistProvider({ children }) {
       // Ahora, cualquier edición de un campo relevante (fecha límite, título,
       // prioridad, sede) también notifica a quienes ya estaban asignados —
       // no solo a los que se agregan de nuevo.
-      const relevantFieldChanged = ['deadline', 'task', 'title', 'priority', 'assignedSede'].some(
+      const relevantFieldChanged = ['deadline', 'task', 'title', 'priority', 'assignedSede', 'notes', 'description', 'comments'].some(
         field => field in cleanUpdatedData && cleanUpdatedData[field] !== currentTask[field]
       );
 
+      const activeNote = (cleanUpdatedData.notes || currentTask.notes || '').trim();
+
       newlyAddedEmails.forEach(email => {
         const cleanEmail = sanitizeEmail(email);
+        const notifMsg = activeNote
+          ? `Se te asignó en ${cleanUpdatedData.assignedSede || currentTask.assignedSede || 'Global'}: "${cleanUpdatedData.task || currentTask.task}". Nota: ${activeNote.substring(0, 80)}${activeNote.length > 80 ? '...' : ''}`
+          : `Se te ha asignado una tarea en la sede ${cleanUpdatedData.assignedSede || currentTask.assignedSede || 'Global'}.`;
+
         // 1. Notificación In-App
         const notifRef = doc(collection(db, 'notifications'));
         batch.set(notifRef, {
           userId: cleanEmail,
           title: cleanUpdatedData.task || currentTask.task,
-          message: `Se te ha asignado una tarea en la sede ${cleanUpdatedData.assignedSede || currentTask.assignedSede || 'Global'}.`,
+          message: notifMsg,
           read: false,
           taskId: taskId,
           created_at: new Date().toISOString()
@@ -403,6 +420,12 @@ export function ChecklistProvider({ children }) {
             html: `
                 <h2>Hola, se te ha asignado una tarea en Causa OS</h2>
                 <p><strong>Tarea:</strong> ${cleanUpdatedData.task || currentTask.task}</p>
+                ${activeNote ? `
+                <div style="background-color: #0f172a; color: #f8fafc; border-left: 4px solid #f59e0b; padding: 12px 16px; margin: 12px 0; border-radius: 6px;">
+                  <strong style="color: #fbbf24;">📝 Notas / Instrucciones:</strong><br/>
+                  <span style="white-space: pre-wrap; font-size: 14px; line-height: 1.45;">${activeNote}</span>
+                </div>
+                ` : ''}
                 <p><strong>⏰ Fecha límite:</strong> ${formatDeadlineEs(cleanUpdatedData.deadline || currentTask.deadline)}</p>
                 <p><strong>Sede:</strong> ${cleanUpdatedData.assignedSede || currentTask.assignedSede || 'Global'}</p>
                 <p><strong>Prioridad:</strong> ${cleanUpdatedData.priority || currentTask.priority || 'Normal'}</p>
@@ -415,7 +438,7 @@ export function ChecklistProvider({ children }) {
             taskId: taskId,
             title: cleanUpdatedData.task || currentTask.task,
             deadline: cleanUpdatedData.deadline || currentTask.deadline || null,
-            description: `Tarea Causa OS — Sede: ${cleanUpdatedData.assignedSede || currentTask.assignedSede || 'Global'}. Prioridad: ${cleanUpdatedData.priority || currentTask.priority || 'Normal'}.`
+            description: `Tarea Causa OS — Sede: ${cleanUpdatedData.assignedSede || currentTask.assignedSede || 'Global'}. Prioridad: ${cleanUpdatedData.priority || currentTask.priority || 'Normal'}.${activeNote ? ' \nNotas: ' + activeNote : ''}`
           }
         });
       });
@@ -423,12 +446,16 @@ export function ChecklistProvider({ children }) {
       if (relevantFieldChanged) {
         stillAssignedEmails.forEach(email => {
           const cleanEmail = sanitizeEmail(email);
+          const notifMsg = activeNote
+            ? `Se actualizó la tarea "${cleanUpdatedData.task || currentTask.task}". Nota: ${activeNote.substring(0, 80)}${activeNote.length > 80 ? '...' : ''}`
+            : `Se actualizó una tarea que tenías asignada en la sede ${cleanUpdatedData.assignedSede || currentTask.assignedSede || 'Global'}.`;
+
           // 1. Notificación In-App
           const notifRef = doc(collection(db, 'notifications'));
           batch.set(notifRef, {
             userId: cleanEmail,
             title: cleanUpdatedData.task || currentTask.task,
-            message: `Se actualizó una tarea que tenías asignada en la sede ${cleanUpdatedData.assignedSede || currentTask.assignedSede || 'Global'}.`,
+            message: notifMsg,
             read: false,
             taskId: taskId,
             created_at: new Date().toISOString()
@@ -443,6 +470,12 @@ export function ChecklistProvider({ children }) {
               html: `
                 <h2>Hola, se actualizó una tarea que tienes asignada en Causa OS</h2>
                 <p><strong>Tarea:</strong> ${cleanUpdatedData.task || currentTask.task}</p>
+                ${activeNote ? `
+                <div style="background-color: #0f172a; color: #f8fafc; border-left: 4px solid #f59e0b; padding: 12px 16px; margin: 12px 0; border-radius: 6px;">
+                  <strong style="color: #fbbf24;">📝 Notas / Instrucciones:</strong><br/>
+                  <span style="white-space: pre-wrap; font-size: 14px; line-height: 1.45;">${activeNote}</span>
+                </div>
+                ` : ''}
                 <p><strong>⏰ Fecha límite:</strong> ${formatDeadlineEs(cleanUpdatedData.deadline || currentTask.deadline)}</p>
                 <p><strong>Sede:</strong> ${cleanUpdatedData.assignedSede || currentTask.assignedSede || 'Global'}</p>
                 <p><strong>Prioridad:</strong> ${cleanUpdatedData.priority || currentTask.priority || 'Normal'}</p>
@@ -455,7 +488,7 @@ export function ChecklistProvider({ children }) {
               taskId: taskId,
               title: cleanUpdatedData.task || currentTask.task,
               deadline: cleanUpdatedData.deadline || currentTask.deadline || null,
-              description: `Tarea Causa OS — Sede: ${cleanUpdatedData.assignedSede || currentTask.assignedSede || 'Global'}. Prioridad: ${cleanUpdatedData.priority || currentTask.priority || 'Normal'}.`
+              description: `Tarea Causa OS — Sede: ${cleanUpdatedData.assignedSede || currentTask.assignedSede || 'Global'}. Prioridad: ${cleanUpdatedData.priority || currentTask.priority || 'Normal'}.${activeNote ? ' \nNotas: ' + activeNote : ''}`
             }
           });
         });

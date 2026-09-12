@@ -4,7 +4,7 @@ import {
   ExternalLink, Link as LinkIcon, Plus, Trash2, Edit3,
   Send, Sparkles, User, FileText, Check, ShieldCheck,
   TrendingUp, RefreshCw, UploadCloud, Paperclip, FileCheck,
-  FolderPlus, Loader2, UserPlus
+  FolderPlus, Loader2, UserPlus, MessageSquare
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useChecklist } from '../context/ChecklistContext';
@@ -124,12 +124,15 @@ export default function TaskDetailModal({
       let notes = [];
       if (Array.isArray(task.progressNotes) && task.progressNotes.length > 0) {
         notes = [...task.progressNotes];
-      } else if (task.comments && typeof task.comments === 'string' && task.comments.trim()) {
+      } else if ((task.notes || task.description || task.comments) && typeof (task.notes || task.description || task.comments) === 'string' && (task.notes || task.description || task.comments).trim()) {
+        const textVal = (task.notes || task.description || task.comments).trim();
         notes = [{
-          id: 'note_legacy',
-          text: task.comments,
-          createdAt: new Date().toISOString(),
-          authorName: 'Nota existente',
+          id: 'note_initial',
+          text: textVal,
+          createdAt: task.created_at || new Date().toISOString(),
+          authorName: task.createdBy ? `Asignado por ${task.createdBy.split('@')[0]}` : 'Nota de asignación',
+          authorEmail: task.createdBy || '',
+          isInitialNote: true,
           progressPercentage: initialProgress
         }];
       }
@@ -348,6 +351,8 @@ export default function TaskDetailModal({
         evidence_url: mainEvidenceUrl,
         evidences: evidencesList,
         comments: latestComment,
+        notes: task.notes || task.description || task.comments || '',
+        description: task.description || task.notes || task.comments || '',
         progressNotes: notesList,
         lastUpdated: new Date().toISOString(),
         lastUpdatedBy: currentUser?.email || ''
@@ -576,6 +581,40 @@ export default function TaskDetailModal({
               {countdown.label}
             </span>
           </div>
+
+          {/* BANNER DE NOTAS E INSTRUCCIONES ASIGNADAS */}
+          {(task.notes || task.description || task.comments) && (
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(255, 215, 0, 0.08) 0%, rgba(0, 0, 0, 0.35) 100%)',
+              border: '1px solid rgba(255, 215, 0, 0.35)',
+              borderLeft: '4px solid var(--crear-gold)',
+              borderRadius: '10px',
+              padding: '1rem 1.2rem',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem', flexWrap: 'wrap', gap: '0.4rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', color: 'var(--crear-gold)', fontWeight: 800, fontSize: '0.88rem' }}>
+                  <MessageSquare size={16} />
+                  <span>Notas e Instrucciones de la Tarea</span>
+                </div>
+                {task.createdBy && (
+                  <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                    Asignado por: <strong style={{ color: '#ffffff' }}>{task.createdBy}</strong>
+                  </span>
+                )}
+              </div>
+              <p style={{
+                margin: 0,
+                color: '#ffffff',
+                fontSize: '0.86rem',
+                lineHeight: '1.5',
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-word'
+              }}>
+                {task.notes || task.description || task.comments}
+              </p>
+            </div>
+          )}
 
           {/* 1. SECCIÓN DE AVANCE (%) */}
           <div style={{
