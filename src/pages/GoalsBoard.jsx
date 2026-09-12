@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../services/firebase';
-import { collection, onSnapshot, addDoc, updateDoc, doc, query, where, orderBy, writeBatch, runTransaction } from 'firebase/firestore';
+import { collection, onSnapshot, addDoc, updateDoc, doc, query, where, orderBy, writeBatch, runTransaction, setDoc, limit } from 'firebase/firestore';
 import { useAuth } from '../context/AuthContext';
 import { useCycles } from '../context/CyclesContext';
 import { useUI } from '../context/UIContext';
-import { ArrowLeft, Target, Settings, GitMerge, Users, UserPlus, Award, CheckCircle2, Plus, Edit3, Calendar, Clock, Sparkles, Check } from 'lucide-react';
+import { ArrowLeft, Target, Settings, GitMerge, Users, UserPlus, Award, CheckCircle2, Plus, Edit3, Calendar, Clock, Sparkles, Check, FileSpreadsheet, Eye, RefreshCw, X, Search, Filter } from 'lucide-react';
 import GoalDivisionModal from '../components/GoalDivisionModal';
 import { normalizeSede } from '../data/usersData';
 
@@ -80,6 +80,14 @@ export default function GoalsBoard() {
   );
   
   const [quitoCycle, setQuitoCycle] = useState('C1');
+
+  // Sincronizacion oficial para Sede LIMA desde Google Sheet GRADUADOS LIMA (C1E31)
+  const [syncingLima, setSyncingLima] = useState(false);
+  const [showLimaModal, setShowLimaModal] = useState(false);
+  const [limaAliadosData, setLimaAliadosData] = useState([]);
+  const [limaSearchTerm, setLimaSearchTerm] = useState('');
+  const [limaRespFilter, setLimaRespFilter] = useState('ALL');
+  const [limaStatusFilter, setLimaStatusFilter] = useState('ALL');
 
 
   useEffect(() => {
@@ -279,11 +287,213 @@ export default function GoalsBoard() {
         updatedAt: new Date().toISOString()
       });
       await performRollUp(goal.id, newProgress);
-      showToast(`Avance sincronizado con éxito desde Reportes: ${totalOk} OK (${newProgress}%).`, 'success');
+      showToast(Avance sincronizado con Ã©xito desde Reportes: ${totalOk} OK (${newProgress}%)., 'success');
     } catch (err) {
       console.error(err);
       showToast('Error al sincronizar avance con reportes.', 'error');
     }
+  };
+
+  // SINCRONIZACION EXCLUSIVA PARA SEDE LIMA DESDE LA HOJA OFICIAL GRADUADOS LIMA (C1E31)
+  const handleSyncLimaGraduadosSheet = async (targetGoal = null) => {
+    setSyncingLima(true);
+    try {
+      const SHEET_ID = '1l93lhINfZtthELjOwBodoUEgk_d6A8gTb9hPGO6cOe4';
+      const GID_ALIADOS = '488639774';
+      const url = https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID_ALIADOS};
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(HTTP ${res.status});
+      const csvText = await res.text();
+
+      const lines = csvText.split(/\r?\n/).filter(l => l.trim().length > 0);
+      let totalOk = 0;
+      let totalSig = 0;
+      const parsedAliados = [];
+
+      const coordStats = {
+        JOYCE: { count: 0, ok: 0, name: 'Joyce Marin Suarez', email: 'joyce.marin@crearpsl.net', role: 'coord_c1' },
+        DIANA: { count: 0, ok: 0, name: 'Diana Moscoso Robles', email: 'diana.moscoso@crearpsl.net', role: 'coord_c1' },
+        LINID: { count: 0, ok: 0, name: 'Linid Valencia', email: 'linid.valencia@crearpsl.net', role: 'coord_maestria' },
+        LEYLA: { count: 0, ok: 0, name: 'Leyla Pasquel', email: 'leyla.pasquel@crearpsl.net', role: 'coord_maestria' },
+        JOSE: { count: 0, ok: 0, name: 'Jose Sanchez', email: 'jose.sanchez@crearpsl.net', role: 'gerente' }
+      };
+
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i];
+        if (!line) continue;
+        const matches = line.match(/(?:^|,)("(?:[^"]|"")*"|[^,]*)/g) || [];
+        const cols = matches.map(m => {
+          let val = m.replace(/^,/, '').trim();
+          if (val.startsWith('"') && val.endsWith('"')) {
+            val = val.slice(1, -1).replace(/""/g, '"').trim();
+          }
+          return val;
+        });
+
+        const nombre = (cols[0] || '').trim();
+        if (!nombre || nombre.toLowerCase().includes('creador') || nombre.toLowerCase().includes('capitana')) continue;
+
+        const equipo = (cols[1] || '').trim();
+        const resp = (cols[2] || '').trim().toUpperCase();
+        const estado = (cols[3] || '').trim().toUpperCase();
+        const obs = (cols[4] || '').trim();
+
+        parsedAliados.push({ nombre, equipo, responsable: resp, estado, observaciones: obs });
+
+        if (estado === 'OK') totalOk++;
+        if (estado === 'SIG') totalSig++;
+
+        if (resp.includes('JOYCE') || resp.includes('JM')) {
+          coordStats.JOYCE.count++;
+          if (estado === 'OK') coordStats.JOYCE.ok++;
+        } else if (resp.includes('DIANA') || resp.includes('DM')) {
+          coordStats.DIANA.count++;
+          if (estado === 'OK') coordStats.DIANA.ok++;
+        } else if (resp.includes('LINID')) {
+          coordStats.LINID.count++;
+          if (estado === 'OK') coordStats.LINID.ok++;
+        } else if (resp.includes('LEYLA')) {
+          coordStats.LEYLA.count++;
+          if (estado === 'OK') coordStats.LEYLA.ok++;
+        } else if (resp.includes('JOSE')) {
+          coordStats.JOSE.count++;
+          if (estado === 'OK') coordStats.JOSE.ok++;
+        }
+      }
+
+      setLimaAliadosData(parsedAliados);
+
+      // Buscar la meta de Aliados C1 para Lima
+      const limaGoal = targetGoal || goals.find(g => 
+        (normalizeSede(g.sede || '') === 'Lima') && 
+        (g.title?.toLowerCase().includes('aliados') && (g.title?.includes('1') || g.title?.toLowerCase().includes('c1') || g.stage === 'C1'))
+      );
+
+      const assignedCoordinators = [
+        {
+          name: coordStats.DIANA.name,
+          email: coordStats.DIANA.email,
+          role: coordStats.DIANA.role,
+          sede: 'Lima',
+          targetQuota: coordStats.DIANA.ok || 13,
+          currentQuota: coordStats.DIANA.ok
+        },
+        {
+          name: coordStats.JOYCE.name,
+          email: coordStats.JOYCE.email,
+          role: coordStats.JOYCE.role,
+          sede: 'Lima',
+          targetQuota: coordStats.JOYCE.ok || 12,
+          currentQuota: coordStats.JOYCE.ok
+        },
+        {
+          name: coordStats.LINID.name,
+          email: coordStats.LINID.email,
+          role: coordStats.LINID.role,
+          sede: 'Lima',
+          targetQuota: coordStats.LINID.ok || 3,
+          currentQuota: coordStats.LINID.ok
+        },
+        {
+          name: coordStats.LEYLA.name,
+          email: coordStats.LEYLA.email,
+          role: coordStats.LEYLA.role,
+          sede: 'Lima',
+          targetQuota: 2,
+          currentQuota: coordStats.LEYLA.ok
+        },
+        {
+          name: coordStats.JOSE.name,
+          email: coordStats.JOSE.email,
+          role: coordStats.JOSE.role,
+          sede: 'Lima',
+          targetQuota: 2,
+          currentQuota: coordStats.JOSE.ok
+        }
+      ];
+
+      const targetVal = Number(limaGoal?.targetValue || 32);
+      const newProgress = Math.min(100, Math.round((totalOk / targetVal) * 100));
+
+      if (limaGoal) {
+        const goalRef = doc(db, 'goals', limaGoal.id);
+        await updateDoc(goalRef, {
+          currentValue: totalOk,
+          progress: newProgress,
+          assignedCoordinators,
+          autoSyncedFromLimaSheet: true,
+          limaSheetSyncedAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        });
+        await performRollUp(limaGoal.id, newProgress);
+        showToast(Metas de Lima sincronizadas: ${totalOk} Aliados confirmados (${newProgress}%). Joyce: ${coordStats.JOYCE.ok}, Diana: ${coordStats.DIANA.ok}., 'success');
+      } else {
+        const limaCycle = goals.find(g => normalizeSede(g.sede || '') === 'Lima' && g.scope === 'CICLO');
+        const newRef = doc(collection(db, 'goals'));
+        await setDoc(newRef, {
+          title: 'Aliados - CapÃ­tulo 1',
+          kpi: 'Cantidad de Aliados',
+          targetValue: 32,
+          currentValue: totalOk,
+          progress: newProgress,
+          scope: 'ENTRENAMIENTO',
+          cyclePhase: 'C1',
+          parentId: limaCycle ? limaCycle.id : null,
+          stage: 'C1',
+          ownerId: currentUser?.uid || 'admin',
+          sede: 'Lima',
+          assignedCoordinators,
+          autoSyncedFromLimaSheet: true,
+          limaSheetSyncedAt: new Date().toISOString(),
+          createdAt: new Date().toISOString()
+        });
+        if (limaCycle) {
+          await performRollUp(newRef.id, newProgress);
+        }
+        showToast(Meta Aliados (Lima) creada y sincronizada: ${totalOk} confirmados (${newProgress}%), 'success');
+      }
+    } catch (e) {
+      console.error('Error sincronizando hoja de Lima:', e);
+      showToast('Error sincronizando hoja de Lima: ' + e.message, 'error');
+    } finally {
+      setSyncingLima(false);
+    }
+  };
+
+  const handleOpenLimaAliadosModal = async () => {
+    if (limaAliadosData.length === 0) {
+      setSyncingLima(true);
+      try {
+        const SHEET_ID = '1l93lhINfZtthELjOwBodoUEgk_d6A8gTb9hPGO6cOe4';
+        const GID_ALIADOS = '488639774';
+        const url = https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID_ALIADOS};
+        const res = await fetch(url);
+        if (res.ok) {
+          const csvText = await res.text();
+          const lines = csvText.split(/\r?\n/).filter(l => l.trim().length > 0);
+          const parsed = [];
+          for (let i = 1; i < lines.length; i++) {
+            const matches = lines[i].match(/(?:^|,)("(?:[^"]|"")*"|[^,]*)/g) || [];
+            const cols = matches.map(m => m.replace(/^,?"?|"$/g, '').trim());
+            const nombre = (cols[0] || '').trim();
+            if (!nombre || nombre.toLowerCase().includes('creador') || nombre.toLowerCase().includes('capitana')) continue;
+            parsed.push({
+              nombre,
+              equipo: (cols[1] || '').trim(),
+              responsable: (cols[2] || '').trim().toUpperCase(),
+              estado: (cols[3] || '').trim().toUpperCase(),
+              observaciones: (cols[4] || '').trim()
+            });
+          }
+          setLimaAliadosData(parsed);
+        }
+      } catch (err) {
+        console.warn(err);
+      } finally {
+        setSyncingLima(false);
+      }
+    }
+    setShowLimaModal(true);
   };
 
   // Guardar Reporte de Sentados en Sala (Gerente / Oficina al iniciar entrenamiento)
@@ -882,16 +1092,40 @@ export default function GoalsBoard() {
             </p>
           </div>
         </div>
-        {currentUser?.appRole === 'gerente' && (
-          <div style={{ display: 'flex', gap: '1rem' }}>
-            <button className="btn-secondary" onClick={() => setShowDailyModal(true)} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.8rem 1.5rem' }}>
-              <Plus size={18} /> Meta Diaria
+        <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          {(selectedSedeFilter === 'Lima' || normalizeSede(currentUser?.sede || '') === 'Lima' || currentUser?.isSuperAdmin || currentUser?.isDireccion) && (
+            <button
+              onClick={() => handleSyncLimaGraduadosSheet()}
+              disabled={syncingLima}
+              className="btn-secondary"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                padding: '0.65rem 1.2rem',
+                border: '1px solid var(--crear-cyan)',
+                color: 'var(--crear-cyan)',
+                background: 'rgba(0, 210, 255, 0.08)',
+                cursor: syncingLima ? 'wait' : 'pointer'
+              }}
+              title="Sincronizar metas de Lima desde Google Sheet GRADUADOS LIMA (C1E31)"
+            >
+              <FileSpreadsheet size={16} />
+              <span>{syncingLima ? 'Sincronizando...' : 'Sincronizar Graduados Lima'}</span>
             </button>
-            <button className="btn-primary" onClick={() => setShowWizard(true)} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.8rem 1.5rem' }}>
-              <Settings size={18} /> Setup de Ciclo
-            </button>
-          </div>
-        )}
+          )}
+
+          {currentUser?.appRole === 'gerente' && (
+            <div style={{ display: 'flex', gap: '1rem' }}>
+              <button className="btn-secondary" onClick={() => setShowDailyModal(true)} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.8rem 1.5rem' }}>
+                <Plus size={18} /> Meta Diaria
+              </button>
+              <button className="btn-primary" onClick={() => setShowWizard(true)} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.8rem 1.5rem' }}>
+                <Settings size={18} /> Setup de Ciclo
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
         {(currentUser?.isSuperAdmin || currentUser?.isDireccion) && (
@@ -1129,6 +1363,230 @@ export default function GoalsBoard() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* MODAL DIRECTORIO DE ALIADOS LIMA */}
+      {showLimaModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0,0,0,0.85)',
+          backdropFilter: 'blur(8px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000,
+          padding: '1rem'
+        }}>
+          <div className="glass-panel" style={{
+            maxWidth: '1000px',
+            width: '100%',
+            maxHeight: '90vh',
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+            border: '1px solid rgba(0, 210, 255, 0.3)',
+            boxShadow: '0 10px 40px rgba(0,0,0,0.8)'
+          }}>
+            {/* Header Modal */}
+            <div style={{
+              padding: '1.25rem 1.5rem',
+              borderBottom: '1px solid rgba(255,255,255,0.1)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              background: 'rgba(0,0,0,0.4)'
+            }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                  <span className="badge badge-primary">Sede Lima</span>
+                  <span className="badge badge-success">C1E31</span>
+                  <h2 style={{ margin: 0, fontSize: '1.3rem', color: '#fff' }}>Directorio Oficial de Aliados (Graduados Lima)</h2>
+                </div>
+                <p className="text-muted" style={{ margin: '0.2rem 0 0 0', fontSize: '0.85rem' }}>
+                  Alimentado en tiempo real desde la hoja de cÃ¡lculo oficial: <code>GRADUADOS LIMA</code>
+                </p>
+              </div>
+              <button
+                onClick={() => setShowLimaModal(false)}
+                style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '0.4rem' }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Subheader MÃ©tricas */}
+            <div style={{
+              padding: '0.75rem 1.5rem',
+              background: 'rgba(255,255,255,0.02)',
+              borderBottom: '1px solid rgba(255,255,255,0.06)',
+              display: 'flex',
+              gap: '1rem',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}>
+              <div style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '0.8rem', padding: '3px 10px', borderRadius: '6px', background: 'rgba(34, 197, 94, 0.15)', color: '#22c55e', border: '1px solid rgba(34, 197, 94, 0.3)', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                  <CheckCircle2 size={13} /> Confirmados (OK): {limaAliadosData.filter(a => a.estado === 'OK').length}
+                </span>
+                <span style={{ fontSize: '0.8rem', padding: '3px 10px', borderRadius: '6px', background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', border: '1px solid rgba(56, 189, 248, 0.3)', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                  <RefreshCw size={13} /> En Seguimiento (SIG): {limaAliadosData.filter(a => a.estado === 'SIG').length}
+                </span>
+                <span style={{ fontSize: '0.8rem', padding: '3px 10px', borderRadius: '6px', background: 'rgba(255, 255, 255, 0.08)', color: '#cbd5e1', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                  <Users size={13} /> Total Creadores Registrados: {limaAliadosData.length}
+                </span>
+              </div>
+
+              <button
+                disabled={syncingLima}
+                onClick={() => handleSyncLimaGraduadosSheet()}
+                className="btn-secondary"
+                style={{ fontSize: '0.75rem', padding: '0.35rem 0.8rem', display: 'flex', alignItems: 'center', gap: '4px' }}
+              >
+                <RefreshCw size={13} className={syncingLima ? 'animate-spin' : ''} />
+                <span>{syncingLima ? 'Actualizando...' : 'Recargar Hoja'}</span>
+              </button>
+            </div>
+
+            {/* Filtros de BÃºsqueda */}
+            <div style={{
+              padding: '0.75rem 1.5rem',
+              display: 'flex',
+              gap: '0.75rem',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              background: 'rgba(0,0,0,0.2)'
+            }}>
+              <div style={{ flex: 1, minWidth: '220px', position: 'relative' }}>
+                <Search size={14} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                <input
+                  type="text"
+                  placeholder="Buscar por nombre, equipo u observaciones..."
+                  value={limaSearchTerm}
+                  onChange={e => setLimaSearchTerm(e.target.value)}
+                  className="form-input"
+                  style={{ paddingLeft: '2rem', fontSize: '0.85rem' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Responsable:</label>
+                <select
+                  value={limaRespFilter}
+                  onChange={e => setLimaRespFilter(e.target.value)}
+                  style={{ background: '#0f172a', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', padding: '0.4rem', borderRadius: '6px', fontSize: '0.8rem' }}
+                >
+                  <option value="ALL">Todos</option>
+                  <option value="JOYCE">Joyce Marin</option>
+                  <option value="DIANA">Diana Moscoso</option>
+                  <option value="LINID">Linid Valencia</option>
+                  <option value="LEYLA">Leyla Pasquel</option>
+                  <option value="JOSE">Jose Sanchez</option>
+                </select>
+              </div>
+
+              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Estado:</label>
+                <select
+                  value={limaStatusFilter}
+                  onChange={e => setLimaStatusFilter(e.target.value)}
+                  style={{ background: '#0f172a', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', padding: '0.4rem', borderRadius: '6px', fontSize: '0.8rem' }}
+                >
+                  <option value="ALL">Todos los Estados</option>
+                  <option value="OK">OK (Confirmado)</option>
+                  <option value="SIG">SIG (En Seguimiento)</option>
+                  <option value="NO">NO (No va)</option>
+                  <option value="NP">NP (No puede)</option>
+                  <option value="NC">NC (No contesta)</option>
+                  <option value="NI">NI (No interesado)</option>
+                  <option value="XC">XC (Por confirmar)</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Tabla con Scroll */}
+            <div style={{ flex: 1, overflowY: 'auto', padding: '1rem 1.5rem' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', textAlign: 'left', color: 'var(--text-muted)' }}>
+                    <th style={{ padding: '0.6rem 0.5rem' }}>Creador CuÃ¡ntico</th>
+                    <th style={{ padding: '0.6rem 0.5rem' }}>Equipo</th>
+                    <th style={{ padding: '0.6rem 0.5rem' }}>Responsable</th>
+                    <th style={{ padding: '0.6rem 0.5rem' }}>Estado</th>
+                    <th style={{ padding: '0.6rem 0.5rem' }}>Observaciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {limaAliadosData
+                    .filter(a => {
+                      const matchSearch = !limaSearchTerm || 
+                        a.nombre?.toLowerCase().includes(limaSearchTerm.toLowerCase()) ||
+                        a.equipo?.toLowerCase().includes(limaSearchTerm.toLowerCase()) ||
+                        a.observaciones?.toLowerCase().includes(limaSearchTerm.toLowerCase());
+                      const matchResp = limaRespFilter === 'ALL' || a.responsable?.includes(limaRespFilter);
+                      const matchStatus = limaStatusFilter === 'ALL' || a.estado === limaStatusFilter;
+                      return matchSearch && matchResp && matchStatus;
+                    })
+                    .map((item, idx) => {
+                      const isOk = item.estado === 'OK';
+                      const isSig = item.estado === 'SIG';
+                      const isNo = item.estado === 'NO' || item.estado === 'NP' || item.estado === 'NI';
+
+                      return (
+                        <tr key={idx} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', background: idx % 2 === 0 ? 'rgba(255,255,255,0.01)' : 'transparent' }}>
+                          <td style={{ padding: '0.6rem 0.5rem', fontWeight: 600, color: '#f8fafc' }}>{item.nombre}</td>
+                          <td style={{ padding: '0.6rem 0.5rem', color: 'var(--crear-gold)' }}>{item.equipo || '-'}</td>
+                          <td style={{ padding: '0.6rem 0.5rem' }}>
+                            <span style={{ fontSize: '0.75rem', fontWeight: 700, padding: '2px 6px', borderRadius: '4px', background: 'rgba(255,255,255,0.06)' }}>
+                              {item.responsable}
+                            </span>
+                          </td>
+                          <td style={{ padding: '0.6rem 0.5rem' }}>
+                            <span style={{
+                              fontSize: '0.72rem',
+                              fontWeight: 800,
+                              padding: '2px 8px',
+                              borderRadius: '4px',
+                              background: isOk ? 'rgba(34, 197, 94, 0.2)' : isSig ? 'rgba(56, 189, 248, 0.2)' : isNo ? 'rgba(239, 68, 68, 0.2)' : 'rgba(255, 255, 255, 0.08)',
+                              color: isOk ? '#22c55e' : isSig ? '#38bdf8' : isNo ? '#ef4444' : '#94a3b8',
+                              border: isOk ? '1px solid rgba(34, 197, 94, 0.4)' : isSig ? '1px solid rgba(56, 189, 248, 0.4)' : isNo ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid rgba(255, 255, 255, 0.1)'
+                            }}>
+                              {item.estado || 'PENDIENTE'}
+                            </span>
+                          </td>
+                          <td style={{ padding: '0.6rem 0.5rem', color: 'var(--text-muted)', fontSize: '0.8rem', maxWidth: '300px' }}>
+                            {item.observaciones || '-'}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Footer Modal */}
+            <div style={{
+              padding: '0.75rem 1.5rem',
+              borderTop: '1px solid rgba(255,255,255,0.08)',
+              background: 'rgba(0,0,0,0.4)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                Sede exclusiva: <strong>Lima</strong> â€¢ Hoja GID: <code>488639774</code>
+              </span>
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={() => setShowLimaModal(false)}
+                style={{ padding: '0.4rem 1rem', fontSize: '0.85rem' }}
+              >
+                Cerrar
+              </button>
+            </div>
           </div>
         </div>
       )}
