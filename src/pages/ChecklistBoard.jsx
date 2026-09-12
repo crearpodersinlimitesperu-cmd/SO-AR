@@ -19,22 +19,22 @@ import SyncHistoryModal from '../components/SyncHistoryModal';
 import TaskDetailModal from '../components/TaskDetailModal';
 import { celebrateVictory } from '../utils/neuroFeedback';
 
-// Fases operativas reales existentes en src/data/checklistData.js (cyclePhase).
-// No existen 'PRE-C2' ni 'POST-C2' como fases propias: todo lo de C2 usa la fase única 'C2'.
-const PHASE_ORDER = ['GATE 1', 'PRE-C1', 'C1', 'POST-C1', 'C2', 'PRE-MJ', 'MJ', 'POST-MJ'];
+// Fases operativas requeridas para todos los usuarios de oficina:
+// PRE-C1, C1, POST-C1, PRE-C2, C2, PRE-MJ, MJ, POST-MJ
+const PHASE_ORDER = ['PRE-C1', 'C1', 'POST-C1', 'PRE-C2', 'C2', 'PRE-MJ', 'MJ', 'POST-MJ'];
 const PHASE_META = {
   'GATE 1': { emoji: '🚪', label: 'GATE 1', color: '#3b82f6' },
   'PRE-C1': { emoji: '📦', label: 'PRE-C1', color: 'var(--crear-gold)' },
-  'C1': { emoji: '🏢', label: 'C1 Sala', color: 'var(--color-success)' },
+  'C1': { emoji: '🏢', label: 'C1', color: 'var(--color-success)' },
   'POST-C1': { emoji: '🚀', label: 'POST-C1', color: '#8b5cf6' },
+  'PRE-C2': { emoji: '⚡', label: 'PRE-C2', color: '#a855f7' },
   'C2': { emoji: '🔥', label: 'C2', color: '#ec4899' },
   'PRE-MJ': { emoji: '🧭', label: 'PRE-MJ', color: '#0ea5e9' },
   'MJ': { emoji: '🏆', label: 'MJ', color: '#f59e0b' },
   'POST-MJ': { emoji: '🌅', label: 'POST-MJ', color: '#22c55e' },
 };
-// Roles operativos que navegan su checklist por pestañas de fase (catálogo completo),
-// permitiendo ver y ejecutar tareas cíclicas en cada etapa (C1, C2, MJ).
-const COORDINATOR_ROLES_WITH_PHASE_TABS = ['qt', 'coord_c1', 'coord_maestria', 'coordinador', 'gerente', 'capitan'];
+// Todos los roles operativos y de oficina tienen habilitadas las pestañas de fase
+const COORDINATOR_ROLES_WITH_PHASE_TABS = ['qt', 'coord_c1', 'coord_maestria', 'coordinador', 'gerente', 'capitan', 'cfo', 'finanzas', 'talento_humano', 'director_th', 'direccion'];
 
 const getCountdownInfo = (deadlineIso, now = new Date()) => {
   if (!deadlineIso) return { label: 'Sin fecha límite', color: '#9ca3af', bg: 'rgba(156,163,175,0.12)', border: '#9ca3af', overdue: false };
@@ -84,7 +84,7 @@ export default function ChecklistBoard() {
   }, [searchParams]);
 
   const { currentUser } = useAuth();
-  const { tasks, toggleTask, updateTaskDetails, inviteCollaborator, syncTasksToGoogle } = useChecklist();
+  const { tasks, toggleTask, updateTaskDetails, inviteCollaborator, syncTasksToGoogle, updateIndividualProgress, acceptCollaboration, rejectCollaboration } = useChecklist();
   const { currentCycle, currentStage } = useCycles();
   const { showPrompt } = useUI();
   const role = roles.find(r => r.id === roleId) || {
@@ -151,11 +151,9 @@ export default function ChecklistBoard() {
 
   const filterParam = searchParams.get('filter');
 
-  // Fases que este rol realmente tiene en su catálogo de tareas (aplica a todos los roles y consolidado).
-  const phasesPresent = PHASE_ORDER.filter(p => myTasks.some(t => t.cyclePhase === p));
-  // Mostramos pestañas si el rol abarca más de una fase
-  const showPhaseTabs = phasesPresent.length > 1;
-  const isCurrentStageInRole = currentStage && phasesPresent.includes(currentStage);
+  // Pestañas de fases operativas: permanentemente activas para todos los usuarios de oficina (PRE-C1, C1, POST-C1, PRE-C2, C2, PRE-MJ, MJ, POST-MJ)
+  const showPhaseTabs = true;
+  const isCurrentStageInRole = currentStage && PHASE_ORDER.includes(currentStage);
 
   const sortByDeadline = (tasksArray) => {
     return tasksArray.sort((a, b) => {
@@ -184,15 +182,21 @@ export default function ChecklistBoard() {
         viewTitle = `${role?.name || 'Checklist'}: Fase Activa ${meta.label}`;
       } else {
         scopedTasks = myTasks;
-        viewTitle = `${role?.name || 'Checklist'}: Catálogo Operativo Integral (${phasesPresent.join(', ')})`;
+        viewTitle = `${role?.name || 'Checklist'}: Catálogo Operativo Integral`;
       }
-    } else if (qtPhaseFilter !== 'all' && phasesPresent.includes(qtPhaseFilter)) {
+    } else if (qtPhaseFilter !== 'all') {
       const meta = PHASE_META[qtPhaseFilter] || { label: qtPhaseFilter };
-      scopedTasks = myTasks.filter(t => t.cyclePhase === qtPhaseFilter);
+      scopedTasks = myTasks.filter(t => {
+        if (t.cyclePhase === qtPhaseFilter) return true;
+        if (qtPhaseFilter === 'PRE-C2') {
+          return t.cyclePhase === 'PRE-C2' || (t.cyclePhase === 'C2' && (t.task || '').toLowerCase().includes('pre'));
+        }
+        return false;
+      });
       viewTitle = `${role?.name || 'Checklist'}: Fase ${meta.label}`;
     } else {
       scopedTasks = myTasks;
-      viewTitle = `${role?.name || 'Checklist'}: Catálogo Operativo Integral (${phasesPresent.join(', ')})`;
+      viewTitle = `${role?.name || 'Checklist'}: Catálogo Operativo Integral`;
     }
   } else {
     // Vista Normal del Checklist Activo para roles de fase única
@@ -390,8 +394,13 @@ export default function ChecklistBoard() {
               </button>
             )}
 
-            {phasesPresent.map(phase => {
+            {PHASE_ORDER.map(phase => {
               const meta = PHASE_META[phase] || { emoji: '📌', label: phase, color: 'var(--crear-gold)' };
+              const count = myTasks.filter(t => {
+                if (t.cyclePhase === phase) return true;
+                if (phase === 'PRE-C2') return t.cyclePhase === 'PRE-C2' || (t.cyclePhase === 'C2' && (t.task || '').toLowerCase().includes('pre'));
+                return false;
+              }).length;
               const active = qtPhaseFilter === phase;
               return (
                 <button
@@ -409,7 +418,7 @@ export default function ChecklistBoard() {
                     border: `1px solid ${active ? meta.color : 'rgba(255,255,255,0.1)'}`
                   }}
                 >
-                  {meta.emoji} {meta.label} ({myTasks.filter(t => t.cyclePhase === phase).length})
+                  {meta.emoji} {meta.label} ({count})
                 </button>
               );
             })}
@@ -712,6 +721,118 @@ export default function ChecklistBoard() {
                         {task.evidenceUrl && <a href={task.evidenceUrl} target="_blank" rel="noreferrer" className="text-gold" style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', textDecoration: 'none' }}><LinkIcon size={12}/> Evidencia Adjunta</a>}
                       </div>
                     )}
+
+                    {/* ETIQUETAS DE TAREA OPCIONAL O PERIÓDICA */}
+                    {(task.isOptional || (task.periodicity && task.periodicity !== 'UNICA')) && (
+                      <div style={{ marginTop: '0.5rem', display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+                        {task.isOptional && (
+                          <span style={{ fontSize: '0.72rem', padding: '0.15rem 0.5rem', borderRadius: '4px', background: 'rgba(245,158,11,0.15)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.3)', fontWeight: 'bold' }}>
+                            ✨ Opcional / Recomendada
+                          </span>
+                        )}
+                        {task.periodicity && task.periodicity !== 'UNICA' && (
+                          <span style={{ fontSize: '0.72rem', padding: '0.15rem 0.5rem', borderRadius: '4px', background: 'rgba(14,165,233,0.15)', color: '#0ea5e9', border: '1px solid rgba(14,165,233,0.3)', fontWeight: 'bold' }}>
+                            🔄 Periódica ({task.periodicity})
+                          </span>
+                        )}
+                      </div>
+                    )}
+
+                    {/* SEGUIMIENTO INDIVIDUAL EN UNA SOLA TARJETA (MULTI-ÁREA) */}
+                    {task.assigneeProgress && Object.keys(task.assigneeProgress).length > 0 && (() => {
+                      const entries = Object.entries(task.assigneeProgress);
+                      const total = entries.length;
+                      const completedCount = entries.filter(([_, v]) => v.completed).length;
+                      const percent = total > 0 ? Math.round((completedCount / total) * 100) : 0;
+                      const myEmail = currentUser?.email?.toLowerCase();
+                      const myEntry = entries.find(([email]) => email.toLowerCase() === myEmail || email.toLowerCase().replace('@crearpsl.com','@crearpsl.net') === myEmail?.replace('@crearpsl.com','@crearpsl.net'));
+                      const myProgress = myEntry ? myEntry[1] : null;
+
+                      return (
+                        <div style={{ marginTop: '0.9rem', padding: '0.8rem', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                              <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: 'var(--crear-gold)' }}>
+                                👥 Seguimiento Individual ({completedCount}/{total} completaron):
+                              </span>
+                              <span style={{ fontSize: '0.75rem', color: percent === 100 ? '#22c55e' : 'var(--text-muted)', fontWeight: 'bold' }}>
+                                {percent}%
+                              </span>
+                            </div>
+                            
+                            {/* Botón rápido para que el usuario actual complete o reabra su parte individual */}
+                            {myProgress && (
+                              <button
+                                type="button"
+                                onClick={() => updateIndividualProgress(task.id, myEntry[0], !myProgress.completed)}
+                                style={{
+                                  padding: '0.25rem 0.7rem',
+                                  borderRadius: '6px',
+                                  fontSize: '0.75rem',
+                                  fontWeight: 'bold',
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '0.3rem',
+                                  background: myProgress.completed ? 'rgba(34,197,94,0.15)' : 'rgba(245,158,11,0.2)',
+                                  color: myProgress.completed ? '#22c55e' : 'var(--crear-gold)',
+                                  border: `1px solid ${myProgress.completed ? '#22c55e' : 'var(--crear-gold)'}`
+                                }}
+                              >
+                                {myProgress.completed ? '✓ Mi parte completada' : '⚡ Marcar mi parte como completada'}
+                              </button>
+                            )}
+                          </div>
+
+                          {/* Barra de progreso colectiva */}
+                          <div style={{ width: '100%', height: '6px', background: 'rgba(255,255,255,0.08)', borderRadius: '3px', overflow: 'hidden', marginBottom: '0.7rem' }}>
+                            <div style={{ width: `${percent}%`, height: '100%', background: percent === 100 ? '#22c55e' : 'var(--crear-gold)', transition: 'width 0.3s ease' }} />
+                          </div>
+
+                          {/* Chips individuales de avance */}
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '0.5rem' }}>
+                            {entries.map(([email, prog]) => {
+                              const isMe = email.toLowerCase() === myEmail || email.toLowerCase().replace('@crearpsl.com','@crearpsl.net') === myEmail?.replace('@crearpsl.com','@crearpsl.net');
+                              return (
+                                <div 
+                                  key={email}
+                                  style={{
+                                    padding: '0.4rem 0.6rem',
+                                    borderRadius: '6px',
+                                    background: prog.completed ? 'rgba(34,197,94,0.06)' : 'rgba(255,255,255,0.03)',
+                                    border: `1px solid ${prog.completed ? 'rgba(34,197,94,0.3)' : 'rgba(255,255,255,0.08)'}`,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    gap: '0.4rem'
+                                  }}
+                                >
+                                  <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                    <div style={{ fontSize: '0.75rem', fontWeight: isMe ? 'bold' : 'normal', color: isMe ? 'var(--crear-cyan)' : 'var(--text-heading)' }}>
+                                      {isMe ? '👉 Tú (' + (prog.name || email.split('@')[0]) + ')' : (prog.name || email.split('@')[0])}
+                                    </div>
+                                    <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
+                                      {prog.sede || 'Global'} • {prog.role || 'colaborador'}
+                                    </div>
+                                  </div>
+                                  <span style={{
+                                    fontSize: '0.7rem',
+                                    fontWeight: 'bold',
+                                    padding: '0.15rem 0.4rem',
+                                    borderRadius: '4px',
+                                    background: prog.completed ? 'rgba(34,197,94,0.2)' : 'rgba(245,158,11,0.15)',
+                                    color: prog.completed ? '#22c55e' : '#f59e0b',
+                                    whiteSpace: 'nowrap'
+                                  }}>
+                                    {prog.completed ? '✓ Listo' : '⏳ Pendiente'}
+                                  </span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </div>
                 </div>
 
