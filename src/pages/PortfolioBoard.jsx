@@ -233,7 +233,7 @@ export default function PortfolioBoard() {
         let ciclosReales = [
           { 
             id: 1, 
-            name: ${selectedSede} - Consolidado Nodus (Datos Reales), 
+            name: `${selectedSede} - Consolidado Nodus (Datos Reales)`, 
             progress: progress || 0, 
             health: health, 
             date: new Date().toLocaleDateString('es-ES', { month: 'short', day: 'numeric', year: 'numeric' }), 
@@ -651,7 +651,7 @@ export default function PortfolioBoard() {
                   </div>
                 </div>
                 <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#b91c1c', marginBottom: '0.5rem' }}>
-                  {activePrediction?.totalNoContesta ? ${(activePrediction.totalNoContesta).toLocaleString('en-US')} en "No Contesta" : 'Alerta preventiva activa'}
+                  {activePrediction?.totalNoContesta ? `${activePrediction.totalNoContesta.toLocaleString('en-US')} en "No Contesta"` : 'Alerta preventiva activa'}
                 </div>
                 <p style={{ fontSize: '0.75rem', color: textMuted, margin: 0, lineHeight: '1.4' }}>
                   Calculado cruzando estados de llamadas con histÃ³rico de abandono entre viernes y sÃ¡bado.
