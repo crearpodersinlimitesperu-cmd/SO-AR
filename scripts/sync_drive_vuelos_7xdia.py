@@ -65,25 +65,25 @@ AIRPORT_CITIES = {
 
 SEDES_LOGISTICA = {
     'Guayaquil': {
-        'hotel': 'Hotel Wyndham Guayaquil (Puerto Santa Ana)',
-        'direccion': 'Calle Numa Pompilio Llona, Ciudad del Río, Puerto Santa Ana, Guayaquil',
-        'pickupLocation': 'Puerta de Salida Internacional / Nacional (Aeropuerto Olmedo GYE)',
+        'hotel': 'Sede Guayaquil (Hospedaje por coordinar con Dirección de Sede)',
+        'direccion': 'Guayaquil, Ecuador',
+        'pickupLocation': 'Puerta de Salida de Arribos (Aeropuerto Olmedo GYE)',
         'driverPickupEstimated': '30 min posteriores al aterrizaje',
-        'driverNote': 'Conductor de CPSL esperará en arribos con cartel oficial CREAR PODER SIN LÍMITES.'
+        'driverNote': 'Coordinación de bienvenida y traslado con Dirección de Sede Guayaquil.'
     },
     'Quito': {
-        'hotel': 'Fortaleza Cuántica / Swissôtel Quito',
+        'hotel': 'CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA',
         'direccion': 'De los Naranjos, 170124 Quito, Ecuador',
         'pickupLocation': 'Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)',
         'driverPickupEstimated': '30 min posteriores al aterrizaje',
-        'driverNote': 'Conductor te esperará en puerta con cartel oficial CREAR PODER SIN LÍMITES.'
+        'driverNote': 'Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES.'
     },
     'Cuenca': {
-        'hotel': 'Hotel Oro Verde Cuenca',
-        'direccion': 'Av. Ordóñez Lasso s/n, Cuenca 010150, Ecuador',
+        'hotel': 'Sede Cuenca (Hospedaje por coordinar con Dirección de Sede)',
+        'direccion': 'Cuenca, Ecuador',
         'pickupLocation': 'Hall Principal de Salida de Pasajeros (Aeropuerto CUE)',
         'driverPickupEstimated': '20 min posteriores al aterrizaje',
-        'driverNote': 'Traslado coordinado con chofer de sede Cuenca.'
+        'driverNote': 'Traslado coordinado con equipo local de Sede Cuenca.'
     },
     'Lima': {
         'hotel': 'Hotel Jose Antonio Deluxe Miraflores',
@@ -93,18 +93,18 @@ SEDES_LOGISTICA = {
         'driverNote': 'El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial.'
     },
     'Medellin': {
-        'hotel': 'Hotel Dann Carlton Belfort Medellín',
-        'direccion': 'Cl. 17 #40b-300, El Poblado, Medellín, Antioquia, Colombia',
+        'hotel': 'Sede Medellín (Hospedaje por coordinar con Dirección de Sede)',
+        'direccion': 'Medellín, Colombia',
         'pickupLocation': 'Salida Puerta 1 Llegadas Internacionales / Nacionales MDE',
         'driverPickupEstimated': '35 min posteriores al aterrizaje',
-        'driverNote': 'Conductor oficial de CPSL Medellín con identificación.'
+        'driverNote': 'Coordinación de bienvenida y traslado con Sede Medellín.'
     },
     'Mexico': {
-        'hotel': 'Hotel Fiesta Americana Reforma',
-        'direccion': 'Paseo de la Reforma 80, Cuauhtémoc, CDMX, México',
-        'pickupLocation': 'Puerta de Salida de Vuelos Llegadas T1 / T2',
+        'hotel': 'Sede Ciudad de México (Hospedaje por coordinar con Dirección de Sede)',
+        'direccion': 'Ciudad de México, México',
+        'pickupLocation': 'Puerta de Salida de Vuelos Llegadas T1 / T2 (Aeropuerto Benito Juárez MEX)',
         'driverPickupEstimated': '30 min posteriores al aterrizaje',
-        'driverNote': 'Chofer asignado con cartel CREAR PODER SIN LÍMITES.'
+        'driverNote': 'Coordinación de bienvenida y traslado con Sede México.'
     }
 }
 
@@ -186,12 +186,21 @@ def normalize_pax(raw_pax, file_path, file_name):
     return 'Entrenador Oficial'
 
 def get_destination_logistics(dest_code, orig_code):
-    dest_city = AIRPORT_CITIES.get(dest_code, (dest_code, f"Aeropuerto {dest_code}", ""))[0]
-    orig_city = AIRPORT_CITIES.get(orig_code, (orig_code, f"Aeropuerto {orig_code}", ""))[0]
-
-    for sede_name, log_data in SEDES_LOGISTICA.items():
-        if sede_name.lower() in dest_city.lower() or sede_name.lower() in orig_city.lower():
-            return log_data
+    if dest_code == 'UIO': return SEDES_LOGISTICA['Quito']
+    if dest_code == 'GYE': return SEDES_LOGISTICA['Guayaquil']
+    if dest_code == 'CUE': return SEDES_LOGISTICA['Cuenca']
+    if dest_code == 'LIM': return SEDES_LOGISTICA['Lima']
+    if dest_code == 'MDE': return SEDES_LOGISTICA['Medellin']
+    if dest_code == 'MEX': return SEDES_LOGISTICA['Mexico']
+    
+    # Si el destino no es sede (retorno), verificar origen
+    if orig_code == 'UIO': return SEDES_LOGISTICA['Quito']
+    if orig_code == 'GYE': return SEDES_LOGISTICA['Guayaquil']
+    if orig_code == 'CUE': return SEDES_LOGISTICA['Cuenca']
+    if orig_code == 'LIM': return SEDES_LOGISTICA['Lima']
+    if orig_code == 'MDE': return SEDES_LOGISTICA['Medellin']
+    if orig_code == 'MEX': return SEDES_LOGISTICA['Mexico']
+    
     return SEDES_LOGISTICA['Lima']
 
 def sync_from_drive():
