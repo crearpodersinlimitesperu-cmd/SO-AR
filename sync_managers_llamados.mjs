@@ -226,9 +226,11 @@ async function syncManagers() {
 
     const desertorVal = col.desertor !== undefined ? (row[col.desertor] || '').toString().trim() : '';
     const graduadoVal = col.graduado !== undefined ? (row[col.graduado] || '').toString().trim() : '';
-    let estado = '';
+    const existingM = docId ? effectiveById.get(String(docId)) : null;
+    let estado = 'Activo';
     if (desertorVal) estado = 'Desertor';
     else if (graduadoVal) estado = 'Graduado';
+    else if (existingM && existingM.estado) estado = existingM.estado;
 
     const data = {
       id: Number.isFinite(Number(docId)) ? Number(docId) : docId,
