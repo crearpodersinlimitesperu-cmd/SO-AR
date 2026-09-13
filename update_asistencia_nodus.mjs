@@ -2,6 +2,11 @@ import { initializeApp } from "firebase/app";
 import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
 import 'dotenv/config';
 
+const ROBOT_TOKEN = process.env.ROBOT_TOKEN;
+if (!ROBOT_TOKEN) {
+  throw new Error('❌ Falta la variable de entorno ROBOT_TOKEN. Configúrala antes de ejecutar este script (ver GitHub Secrets: ROBOT_TOKEN).');
+}
+
 const firebaseConfig = {
   apiKey: process.env.VITE_FIREBASE_API_KEY || ['AIzaSy', 'CTMrA6A64s', '1ppDBBso', 'l-fqam5V', 'ch_Q5B0'].join(''),
   authDomain: "centro-operativo-cpsl.firebaseapp.com",
@@ -55,7 +60,7 @@ async function updateRealSnapshot() {
   };
 
   data.timestamp = new Date().toISOString();
-  data.robot_token = "NODUS_ROBOT_CPSL_2026_SECRET";
+  data.robot_token = ROBOT_TOKEN;
   data.fuente = "Nodus En Vivo (Reporte Asistencia - Equipo 30 Lima)";
 
   console.log("Guardando latest_snapshot actualizado en Firestore...");

@@ -3,6 +3,11 @@ import 'dotenv/config';
 import { initializeApp } from "firebase/app";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
 
+const ROBOT_TOKEN = process.env.ROBOT_TOKEN;
+if (!ROBOT_TOKEN) {
+  throw new Error('❌ Falta la variable de entorno ROBOT_TOKEN. Configúrala antes de ejecutar este script (ver GitHub Secrets: ROBOT_TOKEN).');
+}
+
 // Inicializar Firebase
 const firebaseConfig = {
   apiKey: process.env.VITE_FIREBASE_API_KEY || ['AIzaSy', 'CTMrA6A64s', '1ppDBBso', 'l-fqam5V', 'ch_Q5B0'].join(''),
@@ -110,7 +115,7 @@ export async function runScraperWithDates(startDate = null, endDate = null, sede
     const extractedData = {
       timestamp: new Date().toISOString(),
       fuente: "Robot de Nodus V2 (Reportes y Facturación)",
-      robot_token: "NODUS_ROBOT_CPSL_2026_SECRET",
+      robot_token: ROBOT_TOKEN,
       fechasFiltro: { startDate, endDate },
       secciones: {}
     };

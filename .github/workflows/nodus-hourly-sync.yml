@@ -52,6 +52,7 @@ jobs:
           VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.VITE_FIREBASE_MEASUREMENT_ID }}
           GMAIL_USER: ${{ secrets.GMAIL_USER }}
           GMAIL_PASS: ${{ secrets.GMAIL_PASS }}
+          ROBOT_TOKEN: ${{ secrets.ROBOT_TOKEN }}
         run: |
           node scripts/nodusMultiAgentSync.mjs || (echo "⚠️ Intento 1 desafiado o interrumpido. Reintentando tras 20s con contingencia..." && sleep 20 && node scripts/nodusMultiAgentSync.mjs) || echo "🛡️ Pipeline protegido: salvaguarda de contingencia activa sin afectar la base de datos."
 

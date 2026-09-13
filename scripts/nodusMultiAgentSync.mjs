@@ -9,6 +9,11 @@ import { NodusDataScientistAgent } from './nodusDataScientistAgent.mjs';
 import { NodusHrSentinelAgent } from './nodusHrSentinelAgent.mjs';
 import { NodusFIAgent } from './nodusFIAgent.mjs';
 
+const ROBOT_TOKEN = process.env.ROBOT_TOKEN;
+if (!ROBOT_TOKEN) {
+  throw new Error('❌ Falta la variable de entorno ROBOT_TOKEN. Configúrala antes de ejecutar este script (ver GitHub Secrets: ROBOT_TOKEN).');
+}
+
 puppeteer.use(StealthPlugin());
 
 // Configuración Resiliente de Firebase
@@ -571,7 +576,7 @@ class NodusDispatcherAgent {
     }));
 
     const masterSnapshot = {
-      robot_token: "NODUS_ROBOT_CPSL_2026_SECRET",
+      robot_token: ROBOT_TOKEN,
       timestamp,
       fuente: "Sistema Autónomo Multi-Agente Nodus CPSL 2026",
       usuarioExtraccion: "jsanchez (Super Administrador Global)",
@@ -594,7 +599,7 @@ class NodusDispatcherAgent {
     }
 
     await setDoc(doc(db, 'nodus_coordinadores_c1c2', 'latest'), {
-      robot_token: "NODUS_ROBOT_CPSL_2026_SECRET",
+      robot_token: ROBOT_TOKEN,
       timestamp,
       totales: normalizedData.totales,
       sedes: normalizedData.sedesSummary,
@@ -606,7 +611,7 @@ class NodusDispatcherAgent {
     // 3. Guardar en historial horario: nodus_kpis_history / snapshot_<timestamp>
     const historyId = `snap_${new Date().getTime()}`;
     await setDoc(doc(db, 'nodus_kpis_history', historyId), {
-      robot_token: "NODUS_ROBOT_CPSL_2026_SECRET",
+      robot_token: ROBOT_TOKEN,
       timestamp,
       totales: normalizedData.totales,
       sedes: normalizedData.sedesSummary

@@ -31,4 +31,5 @@ jobs:
           NODUS_USER: ${{ secrets.NODUS_USER }}
           NODUS_PASSWORD: ${{ secrets.NODUS_PASSWORD }}
           FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+          ROBOT_TOKEN: ${{ secrets.ROBOT_TOKEN }}
         run: node scripts/nodusScraper.js

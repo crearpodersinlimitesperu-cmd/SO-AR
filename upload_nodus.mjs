@@ -2,6 +2,11 @@ import { readFileSync } from 'fs';
 import { initializeApp } from "firebase/app";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
 
+const ROBOT_TOKEN = process.env.ROBOT_TOKEN;
+if (!ROBOT_TOKEN) {
+  throw new Error('❌ Falta la variable de entorno ROBOT_TOKEN. Configúrala antes de ejecutar este script (ver GitHub Secrets: ROBOT_TOKEN).');
+}
+
 const firebaseConfig = {
   apiKey: ['AIzaSy', 'CTMrA6A64s', '1ppDBBso', 'l-fqam5V', 'ch_Q5B0'].join(''),
   authDomain: "centro-operativo-cpsl.firebaseapp.com",
@@ -18,7 +23,7 @@ async function upload() {
   try {
     const data = JSON.parse(readFileSync('./nodus_dump.json', 'utf8'));
     // Make sure we have the robot_token so the rules allow the write
-    data.robot_token = "NODUS_ROBOT_CPSL_2026_SECRET";
+    data.robot_token = ROBOT_TOKEN;
     
     console.log("Uploading to Firestore...");
     await setDoc(doc(db, 'nodus_kpis_sincronizados', 'latest_snapshot'), data);

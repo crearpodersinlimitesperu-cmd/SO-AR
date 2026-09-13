@@ -30,7 +30,10 @@ const firebaseConfig = {
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 const db = getFirestore(app);
 
-const ROBOT_TOKEN = "NODUS_ROBOT_CPSL_2026_SECRET";
+const ROBOT_TOKEN = process.env.ROBOT_TOKEN;
+if (!ROBOT_TOKEN) {
+  throw new Error('❌ Falta la variable de entorno ROBOT_TOKEN. Configúrala antes de ejecutar este script (ver GitHub Secrets: ROBOT_TOKEN).');
+}
 const HABEAS_DATA_SECRET = "CPSL_HABEAS_DATA_TOKEN_KEY_2026";
 const APP_URL = "https://centro-operativo-cpsl.web.app";
 

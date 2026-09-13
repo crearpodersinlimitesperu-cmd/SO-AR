@@ -4,6 +4,11 @@ import { readFileSync, writeFileSync } from 'fs';
 import { initializeApp } from "firebase/app";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
 
+const ROBOT_TOKEN = process.env.ROBOT_TOKEN;
+if (!ROBOT_TOKEN) {
+  throw new Error('❌ Falta la variable de entorno ROBOT_TOKEN. Configúrala antes de ejecutar este script (ver GitHub Secrets: ROBOT_TOKEN).');
+}
+
 const firebaseConfig = {
   apiKey: ['AIzaSy', 'CTMrA6A64s', '1ppDBBso', 'l-fqam5V', 'ch_Q5B0'].join(''),
   authDomain: "centro-operativo-cpsl.firebaseapp.com",
@@ -108,7 +113,7 @@ export async function exploreEntireNodus() {
   const nodusDump = {
     timestamp: new Date().toISOString(),
     fuente: "Explorador Exhaustivo Nodus Global (En Vivo)",
-    robot_token: "NODUS_ROBOT_CPSL_2026_SECRET",
+    robot_token: ROBOT_TOKEN,
     secciones: {}
   };
 

@@ -27,7 +27,10 @@ const firebaseConfig = {
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 const db = getFirestore(app);
 
-const ROBOT_TOKEN = "NODUS_ROBOT_CPSL_2026_SECRET";
+const ROBOT_TOKEN = process.env.ROBOT_TOKEN;
+if (!ROBOT_TOKEN) {
+  throw new Error('❌ Falta la variable de entorno ROBOT_TOKEN. Configúrala antes de ejecutar este script (ver GitHub Secrets: ROBOT_TOKEN).');
+}
 
 // Mapeo oficial de Gerentes por Sede y Dirección Corporativa
 export const GERENTES_POR_SEDE = {

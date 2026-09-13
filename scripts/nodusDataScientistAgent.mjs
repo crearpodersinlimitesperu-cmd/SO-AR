@@ -14,6 +14,11 @@ import { initializeApp, getApps } from "firebase/app";
 import { getFirestore, doc, setDoc, getDoc, collection, getDocs, writeBatch } from "firebase/firestore";
 import 'dotenv/config';
 
+const ROBOT_TOKEN = process.env.ROBOT_TOKEN;
+if (!ROBOT_TOKEN) {
+  throw new Error('❌ Falta la variable de entorno ROBOT_TOKEN. Configúrala antes de ejecutar este script (ver GitHub Secrets: ROBOT_TOKEN).');
+}
+
 // Normalizador canónico de sedes
 export function normalizeSedeName(raw) {
   if (!raw) return 'GLOBAL';
@@ -290,7 +295,7 @@ export class NodusDataScientistAgent {
 
     // Guardar documento consolidado de reconciliación
     await setDoc(doc(this.db, 'nodus_managers_reconciliados', 'latest'), {
-      robot_token: "NODUS_ROBOT_CPSL_2026_SECRET",
+      robot_token: ROBOT_TOKEN,
       timestamp: new Date().toISOString(),
       totalManagers: reconciledList.length,
       updatesApplied: updatesCount,
@@ -467,14 +472,14 @@ export class NodusDataScientistAgent {
     
     // 1. Guardar en nodus_predictor_portfolio/latest
     await setDoc(doc(this.db, 'nodus_predictor_portfolio', 'latest'), {
-      robot_token: "NODUS_ROBOT_CPSL_2026_SECRET",
+      robot_token: ROBOT_TOKEN,
       timestamp: new Date().toISOString(),
       ...predictions
     }, { merge: true });
 
     // 2. Guardar prospectos deduplicados en nodus_prospectos_sin_pago/latest
     await setDoc(doc(this.db, 'nodus_prospectos_sin_pago', 'latest'), {
-      robot_token: "NODUS_ROBOT_CPSL_2026_SECRET",
+      robot_token: ROBOT_TOKEN,
       timestamp: new Date().toISOString(),
       total: prospectosData.total,
       prospectos: prospectosData.prospectos

@@ -375,43 +375,43 @@ service cloud.firestore {
     // NODUS: mecanismo seguro de token del robot para sincronización horaria autónoma
     match /nodus_kpis_sincronizados/{document=**} {
       allow read: if isAuthenticated();
-      allow write: if request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET";
+      allow write: if request.resource.data.robot_token == "CPSL_7KTBPBqqz7o6FCjioPTw_5v0LOOaersyd8sq2pqo2Eg";
     }
 
     match /nodus_coordinadores_c1c2/{document=**} {
       allow read: if isAuthenticated();
-      allow write: if request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET";
+      allow write: if request.resource.data.robot_token == "CPSL_7KTBPBqqz7o6FCjioPTw_5v0LOOaersyd8sq2pqo2Eg";
     }
 
     match /nodus_kpis_history/{document=**} {
       allow read: if isAuthenticated();
-      allow write: if request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET";
+      allow write: if request.resource.data.robot_token == "CPSL_7KTBPBqqz7o6FCjioPTw_5v0LOOaersyd8sq2pqo2Eg";
     }
 
     match /nodus_predictor_portfolio/{document=**} {
       allow read: if isAuthenticated();
-      allow write: if request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET";
+      allow write: if request.resource.data.robot_token == "CPSL_7KTBPBqqz7o6FCjioPTw_5v0LOOaersyd8sq2pqo2Eg";
     }
 
     match /nodus_prospectos_sin_pago/{document=**} {
       allow read: if isAuthenticated();
-      allow write: if request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET";
+      allow write: if request.resource.data.robot_token == "CPSL_7KTBPBqqz7o6FCjioPTw_5v0LOOaersyd8sq2pqo2Eg";
     }
 
     match /nodus_managers_reconciliados/{document=**} {
       allow read: if isAuthenticated();
-      allow write: if request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET";
+      allow write: if request.resource.data.robot_token == "CPSL_7KTBPBqqz7o6FCjioPTw_5v0LOOaersyd8sq2pqo2Eg";
     }
 
     // NODUS: Centinela de RRHH y desempeño de coordinadores
     match /nodus_hr_sentinel/{document=**} {
       allow read: if isAuthenticated();
-      allow write: if request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET";
+      allow write: if request.resource.data.robot_token == "CPSL_7KTBPBqqz7o6FCjioPTw_5v0LOOaersyd8sq2pqo2Eg";
     }
 
     // HABEAS DATA: Lista de bajas y opt-out de campañas de correo
     match /opt_outs/{document=**} {
-      allow read: if isAuthenticated() || request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET";
+      allow read: if isAuthenticated() || request.resource.data.robot_token == "CPSL_7KTBPBqqz7o6FCjioPTw_5v0LOOaersyd8sq2pqo2Eg";
       allow write: if true; // Permite a prospectos desuscribirse desde la web sin login
     }
 
@@ -487,7 +487,7 @@ service cloud.firestore {
     // NOTIFICATIONS (userId siempre es el correo, nunca el uid)
     match /notifications/{notifId} {
       allow read: if isAuthenticated();
-      allow create: if isAuthenticated() || request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET";
+      allow create: if isAuthenticated() || request.resource.data.robot_token == "CPSL_7KTBPBqqz7o6FCjioPTw_5v0LOOaersyd8sq2pqo2Eg";
       allow update: if isAuthenticated() && resource.data.userId == email();
       allow delete: if isAuthenticated() && resource.data.userId == email();
     }
