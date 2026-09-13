@@ -4,7 +4,8 @@
 **URL de Producción:** [https://causa-operativo.web.app](https://causa-operativo.web.app) / [https://centro-operativo-cpsl.web.app/home](https://centro-operativo-cpsl.web.app/home)  
 **Repositorio Principal:** [`crearpodersinlimitesperu-cmd/SO-AR`](https://github.com/crearpodersinlimitesperu-cmd/SO-AR) (rama `master`)  
 **Fecha de Certificación y Consolidación:** 12 de Septiembre de 2026  
-**Auditor & Arquitecto:** Antigravity AI (Google DeepMind)  
+**Última Actualización Registrada:** 13 de Septiembre de 2026 (ver Sección 11)  
+**Auditor & Arquitecto:** Antigravity AI (Google DeepMind) / Claude Sonnet 5 (Anthropic) — actualizaciones del 13/09  
 **Directiva Permanente del Sistema:** **"AGREGAR TODO A LA CAJA NEGRA SIEMPRE"** — Cada cambio, regla de negocio, credencial, arquitectura o integración técnica debe quedar inmediatamente registrado y versionado en este documento.
 
 ---
@@ -64,17 +65,16 @@ flowchart TD
 
 ### 2.1. Nodus / Plataforma IMO
 * **Portal Oficial:** `https://imo.crearpslglobal.com/`
-* **Usuario Maestro:** `CREARPSL`
-* **Contraseña Verificada:** `CREARPSL26*`
-* **Regla de Oro Crítica:**
+* **Usuario / Contraseña:** Ver GitHub Secrets: `NODUS_USER` / `NODUS_PASSWORD`. No se documentan en texto plano en este archivo — el repositorio `SO-AR` es público (ver Sección 11.4).
+* **Regla de Oro Crítica (conocimiento operativo, no es un secreto en sí):**
   * La contraseña **DEBE incluir el asterisco final (`*`)**.
-  * Si se ingresa `CREARPSL26` (sin asterisco), el backend responde HTTP 200 pero mantiene al usuario en `/auth/login` sin mensaje de error (rechazo silencioso).
-  * Con `CREARPSL26*`, el backend responde HTTP 302 y autoriza la sesión redirigiendo inmediatamente a `/sedes`.
+  * Si se ingresa la contraseña sin el asterisco, el backend responde HTTP 200 pero mantiene al usuario en `/auth/login` sin mensaje de error (rechazo silencioso).
+  * Con el asterisco correcto, el backend responde HTTP 302 y autoriza la sesión redirigiendo inmediatamente a `/sedes`.
 
 ### 2.2. Servidor de Correo (Gmail SMTP)
 * **Host / Puerto:** `smtp.gmail.com:465` (SSL/TLS nativo)
 * **Cuenta Remitente:** `servidorcrearpsl@gmail.com`
-* **Contraseña de Aplicación:** `oaqx **** **** bwuo` (Registrada como `GMAIL_PASS` en GitHub Secrets).
+* **Contraseña de Aplicación:** Ver GitHub Secrets: `GMAIL_PASS`. No se documenta el valor (ni siquiera parcial) en este archivo — el repositorio `SO-AR` es público (ver Sección 11.4).
 * **Estado SMTP:** Autenticación aprobada con código `235 2.7.0 Accepted`.
 * **Función Operativa:** Envío automatizado de bienvenidas IMO, alertas de inactividad, recordatorios de metas, invitaciones y notificaciones de coordinación.
 
@@ -92,8 +92,9 @@ flowchart TD
 * **Token en GitHub Secrets:** `GH_PAT` (Permisos plenos: `repo`, `workflow`, `admin:org`).
 
 ### 2.5. Token Robot para Firestore
-* **Identificador:** `robot_token = "NODUS_ROBOT_CPSL_2026_SECRET"`
+* **Identificador:** `robot_token` — Ver GitHub Secrets: `ROBOT_TOKEN`. **Rotado el 13/09/2026** tras detectarse que el valor anterior estaba expuesto en texto plano en este documento y en el código fuente (repositorio público) — ver Sección 11.4 para el detalle completo y el riesgo estructural que permanece abierto.
 * **Permisos:** Permite a scripts y agentes autónomos desatendidos escribir en Firestore (`nodus_kpis_sincronizados`, `nodus_coordinadores_c1c2`, `nodus_hr_sentinel`, `lima_graduados_lineage`, etc.) cumpliendo con `firestore.rules`.
+* **Arquitectura:** Inyectado vía `process.env.ROBOT_TOKEN` en 11 scripts y 3 workflows de GitHub Actions (antes estaba hardcodeado como literal). Firestore Security Rules **no puede leer variables de entorno** — son archivos estáticos desplegados tal cual — por lo que el valor literal del token sigue existiendo en `firestore.rules`, dentro del repositorio público.
 
 ---
 
@@ -242,42 +243,42 @@ Permite a directores, coordinadores y managers auditar en tiempo real el avance 
 
 ---
 
-## 9. ðŸ¤– Agente 9: Centinela de Seguimiento a Metas y Llamadas Nodus (Efectivo, Real y Confiable)
+## 9. 🤖 Agente 9: Centinela de Seguimiento a Metas y Llamadas Nodus (Efectivo, Real y Confiable)
 
-### 9.1. MisiÃ³n Operativa y Problema Resuelto
-* **Problema:** En el panel `/metas`, las metas de liderazgo y operativas ("Managers - MJ - CreaciÃ³n", "Managers - MJ - RelaciÃ³n", "Sentados en Sala") aparecÃ­an en `0 de 8` o `0 de 10` (0%) debido a que no existÃ­a un agente que alimentara y auditara automÃ¡ticamente el avance a partir de los datos vivos de Nodus y las llamadas de coordinadoras y entrenadores.
-* **MisiÃ³n:** Establecer un agente centinela 100% efectivo, real y confiable, sin alucinaciones, que audita en tiempo real cada meta contra las fuentes de Nodus (`nodus_coordinadores_c1c2`, `managersData.js`, `kpisEntrenadoresData.json`, `SEGUIMIENTO_EQUIPOS.json`), deduplica registros mediante hashing matemÃ¡tico y permite la sincronizaciÃ³n instantÃ¡nea con rollup automÃ¡tico hacia la meta global del ciclo.
+### 9.1. Misión Operativa y Problema Resuelto
+* **Problema:** En el panel `/metas`, las metas de liderazgo y operativas ("Managers - MJ - Creación", "Managers - MJ - Relación", "Sentados en Sala") aparecían en `0 de 8` o `0 de 10` (0%) debido a que no existía un agente que alimentara y auditara automáticamente el avance a partir de los datos vivos de Nodus y las llamadas de coordinadoras y entrenadores.
+* **Misión:** Establecer un agente centinela 100% efectivo, real y confiable, sin alucinaciones, que audita en tiempo real cada meta contra las fuentes de Nodus (`nodus_coordinadores_c1c2`, `managersData.js`, `kpisEntrenadoresData.json`, `SEGUIMIENTO_EQUIPOS.json`), deduplica registros mediante hashing matemático y permite la sincronización instantánea con rollup automático hacia la meta global del ciclo.
 
 ### 9.2. Arquitectura de Confiabilidad y Hashing Anti-Redundancia
 * **Protocolo de Unicidad Determinista:**
-  Para evitar duplicados y contar gestiones mÃºltiples como un solo resultado operativo, se implementÃ³ el algoritmo SHA-256:
+  Para evitar duplicados y contar gestiones múltiples como un solo resultado operativo, se implementó el algoritmo SHA-256:
   ```text
   hash = sha256(tipo_registro + ":" + sede + ":" + escuadra + ":" + id_entidad + ":" + fecha + ":" + etapa)
   ```
 * **Mapeo de Metas vs. Fuentes Reales de Nodus:**
-  1. **Managers CreaciÃ³n (MJ):**
+  1. **Managers Creación (MJ):**
      * Fuente: `managersData.js` (`managers_directory`).
-     * DetecciÃ³n Lima Equipo 30: 10 Managers activos registrados y asignados a sus respectivos entrenadores.
-  2. **Managers RelaciÃ³n (MJ):**
+     * Detección Lima Equipo 30: 10 Managers activos registrados y asignados a sus respectivos entrenadores.
+  2. **Managers Relación (MJ):**
      * Fuente: `managersData.js` (`managers_directory`).
-     * DetecciÃ³n Lima Equipo 30: 8 Managers de relaciÃ³n activos.
+     * Detección Lima Equipo 30: 8 Managers de relación activos.
   3. **Llamadas y Gestiones de Seguimiento:**
-     * Fuente: `kpisEntrenadoresData.json` (5,402 llamadas en total; 215 llamadas especÃ­ficas para Lima Equipo 30) y `nodus_coordinadores_c1c2` (249 gestiones: 105 confirmados, 22 por confirmar, 122 no asisten).
+     * Fuente: `kpisEntrenadoresData.json` (5,402 llamadas en total; 215 llamadas específicas para Lima Equipo 30) y `nodus_coordinadores_c1c2` (249 gestiones: 105 confirmados, 22 por confirmar, 122 no asisten).
   4. **Sentados en Sala:**
      * Fuente: `SEGUIMIENTO_EQUIPOS.json` y `kpisLima.json`.
-     * DetecciÃ³n Lima Equipo 30: 94 sentados que culminaron sala con 49.7% de efectividad de sala.
+     * Detección Lima Equipo 30: 94 sentados que culminaron sala con 49.7% de efectividad de sala.
 
 ### 9.3. Componentes Implementados
 * **`src/services/goalsSentinelAgent.js`:**
-  * Motor analÃ­tico para la aplicaciÃ³n web.
+  * Motor analítico para la aplicación web.
   * Funciones exportadas: `auditSingleGoal(goal, parentGoal, context)`, `auditAllGoals(goals, parentsMap, context)`, `generateEntityHash(type, id, date, payload)`.
-  * Calcula discrepancias, semÃ¡foros (`AL_DIA`, `PENDIENTE_SYNC`, `DESACTUALIZADO`, `EN_RIESGO`), efectividad de llamadas y genera el plan de actualizaciÃ³n.
+  * Calcula discrepancias, semáforos (`AL_DIA`, `PENDIENTE_SYNC`, `DESACTUALIZADO`, `EN_RIESGO`), efectividad de llamadas y genera el plan de actualización.
 * **`scripts/nodusGoalsSentinelAgent.mjs`:**
-  * Script autÃ³nomo ejecutable vÃ­a Node.js / CLI / GitHub Actions.
-  * Conecta a Firebase Admin SDK con Service Account, inspecciona la colecciÃ³n `goals`, detecta discrepancias contra Nodus y realiza la actualizaciÃ³n en lote registrando la bitÃ¡cora en `goals_sentinel_audits`.
+  * Script autónomo ejecutable vía Node.js / CLI / GitHub Actions.
+  * Conecta a Firebase Admin SDK con Service Account, inspecciona la colección `goals`, detecta discrepancias contra Nodus y realiza la actualización en lote registrando la bitácora en `goals_sentinel_audits`.
 * **`src/pages/GoalsBoard.jsx` (UI Integrada):**
-  * **CÃ¡psula del Agente en Cada Meta:** Inserta un badge de auditorÃ­a en tiempo real con el estado de avance detectado en Nodus y el botÃ³n de acciÃ³n rÃ¡pida `âš¡ Sincronizar Avance Real (X/Target)`.
-  * **BotÃ³n de Cabecera:** `ðŸ¤– Agente Centinela Nodus` con indicador de estado y contador de metas pendientes.
+  * **Cápsula del Agente en Cada Meta:** Inserta un badge de auditoría en tiempo real con el estado de avance detectado en Nodus y el botón de acción rápida `⚡ Sincronizar Avance Real (X/Target)`.
+  * **Botón de Cabecera:** `🤖 Agente Centinela Nodus` con indicador de estado y contador de metas pendientes.
   * **Consola Interactiva del Agente Centinela (`showSentinelModal`):**
   * Tarjetas de métricas globales (Metas Evaluadas, Metas al Día, Pendientes, Total Llamadas).
     * Botón maestro `⚡ Sincronizar Todas las Metas con Nodus`.
@@ -345,6 +346,44 @@ Permite a directores, coordinadores y managers auditar en tiempo real el avance 
   - Rutas rápidas de Cuenca (`UIO-CUE`, `CUE-UIO`), Medellín (`MDE-BOG`, `UIO-MDE`), México (`MEX-PTY`, `PTY-MEX`).
   - Badge de estado con indicador del Motor IA de Vuelos (298 vuelos indexados).
   - Visualización del PDF de origen en cada tarjeta de vuelo (`flight.sourcePdf`).
+
+---
+
+## 11. 📝 Actualizaciones del 13 de Septiembre de 2026
+
+### 11.1. Corrección de Consistencia Visual (Colores/Contraste) en Todos los Modos
+* **Commit:** `37b8fbd`
+* Se extendió la cobertura de los selectores de fallback en `src/index.css` para capturar estilos inline (`background: rgba(255,255,255,X)`, `color: white`, etc.) que quedaban con bajo contraste en modo Día y sin adaptar en modo Zen (Día, Noche, Zen y Auto).
+* Archivos corregidos puntualmente: `src/pages/BrandScriptBoard.jsx`, `src/pages/MisKPIs.jsx` (textos con color blanco fijo que se volvían invisibles sobre fondo claro).
+* Verificado en producción tras el despliegue.
+
+### 11.2. Corrección de Bug de Producción en Monitor de IMOs
+* **Commit:** `6a83e39`
+* **Síntoma:** Error `ReferenceError: cleanSearchStr is not defined` al cargar `/monitor-imos`, reportado por José con captura de pantalla.
+* **Causa raíz:** Faltaba un `};` de cierre en la función `getEnroladosList` de `src/pages/MonitorImos.jsx`, lo que dejaba `cleanSearchStr` y otras dos funciones anidadas incorrectamente dentro de esa función en vez de ser funciones hermanas del componente.
+* Diagnóstico confirmado mediante análisis de AST (acorn/acorn-jsx sobre el archivo), no solo inspección visual.
+* Verificado en producción tras el despliegue.
+
+### 11.3. Corrección de Corrupción de Caracteres (Mojibake) en 5 Archivos + Esta Caja Negra
+* **Commit:** `5a50c17`
+* **Causa raíz:** El commit `596019a` introdujo una doble codificación (bytes UTF-8 reinterpretados como Windows-1252 y regrabados como UTF-8), corrompiendo emojis y letras acentuadas en varios archivos.
+* **Archivos corregidos:** `src/components/TaskAssignmentModal.jsx` (177 fragmentos), `src/components/TaskDetailModal.jsx` (23), `src/pages/GoalsBoard.jsx` (32), `src/pages/PortfolioBoard.jsx` (41), `src/context/ChecklistContext.jsx` (27) — este último incluye la plantilla real de correo HTML que reciben los colaboradores al ser invitados a una tarea.
+* **Nota:** Esta misma clase de corrupción se encontró también en este documento (Sección 9, texto y emojis de `🤖` y letras acentuadas) y fue corregida en la misma actualización que agregó esta Sección 11, usando el mismo método de reversión verificado byte a byte.
+* Verificado en producción tras el despliegue, incluyendo el texto real del correo enviado a colaboradores.
+
+### 11.4. Rotación del robot_token y Migración a GitHub Secrets
+* **Commit:** `27056c3`
+* **Hallazgo:** El repositorio `SO-AR` es público (confirmado mediante clonado anónimo exitoso, sin credenciales de ningún tipo). El valor de `robot_token` estaba hardcodeado en texto plano en `firestore.rules` (9 ocurrencias) y en 11 scripts, y además documentado en texto plano en este mismo archivo (antigua Sección 2.5) — visible para cualquier persona en internet, no solo para el equipo.
+* **Acción ejecutada:**
+  * Se generó un nuevo valor de `robot_token` y se aplicó en las 9 reglas de `firestore.rules` que lo usaban.
+  * Los 11 scripts ya no hardcodean el valor: ahora leen `process.env.ROBOT_TOKEN`, con un guard que corta la ejecución con un error explícito si la variable no está definida.
+  * Los 3 workflows de GitHub Actions que ejecutan esos scripts (`nodus-hourly-sync.yml`, `nodus-daily.yml`, `scraper.yml`) ahora inyectan `ROBOT_TOKEN` desde GitHub Secrets, siguiendo el mismo patrón ya usado para `NODUS_USER`, `GMAIL_PASS` y el resto de secretos del repositorio.
+  * Esta Caja Negra (Sección 2) fue actualizada para dejar de mostrar credenciales en texto plano.
+* **RIESGO ABIERTO — sin resolver todavía:** Firestore Security Rules no puede leer variables de entorno; son archivos estáticos que se despliegan tal cual. Esto significa que el *nuevo* valor de `robot_token` también queda como texto plano en `firestore.rules`, dentro del mismo repositorio público. Rotar el valor cierra la exposición del valor *anterior* (ya inútil si alguien llegó a capturarlo), pero no cierra la exposición estructural de fondo. Opciones planteadas a José, pendientes de su decisión:
+  1. Hacer privado el repositorio `SO-AR`.
+  2. Rediseñar la arquitectura para no depender de un token de portador visible en reglas de Firestore (cambio mayor, no ejecutado).
+  3. Purgar el historial de git para eliminar el valor anterior de commits pasados (explícitamente pospuesto hasta después de completar la rotación).
+* **Pendiente de acción de José (no ejecutable por el asistente — sin acceso a GitHub Settings):** Crear el secreto `ROBOT_TOKEN` en GitHub → repo `SO-AR` → Settings → Secrets and variables → Actions, con el valor generado en la rotación. Sin este secreto, los 3 workflows automáticos fallarán intencionalmente (diseño "fail-loud") hasta que se cree.
 
 ---
 
