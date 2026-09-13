@@ -412,6 +412,11 @@ export default function DirectorioQT() {
                   <span style={{ fontSize: '0.75rem', background: 'rgba(41, 171, 226, 0.15)', color: 'var(--crear-cyan, #29abe2)', border: '1px solid rgba(41, 171, 226, 0.3)', padding: '2px 8px', borderRadius: '12px', display: 'inline-flex', alignItems: 'center', gap: '0.2rem', fontWeight: 700 }}>
                     <CountryFlag sede={m.sede} /> {m.sede}
                   </span>
+                  {!m.esActivo && (
+                    <span style={{ fontSize: '0.75rem', background: 'rgba(239, 68, 68, 0.2)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.4)', padding: '2px 8px', borderRadius: '12px', fontWeight: 800 }}>
+                      INACTIVO: {m.estado}
+                    </span>
+                  )}
                   {m.docNumero && (
                     <span style={{ fontSize: '0.75rem', background: 'rgba(255, 255, 255, 0.05)', color: 'var(--text-muted, #94a3b8)', border: '1px solid rgba(255, 255, 255, 0.1)', padding: '2px 8px', borderRadius: '12px', fontWeight: 600 }}>
                       {m.docTipo}: {m.docNumero}
