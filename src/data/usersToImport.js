@@ -1,4 +1,4 @@
-﻿export const USERS_TO_IMPORT = [
+﻿﻿export const USERS_TO_IMPORT = [
   {
     "id": "staff_evelynpaulinacedillo",
     "name": "Pauly Cedillo",
@@ -377,10 +377,11 @@
   {
     "id": "staff_leylapasquel",
     "name": "Leyla Pasquel",
-    "role": "coord_maestria",
-    "roles": [
-      "coord_maestria"
-    ],
+    "role": "inactivo",
+    "roles": [],
+    "active": false,
+    "estado": "inactivo",
+    "motivo": "Renuncia a QT y a Oficina (12/09/2026)",
     "sede": "Lima",
     "emails": [
       "leyla.pasquel@crearpsl.net",
@@ -873,10 +874,11 @@
   {
     "id": "qt_leylakellypasquelalfaro",
     "name": "Leyla Kelly Pasquel Alfaro",
-    "role": "qt",
-    "roles": [
-      "qt"
-    ],
+    "role": "inactivo",
+    "roles": [],
+    "active": false,
+    "estado": "inactivo",
+    "motivo": "Renuncia a QT y a Oficina (12/09/2026)",
     "sede": "LIM",
     "emails": [
       "leylakellypasquel@gmail.com"
