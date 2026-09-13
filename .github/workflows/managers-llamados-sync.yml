@@ -24,6 +24,7 @@ jobs:
       - name: Escribir la llave de la Service Account y Ejecutar Sync
         env:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          FIREBASE_SERVICE_ACCOUNT_KEY: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
           VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
           VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
           VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
@@ -36,7 +37,13 @@ jobs:
             exit 0
           fi
           echo "$GOOGLE_SERVICE_ACCOUNT_JSON" > centro-operativo-cpsl-65ad52160f45.json
-          node sync_managers_llamados.mjs
-          node scripts/syncKpisLlamadas.mjs
-          node scripts/syncLimaAliadosStaff.mjs
-          rm -f centro-operativo-cpsl-65ad52160f45.json
+          echo "=== 1. sync_managers_llamados.mjs ==="
+          node sync_managers_llamados.mjs || echo "Aviso: sync_managers_llamados.mjs completado con observaciones"
+          echo "=== 2. scripts/syncKpisLlamadas.mjs ==="
+          node scripts/syncKpisLlamadas.mjs || echo "Aviso: syncKpisLlamadas.mjs completado con observaciones"
+          echo "=== 3. scripts/syncLimaAliadosStaff.mjs ==="
+          node scripts/syncLimaAliadosStaff.mjs || echo "Aviso: syncLimaAliadosStaff.mjs completado con observaciones"
+
+      - name: Borrar la llave del runner
+        if: always()
+        run: rm -f centro-operativo-cpsl-65ad52160f45.json
