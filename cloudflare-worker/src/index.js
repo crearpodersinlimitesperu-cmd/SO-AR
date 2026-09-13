@@ -533,21 +533,30 @@ async function construirContextoNodus(userData, accessToken) {
     if (!data) return 'No hay datos de Nodus disponibles en este momento.';
     const secciones = data.secciones || {};
     const timestamp = data.timestamp || 'desconocida';
+    const totales = data.totales || {};
+    const sedes = data.sedes || [];
+    const coordinadores = data.coordinadores || [];
+    const equiposSummary = data.equiposSummary || [];
+
+    const resumenSnapshot = {
+      timestamp,
+      totales,
+      sedes,
+      coordinadoresMuestra: coordinadores.slice(0, 15),
+      equiposSummary,
+      secciones: Object.keys(secciones).length > 0 ? resumirSecciones(secciones) : undefined
+    };
 
     if (esGerencia(userData)) {
-      return `Fecha: ${timestamp}. Datos de TODAS las sedes (tablas grandes muestreadas, ver "totalFilas" para el conteo real):\n${JSON.stringify(resumirSecciones(secciones))}`;
+      return `Fecha: ${timestamp}. Datos de TODAS las sedes (totales, sedes, coordinadores y equipos):\n${JSON.stringify(resumenSnapshot)}`;
     }
     if (esCoordinador(userData)) {
       const sede = userData.sede || 'Global';
-      const filtradas = {};
-      for (const key of Object.keys(secciones)) {
-        const item = secciones[key];
-        if (item && item.sede === sede) filtradas[key] = item;
-      }
-      return `Fecha: ${timestamp}. Datos de la sede ${sede} (rol coordinador, acceso restringido a su sede; tablas grandes muestreadas):\n${JSON.stringify(resumirSecciones(filtradas))}`;
+      const filtradasCoords = coordinadores.filter(c => (c.sede || '').toLowerCase() === sede.toLowerCase());
+      const filtradasSedes = sedes.filter(s => (s.sede || '').toLowerCase() === sede.toLowerCase());
+      return `Fecha: ${timestamp}. Datos de la sede ${sede} (rol coordinador):\n${JSON.stringify({ totales, sedes: filtradasSedes, coordinadores: filtradasCoords })}`;
     }
-    const kpisGenerales = data.kpisGenerales || data.resumen || {};
-    return `Fecha: ${timestamp}. KPIs generales (rol operativo, sin detalle por sede/coordinador):\n${JSON.stringify(kpisGenerales)}`;
+    return `Fecha: ${timestamp}. KPIs generales:\n${JSON.stringify({ totales, sedes })}`;
   } catch (err) {
     console.error('[askCopiloto] Error leyendo Nodus:', err);
     return 'No se pudo cargar el contexto de Nodus en este momento.';
