@@ -21,7 +21,7 @@ export default function BrandScriptBoard() {
   const bgSurface = 'rgba(255,255,255,0.02)';
 
   return (
-    <div style={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto', color: 'white', fontFamily: '"Inter", sans-serif' }}>
+    <div style={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto', color: 'var(--text-heading)', fontFamily: '"Inter", sans-serif' }}>
 
       {/* BUG REAL encontrado y corregido (08/09/2026, reportado por José: "este modulo
           no tiene atras para regresar"). Este componente no importaba useNavigate ni

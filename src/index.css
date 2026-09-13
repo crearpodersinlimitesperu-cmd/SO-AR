@@ -150,25 +150,54 @@
 
 /* Removidos hacks de mix-blend-mode de logo transparente */
 
-/* Fallback override for any inline translucent white colors in light mode */
-[data-theme="light"] [style*="color: rgba(255,255,255,"],
-[data-theme="light"] [style*="color: rgba(255, 255, 255,"],
-[data-theme="light"] [style*="color: rgb(255, 255, 255)"],
-[data-theme="light"] [style*="color: #ffffff"],
-[data-theme="light"] [style*="color: #fff"],
-[data-theme="light"] [style*="color: #f1f5f9"],
-[data-theme="light"] [style*="color: #f8fafc"],
-[data-theme="light"] [style*="color: #e2e8f0"],
-[data-theme="light"] [style*="color: #cbd5e1"] {
+/* Fallback override for any inline translucent white colors in light mode.
+   (13/09/2026) Se agregan las variantes con color CSS por nombre ("white",
+   "whitesmoke", etc.) — un barrido de auditoría de contraste encontró 21
+   usos de color: 'white' en inline styles (BrandScriptBoard.jsx, MisKPIs.jsx,
+   entre otros) que NUNCA coincidían con ninguno de los selectores anteriores
+   porque estos solo buscaban formatos hex/rgba, nunca la palabra "white".
+   Se verificó con Playwright/Chromium que React NO normaliza los colores
+   por nombre a rgb() al serializar el atributo style — se preservan
+   literalmente como "white"/"black", así que el selector de atributo
+   funciona de forma confiable. Se agrega el flag "i" (case-insensitive)
+   para cubrir variantes de mayúsculas/minúsculas entre distintos editores. */
+[data-theme="light"] [style*="color: rgba(255,255,255," i],
+[data-theme="light"] [style*="color: rgba(255, 255, 255," i],
+[data-theme="light"] [style*="color: rgb(255, 255, 255)" i],
+[data-theme="light"] [style*="color: #ffffff" i],
+[data-theme="light"] [style*="color: #fff" i],
+[data-theme="light"] [style*="color: #f1f5f9" i],
+[data-theme="light"] [style*="color: #f8fafc" i],
+[data-theme="light"] [style*="color: #e2e8f0" i],
+[data-theme="light"] [style*="color: #cbd5e1" i],
+[data-theme="light"] [style*="color: white" i],
+[data-theme="light"] [style*="color: whitesmoke" i],
+[data-theme="light"] [style*="color: lightgray" i],
+[data-theme="light"] [style*="color: lightgrey" i] {
   color: #0f172a !important;
 }
 
-/* Ensure light backgrounds for elements with dark translucent styles */
-[data-theme="light"] [style*="background: rgba(0,0,0,"],
-[data-theme="light"] [style*="background: rgba(0, 0, 0,"],
-[data-theme="light"] [style*="background: rgba(255,255,255,0.03)"],
-[data-theme="light"] [style*="background: rgba(255, 255, 255, 0.03)"] {
+/* Ensure light backgrounds for elements with dark translucent styles.
+   (13/09/2026) Antes solo se interceptaba la opacidad exacta 0.03 de
+   rgba(255,255,255,X). Una auditoría de contraste encontró 11 valores de
+   opacidad distintos (0.01 a 0.15) usados como fondo de "tarjeta de
+   cristal" en 266 lugares del código — solo 46 (los de 0.03) quedaban
+   corregidos, dejando ~220 tarjetas casi invisibles en modo claro (fondo
+   ya casi blanco + tarjeta blanca translúcida encima = sin contraste
+   entre tarjeta y página). Se cambia a un selector de PREFIJO
+   (sin el valor de opacidad) para cubrir cualquier opacidad de una sola
+   vez, y se agregan las variantes con background-color (propiedad
+   separada en React: backgroundColor) que antes no se cubrían. */
+[data-theme="light"] [style*="background: rgba(0,0,0," i],
+[data-theme="light"] [style*="background: rgba(0, 0, 0," i],
+[data-theme="light"] [style*="background-color: rgba(0,0,0," i],
+[data-theme="light"] [style*="background-color: rgba(0, 0, 0," i],
+[data-theme="light"] [style*="background: rgba(255,255,255," i],
+[data-theme="light"] [style*="background: rgba(255, 255, 255," i],
+[data-theme="light"] [style*="background-color: rgba(255,255,255," i],
+[data-theme="light"] [style*="background-color: rgba(255, 255, 255," i] {
   background: #f8fafc !important;
+  background-color: #f8fafc !important;
   border-color: rgba(15, 23, 42, 0.1) !important;
 }
 
@@ -319,6 +348,30 @@
 [data-theme="zen"] .evidence-dropzone:hover {
   background: rgba(16, 185, 129, 0.1) !important;
   border-color: #10b981 !important;
+}
+
+/* (13/09/2026) Consistencia estética en Modo Zen: el mismo problema
+   detectado en Modo Claro (tarjetas rgba(255,255,255,X) sin cubrir) existe
+   aquí también, aunque no como bug de ilegibilidad (el fondo de Zen es
+   oscuro, así que el texto blanco sigue siendo legible) sino como
+   inconsistencia visual — esas tarjetas se ven blanquecinas/grisáceas en
+   vez de tomar el tinte verde esmeralda del resto del Modo Zen. Se
+   recolorean al mismo --bg-card/--border-subtle de Zen, y el texto
+   hardcodeado a blanco puro se alinea al --text-heading de Zen (blanco
+   con tinte verde) para que se vea parte del mismo sistema. */
+[data-theme="zen"] [style*="background: rgba(255,255,255," i],
+[data-theme="zen"] [style*="background: rgba(255, 255, 255," i],
+[data-theme="zen"] [style*="background-color: rgba(255,255,255," i],
+[data-theme="zen"] [style*="background-color: rgba(255, 255, 255," i] {
+  background: rgba(16, 185, 129, 0.06) !important;
+  background-color: rgba(16, 185, 129, 0.06) !important;
+  border-color: rgba(52, 211, 153, 0.2) !important;
+}
+
+[data-theme="zen"] [style*="color: white" i],
+[data-theme="zen"] [style*="color: #ffffff" i],
+[data-theme="zen"] [style*="color: #fff" i] {
+  color: #f0fdf4 !important;
 }
 
 /* Reducción de animaciones agresivas en Modo Zen para menor fatiga visual */

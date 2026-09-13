@@ -1371,7 +1371,7 @@ export default function MisKPIs() {
                 <div key={rep.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', borderLeft: rep.status === 'reviewed' ? '4px solid #10b981' : '4px solid #f59e0b', flexWrap: 'wrap', gap: '0.8rem' }}>
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
-                      <h4 style={{ margin: 0, color: 'white', fontSize: '1rem' }}>
+                      <h4 style={{ margin: 0, color: 'var(--text-heading)', fontSize: '1rem' }}>
                         {rep.roleName || (rep.role === 'qt' ? 'Quantum Team (QT)' : 'Coordinación C1 / C2')} - {targetSede}
                       </h4>
                       <span style={{ fontSize: '0.75rem', padding: '0.1rem 0.5rem', borderRadius: '4px', background: 'rgba(212, 175, 55, 0.15)', color: 'var(--crear-gold)', fontWeight: 'bold' }}>
