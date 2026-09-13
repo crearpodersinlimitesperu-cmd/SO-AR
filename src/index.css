@@ -155,7 +155,11 @@
 [data-theme="light"] [style*="color: rgba(255, 255, 255,"],
 [data-theme="light"] [style*="color: rgb(255, 255, 255)"],
 [data-theme="light"] [style*="color: #ffffff"],
-[data-theme="light"] [style*="color: #fff"] {
+[data-theme="light"] [style*="color: #fff"],
+[data-theme="light"] [style*="color: #f1f5f9"],
+[data-theme="light"] [style*="color: #f8fafc"],
+[data-theme="light"] [style*="color: #e2e8f0"],
+[data-theme="light"] [style*="color: #cbd5e1"] {
   color: #0f172a !important;
 }
 
