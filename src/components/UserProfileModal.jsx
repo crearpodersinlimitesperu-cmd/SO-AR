@@ -1,5 +1,8 @@
 import { getWhatsAppUrl } from '../utils/phoneUtils';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { calculateAutomaticDeadline } from '../utils/soarDates';
+import { useCycles } from '../context/CyclesContext';
+import { cyclesData } from '../data/cyclesData';
 import { 
   X, User, CheckCircle2, Clock, AlertTriangle, 
   FileText, Link2, Plus, Trash2, ExternalLink, Calendar, 
@@ -76,6 +79,77 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
   const navigate = useNavigate();
   const { toggleTask } = useChecklist();
   const { showToast } = useUI();
+  let currentCycle = null;
+  try {
+    const cyclesCtx = useCycles();
+    currentCycle = cyclesCtx?.currentCycle || cyclesData[0];
+  } catch (e) {
+    currentCycle = cyclesData[0];
+  }
+
+  // Orden y filtro de tareas en la Matriz Operativa
+  const [taskSortOrder, setTaskSortOrder] = useState('asc'); // 'asc' (Próximas primero / Cronológico) | 'desc'
+  const [taskFilterStatus, setTaskFilterStatus] = useState('all'); // 'all' | 'pending' | 'completed' | 'critical'
+
+  const parseDateToMs = (val) => {
+    if (!val) return null;
+    if (val instanceof Date) return isNaN(val.getTime()) ? null : val.getTime();
+    if (typeof val === 'object' && typeof val.toDate === 'function') {
+      const d = val.toDate();
+      return isNaN(d.getTime()) ? null : d.getTime();
+    }
+    if (typeof val === 'number') return isNaN(val) ? null : val;
+    if (typeof val === 'string') {
+      const clean = val.trim();
+      if (!clean) return null;
+      let ms = Date.parse(clean);
+      if (!isNaN(ms)) return ms;
+      ms = Date.parse(clean.replace(' ', 'T'));
+      if (!isNaN(ms)) return ms;
+    }
+    return null;
+  };
+
+  const getTaskDeadlineInfo = (task, activeCycle) => {
+    if (task.deadline) {
+      const ms = parseDateToMs(task.deadline);
+      if (ms !== null) {
+        return { deadlineStr: task.deadline, dateObj: new Date(ms), timestamp: ms, isAutomatic: false };
+      }
+    }
+    if (task.dueDate || task.date) {
+      const raw = task.dueDate || task.date;
+      const ms = parseDateToMs(raw);
+      if (ms !== null) {
+        return { deadlineStr: raw, dateObj: new Date(ms), timestamp: ms, isAutomatic: false };
+      }
+    }
+    try {
+      const auto = calculateAutomaticDeadline(task, activeCycle || cyclesData[0]);
+      if (auto) {
+        const ms = parseDateToMs(auto);
+        if (ms !== null) {
+          return { deadlineStr: auto, dateObj: new Date(ms), timestamp: ms, isAutomatic: true };
+        }
+      }
+    } catch (e) {}
+
+    if (task.createdAt || task.created_at) {
+      const ms = parseDateToMs(task.createdAt || task.created_at);
+      if (ms !== null) {
+        return { deadlineStr: null, dateObj: new Date(ms), timestamp: ms, isAutomatic: false };
+      }
+    }
+
+    return { deadlineStr: null, dateObj: null, timestamp: Infinity, isAutomatic: false };
+  };
+
+  const isTaskCompleted = (t, userSede) => {
+    if (t.completions && userSede && t.completions[userSede]) {
+      return !!t.completions[userSede].completed;
+    }
+    return !!(t.completed || t.status === 'Completada');
+  };
 
   const [targetUser, setTargetUser] = useState(user);
   useEffect(() => {
@@ -183,55 +257,90 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
     setShowTaskModal(true);
   };
 
-  // Filter tasks belonging to this user:
+  // Filter tasks belonging to this user and sort them chronologically:
   // 1. Base tasks of this user's role and sede
   // 2. Direct assigned custom tasks (assignedToEmail)
-  const userTasks = allTasks.filter(t => {
-    const isAssigned = (t.assignedToEmails && t.assignedToEmails.some(e => e.toLowerCase() === user.email?.toLowerCase())) || (t.assignedToEmail && t.assignedToEmail.toLowerCase() === user.email?.toLowerCase());
-    const isCollab = t.collaborators && t.collaborators.includes(user.email);
-    
-    if (isAssigned || isCollab) {
-      // Regla de Privacidad: Si yo (currentUser) soy gerente/director y estoy viendo el perfil de otro gerente/director
-      if (!currentUser?.isSuperAdmin) {
-        const myRole = currentUser?.appRole;
-        const targetRole = normalizeRole(user.role);
-        const isManagerRole = r => r === 'gerente' || r === 'director_maestria' || r === 'direccion';
-        
-        if (isManagerRole(myRole) && isManagerRole(targetRole) && currentUser.email?.toLowerCase() !== user.email?.toLowerCase()) {
-          const iAmCreator = t.createdBy?.toLowerCase() === currentUser?.email?.toLowerCase();
-          const iAmCollaborator = t.collaborators?.includes(currentUser?.email);
-          if (!iAmCreator && !iAmCollaborator) return false;
+  const userTasks = useMemo(() => {
+    const raw = allTasks.filter(t => {
+      const isAssigned = (t.assignedToEmails && t.assignedToEmails.some(e => e.toLowerCase() === user.email?.toLowerCase())) || (t.assignedToEmail && t.assignedToEmail.toLowerCase() === user.email?.toLowerCase());
+      const isCollab = t.collaborators && t.collaborators.includes(user.email);
+      
+      if (isAssigned || isCollab) {
+        // Regla de Privacidad: Si yo (currentUser) soy gerente/director y estoy viendo el perfil de otro gerente/director
+        if (!currentUser?.isSuperAdmin) {
+          const myRole = currentUser?.appRole;
+          const targetRole = normalizeRole(user.role);
+          const isManagerRole = r => r === 'gerente' || r === 'director_maestria' || r === 'direccion';
+          
+          if (isManagerRole(myRole) && isManagerRole(targetRole) && currentUser.email?.toLowerCase() !== user.email?.toLowerCase()) {
+            const iAmCreator = t.createdBy?.toLowerCase() === currentUser?.email?.toLowerCase();
+            const iAmCollaborator = t.collaborators?.includes(currentUser?.email);
+            if (!iAmCreator && !iAmCollaborator) return false;
+          }
         }
+        return true;
+      }
+
+      if (t.assignedToEmail || (t.assignedToEmails && t.assignedToEmails.length > 0)) return false; // Is a specific task for someone else
+
+      const tRoleNorm = normalizeRole(t.role);
+      const roleMatches = tRoleNorm === canonicalRole || t.role === user.role;
+      if (!roleMatches) return false;
+
+      // Check sede match
+      if (t.sede) {
+        return t.sede === user.sede || t.sede === 'Global' || user.sede === 'Global';
       }
       return true;
+    });
+
+    // Ordenamiento cronológico garantizado de la Matriz Operativa
+    return raw.sort((a, b) => {
+      const dInfoA = getTaskDeadlineInfo(a, currentCycle);
+      const dInfoB = getTaskDeadlineInfo(b, currentCycle);
+
+      const timeA = dInfoA.timestamp;
+      const timeB = dInfoB.timestamp;
+
+      if (timeA !== timeB) {
+        return taskSortOrder === 'asc' ? timeA - timeB : timeB - timeA;
+      }
+
+      // Tie-breakers:
+      // 1. Tareas pendientes antes que completadas en la misma fecha
+      const compA = isTaskCompleted(a, user.sede) ? 1 : 0;
+      const compB = isTaskCompleted(b, user.sede) ? 1 : 0;
+      if (compA !== compB) return compA - compB;
+
+      // 2. Tareas críticas primero
+      const critA = a.isCritical || a.priority?.includes('ROJO') ? 1 : 0;
+      const critB = b.isCritical || b.priority?.includes('ROJO') ? 1 : 0;
+      if (critA !== critB) return critB - critA;
+
+      return (a.task || a.title || '').localeCompare(b.task || b.title || '');
+    });
+  }, [allTasks, user, currentUser, canonicalRole, currentCycle, taskSortOrder]);
+
+  const completedTasks = useMemo(() => {
+    return userTasks.filter(t => isTaskCompleted(t, user.sede));
+  }, [userTasks, user.sede]);
+
+  const criticalPending = useMemo(() => {
+    return userTasks.filter(t => !isTaskCompleted(t, user.sede) && (t.isCritical || t.priority?.includes('ROJO')));
+  }, [userTasks, user.sede]);
+
+  const displayedTasks = useMemo(() => {
+    if (taskFilterStatus === 'pending') {
+      return userTasks.filter(t => !isTaskCompleted(t, user.sede));
     }
-
-    if (t.assignedToEmail || (t.assignedToEmails && t.assignedToEmails.length > 0)) return false; // Is a specific task for someone else
-
-    const tRoleNorm = normalizeRole(t.role);
-    const roleMatches = tRoleNorm === canonicalRole || t.role === user.role;
-    if (!roleMatches) return false;
-
-    // Check sede match
-    if (t.sede) {
-      return t.sede === user.sede || t.sede === 'Global' || user.sede === 'Global';
+    if (taskFilterStatus === 'completed') {
+      return userTasks.filter(t => isTaskCompleted(t, user.sede));
     }
-    return true;
-  });
-
-  const completedTasks = userTasks.filter(t => {
-    if (t.completions && user.sede && t.completions[user.sede]) {
-      return t.completions[user.sede].completed;
+    if (taskFilterStatus === 'critical') {
+      return userTasks.filter(t => t.isCritical || t.priority?.includes('ROJO'));
     }
-    return t.completed || t.status === 'Completada';
-  });
-
-  const criticalPending = userTasks.filter(t => {
-    const isComp = t.completions && user.sede && t.completions[user.sede]
-      ? t.completions[user.sede].completed
-      : (t.completed || t.status === 'Completada');
-    return !isComp && (t.isCritical || t.priority?.includes('ROJO'));
-  });
+    return userTasks;
+  }, [userTasks, taskFilterStatus, user.sede]);
 
   const pct = userTasks.length > 0 ? Math.round((completedTasks.length / userTasks.length) * 100) : 0;
 
@@ -865,11 +974,11 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
             {/* TAB 1: TASKS */}
             {activeTab === 'tasks' && (
               <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem', flexWrap: 'wrap', gap: '0.8rem' }}>
                   <h4 style={{ margin: 0, color: '#fff', fontSize: '1.05rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <CheckSquare size={18} color="var(--crear-cyan)" /> Matriz Operativa de {user.name}
                   </h4>
-                  <div style={{ display: 'flex', gap: '0.8rem' }}>
+                  <div style={{ display: 'flex', gap: '0.6rem' }}>
                     {canSimulate(currentUser, originalAdminUser) && (
                       <button 
                         onClick={() => {
@@ -901,18 +1010,91 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
                   </div>
                 </div>
 
-                {userTasks.length === 0 ? (
+                {/* Barra de Filtros y Orden Cronológico */}
+                <div style={{ 
+                  display: 'flex', 
+                  flexWrap: 'wrap', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center', 
+                  gap: '0.6rem', 
+                  marginBottom: '1rem',
+                  padding: '0.55rem 0.8rem',
+                  background: 'rgba(255,255,255,0.02)',
+                  borderRadius: '10px',
+                  border: '1px solid rgba(255,255,255,0.06)'
+                }}>
+                  {/* Filtros de estado */}
+                  <div style={{ display: 'flex', gap: '0.35rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                    {[
+                      { key: 'all', label: `Todas (${userTasks.length})` },
+                      { key: 'pending', label: `Pendientes (${userTasks.length - completedTasks.length})` },
+                      { key: 'completed', label: `Completadas (${completedTasks.length})` },
+                      { key: 'critical', label: `Críticas (${criticalPending.length})` },
+                    ].map(f => (
+                      <button
+                        key={f.key}
+                        type="button"
+                        onClick={() => setTaskFilterStatus(f.key)}
+                        style={{
+                          padding: '0.25rem 0.65rem',
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                          fontSize: '0.74rem',
+                          fontWeight: taskFilterStatus === f.key ? 'bold' : 'normal',
+                          background: taskFilterStatus === f.key ? 'rgba(41, 171, 226, 0.2)' : 'rgba(255,255,255,0.05)',
+                          color: taskFilterStatus === f.key ? 'var(--crear-cyan)' : 'var(--text-muted)',
+                          border: taskFilterStatus === f.key ? '1px solid rgba(41, 171, 226, 0.4)' : '1px solid transparent',
+                          transition: 'all 0.15s ease'
+                        }}
+                      >
+                        {f.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Selector / Indicador de Orden Cronológico */}
+                  <button
+                    type="button"
+                    onClick={() => setTaskSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
+                    title="Alternar dirección cronológica"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.35rem',
+                      padding: '0.25rem 0.65rem',
+                      borderRadius: '6px',
+                      background: 'rgba(255,215,0,0.1)',
+                      color: 'var(--crear-gold)',
+                      border: '1px solid rgba(255,215,0,0.25)',
+                      fontSize: '0.74rem',
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease'
+                    }}
+                  >
+                    <Clock size={13} />
+                    <span>Orden: {taskSortOrder === 'asc' ? 'Cronológico (Próximas ↑)' : 'Cronológico (Futuras ↓)'}</span>
+                  </button>
+                </div>
+
+                {displayedTasks.length === 0 ? (
                   <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
                     <CheckCircle2 size={40} style={{ opacity: 0.3, marginBottom: '0.5rem' }} />
-                    <p>No hay tareas asignadas para este usuario o rol en la sede {user.sede}.</p>
+                    <p style={{ margin: 0 }}>
+                      {taskFilterStatus === 'completed'
+                        ? 'No hay tareas completadas para este perfil.'
+                        : taskFilterStatus === 'pending'
+                        ? '¡Excelente! Todas las tareas asignadas están completadas.'
+                        : `No hay tareas asignadas para este usuario o rol en la sede ${user.sede}.`}
+                    </p>
                   </div>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-                    {userTasks.map(task => {
-                      const isCompleted = task.completions && user.sede && task.completions[user.sede]
-                        ? task.completions[user.sede].completed
-                        : (task.completed || task.status === 'Completada');
+                    {displayedTasks.map(task => {
+                      const isCompleted = isTaskCompleted(task, user.sede);
                       const isCrit = task.isCritical || task.priority?.includes('ROJO');
+                      const dInfo = getTaskDeadlineInfo(task, currentCycle);
+                      const isOverdue = !isCompleted && dInfo.dateObj && dInfo.timestamp < Date.now();
 
                       return (
                         <div 
@@ -950,11 +1132,34 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
                                   </button>
                                 )}
                               </div>
-                              <div style={{ display: 'flex', gap: '0.8rem', marginTop: '0.2rem', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.8rem', marginTop: '0.25rem', fontSize: '0.72rem', color: 'var(--text-muted)', alignItems: 'center' }}>
                                 {task.cyclePhase && <span>Fase: <strong style={{ color: '#29abe2' }}>{task.cyclePhase}</strong></span>}
-                                {task.deadline && (
-                                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.2rem', color: 'var(--crear-gold)' }}>
-                                    <Clock size={11} /> Límite: {new Date(task.deadline).toLocaleDateString()} {new Date(task.deadline).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                {dInfo.dateObj ? (
+                                  <span style={{ 
+                                    display: 'flex', 
+                                    alignItems: 'center', 
+                                    gap: '0.25rem', 
+                                    color: isCompleted ? 'var(--text-muted)' : isOverdue ? '#f87171' : 'var(--crear-gold)' 
+                                  }}>
+                                    <Clock size={11} /> Límite: {dInfo.dateObj.toLocaleDateString()} {dInfo.dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    {isOverdue && (
+                                      <span style={{ 
+                                        background: 'rgba(239, 68, 68, 0.2)', 
+                                        color: '#ef4444', 
+                                        border: '1px solid rgba(239, 68, 68, 0.35)', 
+                                        padding: '0.05rem 0.35rem', 
+                                        borderRadius: '4px', 
+                                        fontSize: '0.65rem', 
+                                        fontWeight: 'bold', 
+                                        marginLeft: '0.2rem' 
+                                      }}>
+                                        Vencida
+                                      </span>
+                                    )}
+                                  </span>
+                                ) : (
+                                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.2rem', color: 'rgba(255,255,255,0.3)', fontStyle: 'italic' }}>
+                                    Sin fecha límite
                                   </span>
                                 )}
                                 {(task.assignedToEmail || (task.assignedToEmails && task.assignedToEmails.length > 0)) && (
@@ -981,7 +1186,6 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
                 )}
               </div>
             )}
-
             {/* TAB 2: NOTES & BITÁCORA */}
             {activeTab === 'notes' && (
               <div>
