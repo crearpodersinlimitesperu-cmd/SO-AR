@@ -1,4 +1,4 @@
-﻿﻿// Configuración centralizada de permisos y roles administrativos
+﻿// Configuración centralizada de permisos y roles administrativos
 // Este archivo es la ÚNICA fuente de verdad para emails con privilegios elevados.
 // Cualquier cambio de SuperAdmin se hace AQUÍ, no disperso en el código.
 
@@ -86,10 +86,12 @@ export const hasQTPrivileges = (currentUser) => {
   const name = (currentUser.name || currentUser.displayName || '').toLowerCase();
   const r = currentUser.appRole;
   
-  if (r === 'qt') return true;
-  // Regla especial: Leyla (Lima) es coord_maestria y qt senior
-  if (name.includes('leyla') || email.includes('leyla')) return true;
+  // Usuario inactivo o desvinculado no tiene privilegios
+  if (currentUser.active === false || currentUser.estado === 'inactivo' || currentUser.role === 'inactivo') return false;
+  // Leyla renunciÃ³ a QT y a Oficina (12/09/2026)
+  if (email.includes('leylakellypasquel') || email.includes('leyla.pasquel') || name.includes('leyla pasquel')) return false;
   
+  if (r === 'qt') return true;
   return false;
 };
 
