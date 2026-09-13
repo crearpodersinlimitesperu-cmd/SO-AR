@@ -1,0 +1,40 @@
+name: ðŸ›¡ï¸ Asignar Tarea y Enviar Correo de Seguros de Salud a Entrenadores
+
+on:
+  workflow_dispatch:
+
+jobs:
+  assign-and-mail:
+    name: Asignar Tarea Causa OS y Notificar por Correo
+    runs-on: ubuntu-latest
+    steps:
+      - name: â¬‡ï¸ Checkout repository
+        uses: actions/checkout@v4
+
+      - name: ðŸŸ¢ Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: ðŸ“¦ Install dependencies
+        run: npm install --include=optional
+
+      - name: ðŸ”‘ Escribir la llave de la Service Account
+        run: echo "$GOOGLE_SERVICE_ACCOUNT_JSON" > centro-operativo-cpsl-65ad52160f45.json
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+
+      - name: ðŸš€ Ejecutar AsignaciÃ³n y EnvÃ­o de Correos
+        env:
+          GMAIL_SERVER_EMAIL: ${{ secrets.GMAIL_USER }}
+          GMAIL_SERVER_APP_PASSWORD: ${{ secrets.GMAIL_PASS }}
+          LIMA_GMAIL_USER: ${{ secrets.LIMA_GMAIL_USER }}
+          LIMA_GMAIL_PASS: ${{ secrets.LIMA_GMAIL_PASS }}
+        run: |
+          node scripts/assignInsuranceTaskAndMail.mjs
+          node scripts/mailerDaemon.js --one-shot || echo "Daemon finalizado"
+
+      - name: ðŸ—‘ï¸ Borrar la llave del runner
+        if: always()
+        run: rm -f centro-operativo-cpsl-65ad52160f45.json
