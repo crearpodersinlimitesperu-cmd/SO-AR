@@ -115,6 +115,60 @@ async function syncQTSheet() {
       }
 
       const uid = 'qt_' + cleanId(name);
+
+      // VerificaciÃ³n de bajas y renuncias confirmadas
+      const isResigned = ['9875120', 'leylakellypasquel@gmail.com', 'leyla.pasquel@crearpsl.net'].includes(email.toLowerCase()) || 
+                         name.toLowerCase().includes('leyla');
+      
+      if (isResigned) {
+        console.log(`[BAJA/RENUNCIA] Marcando integrante inactivo: ${name}`);
+        const qtRef = doc(db, 'qt_directory', uid);
+        await setDoc(qtRef, {
+          id: uid,
+          index: updatedCount + 1,
+          nombre: name,
+          role: 'inactivo',
+          roles: [],
+          sede: sede,
+          email: email,
+          emails: [email],
+          estado: 'INACTIVO - RENUNCIA',
+          esActivo: false,
+          active: false,
+          motivoBaja: 'Renuncia a QT y a Oficina (12/09/2026)',
+          updatedAt: new Date().toISOString(),
+          source: 'qtSyncDaemon'
+        }, { merge: true });
+
+        const userRef = doc(db, 'users', uid);
+        await setDoc(userRef, {
+          id: uid,
+          name: name,
+          role: 'inactivo',
+          roles: [],
+          active: false,
+          estado: 'inactivo',
+          motivoBaja: 'Renuncia a QT y a Oficina (12/09/2026)',
+          updatedAt: new Date().toISOString(),
+          source: 'qtSyncDaemon'
+        }, { merge: true });
+
+        const staffRef = doc(db, 'users', 'staff_leylapasquel');
+        await setDoc(staffRef, {
+          id: 'staff_leylapasquel',
+          name: 'Leyla Pasquel',
+          role: 'inactivo',
+          roles: [],
+          active: false,
+          estado: 'inactivo',
+          motivoBaja: 'Renuncia a QT y a Oficina (12/09/2026)',
+          updatedAt: new Date().toISOString(),
+          source: 'qtSyncDaemon'
+        }, { merge: true });
+
+        updatedCount++;
+        continue;
+      }
       
       // 1. Guardar en la colección especializada qt_directory
       const qtRef = doc(db, 'qt_directory', uid);
