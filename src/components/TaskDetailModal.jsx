@@ -301,7 +301,7 @@ export default function TaskDetailModal({
   const isForeign = isForeignTask(task, currentUser);
 
   // Formateo de asignados
-  // Formateo de asignados y lÃ³gica de avance colaborativo
+  // Formateo de asignados y lógica de avance colaborativo
   const assignedList = useMemo(() => {
     if (!task) return [];
     if (Array.isArray(task.assignedToEmails) && task.assignedToEmails.length > 0) {
@@ -356,7 +356,7 @@ export default function TaskDetailModal({
     return collaboratorsList.filter(c => c.completed).length;
   }, [collaboratorsList]);
 
-  // CÃ¡lculo del avance general del equipo en tiempo real
+  // Cálculo del avance general del equipo en tiempo real
   const computedOverallProgress = useMemo(() => {
     if (!isMultiAssignee) return progress;
     if (totalAssigneesCount === 0) return progress;
@@ -364,7 +364,7 @@ export default function TaskDetailModal({
     return Math.round(sum / totalAssigneesCount);
   }, [isMultiAssignee, totalAssigneesCount, collaboratorsList, progress]);
 
-  // Selector rÃ¡pido de porcentaje para tarea individual
+  // Selector rápido de porcentaje para tarea individual
   const handleSetQuickProgress = (val) => {
     setProgress(val);
     if (val === 100) {
@@ -508,7 +508,7 @@ export default function TaskDetailModal({
 
       const finalCompleted = allDone || finalOverall === 100;
 
-      // Registrar avance en la bitÃ¡cora de notas si el usuario actual avanzÃ³
+      // Registrar avance en la bitácora de notas si el usuario actual avanzó
       let updatedNotesList = [...notesList];
       if (isMultiAssignee && myAssigneeEntry) {
         const autoNote = {
@@ -542,7 +542,7 @@ export default function TaskDetailModal({
       if (finalCompleted || (myAssigneeEntry && myProgress === 100) || (!isMultiAssignee && progress === 100)) {
         celebrateVictory();
       }
-      showToast('ðŸŽ‰ Â¡Tarea actualizada y avances guardados exitosamente!', 'success');
+      showToast('🎉 ¡Tarea actualizada y avances guardados exitosamente!', 'success');
       onClose();
     } catch (err) {
       console.error('Error guardando avances:', err);
@@ -818,7 +818,7 @@ export default function TaskDetailModal({
           )}
 
           {/* 1. SECCIÓN DE AVANCE (%) */}
-          {/* 1. SECCIÃ“N DE AVANCE (%) */}
+          {/* 1. SECCIÓN DE AVANCE (%) */}
           <div style={{
             background: 'rgba(255, 255, 255, 0.02)',
             border: '1px solid rgba(41, 171, 226, 0.25)',
@@ -919,7 +919,7 @@ export default function TaskDetailModal({
                   </div>
                 </div>
 
-                {/* 1.2 MI AVANCE INDIVIDUAL (SI EL USUARIO ACTUAL ESTÃ ASIGNADO) */}
+                {/* 1.2 MI AVANCE INDIVIDUAL (SI EL USUARIO ACTUAL ESTÁ ASIGNADO) */}
                 {myAssigneeEntry && (
                   <div style={{
                     background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%)',
@@ -931,7 +931,7 @@ export default function TaskDetailModal({
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
                         <TrendingUp size={17} style={{ color: 'var(--crear-gold)' }} />
                         <span style={{ fontSize: '0.94rem', fontWeight: 800, color: '#ffffff' }}>
-                          Mi Avance Individual ({myAssigneeEntry.name || 'TÃº'})
+                          Mi Avance Individual ({myAssigneeEntry.name || 'Tú'})
                         </span>
                         <span style={{
                           fontSize: '0.68rem',
@@ -942,7 +942,7 @@ export default function TaskDetailModal({
                           color: 'var(--crear-gold)',
                           border: '1px solid rgba(212, 175, 55, 0.4)'
                         }}>
-                          TÃš
+                          TÚ
                         </span>
                       </div>
 
@@ -987,7 +987,7 @@ export default function TaskDetailModal({
                       }} />
                     </div>
 
-                    {/* Botones de selecciÃ³n rÃ¡pida y slider */}
+                    {/* Botones de selección rápida y slider */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '0.4rem' }}>
                         {[0, 25, 50, 75, 100].map(val => (
@@ -1007,7 +1007,7 @@ export default function TaskDetailModal({
                               transition: 'all 0.15s ease'
                             }}
                           >
-                            {val === 100 ? 'âœ… 100%' : `${val}%`}
+                            {val === 100 ? '✅ 100%' : `${val}%`}
                           </button>
                         ))}
                       </div>
@@ -1029,7 +1029,7 @@ export default function TaskDetailModal({
                   </div>
                 )}
 
-                {/* 1.3 DESGLOSE DEL AVANCE DE LOS DEMÃS COLABORADORES */}
+                {/* 1.3 DESGLOSE DEL AVANCE DE LOS DEMÁS COLABORADORES */}
                 <div style={{
                   background: 'rgba(0, 0, 0, 0.25)',
                   border: '1px solid rgba(255, 255, 255, 0.08)',
@@ -1046,7 +1046,7 @@ export default function TaskDetailModal({
                   }}>
                     <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#ffffff', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                       <Users size={14} style={{ color: 'var(--crear-cyan)' }} />
-                      Avance de los demÃ¡s colaboradores ({collaboratorsList.length}):
+                      Avance de los demás colaboradores ({collaboratorsList.length}):
                     </span>
                     <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
                       {completedAssigneesCount} de {totalAssigneesCount} completaron
@@ -1084,7 +1084,7 @@ export default function TaskDetailModal({
                               fontWeight: 700,
                               flexShrink: 0
                             }}>
-                              {isCompletedC ? 'âœ“' : c.name.charAt(0).toUpperCase()}
+                              {isCompletedC ? '✓' : c.name.charAt(0).toUpperCase()}
                             </div>
 
                             <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, flex: 1 }}>
@@ -1099,12 +1099,12 @@ export default function TaskDetailModal({
                                   {c.name}
                                 </span>
                                 {c.isMe && (
-                                  <span style={{ fontSize: '0.65rem', color: 'var(--crear-gold)', fontWeight: 800 }}>(TÃº)</span>
+                                  <span style={{ fontSize: '0.65rem', color: 'var(--crear-gold)', fontWeight: 800 }}>(Tú)</span>
                                 )}
                               </div>
                               {c.sede && (
                                 <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
-                                  {c.sede} {c.role ? `â€¢ ${c.role}` : ''}
+                                  {c.sede} {c.role ? `• ${c.role}` : ''}
                                 </span>
                               )}
                             </div>
@@ -1160,7 +1160,7 @@ export default function TaskDetailModal({
                 </div>
               </>
             ) : (
-              /* CASO INDIVIDUAL (1 SOLO ASIGNADO O ASIGNACIÃ“N DIRECTA) */
+              /* CASO INDIVIDUAL (1 SOLO ASIGNADO O ASIGNACIÓN DIRECTA) */
               <>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
@@ -1212,7 +1212,7 @@ export default function TaskDetailModal({
                   }} />
                 </div>
 
-                {/* Botones de selecciÃ³n rÃ¡pida y slider */}
+                {/* Botones de selección rápida y slider */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '0.4rem' }}>
                     {[0, 25, 50, 75, 100].map(val => (
@@ -1232,7 +1232,7 @@ export default function TaskDetailModal({
                           transition: 'all 0.15s ease'
                         }}
                       >
-                        {val === 100 ? 'âœ… 100%' : `${val}%`}
+                        {val === 100 ? '✅ 100%' : `${val}%`}
                       </button>
                     ))}
                   </div>

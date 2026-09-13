@@ -286,7 +286,7 @@ export default function GoalsBoard() {
     return null;
   };
 
-  // SincronizaciÃ³n individual del Agente Centinela
+  // Sincronización individual del Agente Centinela
   const handleApplySentinelSync = async (goal, audit) => {
     setSyncingSentinelGoalId(goal.id);
     try {
@@ -323,7 +323,7 @@ export default function GoalsBoard() {
       }
 
       await performRollUp(goal.id, newProgress);
-      showToast(`âœ… Meta "${goal.title}" sincronizada: ${newCurrent}/${targetVal} (${newProgress}%)`, 'success');
+      showToast(`✅ Meta "${goal.title}" sincronizada: ${newCurrent}/${targetVal} (${newProgress}%)`, 'success');
     } catch (err) {
       console.error('Error aplicando sync del Agente Centinela:', err);
       showToast('Error al sincronizar con el Agente Centinela.', 'error');
@@ -332,7 +332,7 @@ export default function GoalsBoard() {
     }
   };
 
-  // SincronizaciÃ³n masiva de todas las metas pendientes
+  // Sincronización masiva de todas las metas pendientes
   const handleApplyAllSentinelSync = async (auditedList) => {
     setIsMassSyncingSentinel(true);
     let count = 0;
@@ -360,11 +360,11 @@ export default function GoalsBoard() {
           }
         }
       }
-      showToast(`ðŸš€ Â¡AuditorÃ­a masiva aplicada! ${count} metas sincronizadas con datos certificados de Nodus.`, 'success');
+      showToast(`🚀 ¡Auditoría masiva aplicada! ${count} metas sincronizadas con datos certificados de Nodus.`, 'success');
       setShowSentinelModal(false);
     } catch (err) {
       console.error('Error en sync masivo de Agente Centinela:', err);
-      showToast('Error al aplicar sincronizaciÃ³n masiva.', 'error');
+      showToast('Error al aplicar sincronización masiva.', 'error');
     } finally {
       setIsMassSyncingSentinel(false);
     }
@@ -557,7 +557,7 @@ export default function GoalsBoard() {
         const limaCycle = goals.find(g => normalizeSede(g.sede || '') === 'Lima' && g.scope === 'CICLO');
         const newRef = doc(collection(db, 'goals'));
         await setDoc(newRef, {
-          title: 'Aliados - CapÃ­tulo 1',
+          title: 'Aliados - Capítulo 1',
           kpi: 'Cantidad de Aliados',
           targetValue: 32,
           currentValue: totalOk,
@@ -1188,11 +1188,11 @@ export default function GoalsBoard() {
                         <span>Llamadas {teamCalls.teamName}:</span>
                         <span style={{ color: '#38bdf8', fontWeight: 800 }}>{teamCalls.totalLlamadas} gestiones</span>
                         <span style={{ color: '#10b981', background: 'rgba(16, 185, 129, 0.18)', padding: '1px 6px', borderRadius: '4px', fontSize: '0.74rem', fontWeight: 700 }}>
-                          âœ“ {teamCalls.totalConfirmados} Confirmados
+                          ✓ {teamCalls.totalConfirmados} Confirmados
                         </span>
                         {teamCalls.totalPorConfirmar > 0 && (
                           <span style={{ color: '#f59e0b', background: 'rgba(245, 158, 11, 0.18)', padding: '1px 6px', borderRadius: '4px', fontSize: '0.74rem', fontWeight: 700 }}>
-                            â³ {teamCalls.totalPorConfirmar} Por confirmar
+                            ⏳ {teamCalls.totalPorConfirmar} Por confirmar
                           </span>
                         )}
                         <span style={{ fontSize: '0.72rem', color: 'var(--crear-gold)', fontWeight: 700 }}>
@@ -1200,7 +1200,7 @@ export default function GoalsBoard() {
                         </span>
                       </div>
                       <div style={{ fontSize: '0.72rem', color: '#94a3b8', marginTop: '2px' }}>
-                        {teamCalls.coordinadoresList.length} coordinadoras activas ({teamCalls.coordinadoresList.map(c => c.nombre).join(', ')}) â€¢ <span style={{ color: '#38bdf8', textDecoration: 'underline' }}>Clic para ver detalles nominales</span>
+                        {teamCalls.coordinadoresList.length} coordinadoras activas ({teamCalls.coordinadoresList.map(c => c.nombre).join(', ')}) • <span style={{ color: '#38bdf8', textDecoration: 'underline' }}>Clic para ver detalles nominales</span>
                       </div>
                     </div>
                   </div>
@@ -1264,7 +1264,7 @@ export default function GoalsBoard() {
                       </span>
                       {audit.callsDetails.totalLlamadas > 0 && (
                         <span style={{ fontSize: '0.73rem', color: '#94a3b8' }}>
-                          â€¢ {audit.callsDetails.totalLlamadas} llamadas ({audit.callsDetails.efectividad}% efectividad)
+                          • {audit.callsDetails.totalLlamadas} llamadas ({audit.callsDetails.efectividad}% efectividad)
                         </span>
                       )}
                     </div>
@@ -1316,7 +1316,7 @@ export default function GoalsBoard() {
                           }}
                         >
                           <Zap size={13} />
-                          <span>{syncingSentinelGoalId === goal.id ? 'Sincronizando...' : `âš¡ Sincronizar Avance Real (${audit.detectedRealValue}/${audit.detectedTarget})`}</span>
+                          <span>{syncingSentinelGoalId === goal.id ? 'Sincronizando...' : `⚡ Sincronizar Avance Real (${audit.detectedRealValue}/${audit.detectedTarget})`}</span>
                         </button>
                       )}
                     </div>
@@ -1324,7 +1324,7 @@ export default function GoalsBoard() {
 
                   <div style={{ fontSize: '0.71rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                     <span>Fuentes: <strong style={{ color: '#cbd5e1' }}>{audit.sources.join(' + ')}</strong></span>
-                    <span>â€¢ Hash: <code style={{ color: '#38bdf8', background: 'rgba(56, 189, 248, 0.1)', padding: '1px 5px', borderRadius: '4px', fontFamily: 'monospace' }}>{audit.auditHash}</code></span>
+                    <span>• Hash: <code style={{ color: '#38bdf8', background: 'rgba(56, 189, 248, 0.1)', padding: '1px 5px', borderRadius: '4px', fontFamily: 'monospace' }}>{audit.auditHash}</code></span>
                     <span style={{ color: '#10b981', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
                       <ShieldCheck size={11} /> 100% Confiable / Sin Alucinaciones
                     </span>
@@ -1559,7 +1559,7 @@ export default function GoalsBoard() {
             </button>
           )}
 
-          {/* BOTÃ“N AGENTE CENTINELA DE METAS Y LLAMADAS NODUS */}
+          {/* BOTÓN AGENTE CENTINELA DE METAS Y LLAMADAS NODUS */}
           <button
             type="button"
             onClick={() => {
@@ -1617,7 +1617,7 @@ export default function GoalsBoard() {
                   padding: '1px 6px',
                   borderRadius: '9999px'
                 }}>
-                  Al dÃ­a
+                  Al día
                 </span>
               );
             })()}
@@ -1913,7 +1913,7 @@ export default function GoalsBoard() {
                   <h2 style={{ margin: 0, fontSize: '1.3rem', color: '#fff' }}>Directorio Oficial de Aliados (Graduados Lima)</h2>
                 </div>
                 <p className="text-muted" style={{ margin: '0.2rem 0 0 0', fontSize: '0.85rem' }}>
-                  Alimentado en tiempo real desde la hoja de cÃ¡lculo oficial: <code>GRADUADOS LIMA</code>
+                  Alimentado en tiempo real desde la hoja de cálculo oficial: <code>GRADUADOS LIMA</code>
                 </p>
               </div>
               <button
@@ -2019,7 +2019,7 @@ export default function GoalsBoard() {
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
                 <thead>
                   <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', textAlign: 'left', color: 'var(--text-muted)' }}>
-                    <th style={{ padding: '0.6rem 0.5rem' }}>Creador CuÃ¡ntico</th>
+                    <th style={{ padding: '0.6rem 0.5rem' }}>Creador Cuántico</th>
                     <th style={{ padding: '0.6rem 0.5rem' }}>Equipo</th>
                     <th style={{ padding: '0.6rem 0.5rem' }}>Responsable</th>
                     <th style={{ padding: '0.6rem 0.5rem' }}>Estado</th>
@@ -2084,7 +2084,7 @@ export default function GoalsBoard() {
               alignItems: 'center'
             }}>
               <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                Sede exclusiva: <strong>Lima</strong> â€¢ Hoja GID: <code>488639774</code>
+                Sede exclusiva: <strong>Lima</strong> • Hoja GID: <code>488639774</code>
               </span>
               <button
                 type="button"
@@ -2099,7 +2099,7 @@ export default function GoalsBoard() {
         </div>
       )}
 
-      {/* MODAL DETALLADO DE AVANCE Y AUDITORÃA DE LLAMADAS DEL EQUIPO */}
+      {/* MODAL DETALLADO DE AVANCE Y AUDITORÍA DE LLAMADAS DEL EQUIPO */}
       {showTeamCallsModal && selectedTeamCallsData && (
         <div style={{
           position: 'fixed',
@@ -2160,7 +2160,7 @@ export default function GoalsBoard() {
                     </span>
                   </h3>
                   <p style={{ margin: '2px 0 0 0', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                    Meta: <strong>{selectedTeamCallsData.goalTitle}</strong> â€¢ AuditorÃ­a de llamadas y confirmaciones en tiempo real
+                    Meta: <strong>{selectedTeamCallsData.goalTitle}</strong> • Auditoría de llamadas y confirmaciones en tiempo real
                   </p>
                 </div>
               </div>
@@ -2336,7 +2336,7 @@ export default function GoalsBoard() {
                 <div>
                   <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                      GestiÃ³n individual de llamadas registradas para <strong>{selectedTeamCallsData.teamName}</strong>:
+                      Gestión individual de llamadas registradas para <strong>{selectedTeamCallsData.teamName}</strong>:
                     </span>
                     <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 600 }}>
                       Sincronizado con Nodus CRM & Causa OS
@@ -2380,7 +2380,7 @@ export default function GoalsBoard() {
                                   {coord.nombreCompleto || coord.nombre}
                                 </div>
                                 <div style={{ fontSize: '0.72rem', color: 'var(--crear-blue)', fontWeight: 600 }}>
-                                  {coord.rol} â€¢ {coord.sede}
+                                  {coord.rol} • {coord.sede}
                                 </div>
                               </div>
                             </div>
@@ -2398,7 +2398,7 @@ export default function GoalsBoard() {
                             </span>
                           </div>
 
-                          {/* MÃ©tricas individuales */}
+                          {/* Métricas individuales */}
                           <div style={{
                             display: 'grid',
                             gridTemplateColumns: 'repeat(4, 1fr)',
@@ -2426,10 +2426,10 @@ export default function GoalsBoard() {
                             </div>
                           </div>
 
-                          {/* Barra Visual de DistribuciÃ³n */}
+                          {/* Barra Visual de Distribución */}
                           <div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: '#94a3b8', marginBottom: '4px' }}>
-                              <span>DistribuciÃ³n de Respuestas:</span>
+                              <span>Distribución de Respuestas:</span>
                               <span>{coord.confirmados} de {coord.llamadas} OK</span>
                             </div>
                             <div style={{ height: '8px', background: 'rgba(255,255,255,0.06)', borderRadius: '4px', overflow: 'hidden', display: 'flex' }}>
@@ -2451,7 +2451,7 @@ export default function GoalsBoard() {
                   {selectedTeamCallsData.sedeReports.length === 0 ? (
                     <div style={{ textAlign: 'center', padding: '2.5rem', color: 'var(--text-muted)' }}>
                       <FileSpreadsheet size={40} style={{ margin: '0 auto 0.75rem auto', opacity: 0.4 }} />
-                      <p>No se registran reportes oficiales manuales aÃºn para esta sede.</p>
+                      <p>No se registran reportes oficiales manuales aún para esta sede.</p>
                     </div>
                   ) : (
                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
@@ -2500,8 +2500,8 @@ export default function GoalsBoard() {
                   {selectedTeamCallsData.teamManagers.length === 0 ? (
                     <div style={{ textAlign: 'center', padding: '2.5rem', color: 'var(--text-muted)' }}>
                       <Award size={40} style={{ margin: '0 auto 0.75rem auto', opacity: 0.4 }} />
-                      <p>No se encontraron managers registrados explÃ­citamente con {selectedTeamCallsData.teamName} en esta sede.</p>
-                      <span style={{ fontSize: '0.75rem' }}>Los participantes inscritos se gestionan directamente en la pestaÃ±a de coordinadoras.</span>
+                      <p>No se encontraron managers registrados explícitamente con {selectedTeamCallsData.teamName} en esta sede.</p>
+                      <span style={{ fontSize: '0.75rem' }}>Los participantes inscritos se gestionan directamente en la pestaña de coordinadoras.</span>
                     </div>
                   ) : (
                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
@@ -2510,7 +2510,7 @@ export default function GoalsBoard() {
                           <th style={{ padding: '0.6rem 0.5rem' }}>Manager</th>
                           <th style={{ padding: '0.6rem 0.5rem' }}>Rol</th>
                           <th style={{ padding: '0.6rem 0.5rem' }}>Entrenador Asignado</th>
-                          <th style={{ padding: '0.6rem 0.5rem' }}>TelÃ©fono</th>
+                          <th style={{ padding: '0.6rem 0.5rem' }}>Teléfono</th>
                           <th style={{ padding: '0.6rem 0.5rem' }}>Estado</th>
                         </tr>
                       </thead>
@@ -2574,7 +2574,7 @@ export default function GoalsBoard() {
                           updatedAt: new Date().toISOString()
                         });
                         await performRollUp(selectedGoalForTeamCalls.id, newPct);
-                        showToast(`âš¡ Meta sincronizada con ${selectedTeamCallsData.totalConfirmados} confirmados (${newPct}%).`, 'success');
+                        showToast(`⚡ Meta sincronizada con ${selectedTeamCallsData.totalConfirmados} confirmados (${newPct}%).`, 'success');
                         setShowTeamCallsModal(false);
                       } catch (err) {
                         showToast('Error sincronizando avance: ' + err.message, 'error');

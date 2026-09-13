@@ -317,7 +317,7 @@ export default function PortfolioBoard() {
     fetchData();
   }, [selectedSede, events]);
 
-    // SÃ­ntesis Cuantitativa de Inteligencia Predictiva Multisede (EmpÃ­rica y Certificada)
+    // Síntesis Cuantitativa de Inteligencia Predictiva Multisede (Empírica y Certificada)
   const predictorMatrixData = useMemo(() => {
     const list = coordinadoresRaw || [];
     if (!list.length && !predictorData) return null;
@@ -327,8 +327,8 @@ export default function PortfolioBoard() {
       'Cuenca': 81,
       'Guayaquil': 68,
       'Lima': 60,
-      'MedellÃ­n': 51,
-      'MÃ©xico': 43
+      'Medellín': 51,
+      'México': 43
     };
 
     const sedesMap = {};
@@ -383,7 +383,7 @@ export default function PortfolioBoard() {
       const prospectosSinPago = remoteSede?.prospectosSinPago || defaultProspectosPorSede[sede] || 40;
       const recuperablesEstimados = Math.round(prospectosSinPago * 0.165);
       
-      // CÃ¡lculo REAL con precio de FDS de la sede
+      // Cálculo REAL con precio de FDS de la sede
       const precioFdsC1 = pricing.precioFdsC1;
       const ingresoRecuperableLocal = recuperablesEstimados * precioFdsC1;
       const ingresoRecuperableUSD = Math.round(ingresoRecuperableLocal / pricing.tasaCambioUSD);
@@ -399,8 +399,8 @@ export default function PortfolioBoard() {
       else if (scoreSalud < 50) semaforo = 'ALERTA';
 
       const etaCumplimiento = totalConfirmados >= 50
-        ? 'En Ritmo (ProyecciÃ³n 100% alcanzable)'
-        : 'Requiere aceleraciÃ³n de llamadas';
+        ? 'En Ritmo (Proyección 100% alcanzable)'
+        : 'Requiere aceleración de llamadas';
 
       sedesMap[sede] = {
         sede,
@@ -477,7 +477,7 @@ export default function PortfolioBoard() {
       ingresoRecuperableUSD: totalIngresoRecuperableUSD,
       scoreSalud: scoreSaludGlobal,
       semaforo: scoreSaludGlobal >= 75 ? 'EXCELENTE' : scoreSaludGlobal >= 50 ? 'ESTABLE' : 'ALERTA',
-      etaCumplimiento: 'En Ritmo (ProyecciÃ³n 100% alcanzable)'
+      etaCumplimiento: 'En Ritmo (Proyección 100% alcanzable)'
     };
 
     return {
@@ -486,7 +486,7 @@ export default function PortfolioBoard() {
     };
   }, [coordinadoresRaw, predictorData, customPricing]);
 
-  // Extraer mÃ©tricas predictivas segÃºn la sede seleccionada o Global
+  // Extraer métricas predictivas según la sede seleccionada o Global
   const activePrediction = useMemo(() => {
     if (selectedSede === 'GLOBAL') {
       return predictorMatrixData.global;
@@ -689,16 +689,16 @@ export default function PortfolioBoard() {
                   <div style={{ width: `${Math.min(100, activePrediction?.scoreSalud || 75)}%`, height: '100%', background: (activePrediction?.scoreSalud || 75) >= 70 ? '#10b981' : (activePrediction?.scoreSalud || 75) >= 50 ? '#f59e0b' : '#ef4444', borderRadius: '10px' }}></div>
                 </div>
                 <p style={{ fontSize: '0.75rem', color: textMuted, margin: 0, lineHeight: '1.4' }}>
-                  Ãndice multifactorial: 40% Tasa ConversiÃ³n + 40% RetenciÃ³n FDS + 20% Ritmo Operativo &bull; Estado: <strong style={{ color: (activePrediction?.scoreSalud || 75) >= 70 ? '#10b981' : '#f59e0b' }}>{activePrediction?.semaforo || 'ESTABLE'}</strong>
+                  Índice multifactorial: 40% Tasa Conversión + 40% Retención FDS + 20% Ritmo Operativo &bull; Estado: <strong style={{ color: (activePrediction?.scoreSalud || 75) >= 70 ? '#10b981' : '#f59e0b' }}>{activePrediction?.semaforo || 'ESTABLE'}</strong>
                 </p>
               </div>
 
-              {/* CARD 2: PREDICCIÃ“N DE DESERCIÃ“N FDS */}
+              {/* CARD 2: PREDICCIÓN DE DESERCIÓN FDS */}
               <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.5rem', boxShadow: '0 2px 4px rgba(0,0,0,0.04)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
                   <div>
                     <span style={{ fontSize: '0.75rem', fontWeight: 800, color: textMuted, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                      Riesgo DeserciÃ³n FDS
+                      Riesgo Deserción FDS
                     </span>
                     <h3 style={{ fontSize: '2.2rem', fontWeight: 900, color: (activePrediction?.riesgoDesercionFDS || 20) > 25 ? '#ef4444' : '#f59e0b', margin: '0.2rem 0' }}>
                       {activePrediction?.riesgoDesercionFDS ?? 20.3}%
@@ -712,16 +712,16 @@ export default function PortfolioBoard() {
                   {activePrediction?.totalNoContesta ? `${activePrediction.totalNoContesta.toLocaleString('en-US')} en "No Contesta"` : 'Alerta preventiva activa'}
                 </div>
                 <p style={{ fontSize: '0.75rem', color: textMuted, margin: 0, lineHeight: '1.4' }}>
-                  Calculado cruzando estados de llamadas con histÃ³rico de abandono entre viernes y sÃ¡bado.
+                  Calculado cruzando estados de llamadas con histórico de abandono entre viernes y sábado.
                 </p>
               </div>
 
-              {/* CARD 3: PROYECCIÃ“N RECAUDACIÃ“N PROSPECTOS SIN PAGO */}
+              {/* CARD 3: PROYECCIÓN RECAUDACIÓN PROSPECTOS SIN PAGO */}
               <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.5rem', boxShadow: '0 2px 4px rgba(0,0,0,0.04)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
                   <div>
                     <span style={{ fontSize: '0.75rem', fontWeight: 800, color: textMuted, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                      RecaudaciÃ³n Proyectada {activePrediction?.precioFdsC1 ? `(FDS C1: ${activePrediction?.simbolo || '$'}${activePrediction?.precioFdsC1?.toLocaleString('en-US')})` : ''}
+                      Recaudación Proyectada {activePrediction?.precioFdsC1 ? `(FDS C1: ${activePrediction?.simbolo || '$'}${activePrediction?.precioFdsC1?.toLocaleString('en-US')})` : ''}
                     </span>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.35rem', marginTop: '0.2rem' }}>
                       <h3 style={{ fontSize: '2.1rem', fontWeight: 900, color: '#2563eb', margin: 0 }}>
@@ -752,7 +752,7 @@ export default function PortfolioBoard() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
                   <div>
                     <span style={{ fontSize: '0.75rem', fontWeight: 800, color: textMuted, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                      Tasa de ConversiÃ³n
+                      Tasa de Conversión
                     </span>
                     <h3 style={{ fontSize: '2.2rem', fontWeight: 900, color: '#10b981', margin: '0.2rem 0' }}>
                       {activePrediction?.tasaConversion ?? 0}%
@@ -780,7 +780,7 @@ export default function PortfolioBoard() {
                     <BarChart2 size={20} color="#d97706" /> Matriz Predictiva Multisede (Corte en Tiempo Real)
                   </h3>
                   <p style={{ fontSize: '0.75rem', color: textMuted, margin: '0.2rem 0 0 0' }}>
-                    Comparativa cuantitativa de confirmados, conversiÃ³n, riesgo y score de salud por sede operativa
+                    Comparativa cuantitativa de confirmados, conversión, riesgo y score de salud por sede operativa
                   </p>
                 </div>
                 <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
@@ -791,7 +791,7 @@ export default function PortfolioBoard() {
                     }}
                     style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', borderRadius: '6px', border: '1px solid #2563eb', background: '#eff6ff', color: '#2563eb', cursor: 'pointer', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.35rem' }}
                   >
-                    âš™ï¸ Tarifas FDS C1
+                    ⚙️ Tarifas FDS C1
                   </button>
                   {selectedSede !== 'GLOBAL' && (
                     <button 
@@ -811,10 +811,10 @@ export default function PortfolioBoard() {
                       <th style={{ padding: '0.75rem 1rem', fontWeight: 700 }}>Sede Operativa</th>
                       <th style={{ padding: '0.75rem 1rem', fontWeight: 700 }}>Precio FDS C1</th>
                       <th style={{ padding: '0.75rem 1rem', fontWeight: 700 }}>Confirmados</th>
-                      <th style={{ padding: '0.75rem 1rem', fontWeight: 700 }}>Tasa ConversiÃ³n</th>
-                      <th style={{ padding: '0.75rem 1rem', fontWeight: 700 }}>Riesgo DeserciÃ³n</th>
+                      <th style={{ padding: '0.75rem 1rem', fontWeight: 700 }}>Tasa Conversión</th>
+                      <th style={{ padding: '0.75rem 1rem', fontWeight: 700 }}>Riesgo Deserción</th>
                       <th style={{ padding: '0.75rem 1rem', fontWeight: 700 }}>Prospectos Sin Pago</th>
-                      <th style={{ padding: '0.75rem 1rem', fontWeight: 700 }}>RecaudaciÃ³n Potencial</th>
+                      <th style={{ padding: '0.75rem 1rem', fontWeight: 700 }}>Recaudación Potencial</th>
                       <th style={{ padding: '0.75rem 1rem', fontWeight: 700 }}>Salud Predictiva</th>
                     </tr>
                   </thead>
@@ -865,7 +865,7 @@ export default function PortfolioBoard() {
                               {s.simbolo}{(s.ingresoRecuperableLocal != null ? s.ingresoRecuperableLocal : 0).toLocaleString('en-US')} {s.moneda}
                             </div>
                             <div style={{ fontSize: '0.7rem', color: textMuted }}>
-                              â‰ˆ ${(s.ingresoRecuperableUSD || 0).toLocaleString('en-US')} USD
+                              ≈ ${(s.ingresoRecuperableUSD || 0).toLocaleString('en-US')} USD
                             </div>
                           </td>
                           <td style={{ padding: '1rem' }}>
@@ -973,7 +973,7 @@ export default function PortfolioBoard() {
                                 <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#10b981' }}>{p.details.totalEnrolados} <span style={{ fontSize: '0.75rem', fontWeight: 500, color: textMuted }}>enrolados</span></div>
                               </div>
                               <div style={{ background: bgCard, padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                                <div style={{ fontSize: '0.7rem', color: textMuted, textTransform: 'uppercase', fontWeight: 700 }}>En GestiÃ³n TelefÃ³nica</div>
+                                <div style={{ fontSize: '0.7rem', color: textMuted, textTransform: 'uppercase', fontWeight: 700 }}>En Gestión Telefónica</div>
                                 <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#3b82f6' }}>{p.details.totalEnGestion} <span style={{ fontSize: '0.75rem', fontWeight: 500, color: textMuted }}>contactos</span></div>
                               </div>
                               <div style={{ background: bgCard, padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
@@ -1982,7 +1982,7 @@ ${coord.coachingFeedback}`;
             textMuted={textMuted}
           />
         ) : null}
-      {/* MODAL CONFIGURACIÃ“N DE TARIFAS FDS CAPÃTULO 1 */}
+      {/* MODAL CONFIGURACIÓN DE TARIFAS FDS CAPÍTULO 1 */}
       {showPricingModal && (
         <div style={{
           position: 'fixed',
@@ -2017,10 +2017,10 @@ ${coord.coachingFeedback}`;
             }}>
               <div>
                 <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  âš™ï¸ Tarifas Oficiales FDS CapÃ­tulo 1 por Sede
+                  ⚙️ Tarifas Oficiales FDS Capítulo 1 por Sede
                 </h3>
                 <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.75rem', color: '#94a3b8' }}>
-                  Define el valor de matrÃ­cula de FDS C1 para el cÃ¡lculo exacto de recaudaciÃ³n.
+                  Define el valor de matrícula de FDS C1 para el cálculo exacto de recaudación.
                 </p>
               </div>
               <button
@@ -2033,7 +2033,7 @@ ${coord.coachingFeedback}`;
 
             <div style={{ padding: '1.5rem', maxHeight: '65vh', overflowY: 'auto' }}>
               <div style={{ background: '#f8fafc', padding: '0.75rem 1rem', borderRadius: '8px', border: '1px solid #e2e8f0', marginBottom: '1.25rem', fontSize: '0.8rem', color: '#475569', lineHeight: '1.4' }}>
-                ðŸ’¡ <strong>Precios confirmados:</strong> Lima estÃ¡ certificado en <strong>S/. 900 Soles</strong>. Si los gerentes de otras sedes actualizan sus tarifas, modifÃ­calas aquÃ­ para recalcular las proyecciones en tiempo real.
+                💡 <strong>Precios confirmados:</strong> Lima está certificado en <strong>S/. 900 Soles</strong>. Si los gerentes de otras sedes actualizan sus tarifas, modifícalas aquí para recalcular las proyecciones en tiempo real.
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>

@@ -15,16 +15,16 @@ import { getAllCompanyUsers } from '../services/userService';
 export const OPERATIONAL_AREAS = [
   {
     id: 'todas',
-    label: 'ðŸŒ Todos los Colaboradores',
+    label: '🌐 Todos los Colaboradores',
     shortLabel: 'Todos',
-    icon: 'ðŸ‘¥',
+    icon: '👥',
     filter: () => true
   },
   {
     id: 'finanzas',
-    label: 'ðŸ“Š Finanzas, Contabilidad y AdministraciÃ³n',
+    label: '📊 Finanzas, Contabilidad y Administración',
     shortLabel: 'Finanzas / Contab',
-    icon: 'ðŸ“Š',
+    icon: '📊',
     filter: (u) => {
       const r = normalizeRole(u.role);
       const email = (u.email || '').toLowerCase();
@@ -43,51 +43,51 @@ export const OPERATIONAL_AREAS = [
   },
   {
     id: 'gerentes',
-    label: 'ðŸ¢ Gerencia de Sede',
+    label: '🏢 Gerencia de Sede',
     shortLabel: 'Gerencia',
-    icon: 'ðŸ¢',
+    icon: '🏢',
     filter: (u) => normalizeRole(u.role) === 'gerente'
   },
   {
     id: 'mj',
-    label: 'ðŸ† Coordinadores MJ (MaestrÃ­a del Juego)',
+    label: '🏆 Coordinadores MJ (Maestría del Juego)',
     shortLabel: 'Coord. MJ',
-    icon: 'ðŸ†',
+    icon: '🏆',
     filter: (u) => ['coord_maestria', 'coordinador_mj', 'director_maestria'].includes(normalizeRole(u.role))
   },
   {
     id: 'c1',
-    label: 'ðŸŒŸ Coordinadores C1 / C2',
+    label: '🌟 Coordinadores C1 / C2',
     shortLabel: 'Coord. C1/C2',
-    icon: 'ðŸŒŸ',
+    icon: '🌟',
     filter: (u) => normalizeRole(u.role) === 'coord_c1'
   },
   {
     id: 'qt',
-    label: 'âš¡ Quantum Team (QT)',
+    label: '⚡ Quantum Team (QT)',
     shortLabel: 'Quantum Team',
-    icon: 'âš¡',
+    icon: '⚡',
     filter: (u) => normalizeRole(u.role) === 'qt'
   },
   {
     id: 'th',
-    label: 'ðŸ‘¥ Talento Humano',
+    label: '👥 Talento Humano',
     shortLabel: 'Talento Humano',
-    icon: 'ðŸ‘¥',
+    icon: '👥',
     filter: (u) => ['talento_humano', 'director_th'].includes(normalizeRole(u.role)) || (u.email || '').toLowerCase().includes('talento')
   },
   {
     id: 'direccion',
-    label: 'ðŸ‘‘ DirecciÃ³n Ejecutiva (CEO / CCO)',
-    shortLabel: 'DirecciÃ³n',
-    icon: 'ðŸ‘‘',
+    label: '👑 Dirección Ejecutiva (CEO / CCO)',
+    shortLabel: 'Dirección',
+    icon: '👑',
     filter: (u) => ['direccion', 'ceo', 'cco'].includes(normalizeRole(u.role))
   },
   {
     id: 'otros',
-    label: 'ðŸ› ï¸ Otras Especialidades (SST, Legal, Coaches)',
-    shortLabel: 'Otras Ãreas',
-    icon: 'ðŸ› ï¸',
+    label: '🛠️ Otras Especialidades (SST, Legal, Coaches)',
+    shortLabel: 'Otras Áreas',
+    icon: '🛠️',
     filter: (u) => ['tecnico_sst', 'legal', 'entrenador', 'marketing', 'entrenador_llamadas'].includes(normalizeRole(u.role))
   }
 ];
@@ -116,13 +116,13 @@ export const QUICK_ASSIGN_AREAS = [
 ];
 
 export const getSedeFlag = (sede) => {
-  if (!sede) return 'ðŸŒ';
+  if (!sede) return '🌐';
   const s = sede.toLowerCase();
-  if (s.includes('quito') || s.includes('cuenca') || s.includes('guayaquil') || s.includes('uio') || s.includes('cue') || s.includes('gye')) return 'ðŸ‡ªðŸ‡¨';
-  if (s.includes('lima') || s.includes('lim')) return 'ðŸ‡µðŸ‡ª';
-  if (s.includes('medell') || s.includes('med')) return 'ðŸ‡¨ðŸ‡´';
-  if (s.includes('mex') || s.includes('cdmx')) return 'ðŸ‡²ðŸ‡½';
-  return 'ðŸŒ';
+  if (s.includes('quito') || s.includes('cuenca') || s.includes('guayaquil') || s.includes('uio') || s.includes('cue') || s.includes('gye')) return '🇪🇨';
+  if (s.includes('lima') || s.includes('lim')) return '🇵🇪';
+  if (s.includes('medell') || s.includes('med')) return '🇨🇴';
+  if (s.includes('mex') || s.includes('cdmx')) return '🇲🇽';
+  return '🌐';
 };
 
 export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = null, taskToEdit = null }) {
@@ -207,7 +207,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
     assignedToEmails: [],
     assignedRoles: [],
     assignedSede: currentUser?.sede || '',
-    priority: 'ðŸŸ¡ AMARILLO'
+    priority: '🟡 AMARILLO'
   });
 
   const [selectedAreaId, setSelectedAreaId] = useState('todas');
@@ -241,7 +241,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
           deadlineTime: dTime,
           assignedToEmails: taskToEdit.assignedToEmails || (taskToEdit.assignedToEmail ? [taskToEdit.assignedToEmail] : []),
           assignedSede: taskToEdit.assignedSede || taskToEdit.sede || '',
-          priority: taskToEdit.priority || 'ðŸŸ¡ AMARILLO'
+          priority: taskToEdit.priority || '🟡 AMARILLO'
         });
       } else if (prefilledUser) {
         setNewTask({
@@ -252,7 +252,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
           deadlineTime: '18:00',
           assignedToEmails: prefilledUser.email ? [prefilledUser.email] : [],
           assignedSede: prefilledUser.sede || currentUser?.sede || '',
-          priority: 'ðŸŸ¡ AMARILLO'
+          priority: '🟡 AMARILLO'
         });
       } else {
         setNewTask(prev => ({
@@ -278,7 +278,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
 
   const isSearching = searchQuery.trim().length > 0;
 
-  // Filtrado de usuarios segÃºn Ã¡rea, sede y buscador de texto
+  // Filtrado de usuarios según área, sede y buscador de texto
   const activeArea = OPERATIONAL_AREAS.find(a => a.id === selectedAreaId) || OPERATIONAL_AREAS[0];
 
   const visibleUsers = activeUsersList.filter(u => {
@@ -407,7 +407,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
     
     const assignedEmails = canAssignSpecific ? (newTask.assignedToEmails?.length > 0 ? newTask.assignedToEmails : [currentUser?.email]) : (prefilledUser?.email ? [prefilledUser.email] : [currentUser?.email]);
 
-    // Obtener sedes y roles automÃ¡ticos a partir de los colaboradores seleccionados:
+    // Obtener sedes y roles automáticos a partir de los colaboradores seleccionados:
     const assignedUsers = assignedEmails.map(email => usersData.find(usr => usr.email?.toLowerCase() === email.toLowerCase())).filter(Boolean);
     const assignedRolesList = [...new Set(assignedUsers.map(u => normalizeRole(u.role)).filter(Boolean))];
     const assignedSedesList = [...new Set(assignedUsers.map(u => normalizeSede(u.sede)).filter(Boolean))];
@@ -444,7 +444,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
       role: computedRole,
       deadline: deadlineISO,
       priority: newTask.priority,
-      isCritical: newTask.priority === 'ðŸ”´ ROJO',
+      isCritical: newTask.priority === '🔴 ROJO',
       isOptional: isOptional,
       periodicity: periodicity,
       createdBy: currentUser.email,
@@ -531,7 +531,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
         assignedToEmails: [],
         assignedRoles: [],
         assignedSede: currentUser?.sede || '',
-        priority: 'ðŸŸ¡ AMARILLO'
+        priority: '🟡 AMARILLO'
       });
     }
     setIsSubmitting(false);
@@ -623,7 +623,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                       : 'var(--crear-gold)',
                   border: `1px solid ${modalViewMode === 'lite' ? '#22c55e' : modalViewMode === 'compact' ? '#38bdf8' : 'var(--crear-gold)'}`
                 }}>
-                  {modalViewMode === 'lite' ? 'âš¡ Lite' : modalViewMode === 'compact' ? 'ðŸ”² Compacto' : 'ðŸŽ›ï¸ Pro'}
+                  {modalViewMode === 'lite' ? '⚡ Lite' : modalViewMode === 'compact' ? '🔲 Compacto' : '🎛️ Pro'}
                 </span>
               </div>
               <p style={{ margin: 0, fontSize: '0.7rem', color: 'var(--text-muted)' }}>
@@ -631,7 +631,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                   ? 'Vista ultra limpia y directa: solo lo esencial sin sobrecarga' 
                   : modalViewMode === 'compact'
                     ? 'Vista equilibrada con densidad optimizada'
-                    : 'AsignaciÃ³n institucional avanzada con control multi-Ã¡rea'}
+                    : 'Asignación institucional avanzada con control multi-área'}
               </p>
             </div>
           </div>
@@ -666,7 +666,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                   background: modalViewMode === 'lite' ? 'linear-gradient(135deg, #22c55e, #16a34a)' : 'transparent',
                   color: modalViewMode === 'lite' ? '#ffffff' : 'var(--text-muted)'
                 }}
-                title="Modo Lite: Vista ultra limpia, rÃ¡pida y sin saturaciÃ³n"
+                title="Modo Lite: Vista ultra limpia, rápida y sin saturación"
               >
                 <Zap size={13} />
                 <span>Lite</span>
@@ -712,7 +712,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                   background: modalViewMode === 'pro' ? 'linear-gradient(135deg, #f59e0b, #d97706)' : 'transparent',
                   color: modalViewMode === 'pro' ? '#ffffff' : 'var(--text-muted)'
                 }}
-                title="Modo Pro: Todas las herramientas multi-Ã¡rea y opciones avanzadas"
+                title="Modo Pro: Todas las herramientas multi-área y opciones avanzadas"
               >
                 <Sliders size={13} />
                 <span>Pro</span>
@@ -757,7 +757,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
             overflow: 'hidden' 
           }}
         >
-          {/* CUERPO SCROLLEABLE SEGÃšN EL MODO ACTIVO */}
+          {/* CUERPO SCROLLEABLE SEGÚN EL MODO ACTIVO */}
           <div style={{
             flex: 1,
             overflowY: 'auto',
@@ -770,18 +770,18 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
           }}>
 
             {/* -------------------------------------------------------------
-                CASO 1: MODO LITE (ULTRA-LIMPIO, RÃPIDO, SIN SATURACIÃ“N)
+                CASO 1: MODO LITE (ULTRA-LIMPIO, RÁPIDO, SIN SATURACIÓN)
                 ------------------------------------------------------------- */}
             {modalViewMode === 'lite' && (
               <>
-                {/* 1. TÃTULO DE LA TAREA */}
+                {/* 1. TÍTULO DE LA TAREA */}
                 <div>
                   <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--crear-gold)', marginBottom: '0.35rem', fontWeight: 700 }}>
-                    ðŸ“Œ TÃ­tulo de la Tarea:
+                    📌 Título de la Tarea:
                   </label>
                   <input 
                     type="text" 
-                    placeholder="TÃ­tulo de la tarea (Ej. Revisar mÃ©tricas, Auditar sala...)" 
+                    placeholder="Título de la tarea (Ej. Revisar métricas, Auditar sala...)" 
                     value={newTask.title} 
                     onChange={e => setNewTask({...newTask, title: e.target.value})} 
                     className="input-field" 
@@ -791,8 +791,8 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                     autoFocus
                   />
                   <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap', alignItems: 'center' }}>
-                    <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>âš¡ RÃ¡pidas:</span>
-                    {['Llamar a seguimiento', 'Revisar mÃ©tricas', 'Auditar salÃ³n', 'Feedback de Staff', 'Verificar asistencia'].map(qt => (
+                    <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>⚡ Rápidas:</span>
+                    {['Llamar a seguimiento', 'Revisar métricas', 'Auditar salón', 'Feedback de Staff', 'Verificar asistencia'].map(qt => (
                       <button
                         key={qt}
                         type="button"
@@ -813,7 +813,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                   </div>
                 </div>
 
-                {/* 2. RESPONSABLE / ASIGNACIÃ“N SIMPLE */}
+                {/* 2. RESPONSABLE / ASIGNACIÓN SIMPLE */}
                 <div style={{
                   background: 'rgba(255, 215, 0, 0.03)',
                   border: '1px solid rgba(255, 215, 0, 0.22)',
@@ -823,7 +823,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.45rem', flexWrap: 'wrap', gap: '0.4rem' }}>
                     <label style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--crear-gold)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                       <UserCheck size={16} />
-                      <span>ðŸ‘¤ Responsable de la Tarea:</span>
+                      <span>👤 Responsable de la Tarea:</span>
                     </label>
                     <button
                       type="button"
@@ -843,11 +843,11 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                         transition: 'all 0.2s'
                       }}
                     >
-                      {isAssignedOnlyToMe ? 'âœ“ Asignado a mÃ­' : 'ðŸ™‹â€â™‚ï¸ Asignarme a mÃ­'}
+                      {isAssignedOnlyToMe ? '✓ Asignado a mí' : '🙋‍♂️ Asignarme a mí'}
                     </button>
                   </div>
 
-                  {/* Combobox flotante de bÃºsqueda */}
+                  {/* Combobox flotante de búsqueda */}
                   <div ref={liteDropdownRef} style={{ position: 'relative', marginBottom: '0.45rem' }}>
                     <div style={{ position: 'relative' }}>
                       <Search size={14} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
@@ -884,12 +884,12 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                           }}
                           title="Limpiar"
                         >
-                          âœ•
+                          ✕
                         </button>
                       )}
                     </div>
 
-                    {/* MenÃº de resultados */}
+                    {/* Menú de resultados */}
                     {isLiteDropdownOpen && (
                       <div style={{
                         position: 'absolute',
@@ -933,11 +933,11 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                             >
                               <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', minWidth: 0 }}>
                                 <span style={{ fontWeight: isSelected ? 700 : 500 }}>{u.name}</span>
-                                <span style={{ fontSize: '0.66rem', color: 'var(--text-muted)' }}>â€¢ {roleDisplay}</span>
+                                <span style={{ fontSize: '0.66rem', color: 'var(--text-muted)' }}>• {roleDisplay}</span>
                                 <span style={{ fontSize: '0.66rem', color: 'var(--text-muted)' }}>({flag} {sedeDisplay})</span>
                               </div>
                               <span style={{ fontSize: '0.7rem', color: isSelected ? 'var(--crear-gold)' : 'var(--crear-cyan)', fontWeight: 700, flexShrink: 0 }}>
-                                {isSelected ? 'âœ“ Asignado' : '+ Asignar'}
+                                {isSelected ? '✓ Asignado' : '+ Asignar'}
                               </span>
                             </div>
                           );
@@ -954,7 +954,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                   {/* Chips de Asignados */}
                   {(!newTask.assignedToEmails || newTask.assignedToEmails.length === 0) ? (
                     <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontStyle: 'italic', padding: '0.1rem 0' }}>
-                      ðŸ’¡ Sin colaboradores especÃ­ficos: la tarea se asignarÃ¡ a tu usuario automÃ¡ticamente.
+                      💡 Sin colaboradores específicos: la tarea se asignará a tu usuario automáticamente.
                     </div>
                   ) : (
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem', paddingTop: '2px' }}>
@@ -978,8 +978,8 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                               color: '#ffffff'
                             }}
                           >
-                            <span style={{ color: 'var(--crear-gold)', fontWeight: 700 }}>ðŸ‘¤ {u?.name || email}</span>
-                            {roleLabel && <span style={{ color: 'var(--crear-cyan)', fontSize: '0.66rem' }}>â€¢ {roleLabel}</span>}
+                            <span style={{ color: 'var(--crear-gold)', fontWeight: 700 }}>👤 {u?.name || email}</span>
+                            {roleLabel && <span style={{ color: 'var(--crear-cyan)', fontSize: '0.66rem' }}>• {roleLabel}</span>}
                             {sedeLabel && <span style={{ color: 'var(--text-muted)', fontSize: '0.66rem' }}>({flag} {sedeLabel})</span>}
                             <button
                               type="button"
@@ -996,7 +996,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                               }}
                               title="Quitar"
                             >
-                              âœ•
+                              ✕
                             </button>
                           </span>
                         );
@@ -1005,11 +1005,11 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                   )}
                 </div>
 
-                {/* 3. FECHA LÃMITE Y PRIORIDAD EN 1 FILA */}
+                {/* 3. FECHA LÍMITE Y PRIORIDAD EN 1 FILA */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.8rem', alignItems: 'end' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--crear-gold)', marginBottom: '0.35rem', fontWeight: 700 }}>
-                      ðŸ“… Plazo / Fecha LÃ­mite:
+                      📅 Plazo / Fecha Límite:
                     </label>
                     <div style={{ display: 'flex', gap: '0.35rem', marginBottom: '0.35rem' }}>
                       <button
@@ -1027,7 +1027,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                           cursor: 'pointer'
                         }}
                       >
-                        âš¡ Hoy 18:00
+                        ⚡ Hoy 18:00
                       </button>
                       <button
                         type="button"
@@ -1044,7 +1044,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                           cursor: 'pointer'
                         }}
                       >
-                        ðŸŒ… MaÃ±ana 12:00
+                        🌅 Mañana 12:00
                       </button>
                     </div>
                     <div style={{ display: 'flex', gap: '0.4rem' }}>
@@ -1064,8 +1064,8 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                       style={{ width: '100%', fontSize: '0.8rem', padding: '0.42rem 0.6rem' }}
                       disabled={isSubmitting}
                     >
-                      <option value="ðŸŸ¡ AMARILLO">Normal (Amarillo)</option>
-                      <option value="ðŸ”´ ROJO">Urgente/CrÃ­tica (Rojo)</option>
+                      <option value="🟡 AMARILLO">Normal (Amarillo)</option>
+                      <option value="🔴 ROJO">Urgente/Crítica (Rojo)</option>
                     </select>
                   </div>
                 </div>
@@ -1073,11 +1073,11 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                 {/* 4. NOTAS */}
                 <div>
                   <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--crear-gold)', fontWeight: 700, marginBottom: '0.25rem' }}>
-                    ðŸ“ Instrucciones o Notas (Opcional):
+                    📝 Instrucciones o Notas (Opcional):
                   </label>
                   <textarea
                     rows={2}
-                    placeholder="Instrucciones especÃ­ficas para quien realice la tarea..."
+                    placeholder="Instrucciones específicas para quien realice la tarea..."
                     value={newTask.notes}
                     onChange={e => setNewTask({ ...newTask, notes: e.target.value })}
                     className="input-field"
@@ -1097,7 +1097,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                   />
                 </div>
 
-                {/* 5. ACORDEÃ“N DESPLEGABLE DE MÃS OPCIONES */}
+                {/* 5. ACORDEÓN DESPLEGABLE DE MÁS OPCIONES */}
                 <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '0.35rem' }}>
                   <button
                     type="button"
@@ -1114,22 +1114,22 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                       padding: '0.15rem 0'
                     }}
                   >
-                    <span>{showAdvancedLite ? 'â–²' : 'â–¼'}</span>
-                    <span>{showAdvancedLite ? 'Ocultar opciones avanzadas' : 'MÃ¡s opciones avanzadas (Sede, periodicidad)...'}</span>
+                    <span>{showAdvancedLite ? '▲' : '▼'}</span>
+                    <span>{showAdvancedLite ? 'Ocultar opciones avanzadas' : 'Más opciones avanzadas (Sede, periodicidad)...'}</span>
                   </button>
 
                   {showAdvancedLite && (
                     <div style={{ marginTop: '0.45rem', display: 'flex', flexDirection: 'column', gap: '0.55rem', padding: '0.6rem', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }}>
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '0.6rem' }}>
                         <div>
-                          <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>Sede EspecÃ­fica:</label>
+                          <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>Sede Específica:</label>
                           <select
                             value={newTask.assignedSede || ''}
                             onChange={e => setNewTask({...newTask, assignedSede: e.target.value})}
                             className="input-field"
                             style={{ width: '100%', fontSize: '0.76rem' }}
                           >
-                            <option value="">-- AutomÃ¡tica / Global --</option>
+                            <option value="">-- Automática / Global --</option>
                             {OPERATIONAL_SEDES.map(s => (
                               <option key={s} value={s}>{getSedeFlag(s)} {s}</option>
                             ))}
@@ -1167,7 +1167,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                             onChange={e => setPeriodicity(e.target.checked ? 'DIARIA' : 'UNICA')} 
                             style={{ accentColor: 'var(--crear-cyan)' }}
                           />
-                          <span>Tarea PeriÃ³dica / Recurrente</span>
+                          <span>Tarea Periódica / Recurrente</span>
                         </label>
                         {periodicity !== 'UNICA' && (
                           <select
@@ -1193,14 +1193,14 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                 ------------------------------------------------------------- */}
             {modalViewMode !== 'lite' && (
               <>
-                {/* 1. TÃTULO DE LA TAREA */}
+                {/* 1. TÍTULO DE LA TAREA */}
                 <div>
                   <label style={{ display: 'block', fontSize: '0.76rem', color: 'var(--crear-gold)', marginBottom: '0.35rem', fontWeight: 700 }}>
-                    ðŸ“Œ TÃ­tulo de la Tarea:
+                    📌 Título de la Tarea:
                   </label>
                   <input 
                     type="text" 
-                    placeholder="TÃ­tulo de la tarea (Ej. Revisar mÃ©tricas, Auditar sala...)" 
+                    placeholder="Título de la tarea (Ej. Revisar métricas, Auditar sala...)" 
                     value={newTask.title} 
                     onChange={e => setNewTask({...newTask, title: e.target.value})} 
                     className="input-field" 
@@ -1209,8 +1209,8 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                     disabled={isSubmitting}
                   />
                   <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', alignItems: 'center' }}>
-                    <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center' }}>âš¡ RÃ¡pidas:</span>
-                    {['Llamar a seguimiento', 'Revisar mÃ©tricas', 'Auditar salÃ³n', 'Feedback de Staff', 'Verificar asistencia'].map(qt => (
+                    <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center' }}>⚡ Rápidas:</span>
+                    {['Llamar a seguimiento', 'Revisar métricas', 'Auditar salón', 'Feedback de Staff', 'Verificar asistencia'].map(qt => (
                       <button
                         key={qt}
                         type="button"
@@ -1231,7 +1231,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                   </div>
                 </div>
 
-                {/* 2. ASIGNACIÃ“N RÃPIDA A VARIAS ÃREAS DE UNA SOLA VEZ */}
+                {/* 2. ASIGNACIÓN RÁPIDA A VARIAS ÁREAS DE UNA SOLA VEZ */}
                 <div style={{
                   background: 'rgba(255, 215, 0, 0.03)',
                   border: '1px solid rgba(255, 215, 0, 0.22)',
@@ -1239,7 +1239,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                   padding: modalViewMode === 'compact' ? '0.55rem 0.8rem' : '0.75rem 0.9rem'
                 }}>
                   <div style={{ fontSize: '0.76rem', fontWeight: 800, color: 'var(--crear-gold)', marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                    âš¡ Asignar a Varias Ãreas de una sola vez:
+                    ⚡ Asignar a Varias Áreas de una sola vez:
                   </div>
                   <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
                     {QUICK_ASSIGN_AREAS.map(area => {
@@ -1277,7 +1277,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                             transition: 'all 0.15s ease'
                           }}
                         >
-                          <span>{isAllSelected ? 'âœ“' : '+'}</span>
+                          <span>{isAllSelected ? '✓' : '+'}</span>
                           <span>{area.label}</span>
                           <span style={{
                             background: isAllSelected ? '#000000' : 'rgba(255,255,255,0.12)',
@@ -1304,7 +1304,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: (newTask.assignedToEmails?.length > 0 ? '0.45rem' : 0), flexWrap: 'wrap', gap: '0.5rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', fontSize: '0.8rem', fontWeight: 700, color: 'var(--crear-gold)' }}>
                       <UserCheck size={16} />
-                      <span>ðŸŽ¯ Colaboradores Asignados ({newTask.assignedToEmails?.length || 0}):</span>
+                      <span>🎯 Colaboradores Asignados ({newTask.assignedToEmails?.length || 0}):</span>
                     </div>
                     <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
                       <button
@@ -1324,7 +1324,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                           gap: '0.3rem'
                         }}
                       >
-                        {isAssignedOnlyToMe ? 'âœ“ Asignado a mÃ­' : 'ðŸ™‹â€â™‚ï¸ Asignarme a mÃ­'}
+                        {isAssignedOnlyToMe ? '✓ Asignado a mí' : '🙋‍♂️ Asignarme a mí'}
                       </button>
                       {newTask.assignedToEmails?.length > 0 && (
                         <button
@@ -1341,7 +1341,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                             fontWeight: 600
                           }}
                         >
-                          âœ• Limpiar selecciÃ³n
+                          ✕ Limpiar selección
                         </button>
                       )}
                     </div>
@@ -1349,7 +1349,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
 
                   {(!newTask.assignedToEmails || newTask.assignedToEmails.length === 0) ? (
                     <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontStyle: 'italic', padding: '0.2rem 0' }}>
-                      âš ï¸ No has seleccionado colaboradores especÃ­ficos. Si lo dejas vacÃ­o, la tarea se asignarÃ¡ a tu usuario.
+                      ⚠️ No has seleccionado colaboradores específicos. Si lo dejas vacío, la tarea se asignará a tu usuario.
                     </div>
                   ) : (
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem', maxHeight: modalViewMode === 'compact' ? '85px' : '110px', overflowY: 'auto', paddingTop: '2px' }}>
@@ -1373,8 +1373,8 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                               color: '#ffffff'
                             }}
                           >
-                            <span style={{ color: 'var(--crear-gold)', fontWeight: 700 }}>ðŸ‘¤ {u?.name || email}</span>
-                            {roleLabel && <span style={{ color: 'var(--crear-cyan)', fontSize: '0.66rem' }}>â€¢ {roleLabel}</span>}
+                            <span style={{ color: 'var(--crear-gold)', fontWeight: 700 }}>👤 {u?.name || email}</span>
+                            {roleLabel && <span style={{ color: 'var(--crear-cyan)', fontSize: '0.66rem' }}>• {roleLabel}</span>}
                             {sedeLabel && <span style={{ color: 'var(--text-muted)', fontSize: '0.66rem' }}>({flag} {sedeLabel})</span>}
                             <button
                               type="button"
@@ -1391,7 +1391,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                               }}
                               title="Quitar de la tarea"
                             >
-                              âœ•
+                              ✕
                             </button>
                           </span>
                         );
@@ -1400,7 +1400,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                   )}
                 </div>
 
-                {/* 4. SELECTOR INTERACTIVO POR ÃREAS, SEDES Y COLABORADORES */}
+                {/* 4. SELECTOR INTERACTIVO POR ÁREAS, SEDES Y COLABORADORES */}
                 <div style={{
                   background: 'rgba(255, 255, 255, 0.02)',
                   border: '1px solid rgba(255, 255, 255, 0.08)',
@@ -1413,16 +1413,16 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.4rem' }}>
                     <div style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--crear-gold)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                       <Search size={15} />
-                      <span>ðŸ” Buscador RÃ¡pido (escribe y haz clic para ir agregando):</span>
+                      <span>🔍 Buscador Rápido (escribe y haz clic para ir agregando):</span>
                     </div>
                     <div style={{ fontSize: '0.7rem', color: isSearching ? 'var(--crear-cyan)' : 'var(--text-muted)' }}>
                       {isSearching 
-                        ? `Encontrados: ${visibleUsers.length} en toda la organizaciÃ³n` 
+                        ? `Encontrados: ${visibleUsers.length} en toda la organización` 
                         : `Total disponibles: ${visibleUsers.length}`}
                     </div>
                   </div>
 
-                  {/* BARRA DE BÃšSQUEDA */}
+                  {/* BARRA DE BÚSQUEDA */}
                   <div style={{ position: 'relative' }}>
                     <Search size={15} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: isSearching ? 'var(--crear-gold)' : 'var(--text-muted)' }} />
                     <input
@@ -1452,14 +1452,14 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                           position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)',
                           background: 'rgba(255,255,255,0.15)', border: 'none', color: '#ffffff', borderRadius: '50%', width: '18px', height: '18px', cursor: 'pointer', fontSize: '0.7rem', display: 'flex', alignItems: 'center', justifyContent: 'center'
                         }}
-                        title="Limpiar bÃºsqueda"
+                        title="Limpiar búsqueda"
                       >
-                        âœ•
+                        ✕
                       </button>
                     )}
                   </div>
 
-                  {/* FILTROS POR ÃREAS Y SEDE */}
+                  {/* FILTROS POR ÁREAS Y SEDE */}
                   <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
                     <div style={{ display: 'flex', gap: '0.3rem', overflowX: 'auto', flex: 1, minWidth: '240px', paddingBottom: '2px' }}>
                       {OPERATIONAL_AREAS.map(area => {
@@ -1510,7 +1510,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                     </div>
 
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', flexShrink: 0 }}>
-                      <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>ðŸ“ Sede:</span>
+                      <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>📍 Sede:</span>
                       <select
                         value={selectedSedeFilter}
                         onChange={e => setSelectedSedeFilter(e.target.value)}
@@ -1525,10 +1525,10 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                     </div>
                   </div>
 
-                  {/* ACCIONES DE SELECCIÃ“N VISIBLE */}
+                  {/* ACCIONES DE SELECCIÓN VISIBLE */}
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.7rem', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '0.3rem' }}>
                     <span style={{ color: 'var(--text-muted)' }}>
-                      {isSearching ? `ðŸ” BÃºsqueda: "${searchQuery}"` : activeArea.label} {selectedSedeFilter ? `â€¢ Sede ${selectedSedeFilter}` : ''}
+                      {isSearching ? `🔍 Búsqueda: "${searchQuery}"` : activeArea.label} {selectedSedeFilter ? `• Sede ${selectedSedeFilter}` : ''}
                     </span>
                     <div style={{ display: 'flex', gap: '0.4rem' }}>
                       <button
@@ -1668,7 +1668,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                                 <span style={{ color: isSelected ? 'var(--crear-cyan)' : 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                   {roleDisplay}
                                 </span>
-                                <span>â€¢</span>
+                                <span>•</span>
                                 <span style={{ whiteSpace: 'nowrap' }}>{flag} {sedeDisplay}</span>
                               </div>
                             </div>
@@ -1679,7 +1679,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                   </div>
                 </div>
 
-                {/* 5. PRIORIDAD, ROL Y SEDE ESPECÃFICA */}
+                {/* 5. PRIORIDAD, ROL Y SEDE ESPECÍFICA */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.7rem' }}>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.74rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Prioridad:</label>
@@ -1690,8 +1690,8 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                       style={{ width: '100%', fontSize: '0.8rem' }}
                       disabled={isSubmitting}
                     >
-                      <option value="ðŸŸ¡ AMARILLO">Normal (Amarillo)</option>
-                      <option value="ðŸ”´ ROJO">Urgente/CrÃ­tica (Rojo)</option>
+                      <option value="🟡 AMARILLO">Normal (Amarillo)</option>
+                      <option value="🔴 ROJO">Urgente/Crítica (Rojo)</option>
                     </select>
                   </div>
 
@@ -1711,7 +1711,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                   </div>
 
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.74rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Sede EspecÃ­fica:</label>
+                    <label style={{ display: 'block', fontSize: '0.74rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>Sede Específica:</label>
                     <select
                       value={newTask.assignedSede || ''}
                       onChange={e => setNewTask({...newTask, assignedSede: e.target.value})}
@@ -1719,7 +1719,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                       style={{ width: '100%', fontSize: '0.8rem' }}
                       disabled={isSubmitting}
                     >
-                      <option value="">-- Detectar AutomÃ¡tica / Global --</option>
+                      <option value="">-- Detectar Automática / Global --</option>
                       {OPERATIONAL_SEDES.map(s => (
                         <option key={s} value={s}>{getSedeFlag(s)} {s}</option>
                       ))}
@@ -1727,10 +1727,10 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                   </div>
                 </div>
 
-                {/* 6. PLAZO / FECHA LÃMITE RÃPIDA */}
+                {/* 6. PLAZO / FECHA LÍMITE RÁPIDA */}
                 <div>
                   <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--crear-gold)', marginBottom: '0.35rem', fontWeight: 700 }}>
-                    ðŸ“… Plazo / Fecha LÃ­mite RÃ¡pida:
+                    📅 Plazo / Fecha Límite Rápida:
                   </label>
                   <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', marginBottom: '0.45rem' }}>
                     <button
@@ -1747,7 +1747,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                         cursor: 'pointer'
                       }}
                     >
-                      âš¡ Hoy (18:00)
+                      ⚡ Hoy (18:00)
                     </button>
                     <button
                       type="button"
@@ -1763,7 +1763,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                         cursor: 'pointer'
                       }}
                     >
-                      ðŸŒ… MaÃ±ana (12:00)
+                      🌅 Mañana (12:00)
                     </button>
                     <button
                       type="button"
@@ -1779,7 +1779,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                         cursor: 'pointer'
                       }}
                     >
-                      ðŸ—“ï¸ En 3 dÃ­as
+                      🗓️ En 3 días
                     </button>
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '0.6rem' }}>
@@ -1796,15 +1796,15 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
                     <label style={{ fontSize: '0.76rem', color: 'var(--crear-gold)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                      ðŸ“ Notas / Instrucciones de la Tarea:
+                      📝 Notas / Instrucciones de la Tarea:
                     </label>
                     <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
-                      Opcional â€¢ Se notificarÃ¡ al colaborador
+                      Opcional • Se notificará al colaborador
                     </span>
                   </div>
                   <textarea
                     rows={2}
-                    placeholder="Escribe aquÃ­ las instrucciones especÃ­ficas, acuerdos, contexto o detalles..."
+                    placeholder="Escribe aquí las instrucciones específicas, acuerdos, contexto o detalles..."
                     value={newTask.notes}
                     onChange={e => setNewTask({ ...newTask, notes: e.target.value })}
                     className="input-field"
@@ -1823,13 +1823,13 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                     }}
                     disabled={isSubmitting}
                   />
-                  {/* Sugerencias RÃ¡pidas para Notas */}
+                  {/* Sugerencias Rápidas para Notas */}
                   <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap', marginTop: '0.35rem' }}>
                     {[
-                      'âš¡ Prioritario para este ciclo',
-                      'ðŸ“ž Coordinar llamada con el equipo',
-                      'ðŸ“Ž Adjuntar comprobante / link de Drive',
-                      'âš ï¸ Validar antes de cierre operativo'
+                      '⚡ Prioritario para este ciclo',
+                      '📞 Coordinar llamada con el equipo',
+                      '📎 Adjuntar comprobante / link de Drive',
+                      '⚠️ Validar antes de cierre operativo'
                     ].map((chip) => (
                       <button
                         key={chip}
@@ -1838,7 +1838,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                           setNewTask(prev => {
                             const current = (prev.notes || '').trim();
                             const addition = chip.replace(/^[^\w\s]+/, '').trim();
-                            const newText = current ? `${current}\nâ€¢ ${addition}` : `â€¢ ${addition}`;
+                            const newText = current ? `${current}\n• ${addition}` : `• ${addition}`;
                             return { ...prev, notes: newText };
                           });
                         }}
@@ -1860,7 +1860,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                   </div>
                 </div>
 
-                {/* 8. OPCIONES ADICIONALES: OPCIONALES Y PERIÃ“DICAS */}
+                {/* 8. OPCIONES ADICIONALES: OPCIONALES Y PERIÓDICAS */}
                 <div style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap', padding: '0.6rem 0.8rem', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)', alignItems: 'center' }}>
                   <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.74rem', color: 'var(--text-heading)', cursor: 'pointer' }}>
                     <input 
@@ -1869,7 +1869,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                       onChange={e => setIsOptional(e.target.checked)} 
                       style={{ accentColor: 'var(--crear-gold)' }}
                     />
-                    <span>âœ¨ Tarea Opcional (No bloqueante)</span>
+                    <span>✨ Tarea Opcional (No bloqueante)</span>
                   </label>
                   
                   <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.74rem', color: 'var(--text-heading)', cursor: 'pointer' }}>
@@ -1879,7 +1879,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                       onChange={e => setPeriodicity(e.target.checked ? 'DIARIA' : 'UNICA')} 
                       style={{ accentColor: 'var(--crear-cyan)' }}
                     />
-                    <span>ðŸ”„ Tarea PeriÃ³dica / Recurrente</span>
+                    <span>🔄 Tarea Periódica / Recurrente</span>
                   </label>
 
                   {periodicity !== 'UNICA' && (
@@ -1915,7 +1915,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
             flexShrink: 0,
             zIndex: 10
           }}>
-            {/* RESUMEN DINÃMICO */}
+            {/* RESUMEN DINÁMICO */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.76rem' }}>
               <span style={{ 
                 color: 'var(--crear-gold)', 
@@ -1925,20 +1925,20 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                 borderRadius: '6px',
                 border: '1px solid rgba(255, 215, 0, 0.25)'
               }}>
-                ðŸŽ¯ {newTask.assignedToEmails?.length || 0} asignado(s)
+                🎯 {newTask.assignedToEmails?.length || 0} asignado(s)
               </span>
               <span style={{ 
-                color: newTask.priority === 'ðŸ”´ ROJO' ? '#ef4444' : '#f59e0b', 
+                color: newTask.priority === '🔴 ROJO' ? '#ef4444' : '#f59e0b', 
                 fontWeight: 600,
-                background: newTask.priority === 'ðŸ”´ ROJO' ? 'rgba(239, 68, 68, 0.12)' : 'rgba(245, 158, 11, 0.12)',
+                background: newTask.priority === '🔴 ROJO' ? 'rgba(239, 68, 68, 0.12)' : 'rgba(245, 158, 11, 0.12)',
                 padding: '3px 8px',
                 borderRadius: '6px'
               }}>
-                {newTask.priority || 'ðŸŸ¡ AMARILLO'}
+                {newTask.priority || '🟡 AMARILLO'}
               </span>
             </div>
 
-            {/* BOTONES DE ACCIÃ“N */}
+            {/* BOTONES DE ACCIÓN */}
             <div style={{ display: 'flex', gap: '0.65rem', alignItems: 'center' }}>
               <button 
                 type="button" 
@@ -1964,7 +1964,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                   cursor: isSubmitting ? 'not-allowed' : 'pointer'
                 }}
               >
-                {isSubmitting ? 'Guardando...' : (taskToEdit ? 'ðŸ’¾ Guardar Cambios' : 'âš¡ Guardar Tarea')}
+                {isSubmitting ? 'Guardando...' : (taskToEdit ? '💾 Guardar Cambios' : '⚡ Guardar Tarea')}
               </button>
             </div>
           </div>

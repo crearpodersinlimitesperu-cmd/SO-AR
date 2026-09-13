@@ -845,27 +845,27 @@ export function ChecklistProvider({ children }) {
         created_at: new Date().toISOString()
       });
 
-      // 3. NotificaciÃ³n por Correo Institucional Causa OS (VÃ­a Firebase Trigger Email / Mailer Daemon)
+      // 3. Notificación por Correo Institucional Causa OS (Vía Firebase Trigger Email / Mailer Daemon)
       const mailRef = doc(collection(db, 'mail'));
-      const collaboratorName = targetUser.name || 'LÃ­der';
-      const inviterLabel = currentUser.displayName || currentUser.email || 'CompaÃ±ero';
-      const inviteTaskTitle = task.task || task.title || 'Compromiso sin tÃ­tulo';
+      const collaboratorName = targetUser.name || 'Líder';
+      const inviterLabel = currentUser.displayName || currentUser.email || 'Compañero';
+      const inviteTaskTitle = task.task || task.title || 'Compromiso sin título';
       batch.set(mailRef, {
         to: [targetUser.email],
         message: {
-          subject: `ðŸ¤ Causa OS | InvitaciÃ³n de ColaboraciÃ³n â€” ${inviteTaskTitle}`,
+          subject: `🤝 Causa OS | Invitación de Colaboración — ${inviteTaskTitle}`,
           html: `
             <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1e293b; max-width: 620px; margin: 0 auto; border: 1px solid #cbd5e1; border-radius: 12px; overflow: hidden; background-color: #ffffff; box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);">
               <!-- Cabecera Institucional Premium Causa OS -->
               <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 26px 24px; text-align: center; border-bottom: 3px solid #f59e0b;">
                 <span style="display: inline-block; font-size: 11px; letter-spacing: 2.5px; text-transform: uppercase; color: #fbbf24; font-weight: 700; margin-bottom: 6px;">
-                  CREAR PODER SIN LÃMITES Â· TRANSFORMACIÃ“N GLOBAL
+                  CREAR PODER SIN LÍMITES · TRANSFORMACIÓN GLOBAL
                 </span>
                 <h1 style="margin: 0; font-size: 22px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px;">
-                  ðŸ¤ INVITACIÃ“N A COLABORAR
+                  🤝 INVITACIÓN A COLABORAR
                 </h1>
                 <p style="margin: 6px 0 0 0; font-size: 13px; color: #94a3b8; font-weight: 500;">
-                  Sistema Operativo Causa OS Â· Sinergia y Compromiso de Equipo
+                  Sistema Operativo Causa OS · Sinergia y Compromiso de Equipo
                 </p>
               </div>
 
@@ -875,7 +875,7 @@ export function ChecklistProvider({ children }) {
                 </p>
 
                 <p style="font-size: 14px; color: #334155; line-height: 1.6; margin-bottom: 18px;">
-                  <strong>${inviterLabel}</strong> te ha extendido una invitaciÃ³n formal para sumar tu visiÃ³n y colaborar en el cumplimiento del siguiente compromiso:
+                  <strong>${inviterLabel}</strong> te ha extendido una invitación formal para sumar tu visión y colaborar en el cumplimiento del siguiente compromiso:
                 </p>
 
                 <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 18px 20px; margin-bottom: 22px;">
@@ -884,7 +884,7 @@ export function ChecklistProvider({ children }) {
 
                   ${message ? `
                   <div style="background-color: #0f172a; color: #f8fafc; border-left: 4px solid #f59e0b; padding: 12px 14px; margin-top: 14px; border-radius: 6px;">
-                    <strong style="color: #fbbf24; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px;">ðŸ’¬ Mensaje de ${inviterLabel}:</strong>
+                    <strong style="color: #fbbf24; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px;">💬 Mensaje de ${inviterLabel}:</strong>
                     <span style="font-size: 13px; line-height: 1.5; color: #f1f5f9; white-space: pre-wrap;">"${message}"</span>
                   </div>
                   ` : ''}
@@ -892,20 +892,20 @@ export function ChecklistProvider({ children }) {
 
                 <div style="text-align: center; margin: 26px 0 28px 0;">
                   <a href="https://centro-operativo-cpsl.web.app/checklist" style="background-color: #2563eb; color: #ffffff; padding: 14px 34px; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 15px; display: inline-block; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35); letter-spacing: 0.3px;">
-                    ðŸš€ Responder InvitaciÃ³n en Causa OS
+                    🚀 Responder Invitación en Causa OS
                   </a>
                 </div>
 
                 <p style="font-size: 13px; color: #334155; margin: 20px 0 0 0; line-height: 1.5;">
                   Tu liderazgo multiplica la capacidad de respuesta de todo el equipo.<br/>
-                  <strong>Equipo de DirecciÃ³n y CoordinaciÃ³n Operativa</strong><br/>
-                  <span style="font-size: 12px; color: #64748b;">CREAR Poder Sin LÃ­mites</span>
+                  <strong>Equipo de Dirección y Coordinación Operativa</strong><br/>
+                  <span style="font-size: 12px; color: #64748b;">CREAR Poder Sin Límites</span>
                 </p>
               </div>
 
               <div style="background-color: #f8fafc; border-top: 1px solid #e2e8f0; padding: 14px 20px; text-align: center; font-size: 11.5px; color: #64748b; line-height: 1.5;">
                 <em>"Vivir en Causa es ser la fuente incondicional de los resultados."</em><br/>
-                CREAR Poder Sin LÃ­mites Â· Causa OS Â· TransformaciÃ³n Global
+                CREAR Poder Sin Límites · Causa OS · Transformación Global
               </div>
             </div>
           `
