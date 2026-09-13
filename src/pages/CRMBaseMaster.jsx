@@ -11,6 +11,8 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-hot-toast';
 import { canViewCRMMaestro } from '../config/permissions';
+import { useTheme } from '../context/ThemeContext';
+import ThemeSelector from '../components/ThemeSelector';
 import { 
   crmGenealogyAgent, 
   SEDES_CATALOG, 
@@ -26,6 +28,9 @@ export default function CRMBaseMaster() {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
   const hasAccess = canViewCRMMaestro(currentUser);
+  const { activeTheme } = useTheme();
+  const isLight = activeTheme === 'light';
+  const isZen = activeTheme === 'zen';
 
   const [data, setData] = useState([]);
   const [nodusData, setNodusData] = useState(null);
@@ -205,20 +210,38 @@ export default function CRMBaseMaster() {
     }
   };
 
-  const bgPage = '#0d152d';
-  const bgCard = 'rgba(255,255,255,0.03)';
-  const bgCardHeader = 'rgba(255,255,255,0.02)';
-  const bgInput = 'rgba(0,0,0,0.25)';
-  const borderSubtle = 'rgba(255,255,255,0.08)';
-  const gold = 'var(--crear-gold, #f59e0b)';
-  const textMain = '#f1f5f9';
-  const textMuted = '#94a3b8';
+  const bgPage = isLight ? '#f1f5f9' : (isZen ? '#061a14' : '#0A192F');
+  const bgCard = isLight ? '#ffffff' : (isZen ? '#0c2720' : 'rgba(255,255,255,0.03)');
+  const bgCardHeader = isLight ? '#ffffff' : (isZen ? '#0a221c' : 'rgba(255,255,255,0.02)');
+  const bgInput = isLight ? '#ffffff' : (isZen ? '#08201a' : 'rgba(0,0,0,0.25)');
+  const borderSubtle = isLight ? '#cbd5e1' : (isZen ? 'rgba(52, 211, 153, 0.25)' : 'rgba(255,255,255,0.08)');
+  const borderCard = isLight ? '#e2e8f0' : (isZen ? 'rgba(52, 211, 153, 0.2)' : 'rgba(255, 255, 255, 0.08)');
+  const gold = isLight ? '#d97706' : (isZen ? '#34d399' : '#fbbf24');
+  const textMain = isLight ? '#0f172a' : (isZen ? '#ecfdf5' : '#f1f5f9');
+  const textMuted = isLight ? '#64748b' : (isZen ? '#6ee7b7' : '#94a3b8');
+  const cardShadow = isLight ? '0 4px 14px rgba(0,0,0,0.05)' : '0 10px 30px rgba(0,0,0,0.3)';
 
   const STATUS_STYLES = {
-    SENTADO: { bg: 'rgba(16,185,129,0.15)', color: '#34d399', Icon: CheckCircle },
-    DESERTOR: { bg: 'rgba(244,63,94,0.15)', color: '#fb7185', Icon: XCircle },
-    REZAGADO: { bg: 'rgba(245,158,11,0.15)', color: '#fbbf24', Icon: Clock },
-    PENDIENTE: { bg: 'rgba(148,163,184,0.15)', color: '#94a3b8', Icon: Clock }
+    SENTADO: { 
+      bg: isLight ? '#dcfce7' : 'rgba(16,185,129,0.15)', 
+      color: isLight ? '#047857' : '#34d399', 
+      Icon: CheckCircle 
+    },
+    DESERTOR: { 
+      bg: isLight ? '#ffe4e6' : 'rgba(244,63,94,0.15)', 
+      color: isLight ? '#be123c' : '#fb7185', 
+      Icon: XCircle 
+    },
+    REZAGADO: { 
+      bg: isLight ? '#fef3c7' : 'rgba(245,158,11,0.15)', 
+      color: isLight ? '#b45309' : '#fbbf24', 
+      Icon: Clock 
+    },
+    PENDIENTE: { 
+      bg: isLight ? '#f1f5f9' : 'rgba(148,163,184,0.15)', 
+      color: isLight ? '#475569' : '#94a3b8', 
+      Icon: Clock 
+    }
   };
 
   const getStatusBadge = (statusStr) => {
@@ -241,7 +264,18 @@ export default function CRMBaseMaster() {
     const s = normalizeSedeName(sedeName);
     const cat = SEDES_CATALOG.find(x => x.key === s) || { flag: '📍', label: s };
     return (
-      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', background: 'rgba(255,255,255,0.06)', border: `1px solid ${borderSubtle}`, padding: '0.15rem 0.5rem', borderRadius: '8px', fontSize: '0.7rem', color: textMain }}>
+      <span style={{ 
+        display: 'inline-flex', 
+        alignItems: 'center', 
+        gap: '0.3rem', 
+        background: isLight ? '#f1f5f9' : 'rgba(255,255,255,0.06)', 
+        border: `1px solid ${borderSubtle}`, 
+        padding: '0.15rem 0.5rem', 
+        borderRadius: '8px', 
+        fontSize: '0.7rem', 
+        color: textMain,
+        fontWeight: 600
+      }}>
         <span>{cat.flag}</span>
         <span>{cat.label}</span>
       </span>
@@ -495,14 +529,14 @@ export default function CRMBaseMaster() {
     <div style={{ minHeight: '100vh', background: bgPage, fontFamily: 'Inter, system-ui, sans-serif' }}>
       
       {/* HEADER COHERENTE */}
-      <header style={{ background: bgCardHeader, borderBottom: `1px solid ${borderSubtle}`, padding: '1.2rem 2rem', position: 'sticky', top: 0, zIndex: 100, backdropFilter: 'blur(10px)' }}>
+      <header style={{ background: bgCardHeader, borderBottom: `1px solid ${borderSubtle}`, padding: '1rem 2rem', position: 'sticky', top: 0, zIndex: 100, backdropFilter: 'blur(10px)', boxShadow: isLight ? '0 2px 10px rgba(0,0,0,0.03)' : 'none' }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem' }}>
-            <button onClick={() => navigate('/')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 1rem', background: bgCard, border: `1px solid ${borderSubtle}`, color: textMain, borderRadius: '8px', cursor: 'pointer' }}>
+            <button onClick={() => navigate('/')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 1rem', background: bgCard, border: `1px solid ${borderSubtle}`, color: textMain, borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}>
               <ArrowLeft size={16} /> Volver a Causa OS
             </button>
             <div>
-              <h1 style={{ margin: 0, fontSize: '1.35rem', color: gold, display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <h1 style={{ margin: 0, fontSize: '1.35rem', color: gold, display: 'flex', alignItems: 'center', gap: '0.6rem', fontWeight: 800 }}>
                 <Users size={24} /> Red Genealógica de Enrolamiento (CRM Multi-Sede)
               </h1>
               <p style={{ margin: 0, fontSize: '0.85rem', color: textMuted }}>
@@ -511,11 +545,24 @@ export default function CRMBaseMaster() {
             </div>
           </div>
           
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap' }}>
+            <ThemeSelector compact />
+
             <button 
               onClick={handleRunLiveAudit}
               disabled={runningAgentAudit}
-              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(139, 92, 246, 0.2)', border: '1px solid #8b5cf6', color: '#c4b5fd', padding: '0.6rem 1.2rem', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
+              style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '0.5rem', 
+                background: isLight ? '#ede9fe' : 'rgba(139, 92, 246, 0.2)', 
+                border: '1px solid #8b5cf6', 
+                color: isLight ? '#6d28d9' : '#c4b5fd', 
+                padding: '0.6rem 1.2rem', 
+                borderRadius: '8px', 
+                fontWeight: 'bold', 
+                cursor: 'pointer' 
+              }}
             >
               <Bot size={16} className={runningAgentAudit ? "animate-spin" : ""} />
               {runningAgentAudit ? "Auditoría en Curso..." : "Auditoría Nodus en Vivo"}
@@ -531,13 +578,13 @@ export default function CRMBaseMaster() {
       <main style={{ maxWidth: '1400px', margin: '1.5rem auto 3rem', padding: '0 2rem' }}>
         
         {/* SELECTOR INTERACTIVO DE SEDES (MULTISEDE COMPLETA) */}
-        <div style={{ background: 'rgba(15, 23, 42, 0.65)', border: `1px solid ${borderSubtle}`, borderRadius: '14px', padding: '1rem 1.2rem', marginBottom: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+        <div style={{ background: isLight ? '#ffffff' : 'rgba(15, 23, 42, 0.65)', border: `1px solid ${borderCard}`, borderRadius: '14px', padding: '1rem 1.2rem', marginBottom: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.8rem', boxShadow: cardShadow }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', color: gold, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               <Building2 size={16} /> Filtrar Árbol Genealógico por Sede Operativa:
             </div>
             <div style={{ fontSize: '0.8rem', color: textMuted }}>
-              Sede Activa: <strong style={{ color: '#fff' }}>{selectedSedeObj.flag} {selectedSedeObj.label}</strong>
+              Sede Activa: <strong style={{ color: textMain }}>{selectedSedeObj.flag} {selectedSedeObj.label}</strong>
             </div>
           </div>
 
@@ -568,9 +615,9 @@ export default function CRMBaseMaster() {
                     padding: '0.55rem 1rem',
                     borderRadius: '10px',
                     border: isSelected ? `2px solid ${gold}` : `1px solid ${borderSubtle}`,
-                    background: isSelected ? 'rgba(245, 158, 11, 0.15)' : 'rgba(255, 255, 255, 0.02)',
-                    color: isSelected ? '#fbbf24' : textMain,
-                    fontWeight: isSelected ? 800 : 500,
+                    background: isSelected ? (isLight ? '#fef3c7' : 'rgba(245, 158, 11, 0.15)') : (isLight ? '#f8fafc' : 'rgba(255, 255, 255, 0.02)'),
+                    color: isSelected ? (isLight ? '#b45309' : '#fbbf24') : textMain,
+                    fontWeight: isSelected ? 800 : 600,
                     cursor: 'pointer',
                     whiteSpace: 'nowrap',
                     transition: 'all 0.2s ease',
@@ -583,8 +630,8 @@ export default function CRMBaseMaster() {
                     fontSize: '0.7rem', 
                     padding: '0.15rem 0.45rem', 
                     borderRadius: '10px', 
-                    background: isSelected ? 'rgba(245, 158, 11, 0.3)' : 'rgba(255,255,255,0.06)', 
-                    color: isSelected ? '#fff' : textMuted,
+                    background: isSelected ? (isLight ? '#fde68a' : 'rgba(245, 158, 11, 0.3)') : (isLight ? '#e2e8f0' : 'rgba(255,255,255,0.06)'), 
+                    color: isSelected ? (isLight ? '#92400e' : '#fff') : textMuted,
                     fontWeight: 'bold'
                   }}>
                     {countForSede}
@@ -597,8 +644,8 @@ export default function CRMBaseMaster() {
 
         {/* STATS GLOBALES Y COHERENCIA NODUS POR SEDE */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
-          <div style={{ background: bgCard, border: `1px solid ${borderSubtle}`, borderRadius: '12px', padding: '1.2rem' }}>
-            <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: '#3b82f6', fontWeight: 800, marginBottom: '0.3rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+          <div style={{ background: bgCard, border: `1px solid ${borderCard}`, borderRadius: '12px', padding: '1.2rem', boxShadow: cardShadow }}>
+            <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: isLight ? '#2563eb' : '#3b82f6', fontWeight: 800, marginBottom: '0.3rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
               <Database size={14} /> Sincronizados Nodus
             </div>
             <div style={{ fontSize: '2.2rem', fontWeight: 800, color: textMain }}>
@@ -609,20 +656,20 @@ export default function CRMBaseMaster() {
             </div>
           </div>
 
-          <div style={{ background: bgCard, border: `1px solid ${borderSubtle}`, borderRadius: '12px', padding: '1.2rem' }}>
-            <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: '#10b981', fontWeight: 800, marginBottom: '0.3rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+          <div style={{ background: bgCard, border: `1px solid ${borderCard}`, borderRadius: '12px', padding: '1.2rem', boxShadow: cardShadow }}>
+            <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: isLight ? '#047857' : '#10b981', fontWeight: 800, marginBottom: '0.3rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
               <CheckCircle size={14} /> Sentados en Sala
             </div>
             <div style={{ fontSize: '2.2rem', fontWeight: 800, color: textMain }}>
               {agentAnalysis.sentadosCount}
             </div>
-            <div style={{ fontSize: '0.75rem', color: '#34d399', marginTop: '0.2rem', fontWeight: 600 }}>
+            <div style={{ fontSize: '0.75rem', color: isLight ? '#047857' : '#34d399', marginTop: '0.2rem', fontWeight: 600 }}>
               {agentAnalysis.coherencePercentage}% de conversión efectiva
             </div>
           </div>
 
-          <div style={{ background: bgCard, border: `1px solid ${borderSubtle}`, borderRadius: '12px', padding: '1.2rem' }}>
-            <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: '#fbbf24', fontWeight: 800, marginBottom: '0.3rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+          <div style={{ background: bgCard, border: `1px solid ${borderCard}`, borderRadius: '12px', padding: '1.2rem', boxShadow: cardShadow }}>
+            <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: isLight ? '#b45309' : '#fbbf24', fontWeight: 800, marginBottom: '0.3rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
               <Clock size={14} /> Pendientes / En Proceso
             </div>
             <div style={{ fontSize: '2.2rem', fontWeight: 800, color: textMain }}>
@@ -633,11 +680,11 @@ export default function CRMBaseMaster() {
             </div>
           </div>
 
-          <div style={{ background: bgCard, border: `1px solid ${borderSubtle}`, borderRadius: '12px', padding: '1.2rem', cursor: 'pointer' }} onClick={() => setActiveTab('duplicates')}>
-            <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: agentAnalysis.totalDuplicatesCount > 0 ? '#f43f5e' : '#10b981', fontWeight: 800, marginBottom: '0.3rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+          <div style={{ background: bgCard, border: `1px solid ${borderCard}`, borderRadius: '12px', padding: '1.2rem', cursor: 'pointer', boxShadow: cardShadow }} onClick={() => setActiveTab('duplicates')}>
+            <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: agentAnalysis.totalDuplicatesCount > 0 ? (isLight ? '#be123c' : '#f43f5e') : (isLight ? '#047857' : '#10b981'), fontWeight: 800, marginBottom: '0.3rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
               <AlertTriangle size={14} /> Duplicados Detectados
             </div>
-            <div style={{ fontSize: '2.2rem', fontWeight: 800, color: agentAnalysis.totalDuplicatesCount > 0 ? '#fb7185' : '#34d399' }}>
+            <div style={{ fontSize: '2.2rem', fontWeight: 800, color: agentAnalysis.totalDuplicatesCount > 0 ? (isLight ? '#be123c' : '#fb7185') : (isLight ? '#047857' : '#34d399') }}>
               {agentAnalysis.totalDuplicatesCount}
             </div>
             <div style={{ fontSize: '0.75rem', color: textMuted, marginTop: '0.2rem' }}>
@@ -645,12 +692,12 @@ export default function CRMBaseMaster() {
             </div>
           </div>
 
-          <div style={{ background: bgCard, border: `1px solid ${borderSubtle}`, borderRadius: '12px', padding: '1.2rem', cursor: 'pointer' }} onClick={() => setActiveTab('agent')}>
+          <div style={{ background: bgCard, border: `1px solid ${borderCard}`, borderRadius: '12px', padding: '1.2rem', cursor: 'pointer', boxShadow: cardShadow }} onClick={() => setActiveTab('agent')}>
             <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: gold, fontWeight: 800, marginBottom: '0.3rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
               <Bot size={14} /> Salud del Árbol Nodus
             </div>
             <div style={{ fontSize: '2.2rem', fontWeight: 800, color: gold }}>99.8%</div>
-            <div style={{ fontSize: '0.75rem', color: '#10b981', marginTop: '0.2rem', fontWeight: 600 }}>
+            <div style={{ fontSize: '0.75rem', color: isLight ? '#047857' : '#10b981', marginTop: '0.2rem', fontWeight: 600 }}>
               Auditado por Agente Multi-Sede
             </div>
           </div>
@@ -661,7 +708,20 @@ export default function CRMBaseMaster() {
           <button 
             type="button" 
             onClick={() => { setActiveTab('tree'); setFilterDuplicatesOnly(false); }}
-            style={{ padding: '0.6rem 1.2rem', borderRadius: '8px', border: activeTab === 'tree' && !filterDuplicatesOnly ? `1px solid ${gold}` : `1px solid ${borderSubtle}`, background: activeTab === 'tree' && !filterDuplicatesOnly ? 'rgba(212, 175, 55, 0.15)' : bgCard, color: activeTab === 'tree' && !filterDuplicatesOnly ? gold : textMuted, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem' }}
+            style={{ 
+              padding: '0.6rem 1.2rem', 
+              borderRadius: '8px', 
+              border: activeTab === 'tree' && !filterDuplicatesOnly ? `1px solid ${gold}` : `1px solid ${borderSubtle}`, 
+              background: activeTab === 'tree' && !filterDuplicatesOnly ? (isLight ? '#fef3c7' : 'rgba(212, 175, 55, 0.15)') : bgCard, 
+              color: activeTab === 'tree' && !filterDuplicatesOnly ? (isLight ? '#92400e' : gold) : (isLight ? '#475569' : textMuted), 
+              fontWeight: 700, 
+              cursor: 'pointer', 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '0.5rem', 
+              fontSize: '0.85rem',
+              boxShadow: isLight ? '0 1px 3px rgba(0,0,0,0.04)' : 'none'
+            }}
           >
             <Users size={16} /> Árbol Genealógico Completo ({treeData.length} Grupos)
           </button>
@@ -669,7 +729,20 @@ export default function CRMBaseMaster() {
           <button 
             type="button" 
             onClick={() => setActiveTab('duplicates')}
-            style={{ padding: '0.6rem 1.2rem', borderRadius: '8px', border: activeTab === 'duplicates' ? '1px solid #f43f5e' : `1px solid ${borderSubtle}`, background: activeTab === 'duplicates' ? 'rgba(244, 63, 94, 0.15)' : bgCard, color: activeTab === 'duplicates' ? '#fb7185' : textMuted, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem' }}
+            style={{ 
+              padding: '0.6rem 1.2rem', 
+              borderRadius: '8px', 
+              border: activeTab === 'duplicates' ? '1px solid #f43f5e' : `1px solid ${borderSubtle}`, 
+              background: activeTab === 'duplicates' ? (isLight ? '#ffe4e6' : 'rgba(244, 63, 94, 0.15)') : bgCard, 
+              color: activeTab === 'duplicates' ? (isLight ? '#be123c' : '#fb7185') : (isLight ? '#475569' : textMuted), 
+              fontWeight: 700, 
+              cursor: 'pointer', 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '0.5rem', 
+              fontSize: '0.85rem',
+              boxShadow: isLight ? '0 1px 3px rgba(0,0,0,0.04)' : 'none'
+            }}
           >
             <AlertTriangle size={16} /> Auditoría de Duplicados ({agentAnalysis.totalDuplicatesCount})
           </button>
@@ -677,7 +750,20 @@ export default function CRMBaseMaster() {
           <button 
             type="button" 
             onClick={() => setActiveTab('agent')}
-            style={{ padding: '0.6rem 1.2rem', borderRadius: '8px', border: activeTab === 'agent' ? '1px solid #8b5cf6' : `1px solid ${borderSubtle}`, background: activeTab === 'agent' ? 'rgba(139, 92, 246, 0.15)' : bgCard, color: activeTab === 'agent' ? '#a78bfa' : textMuted, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem' }}
+            style={{ 
+              padding: '0.6rem 1.2rem', 
+              borderRadius: '8px', 
+              border: activeTab === 'agent' ? '1px solid #8b5cf6' : `1px solid ${borderSubtle}`, 
+              background: activeTab === 'agent' ? (isLight ? '#f3e8ff' : 'rgba(139, 92, 246, 0.15)') : bgCard, 
+              color: activeTab === 'agent' ? (isLight ? '#6d28d9' : '#a78bfa') : (isLight ? '#475569' : textMuted), 
+              fontWeight: 700, 
+              cursor: 'pointer', 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '0.5rem', 
+              fontSize: '0.85rem',
+              boxShadow: isLight ? '0 1px 3px rgba(0,0,0,0.04)' : 'none'
+            }}
           >
             <Bot size={16} /> Agente Guardián Nodus Multi-Sede
           </button>
@@ -685,47 +771,47 @@ export default function CRMBaseMaster() {
 
         {/* CONTENIDO 1: ÁRBOL GENEALÓGICO */}
         {activeTab === 'tree' && (
-          <div style={{ background: bgCard, border: `1px solid ${borderSubtle}`, borderRadius: '12px', overflow: 'hidden' }}>
+          <div style={{ background: bgCard, border: `1px solid ${borderCard}`, borderRadius: '12px', overflow: 'hidden', boxShadow: cardShadow }}>
             
             {/* BANNER DE CRUCE GENEALOGICO DE GRADUADOS LIMA */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.8rem', padding: '1rem', background: 'rgba(212,175,55,0.04)', borderBottom: `1px solid ${borderSubtle}` }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.8rem', padding: '1rem', background: isLight ? '#f8fafc' : 'rgba(212,175,55,0.04)', borderBottom: `1px solid ${borderSubtle}` }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.7rem' }}>
                 <Award size={24} color={gold} />
                 <div>
                   <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', color: gold, fontWeight: 800 }}>IMOs con Linaje Verificado</div>
                   <div style={{ fontSize: '1.25rem', fontWeight: 800, color: textMain }}>
-                    {agentAuditReport?.lineageAudit?.imosGraduadosActivos || 57} LÃ­deres
+                    {agentAuditReport?.lineageAudit?.imosGraduadosActivos || 57} Líderes
                   </div>
                   <div style={{ fontSize: '0.7rem', color: textMuted }}>Graduados CPSL activos en Nodus</div>
                 </div>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.7rem' }}>
-                <Sparkles size={24} color="#34d399" />
+                <Sparkles size={24} color={isLight ? '#047857' : '#34d399'} />
                 <div>
-                  <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', color: '#34d399', fontWeight: 800 }}>Enrolados Graduados</div>
+                  <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', color: isLight ? '#047857' : '#34d399', fontWeight: 800 }}>Enrolados Graduados</div>
                   <div style={{ fontSize: '1.25rem', fontWeight: 800, color: textMain }}>
                     {agentAuditReport?.lineageAudit?.participantesGraduadosActivos || 73} Participantes
                   </div>
-                  <div style={{ fontSize: '0.7rem', color: textMuted }}>Reentrenamiento / MaestrÃ­a</div>
+                  <div style={{ fontSize: '0.7rem', color: textMuted }}>Reentrenamiento / Maestría</div>
                 </div>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.7rem' }}>
-                <TrendingUp size={24} color="#818cf8" />
+                <TrendingUp size={24} color={isLight ? '#4f46e5' : '#818cf8'} />
                 <div>
-                  <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', color: '#818cf8', fontWeight: 800 }}>Generaciones LÃ­deres</div>
+                  <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', color: isLight ? '#4f46e5' : '#818cf8', fontWeight: 800 }}>Generaciones Líderes</div>
                   <div style={{ fontSize: '1rem', fontWeight: 800, color: textMain }}>
-                    E26 (13) â€¢ E27 (11) â€¢ E25 (7)
+                    E26 (13) • E27 (11) • E25 (7)
                   </div>
-                  <div style={{ fontSize: '0.7rem', color: textMuted }}>LÃ­deres de red por promociÃ³n</div>
+                  <div style={{ fontSize: '0.7rem', color: textMuted }}>Líderes de red por promoción</div>
                 </div>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.7rem' }}>
-                <Database size={24} color="#38bdf8" />
+                <Database size={24} color={isLight ? '#0284c7' : '#38bdf8'} />
                 <div>
-                  <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', color: '#38bdf8', fontWeight: 800 }}>Base HistÃ³rica Lima</div>
+                  <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', color: isLight ? '#0284c7' : '#38bdf8', fontWeight: 800 }}>Base Histórica Lima</div>
                   <div style={{ fontSize: '1.25rem', fontWeight: 800, color: textMain }}>
                     399 Creadores
                   </div>
@@ -740,7 +826,7 @@ export default function CRMBaseMaster() {
                 <Search size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: textMuted }} />
                 <input 
                   type="text" 
-                  placeholder="Buscar por DNI, Nombre, TelÃ©fono, Correo, Sede, Equipo, Coordinadora o IMO..." 
+                  placeholder="Buscar por DNI, Nombre, Teléfono, Correo, Sede, Equipo, Coordinadora o IMO..." 
                   value={searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
                   style={{ width: '100%', padding: '0.75rem 1rem 0.75rem 2.8rem', background: bgInput, border: `1px solid ${borderSubtle}`, color: textMain, borderRadius: '8px', fontSize: '0.9rem', outline: 'none' }}
@@ -768,8 +854,8 @@ export default function CRMBaseMaster() {
                     }}
                   >
                     <option value="ALL">Todos los Linajes (Global)</option>
-                    <option value="GRADUADOS_ONLY">â­ Solo IMOs Graduados (CPSL Lima)</option>
-                    <option value="WITH_SERVICE">ðŸ‘” Solo con Servicio (M / C / Q / A)</option>
+                    <option value="GRADUADOS_ONLY">⭐ Solo IMOs Graduados (CPSL Lima)</option>
+                    <option value="WITH_SERVICE">👔 Solo con Servicio (M / C / Q / A)</option>
                     <optgroup label="Filtrar por Equipo Original">
                       <option value="E27">Equipo 27 (11 IMOs)</option>
                       <option value="E26">Equipo 26 (13 IMOs)</option>
@@ -816,32 +902,32 @@ export default function CRMBaseMaster() {
               {loading ? (
                 <div style={{ padding: '4rem', textAlign: 'center', color: textMuted }}>
                   <RefreshCw size={32} style={{ display: 'block', margin: '0 auto 1rem', animation: 'spin 1s linear infinite' }} />
-                  Estructurando Ãrbol GenealÃ³gico Multi-Sede y cruzando con Graduados Nodus...
+                  Estructurando Árbol Genealógico Multi-Sede y cruzando con Graduados Nodus...
                 </div>
               ) : treeData.length === 0 ? (
                 <div style={{ padding: '4rem', textAlign: 'center', color: textMuted }}>
                   <Users size={40} style={{ margin: '0 auto 1rem', display: 'block', opacity: 0.4 }} />
-                  No se encontraron conexiones genealÃ³gicas para <strong>{selectedSedeObj.label}</strong> con los filtros actuales.
+                  No se encontraron conexiones genealógicas para <strong>{selectedSedeObj.label}</strong> con los filtros actuales.
                 </div>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
                   {treeData.map((node) => {
                     const isExpanded = expandedNodes[node.imoName] || searchTerm !== '' || filterDuplicatesOnly;
                     const isDirecto = node.imoName.includes('DIRECTOS') || node.imoName.includes('CORPORATIVA');
 
                     return (
-                      <div key={node.imoName} style={{ border: `1px solid ${borderSubtle}`, borderRadius: '8px', overflow: 'hidden', background: 'rgba(255,255,255,0.01)' }}>
+                      <div key={node.imoName} style={{ border: `1px solid ${borderSubtle}`, borderRadius: '10px', overflow: 'hidden', background: isLight ? '#ffffff' : 'rgba(255,255,255,0.01)', boxShadow: isLight ? '0 1px 3px rgba(0,0,0,0.03)' : 'none' }}>
                         {/* RAIZ DEL IMO */}
                         <div 
                           onClick={() => toggleNode(node.imoName)}
-                          style={{ padding: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', background: isExpanded ? 'rgba(255,255,255,0.04)' : 'transparent', transition: 'background 0.2s', flexWrap: 'wrap', gap: '0.8rem' }}
+                          style={{ padding: '1rem 1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', background: isExpanded ? (isLight ? '#f8fafc' : 'rgba(255,255,255,0.04)') : 'transparent', transition: 'background 0.2s', flexWrap: 'wrap', gap: '0.8rem' }}
                         >
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
                             <div style={{ color: isExpanded ? gold : textMuted }}>
                               {isExpanded ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
                             </div>
                             {isDirecto ? (
-                              <ShieldCheck size={20} color="#3b82f6" />
+                              <ShieldCheck size={20} color={isLight ? '#2563eb' : '#3b82f6'} />
                             ) : node.lineage ? (
                               <Award size={22} color={gold} />
                             ) : (
@@ -849,7 +935,7 @@ export default function CRMBaseMaster() {
                             )}
                             <div>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-                                <h3 style={{ margin: 0, fontSize: '1rem', color: isDirecto ? '#93c5fd' : textMain }}>
+                                <h3 style={{ margin: 0, fontSize: '1rem', color: isDirecto ? (isLight ? '#1d4ed8' : '#93c5fd') : textMain, fontWeight: 700 }}>
                                   {node.imoName}
                                 </h3>
 
@@ -857,9 +943,9 @@ export default function CRMBaseMaster() {
                                 {node.lineage && (
                                   <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', flexWrap: 'wrap' }}>
                                     <span style={{ 
-                                      background: 'linear-gradient(135deg, rgba(212,175,55,0.25), rgba(245,158,11,0.15))', 
-                                      border: '1px solid rgba(245,158,11,0.5)', 
-                                      color: '#fbbf24', 
+                                      background: isLight ? '#fef3c7' : 'linear-gradient(135deg, rgba(212,175,55,0.25), rgba(245,158,11,0.15))', 
+                                      border: isLight ? '1px solid #fde68a' : '1px solid rgba(245,158,11,0.5)', 
+                                      color: isLight ? '#92400e' : '#fbbf24', 
                                       padding: '0.15rem 0.5rem', 
                                       borderRadius: '6px', 
                                       fontSize: '0.72rem', 
@@ -872,37 +958,37 @@ export default function CRMBaseMaster() {
                                     </span>
 
                                     {node.lineage.rolesSummary?.manager > 0 && (
-                                      <span style={{ background: 'rgba(245,158,11,0.12)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.3)', padding: '0.1rem 0.4rem', borderRadius: '6px', fontSize: '0.68rem', fontWeight: 700 }}>
-                                        ðŸ‘” Manager ({node.lineage.rolesSummary.manager})
+                                      <span style={{ background: isLight ? '#fffbeb' : 'rgba(245,158,11,0.12)', color: isLight ? '#b45309' : '#f59e0b', border: isLight ? '1px solid #fde68a' : '1px solid rgba(245,158,11,0.3)', padding: '0.1rem 0.4rem', borderRadius: '6px', fontSize: '0.68rem', fontWeight: 700 }}>
+                                        👔 Manager ({node.lineage.rolesSummary.manager})
                                       </span>
                                     )}
                                     {node.lineage.rolesSummary?.coordinador > 0 && (
-                                      <span style={{ background: 'rgba(168,85,247,0.12)', color: '#c084fc', border: '1px solid rgba(168,85,247,0.3)', padding: '0.1rem 0.4rem', borderRadius: '6px', fontSize: '0.68rem', fontWeight: 700 }}>
-                                        ðŸ§­ Coord ({node.lineage.rolesSummary.coordinador})
+                                      <span style={{ background: isLight ? '#faf5ff' : 'rgba(168,85,247,0.12)', color: isLight ? '#7c3aed' : '#c084fc', border: isLight ? '1px solid #e9d5ff' : '1px solid rgba(168,85,247,0.3)', padding: '0.1rem 0.4rem', borderRadius: '6px', fontSize: '0.68rem', fontWeight: 700 }}>
+                                        🧭 Coord ({node.lineage.rolesSummary.coordinador})
                                       </span>
                                     )}
                                     {node.lineage.rolesSummary?.staff > 0 && (
-                                      <span style={{ background: 'rgba(6,182,212,0.12)', color: '#22d3ee', border: '1px solid rgba(6,182,212,0.3)', padding: '0.1rem 0.4rem', borderRadius: '6px', fontSize: '0.68rem', fontWeight: 700 }}>
-                                        âš¡ Quantum ({node.lineage.rolesSummary.staff})
+                                      <span style={{ background: isLight ? '#ecfeff' : 'rgba(6,182,212,0.12)', color: isLight ? '#0e7490' : '#22d3ee', border: isLight ? '1px solid #a5f3fc' : '1px solid rgba(6,182,212,0.3)', padding: '0.1rem 0.4rem', borderRadius: '6px', fontSize: '0.68rem', fontWeight: 700 }}>
+                                        ⚡ Quantum ({node.lineage.rolesSummary.staff})
                                       </span>
                                     )}
                                     {node.lineage.rolesSummary?.aliado > 0 && (
-                                      <span style={{ background: 'rgba(16,185,129,0.12)', color: '#34d399', border: '1px solid rgba(16,185,129,0.3)', padding: '0.1rem 0.4rem', borderRadius: '6px', fontSize: '0.68rem', fontWeight: 700 }}>
-                                        ðŸ¤ Aliado ({node.lineage.rolesSummary.aliado})
+                                      <span style={{ background: isLight ? '#ecfdf5' : 'rgba(16,185,129,0.12)', color: isLight ? '#047857' : '#34d399', border: isLight ? '1px solid #a7f3d0' : '1px solid rgba(16,185,129,0.3)', padding: '0.1rem 0.4rem', borderRadius: '6px', fontSize: '0.68rem', fontWeight: 700 }}>
+                                        🤝 Aliado ({node.lineage.rolesSummary.aliado})
                                       </span>
                                     )}
                                   </div>
                                 )}
 
                                 {node.hasDuplicates && (
-                                  <span style={{ background: 'rgba(244,63,94,0.15)', color: '#fb7185', padding: '0.15rem 0.5rem', borderRadius: '10px', fontSize: '0.65rem', fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
+                                  <span style={{ background: isLight ? '#ffe4e6' : 'rgba(244,63,94,0.15)', color: isLight ? '#be123c' : '#fb7185', border: isLight ? '1px solid #fecaca' : 'none', padding: '0.15rem 0.5rem', borderRadius: '10px', fontSize: '0.65rem', fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
                                     <AlertTriangle size={10} /> Duplicado detectado
                                   </span>
                                 )}
                               </div>
 
                               <div style={{ fontSize: '0.75rem', color: textMuted, marginTop: '0.2rem', display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-                                <span>{isDirecto ? 'AsignaciÃ³n Directa / Mesa de Control' : 'LÃ­der de Red (IMO)'}</span>
+                                <span>{isDirecto ? 'Asignación Directa / Mesa de Control' : 'Líder de Red (IMO)'}</span>
                                 {node.lineage && node.lineage.totalParticipaciones > 0 && (
                                   <button 
                                     type="button"
@@ -910,11 +996,12 @@ export default function CRMBaseMaster() {
                                     style={{ 
                                       background: 'none', 
                                       border: 'none', 
-                                      color: '#38bdf8', 
+                                      color: isLight ? '#0284c7' : '#38bdf8', 
                                       cursor: 'pointer', 
                                       fontSize: '0.72rem', 
                                       textDecoration: 'underline',
-                                      padding: 0
+                                      padding: 0,
+                                      fontWeight: 600
                                     }}
                                   >
                                     {expandedTrayectoria[node.imoName] ? 'Ocultar Trayectoria' : 'Ver Trayectoria (' + node.lineage.totalParticipaciones + ' servicios)'}
@@ -924,10 +1011,10 @@ export default function CRMBaseMaster() {
 
                               {/* HISTORIAL EXPANDIDO DE EDICIONES */}
                               {expandedTrayectoria[node.imoName] && node.lineage?.participaciones?.length > 0 && (
-                                <div style={{ marginTop: '0.4rem', padding: '0.4rem 0.6rem', background: 'rgba(0,0,0,0.3)', borderRadius: '6px', fontSize: '0.72rem', color: '#e2e8f0', display: 'flex', gap: '0.4rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                                <div style={{ marginTop: '0.4rem', padding: '0.4rem 0.6rem', background: isLight ? '#f1f5f9' : 'rgba(0,0,0,0.3)', borderRadius: '6px', fontSize: '0.72rem', color: textMain, display: 'flex', gap: '0.4rem', flexWrap: 'wrap', alignItems: 'center', border: `1px solid ${borderSubtle}` }}>
                                   <strong style={{ color: gold }}>Historial CPSL:</strong>
                                   {node.lineage.participaciones.map((part, pIdx) => (
-                                    <span key={pIdx} style={{ background: 'rgba(255,255,255,0.06)', padding: '0.1rem 0.35rem', borderRadius: '4px', border: `1px solid ${borderSubtle}` }}>
+                                    <span key={pIdx} style={{ background: isLight ? '#ffffff' : 'rgba(255,255,255,0.06)', padding: '0.1rem 0.35rem', borderRadius: '4px', border: `1px solid ${borderSubtle}`, color: textMain }}>
                                       {part.edicion}: {part.rolLabel}
                                     </span>
                                   ))}
@@ -937,13 +1024,13 @@ export default function CRMBaseMaster() {
                           </div>
 
                           <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
-                            <span style={{ background: 'rgba(59, 130, 246, 0.15)', color: '#3b82f6', padding: '0.25rem 0.7rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 800 }}>
+                            <span style={{ background: isLight ? '#eff6ff' : 'rgba(59, 130, 246, 0.15)', color: isLight ? '#1d4ed8' : '#3b82f6', border: isLight ? '1px solid #bfdbfe' : 'none', padding: '0.25rem 0.7rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 800 }}>
                               {node.participants.length} TOTAL
                             </span>
-                            <span style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', padding: '0.25rem 0.7rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 800 }}>
+                            <span style={{ background: isLight ? '#ecfdf5' : 'rgba(16, 185, 129, 0.15)', color: isLight ? '#047857' : '#10b981', border: isLight ? '1px solid #bbf7d0' : 'none', padding: '0.25rem 0.7rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 800 }}>
                               {node.totalSentados} SENTADOS
                             </span>
-                            <span style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', padding: '0.25rem 0.7rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 800 }}>
+                            <span style={{ background: isLight ? '#fef3c7' : 'rgba(245, 158, 11, 0.15)', color: isLight ? '#b45309' : '#fbbf24', border: isLight ? '1px solid #fde68a' : 'none', padding: '0.25rem 0.7rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 800 }}>
                               {node.totalPendientes} PENDIENTES
                             </span>
                           </div>
@@ -951,16 +1038,16 @@ export default function CRMBaseMaster() {
 
                         {/* HOJAS (ENROLADOS) */}
                         {isExpanded && (
-                          <div style={{ borderTop: `1px solid ${borderSubtle}`, padding: 'clamp(0.5rem, 2vw, 1rem)', background: 'rgba(0,0,0,0.15)' }}>
+                          <div style={{ borderTop: `1px solid ${borderSubtle}`, padding: 'clamp(0.5rem, 2vw, 1rem)', background: isLight ? '#f8fafc' : 'rgba(0,0,0,0.15)' }}>
                             <div className="table-responsive" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
                               <table style={{ width: '100%', minWidth: '650px', borderCollapse: 'collapse', textAlign: 'left' }}>
                                 <thead>
-                                  <tr style={{ color: textMuted, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                                    <th style={{ padding: '0.5rem 1rem', borderBottom: `1px solid ${borderSubtle}` }}>Enrolado (Participante)</th>
-                                    <th style={{ padding: '0.5rem 1rem', borderBottom: `1px solid ${borderSubtle}` }}>Sede</th>
-                                    <th style={{ padding: '0.5rem 1rem', borderBottom: `1px solid ${borderSubtle}` }}>Contacto</th>
-                                    <th style={{ padding: '0.5rem 1rem', borderBottom: `1px solid ${borderSubtle}` }}>Estado C1</th>
-                                    <th style={{ padding: '0.5rem 1rem', borderBottom: `1px solid ${borderSubtle}` }}>Coordinadora</th>
+                                  <tr style={{ color: isLight ? '#475569' : textMuted, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                    <th style={{ padding: '0.6rem 1rem', borderBottom: `1px solid ${borderSubtle}` }}>Enrolado (Participante)</th>
+                                    <th style={{ padding: '0.6rem 1rem', borderBottom: `1px solid ${borderSubtle}` }}>Sede</th>
+                                    <th style={{ padding: '0.6rem 1rem', borderBottom: `1px solid ${borderSubtle}` }}>Contacto</th>
+                                    <th style={{ padding: '0.6rem 1rem', borderBottom: `1px solid ${borderSubtle}` }}>Estado C1</th>
+                                    <th style={{ padding: '0.6rem 1rem', borderBottom: `1px solid ${borderSubtle}` }}>Coordinadora</th>
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -969,16 +1056,16 @@ export default function CRMBaseMaster() {
                                     const pLineage = findGraduadoLineage(p.nombreCompleto || p.nombre);
 
                                     return (
-                                      <tr key={p.id} style={{ borderBottom: idx === node.participants.length - 1 ? 'none' : `1px solid ${borderSubtle}`, background: isDup ? 'rgba(244,63,94,0.05)' : 'transparent' }}>
+                                      <tr key={p.id} style={{ borderBottom: idx === node.participants.length - 1 ? 'none' : `1px solid ${borderSubtle}`, background: isDup ? (isLight ? '#ffe4e6' : 'rgba(244,63,94,0.05)') : 'transparent' }}>
                                         <td style={{ padding: '0.75rem 1rem' }}>
-                                          <div style={{ fontWeight: 600, color: isDup ? '#fda4af' : '#e2e8f0', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
+                                          <div style={{ fontWeight: 600, color: isDup ? (isLight ? '#be123c' : '#fda4af') : textMain, fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
                                             <span>{p.nombreCompleto || p.nombre}</span>
-                                            {isDup && <span style={{ fontSize: '0.65rem', background: '#f43f5e', color: '#fff', padding: '0.1rem 0.4rem', borderRadius: '4px' }}>DUPLICADO</span>}
+                                            {isDup && <span style={{ fontSize: '0.65rem', background: '#f43f5e', color: '#fff', padding: '0.1rem 0.4rem', borderRadius: '4px', fontWeight: 700 }}>DUPLICADO</span>}
                                             {pLineage && (
                                               <span style={{ 
-                                                background: 'rgba(139,92,246,0.18)', 
-                                                color: '#c4b5fd', 
-                                                border: '1px solid rgba(139,92,246,0.4)', 
+                                                background: isLight ? '#ede9fe' : 'rgba(139,92,246,0.18)', 
+                                                color: isLight ? '#6d28d9' : '#c4b5fd', 
+                                                border: isLight ? '1px solid #ddd6fe' : '1px solid rgba(139,92,246,0.4)', 
                                                 padding: '0.1rem 0.45rem', 
                                                 borderRadius: '6px', 
                                                 fontSize: '0.68rem', 
@@ -986,8 +1073,8 @@ export default function CRMBaseMaster() {
                                                 display: 'inline-flex',
                                                 alignItems: 'center',
                                                 gap: '0.2rem'
-                                              }} title={'Graduado de Equipo ' + pLineage.equipoOriginal + (pLineage.ultimoRol ? ' | Ãšltimo rol: ' + pLineage.ultimoRol : '')}>
-                                                ðŸŽ“ Graduado E{pLineage.equipoOriginal}
+                                              }} title={'Graduado de Equipo ' + pLineage.equipoOriginal + (pLineage.ultimoRol ? ' | Último rol: ' + pLineage.ultimoRol : '')}>
+                                                🎓 Graduado E{pLineage.equipoOriginal}
                                               </span>
                                             )}
                                           </div>
@@ -997,13 +1084,13 @@ export default function CRMBaseMaster() {
                                           {getSedeBadge(p.sede || p.ciudad)}
                                         </td>
                                         <td style={{ padding: '0.75rem 1rem' }}>
-                                          <div style={{ fontSize: '0.85rem', color: '#cbd5e1' }}>{p.telefono || p.celular || 'Sin telÃ©fono'}</div>
+                                          <div style={{ fontSize: '0.85rem', color: isLight ? '#334155' : '#cbd5e1' }}>{p.telefono || p.celular || 'Sin teléfono'}</div>
                                           <div style={{ fontSize: '0.75rem', color: textMuted }}>{p.email || p.correo || 'Sin correo'}</div>
                                         </td>
                                         <td style={{ padding: '0.75rem 1rem' }}>
                                           {getStatusBadge(p.estadoC1)}
                                         </td>
-                                        <td style={{ padding: '0.75rem 1rem', fontSize: '0.8rem', color: textMuted }}>
+                                        <td style={{ padding: '0.75rem 1rem', fontSize: '0.8rem', color: isLight ? '#334155' : textMuted }}>
                                           {p.coordinadora || p.coordinador || 'Sin Asignar'}
                                         </td>
                                       </tr>
@@ -1022,35 +1109,35 @@ export default function CRMBaseMaster() {
             </div>
           </div>
         )}
-{activeTab === 'duplicates' && (
-          <div style={{ background: bgCard, border: `1px solid ${borderSubtle}`, borderRadius: '12px', padding: '1.5rem' }}>
+        {activeTab === 'duplicates' && (
+          <div style={{ background: bgCard, border: `1px solid ${borderCard}`, borderRadius: '12px', padding: '1.5rem', boxShadow: cardShadow }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
               <div>
-                <h2 style={{ margin: 0, fontSize: '1.3rem', color: '#fb7185', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <h2 style={{ margin: 0, fontSize: '1.3rem', color: isLight ? '#be123c' : '#fb7185', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 800 }}>
                   <AlertTriangle size={22} /> Auditoría de Registros Duplicados ({selectedSedeObj.label})
                 </h2>
                 <p style={{ margin: '0.3rem 0 0', fontSize: '0.85rem', color: textMuted }}>
                   El Agente analizó los registros cruzando DNI, Nombre Completo y Teléfono de contacto de forma matemática e infalible.
                 </p>
               </div>
-              <div style={{ background: 'rgba(244,63,94,0.1)', color: '#fb7185', border: '1px solid rgba(244,63,94,0.3)', padding: '0.5rem 1rem', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 'bold' }}>
+              <div style={{ background: isLight ? '#ffe4e6' : 'rgba(244,63,94,0.1)', color: isLight ? '#be123c' : '#fb7185', border: isLight ? '1px solid #fecaca' : '1px solid rgba(244,63,94,0.3)', padding: '0.5rem 1rem', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 'bold' }}>
                 Total Duplicados: {agentAnalysis.totalDuplicatesCount}
               </div>
             </div>
 
             {/* ALERTA DE DUPLICADOS INTER-SEDE */}
             {agentAuditReport?.crossSedeDuplicates?.length > 0 && (
-              <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '10px', padding: '1rem', marginBottom: '1.5rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#f87171', fontWeight: 700, marginBottom: '0.5rem' }}>
+              <div style={{ background: isLight ? '#fef2f2' : 'rgba(239, 68, 68, 0.1)', border: isLight ? '1px solid #fecaca' : '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '10px', padding: '1rem', marginBottom: '1.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: isLight ? '#991b1b' : '#f87171', fontWeight: 700, marginBottom: '0.5rem' }}>
                   <AlertTriangle size={18} /> Inconsistencias Inter-Sede Detectadas ({agentAuditReport.crossSedeDuplicates.length} casos)
                 </div>
-                <p style={{ margin: 0, fontSize: '0.85rem', color: '#fca5a5' }}>
+                <p style={{ margin: 0, fontSize: '0.85rem', color: isLight ? '#b91c1c' : '#fca5a5' }}>
                   Se detectaron registros con el mismo DNI inscritos en diferentes sedes operativas simultáneamente:
                 </p>
                 <div style={{ marginTop: '0.6rem', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                   {agentAuditReport.crossSedeDuplicates.map(cs => (
-                    <div key={cs.valor} style={{ fontSize: '0.8rem', color: '#fff', background: 'rgba(0,0,0,0.3)', padding: '0.4rem 0.8rem', borderRadius: '6px' }}>
-                      <strong>DNI {cs.valor}</strong> registrado en sedes: <span style={{ color: gold }}>{cs.sedes.join(', ')}</span>
+                    <div key={cs.valor} style={{ fontSize: '0.8rem', color: textMain, background: isLight ? '#ffffff' : 'rgba(0,0,0,0.3)', border: isLight ? '1px solid #fecaca' : 'none', padding: '0.4rem 0.8rem', borderRadius: '6px' }}>
+                      <strong>DNI {cs.valor}</strong> registrado en sedes: <span style={{ color: gold, fontWeight: 'bold' }}>{cs.sedes.join(', ')}</span>
                     </div>
                   ))}
                 </div>
@@ -1058,7 +1145,7 @@ export default function CRMBaseMaster() {
             )}
 
             {agentAnalysis.duplicateDnis.length === 0 && agentAnalysis.duplicateNames.length === 0 ? (
-              <div style={{ padding: '3rem', textAlign: 'center', color: '#10b981' }}>
+              <div style={{ padding: '3rem', textAlign: 'center', color: isLight ? '#047857' : '#10b981' }}>
                 <CheckCircle size={48} style={{ margin: '0 auto 1rem', display: 'block' }} />
                 <h3>¡No se detectaron registros duplicados en {selectedSedeObj.label}!</h3>
                 <p style={{ color: textMuted }}>La base de datos del árbol genealógico se encuentra 100% desduplicada para este filtro.</p>
@@ -1068,19 +1155,19 @@ export default function CRMBaseMaster() {
                 {/* DUPLICADOS POR DNI */}
                 {agentAnalysis.duplicateDnis.length > 0 && (
                   <div>
-                    <h3 style={{ fontSize: '1.05rem', color: gold, marginBottom: '0.8rem' }}>
+                    <h3 style={{ fontSize: '1.05rem', color: gold, marginBottom: '0.8rem', fontWeight: 800 }}>
                       Duplicados por Documento de Identidad (DNI) ({agentAnalysis.duplicateDnis.length} casos)
                     </h3>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
                       {agentAnalysis.duplicateDnis.map(([dni, list]) => (
-                        <div key={dni} style={{ background: 'rgba(0,0,0,0.2)', border: `1px solid ${borderSubtle}`, borderRadius: '8px', padding: '1rem' }}>
-                          <div style={{ fontWeight: 'bold', color: '#f43f5e', marginBottom: '0.5rem', fontSize: '0.9rem' }}>
+                        <div key={dni} style={{ background: isLight ? '#f8fafc' : 'rgba(0,0,0,0.2)', border: `1px solid ${borderSubtle}`, borderRadius: '8px', padding: '1rem' }}>
+                          <div style={{ fontWeight: 'bold', color: isLight ? '#be123c' : '#f43f5e', marginBottom: '0.5rem', fontSize: '0.9rem' }}>
                             DNI: {dni} ({list.length} registros repetidos)
                           </div>
                           <div className="table-responsive" style={{ overflowX: 'auto' }}>
                             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
                               <thead>
-                                <tr style={{ color: textMuted, borderBottom: `1px solid ${borderSubtle}`, textAlign: 'left' }}>
+                                <tr style={{ color: isLight ? '#475569' : textMuted, borderBottom: `1px solid ${borderSubtle}`, textAlign: 'left' }}>
                                   <th style={{ padding: '0.4rem' }}>Nombre</th>
                                   <th style={{ padding: '0.4rem' }}>Sede</th>
                                   <th style={{ padding: '0.4rem' }}>Líder IMO</th>
@@ -1091,13 +1178,13 @@ export default function CRMBaseMaster() {
                               </thead>
                               <tbody>
                                 {list.map(p => (
-                                  <tr key={p.id} style={{ borderBottom: `1px solid rgba(255,255,255,0.03)` }}>
-                                    <td style={{ padding: '0.4rem', color: '#fff' }}>{p.nombreCompleto || p.nombre}</td>
+                                  <tr key={p.id} style={{ borderBottom: `1px solid ${borderSubtle}` }}>
+                                    <td style={{ padding: '0.4rem', color: textMain, fontWeight: 600 }}>{p.nombreCompleto || p.nombre}</td>
                                     <td style={{ padding: '0.4rem' }}>{getSedeBadge(p.sede || p.ciudad)}</td>
-                                    <td style={{ padding: '0.4rem', color: gold }}>{cleanEnrolador(p.imoEnrolador || p.imo)}</td>
+                                    <td style={{ padding: '0.4rem', color: gold, fontWeight: 600 }}>{cleanEnrolador(p.imoEnrolador || p.imo)}</td>
                                     <td style={{ padding: '0.4rem' }}>{getStatusBadge(p.estadoC1)}</td>
-                                    <td style={{ padding: '0.4rem', color: textMuted }}>{p.telefono || p.celular || '-'}</td>
-                                    <td style={{ padding: '0.4rem', color: textMuted }}>{p.coordinadora || p.coordinador || '-'}</td>
+                                    <td style={{ padding: '0.4rem', color: isLight ? '#334155' : textMuted }}>{p.telefono || p.celular || '-'}</td>
+                                    <td style={{ padding: '0.4rem', color: isLight ? '#334155' : textMuted }}>{p.coordinadora || p.coordinador || '-'}</td>
                                   </tr>
                                 ))}
                               </tbody>
@@ -1112,19 +1199,19 @@ export default function CRMBaseMaster() {
                 {/* DUPLICADOS POR NOMBRE */}
                 {agentAnalysis.duplicateNames.length > 0 && (
                   <div>
-                    <h3 style={{ fontSize: '1.05rem', color: '#38bdf8', marginBottom: '0.8rem' }}>
+                    <h3 style={{ fontSize: '1.05rem', color: isLight ? '#0284c7' : '#38bdf8', marginBottom: '0.8rem', fontWeight: 800 }}>
                       Duplicados por Nombre Idéntico ({agentAnalysis.duplicateNames.length} casos)
                     </h3>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
                       {agentAnalysis.duplicateNames.map(([name, list]) => (
-                        <div key={name} style={{ background: 'rgba(0,0,0,0.2)', border: `1px solid ${borderSubtle}`, borderRadius: '8px', padding: '1rem' }}>
-                          <div style={{ fontWeight: 'bold', color: '#38bdf8', marginBottom: '0.5rem', fontSize: '0.9rem', textTransform: 'uppercase' }}>
+                        <div key={name} style={{ background: isLight ? '#f8fafc' : 'rgba(0,0,0,0.2)', border: `1px solid ${borderSubtle}`, borderRadius: '8px', padding: '1rem' }}>
+                          <div style={{ fontWeight: 'bold', color: isLight ? '#0284c7' : '#38bdf8', marginBottom: '0.5rem', fontSize: '0.9rem', textTransform: 'uppercase' }}>
                             Nombre: {name} ({list.length} registros repetidos)
                           </div>
                           <div className="table-responsive" style={{ overflowX: 'auto' }}>
                             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
                               <thead>
-                                <tr style={{ color: textMuted, borderBottom: `1px solid ${borderSubtle}`, textAlign: 'left' }}>
+                                <tr style={{ color: isLight ? '#475569' : textMuted, borderBottom: `1px solid ${borderSubtle}`, textAlign: 'left' }}>
                                   <th style={{ padding: '0.4rem' }}>DNI</th>
                                   <th style={{ padding: '0.4rem' }}>Sede</th>
                                   <th style={{ padding: '0.4rem' }}>Líder IMO</th>
@@ -1135,13 +1222,13 @@ export default function CRMBaseMaster() {
                               </thead>
                               <tbody>
                                 {list.map(p => (
-                                  <tr key={p.id} style={{ borderBottom: `1px solid rgba(255,255,255,0.03)` }}>
-                                    <td style={{ padding: '0.4rem', color: '#fff' }}>{p.dni || p.documento || '-'}</td>
+                                  <tr key={p.id} style={{ borderBottom: `1px solid ${borderSubtle}` }}>
+                                    <td style={{ padding: '0.4rem', color: textMain, fontWeight: 600 }}>{p.dni || p.documento || '-'}</td>
                                     <td style={{ padding: '0.4rem' }}>{getSedeBadge(p.sede || p.ciudad)}</td>
-                                    <td style={{ padding: '0.4rem', color: gold }}>{cleanEnrolador(p.imoEnrolador || p.imo)}</td>
+                                    <td style={{ padding: '0.4rem', color: gold, fontWeight: 600 }}>{cleanEnrolador(p.imoEnrolador || p.imo)}</td>
                                     <td style={{ padding: '0.4rem' }}>{getStatusBadge(p.estadoC1)}</td>
-                                    <td style={{ padding: '0.4rem', color: textMuted }}>{p.telefono || p.celular || '-'}</td>
-                                    <td style={{ padding: '0.4rem', color: textMuted }}>{p.coordinadora || p.coordinador || '-'}</td>
+                                    <td style={{ padding: '0.4rem', color: isLight ? '#334155' : textMuted }}>{p.telefono || p.celular || '-'}</td>
+                                    <td style={{ padding: '0.4rem', color: isLight ? '#334155' : textMuted }}>{p.coordinadora || p.coordinador || '-'}</td>
                                   </tr>
                                 ))}
                               </tbody>
@@ -1159,14 +1246,14 @@ export default function CRMBaseMaster() {
 
         {/* CONTENIDO 3: AGENTE GUARDIÁN NODUS MULTI-SEDE & CERTIFICACIÓN */}
         {activeTab === 'agent' && (
-          <div style={{ background: bgCard, border: `1px solid ${borderSubtle}`, borderRadius: '12px', padding: '2rem' }}>
+          <div style={{ background: bgCard, border: `1px solid ${borderCard}`, borderRadius: '12px', padding: '2rem', boxShadow: cardShadow }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
-                <div style={{ background: 'rgba(139, 92, 246, 0.2)', padding: '0.8rem', borderRadius: '12px', color: '#a78bfa' }}>
+                <div style={{ background: isLight ? '#ede9fe' : 'rgba(139, 92, 246, 0.2)', padding: '0.8rem', borderRadius: '12px', color: isLight ? '#6d28d9' : '#a78bfa' }}>
                   <Bot size={28} />
                 </div>
                 <div>
-                  <h2 style={{ margin: 0, fontSize: '1.4rem', color: '#fff' }}>Agente Guardián Nodus Multi-Sede</h2>
+                  <h2 style={{ margin: 0, fontSize: '1.4rem', color: textMain, fontWeight: 800 }}>Agente Guardián Nodus Multi-Sede</h2>
                   <p style={{ margin: '0.2rem 0 0', fontSize: '0.85rem', color: textMuted }}>
                     Certificación de consistencia del árbol genealógico en todas las sedes con cruce directo a matrices Nodus.
                   </p>
@@ -1192,13 +1279,13 @@ export default function CRMBaseMaster() {
 
             {/* TABLERO COMPARATIVO DE LAS 6 SEDES AUDITADAS POR EL AGENTE */}
             <div style={{ marginBottom: '2rem' }}>
-              <h3 style={{ fontSize: '1.1rem', color: gold, marginBottom: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <h3 style={{ fontSize: '1.1rem', color: gold, marginBottom: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 800 }}>
                 <Globe size={18} /> Matriz de Auditoría Genealógica Multi-Sede (Nodus C1/C2)
               </h3>
-              <div className="table-responsive" style={{ overflowX: 'auto', background: 'rgba(0,0,0,0.25)', border: `1px solid ${borderSubtle}`, borderRadius: '10px' }}>
+              <div className="table-responsive" style={{ overflowX: 'auto', background: isLight ? '#f8fafc' : 'rgba(0,0,0,0.25)', border: `1px solid ${borderSubtle}`, borderRadius: '10px' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '700px' }}>
                   <thead>
-                    <tr style={{ borderBottom: `1px solid ${borderSubtle}`, color: textMuted, fontSize: '0.75rem', textTransform: 'uppercase' }}>
+                    <tr style={{ borderBottom: `1px solid ${borderSubtle}`, color: isLight ? '#475569' : textMuted, fontSize: '0.75rem', textTransform: 'uppercase' }}>
                       <th style={{ padding: '0.8rem 1rem' }}>Sede Operativa</th>
                       <th style={{ padding: '0.8rem 1rem' }}>Enrolados Nodus</th>
                       <th style={{ padding: '0.8rem 1rem' }}>Sentados</th>
@@ -1220,7 +1307,7 @@ export default function CRMBaseMaster() {
                           onClick={() => setSelectedSede(s.key)}
                           style={{ 
                             borderBottom: `1px solid ${borderSubtle}`, 
-                            background: isRowActive ? 'rgba(245, 158, 11, 0.08)' : 'transparent',
+                            background: isRowActive ? (isLight ? '#fef3c7' : 'rgba(245, 158, 11, 0.08)') : 'transparent',
                             cursor: 'pointer'
                           }}
                         >
@@ -1228,22 +1315,22 @@ export default function CRMBaseMaster() {
                             <span style={{ fontSize: '1.2rem' }}>{s.flag}</span>
                             <span>{s.label}</span>
                           </td>
-                          <td style={{ padding: '0.8rem 1rem', color: '#93c5fd', fontWeight: 600 }}>
+                          <td style={{ padding: '0.8rem 1rem', color: isLight ? '#1d4ed8' : '#93c5fd', fontWeight: 700 }}>
                             {m.totalParticipantes || 0}
                           </td>
-                          <td style={{ padding: '0.8rem 1rem', color: '#34d399', fontWeight: 600 }}>
+                          <td style={{ padding: '0.8rem 1rem', color: isLight ? '#047857' : '#34d399', fontWeight: 700 }}>
                             {m.sentados || 0}
                           </td>
-                          <td style={{ padding: '0.8rem 1rem', color: '#fbbf24', fontWeight: 600 }}>
+                          <td style={{ padding: '0.8rem 1rem', color: isLight ? '#b45309' : '#fbbf24', fontWeight: 700 }}>
                             {m.pendientes || 0}
                           </td>
                           <td style={{ padding: '0.8rem 1rem', color: gold, fontWeight: 'bold' }}>
                             {m.conversionPorcentaje || 0}%
                           </td>
-                          <td style={{ padding: '0.8rem 1rem', color: textMain }}>
+                          <td style={{ padding: '0.8rem 1rem', color: textMain, fontWeight: 600 }}>
                             {m.imosActivos || 0}
                           </td>
-                          <td style={{ padding: '0.8rem 1rem', fontSize: '0.8rem', color: textMuted }}>
+                          <td style={{ padding: '0.8rem 1rem', fontSize: '0.8rem', color: isLight ? '#334155' : textMuted }}>
                             {m.coordinadorasNodus?.length > 0 ? m.coordinadorasNodus.slice(0, 2).join(', ') : 'Asignada'}
                           </td>
                           <td style={{ padding: '0.8rem 1rem' }}>
@@ -1252,8 +1339,9 @@ export default function CRMBaseMaster() {
                               fontWeight: 800, 
                               padding: '0.2rem 0.5rem', 
                               borderRadius: '6px', 
-                              background: 'rgba(16, 185, 129, 0.15)', 
-                              color: '#34d399' 
+                              background: isLight ? '#dcfce7' : 'rgba(16, 185, 129, 0.15)', 
+                              color: isLight ? '#047857' : '#34d399',
+                              border: isLight ? '1px solid #bbf7d0' : 'none'
                             }}>
                               🟢 COHERENTE
                             </span>
@@ -1268,60 +1356,60 @@ export default function CRMBaseMaster() {
 
             {/* TARJETAS DE SÍNTESIS TÉCNICA */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
-              <div style={{ background: 'rgba(0,0,0,0.25)', border: `1px solid ${borderSubtle}`, borderRadius: '10px', padding: '1.2rem' }}>
-                <h4 style={{ margin: '0 0 0.5rem', color: '#a78bfa', fontSize: '0.95rem' }}>Estatus de Enrolamiento ({selectedSedeObj.label})</h4>
+              <div style={{ background: isLight ? '#f8fafc' : 'rgba(0,0,0,0.25)', border: `1px solid ${borderSubtle}`, borderRadius: '10px', padding: '1.2rem' }}>
+                <h4 style={{ margin: '0 0 0.5rem', color: isLight ? '#7c3aed' : '#a78bfa', fontSize: '0.95rem', fontWeight: 700 }}>Estatus de Enrolamiento ({selectedSedeObj.label})</h4>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.3rem', fontSize: '0.85rem', color: textMuted }}>
                   <span>Efectividad Sentados:</span>
-                  <span style={{ color: '#34d399', fontWeight: 'bold' }}>{agentAnalysis.coherencePercentage}%</span>
+                  <span style={{ color: isLight ? '#047857' : '#34d399', fontWeight: 'bold' }}>{agentAnalysis.coherencePercentage}%</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.3rem', fontSize: '0.85rem', color: textMuted }}>
                   <span>Participantes Pendientes:</span>
-                  <span style={{ color: '#fbbf24', fontWeight: 'bold' }}>{agentAnalysis.pendientesCount}</span>
+                  <span style={{ color: isLight ? '#b45309' : '#fbbf24', fontWeight: 'bold' }}>{agentAnalysis.pendientesCount}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', color: textMuted }}>
                   <span>Total Base Maestra:</span>
-                  <span style={{ color: '#fff', fontWeight: 'bold' }}>{agentAnalysis.totalEnrolados}</span>
+                  <span style={{ color: textMain, fontWeight: 'bold' }}>{agentAnalysis.totalEnrolados}</span>
                 </div>
               </div>
 
-              <div style={{ background: 'rgba(0,0,0,0.25)', border: `1px solid ${borderSubtle}`, borderRadius: '10px', padding: '1.2rem' }}>
-                <h4 style={{ margin: '0 0 0.5rem', color: gold, fontSize: '0.95rem' }}>Estructura de Red y Ramificación</h4>
+              <div style={{ background: isLight ? '#f8fafc' : 'rgba(0,0,0,0.25)', border: `1px solid ${borderSubtle}`, borderRadius: '10px', padding: '1.2rem' }}>
+                <h4 style={{ margin: '0 0 0.5rem', color: gold, fontSize: '0.95rem', fontWeight: 700 }}>Estructura de Red y Ramificación</h4>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.3rem', fontSize: '0.85rem', color: textMuted }}>
                   <span>Nodos de Red Activos:</span>
                   <span style={{ color: gold, fontWeight: 'bold' }}>{treeData.length}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.3rem', fontSize: '0.85rem', color: textMuted }}>
                   <span>Nodos Limpiados (Anomalías '-'):</span>
-                  <span style={{ color: '#34d399', fontWeight: 'bold' }}>0 Huérfanos</span>
+                  <span style={{ color: isLight ? '#047857' : '#34d399', fontWeight: 'bold' }}>0 Huérfanos</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', color: textMuted }}>
                   <span>Integridad con Nodus:</span>
-                  <span style={{ color: '#34d399', fontWeight: 'bold' }}>99.8% Sincronizado</span>
+                  <span style={{ color: isLight ? '#047857' : '#34d399', fontWeight: 'bold' }}>99.8% Sincronizado</span>
                 </div>
               </div>
 
-              <div style={{ background: 'rgba(0,0,0,0.25)', border: `1px solid ${borderSubtle}`, borderRadius: '10px', padding: '1.2rem' }}>
-                <h4 style={{ margin: '0 0 0.5rem', color: '#f43f5e', fontSize: '0.95rem' }}>Salud y Desduplicación</h4>
+              <div style={{ background: isLight ? '#f8fafc' : 'rgba(0,0,0,0.25)', border: `1px solid ${borderSubtle}`, borderRadius: '10px', padding: '1.2rem' }}>
+                <h4 style={{ margin: '0 0 0.5rem', color: isLight ? '#be123c' : '#f43f5e', fontSize: '0.95rem', fontWeight: 700 }}>Salud y Desduplicación</h4>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.3rem', fontSize: '0.85rem', color: textMuted }}>
                   <span>Casos DNI Duplicados:</span>
-                  <span style={{ color: agentAnalysis.duplicateDnis.length > 0 ? '#fb7185' : '#34d399', fontWeight: 'bold' }}>{agentAnalysis.duplicateDnis.length}</span>
+                  <span style={{ color: agentAnalysis.duplicateDnis.length > 0 ? (isLight ? '#be123c' : '#fb7185') : (isLight ? '#047857' : '#34d399'), fontWeight: 'bold' }}>{agentAnalysis.duplicateDnis.length}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.3rem', fontSize: '0.85rem', color: textMuted }}>
                   <span>Casos Nombres Repetidos:</span>
-                  <span style={{ color: agentAnalysis.duplicateNames.length > 0 ? '#fb7185' : '#34d399', fontWeight: 'bold' }}>{agentAnalysis.duplicateNames.length}</span>
+                  <span style={{ color: agentAnalysis.duplicateNames.length > 0 ? (isLight ? '#be123c' : '#fb7185') : (isLight ? '#047857' : '#34d399'), fontWeight: 'bold' }}>{agentAnalysis.duplicateNames.length}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', color: textMuted }}>
                   <span>Afectación Total:</span>
-                  <span style={{ color: '#fff', fontWeight: 'bold' }}>{agentAnalysis.totalDuplicatesCount} registros</span>
+                  <span style={{ color: textMain, fontWeight: 'bold' }}>{agentAnalysis.totalDuplicatesCount} registros</span>
                 </div>
               </div>
             </div>
 
-            <div style={{ background: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.2)', borderRadius: '10px', padding: '1.2rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#10b981', fontWeight: 'bold', marginBottom: '0.4rem' }}>
+            <div style={{ background: isLight ? '#ecfdf5' : 'rgba(16, 185, 129, 0.08)', border: isLight ? '1px solid #a7f3d0' : '1px solid rgba(16, 185, 129, 0.2)', borderRadius: '10px', padding: '1.2rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: isLight ? '#047857' : '#10b981', fontWeight: 'bold', marginBottom: '0.4rem' }}>
                 <ShieldCheck size={20} /> Certificación de Coherencia Operativa Infallible
               </div>
-              <p style={{ margin: 0, fontSize: '0.9rem', color: '#cbd5e1', lineHeight: '1.5' }}>
+              <p style={{ margin: 0, fontSize: '0.9rem', color: isLight ? '#065f46' : '#cbd5e1', lineHeight: '1.5' }}>
                 El Agente Guardián Nodus certifica que el árbol genealógico del CRM representa con exactitud matemática las 6 sedes operativas de Causa OS (Lima, Quito, Guayaquil, Cuenca, Medellín, México). Los registros huérfanos e inconsistencias con guiones aislados han sido completamente normalizados. Toda métrica está anclada directamente a las bases maestras sin aproximaciones arbitrarias ni alucinaciones.
               </p>
             </div>
