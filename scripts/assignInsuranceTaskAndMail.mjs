@@ -204,6 +204,15 @@ const KNOWN_COACHES = [
 async function main() {
   console.log('🚀 Iniciando proceso de asignación y notificación de seguros de salud para entrenadores...');
 
+  const masterTaskId = 'custom_seguros_salud_entrenadores_20260915';
+
+  // Verificación de idempotencia
+  const existingMasterDoc = await db.collection('tasks').doc(masterTaskId).get();
+  if (existingMasterDoc.exists && existingMasterDoc.data()?.emailsSent === true && !process.env.FORCE_RESEND) {
+    console.log('✅ La tarea y los correos para la solicitud de seguros de salud ya fueron emitidos exitosamente. Omitiendo reenvío para evitar spam.');
+    return;
+  }
+
   // A. Obtener entrenadores adicionales de Firestore si existen
   const coachesMap = new Map();
   for (const c of KNOWN_COACHES) {
@@ -262,6 +271,23 @@ CÓMO ENVIAR LA CONSTANCIA:
 
   const coachEmails = allCoaches.map(c => c.email.toLowerCase().trim());
 
+  // Asegurar que cada entrenador esté registrado en Firestore 'users' para habilitar permisos y validación de correo
+  for (const coach of allCoaches) {
+    try {
+      await db.collection('users').doc(coach.email).set({
+        name: coach.name,
+        email: coach.email,
+        sede: coach.sede || 'Global',
+        role: 'entrenador',
+        roles: ['entrenador'],
+        emails: [coach.email],
+        isActive: true
+      }, { merge: true });
+    } catch (e) {
+      // Ignorar si ya existe
+    }
+  }
+
   // Mapa de progreso individual por entrenador
   const assigneeProgress = {};
   allCoaches.forEach(c => {
@@ -274,8 +300,6 @@ CÓMO ENVIAR LA CONSTANCIA:
       progress: 0
     };
   });
-
-  const masterTaskId = 'custom_seguros_salud_entrenadores_20260915';
 
   // C. Guardar o actualizar la Tarea Maestra en Firestore
   const taskData = {
@@ -426,6 +450,14 @@ CÓMO ENVIAR LA CONSTANCIA:
 
     await mailDocRef.set(mailDocData);
   }
+
+  // Marcar en la tarea maestra que los correos ya fueron emitidos
+  await db.collection('tasks').doc(masterTaskId).set({
+    emailsSent: true,
+    emailsSentAt: new Date().toISOString(),
+    emailsSentCount: sentCount,
+    emailsQueuedCount: queuedCount
+  }, { merge: true });
 
   console.log(`\n======================================================`);
   console.log(`🎉 PROCESO COMPLETADO EXITOSAMENTE`);
