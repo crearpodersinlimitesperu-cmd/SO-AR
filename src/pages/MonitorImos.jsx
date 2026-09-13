@@ -172,6 +172,7 @@ export default function MonitorImos() {
         coordinadora_nombre: chk.coordinadora_nombre || m.equipo || 'Coordinación'
       };
     });
+  };
 
   // Normalizacion universal y robusta para busquedas (diacriticos/tildes, minusculas, espacios)
   const cleanSearchStr = (str) =>
@@ -226,7 +227,6 @@ export default function MonitorImos() {
 
     // Coincidencia nominal o telefonica en cualquiera de sus enrolados
     return enrolados.some(e => isEnroladoSearchMatch(e, qNorm, qDigits));
-  };
   };
 
   // 🔒 (09/09/2026) José reportó, con captura, que el Monitor de IMOs le mostraba a un
