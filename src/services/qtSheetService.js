@@ -145,6 +145,13 @@ export function parseCSV(text) {
  * Transforma y SANEAMENTE INTELIGENTE de las filas crudas del CSV en objetos de miembros de QT
  * Corrige automáticamente filas desfasadas, datos invertidos y elimina duplicados.
  */
+// Lista de bajas y renuncias confirmadas por la direcciÃ³n de CREAR PSL
+export const INACTIVE_QT_MEMBERS_OVERRIDE = [
+  '9875120',                    // Leyla Kelly Pasquel Alfaro (Renuncia a QT y a Oficina)
+  'leylakellypasquel@gmail.com',
+  'leyla.pasquel@crearpsl.net'
+];
+
 export function mapRowsToQTMembers(rows) {
   if (!rows || rows.length < 2) return [];
 
@@ -274,6 +281,17 @@ export function mapRowsToQTMembers(rows) {
                      ediciones.toLowerCase().includes('mas de 15') || 
                      ediciones.toLowerCase().includes('9 a 15');
 
+    // Validacion contra lista de bajas y renuncias confirmadas
+    const isResigned = INACTIVE_QT_MEMBERS_OVERRIDE.includes(docNumero) ||
+                       INACTIVE_QT_MEMBERS_OVERRIDE.includes(email.toLowerCase()) ||
+                       nombre.toLowerCase().includes('leyla kelly pasquel');
+
+    if (isResigned) {
+      estado = 'INACTIVO - RENUNCIA';
+    }
+
+    const esActivo = !isResigned && estado.toUpperCase().includes('ACTIVO');
+
     validMembers.push({
       id,
       index: validMembers.length + 1,
@@ -281,8 +299,8 @@ export function mapRowsToQTMembers(rows) {
       sedeCode: rawSede,
       sede,
       nombre,
-      role: 'qt',
-      roles: ['qt'],
+      role: isResigned ? 'inactivo' : 'qt',
+      roles: isResigned ? [] : ['qt'],
       docTipo,
       docNumero,
       birthDate,
@@ -297,7 +315,8 @@ export function mapRowsToQTMembers(rows) {
       instagramUrl: cleanInstagram ? `https://instagram.com/${cleanInstagram.replace('@', '')}` : null,
       declaracion,
       estado,
-      esActivo: estado.toUpperCase().includes('ACTIVO')
+      esActivo,
+      motivoBaja: isResigned ? 'Renuncia a QT y a Oficina (12/09/2026)' : null
     });
   }
 
