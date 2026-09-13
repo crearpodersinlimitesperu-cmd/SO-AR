@@ -12,6 +12,7 @@
 import { initializeApp, cert, getApps } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import fetch from 'node-fetch';
+import fs from 'fs';
 
 const SHEET_ID = '1l93lhINfZtthELjOwBodoUEgk_d6A8gTb9hPGO6cOe4';
 const GID_ALIADOS_C1E31 = '488639774';
@@ -193,10 +194,16 @@ export async function syncLimaGoalsToFirestore() {
   let db;
   try {
     if (getApps().length === 0) {
-      const serviceAccountKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
-      if (serviceAccountKey) {
+      const KEY_FILE = './centro-operativo-cpsl-65ad52160f45.json';
+      const saRaw = process.env.FIREBASE_SERVICE_ACCOUNT_KEY || process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
+      if (saRaw) {
         initializeApp({
-          credential: cert(JSON.parse(serviceAccountKey))
+          credential: cert(JSON.parse(saRaw))
+        });
+      } else if (fs.existsSync(KEY_FILE)) {
+        const sa = JSON.parse(fs.readFileSync(KEY_FILE, 'utf8'));
+        initializeApp({
+          credential: cert(sa)
         });
       } else {
         initializeApp();
