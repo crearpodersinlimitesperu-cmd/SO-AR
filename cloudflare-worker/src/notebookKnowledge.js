@@ -1625,6 +1625,28 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
 Filosofía Rick Rubin: El Arte como Estado del Ser; Disciplina militar para liberar la magia cuántica; Mente de principiante (flexibilidad como autorizar zapatillas negras para el Coach); Mentalidad de abundancia; y La búsqueda de la Opción C frente a quiebres.
 
 ---
+## 15. AUDITORÍA Y CIFRAS OFICIALES C1 E31 — LIMA CICLO 31 (SEPTIEMBRE 2026)
+
+### 15.1 Métricas Clave de Confirmados y Enrolamiento C1 E31
+- Evento y Ciclo: Capítulo 1 - Ciclo 31 (C1 E31), Sede Lima.
+- Participantes / Enrolados Asignados: 130 contactos en base auditada.
+- Participantes Confirmados a Sala: 82 confirmados (63.1% tasa de efectividad).
+- Contactos Por Confirmar: 48 contactos pendientes de confirmación.
+- Fuerza de IMOs: 58 IMOs en misión asignada (30 IMOs han cerrado el 100% de su cuota).
+- Aliados C1 E31 (Staff de Apoyo): 30 aliados confirmados OK (de 184 registrados en padrón oficial de Lima, 4 en seguimiento activo SIG).
+- Total Asistentes Confirmados a Sala Consolidada: 112 confirmados (82 participantes + 30 aliados).
+- Coordinación C1 Lima: Diana Moscoso Robles y Joyce Marin Suarez.
+- Capitana de Aliados E31: Raquel Riveros.
+- Gerente de Sede Lima: José Sánchez.
+- Directiva Operativa: Concentrar llamadas prioritarias del Quantum Team en los 48 contactos pendientes para asegurar el lleno total al 100%.
+
+### 15.2 Histórico Comparativo de Equipos Lima
+- Equipo 30 (E30): 189 asignados, 127 confirmados, 94 sentados (49.7% efectividad).
+- Equipo 29 (E29): 365 asignados, 167 confirmados, 139 sentados (38.1% efectividad).
+- Equipo 28 (E28): 222 asignados, 123 confirmados, 110 sentados (49.5% efectividad).
+- Equipo 27 (E27): 372 asignados, 195 confirmados, 159 sentados (42.7% efectividad).
+
+---
 *Este documento constituye la hoja de ruta y manual de reingeniería de Crear Poder Sin Límites.*
 *Edición Oficial Integrada: Septiembre 2026. Clasificación: CONFIDENCIAL - EXCLUSIVO DIRECCIÓN REGIONAL Y SALA.*
 
