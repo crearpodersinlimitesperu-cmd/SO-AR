@@ -2236,10 +2236,21 @@ export default function Home() {
                       // 2. Coordinadores (C1/C2 y Maestría): Confirmado por José (08/09/2026):
                       // "las coordinadoras de cada sede pueden ver todas las fechas de sus sedes tanto de mj como de c1y c2 todas las fechas y entrenadores"
                       if (isCoordC1C2 || isCoordMJ) {
-                        const userSede = currentUser?.sede || '';
-                        const evSede = ev.sede || ev.sedeTag || '';
-                        if (userSede && !userSede.toLowerCase().includes('global')) {
-                          if (!evSede || (!evSede.toLowerCase().includes(userSede.toLowerCase()) && !userSede.toLowerCase().includes(evSede.toLowerCase()))) {
+                        // (14/09/2026) CORREGIDO: mismo bug ya arreglado hoy en el selector
+                        // manual de sede (más abajo) — currentUser.sede puede llegar
+                        // normalizado como "Quito Ciclo 1"/"Quito Ciclo 2" (ver
+                        // normalizeUserRecord() en userNormalizer.js, usado por
+                        // AuthContext.jsx) mientras que los eventos reales guardan la sede
+                        // como código ("UIO", "GYE", etc.), por lo que el includes() de texto
+                        // crudo nunca coincidía para Quito. normalizeSede() (import de
+                        // '../data/usersData', mismo que usa el resto de este archivo)
+                        // resuelve ambos lados a la misma forma canónica ("Quito",
+                        // "Guayaquil", etc.) antes de comparar. Reportado por José: a Erika
+                        // (Coordinadora MJ, Quito) no le cargaban las fechas de su sede.
+                        const userSedeNorm = normalizeSede(currentUser?.sede);
+                        if (userSedeNorm !== 'Sede Global') {
+                          const evSedeRaw = ev.sede || ev.sedeTag || '';
+                          if (!evSedeRaw || normalizeSede(evSedeRaw) !== userSedeNorm) {
                             return false;
                           }
                         }
@@ -2255,10 +2266,12 @@ export default function Home() {
                           const desc = (ev.descripcion || ev.desc || '').toLowerCase();
                           return name.includes(userTeam) || desc.includes(userTeam);
                         }
-                        const userSede = currentUser?.sede || '';
-                        const evSede = ev.sede || ev.sedeTag || '';
-                        if (userSede && !userSede.toLowerCase().includes('global')) {
-                          if (!evSede || (!evSede.toLowerCase().includes(userSede.toLowerCase()) && !userSede.toLowerCase().includes(evSede.toLowerCase()))) {
+                        // (14/09/2026) CORREGIDO: mismo fix de normalizeSede() que el bloque
+                        // de Coordinadores de arriba — ver ese comentario para el detalle.
+                        const userSedeNorm = normalizeSede(currentUser?.sede);
+                        if (userSedeNorm !== 'Sede Global') {
+                          const evSedeRaw = ev.sede || ev.sedeTag || '';
+                          if (!evSedeRaw || normalizeSede(evSedeRaw) !== userSedeNorm) {
                             return false;
                           }
                         }
@@ -2280,11 +2293,13 @@ export default function Home() {
                         // Bypass locales lock for directors/gerentes when they specifically select a sede filter (handled below) or just to see all
                         if (isSuperOrDir || isGerente) return true;
 
-                        const userSede = currentUser?.sede || '';
-                        if (!userSede || userSede.toLowerCase().includes('global')) return true;
-                        const evSede = ev.sede || ev.sedeTag || '';
-                        if (!evSede) return false;
-                        return evSede.toLowerCase().includes(userSede.toLowerCase()) || userSede.toLowerCase().includes(evSede.toLowerCase());
+                        // (14/09/2026) CORREGIDO: mismo fix de normalizeSede() — ver el
+                        // comentario del bloque de Coordinadores más arriba para el detalle.
+                        const userSedeNorm = normalizeSede(currentUser?.sede);
+                        if (userSedeNorm === 'Sede Global') return true;
+                        const evSedeRaw = ev.sede || ev.sedeTag || '';
+                        if (!evSedeRaw) return false;
+                        return normalizeSede(evSedeRaw) === userSedeNorm;
                       }
 
                       return true;
