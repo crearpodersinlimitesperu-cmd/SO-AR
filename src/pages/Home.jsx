@@ -13,7 +13,7 @@ import {
   AlertCircle, Circle, RefreshCw, CalendarPlus, Bell, Users, AtSign, 
   BookOpen, Lightbulb, Search, X, Filter, ChevronDown, Sparkles,
   Zap, LayoutGrid, Sliders, CheckSquare, ArrowRight, ArrowUpRight, ShieldCheck,
-  TrendingUp, Compass, HelpCircle
+  TrendingUp, Compass, HelpCircle, User
 } from 'lucide-react';
 import { getFlagForSede } from '../utils/flags';
 import { createGoogleEvent } from '../services/googleSync';
@@ -1058,6 +1058,24 @@ export default function Home() {
     setGlobalSearchTerm('');
   };
 
+  // (14/09/2026) "Mi Perfil" — acceso directo pedido por José: antes, para editar
+  // el propio perfil (ej. elegir equipo(s) de Quito, cumpleaños), había que
+  // buscarse a uno mismo en el buscador global de personas, sin ningún acceso
+  // directo. Busca el registro propio en realUsersData (misma fuente que ya usa
+  // el buscador de personas) por email normalizado, y abre el MISMO
+  // UserProfileModal que abre un resultado de búsqueda (handleSelectSearchPerson).
+  // Si por algún motivo el registro no aparece todavía en realUsersData (ej. aún
+  // cargando), cae de vuelta a currentUser tal cual — UserProfileModal ya sabe
+  // mostrar un aviso si ese objeto no tiene un id real de Firestore para guardar.
+  const handleOpenMyProfile = () => {
+    const myEmail = (currentUser?.email || '').toLowerCase().trim();
+    const ownRecord = myEmail
+      ? realUsersData.find(u => (u.email || '').toLowerCase().trim() === myEmail)
+      : null;
+    setSelectedSearchUser(ownRecord || currentUser);
+    setShowSearchUserModal(true);
+  };
+
   const handleSelectSearchModule = (mod) => {
     setShowGlobalSearchResults(false);
     setGlobalSearchTerm('');
@@ -1224,6 +1242,22 @@ export default function Home() {
               <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: '600' }}>Vista:</span>
               <ViewModeSelector />
             </div>
+            {/* (14/09/2026) Acceso directo "Mi Perfil" — antes había que buscarse a
+                uno mismo en el buscador de personas para editar el propio perfil
+                (ej. elegir equipo(s) de Quito). Pedido explícito de José. */}
+            <button
+              onClick={handleOpenMyProfile}
+              title="Ver y editar mi perfil"
+              style={{
+                display: 'flex', alignItems: 'center', gap: '0.35rem',
+                background: 'rgba(255,255,255,0.06)', border: '1px solid var(--border-strong)',
+                borderRadius: '8px', padding: '0.35rem 0.7rem', cursor: 'pointer',
+                color: 'var(--text-main)', fontSize: '0.75rem', fontWeight: 600
+              }}
+            >
+              <User size={14} style={{ color: 'var(--crear-gold)' }} />
+              Mi Perfil
+            </button>
           </div>
 
           {/* BUSCADOR GLOBAL (Opciones de Causa + Personas + Páginas y módulos + Equipos/Capitanes) */}
