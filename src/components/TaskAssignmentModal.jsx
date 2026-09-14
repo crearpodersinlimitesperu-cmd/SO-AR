@@ -910,6 +910,14 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                           const roleDisplay = getRoleDisplayName(u.role);
                           const sedeDisplay = normalizeSede(u.sede);
                           const flag = getSedeFlag(sedeDisplay);
+                          // (14/09/2026) CORREGIDO: José reportó (captura) un resultado de
+                          // búsqueda sin nombre visible — solo "• Dirección Global (Sede
+                          // Global)". Es un registro real de Firestore al que le falta el
+                          // campo "name"/"displayName" (no está en el catálogo oficial de
+                          // usersData.js para que getAllCompanyUsers() lo rellene). Nunca se
+                          // inventa un nombre: se usa el correo real como respaldo, que sigue
+                          // siendo un dato verdadero de esa persona.
+                          const displayLabel = u.name || u.displayName || u.email || 'Sin nombre registrado';
                           return (
                             <div
                               key={u.email}
@@ -932,7 +940,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                               }}
                             >
                               <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', minWidth: 0 }}>
-                                <span style={{ fontWeight: isSelected ? 700 : 500 }}>{u.name}</span>
+                                <span style={{ fontWeight: isSelected ? 700 : 500 }}>{displayLabel}</span>
                                 <span style={{ fontSize: '0.66rem', color: 'var(--text-muted)' }}>• {roleDisplay}</span>
                                 <span style={{ fontSize: '0.66rem', color: 'var(--text-muted)' }}>({flag} {sedeDisplay})</span>
                               </div>
@@ -1584,6 +1592,10 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                         const roleDisplay = getRoleDisplayName(u.role);
                         const sedeDisplay = normalizeSede(u.sede);
                         const flag = getSedeFlag(sedeDisplay);
+                        // (14/09/2026) mismo fix que en el buscador Lite: nunca mostrar una
+                        // fila sin nombre visible — el correo real es el respaldo, nunca un
+                        // nombre inventado. Ver nota completa junto a filteredLiteUsers arriba.
+                        const displayLabel = u.name || u.displayName || u.email || 'Sin nombre registrado';
 
                         // Formato de fila densa para Modo Compacto
                         if (modalViewMode === 'compact') {
@@ -1618,7 +1630,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                                   overflow: 'hidden',
                                   textOverflow: 'ellipsis'
                                 }}>
-                                  {u.name}
+                                  {displayLabel}
                                 </span>
                                 <span style={{ fontSize: '0.62rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
                                   ({flag})
@@ -1662,7 +1674,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis'
                               }}>
-                                {u.name}
+                                {displayLabel}
                               </div>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.64rem', color: 'var(--text-muted)', marginTop: '1px' }}>
                                 <span style={{ color: isSelected ? 'var(--crear-cyan)' : 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
