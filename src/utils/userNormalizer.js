@@ -136,6 +136,18 @@ export const normalizeUserRecord = (data, source = 'unknown') => {
     activeRole: activeRole,
     sede: nSede,
     sedeTag: nSede.substring(0, 3).toUpperCase(),
+    // (14/09/2026) equiposQuito: a diferencia de las demás sedes (un solo equipo
+    // activo a la vez), Quito corre VARIOS equipos en paralelo (ej. C1 Equipo 122 y
+    // C1 Equipo 128 el mismo fin de semana). Este campo NUEVO guarda 0, 1 o 2
+    // números de equipo (string) que la propia persona elige en su perfil (ver
+    // UserProfileModal.jsx) para que CyclesContext.jsx sepa exactamente qué equipo
+    // usar en vez de adivinar "el próximo evento cronológico de la sede" (que fallaba
+    // cuando hay más de un equipo activo). Solo se usa/lee para Quito; el resto de
+    // sedes lo ignoran. Se capa a 2 elementos porque el diseño confirmado con José
+    // solo contempla 1 o 2 equipos simultáneos por persona.
+    equiposQuito: Array.isArray(data.equiposQuito)
+      ? [...new Set(data.equiposQuito.map(v => String(v).trim()).filter(Boolean))].slice(0, 2)
+      : [],
     status: data.status || (data.active === false || data.isActive === false ? 'inactive' : 'active'),
     active: data.active !== false && data.isActive !== false && data.status !== 'inactive',
     isActive: data.active !== false && data.isActive !== false && data.status !== 'inactive',
@@ -178,6 +190,9 @@ export const mergeUserRecords = (existing, incoming) => {
     roles: mergedRoles,
     activeRole: e.activeRole !== 'miembro' ? e.activeRole : i.activeRole,
     sede: e.sede !== 'Global' ? e.sede : i.sede,
+    // (14/09/2026) mismo criterio que el resto de campos "propios": el existente manda
+    // si ya trae algo elegido; si no, se respalda con el del registro entrante.
+    equiposQuito: (e.equiposQuito && e.equiposQuito.length > 0) ? e.equiposQuito : i.equiposQuito,
     status: isInactive ? 'inactive' : 'active',
     active: !isInactive,
     isActive: !isInactive,

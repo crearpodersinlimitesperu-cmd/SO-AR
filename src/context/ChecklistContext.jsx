@@ -160,6 +160,20 @@ export function ChecklistProvider({ children }) {
   // sus propias fechas.
   const cyclesCtx = useCycles();
   const currentCycle = cyclesCtx?.currentCycle || null;
+  // (14/09/2026) MULTI-EQUIPO QUITO: quitoCycles trae 0, 1 o 2 entradas
+  // { equipo, cycle, stage } — una por cada equipo que el usuario de Quito eligió
+  // en su perfil (ver CyclesContext.jsx). Cuando trae 2, expandimos cada tarea del
+  // catálogo (checklistData) en una copia por equipo más abajo, para que
+  // ChecklistBoard.jsx pueda mostrar la vista combinada "Todos" (con badge de
+  // equipo) y las pestañas por equipo que pidió José. Para cualquier otra sede, o
+  // para un usuario de Quito con 0 o 1 equipo elegido, esto queda en [] y el
+  // comportamiento es exactamente el de siempre (un solo currentCycle).
+  const quitoCycles = cyclesCtx?.quitoCycles || [];
+  const isMultiTeamQuito = quitoCycles.length > 1;
+  // Llave estable para el useEffect de abajo: cambia cuando cambian los equipos
+  // elegidos o el ciclo calculado para alguno de ellos, sin depender de la
+  // identidad del arreglo (que CyclesContext recrea en cada recálculo).
+  const quitoCyclesKey = quitoCycles.map(qc => `${qc.equipo}:${qc.cycle?.id || ''}`).join('|');
 
   // Escribe cambios en un documento de "tasks", creándolo primero si todavía no existe.
   //
@@ -175,7 +189,13 @@ export function ChecklistProvider({ children }) {
   // se verifica primero si existe: si no, se crea con los datos base del catálogo (para
   // que quede completo para cualquier otro que lo lea) + el cambio pedido; si ya existe,
   // se actualiza normalmente sin tocar el resto de sus campos.
-  const writeTaskDoc = async (taskId, updates) => {
+  // (14/09/2026) cycleForDeadline (opcional): el ciclo a usar si hay que CREAR el
+  // documento recién ahora (primera vez que se toca esta tarea de catálogo).
+  // toggleTask() pasa aquí el ciclo del equipo específico de Quito que originó el
+  // toque, para no congelar en el doc compartido la fecha del primer equipo que
+  // por azar lo haya tocado primero — para cualquier otro caso (default) se sigue
+  // usando currentCycle, igual que siempre.
+  const writeTaskDoc = async (taskId, updates, cycleForDeadline = currentCycle) => {
     try {
       const taskRef = doc(db, 'tasks', taskId);
       const snap = await getDoc(taskRef);
@@ -188,7 +208,7 @@ export function ChecklistProvider({ children }) {
           status: 'Pendiente',
           priority: baseTask?.isCritical ? '🔴 ROJO' : '🟡 AMARILLO',
           progressPercentage: 0,
-          deadline: baseTask ? calculateAutomaticDeadline(baseTask, currentCycle) : null,
+          deadline: baseTask ? calculateAutomaticDeadline(baseTask, cycleForDeadline) : null,
           created_at: new Date().toISOString(),
           ...updates
         });
@@ -261,7 +281,66 @@ export function ChecklistProvider({ children }) {
       });
 
       const allTasks = [...loadedTasks, ...missingBaseTasks];
-      setTasks(allTasks);
+
+      // (14/09/2026) MULTI-EQUIPO QUITO: si esta persona eligió 2 equipos en su
+      // perfil (quitoCycles.length > 1 — ver CyclesContext.jsx), cada tarea del
+      // CATÁLOGO (checklistData) se expande en una copia por equipo, cada una con
+      // su propia fecha límite (calculada con el ciclo real de ESE equipo, no el
+      // genérico currentCycle que solo refleja el primero) y su propio estado de
+      // completado (leído de completions["${userSede}__${cycle.id}"], que ya es
+      // único por equipo porque cycle.id incluye el número de equipo — ver
+      // buildCycleForEquipo() en CyclesContext.jsx). Las tareas PERSONALIZADAS
+      // (asignadas puntualmente, id "custom_..."), que no existen en checklistData,
+      // NO se duplican — se muestran una sola vez, igual que siempre.
+      // IMPORTANTE: si la fila ya existe en Firestore y YA trae un "deadline"
+      // guardado, se respeta tal cual para AMBOS equipos (mismo criterio que ya
+      // aplica hoy para cualquier sede: una fecha ya persistida no se recalcula).
+      // Solo se calcula una fecha distinta por equipo cuando la tarea todavía no
+      // tiene documento propio en Firestore (missingBaseTasks).
+      let finalTasks = allTasks;
+      if (isMultiTeamQuito) {
+        // Solo las tareas que YA tienen documento propio en Firestore (loadedTasks)
+        // pueden traer un "deadline" persistido de verdad (manual o congelado desde
+        // que se creó el doc) — ese valor se respeta igual para los dos equipos,
+        // igual que ya ocurre hoy para cualquier sede. Las que vienen de
+        // missingBaseTasks (sin doc todavía) traen un "deadline" que solo se
+        // calculó para el PRIMER equipo elegido (currentCycle) — para esas,
+        // recalculamos siempre por equipo en vez de reusar ese valor.
+        const loadedTaskIds = new Set(loadedTasks.map(t => t.id));
+        const expanded = [];
+        allTasks.forEach(t => {
+          const baseTaskDef = checklistData.find(bt => bt.id === t.id);
+          if (!baseTaskDef) {
+            expanded.push(t);
+            return;
+          }
+          const isPersisted = loadedTaskIds.has(t.id);
+          quitoCycles.forEach(({ equipo, cycle }) => {
+            const cycleKey = cycle?.id ? `${userSede}__${cycle.id}` : null;
+            const myCycleData = cycleKey && t.completions ? t.completions[cycleKey] : null;
+            const mySedeData = t.completions ? t.completions[userSede] : null;
+            const effective = (myCycleData && myCycleData.completed !== undefined)
+              ? myCycleData
+              : (mySedeData || { completed: false, status: 'Pendiente' });
+            const perTeamDeadline = isPersisted
+              ? (t.deadline || calculateAutomaticDeadline(baseTaskDef, cycle))
+              : calculateAutomaticDeadline(baseTaskDef, cycle);
+
+            expanded.push({
+              ...t,
+              uiKey: `${t.id}__EQ${equipo}`,
+              equipoQuito: equipo,
+              quitoCycleId: cycle?.id || null,
+              deadline: perTeamDeadline,
+              completed: effective.completed,
+              status: effective.status
+            });
+          });
+        });
+        finalTasks = expanded;
+      }
+
+      setTasks(finalTasks);
       setLoading(false);
     }, (error) => {
       console.error("Error fetching tasks from Firestore:", error);
@@ -298,12 +377,28 @@ export function ChecklistProvider({ children }) {
     // el ciclo real (llega después del primer render, vía la API del calendario),
     // este listener se vuelva a suscribir y recalcule los "deadline" faltantes con
     // las fechas reales — antes se quedaban calculados con el ciclo de ejemplo.
-  }, [currentUser?.sede, currentUser?.email, currentUser?.appRole, currentCycle?.id, currentCycle?.name]);
+    // (14/09/2026) quitoCyclesKey se agrega para que, cuando una persona de Quito
+    // elige/cambia su(s) equipo(s) en su perfil, este listener se vuelva a
+    // suscribir y reconstruya "tasks" con la expansión multi-equipo correcta —
+    // igual que ya hacía currentCycle?.id, pero para quitoCycles.
+  }, [currentUser?.sede, currentUser?.email, currentUser?.appRole, currentCycle?.id, currentCycle?.name, quitoCyclesKey]);
 
-  const toggleTask = async (taskId, currentStatus) => {
+  // (14/09/2026) equipoQuito (opcional): cuando el usuario de Quito tiene 2 equipos
+  // elegidos, ChecklistBoard.jsx pasa aquí a cuál de los dos pertenece la fila que
+  // se está marcando (task.equipoQuito), para usar el "cycle" de ESE equipo
+  // puntual al armar la cycleKey de completions — no el currentCycle genérico
+  // (que solo refleja el primero de los equipos elegidos, ver CyclesContext.jsx).
+  // Así el completado de un equipo no se mezcla con el del otro aunque sea la
+  // misma tarea de catálogo. Para cualquier otro caso (equipoQuito ausente,
+  // sedes fuera de Quito, Quito con 0 o 1 equipo) el comportamiento es idéntico
+  // al de siempre: se usa currentCycle.
+  const toggleTask = async (taskId, currentStatus, equipoQuito = null) => {
     try {
       const userSede = currentUser?.sede?.trim() || 'Global';
-      const cycleKey = currentCycle?.id ? `${userSede}__${currentCycle.id}` : null;
+      const cycleForThisToggle = equipoQuito
+        ? (quitoCycles.find(qc => qc.equipo === equipoQuito)?.cycle || currentCycle)
+        : currentCycle;
+      const cycleKey = cycleForThisToggle?.id ? `${userSede}__${cycleForThisToggle.id}` : null;
 
       const updates = {
         completed: !currentStatus,
@@ -316,13 +411,13 @@ export function ChecklistProvider({ children }) {
       if (cycleKey) {
         updates[`completions.${cycleKey}.completed`] = !currentStatus;
         updates[`completions.${cycleKey}.status`] = !currentStatus ? 'Completada' : 'Pendiente';
-        updates[`completions.${cycleKey}.cycleId`] = currentCycle.id;
-        updates[`completions.${cycleKey}.cycleName`] = currentCycle.name || '';
+        updates[`completions.${cycleKey}.cycleId`] = cycleForThisToggle.id;
+        updates[`completions.${cycleKey}.cycleName`] = cycleForThisToggle.name || '';
         updates[`completions.${cycleKey}.updatedAt`] = new Date().toISOString();
       }
 
       // Update both legacy and map formats just in case it's a custom task
-      await writeTaskDoc(taskId, updates);
+      await writeTaskDoc(taskId, updates, cycleForThisToggle);
     } catch (error) {
       console.error("Error updating task:", error);
       showToast("No se pudo actualizar la tarea. Revisa los permisos de Firestore.", "error");

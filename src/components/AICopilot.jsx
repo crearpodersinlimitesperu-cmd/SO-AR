@@ -27,65 +27,54 @@ function generateAssertiveResponse(queryText, nodusData, currentUser, messageHis
     }
   }
 
-  // 1. Preguntas sobre C1 E31 / Ciclo 31 / Equipo 31
-  const isE31 = q.includes('e31') || 
-                q.includes('31') || 
-                q.includes('c1 e31') || 
-                q.includes('c1e31') || 
-                q.includes('equipo 31') ||
-                (q.includes('c1') && (q.includes('lima') || q.includes('confirmad')));
-
-  if (isE31) {
-    let resp = `📊 **Reporte Oficial C1 E31 — Lima (Auditoría en Vivo Causa OS):**\n\n`;
-    resp += `Para el entrenamiento **Capítulo 1 - Ciclo 31 (C1 E31 Lima)**, el estatus consolidado y verificado en las fuentes autorizadas (NODUS / Firestore / Padrón Oficial) es:\n\n`;
-    resp += `* 🎯 **Participantes / Enrolados Confirmados a Sala:** **82 confirmados** (de 130 contactos asignados a sala, alcanzando una tasa de efectividad del **63.1%**).\n`;
-    resp += `* ⏳ **Contactos Por Confirmar:** **48 contactos pendientes** en proceso activo de remarcación.\n`;
-    resp += `* 👥 **Fuerza de IMOs Activos:** **58 IMOs** en misión (de los cuales **30 IMOs ya cerraron el 100%** de sus enrolamientos comprometidos).\n`;
-    resp += `* 🛡️ **Aliados C1 E31 (Staff de Apoyo):** **30 aliados confirmados (OK)** (de 184 registrados en el padrón oficial de Lima, con 4 adicionales en seguimiento activo).\n`;
-    resp += `* 🏛️ **Total Asistentes Confirmados a Sala (Participantes + Aliados):** **112 confirmados** asegurados para sala.\n\n`;
-    resp += `**Liderazgo Operativo a Cargo:**\n`;
-    resp += `* **Coordinación C1 Lima:** Diana Moscoso Robles & Joyce Marin Suarez.\n`;
-    resp += `* **Capitana de Aliados E31:** Raquel Riveros.\n`;
-    resp += `* **Gerencia de Sede Lima:** José Sánchez.\n\n`;
-    resp += `⚡ **Plan de Acción Inmediato:** El lleno total de la sala se consolida cerrando los **48 contactos por confirmar**. Se recomienda desplegar bloque de llamadas prioritarias de rescate con el Quantum Team hoy entre las 18:00 y 21:00 hrs.`;
+  // 1. Preguntas sobre un equipo/ciclo específico (ej. "C1 E31", "equipo 30")
+  // (14/09/2026) CORREGIDO: antes esta rama devolvía SIEMPRE un "Reporte Oficial"
+  // con cifras y nombres de coordinadoras totalmente inventados (fijos en el
+  // código, sin leer nodusData) y lo presentaba como "verificado en las fuentes
+  // autorizadas" — una alucinación literal, detectada junto con el fix del
+  // selector de sedes de Home.jsx (mismo reporte de José: "no alucinar"). Ahora
+  // se busca el equipo en los datos reales de coords/sedes (si existen) y, si no
+  // hay coincidencia con datos en vivo, se dice explícitamente que no hay datos
+  // verificados disponibles — nunca se inventa una cifra para rellenar.
+  const equipoMatch = q.match(/\b(?:e|equipo\s*)(\d{1,3})\b/);
+  if (equipoMatch) {
+    const equipoNum = equipoMatch[1];
+    const coordsDelEquipo = coords.filter(c => String(c.equipo || '').includes(equipoNum));
+    let resp = `📊 **Consulta Equipo ${equipoNum}:**\n\n`;
+    if (coordsDelEquipo.length > 0) {
+      resp += `Datos en vivo (Nodus) para las coordinaciones asociadas a este equipo:\n\n`;
+      coordsDelEquipo.forEach(c => {
+        const est = c.estados || {};
+        resp += `* **${c.nombre} (${c.sede || 'sede no especificada'}):** ${est.confirmado || 0} confirmados, ${est.porConfirmar || 0} por confirmar, de ${est.asignados || 0} asignados.\n`;
+      });
+    } else {
+      resp += `⚠️ No encuentro datos en vivo verificados (Nodus/Firestore) para el Equipo ${equipoNum} en este momento. No voy a inventar cifras — puedes pedirme el reporte general de sedes ("¿cómo van los confirmados?") mientras se sincroniza, o consultar directamente en Nodus/el padrón oficial.`;
+    }
     return resp;
   }
 
-  // 1.1 Otros Equipos Históricos / Comparativa (E30, E29, E28, E27)
-  if (q.includes('e30') || q.includes('equipo 30')) {
-    return `📊 **Reporte Equipo 30 (Lima):**\n\n` +
-      `* **Asignados:** 189 contactos\n` +
-      `* **Confirmados:** **127 confirmados** (94 sentados en sala)\n` +
-      `* **Efectividad:** 49.7%\n` +
-      `* **Coordinación:** Diana M. & Joyce M.`;
-  }
-  if (q.includes('e29') || q.includes('equipo 29')) {
-    return `📊 **Reporte Equipo 29 (Lima):**\n\n` +
-      `* **Asignados:** 365 contactos\n` +
-      `* **Confirmados:** **167 confirmados** (139 sentados en sala)\n` +
-      `* **Efectividad:** 38.1%`;
-  }
-  if (q.includes('e28') || q.includes('equipo 28')) {
-    return `📊 **Reporte Equipo 28 (Lima):**\n\n` +
-      `* **Asignados:** 222 contactos\n` +
-      `* **Confirmados:** **123 confirmados** (110 sentados en sala)\n` +
-      `* **Efectividad:** 49.5%`;
-  }
-  if (q.includes('e27') || q.includes('equipo 27')) {
-    return `📊 **Reporte Equipo 27 (Lima):**\n\n` +
-      `* **Asignados:** 372 contactos\n` +
-      `* **Confirmados:** **195 confirmados** (159 sentados en sala)\n` +
-      `* **Efectividad:** 42.7%`;
-  }
-
   // 2. Preguntas sobre confirmados o enrolados en general
+  // (14/09/2026) CORREGIDO: los totales (133/24/80/18%) y el desglose por sede
+  // (Lima 19/76, "Arequipa" 3/12, Guayaquil 2/18) eran valores fijos en el código
+  // que se mostraban como si fueran el reporte real cuando totales/sedes venían
+  // vacíos (sin conexión a Nodus) — "Arequipa" ni siquiera es una sede de CREAR.
+  // Ahora, si no hay datos en vivo, se dice explícitamente.
   if (q.includes('confirmad') || q.includes('enrola') || q.includes('cuanto') || q.includes('total') || q.includes('cierre') || q.includes('asistencia')) {
-    let resp = `📊 **Reporte Analítico de Enrolamiento y Confirmados (Nodus Live Audit):**\n\n`;
-    resp += `* **Total Asignados:** **${totales.totalAsignados || 133}** contactos\n`;
-    resp += `* **Confirmados a Sala:** **${totales.totalConfirmados || 24}** participantes confirmados\n`;
-    resp += `* **Gestiones Realizadas:** **${totales.totalGestiones || 80}** llamadas efectivas\n`;
-    const conv = (totales.totalAsignados || 0) > 0 ? Math.round(((totales.totalConfirmados || 0) / (totales.totalAsignados || 1)) * 100) : 18;
-    resp += `* **Tasa de Conversión Real:** **${conv}%**\n\n`;
+    const hayTotales = totales && (totales.totalAsignados !== undefined || totales.totalConfirmados !== undefined || totales.totalGestiones !== undefined);
+    if (!hayTotales && sedes.length === 0) {
+      return `⚠️ **Sin datos en vivo disponibles ahora mismo.**\n\n` +
+        `No tengo un snapshot reciente de Nodus/Firestore para darte cifras verificadas de enrolamiento. No voy a inventar totales — intenta de nuevo en unos minutos o revisa directamente el dashboard de Nodus.`;
+    }
+    let resp = `📊 **Reporte de Enrolamiento y Confirmados (Nodus Live Audit):**\n\n`;
+    resp += `* **Total Asignados:** **${totales.totalAsignados ?? 'sin dato'}** contactos\n`;
+    resp += `* **Confirmados a Sala:** **${totales.totalConfirmados ?? 'sin dato'}** participantes confirmados\n`;
+    resp += `* **Gestiones Realizadas:** **${totales.totalGestiones ?? 'sin dato'}** llamadas efectivas\n`;
+    if (totales.totalAsignados > 0) {
+      const conv = Math.round(((totales.totalConfirmados || 0) / totales.totalAsignados) * 100);
+      resp += `* **Tasa de Conversión Real:** **${conv}%**\n\n`;
+    } else {
+      resp += `\n`;
+    }
     resp += `**Desglose Directivo por Sedes:**\n`;
     if (sedes.length > 0) {
       sedes.forEach(s => {
@@ -95,16 +84,18 @@ function generateAssertiveResponse(queryText, nodusData, currentUser, messageHis
         resp += `* **${s.sede}:** ${conf} confirmados de ${asig} asignados (${p}% conversión)\n`;
       });
     } else {
-      resp += `* **Lima:** 19 confirmados de 76 asignados (25% conversión)\n`;
-      resp += `* **Arequipa:** 3 confirmados de 12 asignados\n`;
-      resp += `* **Guayaquil:** 2 confirmados de 18 asignados\n`;
+      resp += `* Sin desglose por sede disponible en este snapshot.\n`;
     }
     resp += `\n🎯 **Diagnóstico Asertivo:** El punto neurálgico de la sala está en acelerar la remarcación de los contactos 'Por Confirmar' para asegurar el lleno total antes del fin de semana de entrenamiento.`;
     return resp;
   }
 
   // 3. Preguntas sobre sedes específicas
-  const foundSede = ['lima', 'guayaquil', 'quito', 'arequipa', 'bogota', 'mexico'].find(s => q.includes(s));
+  // (14/09/2026) CORREGIDO: la lista incluía "arequipa" y "bogota", que nunca
+  // fueron sedes de CREAR (mismo hallazgo que el selector de Home.jsx) — se
+  // reemplaza por las 6 sedes reales confirmadas en CAJA_NEGRA_OPERATIVA.md
+  // Sección 5.
+  const foundSede = ['lima', 'quito', 'guayaquil', 'cuenca', 'medellin', 'mexico'].find(s => q.includes(s));
   if (foundSede) {
     const sedeName = foundSede.charAt(0).toUpperCase() + foundSede.slice(1);
     const sedeCoords = coords.filter(c => (c.sede || '').toLowerCase().includes(foundSede));
@@ -123,7 +114,7 @@ function generateAssertiveResponse(queryText, nodusData, currentUser, messageHis
         resp += `  - Contactabilidad: **${callRate}%**\n`;
       });
     } else {
-      resp += `La sede ${sedeName} registra monitoreo activo bajo los estándares Causa OS.\n`;
+      resp += `⚠️ No tengo coordinaciones con datos en vivo registradas para ${sedeName} en este snapshot de Nodus.\n`;
     }
     resp += `\n⚡ **Plan de Acción:** Desplegar bloque de llamadas prioritarias con el Quantum Team entre las 18:00 y 21:00 hrs para cerrar confirmaciones pendientes.`;
     return resp;
@@ -150,23 +141,36 @@ function generateAssertiveResponse(queryText, nodusData, currentUser, messageHis
   }
 
   // 5. Preguntas sobre metas u OKRs
+  // (14/09/2026) CORREGIDO: el "75%" de contactabilidad era un valor fijo que se
+  // mostraba como si fuera calculado cuando no había datos — se reemplaza por un
+  // indicador honesto de "sin dato" en ese caso. Las metas fijas (30 participantes
+  // por sede, <10% desgaste, 70% conversión a MJ) NO son datos en vivo, son
+  // objetivos declarados de la organización, así que se mantienen tal cual.
   if (q.includes('meta') || q.includes('okr') || q.includes('objetivo') || q.includes('salud') || q.includes('estrategia') || q.includes('predic')) {
-    return `🎯 **Alineación Estratégica Causa OS & Predicción:**\n\n` +
-      `* **Meta de Contactabilidad C1:** 100% de la base llamada (Actualmente en **${totales.totalAsignados > 0 ? Math.round(((totales.totalGestiones || 0) / totales.totalAsignados) * 100) : 75}%**).\n` +
+    const contactabilidad = totales.totalAsignados > 0
+      ? `${Math.round(((totales.totalGestiones || 0) / totales.totalAsignados) * 100)}%`
+      : 'sin dato en vivo';
+    return `🎯 **Alineación Estratégica Causa OS:**\n\n` +
+      `* **Meta de Contactabilidad C1:** 100% de la base llamada (Actualmente en **${contactabilidad}**).\n` +
       `* **Meta de Confirmados por Sede:** Mínimo 30 participantes activos en sala.\n` +
       `* **Retención C1:** Menor al 10% de desgaste.\n` +
       `* **Movimiento a Maestría del Juego (CMJ):** 70% de conversión declarada.\n\n` +
       `⚡ **Acción Inmediata:** Desplegar revisión diaria a primera hora en el Centro de Managers para alinear compromisos de palabra.`;
   }
 
-  // 6. Respuesta por defecto poderosa y asertiva
+  // 6. Respuesta por defecto
+  // (14/09/2026) CORREGIDO: "24 confirmados, 80 gestiones" eran valores fijos que
+  // se mostraban como "Métricas Clave" reales incluso sin datos de Nodus.
+  const metricasClave = (totales.totalConfirmados !== undefined || totales.totalGestiones !== undefined)
+    ? `${totales.totalConfirmados ?? 'sin dato'} confirmados consolidados, ${totales.totalGestiones ?? 'sin dato'} gestiones registradas.`
+    : 'sin snapshot de Nodus disponible en este momento.';
   return `🤖 **Diagnóstico Operativo Causa OS:**\n\n` +
     `He procesado tu consulta: _"${queryText}"_\n\n` +
-    `* **Base de Datos:** NODUS Live & Firestore Causa OS sincronizados.\n` +
+    `* **Base de Datos:** NODUS Live & Firestore Causa OS.\n` +
     `* **Usuario en Sesión:** ${currentUser?.displayName || currentUser?.name || 'Líder'} (${currentUser?.appRole || 'Oficina'} - ${currentUser?.sede || 'Global'}).\n` +
-    `* **Métricas Clave:** ${totales.totalConfirmados || 24} confirmados consolidados, ${totales.totalGestiones || 80} gestiones registradas.\n\n` +
+    `* **Métricas Clave:** ${metricasClave}\n\n` +
     `Puedes pedirme:\n` +
-    `1. *"¿Cuántos confirmados hay para C1 E31?"*\n` +
+    `1. *"¿Cuántos confirmados hay para C1 Equipo 31?"*\n` +
     `2. *"¿Cómo va la sede Lima o Guayaquil?"*\n` +
     `3. *"¿Quiénes tienen contactos pendientes de llamar?"*\n` +
     `4. *"¿Cuál es la proyección de cierre de sala?"*`;

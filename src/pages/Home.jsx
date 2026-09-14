@@ -2129,12 +2129,24 @@ export default function Home() {
                     onChange={(e) => setSelectedSedeFilter(e.target.value)}
                     style={{ background: 'rgba(255,255,255,0.07)', color: 'white', border: '1px solid rgba(255,255,255,0.15)', padding: '0.25rem 0.5rem', borderRadius: '6px', fontSize: '0.78rem', cursor: 'pointer' }}
                   >
+                    {/* (14/09/2026) CORREGIDO: este selector mostraba ciudades inventadas
+                        (Arequipa, San Juan de Lurigancho, Trujillo, Los Olivos) que NUNCA
+                        fueron sedes reales de CREAR — reportado por José con captura ("aqui
+                        debe de aparecer la sedes reales de crear no alucinar"). Ahora lista
+                        las 6 sedes reales confirmadas en CAJA_NEGRA_OPERATIVA.md Sección 5
+                        (Lima, Quito, Guayaquil, Cuenca, Medellín, México). El filtro de abajo
+                        también se corrigió para usar normalizeSede() (ya importado de
+                        '../data/usersData', usado en el resto de este mismo archivo) en vez
+                        de un includes() de texto crudo — sin este cambio, "Quito" y "Guayaquil"
+                        no habrían coincidido nunca con los eventos reales (que guardan la sede
+                        como código "UIO"/"GYE", no como el nombre completo de la ciudad). */}
                     <option value="todas" style={{ background: '#0d152d' }}>Todas las sedes</option>
                     <option value="Lima" style={{ background: '#0d152d' }}>Lima</option>
-                    <option value="Arequipa" style={{ background: '#0d152d' }}>Arequipa</option>
-                    <option value="San Juan de Lurigancho" style={{ background: '#0d152d' }}>San Juan de Lurigancho</option>
-                    <option value="Trujillo" style={{ background: '#0d152d' }}>Trujillo</option>
-                    <option value="Los Olivos" style={{ background: '#0d152d' }}>Los Olivos</option>
+                    <option value="Quito" style={{ background: '#0d152d' }}>Quito</option>
+                    <option value="Guayaquil" style={{ background: '#0d152d' }}>Guayaquil</option>
+                    <option value="Cuenca" style={{ background: '#0d152d' }}>Cuenca</option>
+                    <option value="Medellín" style={{ background: '#0d152d' }}>Medellín</option>
+                    <option value="México" style={{ background: '#0d152d' }}>México</option>
                   </select>
                 </div>
 
@@ -2255,10 +2267,16 @@ export default function Home() {
                     }
 
                     if (selectedSedeFilter !== 'todas') {
-                      const sf = selectedSedeFilter.toLowerCase();
+                      // (14/09/2026) CORREGIDO: antes era un includes() de texto crudo, que
+                      // nunca funcionaba para Quito/Guayaquil porque los eventos reales guardan
+                      // la sede como código ("UIO", "GYE"), no como el nombre completo de la
+                      // ciudad ("quito".includes("uio") es false). normalizeSede() ya resuelve
+                      // esa equivalencia (código <-> nombre, con o sin tilde) y es la misma
+                      // función que usa el resto de este archivo para comparar sedes.
+                      const sfNorm = normalizeSede(selectedSedeFilter);
                       displayEvents = displayEvents.filter(ev => {
-                        const evSede = (ev.sede || ev.sedeTag || ev.place || ev.address || ev.lugar || '').toLowerCase();
-                        return evSede.includes(sf) || sf.includes(evSede);
+                        const evSedeRaw = ev.sede || ev.sedeTag || ev.place || ev.address || ev.lugar || '';
+                        return normalizeSede(evSedeRaw) === sfNorm;
                       });
                     }
 

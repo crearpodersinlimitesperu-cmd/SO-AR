@@ -305,6 +305,20 @@ export function AuthProvider({ children }) {
       isDireccion,
       isRoleSimulationActive: false,
       sede: foundUser.sede || 'Global',
+      // (14/09/2026) NUEVO CAMPO: equiposQuito — José confirmó que, a diferencia de
+      // las demás sedes (que corren UN solo equipo a la vez), Quito corre VARIOS
+      // equipos en paralelo (ej. C1 Equipo 122 y C1 Equipo 128 el mismo fin de
+      // semana). Antes no existía forma de saber a qué equipo específico pertenece
+      // cada gerente/coordinador de Quito, así que CyclesContext.jsx adivinaba "el
+      // próximo evento cronológico de la sede" sin importar el equipo real de la
+      // persona (ver CyclesContext.jsx para el detalle completo). Este arreglo (0, 1
+      // o 2 strings con el número de equipo, ej. ["122"] o ["122","128"]) lo elige la
+      // propia persona en su perfil (ver UserProfileModal.jsx) y solo se usa/lee en
+      // Quito; el resto de sedes lo ignoran por completo. Vive en
+      // users/{id}.equiposQuito en Firestore, y llega aquí ya saneado por
+      // normalizeUserRecord() (userNormalizer.js) — este fallback solo cubre el caso
+      // de foundUser sin pasar por ese normalizador (ej. catálogo estático).
+      equiposQuito: Array.isArray(foundUser.equiposQuito) ? foundUser.equiposQuito : [],
       document: foundUser.document || '',
       docType: foundUser.docType || '',
       dbId: foundUser.id,
@@ -490,6 +504,17 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // (14/09/2026) Actualiza campos sueltos del currentUser EN MEMORIA (sin recargar
+  // sesión ni volver a llamar a Google). Se agregó para equiposQuito
+  // (UserProfileModal.jsx): cuando una persona de Quito elige su(s) equipo(s) en su
+  // propio perfil, CyclesContext.jsx necesita ver el cambio de inmediato (para
+  // recalcular su ciclo activo) en vez de esperar a que cierre sesión y vuelva a
+  // entrar. Es un merge superficial deliberado — no toca Firestore, eso ya lo hace
+  // quien llama a esta función antes de invocarla.
+  const updateCurrentUserFields = (updates) => {
+    setCurrentUser(prev => (prev ? { ...prev, ...updates } : prev));
+  };
+
   const logout = async () => {
     if (currentUser && !currentUser.isSimulated) {
       try {
@@ -633,7 +658,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ currentUser, originalAdminUser, loginWithGoogle, reauthenticateGoogle, logout, loading, switchRole, simulateUser, stopSimulation }}>
+    <AuthContext.Provider value={{ currentUser, originalAdminUser, loginWithGoogle, reauthenticateGoogle, logout, loading, switchRole, simulateUser, stopSimulation, updateCurrentUserFields }}>
       {loading ? (
         <div style={{
           minHeight: '100vh',

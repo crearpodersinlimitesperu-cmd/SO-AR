@@ -97,8 +97,34 @@ export default function ChecklistBoard() {
   const [searchQuery, setSearchQuery] = useState('');
 
   const { tasks, toggleTask, updateTaskDetails, inviteCollaborator, syncTasksToGoogle, updateIndividualProgress, acceptCollaboration, rejectCollaboration } = useChecklist();
-  const { currentCycle, currentStage } = useCycles();
+  const { currentCycle, currentStage, quitoCycles } = useCycles();
   const { showPrompt } = useUI();
+
+  // (14/09/2026) MULTI-EQUIPO QUITO: cuando el usuario eligió 2 equipos en su
+  // perfil (ver CyclesContext.jsx/UserProfileModal.jsx), ChecklistContext.jsx ya
+  // entrega "tasks" con una copia por equipo (task.equipoQuito) para cada tarea
+  // de catálogo. Acá se agrega el selector "Todos / Equipo X / Equipo Y" que
+  // pidió José — vista combinada con badge de equipo POR DEFECTO, y pestañas
+  // para ver un equipo a la vez. Para cualquier otra sede, o Quito con 0 o 1
+  // equipo, quitoCycles.length <= 1 y todo este bloque queda inactivo (no se
+  // renderiza nada nuevo, comportamiento idéntico al de siempre).
+  const quitoCyclesList = Array.isArray(quitoCycles) ? quitoCycles : [];
+  const isMultiTeamQuitoView = quitoCyclesList.length > 1;
+  const [selectedQuitoTeam, setSelectedQuitoTeam] = useState('all');
+  // Ciclo real de una tarea puntual: el de su propio equipo si la tarea trae
+  // equipoQuito (fila expandida), si no el currentCycle genérico de siempre.
+  const cycleForTask = (task) => {
+    if (task?.equipoQuito) {
+      const match = quitoCyclesList.find(qc => qc.equipo === task.equipoQuito);
+      if (match) return match.cycle;
+    }
+    return currentCycle;
+  };
+  // Etapa efectiva para las pestañas de fase: la del equipo seleccionado cuando
+  // hay 2 equipos y se eligió uno puntual; si no, la de siempre (currentStage).
+  const effectiveStage = (isMultiTeamQuitoView && selectedQuitoTeam !== 'all')
+    ? (quitoCyclesList.find(qc => qc.equipo === selectedQuitoTeam)?.stage || currentStage)
+    : currentStage;
   const role = roles.find(r => r.id === roleId) || {
     id: roleId,
     name: getRoleDisplayName(roleId)
@@ -174,18 +200,27 @@ export default function ChecklistBoard() {
     }
 
     return true;
+  }).filter(t => {
+    // (14/09/2026) Pestaña de equipo (solo aplica con 2 equipos elegidos en Quito):
+    // una fila SIN equipoQuito (ej. una tarea personalizada, no del catálogo) se
+    // muestra siempre, sea cual sea la pestaña activa. Una fila CON equipoQuito
+    // solo se filtra cuando hay una pestaña de equipo específica seleccionada
+    // (no "Todos").
+    if (!isMultiTeamQuitoView || selectedQuitoTeam === 'all') return true;
+    if (!t.equipoQuito) return true;
+    return t.equipoQuito === selectedQuitoTeam;
   });
 
   const filterParam = searchParams.get('filter');
 
   // Pestañas de fases operativas: permanentemente activas para todos los usuarios de oficina (PRE-C1, C1, POST-C1, PRE-C2, C2, PRE-MJ, MJ, POST-MJ)
   const showPhaseTabs = true;
-  const isCurrentStageInRole = currentStage && PHASE_ORDER.includes(currentStage);
+  const isCurrentStageInRole = effectiveStage && PHASE_ORDER.includes(effectiveStage);
 
   const sortByDeadline = (tasksArray) => {
     return tasksArray.sort((a, b) => {
-      const dA = a.deadline || calculateAutomaticDeadline(a, currentCycle);
-      const dB = b.deadline || calculateAutomaticDeadline(b, currentCycle);
+      const dA = a.deadline || calculateAutomaticDeadline(a, cycleForTask(a));
+      const dB = b.deadline || calculateAutomaticDeadline(b, cycleForTask(b));
       const timeA = dA ? new Date(dA).getTime() : Infinity;
       const timeB = dB ? new Date(dB).getTime() : Infinity;
       return timeA - timeB;
@@ -193,7 +228,7 @@ export default function ChecklistBoard() {
   };
 
   let scopedTasks = myTasks;
-  let viewTitle = `Checklist Causa OS Activo: ${currentStage}`;
+  let viewTitle = `Checklist Causa OS Activo: ${effectiveStage}`;
 
   if (filterParam === 'criticas') {
     scopedTasks = myTasks.filter(t => t.isCritical || t.priority === 'Crítica');
@@ -204,8 +239,8 @@ export default function ChecklistBoard() {
   } else if (showPhaseTabs) {
     if (qtPhaseFilter === 'active') {
       if (isCurrentStageInRole) {
-        const meta = PHASE_META[currentStage] || { label: currentStage };
-        scopedTasks = myTasks.filter(t => t.cyclePhase === currentStage);
+        const meta = PHASE_META[effectiveStage] || { label: effectiveStage };
+        scopedTasks = myTasks.filter(t => t.cyclePhase === effectiveStage);
         viewTitle = `${role?.name || 'Checklist'}: Fase Activa ${meta.label}`;
       } else {
         scopedTasks = myTasks;
@@ -227,8 +262,8 @@ export default function ChecklistBoard() {
     }
   } else {
     // Vista Normal del Checklist Activo para roles de fase única
-    if (currentStage && currentStage !== 'GLOBAL' && currentStage !== 'INACTIVO') {
-      scopedTasks = myTasks.filter(t => t.cyclePhase === currentStage);
+    if (effectiveStage && effectiveStage !== 'GLOBAL' && effectiveStage !== 'INACTIVO') {
+      scopedTasks = myTasks.filter(t => t.cyclePhase === effectiveStage);
     } else {
       scopedTasks = myTasks;
     }
@@ -286,7 +321,7 @@ export default function ChecklistBoard() {
     if (task.completed || task.status === 'Completada') {
       try {
         setProcessingTasks(prev => new Set(prev).add(task.id));
-        await toggleTask(task.id, true);
+        await toggleTask(task.id, true, task.equipoQuito);
       } catch (err) {
         console.error("Error toggling task status:", err);
       } finally {
@@ -315,7 +350,7 @@ export default function ChecklistBoard() {
     if (!task) return;
     try {
       setProcessingTasks(prev => new Set(prev).add(task.id));
-      await toggleTask(task.id, false);
+      await toggleTask(task.id, false, task.equipoQuito);
       celebrateVictory();
     } catch (err) {
       console.error("Error al forzar completado de tarea ajena:", err);
@@ -333,7 +368,7 @@ export default function ChecklistBoard() {
     setTaskForCompletionChoice(null);
     try {
       setProcessingTasks(prev => new Set(prev).add(task.id));
-      await toggleTask(task.id, false);
+      await toggleTask(task.id, false, task.equipoQuito);
       celebrateVictory();
     } catch (err) {
       console.error("Error al completar tarea:", err);
@@ -488,6 +523,54 @@ export default function ChecklistBoard() {
         </div>
         <p className="text-gold" style={{ marginTop: '0.5rem', fontWeight: 'bold' }}>{progress}% Completado en esta Fase</p>
 
+        {/* (14/09/2026) SELECTOR DE EQUIPO DE QUITO — solo aparece cuando el usuario
+            eligió 2 equipos en su perfil (ver UserProfileModal.jsx). José pidió
+            explícitamente las dos opciones: "Todos" muestra ambos equipos juntos con
+            el badge de equipo junto al título de cada tarea (ver arriba), y las
+            pestañas por equipo dejan ver uno a la vez por separado. Para cualquier
+            otra sede, o Quito con 0 o 1 equipo, este bloque no se renderiza y el
+            comportamiento queda idéntico al de siempre. */}
+        {isMultiTeamQuitoView && (
+          <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1.25rem', flexWrap: 'wrap', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '1rem', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>👥 Equipo (Quito):</span>
+            <button
+              type="button"
+              onClick={() => setSelectedQuitoTeam('all')}
+              style={{
+                padding: '0.35rem 0.8rem',
+                borderRadius: '6px',
+                fontSize: '0.8rem',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                background: selectedQuitoTeam === 'all' ? 'var(--crear-blue, #29abe2)' : 'rgba(255,255,255,0.05)',
+                color: selectedQuitoTeam === 'all' ? '#000000' : 'var(--text-muted)',
+                border: `1px solid ${selectedQuitoTeam === 'all' ? 'var(--crear-blue, #29abe2)' : 'rgba(255,255,255,0.1)'}`
+              }}
+            >
+              Todos
+            </button>
+            {quitoCyclesList.map(({ equipo }) => (
+              <button
+                key={equipo}
+                type="button"
+                onClick={() => setSelectedQuitoTeam(equipo)}
+                style={{
+                  padding: '0.35rem 0.8rem',
+                  borderRadius: '6px',
+                  fontSize: '0.8rem',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  background: selectedQuitoTeam === equipo ? 'var(--crear-gold)' : 'rgba(255,255,255,0.05)',
+                  color: selectedQuitoTeam === equipo ? '#000000' : 'var(--text-muted)',
+                  border: `1px solid ${selectedQuitoTeam === equipo ? 'var(--crear-gold)' : 'rgba(255,255,255,0.1)'}`
+                }}
+              >
+                Equipo {equipo}
+              </button>
+            ))}
+          </div>
+        )}
+
         {/* NAVEGACIÓN PROLIJA DE FASES OPERATIVAS */}
         {showPhaseTabs && (
           <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1.25rem', flexWrap: 'wrap', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '1rem' }}>
@@ -507,7 +590,7 @@ export default function ChecklistBoard() {
                   border: `1px solid ${qtPhaseFilter === 'active' ? 'var(--color-success)' : 'rgba(255,255,255,0.1)'}`
                 }}
               >
-                ⚡ Fase Activa: {currentStage} ({myTasks.filter(t => t.cyclePhase === currentStage).length})
+                ⚡ Fase Activa: {effectiveStage} ({myTasks.filter(t => t.cyclePhase === effectiveStage).length})
               </button>
             )}
 
@@ -797,7 +880,7 @@ export default function ChecklistBoard() {
             const isForeign = isForeignTask(task, currentUser);
             const taskSede = task.assignedSede || task.sede;
             return (
-            <div key={task.id} className="glass-panel hover-glow" style={{ padding: '1.5rem', borderLeft: `4px solid ${isForeign ? '#ef4444' : getPriorityColor(task.priority)}`, opacity: task.completed ? 0.6 : 1, transition: 'all 0.3s' }}>
+            <div key={task.uiKey || task.id} className="glass-panel hover-glow" style={{ padding: '1.5rem', borderLeft: `4px solid ${isForeign ? '#ef4444' : getPriorityColor(task.priority)}`, opacity: task.completed ? 0.6 : 1, transition: 'all 0.3s' }}>
               
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
                 <div style={{ flex: 1, display: 'flex', gap: '1rem' }}>
@@ -851,6 +934,26 @@ export default function ChecklistBoard() {
                         }}
                         title="Haz clic para ver detalles, registrar avances o adjuntar evidencias a Google Drive"
                       >
+                        {/* (14/09/2026) Badge de equipo -- solo aparece cuando hay 2 equipos
+                            de Quito elegidos y la tarea viene "expandida" por equipo (ver
+                            ChecklistContext.jsx). Es lo que permite distinguir, en la vista
+                            combinada "Todos", a cuál de los dos equipos pertenece cada fila. */}
+                        {isMultiTeamQuitoView && task.equipoQuito && (
+                          <span style={{
+                            display: 'inline-block',
+                            fontSize: '0.68rem',
+                            fontWeight: 800,
+                            padding: '1px 7px',
+                            borderRadius: '9999px',
+                            marginRight: '0.4rem',
+                            verticalAlign: 'middle',
+                            background: 'rgba(41, 171, 226, 0.15)',
+                            color: 'var(--crear-blue, #29abe2)',
+                            border: '1px solid rgba(41, 171, 226, 0.4)'
+                          }}>
+                            Equipo {task.equipoQuito}
+                          </span>
+                        )}
                         {task.task || task.title}
                       </h3>
                       {canEditTask(task) && !task.completed && (
@@ -866,7 +969,7 @@ export default function ChecklistBoard() {
 
                       {/* FECHA Y HORA LÍMITE AUTOMÁTICA Causa OS */}
                       {(() => {
-                        const effectiveDeadline = task.deadline || calculateAutomaticDeadline(task, currentCycle);
+                        const effectiveDeadline = task.deadline || calculateAutomaticDeadline(task, cycleForTask(task));
                         const countdown = getCountdownInfo(effectiveDeadline);
                         return (
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
@@ -1219,7 +1322,7 @@ export default function ChecklistBoard() {
         onClose={() => setTaskForReflection(null)}
         task={taskForReflection}
         onComplete={async (taskId) => {
-          await toggleTask(taskId, false); // false porque antes no estaba completada
+          await toggleTask(taskId, false, taskForReflection?.equipoQuito); // false porque antes no estaba completada
           setTaskForReflection(null);
         }}
       />

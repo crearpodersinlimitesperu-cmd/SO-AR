@@ -4,7 +4,7 @@ import { calculateAutomaticDeadline } from '../utils/soarDates';
 import { useCycles } from '../context/CyclesContext';
 import { cyclesData } from '../data/cyclesData';
 import { 
-  X, User, CheckCircle2, Clock, AlertTriangle, 
+  X, User, Users, CheckCircle2, Clock, AlertTriangle, 
   FileText, Link2, Plus, Trash2, ExternalLink, Calendar, 
   Building2, Mail, Shield, PlusCircle, CheckSquare, Eye,
   UserX, UserCheck, ShieldAlert
@@ -75,14 +75,19 @@ function formatBirthdayNoYear(cumpleanos) {
 }
 
 export default function UserProfileModal({ isOpen, onClose, user, allTasks = [], onStatusUpdated }) {
-  const { currentUser, originalAdminUser, simulateUser } = useAuth();
+  const { currentUser, originalAdminUser, simulateUser, updateCurrentUserFields } = useAuth();
   const navigate = useNavigate();
   const { toggleTask } = useChecklist();
   const { showToast } = useUI();
   let currentCycle = null;
+  // (14/09/2026) quitoTeamOptions: lista dinamica de numeros de equipo de Quito,
+  // provista por CyclesContext.jsx a partir del calendario oficial en vivo -- se usa
+  // mas abajo para el selector de "Equipo(s) en Quito" (equiposQuito).
+  let quitoTeamOptions = [];
   try {
     const cyclesCtx = useCycles();
     currentCycle = cyclesCtx?.currentCycle || cyclesData[0];
+    quitoTeamOptions = cyclesCtx?.quitoTeamOptions || [];
   } catch (e) {
     currentCycle = cyclesData[0];
   }
@@ -182,6 +187,14 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
   const [editingBirthday, setEditingBirthday] = useState(false);
   const [birthdayDraft, setBirthdayDraft] = useState(user?.cumpleanos || '');
   const [isSavingBirthday, setIsSavingBirthday] = useState(false);
+
+  // (14/09/2026) Equipo(s) de Quito (editable por la propia persona, o por Super
+  // Admin) -- se guarda en users/{id}.equiposQuito. Ver CyclesContext.jsx para el
+  // porque: Quito, a diferencia de las demas sedes, corre varios equipos en
+  // paralelo, asi que hace falta que cada quien indique a cual pertenece.
+  const [editingQuitoTeams, setEditingQuitoTeams] = useState(false);
+  const [quitoTeamsDraft, setQuitoTeamsDraft] = useState(Array.isArray(user?.equiposQuito) ? user.equiposQuito : []);
+  const [isSavingQuitoTeams, setIsSavingQuitoTeams] = useState(false);
 
   // Firestore sync for user meta
   useEffect(() => {
@@ -364,6 +377,48 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
       showToast('No se pudo guardar el cumpleaños: ' + error.message, 'error');
     } finally {
       setIsSavingBirthday(false);
+    }
+  };
+
+  // (14/09/2026) Equipo(s) de Quito -- editable por la propia persona (self-service,
+  // confirmado por Jose) o por Super Admin (para poder ayudar/corregir). Igual que
+  // el cumpleanos, requiere un id real de Firestore.
+  const isViewingOwnProfile = Boolean(currentUser?.email && user?.email && currentUser.email.toLowerCase().trim() === user.email.toLowerCase().trim());
+  const canEditQuitoTeams = isViewingOwnProfile || Boolean(currentUser?.isSuperAdmin);
+  const isQuitoUser = normalizeSede(user?.sede || '').startsWith('Quito');
+
+  const toggleQuitoTeamDraft = (team) => {
+    setQuitoTeamsDraft(prev => {
+      if (prev.includes(team)) return prev.filter(t => t !== team);
+      if (prev.length >= 2) {
+        showToast('Solo puedes elegir hasta 2 equipos a la vez.', 'error');
+        return prev;
+      }
+      return [...prev, team];
+    });
+  };
+
+  const handleSaveQuitoTeams = async () => {
+    if (!user?.id) {
+      showToast('Este perfil no tiene un documento en Firestore para editar (registro local).', 'error');
+      return;
+    }
+    setIsSavingQuitoTeams(true);
+    try {
+      await updateDoc(doc(db, 'users', user.id), { equiposQuito: quitoTeamsDraft });
+      // Si la persona esta editando su PROPIO perfil, reflejamos el cambio de
+      // inmediato en el currentUser de la sesion -- si no, CyclesContext.jsx no se
+      // entera del equipo elegido hasta que cierre sesion y vuelva a entrar.
+      if (isViewingOwnProfile && typeof updateCurrentUserFields === 'function') {
+        updateCurrentUserFields({ equiposQuito: quitoTeamsDraft });
+      }
+      showToast('Equipo(s) de Quito actualizados.', 'success');
+      setEditingQuitoTeams(false);
+    } catch (error) {
+      console.error('Error guardando equiposQuito:', error);
+      showToast('No se pudo guardar tu seleccion de equipo(s): ' + error.message, 'error');
+    } finally {
+      setIsSavingQuitoTeams(false);
     }
   };
 
@@ -680,6 +735,81 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
                         <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Sin cumpleaños — clic para agregar</span>
                       ) : null}
                     </span>
+                  )}
+
+                  {/* (14/09/2026) Equipo(s) de Quito -- solo aparece para perfiles de Quito.
+                      Quito corre varios equipos en paralelo (a diferencia de las demas sedes),
+                      asi que cada persona indica aqui a cual(es) pertenece: 1 o 2 equipos,
+                      elegidos de la lista real y viva del calendario (nunca inventados).
+                      Editable por la propia persona (self-service) o por Super Admin. */}
+                  {isQuitoUser && (
+                    editingQuitoTeams ? (
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }} onClick={(e) => e.stopPropagation()}>
+                        <Users size={14} color="var(--crear-gold)" />
+                        <span style={{ display: 'inline-flex', gap: '0.35rem', flexWrap: 'wrap' }}>
+                          {quitoTeamOptions.length === 0 ? (
+                            <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
+                              Sin equipos detectados aun en el calendario de Quito.
+                            </span>
+                          ) : quitoTeamOptions.map(team => {
+                            const selected = quitoTeamsDraft.includes(team);
+                            return (
+                              <button
+                                key={team}
+                                type="button"
+                                onClick={() => toggleQuitoTeamDraft(team)}
+                                style={{
+                                  fontSize: '0.75rem',
+                                  padding: '3px 9px',
+                                  borderRadius: '9999px',
+                                  cursor: 'pointer',
+                                  fontWeight: 700,
+                                  border: `1px solid ${selected ? 'var(--crear-gold)' : 'rgba(255,255,255,0.2)'}`,
+                                  background: selected ? 'var(--crear-gold)' : 'transparent',
+                                  color: selected ? '#000' : 'var(--text-muted)'
+                                }}
+                              >
+                                Equipo {team}
+                              </button>
+                            );
+                          })}
+                        </span>
+                        <button
+                          onClick={handleSaveQuitoTeams}
+                          disabled={isSavingQuitoTeams}
+                          style={{ fontSize: '0.75rem', padding: '3px 8px', borderRadius: '6px', border: 'none', background: 'var(--crear-gold)', color: '#000', fontWeight: 700, cursor: 'pointer' }}
+                        >
+                          {isSavingQuitoTeams ? '...' : 'Guardar'}
+                        </button>
+                        <button
+                          onClick={() => { setEditingQuitoTeams(false); setQuitoTeamsDraft(Array.isArray(user?.equiposQuito) ? user.equiposQuito : []); }}
+                          style={{ fontSize: '0.75rem', padding: '3px 8px', borderRadius: '6px', border: '1px solid var(--text-muted)', background: 'transparent', color: 'var(--text-muted)', cursor: 'pointer' }}
+                        >
+                          Cancelar
+                        </button>
+                      </span>
+                    ) : (
+                      <span
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', cursor: canEditQuitoTeams ? 'pointer' : 'default' }}
+                        title={canEditQuitoTeams ? 'Clic para elegir tu(s) equipo(s) de Quito' : 'Equipo(s) de Quito (elegido por la propia persona)'}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (canEditQuitoTeams) {
+                            setQuitoTeamsDraft(Array.isArray(user?.equiposQuito) ? user.equiposQuito : []);
+                            setEditingQuitoTeams(true);
+                          }
+                        }}
+                      >
+                        <Users size={14} color="var(--crear-gold)" />
+                        {Array.isArray(user?.equiposQuito) && user.equiposQuito.length > 0 ? (
+                          <span>Equipo(s) Quito: <strong style={{ color: 'var(--text-heading)' }}>{user.equiposQuito.map(t => `Equipo ${t}`).join(' + ')}</strong></span>
+                        ) : canEditQuitoTeams ? (
+                          <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Sin equipo elegido -- clic para asignar (usa auto-deteccion mientras tanto)</span>
+                        ) : (
+                          <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Sin equipo elegido (auto-deteccion)</span>
+                        )}
+                      </span>
+                    )
                   )}
 
                   {/* Última Conexión Visible para Directorio y Super Admin */}
