@@ -2101,7 +2101,16 @@ export default function Home() {
       {viewMode !== 'lite' && (
         <>
           {/* MI PROGRESO GENERAL */}
-          {(viewMode === 'compact' || customModules.progress !== false) && !hasRoleAccess(['entrenador', 'entrenador_llamadas']) && (
+          {/* (15/09/2026) BUG hasRoleAccess #2 CORREGIDO: mismo patron ya
+              documentado en esta pagina (ver comentario ~linea 2445, fix del
+              10/09/2026): hasRoleAccess(allowedRoles) devuelve `true` para
+              CUALQUIER lista de roles cuando el usuario es SuperAdmin no
+              simulado, asi que la negacion "!hasRoleAccess([...])" usada aqui
+              para ocultar este panel a entrenadores terminaba ocultandoselo
+              tambien al SuperAdmin en Vista Consolidada -- justo a quien nunca
+              deberia ocultarsele nada. Se agrega la misma excepcion ya usada en
+              las lineas ~969 y ~2453 de este archivo. */}
+          {(viewMode === 'compact' || customModules.progress !== false) && (!hasRoleAccess(['entrenador', 'entrenador_llamadas']) || (currentUser?.isSuperAdmin && !currentUser?.isSimulated)) && (
             <div className="glass-panel" style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem' }}>
                 <h3 className="text-main" style={{ margin: 0, fontSize: '1.1rem' }}>Mi Progreso General en el Ciclo</h3>
