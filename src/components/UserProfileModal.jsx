@@ -10,7 +10,7 @@ import {
   UserX, UserCheck, ShieldAlert
 } from 'lucide-react';
 import { db } from '../services/firebase';
-import { doc, onSnapshot, setDoc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
+import { doc, onSnapshot, setDoc, updateDoc, arrayUnion, arrayRemove, addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { useAuth } from '../context/AuthContext';
 import { useChecklist } from '../context/ChecklistContext';
 import { normalizeRole, normalizeSede, getRoleDisplayName } from '../data/usersData';
@@ -176,6 +176,7 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
   const [newDocUrl, setNewDocUrl] = useState('');
   const [isSavingNote, setIsSavingNote] = useState(false);
   const [isSavingDoc, setIsSavingDoc] = useState(false);
+  const [isSendingNotification, setIsSendingNotification] = useState(false);
 
   // Task assignment submodal
   const [showTaskModal, setShowTaskModal] = useState(false);
@@ -419,6 +420,34 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
       showToast('No se pudo guardar tu seleccion de equipo(s): ' + error.message, 'error');
     } finally {
       setIsSavingQuitoTeams(false);
+    }
+  };
+
+  // Handler: Notificar por correo -- encola un correo en la coleccion 'mail' de Firestore,
+  // que ya es procesada automaticamente por el sistema de correo de la plataforma
+  // (mail-dispatch.yml + mailerDaemon.js), igual que HelpModal.jsx y MonitorImos.jsx.
+  const handleNotifyByEmail = async () => {
+    if (!user?.email) {
+      showToast('Este perfil no tiene un correo registrado para notificar.', 'error');
+      return;
+    }
+    setIsSendingNotification(true);
+    try {
+      const primerNombre = user.name ? user.name.split(' ')[0] : '';
+      await addDoc(collection(db, 'mail'), {
+        to: [user.email],
+        message: {
+          subject: 'Causa OS: tu perfil ha sido actualizado',
+          html: `<p>Hola ${primerNombre},</p><p>Te confirmamos que tu perfil en Causa OS ya está actualizado.</p><p>Si tienes alguna situación o consulta al respecto, por favor comunícala respondiendo a este correo o contactando a tu coordinador/a.</p><p>Gracias,<br/>Causa OS</p>`
+        },
+        createdAt: serverTimestamp()
+      });
+      showToast('Correo de notificacion enviado a la cola para ' + (user.name || user.email) + '.', 'success');
+    } catch (error) {
+      console.error('Error enviando notificacion por correo:', error);
+      showToast('No se pudo poner en cola el correo: ' + error.message, 'error');
+    } finally {
+      setIsSendingNotification(false);
     }
   };
 
@@ -1125,6 +1154,22 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
                         }}
                       >
                         <Eye size={16} /> Simular Vista
+                      </button>
+                    )}
+                    {canSimulate(currentUser, originalAdminUser) && (
+                      <button 
+                        onClick={handleNotifyByEmail}
+                        disabled={isSendingNotification || !user?.email}
+                        className="btn-secondary"
+                        style={{
+                          padding: '0.4rem 0.9rem', fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '0.4rem',
+                          background: 'rgba(255,255,255,0.1)', color: '#fff', border: '1px solid rgba(255,255,255,0.2)', fontWeight: 'bold', borderRadius: '8px',
+                          cursor: (isSendingNotification || !user?.email) ? 'not-allowed' : 'pointer',
+                          opacity: (isSendingNotification || !user?.email) ? 0.6 : 1
+                        }}
+                        title="Encola un correo a este colaborador via el sistema de correo de la plataforma"
+                      >
+                        <Mail size={16} /> {isSendingNotification ? 'Enviando...' : 'Notificar por correo'}
                       </button>
                     )}
                     <button 
