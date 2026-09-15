@@ -2558,7 +2558,14 @@ export default function Home() {
           )}
 
           {/* PANEL: TAREAS QUE HAS ASIGNADO A OTROS (con cuenta regresiva) */}
-          {tareasQueHeAsignado.length > 0 && (() => {
+          {/* José confirmó (15/09/2026): el panel debe aparecer SIEMPRE, para
+              todos los usuarios, con su información -- aunque no tengan
+              ninguna tarea. Antes se ocultaba por completo cuando
+              tareasQueHeAsignado.length era 0, lo que hacía parecer que la
+              app estaba rota para coordinadores que simplemente aún no
+              tienen tareas asignadas en el sistema (ej. Erika y otros
+              Coordinadores MJ recién dados de alta). */}
+          {(() => {
             // Clasificación para las pestañas de filtro (Activas/Vencidas/Cumplidas/Todas).
             const clasificadas = tareasQueHeAsignado.map(task => {
               const isDone = task.completed || task.status === 'Completada';
@@ -2602,7 +2609,11 @@ export default function Home() {
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.8rem', maxHeight: '360px', overflowY: 'auto' }}>
                 {visibles.length === 0 && (
-                  <p className="text-muted" style={{ fontSize: '0.82rem', padding: '0.5rem 0' }}>No hay tareas en "{tareasAsignadasFilter}".</p>
+                  <p className="text-muted" style={{ fontSize: '0.82rem', padding: '0.5rem 0' }}>
+                    {tareasQueHeAsignado.length === 0
+                      ? 'No tienes tareas asignadas todavía (ni creadas por ti, ni asignadas a ti).'
+                      : `No hay tareas en "${tareasAsignadasFilter}".`}
+                  </p>
                 )}
                 {visibles.map(({ task, isDone }) => {
                   const countdown = getCountdownInfo(task.deadline, time);
