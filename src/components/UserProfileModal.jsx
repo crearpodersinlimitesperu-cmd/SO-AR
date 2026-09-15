@@ -252,11 +252,22 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
     return () => unsubscribe();
   }, [isOpen, user]);
 
-  if (!isOpen || !user) return null;
-
-  const canonicalRole = normalizeRole(user.role);
-  const roleColor = ROLE_COLORS[canonicalRole] || ROLE_COLORS[user.role] || '#29abe2';
-  const roleLabel = ROLE_LABELS[canonicalRole] || ROLE_LABELS[user.role] || user.role;
+  // (15/09/2026) BUG CRITICO CORREGIDO: este "return null" vivia AQUI, antes de
+  // los 4 useMemo de mas abajo (userTasks/completedTasks/criticalPending/
+  // displayedTasks). Home.jsx renderiza <UserProfileModal isOpen={...} .../>
+  // SIEMPRE montado (no con "{showModal && <UserProfileModal/>}"), asi que
+  // cuando isOpen pasaba de true a false (cerrar el modal), React ejecutaba
+  // MENOS hooks que en el render anterior -- viola las Reglas de los Hooks y
+  // causaba el crash real de la app: "Minified React error #300: Rendered
+  // fewer hooks than expected" (pantalla "Ocurrio una interrupcion
+  // inesperada"), reportado por Liliana Cubillo. El check se movio a despues
+  // del ultimo useMemo (linea ~360) para que los hooks siempre se llamen en
+  // el mismo orden y cantidad, sin importar isOpen/user. Los useMemo de abajo
+  // se hicieron seguros ante user=null/undefined para que puedan ejecutarse
+  // incondicionalmente sin romperse.
+  const canonicalRole = normalizeRole(user?.role);
+  const roleColor = ROLE_COLORS[canonicalRole] || ROLE_COLORS[user?.role] || '#29abe2';
+  const roleLabel = ROLE_LABELS[canonicalRole] || ROLE_LABELS[user?.role] || user?.role;
 
   const canEditTask = (task) => {
     if (!currentUser) return false;
@@ -275,6 +286,7 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
   // 1. Base tasks of this user's role and sede
   // 2. Direct assigned custom tasks (assignedToEmail)
   const userTasks = useMemo(() => {
+    if (!user) return [];
     const raw = allTasks.filter(t => {
       const isAssigned = (t.assignedToEmails && t.assignedToEmails.some(e => e.toLowerCase() === user.email?.toLowerCase())) || (t.assignedToEmail && t.assignedToEmail.toLowerCase() === user.email?.toLowerCase());
       const isCollab = t.collaborators && t.collaborators.includes(user.email);
@@ -336,14 +348,17 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
   }, [allTasks, user, currentUser, canonicalRole, currentCycle, taskSortOrder]);
 
   const completedTasks = useMemo(() => {
+    if (!user) return [];
     return userTasks.filter(t => isTaskCompleted(t, user.sede));
-  }, [userTasks, user.sede]);
+  }, [userTasks, user?.sede]);
 
   const criticalPending = useMemo(() => {
+    if (!user) return [];
     return userTasks.filter(t => !isTaskCompleted(t, user.sede) && (t.isCritical || t.priority?.includes('ROJO')));
-  }, [userTasks, user.sede]);
+  }, [userTasks, user?.sede]);
 
   const displayedTasks = useMemo(() => {
+    if (!user) return [];
     if (taskFilterStatus === 'pending') {
       return userTasks.filter(t => !isTaskCompleted(t, user.sede));
     }
@@ -354,7 +369,13 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
       return userTasks.filter(t => t.isCritical || t.priority?.includes('ROJO'));
     }
     return userTasks;
-  }, [userTasks, taskFilterStatus, user.sede]);
+  }, [userTasks, taskFilterStatus, user?.sede]);
+
+  // Este es el punto correcto para el early-return: TODOS los hooks del
+  // componente (useState/useEffect/useMemo) ya se llamaron arriba, en el
+  // mismo orden en cada render, sin importar isOpen/user. Todo lo que sigue
+  // de aqui en adelante (handlers, y el JSX del modal) es seguro de saltar.
+  if (!isOpen || !user) return null;
 
   const pct = userTasks.length > 0 ? Math.round((completedTasks.length / userTasks.length) * 100) : 0;
 
