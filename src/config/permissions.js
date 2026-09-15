@@ -34,19 +34,34 @@ export const isSuperAdminEmail = (email) => {
 };
 
 /**
+ * Email de la ÚNICA persona autorizada a simular usuarios (ver la app como si
+ * fuera otra persona específica, vía "Simular como..." en UserProfileModal.jsx).
+ * (15/09/2026) CORREGIDO: José confirmó explícitamente "solo yo puedo simular
+ * usuarios". El comentario de canSimulate() de abajo YA decía "ÚNICA Y
+ * EXCLUSIVAMENTE los Super Administradores", pero el código real no
+ * coincidía con ese comentario: también dejaba simular a cualquiera con rol
+ * Dirección/CFO/CCO/CEO (DIRECCION_ROLES), y SUPER_ADMIN_EMAILS tiene 3
+ * personas (José, Armando Pilacuán, Paul Sosa), no solo José. Este cambio
+ * SOLO restringe la capacidad de simular OTROS usuarios — no toca
+ * SUPER_ADMIN_EMAILS ni DIRECCION_ROLES, que se siguen usando tal cual en
+ * el resto de este archivo para todo lo demás (Centro de Mando, reinicio de
+ * ciclos, CRM Nodus, etc.) — Armando y Paul conservan su acceso de Super
+ * Admin en todo lo demás, solo pierden la capacidad de simular usuarios.
+ */
+const UNICO_EMAIL_AUTORIZADO_A_SIMULAR = 'jose.sanchez@crearpsl.net';
+
+/**
  * Verifica si el usuario actual tiene permisos para simular vistas de otros colaboradores.
  * REGLA ESTRICTA DE SEGURIDAD:
- * ÚNICA Y EXCLUSIVAMENTE los Super Administradores pueden simular usuarios.
+ * ÚNICA Y EXCLUSIVAMENTE jose.sanchez@crearpsl.net puede simular usuarios.
  * @param {Object} currentUser
  * @param {Object} originalAdminUser
  * @returns {boolean}
  */
 export const canSimulate = (currentUser, originalAdminUser = null) => {
-  if (originalAdminUser) {
-    return Boolean(originalAdminUser.isSuperAdmin || isSuperAdminEmail(originalAdminUser.email) || DIRECCION_ROLES.includes(originalAdminUser.appRole));
-  }
-  if (!currentUser) return false;
-  return Boolean(currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email) || DIRECCION_ROLES.includes(currentUser.appRole));
+  const persona = originalAdminUser || currentUser;
+  if (!persona) return false;
+  return (persona.email || '').trim().toLowerCase() === UNICO_EMAIL_AUTORIZADO_A_SIMULAR;
 };
 
 /**

@@ -156,7 +156,9 @@ export function AuthProvider({ children }) {
 
   const simulateUser = (targetUser) => {
     if (!canSimulate(currentUser, originalAdminUser)) {
-      showToast('Acceso Denegado: Solo Super Administradores y Directivos pueden simular usuarios.', 'error');
+      // (15/09/2026) CORREGIDO: mensaje desactualizado — José confirmó que solo
+      // él puede simular usuarios (ver canSimulate() en config/permissions.js).
+      showToast('Acceso Denegado: solo José Sánchez puede simular usuarios.', 'error');
       return;
     }
     setOriginalAdminUser(currentUser);
