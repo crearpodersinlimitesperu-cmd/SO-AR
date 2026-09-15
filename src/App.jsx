@@ -90,10 +90,27 @@ function RoleRoute({ children, allowedRoles = [], requireSuperAdmin = false, exc
     return children;
   }
 
-  // En vista consolidada, el usuario ve todo lo que sus roles abarcan sin restricciones
-  if (currentUser.isConsolidatedView || currentUser.appRole === 'consolidado') {
-    return children;
-  }
+  // (15/09/2026) BUG CRITICO CORREGIDO: este bloque otorgaba "return children"
+  // INCONDICIONAL a cualquier usuario en Vista Consolidada, ignorando por completo
+  // el array allowedRoles de CADA RoleRoute individual -- incluso rutas que
+  // explicitamente excluyen el bypass de Direccion via excludeDireccionBypass=true
+  // (ej. /calendario-mj, /generador-flyer) quedaban expuestas igual, porque este
+  // bloque se evaluaba ANTES de llegar siquiera a esa logica. El comentario original
+  // decia "el usuario ve todo lo que SUS ROLES abarcan" pero el codigo no verificaba
+  // los roles reales del usuario en absoluto -- era equivalente a un bypass de
+  // SuperAdmin para cualquiera con 2+ roles (ver RoleSelector.jsx: el boton "Vista
+  // Consolidada" se ofrece a cualquier usuario con userRoles.length > 1, incluyendo
+  // perfiles de bajo privilegio como entrenadores). Confirmado explotable contra 8
+  // usuarios reales del catalogo. La proteccion de datos en Firestore SI estaba bien
+  // disenada (ver effectiveRole() en firestore.rules, que ya excluye 'consolidado'
+  // como rol efectivo valido), pero esta ruta del lado del cliente exponia
+  // navegacion/UI a secciones restringidas sin ninguna verificacion real.
+  // FIX: se elimina el bypass incondicional. Ahora un usuario en Vista Consolidada
+  // sigue el flujo normal de abajo, que YA verifica (linea "roles || []).some(...)")
+  // si CUALQUIERA de sus roles reales esta en allowedRoles -- que es exactamente lo
+  // que el comentario original decia que debia pasar. Ver tambien el ajuste en el
+  // chequeo de abajo para que 'consolidado' (no es un rol real) no cuente como match
+  // literal de allowedRoles.includes(currentUser.appRole).
 
   // Verificación de Super Admin
   if (requireSuperAdmin) {
@@ -106,7 +123,7 @@ function RoleRoute({ children, allowedRoles = [], requireSuperAdmin = false, exc
 
   // Verificación de Roles permitidos
   if (allowedRoles.length > 0) {
-    const hasRole = allowedRoles.includes(currentUser.appRole) ||
+    const hasRole = (currentUser.appRole !== 'consolidado' && allowedRoles.includes(currentUser.appRole)) ||
                     currentUser.isSuperAdmin ||
                     (!excludeDireccionBypass && currentUser.isDireccion) ||
                     (currentUser.roles || []).some(r => allowedRoles.includes(r));

@@ -652,9 +652,20 @@ const getCountdownInfo = (deadlineIso, now) => {
 };
 
 export default function Home() {
+  // (15/09/2026) BUG CRITICO CORREGIDO: la linea de 'consolidado' devolvia true
+  // para CUALQUIER lista de roles pedida, sin verificar los roles reales del
+  // usuario -- mismo patron que el bug ya corregido en RoleRoute (src/App.jsx).
+  // Cualquier usuario con 2+ roles (ver boton "Vista Consolidada" en
+  // RoleSelector.jsx) obtenia acceso equivalente a SuperAdmin en TODO lo que
+  // esta funcion protege en esta pagina. FIX: en vista consolidada, el acceso
+  // ahora se basa en si ALGUNO de los roles reales del usuario (currentUser.roles)
+  // esta en la lista pedida -- exactamente lo que la vista consolidada deberia
+  // mostrar ("todo lo que sus roles reales abarcan"), no todo sin excepcion.
   const hasRoleAccess = (allowedRoles) => {
     if (currentUser?.isSuperAdmin && !currentUser?.isSimulated) return true;
-    if (currentUser?.appRole === 'consolidado') return true;
+    if (currentUser?.appRole === 'consolidado') {
+      return (currentUser?.roles || []).some(r => allowedRoles.includes(r));
+    }
     return allowedRoles.includes(currentUser?.appRole);
   };
 
