@@ -71,7 +71,21 @@ export const normalizeSede = (sede) => {
   if (s === 'CUE' || clean.includes('cuenca')) return 'Cuenca';
   if (s === 'GYE' || clean.includes('guayaquil')) return 'Guayaquil';
   if (s === 'MEX' || clean.includes('mex') || clean.includes('cdmx')) return 'M\u00E9xico';
+  // (15/09/2026) CORREGIDO — causa raíz real de "a Erika no le cargan las fechas
+  // de su sede", confirmada leyendo el JSON en vivo del endpoint real de eventos
+  // (Google Apps Script, ?action=getEventos — NO Firestore): los eventos de
+  // Quito usan el código de sede "UIO C1" / "UIO C2" con ESPACIO, no con guion
+  // ("UIO-C1"/"UIO-C2" como asumía este código) y sin la palabra "quito" en
+  // ningún lado. Por eso ningún caso de abajo los reconocía y normalizeSede()
+  // los devolvía tal cual ("UIO C1"), distinto de "Quito" — así que la
+  // comparación en el filtro de eventos de Home.jsx (isCoordMJ/isCoordC1C2)
+  // nunca coincidía para Quito, aunque SÍ hay 219 eventos futuros reales para
+  // Quito ahora mismo (confirmado en vivo). Se agrega clean.includes('uio') —
+  // "uio" no aparece en ningún otro código/nombre de sede real (Lima, Cuenca,
+  // Guayaquil, Medellín, México), así que es seguro y cubre "UIO", "UIO C1",
+  // "UIO C2", "UIO-C1", "UIO-C2" y cualquier variante futura con ese prefijo.
   if (s === 'UIO-C1' || s === 'UIO-C2' || s === 'UIO' ||
+      clean.includes('uio') ||
       clean.includes('ciclo 1') || clean.includes('ciclo1') ||
       clean.includes('ciclo 2') || clean.includes('ciclo2') ||
       clean.includes('quito')) return 'Quito';
