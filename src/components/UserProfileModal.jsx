@@ -177,6 +177,8 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
   const [isSavingNote, setIsSavingNote] = useState(false);
   const [isSavingDoc, setIsSavingDoc] = useState(false);
   const [isSendingNotification, setIsSendingNotification] = useState(false);
+  const [showNotifyMessageBox, setShowNotifyMessageBox] = useState(false);
+  const [notifyCustomMessage, setNotifyCustomMessage] = useState('');
 
   // Task assignment submodal
   const [showTaskModal, setShowTaskModal] = useState(false);
@@ -447,23 +449,39 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
   // Handler: Notificar por correo -- encola un correo en la coleccion 'mail' de Firestore,
   // que ya es procesada automaticamente por el sistema de correo de la plataforma
   // (mail-dispatch.yml + mailerDaemon.js), igual que HelpModal.jsx y MonitorImos.jsx.
+  // (15/09/2026) Se agrego un cuadro de mensaje personalizado -- a peticion de Jose,
+  // para poder avisarle a cada colaborador (ej. Liliana, Erika, Andres) puntualmente
+  // que su situacion especifica ya fue resuelta, en vez de mandar siempre el mismo
+  // texto generico fijo. El boton de mas abajo ahora abre este cuadro en vez de
+  // enviar directo; el envio real ocurre desde el boton "Enviar correo" del cuadro.
   const handleNotifyByEmail = async () => {
     if (!user?.email) {
       showToast('Este perfil no tiene un correo registrado para notificar.', 'error');
       return;
     }
+    if (!notifyCustomMessage.trim()) {
+      showToast('Escribe un mensaje antes de enviar.', 'error');
+      return;
+    }
     setIsSendingNotification(true);
     try {
       const primerNombre = user.name ? user.name.split(' ')[0] : '';
+      const escapeHtml = (str) => str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+      const cuerpoHtml = escapeHtml(notifyCustomMessage.trim()).replace(/\n/g, '<br/>');
       await addDoc(collection(db, 'mail'), {
         to: [user.email],
         message: {
-          subject: 'Causa OS: tu perfil ha sido actualizado',
-          html: `<p>Hola ${primerNombre},</p><p>Te confirmamos que tu perfil en Causa OS ya está actualizado.</p><p>Si tienes alguna situación o consulta al respecto, por favor comunícala respondiendo a este correo o contactando a tu coordinador/a.</p><p>Gracias,<br/>Causa OS</p>`
+          subject: 'Causa OS: novedades sobre tu situación',
+          html: `<p>Hola ${primerNombre},</p><p>${cuerpoHtml}</p><p>Si tienes alguna situación o consulta al respecto, por favor comunícala respondiendo a este correo o contactando a tu coordinador/a.</p><p>Gracias,<br/>Causa OS</p>`
         },
         createdAt: serverTimestamp()
       });
       showToast('Correo de notificacion enviado a la cola para ' + (user.name || user.email) + '.', 'success');
+      setShowNotifyMessageBox(false);
+      setNotifyCustomMessage('');
     } catch (error) {
       console.error('Error enviando notificacion por correo:', error);
       showToast('No se pudo poner en cola el correo: ' + error.message, 'error');
@@ -1179,7 +1197,15 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
                     )}
                     {canSimulate(currentUser, originalAdminUser) && (
                       <button 
-                        onClick={handleNotifyByEmail}
+                        onClick={() => {
+                          setShowNotifyMessageBox(prev => {
+                            const next = !prev;
+                            if (next && !notifyCustomMessage.trim()) {
+                              setNotifyCustomMessage('Te confirmamos que tu perfil en Causa OS ya está actualizado. Si tienes alguna situación o consulta al respecto, por favor comunícala respondiendo a este correo o contactando a tu coordinador/a.');
+                            }
+                            return next;
+                          });
+                        }}
                         disabled={isSendingNotification || !user?.email}
                         className="btn-secondary"
                         style={{
@@ -1188,9 +1214,9 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
                           cursor: (isSendingNotification || !user?.email) ? 'not-allowed' : 'pointer',
                           opacity: (isSendingNotification || !user?.email) ? 0.6 : 1
                         }}
-                        title="Encola un correo a este colaborador via el sistema de correo de la plataforma"
+                        title="Escribe y envia un mensaje personalizado a este colaborador via el sistema de correo de la plataforma"
                       >
-                        <Mail size={16} /> {isSendingNotification ? 'Enviando...' : 'Notificar por correo'}
+                        <Mail size={16} /> Notificar por correo
                       </button>
                     )}
                     <button 
@@ -1205,6 +1231,64 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
                     </button>
                   </div>
                 </div>
+
+                {showNotifyMessageBox && (
+                  <div style={{
+                    marginBottom: '1rem',
+                    padding: '0.9rem 1rem',
+                    background: 'rgba(255,255,255,0.03)',
+                    border: '1px solid rgba(255,255,255,0.12)',
+                    borderRadius: '10px'
+                  }}>
+                    <label style={{ display: 'block', fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '0.4rem' }}>
+                      Mensaje para {user?.name || 'este colaborador'} (se enviará por correo a {user?.email}):
+                    </label>
+                    <textarea
+                      value={notifyCustomMessage}
+                      onChange={(e) => setNotifyCustomMessage(e.target.value)}
+                      rows={4}
+                      style={{
+                        width: '100%',
+                        padding: '0.6rem 0.7rem',
+                        borderRadius: '8px',
+                        border: '1px solid rgba(255,255,255,0.15)',
+                        background: 'rgba(0,0,0,0.25)',
+                        color: '#fff',
+                        fontSize: '0.85rem',
+                        fontFamily: 'inherit',
+                        resize: 'vertical'
+                      }}
+                      placeholder="Escribe aquí el mensaje específico para este colaborador..."
+                    />
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '0.6rem' }}>
+                      <button
+                        onClick={() => { setShowNotifyMessageBox(false); setNotifyCustomMessage(''); }}
+                        disabled={isSendingNotification}
+                        className="btn-secondary"
+                        style={{
+                          padding: '0.4rem 0.9rem', fontSize: '0.82rem',
+                          background: 'rgba(255,255,255,0.08)', color: '#fff', border: '1px solid rgba(255,255,255,0.2)', fontWeight: 'bold', borderRadius: '8px',
+                          cursor: isSendingNotification ? 'not-allowed' : 'pointer'
+                        }}
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        onClick={handleNotifyByEmail}
+                        disabled={isSendingNotification || !notifyCustomMessage.trim() || !user?.email}
+                        className="btn-primary"
+                        style={{
+                          padding: '0.4rem 0.9rem', fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '0.4rem',
+                          background: 'var(--crear-cyan)', color: '#000', border: 'none', fontWeight: 'bold', borderRadius: '8px',
+                          cursor: (isSendingNotification || !notifyCustomMessage.trim() || !user?.email) ? 'not-allowed' : 'pointer',
+                          opacity: (isSendingNotification || !notifyCustomMessage.trim() || !user?.email) ? 0.6 : 1
+                        }}
+                      >
+                        <Mail size={16} /> {isSendingNotification ? 'Enviando...' : 'Enviar correo'}
+                      </button>
+                    </div>
+                  </div>
+                )}
 
                 {/* Barra de Filtros y Orden Cronológico */}
                 <div style={{ 
