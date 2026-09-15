@@ -19,6 +19,22 @@ export const normalizeRole = (role) => {
   // Coordinadores Capítulo 1 / Capítulo 2 (C1 / C2)
   if (r === 'coordinador_c1c2' || r === 'coord_c1' || r === 'coord_c2' || r === 'coordinador_c1' || r === 'coordinador_c2' || r.includes('capitulo uno') || r.includes('capitulo 1') || r.includes('capitulo dos') || r.includes('capitulo 2') || r === 'c1' || r === 'c2' || r === 'c1/c2' || r === 'c1c2') return 'coord_c1';
   
+  // (15/09/2026) BUG CRITICO CORREGIDO: este chequeo de "director_maestria"
+  // se movio ANTES del chequeo de "coord_maestria" (unas lineas mas abajo).
+  // Motivo: el chequeo de coord_maestria usaba r.includes('maestria'), que
+  // TAMBIEN es verdadero para el string 'director_maestria' -- como los if
+  // regresan en la primera coincidencia, CUALQUIER usuario con rol
+  // "director_maestria" quedaba silenciosamente reclasificado como
+  // "coord_maestria" en cada login, sin importar lo que dijera el catalogo
+  // oficial (usersToImport.js) o Firestore. Mismo bug que en usersData.js
+  // (normalizeRole tiene dos implementaciones casi identicas en el repo).
+  // Confirmado como la causa real de que Andres Gomez -- con
+  // "director_maestria" ya asignado en el catalogo desde el 13/09/2026
+  // (commit 3f3f6fb) -- nunca viera ese rol activo en su selector.
+  // Reportado por Jose el 15/09/2026.
+  // Director Maestría del Juego (MJ)
+  if (r === 'director_maestria' || r === 'director_mj' || (r.includes('director') && (r.includes('maestr') || r.includes('mj')))) return 'director_maestria';
+  
   // Coordinadores Maestría del Juego (MJ)
   if (r === 'coordinador_mj' || r === 'coord_maestria' || r === 'coordinador_maestria' || r.includes('maestria del juego') || r.includes('maestria') || r.includes('coordinador global maestria') || r === 'mj') return 'coord_maestria';
   
@@ -31,8 +47,6 @@ export const normalizeRole = (role) => {
   // Quantum Team & Coordinación QT Global
   if (r === 'qt' || r === 'quantum_team' || r.includes('quantum') || r.includes('coord_qt') || r.includes('coordinador qt') || r.includes('coordinador_qt') || r.includes('qt global')) return 'qt';
   
-  // Director Maestría del Juego (MJ)
-  if (r === 'director_maestria' || r === 'director_mj' || (r.includes('director') && (r.includes('maestr') || r.includes('mj')))) return 'director_maestria';
   
   // Manager
   if (r === 'manager' || r === 'managers') return 'manager';
