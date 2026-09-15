@@ -1402,29 +1402,42 @@ export default function Home() {
                   : <>{currentUser?.appRole === 'consolidado' ? 'Vista Consolidada (Global)' : (ROLE_DISPLAY_NAMES[currentUser?.appRole] || currentUser?.appRole?.replace(/_/g, ' ') || 'Miembro')} {getFlagForSede(currentUser?.sede)}</>}
               </span>
               {((currentUser?.roles && currentUser.roles.length > 1) || currentUser?.isSuperAdmin) && (
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.4rem', marginTop: '3px' }}>
-                  <select
-                    value={currentUser.activeRole || currentUser.appRole}
-                    onChange={(e) => switchRole(e.target.value)}
-                    style={{
-                      padding: '0.2rem 0.5rem',
-                      borderRadius: '6px',
-                      background: 'rgba(255, 183, 3, 0.15)',
-                      border: '1px solid var(--crear-gold)',
-                      color: 'var(--text-heading)',
-                      fontSize: '0.75rem',
-                      fontWeight: 'bold',
-                      cursor: 'pointer',
-                      outline: 'none'
-                    }}
-                    title="Cambiar tu rol activo"
-                  >
-                    {(currentUser?.isSuperAdmin ? ALL_SIMULATABLE_ROLES : (currentUser?.roles || [])).map(r => (
-                      <option key={r} value={r} style={{ background: '#0d152d', color: '#ffffff' }}>
-                        🎭 {r === 'consolidado' ? 'Vista Consolidada (Global)' : (ROLE_DISPLAY_NAMES[r] || r.toUpperCase())}
-                      </option>
-                    ))}
-                  </select>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.15rem', marginTop: '3px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.4rem' }}>
+                    <select
+                      value={currentUser.activeRole || currentUser.appRole}
+                      onChange={(e) => switchRole(e.target.value)}
+                      style={{
+                        padding: '0.2rem 0.5rem',
+                        borderRadius: '6px',
+                        background: 'rgba(255, 183, 3, 0.15)',
+                        border: '1px solid var(--crear-gold)',
+                        color: 'var(--text-heading)',
+                        fontSize: '0.75rem',
+                        fontWeight: 'bold',
+                        cursor: 'pointer',
+                        outline: 'none'
+                      }}
+                      title="Cambiar tu rol activo: esto cambia de verdad las tareas, los eventos y los permisos que ves en toda la plataforma — no es solo una etiqueta"
+                    >
+                      {(currentUser?.isSuperAdmin ? ALL_SIMULATABLE_ROLES : (currentUser?.roles || [])).map(r => (
+                        <option key={r} value={r} style={{ background: '#0d152d', color: '#ffffff' }}>
+                          🎭 {r === 'consolidado' ? 'Vista Consolidada (Global)' : (ROLE_DISPLAY_NAMES[r] || r.toUpperCase())}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  {/* (15/09/2026) CORREGIDO: José reportó (captura) que este selector de
+                      rol activo debía dejar muy claro que NO es cosmético — al cambiarlo
+                      cambian de verdad las tareas, eventos y permisos que ve y puede usar
+                      la persona en toda la plataforma. Confirmó explícitamente que es el
+                      selector real (el mismo que usa cualquier usuario con varios roles
+                      asignados, no solo la simulación de Super Admin). Antes esa aclaración
+                      solo vivía en el "title" (tooltip al pasar el mouse, invisible en
+                      móvil/touch); ahora hay un texto siempre visible debajo del selector. */}
+                  <span style={{ fontSize: '0.62rem', color: 'var(--crear-gold)', fontWeight: 600, textAlign: 'right', maxWidth: '230px', lineHeight: 1.25 }}>
+                    ⚠️ cambia tus tareas, eventos y permisos
+                  </span>
                 </div>
               )}
             </div>
