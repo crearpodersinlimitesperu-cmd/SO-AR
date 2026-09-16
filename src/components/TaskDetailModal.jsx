@@ -293,15 +293,10 @@ export default function TaskDetailModal({
     }
   };
 
-  if (!isOpen || !task) return null;
-
   const userEmail = (currentUser?.email || '').toLowerCase().trim();
-  const taskCreatorEmail = (task.createdBy || '').toLowerCase().trim();
-  const isCreator = Boolean(taskCreatorEmail && userEmail === taskCreatorEmail);
-  const isForeign = isForeignTask(task, currentUser);
+  const normalizeEm = (e) => (e || '').toLowerCase().trim().replace('@crearpls.com', '@crearpsl.net');
 
-  // Formateo de asignados
-  // Formateo de asignados y lógica de avance colaborativo
+  // Formateo de asignados y logica de avance colaborativo
   const assignedList = useMemo(() => {
     if (!task) return [];
     if (Array.isArray(task.assignedToEmails) && task.assignedToEmails.length > 0) {
@@ -315,24 +310,12 @@ export default function TaskDetailModal({
 
   const isMultiAssignee = assignedList.length > 1;
 
-  const getDisplayName = (email) => {
-    if (resolveAssigneeName && typeof resolveAssigneeName === 'function') {
-      return resolveAssigneeName(email);
-    }
-    return email;
-  };
-
-  const countdown = getCountdown(task.deadline);
-  const normalizeEm = (e) => (e || '').toLowerCase().trim().replace('@crearpls.com', '@crearpsl.net');
-
   // Identificar si el usuario actual es uno de los asignados
   const myEmailKey = useMemo(() => {
     return Object.keys(assigneeProgressMap).find(k => 
       k.toLowerCase().trim() === userEmail || normalizeEm(k) === normalizeEm(userEmail)
     ) || null;
   }, [assigneeProgressMap, userEmail]);
-
-  const myAssigneeEntry = myEmailKey ? assigneeProgressMap[myEmailKey] : null;
 
   // Lista estructurada de colaboradores para renderizado
   const collaboratorsList = useMemo(() => {
@@ -356,13 +339,38 @@ export default function TaskDetailModal({
     return collaboratorsList.filter(c => c.completed).length;
   }, [collaboratorsList]);
 
-  // Cálculo del avance general del equipo en tiempo real
+  // Calculo del avance general del equipo en tiempo real
   const computedOverallProgress = useMemo(() => {
     if (!isMultiAssignee) return progress;
     if (totalAssigneesCount === 0) return progress;
     const sum = collaboratorsList.reduce((acc, c) => acc + c.progress, 0);
     return Math.round(sum / totalAssigneesCount);
   }, [isMultiAssignee, totalAssigneesCount, collaboratorsList, progress]);
+
+  // FIX 16/09/2026: el guard de apertura se movio a este punto -- DESPUES de
+  // TODOS los hooks (useMemo) del componente -- porque antes estaba ANTES de 5
+  // de ellos. TaskDetailModal esta siempre montado en Home.jsx (isOpen es una
+  // prop, no un mount/unmount condicional), asi que al abrir cualquier tarea el
+  // numero de hooks ejecutados cambiaba entre renders (menos hooks cerrado, mas
+  // hooks abierto) -- exactamente "Rendered more hooks than during the previous
+  // render" (React error #310). Confirmado en vivo por Jose (captura, 16/09/2026)
+  // al dar clic en una tarea desde "Mis Tareas Asignadas".
+  if (!isOpen || !task) return null;
+
+  const taskCreatorEmail = (task.createdBy || '').toLowerCase().trim();
+  const isCreator = Boolean(taskCreatorEmail && userEmail === taskCreatorEmail);
+  const isForeign = isForeignTask(task, currentUser);
+
+  const getDisplayName = (email) => {
+    if (resolveAssigneeName && typeof resolveAssigneeName === 'function') {
+      return resolveAssigneeName(email);
+    }
+    return email;
+  };
+
+  const countdown = getCountdown(task.deadline);
+
+  const myAssigneeEntry = myEmailKey ? assigneeProgressMap[myEmailKey] : null;
 
   // Selector rápido de porcentaje para tarea individual
   const handleSetQuickProgress = (val) => {
