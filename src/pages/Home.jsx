@@ -6,7 +6,7 @@ import { useChecklist } from '../context/ChecklistContext';
 import { useUI } from '../context/UIContext';
 import { useTheme } from '../context/ThemeContext';
 import { useNotifications } from '../context/NotificationContext';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { 
   FileText, LogOut, Clock, Calendar as CalendarIcon, MapPin, CheckCircle2, 
@@ -670,7 +670,7 @@ export default function Home() {
   };
 
   const { currentUser, logout, switchRole, reauthenticateGoogle } = useAuth();
-  const { currentCycle, currentStage, events, loadingEvents } = useCycles();
+  const { currentCycle, currentStage, events, loadingEvents, quitoCycles, quitoTeamOptions } = useCycles();
   const { tasks: allTasks, loading: loadingTasks, syncTasksToGoogle, acceptCollaboration, rejectCollaboration } = useChecklist();
   const { showToast, viewMode, setViewMode, customModules } = useUI();
   const { themeMode, setThemeMode } = useTheme();
@@ -895,7 +895,7 @@ export default function Home() {
                           userEmail === 'paul.sosa@crearpsl.net';
 
   const myTasksForProgress = allTasks.filter(t => {
-    const isAssigned = (t.assignedToEmails && t.assignedToEmails.some(e => e.toLowerCase().trim() === userEmail)) || 
+    const isAssigned = (t.assignedToEmails && t.assignedToEmails.some(e => e.toLowerCase().trim() === userEmail)) ||
                        (t.assignedToEmail && t.assignedToEmail.toLowerCase().trim() === userEmail) ||
                        (t.collaborators && t.collaborators.map(c => c.toLowerCase().trim()).includes(userEmail));
     if (isAssigned) return true;
@@ -915,6 +915,26 @@ export default function Home() {
       const normTaskSede = normalizeSede(taskSede);
       if (userSede && userSede !== 'Sede Global' && normTaskSede !== userSede) {
         return false;
+      }
+    }
+
+    // 3. (17/09/2026) CORRECCIÓN CRUCE DE TAREAS: Si la tarea no tiene email
+    //    asignado pero sí tiene createdBy apuntando a otra persona (ej. una
+    //    tarea creada por José/Admin para alguien de Lima), no incluirla en el
+    //    progreso de un usuario de otra persona aunque el rol coincida.
+    //    Esto evita que tareas de "Gina Cárdenas", "Roberto", "Fer" aparezcan
+    //    en el TOP 5 de Emily Campuzano (Quito) al simular o al tener el mismo rol.
+    //    Solo se filtra si createdBy NO es el propio usuario (auto-asignadas están bien).
+    if (t.createdBy && t.createdBy.toLowerCase().trim() !== userEmail) {
+      // Si tiene sede y es la misma del usuario, puede pertenecer al rol de la sede
+      const taskSedeFinal = t.assignedSede || t.sede;
+      if (!taskSedeFinal || taskSedeFinal === 'Global' || taskSedeFinal === 'Sede Global') {
+        // Tarea sin sede explícita creada por otro → es probable que sea de esa otra persona
+        // Solo la incluimos si el ID tiene prefijo de catálogo (checklist_*), no si es custom_
+        const taskIdStr = String(t.id || '');
+        if (taskIdStr.startsWith('custom_') || taskIdStr.startsWith('fs_')) {
+          return false; // Tarea custom/Firestore creada por otro, sin email asignado → no incluir
+        }
       }
     }
 
@@ -1208,7 +1228,11 @@ export default function Home() {
             </h2>
           </div>
           <p className="text-muted" style={{ margin: '0.8rem 0 0', textTransform: 'uppercase', fontSize: '0.85rem' }}>
-            {((currentUser?.isSuperAdmin && !currentUser?.isSimulated) || currentUser?.appRole === 'direccion' || currentUser?.isConsolidatedView || currentUser?.appRole === 'consolidado') ? 'MÚLTIPLES EQUIPOS (GLOBAL) • VISIÓN MÚLTIPLES SEDES' : (currentCycle ? `${currentCycle.name} • ETAPA: ${currentStage}` : 'CARGANDO CICLO...')}
+            {((currentUser?.isSuperAdmin && !currentUser?.isSimulated) || currentUser?.appRole === 'direccion' || currentUser?.isConsolidatedView || currentUser?.appRole === 'consolidado')
+              ? 'MÚLTIPLES EQUIPOS (GLOBAL) • VISIÓN MÚLTIPLES SEDES'
+              : (normalizeSede(currentUser?.sede) === 'Quito' && Array.isArray(quitoCycles) && quitoCycles.length > 0)
+                ? quitoCycles.map(qc => `EQUIPO ${qc.equipo} (${qc.stage})`).join(' • ')
+                : (currentCycle ? `${currentCycle.name} • ETAPA: ${currentStage}` : 'CARGANDO CICLO...')}
           </p>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginTop: '0.8rem', flexWrap: 'wrap' }}>
@@ -1449,6 +1473,63 @@ export default function Home() {
                   <span style={{ fontSize: '0.62rem', color: 'var(--crear-gold)', fontWeight: 600, textAlign: 'right', maxWidth: '230px', lineHeight: 1.25 }}>
                     ⚠️ cambia tus tareas, eventos y permisos
                   </span>
+                </div>
+              )}
+
+              {/* (17/09/2026) SELECTOR RÁPIDO DE EQUIPO PARA QUITO (PARES / IMPARES / C1 / C2)
+                  Permite a coordinadores y gerentes de Quito elegir sus 1 o 2 equipos activos
+                  directamente desde la barra de inicio sin tener que abrir el modal completo */}
+              {normalizeSede(currentUser?.sede) === 'Quito' && quitoTeamOptions && quitoTeamOptions.length > 0 && (
+                <div style={{ marginTop: '6px', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '3px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--crear-cyan)', fontWeight: 700 }}>
+                      🇪🇨 Equipo(s) Quito:
+                    </span>
+                    <select
+                      value={(currentUser?.equiposQuito && currentUser.equiposQuito[0]) || ''}
+                      onChange={async (e) => {
+                        const val = e.target.value;
+                        const current = Array.isArray(currentUser?.equiposQuito) ? [...currentUser.equiposQuito] : [];
+                        const second = current[1] || '';
+                        const next = val ? (second && second !== val ? [val, second] : [val]) : [];
+                        try {
+                          const uid = currentUser?.uid || currentUser?.id;
+                          if (uid) {
+                            await updateDoc(doc(db, 'users', uid), { equiposQuito: next });
+                            if (currentUser) currentUser.equiposQuito = next;
+                            showToast(`Equipo principal Quito actualizado: ${val ? 'Equipo ' + val : 'Automático'}`, 'success');
+                          }
+                        } catch (err) {
+                          console.error('Error guardando equipo Quito:', err);
+                          showToast('No se pudo guardar el equipo seleccionado', 'error');
+                        }
+                      }}
+                      style={{
+                        padding: '2px 6px',
+                        borderRadius: '5px',
+                        background: 'rgba(0, 212, 255, 0.1)',
+                        border: '1px solid rgba(0, 212, 255, 0.4)',
+                        color: 'var(--text-heading)',
+                        fontSize: '0.72rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        outline: 'none'
+                      }}
+                      title="Seleccionar equipo de Quito para alinear checklists, eventos y metas"
+                    >
+                      <option value="" style={{ background: '#0d152d', color: '#fff' }}>Automático (Próximo)</option>
+                      {quitoTeamOptions.map(eq => {
+                        const num = parseInt(eq.replace(/\D/g, ''), 10);
+                        const isEven = !isNaN(num) && num % 2 === 0;
+                        const parLabel = !isNaN(num) ? (isEven ? ' (Par)' : ' (Impar)') : '';
+                        return (
+                          <option key={eq} value={eq} style={{ background: '#0d152d', color: '#fff' }}>
+                            Equipo {eq}{parLabel}
+                          </option>
+                        );
+                      })}
+                    </select>
+                  </div>
                 </div>
               )}
             </div>
