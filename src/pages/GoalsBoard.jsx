@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../services/firebase';
 import { collection, onSnapshot, addDoc, updateDoc, doc, query, where, orderBy, writeBatch, runTransaction, setDoc, limit } from 'firebase/firestore';
@@ -213,86 +213,273 @@ export default function GoalsBoard() {
     };
   }, []);
 
-  // Coherencia con el Calendario: obtiene fechas oficiales de la etapa/evento
-  const getGoalCalendarInfo = (goal) => {
+  // Helper: Formato en español claro y legible para rangos de fechas (ej: "04 al 06 Sep 2026")
+  const formatCalendarDateRange = (fInicio, fFin) => {
+    if (!fInicio) return '';
+    const MONTHS_ES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    const dStart = new Date(fInicio.includes('T') ? fInicio : fInicio + 'T00:00:00');
+    const dEnd = fFin ? new Date(fFin.includes('T') ? fFin : fFin + 'T00:00:00') : null;
+
+    if (isNaN(dStart.getTime())) return fInicio;
+
+    const dayStart = String(dStart.getDate()).padStart(2, '0');
+    const monthStart = MONTHS_ES[dStart.getMonth()];
+    const yearStart = dStart.getFullYear();
+
+    if (!dEnd || isNaN(dEnd.getTime()) || fInicio.slice(0, 10) === fFin.slice(0, 10)) {
+      return `${dayStart} ${monthStart} ${yearStart}`;
+    }
+
+    const dayEnd = String(dEnd.getDate()).padStart(2, '0');
+    const monthEnd = MONTHS_ES[dEnd.getMonth()];
+    const yearEnd = dEnd.getFullYear();
+
+    if (monthStart === monthEnd && yearStart === yearEnd) {
+      return `${dayStart} al ${dayEnd} ${monthStart} ${yearStart}`;
+    }
+    return `${dayStart} ${monthStart} al ${dayEnd} ${monthEnd} ${yearEnd}`;
+  };
+
+  // Helper: Normaliza y limpia el nombre de la etapa o fin de semana
+  const cleanCalendarStageTitle = (raw) => {
+    if (!raw) return '';
+    let str = String(raw).replace(/[:.]+$/, '').trim();
+    const up = str.toUpperCase();
+    if (up.includes('PRIMER FDS') || up.includes('1ER FDS') || up.includes('CREACION') || up.includes('CREACIÓN')) {
+      return '1er FDS (Creación)';
+    }
+    if (up.includes('SEGUNDO FDS') || up.includes('2DO FDS') || up.includes('RELACION') || up.includes('RELACIÓN')) {
+      return '2do FDS (Relación)';
+    }
+    if (up.includes('TERCER FDS') || up.includes('3ER FDS') || up.includes('GRATITUD')) {
+      return '3er FDS (Gratitud)';
+    }
+    if (up.includes('CAPITULO UNO') || up.includes('CAPÍTULO 1') || up.includes('CAPITULO 1') || up === 'C1') {
+      return 'Capítulo 1';
+    }
+    if (up.includes('CAPITULO DOS') || up.includes('CAPÍTULO 2') || up.includes('CAPITULO 2') || up === 'C2') {
+      return 'Capítulo 2';
+    }
+    if (up.includes('MAESTRIA DEL JUEGO') || up.includes('MAESTRÍA')) {
+      return 'Maestría del Juego';
+    }
+    return str;
+  };
+
+  // Helper: Construye el objeto enriquecido con estado operativo (MOMENTOS)
+  const buildCalendarMomentInfo = (rawTipo, fechaInicio, fechaFin, equipo = '') => {
+    if (!fechaInicio) return null;
+    const now = new Date();
+    const todayStr = now.toISOString().slice(0, 10);
+    
+    const fIni = fechaInicio.slice(0, 10);
+    const fEnd = fechaFin ? fechaFin.slice(0, 10) : fIni;
+
+    const isStarted = todayStr >= fIni;
+    const isPast = todayStr > fEnd;
+    const isEnSala = isStarted && !isPast;
+
+    const dToday = new Date(todayStr + 'T00:00:00');
+    const dStart = new Date(fIni + 'T00:00:00');
+    const diffTime = dStart.getTime() - dToday.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    let momentoKey = 'PROXIMO';
+    let momentoLabel = '';
+    let momentoBadgeColor = '#38bdf8';
+    let momentoBg = 'rgba(56, 189, 248, 0.12)';
+    let momentoBorder = 'rgba(56, 189, 248, 0.3)';
+
+    if (isEnSala) {
+      momentoKey = 'EN_SALA';
+      momentoLabel = 'EN SALA';
+      momentoBadgeColor = '#22c55e';
+      momentoBg = 'rgba(34, 197, 94, 0.18)';
+      momentoBorder = 'rgba(34, 197, 94, 0.45)';
+    } else if (isPast) {
+      momentoKey = 'CONCLUIDO';
+      momentoLabel = 'Concluido';
+      momentoBadgeColor = '#94a3b8';
+      momentoBg = 'rgba(148, 163, 184, 0.12)';
+      momentoBorder = 'rgba(148, 163, 184, 0.25)';
+    } else {
+      if (diffDays === 0) {
+        momentoLabel = '¡Inicia Hoy!';
+        momentoBadgeColor = '#eab308';
+        momentoBg = 'rgba(234, 179, 8, 0.16)';
+        momentoBorder = 'rgba(234, 179, 8, 0.45)';
+      } else if (diffDays === 1) {
+        momentoLabel = '⚡ Inicia Mañana';
+        momentoBadgeColor = '#f59e0b';
+        momentoBg = 'rgba(245, 158, 11, 0.16)';
+        momentoBorder = 'rgba(245, 158, 11, 0.45)';
+      } else if (diffDays <= 7) {
+        momentoLabel = `⚡ En ${diffDays} días`;
+        momentoBadgeColor = '#38bdf8';
+        momentoBg = 'rgba(56, 189, 248, 0.15)';
+        momentoBorder = 'rgba(56, 189, 248, 0.35)';
+      } else {
+        momentoLabel = `En ${diffDays} días`;
+        momentoBadgeColor = '#38bdf8';
+        momentoBg = 'rgba(56, 189, 248, 0.12)';
+        momentoBorder = 'rgba(56, 189, 248, 0.25)';
+      }
+    }
+
+    const tipo = cleanCalendarStageTitle(rawTipo);
+    const dateFormatted = formatCalendarDateRange(fechaInicio, fechaFin);
+
+    return {
+      tipo,
+      fechaInicio,
+      fechaFin,
+      dateFormatted,
+      equipo,
+      isStarted,
+      isPast,
+      isEnSala,
+      diffDays,
+      momentoKey,
+      momentoLabel,
+      momentoBadgeColor,
+      momentoBg,
+      momentoBorder
+    };
+  };
+
+  // Helper: Búsqueda de cohorte en Maestría del Juego (3 equipos por fin de semana)
+  const findMjCohorteEvent = (eventsList, teamNum, stage, sede = 'Lima') => {
+    if (!eventsList || !eventsList.length || !teamNum) return null;
+    const sedeNorm = normalizeSede(sede).toLowerCase();
+
+    const mjEvents = eventsList.filter(e => {
+      const s = (e.sede || e.sedeTag || e.place || '').toLowerCase();
+      const isSede = !sedeNorm || s.includes(sedeNorm) || sedeNorm.includes(s) || (sedeNorm === 'lima' && s.includes('lim'));
+      const n = (e.nombre || e.name || '').toUpperCase();
+      return isSede && n === 'MAESTRIA DEL JUEGO';
+    });
+
+    const stageNorm = stage.toLowerCase();
+
+    for (const ev of mjEvents) {
+      const eqStr = String(ev.equipo || '').trim();
+      if (!eqStr.includes(String(teamNum))) continue;
+
+      let teams = [];
+      if (eqStr.length === 6) {
+        teams = [eqStr.slice(0, 2), eqStr.slice(2, 4), eqStr.slice(4, 6)];
+      } else if (eqStr.length === 9) {
+        teams = [eqStr.slice(0, 3), eqStr.slice(3, 6), eqStr.slice(6, 9)];
+      } else {
+        teams = [eqStr];
+      }
+
+      const idx = teams.indexOf(String(teamNum));
+      if (idx === -1) continue;
+
+      // idx 0 = 3er FDS Gratitud
+      // idx 1 = 2do FDS Relación
+      // idx 2 = 1er FDS Creación
+      if ((stageNorm.includes('creac') || stageNorm === 'c1_mj') && idx === 2) return ev;
+      if ((stageNorm.includes('relac') || stageNorm === 'c2_mj') && idx === 1) return ev;
+      if ((stageNorm.includes('grat') || stageNorm === 'c3_mj') && idx === 0) return ev;
+    }
+    return null;
+  };
+
+  // Coherencia con el Calendario Oficial y Momentos Operativos
+  const getGoalCalendarInfo = (goal, parentGoal = null) => {
     if (!goal) return null;
     const titleLower = (goal.title || '').toLowerCase();
-    const sedeNorm = (goal.sede || '').toLowerCase();
+    const stageLower = (goal.stage || goal.cyclePhase || '').toLowerCase();
+    const sedeNorm = normalizeSede(goal.sede || parentGoal?.sede || 'Lima').toLowerCase();
+    const goalTeam = extractTeamNumber(goal, parentGoal);
 
-    // 1. Calendarios de Maestría (mj_calendars)
-    const calMatch = mjCalendars.find(c => {
-      const cSede = (c.sede || '').toLowerCase();
+    // 1. Calendarios de Maestría (mj_calendars en Firestore)
+    const matchingCals = mjCalendars.filter(c => {
+      const cSede = normalizeSede(c.sede || '').toLowerCase();
       return sedeNorm && (cSede.includes(sedeNorm) || sedeNorm.includes(cSede));
     });
 
+    let calMatch = null;
+    if (goalTeam && matchingCals.length > 0) {
+      calMatch = matchingCals.find(c => String(c.equipoNumero).trim() === String(goalTeam).trim());
+    }
+    if (!calMatch && matchingCals.length > 0) {
+      calMatch = matchingCals[0];
+    }
+
     if (calMatch && calMatch.fds) {
       let fdsKey = null;
-      if (titleLower.includes('creación') || titleLower.includes('creacion')) fdsKey = 'creacion';
-      else if (titleLower.includes('relación') || titleLower.includes('relacion')) fdsKey = 'relacion';
-      else if (titleLower.includes('gratitud')) fdsKey = 'gratitud';
+      if (titleLower.includes('creación') || titleLower.includes('creacion') || stageLower.includes('creacion')) fdsKey = 'creacion';
+      else if (titleLower.includes('relación') || titleLower.includes('relacion') || stageLower.includes('relacion')) fdsKey = 'relacion';
+      else if (titleLower.includes('gratitud') || stageLower.includes('gratitud')) fdsKey = 'gratitud';
 
       if (fdsKey) {
         const fds = calMatch.fds.find(f => f.id === fdsKey);
         if (fds && fds.fechaInicio) {
-          const now = new Date().toISOString().slice(0, 10);
-          const isStarted = now >= fds.fechaInicio;
-          const isPast = fds.fechaFin ? now > fds.fechaFin : false;
-          return {
-            tipo: fds.titulo || fdsKey.toUpperCase(),
-            fechaInicio: fds.fechaInicio,
-            fechaFin: fds.fechaFin,
-            equipo: `${calMatch.equipoNumero ? 'Equipo ' + calMatch.equipoNumero : ''} ${calMatch.equipoNombre || ''}`.trim(),
-            isStarted,
-            isPast
-          };
+          return buildCalendarMomentInfo(
+            fds.titulo || fdsKey,
+            fds.fechaInicio,
+            fds.fechaFin,
+            `${calMatch.equipoNumero ? 'Equipo ' + calMatch.equipoNumero : ''} ${calMatch.equipoNombre || ''}`.trim()
+          );
         }
       }
     }
 
-    // 2. Eventos generales (CyclesContext events)
+    // 2. Eventos generales oficiales (CyclesContext events / events.json)
     if (events && events.length > 0) {
-      const goalTeam = extractTeamNumber(goal);
+      const isCreacion = titleLower.includes('creación') || titleLower.includes('creacion') || stageLower.includes('creacion');
+      const isRelacion = titleLower.includes('relación') || titleLower.includes('relacion') || stageLower.includes('relacion');
+      const isGratitud = titleLower.includes('gratitud') || stageLower.includes('gratitud');
+      const isMJ = isCreacion || isRelacion || isGratitud || titleLower.includes('maestría') || titleLower.includes('maestria') || titleLower.includes('mj') || stageLower.includes('mj');
 
-      const evMatch = events.find(e => {
-        const evSede = (e.sede || e.sedeTag || e.place || '').toLowerCase();
-        const evNombre = (e.nombre || e.name || '').toLowerCase();
-        const sedeCoincide = !sedeNorm || evSede.includes(sedeNorm) || sedeNorm.includes(evSede);
-        if (!sedeCoincide) return false;
+      if (isMJ && goalTeam) {
+        const mjStage = isCreacion ? 'creacion' : isRelacion ? 'relacion' : isGratitud ? 'gratitud' : 'general';
+        const mjEvent = findMjCohorteEvent(events, goalTeam, mjStage, sedeNorm);
+        if (mjEvent) {
+          const fInicio = mjEvent.fecha_inicio || mjEvent.start;
+          const fFin = mjEvent.fecha_fin || mjEvent.end;
+          const stageLabel = isCreacion ? '1er FDS (Creación)' : isRelacion ? '2do FDS (Relación)' : isGratitud ? '3er FDS (Gratitud)' : 'Maestría del Juego';
+          return buildCalendarMomentInfo(stageLabel, fInicio, fFin, `Equipo ${goalTeam}`);
+        }
+      }
 
-        // Validar coincidencia de equipo si está registrado en el evento
-        if (goalTeam && e.equipo) {
-          const cleanEq = String(e.equipo).replace(/\D/g, '');
-          if (cleanEq && !cleanEq.includes(goalTeam) && !goalTeam.includes(cleanEq)) {
-            return false;
+      // C1 / C2 / Otros eventos
+      const isC1 = titleLower.includes('capítulo 1') || titleLower.includes('capitulo 1') || titleLower.includes('c1') || titleLower.includes('uno') || stageLower === 'c1';
+      const isC2 = titleLower.includes('capítulo 2') || titleLower.includes('capitulo 2') || titleLower.includes('c2') || titleLower.includes('dos') || stageLower === 'c2';
+
+      if (isC1 || isC2) {
+        const evMatch = events.find(e => {
+          const evSede = (e.sede || e.sedeTag || e.place || '').toLowerCase();
+          const sedeCoincide = !sedeNorm || evSede.includes(sedeNorm) || sedeNorm.includes(evSede) || (sedeNorm === 'lima' && evSede.includes('lim'));
+          if (!sedeCoincide) return false;
+
+          // Coincidencia de equipo
+          if (goalTeam && e.equipo) {
+            const cleanEq = String(e.equipo).replace(/\D/g, '');
+            if (cleanEq && !cleanEq.includes(goalTeam) && !goalTeam.includes(cleanEq)) {
+              return false;
+            }
           }
-        }
 
-        if (titleLower.includes('capítulo 1') || titleLower.includes('capitulo 1') || titleLower.includes('c1') || titleLower.includes('uno')) {
-          return evNombre.includes('c1') || evNombre.includes('uno') || evNombre.includes('capítulo 1') || evNombre.includes('capitulo 1');
-        }
-        if (titleLower.includes('capítulo 2') || titleLower.includes('capitulo 2') || titleLower.includes('c2') || titleLower.includes('dos')) {
-          return evNombre.includes('c2') || evNombre.includes('dos') || evNombre.includes('capítulo 2') || evNombre.includes('capitulo 2');
-        }
-        if (titleLower.includes('maestría') || titleLower.includes('maestria') || titleLower.includes('mj')) {
-          return evNombre.includes('maestria') || evNombre.includes('maestría') || evNombre.includes('mj');
-        }
-        return false;
-      });
+          const evNombre = (e.nombre || e.name || '').toLowerCase();
+          if (isC1) {
+            return evNombre.includes('c1') || evNombre.includes('uno') || evNombre.includes('capítulo 1') || evNombre.includes('capitulo 1');
+          }
+          if (isC2) {
+            return evNombre.includes('c2') || evNombre.includes('dos') || evNombre.includes('capítulo 2') || evNombre.includes('capitulo 2');
+          }
+          return false;
+        });
 
-      if (evMatch) {
-        const fInicio = evMatch.fecha_inicio || evMatch.start;
-        const fFin = evMatch.fecha_fin || evMatch.end;
-        const now = new Date().toISOString().slice(0, 10);
-        const isStarted = fInicio ? now >= fInicio.slice(0, 10) : false;
-        const isPast = fFin ? now > fFin.slice(0, 10) : false;
-        return {
-          tipo: evMatch.nombre || evMatch.name,
-          fechaInicio: fInicio,
-          fechaFin: fFin,
-          equipo: evMatch.equipo ? `Equipo ${evMatch.equipo}` : '',
-          isStarted,
-          isPast
-        };
+        if (evMatch) {
+          const fInicio = evMatch.fecha_inicio || evMatch.start;
+          const fFin = evMatch.fecha_fin || evMatch.end;
+          const label = isC1 ? 'Capítulo 1' : 'Capítulo 2';
+          return buildCalendarMomentInfo(label, fInicio, fFin, evMatch.equipo ? `Equipo ${evMatch.equipo}` : '');
+        }
       }
     }
 
@@ -1171,7 +1358,7 @@ export default function GoalsBoard() {
   const renderGoal = (goal) => {
     const parentGoal = goals.find(g => g.id === goal.parentId);
     const isAssigned = goal.assignedCoordinators && Array.isArray(goal.assignedCoordinators) && goal.assignedCoordinators.length > 0;
-    const calInfo = getGoalCalendarInfo(goal);
+    const calInfo = getGoalCalendarInfo(goal, parentGoal);
     const repSummary = getGoalReportsSummary(goal);
     
     return (
@@ -1196,22 +1383,40 @@ export default function GoalsBoard() {
                 </span>
               )}
 
-              {/* COHERENCIA CON CALENDARIO OFICIAL */}
+              {/* COHERENCIA CON CALENDARIO OFICIAL Y MOMENTO OPERATIVO */}
               {calInfo && (
                 <span style={{
-                  fontSize: '0.72rem', fontWeight: 'bold', padding: '0.2rem 0.6rem', borderRadius: '6px',
-                  background: calInfo.isStarted ? 'rgba(34, 197, 94, 0.15)' : 'rgba(56, 189, 248, 0.15)',
-                  color: calInfo.isStarted ? '#22c55e' : '#38bdf8',
-                  border: calInfo.isStarted ? '1px solid rgba(34, 197, 94, 0.35)' : '1px solid rgba(56, 189, 248, 0.3)',
-                  display: 'inline-flex', alignItems: 'center', gap: '4px'
-                }}>
-                  <Calendar size={12} />
-                  <span>{calInfo.tipo}: {calInfo.fechaInicio ? calInfo.fechaInicio.slice(5) : ''} {calInfo.fechaFin ? 'al ' + calInfo.fechaFin.slice(5) : ''}</span>
-                  {calInfo.isStarted && !calInfo.isPast && (
-                    <span style={{ marginLeft: '4px', background: '#22c55e', color: '#000', padding: '1px 5px', borderRadius: '4px', fontSize: '0.62rem', fontWeight: 900 }}>
-                      EN SALA
-                    </span>
-                  )}
+                  fontSize: '0.72rem', fontWeight: 'bold', padding: '0.22rem 0.65rem', borderRadius: '6px',
+                  background: calInfo.momentoBg,
+                  color: calInfo.momentoBadgeColor,
+                  border: `1px solid ${calInfo.momentoBorder}`,
+                  display: 'inline-flex', alignItems: 'center', gap: '5px',
+                  boxShadow: calInfo.momentoKey === 'EN_SALA' ? '0 0 10px rgba(34, 197, 94, 0.35)' : 'none'
+                }}
+                title={`Oficial: ${calInfo.tipo} | Fechas: ${calInfo.dateFormatted} | Estado: ${calInfo.momentoLabel}${calInfo.equipo ? ' • ' + calInfo.equipo : ''}`}
+                >
+                  <Calendar size={12} style={{ flexShrink: 0 }} />
+                  <span><strong>{calInfo.tipo}:</strong> {calInfo.dateFormatted}</span>
+                  <span style={{
+                    marginLeft: '2px',
+                    background: calInfo.momentoKey === 'EN_SALA'
+                      ? '#22c55e'
+                      : calInfo.momentoKey === 'CONCLUIDO'
+                      ? 'rgba(148, 163, 184, 0.25)'
+                      : calInfo.momentoKey === 'PROXIMO' && calInfo.diffDays <= 1
+                      ? '#f59e0b'
+                      : 'rgba(56, 189, 248, 0.2)',
+                    color: (calInfo.momentoKey === 'EN_SALA' || (calInfo.momentoKey === 'PROXIMO' && calInfo.diffDays <= 1))
+                      ? '#000'
+                      : calInfo.momentoBadgeColor,
+                    padding: '1px 5px',
+                    borderRadius: '4px',
+                    fontSize: '0.62rem',
+                    fontWeight: 900,
+                    textTransform: 'uppercase'
+                  }}>
+                    {calInfo.momentoLabel}
+                  </span>
                 </span>
               )}
               
@@ -1229,9 +1434,14 @@ export default function GoalsBoard() {
                 <span className="text-muted" style={{ fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.35rem', flexWrap: 'wrap' }}>
                   <GitMerge size={12} /> Aporta a: <strong style={{ color: 'var(--text-heading)' }}>{parentGoal.title}</strong>
                   {(() => {
-                    const childTeam = extractTeamNumber(goal);
+                    const goalTitle = goal?.title || '';
+                    const matchDirect = goalTitle.match(/C\d+E(\d+)/i) || goalTitle.match(/(?:Equipo|E)\s*(\d+)/i);
+                    const ownText = `${goal?.description || ''} ${goal?.cyclePhase || ''}`;
+                    const matchOwn = ownText.match(/C\d+E(\d+)/i) || ownText.match(/(?:Equipo|E)\s*(\d+)/i);
+                    const childExplicitTeam = matchDirect ? matchDirect[1] : matchOwn ? matchOwn[1] : null;
                     const parentTeam = extractTeamNumber(parentGoal);
-                    if (childTeam && parentTeam && childTeam !== parentTeam) {
+
+                    if (childExplicitTeam && parentTeam && childExplicitTeam !== parentTeam) {
                       return (
                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                           <span 
@@ -1244,9 +1454,9 @@ export default function GoalsBoard() {
                               fontSize: '0.68rem', 
                               fontWeight: 800
                             }} 
-                            title={`Incoherencia detectada: Esta meta pertenece al Equipo ${childTeam}, pero está aportando al Ciclo del Equipo ${parentTeam}.`}
+                            title={`Incoherencia detectada: Esta meta pertenece explícitamente al Equipo ${childExplicitTeam}, pero está aportando al Ciclo del Equipo ${parentTeam}.`}
                           >
-                            ⚠️ Ciclo Desalineado (Eq. ${childTeam} vs Eq. ${parentTeam})
+                            ⚠️ Ciclo Desalineado (Eq. {childExplicitTeam} vs Eq. {parentTeam})
                           </span>
                           {canManageGoals && (
                             <button
@@ -1266,9 +1476,9 @@ export default function GoalsBoard() {
                                 cursor: 'pointer',
                                 textDecoration: 'underline'
                               }}
-                              title={`Crear o re-vincular al Ciclo del Equipo ${childTeam}`}
+                              title={`Crear o re-vincular al Ciclo del Equipo ${childExplicitTeam}`}
                             >
-                              Alinear a Ciclo Eq. ${childTeam}
+                              Alinear a Ciclo Eq. {childExplicitTeam}
                             </button>
                           )}
                         </span>

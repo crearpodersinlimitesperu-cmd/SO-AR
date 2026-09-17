@@ -137,6 +137,16 @@ flowchart TD
 4. **Edición Posterior del Reporte de Sentados en Sala:**
    * Una vez reportada la cantidad de participantes sentados en sala, el indicador permanece interactivo (`[✔ Sentados en Sala: X ✏️]`).
    * Permite a los Gerentes de Sede y Directivos hacer clic en cualquier momento posterior para abrir el modal, ajustar las cifras reales, corregir managers/apoyos/observaciones y re-calcular automáticamente el porcentaje de cumplimiento y rollup a la meta padre sin bloqueos estáticos.
+5. **Estándar de Fechas Claras y Momentos Operativos del Calendario:**
+   * **Fechas Humanas y Legibles:** Prohibido el uso de formatos crudos numéricos ambiguos (ej: `09-04 al 09-06`). Todas las fechas de entrenamiento en las metas se formatean en español formal completo con día, mes abreviado y año: `04 al 06 Sep 2026`, `18 al 20 Sep 2026`, `09 al 11 Oct 2026`.
+   * **Nomenclatura Limpia de Etapa:** Sin puntos ni dobles puntuaciones residuales (`1er FDS (Creación)`, `2do FDS (Relación)`, `3er FDS (Gratitud)`, `Capítulo 1`, `Capítulo 2`).
+   * **Momentos Operativos en Tiempo Real:** Cada tarjeta de meta computa y destaca el momento temporal exacto:
+     - `CONCLUIDO`: Si la fecha de fin ya pasó (estilo neutro slate).
+     - `EN SALA`: Si la fecha actual coincide con los días de ejecución del entrenamiento (verde esmeralda brillante con badge activo).
+     - `PRÓXIMO / CONVOCATORIA`: Si la fecha es futura, con cálculo dinámico de proximidad (`⚡ Inicia Mañana`, `⚡ En X días`).
+   * **Regla de Cohortes MJ (3 equipos por FDS):** En Maestría del Juego (donde 3 equipos comparten sala y fin de semana), el sistema mapea la fecha exacta según la jerarquía de la cohorte: Equipo más nuevo (índice 2) = 1er FDS (Creación); Equipo intermedio (índice 1) = 2do FDS (Relación); Equipo veterano (índice 0) = 3er FDS (Gratitud).
+   * **Protección contra Falsos Desalineamientos:** Si una meta operativa no especifica explícitamente un equipo contradictorio en su título, hereda y respeta la pertenencia a su meta de ciclo padre sin emitir advertencias erróneas.
+
 
 ### 3.3. Estándar de Bienvenidas Oficiales y Coherencia Cronológica de Sedes (Portal de Alumnos & Correo IMO)
 1. **Coherencia con el Momento Presente de Sala (Septiembre 2026 - Equipo 31 Lima):**
