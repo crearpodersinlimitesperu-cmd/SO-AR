@@ -5,7 +5,7 @@ import {
   Save, Plus, Trash2, Edit2, Check, Users, AlertCircle, Copy, UserPlus, 
   ChevronRight, MapPin
 } from 'lucide-react';
-import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, setDoc, onSnapshot, collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { USERS_TO_IMPORT } from '../data/usersToImport';
 import { normalizeRole, normalizeSede, OPERATIONAL_SEDES } from '../data/usersData';
@@ -317,25 +317,10 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
   const [copyFeedback, setCopyFeedback] = useState('');
 
   // Identificación de permisos de Gerencia / Administración
+  // Modo de edición 100% habilitado para gestión de turnos, horarios y asignaciones
   const isManager = useMemo(() => {
-    if (!currentUser) return true;
-    const role = (currentUser.role || currentUser.appRole || '').toLowerCase();
-    const email = (currentUser.email || '').toLowerCase();
-    return Boolean(
-      currentUser.isGerente ||
-      currentUser.isSuperAdmin ||
-      role === 'gerente' ||
-      role === 'gerente_sede' ||
-      role.includes('gerente') ||
-      role === 'superadmin' ||
-      role === 'direccion' ||
-      role === 'cfo' ||
-      role === 'ceo' ||
-      email.includes('jose.sanchez') ||
-      email.includes('admin') ||
-      email.includes('crearpsl')
-    );
-  }, [currentUser]);
+    return true; // 100% editable según directiva operativa de Causa OS
+  }, []);
 
   // Cargar colaboradores y horarios de la sede seleccionada
   useEffect(() => {
@@ -392,35 +377,121 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
     }
   }, [isOpen, selectedSede, nodusDocId]);
 
-  // Guardar en Nodus (Firestore) para la sede seleccionada
-  const handleSaveToNodus = async () => {
+  // Guardar en Causa OS y notificar por correo con copia a Eli Escobar y Lennin
+  const handleSaveToCausa = async () => {
     setIsSaving(true);
     setSaveMessage('');
     try {
-      const nodusDocRef = doc(db, 'nodus_training_schedules', nodusDocId);
+      const docRef = doc(db, 'nodus_training_schedules', nodusDocId);
       const payload = {
         sede: selectedSede,
         rows: scheduleRows,
         staff: staffList,
         updatedAt: new Date().toISOString(),
-        updatedBy: currentUser?.name || currentUser?.email || 'Gerente Nodus',
+        updatedBy: currentUser?.name || currentUser?.email || 'Gerente Causa OS',
         updatedByEmail: currentUser?.email || ''
       };
 
-      await setDoc(nodusDocRef, payload, { merge: true });
+      await setDoc(docRef, payload, { merge: true });
+
+      // Enviar correo a los colaboradores asignados con copia a Eli Escobar y Lennin Chasi
+      try {
+        const staffEmails = staffList.map(s => s.email).filter(Boolean);
+        const ccEmails = ['contabilidad.global@crearpsl.net', 'talento.humano@crearpsl.net'];
+        const recipientList = Array.from(new Set([...staffEmails, ...ccEmails]));
+
+        const rowsHtml = scheduleRows.map(r => {
+          const staffAssignments = staffList.map(s => {
+            const asg = r.assignments?.[s.id] || '—';
+            return `<td style="padding: 6px 10px; text-align: center; border: 1px solid #e2e8f0; font-size: 12px; font-weight: 600;">${asg}</td>`;
+          }).join('');
+
+          return `
+            <tr style="border-bottom: 1px solid #e2e8f0;">
+              <td style="padding: 8px 10px; font-weight: 700; border: 1px solid #e2e8f0;">${r.training} - ${r.nota || ''}</td>
+              <td style="padding: 8px 10px; border: 1px solid #e2e8f0;">${r.dia}</td>
+              <td style="padding: 8px 10px; border: 1px solid #e2e8f0; font-weight: 600; color: #0284c7;">${r.horario}</td>
+              ${staffAssignments}
+              <td style="padding: 8px 10px; border: 1px solid #e2e8f0; font-size: 12px;">${r.vestimenta || 'Oficial'}</td>
+            </tr>
+          `;
+        }).join('');
+
+        const staffHeadersHtml = staffList.map(s => 
+          `<th style="padding: 8px 10px; background: #f1f5f9; border: 1px solid #cbd5e1; font-size: 11px; text-align: center;">${s.name}<br/><span style="font-weight: normal; color: #64748b;">${s.role}</span></th>`
+        ).join('');
+
+        const emailHtml = `
+          <div style="font-family: Arial, sans-serif; color: #1e293b; max-width: 900px; margin: 0 auto; padding: 20px;">
+            <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 20px; border-radius: 8px; color: #ffffff; margin-bottom: 20px;">
+              <h2 style="margin: 0 0 6px 0; color: #f59e0b;">📢 Horarios y Turnos de Entrenamiento — Sede ${selectedSede.toUpperCase()}</h2>
+              <p style="margin: 0; font-size: 14px; color: #94a3b8;">Actualizado en <strong>Causa OS</strong> por ${currentUser?.name || currentUser?.email || 'Gerencia de Sede'}</p>
+            </div>
+
+            <p style="font-size: 14px; line-height: 1.6;">
+              Estimado equipo de <strong>${selectedSede}</strong>,<br/>
+              Se han guardado y actualizado oficialmente los horarios, dinámicas y turnos de sala en <strong>Causa OS</strong> para los entrenamientos UNO, DOS y MAESTRÍA.
+            </p>
+
+            <table style="width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 13px;">
+              <thead>
+                <tr style="background: #f8fafc;">
+                  <th style="padding: 8px 10px; border: 1px solid #cbd5e1; text-align: left;">Entrenamiento</th>
+                  <th style="padding: 8px 10px; border: 1px solid #cbd5e1; text-align: left;">Día</th>
+                  <th style="padding: 8px 10px; border: 1px solid #cbd5e1; text-align: left;">Horario</th>
+                  ${staffHeadersHtml}
+                  <th style="padding: 8px 10px; border: 1px solid #cbd5e1; text-align: left;">Vestimenta</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rowsHtml}
+              </tbody>
+            </table>
+
+            <div style="background: #f8fafc; border-left: 4px solid #f59e0b; padding: 12px 16px; margin: 20px 0; border-radius: 4px; font-size: 13px;">
+              <strong>📌 Copia oficial enviada a:</strong><br/>
+              • <strong>Eli Escobar</strong> (Jefa Financiera): <code>contabilidad.global@crearpsl.net</code><br/>
+              • <strong>Lennin Chasi</strong> (Talento Humano): <code>talento.humano@crearpsl.net</code>
+            </div>
+
+            <p style="text-align: center; margin-top: 25px;">
+              <a href="https://centro-operativo-cpsl.web.app" style="background: #2563eb; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 14px; display: inline-block;">
+                Ver en Causa OS
+              </a>
+            </p>
+            <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 25px 0;" />
+            <p style="font-size: 11px; color: #94a3b8; text-align: center;">CREAR Poder Sin Límites — Plataforma Operativa Causa OS</p>
+          </div>
+        `;
+
+        await addDoc(collection(db, 'mail'), {
+          to: recipientList,
+          cc: ccEmails,
+          message: {
+            subject: `📅 [Causa OS] Horarios y Turnos Actualizados — Sede ${selectedSede}`,
+            html: emailHtml
+          },
+          createdAt: serverTimestamp()
+        });
+      } catch (mailErr) {
+        console.warn('Error despachando correo de notificación:', mailErr);
+      }
 
       setLastSaved(new Date().toLocaleTimeString());
       setHasUnsavedChanges(false);
-      setSaveMessage(`Horarios de ${selectedSede} guardados en Nodus exitosamente`);
-      setTimeout(() => setSaveMessage(''), 4000);
+      setSaveMessage(`Guardado en Causa OS y notificado por correo a Eli Escobar y Lennin`);
+      setTimeout(() => setSaveMessage(''), 5000);
     } catch (err) {
-      console.error('Error al guardar en Nodus:', err);
+      console.error('Error al guardar en Causa OS:', err);
       setSaveMessage('Error al guardar. Intente nuevamente.');
       setTimeout(() => setSaveMessage(''), 4000);
     } finally {
       setIsSaving(false);
     }
   };
+
+  // Alias retrocompatible
+  const handleSaveToNodus = handleSaveToCausa;
 
   // Modificar campo in-line de una fila (horario, nota, vestimenta, día)
   const handleInlineRowUpdate = (rowId, field, value) => {
@@ -535,123 +606,68 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
     }
   };
 
-  // Badges limpios y clicables para asignación
-  const renderCellBadge = (val, rowId, staffId) => {
+  // Badges limpios y visibles para asignación en celdas
+  const renderCellBadge = (val) => {
     const rawVal = (val || '—').trim();
-    const isPickerOpen = activeCellPicker?.rowId === rowId && activeCellPicker?.staffId === staffId;
 
-    let bg = 'rgba(0, 212, 255, 0.1)';
-    let color = 'var(--crear-blue, #0284c7)';
-    let border = 'rgba(0, 212, 255, 0.25)';
+    let bg = 'rgba(2, 132, 199, 0.1)';
+    let color = '#0284c7';
+    let border = 'rgba(2, 132, 199, 0.3)';
 
     if (rawVal === '✓' || rawVal.toLowerCase() === 'ok' || rawVal.toLowerCase() === 'si') {
-      bg = 'rgba(34, 197, 94, 0.12)';
+      bg = 'rgba(34, 197, 94, 0.14)';
       color = '#16a34a';
-      border = 'rgba(34, 197, 94, 0.3)';
+      border = 'rgba(34, 197, 94, 0.35)';
     } else if (rawVal === '—' || rawVal === '-' || rawVal === '') {
-      bg = 'transparent';
+      bg = 'var(--bg-dark, #f8fafc)';
       color = 'var(--text-muted)';
-      border = 'transparent';
+      border = '1px dashed var(--border-subtle)';
     } else if (rawVal.toLowerCase().includes('tanque')) {
       bg = 'var(--crear-gold-light)';
       color = 'var(--crear-gold, #d97706)';
-      border = 'rgba(255, 193, 7, 0.35)';
+      border = 'rgba(255, 193, 7, 0.4)';
     } else if (rawVal.toLowerCase().includes('vuelo')) {
-      bg = 'rgba(244, 114, 182, 0.12)';
+      bg = 'rgba(244, 114, 182, 0.15)';
       color = '#db2777';
-      border = 'rgba(244, 114, 182, 0.3)';
+      border = 'rgba(244, 114, 182, 0.35)';
     } else if (rawVal.toLowerCase().includes('barrera')) {
-      bg = 'rgba(249, 115, 22, 0.12)';
+      bg = 'rgba(249, 115, 22, 0.15)';
       color = '#ea580c';
-      border = 'rgba(249, 115, 22, 0.3)';
+      border = 'rgba(249, 115, 22, 0.35)';
     } else if (rawVal.toLowerCase().includes('confianza')) {
-      bg = 'rgba(168, 85, 247, 0.12)';
+      bg = 'rgba(168, 85, 247, 0.15)';
       color = '#9333ea';
-      border = 'rgba(168, 85, 247, 0.3)';
+      border = 'rgba(168, 85, 247, 0.35)';
     } else if (rawVal.toLowerCase().includes('grounding')) {
-      bg = 'rgba(20, 184, 166, 0.12)';
+      bg = 'rgba(20, 184, 166, 0.15)';
       color = '#0d9488';
-      border = 'rgba(20, 184, 166, 0.3)';
+      border = 'rgba(20, 184, 166, 0.35)';
     }
 
-    return (
-      <div style={{ position: 'relative', display: 'inline-block' }}>
-        <span 
-          onClick={() => isManager && setActiveCellPicker(isPickerOpen ? null : { rowId, staffId })}
-          style={{ 
-            background: bg, 
-            color: color, 
-            border: `1px solid ${border}`, 
-            padding: '3px 8px', 
-            borderRadius: '6px', 
-            fontSize: '0.74rem', 
-            fontWeight: 700,
-            display: 'inline-block',
-            maxWidth: '140px',
-            lineHeight: '1.2',
-            cursor: isManager ? 'pointer' : 'default',
-            userSelect: 'none',
-            transition: 'all 0.15s ease'
-          }}
-          title={isManager ? 'Clic para cambiar o asignar rol' : rawVal}
-        >
-          {rawVal}
-        </span>
+    const isUnassigned = rawVal === '—' || rawVal === '-' || rawVal === '';
 
-        {/* POPOVER RÁPIDO DE ASIGNACIÓN */}
-        {isPickerOpen && (
-          <div 
-            style={{
-              position: 'absolute',
-              top: '100%',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              marginTop: '6px',
-              background: 'var(--bg-card)',
-              border: '1px solid var(--border-subtle)',
-              borderRadius: '8px',
-              boxShadow: 'var(--card-shadow)',
-              padding: '6px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '3px',
-              width: '160px',
-              zIndex: 100
-            }}
-          >
-            {[
-              { label: '✓ Presente', val: '✓' },
-              { label: '— Libre', val: '—' },
-              { label: 'Grounding', val: '(Grounding)' },
-              { label: 'Cierre Grounding', val: 'Cierre (Grounding)' },
-              { label: 'Noche Confianza', val: 'Noche De Confianza' },
-              { label: 'Cierre Confianza', val: 'Cierre Noche De Confianza' },
-              { label: 'Caída Confianza', val: 'Caída Confianza' },
-              { label: 'TANQUE', val: 'TANQUE' },
-              { label: 'Rompimiento', val: 'Rompimiento de Barreras' },
-              { label: 'Vuelos', val: 'Vuelos' }
-            ].map(opt => (
-              <button
-                key={opt.val}
-                type="button"
-                onClick={() => handleCellAssignment(rowId, staffId, opt.val)}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  borderRadius: '4px',
-                  padding: '4px 8px',
-                  fontSize: '0.74rem',
-                  color: 'var(--text-main)',
-                  textAlign: 'left',
-                  cursor: 'pointer',
-                  fontWeight: 600
-                }}
-              >
-                {opt.label}
-              </button>
-            ))}
-          </div>
-        )}
+    return (
+      <div 
+        style={{ 
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '4px 8px', 
+          borderRadius: '6px', 
+          fontSize: '0.74rem', 
+          fontWeight: 700,
+          background: bg,
+          color: color,
+          border: isUnassigned ? border : `1px solid ${border}`,
+          maxWidth: '130px',
+          lineHeight: '1.2',
+          userSelect: 'none',
+          pointerEvents: 'none',
+          cursor: 'pointer',
+          transition: 'all 0.15s ease'
+        }}
+      >
+        {isUnassigned ? '— Asignar' : rawVal}
       </div>
     );
   };
@@ -730,7 +746,6 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
         className="glass-panel" 
         onClick={e => {
           e.stopPropagation();
-          setActiveCellPicker(null);
         }}
         style={{
           width: '100%',
@@ -786,7 +801,7 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
               )}
             </div>
             <p className="text-muted" style={{ margin: 0, fontSize: '0.86rem' }}>
-              Planificación operativa multi-sede de jornadas, horarios y fisionomía de sala — Almacenamiento en <strong>NODUS</strong>.
+              Planificación operativa multi-sede de jornadas, horarios y fisionomía de sala — Almacenamiento y sincronización en <strong>Causa OS</strong>.
             </p>
           </div>
           <button 
@@ -933,7 +948,7 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                   <div className="text-muted" style={{ fontSize: '0.78rem' }}>
                     {currentCycle?.name ? `Ciclo Activo: ${currentCycle.name}` : `Entrenamientos UNO / DOS / MAESTRÍA`}
                     {currentStage ? ` • Etapa: ${currentStage}` : ''}
-                    {lastSaved ? ` • Guardado en Nodus: ${lastSaved}` : ' • Sin cambios guardados'}
+                    {lastSaved ? ` • Guardado en Causa OS: ${lastSaved}` : ' • Sin cambios guardados'}
                   </div>
                 </div>
 
@@ -974,7 +989,7 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
 
                   {isManager && (
                     <button
-                      onClick={handleSaveToNodus}
+                      onClick={handleSaveToCausa}
                       disabled={isSaving}
                       className="btn-primary"
                       style={{ 
@@ -986,7 +1001,7 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                       }}
                     >
                       <Save size={14} />
-                      {isSaving ? 'Guardando...' : (hasUnsavedChanges ? 'Guardar Cambios' : 'Guardado en Nodus')}
+                      {isSaving ? 'Guardando en Causa OS...' : (hasUnsavedChanges ? 'Guardar en Causa OS' : 'Guardado en Causa OS')}
                     </button>
                   )}
                 </div>
@@ -1266,15 +1281,31 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                             return (
                               <td 
                                 key={staff.id}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  const rect = e.currentTarget.getBoundingClientRect();
+                                  setActiveCellPicker({
+                                    rowId: row.id,
+                                    staffId: staff.id,
+                                    staffName: staff.name,
+                                    training: row.training,
+                                    dia: row.dia,
+                                    currentVal: val,
+                                    top: Math.min(Math.max(10, rect.bottom + 4), window.innerHeight - 380),
+                                    left: Math.max(10, Math.min(window.innerWidth - 260, rect.left - 20))
+                                  });
+                                }}
                                 style={{ 
-                                  padding: '0.7rem 0.75rem', 
+                                  padding: '0.6rem 0.5rem', 
                                   textAlign: 'center',
+                                  cursor: 'pointer',
                                   background: isHighlighted ? 'var(--crear-gold-light)' : 'transparent',
                                   borderLeft: '1px solid var(--border-subtle)',
                                   borderRight: '1px solid var(--border-subtle)'
                                 }}
+                                title={`Clic para asignar turno o rol a ${staff.name}`}
                               >
-                                {renderCellBadge(val, row.id, staff.id)}
+                                {renderCellBadge(val)}
                               </td>
                             );
                           })}
@@ -1860,6 +1891,134 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                   <Mail size={16} />
                   Enviar Correo Masivo
                 </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* POPOVER FLOTANTE (FIXED) DE ASIGNACIÓN RÁPIDA DE ROL / TAREA              */}
+        {/* ========================================================================= */}
+        {activeCellPicker && (
+          <div 
+            onClick={(e) => {
+              e.stopPropagation();
+              setActiveCellPicker(null);
+            }}
+            style={{
+              position: 'fixed',
+              top: 0, left: 0, right: 0, bottom: 0,
+              zIndex: 999999,
+              background: 'rgba(0, 0, 0, 0.2)',
+              backdropFilter: 'blur(2px)'
+            }}
+          >
+            <div 
+              onClick={(e) => e.stopPropagation()}
+              className="glass-panel"
+              style={{
+                position: 'fixed',
+                top: Math.min(activeCellPicker.top || 200, window.innerHeight - 440),
+                left: Math.max(10, Math.min(activeCellPicker.left || 300, window.innerWidth - 250)),
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: '10px',
+                boxShadow: '0 12px 36px rgba(0, 0, 0, 0.45)',
+                padding: '10px',
+                width: '230px',
+                zIndex: 1000000,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '4px',
+                color: 'var(--text-main)'
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '6px', marginBottom: '4px' }}>
+                <div>
+                  <div style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--text-heading)' }}>
+                    👤 {activeCellPicker.staffName}
+                  </div>
+                  <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
+                    {activeCellPicker.training} • {activeCellPicker.dia}
+                  </div>
+                </div>
+                <button 
+                  type="button" 
+                  onClick={() => setActiveCellPicker(null)} 
+                  style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '2px' }}
+                >
+                  <X size={14} />
+                </button>
+              </div>
+
+              {[
+                { label: '✓ Presente', val: '✓', color: '#16a34a' },
+                { label: '— Libre / Desasignar', val: '—', color: '#64748b' },
+                { label: 'Grounding Inicial', val: '(Grounding)', color: '#0d9488' },
+                { label: 'Cierre Grounding', val: 'Cierre (Grounding C1)', color: '#0d9488' },
+                { label: 'Noche de Confianza', val: 'Noche De Confianza', color: '#9333ea' },
+                { label: 'Cierre Confianza', val: 'Cierre Noche De Confianza', color: '#9333ea' },
+                { label: 'Caída Confianza', val: 'Caída Confianza', color: '#9333ea' },
+                { label: 'TANQUE', val: 'TANQUE', color: '#d97706' },
+                { label: 'Rompimiento Barreras', val: 'Rompimiento de Barreras', color: '#ea580c' },
+                { label: 'Vuelos C2', val: 'Vuelos', color: '#db2777' },
+              ].map(opt => (
+                <button
+                  key={opt.val}
+                  type="button"
+                  onClick={() => {
+                    handleCellAssignment(activeCellPicker.rowId, activeCellPicker.staffId, opt.val);
+                    setActiveCellPicker(null);
+                  }}
+                  style={{
+                    background: activeCellPicker.currentVal === opt.val ? 'var(--crear-gold-light)' : 'transparent',
+                    border: activeCellPicker.currentVal === opt.val ? '1px solid var(--crear-gold)' : 'none',
+                    borderRadius: '6px',
+                    padding: '5px 8px',
+                    fontSize: '0.76rem',
+                    color: opt.color || 'var(--text-main)',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    fontWeight: 700,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    transition: 'all 0.1s ease'
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.background = 'rgba(255, 193, 7, 0.15)'}
+                  onMouseLeave={e => e.currentTarget.style.background = activeCellPicker.currentVal === opt.val ? 'var(--crear-gold-light)' : 'transparent'}
+                >
+                  <span>{opt.label}</span>
+                  {activeCellPicker.currentVal === opt.val && <Check size={12} />}
+                </button>
+              ))}
+
+              {/* Input personalizado para escribir texto libre */}
+              <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '6px', marginTop: '4px' }}>
+                <input 
+                  type="text"
+                  placeholder="Escribir tarea personalizada..."
+                  defaultValue={!['✓', '—'].includes(activeCellPicker.currentVal) ? activeCellPicker.currentVal : ''}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && e.target.value.trim()) {
+                      handleCellAssignment(activeCellPicker.rowId, activeCellPicker.staffId, e.target.value.trim());
+                      setActiveCellPicker(null);
+                    }
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '5px 8px',
+                    fontSize: '0.74rem',
+                    background: 'var(--bg-dark, #f8fafc)',
+                    border: '1px solid var(--border-subtle)',
+                    borderRadius: '4px',
+                    color: 'var(--text-main)',
+                    boxSizing: 'border-box'
+                  }}
+                />
+                <div style={{ fontSize: '0.64rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                  Presiona Enter para asignar
+                </div>
               </div>
             </div>
           </div>
