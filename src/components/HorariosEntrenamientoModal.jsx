@@ -13,8 +13,10 @@ import { useCycles } from '../context/CyclesContext';
 
 // Helper para obtener los gerentes y coordinadores reales de una sede
 function getLeadershipForSede(sedeName) {
-  const cleanTarget = normalizeSede(sedeName).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-  const leaders = USERS_TO_IMPORT.filter(u => {
+  const normSede = normalizeSede(sedeName);
+  const cleanTarget = normSede.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+  let leaders = USERS_TO_IMPORT.filter(u => {
     // Excluir personal desvinculado
     const email = (u.email || '').toLowerCase();
     const name = (u.name || '').toLowerCase();
@@ -27,20 +29,91 @@ function getLeadershipForSede(sedeName) {
     return isThisSede && isLeader;
   });
 
-  return leaders.map(u => {
+  // Especial Quito: asegurar inclusión de Marcela Robbys (coord_c1 oficial de Quito)
+  if (cleanTarget.includes('quito')) {
+    const hasMarcela = leaders.some(u => (u.email || '').toLowerCase().includes('marobel'));
+    if (!hasMarcela) {
+      leaders.push({
+        id: 'coord_marcela_quito',
+        name: 'Marcela Robbys',
+        role: 'coord_c1',
+        sede: 'Quito',
+        email: 'marobel.studio@gmail.com'
+      });
+    }
+  }
+
+  const mapped = leaders.map(u => {
+    let cleanName = u.name;
     let cleanRole = 'Coordinador';
     const r = (u.role || u.appRole || '').toLowerCase();
-    if (r.includes('gerente')) cleanRole = 'Gerente de Sede';
-    else if (r.includes('maestria') || r.includes('mj')) cleanRole = 'Coord. Maestría';
-    else if (r.includes('c1') || r.includes('c2')) cleanRole = 'Coord. C1/C2';
+    const email = (u.email || '').toLowerCase();
+
+    // Mapeo riguroso de coordinadores y gerentes de Quito y sedes
+    if (email.includes('katherine.aguirre')) {
+      cleanName = 'Karla Aguirre';
+      cleanRole = 'Coord. C1/C2';
+    } else if (email.includes('karla.pastrano')) {
+      cleanName = 'Karla Pastrano';
+      cleanRole = 'Coord. C1';
+    } else if (email.includes('adrianna.guarochico') || email.includes('adrianna@')) {
+      cleanName = 'Adrianna Guarochico';
+      cleanRole = 'Coord. C1';
+    } else if (email.includes('marco.gonzalez') || email.includes('adams')) {
+      cleanName = 'Adams Gonzalez';
+      cleanRole = 'Coord. C2';
+    } else if (email.includes('daniela.esposito')) {
+      cleanName = 'Daniela Esposito';
+      cleanRole = 'Coord. C2';
+    } else if (email.includes('danna.guaman')) {
+      cleanName = 'Danna Guaman';
+      cleanRole = 'Coord. C2';
+    } else if (email.includes('marobel')) {
+      cleanName = 'Marcela Robbys';
+      cleanRole = 'Coord. C1/C2';
+    } else if (email.includes('erika.gavilanez')) {
+      cleanName = 'Erika Gavilanez';
+      cleanRole = 'Coord. Maestría';
+    } else if (email.includes('liliana.cubillo')) {
+      cleanName = 'Liliana Cubillo';
+      cleanRole = 'Coord. Maestría';
+    } else if (email.includes('emily.campuzano')) {
+      cleanName = 'Emily Campuzano';
+      cleanRole = 'Gerente de Sede';
+    } else if (email.includes('freddy.sosa')) {
+      cleanName = 'David Sosa';
+      cleanRole = 'Gerente de Sede';
+    } else if (r.includes('gerente')) {
+      cleanRole = 'Gerente de Sede';
+    } else if (r.includes('maestria') || r.includes('mj')) {
+      cleanRole = 'Coord. Maestría';
+    } else if (r.includes('c1') || r.includes('c2')) {
+      cleanRole = 'Coord. C1/C2';
+    }
 
     return {
       id: u.id || u.email.split('@')[0],
-      name: u.name,
+      name: cleanName,
       role: cleanRole,
       email: u.email
     };
   });
+
+  // Orden ejecutivo de columnas en el cuadro:
+  // 1. Gerentes
+  // 2. Coord. Maestría
+  // 3. Coord. C1/C2 y C1
+  // 4. Coord. C2
+  const rolePriority = (role) => {
+    if (role.includes('Gerente')) return 1;
+    if (role.includes('Maestría')) return 2;
+    if (role.includes('C1/C2')) return 3;
+    if (role.includes('C1')) return 4;
+    if (role.includes('C2')) return 5;
+    return 6;
+  };
+
+  return mapped.sort((a, b) => rolePriority(a.role) - rolePriority(b.role));
 }
 
 // Plantilla de filas iniciales por entrenamiento
@@ -430,6 +503,22 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
     })));
 
     setNewStaffForm({ name: '', role: '', email: '' });
+    setHasUnsavedChanges(true);
+  };
+
+  // Incorporar coordinador oficial de la sede a la matriz activa
+  const handleAddExistingStaff = (staff) => {
+    if (staffList.some(s => s.id === staff.id || (s.email && s.email.toLowerCase() === staff.email.toLowerCase()))) {
+      return;
+    }
+    setStaffList(prev => [...prev, staff]);
+    setScheduleRows(prev => prev.map(row => ({
+      ...row,
+      assignments: {
+        ...row.assignments,
+        [staff.id]: '—'
+      }
+    })));
     setHasUnsavedChanges(true);
   };
 
@@ -982,27 +1071,84 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                       {/* Columnas dinámicas de Gerentes y Coordinadores de esta Sede */}
                       {staffList.map(staff => {
                         const isHighlighted = highlightPerson === staff.id;
+                        const isGerente = staff.role.includes('Gerente');
+                        const isMaestria = staff.role.includes('Maestría');
+                        const badgeBg = isGerente ? 'rgba(217, 119, 6, 0.12)' : (isMaestria ? 'rgba(147, 51, 234, 0.12)' : 'rgba(2, 132, 199, 0.12)');
+                        const badgeColor = isGerente ? '#d97706' : (isMaestria ? '#9333ea' : '#0284c7');
+
                         return (
                           <th 
                             key={staff.id} 
                             style={{ 
-                              padding: '0.85rem 0.75rem', 
+                              padding: '0.75rem 0.6rem', 
                               textAlign: 'center',
                               background: isHighlighted ? 'var(--crear-gold-light)' : 'transparent',
                               borderLeft: '1px solid var(--border-subtle)',
                               borderRight: '1px solid var(--border-subtle)',
-                              minWidth: '125px'
+                              minWidth: '130px',
+                              position: 'relative'
                             }}
                           >
-                            <div style={{ fontWeight: 700, color: isHighlighted ? 'var(--crear-gold)' : 'var(--text-heading)', fontSize: '0.85rem' }}>
-                              {staff.name}
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
+                              <div style={{ fontWeight: 700, color: isHighlighted ? 'var(--crear-gold)' : 'var(--text-heading)', fontSize: '0.85rem' }}>
+                                {staff.name}
+                              </div>
+                              {isManager && (
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDeleteStaffMember(staff.id, staff.name);
+                                  }}
+                                  title={`Ocultar ${staff.name} de esta matriz`}
+                                  style={{
+                                    background: 'transparent',
+                                    border: 'none',
+                                    color: 'var(--text-muted)',
+                                    cursor: 'pointer',
+                                    padding: '2px',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    opacity: 0.45,
+                                    borderRadius: '4px'
+                                  }}
+                                  onMouseEnter={e => e.currentTarget.style.opacity = '1'}
+                                  onMouseLeave={e => e.currentTarget.style.opacity = '0.45'}
+                                >
+                                  <X size={12} />
+                                </button>
+                              )}
                             </div>
-                            <div className="text-muted" style={{ fontSize: '0.7rem', fontWeight: 400, marginTop: '2px' }}>
+                            <div style={{
+                              display: 'inline-block',
+                              marginTop: '3px',
+                              padding: '1px 6px',
+                              borderRadius: '4px',
+                              fontSize: '0.68rem',
+                              fontWeight: 700,
+                              background: badgeBg,
+                              color: badgeColor
+                            }}>
                               {staff.role}
                             </div>
                           </th>
                         );
                       })}
+
+                      {isManager && (
+                        <th style={{ padding: '0.5rem', textAlign: 'center', borderLeft: '1px dashed var(--border-subtle)', borderRight: '1px dashed var(--border-subtle)', minWidth: '70px' }}>
+                          <button
+                            type="button"
+                            onClick={() => setShowManageStaffModal(true)}
+                            className="btn-secondary"
+                            style={{ padding: '3px 8px', fontSize: '0.72rem', display: 'inline-flex', alignItems: 'center', gap: '3px' }}
+                            title="Incorporar otro coordinador o colaborador"
+                          >
+                            <Plus size={12} />
+                            <span>Staff</span>
+                          </button>
+                        </th>
+                      )}
 
                       <th style={{ padding: '0.85rem 0.9rem', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', minWidth: '150px' }}>
                         VESTIMENTA
@@ -1132,6 +1278,13 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                               </td>
                             );
                           })}
+
+                          {/* Celda de alineación para la columna de acción de Staff */}
+                          {isManager && (
+                            <td style={{ padding: '0.5rem', textAlign: 'center', borderLeft: '1px dashed var(--border-subtle)', borderRight: '1px dashed var(--border-subtle)' }}>
+                              <span className="text-muted" style={{ fontSize: '0.7rem' }}>—</span>
+                            </td>
+                          )}
 
                           {/* Vestimenta (Editable in-line) */}
                           <td style={{ padding: '0.7rem 0.9rem', whiteSpace: 'nowrap', fontSize: '0.8rem' }}>
@@ -1449,6 +1602,56 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                   </div>
                 ))}
               </div>
+
+              {/* COORDINADORES Y GERENTES OFICIALES DISPONIBLES PARA INCORPORAR */}
+              {(() => {
+                const availableOfficial = getLeadershipForSede(selectedSede).filter(
+                  off => !staffList.some(s => s.id === off.id || (s.email && s.email.toLowerCase() === off.email.toLowerCase()))
+                );
+                if (availableOfficial.length === 0) return null;
+
+                return (
+                  <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '0.9rem' }}>
+                    <label className="text-muted" style={{ fontSize: '0.78rem', fontWeight: 700, display: 'block', marginBottom: '6px' }}>
+                      📋 Coordinadores y Gerentes Oficiales de {selectedSede} para incorporar:
+                    </label>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', maxHeight: '180px', overflowY: 'auto' }}>
+                      {availableOfficial.map(official => (
+                        <div 
+                          key={official.id}
+                          style={{
+                            background: 'var(--bg-dark, #f8fafc)',
+                            border: '1px dashed var(--border-subtle)',
+                            borderRadius: '6px',
+                            padding: '0.5rem 0.8rem',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
+                          }}
+                        >
+                          <div>
+                            <span style={{ fontWeight: 700, fontSize: '0.82rem', color: 'var(--text-heading)' }}>
+                              {official.name}
+                            </span>
+                            <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginLeft: '6px' }}>
+                              ({official.role})
+                            </span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleAddExistingStaff(official)}
+                            className="btn-secondary"
+                            style={{ padding: '3px 8px', fontSize: '0.72rem', display: 'inline-flex', alignItems: 'center', gap: '3px' }}
+                          >
+                            <Plus size={12} />
+                            <span>Agregar</span>
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* AGREGAR NUEVO INTEGRANTE A LA SEDE */}
               <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '1rem' }}>
