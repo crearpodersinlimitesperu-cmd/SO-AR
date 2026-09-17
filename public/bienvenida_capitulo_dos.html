@@ -1,0 +1,1825 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Bienvenida Oficial al Capítulo Dos de CREAR Poder Sin Límites.">
+    
+    <!-- Forzar candado de seguridad HTTPS para redes corporativas públicas -->
+    <script>
+        if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+            location.replace(`https:${location.href.substring(location.protocol.length)}`);
+        }
+    </script>
+    
+    <!-- Meta OpenGraph para WhatsApp y Redes Sociales -->
+    <meta property="og:title" content="CREAR Poder Sin Límites | Bienvenida Capítulo Dos">
+    <meta property="og:description" content="Toda la información oficial del entrenamiento Capítulo Dos.">
+    <meta property="og:image" content="https://crearpsl.net/logo_crear_oficial.png">
+    <meta property="og:url" content="https://crearpsl.net/bienvenida_capitulo_dos.html">
+    <meta property="og:type" content="website">
+    
+    <title>Bienvenida Capítulo Dos | CREAR PODER SIN LÍMITES</title>
+
+    <link rel="icon" href="logo_crear_oficial.png" type="image/png">
+    <link rel="preload" href="logo_crear_global_blanco.png" as="image">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        crearDark: '#0a0f1c',
+                        crearDarker: '#05080f',
+                        crearBlue: '#0052cc',
+                        crearBlueLight: '#3385ff',
+                        crearCyan: '#00d2ff',
+                        crearGold: '#ffb703',
+                        crearRed: '#ff3366',
+                        crearBorder: 'rgba(0, 210, 255, 0.15)'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        outfit: ['Outfit', 'sans-serif'],
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'float-delayed': 'float 6s ease-in-out 3s infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'fade-in': 'fadeIn 1s ease-out forwards',
+                        'slide-up': 'slideUp 0.8s ease-out forwards',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(30px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #05080f;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .glassmorphism {
+            background: rgba(10, 15, 28, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 210, 255, 0.1);
+        }
+
+        .glass-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            border-left: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 8px 32px 0 rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0, 210, 255, 0.3);
+            box-shadow: 0 15px 40px 0 rgba(0, 210, 255, 0.15);
+        }
+
+        .text-gradient {
+            background: linear-gradient(to right, #00d2ff, #3385ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .text-gradient-gold {
+            background: linear-gradient(to right, #ffb703, #ffdd77);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Partículas CSS sutiles */
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: white;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        /* Estilos para el scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #05080f;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #0052cc;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00d2ff;
+        }
+
+        /* Clases de animación iniciales */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- ASISTENTE DE LECTURA ACTIVA Y BIENESTAR VISUAL --- */
+        
+        /* Regla de Enfoque */
+        #reading-ruler {
+            position: fixed;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #00d2ff 20%, #3385ff 80%, transparent);
+            box-shadow: 0 0 15px #00d2ff, 0 0 30px #3385ff;
+            pointer-events: none;
+            z-index: 9999;
+            display: none;
+            opacity: 0.85;
+            transition: opacity 0.15s ease, transform 0.08s ease-out;
+        }
+
+        /* Modo Concentración por Bloque */
+        .block-focus-active p,
+        .block-focus-active h1,
+        .block-focus-active h2,
+        .block-focus-active h3,
+        .block-focus-active h4,
+        .block-focus-active h5,
+        .block-focus-active li,
+        .block-focus-active .glass-card {
+            transition: opacity 0.3s ease, filter 0.3s ease, transform 0.3s ease;
+            opacity: 0.45;
+            filter: blur(0.5px);
+        }
+
+        .block-focus-active p:hover,
+        .block-focus-active h1:hover,
+        .block-focus-active h2:hover,
+        .block-focus-active h3:hover,
+        .block-focus-active h4:hover,
+        .block-focus-active h5:hover,
+        .block-focus-active li:hover,
+        .block-focus-active .glass-card:hover {
+            opacity: 1;
+            filter: blur(0);
+            transform: scale(1.005);
+        }
+
+        /* Modo Contraste Cálido (Filtro Anti-Fatiga) */
+        body.warm-reading-active {
+            background-color: #0c0b09 !important;
+            transition: background-color 0.4s ease;
+        }
+        .warm-reading-active p,
+        .warm-reading-active span,
+        .warm-reading-active li,
+        .warm-reading-active h1,
+        .warm-reading-active h2,
+        .warm-reading-active h3,
+        .warm-reading-active h4,
+        .warm-reading-active h5 {
+            color: #ebdcb9 !important;
+            transition: color 0.4s ease;
+        }
+        .warm-reading-active .text-gray-400 {
+            color: #bfae93 !important;
+        }
+        .warm-reading-active .text-gray-300 {
+            color: #dacba7 !important;
+        }
+        .warm-reading-active .text-gradient {
+            background: linear-gradient(to right, #ffb703, #ffe66d) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            background-clip: text !important;
+        }
+        .warm-reading-active .glass-card {
+            background: linear-gradient(135deg, rgba(255, 183, 3, 0.02) 0%, rgba(255, 183, 3, 0.005) 100%) !important;
+            border-color: rgba(255, 183, 3, 0.15) !important;
+        }
+        .warm-reading-active .glass-card:hover {
+            border-color: rgba(255, 183, 3, 0.4) !important;
+            box-shadow: 0 15px 40px 0 rgba(255, 183, 3, 0.1) !important;
+        }
+
+        /* Ajuste de Texto Agrandado */
+        .large-text-active p {
+            font-size: 1.15rem !important;
+            line-height: 1.85 !important;
+            letter-spacing: 0.02em !important;
+        }
+        .large-text-active li {
+            font-size: 1.1rem !important;
+            line-height: 1.75 !important;
+        }
+
+        /* Barra de Progreso de Lectura */
+        #scroll-progress-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.05);
+            z-index: 100;
+        }
+        #scroll-progress-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #0052cc, #00d2ff, #ffb703);
+            box-shadow: 0 0 10px rgba(0, 210, 255, 0.7);
+            transition: width 0.15s ease-out;
+        }
+
+        /* Efecto de Resplandor al Completar Lectura */
+        @keyframes golden-cyan-pulse {
+            0% {
+                box-shadow: 0 0 15px rgba(0, 210, 255, 0.4), 0 0 0 0px rgba(0, 210, 255, 0.4), 0 0 0 0px rgba(255, 183, 3, 0.2);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(255, 183, 3, 0.8), 0 0 0 12px rgba(0, 210, 255, 0), 0 0 0 24px rgba(255, 183, 3, 0);
+                transform: scale(1.02);
+            }
+            100% {
+                box-shadow: 0 0 15px rgba(0, 210, 255, 0.4), 0 0 0 0px rgba(0, 210, 255, 0), 0 0 0 0px rgba(255, 183, 3, 0);
+            }
+        }
+        .completion-glow {
+            animation: golden-cyan-pulse 2.2s infinite !important;
+            border: 2px solid #ffb703 !important;
+            background: rgba(255, 183, 3, 0.1) !important;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased relative min-h-screen">
+
+    <!-- FONDOS ANIMADOS -->
+    <div class="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
+        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-crearBlue/20 rounded-full blur-[120px] animate-float"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-crearCyan/20 rounded-full blur-[120px] animate-float-delayed"></div>
+        <div class="absolute top-[40%] left-[50%] w-[30%] h-[30%] bg-crearGold/10 rounded-full blur-[100px] animate-pulse-slow"></div>
+        
+        <!-- Contenedor de partículas generadas por JS -->
+        <div id="particles-container" class="absolute inset-0 opacity-40"></div>
+    </div>
+
+    <!-- NAVBAR SIMPLIFICADO -->
+    <nav class="fixed top-0 w-full z-50 glassmorphism border-b-0 py-3">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <img src="logo_crear_global_blanco.png" alt="CREAR Poder Sin Límites" class="h-8 md:h-10 object-contain">
+            </div>
+            <div class="hidden md:flex text-[10px] md:text-xs font-bold tracking-[0.2em] text-gray-400 uppercase">
+                <span>Ecuador <span class="text-crearCyan mx-2">•</span> Perú <span class="text-crearCyan mx-2">•</span> Colombia <span class="text-crearCyan mx-2">•</span> México</span>
+            </div>
+        </div>
+        <!-- Barra de Progreso de Lectura Activa -->
+        <div id="scroll-progress-container">
+            <div id="scroll-progress-bar"></div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="pt-28 pb-20 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto relative overflow-hidden">
+        
+        <!-- PRE-TRAINING CONTAINER (Default visible) -->
+        <div id="pre-training-container" class="transition-all duration-1000">
+            <!-- HEADER / HERO -->
+            <header class="text-center mb-16 animate-slide-up">
+                <div id="sede-location-badge" class="inline-flex items-center gap-2 mb-4 bg-white/5 border border-white/10 px-4 py-1.5 rounded-full shadow-[0_0_15px_rgba(255,255,255,0.05)]">
+                    <img id="sede-flag" src="" alt="Flag" class="w-5 h-auto rounded-[2px] hidden shadow-sm border border-white/20" />
+                    <span id="sede-city-name" class="text-white text-sm font-bold tracking-widest uppercase">LIMA, PERÚ</span>
+                </div>
+                <br>
+                <span class="inline-block py-1 px-3 rounded-full bg-crearCyan/10 border border-crearCyan/30 text-crearCyan text-xs font-bold tracking-widest uppercase mb-4 shadow-[0_0_15px_rgba(0,210,255,0.2)]">
+                    Bienvenida Oficial al Capítulo Dos
+                </span>
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-black font-outfit tracking-tight mb-4 leading-tight">
+                    <span class="text-gradient">Tu Transformación Cuántica</span><br>en Capítulo Dos Comienza YA
+                </h1>
+                <h2 class="text-lg md:text-xl font-light text-gray-300 mb-8 max-w-3xl mx-auto">
+                    ¡Felicidades, Creador Cuántico del <span id="team-badge" class="text-crearCyan font-bold">Equipo ...</span>! Estás a punto de ingresar al espacio vivencial donde romperás paradigmas, potenciarás tu ser y diseñarás un futuro extraordinario.
+                </h2>
+                
+                <div class="mb-8 relative z-10">
+                    <a href="#contacto" class="inline-block bg-crearCyan hover:bg-crearBlue transition-colors text-crearDarker font-bold py-3 px-8 rounded-full shadow-[0_0_20px_rgba(0,210,255,0.4)] hover:shadow-[0_0_30px_rgba(0,210,255,0.6)] transform hover:-translate-y-1 cursor-pointer uppercase tracking-wider text-sm">
+                        CONFIRMAR MI ASISTENCIA AL CAPÍTULO DOS
+                    </a>
+                </div>
+
+                <!-- FECHAS DESTACADAS PREMIUM -->
+                <div class="mb-10 relative z-10 flex flex-col items-center justify-center text-center animate-pulse-slow">
+                    <p class="text-xs text-crearCyan font-bold uppercase tracking-[0.3em] mb-3">Reserva estas fechas</p>
+                    <div class="border-y border-crearGold/30 py-4 px-8 bg-crearGold/5 rounded-3xl backdrop-blur-sm shadow-[0_0_30px_rgba(255,183,3,0.15)]">
+                        <p id="hero-date-main" class="text-crearGold font-black text-3xl md:text-4xl lg:text-5xl uppercase tracking-tight drop-shadow-[0_0_15px_rgba(255,183,3,0.6)]">Del jueves 01 al domingo 04</p>
+                        <p id="hero-month-main" class="text-crearGold font-bold text-xl md:text-2xl mt-1 tracking-widest">de octubre de 2026</p>
+                    </div>
+                </div>
+
+                <!-- CONTADOR REGRESIVO -->
+                <div class="mb-10 text-center relative z-10">
+                    <p class="text-crearGold text-sm font-bold tracking-[0.2em] uppercase mb-2">Falta poco para comenzar tu C2</p>
+                    <div class="inline-flex items-center justify-center gap-4 bg-crearDark/50 border border-crearGold/30 px-6 py-4 rounded-2xl shadow-[0_0_15px_rgba(255,183,3,0.1)]">
+                        <div class="text-center">
+                            <span id="dias" class="text-4xl font-black text-white font-mono">...</span>
+                            <p class="text-xs text-gray-400 uppercase tracking-wider">Días</p>
+                        </div>
+                        <span class="text-3xl text-crearGold/50 pb-4">:</span>
+                        <div class="text-center">
+                            <span id="horas" class="text-4xl font-black text-white font-mono">..</span>
+                            <p class="text-xs text-gray-400 uppercase tracking-wider">Horas</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 text-sm mt-3">para dar tu siguiente salto de consciencia</p>
+                </div>
+                
+                <div class="text-base md:text-lg text-gray-400 font-light leading-relaxed max-w-4xl mx-auto glass-card p-6 md:p-8 rounded-2xl text-left sm:text-center relative z-10">
+                    <p class="text-white font-medium mb-4"><strong class="font-bold text-crearCyan">En CREAR no venimos a motivarte. La motivación es temporal. Venimos a entrenarte para que desarrolles nuevas formas de pensar, actuar y sostener resultados extraordinarios.</strong></p>
+                    <p class="mb-4">El Capítulo Dos es el espacio de consolidación vivencial donde tus intenciones se convierten en carácter y tu visión se alinea con tu poder personal sin límites.</p>
+                    <p class="text-crearGold font-medium">Nos comprometemos a entregarte un entorno seguro, impecable y de altísima vibración. Tu compromiso es presentarte con total puntualidad y entrega.</p>
+                </div>
+
+                <!-- REPRODUCTOR DE AUDIO DE FONDO -->
+                <audio id="bg-audio" loop>
+                    <source src="vivo_pedro_capo.mp3" type="audio/mpeg">
+                </audio>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        var audio = document.getElementById('bg-audio');
+                        if (audio) {
+                            audio.volume = 0.35;
+                            var audioStarted = false;
+                            var startAudio = function() {
+                                if (audioStarted) return;
+                                if (audio.currentTime < 15) audio.currentTime = 15;
+                                audio.play().then(function() {
+                                    audioStarted = true;
+                                    document.body.removeEventListener('click', startAudio);
+                                    document.body.removeEventListener('touchstart', startAudio);
+                                }).catch(function(e) {});
+                            };
+                            document.body.addEventListener('click', startAudio);
+                            document.body.addEventListener('touchstart', startAudio);
+                        }
+                    });
+                </script>
+            </header>
+
+            <!-- GRID DE INFORMACIÓN (2 COLUMNAS) -->
+            <div id="grid-info-section" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+                
+                <!-- TARJETA: INFORMACIÓN CLAVE -->
+                <div class="glass-card rounded-3xl p-8 reveal">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-12 h-12 rounded-full bg-crearCyan/20 flex items-center justify-center text-crearCyan">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-black font-outfit text-white">Información Clave</h3>
+                    </div>
+                    
+                    <ul class="space-y-5">
+                        <li class="flex items-start gap-4">
+                            <div class="mt-1 w-2 h-2 rounded-full bg-crearCyan shadow-[0_0_8px_#00d2ff]"></div>
+                            <div>
+                                <p class="text-xs text-crearCyan font-bold uppercase tracking-wider mb-1">Lugar de Entrenamiento</p>
+                                <p id="hotel-name" class="text-white font-medium text-lg leading-snug">Hotel José Antonio Deluxe</p>
+                                <p id="hotel-address" class="text-gray-400 text-sm">Calle Bellavista 133 – Miraflores 15038</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-4">
+                            <div class="mt-1 w-2 h-2 rounded-full bg-crearCyan shadow-[0_0_8px_#00d2ff]"></div>
+                            <div>
+                                <p class="text-xs text-crearCyan font-bold uppercase tracking-wider mb-1">Fechas Oficiales</p>
+                                <p id="hero-date" class="text-crearGold font-black text-2xl md:text-3xl uppercase tracking-tight drop-shadow-[0_0_12px_rgba(255,183,3,0.4)]">Del jueves 01 al domingo 04</p>
+                                <p id="hero-month" class="text-crearGold font-bold text-lg mt-1 tracking-widest">de octubre de 2026</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- TARJETA: HORARIOS (4 DÍAS DE CAPÍTULO DOS) -->
+                <div class="glass-card rounded-3xl p-8 reveal">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-12 h-12 rounded-full bg-crearGold/20 flex items-center justify-center text-crearGold">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-black font-outfit text-white">Horarios Oficiales</h3>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-crearDark/50 border border-crearBorder/30 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div class="flex items-center gap-3">
+                                <span class="text-2xl font-black text-white font-outfit">JUE</span>
+                                <span class="bg-crearCyan/20 text-crearCyan text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide">¡Registro y Apertura!</span>
+                            </div>
+                            <div class="text-right sm:text-left">
+                                <p class="text-white font-mono font-medium">13:00 hrs Mesa de Registro</p>
+                                <p class="text-gray-400 text-xs">Apertura: 14:00 hrs - Fin: 22:30 hrs (aprox.)</p>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-crearDark/50 border border-crearBorder/30 rounded-xl p-4 flex items-center justify-between">
+                            <span class="text-2xl font-black text-gray-300 font-outfit">VIE Y SÁB</span>
+                            <div class="text-right">
+                                <p class="text-white font-mono font-medium">09:00 hrs - 22:30 hrs / 23:00 hrs</p>
+                                <p class="text-gray-400 text-xs">(permanencia completa requerida)</p>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-crearDark/50 border border-crearBorder/30 rounded-xl p-4 flex items-center justify-between">
+                            <span class="text-2xl font-black text-gray-300 font-outfit">DOM</span>
+                            <div class="text-right">
+                                <p class="text-white font-mono font-medium">08:00 hrs - 20:00 hrs</p>
+                                <p class="text-gray-400 text-xs">(aprox. Clausura del Capítulo)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MAPA INTERACTIVO DE GOOGLE MAPS -->
+            <div class="glass-card rounded-3xl p-6 md:p-8 mb-12 reveal overflow-hidden relative border border-crearBorder/20">
+                <div class="flex flex-col md:flex-row gap-6 items-center">
+                    <div class="w-full md:w-1/3 space-y-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-crearCyan/20 flex items-center justify-center text-crearCyan">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                                </svg>
+                            </div>
+                            <h4 class="text-xl font-black font-outfit text-white">¿Cómo llegar?</h4>
+                        </div>
+                        <div>
+                            <p id="hotel-name-map" class="text-white font-bold text-lg">Hotel José Antonio Deluxe</p>
+                            <p id="hotel-address-map" class="text-gray-400 text-sm mt-1">Calle Bellavista 133, Miraflores 15038</p>
+                            <p id="hotel-city-map" class="text-gray-500 text-xs mt-1">Lima, Perú</p>
+                        </div>
+                        <div class="pt-2">
+                            <a id="map-link" href="https://maps.google.com/?q=Hotel+José+Antonio+Deluxe+Miraflores+Calle+Bellavista+133" target="_blank" class="inline-flex items-center gap-2 bg-crearCyan/10 hover:bg-crearCyan/20 border border-crearCyan/30 text-crearCyan font-bold py-2.5 px-4 rounded-xl text-xs transition-colors cursor-pointer">
+                                <span>Abrir en Google Maps</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="w-full md:w-2/3 h-64 md:h-80 rounded-2xl overflow-hidden border border-crearBorder/30 shadow-inner relative">
+                        <iframe 
+                            id="map-iframe"
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3900.7430415!2d-77.0313019!3d-12.1290333!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9105c819389bd7c9%3A0xbd7c8ee17dfbc462!2sHotel%20Jos%C3%A9%20Antonio%20Deluxe!5e0!3m2!1ses!2spe!4v1719528000000!5m2!1ses!2spe" 
+                            class="absolute inset-0 w-full h-full border-0" 
+                            allowfullscreen="" 
+                            loading="lazy" 
+                            referrerpolicy="no-referrer-when-downgrade">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN: QUÉ TRAER Y PREPARACIÓN ESENCIAL -->
+            <div id="que-traer-section" class="glass-card rounded-3xl p-8 md:p-10 mb-12 border-t-4 border-t-crearCyan reveal relative overflow-hidden">
+                <div class="absolute -right-20 -top-20 opacity-5">
+                    <svg class="w-64 h-64" viewBox="0 0 24 24" fill="currentColor"><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm0-2a8 8 0 100-16 8 8 0 000 16zm-1-5h2v2h-2v-2zm2-1.645V14h-2v-1.5a1 1 0 011-1 1.5 1.5 0 10-1.471-1.304L6.5 10A3.5 3.5 0 1113 13.355z"/></svg>
+                </div>
+                
+                <h3 class="text-2xl md:text-3xl font-black font-outfit text-white mb-8 text-center">Herramientas y Preparación Esencial de Capítulo Dos</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Ítem 1: Documento de Identidad -->
+                    <div class="bg-crearDark/60 p-6 rounded-2xl text-center border border-crearBorder/30 hover:border-crearCyan/50 transition-colors group">
+                        <div class="w-14 h-14 mx-auto bg-crearCyan/10 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7 text-crearCyan">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5zm6-10.125a1.875 1.875 0 11-3.75 0 1.875 1.875 0 013.75 0zm1.294 6.336a6.721 6.721 0 01-3.17.789 6.721 6.721 0 01-3.168-.789 3.376 3.376 0 016.338 0z" />
+                            </svg>
+                        </div>
+                        <h4 class="font-bold text-white text-lg mb-2">Documento de Identidad</h4>
+                        <p class="text-xs text-gray-400 leading-relaxed">Indispensable traer tu DNI físico, Pasaporte o documento de identidad oficial para tu acreditación el jueves a las 13:00 hrs.</p>
+                    </div>
+
+                    <!-- Ítem 2: Lectura Indispensable -->
+                    <div class="bg-crearDark/60 p-6 rounded-2xl text-center border border-crearBorder/30 hover:border-crearCyan/50 transition-colors group">
+                        <div class="w-14 h-14 mx-auto bg-crearCyan/10 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7 text-crearCyan">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-2.98.512v14.125A8.94 8.967 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.967 0 016-2.292c1.052 0 2.062.18 2.98.512v14.125A8.94 8.97 0 0018 18c-2.305 0-4.408.867-6 2.292m0-14.25v14.25" />
+                            </svg>
+                        </div>
+                        <h4 class="font-bold text-white text-lg mb-2">Lectura Indispensable</h4>
+                        <p class="text-xs text-gray-400 leading-relaxed">Debes haber leído <strong class="text-crearGold">"Los Cuatro Acuerdos"</strong> de Don Miguel Ruiz. Es la base fundamental para el despegue de tu C2.</p>
+                    </div>
+                    
+                    <!-- Ítem 3: Kit de Herramientas C2 -->
+                    <div class="bg-crearDark/60 p-6 rounded-2xl text-center border border-crearBorder/30 hover:border-crearCyan/50 transition-colors group">
+                        <div class="w-14 h-14 mx-auto bg-crearCyan/10 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7 text-crearCyan">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17L17.25 21A2.67 2.67 0 1021 17.25l-5.83-5.83m-3.75 3.75a3.75 3.75 0 11-5.3-5.3 3.75 3.75 0 015.3 5.3zm6-10.5a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+                            </svg>
+                        </div>
+                        <h4 class="font-bold text-white text-lg mb-2">Kit de Herramientas C2</h4>
+                        <p class="text-xs text-gray-400 leading-relaxed">Indispensable traer: <strong class="text-white">Cuaderno A4 cuadriculado, lapicero, una sábana (sin elástico) y tu Ticket Rojo</strong>.</p>
+                    </div>
+                    
+                    <!-- Ítem 4: Comodidad y Abrigo -->
+                    <div class="bg-crearDark/60 p-6 rounded-2xl text-center border border-crearBorder/30 hover:border-crearCyan/50 transition-colors group">
+                        <div class="w-14 h-14 mx-auto bg-crearCyan/10 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7 text-crearCyan">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 00-5.965 1.49M9.53 16.122a3 3 0 015.965-1.49M9.53 16.122a3 3 0 01-5.965 1.49m5.965-1.49a3 3 0 005.965 1.49m-5.965-1.49a3 3 0 00-5.965-1.49" />
+                            </svg>
+                        </div>
+                        <h4 class="font-bold text-white text-lg mb-2">Ropa Cómoda y Abrigo</h4>
+                        <p class="text-xs text-gray-400 leading-relaxed">Ropa muy cómoda para moverte. <span id="abrigo-text" class="text-crearGold font-medium">El aire acondicionado del salón suele estar frío;</span> es obligatorio traer abrigo (chompa, casaca) y snacks.</p>
+                    </div>
+
+                    <!-- Ítem 5: Hidratación -->
+                    <div class="bg-crearDark/60 p-6 rounded-2xl text-center border border-crearBorder/30 hover:border-crearCyan/50 transition-colors group">
+                        <div class="w-14 h-14 mx-auto bg-crearCyan/10 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7 text-crearCyan">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23-.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" />
+                            </svg>
+                        </div>
+                        <h4 class="font-bold text-white text-lg mb-2">Botella con Agua</h4>
+                        <p class="text-xs text-gray-400 leading-relaxed">Mantener tu hidratación es vital para sostener tu nivel de energía y concentración en las dinámicas.</p>
+                    </div>
+                    
+                    <!-- Ítem 6: Apertura Mental -->
+                    <div class="bg-crearDark/60 p-6 rounded-2xl text-center border border-crearGold/30 hover:border-crearGold/70 transition-colors group shadow-inner">
+                        <div class="w-14 h-14 mx-auto bg-crearGold/10 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7 text-crearGold">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.361-6.866 8.21 8.21 0 003 2.48z" />
+                            </svg>
+                        </div>
+                        <h4 class="font-bold text-gradient-gold text-lg mb-2">Apertura Mental</h4>
+                        <p class="text-xs text-gray-300 leading-relaxed">El compromiso contigo mismo. Ven dispuesto a vaciar tu vaso para recibir un nuevo nivel de consciencia cuántica.</p>
+                    </div>
+                </div>
+
+                <!-- NORMAS DE CONVIVENCIA Y RESTRICCIONES -->
+                <div id="normas-convivencia-section" class="mt-12 pt-10 border-t border-crearRed/20 max-w-4xl mx-auto">
+                    <h4 class="text-center text-crearRed font-bold uppercase tracking-[0.25em] mb-8 text-sm font-outfit">Normas de Convivencia y Restricciones</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
+                        <div class="bg-crearRed/5 border border-crearRed/20 p-4 rounded-2xl flex items-start gap-3 shadow-[0_0_15px_rgba(255,51,102,0.05)] hover:border-crearRed/40 transition-colors">
+                            <span class="text-crearRed text-lg shrink-0 mt-0.5">🚫</span>
+                            <div>
+                                <p class="text-white font-bold text-sm mb-1">Registro de Medios</p>
+                                <p class="text-gray-400 text-xs leading-relaxed">Prohibido filmar o tomar fotos en la sala. Protegemos la confidencialidad absoluta de los procesos de todos los creadores.</p>
+                            </div>
+                        </div>
+                        <div class="bg-crearRed/5 border border-crearRed/20 p-4 rounded-2xl flex items-start gap-3 shadow-[0_0_15px_rgba(255,51,102,0.05)] hover:border-crearRed/40 transition-colors">
+                            <span class="text-crearRed text-lg shrink-0 mt-0.5">🚫</span>
+                            <div>
+                                <p class="text-white font-bold text-sm mb-1">Cero Sustancias</p>
+                                <p class="text-gray-400 text-xs leading-relaxed">No se permite asistir bajo efectos de alcohol o cualquier sustancia psicoactiva. Es un espacio de consciencia plena.</p>
+                            </div>
+                        </div>
+                        <div class="bg-crearRed/5 border border-crearRed/20 p-4 rounded-2xl flex items-start gap-3 shadow-[0_0_15px_rgba(255,51,102,0.05)] hover:border-crearRed/40 transition-colors">
+                            <span class="text-crearRed text-lg shrink-0 mt-0.5">🚫</span>
+                            <div>
+                                <p class="text-white font-bold text-sm mb-1">Acompañantes</p>
+                                <p class="text-gray-400 text-xs leading-relaxed">Por seguridad y aforo de la sala, no se permite asistir al entrenamiento con personas que no estén previamente inscritas.</p>
+                            </div>
+                        </div>
+                        <div class="bg-crearRed/5 border border-crearRed/20 p-4 rounded-2xl flex items-start gap-3 shadow-[0_0_15px_rgba(255,51,102,0.05)] hover:border-crearRed/40 transition-colors">
+                            <span class="text-crearRed text-lg shrink-0 mt-0.5">🚫</span>
+                            <div>
+                                <p class="text-white font-bold text-sm mb-1">Sustancias Prohibidas</p>
+                                <p class="text-gray-400 text-xs leading-relaxed">Queda estrictamente prohibido el ingreso de bebidas alcohólicas o sustancias controladas al recinto.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN: COMPROMISO Y POLÍTICAS OPERATIVAS -->
+            <div id="compromiso-proceso-section" class="mb-16 reveal relative">
+                <h3 class="text-center text-xs font-bold tracking-[0.3em] text-crearCyan uppercase mb-8">Información Importante & Políticas</h3>
+                
+                <div class="space-y-6 max-w-4xl mx-auto">
+                    <!-- Compromiso con el proceso -->
+                    <div class="glass-card rounded-2xl p-6 md:p-8 border-l-4 border-l-crearGold">
+                        <h4 class="text-white font-black font-outfit text-xl mb-4 text-gradient-gold">Compromiso con el proceso de Capítulo Dos</h4>
+                        <div class="space-y-4 text-gray-300 text-sm leading-relaxed">
+                            <p>El Capítulo Dos opera como un ecosistema integrado continuo. Cada bloque de aprendizaje cimienta el siguiente.</p>
+                            <p>Por lo tanto, <strong class="text-white">tu presencia absoluta y puntual es obligatoria de principio a fin durante los 4 días</strong> (Jueves a Domingo). No se admiten ausencias parciales ni salidas anticipadas.</p>
+                            <p class="pt-2 text-gray-400">Si por cualquier motivo no puedes asistir a una parte del entrenamiento o debes retirarte antes de finalizar:</p>
+                            <ul class="list-none space-y-2 pl-2">
+                                <li class="flex items-start gap-2"><span class="text-crearGold">•</span> No podrás continuar el proceso de manera parcial.</li>
+                                <li class="flex items-start gap-2"><span class="text-crearGold">•</span> Deberás realizar nuevamente el Capítulo Dos desde el inicio en una próxima fecha programada.</li>
+                                <li class="flex items-start gap-2"><span class="text-crearGold">•</span> Esta reprogramación no tendrá costo adicional y estará sujeta a disponibilidad de cupos.</li>
+                            </ul>
+                            <div class="mt-6 p-5 bg-crearGold/10 border border-crearGold/30 rounded-xl text-center shadow-[0_0_15px_rgba(255,183,3,0.1)]">
+                                <strong class="text-crearGold block text-lg mb-2">Este fin de semana es tu prioridad.</strong>
+                                <p class="text-gray-300">Regálate el espacio desconectándote de las obligaciones externas durante las sesiones para entregarte al 100% a tu salto cuántico.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Puntualidad & Permanencia -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="glass-card rounded-2xl p-6 border-l-4 border-l-crearBlueLight">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="bg-crearDark rounded-xl p-3 shrink-0 text-xl">⏰</div>
+                                <h4 class="text-white font-bold text-lg">Puntualidad Estricta</h4>
+                            </div>
+                            <div class="space-y-3 text-gray-400 text-sm leading-relaxed">
+                                <p>El entrenamiento inicia puntualmente en los horarios establecidos.</p>
+                                <p>Las puertas se cerrarán al iniciar cada sesión para proteger la inmersión del grupo.</p>
+                                <p class="text-gray-300 font-medium pt-1">Llegar a tiempo es tu primera declaración de compromiso.</p>
+                            </div>
+                        </div>
+
+                        <div class="glass-card rounded-2xl p-6 border-l-4 border-l-crearCyan">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="bg-crearDark rounded-xl p-3 shrink-0 text-xl">👤</div>
+                                <h4 class="text-white font-bold text-lg">Permanencia Completa</h4>
+                            </div>
+                            <div class="space-y-3 text-gray-400 text-sm leading-relaxed">
+                                <p>Durante los horarios del entrenamiento deberás permanecer en las instalaciones participando en cada dinámica.</p>
+                                <p>Cada experiencia es secuencial y vital para la integración de tus herramientas de liderazgo.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Alimentos y bebidas -->
+                    <div class="glass-card rounded-2xl p-6 md:p-8 border-l-4 border-l-crearRed">
+                        <div class="flex items-center gap-3 mb-5">
+                            <div class="bg-crearDark rounded-xl p-3 shrink-0 text-xl">☕</div>
+                            <h4 class="text-white font-bold text-lg">Políticas de Alimentos y Bebidas</h4>
+                        </div>
+                        <div class="w-full">
+                            <p class="text-gray-300 text-sm mb-5">En estricto acuerdo con la sede del entrenamiento, se aplican las siguientes reglas:</p>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
+                                <div class="bg-crearRed/10 border border-crearRed/20 p-4 rounded-xl flex items-start gap-3">
+                                    <span class="text-crearRed mt-0.5">❌</span>
+                                    <span class="text-sm text-gray-300">No se permite ingresar comida del exterior al salón.</span>
+                                </div>
+                                <div class="bg-crearRed/10 border border-crearRed/20 p-4 rounded-xl flex items-start gap-3">
+                                    <span class="text-crearRed mt-0.5">❌</span>
+                                    <span class="text-sm text-gray-300">No se permiten refrescos, jugos o gaseosas.</span>
+                                </div>
+                                <div class="bg-green-500/10 border border-green-500/30 p-4 rounded-xl flex items-start gap-3 sm:col-span-2 shadow-[0_0_15px_rgba(34,197,94,0.1)]">
+                                    <span class="text-green-500 mt-0.5">✅</span>
+                                    <span class="text-sm text-white font-medium">SÓLO se permite ingresar y consumir agua pura (trae tu tomatodo).</span>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-400 italic bg-crearDark/50 p-3 rounded-lg border border-crearBorder/20">Si requieres consumir algún alimento por condición médica, comunícalo previamente a la coordinación para facilitarte el espacio adecuado durante los recesos.</p>
+                        </div>
+                    </div>
+
+                    <!-- Uso de dispositivos electrónicos -->
+                    <div class="glass-card rounded-2xl p-6 md:p-8 border-l-4 border-l-gray-400 flex flex-col md:flex-row gap-6 items-center md:items-start">
+                        <div class="bg-crearDark rounded-xl p-4 shrink-0 text-3xl">📵</div>
+                        <div>
+                            <h4 class="text-white font-bold text-lg mb-3">Uso de Dispositivos Electrónicos</h4>
+                            <div class="space-y-2 text-gray-400 text-sm leading-relaxed">
+                                <p>Para maximizar tu enfoque, los teléfonos celulares deberán permanecer apagados o en modo silencio durante las sesiones.</p>
+                                <p>Podrás revisar mensajes y llamadas durante los recesos programados.</p>
+                                <p class="text-gray-300 font-medium pt-2">Tu presencia sin distracciones es esencial para tu avance.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN: MAESTRÍA DEL JUEGO (Llamado a la acción) -->
+            <div class="glass-card rounded-3xl p-8 md:p-12 mb-16 text-center max-w-4xl mx-auto relative overflow-hidden border-2 border-crearGold/30 shadow-[0_0_30px_rgba(255,183,3,0.1)]">
+                <div class="absolute -left-10 -bottom-10 w-40 h-40 bg-crearGold/10 rounded-full blur-[80px]"></div>
+                <h3 class="text-2xl md:text-4xl font-black font-outfit mb-4 text-gradient-gold uppercase tracking-tight">Tu Siguiente Nivel: Maestría del Juego®</h3>
+                <p class="text-gray-300 text-base md:text-lg mb-6 leading-relaxed max-w-2xl mx-auto">
+                    Capítulo Dos es el umbral para consolidar tu liderazgo. Sigue extendiendo tu transformación en la cúspide de nuestro ecosistema.
+                </p>
+                <p class="text-white font-bold text-lg mb-8">
+                    ¡Asegura tu lugar en Maestría del Juego® hoy mismo y aprovecha los beneficios exclusivos del Equipo!
+                </p>
+                <div class="relative z-10">
+                    <a href="javascript:void(0)" onclick="openMaestriaModal()" class="inline-block bg-gradient-to-r from-crearGold to-yellow-500 hover:from-yellow-500 hover:to-crearGold text-crearDarker font-black py-4 px-10 rounded-full transition-all shadow-[0_0_20px_rgba(255,183,3,0.4)] hover:scale-105 uppercase tracking-widest text-sm cursor-pointer">
+                        RESERVAR MI MAESTRÍA DEL JUEGO
+                    </a>
+                </div>
+                <p class="text-xs text-gray-500 mt-4 italic">Beneficio promocional disponible antes de dar inicio a la primera sesión del jueves.</p>
+            </div>
+
+            <!-- SECCIÓN: TU COMPROMISO (FINAL) -->
+            <div class="mb-20 reveal text-center max-w-4xl mx-auto py-16 px-6 border-y border-crearBorder/20 relative">
+                <div class="absolute inset-0 bg-crearCyan/5 blur-[50px] pointer-events-none"></div>
+                <h3 class="text-3xl md:text-5xl font-black text-white font-outfit mb-8 text-gradient">Crear no motiva, Crear entrena.</h3>
+                <div class="space-y-6 text-gray-300 font-light text-lg md:text-xl relative z-10 max-w-3xl mx-auto">
+                    <p class="text-2xl md:text-3xl font-black font-outfit text-white drop-shadow-md">CREAR no hace el proceso por ti. CREAR crea el espacio para que tú produzcas tu propia transformación.</p>
+                    <div class="bg-crearDark/50 border border-crearGold/30 p-8 rounded-3xl mt-8 shadow-[0_0_30px_rgba(255,183,3,0.15)] inline-block w-full">
+                        <p class="text-2xl font-bold text-white mb-2">El compromiso es tuyo.</p>
+                        <p class="text-2xl font-bold text-white mb-6">La experiencia también.</p>
+                        <p class="text-crearGold font-medium text-lg md:text-xl uppercase tracking-wider">La transformación depende de lo que decidas hacer con ella.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONTACTO & CONFIRMACIÓN -->
+            <section id="contacto" class="glass-card rounded-3xl p-8 md:p-12 text-center max-w-4xl mx-auto border-t-4 border-t-crearGold relative overflow-hidden shadow-2xl">
+                <div class="absolute inset-0 bg-gradient-to-b from-crearGold/5 to-transparent pointer-events-none"></div>
+                <h3 class="text-2xl md:text-3xl font-black font-outfit text-gradient mb-4">Confirmación de Asistencia al Capítulo Dos</h3>
+                <p class="text-gray-300 text-sm md:text-base mb-8 max-w-lg mx-auto font-light leading-relaxed">
+                    Para activar formalmente tu registro de Capítulo Dos y recibir tu Ticket de Acceso, es <strong class="text-crearCyan font-bold">obligatorio</strong> confirmar tu asistencia con una de nuestras coordinadoras oficiales vía WhatsApp:
+                </p>
+
+                <!-- Banner de Felicitación / Desbloqueado -->
+                <div id="completion-banner" class="hidden bg-green-500/10 border border-green-500/30 p-5 rounded-2xl mb-8 max-w-xl mx-auto animate-fade-in shadow-[0_0_20px_rgba(34,197,94,0.1)]">
+                    <span class="text-2xl mr-2">🎉</span>
+                    <strong class="text-white text-base">¡Lectura Obligatoria Completada al 100%!</strong>
+                    <p class="text-gray-300 text-xs mt-1">Has demostrado tu responsabilidad y compromiso cuántico. Haz clic en el botón de abajo para notificar a tu coordinadora.</p>
+                </div>
+
+                <!-- Botones de Coordinadoras dinámicos -->
+                <div id="coordinators-container" class="flex flex-col sm:flex-row justify-center gap-4 mb-10 relative z-10">
+                </div>
+
+                <hr class="border-t border-crearBorder/20 w-32 mx-auto mb-8 relative z-10">
+                
+                <p class="text-lg md:text-xl text-white font-light mb-4 relative z-10">Has tomado una decisión importante.<br>Ahora comienza la parte más importante:</p>
+                <p class="text-xl md:text-2xl font-black text-white font-outfit uppercase tracking-wide mb-8 relative z-10">Vivir la experiencia con apertura, responsabilidad y compromiso total.</p>
+                
+                <h2 class="text-3xl md:text-5xl font-black text-gradient font-outfit uppercase tracking-wide mb-2 relative z-10 drop-shadow-[0_0_10px_rgba(0,210,255,0.5)]">¡Nos vemos en el Capítulo Dos!</h2>
+            </section>
+        </div> <!-- END OF #pre-training-container -->
+
+        <!-- OVERLAY DE TRANSICIÓN WARP (Al iniciar el entrenamiento) -->
+        <div id="warp-transition-overlay" class="fixed inset-0 z-[100] bg-black flex items-center justify-center pointer-events-none" style="opacity: 0; display: none;">
+            <div class="absolute inset-0 bg-gradient-radial from-crearCyan/20 to-black animate-pulse"></div>
+            <div id="warp-text" class="text-white text-4xl md:text-6xl font-black font-outfit uppercase tracking-[0.2em] opacity-0 transform scale-50 transition-all duration-1000 drop-shadow-[0_0_20px_rgba(0,210,255,0.8)] text-center px-4">
+                Iniciando Secuencia<br><span class="text-crearCyan">Capítulo Dos</span>
+            </div>
+        </div>
+
+        <!-- PORTAL ACTIVO DE FIN DE SEMANA (En vivo) -->
+        <div id="portal-active-container" class="transition-all duration-1000 hidden" style="opacity: 0;">
+            <div class="text-center mb-12">
+                <span class="inline-block py-1 px-3 rounded-full bg-red-500/20 border border-red-500/50 text-red-400 text-xs font-bold tracking-widest uppercase mb-4 shadow-[0_0_15px_rgba(239,68,68,0.3)] animate-pulse">
+                    EN VIVO - TRAINING C2 EN CURSO
+                </span>
+                <h1 class="text-4xl md:text-6xl font-black font-outfit tracking-tight mb-4 text-white drop-shadow-md">
+                    Portal <span class="text-crearCyan">Capítulo Dos</span>
+                </h1>
+                <p class="text-gray-400 text-lg max-w-2xl mx-auto">
+                    Has cruzado el umbral. Estás en tu espacio de transformación y consolidación cuántica.
+                </p>
+            </div>
+
+            <!-- TABS DEL PORTAL -->
+            <div class="flex justify-center gap-4 mb-8 border-b border-crearBorder/30 pb-4">
+                <button id="tab-btn-schedule" class="px-6 py-2 rounded-full font-bold text-sm tracking-wider transition-all bg-crearCyan text-crearDarker shadow-[0_0_15px_rgba(0,210,255,0.4)] cursor-pointer">HORARIOS C2</button>
+                <button id="tab-btn-journal" class="px-6 py-2 rounded-full font-bold text-sm tracking-wider transition-all bg-crearDark/50 text-gray-400 border border-crearBorder/30 hover:text-white cursor-pointer">BITÁCORA</button>
+            </div>
+
+            <!-- CONTENIDO DE TABS -->
+            <div id="tab-content-schedule" class="glass-card rounded-3xl p-8 max-w-3xl mx-auto mb-12 border-t-4 border-t-crearCyan">
+                <h3 class="text-2xl font-black text-white font-outfit mb-6 text-center">Agenda del Capítulo Dos</h3>
+                <div class="space-y-4">
+                    <div class="bg-crearDark/50 border border-crearCyan/30 rounded-xl p-4 flex justify-between items-center relative overflow-hidden">
+                        <div class="absolute inset-0 bg-crearCyan/5 animate-pulse"></div>
+                        <div class="relative z-10 flex gap-4 items-center">
+                            <span class="text-3xl font-black text-crearCyan font-outfit">JUE</span>
+                            <div>
+                                <p class="text-white font-bold">1er Día - Registro y Apertura</p>
+                                <p class="text-crearCyan text-xs uppercase tracking-wider">Apertura 14:00 hrs</p>
+                            </div>
+                        </div>
+                        <div class="text-right relative z-10">
+                            <p class="text-white font-mono font-medium">13:00 - 22:30 hrs</p>
+                        </div>
+                    </div>
+                    <div class="bg-crearDark/30 border border-crearBorder/20 rounded-xl p-4 flex justify-between items-center opacity-80">
+                        <div class="flex gap-4 items-center">
+                            <span class="text-3xl font-black text-gray-400 font-outfit">VIE</span>
+                            <div>
+                                <p class="text-gray-200 font-bold">2do Día - Inmersión Cuántica</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-gray-300 font-mono font-medium">09:00 - 22:30 hrs</p>
+                        </div>
+                    </div>
+                    <div class="bg-crearDark/30 border border-crearBorder/20 rounded-xl p-4 flex justify-between items-center opacity-80">
+                        <div class="flex gap-4 items-center">
+                            <span class="text-3xl font-black text-gray-400 font-outfit">SÁB</span>
+                            <div>
+                                <p class="text-gray-200 font-bold">3er Día - Consolidación</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-gray-300 font-mono font-medium">09:00 - 23:00 hrs</p>
+                        </div>
+                    </div>
+                    <div class="bg-crearDark/30 border border-crearBorder/20 rounded-xl p-4 flex justify-between items-center opacity-80">
+                        <div class="flex gap-4 items-center">
+                            <span class="text-3xl font-black text-gray-400 font-outfit">DOM</span>
+                            <div>
+                                <p class="text-gray-200 font-bold">4to Día - Clausura y Salto</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-gray-300 font-mono font-medium">08:00 - 20:00 hrs</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-content-journal" class="glass-card rounded-3xl p-8 max-w-3xl mx-auto mb-12 border-t-4 border-t-crearGold hidden">
+                <h3 class="text-2xl font-black text-gradient-gold font-outfit mb-2 text-center">Bitácora de Reflexión C2</h3>
+                <p class="text-gray-400 text-sm text-center mb-6">Un espacio seguro solo para ti. Lo que escribas aquí se guarda automáticamente en tu dispositivo.</p>
+                <textarea id="reflection-journal" rows="8" class="w-full bg-crearDarker/80 border border-crearGold/30 rounded-2xl p-5 text-gray-300 focus:outline-none focus:border-crearGold focus:ring-1 focus:ring-crearGold/50 transition-all resize-none shadow-inner" placeholder="¿Qué descubriste hoy sobre ti? ¿Qué acuerdos estás transformando en tu vida? Escribe aquí tus pensamientos..."></textarea>
+                <div class="flex justify-between items-center mt-3">
+                    <span id="journal-status" class="text-xs text-green-400 opacity-0 transition-opacity">Guardado automáticamente ✓</span>
+                    <button class="text-xs text-gray-500 hover:text-white transition-colors cursor-pointer" onclick="document.getElementById('reflection-journal').value=''; localStorage.removeItem('cpsl_journal_c2');">Borrar bitácora</button>
+                </div>
+            </div>
+
+            <!-- CONTACTO DE SOPORTE ACTIVO -->
+            <div class="text-center max-w-xl mx-auto">
+                <p class="text-gray-400 text-sm mb-4">¿Necesitas asistencia urgente durante el entrenamiento?</p>
+                <a id="active-support-btn" href="#" target="_blank" class="inline-flex items-center gap-2 bg-[#25D366]/20 hover:bg-[#25D366]/30 border border-[#25D366]/50 text-white font-bold py-3 px-6 rounded-xl transition-all shadow-[0_0_15px_rgba(37,211,102,0.2)]">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-[#25D366]" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.87-2.031-.97-.272-.099-.47-.149-.669.149-.198.297-.768.97-.941 1.168-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.305-.88-.653-1.473-1.46-1.646-1.758-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.52-.075-.149-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.347-.272.297-1.04 1.016-1.04 2.479 0 1.463 1.065 2.876 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+                    Contactar Soporte
+                </a>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-crearDarker border-t border-crearBorder/30 py-8 relative z-10 mt-10">
+        <div class="max-w-5xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="flex items-center gap-3">
+                <img src="logo_crear_global_blanco.png" alt="CREAR Poder Sin Límites" class="h-6 md:h-8 object-contain opacity-60">
+            </div>
+            
+            <div class="flex flex-col items-center gap-4 text-xs text-gray-400 font-outfit tracking-wider">
+                <!-- Libro de Reclamaciones -->
+                <a href="https://app.reclamovirtual.pe/reclamar/2205e150-ddd1-468a-afa4-ed634b8af4d7/miraflores" target="_blank" class="hover:text-crearCyan transition-colors flex items-center gap-2 border border-gray-600/50 rounded-lg px-4 py-2 hover:border-crearCyan bg-gray-900/30">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+                    </svg>
+                    Libro de Reclamaciones
+                </a>
+
+                <!-- Redes Sociales Oficiales -->
+                <div class="flex flex-wrap justify-center gap-x-6 gap-y-3">
+                    <a href="https://instagram.com/crearpsl" target="_blank" class="hover:text-crearCyan transition-colors cursor-pointer flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4z"/></svg>
+                        @crearpsl
+                    </a>
+                    <a href="https://instagram.com/crearpsl.colombia" target="_blank" class="hover:text-crearCyan transition-colors cursor-pointer flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4z"/></svg>
+                        @crearpsl.colombia
+                    </a>
+                    <a href="https://instagram.com/crearpsl.mexico" target="_blank" class="hover:text-crearCyan transition-colors cursor-pointer flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4z"/></svg>
+                        @crearpsl.mexico
+                    </a>
+                    <a href="https://instagram.com/crearpslperu" target="_blank" class="hover:text-crearCyan transition-colors cursor-pointer flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4z"/></svg>
+                        @crearpslperu
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ASISTENTE DE LECTURA ACTIVA Y BIENESTAR VISUAL -->
+    <div id="reading-assistant" class="fixed bottom-6 right-6 z-[999] font-sans">
+        
+        <!-- Botón Flotante Principal -->
+        <button id="assistant-trigger" class="glassmorphism w-14 h-14 rounded-full flex items-center justify-center text-crearCyan shadow-[0_0_20px_rgba(0,210,255,0.3)] hover:text-white hover:border-crearCyan/50 transition-all duration-300 relative group cursor-pointer border border-crearBorder/30">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 group-hover:scale-110 transition-transform">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            
+            <span id="assistant-badge" class="absolute -top-1 -right-1 bg-crearRed text-white text-[10px] font-black w-6 h-6 rounded-full flex items-center justify-center border border-crearDarker shadow-md transition-all animate-bounce">0%</span>
+        </button>
+
+        <!-- Panel del Asistente -->
+        <div id="assistant-panel" class="hidden absolute bottom-16 right-0 w-80 max-w-[calc(100vw-2rem)] glassmorphism rounded-3xl p-6 shadow-[0_10px_40px_rgba(0,0,0,0.5)] border border-crearBorder/40 transition-all duration-300">
+            <div class="flex justify-between items-center mb-4 border-b border-crearBorder/20 pb-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-crearCyan text-lg">✨</span>
+                    <h4 class="text-white font-bold font-outfit text-sm uppercase tracking-wider">Asistente de Lectura</h4>
+                </div>
+                <button id="assistant-close" class="text-gray-400 hover:text-white transition-colors cursor-pointer text-xs">
+                    ✕
+                </button>
+            </div>
+
+            <!-- Garantía de Lectura Obligatoria -->
+            <div class="mb-5 bg-crearDark/40 rounded-2xl p-4 border border-crearBorder/10">
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-3">Lectura Obligatoria</p>
+                <div class="space-y-2.5">
+                    <div class="flex items-center justify-between text-xs text-gray-300">
+                        <span class="flex items-center gap-2">
+                            <span id="check-step-1" class="w-4 h-4 rounded-full border border-gray-600 flex items-center justify-center text-[10px] text-gray-500 font-bold transition-all">✓</span>
+                            <span>1. Info Clave y Horarios</span>
+                        </span>
+                        <span id="status-step-1" class="text-[10px] text-gray-500 font-mono transition-colors">Pendiente</span>
+                    </div>
+                    <div class="flex items-center justify-between text-xs text-gray-300">
+                        <span class="flex items-center gap-2">
+                            <span id="check-step-2" class="w-4 h-4 rounded-full border border-gray-600 flex items-center justify-center text-[10px] text-gray-500 font-bold transition-all">✓</span>
+                            <span>2. Qué Traer y Kit C2</span>
+                        </span>
+                        <span id="status-step-2" class="text-[10px] text-gray-500 font-mono transition-colors">Pendiente</span>
+                    </div>
+                    <div class="flex items-center justify-between text-xs text-gray-300">
+                        <span class="flex items-center gap-2">
+                            <span id="check-step-3" class="w-4 h-4 rounded-full border border-gray-600 flex items-center justify-center text-[10px] text-gray-500 font-bold transition-all">✓</span>
+                            <span>3. Normas de Convivencia</span>
+                        </span>
+                        <span id="status-step-3" class="text-[10px] text-gray-500 font-mono transition-colors">Pendiente</span>
+                    </div>
+                    <div class="flex items-center justify-between text-xs text-gray-300">
+                        <span class="flex items-center gap-2">
+                            <span id="check-step-4" class="w-4 h-4 rounded-full border border-gray-600 flex items-center justify-center text-[10px] text-gray-500 font-bold transition-all">✓</span>
+                            <span>4. Compromiso con el Proceso</span>
+                        </span>
+                        <span id="status-step-4" class="text-[10px] text-gray-500 font-mono transition-colors">Pendiente</span>
+                    </div>
+                </div>
+                
+                <div class="mt-4 pt-3 border-t border-crearBorder/10 flex items-center justify-between">
+                    <span class="text-[10px] text-gray-400 uppercase tracking-wider font-bold">Progreso total:</span>
+                    <span id="panel-progress-text" class="text-xs font-black text-crearCyan font-mono">0%</span>
+                </div>
+            </div>
+
+            <!-- Herramientas de Bienestar Visual -->
+            <div class="space-y-4">
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-2">Herramientas Visuales</p>
+                
+                <div class="flex justify-between items-center text-xs">
+                    <span class="text-gray-300">Regla de Enfoque (Láser)</span>
+                    <button id="btn-ruler" class="bg-gray-800/80 border border-gray-600 text-gray-400 font-bold px-3 py-1.5 rounded-xl cursor-pointer hover:bg-gray-700 hover:text-white transition-colors">Activar</button>
+                </div>
+                
+                <div class="flex justify-between items-center text-xs">
+                    <span class="text-gray-300">Modo Concentración (Bloques)</span>
+                    <button id="btn-focus" class="bg-gray-800/80 border border-gray-600 text-gray-400 font-bold px-3 py-1.5 rounded-xl cursor-pointer hover:bg-gray-700 hover:text-white transition-colors">Activar</button>
+                </div>
+                
+                <div class="flex justify-between items-center text-xs">
+                    <span class="text-gray-300">Filtro de Lectura (Cálida)</span>
+                    <button id="btn-warm" class="bg-gray-800/80 border border-gray-600 text-gray-400 font-bold px-3 py-1.5 rounded-xl cursor-pointer hover:bg-gray-700 hover:text-white transition-colors">Activar</button>
+                </div>
+                
+                <div class="flex justify-between items-center text-xs">
+                    <span class="text-gray-300">Tamaño del Texto (Cómodo)</span>
+                    <button id="btn-text-size" class="bg-gray-800/80 border border-gray-600 text-gray-400 font-bold px-3 py-1.5 rounded-xl cursor-pointer hover:bg-gray-700 hover:text-white transition-colors">Normal</button>
+                </div>
+            </div>
+            
+            <div class="mt-5 text-center text-[10px] text-gray-500 italic">
+                Estrategias de bienestar visual para evitar el cansancio.
+            </div>
+        </div>
+    </div>
+
+    <!-- Regla de Enfoque Láser de Lectura -->
+    <div id="reading-ruler"></div>
+
+    <!-- MODAL DE MAESTRÍA (GLASSMORPHISM PREMIUM) -->
+    <div id="maestria-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black/80 backdrop-blur-md opacity-0 transition-opacity duration-300">
+        <div class="relative glass-card border border-crearGold/30 rounded-2xl p-8 max-w-md w-full mx-4 shadow-[0_0_50px_rgba(255,183,3,0.2)] transform scale-95 transition-transform duration-300" id="maestria-modal-content">
+            <button onclick="closeMaestriaModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <div class="text-center mb-6">
+                <div class="inline-block bg-crearGold/10 p-3 rounded-full border border-crearGold/30 mb-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-crearGold" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.907c.961 0 1.36 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                    </svg>
+                </div>
+                <h3 class="text-2xl font-black font-outfit text-white uppercase tracking-tight text-gradient-gold">Reservar mi Maestría</h3>
+                <p class="text-gray-300 text-sm mt-2">
+                    Selecciona una coordinadora para reservar tu cupo y obtener tus beneficios exclusivos del equipo activo.
+                </p>
+            </div>
+            <div id="maestria-coordinators-container" class="space-y-4">
+            </div>
+        </div>
+    </div>
+
+    <!-- INTERACTIVIDAD JS Y MOTOR MULTI-SEDE DE CAPÍTULO DOS -->
+    <script>
+        // 1. Generador de Partículas de fondo
+        const particlesContainer = document.getElementById('particles-container');
+        for(let i=0; i<40; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            
+            const x = Math.random() * 100;
+            const y = Math.random() * 100;
+            const size = Math.random() * 4 + 1;
+            const duration = Math.random() * 10 + 10;
+            const delay = Math.random() * 5;
+            
+            particle.style.left = `${x}%`;
+            particle.style.top = `${y}%`;
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            
+            const colors = ['rgba(255,255,255,0.3)', 'rgba(0,210,255,0.4)', 'rgba(255,183,3,0.3)'];
+            particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+            
+            particle.animate([
+                { transform: 'translate(0,0) scale(1)', opacity: Math.random() * 0.3 },
+                { transform: `translate(${(Math.random()-0.5)*150}px, ${(Math.random()-0.5)*150}px) scale(${Math.random()*1.5})`, opacity: Math.random() * 0.6 + 0.2 },
+                { transform: 'translate(0,0) scale(1)', opacity: Math.random() * 0.3 }
+            ], {
+                duration: duration * 1000,
+                iterations: Infinity,
+                delay: delay * 1000,
+                direction: 'alternate',
+                easing: 'ease-in-out'
+            });
+            
+            particlesContainer.appendChild(particle);
+        }
+
+        // 2. Animación de entrada al hacer scroll (Reveal elements)
+        function reveal() {
+            const reveals = document.querySelectorAll('.reveal');
+            for (let i = 0; i < reveals.length; i++) {
+                const windowHeight = window.innerHeight;
+                const elementTop = reveals[i].getBoundingClientRect().top;
+                const elementVisible = 100;
+                
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add('active');
+                }
+            }
+        }
+        window.addEventListener('scroll', reveal);
+        setTimeout(reveal, 100);
+
+        // ==========================================
+        // DICCIONARIO DE CONFIGURACIÓN MULTI-SEDE (C2)
+        // ==========================================
+        const sedeConfig = {
+            "LIM": {
+                name: "Lima, Perú",
+                countryCode: "pe",
+                hotelName: "Hotel José Antonio Deluxe",
+                hotelAddress: "Calle Bellavista 133 – Miraflores 15038",
+                mapSrc: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3900.7430415!2d-77.0313019!3d-12.1290333!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9105c819389bd7c9%3A0xbd7c8ee17dfbc462!2sHotel%20Jos%C3%A9%20Antonio%20Deluxe!5e0!3m2!1ses!2spe!4v1719528000000!5m2!1ses!2spe",
+                mapLink: "https://maps.google.com/?q=Hotel+José+Antonio+Deluxe+Miraflores+Calle+Bellavista+133",
+                team: "Equipo 30",
+                heroDate: "Del jueves 01 al domingo 04",
+                heroMonth: "de octubre de 2026",
+                startDateStr: "2026-10-01T13:00:00",
+                transitionDateStr: "2026-10-01T15:00:00",
+                coldAC: true,
+                coordinators: [
+                    { name: "Joyce Marín", phone: "51933599903", role: "Coordinadora Principal" },
+                    { name: "Diana Moscoso", phone: "51912379744", role: "Coordinadora" }
+                ],
+                supportPhone: "51933599903"
+            },
+            "UIO": {
+                name: "Quito, Ecuador",
+                countryCode: "ec",
+                hotelName: "CREAR PODER SIN LIMITES FORTALEZA CUÁNTICA",
+                hotelAddress: "De los Naranjos, 170124 Quito, Ecuador",
+                mapSrc: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.7915573523533!2d-78.48398418524673!3d-0.18029559986877865!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91d59a7a9bdc543f%3A0xe54d31e97669d273!2sHotel%20Dann%20Carlton%20Quito!5e0!3m2!1ses!2spe!4v1719528000000!5m2!1ses!2spe",
+                mapLink: "https://maps.google.com/?q=De+los+Naranjos,+170124+Quito,+Ecuador",
+                team: "Equipo 130",
+                heroDate: "Del jueves 25 al domingo 28",
+                heroMonth: "de marzo de 2027",
+                startDateStr: "2027-03-25T13:00:00",
+                transitionDateStr: "2027-03-25T15:00:00",
+                coldAC: true,
+                coordinators: [
+                    { name: "Daniela", phone: "593988647573", role: "Coordinadora" }
+                ],
+                supportPhone: "593988647573"
+            },
+            "UIO1": {
+                name: "Quito, Ecuador (Ciclo 1)",
+                countryCode: "ec",
+                hotelName: "CREAR PODER SIN LIMITES FORTALEZA CUÁNTICA",
+                hotelAddress: "De los Naranjos, 170124 Quito, Ecuador",
+                mapSrc: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.7915573523533!2d-78.48398418524673!3d-0.18029559986877865!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91d59a7a9bdc543f%3A0xe54d31e97669d273!2sHotel%20Dann%20Carlton%20Quito!5e0!3m2!1ses!2spe!4v1719528000000!5m2!1ses!2spe",
+                mapLink: "https://maps.google.com/?q=De+los+Naranjos,+170124+Quito,+Ecuador",
+                team: "Equipo 130",
+                heroDate: "Del jueves 25 al domingo 28",
+                heroMonth: "de marzo de 2027",
+                startDateStr: "2027-03-25T13:00:00",
+                transitionDateStr: "2027-03-25T15:00:00",
+                coldAC: true,
+                coordinators: [
+                    { name: "Daniela", phone: "593988647573", role: "Coordinadora" }
+                ],
+                supportPhone: "593988647573"
+            },
+            "UIO2": {
+                name: "Quito, Ecuador (Ciclo 2)",
+                countryCode: "ec",
+                hotelName: "CREAR PODER SIN LIMITES FORTALEZA CUÁNTICA",
+                hotelAddress: "De los Naranjos, 170124 Quito, Ecuador",
+                mapSrc: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.7915573523533!2d-78.48398418524673!3d-0.18029559986877865!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91d59a7a9bdc543f%3A0xe54d31e97669d273!2sHotel%20Dann%20Carlton%20Quito!5e0!3m2!1ses!2spe!4v1719528000000!5m2!1ses!2spe",
+                mapLink: "https://maps.google.com/?q=De+los+Naranjos,+170124+Quito,+Ecuador",
+                team: "Equipo 131",
+                heroDate: "Del jueves 22 al domingo 25",
+                heroMonth: "de abril de 2027",
+                startDateStr: "2027-04-22T13:00:00",
+                transitionDateStr: "2027-04-22T15:00:00",
+                coldAC: true,
+                coordinators: [
+                    { name: "Daniela", phone: "593988647573", role: "Coordinadora" }
+                ],
+                supportPhone: "593988647573"
+            },
+            "GYE": {
+                name: "Guayaquil, Ecuador",
+                countryCode: "ec",
+                hotelName: "Hotel Oro Verde",
+                hotelAddress: "9 de Octubre y García Moreno",
+                mapSrc: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3986.914902148003!2d-79.8941724!3d-2.1884351!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x902d6e7f8674dcf7%3A0xc3f8e5b611ff6e71!2sHotel%20Oro%20Verde%20Guayaquil!5e0!3m2!1ses!2spe!4v1719528000000!5m2!1ses!2spe",
+                mapLink: "https://maps.google.com/?q=Hotel+Oro+Verde+Guayaquil",
+                team: "Equipo 43",
+                heroDate: "Del jueves 29 de abril al domingo 2",
+                heroMonth: "de mayo de 2027",
+                startDateStr: "2027-04-29T13:00:00",
+                transitionDateStr: "2027-04-29T15:00:00",
+                coldAC: true,
+                coordinators: [
+                    { name: "Alejandra", phone: "593998132962", role: "Coordinadora" }
+                ],
+                supportPhone: "593998132962"
+            },
+            "CUE": {
+                name: "Cuenca, Ecuador",
+                countryCode: "ec",
+                hotelName: "Hotel Oro Verde",
+                hotelAddress: "Av. Ordóñez Lazo",
+                mapSrc: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3984.7369903906323!2d-79.0270503!3d-2.8911506!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91cd181a4bbaefbf%3A0xa61fc6b3fcfec0b2!2sHotel%20Oro%20Verde%20Cuenca!5e0!3m2!1ses!2spe!4v1719528000000!5m2!1ses!2spe",
+                mapLink: "https://maps.google.com/?q=Hotel+Oro+Verde+Cuenca",
+                team: "Equipo 22",
+                heroDate: "Del jueves 20 al domingo 23",
+                heroMonth: "de agosto de 2026",
+                startDateStr: "2026-08-20T13:00:00",
+                transitionDateStr: "2026-08-20T15:00:00",
+                coldAC: true,
+                coordinators: [
+                    { name: "Daniela", phone: "593988647573", role: "Coordinadora" }
+                ],
+                supportPhone: "593988647573"
+            },
+            "MED": {
+                name: "Medellín, Colombia",
+                countryCode: "co",
+                hotelName: "Hotel Dann Carlton",
+                hotelAddress: "Cra 43A #7-50, El Poblado",
+                mapSrc: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.230751268305!2d-75.5750005!3d6.2067713!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e44282f1b88e1bb%3A0xd32dffc799a4c100!2sHotel%20Dann%20Carlton%20Medell%C3%ADn!5e0!3m2!1ses!2spe!4v1719528000000!5m2!1ses!2spe",
+                mapLink: "https://maps.google.com/?q=Hotel+Dann+Carlton+Medellin",
+                team: "Equipo 18",
+                heroDate: "Del jueves 20 al domingo 23",
+                heroMonth: "de agosto de 2026",
+                startDateStr: "2026-08-20T13:00:00",
+                transitionDateStr: "2026-08-20T15:00:00",
+                coldAC: true,
+                coordinators: [
+                    { name: "Camila", phone: "573215034873", role: "Coordinadora" }
+                ],
+                supportPhone: "573215034873"
+            },
+            "MEX": {
+                name: "CDMX, México",
+                countryCode: "mx",
+                hotelName: "Hotel Camino Real Polanco",
+                hotelAddress: "Calz. Gral. Mariano Escobedo 700",
+                mapSrc: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3762.628864506547!2d-99.179374!3d19.428454!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1f8cb15bd1633%3A0xa61fc6b3fcfec0b2!2sCamino%20Real%20Polanco%20M%C3%A9xico!5e0!3m2!1ses!2spe!4v1719528000000!5m2!1ses!2spe",
+                mapLink: "https://maps.google.com/?q=Camino+Real+Polanco",
+                team: "Equipo 33",
+                heroDate: "Del jueves 13 al domingo 16",
+                heroMonth: "de mayo de 2027",
+                startDateStr: "2027-05-13T13:00:00",
+                transitionDateStr: "2027-05-13T15:00:00",
+                coldAC: true,
+                coordinators: [
+                    { name: "Soporte", phone: "525512345678", role: "Coordinador" }
+                ],
+                supportPhone: "525512345678"
+            }
+        };
+
+        // Extraer parámetros URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const sedeCode = (urlParams.get('sede') || 'LIM').toUpperCase();
+        const testTimeOverride = urlParams.get('test_time'); // ej: 2026-08-27T14:00:00
+        
+        const currentSede = sedeConfig[sedeCode] || sedeConfig['LIM'];
+
+        // ==========================================
+        // RENDERIZAR DATOS DE LA SEDE EN EL DOM
+        // ==========================================
+        function renderSedeData() {
+            // Actualizar Badge de Ciudad y Bandera
+            const sedeFlag = document.getElementById('sede-flag');
+            const sedeCityName = document.getElementById('sede-city-name');
+            if (sedeFlag && sedeCityName && currentSede.countryCode) {
+                sedeFlag.src = `https://flagcdn.com/${currentSede.countryCode}.svg`;
+                sedeFlag.classList.remove('hidden');
+                sedeCityName.innerText = currentSede.name;
+            }
+
+            document.getElementById('team-badge').innerText = currentSede.team || 'Equipo Activo';
+            document.getElementById('hotel-name').innerText = currentSede.hotelName;
+            document.getElementById('hotel-address').innerText = currentSede.hotelAddress;
+            document.getElementById('hero-date').innerText = currentSede.heroDate;
+            document.getElementById('hero-month').innerText = currentSede.heroMonth;
+            
+            const heroDateMainEl = document.getElementById('hero-date-main');
+            if (heroDateMainEl) heroDateMainEl.innerText = currentSede.heroDate;
+            
+            const heroMonthMainEl = document.getElementById('hero-month-main');
+            if (heroMonthMainEl) heroMonthMainEl.innerText = currentSede.heroMonth;
+            
+            document.getElementById('hotel-name-map').innerText = currentSede.hotelName;
+            document.getElementById('hotel-address-map').innerText = currentSede.hotelAddress;
+            document.getElementById('hotel-city-map').innerText = currentSede.name;
+            
+            document.getElementById('map-iframe').src = currentSede.mapSrc;
+            document.getElementById('map-link').href = currentSede.mapLink;
+            
+            const abrigoText = document.getElementById('abrigo-text');
+            if (abrigoText) {
+                if (currentSede.coldAC) {
+                    abrigoText.innerText = `El aire acondicionado de ${currentSede.hotelName} suele estar frío;`;
+                } else {
+                    abrigoText.innerText = `Es posible que la temperatura varíe en el salón;`;
+                }
+            }
+            
+            // Generar botones de coordinadores para WhatsApp
+            const coordContainer = document.getElementById('coordinators-container');
+            if (coordContainer) {
+                coordContainer.innerHTML = '';
+                currentSede.coordinators.forEach(coord => {
+                    const waText = encodeURIComponent(`Hola ${coord.name}, quiero confirmar mi asistencia al entrenamiento CREAR Capítulo Dos del ${currentSede.team || ''}`);
+                    const waLink = `https://wa.me/${coord.phone}?text=${waText}`;
+                    coordContainer.innerHTML += `
+                    <a href="${waLink}" target="_blank" class="flex items-center justify-center gap-3 bg-[#25D366]/10 hover:bg-[#25D366]/20 border border-[#25D366]/30 text-white px-6 py-4 rounded-xl transition-all group shadow-[0_0_15px_rgba(37,211,102,0.15)] hover:shadow-[0_0_25px_rgba(37,211,102,0.3)] cursor-pointer">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-[#25D366] group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.87-2.031-.97-.272-.099-.47-.149-.669.149-.198.297-.768.97-.941 1.168-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.305-.88-.653-1.473-1.46-1.646-1.758-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.52-.075-.149-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.347-.272.297-1.04 1.016-1.04 2.479 0 1.463 1.065 2.876 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+                        <div class="text-left">
+                            <p class="text-[10px] uppercase tracking-wider text-[#25D366] font-bold">${coord.role || 'Coordinadora'}</p>
+                            <p class="font-medium font-outfit">${coord.name}</p>
+                        </div>
+                    </a>`;
+                });
+            }
+
+            // Generar botones en modal de Maestría
+            const modalCoordContainer = document.getElementById('maestria-coordinators-container');
+            if (modalCoordContainer) {
+                modalCoordContainer.innerHTML = '';
+                currentSede.coordinators.forEach(coord => {
+                    const joyceMsg = encodeURIComponent(`Hola ${coord.name}, quiero reservar mi cupo para el entrenamiento Maestría del Juego del ${currentSede.team || ''}`);
+                    modalCoordContainer.innerHTML += `
+                    <a href="https://wa.me/${coord.phone}?text=${joyceMsg}" target="_blank" class="flex items-center justify-between bg-gradient-to-r from-crearGold/10 to-yellow-500/5 hover:from-crearGold/20 hover:to-yellow-500/10 border border-crearGold/30 text-white px-6 py-4 rounded-xl transition-all group shadow-[0_0_15px_rgba(255,183,3,0.05)] cursor-pointer">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-crearGold/20 flex items-center justify-center text-crearGold font-bold font-outfit">${coord.name.charAt(0)}</div>
+                            <div class="text-left">
+                                <p class="text-[10px] uppercase tracking-wider text-crearGold font-bold">${coord.role || 'Coordinadora'}</p>
+                                <p class="font-bold text-sm font-outfit">${coord.name}</p>
+                            </div>
+                        </div>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-[#25D366] group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.87-2.031-.97-.272-.099-.47-.149-.669.149-.198.297-.768.97-.941 1.168-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.305-.88-.653-1.473-1.46-1.646-1.758-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.52-.075-.149-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.347-.272.297-1.04 1.016-1.04 2.479 0 1.463 1.065 2.876 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+                    </a>`;
+                });
+            }
+
+            const supportBtn = document.getElementById('active-support-btn');
+            if (supportBtn) {
+                supportBtn.href = `https://wa.me/${currentSede.supportPhone}?text=Ayuda%20necesito%20asistencia%20en%20el%20sal%C3%B3n%20de%20Cap%C3%ADtulo%20Dos`;
+            }
+        }
+
+        // ==========================================
+        // CARGA DINÁMICA DE FECHAS DESDE CALENDARIO C2
+        // ==========================================
+        let targetStartDate = 0;
+        let targetTransitionDate = 0;
+        let currentState = 'PRE-TRAINING'; // 'PRE-TRAINING' | 'TRANSITION' | 'ACTIVE'
+
+        async function fetchAndInitC2Dates() {
+            try {
+                const now = testTimeOverride ? new Date(testTimeOverride) : new Date();
+                const response = await fetch('calendario_c2.json');
+                const calendarData = await response.json();
+                
+                const datesArray = calendarData[sedeCode] || calendarData['LIM'];
+                let nextEvent = null;
+                const targetEquipo = urlParams.get('equipo');
+                
+                if (datesArray) {
+                    for (const eventObj of datesArray) {
+                        const startDateStr = typeof eventObj === 'string' ? eventObj : eventObj.start;
+                        if (!startDateStr) continue;
+                        
+                        if (targetEquipo && typeof eventObj !== 'string' && eventObj.equipo !== targetEquipo) {
+                            continue;
+                        }
+                        
+                        const dObj = new Date(startDateStr);
+                        // El evento caduca el domingo a las 20:00 (sumamos 79 horas desde jueves 13:00)
+                        const expirationTime = new Date(dObj.getTime() + (79 * 60 * 60 * 1000));
+                        
+                        if (expirationTime > now) {
+                            nextEvent = eventObj;
+                            break;
+                        }
+                    }
+                }
+                
+                if (nextEvent) {
+                    const startObj = new Date(nextEvent.start);
+                    const transitionObj = new Date(startObj.getTime() + (2 * 60 * 60 * 1000)); // Jueves 15:00
+                    const endObj = new Date(startObj.getTime() + (3 * 24 * 60 * 60 * 1000)); // Domingo
+
+                    const monthNames = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+                    
+                    const startDay = startObj.getDate();
+                    const endDay = endObj.getDate();
+                    const startMonth = monthNames[startObj.getMonth()];
+                    const endMonth = monthNames[endObj.getMonth()];
+                    const year = startObj.getFullYear();
+                    
+                    if (startMonth === endMonth) {
+                        currentSede.heroDate = `Del jueves ${startDay} al domingo ${endDay}`;
+                        currentSede.heroMonth = `de ${startMonth} de ${year}`;
+                    } else {
+                        currentSede.heroDate = `Del jueves ${startDay} de ${startMonth} al domingo ${endDay}`;
+                        currentSede.heroMonth = `de ${endMonth} de ${year}`;
+                    }
+                    
+                    if (nextEvent.equipo) {
+                        currentSede.team = isNaN(nextEvent.equipo) ? nextEvent.equipo : `Equipo ${nextEvent.equipo}`;
+                    }
+                    currentSede.startDateStr = startObj.toISOString();
+                    currentSede.transitionDateStr = transitionObj.toISOString();
+                }
+            } catch (err) {
+                console.error("Error fetching C2 dates, using fallback:", err);
+            }
+            
+            renderSedeData();
+            
+            targetStartDate = new Date(currentSede.startDateStr).getTime();
+            targetTransitionDate = new Date(currentSede.transitionDateStr).getTime();
+
+            setInterval(checkSystemState, 1000);
+            
+            let nowInitial = testTimeOverride ? new Date(testTimeOverride).getTime() : new Date().getTime();
+            if (nowInitial >= targetTransitionDate) {
+                document.getElementById('pre-training-container').style.display = 'none';
+                document.getElementById('pre-training-container').style.opacity = '0';
+                const portal = document.getElementById('portal-active-container');
+                portal.style.display = 'block';
+                portal.style.opacity = '1';
+                currentState = 'ACTIVE';
+            } else {
+                checkSystemState();
+            }
+        }
+
+        function checkSystemState() {
+            let now = testTimeOverride ? new Date(testTimeOverride).getTime() : new Date().getTime();
+
+            if (currentState === 'PRE-TRAINING') {
+                const diffStart = targetStartDate - now;
+                if (diffStart > 0) {
+                    const dias = Math.floor(diffStart / (1000 * 60 * 60 * 24));
+                    const horas = Math.floor((diffStart % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    document.getElementById('dias').innerText = dias;
+                    document.getElementById('horas').innerText = horas.toString().padStart(2, '0');
+                } else {
+                    document.getElementById('dias').innerText = '0';
+                    document.getElementById('horas').innerText = '00';
+                }
+                
+                if (now >= targetTransitionDate && targetTransitionDate !== 0) {
+                    initiateWarpTransition();
+                }
+            }
+        }
+
+        function initiateWarpTransition() {
+            if (currentState === 'TRANSITION' || currentState === 'ACTIVE') return;
+            currentState = 'TRANSITION';
+            
+            const overlay = document.getElementById('warp-transition-overlay');
+            const text = document.getElementById('warp-text');
+            const preContainer = document.getElementById('pre-training-container');
+            const activeContainer = document.getElementById('portal-active-container');
+            
+            overlay.style.display = 'flex';
+            setTimeout(() => {
+                overlay.style.opacity = '1';
+                text.classList.remove('opacity-0', 'scale-50');
+                text.classList.add('opacity-100', 'scale-100');
+            }, 50);
+
+            setTimeout(() => {
+                preContainer.style.opacity = '0';
+                setTimeout(() => {
+                    preContainer.style.display = 'none';
+                    activeContainer.style.display = 'block';
+                    setTimeout(() => {
+                        activeContainer.style.opacity = '1';
+                    }, 50);
+                }, 1000);
+            }, 1000);
+
+            setTimeout(() => {
+                text.classList.remove('opacity-100', 'scale-100');
+                text.classList.add('opacity-0', 'scale-150');
+                overlay.style.opacity = '0';
+                
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                    currentState = 'ACTIVE';
+                }, 1000);
+            }, 4000);
+        }
+
+        fetchAndInitC2Dates();
+
+        // ==========================================
+        // TABS DEL PORTAL ACTIVO Y BITÁCORA
+        // ==========================================
+        const btnSchedule = document.getElementById('tab-btn-schedule');
+        const btnJournal = document.getElementById('tab-btn-journal');
+        const contentSchedule = document.getElementById('tab-content-schedule');
+        const contentJournal = document.getElementById('tab-content-journal');
+        const journalTextArea = document.getElementById('reflection-journal');
+        const journalStatus = document.getElementById('journal-status');
+
+        if (btnSchedule && btnJournal) {
+            btnSchedule.addEventListener('click', () => {
+                btnSchedule.classList.replace('bg-crearDark/50', 'bg-crearCyan');
+                btnSchedule.classList.replace('text-gray-400', 'text-crearDarker');
+                btnSchedule.classList.replace('border', 'shadow-[0_0_15px_rgba(0,210,255,0.4)]');
+                
+                btnJournal.classList.replace('bg-crearCyan', 'bg-crearDark/50');
+                btnJournal.classList.replace('text-crearDarker', 'text-gray-400');
+                btnJournal.classList.replace('shadow-[0_0_15px_rgba(0,210,255,0.4)]', 'border');
+
+                contentSchedule.classList.remove('hidden');
+                contentJournal.classList.add('hidden');
+            });
+
+            btnJournal.addEventListener('click', () => {
+                btnJournal.classList.replace('bg-crearDark/50', 'bg-crearCyan');
+                btnJournal.classList.replace('text-gray-400', 'text-crearDarker');
+                btnJournal.classList.replace('border', 'shadow-[0_0_15px_rgba(0,210,255,0.4)]');
+                
+                btnSchedule.classList.replace('bg-crearCyan', 'bg-crearDark/50');
+                btnSchedule.classList.replace('text-crearDarker', 'text-gray-400');
+                btnSchedule.classList.replace('shadow-[0_0_15px_rgba(0,210,255,0.4)]', 'border');
+
+                contentJournal.classList.remove('hidden');
+                contentSchedule.classList.add('hidden');
+            });
+        }
+
+        if (journalTextArea) {
+            const savedData = localStorage.getItem('cpsl_journal_c2');
+            if (savedData) {
+                journalTextArea.value = savedData;
+            }
+
+            let timeoutId;
+            journalTextArea.addEventListener('input', () => {
+                clearTimeout(timeoutId);
+                journalStatus.style.opacity = '0';
+                
+                timeoutId = setTimeout(() => {
+                    localStorage.setItem('cpsl_journal_c2', journalTextArea.value);
+                    journalStatus.style.opacity = '1';
+                    setTimeout(() => {
+                        journalStatus.style.opacity = '0';
+                    }, 2000);
+                }, 1000);
+            });
+        }
+
+        // ==========================================
+        // GESTIÓN DEL MODAL DE MAESTRÍA
+        // ==========================================
+        function openMaestriaModal() {
+            const modal = document.getElementById('maestria-modal');
+            const content = document.getElementById('maestria-modal-content');
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+            }, 10);
+        }
+        
+        function closeMaestriaModal() {
+            const modal = document.getElementById('maestria-modal');
+            const content = document.getElementById('maestria-modal-content');
+            
+            modal.classList.add('opacity-0');
+            content.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        // ==========================================
+        // SISTEMA DE BIENESTAR VISUAL Y GARANTÍA DE LECTURA
+        // ==========================================
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY || document.documentElement.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+            const progressBar = document.getElementById('scroll-progress-bar');
+            if (progressBar) {
+                progressBar.style.width = `${progress}%`;
+            }
+        });
+
+        const assistantTrigger = document.getElementById('assistant-trigger');
+        const assistantPanel = document.getElementById('assistant-panel');
+        const assistantClose = document.getElementById('assistant-close');
+
+        if (assistantTrigger && assistantPanel && assistantClose) {
+            assistantTrigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                assistantPanel.classList.toggle('hidden');
+            });
+
+            assistantClose.addEventListener('click', (e) => {
+                e.stopPropagation();
+                assistantPanel.classList.add('hidden');
+            });
+
+            assistantPanel.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+
+            document.addEventListener('click', () => {
+                assistantPanel.classList.add('hidden');
+            });
+        }
+
+        // Regla Láser
+        const btnRuler = document.getElementById('btn-ruler');
+        const rulerEl = document.getElementById('reading-ruler');
+        let rulerActive = false;
+
+        if (btnRuler && rulerEl) {
+            btnRuler.addEventListener('click', () => {
+                rulerActive = !rulerActive;
+                if (rulerActive) {
+                    rulerEl.style.display = 'block';
+                    btnRuler.classList.remove('bg-gray-800/80', 'text-gray-400');
+                    btnRuler.classList.add('bg-crearCyan', 'text-crearDarker', 'shadow-[0_0_10px_#00d2ff]');
+                    btnRuler.innerText = 'Activo';
+                } else {
+                    rulerEl.style.display = 'none';
+                    btnRuler.classList.add('bg-gray-800/80', 'text-gray-400');
+                    btnRuler.classList.remove('bg-crearCyan', 'text-crearDarker', 'shadow-[0_0_10px_#00d2ff]');
+                    btnRuler.innerText = 'Activar';
+                }
+            });
+
+            window.addEventListener('mousemove', (e) => {
+                if (rulerActive) {
+                    rulerEl.style.transform = `translateY(${e.clientY - 1.5}px)`;
+                }
+            });
+
+            window.addEventListener('touchmove', (e) => {
+                if (rulerActive && e.touches.length > 0) {
+                    rulerEl.style.transform = `translateY(${e.touches[0].clientY - 1.5}px)`;
+                }
+            });
+        }
+
+        // Enfoque por Bloques
+        const btnFocus = document.getElementById('btn-focus');
+        let focusActive = false;
+
+        if (btnFocus) {
+            btnFocus.addEventListener('click', () => {
+                focusActive = !focusActive;
+                if (focusActive) {
+                    document.body.classList.add('block-focus-active');
+                    btnFocus.classList.remove('bg-gray-800/80', 'text-gray-400');
+                    btnFocus.classList.add('bg-crearCyan', 'text-crearDarker', 'shadow-[0_0_10px_#00d2ff]');
+                    btnFocus.innerText = 'Activo';
+                } else {
+                    document.body.classList.remove('block-focus-active');
+                    btnFocus.classList.add('bg-gray-800/80', 'text-gray-400');
+                    btnFocus.classList.remove('bg-crearCyan', 'text-crearDarker', 'shadow-[0_0_10px_#00d2ff]');
+                    btnFocus.innerText = 'Activar';
+                }
+            });
+        }
+
+        // Sepia Anti-Fatiga
+        const btnWarm = document.getElementById('btn-warm');
+        let warmActive = false;
+
+        if (btnWarm) {
+            btnWarm.addEventListener('click', () => {
+                warmActive = !warmActive;
+                if (warmActive) {
+                    document.body.classList.add('warm-reading-active');
+                    btnWarm.classList.remove('bg-gray-800/80', 'text-gray-400');
+                    btnWarm.classList.add('bg-crearGold', 'text-crearDarker', 'shadow-[0_0_10px_#ffb703]');
+                    btnWarm.innerText = 'Activo';
+                } else {
+                    document.body.classList.remove('warm-reading-active');
+                    btnWarm.classList.add('bg-gray-800/80', 'text-gray-400');
+                    btnWarm.classList.remove('bg-crearGold', 'text-crearDarker', 'shadow-[0_0_10px_#ffb703]');
+                    btnWarm.innerText = 'Activar';
+                }
+            });
+        }
+
+        // Texto Grande
+        const btnTextSize = document.getElementById('btn-text-size');
+        let textLargeActive = false;
+
+        if (btnTextSize) {
+            btnTextSize.addEventListener('click', () => {
+                textLargeActive = !textLargeActive;
+                if (textLargeActive) {
+                    document.body.classList.add('large-text-active');
+                    btnTextSize.classList.remove('bg-gray-800/80', 'text-gray-400');
+                    btnTextSize.classList.add('bg-crearCyan', 'text-crearDarker', 'shadow-[0_0_10px_#00d2ff]');
+                    btnTextSize.innerText = 'Grande';
+                } else {
+                    document.body.classList.remove('large-text-active');
+                    btnTextSize.classList.add('bg-gray-800/80', 'text-gray-400');
+                    btnTextSize.classList.remove('bg-crearCyan', 'text-crearDarker', 'shadow-[0_0_10px_#00d2ff]');
+                    btnTextSize.innerText = 'Normal';
+                }
+            });
+        }
+
+        // Lógica de "Garantía de Lectura Obligatoria"
+        const readingSections = [
+            { id: 'grid-info-section', step: 1 },
+            { id: 'que-traer-section', step: 2 },
+            { id: 'normas-convivencia-section', step: 3 },
+            { id: 'compromiso-proceso-section', step: 4 }
+        ];
+
+        const readSections = { 1: false, 2: false, 3: false, 4: false };
+        const sectionDwellTimes = {};
+
+        function markSectionAsRead(step) {
+            if (readSections[step]) return;
+            readSections[step] = true;
+
+            const checkEl = document.getElementById(`check-step-${step}`);
+            const statusEl = document.getElementById(`status-step-${step}`);
+
+            if (checkEl) {
+                checkEl.classList.remove('border-gray-600', 'text-gray-500');
+                checkEl.classList.add('bg-green-500/20', 'border-green-500', 'text-green-400');
+                checkEl.innerText = '✓';
+            }
+
+            if (statusEl) {
+                statusEl.classList.remove('text-gray-500');
+                statusEl.classList.add('text-green-400', 'font-bold');
+                statusEl.innerText = 'Leído';
+            }
+
+            updateReadingCompletion();
+        }
+
+        function updateReadingCompletion() {
+            const completedCount = Object.values(readSections).filter(Boolean).length;
+            const percentage = Math.round((completedCount / 4) * 100);
+
+            const badgeEl = document.getElementById('assistant-badge');
+            const progressTextEl = document.getElementById('panel-progress-text');
+
+            if (badgeEl) {
+                badgeEl.innerText = `${percentage}%`;
+                if (percentage === 100) {
+                    badgeEl.classList.remove('bg-crearRed', 'animate-bounce');
+                    badgeEl.classList.add('bg-green-500');
+                    badgeEl.innerText = '✓';
+                }
+            }
+
+            if (progressTextEl) {
+                progressTextEl.innerText = `${percentage}%`;
+                if (percentage === 100) {
+                    progressTextEl.classList.remove('text-crearCyan');
+                    progressTextEl.classList.add('text-green-400');
+                }
+            }
+
+            if (percentage === 100) {
+                unlockConfirmation();
+            }
+        }
+
+        function unlockConfirmation() {
+            const bannerEl = document.getElementById('completion-banner');
+            if (bannerEl) {
+                bannerEl.classList.remove('hidden');
+                bannerEl.classList.add('block');
+            }
+
+            const waButtons = document.querySelectorAll('#coordinators-container a');
+            waButtons.forEach(btn => {
+                btn.classList.add('completion-glow');
+            });
+
+            const heroBtn = document.querySelector('a[href="#contacto"]');
+            if (heroBtn) {
+                heroBtn.classList.add('completion-glow');
+                heroBtn.innerHTML = '✨ ¡LECTURA COMPLETADA! CONFIRMAR ASISTENCIA AL CAPÍTULO DOS';
+            }
+        }
+
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.15
+        };
+
+        const readingObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const sectionId = entry.target.id;
+                const sectionConfig = readingSections.find(s => s.id === sectionId);
+                if (!sectionConfig) return;
+
+                const step = sectionConfig.step;
+
+                if (entry.isIntersecting && !readSections[step]) {
+                    sectionDwellTimes[step] = setTimeout(() => {
+                        markSectionAsRead(step);
+                    }, 1800);
+                } else {
+                    if (sectionDwellTimes[step]) {
+                        clearTimeout(sectionDwellTimes[step]);
+                        delete sectionDwellTimes[step];
+                    }
+                }
+            });
+        }, observerOptions);
+
+        readingSections.forEach(sec => {
+            const el = document.getElementById(sec.id);
+            if (el) readingObserver.observe(el);
+        });
+    </script>
+</body>
+</html>
