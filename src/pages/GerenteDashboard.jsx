@@ -14,7 +14,7 @@ import VenueConfigModal from '../components/VenueConfigModal';
 
 export default function GerenteDashboard() {
   const { currentUser } = useAuth();
-  const { currentStage } = useCycles();
+  const { currentStage, currentCycle, events, quitoCycles } = useCycles();
   const { tasks, initializeFirestore, getProgressByRole } = useChecklist();
   const { showToast } = useUI();
   const navigate = useNavigate();
@@ -57,6 +57,53 @@ export default function GerenteDashboard() {
   const cycleFlow = ['GATE 1', 'PRE-C1', 'C1', 'POST-C1', 'C2', 'PRE-MJ', 'MJ', 'POST-MJ'];
   const currentIndex = cycleFlow.indexOf(currentStage);
   const nextTraining = currentIndex !== -1 && currentIndex < cycleFlow.length - 1 ? cycleFlow[currentIndex + 1] : 'Próximo Ciclo';
+
+  // Helper para resolver el número de equipo de una meta
+  const resolveGoalTeam = (goal) => {
+    if (!goal) return '';
+    // 1. Si el goal ya trae explícitamente numEquipo o equipo
+    if (goal.numEquipo) return `Eq. ${goal.numEquipo}`;
+    if (goal.equipo && !isNaN(parseInt(goal.equipo, 10))) return `Eq. ${goal.equipo}`;
+
+    // 2. Extraer del título (ej. "Meta Global del Ciclo Equipo 30" -> "Eq. 30", o "Equipo 128")
+    const title = goal.title || '';
+    const match = title.match(/(?:Equipo|Eq\.?|E)\s*(\d+)/i);
+    if (match) return `Eq. ${match[1]}`;
+
+    // 3. Buscar en el calendario de eventos para la sede y fase de la meta
+    const goalSedeNorm = normalizeSede(goal.sede || currentUser?.sede);
+    if (events && events.length > 0) {
+      const titleLower = title.toLowerCase();
+      const phaseLower = (goal.cyclePhase || '').toLowerCase();
+      const ev = events.find(e => {
+        const evSede = normalizeSede(e.sede || e.sedeTag || e.place || '');
+        if (evSede !== goalSedeNorm) return false;
+        const evNom = (e.nombre || e.name || '').toLowerCase();
+        if (titleLower.includes('creacion') || titleLower.includes('creación')) return evNom.includes('creacion') || evNom.includes('creación') || evNom.includes('maestria');
+        if (titleLower.includes('relacion') || titleLower.includes('relación')) return evNom.includes('relacion') || evNom.includes('relación') || evNom.includes('maestria');
+        if (titleLower.includes('gratitud')) return evNom.includes('gratitud') || evNom.includes('maestria');
+        if (titleLower.includes('viaje')) return evNom.includes('viaje') || evNom.includes('maestria');
+        if (titleLower.includes('c1') || titleLower.includes('capítulo 1') || phaseLower === 'c1') return evNom.includes('c1') || evNom.includes('capitulo 1');
+        if (titleLower.includes('c2') || titleLower.includes('capítulo 2') || phaseLower === 'c2') return evNom.includes('c2') || evNom.includes('capitulo 2');
+        return false;
+      });
+      if (ev && ev.equipo) {
+        return `Eq. ${ev.equipo}`;
+      }
+    }
+
+    // 4. Si es Quito y el usuario tiene equipo(s) activo(s)
+    if (goalSedeNorm === 'Quito') {
+      if (Array.isArray(quitoCycles) && quitoCycles.length > 0) {
+        return `Eq. ${quitoCycles[0].equipo}`;
+      }
+      if (currentUser?.equiposQuito && currentUser.equiposQuito[0]) {
+        return `Eq. ${currentUser.equiposQuito[0]}`;
+      }
+    }
+
+    return goal.stage || goal.cyclePhase || '';
+  };
 
   const isTaskVisibleToMe = (t) => {
     // Si el usuario está simulado, evaluamos siempre con el perfil simulado (ej. Emily)
@@ -349,24 +396,27 @@ export default function GerenteDashboard() {
                       if (!g.sede || g.sede === 'Global' || g.sede === 'Sede Global') return true;
                       const userSede = normalizeSede(currentUser?.sede);
                       return normalizeSede(g.sede) === userSede;
-                    }).map(g => (
-                      <div key={g.id} style={{ background: 'rgba(0,0,0,0.2)', padding: '0.6rem 0.8rem', borderRadius: '6px', borderLeft: '3px solid var(--crear-gold)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.85rem', marginBottom: '0.3rem', gap: '0.5rem' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-                            <span style={{ fontWeight: '600', color: 'var(--text-heading)' }}>{g.title}</span>
-                            {(g.numEquipo || g.equipo || g.stage || g.cyclePhase) && (
-                              <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: '8px', background: 'rgba(255, 183, 3, 0.15)', color: 'var(--crear-gold)', fontWeight: 700 }}>
-                                👥 {g.numEquipo ? `Eq. ${g.numEquipo}` : g.equipo ? `Eq. ${g.equipo}` : (g.stage || g.cyclePhase)}
-                              </span>
-                            )}
+                    }).map(g => {
+                      const teamBadge = resolveGoalTeam(g);
+                      return (
+                        <div key={g.id} style={{ background: 'rgba(0,0,0,0.2)', padding: '0.6rem 0.8rem', borderRadius: '6px', borderLeft: '3px solid var(--crear-gold)' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.85rem', marginBottom: '0.3rem', gap: '0.5rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                              <span style={{ fontWeight: '600', color: 'var(--text-heading)' }}>{g.title}</span>
+                              {teamBadge && (
+                                <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: '8px', background: 'rgba(255, 183, 3, 0.2)', color: 'var(--crear-gold)', fontWeight: 700, border: '1px solid rgba(255, 183, 3, 0.4)' }}>
+                                  👥 {teamBadge}
+                                </span>
+                              )}
+                            </div>
+                            <span style={{ fontWeight: 'bold', color: g.progress >= 100 ? '#22c55e' : 'var(--crear-gold)', whiteSpace: 'nowrap' }}>{g.currentValue} / {g.targetValue}</span>
                           </div>
-                          <span style={{ fontWeight: 'bold', color: g.progress >= 100 ? '#22c55e' : 'var(--crear-gold)', whiteSpace: 'nowrap' }}>{g.currentValue} / {g.targetValue}</span>
+                          <div style={{ width: '100%', height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', overflow: 'hidden' }}>
+                            <div style={{ height: '100%', width: `${Math.min(g.progress, 100)}%`, background: g.progress >= 100 ? '#22c55e' : 'var(--crear-gold)' }} />
+                          </div>
                         </div>
-                        <div style={{ width: '100%', height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', overflow: 'hidden' }}>
-                          <div style={{ height: '100%', width: `${Math.min(g.progress, 100)}%`, background: g.progress >= 100 ? '#22c55e' : 'var(--crear-gold)' }} />
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -384,24 +434,27 @@ export default function GerenteDashboard() {
                         if (normalizeSede(g.sede) !== userSede) return false;
                       }
                       return g.cyclePhase === currentStage || !g.cyclePhase || g.cyclePhase.includes('MJ');
-                    }).map(g => (
-                      <div key={g.id} style={{ background: 'rgba(0,0,0,0.2)', padding: '0.6rem 0.8rem', borderRadius: '6px', borderLeft: '3px solid var(--crear-cyan)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.85rem', marginBottom: '0.3rem', gap: '0.5rem' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-                            <span style={{ fontWeight: '600', color: 'var(--text-heading)' }}>{g.title}</span>
-                            {(g.numEquipo || g.equipo || g.stage || g.cyclePhase) && (
-                              <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: '8px', background: 'rgba(0, 212, 255, 0.15)', color: 'var(--crear-cyan)', fontWeight: 700 }}>
-                                👥 {g.numEquipo ? `Eq. ${g.numEquipo}` : g.equipo ? `Eq. ${g.equipo}` : (g.stage || g.cyclePhase)}
-                              </span>
-                            )}
+                    }).map(g => {
+                      const teamBadge = resolveGoalTeam(g);
+                      return (
+                        <div key={g.id} style={{ background: 'rgba(0,0,0,0.2)', padding: '0.6rem 0.8rem', borderRadius: '6px', borderLeft: '3px solid var(--crear-cyan)' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.85rem', marginBottom: '0.3rem', gap: '0.5rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                              <span style={{ fontWeight: '600', color: 'var(--text-heading)' }}>{g.title}</span>
+                              {teamBadge && (
+                                <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: '8px', background: 'rgba(0, 212, 255, 0.2)', color: 'var(--crear-cyan)', fontWeight: 700, border: '1px solid rgba(0, 212, 255, 0.4)' }}>
+                                  👥 {teamBadge}
+                                </span>
+                              )}
+                            </div>
+                            <span style={{ fontWeight: 'bold', color: g.progress >= 100 ? '#22c55e' : 'var(--crear-cyan)', whiteSpace: 'nowrap' }}>{g.currentValue} / {g.targetValue}</span>
                           </div>
-                          <span style={{ fontWeight: 'bold', color: g.progress >= 100 ? '#22c55e' : 'var(--crear-cyan)', whiteSpace: 'nowrap' }}>{g.currentValue} / {g.targetValue}</span>
+                          <div style={{ width: '100%', height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', overflow: 'hidden' }}>
+                            <div style={{ height: '100%', width: `${Math.min(g.progress, 100)}%`, background: g.progress >= 100 ? '#22c55e' : 'var(--crear-cyan)' }} />
+                          </div>
                         </div>
-                        <div style={{ width: '100%', height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', overflow: 'hidden' }}>
-                          <div style={{ height: '100%', width: `${Math.min(g.progress, 100)}%`, background: g.progress >= 100 ? '#22c55e' : 'var(--crear-cyan)' }} />
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}
