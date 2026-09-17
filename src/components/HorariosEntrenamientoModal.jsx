@@ -10,6 +10,13 @@ import { db } from '../services/firebase';
 import { USERS_TO_IMPORT } from '../data/usersToImport';
 import { normalizeRole, normalizeSede, OPERATIONAL_SEDES } from '../data/usersData';
 import { useCycles } from '../context/CyclesContext';
+import { useAuth } from '../context/AuthContext';
+import { 
+  checkScheduleAuthority, 
+  notifyTeamScheduleUpdated, 
+  recordStaffAcknowledgement, 
+  auditAcknowledgements 
+} from '../services/scheduleGovernanceAgent';
 
 // Helper para obtener los gerentes y coordinadores reales de una sede
 function getLeadershipForSede(sedeName) {
@@ -281,21 +288,34 @@ const DEFAULT_SCHEDULE_TEMPLATE = [
 export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUser }) {
   const [activeTab, setActiveTab] = useState('matriz_equipos');
   
+  // Usuario activo (vía prop o fallback desde AuthContext)
+  const auth = useAuth?.() || {};
+  const activeUser = currentUser || auth.currentUser;
+
   // Contexto de Ciclos y Fechas Oficiales
   const cyclesContext = useCycles?.() || {};
   const { currentCycle, currentStage } = cyclesContext;
 
   // Sede seleccionada (auto-detecta la sede del usuario)
   const initialSede = useMemo(() => {
-    const norm = normalizeSede(currentUser?.sede);
-    return OPERATIONAL_SEDES.includes(norm) ? norm : 'Quito';
-  }, [currentUser]);
+    const norm = normalizeSede(activeUser?.sede);
+    return OPERATIONAL_SEDES.includes(norm) ? norm : 'Lima';
+  }, [activeUser]);
 
   const [selectedSede, setSelectedSede] = useState(initialSede);
 
   // Sede key para Firestore
   const sedeKey = selectedSede.toLowerCase().trim().replace(/\s+/g, '_');
   const nodusDocId = `${sedeKey}_horarios_equipos`;
+
+  // Control de Gobernanza y Mando Organizacional vía ScheduleGovernanceAgent:
+  // Solo los Gerentes de Sede, Dirección General y SuperAdmins pueden editar.
+  // El resto del equipo accede en Modo Consulta Oficial (Solo Lectura).
+  const authority = useMemo(() => {
+    return checkScheduleAuthority(activeUser, selectedSede);
+  }, [activeUser, selectedSede]);
+
+  const isManager = authority.canEdit;
 
   // Lista de colaboradores y filas por sede
   const [staffList, setStaffList] = useState([]);
@@ -307,6 +327,11 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
   const [saveMessage, setSaveMessage] = useState('');
   const [lastSaved, setLastSaved] = useState(null);
 
+  // Acuses de Recibo ("Leído y Enterado")
+  const [acknowledgements, setAcknowledgements] = useState({});
+  const [isConfirmingAck, setIsConfirmingAck] = useState(false);
+  const [showAckAuditModal, setShowAckAuditModal] = useState(false);
+
   // Popover rápido de celda activa
   const [activeCellPicker, setActiveCellPicker] = useState(null); // { rowId, staffId }
 
@@ -315,12 +340,6 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
   const [showNotifyModal, setShowNotifyModal] = useState(false);
   const [newStaffForm, setNewStaffForm] = useState({ name: '', role: '', email: '' });
   const [copyFeedback, setCopyFeedback] = useState('');
-
-  // Identificación de permisos de Gerencia / Administración
-  // Modo de edición 100% habilitado para gestión de turnos, horarios y asignaciones
-  const isManager = useMemo(() => {
-    return true; // 100% editable según directiva operativa de Causa OS
-  }, []);
 
   // Cargar colaboradores y horarios de la sede seleccionada
   useEffect(() => {
@@ -354,19 +373,26 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
             setScheduleRows(DEFAULT_SCHEDULE_TEMPLATE);
           }
 
+          if (data.acknowledgements && typeof data.acknowledgements === 'object') {
+            setAcknowledgements(data.acknowledgements);
+          } else {
+            setAcknowledgements({});
+          }
+
           if (data.updatedAt) {
             setLastSaved(new Date(data.updatedAt).toLocaleTimeString());
           }
         } else {
-          // Si no existe documento previo para esta sede, inicializarlo limpio con su equipo
+          // Documento no existe en Firestore aún para esta sede
           setStaffList(realLeadership);
           setScheduleRows(DEFAULT_SCHEDULE_TEMPLATE);
-          setLastSaved(null);
+          setAcknowledgements({});
         }
       }, (err) => {
         console.warn(`Error leyendo horarios para ${selectedSede}:`, err);
         setStaffList(realLeadership);
         setScheduleRows(DEFAULT_SCHEDULE_TEMPLATE);
+        setAcknowledgements({});
       });
 
       return () => unsub();
@@ -374,6 +400,7 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
       console.warn('Error en conexión Firestore:', err);
       setStaffList(realLeadership);
       setScheduleRows(DEFAULT_SCHEDULE_TEMPLATE);
+      setAcknowledgements({});
     }
   }, [isOpen, selectedSede, nodusDocId]);
 
@@ -387,13 +414,25 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
         sede: selectedSede,
         rows: scheduleRows,
         staff: staffList,
+        acknowledgements: acknowledgements || {},
         updatedAt: new Date().toISOString(),
-        updatedBy: currentUser?.name || currentUser?.email || 'Gerente Causa OS',
-        updatedByEmail: currentUser?.email || ''
+        updatedBy: activeUser?.name || activeUser?.displayName || activeUser?.email || 'Gerente Causa OS',
+        updatedByEmail: activeUser?.email || ''
       };
 
       const cleanPayload = JSON.parse(JSON.stringify(payload));
       await setDoc(docRef, cleanPayload, { merge: true });
+
+      // 1. Disparar Notificaciones In-App en Causa OS para todo el equipo de la sede
+      try {
+        await notifyTeamScheduleUpdated({
+          sede: selectedSede,
+          updatedBy: activeUser?.name || activeUser?.displayName || 'Gerencia de Sede',
+          staffList: staffList
+        });
+      } catch (notifErr) {
+        console.warn('Error enviando notificaciones in-app:', notifErr);
+      }
 
       // Enviar correo a los colaboradores asignados con copia a Eli Escobar y Lennin Chasi
       // Y si la sede es LIMA (SOLO EN LIMA), incluir con copia a Gabriela Rivadeneyra (Contadora Lima)
@@ -503,6 +542,40 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
 
   // Alias retrocompatible
   const handleSaveToNodus = handleSaveToCausa;
+
+  // Comprobación de Acuse de Recibo del Colaborador en sesión
+  const activeUserEmail = (activeUser?.email || '').toLowerCase().trim();
+  const isUserInCurrentStaff = staffList.some(s => (s.email || '').toLowerCase().trim() === activeUserEmail);
+  const userAckKey = activeUserEmail.replace(/[\.\@\-]/g, '_');
+  const userAck = acknowledgements[userAckKey] || Object.values(acknowledgements).find(a => (a.email || '').toLowerCase().trim() === activeUserEmail);
+
+  // Auditoría logística de Acuses de Recibo para Gerencia
+  const ackAudit = useMemo(() => {
+    return auditAcknowledgements(acknowledgements, staffList);
+  }, [acknowledgements, staffList]);
+
+  // Manejador del botón "Confirmar de Leído y Enterado"
+  const handleConfirmAck = async () => {
+    if (!activeUser?.email) {
+      alert('Debes tener una sesión activa con correo oficial para confirmar tu acuse de recibo.');
+      return;
+    }
+    setIsConfirmingAck(true);
+    try {
+      await recordStaffAcknowledgement({
+        sedeDocId: nodusDocId,
+        user: activeUser,
+        sede: selectedSede
+      });
+      setSaveMessage('✅ ¡Acuse de recibo registrado con éxito! Has confirmado de Leído y Enterado.');
+      setTimeout(() => setSaveMessage(''), 5000);
+    } catch (err) {
+      console.error('Error al registrar acuse de recibo:', err);
+      alert('Error registrando acuse de recibo: ' + (err.message || 'Error de conexión'));
+    } finally {
+      setIsConfirmingAck(false);
+    }
+  };
 
   // Modificar campo in-line de una fila (horario, nota, vestimenta, día)
   const handleInlineRowUpdate = (rowId, field, value) => {
@@ -804,6 +877,21 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                 <MapPin size={11} />
                 Sede Activa: {selectedSede}
               </span>
+              <span style={{ 
+                background: isManager ? 'var(--crear-gold-light)' : 'rgba(2, 132, 199, 0.12)',
+                color: isManager ? 'var(--crear-gold)' : '#0284c7',
+                border: isManager ? '1px solid var(--border-subtle)' : '1px solid rgba(2, 132, 199, 0.3)',
+                borderRadius: '6px',
+                fontSize: '0.72rem',
+                fontWeight: 700,
+                padding: '2px 8px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}>
+                {isManager ? <ShieldCheck size={11} /> : <Eye size={11} />}
+                {isManager ? `👑 Modo Gerencia: Edición Habilitada` : `🛡️ Modo Oficial: Solo Lectura`}
+              </span>
               {hasUnsavedChanges && (
                 <span style={{
                   background: 'rgba(239, 68, 68, 0.12)',
@@ -971,6 +1059,42 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+                  {/* Botón de Auditoría de Acuses de Recibo */}
+                  <button
+                    onClick={() => setShowAckAuditModal(true)}
+                    className="btn-secondary"
+                    style={{ 
+                      padding: '0.45rem 0.85rem', 
+                      fontSize: '0.8rem', 
+                      display: 'inline-flex', 
+                      alignItems: 'center', 
+                      gap: '0.35rem',
+                      borderColor: ackAudit.percentage === 100 ? 'rgba(34, 197, 94, 0.4)' : 'var(--border-subtle)',
+                      background: ackAudit.percentage === 100 ? 'rgba(34, 197, 94, 0.08)' : 'transparent'
+                    }}
+                    title="Control de Acuses de Recibo (Leído y Enterado)"
+                  >
+                    <CheckCircle2 size={14} color={ackAudit.percentage === 100 ? '#16a34a' : '#f59e0b'} />
+                    <span>Acuses ({ackAudit.confirmed}/{ackAudit.total})</span>
+                  </button>
+
+                  {!isManager && (
+                    <span style={{ 
+                      fontSize: '0.78rem', 
+                      color: 'var(--text-muted)', 
+                      display: 'inline-flex', 
+                      alignItems: 'center', 
+                      gap: '4px',
+                      padding: '0.35rem 0.65rem',
+                      background: 'var(--bg-dark, #f8fafc)',
+                      border: '1px solid var(--border-subtle)',
+                      borderRadius: '6px'
+                    }}>
+                      <Lock size={12} />
+                      Modo Consulta (Solo Lectura)
+                    </span>
+                  )}
+
                   {isManager && (
                     <button
                       onClick={() => setShowManageStaffModal(true)}
@@ -982,6 +1106,16 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                       Equipo de {selectedSede} ({staffList.length})
                     </button>
                   )}
+
+                  <button
+                    onClick={() => setShowAckAuditModal(true)}
+                    className="btn-secondary"
+                    style={{ padding: '0.45rem 0.85rem', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
+                    title="Auditoría y control de acuses de recibo (Leído y Enterado)"
+                  >
+                    <CheckCircle2 size={14} color={ackAudit.percentage === 100 ? '#16a34a' : '#f59e0b'} />
+                    <span>Acuses ({ackAudit.confirmed}/{ackAudit.total})</span>
+                  </button>
 
                   {isManager && (
                     <button
@@ -1024,6 +1158,96 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                   )}
                 </div>
               </div>
+
+              {/* BANNER DE ACUSE DE RECIBO (LEÍDO Y ENTERADO) PARA EL COLABORADOR */}
+              {isUserInCurrentStaff && (
+                <div style={{
+                  background: userAck 
+                    ? 'rgba(34, 197, 94, 0.08)' 
+                    : 'linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.07))',
+                  border: userAck 
+                    ? '1px solid rgba(34, 197, 94, 0.35)' 
+                    : '1px solid rgba(245, 158, 11, 0.45)',
+                  borderRadius: '10px',
+                  padding: '12px 16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  flexWrap: 'wrap',
+                  gap: '12px'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    {userAck ? (
+                      <CheckCircle2 size={24} color="#16a34a" />
+                    ) : (
+                      <AlertCircle size={24} color="#f59e0b" />
+                    )}
+                    <div>
+                      <div style={{ fontWeight: 800, fontSize: '0.88rem', color: userAck ? '#16a34a' : '#f59e0b' }}>
+                        {userAck ? '✅ Acuse de Recibo Registrado (Leído y Enterado)' : '📢 Acuse de Recibo Obligatorio de Horarios — Causa OS'}
+                      </div>
+                      <div style={{ fontSize: '0.78rem', color: 'var(--text-main)', marginTop: '2px' }}>
+                        {userAck ? (
+                          <>Confirmaste formalmente estar <strong>Leído y Enterado</strong> de tus horarios y vestimenta el <strong>{new Date(userAck.confirmedAt).toLocaleString('es-PE', { dateStyle: 'medium', timeStyle: 'short' })}</strong>.</>
+                        ) : (
+                          <>Revisa tus jornadas de sala, horarios y código de vestimenta. Por directiva de Gerencia, debes certificar tu disponibilidad:</>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {!userAck && (
+                    <button
+                      onClick={handleConfirmAck}
+                      disabled={isConfirmingAck}
+                      className="btn-primary"
+                      style={{
+                        padding: '0.55rem 1.3rem',
+                        fontSize: '0.84rem',
+                        fontWeight: 800,
+                        background: 'linear-gradient(135deg, #16a34a, #15803d)',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        boxShadow: '0 2px 10px rgba(22, 163, 74, 0.35)'
+                      }}
+                    >
+                      <Check size={16} />
+                      {isConfirmingAck ? 'Registrando...' : '✍️ Confirmar de Leído y Enterado'}
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {/* ALERTA DE SEGUIMIENTO PARA GERENTES */}
+              {isManager && ackAudit.pendingList.length > 0 && (
+                <div style={{
+                  background: 'rgba(245, 158, 11, 0.08)',
+                  border: '1px solid rgba(245, 158, 11, 0.25)',
+                  borderRadius: '8px',
+                  padding: '8px 12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  fontSize: '0.78rem',
+                  color: 'var(--text-main)'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <AlertCircle size={14} color="#f59e0b" />
+                    <span><strong>Control Logístico:</strong> Hay <strong>{ackAudit.pendingList.length}</strong> colaboradores pendientes de confirmar "Leído y Enterado" en {selectedSede}.</span>
+                  </div>
+                  <button
+                    onClick={() => setShowAckAuditModal(true)}
+                    style={{ background: 'transparent', border: 'none', color: '#0284c7', fontWeight: 700, cursor: 'pointer', fontSize: '0.76rem', textDecoration: 'underline' }}
+                  >
+                    Ver control de acuses
+                  </button>
+                </div>
+              )}
 
               {/* FILTROS Y RESALTADO */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.8rem' }}>
@@ -1300,6 +1524,7 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                               <td 
                                 key={staff.id}
                                 onClick={(e) => {
+                                  if (!isManager) return;
                                   e.stopPropagation();
                                   const rect = e.currentTarget.getBoundingClientRect();
                                   setActiveCellPicker({
@@ -1316,12 +1541,12 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                                 style={{ 
                                   padding: '0.6rem 0.5rem', 
                                   textAlign: 'center',
-                                  cursor: 'pointer',
+                                  cursor: isManager ? 'pointer' : 'default',
                                   background: isHighlighted ? 'var(--crear-gold-light)' : 'transparent',
                                   borderLeft: '1px solid var(--border-subtle)',
                                   borderRight: '1px solid var(--border-subtle)'
                                 }}
-                                title={`Clic para asignar turno o rol a ${staff.name}`}
+                                title={isManager ? `Clic para asignar turno o rol a ${staff.name}` : `${staff.name}: ${val}`}
                               >
                                 {renderCellBadge(val)}
                               </td>
@@ -1908,6 +2133,176 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                 >
                   <Mail size={16} />
                   Enviar Correo Masivo
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* MODAL: AUDITORÍA DE ACUSES DE RECIBO LOGÍSTICOS ("LEÍDO Y ENTERADO")      */}
+        {/* ========================================================================= */}
+        {showAckAuditModal && (
+          <div 
+            onClick={() => setShowAckAuditModal(false)}
+            style={{
+              position: 'fixed',
+              top: 0, left: 0, right: 0, bottom: 0,
+              background: 'rgba(0, 0, 0, 0.75)',
+              backdropFilter: 'blur(5px)',
+              zIndex: 100002,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '1rem'
+            }}
+          >
+            <div 
+              onClick={e => e.stopPropagation()}
+              className="glass-panel"
+              style={{
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: 'var(--radius-md)',
+                padding: '1.6rem',
+                maxWidth: '650px',
+                width: '100%',
+                maxHeight: '90vh',
+                overflowY: 'auto',
+                boxShadow: 'var(--card-shadow)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '1.2rem',
+                color: 'var(--text-main)'
+              }}
+            >
+              {/* Header */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.8rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                  <ShieldCheck size={22} className="text-gold" />
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-heading)' }}>
+                      Auditoría de Acuses de Recibo — Sede {selectedSede}
+                    </h3>
+                    <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
+                      Control de confirmación operativa de sala (Principio de Responsabilidad Compartida)
+                    </div>
+                  </div>
+                </div>
+                <button onClick={() => setShowAckAuditModal(false)} className="btn-icon" style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* Indicadores de Cumplimiento */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.8rem' }}>
+                <div style={{ background: 'var(--bg-dark, #f8fafc)', border: '1px solid var(--border-subtle)', borderRadius: '8px', padding: '0.75rem', textAlign: 'center' }}>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 600 }}>TOTAL ASIGNADOS</div>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-heading)', marginTop: '2px' }}>{ackAudit.total}</div>
+                </div>
+                <div style={{ background: 'rgba(34, 197, 94, 0.08)', border: '1px solid rgba(34, 197, 94, 0.25)', borderRadius: '8px', padding: '0.75rem', textAlign: 'center' }}>
+                  <div style={{ fontSize: '0.72rem', color: '#16a34a', fontWeight: 700 }}>LEÍDO Y ENTERADO</div>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#16a34a', marginTop: '2px' }}>{ackAudit.confirmed} <span style={{ fontSize: '0.82rem', fontWeight: 600 }}>({ackAudit.percentage}%)</span></div>
+                </div>
+                <div style={{ background: ackAudit.pendingList.length > 0 ? 'rgba(245, 158, 11, 0.08)' : 'var(--bg-dark, #f8fafc)', border: '1px solid var(--border-subtle)', borderRadius: '8px', padding: '0.75rem', textAlign: 'center' }}>
+                  <div style={{ fontSize: '0.72rem', color: ackAudit.pendingList.length > 0 ? '#d97706' : 'var(--text-muted)', fontWeight: 600 }}>PENDIENTES</div>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 800, color: ackAudit.pendingList.length > 0 ? '#d97706' : 'var(--text-heading)', marginTop: '2px' }}>{ackAudit.pendingList.length}</div>
+                </div>
+              </div>
+
+              {/* Lista de Colaboradores Confirmados */}
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.82rem', fontWeight: 700, color: '#16a34a', marginBottom: '6px' }}>
+                  <CheckCircle2 size={16} />
+                  <span>Personal Confirmado ({ackAudit.confirmed})</span>
+                </div>
+                {ackAudit.confirmedList.length === 0 ? (
+                  <div style={{ padding: '0.8rem', background: 'var(--bg-dark, #f8fafc)', borderRadius: '6px', fontSize: '0.78rem', color: 'var(--text-muted)', textAlign: 'center' }}>
+                    Aún no hay acuses de recibo registrados para esta sede en Causa OS.
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', maxHeight: '160px', overflowY: 'auto' }}>
+                    {ackAudit.confirmedList.map(item => (
+                      <div 
+                        key={item.id}
+                        style={{
+                          background: 'rgba(34, 197, 94, 0.05)',
+                          border: '1px solid rgba(34, 197, 94, 0.2)',
+                          borderRadius: '6px',
+                          padding: '0.5rem 0.8rem',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          fontSize: '0.8rem'
+                        }}
+                      >
+                        <div>
+                          <div style={{ fontWeight: 700, color: 'var(--text-heading)' }}>{item.name}</div>
+                          <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{item.role} • {item.email}</div>
+                        </div>
+                        <div style={{ textAlign: 'right' }}>
+                          <span style={{ fontSize: '0.68rem', background: 'rgba(34, 197, 94, 0.15)', color: '#15803d', padding: '2px 6px', borderRadius: '4px', fontWeight: 700 }}>
+                            ✓ Confirmado
+                          </span>
+                          {item.confirmedAt && (
+                            <div style={{ fontSize: '0.66rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                              {new Date(item.confirmedAt).toLocaleString('es-PE', { dateStyle: 'short', timeStyle: 'short' })}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Lista de Colaboradores Pendientes */}
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.82rem', fontWeight: 700, color: ackAudit.pendingList.length > 0 ? '#d97706' : 'var(--text-muted)', marginBottom: '6px' }}>
+                  <AlertCircle size={16} />
+                  <span>Personal Pendiente de Confirmar ({ackAudit.pendingList.length})</span>
+                </div>
+                {ackAudit.pendingList.length === 0 ? (
+                  <div style={{ padding: '0.8rem', background: 'rgba(34, 197, 94, 0.08)', borderRadius: '6px', fontSize: '0.8rem', color: '#16a34a', textAlign: 'center', fontWeight: 700 }}>
+                    🎉 ¡Todo el equipo de {selectedSede} ha confirmado sus horarios! Cumplimiento 100%.
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', maxHeight: '160px', overflowY: 'auto' }}>
+                    {ackAudit.pendingList.map(item => (
+                      <div 
+                        key={item.id}
+                        style={{
+                          background: 'rgba(245, 158, 11, 0.05)',
+                          border: '1px solid rgba(245, 158, 11, 0.2)',
+                          borderRadius: '6px',
+                          padding: '0.5rem 0.8rem',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          fontSize: '0.8rem'
+                        }}
+                      >
+                        <div>
+                          <div style={{ fontWeight: 700, color: 'var(--text-heading)' }}>{item.name}</div>
+                          <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{item.role} • {item.email || 'Sin correo registrado'}</div>
+                        </div>
+                        <span style={{ fontSize: '0.68rem', background: 'rgba(245, 158, 11, 0.15)', color: '#b45309', padding: '2px 6px', borderRadius: '4px', fontWeight: 700 }}>
+                          ⏳ Pendiente en Causa OS
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Botones de Cierre */}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', borderTop: '1px solid var(--border-subtle)', paddingTop: '0.8rem' }}>
+                <button
+                  onClick={() => setShowAckAuditModal(false)}
+                  className="btn-primary"
+                  style={{ padding: '0.45rem 1.4rem', fontSize: '0.82rem' }}
+                >
+                  Cerrar Auditoría
                 </button>
               </div>
             </div>
