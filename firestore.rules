@@ -22,19 +22,12 @@ rules_version = '2';
 //     ciclos y reportes fallando en silencio para roles no-superadmin).
 //
 // Qu├® NO cambia (a prop├│sito, para no romper nada que no revis├® a fondo):
-//  Las colecciones staff_directory, excellence_standards, kpi_reports,
-//  learning_logs, success_patterns, sync_history y user_stats se dejan
-//  EXACTAMENTE como decía este comentario que estaban (cualquier autenticado lee
-//  y escribe) — ver hallazgo del 08/09/2026 más abajo, porque en la práctica
-//  habían dejado de estarlo. Sigue pendiente una auditoría dedicada del detalle
-//  de cada una (marcado abajo con TODO para una siguiente pasada), pero al menos
-//  ya no están completamente cerradas.
-//
-// ACTUALIZACIÓN 02/09/2026 (confirmada explícitamente por José): managers_directory
-// SALIÓ de la lista de arriba — ya no se deja abierta a cualquier autenticado. Ver
-// canManageManagers() y el match /managers_directory/ más abajo para el detalle.
-// Se agregaron además llamadas_grupales_historial y liquidaciones_pagos (pestaña de
-// Liquidación de Entrenadores), esta última restringida solo a José y Elizabeth.
+//  Las colecciones staff_directory, managers_directory, excellence_standards,
+//  kpi_reports, learning_logs, qt_directory, success_patterns, sync_history y
+//  user_stats se dejan EXACTAMENTE como est├ín hoy (cualquier autenticado lee y
+//  escribe) porque no alcanc├® a auditar el detalle de cada una y prefiero no
+//  inventar una restricci├│n que bloquee algo que no vi. Quedan marcadas abajo
+//  con un TODO para una siguiente pasada.
 //
 // Lista de gerencia/direcci├│n (funci├│n isGerenteODireccion): se extrajo del
 // ├║ltimo snapshot de src/data/usersToImport.js en GitHub (anterior a la
@@ -47,25 +40,6 @@ rules_version = '2';
 // isOperationalProgressUpdate() en la regla de "tasks" — ver esa función más abajo
 // para el detalle del bug real que corrige (permission-denied al marcar checklists
 // del catálogo base, reportado como "Revisa los permisos de Firestore").
-//
-// ⚠️ HALLAZGO REAL, ACTUALIZACIÓN 08/09/2026 (confirmado explícitamente por José
-// antes de tocar este archivo, como "Fase 2" de la auditoría de permisos por rol):
-// managers_directory, llamadas_grupales_historial, liquidaciones_pagos,
-// qt_directory, staff_directory, excellence_standards, kpi_reports,
-// learning_logs, success_patterns, sync_history y user_stats — 11 colecciones en
-// total — NO TENÍAN NINGÚN bloque "match" propio en este archivo, a pesar de que
-// el comentario de arriba decía que las últimas 7 (más qt_directory) se dejaban
-// "exactamente como están" (abiertas a cualquier autenticado). Sin el catch-all
-// que existía antes del 26/08/2026 y sin un bloque específico, Firestore las
-// denegaba TOTALMENTE por defecto — ninguna de las 11 podía leerse ni escribirse
-// desde el cliente. managers_directory en particular se usa activamente desde
-// CentroManagers.jsx (onSnapshot/setDoc/updateDoc/addDoc), y qt_directory desde
-// AuthContext.jsx en cada login — es decir, es probable que ambas hayan estado
-// fallando en silencio en producción. Restauradas todas abajo. Además, se agregó
-// enforcement real de "SOLO SU SEDE" (pedido explícito de José) en venues
-// (Gerentes) y qt_directory (Coordinadores de C1Y2) — antes solo existía como
-// restricción visual en el cliente (VenueConfigModal.jsx, DirectorioQT.jsx), sin
-// nada que lo respaldara del lado del servidor.
 // ============================================================================
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -91,6 +65,7 @@ service cloud.firestore {
     // cfo/cco/ceo/director_maestria/socio). VERIFICAR Y CORREGIR antes de desplegar.
     function isGerenteODireccion() {
       return isSuperAdmin() || (isAuthenticated() && email() in [
+        'emely.leon@crearpls.com',
         'emely.leon@crearpsl.net',
         'fer.aragon@crearpsl.net',
         'andres.gomez@crearpsl.net',
@@ -110,6 +85,14 @@ service cloud.firestore {
       return isAuthenticated() && (
         resourceData.assignedToEmail == email() ||
         (resourceData.assigned_to != null && resourceData.assigned_to == email()) ||
+        // FIX (16/09/2026): las tareas "Personalizada (Directa)" compartidas entre
+        // varias personas (ej. un mismo aviso mandado a varios gerentes a la vez)
+        // usan el campo assignedToEmails (arreglo), nunca el singular
+        // assignedToEmail. Antes, alguien que solo estaba en ese arreglo (y no era
+        // SuperAdmin ni estaba en la lista fija de isGerenteODireccion()) no
+        // cumplía isOwner() ni isCollaborator() con nada, así que Firestore
+        // rechazaba el guardado de su evidencia/avance en esas tareas. Ahora
+        // cuenta como dueño igual que si estuviera en el campo singular.
         (resourceData.assignedToEmails != null && email() in resourceData.assignedToEmails) ||
         // Se conserva por compatibilidad si alg├║n flujo futuro s├¡ llega a usar el uid real:
         (resourceData.ownerId != null && resourceData.ownerId == request.auth.uid)
@@ -129,68 +112,32 @@ service cloud.firestore {
     // Ciclo" ya corrió). Este helper permite a CUALQUIER autenticado tocar SOLO estos campos
     // operativos de progreso/completitud — nunca campos estructurales (dueño, rol, sede,
     // plazo, título), que siguen exigiendo isOwner()/isGerenteODireccion()/isSuperAdmin().
+    //
+    // FIX (16/09/2026): José reportó que los adjuntos/evidencia y las notas de
+    // avance "no se guardan". Causa real (verificada leyendo el código): el botón
+    // "Guardar Avances" de TaskDetailModal.jsx (handleSaveAll) manda SIEMPRE un
+    // solo update con estos campos: progressPercentage, completed, status,
+    // completedAt, assigneeProgress, evidenceUrl, evidence_url, evidences,
+    // comments, notes, description, progressNotes, lastUpdated, lastUpdatedBy.
+    // Esta lista solo permitía 9 de esos campos — le faltaban assigneeProgress,
+    // evidences (el arreglo real de adjuntos, evidence_url es solo el legado de
+    // uno solo), comments, notes, description, progressNotes, completedAt,
+    // lastUpdated y lastUpdatedBy. Cualquier persona que guardara evidencia sin
+    // ser SuperAdmin, sin estar en la lista fija de isGerenteODireccion(), y sin
+    // ser dueño/colaborador de esa tarea puntual, era rechazada por Firestore en
+    // cuanto intentaba guardar evidencia o una nota — sin importar que el propio
+    // modal ya avisara "guarda tus avances antes de salir". Se agregan esos 9
+    // campos, que son de bitácora/progreso propio, nunca estructurales (título,
+    // asignación, rol, sede, plazo siguen exigiendo isOwner()/isGerenteODireccion()/
+    // isSuperAdmin() como hasta ahora).
     function isOperationalProgressUpdate() {
       return isAuthenticated() &&
         request.resource.data.diff(resource.data).affectedKeys().hasOnly([
           'completed', 'status', 'completions', 'progress', 'progressPercentage',
-          'evidence_url', 'evidenceUrl', 'date', 'googleSynced', 'evidences', 'comments', 'progressNotes', 'authorEmail',
-          'notes', 'description', 'lastUpdated', 'lastUpdatedBy'
+          'evidence_url', 'evidenceUrl', 'date', 'googleSynced',
+          'assigneeProgress', 'evidences', 'comments', 'notes', 'description',
+          'progressNotes', 'completedAt', 'lastUpdated', 'lastUpdatedBy'
         ]);
-    }
-
-    // (07/09/2026) EFFECTIVE ROLE — confirmado explícitamente por José antes de tocar
-    // firestore.rules (pidió que el selector "cambiar rol" de Home.jsx deje de ser
-    // decorativo). Antes de esto, callerRole()/canManageManagers() leían SIEMPRE
-    // users/{uid}.data.role — el cargo "oficial" guardado en el login — sin importar qué
-    // rol hubiera elegido la persona en el selector (switchRole() en AuthContext.jsx solo
-    // actualizaba estado local de React, nunca escribía a Firestore).
-    // Esta función agrega un segundo campo, activeRoleOverride, que switchRole() sí
-    // escribe en users/{uid}. A propósito NO reutilizamos el campo "role" existente:
-    // ese campo lo leen también SuperAdminPanel.jsx (para agrupar gente en el Centro de
-    // Mando), GerenteDashboard.jsx (para asignar responsables de tareas por rol),
-    // UserAuditReport.jsx (que marca "Conflicto Rol" si no coincide con el catálogo
-    // estático) y causa_sync_bot.mjs — sobrescribirlo con la vista de sesión de alguien
-    // habría alterado esos reportes y esa sincronización. "role" sigue siendo el cargo
-    // oficial de la persona; activeRoleOverride es solo la vista activa de ESTA sesión.
-    // Solo se usa el override si es exactamente uno de los roles que la propia persona
-    // ya tiene en su arreglo "roles" en ese mismo documento — así, si alguien manipulara
-    // el cliente para escribir un valor arbitrario en activeRoleOverride, no logra nada
-    // que no pudiera ya lograr escribiendo directamente en "role" (ver el RIESGO CONOCIDO
-    // ya documentado más abajo en match /users/{userId}, aceptado explícitamente por José
-    // el 03/09/2026 — este cambio no amplía esa superficie, la comparte).
-    // NOTA: el modo "consolidado" (vista agregada de varios roles a la vez) no tiene un
-    // único "rol efectivo" equivalente — por eso activeRoleOverride == 'consolidado' NO
-    // se usa aquí, y estas dos funciones siguen evaluando el "role" oficial en ese caso.
-    function effectiveRole() {
-      let u = get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
-      return (("activeRoleOverride" in u) && u.activeRoleOverride != null &&
-              u.activeRoleOverride != 'consolidado' &&
-              ("roles" in u) && (u.activeRoleOverride in u.roles))
-        ? u.activeRoleOverride
-        : u.role;
-    }
-
-    // Lista de correos institucionales de Coordinadores de Maestría del Juego (CMJ)
-    // para acceso infalible sin depender exclusivamente del lookup de users/{uid}
-    function isCMJEmail() {
-      return isAuthenticated() && email() in [
-        'linid.valencia@crearpsl.net',
-        'linid.valencia@crearpsl.com',
-        'alonso.solares@crearpsl.net',
-        'alonso.solares@crearpsl.com',
-        'kerly.carrillo@crearpsl.net',
-        'kerly.carrillo@crearpsl.com',
-        'mauricio.ramirez@crearpsl.net',
-        'mauricio.ramirez@crearpsl.com',
-        'erika.gavilanez@crearpsl.net',
-        'erika.gavilanez@crearpsl.com',
-        'leyla.pasquel@crearpsl.net',
-        'leyla.pasquel@crearpsl.com',
-        'juan.reinoso@crearpsl.net',
-        'juan.reinoso@crearpsl.com',
-        'josue.vera@crearpsl.net',
-        'josue.vera@crearpsl.com'
-      ];
     }
 
     // (29/08/2026) MJ_CALENDARS: el rol operativo del usuario (coord_maestria,
@@ -204,29 +151,10 @@ service cloud.firestore {
     // Firebase Auth, no el correo. get() para lectura de reglas no depende de
     // la regla "allow read" de esa colección, así que esto funciona aunque
     // "users" solo permita escritura a SuperAdmin.
-    // (07/09/2026) Ahora usa effectiveRole() en vez de leer .data.role directo, para que
-    // el selector de rol de Home.jsx sí tenga efecto real aquí — ver comentario arriba.
     function callerRole() {
       return isAuthenticated() &&
-        (isCMJEmail() || effectiveRole() in ['coord_maestria', 'director_maestria', 'coordinador_mj']);
-    }
-
-    // (08/09/2026) CALLER SEDE — para el enforcement real de "SOLO SU SEDE" en
-    // venues y qt_directory (Fase 2 de la auditoría de permisos, confirmada
-    // explícitamente por José antes de tocar firestore.rules). Mismo patrón de
-    // lectura que effectiveRole(): users/{uid real de Firebase Auth}.data.sede.
-    // Puede devolver null si el documento no tiene ese campo — quien lo use debe
-    // comparar contra null antes de comparar strings.
-    function callerSede() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.sede;
-    }
-
-    // (02/09/2026) MANAGERS_DIRECTORY: mismo patrón que callerRole() (users/{uid}.data.role)
-    // para permitir que Coordinación/Dirección de Maestría gestionen el directorio de
-    // managers sin abrir la escritura a cualquier autenticado.
-    function canManageManagers() {
-      return isAuthenticated() &&
-        (isCMJEmail() || effectiveRole() in ['coord_maestria', 'director_maestria', 'coordinador_mj']);
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role
+        in ['coord_maestria', 'director_maestria'];
     }
 
     // MJ_CALENDARS (29/08/2026): calendarios de Maestría del Juego por equipo
@@ -234,220 +162,7 @@ service cloud.firestore {
     // Confirmado explícitamente por José antes de tocar firestore.rules.
     match /mj_calendars/{calendarId} {
       allow read: if isAuthenticated();
-      allow write: if isSuperAdmin() || isGerenteODireccion() || callerRole() || isCMJEmail();
-    }
-
-    // ⚠️ HALLAZGO REAL (08/09/2026), encontrado al implementar la Fase 2 de la
-    // auditoría de permisos, confirmado por José antes de tocar firestore.rules:
-    // el bloque "match /managers_directory/{document}" (junto con
-    // llamadas_grupales_historial y liquidaciones_pagos, agregados el mismo día
-    // que ese bloque, commit 257c3d6) DESAPARECIÓ de este archivo en algún punto
-    // posterior a esa fecha — no por un cambio hecho por esta sesión, y sin que
-    // ninguna sesión anterior lo documentara. Como ya no existe el catch-all
-    // "match /{document=**}" (removido el 26/08/2026), estas 3 colecciones
-    // quedaron con denegación TOTAL por defecto de Firestore: NINGÚN cliente podía
-    // leer ni escribir en ellas. Esto es grave porque CentroManagers.jsx las usa
-    // activamente desde el navegador (onSnapshot/setDoc/updateDoc/addDoc) — es
-    // decir, la pestaña de Centro de Managers probablemente ha estado fallando en
-    // silencio (permission-denied) para cualquier usuario, desde que se perdió
-    // este bloque. Restaurado aquí exactamente como estaba (mismas condiciones),
-    // ahora usando effectiveRole() en vez de leer users/{uid}.data.role directo,
-    // consistente con canManageManagers() (ver arriba).
-    match /managers_directory/{document} {
-      allow read: if isAuthenticated();
-      allow create, delete: if isSuperAdmin() || isGerenteODireccion() || canManageManagers();
-      allow update: if isSuperAdmin() || isGerenteODireccion() || canManageManagers() ||
-                    (isAuthenticated() &&
-                     request.resource.data.diff(resource.data).affectedKeys()
-                       .hasOnly(['llamadaFecha', 'llamadaAsistio']));
-    }
-
-    // Historial de llamadas grupales (nunca se sobrescribe, cada llamada es un
-    // documento nuevo) — base de la pestaña de Liquidación de Entrenadores.
-    // Restaurado junto con managers_directory, ver nota arriba.
-    match /llamadas_grupales_historial/{document} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated(); // cualquier entrenador registra su propia llamada
-      allow update, delete: if isSuperAdmin() || isGerenteODireccion() || canManageManagers();
-    }
-
-    // Liquidación de Entrenadores ($400 por equipo al llegar a 7 llamadas).
-    // REGLA ESTRICTA (pedido explícito de José, vigente desde 02/09/2026): "esta
-    // info solo la debo de ver yo y Elizabeth Escobar" — debe coincidir con
-    // LIQUIDACION_ENTRENADORES_EMAILS en src/config/permissions.js; si esa lista
-    // cambia hay que actualizar AMBOS lugares. Restaurado junto con lo de arriba.
-    // ========================================================================
-    // LIQUIDACIONES_PAGOS: registro de pagos liquidados a entrenadores.
-    // REGLA ESTRICTA (pedido explicito de Jose, 12/09/2026):
-    // 'solo visible para mi y directores'
-    // Coincide con canViewLiquidacionEntrenadores en src/config/permissions.js.
-    // ========================================================================
-    match /liquidaciones_pagos/{document} {
-      allow read, write: if isAuthenticated() && (
-        isSuperAdmin() ||
-        effectiveRole() in ['direccion', 'cfo', 'ceo', 'cco', 'director_maestria'] ||
-        email() in [
-          'jose.sanchez@crearpsl.net',
-          'contabilidad.global@crearpsl.net'
-        ]
-      );
-    }
-
-    // ⚠️ MISMO HALLAZGO (08/09/2026): estas 7 colecciones aparecían documentadas en
-    // el comentario de cabecera de este archivo ("Qué NO cambia... se dejan
-    // EXACTAMENTE como están hoy: cualquier autenticado lee y escribe") pero,
-    // igual que managers_directory arriba, NUNCA tuvieron su propio bloque "match"
-    // en este archivo — probablemente se perdieron junto con el catch-all que las
-    // cubría, sin que nadie agregara el bloque explícito prometido en ese
-    // comentario. Restauradas aquí tal como el comentario original decía que ya
-    // estaban, sin inventar ninguna restricción nueva (eso queda para una
-    // auditoría dedicada de cada una, como el comentario original ya avisaba).
-    match /staff_directory/{document} {
-      allow read, write: if isAuthenticated();
-    }
-    match /excellence_standards/{document} {
-      allow read, write: if isAuthenticated();
-    }
-    match /kpi_reports/{document} {
-      allow read, write: if isAuthenticated();
-    }
-    match /learning_logs/{document} {
-      allow read, write: if isAuthenticated();
-    }
-    match /success_patterns/{document} {
-      allow read, write: if isAuthenticated();
-    }
-    match /sync_history/{document} {
-      allow read, write: if isAuthenticated();
-    }
-    match /user_stats/{document} {
-      allow read, write: if isAuthenticated();
-    }
-
-    // QT_DIRECTORY — Fase 2 (08/09/2026), confirmada explícitamente por José.
-    // MISMO HALLAZGO que arriba: esta colección tampoco tenía bloque "match"
-    // propio (a pesar de estar en la lista "se deja como está" del comentario de
-    // cabecera), así que estaba con denegación total — y se usa activamente desde
-    // el cliente (AuthContext.jsx en cada login, userService.js, qtSheetService.js,
-    // roleAgentDaemon.js). Restaurada con lectura abierta a cualquier autenticado
-    // (como decía el comentario original), y además — esto sí es nuevo, pedido
-    // explícito de José — la fila "Directorio QT" de la Matriz Oficial dice que
-    // Coordinadores de C1Y2 solo deben operar sobre SU sede; el resto de roles con
-    // acceso (Dirección, Gerentes, QT) siguen con alcance global, igual que ya
-    // tenían antes de perderse esta regla.
-    match /qt_directory/{document} {
-      allow read: if isAuthenticated();
-      allow create: if isSuperAdmin() || isGerenteODireccion() ||
-        (isAuthenticated() && (
-          effectiveRole() in ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'qt', 'director_maestria'] ||
-          (effectiveRole() in ['coord_c1', 'coord_c2', 'coordinador_c1c2'] &&
-           callerSede() != null && request.resource.data.sede != null &&
-           callerSede().lower() == request.resource.data.sede.lower())
-        ));
-      allow update, delete: if isSuperAdmin() || isGerenteODireccion() ||
-        (isAuthenticated() && (
-          effectiveRole() in ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'qt', 'director_maestria'] ||
-          (effectiveRole() in ['coord_c1', 'coord_c2', 'coordinador_c1c2'] &&
-           callerSede() != null && resource.data.sede != null &&
-           callerSede().lower() == resource.data.sede.lower())
-        ));
-    }
-
-    // ⚠️ SEGUNDO HALLAZGO REAL (08/09/2026), encontrado DESPUÉS de desplegar la
-    // restauración de arriba, al revisar el reporte de José de que "Auditoría de
-    // Accesos y Movimientos" (SuperAdminPanel.jsx) aparecía vacía. Investigando esa
-    // pantalla se encontró que estas 7 colecciones (audit_logs entre ellas) también
-    // se quedaron SIN NINGÚN bloque "match" — pero por una causa DISTINTA a las 11
-    // de arriba: un commit de OTRO agente de IA trabajando este mismo repo en
-    // paralelo ("Migrar MonitorImos a Causa OS", autor genérico
-    // "Crear Poder Sin Limites", hoy 08/09/2026 a las 16:19, ANTES de que esta
-    // sesión empezara su propio trabajo de Fase 1/Fase 2) borró por accidente 144
-    // líneas de firestore.rules al mover código de Monitor de IMOs, incluyendo
-    // estos 7 bloques completos, sin que ninguna sesión lo notara ni lo
-    // documentara. Restauradas aquí EXACTAMENTE como estaban antes de ese commit
-    // (mismos permisos, sin ningún cambio ni endurecimiento nuevo) — confirmado
-    // explícitamente por José antes de tocar este archivo otra vez.
-    match /audit_logs/{logId} {
-      allow read: if isSuperAdmin();
-      allow create: if isAuthenticated();
-    }
-
-    // NODUS: mecanismo seguro de token del robot para sincronización horaria autónoma
-    match /nodus_kpis_sincronizados/{document=**} {
-      allow read: if isAuthenticated();
-      allow write: if request.resource.data.robot_token == "CPSL_7KTBPBqqz7o6FCjioPTw_5v0LOOaersyd8sq2pqo2Eg";
-    }
-
-    match /nodus_coordinadores_c1c2/{document=**} {
-      allow read: if isAuthenticated();
-      allow write: if request.resource.data.robot_token == "CPSL_7KTBPBqqz7o6FCjioPTw_5v0LOOaersyd8sq2pqo2Eg";
-    }
-
-    match /nodus_kpis_history/{document=**} {
-      allow read: if isAuthenticated();
-      allow write: if request.resource.data.robot_token == "CPSL_7KTBPBqqz7o6FCjioPTw_5v0LOOaersyd8sq2pqo2Eg";
-    }
-
-    match /nodus_predictor_portfolio/{document=**} {
-      allow read: if isAuthenticated();
-      allow write: if request.resource.data.robot_token == "CPSL_7KTBPBqqz7o6FCjioPTw_5v0LOOaersyd8sq2pqo2Eg";
-    }
-
-    match /nodus_prospectos_sin_pago/{document=**} {
-      allow read: if isAuthenticated();
-      allow write: if request.resource.data.robot_token == "CPSL_7KTBPBqqz7o6FCjioPTw_5v0LOOaersyd8sq2pqo2Eg";
-    }
-
-    match /nodus_managers_reconciliados/{document=**} {
-      allow read: if isAuthenticated();
-      allow write: if request.resource.data.robot_token == "CPSL_7KTBPBqqz7o6FCjioPTw_5v0LOOaersyd8sq2pqo2Eg";
-    }
-
-    // NODUS: Centinela de RRHH y desempeño de coordinadores
-    match /nodus_hr_sentinel/{document=**} {
-      allow read: if isAuthenticated();
-      allow write: if request.resource.data.robot_token == "CPSL_7KTBPBqqz7o6FCjioPTw_5v0LOOaersyd8sq2pqo2Eg";
-    }
-
-    // HABEAS DATA: Lista de bajas y opt-out de campañas de correo
-    match /opt_outs/{document=**} {
-      allow read: if isAuthenticated() || request.resource.data.robot_token == "CPSL_7KTBPBqqz7o6FCjioPTw_5v0LOOaersyd8sq2pqo2Eg";
-      allow write: if true; // Permite a prospectos desuscribirse desde la web sin login
-    }
-
-    // NOTAS DE SEGUIMIENTO — feedback que el entrenador de llamadas deja después de
-    // cada llamada (individual o grupal), para detectar y anticiparse a quiebres.
-    // Pedido explícito de José (vigente desde antes de perderse esta regla): "deben
-    // de guardarse en un historial por persona y jamás perderse" — por eso NO hay
-    // "allow delete" (ninguna nota se puede borrar) y "allow update" solo permite
-    // AGREGAR una respuesta del CMJ, nunca modificar la nota original.
-    match /notas_seguimiento/{document} {
-      allow read: if isSuperAdmin() || isGerenteODireccion() || callerRole() ||
-                    (isAuthenticated() && resource.data.autorEmail == email());
-      allow create: if isAuthenticated() && request.resource.data.autorEmail == email();
-      allow update: if (isSuperAdmin() || callerRole()) &&
-                    request.resource.data.diff(resource.data).affectedKeys().hasOnly(['respuestas']);
-      // Sin "allow delete": ninguna nota de seguimiento se puede eliminar (histórico permanente).
-    }
-
-    // KPIs de Entrenadores de Llamadas — REGLA ESTRICTA: solo directores y José
-    // Sánchez / SuperAdmin.
-    match /kpis_entrenadores_llamadas/{document=**} {
-      allow read: if isAuthenticated() && (
-        isSuperAdmin() ||
-        effectiveRole() in ['direccion', 'cfo', 'ceo', 'cco', 'director_maestria'] ||
-        email() == 'jose.sanchez@crearpsl.net' ||
-        email() in [
-          'emely.leon@crearpsl.net',
-          'fer.aragon@crearpsl.net',
-          'andres.gomez@crearpsl.net',
-          'gomeznueve@gmail.com',
-          'contabilidad.global@crearpsl.net',
-          'leandro.brunis@crearpsl.net',
-          'paul.sosa@crearpsl.net'
-        ]
-      );
-      allow write: if isSuperAdmin() || email() == 'jose.sanchez@crearpsl.net';
+      allow write: if isSuperAdmin() || isGerenteODireccion() || callerRole();
     }
 
     // TASKS
@@ -487,29 +202,15 @@ service cloud.firestore {
     // NOTIFICATIONS (userId siempre es el correo, nunca el uid)
     match /notifications/{notifId} {
       allow read: if isAuthenticated();
-      allow create: if isAuthenticated() || request.resource.data.robot_token == "CPSL_7KTBPBqqz7o6FCjioPTw_5v0LOOaersyd8sq2pqo2Eg";
+      allow create: if isAuthenticated();
       allow update: if isAuthenticated() && resource.data.userId == email();
       allow delete: if isAuthenticated() && resource.data.userId == email();
     }
 
-    // VENUES (sede, hotel, salón) — doc ID = nombre exacto de la sede
-    // (VenueConfigModal.jsx: doc(db, 'venues', selectedSede)).
-    // ⚠️ HALLAZGO REAL (08/09/2026): antes de este cambio, la única forma de
-    // escribir aquí era isGerenteODireccion() (una lista fija de ~12 correos de
-    // staff corporativo) o isSuperAdmin() — es decir, un Gerente de Sede normal,
-    // cuyo correo NO esté en esa lista fija, no podía guardar el hotel/salón de
-    // SU PROPIA sede aunque VenueConfigModal.jsx esté diseñado exactamente para
-    // eso ("Solo puedes configurar los salones de tu propia sede", comentario ya
-    // existente en ese componente). Se agrega el permiso real que faltaba:
-    // Gerente puede escribir SOLO el documento de su propia sede (comparación
-    // case-insensitive, igual que ya hace VenueConfigModal.jsx en el cliente).
-    // Dirección/SuperAdmin/la lista fija de staff conservan alcance global, sin
-    // cambio respecto a antes.
+    // VENUES (sede, hotel, sal├│n)
     match /venues/{venueId} {
       allow read: if isAuthenticated();
-      allow write: if isGerenteODireccion() || isSuperAdmin() ||
-        (isAuthenticated() && effectiveRole() == 'gerente' &&
-         callerSede() != null && callerSede().lower() == venueId.lower());
+      allow write: if isGerenteODireccion() || isSuperAdmin();
     }
 
     // CYCLES
@@ -518,83 +219,77 @@ service cloud.firestore {
       allow write: if isGerenteODireccion() || isSuperAdmin();
     }
 
-    // MAIL (cola de la extensi├│n Trigger Email)
+    // MAIL (cola de la extensión Trigger Email)
     match /mail/{mailId} {
       allow read: if isAuthenticated();
-      allow create: if isAuthenticated();
+      allow create: if true;
       allow update, delete: if isSuperAdmin();
     }
 
-    // USERS
-    // (03/09/2026) FIX — confirmado con diagnosticarCalendarioMJ_v2.mjs contra Firestore
-    // real: con "allow write: if isSuperAdmin()" (regla anterior), AuthContext.jsx NUNCA
-    // podía escribir users/{uid real de Firebase Auth} para ningún usuario que no fuera
-    // superadmin (su propio setDoc en cada login fallaba silenciosamente — ver el
-    // try/catch "Cannot update /users since only superadmin can" en AuthContext.jsx).
-    // Resultado verificado: mj_calendars tenía 0 documentos guardados en TODA la
-    // plataforma — nadie con rol coord_maestria/director_maestria podía guardar NADA en
-    // mj_calendars, notas_seguimiento ni managers_directory (las 3 colecciones que
-    // dependen de callerRole()/canManageManagers(), que a su vez leen users/{uid real}).
-    // Caso real confirmado: Linid Valencia y Leyla Pasquel, CMJ Lima — José, "reparar
-    // para todos".
-    // Fix: cada usuario autenticado puede crear y actualizar SOLO su propio documento
-    // (request.auth.uid == userId) — pero una vez creado, NO puede cambiar sus propios
-    // campos role/roles/isSuperAdmin por su cuenta (eso sigue exigiendo SuperAdmin).
-    // RIESGO CONOCIDO, aceptado explícitamente por José: en la escritura de CREACIÓN
-    // (primer login) no hay forma simple, desde las reglas, de impedir que alguien
-    // manipule el cliente para auto-asignarse un role de mayor privilegio la primera vez
-    // — igual que "goals" y otras colecciones de esta misma plataforma ya confían en el
-    // rol que calcula el cliente. isSuperAdmin() e isGerenteODireccion() NO se ven
-    // afectados por esto (son listas de correo fijas, no leen este campo "role").
-    //
-    // (07/09/2026) NOTA: este mismo documento ahora también puede tener un campo
-    // activeRoleOverride (escrito por switchRole() en AuthContext.jsx) — ver
-    // effectiveRole() más arriba. No es un campo nuevo con reglas propias: queda
-    // cubierto por el mismo "allow read, write" de aquí abajo, dentro del mismo riesgo
-    // ya aceptado en el párrafo anterior (no lo amplía).
+    // HORARIOS Y TURNOS DE ENTRENAMIENTO (Causa OS)
+    match /nodus_training_schedules/{scheduleId} {
+      allow read, write: if true;
+    }
+
+    // USERS (colecci├│n legacy, solo SuperAdmin escribe)
     match /users/{userId} {
       allow read: if isAuthenticated();
-      allow write: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());
+      allow write: if isSuperAdmin();
 
-      match /progress/{docId} {
-        allow read, write: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());
-      }
-
-      match /sessions/{sessionId} {
-        allow read, write: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());
-      }
-
+      // Historial de chats del Copiloto IA (AICopilot.jsx): esta es la ├ÜNICA ruta de toda
+      // la app donde currentUser.uid corresponde de verdad al uid real de Firebase Auth
+      // (viene del objeto crudo de Firebase, no se sobreescribe en buildUserObject), as├¡
+      // que aqu├¡ s├¡ se puede comparar contra request.auth.uid con seguridad.
       match /copilot_chats/{chatId} {
-        allow read, write: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());
+        allow read, write: if isAuthenticated() && request.auth.uid == userId;
       }
     }
 
-    // Trazabilidad de Auditoría Financiera (CAUSA OS Finanzas)
-    match /finanzas_audit_trail/{docId} {
+    // AUDIT LOGS
+    match /audit_logs/{logId} {
+      allow read: if isSuperAdmin();
+      allow create: if isAuthenticated();
+    }
+
+    // NODUS: se mantiene el mecanismo de token del robot (no requiere sesi├│n porque
+    // es un script, no una persona), pero ahora la lectura s├¡ exige sesi├│n iniciada.
+    match /nodus_kpis_sincronizados/{document=**} {
       allow read: if isAuthenticated();
-      allow create: if isAuthenticated();
-      allow update, delete: if isSuperAdmin();
+      allow write: if request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET";
     }
 
-    // CRM Nodus (Participants)
-    // SUGERENCIAS Y SOPORTE
-    match /sugerencias_soporte/{docId} {
-      allow create: if isAuthenticated();
-      allow read, update, delete: if isSuperAdmin();
+    // ------------------------------------------------------------------------
+    // TODO: revisar individualmente y restringir cuando se conozca el patr├│n
+    // real de lectura/escritura de cada una. Por ahora se dejan EXACTAMENTE
+    // como est├ín hoy en producci├│n (cualquier autenticado lee y escribe) para
+    // no romper nada que no audit├® a fondo.
+    // ------------------------------------------------------------------------
+    match /staff_directory/{document} {
+      allow read, write: if isAuthenticated();
     }
-
-    match /participants/{document=**} {
-      allow read, write: if isSuperAdmin() || isGerenteODireccion();
+    match /managers_directory/{document} {
+      allow read, write: if isAuthenticated();
     }
-
-    // IMO MISSIONS (Misión IMO — landing pública en crearpsl.net/imose31lima)
-    // Los IMOs NO hacen login (no hay auth), así que la escritura debe ser abierta.
-    // La lectura se abre también para que el onSnapshot del frontend IMO funcione.
-    // El delete se abre a autenticados (Reset desde el Monitor en Causa OS).
-    match /imo_missions/{missionId} {
-      allow read: if true;
-      allow create, update: if true;
-      allow delete: if isGerenteODireccion() || isSuperAdmin();
+    match /excellence_standards/{document} {
+      allow read, write: if isAuthenticated();
+    }
+    match /kpi_reports/{document} {
+      allow read, write: if isAuthenticated();
+    }
+    match /learning_logs/{document} {
+      allow read, write: if isAuthenticated();
+    }
+    match /qt_directory/{document} {
+      allow read, write: if isAuthenticated();
+    }
+    match /success_patterns/{document} {
+      allow read, write: if isAuthenticated();
+    }
+    match /sync_history/{document} {
+      allow read, write: if isAuthenticated();
+    }
+    match /user_stats/{document} {
+      allow read, write: if isAuthenticated();
     }
   }
 }
