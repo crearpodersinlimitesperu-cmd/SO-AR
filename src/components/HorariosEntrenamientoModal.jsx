@@ -3,33 +3,55 @@ import {
   X, Clock, Shirt, Sparkles, CheckCircle2, ShieldCheck, Calendar, Info, 
   Briefcase, Building, UserCheck, Lock, Eye, Mail, MessageSquare, Send, 
   Save, Plus, Trash2, Edit2, Check, Users, AlertCircle, Copy, UserPlus, 
-  ChevronRight, ArrowRight
+  ChevronRight, MapPin
 } from 'lucide-react';
 import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '../services/firebase';
+import { USERS_TO_IMPORT } from '../data/usersToImport';
+import { normalizeRole, normalizeSede, OPERATIONAL_SEDES } from '../data/usersData';
+import { useCycles } from '../context/CyclesContext';
 
-// Personal inicial por defecto (SIN LEYLA PASQUEL - 100% desvinculada)
-const INITIAL_STAFF = [
-  { id: 'linid', name: 'Linid Valencia', email: 'linid.valencia@crearpsl.net', role: 'Coordinadora Maestría' },
-  { id: 'joyce', name: 'Joyce Villanueva', email: 'joyce.villanueva@crearpsl.net', role: 'Coordinadora C1/C2' },
-  { id: 'jose', name: 'Jose Sanchez', email: 'jose.sanchez@crearpsl.net', role: 'Gerente de Operaciones' },
-  { id: 'diana', name: 'Diana Rodriguez', email: 'diana.rodriguez@crearpsl.net', role: 'Coordinadora Sede' }
-];
+// Helper para obtener los gerentes y coordinadores reales de una sede
+function getLeadershipForSede(sedeName) {
+  const cleanTarget = normalizeSede(sedeName).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const leaders = USERS_TO_IMPORT.filter(u => {
+    // Excluir personal desvinculado
+    const email = (u.email || '').toLowerCase();
+    const name = (u.name || '').toLowerCase();
+    if (email.includes('leyla') || name.includes('leyla')) return false;
 
-// Matriz inicial de turnos y tareas por defecto (Nodus / Causa OS)
-const INITIAL_SCHEDULE_ROWS = [
+    const uSede = normalizeSede(u.sede || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const uRole = (u.role || u.appRole || '').toLowerCase();
+    const isThisSede = uSede.includes(cleanTarget);
+    const isLeader = uRole.includes('gerente') || uRole.includes('coord') || uRole.includes('director');
+    return isThisSede && isLeader;
+  });
+
+  return leaders.map(u => {
+    let cleanRole = 'Coordinador';
+    const r = (u.role || u.appRole || '').toLowerCase();
+    if (r.includes('gerente')) cleanRole = 'Gerente de Sede';
+    else if (r.includes('maestria') || r.includes('mj')) cleanRole = 'Coord. Maestría';
+    else if (r.includes('c1') || r.includes('c2')) cleanRole = 'Coord. C1/C2';
+
+    return {
+      id: u.id || u.email.split('@')[0],
+      name: u.name,
+      role: cleanRole,
+      email: u.email
+    };
+  });
+}
+
+// Plantilla de filas iniciales por entrenamiento
+const DEFAULT_SCHEDULE_TEMPLATE = [
   // UNO (C1)
   {
     id: 'uno_jue_1',
     training: 'UNO',
     dia: 'Jueves',
     horario: '4:30 PM - Cierre',
-    assignments: {
-      linid: '—',
-      joyce: '(Grounding)',
-      jose: 'Cierre (Grounding C1)',
-      diana: '(Grounding)'
-    },
+    assignments: {},
     vestimenta: 'Negro',
     nota: 'Grounding Inicial C1'
   },
@@ -38,12 +60,7 @@ const INITIAL_SCHEDULE_ROWS = [
     training: 'UNO',
     dia: 'Viernes',
     horario: '7:30 AM - 3:00 PM',
-    assignments: {
-      linid: '—',
-      joyce: '✓',
-      jose: '✓',
-      diana: '✓'
-    },
+    assignments: {},
     vestimenta: 'Negro formal',
     nota: 'Jornada Mañana'
   },
@@ -52,12 +69,7 @@ const INITIAL_SCHEDULE_ROWS = [
     training: 'UNO',
     dia: 'Viernes',
     horario: '5:00 PM - Cierre',
-    assignments: {
-      linid: 'Cierre Noche De Confianza',
-      joyce: '✓',
-      jose: '—',
-      diana: '✓'
-    },
+    assignments: {},
     vestimenta: 'Negro formal',
     nota: 'Noche de Confianza'
   },
@@ -66,12 +78,7 @@ const INITIAL_SCHEDULE_ROWS = [
     training: 'UNO',
     dia: 'Sábado',
     horario: '8:00 AM - 4:00 PM',
-    assignments: {
-      linid: 'Caída Confianza',
-      joyce: '✓',
-      jose: '—',
-      diana: '✓'
-    },
+    assignments: {},
     vestimenta: 'Polo negro + pantalón negro',
     nota: 'Caída de Confianza'
   },
@@ -80,12 +87,7 @@ const INITIAL_SCHEDULE_ROWS = [
     training: 'UNO',
     dia: 'Sábado',
     horario: '3:00 PM - Cierre',
-    assignments: {
-      linid: '✓',
-      joyce: '✓',
-      jose: '✓',
-      diana: '—'
-    },
+    assignments: {},
     vestimenta: 'Polo negro + pantalón negro',
     nota: 'Turno Tarde'
   },
@@ -94,12 +96,7 @@ const INITIAL_SCHEDULE_ROWS = [
     training: 'UNO',
     dia: 'Domingo',
     horario: '8:00 AM - Cierre',
-    assignments: {
-      linid: '✓',
-      joyce: '✓',
-      jose: '✓',
-      diana: '✓'
-    },
+    assignments: {},
     vestimenta: 'Polo negro + pantalón negro',
     nota: 'Graduación y Cierre Ciclo'
   },
@@ -110,12 +107,7 @@ const INITIAL_SCHEDULE_ROWS = [
     training: 'DOS',
     dia: 'Jueves',
     horario: '10:30 AM - 4:00 PM',
-    assignments: {
-      linid: '✓',
-      joyce: '✓',
-      jose: '✓',
-      diana: '✓'
-    },
+    assignments: {},
     vestimenta: 'Negro formal',
     nota: 'Apertura Oficial C2'
   },
@@ -124,12 +116,7 @@ const INITIAL_SCHEDULE_ROWS = [
     training: 'DOS',
     dia: 'Jueves',
     horario: '4:00 PM - Cierre',
-    assignments: {
-      linid: '✓',
-      joyce: '✓',
-      jose: '—',
-      diana: '—'
-    },
+    assignments: {},
     vestimenta: 'Negro formal',
     nota: 'Cierre Jueves C2'
   },
@@ -138,12 +125,7 @@ const INITIAL_SCHEDULE_ROWS = [
     training: 'DOS',
     dia: 'Viernes',
     horario: '7:15 AM - 4:00 PM',
-    assignments: {
-      linid: '✓',
-      joyce: '✓',
-      jose: '✓',
-      diana: '✓'
-    },
+    assignments: {},
     vestimenta: 'Polo negro + pantalón negro',
     nota: '14:01 PM Palabra Rota'
   },
@@ -152,12 +134,7 @@ const INITIAL_SCHEDULE_ROWS = [
     training: 'DOS',
     dia: 'Viernes',
     horario: '4:00 PM - Cierre',
-    assignments: {
-      linid: '✓',
-      joyce: '✓',
-      jose: '—',
-      diana: '—'
-    },
+    assignments: {},
     vestimenta: 'Polo negro + pantalón negro',
     nota: 'Guardia y Logística'
   },
@@ -166,12 +143,7 @@ const INITIAL_SCHEDULE_ROWS = [
     training: 'DOS',
     dia: 'Sábado',
     horario: '7:30 AM - 3:00 PM',
-    assignments: {
-      linid: 'TANQUE',
-      joyce: '✓',
-      jose: 'Rompimiento de Barreras',
-      diana: '✓'
-    },
+    assignments: {},
     vestimenta: 'Polo negro + pantalón negro',
     nota: 'Tanque & Rompimiento de Barreras'
   },
@@ -180,12 +152,7 @@ const INITIAL_SCHEDULE_ROWS = [
     training: 'DOS',
     dia: 'Sábado',
     horario: '3:00 PM - Cierre',
-    assignments: {
-      linid: '✓',
-      joyce: '✓',
-      jose: 'Vuelos',
-      diana: '✓'
-    },
+    assignments: {},
     vestimenta: 'Polo negro + pantalón negro',
     nota: 'Vuelos C2'
   },
@@ -194,12 +161,7 @@ const INITIAL_SCHEDULE_ROWS = [
     training: 'DOS',
     dia: 'Domingo',
     horario: 'Inicio - Cierre',
-    assignments: {
-      linid: '✓',
-      joyce: '—',
-      jose: '—',
-      diana: '✓'
-    },
+    assignments: {},
     vestimenta: 'Polo negro + pantalón negro',
     nota: 'Jornada Dominical C2'
   },
@@ -208,12 +170,7 @@ const INITIAL_SCHEDULE_ROWS = [
     training: 'DOS',
     dia: 'Domingo',
     horario: '3:00 PM - Cierre',
-    assignments: {
-      linid: '✓',
-      joyce: '—',
-      jose: '✓',
-      diana: '✓'
-    },
+    assignments: {},
     vestimenta: 'Polo negro + pantalón negro',
     nota: 'Cierre General C2'
   },
@@ -224,12 +181,7 @@ const INITIAL_SCHEDULE_ROWS = [
     training: 'MAESTRÍA',
     dia: 'Viernes',
     horario: '3:00 PM - 9:00 PM',
-    assignments: {
-      linid: '✓',
-      joyce: '✓',
-      jose: '✓',
-      diana: '✓'
-    },
+    assignments: {},
     vestimenta: 'Negro formal',
     nota: 'Alineamiento General Maestría'
   },
@@ -238,12 +190,7 @@ const INITIAL_SCHEDULE_ROWS = [
     training: 'MAESTRÍA',
     dia: 'Sábado',
     horario: '8:30 AM - 12:00 PM / 4:00 PM - 9:00 PM',
-    assignments: {
-      linid: '✓',
-      joyce: '✓',
-      jose: '✓',
-      diana: '✓'
-    },
+    assignments: {},
     vestimenta: 'Camiseta negra + pantalón negro',
     nota: 'Jornada Intensiva MJ'
   },
@@ -252,38 +199,51 @@ const INITIAL_SCHEDULE_ROWS = [
     training: 'MAESTRÍA',
     dia: 'Domingo',
     horario: '8:30 AM - 12:00 PM / 4:00 PM - Cierre',
-    assignments: {
-      linid: '✓',
-      joyce: '✓',
-      jose: '✓',
-      diana: '✓'
-    },
+    assignments: {},
     vestimenta: 'Camiseta negra + pantalón negro',
-    nota: 'FDS 4 El Viaje con Paul Sosa y Pase de Antorcha a las 18:00 PM'
+    nota: 'FDS 4 El Viaje con Paul Sosa y Pase de Antorcha'
   }
 ];
 
 export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUser }) {
   const [activeTab, setActiveTab] = useState('matriz_equipos');
   
-  // Estado de la Matriz Nodus
-  const [staffList, setStaffList] = useState(INITIAL_STAFF);
-  const [scheduleRows, setScheduleRows] = useState(INITIAL_SCHEDULE_ROWS);
+  // Contexto de Ciclos y Fechas Oficiales
+  const cyclesContext = useCycles?.() || {};
+  const { currentCycle, currentStage } = cyclesContext;
+
+  // Sede seleccionada (auto-detecta la sede del usuario)
+  const initialSede = useMemo(() => {
+    const norm = normalizeSede(currentUser?.sede);
+    return OPERATIONAL_SEDES.includes(norm) ? norm : 'Quito';
+  }, [currentUser]);
+
+  const [selectedSede, setSelectedSede] = useState(initialSede);
+
+  // Sede key para Firestore
+  const sedeKey = selectedSede.toLowerCase().trim().replace(/\s+/g, '_');
+  const nodusDocId = `${sedeKey}_horarios_equipos`;
+
+  // Lista de colaboradores y filas por sede
+  const [staffList, setStaffList] = useState([]);
+  const [scheduleRows, setScheduleRows] = useState([]);
   const [filterTraining, setFilterTraining] = useState('TODOS');
   const [highlightPerson, setHighlightPerson] = useState('TODOS');
   const [isSaving, setIsSaving] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
   const [lastSaved, setLastSaved] = useState(null);
-  
-  // Modales de edición profesional
-  const [editingRow, setEditingRow] = useState(null); // Fila abierta en modal de edición
+
+  // Popover rápido de celda activa
+  const [activeCellPicker, setActiveCellPicker] = useState(null); // { rowId, staffId }
+
+  // Modales
   const [showManageStaffModal, setShowManageStaffModal] = useState(false);
   const [showNotifyModal, setShowNotifyModal] = useState(false);
   const [newStaffForm, setNewStaffForm] = useState({ name: '', role: '', email: '' });
   const [copyFeedback, setCopyFeedback] = useState('');
 
-  // Identificación de permisos de Gerencia / Dirección
+  // Identificación de permisos de Gerencia / Administración
   const isManager = useMemo(() => {
     if (!currentUser) return true;
     const role = (currentUser.role || currentUser.appRole || '').toLowerCase();
@@ -304,61 +264,69 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
     );
   }, [currentUser]);
 
-  // Sede normalizada para aislamiento multi-sede
-  const userSede = currentUser?.sede || 'Lima';
-  const sedeKey = userSede.toLowerCase().trim().replace(/\s+/g, '_');
-  const nodusDocId = `${sedeKey}_horarios_equipos`;
-
-  // Sincronización en tiempo real con Nodus (Firestore)
+  // Cargar colaboradores y horarios de la sede seleccionada
   useEffect(() => {
     if (!isOpen) return;
 
+    // 1. Cargar el equipo real de esta sede desde el catálogo oficial
+    const realLeadership = getLeadershipForSede(selectedSede);
+
+    // 2. Suscribirse a Firestore para la sede elegida
     try {
       const docRef = doc(db, 'nodus_training_schedules', nodusDocId);
       const unsub = onSnapshot(docRef, (docSnap) => {
         if (docSnap.exists()) {
           const data = docSnap.data();
           if (data.staff && Array.isArray(data.staff) && data.staff.length > 0) {
-            // Depuración de seguridad: Leyla Pasquel NUNCA debe aparecer
-            const sanitizedStaff = data.staff.filter(s => {
+            // Filtrar y sanear desvinculados
+            const clean = data.staff.filter(s => {
               const name = (s.name || '').toLowerCase();
               const email = (s.email || '').toLowerCase();
               return !name.includes('leyla') && !email.includes('leyla');
             });
-            if (sanitizedStaff.length > 0) {
-              setStaffList(sanitizedStaff);
-            }
+            setStaffList(clean);
+          } else {
+            setStaffList(realLeadership);
           }
+
           if (data.rows && Array.isArray(data.rows) && data.rows.length > 0) {
-            const sanitizedRows = data.rows.map(r => {
-              const newAssignments = { ...(r.assignments || {}) };
-              delete newAssignments.leyla;
-              return { ...r, assignments: newAssignments };
-            });
-            setScheduleRows(sanitizedRows);
+            setScheduleRows(data.rows);
+          } else {
+            // Inicializar filas con el equipo de la sede
+            setScheduleRows(DEFAULT_SCHEDULE_TEMPLATE);
           }
+
           if (data.updatedAt) {
             setLastSaved(new Date(data.updatedAt).toLocaleTimeString());
           }
+        } else {
+          // Si no existe documento previo para esta sede, inicializarlo limpio con su equipo
+          setStaffList(realLeadership);
+          setScheduleRows(DEFAULT_SCHEDULE_TEMPLATE);
+          setLastSaved(null);
         }
       }, (err) => {
-        console.warn('Error leyendo horarios en Nodus:', err);
+        console.warn(`Error leyendo horarios para ${selectedSede}:`, err);
+        setStaffList(realLeadership);
+        setScheduleRows(DEFAULT_SCHEDULE_TEMPLATE);
       });
 
       return () => unsub();
     } catch (err) {
-      console.warn('Error conectando a Nodus:', err);
+      console.warn('Error en conexión Firestore:', err);
+      setStaffList(realLeadership);
+      setScheduleRows(DEFAULT_SCHEDULE_TEMPLATE);
     }
-  }, [isOpen, nodusDocId]);
+  }, [isOpen, selectedSede, nodusDocId]);
 
-  // Guardar en Nodus (Firestore)
+  // Guardar en Nodus (Firestore) para la sede seleccionada
   const handleSaveToNodus = async () => {
     setIsSaving(true);
     setSaveMessage('');
     try {
       const nodusDocRef = doc(db, 'nodus_training_schedules', nodusDocId);
       const payload = {
-        sede: userSede,
+        sede: selectedSede,
         rows: scheduleRows,
         staff: staffList,
         updatedAt: new Date().toISOString(),
@@ -370,25 +338,47 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
 
       setLastSaved(new Date().toLocaleTimeString());
       setHasUnsavedChanges(false);
-      setSaveMessage('Horarios sincronizados y guardados en Nodus');
+      setSaveMessage(`Horarios de ${selectedSede} guardados en Nodus exitosamente`);
       setTimeout(() => setSaveMessage(''), 4000);
     } catch (err) {
       console.error('Error al guardar en Nodus:', err);
-      setSaveMessage('Error al guardar en Nodus. Intente nuevamente.');
+      setSaveMessage('Error al guardar. Intente nuevamente.');
       setTimeout(() => setSaveMessage(''), 4000);
     } finally {
       setIsSaving(false);
     }
   };
 
-  // Guardar cambios de una fila editada en el modal
-  const handleSaveRowEdit = (updatedRow) => {
-    setScheduleRows(prev => prev.map(r => r.id === updatedRow.id ? updatedRow : r));
-    setEditingRow(null);
+  // Modificar campo in-line de una fila (horario, nota, vestimenta, día)
+  const handleInlineRowUpdate = (rowId, field, value) => {
+    setScheduleRows(prev => prev.map(row => {
+      if (row.id === rowId) {
+        return { ...row, [field]: value };
+      }
+      return row;
+    }));
     setHasUnsavedChanges(true);
   };
 
-  // Agregar nueva fila
+  // Modificar celda de asignación de una persona
+  const handleCellAssignment = (rowId, staffId, value) => {
+    setScheduleRows(prev => prev.map(row => {
+      if (row.id === rowId) {
+        return {
+          ...row,
+          assignments: {
+            ...row.assignments,
+            [staffId]: value
+          }
+        };
+      }
+      return row;
+    }));
+    setHasUnsavedChanges(true);
+    setActiveCellPicker(null);
+  };
+
+  // Agregar nuevo turno
   const handleAddNewRow = (trainingType = 'UNO') => {
     const newId = `turno_${trainingType.toLowerCase()}_${Date.now()}`;
     const initialAssignments = {};
@@ -401,13 +391,11 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
       horario: '9:00 AM - 2:00 PM',
       assignments: initialAssignments,
       vestimenta: 'Polo negro + pantalón negro',
-      nota: 'Turno Personalizado'
+      nota: 'Nueva Dinámica'
     };
 
     setScheduleRows(prev => [...prev, newRow]);
     setHasUnsavedChanges(true);
-    // Abrir de inmediato el modal de edición de la nueva fila
-    setEditingRow(newRow);
   };
 
   // Eliminar fila
@@ -415,11 +403,10 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
     if (window.confirm('¿Deseas eliminar este turno de entrenamiento de la matriz?')) {
       setScheduleRows(prev => prev.filter(r => r.id !== rowId));
       setHasUnsavedChanges(true);
-      if (editingRow?.id === rowId) setEditingRow(null);
     }
   };
 
-  // Agregar nuevo colaborador
+  // Agregar nuevo colaborador a la sede
   const handleAddStaffMember = () => {
     if (!newStaffForm.name.trim()) {
       alert('Ingresa el nombre del colaborador');
@@ -429,7 +416,7 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
     const newStaff = {
       id: staffId,
       name: newStaffForm.name.trim(),
-      role: newStaffForm.role.trim() || 'Coordinador / Staff',
+      role: newStaffForm.role.trim() || 'Coordinador',
       email: newStaffForm.email.trim() || ''
     };
 
@@ -446,9 +433,9 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
     setHasUnsavedChanges(true);
   };
 
-  // Eliminar colaborador
+  // Retirar colaborador de la sede
   const handleDeleteStaffMember = (staffId, staffName) => {
-    if (window.confirm(`¿Eliminar al colaborador "${staffName}" y sus asignaciones de la matriz?`)) {
+    if (window.confirm(`¿Retirar a "${staffName}" de la matriz de horarios de ${selectedSede}?`)) {
       setStaffList(prev => prev.filter(s => s.id !== staffId));
       setScheduleRows(prev => prev.map(row => {
         const copy = { ...row.assignments };
@@ -459,47 +446,30 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
     }
   };
 
-  // Renderizador limpio de badges de tareas (conforme al diseño oficial)
-  const renderAssignmentBadge = (val) => {
+  // Badges limpios y clicables para asignación
+  const renderCellBadge = (val, rowId, staffId) => {
     const rawVal = (val || '—').trim();
+    const isPickerOpen = activeCellPicker?.rowId === rowId && activeCellPicker?.staffId === staffId;
 
-    if (rawVal === '✓' || rawVal.toLowerCase() === 'ok' || rawVal.toLowerCase() === 'si') {
-      return (
-        <span style={{ 
-          background: 'rgba(34, 197, 94, 0.12)', 
-          color: '#16a34a', 
-          border: '1px solid rgba(34, 197, 94, 0.3)', 
-          padding: '2px 8px', 
-          borderRadius: '12px', 
-          fontWeight: 800,
-          fontSize: '0.8rem',
-          display: 'inline-block'
-        }}>
-          ✓
-        </span>
-      );
-    }
-
-    if (rawVal === '—' || rawVal === '-' || rawVal === '' || rawVal.toLowerCase() === 'no') {
-      return (
-        <span style={{ color: 'var(--text-muted)', fontWeight: 500, fontSize: '0.85rem' }}>
-          —
-        </span>
-      );
-    }
-
-    // Tareas específicas con la paleta de Causa OS
     let bg = 'rgba(0, 212, 255, 0.1)';
-    let color = 'var(--crear-blue, #00d4ff)';
+    let color = 'var(--crear-blue, #0284c7)';
     let border = 'rgba(0, 212, 255, 0.25)';
 
-    if (rawVal.toLowerCase().includes('tanque')) {
+    if (rawVal === '✓' || rawVal.toLowerCase() === 'ok' || rawVal.toLowerCase() === 'si') {
+      bg = 'rgba(34, 197, 94, 0.12)';
+      color = '#16a34a';
+      border = 'rgba(34, 197, 94, 0.3)';
+    } else if (rawVal === '—' || rawVal === '-' || rawVal === '') {
+      bg = 'transparent';
+      color = 'var(--text-muted)';
+      border = 'transparent';
+    } else if (rawVal.toLowerCase().includes('tanque')) {
       bg = 'var(--crear-gold-light)';
-      color = 'var(--crear-gold, #f59e0b)';
+      color = 'var(--crear-gold, #d97706)';
       border = 'rgba(255, 193, 7, 0.35)';
     } else if (rawVal.toLowerCase().includes('vuelo')) {
       bg = 'rgba(244, 114, 182, 0.12)';
-      color = '#ec4899';
+      color = '#db2777';
       border = 'rgba(244, 114, 182, 0.3)';
     } else if (rawVal.toLowerCase().includes('barrera')) {
       bg = 'rgba(249, 115, 22, 0.12)';
@@ -507,7 +477,7 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
       border = 'rgba(249, 115, 22, 0.3)';
     } else if (rawVal.toLowerCase().includes('confianza')) {
       bg = 'rgba(168, 85, 247, 0.12)';
-      color = '#a855f7';
+      color = '#9333ea';
       border = 'rgba(168, 85, 247, 0.3)';
     } else if (rawVal.toLowerCase().includes('grounding')) {
       bg = 'rgba(20, 184, 166, 0.12)';
@@ -516,20 +486,84 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
     }
 
     return (
-      <span style={{ 
-        background: bg, 
-        color: color, 
-        border: `1px solid ${border}`, 
-        padding: '2px 8px', 
-        borderRadius: '6px', 
-        fontSize: '0.74rem', 
-        fontWeight: 700,
-        display: 'inline-block',
-        maxWidth: '140px',
-        lineHeight: '1.2'
-      }}>
-        {rawVal}
-      </span>
+      <div style={{ position: 'relative', display: 'inline-block' }}>
+        <span 
+          onClick={() => isManager && setActiveCellPicker(isPickerOpen ? null : { rowId, staffId })}
+          style={{ 
+            background: bg, 
+            color: color, 
+            border: `1px solid ${border}`, 
+            padding: '3px 8px', 
+            borderRadius: '6px', 
+            fontSize: '0.74rem', 
+            fontWeight: 700,
+            display: 'inline-block',
+            maxWidth: '140px',
+            lineHeight: '1.2',
+            cursor: isManager ? 'pointer' : 'default',
+            userSelect: 'none',
+            transition: 'all 0.15s ease'
+          }}
+          title={isManager ? 'Clic para cambiar o asignar rol' : rawVal}
+        >
+          {rawVal}
+        </span>
+
+        {/* POPOVER RÁPIDO DE ASIGNACIÓN */}
+        {isPickerOpen && (
+          <div 
+            style={{
+              position: 'absolute',
+              top: '100%',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              marginTop: '6px',
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-subtle)',
+              borderRadius: '8px',
+              boxShadow: 'var(--card-shadow)',
+              padding: '6px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '3px',
+              width: '160px',
+              zIndex: 100
+            }}
+          >
+            {[
+              { label: '✓ Presente', val: '✓' },
+              { label: '— Libre', val: '—' },
+              { label: 'Grounding', val: '(Grounding)' },
+              { label: 'Cierre Grounding', val: 'Cierre (Grounding)' },
+              { label: 'Noche Confianza', val: 'Noche De Confianza' },
+              { label: 'Cierre Confianza', val: 'Cierre Noche De Confianza' },
+              { label: 'Caída Confianza', val: 'Caída Confianza' },
+              { label: 'TANQUE', val: 'TANQUE' },
+              { label: 'Rompimiento', val: 'Rompimiento de Barreras' },
+              { label: 'Vuelos', val: 'Vuelos' }
+            ].map(opt => (
+              <button
+                key={opt.val}
+                type="button"
+                onClick={() => handleCellAssignment(rowId, staffId, opt.val)}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  borderRadius: '4px',
+                  padding: '4px 8px',
+                  fontSize: '0.74rem',
+                  color: 'var(--text-main)',
+                  textAlign: 'left',
+                  cursor: 'pointer',
+                  fontWeight: 600
+                }}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
     );
   };
 
@@ -543,21 +577,21 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
     });
   }, [scheduleRows, filterTraining]);
 
-  // Mensaje nativo para Google Chat
+  // Mensaje para Google Chat
   const generateGoogleChatMessage = () => {
     const assignedNames = staffList.map(s => s.name).join(', ');
-    return `📢 *ATENCIÓN EQUIPO OPERATIVO — HORARIOS OFICIALES EN NODUS* 📅\n\n` +
-      `Estimado equipo asignado (*${assignedNames}*):\n\n` +
-      `La Gerencia de Sede (*${userSede}*) ha actualizado los *Horarios y Turnos Operativos Oficiales* para los entrenamientos UNO, DOS y MAESTRÍA en *Nodus / Causa OS*.\n\n` +
-      `🔗 *Consulta tus Turnos en Vivo:* https://centro-operativo-cpsl.web.app\n\n` +
-      `📌 *Lineamientos:* \n` +
-      `• Revisa tus roles asignados (Groundings, Noches de Confianza, Tanque, Rompimiento de Barreras, Vuelos).\n` +
+    return `📢 *HORARIOS Y TURNOS DE ENTRENAMIENTO — SEDE ${selectedSede.toUpperCase()}* 📅\n\n` +
+      `Estimado equipo de *${selectedSede}* (*${assignedNames}*):\n\n` +
+      `Se han actualizado los *Horarios y Turnos Operativos Oficiales* para los entrenamientos UNO, DOS y MAESTRÍA en *Nodus / Causa OS*.\n\n` +
+      `🔗 *Consulta tus Turnos:* https://centro-operativo-cpsl.web.app\n\n` +
+      `📌 *Lineamientos Clave:* \n` +
+      `• Revisa tus horas asignadas y tareas en sala (Groundings, Noches de Confianza, Tanque, Rompimiento de Barreras, Vuelos).\n` +
       `• Cumplir estrictamente el Código de Vestimenta por jornada.\n` +
-      `• Cualquier duda de asignación, coordinar directamente con Gerencia.\n\n` +
+      `• Coordinar cualquier ajuste directamente con la Gerencia de Sede.\n\n` +
       `_Equipo Crear Poder Sin Límites — Plataforma Operativa Nodus / Causa OS_`;
   };
 
-  // Copiar mensaje para Google Chat y abrirlo
+  // Copiar mensaje para Google Chat
   const handleOpenGoogleChat = () => {
     const msg = generateGoogleChatMessage();
     if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -569,30 +603,19 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
     window.open('https://chat.google.com/u/0/', '_blank');
   };
 
-  // Enviar Correo a todos los asignados
+  // Enviar Correo masivo
   const handleSendBatchEmail = () => {
     const emails = staffList.map(s => s.email).filter(Boolean).join(',');
-    const subject = `📅 Horarios Oficiales de Entrenamiento — Sede ${userSede} (Nodus Causa OS)`;
-    const body = `Estimado Equipo Asignado,\n\n` +
-      `Se han actualizado y publicado los Horarios y Turnos Operativos de Entrenamiento en Nodus para la sede ${userSede}.\n\n` +
-      `Por favor ingresa a la plataforma Causa OS para revisar tus jornadas, salas y tareas específicas asignadas:\n` +
+    const subject = `📅 Horarios Oficiales de Entrenamiento — Sede ${selectedSede} (Nodus Causa OS)`;
+    const body = `Estimado Equipo de ${selectedSede},\n\n` +
+      `Se han actualizado los Horarios y Turnos Operativos de Entrenamiento en Nodus para la sede ${selectedSede}.\n\n` +
+      `Por favor ingresa a la plataforma Causa OS para revisar tus jornadas, salas y tareas específicas:\n` +
       `👉 https://centro-operativo-cpsl.web.app\n\n` +
       `Saludos cordiales,\n` +
-      `Gerencia de Sede ${userSede}\n` +
+      `Gerencia de Sede ${selectedSede}\n` +
       `Crear Poder Sin Límites`;
 
     window.location.href = `mailto:${emails}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  };
-
-  // Copiar correos al portapapeles
-  const handleCopyEmails = () => {
-    const emails = staffList.map(s => s.email).filter(Boolean).join(', ');
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(emails).then(() => {
-        setCopyFeedback('¡Correos copiados al portapapeles!');
-        setTimeout(() => setCopyFeedback(''), 3000);
-      });
-    }
   };
 
   if (!isOpen) return null;
@@ -616,11 +639,14 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
     >
       <div 
         className="glass-panel" 
-        onClick={e => e.stopPropagation()}
+        onClick={e => {
+          e.stopPropagation();
+          setActiveCellPicker(null);
+        }}
         style={{
           width: '100%',
-          maxWidth: '1240px',
-          maxHeight: '92vh',
+          maxWidth: '1260px',
+          maxHeight: '94vh',
           overflowY: 'auto',
           background: 'var(--bg-card)',
           borderRadius: 'var(--radius-lg)',
@@ -653,8 +679,8 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                 alignItems: 'center',
                 gap: '4px'
               }}>
-                <Lock size={11} />
-                Sede {userSede}
+                <MapPin size={11} />
+                Sede Activa: {selectedSede}
               </span>
               {hasUnsavedChanges && (
                 <span style={{
@@ -671,7 +697,7 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
               )}
             </div>
             <p className="text-muted" style={{ margin: 0, fontSize: '0.86rem' }}>
-              Protocolo de jornadas, turnos y fisionomía para <strong>Equipo de Oficina, Gerentes de Sede y Coordinadores</strong> — Almacenamiento en <strong>NODUS</strong>.
+              Planificación operativa multi-sede de jornadas, horarios y fisionomía de sala — Almacenamiento en <strong>NODUS</strong>.
             </p>
           </div>
           <button 
@@ -695,15 +721,48 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
           </button>
         </div>
 
+        {/* SELECTOR DE SEDE (MULTI-SEDE REAL) */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap', padding: '0.6rem 0.8rem', background: 'var(--bg-dark, #f8fafc)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
+          <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-heading)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <MapPin size={14} className="text-gold" />
+            Seleccionar Sede:
+          </span>
+          {OPERATIONAL_SEDES.map(s => {
+            const isSel = selectedSede === s;
+            return (
+              <button
+                key={s}
+                onClick={() => {
+                  setSelectedSede(s);
+                  setActiveCellPicker(null);
+                }}
+                style={{
+                  padding: '0.3rem 0.75rem',
+                  borderRadius: '6px',
+                  fontSize: '0.78rem',
+                  fontWeight: isSel ? 700 : 500,
+                  cursor: 'pointer',
+                  border: isSel ? '1px solid var(--crear-gold)' : '1px solid var(--border-subtle)',
+                  background: isSel ? 'var(--crear-gold-light)' : 'var(--bg-card)',
+                  color: isSel ? 'var(--crear-gold)' : 'var(--text-muted)',
+                  transition: 'all 0.15s ease'
+                }}
+              >
+                {s}
+              </button>
+            );
+          })}
+        </div>
+
         {/* TABS DE FILTRO */}
         <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap' }}>
           {[
-            { id: 'matriz_equipos', label: '🗓️ Horarios de Equipos (Matriz Nodus)' },
+            { id: 'matriz_equipos', label: `🗓️ Matriz de Horarios (${selectedSede})` },
             { id: 'todos_equipo', label: '👥 Resumen del Equipo' },
             { id: 'oficina', label: '🏢 Equipo de Oficina' },
             { id: 'gerentes', label: '👔 Gerentes de Sede' },
             { id: 'coordinadores', label: '🎯 Coordinadores' },
-            { id: 'pulsos_reportes', label: '⚡ Pulsos & Reportes Post-FDS' },
+            { id: 'pulsos_reportes', label: '⚡ Pulsos & Reportes' },
             { id: 'sala_c1', label: '🟣 Sala C1' },
             { id: 'sala_c2', label: '🔵 Sala C2' },
             { id: 'sala_mj', label: '🟡 Sala Maestría' }
@@ -737,7 +796,7 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
           })}
         </div>
 
-        {/* NOTIFICACIÓN O ALERTA */}
+        {/* MENSAJE DE CONFIRMACIÓN */}
         {saveMessage && (
           <div style={{
             background: 'var(--crear-gold-light)',
@@ -759,12 +818,12 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
 
           {/* ========================================================================= */}
-          {/* TAB: MATRIZ DE HORARIOS Y TURNOS (DISEÑO LIMPIO Y EJECUTIVO)              */}
+          {/* TAB: MATRIZ DE HORARIOS Y TURNOS (100% EDITABLE IN-LINE & MULTI-SEDE)     */}
           {/* ========================================================================= */}
           {activeTab === 'matriz_equipos' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               
-              {/* BARRA SUPERIOR DE ACCIONES */}
+              {/* BARRA SUPERIOR DE ACCIONES Y CONTEXTO DE ENTRENAMIENTOS */}
               <div 
                 style={{ 
                   display: 'flex',
@@ -780,11 +839,12 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
               >
                 <div>
                   <div style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--text-heading)' }}>
-                    Matriz de Asignaciones y Turnos de Sala
+                    Horarios y Dinámicas de Entrenamiento — Sede {selectedSede}
                   </div>
                   <div className="text-muted" style={{ fontSize: '0.78rem' }}>
-                    {isManager ? 'Haz clic en "Editar" en cualquier turno para modificar horarios y personas.' : 'Visualización oficial de turnos asignados por Gerencia.'}
-                    {lastSaved && ` • Guardado: ${lastSaved}`}
+                    {currentCycle?.name ? `Ciclo Activo: ${currentCycle.name}` : `Entrenamientos UNO / DOS / MAESTRÍA`}
+                    {currentStage ? ` • Etapa: ${currentStage}` : ''}
+                    {lastSaved ? ` • Guardado en Nodus: ${lastSaved}` : ' • Sin cambios guardados'}
                   </div>
                 </div>
 
@@ -794,10 +854,10 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                       onClick={() => setShowManageStaffModal(true)}
                       className="btn-secondary"
                       style={{ padding: '0.45rem 0.85rem', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
-                      title="Administrar colaboradores de la matriz"
+                      title="Administrar colaboradores de esta sede"
                     >
                       <Users size={14} />
-                      Equipo ({staffList.length})
+                      Equipo de {selectedSede} ({staffList.length})
                     </button>
                   )}
 
@@ -843,7 +903,7 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                 </div>
               </div>
 
-              {/* FILTROS LIMPIOS */}
+              {/* FILTROS Y RESALTADO */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.8rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
                   <span className="text-muted" style={{ fontSize: '0.78rem', fontWeight: 600 }}>Entrenamiento:</span>
@@ -897,7 +957,7 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                 </div>
               </div>
 
-              {/* TABLA EJECUTIVA LIMPIA */}
+              {/* TABLA EJECUTIVA EDITABLE IN-LINE */}
               <div 
                 style={{ 
                   overflowX: 'auto', 
@@ -909,31 +969,32 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.86rem', textAlign: 'left' }}>
                   <thead>
                     <tr style={{ borderBottom: '2px solid var(--border-subtle)', background: 'var(--bg-dark, #f8fafc)' }}>
-                      <th style={{ padding: '0.85rem 1rem', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                        ENTRENAMIENTO
+                      <th style={{ padding: '0.85rem 0.9rem', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                        ENTRENAMIENTO & DINÁMICA
                       </th>
-                      <th style={{ padding: '0.85rem 1rem', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      <th style={{ padding: '0.85rem 0.7rem', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                         DÍA
                       </th>
-                      <th style={{ padding: '0.85rem 1rem', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      <th style={{ padding: '0.85rem 0.8rem', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', minWidth: '135px' }}>
                         HORARIO
                       </th>
 
+                      {/* Columnas dinámicas de Gerentes y Coordinadores de esta Sede */}
                       {staffList.map(staff => {
                         const isHighlighted = highlightPerson === staff.id;
                         return (
                           <th 
                             key={staff.id} 
                             style={{ 
-                              padding: '0.85rem 0.8rem', 
+                              padding: '0.85rem 0.75rem', 
                               textAlign: 'center',
                               background: isHighlighted ? 'var(--crear-gold-light)' : 'transparent',
                               borderLeft: '1px solid var(--border-subtle)',
                               borderRight: '1px solid var(--border-subtle)',
-                              minWidth: '130px'
+                              minWidth: '125px'
                             }}
                           >
-                            <div style={{ fontWeight: 700, color: isHighlighted ? 'var(--crear-gold)' : 'var(--text-heading)', fontSize: '0.86rem' }}>
+                            <div style={{ fontWeight: 700, color: isHighlighted ? 'var(--crear-gold)' : 'var(--text-heading)', fontSize: '0.85rem' }}>
                               {staff.name}
                             </div>
                             <div className="text-muted" style={{ fontSize: '0.7rem', fontWeight: 400, marginTop: '2px' }}>
@@ -943,12 +1004,12 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                         );
                       })}
 
-                      <th style={{ padding: '0.85rem 1rem', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      <th style={{ padding: '0.85rem 0.9rem', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', minWidth: '150px' }}>
                         VESTIMENTA
                       </th>
 
                       {isManager && (
-                        <th style={{ padding: '0.85rem 0.8rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                        <th style={{ padding: '0.85rem 0.6rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                           ACCIONES
                         </th>
                       )}
@@ -967,37 +1028,92 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                           key={row.id}
                           style={{ borderBottom: '1px solid var(--border-subtle)' }}
                         >
-                          {/* Entrenamiento */}
-                          <td style={{ padding: '0.75rem 1rem', whiteSpace: 'nowrap' }}>
+                          {/* Entrenamiento y Actividad (Editable in-line) */}
+                          <td style={{ padding: '0.7rem 0.9rem', whiteSpace: 'nowrap' }}>
                             <span style={{
                               background: trainingBg,
                               color: trainingColor,
                               border: `1px solid ${trainingColor}30`,
-                              padding: '2px 8px',
+                              padding: '2px 7px',
                               borderRadius: '6px',
-                              fontSize: '0.76rem',
+                              fontSize: '0.75rem',
                               fontWeight: 800
                             }}>
                               {row.training}
                             </span>
-                            {row.nota && (
-                              <div className="text-muted" style={{ fontSize: '0.72rem', marginTop: '3px' }}>
-                                {row.nota}
-                              </div>
+                            {/* Campo de Actividad / Subtítulo editable in-line */}
+                            <input
+                              type="text"
+                              value={row.nota || ''}
+                              placeholder="Editar actividad..."
+                              disabled={!isManager}
+                              onChange={(e) => handleInlineRowUpdate(row.id, 'nota', e.target.value)}
+                              style={{
+                                display: 'block',
+                                marginTop: '4px',
+                                background: 'transparent',
+                                border: 'none',
+                                borderBottom: isManager ? '1px dotted var(--border-subtle)' : 'none',
+                                color: 'var(--text-muted)',
+                                fontSize: '0.74rem',
+                                width: '140px',
+                                outline: 'none'
+                              }}
+                            />
+                          </td>
+
+                          {/* Día (Editable in-line) */}
+                          <td style={{ padding: '0.7rem 0.7rem', fontWeight: 600, color: 'var(--text-heading)', whiteSpace: 'nowrap' }}>
+                            {isManager ? (
+                              <select
+                                value={row.dia}
+                                onChange={(e) => handleInlineRowUpdate(row.id, 'dia', e.target.value)}
+                                style={{
+                                  background: 'transparent',
+                                  border: 'none',
+                                  borderBottom: '1px dotted var(--border-subtle)',
+                                  color: 'var(--text-heading)',
+                                  fontSize: '0.84rem',
+                                  fontWeight: 600,
+                                  cursor: 'pointer',
+                                  padding: '2px 0'
+                                }}
+                              >
+                                <option value="Jueves">Jueves</option>
+                                <option value="Viernes">Viernes</option>
+                                <option value="Sábado">Sábado</option>
+                                <option value="Domingo">Domingo</option>
+                                <option value="Lunes">Lunes</option>
+                                <option value="Miércoles">Miércoles</option>
+                              </select>
+                            ) : (
+                              row.dia
                             )}
                           </td>
 
-                          {/* Día */}
-                          <td style={{ padding: '0.75rem 1rem', fontWeight: 600, color: 'var(--text-heading)', whiteSpace: 'nowrap' }}>
-                            {row.dia}
+                          {/* Horario (Editable in-line sin cajas clunky) */}
+                          <td style={{ padding: '0.7rem 0.8rem', whiteSpace: 'nowrap' }}>
+                            <input
+                              type="text"
+                              value={row.horario || ''}
+                              disabled={!isManager}
+                              onChange={(e) => handleInlineRowUpdate(row.id, 'horario', e.target.value)}
+                              placeholder="Ej. 4:30 PM - Cierre"
+                              style={{
+                                background: 'transparent',
+                                border: 'none',
+                                borderBottom: isManager ? '1px dashed var(--border-subtle)' : 'none',
+                                color: 'var(--crear-blue, #0284c7)',
+                                fontWeight: 700,
+                                fontSize: '0.84rem',
+                                width: '130px',
+                                outline: 'none',
+                                padding: '2px 0'
+                              }}
+                            />
                           </td>
 
-                          {/* Horario */}
-                          <td style={{ padding: '0.75rem 1rem', whiteSpace: 'nowrap', fontWeight: 700, color: 'var(--crear-blue, #0284c7)' }}>
-                            {row.horario}
-                          </td>
-
-                          {/* Celdas de Colaboradores */}
+                          {/* Celdas de Colaboradores de esta Sede (Clickeable in-line) */}
                           {staffList.map(staff => {
                             const val = row.assignments?.[staff.id] || '—';
                             const isHighlighted = highlightPerson === staff.id;
@@ -1005,50 +1121,45 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                               <td 
                                 key={staff.id}
                                 style={{ 
-                                  padding: '0.75rem 0.8rem', 
+                                  padding: '0.7rem 0.75rem', 
                                   textAlign: 'center',
                                   background: isHighlighted ? 'var(--crear-gold-light)' : 'transparent',
                                   borderLeft: '1px solid var(--border-subtle)',
                                   borderRight: '1px solid var(--border-subtle)'
                                 }}
                               >
-                                {renderAssignmentBadge(val)}
+                                {renderCellBadge(val, row.id, staff.id)}
                               </td>
                             );
                           })}
 
-                          {/* Vestimenta */}
-                          <td style={{ padding: '0.75rem 1rem', whiteSpace: 'nowrap', fontSize: '0.8rem' }}>
-                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', color: 'var(--text-main)' }}>
+                          {/* Vestimenta (Editable in-line) */}
+                          <td style={{ padding: '0.7rem 0.9rem', whiteSpace: 'nowrap', fontSize: '0.8rem' }}>
+                            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', width: '100%' }}>
                               <Shirt size={14} className="text-muted" />
-                              {row.vestimenta}
-                            </span>
-                          </td>
-
-                          {/* Acciones de Fila (Solo Gerentes) */}
-                          {isManager && (
-                            <td style={{ padding: '0.75rem 0.8rem', textAlign: 'center', whiteSpace: 'nowrap' }}>
-                              <button
-                                onClick={() => setEditingRow(row)}
-                                className="btn-icon"
+                              <input
+                                type="text"
+                                value={row.vestimenta || ''}
+                                disabled={!isManager}
+                                onChange={(e) => handleInlineRowUpdate(row.id, 'vestimenta', e.target.value)}
+                                placeholder="Vestimenta..."
                                 style={{
                                   background: 'transparent',
-                                  border: '1px solid var(--border-subtle)',
-                                  borderRadius: '6px',
-                                  padding: '4px 8px',
-                                  cursor: 'pointer',
-                                  color: 'var(--text-muted)',
-                                  fontSize: '0.75rem',
-                                  display: 'inline-flex',
-                                  alignItems: 'center',
-                                  gap: '4px',
-                                  marginRight: '4px'
+                                  border: 'none',
+                                  borderBottom: isManager ? '1px dotted var(--border-subtle)' : 'none',
+                                  color: 'var(--text-main)',
+                                  fontSize: '0.78rem',
+                                  width: '135px',
+                                  outline: 'none',
+                                  padding: '2px 0'
                                 }}
-                                title="Editar este turno"
-                              >
-                                <Edit2 size={13} />
-                                <span>Editar</span>
-                              </button>
+                              />
+                            </div>
+                          </td>
+
+                          {/* Acciones de Fila (Eliminar Turno) */}
+                          {isManager && (
+                            <td style={{ padding: '0.7rem 0.6rem', textAlign: 'center', whiteSpace: 'nowrap' }}>
                               <button
                                 onClick={() => handleDeleteRow(row.id)}
                                 className="btn-icon"
@@ -1226,7 +1337,7 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
         {/* FOOTER */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-subtle)', paddingTop: '0.8rem', flexWrap: 'wrap', gap: '0.5rem' }}>
           <div className="text-muted" style={{ fontSize: '0.78rem' }}>
-            Sede Operativa: <strong style={{ color: 'var(--text-heading)' }}>{userSede}</strong>
+            Sede Operativa: <strong style={{ color: 'var(--text-heading)' }}>{selectedSede}</strong> • {staffList.length} colaboradores activos
           </div>
           <button 
             onClick={onClose}
@@ -1241,284 +1352,7 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
         </div>
 
         {/* ========================================================================= */}
-        {/* MODAL: EDITAR FILA / TURNO (ELEGANTE, SIN INPUTS CLUNKY EN LA TABLA)      */}
-        {/* ========================================================================= */}
-        {editingRow && (
-          <div 
-            onClick={() => setEditingRow(null)}
-            style={{
-              position: 'fixed',
-              top: 0, left: 0, right: 0, bottom: 0,
-              background: 'rgba(0, 0, 0, 0.75)',
-              backdropFilter: 'blur(5px)',
-              zIndex: 100002,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '1rem'
-            }}
-          >
-            <div 
-              onClick={e => e.stopPropagation()}
-              className="glass-panel"
-              style={{
-                background: 'var(--bg-card)',
-                border: '1px solid var(--border-subtle)',
-                borderRadius: 'var(--radius-md)',
-                padding: '1.6rem',
-                maxWidth: '650px',
-                width: '100%',
-                maxHeight: '90vh',
-                overflowY: 'auto',
-                boxShadow: 'var(--card-shadow)',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '1.2rem',
-                color: 'var(--text-main)'
-              }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.8rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <Edit2 size={18} className="text-gold" />
-                  <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-heading)' }}>
-                    Editar Turno de Entrenamiento
-                  </h3>
-                </div>
-                <button onClick={() => setEditingRow(null)} className="btn-icon" style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
-                  <X size={18} />
-                </button>
-              </div>
-
-              {/* CAMPOS PRINCIPALES */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.8rem' }}>
-                <div>
-                  <label className="text-muted" style={{ fontSize: '0.76rem', display: 'block', marginBottom: '4px', fontWeight: 600 }}>
-                    Entrenamiento:
-                  </label>
-                  <select
-                    value={editingRow.training}
-                    onChange={(e) => setEditingRow({ ...editingRow, training: e.target.value })}
-                    style={{
-                      width: '100%',
-                      padding: '0.5rem',
-                      background: 'var(--bg-dark-alt, #ffffff)',
-                      border: '1px solid var(--border-subtle)',
-                      borderRadius: '6px',
-                      color: 'var(--text-main)',
-                      fontSize: '0.84rem'
-                    }}
-                  >
-                    <option value="UNO">UNO (C1)</option>
-                    <option value="DOS">DOS (C2)</option>
-                    <option value="MAESTRÍA">MAESTRÍA (MJ)</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="text-muted" style={{ fontSize: '0.76rem', display: 'block', marginBottom: '4px', fontWeight: 600 }}>
-                    Día:
-                  </label>
-                  <select
-                    value={editingRow.dia}
-                    onChange={(e) => setEditingRow({ ...editingRow, dia: e.target.value })}
-                    style={{
-                      width: '100%',
-                      padding: '0.5rem',
-                      background: 'var(--bg-dark-alt, #ffffff)',
-                      border: '1px solid var(--border-subtle)',
-                      borderRadius: '6px',
-                      color: 'var(--text-main)',
-                      fontSize: '0.84rem'
-                    }}
-                  >
-                    <option value="Jueves">Jueves</option>
-                    <option value="Viernes">Viernes</option>
-                    <option value="Sábado">Sábado</option>
-                    <option value="Domingo">Domingo</option>
-                    <option value="Lunes">Lunes</option>
-                    <option value="Miércoles">Miércoles</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="text-muted" style={{ fontSize: '0.76rem', display: 'block', marginBottom: '4px', fontWeight: 600 }}>
-                    Horario:
-                  </label>
-                  <input
-                    type="text"
-                    value={editingRow.horario}
-                    onChange={(e) => setEditingRow({ ...editingRow, horario: e.target.value })}
-                    placeholder="Ej. 4:30 PM - Cierre"
-                    style={{
-                      width: '100%',
-                      padding: '0.5rem',
-                      background: 'var(--bg-dark-alt, #ffffff)',
-                      border: '1px solid var(--border-subtle)',
-                      borderRadius: '6px',
-                      color: 'var(--text-main)',
-                      fontSize: '0.84rem'
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.8rem' }}>
-                <div>
-                  <label className="text-muted" style={{ fontSize: '0.76rem', display: 'block', marginBottom: '4px', fontWeight: 600 }}>
-                    Código de Vestimenta:
-                  </label>
-                  <input
-                    type="text"
-                    value={editingRow.vestimenta}
-                    onChange={(e) => setEditingRow({ ...editingRow, vestimenta: e.target.value })}
-                    placeholder="Ej. Negro formal / Polo negro + pantalón negro"
-                    style={{
-                      width: '100%',
-                      padding: '0.5rem',
-                      background: 'var(--bg-dark-alt, #ffffff)',
-                      border: '1px solid var(--border-subtle)',
-                      borderRadius: '6px',
-                      color: 'var(--text-main)',
-                      fontSize: '0.84rem'
-                    }}
-                  />
-                </div>
-
-                <div>
-                  <label className="text-muted" style={{ fontSize: '0.76rem', display: 'block', marginBottom: '4px', fontWeight: 600 }}>
-                    Actividad / Subtítulo:
-                  </label>
-                  <input
-                    type="text"
-                    value={editingRow.nota || ''}
-                    onChange={(e) => setEditingRow({ ...editingRow, nota: e.target.value })}
-                    placeholder="Ej. Noche de Confianza / Tanque / Vuelos"
-                    style={{
-                      width: '100%',
-                      padding: '0.5rem',
-                      background: 'var(--bg-dark-alt, #ffffff)',
-                      border: '1px solid var(--border-subtle)',
-                      borderRadius: '6px',
-                      color: 'var(--text-main)',
-                      fontSize: '0.84rem'
-                    }}
-                  />
-                </div>
-              </div>
-
-              {/* ASIGNACIONES PERSONA POR PERSONA */}
-              <div>
-                <label className="text-muted" style={{ fontSize: '0.78rem', display: 'block', marginBottom: '8px', fontWeight: 700 }}>
-                  Asignación por Colaborador:
-                </label>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '0.7rem' }}>
-                  {staffList.map(staff => {
-                    const currentVal = editingRow.assignments?.[staff.id] || '—';
-                    return (
-                      <div 
-                        key={staff.id}
-                        style={{
-                          background: 'var(--bg-dark-alt, #ffffff)',
-                          border: '1px solid var(--border-subtle)',
-                          borderRadius: '8px',
-                          padding: '0.6rem 0.8rem',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          gap: '4px'
-                        }}
-                      >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <span style={{ fontWeight: 700, fontSize: '0.82rem', color: 'var(--text-heading)' }}>
-                            {staff.name}
-                          </span>
-                          <span className="text-muted" style={{ fontSize: '0.7rem' }}>
-                            {staff.role}
-                          </span>
-                        </div>
-                        <input
-                          type="text"
-                          value={currentVal === '—' ? '' : currentVal}
-                          placeholder="✓, —, o tarea (ej. Grounding)"
-                          onChange={(e) => {
-                            const val = e.target.value.trim() || '—';
-                            setEditingRow({
-                              ...editingRow,
-                              assignments: {
-                                ...editingRow.assignments,
-                                [staff.id]: val
-                              }
-                            });
-                          }}
-                          style={{
-                            width: '100%',
-                            padding: '0.4rem 0.6rem',
-                            background: 'var(--bg-card)',
-                            border: '1px solid var(--border-subtle)',
-                            borderRadius: '6px',
-                            color: 'var(--text-main)',
-                            fontSize: '0.8rem'
-                          }}
-                        />
-                        {/* Botones de selección rápida */}
-                        <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: '2px' }}>
-                          {['✓', '—', 'Grounding', 'Noche Confianza', 'Tanque', 'Vuelos'].map(preset => (
-                            <button
-                              key={preset}
-                              type="button"
-                              onClick={() => {
-                                setEditingRow({
-                                  ...editingRow,
-                                  assignments: {
-                                    ...editingRow.assignments,
-                                    [staff.id]: preset
-                                  }
-                                });
-                              }}
-                              style={{
-                                background: 'transparent',
-                                border: '1px solid var(--border-subtle)',
-                                borderRadius: '4px',
-                                padding: '1px 6px',
-                                fontSize: '0.68rem',
-                                color: 'var(--text-muted)',
-                                cursor: 'pointer'
-                              }}
-                            >
-                              {preset}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* BOTONERA MODAL */}
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.6rem', borderTop: '1px solid var(--border-subtle)', paddingTop: '0.8rem' }}>
-                <button
-                  type="button"
-                  onClick={() => setEditingRow(null)}
-                  className="btn-secondary"
-                  style={{ padding: '0.5rem 1.2rem', fontSize: '0.82rem' }}
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleSaveRowEdit(editingRow)}
-                  className="btn-primary"
-                  style={{ padding: '0.5rem 1.5rem', fontSize: '0.82rem' }}
-                >
-                  Guardar Turno
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ========================================================================= */}
-        {/* MODAL: ADMINISTRAR COLABORADORES DEL EQUIPO                               */}
+        {/* MODAL: ADMINISTRAR COLABORADORES DE ESTA SEDE                             */}
         {/* ========================================================================= */}
         {showManageStaffModal && (
           <div 
@@ -1558,7 +1392,7 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   <Users size={20} className="text-gold" />
                   <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-heading)' }}>
-                    Administrar Colaboradores de la Matriz
+                    Equipo de {selectedSede} ({staffList.length})
                   </h3>
                 </div>
                 <button onClick={() => setShowManageStaffModal(false)} className="btn-icon" style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
@@ -1566,10 +1400,10 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                 </button>
               </div>
 
-              {/* LISTA ACTUAL DE COLABORADORES */}
+              {/* LISTA ACTUAL DE COLABORADORES DE ESTA SEDE */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 <label className="text-muted" style={{ fontSize: '0.78rem', fontWeight: 700 }}>
-                  Colaboradores Actuales ({staffList.length}):
+                  Gerentes y Coordinadores de {selectedSede}:
                 </label>
                 {staffList.map(staff => (
                   <div 
@@ -1578,7 +1412,7 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                       background: 'var(--bg-dark-alt, #ffffff)',
                       border: '1px solid var(--border-subtle)',
                       borderRadius: '8px',
-                      padding: '0.7rem 1rem',
+                      padding: '0.65rem 0.9rem',
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center'
@@ -1588,8 +1422,8 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                       <div style={{ fontWeight: 700, color: 'var(--text-heading)', fontSize: '0.88rem' }}>
                         {staff.name}
                       </div>
-                      <div className="text-muted" style={{ fontSize: '0.75rem' }}>
-                        {staff.role} • {staff.email || 'Sin correo asignado'}
+                      <div className="text-muted" style={{ fontSize: '0.74rem' }}>
+                        {staff.role} • {staff.email || 'Sin correo registrado'}
                       </div>
                     </div>
                     <button
@@ -1605,9 +1439,9 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                         display: 'inline-flex',
                         alignItems: 'center',
                         gap: '4px',
-                        fontSize: '0.75rem'
+                        fontSize: '0.74rem'
                       }}
-                      title="Retirar de la matriz"
+                      title="Retirar de esta sede"
                     >
                       <Trash2 size={13} />
                       <span>Retirar</span>
@@ -1616,15 +1450,15 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                 ))}
               </div>
 
-              {/* FORMULARIO AGREGAR COLABORADOR */}
+              {/* AGREGAR NUEVO INTEGRANTE A LA SEDE */}
               <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '1rem' }}>
                 <label className="text-muted" style={{ fontSize: '0.78rem', fontWeight: 700, display: 'block', marginBottom: '8px' }}>
-                  ➕ Agregar Nuevo Colaborador a la Matriz:
+                  ➕ Agregar Nuevo Integrante a {selectedSede}:
                 </label>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '0.6rem' }}>
                   <input
                     type="text"
-                    placeholder="Nombre completo"
+                    placeholder="Nombre y Apellido"
                     value={newStaffForm.name}
                     onChange={e => setNewStaffForm({ ...newStaffForm, name: e.target.value })}
                     style={{
@@ -1638,7 +1472,7 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                   />
                   <input
                     type="text"
-                    placeholder="Cargo / Rol"
+                    placeholder="Cargo (ej. Coordinador C1)"
                     value={newStaffForm.role}
                     onChange={e => setNewStaffForm({ ...newStaffForm, role: e.target.value })}
                     style={{
@@ -1671,7 +1505,7 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                     className="btn-secondary"
                     style={{ padding: '0.45rem 1.2rem', fontSize: '0.8rem' }}
                   >
-                    Agregar a la Matriz
+                    Agregar a {selectedSede}
                   </button>
                 </div>
               </div>
@@ -1728,7 +1562,7 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   <Send size={20} className="text-gold" />
                   <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-heading)' }}>
-                    Notificar Horarios Disponibles
+                    Notificar Horarios — Sede {selectedSede}
                   </h3>
                 </div>
                 <button onClick={() => setShowNotifyModal(false)} className="btn-icon" style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
@@ -1745,7 +1579,7 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
               {/* DESTINATARIOS */}
               <div>
                 <div className="text-muted" style={{ fontSize: '0.78rem', marginBottom: '0.4rem', fontWeight: 600 }}>
-                  Destinatarios del Equipo ({staffList.length}):
+                  Destinatarios en {selectedSede} ({staffList.length}):
                 </div>
                 <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
                   {staffList.map(s => (
@@ -1822,22 +1656,6 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                 >
                   <Mail size={16} />
                   Enviar Correo Masivo
-                </button>
-
-                <button
-                  onClick={handleCopyEmails}
-                  className="btn-secondary"
-                  style={{
-                    padding: '0.65rem 1rem',
-                    fontSize: '0.82rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '0.5rem'
-                  }}
-                >
-                  <Copy size={16} />
-                  Copiar Correos
                 </button>
               </div>
             </div>
