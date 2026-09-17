@@ -59,16 +59,29 @@ export function generateEntityHash(components) {
  * Extrae el número de equipo de una meta o texto
  */
 export function extractTeamNumber(goal, parentGoal = null) {
-  const fullText = `${goal?.title || ''} ${goal?.description || ''} ${parentGoal?.title || ''} ${goal?.cyclePhase || ''} ${goal?.sede || ''}`;
-  const match = fullText.match(/(?:Equipo|E)\s*(\d+)/i);
-  if (match) return match[1];
+  // 1. Título propio de la meta (máxima prioridad)
+  const goalTitle = goal?.title || '';
+  const matchDirect = goalTitle.match(/C\d+E(\d+)/i) || goalTitle.match(/(?:Equipo|E)\s*(\d+)/i);
+  if (matchDirect) return matchDirect[1];
 
+  // 2. Descripción o ciclo propio
+  const ownText = `${goal?.description || ''} ${goal?.cyclePhase || ''}`;
+  const matchOwn = ownText.match(/C\d+E(\d+)/i) || ownText.match(/(?:Equipo|E)\s*(\d+)/i);
+  if (matchOwn) return matchOwn[1];
+
+  // 3. Título del parentGoal si existe
+  if (parentGoal?.title) {
+    const matchParent = parentGoal.title.match(/(?:Equipo|E)\s*(\d+)/i);
+    if (matchParent) return matchParent[1];
+  }
+
+  // 4. Default por sede (Ciclos activos vigentes)
   const sede = normalizeSede(goal?.sede || parentGoal?.sede);
-  if (sede === 'Lima') return '30';
+  if (sede === 'Lima') return '31'; // Ciclo activo Lima: E31
   if (sede === 'Quito') return '119';
   if (sede === 'Guayaquil') return '24';
   if (sede === 'Cuenca') return '23';
-  return '30';
+  return '31';
 }
 
 /**
@@ -93,12 +106,23 @@ export function auditSingleGoal(goal, parentGoal, options = {}) {
   const managers = liveManagers && liveManagers.length > 0 ? liveManagers : getManagersList();
   const sedeManagers = managers.filter(m => normalizeSede(m.sede || '') === sede);
 
-  // Clasificación del Tipo de Meta
-  const isManagersCreation = titleLower.includes('creaci') || (titleLower.includes('manager') && titleLower.includes('creaci'));
-  const isManagersRelacion = titleLower.includes('relaci') || (titleLower.includes('manager') && titleLower.includes('relaci'));
-  const isManagersGeneral = titleLower.includes('manager') || kpiLower.includes('manager');
-  const isSentadosPx = titleLower.includes('sentados') || titleLower.includes('capitulo 1') || titleLower.includes('c1') || kpiLower.includes('participantes') || kpiLower.includes('sentados');
+  // Clasificación del Tipo de Meta con precedencia estricta:
+  // 1. Aliados (tiene prioridad absoluta sobre 'c1' o 'px' para evitar falsos positivos)
   const isAliados = titleLower.includes('aliado') || kpiLower.includes('aliado');
+
+  // 2. Managers
+  const isManagersCreation = !isAliados && (titleLower.includes('creaci') || (titleLower.includes('manager') && titleLower.includes('creaci')));
+  const isManagersRelacion = !isAliados && (titleLower.includes('relaci') || (titleLower.includes('manager') && titleLower.includes('relaci')));
+  const isManagersGeneral = !isAliados && (titleLower.includes('manager') || kpiLower.includes('manager'));
+
+  // 3. Sentados / Px en Sala
+  const isSentadosPx = !isAliados && !isManagersGeneral && (
+    titleLower.includes('sentados') || 
+    titleLower.includes('participantes') || 
+    kpiLower.includes('participantes') || 
+    kpiLower.includes('sentados') ||
+    (titleLower.includes('px') && !titleLower.includes('aliado'))
+  );
 
   let detectedRealValue = 0;
   let detectedTarget = Number(goal?.targetValue) || 0;
@@ -212,8 +236,11 @@ export function auditSingleGoal(goal, parentGoal, options = {}) {
     }
   } else if (isAliados) {
     category = 'ALIADOS';
-    sources.push('Hoja Oficial Aliados Lima (488639774)');
-    detectedRealValue = 32;
+    sources.push('Hoja Oficial Aliados (GID 488639774)');
+    const coordsConfirmed = (goal?.assignedCoordinators || []).reduce((acc, c) => acc + (Number(c.currentQuota) || 0), 0);
+    const coordsTarget = (goal?.assignedCoordinators || []).reduce((acc, c) => acc + (Number(c.targetQuota) || 0), 0);
+    detectedTarget = coordsTarget > 0 ? coordsTarget : (Number(goal?.targetValue) || 25);
+    detectedRealValue = coordsConfirmed > 0 ? coordsConfirmed : (Number(goal?.currentValue) || 0);
   } else {
     detectedRealValue = Number(goal?.currentValue) || 0;
   }
