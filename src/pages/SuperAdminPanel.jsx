@@ -111,7 +111,8 @@ function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, curre
     const matchesRole = tNorm === canonicalRole || t.role === person.role;
     if (!matchesRole) return false;
     if (t.sede) {
-      return t.sede === person.sede || t.sede === 'Global' || person.sede === 'Global';
+      const normTaskSede = normalizeSede(t.sede);
+      return normTaskSede === normalizedSedeName || normTaskSede === 'Global' || normalizedSedeName === 'Global';
     }
     return true;
   });
@@ -159,7 +160,7 @@ function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, curre
           }}
           title={`Sede: ${normalizedSedeName}`}
         >
-          <div style={{ transform: 'scale(1.2)' }}>{getFlagForSede(person.sede)}</div>
+          <div style={{ transform: 'scale(1.2)' }}>{getFlagForSede(normalizedSedeName)}</div>
         </div>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
@@ -1272,12 +1273,16 @@ export default function SuperAdminPanel() {
   });
 
   const searchFilteredUsers = searchTerm.trim() ? displayedUsersData.filter(u => {
-    const term = searchTerm.toLowerCase().trim();
-    const nameMatch = u.name?.toLowerCase().includes(term);
-    const emailMatch = u.email?.toLowerCase().includes(term);
-    const roleMatch = (ROLE_LABELS[u.role] || u.role)?.toLowerCase().includes(term);
-    const sedeMatch = u.sede?.toLowerCase().includes(term);
-    return nameMatch || emailMatch || roleMatch || sedeMatch;
+    const norm = s => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+    const term = norm(searchTerm);
+    if (norm(u.name).includes(term)) return true;
+    if (norm(u.email).includes(term)) return true;
+    if (norm(ROLE_LABELS[u.role] || u.role).includes(term)) return true;
+    if (norm(u.sede).includes(term)) return true;
+    // Búsqueda por alias (apodo/nombre alternativo) — ej: "Mila" encuentra a Emily Campuzano
+    if (u.alias && norm(u.alias).includes(term)) return true;
+    if (Array.isArray(u.aliases) && u.aliases.some(a => norm(a).includes(term))) return true;
+    return false;
   }) : [];
 
   return (
