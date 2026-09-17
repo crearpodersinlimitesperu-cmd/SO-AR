@@ -392,7 +392,8 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
         updatedByEmail: currentUser?.email || ''
       };
 
-      await setDoc(docRef, payload, { merge: true });
+      const cleanPayload = JSON.parse(JSON.stringify(payload));
+      await setDoc(docRef, cleanPayload, { merge: true });
 
       // Enviar correo a los colaboradores asignados con copia a Eli Escobar y Lennin Chasi
       // Y si la sede es LIMA (SOLO EN LIMA), incluir con copia a Gabriela Rivadeneyra (Contadora Lima)
@@ -493,8 +494,8 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
       setTimeout(() => setSaveMessage(''), 5000);
     } catch (err) {
       console.error('Error al guardar en Causa OS:', err);
-      setSaveMessage('Error al guardar. Intente nuevamente.');
-      setTimeout(() => setSaveMessage(''), 4000);
+      setSaveMessage(err?.message ? `Error al guardar: ${err.message}` : 'Error al guardar. Intente nuevamente.');
+      setTimeout(() => setSaveMessage(''), 6000);
     } finally {
       setIsSaving(false);
     }
