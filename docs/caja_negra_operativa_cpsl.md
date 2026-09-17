@@ -122,6 +122,15 @@ flowchart TD
      * **Regla Exclusiva para Lima:** Envíos de la sede Lima incluyen en copia a Gabriela Rivadeneyra (`contabilidad.lima@crearpsl.net` / `grivadeneira@crearpsl.com`).
   6. **Código de Vestimenta Oficial y Ergonomía de Coach:** Etiqueta negra formal en aperturas y Noches de Confianza; polos oficiales sábado/domingo; autorización expresa y formal de **zapatillas deportivas negras limpias** para Entrenadores en tarima.
 
+### 3.2. Regla Maestra de Coherencia de Metas, Nodus y Fechas de Entrenamiento (`GoalsSentinelAgent`)
+1. **Jerarquía y Paternidad de Ciclo (No mezclar Equipos):** Cada meta de sala (C1, C2, MJ) debe pertenecer y aportar exclusivamente a la `Meta Global del Ciclo` del **mismo número de equipo**. Si la meta es `Aliados C1E31`, su ciclo padre debe ser `Meta Global del Ciclo Equipo 31`, nunca un ciclo anterior (como Equipo 30). Si se detecta desalineación, el sistema muestra el badge `⚠️ Ciclo Desalineado (Eq. X vs Eq. Y)` y habilita el botón de re-alineación inmediata a su ciclo correspondiente.
+2. **Distinción Estricta de KPIs (Actividad Telefónica vs. Cupos de Sala):**
+   * **KPI de Proceso (Llamadas):** Las llamadas de coordinadoras (`nuevos_OK` + `rezagados_OK`) miden el volumen de contacto telefónico.
+   * **KPI de Resultado (Sala / Cupos):** Las metas de **Aliados (25)**, **Managers (10/8)** o **Apoyos (6)** miden cupos de personas sentadas/activas en sala. NUNCA deben sumarse acumuladores históricos de llamadas (como los 424 de Diana Moscoso) a metas de cupos de sala. El botón `⚡ Sincronizar al avance` se bloquea estrictamente para metas de Aliados, Managers y Apoyos, certificando su avance mediante la hoja oficial (GID `488639774`) o reportes de sala reales.
+3. **Coherencia con Nodus y Fechas Oficiales de Entrenamiento:**
+   * La clasificación de metas en `goalsSentinelAgent.js` prioriza `ALIADOS` para evitar que cadenas como `C1E31` se clasifiquen como `SENTADOS_PX`.
+   * Las fechas oficiales se enlazan con la API de eventos reconociendo los nombres reales (`CAPITULO UNO`, `CAPITULO DOS`, `MAESTRIA DEL JUEGO`), cruzando el número de equipo extraído (`extractTeamNumber`) y desplegando en la tarjeta el rango de fechas (`fechaInicio` al `fechaFin`) y el estado en vivo (`PRE-C1`, `EN SALA`, `POST-C1`).
+
 ---
 
 ## 4. 📊 Bases de Datos Externas & Google Sheets Oficiales
