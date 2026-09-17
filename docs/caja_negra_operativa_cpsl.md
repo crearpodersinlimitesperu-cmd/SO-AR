@@ -135,6 +135,17 @@ flowchart TD
    * La clasificación de metas en `goalsSentinelAgent.js` prioriza `ALIADOS` para evitar que cadenas como `C1E31` se clasifiquen como `SENTADOS_PX`.
    * Las fechas oficiales se enlazan con la API de eventos reconociendo los nombres reales (`CAPITULO UNO`, `CAPITULO DOS`, `MAESTRIA DEL JUEGO`), cruzando el número de equipo extraído (`extractTeamNumber`) y desplegando en la tarjeta el rango de fechas (`fechaInicio` al `fechaFin`) y el estado en vivo (`PRE-C1`, `EN SALA`, `POST-C1`).
 
+### 3.3. Estándar de Bienvenidas Oficiales y Coherencia Cronológica de Sedes (Portal de Alumnos & Correo IMO)
+1. **Coherencia con el Momento Presente de Sala (Septiembre 2026 - Equipo 31 Lima):**
+   * **Capítulo Uno (C1):** Fechas oficiales sincronizadas: **Del viernes 18 al domingo 20 de septiembre de 2026** (Equipo 31, Hotel José Antonio Deluxe, Miraflores, Entrenador: Fer Aragón, Coordinadoras: Joyce Marín y Diana Moscoso).
+   * **Capítulo Dos (C2):** Fechas oficiales sincronizadas: **Del jueves 01 al domingo 04 de octubre de 2026** (Equipo 31, Entrenador: Mildred).
+2. **Blindaje de Expiración en Fin de Semana Operativo (Warp Transition & Portal Activo):**
+   * Anteriormente, los eventos caducaban el viernes a las 14:00 (+5 horas), lo cual provocaba que el viernes por la tarde y sábado los alumnos en sala vieran el portal retroceder al countdown de octubre (+35 días).
+   * Se blindó la expiración para abarcar la **totalidad del fin de semana de entrenamiento hasta el domingo a las 23:59:59**. Durante el viernes mediodía, sábado y domingo, el portal permanece en estado activo (`portal-active-container`) mostrando la agenda de sala y la bitácora de reflexión.
+3. **Despacho Automatizado de Correos de Bienvenida IMO (`MonitorImos.jsx`):**
+   * El despacho de bienvenida genera el enlace directo con parámetro unívoco de escuadra (`?sede=LIM&equipo=31`).
+   * El cuerpo del correo incorpora una caja destacada oficial con el rango de fechas (`18 al 20 de septiembre de 2026`), sede hotelera y dirección, eliminando cualquier ambigüedad para el participante.
+
 ---
 
 ## 4. 📊 Bases de Datos Externas & Google Sheets Oficiales
