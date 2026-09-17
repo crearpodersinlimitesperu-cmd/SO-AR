@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+﻿import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { collection, query, orderBy, onSnapshot, deleteDoc, doc, writeBatch, addDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
@@ -19,21 +19,8 @@ export default function MonitorImos() {
   const [expandedImo, setExpandedImo] = useState(null);
   const [sendingEmail, setSendingEmail] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  // (17/09/2026) CORREGIDO: filterSede y filterEquipo antes estaban hardcodeados a
-  // 'Lima' / 'EQUIPO 31 - LIMA CICLO 1', haciendo que cualquier usuario (incluyendo
-  // los de Quito, Cuenca, Guayaquil, etc.) abriera el Monitor siempre en Lima.
-  // Ahora filterSede se inicializa dinámicamente: SuperAdmin y Dirección ven 'todos'
-  // (alcance global), cualquier otro rol ve su propia sede. filterEquipo arranca en
-  // 'todos' para no forzar un equipo específico que puede no existir en la sede del
-  // usuario — el selector de equipos se poblará automáticamente con los equipos reales
-  // de la sede seleccionada (lógica existente en equiposDisponibles).
-  const _initialSede = (() => {
-    if (!currentUser) return 'Lima';
-    if (currentUser.isSuperAdmin || currentUser.isDireccion || currentUser.isConsolidatedView || currentUser.appRole === 'consolidado') return 'todos';
-    return normalizeSede(currentUser.sede) || 'Lima';
-  })();
-  const [filterSede, setFilterSede] = useState(_initialSede);
-  const [filterEquipo, setFilterEquipo] = useState('todos');
+  const [filterSede, setFilterSede] = useState('Lima');
+  const [filterEquipo, setFilterEquipo] = useState('EQUIPO 31 - LIMA CICLO 1');
   const [filterEstado, setFilterEstado] = useState('todos');
   const [filterNodus, setFilterNodus] = useState('todos');
   const [viewMode, setViewMode] = useState('imos'); // 'imos' | 'enrolados'
@@ -668,15 +655,26 @@ export default function MonitorImos() {
     try {
       setSendingEmail(enrolado.id);
       
-      const welcomeLink = "https://crearpsl.net/bienvenida_capitulo_uno.html?sede=LIM";
+      const eqRaw = enrolado.equipo || enrolado.equipo_nombre || '';
+      const eqMatch = eqRaw.match(/\d+/);
+      const eqNum = eqMatch ? eqMatch[0] : '31';
+      const welcomeLink = `https://crearpsl.net/bienvenida_capitulo_uno.html?sede=LIM&equipo=${eqNum}`;
+
       const htmlContent = `
         <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 8px;">
           <h2 style="color: #0ea5e9;">¡Bienvenido/a al Entrenamiento, ${enrolado.nombre}!</h2>
-          <p>Tu coordinador/a <strong>${enrolado.coordinadora_nombre}</strong> y tu equipo están emocionados de acompañarte en este proceso.</p>
+          <p>Tu coordinador/a <strong>${enrolado.coordinadora_nombre || 'de Sala'}</strong> y tu equipo están emocionados de acompañarte en este proceso.</p>
+          
+          <div style="background: rgba(14, 165, 233, 0.08); border-left: 4px solid #0ea5e9; padding: 12px 16px; margin: 18px 0; border-radius: 4px;">
+            <p style="margin: 0; font-weight: bold; color: #0284c7; font-size: 15px;">📍 Fechas Oficiales (Capítulo Uno - Lima):</p>
+            <p style="margin: 4px 0 0 0; font-size: 14px; color: #1e293b;"><strong>Del viernes 18 al domingo 20 de septiembre de 2026</strong></p>
+            <p style="margin: 4px 0 0 0; font-size: 13px; color: #64748b;">Hotel José Antonio Deluxe · Calle Bellavista 133, Miraflores</p>
+          </div>
+
           <p>Hemos preparado una página de bienvenida muy especial con toda la información clave, la cuenta regresiva oficial y detalles importantes para tu primer fin de semana.</p>
           <div style="text-align: center; margin: 30px 0;">
             <a href="${welcomeLink}" style="background-color: #0ea5e9; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">
-              Ver mi Bienvenida Oficial
+              Ver mi Bienvenida Oficial (Equipo ${eqNum})
             </a>
           </div>
           <p>¡Nos vemos pronto!</p>
