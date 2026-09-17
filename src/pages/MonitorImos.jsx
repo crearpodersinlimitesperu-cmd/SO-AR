@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { collection, query, orderBy, onSnapshot, deleteDoc, doc, writeBatch, addDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
@@ -19,8 +19,21 @@ export default function MonitorImos() {
   const [expandedImo, setExpandedImo] = useState(null);
   const [sendingEmail, setSendingEmail] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterSede, setFilterSede] = useState('Lima');
-  const [filterEquipo, setFilterEquipo] = useState('EQUIPO 31 - LIMA CICLO 1');
+  // (17/09/2026) CORREGIDO: filterSede y filterEquipo antes estaban hardcodeados a
+  // 'Lima' / 'EQUIPO 31 - LIMA CICLO 1', haciendo que cualquier usuario (incluyendo
+  // los de Quito, Cuenca, Guayaquil, etc.) abriera el Monitor siempre en Lima.
+  // Ahora filterSede se inicializa dinámicamente: SuperAdmin y Dirección ven 'todos'
+  // (alcance global), cualquier otro rol ve su propia sede. filterEquipo arranca en
+  // 'todos' para no forzar un equipo específico que puede no existir en la sede del
+  // usuario — el selector de equipos se poblará automáticamente con los equipos reales
+  // de la sede seleccionada (lógica existente en equiposDisponibles).
+  const _initialSede = (() => {
+    if (!currentUser) return 'Lima';
+    if (currentUser.isSuperAdmin || currentUser.isDireccion || currentUser.isConsolidatedView || currentUser.appRole === 'consolidado') return 'todos';
+    return normalizeSede(currentUser.sede) || 'Lima';
+  })();
+  const [filterSede, setFilterSede] = useState(_initialSede);
+  const [filterEquipo, setFilterEquipo] = useState('todos');
   const [filterEstado, setFilterEstado] = useState('todos');
   const [filterNodus, setFilterNodus] = useState('todos');
   const [viewMode, setViewMode] = useState('imos'); // 'imos' | 'enrolados'
