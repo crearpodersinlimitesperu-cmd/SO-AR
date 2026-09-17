@@ -2,13 +2,13 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { 
   X, Clock, Shirt, Sparkles, CheckCircle2, ShieldCheck, Calendar, Info, 
   Briefcase, Building, UserCheck, Lock, Eye, Mail, MessageSquare, Send, 
-  Save, Plus, Trash2, Edit2, Check, RefreshCw, Users, AlertCircle,
-  Copy, ChevronDown, Award, UserPlus, Settings
+  Save, Plus, Trash2, Edit2, Check, Users, AlertCircle, Copy, UserPlus, 
+  ChevronRight, ArrowRight
 } from 'lucide-react';
 import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '../services/firebase';
 
-// Personal inicial por defecto (SIN LEYLA PASQUEL - Leyla ya no labora en CREAR)
+// Personal inicial por defecto (SIN LEYLA PASQUEL - 100% desvinculada)
 const INITIAL_STAFF = [
   { id: 'linid', name: 'Linid Valencia', email: 'linid.valencia@crearpsl.net', role: 'Coordinadora Maestría' },
   { id: 'joyce', name: 'Joyce Villanueva', email: 'joyce.villanueva@crearpsl.net', role: 'Coordinadora C1/C2' },
@@ -37,7 +37,7 @@ const INITIAL_SCHEDULE_ROWS = [
     id: 'uno_vie_1',
     training: 'UNO',
     dia: 'Viernes',
-    horario: '7:30 AM - 3 PM',
+    horario: '7:30 AM - 3:00 PM',
     assignments: {
       linid: '—',
       joyce: '✓',
@@ -51,7 +51,7 @@ const INITIAL_SCHEDULE_ROWS = [
     id: 'uno_vie_2',
     training: 'UNO',
     dia: 'Viernes',
-    horario: '5 PM - Cierre',
+    horario: '5:00 PM - Cierre',
     assignments: {
       linid: 'Cierre Noche De Confianza',
       joyce: '✓',
@@ -65,42 +65,42 @@ const INITIAL_SCHEDULE_ROWS = [
     id: 'uno_sab_1',
     training: 'UNO',
     dia: 'Sábado',
-    horario: '8 AM - 4 PM',
+    horario: '8:00 AM - 4:00 PM',
     assignments: {
       linid: 'Caída Confianza',
       joyce: '✓',
       jose: '—',
       diana: '✓'
     },
-    vestimenta: 'Polo negro + pantalón Negro',
+    vestimenta: 'Polo negro + pantalón negro',
     nota: 'Caída de Confianza'
   },
   {
     id: 'uno_sab_2',
     training: 'UNO',
     dia: 'Sábado',
-    horario: '3 PM - Cierre',
+    horario: '3:00 PM - Cierre',
     assignments: {
       linid: '✓',
       joyce: '✓',
       jose: '✓',
       diana: '—'
     },
-    vestimenta: 'Polo negro + pantalón Negro',
+    vestimenta: 'Polo negro + pantalón negro',
     nota: 'Turno Tarde'
   },
   {
     id: 'uno_dom_1',
     training: 'UNO',
     dia: 'Domingo',
-    horario: '8 AM - Cierre',
+    horario: '8:00 AM - Cierre',
     assignments: {
       linid: '✓',
       joyce: '✓',
       jose: '✓',
       diana: '✓'
     },
-    vestimenta: 'Polo Negro + Pantalón Negro',
+    vestimenta: 'Polo negro + pantalón negro',
     nota: 'Graduación y Cierre Ciclo'
   },
 
@@ -109,7 +109,7 @@ const INITIAL_SCHEDULE_ROWS = [
     id: 'dos_jue_1',
     training: 'DOS',
     dia: 'Jueves',
-    horario: '10:30 AM - 4 PM',
+    horario: '10:30 AM - 4:00 PM',
     assignments: {
       linid: '✓',
       joyce: '✓',
@@ -123,7 +123,7 @@ const INITIAL_SCHEDULE_ROWS = [
     id: 'dos_jue_2',
     training: 'DOS',
     dia: 'Jueves',
-    horario: '4 PM - Cierre',
+    horario: '4:00 PM - Cierre',
     assignments: {
       linid: '✓',
       joyce: '✓',
@@ -137,7 +137,7 @@ const INITIAL_SCHEDULE_ROWS = [
     id: 'dos_vie_1',
     training: 'DOS',
     dia: 'Viernes',
-    horario: '7:15 AM - 4 PM',
+    horario: '7:15 AM - 4:00 PM',
     assignments: {
       linid: '✓',
       joyce: '✓',
@@ -151,7 +151,7 @@ const INITIAL_SCHEDULE_ROWS = [
     id: 'dos_vie_2',
     training: 'DOS',
     dia: 'Viernes',
-    horario: '4 PM - Cierre',
+    horario: '4:00 PM - Cierre',
     assignments: {
       linid: '✓',
       joyce: '✓',
@@ -165,7 +165,7 @@ const INITIAL_SCHEDULE_ROWS = [
     id: 'dos_sab_1',
     training: 'DOS',
     dia: 'Sábado',
-    horario: '7:30 AM - 3 PM',
+    horario: '7:30 AM - 3:00 PM',
     assignments: {
       linid: 'TANQUE',
       joyce: '✓',
@@ -179,7 +179,7 @@ const INITIAL_SCHEDULE_ROWS = [
     id: 'dos_sab_2',
     training: 'DOS',
     dia: 'Sábado',
-    horario: '3 PM - Cierre',
+    horario: '3:00 PM - Cierre',
     assignments: {
       linid: '✓',
       joyce: '✓',
@@ -207,7 +207,7 @@ const INITIAL_SCHEDULE_ROWS = [
     id: 'dos_dom_2',
     training: 'DOS',
     dia: 'Domingo',
-    horario: '3 PM - Cierre',
+    horario: '3:00 PM - Cierre',
     assignments: {
       linid: '✓',
       joyce: '—',
@@ -223,7 +223,7 @@ const INITIAL_SCHEDULE_ROWS = [
     id: 'mj_vie_1',
     training: 'MAESTRÍA',
     dia: 'Viernes',
-    horario: '3:00 PM - 9 PM',
+    horario: '3:00 PM - 9:00 PM',
     assignments: {
       linid: '✓',
       joyce: '✓',
@@ -237,70 +237,53 @@ const INITIAL_SCHEDULE_ROWS = [
     id: 'mj_sab_1',
     training: 'MAESTRÍA',
     dia: 'Sábado',
-    horario: '8:30 AM - 12 M / 4 PM - 9 PM',
+    horario: '8:30 AM - 12:00 PM / 4:00 PM - 9:00 PM',
     assignments: {
       linid: '✓',
       joyce: '✓',
       jose: '✓',
       diana: '✓'
     },
-    vestimenta: 'Camiseta Negra + pantalón negro',
+    vestimenta: 'Camiseta negra + pantalón negro',
     nota: 'Jornada Intensiva MJ'
   },
   {
     id: 'mj_dom_1',
     training: 'MAESTRÍA',
     dia: 'Domingo',
-    horario: '8:30 AM - 12 M / 4 PM - CIERRE',
+    horario: '8:30 AM - 12:00 PM / 4:00 PM - Cierre',
     assignments: {
       linid: '✓',
       joyce: '✓',
       jose: '✓',
       diana: '✓'
     },
-    vestimenta: 'Camiseta Negra + pantalón negro',
+    vestimenta: 'Camiseta negra + pantalón negro',
     nota: 'FDS 4 El Viaje con Paul Sosa y Pase de Antorcha a las 18:00 PM'
   }
-];
-
-// Opciones rápidas para asignación de celdas
-const QUICK_ASSIGNMENT_OPTIONS = [
-  { label: '✓ Presente', value: '✓', color: '#10b981' },
-  { label: '— Libre', value: '—', color: '#64748b' },
-  { label: 'Grounding', value: '(Grounding)', color: '#14b8a6' },
-  { label: 'Noche Confianza', value: 'Noche De Confianza', color: '#8b5cf6' },
-  { label: 'Caída Confianza', value: 'Caída Confianza', color: '#a855f7' },
-  { label: 'TANQUE', value: 'TANQUE', color: '#f59e0b' },
-  { label: 'Rompimiento', value: 'Rompimiento de Barreras', color: '#ef4444' },
-  { label: 'Vuelos', value: 'Vuelos', color: '#ec4899' }
 ];
 
 export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUser }) {
   const [activeTab, setActiveTab] = useState('matriz_equipos');
   
-  // Estado de la Matriz Oficial Nodus
+  // Estado de la Matriz Nodus
   const [staffList, setStaffList] = useState(INITIAL_STAFF);
   const [scheduleRows, setScheduleRows] = useState(INITIAL_SCHEDULE_ROWS);
   const [filterTraining, setFilterTraining] = useState('TODOS');
   const [highlightPerson, setHighlightPerson] = useState('TODOS');
-  const [isEditing, setIsEditing] = useState(true); // Siempre editable por defecto
   const [isSaving, setIsSaving] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
   const [lastSaved, setLastSaved] = useState(null);
   
-  // Modales secundarios
+  // Modales de edición profesional
+  const [editingRow, setEditingRow] = useState(null); // Fila abierta en modal de edición
+  const [showManageStaffModal, setShowManageStaffModal] = useState(false);
   const [showNotifyModal, setShowNotifyModal] = useState(false);
-  const [showAddStaffModal, setShowAddStaffModal] = useState(false);
-  const [newStaffData, setNewStaffData] = useState({ name: '', role: '', email: '' });
-  const [editingStaffId, setEditingStaffId] = useState(null);
-  const [editStaffData, setEditStaffData] = useState({ name: '', role: '', email: '' });
-  
-  // Editor rápido de celda
-  const [activeCellEdit, setActiveCellEdit] = useState(null); // { rowId, staffId }
+  const [newStaffForm, setNewStaffForm] = useState({ name: '', role: '', email: '' });
   const [copyFeedback, setCopyFeedback] = useState('');
 
-  // Identificación de permisos de Gerencia / Administración
+  // Identificación de permisos de Gerencia / Dirección
   const isManager = useMemo(() => {
     if (!currentUser) return true;
     const role = (currentUser.role || currentUser.appRole || '').toLowerCase();
@@ -321,7 +304,7 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
     );
   }, [currentUser]);
 
-  // Sede normalizada para aislamiento multi-sede estricto en Nodus
+  // Sede normalizada para aislamiento multi-sede
   const userSede = currentUser?.sede || 'Lima';
   const sedeKey = userSede.toLowerCase().trim().replace(/\s+/g, '_');
   const nodusDocId = `${sedeKey}_horarios_equipos`;
@@ -336,7 +319,7 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
         if (docSnap.exists()) {
           const data = docSnap.data();
           if (data.staff && Array.isArray(data.staff) && data.staff.length > 0) {
-            // Depuración de seguridad: Asegurar que Leyla Pasquel NUNCA aparezca
+            // Depuración de seguridad: Leyla Pasquel NUNCA debe aparecer
             const sanitizedStaff = data.staff.filter(s => {
               const name = (s.name || '').toLowerCase();
               const email = (s.email || '').toLowerCase();
@@ -347,7 +330,6 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
             }
           }
           if (data.rows && Array.isArray(data.rows) && data.rows.length > 0) {
-            // Eliminar asignaciones huérfanas de Leyla si existieran
             const sanitizedRows = data.rows.map(r => {
               const newAssignments = { ...(r.assignments || {}) };
               delete newAssignments.leyla;
@@ -369,12 +351,11 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
     }
   }, [isOpen, nodusDocId]);
 
-  // Guardar en Nodus / Firestore
+  // Guardar en Nodus (Firestore)
   const handleSaveToNodus = async () => {
     setIsSaving(true);
     setSaveMessage('');
     try {
-      // Guardar en la colección nodus_training_schedules
       const nodusDocRef = doc(db, 'nodus_training_schedules', nodusDocId);
       const payload = {
         sede: userSede,
@@ -387,57 +368,28 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
 
       await setDoc(nodusDocRef, payload, { merge: true });
 
-      // También mantener réplica en training_team_schedules para compatibilidad
-      try {
-        const legacyRef = doc(db, 'training_team_schedules', `${sedeKey}_matriz_oficial`);
-        await setDoc(legacyRef, payload, { merge: true });
-      } catch (e) {
-        // Silencioso
-      }
-
       setLastSaved(new Date().toLocaleTimeString());
       setHasUnsavedChanges(false);
-      setSaveMessage('✅ Horarios guardados y sincronizados en Nodus exitosamente.');
+      setSaveMessage('Horarios sincronizados y guardados en Nodus');
       setTimeout(() => setSaveMessage(''), 4000);
     } catch (err) {
       console.error('Error al guardar en Nodus:', err);
-      setSaveMessage('❌ Error al guardar en Nodus. Intente nuevamente.');
+      setSaveMessage('Error al guardar en Nodus. Intente nuevamente.');
       setTimeout(() => setSaveMessage(''), 4000);
     } finally {
       setIsSaving(false);
     }
   };
 
-  // Modificar celda de asignación
-  const handleCellChange = (rowId, staffId, value) => {
-    setScheduleRows(prev => prev.map(row => {
-      if (row.id === rowId) {
-        return {
-          ...row,
-          assignments: {
-            ...row.assignments,
-            [staffId]: value
-          }
-        };
-      }
-      return row;
-    }));
+  // Guardar cambios de una fila editada en el modal
+  const handleSaveRowEdit = (updatedRow) => {
+    setScheduleRows(prev => prev.map(r => r.id === updatedRow.id ? updatedRow : r));
+    setEditingRow(null);
     setHasUnsavedChanges(true);
   };
 
-  // Modificar campo de fila (entrenamiento, dia, horario, vestimenta, nota)
-  const handleRowFieldChange = (rowId, field, value) => {
-    setScheduleRows(prev => prev.map(row => {
-      if (row.id === rowId) {
-        return { ...row, [field]: value };
-      }
-      return row;
-    }));
-    setHasUnsavedChanges(true);
-  };
-
-  // Agregar fila / turno
-  const handleAddRow = (trainingType = 'UNO') => {
+  // Agregar nueva fila
+  const handleAddNewRow = (trainingType = 'UNO') => {
     const newId = `turno_${trainingType.toLowerCase()}_${Date.now()}`;
     const initialAssignments = {};
     staffList.forEach(s => { initialAssignments[s.id] = '—'; });
@@ -454,33 +406,34 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
 
     setScheduleRows(prev => [...prev, newRow]);
     setHasUnsavedChanges(true);
+    // Abrir de inmediato el modal de edición de la nueva fila
+    setEditingRow(newRow);
   };
 
   // Eliminar fila
   const handleDeleteRow = (rowId) => {
-    if (window.confirm('¿Eliminar este turno de entrenamiento de la matriz?')) {
+    if (window.confirm('¿Deseas eliminar este turno de entrenamiento de la matriz?')) {
       setScheduleRows(prev => prev.filter(r => r.id !== rowId));
       setHasUnsavedChanges(true);
+      if (editingRow?.id === rowId) setEditingRow(null);
     }
   };
 
-  // Agregar nuevo colaborador (columna dinámica)
-  const handleAddStaff = () => {
-    if (!newStaffData.name.trim()) {
-      alert('Por favor ingresa al menos el nombre del colaborador');
+  // Agregar nuevo colaborador
+  const handleAddStaffMember = () => {
+    if (!newStaffForm.name.trim()) {
+      alert('Ingresa el nombre del colaborador');
       return;
     }
-
-    const staffId = newStaffData.name.toLowerCase().replace(/[^a-z0-9]/g, '_') + '_' + Date.now().toString().slice(-4);
+    const staffId = newStaffForm.name.toLowerCase().replace(/[^a-z0-9]/g, '_') + '_' + Date.now().toString().slice(-4);
     const newStaff = {
       id: staffId,
-      name: newStaffData.name.trim(),
-      role: newStaffData.role.trim() || 'Coordinador / Staff',
-      email: newStaffData.email.trim() || ''
+      name: newStaffForm.name.trim(),
+      role: newStaffForm.role.trim() || 'Coordinador / Staff',
+      email: newStaffForm.email.trim() || ''
     };
 
     setStaffList(prev => [...prev, newStaff]);
-    // Inicializar asignación en todas las filas
     setScheduleRows(prev => prev.map(row => ({
       ...row,
       assignments: {
@@ -489,34 +442,13 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
       }
     })));
 
-    setNewStaffData({ name: '', role: '', email: '' });
-    setShowAddStaffModal(false);
-    setHasUnsavedChanges(true);
-    setSaveMessage(`✅ Colaborador ${newStaff.name} agregado a la matriz.`);
-    setTimeout(() => setSaveMessage(''), 3000);
-  };
-
-  // Guardar edición de colaborador
-  const handleSaveStaffEdit = () => {
-    if (!editingStaffId) return;
-    setStaffList(prev => prev.map(s => {
-      if (s.id === editingStaffId) {
-        return {
-          ...s,
-          name: editStaffData.name.trim() || s.name,
-          role: editStaffData.role.trim() || s.role,
-          email: editStaffData.email.trim() || s.email
-        };
-      }
-      return s;
-    }));
-    setEditingStaffId(null);
+    setNewStaffForm({ name: '', role: '', email: '' });
     setHasUnsavedChanges(true);
   };
 
-  // Eliminar colaborador (columna)
-  const handleDeleteStaff = (staffId, staffName) => {
-    if (window.confirm(`¿Eliminar al colaborador "${staffName}" y su columna de la matriz?`)) {
+  // Eliminar colaborador
+  const handleDeleteStaffMember = (staffId, staffName) => {
+    if (window.confirm(`¿Eliminar al colaborador "${staffName}" y sus asignaciones de la matriz?`)) {
       setStaffList(prev => prev.filter(s => s.id !== staffId));
       setScheduleRows(prev => prev.map(row => {
         const copy = { ...row.assignments };
@@ -527,109 +459,22 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
     }
   };
 
-  // Renderizador interactivo de badge de celda
-  const renderAssignmentBadge = (val, rowId, staffId) => {
+  // Renderizador limpio de badges de tareas (conforme al diseño oficial)
+  const renderAssignmentBadge = (val) => {
     const rawVal = (val || '—').trim();
-    const isThisActive = activeCellEdit?.rowId === rowId && activeCellEdit?.staffId === staffId;
 
-    if (isThisActive) {
-      return (
-        <div style={{ position: 'relative', zIndex: 10 }}>
-          <input
-            type="text"
-            autoFocus
-            defaultValue={rawVal === '—' ? '' : rawVal}
-            onBlur={(e) => {
-              handleCellChange(rowId, staffId, e.target.value.trim() || '—');
-              setActiveCellEdit(null);
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                handleCellChange(rowId, staffId, e.currentTarget.value.trim() || '—');
-                setActiveCellEdit(null);
-              } else if (e.key === 'Escape') {
-                setActiveCellEdit(null);
-              }
-            }}
-            style={{
-              width: '120px',
-              background: '#0284c7',
-              border: '2px solid #fff',
-              color: '#fff',
-              borderRadius: '6px',
-              padding: '4px 8px',
-              fontSize: '0.8rem',
-              fontWeight: 700,
-              textAlign: 'center',
-              boxShadow: '0 4px 15px rgba(0,0,0,0.5)'
-            }}
-          />
-          {/* Menu de opciones rápidas */}
-          <div 
-            style={{
-              position: 'absolute',
-              top: '100%',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              marginTop: '4px',
-              background: '#0f172a',
-              border: '1px solid rgba(255,255,255,0.2)',
-              borderRadius: '8px',
-              padding: '4px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '2px',
-              width: '140px',
-              boxShadow: '0 10px 25px rgba(0,0,0,0.8)',
-              zIndex: 100
-            }}
-          >
-            {QUICK_ASSIGNMENT_OPTIONS.map(opt => (
-              <button
-                key={opt.value}
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  handleCellChange(rowId, staffId, opt.value);
-                  setActiveCellEdit(null);
-                }}
-                style={{
-                  background: 'rgba(255,255,255,0.05)',
-                  border: 'none',
-                  borderRadius: '4px',
-                  padding: '4px 6px',
-                  fontSize: '0.72rem',
-                  color: opt.color,
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  fontWeight: 600
-                }}
-              >
-                {opt.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      );
-    }
-
-    // Estilos de visualización
     if (rawVal === '✓' || rawVal.toLowerCase() === 'ok' || rawVal.toLowerCase() === 'si') {
       return (
-        <span 
-          onClick={() => isEditing && setActiveCellEdit({ rowId, staffId })}
-          style={{ 
-            background: 'rgba(16, 185, 129, 0.2)', 
-            color: '#34d399', 
-            border: '1px solid rgba(16, 185, 129, 0.4)', 
-            padding: '3px 10px', 
-            borderRadius: '12px', 
-            fontWeight: 800,
-            fontSize: '0.84rem',
-            cursor: isEditing ? 'pointer' : 'default',
-            display: 'inline-block'
-          }}
-          title={isEditing ? 'Clic para editar o cambiar' : 'Presente'}
-        >
+        <span style={{ 
+          background: 'rgba(34, 197, 94, 0.12)', 
+          color: '#16a34a', 
+          border: '1px solid rgba(34, 197, 94, 0.3)', 
+          padding: '2px 8px', 
+          borderRadius: '12px', 
+          fontWeight: 800,
+          fontSize: '0.8rem',
+          display: 'inline-block'
+        }}>
           ✓
         </span>
       );
@@ -637,68 +482,52 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
 
     if (rawVal === '—' || rawVal === '-' || rawVal === '' || rawVal.toLowerCase() === 'no') {
       return (
-        <span 
-          onClick={() => isEditing && setActiveCellEdit({ rowId, staffId })}
-          style={{ 
-            color: 'rgba(255,255,255,0.25)', 
-            fontWeight: 600, 
-            fontSize: '0.85rem',
-            cursor: isEditing ? 'pointer' : 'default',
-            padding: '2px 8px'
-          }}
-          title={isEditing ? 'Clic para asignar tarea' : 'Libre'}
-        >
+        <span style={{ color: 'var(--text-muted)', fontWeight: 500, fontSize: '0.85rem' }}>
           —
         </span>
       );
     }
 
-    // Tareas específicas con colores
-    let bg = 'rgba(59, 130, 246, 0.2)';
-    let color = '#60a5fa';
-    let border = 'rgba(59, 130, 246, 0.4)';
+    // Tareas específicas con la paleta de Causa OS
+    let bg = 'rgba(0, 212, 255, 0.1)';
+    let color = 'var(--crear-blue, #00d4ff)';
+    let border = 'rgba(0, 212, 255, 0.25)';
 
     if (rawVal.toLowerCase().includes('tanque')) {
-      bg = 'rgba(245, 158, 11, 0.25)';
-      color = '#fbbf24';
-      border = 'rgba(245, 158, 11, 0.6)';
+      bg = 'var(--crear-gold-light)';
+      color = 'var(--crear-gold, #f59e0b)';
+      border = 'rgba(255, 193, 7, 0.35)';
     } else if (rawVal.toLowerCase().includes('vuelo')) {
-      bg = 'rgba(236, 72, 153, 0.25)';
-      color = '#f472b6';
-      border = 'rgba(236, 72, 153, 0.6)';
+      bg = 'rgba(244, 114, 182, 0.12)';
+      color = '#ec4899';
+      border = 'rgba(244, 114, 182, 0.3)';
     } else if (rawVal.toLowerCase().includes('barrera')) {
-      bg = 'rgba(239, 68, 68, 0.25)';
-      color = '#f87171';
-      border = 'rgba(239, 68, 68, 0.6)';
+      bg = 'rgba(249, 115, 22, 0.12)';
+      color = '#ea580c';
+      border = 'rgba(249, 115, 22, 0.3)';
     } else if (rawVal.toLowerCase().includes('confianza')) {
-      bg = 'rgba(139, 92, 246, 0.25)';
-      color = '#c084fc';
-      border = 'rgba(139, 92, 246, 0.6)';
+      bg = 'rgba(168, 85, 247, 0.12)';
+      color = '#a855f7';
+      border = 'rgba(168, 85, 247, 0.3)';
     } else if (rawVal.toLowerCase().includes('grounding')) {
-      bg = 'rgba(20, 184, 166, 0.25)';
-      color = '#2dd4bf';
-      border = 'rgba(20, 184, 166, 0.6)';
+      bg = 'rgba(20, 184, 166, 0.12)';
+      color = '#0d9488';
+      border = 'rgba(20, 184, 166, 0.3)';
     }
 
     return (
-      <span 
-        onClick={() => isEditing && setActiveCellEdit({ rowId, staffId })}
-        style={{ 
-          background: bg, 
-          color: color, 
-          border: `1px solid ${border}`, 
-          padding: '2px 8px', 
-          borderRadius: '8px', 
-          fontSize: '0.74rem', 
-          fontWeight: 700,
-          display: 'inline-block',
-          maxWidth: '140px',
-          whiteSpace: 'normal',
-          lineHeight: '1.2',
-          cursor: isEditing ? 'pointer' : 'default'
-        }}
-        title={isEditing ? 'Clic para editar' : rawVal}
-      >
+      <span style={{ 
+        background: bg, 
+        color: color, 
+        border: `1px solid ${border}`, 
+        padding: '2px 8px', 
+        borderRadius: '6px', 
+        fontSize: '0.74rem', 
+        fontWeight: 700,
+        display: 'inline-block',
+        maxWidth: '140px',
+        lineHeight: '1.2'
+      }}>
         {rawVal}
       </span>
     );
@@ -714,17 +543,17 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
     });
   }, [scheduleRows, filterTraining]);
 
-  // Mensaje nativo para Google Chat (sin enlaces externos de Sheet)
+  // Mensaje nativo para Google Chat
   const generateGoogleChatMessage = () => {
     const assignedNames = staffList.map(s => s.name).join(', ');
     return `📢 *ATENCIÓN EQUIPO OPERATIVO — HORARIOS OFICIALES EN NODUS* 📅\n\n` +
       `Estimado equipo asignado (*${assignedNames}*):\n\n` +
-      `La Gerencia de Sede (*${userSede}*) ha actualizado los *Horarios y Turnos Operativos Oficiales* para los entrenamientos UNO, DOS y MAESTRÍA en la plataforma *Nodus / Causa OS*.\n\n` +
+      `La Gerencia de Sede (*${userSede}*) ha actualizado los *Horarios y Turnos Operativos Oficiales* para los entrenamientos UNO, DOS y MAESTRÍA en *Nodus / Causa OS*.\n\n` +
       `🔗 *Consulta tus Turnos en Vivo:* https://centro-operativo-cpsl.web.app\n\n` +
-      `📌 *Lineamientos Clave:* \n` +
+      `📌 *Lineamientos:* \n` +
       `• Revisa tus roles asignados (Groundings, Noches de Confianza, Tanque, Rompimiento de Barreras, Vuelos).\n` +
-      `• Cumplir estrictamente el Código de Vestimenta por jornada (Negro formal / Polos oficiales).\n` +
-      `• Cualquier cambio o reemplazo debe ser autorizado por Gerencia de Sede.\n\n` +
+      `• Cumplir estrictamente el Código de Vestimenta por jornada.\n` +
+      `• Cualquier duda de asignación, coordinar directamente con Gerencia.\n\n` +
       `_Equipo Crear Poder Sin Límites — Plataforma Operativa Nodus / Causa OS_`;
   };
 
@@ -733,19 +562,19 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
     const msg = generateGoogleChatMessage();
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(msg).then(() => {
-        setCopyFeedback('¡Mensaje copiado! Abriendo Google Chat...');
+        setCopyFeedback('¡Mensaje copiado al portapapeles!');
         setTimeout(() => setCopyFeedback(''), 3000);
       });
     }
     window.open('https://chat.google.com/u/0/', '_blank');
   };
 
-  // Enviar Correo a todos los asignados (sin Leyla)
+  // Enviar Correo a todos los asignados
   const handleSendBatchEmail = () => {
     const emails = staffList.map(s => s.email).filter(Boolean).join(',');
-    const subject = `📅 Horarios Oficiales de Entrenamiento Asignados — Sede ${userSede} (Nodus Causa OS)`;
+    const subject = `📅 Horarios Oficiales de Entrenamiento — Sede ${userSede} (Nodus Causa OS)`;
     const body = `Estimado Equipo Asignado,\n\n` +
-      `Se han actualizado y publicado oficialmente los Horarios y Turnos Operativos de Entrenamiento en Nodus para la sede ${userSede}.\n\n` +
+      `Se han actualizado y publicado los Horarios y Turnos Operativos de Entrenamiento en Nodus para la sede ${userSede}.\n\n` +
       `Por favor ingresa a la plataforma Causa OS para revisar tus jornadas, salas y tareas específicas asignadas:\n` +
       `👉 https://centro-operativo-cpsl.web.app\n\n` +
       `Saludos cordiales,\n` +
@@ -774,12 +603,9 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
       onClick={onClose}
       style={{
         position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.85)',
-        backdropFilter: 'blur(8px)',
+        top: 0, left: 0, right: 0, bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.75)',
+        backdropFilter: 'blur(6px)',
         zIndex: 99999,
         display: 'flex',
         alignItems: 'center',
@@ -793,33 +619,33 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
         onClick={e => e.stopPropagation()}
         style={{
           width: '100%',
-          maxWidth: '1280px',
-          maxHeight: '94vh',
+          maxWidth: '1240px',
+          maxHeight: '92vh',
           overflowY: 'auto',
-          background: 'var(--bg-card, #0f172a)',
-          borderRadius: '16px',
-          border: '1px solid rgba(41, 171, 226, 0.3)',
-          boxShadow: '0 25px 60px rgba(0,0,0,0.8), 0 0 30px rgba(41, 171, 226, 0.15)',
-          padding: 'clamp(1rem, 2.5vw, 1.8rem)',
+          background: 'var(--bg-card)',
+          borderRadius: 'var(--radius-lg)',
+          border: '1px solid var(--border-subtle)',
+          boxShadow: 'var(--card-shadow)',
+          padding: 'clamp(1.2rem, 2.5vw, 1.8rem)',
           display: 'flex',
           flexDirection: 'column',
           gap: '1.2rem',
-          color: 'var(--text-main, #f8fafc)'
+          color: 'var(--text-main)'
         }}
       >
         {/* HEADER */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '1rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '1rem' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.3rem', flexWrap: 'wrap' }}>
-              <Clock size={28} color="var(--crear-cyan, #29abe2)" />
-              <h2 style={{ margin: 0, fontSize: '1.45rem', fontWeight: 800, color: 'var(--text-heading, #fff)', letterSpacing: '-0.5px' }}>
+              <Clock size={24} className="text-gold" />
+              <h2 style={{ margin: 0, fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-heading)', fontFamily: 'var(--font-heading)' }}>
                 Horarios y Turnos Operativos del Equipo
               </h2>
               <span style={{ 
-                background: 'rgba(245, 158, 11, 0.2)',
-                color: '#f59e0b',
-                border: '1px solid rgba(245, 158, 11, 0.4)',
-                borderRadius: '8px',
+                background: 'var(--crear-gold-light)',
+                color: 'var(--crear-gold)',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: '6px',
                 fontSize: '0.72rem',
                 fontWeight: 700,
                 padding: '2px 8px',
@@ -827,44 +653,41 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                 alignItems: 'center',
                 gap: '4px'
               }}>
-                <Lock size={12} />
-                Gestión Nodus ({userSede})
+                <Lock size={11} />
+                Sede {userSede}
               </span>
               {hasUnsavedChanges && (
                 <span style={{
-                  background: 'rgba(239, 68, 68, 0.2)',
-                  color: '#f87171',
-                  border: '1px solid rgba(239, 68, 68, 0.4)',
-                  borderRadius: '8px',
+                  background: 'rgba(239, 68, 68, 0.12)',
+                  color: 'var(--color-error)',
+                  border: '1px solid rgba(239, 68, 68, 0.3)',
+                  borderRadius: '6px',
                   fontSize: '0.72rem',
                   fontWeight: 700,
-                  padding: '2px 8px',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '4px'
+                  padding: '2px 8px'
                 }}>
-                  ⚠️ Cambios sin guardar
+                  ● Cambios pendientes
                 </span>
               )}
             </div>
-            <p style={{ margin: 0, fontSize: '0.86rem', color: 'var(--text-muted, #94a3b8)' }}>
-              Matriz operativa editable en tiempo real para <strong>Gerentes de Sede, Coordinadores y Staff</strong> — Almacenamiento nativo en <strong>NODUS</strong>.
+            <p className="text-muted" style={{ margin: 0, fontSize: '0.86rem' }}>
+              Protocolo de jornadas, turnos y fisionomía para <strong>Equipo de Oficina, Gerentes de Sede y Coordinadores</strong> — Almacenamiento en <strong>NODUS</strong>.
             </p>
           </div>
           <button 
             onClick={onClose}
             className="btn-icon"
             style={{
-              background: 'rgba(255,255,255,0.06)',
-              border: '1px solid rgba(255,255,255,0.1)',
+              background: 'transparent',
+              border: '1px solid var(--border-subtle)',
               borderRadius: '50%',
-              width: '36px',
-              height: '36px',
+              width: '34px',
+              height: '34px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
-              color: 'var(--text-muted, #94a3b8)',
+              color: 'var(--text-muted)',
               transition: 'all 0.2s'
             }}
           >
@@ -875,12 +698,12 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
         {/* TABS DE FILTRO */}
         <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap' }}>
           {[
-            { id: 'matriz_equipos', label: '🗓️ Horarios de Equipos (Matriz Nodus)', highlight: true },
-            { id: 'todos_equipo', label: '👥 Resumen de Todo el Equipo' },
-            { id: 'oficina', label: '🏢 Equipo de Oficina (Soporte)' },
-            { id: 'gerentes', label: '👔 Gerentes de Sede (Nivel 8)' },
-            { id: 'coordinadores', label: '🎯 Coordinadores (CC1Y2 & CMJ)' },
-            { id: 'pulsos_reportes', label: '⚡ Pulsos & Reportes Post-FDS (Nodus & Causa OS)' },
+            { id: 'matriz_equipos', label: '🗓️ Horarios de Equipos (Matriz Nodus)' },
+            { id: 'todos_equipo', label: '👥 Resumen del Equipo' },
+            { id: 'oficina', label: '🏢 Equipo de Oficina' },
+            { id: 'gerentes', label: '👔 Gerentes de Sede' },
+            { id: 'coordinadores', label: '🎯 Coordinadores' },
+            { id: 'pulsos_reportes', label: '⚡ Pulsos & Reportes Post-FDS' },
             { id: 'sala_c1', label: '🟣 Sala C1' },
             { id: 'sala_c2', label: '🔵 Sala C2' },
             { id: 'sala_mj', label: '🟡 Sala Maestría' }
@@ -897,14 +720,14 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                   fontWeight: isSelected ? 700 : 500,
                   cursor: 'pointer',
                   border: isSelected 
-                    ? (tab.highlight ? '1px solid #f59e0b' : '1px solid var(--crear-cyan, #29abe2)') 
-                    : (tab.highlight ? '1px dashed rgba(245, 158, 11, 0.4)' : '1px solid rgba(255,255,255,0.08)'),
+                    ? '1px solid var(--crear-gold)' 
+                    : '1px solid var(--border-subtle)',
                   background: isSelected 
-                    ? (tab.highlight ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(41, 171, 226, 0.2))' : 'rgba(41, 171, 226, 0.15)') 
-                    : (tab.highlight ? 'rgba(245, 158, 11, 0.08)' : 'rgba(255,255,255,0.03)'),
+                    ? 'var(--crear-gold-light)' 
+                    : 'transparent',
                   color: isSelected 
-                    ? (tab.highlight ? '#fbbf24' : 'var(--crear-cyan, #29abe2)') 
-                    : (tab.highlight ? '#f59e0b' : 'var(--text-muted, #94a3b8)'),
+                    ? 'var(--crear-gold)' 
+                    : 'var(--text-muted)',
                   transition: 'all 0.15s ease'
                 }}
               >
@@ -914,12 +737,12 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
           })}
         </div>
 
-        {/* FEEDBACK DE GUARDADO O ALERTA */}
+        {/* NOTIFICACIÓN O ALERTA */}
         {saveMessage && (
           <div style={{
-            background: saveMessage.includes('❌') ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)',
-            border: `1px solid ${saveMessage.includes('❌') ? 'rgba(239, 68, 68, 0.4)' : 'rgba(16, 185, 129, 0.4)'}`,
-            color: saveMessage.includes('❌') ? '#fca5a5' : '#6ee7b7',
+            background: 'var(--crear-gold-light)',
+            border: '1px solid var(--border-subtle)',
+            color: 'var(--crear-gold)',
             padding: '0.6rem 1rem',
             borderRadius: '8px',
             fontSize: '0.84rem',
@@ -936,152 +759,131 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
 
           {/* ========================================================================= */}
-          {/* TAB: MATRIZ DE HORARIOS Y TURNOS (100% EDITABLE EN NODUS)                  */}
+          {/* TAB: MATRIZ DE HORARIOS Y TURNOS (DISEÑO LIMPIO Y EJECUTIVO)              */}
           {/* ========================================================================= */}
           {activeTab === 'matriz_equipos' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               
-              {/* BARRA SUPERIOR DE CONTROL NODUS */}
+              {/* BARRA SUPERIOR DE ACCIONES */}
               <div 
                 style={{ 
-                  background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.95))',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: '12px',
-                  padding: '1rem',
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   flexWrap: 'wrap',
-                  gap: '1rem'
+                  gap: '0.8rem',
+                  padding: '0.8rem 1rem',
+                  background: 'var(--bg-dark-alt, #ffffff)',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: 'var(--radius-md)'
                 }}
               >
                 <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.3rem' }}>
-                    <Calendar size={20} color="#f59e0b" />
-                    <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: '#fff' }}>
-                      Matriz Operativa de Horarios & Turnos — Nodus Causa OS
-                    </h3>
+                  <div style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--text-heading)' }}>
+                    Matriz de Asignaciones y Turnos de Sala
                   </div>
-                  <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--text-muted, #94a3b8)' }}>
-                    Totalmente editable: haz clic en cualquier celda para cambiar turnos o asignar responsabilidades.
-                    {lastSaved && ` • Último guardado en Nodus: ${lastSaved}`}
-                  </p>
+                  <div className="text-muted" style={{ fontSize: '0.78rem' }}>
+                    {isManager ? 'Haz clic en "Editar" en cualquier turno para modificar horarios y personas.' : 'Visualización oficial de turnos asignados por Gerencia.'}
+                    {lastSaved && ` • Guardado: ${lastSaved}`}
+                  </div>
                 </div>
 
-                {/* BOTONES DE GESTIÓN */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-                  {/* Botón Agregar Colaborador */}
-                  <button
-                    onClick={() => setShowAddStaffModal(true)}
-                    style={{
-                      background: 'rgba(139, 92, 246, 0.2)',
-                      color: '#c084fc',
-                      border: '1px solid rgba(139, 92, 246, 0.4)',
-                      borderRadius: '8px',
-                      padding: '0.5rem 0.9rem',
-                      fontSize: '0.82rem',
-                      fontWeight: 700,
-                      cursor: 'pointer',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '0.4rem'
-                    }}
-                    title="Añadir una nueva columna de persona o coordinador"
-                  >
-                    <UserPlus size={15} />
-                    ➕ Colaborador
-                  </button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+                  {isManager && (
+                    <button
+                      onClick={() => setShowManageStaffModal(true)}
+                      className="btn-secondary"
+                      style={{ padding: '0.45rem 0.85rem', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
+                      title="Administrar colaboradores de la matriz"
+                    >
+                      <Users size={14} />
+                      Equipo ({staffList.length})
+                    </button>
+                  )}
 
-                  {/* Botón de Notificación Correo & Google Chat */}
+                  {isManager && (
+                    <button
+                      onClick={() => handleAddNewRow('UNO')}
+                      className="btn-secondary"
+                      style={{ padding: '0.45rem 0.85rem', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
+                      title="Agregar un nuevo turno"
+                    >
+                      <Plus size={14} />
+                      Nuevo Turno
+                    </button>
+                  )}
+
                   <button
                     onClick={() => setShowNotifyModal(true)}
-                    style={{
-                      background: 'linear-gradient(135deg, #10b981, #059669)',
-                      color: '#fff',
-                      border: 'none',
-                      borderRadius: '8px',
-                      padding: '0.5rem 0.9rem',
-                      fontSize: '0.82rem',
-                      fontWeight: 700,
-                      cursor: 'pointer',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '0.4rem',
-                      boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)'
-                    }}
-                    title="Notificar a los colaboradores asignados por Correo y Google Chat"
+                    className="btn-secondary"
+                    style={{ padding: '0.45rem 0.85rem', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
+                    title="Notificar disponibilidad por Correo o Google Chat"
                   >
-                    <Send size={15} />
-                    📢 Notificar Disponibilidad
+                    <Send size={14} />
+                    Notificar
                   </button>
 
-                  {/* Guardar en Nodus (Firestore) */}
-                  <button
-                    onClick={handleSaveToNodus}
-                    disabled={isSaving}
-                    style={{
-                      background: hasUnsavedChanges 
-                        ? 'linear-gradient(135deg, #f59e0b, #d97706)' 
-                        : 'linear-gradient(135deg, #0284c7, #0369a1)',
-                      color: '#fff',
-                      border: 'none',
-                      borderRadius: '8px',
-                      padding: '0.5rem 1.1rem',
-                      fontSize: '0.82rem',
-                      fontWeight: 800,
-                      cursor: isSaving ? 'wait' : 'pointer',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '0.4rem',
-                      boxShadow: '0 4px 12px rgba(2, 132, 199, 0.3)'
-                    }}
-                  >
-                    <Save size={15} />
-                    {isSaving ? 'Guardando en Nodus...' : (hasUnsavedChanges ? '💾 Guardar Cambios en Nodus' : '💾 Guardado en Nodus')}
-                  </button>
+                  {isManager && (
+                    <button
+                      onClick={handleSaveToNodus}
+                      disabled={isSaving}
+                      className="btn-primary"
+                      style={{ 
+                        padding: '0.45rem 1.2rem', 
+                        fontSize: '0.8rem', 
+                        display: 'inline-flex', 
+                        alignItems: 'center', 
+                        gap: '0.4rem' 
+                      }}
+                    >
+                      <Save size={14} />
+                      {isSaving ? 'Guardando...' : (hasUnsavedChanges ? 'Guardar Cambios' : 'Guardado en Nodus')}
+                    </button>
+                  )}
                 </div>
               </div>
 
-              {/* FILTROS Y CONTROLES DE VISTA */}
+              {/* FILTROS LIMPIOS */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.8rem' }}>
-                {/* Filtro por Entrenamiento */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 600 }}>Entrenamiento:</span>
+                  <span className="text-muted" style={{ fontSize: '0.78rem', fontWeight: 600 }}>Entrenamiento:</span>
                   {[
                     { id: 'TODOS', label: 'Todos' },
-                    { id: 'UNO', label: '🟣 UNO (C1)' },
-                    { id: 'DOS', label: '🔵 DOS (C2)' },
-                    { id: 'MAESTRÍA', label: '🟡 Maestría (MJ)' }
-                  ].map(f => (
-                    <button
-                      key={f.id}
-                      onClick={() => setFilterTraining(f.id)}
-                      style={{
-                        padding: '0.3rem 0.7rem',
-                        borderRadius: '6px',
-                        fontSize: '0.76rem',
-                        fontWeight: filterTraining === f.id ? 700 : 500,
-                        cursor: 'pointer',
-                        border: filterTraining === f.id ? '1px solid var(--crear-cyan)' : '1px solid rgba(255,255,255,0.1)',
-                        background: filterTraining === f.id ? 'rgba(41, 171, 226, 0.2)' : 'rgba(255,255,255,0.04)',
-                        color: filterTraining === f.id ? '#fff' : 'var(--text-muted)'
-                      }}
-                    >
-                      {f.label}
-                    </button>
-                  ))}
+                    { id: 'UNO', label: 'UNO (C1)' },
+                    { id: 'DOS', label: 'DOS (C2)' },
+                    { id: 'MAESTRÍA', label: 'Maestría (MJ)' }
+                  ].map(f => {
+                    const isSel = filterTraining === f.id;
+                    return (
+                      <button
+                        key={f.id}
+                        onClick={() => setFilterTraining(f.id)}
+                        style={{
+                          padding: '0.3rem 0.7rem',
+                          borderRadius: '6px',
+                          fontSize: '0.76rem',
+                          fontWeight: isSel ? 700 : 500,
+                          cursor: 'pointer',
+                          border: isSel ? '1px solid var(--crear-gold)' : '1px solid var(--border-subtle)',
+                          background: isSel ? 'var(--crear-gold-light)' : 'transparent',
+                          color: isSel ? 'var(--crear-gold)' : 'var(--text-muted)'
+                        }}
+                      >
+                        {f.label}
+                      </button>
+                    );
+                  })}
                 </div>
 
-                {/* Filtro / Resaltado por Colaborador */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 600 }}>Destacar persona:</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <span className="text-muted" style={{ fontSize: '0.78rem', fontWeight: 600 }}>Destacar persona:</span>
                   <select
                     value={highlightPerson}
                     onChange={(e) => setHighlightPerson(e.target.value)}
                     style={{
-                      background: 'rgba(0,0,0,0.35)',
-                      border: '1px solid rgba(255,255,255,0.15)',
-                      color: '#fff',
+                      background: 'var(--bg-card)',
+                      border: '1px solid var(--border-subtle)',
+                      color: 'var(--text-main)',
                       borderRadius: '6px',
                       padding: '0.3rem 0.6rem',
                       fontSize: '0.78rem'
@@ -1089,174 +891,113 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                   >
                     <option value="TODOS">Ver todos los asignados</option>
                     {staffList.map(s => (
-                      <option key={s.id} value={s.id}>{s.name} ({s.email})</option>
+                      <option key={s.id} value={s.id}>{s.name}</option>
                     ))}
                   </select>
                 </div>
               </div>
 
-              {/* TABLA EDITABLE DE HORARIOS */}
+              {/* TABLA EJECUTIVA LIMPIA */}
               <div 
-                className="custom-scrollbar"
                 style={{ 
                   overflowX: 'auto', 
-                  border: '1px solid rgba(255,255,255,0.1)', 
-                  borderRadius: '12px',
-                  background: 'rgba(15, 23, 42, 0.6)'
+                  borderRadius: 'var(--radius-md)', 
+                  border: '1px solid var(--border-subtle)',
+                  background: 'var(--bg-card)'
                 }}
               >
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem', textAlign: 'left' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.86rem', textAlign: 'left' }}>
                   <thead>
-                    <tr style={{ background: 'rgba(255,255,255,0.06)', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>
-                      <th style={{ padding: '0.75rem 0.8rem', color: 'var(--text-muted)', fontWeight: 700 }}>ENTRENAMIENTO</th>
-                      <th style={{ padding: '0.75rem 0.8rem', color: 'var(--text-muted)', fontWeight: 700 }}>DÍA</th>
-                      <th style={{ padding: '0.75rem 0.8rem', color: 'var(--text-muted)', fontWeight: 700 }}>HORARIO</th>
-                      
-                      {/* Columnas dinámicas de Personas con opciones de edición y eliminación */}
+                    <tr style={{ borderBottom: '2px solid var(--border-subtle)', background: 'var(--bg-dark, #f8fafc)' }}>
+                      <th style={{ padding: '0.85rem 1rem', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                        ENTRENAMIENTO
+                      </th>
+                      <th style={{ padding: '0.85rem 1rem', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                        DÍA
+                      </th>
+                      <th style={{ padding: '0.85rem 1rem', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                        HORARIO
+                      </th>
+
                       {staffList.map(staff => {
                         const isHighlighted = highlightPerson === staff.id;
                         return (
                           <th 
                             key={staff.id} 
                             style={{ 
-                              padding: '0.65rem 0.75rem', 
+                              padding: '0.85rem 0.8rem', 
                               textAlign: 'center',
-                              color: isHighlighted ? '#fbbf24' : '#fff',
-                              fontWeight: 800,
-                              background: isHighlighted ? 'rgba(245, 158, 11, 0.15)' : 'transparent',
-                              borderLeft: '1px solid rgba(255,255,255,0.05)',
-                              borderRight: '1px solid rgba(255,255,255,0.05)',
+                              background: isHighlighted ? 'var(--crear-gold-light)' : 'transparent',
+                              borderLeft: '1px solid var(--border-subtle)',
+                              borderRight: '1px solid var(--border-subtle)',
                               minWidth: '130px'
                             }}
                           >
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
-                              <span>{staff.name}</span>
-                              <button
-                                onClick={() => {
-                                  setEditingStaffId(staff.id);
-                                  setEditStaffData({ name: staff.name, role: staff.role, email: staff.email });
-                                }}
-                                style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '1px' }}
-                                title="Editar nombre / cargo / correo"
-                              >
-                                <Edit2 size={12} />
-                              </button>
-                              <button
-                                onClick={() => handleDeleteStaff(staff.id, staff.name)}
-                                style={{ background: 'transparent', border: 'none', color: '#f87171', cursor: 'pointer', padding: '1px' }}
-                                title={`Eliminar columna de ${staff.name}`}
-                              >
-                                <Trash2 size={12} />
-                              </button>
+                            <div style={{ fontWeight: 700, color: isHighlighted ? 'var(--crear-gold)' : 'var(--text-heading)', fontSize: '0.86rem' }}>
+                              {staff.name}
                             </div>
-                            <div style={{ fontSize: '0.68rem', fontWeight: 400, color: 'var(--text-muted)', marginTop: '2px' }}>
-                              {staff.role || 'Staff'}
+                            <div className="text-muted" style={{ fontSize: '0.7rem', fontWeight: 400, marginTop: '2px' }}>
+                              {staff.role}
                             </div>
                           </th>
                         );
                       })}
 
-                      <th style={{ padding: '0.75rem 0.8rem', color: 'var(--text-muted)', fontWeight: 700 }}>VESTIMENTA</th>
-                      <th style={{ padding: '0.75rem 0.8rem', textAlign: 'center', color: 'var(--text-muted)' }}>ACCIÓN</th>
+                      <th style={{ padding: '0.85rem 1rem', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                        VESTIMENTA
+                      </th>
+
+                      {isManager && (
+                        <th style={{ padding: '0.85rem 0.8rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                          ACCIONES
+                        </th>
+                      )}
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredRows.map((row, idx) => {
+                    {filteredRows.map((row) => {
                       const isUno = row.training === 'UNO';
                       const isDos = row.training === 'DOS';
-                      const trainingColor = isUno ? '#a78bfa' : isDos ? 'var(--crear-cyan, #29abe2)' : '#f59e0b';
-                      const trainingBg = isUno ? 'rgba(139, 92, 246, 0.15)' : isDos ? 'rgba(41, 171, 226, 0.15)' : 'rgba(245, 158, 11, 0.15)';
+
+                      const trainingColor = isUno ? '#0284c7' : (isDos ? '#d97706' : '#9333ea');
+                      const trainingBg = isUno ? 'rgba(2, 132, 199, 0.1)' : (isDos ? 'rgba(217, 119, 6, 0.1)' : 'rgba(147, 51, 234, 0.1)');
 
                       return (
                         <tr 
                           key={row.id}
-                          style={{ 
-                            borderBottom: '1px solid rgba(255,255,255,0.05)',
-                            background: idx % 2 === 0 ? 'rgba(255,255,255,0.015)' : 'transparent'
-                          }}
+                          style={{ borderBottom: '1px solid var(--border-subtle)' }}
                         >
-                          {/* Entrenamiento y Subtítulo */}
-                          <td style={{ padding: '0.65rem 0.8rem', whiteSpace: 'nowrap' }}>
-                            <select
-                              value={row.training}
-                              onChange={(e) => handleRowFieldChange(row.id, 'training', e.target.value)}
-                              style={{
-                                background: trainingBg,
-                                color: trainingColor,
-                                border: `1px solid ${trainingColor}40`,
-                                padding: '3px 6px',
-                                borderRadius: '6px',
-                                fontSize: '0.74rem',
-                                fontWeight: 800,
-                                cursor: 'pointer'
-                              }}
-                            >
-                              <option value="UNO">UNO</option>
-                              <option value="DOS">DOS</option>
-                              <option value="MAESTRÍA">MAESTRÍA</option>
-                            </select>
-                            <input
-                              type="text"
-                              value={row.nota || ''}
-                              placeholder="Subtítulo / Actividad"
-                              onChange={(e) => handleRowFieldChange(row.id, 'nota', e.target.value)}
-                              style={{
-                                display: 'block',
-                                marginTop: '4px',
-                                background: 'transparent',
-                                border: 'none',
-                                borderBottom: '1px dotted rgba(255,255,255,0.2)',
-                                color: 'var(--text-muted)',
-                                fontSize: '0.7rem',
-                                width: '130px'
-                              }}
-                            />
+                          {/* Entrenamiento */}
+                          <td style={{ padding: '0.75rem 1rem', whiteSpace: 'nowrap' }}>
+                            <span style={{
+                              background: trainingBg,
+                              color: trainingColor,
+                              border: `1px solid ${trainingColor}30`,
+                              padding: '2px 8px',
+                              borderRadius: '6px',
+                              fontSize: '0.76rem',
+                              fontWeight: 800
+                            }}>
+                              {row.training}
+                            </span>
+                            {row.nota && (
+                              <div className="text-muted" style={{ fontSize: '0.72rem', marginTop: '3px' }}>
+                                {row.nota}
+                              </div>
+                            )}
                           </td>
 
                           {/* Día */}
-                          <td style={{ padding: '0.65rem 0.8rem', whiteSpace: 'nowrap' }}>
-                            <select
-                              value={row.dia}
-                              onChange={(e) => handleRowFieldChange(row.id, 'dia', e.target.value)}
-                              style={{
-                                background: 'rgba(0,0,0,0.3)',
-                                border: '1px solid rgba(255,255,255,0.15)',
-                                color: '#fff',
-                                borderRadius: '6px',
-                                padding: '3px 6px',
-                                fontSize: '0.78rem',
-                                fontWeight: 600
-                              }}
-                            >
-                              <option value="Jueves">Jueves</option>
-                              <option value="Viernes">Viernes</option>
-                              <option value="Sábado">Sábado</option>
-                              <option value="Domingo">Domingo</option>
-                              <option value="Lunes">Lunes</option>
-                              <option value="Miércoles">Miércoles</option>
-                            </select>
+                          <td style={{ padding: '0.75rem 1rem', fontWeight: 600, color: 'var(--text-heading)', whiteSpace: 'nowrap' }}>
+                            {row.dia}
                           </td>
 
                           {/* Horario */}
-                          <td style={{ padding: '0.65rem 0.8rem', whiteSpace: 'nowrap' }}>
-                            <input
-                              type="text"
-                              value={row.horario}
-                              onChange={(e) => handleRowFieldChange(row.id, 'horario', e.target.value)}
-                              style={{
-                                background: 'rgba(0,0,0,0.3)',
-                                border: '1px solid rgba(255,255,255,0.15)',
-                                color: 'var(--crear-cyan, #29abe2)',
-                                borderRadius: '6px',
-                                padding: '4px 6px',
-                                fontSize: '0.78rem',
-                                fontWeight: 700,
-                                width: '135px'
-                              }}
-                            />
+                          <td style={{ padding: '0.75rem 1rem', whiteSpace: 'nowrap', fontWeight: 700, color: 'var(--crear-blue, #0284c7)' }}>
+                            {row.horario}
                           </td>
 
-                          {/* Asignaciones por persona */}
+                          {/* Celdas de Colaboradores */}
                           {staffList.map(staff => {
                             const val = row.assignments?.[staff.id] || '—';
                             const isHighlighted = highlightPerson === staff.id;
@@ -1264,53 +1005,67 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                               <td 
                                 key={staff.id}
                                 style={{ 
-                                  padding: '0.65rem 0.75rem', 
+                                  padding: '0.75rem 0.8rem', 
                                   textAlign: 'center',
-                                  background: isHighlighted ? 'rgba(245, 158, 11, 0.08)' : 'transparent',
-                                  borderLeft: '1px solid rgba(255,255,255,0.03)',
-                                  borderRight: '1px solid rgba(255,255,255,0.03)'
+                                  background: isHighlighted ? 'var(--crear-gold-light)' : 'transparent',
+                                  borderLeft: '1px solid var(--border-subtle)',
+                                  borderRight: '1px solid var(--border-subtle)'
                                 }}
                               >
-                                {renderAssignmentBadge(val, row.id, staff.id)}
+                                {renderAssignmentBadge(val)}
                               </td>
                             );
                           })}
 
                           {/* Vestimenta */}
-                          <td style={{ padding: '0.65rem 0.8rem', whiteSpace: 'nowrap' }}>
-                            <input
-                              type="text"
-                              value={row.vestimenta}
-                              onChange={(e) => handleRowFieldChange(row.id, 'vestimenta', e.target.value)}
-                              style={{
-                                background: 'rgba(0,0,0,0.3)',
-                                border: '1px solid rgba(255,255,255,0.15)',
-                                color: '#e2e8f0',
-                                borderRadius: '6px',
-                                padding: '4px 6px',
-                                fontSize: '0.76rem',
-                                width: '150px'
-                              }}
-                            />
+                          <td style={{ padding: '0.75rem 1rem', whiteSpace: 'nowrap', fontSize: '0.8rem' }}>
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', color: 'var(--text-main)' }}>
+                              <Shirt size={14} className="text-muted" />
+                              {row.vestimenta}
+                            </span>
                           </td>
 
-                          {/* Acciones de fila */}
-                          <td style={{ padding: '0.65rem 0.8rem', textAlign: 'center' }}>
-                            <button
-                              onClick={() => handleDeleteRow(row.id)}
-                              style={{
-                                background: 'rgba(239, 68, 68, 0.2)',
-                                border: '1px solid rgba(239, 68, 68, 0.4)',
-                                color: '#f87171',
-                                borderRadius: '6px',
-                                padding: '4px 8px',
-                                cursor: 'pointer'
-                              }}
-                              title="Eliminar este turno"
-                            >
-                              <Trash2 size={13} />
-                            </button>
-                          </td>
+                          {/* Acciones de Fila (Solo Gerentes) */}
+                          {isManager && (
+                            <td style={{ padding: '0.75rem 0.8rem', textAlign: 'center', whiteSpace: 'nowrap' }}>
+                              <button
+                                onClick={() => setEditingRow(row)}
+                                className="btn-icon"
+                                style={{
+                                  background: 'transparent',
+                                  border: '1px solid var(--border-subtle)',
+                                  borderRadius: '6px',
+                                  padding: '4px 8px',
+                                  cursor: 'pointer',
+                                  color: 'var(--text-muted)',
+                                  fontSize: '0.75rem',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '4px',
+                                  marginRight: '4px'
+                                }}
+                                title="Editar este turno"
+                              >
+                                <Edit2 size={13} />
+                                <span>Editar</span>
+                              </button>
+                              <button
+                                onClick={() => handleDeleteRow(row.id)}
+                                className="btn-icon"
+                                style={{
+                                  background: 'transparent',
+                                  border: '1px solid var(--border-subtle)',
+                                  borderRadius: '6px',
+                                  padding: '4px 6px',
+                                  cursor: 'pointer',
+                                  color: 'var(--color-error)'
+                                }}
+                                title="Eliminar este turno"
+                              >
+                                <Trash2 size={13} />
+                              </button>
+                            </td>
+                          )}
                         </tr>
                       );
                     })}
@@ -1318,70 +1073,11 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                 </table>
               </div>
 
-              {/* BOTONES PARA AGREGAR NUEVAS FILAS / TURNOS */}
-              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>➕ Agregar nuevo turno:</span>
-                <button
-                  onClick={() => handleAddRow('UNO')}
-                  style={{
-                    background: 'rgba(139, 92, 246, 0.15)',
-                    border: '1px solid rgba(139, 92, 246, 0.4)',
-                    color: '#c084fc',
-                    padding: '4px 10px',
-                    borderRadius: '6px',
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '4px'
-                  }}
-                >
-                  <Plus size={13} /> Fila UNO (C1)
-                </button>
-                <button
-                  onClick={() => handleAddRow('DOS')}
-                  style={{
-                    background: 'rgba(41, 171, 226, 0.15)',
-                    border: '1px solid rgba(41, 171, 226, 0.4)',
-                    color: 'var(--crear-cyan)',
-                    padding: '4px 10px',
-                    borderRadius: '6px',
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '4px'
-                  }}
-                >
-                  <Plus size={13} /> Fila DOS (C2)
-                </button>
-                <button
-                  onClick={() => handleAddRow('MAESTRÍA')}
-                  style={{
-                    background: 'rgba(245, 158, 11, 0.15)',
-                    border: '1px solid rgba(245, 158, 11, 0.4)',
-                    color: '#fbbf24',
-                    padding: '4px 10px',
-                    borderRadius: '6px',
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '4px'
-                  }}
-                >
-                  <Plus size={13} /> Fila Maestría (MJ)
-                </button>
-              </div>
-
             </div>
           )}
 
           {/* ========================================================================= */}
-          {/* TABS ORIGINALES DE HORARIOS OPERATIVOS                                    */}
+          {/* TABS INFORMATIVOS ORIGINALES                                              */}
           {/* ========================================================================= */}
           {activeTab === 'todos_equipo' && (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
@@ -1427,7 +1123,7 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
 
           {activeTab === 'oficina' && (
             <div className="glass-panel" style={{ padding: '1.25rem', borderTop: '4px solid #3b82f6', borderRadius: '12px' }}>
-              <h3 style={{ color: '#60a5fa', margin: '0 0 0.8rem 0' }}>🏢 Protocolo Operativo del Equipo de Oficina</h3>
+              <h3 style={{ color: '#0284c7', margin: '0 0 0.8rem 0' }}>🏢 Protocolo Operativo del Equipo de Oficina</h3>
               <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.6', margin: '0 0 1rem 0' }}>
                 El equipo de oficina garantiza la continuidad del servicio al cliente, cobranzas, emisión de certificados y respaldo logístico durante toda la semana de entrenamiento.
               </p>
@@ -1436,7 +1132,7 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
 
           {activeTab === 'gerentes' && (
             <div className="glass-panel" style={{ padding: '1.25rem', borderTop: '4px solid #f59e0b', borderRadius: '12px' }}>
-              <h3 style={{ color: '#f59e0b', margin: '0 0 0.8rem 0' }}>👔 Directiva para Gerentes de Sede (Nivel 8)</h3>
+              <h3 className="text-gold" style={{ margin: '0 0 0.8rem 0' }}>👔 Directiva para Gerentes de Sede (Nivel 8)</h3>
               <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.6', margin: '0 0 1rem 0' }}>
                 Los gerentes son los máximos custodios de la experiencia del participante, la integridad de la sede y el cumplimiento de las metas del ciclo.
               </p>
@@ -1445,7 +1141,7 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
 
           {activeTab === 'coordinadores' && (
             <div className="glass-panel" style={{ padding: '1.25rem', borderTop: '4px solid #10b981', borderRadius: '12px' }}>
-              <h3 style={{ color: '#34d399', margin: '0 0 0.8rem 0' }}>🎯 Turnos y Tareas de Coordinadores (CC1Y2 & CMJ)</h3>
+              <h3 style={{ color: '#16a34a', margin: '0 0 0.8rem 0' }}>🎯 Turnos y Tareas de Coordinadores (CC1Y2 & CMJ)</h3>
               <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.6', margin: '0 0 1rem 0' }}>
                 Responsables directos de la ejecución operativa de sala, música, control de tiempo, lista de asistencia y fisionomía de los entrenamientos.
               </p>
@@ -1454,7 +1150,7 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
 
           {activeTab === 'pulsos_reportes' && (
             <div className="glass-panel" style={{ padding: '1.25rem', borderTop: '4px solid #ec4899', borderRadius: '12px' }}>
-              <h3 style={{ color: '#f472b6', margin: '0 0 0.8rem 0' }}>⚡ Pulsos & Reportes Post-FDS (Nodus & Causa OS)</h3>
+              <h3 style={{ color: '#db2777', margin: '0 0 0.8rem 0' }}>⚡ Pulsos & Reportes Post-FDS (Nodus & Causa OS)</h3>
               <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.6' }}>
                 Al finalizar cada fin de semana de entrenamiento, cada sede emite su reporte de asistencia, retención de participantes, recaudación e incidencias para el directorio ejecutivo.
               </p>
@@ -1463,7 +1159,7 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
 
           {activeTab === 'sala_c1' && (
             <div className="glass-panel" style={{ padding: '1.25rem', borderTop: '4px solid #8b5cf6', borderRadius: '12px' }}>
-              <h3 style={{ color: '#a78bfa', margin: '0 0 0.8rem 0' }}>🟣 Horarios de Sala: Capítulo UNO (C1)</h3>
+              <h3 style={{ color: '#7c3aed', margin: '0 0 0.8rem 0' }}>🟣 Horarios de Sala: Capítulo UNO (C1)</h3>
               <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', margin: 0, lineHeight: '1.7' }}>
                 • Jueves: 4:30 PM - Cierre (Negro formal / Grounding)<br/>
                 • Viernes: 7:30 AM - 3:00 PM y 5:00 PM - Cierre (Noche de Confianza, Negro formal)<br/>
@@ -1474,8 +1170,8 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
           )}
 
           {activeTab === 'sala_c2' && (
-            <div className="glass-panel" style={{ padding: '1.25rem', borderTop: '4px solid #29abe2', borderRadius: '12px' }}>
-              <h3 style={{ color: 'var(--crear-cyan)', margin: '0 0 0.8rem 0' }}>🔵 Horarios de Sala: Capítulo DOS (C2)</h3>
+            <div className="glass-panel" style={{ padding: '1.25rem', borderTop: '4px solid #0284c7', borderRadius: '12px' }}>
+              <h3 style={{ color: '#0284c7', margin: '0 0 0.8rem 0' }}>🔵 Horarios de Sala: Capítulo DOS (C2)</h3>
               <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', margin: 0, lineHeight: '1.7' }}>
                 • Jueves: 10:30 AM - 4:00 PM y 4:00 PM - Cierre (Negro formal)<br/>
                 • Viernes: 7:15 AM - 4:00 PM y 4:00 PM - Cierre (14:01 PM Palabra Rota)<br/>
@@ -1487,7 +1183,7 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
 
           {activeTab === 'sala_mj' && (
             <div className="glass-panel" style={{ padding: '1.25rem', borderTop: '4px solid #f59e0b', borderRadius: '12px' }}>
-              <h3 style={{ color: '#f59e0b', margin: '0 0 0.8rem 0' }}>🟡 Horarios de Sala: Maestría del Juego (MJ)</h3>
+              <h3 className="text-gold" style={{ margin: '0 0 0.8rem 0' }}>🟡 Horarios de Sala: Maestría del Juego (MJ)</h3>
               <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', margin: 0, lineHeight: '1.7' }}>
                 • Viernes: 3:00 PM - 9:00 PM (Alineamiento, Negro formal)<br/>
                 • Sábado: 8:30 AM - 12:00 PM y 4:00 PM - 9:00 PM (Camiseta negra + pantalón negro)<br/>
@@ -1501,8 +1197,8 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
         {/* NOTA DE VESTIMENTA OFICIAL Y SNEAKERS */}
         <div 
           style={{ 
-            background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(41, 171, 226, 0.05))', 
-            border: '1px solid rgba(245, 158, 11, 0.35)', 
+            background: 'var(--crear-gold-light)', 
+            border: '1px solid var(--border-subtle)', 
             borderRadius: '12px', 
             padding: '1rem',
             display: 'flex',
@@ -1510,8 +1206,8 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
             gap: '0.4rem'
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', color: '#f59e0b', fontWeight: 800, fontSize: '0.9rem' }}>
-            <Shirt size={18} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', color: 'var(--crear-gold)', fontWeight: 800, fontSize: '0.88rem' }}>
+            <Shirt size={17} />
             <span>CÓDIGO DE VESTIMENTA & AUTORIZACIÓN 2026 — CREAR PODER SIN LÍMITES</span>
           </div>
           <div style={{ fontSize: '0.82rem', lineHeight: '1.5', color: 'var(--text-main)' }}>
@@ -1521,29 +1217,23 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
             <p style={{ margin: '0 0 0.3rem 0' }}>
               • <strong>Gerentes y Coordinadores:</strong> Etiqueta negra formal en aperturas, Noches de Confianza y groundings iniciales. Polos oficiales el fin de semana.
             </p>
-            <p style={{ margin: 0, color: 'var(--crear-cyan)', fontWeight: 600 }}>
+            <p style={{ margin: 0, color: 'var(--crear-blue, #0284c7)', fontWeight: 600 }}>
               👟 <strong>Entrenador / Coach:</strong> Autorización formal de utilizar <strong>zapatillas deportivas negras limpias</strong> en tarima y salón para cuidar su postura y rendimiento en jornadas de más de 10 horas.
             </p>
           </div>
         </div>
 
         {/* FOOTER */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '0.8rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-          <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-            Sede Operativa: <strong style={{ color: '#fff' }}>{userSede}</strong>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-subtle)', paddingTop: '0.8rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+          <div className="text-muted" style={{ fontSize: '0.78rem' }}>
+            Sede Operativa: <strong style={{ color: 'var(--text-heading)' }}>{userSede}</strong>
           </div>
           <button 
             onClick={onClose}
             className="btn-primary"
             style={{
-              padding: '0.55rem 1.6rem',
-              fontSize: '0.88rem',
-              fontWeight: 700,
-              borderRadius: '8px',
-              background: 'linear-gradient(135deg, #0ea5e9, #0284c7)',
-              color: '#fff',
-              border: 'none',
-              cursor: 'pointer'
+              padding: '0.5rem 1.6rem',
+              fontSize: '0.85rem'
             }}
           >
             Entendido / Cerrar
@@ -1551,17 +1241,17 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
         </div>
 
         {/* ========================================================================= */}
-        {/* MODAL: AGREGAR NUEVO COLABORADOR (COLUMNA)                                */}
+        {/* MODAL: EDITAR FILA / TURNO (ELEGANTE, SIN INPUTS CLUNKY EN LA TABLA)      */}
         {/* ========================================================================= */}
-        {showAddStaffModal && (
+        {editingRow && (
           <div 
-            onClick={() => setShowAddStaffModal(false)}
+            onClick={() => setEditingRow(null)}
             style={{
               position: 'fixed',
               top: 0, left: 0, right: 0, bottom: 0,
-              background: 'rgba(0,0,0,0.8)',
+              background: 'rgba(0, 0, 0, 0.75)',
               backdropFilter: 'blur(5px)',
-              zIndex: 100001,
+              zIndex: 100002,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -1570,123 +1260,257 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
           >
             <div 
               onClick={e => e.stopPropagation()}
+              className="glass-panel"
               style={{
-                background: '#0f172a',
-                border: '1px solid rgba(139, 92, 246, 0.4)',
-                borderRadius: '16px',
-                padding: '1.5rem',
-                maxWidth: '450px',
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: 'var(--radius-md)',
+                padding: '1.6rem',
+                maxWidth: '650px',
                 width: '100%',
-                boxShadow: '0 20px 50px rgba(0,0,0,0.9)',
+                maxHeight: '90vh',
+                overflowY: 'auto',
+                boxShadow: 'var(--card-shadow)',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '1rem',
-                color: '#fff'
+                gap: '1.2rem',
+                color: 'var(--text-main)'
               }}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800 }}>
-                  ➕ Agregar Colaborador a la Matriz
-                </h3>
-                <button onClick={() => setShowAddStaffModal(false)} style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.8rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <Edit2 size={18} className="text-gold" />
+                  <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-heading)' }}>
+                    Editar Turno de Entrenamiento
+                  </h3>
+                </div>
+                <button onClick={() => setEditingRow(null)} className="btn-icon" style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
                   <X size={18} />
                 </button>
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+              {/* CAMPOS PRINCIPALES */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.8rem' }}>
                 <div>
-                  <label style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
-                    Nombre Completo:
+                  <label className="text-muted" style={{ fontSize: '0.76rem', display: 'block', marginBottom: '4px', fontWeight: 600 }}>
+                    Entrenamiento:
                   </label>
-                  <input
-                    type="text"
-                    placeholder="Ej. Carlos Mendoza"
-                    value={newStaffData.name}
-                    onChange={e => setNewStaffData({ ...newStaffData, name: e.target.value })}
+                  <select
+                    value={editingRow.training}
+                    onChange={(e) => setEditingRow({ ...editingRow, training: e.target.value })}
                     style={{
                       width: '100%',
                       padding: '0.5rem',
-                      background: 'rgba(0,0,0,0.3)',
-                      border: '1px solid rgba(255,255,255,0.2)',
+                      background: 'var(--bg-dark-alt, #ffffff)',
+                      border: '1px solid var(--border-subtle)',
                       borderRadius: '6px',
-                      color: '#fff',
-                      fontSize: '0.82rem'
+                      color: 'var(--text-main)',
+                      fontSize: '0.84rem'
                     }}
-                  />
+                  >
+                    <option value="UNO">UNO (C1)</option>
+                    <option value="DOS">DOS (C2)</option>
+                    <option value="MAESTRÍA">MAESTRÍA (MJ)</option>
+                  </select>
                 </div>
 
                 <div>
-                  <label style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
-                    Cargo / Rol en Sala:
+                  <label className="text-muted" style={{ fontSize: '0.76rem', display: 'block', marginBottom: '4px', fontWeight: 600 }}>
+                    Día:
                   </label>
-                  <input
-                    type="text"
-                    placeholder="Ej. Coordinador C1 / Entrenador"
-                    value={newStaffData.role}
-                    onChange={e => setNewStaffData({ ...newStaffData, role: e.target.value })}
+                  <select
+                    value={editingRow.dia}
+                    onChange={(e) => setEditingRow({ ...editingRow, dia: e.target.value })}
                     style={{
                       width: '100%',
                       padding: '0.5rem',
-                      background: 'rgba(0,0,0,0.3)',
-                      border: '1px solid rgba(255,255,255,0.2)',
+                      background: 'var(--bg-dark-alt, #ffffff)',
+                      border: '1px solid var(--border-subtle)',
                       borderRadius: '6px',
-                      color: '#fff',
-                      fontSize: '0.82rem'
+                      color: 'var(--text-main)',
+                      fontSize: '0.84rem'
                     }}
-                  />
+                  >
+                    <option value="Jueves">Jueves</option>
+                    <option value="Viernes">Viernes</option>
+                    <option value="Sábado">Sábado</option>
+                    <option value="Domingo">Domingo</option>
+                    <option value="Lunes">Lunes</option>
+                    <option value="Miércoles">Miércoles</option>
+                  </select>
                 </div>
 
                 <div>
-                  <label style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
-                    Correo Electrónico (para notificaciones):
+                  <label className="text-muted" style={{ fontSize: '0.76rem', display: 'block', marginBottom: '4px', fontWeight: 600 }}>
+                    Horario:
                   </label>
                   <input
-                    type="email"
-                    placeholder="carlos.mendoza@crearpsl.net"
-                    value={newStaffData.email}
-                    onChange={e => setNewStaffData({ ...newStaffData, email: e.target.value })}
+                    type="text"
+                    value={editingRow.horario}
+                    onChange={(e) => setEditingRow({ ...editingRow, horario: e.target.value })}
+                    placeholder="Ej. 4:30 PM - Cierre"
                     style={{
                       width: '100%',
                       padding: '0.5rem',
-                      background: 'rgba(0,0,0,0.3)',
-                      border: '1px solid rgba(255,255,255,0.2)',
+                      background: 'var(--bg-dark-alt, #ffffff)',
+                      border: '1px solid var(--border-subtle)',
                       borderRadius: '6px',
-                      color: '#fff',
-                      fontSize: '0.82rem'
+                      color: 'var(--text-main)',
+                      fontSize: '0.84rem'
                     }}
                   />
                 </div>
               </div>
 
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '0.5rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.8rem' }}>
+                <div>
+                  <label className="text-muted" style={{ fontSize: '0.76rem', display: 'block', marginBottom: '4px', fontWeight: 600 }}>
+                    Código de Vestimenta:
+                  </label>
+                  <input
+                    type="text"
+                    value={editingRow.vestimenta}
+                    onChange={(e) => setEditingRow({ ...editingRow, vestimenta: e.target.value })}
+                    placeholder="Ej. Negro formal / Polo negro + pantalón negro"
+                    style={{
+                      width: '100%',
+                      padding: '0.5rem',
+                      background: 'var(--bg-dark-alt, #ffffff)',
+                      border: '1px solid var(--border-subtle)',
+                      borderRadius: '6px',
+                      color: 'var(--text-main)',
+                      fontSize: '0.84rem'
+                    }}
+                  />
+                </div>
+
+                <div>
+                  <label className="text-muted" style={{ fontSize: '0.76rem', display: 'block', marginBottom: '4px', fontWeight: 600 }}>
+                    Actividad / Subtítulo:
+                  </label>
+                  <input
+                    type="text"
+                    value={editingRow.nota || ''}
+                    onChange={(e) => setEditingRow({ ...editingRow, nota: e.target.value })}
+                    placeholder="Ej. Noche de Confianza / Tanque / Vuelos"
+                    style={{
+                      width: '100%',
+                      padding: '0.5rem',
+                      background: 'var(--bg-dark-alt, #ffffff)',
+                      border: '1px solid var(--border-subtle)',
+                      borderRadius: '6px',
+                      color: 'var(--text-main)',
+                      fontSize: '0.84rem'
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* ASIGNACIONES PERSONA POR PERSONA */}
+              <div>
+                <label className="text-muted" style={{ fontSize: '0.78rem', display: 'block', marginBottom: '8px', fontWeight: 700 }}>
+                  Asignación por Colaborador:
+                </label>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '0.7rem' }}>
+                  {staffList.map(staff => {
+                    const currentVal = editingRow.assignments?.[staff.id] || '—';
+                    return (
+                      <div 
+                        key={staff.id}
+                        style={{
+                          background: 'var(--bg-dark-alt, #ffffff)',
+                          border: '1px solid var(--border-subtle)',
+                          borderRadius: '8px',
+                          padding: '0.6rem 0.8rem',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '4px'
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span style={{ fontWeight: 700, fontSize: '0.82rem', color: 'var(--text-heading)' }}>
+                            {staff.name}
+                          </span>
+                          <span className="text-muted" style={{ fontSize: '0.7rem' }}>
+                            {staff.role}
+                          </span>
+                        </div>
+                        <input
+                          type="text"
+                          value={currentVal === '—' ? '' : currentVal}
+                          placeholder="✓, —, o tarea (ej. Grounding)"
+                          onChange={(e) => {
+                            const val = e.target.value.trim() || '—';
+                            setEditingRow({
+                              ...editingRow,
+                              assignments: {
+                                ...editingRow.assignments,
+                                [staff.id]: val
+                              }
+                            });
+                          }}
+                          style={{
+                            width: '100%',
+                            padding: '0.4rem 0.6rem',
+                            background: 'var(--bg-card)',
+                            border: '1px solid var(--border-subtle)',
+                            borderRadius: '6px',
+                            color: 'var(--text-main)',
+                            fontSize: '0.8rem'
+                          }}
+                        />
+                        {/* Botones de selección rápida */}
+                        <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: '2px' }}>
+                          {['✓', '—', 'Grounding', 'Noche Confianza', 'Tanque', 'Vuelos'].map(preset => (
+                            <button
+                              key={preset}
+                              type="button"
+                              onClick={() => {
+                                setEditingRow({
+                                  ...editingRow,
+                                  assignments: {
+                                    ...editingRow.assignments,
+                                    [staff.id]: preset
+                                  }
+                                });
+                              }}
+                              style={{
+                                background: 'transparent',
+                                border: '1px solid var(--border-subtle)',
+                                borderRadius: '4px',
+                                padding: '1px 6px',
+                                fontSize: '0.68rem',
+                                color: 'var(--text-muted)',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              {preset}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* BOTONERA MODAL */}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.6rem', borderTop: '1px solid var(--border-subtle)', paddingTop: '0.8rem' }}>
                 <button
-                  onClick={() => setShowAddStaffModal(false)}
-                  style={{
-                    background: 'rgba(255,255,255,0.1)',
-                    border: 'none',
-                    borderRadius: '6px',
-                    padding: '0.5rem 1rem',
-                    color: '#cbd5e1',
-                    fontSize: '0.8rem',
-                    cursor: 'pointer'
-                  }}
+                  type="button"
+                  onClick={() => setEditingRow(null)}
+                  className="btn-secondary"
+                  style={{ padding: '0.5rem 1.2rem', fontSize: '0.82rem' }}
                 >
                   Cancelar
                 </button>
                 <button
-                  onClick={handleAddStaff}
-                  style={{
-                    background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
-                    border: 'none',
-                    borderRadius: '6px',
-                    padding: '0.5rem 1.2rem',
-                    color: '#fff',
-                    fontWeight: 700,
-                    fontSize: '0.8rem',
-                    cursor: 'pointer'
-                  }}
+                  type="button"
+                  onClick={() => handleSaveRowEdit(editingRow)}
+                  className="btn-primary"
+                  style={{ padding: '0.5rem 1.5rem', fontSize: '0.82rem' }}
                 >
-                  Crear Columna
+                  Guardar Turno
                 </button>
               </div>
             </div>
@@ -1694,17 +1518,17 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
         )}
 
         {/* ========================================================================= */}
-        {/* MODAL: EDITAR COLABORADOR EXISTENTE                                       */}
+        {/* MODAL: ADMINISTRAR COLABORADORES DEL EQUIPO                               */}
         {/* ========================================================================= */}
-        {editingStaffId && (
+        {showManageStaffModal && (
           <div 
-            onClick={() => setEditingStaffId(null)}
+            onClick={() => setShowManageStaffModal(false)}
             style={{
               position: 'fixed',
               top: 0, left: 0, right: 0, bottom: 0,
-              background: 'rgba(0,0,0,0.8)',
+              background: 'rgba(0, 0, 0, 0.75)',
               backdropFilter: 'blur(5px)',
-              zIndex: 100001,
+              zIndex: 100002,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -1713,120 +1537,152 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
           >
             <div 
               onClick={e => e.stopPropagation()}
+              className="glass-panel"
               style={{
-                background: '#0f172a',
-                border: '1px solid rgba(41, 171, 226, 0.4)',
-                borderRadius: '16px',
-                padding: '1.5rem',
-                maxWidth: '450px',
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: 'var(--radius-md)',
+                padding: '1.6rem',
+                maxWidth: '600px',
                 width: '100%',
-                boxShadow: '0 20px 50px rgba(0,0,0,0.9)',
+                maxHeight: '90vh',
+                overflowY: 'auto',
+                boxShadow: 'var(--card-shadow)',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '1rem',
-                color: '#fff'
+                gap: '1.2rem',
+                color: 'var(--text-main)'
               }}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800 }}>
-                  ✏️ Editar Datos de Colaborador
-                </h3>
-                <button onClick={() => setEditingStaffId(null)} style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.8rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <Users size={20} className="text-gold" />
+                  <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-heading)' }}>
+                    Administrar Colaboradores de la Matriz
+                  </h3>
+                </div>
+                <button onClick={() => setShowManageStaffModal(false)} className="btn-icon" style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
                   <X size={18} />
                 </button>
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-                <div>
-                  <label style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
-                    Nombre:
-                  </label>
+              {/* LISTA ACTUAL DE COLABORADORES */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <label className="text-muted" style={{ fontSize: '0.78rem', fontWeight: 700 }}>
+                  Colaboradores Actuales ({staffList.length}):
+                </label>
+                {staffList.map(staff => (
+                  <div 
+                    key={staff.id}
+                    style={{
+                      background: 'var(--bg-dark-alt, #ffffff)',
+                      border: '1px solid var(--border-subtle)',
+                      borderRadius: '8px',
+                      padding: '0.7rem 1rem',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center'
+                    }}
+                  >
+                    <div>
+                      <div style={{ fontWeight: 700, color: 'var(--text-heading)', fontSize: '0.88rem' }}>
+                        {staff.name}
+                      </div>
+                      <div className="text-muted" style={{ fontSize: '0.75rem' }}>
+                        {staff.role} • {staff.email || 'Sin correo asignado'}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleDeleteStaffMember(staff.id, staff.name)}
+                      className="btn-icon"
+                      style={{
+                        background: 'transparent',
+                        border: '1px solid var(--border-subtle)',
+                        borderRadius: '6px',
+                        padding: '4px 8px',
+                        color: 'var(--color-error)',
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        fontSize: '0.75rem'
+                      }}
+                      title="Retirar de la matriz"
+                    >
+                      <Trash2 size={13} />
+                      <span>Retirar</span>
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              {/* FORMULARIO AGREGAR COLABORADOR */}
+              <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '1rem' }}>
+                <label className="text-muted" style={{ fontSize: '0.78rem', fontWeight: 700, display: 'block', marginBottom: '8px' }}>
+                  ➕ Agregar Nuevo Colaborador a la Matriz:
+                </label>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '0.6rem' }}>
                   <input
                     type="text"
-                    value={editStaffData.name}
-                    onChange={e => setEditStaffData({ ...editStaffData, name: e.target.value })}
+                    placeholder="Nombre completo"
+                    value={newStaffForm.name}
+                    onChange={e => setNewStaffForm({ ...newStaffForm, name: e.target.value })}
                     style={{
-                      width: '100%',
                       padding: '0.5rem',
-                      background: 'rgba(0,0,0,0.3)',
-                      border: '1px solid rgba(255,255,255,0.2)',
+                      background: 'var(--bg-dark-alt, #ffffff)',
+                      border: '1px solid var(--border-subtle)',
                       borderRadius: '6px',
-                      color: '#fff',
-                      fontSize: '0.82rem'
+                      color: 'var(--text-main)',
+                      fontSize: '0.8rem'
                     }}
                   />
-                </div>
-
-                <div>
-                  <label style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
-                    Cargo / Rol:
-                  </label>
                   <input
                     type="text"
-                    value={editStaffData.role}
-                    onChange={e => setEditStaffData({ ...editStaffData, role: e.target.value })}
+                    placeholder="Cargo / Rol"
+                    value={newStaffForm.role}
+                    onChange={e => setNewStaffForm({ ...newStaffForm, role: e.target.value })}
                     style={{
-                      width: '100%',
                       padding: '0.5rem',
-                      background: 'rgba(0,0,0,0.3)',
-                      border: '1px solid rgba(255,255,255,0.2)',
+                      background: 'var(--bg-dark-alt, #ffffff)',
+                      border: '1px solid var(--border-subtle)',
                       borderRadius: '6px',
-                      color: '#fff',
-                      fontSize: '0.82rem'
+                      color: 'var(--text-main)',
+                      fontSize: '0.8rem'
                     }}
                   />
-                </div>
-
-                <div>
-                  <label style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
-                    Correo Electrónico:
-                  </label>
                   <input
                     type="email"
-                    value={editStaffData.email}
-                    onChange={e => setEditStaffData({ ...editStaffData, email: e.target.value })}
+                    placeholder="correo@crearpsl.net"
+                    value={newStaffForm.email}
+                    onChange={e => setNewStaffForm({ ...newStaffForm, email: e.target.value })}
                     style={{
-                      width: '100%',
                       padding: '0.5rem',
-                      background: 'rgba(0,0,0,0.3)',
-                      border: '1px solid rgba(255,255,255,0.2)',
+                      background: 'var(--bg-dark-alt, #ffffff)',
+                      border: '1px solid var(--border-subtle)',
                       borderRadius: '6px',
-                      color: '#fff',
-                      fontSize: '0.82rem'
+                      color: 'var(--text-main)',
+                      fontSize: '0.8rem'
                     }}
                   />
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.7rem' }}>
+                  <button
+                    onClick={handleAddStaffMember}
+                    className="btn-secondary"
+                    style={{ padding: '0.45rem 1.2rem', fontSize: '0.8rem' }}
+                  >
+                    Agregar a la Matriz
+                  </button>
                 </div>
               </div>
 
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '0.5rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', borderTop: '1px solid var(--border-subtle)', paddingTop: '0.8rem' }}>
                 <button
-                  onClick={() => setEditingStaffId(null)}
-                  style={{
-                    background: 'rgba(255,255,255,0.1)',
-                    border: 'none',
-                    borderRadius: '6px',
-                    padding: '0.5rem 1rem',
-                    color: '#cbd5e1',
-                    fontSize: '0.8rem',
-                    cursor: 'pointer'
-                  }}
+                  onClick={() => setShowManageStaffModal(false)}
+                  className="btn-primary"
+                  style={{ padding: '0.45rem 1.4rem', fontSize: '0.82rem' }}
                 >
-                  Cancelar
-                </button>
-                <button
-                  onClick={handleSaveStaffEdit}
-                  style={{
-                    background: 'linear-gradient(135deg, #0284c7, #0369a1)',
-                    border: 'none',
-                    borderRadius: '6px',
-                    padding: '0.5rem 1.2rem',
-                    color: '#fff',
-                    fontWeight: 700,
-                    fontSize: '0.8rem',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Actualizar
+                  Listo
                 </button>
               </div>
             </div>
@@ -1834,7 +1690,7 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
         )}
 
         {/* ========================================================================= */}
-        {/* MODAL DE NOTIFICACIÓN MULTI-CANAL (CORREO & GOOGLE CHAT)                   */}
+        {/* MODAL: NOTIFICACIONES (CORREO & GOOGLE CHAT)                               */}
         {/* ========================================================================= */}
         {showNotifyModal && (
           <div 
@@ -1842,9 +1698,9 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
             style={{
               position: 'fixed',
               top: 0, left: 0, right: 0, bottom: 0,
-              background: 'rgba(0,0,0,0.8)',
+              background: 'rgba(0, 0, 0, 0.75)',
               backdropFilter: 'blur(5px)',
-              zIndex: 100000,
+              zIndex: 100002,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -1853,80 +1709,78 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
           >
             <div 
               onClick={e => e.stopPropagation()}
+              className="glass-panel"
               style={{
-                background: '#0f172a',
-                border: '1px solid rgba(16, 185, 129, 0.4)',
-                borderRadius: '16px',
-                padding: '1.5rem',
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: 'var(--radius-md)',
+                padding: '1.6rem',
                 maxWidth: '650px',
                 width: '100%',
-                boxShadow: '0 20px 50px rgba(0,0,0,0.9), 0 0 30px rgba(16, 185, 129, 0.2)',
+                boxShadow: 'var(--card-shadow)',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '1rem',
-                color: '#fff'
+                color: 'var(--text-main)'
               }}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '0.7rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.7rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <Send size={22} color="#10b981" />
-                  <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800 }}>
-                    Notificar Horarios a Colaboradores
+                  <Send size={20} className="text-gold" />
+                  <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-heading)' }}>
+                    Notificar Horarios Disponibles
                   </h3>
                 </div>
-                <button 
-                  onClick={() => setShowNotifyModal(false)}
-                  style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer' }}
-                >
-                  <X size={20} />
+                <button onClick={() => setShowNotifyModal(false)} className="btn-icon" style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
+                  <X size={18} />
                 </button>
               </div>
 
               {copyFeedback && (
-                <div style={{ background: 'rgba(16, 185, 129, 0.2)', color: '#34d399', padding: '0.5rem 0.8rem', borderRadius: '6px', fontSize: '0.82rem', textAlign: 'center' }}>
+                <div style={{ background: 'var(--crear-gold-light)', color: 'var(--crear-gold)', padding: '0.5rem 0.8rem', borderRadius: '6px', fontSize: '0.82rem', textAlign: 'center', fontWeight: 600 }}>
                   {copyFeedback}
                 </div>
               )}
 
-              {/* LISTA DE DESTINATARIOS */}
+              {/* DESTINATARIOS */}
               <div>
-                <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '0.4rem', fontWeight: 600 }}>
-                  👥 Colaboradores Asignados ({staffList.length}):
+                <div className="text-muted" style={{ fontSize: '0.78rem', marginBottom: '0.4rem', fontWeight: 600 }}>
+                  Destinatarios del Equipo ({staffList.length}):
                 </div>
                 <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
                   {staffList.map(s => (
                     <span 
                       key={s.id} 
                       style={{
-                        background: 'rgba(255,255,255,0.06)',
-                        border: '1px solid rgba(255,255,255,0.12)',
+                        background: 'var(--bg-dark-alt, #ffffff)',
+                        border: '1px solid var(--border-subtle)',
                         padding: '3px 8px',
                         borderRadius: '6px',
                         fontSize: '0.75rem',
-                        color: '#cbd5e1'
+                        color: 'var(--text-main)'
                       }}
                     >
-                      {s.name} ({s.email || 'Sin correo'})
+                      {s.name} ({s.email || 'Sin email'})
                     </span>
                   ))}
                 </div>
               </div>
 
-              {/* VISTA PREVIA DEL MENSAJE PARA GOOGLE CHAT */}
+              {/* MENSAJE PARA GOOGLE CHAT */}
               <div>
-                <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '0.4rem', fontWeight: 600 }}>
-                  💬 Mensaje Estructurado para Google Chat:
+                <div className="text-muted" style={{ fontSize: '0.78rem', marginBottom: '0.4rem', fontWeight: 600 }}>
+                  Mensaje Formateado para Google Chat:
                 </div>
                 <div 
                   style={{
-                    background: 'rgba(0,0,0,0.4)',
-                    border: '1px solid rgba(255,255,255,0.1)',
+                    background: 'var(--bg-dark, #f8fafc)',
+                    border: '1px solid var(--border-subtle)',
                     borderRadius: '8px',
                     padding: '0.8rem',
                     fontSize: '0.78rem',
                     lineHeight: '1.45',
-                    color: '#e2e8f0',
-                    maxHeight: '160px',
+                    color: 'var(--text-main)',
+                    maxHeight: '150px',
                     overflowY: 'auto',
                     whiteSpace: 'pre-wrap',
                     fontFamily: 'monospace'
@@ -1937,65 +1791,45 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
               </div>
 
               {/* BOTONES DE DISPARO */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.8rem', marginTop: '0.5rem' }}>
-                {/* Google Chat */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.8rem', marginTop: '0.5rem' }}>
                 <button
                   onClick={handleOpenGoogleChat}
+                  className="btn-primary"
                   style={{
-                    background: 'linear-gradient(135deg, #0284c7, #0369a1)',
-                    color: '#fff',
-                    border: 'none',
-                    borderRadius: '8px',
-                    padding: '0.7rem 1rem',
-                    fontSize: '0.85rem',
-                    fontWeight: 700,
-                    cursor: 'pointer',
+                    padding: '0.65rem 1rem',
+                    fontSize: '0.82rem',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: '0.5rem',
-                    boxShadow: '0 4px 12px rgba(2, 132, 199, 0.3)'
+                    gap: '0.5rem'
                   }}
                 >
                   <MessageSquare size={16} />
-                  Copiar & Abrir Google Chat
+                  Copiar & Abrir Chat
                 </button>
 
-                {/* Enviar Correo */}
                 <button
                   onClick={handleSendBatchEmail}
+                  className="btn-secondary"
                   style={{
-                    background: 'linear-gradient(135deg, #10b981, #059669)',
-                    color: '#fff',
-                    border: 'none',
-                    borderRadius: '8px',
-                    padding: '0.7rem 1rem',
-                    fontSize: '0.85rem',
-                    fontWeight: 700,
-                    cursor: 'pointer',
+                    padding: '0.65rem 1rem',
+                    fontSize: '0.82rem',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: '0.5rem',
-                    boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)'
+                    gap: '0.5rem'
                   }}
                 >
                   <Mail size={16} />
                   Enviar Correo Masivo
                 </button>
 
-                {/* Copiar Correos */}
                 <button
                   onClick={handleCopyEmails}
+                  className="btn-secondary"
                   style={{
-                    background: 'rgba(255,255,255,0.06)',
-                    color: '#cbd5e1',
-                    border: '1px solid rgba(255,255,255,0.15)',
-                    borderRadius: '8px',
-                    padding: '0.7rem 1rem',
-                    fontSize: '0.85rem',
-                    fontWeight: 600,
-                    cursor: 'pointer',
+                    padding: '0.65rem 1rem',
+                    fontSize: '0.82rem',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -2003,12 +1837,8 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                   }}
                 >
                   <Copy size={16} />
-                  Copiar Lista de Emails
+                  Copiar Correos
                 </button>
-              </div>
-
-              <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', textAlign: 'center', marginTop: '0.2rem' }}>
-                💡 Al hacer clic en "Copiar & Abrir Google Chat", el mensaje completo queda en tu portapapeles listo para pegar en el espacio del equipo.
               </div>
             </div>
           </div>
