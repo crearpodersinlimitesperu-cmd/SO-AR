@@ -377,7 +377,7 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
     }
   }, [isOpen, selectedSede, nodusDocId]);
 
-  // Guardar en Causa OS y notificar por correo con copia a Eli Escobar y Lennin
+  // Guardar en Causa OS y notificar por correo con copia a Eli Escobar y Lennin (y Gabriela Rivadeneyra en Lima)
   const handleSaveToCausa = async () => {
     setIsSaving(true);
     setSaveMessage('');
@@ -395,9 +395,15 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
       await setDoc(docRef, payload, { merge: true });
 
       // Enviar correo a los colaboradores asignados con copia a Eli Escobar y Lennin Chasi
+      // Y si la sede es LIMA (SOLO EN LIMA), incluir con copia a Gabriela Rivadeneyra (Contadora Lima)
+      const isLima = selectedSede.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes('lima');
       try {
         const staffEmails = staffList.map(s => s.email).filter(Boolean);
         const ccEmails = ['contabilidad.global@crearpsl.net', 'talento.humano@crearpsl.net'];
+        if (isLima) {
+          ccEmails.push('contabilidad.lima@crearpsl.net');
+          ccEmails.push('grivadeneira@crearpsl.com');
+        }
         const recipientList = Array.from(new Set([...staffEmails, ...ccEmails]));
 
         const rowsHtml = scheduleRows.map(r => {
@@ -451,7 +457,8 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
             <div style="background: #f8fafc; border-left: 4px solid #f59e0b; padding: 12px 16px; margin: 20px 0; border-radius: 4px; font-size: 13px;">
               <strong>📌 Copia oficial enviada a:</strong><br/>
               • <strong>Eli Escobar</strong> (Jefa Financiera): <code>contabilidad.global@crearpsl.net</code><br/>
-              • <strong>Lennin Chasi</strong> (Talento Humano): <code>talento.humano@crearpsl.net</code>
+              • <strong>Lennin Chasi</strong> (Talento Humano): <code>talento.humano@crearpsl.net</code><br/>
+              ${isLima ? '• <strong>Gabriela Rivadeneyra</strong> (Contadora Lima): <code>contabilidad.lima@crearpsl.net</code><br/>' : ''}
             </div>
 
             <p style="text-align: center; margin-top: 25px;">
@@ -479,7 +486,10 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
 
       setLastSaved(new Date().toLocaleTimeString());
       setHasUnsavedChanges(false);
-      setSaveMessage(`Guardado en Causa OS y notificado por correo a Eli Escobar y Lennin`);
+      const notifMsg = isLima 
+        ? 'Guardado en Causa OS y notificado por correo a Eli Escobar, Lennin y Gabriela Rivadeneyra (Lima)' 
+        : 'Guardado en Causa OS y notificado por correo a Eli Escobar y Lennin';
+      setSaveMessage(notifMsg);
       setTimeout(() => setSaveMessage(''), 5000);
     } catch (err) {
       console.error('Error al guardar en Causa OS:', err);
@@ -687,13 +697,13 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
     const assignedNames = staffList.map(s => s.name).join(', ');
     return `📢 *HORARIOS Y TURNOS DE ENTRENAMIENTO — SEDE ${selectedSede.toUpperCase()}* 📅\n\n` +
       `Estimado equipo de *${selectedSede}* (*${assignedNames}*):\n\n` +
-      `Se han actualizado los *Horarios y Turnos Operativos Oficiales* para los entrenamientos UNO, DOS y MAESTRÍA en *Nodus / Causa OS*.\n\n` +
+      `Se han actualizado los *Horarios y Turnos Operativos Oficiales* para los entrenamientos UNO, DOS y MAESTRÍA en *Causa OS*.\n\n` +
       `🔗 *Consulta tus Turnos:* https://centro-operativo-cpsl.web.app\n\n` +
       `📌 *Lineamientos Clave:* \n` +
       `• Revisa tus horas asignadas y tareas en sala (Groundings, Noches de Confianza, Tanque, Rompimiento de Barreras, Vuelos).\n` +
       `• Cumplir estrictamente el Código de Vestimenta por jornada.\n` +
       `• Coordinar cualquier ajuste directamente con la Gerencia de Sede.\n\n` +
-      `_Equipo Crear Poder Sin Límites — Plataforma Operativa Nodus / Causa OS_`;
+      `_Equipo Crear Poder Sin Límites — Plataforma Operativa Causa OS_`;
   };
 
   // Copiar mensaje para Google Chat
@@ -710,17 +720,24 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
 
   // Enviar Correo masivo
   const handleSendBatchEmail = () => {
-    const emails = staffList.map(s => s.email).filter(Boolean).join(',');
-    const subject = `📅 Horarios Oficiales de Entrenamiento — Sede ${selectedSede} (Nodus Causa OS)`;
+    const isLima = selectedSede.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes('lima');
+    const staffEmails = staffList.map(s => s.email).filter(Boolean);
+    const ccList = ['contabilidad.global@crearpsl.net', 'talento.humano@crearpsl.net'];
+    if (isLima) {
+      ccList.push('contabilidad.lima@crearpsl.net');
+    }
+    const emails = staffEmails.join(',');
+    const cc = ccList.join(',');
+    const subject = `📅 Horarios Oficiales de Entrenamiento — Sede ${selectedSede} (Causa OS)`;
     const body = `Estimado Equipo de ${selectedSede},\n\n` +
-      `Se han actualizado los Horarios y Turnos Operativos de Entrenamiento en Nodus para la sede ${selectedSede}.\n\n` +
+      `Se han actualizado los Horarios y Turnos Operativos de Entrenamiento en Causa OS para la sede ${selectedSede}.\n\n` +
       `Por favor ingresa a la plataforma Causa OS para revisar tus jornadas, salas y tareas específicas:\n` +
       `👉 https://centro-operativo-cpsl.web.app\n\n` +
       `Saludos cordiales,\n` +
       `Gerencia de Sede ${selectedSede}\n` +
       `Crear Poder Sin Límites`;
 
-    window.location.href = `mailto:${emails}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = `mailto:${emails}?cc=${encodeURIComponent(cc)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
 
   if (!isOpen) return null;
