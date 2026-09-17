@@ -10,21 +10,6 @@ export const normalizeRole = (role) => {
   // Coordinadores Capítulo 1 / Capítulo 2 (C1 / C2)
   if (r === 'coordinador_c1c2' || r === 'coord_c1' || r === 'coord_c2' || r === 'coordinador_c1' || r === 'coordinador_c2' || r.includes('capitulo uno') || r.includes('capitulo 1') || r.includes('capitulo dos') || r.includes('capitulo 2') || r === 'c1' || r === 'c2' || r === 'c1/c2' || r === 'c1c2') return 'coord_c1';
   
-  // (15/09/2026) BUG CRITICO CORREGIDO: este chequeo de "director_maestria"
-  // se movio ANTES del chequeo de "coord_maestria" (unas lineas mas abajo).
-  // Motivo: el chequeo de coord_maestria usaba r.includes('maestria'), que
-  // TAMBIEN es verdadero para el string 'director_maestria' -- como los if
-  // regresan en la primera coincidencia, CUALQUIER usuario con rol
-  // "director_maestria" quedaba silenciosamente reclasificado como
-  // "coord_maestria" en cada login, sin importar lo que dijera el catalogo
-  // oficial (usersToImport.js) o Firestore. Confirmado como la causa real de
-  // que Andres Gomez -- con "director_maestria" ya asignado en el catalogo
-  // desde el 13/09/2026 (commit 3f3f6fb) -- nunca viera ese rol activo en su
-  // selector: se colapsaba a "Coordinador Maestria del Juego (MJ)" antes de
-  // llegar siquiera a este chequeo. Reportado por Jose el 15/09/2026.
-  // Director Maestría del Juego (MJ)
-  if (r === 'director_maestria' || r === 'director_mj' || (r.includes('director') && (r.includes('maestr') || r.includes('mj')))) return 'director_maestria';
-  
   // Coordinadores Maestría del Juego (MJ)
   if (r === 'coordinador_mj' || r === 'coord_maestria' || r === 'coordinador_maestria' || r.includes('maestria del juego') || r.includes('maestria') || r.includes('coordinador global maestria') || r === 'mj') return 'coord_maestria';
   
@@ -37,6 +22,8 @@ export const normalizeRole = (role) => {
   // Quantum Team & Coordinación QT Global
   if (r === 'qt' || r === 'quantum_team' || r.includes('quantum') || r.includes('coord_qt') || r.includes('coordinador qt') || r.includes('coordinador_qt') || r.includes('qt global')) return 'qt';
   
+  // Director Maestría del Juego (MJ)
+  if (r === 'director_maestria' || r === 'director_mj' || (r.includes('director') && (r.includes('maestr') || r.includes('mj')))) return 'director_maestria';
   
   // Manager
   if (r === 'manager' || r === 'managers') return 'manager';
@@ -84,21 +71,7 @@ export const normalizeSede = (sede) => {
   if (s === 'CUE' || clean.includes('cuenca')) return 'Cuenca';
   if (s === 'GYE' || clean.includes('guayaquil')) return 'Guayaquil';
   if (s === 'MEX' || clean.includes('mex') || clean.includes('cdmx')) return 'M\u00E9xico';
-  // (15/09/2026) CORREGIDO — causa raíz real de "a Erika no le cargan las fechas
-  // de su sede", confirmada leyendo el JSON en vivo del endpoint real de eventos
-  // (Google Apps Script, ?action=getEventos — NO Firestore): los eventos de
-  // Quito usan el código de sede "UIO C1" / "UIO C2" con ESPACIO, no con guion
-  // ("UIO-C1"/"UIO-C2" como asumía este código) y sin la palabra "quito" en
-  // ningún lado. Por eso ningún caso de abajo los reconocía y normalizeSede()
-  // los devolvía tal cual ("UIO C1"), distinto de "Quito" — así que la
-  // comparación en el filtro de eventos de Home.jsx (isCoordMJ/isCoordC1C2)
-  // nunca coincidía para Quito, aunque SÍ hay 219 eventos futuros reales para
-  // Quito ahora mismo (confirmado en vivo). Se agrega clean.includes('uio') —
-  // "uio" no aparece en ningún otro código/nombre de sede real (Lima, Cuenca,
-  // Guayaquil, Medellín, México), así que es seguro y cubre "UIO", "UIO C1",
-  // "UIO C2", "UIO-C1", "UIO-C2" y cualquier variante futura con ese prefijo.
   if (s === 'UIO-C1' || s === 'UIO-C2' || s === 'UIO' ||
-      clean.includes('uio') ||
       clean.includes('ciclo 1') || clean.includes('ciclo1') ||
       clean.includes('ciclo 2') || clean.includes('ciclo2') ||
       clean.includes('quito')) return 'Quito';
@@ -187,6 +160,19 @@ export const isForeignTask = (task, currentUser) => {
   const hasSpecificAssignees = (Array.isArray(task.assignedToEmails) && task.assignedToEmails.length > 0) || Boolean(task.assignedToEmail);
   if (hasSpecificAssignees && !isAssigned) {
     return true; // Asignada nominalmente a terceros
+  }
+
+  // 6. (17/09/2026) Tareas ad-hoc/custom creadas por otra persona sin asignación explícita
+  // ni sede coincidente: no deben filtrarse a usuarios de otras sedes
+  if (creatorEmail && !isMyCreation) {
+    const taskIdStr = String(task.id || '');
+    if (taskIdStr.startsWith('custom_') || taskIdStr.startsWith('fs_')) {
+      const taskSedeEff = normalizeSede(task.assignedSede || task.sede);
+      const userSedeEff = normalizeSede(userSede);
+      if (!taskSedeEff || taskSedeEff === 'Sede Global' || taskSedeEff !== userSedeEff) {
+        return true;
+      }
+    }
   }
 
   return false;
