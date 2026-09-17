@@ -7,7 +7,7 @@ import { db } from '../services/firebase';
 import { useUI } from '../context/UIContext';
 import { useNavigate } from 'react-router-dom';
 import { Target, Zap, AlertTriangle, Users, PlusCircle, Activity, CheckCircle, Building, MessageSquare, Mail, ExternalLink, ArrowRight, Clock, ShieldAlert, ChevronRight, CheckSquare } from 'lucide-react';
-import { usersData, normalizeRole } from '../data/usersData';
+import { usersData, normalizeRole, normalizeSede, isForeignTask } from '../data/usersData';
 import TaskAssignmentModal from '../components/TaskAssignmentModal';
 import IAAuditor from '../components/IAAuditor';
 import VenueConfigModal from '../components/VenueConfigModal';
@@ -59,13 +59,31 @@ export default function GerenteDashboard() {
   const nextTraining = currentIndex !== -1 && currentIndex < cycleFlow.length - 1 ? cycleFlow[currentIndex + 1] : 'Próximo Ciclo';
 
   const isTaskVisibleToMe = (t) => {
-    if (currentUser?.isSuperAdmin || currentUser?.appRole === 'consolidado') return true;
+    // Si el usuario está simulado, evaluamos siempre con el perfil simulado (ej. Emily)
+    const activeUser = currentUser;
+    if (!activeUser) return false;
+    if (activeUser.isSuperAdmin && !activeUser.isSimulated) return true;
+    if (activeUser.appRole === 'consolidado') return true;
+
+    // Descartar si es foránea según la regla canónica
+    if (isForeignTask(t, activeUser)) return false;
+
+    // Validar sede de la tarea
+    const taskSede = t.assignedSede || t.sede;
+    if (taskSede && taskSede !== 'Global' && taskSede !== 'Sede Global') {
+      const userSede = normalizeSede(activeUser.sede);
+      const normTaskSede = normalizeSede(taskSede);
+      if (userSede && userSede !== 'Sede Global' && normTaskSede !== userSede) {
+        return false;
+      }
+    }
+
     if (t.assignedToEmail) {
       const isManagerRole = r => r === 'gerente' || r === 'director_maestria' || r === 'direccion';
-      if (isManagerRole(currentUser?.appRole) && isManagerRole(normalizeRole(t.role))) {
-        if (t.assignedToEmail.toLowerCase() !== currentUser?.email?.toLowerCase()) {
-          const iAmCreator = t.createdBy?.toLowerCase() === currentUser?.email?.toLowerCase();
-          const iAmCollaborator = t.collaborators?.includes(currentUser?.email);
+      if (isManagerRole(activeUser.appRole) && isManagerRole(normalizeRole(t.role))) {
+        if (t.assignedToEmail.toLowerCase() !== activeUser.email?.toLowerCase()) {
+          const iAmCreator = t.createdBy?.toLowerCase() === activeUser.email?.toLowerCase();
+          const iAmCollaborator = t.collaborators?.includes(activeUser.email);
           if (!iAmCreator && !iAmCollaborator) return false;
         }
       }
@@ -80,7 +98,24 @@ export default function GerenteDashboard() {
   const upcomingTasks = tasks.filter(t => !t.completed && !t.isCritical && t.priority !== 'Crítica' && isTaskVisibleToMe(t));
 
   // 3. QUÉ DEBO HACER HOY (Acciones Gerente)
-  const myPendingTasks = tasks.filter(t => t.role === 'gerente' && !t.completed && (t.cyclePhase === currentStage || t.isCritical) && isTaskVisibleToMe(t));
+  // Deben ser tareas del rol gerente, que correspondan a su sede o a él directamente
+  const myPendingTasks = tasks.filter(t => {
+    if (t.completed) return false;
+    if (normalizeRole(t.role) !== 'gerente' && t.role !== 'gerente') return false;
+    if (!isTaskVisibleToMe(t)) return false;
+
+    // Si la tarea tiene asignados específicos y yo no estoy, fuera
+    const hasAssignees = (Array.isArray(t.assignedToEmails) && t.assignedToEmails.length > 0) || Boolean(t.assignedToEmail);
+    const userEmail = (currentUser?.email || '').toLowerCase().trim();
+    if (hasAssignees) {
+      const inAssigned = (t.assignedToEmails && t.assignedToEmails.some(e => (e || '').toLowerCase().trim() === userEmail)) ||
+                         (t.assignedToEmail && t.assignedToEmail.toLowerCase().trim() === userEmail);
+      const inCollab = t.collaborators && t.collaborators.some(c => (typeof c === 'string' ? c : c?.email || '').toLowerCase().trim() === userEmail);
+      if (!inAssigned && !inCollab) return false;
+    }
+
+    return t.cyclePhase === currentStage || t.isCritical;
+  });
   const topActions = myPendingTasks.slice(0, 5); // Limit to top 5 actions
 
   // Helper para resolver los responsables
@@ -310,11 +345,22 @@ export default function GerenteDashboard() {
                     <Target size={14} /> Metas Globales de Ciclo
                   </h4>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    {cycleGoals.map(g => (
+                    {cycleGoals.filter(g => {
+                      if (!g.sede || g.sede === 'Global' || g.sede === 'Sede Global') return true;
+                      const userSede = normalizeSede(currentUser?.sede);
+                      return normalizeSede(g.sede) === userSede;
+                    }).map(g => (
                       <div key={g.id} style={{ background: 'rgba(0,0,0,0.2)', padding: '0.6rem 0.8rem', borderRadius: '6px', borderLeft: '3px solid var(--crear-gold)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '0.3rem' }}>
-                          <span style={{ fontWeight: '600', color: 'var(--text-heading)' }}>{g.title}</span>
-                          <span style={{ fontWeight: 'bold', color: g.progress >= 100 ? '#22c55e' : 'var(--crear-gold)' }}>{g.currentValue} / {g.targetValue}</span>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.85rem', marginBottom: '0.3rem', gap: '0.5rem' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                            <span style={{ fontWeight: '600', color: 'var(--text-heading)' }}>{g.title}</span>
+                            {(g.numEquipo || g.equipo || g.stage || g.cyclePhase) && (
+                              <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: '8px', background: 'rgba(255, 183, 3, 0.15)', color: 'var(--crear-gold)', fontWeight: 700 }}>
+                                👥 {g.numEquipo ? `Eq. ${g.numEquipo}` : g.equipo ? `Eq. ${g.equipo}` : (g.stage || g.cyclePhase)}
+                              </span>
+                            )}
+                          </div>
+                          <span style={{ fontWeight: 'bold', color: g.progress >= 100 ? '#22c55e' : 'var(--crear-gold)', whiteSpace: 'nowrap' }}>{g.currentValue} / {g.targetValue}</span>
                         </div>
                         <div style={{ width: '100%', height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', overflow: 'hidden' }}>
                           <div style={{ height: '100%', width: `${Math.min(g.progress, 100)}%`, background: g.progress >= 100 ? '#22c55e' : 'var(--crear-gold)' }} />
@@ -332,11 +378,24 @@ export default function GerenteDashboard() {
                     <Target size={14} /> Metas de Entrenamiento
                   </h4>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    {trainingGoals.filter(g => g.cyclePhase === currentStage || !g.cyclePhase || g.cyclePhase.includes('MJ')).map(g => (
+                    {trainingGoals.filter(g => {
+                      if (g.sede && g.sede !== 'Global' && g.sede !== 'Sede Global') {
+                        const userSede = normalizeSede(currentUser?.sede);
+                        if (normalizeSede(g.sede) !== userSede) return false;
+                      }
+                      return g.cyclePhase === currentStage || !g.cyclePhase || g.cyclePhase.includes('MJ');
+                    }).map(g => (
                       <div key={g.id} style={{ background: 'rgba(0,0,0,0.2)', padding: '0.6rem 0.8rem', borderRadius: '6px', borderLeft: '3px solid var(--crear-cyan)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '0.3rem' }}>
-                          <span style={{ fontWeight: '600', color: 'var(--text-heading)' }}>{g.title}</span>
-                          <span style={{ fontWeight: 'bold', color: g.progress >= 100 ? '#22c55e' : 'var(--crear-cyan)' }}>{g.currentValue} / {g.targetValue}</span>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.85rem', marginBottom: '0.3rem', gap: '0.5rem' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                            <span style={{ fontWeight: '600', color: 'var(--text-heading)' }}>{g.title}</span>
+                            {(g.numEquipo || g.equipo || g.stage || g.cyclePhase) && (
+                              <span style={{ fontSize: '0.68rem', padding: '1px 6px', borderRadius: '8px', background: 'rgba(0, 212, 255, 0.15)', color: 'var(--crear-cyan)', fontWeight: 700 }}>
+                                👥 {g.numEquipo ? `Eq. ${g.numEquipo}` : g.equipo ? `Eq. ${g.equipo}` : (g.stage || g.cyclePhase)}
+                              </span>
+                            )}
+                          </div>
+                          <span style={{ fontWeight: 'bold', color: g.progress >= 100 ? '#22c55e' : 'var(--crear-cyan)', whiteSpace: 'nowrap' }}>{g.currentValue} / {g.targetValue}</span>
                         </div>
                         <div style={{ width: '100%', height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', overflow: 'hidden' }}>
                           <div style={{ height: '100%', width: `${Math.min(g.progress, 100)}%`, background: g.progress >= 100 ? '#22c55e' : 'var(--crear-cyan)' }} />
@@ -719,4 +778,5 @@ export default function GerenteDashboard() {
     </div>
   );
 }
+
 
