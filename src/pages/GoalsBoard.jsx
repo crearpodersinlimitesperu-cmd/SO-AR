@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../services/firebase';
 import { collection, onSnapshot, addDoc, updateDoc, doc, query, where, orderBy, writeBatch, runTransaction, setDoc, limit } from 'firebase/firestore';
@@ -823,7 +823,9 @@ export default function GoalsBoard() {
     try {
       const batch = writeBatch(db);
       const cycleGoalRef = doc(collection(db, 'goals'));
-      const suffix = currentUser?.sede === 'Quito' ? ` (${quitoCycle})` : '';
+      const suffix = currentUser?.sede === 'Quito'
+        ? (quitoCycle === 'C1' ? ' (Capítulo 1 / Par)' : quitoCycle === 'C2' ? ' (Capítulo 2 / Impar)' : ` (${quitoCycle})`)
+        : '';
       const currentUserId = currentUser?.uid || currentUser?.id || 'admin';
       const currentUserName = currentUser?.displayName || currentUser?.name || 'Administrador';
       const userSede = currentUser?.sede || '';
@@ -1136,7 +1138,25 @@ export default function GoalsBoard() {
               )}
             </div>
 
-            <h3 className="text-main" style={{ margin: '0 0 0.35rem 0', fontSize: '1.25rem' }}>{goal.title}</h3>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '0.35rem' }}>
+              <h3 className="text-main" style={{ margin: 0, fontSize: '1.25rem' }}>{goal.title}</h3>
+              {(goal.numEquipo || goal.equipo || goal.stage || goal.cyclePhase) && (
+                <span style={{
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  padding: '2px 8px',
+                  borderRadius: '12px',
+                  background: 'rgba(255, 183, 3, 0.15)',
+                  color: 'var(--crear-gold)',
+                  border: '1px solid rgba(255, 183, 3, 0.35)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '3px'
+                }}>
+                  👥 {goal.numEquipo ? `Eq. ${goal.numEquipo}` : goal.equipo ? `Eq. ${goal.equipo}` : (goal.stage || goal.cyclePhase)}
+                </span>
+              )}
+            </div>
             
             <p className="text-muted" style={{ margin: 0, fontSize: '0.9rem' }}>
               {goal.targetValue ? (
