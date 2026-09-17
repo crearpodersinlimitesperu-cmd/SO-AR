@@ -134,6 +134,9 @@ flowchart TD
 3. **Coherencia con Nodus y Fechas Oficiales de Entrenamiento:**
    * La clasificación de metas en `goalsSentinelAgent.js` prioriza `ALIADOS` para evitar que cadenas como `C1E31` se clasifiquen como `SENTADOS_PX`.
    * Las fechas oficiales se enlazan con la API de eventos reconociendo los nombres reales (`CAPITULO UNO`, `CAPITULO DOS`, `MAESTRIA DEL JUEGO`), cruzando el número de equipo extraído (`extractTeamNumber`) y desplegando en la tarjeta el rango de fechas (`fechaInicio` al `fechaFin`) y el estado en vivo (`PRE-C1`, `EN SALA`, `POST-C1`).
+4. **Edición Posterior del Reporte de Sentados en Sala:**
+   * Una vez reportada la cantidad de participantes sentados en sala, el indicador permanece interactivo (`[✔ Sentados en Sala: X ✏️]`).
+   * Permite a los Gerentes de Sede y Directivos hacer clic en cualquier momento posterior para abrir el modal, ajustar las cifras reales, corregir managers/apoyos/observaciones y re-calcular automáticamente el porcentaje de cumplimiento y rollup a la meta padre sin bloqueos estáticos.
 
 ### 3.3. Estándar de Bienvenidas Oficiales y Coherencia Cronológica de Sedes (Portal de Alumnos & Correo IMO)
 1. **Coherencia con el Momento Presente de Sala (Septiembre 2026 - Equipo 31 Lima):**
