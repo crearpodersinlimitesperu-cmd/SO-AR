@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../services/firebase';
 import { collection, onSnapshot, addDoc, updateDoc, doc, query, where, orderBy, writeBatch, runTransaction, setDoc, limit } from 'firebase/firestore';
@@ -9,7 +9,7 @@ import { ArrowLeft, Target, Settings, GitMerge, Users, UserPlus, Award, CheckCir
 import GoalDivisionModal from '../components/GoalDivisionModal';
 import { normalizeSede } from '../data/usersData';
 import nodusFallbackData from '../data/nodusFallbackData.json';
-import { auditSingleGoal, auditAllGoals } from '../services/goalsSentinelAgent';
+import { auditSingleGoal, auditAllGoals, extractTeamNumber } from '../services/goalsSentinelAgent';
 
 export default function GoalsBoard() {
   const { currentUser } = useAuth();
@@ -251,17 +251,30 @@ export default function GoalsBoard() {
 
     // 2. Eventos generales (CyclesContext events)
     if (events && events.length > 0) {
+      const goalTeam = extractTeamNumber(goal);
+
       const evMatch = events.find(e => {
         const evSede = (e.sede || e.sedeTag || e.place || '').toLowerCase();
         const evNombre = (e.nombre || e.name || '').toLowerCase();
         const sedeCoincide = !sedeNorm || evSede.includes(sedeNorm) || sedeNorm.includes(evSede);
         if (!sedeCoincide) return false;
 
-        if (titleLower.includes('capítulo 1') || titleLower.includes('capitulo 1') || titleLower.includes('c1')) {
-          return evNombre.includes('c1') || evNombre.includes('capítulo 1') || evNombre.includes('capitulo 1');
+        // Validar coincidencia de equipo si está registrado en el evento
+        if (goalTeam && e.equipo) {
+          const cleanEq = String(e.equipo).replace(/\D/g, '');
+          if (cleanEq && !cleanEq.includes(goalTeam) && !goalTeam.includes(cleanEq)) {
+            return false;
+          }
         }
-        if (titleLower.includes('capítulo 2') || titleLower.includes('capitulo 2') || titleLower.includes('c2')) {
-          return evNombre.includes('c2') || evNombre.includes('capítulo 2') || evNombre.includes('capitulo 2');
+
+        if (titleLower.includes('capítulo 1') || titleLower.includes('capitulo 1') || titleLower.includes('c1') || titleLower.includes('uno')) {
+          return evNombre.includes('c1') || evNombre.includes('uno') || evNombre.includes('capítulo 1') || evNombre.includes('capitulo 1');
+        }
+        if (titleLower.includes('capítulo 2') || titleLower.includes('capitulo 2') || titleLower.includes('c2') || titleLower.includes('dos')) {
+          return evNombre.includes('c2') || evNombre.includes('dos') || evNombre.includes('capítulo 2') || evNombre.includes('capitulo 2');
+        }
+        if (titleLower.includes('maestría') || titleLower.includes('maestria') || titleLower.includes('mj')) {
+          return evNombre.includes('maestria') || evNombre.includes('maestría') || evNombre.includes('mj');
         }
         return false;
       });
@@ -276,7 +289,7 @@ export default function GoalsBoard() {
           tipo: evMatch.nombre || evMatch.name,
           fechaInicio: fInicio,
           fechaFin: fFin,
-          equipo: evMatch.equipo || '',
+          equipo: evMatch.equipo ? `Equipo ${evMatch.equipo}` : '',
           isStarted,
           isPast
         };
@@ -284,7 +297,7 @@ export default function GoalsBoard() {
     }
 
     return null;
-  };
+  };;
 
   // Sincronización individual del Agente Centinela
   const handleApplySentinelSync = async (goal, audit) => {
@@ -370,14 +383,45 @@ export default function GoalsBoard() {
     }
   };
 
-  // Avance acumulado desde reportes de coordinadoras
+  // Avance acumulado desde reportes de coordinadoras (Control de Coherencia de KPIs)
   const getGoalReportsSummary = (goal) => {
     if (!goal || !coordinatorReports.length) return null;
+
+    // REGLA FUNDAMENTAL DE KPIS:
+    // Metas de Aliados, Managers o Apoyos de Sala NO deben vincularse a reportes brutos de llamadas telefónicas.
+    // Los Aliados son cupos de servicio en sala; las llamadas son esfuerzos comerciales de contacto.
+    const titleLower = (goal.title || '').toLowerCase();
+    const kpiLower = (goal.kpi || '').toLowerCase();
+    if (
+      titleLower.includes('aliado') || kpiLower.includes('aliado') ||
+      titleLower.includes('manager') || kpiLower.includes('manager') ||
+      titleLower.includes('apoyo') || kpiLower.includes('apoyo')
+    ) {
+      return null;
+    }
+
     const sedeNorm = (goal.sede || '').toLowerCase();
+    const goalTeam = extractTeamNumber(goal);
 
     const matchingReports = coordinatorReports.filter(r => {
       const rSede = (r.sede || r.data?.sede_id || '').toLowerCase();
-      return !sedeNorm || rSede.includes(sedeNorm) || sedeNorm.includes(rSede);
+      const matchSede = !sedeNorm || rSede.includes(sedeNorm) || sedeNorm.includes(rSede);
+      if (!matchSede) return false;
+
+      // Filtrar estrictamente por equipo
+      const rEquipo = String(r.equipo || r.data?.numEquipo || r.data?.equipo || '').replace(/\D/g, '');
+      if (rEquipo && goalTeam && rEquipo !== String(goalTeam)) {
+        return false;
+      }
+
+      // Validar coincidencia de etapa si la meta especifica C1, C2 o MJ
+      if (goal.stage && r.etapa && r.etapa !== 'Todas') {
+        const normStage = goal.stage.toUpperCase();
+        const normREtapa = r.etapa.toUpperCase();
+        if (normStage !== normREtapa && !normREtapa.includes(normStage)) return false;
+      }
+
+      return true;
     });
 
     let totalOk = 0;
@@ -395,10 +439,59 @@ export default function GoalsBoard() {
       }
     });
 
-    if (totalOk > 0) {
+    // Control de coherencia: Si el número de llamadas excede de forma desmedida la meta, no sugerir sync directo
+    const targetVal = Number(goal.targetValue) || 1;
+    if (totalOk > 0 && totalOk <= targetVal * 1.5) {
       return { totalOk, totalReportsCount, lastCoord };
     }
     return null;
+  };
+
+  // Corrección y Re-alineación de Ciclo para coherencia de Equipos
+  const handleFixTeamAlignment = async (goal) => {
+    const childTeam = extractTeamNumber(goal);
+    if (!childTeam) return;
+
+    try {
+      const sede = normalizeSede(goal.sede || 'Lima');
+      // Buscar si ya existe la meta de ciclo para este equipo
+      let targetCycle = goals.find(g => 
+        normalizeSede(g.sede || '') === sede && 
+        g.scope === 'CICLO' && 
+        (g.title.includes(childTeam) || extractTeamNumber(g) === childTeam)
+      );
+
+      if (!targetCycle) {
+        // Crear la meta global del ciclo para este equipo
+        const newCycleRef = doc(collection(db, 'goals'));
+        const newCycleData = {
+          title: `Meta Global del Ciclo Equipo ${childTeam} (${sede})`,
+          kpi: 'Cumplimiento General (%)',
+          progress: 0,
+          targetValue: 100,
+          currentValue: 0,
+          scope: 'CICLO',
+          parentId: null,
+          ownerId: currentUser?.uid || 'admin',
+          ownerName: currentUser?.displayName || currentUser?.name || 'Gerencia',
+          sede: sede,
+          createdAt: new Date().toISOString()
+        };
+        await setDoc(newCycleRef, newCycleData);
+        targetCycle = { id: newCycleRef.id, ...newCycleData };
+      }
+
+      // Re-vincular el parentId de la meta
+      await updateDoc(doc(db, 'goals', goal.id), {
+        parentId: targetCycle.id,
+        updatedAt: new Date().toISOString()
+      });
+
+      showToast(`✅ Meta re-alineada con éxito al Ciclo del Equipo ${childTeam}.`, 'success');
+    } catch (err) {
+      console.error('Error re-alineando meta al ciclo:', err);
+      showToast('Error al re-alinear meta: ' + err.message, 'error');
+    }
   };
 
   const handleSyncReportsProgress = async (goal, totalOk) => {
@@ -823,9 +916,7 @@ export default function GoalsBoard() {
     try {
       const batch = writeBatch(db);
       const cycleGoalRef = doc(collection(db, 'goals'));
-      const suffix = currentUser?.sede === 'Quito'
-        ? (quitoCycle === 'C1' ? ' (Capítulo 1 / Par)' : quitoCycle === 'C2' ? ' (Capítulo 2 / Impar)' : ` (${quitoCycle})`)
-        : '';
+      const suffix = currentUser?.sede === 'Quito' ? ` (${quitoCycle})` : '';
       const currentUserId = currentUser?.uid || currentUser?.id || 'admin';
       const currentUserName = currentUser?.displayName || currentUser?.name || 'Administrador';
       const userSede = currentUser?.sede || '';
@@ -1132,31 +1223,61 @@ export default function GoalsBoard() {
               )}
 
               {parentGoal && (
-                <span className="text-muted" style={{ fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.2rem' }}>
-                  <GitMerge size={12} /> Aporta a: {parentGoal.title}
+                <span className="text-muted" style={{ fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.35rem', flexWrap: 'wrap' }}>
+                  <GitMerge size={12} /> Aporta a: <strong style={{ color: 'var(--text-heading)' }}>{parentGoal.title}</strong>
+                  {(() => {
+                    const childTeam = extractTeamNumber(goal);
+                    const parentTeam = extractTeamNumber(parentGoal);
+                    if (childTeam && parentTeam && childTeam !== parentTeam) {
+                      return (
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                          <span 
+                            style={{ 
+                              background: 'rgba(239, 68, 68, 0.12)', 
+                              color: '#ef4444', 
+                              border: '1px solid rgba(239, 68, 68, 0.3)',
+                              padding: '1px 6px', 
+                              borderRadius: '4px', 
+                              fontSize: '0.68rem', 
+                              fontWeight: 800
+                            }} 
+                            title={`Incoherencia detectada: Esta meta pertenece al Equipo ${childTeam}, pero está aportando al Ciclo del Equipo ${parentTeam}.`}
+                          >
+                            ⚠️ Ciclo Desalineado (Eq. ${childTeam} vs Eq. ${parentTeam})
+                          </span>
+                          {canManageGoals && (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleFixTeamAlignment(goal);
+                              }}
+                              style={{
+                                background: 'rgba(239, 68, 68, 0.15)',
+                                border: '1px solid #ef4444',
+                                color: '#ef4444',
+                                borderRadius: '4px',
+                                padding: '1px 6px',
+                                fontSize: '0.68rem',
+                                fontWeight: 800,
+                                cursor: 'pointer',
+                                textDecoration: 'underline'
+                              }}
+                              title={`Crear o re-vincular al Ciclo del Equipo ${childTeam}`}
+                            >
+                              Alinear a Ciclo Eq. ${childTeam}
+                            </button>
+                          )}
+                        </span>
+                      );
+                    }
+                    return null;
+                  })()}
                 </span>
               )}
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '0.35rem' }}>
-              <h3 className="text-main" style={{ margin: 0, fontSize: '1.25rem' }}>{goal.title}</h3>
-              {(goal.numEquipo || goal.equipo || goal.stage || goal.cyclePhase) && (
-                <span style={{
-                  fontSize: '0.72rem',
-                  fontWeight: 700,
-                  padding: '2px 8px',
-                  borderRadius: '12px',
-                  background: 'rgba(255, 183, 3, 0.15)',
-                  color: 'var(--crear-gold)',
-                  border: '1px solid rgba(255, 183, 3, 0.35)',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '3px'
-                }}>
-                  👥 {goal.numEquipo ? `Eq. ${goal.numEquipo}` : goal.equipo ? `Eq. ${goal.equipo}` : (goal.stage || goal.cyclePhase)}
-                </span>
-              )}
-            </div>
+            <h3 className="text-main" style={{ margin: '0 0 0.35rem 0', fontSize: '1.25rem' }}>{goal.title}</h3>
             
             <p className="text-muted" style={{ margin: 0, fontSize: '0.9rem' }}>
               {goal.targetValue ? (
