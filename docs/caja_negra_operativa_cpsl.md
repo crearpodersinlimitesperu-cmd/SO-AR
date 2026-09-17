@@ -121,6 +121,10 @@ flowchart TD
      * Copia general permanente: Eli Escobar (`contabilidad.global@crearpsl.net`) y Lennin Chasi (`talento.humano@crearpsl.net`).
      * **Regla Exclusiva para Lima:** Envíos de la sede Lima incluyen en copia a Gabriela Rivadeneyra (`contabilidad.lima@crearpsl.net` / `grivadeneira@crearpsl.com`).
   6. **Código de Vestimenta Oficial y Ergonomía de Coach:** Etiqueta negra formal en aperturas y Noches de Confianza; polos oficiales sábado/domingo; autorización expresa y formal de **zapatillas deportivas negras limpias** para Entrenadores en tarima.
+  7. **Aislamiento y Privacidad Estricta de Sede (Data Segregation):**
+      * En el módulo de Horarios de Entrenamiento (`HorariosEntrenamientoModal`), los Gerentes de Sede y colaboradores/equipos (Coordinadores, Staff, Apoyos) **SOLO** pueden visualizar y operar en su respectiva sede asignada (`activeUser.sede`).
+      * La interfaz bloquea el selector multi-sede para estos perfiles y despliega el banner de seguridad institucional: `📍 Sede Operativa Asignada: [SEDE] • 🛡️ Privacidad y Aislamiento de Sede Activo`.
+      * Únicamente los **SuperAdmins y Dirección Global** (`authority.isSuperAdmin = true`: Paul Sosa, Fer Aragón, Andrés Gómez, José Sánchez, etc.) retienen la facultad de alternar y auditar la visibilidad entre todas las sedes operativas (`Lima`, `Quito`, `Guayaquil`, `Cuenca`, `Medellín`, `México`).
 
 ### 3.2. Regla Maestra de Coherencia de Metas, Nodus y Fechas de Entrenamiento (`GoalsSentinelAgent`)
 1. **Jerarquía y Paternidad de Ciclo (No mezclar Equipos):** Cada meta de sala (C1, C2, MJ) debe pertenecer y aportar exclusivamente a la `Meta Global del Ciclo` del **mismo número de equipo**. Si la meta es `Aliados C1E31`, su ciclo padre debe ser `Meta Global del Ciclo Equipo 31`, nunca un ciclo anterior (como Equipo 30). Si se detecta desalineación, el sistema muestra el badge `⚠️ Ciclo Desalineado (Eq. X vs Eq. Y)` y habilita el botón de re-alineación inmediata a su ciclo correspondiente.
