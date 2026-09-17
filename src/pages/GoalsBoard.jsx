@@ -734,6 +734,9 @@ export default function GoalsBoard() {
         currentValue: sentadosNum,
         progress: newProgress,
         sentadosReportados: true,
+        sentadosManagers: sentadosData.managers ? Number(sentadosData.managers) : null,
+        sentadosApoyos: sentadosData.apoyos ? Number(sentadosData.apoyos) : null,
+        sentadosObservaciones: sentadosData.observaciones || '',
         sentadosReportedBy: currentUser?.displayName || currentUser?.name || currentUser?.email || 'Gerente',
         sentadosReportedAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
@@ -1495,16 +1498,59 @@ export default function GoalsBoard() {
           {/* BOTONES DE ACCIÓN PARA GERENTES Y DIRECTIVOS */}
           {goal.targetValue && canManageGoals && (
             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
-              {/* ACCIÓN OPERATIVA: REPORTAR SENTADOS EN SALA */}
+              {/* ACCIÓN OPERATIVA: REPORTAR / EDITAR SENTADOS EN SALA */}
               {goal.sentadosReportados ? (
-                <span style={{ fontSize: '0.78rem', background: 'rgba(16, 185, 129, 0.18)', color: '#10b981', border: '1px solid rgba(16, 185, 129, 0.35)', padding: '0.45rem 0.8rem', borderRadius: '8px', fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
-                  <CheckCircle2 size={14} /> Sentados en Sala: {goal.currentValue}
-                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedGoalForSentados(goal);
+                    setSentadosData({
+                      sentados: goal.currentValue != null ? String(goal.currentValue) : '',
+                      managers: goal.sentadosManagers != null ? String(goal.sentadosManagers) : '',
+                      apoyos: goal.sentadosApoyos != null ? String(goal.sentadosApoyos) : '',
+                      observaciones: goal.sentadosObservaciones || ''
+                    });
+                    setShowSentadosModal(true);
+                  }}
+                  style={{
+                    fontSize: '0.78rem',
+                    background: 'rgba(16, 185, 129, 0.18)',
+                    color: '#10b981',
+                    border: '1px solid rgba(16, 185, 129, 0.4)',
+                    padding: '0.45rem 0.8rem',
+                    borderRadius: '8px',
+                    fontWeight: 800,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.background = 'rgba(16, 185, 129, 0.3)';
+                    e.currentTarget.style.borderColor = '#10b981';
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.background = 'rgba(16, 185, 129, 0.18)';
+                    e.currentTarget.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+                  }}
+                  title="Clic para editar o corregir la cantidad de personas sentadas en sala"
+                >
+                  <CheckCircle2 size={14} />
+                  <span>Sentados en Sala: {goal.currentValue}</span>
+                  <Edit3 size={12} style={{ opacity: 0.85, marginLeft: '3px' }} />
+                </button>
               ) : (
                 <button
                   type="button"
                   onClick={() => {
                     setSelectedGoalForSentados(goal);
+                    setSentadosData({
+                      sentados: goal.currentValue != null ? String(goal.currentValue) : '',
+                      managers: '',
+                      apoyos: '',
+                      observaciones: ''
+                    });
                     setShowSentadosModal(true);
                   }}
                   className="btn-primary"
@@ -1917,7 +1963,9 @@ export default function GoalsBoard() {
                 <Users size={24} color="#10b981" />
               </div>
               <div>
-                <h2 style={{ margin: 0, color: '#10b981', fontSize: '1.35rem' }}>Reporte de Sentados en Sala</h2>
+                <h2 style={{ margin: 0, color: '#10b981', fontSize: '1.35rem' }}>
+                  {selectedGoalForSentados.sentadosReportados ? 'Editar Reporte de Sentados en Sala' : 'Reporte de Sentados en Sala'}
+                </h2>
                 <p className="text-muted" style={{ margin: 0, fontSize: '0.82rem' }}>
                   {selectedGoalForSentados.title} • {selectedGoalForSentados.sede || 'Sede'}
                 </p>
@@ -2008,7 +2056,7 @@ export default function GoalsBoard() {
                     padding: '0.6rem 1.4rem'
                   }}
                 >
-                  {savingSentados ? 'Guardando...' : 'Confirmar Reporte Oficial'}
+                  {savingSentados ? 'Guardando...' : (selectedGoalForSentados.sentadosReportados ? 'Actualizar Reporte de Sala' : 'Confirmar Reporte Oficial')}
                 </button>
               </div>
             </form>
