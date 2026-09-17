@@ -317,6 +317,18 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
 
   const isManager = authority.canEdit;
 
+  // Aislamiento y Privacidad Estricta de Sede:
+  // "en los horarios los gerentes y equipos solo pueden ver su sede"
+  // Solo SuperAdmins y Dirección Global tienen visibilidad multi-sede.
+  const canSwitchSedes = Boolean(authority.isSuperAdmin);
+
+  // Asegurar que si el usuario no tiene permisos globales, permanezca fijado en su sede asignada
+  useEffect(() => {
+    if (!canSwitchSedes && initialSede && selectedSede !== initialSede) {
+      setSelectedSede(initialSede);
+    }
+  }, [canSwitchSedes, initialSede, selectedSede]);
+
   // Lista de colaboradores y filas por sede
   const [staffList, setStaffList] = useState([]);
   const [scheduleRows, setScheduleRows] = useState([]);
@@ -931,38 +943,63 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
           </button>
         </div>
 
-        {/* SELECTOR DE SEDE (MULTI-SEDE REAL) */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap', padding: '0.6rem 0.8rem', background: 'var(--bg-dark, #f8fafc)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
-          <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-heading)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <MapPin size={14} className="text-gold" />
-            Seleccionar Sede:
-          </span>
-          {OPERATIONAL_SEDES.map(s => {
-            const isSel = selectedSede === s;
-            return (
-              <button
-                key={s}
-                onClick={() => {
-                  setSelectedSede(s);
-                  setActiveCellPicker(null);
-                }}
-                style={{
-                  padding: '0.3rem 0.75rem',
-                  borderRadius: '6px',
-                  fontSize: '0.78rem',
-                  fontWeight: isSel ? 700 : 500,
-                  cursor: 'pointer',
-                  border: isSel ? '1px solid var(--crear-gold)' : '1px solid var(--border-subtle)',
-                  background: isSel ? 'var(--crear-gold-light)' : 'var(--bg-card)',
-                  color: isSel ? 'var(--crear-gold)' : 'var(--text-muted)',
-                  transition: 'all 0.15s ease'
-                }}
-              >
-                {s}
-              </button>
-            );
-          })}
-        </div>
+        {/* SELECTOR DE SEDE (MULTI-SEDE REAL PARA SUPERADMINS / AISLAMIENTO PARA GERENTES Y EQUIPOS) */}
+        {canSwitchSedes ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap', padding: '0.6rem 0.8rem', background: 'var(--bg-dark, #f8fafc)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
+            <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-heading)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <MapPin size={14} className="text-gold" />
+              Seleccionar Sede (Vista Global):
+            </span>
+            {OPERATIONAL_SEDES.map(s => {
+              const isSel = selectedSede === s;
+              return (
+                <button
+                  key={s}
+                  onClick={() => {
+                    setSelectedSede(s);
+                    setActiveCellPicker(null);
+                  }}
+                  style={{
+                    padding: '0.3rem 0.75rem',
+                    borderRadius: '6px',
+                    fontSize: '0.78rem',
+                    fontWeight: isSel ? 700 : 500,
+                    cursor: 'pointer',
+                    border: isSel ? '1px solid var(--crear-gold)' : '1px solid var(--border-subtle)',
+                    background: isSel ? 'var(--crear-gold-light)' : 'var(--bg-card)',
+                    color: isSel ? 'var(--crear-gold)' : 'var(--text-muted)',
+                    transition: 'all 0.15s ease'
+                  }}
+                >
+                  {s}
+                </button>
+              );
+            })}
+          </div>
+        ) : (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '0.75rem',
+            flexWrap: 'wrap',
+            padding: '0.6rem 0.9rem',
+            background: 'rgba(234, 179, 8, 0.06)',
+            borderRadius: 'var(--radius-md)',
+            border: '1px solid rgba(234, 179, 8, 0.25)'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <MapPin size={16} className="text-gold" />
+              <span style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--text-heading)' }}>
+                Sede Operativa Asignada: <span style={{ color: 'var(--crear-gold)', textTransform: 'uppercase' }}>{selectedSede}</span>
+              </span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.74rem', color: 'var(--text-muted)' }}>
+              <ShieldCheck size={14} style={{ color: '#10b981' }} />
+              <span>Privacidad y Aislamiento de Sede Activo (Solo puedes ver y gestionar tu sede)</span>
+            </div>
+          </div>
+        )}
 
         {/* TABS DE FILTRO */}
         <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap' }}>
