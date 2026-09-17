@@ -2885,7 +2885,7 @@ export default function Home() {
       )}
 
       {/* MODAL HORARIOS DE ENTRENAMIENTOS Y CÓDIGO DE VESTIMENTA */}
-      <HorariosEntrenamientoModal isOpen={showHorariosModal} onClose={() => setShowHorariosModal(false)} />
+      <HorariosEntrenamientoModal isOpen={showHorariosModal} onClose={() => setShowHorariosModal(false)} currentUser={currentUser} />
     </div>
   );
 }
