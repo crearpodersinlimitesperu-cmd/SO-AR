@@ -889,15 +889,20 @@ export default function Home() {
 
   // Cálculo de tareas del usuario
   const userEmail = (currentUser?.email || '').toLowerCase().trim();
+  // FIX 16/09/2026: normaliza el typo de dominio conocido (crearpls.com ->
+  // crearpsl.net, ver ChecklistContext.jsx/TaskDetailModal.jsx) también aquí,
+  // para que "Mis Tareas Asignadas" no pierda silenciosamente tareas creadas
+  // o asignadas con el dominio viejo/typo guardado en Firestore.
+  const normalizeEm = (e) => (e || '').toLowerCase().trim().replace('@crearpls.com', '@crearpsl.net');
   const activeRole = currentUser?.appRole || currentUser?.role || 'gerente';
-  const isExecutiveUser = ['ceo', 'cco', 'socio', 'super_admin', 'direccion'].includes(activeRole) || 
-                          userEmail === 'fer.aragon@crearpsl.net' || 
+  const isExecutiveUser = ['ceo', 'cco', 'socio', 'super_admin', 'direccion'].includes(activeRole) ||
+                          userEmail === 'fer.aragon@crearpsl.net' ||
                           userEmail === 'paul.sosa@crearpsl.net';
 
   const myTasksForProgress = allTasks.filter(t => {
-    const isAssigned = (t.assignedToEmails && t.assignedToEmails.some(e => e.toLowerCase().trim() === userEmail)) ||
-                       (t.assignedToEmail && t.assignedToEmail.toLowerCase().trim() === userEmail) ||
-                       (t.collaborators && t.collaborators.map(c => c.toLowerCase().trim()).includes(userEmail));
+    const isAssigned = (t.assignedToEmails && t.assignedToEmails.some(e => normalizeEm(e) === normalizeEm(userEmail))) ||
+                       (t.assignedToEmail && normalizeEm(t.assignedToEmail) === normalizeEm(userEmail)) ||
+                       (t.collaborators && t.collaborators.map(c => normalizeEm(c)).includes(normalizeEm(userEmail)));
     if (isAssigned) return true;
     if (isExecutiveUser) return false; // Roles ejecutivos / Fer y Paul no tienen tareas operativas por defecto
     if (activeRole === 'consolidado') {
@@ -1155,15 +1160,15 @@ export default function Home() {
 
   const tareasQueHeAsignado = [
     ...(allTasks || [])
-      .filter(t => (t.createdBy || '').toLowerCase().trim() === userEmail && userEmail)
+      .filter(t => normalizeEm(t.createdBy) === normalizeEm(userEmail) && userEmail)
       .map(t => ({ ...t, __direction: 'asignada_por_mi' })),
     ...(allTasks || [])
       .filter(t => {
-        const yaEsCreador = (t.createdBy || '').toLowerCase().trim() === userEmail;
+        const yaEsCreador = normalizeEm(t.createdBy) === normalizeEm(userEmail);
         if (yaEsCreador || !userEmail) return false; // evita duplicar autoasignadas
-        return (t.assignedToEmails && t.assignedToEmails.some(e => e.toLowerCase().trim() === userEmail)) ||
-               (t.assignedToEmail && t.assignedToEmail.toLowerCase().trim() === userEmail) ||
-               (t.collaborators && t.collaborators.map(c => c.toLowerCase().trim()).includes(userEmail));
+        return (t.assignedToEmails && t.assignedToEmails.some(e => normalizeEm(e) === normalizeEm(userEmail))) ||
+               (t.assignedToEmail && normalizeEm(t.assignedToEmail) === normalizeEm(userEmail)) ||
+               (t.collaborators && t.collaborators.map(c => normalizeEm(c)).includes(normalizeEm(userEmail)));
       })
       .map(t => ({ ...t, __direction: 'asignada_a_mi' }))
   ]
@@ -2669,7 +2674,12 @@ export default function Home() {
           {(() => {
             // Clasificación para las pestañas de filtro (Activas/Vencidas/Cumplidas/Todas).
             const clasificadas = tareasQueHeAsignado.map(task => {
-              const isDone = task.completed || task.status === 'Completada';
+              // FIX 16/09/2026: José confirmó (captura "Feliz Cumpleaños !!",
+              // 100% avance pero seguía en "Vencidas") que una tarea al 100%
+              // de avance debe contar como cumplida aunque completed/status
+              // no estén sincronizados. Red de seguridad, no reemplaza
+              // completed/status (que siguen siendo la fuente principal).
+              const isDone = task.completed || task.status === 'Completada' || task.progressPercentage === 100;
               const isOverdue = !isDone && getCountdownInfo(task.deadline, time).overdue;
               return { task, isDone, isOverdue };
             });
@@ -2802,6 +2812,25 @@ export default function Home() {
                           boxShadow: '0 1px 4px rgba(0,0,0,0.25)'
                         }}>
                           {countdown.label}
+                        </span>
+                      )}
+                      {isDone && (
+                        <span style={{
+                          fontSize: '0.82rem', fontWeight: 800, padding: '0.42rem 0.9rem', borderRadius: '20px',
+                          color: '#10b981', background: 'rgba(16, 185, 129, 0.12)', border: '2px solid rgba(16, 185, 129, 0.35)',
+                          whiteSpace: 'nowrap', letterSpacing: '0.02em',
+                          boxShadow: '0 1px 4px rgba(0,0,0,0.25)'
+                        }}>
+                          {(() => {
+                            // FIX 16/09/2026: fecha real de cumplimiento (nunca inventada).
+                            // Prioridad: completedAt (fecha oficial de cumplimiento) -> lastUpdated
+                            // (mejor dato disponible en tareas antiguas sin completedAt) -> sin fecha.
+                            const fechaCumplida = task.completedAt || task.lastUpdated || null;
+                            if (!fechaCumplida) return '✅ CUMPLIDA';
+                            const d = new Date(fechaCumplida);
+                            if (isNaN(d.getTime())) return '✅ CUMPLIDA';
+                            return `✅ CUMPLIDA el ${d.toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric' })}`;
+                          })()}
                         </span>
                       )}
                       {esCreador && (

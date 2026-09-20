@@ -110,8 +110,13 @@ function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, curre
     const tNorm = normalizeRole(t.role);
     const matchesRole = tNorm === canonicalRole || t.role === person.role;
     if (!matchesRole) return false;
-    if (t.sede) {
-      const normTaskSede = normalizeSede(t.sede);
+    // FIX (20/09/2026): las tareas ad-hoc guardan la sede en "assignedSede", no
+    // en "sede" (ver ChecklistContext.jsx addCustomTask). Leer solo "t.sede"
+    // dejaba pasar sin filtro tareas de otras sedes — mismo bug ya corregido
+    // en GerenteDashboard.jsx.
+    const tSede = t.assignedSede || t.sede;
+    if (tSede) {
+      const normTaskSede = normalizeSede(tSede);
       return normTaskSede === normalizedSedeName || normTaskSede === 'Global' || normalizedSedeName === 'Global';
     }
     return true;
@@ -393,8 +398,11 @@ function SedeBlock({ sede, tasks, navigate, onSelectUser, onAssignTask, currentU
       const tNorm = normalizeRole(t.role);
       const matchesRole = tNorm === canonicalRole || t.role === person.role;
       if (!matchesRole) return false;
-      if (t.sede) {
-        return t.sede === person.sede || t.sede === 'Global' || person.sede === 'Global';
+      // FIX (20/09/2026): ver nota arriba en este mismo archivo — las tareas
+      // ad-hoc guardan la sede en "assignedSede", no en "sede".
+      const tSede = t.assignedSede || t.sede;
+      if (tSede) {
+        return tSede === person.sede || tSede === 'Global' || person.sede === 'Global';
       }
       return true;
     });
@@ -1255,39 +1263,50 @@ export default function SuperAdminPanel() {
 
   const fixKarol = async () => {
     try {
-      showToast('Buscando TODOS los perfiles de Karol...', 'info');
-      const usersRef = collection(db, 'users');
-      const q = query(usersRef);
-      const snapshot = await getDocs(q);
-      
+      showToast('Buscando TODOS los perfiles ocultos de Karol...', 'info');
       let count = 0;
       const batchPromises = [];
       const foundNames = [];
-      
-      snapshot.forEach(docSnap => {
-        const data = docSnap.data();
-        const nameLower = (data.name || '').toLowerCase();
-        
-        if (nameLower.includes("karol")) {
-          count++;
-          foundNames.push(data.name);
-          console.log(`Encontrado duplicado de Karol ID: ${docSnap.id}`, data);
-          
-          batchPromises.push(updateDoc(doc(db, 'users', docSnap.id), {
-            email: 'coordinacion.administrativa@crearpsl.net',
-            emails: ['coordinacion.administrativa@crearpsl.net'],
-            correo: 'coordinacion.administrativa@crearpsl.net',
-            role: 'coordinacion_administrativa',
-            roles: ['coordinacion_administrativa']
-          }));
-        }
-      });
-      
+
+      // (20/09/2026) Version recuperada del working tree de la PC de Jose (no
+      // estaba commiteada): busca en "users" Y en "qt_directory", detecta por
+      // nombre+apellido en cualquier campo y unifica nombre/estado ademas de
+      // correo y rol.
+      const scanCollection = async (collectionName) => {
+        const snap = await getDocs(collection(db, collectionName));
+        snap.forEach(docSnap => {
+          const data = docSnap.data();
+          const stringified = JSON.stringify(data).toLowerCase();
+
+          if (stringified.includes("karol") && stringified.includes("villarruel")) {
+            count++;
+            foundNames.push(`${data.name || data.displayName || 'Sin nombre'} (${collectionName})`);
+            console.log(`Encontrado duplicado de Karol ID: ${docSnap.id} en ${collectionName}`, data);
+
+            batchPromises.push(updateDoc(doc(db, collectionName, docSnap.id), {
+              email: 'coordinacion.administrativa@crearpsl.net',
+              emails: ['coordinacion.administrativa@crearpsl.net'],
+              correo: 'coordinacion.administrativa@crearpsl.net',
+              role: 'coordinacion_administrativa',
+              roles: ['coordinacion_administrativa'],
+              name: 'Karol Fernanda Villarruel Yánez',
+              displayName: 'Karol Fernanda Villarruel Yánez',
+              isActive: true,
+              active: true,
+              status: 'active'
+            }));
+          }
+        });
+      };
+
+      await scanCollection('users');
+      await scanCollection('qt_directory');
+
       if (count > 0) {
         await Promise.all(batchPromises);
-        showToast(`Se arreglaron ${count} perfiles: ${foundNames.join(', ')}`, 'success');
+        showToast(`Se unificaron ${count} perfiles (incluyendo ocultos): ${foundNames.join(', ')}`, 'success');
       } else {
-        showToast('No se encontro ningun perfil de Karol en la base de datos.', 'error');
+        showToast('No se encontro ningun perfil de Karol Villarruel en las bases de datos.', 'error');
       }
     } catch (error) {
       console.error(error);

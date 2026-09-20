@@ -403,6 +403,11 @@ export function ChecklistProvider({ children }) {
       const updates = {
         completed: !currentStatus,
         status: !currentStatus ? 'Completada' : 'Pendiente',
+        // FIX 16/09/2026: fecha real de cumplimiento (trazabilidad, pedido
+        // explicito de Jose). Se limpia al reabrir para no dejar una fecha
+        // vieja "pegada"; se vuelve a fijar (con la fecha real del momento)
+        // si se vuelve a completar.
+        completedAt: !currentStatus ? new Date().toISOString() : null,
         [`completions.${userSede}.completed`]: !currentStatus,
         [`completions.${userSede}.status`]: !currentStatus ? 'Completada' : 'Pendiente',
         [`completions.${userSede}.updatedAt`]: new Date().toISOString()
@@ -1126,6 +1131,11 @@ export function ChecklistProvider({ children }) {
         completed: allCompleted,
         status: allCompleted ? 'Completada' : (anyCompleted ? 'En Progreso' : 'Pendiente'),
         progressPercentage: overallPercent,
+        // FIX 16/09/2026: fecha real de cumplimiento a nivel de tarea (no solo
+        // por colaborador), trazabilidad pedida por Jose. Conserva la fecha
+        // si ya existia (no se pisa en actualizaciones posteriores); nunca se
+        // inventa.
+        completedAt: allCompleted ? (data.completedAt || new Date().toISOString()) : null,
         updatedAt: new Date().toISOString()
       });
       showToast(isCompleted ? "¡Completaste tu parte de la tarea!" : "Marcaste tu parte como pendiente.", "success");

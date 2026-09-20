@@ -51,11 +51,22 @@ async function getOrCreateDriveFolder(accessToken, folderName = DRIVE_FOLDER_NAM
 }
 
 /**
- * Hace que un archivo en Google Drive sea accesible por cualquier miembro con el enlace
+ * Hace que un archivo en Google Drive sea accesible por cualquier miembro con el enlace.
+ *
+ * FIX (17/09/2026): José pidió que la evidencia subida quede "disponible para los
+ * interesados". El código YA intentaba esto (role:'reader', type:'anyone'), pero
+ * antes se ignoraba si la llamada fallaba: no se revisaba `res.ok` y el catch solo
+ * hacía console.warn, así que si Google Drive rechazaba el permiso (token con
+ * alcance insuficiente, límite de la API, error de red), el archivo quedaba
+ * PRIVADO en la cuenta de quien subió, pero la app igual mostraba "subido con
+ * éxito" y guardaba el enlace como si cualquier interesado pudiera abrirlo — sin
+ * que nadie se enterara del fallo. Ahora esta función devuelve true/false para que
+ * quien la llama sepa con certeza si el enlace quedó realmente público, y se pueda
+ * avisar al usuario en vez de asumir que sí funcionó.
  */
 async function makeDriveFilePublic(accessToken, fileId) {
   try {
-    await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}/permissions`, {
+    const res = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}/permissions`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -66,8 +77,16 @@ async function makeDriveFilePublic(accessToken, fileId) {
         type: 'anyone'
       })
     });
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      console.error('No se pudo establecer permiso público en Google Drive (respuesta no OK):', res.status, errorData);
+      return false;
+    }
+    return true;
   } catch (err) {
-    console.warn('Aviso: no se pudo establecer permiso público en Google Drive:', err);
+    console.error('No se pudo establecer permiso público en Google Drive (error de red/excepción):', err);
+    return false;
   }
 }
 
@@ -140,8 +159,11 @@ export async function uploadToGoogleDrive(file, accessToken, subfolderName = '')
   const driveFile = await uploadRes.json();
 
   // 3. Establecer permisos de lectura para que el equipo pueda abrirlo
+  // FIX (17/09/2026): se captura el resultado real (true/false) en vez de asumir
+  // éxito, para poder informar honestamente si el enlace quedó público o no.
+  let publicAccessConfirmed = false;
   if (driveFile.id) {
-    await makeDriveFilePublic(accessToken, driveFile.id);
+    publicAccessConfirmed = await makeDriveFilePublic(accessToken, driveFile.id);
   }
 
   const finalUrl = driveFile.webViewLink || `https://drive.google.com/file/d/${driveFile.id}/view`;
@@ -152,7 +174,8 @@ export async function uploadToGoogleDrive(file, accessToken, subfolderName = '')
     url: finalUrl,
     provider: 'google_drive',
     size: file.size,
-    type: file.type
+    type: file.type,
+    publicAccessConfirmed
   };
 }
 

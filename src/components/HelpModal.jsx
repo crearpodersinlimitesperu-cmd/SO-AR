@@ -28,7 +28,13 @@ export default function HelpModal({ isOpen, onClose }) {
 
     setIsSubmitting(true);
     let imageUrl = '';
-    
+    // FIX 16/09/2026: José reportó que las capturas adjuntas en Sugerencias
+    // "se pierden" — la causa era que si esta subida a imgbb fallaba (red,
+    // cuota, API caída) o devolvía success:false, el código seguía de largo
+    // y mandaba la sugerencia SIN la imagen, sin avisar nunca a quien la
+    // envió. Ahora se marca explícitamente y se le avisa al usuario.
+    let imageUploadFailed = false;
+
     if (suggestionImage) {
       const formData = new FormData();
       formData.append('image', suggestionImage);
@@ -40,9 +46,16 @@ export default function HelpModal({ isOpen, onClose }) {
         const data = await res.json();
         if (data.success) {
           imageUrl = data.data.url;
+        } else {
+          imageUploadFailed = true;
+          console.error("Error subiendo imagen: respuesta sin éxito de imgbb", data);
         }
       } catch (err) {
+        imageUploadFailed = true;
         console.error("Error subiendo imagen:", err);
+      }
+      if (imageUploadFailed) {
+        toast.error('No se pudo adjuntar la captura de pantalla (la sugerencia se enviará solo con el texto). Intenta adjuntarla de nuevo o descríbelo en el mensaje.');
       }
     }
 

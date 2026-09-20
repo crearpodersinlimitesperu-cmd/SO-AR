@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prebuild": "(python3 dump_code.py || python dump_code.py || true)",
+    "prebuild": "(python3 dump_code.py || python dump_code.py || cd .)",
     "build": "vite build",
     "lint": "oxlint",
     "preview": "vite preview",

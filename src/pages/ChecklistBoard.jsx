@@ -147,14 +147,36 @@ export default function ChecklistBoard() {
 
   // Las tareas mías incluyen: rol directo, asignadas a mi correo O donde soy colaborador aceptado
   const myTasks = tasks.filter(t => {
-    if (roleId === 'consolidado') return true;
-
     const userEmailCom = currentUser?.email?.replace('@crearpsl.net', '@crearpsl.com')?.toLowerCase();
     const userEmailNet = currentUser?.email?.replace('@crearpsl.com', '@crearpsl.net')?.toLowerCase();
-    
+
     const isAssigned = (t.assignedToEmails && t.assignedToEmails.some(e => e.toLowerCase() === userEmailCom || e.toLowerCase() === userEmailNet)) || t.assignedToEmail?.toLowerCase() === userEmailCom || t.assignedToEmail?.toLowerCase() === userEmailNet;
     const isCollaborator = t.collaborators?.some(c => c.toLowerCase() === userEmailCom || c.toLowerCase() === userEmailNet);
     const isMyCreation = t.createdBy?.toLowerCase() === userEmailCom || t.createdBy?.toLowerCase() === userEmailNet;
+
+    // FIX (16/09/2026): José reportó, con captura, que su Consolidado (filtrado
+    // a "Mi Sede (Lima)") mostraba tareas de otras sedes con personas de otras
+    // sedes (ej. una tarea de Quito asignada a 4 coordinadoras de Quito, o una
+    // tarea de "Sede Global"). Causa: esta rama hacía "return true" sin ninguna
+    // condición, saltándose por completo el selector "Filtrar por Sede" de esta
+    // misma vista. El Consolidado sigue mostrando TODOS los roles (para eso
+    // existe), pero ahora, si hay una sede específica seleccionada, solo se
+    // muestran tareas de esa sede — las de sede "Global"/"Sede Global" se
+    // siguen mostrando siempre (mismo criterio que el bloque de
+    // SuperAdmin/Dirección justo abajo) — salvo que la tarea esté asignada a
+    // mí, la haya creado yo, o yo sea colaborador.
+    if (roleId === 'consolidado') {
+      if (selectedSedeFilter && selectedSedeFilter !== 'all') {
+        const taskSede = t.assignedSede || t.sede;
+        if (taskSede && taskSede !== 'Global' && taskSede !== 'Sede Global') {
+          const normTaskSede = normalizeSede(taskSede);
+          if (normTaskSede !== selectedSedeFilter && !isAssigned && !isMyCreation && !isCollaborator) {
+            return false;
+          }
+        }
+      }
+      return true;
+    }
 
     // SuperAdmin o Dirección tienen visibilidad de supervisión pero respetando el filtro de sede seleccionado
     if (currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.appRole === 'direccion') {

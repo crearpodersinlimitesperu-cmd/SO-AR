@@ -101,6 +101,18 @@ export default function TaskDetailModal({
   const [newNoteText, setNewNoteText] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
+  // FIX 16/09/2026: José reportó (y se confirmó leyendo el código) que los
+  // adjuntos de evidencia y las notas de avance se pierden — se agregan a
+  // "evidencesList"/"notesList" (estado local del modal, incluso con un toast
+  // de "guardado exitosamente" cuando el archivo llega a Drive) pero SOLO se
+  // escriben en Firestore cuando se presiona el botón "Guardar" (handleSaveAll).
+  // Si el usuario cierra con la X, "Cancelar" o "Agregar colaborador"/"Editar
+  // Configuración" (los cuatro cierran con onClose sin pasar por
+  // handleSaveAll), todo lo agregado desde que se abrió el modal desaparece
+  // sin ningún aviso. hasUnsavedChanges marca si hay algo agregado/quitado
+  // desde la apertura que todavía no pasó por handleSaveAll.
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
   // Sincronizar estado cuando se abre el modal o cambia la tarea
   useEffect(() => {
     if (task && isOpen) {
@@ -198,8 +210,25 @@ export default function TaskDetailModal({
       setIsDragging(false);
       setEvidenceMode('upload');
       setNewNoteText('');
+      setHasUnsavedChanges(false);
     }
   }, [task, isOpen]);
+
+  // Cierra el modal, pero si hay evidencia/notas agregadas o quitadas que
+  // todavía no se guardaron con "Guardar", pide confirmación explícita antes
+  // de descartarlas — para no perder datos silenciosamente (ver FIX 16/09/2026
+  // arriba). afterClose (opcional) corre solo si el usuario confirma salir
+  // (o si no había nada sin guardar).
+  const handleCloseAttempt = (afterClose) => {
+    if (hasUnsavedChanges) {
+      const confirmLeave = window.confirm(
+        'Agregaste o quitaste evidencia/notas que todavía no guardaste. Si sales ahora, se pierden.\n\n¿Salir sin guardar?'
+      );
+      if (!confirmLeave) return;
+    }
+    onClose();
+    if (afterClose) afterClose();
+  };
 
   // Manejadores para adjuntar documentos (Google Drive / Cloud)
   const handleFileSelect = (e) => {
@@ -275,15 +304,30 @@ export default function TaskDetailModal({
       };
 
       setEvidencesList(prev => [newEvidence, ...prev]);
+      setHasUnsavedChanges(true);
       setSelectedFile(null);
       setNewEvidenceTitle('');
       setShowAddEvidence(false);
       showToast(
-        result.provider === 'google_drive' 
-          ? '📁 Documento guardado en Google Drive exitosamente.' 
-          : '☁️ Documento guardado en la nube exitosamente.',
+        result.provider === 'google_drive'
+          ? '📁 Documento subido a Google Drive. Falta un paso: presiona "Guardar" abajo para vincularlo a la tarea.'
+          : '☁️ Documento subido a la nube. Falta un paso: presiona "Guardar" abajo para vincularlo a la tarea.',
         'success'
       );
+
+      // FIX (17/09/2026): antes se asumía siempre que el archivo quedaba
+      // visible para cualquier interesado. Ahora googleDriveService.js
+      // confirma de verdad si el permiso público se aplicó
+      // (result.publicAccessConfirmed). Si NO se pudo confirmar, se avisa
+      // explícitamente en vez de dejar al usuario creyendo que ya es
+      // accesible para su equipo cuando puede seguir siendo privado en su
+      // cuenta de Google.
+      if (result.provider === 'google_drive' && result.publicAccessConfirmed === false) {
+        showToast(
+          '⚠️ El archivo se subió, pero no se pudo confirmar que quede visible para el resto del equipo. Verifica el enlace en Google Drive o comparte el archivo manualmente.',
+          'error'
+        );
+      }
     } catch (err) {
       console.error('Error al subir documento:', err);
       showToast(err.message || 'Error al subir el archivo.', 'error');
@@ -453,6 +497,7 @@ export default function TaskDetailModal({
     };
 
     setEvidencesList(prev => [newEvidence, ...prev]);
+    setHasUnsavedChanges(true);
     setNewEvidenceUrl('');
     setNewEvidenceTitle('');
     setShowAddEvidence(false);
@@ -461,7 +506,8 @@ export default function TaskDetailModal({
 
   const handleRemoveEvidence = (idToRemove) => {
     setEvidencesList(prev => prev.filter(e => e.id !== idToRemove));
-    showToast('Evidencia removida de la lista.', 'info');
+    setHasUnsavedChanges(true);
+    showToast('Evidencia removida de la lista. Guarda los avances para confirmar.', 'info');
   };
 
   // Agregar nota de avance
@@ -482,8 +528,9 @@ export default function TaskDetailModal({
     };
 
     setNotesList(prev => [note, ...prev]);
+    setHasUnsavedChanges(true);
     setNewNoteText('');
-    showToast('Avance registrado en la bitácora.', 'info');
+    showToast('Avance registrado en la bitácora. Guarda los avances para confirmar.', 'info');
   };
 
   // Alternar estado completada
@@ -534,6 +581,14 @@ export default function TaskDetailModal({
         progressPercentage: finalOverall,
         completed: finalCompleted,
         status: finalCompleted ? 'Completada' : (finalOverall > 0 ? 'En progreso' : 'Pendiente'),
+        // FIX 16/09/2026: registrar fecha real de cumplimiento (trazabilidad,
+        // pedido explicito de Jose: "no podemos perder datos"). Si la tarea
+        // ya tenia una fecha de cumplimiento registrada, se conserva (no se
+        // pisa al editar evidencias/notas despues). Si se completa por
+        // primera vez ahora, se guarda el momento real. Si se reabre
+        // (finalCompleted=false), se limpia -- se resetea al volver a
+        // completarse, nunca se inventa una fecha.
+        completedAt: finalCompleted ? (task.completedAt || new Date().toISOString()) : null,
         assigneeProgress: isMultiAssignee ? assigneeProgressMap : (task.assigneeProgress || {}),
         evidenceUrl: mainEvidenceUrl,
         evidence_url: mainEvidenceUrl,
@@ -551,6 +606,7 @@ export default function TaskDetailModal({
         celebrateVictory();
       }
       showToast('🎉 ¡Tarea actualizada y avances guardados exitosamente!', 'success');
+      setHasUnsavedChanges(false);
       onClose();
     } catch (err) {
       console.error('Error guardando avances:', err);
@@ -697,10 +753,7 @@ export default function TaskDetailModal({
               {isCreator && onEditTaskParams && (
                 <button
                   type="button"
-                  onClick={() => {
-                    onClose();
-                    onEditTaskParams(task);
-                  }}
+                  onClick={() => handleCloseAttempt(() => onEditTaskParams(task))}
                   title="Agregar o quitar personas asignadas a esta tarea"
                   style={{
                     marginTop: '0.3rem',
@@ -727,7 +780,7 @@ export default function TaskDetailModal({
           {/* BOTÓN CERRAR */}
           <button
             type="button"
-            onClick={onClose}
+            onClick={() => handleCloseAttempt()}
             style={{
               background: 'rgba(255, 255, 255, 0.05)',
               border: '1px solid rgba(255, 255, 255, 0.1)',
@@ -1437,7 +1490,29 @@ export default function TaskDetailModal({
                       </div>
                     )}
 
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '0.2rem' }}>
+                    {/* FIX (17/09/2026): José reportó, con captura, que el botón
+                        "Subir y Guardar en Google Drive" se veía cortado/truncado
+                        en algunas pantallas. Causa: la fila usaba
+                        justify-content:'flex-end' sin flexWrap y el botón
+                        combinaba un ícono (UploadCloud) + un emoji redundante
+                        (☁️) + un texto largo, todo en una sola línea sin permitir
+                        salto. Ahora: (1) la fila permite salto de línea
+                        (flexWrap:'wrap') para que en pantallas angostas
+                        "Cancelar" y el botón de subir se acomoden en dos líneas
+                        en vez de recortarse, (2) el botón de subir tiene
+                        minWidth/whiteSpace:'normal' y flex:'1 1 auto' para que su
+                        propio texto pueda envolver en vez de desbordarse, y (3)
+                        se quitó el emoji redundante y se acortó el texto a
+                        "Subir a Google Drive" (el ícono UploadCloud ya comunica
+                        la acción de subir; "y Guardar" se explica en el toast
+                        de confirmación que ya aparece tras subir). También se
+                        agrega una leyenda explicando que el archivo quedará
+                        visible para el equipo, en línea con el pedido de que la
+                        evidencia esté "disponible para los interesados". */}
+                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', lineHeight: 1.4 }}>
+                      El archivo se guardará en Google Drive con acceso para todo el equipo interesado en esta tarea.
+                    </div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '0.2rem' }}>
                       <button
                         type="button"
                         disabled={isUploadingFile}
@@ -1449,7 +1524,8 @@ export default function TaskDetailModal({
                           background: 'transparent',
                           color: 'var(--text-muted)',
                           border: '1px solid rgba(255, 255, 255, 0.15)',
-                          cursor: isUploadingFile ? 'not-allowed' : 'pointer'
+                          cursor: isUploadingFile ? 'not-allowed' : 'pointer',
+                          whiteSpace: 'nowrap'
                         }}
                       >
                         Cancelar
@@ -1458,6 +1534,7 @@ export default function TaskDetailModal({
                         type="button"
                         disabled={!selectedFile || isUploadingFile}
                         onClick={handleUploadFile}
+                        title="Subir a Google Drive"
                         style={{
                           padding: '0.45rem 1rem',
                           borderRadius: '6px',
@@ -1469,17 +1546,23 @@ export default function TaskDetailModal({
                           cursor: selectedFile && !isUploadingFile ? 'pointer' : 'not-allowed',
                           display: 'flex',
                           alignItems: 'center',
+                          justifyContent: 'center',
                           gap: '0.4rem',
-                          transition: 'all 0.15s ease'
+                          transition: 'all 0.15s ease',
+                          flex: '1 1 auto',
+                          minWidth: '160px',
+                          whiteSpace: 'normal',
+                          textAlign: 'center',
+                          lineHeight: 1.25
                         }}
                       >
                         {isUploadingFile ? (
                           <>
-                            <RefreshCw size={14} className="animate-spin" /> Guardando...
+                            <RefreshCw size={14} className="animate-spin" style={{ flexShrink: 0 }} /> Guardando...
                           </>
                         ) : (
                           <>
-                            <UploadCloud size={14} /> ☁️ Subir y Guardar en Google Drive
+                            <UploadCloud size={14} style={{ flexShrink: 0 }} /> Subir a Google Drive
                           </>
                         )}
                       </button>
@@ -1836,10 +1919,7 @@ export default function TaskDetailModal({
             {isCreator && onEditTaskParams && (
               <button
                 type="button"
-                onClick={() => {
-                  onClose();
-                  onEditTaskParams(task);
-                }}
+                onClick={() => handleCloseAttempt(() => onEditTaskParams(task))}
                 style={{
                   padding: '0.55rem 0.9rem',
                   borderRadius: '8px',
@@ -1864,7 +1944,7 @@ export default function TaskDetailModal({
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
             <button
               type="button"
-              onClick={onClose}
+              onClick={() => handleCloseAttempt()}
               disabled={isSaving}
               style={{
                 padding: '0.55rem 1rem',

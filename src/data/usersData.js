@@ -71,7 +71,15 @@ export const normalizeSede = (sede) => {
   if (s === 'CUE' || clean.includes('cuenca')) return 'Cuenca';
   if (s === 'GYE' || clean.includes('guayaquil')) return 'Guayaquil';
   if (s === 'MEX' || clean.includes('mex') || clean.includes('cdmx')) return 'M\u00E9xico';
+  // (15/09/2026) Los eventos de Quito llegan del endpoint real (Google Apps
+  // Script) con el código "UIO C1" / "UIO C2" CON ESPACIO, no con guion, y sin
+  // la palabra "quito". Ningún caso de abajo los reconocía y normalizeSede()
+  // devolvía "UIO C1" tal cual, así que el filtro de eventos por sede nunca
+  // coincidía para Quito. "uio" no aparece en ningún otro código/nombre de
+  // sede real, así que clean.includes('uio') es seguro y cubre todas las
+  // variantes ("UIO", "UIO C1", "UIO-C2", etc.).
   if (s === 'UIO-C1' || s === 'UIO-C2' || s === 'UIO' ||
+      clean.includes('uio') ||
       clean.includes('ciclo 1') || clean.includes('ciclo1') ||
       clean.includes('ciclo 2') || clean.includes('ciclo2') ||
       clean.includes('quito')) return 'Quito';

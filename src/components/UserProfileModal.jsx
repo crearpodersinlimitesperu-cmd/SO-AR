@@ -13,13 +13,23 @@ import { db } from '../services/firebase';
 import { doc, onSnapshot, setDoc, updateDoc, arrayUnion, arrayRemove, addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { useAuth } from '../context/AuthContext';
 import { useChecklist } from '../context/ChecklistContext';
-import { normalizeRole, normalizeSede, getRoleDisplayName } from '../data/usersData';
+import { normalizeRole, normalizeSede, getRoleDisplayName, OPERATIONAL_SEDES } from '../data/usersData';
 import { useUI } from '../context/UIContext';
 import { useNavigate } from 'react-router-dom';
 import { isSuperAdminEmail, canSimulate, canManageUserStatus } from '../config/permissions';
 import { getFlagForSede } from '../utils/flags';
 import TaskAssignmentModal from './TaskAssignmentModal';
 import UserStatusModal from './UserStatusModal';
+
+// Roles editables desde este modal (Super Admin) — lista curada de roles
+// canónicos para evitar mostrar sinónimos duplicados (ej. "coordinador_c1c2"
+// y "coord_c1" son el mismo rol, solo se ofrece el segundo).
+const ROLE_EDIT_OPTIONS = [
+  'direccion', 'cfo', 'gerente', 'director_maestria', 'coord_c1', 'coord_maestria',
+  'capitan', 'manager', 'qt', 'coordinador', 'finanzas', 'asistente_impuestos_quito',
+  'talento_humano', 'legal', 'tecnico_sst', 'entrenador', 'entrenador_llamadas'
+];
+const SEDE_EDIT_OPTIONS = [...OPERATIONAL_SEDES, 'Sede Global'];
 
 const ROLE_LABELS = {
   gerente: 'Gerente de Sede',
@@ -191,6 +201,19 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
   const [birthdayDraft, setBirthdayDraft] = useState(user?.cumpleanos || '');
   const [isSavingBirthday, setIsSavingBirthday] = useState(false);
 
+  // Rol y Sede (editable solo por Super Admin) — mismo patrón/mismo destino
+  // (users/{user.id}) que el cumpleaños arriba. Se agregó (16/09/2026) porque
+  // se detectó un caso real (Marce Aguirre, CC1Y2 de Quito/UIO) mostrado en el
+  // Panel Super Admin con el rol genérico "Coordinación Administrativa" en vez
+  // de su rol real de coordinadora de Capítulo 1 y 2 — sin esta pantalla, la
+  // única forma de corregirlo era escribir directamente en la consola de
+  // Firestore. (20/09/2026) Mismo caso con la sede de Daniela Esposito (Quito
+  // según el Directorio Global, "global" en Firestore).
+  const [editingRole, setEditingRole] = useState(false);
+  const [roleDraft, setRoleDraft] = useState(normalizeRole(user?.role) || '');
+  const [sedeDraft, setSedeDraft] = useState(normalizeSede(user?.sede) || '');
+  const [isSavingRole, setIsSavingRole] = useState(false);
+
   // (14/09/2026) Equipo(s) de Quito (editable por la propia persona, o por Super
   // Admin) -- se guarda en users/{id}.equiposQuito. Ver CyclesContext.jsx para el
   // porque: Quito, a diferencia de las demas sedes, corre varios equipos en
@@ -316,8 +339,13 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
       if (!roleMatches) return false;
 
       // Check sede match
-      if (t.sede) {
-        return t.sede === user.sede || t.sede === 'Global' || user.sede === 'Global';
+      // FIX (20/09/2026): las tareas ad-hoc guardan la sede en "assignedSede",
+      // no en "sede" (ver ChecklistContext.jsx addCustomTask). Leer solo
+      // "t.sede" dejaba pasar sin filtro tareas de otras sedes — mismo bug
+      // corregido en GerenteDashboard.jsx y SuperAdminPanel.jsx.
+      const tSede = t.assignedSede || t.sede;
+      if (tSede) {
+        return tSede === user.sede || tSede === 'Global' || user.sede === 'Global';
       }
       return true;
     });
@@ -401,6 +429,32 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
       showToast('No se pudo guardar el cumpleaños: ' + error.message, 'error');
     } finally {
       setIsSavingBirthday(false);
+    }
+  };
+
+  // Handler: Guardar Rol y Sede — mismo patrón que handleSaveBirthday (mismo
+  // doc, mismo guard de user.id). Requiere que ambos campos estén elegidos y
+  // muestra confirmación inline (no hay "deshacer": el rol cambia qué tareas
+  // ve esta persona en toda la plataforma).
+  const handleSaveRole = async () => {
+    if (!user?.id) {
+      showToast('Este perfil no tiene un documento en Firestore para editar (registro local).', 'error');
+      return;
+    }
+    if (!roleDraft || !sedeDraft) {
+      showToast('Selecciona un rol y una sede antes de guardar.', 'error');
+      return;
+    }
+    setIsSavingRole(true);
+    try {
+      await updateDoc(doc(db, 'users', user.id), { role: roleDraft, sede: sedeDraft });
+      showToast(`Rol actualizado: ${getRoleDisplayName(roleDraft)} — ${sedeDraft}.`, 'success');
+      setEditingRole(false);
+    } catch (error) {
+      console.error('Error guardando rol/sede:', error);
+      showToast('No se pudo guardar el rol/sede: ' + error.message, 'error');
+    } finally {
+      setIsSavingRole(false);
     }
   };
 
@@ -710,6 +764,77 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
                   <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
                     <Building2 size={15} color="var(--crear-gold)" /> Sede: <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>{getFlagForSede(user.sede)} <strong style={{ color: 'var(--text-heading)' }}>{normalizeSede(user.sede)}</strong></span>
                   </span>
+                  {currentUser?.isSuperAdmin && !editingRole && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setRoleDraft(normalizeRole(user.role) || '');
+                        setSedeDraft(normalizeSede(user.sede) || '');
+                        setEditingRole(true);
+                      }}
+                      title="Editar rol y sede"
+                      style={{
+                        background: 'transparent', border: '1px dashed rgba(255,255,255,0.25)', borderRadius: '9999px',
+                        color: 'var(--text-muted)', fontSize: '0.72rem', padding: '0.25rem 0.7rem', cursor: 'pointer',
+                        display: 'inline-flex', alignItems: 'center', gap: '0.3rem'
+                      }}
+                    >
+                      ✏️ Editar rol/sede
+                    </button>
+                  )}
+                  {editingRole && (
+                    <div
+                      onClick={(e) => e.stopPropagation()}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', width: '100%',
+                        padding: '0.6rem 0.8rem', borderRadius: '10px',
+                        background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)'
+                      }}
+                    >
+                      <select
+                        value={roleDraft}
+                        onChange={(e) => setRoleDraft(e.target.value)}
+                        style={{
+                          padding: '0.35rem 0.5rem', borderRadius: '6px', border: '1px solid var(--crear-gold)',
+                          background: 'var(--bg-input, #1a1a1a)', color: 'var(--text-heading)', fontSize: '0.82rem'
+                        }}
+                      >
+                        <option value="" disabled>Rol…</option>
+                        {ROLE_EDIT_OPTIONS.map(r => (
+                          <option key={r} value={r}>{getRoleDisplayName(r)}</option>
+                        ))}
+                      </select>
+                      <select
+                        value={sedeDraft}
+                        onChange={(e) => setSedeDraft(e.target.value)}
+                        style={{
+                          padding: '0.35rem 0.5rem', borderRadius: '6px', border: '1px solid var(--crear-gold)',
+                          background: 'var(--bg-input, #1a1a1a)', color: 'var(--text-heading)', fontSize: '0.82rem'
+                        }}
+                      >
+                        <option value="" disabled>Sede…</option>
+                        {SEDE_EDIT_OPTIONS.map(s => (
+                          <option key={s} value={s}>{s}</option>
+                        ))}
+                      </select>
+                      <button
+                        onClick={handleSaveRole}
+                        disabled={isSavingRole}
+                        style={{ fontSize: '0.75rem', padding: '4px 10px', borderRadius: '6px', border: 'none', background: 'var(--crear-gold)', color: '#000', fontWeight: 700, cursor: 'pointer' }}
+                      >
+                        {isSavingRole ? '...' : 'Guardar'}
+                      </button>
+                      <button
+                        onClick={() => setEditingRole(false)}
+                        style={{ fontSize: '0.75rem', padding: '4px 10px', borderRadius: '6px', border: '1px solid var(--text-muted)', background: 'transparent', color: 'var(--text-muted)', cursor: 'pointer' }}
+                      >
+                        Cancelar
+                      </button>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', width: '100%' }}>
+                        Escribe directamente en <code>users/{user.id}</code>. El rol determina qué tareas ve esta persona en toda la plataforma — verifica antes de guardar.
+                      </span>
+                    </div>
+                  )}
                   {user.corporateEmail && (
                     <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }} title="Correo Corporativo Oficial">
                       <Mail size={14} color="var(--crear-gold)" /> Corp: {user.corporateEmail}
