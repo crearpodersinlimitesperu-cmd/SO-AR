@@ -1262,20 +1262,22 @@ export default function SuperAdminPanel() {
       
       let count = 0;
       const batchPromises = [];
+      const foundNames = [];
       
       snapshot.forEach(docSnap => {
         const data = docSnap.data();
         const nameLower = (data.name || '').toLowerCase();
         
-        if (nameLower.includes("karol") && nameLower.includes("villarruel")) {
+        if (nameLower.includes("karol")) {
           count++;
+          foundNames.push(data.name);
           console.log(`Encontrado duplicado de Karol ID: ${docSnap.id}`, data);
-          // Actualizar a todas con el correo oficial para que getAllCompanyUsers las fusione
+          
           batchPromises.push(updateDoc(doc(db, 'users', docSnap.id), {
             email: 'coordinacion.administrativa@crearpsl.net',
             emails: ['coordinacion.administrativa@crearpsl.net'],
             correo: 'coordinacion.administrativa@crearpsl.net',
-            role: 'coordinacion_administrativa', // Normalizamos el rol a CA tambien
+            role: 'coordinacion_administrativa',
             roles: ['coordinacion_administrativa']
           }));
         }
@@ -1283,9 +1285,9 @@ export default function SuperAdminPanel() {
       
       if (count > 0) {
         await Promise.all(batchPromises);
-        showToast(`Se arreglaron ${count} perfiles de Karol! Refresca la pagina.`, 'success');
+        showToast(`Se arreglaron ${count} perfiles: ${foundNames.join(', ')}`, 'success');
       } else {
-        showToast('No se encontro ningun perfil de Karol.', 'error');
+        showToast('No se encontro ningun perfil de Karol en la base de datos.', 'error');
       }
     } catch (error) {
       console.error(error);
