@@ -1253,6 +1253,46 @@ export default function SuperAdminPanel() {
     setShowUserModal(true);
   };
 
+  const fixKarol = async () => {
+    try {
+      showToast('Buscando TODOS los perfiles de Karol...', 'info');
+      const usersRef = collection(db, 'users');
+      const q = query(usersRef);
+      const snapshot = await getDocs(q);
+      
+      let count = 0;
+      const batchPromises = [];
+      
+      snapshot.forEach(docSnap => {
+        const data = docSnap.data();
+        const nameLower = (data.name || '').toLowerCase();
+        
+        if (nameLower.includes("karol") && nameLower.includes("villarruel")) {
+          count++;
+          console.log(`Encontrado duplicado de Karol ID: ${docSnap.id}`, data);
+          // Actualizar a todas con el correo oficial para que getAllCompanyUsers las fusione
+          batchPromises.push(updateDoc(doc(db, 'users', docSnap.id), {
+            email: 'coordinacion.administrativa@crearpsl.net',
+            emails: ['coordinacion.administrativa@crearpsl.net'],
+            correo: 'coordinacion.administrativa@crearpsl.net',
+            role: 'coordinacion_administrativa', // Normalizamos el rol a CA tambien
+            roles: ['coordinacion_administrativa']
+          }));
+        }
+      });
+      
+      if (count > 0) {
+        await Promise.all(batchPromises);
+        showToast(`Se arreglaron ${count} perfiles de Karol! Refresca la pagina.`, 'success');
+      } else {
+        showToast('No se encontro ningun perfil de Karol.', 'error');
+      }
+    } catch (error) {
+      console.error(error);
+      showToast('Error: ' + error.message, 'error');
+    }
+  };
+
   const tabStyle = (view) => ({
     padding: '0.6rem 1.2rem',
     borderRadius: '8px',
@@ -1287,9 +1327,14 @@ export default function SuperAdminPanel() {
 
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1rem' }}>
-      <button onClick={() => navigate('/home')} className="btn-secondary" style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}>
-        <ArrowLeft size={16} /> Volver al Inicio
-      </button>
+      <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
+        <button onClick={() => navigate('/home')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}>
+          <ArrowLeft size={16} /> Volver al Inicio
+        </button>
+        <button onClick={fixKarol} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.4rem 0.8rem', fontSize: '0.85rem', background: '#ef4444', color: 'white', border: 'none' }}>
+          Corregir Perfil de Karol
+        </button>
+      </div>
 
       <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
