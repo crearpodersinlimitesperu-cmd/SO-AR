@@ -1,0 +1,1948 @@
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { 
+  X, CheckCircle2, Clock, Calendar, AlertCircle, 
+  ExternalLink, Link as LinkIcon, Plus, Trash2, Edit3,
+  Send, Sparkles, User, FileText, Check, ShieldCheck, ShieldAlert,
+  TrendingUp, RefreshCw, UploadCloud, Paperclip, FileCheck,
+  FolderPlus, Loader2, UserPlus, MessageSquare,
+  Users, UserCheck, CheckSquare, Square
+} from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { useChecklist } from '../context/ChecklistContext';
+import { useUI } from '../context/UIContext';
+import { getFlagForSede } from '../utils/flags';
+import { uploadEvidenceDocument } from '../services/googleDriveService';
+import { celebrateVictory } from '../utils/neuroFeedback';
+import { usersData, isForeignTask } from '../data/usersData';
+const getCountdown = (deadlineIso) => {
+  if (!deadlineIso) return { label: 'Sin fecha límite', color: '#9ca3af', bg: 'rgba(156,163,175,0.12)', border: '#9ca3af', overdue: false };
+  const deadline = new Date(deadlineIso).getTime();
+  if (isNaN(deadline)) return { label: 'Fecha inválida', color: '#9ca3af', bg: 'rgba(156,163,175,0.12)', border: '#9ca3af', overdue: false };
+
+  const now = Date.now();
+  const diffMs = deadline - now;
+  const absMs = Math.abs(diffMs);
+  const totalHours = Math.floor(absMs / 3600000);
+  const days = Math.floor(totalHours / 24);
+  const mins = Math.floor((absMs % 3600000) / 60000);
+  const timeStr = days > 0 ? `${days}d ${totalHours % 24}h` : (totalHours > 0 ? `${totalHours}h ${mins}m` : `${mins}m`);
+
+  if (diffMs <= 0) return { label: `⏰ VENCIDA hace ${timeStr}`, color: '#ffffff', bg: '#dc2626', border: '#7f1d1d', overdue: true };
+  if (diffMs < 3 * 3600000) return { label: `🔴 ${timeStr} restantes`, color: '#ffffff', bg: '#ef4444', border: '#b91c1c', overdue: false };
+  if (diffMs < 24 * 3600000) return { label: `🟠 ${timeStr} restantes`, color: '#ffffff', bg: '#f97316', border: '#c2410c', overdue: false };
+  if (diffMs < 72 * 3600000) return { label: `🟡 ${timeStr} restantes`, color: '#1a1300', bg: '#facc15', border: '#a16207', overdue: false };
+  return { label: `🟢 ${timeStr} restantes`, color: '#ffffff', bg: '#16a34a', border: '#166534', overdue: false };
+};
+
+const formatFileSize = (bytes) => {
+  if (!bytes || isNaN(bytes)) return '';
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+};
+
+const getEvidenceCategory = (url = '', fileName = '', provider = '') => {
+  const text = `${url} ${fileName} ${provider}`.toLowerCase();
+  if (text.includes('drive.google.com') || provider === 'google_drive') {
+    return { icon: '📁', label: 'Google Drive', color: '#00d2ff', bg: 'rgba(0, 210, 255, 0.12)', border: 'rgba(0, 210, 255, 0.35)' };
+  }
+  if (text.includes('.pdf')) {
+    return { icon: '📄', label: 'PDF', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.12)', border: 'rgba(239, 68, 68, 0.35)' };
+  }
+  if (text.includes('.xls') || text.includes('.xlsx') || text.includes('.csv') || text.includes('sheet')) {
+    return { icon: '📊', label: 'Excel / Planilla', color: '#10b981', bg: 'rgba(16, 185, 129, 0.12)', border: 'rgba(16, 185, 129, 0.35)' };
+  }
+  if (text.includes('.doc') || text.includes('.docx') || text.includes('docs.google.com/document')) {
+    return { icon: '📝', label: 'Word / Doc', color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.12)', border: 'rgba(59, 130, 246, 0.35)' };
+  }
+  if (text.includes('.png') || text.includes('.jpg') || text.includes('.jpeg') || text.includes('.webp') || text.includes('image')) {
+    return { icon: '🖼️', label: 'Imagen', color: '#ec4899', bg: 'rgba(236, 72, 153, 0.12)', border: 'rgba(236, 72, 153, 0.35)' };
+  }
+  if (provider === 'firebase_storage' || text.includes('firebasestorage')) {
+    return { icon: '☁️', label: 'Almacenamiento Cloud', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.12)', border: 'rgba(245, 158, 11, 0.35)' };
+  }
+  return { icon: '🔗', label: 'Enlace', color: 'var(--crear-gold)', bg: 'rgba(212, 175, 55, 0.12)', border: 'rgba(212, 175, 55, 0.35)' };
+};
+
+export default function TaskDetailModal({ 
+  isOpen, 
+  onClose, 
+  task, 
+  onEditTaskParams = null,
+  resolveAssigneeName = null 
+}) {
+  const { currentUser, reauthenticateGoogle } = useAuth();
+  const { updateTaskDetails, toggleTask } = useChecklist();
+  const { showToast } = useUI();
+
+  // Estados locales editables para avances y evidencias
+  // Estados locales editables para avances y evidencias
+  const [progress, setProgress] = useState(0);
+  const [isCompleted, setIsCompleted] = useState(false);
+
+  // Estados de seguimiento colaborativo (avance general vs individual)
+  const [assigneeProgressMap, setAssigneeProgressMap] = useState({});
+  const [myProgress, setMyProgress] = useState(0);
+  const [myCompleted, setMyCompleted] = useState(false);
+  const [evidencesList, setEvidencesList] = useState([]);
+  const [newEvidenceUrl, setNewEvidenceUrl] = useState('');
+  const [newEvidenceTitle, setNewEvidenceTitle] = useState('');
+  const [showAddEvidence, setShowAddEvidence] = useState(false);
+
+  // Estados para subida de archivos y Google Drive
+  const [evidenceMode, setEvidenceMode] = useState('upload'); // 'upload' | 'link'
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [isUploadingFile, setIsUploadingFile] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState('');
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef(null);
+
+  const [notesList, setNotesList] = useState([]);
+  const [newNoteText, setNewNoteText] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+
+  // FIX 16/09/2026: José reportó (y se confirmó leyendo el código) que los
+  // adjuntos de evidencia y las notas de avance se pierden — se agregan a
+  // "evidencesList"/"notesList" (estado local del modal, incluso con un toast
+  // de "guardado exitosamente" cuando el archivo llega a Drive) pero SOLO se
+  // escriben en Firestore cuando se presiona el botón "Guardar" (handleSaveAll).
+  // Si el usuario cierra con la X, "Cancelar" o "Agregar colaborador"/"Editar
+  // Configuración" (los cuatro cierran con onClose sin pasar por
+  // handleSaveAll), todo lo agregado desde que se abrió el modal desaparece
+  // sin ningún aviso. hasUnsavedChanges marca si hay algo agregado/quitado
+  // desde la apertura que todavía no pasó por handleSaveAll.
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  // Sincronizar estado cuando se abre el modal o cambia la tarea
+  useEffect(() => {
+    if (task && isOpen) {
+      const initialProgress = typeof task.progressPercentage === 'number' 
+        ? task.progressPercentage 
+        : (task.completed || task.status === 'Completada' ? 100 : 0);
+      
+      setProgress(initialProgress);
+      setIsCompleted(task.completed === true || task.status === 'Completada' || initialProgress === 100);
+
+      // Normalizar lista de asignados y mapa de progreso individual
+      const rawAssigned = Array.isArray(task.assignedToEmails) && task.assignedToEmails.length > 0
+        ? task.assignedToEmails
+        : (task.assignedToEmail ? [task.assignedToEmail] : []);
+
+      const uEmail = (currentUser?.email || '').toLowerCase().trim();
+      const normalizeEm = (e) => (e || '').toLowerCase().trim().replace('@crearpls.com', '@crearpsl.net');
+
+      const existingMap = task.assigneeProgress || {};
+      const newMap = {};
+      let foundMyProgress = initialProgress;
+      let foundMyCompleted = task.completed === true || initialProgress === 100;
+
+      rawAssigned.forEach(email => {
+        const clean = (email || '').toLowerCase().trim();
+        const existingKey = Object.keys(existingMap).find(k => 
+          k.toLowerCase().trim() === clean || normalizeEm(k) === normalizeEm(clean)
+        );
+        const u = usersData.find(usr => usr.email?.toLowerCase() === clean);
+        const entry = existingKey ? existingMap[existingKey] : null;
+
+        const entryProg = typeof entry?.progress === 'number'
+          ? entry.progress
+          : (entry?.completed ? 100 : (task.completed ? 100 : 0));
+        const entryComp = entry?.completed === true || entryProg === 100;
+
+        newMap[clean] = {
+          name: entry?.name || u?.name || (resolveAssigneeName ? resolveAssigneeName(clean) : clean),
+          role: entry?.role || u?.role || '',
+          sede: entry?.sede || u?.sede || task.sede || 'Global',
+          completed: entryComp,
+          completedAt: entry?.completedAt || null,
+          progress: entryProg
+        };
+
+        if (clean === uEmail || normalizeEm(clean) === normalizeEm(uEmail)) {
+          foundMyProgress = entryProg;
+          foundMyCompleted = entryComp;
+        }
+      });
+
+      setAssigneeProgressMap(newMap);
+      setMyProgress(foundMyProgress);
+      setMyCompleted(foundMyCompleted);
+
+      // Normalizar lista de evidencias existentes (soporte para array `evidences` y campo legacy `evidenceUrl`)
+      let list = [];
+      if (Array.isArray(task.evidences) && task.evidences.length > 0) {
+        list = [...task.evidences];
+      } else if (task.evidenceUrl || task.evidence_url) {
+        const legacyUrl = task.evidenceUrl || task.evidence_url;
+        list = [{
+          id: 'ev_legacy',
+          url: legacyUrl,
+          title: 'Evidencia principal',
+          createdAt: task.date || new Date().toISOString(),
+          addedByName: 'Adjunto'
+        }];
+      }
+      setEvidencesList(list);
+
+      // Normalizar bitácora de notas
+      let notes = [];
+      if (Array.isArray(task.progressNotes) && task.progressNotes.length > 0) {
+        notes = [...task.progressNotes];
+      } else if ((task.notes || task.description || task.comments) && typeof (task.notes || task.description || task.comments) === 'string' && (task.notes || task.description || task.comments).trim()) {
+        const textVal = (task.notes || task.description || task.comments).trim();
+        notes = [{
+          id: 'note_initial',
+          text: textVal,
+          createdAt: task.created_at || new Date().toISOString(),
+          authorName: task.createdBy ? `Asignado por ${task.createdBy.split('@')[0]}` : 'Nota de asignación',
+          authorEmail: task.createdBy || '',
+          isInitialNote: true,
+          progressPercentage: initialProgress
+        }];
+      }
+      setNotesList(notes);
+      setNewEvidenceUrl('');
+      setNewEvidenceTitle('');
+      setShowAddEvidence(false);
+      setSelectedFile(null);
+      setIsUploadingFile(false);
+      setUploadProgress('');
+      setIsDragging(false);
+      setEvidenceMode('upload');
+      setNewNoteText('');
+      setHasUnsavedChanges(false);
+    }
+  }, [task, isOpen]);
+
+  // Cierra el modal, pero si hay evidencia/notas agregadas o quitadas que
+  // todavía no se guardaron con "Guardar", pide confirmación explícita antes
+  // de descartarlas — para no perder datos silenciosamente (ver FIX 16/09/2026
+  // arriba). afterClose (opcional) corre solo si el usuario confirma salir
+  // (o si no había nada sin guardar).
+  const handleCloseAttempt = (afterClose) => {
+    if (hasUnsavedChanges) {
+      const confirmLeave = window.confirm(
+        'Agregaste o quitaste evidencia/notas que todavía no guardaste. Si sales ahora, se pierden.\n\n¿Salir sin guardar?'
+      );
+      if (!confirmLeave) return;
+    }
+    onClose();
+    if (afterClose) afterClose();
+  };
+
+  // Manejadores para adjuntar documentos (Google Drive / Cloud)
+  const handleFileSelect = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setSelectedFile(file);
+      if (!newEvidenceTitle.trim()) {
+        const cleanName = file.name.replace(/\.[^/.]+$/, "");
+        setNewEvidenceTitle(cleanName);
+      }
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0];
+      setSelectedFile(file);
+      if (!newEvidenceTitle.trim()) {
+        const cleanName = file.name.replace(/\.[^/.]+$/, "");
+        setNewEvidenceTitle(cleanName);
+      }
+    }
+  };
+
+  const handleUploadFile = async () => {
+    if (!selectedFile) {
+      showToast('Por favor selecciona o arrastra un archivo primero.', 'error');
+      return;
+    }
+
+    setIsUploadingFile(true);
+    setUploadProgress('Conectando...');
+
+    try {
+      let accessToken = sessionStorage.getItem('googleAccessToken');
+      if (!accessToken && reauthenticateGoogle) {
+        setUploadProgress('Solicitando acceso a Google Drive...');
+        accessToken = await reauthenticateGoogle();
+      }
+
+      setUploadProgress(accessToken ? 'Subiendo documento a Google Drive...' : 'Subiendo documento a la nube...');
+      
+      const result = await uploadEvidenceDocument(selectedFile, {
+        accessToken,
+        taskId: task.id
+      });
+
+      const newEvidence = {
+        id: `ev_${Date.now()}`,
+        url: result.url,
+        title: newEvidenceTitle.trim() || selectedFile.name,
+        fileName: selectedFile.name,
+        fileSize: selectedFile.size,
+        provider: result.provider,
+        createdAt: new Date().toISOString(),
+        addedByName: currentUser?.displayName || currentUser?.name || currentUser?.email || 'Usuario',
+        addedByEmail: currentUser?.email || ''
+      };
+
+      setEvidencesList(prev => [newEvidence, ...prev]);
+      setHasUnsavedChanges(true);
+      setSelectedFile(null);
+      setNewEvidenceTitle('');
+      setShowAddEvidence(false);
+      showToast(
+        result.provider === 'google_drive'
+          ? '📁 Documento subido a Google Drive. Falta un paso: presiona "Guardar" abajo para vincularlo a la tarea.'
+          : '☁️ Documento subido a la nube. Falta un paso: presiona "Guardar" abajo para vincularlo a la tarea.',
+        'success'
+      );
+    } catch (err) {
+      console.error('Error al subir documento:', err);
+      showToast(err.message || 'Error al subir el archivo.', 'error');
+    } finally {
+      setIsUploadingFile(false);
+      setUploadProgress('');
+    }
+  };
+
+  const userEmail = (currentUser?.email || '').toLowerCase().trim();
+  const normalizeEm = (e) => (e || '').toLowerCase().trim().replace('@crearpls.com', '@crearpsl.net');
+
+  // Formateo de asignados y logica de avance colaborativo
+  const assignedList = useMemo(() => {
+    if (!task) return [];
+    if (Array.isArray(task.assignedToEmails) && task.assignedToEmails.length > 0) {
+      return task.assignedToEmails;
+    }
+    if (task.assignedToEmail) {
+      return [task.assignedToEmail];
+    }
+    return [];
+  }, [task]);
+
+  const isMultiAssignee = assignedList.length > 1;
+
+  // Identificar si el usuario actual es uno de los asignados
+  const myEmailKey = useMemo(() => {
+    return Object.keys(assigneeProgressMap).find(k => 
+      k.toLowerCase().trim() === userEmail || normalizeEm(k) === normalizeEm(userEmail)
+    ) || null;
+  }, [assigneeProgressMap, userEmail]);
+
+  // Lista estructurada de colaboradores para renderizado
+  const collaboratorsList = useMemo(() => {
+    return Object.entries(assigneeProgressMap).map(([email, info]) => {
+      const isMe = email.toLowerCase().trim() === userEmail || normalizeEm(email) === normalizeEm(userEmail);
+      return {
+        email,
+        name: info.name || (resolveAssigneeName ? resolveAssigneeName(email) : email),
+        role: info.role || '',
+        sede: info.sede || 'Global',
+        completed: info.completed === true || info.progress === 100,
+        completedAt: info.completedAt || null,
+        progress: typeof info.progress === 'number' ? info.progress : (info.completed ? 100 : 0),
+        isMe
+      };
+    });
+  }, [assigneeProgressMap, userEmail, resolveAssigneeName]);
+
+  const totalAssigneesCount = collaboratorsList.length;
+  const completedAssigneesCount = useMemo(() => {
+    return collaboratorsList.filter(c => c.completed).length;
+  }, [collaboratorsList]);
+
+  // Calculo del avance general del equipo en tiempo real
+  const computedOverallProgress = useMemo(() => {
+    if (!isMultiAssignee) return progress;
+    if (totalAssigneesCount === 0) return progress;
+    const sum = collaboratorsList.reduce((acc, c) => acc + c.progress, 0);
+    return Math.round(sum / totalAssigneesCount);
+  }, [isMultiAssignee, totalAssigneesCount, collaboratorsList, progress]);
+
+  // FIX 16/09/2026: el guard de apertura se movio a este punto -- DESPUES de
+  // TODOS los hooks (useMemo) del componente -- porque antes estaba ANTES de 5
+  // de ellos. TaskDetailModal esta siempre montado en Home.jsx (isOpen es una
+  // prop, no un mount/unmount condicional), asi que al abrir cualquier tarea el
+  // numero de hooks ejecutados cambiaba entre renders (menos hooks cerrado, mas
+  // hooks abierto) -- exactamente "Rendered more hooks than during the previous
+  // render" (React error #310). Confirmado en vivo por Jose (captura, 16/09/2026)
+  // al dar clic en una tarea desde "Mis Tareas Asignadas".
+  if (!isOpen || !task) return null;
+
+  const taskCreatorEmail = (task.createdBy || '').toLowerCase().trim();
+  const isCreator = Boolean(taskCreatorEmail && userEmail === taskCreatorEmail);
+  const isForeign = isForeignTask(task, currentUser);
+
+  const getDisplayName = (email) => {
+    if (resolveAssigneeName && typeof resolveAssigneeName === 'function') {
+      return resolveAssigneeName(email);
+    }
+    return email;
+  };
+
+  const countdown = getCountdown(task.deadline);
+
+  const myAssigneeEntry = myEmailKey ? assigneeProgressMap[myEmailKey] : null;
+
+  // Selector rápido de porcentaje para tarea individual
+  const handleSetQuickProgress = (val) => {
+    setProgress(val);
+    if (val === 100) {
+      setIsCompleted(true);
+    } else if (val < 100 && isCompleted) {
+      setIsCompleted(false);
+    }
+  };
+
+  // Selector de avance individual del usuario actual
+  const handleSetMyProgress = (val) => {
+    setMyProgress(val);
+    const isDone = val === 100;
+    setMyCompleted(isDone);
+
+    if (myEmailKey) {
+      setAssigneeProgressMap(prev => ({
+        ...prev,
+        [myEmailKey]: {
+          ...(prev[myEmailKey] || {}),
+          progress: val,
+          completed: isDone,
+          completedAt: isDone ? (prev[myEmailKey]?.completedAt || new Date().toISOString()) : null
+        }
+      }));
+    }
+  };
+
+  const handleToggleMyPart = () => {
+    const nextVal = myCompleted ? 0 : 100;
+    handleSetMyProgress(nextVal);
+  };
+
+  // Alternar avance de un colaborador (para creadores o coordinadores)
+  const handleToggleCollaboratorStatus = (collabEmail) => {
+    if (!isCreator) return;
+    setAssigneeProgressMap(prev => {
+      const entry = prev[collabEmail] || {};
+      const nextDone = !entry.completed;
+      const nextProg = nextDone ? 100 : 0;
+      const updated = {
+        ...prev,
+        [collabEmail]: {
+          ...entry,
+          completed: nextDone,
+          progress: nextProg,
+          completedAt: nextDone ? new Date().toISOString() : null
+        }
+      };
+      if (collabEmail === myEmailKey) {
+        setMyProgress(nextProg);
+        setMyCompleted(nextDone);
+      }
+      return updated;
+    });
+  };
+  // Agregar una nueva evidencia
+  const handleAddEvidenceItem = () => {
+    const trimmedUrl = newEvidenceUrl.trim();
+    if (!trimmedUrl) {
+      showToast('Por favor introduce la URL o link de la evidencia.', 'error');
+      return;
+    }
+
+    // Asegurar prefijo de protocolo si no lo tiene
+    let finalUrl = trimmedUrl;
+    if (!/^https?:\/\//i.test(finalUrl)) {
+      finalUrl = 'https://' + finalUrl;
+    }
+
+    const newEvidence = {
+      id: `ev_${Date.now()}`,
+      url: finalUrl,
+      title: newEvidenceTitle.trim() || 'Evidencia de cumplimiento',
+      createdAt: new Date().toISOString(),
+      addedByName: currentUser?.displayName || currentUser?.name || currentUser?.email || 'Usuario',
+      addedByEmail: currentUser?.email || ''
+    };
+
+    setEvidencesList(prev => [newEvidence, ...prev]);
+    setHasUnsavedChanges(true);
+    setNewEvidenceUrl('');
+    setNewEvidenceTitle('');
+    setShowAddEvidence(false);
+    showToast('Evidencia adjuntada a la lista. Guarda los avances para confirmar.', 'info');
+  };
+
+  const handleRemoveEvidence = (idToRemove) => {
+    setEvidencesList(prev => prev.filter(e => e.id !== idToRemove));
+    setHasUnsavedChanges(true);
+    showToast('Evidencia removida de la lista. Guarda los avances para confirmar.', 'info');
+  };
+
+  // Agregar nota de avance
+  const handleAddNote = () => {
+    const text = newNoteText.trim();
+    if (!text) {
+      showToast('Por favor escribe el detalle de tu avance.', 'error');
+      return;
+    }
+
+    const note = {
+      id: `note_${Date.now()}`,
+      text: text,
+      createdAt: new Date().toISOString(),
+      authorName: currentUser?.displayName || currentUser?.name || currentUser?.email || 'Usuario',
+      authorEmail: currentUser?.email || '',
+      progressPercentage: progress
+    };
+
+    setNotesList(prev => [note, ...prev]);
+    setHasUnsavedChanges(true);
+    setNewNoteText('');
+    showToast('Avance registrado en la bitácora. Guarda los avances para confirmar.', 'info');
+  };
+
+  // Alternar estado completada
+  const handleToggleCompleted = () => {
+    if (isForeign && !isCompleted && !currentUser?.isSuperAdmin) {
+      showToast('⚠️ No puedes completar esta tarea porque pertenece a otra sede y no te fue asignada.', 'warning');
+      return;
+    }
+    const nextCompleted = !isCompleted;
+    setIsCompleted(nextCompleted);
+    if (nextCompleted && progress < 100) {
+      setProgress(100);
+    } else if (!nextCompleted && progress === 100) {
+      setProgress(75);
+    }
+  };
+
+  // Guardar todos los cambios en Firestore
+  // Guardar todos los cambios en Firestore
+  const handleSaveAll = async () => {
+    setIsSaving(true);
+    try {
+      const mainEvidenceUrl = evidencesList.length > 0 ? evidencesList[0].url : '';
+      const latestComment = notesList.length > 0 ? notesList[0].text : (task.comments || '');
+
+      const finalOverall = isMultiAssignee ? computedOverallProgress : progress;
+      const allDone = isMultiAssignee 
+        ? (totalAssigneesCount > 0 && Object.values(assigneeProgressMap).every(v => v.completed === true || v.progress === 100))
+        : isCompleted;
+
+      const finalCompleted = allDone || finalOverall === 100;
+
+      // Registrar avance en la bitácora de notas si el usuario actual avanzó
+      let updatedNotesList = [...notesList];
+      if (isMultiAssignee && myAssigneeEntry) {
+        const autoNote = {
+          id: `note_auto_${Date.now()}`,
+          text: `Avance individual registrado por ${myAssigneeEntry.name}: ${myProgress}%. Avance general del equipo: ${finalOverall}%.`,
+          createdAt: new Date().toISOString(),
+          authorName: currentUser?.displayName || currentUser?.name || currentUser?.email || 'Usuario',
+          authorEmail: currentUser?.email || '',
+          progressPercentage: finalOverall
+        };
+        updatedNotesList = [autoNote, ...updatedNotesList];
+      }
+
+      const updates = {
+        progressPercentage: finalOverall,
+        completed: finalCompleted,
+        status: finalCompleted ? 'Completada' : (finalOverall > 0 ? 'En progreso' : 'Pendiente'),
+        // FIX 16/09/2026: registrar fecha real de cumplimiento (trazabilidad,
+        // pedido explicito de Jose: "no podemos perder datos"). Si la tarea
+        // ya tenia una fecha de cumplimiento registrada, se conserva (no se
+        // pisa al editar evidencias/notas despues). Si se completa por
+        // primera vez ahora, se guarda el momento real. Si se reabre
+        // (finalCompleted=false), se limpia -- se resetea al volver a
+        // completarse, nunca se inventa una fecha.
+        completedAt: finalCompleted ? (task.completedAt || new Date().toISOString()) : null,
+        assigneeProgress: isMultiAssignee ? assigneeProgressMap : (task.assigneeProgress || {}),
+        evidenceUrl: mainEvidenceUrl,
+        evidence_url: mainEvidenceUrl,
+        evidences: evidencesList,
+        comments: latestComment,
+        notes: task.notes || task.description || task.comments || '',
+        description: task.description || task.notes || task.comments || '',
+        progressNotes: updatedNotesList,
+        lastUpdated: new Date().toISOString(),
+        lastUpdatedBy: currentUser?.email || ''
+      };
+
+      await updateTaskDetails(task.id, updates);
+      if (finalCompleted || (myAssigneeEntry && myProgress === 100) || (!isMultiAssignee && progress === 100)) {
+        celebrateVictory();
+      }
+      showToast('🎉 ¡Tarea actualizada y avances guardados exitosamente!', 'success');
+      setHasUnsavedChanges(false);
+      onClose();
+    } catch (err) {
+      console.error('Error guardando avances:', err);
+      showToast('No se pudieron guardar los avances.', 'error');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(3, 7, 18, 0.88)',
+      backdropFilter: 'blur(10px)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 10000,
+      padding: '1rem'
+    }}>
+      <div 
+        className="glass-panel task-detail-modal-card"
+        style={{
+          width: '100%',
+          maxWidth: '680px',
+          maxHeight: '90vh',
+          display: 'flex',
+          flexDirection: 'column',
+          borderRadius: '16px',
+          border: '1px solid rgba(41, 171, 226, 0.35)',
+          background: 'linear-gradient(145deg, rgba(13, 21, 45, 0.96) 0%, rgba(6, 11, 25, 0.98) 100%)',
+          boxShadow: '0 25px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(41, 171, 226, 0.15)',
+          overflow: 'hidden'
+        }}
+      >
+        {/* CABECERA DEL MODAL */}
+        <div style={{
+          padding: '1.2rem 1.5rem',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          gap: '1rem',
+          background: 'rgba(255, 255, 255, 0.02)'
+        }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            {/* BADGES SUPERIORES */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.4rem' }}>
+              <span style={{
+                fontSize: '0.72rem',
+                fontWeight: 800,
+                padding: '0.2rem 0.6rem',
+                borderRadius: '12px',
+                background: isForeign ? 'rgba(239, 68, 68, 0.2)' : isCreator ? 'rgba(41, 171, 226, 0.2)' : 'rgba(255, 193, 7, 0.2)',
+                color: isForeign ? '#f87171' : isCreator ? 'var(--crear-cyan)' : '#ffc107',
+                border: `1px solid ${isForeign ? 'rgba(239, 68, 68, 0.45)' : isCreator ? 'rgba(41, 171, 226, 0.45)' : 'rgba(255, 193, 7, 0.45)'}`,
+                letterSpacing: '0.5px'
+              }}>
+                {isForeign ? '📍 TAREA DE OTRA SEDE / NO ASIGNADA A TI' : isCreator ? '→ TÚ ASIGNASTE ESTA TAREA' : '← TE ASIGNARON ESTA TAREA'}
+              </span>
+
+              {task.priority && (
+                <span style={{
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  padding: '0.2rem 0.5rem',
+                  borderRadius: '10px',
+                  background: 'rgba(255, 255, 255, 0.06)',
+                  color: task.priority.includes('ROJO') ? '#ef4444' : task.priority.includes('AMARILLO') ? '#facc15' : '#10b981',
+                  border: '1px solid rgba(255, 255, 255, 0.1)'
+                }}>
+                  {task.priority}
+                </span>
+              )}
+
+              {(task.assignedSede || task.sede) && (
+                <span style={{
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  padding: '0.2rem 0.5rem',
+                  borderRadius: '10px',
+                  background: 'rgba(212, 175, 55, 0.12)',
+                  color: 'var(--crear-gold)',
+                  border: '1px solid rgba(212, 175, 55, 0.25)'
+                }}>
+                  {getFlagForSede(task.assignedSede || task.sede)} {task.assignedSede || task.sede}
+                </span>
+              )}
+            </div>
+
+            {/* BANNER PREVENTIVO SI ES TAREA FORÁNEA */}
+            {isForeign && (
+              <div style={{
+                marginBottom: '0.8rem',
+                background: 'rgba(239, 68, 68, 0.1)',
+                border: '1px solid rgba(239, 68, 68, 0.35)',
+                borderRadius: '8px',
+                padding: '0.65rem 0.85rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.6rem',
+                color: '#fca5a5',
+                fontSize: '0.78rem',
+                lineHeight: 1.4
+              }}>
+                <ShieldAlert size={18} color="#ef4444" style={{ flexShrink: 0 }} />
+                <div>
+                  <strong style={{ color: '#ffffff' }}>Atención de Gobernanza:</strong> Esta tarea pertenece a <strong>Sede {task.assignedSede || task.sede || 'Externa'}</strong> y no fue creada ni asignada a ti. La visualizas en modo de supervisión para no interferir con las operaciones de esa sede.
+                </div>
+              </div>
+            )}
+
+            {/* TÍTULO DE LA TAREA */}
+            <h2 style={{
+              margin: '0.3rem 0 0.5rem 0',
+              fontSize: '1.25rem',
+              fontWeight: 800,
+              color: '#ffffff',
+              lineHeight: 1.35,
+              wordBreak: 'break-word'
+            }}>
+              {isCompleted ? '✅ ' : ''}{task.task || task.title}
+            </h2>
+
+            {/* ASIGNADOR Y ASIGNADOS */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+              {task.createdBy && (
+                <div>
+                  <span style={{ color: 'var(--text-muted)' }}>👤 Asignada por: </span>
+                  <strong style={{ color: 'var(--crear-cyan)' }}>{getDisplayName(task.createdBy)}</strong>
+                </div>
+              )}
+              {assignedList.length > 0 && (
+                <div>
+                  <span style={{ color: 'var(--text-muted)' }}>👥 Asignada a: </span>
+                  <strong style={{ color: '#ffffff' }}>
+                    {assignedList.map(getDisplayName).join(', ')}
+                  </strong>
+                </div>
+              )}
+              {isCreator && onEditTaskParams && (
+                <button
+                  type="button"
+                  onClick={() => handleCloseAttempt(() => onEditTaskParams(task))}
+                  title="Agregar o quitar personas asignadas a esta tarea"
+                  style={{
+                    marginTop: '0.3rem',
+                    alignSelf: 'flex-start',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.3rem',
+                    padding: '0.3rem 0.6rem',
+                    borderRadius: '6px',
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    border: '1px solid rgba(41, 171, 226, 0.4)',
+                    background: 'rgba(41, 171, 226, 0.12)',
+                    color: 'var(--crear-cyan)'
+                  }}
+                >
+                  <UserPlus size={13} /> Agregar colaborador
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* BOTÓN CERRAR */}
+          <button
+            type="button"
+            onClick={() => handleCloseAttempt()}
+            style={{
+              background: 'rgba(255, 255, 255, 0.05)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              color: 'var(--text-muted)',
+              cursor: 'pointer',
+              borderRadius: '8px',
+              padding: '0.4rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.15s ease'
+            }}
+            title="Cerrar modal"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* CONTENIDO PRINCIPAL CON SCROLL */}
+        <div style={{
+          padding: '1.5rem',
+          overflowY: 'auto',
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '1.4rem'
+        }}>
+          {/* BARRA DE TIEMPO LÍMITE Y ESTADO */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            background: 'rgba(0, 0, 0, 0.25)',
+            border: '1px solid rgba(255, 255, 255, 0.06)',
+            borderRadius: '10px',
+            padding: '0.75rem 1rem',
+            flexWrap: 'wrap',
+            gap: '0.6rem'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem' }}>
+              <Clock size={16} className="text-gold" />
+              <span style={{ color: 'var(--text-muted)' }}>Fecha límite:</span>
+              <strong style={{ color: '#ffffff' }}>
+                {task.deadline ? new Date(task.deadline).toLocaleString('es-ES', { 
+                  weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' 
+                }) : 'Sin fecha fijada'}
+              </strong>
+            </div>
+
+            <span style={{
+              fontSize: '0.82rem',
+              fontWeight: 800,
+              padding: '0.3rem 0.8rem',
+              borderRadius: '16px',
+              color: countdown.color,
+              background: countdown.bg,
+              border: `1.5px solid ${countdown.border}`,
+              letterSpacing: '0.3px'
+            }}>
+              {countdown.label}
+            </span>
+          </div>
+
+          {/* BANNER DE NOTAS E INSTRUCCIONES ASIGNADAS */}
+          {(task.notes || task.description || task.comments) && (
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(255, 215, 0, 0.08) 0%, rgba(0, 0, 0, 0.35) 100%)',
+              border: '1px solid rgba(255, 215, 0, 0.35)',
+              borderLeft: '4px solid var(--crear-gold)',
+              borderRadius: '10px',
+              padding: '1rem 1.2rem',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem', flexWrap: 'wrap', gap: '0.4rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', color: 'var(--crear-gold)', fontWeight: 800, fontSize: '0.88rem' }}>
+                  <MessageSquare size={16} />
+                  <span>Notas e Instrucciones de la Tarea</span>
+                </div>
+                {task.createdBy && (
+                  <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                    Asignado por: <strong style={{ color: '#ffffff' }}>{task.createdBy}</strong>
+                  </span>
+                )}
+              </div>
+              <p style={{
+                margin: 0,
+                color: '#ffffff',
+                fontSize: '0.86rem',
+                lineHeight: '1.5',
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-word'
+              }}>
+                {task.notes || task.description || task.comments}
+              </p>
+            </div>
+          )}
+
+          {/* 1. SECCIÓN DE AVANCE (%) */}
+          {/* 1. SECCIÓN DE AVANCE (%) */}
+          <div style={{
+            background: 'rgba(255, 255, 255, 0.02)',
+            border: '1px solid rgba(41, 171, 226, 0.25)',
+            borderRadius: '14px',
+            padding: '1.25rem',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1.2rem'
+          }}>
+            {isMultiAssignee ? (
+              <>
+                {/* 1.1 AVANCE GENERAL DEL EQUIPO (COLABORATIVO) */}
+                <div style={{
+                  background: 'linear-gradient(135deg, rgba(41, 171, 226, 0.1) 0%, rgba(13, 21, 45, 0.7) 100%)',
+                  border: '1px solid rgba(41, 171, 226, 0.35)',
+                  borderRadius: '12px',
+                  padding: '1.1rem'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <Users size={18} style={{ color: 'var(--crear-cyan)' }} />
+                      <div>
+                        <div style={{ fontSize: '0.98rem', fontWeight: 800, color: '#ffffff', letterSpacing: '0.2px' }}>
+                          Avance General de la Tarea
+                        </div>
+                        <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+                          {completedAssigneesCount} de {totalAssigneesCount} colaboradores completaron su parte
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span style={{
+                        fontSize: '1.5rem',
+                        fontWeight: 900,
+                        color: computedOverallProgress === 100 ? '#10b981' : (computedOverallProgress >= 50 ? 'var(--crear-cyan)' : 'var(--crear-gold)')
+                      }}>
+                        {computedOverallProgress}%
+                      </span>
+                      <span style={{
+                        fontSize: '0.72rem',
+                        padding: '2px 8px',
+                        borderRadius: '10px',
+                        background: computedOverallProgress === 100 ? 'rgba(16, 185, 129, 0.15)' : (computedOverallProgress > 0 ? 'rgba(41, 171, 226, 0.15)' : 'rgba(255, 193, 7, 0.15)'),
+                        color: computedOverallProgress === 100 ? '#10b981' : (computedOverallProgress > 0 ? 'var(--crear-cyan)' : '#facc15'),
+                        border: `1px solid ${computedOverallProgress === 100 ? 'rgba(16, 185, 129, 0.3)' : (computedOverallProgress > 0 ? 'rgba(41, 171, 226, 0.3)' : 'rgba(255, 193, 7, 0.3)')}`,
+                        fontWeight: 700
+                      }}>
+                        {computedOverallProgress === 100 ? 'COMPLETADA' : (computedOverallProgress > 0 ? 'EN PROCESO' : 'PENDIENTE')}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Barra visual de progreso global */}
+                  <div style={{
+                    width: '100%',
+                    height: '10px',
+                    background: 'rgba(255, 255, 255, 0.08)',
+                    borderRadius: '6px',
+                    overflow: 'hidden',
+                    marginBottom: '0.75rem',
+                    boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.5)'
+                  }}>
+                    <div style={{
+                      height: '100%',
+                      width: `${computedOverallProgress}%`,
+                      background: computedOverallProgress === 100 
+                        ? 'linear-gradient(90deg, #10b981, #34d399)' 
+                        : 'linear-gradient(90deg, #29abe2, #d4af37)',
+                      transition: 'width 0.35s ease-out'
+                    }} />
+                  </div>
+
+                  {/* Métrica explicativa del impacto */}
+                  <div style={{
+                    fontSize: '0.76rem',
+                    color: '#e2e8f0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.45rem',
+                    background: 'rgba(0, 0, 0, 0.3)',
+                    padding: '0.45rem 0.75rem',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(255, 255, 255, 0.06)'
+                  }}>
+                    <Sparkles size={14} style={{ color: 'var(--crear-gold)', flexShrink: 0 }} />
+                    <span>
+                      {myAssigneeEntry ? (
+                        <>
+                          Con <strong>{totalAssigneesCount} colaboradores</strong>, cada uno representa <strong>{(100 / totalAssigneesCount).toFixed(1)}%</strong>. Tu avance individual de <strong style={{ color: 'var(--crear-cyan)' }}>{myProgress}%</strong> aporta <strong style={{ color: '#ffffff' }}>{(myProgress / totalAssigneesCount).toFixed(1)}%</strong> al avance general.
+                        </>
+                      ) : (
+                        <>
+                          Promedio global de <strong>{totalAssigneesCount} colaboradores asignados</strong> (peso equitativo de {(100 / totalAssigneesCount).toFixed(1)}% por colaborador).
+                        </>
+                      )}
+                    </span>
+                  </div>
+                </div>
+
+                {/* 1.2 MI AVANCE INDIVIDUAL (SI EL USUARIO ACTUAL ESTÁ ASIGNADO) */}
+                {myAssigneeEntry && (
+                  <div style={{
+                    background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%)',
+                    border: '1px solid rgba(212, 175, 55, 0.35)',
+                    borderRadius: '12px',
+                    padding: '1.1rem'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem', flexWrap: 'wrap', gap: '0.4rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                        <TrendingUp size={17} style={{ color: 'var(--crear-gold)' }} />
+                        <span style={{ fontSize: '0.94rem', fontWeight: 800, color: '#ffffff' }}>
+                          Mi Avance Individual ({myAssigneeEntry.name || 'Tú'})
+                        </span>
+                        <span style={{
+                          fontSize: '0.68rem',
+                          fontWeight: 800,
+                          padding: '0.15rem 0.45rem',
+                          borderRadius: '6px',
+                          background: 'rgba(212, 175, 55, 0.2)',
+                          color: 'var(--crear-gold)',
+                          border: '1px solid rgba(212, 175, 55, 0.4)'
+                        }}>
+                          TÚ
+                        </span>
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <span style={{
+                          fontSize: '1.35rem',
+                          fontWeight: 900,
+                          color: myProgress === 100 ? '#10b981' : (myProgress >= 50 ? 'var(--crear-cyan)' : 'var(--crear-gold)')
+                        }}>
+                          {myProgress}%
+                        </span>
+                        <span style={{
+                          fontSize: '0.7rem',
+                          padding: '2px 8px',
+                          borderRadius: '10px',
+                          background: myProgress === 100 ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255, 193, 7, 0.15)',
+                          color: myProgress === 100 ? '#10b981' : '#facc15',
+                          border: `1px solid ${myProgress === 100 ? 'rgba(16, 185, 129, 0.3)' : 'rgba(255, 193, 7, 0.3)'}`,
+                          fontWeight: 700
+                        }}>
+                          {myProgress === 100 ? 'COMPLETASTE TU PARTE' : (myProgress > 0 ? 'EN PROCESO' : 'PENDIENTE')}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Barra visual de mi progreso */}
+                    <div style={{
+                      width: '100%',
+                      height: '8px',
+                      background: 'rgba(255, 255, 255, 0.08)',
+                      borderRadius: '5px',
+                      overflow: 'hidden',
+                      marginBottom: '0.9rem'
+                    }}>
+                      <div style={{
+                        height: '100%',
+                        width: `${myProgress}%`,
+                        background: myProgress === 100 
+                          ? 'linear-gradient(90deg, #10b981, #34d399)' 
+                          : 'linear-gradient(90deg, #d4af37, #29abe2)',
+                        transition: 'width 0.3s ease-out'
+                      }} />
+                    </div>
+
+                    {/* Botones de selección rápida y slider */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '0.4rem' }}>
+                        {[0, 25, 50, 75, 100].map(val => (
+                          <button
+                            key={val}
+                            type="button"
+                            onClick={() => handleSetMyProgress(val)}
+                            style={{
+                              padding: '0.45rem 0.2rem',
+                              borderRadius: '6px',
+                              fontSize: '0.78rem',
+                              fontWeight: myProgress === val ? 800 : 600,
+                              cursor: 'pointer',
+                              border: `1px solid ${myProgress === val ? 'var(--crear-gold)' : 'rgba(255,255,255,0.1)'}`,
+                              background: myProgress === val ? 'rgba(212, 175, 55, 0.25)' : 'rgba(255,255,255,0.03)',
+                              color: myProgress === val ? '#ffffff' : 'var(--text-muted)',
+                              transition: 'all 0.15s ease'
+                            }}
+                          >
+                            {val === 100 ? '✅ 100%' : `${val}%`}
+                          </button>
+                        ))}
+                      </div>
+
+                      <input 
+                        type="range"
+                        min="0"
+                        max="100"
+                        step="5"
+                        value={myProgress}
+                        onChange={(e) => handleSetMyProgress(parseInt(e.target.value, 10))}
+                        style={{
+                          width: '100%',
+                          cursor: 'pointer',
+                          accentColor: 'var(--crear-gold)'
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* 1.3 DESGLOSE DEL AVANCE DE LOS DEMÁS COLABORADORES */}
+                <div style={{
+                  background: 'rgba(0, 0, 0, 0.25)',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  borderRadius: '12px',
+                  padding: '0.9rem 1rem'
+                }}>
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '0.75rem',
+                    flexWrap: 'wrap',
+                    gap: '0.4rem'
+                  }}>
+                    <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#ffffff', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                      <Users size={14} style={{ color: 'var(--crear-cyan)' }} />
+                      Avance de los demás colaboradores ({collaboratorsList.length}):
+                    </span>
+                    <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                      {completedAssigneesCount} de {totalAssigneesCount} completaron
+                    </span>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem', maxHeight: '180px', overflowY: 'auto' }}>
+                    {collaboratorsList.map(c => {
+                      const isCompletedC = c.completed || c.progress === 100;
+                      return (
+                        <div 
+                          key={c.email}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            padding: '0.45rem 0.65rem',
+                            borderRadius: '8px',
+                            background: c.isMe ? 'rgba(41, 171, 226, 0.1)' : 'rgba(255, 255, 255, 0.02)',
+                            border: `1px solid ${c.isMe ? 'rgba(41, 171, 226, 0.35)' : 'rgba(255, 255, 255, 0.05)'}`,
+                            fontSize: '0.8rem'
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', minWidth: 0, flex: 1 }}>
+                            <div style={{
+                              width: '24px',
+                              height: '24px',
+                              borderRadius: '50%',
+                              background: isCompletedC ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255, 255, 255, 0.08)',
+                              color: isCompletedC ? '#10b981' : '#ffffff',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: '0.7rem',
+                              fontWeight: 700,
+                              flexShrink: 0
+                            }}>
+                              {isCompletedC ? '✓' : c.name.charAt(0).toUpperCase()}
+                            </div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, flex: 1 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                <span style={{
+                                  color: c.isMe ? 'var(--crear-cyan)' : '#ffffff',
+                                  fontWeight: c.isMe ? 800 : 600,
+                                  whiteSpace: 'nowrap',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis'
+                                }}>
+                                  {c.name}
+                                </span>
+                                {c.isMe && (
+                                  <span style={{ fontSize: '0.65rem', color: 'var(--crear-gold)', fontWeight: 800 }}>(Tú)</span>
+                                )}
+                              </div>
+                              {c.sede && (
+                                <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
+                                  {c.sede} {c.role ? `• ${c.role}` : ''}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Mini barra y porcentaje individual */}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexShrink: 0, marginLeft: '0.5rem' }}>
+                            <div style={{
+                              width: '60px',
+                              height: '6px',
+                              background: 'rgba(255, 255, 255, 0.08)',
+                              borderRadius: '3px',
+                              overflow: 'hidden'
+                            }}>
+                              <div style={{
+                                height: '100%',
+                                width: `${c.progress}%`,
+                                background: isCompletedC ? '#10b981' : (c.progress > 0 ? 'var(--crear-cyan)' : 'transparent'),
+                                transition: 'width 0.3s ease-out'
+                              }} />
+                            </div>
+                            <span style={{
+                              minWidth: '34px',
+                              textAlign: 'right',
+                              fontWeight: 700,
+                              fontSize: '0.78rem',
+                              color: isCompletedC ? '#10b981' : (c.progress > 0 ? 'var(--crear-cyan)' : 'var(--text-muted)')
+                            }}>
+                              {c.progress}%
+                            </span>
+
+                            {isCreator && (
+                              <button
+                                type="button"
+                                onClick={() => handleToggleCollaboratorStatus(c.email)}
+                                title={c.completed ? 'Marcar pendiente' : 'Marcar completado'}
+                                style={{
+                                  background: 'none',
+                                  border: 'none',
+                                  cursor: 'pointer',
+                                  color: c.completed ? '#10b981' : 'var(--text-muted)',
+                                  padding: '0 2px'
+                                }}
+                              >
+                                {c.completed ? <CheckSquare size={14} /> : <Square size={14} />}
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </>
+            ) : (
+              /* CASO INDIVIDUAL (1 SOLO ASIGNADO O ASIGNACIÓN DIRECTA) */
+              <>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <TrendingUp size={18} style={{ color: 'var(--crear-cyan)' }} />
+                    <h3 style={{ margin: 0, fontSize: '0.98rem', fontWeight: 700, color: '#ffffff' }}>
+                      Porcentaje de Avance
+                    </h3>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span style={{
+                      fontSize: '1.4rem',
+                      fontWeight: 900,
+                      color: progress === 100 ? '#10b981' : (progress >= 50 ? 'var(--crear-cyan)' : 'var(--crear-gold)')
+                    }}>
+                      {progress}%
+                    </span>
+                    <span style={{
+                      fontSize: '0.72rem',
+                      padding: '2px 8px',
+                      borderRadius: '10px',
+                      background: isCompleted ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255, 193, 7, 0.15)',
+                      color: isCompleted ? '#10b981' : '#facc15',
+                      border: `1px solid ${isCompleted ? 'rgba(16, 185, 129, 0.3)' : 'rgba(255, 193, 7, 0.3)'}`,
+                      fontWeight: 700
+                    }}>
+                      {isCompleted ? 'COMPLETADA' : (progress > 0 ? 'EN PROCESO' : 'PENDIENTE')}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Barra visual de progreso */}
+                <div style={{
+                  width: '100%',
+                  height: '10px',
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  borderRadius: '6px',
+                  overflow: 'hidden',
+                  marginBottom: '1rem',
+                  boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.5)'
+                }}>
+                  <div style={{
+                    height: '100%',
+                    width: `${progress}%`,
+                    background: progress === 100 
+                      ? 'linear-gradient(90deg, #10b981, #34d399)' 
+                      : 'linear-gradient(90deg, #29abe2, #d4af37)',
+                    transition: 'width 0.35s ease-out'
+                  }} />
+                </div>
+
+                {/* Botones de selección rápida y slider */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '0.4rem' }}>
+                    {[0, 25, 50, 75, 100].map(val => (
+                      <button
+                        key={val}
+                        type="button"
+                        onClick={() => handleSetQuickProgress(val)}
+                        style={{
+                          padding: '0.45rem 0.2rem',
+                          borderRadius: '6px',
+                          fontSize: '0.78rem',
+                          fontWeight: progress === val ? 800 : 600,
+                          cursor: 'pointer',
+                          border: `1px solid ${progress === val ? 'var(--crear-cyan)' : 'rgba(255,255,255,0.1)'}`,
+                          background: progress === val ? 'rgba(41, 171, 226, 0.25)' : 'rgba(255,255,255,0.03)',
+                          color: progress === val ? '#ffffff' : 'var(--text-muted)',
+                          transition: 'all 0.15s ease'
+                        }}
+                      >
+                        {val === 100 ? '✅ 100%' : `${val}%`}
+                      </button>
+                    ))}
+                  </div>
+
+                  <input 
+                    type="range"
+                    min="0"
+                    max="100"
+                    step="5"
+                    value={progress}
+                    onChange={(e) => handleSetQuickProgress(parseInt(e.target.value, 10))}
+                    style={{
+                      width: '100%',
+                      cursor: 'pointer',
+                      accentColor: 'var(--crear-cyan)'
+                    }}
+                  />
+                </div>
+              </>
+            )}
+          </div>
+          {/* 2. SECCIÓN DE ADJUNTAR Y VER EVIDENCIAS */}
+          <div style={{
+            background: 'rgba(255, 255, 255, 0.02)',
+            border: '1px solid rgba(212, 175, 55, 0.25)',
+            borderRadius: '12px',
+            padding: '1.2rem'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <LinkIcon size={18} style={{ color: 'var(--crear-gold)' }} />
+                <h3 style={{ margin: 0, fontSize: '0.98rem', fontWeight: 700, color: '#ffffff' }}>
+                  Evidencias de Cumplimiento ({evidencesList.length})
+                </h3>
+              </div>
+
+              {!showAddEvidence && (
+                <button
+                  type="button"
+                  onClick={() => setShowAddEvidence(true)}
+                  style={{
+                    padding: '0.4rem 0.85rem',
+                    borderRadius: '6px',
+                    fontSize: '0.8rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    background: 'rgba(212, 175, 55, 0.15)',
+                    color: 'var(--crear-gold)',
+                    border: '1px solid rgba(212, 175, 55, 0.4)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.4rem'
+                  }}
+                >
+                  <Plus size={14} /> Adjuntar Evidencia
+                </button>
+              )}
+            </div>
+
+            {/* Formulario para añadir nueva evidencia (Subida a Drive / Enlace) */}
+            {showAddEvidence && (
+              <div style={{
+                background: 'rgba(0, 0, 0, 0.35)',
+                border: '1px dashed rgba(212, 175, 55, 0.45)',
+                borderRadius: '10px',
+                padding: '1rem',
+                marginBottom: '1rem',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.8rem'
+              }}>
+                {/* Pestañas de modo: Subir Archivo vs Pegar Enlace */}
+                <div style={{ display: 'flex', gap: '0.5rem', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '0.6rem' }}>
+                  <button
+                    type="button"
+                    onClick={() => setEvidenceMode('upload')}
+                    style={{
+                      padding: '0.35rem 0.8rem',
+                      borderRadius: '6px',
+                      fontSize: '0.8rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      border: 'none',
+                      background: evidenceMode === 'upload' ? 'rgba(0, 210, 255, 0.2)' : 'transparent',
+                      color: evidenceMode === 'upload' ? 'var(--crear-cyan)' : 'var(--text-muted)',
+                      borderBottom: evidenceMode === 'upload' ? '2px solid var(--crear-cyan)' : '2px solid transparent',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.4rem'
+                    }}
+                  >
+                    <UploadCloud size={14} /> 📁 Subir Archivo (Google Drive / Nube)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEvidenceMode('link')}
+                    style={{
+                      padding: '0.35rem 0.8rem',
+                      borderRadius: '6px',
+                      fontSize: '0.8rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      border: 'none',
+                      background: evidenceMode === 'link' ? 'rgba(212, 175, 55, 0.2)' : 'transparent',
+                      color: evidenceMode === 'link' ? 'var(--crear-gold)' : 'var(--text-muted)',
+                      borderBottom: evidenceMode === 'link' ? '2px solid var(--crear-gold)' : '2px solid transparent',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.4rem'
+                    }}
+                  >
+                    <LinkIcon size={14} /> 🔗 Pegar Enlace
+                  </button>
+                </div>
+
+                {/* MODO SUBIR ARCHIVO */}
+                {evidenceMode === 'upload' && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.ppt,.pptx,image/*"
+                      onChange={handleFileSelect}
+                      style={{ display: 'none' }}
+                    />
+
+                    {/* Zona Dropzone */}
+                    <div
+                      onDragOver={handleDragOver}
+                      onDragLeave={handleDragLeave}
+                      onDrop={handleDrop}
+                      onClick={() => fileInputRef.current?.click()}
+                      style={{
+                        padding: selectedFile ? '0.9rem' : '1.4rem 1rem',
+                        border: isDragging ? '2px dashed var(--crear-cyan)' : '1px dashed rgba(255, 255, 255, 0.2)',
+                        borderRadius: '8px',
+                        background: isDragging ? 'rgba(0, 210, 255, 0.08)' : 'rgba(255, 255, 255, 0.03)',
+                        textAlign: 'center',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '0.4rem'
+                      }}
+                    >
+                      {selectedFile ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', width: '100%', justifyContent: 'center' }}>
+                          <FileCheck size={24} style={{ color: 'var(--crear-cyan)' }} />
+                          <div style={{ textAlign: 'left' }}>
+                            <div style={{ color: '#ffffff', fontWeight: 700, fontSize: '0.88rem' }}>
+                              {selectedFile.name}
+                            </div>
+                            <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>
+                              Tamaño: {formatFileSize(selectedFile.size)} • Clic para cambiar
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <UploadCloud size={30} style={{ color: 'var(--crear-cyan)', opacity: 0.85 }} />
+                          <div style={{ color: '#ffffff', fontSize: '0.85rem', fontWeight: 600 }}>
+                            Haz clic para examinar o arrastra aquí tu documento
+                          </div>
+                          <div style={{ color: 'var(--text-muted)', fontSize: '0.74rem' }}>
+                            PDF, Excel, Word, Fotos o Comprobantes (máx. 25MB)
+                          </div>
+                        </>
+                      )}
+                    </div>
+
+                    <input
+                      type="text"
+                      placeholder="Nombre o descripción de la evidencia (opcional)"
+                      value={newEvidenceTitle}
+                      onChange={(e) => setNewEvidenceTitle(e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '0.55rem 0.8rem',
+                        background: 'rgba(255, 255, 255, 0.05)',
+                        border: '1px solid rgba(255, 255, 255, 0.15)',
+                        borderRadius: '6px',
+                        color: '#ffffff',
+                        fontSize: '0.85rem',
+                        outline: 'none',
+                        boxSizing: 'border-box'
+                      }}
+                    />
+
+                    {isUploadingFile && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--crear-cyan)', fontSize: '0.82rem', padding: '0.2rem 0' }}>
+                        <RefreshCw size={14} className="animate-spin" />
+                        <span>{uploadProgress || 'Subiendo archivo...'}</span>
+                      </div>
+                    )}
+
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '0.2rem' }}>
+                      <button
+                        type="button"
+                        disabled={isUploadingFile}
+                        onClick={() => { setShowAddEvidence(false); setSelectedFile(null); }}
+                        style={{
+                          padding: '0.45rem 0.85rem',
+                          borderRadius: '6px',
+                          fontSize: '0.8rem',
+                          background: 'transparent',
+                          color: 'var(--text-muted)',
+                          border: '1px solid rgba(255, 255, 255, 0.15)',
+                          cursor: isUploadingFile ? 'not-allowed' : 'pointer'
+                        }}
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        type="button"
+                        disabled={!selectedFile || isUploadingFile}
+                        onClick={handleUploadFile}
+                        style={{
+                          padding: '0.45rem 1rem',
+                          borderRadius: '6px',
+                          fontSize: '0.8rem',
+                          fontWeight: 700,
+                          background: selectedFile && !isUploadingFile ? 'var(--crear-cyan)' : 'rgba(255,255,255,0.1)',
+                          color: selectedFile && !isUploadingFile ? '#000000' : 'var(--text-muted)',
+                          border: 'none',
+                          cursor: selectedFile && !isUploadingFile ? 'pointer' : 'not-allowed',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.4rem',
+                          transition: 'all 0.15s ease'
+                        }}
+                      >
+                        {isUploadingFile ? (
+                          <>
+                            <RefreshCw size={14} className="animate-spin" /> Guardando...
+                          </>
+                        ) : (
+                          <>
+                            <UploadCloud size={14} /> ☁️ Subir y Guardar en Google Drive
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* MODO PEGAR ENLACE MANUAL */}
+                {evidenceMode === 'link' && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
+                    <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                      Ingresa el enlace de Google Drive, Google Sheets, Docs o cualquier recurso web:
+                    </div>
+
+                    <input 
+                      type="url"
+                      placeholder="https://drive.google.com/file/... o enlace web"
+                      value={newEvidenceUrl}
+                      onChange={(e) => setNewEvidenceUrl(e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '0.55rem 0.8rem',
+                        background: 'rgba(255, 255, 255, 0.05)',
+                        border: '1px solid rgba(255, 255, 255, 0.15)',
+                        borderRadius: '6px',
+                        color: '#ffffff',
+                        fontSize: '0.85rem',
+                        outline: 'none',
+                        boxSizing: 'border-box'
+                      }}
+                    />
+
+                    <input 
+                      type="text"
+                      placeholder="Descripción de la evidencia (ej: Presupuesto Agosto final, Foto de asistencia)"
+                      value={newEvidenceTitle}
+                      onChange={(e) => setNewEvidenceTitle(e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '0.55rem 0.8rem',
+                        background: 'rgba(255, 255, 255, 0.05)',
+                        border: '1px solid rgba(255, 255, 255, 0.15)',
+                        borderRadius: '6px',
+                        color: '#ffffff',
+                        fontSize: '0.85rem',
+                        outline: 'none',
+                        boxSizing: 'border-box'
+                      }}
+                    />
+
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '0.2rem' }}>
+                      <button
+                        type="button"
+                        onClick={() => { setShowAddEvidence(false); setNewEvidenceUrl(''); }}
+                        style={{
+                          padding: '0.45rem 0.85rem',
+                          borderRadius: '6px',
+                          fontSize: '0.8rem',
+                          background: 'transparent',
+                          color: 'var(--text-muted)',
+                          border: '1px solid rgba(255, 255, 255, 0.15)',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleAddEvidenceItem}
+                        style={{
+                          padding: '0.45rem 1rem',
+                          borderRadius: '6px',
+                          fontSize: '0.8rem',
+                          fontWeight: 700,
+                          background: 'var(--crear-gold)',
+                          color: '#000000',
+                          border: 'none',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.4rem'
+                        }}
+                      >
+                        <Plus size={14} /> Añadir a la lista
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Listado de evidencias adjuntas */}
+            {evidencesList.length === 0 ? (
+              <div style={{
+                textAlign: 'center',
+                padding: '1.4rem',
+                background: 'rgba(0, 0, 0, 0.18)',
+                borderRadius: '8px',
+                color: 'var(--text-muted)',
+                fontSize: '0.82rem',
+                border: '1px dashed rgba(255,255,255,0.06)'
+              }}>
+                Sin evidencias adjuntas todavía. Haz clic en <strong>"+ Adjuntar Evidencia"</strong> para subir un archivo a Google Drive o ingresar tu enlace.
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+                {evidencesList.map((ev, idx) => {
+                  const category = getEvidenceCategory(ev.url, ev.fileName || ev.title, ev.provider);
+                  return (
+                    <div
+                      key={ev.id || idx}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        background: 'rgba(0, 0, 0, 0.3)',
+                        border: '1px solid rgba(255, 255, 255, 0.08)',
+                        borderRadius: '8px',
+                        padding: '0.7rem 0.95rem',
+                        gap: '0.8rem',
+                        flexWrap: 'wrap'
+                      }}
+                    >
+                      <div style={{ flex: 1, minWidth: '180px' }}>
+                        <div style={{ fontWeight: 700, fontSize: '0.85rem', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '0.45rem', flexWrap: 'wrap' }}>
+                          <span style={{ fontSize: '1.1rem' }}>{category.icon}</span>
+                          <span>{ev.title || ev.fileName || 'Evidencia adjunta'}</span>
+                          <span style={{
+                            fontSize: '0.68rem',
+                            padding: '0.12rem 0.45rem',
+                            borderRadius: '10px',
+                            background: category.bg,
+                            color: category.color,
+                            border: `1px solid ${category.border}`,
+                            fontWeight: 700
+                          }}>
+                            {category.label}
+                          </span>
+                          {ev.fileSize && (
+                            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                              ({formatFileSize(ev.fileSize)})
+                            </span>
+                          )}
+                        </div>
+                        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '0.2rem', wordBreak: 'break-all' }}>
+                          {ev.url}
+                        </div>
+                        {ev.addedByName && (
+                          <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
+                            Adjuntado por: {ev.addedByName} {ev.createdAt ? `• ${new Date(ev.createdAt).toLocaleDateString()}` : ''}
+                          </div>
+                        )}
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <a 
+                          href={ev.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.35rem',
+                            background: 'rgba(41, 171, 226, 0.18)',
+                            color: 'var(--crear-cyan)',
+                            border: '1px solid rgba(41, 171, 226, 0.4)',
+                            padding: '0.38rem 0.75rem',
+                            borderRadius: '6px',
+                            fontSize: '0.78rem',
+                            fontWeight: 700,
+                            textDecoration: 'none',
+                            cursor: 'pointer',
+                            transition: 'all 0.15s ease'
+                          }}
+                        >
+                          <ExternalLink size={13} /> Abrir Evidencia ↗
+                        </a>
+
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveEvidence(ev.id)}
+                          style={{
+                            background: 'rgba(239, 68, 68, 0.12)',
+                            color: '#ef4444',
+                            border: '1px solid rgba(239, 68, 68, 0.3)',
+                            padding: '0.38rem',
+                            borderRadius: '6px',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}
+                          title="Eliminar evidencia"
+                        >
+                          <Trash2 size={13} />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* 3. SECCIÓN DE BITÁCORA DE AVANCES Y NOTAS */}
+          <div style={{
+            background: 'rgba(255, 255, 255, 0.02)',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+            borderRadius: '12px',
+            padding: '1.2rem'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.8rem' }}>
+              <Edit3 size={18} style={{ color: 'var(--crear-cyan)' }} />
+              <h3 style={{ margin: 0, fontSize: '0.98rem', fontWeight: 700, color: '#ffffff' }}>
+                Bitácora de Avances y Notas
+              </h3>
+            </div>
+
+            {/* Caja para registrar nuevo avance */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1rem' }}>
+              <textarea 
+                rows="2"
+                placeholder="Escribe un avance u observación (ej: Se actualizó la columna de viáticos, pendiente validación final...)"
+                value={newNoteText}
+                onChange={(e) => setNewNoteText(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '0.6rem 0.8rem',
+                  background: 'rgba(0, 0, 0, 0.35)',
+                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  borderRadius: '8px',
+                  color: '#ffffff',
+                  fontSize: '0.85rem',
+                  outline: 'none',
+                  resize: 'vertical',
+                  boxSizing: 'border-box',
+                  lineHeight: 1.4
+                }}
+              />
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <button
+                  type="button"
+                  onClick={handleAddNote}
+                  disabled={!newNoteText.trim()}
+                  style={{
+                    padding: '0.4rem 0.9rem',
+                    borderRadius: '6px',
+                    fontSize: '0.78rem',
+                    fontWeight: 700,
+                    background: newNoteText.trim() ? 'var(--crear-cyan)' : 'rgba(255,255,255,0.08)',
+                    color: newNoteText.trim() ? '#000000' : 'var(--text-muted)',
+                    border: 'none',
+                    cursor: newNoteText.trim() ? 'pointer' : 'not-allowed',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.35rem',
+                    transition: 'all 0.15s ease'
+                  }}
+                >
+                  <Send size={13} /> Registrar Avance
+                </button>
+              </div>
+            </div>
+
+            {/* Historial de avances */}
+            {notesList.length === 0 ? (
+              <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)', textAlign: 'center', padding: '0.5rem' }}>
+                Aún no hay notas de avance registradas.
+              </p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '180px', overflowY: 'auto' }}>
+                {notesList.map((n, i) => (
+                  <div 
+                    key={n.id || i}
+                    style={{
+                      background: 'rgba(0, 0, 0, 0.25)',
+                      borderLeft: '3px solid var(--crear-cyan)',
+                      padding: '0.6rem 0.8rem',
+                      borderRadius: '0 6px 6px 0',
+                      fontSize: '0.82rem'
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.2rem' }}>
+                      <strong style={{ color: 'var(--crear-cyan)', fontSize: '0.75rem' }}>
+                        {n.authorName || 'Usuario'} {n.progressPercentage !== undefined ? `(${n.progressPercentage}% avance)` : ''}
+                      </strong>
+                      <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
+                        {n.createdAt ? new Date(n.createdAt).toLocaleString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : ''}
+                      </span>
+                    </div>
+                    <div style={{ color: 'var(--text-main)', lineHeight: 1.35, whiteSpace: 'pre-wrap' }}>
+                      {n.text}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* FOOTER CON ACCIONES */}
+        <div style={{
+          padding: '1.2rem 1.5rem',
+          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+          background: 'rgba(0, 0, 0, 0.4)',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '0.8rem'
+        }}>
+          {/* BOTÓN COMPLETAR O REABRIR */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+            <button
+              type="button"
+              onClick={isMultiAssignee && myAssigneeEntry ? handleToggleMyPart : handleToggleCompleted}
+              disabled={isForeign && !currentUser?.isSuperAdmin}
+              style={{
+                padding: '0.55rem 1rem',
+                borderRadius: '8px',
+                fontSize: '0.85rem',
+                fontWeight: 700,
+                cursor: (isForeign && !currentUser?.isSuperAdmin) ? 'not-allowed' : 'pointer',
+                opacity: (isForeign && !currentUser?.isSuperAdmin) ? 0.6 : 1,
+                border: `1px solid ${
+                  (isMultiAssignee && myAssigneeEntry ? myCompleted : isCompleted) 
+                    ? 'rgba(239, 68, 68, 0.4)' 
+                    : isForeign
+                      ? 'rgba(239, 68, 68, 0.4)'
+                      : 'rgba(16, 185, 129, 0.4)'
+                }`,
+                background: (isMultiAssignee && myAssigneeEntry ? myCompleted : isCompleted) 
+                  ? 'rgba(239, 68, 68, 0.15)' 
+                  : isForeign
+                    ? 'rgba(239, 68, 68, 0.12)'
+                    : 'rgba(16, 185, 129, 0.18)',
+                color: (isMultiAssignee && myAssigneeEntry ? myCompleted : isCompleted) 
+                  ? '#f87171' 
+                  : isForeign
+                    ? '#fca5a5'
+                    : '#10b981',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              <CheckCircle2 size={16} />
+              {isMultiAssignee && myAssigneeEntry 
+                ? (myCompleted ? 'Reabrir Mi Parte' : 'Marcar Mi Parte Completada')
+                : (isCompleted ? 'Reabrir Tarea' : isForeign ? 'Completar Bloqueado (Otra Sede)' : 'Marcar Completada')}
+            </button>
+            {isCreator && onEditTaskParams && (
+              <button
+                type="button"
+                onClick={() => handleCloseAttempt(() => onEditTaskParams(task))}
+                style={{
+                  padding: '0.55rem 0.9rem',
+                  borderRadius: '8px',
+                  fontSize: '0.82rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  color: 'var(--text-muted)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.35rem'
+                }}
+                title="Editar fecha, asignados o rol de la tarea"
+              >
+                <Edit3 size={14} /> Editar Configuración
+              </button>
+            )}
+          </div>
+
+          {/* BOTONES GUARDAR Y CANCELAR */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+            <button
+              type="button"
+              onClick={() => handleCloseAttempt()}
+              disabled={isSaving}
+              style={{
+                padding: '0.55rem 1rem',
+                borderRadius: '8px',
+                fontSize: '0.85rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                background: 'transparent',
+                color: 'var(--text-muted)'
+              }}
+            >
+              Cancelar
+            </button>
+
+            <button
+              type="button"
+              onClick={handleSaveAll}
+              disabled={isSaving}
+              className="btn-neon-action"
+              style={{
+                padding: '0.55rem 1.4rem',
+                fontSize: '0.88rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.4rem'
+              }}
+            >
+              {isSaving ? (
+                <>
+                  <RefreshCw size={15} className="spin" /> Guardando...
+                </>
+              ) : (
+                <>
+                  <Sparkles size={15} /> Guardar Avances
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+

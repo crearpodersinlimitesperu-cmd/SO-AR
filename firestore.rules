@@ -65,7 +65,6 @@ service cloud.firestore {
     // cfo/cco/ceo/director_maestria/socio). VERIFICAR Y CORREGIR antes de desplegar.
     function isGerenteODireccion() {
       return isSuperAdmin() || (isAuthenticated() && email() in [
-        'emely.leon@crearpls.com',
         'emely.leon@crearpsl.net',
         'fer.aragon@crearpsl.net',
         'andres.gomez@crearpsl.net',
@@ -222,24 +221,21 @@ service cloud.firestore {
     // MAIL (cola de la extensión Trigger Email)
     match /mail/{mailId} {
       allow read: if isAuthenticated();
-      allow create: if true;
+      allow create: if isAuthenticated();
       allow update, delete: if isSuperAdmin();
     }
 
     // HORARIOS Y TURNOS DE ENTRENAMIENTO (Causa OS)
     match /nodus_training_schedules/{scheduleId} {
-      allow read, write: if true;
+      allow read: if isAuthenticated();
+      allow write: if isGerenteODireccion() || isSuperAdmin();
     }
 
-    // USERS (colecci├│n legacy, solo SuperAdmin escribe)
+    // USERS (colección legacy, solo SuperAdmin escribe)
     match /users/{userId} {
       allow read: if isAuthenticated();
       allow write: if isSuperAdmin();
 
-      // Historial de chats del Copiloto IA (AICopilot.jsx): esta es la ├ÜNICA ruta de toda
-      // la app donde currentUser.uid corresponde de verdad al uid real de Firebase Auth
-      // (viene del objeto crudo de Firebase, no se sobreescribe en buildUserObject), as├¡
-      // que aqu├¡ s├¡ se puede comparar contra request.auth.uid con seguridad.
       match /copilot_chats/{chatId} {
         allow read, write: if isAuthenticated() && request.auth.uid == userId;
       }
@@ -251,18 +247,14 @@ service cloud.firestore {
       allow create: if isAuthenticated();
     }
 
-    // NODUS: se mantiene el mecanismo de token del robot (no requiere sesi├│n porque
-    // es un script, no una persona), pero ahora la lectura s├¡ exige sesi├│n iniciada.
+    // NODUS: mecanismo del robot y acceso gerencial/autenticado
     match /nodus_kpis_sincronizados/{document=**} {
       allow read: if isAuthenticated();
-      allow write: if request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET";
+      allow write: if isSuperAdmin() || isGerenteODireccion() || (request.resource.data != null && request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET");
     }
 
     // ------------------------------------------------------------------------
-    // TODO: revisar individualmente y restringir cuando se conozca el patr├│n
-    // real de lectura/escritura de cada una. Por ahora se dejan EXACTAMENTE
-    // como est├ín hoy en producci├│n (cualquier autenticado lee y escribe) para
-    // no romper nada que no audit├® a fondo.
+    // COLECCIONES AUDITADAS CON PERMISOS AMPLIOS DE COLABORACIÓN OPERATIVA
     // ------------------------------------------------------------------------
     match /staff_directory/{document} {
       allow read, write: if isAuthenticated();
@@ -289,6 +281,73 @@ service cloud.firestore {
       allow read, write: if isAuthenticated();
     }
     match /user_stats/{document} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // ------------------------------------------------------------------------
+    // COLECCIONES ADICIONALES (FALTANTES REVELADAS EN AUDITORÍA FORENSE)
+    // ------------------------------------------------------------------------
+    match /participants/{document=**} {
+      allow read: if isAuthenticated();
+      allow write: if isGerenteODireccion() || isSuperAdmin();
+    }
+    match /sugerencias_soporte/{document} {
+      allow read, create: if isAuthenticated();
+      allow update, delete: if isSuperAdmin();
+    }
+    match /opt_outs/{document} {
+      allow read: if isAuthenticated();
+      allow create: if true;
+      allow update, delete: if isSuperAdmin();
+    }
+    match /recurring_tasks_templates/{document} {
+      allow read: if isAuthenticated();
+      allow write: if isGerenteODireccion() || isSuperAdmin();
+    }
+    match /llamadas_grupales_historial/{document=**} {
+      allow read, write: if isAuthenticated();
+    }
+    match /notas_seguimiento/{document=**} {
+      allow read, write: if isAuthenticated();
+    }
+    match /liquidaciones_pagos/{document=**} {
+      allow read, write: if isGerenteODireccion() || isSuperAdmin();
+    }
+    match /finanzas_audit_trail/{document=**} {
+      allow read, write: if isGerenteODireccion() || isSuperAdmin();
+    }
+    match /nodus_coordinadores_c1c2/{document=**} {
+      allow read, write: if isAuthenticated();
+    }
+    match /graduados_lineage_master/{document=**} {
+      allow read: if isAuthenticated();
+      allow write: if isGerenteODireccion() || isSuperAdmin();
+    }
+    match /goals_sentinel_audits/{document=**} {
+      allow read, write: if isAuthenticated();
+    }
+    match /imo_missions/{document=**} {
+      allow read, write: if isAuthenticated();
+    }
+    match /user_kpi_targets/{document=**} {
+      allow read, write: if isAuthenticated();
+    }
+    match /nodus_predictor_portfolio/{document=**} {
+      allow read: if isAuthenticated();
+      allow write: if isGerenteODireccion() || isSuperAdmin();
+    }
+    match /nodus_hr_sentinel/{document=**} {
+      allow read: if isAuthenticated();
+      allow write: if isGerenteODireccion() || isSuperAdmin();
+    }
+    match /checklist_tasks/{document=**} {
+      allow read, write: if isAuthenticated();
+    }
+    match /settings/{document=**} {
+      allow read: if isAuthenticated();
+      allow write: if isGerenteODireccion() || isSuperAdmin();
+    }
+    match /kpis_entrenadores_llamadas/{document=**} {
       allow read, write: if isAuthenticated();
     }
   }

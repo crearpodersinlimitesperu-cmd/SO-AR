@@ -1,4 +1,4 @@
-﻿import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import { useUI } from './context/UIContext'
 import './index.css'
@@ -37,6 +37,7 @@ import MasterclassDistinciones from './pages/MasterclassDistinciones'
 import DashboardKpisLima from './pages/DashboardKpisLima'
 import CRMBaseMaster from './pages/CRMBaseMaster'
 import MonitorImos from './pages/MonitorImos'
+import MatrizEnrolamientoSentados from './pages/MatrizEnrolamientoSentados'
 import AICopilot from './components/AICopilot'
 import PromptModal from './components/PromptModal'
 import BirthdayAlert from './components/BirthdayAlert'
@@ -429,6 +430,13 @@ function App() {
               <MonitorImos />
             </RoleRoute>
           } />
+          <Route path="/matriz-enrolamiento-sentados" element={
+            <PrivateRoute>
+              <MatrizEnrolamientoSentados />
+            </PrivateRoute>
+          } />
+          <Route path="/reporte-equipos-sentados" element={<Navigate to="/matriz-enrolamiento-sentados" replace />} />
+
           <Route path="/kpis-lima" element={
             <PrivateRoute>
               <DashboardKpisLima />

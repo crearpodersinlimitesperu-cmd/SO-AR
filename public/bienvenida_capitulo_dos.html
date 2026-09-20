@@ -22,7 +22,7 @@
     <title>Bienvenida Capítulo Dos | CREAR PODER SIN LÍMITES</title>
 
     <link rel="icon" href="logo_crear_oficial.png" type="image/png">
-    <link rel="preload" href="logo_crear_global_blanco.png" as="image">
+    <link rel="preload" href="logo_crear_blanco.png" as="image">
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -300,7 +300,7 @@
     <nav class="fixed top-0 w-full z-50 glassmorphism border-b-0 py-3">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <img src="logo_crear_global_blanco.png" alt="CREAR Poder Sin Límites" class="h-8 md:h-10 object-contain">
+                <img src="logo_crear_blanco.png" alt="CREAR Poder Sin Límites" class="h-8 md:h-10 object-contain">
             </div>
             <div class="hidden md:flex text-[10px] md:text-xs font-bold tracking-[0.2em] text-gray-400 uppercase">
                 <span>Ecuador <span class="text-crearCyan mx-2">•</span> Perú <span class="text-crearCyan mx-2">•</span> Colombia <span class="text-crearCyan mx-2">•</span> México</span>
@@ -810,11 +810,14 @@
             <!-- CONTENIDO DE TABS -->
             <div id="tab-content-schedule" class="glass-card rounded-3xl p-8 max-w-3xl mx-auto mb-12 border-t-4 border-t-crearCyan">
                 <h3 class="text-2xl font-black text-white font-outfit mb-6 text-center">Agenda del Capítulo Dos</h3>
-                <div class="space-y-4">
+                <div id="agenda-dates-container" class="space-y-4">
                     <div class="bg-crearDark/50 border border-crearCyan/30 rounded-xl p-4 flex justify-between items-center relative overflow-hidden">
                         <div class="absolute inset-0 bg-crearCyan/5 animate-pulse"></div>
                         <div class="relative z-10 flex gap-4 items-center">
-                            <span class="text-3xl font-black text-crearCyan font-outfit">JUE</span>
+                            <div class="text-center">
+                                <span class="text-3xl font-black text-crearCyan font-outfit">JUE</span>
+                                <p id="agenda-day-1" class="text-crearCyan text-xs font-bold"></p>
+                            </div>
                             <div>
                                 <p class="text-white font-bold">1er Día - Registro y Apertura</p>
                                 <p class="text-crearCyan text-xs uppercase tracking-wider">Apertura 14:00 hrs</p>
@@ -826,7 +829,10 @@
                     </div>
                     <div class="bg-crearDark/30 border border-crearBorder/20 rounded-xl p-4 flex justify-between items-center opacity-80">
                         <div class="flex gap-4 items-center">
-                            <span class="text-3xl font-black text-gray-400 font-outfit">VIE</span>
+                            <div class="text-center">
+                                <span class="text-3xl font-black text-gray-400 font-outfit">VIE</span>
+                                <p id="agenda-day-2" class="text-gray-400 text-xs font-bold"></p>
+                            </div>
                             <div>
                                 <p class="text-gray-200 font-bold">2do Día - Inmersión Cuántica</p>
                             </div>
@@ -837,7 +843,10 @@
                     </div>
                     <div class="bg-crearDark/30 border border-crearBorder/20 rounded-xl p-4 flex justify-between items-center opacity-80">
                         <div class="flex gap-4 items-center">
-                            <span class="text-3xl font-black text-gray-400 font-outfit">SÁB</span>
+                            <div class="text-center">
+                                <span class="text-3xl font-black text-gray-400 font-outfit">SÁB</span>
+                                <p id="agenda-day-3" class="text-gray-400 text-xs font-bold"></p>
+                            </div>
                             <div>
                                 <p class="text-gray-200 font-bold">3er Día - Consolidación</p>
                             </div>
@@ -848,7 +857,10 @@
                     </div>
                     <div class="bg-crearDark/30 border border-crearBorder/20 rounded-xl p-4 flex justify-between items-center opacity-80">
                         <div class="flex gap-4 items-center">
-                            <span class="text-3xl font-black text-gray-400 font-outfit">DOM</span>
+                            <div class="text-center">
+                                <span class="text-3xl font-black text-gray-400 font-outfit">DOM</span>
+                                <p id="agenda-day-4" class="text-gray-400 text-xs font-bold"></p>
+                            </div>
                             <div>
                                 <p class="text-gray-200 font-bold">4to Día - Clausura y Salto</p>
                             </div>
@@ -886,7 +898,7 @@
     <footer class="bg-crearDarker border-t border-crearBorder/30 py-8 relative z-10 mt-10">
         <div class="max-w-5xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-6">
             <div class="flex items-center gap-3">
-                <img src="logo_crear_global_blanco.png" alt="CREAR Poder Sin Límites" class="h-6 md:h-8 object-contain opacity-60">
+                <img src="logo_crear_blanco.png" alt="CREAR Poder Sin Límites" class="h-6 md:h-8 object-contain opacity-60">
             </div>
             
             <div class="flex flex-col items-center gap-4 text-xs text-gray-400 font-outfit tracking-wider">
@@ -1108,7 +1120,7 @@
                 hotelAddress: "Calle Bellavista 133 – Miraflores 15038",
                 mapSrc: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3900.7430415!2d-77.0313019!3d-12.1290333!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9105c819389bd7c9%3A0xbd7c8ee17dfbc462!2sHotel%20Jos%C3%A9%20Antonio%20Deluxe!5e0!3m2!1ses!2spe!4v1719528000000!5m2!1ses!2spe",
                 mapLink: "https://maps.google.com/?q=Hotel+José+Antonio+Deluxe+Miraflores+Calle+Bellavista+133",
-                team: "Equipo 30",
+                team: "Equipo 31",
                 heroDate: "Del jueves 01 al domingo 04",
                 heroMonth: "de octubre de 2026",
                 startDateStr: "2026-10-01T13:00:00",
@@ -1337,6 +1349,19 @@
             const supportBtn = document.getElementById('active-support-btn');
             if (supportBtn) {
                 supportBtn.href = `https://wa.me/${currentSede.supportPhone}?text=Ayuda%20necesito%20asistencia%20en%20el%20sal%C3%B3n%20de%20Cap%C3%ADtulo%20Dos`;
+            }
+
+            // Llenar las fechas reales en la agenda del portal activo
+            if (currentSede.startDateStr) {
+                const baseDate = new Date(currentSede.startDateStr);
+                const monthNames = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+                for (let i = 0; i < 4; i++) {
+                    const dayDate = new Date(baseDate.getTime() + (i * 24 * 60 * 60 * 1000));
+                    const dayEl = document.getElementById(`agenda-day-${i + 1}`);
+                    if (dayEl) {
+                        dayEl.innerText = `${dayDate.getDate()} ${monthNames[dayDate.getMonth()]}`;
+                    }
+                }
             }
         }
 
