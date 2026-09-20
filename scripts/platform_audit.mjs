@@ -50,6 +50,103 @@ const KNOWN_ROLES = new Set([
 
 const AUDIT_WINDOW_HOURS = 6; // ventana de "trazabilidad reciente" (coincide con la frecuencia del workflow: cada ~5h)
 
+// ----------------------------------------------------------------------------
+// (20/09/2026) Constantes de los chequeos agregados este día, pedidos por José
+// ("asegurarse que Causa funciona... que supervise esta plataforma sin
+// alucinar"). Todos siguen la misma regla del resto del archivo: si un dato no
+// se pudo leer, se dice que NO se pudo leer — nunca se asume que está bien.
+// ----------------------------------------------------------------------------
+
+// URL real del hosting (firebase.json → hosting.site: "centro-operativo-cpsl").
+const SITIO_URL = process.env.CAUSA_OS_URL || 'https://centro-operativo-cpsl.web.app/';
+
+// Hoja "DIRECTORIO GLOBAL" — fuente de verdad de sede/cargo del staff, la misma
+// que José usó el 17/09/2026 para detectar que Daniela Esposito (Quito/UIO)
+// estaba con sede "global" en Firestore.
+// OJO: al escribir esto NO se pudo comprobar si la hoja permite lectura
+// anónima (el entorno donde se programó no tiene salida a Google). Si no se
+// puede leer, el chequeo lo reporta explícitamente en vez de dar un falso OK.
+const DIRECTORIO_SHEET_ID = process.env.DIRECTORIO_GLOBAL_SHEET_ID || '1bl1_R6Qiee4tQ31Oix1Mjo_Jsbmddv3nsc5xBIy7QJY';
+const DIRECTORIO_SHEET_GID = process.env.DIRECTORIO_GLOBAL_GID || '0';
+
+// Copia local de normalizeSede() de src/data/usersData.js. Se duplica a
+// propósito: ese archivo importa usersToImport.js y arrastra el bundle entero
+// de la app, que no tiene por qué correr en un script de CI. Si normalizeSede()
+// cambia allá, hay que actualizar esta copia (igual que pasa con
+// firestore.rules ↔ permissions.js).
+const normalizeSede = (sede) => {
+  if (!sede) return 'Sede Global';
+  const s = sede.toString().trim();
+  const clean = s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  if (s === 'MED' || clean.includes('medell')) return 'Medellín';
+  if (s === 'LIM' || clean.includes('lima')) return 'Lima';
+  if (s === 'CUE' || clean.includes('cuenca')) return 'Cuenca';
+  if (s === 'GYE' || clean.includes('guayaquil')) return 'Guayaquil';
+  if (s === 'MEX' || clean.includes('mex') || clean.includes('cdmx')) return 'México';
+  if (s === 'UIO-C1' || s === 'UIO-C2' || s === 'UIO' || clean.includes('uio') ||
+      clean.includes('ciclo 1') || clean.includes('ciclo1') ||
+      clean.includes('ciclo 2') || clean.includes('ciclo2') ||
+      clean.includes('quito')) return 'Quito';
+  if (s === 'INT' || clean.includes('intern')) return 'Internacional';
+  if (clean.includes('global')) return 'Sede Global';
+  return s;
+};
+
+const esSedeGlobal = (s) => {
+  const n = normalizeSede(s);
+  return n === 'Sede Global' || n === 'Global';
+};
+
+// Copia reducida de normalizeRole() de src/data/usersData.js — solo los grupos
+// de sinónimos, que es lo único que hace falta para comparar dos documentos de
+// la misma persona. Sin esto, "coordinador_maestria" vs "coord_maestria" (el
+// MISMO rol, escrito distinto por bootstrapSync y por el login) se reportaría
+// como contradicción: una falsa alarma. Un agente que da falsas alarmas se
+// vuelve ruido y se deja de leer.
+const normalizeRoleCompare = (role) => {
+  const r = (role || '').toString().toLowerCase().trim();
+  if (!r) return '';
+  if (['coordinador_c1c2', 'coord_c1', 'coord_c2', 'coordinador_c1', 'coordinador_c2', 'c1', 'c2', 'c1c2'].includes(r)) return 'coord_c1';
+  if (r === 'director_maestria' || r === 'director_mj') return 'director_maestria';
+  if (['coordinador_mj', 'coord_maestria', 'coordinador_maestria'].includes(r) || r.includes('maestria')) return 'coord_maestria';
+  if (r === 'gerente' || r === 'gerente_sede') return 'gerente';
+  if (['coordinador', 'coordinadora', 'coordinacion_administrativa', 'colaborador'].includes(r)) return 'coordinador';
+  if (r === 'entrenador_llamadas' || r.includes('llamadas')) return 'entrenador_llamadas';
+  if (r === 'entrenador' || r === 'coach') return 'entrenador';
+  if (r.includes('direccion') || r.includes('ceo') || r.includes('cco') || r.includes('socio')) return 'direccion';
+  if (r === 'finanzas' || r.includes('facturacion')) return 'finanzas';
+  return r;
+};
+
+const emailKey = (e) => (e || '')
+  .toString()
+  .toLowerCase()
+  .trim()
+  // typos de dominio ya documentados en la app (ver ChecklistContext.jsx)
+  .replace('@crearpls.com', '@crearpsl.net')
+  .replace('@crearpsl.com', '@crearpsl.net');
+
+// Parser CSV mínimo con soporte de comillas (las celdas del Directorio traen
+// comas dentro de "Cargo / Función").
+function parseCsv(text) {
+  const rows = [];
+  let row = [], field = '', inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inQuotes) {
+      if (c === '"') {
+        if (text[i + 1] === '"') { field += '"'; i++; }
+        else inQuotes = false;
+      } else field += c;
+    } else if (c === '"') inQuotes = true;
+    else if (c === ',') { row.push(field); field = ''; }
+    else if (c === '\n') { row.push(field); rows.push(row); row = []; field = ''; }
+    else if (c !== '\r') field += c;
+  }
+  if (field.length > 0 || row.length > 0) { row.push(field); rows.push(row); }
+  return rows.filter(r => r.some(cell => (cell || '').trim() !== ''));
+}
+
 const normalizeForDupCheck = (s) => (s || '')
   .toString()
   .trim()
@@ -302,6 +399,179 @@ async function main() {
       findings.push({ severity: 'WARN', tipo: 'HECHO', titulo: 'Trazabilidad (audit_logs)', detalle: `0 eventos registrados en audit_logs en las últimas ${AUDIT_WINDOW_HOURS}h. Puede ser normal (poca actividad, ej. de madrugada) o indicar que el registro de auditoría dejó de escribir — no se puede distinguir automáticamente entre ambos casos.` });
     } else {
       info.push(`✅ Trazabilidad: ${recientes.length} eventos registrados en audit_logs en las últimas ${AUDIT_WINDOW_HOURS}h.`);
+    }
+  }
+
+  // ==========================================================================
+  // (20/09/2026) CHEQUEOS AGREGADOS — pedido de José: "asegurarse que Causa
+  // funciona" y "supervisar esta plataforma sin alucinar".
+  // ==========================================================================
+
+  // --- 4a. ¿Causa OS está realmente en pie? (HECHO — petición HTTP real) -----
+  // Este es el chequeo que antes NO existía: el agente miraba si el workflow
+  // de deploy decía "success", pero nunca abría el sitio. Ya pasó (ver
+  // deploy.yml, fix del 04/09/2026) que el deploy reportara verde durante
+  // semanas sin publicar nada. Acá se pide la página de verdad y además se
+  // descarga el bundle JS que esa página referencia: un index.html que
+  // responde 200 pero cuyo bundle da 404 es exactamente una pantalla en
+  // blanco para el usuario, y el HTTP 200 solo no lo detecta.
+  try {
+    const res = await fetch(SITIO_URL, { redirect: 'follow' });
+    if (!res.ok) {
+      findings.push({ severity: 'ERROR', tipo: 'HECHO', titulo: 'Causa OS no responde', detalle: `${SITIO_URL} devolvió HTTP ${res.status}. El sitio está caído o mal desplegado.` });
+    } else {
+      const html = await res.text();
+      const tieneRoot = html.includes('id="root"');
+      const bundleMatch = html.match(/src="(\/assets\/[^"]+\.js)"/);
+      if (!tieneRoot) {
+        findings.push({ severity: 'ERROR', tipo: 'HECHO', titulo: 'Causa OS responde pero sin la app', detalle: `${SITIO_URL} devolvió HTTP 200 pero el HTML no contiene <div id="root"> — lo que llega no es la aplicación (¿deploy incompleto o página de error del hosting?).` });
+      } else if (!bundleMatch) {
+        findings.push({ severity: 'WARN', tipo: 'HECHO', titulo: 'Bundle JS no referenciado', detalle: `El HTML de ${SITIO_URL} tiene <div id="root"> pero no se encontró la etiqueta <script src="/assets/*.js">. No se pudo verificar que el código de la app esté publicado.` });
+      } else {
+        const bundleUrl = new URL(bundleMatch[1], SITIO_URL).toString();
+        const bundleRes = await fetch(bundleUrl, { method: 'GET' });
+        if (!bundleRes.ok) {
+          findings.push({ severity: 'ERROR', tipo: 'HECHO', titulo: 'Causa OS sirve una pantalla en blanco', detalle: `El index.html carga bien pero su bundle ${bundleMatch[1]} devuelve HTTP ${bundleRes.status}. Para el usuario esto es una pantalla en blanco.` });
+        } else {
+          const bytes = (await bundleRes.arrayBuffer()).byteLength;
+          info.push(`✅ Causa OS en línea: ${SITIO_URL} responde 200 con la app cargada (bundle ${bundleMatch[1]}, ${(bytes / 1024).toFixed(0)} KB).`);
+        }
+      }
+    }
+  } catch (e) {
+    findings.push({ severity: 'ERROR', tipo: 'HECHO', titulo: 'Causa OS inalcanzable', detalle: `No se pudo conectar a ${SITIO_URL}: ${e.message}` });
+  }
+
+  // --- 4b. Cruce de tareas entre sedes (HECHO — datos reales de Firestore) ---
+  // Detecta la fuga que José reportó el 16-17/09/2026 y que se corrigió en
+  // GerenteDashboard/SuperAdminPanel/UserProfileModal: una tarea marcada para
+  // una sede pero asignada nominalmente a alguien de OTRA sede. Acá no se
+  // evalúa el filtro de la interfaz (eso es código), se revisa el DATO: si el
+  // dato está cruzado, la interfaz lo va a mostrar cruzado.
+  const tasks = await fetchCollection('tasks');
+  if (tasks && users) {
+    const sedePorEmail = new Map();
+    users.forEach(u => {
+      [u.email, u.corporateEmail, ...(Array.isArray(u.emails) ? u.emails : [])]
+        .filter(Boolean)
+        .forEach(e => { if (u.sede) sedePorEmail.set(emailKey(e), u.sede); });
+    });
+
+    const cruzadas = [];
+    tasks.forEach(t => {
+      const tSede = t.assignedSede || t.sede;
+      if (!tSede || esSedeGlobal(tSede)) return; // "Global" es visible para todos a propósito
+      const destinatarios = [
+        ...(Array.isArray(t.assignedToEmails) ? t.assignedToEmails : []),
+        ...(t.assignedToEmail ? [t.assignedToEmail] : [])
+      ].filter(Boolean);
+      destinatarios.forEach(e => {
+        const sedePersona = sedePorEmail.get(emailKey(e));
+        if (!sedePersona || esSedeGlobal(sedePersona)) return; // sin dato o global → no es cruce comprobable
+        if (normalizeSede(sedePersona) !== normalizeSede(tSede)) {
+          cruzadas.push(`"${(t.task || t.title || t.id)}" (sede ${normalizeSede(tSede)}) → ${e} (sede ${normalizeSede(sedePersona)})`);
+        }
+      });
+    });
+
+    if (cruzadas.length > 0) {
+      findings.push({ severity: 'WARN', tipo: 'HECHO', titulo: 'Tareas cruzadas entre sedes', detalle: `${cruzadas.length} asignación(es) donde la sede de la tarea no coincide con la sede de la persona asignada: ${cruzadas.slice(0, 8).join(' | ')}${cruzadas.length > 8 ? ` | …y ${cruzadas.length - 8} más` : ''}` });
+    } else {
+      info.push(`✅ Aislamiento de sede: ninguna de las ${tasks.length} tareas está asignada a alguien de otra sede.`);
+    }
+  } else if (!tasks) {
+    findings.push({ severity: 'WARN', tipo: 'HECHO', titulo: 'Tareas no verificables', detalle: 'No se pudo leer la colección "tasks" — no se pudo comprobar el aislamiento de sede en este ciclo.' });
+  }
+
+  // --- 4c. Sede en Firestore vs. Directorio Global (HECHO / o falla honesta) --
+  // El "desastre" que José encontró el 17/09/2026: la hoja dice una sede y
+  // Firestore tiene otra (Daniela Esposito: UIO en la hoja, "global" en la
+  // base). Esto lo detecta automáticamente y de forma reversible: solo
+  // REPORTA, nunca escribe en Firestore.
+  if (users) {
+    try {
+      const csvUrl = `https://docs.google.com/spreadsheets/d/${DIRECTORIO_SHEET_ID}/export?format=csv&gid=${DIRECTORIO_SHEET_GID}`;
+      const res = await fetch(csvUrl, { redirect: 'follow' });
+      const text = res.ok ? await res.text() : '';
+      const pareceCsv = res.ok && !text.trimStart().toLowerCase().startsWith('<!doctype') && !text.trimStart().toLowerCase().startsWith('<html');
+
+      if (!pareceCsv) {
+        findings.push({ severity: 'WARN', tipo: 'HECHO', titulo: 'Directorio Global no legible', detalle: `No se pudo leer la hoja DIRECTORIO GLOBAL como CSV (HTTP ${res.status}${res.ok ? ', pero la respuesta es una página de login/HTML, no datos' : ''}). Probablemente la hoja no permite lectura anónima. Para activar este chequeo: compartirla como "cualquiera con el enlace puede ver". NO se comparó ninguna sede en este ciclo — esto no es un OK.` });
+      } else {
+        const rows = parseCsv(text);
+        const header = (rows[0] || []).map(h => (h || '').toLowerCase().trim());
+        const idxEmail = header.findIndex(h => h.includes('email') || h.includes('correo'));
+        const idxSede = header.findIndex(h => h === 'sede' || h.includes('sede'));
+        const idxNombre = header.findIndex(h => h.includes('nombre'));
+
+        if (idxEmail === -1 || idxSede === -1) {
+          findings.push({ severity: 'WARN', tipo: 'HECHO', titulo: 'Directorio Global con formato inesperado', detalle: `La hoja se leyó (${rows.length} filas) pero no se encontraron las columnas de email y/o sede en el encabezado: [${header.join(', ')}]. No se comparó nada — revisar si cambiaron los títulos de las columnas.` });
+        } else {
+          const sedeHoja = new Map();
+          rows.slice(1).forEach(r => {
+            const e = emailKey(r[idxEmail]);
+            const s = (r[idxSede] || '').trim();
+            if (e && s) sedeHoja.set(e, { sede: s, nombre: (r[idxNombre] || '').trim() });
+          });
+
+          const discrepancias = [];
+          const sinCuenta = [];
+          sedeHoja.forEach((fila, e) => {
+            const u = users.find(x => [x.email, x.corporateEmail, ...(Array.isArray(x.emails) ? x.emails : [])]
+              .filter(Boolean).some(ue => emailKey(ue) === e));
+            if (!u) { sinCuenta.push(`${fila.nombre || e} (${e})`); return; }
+            if (!u.sede) { discrepancias.push(`${fila.nombre || e}: hoja dice "${fila.sede}", Firestore no tiene sede`); return; }
+            if (normalizeSede(u.sede) !== normalizeSede(fila.sede)) {
+              discrepancias.push(`${fila.nombre || e}: hoja dice "${fila.sede}" (${normalizeSede(fila.sede)}), Firestore dice "${u.sede}" (${normalizeSede(u.sede)})`);
+            }
+          });
+
+          if (discrepancias.length > 0) {
+            findings.push({ severity: 'WARN', tipo: 'HECHO', titulo: 'Sede distinta a la del Directorio Global', detalle: `${discrepancias.length} persona(s) con la sede desalineada respecto de la hoja oficial: ${discrepancias.slice(0, 10).join(' | ')}${discrepancias.length > 10 ? ` | …y ${discrepancias.length - 10} más` : ''}` });
+          } else {
+            info.push(`✅ Sedes: las ${sedeHoja.size} personas del Directorio Global con cuenta en Causa OS tienen la misma sede en ambos lados.`);
+          }
+          if (sinCuenta.length > 0) {
+            findings.push({ severity: 'WARN', tipo: 'HECHO', titulo: 'Personas del Directorio sin cuenta en Causa OS', detalle: `${sinCuenta.length} persona(s) están en la hoja pero no tienen documento en "users" (nunca ingresaron o nunca se sincronizaron): ${sinCuenta.slice(0, 10).join(', ')}${sinCuenta.length > 10 ? '…' : ''}` });
+          }
+        }
+      }
+    } catch (e) {
+      findings.push({ severity: 'WARN', tipo: 'HECHO', titulo: 'Directorio Global no verificado', detalle: `Error al intentar leer la hoja: ${e.message}. No se comparó ninguna sede en este ciclo.` });
+    }
+  }
+
+  // --- 4d. Misma persona en varios documentos con datos que NO coinciden -----
+  // El patrón real de esta base: casi todos tienen 2 documentos (uno de
+  // bootstrapSync con id tipo "nombre_apellido" y otro creado al ingresar, con
+  // id = UID de Firebase). Tener 2 documentos por sí solo no es un problema y
+  // por eso NO se reporta. Lo que sí rompe cosas es que esos documentos se
+  // contradigan en sede o rol: según cuál lea cada pantalla, la persona ve una
+  // cosa u otra.
+  if (users) {
+    const porPersona = new Map();
+    users.forEach(u => {
+      const claves = [u.corporateEmail, u.email, ...(Array.isArray(u.emails) ? u.emails : [])]
+        .filter(Boolean).map(emailKey);
+      const clave = claves.sort()[0];
+      if (!clave) return;
+      if (!porPersona.has(clave)) porPersona.set(clave, []);
+      porPersona.get(clave).push(u);
+    });
+
+    const contradicciones = [];
+    porPersona.forEach((docs, clave) => {
+      if (docs.length < 2) return;
+      const sedes = [...new Set(docs.filter(d => d.sede).map(d => normalizeSede(d.sede)))];
+      const roles = [...new Set(docs.map(d => normalizeRoleCompare(d.appRole || d.role)).filter(Boolean))];
+      if (sedes.length > 1) contradicciones.push(`${clave}: sedes distintas entre sus documentos → ${sedes.join(' vs ')} (ids: ${docs.map(d => d.id).join(', ')})`);
+      else if (roles.length > 1) contradicciones.push(`${clave}: roles distintos entre sus documentos → ${roles.join(' vs ')} (ids: ${docs.map(d => d.id).join(', ')})`);
+    });
+
+    if (contradicciones.length > 0) {
+      findings.push({ severity: 'WARN', tipo: 'HECHO', titulo: 'Documentos de la misma persona que se contradicen', detalle: `${contradicciones.length} caso(s) donde la misma persona tiene varios documentos en "users" con sede o rol distintos entre sí: ${contradicciones.slice(0, 8).join(' | ')}${contradicciones.length > 8 ? ` | …y ${contradicciones.length - 8} más` : ''}` });
+    } else {
+      info.push('✅ Consistencia: cuando una persona tiene varios documentos en "users", todos coinciden en sede y rol.');
     }
   }
 
