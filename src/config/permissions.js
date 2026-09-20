@@ -408,6 +408,37 @@ export const canViewAllNotasSeguimiento = (currentUser) => {
 };
 
 /**
+ * Emails autorizados al "Asignador Oficial de Entrenadores & Cronograma Maestro"
+ * (/asignador-entrenadores): decidir QUÉ entrenador va a CADA entrenamiento de
+ * cada sede, y en Maestría del Juego a cada uno de los 3 FDS (Creación,
+ * Relación y Gratitud) por separado.
+ *
+ * REGLA ESTRICTA (pedido explícito de José, 20/09/2026): "esta opción solo esté
+ * disponible para Fer, Paul y yo". Mismo patrón cerrado que
+ * CRM_MAESTRO_ACCESS_EMAILS: lista fija de correos, SIN excepción automática
+ * para otros SuperAdmin, Dirección ni Gerencia — quien no esté en esta lista no
+ * ve la opción ni puede entrar escribiendo la URL.
+ *
+ * NOTA: esto controla el acceso en la interfaz. A nivel de base de datos, la
+ * colección "asignaciones_entrenadores" necesita su propia regla en
+ * firestore.rules; ese archivo NO se toca sin autorización explícita de José,
+ * así que queda señalado aquí para hacerlo en un paso aparte y confirmado.
+ */
+export const ASIGNADOR_ENTRENADORES_EMAILS = [
+  'jose.sanchez@crearpsl.net',   // José Sánchez
+  'fer.aragon@crearpsl.net',     // Fer Aragon (CEO)
+  'fer.aragon@crearpsl.com',     // Fer Aragon (alterno)
+  'paul.sosa@crearpsl.net',      // Paul Sosa (CCO)
+];
+
+export const canUseAsignadorEntrenadores = (currentUser) => {
+  if (!currentUser) return false;
+  const email = (currentUser.email || '').trim().toLowerCase();
+  if (!email) return false;
+  return ASIGNADOR_ENTRENADORES_EMAILS.includes(email);
+};
+
+/**
  * ¿Puede el usuario actual RESPONDER a una nota de seguimiento? Pedido explícito
  * de José: "los CMJ pueden responder a estas notas (opcional)" — solo CMJ, no
  * toda la gerencia. Debe coincidir con callerRole() en firestore.rules.

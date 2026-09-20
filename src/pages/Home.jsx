@@ -29,7 +29,8 @@ import {
   canAssignTrainer, canViewAllManagers, isDireccionRole, isGlobalQTCoordinator,
   canAccessAgendaTimeBoxing, canAccessFlyersC1, canAccessCalendarioMJ,
   canAccessMonitorVuelos, canAccessMonitorIMOs, canAccessHotelesSede, canAccessManualQT,
-  canAccessDirectorioQT, canAccessManualNodus, canAccessCampusInteractivo
+  canAccessDirectorioQT, canAccessManualNodus, canAccessCampusInteractivo,
+  canUseAsignadorEntrenadores
 } from '../config/permissions';
 import EffectiveCommunicationButton from '../components/EffectiveCommunicationButton';
 import { getAllCompanyUsers } from '../services/userService';
@@ -1990,6 +1991,14 @@ export default function Home() {
           {canAccessMonitorIMOs(currentUser) && (
             <button onClick={() => navigate('/monitor-imos')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #a855f7, #7e22ce)', color: 'white', fontWeight: 'bold', border: 'none' }}>
               🦅 Monitor de IMOs
+            </button>
+          )}
+
+          {/* (20/09/2026) Asignador Oficial de Entrenadores — solo Fer, Paul y José
+              (canUseAsignadorEntrenadores, lista cerrada de correos). */}
+          {canUseAsignadorEntrenadores(currentUser) && (
+            <button onClick={() => navigate('/asignador-entrenadores')} className="btn-primary" title="Asignar qué entrenador va a cada entrenamiento y a cada FDS de Maestría" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #6366f1, #4338ca)', color: 'white', fontWeight: 'bold', border: 'none' }}>
+              🎯 Asignador de Entrenadores
             </button>
           )}
         </div>

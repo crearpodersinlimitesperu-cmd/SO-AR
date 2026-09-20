@@ -38,6 +38,7 @@ import DashboardKpisLima from './pages/DashboardKpisLima'
 import CRMBaseMaster from './pages/CRMBaseMaster'
 import MonitorImos from './pages/MonitorImos'
 import MatrizEnrolamientoSentados from './pages/MatrizEnrolamientoSentados'
+import AsignadorEntrenadores from './pages/AsignadorEntrenadores'
 import AICopilot from './components/AICopilot'
 import PromptModal from './components/PromptModal'
 import BirthdayAlert from './components/BirthdayAlert'
@@ -436,6 +437,17 @@ function App() {
             </PrivateRoute>
           } />
           <Route path="/reporte-equipos-sentados" element={<Navigate to="/matriz-enrolamiento-sentados" replace />} />
+
+          {/* (20/09/2026) Asignador Oficial de Entrenadores. El control de acceso
+              real (solo Fer, Paul y José) vive dentro del componente vía
+              canUseAsignadorEntrenadores(); PrivateRoute solo exige sesión. */}
+          <Route path="/asignador-entrenadores" element={
+            <PrivateRoute>
+              <AsignadorEntrenadores />
+            </PrivateRoute>
+          } />
+          <Route path="/asignador" element={<Navigate to="/asignador-entrenadores" replace />} />
+          <Route path="/cronograma-maestro" element={<Navigate to="/asignador-entrenadores" replace />} />
 
           <Route path="/kpis-lima" element={
             <PrivateRoute>
