@@ -1,0 +1,602 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_PE">
+<meta property="og:site_name" content="Crear Poder Sin Límites">
+<meta property="og:title" content="Crear Poder Sin Límites — Lima">
+<meta property="og:description" content="Entrenamientos de liderazgo y transformación cuántica en Lima. Capítulo Uno, Capítulo Dos, Maestría del Juego y Proceso Completo. Reserva por WhatsApp.">
+<meta property="og:url" content="https://crearpsl.net/lima.html">
+<meta name="twitter:card" content="summary_large_image">
+<title>Crear Poder Sin Límites</title>
+<meta name="description" content="Entrenamientos de liderazgo y transformación cuántica en Lima — Capítulo Uno, Capítulo Dos, Maestría del Juego y Proceso Completo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Manrope:wght@400;500;600;700&display=swap">
+<style>
+  :root{
+    --bg:#070a12;
+    --bg-2:#0b0f1a;
+    --surface:#121826;
+    --surface-2:#18203010;
+    --line:rgba(255,255,255,.09);
+    --line-strong:rgba(255,255,255,.17);
+    --ink:#eef2f9;
+    --muted:#98a2b6;
+    --faint:#6a7488;
+    --gold:#e6bb52;
+    --gold-deep:#c99b2e;
+    --cyan:#3bbced;
+    --cyan-soft:rgba(59,188,237,.12);
+    --good:#3ecf8e;
+    --display:"Archivo",system-ui,sans-serif;
+    --body:"Manrope",system-ui,sans-serif;
+    --wrap:1080px;
+    color-scheme:dark;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:var(--body);font-size:16px;line-height:1.65;
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;
+  }
+  .wrap{width:100%;max-width:var(--wrap);margin-inline:auto;padding-inline:20px}
+  section{padding-block:clamp(56px,9vw,104px)}
+  h1,h2,h3{font-family:var(--display);font-weight:900;line-height:1.03;margin:0;text-wrap:balance;letter-spacing:-.01em}
+  p{margin:0}
+  a{color:inherit}
+  .eyebrow{font-family:var(--display);font-weight:700;font-size:.74rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold)}
+  .lead{font-size:clamp(1.05rem,2.2vw,1.24rem);color:var(--muted);line-height:1.7}
+  .tnum{font-variant-numeric:tabular-nums}
+  b.ink,.ink{color:var(--ink)}
+
+  /* galaxy mark */
+  .galaxy{width:34px;height:34px;flex:0 0 auto}
+  .galaxy .orbit{fill:none;stroke:var(--gold);stroke-width:2}
+  .galaxy .core{fill:var(--gold)}
+  .galaxy .star{fill:#fff}
+
+  /* header */
+  header{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;
+    background:rgba(7,10,18,.8);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+  .bar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding-block:11px}
+  .brand{display:flex;align-items:center;gap:11px;font-family:var(--display);font-weight:800;font-size:1rem;letter-spacing:.04em}
+  .brand small{display:block;font-family:var(--body);font-weight:500;font-size:.64rem;letter-spacing:.16em;color:var(--faint);text-transform:uppercase;margin-top:1px;letter-spacing:.14em}
+
+  .wa{display:inline-flex;align-items:center;gap:9px;font-family:var(--display);font-weight:700;font-size:.9rem;
+    text-decoration:none;padding:11px 18px;border-radius:999px;white-space:nowrap;
+    background:linear-gradient(150deg,var(--gold),var(--gold-deep));color:#1a1204;
+    box-shadow:0 6px 22px rgba(230,187,82,.30);transition:transform .15s ease,box-shadow .15s ease}
+  .wa:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(230,187,82,.42)}
+  .wa svg{width:17px;height:17px;flex:0 0 auto}
+  .wa.sm{padding:9px 15px;font-size:.82rem}
+  .wa.ghost{background:transparent;color:var(--ink);border:1px solid var(--line-strong);box-shadow:none}
+  .wa.ghost:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-2px);box-shadow:none}
+  .wa.big{padding:16px 30px;font-size:1.05rem}
+
+  /* hero */
+  .hero{position:relative;overflow:hidden;isolation:isolate}
+  #field{position:absolute;inset:0;z-index:-2;width:100%;height:100%;opacity:.7}
+  .hero::after{content:"";position:absolute;z-index:-1;inset:0;
+    background:
+      radial-gradient(120% 80% at 50% -10%,rgba(230,187,82,.15),transparent 58%),
+      radial-gradient(90% 70% at 85% 15%,rgba(59,188,237,.12),transparent 60%),
+      linear-gradient(180deg,transparent 55%,var(--bg) 100%)}
+  .hero .wrap{padding-block:clamp(70px,12vw,128px)}
+  .hero h1{font-size:clamp(2.5rem,7.2vw,4.9rem);max-width:15ch}
+  .hero h1 .hl{color:var(--gold);white-space:nowrap}
+  .hero .lead{max-width:53ch;margin-top:26px}
+  .cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-top:36px}
+  .trust{display:flex;flex-wrap:wrap;gap:10px 26px;margin-top:40px;color:var(--faint);font-size:.86rem;font-weight:500}
+  .trust b{color:var(--muted);font-weight:600}
+  .trust span{display:inline-flex;align-items:center;gap:8px}
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--gold);flex:0 0 auto;box-shadow:0 0 10px var(--gold)}
+
+  /* premise */
+  .premise{background:linear-gradient(180deg,var(--bg),var(--bg-2))}
+  .manifesto{font-family:var(--display);font-weight:800;font-size:clamp(1.5rem,3.8vw,2.5rem);line-height:1.2;letter-spacing:-.015em;max-width:19ch}
+  .manifesto .q{color:var(--faint)}
+  .manifesto .arrow{color:var(--gold)}
+  .premise .lead{max-width:58ch;margin-top:24px}
+  .mission{margin-top:30px;font-family:var(--display);font-weight:700;color:var(--ink);font-size:clamp(1.1rem,2.4vw,1.35rem);line-height:1.4;max-width:34ch;padding-left:18px;border-left:3px solid var(--gold)}
+
+  /* quantum */
+  .quantum{background:var(--bg-2)}
+  .qgrid{display:grid;grid-template-columns:1fr;gap:clamp(28px,5vw,48px)}
+  @media(min-width:820px){.qgrid{grid-template-columns:1.05fr .95fr;align-items:center}}
+  .qbody p+p{margin-top:16px}
+  .qbody .lead{color:var(--muted)}
+  .pull{position:relative;background:linear-gradient(160deg,var(--surface),var(--bg));border:1px solid var(--line);
+    border-radius:22px;padding:clamp(28px,4vw,40px);overflow:hidden}
+  .pull::before{content:"";position:absolute;inset:0;background:radial-gradient(90% 70% at 100% 0,rgba(230,187,82,.12),transparent 60%)}
+  .pull .q{font-family:var(--display);font-weight:900;font-size:clamp(1.5rem,3.4vw,2.15rem);line-height:1.2;letter-spacing:-.01em;position:relative}
+  .pull .q .gold{color:var(--gold)}
+  .pull .cap{position:relative;margin-top:18px;color:var(--faint);font-size:.82rem;letter-spacing:.14em;text-transform:uppercase;font-family:var(--display);font-weight:700}
+
+  /* section heading */
+  .sh{margin-bottom:clamp(34px,5vw,54px)}
+  .sh h2{font-size:clamp(1.9rem,5vw,3rem);margin-top:12px}
+  .sh p{color:var(--muted);margin-top:16px;max-width:56ch;font-size:1.05rem}
+
+  /* journey */
+  .journey{display:flex;flex-direction:column;gap:18px}
+  .stage{position:relative;display:grid;grid-template-columns:auto 1fr;gap:22px;
+    background:linear-gradient(160deg,var(--surface),var(--bg-2));border:1px solid var(--line);
+    border-radius:20px;padding:clamp(22px,3.4vw,32px);overflow:hidden}
+  .stage::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(var(--gold),transparent)}
+  .stage .idx{font-family:var(--display);font-weight:900;font-size:clamp(2.2rem,6vw,3.4rem);line-height:.8;
+    color:transparent;-webkit-text-stroke:1.4px var(--gold-deep)}
+  .stage h3{font-size:clamp(1.35rem,3.4vw,1.9rem)}
+  .stage h3 sup{font-size:.5em;color:var(--gold);font-weight:700;top:-.9em}
+  .stage .code{font-family:var(--display);font-weight:700;font-size:.72rem;letter-spacing:.2em;color:var(--cyan);text-transform:uppercase}
+  .stage .meta{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;margin-top:6px;margin-bottom:14px}
+  .stage .price{margin-left:auto;text-align:right;font-family:var(--display)}
+  .stage .price .s{font-weight:900;font-size:1.35rem;color:var(--gold)}
+  .stage .price .u{display:block;font-weight:600;font-size:.78rem;color:var(--faint)}
+  .stage p{color:var(--muted);line-height:1.7;max-width:62ch}
+  .stage .kw{color:var(--ink);font-weight:600}
+  .stage .qs{margin-top:12px;display:flex;flex-wrap:wrap;gap:8px}
+  .stage .qs span{font-size:.82rem;color:var(--cyan);border:1px solid rgba(59,188,237,.28);background:var(--cyan-soft);
+    padding:5px 11px;border-radius:999px;font-weight:600}
+
+  /* pricing */
+  .pricing{background:linear-gradient(180deg,var(--bg-2),var(--bg))}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;align-items:stretch}
+  .card{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:26px 24px 24px;position:relative}
+  .card .t{font-family:var(--display);font-weight:800;font-size:1.12rem;letter-spacing:-.01em}
+  .card .t sup{font-size:.5em;color:var(--gold);top:-.9em}
+  .card .sub{color:var(--faint);font-size:.82rem;margin-top:4px;min-height:2.4em}
+  .card .amt{margin-top:18px;display:flex;align-items:baseline;gap:4px}
+  .card .cur{font-family:var(--display);font-weight:700;color:var(--muted);font-size:1rem}
+  .card .big{font-family:var(--display);font-weight:900;font-size:2.5rem;letter-spacing:-.02em;line-height:1}
+  .card .usd{color:var(--faint);font-size:.86rem;margin-top:6px;font-weight:500}
+  .card ul{list-style:none;margin:20px 0 0;padding:0;display:flex;flex-direction:column;gap:9px}
+  .card li{display:flex;gap:10px;font-size:.9rem;color:var(--muted);line-height:1.5}
+  .card li svg{width:16px;height:16px;flex:0 0 auto;margin-top:3px;color:var(--gold)}
+  .card .spacer{flex:1}
+  .card .go{margin-top:22px;display:inline-flex;justify-content:center;align-items:center;gap:8px;text-decoration:none;
+    font-family:var(--display);font-weight:700;font-size:.92rem;padding:13px;border-radius:12px;border:1px solid var(--line-strong);color:var(--ink);transition:.15s}
+  .card .go:hover{border-color:var(--gold);color:var(--gold)}
+  .card.feat{background:linear-gradient(165deg,#1c2334,#121826);border-color:var(--gold);box-shadow:0 22px 60px -24px rgba(230,187,82,.5)}
+  .card.feat .big{color:var(--gold)}
+  .card.feat .go{background:linear-gradient(150deg,var(--gold),var(--gold-deep));color:#1a1204;border:none;box-shadow:0 8px 24px rgba(230,187,82,.3)}
+  .card.feat .go:hover{transform:translateY(-2px);color:#1a1204}
+  .tag{position:absolute;top:-11px;left:24px;font-family:var(--display);font-weight:800;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;
+    background:linear-gradient(150deg,var(--gold),var(--gold-deep));color:#1a1204;padding:5px 12px;border-radius:999px}
+  .anchor{margin-top:16px;padding:12px 14px;border-radius:12px;background:var(--cyan-soft);border:1px solid rgba(59,188,237,.22);font-size:.82rem;color:var(--muted);line-height:1.55}
+  .anchor b{color:var(--ink);font-weight:700}
+  .anchor .save{color:var(--good);font-weight:700}
+  .pnote{margin-top:22px;color:var(--faint);font-size:.84rem;text-align:center;max-width:64ch;margin-inline:auto;line-height:1.65}
+  .pnote b{color:var(--muted)}
+
+  /* values band */
+  .values{text-align:center;background:linear-gradient(180deg,var(--bg),var(--bg-2))}
+  .values .row{display:flex;flex-wrap:wrap;justify-content:center;gap:14px 40px;font-family:var(--display);font-weight:800;
+    font-size:clamp(1.05rem,3vw,1.6rem);letter-spacing:.16em;text-transform:uppercase;margin-top:18px}
+  .values .row span{color:var(--ink)}
+  .values .row i{color:var(--gold);font-style:normal}
+
+  /* commitment */
+  .vow-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:8px}
+  .vow-item{border:1px solid var(--line);border-radius:18px;padding:24px;background:var(--surface)}
+  .vow-item .n{font-family:var(--display);font-weight:900;color:var(--gold);font-size:1.02rem;letter-spacing:.01em}
+  .vow-item p{color:var(--muted);margin-top:10px;font-size:.94rem;line-height:1.6}
+
+  /* cta band */
+  .band{position:relative;overflow:hidden;isolation:isolate;text-align:center;background:linear-gradient(150deg,#161d2e,#0b0f1a);border-block:1px solid var(--line)}
+  .band::after{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(80% 120% at 50% 0%,rgba(230,187,82,.16),transparent 60%)}
+  .band h2{font-size:clamp(2rem,5.4vw,3.1rem);max-width:18ch;margin-inline:auto}
+  .band p{color:var(--muted);margin-top:18px;max-width:48ch;margin-inline:auto;font-size:1.05rem}
+  .band .cta-row{justify-content:center}
+  .band .also{margin-top:26px;color:var(--faint);font-size:.9rem}
+  .band .also a{color:var(--gold);text-decoration:none;font-weight:600}
+  .coords{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;margin-top:34px;max-width:720px;margin-inline:auto}
+  .coord{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:26px 22px;display:flex;flex-direction:column;align-items:center;gap:4px}
+  .cavatar{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;margin-bottom:8px;
+    font-family:var(--display);font-weight:900;font-size:1.5rem;color:#1a1204;background:linear-gradient(150deg,var(--gold),var(--gold-deep));box-shadow:0 6px 20px rgba(230,187,82,.32)}
+  .cname{font-family:var(--display);font-weight:800;font-size:1.2rem;color:var(--ink)}
+  .crole{color:var(--faint);font-size:.82rem;margin-bottom:16px}
+  .coord .wa{width:100%;justify-content:center}
+
+  /* faq */
+  .faq details{border:1px solid var(--line);border-radius:14px;padding:4px 20px;background:var(--surface);margin-bottom:12px}
+  .faq details[open]{border-color:var(--line-strong)}
+  .faq summary{font-family:var(--display);font-weight:700;font-size:1.02rem;cursor:pointer;padding:16px 0;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:14px}
+  .faq summary::-webkit-details-marker{display:none}
+  .faq summary::after{content:"+";font-family:var(--display);font-weight:700;color:var(--gold);font-size:1.5rem;line-height:1;transition:transform .2s}
+  .faq details[open] summary::after{transform:rotate(45deg)}
+  .faq .a{color:var(--muted);padding:0 0 18px;line-height:1.7;max-width:66ch}
+
+  /* footer */
+  footer{border-top:1px solid var(--line);background:var(--bg-2)}
+  footer .wrap{padding-block:44px;display:flex;flex-wrap:wrap;gap:28px;justify-content:space-between;align-items:flex-start}
+  .fbrand{display:flex;align-items:center;gap:12px;font-family:var(--display);font-weight:800;font-size:1.05rem}
+  .ftag{color:var(--gold);margin-top:8px;font-size:.92rem;font-weight:700;font-family:var(--display);letter-spacing:.04em}
+  .fcontact{display:flex;flex-direction:column;gap:9px;font-size:.9rem}
+  .fcontact a{display:inline-flex;align-items:center;gap:10px;color:var(--muted);text-decoration:none}
+  .fcontact a:hover{color:var(--gold)}
+  .fcontact svg{width:16px;height:16px;flex:0 0 auto;color:var(--gold)}
+  footer small{color:var(--faint);font-size:.76rem;line-height:1.7;display:block;max-width:56ch;margin-top:22px}
+  footer .foot-legal{width:100%;border-top:1px solid var(--line);padding-top:20px}
+
+  @media (max-width:560px){
+    .stage{grid-template-columns:1fr;gap:14px}
+    .stage .idx{font-size:2.6rem}
+    .stage .price{margin-left:0;text-align:left}
+    .bar .brand small{display:none}
+  }
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <div class="brand">
+      <svg class="galaxy" viewBox="0 0 40 40" aria-hidden="true">
+        <ellipse class="orbit" cx="20" cy="21" rx="16" ry="6.4" transform="rotate(-24 20 21)"/>
+        <circle class="core" cx="20" cy="21" r="5.4"/>
+        <path class="star" d="M31 8l1.1 2.6L35 11.7l-2.6 1.1L31 15.4l-1.1-2.6L27 11.7l2.9-1.1z"/>
+      </svg>
+      <span>CREAR<br><small>Poder Sin Límites · Lima</small></span>
+    </div>
+    <a class="wa sm" href="#contacto">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.2-1.7-.9-2-1-.3-.1-.5-.1-.6.2-.2.3-.7 1-.9 1.1-.2.2-.3.2-.6.1-.3-.2-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6l.5-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5 0-.2-.6-1.5-.9-2-.2-.5-.5-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.1 5 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.7-.7 1.9-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3zM12 2a10 10 0 0 0-8.6 15l-1.3 4.8 4.9-1.3A10 10 0 1 0 12 2z"/></svg>
+      Escríbenos
+    </a>
+  </div>
+</header>
+
+<section class="hero">
+  <canvas id="field"></canvas>
+  <div class="wrap">
+    <p class="eyebrow">Lima · Perú · Entrenamiento de alto rendimiento</p>
+    <h1>No venimos a motivarte. Venimos a que <span class="hl">rediseñes tu vida.</span></h1>
+    <p class="lead">Crear Poder Sin Límites es un centro de entrenamiento de liderazgo y <b class="ink">transformación cuántica</b>. Aquí sales del modo automático, tomas consciencia de los límites que heredaste y descubres que tienes muchas más posibilidades de elegir de las que creías.</p>
+    <div class="cta-row">
+      <a class="wa big" href="#contacto">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.2-1.7-.9-2-1-.3-.1-.5-.1-.6.2-.2.3-.7 1-.9 1.1-.2.2-.3.2-.6.1-.3-.2-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6l.5-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5 0-.2-.6-1.5-.9-2-.2-.5-.5-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.1 5 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.7-.7 1.9-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3zM12 2a10 10 0 0 0-8.6 15l-1.3 4.8 4.9-1.3A10 10 0 1 0 12 2z"/></svg>
+        Reservar mi lugar
+      </a>
+      <a class="wa big ghost" href="#inversion">Ver la inversión</a>
+    </div>
+    <div class="trust">
+      <span><span class="dot"></span>Presencial en <b>Lima</b></span>
+      <span><span class="dot"></span>3 capítulos: <b>C1 · C2 · Maestría del Juego</b></span>
+      <span><span class="dot"></span>Cupos <b>personales</b> por salón</span>
+    </div>
+  </div>
+</section>
+
+<section class="premise">
+  <div class="wrap">
+    <p class="eyebrow">La diferencia</p>
+    <p class="manifesto"><span class="q">Del</span> modo automático <span class="arrow">→</span> a una vida extraordinaria.</p>
+    <p class="lead">La mayoría vive en piloto automático: reacciona, sobrevive, repite. Aquí no operamos con charlas ni frases para el momento. Operamos en el alto rendimiento: ponemos a la vista los paradigmas que te frenan y te devolvemos el timón de tus resultados.</p>
+    <p class="mission">Nuestra misión: impactar a la máxima cantidad de seres humanos para que vivan una vida extraordinaria.</p>
+  </div>
+</section>
+
+<section class="quantum" id="cuantica">
+  <div class="wrap qgrid">
+    <div class="qbody">
+      <p class="eyebrow">El modelo</p>
+      <h2 style="font-size:clamp(1.8rem,4.6vw,2.7rem);margin:12px 0 20px">¿Qué es la Transformación Cuántica?</h2>
+      <p class="lead">Es un modelo de entrenamiento orientado al alto rendimiento personal: nuevas formas de pensamiento, gestión emocional y hábitos que generan cambios sostenibles en tu vida diaria.</p>
+      <p class="lead">Más que “transformarte”, te compartimos las habilidades y competencias para que <b class="ink">tú</b> transformes tu realidad y crees un futuro distinto, a tu manera. Su objetivo central: crear consciencia de los límites que heredaste, y darte cuenta de que tus posibilidades de elegir son muchas más de las que normalmente ves.</p>
+    </div>
+    <figure class="pull" style="margin:0">
+      <p class="q">“La única <span class="gold">garantía</span> y el único <span class="gold">límite</span> los elige cada participante.”</p>
+      <p class="cap">— El principio del salón</p>
+    </figure>
+  </div>
+</section>
+
+<section id="camino">
+  <div class="wrap">
+    <div class="sh">
+      <p class="eyebrow">Estructura del programa · 3 fases</p>
+      <h2>Tres capítulos. Una sola transformación.</h2>
+      <p>No es un evento suelto: es un proceso diseñado para sostenerse. Cada capítulo te prepara para el siguiente, y el último te saca del salón a tu vida real.</p>
+    </div>
+    <div class="journey">
+
+      <article class="stage">
+        <div class="idx">01</div>
+        <div>
+          <span class="code">Capítulo Uno · 3 días</span>
+          <div class="meta">
+            <h3>El descubrimiento<sup>®</sup></h3>
+            <span class="price"><span class="s tnum">S/ 1,515</span><span class="u tnum">$420 · 3 días</span></span>
+          </div>
+          <p>Un espacio de descubrimiento y de <span class="kw">alto impacto</span>. Tres días para <span class="kw">romper paradigmas</span>, observar los mecanismos con los que te proteges y confrontar de frente los límites que te has puesto. Sales viendo lo que antes no veías.</p>
+          <div class="qs"><span>¿Dónde estoy?</span><span>¿Hacia dónde estoy comprometido a ir?</span><span>¿Cómo puedo llegar?</span></div>
+        </div>
+      </article>
+
+      <article class="stage">
+        <div class="idx">02</div>
+        <div>
+          <span class="code">Capítulo Dos · 4 días</span>
+          <div class="meta">
+            <h3>La ejecución<sup>®</sup></h3>
+            <span class="price"><span class="s tnum">S/ 2,595</span><span class="u tnum">C1 + C2 · $720</span></span>
+          </div>
+          <p>El momento de ejecución. Cuatro días donde profundizas lo aprendido en el Capítulo Uno y lo pones en práctica en un espacio controlado: aquí ocurren los <span class="kw">primeros rompimientos de barreras</span> y reafirmas el compromiso con tu vida y contigo mismo.</p>
+        </div>
+      </article>
+
+      <article class="stage">
+        <div class="idx">03</div>
+        <div>
+          <span class="code">Maestría del Juego · 100 días</span>
+          <div class="meta">
+            <h3>La cancha real<sup>®</sup></h3>
+            <span class="price"><span class="s tnum">S/ 3,185</span><span class="u tnum">$885 · 100 días</span></span>
+          </div>
+          <p>Llevar el entrenamiento fuera del salón. Alrededor de <span class="kw">100 días</span> para integrar todo lo aprendido a tu vida cotidiana —con el apoyo de un equipo y el seguimiento de gente entrenada— hasta que no solo lo entiendas, sino que te adueñes de ello: hábitos de alto impacto y un nuevo estilo de vida.</p>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<section class="pricing" id="inversion">
+  <div class="wrap">
+    <div class="sh">
+      <p class="eyebrow">La inversión</p>
+      <h2>Elige por dónde empiezas.</h2>
+      <p>Precios oficiales para Lima, en soles. Puedes entrar por el Capítulo Uno, avanzar por partes, o tomar todo el camino de una vez con el mejor valor.</p>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <div class="t">Capítulo Uno<sup>®</sup></div>
+        <div class="sub">El descubrimiento · 3 días</div>
+        <div class="amt"><span class="cur">S/</span><span class="big tnum">1,515</span></div>
+        <div class="usd tnum">USD $420</div>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>Tu entrada al proceso</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>3 días presenciales en Lima</li>
+        </ul>
+        <div class="spacer"></div>
+        <a class="go" href="#contacto">Quiero empezar aquí</a>
+      </div>
+
+      <div class="card">
+        <div class="t">Capítulo Uno + Dos</div>
+        <div class="sub">Descubrimiento + ejecución · 3 + 4 días</div>
+        <div class="amt"><span class="cur">S/</span><span class="big tnum">2,595</span></div>
+        <div class="usd tnum">USD $720</div>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>Incluye Capítulo Uno y Dos</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>La experiencia inmersiva completa</li>
+        </ul>
+        <div class="spacer"></div>
+        <a class="go" href="#contacto">Quiero los dos</a>
+      </div>
+
+      <div class="card">
+        <div class="t">Maestría del Juego<sup>®</sup></div>
+        <div class="sub">La cancha real · 100 días</div>
+        <div class="amt"><span class="cur">S/</span><span class="big tnum">3,185</span></div>
+        <div class="usd tnum">USD $885</div>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>100 días de juego real</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>Con equipo y seguimiento</li>
+        </ul>
+        <div class="spacer"></div>
+        <a class="go" href="#contacto">Quiero jugar en serio</a>
+      </div>
+
+      <div class="card feat">
+        <span class="tag">El camino completo</span>
+        <div class="t">Proceso Completo</div>
+        <div class="sub">Capítulo Uno · Dos · Maestría del Juego</div>
+        <div class="amt"><span class="cur">S/</span><span class="big tnum">4,250</span></div>
+        <div class="usd tnum">USD $1,180 · en una sola inversión</div>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>Los tres capítulos, todo el proceso</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>El mejor valor del camino</li>
+        </ul>
+        <div class="anchor">
+          Por separado: C1+C2 <b class="tnum">S/ 2,595</b> + Maestría <b class="tnum">S/ 3,185</b> = <b class="tnum">S/ 5,780</b>.<br>
+          Completo hoy: <b class="tnum">S/ 4,250</b> · <span class="save tnum">ahorras S/ 1,530</span>.
+        </div>
+        <div class="spacer"></div>
+        <a class="go" href="#contacto">Quiero todo el camino</a>
+      </div>
+    </div>
+    <p class="pnote">Aceptamos <b>efectivo, transferencia bancaria (BCP), tarjetas (Visa, Mastercard, American Express, Diners) y PayPal.</b> Existen condiciones y opciones de pago para familiares, aliados y enrolamiento — las vemos contigo por WhatsApp.</p>
+  </div>
+</section>
+
+<section class="values">
+  <div class="wrap">
+    <p class="eyebrow">Nuestros valores</p>
+    <div class="row"><span>Compromiso</span><i>·</i><span>Excelencia</span><i>·</i><span>Integridad</span></div>
+  </div>
+</section>
+
+<section class="vow">
+  <div class="wrap">
+    <div class="sh" style="margin-bottom:26px">
+      <p class="eyebrow">Tu palabra</p>
+      <h2>Reservar es el primer acto de responsabilidad.</h2>
+      <p>Aquí no compras un ticket: inicias tu entrenamiento. Por eso el compromiso empieza antes de entrar al salón.</p>
+    </div>
+    <div class="vow-grid">
+      <div class="vow-item">
+        <div class="n">100% responsabilidad</div>
+        <p>El primer principio del salón. Nadie viene a rescatarte: vienes a tomar el timón de tus propios resultados.</p>
+      </div>
+      <div class="vow-item">
+        <div class="n">Tu cupo se bloquea para ti</div>
+        <p>El espacio que reservas queda apartado a tu nombre. Es personal e intransferible — es tu lugar, tu proceso, tu palabra.</p>
+      </div>
+      <div class="vow-item">
+        <div class="n">Nos vemos en la cancha</div>
+        <p>El salón es solo el comienzo. Lo que se entrena aquí se juega afuera: en tu vida real, todos los días.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="contacto">
+  <div class="wrap">
+    <p class="eyebrow">Reserva tu lugar</p>
+    <h2>Escríbele a nuestras coordinadoras de Lima.</h2>
+    <p>Ellas lideran el Capítulo Uno y Dos: te cuentan las próximas fechas, resuelven tus dudas y reservan tu lugar. Elige con quién prefieres hablar.</p>
+    <div class="coords">
+      <div class="coord">
+        <div class="cavatar">J</div>
+        <div class="cname">Joyce Marín</div>
+        <div class="crole">Coordinadora Capítulo Uno y Dos · Lima</div>
+        <a class="wa big wa-joyce" href="#" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.2-1.7-.9-2-1-.3-.1-.5-.1-.6.2-.2.3-.7 1-.9 1.1-.2.2-.3.2-.6.1-.3-.2-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6l.5-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5 0-.2-.6-1.5-.9-2-.2-.5-.5-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.1 5 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.7-.7 1.9-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3zM12 2a10 10 0 0 0-8.6 15l-1.3 4.8 4.9-1.3A10 10 0 1 0 12 2z"/></svg>
+          WhatsApp · +51 933 599 903
+        </a>
+      </div>
+      <div class="coord">
+        <div class="cavatar">D</div>
+        <div class="cname">Dina Moscoso</div>
+        <div class="crole">Coordinadora Capítulo Uno y Dos · Lima</div>
+        <a class="wa big wa-dina" href="#" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.2-1.7-.9-2-1-.3-.1-.5-.1-.6.2-.2.3-.7 1-.9 1.1-.2.2-.3.2-.6.1-.3-.2-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6l.5-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5 0-.2-.6-1.5-.9-2-.2-.5-.5-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.1 5 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.7-.7 1.9-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3zM12 2a10 10 0 0 0-8.6 15l-1.3 4.8 4.9-1.3A10 10 0 1 0 12 2z"/></svg>
+          WhatsApp · +51 912 379 744
+        </a>
+      </div>
+    </div>
+    <p class="also">o síguenos en Instagram <a href="https://instagram.com/crearpslperu" target="_blank" rel="noopener">@crearpslperu</a></p>
+  </div>
+</section>
+
+<section class="faq">
+  <div class="wrap">
+    <div class="sh">
+      <p class="eyebrow">Antes de decidir</p>
+      <h2>Lo que suelen preguntarnos.</h2>
+    </div>
+    <details>
+      <summary>¿Es una charla motivacional?</summary>
+      <div class="a">No. No damos charlas ni frases para el momento. Somos un centro de entrenamiento de liderazgo y transformación cuántica que opera en el alto rendimiento: se trabaja de frente con tus paradigmas, tus límites y tus resultados reales.</div>
+    </details>
+    <details>
+      <summary>¿Cuánto dura cada capítulo?</summary>
+      <div class="a">Capítulo Uno son 3 días. Capítulo Dos son 4 días. Maestría del Juego son alrededor de 100 días de aplicación en tu vida real. Puedes tomarlos por partes o como Proceso Completo.</div>
+    </details>
+    <details>
+      <summary>¿Desde qué edad puedo participar?</summary>
+      <div class="a">El entrenamiento es solo para mayores de 18 años cumplidos.</div>
+    </details>
+    <details>
+      <summary>¿Es una terapia?</summary>
+      <div class="a">No. Aunque se viven momentos de liberación, el entrenamiento no está diseñado para “arreglar o sanar” y no sustituye ninguna terapia ni proceso de salud mental. Si estás en un tratamiento de salud mental, se solicita una carta del profesional responsable. No está recomendado para personas en procesos de adicción.</div>
+    </details>
+    <details>
+      <summary>¿Cómo puedo pagar?</summary>
+      <div class="a">Aceptamos efectivo, transferencia bancaria (BCP), tarjetas (Visa, Mastercard, American Express, Diners) y PayPal. Hay condiciones y estructuras de pago según tu caso — familiar, aliado, enrolamiento. Lo armamos contigo por WhatsApp.</div>
+    </details>
+    <details>
+      <summary>¿Dónde se realiza y cuándo?</summary>
+      <div class="a">De forma presencial en Lima, Perú. Al escribirnos por WhatsApp te confirmamos la sede exacta y las próximas fechas disponibles.</div>
+    </details>
+    <details>
+      <summary>¿La inversión es reembolsable?</summary>
+      <div class="a">No. Una vez realizada, la inversión no es reembolsable y el cupo es personal e intransferible: el espacio se reserva y se bloquea a tu nombre. Reservar es, en sí mismo, el primer acto de compromiso con tu proceso.</div>
+    </details>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <div class="fbrand">
+        <svg class="galaxy" viewBox="0 0 40 40" aria-hidden="true" style="width:30px;height:30px">
+          <ellipse class="orbit" cx="20" cy="21" rx="16" ry="6.4" transform="rotate(-24 20 21)"/>
+          <circle class="core" cx="20" cy="21" r="5.4"/>
+          <path class="star" d="M31 8l1.1 2.6L35 11.7l-2.6 1.1L31 15.4l-1.1-2.6L27 11.7l2.9-1.1z"/>
+        </svg>
+        CREAR · Poder Sin Límites
+      </div>
+      <div class="ftag">Nos vemos en la cancha ⚡ · Leones con leones</div>
+    </div>
+    <div class="fcontact">
+      <a class="wa-joyce" href="#" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.2-1.7-.9-2-1-.3-.1-.5-.1-.6.2-.2.3-.7 1-.9 1.1-.2.2-.3.2-.6.1-.3-.2-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6l.5-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5 0-.2-.6-1.5-.9-2-.2-.5-.5-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.1 5 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.7-.7 1.9-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3zM12 2a10 10 0 0 0-8.6 15l-1.3 4.8 4.9-1.3A10 10 0 1 0 12 2z"/></svg>
+        Joyce Marín · +51 933 599 903
+      </a>
+      <a class="wa-dina" href="#" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.2-1.7-.9-2-1-.3-.1-.5-.1-.6.2-.2.3-.7 1-.9 1.1-.2.2-.3.2-.6.1-.3-.2-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6l.5-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5 0-.2-.6-1.5-.9-2-.2-.5-.5-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.1 5 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.7-.7 1.9-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3zM12 2a10 10 0 0 0-8.6 15l-1.3 4.8 4.9-1.3A10 10 0 1 0 12 2z"/></svg>
+        Dina Moscoso · +51 912 379 744
+      </a>
+      <a href="https://instagram.com/crearpslperu" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+        @crearpslperu
+      </a>
+      <a href="mailto:crearpodersinlimitesperu@gmail.com">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+        crearpodersinlimitesperu@gmail.com
+      </a>
+    </div>
+    <div class="foot-legal">
+      <small>
+        Centro de entrenamiento de liderazgo y transformación cuántica · Lima, Perú · Creación Cuántica E.I.R.L.<br>
+        Precios oficiales Lima 2025 en soles (S/) y dólares (USD): tarifas para público general. Solo para mayores de 18 años. El entrenamiento no sustituye ninguna terapia ni proceso de salud mental.<br>
+        La inversión no es reembolsable. Los cupos son personales e intransferibles. Cualquier caso especial se consulta con la dirección.
+      </small>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Coordinadoras oficiales de Capítulo Uno y Dos · Lima (Directorio Global)
+  var COORDS = {
+    joyce: { tel:"51933599903", nombre:"Joyce" },
+    dina:  { tel:"51912379744", nombre:"Dina" }
+  };
+  function waLink(c){
+    var msg = "Hola "+c.nombre+", vengo de la página de Crear Poder Sin Límites y quiero información sobre los entrenamientos en Lima y reservar mi lugar.";
+    return "https://wa.me/"+c.tel+"?text="+encodeURIComponent(msg);
+  }
+  document.querySelectorAll('.wa-joyce').forEach(function(a){ a.href = waLink(COORDS.joyce); });
+  document.querySelectorAll('.wa-dina').forEach(function(a){ a.href = waLink(COORDS.dina); });
+
+  (function(){
+    var c = document.getElementById('field'); if(!c) return;
+    var ctx = c.getContext('2d');
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+    var dpr = Math.min(window.devicePixelRatio||1, 2);
+    var pts = [], W=0, H=0, raf=0;
+    function size(){
+      var r = c.parentElement.getBoundingClientRect();
+      W = r.width; H = r.height;
+      c.width = W*dpr; c.height = H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
+      var n = Math.max(28, Math.min(66, Math.round(W*H/25000)));
+      pts = [];
+      for(var i=0;i<n;i++){
+        pts.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.28,vy:(Math.random()-.5)*.28,r:Math.random()*1.6+.6,cy:Math.random()<.22});
+      }
+    }
+    function draw(){
+      ctx.clearRect(0,0,W,H);
+      for(var i=0;i<pts.length;i++){var p=pts[i];
+        for(var j=i+1;j<pts.length;j++){var q=pts[j],dx=p.x-q.x,dy=p.y-q.y,d=dx*dx+dy*dy;
+          if(d<12000){ctx.globalAlpha=(1-d/12000)*.16;ctx.strokeStyle=(p.cy||q.cy)?'#3bbced':'#e6bb52';ctx.lineWidth=.6;
+            ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.stroke();}}}
+      for(var k=0;k<pts.length;k++){var pt=pts[k];ctx.globalAlpha=.75;ctx.fillStyle=pt.cy?'#3bbced':'#e6bb52';
+        ctx.beginPath();ctx.arc(pt.x,pt.y,pt.r,0,6.2832);ctx.fill();}
+      ctx.globalAlpha=1;
+    }
+    function step(){for(var i=0;i<pts.length;i++){var p=pts[i];p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;}draw();raf=requestAnimationFrame(step);}
+    function start(){size();if(reduce){draw();}else{cancelAnimationFrame(raf);step();}}
+    var t;window.addEventListener('resize',function(){clearTimeout(t);t=setTimeout(start,180);});
+    start();
+  })();
+</script>
+</body>
+</html>
