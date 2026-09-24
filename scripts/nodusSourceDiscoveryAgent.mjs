@@ -32,10 +32,19 @@ async function inspectRoute(page, route) {
   // NODUS puede hacer una redirección de sesión justo después de DOMContentLoaded.
   // Reintentamos la lectura de metadatos sin enviar formularios ni tocar datos.
   for (let attempt = 1; attempt <= 2; attempt += 1) {
+    let captureResponse;
     try {
+      const networkPaths = new Set();
+      captureResponse = (response) => {
+        try {
+          const parsed = new URL(response.url());
+          if (parsed.origin === 'https://imo.crearpslglobal.com') networkPaths.add(parsed.pathname);
+        } catch (_) {}
+      };
+      page.on('response', captureResponse);
       await page.goto(url, { waitUntil: 'networkidle2', timeout: 45000 });
       await new Promise((resolve) => setTimeout(resolve, 600));
-      return await page.evaluate((expectedRoute) => {
+      const inspected = await page.evaluate((expectedRoute) => {
     const normalizeKey = (value = '') => value.toString().toLowerCase()
       .normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
     const tables = Array.from(document.querySelectorAll('table')).map((table) => ({
@@ -48,16 +57,23 @@ async function inspectRoute(page, route) {
       name: normalizeKey(element.name || element.id || element.getAttribute('aria-label') || element.innerText),
       type: element.getAttribute('type') || ''
     })).filter((control) => control.name || control.type);
+    const labels = Array.from(document.querySelectorAll('h1,h2,h3,h4,h5,h6,[role="heading"],th,[aria-label]'))
+      .map((element) => normalizeKey(element.innerText || element.getAttribute('aria-label') || ''))
+      .filter(Boolean).slice(0, 100);
     return {
       route: expectedRoute,
       resolvedPath: window.location.pathname,
       title: document.title,
       tables,
       controls,
+      labels,
       inspectedAt: new Date().toISOString()
     };
       }, route);
+      page.off('response', captureResponse);
+      return { ...inspected, networkPaths: [...networkPaths].sort() };
     } catch (error) {
+      page.off('response', captureResponse);
       lastError = error;
       if (!/Execution context was destroyed|navigation|detached/i.test(error.message) || attempt === 2) break;
       await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -113,8 +129,8 @@ async function login(page, user, password) {
 }
 
 function locateFIContract(page) {
-  const flattenedHeaders = page.tables.flatMap((table) => table.headers);
-  const has = (...terms) => terms.some((term) => flattenedHeaders.some((header) => header.includes(term)));
+  const fields = [...page.tables.flatMap((table) => table.headers), ...(page.labels || []), ...(page.controls || []).map((control) => control.name)];
+  const has = (...terms) => terms.some((term) => fields.some((field) => field.includes(term)));
   return {
     participantIdentity: has('nombre', 'participante', 'asistente'),
     pfdAttendance: has('asistencia pfd', 'asistio pfd', 'pfd'),
@@ -152,6 +168,8 @@ export async function discoverNodusSources() {
         : 'not_ready',
       tables: futuros.tables,
       controls: futuros.controls,
+      labels: futuros.labels,
+      networkPaths: futuros.networkPaths,
       discoveredAt: futuros.inspectedAt,
       privacy: 'Metadatos de estructura únicamente; sin filas ni PII.'
     };
@@ -159,7 +177,7 @@ export async function discoverNodusSources() {
       ...catalog,
       updatedAt: FieldValue.serverTimestamp()
     }, { merge: true });
-    console.log(`Catálogo FI publicado: ${catalog.extractionReadiness}.`);
+    console.log(`Catálogo FI publicado: ${catalog.extractionReadiness}. rutas detectadas: ${(catalog.networkPaths || []).join(', ') || 'ninguna'}.`);
     return catalog;
   } finally {
     await browser.close();
