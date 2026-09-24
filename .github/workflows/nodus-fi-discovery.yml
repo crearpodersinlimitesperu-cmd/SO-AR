@@ -1,0 +1,26 @@
+name: Descubrir fuente FI de NODUS
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: nodus-fi-discovery
+  cancel-in-progress: false
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm ci
+      - name: Inspeccionar estructura FI sin PII
+        env:
+          NODUS_USER: ${{ secrets.NODUS_USER }}
+          NODUS_PASSWORD: ${{ secrets.NODUS_PASSWORD }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: node scripts/nodusSourceDiscoveryAgent.mjs
