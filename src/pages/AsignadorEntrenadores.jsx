@@ -183,6 +183,10 @@ export default function AsignadorEntrenadores() {
   const [policyExpiryDrafts, setPolicyExpiryDrafts] = useState({});
   const [policySaving, setPolicySaving] = useState('');
 
+  // Calendario
+  const [calMes, setCalMes] = useState(() => { const h = new Date(); return new Date(h.getFullYear(), h.getMonth(), 1); });
+  const [calTooltip, setCalTooltip] = useState(null);
+
   // Filtros
   const [periodo, setPeriodo] = useState('proximos');
   const [filtroSede, setFiltroSede] = useState('todas');
@@ -358,11 +362,23 @@ export default function AsignadorEntrenadores() {
       if (['caida_confianza', 'tanque', 'caminata_fuego', 'rompimiento'].includes(filtroTipo) && f.complementario !== filtroTipo) return false;
       if (filtroEntrenador === 'pendientes' && (f.entrenadorAsignado || f.entrenadorHoja)) return false;
       if (filtroEntrenador !== 'todos' && filtroEntrenador !== 'pendientes') {
-        const candidates = [f.entrenadorAsignado || f.entrenadorHoja, ...(f.preasignacionesHoja || [])];
-        if (!candidates.some(candidate => mismoEntrenador(candidate, filtroEntrenador))) return false;
+        // Token-based partial matching: any candidate sharing ≥1 significant token (>2 chars) with the
+        // selected filter name is accepted. Handles name variants, initials and casing differences.
+        const filterTokens = normalizarTexto(filtroEntrenador).split(' ').filter(t => t.length > 2);
+        const allCandidates = [
+          f.entrenadorAsignado,
+          f.entrenadorHoja,
+          ...(f.preasignacionesHoja || []),
+        ].filter(Boolean);
+        const matches = filterTokens.length > 0 && allCandidates.some(candidate => {
+          const cn = normalizarTexto(candidate);
+          return filterTokens.some(token => cn.includes(token));
+        });
+        if (!matches) return false;
       }
       if (q) {
-        const blob = `${f.nombre} ${f.sede} ${f.equipo} ${f.lugar} ${f.entrenadorAsignado} ${f.entrenadorHojaRaw}`.toLowerCase();
+        const preasig = (f.preasignacionesHoja || []).join(' ');
+        const blob = `${f.nombre} ${f.sede} ${f.equipo} ${f.lugar} ${f.entrenadorAsignado} ${f.entrenadorHojaRaw} ${preasig}`.toLowerCase();
         if (!blob.includes(q)) return false;
       }
       return true;
@@ -673,6 +689,7 @@ export default function AsignadorEntrenadores() {
           ['carga', `Carga por Entrenador (${carga.filter(c => c.total > 0).length})`],
           ['trazabilidad', `Trazabilidad (${trazas.length})`],
           ['polizas', 'Pólizas Drive'],
+          ['calendario', '📅 Calendario'],
         ].map(([id, label]) => (
           <button key={id} onClick={() => setTab(id)}
             style={{
@@ -926,6 +943,153 @@ export default function AsignadorEntrenadores() {
           {!policyReviewsLoaded && !policyLoading && !policyError && <div style={{ ...card, textAlign: 'center' }}>Cargando el último control guardado…</div>}
         </>
       )}
+
+      {/* ---------------- CALENDARIO DE ENTRENAMIENTOS ---------------- */}
+      {tab === 'calendario' && (() => {
+        const DIAS_SEMANA = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+        const SEDE_COLORS = {
+          lima:      { bg: 'rgba(251,191,36,0.18)',  border: '#fbbf24', text: '#fbbf24' },
+          quito:     { bg: 'rgba(99,102,241,0.18)',  border: '#6366f1', text: '#a5b4fc' },
+          cuenca:    { bg: 'rgba(16,185,129,0.18)',  border: '#10b981', text: '#6ee7b7' },
+          guayaquil: { bg: 'rgba(245,158,11,0.18)',  border: '#f59e0b', text: '#fcd34d' },
+          medellin:  { bg: 'rgba(236,72,153,0.18)',  border: '#ec4899', text: '#f9a8d4' },
+          mexico:    { bg: 'rgba(239,68,68,0.18)',   border: '#ef4444', text: '#fca5a5' },
+          bogota:    { bg: 'rgba(59,130,246,0.18)',  border: '#3b82f6', text: '#93c5fd' },
+          default:   { bg: 'rgba(156,163,175,0.13)', border: 'rgba(156,163,175,0.4)', text: '#9ca3af' },
+        };
+        const getColor = (sede) => SEDE_COLORS[normalizarTexto(sede || '')] || SEDE_COLORS.default;
+
+        const año = calMes.getFullYear();
+        const mes  = calMes.getMonth();
+        const primerDia = new Date(año, mes, 1);
+        const ultimoDia = new Date(año, mes + 1, 0);
+        const startOffset = (primerDia.getDay() + 6) % 7; // Monday-first
+        const filasCal = Math.ceil((startOffset + ultimoDia.getDate()) / 7);
+        const hoyStr = (() => { const h = new Date(); return `${h.getFullYear()}-${String(h.getMonth()+1).padStart(2,'0')}-${String(h.getDate()).padStart(2,'0')}`; })();
+        const mesNombre = primerDia.toLocaleString('es-PE', { month: 'long', year: 'numeric' });
+
+        // Build day map from all filas, applying sede+entrenador filters
+        const eventosPorDia = {};
+        filas.forEach(f => {
+          if (!f.fechaInicio) return;
+          if (filtroSede !== 'todas' && f.sede !== filtroSede) return;
+          if (filtroEntrenador === 'pendientes' && (f.entrenadorAsignado || f.entrenadorHoja)) return;
+          if (filtroEntrenador !== 'todos' && filtroEntrenador !== 'pendientes') {
+            const ft = normalizarTexto(filtroEntrenador).split(' ').filter(t => t.length > 2);
+            const cands = [f.entrenadorAsignado, f.entrenadorHoja, ...(f.preasignacionesHoja || [])].filter(Boolean);
+            const ok = ft.length > 0 && cands.some(c => ft.some(t => normalizarTexto(c).includes(t)));
+            if (!ok) return;
+          }
+          let fecha;
+          if (/^\d{2}\/\d{2}\/\d{4}$/.test(f.fechaInicio)) {
+            const [d, m, y] = f.fechaInicio.split('/');
+            fecha = `${y}-${m}-${d}`;
+          } else if (/^\d{4}-\d{2}-\d{2}/.test(f.fechaInicio)) {
+            fecha = f.fechaInicio.substring(0, 10);
+          } else return;
+          if (!eventosPorDia[fecha]) eventosPorDia[fecha] = [];
+          eventosPorDia[fecha].push(f);
+        });
+
+        return (
+          <div>
+            {/* Navegación mes */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+              <button onClick={() => setCalMes(new Date(año, mes - 1, 1))} style={{ background: 'transparent', border: '1px solid var(--border-color, rgba(255,255,255,0.15))', borderRadius: 8, color: 'var(--text-muted)', cursor: 'pointer', padding: '0.35rem 0.85rem', fontSize: '1rem' }}>‹</button>
+              <span style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--text-heading)', textTransform: 'capitalize' }}>{mesNombre}</span>
+              <button onClick={() => setCalMes(new Date(año, mes + 1, 1))} style={{ background: 'transparent', border: '1px solid var(--border-color, rgba(255,255,255,0.15))', borderRadius: 8, color: 'var(--text-muted)', cursor: 'pointer', padding: '0.35rem 0.85rem', fontSize: '1rem' }}>›</button>
+            </div>
+
+            {/* Leyenda sedes */}
+            <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap', marginBottom: '0.85rem' }}>
+              {Object.entries(SEDE_COLORS).filter(([k]) => k !== 'default').map(([sede, col]) => (
+                <span key={sede} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.68rem', fontWeight: 700, padding: '0.18rem 0.5rem', borderRadius: 6, background: col.bg, border: `1px solid ${col.border}`, color: col.text }}>
+                  {getFlagForSede(sede)} {normalizeSede(sede)}
+                </span>
+              ))}
+            </div>
+
+            {/* Cabecera días */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 3, marginBottom: 3 }}>
+              {DIAS_SEMANA.map(d => (
+                <div key={d} style={{ textAlign: 'center', fontSize: '0.67rem', fontWeight: 800, color: 'var(--text-muted)', padding: '0.28rem 0' }}>{d}</div>
+              ))}
+            </div>
+
+            {/* Grid calendario */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 3 }}>
+              {Array.from({ length: filasCal * 7 }).map((_, idx) => {
+                const dia = idx - startOffset + 1;
+                const esValido = dia >= 1 && dia <= ultimoDia.getDate();
+                const dateStr = esValido ? `${año}-${String(mes+1).padStart(2,'0')}-${String(dia).padStart(2,'0')}` : null;
+                const eventos = dateStr ? (eventosPorDia[dateStr] || []) : [];
+                const esHoy = dateStr === hoyStr;
+                return (
+                  <div key={idx} style={{
+                    minHeight: 76, borderRadius: 8, padding: '0.25rem 0.3rem',
+                    border: esHoy ? '1.5px solid var(--crear-gold)' : '1px solid var(--border-color, rgba(255,255,255,0.07))',
+                    background: esValido ? 'var(--card-bg, rgba(255,255,255,0.03))' : 'transparent',
+                    overflow: 'hidden',
+                  }}>
+                    {esValido && (<>
+                      <div style={{ fontSize: '0.72rem', fontWeight: esHoy ? 900 : 600, color: esHoy ? 'var(--crear-gold)' : 'var(--text-muted)', marginBottom: '0.18rem' }}>{dia}</div>
+                      {eventos.slice(0, 3).map((ev, i) => {
+                        const col = getColor(ev.sede);
+                        const label = (ev.nombre || '').length > 17 ? ev.nombre.substring(0, 16) + '…' : (ev.nombre || '');
+                        return (
+                          <div key={i}
+                            onClick={() => setCalTooltip(calTooltip?.key === `${dateStr}-${i}` ? null : { key: `${dateStr}-${i}`, ev })}
+                            title={`${ev.nombre} · ${ev.entrenadorAsignado || ev.entrenadorHoja || 'Sin asignar'}`}
+                            style={{ fontSize: '0.6rem', fontWeight: 700, padding: '0.12rem 0.28rem', borderRadius: 4, marginBottom: 2, cursor: 'pointer', background: col.bg, border: `1px solid ${col.border}`, color: col.text, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {getFlagForSede(ev.sede)} {label}
+                          </div>
+                        );
+                      })}
+                      {eventos.length > 3 && <div style={{ fontSize: '0.58rem', color: 'var(--text-muted)', fontWeight: 700 }}>+{eventos.length - 3} más</div>}
+                    </>)}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Panel detalle evento */}
+            {calTooltip && (
+              <div style={{ ...card, marginTop: '1rem', borderColor: 'var(--crear-gold)', maxWidth: 440 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
+                  <div style={{ fontWeight: 800, color: 'var(--text-heading)', fontSize: '0.95rem' }}>{calTooltip.ev.nombre}</div>
+                  <button onClick={() => setCalTooltip(null)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '1.1rem', lineHeight: 1, padding: 0 }}>✕</button>
+                </div>
+                <div style={{ fontSize: '0.78rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.3rem 1.2rem', color: 'var(--text-muted)' }}>
+                  <span><strong style={{ color: 'var(--text-heading)' }}>Fecha:</strong> {calTooltip.ev.fechaInicio}{calTooltip.ev.fechaFin && calTooltip.ev.fechaFin !== calTooltip.ev.fechaInicio ? ` → ${calTooltip.ev.fechaFin}` : ''}</span>
+                  <span><strong style={{ color: 'var(--text-heading)' }}>Sede:</strong> {getFlagForSede(calTooltip.ev.sede)} {normalizeSede(calTooltip.ev.sede)}</span>
+                  <span><strong style={{ color: 'var(--text-heading)' }}>Equipo:</strong> {calTooltip.ev.equipo || '—'}</span>
+                  <span><strong style={{ color: 'var(--text-heading)' }}>Lugar:</strong> {calTooltip.ev.lugar || '—'}</span>
+                  <span style={{ gridColumn: '1/-1' }}>
+                    <strong style={{ color: 'var(--text-heading)' }}>Entrenador:</strong>{' '}
+                    {calTooltip.ev.entrenadorAsignado
+                      ? <span style={{ color: '#10b981', fontWeight: 700 }}>✓ {calTooltip.ev.entrenadorAsignado} <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>(asignado en Causa OS)</span></span>
+                      : calTooltip.ev.entrenadorHoja
+                        ? <span style={{ color: '#f59e0b', fontWeight: 700 }}>{calTooltip.ev.entrenadorHoja} <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>(de la hoja)</span></span>
+                        : <span style={{ color: '#ef4444' }}>Sin asignar</span>
+                    }
+                  </span>
+                  {(calTooltip.ev.preasignacionesHoja || []).length > 1 && (
+                    <span style={{ gridColumn: '1/-1' }}>
+                      <strong style={{ color: 'var(--text-heading)' }}>Preasignados en hoja:</strong> {calTooltip.ev.preasignacionesHoja.join(', ')}
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+
+            <div className="text-muted" style={{ fontSize: '0.71rem', marginTop: '0.8rem' }}>
+              {Object.values(eventosPorDia).flat().length} entrenamientos en este mes.
+              Los filtros de Sede y Entrenador aplican también aquí.
+            </div>
+          </div>
+        );
+      })()}
+
     </div>
   );
 }
