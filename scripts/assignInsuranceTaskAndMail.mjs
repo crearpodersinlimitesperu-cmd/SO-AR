@@ -245,11 +245,32 @@ async function main() {
     console.warn('⚠️ Advertencia leyendo colección users:', err.message);
   }
 
-  const allCoaches = Array.from(coachesMap.values());
-  console.log(`📋 Total de entrenadores identificados: ${allCoaches.length}`);
-  allCoaches.forEach((c, idx) => {
+  const detectedCoaches = Array.from(coachesMap.values());
+  console.log(`📋 Total de entrenadores identificados: ${detectedCoaches.length}`);
+  detectedCoaches.forEach((c, idx) => {
     console.log(`   ${idx + 1}. ${c.name} <${c.email}> (${c.sede})`);
   });
+
+  // Exclusión segura de recordatorios: únicamente una verificación humana con
+  // fecha de vigencia futura habilita la exclusión. Un archivo hallado en
+  // Drive, su fecha de modificación o una coincidencia probable NO bastan.
+  const today = new Date().toISOString().slice(0, 10);
+  const validPolicyEmails = new Set();
+  try {
+    const policySnap = await db.collection('trainer_policy_reviews')
+      .where('verificationStatus', '==', 'vigente').get();
+    policySnap.forEach(policyDoc => {
+      const policy = policyDoc.data();
+      const email = String(policy.coachEmail || '').toLowerCase().trim();
+      if (email && policy.validUntil >= today && policy.verifiedFileId) validPolicyEmails.add(email);
+    });
+  } catch (err) {
+    // Fallo cerrado: si no se puede leer el control, no se excluye a nadie.
+    console.warn('⚠️ No se pudo consultar pólizas vigentes; no se aplicará exclusión automática:', err.message);
+  }
+  const allCoaches = detectedCoaches.filter(coach => !validPolicyEmails.has(coach.email.toLowerCase().trim()));
+  const excludedCoaches = detectedCoaches.filter(coach => validPolicyEmails.has(coach.email.toLowerCase().trim()));
+  console.log(`🛡️ ${excludedCoaches.length} entrenadores con póliza vigente confirmada no recibirán solicitud ni recordatorio.`);
 
   // B. Parámetros de la Tarea
   const DEADLINE_ISO = '2026-09-15T12:00:00-05:00';

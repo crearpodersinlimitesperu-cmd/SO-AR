@@ -30,7 +30,7 @@ import {
   canAccessAgendaTimeBoxing, canAccessFlyersC1, canAccessCalendarioMJ,
   canAccessMonitorVuelos, canAccessMonitorIMOs, canAccessHotelesSede, canAccessManualQT,
   canAccessDirectorioQT, canAccessManualNodus, canAccessCampusInteractivo,
-  canUseAsignadorEntrenadores
+  canUseAsignadorEntrenadores, PORTFOLIO_FI_REVIEW_EMAILS
 } from '../config/permissions';
 import EffectiveCommunicationButton from '../components/EffectiveCommunicationButton';
 import { getAllCompanyUsers } from '../services/userService';
@@ -619,6 +619,9 @@ const isModuleVisible = (mod, currentUser) => {
   const allowedRoles = mod.roles || [];
   // Super Administrador (cuando NO está en simulación explícita de otro usuario) tiene acceso total a todos los módulos
   if (currentUser?.isSuperAdmin && !currentUser?.isSimulated) return true;
+  // Respaldo nominal únicamente para el acceso de revisión FI de Andrés Gómez.
+  // No convierte su cuenta en superadmin ni altera otros módulos.
+  if (mod.id === 'portafolio' && PORTFOLIO_FI_REVIEW_EMAILS.includes((currentUser?.email || '').trim().toLowerCase())) return true;
   if (currentUser?.appRole === 'consolidado') return true;
   return allowedRoles.includes(currentUser?.appRole);
 };
@@ -2927,4 +2930,3 @@ export default function Home() {
     </div>
   );
 }
-

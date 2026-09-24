@@ -429,6 +429,16 @@ export const ASIGNADOR_ENTRENADORES_EMAILS = [
   'fer.aragon@crearpsl.net',     // Fer Aragon (CEO)
   'fer.aragon@crearpsl.com',     // Fer Aragon (alterno)
   'paul.sosa@crearpsl.net',      // Paul Sosa (CCO)
+  'andres.gomez@crearpsl.net',   // Director de Maestría del Juego
+  'gomeznueve@gmail.com',        // Cuenta alterna registrada de Andrés Gómez
+];
+
+// Revisión de Futuros Imposibles desde Portafolio PMO. Andrés es Director de
+// Maestría; este respaldo nominal evita que una sesión antigua con rol activo
+// desactualizado lo bloquee, sin abrir el módulo a otros perfiles.
+export const PORTFOLIO_FI_REVIEW_EMAILS = [
+  'andres.gomez@crearpsl.net',
+  'gomeznueve@gmail.com',
 ];
 
 export const canUseAsignadorEntrenadores = (currentUser) => {

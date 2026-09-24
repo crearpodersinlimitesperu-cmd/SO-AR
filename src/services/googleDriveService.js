@@ -10,6 +10,29 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 const DRIVE_FOLDER_NAME = 'Causa OS - Evidencias';
 
+// Carpeta oficial de pólizas de entrenadores. La consulta es exclusivamente
+// de metadatos; esta integración nunca descarga, edita, mueve ni comparte.
+export const TRAINER_POLICIES_FOLDER_ID = '1XDkAtrhZcPbInZLQbpQ4DwlQijMLxGbq';
+
+export async function listTrainerPolicyFiles(accessToken, folderId = TRAINER_POLICIES_FOLDER_ID) {
+  if (!accessToken) throw new Error('Se requiere autorización de Google Drive.');
+  const params = new URLSearchParams({
+    q: `'${folderId}' in parents and trashed = false`,
+    orderBy: 'modifiedTime desc', pageSize: '100',
+    fields: 'files(id,name,mimeType,modifiedTime,webViewLink,size)',
+    supportsAllDrives: 'true', includeItemsFromAllDrives: 'true',
+  });
+  const response = await fetch(`https://www.googleapis.com/drive/v3/files?${params}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  if (!response.ok) {
+    const detail = await response.json().catch(() => ({}));
+    throw new Error(detail?.error?.message || `Google Drive respondió HTTP ${response.status}.`);
+  }
+  const data = await response.json();
+  return Array.isArray(data.files) ? data.files : [];
+}
+
 /**
  * Obtiene o crea la carpeta de evidencias en Google Drive
  */

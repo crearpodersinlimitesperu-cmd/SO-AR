@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import { useUI } from './context/UIContext'
+import { PORTFOLIO_FI_REVIEW_EMAILS } from './config/permissions'
 import './index.css'
 
 import LearningDashboard from './pages/LearningDashboard'
@@ -73,7 +74,7 @@ function PrivateRoute({ children }) {
 // debe estar literalmente en `allowedRoles` (o en su array `roles` para multi-rol) —
 // isSuperAdmin SIGUE siendo un bypass total incluso con esta bandera, porque un
 // Super Admin debe poder entrar a cualquier sección para soporte/depuración.
-function RoleRoute({ children, allowedRoles = [], requireSuperAdmin = false, excludeDireccionBypass = false }) {
+function RoleRoute({ children, allowedRoles = [], allowedEmails = [], requireSuperAdmin = false, excludeDireccionBypass = false }) {
   const { currentUser, loading } = useAuth();
   const { showToast } = useUI();
 
@@ -125,10 +126,11 @@ function RoleRoute({ children, allowedRoles = [], requireSuperAdmin = false, exc
 
   // Verificación de Roles permitidos
   if (allowedRoles.length > 0) {
+    const hasAllowedEmail = allowedEmails.includes((currentUser.email || '').trim().toLowerCase());
     const hasRole = (currentUser.appRole !== 'consolidado' && allowedRoles.includes(currentUser.appRole)) ||
                     currentUser.isSuperAdmin ||
                     (!excludeDireccionBypass && currentUser.isDireccion) ||
-                    (currentUser.roles || []).some(r => allowedRoles.includes(r));
+                    (currentUser.roles || []).some(r => allowedRoles.includes(r)) || hasAllowedEmail;
     if (!hasRole) {
       showToast(`ACCESO DENEGADO: Tu rol actual (${currentUser.appRole}) no tiene acceso a esta sección.`, "error");
       return <Navigate to="/home" replace />;
@@ -331,7 +333,7 @@ function App() {
 
           {/* PMO Culture Integrations */}
           <Route path="/portafolio" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria']} allowedEmails={PORTFOLIO_FI_REVIEW_EMAILS} requireSuperAdmin={false}>
               <PortfolioBoard />
             </RoleRoute>
           } />

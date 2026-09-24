@@ -294,10 +294,24 @@ export async function getAllCompanyUsers() {
     console.error("Error fetching company users:", error);
   }
 
-  // Merge fallback con registro estático local para usuarios que aún no están en Firestore
+  // Merge fallback con registro estático local para usuarios que aún no están en Firestore.
+  // Para perfiles multirol con sedes explícitas, el catálogo canónico completa
+  // los roles y sus sedes aun cuando exista un documento histórico incompleto.
+  // Es un merge no destructivo: el resto de campos del usuario vivo se conserva.
   usersData.forEach(localUser => {
     const candidateKeys = emailKeysOf(localUser);
-    if (candidateKeys.size > 0 && findExistingIndex(candidateKeys) === -1) {
+    const existingIndex = candidateKeys.size > 0 ? findExistingIndex(candidateKeys) : -1;
+    if (existingIndex >= 0 && localUser.roleSedes) {
+      const existing = allUsers[existingIndex];
+      allUsers[existingIndex] = {
+        ...existing,
+        role: localUser.role || existing.role,
+        roles: Array.from(new Set([...(existing.roles || []), ...(localUser.roles || [localUser.role])].filter(Boolean))),
+        sede: localUser.sede || existing.sede,
+        roleSedes: { ...(existing.roleSedes || {}), ...localUser.roleSedes },
+        canonicalProfileSource: 'local_registry_multi_role'
+      };
+    } else if (candidateKeys.size > 0 && existingIndex === -1) {
       allUsers.push(withCanonicalEmail({ ...localUser, id: localUser.id || localUser.email, source: 'local_registry' }));
     }
   });

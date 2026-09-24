@@ -10,6 +10,11 @@ export const normalizeRole = (role) => {
   // Coordinadores Capítulo 1 / Capítulo 2 (C1 / C2)
   if (r === 'coordinador_c1c2' || r === 'coord_c1' || r === 'coord_c2' || r === 'coordinador_c1' || r === 'coordinador_c2' || r.includes('capitulo uno') || r.includes('capitulo 1') || r.includes('capitulo dos') || r.includes('capitulo 2') || r === 'c1' || r === 'c2' || r === 'c1/c2' || r === 'c1c2') return 'coord_c1';
   
+  // Dirección de Maestría debe evaluarse ANTES de la coordinación: el texto
+  // "director_maestria" también contiene "maestria" y antes quedaba rebajado
+  // silenciosamente a coord_maestria al iniciar sesión.
+  if (r === 'director_maestria' || r === 'director_mj' || (r.includes('director') && (r.includes('maestr') || r.includes('mj')))) return 'director_maestria';
+
   // Coordinadores Maestría del Juego (MJ)
   if (r === 'coordinador_mj' || r === 'coord_maestria' || r === 'coordinador_maestria' || r.includes('maestria del juego') || r.includes('maestria') || r.includes('coordinador global maestria') || r === 'mj') return 'coord_maestria';
   
@@ -21,9 +26,6 @@ export const normalizeRole = (role) => {
   
   // Quantum Team & Coordinación QT Global
   if (r === 'qt' || r === 'quantum_team' || r.includes('quantum') || r.includes('coord_qt') || r.includes('coordinador qt') || r.includes('coordinador_qt') || r.includes('qt global')) return 'qt';
-  
-  // Director Maestría del Juego (MJ)
-  if (r === 'director_maestria' || r === 'director_mj' || (r.includes('director') && (r.includes('maestr') || r.includes('mj')))) return 'director_maestria';
   
   // Manager
   if (r === 'manager' || r === 'managers') return 'manager';
