@@ -1,4 +1,4 @@
-﻿import puppeteer from 'puppeteer-extra';
+import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import 'dotenv/config';
 import fs from 'fs';
@@ -348,26 +348,9 @@ class NodusExtractorAgent {
   }
 
   async extractFuturosImposibles() {
-    console.log("🎯 [Agente 1 - Extractor] Extrayendo Futuros Imposibles post-PFD desde NODUS...");
-    await this.safeGoto('https://imo.crearpslglobal.com/futurosimposibles', 45000);
-    if (this.page.url().includes('sgcaptcha') || this.page.url().includes('.well-known/sgcaptcha')) {
-      throw new Error('El WAF de NODUS/SiteGround bloqueó la lectura de Futuros Imposibles; no se interpretó como universo vacío.');
-    }
+    console.log("🎯 [Agente 1 - Extractor] Extrayendo Futuros Imposibles multi-sede desde NODUS...");
 
-    const rawRows = await this.page.evaluate(() => {
-      const key = (value = '') => value.toString().toLowerCase()
-        .normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
-      const table = Array.from(document.querySelectorAll('table')).find((candidate) => {
-        const heading = key(candidate.querySelector('thead')?.innerText || '');
-        return heading.includes('nombre') || heading.includes('participante') || heading.includes('asistente');
-      });
-      if (!table) return [];
-      const headers = Array.from(table.querySelectorAll('thead th')).map((header, index) => key(header.innerText || `col_${index}`));
-      return Array.from(table.querySelectorAll('tbody tr')).map((row) => {
-        const cells = Array.from(row.querySelectorAll('td')).map((cell) => cell.innerText.trim());
-        return headers.reduce((record, header, index) => ({ ...record, [header]: cells[index] || '' }), {});
-      }).filter((row) => Object.values(row).some(Boolean));
-    });
+    const SEDES_CONOCIDAS = ['Lima', 'Quito', 'Cuenca', 'Guayaquil', 'Medellín', 'México', 'Bogotá'];
 
     const first = (row, candidates) => {
       const found = Object.entries(row).find(([key]) => candidates.some((candidate) => key.includes(candidate)));
@@ -376,27 +359,158 @@ class NodusExtractorAgent {
     const yes = (value) => /^(si|s[ií]|true|1|asistio|asistió|confirmad[oa])$/i.test(String(value).trim());
     const number = (value) => Number.parseInt(String(value).replace(/[^0-9-]/g, ''), 10) || 0;
 
-    const participantes = rawRows.map((row, index) => {
-      const nombre = first(row, ['nombre', 'participante', 'asistente']);
-      const asistencia = first(row, ['asistencia pfd', 'asistio pfd', 'asistencia', 'pfd']);
-      return {
-        id: first(row, ['id', 'dni', 'cedula']) || `nodus_fi_${index}`,
-        dni: first(row, ['dni', 'cedula', 'documento']),
-        nombre,
-        sede: first(row, ['sede', 'ciudad']),
-        equipo: first(row, ['equipo', 'team']),
-        fechaPFD: first(row, ['fecha pfd', 'pfd fecha']),
-        asistioPFD: yes(asistencia),
-        totalFi: number(first(row, ['total fi', 'fis cargados', 'futuros cargados'])),
-        pendientes: number(first(row, ['pendiente'])),
-        devueltos: number(first(row, ['devuelto'])),
-        aprobados: number(first(row, ['aprobado'])),
-        fis: []
-      };
-    }).filter((participant) => participant.nombre && participant.asistioPFD);
+    // Infiere sede desde la columna o, si vacía, desde el nombre del equipo
+    const inferirSede = (equipo, sedeColumna) => {
+      if (sedeColumna && sedeColumna.trim()) return sedeColumna.trim();
+      const eq = (equipo || '').toUpperCase();
+      if (eq.includes('CUENCA')) return 'Cuenca';
+      if (eq.includes('QUITO')) return 'Quito';
+      if (eq.includes('GUAYAQUIL') || eq.includes('GYE')) return 'Guayaquil';
+      if (eq.includes('BOGOTA') || eq.includes('BOGOTÁ')) return 'Bogotá';
+      if (eq.includes('MEDELLIN') || eq.includes('MEDELLÍN')) return 'Medellín';
+      if (eq.includes('MEXICO') || eq.includes('MÉXICO') || eq.includes('CDMX')) return 'México';
+      return 'Lima';
+    };
 
-    console.log(`✅ [Agente 1 - Extractor] ${participantes.length} asistentes PFD FI extraídos con evidencia explícita.`);
-    return participantes;
+    // Extrae la tabla de la página actual y mapea a participantes
+    const extraerTablaActual = async (sedeForzada) => {
+      const rawRows = await this.page.evaluate(() => {
+        const key = (value = '') => value.toString().toLowerCase()
+          .normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+        const table = Array.from(document.querySelectorAll('table')).find((candidate) => {
+          const heading = key(candidate.querySelector('thead')?.innerText || '');
+          return heading.includes('nombre') || heading.includes('participante') || heading.includes('asistente');
+        });
+        if (!table) return [];
+        const headers = Array.from(table.querySelectorAll('thead th')).map((header, index) => key(header.innerText || `col_${index}`));
+        return Array.from(table.querySelectorAll('tbody tr')).map((row) => {
+          const cells = Array.from(row.querySelectorAll('td')).map((cell) => cell.innerText.trim());
+          return headers.reduce((record, header, index) => ({ ...record, [header]: cells[index] || '' }), {});
+        }).filter((row) => Object.values(row).some(Boolean));
+      });
+      return rawRows.map((row, index) => {
+        const nombre = first(row, ['nombre', 'participante', 'asistente']);
+        const asistencia = first(row, ['asistencia pfd', 'asistio pfd', 'asistencia', 'pfd']);
+        const sedeCol = first(row, ['sede', 'ciudad']);
+        const equipo = first(row, ['equipo', 'team']);
+        return {
+          id: first(row, ['id', 'dni', 'cedula']) || `nodus_fi_${index}`,
+          dni: first(row, ['dni', 'cedula', 'documento']),
+          nombre,
+          sede: sedeForzada || inferirSede(equipo, sedeCol),
+          equipo,
+          fechaPFD: first(row, ['fecha pfd', 'pfd fecha']),
+          asistioPFD: yes(asistencia),
+          totalFi: number(first(row, ['total fi', 'fis cargados', 'futuros cargados'])),
+          pendientes: number(first(row, ['pendiente'])),
+          devueltos: number(first(row, ['devuelto'])),
+          aprobados: number(first(row, ['aprobado'])),
+          fis: []
+        };
+      }).filter((p) => p.nombre && p.asistioPFD);
+    };
+
+    // ── PASO 1: Navegar a la página de FIs ───────────────────────────────────
+    await this.safeGoto('https://imo.crearpslglobal.com/futurosimposibles', 45000);
+    if (this.page.url().includes('sgcaptcha') || this.page.url().includes('.well-known/sgcaptcha')) {
+      throw new Error('El WAF de NODUS/SiteGround bloqueó la lectura de Futuros Imposibles; no se interpretó como universo vacío.');
+    }
+
+    // ── PASO 2: Intentar seleccionar "Todas las sedes" en el filtro de NODUS ─
+    try {
+      const filterActivated = await this.page.evaluate(() => {
+        const selects = Array.from(document.querySelectorAll('select'));
+        for (const sel of selects) {
+          const allOpt = Array.from(sel.options).find(o => /todas|all|global|sin filtro|todos/i.test(o.text));
+          if (allOpt) {
+            sel.value = allOpt.value;
+            sel.dispatchEvent(new Event('change', { bubbles: true }));
+            return true;
+          }
+        }
+        return false;
+      });
+      if (filterActivated) {
+        await new Promise(r => setTimeout(r, 2500));
+        const resultado = await extraerTablaActual(null);
+        const sedesFound = new Set(resultado.map(p => p.sede).filter(Boolean));
+        if (resultado.length > 0) {
+          console.log(`✅ [Agente 6 - FI] Filtro "Todas" activado. Sedes: ${[...sedesFound].join(', ')} (${resultado.length} participantes)`);
+          return resultado;
+        }
+      }
+    } catch (filterErr) {
+      console.warn(`⚠️ [Agente 6 - FI] Filtro "Todas" no disponible: ${filterErr.message}`);
+    }
+
+    // ── PASO 3: Leer tabla inicial (puede tener todas las sedes si NODUS es global) ─
+    const resultadoInicial = await extraerTablaActual(null);
+    const sedesIniciales = new Set(resultadoInicial.map(p => p.sede).filter(s => s && s !== ''));
+    console.log(`📋 [Agente 6 - FI] Extracción inicial: ${resultadoInicial.length} participantes. Sedes detectadas: ${[...sedesIniciales].join(', ') || 'ninguna'}`);
+
+    // Si ya tenemos 2+ sedes reales en columna sede, no necesitamos iterar
+    if ([...sedesIniciales].filter(s => s !== 'Lima').length >= 2) {
+      console.log(`✅ [Agente 6 - FI] Tabla multi-sede en carga directa. No se requiere iteración.`);
+      return resultadoInicial;
+    }
+
+    // ── PASO 4: Iteración por sede con parámetro URL o selector UI ───────────
+    console.log("🔄 [Agente 6 - FI] Extracción iterativa por sede...");
+    const acumulador = new Map();
+    const clavePart = (p) => {
+      const dni = (p.dni || '').replace(/\D/g, '');
+      const nombre = (p.nombre || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+      return dni.length >= 6 ? `dni:${dni}` : `nombre:${nombre}`;
+    };
+    for (const p of resultadoInicial) acumulador.set(clavePart(p), p);
+
+    for (const sede of SEDES_CONOCIDAS) {
+      try {
+        // Estrategia A: parámetro URL ?sede=
+        const urlSede = `https://imo.crearpslglobal.com/futurosimposibles?sede=${encodeURIComponent(sede)}`;
+        await this.safeGoto(urlSede, 40000);
+        if (this.page.url().includes('sgcaptcha')) {
+          console.warn(`⚠️ WAF bloqueó sede ${sede}, omitiendo.`);
+          continue;
+        }
+        await new Promise(r => setTimeout(r, 1500));
+
+        // Estrategia B: si NODUS ignoró el parámetro, buscar selector en UI
+        if (!this.page.url().includes('sede=') && !this.page.url().includes(encodeURIComponent(sede))) {
+          await this.safeGoto('https://imo.crearpslglobal.com/futurosimposibles', 35000);
+          const sedeSeleccionada = await this.page.evaluate((sedeName) => {
+            const selects = Array.from(document.querySelectorAll('select'));
+            for (const sel of selects) {
+              const opt = Array.from(sel.options).find(o => o.text.trim().toLowerCase() === sedeName.toLowerCase());
+              if (opt) { sel.value = opt.value; sel.dispatchEvent(new Event('change', { bubbles: true })); return true; }
+            }
+            const btn = Array.from(document.querySelectorAll('button, a, [role="tab"]'))
+              .find(b => b.textContent.trim().toLowerCase() === sedeName.toLowerCase());
+            if (btn) { btn.click(); return true; }
+            return false;
+          }, sede);
+          if (!sedeSeleccionada) {
+            console.warn(`⚠️ [Agente 6 - FI] Sin selector UI para "${sede}", omitiendo.`);
+            continue;
+          }
+          await new Promise(r => setTimeout(r, 2000));
+        }
+
+        const parts = await extraerTablaActual(sede);
+        let nuevos = 0;
+        for (const p of parts) {
+          if (!acumulador.has(clavePart(p))) { acumulador.set(clavePart(p), p); nuevos++; }
+        }
+        console.log(`📍 [Agente 6 - FI] ${sede}: ${parts.length} extraídos, ${nuevos} nuevos. Total: ${acumulador.size}`);
+      } catch (sedeErr) {
+        console.warn(`⚠️ [Agente 6 - FI] Error en sede "${sede}": ${sedeErr.message}`);
+      }
+    }
+
+    const resultado = Array.from(acumulador.values());
+    const sedesFinales = new Set(resultado.map(p => p.sede).filter(Boolean));
+    console.log(`✅ [Agente 6 - FI] ${resultado.length} participantes únicos. Sedes: ${[...sedesFinales].join(', ')}`);
+    return resultado;
   }
 
   async close() {
