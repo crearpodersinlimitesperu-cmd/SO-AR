@@ -983,7 +983,8 @@ export default function AsignadorEntrenadores() {
         const startOffset = (primerDia.getDay() + 6) % 7; // Monday-first
         const filasCal = Math.ceil((startOffset + ultimoDia.getDate()) / 7);
         const hoyStr = (() => { const h = new Date(); return `${h.getFullYear()}-${String(h.getMonth()+1).padStart(2,'0')}-${String(h.getDate()).padStart(2,'0')}`; })();
-        const mesNombre = primerDia.toLocaleString('es-PE', { month: 'long', year: 'numeric' });
+        const MESES_ES_LARGO = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+        const mesNombre = `${MESES_ES_LARGO[mes]} ${año}`;
 
         // Build day map from all filas, applying sede+entrenador filters
         const eventosPorDia = {};
