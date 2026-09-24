@@ -57,7 +57,7 @@ jobs:
           # se publica con Firebase Admin y nunca expone tokens en Firestore.
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
         run: |
-          node scripts/nodusMultiAgentSync.mjs || (echo "⚠️ Intento 1 desafiado o interrumpido. Reintentando tras 20s con contingencia..." && sleep 20 && node scripts/nodusMultiAgentSync.mjs) || echo "🛡️ Pipeline protegido: salvaguarda de contingencia activa sin afectar la base de datos."
+          node scripts/nodusMultiAgentSync.mjs || (echo "⚠️ Intento 1 desafiado o interrumpido. Reintentando tras 20s con contingencia..." && sleep 20 && node scripts/nodusMultiAgentSync.mjs)
 
       - name: Discover NODUS FI source contract
         # El catálogo mejora la precisión del FI, pero jamás debe convertir en

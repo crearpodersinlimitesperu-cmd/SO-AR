@@ -634,6 +634,10 @@ class NodusNormalizerAgent {
 class NodusDispatcherAgent {
   async dispatch(normalizedData, rawData) {
     console.log("☁️ [Agente 3 - Despachador] Guardando datos en Firestore y respaldos locales...");
+    // Este job no tiene una sesión Firebase de usuario. Escribir con el SDK
+    // web provoca PERMISSION_DENIED y detenía el flujo antes de FI. La cuenta
+    // de servicio se limita al entorno de CI y nunca se expone al cliente.
+    const adminDb = getAdminDbForNodusPublish();
     const timestamp = new Date().toISOString();
 
     const equiposSummary = (normalizedData.equiposReporte || []).map(eq => ({
@@ -654,7 +658,7 @@ class NodusDispatcherAgent {
     };
 
     // 1. Guardar en nodus_kpis_sincronizados / latest_snapshot
-    await setDoc(doc(db, 'nodus_kpis_sincronizados', 'latest_snapshot'), masterSnapshot);
+    await adminDb.collection('nodus_kpis_sincronizados').doc('latest_snapshot').set(masterSnapshot);
     console.log("✅ [Agente 3 - Despachador] Guardado 'nodus_kpis_sincronizados/latest_snapshot'");
 
     // 2. Guardar en colección optimizada para Dashboard C1/C2: nodus_coordinadores_c1c2 / latest
@@ -665,7 +669,7 @@ class NodusDispatcherAgent {
       safeEquiposReporte = equiposSummary;
     }
 
-    await setDoc(doc(db, 'nodus_coordinadores_c1c2', 'latest'), {
+    await adminDb.collection('nodus_coordinadores_c1c2').doc('latest').set({
       robot_token: ROBOT_TOKEN,
       timestamp,
       totales: normalizedData.totales,
@@ -677,7 +681,7 @@ class NodusDispatcherAgent {
 
     // 3. Guardar en historial horario: nodus_kpis_history / snapshot_<timestamp>
     const historyId = `snap_${new Date().getTime()}`;
-    await setDoc(doc(db, 'nodus_kpis_history', historyId), {
+    await adminDb.collection('nodus_kpis_history').doc(historyId).set({
       robot_token: ROBOT_TOKEN,
       timestamp,
       totales: normalizedData.totales,
@@ -787,7 +791,7 @@ class NodusDispatcherAgent {
       mission.progreso = mission.totalEnrolados > 0 ? Math.round((mission.completados / mission.totalEnrolados) * 100) : 0;
 
       // merge: true para respetar datos adicionales (como emails) agregados por otros medios
-      await setDoc(doc(db, 'imo_missions', mission.id), mission, { merge: true });
+      await adminDb.collection('imo_missions').doc(mission.id).set(mission, { merge: true });
       misionesGuardadas++;
     }
     console.log(`✅ [Agente 3 - Despachador] ${misionesGuardadas} Misiones de IMO sincronizadas en 'imo_missions'`);
