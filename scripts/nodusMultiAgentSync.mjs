@@ -3,11 +3,17 @@ import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import 'dotenv/config';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import { initializeApp, getApps } from "firebase/app";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
+import { initializeApp as initializeAdminApp, cert, getApps as getAdminApps } from 'firebase-admin/app';
+import { getFirestore as getAdminFirestore, FieldValue } from 'firebase-admin/firestore';
 import { NodusDataScientistAgent } from './nodusDataScientistAgent.mjs';
 import { NodusHrSentinelAgent } from './nodusHrSentinelAgent.mjs';
 import { NodusFIAgent } from './nodusFIAgent.mjs';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const ROBOT_TOKEN = process.env.ROBOT_TOKEN;
 if (!ROBOT_TOKEN) {
@@ -35,6 +41,18 @@ const firebaseConfig = {
 
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 const db = getFirestore(app);
+
+// La publicación de FIs nunca usa el SDK público ni guarda tokens en
+// Firestore. El job de CI debe inyectar una cuenta de servicio de Firebase.
+function getAdminDbForNodusPublish() {
+  const rawServiceAccount = process.env.FIREBASE_SERVICE_ACCOUNT_KEY || process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
+  if (!rawServiceAccount) {
+    throw new Error('Falta FIREBASE_SERVICE_ACCOUNT_KEY/GOOGLE_SERVICE_ACCOUNT_JSON para publicar el snapshot FI.');
+  }
+  const serviceAccount = JSON.parse(rawServiceAccount);
+  const adminApp = getAdminApps().length ? getAdminApps()[0] : initializeAdminApp({ credential: cert(serviceAccount) });
+  return getAdminFirestore(adminApp);
+}
 
 
 /**
@@ -327,6 +345,55 @@ class NodusExtractorAgent {
 
     console.log(`✅ [Agente 1 - Extractor] Datos de ${equiposData.length} equipos extraídos con éxito.`);
     return equiposData;
+  }
+
+  async extractFuturosImposibles() {
+    console.log("🎯 [Agente 1 - Extractor] Extrayendo Futuros Imposibles post-PFD desde NODUS...");
+    await this.safeGoto('https://imo.crearpslglobal.com/futurosimposibles', 45000);
+
+    const rawRows = await this.page.evaluate(() => {
+      const key = (value = '') => value.toString().toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+      const table = Array.from(document.querySelectorAll('table')).find((candidate) => {
+        const heading = key(candidate.querySelector('thead')?.innerText || '');
+        return heading.includes('nombre') || heading.includes('participante') || heading.includes('asistente');
+      });
+      if (!table) return [];
+      const headers = Array.from(table.querySelectorAll('thead th')).map((header, index) => key(header.innerText || `col_${index}`));
+      return Array.from(table.querySelectorAll('tbody tr')).map((row) => {
+        const cells = Array.from(row.querySelectorAll('td')).map((cell) => cell.innerText.trim());
+        return headers.reduce((record, header, index) => ({ ...record, [header]: cells[index] || '' }), {});
+      }).filter((row) => Object.values(row).some(Boolean));
+    });
+
+    const first = (row, candidates) => {
+      const found = Object.entries(row).find(([key]) => candidates.some((candidate) => key.includes(candidate)));
+      return found?.[1] || '';
+    };
+    const yes = (value) => /^(si|s[ií]|true|1|asistio|asistió|confirmad[oa])$/i.test(String(value).trim());
+    const number = (value) => Number.parseInt(String(value).replace(/[^0-9-]/g, ''), 10) || 0;
+
+    const participantes = rawRows.map((row, index) => {
+      const nombre = first(row, ['nombre', 'participante', 'asistente']);
+      const asistencia = first(row, ['asistencia pfd', 'asistio pfd', 'asistencia', 'pfd']);
+      return {
+        id: first(row, ['id', 'dni', 'cedula']) || `nodus_fi_${index}`,
+        dni: first(row, ['dni', 'cedula', 'documento']),
+        nombre,
+        sede: first(row, ['sede', 'ciudad']),
+        equipo: first(row, ['equipo', 'team']),
+        fechaPFD: first(row, ['fecha pfd', 'pfd fecha']),
+        asistioPFD: yes(asistencia),
+        totalFi: number(first(row, ['total fi', 'fis cargados', 'futuros cargados'])),
+        pendientes: number(first(row, ['pendiente'])),
+        devueltos: number(first(row, ['devuelto'])),
+        aprobados: number(first(row, ['aprobado'])),
+        fis: []
+      };
+    }).filter((participant) => participant.nombre && participant.asistioPFD);
+
+    console.log(`✅ [Agente 1 - Extractor] ${participantes.length} asistentes PFD FI extraídos con evidencia explícita.`);
+    return participantes;
   }
 
   async close() {
@@ -865,24 +932,60 @@ export async function runMultiAgentSync() {
     }
 
     console.log("\n=======================================================");
-        // =========================================================================
+    // =========================================================================
     // AGENTE 6: AUDITOR CENTINELA DE FUTUROS IMPOSIBLES (FIs) POST-PFD
     // =========================================================================
-    console.log("\nðŸŽ¯ [Agente 6 - Futuros Imposibles] Activando auditorÃ­a de metas post-PFD...");
+    console.log("\n🎯 [Agente 6 - Futuros Imposibles] Activando auditoría de metas post-PFD...");
     try {
       const fiAgent = new NodusFIAgent();
-      const dataModulePath = path.join(__dirname, '../src/data/nodusFuturosImposiblesData.js');
-      if (fs.existsSync(dataModulePath)) {
-        const rawJs = fs.readFileSync(dataModulePath, 'utf8');
-        const jsonMatch = rawJs.match(/export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES\s*=\s*(\[[\s\S]*?\]);/);
-        if (jsonMatch) {
-          const participantesFI = JSON.parse(jsonMatch[1]);
-          const fiDiag = await fiAgent.runAudit(participantesFI);
-          console.log("âœ… [Agente 6 - Futuros Imposibles] AuditorÃ­a de metas completada con Ã©xito.");
-        }
+      const participantesFI = await extractor.extractFuturosImposibles();
+      if (participantesFI.length === 0) {
+        throw new Error('NODUS no devolvió asistentes PFD verificables; se conserva el último snapshot FI.');
       }
+
+      const fiDiag = await fiAgent.runAudit(participantesFI);
+      const adminDb = getAdminDbForNodusPublish();
+      const syncId = new Date().toISOString();
+
+      // Escritura atómica a través de Firebase Admin. El documento latest se
+      // toca únicamente después de completar extracción y validación; así una
+      // respuesta parcial, una pantalla de login o un bloqueo WAF no borran
+      // el universo ya publicado.
+      await adminDb.collection('nodus_futuros_imposibles').doc('latest').set({
+        participantes: participantesFI,
+        source: 'nodus_futuros_imposibles',
+        sourceVersion: 'fi-sync-v2',
+        sourceUrl: 'https://imo.crearpslglobal.com/futurosimposibles',
+        extractedAt: syncId,
+        syncedAt: FieldValue.serverTimestamp(),
+        universePfd: participantesFI.length,
+        summary: fiDiag.resumen
+      }, { merge: false });
+      await adminDb.collection('nodus_fi_sync_history').add({
+        status: 'published',
+        source: 'nodus_futuros_imposibles',
+        extractedAt: syncId,
+        universePfd: participantesFI.length,
+        summary: fiDiag.resumen,
+        createdAt: FieldValue.serverTimestamp()
+      });
+      console.log(`✅ [Agente 6 - Futuros Imposibles] Snapshot publicado: ${participantesFI.length} asistentes PFD.`);
     } catch (fiErr) {
-      console.error("âš ï¸ [Agente 6 - Futuros Imposibles] Error no bloqueante en auditorÃ­a de FIs:", fiErr.message);
+      console.error("⚠️ [Agente 6 - Futuros Imposibles] No se publicó ningún snapshot FI:", fiErr.message);
+      // El registro de fallo es aislado del snapshot: permite diagnóstico sin
+      // alterar el último universo válido que está usando Causa OS.
+      try {
+        const adminDb = getAdminDbForNodusPublish();
+        await adminDb.collection('nodus_fi_sync_history').add({
+          status: 'failed',
+          source: 'nodus_futuros_imposibles',
+          error: fiErr.message,
+          createdAt: FieldValue.serverTimestamp()
+        });
+      } catch (_) {
+        // Si la cuenta de servicio tampoco está disponible, no se intenta una
+        // escritura alternativa con el SDK público.
+      }
     }
 
     console.log("✨ PIPELINE MULTI-AGENTE COMPLETADO EXITOSAMENTE");
@@ -900,7 +1003,6 @@ export async function runMultiAgentSync() {
   }
 }
 
-import { fileURLToPath } from 'url';
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   runMultiAgentSync()
     .then((result) => {

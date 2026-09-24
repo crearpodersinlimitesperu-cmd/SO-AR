@@ -247,10 +247,68 @@ service cloud.firestore {
       allow create: if isAuthenticated();
     }
 
+    // ASIGNADOR OFICIAL DE ENTRENADORES. La pantalla guarda confirmaciones
+    // separadas del calendario fuente y un log inmutable. Solo las personas
+    // autorizadas pueden modificar la asignación; nadie puede borrar la
+    // trazabilidad desde el cliente.
+    function canManageTrainerAssignments() {
+      return isAuthenticated() && email() in [
+        'jose.sanchez@crearpsl.net',
+        'fer.aragon@crearpsl.net',
+        'fer.aragon@crearpsl.com',
+        'paul.sosa@crearpsl.net',
+        'andres.gomez@crearpsl.net',
+        'gomeznueve@gmail.com'
+      ];
+    }
+    match /asignaciones_entrenadores/{assignmentId} {
+      allow read, create, update: if canManageTrainerAssignments();
+      allow delete: if false;
+    }
+    match /asignaciones_entrenadores_log/{logId} {
+      allow read, create: if canManageTrainerAssignments();
+      allow update, delete: if false;
+    }
+
+    // CONTROL DE PÓLIZAS: el resultado de cada validación queda persistido
+    // para no reconsultar Drive al entrar. El historial es append-only: nadie
+    // puede editar ni borrar eventos de auditoría desde el cliente.
+    match /trainer_policy_reviews/{reviewId} {
+      allow read, create, update: if canManageTrainerAssignments();
+      allow delete: if false;
+    }
+    match /trainer_policy_audit/{auditId} {
+      allow read, create: if canManageTrainerAssignments();
+      allow update, delete: if false;
+    }
+
     // NODUS: mecanismo del robot y acceso gerencial/autenticado
     match /nodus_kpis_sincronizados/{document=**} {
       allow read: if isAuthenticated();
       allow write: if isSuperAdmin() || isGerenteODireccion() || (request.resource.data != null && request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET");
+    }
+
+    // FUTUROS IMPOSIBLES: NODUS conserva la fuente; Causa OS solo consume
+    // el snapshot publicado y registra las decisiones de revisión por
+    // separado. El historial no puede ser alterado desde el cliente.
+    match /nodus_futuros_imposibles/{document=**} {
+      allow read: if isGerenteODireccion() || isSuperAdmin();
+      allow write: if isSuperAdmin();
+    }
+    match /nodus_fi_reviews/{reviewId} {
+      allow read, create, update: if isGerenteODireccion() || isSuperAdmin();
+      allow delete: if false;
+    }
+    match /nodus_fi_audit/{auditId} {
+      allow read, create: if isGerenteODireccion() || isSuperAdmin();
+      allow update, delete: if false;
+    }
+    // Catálogo técnico sin PII, producido por el agente servidor de
+    // descubrimiento. Causa OS lo lee para informar qué contrato NODUS está
+    // disponible; ningún cliente puede alterarlo.
+    match /nodus_source_catalog/{document=**} {
+      allow read: if isGerenteODireccion() || isSuperAdmin();
+      allow write: if false;
     }
 
     // ------------------------------------------------------------------------

@@ -5,8 +5,9 @@ import {
   Filter, ShieldAlert, Award, FileText, UserCheck, AlertTriangle,
   Loader2, ThumbsUp, Send, Check
 } from 'lucide-react';
-import { doc } from 'firebase/firestore';
-import { db, getDocResilient } from '../services/firebase';
+import { addDoc, collection, doc, getDocFromServer, onSnapshot, serverTimestamp, setDoc } from 'firebase/firestore';
+import { db } from '../services/firebase';
+import { useAuth } from '../context/AuthContext';
 import { 
   NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES, 
   EQUIPOS_FUTUROS_IMPOSIBLES, 
@@ -25,13 +26,23 @@ export default function FuturosImposiblesView({
   textDark = 'var(--text-main, #f8fafc)',
   textMuted = 'var(--text-muted, #94a3b8)'
 }) {
+  const { currentUser } = useAuth();
   // Estados de filtrado y búsqueda
   const [equipoFilter, setEquipoFilter] = useState('Todos');
   const [estadoFilter, setEstadoFilter] = useState('TODOS');
   const [searchQuery, setSearchQuery] = useState('');
   
-  // Datos crudos y respaldo con Firestore
+  // Datos de NODUS: un payload vacío no puede sustituir el último universo
+  // verificado ni producir un dictamen de cumplimiento.
   const [participantesRaw, setParticipantesRaw] = useState(() => NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES);
+  const [sourceState, setSourceState] = useState({
+    status: 'snapshot',
+    label: 'Respaldo NODUS verificado',
+    detail: 'Esperando la última publicación de NODUS.',
+    syncedAt: null
+  });
+  const [sourceCatalog, setSourceCatalog] = useState(null);
+  const [reviewOverrides, setReviewOverrides] = useState({});
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
 
@@ -41,45 +52,116 @@ export default function FuturosImposiblesView({
   const [activeAreaTab, setActiveAreaTab] = useState(0);
   const [mentorNote, setMentorNote] = useState('');
 
-  // Sincronización opcional en vivo con Firestore
+  // Lee en servidor para no presentar una caché local como una sincronización
+  // oficial. Solo acepta fuentes con asistentes PFD explícitamente confirmados.
   useEffect(() => {
     let isMounted = true;
     async function fetchNodusFIData() {
       try {
-        const snap = await getDocResilient(doc(db, 'nodus_futuros_imposibles', 'latest'));
-        if (snap.exists() && snap.data()?.participantes && isMounted) {
-          setParticipantesRaw(snap.data().participantes);
+        const snap = await getDocFromServer(doc(db, 'nodus_futuros_imposibles', 'latest'));
+        const payload = snap.exists() ? snap.data() : null;
+        const participantes = Array.isArray(payload?.participantes) ? payload.participantes : [];
+        const universoPfd = participantes.filter((p) => p?.asistioPFD === true);
+        if (!isMounted) return;
+        if (universoPfd.length > 0) {
+          setParticipantesRaw(participantes);
+          setSourceState({ status: 'live', label: 'NODUS CREAR · fuente en vivo', detail: `${universoPfd.length} participantes con PFD confirmado.`, syncedAt: payload?.syncedAt || payload?.timestamp || payload?.updatedAt || null });
+        } else {
+          setSourceState({ status: 'invalid', label: 'Sincronización NODUS incompleta', detail: 'La última publicación no contiene asistentes PFD; se conserva el último respaldo verificable.', syncedAt: payload?.syncedAt || payload?.timestamp || payload?.updatedAt || null });
         }
       } catch (err) {
-        // Fallback natural a NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES
+        if (isMounted) setSourceState({ status: 'unavailable', label: 'NODUS no disponible ahora', detail: 'No se pudo leer la publicación en vivo; se conserva el respaldo verificable.', syncedAt: null });
       }
     }
     fetchNodusFIData();
     return () => { isMounted = false; };
   }, []);
 
+  // El catálogo no contiene personas: describe qué ruta y qué campos detectó
+  // el agente de descubrimiento para que la operación pueda saber si el
+  // diagnóstico proviene de detalle FI, de resumen o requiere ajuste.
+  useEffect(() => {
+    let isMounted = true;
+    getDocFromServer(doc(db, 'nodus_source_catalog', 'futuros_imposibles'))
+      .then((snapshot) => { if (isMounted && snapshot.exists()) setSourceCatalog(snapshot.data()); })
+      .catch(() => { if (isMounted) setSourceCatalog(null); });
+    return () => { isMounted = false; };
+  }, []);
+
+  // Las revisiones son un registro de Causa OS separado del origen NODUS. Así
+  // quedan persistidas y auditables sin alterar el registro fuente.
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, 'nodus_fi_reviews'), (snapshot) => {
+      const next = {};
+      snapshot.forEach((review) => { next[review.id] = review.data(); });
+      setReviewOverrides(next);
+    }, () => setReviewOverrides({}));
+    return unsubscribe;
+  }, []);
+
+  const participantesConRevision = useMemo(() => participantesRaw.map((participant) => {
+    const fis = (participant.fis || []).map((fi, areaIndex) => {
+      const review = reviewOverrides[`${participant.id}__${areaIndex}`];
+      return review ? { ...fi, estado: review.estado, feedback: review.feedback || fi.feedback } : fi;
+    });
+    // Algunas publicaciones de NODUS entregan resumen por participante antes
+    // de exponer el detalle de las cinco áreas. Se conserva ese resumen y no
+    // se lo convierte artificialmente en cero; cuando hay detalle, este es la
+    // fuente de verdad para las métricas y revisiones.
+    const hasFiDetail = fis.length > 0;
+    return {
+      ...participant,
+      fis,
+      totalFi: hasFiDetail ? fis.filter((fi) => fi.estado !== 'no_presentado').length : Number(participant.totalFi) || 0,
+      aprobados: hasFiDetail ? fis.filter((fi) => fi.estado === 'aprobado').length : Number(participant.aprobados) || 0,
+      pendientes: hasFiDetail ? fis.filter((fi) => fi.estado === 'pendiente').length : Number(participant.pendientes) || 0,
+      devueltos: hasFiDetail ? fis.filter((fi) => fi.estado === 'devuelto').length : Number(participant.devueltos) || 0
+    };
+  }), [participantesRaw, reviewOverrides]);
+
   const triggerToast = (text, type = 'success') => {
     setToastMessage({ text, type });
     setTimeout(() => setToastMessage(null), 3500);
   };
 
+  const sourceDateLabel = (value) => {
+    if (!value) return 'sin fecha publicada';
+    const date = typeof value?.toDate === 'function' ? value.toDate() : new Date(value);
+    return Number.isNaN(date.getTime()) ? 'fecha no verificable' : date.toLocaleString('es-EC');
+  };
+
   // Ejecución reactiva del diagnóstico del Agente IA
   const diagnostic = useMemo(() => {
     return ejecutarDiagnosticoFIs(
-      participantesRaw,
+      participantesConRevision,
       selectedSede,
       equipoFilter,
       estadoFilter,
       searchQuery
     );
-  }, [participantesRaw, selectedSede, equipoFilter, estadoFilter, searchQuery]);
+  }, [participantesConRevision, selectedSede, equipoFilter, estadoFilter, searchQuery]);
 
-  const handleReevaluate = () => {
+  const handleReevaluate = async () => {
     setIsEvaluating(true);
-    setTimeout(() => {
+    try {
+      const snap = await getDocFromServer(doc(db, 'nodus_futuros_imposibles', 'latest'));
+      const payload = snap.exists() ? snap.data() : null;
+      const participantes = Array.isArray(payload?.participantes) ? payload.participantes : [];
+      const universoPfd = participantes.filter((p) => p?.asistioPFD === true);
+      if (universoPfd.length === 0) {
+        setSourceState({ status: 'invalid', label: 'Sincronización NODUS incompleta', detail: 'NODUS no publicó un universo PFD verificable. No se recalculó ningún cumplimiento.', syncedAt: payload?.syncedAt || payload?.timestamp || null });
+        triggerToast('No hay universo PFD verificable en la última publicación de NODUS.', 'warning');
+        return;
+      }
+      setParticipantesRaw(participantes);
+      setSourceState({ status: 'live', label: 'NODUS CREAR · fuente en vivo', detail: `${universoPfd.length} participantes con PFD confirmado.`, syncedAt: payload?.syncedAt || payload?.timestamp || payload?.updatedAt || null });
+      triggerToast('Diagnóstico recalculado con la última publicación verificable de NODUS.');
+    } catch (error) {
+      setSourceState({ status: 'unavailable', label: 'NODUS no disponible ahora', detail: 'No se pudo releer la fuente en vivo. Se mantiene el último respaldo verificable.', syncedAt: null });
+      triggerToast('No se pudo consultar NODUS en este momento.', 'warning');
+    } finally {
       setIsEvaluating(false);
-      triggerToast('Auditoría y diagnóstico re-evaluados con éxito por el Agente IA.', 'success');
-    }, 600);
+    }
   };
 
   const handleOpenReviewModal = (participant) => {
@@ -89,75 +171,53 @@ export default function FuturosImposiblesView({
     setModalOpen(true);
   };
 
-  const handleApproveCurrentFI = () => {
+  const saveReview = async (estado) => {
     if (!selectedParticipant) return;
     const partId = selectedParticipant.id;
     const areaIdx = activeAreaTab;
-
-    setParticipantesRaw(prev => prev.map(p => {
-      if (p.id !== partId) return p;
-      const newFis = [...p.fis];
-      const area = newFis[areaIdx];
-      newFis[areaIdx] = {
-        ...area,
-        estado: 'aprobado',
-        feedback: mentorNote.trim() || 'Meta aprobada y certificada por Mentor.'
-      };
-
-      const aprobados = newFis.filter(f => f.estado === 'aprobado').length;
-      const pendientes = newFis.filter(f => f.estado === 'pendiente').length;
-      const devueltos = newFis.filter(f => f.estado === 'devuelto').length;
-      const total = newFis.filter(f => f.estado !== 'no_presentado').length;
-
-      const updated = {
-        ...p,
-        totalFi: total,
-        aprobados,
-        pendientes,
-        devueltos,
-        fis: newFis
-      };
+    const area = selectedParticipant.fis?.[areaIdx] || {};
+    const reviewId = `${partId}__${areaIdx}`;
+    const feedback = mentorNote.trim() || (estado === 'aprobado'
+      ? 'Meta aprobada y certificada por Mentor.'
+      : 'Devuelto para ajuste: requiere métricas cuantificables y fecha límite.');
+    try {
+      await setDoc(doc(db, 'nodus_fi_reviews', reviewId), {
+        participantId: partId,
+        participantName: selectedParticipant.nombre || '',
+        sede: selectedParticipant.sede || '',
+        equipo: selectedParticipant.equipo || '',
+        areaIndex: areaIdx,
+        area: area.area || '',
+        estado,
+        feedback,
+        reviewedByEmail: currentUser?.email || '',
+        reviewedByName: currentUser?.name || '',
+        reviewedAt: serverTimestamp(),
+        source: 'causa_os_fi_review'
+      }, { merge: true });
+      await addDoc(collection(db, 'nodus_fi_audit'), {
+        action: estado === 'aprobado' ? 'FI_APROBADO' : 'FI_DEVUELTO',
+        participantId: partId,
+        participantName: selectedParticipant.nombre || '',
+        areaIndex: areaIdx,
+        area: area.area || '',
+        estado,
+        feedback,
+        actorEmail: currentUser?.email || '',
+        actorName: currentUser?.name || '',
+        createdAt: serverTimestamp(),
+        source: 'causa_os_fi_review'
+      });
+      const updated = { ...selectedParticipant, fis: selectedParticipant.fis.map((fi, index) => index === areaIdx ? { ...fi, estado, feedback } : fi) };
       setSelectedParticipant(updated);
-      return updated;
-    }));
-
-    triggerToast(`FI "${selectedParticipant.fis[areaIdx]?.area}" aprobado con éxito.`);
+      triggerToast(estado === 'aprobado' ? `FI "${area.area}" aprobado y auditado.` : 'FI devuelto y registrado en la trazabilidad.', estado === 'aprobado' ? 'success' : 'warning');
+    } catch (error) {
+      triggerToast('No se pudo guardar la revisión. No se aplicó ningún cambio local.', 'warning');
+    }
   };
 
-  const handleDevolverCurrentFI = () => {
-    if (!selectedParticipant) return;
-    const partId = selectedParticipant.id;
-    const areaIdx = activeAreaTab;
-
-    setParticipantesRaw(prev => prev.map(p => {
-      if (p.id !== partId) return p;
-      const newFis = [...p.fis];
-      const area = newFis[areaIdx];
-      newFis[areaIdx] = {
-        ...area,
-        estado: 'devuelto',
-        feedback: mentorNote.trim() || 'Devuelto para ajuste: Requiere métricas cuantificables y fecha límite.'
-      };
-
-      const aprobados = newFis.filter(f => f.estado === 'aprobado').length;
-      const pendientes = newFis.filter(f => f.estado === 'pendiente').length;
-      const devueltos = newFis.filter(f => f.estado === 'devuelto').length;
-      const total = newFis.filter(f => f.estado !== 'no_presentado').length;
-
-      const updated = {
-        ...p,
-        totalFi: total,
-        aprobados,
-        pendientes,
-        devueltos,
-        fis: newFis
-      };
-      setSelectedParticipant(updated);
-      return updated;
-    }));
-
-    triggerToast(`FI devuelto con observaciones para ajuste.`, 'warning');
-  };
+  const handleApproveCurrentFI = () => saveReview('aprobado');
+  const handleDevolverCurrentFI = () => saveReview('devuelto');
 
   const { metricas, dictamenIA, participantes } = diagnostic;
 
@@ -215,13 +275,21 @@ export default function FuturosImposiblesView({
             }}>
               <Target size={14} /> AGENTE CENTINELA IA &bull; AUDITORÍA DE FUTUROS IMPOSIBLES
             </span>
-            <span style={{ fontSize: '0.85rem', color: textMuted }}>
-              &bull; Sincronización oficial con NODUS CREAR
+            <span style={{ fontSize: '0.85rem', color: sourceState.status === 'live' ? '#10b981' : sourceState.status === 'snapshot' ? '#38bdf8' : '#ef4444' }}>
+              &bull; {sourceState.label}
             </span>
           </div>
           <p style={{ margin: 0, fontSize: '0.85rem', color: textMuted, maxWidth: '900px', lineHeight: 1.4 }}>
             <strong style={{ color: '#f59e0b' }}>Regla Operativa Nodus:</strong> <em>"Solo participantes que ya asistieron a su PFD (primer fin de semana) — ahí es cuando corresponde revisar sus Futuros Imposibles."</em>
           </p>
+          <p style={{ margin: '0.45rem 0 0', fontSize: '0.76rem', color: sourceState.status === 'live' ? '#6ee7b7' : sourceState.status === 'snapshot' ? '#7dd3fc' : '#fca5a5', maxWidth: '900px', lineHeight: 1.4 }}>
+            {sourceState.detail} Última marca: {sourceDateLabel(sourceState.syncedAt)}.
+          </p>
+          {sourceCatalog && (
+            <p style={{ margin: '0.35rem 0 0', fontSize: '0.73rem', color: textMuted, maxWidth: '900px', lineHeight: 1.4 }}>
+              Contrato NODUS detectado: <strong>{sourceCatalog.extractionReadiness === 'detail_ready' ? 'detalle FI disponible' : sourceCatalog.extractionReadiness === 'summary_ready' ? 'resumen FI disponible' : 'requiere ajuste de campos'}</strong> · ruta {sourceCatalog.resolvedPath || sourceCatalog.route} · inspeccionado {sourceDateLabel(sourceCatalog.updatedAt || sourceCatalog.discoveredAt)}.
+            </p>
+          )}
         </div>
 
         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
@@ -243,7 +311,7 @@ export default function FuturosImposiblesView({
             }}
           >
             <RefreshCw size={15} className={isEvaluating ? 'animate-spin' : ''} />
-            {isEvaluating ? 'Auditando...' : 'Re-ejecutar Diagnóstico IA'}
+            {isEvaluating ? 'Consultando NODUS...' : 'Releer y diagnosticar'}
           </button>
           
           <a
@@ -512,7 +580,7 @@ export default function FuturosImposiblesView({
               whiteSpace: 'nowrap'
             }}
           >
-            Todos ({participantesRaw.length})
+            Todos ({metricas.totalParticipantes})
           </button>
 
           {metricas.equiposList.map((eq, idx) => {
@@ -662,7 +730,7 @@ export default function FuturosImposiblesView({
           </div>
 
           <div style={{ fontSize: '0.8rem', color: textMuted, marginLeft: '0.5rem' }}>
-            Mostrando <strong>{participantes.length}</strong> de {participantesRaw.length}
+            Mostrando <strong>{participantes.length}</strong> de {participantesConRevision.filter((p) => p?.asistioPFD === true).length} asistentes PFD verificables
           </div>
         </div>
       </div>

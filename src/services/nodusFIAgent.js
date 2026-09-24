@@ -29,8 +29,11 @@ export function ejecutarDiagnosticoFIs(
   filtroEstado = 'TODOS',
   queryBusqueda = ''
 ) {
-  // 1. Filtrado por sede
-  let filtrados = todosParticipantes;
+  // 0. El universo de una auditoría FI nunca es "todos los registros": solo
+  // personas con asistencia PFD explícitamente confirmada. Si la fuente no
+  // entrega esa señal, no se inventa una conclusión con datos ambiguos.
+  let filtrados = (Array.isArray(todosParticipantes) ? todosParticipantes : [])
+    .filter((participante) => participante?.asistioPFD === true);
   if (filtroSede && filtroSede !== 'GLOBAL') {
     const sedeNorm = normalizarTexto(filtroSede);
     filtrados = filtrados.filter(p => normalizarTexto(p.sede).includes(sedeNorm));
@@ -170,6 +173,42 @@ export function ejecutarDiagnosticoFIs(
 export function generarDictamenEjecutivoIA(metricas, filtroSede, filtroEquipo) {
   const { totalParticipantes, conCeroFIs, tasaSinEntrega, totalPendientes, totalDevueltos, totalAprobados } = metricas;
 
+  const sedeLabel = filtroSede === 'GLOBAL' ? 'todas las Sedes' : `Sede ${filtroSede}`;
+  const equipoLabel = filtroEquipo === 'Todos' ? '' : ` (${filtroEquipo})`;
+
+  // Cero participantes no es una situación óptima. Es ausencia de universo
+  // verificable y por seguridad operativa debe detener el dictamen.
+  if (totalParticipantes === 0) {
+    return {
+      severidad: 'SIN_DATOS',
+      badgeTexto: '⛔ SIN UNIVERSO PFD VERIFICABLE',
+      colorBadge: '#ef4444',
+      resumen: `No se puede emitir un diagnóstico de Futuros Imposibles para ${sedeLabel}${equipoLabel}: la fuente actual no aporta participantes con asistencia PFD confirmada. No se interpreta este resultado como cobertura, cumplimiento ni estabilidad.`,
+      pilarCobertura: {
+        titulo: '1. Universo no verificable',
+        detalle: 'La auditoría requiere participantes con asistencia PFD explícita. Hasta que NODUS entregue ese universo, cualquier porcentaje sería engañoso.',
+        alerta: 'Sin datos verificables: revisar la sincronización de NODUS antes de tomar decisiones.'
+      },
+      pilarCuelloBotella: {
+        titulo: '2. Revisión no calculable',
+        detalle: 'No existen registros PFD verificables sobre los cuales medir entregas, pendientes, devoluciones o aprobaciones.',
+        alerta: 'No se asignan responsables ni se envían recordatorios basados en este resultado.'
+      },
+      pilarPlanAccion: {
+        titulo: '3. Acción requerida para recuperar evidencia',
+        pasos: [{
+          plazo: 'Inmediato',
+          accion: 'Revisar la última sincronización NODUS y publicar participantes con id, sede, equipo, asistencia PFD y sus cinco FIs.',
+          responsable: 'Integración NODUS / Dirección de Operaciones'
+        }]
+      },
+      directivasParaDireccion: [
+        'No declarar cumplimiento ni iniciar campañas con un universo PFD vacío.',
+        'Validar fecha, origen y cantidad de registros de la sincronización antes de re-ejecutar el diagnóstico.'
+      ]
+    };
+  }
+
   let severidad = 'OPTIMA';
   let badgeTexto = 'SITUACIÓN ESTABLE &bull; METAS EN REGLA';
   let colorBadge = '#10b981';
@@ -183,9 +222,6 @@ export function generarDictamenEjecutivoIA(metricas, filtroSede, filtroEquipo) {
     badgeTexto = `⚠️ ALERTA OPERATIVA (${tasaSinEntrega}% REZAGADOS / ${totalPendientes} PENDIENTES)`;
     colorBadge = '#f59e0b';
   }
-
-  const sedeLabel = filtroSede === 'GLOBAL' ? 'todas las Sedes' : `Sede ${filtroSede}`;
-  const equipoLabel = filtroEquipo === 'Todos' ? '' : ` (${filtroEquipo})`;
 
   const resumen = `El Agente Centinela IA ha auditado el universo de ${totalParticipantes} participantes que asistieron a su Primer Fin de Semana (PFD) en ${sedeLabel}${equipoLabel}. Se detecta que ${conCeroFIs} participantes (${tasaSinEntrega}%) no registran ningún Futuro Imposible en la plataforma oficial de NODUS. Esto representa un punto ciego crítico para el acompañamiento y consolidación de metas transformacionales del Ciclo 1.`;
 
