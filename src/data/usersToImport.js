@@ -168,7 +168,8 @@
     "name": "Andres Gomez",
     "role": "director_maestria",
     "roles": [
-      "director_maestria"
+      "director_maestria",
+      "coord_maestria"
     ],
     "sede": "Global",
     "emails": [
@@ -979,11 +980,16 @@
   {
     "id": "qt_edisonricardogavilnezgallardo",
     "name": "Edison Ricardo Gavilánez Gallardo",
-    "role": "qt",
+    "role": "gerente",
     "roles": [
+      "gerente",
       "qt"
     ],
-    "sede": "UIO",
+    "sede": "Cuenca",
+    "roleSedes": {
+      "gerente": "Cuenca",
+      "qt": "Quito"
+    },
     "emails": [
       "ricardogavilanez1021@gmail.com"
     ],

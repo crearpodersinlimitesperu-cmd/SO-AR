@@ -123,6 +123,9 @@ export function AuthProvider({ children }) {
       const hasDireccion = userRoles.some(r => isDireccionRole(r)) || isDireccionRole(prev.role) || isDireccionRole(prev.rawRole);
       const hasGerente = userRoles.some(r => isGerenciaRole(r)) || isGerenciaRole(prev.role);
       const isSuper = prev.isSuperAdmin || isSuperAdminEmail(prev.email);
+      // Un perfil dual puede operar en sedes distintas según su rol. Nunca se
+      // modifica su sede base almacenada: el cambio es solo de sesión.
+      const activeSede = prev.roleSedes?.[canonicalNewRole] || prev.sede || 'Global';
 
       // Las simulaciones de usuario ÚNICAMENTE las activa el usuario explícitamente mediante simulateUser().
       // SuperAdmin SIEMPRE conserva sus privilegios reales, visibilidad total y acceso completo.
@@ -137,6 +140,7 @@ export function AuthProvider({ children }) {
         isDireccion,
         isGerente,
         isSuperAdmin: isSuper,
+        sede: activeSede,
         isRoleSimulationActive: false
       };
 
@@ -144,7 +148,7 @@ export function AuthProvider({ children }) {
         email: prev.email || '',
         name: prev.name || prev.displayName || 'Usuario',
         role: canonicalNewRole,
-        sede: prev.sede || 'Global',
+        sede: activeSede,
         action: 'CAMBIO_ROL',
         details: `Cambió de rol activo a: ${ROLE_DISPLAY_NAMES[canonicalNewRole] || canonicalNewRole}`
       });
@@ -208,8 +212,20 @@ export function AuthProvider({ children }) {
   };
 
   const buildUserObject = (user, foundUser, normalizedEmail) => {
-    // 0. Respaldo fidedigno contra el catálogo oficial corporativo para erradicar colapsos de cargos
-    const officialProfile = findUserByAnyEmail(normalizedEmail) || (foundUser?.email ? findUserByAnyEmail(foundUser.email) : null);
+    // 0. Respaldo fidedigno contra el catálogo oficial corporativo para erradicar
+    // colapsos de cargos. Un documento histórico puede tener el correo de login
+    // en un campo y el corporativo/alterno en otro; se consultan todos antes de
+    // aceptar que no existe un perfil canónico. Así un alias no rebaja cargos.
+    const identityEmails = Array.from(new Set([
+      normalizedEmail,
+      user?.email,
+      foundUser?.email,
+      foundUser?.correo,
+      foundUser?.corporateEmail,
+      foundUser?.personalEmail,
+      ...(Array.isArray(foundUser?.emails) ? foundUser.emails : [])
+    ].filter(Boolean).map((email) => email.toString().trim().toLowerCase())));
+    const officialProfile = identityEmails.map(findUserByAnyEmail).find(Boolean) || null;
     
     let canonicalRole = normalizeRole(officialProfile?.role || foundUser.role);
     const isSuperAdmin = isSuperAdminEmail(normalizedEmail) || isSuperAdminEmail(foundUser.email);
@@ -306,7 +322,11 @@ export function AuthProvider({ children }) {
       isSuperAdmin,
       isDireccion,
       isRoleSimulationActive: false,
-      sede: foundUser.sede || 'Global',
+      // La sede efectiva acompaña el rol activo. Ej.: Ricardo Gavilánez es
+      // Gerente de Cuenca y QT de Quito; al alternar rol no debe heredar la
+      // sede equivocada ni contaminar los filtros de cada operación.
+      sede: (officialProfile?.roleSedes || foundUser.roleSedes)?.[activeRole] || foundUser.sede || officialProfile?.sede || 'Global',
+      roleSedes: officialProfile?.roleSedes || foundUser.roleSedes || {},
       // (14/09/2026) NUEVO CAMPO: equiposQuito — José confirmó que, a diferencia de
       // las demás sedes (que corren UN solo equipo a la vez), Quito corre VARIOS
       // equipos en paralelo (ej. C1 Equipo 122 y C1 Equipo 128 el mismo fin de
@@ -344,6 +364,7 @@ export function AuthProvider({ children }) {
     provider.addScope('https://www.googleapis.com/auth/calendar.events');
     provider.addScope('https://www.googleapis.com/auth/tasks');
     provider.addScope('https://www.googleapis.com/auth/drive.file');
+    provider.addScope('https://www.googleapis.com/auth/drive.metadata.readonly');
     try {
       const result = await reauthenticateWithPopup(auth.currentUser, provider);
       const credential = GoogleAuthProvider.credentialFromResult(result);
@@ -363,6 +384,7 @@ export function AuthProvider({ children }) {
     provider.addScope('https://www.googleapis.com/auth/calendar.events');
     provider.addScope('https://www.googleapis.com/auth/tasks');
     provider.addScope('https://www.googleapis.com/auth/drive.file');
+    provider.addScope('https://www.googleapis.com/auth/drive.metadata.readonly');
 
     try {
       const result = await signInWithPopup(auth, provider);
