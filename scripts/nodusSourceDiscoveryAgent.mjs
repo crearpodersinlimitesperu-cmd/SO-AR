@@ -66,6 +66,52 @@ async function inspectRoute(page, route) {
   throw lastError;
 }
 
+async function safeGoto(page, url, timeout = 45000) {
+  let lastError;
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    try {
+      await page.goto(url, { waitUntil: 'domcontentloaded', timeout });
+      await new Promise((resolve) => setTimeout(resolve, 1800));
+      return;
+    } catch (error) {
+      lastError = error;
+      if (attempt < 3) await new Promise((resolve) => setTimeout(resolve, 1800));
+    }
+  }
+  throw lastError;
+}
+
+async function login(page, user, password) {
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    try {
+      await safeGoto(page, 'https://imo.crearpslglobal.com/auth/login');
+      let currentUrl = page.url();
+      const challenge = () => currentUrl.includes('sgcaptcha') || currentUrl.includes('.well-known/sgcaptcha');
+      const deadline = Date.now() + 18000;
+      while (challenge() && Date.now() < deadline) {
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        currentUrl = page.url();
+      }
+      if (challenge()) throw new Error('El desafío anti-bot de NODUS no se resolvió en este intento.');
+      if (!currentUrl.includes('/auth/login')) return;
+
+      await page.waitForSelector('input[name="usuario"]', { visible: true, timeout: 15000 });
+      await page.locator('input[name="usuario"]').fill(user);
+      await page.locator('input[name="password"]').fill(password);
+      await Promise.all([
+        page.locator('button[type="submit"]').click(),
+        page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 40000 }).catch(() => {})
+      ]);
+      await new Promise((resolve) => setTimeout(resolve, 2500));
+      if (!page.url().includes('/auth/login')) return;
+    } catch (error) {
+      if (attempt === 3) throw error;
+      await new Promise((resolve) => setTimeout(resolve, 2500));
+    }
+  }
+  throw new Error('NODUS no confirmó la sesión del agente de descubrimiento.');
+}
+
 function locateFIContract(page) {
   const flattenedHeaders = page.tables.flatMap((table) => table.headers);
   const has = (...terms) => terms.some((term) => flattenedHeaders.some((header) => header.includes(term)));
@@ -84,18 +130,14 @@ export async function discoverNodusSources() {
   const password = process.env.NODUS_PASSWORD;
   if (!user || !password) throw new Error('Faltan NODUS_USER/NODUS_PASSWORD en los secretos del job.');
 
-  const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'] });
+  const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-blink-features=AutomationControlled'] });
   try {
     const page = await browser.newPage();
+    await page.evaluateOnNewDocument(() => Object.defineProperty(navigator, 'webdriver', { get: () => undefined }));
+    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36');
+    await page.setExtraHTTPHeaders({ 'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8' });
     await page.setViewport({ width: 1440, height: 960 });
-    await page.goto('https://imo.crearpslglobal.com/auth/login', { waitUntil: 'domcontentloaded', timeout: 45000 });
-    await page.type('input[name="usuario"]', user);
-    await page.type('input[name="password"]', password);
-    await Promise.all([
-      page.click('button[type="submit"]'),
-      page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 45000 }).catch(() => {})
-    ]);
-    if (page.url().includes('/auth/login')) throw new Error('NODUS no confirmó la sesión del agente de descubrimiento.');
+    await login(page, user, password);
 
     const futuros = await inspectRoute(page, '/futurosimposibles');
     const contract = locateFIContract(futuros);

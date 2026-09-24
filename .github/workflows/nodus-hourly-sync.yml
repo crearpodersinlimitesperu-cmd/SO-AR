@@ -60,6 +60,10 @@ jobs:
           node scripts/nodusMultiAgentSync.mjs || (echo "⚠️ Intento 1 desafiado o interrumpido. Reintentando tras 20s con contingencia..." && sleep 20 && node scripts/nodusMultiAgentSync.mjs) || echo "🛡️ Pipeline protegido: salvaguarda de contingencia activa sin afectar la base de datos."
 
       - name: Discover NODUS FI source contract
+        # El catálogo mejora la precisión del FI, pero jamás debe convertir en
+        # fallida una sincronización operativa ya protegida. El error queda
+        # visible en Actions y el snapshot anterior permanece intacto.
+        continue-on-error: true
         env:
           NODUS_USER: ${{ secrets.NODUS_USER }}
           NODUS_PASSWORD: ${{ secrets.NODUS_PASSWORD }}
