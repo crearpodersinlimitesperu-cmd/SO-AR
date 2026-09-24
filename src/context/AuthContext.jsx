@@ -297,7 +297,12 @@ export function AuthProvider({ children }) {
     
     // Por defecto, SuperAdmin inicia SIEMPRE en 'consolidado' para ver todas las opciones sin límites
     let activeRole = isSuperAdmin ? 'consolidado' : canonicalRole;
-    if (savedActiveRole && (assignedRoles.includes(savedActiveRole) || isSuperAdmin)) {
+    // Dirección de Maestría es el cargo institucional principal de Andrés.
+    // Una preferencia histórica de sesión como "coord_maestria" no debe
+    // degradarlo al entrar; el cargo de coordinación permanece disponible en
+    // el selector cuando necesite operar esa vista.
+    const enforceDirectorMaestriaDefault = canonicalRole === 'director_maestria';
+    if (!enforceDirectorMaestriaDefault && savedActiveRole && (assignedRoles.includes(savedActiveRole) || isSuperAdmin)) {
       activeRole = savedActiveRole;
     } else if (isSuperAdmin) {
       activeRole = 'consolidado';
