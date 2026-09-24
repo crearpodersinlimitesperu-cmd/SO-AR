@@ -57,6 +57,12 @@ export default function ResourceCapacityView({ selectedSede = 'GLOBAL', hrSentin
     return upper;
   };
 
+  const isGlobal = useMemo(() => {
+    if (!selectedSede) return true;
+    const s = String(selectedSede).trim().toUpperCase();
+    return s === 'GLOBAL' || s === 'SEDE GLOBAL' || s === 'TODAS' || s === 'TODOS';
+  }, [selectedSede]);
+
   // 1. Filtrar eventos relevantes (actuales y futuros)
   const processedEvents = useMemo(() => {
     if (!events || !Array.isArray(events)) return [];
@@ -72,14 +78,14 @@ export default function ResourceCapacityView({ selectedSede = 'GLOBAL', hrSentin
       const d = new Date(dateStr.replace('Z', ''));
       if (d < minDate || d > maxDate) return false;
 
-      if (selectedSede !== 'GLOBAL') {
+      if (!isGlobal) {
         const evSedeNorm = normSede(e.sede || e.sedeTag || e.lugar);
         const selNorm = normSede(selectedSede);
         if (evSedeNorm !== selNorm) return false;
       }
       return true;
     }).sort((a, b) => new Date((a.fecha_inicio || a.start).replace('Z', '')) - new Date((b.fecha_inicio || b.start).replace('Z', '')));
-  }, [events, selectedSede]);
+  }, [events, selectedSede, isGlobal]);
 
   // 2. Mapear Entrenadores y sus eventos
   const trainersCapacity = useMemo(() => {
@@ -171,7 +177,7 @@ export default function ResourceCapacityView({ selectedSede = 'GLOBAL', hrSentin
   // 4. Mapear Ocupación de Salas / Sedes
   const venuesCapacity = useMemo(() => {
     const list = [];
-    const sedesKeys = selectedSede === 'GLOBAL' 
+    const sedesKeys = isGlobal 
       ? Object.keys(defaultVenues) 
       : Object.keys(defaultVenues).filter(k => normSede(k) === normSede(selectedSede));
 
@@ -189,7 +195,7 @@ export default function ResourceCapacityView({ selectedSede = 'GLOBAL', hrSentin
     });
 
     return list;
-  }, [processedEvents, selectedSede]);
+  }, [processedEvents, selectedSede, isGlobal]);
 
   // 5. Coordinadores desde hrSentinelData
   const coordinatorsList = useMemo(() => {
@@ -200,9 +206,9 @@ export default function ResourceCapacityView({ selectedSede = 'GLOBAL', hrSentin
       ...(hrSentinelData.optimos || [])
     ];
 
-    if (selectedSede === 'GLOBAL') return all;
+    if (isGlobal) return all;
     return all.filter(c => normSede(c.sede) === normSede(selectedSede));
-  }, [hrSentinelData, selectedSede]);
+  }, [hrSentinelData, selectedSede, isGlobal]);
 
   // Filtrado por buscador
   const filteredTrainers = useMemo(() => {
@@ -257,7 +263,7 @@ export default function ResourceCapacityView({ selectedSede = 'GLOBAL', hrSentin
             {coordinatorsList.length > 0 ? coordinatorsList.length : '18+'}
           </div>
           <div style={{ fontSize: '0.8rem', color: textMuted, marginTop: '0.2rem' }}>
-            {selectedSede === 'GLOBAL' ? 'Desplegados en las 6 sedes' : `Asignados a sede ${selectedSede}`}
+            {isGlobal ? 'Desplegados en las 6 sedes' : `Asignados a sede ${selectedSede}`}
           </div>
         </div>
 
@@ -271,7 +277,7 @@ export default function ResourceCapacityView({ selectedSede = 'GLOBAL', hrSentin
             {venuesCapacity.length}
           </div>
           <div style={{ fontSize: '0.8rem', color: textMuted, marginTop: '0.2rem' }}>
-            {selectedSede === 'GLOBAL' ? 'Sedes homologadas con salones oficiales' : `Salas operativas en ${selectedSede}`}
+            {isGlobal ? 'Sedes homologadas con salones oficiales' : `Salas operativas en ${selectedSede}`}
           </div>
         </div>
 
@@ -417,7 +423,7 @@ export default function ResourceCapacityView({ selectedSede = 'GLOBAL', hrSentin
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.25rem' }}>
           {filteredTrainers.length === 0 ? (
             <div style={{ gridColumn: '1 / -1', background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '3rem', textAlign: 'center', color: textMuted }}>
-              No se encontraron entrenadores para la sede {selectedSede} con el filtro aplicado.
+              No se encontraron entrenadores para {isGlobal ? 'la operación global' : `la sede ${selectedSede}`} con el filtro aplicado.
             </div>
           ) : (
             filteredTrainers.map((t, idx) => {
@@ -538,7 +544,7 @@ export default function ResourceCapacityView({ selectedSede = 'GLOBAL', hrSentin
                 <Users color="#10b981" size={20} /> Asignación y Carga de Coordinadores
               </h3>
               <p style={{ fontSize: '0.8rem', color: textMuted, margin: 0 }}>
-                Supervisión del volumen de gestión y cobertura por coordinador en {selectedSede}
+                Supervisión del volumen de gestión y cobertura por coordinador en {isGlobal ? 'todas las sedes (Global)' : selectedSede}
               </p>
             </div>
           </div>
@@ -559,7 +565,7 @@ export default function ResourceCapacityView({ selectedSede = 'GLOBAL', hrSentin
                 {filteredCoordinators.length === 0 ? (
                   <tr>
                     <td colSpan="6" style={{ padding: '3rem', textAlign: 'center', color: textMuted }}>
-                      No se registran coordinadores con el filtro seleccionado en {selectedSede}.
+                      No se registran coordinadores con el filtro seleccionado en {isGlobal ? 'la operación global' : selectedSede}.
                     </td>
                   </tr>
                 ) : (

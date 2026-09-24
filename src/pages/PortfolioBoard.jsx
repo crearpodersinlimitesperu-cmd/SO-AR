@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useCycles } from '../context/CyclesContext';
 import {
@@ -16,6 +16,7 @@ import { SEDES_FDS_PRICING, getSedePricing, formatCurrencyAmount } from '../data
 import nodusFallbackData from '../data/nodusFallbackData.json';
 import ResourceCapacityView from '../components/ResourceCapacityView';
 import FuturosImposiblesView from '../components/FuturosImposiblesView';
+import { PORTFOLIO_FI_REVIEW_EMAILS } from '../config/permissions';
 
 export const KNOWN_COORDINATORS = {
   'MARIBEL': { formalName: 'Maribel Catota', email: 'viviana.catota@crearpsl.net', role: 'coord_c1', sede: 'Cuenca' },
@@ -165,11 +166,15 @@ export default function PortfolioBoard() {
 
   const isGlobalPortfolioRole = (() => {
     if (currentUser?.isSuperAdmin) return true;
-    const exec = ['direccion', 'cfo', 'ceo', 'cco'];
+    const exec = ['direccion', 'cfo', 'ceo', 'cco', 'director_maestria', 'superadmin'];
+    const email = (currentUser?.email || '').toLowerCase().trim();
+    if (PORTFOLIO_FI_REVIEW_EMAILS.some(e => e.toLowerCase() === email)) return true;
     if (currentUser?.appRole === 'consolidado') {
       return (currentUser?.roles || []).some(r => exec.includes(r));
     }
-    return exec.includes(currentUser?.appRole);
+    const currentRoles = [currentUser?.appRole, currentUser?.role, ...(Array.isArray(currentUser?.roles) ? currentUser.roles : [])]
+      .filter(Boolean).map(r => normalizeRole(r));
+    return currentRoles.some(r => exec.includes(r));
   })();
   const [selectedSede, setSelectedSede] = useState(() => isGlobalPortfolioRole ? 'GLOBAL' : normalizeSede(currentUser?.sede));
 
@@ -209,7 +214,9 @@ export default function PortfolioBoard() {
         let totalParticipantes = 0;
         let totalSinContactar = 0;
 
-        if (selectedSede === 'GLOBAL') {
+        const isGlobalSelected = !selectedSede || selectedSede === 'GLOBAL' || selectedSede === 'Global' || selectedSede === 'Sede Global' || selectedSede === 'Todas' || selectedSede === 'TODAS';
+
+        if (isGlobalSelected) {
           if (data && data.totales) {
             totalEnrolados = data.totales.totalConfirmados || 0;
             totalBajasReales = data.totales.totalNoInteresa || 0;
@@ -488,7 +495,8 @@ export default function PortfolioBoard() {
 
   // Extraer métricas predictivas según la sede seleccionada o Global
   const activePrediction = useMemo(() => {
-    if (selectedSede === 'GLOBAL') {
+    const isGlobalSelected = !selectedSede || selectedSede === 'GLOBAL' || selectedSede === 'Global' || selectedSede === 'Sede Global' || selectedSede === 'Todas' || selectedSede === 'TODAS';
+    if (isGlobalSelected) {
       return predictorMatrixData.global;
     }
     const norm = normalizeSede(selectedSede);
@@ -793,7 +801,7 @@ export default function PortfolioBoard() {
                   >
                     ⚙️ Tarifas FDS C1
                   </button>
-                  {selectedSede !== 'GLOBAL' && (
+                  {!(!selectedSede || selectedSede === 'GLOBAL' || selectedSede === 'Global' || selectedSede === 'Sede Global' || selectedSede === 'Todas' || selectedSede === 'TODAS') && (
                     <button 
                       onClick={() => setSelectedSede('GLOBAL')}
                       style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', borderRadius: '6px', border: `1px solid ${borderLight}`, background: '#f8fafc', color: textDark, cursor: 'pointer', fontWeight: 600 }}
@@ -1174,7 +1182,8 @@ export default function PortfolioBoard() {
               });
 
               // Filtro por Sede seleccionada
-              const sedeList = selectedSede === 'GLOBAL'
+              const isGlobalCentinela = !selectedSede || selectedSede === 'GLOBAL' || selectedSede === 'Global' || selectedSede === 'Sede Global' || selectedSede === 'Todas' || selectedSede === 'TODAS';
+              const sedeList = isGlobalCentinela
                 ? mergedList
                 : mergedList.filter(c => normalizeSede(c.sede) === normalizeSede(selectedSede));
 
@@ -1259,14 +1268,14 @@ ${coord.coachingFeedback}`;
                   {/* 4 CARDS DE AUDITORÍA Y SALUD OPERATIVA */}
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.25rem', marginBottom: '1.5rem' }}>
                     <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.25rem', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
-                      <div style={{ fontSize: '0.75rem', fontWeight: 800, color: textMuted, textTransform: 'uppercase' }}>Salud Operativa Global</div>
+                      <div style={{ fontSize: '0.75rem', fontWeight: 800, color: textMuted, textTransform: 'uppercase' }}>{isGlobalCentinela ? 'Salud Operativa Global' : `Salud Operativa - ${selectedSede}`}</div>
                       <div style={{ fontSize: '2rem', fontWeight: 900, color: saludPct === null ? '#94a3b8' : saludPct >= 70 ? '#10b981' : '#f59e0b', margin: '0.2rem 0' }}>
                         {saludPct === null ? '—' : `${saludPct}%`}
                       </div>
                       <div style={{ fontSize: '0.8rem', color: textMuted }}>
                         {saludPct === null
-                          ? `Sin universo verificable desde Nodus para ${selectedSede}; no se emite diagnóstico.`
-                          : `${optimosList.length} de ${totalCoords} coordinadores con ritmo activo (${selectedSede})`}
+                          ? `Sin universo verificable desde Nodus para ${isGlobalCentinela ? 'operación global' : selectedSede}; no se emite diagnóstico.`
+                          : `${optimosList.length} de ${totalCoords} coordinadores con ritmo activo (${isGlobalCentinela ? 'Operación Global' : selectedSede})`}
                       </div>
                     </div>
 
@@ -1433,7 +1442,7 @@ ${coord.coachingFeedback}`;
                           <Award color="#f59e0b" size={20} /> Ranking General &bull; Integridad de Llamados y Asignación de Tareas
                         </h3>
                         <p style={{ fontSize: '0.8rem', color: textMuted, margin: 0 }}>
-                          {displayList.length} coordinadores visualizados en <strong>{selectedSede}</strong> &bull; Cruzado con roles Causa OS y Nodus
+                          {displayList.length} coordinadores visualizados en <strong>{isGlobalCentinela ? 'Operación Global' : selectedSede}</strong> &bull; Cruzado con roles Causa OS y Nodus
                         </p>
                       </div>
                     </div>

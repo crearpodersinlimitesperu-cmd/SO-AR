@@ -1,4 +1,4 @@
-﻿﻿export const USERS_TO_IMPORT = [
+export const USERS_TO_IMPORT = [
   {
     "id": "staff_evelynpaulinacedillo",
     "name": "Pauly Cedillo",
@@ -169,12 +169,14 @@
     "role": "director_maestria",
     "roles": [
       "director_maestria",
-      "coord_maestria"
+      "coord_maestria",
+      "entrenador",
+      "entrenador_llamadas"
     ],
     "sede": "Global",
     "emails": [
       "andres.gomez@crearpsl.net",
-      "andres.gomez@crearpsl.net",
+
       "gomeznueve@gmail.com"
     ],
     "email": "andres.gomez@crearpsl.net"

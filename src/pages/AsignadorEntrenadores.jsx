@@ -203,7 +203,7 @@ export default function AsignadorEntrenadores() {
           const roles = [u.role, u.appRole, ...(Array.isArray(u.roles) ? u.roles : [])]
             .filter(Boolean).map(r => normalizeRole(r));
           const activo = u.isActive !== false && u.status !== 'inactive';
-          return activo && roles.some(r => r === 'entrenador' || r === 'entrenador_llamadas');
+          return activo && roles.some(r => r === 'entrenador' || r === 'entrenador_llamadas' || r === 'director_maestria');
         });
         const vistos = new Set();
         const unicos = [];
@@ -791,24 +791,24 @@ export default function AsignadorEntrenadores() {
                           >
                             <option value="">
                               {tienePreasignacionAmbigua
-                                ? `— Confirmar un entrenador (${f.preasignacionesHoja.length} preasignados) —`
-                                : f.entrenadorHoja ? `— (hoja: ${f.entrenadorHoja})` : '— Sin asignar —'}
+                                ? `— Confirmar entrenador (${f.preasignacionesHoja.length} en nómina) —`
+                                : f.entrenadorHoja ? `📋 ${f.entrenadorHoja} (Sugerido de Cronograma)` : '— Sin asignar —'}
                             </option>
                             {entrenadores.map(e => <option key={e.nombre} value={e.nombre}>{e.nombre}</option>)}
                           </select>
                           {f.asignadoPor && actual && (
-                            <div className="text-muted" style={{ fontSize: '0.68rem', marginTop: 3 }}>
-                              por {f.asignadoPor} · {fmtFecha(f.asignadoEn)}
+                            <div style={{ fontSize: '0.68rem', marginTop: 4, color: '#10b981', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              <span>✓</span> Asignado por {f.asignadoPor} · {fmtFecha(f.asignadoEn)}
                             </div>
                           )}
                           {!actual && tienePreasignacionAmbigua && (
-                            <div className="text-muted" style={{ fontSize: '0.68rem', marginTop: 3 }}>
-                              Preasignación importada: {f.preasignacionesHoja.join(' · ')}. Selecciona una persona para fijarla en Causa OS.
+                            <div style={{ fontSize: '0.68rem', marginTop: 4, color: '#818cf8', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              <span>ℹ️</span> Preasignación: {f.preasignacionesHoja.join(' · ')}
                             </div>
                           )}
                           {!actual && !tienePreasignacionAmbigua && f.entrenadorHoja && (
-                            <div className="text-muted" style={{ fontSize: '0.68rem', marginTop: 3 }}>
-                              viene de la hoja — elige aquí para fijarlo en Causa OS
+                            <div style={{ fontSize: '0.68rem', marginTop: 4, color: '#f59e0b', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              <span>📋</span> Registrado en cronograma · Seleccionar para confirmar
                             </div>
                           )}
                         </td>

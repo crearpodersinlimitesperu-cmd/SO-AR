@@ -1,4 +1,4 @@
-﻿/**
+/**
  * AGENTE CENTINELA DE INTELIGENCIA ARTIFICIAL &bull; AUDITOR DE FUTUROS IMPOSIBLES (FIs)
  * Módulo de Inteligencia Operativa y Diagnóstico Predictivo - Causa OS / NODUS CREAR
  * 
@@ -34,7 +34,8 @@ export function ejecutarDiagnosticoFIs(
   // entrega esa señal, no se inventa una conclusión con datos ambiguos.
   let filtrados = (Array.isArray(todosParticipantes) ? todosParticipantes : [])
     .filter((participante) => participante?.asistioPFD === true);
-  if (filtroSede && filtroSede !== 'GLOBAL') {
+  const esFiltroGlobal = !filtroSede || ['global', 'sede global', 'todas', 'todos', 'all'].includes(normalizarTexto(filtroSede));
+  if (!esFiltroGlobal) {
     const sedeNorm = normalizarTexto(filtroSede);
     filtrados = filtrados.filter(p => normalizarTexto(p.sede).includes(sedeNorm));
   }

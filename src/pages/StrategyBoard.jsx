@@ -9,7 +9,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { doc } from 'firebase/firestore';
 import { auth, db, getDocResilient } from '../services/firebase';
-import { OPERATIONAL_SEDES, normalizeSede, usersData } from '../data/usersData';
+import { OPERATIONAL_SEDES, normalizeSede, normalizeRole, usersData } from '../data/usersData';
 import { getSedePricing, formatCurrencyAmount } from '../data/sedesPricingData';
 import nodusFallbackData from '../data/nodusFallbackData.json';
 
@@ -52,35 +52,68 @@ function buildDeterministicStrategy({
   // Ritmo diario requerido
   const ritmoRequerido = diasRestantes > 0 ? (deficit / diasRestantes).toFixed(1) : deficit;
 
-  // Plan día por día
-  const cronogramaDias = [
+  // Plan día por día (realista y adaptativo según métricas Nodus)
+  const cronogramaDias = deficit === 0 ? [
     {
       dia: 'Día 1 (D-4)',
-      foco: 'Operativo Cierre Rápido "Por Confirmar"',
-      detalle: `Barrido prioritario sobre los ${totalPorConfirmar || 20} contactos en estado 'Por Confirmar'. Llamada de bienvenida y reserva nominal de silla en sala.`,
-      metaDia: `${Math.ceil(deficit * 0.4)} confirmados`,
+      foco: 'Blindaje de Asistencia y Confirmación Logística',
+      detalle: `Reconfirmación con los ${confirmados} participantes confirmados de la sede. Envío de accesos, ubicación del recinto y recomendaciones formativas.`,
+      metaDia: 'Meta cubierta al 100%',
+      responsable: 'Coordinación y Gerencia'
+    },
+    {
+      dia: 'Día 2 (D-3)',
+      foco: 'Mesa de Acreditación y Materiales Oficiales',
+      detalle: 'Revisión de nómina de sala con el Director de Maestría y equipo de logística para asignación de credenciales y mesas de trabajo.',
+      metaDia: 'Nómina validada',
+      responsable: 'Staff de Maestría'
+    },
+    {
+      dia: 'Día 3 (D-2)',
+      foco: 'Aseguramiento de Sala y Protocolo Anti-Deserción',
+      detalle: 'Llamada protocolar de bienvenida. Confirmación de horarios de apertura de puertas y protocolo de puntualidad.',
+      metaDia: '100% Contactados',
+      responsable: 'Coordinadores Oficiales'
+    },
+    {
+      dia: 'Día 4 (D-1)',
+      foco: 'Acreditación Definitiva de Asistentes',
+      detalle: 'Cierre del padrón de sala y verificación presencial con el equipo de producción del evento.',
+      metaDia: 'Sala Completa',
+      responsable: 'Gerente de Sede'
+    }
+  ] : [
+    {
+      dia: 'Día 1 (D-4)',
+      foco: 'Cierre Prioritario de Preasignados (Por Confirmar)',
+      detalle: totalPorConfirmar > 0
+        ? `Llamada directa a los ${totalPorConfirmar} participantes en estado 'Por Confirmar' en Nodus para oficializar su pase de sala y arancel.`
+        : 'Contacto directo con la base asignada para levantar los primeros pases de sala formales.',
+      metaDia: `${Math.max(1, Math.ceil(deficit * 0.4))} confirmados`,
       responsable: 'Coordinadores C1/C2'
     },
     {
       dia: 'Día 2 (D-3)',
-      foco: 'Operación Rescate Quantum Team (No Contesta)',
-      detalle: `Despliegue del Quantum Team en bloque nocturno (18:00 - 21:00 hrs) para contactar a los ${totalNoContesta || 30} prospectos que no contestaron de día.`,
-      metaDia: `${Math.ceil(deficit * 0.3)} confirmados`,
-      responsable: 'Quantum Team + Coordinación'
+      foco: 'Operativo Recontacto (Horario Estratégico)',
+      detalle: totalNoContesta > 0
+        ? `Despliegue telefónico vespertino (18:00 a 21:00 hrs) sobre los ${totalNoContesta} participantes que no contestaron en horario matutino.`
+        : 'Seguimiento de llamadas con interesados que solicitaron información adicional o confirmación de horario.',
+      metaDia: `${Math.max(1, Math.ceil(deficit * 0.3))} confirmados`,
+      responsable: 'Coordinación Operativa'
     },
     {
       dia: 'Día 3 (D-2)',
-      foco: 'Mesa Financiera & Validación de Aranceles',
-      detalle: `Validación de pagos y comprobantes de FDS C1 (${formatCurrencyAmount(precioUnitario, moneda)} por cupo). Conciliación con el área de finanzas.`,
-      metaDia: `${Math.ceil(deficit * 0.2)} confirmados`,
-      responsable: 'Finanzas + Gerencia'
+      foco: 'Validación Financiera & Cupo Definitivo',
+      detalle: `Conciliación de pagos de arancel (${formatCurrencyAmount(precioUnitario, moneda)} por participante) y emisión de credencial oficial de acceso.`,
+      metaDia: `${Math.max(1, Math.ceil(deficit * 0.2))} confirmados`,
+      responsable: 'Administración y Finanzas'
     },
     {
       dia: 'Día 4 (D-1)',
-      foco: 'Aseguramiento de Sala & Blindaje Anti-Deserción',
-      detalle: 'Llamada de confirmación de asistencia, envío de recomendaciones logísticas (vestimenta, puntualidad) y lista definitiva de sala.',
-      metaDia: `${Math.ceil(deficit * 0.1)} confirmados`,
-      responsable: 'Gerente de Sede + Staff'
+      foco: 'Blindaje Final de Sala & Cierre de Padrón',
+      detalle: 'Confirmación de ruta al recinto, entrega de credenciales y asignación de asiento numerado para garantizar asistencia efectiva sin deserción.',
+      metaDia: `${Math.max(1, Math.ceil(deficit * 0.1))} confirmados`,
+      responsable: 'Gerente de Sede y Staff'
     }
   ];
 
@@ -157,15 +190,19 @@ export default function StrategyBoard() {
 
   const isGlobalStrategyRole = (() => {
     if (currentUser?.isSuperAdmin) return true;
-    const exec = ['direccion', 'cfo', 'ceo', 'cco'];
+    const exec = ['direccion', 'cfo', 'ceo', 'cco', 'director_maestria', 'superadmin'];
     if (currentUser?.appRole === 'consolidado') {
       return (currentUser?.roles || []).some(r => exec.includes(r));
     }
-    return exec.includes(currentUser?.appRole);
+    const currentRoles = [currentUser?.appRole, currentUser?.role, ...(Array.isArray(currentUser?.roles) ? currentUser.roles : [])]
+      .filter(Boolean).map(r => normalizeRole ? normalizeRole(r) : r);
+    return currentRoles.some(r => exec.includes(r));
   })();
 
-  const [selectedSede, setSelectedSede] = useState(() => isGlobalStrategyRole ? 'GLOBAL' : normalizeSede(currentUser?.sede));
-  const sedesDisponibles = isGlobalStrategyRole ? ['GLOBAL', ...OPERATIONAL_SEDES] : [normalizeSede(currentUser?.sede)];
+  const rawUserSede = currentUser?.sede ? normalizeSede(currentUser.sede) : 'GLOBAL';
+  const initialSede = isGlobalStrategyRole || ['global', 'sede global', 'todas'].includes(String(rawUserSede).toLowerCase()) ? 'GLOBAL' : rawUserSede;
+  const [selectedSede, setSelectedSede] = useState(initialSede);
+  const sedesDisponibles = isGlobalStrategyRole ? ['GLOBAL', ...OPERATIONAL_SEDES] : [initialSede];
 
   const [loading, setLoading] = useState(true);
   const [globalHealth, setGlobalHealth] = useState(0);
@@ -222,13 +259,14 @@ export default function StrategyBoard() {
         let totalNoInteresa = 0;
 
         const coords = (data.coordinadores || nodusFallbackData?.coordinadores || []);
-        const filteredCoords = selectedSede === 'GLOBAL'
+        const isGlobal = !selectedSede || ['global', 'sede global', 'todas', 'todos'].includes(String(selectedSede).toLowerCase().trim());
+        const filteredCoords = isGlobal
           ? coords
           : coords.filter(c => normalizeSede(c.sede) === normalizeSede(selectedSede));
 
         setCoordinadoresList(filteredCoords);
 
-        if (selectedSede === 'GLOBAL') {
+        if (isGlobal) {
           if (data.totales) {
             totalAsignados = data.totales.totalAsignados || 0;
             totalGestiones = data.totales.totalGestiones || 0;
@@ -236,6 +274,21 @@ export default function StrategyBoard() {
             totalPorConfirmar = data.totales.totalPorConfirmar || 0;
             totalNoContesta = data.totales.totalNoContesta || 0;
             totalNoInteresa = data.totales.totalNoInteresa || 0;
+          }
+          if (totalConfirmados === 0 && coords.length > 0) {
+            totalConfirmados = coords.reduce((acc, c) => acc + Number(c.estados?.confirmado ?? c.confirmados ?? ((c.confirmadosC1 || 0) + (c.confirmadosC2 || 0)) ?? 0), 0);
+          }
+          if (totalGestiones === 0 && coords.length > 0) {
+            totalGestiones = coords.reduce((acc, c) => acc + Number(c.estados?.llamadas ?? c.gestiones ?? 0), 0);
+          }
+          if (totalAsignados === 0 && coords.length > 0) {
+            totalAsignados = coords.reduce((acc, c) => acc + Number(c.estados?.asignados ?? c.asignados ?? 0), 0);
+          }
+          if (totalPorConfirmar === 0 && coords.length > 0) {
+            totalPorConfirmar = coords.reduce((acc, c) => acc + Number(c.estados?.porConfirmar ?? 0), 0);
+          }
+          if (totalNoContesta === 0 && coords.length > 0) {
+            totalNoContesta = coords.reduce((acc, c) => acc + Number(c.estados?.noContesta ?? 0), 0);
           }
         } else {
           // 1. Buscar en data.sedes
@@ -309,7 +362,7 @@ export default function StrategyBoard() {
         // Agente de Predicción Operativa
         const diasCampanaTranscurridos = 8;
         const diasRestantesSala = 4;
-        const metaSalaSede = selectedSede === 'GLOBAL' ? 180 : 32;
+        const metaSalaSede = isGlobal ? 180 : 32;
         const deficitSala = Math.max(0, metaSalaSede - totalConfirmados);
         const ritmoDiario = totalConfirmados > 0 ? (totalConfirmados / diasCampanaTranscurridos) : 0;
         const proyeccionFinal = Math.round(totalConfirmados + (ritmoDiario * diasRestantesSala));
@@ -549,10 +602,10 @@ Genera una estrategia de cierre para los próximos 4 días con metas nominales e
             {/* RESUMEN GLOBAL */}
             <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.5rem', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
               <div>
-                <div style={{ fontSize: '0.75rem', color: textMuted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.5rem' }}>{`Salud Estratégica ${selectedSede === 'GLOBAL' ? 'Global' : selectedSede}`}</div>
+                <div style={{ fontSize: '0.75rem', color: textMuted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.5rem' }}>{`Salud Estratégica ${['global', 'sede global'].includes(String(selectedSede).toLowerCase()) ? 'Global' : selectedSede}`}</div>
                 <div style={{ display: 'flex', alignItems: 'flex-end', gap: '0.5rem' }}>
                   <span style={{ fontSize: '2.5rem', fontWeight: 900, color: '#10b981', lineHeight: 1 }}>{globalHealth}%</span>
-                  <span style={{ color: textMuted, fontSize: '0.9rem', marginBottom: '0.3rem' }}>{`Cumplimiento ${selectedSede === 'GLOBAL' ? 'Global' : 'Sede'} (Calculado en Vivo)`}</span>
+                  <span style={{ color: textMuted, fontSize: '0.9rem', marginBottom: '0.3rem' }}>{`Cumplimiento ${['global', 'sede global'].includes(String(selectedSede).toLowerCase()) ? 'Global' : 'Sede'} (Calculado en Vivo)`}</span>
                 </div>
               </div>
               <div style={{ padding: '1rem', background: '#ecfdf5', borderRadius: '50%', color: '#10b981' }}>
@@ -584,7 +637,7 @@ Genera una estrategia de cierre para los próximos 4 días con metas nominales e
                           AGENTE ESTRATÉGICO IA &bull; GEMINI + CAUSA OS
                         </span>
                         <span style={{ fontSize: '0.75rem', color: textMuted, fontWeight: 600 }}>
-                          Sede {aiStrategy.sede} ({formatCurrencyAmount(aiStrategy.financiero.precioUnitario, aiStrategy.financiero.moneda)} / cupo)
+                          {['global', 'sede global'].includes(String(aiStrategy.sede).toLowerCase()) ? 'Operación Global' : `Sede ${aiStrategy.sede}`} ({formatCurrencyAmount(aiStrategy.financiero.precioUnitario, aiStrategy.financiero.moneda)} / cupo)
                         </span>
                       </div>
                       <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: textDark, margin: 0 }}>
