@@ -94,11 +94,22 @@ const eventoKey = (ev) => {
   return `${f}__${s}__${n}`.replace(/\//g, '-');
 };
 
+// Meses en español latinoamericano estándar — sin depender del locale del
+// navegador. Evita peruanismos como "set." para septiembre que no se usan
+// en México, Colombia, Ecuador ni el resto de Latinoamérica.
+const MESES_ES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
 const fmtFecha = (v) => {
   if (!v) return '';
-  const d = new Date(v);
+  // Soporte para DD/MM/YYYY (formato de la hoja) y para ISO
+  let d;
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(String(v))) {
+    const [dd, mm, yyyy] = String(v).split('/');
+    d = new Date(`${yyyy}-${mm}-${dd}T00:00:00`);
+  } else {
+    d = new Date(v);
+  }
   if (isNaN(d.getTime())) return String(v).slice(0, 10);
-  return d.toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' });
+  return `${d.getDate()} ${MESES_ES[d.getMonth()]}. ${d.getFullYear()}`;
 };
 
 // El calendario histórico puede traer "FERNANDO ARAGON" y el directorio
