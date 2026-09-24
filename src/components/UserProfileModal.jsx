@@ -211,6 +211,9 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
   // según el Directorio Global, "global" en Firestore).
   const [editingRole, setEditingRole] = useState(false);
   const [roleDraft, setRoleDraft] = useState(normalizeRole(user?.role) || '');
+  const [rolesDraft, setRolesDraft] = useState(() => Array.from(new Set([
+    normalizeRole(user?.role), ...(Array.isArray(user?.roles) ? user.roles.map(normalizeRole) : [])
+  ].filter(Boolean))));
   const [sedeDraft, setSedeDraft] = useState(normalizeSede(user?.sede) || '');
   const [isSavingRole, setIsSavingRole] = useState(false);
 
@@ -446,9 +449,25 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
       return;
     }
     setIsSavingRole(true);
+    const selectedRoles = Array.from(new Set([roleDraft, ...rolesDraft].map(normalizeRole).filter(Boolean)));
     try {
-      await updateDoc(doc(db, 'users', user.id), { role: roleDraft, sede: sedeDraft });
-      showToast(`Rol actualizado: ${getRoleDisplayName(roleDraft)} — ${sedeDraft}.`, 'success');
+      await updateDoc(doc(db, 'users', user.id), {
+        role: roleDraft,
+        roles: selectedRoles,
+        sede: sedeDraft,
+        roleSedes: { ...(user.roleSedes || {}), [roleDraft]: sedeDraft },
+        rolesUpdatedAt: serverTimestamp(),
+        rolesUpdatedBy: currentUser?.email || ''
+      });
+      await recordAuditEvent({
+        email: currentUser?.email,
+        name: currentUser?.name,
+        role: currentUser?.appRole || currentUser?.role,
+        sede: currentUser?.sede,
+        action: 'USER_ROLES_UPDATED',
+        details: `${user.name || user.email}: rol principal ${roleDraft}; roles [${selectedRoles.join(', ')}]; sede ${sedeDraft}.`
+      });
+      showToast(`Roles actualizados: ${selectedRoles.map(getRoleDisplayName).join(', ')} — sede principal ${sedeDraft}.`, 'success');
       setEditingRole(false);
     } catch (error) {
       console.error('Error guardando rol/sede:', error);
@@ -769,6 +788,9 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
                       onClick={(e) => {
                         e.stopPropagation();
                         setRoleDraft(normalizeRole(user.role) || '');
+                        setRolesDraft(Array.from(new Set([
+                          normalizeRole(user.role), ...(Array.isArray(user.roles) ? user.roles.map(normalizeRole) : [])
+                        ].filter(Boolean))));
                         setSedeDraft(normalizeSede(user.sede) || '');
                         setEditingRole(true);
                       }}
@@ -804,6 +826,18 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
                           <option key={r} value={r}>{getRoleDisplayName(r)}</option>
                         ))}
                       </select>
+                      <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap', width: '100%' }}>
+                        {ROLE_EDIT_OPTIONS.map(r => {
+                          const selected = rolesDraft.includes(r);
+                          return <label key={r} style={{ fontSize: '0.72rem', color: selected ? 'var(--crear-gold)' : 'var(--text-muted)', cursor: 'pointer' }}>
+                            <input
+                              type="checkbox"
+                              checked={selected}
+                              onChange={() => setRolesDraft(prev => selected ? prev.filter(item => item !== r) : [...prev, r])}
+                            /> {getRoleDisplayName(r)}
+                          </label>;
+                        })}
+                      </div>
                       <select
                         value={sedeDraft}
                         onChange={(e) => setSedeDraft(e.target.value)}
@@ -831,7 +865,7 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
                         Cancelar
                       </button>
                       <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', width: '100%' }}>
-                        Escribe directamente en <code>users/{user.id}</code>. El rol determina qué tareas ve esta persona en toda la plataforma — verifica antes de guardar.
+                        El primer selector define el rol de inicio. Las casillas conservan roles adicionales; el cambio se registra en la trazabilidad. Verifica la sede correspondiente antes de guardar.
                       </span>
                     </div>
                   )}

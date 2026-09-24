@@ -1127,13 +1127,15 @@ export default function SuperAdminPanel() {
     try {
       setIsHealingRoles(true);
       showToast("🛡️ Agente Supervisor de Roles analizando la base de datos...", "info");
-      const report = await runRoleIntegrityAuditAndHeal({ dryRun: false });
+      // Una auditoría no debe modificar usuarios por sorpresa. Las correcciones
+      // se realizan desde cada perfil, con sede, roles y trazabilidad visibles.
+      const report = await runRoleIntegrityAuditAndHeal({ dryRun: true });
       if (report.status === 'success') {
         const refreshed = await getAllCompanyUsers();
         setRealUsersData(refreshed);
         setRoleAuditModalData(report);
         if (report.rolesRepaired > 0) {
-          showToast(`✅ Se sanaron y restauraron ${report.rolesRepaired} cargos alterados o duplicados sin colapsos.`, "success");
+          showToast(`⚠️ Auditoría detectó ${report.rolesRepaired} perfiles a revisar. No se cambió ningún acceso automáticamente.`, "info");
         } else {
           showToast(`✅ Integridad de roles perfecta: ${report.totalUsersScanned} usuarios analizados, cero colapsos.`, "success");
         }
@@ -1148,61 +1150,6 @@ export default function SuperAdminPanel() {
     }
   };
 
-
-  // HOTFIX temporal para corregir el rol de José Sánchez en la base de datos
-  useEffect(() => {
-    if (currentUser?.email === 'jose.sanchez@crearpsl.net' && currentUser?.dbId) {
-      const fixRole = async () => {
-        try {
-          const { doc, updateDoc } = await import('firebase/firestore');
-          const userRef = doc(db, 'users', currentUser.dbId);
-          await updateDoc(userRef, {
-            role: 'gerente',
-            roles: ['gerente', 'qt', 'superadmin'],
-            sede: 'Lima'
-          });
-          console.log("Rol de José Sánchez corregido en DB.");
-        } catch (err) {
-          console.error("Error corrigiendo rol:", err);
-        }
-      };
-      fixRole();
-    }
-  }, [currentUser]);
-
-  // Saneamiento y sincronización de identidad de Alex Zapata (redes sociales -> Alex Zapata)
-  useEffect(() => {
-    const healAlexZapata = async () => {
-      try {
-        const { collection, query, where, getDocs, updateDoc, doc, setDoc } = await import('firebase/firestore');
-        const q = query(collection(db, 'users'), where('email', '==', 'redessociales@crearpsl.net'));
-        const snap = await getDocs(q);
-        snap.forEach(async (d) => {
-          const data = d.data();
-          if (data.name !== 'Alex Zapata' || data.displayName !== 'Alex Zapata') {
-            await updateDoc(doc(db, 'users', d.id), {
-              name: 'Alex Zapata',
-              displayName: 'Alex Zapata'
-            });
-            console.log("Nombre de Alex Zapata sincronizado en Firestore (users).");
-          }
-        });
-
-        // Asegurar consistencia en user_profiles
-        const profileRef = doc(db, 'user_profiles', 'redessociales@crearpsl.net');
-        await setDoc(profileRef, {
-          name: 'Alex Zapata',
-          displayName: 'Alex Zapata',
-          email: 'redessociales@crearpsl.net',
-          role: 'marketing',
-          sede: 'Global'
-        }, { merge: true });
-      } catch (err) {
-        console.warn("Saneamiento de perfil Alex Zapata:", err);
-      }
-    };
-    healAlexZapata();
-  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -1351,9 +1298,6 @@ export default function SuperAdminPanel() {
       <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
         <button onClick={() => navigate('/home')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}>
           <ArrowLeft size={16} /> Volver al Inicio
-        </button>
-        <button onClick={fixKarol} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.4rem 0.8rem', fontSize: '0.85rem', background: '#ef4444', color: 'white', border: 'none' }}>
-          Corregir Perfil de Karol
         </button>
       </div>
 

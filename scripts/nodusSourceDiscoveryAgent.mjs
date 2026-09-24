@@ -27,9 +27,15 @@ function adminDb() {
 }
 
 async function inspectRoute(page, route) {
-  await page.goto(`https://imo.crearpslglobal.com${route}`, { waitUntil: 'domcontentloaded', timeout: 45000 });
-  await new Promise((resolve) => setTimeout(resolve, 1200));
-  return page.evaluate((expectedRoute) => {
+  const url = `https://imo.crearpslglobal.com${route}`;
+  let lastError;
+  // NODUS puede hacer una redirección de sesión justo después de DOMContentLoaded.
+  // Reintentamos la lectura de metadatos sin enviar formularios ni tocar datos.
+  for (let attempt = 1; attempt <= 2; attempt += 1) {
+    try {
+      await page.goto(url, { waitUntil: 'networkidle2', timeout: 45000 });
+      await new Promise((resolve) => setTimeout(resolve, 600));
+      return await page.evaluate((expectedRoute) => {
     const normalizeKey = (value = '') => value.toString().toLowerCase()
       .normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
     const tables = Array.from(document.querySelectorAll('table')).map((table) => ({
@@ -50,7 +56,14 @@ async function inspectRoute(page, route) {
       controls,
       inspectedAt: new Date().toISOString()
     };
-  }, route);
+      }, route);
+    } catch (error) {
+      lastError = error;
+      if (!/Execution context was destroyed|navigation|detached/i.test(error.message) || attempt === 2) break;
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+  }
+  throw lastError;
 }
 
 function locateFIContract(page) {

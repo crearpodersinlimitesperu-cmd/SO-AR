@@ -1183,7 +1183,9 @@ export default function PortfolioBoard() {
               const criticosList = sedeList.filter(c => c.nivelRiesgo === 'CRITICO');
               const rezagosList = sedeList.filter(c => c.nivelRiesgo === 'MEDIO');
               const optimosList = sedeList.filter(c => c.nivelRiesgo === 'OPTIMO');
-              const saludPct = totalCoords > 0 ? Math.round((optimosList.length / totalCoords) * 100) : 100;
+              // Sin universo real no existe una métrica de salud. Mostrar 100%
+              // cuando Nodus devolvió cero personas era un falso positivo.
+              const saludPct = totalCoords > 0 ? Math.round((optimosList.length / totalCoords) * 100) : null;
 
               // Filtrado por tab y búsqueda
               let displayList = [...sedeList];
@@ -1258,11 +1260,13 @@ ${coord.coachingFeedback}`;
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.25rem', marginBottom: '1.5rem' }}>
                     <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.25rem', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
                       <div style={{ fontSize: '0.75rem', fontWeight: 800, color: textMuted, textTransform: 'uppercase' }}>Salud Operativa Global</div>
-                      <div style={{ fontSize: '2rem', fontWeight: 900, color: saludPct >= 70 ? '#10b981' : '#f59e0b', margin: '0.2rem 0' }}>
-                        {saludPct}%
+                      <div style={{ fontSize: '2rem', fontWeight: 900, color: saludPct === null ? '#94a3b8' : saludPct >= 70 ? '#10b981' : '#f59e0b', margin: '0.2rem 0' }}>
+                        {saludPct === null ? '—' : `${saludPct}%`}
                       </div>
                       <div style={{ fontSize: '0.8rem', color: textMuted }}>
-                        {optimosList.length} de {totalCoords} coordinadores con ritmo activo ({selectedSede})
+                        {saludPct === null
+                          ? `Sin universo verificable desde Nodus para ${selectedSede}; no se emite diagnóstico.`
+                          : `${optimosList.length} de ${totalCoords} coordinadores con ritmo activo (${selectedSede})`}
                       </div>
                     </div>
 

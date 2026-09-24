@@ -38,9 +38,9 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Calendar, CheckCircle2, AlertTriangle, Plane, Building2,
-  ShieldCheck, Search, History, ExternalLink, Users, Save, X, Filter
+  ShieldCheck, Search, History, ExternalLink, Users, Save, X, Filter, RefreshCw, CircleAlert
 } from 'lucide-react';
-import { collection, onSnapshot, doc, setDoc, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, onSnapshot, doc, setDoc, addDoc, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useAuth } from '../context/AuthContext';
 import { useCycles } from '../context/CyclesContext';
@@ -49,14 +49,37 @@ import { getAllCompanyUsers } from '../services/userService';
 import { normalizeSede, normalizeRole, OPERATIONAL_SEDES } from '../data/usersData';
 import { getFlagForSede } from '../utils/flags';
 import { canUseAsignadorEntrenadores } from '../config/permissions';
+import { listTrainerPolicyFiles, TRAINER_POLICIES_FOLDER_ID } from '../services/googleDriveService';
 
 // Los 3 fines de semana de Maestría del Juego. El orden es el oficial del
 // entrenamiento y se usa tal cual para numerar los FDS.
 const FDS_MAESTRIA = ['Creación', 'Relación', 'Gratitud'];
 
-const esMaestria = (nombre) => {
+const tipoPrograma = (nombre = '') => {
   const n = (nombre || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
-  return n.includes('maestria') || n.includes('mj') || n.includes('el viaje');
+  if (n.includes('el viaje')) return 'mj_el_viaje';
+  if (n.includes('maestria') || n.includes('mj')) return 'mj';
+  if (n.includes('vuelo')) return 'vuelos';
+  return '';
+};
+const esMaestria = nombre => tipoPrograma(nombre) === 'mj';
+
+// Los complementarios no son C1/C2 ni MJ. Se clasifican por el nombre oficial
+// del calendario, sin modificar el evento ni su asignación guardada.
+const tipoComplementario = (nombre = '') => {
+  const value = String(nombre).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  if (value.includes('caida') && value.includes('confianza')) return 'caida_confianza';
+  if (value.includes('tanque')) return 'tanque';
+  if (value.includes('caminata') && value.includes('fuego')) return 'caminata_fuego';
+  if (value.includes('rompimiento')) return 'rompimiento';
+  return '';
+};
+
+const tipoCapitulo = (nombre = '') => {
+  const value = String(nombre).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  if (value.includes('capitulo uno') || value.includes('capitulo 1')) return 'c1';
+  if (value.includes('capitulo dos') || value.includes('capitulo 2')) return 'c2';
+  return '';
 };
 
 // Identificador estable de un entrenamiento. Los eventos del Apps Script no
@@ -78,8 +101,67 @@ const fmtFecha = (v) => {
   return d.toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' });
 };
 
+// El calendario histórico puede traer "FERNANDO ARAGON" y el directorio
+// "Fer Aragon". Para filtrar se compara una identidad normalizada; no altera
+// el nombre original mostrado ni una asignación guardada.
+const normalizarIdentidadEntrenador = (value = '') => String(value)
+  .toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+  .replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter(Boolean)
+  .map(token => ({ fernando: 'fer', fer: 'fer' }[token] || token))
+  .join(' ');
+const mismoEntrenador = (a, b) => {
+  const left = normalizarIdentidadEntrenador(a);
+  const right = normalizarIdentidadEntrenador(b);
+  return Boolean(left && right && left === right);
+};
+
+// La hoja histórica a veces concentra varias preasignaciones en una misma
+// celda ("Ana / María / Michael"). Eso es una señal de trabajo pendiente,
+// no una asignación válida: un FDS debe tener exactamente una persona.
+// Conservamos el texto original y mostramos cada candidato, pero jamás
+// escogemos uno automáticamente ni lo escribimos en Firestore.
+const extraerPreasignaciones = (value = '') => {
+  const seen = new Set();
+  return String(value)
+    .split(/[\/;,\n]+/)
+    .map(name => name.trim())
+    .filter(Boolean)
+    .filter(name => {
+      const key = normalizarIdentidadEntrenador(name);
+      if (!key || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+};
+
+const normalizarTexto = (value = '') => String(value).toLowerCase().normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
+const tokensNombre = value => normalizarTexto(value).split(' ')
+  .filter(token => token.length > 2 && !['del', 'las', 'los', 'para'].includes(token));
+const policyReviewId = entrenador => String(entrenador.email || normalizarTexto(entrenador.nombre).replace(/\s+/g, '_'))
+  .toLowerCase().replace(/[^a-z0-9_@.-]/g, '_');
+const todayIso = () => new Date().toISOString().slice(0, 10);
+const buscarPoliza = (nombre, archivos, directorio = []) => {
+  const tokens = tokensNombre(nombre);
+  const ranked = (archivos || []).map(file => ({ file, shared: tokens.filter(token => normalizarTexto(file.name).includes(token)).length }))
+    .sort((a, b) => b.shared - a.shared);
+  const best = ranked[0];
+  if (!best || best.shared === 0) return { file: null, confidence: 'none' };
+  // Una sola coincidencia solo se muestra cuando ese nombre es distintivo en
+  // el directorio Y el archivo parece ser una póliza. Queda siempre como
+  // revisión humana; no se presenta como una cobertura confirmada.
+  if (best.shared === 1) {
+    const matchedToken = tokens.find(token => normalizarTexto(best.file.name).includes(token));
+    const tokenIsUnique = matchedToken && directorio.filter(persona => tokensNombre(persona.nombre).includes(matchedToken)).length === 1;
+    const policyLikeFile = /poliza|seguro|assist|travel|chubb|axa|sura|salud/.test(normalizarTexto(best.file.name));
+    if (!(tokenIsUnique && policyLikeFile)) return { file: null, confidence: 'none' };
+    return { file: best.file, confidence: 'review' };
+  }
+  return { file: best.file, confidence: best.shared === tokens.length ? 'high' : 'review' };
+};
+
 export default function AsignadorEntrenadores() {
-  const { currentUser } = useAuth();
+  const { currentUser, reauthenticateGoogle } = useAuth();
   const { events, loadingEvents } = useCycles();
   const { showToast } = useUI();
   const navigate = useNavigate();
@@ -91,6 +173,15 @@ export default function AsignadorEntrenadores() {
   const [trazas, setTrazas] = useState([]);
   const [tab, setTab] = useState('matriz');
   const [guardando, setGuardando] = useState('');
+  const [policyFiles, setPolicyFiles] = useState([]);
+  const [policyLoading, setPolicyLoading] = useState(false);
+  const [policyError, setPolicyError] = useState('');
+  const [policyScannedAt, setPolicyScannedAt] = useState(null);
+  const [policyReviews, setPolicyReviews] = useState({});
+  const [policyReviewsLoaded, setPolicyReviewsLoaded] = useState(false);
+  const [policyAudits, setPolicyAudits] = useState([]);
+  const [policyExpiryDrafts, setPolicyExpiryDrafts] = useState({});
+  const [policySaving, setPolicySaving] = useState('');
 
   // Filtros
   const [periodo, setPeriodo] = useState('proximos');
@@ -129,6 +220,35 @@ export default function AsignadorEntrenadores() {
       }
     })();
     return () => { vivo = false; };
+  }, [autorizado]);
+
+  useEffect(() => {
+    if (!autorizado) return;
+    const unsub = onSnapshot(collection(db, 'trainer_policy_audit'), snap => {
+      const items = [];
+      snap.forEach(item => items.push({ id: item.id, ...item.data() }));
+      items.sort((a, b) => String(b.occurredAt || '').localeCompare(String(a.occurredAt || '')));
+      setPolicyAudits(items.slice(0, 12));
+    }, err => console.error('trainer_policy_audit:', err));
+    return () => unsub();
+  }, [autorizado]);
+
+  // Resultados persistidos: se leen desde Causa OS al entrar, pero Drive solo
+  // se consulta bajo acción explícita del operador. Así una sesión no vuelve a
+  // validar ni depende de Google para mostrar el último control certificado.
+  useEffect(() => {
+    if (!autorizado) return;
+    const unsub = onSnapshot(collection(db, 'trainer_policy_reviews'), snap => {
+      const out = {};
+      snap.forEach(item => { out[item.id] = { id: item.id, ...item.data() }; });
+      setPolicyReviews(out);
+      setPolicyReviewsLoaded(true);
+    }, err => {
+      console.error('trainer_policy_reviews:', err);
+      setPolicyError('No se pudo leer el registro guardado de pólizas: ' + err.message);
+      setPolicyReviewsLoaded(true);
+    });
+    return () => unsub();
   }, [autorizado]);
 
   // --- Asignaciones guardadas en Causa OS (en vivo) -------------------------
@@ -186,15 +306,23 @@ export default function AsignadorEntrenadores() {
 
       const key = eventoKey(ev);
       const nombre = ev.nombre || ev.name || 'Entrenamiento';
+      const complementario = tipoComplementario(nombre);
+      const capitulo = tipoCapitulo(nombre);
+      const programa = tipoPrograma(nombre);
       const sede = normalizeSede(ev.sede || ev.sedeTag || '');
       const guardado = asignaciones[key] || {};
       const slots = esMaestria(nombre) ? FDS_MAESTRIA : ['unico'];
 
       slots.forEach((slot, i) => {
         const asign = guardado[slot] || {};
+        const entrenadorHojaRaw = ev.trainer || ev.entrenador || '';
+        const preasignacionesHoja = extraerPreasignaciones(entrenadorHojaRaw);
         out.push({
           key, slot,
           esMJ: slots.length > 1,
+          complementario,
+          capitulo,
+          programa: slots.length > 1 ? `mj_${slot === 'Creación' ? 'creacion' : slot === 'Relación' ? 'relacion' : 'gratitud'}` : programa,
           fdsLabel: slots.length > 1 ? `FDS ${i + 1} · ${slot}` : null,
           nombre, sede,
           fechaInicio: inicio,
@@ -202,7 +330,11 @@ export default function AsignadorEntrenadores() {
           equipo: ev.equipo || ev.team || '',
           lugar: ev.lugar || ev.direccion || '',
           // entrenador de la hoja (lo que hay hoy) vs el asignado en Causa OS
-          entrenadorHoja: ev.trainer || ev.entrenador || '',
+          entrenadorHojaRaw,
+          // Solo una persona de la fuente puede presentarse como asignación.
+          // Las listas múltiples quedan explícitamente pendientes de confirmar.
+          entrenadorHoja: preasignacionesHoja.length === 1 ? preasignacionesHoja[0] : '',
+          preasignacionesHoja,
           entrenadorAsignado: asign.entrenador || '',
           asignadoPor: asign.asignadoPor || '',
           asignadoEn: asign.fechaIso || '',
@@ -217,15 +349,20 @@ export default function AsignadorEntrenadores() {
     const q = busqueda.toLowerCase().trim();
     return filas.filter(f => {
       if (filtroSede !== 'todas' && f.sede !== filtroSede) return false;
-      if (filtroTipo === 'mj' && !f.esMJ) return false;
-      if (filtroTipo === 'c1c2' && f.esMJ) return false;
+      if (filtroTipo === 'mj' && !f.esMJ && f.programa !== 'mj_el_viaje') return false;
+      if (filtroTipo === 'c1c2' && !f.capitulo) return false;
+      if (filtroTipo === 'c1' && f.capitulo !== 'c1') return false;
+      if (filtroTipo === 'c2' && f.capitulo !== 'c2') return false;
+      if (['mj_creacion', 'mj_relacion', 'mj_gratitud', 'mj_el_viaje', 'vuelos'].includes(filtroTipo) && f.programa !== filtroTipo) return false;
+      if (filtroTipo === 'complementarios' && !f.complementario) return false;
+      if (['caida_confianza', 'tanque', 'caminata_fuego', 'rompimiento'].includes(filtroTipo) && f.complementario !== filtroTipo) return false;
       if (filtroEntrenador === 'pendientes' && (f.entrenadorAsignado || f.entrenadorHoja)) return false;
       if (filtroEntrenador !== 'todos' && filtroEntrenador !== 'pendientes') {
-        const actual = f.entrenadorAsignado || f.entrenadorHoja;
-        if (actual !== filtroEntrenador) return false;
+        const candidates = [f.entrenadorAsignado || f.entrenadorHoja, ...(f.preasignacionesHoja || [])];
+        if (!candidates.some(candidate => mismoEntrenador(candidate, filtroEntrenador))) return false;
       }
       if (q) {
-        const blob = `${f.nombre} ${f.sede} ${f.equipo} ${f.lugar} ${f.entrenadorAsignado} ${f.entrenadorHoja}`.toLowerCase();
+        const blob = `${f.nombre} ${f.sede} ${f.equipo} ${f.lugar} ${f.entrenadorAsignado} ${f.entrenadorHojaRaw}`.toLowerCase();
         if (!blob.includes(q)) return false;
       }
       return true;
@@ -262,10 +399,113 @@ export default function AsignadorEntrenadores() {
     return [...m.values()].sort((a, b) => b.total - a.total);
   }, [entrenadores, filas]);
 
+  const policyRows = useMemo(() => entrenadores.map(entrenador => {
+    const reviewId = policyReviewId(entrenador);
+    const stored = policyReviews[reviewId] || null;
+    const discovered = policyFiles.length ? buscarPoliza(entrenador.nombre, policyFiles, entrenadores) : { file: null, confidence: stored?.matchConfidence || 'none' };
+    const file = discovered.file || stored?.file || null;
+    const isExpired = Boolean(stored?.validUntil && stored.validUntil < todayIso());
+    const changedFile = Boolean(policyFiles.length && stored?.verifiedFileId && discovered.file?.id && stored.verifiedFileId !== discovered.file.id);
+    let status = 'sin_documento';
+    if (stored?.verificationStatus === 'vigente' && stored?.validUntil && !isExpired && !changedFile) status = 'vigente';
+    else if (isExpired) status = 'vencida';
+    else if (changedFile) status = 'requiere_revision';
+    else if (file) status = 'pendiente_fecha';
+    return { ...entrenador, reviewId, stored, file, confidence: discovered.confidence, status };
+  }), [entrenadores, policyFiles, policyReviews]);
+  const policySummary = useMemo(() => ({
+    found: policyRows.filter(row => row.status === 'vigente').length,
+    review: policyRows.filter(row => ['pendiente_fecha', 'requiere_revision'].includes(row.status)).length,
+    missing: policyRows.filter(row => ['sin_documento', 'vencida'].includes(row.status)).length,
+  }), [policyRows]);
+  const lastPolicyScan = useMemo(() => Object.values(policyReviews)
+    .map(review => review.lastScannedAt).filter(Boolean).sort().reverse()[0] || null, [policyReviews]);
+
+  const validarPolizas = async () => {
+    setPolicyLoading(true); setPolicyError('');
+    try {
+      let token = sessionStorage.getItem('googleAccessToken');
+      if (!token) token = await reauthenticateGoogle();
+      if (!token) throw new Error('No se autorizó la consulta de metadatos de Drive.');
+      let files;
+      try {
+        files = await listTrainerPolicyFiles(token);
+      } catch (firstError) {
+        if (!/invalid authentication credentials|http 401|unauthenticated/i.test(firstError?.message || '')) throw firstError;
+        token = await reauthenticateGoogle();
+        if (!token) throw firstError;
+        files = await listTrainerPolicyFiles(token);
+      }
+      // Se persiste el hallazgo y un evento inmutable de auditoría. La fecha de
+      // vigencia NO se infiere del archivo: solo la conserva si fue verificada
+      // manualmente contra el documento por un operador autorizado.
+      const scanAt = new Date().toISOString();
+      const batch = writeBatch(db);
+      entrenadores.forEach(entrenador => {
+        const reviewId = policyReviewId(entrenador);
+        const previous = policyReviews[reviewId] || {};
+        const match = buscarPoliza(entrenador.nombre, files, entrenadores);
+        const changedFile = Boolean(previous.verifiedFileId && match.file?.id && previous.verifiedFileId !== match.file.id);
+        const verificationStatus = changedFile ? 'pendiente_revision' : (previous.verificationStatus || (match.file ? 'pendiente_fecha' : 'sin_documento'));
+        const reviewRef = doc(db, 'trainer_policy_reviews', reviewId);
+        batch.set(reviewRef, {
+          trainerName: entrenador.nombre,
+          coachEmail: entrenador.email || null,
+          sede: entrenador.sede || 'Global',
+          file: match.file ? { id: match.file.id, name: match.file.name, webViewLink: match.file.webViewLink || null, modifiedTime: match.file.modifiedTime || null } : null,
+          matchConfidence: match.confidence,
+          verificationStatus,
+          requiresRevalidation: changedFile,
+          lastScannedAt: scanAt,
+          lastScannedBy: currentUser?.email || '',
+          updatedAt: serverTimestamp(),
+        }, { merge: true });
+        batch.set(doc(collection(db, 'trainer_policy_audit')), {
+          action: 'POLICY_DRIVE_SCAN', trainerName: entrenador.nombre, coachEmail: entrenador.email || null,
+          reviewId, fileId: match.file?.id || null, fileName: match.file?.name || null,
+          confidence: match.confidence, occurredAt: scanAt, actorEmail: currentUser?.email || '', actorName: currentUser?.name || '',
+          immutable: true,
+        });
+      });
+      await batch.commit();
+      setPolicyFiles(files);
+      setPolicyScannedAt(new Date(scanAt));
+      showToast(`Validación guardada: ${entrenadores.length} entrenadores auditados.`, 'success');
+    } catch (error) { setPolicyError(error.message || 'No se pudo consultar Drive.'); }
+    finally { setPolicyLoading(false); }
+  };
+
+  const confirmarVigencia = async (row) => {
+    const validUntil = policyExpiryDrafts[row.reviewId] ?? row.stored?.validUntil ?? '';
+    if (!row.file) return showToast('Primero debe existir un documento localizado para confirmar su vigencia.', 'error');
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(validUntil)) return showToast('Indica la fecha de vigencia leída en el documento.', 'error');
+    setPolicySaving(row.reviewId);
+    const verificationStatus = validUntil >= todayIso() ? 'vigente' : 'vencida';
+    const occurredAt = new Date().toISOString();
+    try {
+      await setDoc(doc(db, 'trainer_policy_reviews', row.reviewId), {
+        trainerName: row.nombre, coachEmail: row.email || null, sede: row.sede || 'Global',
+        file: row.file, verifiedFileId: row.file.id, validUntil, verificationStatus,
+        requiresRevalidation: false, verifiedAt: occurredAt,
+        verifiedBy: currentUser?.email || '', verifiedByName: currentUser?.name || '', updatedAt: serverTimestamp(),
+      }, { merge: true });
+      await addDoc(collection(db, 'trainer_policy_audit'), {
+        action: verificationStatus === 'vigente' ? 'POLICY_VERIFIED_VALID' : 'POLICY_VERIFIED_EXPIRED',
+        trainerName: row.nombre, coachEmail: row.email || null, reviewId: row.reviewId,
+        fileId: row.file.id, fileName: row.file.name, validUntil, occurredAt,
+        actorEmail: currentUser?.email || '', actorName: currentUser?.name || '', immutable: true,
+      });
+      showToast(verificationStatus === 'vigente' ? `Vigencia de ${row.nombre} confirmada hasta ${validUntil}.` : `La póliza de ${row.nombre} quedó registrada como vencida.`, 'success');
+    } catch (error) {
+      showToast('No se pudo guardar la verificación: ' + error.message, 'error');
+    } finally { setPolicySaving(''); }
+  };
+
   // --- Guardar una asignación (con trazabilidad) ---------------------------
   const asignar = async (fila, nuevoEntrenador) => {
     if (!autorizado) return;
-    const anterior = fila.entrenadorAsignado || fila.entrenadorHoja || '(sin asignar)';
+    const anterior = fila.entrenadorAsignado || fila.entrenadorHoja
+      || (fila.preasignacionesHoja?.length ? `preasignación pendiente: ${fila.preasignacionesHoja.join(' / ')}` : '(sin asignar)');
     if (nuevoEntrenador === fila.entrenadorAsignado) return;
     setGuardando(`${fila.key}__${fila.slot}`);
     try {
@@ -468,9 +708,18 @@ export default function AsignadorEntrenadores() {
             <div>
               <label className="text-muted" style={{ fontSize: '0.7rem', fontWeight: 700 }}>ENTRENAMIENTO</label>
               <select style={selectStyle} value={filtroTipo} onChange={e => setFiltroTipo(e.target.value)}>
-                <option value="todos">Todos los tipos</option>
-                <option value="mj">Solo Maestría del Juego</option>
-                <option value="c1c2">Solo Capítulo 1 y 2</option>
+                <option value="todos">Todos los programas vigentes</option>
+                <option value="c1">Capítulo Uno</option>
+                <option value="c2">Capítulo Dos</option>
+                <option value="mj_creacion">MJ · Creación</option>
+                <option value="mj_relacion">MJ · Relación</option>
+                <option value="mj_gratitud">MJ · Gratitud</option>
+                <option value="mj_el_viaje">MJ · El Viaje</option>
+                <option value="rompimiento">Rompimiento de Barreras</option>
+                <option value="tanque">Tanque</option>
+                <option value="caida_confianza">Caída de Confianza</option>
+                <option value="caminata_fuego">Caminata sobre Fuego</option>
+                <option value="vuelos">Vuelos</option>
               </select>
             </div>
             <div>
@@ -513,6 +762,7 @@ export default function AsignadorEntrenadores() {
                   {filasFiltradas.map(f => {
                     const idFila = `${f.key}__${f.slot}`;
                     const actual = f.entrenadorAsignado || '';
+                    const tienePreasignacionAmbigua = !actual && (f.preasignacionesHoja?.length || 0) > 1;
                     const sinAsignar = !actual && !f.entrenadorHoja;
                     return (
                       <tr key={idFila} style={{ borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.06))' }}>
@@ -540,7 +790,9 @@ export default function AsignadorEntrenadores() {
                             onChange={e => asignar(f, e.target.value)}
                           >
                             <option value="">
-                              {f.entrenadorHoja ? `— (hoja: ${f.entrenadorHoja})` : '— Sin asignar —'}
+                              {tienePreasignacionAmbigua
+                                ? `— Confirmar un entrenador (${f.preasignacionesHoja.length} preasignados) —`
+                                : f.entrenadorHoja ? `— (hoja: ${f.entrenadorHoja})` : '— Sin asignar —'}
                             </option>
                             {entrenadores.map(e => <option key={e.nombre} value={e.nombre}>{e.nombre}</option>)}
                           </select>
@@ -549,7 +801,12 @@ export default function AsignadorEntrenadores() {
                               por {f.asignadoPor} · {fmtFecha(f.asignadoEn)}
                             </div>
                           )}
-                          {!actual && f.entrenadorHoja && (
+                          {!actual && tienePreasignacionAmbigua && (
+                            <div className="text-muted" style={{ fontSize: '0.68rem', marginTop: 3 }}>
+                              Preasignación importada: {f.preasignacionesHoja.join(' · ')}. Selecciona una persona para fijarla en Causa OS.
+                            </div>
+                          )}
+                          {!actual && !tienePreasignacionAmbigua && f.entrenadorHoja && (
                             <div className="text-muted" style={{ fontSize: '0.68rem', marginTop: 3 }}>
                               viene de la hoja — elige aquí para fijarlo en Causa OS
                             </div>
@@ -581,7 +838,9 @@ export default function AsignadorEntrenadores() {
               {carga.map(c => (
                 <tr key={c.nombre} style={{ borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.06))' }}>
                   <td style={{ padding: '0.6rem 0.9rem', color: 'var(--text-heading)', fontWeight: 600 }}>{c.nombre}</td>
-                  <td style={{ padding: '0.6rem 0.9rem' }} className="text-muted">{c.sede ? `${getFlagForSede(c.sede)} ${normalizeSede(c.sede)}` : '—'}</td>
+                  <td style={{ padding: '0.6rem 0.9rem' }} className="text-muted">
+                    {c.sede ? <>{getFlagForSede(c.sede)} {normalizeSede(c.sede)}</> : '—'}
+                  </td>
                   <td style={{ padding: '0.6rem 0.9rem', fontWeight: 800, color: c.total === 0 ? 'var(--text-muted)' : 'var(--crear-gold)' }}>{c.total}</td>
                   <td style={{ padding: '0.6rem 0.9rem' }} className="text-muted">{c.mj}</td>
                   <td style={{ padding: '0.6rem 0.9rem' }} className="text-muted">{c.c1c2}</td>
@@ -634,22 +893,38 @@ export default function AsignadorEntrenadores() {
 
       {/* ---------------- PÓLIZAS ---------------- */}
       {tab === 'polizas' && (
-        <div style={{ ...card }}>
-          <h3 style={{ marginTop: 0, color: 'var(--text-heading)', fontSize: '1rem' }}>
-            <ShieldCheck size={17} style={{ verticalAlign: '-3px' }} /> Auditoría de Pólizas en Drive
-          </h3>
-          <p className="text-muted" style={{ fontSize: '0.85rem', lineHeight: 1.6, margin: '0.6rem 0 0' }}>
-            Esta pestaña todavía <strong>no está conectada</strong>. Causa OS hoy sabe <em>subir</em> archivos a
-            Google Drive (<code>googleDriveService.js</code>), pero no tiene permiso de <em>listar</em> una
-            carpeta, que es lo que hace falta para leer las pólizas de cada entrenador y calcular
-            cuáles están vigentes y cuáles vencidas.
-          </p>
-          <p className="text-muted" style={{ fontSize: '0.85rem', lineHeight: 1.6 }}>
-            Se deja declarado en vez de mostrar un número inventado. Para activarlo hace falta
-            definir la carpeta de Drive donde viven las pólizas y autorizar el alcance de lectura —
-            dímelo y lo conecto.
-          </p>
-        </div>
+        <>
+          <div style={{ ...card, display: 'flex', justifyContent: 'space-between', gap: '1rem', alignItems: 'center', flexWrap: 'wrap', marginBottom: '0.9rem' }}>
+            <div><h3 style={{ margin: 0, color: 'var(--text-heading)', fontSize: '1rem' }}><ShieldCheck size={17} style={{ verticalAlign: '-3px' }} /> Centro de Control de Pólizas</h3>
+              <div className="text-muted" style={{ fontSize: '0.78rem', marginTop: 5 }}>Control persistente y auditable. Drive solo se consulta al validar; la vigencia se confirma con la fecha leída en el documento.</div></div>
+            <div style={{ display: 'flex', gap: '0.55rem' }}><a href={`https://drive.google.com/drive/folders/${TRAINER_POLICIES_FOLDER_ID}`} target="_blank" rel="noreferrer" style={{ ...selectStyle, width: 'auto', textDecoration: 'none' }}><ExternalLink size={14} /> Abrir carpeta</a>
+              <button onClick={validarPolizas} disabled={policyLoading} style={{ border: 0, borderRadius: 8, padding: '0.5rem 0.75rem', background: 'var(--crear-gold)', color: '#111827', fontWeight: 800, cursor: policyLoading ? 'wait' : 'pointer' }}><RefreshCw size={14} /> {policyLoading ? 'Validando…' : 'Validar pólizas'}</button></div>
+          </div>
+          {policyError && <div style={{ ...card, borderColor: 'rgba(239,68,68,.4)', marginBottom: '0.9rem' }}><CircleAlert size={17} style={{ color: '#ef4444', verticalAlign: '-3px' }} /> {policyError}</div>}
+          {(policyReviewsLoaded || policyScannedAt) && <>
+            <div style={{ display: 'flex', gap: '.5rem', flexWrap: 'wrap', marginBottom: '.7rem', fontSize: '.76rem' }}>
+              <span style={{ ...selectStyle, width: 'auto', color: '#10b981' }}>{policySummary.found} vigentes confirmadas</span>
+              <span style={{ ...selectStyle, width: 'auto', color: '#f59e0b' }}>{policySummary.review} por revisar</span>
+              <span style={{ ...selectStyle, width: 'auto', color: '#ef4444' }}>{policySummary.missing} sin cobertura vigente</span>
+              {lastPolicyScan && <span className="text-muted" style={{ alignSelf: 'center' }}>Última lectura de Drive: {fmtFecha(lastPolicyScan)}</span>}
+            </div>
+            <div style={{ ...card, padding: 0, overflowX: 'auto' }}><table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem', minWidth: 1080 }}><thead><tr>{['ENTRENADOR','SEDE','ESTADO','DOCUMENTO','VENCE','CONTROL'].map(h => <th key={h} style={{ textAlign: 'left', padding: '0.7rem .85rem', color: 'var(--text-muted)', fontSize: '.68rem' }}>{h}</th>)}</tr></thead><tbody>{policyRows.map(row => {
+              const state = {
+                vigente: ['Vigente confirmada', '#10b981'], vencida: ['Vencida', '#ef4444'], requiere_revision: ['Cambio detectado · revisar', '#f59e0b'], pendiente_fecha: ['Documento localizado · falta vigencia', '#f59e0b'], sin_documento: ['Sin coincidencia segura', '#ef4444'],
+              }[row.status];
+              const draft = policyExpiryDrafts[row.reviewId] ?? row.stored?.validUntil ?? '';
+              return <tr key={row.reviewId} style={{ borderTop: '1px solid var(--border-color, rgba(255,255,255,.06))' }}>
+                <td style={{ padding: '.65rem .85rem', fontWeight: 650 }}>{row.nombre}</td><td style={{ padding: '.65rem .85rem' }}>{row.sede || 'Global'}</td>
+                <td style={{ padding: '.65rem .85rem', color: state[1], fontWeight: 700 }}>{state[0]}{row.stored?.verifiedAt && <div className="text-muted" style={{ fontSize: '.68rem', fontWeight: 400, marginTop: 3 }}>verificada {fmtFecha(row.stored.verifiedAt)}</div>}</td>
+                <td style={{ padding: '.65rem .85rem', maxWidth: 280 }}>{row.file ? <><a href={row.file.webViewLink || `https://drive.google.com/open?id=${row.file.id}`} target="_blank" rel="noreferrer" style={{ color: 'var(--crear-gold)' }}>{row.file.name}</a><div className="text-muted" style={{ fontSize: '.68rem', marginTop: 3 }}>archivo actualizado {row.file.modifiedTime ? fmtFecha(row.file.modifiedTime) : 'sin fecha'}</div></> : '—'}</td>
+                <td style={{ padding: '.65rem .85rem' }}>{row.stored?.validUntil ? <strong style={{ color: row.status === 'vencida' ? '#ef4444' : 'inherit' }}>{fmtFecha(row.stored.validUntil)}</strong> : 'Sin verificar'}</td>
+                <td style={{ padding: '.65rem .85rem' }}><div style={{ display: 'flex', gap: '.35rem', alignItems: 'center' }}><input aria-label={`Vigencia de ${row.nombre}`} type="date" value={draft} onChange={e => setPolicyExpiryDrafts(prev => ({ ...prev, [row.reviewId]: e.target.value }))} disabled={!row.file || policySaving === row.reviewId} style={{ ...selectStyle, width: 132, padding: '.35rem .45rem' }} /><button onClick={() => confirmarVigencia(row)} disabled={!row.file || policySaving === row.reviewId} style={{ border: 0, borderRadius: 7, padding: '.38rem .55rem', background: row.file ? 'var(--crear-gold)' : 'var(--border-color)', color: '#111827', fontWeight: 750, cursor: row.file ? 'pointer' : 'not-allowed' }}>{policySaving === row.reviewId ? 'Guardando…' : 'Confirmar'}</button></div><div className="text-muted" style={{ fontSize: '.67rem', marginTop: 4 }}>Fecha verificada en el documento</div></td>
+              </tr>;
+            })}</tbody></table></div>
+            {policyAudits.length > 0 && <div style={{ ...card, marginTop: '.8rem', padding: '.75rem .9rem' }}><div style={{ fontWeight: 750, fontSize: '.8rem', marginBottom: '.45rem' }}><History size={14} style={{ verticalAlign: '-2px' }} /> Auditoría reciente</div>{policyAudits.slice(0, 6).map(audit => <div key={audit.id} className="text-muted" style={{ fontSize: '.72rem', padding: '.28rem 0', borderTop: '1px solid var(--border-color, rgba(255,255,255,.06))' }}>{fmtFecha(audit.occurredAt)} · <strong>{audit.trainerName}</strong> · {audit.action === 'POLICY_VERIFIED_VALID' ? `vigencia confirmada hasta ${audit.validUntil}` : audit.action === 'POLICY_VERIFIED_EXPIRED' ? `vigencia vencida: ${audit.validUntil}` : `lectura de Drive${audit.fileName ? `: ${audit.fileName}` : ' sin coincidencia segura'}`} · {audit.actorName || audit.actorEmail || 'sistema'}</div>)}</div>}
+          </>}
+          {!policyReviewsLoaded && !policyLoading && !policyError && <div style={{ ...card, textAlign: 'center' }}>Cargando el último control guardado…</div>}
+        </>
       )}
     </div>
   );
