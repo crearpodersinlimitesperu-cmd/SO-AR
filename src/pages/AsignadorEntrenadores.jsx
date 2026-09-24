@@ -1042,12 +1042,17 @@ export default function AsignadorEntrenadores() {
                       {eventos.slice(0, 3).map((ev, i) => {
                         const col = getColor(ev.sede);
                         const label = (ev.nombre || '').length > 17 ? ev.nombre.substring(0, 16) + '…' : (ev.nombre || '');
+                        const tieneFin = ev.fechaFin && ev.fechaFin !== ev.fechaInicio;
+                        const fechaChip = tieneFin
+                          ? `${fmtFecha(ev.fechaInicio)} → ${fmtFecha(ev.fechaFin)}`
+                          : fmtFecha(ev.fechaInicio);
                         return (
                           <div key={i}
                             onClick={() => setCalTooltip(calTooltip?.key === `${dateStr}-${i}` ? null : { key: `${dateStr}-${i}`, ev })}
-                            title={`${ev.nombre} · ${ev.entrenadorAsignado || ev.entrenadorHoja || 'Sin asignar'}`}
-                            style={{ fontSize: '0.6rem', fontWeight: 700, padding: '0.12rem 0.28rem', borderRadius: 4, marginBottom: 2, cursor: 'pointer', background: col.bg, border: `1px solid ${col.border}`, color: col.text, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                            {getFlagForSede(ev.sede)} {label}
+                            title={`${ev.nombre}\n${fechaChip}\n${ev.entrenadorAsignado || ev.entrenadorHoja || 'Sin asignar'}`}
+                            style={{ fontSize: '0.6rem', fontWeight: 700, padding: '0.14rem 0.28rem', borderRadius: 4, marginBottom: 2, cursor: 'pointer', background: col.bg, border: `1px solid ${col.border}`, color: col.text, overflow: 'hidden' }}>
+                            <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{getFlagForSede(ev.sede)} {label}</div>
+                            <div style={{ fontWeight: 500, opacity: 0.85, fontSize: '0.56rem', marginTop: '0.06rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>📅 {fechaChip}</div>
                           </div>
                         );
                       })}
@@ -1066,7 +1071,12 @@ export default function AsignadorEntrenadores() {
                   <button onClick={() => setCalTooltip(null)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '1.1rem', lineHeight: 1, padding: 0 }}>✕</button>
                 </div>
                 <div style={{ fontSize: '0.78rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.3rem 1.2rem', color: 'var(--text-muted)' }}>
-                  <span><strong style={{ color: 'var(--text-heading)' }}>Fecha:</strong> {calTooltip.ev.fechaInicio}{calTooltip.ev.fechaFin && calTooltip.ev.fechaFin !== calTooltip.ev.fechaInicio ? ` → ${calTooltip.ev.fechaFin}` : ''}</span>
+                  {calTooltip.ev.fechaFin && calTooltip.ev.fechaFin !== calTooltip.ev.fechaInicio ? (<>
+                    <span><strong style={{ color: 'var(--text-heading)' }}>Inicio:</strong> {fmtFecha(calTooltip.ev.fechaInicio)}</span>
+                    <span><strong style={{ color: 'var(--text-heading)' }}>Fin:</strong> {fmtFecha(calTooltip.ev.fechaFin)}</span>
+                  </>) : (
+                    <span><strong style={{ color: 'var(--text-heading)' }}>Fecha:</strong> {fmtFecha(calTooltip.ev.fechaInicio)}</span>
+                  )}
                   <span><strong style={{ color: 'var(--text-heading)' }}>Sede:</strong> {getFlagForSede(calTooltip.ev.sede)} {normalizeSede(calTooltip.ev.sede)}</span>
                   <span><strong style={{ color: 'var(--text-heading)' }}>Equipo:</strong> {calTooltip.ev.equipo || '—'}</span>
                   <span><strong style={{ color: 'var(--text-heading)' }}>Lugar:</strong> {calTooltip.ev.lugar || '—'}</span>
