@@ -20,7 +20,8 @@
     "flyer:generate": "node scripts/generar_flyer.mjs",
     "sync:nodus": "node scripts/nodusMultiAgentSync.mjs",
     "daemon:nodus": "node scripts/nodusDaemon.mjs",
-    "sync:kpis": "node scripts/syncKpisLlamadas.mjs"
+    "sync:kpis": "node scripts/syncKpisLlamadas.mjs",
+    "audit:polizas": "node scripts/trainerPolicyAuditAgent.mjs"
   },
   "dependencies": {
     "cors": "^2.8.6",
