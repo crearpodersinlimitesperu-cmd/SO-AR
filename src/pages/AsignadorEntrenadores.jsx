@@ -947,17 +947,23 @@ export default function AsignadorEntrenadores() {
       {/* ---------------- CALENDARIO DE ENTRENAMIENTOS ---------------- */}
       {tab === 'calendario' && (() => {
         const DIAS_SEMANA = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
-        const SEDE_COLORS = {
-          lima:      { bg: 'rgba(251,191,36,0.18)',  border: '#fbbf24', text: '#fbbf24' },
-          quito:     { bg: 'rgba(99,102,241,0.18)',  border: '#6366f1', text: '#a5b4fc' },
-          cuenca:    { bg: 'rgba(16,185,129,0.18)',  border: '#10b981', text: '#6ee7b7' },
-          guayaquil: { bg: 'rgba(245,158,11,0.18)',  border: '#f59e0b', text: '#fcd34d' },
-          medellin:  { bg: 'rgba(236,72,153,0.18)',  border: '#ec4899', text: '#f9a8d4' },
-          mexico:    { bg: 'rgba(239,68,68,0.18)',   border: '#ef4444', text: '#fca5a5' },
-          bogota:    { bg: 'rgba(59,130,246,0.18)',  border: '#3b82f6', text: '#93c5fd' },
-          default:   { bg: 'rgba(156,163,175,0.13)', border: 'rgba(156,163,175,0.4)', text: '#9ca3af' },
-        };
-        const getColor = (sede) => SEDE_COLORS[normalizarTexto(sede || '')] || SEDE_COLORS.default;
+        // Colores por sede — generados desde OPERATIONAL_SEDES (src/data/usersData.js)
+        // que es la única fuente de verdad del sistema. No se inventa ninguna sede.
+        const SEDE_COLOR_LIST = [
+          { sede: 'Lima',      bg: 'rgba(251,191,36,0.18)',  border: '#fbbf24', text: '#fbbf24' },
+          { sede: 'Quito',     bg: 'rgba(99,102,241,0.18)',  border: '#6366f1', text: '#a5b4fc' },
+          { sede: 'Cuenca',    bg: 'rgba(16,185,129,0.18)',  border: '#10b981', text: '#6ee7b7' },
+          { sede: 'Guayaquil', bg: 'rgba(245,158,11,0.18)',  border: '#f59e0b', text: '#fcd34d' },
+          { sede: 'Medellín',  bg: 'rgba(236,72,153,0.18)',  border: '#ec4899', text: '#f9a8d4' },
+          { sede: 'México',    bg: 'rgba(239,68,68,0.18)',   border: '#ef4444', text: '#fca5a5' },
+        ];
+        // Lookup por clave normalizada (sin tildes, lowercase) — así funciona normalizarTexto()
+        const SEDE_COLORS_MAP = {};
+        SEDE_COLOR_LIST.forEach(({ sede, ...col }) => {
+          SEDE_COLORS_MAP[normalizarTexto(sede)] = col;
+        });
+        const COLOR_DEFAULT = { bg: 'rgba(156,163,175,0.13)', border: 'rgba(156,163,175,0.4)', text: '#9ca3af' };
+        const getColor = (sede) => SEDE_COLORS_MAP[normalizarTexto(sede || '')] || COLOR_DEFAULT;
 
         const año = calMes.getFullYear();
         const mes  = calMes.getMonth();
@@ -1000,11 +1006,11 @@ export default function AsignadorEntrenadores() {
               <button onClick={() => setCalMes(new Date(año, mes + 1, 1))} style={{ background: 'transparent', border: '1px solid var(--border-color, rgba(255,255,255,0.15))', borderRadius: 8, color: 'var(--text-muted)', cursor: 'pointer', padding: '0.35rem 0.85rem', fontSize: '1rem' }}>›</button>
             </div>
 
-            {/* Leyenda sedes */}
+            {/* Leyenda sedes — solo las sedes reales del sistema */}
             <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap', marginBottom: '0.85rem' }}>
-              {Object.entries(SEDE_COLORS).filter(([k]) => k !== 'default').map(([sede, col]) => (
-                <span key={sede} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.68rem', fontWeight: 700, padding: '0.18rem 0.5rem', borderRadius: 6, background: col.bg, border: `1px solid ${col.border}`, color: col.text }}>
-                  {getFlagForSede(sede)} {normalizeSede(sede)}
+              {SEDE_COLOR_LIST.map(({ sede, bg, border, text }) => (
+                <span key={sede} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.68rem', fontWeight: 700, padding: '0.18rem 0.5rem', borderRadius: 6, background: bg, border: `1px solid ${border}`, color: text }}>
+                  {getFlagForSede(sede)} {sede}
                 </span>
               ))}
             </div>
