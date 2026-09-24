@@ -350,6 +350,9 @@ class NodusExtractorAgent {
   async extractFuturosImposibles() {
     console.log("🎯 [Agente 1 - Extractor] Extrayendo Futuros Imposibles post-PFD desde NODUS...");
     await this.safeGoto('https://imo.crearpslglobal.com/futurosimposibles', 45000);
+    if (this.page.url().includes('sgcaptcha') || this.page.url().includes('.well-known/sgcaptcha')) {
+      throw new Error('El WAF de NODUS/SiteGround bloqueó la lectura de Futuros Imposibles; no se interpretó como universo vacío.');
+    }
 
     const rawRows = await this.page.evaluate(() => {
       const key = (value = '') => value.toString().toLowerCase()

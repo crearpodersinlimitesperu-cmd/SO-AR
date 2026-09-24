@@ -287,7 +287,7 @@ export default function FuturosImposiblesView({
           </p>
           {sourceCatalog && (
             <p style={{ margin: '0.35rem 0 0', fontSize: '0.73rem', color: textMuted, maxWidth: '900px', lineHeight: 1.4 }}>
-              Contrato NODUS detectado: <strong>{sourceCatalog.extractionReadiness === 'detail_ready' ? 'detalle FI disponible' : sourceCatalog.extractionReadiness === 'summary_ready' ? 'resumen FI disponible' : 'requiere ajuste de campos'}</strong> · ruta {sourceCatalog.resolvedPath || sourceCatalog.route} · inspeccionado {sourceDateLabel(sourceCatalog.updatedAt || sourceCatalog.discoveredAt)}.
+              Contrato NODUS detectado: <strong>{sourceCatalog.extractionReadiness === 'detail_ready' ? 'detalle FI disponible' : sourceCatalog.extractionReadiness === 'summary_ready' ? 'resumen FI disponible' : sourceCatalog.extractionReadiness === 'blocked_by_waf' ? 'lectura bloqueada por WAF de NODUS' : 'requiere ajuste de campos'}</strong> · ruta {sourceCatalog.resolvedPath || sourceCatalog.route} · inspeccionado {sourceDateLabel(sourceCatalog.updatedAt || sourceCatalog.discoveredAt)}.
             </p>
           )}
         </div>

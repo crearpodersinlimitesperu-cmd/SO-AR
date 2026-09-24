@@ -132,6 +132,7 @@ function locateFIContract(page) {
   const fields = [...page.tables.flatMap((table) => table.headers), ...(page.labels || []), ...(page.controls || []).map((control) => control.name)];
   const has = (...terms) => terms.some((term) => fields.some((field) => field.includes(term)));
   return {
+    blockedByWaf: String(page.resolvedPath || '').includes('sgcaptcha') || (page.networkPaths || []).some((path) => path.includes('sgcaptcha')),
     participantIdentity: has('nombre', 'participante', 'asistente'),
     pfdAttendance: has('asistencia pfd', 'asistio pfd', 'pfd'),
     sede: has('sede', 'ciudad'),
@@ -163,7 +164,7 @@ export async function discoverNodusSources() {
       resolvedPath: futuros.resolvedPath,
       title: futuros.title,
       contract,
-      extractionReadiness: contract.participantIdentity && contract.pfdAttendance && contract.sede && contract.equipo
+      extractionReadiness: contract.blockedByWaf ? 'blocked_by_waf' : contract.participantIdentity && contract.pfdAttendance && contract.sede && contract.equipo
         ? (contract.fiDetail ? 'detail_ready' : 'summary_ready')
         : 'not_ready',
       tables: futuros.tables,
