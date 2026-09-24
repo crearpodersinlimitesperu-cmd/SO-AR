@@ -177,7 +177,14 @@ export async function discoverNodusSources() {
       ...catalog,
       updatedAt: FieldValue.serverTimestamp()
     }, { merge: true });
-    console.log(`Catálogo FI publicado: ${catalog.extractionReadiness}. rutas detectadas: ${(catalog.networkPaths || []).join(', ') || 'ninguna'}.`);
+    const structure = {
+      readiness: catalog.extractionReadiness,
+      resolvedPath: catalog.resolvedPath,
+      tableHeaders: catalog.tables.map((table) => table.headers),
+      controls: catalog.controls.map((control) => ({ tag: control.tag, name: control.name, type: control.type })),
+      networkPaths: catalog.networkPaths || []
+    };
+    console.log(`Catálogo FI publicado: ${JSON.stringify(structure)}.`);
     return catalog;
   } finally {
     await browser.close();
