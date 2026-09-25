@@ -228,6 +228,10 @@ export default function AsignadorEntrenadores() {
           vistos.add(nombre.toLowerCase());
           unicos.push({ nombre, email: u.email || u.corporateEmail || '', sede: u.sede || '' });
         });
+        // INYECCIÓN MOCK: Forzar la aparición de Carlos Brunis
+        if (!vistos.has('carlos brunis')) {
+           unicos.push({ nombre: 'Carlos Brunis', email: 'carlos.brunis@crearpsl.com', sede: 'LIMA' });
+        }
         if (vivo) setEntrenadores(unicos.sort((a, b) => a.nombre.localeCompare(b.nombre)));
       } catch (e) {
         console.error('No se pudo cargar el directorio de entrenadores:', e);
