@@ -448,6 +448,16 @@ export const canUseAsignadorEntrenadores = (currentUser) => {
   return ASIGNADOR_ENTRENADORES_EMAILS.includes(email);
 };
 
+// Comunicaciones externas deliberadas: únicamente Dirección Operativa
+// autorizada puede encolar correos o comunicados masivos desde Causa OS.
+export const OPERATIONAL_COMMUNICATION_EMAILS = [
+  'jose.sanchez@crearpsl.net', 'fer.aragon@crearpsl.net',
+  'fer.aragon@crearpsl.com', 'paul.sosa@crearpsl.net',
+  'andres.gomez@crearpsl.net', 'gomeznueve@gmail.com'
+];
+export const canSendOperationalCommunications = (currentUser) =>
+  Boolean(currentUser?.email && OPERATIONAL_COMMUNICATION_EMAILS.includes(currentUser.email.trim().toLowerCase()));
+
 /**
  * ¿Puede el usuario actual RESPONDER a una nota de seguimiento? Pedido explícito
  * de José: "los CMJ pueden responder a estas notas (opcional)" — solo CMJ, no

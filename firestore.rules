@@ -269,6 +269,17 @@ service cloud.firestore {
       allow read, create: if canManageTrainerAssignments();
       allow update, delete: if false;
     }
+    function canSendOperationalCommunications() {
+      return isAuthenticated() && email() in [
+        'jose.sanchez@crearpsl.net', 'fer.aragon@crearpsl.net',
+        'fer.aragon@crearpsl.com', 'paul.sosa@crearpsl.net',
+        'andres.gomez@crearpsl.net', 'gomeznueve@gmail.com'
+      ];
+    }
+    match /operational_communications/{communicationId} {
+      allow read, create: if canSendOperationalCommunications();
+      allow update, delete: if false;
+    }
 
     // Conversación interna vinculada a una tarea. El mensaje es inmutable y
     // solo lo ven quien lo envió y quienes aparecen como destinatarios.

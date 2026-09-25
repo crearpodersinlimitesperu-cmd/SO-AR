@@ -16,6 +16,7 @@ import { celebrateVictory } from '../utils/neuroFeedback';
 import { usersData, isForeignTask } from '../data/usersData';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { db } from '../services/firebase';
+import { canSendOperationalCommunications } from '../config/permissions';
 const getCountdown = (deadlineIso) => {
   if (!deadlineIso) return { label: 'Sin fecha límite', color: '#9ca3af', bg: 'rgba(156,163,175,0.12)', border: '#9ca3af', overdue: false };
   const deadline = new Date(deadlineIso).getTime();
@@ -74,7 +75,7 @@ export default function TaskDetailModal({
   resolveAssigneeName = null 
 }) {
   const { currentUser, reauthenticateGoogle } = useAuth();
-  const { updateTaskDetails, toggleTask, sendTaskMessage } = useChecklist();
+  const { updateTaskDetails, toggleTask, sendTaskMessage, sendTaskReminderEmail } = useChecklist();
   const { showToast } = useUI();
 
   // Estados locales editables para avances y evidencias
@@ -118,6 +119,7 @@ export default function TaskDetailModal({
   const [messageText, setMessageText] = useState('');
   const [messageTarget, setMessageTarget] = useState('group');
   const [messageSending, setMessageSending] = useState(false);
+  const [emailSending, setEmailSending] = useState(false);
 
   // Sincronizar estado cuando se abre el modal o cambia la tarea
   useEffect(() => {
@@ -510,6 +512,24 @@ export default function TaskDetailModal({
     } finally {
       setMessageSending(false);
     }
+  };
+
+  const handleSendTaskEmail = async () => {
+    if (emailSending) return;
+    const text = messageText.trim();
+    const recipients = messageTarget === 'group'
+      ? collaboratorsList.filter(item => !item.isMe).map(item => item.email)
+      : [messageTarget];
+    if (!text) return showToast('Escribe el mensaje antes de enviar el correo.', 'error');
+    setEmailSending(true);
+    try {
+      const result = await sendTaskReminderEmail(task, recipients, text);
+      setMessageText('');
+      showToast(`Correo operativo encolado para ${result.recipients} destinatario${result.recipients === 1 ? '' : 's'}.`, 'success');
+    } catch (error) {
+      console.error('No se pudo enviar el recordatorio por correo:', error);
+      showToast(error.message || 'No se pudo encolar el correo.', 'error');
+    } finally { setEmailSending(false); }
   };
   // Agregar una nueva evidencia
   const handleAddEvidenceItem = () => {
@@ -946,6 +966,14 @@ export default function TaskDetailModal({
                   color: messageSending || !messageText.trim() ? 'var(--text-muted)' : '#06121a', fontWeight: 800,
                   cursor: messageSending || !messageText.trim() ? 'not-allowed' : 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.35rem'
                 }}><Send size={14} /> {messageSending ? 'Enviando…' : 'Enviar'}</button>
+                {canSendOperationalCommunications(currentUser) && (
+                  <button type="button" onClick={handleSendTaskEmail} disabled={emailSending || !messageText.trim()} style={{
+                    border: '1px solid rgba(245,158,11,.7)', borderRadius: '7px', padding: '0.5rem 0.8rem',
+                    background: emailSending || !messageText.trim() ? 'rgba(245,158,11,.1)' : 'rgba(245,158,11,.22)',
+                    color: emailSending || !messageText.trim() ? 'var(--text-muted)' : '#facc15', fontWeight: 800,
+                    cursor: emailSending || !messageText.trim() ? 'not-allowed' : 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.35rem'
+                  }}><Send size={14} /> {emailSending ? 'Encolando…' : 'Enviar correo'}</button>
+                )}
               </div>
               <textarea rows="2" value={messageText} onChange={event => setMessageText(event.target.value)}
                 placeholder="Ej.: Nora, ¿qué pasó con esta tarea? Necesito tu actualización hoy."

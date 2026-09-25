@@ -4,6 +4,7 @@ import { collection, onSnapshot, doc, updateDoc, setDoc, writeBatch, addDoc, que
 import { checklistData } from '../data/checklistData';
 import { usersData, normalizeRole } from '../data/usersData';
 import { isSuperAdminEmail, isGerenciaRole } from '../config/permissions';
+import { canSendOperationalCommunications } from '../config/permissions';
 import { calculateAutomaticDeadline } from '../utils/soarDates';
 import { createGoogleTask } from '../services/googleSync';
 import { useUI } from './UIContext';
@@ -480,6 +481,29 @@ export function ChecklistProvider({ children }) {
         read: false,
         created_at: now
       });
+    });
+    await batch.commit();
+    return { recipients: recipients.length };
+  };
+
+  const sendTaskReminderEmail = async (task, recipientEmails, text) => {
+    if (!canSendOperationalCommunications(currentUser)) throw new Error('No tienes autorización para enviar correos operativos.');
+    const body = String(text || '').trim();
+    const recipients = [...new Set((recipientEmails || []).map(email => String(email || '').toLowerCase().trim()).filter(Boolean))];
+    if (!body || !recipients.length) throw new Error('Escribe el mensaje y selecciona destinatarios.');
+    const title = task.task || task.title || 'Tarea Causa OS';
+    const senderName = currentUser?.displayName || currentUser?.name || currentUser?.email || 'Dirección Causa OS';
+    const now = new Date().toISOString();
+    const escapeHtml = value => String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
+    const batch = writeBatch(db);
+    const auditRef = doc(collection(db, 'operational_communications'));
+    batch.set(auditRef, { type: 'task_reminder', taskId: task.id, taskTitle: title, senderEmail: currentUser.email, senderName, recipients, body, createdAt: now, immutable: true });
+    recipients.forEach(email => {
+      batch.set(doc(collection(db, 'mail')), {
+        to: [email], type: 'task_reminder', delivery: { state: 'PENDING' }, createdAt: now,
+        message: { subject: `Recordatorio de tarea: ${title} — Causa OS`, html: `<div style="font-family:Arial,sans-serif;max-width:620px;margin:auto;color:#172033"><h2 style="color:#078ac6">Recordatorio de tarea</h2><p><strong>${escapeHtml(senderName)}</strong> te escribió sobre:</p><p style="font-weight:bold">${escapeHtml(title)}</p><div style="white-space:pre-wrap;background:#f3f7fa;border-left:4px solid #078ac6;padding:14px">${escapeHtml(body)}</div><p style="color:#5b6673;font-size:12px">Mensaje enviado desde Causa OS.</p></div>` }
+      });
+      batch.set(doc(collection(db, 'notifications')), { userId: email, title: `Recordatorio: ${title}`, message: `${senderName}: ${body}`, taskId: task.id, type: 'task_email_reminder', read: false, created_at: now });
     });
     await batch.commit();
     return { recipients: recipients.length };
@@ -1200,6 +1224,7 @@ export function ChecklistProvider({ children }) {
       toggleTask, 
       updateTaskDetails,
       sendTaskMessage,
+      sendTaskReminderEmail,
       editCustomTask, 
       submitEvidence, 
       getProgressByRole, 

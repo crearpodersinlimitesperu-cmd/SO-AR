@@ -40,6 +40,7 @@ import CRMBaseMaster from './pages/CRMBaseMaster'
 import MonitorImos from './pages/MonitorImos'
 import MatrizEnrolamientoSentados from './pages/MatrizEnrolamientoSentados'
 import AsignadorEntrenadores from './pages/AsignadorEntrenadores'
+import ComunicadosOperativos from './pages/ComunicadosOperativos'
 import AICopilot from './components/AICopilot'
 import PromptModal from './components/PromptModal'
 import BirthdayAlert from './components/BirthdayAlert'
@@ -450,6 +451,7 @@ function App() {
           } />
           <Route path="/asignador" element={<Navigate to="/asignador-entrenadores" replace />} />
           <Route path="/cronograma-maestro" element={<Navigate to="/asignador-entrenadores" replace />} />
+          <Route path="/comunicados" element={<PrivateRoute><ComunicadosOperativos /></PrivateRoute>} />
 
           <Route path="/kpis-lima" element={
             <PrivateRoute>

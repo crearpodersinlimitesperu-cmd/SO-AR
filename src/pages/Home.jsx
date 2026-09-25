@@ -108,6 +108,18 @@ const REPORTES_VISIBLE = (u) => Boolean(
 // ============================================================================
 const CAUSA_OPTIONS_REGISTRY = [
   {
+    id: 'opt-comunicados-operativos',
+    title: '✉️ Enviar comunicado operativo',
+    category: 'Dirección Operativa',
+    badge: 'Correo + notificación',
+    emoji: '✉️',
+    desc: 'Comunica por persona, rol, sede o equipo con trazabilidad institucional.',
+    keywords: ['comunicado', 'correo', 'recordatorio', 'ping', 'mensaje', 'area', 'rol', 'equipo'],
+    route: '/comunicados',
+    roles: null,
+    visible: user => ['jose.sanchez@crearpsl.net', 'fer.aragon@crearpsl.net', 'fer.aragon@crearpsl.com', 'paul.sosa@crearpsl.net', 'andres.gomez@crearpsl.net', 'gomeznueve@gmail.com'].includes((user?.email || '').toLowerCase())
+  },
+  {
     id: 'opt-brandscript',
     title: '📜 BrandScript & Guiones MJ',
     category: 'Ventas y Enrolamiento',
