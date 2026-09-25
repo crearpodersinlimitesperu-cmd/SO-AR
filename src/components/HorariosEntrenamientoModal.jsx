@@ -866,143 +866,174 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
           color: 'var(--text-main)'
         }}
       >
-        {/* HEADER */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '1rem' }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.3rem', flexWrap: 'wrap' }}>
-              <Clock size={24} className="text-gold" />
-              <h2 style={{ margin: 0, fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-heading)', fontFamily: 'var(--font-heading)' }}>
-                Horarios y Turnos Operativos del Equipo
-              </h2>
-              <span style={{ 
-                background: 'var(--crear-gold-light)',
-                color: 'var(--crear-gold)',
-                border: '1px solid var(--border-subtle)',
-                borderRadius: '6px',
-                fontSize: '0.72rem',
-                fontWeight: 700,
-                padding: '2px 8px',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '4px'
-              }}>
-                <MapPin size={11} />
-                Sede Activa: {selectedSede}
-              </span>
-              <span style={{ 
-                background: isManager ? 'var(--crear-gold-light)' : 'rgba(2, 132, 199, 0.12)',
-                color: isManager ? 'var(--crear-gold)' : '#0284c7',
-                border: isManager ? '1px solid var(--border-subtle)' : '1px solid rgba(2, 132, 199, 0.3)',
-                borderRadius: '6px',
-                fontSize: '0.72rem',
-                fontWeight: 700,
-                padding: '2px 8px',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '4px'
-              }}>
-                {isManager ? <ShieldCheck size={11} /> : <Eye size={11} />}
-                {isManager ? `👑 Modo Gerencia: Edición Habilitada` : `🛡️ Modo Oficial: Solo Lectura`}
-              </span>
-              {hasUnsavedChanges && (
-                <span style={{
-                  background: 'rgba(239, 68, 68, 0.12)',
-                  color: 'var(--color-error)',
-                  border: '1px solid rgba(239, 68, 68, 0.3)',
-                  borderRadius: '6px',
+        {/* HEADER & SELECTOR CONTAINER */}
+        <div 
+          className="glass-panel"
+          style={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            gap: '1rem', 
+            padding: '1.2rem', 
+            borderRadius: 'var(--radius-md)', 
+            border: '1px solid var(--border-subtle)', 
+            background: 'var(--bg-glass, rgba(255, 255, 255, 0.02))',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+            marginBottom: '0.5rem'
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.3rem', flexWrap: 'wrap' }}>
+                <Clock size={24} className="text-gold" />
+                <h2 style={{ margin: 0, fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-heading)', fontFamily: 'var(--font-heading)' }}>
+                  Horarios y Turnos Operativos del Equipo
+                </h2>
+                <span style={{ 
+                  background: 'var(--crear-gold-light)',
+                  color: 'var(--crear-gold)',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: '12px',
                   fontSize: '0.72rem',
                   fontWeight: 700,
-                  padding: '2px 8px'
+                  padding: '4px 10px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px'
                 }}>
-                  ● Cambios pendientes
+                  <MapPin size={11} />
+                  Sede Activa: {selectedSede}
                 </span>
-              )}
+                <span style={{ 
+                  background: isManager ? 'var(--crear-gold-light)' : 'rgba(2, 132, 199, 0.12)',
+                  color: isManager ? 'var(--crear-gold)' : '#0284c7',
+                  border: isManager ? '1px solid var(--border-subtle)' : '1px solid rgba(2, 132, 199, 0.3)',
+                  borderRadius: '12px',
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  padding: '4px 10px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}>
+                  {isManager ? <ShieldCheck size={11} /> : <Eye size={11} />}
+                  {isManager ? '👑 Modo Gerencia: Edición Habilitada' : '🛡️ Modo Oficial: Solo Lectura'}
+                </span>
+                {hasUnsavedChanges && (
+                  <span style={{
+                    background: 'rgba(239, 68, 68, 0.12)',
+                    color: 'var(--color-error)',
+                    border: '1px solid rgba(239, 68, 68, 0.3)',
+                    borderRadius: '12px',
+                    fontSize: '0.72rem',
+                    fontWeight: 700,
+                    padding: '4px 10px'
+                  }}>
+                    ● Cambios pendientes
+                  </span>
+                )}
+              </div>
+              <p className="text-muted" style={{ margin: 0, fontSize: '0.86rem' }}>
+                Planificación operativa multi-sede de jornadas, horarios y fisionomía de sala — Almacenamiento y sincronización en <strong>Causa OS</strong>.
+              </p>
             </div>
-            <p className="text-muted" style={{ margin: 0, fontSize: '0.86rem' }}>
-              Planificación operativa multi-sede de jornadas, horarios y fisionomía de sala — Almacenamiento y sincronización en <strong>Causa OS</strong>.
-            </p>
+            <button 
+              onClick={onClose}
+              className="btn-icon"
+              style={{
+                background: 'transparent',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: '50%',
+                width: '34px',
+                height: '34px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                color: 'var(--text-muted)',
+                transition: 'all 0.2s',
+                boxShadow: 'var(--shadow-sm)'
+              }}
+            >
+              <X size={18} />
+            </button>
           </div>
-          <button 
-            onClick={onClose}
-            className="btn-icon"
-            style={{
-              background: 'transparent',
-              border: '1px solid var(--border-subtle)',
-              borderRadius: '50%',
-              width: '34px',
-              height: '34px',
+
+          {/* SELECTOR DE SEDE */}
+          {canSwitchSedes ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap', marginTop: '0.5rem' }}>
+              <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-heading)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <MapPin size={14} className="text-gold" />
+                Vista Global:
+              </span>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                {OPERATIONAL_SEDES.map(s => {
+                  const isSel = selectedSede === s;
+                  return (
+                    <button
+                      key={s}
+                      onClick={() => {
+                        setSelectedSede(s);
+                        setActiveCellPicker(null);
+                      }}
+                      className={isSel ? "sede-pill active" : "sede-pill"}
+                      style={{
+                        padding: '0.4rem 1rem',
+                        borderRadius: '20px',
+                        fontSize: '0.78rem',
+                        fontWeight: isSel ? 700 : 500,
+                        cursor: 'pointer',
+                        border: isSel ? '1px solid var(--crear-gold)' : '1px solid var(--border-subtle)',
+                        background: isSel ? 'var(--crear-gold-light)' : 'transparent',
+                        color: isSel ? 'var(--crear-gold)' : 'var(--text-muted)',
+                        boxShadow: isSel ? '0 2px 8px rgba(217, 119, 6, 0.15)' : 'none',
+                        transition: 'all 0.2s ease',
+                      }}
+                      onMouseEnter={e => { if(!isSel) e.currentTarget.style.background = 'var(--bg-card-hover)'; }}
+                      onMouseLeave={e => { if(!isSel) e.currentTarget.style.background = 'transparent'; }}
+                    >
+                      {s}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ) : (
+            <div style={{
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              color: 'var(--text-muted)',
-              transition: 'all 0.2s'
-            }}
-          >
-            <X size={18} />
-          </button>
+              justifyContent: 'space-between',
+              gap: '0.75rem',
+              flexWrap: 'wrap',
+              padding: '0.6rem 0.9rem',
+              background: 'rgba(234, 179, 8, 0.06)',
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid rgba(234, 179, 8, 0.25)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <MapPin size={16} className="text-gold" />
+                <span style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--text-heading)' }}>
+                  Sede Operativa Asignada: <span style={{ color: 'var(--crear-gold)', textTransform: 'uppercase' }}>{selectedSede}</span>
+                </span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.74rem', color: 'var(--text-muted)' }}>
+                <ShieldCheck size={14} style={{ color: '#10b981' }} />
+                <span>Privacidad y Aislamiento de Sede Activo</span>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* SELECTOR DE SEDE (MULTI-SEDE REAL PARA SUPERADMINS / AISLAMIENTO PARA GERENTES Y EQUIPOS) */}
-        {canSwitchSedes ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap', padding: '0.6rem 0.8rem', background: 'var(--bg-dark, #f8fafc)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
-            <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-heading)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <MapPin size={14} className="text-gold" />
-              Seleccionar Sede (Vista Global):
-            </span>
-            {OPERATIONAL_SEDES.map(s => {
-              const isSel = selectedSede === s;
-              return (
-                <button
-                  key={s}
-                  onClick={() => {
-                    setSelectedSede(s);
-                    setActiveCellPicker(null);
-                  }}
-                  style={{
-                    padding: '0.3rem 0.75rem',
-                    borderRadius: '6px',
-                    fontSize: '0.78rem',
-                    fontWeight: isSel ? 700 : 500,
-                    cursor: 'pointer',
-                    border: isSel ? '1px solid var(--crear-gold)' : '1px solid var(--border-subtle)',
-                    background: isSel ? 'var(--crear-gold-light)' : 'var(--bg-card)',
-                    color: isSel ? 'var(--crear-gold)' : 'var(--text-muted)',
-                    transition: 'all 0.15s ease'
-                  }}
-                >
-                  {s}
-                </button>
-              );
-            })}
-          </div>
-        ) : (
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '0.75rem',
-            flexWrap: 'wrap',
-            padding: '0.6rem 0.9rem',
-            background: 'rgba(234, 179, 8, 0.06)',
-            borderRadius: 'var(--radius-md)',
-            border: '1px solid rgba(234, 179, 8, 0.25)'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <MapPin size={16} className="text-gold" />
-              <span style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--text-heading)' }}>
-                Sede Operativa Asignada: <span style={{ color: 'var(--crear-gold)', textTransform: 'uppercase' }}>{selectedSede}</span>
-              </span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.74rem', color: 'var(--text-muted)' }}>
-              <ShieldCheck size={14} style={{ color: '#10b981' }} />
-              <span>Privacidad y Aislamiento de Sede Activo (Solo puedes ver y gestionar tu sede)</span>
-            </div>
-          </div>
-        )}
-
-        {/* TABS DE FILTRO */}
-        <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap' }}>
+        {/* TABS DE FILTRO (SEGMENTED CONTROL) */}
+        <div style={{ 
+          display: 'inline-flex', 
+          gap: '0.2rem', 
+          flexWrap: 'wrap',
+          background: 'var(--bg-dark, #f1f5f9)',
+          padding: '0.3rem',
+          borderRadius: '12px',
+          border: '1px solid var(--border-subtle)',
+          boxShadow: 'inset 0 1px 4px rgba(0,0,0,0.05)'
+        }}>
           {[
             { id: 'matriz_equipos', label: `🗓️ Matriz de Horarios (${selectedSede})` },
             { id: 'todos_equipo', label: '👥 Resumen del Equipo' },
@@ -1020,21 +1051,20 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 style={{
-                  padding: '0.45rem 0.85rem',
+                  padding: '0.5rem 0.9rem',
                   borderRadius: '8px',
-                  fontSize: '0.82rem',
+                  fontSize: '0.8rem',
                   fontWeight: isSelected ? 700 : 500,
                   cursor: 'pointer',
-                  border: isSelected 
-                    ? '1px solid var(--crear-gold)' 
-                    : '1px solid var(--border-subtle)',
+                  border: 'none',
                   background: isSelected 
-                    ? 'var(--crear-gold-light)' 
+                    ? 'var(--bg-card)' 
                     : 'transparent',
                   color: isSelected 
                     ? 'var(--crear-gold)' 
                     : 'var(--text-muted)',
-                  transition: 'all 0.15s ease'
+                  boxShadow: isSelected ? '0 2px 5px rgba(0,0,0,0.08)' : 'none',
+                  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
                 }}
               >
                 {tab.label}
@@ -1070,51 +1100,43 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
           {activeTab === 'matriz_equipos' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               
-              {/* BARRA SUPERIOR DE ACCIONES Y CONTEXTO DE ENTRENAMIENTOS */}
+              {/* BARRA SUPERIOR DE ACCIONES (ACTION BAR) */}
               <div 
+                className="glass-panel"
                 style={{ 
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   flexWrap: 'wrap',
-                  gap: '0.8rem',
-                  padding: '0.8rem 1rem',
-                  background: 'var(--bg-dark-alt, #ffffff)',
+                  gap: '1rem',
+                  padding: '1rem 1.2rem',
+                  background: 'var(--bg-card)',
                   border: '1px solid var(--border-subtle)',
-                  borderRadius: 'var(--radius-md)'
+                  borderRadius: 'var(--radius-md)',
+                  boxShadow: 'var(--shadow-sm)'
                 }}
               >
                 <div>
-                  <div style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--text-heading)' }}>
+                  <div style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-heading)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <Calendar size={18} className="text-gold" />
                     Horarios y Dinámicas de Entrenamiento — Sede {selectedSede}
                   </div>
-                  <div className="text-muted" style={{ fontSize: '0.78rem' }}>
-                    {currentCycle?.name ? `Ciclo Activo: ${currentCycle.name}` : `Entrenamientos UNO / DOS / MAESTRÍA`}
-                    {currentStage ? ` • Etapa: ${currentStage}` : ''}
-                    {lastSaved ? ` • Guardado en Causa OS: ${lastSaved}` : ' • Sin cambios guardados'}
+                  <div className="text-muted" style={{ fontSize: '0.78rem', marginTop: '4px', display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', background: 'var(--bg-dark)', padding: '2px 8px', borderRadius: '4px' }}>
+                      <Activity size={12} /> {currentCycle?.name ? `Ciclo: ${currentCycle.name}` : 'UNO / DOS / MJ'}
+                    </span>
+                    {currentStage && (
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', background: 'var(--bg-dark)', padding: '2px 8px', borderRadius: '4px' }}>
+                        <Target size={12} /> Etapa: {currentStage}
+                      </span>
+                    )}
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', color: lastSaved ? 'var(--text-muted)' : '#f59e0b' }}>
+                      <Clock size={12} /> {lastSaved ? `Guardado: ${lastSaved}` : 'Sin cambios guardados'}
+                    </span>
                   </div>
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
-                  {/* Botón de Auditoría de Acuses de Recibo */}
-                  <button
-                    onClick={() => setShowAckAuditModal(true)}
-                    className="btn-secondary"
-                    style={{ 
-                      padding: '0.45rem 0.85rem', 
-                      fontSize: '0.8rem', 
-                      display: 'inline-flex', 
-                      alignItems: 'center', 
-                      gap: '0.35rem',
-                      borderColor: ackAudit.percentage === 100 ? 'rgba(34, 197, 94, 0.4)' : 'var(--border-subtle)',
-                      background: ackAudit.percentage === 100 ? 'rgba(34, 197, 94, 0.08)' : 'transparent'
-                    }}
-                    title="Control de Acuses de Recibo (Leído y Enterado)"
-                  >
-                    <CheckCircle2 size={14} color={ackAudit.percentage === 100 ? '#16a34a' : '#f59e0b'} />
-                    <span>Acuses ({ackAudit.confirmed}/{ackAudit.total})</span>
-                  </button>
-
                   {!isManager && (
                     <span style={{ 
                       fontSize: '0.78rem', 
@@ -1122,13 +1144,12 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                       display: 'inline-flex', 
                       alignItems: 'center', 
                       gap: '4px',
-                      padding: '0.35rem 0.65rem',
+                      padding: '0.45rem 0.85rem',
                       background: 'var(--bg-dark, #f8fafc)',
-                      border: '1px solid var(--border-subtle)',
-                      borderRadius: '6px'
+                      border: '1px dashed var(--border-subtle)',
+                      borderRadius: '8px'
                     }}>
-                      <Lock size={12} />
-                      Modo Consulta (Solo Lectura)
+                      <Lock size={12} /> Modo Consulta
                     </span>
                   )}
 
@@ -1136,19 +1157,26 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                     <button
                       onClick={() => setShowManageStaffModal(true)}
                       className="btn-secondary"
-                      style={{ padding: '0.45rem 0.85rem', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
-                      title="Administrar colaboradores de esta sede"
+                      style={{ padding: '0.45rem 0.85rem', fontSize: '0.8rem', borderRadius: '8px', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', background: 'transparent', border: '1px solid var(--border-subtle)' }}
                     >
-                      <Users size={14} />
-                      Equipo de {selectedSede} ({staffList.length})
+                      <Users size={14} /> Equipo ({staffList.length})
                     </button>
                   )}
 
                   <button
                     onClick={() => setShowAckAuditModal(true)}
                     className="btn-secondary"
-                    style={{ padding: '0.45rem 0.85rem', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
-                    title="Auditoría y control de acuses de recibo (Leído y Enterado)"
+                    style={{ 
+                      padding: '0.45rem 0.85rem', 
+                      fontSize: '0.8rem', 
+                      borderRadius: '8px', 
+                      display: 'inline-flex', 
+                      alignItems: 'center', 
+                      gap: '0.35rem',
+                      borderColor: ackAudit.percentage === 100 ? 'rgba(34, 197, 94, 0.4)' : 'var(--border-subtle)',
+                      background: ackAudit.percentage === 100 ? 'rgba(34, 197, 94, 0.08)' : 'transparent',
+                      color: ackAudit.percentage === 100 ? '#16a34a' : 'var(--text-main)'
+                    }}
                   >
                     <CheckCircle2 size={14} color={ackAudit.percentage === 100 ? '#16a34a' : '#f59e0b'} />
                     <span>Acuses ({ackAudit.confirmed}/{ackAudit.total})</span>
@@ -1158,22 +1186,18 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                     <button
                       onClick={() => handleAddNewRow('UNO')}
                       className="btn-secondary"
-                      style={{ padding: '0.45rem 0.85rem', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
-                      title="Agregar un nuevo turno"
+                      style={{ padding: '0.45rem 0.85rem', fontSize: '0.8rem', borderRadius: '8px', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', background: 'transparent', border: '1px solid var(--border-subtle)' }}
                     >
-                      <Plus size={14} />
-                      Nuevo Turno
+                      <Plus size={14} /> Nuevo Turno
                     </button>
                   )}
 
                   <button
                     onClick={() => setShowNotifyModal(true)}
                     className="btn-secondary"
-                    style={{ padding: '0.45rem 0.85rem', fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
-                    title="Notificar disponibilidad por Correo o Google Chat"
+                    style={{ padding: '0.45rem 0.85rem', fontSize: '0.8rem', borderRadius: '8px', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', background: 'transparent', border: '1px solid var(--border-subtle)' }}
                   >
-                    <Send size={14} />
-                    Notificar
+                    <Send size={14} /> Notificar
                   </button>
 
                   {isManager && (
@@ -1183,14 +1207,20 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                       className="btn-primary"
                       style={{ 
                         padding: '0.45rem 1.2rem', 
-                        fontSize: '0.8rem', 
+                        fontSize: '0.82rem', 
+                        borderRadius: '8px', 
                         display: 'inline-flex', 
                         alignItems: 'center', 
-                        gap: '0.4rem' 
+                        gap: '0.4rem',
+                        background: hasUnsavedChanges ? 'linear-gradient(135deg, var(--crear-gold), #d97706)' : 'var(--bg-dark)',
+                        color: hasUnsavedChanges ? '#fff' : 'var(--text-muted)',
+                        border: hasUnsavedChanges ? 'none' : '1px solid var(--border-subtle)',
+                        boxShadow: hasUnsavedChanges ? '0 2px 10px rgba(217, 119, 6, 0.3)' : 'none',
+                        transition: 'all 0.2s ease'
                       }}
                     >
                       <Save size={14} />
-                      {isSaving ? 'Guardando en Causa OS...' : (hasUnsavedChanges ? 'Guardar en Causa OS' : 'Guardado en Causa OS')}
+                      {isSaving ? 'Guardando...' : (hasUnsavedChanges ? 'Guardar Cambios' : 'Guardado')}
                     </button>
                   )}
                 </div>
@@ -1466,7 +1496,10 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                       return (
                         <tr 
                           key={row.id}
-                          style={{ borderBottom: '1px solid var(--border-subtle)' }}
+                          className="matrix-row"
+                          style={{ borderBottom: '1px solid var(--border-subtle)', transition: 'background 0.2s ease' }}
+                          onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-card-hover, rgba(0,0,0,0.02))'}
+                          onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                         >
                           {/* Entrenamiento y Actividad (Editable in-line) */}
                           <td style={{ padding: '0.7rem 0.9rem', whiteSpace: 'nowrap' }}>
@@ -1488,12 +1521,14 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                               placeholder="Editar actividad..."
                               disabled={!isManager}
                               onChange={(e) => handleInlineRowUpdate(row.id, 'nota', e.target.value)}
+                              onFocus={(e) => e.currentTarget.style.borderBottom = '1px dotted var(--crear-gold)'}
+                              onBlur={(e) => e.currentTarget.style.borderBottom = '1px dotted transparent'}
                               style={{
                                 display: 'block',
                                 marginTop: '4px',
                                 background: 'transparent',
                                 border: 'none',
-                                borderBottom: isManager ? '1px dotted var(--border-subtle)' : 'none',
+                                borderBottom: isManager ? '1px dotted transparent' : 'none',
                                 color: 'var(--text-muted)',
                                 fontSize: '0.74rem',
                                 width: '140px',
@@ -1538,11 +1573,13 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                               value={row.horario || ''}
                               disabled={!isManager}
                               onChange={(e) => handleInlineRowUpdate(row.id, 'horario', e.target.value)}
+                              onFocus={(e) => e.currentTarget.style.borderBottom = '1px dashed var(--crear-gold)'}
+                              onBlur={(e) => e.currentTarget.style.borderBottom = '1px dashed transparent'}
                               placeholder="Ej. 4:30 PM - Cierre"
                               style={{
                                 background: 'transparent',
                                 border: 'none',
-                                borderBottom: isManager ? '1px dashed var(--border-subtle)' : 'none',
+                                borderBottom: isManager ? '1px dashed transparent' : 'none',
                                 color: 'var(--crear-blue, #0284c7)',
                                 fontWeight: 700,
                                 fontSize: '0.84rem',
@@ -1610,7 +1647,7 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
                                 style={{
                                   background: 'transparent',
                                   border: 'none',
-                                  borderBottom: isManager ? '1px dotted var(--border-subtle)' : 'none',
+                                  borderBottom: isManager ? '1px dotted transparent' : 'none',
                                   color: 'var(--text-main)',
                                   fontSize: '0.78rem',
                                   width: '135px',
