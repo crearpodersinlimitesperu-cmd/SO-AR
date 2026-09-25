@@ -958,8 +958,6 @@ export default function AsignadorEntrenadores() {
       {/* ---------------- CALENDARIO DE ENTRENAMIENTOS ---------------- */}
       {tab === 'calendario' && (() => {
         const DIAS_SEMANA = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
-        // Colores por sede — generados desde OPERATIONAL_SEDES (src/data/usersData.js)
-        // que es la única fuente de verdad del sistema. No se inventa ninguna sede.
         const SEDE_COLOR_LIST = [
           { sede: 'Lima',      bg: 'rgba(251,191,36,0.18)',  border: '#fbbf24', text: '#fbbf24' },
           { sede: 'Quito',     bg: 'rgba(99,102,241,0.18)',  border: '#6366f1', text: '#a5b4fc' },
@@ -968,11 +966,8 @@ export default function AsignadorEntrenadores() {
           { sede: 'Medellín',  bg: 'rgba(236,72,153,0.18)',  border: '#ec4899', text: '#f9a8d4' },
           { sede: 'México',    bg: 'rgba(239,68,68,0.18)',   border: '#ef4444', text: '#fca5a5' },
         ];
-        // Lookup por clave normalizada (sin tildes, lowercase) — así funciona normalizarTexto()
         const SEDE_COLORS_MAP = {};
-        SEDE_COLOR_LIST.forEach(({ sede, ...col }) => {
-          SEDE_COLORS_MAP[normalizarTexto(sede)] = col;
-        });
+        SEDE_COLOR_LIST.forEach(({ sede, ...col }) => { SEDE_COLORS_MAP[normalizarTexto(sede)] = col; });
         const COLOR_DEFAULT = { bg: 'rgba(156,163,175,0.13)', border: 'rgba(156,163,175,0.4)', text: '#9ca3af' };
         const getColor = (sede) => SEDE_COLORS_MAP[normalizarTexto(sede || '')] || COLOR_DEFAULT;
 
@@ -980,14 +975,21 @@ export default function AsignadorEntrenadores() {
         const mes  = calMes.getMonth();
         const primerDia = new Date(año, mes, 1);
         const ultimoDia = new Date(año, mes + 1, 0);
-        const startOffset = (primerDia.getDay() + 6) % 7; // Monday-first
-        const filasCal = Math.ceil((startOffset + ultimoDia.getDate()) / 7);
+        const startOffset = (primerDia.getDay() + 6) % 7;
+        const totalCeldas = Math.ceil((startOffset + ultimoDia.getDate()) / 7) * 7;
+        const filasCal = totalCeldas / 7;
         const hoyStr = (() => { const h = new Date(); return `${h.getFullYear()}-${String(h.getMonth()+1).padStart(2,'0')}-${String(h.getDate()).padStart(2,'0')}`; })();
         const MESES_ES_LARGO = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
         const mesNombre = `${MESES_ES_LARGO[mes]} ${año}`;
 
-        // Build day map from all filas, applying sede+entrenador filters
-        const eventosPorDia = {};
+        const toDateStr = (v) => {
+          if (!v) return null;
+          if (/^\d{2}\/\d{2}\/\d{4}$/.test(v)) { const [d,m,y] = v.split('/'); return `${y}-${m}-${d}`; }
+          if (/^\d{4}-\d{2}-\d{2}/.test(v)) return v.substring(0, 10);
+          return null;
+        };
+
+        const eventosFiltrados = [];
         filas.forEach(f => {
           if (!f.fechaInicio) return;
           if (filtroSede !== 'todas' && f.sede !== filtroSede) return;
@@ -995,18 +997,53 @@ export default function AsignadorEntrenadores() {
           if (filtroEntrenador !== 'todos' && filtroEntrenador !== 'pendientes') {
             const ft = normalizarTexto(filtroEntrenador).split(' ').filter(t => t.length > 2);
             const cands = [f.entrenadorAsignado, f.entrenadorHoja, ...(f.preasignacionesHoja || [])].filter(Boolean);
-            const ok = ft.length > 0 && cands.some(c => ft.some(t => normalizarTexto(c).includes(t)));
-            if (!ok) return;
+            if (!(ft.length > 0 && cands.some(c => ft.some(t => normalizarTexto(c).includes(t))))) return;
           }
-          let fecha;
-          if (/^\d{2}\/\d{2}\/\d{4}$/.test(f.fechaInicio)) {
-            const [d, m, y] = f.fechaInicio.split('/');
-            fecha = `${y}-${m}-${d}`;
-          } else if (/^\d{4}-\d{2}-\d{2}/.test(f.fechaInicio)) {
-            fecha = f.fechaInicio.substring(0, 10);
-          } else return;
-          if (!eventosPorDia[fecha]) eventosPorDia[fecha] = [];
-          eventosPorDia[fecha].push(f);
+          const dsInicio = toDateStr(f.fechaInicio);
+          const dsFin    = toDateStr(f.fechaFin) || dsInicio;
+          if (!dsInicio) return;
+          eventosFiltrados.push({ ...f, _dsInicio: dsInicio, _dsFin: dsFin >= dsInicio ? dsFin : dsInicio });
+        });
+
+        const totalEnMes = eventosFiltrados.filter(ev => {
+          const [y1,m1,d1] = ev._dsInicio.split('-').map(Number);
+          const [y2,m2,d2] = ev._dsFin.split('-').map(Number);
+          return new Date(y1,m1-1,d1) <= new Date(año,mes+1,0) && new Date(y2,m2-1,d2) >= new Date(año,mes,1);
+        }).length;
+
+        // Calcular segmentos por semana (barras multi-día)
+        const segmentosPorSemana = Array.from({ length: filasCal }, () => []);
+        eventosFiltrados.forEach(ev => {
+          const primerCelda = startOffset;
+          const ultimaCelda = startOffset + ultimoDia.getDate() - 1;
+          let celdaI, celdaF;
+          const [yi,mi,di] = ev._dsInicio.split('-').map(Number);
+          const dtI = new Date(yi,mi-1,di);
+          if (dtI > ultimoDia) return;
+          celdaI = dtI < primerDia ? primerCelda : startOffset + di - 1;
+          const [yf,mf,df] = ev._dsFin.split('-').map(Number);
+          const dtF = new Date(yf,mf-1,df);
+          if (dtF < primerDia) return;
+          celdaF = dtF > ultimoDia ? ultimaCelda : startOffset + df - 1;
+          if (celdaF < celdaI) return;
+          let c = celdaI;
+          while (c <= celdaF) {
+            const semana = Math.floor(c / 7);
+            if (semana >= filasCal) break;
+            const cFin = Math.min(celdaF, (semana + 1) * 7 - 1);
+            segmentosPorSemana[semana].push({ ev, celdaInicioSeg: c, celdaFinSeg: cFin, celdaInicioTotal: celdaI, celdaFinTotal: celdaF });
+            c = (semana + 1) * 7;
+          }
+        });
+        segmentosPorSemana.forEach(segs => {
+          segs.sort((a,b) => a.celdaInicioSeg - b.celdaInicioSeg || (b.celdaFinSeg - b.celdaInicioSeg) - (a.celdaFinSeg - a.celdaInicioSeg));
+          const laneEnd = [];
+          segs.forEach(seg => {
+            let lane = laneEnd.findIndex(end => end < seg.celdaInicioSeg);
+            if (lane === -1) { lane = laneEnd.length; laneEnd.push(seg.celdaFinSeg); }
+            else laneEnd[lane] = seg.celdaFinSeg;
+            seg.lane = lane;
+          });
         });
 
         return (
@@ -1017,8 +1054,7 @@ export default function AsignadorEntrenadores() {
               <span style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--text-heading)', textTransform: 'capitalize' }}>{mesNombre}</span>
               <button onClick={() => setCalMes(new Date(año, mes + 1, 1))} style={{ background: 'transparent', border: '1px solid var(--border-color, rgba(255,255,255,0.15))', borderRadius: 8, color: 'var(--text-muted)', cursor: 'pointer', padding: '0.35rem 0.85rem', fontSize: '1rem' }}>›</button>
             </div>
-
-            {/* Leyenda sedes — solo las sedes reales del sistema */}
+            {/* Leyenda sedes */}
             <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap', marginBottom: '0.85rem' }}>
               {SEDE_COLOR_LIST.map(({ sede, bg, border, text }) => (
                 <span key={sede} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.68rem', fontWeight: 700, padding: '0.18rem 0.5rem', borderRadius: 6, background: bg, border: `1px solid ${border}`, color: text }}>
@@ -1026,56 +1062,78 @@ export default function AsignadorEntrenadores() {
                 </span>
               ))}
             </div>
-
             {/* Cabecera días */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 3, marginBottom: 3 }}>
               {DIAS_SEMANA.map(d => (
                 <div key={d} style={{ textAlign: 'center', fontSize: '0.67rem', fontWeight: 800, color: 'var(--text-muted)', padding: '0.28rem 0' }}>{d}</div>
               ))}
             </div>
-
-            {/* Grid calendario */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 3 }}>
-              {Array.from({ length: filasCal * 7 }).map((_, idx) => {
-                const dia = idx - startOffset + 1;
-                const esValido = dia >= 1 && dia <= ultimoDia.getDate();
-                const dateStr = esValido ? `${año}-${String(mes+1).padStart(2,'0')}-${String(dia).padStart(2,'0')}` : null;
-                const eventos = dateStr ? (eventosPorDia[dateStr] || []) : [];
-                const esHoy = dateStr === hoyStr;
-                return (
-                  <div key={idx} style={{
-                    minHeight: 76, borderRadius: 8, padding: '0.25rem 0.3rem',
-                    border: esHoy ? '1.5px solid var(--crear-gold)' : '1px solid var(--border-color, rgba(255,255,255,0.07))',
-                    background: esValido ? 'var(--card-bg, rgba(255,255,255,0.03))' : 'transparent',
-                    overflow: 'hidden',
-                  }}>
-                    {esValido && (<>
-                      <div style={{ fontSize: '0.72rem', fontWeight: esHoy ? 900 : 600, color: esHoy ? 'var(--crear-gold)' : 'var(--text-muted)', marginBottom: '0.18rem' }}>{dia}</div>
-                      {eventos.slice(0, 3).map((ev, i) => {
-                        const col = getColor(ev.sede);
-                        const label = (ev.nombre || '').length > 17 ? ev.nombre.substring(0, 16) + '…' : (ev.nombre || '');
-                        const tieneFin = ev.fechaFin && ev.fechaFin !== ev.fechaInicio;
-                        const fechaChip = tieneFin
-                          ? `${fmtFecha(ev.fechaInicio)} → ${fmtFecha(ev.fechaFin)}`
-                          : fmtFecha(ev.fechaInicio);
-                        return (
-                          <div key={i}
-                            onClick={() => setCalTooltip(calTooltip?.key === `${dateStr}-${i}` ? null : { key: `${dateStr}-${i}`, ev })}
-                            title={`${ev.nombre}\n${fechaChip}\n${ev.entrenadorAsignado || ev.entrenadorHoja || 'Sin asignar'}`}
-                            style={{ fontSize: '0.6rem', fontWeight: 700, padding: '0.14rem 0.28rem', borderRadius: 4, marginBottom: 2, cursor: 'pointer', background: col.bg, border: `1px solid ${col.border}`, color: col.text, overflow: 'hidden' }}>
-                            <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{getFlagForSede(ev.sede)} {label}</div>
-                            <div style={{ fontWeight: 500, opacity: 0.85, fontSize: '0.56rem', marginTop: '0.06rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>📅 {fechaChip}</div>
-                          </div>
-                        );
-                      })}
-                      {eventos.length > 3 && <div style={{ fontSize: '0.58rem', color: 'var(--text-muted)', fontWeight: 700 }}>+{eventos.length - 3} más</div>}
-                    </>)}
+            {/* Grid — semana a semana con barras multi-día */}
+            {Array.from({ length: filasCal }).map((_, semanaIdx) => {
+              const celdaBase = semanaIdx * 7;
+              const segsEnSemana = segmentosPorSemana[semanaIdx] || [];
+              const maxLanes = segsEnSemana.length > 0 ? Math.max(...segsEnSemana.map(s => s.lane)) + 1 : 0;
+              const alturaCelda = Math.max(52, 24 + maxLanes * 21);
+              return (
+                <div key={semanaIdx} style={{ position: 'relative', marginBottom: 3 }}>
+                  {/* Celdas fondo */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 3 }}>
+                    {Array.from({ length: 7 }).map((_, colIdx) => {
+                      const celda = celdaBase + colIdx;
+                      const dia = celda - startOffset + 1;
+                      const esValido = dia >= 1 && dia <= ultimoDia.getDate();
+                      const dateStr = esValido ? `${año}-${String(mes+1).padStart(2,'0')}-${String(dia).padStart(2,'0')}` : null;
+                      const esHoy = dateStr === hoyStr;
+                      return (
+                        <div key={colIdx} style={{ height: alturaCelda, borderRadius: 8, padding: '0.22rem 0.3rem', border: esHoy ? '1.5px solid var(--crear-gold)' : '1px solid var(--border-color, rgba(255,255,255,0.07))', background: esValido ? 'var(--card-bg, rgba(255,255,255,0.03))' : 'transparent', boxSizing: 'border-box' }}>
+                          {esValido && <div style={{ fontSize: '0.72rem', fontWeight: esHoy ? 900 : 600, color: esHoy ? 'var(--crear-gold)' : 'var(--text-muted)' }}>{dia}</div>}
+                        </div>
+                      );
+                    })}
                   </div>
-                );
-              })}
-            </div>
-
-            {/* Panel detalle evento */}
+                  {/* Barras multi-día overlay */}
+                  {segsEnSemana.map((seg, si) => {
+                    const col = getColor(seg.ev.sede);
+                    const colInSemana = seg.celdaInicioSeg - celdaBase;
+                    const spanCols    = seg.celdaFinSeg - seg.celdaInicioSeg + 1;
+                    const esInicio    = seg.celdaInicioSeg === seg.celdaInicioTotal;
+                    const esFin       = seg.celdaFinSeg    === seg.celdaFinTotal;
+                    const label       = (seg.ev.nombre || '').length > 18 ? seg.ev.nombre.substring(0, 17) + '…' : (seg.ev.nombre || '');
+                    const topOffset   = 24 + seg.lane * 21;
+                    return (
+                      <div key={si}
+                        onClick={() => setCalTooltip(calTooltip?.key === `seg-${semanaIdx}-${si}` ? null : { key: `seg-${semanaIdx}-${si}`, ev: seg.ev })}
+                        title={`${seg.ev.nombre}\n${fmtFecha(seg.ev.fechaInicio)} → ${fmtFecha(seg.ev.fechaFin || seg.ev.fechaInicio)}\n${seg.ev.entrenadorAsignado || seg.ev.entrenadorHoja || 'Sin asignar'}`}
+                        style={{
+                          position: 'absolute',
+                          top: topOffset,
+                          left: `calc(${colInSemana} * (100% / 7) + ${colInSemana * 3 + (esInicio ? 2 : 0)}px)`,
+                          width: `calc(${spanCols} * (100% / 7) + ${(spanCols-1)*3 - (esInicio?2:0) - (esFin?2:0)}px)`,
+                          height: 18,
+                          cursor: 'pointer',
+                          zIndex: seg.lane + 2,
+                          background: col.bg,
+                          border: `1px solid ${col.border}`,
+                          borderLeftWidth: esInicio ? 3 : 0,
+                          borderRightWidth: esFin ? 1 : 0,
+                          borderRadius: esInicio && esFin ? 4 : esInicio ? '4px 0 0 4px' : esFin ? '0 4px 4px 0' : 0,
+                          display: 'flex', alignItems: 'center',
+                          paddingLeft: esInicio ? '0.3rem' : '0.1rem',
+                          overflow: 'hidden', boxSizing: 'border-box',
+                        }}
+                      >
+                        {esInicio && (
+                          <span style={{ fontSize: '0.58rem', fontWeight: 700, color: col.text, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {getFlagForSede(seg.ev.sede)} {label}
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })}
+            {/* Panel detalle */}
             {calTooltip && (
               <div style={{ ...card, marginTop: '1rem', borderColor: 'var(--crear-gold)', maxWidth: 440 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
@@ -1109,10 +1167,8 @@ export default function AsignadorEntrenadores() {
                 </div>
               </div>
             )}
-
             <div className="text-muted" style={{ fontSize: '0.71rem', marginTop: '0.8rem' }}>
-              {Object.values(eventosPorDia).flat().length} entrenamientos en este mes.
-              Los filtros de Sede y Entrenador aplican también aquí.
+              {totalEnMes} entrenamientos en este mes. Los filtros de Sede y Entrenador aplican también aquí.
             </div>
           </div>
         );
