@@ -269,6 +269,20 @@ service cloud.firestore {
       allow read, create: if canManageTrainerAssignments();
       allow update, delete: if false;
     }
+    // Calendario operativo: Causa OS conserva ajustes y nuevos eventos sin
+    // alterar la hoja histórica. Los cambios se auditan de forma append-only.
+    match /calendario_operativo_overrides/{eventId} {
+      allow read, create, update: if canManageTrainerAssignments();
+      allow delete: if false;
+    }
+    match /calendario_operativo_custom/{eventId} {
+      allow read, create, update: if canManageTrainerAssignments();
+      allow delete: if false;
+    }
+    match /calendario_operativo_log/{logId} {
+      allow read, create: if canManageTrainerAssignments();
+      allow update, delete: if false;
+    }
 
     // CONTROL DE PÓLIZAS: el resultado de cada validación queda persistido
     // para no reconsultar Drive al entrar. El historial es append-only: nadie

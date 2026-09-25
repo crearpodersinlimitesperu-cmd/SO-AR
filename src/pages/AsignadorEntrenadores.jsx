@@ -38,7 +38,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Calendar, CheckCircle2, AlertTriangle, Plane, Building2,
-  ShieldCheck, Search, History, ExternalLink, Users, Save, X, Filter, RefreshCw, CircleAlert
+  ShieldCheck, Search, History, ExternalLink, Users, Save, X, Filter, RefreshCw, CircleAlert, Pencil, Plus
 } from 'lucide-react';
 import { collection, onSnapshot, doc, setDoc, addDoc, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { db } from '../services/firebase';
@@ -196,6 +196,11 @@ export default function AsignadorEntrenadores() {
   const [policyAudits, setPolicyAudits] = useState([]);
   const [policyExpiryDrafts, setPolicyExpiryDrafts] = useState({});
   const [policySaving, setPolicySaving] = useState('');
+  const [calendarOverrides, setCalendarOverrides] = useState({});
+  const [customCalendarEvents, setCustomCalendarEvents] = useState([]);
+  const [calendarEditor, setCalendarEditor] = useState(null);
+  const [calendarDraft, setCalendarDraft] = useState({});
+  const [calendarSaving, setCalendarSaving] = useState(false);
 
   // Calendario
   const [calMes, setCalMes] = useState(() => { const h = new Date(); return new Date(h.getFullYear(), h.getMonth(), 1); });
@@ -242,6 +247,27 @@ export default function AsignadorEntrenadores() {
       }
     })();
     return () => { vivo = false; };
+  }, [autorizado]);
+
+  // Calendario operativo Causa OS: conserva los ajustes de fechas y los
+  // entrenamientos creados aquí SIN reescribir la hoja que actúa como respaldo.
+  // Las dos colecciones se leen en vivo y cada cambio queda además en su log.
+  useEffect(() => {
+    if (!autorizado) return;
+    const unsub = onSnapshot(collection(db, 'calendario_operativo_overrides'), snap => {
+      const out = {};
+      snap.forEach(item => { out[item.id] = item.data(); });
+      setCalendarOverrides(out);
+    }, error => console.error('calendario_operativo_overrides:', error));
+    return () => unsub();
+  }, [autorizado]);
+
+  useEffect(() => {
+    if (!autorizado) return;
+    const unsub = onSnapshot(collection(db, 'calendario_operativo_custom'), snap => {
+      setCustomCalendarEvents(snap.docs.map(item => ({ id: item.id, ...item.data() })));
+    }, error => console.error('calendario_operativo_custom:', error));
+    return () => unsub();
   }, [autorizado]);
 
   useEffect(() => {
@@ -320,13 +346,15 @@ export default function AsignadorEntrenadores() {
     const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
     const out = [];
     (events || []).forEach(ev => {
-      const inicio = ev.fecha_inicio || ev.start;
+      const sourceKey = eventoKey(ev);
+      const override = calendarOverrides[sourceKey] || {};
+      const inicio = override.fechaInicio || ev.fecha_inicio || ev.start;
       if (!inicio) return;
       const d = new Date(inicio);
       if (periodo === 'proximos' && !isNaN(d.getTime()) && d < hoy) return;
       if (periodo === 'pasados' && !isNaN(d.getTime()) && d >= hoy) return;
 
-      const key = eventoKey(ev);
+      const key = sourceKey;
       const nombre = ev.nombre || ev.name || 'Entrenamiento';
       const complementario = tipoComplementario(nombre);
       const capitulo = tipoCapitulo(nombre);
@@ -348,7 +376,7 @@ export default function AsignadorEntrenadores() {
           fdsLabel: slots.length > 1 ? `FDS ${i + 1} · ${slot}` : null,
           nombre, sede,
           fechaInicio: inicio,
-          fechaFin: ev.fecha_fin || ev.end || '',
+          fechaFin: override.fechaFin ?? (ev.fecha_fin || ev.end || ''),
           equipo: ev.equipo || ev.team || '',
           lugar: ev.lugar || ev.direccion || '',
           // entrenador de la hoja (lo que hay hoy) vs el asignado en Causa OS
@@ -363,9 +391,24 @@ export default function AsignadorEntrenadores() {
         });
       });
     });
+    customCalendarEvents.forEach(ev => {
+      const inicio = ev.fechaInicio || '';
+      const d = new Date(inicio);
+      if (!inicio || (periodo === 'proximos' && !isNaN(d.getTime()) && d < hoy) || (periodo === 'pasados' && !isNaN(d.getTime()) && d >= hoy)) return;
+      const nombre = ev.nombre || 'Entrenamiento';
+      out.push({
+        key: ev.id, slot: 'unico', esMJ: false,
+        complementario: tipoComplementario(nombre), capitulo: tipoCapitulo(nombre), programa: tipoPrograma(nombre),
+        fdsLabel: null, nombre, sede: normalizeSede(ev.sede || ''), fechaInicio: inicio, fechaFin: ev.fechaFin || '',
+        equipo: ev.equipo || '', lugar: ev.lugar || '', entrenadorHojaRaw: '', entrenadorHoja: '', preasignacionesHoja: [],
+        entrenadorAsignado: (asignaciones[ev.id] || {}).unico?.entrenador || '',
+        asignadoPor: (asignaciones[ev.id] || {}).unico?.asignadoPor || '',
+        asignadoEn: (asignaciones[ev.id] || {}).unico?.fechaIso || '', esPersonalizado: true,
+      });
+    });
     out.sort((a, b) => new Date(a.fechaInicio) - new Date(b.fechaInicio));
     return out;
-  }, [events, asignaciones, periodo]);
+  }, [events, asignaciones, periodo, calendarOverrides, customCalendarEvents]);
 
   const filasFiltradas = useMemo(() => {
     const q = busqueda.toLowerCase().trim();
@@ -549,6 +592,62 @@ export default function AsignadorEntrenadores() {
     } catch (error) {
       showToast('No se pudo guardar la verificación: ' + error.message, 'error');
     } finally { setPolicySaving(''); }
+  };
+
+  const abrirEditorCalendario = (fila = null) => {
+    const onlyDate = value => String(value || '').slice(0, 10);
+    setCalendarEditor(fila ? { mode: 'editar', fila } : { mode: 'nuevo', fila: null });
+    setCalendarDraft(fila ? {
+      nombre: fila.nombre || '', sede: fila.sede || '', equipo: fila.equipo || '', lugar: fila.lugar || '',
+      fechaInicio: onlyDate(fila.fechaInicio), fechaFin: onlyDate(fila.fechaFin) || onlyDate(fila.fechaInicio),
+    } : {
+      nombre: '', sede: 'Lima', equipo: '', lugar: '', fechaInicio: '', fechaFin: '',
+    });
+  };
+
+  const guardarCalendarioOperativo = async () => {
+    const draft = calendarDraft;
+    if (!draft.nombre?.trim() || !draft.sede || !draft.fechaInicio) {
+      showToast('Indica entrenamiento, sede y fecha de inicio.', 'error'); return;
+    }
+    const fechaFin = draft.fechaFin || draft.fechaInicio;
+    if (fechaFin < draft.fechaInicio) {
+      showToast('La fecha final no puede ser anterior al inicio.', 'error'); return;
+    }
+    setCalendarSaving(true);
+    const now = new Date().toISOString();
+    const actorName = currentUser?.name || currentUser?.email || 'desconocido';
+    try {
+      const batch = writeBatch(db);
+      const isNew = calendarEditor?.mode === 'nuevo';
+      const target = isNew
+        ? doc(collection(db, 'calendario_operativo_custom'))
+        : doc(db, 'calendario_operativo_overrides', calendarEditor.fila.key);
+      const payload = {
+        nombre: draft.nombre.trim(), sede: normalizeSede(draft.sede), equipo: String(draft.equipo || '').trim(),
+        lugar: String(draft.lugar || '').trim(), fechaInicio: `${draft.fechaInicio}T00:00:00`, fechaFin: `${fechaFin}T00:00:00`,
+        actualizadoPor: actorName, actualizadoPorEmail: currentUser?.email || '', actualizadoEn: serverTimestamp(), fechaIso: now,
+      };
+      if (isNew) {
+        batch.set(target, { ...payload, creadoPor: actorName, creadoPorEmail: currentUser?.email || '', creadoEn: serverTimestamp(), origen: 'causa_os' });
+      } else {
+        batch.set(target, { ...payload, sourceEventKey: calendarEditor.fila.key, origen: 'override_causa_os' }, { merge: true });
+      }
+      batch.set(doc(collection(db, 'calendario_operativo_log')), {
+        action: isNew ? 'CALENDAR_EVENT_CREATED' : 'CALENDAR_DATES_UPDATED',
+        eventKey: target.id, sourceEventKey: isNew ? null : calendarEditor.fila.key,
+        nombre: payload.nombre, sede: payload.sede, equipo: payload.equipo,
+        fechaInicio: payload.fechaInicio, fechaFin: payload.fechaFin,
+        actorName, actorEmail: currentUser?.email || '', occurredAt: now, immutable: true,
+      });
+      await batch.commit();
+      setCalMes(new Date(`${draft.fechaInicio}T00:00:00`));
+      setCalendarEditor(null);
+      showToast(isNew ? 'Entrenamiento creado en el calendario operativo de Causa OS.' : 'Fechas actualizadas en Causa OS; la hoja no fue modificada.', 'success');
+    } catch (error) {
+      console.error('guardarCalendarioOperativo:', error);
+      showToast('No se pudo guardar el calendario: ' + error.message, 'error');
+    } finally { setCalendarSaving(false); }
   };
 
   // --- Guardar una asignación (con trazabilidad) ---------------------------
@@ -735,7 +834,31 @@ export default function AsignadorEntrenadores() {
             {label}
           </button>
         ))}
+        <button onClick={() => abrirEditorCalendario()} style={{ marginLeft: 'auto', padding: '0.5rem 0.9rem', borderRadius: '10px', cursor: 'pointer', fontSize: '0.82rem', fontWeight: 800, border: 0, background: 'var(--crear-gold)', color: '#111827', display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+          <Plus size={15} /> Nuevo entrenamiento
+        </button>
       </div>
+
+      {calendarEditor && (
+        <div style={{ ...card, marginBottom: '0.9rem', borderColor: 'var(--crear-gold)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', alignItems: 'center', marginBottom: '.8rem' }}>
+            <div><strong style={{ color: 'var(--text-heading)' }}>{calendarEditor.mode === 'nuevo' ? 'Nuevo entrenamiento' : 'Editar fechas del entrenamiento'}</strong><div className="text-muted" style={{ fontSize: '.72rem', marginTop: 3 }}>Se guarda en Causa OS con trazabilidad; Google Sheets no se modifica.</div></div>
+            <button onClick={() => setCalendarEditor(null)} style={{ background: 'none', border: 0, color: 'var(--text-muted)', cursor: 'pointer' }}><X size={18} /></button>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '.65rem' }}>
+            <input aria-label="Nombre del entrenamiento" style={selectStyle} value={calendarDraft.nombre || ''} placeholder="Entrenamiento" onChange={e => setCalendarDraft(prev => ({ ...prev, nombre: e.target.value }))} />
+            <select aria-label="Sede" style={selectStyle} value={calendarDraft.sede || ''} onChange={e => setCalendarDraft(prev => ({ ...prev, sede: e.target.value }))}>{OPERATIONAL_SEDES.map(s => <option key={s} value={s}>{s}</option>)}</select>
+            <input aria-label="Equipo" style={selectStyle} value={calendarDraft.equipo || ''} placeholder="Equipo" onChange={e => setCalendarDraft(prev => ({ ...prev, equipo: e.target.value }))} />
+            <input aria-label="Lugar o salón" style={selectStyle} value={calendarDraft.lugar || ''} placeholder="Lugar / salón" onChange={e => setCalendarDraft(prev => ({ ...prev, lugar: e.target.value }))} />
+            <input aria-label="Fecha de inicio" type="date" style={selectStyle} value={calendarDraft.fechaInicio || ''} onChange={e => setCalendarDraft(prev => ({ ...prev, fechaInicio: e.target.value }))} />
+            <input aria-label="Fecha final" type="date" style={selectStyle} value={calendarDraft.fechaFin || ''} onChange={e => setCalendarDraft(prev => ({ ...prev, fechaFin: e.target.value }))} />
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '.5rem', marginTop: '.8rem' }}>
+            <button onClick={() => setCalendarEditor(null)} style={{ ...selectStyle, width: 'auto', cursor: 'pointer' }}>Cancelar</button>
+            <button onClick={guardarCalendarioOperativo} disabled={calendarSaving} style={{ border: 0, borderRadius: 8, padding: '.5rem .75rem', background: 'var(--crear-gold)', color: '#111827', fontWeight: 800, cursor: calendarSaving ? 'wait' : 'pointer' }}>{calendarSaving ? 'Guardando…' : 'Guardar en Causa OS'}</button>
+          </div>
+        </div>
+      )}
 
       {/* ---------------- MATRIZ ---------------- */}
       {tab === 'matriz' && (
@@ -829,6 +952,7 @@ export default function AsignadorEntrenadores() {
                         <td style={{ padding: '0.65rem 0.8rem', whiteSpace: 'nowrap' }}>
                           <strong style={{ color: 'var(--text-heading)' }}>{fmtFecha(f.fechaInicio)}</strong>
                           {f.fechaFin && <span className="text-muted"> → {fmtFecha(f.fechaFin)}</span>}
+                          <button title="Editar fechas" onClick={() => abrirEditorCalendario(f)} style={{ marginLeft: 7, verticalAlign: 'middle', border: 0, background: 'transparent', color: 'var(--text-muted)', cursor: 'pointer', padding: 2 }}><Pencil size={13} /></button>
                         </td>
                         <td style={{ padding: '0.65rem 0.8rem', whiteSpace: 'nowrap' }}>
                           {getFlagForSede(f.sede)} {f.sede}
@@ -1170,7 +1294,10 @@ export default function AsignadorEntrenadores() {
               <div style={{ ...card, marginTop: '1rem', borderColor: 'var(--crear-gold)', maxWidth: 440 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
                   <div style={{ fontWeight: 800, color: 'var(--text-heading)', fontSize: '0.95rem' }}>{calTooltip.ev.nombre}</div>
-                  <button onClick={() => setCalTooltip(null)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '1.1rem', lineHeight: 1, padding: 0 }}>✕</button>
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    <button title="Editar fechas" onClick={() => abrirEditorCalendario(calTooltip.ev)} style={{ background: 'none', border: 'none', color: 'var(--crear-gold)', cursor: 'pointer', padding: 0 }}><Pencil size={15} /></button>
+                    <button onClick={() => setCalTooltip(null)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '1.1rem', lineHeight: 1, padding: 0 }}>✕</button>
+                  </div>
                 </div>
                 <div style={{ fontSize: '0.78rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.3rem 1.2rem', color: 'var(--text-muted)' }}>
                   {calTooltip.ev.fechaFin && calTooltip.ev.fechaFin !== calTooltip.ev.fechaInicio ? (<>
