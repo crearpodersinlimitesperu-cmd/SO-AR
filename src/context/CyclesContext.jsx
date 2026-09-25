@@ -7,6 +7,74 @@ import { useAuth } from './AuthContext';
 const getEventSyncId = (ev) =>
   ev.id || `${ev.nombre || ev.name || ''}|${ev.sede || ev.sedeTag || ''}|${ev.fecha_inicio || ev.start || ''}`;
 
+// El Apps Script conserva el histórico completo, pero puede tardar en
+// republicar cambios de la agenda. Esta vista pública de la MISMA hoja es el
+// contraste de actualidad: solamente complementa/actualiza eventos, nunca
+// escribe en Sheets y nunca toca las asignaciones de Causa OS.
+const OFFICIAL_CALENDAR_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1u0tc4GeooPmSwNxZ0CErKGtRU4oD-mO3l--ZSQM-KPs/gviz/tq?tqx=out:json&gid=1326951636';
+
+const googleVizDateToIso = (value) => {
+  const match = String(value || '').match(/^Date\((\d+),(\d+),(\d+)\)$/);
+  if (!match) return '';
+  const [, year, monthZeroBased, day] = match;
+  return `${year}-${String(Number(monthZeroBased) + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}T00:00:00`;
+};
+
+const calendarMergeKey = (event = {}) => [
+  String(event.fecha_inicio || event.start || '').slice(0, 10),
+  String(event.sede || event.sedeTag || '').trim().toUpperCase(),
+  String(event.equipo || event.team || '').trim(),
+  String(event.nombre || event.name || '').trim().toUpperCase()
+].join('__');
+
+const parseOfficialCalendarSheet = (text) => {
+  const first = text.indexOf('{');
+  const last = text.lastIndexOf('}');
+  if (first < 0 || last < first) throw new Error('Respuesta de calendario oficial inválida.');
+  const payload = JSON.parse(text.slice(first, last + 1));
+  return (payload.table?.rows || []).map(row => {
+    const cells = row.c || [];
+    const value = index => cells[index]?.v ?? '';
+    const fechaInicio = googleVizDateToIso(value(0));
+    if (!fechaInicio) return null;
+    return {
+      fecha_inicio: fechaInicio,
+      // La hoja de contraste no declara fecha de fin. Se deja vacía: no se
+      // inventa duración ni se altera la que ya provea el Apps Script.
+      fecha_fin: '',
+      sede: String(value(1) || '').trim(),
+      equipo: String(value(2) ?? '').trim(),
+      nombre: String(value(3) || '').trim(),
+      trainer: String(value(4) || '').trim(),
+      lugar: String(value(5) || '').trim(),
+      direccion: String(value(6) || '').trim(),
+      source: 'official_sheet_crosscheck'
+    };
+  }).filter(Boolean);
+};
+
+const mergeOfficialCalendar = (apiEvents, sheetEvents) => {
+  const byKey = new Map((apiEvents || []).map(event => [calendarMergeKey(event), event]));
+  for (const sheetEvent of sheetEvents || []) {
+    const key = calendarMergeKey(sheetEvent);
+    const previous = byKey.get(key);
+    // La hoja es más reciente en los campos de programación. Conservamos los
+    // datos logísticos del API, porque pertenecen a otro flujo y no existen
+    // en el calendario de Sheets.
+    byKey.set(key, {
+      ...(previous || {}),
+      ...sheetEvent,
+      fecha_fin: previous?.fecha_fin || previous?.end || '',
+      ticket: previous?.ticket || 'pending',
+      hotel: previous?.hotel || 'pending',
+      notified: previous?.notified || false,
+      arrival: previous?.arrival || '',
+      ticket_url: previous?.ticket_url || ''
+    });
+  }
+  return [...byKey.values()];
+};
+
 // (14/09/2026) EXTRAÍDO de calculateCycleAndStage() sin cambiar su lógica, para
 // poder reutilizarlo tanto en la detección AUTOMÁTICA de equipo (el comportamiento
 // de siempre: "el próximo evento cronológico de la sede") como en la selección
@@ -121,17 +189,41 @@ export function CyclesProvider({ children }) {
     const fetchEvents = async () => {
       try {
         const API_URL = 'https://script.google.com/macros/s/AKfycbxSZFhddMYyspZpkW-qPHEi8hycLGfnhFeCPSYc4VbckWIeiiZAbxyJY71XRb2-Ya4U/exec?action=getEventos';
-        const res = await fetch(API_URL);
-        const json = await res.json();
-        const data = json.data || json;
-        
+        const [apiResult, sheetResult] = await Promise.allSettled([
+          fetch(API_URL).then(res => {
+            if (!res.ok) throw new Error(`Apps Script respondió ${res.status}`);
+            return res.json();
+          }),
+          fetch(OFFICIAL_CALENDAR_SHEET_URL).then(res => {
+            if (!res.ok) throw new Error(`Calendario oficial respondió ${res.status}`);
+            return res.text();
+          })
+        ]);
+        const apiJson = apiResult.status === 'fulfilled' ? apiResult.value : [];
+        const data = apiJson.data || apiJson;
+        const sheetEvents = sheetResult.status === 'fulfilled'
+          ? parseOfficialCalendarSheet(sheetResult.value)
+          : [];
+        if (sheetResult.status === 'rejected') {
+          console.warn('No se pudo contrastar la agenda actual de Sheets:', sheetResult.reason);
+        }
+
         if (Array.isArray(data)) {
-           const allEvents = data.filter(ev => ev.fecha_inicio || ev.start).sort((a, b) => new Date(a.fecha_inicio || a.start) - new Date(b.fecha_inicio || b.start));
+           const allEvents = mergeOfficialCalendar(
+             data.filter(ev => ev.fecha_inicio || ev.start),
+             sheetEvents
+           ).sort((a, b) => new Date(a.fecha_inicio || a.start) - new Date(b.fecha_inicio || b.start));
            setEvents(allEvents);
            
            if (currentUser) {
              calculateCycleAndStage(allEvents, currentUser.sede, currentUser.appRole, currentUser.equiposQuito);
            }
+        } else if (sheetEvents.length) {
+          // Si el histórico del Apps Script falla, seguimos mostrando la
+          // programación actual verificable de la hoja, sin fabricar datos.
+          const allEvents = sheetEvents.sort((a, b) => new Date(a.fecha_inicio) - new Date(b.fecha_inicio));
+          setEvents(allEvents);
+          if (currentUser) calculateCycleAndStage(allEvents, currentUser.sede, currentUser.appRole, currentUser.equiposQuito);
         }
       } catch (e) {
         console.error("Error fetching calendar for cycles", e);
