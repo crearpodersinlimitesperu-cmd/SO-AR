@@ -40,7 +40,7 @@
          No crea sesiones paralelas ni guarda credenciales en esta página. -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js';
-        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js';
+        import { getFirestore, collection, getDocs } from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js';
 
         const causaCalendarFirebase = initializeApp({
             apiKey: 'AIzaSyCTMrA6A64s1ppDBBsol-fqam5Vch_Q5B0',
@@ -50,13 +50,13 @@
             messagingSenderId: '122588918051',
             appId: '1:122588918051:web:c85d6835b1b1f920fb1c96'
         });
-        const causaCalendarAuth = getAuth(causaCalendarFirebase);
-        window.causaCalendarAuthReady = new Promise(resolve => {
-            const unsubscribe = onAuthStateChanged(causaCalendarAuth, user => {
-                unsubscribe();
-                resolve(user || null);
-            }, () => resolve(null));
-        });
+        const causaCalendarDb = getFirestore(causaCalendarFirebase);
+        // Lectura de una proyección mínima y pública: no depende de una sesión
+        // de este portal legado y no expone correos ni trazabilidad interna.
+        window.causaCalendarLoadAssignments = async () => {
+            const snapshots = await getDocs(collection(causaCalendarDb, 'calendario_asignaciones_publicas'));
+            return snapshots.docs.map(item => ({ id: item.id, ...item.data() }));
+        };
     </script>
     
     <style>
@@ -491,6 +491,7 @@
         // CONFIGURACIÓN API BACKEND (MULTI-GERENTE + OCR + TRACKING)
         // ═══════════════════════════════════════════════════════════════
         const API_URL = 'https://script.google.com/macros/s/AKfycbxSZFhddMYyspZpkW-qPHEi8hycLGfnhFeCPSYc4VbckWIeiiZAbxyJY71XRb2-Ya4U/exec';
+        const CURRENT_CALENDAR_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1u0tc4GeooPmSwNxZ0CErKGtRU4oD-mO3l--ZSQM-KPs/gviz/tq?tqx=out:json&gid=1326951636';
         let syncInterval = null;
         let isSyncing = false;
         let saveQueue = [];
@@ -520,6 +521,57 @@
           const sede = normalizeSedeAsignador(ev.sede || ev.sedeTag || sedeKey || '');
           const name = String(ev.name || ev.nombre || '').trim();
           return `${date}__${sede}__${name}`.replace(/\//g, '-');
+        }
+
+        function googleVizDateToIso(value) {
+          const match = String(value || '').match(/^Date\((\d+),(\d+),(\d+)\)$/);
+          if (!match) return '';
+          return `${match[1]}-${String(Number(match[2]) + 1).padStart(2, '0')}-${String(match[3]).padStart(2, '0')}T00:00:00`;
+        }
+
+        function currentCalendarMergeKey(event, sedeKey) {
+          return [
+            String(event.start || event.fecha_inicio || '').slice(0, 10),
+            normalizeSedeAsignador(event.sede || event.sedeTag || sedeKey || ''),
+            String(event.equipo || '').trim(),
+            String(event.name || event.nombre || '').trim().toUpperCase()
+          ].join('__');
+        }
+
+        // El Apps Script conserva el historial; esta publicación de la misma
+        // hoja aporta las fechas vigentes sin escribir ni alterar el histórico.
+        async function mergeCurrentOfficialSchedule(data) {
+          const response = await fetch(CURRENT_CALENDAR_SHEET_URL);
+          if (!response.ok) throw new Error('No se pudo leer el calendario vigente');
+          const text = await response.text();
+          const first = text.indexOf('{');
+          const last = text.lastIndexOf('}');
+          if (first < 0 || last < first) throw new Error('Formato de calendario vigente inválido');
+          const rows = JSON.parse(text.slice(first, last + 1)).table?.rows || [];
+          const index = new Map();
+          Object.keys(data || {}).forEach(sede => (data[sede] || []).forEach(event => index.set(currentCalendarMergeKey(event, sede), event)));
+          rows.forEach(row => {
+            const cells = row.c || [];
+            const value = column => cells[column]?.v ?? '';
+            const start = googleVizDateToIso(value(0));
+            if (!start) return;
+            const sourceSede = String(value(1) || '').trim();
+            const sede = normalizeSedeKey(sourceSede || 'LIM');
+            const incoming = {
+              start, end: '', name: String(value(3) || '').trim(), equipo: cleanEquipoFormula(value(2)),
+              trainer: String(value(4) || '').trim(), place: String(value(5) || '').trim(),
+              address: String(value(6) || '').trim(), sedeTag: sede, sede: sourceSede
+            };
+            const key = currentCalendarMergeKey(incoming, sede);
+            const existing = index.get(key);
+            if (existing) {
+              Object.assign(existing, { ...incoming, end: existing.end || incoming.end, logistics: existing.logistics || {} });
+            } else {
+              if (!data[sede]) data[sede] = [];
+              data[sede].push(incoming);
+              index.set(key, incoming);
+            }
+          });
         }
 
         function escapeCalendarText(value) {
@@ -597,17 +649,12 @@
           markSheetContext(data);
           setAsignadorStatus('pendiente');
           try {
-            const user = await window.causaCalendarAuthReady;
-            if (!user) throw new Error('No hay sesión Firebase activa');
-            const token = await user.getIdToken(false);
-            const response = await fetch(ASIGNADOR_ASSIGNMENTS_URL, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-              body: JSON.stringify({ purpose: 'global_calendar_read' })
-            });
-            const payload = await response.json();
-            if (!response.ok || payload.source !== 'causa_os_asignador') throw new Error(payload.message || 'Respuesta no válida del Asignador');
-            mergeOfficialAssignments(data, payload.assignments);
+            if (typeof window.causaCalendarLoadAssignments !== 'function') throw new Error('La proyección del Asignador no está disponible');
+            const assignments = await Promise.race([
+              window.causaCalendarLoadAssignments(),
+              new Promise((_, reject) => setTimeout(() => reject(new Error('Tiempo de espera del Asignador')), 5000))
+            ]);
+            mergeOfficialAssignments(data, assignments);
             setAsignadorStatus('oficial');
             return true;
           } catch (error) {
@@ -662,6 +709,11 @@
                 });
               });
               window.allEventsData = newData;
+              try {
+                await mergeCurrentOfficialSchedule(window.allEventsData);
+              } catch (scheduleError) {
+                console.warn('No se pudo actualizar el contraste de calendario vigente:', scheduleError);
+              }
               await syncOfficialAssignments(window.allEventsData);
               mergeLogistics();
               if (sessionStorage.auth === "true") {
@@ -1737,7 +1789,7 @@
                     });
                     
                 allEventsData = data;
-                syncOfficialAssignments(allEventsData).finally(() => {
+                mergeCurrentOfficialSchedule(allEventsData).catch(error => console.warn('Contraste vigente no disponible:', error)).finally(() => syncOfficialAssignments(allEventsData)).finally(() => {
                     mergeLogistics();
                     if (sessionStorage.auth === "true") {
                         renderSedeTabs();
@@ -1751,7 +1803,7 @@
                         .then(res => res.json())
                         .then(data => {
                             allEventsData = data;
-                            syncOfficialAssignments(allEventsData).finally(() => {
+                            mergeCurrentOfficialSchedule(allEventsData).catch(error => console.warn('Contraste vigente no disponible:', error)).finally(() => syncOfficialAssignments(allEventsData)).finally(() => {
                                 mergeLogistics();
                                 if (sessionStorage.auth === "true") {
                                     renderSedeTabs();
@@ -1762,7 +1814,7 @@
                         .catch(() => {
                             // Fallback to embedded events
                             allEventsData = fallbackEventsData;
-                            syncOfficialAssignments(allEventsData).finally(() => {
+                            mergeCurrentOfficialSchedule(allEventsData).catch(error => console.warn('Contraste vigente no disponible:', error)).finally(() => syncOfficialAssignments(allEventsData)).finally(() => {
                                 mergeLogistics();
                                 if (sessionStorage.auth === "true") {
                                     renderSedeTabs();

@@ -1,0 +1,24 @@
+name: Publicar proyección de asignaciones para calendario
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: calendar-assignment-projection
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm ci
+      - name: Publicar asignaciones existentes sin tocar la fuente canónica
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: node scripts/publishCalendarAssignmentProjection.mjs

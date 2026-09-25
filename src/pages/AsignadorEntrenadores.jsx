@@ -659,6 +659,7 @@ export default function AsignadorEntrenadores() {
     setGuardando(`${fila.key}__${fila.slot}`);
     try {
       const ref = doc(db, 'asignaciones_entrenadores', fila.key);
+      const now = new Date().toISOString();
       const payload = {
         entrenamiento: fila.nombre,
         sede: fila.sede,
@@ -671,14 +672,32 @@ export default function AsignadorEntrenadores() {
               entrenador: nuevoEntrenador,
               asignadoPor: currentUser?.name || currentUser?.email || 'desconocido',
               asignadoPorEmail: currentUser?.email || '',
-              fechaIso: new Date().toISOString(),
+              fechaIso: now,
             }
           : null,
       };
-      await setDoc(ref, payload, { merge: true });
+      const projectionRef = doc(db, 'calendario_asignaciones_publicas', fila.key);
+      const assignmentLogRef = doc(collection(db, 'asignaciones_entrenadores_log'));
+      const batch = writeBatch(db);
+
+      // La asignación privada es el registro canónico. La proyección contiene
+      // exclusivamente el nombre confirmado y el momento de publicación: el
+      // calendario público puede leerla de inmediato sin exponer correos,
+      // usuarios ni la bitácora interna.
+      batch.set(ref, payload, { merge: true });
+      batch.set(projectionRef, {
+        entrenamiento: fila.nombre,
+        sede: fila.sede,
+        fechaInicio: fila.fechaInicio,
+        fechaFin: fila.fechaFin || null,
+        equipo: fila.equipo || null,
+        [fila.slot]: nuevoEntrenador ? { entrenador: nuevoEntrenador, fechaIso: now } : null,
+        source: 'causa_os_asignador',
+        actualizadoEn: serverTimestamp(),
+      }, { merge: true });
 
       // Trazabilidad: queda el quién, qué, cuándo y el valor anterior.
-      await addDoc(collection(db, 'asignaciones_entrenadores_log'), {
+      batch.set(assignmentLogRef, {
         entrenamiento: fila.nombre,
         sede: fila.sede,
         fds: fila.esMJ ? fila.slot : null,
@@ -687,8 +706,9 @@ export default function AsignadorEntrenadores() {
         nuevo: nuevoEntrenador || '(sin asignar)',
         porNombre: currentUser?.name || '',
         porEmail: currentUser?.email || '',
-        fechaIso: new Date().toISOString(),
+        fechaIso: now,
       });
+      await batch.commit();
 
       showToast(
         nuevoEntrenador

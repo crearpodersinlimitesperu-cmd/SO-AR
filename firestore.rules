@@ -269,6 +269,14 @@ service cloud.firestore {
       allow read, create: if canManageTrainerAssignments();
       allow update, delete: if false;
     }
+    // Proyección mínima de asignaciones confirmadas para el calendario global.
+    // Solo publica nombre, evento y fecha de confirmación; nunca correos,
+    // identidades de quien asignó ni la bitácora interna.
+    match /calendario_asignaciones_publicas/{assignmentId} {
+      allow read: if true;
+      allow create, update: if canManageTrainerAssignments();
+      allow delete: if false;
+    }
     // Calendario operativo: Causa OS conserva ajustes y nuevos eventos sin
     // alterar la hoja histórica. Los cambios se auditan de forma append-only.
     match /calendario_operativo_overrides/{eventId} {
