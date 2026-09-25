@@ -269,6 +269,19 @@ service cloud.firestore {
       allow read, create: if canManageTrainerAssignments();
       allow update, delete: if false;
     }
+
+    // Conversación interna vinculada a una tarea. El mensaje es inmutable y
+    // solo lo ven quien lo envió y quienes aparecen como destinatarios.
+    match /task_messages/{messageId} {
+      allow read: if isAuthenticated() &&
+        (resource.data.senderEmail == email() || email() in resource.data.recipientEmails);
+      allow create: if isAuthenticated() &&
+        request.resource.data.senderEmail == email() &&
+        request.resource.data.taskId is string &&
+        request.resource.data.body is string &&
+        request.resource.data.recipientEmails is list;
+      allow update, delete: if false;
+    }
     // Proyección mínima de asignaciones confirmadas para el calendario global.
     // Solo publica nombre, evento y fecha de confirmación; nunca correos,
     // identidades de quien asignó ni la bitácora interna.

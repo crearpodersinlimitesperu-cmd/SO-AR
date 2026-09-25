@@ -438,6 +438,53 @@ export function ChecklistProvider({ children }) {
     }
   };
 
+  // Mensajería interna ligada a una tarea. No envía WhatsApp/correo por
+  // sorpresa: crea una conversación auditable en Causa OS y una notificación
+  // individual para cada destinatario elegido.
+  const sendTaskMessage = async (task, recipientEmails, text) => {
+    const body = String(text || '').trim();
+    const senderEmail = String(currentUser?.email || '').toLowerCase().trim();
+    const assigned = Array.isArray(task?.assignedToEmails) && task.assignedToEmails.length
+      ? task.assignedToEmails : (task?.assignedToEmail ? [task.assignedToEmail] : []);
+    const recipients = [...new Set((recipientEmails || [])
+      .map(email => String(email || '').toLowerCase().trim())
+      .filter(email => email && email !== senderEmail && assigned.map(item => String(item).toLowerCase().trim()).includes(email)))];
+    if (!body) throw new Error('Escribe un mensaje antes de enviarlo.');
+    if (!senderEmail) throw new Error('No se identificó tu sesión. Vuelve a iniciar sesión.');
+    if (!recipients.length) throw new Error('Selecciona al menos un colaborador asignado a la tarea.');
+
+    const now = new Date().toISOString();
+    const senderName = currentUser?.displayName || currentUser?.name || senderEmail;
+    const title = task.task || task.title || 'Tarea sin título';
+    const batch = writeBatch(db);
+    const messageRef = doc(collection(db, 'task_messages'));
+    batch.set(messageRef, {
+      taskId: task.id,
+      taskTitle: title,
+      senderEmail,
+      senderName,
+      recipientEmails: recipients,
+      body,
+      createdAt: now,
+      channel: recipients.length > 1 ? 'grupo' : 'individual',
+      immutable: true
+    });
+    recipients.forEach(email => {
+      batch.set(doc(collection(db, 'notifications')), {
+        userId: email,
+        title: `Mensaje sobre: ${title}`,
+        message: `${senderName}: ${body}`,
+        taskId: task.id,
+        taskMessageId: messageRef.id,
+        type: 'task_message',
+        read: false,
+        created_at: now
+      });
+    });
+    await batch.commit();
+    return { recipients: recipients.length };
+  };
+
   const addCustomTask = async (taskData) => {
     try {
       const batch = writeBatch(db);
@@ -1152,6 +1199,7 @@ export function ChecklistProvider({ children }) {
       tasks, 
       toggleTask, 
       updateTaskDetails,
+      sendTaskMessage,
       editCustomTask, 
       submitEvidence, 
       getProgressByRole, 

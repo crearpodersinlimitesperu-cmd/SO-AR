@@ -14,6 +14,8 @@ import { getFlagForSede } from '../utils/flags';
 import { uploadEvidenceDocument } from '../services/googleDriveService';
 import { celebrateVictory } from '../utils/neuroFeedback';
 import { usersData, isForeignTask } from '../data/usersData';
+import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { db } from '../services/firebase';
 const getCountdown = (deadlineIso) => {
   if (!deadlineIso) return { label: 'Sin fecha límite', color: '#9ca3af', bg: 'rgba(156,163,175,0.12)', border: '#9ca3af', overdue: false };
   const deadline = new Date(deadlineIso).getTime();
@@ -72,7 +74,7 @@ export default function TaskDetailModal({
   resolveAssigneeName = null 
 }) {
   const { currentUser, reauthenticateGoogle } = useAuth();
-  const { updateTaskDetails, toggleTask } = useChecklist();
+  const { updateTaskDetails, toggleTask, sendTaskMessage } = useChecklist();
   const { showToast } = useUI();
 
   // Estados locales editables para avances y evidencias
@@ -112,6 +114,10 @@ export default function TaskDetailModal({
   // sin ningún aviso. hasUnsavedChanges marca si hay algo agregado/quitado
   // desde la apertura que todavía no pasó por handleSaveAll.
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [taskMessages, setTaskMessages] = useState([]);
+  const [messageText, setMessageText] = useState('');
+  const [messageTarget, setMessageTarget] = useState('group');
+  const [messageSending, setMessageSending] = useState(false);
 
   // Sincronizar estado cuando se abre el modal o cambia la tarea
   useEffect(() => {
@@ -213,6 +219,18 @@ export default function TaskDetailModal({
       setHasUnsavedChanges(false);
     }
   }, [task, isOpen]);
+
+  useEffect(() => {
+    if (!task?.id || !isOpen) {
+      setTaskMessages([]);
+      return undefined;
+    }
+    const messagesQuery = query(collection(db, 'task_messages'), where('taskId', '==', task.id));
+    return onSnapshot(messagesQuery, snapshot => {
+      setTaskMessages(snapshot.docs.map(item => ({ id: item.id, ...item.data() }))
+        .sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || ''))));
+    }, error => console.warn('No se pudo cargar la conversación de la tarea:', error));
+  }, [task?.id, isOpen]);
 
   // Cierra el modal, pero si hay evidencia/notas agregadas o quitadas que
   // todavía no se guardaron con "Guardar", pide confirmación explícita antes
@@ -472,6 +490,26 @@ export default function TaskDetailModal({
       }
       return updated;
     });
+  };
+
+  const handleSendTaskMessage = async () => {
+    if (messageSending) return;
+    const text = messageText.trim();
+    const eligibleRecipients = collaboratorsList.filter(item => !item.isMe).map(item => item.email);
+    const recipients = messageTarget === 'group' ? eligibleRecipients : [messageTarget];
+    if (!text) return showToast('Escribe el mensaje antes de enviarlo.', 'error');
+    if (!recipients.filter(Boolean).length) return showToast('No hay otro colaborador asignado para recibir el mensaje.', 'error');
+    setMessageSending(true);
+    try {
+      const result = await sendTaskMessage(task, recipients, text);
+      setMessageText('');
+      showToast(`Mensaje enviado a ${result.recipients} colaborador${result.recipients === 1 ? '' : 'es'}.`, 'success');
+    } catch (error) {
+      console.error('No se pudo enviar el mensaje de tarea:', error);
+      showToast(error.message || 'No se pudo enviar el mensaje.', 'error');
+    } finally {
+      setMessageSending(false);
+    }
   };
   // Agregar una nueva evidencia
   const handleAddEvidenceItem = () => {
@@ -875,6 +913,53 @@ export default function TaskDetailModal({
               }}>
                 {task.notes || task.description || task.comments}
               </p>
+            </div>
+          )}
+
+          {/* Conversación operativa: individual o para todos los colaboradores
+              de esta tarea. Es independiente de las notas de avance y queda
+              registrada en la bitácora inmutable de Causa OS. */}
+          {!isForeign && collaboratorsList.some(item => !item.isMe) && (
+            <div style={{
+              background: 'rgba(41, 171, 226, 0.06)', border: '1px solid rgba(41, 171, 226, 0.3)',
+              borderRadius: '12px', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.7rem'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.6rem', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', color: 'var(--crear-cyan)', fontWeight: 800, fontSize: '0.9rem' }}>
+                  <MessageSquare size={17} /> Mensajes de la tarea
+                </div>
+                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Notifica dentro de Causa OS</span>
+              </div>
+              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                <select value={messageTarget} onChange={event => setMessageTarget(event.target.value)} style={{
+                  flex: '1 1 190px', padding: '0.5rem 0.6rem', borderRadius: '7px', color: '#fff',
+                  background: 'rgba(0,0,0,0.28)', border: '1px solid rgba(255,255,255,0.16)'
+                }}>
+                  <option value="group">Todos los colaboradores asignados</option>
+                  {collaboratorsList.filter(item => !item.isMe).map(item => (
+                    <option key={item.email} value={item.email}>Solo {item.name}</option>
+                  ))}
+                </select>
+                <button type="button" onClick={handleSendTaskMessage} disabled={messageSending || !messageText.trim()} style={{
+                  border: '1px solid rgba(41,171,226,.7)', borderRadius: '7px', padding: '0.5rem 0.8rem',
+                  background: messageSending || !messageText.trim() ? 'rgba(41,171,226,.14)' : 'var(--crear-cyan)',
+                  color: messageSending || !messageText.trim() ? 'var(--text-muted)' : '#06121a', fontWeight: 800,
+                  cursor: messageSending || !messageText.trim() ? 'not-allowed' : 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.35rem'
+                }}><Send size={14} /> {messageSending ? 'Enviando…' : 'Enviar'}</button>
+              </div>
+              <textarea rows="2" value={messageText} onChange={event => setMessageText(event.target.value)}
+                placeholder="Ej.: Nora, ¿qué pasó con esta tarea? Necesito tu actualización hoy."
+                style={{ width: '100%', boxSizing: 'border-box', padding: '0.6rem', borderRadius: '7px', color: '#fff', resize: 'vertical', background: 'rgba(0,0,0,0.26)', border: '1px solid rgba(255,255,255,0.14)' }} />
+              {taskMessages.length > 0 && (
+                <div style={{ maxHeight: '124px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.45rem', paddingTop: '0.15rem' }}>
+                  {taskMessages.slice(0, 10).map(message => (
+                    <div key={message.id} style={{ borderLeft: '3px solid var(--crear-cyan)', background: 'rgba(0,0,0,.2)', borderRadius: '0 6px 6px 0', padding: '0.42rem 0.55rem' }}>
+                      <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.74rem' }}>{message.senderName || message.senderEmail}</div>
+                      <div style={{ color: 'var(--text-muted)', fontSize: '0.76rem', whiteSpace: 'pre-wrap' }}>{message.body}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
