@@ -155,6 +155,102 @@ async function firestoreGet(path, accessToken) {
   return firestoreFieldsToPlain(data.fields);
 }
 
+// Lee una colección paginada desde Firestore REST. Esta función vive solo en
+// el Worker: la cuenta de servicio nunca llega al navegador ni se usa para
+// escribir desde este flujo.
+async function firestoreListCollection(collectionPath, accessToken) {
+  const documents = [];
+  let pageToken = '';
+  do {
+    const url = new URL(`https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/${collectionPath}`);
+    url.searchParams.set('pageSize', '300');
+    if (pageToken) url.searchParams.set('pageToken', pageToken);
+    const resp = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+    if (!resp.ok) {
+      console.error('[calendar-assignments] Error listando Firestore:', resp.status, await resp.text());
+      throw new Error('No se pudieron leer las asignaciones oficiales.');
+    }
+    const data = await resp.json();
+    for (const item of data.documents || []) {
+      documents.push({
+        id: String(item.name || '').split('/').pop(),
+        data: firestoreFieldsToPlain(item.fields)
+      });
+    }
+    pageToken = data.nextPageToken || '';
+  } while (pageToken);
+  return documents;
+}
+
+// Calendario Global no recibe correos, IDs de usuarios ni el historial de
+// cambios. Solo recibe la parte operativa que ya muestra el calendario:
+// entrenador confirmado, FDS, evento y fecha de confirmación.
+function publicAssignmentSlot(slot) {
+  if (!slot || typeof slot !== 'object' || !slot.entrenador) return null;
+  return {
+    entrenador: String(slot.entrenador),
+    asignadoPor: slot.asignadoPor ? String(slot.asignadoPor) : '',
+    fechaIso: slot.fechaIso ? String(slot.fechaIso) : ''
+  };
+}
+
+async function handleCalendarAssignments(request, env, origin) {
+  const authHeader = request.headers.get('Authorization') || '';
+  const idToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+  if (!idToken) {
+    return json({ error: 'unauthenticated', message: 'Inicia sesión en Causa OS para consultar las asignaciones oficiales.' }, 401, origin);
+  }
+
+  let uid;
+  try {
+    uid = (await verifyFirebaseToken(idToken)).sub;
+  } catch (err) {
+    console.error('[calendar-assignments] Token inválido:', err);
+    return json({ error: 'unauthenticated', message: 'La sesión de Causa OS expiró.' }, 401, origin);
+  }
+
+  let accessToken;
+  try {
+    accessToken = await getServiceAccountAccessToken(env);
+  } catch (err) {
+    console.error('[calendar-assignments] Error de credenciales de servidor:', err);
+    return json({ error: 'internal', message: 'No se pudo conectar con la fuente oficial.' }, 500, origin);
+  }
+
+  // Solo usuarios reales de Causa OS pueden ver la programación confirmada.
+  // No ampliamos las reglas de Firestore ni exponemos la colección al público.
+  const userData = await firestoreGet(`users/${uid}`, accessToken);
+  if (!userData) {
+    return json({ error: 'permission-denied', message: 'Tu usuario no está registrado en Causa OS.' }, 403, origin);
+  }
+
+  try {
+    const documents = await firestoreListCollection('asignaciones_entrenadores', accessToken);
+    const assignments = documents.map(({ id, data }) => ({
+      id,
+      entrenamiento: data.entrenamiento || '',
+      sede: data.sede || '',
+      fechaInicio: data.fechaInicio || '',
+      fechaFin: data.fechaFin || '',
+      equipo: data.equipo || '',
+      slots: {
+        unico: publicAssignmentSlot(data.unico),
+        'Creación': publicAssignmentSlot(data['Creación']),
+        'Relación': publicAssignmentSlot(data['Relación']),
+        'Gratitud': publicAssignmentSlot(data['Gratitud'])
+      }
+    }));
+    return json({
+      source: 'causa_os_asignador',
+      generatedAt: new Date().toISOString(),
+      assignments
+    }, 200, origin);
+  } catch (err) {
+    console.error('[calendar-assignments] Error obteniendo asignaciones:', err);
+    return json({ error: 'internal', message: 'No se pudieron leer las asignaciones oficiales.' }, 500, origin);
+  }
+}
+
 async function firestorePlainToFields(obj) {
   const fields = {};
   for (const [key, val] of Object.entries(obj)) {
@@ -650,6 +746,9 @@ export default {
     }
     if (url.pathname === '/trigger-nodus-scraper') {
       return handleTriggerNodusScraper(request, env, origin);
+    }
+    if (url.pathname === '/calendar-assignments') {
+      return handleCalendarAssignments(request, env, origin);
     }
 
     const authHeader = request.headers.get('Authorization') || '';

@@ -403,6 +403,22 @@ export default function AsignadorEntrenadores() {
     });
   }, [filas, filtroSede, filtroTipo, filtroEntrenador, busqueda]);
 
+  // Un filtro vacío no debe hacer parecer que el programa "desapareció".
+  // El cronograma oficial puede no tener una próxima fecha y sí conservar
+  // ejecuciones históricas (por ejemplo, ROMPIMIENTO B. del 29 de agosto).
+  // Informamos ese hecho sin cambiar silenciosamente el período del usuario.
+  const rompimientosHistoricos = useMemo(() => {
+    if (periodo !== 'proximos' || filtroTipo !== 'rompimiento') return 0;
+    const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+    return (events || []).filter(ev => {
+      const inicio = new Date(ev.fecha_inicio || ev.start || '');
+      if (Number.isNaN(inicio.getTime()) || inicio >= hoy) return false;
+      const sede = normalizeSede(ev.sede || ev.sedeTag || '');
+      return tipoComplementario(ev.nombre || ev.name || '') === 'rompimiento'
+        && (filtroSede === 'todas' || sede === filtroSede);
+    }).length;
+  }, [events, periodo, filtroTipo, filtroSede]);
+
   // --- KPIs (todos calculados sobre las filas reales) ----------------------
   const kpis = useMemo(() => {
     const total = filas.length;
@@ -782,7 +798,16 @@ export default function AsignadorEntrenadores() {
               <div style={{ padding: '2.5rem', textAlign: 'center' }} className="text-muted">
                 {(events?.length || 0) === 0
                   ? 'El calendario oficial no devolvió eventos. No se está mostrando nada inventado — si esperabas ver entrenamientos, hay que revisar la conexión con la hoja.'
-                  : 'Ningún entrenamiento coincide con los filtros aplicados.'}
+                  : rompimientosHistoricos > 0
+                    ? <>
+                        No hay próximos Rompimientos de Barreras en el calendario oficial para estos filtros. Hay {rompimientosHistoricos} registro{rompimientosHistoricos !== 1 ? 's' : ''} histórico{rompimientosHistoricos !== 1 ? 's' : ''}.
+                        <div style={{ marginTop: '0.8rem' }}>
+                          <button type="button" onClick={() => setPeriodo('pasados')} style={{ border: '1px solid var(--crear-gold)', color: 'var(--crear-gold)', background: 'transparent', borderRadius: 8, padding: '0.4rem 0.7rem', fontWeight: 700, cursor: 'pointer' }}>
+                            Ver históricos
+                          </button>
+                        </div>
+                      </>
+                    : 'Ningún entrenamiento coincide con los filtros aplicados.'}
               </div>
             ) : (
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.83rem', minWidth: 980 }}>

@@ -36,6 +36,28 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <!-- Puente de sesión: reutiliza únicamente la sesión ya iniciada de Causa OS.
+         No crea sesiones paralelas ni guarda credenciales en esta página. -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js';
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js';
+
+        const causaCalendarFirebase = initializeApp({
+            apiKey: 'AIzaSyCTMrA6A64s1ppDBBsol-fqam5Vch_Q5B0',
+            authDomain: 'centro-operativo-cpsl.firebaseapp.com',
+            projectId: 'centro-operativo-cpsl',
+            storageBucket: 'centro-operativo-cpsl.firebasestorage.app',
+            messagingSenderId: '122588918051',
+            appId: '1:122588918051:web:c85d6835b1b1f920fb1c96'
+        });
+        const causaCalendarAuth = getAuth(causaCalendarFirebase);
+        window.causaCalendarAuthReady = new Promise(resolve => {
+            const unsubscribe = onAuthStateChanged(causaCalendarAuth, user => {
+                unsubscribe();
+                resolve(user || null);
+            }, () => resolve(null));
+        });
+    </script>
     
     <style>
         @keyframes kenBurns {
@@ -473,6 +495,119 @@
         let isSyncing = false;
         let saveQueue = [];
         let isOnline = navigator.onLine;
+        const ASIGNADOR_ASSIGNMENTS_URL = 'https://so-ar-copiloto.crearpsl-cpsl.workers.dev/calendar-assignments';
+        let asignadorSourceStatus = 'pendiente';
+
+        // Esta clave es exactamente la misma que usa el Asignador React. La
+        // agenda de Sheets aporta el contexto del evento; Causa OS decide el
+        // entrenador confirmado. Nunca se escribe nada desde esta pantalla.
+        function normalizeSedeAsignador(sede) {
+          const raw = String(sede || '').trim();
+          const clean = raw.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+          if (raw === 'MED' || clean.includes('medell')) return 'Medellín';
+          if (raw === 'LIM' || clean.includes('lima')) return 'Lima';
+          if (raw === 'CUE' || clean.includes('cuenca')) return 'Cuenca';
+          if (raw === 'GYE' || clean.includes('guayaquil')) return 'Guayaquil';
+          if (raw === 'MEX' || clean.includes('mex') || clean.includes('cdmx')) return 'México';
+          if (raw === 'UIO-C1' || raw === 'UIO-C2' || raw === 'UIO' || clean.includes('uio') || clean.includes('quito') || clean.includes('ciclo 1') || clean.includes('ciclo 2')) return 'Quito';
+          if (raw === 'INT' || clean.includes('intern')) return 'Internacional';
+          if (clean.includes('global')) return 'Sede Global';
+          return raw || 'Sede Global';
+        }
+
+        function assignmentEventKey(ev, sedeKey) {
+          const date = String(ev.start || ev.fecha_inicio || '').slice(0, 10);
+          const sede = normalizeSedeAsignador(ev.sede || ev.sedeTag || sedeKey || '');
+          const name = String(ev.name || ev.nombre || '').trim();
+          return `${date}__${sede}__${name}`.replace(/\//g, '-');
+        }
+
+        function escapeCalendarText(value) {
+          return String(value || '').replace(/[&<>'"]/g, character => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+          })[character]);
+        }
+
+        function setAsignadorStatus(status) {
+          asignadorSourceStatus = status;
+          const badge = document.getElementById('asignadorSourceBadge');
+          if (!badge) return;
+          const states = {
+            oficial: ['Fuente oficial: Asignador Causa OS', 'text-emerald-400', 'checkmark-circle-outline'],
+            contraste: ['Asignador no disponible · Sheets solo como contraste', 'text-amber-400', 'alert-circle-outline'],
+            pendiente: ['Verificando Asignador Causa OS…', 'text-gray-400', 'sync-outline']
+          };
+          const [label, color, icon] = states[status] || states.pendiente;
+          badge.className = `bg-crearCard border border-crearBorder ${color} text-xs font-semibold px-4 py-2 rounded-full flex items-center gap-2 shadow-sm`;
+          badge.innerHTML = `<ion-icon name="${icon}"></ion-icon><span>${label}</span>`;
+        }
+
+        function markSheetContext(data) {
+          Object.keys(data || {}).forEach(sede => {
+            (data[sede] || []).forEach(ev => {
+              if (typeof ev.sheetTrainer === 'undefined') ev.sheetTrainer = ev.trainer || '';
+              // Un nombre en Sheets es una referencia importada; no puede
+              // presentarse como asignación final si Causa OS no la confirma.
+              ev.trainer = '';
+              ev.assignmentSource = 'sheet_crosscheck';
+              ev.causaAssignments = [];
+            });
+          });
+        }
+
+        function mergeOfficialAssignments(data, assignments) {
+          const byEvent = new Map((assignments || []).map(item => [item.id, item]));
+          let confirmed = 0;
+          Object.keys(data || {}).forEach(sede => {
+            (data[sede] || []).forEach(ev => {
+              if (typeof ev.sheetTrainer === 'undefined') ev.sheetTrainer = ev.trainer || '';
+              const assignment = byEvent.get(assignmentEventKey(ev, sede));
+              const slots = assignment?.slots || {};
+              const orderedSlots = ['unico', 'Creación', 'Relación', 'Gratitud'];
+              const confirmedSlots = orderedSlots
+                .filter(slot => slots[slot]?.entrenador)
+                .map(slot => ({ slot, ...slots[slot] }));
+              ev.causaAssignments = confirmedSlots;
+              if (!confirmedSlots.length) {
+                ev.trainer = '';
+                ev.assignmentSource = 'sheet_crosscheck';
+                return;
+              }
+              ev.trainer = confirmedSlots.length === 1 && confirmedSlots[0].slot === 'unico'
+                ? confirmedSlots[0].entrenador
+                : confirmedSlots.map(item => `${item.slot === 'unico' ? '' : `${item.slot}: `}${item.entrenador}`).join(' · ');
+              ev.assignmentSource = 'causa_os';
+              confirmed++;
+            });
+          });
+          return confirmed;
+        }
+
+        async function syncOfficialAssignments(data) {
+          markSheetContext(data);
+          setAsignadorStatus('pendiente');
+          try {
+            const user = await window.causaCalendarAuthReady;
+            if (!user) throw new Error('No hay sesión Firebase activa');
+            const token = await user.getIdToken(false);
+            const response = await fetch(ASIGNADOR_ASSIGNMENTS_URL, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+              body: JSON.stringify({ purpose: 'global_calendar_read' })
+            });
+            const payload = await response.json();
+            if (!response.ok || payload.source !== 'causa_os_asignador') throw new Error(payload.message || 'Respuesta no válida del Asignador');
+            mergeOfficialAssignments(data, payload.assignments);
+            setAsignadorStatus('oficial');
+            return true;
+          } catch (error) {
+            // La agenda queda navegable y muestra el dato de Sheets como
+            // contraste, pero nunca lo eleva a una asignación confirmada.
+            console.warn('No se pudo consultar el Asignador oficial:', error);
+            setAsignadorStatus('contraste');
+            return false;
+          }
+        }
 
         window.addEventListener('online', () => { isOnline = true; syncQueue(); });
         window.addEventListener('offline', () => { isOnline = false; showToast('⚠️ Modo offline. Cambios guardados localmente.', 'warning'); });
@@ -515,6 +650,7 @@
                 });
               });
               window.allEventsData = newData;
+              await syncOfficialAssignments(window.allEventsData);
               mergeLogistics();
               if (sessionStorage.auth === "true") {
                 renderSedeTabs();
@@ -537,11 +673,11 @@
           icon.classList.add('animate-spin');
           btn.classList.add('pointer-events-none', 'opacity-60', 'border-crearCyan', 'text-crearCyan');
           
-          showToast('🔄 Sincronizando datos con Google Sheets...', 'info');
+          showToast('🔄 Cruzando agenda con el Asignador oficial de Causa OS…', 'info');
           
           try {
             await syncFromServer();
-            showToast('✅ Sincronización exitosa. Por favor refresca la página para ver los cambios reflejados.', 'success');
+            showToast('✅ Calendario actualizado. Las asignaciones confirmadas vienen de Causa OS.', 'success');
           } catch (err) {
             showToast('❌ Error en la sincronización', 'error');
           } finally {
@@ -1588,12 +1724,14 @@
                         });
                     });
                     
-                    allEventsData = data;
+                allEventsData = data;
+                syncOfficialAssignments(allEventsData).finally(() => {
                     mergeLogistics();
                     if (sessionStorage.auth === "true") {
                         renderSedeTabs();
                         renderEvents();
                     }
+                });
                 })
                 .catch(err => {
                     console.error("Error cargando API en vivo:", err);
@@ -1601,20 +1739,24 @@
                         .then(res => res.json())
                         .then(data => {
                             allEventsData = data;
-                            mergeLogistics();
-                            if (sessionStorage.auth === "true") {
-                                renderSedeTabs();
-                                renderEvents();
-                            }
+                            syncOfficialAssignments(allEventsData).finally(() => {
+                                mergeLogistics();
+                                if (sessionStorage.auth === "true") {
+                                    renderSedeTabs();
+                                    renderEvents();
+                                }
+                            });
                         })
                         .catch(() => {
                             // Fallback to embedded events
                             allEventsData = fallbackEventsData;
-                            mergeLogistics();
-                            if (sessionStorage.auth === "true") {
-                                renderSedeTabs();
-                                renderEvents();
-                            }
+                            syncOfficialAssignments(allEventsData).finally(() => {
+                                mergeLogistics();
+                                if (sessionStorage.auth === "true") {
+                                    renderSedeTabs();
+                                    renderEvents();
+                                }
+                            });
                         });
                 });
         });
@@ -1790,7 +1932,7 @@
             syncBtn.onclick = (e) => manualSync(e);
             syncBtn.innerHTML = `
                 <ion-icon name="sync-outline" class="text-xl text-crearCyan group-hover:rotate-180 transition-transform duration-700"></ion-icon>
-                <span class="text-xs font-bold text-gray-300 group-hover:text-white uppercase tracking-wider">Sincronizar Sheets</span>
+                <span class="text-xs font-bold text-gray-300 group-hover:text-white uppercase tracking-wider">Actualizar calendario</span>
             `;
             actionsDiv.appendChild(syncBtn);
             container.appendChild(actionsDiv);
@@ -1956,7 +2098,7 @@
                     <input type="text" id="searchInput" placeholder="Busca un mes, año, entrenador, equipo o lugar..." 
                         class="w-full bg-[#111820] border border-gray-800 text-sm text-white rounded-2xl py-3 pl-12 pr-4 focus:outline-none focus:border-crearCyan focus:ring-2 focus:ring-crearCyan/30 transition-all shadow-inner placeholder-gray-600 font-medium">
                 </div>
-                <button onclick="manualSync(event)" id="manualSyncBtn" title="Sincronizar datos con Sheets ahora" 
+                <button onclick="manualSync(event)" id="manualSyncBtn" title="Cruzar agenda con el Asignador oficial de Causa OS"
                     class="h-12 w-12 shrink-0 rounded-2xl bg-[#111820] border border-gray-800 hover:border-crearCyan hover:text-crearCyan text-gray-400 flex items-center justify-center transition-all shadow-md active:scale-95 group/sync">
                     <ion-icon name="sync-outline" class="text-xl group-hover/sync:rotate-180 transition-transform duration-500"></ion-icon>
                 </button>
@@ -1983,6 +2125,9 @@
             </div>
             
             <div class="flex flex-wrap gap-3" id="filterStats">
+                <span id="asignadorSourceBadge" class="bg-crearCard border border-crearBorder text-gray-400 text-xs font-semibold px-4 py-2 rounded-full flex items-center gap-2 shadow-sm">
+                    <ion-icon name="sync-outline"></ion-icon><span>Verificando Asignador Causa OS…</span>
+                </span>
                 <span class="bg-crearCard border border-crearBorder text-gray-300 text-xs font-semibold px-4 py-2 rounded-full flex items-center gap-2 shadow-sm">
                     <ion-icon name="eye" class="text-crearCyan"></ion-icon> Viendo <span id="countVisible" class="text-white">0</span> eventos
                 </span>
@@ -2566,6 +2711,11 @@
                 const yearName = startDateObj.getFullYear().toString();
                 const trainerName = ev.trainer || "Por confirmar";
                 const placeName = ev.place || "Por confirmar";
+                const trainerSource = ev.assignmentSource === 'causa_os'
+                  ? '<span class="mt-1 inline-flex items-center gap-1 text-[9px] font-bold text-emerald-400"><ion-icon name="checkmark-circle-outline"></ion-icon> Confirmado en Asignador Causa OS</span>'
+                  : ev.sheetTrainer
+                    ? `<p class="mt-1 text-[10px] text-amber-400/90">Cruce Sheets: ${escapeCalendarText(ev.sheetTrainer)} · pendiente de confirmar</p>`
+                    : '<p class="mt-1 text-[10px] text-gray-500">Sin referencia en Sheets ni confirmación en Causa OS</p>';
                 
                 const log = ev.logistics || { ticket: "pending", hotel: "pending", trainer_notified: false, trainer_arrival: "" };
                 
@@ -2665,6 +2815,7 @@
                                     ` : `
                                     <p class="text-sm text-gray-500 font-medium">${trainerName}</p>
                                     `}
+                                    ${trainerSource}
                                 </div>
                             </div>
                             <div class="flex items-start gap-3">
@@ -3284,82 +3435,17 @@
         // GOOGLE SHEETS - SINCRONIZACIÓN DE ENTRENADORES
         // ═══════════════════════════════════════════════════════════════
         async function fetchGoogleSheetsTrainers() {
-          try {
-            // Usar el sheet de entrenadores que contiene la programación
-            const SHEET_ID = '1u0tc4GeooPmSwNxZ0CErKGtRU4oD-mO3l--ZSQM-KPs'; // Base de datos centralizada
-            const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=1326951636`;
-            
-            const res = await fetch(url);
-            if (!res.ok) throw new Error('Error al consultar Sheets de entrenadores');
-            const text = await res.text();
-            const json = JSON.parse(text.substring(47, text.length - 2));
-            
-            let updated = false;
-            
-            json.table.rows.forEach(row => {
-              // Mapeo correcto según las columnas de EVENTOS: Fecha (0), Sede (1), Equipo (2), Entrenamiento (3), Entrenador (4)
-              const rawSede = row.c[1]?.v?.trim();
-              const sede = normalizeSedeKey(rawSede);
-              const equipo = cleanEquipoFormula(row.c[2]?.v);
-              const entrenamiento = row.c[3]?.v?.trim();
-              const entrenador = row.c[4]?.v?.trim();
-              
-              if (sede && equipo && entrenador && allEventsData[sede]) {
-                const normEntrenamiento = normalizeStr(entrenamiento || "");
-                const isMaestria = normEntrenamiento.includes("MAESTRIA");
-                
-                // Asignación normal
-                allEventsData[sede].forEach(ev => {
-                  if (ev.equipo === equipo && (!entrenamiento || normalizeStr(ev.name).includes(normEntrenamiento))) {
-                    if (ev.trainer !== entrenador) {
-                      ev.trainer = entrenador;
-                      updated = true;
-                      console.log(`✅ Entrenador actualizado: ${ev.name} - Equipo ${ev.equipo} → ${entrenador}`);
-                    }
-                  }
-                });
-                
-                // Lógica especial para Maestría con múltiples entrenadores
-                if (isMaestria && entrenamiento.includes("/")) {
-                  const trainersArray = entrenamiento.split("/").map(t => t.trim());
-                  const teamNumbers = equipo.split(/[,y]/).map(t => t.trim());
-                  
-                  const IMPACTO_STAGES = ["IMPACTO CREACION", "IMPACTO RELACION", "IMPACTO GRATITUD"];
-                  
-                  teamNumbers.forEach((teamNum, index) => {
-                    const assignedTrainer = trainersArray[index];
-                    if (!assignedTrainer) return;
-                    
-                    const targetStage = IMPACTO_STAGES[index] || '';
-                    
-                    allEventsData[sede].forEach(ev => {
-                      if (ev.equipo === String(teamNum) && normalizeStr(ev.name).includes(normalizeStr(targetStage))) {
-                        if (ev.trainer !== assignedTrainer) {
-                          ev.trainer = assignedTrainer;
-                          updated = true;
-                          console.log(`✅ Entrenador Maestría actualizado: ${ev.name} - Equipo ${ev.equipo} → ${assignedTrainer}`);
-                        }
-                      }
-                    });
-                  });
-                }
-              }
-            });
-            
-            if (updated) {
-              renderEvents();
-              if (typeof renderVuelosActivosDashboard === 'function') {
-                renderVuelosActivosDashboard();
-              }
-              showToast('🔄 Entrenadores sincronizados con Google Sheets');
-            }
-          } catch (e) {
-            console.error("Error cargando entrenadores desde Sheets:", e);
-          }
+          // Se conserva el nombre que llega desde la agenda como
+          // `sheetTrainer` para contraste histórico. Este calendario ya no
+          // acepta que Sheets sobrescriba un entrenador confirmado: esa
+          // decisión solo se toma y se persiste en el Asignador de Causa OS.
+          console.info('Sheets permanece como contraste; el Asignador de Causa OS es la fuente de asignaciones.');
+          return false;
         }
 
-        // Actualizar entrenadores cada 10 minutos
-        setInterval(fetchGoogleSheetsTrainers, 10 * 60 * 1000);
+        // La actualización periódica consulta el Asignador dentro de
+        // syncFromServer(); no se ejecuta ninguna escritura/override desde
+        // Sheets en segundo plano.
 
         // ═══════════════════════════════════════════════════════════════
         // GOOGLE DRIVE - ESCANEO AUTOMÁTICO DE TIQUETES
