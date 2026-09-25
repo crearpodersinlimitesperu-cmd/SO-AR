@@ -40,7 +40,7 @@
          No crea sesiones paralelas ni guarda credenciales en esta página. -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js';
-        import { getFirestore, collection, getDocs } from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js';
+        import { getFirestore, collection, onSnapshot } from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js';
 
         const causaCalendarFirebase = initializeApp({
             apiKey: 'AIzaSyCTMrA6A64s1ppDBBsol-fqam5Vch_Q5B0',
@@ -53,10 +53,25 @@
         const causaCalendarDb = getFirestore(causaCalendarFirebase);
         // Lectura de una proyección mínima y pública: no depende de una sesión
         // de este portal legado y no expone correos ni trazabilidad interna.
-        window.causaCalendarLoadAssignments = async () => {
-            const snapshots = await getDocs(collection(causaCalendarDb, 'calendario_asignaciones_publicas'));
-            return snapshots.docs.map(item => ({ id: item.id, ...item.data() }));
-        };
+        let assignmentProjection = [];
+        let projectionLoaded = false;
+        let resolveProjection;
+        let rejectProjection;
+        const projectionReady = new Promise((resolve, reject) => { resolveProjection = resolve; rejectProjection = reject; });
+        onSnapshot(collection(causaCalendarDb, 'calendario_asignaciones_publicas'), snapshots => {
+            assignmentProjection = snapshots.docs.map(item => ({ id: item.id, ...item.data() }));
+            if (!projectionLoaded) {
+                projectionLoaded = true;
+                resolveProjection(assignmentProjection);
+            }
+            // Cada confirmación del Asignador llega al calendario sin esperar
+            // al polling de la página legado.
+            window.causaCalendarAssignmentsChanged?.(assignmentProjection);
+        }, error => {
+            if (!projectionLoaded) rejectProjection(error);
+            console.warn('No se pudo escuchar la proyección del Asignador:', error);
+        });
+        window.causaCalendarLoadAssignments = async () => projectionLoaded ? assignmentProjection : projectionReady;
     </script>
     
     <style>
@@ -667,6 +682,17 @@
             return false;
           }
         }
+
+        window.causaCalendarAssignmentsChanged = assignments => {
+          if (!window.allEventsData || !Object.keys(window.allEventsData).length) return;
+          mergeOfficialAssignments(window.allEventsData, assignments);
+          setAsignadorStatus('oficial');
+          mergeLogistics();
+          if (sessionStorage.auth === 'true' || sessionStorage.getItem('crearAuthIndex') === 'true') {
+            renderSedeTabs();
+            renderEvents(document.getElementById('searchInput')?.value || '');
+          }
+        };
 
         window.addEventListener('online', () => { isOnline = true; syncQueue(); });
         window.addEventListener('offline', () => { isOnline = false; showToast('⚠️ Modo offline. Cambios guardados localmente.', 'warning'); });
