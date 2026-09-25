@@ -555,6 +555,16 @@
           });
         }
 
+        function restoreSheetReference(data) {
+          Object.keys(data || {}).forEach(sede => {
+            (data[sede] || []).forEach(ev => {
+              ev.trainer = ev.sheetTrainer || '';
+              ev.assignmentSource = 'sheet_fallback';
+              ev.causaAssignments = [];
+            });
+          });
+        }
+
         function mergeOfficialAssignments(data, assignments) {
           const byEvent = new Map((assignments || []).map(item => [item.id, item]));
           let confirmed = 0;
@@ -601,9 +611,11 @@
             setAsignadorStatus('oficial');
             return true;
           } catch (error) {
-            // La agenda queda navegable y muestra el dato de Sheets como
-            // contraste, pero nunca lo eleva a una asignación confirmada.
+            // La agenda queda navegable con la referencia de Sheets, marcada
+            // como provisional. Así una indisponibilidad no borra información
+            // operativa ni convierte ese dato en una confirmación de Causa OS.
             console.warn('No se pudo consultar el Asignador oficial:', error);
+            restoreSheetReference(data);
             setAsignadorStatus('contraste');
             return false;
           }
@@ -2714,7 +2726,7 @@
                 const trainerSource = ev.assignmentSource === 'causa_os'
                   ? '<span class="mt-1 inline-flex items-center gap-1 text-[9px] font-bold text-emerald-400"><ion-icon name="checkmark-circle-outline"></ion-icon> Confirmado en Asignador Causa OS</span>'
                   : ev.sheetTrainer
-                    ? `<p class="mt-1 text-[10px] text-amber-400/90">Cruce Sheets: ${escapeCalendarText(ev.sheetTrainer)} · pendiente de confirmar</p>`
+                    ? `<p class="mt-1 text-[10px] text-amber-400/90">Referencia Sheets · pendiente de confirmar en Causa OS</p>`
                     : '<p class="mt-1 text-[10px] text-gray-500">Sin referencia en Sheets ni confirmación en Causa OS</p>';
                 
                 const log = ev.logistics || { ticket: "pending", hotel: "pending", trainer_notified: false, trainer_arrival: "" };
