@@ -840,7 +840,8 @@ export default function AsignadorEntrenadores() {
       </div>
 
       {calendarEditor && (
-        <div style={{ ...card, marginBottom: '0.9rem', borderColor: 'var(--crear-gold)' }}>
+        <div role="dialog" aria-modal="true" aria-label={calendarEditor.mode === 'nuevo' ? 'Nuevo entrenamiento' : 'Editar fechas'} style={{ position: 'fixed', inset: 0, zIndex: 10000, background: 'rgba(5, 12, 24, .72)', backdropFilter: 'blur(5px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+        <div style={{ ...card, width: 'min(760px, 100%)', margin: 0, borderColor: 'var(--crear-gold)', boxShadow: '0 24px 70px rgba(0,0,0,.45)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', alignItems: 'center', marginBottom: '.8rem' }}>
             <div><strong style={{ color: 'var(--text-heading)' }}>{calendarEditor.mode === 'nuevo' ? 'Nuevo entrenamiento' : 'Editar fechas del entrenamiento'}</strong><div className="text-muted" style={{ fontSize: '.72rem', marginTop: 3 }}>Se guarda en Causa OS con trazabilidad; Google Sheets no se modifica.</div></div>
             <button onClick={() => setCalendarEditor(null)} style={{ background: 'none', border: 0, color: 'var(--text-muted)', cursor: 'pointer' }}><X size={18} /></button>
@@ -857,6 +858,7 @@ export default function AsignadorEntrenadores() {
             <button onClick={() => setCalendarEditor(null)} style={{ ...selectStyle, width: 'auto', cursor: 'pointer' }}>Cancelar</button>
             <button onClick={guardarCalendarioOperativo} disabled={calendarSaving} style={{ border: 0, borderRadius: 8, padding: '.5rem .75rem', background: 'var(--crear-gold)', color: '#111827', fontWeight: 800, cursor: calendarSaving ? 'wait' : 'pointer' }}>{calendarSaving ? 'Guardando…' : 'Guardar en Causa OS'}</button>
           </div>
+        </div>
         </div>
       )}
 
@@ -952,7 +954,7 @@ export default function AsignadorEntrenadores() {
                         <td style={{ padding: '0.65rem 0.8rem', whiteSpace: 'nowrap' }}>
                           <strong style={{ color: 'var(--text-heading)' }}>{fmtFecha(f.fechaInicio)}</strong>
                           {f.fechaFin && <span className="text-muted"> → {fmtFecha(f.fechaFin)}</span>}
-                          <button title="Editar fechas" onClick={() => abrirEditorCalendario(f)} style={{ marginLeft: 7, verticalAlign: 'middle', border: 0, background: 'transparent', color: 'var(--text-muted)', cursor: 'pointer', padding: 2 }}><Pencil size={13} /></button>
+                          <button title="Editar fechas" onClick={() => abrirEditorCalendario(f)} style={{ marginLeft: 8, verticalAlign: 'middle', border: '1px solid var(--crear-gold)', borderRadius: 6, background: 'rgba(245,158,11,.08)', color: 'var(--crear-gold)', cursor: 'pointer', padding: '3px 6px', fontSize: '.68rem', fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: 4 }}><Pencil size={12} /> Editar</button>
                         </td>
                         <td style={{ padding: '0.65rem 0.8rem', whiteSpace: 'nowrap' }}>
                           {getFlagForSede(f.sede)} {f.sede}
