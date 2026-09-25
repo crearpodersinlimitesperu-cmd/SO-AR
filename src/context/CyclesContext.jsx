@@ -1,5 +1,7 @@
 import { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import { collection, onSnapshot } from 'firebase/firestore';
 import { useAuth } from './AuthContext';
+import { db } from '../services/firebase';
 
 // Genera un id estable para un evento del calendario oficial (viene de una hoja
 // de Google, sin "id" propio de Firestore), para poder recordar cuáles ya se
@@ -73,6 +75,63 @@ const mergeOfficialCalendar = (apiEvents, sheetEvents) => {
     });
   }
   return [...byKey.values()];
+};
+
+// Debe coincidir con la clave que usa el Asignador, pero nunca modifica el
+// calendario fuente. Así un cambio de fecha puede localizar su evento previo.
+const normalizeAssignmentSede = (sede = '') => {
+  const raw = String(sede).trim();
+  const value = raw.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  if (raw === 'MED' || value.includes('medell')) return 'Medellín';
+  if (raw === 'LIM' || value.includes('lima')) return 'Lima';
+  if (raw === 'CUE' || value.includes('cuenca')) return 'Cuenca';
+  if (raw === 'GYE' || value.includes('guayaquil')) return 'Guayaquil';
+  if (raw === 'MEX' || value.includes('mex') || value.includes('cdmx')) return 'México';
+  if (raw.startsWith('UIO') || value.includes('quito')) return 'Quito';
+  return raw || 'Sede Global';
+};
+
+const asignadorEventKey = (event = {}) => `${String(event.fecha_inicio || event.start || '').slice(0, 10)}__${normalizeAssignmentSede(event.sede || event.sedeTag || '')}__${String(event.nombre || event.name || '').trim()}`.replace(/\//g, '-');
+
+const trainerFromAssignment = assignment => {
+  const slots = assignment || {};
+  const ordered = ['unico', 'Creación', 'Relación', 'Gratitud']
+    .filter(slot => slots[slot]?.entrenador)
+    .map(slot => slots[slot].entrenador);
+  return ordered.length ? ordered.join(' / ') : '';
+};
+
+const applyAsignadorProjection = (sourceEvents, assignments, operationalChanges) => {
+  const assignmentByKey = new Map((assignments || []).map(item => [item.id, item]));
+  const overridesBySourceKey = new Map((operationalChanges || [])
+    .filter(item => item.kind === 'override' && item.sourceEventKey)
+    .map(item => [item.sourceEventKey, item]));
+  const result = (sourceEvents || []).map(event => {
+    const key = asignadorEventKey(event);
+    const override = overridesBySourceKey.get(key);
+    const confirmedTrainer = trainerFromAssignment(assignmentByKey.get(key));
+    return {
+      ...event,
+      ...(override ? {
+        nombre: override.nombre || event.nombre, name: override.nombre || event.name,
+        sede: override.sede || event.sede, sedeTag: override.sede || event.sedeTag,
+        equipo: override.equipo ?? event.equipo, lugar: override.lugar ?? event.lugar,
+        fecha_inicio: override.fechaInicio || event.fecha_inicio || event.start,
+        fecha_fin: override.fechaFin || event.fecha_fin || event.end || '',
+        start: override.fechaInicio || event.start || event.fecha_inicio,
+        end: override.fechaFin || event.end || event.fecha_fin || '',
+      } : {}),
+      ...(confirmedTrainer ? { trainer: confirmedTrainer, entrenador: confirmedTrainer, assignmentSource: 'causa_os' } : {})
+    };
+  });
+  (operationalChanges || []).filter(item => item.kind === 'custom').forEach(item => {
+    result.push({
+      fecha_inicio: item.fechaInicio, fecha_fin: item.fechaFin || '', start: item.fechaInicio, end: item.fechaFin || '',
+      nombre: item.nombre, name: item.nombre, sede: item.sede, sedeTag: item.sede,
+      equipo: item.equipo || '', lugar: item.lugar || '', direccion: '', trainer: '', origen: 'causa_os'
+    });
+  });
+  return result.sort((a, b) => new Date(a.fecha_inicio || a.start) - new Date(b.fecha_inicio || b.start));
 };
 
 // (14/09/2026) EXTRAÍDO de calculateCycleAndStage() sin cambiar su lógica, para
@@ -177,6 +236,9 @@ export function CyclesProvider({ children }) {
   const [currentCycle, setCurrentCycle] = useState(null);
   const [currentStage, setCurrentStage] = useState('CARGANDO...');
   const [events, setEvents] = useState([]);
+  const [sourceEvents, setSourceEvents] = useState([]);
+  const [assignmentProjection, setAssignmentProjection] = useState([]);
+  const [operationalProjection, setOperationalProjection] = useState([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
   // (14/09/2026) quitoCycles: ciclo(s) construido(s) para el/los equipo(s) que el
   // usuario de Quito eligió en su perfil (0, 1 o 2 — ver equiposQuito). Queda en
@@ -213,17 +275,12 @@ export function CyclesProvider({ children }) {
              data.filter(ev => ev.fecha_inicio || ev.start),
              sheetEvents
            ).sort((a, b) => new Date(a.fecha_inicio || a.start) - new Date(b.fecha_inicio || b.start));
-           setEvents(allEvents);
-           
-           if (currentUser) {
-             calculateCycleAndStage(allEvents, currentUser.sede, currentUser.appRole, currentUser.equiposQuito);
-           }
+           setSourceEvents(allEvents);
         } else if (sheetEvents.length) {
           // Si el histórico del Apps Script falla, seguimos mostrando la
           // programación actual verificable de la hoja, sin fabricar datos.
           const allEvents = sheetEvents.sort((a, b) => new Date(a.fecha_inicio) - new Date(b.fecha_inicio));
-          setEvents(allEvents);
-          if (currentUser) calculateCycleAndStage(allEvents, currentUser.sede, currentUser.appRole, currentUser.equiposQuito);
+          setSourceEvents(allEvents);
         }
       } catch (e) {
         console.error("Error fetching calendar for cycles", e);
@@ -234,6 +291,24 @@ export function CyclesProvider({ children }) {
 
     fetchEvents();
   }, [currentUser]); // Re-fetch or recalculate when currentUser changes
+
+  // Ambas proyecciones se actualizan en vivo al confirmar una asignación o
+  // editar/crear una fecha desde el Asignador. El calendario fuente no se toca.
+  useEffect(() => {
+    const stopAssignments = onSnapshot(collection(db, 'calendario_asignaciones_publicas'), snapshot =>
+      setAssignmentProjection(snapshot.docs.map(item => ({ id: item.id, ...item.data() }))),
+      error => console.warn('No se pudieron leer asignaciones públicas:', error));
+    const stopOperational = onSnapshot(collection(db, 'calendario_operativo_publico'), snapshot =>
+      setOperationalProjection(snapshot.docs.map(item => ({ id: item.id, ...item.data() }))),
+      error => console.warn('No se pudieron leer cambios operativos públicos:', error));
+    return () => { stopAssignments(); stopOperational(); };
+  }, []);
+
+  useEffect(() => {
+    const merged = applyAsignadorProjection(sourceEvents, assignmentProjection, operationalProjection);
+    setEvents(merged);
+    if (currentUser) calculateCycleAndStage(merged, currentUser.sede, currentUser.appRole, currentUser.equiposQuito);
+  }, [sourceEvents, assignmentProjection, operationalProjection, currentUser]);
 
   const calculateCycleAndStage = (allEvents, userSedeRaw, userRole, userEquiposQuito) => {
     if (userRole === 'direccion' || userRole === 'director_maestria' || userRole === 'cfo' || !userSedeRaw || userSedeRaw.toLowerCase() === 'global' || userSedeRaw.toLowerCase() === 'sede global') {

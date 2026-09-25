@@ -54,6 +54,7 @@
         // Lectura de una proyección mínima y pública: no depende de una sesión
         // de este portal legado y no expone correos ni trazabilidad interna.
         let assignmentProjection = [];
+        let operationalProjection = [];
         let projectionLoaded = false;
         let resolveProjection;
         let rejectProjection;
@@ -71,7 +72,12 @@
             if (!projectionLoaded) rejectProjection(error);
             console.warn('No se pudo escuchar la proyección del Asignador:', error);
         });
+        onSnapshot(collection(causaCalendarDb, 'calendario_operativo_publico'), snapshots => {
+            operationalProjection = snapshots.docs.map(item => ({ id: item.id, ...item.data() }));
+            window.causaCalendarOperationalChanged?.(operationalProjection);
+        }, error => console.warn('No se pudieron escuchar cambios operativos del Asignador:', error));
         window.causaCalendarLoadAssignments = async () => projectionLoaded ? assignmentProjection : projectionReady;
+        window.causaCalendarLoadOperational = async () => operationalProjection;
     </script>
     
     <style>
@@ -638,7 +644,7 @@
           Object.keys(data || {}).forEach(sede => {
             (data[sede] || []).forEach(ev => {
               if (typeof ev.sheetTrainer === 'undefined') ev.sheetTrainer = ev.trainer || '';
-              const assignment = byEvent.get(assignmentEventKey(ev, sede));
+              const assignment = byEvent.get(ev.sourceEventKey || assignmentEventKey(ev, sede));
               const slots = assignment?.slots || {};
               const orderedSlots = ['unico', 'Creación', 'Relación', 'Gratitud'];
               const confirmedSlots = orderedSlots
@@ -660,10 +666,42 @@
           return confirmed;
         }
 
+        function applyOperationalChanges(data, changes) {
+          const overrides = new Map((changes || []).filter(item => item.kind === 'override' && item.sourceEventKey).map(item => [item.sourceEventKey, item]));
+          Object.keys(data || {}).forEach(sede => {
+            (data[sede] || []).forEach(ev => {
+              const sourceEventKey = ev.sourceEventKey || assignmentEventKey(ev, sede);
+              const change = overrides.get(sourceEventKey);
+              if (!change) return;
+              ev.sourceEventKey = sourceEventKey;
+              ev.start = change.fechaInicio || ev.start;
+              ev.end = change.fechaFin || ev.end || ev.start;
+              ev.name = change.nombre || ev.name;
+              ev.equipo = change.equipo ?? ev.equipo;
+              ev.place = change.lugar ?? ev.place;
+              ev.sede = change.sede || ev.sede;
+              ev.sedeTag = normalizeSedeKey(change.sede || ev.sedeTag || sede);
+            });
+          });
+          (changes || []).filter(item => item.kind === 'custom' && item.fechaInicio && item.nombre).forEach(item => {
+            const sede = normalizeSedeKey(item.sede || 'LIM');
+            if (!data[sede]) data[sede] = [];
+            if (data[sede].some(ev => ev.sourceEventKey === `custom__${item.id}`)) return;
+            data[sede].push({
+              sourceEventKey: `custom__${item.id}`, start: item.fechaInicio, end: item.fechaFin || item.fechaInicio,
+              name: item.nombre, equipo: item.equipo || '', place: item.lugar || '', address: '', sede: item.sede || sede,
+              sedeTag: sede, trainer: '', logistics: { ticket: 'pending', hotel: 'pending', trainer_notified: false }
+            });
+          });
+        }
+
         async function syncOfficialAssignments(data) {
           markSheetContext(data);
           setAsignadorStatus('pendiente');
           try {
+            const operationalChanges = typeof window.causaCalendarLoadOperational === 'function'
+              ? await window.causaCalendarLoadOperational() : [];
+            applyOperationalChanges(data, operationalChanges);
             if (typeof window.causaCalendarLoadAssignments !== 'function') throw new Error('La proyección del Asignador no está disponible');
             const assignments = await Promise.race([
               window.causaCalendarLoadAssignments(),
@@ -692,6 +730,12 @@
             renderSedeTabs();
             renderEvents(document.getElementById('searchInput')?.value || '');
           }
+        };
+
+        window.causaCalendarOperationalChanged = () => {
+          // Se reconstruye desde la agenda fuente antes de aplicar el cambio;
+          // evita acumular transformaciones y conserva el histórico intacto.
+          syncFromServer();
         };
 
         window.addEventListener('online', () => { isOnline = true; syncQueue(); });
@@ -2577,7 +2621,11 @@
 
         function formatDateRange(startStr, endStr) {
             const start = new Date(startStr);
-            const end = new Date(endStr);
+            // Una fecha de fin vacía significa evento de un día. Nunca se
+            // imprime "NaN undefined" en una agenda operativa.
+            const end = new Date(endStr || startStr);
+            if (Number.isNaN(start.getTime())) return 'Fecha por confirmar';
+            if (Number.isNaN(end.getTime())) return `${start.getDate()} de ${monthNames[start.getMonth()]} ${start.getFullYear()}`;
             start.setMinutes(start.getMinutes() + start.getTimezoneOffset());
             end.setMinutes(end.getMinutes() + end.getTimezoneOffset());
             
@@ -2596,7 +2644,7 @@
             start.setMinutes(start.getMinutes() + start.getTimezoneOffset());
             start.setHours(0,0,0,0);
             
-            const end = new Date(endStr);
+            const end = new Date(endStr || startStr);
             end.setMinutes(end.getMinutes() + end.getTimezoneOffset());
             end.setHours(23,59,59,999);
             

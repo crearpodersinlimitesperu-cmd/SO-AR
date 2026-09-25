@@ -633,6 +633,16 @@ export default function AsignadorEntrenadores() {
       } else {
         batch.set(target, { ...payload, sourceEventKey: calendarEditor.fila.key, origen: 'override_causa_os' }, { merge: true });
       }
+      // Proyección segura para las agendas que todos consultan. Mantiene el
+      // registro privado y su auditoría intactos; publica solamente los
+      // campos operativos que esas agendas ya muestran.
+      batch.set(doc(db, 'calendario_operativo_publico', target.id), {
+        kind: isNew ? 'custom' : 'override',
+        sourceEventKey: isNew ? null : calendarEditor.fila.key,
+        ...payload,
+        source: 'causa_os_asignador',
+        actualizadoEn: serverTimestamp(),
+      }, { merge: true });
       batch.set(doc(collection(db, 'calendario_operativo_log')), {
         action: isNew ? 'CALENDAR_EVENT_CREATED' : 'CALENDAR_DATES_UPDATED',
         eventKey: target.id, sourceEventKey: isNew ? null : calendarEditor.fila.key,

@@ -291,6 +291,14 @@ service cloud.firestore {
       allow read, create: if canManageTrainerAssignments();
       allow update, delete: if false;
     }
+    // Agenda publicada por el Asignador: solo fechas, sede, entrenamiento y
+    // lugar que ya son visibles en los calendarios. No incluye datos de
+    // usuarios ni auditoría. Permite reflejo en vivo para todos los roles.
+    match /calendario_operativo_publico/{eventId} {
+      allow read: if true;
+      allow create, update: if canManageTrainerAssignments();
+      allow delete: if false;
+    }
 
     // CONTROL DE PÓLIZAS: el resultado de cada validación queda persistido
     // para no reconsultar Drive al entrar. El historial es append-only: nadie

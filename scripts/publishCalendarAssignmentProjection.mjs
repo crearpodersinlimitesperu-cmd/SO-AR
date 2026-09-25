@@ -51,4 +51,24 @@ for (const snapshot of source.docs) {
 }
 
 await commitPending();
-console.log(`Proyección de calendario publicada: ${published} asignaciones. Fuente canónica intacta.`);
+let operationalPublished = 0;
+for (const [kind, collectionName] of [['override', 'calendario_operativo_overrides'], ['custom', 'calendario_operativo_custom']]) {
+  const operational = await db.collection(collectionName).get();
+  for (const snapshot of operational.docs) {
+    const value = snapshot.data();
+    batch.set(db.collection('calendario_operativo_publico').doc(snapshot.id), {
+      kind,
+      sourceEventKey: value.sourceEventKey || null,
+      nombre: String(value.nombre || ''), sede: String(value.sede || ''),
+      equipo: value.equipo || '', lugar: value.lugar || '',
+      fechaInicio: String(value.fechaInicio || ''), fechaFin: String(value.fechaFin || ''),
+      source: 'causa_os_asignador', actualizadoEn: FieldValue.serverTimestamp(),
+      publicadoPor: 'backfill_controlado',
+    }, { merge: true });
+    pending += 1;
+    operationalPublished += 1;
+    if (pending === 450) await commitPending();
+  }
+}
+await commitPending();
+console.log(`Proyección de calendario publicada: ${published} asignaciones y ${operationalPublished} ajustes operativos. Fuente canónica intacta.`);
