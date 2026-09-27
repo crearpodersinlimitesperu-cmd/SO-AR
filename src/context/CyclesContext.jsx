@@ -91,7 +91,13 @@ const normalizeAssignmentSede = (sede = '') => {
   return raw || 'Sede Global';
 };
 
-const asignadorEventKey = (event = {}) => `${String(event.fecha_inicio || event.start || '').slice(0, 10)}__${normalizeAssignmentSede(event.sede || event.sedeTag || '')}__${String(event.nombre || event.name || '').trim()}`.replace(/\//g, '-');
+const asignadorEventKey = (event = {}) => {
+  const f = String(event.fecha_inicio || event.start || '').slice(0, 10);
+  const s = normalizeAssignmentSede(event.sede || event.sedeTag || '');
+  const n = String(event.nombre || event.name || '').trim();
+  const eq = String(event.equipo || event.team || '').trim();
+  return `${f}__${s}__${n}${eq ? '__' + eq : ''}`.replace(/\//g, '-');
+};
 
 const trainerFromAssignment = assignment => {
   const slots = assignment || {};

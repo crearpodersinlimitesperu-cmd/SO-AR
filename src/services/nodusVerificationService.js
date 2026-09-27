@@ -24,14 +24,10 @@ export const normText = (s) => {
     .trim();
 };
 
-// Normalizar teléfono (extraer los últimos 9 dígitos para Perú o los dígitos puros)
+// Normalizar teléfono (mantener todos los dígitos para soportar 10 dígitos de MX/EC)
 export const normPhone = (p) => {
   if (!p) return '';
-  const digits = String(p).replace(/\D/g, '');
-  if (digits.length >= 9) {
-    return digits.slice(-9);
-  }
-  return digits;
+  return String(p).replace(/\D/g, '');
 };
 
 // Mapa en memoria para indexación O(1) de participantes Nodus
@@ -49,6 +45,10 @@ function indexRecord(rec) {
   // 2. Clave por teléfono normalizado
   if (rec.telefonoNorm && rec.telefonoNorm.length >= 7) {
     masterMap.set(`TEL_${rec.telefonoNorm}`, rec);
+    if (rec.telefonoNorm.length > 9) {
+      masterMap.set(`TEL_${rec.telefonoNorm.slice(-9)}`, rec);
+      masterMap.set(`TEL_${rec.telefonoNorm.slice(-10)}`, rec);
+    }
   }
 
   // 3. Clave por email

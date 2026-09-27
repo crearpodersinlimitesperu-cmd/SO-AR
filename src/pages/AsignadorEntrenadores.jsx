@@ -94,7 +94,8 @@ const eventoKey = (ev) => {
   const f = (ev.fecha_inicio || ev.start || '').toString().slice(0, 10);
   const s = normalizeSede(ev.sede || ev.sedeTag || '');
   const n = (ev.nombre || ev.name || '').toString().trim();
-  return `${f}__${s}__${n}`.replace(/\//g, '-');
+  const eq = (ev.equipo || ev.team || "").toString().trim();
+  return `${f}__${s}__${n}${eq ? "__" + eq : ""}`.replace(/\//g, '-');
 };
 
 // Meses en español latinoamericano estándar — sin depender del locale del
