@@ -515,7 +515,8 @@ export default function AsignadorEntrenadores() {
     missing: policyRows.filter(row => ['sin_documento', 'vencida'].includes(row.status)).length,
   }), [policyRows]);
   const lastPolicyScan = useMemo(() => Object.values(policyReviews)
-    .map(review => review.lastScannedAt).filter(Boolean).sort().reverse()[0] || null, [policyReviews]);
+    .flatMap(review => [review.lastAutomatedScanAt, review.lastScannedAt])
+    .filter(Boolean).sort().reverse()[0] || null, [policyReviews]);
   const visiblePolicyRows = useMemo(() => policyRows.filter(row => {
     const matchesFilter = policyFilter === 'todos' || row.status === policyFilter ||
       (policyFilter === 'accion' && ['pendiente_fecha', 'requiere_revision', 'vencida'].includes(row.status));

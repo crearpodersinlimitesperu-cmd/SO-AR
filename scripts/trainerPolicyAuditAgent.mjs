@@ -11,6 +11,7 @@
 import { google } from 'googleapis';
 import { initializeApp, cert, getApps } from 'firebase-admin/app';
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 
 const FOLDER_ID = '1XDkAtrhZcPbInZLQbpQ4DwlQijMLxGbq';
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -49,23 +50,47 @@ function fullNameMatch(coach, fileName) {
 }
 
 function parseDate(value) {
-  const match = String(value).match(/\b(\d{1,2})[\/-](\d{1,2})[\/-](20\d{2})\b/);
-  if (!match) return null;
-  const [, day, month, year] = match;
-  const iso = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+  const text = String(value);
+  let match = text.match(/\b(20\d{2})[\/-](\d{1,2})[\/-](\d{1,2})\b/);
+  let year; let month; let day;
+  if (match) [, year, month, day] = match;
+  else {
+    match = text.match(/\b(\d{1,2})[\/-](\d{1,2})[\/-](20\d{2})\b/);
+    if (!match) return null;
+    [, day, month, year] = match;
+  }
+  const iso = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
   const date = new Date(`${iso}T00:00:00Z`);
-  return Number.isNaN(date.getTime()) ? null : iso;
+  return Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== iso ? null : iso;
 }
 
-function extractExpiryFromPdf(buffer) {
-  // PDFs con texto seleccionable mantienen muchas cadenas en sus streams. No
-  // pretendemos hacer OCR de escaneos: si no hay texto o contexto de vigencia,
-  // se deja pendiente para revisión humana en vez de adivinar una fecha.
-  const text = Buffer.from(buffer).toString('latin1').replace(/\0/g, ' ');
-  const context = /(?:vigencia|vigente|vence|vencimiento|validez|valido hasta|válido hasta)[^\r\n]{0,120}/gi;
-  for (const fragment of text.match(context) || []) {
-    const date = parseDate(fragment);
-    if (date) return { validUntil: date, evidence: fragment.slice(0, 180).replace(/\s+/g, ' ') };
+function datesIn(value) {
+  const patterns = [/\b20\d{2}[\/-]\d{1,2}[\/-]\d{1,2}\b/g, /\b\d{1,2}[\/-]\d{1,2}[\/-]20\d{2}\b/g];
+  return patterns.flatMap(pattern => [...String(value).matchAll(pattern)]
+    .map(match => parseDate(match[0])).filter(Boolean));
+}
+
+async function extractExpiryFromPdf(buffer) {
+  // Extraemos el texto real del PDF, no sus bytes comprimidos. Si no existe
+  // una fecha asociada explícitamente a vigencia/vencimiento, se mantiene en
+  // revisión humana: una fecha aislada puede ser emisión, nacimiento o pago.
+  const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(buffer) }).promise;
+  const pages = Math.min(pdf.numPages, 8);
+  let text = '';
+  for (let pageNumber = 1; pageNumber <= pages; pageNumber += 1) {
+    const page = await pdf.getPage(pageNumber);
+    const content = await page.getTextContent();
+    text += `${content.items.map(item => item.str).join(' ')}\n`;
+  }
+  const normalized = text.replace(/\s+/g, ' ').trim();
+  const contexts = normalized.match(/(?:vigencia|vence|vencimiento|expira|expiraci[oó]n|validez|v[aá]lid[oa] hasta)[\s\S]{0,180}/gi) || [];
+  for (const context of contexts) {
+    const candidates = datesIn(context);
+    // Cuando el campo contiene inicio y fin, la fecha mayor es la de término.
+    if (candidates.length) return {
+      validUntil: candidates.sort().at(-1),
+      evidence: context.slice(0, 180),
+    };
   }
   return null;
 }
