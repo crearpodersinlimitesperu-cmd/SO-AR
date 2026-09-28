@@ -11,6 +11,7 @@ import { getFirestore as getAdminFirestore, FieldValue } from 'firebase-admin/fi
 import { NodusDataScientistAgent } from './nodusDataScientistAgent.mjs';
 import { NodusHrSentinelAgent } from './nodusHrSentinelAgent.mjs';
 import { NodusFIAgent } from './nodusFIAgent.mjs';
+import { NodusGenealogyAgent } from './nodusGenealogyAgent.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -1107,6 +1108,22 @@ export async function runMultiAgentSync() {
         // Si la cuenta de servicio tampoco está disponible, no se intenta una
         // escritura alternativa con el SDK público.
       }
+    }
+
+    // =========================================================================
+    // AGENTE 7: GENEALOGÍA Y LINAJE GLOBAL
+    // =========================================================================
+    console.log("\n🧬 [Agente 7 - Genealogista] Activando análisis de linaje y coherencia global...");
+    try {
+      // Necesitamos las variables prospectosData, fdsData, maestriaTeams (obtenidas en Agente 4)
+      // Como no están en el mismo scope o pueden fallar, usamos normalizedData como base obligatoria.
+      // Si NodusDataScientistAgent guardara prospectos en el estado de normalized, sería mejor.
+      // Pasaremos variables vacías a los opcionales por ahora si no los extraemos aquí globalmente.
+      const genealogyAgent = new NodusGenealogyAgent(getAdminDbForNodusPublish());
+      const linajeReport = await genealogyAgent.runCoherenceAndLineage(normalized); // Solo usamos normalizados por ahora (tiene equiposReporte)
+      await genealogyAgent.publicarLinajeYCoherencia(linajeReport);
+    } catch (genErr) {
+      console.error("⚠️ [Agente 7 - Genealogista] Error no bloqueante al construir el linaje:", genErr.message);
     }
 
     console.log("✨ PIPELINE MULTI-AGENTE COMPLETADO EXITOSAMENTE");

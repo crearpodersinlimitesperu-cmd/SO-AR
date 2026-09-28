@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alerta de Rezago Operativo - Nodus</title>
+<style>
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f4f4f5;
+    margin: 0;
+    padding: 0;
+    color: #18181b;
+  }
+  .container {
+    max-width: 600px;
+    margin: 40px auto;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+  }
+  .header {
+    background-color: #dc2626; /* Rojo crítico */
+    padding: 24px;
+    text-align: center;
+  }
+  .header h1 {
+    color: #ffffff;
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .content {
+    padding: 32px;
+  }
+  .greeting {
+    font-size: 18px;
+    font-weight: 600;
+    margin-top: 0;
+    margin-bottom: 16px;
+  }
+  .message {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #3f3f46;
+    margin-bottom: 24px;
+  }
+  .stats-box {
+    background-color: #fef2f2;
+    border-left: 4px solid #dc2626;
+    padding: 16px;
+    border-radius: 4px;
+    margin-bottom: 24px;
+  }
+  .stats-box p {
+    margin: 8px 0;
+    font-size: 14px;
+    color: #991b1b;
+  }
+  .stats-box strong {
+    font-weight: 600;
+  }
+  .table-container {
+    margin-bottom: 24px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  th {
+    background-color: #f4f4f5;
+    color: #52525b;
+    text-align: left;
+    padding: 10px;
+    font-weight: 600;
+    border-bottom: 1px solid #e4e4e7;
+  }
+  td {
+    padding: 10px;
+    border-bottom: 1px solid #e4e4e7;
+    color: #3f3f46;
+  }
+  .badge-critical {
+    background-color: #fee2e2;
+    color: #b91c1c;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .action-btn {
+    display: block;
+    width: 100%;
+    text-align: center;
+    background-color: #18181b;
+    color: #ffffff;
+    text-decoration: none;
+    padding: 14px 0;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 15px;
+    margin-top: 32px;
+  }
+  .action-btn:hover {
+    background-color: #27272a;
+  }
+  .footer {
+    background-color: #f8fafc;
+    padding: 20px;
+    text-align: center;
+    font-size: 12px;
+    color: #64748b;
+    border-top: 1px solid #e2e8f0;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>🚨 ALERTA CRÍTICA: DATOS DESACTUALIZADOS EN NODUS</h1>
+  </div>
+  
+  <div class="content">
+    <p class="greeting">Hola {{nombre_gerente}},</p>
+    
+    <p class="message">
+      El <strong>Sistema Autónomo Nodus (Causa OS)</strong> acaba de realizar su auditoría global y ha detectado un <strong>rezago operativo grave</strong> en tu sede (<strong>{{sede}}</strong>). 
+      Varios de tus coordinadores no han registrado actividad ni actualizado sus gestiones en el sistema durante las últimas 24 horas.
+    </p>
+
+    <div class="stats-box">
+      <p>⚠️ <strong>Coordinadores inactivos:</strong> {{coordinadores_inactivos}} de {{total_coordinadores}}</p>
+      <p>⏱️ <strong>Tiempo promedio sin gestión:</strong> {{tiempo_promedio_inactividad}} horas</p>
+      <p>📉 <strong>Participantes a la deriva (Sin contactar):</strong> {{participantes_riesgo}}</p>
+    </div>
+
+    <p class="message"><strong>Detalle de coordinadores con mayor rezago:</strong></p>
+    
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Coordinador</th>
+            <th>Última Gestión</th>
+            <th>Participantes Asignados</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each coordinadores_rezagados}}
+          <tr>
+            <td>{{nombre}}</td>
+            <td>Hace {{horas_inactivo}} hrs</td>
+            <td>{{asignados}}</td>
+            <td><span class="badge-critical">Bloqueo Operativo</span></td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+
+    <p class="message">
+      <strong>Impacto Real:</strong> Los datos desactualizados rompen los modelos predictivos de la Dirección Corporativa y ocultan posibles fugas de participantes. Si no hay registro, el participante se considera abandonado.
+    </p>
+
+    <a href="https://imo.crearpslglobal.com/" class="action-btn">Ir a Nodus y Exigir Actualización</a>
+  </div>
+  
+  <div class="footer">
+    Reporte generado automáticamente por Agente 5 (Centinela RRHH) • Causa OS 2026<br>
+    Este correo fue enviado porque tu sede superó el 30% de inactividad tolerada.
+  </div>
+</div>
+
+</body>
+</html>
