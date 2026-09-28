@@ -50,25 +50,52 @@ function fullNameMatch(coach, fileName) {
   return { high, matched: matched.length, expected: tokens.length };
 }
 
-function parseDate(value) {
-  const text = String(value);
-  let match = text.match(/\b(20\d{2})[\/-](\d{1,2})[\/-](\d{1,2})\b/);
-  let year; let month; let day;
-  if (match) [, year, month, day] = match;
-  else {
-    match = text.match(/\b(\d{1,2})[\/-](\d{1,2})[\/-](20\d{2})\b/);
-    if (!match) return null;
-    [, day, month, year] = match;
-  }
+const MONTHS = {
+  enero: 1, february: 2, febrero: 2, march: 3, marzo: 3, april: 4, abril: 4,
+  may: 5, mayo: 5, june: 6, junio: 6, july: 7, julio: 7, august: 8, agosto: 8,
+  september: 9, septiembre: 9, setiembre: 9, october: 10, octubre: 10,
+  november: 11, noviembre: 11, december: 12, diciembre: 12,
+  jan: 1, feb: 2, mar: 3, apr: 4, jun: 6, jul: 7, aug: 8, sep: 9, sept: 9,
+  oct: 10, nov: 11, dec: 12, dic: 12, ene: 1, abr: 4, ago: 8, dic: 12,
+};
+
+function toIso(year, month, day) {
   const iso = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
   const date = new Date(`${iso}T00:00:00Z`);
   return Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== iso ? null : iso;
 }
 
+function parseDate(value) {
+  const text = String(value).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  let match = text.match(/\b(20\d{2})[\/-](\d{1,2})[\/-](\d{1,2})\b/);
+  if (match) return toIso(match[1], match[2], match[3]);
+
+  match = text.match(/\b(\d{1,2})[\/-](\d{1,2})[\/-](20\d{2})\b/);
+  if (match) {
+    const [, first, second, year] = match;
+    // DD/MM y MM/DD solo se aceptan cuando una de las posiciones despeja la
+    // ambigüedad. 03/04/2026 no se inventa como abril ni como marzo.
+    if (Number(first) > 12 && Number(second) <= 12) return toIso(year, second, first);
+    if (Number(second) > 12 && Number(first) <= 12) return toIso(year, first, second);
+    return null;
+  }
+
+  match = text.match(/\b(\d{1,2})\s*(?:de\s*)?([a-z]+)\.?[,]?\s*(?:de\s*)?(20\d{2})\b/);
+  if (match && MONTHS[match[2]]) return toIso(match[3], MONTHS[match[2]], match[1]);
+  match = text.match(/\b([a-z]+)\.?\s+(\d{1,2})[,]?\s+(20\d{2})\b/);
+  if (match && MONTHS[match[1]]) return toIso(match[3], MONTHS[match[1]], match[2]);
+  return null;
+}
+
 function datesIn(value) {
-  const patterns = [/\b20\d{2}[\/-]\d{1,2}[\/-]\d{1,2}\b/g, /\b\d{1,2}[\/-]\d{1,2}[\/-]20\d{2}\b/g];
-  return patterns.flatMap(pattern => [...String(value).matchAll(pattern)]
-    .map(match => parseDate(match[0])).filter(Boolean));
+  const patterns = [
+    /\b20\d{2}[\/-]\d{1,2}[\/-]\d{1,2}\b/gi,
+    /\b\d{1,2}[\/-]\d{1,2}[\/-]20\d{2}\b/gi,
+    /\b\d{1,2}\s*(?:de\s*)?[a-záéíóú]+\.?[,]?\s*(?:de\s*)?20\d{2}\b/gi,
+    /\b[a-záéíóú]+\.?\s+\d{1,2}[,]?\s+20\d{2}\b/gi,
+  ];
+  return [...new Set(patterns.flatMap(pattern => [...String(value).matchAll(pattern)]
+    .map(match => parseDate(match[0])).filter(Boolean)))];
 }
 
 async function extractExpiryFromPdf(buffer) {
@@ -84,7 +111,7 @@ async function extractExpiryFromPdf(buffer) {
     text += `${content.items.map(item => item.str).join(' ')}\n`;
   }
   const normalized = text.replace(/\s+/g, ' ').trim();
-  const contexts = normalized.match(/(?:vigencia|vence|vencimiento|expira|expiraci[oó]n|validez|v[aá]lid[oa] hasta)[\s\S]{0,180}/gi) || [];
+  const contexts = normalized.match(/(?:vigencia|vence|vencimiento|expira|expiraci[oó]n|validez|v[aá]lid[oa] hasta|coverage period|period of coverage|insurance period|policy period|effective date|valid from|covered from|insured from)[\s\S]{0,240}/gi) || [];
   for (const context of contexts) {
     const candidates = datesIn(context).filter(Boolean).sort();
     // Cuando el campo contiene inicio y fin, la fecha mayor es la de término.
