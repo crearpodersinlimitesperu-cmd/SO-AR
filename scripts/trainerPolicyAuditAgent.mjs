@@ -12,6 +12,7 @@ import { google } from 'googleapis';
 import { initializeApp, cert, getApps } from 'firebase-admin/app';
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
+import { USERS_TO_IMPORT } from '../src/data/usersToImport.js';
 
 const FOLDER_ID = '1XDkAtrhZcPbInZLQbpQ4DwlQijMLxGbq';
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -105,10 +106,20 @@ export async function runTrainerPolicyAudit() {
   const drive = getDrive();
   const scannedAt = new Date().toISOString();
   const users = await db.collection('users').get();
-  const coaches = users.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+  // Debe abarcar el mismo directorio que el Asignador. La unión es solamente
+  // por email canónico: jamás se funden personas por parecido de nombre.
+  const directoryByEmail = new Map();
+  [...users.docs.map(doc => ({ id: doc.id, ...doc.data() })), ...USERS_TO_IMPORT]
+    .forEach(user => {
+      const email = String(user.email || user.correo || user.corporateEmail || user.personalEmail || user.emails?.[0] || '').trim().toLowerCase();
+      if (!email) return;
+      directoryByEmail.set(email, { ...(directoryByEmail.get(email) || {}), ...user, email });
+    });
+  const coaches = [...directoryByEmail.values()]
     .filter(user => user.isActive !== false && user.status !== 'inactive')
-    .filter(user => [user.role, ...(Array.isArray(user.roles) ? user.roles : [])].some(role => /entrenador|coach/i.test(String(role))))
-    .map(user => ({ name: user.name || user.displayName || user.email, email: String(user.email || user.correo || user.id || '').toLowerCase(), sede: user.sede || 'Global' }))
+    .filter(user => [user.role, ...(Array.isArray(user.roles) ? user.roles : [])]
+      .some(role => /entrenador|coach|director[_\s-]*maestria/i.test(String(role))))
+    .map(user => ({ name: user.name || user.displayName || user.email, email: user.email, sede: user.sede || 'Global' }))
     .filter(coach => coach.name && coach.email);
   const existingReviewSnap = await db.collection('trainer_policy_reviews').get();
   const existingReviews = new Map(existingReviewSnap.docs.map(doc => [String(doc.data().coachEmail || '').toLowerCase(), doc.data()]));
@@ -210,7 +221,7 @@ export async function runTrainerPolicyAudit() {
   await batch.commit();
   const report = { scannedAt, coaches: coaches.length, files: files.length, automatic, pending, ambiguous: ambiguous.size };
   await db.collection('trainer_policy_agent_runs').add({ ...report, status: 'success', createdAt: FieldValue.serverTimestamp() });
-  console.log(`Pólizas auditadas: ${automatic} con vigencia automática, ${pending} para revisión, ${ambiguous.size} identidades ambiguas.`);
+  console.log(`Pólizas auditadas: ${coaches.length} entrenadores, ${automatic} con vigencia automática, ${pending} para revisión, ${ambiguous.size} identidades ambiguas.`);
   return report;
 }
 
