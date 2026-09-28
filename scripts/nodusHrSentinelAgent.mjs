@@ -49,7 +49,7 @@ export class NodusHrSentinelAgent {
    * @param {Array} coordinadores Lista normalizada de coordinadores
    * @returns {Object} Informe diagnóstico de Talento Humano
    */
-  diagnosticarDesempeno(coordinadores) {
+  diagnosticarDesempeno(coordinadores, equiposReporte = []) {
     console.log(`\n👔 [Agente 5 - RRHH] Evaluando métricas operativas de ${coordinadores.length} coordinadores...`);
 
     const enAlertaCritica = [];
@@ -100,6 +100,27 @@ export class NodusHrSentinelAgent {
         motivo = `Excelente ritmo operativo (${cobertura}% de cobertura, ${confirmados} confirmaciones logradas).`;
         coachingFeedback = `Pauta RRHH: Reconocimiento público en el canal de equipo. Posible candidato a apadrinar a coordinadores rezagados.`;
       }
+
+      
+      const pxList = [];
+      if (equiposReporte && equiposReporte.length > 0) {
+        for (const equipo of equiposReporte) {
+          if (!equipo.participantes) continue;
+          for (const p of equipo.participantes) {
+            // El nombre del coordinador en equiposReporte puede estar en otro formato, usamos match parcial
+            if (p.coordinador && c.nombre && p.coordinador.toLowerCase().includes(c.nombre.toLowerCase().split(' ')[0])) {
+               // Consideramos "sin gestionar" a todos si el nivel es CRITICO, o solo los que tienen llamada1 vacío (si existe la lógica)
+               // Como Nodus no da el status individual fácilmente, enviamos la lista de asignados para este coord en riesgo.
+               if (!p.llamada1 || p.llamada1.trim() === '' || nivelRiesgo === 'CRITICO') {
+                 pxList.push(`${p.nombres || ''} ${p.apellidos || ''}`.trim());
+               }
+            }
+          }
+        }
+      }
+      
+      const pxUnicos = Array.from(new Set(pxList)).slice(0, 15); // limit to 15 names
+      const pxNamesStr = pxUnicos.length > 0 ? pxUnicos.join(', ') + (pxList.length > 15 ? '...' : '') : 'No listados';
 
       const itemEvaluado = {
         nombre: c.nombre,

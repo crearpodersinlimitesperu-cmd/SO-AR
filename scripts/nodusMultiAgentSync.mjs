@@ -1046,7 +1046,7 @@ export async function runMultiAgentSync() {
     console.log("\n👔 [Agente 5 - RRHH] Activando auditoría de actividad de coordinadores y alertas para Gerentes...");
     try {
       const hrSentinel = new NodusHrSentinelAgent(getAdminDbForNodusPublish());
-      const diagnostico = hrSentinel.diagnosticarDesempeno(normalized.coordinadores);
+      const diagnostico = hrSentinel.diagnosticarDesempeno(normalized.coordinadores, normalized.equiposReporte);
       await hrSentinel.publicarAlertasYCuadroDeMando(diagnostico);
       console.log("✅ [Agente 5 - RRHH] Cuadro de mando de RRHH y alertas inyectadas a Gerentes con éxito.");
     } catch (hrErr) {
