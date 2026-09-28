@@ -1383,7 +1383,26 @@ export default function Home() {
           </p>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginTop: '0.8rem', flexWrap: 'wrap' }}>
-            {/* ── RELOJ LIMA / ECUADOR / COLOMBIA ── */}
+            {/* ── RELOJ ECUADOR ── */}
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: '0.35rem',
+              background: 'rgba(255,255,255,0.05)', borderRadius: '8px',
+              padding: '3px 8px', border: '1px solid rgba(255,255,255,0.1)'
+            }}>
+              <img src={flagUrl('ec')} alt="Ecuador" style={{ width: '20px', height: '14px', objectFit: 'cover', borderRadius: '2px', flexShrink: 0 }} />
+              <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
+                <span style={{ fontWeight: 'bold', fontSize: '0.92rem', color: '#e2e8f0', letterSpacing: '0.5px' }}>
+                  {getTimeInZone('America/Guayaquil')}
+                </span>
+                <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>
+                  {getDateInZone('America/Guayaquil')}
+                </span>
+              </div>
+            </div>
+
+            <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.9rem' }}>|</span>
+
+            {/* ── RELOJ PERÚ ── */}
             <div style={{
               display: 'flex', alignItems: 'center', gap: '0.35rem',
               background: 'rgba(255,255,255,0.05)', borderRadius: '8px',
@@ -1402,47 +1421,22 @@ export default function Home() {
 
             <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.9rem' }}>|</span>
 
-            {/* ── RELOJ CIUDAD DE MÉXICO ── */}
+            {/* ── RELOJ COLOMBIA ── */}
             <div style={{
               display: 'flex', alignItems: 'center', gap: '0.35rem',
               background: 'rgba(255,255,255,0.05)', borderRadius: '8px',
               padding: '3px 8px', border: '1px solid rgba(255,255,255,0.1)'
             }}>
-              <img src={flagUrl('mx')} alt="Mexico" style={{ width: '20px', height: '14px', objectFit: 'cover', borderRadius: '2px', flexShrink: 0 }} />
+              <img src={flagUrl('co')} alt="Colombia" style={{ width: '20px', height: '14px', objectFit: 'cover', borderRadius: '2px', flexShrink: 0 }} />
               <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
                 <span style={{ fontWeight: 'bold', fontSize: '0.92rem', color: '#e2e8f0', letterSpacing: '0.5px' }}>
-                  {getTimeInZone('America/Mexico_City')}
+                  {getTimeInZone('America/Bogota')}
                 </span>
                 <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>
-                  {getDateInZone('America/Mexico_City')}
+                  {getDateInZone('America/Bogota')}
                 </span>
               </div>
             </div>
-
-            {/* ── HORA LOCAL (solo si el usuario está fuera de LATAM core) ── */}
-            {isOutsideLatam && (
-              <>
-                <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.9rem' }}>|</span>
-                <div style={{
-                  display: 'flex', alignItems: 'center', gap: '0.35rem',
-                  background: 'rgba(59,130,246,0.1)', borderRadius: '8px',
-                  padding: '3px 8px', border: '1px solid rgba(59,130,246,0.3)'
-                }}>
-                  {localCountryCode
-                    ? <img src={flagUrl(localCountryCode)} alt="local" style={{ width: '20px', height: '14px', objectFit: 'cover', borderRadius: '2px', flexShrink: 0 }} />
-                    : <Clock size={13} style={{ color: '#60a5fa' }} />
-                  }
-                  <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
-                    <span style={{ fontWeight: 'bold', fontSize: '0.92rem', color: '#93c5fd', letterSpacing: '0.5px' }}>
-                      {time.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                    </span>
-                    <span style={{ fontSize: '0.7rem', color: '#60a5fa' }}>
-                      {localZoneLabel}
-                    </span>
-                  </div>
-                </div>
-              </>
-            )}
 
             <span style={{
               background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(6, 95, 70, 0.3))',
