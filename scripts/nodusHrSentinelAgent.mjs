@@ -296,6 +296,7 @@ export class NodusHrSentinelAgent {
                   <td>${c.nombre}</td>
                   <td>${c.ultGestion || 'Desconocida'}</td>
                   <td>${c.asignados}</td>
+                  <td><span style="font-size: 12px; color: #52525b; display: block; max-width: 150px; word-wrap: break-word;">${c.pxSinGestionar || 'Ninguno'}</span></td>
                   <td><span class="badge-critical">${c.nivelRiesgo}</span></td>
                 </tr>
                 `;
