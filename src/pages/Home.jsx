@@ -738,6 +738,29 @@ export default function Home() {
       timeZone: tz
     });
   };
+  // URL de bandera real vía flagcdn.com (no emojis)
+  const flagUrl = (countryCode) =>
+    `https://flagcdn.com/w40/${countryCode.toLowerCase()}.png`;
+  // Mapeo IANA timezone → código de país (2 letras ISO)
+  const TZ_TO_COUNTRY = {
+    'America/Lima': 'pe', 'America/Guayaquil': 'ec', 'America/Bogota': 'co',
+    'America/Mexico_City': 'mx', 'America/Monterrey': 'mx', 'America/Mazatlan': 'mx',
+    'America/Cancun': 'mx', 'America/Merida': 'mx', 'America/Chihuahua': 'mx',
+    'America/New_York': 'us', 'America/Chicago': 'us', 'America/Los_Angeles': 'us',
+    'America/Denver': 'us', 'America/Phoenix': 'us', 'America/Anchorage': 'us',
+    'America/Buenos_Aires': 'ar', 'America/Argentina/Buenos_Aires': 'ar',
+    'America/Santiago': 'cl', 'America/Caracas': 've', 'America/La_Paz': 'bo',
+    'America/Asuncion': 'py', 'America/Montevideo': 'uy',
+    'America/Sao_Paulo': 'br', 'America/Manaus': 'br', 'America/Belem': 'br',
+    'America/Toronto': 'ca', 'America/Vancouver': 'ca',
+    'Europe/Madrid': 'es', 'Europe/London': 'gb', 'Europe/Paris': 'fr',
+    'Europe/Berlin': 'de', 'Europe/Rome': 'it', 'Europe/Amsterdam': 'nl',
+    'Europe/Lisbon': 'pt', 'Europe/Moscow': 'ru', 'Europe/Warsaw': 'pl',
+    'Europe/Bucharest': 'ro', 'Europe/Athens': 'gr', 'Europe/Istanbul': 'tr',
+    'Asia/Tokyo': 'jp', 'Asia/Shanghai': 'cn', 'Asia/Seoul': 'kr',
+    'Asia/Kolkata': 'in', 'Asia/Dubai': 'ae', 'Asia/Singapore': 'sg',
+    'Australia/Sydney': 'au', 'Pacific/Auckland': 'nz',
+  };
   // Detecta si el usuario está en una zona diferente a Lima/CDMX
   const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const LATAM_CORE_TZ = [
@@ -745,7 +768,8 @@ export default function Home() {
     'America/Mexico_City', 'America/Monterrey', 'America/Mazatlan',
   ];
   const isOutsideLatam = !LATAM_CORE_TZ.includes(userTz);
-  // Bandera + nombre para zona desconocida (por idioma/región del SO)
+  const localCountryCode = TZ_TO_COUNTRY[userTz] || null;
+  // Label UTC offset para zonas no mapeadas
   const localZoneLabel = (() => {
     const offset = -new Date().getTimezoneOffset() / 60;
     const sign = offset >= 0 ? '+' : '-';
@@ -1365,7 +1389,7 @@ export default function Home() {
               background: 'rgba(255,255,255,0.05)', borderRadius: '8px',
               padding: '3px 8px', border: '1px solid rgba(255,255,255,0.1)'
             }}>
-              <span style={{ fontSize: '1rem', lineHeight: 1 }}>🇵🇪</span>
+              <img src={flagUrl('pe')} alt="Peru" style={{ width: '20px', height: '14px', objectFit: 'cover', borderRadius: '2px', flexShrink: 0 }} />
               <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
                 <span style={{ fontWeight: 'bold', fontSize: '0.92rem', color: '#e2e8f0', letterSpacing: '0.5px' }}>
                   {getTimeInZone('America/Lima')}
@@ -1384,7 +1408,7 @@ export default function Home() {
               background: 'rgba(255,255,255,0.05)', borderRadius: '8px',
               padding: '3px 8px', border: '1px solid rgba(255,255,255,0.1)'
             }}>
-              <span style={{ fontSize: '1rem', lineHeight: 1 }}>🇲🇽</span>
+              <img src={flagUrl('mx')} alt="Mexico" style={{ width: '20px', height: '14px', objectFit: 'cover', borderRadius: '2px', flexShrink: 0 }} />
               <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
                 <span style={{ fontWeight: 'bold', fontSize: '0.92rem', color: '#e2e8f0', letterSpacing: '0.5px' }}>
                   {getTimeInZone('America/Mexico_City')}
@@ -1404,7 +1428,10 @@ export default function Home() {
                   background: 'rgba(59,130,246,0.1)', borderRadius: '8px',
                   padding: '3px 8px', border: '1px solid rgba(59,130,246,0.3)'
                 }}>
-                  <Clock size={13} style={{ color: '#60a5fa' }} />
+                  {localCountryCode
+                    ? <img src={flagUrl(localCountryCode)} alt="local" style={{ width: '20px', height: '14px', objectFit: 'cover', borderRadius: '2px', flexShrink: 0 }} />
+                    : <Clock size={13} style={{ color: '#60a5fa' }} />
+                  }
                   <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
                     <span style={{ fontWeight: 'bold', fontSize: '0.92rem', color: '#93c5fd', letterSpacing: '0.5px' }}>
                       {time.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
