@@ -944,6 +944,7 @@ export async function runMultiAgentSync() {
   const extractor = new NodusExtractorAgent();
   const normalizer = new NodusNormalizerAgent();
   const dispatcher = new NodusDispatcherAgent();
+    const identitySentinel = new NodusIdentityAgent();
 
   try {
     const user = process.env.NODUS_GLOBAL_USER || process.env.NODUS_USER || process.env.IMO_USER || 'CREARPSL';
@@ -1017,6 +1018,9 @@ export async function runMultiAgentSync() {
     };
 
     const normalized = normalizer.normalizeData(rawCoordinadores, rawDashboard, rawEquiposReporte);
+
+      // [Agente 8 - Identidad] Validar que NO haya usuarios inventados, y purgar renuncias
+      normalized.coordinadores = await identitySentinel.enforceIdentityTruth(normalized.coordinadores);
     await dispatcher.dispatch(normalized, rawData);
 
     // =========================================================================
