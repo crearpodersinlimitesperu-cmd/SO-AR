@@ -6,7 +6,7 @@ import { useChecklist } from '../context/ChecklistContext';
 import { useUI } from '../context/UIContext';
 import { useTheme } from '../context/ThemeContext';
 import { useNotifications } from '../context/NotificationContext';
-import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, onSnapshot, setDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { 
   FileText, LogOut, Clock, Calendar as CalendarIcon, MapPin, CheckCircle2, 
@@ -74,6 +74,35 @@ const isTrainerMatchingUser = (evTrainer, user) => {
 
   return false;
 };
+
+// El Asignador guarda una proyección mínima y pública de la asignación
+// confirmada. Esta clave es deliberadamente idéntica a la que usa el
+// Asignador: permite que el perfil del entrenador se actualice en vivo sin
+// exponer la asignación privada (correos, quién hizo el cambio o bitácora).
+const publicAssignmentEventKey = (event = {}) => {
+  const date = String(event.fecha_inicio || event.start || event.fechaInicio || '').slice(0, 10);
+  const sede = normalizeSede(event.sede || event.sedeTag || '');
+  const training = String(event.nombre || event.name || event.entrenamiento || '').trim();
+  const team = String(event.equipo || event.team || '').trim();
+  return `${date}__${sede}__${training}${team ? `__${team}` : ''}`.replace(/\//g, '-');
+};
+
+const trainerIdentityKey = (value) => String(value || '')
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '')
+  .toLowerCase()
+  .replace(/[^a-z0-9]+/g, ' ')
+  .trim();
+
+const isExactAssignedTrainer = (trainer, user) => {
+  const trainerKey = trainerIdentityKey(trainer);
+  const userKey = trainerIdentityKey(user?.name || user?.displayName || '');
+  return Boolean(trainerKey && userKey && trainerKey === userKey);
+};
+
+const confirmedTrainerNames = (assignment) => ['unico', 'Creación', 'Relación', 'Gratitud']
+  .map(slot => assignment?.[slot]?.entrenador)
+  .filter(Boolean);
 
 // ============================================================================
 // BUSCADOR GLOBAL — Registro de módulos/páginas (28/08/2026)
@@ -702,6 +731,7 @@ export default function Home() {
   const [selectedSedeFilter, setSelectedSedeFilter] = useState('todas');
   const [selectedTrainingFilter, setSelectedTrainingFilter] = useState('todos');
   const [searchQuery, setSearchQuery] = useState('');
+  const [publicTrainerAssignments, setPublicTrainerAssignments] = useState({});
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [taskBeingEdited, setTaskBeingEdited] = useState(null); // tarea a editar desde el panel "Tareas que has asignado"
   const [selectedTaskForDetail, setSelectedTaskForDetail] = useState(null);
@@ -722,6 +752,29 @@ export default function Home() {
   const [usersLoading, setUsersLoading] = useState(true);
   const [selectedSearchUser, setSelectedSearchUser] = useState(null);
   const [showSearchUserModal, setShowSearchUserModal] = useState(false);
+
+  // Fuente visible para el calendario de cada entrenador. `onSnapshot` hace
+  // que una confirmación o retiro desde el Asignador aparezca sin recargar la
+  // página. La colección no contiene datos internos de la asignación.
+  useEffect(() => {
+    const unsubscribe = onSnapshot(
+      collection(db, 'calendario_asignaciones_publicas'),
+      (snapshot) => {
+        const nextAssignments = {};
+        snapshot.forEach((assignment) => {
+          nextAssignments[assignment.id] = { id: assignment.id, ...assignment.data() };
+        });
+        setPublicTrainerAssignments(nextAssignments);
+      },
+      (error) => {
+        // No sustituimos el calendario oficial por datos inventados si la
+        // proyección no estuviera disponible temporalmente.
+        console.error('No se pudo leer la proyección pública del Asignador:', error);
+        setPublicTrainerAssignments({});
+      }
+    );
+    return unsubscribe;
+  }, []);
 
   // Carga de personas para el buscador (misma fuente que Centro de Mando: getAllCompanyUsers())
   useEffect(() => {
@@ -2369,10 +2422,21 @@ export default function Home() {
                     const isEntrenador = ['entrenador', 'entrenador_llamadas'].includes(role);
                     const isQT = role === 'qt' || (currentUser?.roles || []).includes('qt');
                     const isEquipoRole = ['capitan', 'aliado', 'manager'].includes(role);
+                    const assignmentForEvent = (event) => publicTrainerAssignments[publicAssignmentEventKey(event)] || null;
+                    const assignedTrainerNamesForEvent = (event) => confirmedTrainerNames(assignmentForEvent(event));
 
                     let displayEvents = (events || []).filter(ev => {
-                      // 1. Entrenadores: solo los eventos que él/ella dictará
+                      // 1. Entrenadores: la asignación confirmada en Causa OS
+                      // tiene prioridad sobre el texto histórico de Sheets.
+                      // Cuando el Asignador ya publicó el evento, una remoción
+                      // también se refleja de inmediato y no deja una fecha
+                      // antigua visible para el entrenador.
                       if (isEntrenador) {
+                        const assignment = assignmentForEvent(ev);
+                        if (assignment?.source === 'causa_os_asignador') {
+                          return assignedTrainerNamesForEvent(ev)
+                            .some(name => isExactAssignedTrainer(name, currentUser));
+                        }
                         return isTrainerMatchingUser(ev.trainer || ev.entrenador, currentUser);
                       }
 
@@ -2452,7 +2516,7 @@ export default function Home() {
                       const q = searchQuery.toLowerCase().trim();
                       displayEvents = displayEvents.filter(ev => {
                         const name = (ev.nombre || ev.name || '').toLowerCase();
-                        const trainer = (ev.trainer || ev.entrenador || '').toLowerCase();
+                        const trainer = (assignedTrainerNamesForEvent(ev).join(' / ') || ev.trainer || ev.entrenador || '').toLowerCase();
                         const sede = (ev.sede || ev.sedeTag || ev.place || ev.address || ev.lugar || '').toLowerCase();
                         return name.includes(q) || trainer.includes(q) || sede.includes(q);
                       });
@@ -2557,6 +2621,7 @@ export default function Home() {
                           const evStartDate = new Date(baseDate || new Date());
                           let evEndDate = new Date(ev.fecha_fin || baseDate || new Date());
                           const hotelVenue = getVenueForTraining(ev.sede || ev.sedeTag || currentUser?.sede, ev.nombre || ev.name, ev.lugar, ev.direccion);
+                          const confirmedTrainerLabel = assignedTrainerNamesForEvent(ev).join(' / ');
 
                           return (
                             <li key={i} style={{ padding: '0.6rem 0', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.8rem' }}>
@@ -2582,7 +2647,7 @@ export default function Home() {
                                     puntual). */}
                                 {(!hasRoleAccess(['qt', 'capitan', 'manager', 'aliado']) || (currentUser?.isSuperAdmin && !currentUser?.isSimulated)) && (
                                   <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginTop: '0.1rem' }}>
-                                    🎙️ Trainer: {ev.trainer || ev.entrenador || 'Por confirmar'}
+                                    🎙️ Trainer: {confirmedTrainerLabel || ev.trainer || ev.entrenador || 'Por confirmar'}
                                   </span>
                                 )}
                               </div>
