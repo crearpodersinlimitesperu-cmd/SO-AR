@@ -724,6 +724,33 @@ export default function Home() {
 
   // Reloj local
   const [time, setTime] = useState(new Date());
+
+  // Helper: devuelve la hora formateada en una zona horaria dada
+  const getTimeInZone = (tz) => {
+    return new Date().toLocaleTimeString('es-ES', {
+      hour: '2-digit', minute: '2-digit', second: '2-digit',
+      timeZone: tz
+    });
+  };
+  const getDateInZone = (tz) => {
+    return new Date().toLocaleDateString('es-ES', {
+      weekday: 'short', month: 'short', day: 'numeric',
+      timeZone: tz
+    });
+  };
+  // Detecta si el usuario está en una zona diferente a Lima/CDMX
+  const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const LATAM_CORE_TZ = [
+    'America/Lima', 'America/Guayaquil', 'America/Bogota',
+    'America/Mexico_City', 'America/Monterrey', 'America/Mazatlan',
+  ];
+  const isOutsideLatam = !LATAM_CORE_TZ.includes(userTz);
+  // Bandera + nombre para zona desconocida (por idioma/región del SO)
+  const localZoneLabel = (() => {
+    const offset = -new Date().getTimezoneOffset() / 60;
+    const sign = offset >= 0 ? '+' : '-';
+    return `UTC${sign}${Math.abs(offset)}`;
+  })();
   
   // Eventos locales
   const [activeEventTab, setActiveEventTab] = useState('locales');
@@ -1332,27 +1359,75 @@ export default function Home() {
           </p>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginTop: '0.8rem', flexWrap: 'wrap' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-              <Clock size={15} className="text-blue" />
-              <span className="text-white" style={{ fontWeight: 'bold', fontSize: '1.05rem' }}>
-                {time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-              </span>
-              <span className="text-muted" style={{ marginLeft: '0.3rem', fontSize: '0.85rem' }}>
-                {time.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })}
-              </span>
+            {/* ── RELOJ LIMA / ECUADOR / COLOMBIA ── */}
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: '0.35rem',
+              background: 'rgba(255,255,255,0.05)', borderRadius: '8px',
+              padding: '3px 8px', border: '1px solid rgba(255,255,255,0.1)'
+            }}>
+              <span style={{ fontSize: '1rem', lineHeight: 1 }}>🇵🇪</span>
+              <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
+                <span style={{ fontWeight: 'bold', fontSize: '0.92rem', color: '#e2e8f0', letterSpacing: '0.5px' }}>
+                  {getTimeInZone('America/Lima')}
+                </span>
+                <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>
+                  {getDateInZone('America/Lima')}
+                </span>
+              </div>
             </div>
 
-            <span style={{ 
-              background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(6, 95, 70, 0.3))', 
-              border: '1px solid #10b981', 
-              color: '#10b981', 
-              padding: '2px 8px', 
-              borderRadius: '12px', 
-              fontSize: '0.72rem', 
-              fontWeight: 700, 
-              display: 'inline-flex', 
-              alignItems: 'center', 
-              gap: '5px' 
+            <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.9rem' }}>|</span>
+
+            {/* ── RELOJ CIUDAD DE MÉXICO ── */}
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: '0.35rem',
+              background: 'rgba(255,255,255,0.05)', borderRadius: '8px',
+              padding: '3px 8px', border: '1px solid rgba(255,255,255,0.1)'
+            }}>
+              <span style={{ fontSize: '1rem', lineHeight: 1 }}>🇲🇽</span>
+              <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
+                <span style={{ fontWeight: 'bold', fontSize: '0.92rem', color: '#e2e8f0', letterSpacing: '0.5px' }}>
+                  {getTimeInZone('America/Mexico_City')}
+                </span>
+                <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>
+                  {getDateInZone('America/Mexico_City')}
+                </span>
+              </div>
+            </div>
+
+            {/* ── HORA LOCAL (solo si el usuario está fuera de LATAM core) ── */}
+            {isOutsideLatam && (
+              <>
+                <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.9rem' }}>|</span>
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: '0.35rem',
+                  background: 'rgba(59,130,246,0.1)', borderRadius: '8px',
+                  padding: '3px 8px', border: '1px solid rgba(59,130,246,0.3)'
+                }}>
+                  <Clock size={13} style={{ color: '#60a5fa' }} />
+                  <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
+                    <span style={{ fontWeight: 'bold', fontSize: '0.92rem', color: '#93c5fd', letterSpacing: '0.5px' }}>
+                      {time.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                    </span>
+                    <span style={{ fontSize: '0.7rem', color: '#60a5fa' }}>
+                      {localZoneLabel}
+                    </span>
+                  </div>
+                </div>
+              </>
+            )}
+
+            <span style={{
+              background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(6, 95, 70, 0.3))',
+              border: '1px solid #10b981',
+              color: '#10b981',
+              padding: '2px 8px',
+              borderRadius: '12px',
+              fontSize: '0.72rem',
+              fontWeight: 700,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '5px'
             }}>
               <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981', display: 'inline-block', boxShadow: '0 0 6px #10b981' }}></span>
               Causa OS v2.8.0
