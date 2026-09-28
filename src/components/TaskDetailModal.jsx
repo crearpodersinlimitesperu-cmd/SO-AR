@@ -17,6 +17,7 @@ import { usersData, isForeignTask } from '../data/usersData';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { canSendOperationalCommunications } from '../config/permissions';
+import { deadlineTimeReference, timeZoneForSede } from '../utils/timezones';
 const getCountdown = (deadlineIso) => {
   if (!deadlineIso) return { label: 'Sin fecha límite', color: '#9ca3af', bg: 'rgba(156,163,175,0.12)', border: '#9ca3af', overdue: false };
   const deadline = new Date(deadlineIso).getTime();
@@ -120,6 +121,9 @@ export default function TaskDetailModal({
   const [messageTarget, setMessageTarget] = useState('group');
   const [messageSending, setMessageSending] = useState(false);
   const [emailSending, setEmailSending] = useState(false);
+  const [editingDeadline, setEditingDeadline] = useState(false);
+  const [deadlineDate, setDeadlineDate] = useState('');
+  const [deadlineTime, setDeadlineTime] = useState('');
 
   // Sincronizar estado cuando se abre el modal o cambia la tarea
   useEffect(() => {
@@ -130,6 +134,10 @@ export default function TaskDetailModal({
       
       setProgress(initialProgress);
       setIsCompleted(task.completed === true || task.status === 'Completada' || initialProgress === 100);
+      const existingDeadline = task.deadline ? new Date(task.deadline) : null;
+      setDeadlineDate(existingDeadline && !Number.isNaN(existingDeadline.getTime()) ? existingDeadline.toISOString().slice(0, 10) : '');
+      setDeadlineTime(existingDeadline && !Number.isNaN(existingDeadline.getTime()) ? existingDeadline.toISOString().slice(11, 16) : '');
+      setEditingDeadline(false);
 
       // Normalizar lista de asignados y mapa de progreso individual
       const rawAssigned = Array.isArray(task.assignedToEmails) && task.assignedToEmails.length > 0
@@ -608,6 +616,31 @@ export default function TaskDetailModal({
 
   // Guardar todos los cambios en Firestore
   // Guardar todos los cambios en Firestore
+  const canSetDeadline = Boolean(currentUser?.isSuperAdmin || canSendOperationalCommunications(currentUser) || String(task?.createdBy || '').toLowerCase() === String(currentUser?.email || '').toLowerCase());
+  const deadlineReference = deadlineTimeReference(task?.deadline, task?.assignedSede || task?.sede);
+  const handleSaveDeadline = async () => {
+    if (!deadlineDate || !deadlineTime) {
+      showToast('Selecciona fecha y hora antes de guardar.', 'error');
+      return;
+    }
+    try {
+      // El valor se guarda como instante ISO único. La referencia visual de la
+      // sede y Quito se calcula al mostrarlo, evitando fechas duplicadas.
+      await updateTaskDetails(task.id, {
+        deadline: new Date(`${deadlineDate}T${deadlineTime}:00`).toISOString(),
+        deadlineSede: task?.assignedSede || task?.sede || 'Quito',
+        deadlineTimeZone: timeZoneForSede(task?.assignedSede || task?.sede)?.zone || 'America/Guayaquil',
+        deadlineUpdatedAt: new Date().toISOString(),
+        deadlineUpdatedBy: currentUser?.email || '',
+      });
+      setEditingDeadline(false);
+      showToast('Fecha y hora límite guardadas.', 'success');
+    } catch (error) {
+      console.error('No se pudo guardar la fecha límite:', error);
+      showToast('No se pudo guardar la fecha límite.', 'error');
+    }
+  };
+
   const handleSaveAll = async () => {
     setIsSaving(true);
     try {
@@ -878,14 +911,20 @@ export default function TaskDetailModal({
             flexWrap: 'wrap',
             gap: '0.6rem'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', flexWrap: 'wrap' }}>
               <Clock size={16} className="text-gold" />
               <span style={{ color: 'var(--text-muted)' }}>Fecha límite:</span>
-              <strong style={{ color: '#ffffff' }}>
-                {task.deadline ? new Date(task.deadline).toLocaleString('es-ES', { 
-                  weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' 
-                }) : 'Sin fecha fijada'}
-              </strong>
+              {!editingDeadline && <>
+                <strong style={{ color: '#ffffff' }}>{deadlineReference?.localLabel || 'Sin fecha fijada'}</strong>
+                {deadlineReference && <small style={{ color: 'var(--text-muted)', width: '100%' }}>{deadlineReference.differsFromQuito ? deadlineReference.quitoLabel : 'Mismo horario que Quito'}</small>}
+                {canSetDeadline && <button onClick={() => setEditingDeadline(true)} style={{ border: 0, background: 'transparent', color: 'var(--crear-cyan)', cursor: 'pointer', textDecoration: 'underline', fontWeight: 700 }}>{task.deadline ? 'Modificar' : 'Asignar fecha'}</button>}
+              </>}
+              {editingDeadline && <>
+                <input aria-label="Fecha límite" type="date" value={deadlineDate} onChange={event => setDeadlineDate(event.target.value)} style={{ minHeight: 34 }} />
+                <input aria-label="Hora límite" type="time" value={deadlineTime} onChange={event => setDeadlineTime(event.target.value)} style={{ minHeight: 34 }} />
+                <button onClick={handleSaveDeadline} style={{ border: 0, borderRadius: 7, padding: '0.4rem 0.65rem', background: 'var(--crear-gold)', color: '#111827', cursor: 'pointer', fontWeight: 800 }}>Guardar</button>
+                <button onClick={() => setEditingDeadline(false)} style={{ border: 0, background: 'transparent', color: 'var(--text-muted)', cursor: 'pointer' }}>Cancelar</button>
+              </>}
             </div>
 
             <span style={{

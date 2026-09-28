@@ -129,7 +129,15 @@ const normalizarIdentidadEntrenador = (value = '') => String(value)
   .replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter(Boolean)
   .map(token => ({ fernando: 'fer', fer: 'fer' }[token] || token))
   .join(' ');
-const NOMBRES_LEGALES_ENTRENADORES = { 'fer mendoza': 'Haydin Fernando Mendoza Clavijo', 'haydin fernando mendoza clavijo': 'Haydin Fernando Mendoza Clavijo' };
+const NOMBRES_LEGALES_ENTRENADORES = {
+  'fer mendoza': 'Haydin Fernando Mendoza Clavijo',
+  'haydin fernando mendoza clavijo': 'Haydin Fernando Mendoza Clavijo',
+  'josue vera': 'Marcos Josué Vera Avilés',
+  'marcos josue vera aviles': 'Marcos Josué Vera Avilés',
+  'paul sosa': 'Edison Paul Sosa Carrera',
+  'edison paul sosa': 'Edison Paul Sosa Carrera',
+  'edison paul sosa carrera': 'Edison Paul Sosa Carrera',
+};
 const nombreLegalEntrenador = (value = '') => NOMBRES_LEGALES_ENTRENADORES[normalizarIdentidadEntrenador(value)] || String(value || '').trim();
 const identidadCanonicaEntrenador = (value = '') => normalizarIdentidadEntrenador(nombreLegalEntrenador(value));
 const mismoEntrenador = (a, b) => {
