@@ -85,10 +85,11 @@ async function extractExpiryFromPdf(buffer) {
   const normalized = text.replace(/\s+/g, ' ').trim();
   const contexts = normalized.match(/(?:vigencia|vence|vencimiento|expira|expiraci[oó]n|validez|v[aá]lid[oa] hasta)[\s\S]{0,180}/gi) || [];
   for (const context of contexts) {
-    const candidates = datesIn(context);
+    const candidates = datesIn(context).filter(Boolean).sort();
     // Cuando el campo contiene inicio y fin, la fecha mayor es la de término.
-    if (candidates.length) return {
-      validUntil: candidates.sort().at(-1),
+    const validUntil = candidates[candidates.length - 1] || null;
+    if (validUntil) return {
+      validUntil,
       evidence: context.slice(0, 180),
     };
   }
