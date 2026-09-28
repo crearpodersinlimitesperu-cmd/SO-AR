@@ -344,18 +344,20 @@ export default function AsignadorEntrenadores() {
     })();
   }, [autorizado]);
 
-  // Los programas operativos son fines de semana: la fecha de cierre es el
-  // domingo que sigue al inicio. La fuente puede traer un fin intermedio
-  // (jueves/sábado) y no debe mostrarse como si el entrenamiento terminara
-  // antes. No se aplica a vuelos ni a revisiones administrativas.
+  // Los programas principales son fines de semana. Los complementarios
+  // operativos indicados abajo duran únicamente el día de su inicio.
   const ajustarFechaFinPorRegla = (nombre, inicioRaw, finRaw) => {
     if (!inicioRaw) return finRaw;
     const n = String(nombre).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const unSoloDia = [
+      'tanque', 'rompimiento', 'caida', 'confianza', 'caminata', 'fuego',
+      'impacto', 'revision', 'revisacion'
+    ];
+    if (unSoloDia.some(kw => n.includes(kw))) return inicioRaw;
+
     const terminaDomingo = [
       'capitulo uno', 'capitulo 1', 'c1', 'capitulo dos', 'capitulo 2', 'c2',
-      'maestria', 'mj', 'creacion', 'relacion', 'gratitud', 'viaje',
-      'rompimiento', 'tanque', 'caida', 'confianza', 'caminata', 'fuego',
-      'impacto', 'confesiones'
+      'maestria', 'mj', 'creacion', 'relacion', 'gratitud', 'viaje', 'confesiones'
     ];
     if (!terminaDomingo.some(kw => n.includes(kw))) return finRaw;
     const partes = inicioRaw.slice(0, 10).split('-');
