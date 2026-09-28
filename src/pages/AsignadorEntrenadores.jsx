@@ -63,6 +63,9 @@ const tipoPrograma = (nombre = '') => {
   return '';
 };
 const esMaestria = nombre => tipoPrograma(nombre) === 'mj';
+// El Viaje pertenece a Maestría, pero no se fragmenta en los tres FDS de
+// Creación / Relación / Gratitud. Así se cuenta como MJ sin duplicar la fila.
+const esProgramaMaestria = nombre => ['mj', 'mj_el_viaje'].includes(tipoPrograma(nombre));
 
 // Los complementarios no son C1/C2 ni MJ. Se clasifican por el nombre oficial
 // del calendario, sin modificar el evento ni su asignación guardada.
@@ -431,7 +434,7 @@ export default function AsignadorEntrenadores() {
         const preasignacionesHoja = extraerPreasignaciones(entrenadorHojaRaw);
         out.push({
           key, slot,
-          esMJ: slots.length > 1,
+          esMJ: esProgramaMaestria(nombre),
           complementario,
           capitulo,
           programa: slots.length > 1 ? `mj_${slot === 'Creación' ? 'creacion' : slot === 'Relación' ? 'relacion' : 'gratitud'}` : programa,
@@ -459,7 +462,7 @@ export default function AsignadorEntrenadores() {
       if (!inicio || (periodo === 'proximos' && !isNaN(d.getTime()) && d < hoy) || (periodo === 'pasados' && !isNaN(d.getTime()) && d >= hoy)) return;
       const nombre = ev.nombre || 'Entrenamiento';
       out.push({
-        key: ev.id, slot: 'unico', esMJ: false,
+        key: ev.id, slot: 'unico', esMJ: esProgramaMaestria(nombre),
         complementario: tipoComplementario(nombre), capitulo: tipoCapitulo(nombre), programa: tipoPrograma(nombre),
         fdsLabel: null, nombre, sede: normalizeSede(ev.sede || ''), fechaInicio: inicio, fechaFin: ajustarFechaFinPorRegla(nombre, inicio, ev.fechaFin || ''),
         equipo: ev.equipo || '', lugar: ev.lugar || '', entrenadorHojaRaw: '', entrenadorHoja: '', preasignacionesHoja: [],
@@ -543,7 +546,7 @@ export default function AsignadorEntrenadores() {
     const m = new Map();
     entrenadores.forEach(e => {
       const key = identidadCanonicaEntrenador(e.nombre);
-      if (key) m.set(key, { nombre: formatearNombrePersona(nombreLegalEntrenador(e.nombre)), sede: e.sede, total: 0, principales: 0, mj: 0, complementarios: 0, proximos: [], fuenteNombre: 'directorio' });
+      if (key) m.set(key, { nombre: formatearNombrePersona(nombreLegalEntrenador(e.nombre)), sede: e.sede, total: 0, principales: 0, mj: 0, complementarios: 0, detalle: new Map(), proximos: [], fuenteNombre: 'directorio' });
     });
     filas.forEach(f => {
       const n = f.entrenadorAsignado || f.entrenadorHoja;
@@ -552,14 +555,28 @@ export default function AsignadorEntrenadores() {
       const nombre = formatearNombrePersona(canonical?.nombre || n);
       const key = identidadCanonicaEntrenador(canonical?.nombre || n);
       if (!key) return;
-      if (!m.has(key)) m.set(key, { nombre, sede: canonical?.sede || '', total: 0, principales: 0, mj: 0, complementarios: 0, proximos: [], fuenteNombre: canonical ? 'directorio' : 'hoja' });
+      if (!m.has(key)) m.set(key, { nombre, sede: canonical?.sede || '', total: 0, principales: 0, mj: 0, complementarios: 0, detalle: new Map(), proximos: [], fuenteNombre: canonical ? 'directorio' : 'hoja' });
       const it = m.get(key);
       it.total++;
-      if (f.complementario) it.complementarios++;
-      else { it.principales++; if (f.esMJ) it.mj++; }
+      const registrarDetalle = (categoria, etiqueta) => {
+        const detailKey = `${categoria}__${etiqueta}`;
+        it.detalle.set(detailKey, { categoria, etiqueta, total: (it.detalle.get(detailKey)?.total || 0) + 1 });
+      };
+      if (f.complementario) {
+        it.complementarios++;
+        registrarDetalle('Complementario', f.nombre);
+      } else if (f.esMJ) {
+        it.mj++;
+        registrarDetalle('Maestría', f.fdsLabel || f.nombre);
+      } else {
+        it.principales++;
+        const categoria = f.capitulo === 'c1' ? 'Capítulo 1' : f.capitulo === 'c2' ? 'Capítulo 2' : 'Otro principal';
+        registrarDetalle(categoria, f.nombre);
+      }
       it.proximos.push(f);
     });
-    return [...m.values()].sort((a, b) => b.total - a.total);
+    return [...m.values()].map(item => ({ ...item, detalle: [...item.detalle.values()] }))
+      .sort((a, b) => b.total - a.total || a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' }));
   }, [entrenadores, filas]);
 
   const cargaVisible = useMemo(() => {
@@ -1134,7 +1151,7 @@ export default function AsignadorEntrenadores() {
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.12))' }}>
-                {['ENTRENADOR', 'SEDE', 'TOTAL', 'PROGRAMAS PRINCIPALES', 'MAESTRÍA', 'COMPLEMENTARIOS'].map(h => (
+                {['ENTRENADOR', 'SEDE', 'TOTAL', 'PRINCIPALES (C1 / C2)', 'MAESTRÍA', 'COMPLEMENTARIOS', 'DETALLE'].map(h => (
                   <th key={h} style={{ textAlign: 'left', padding: '0.7rem 0.9rem', color: 'var(--text-muted)', fontSize: '0.7rem', fontWeight: 800 }}>{h}</th>
                 ))}
               </tr>
@@ -1147,16 +1164,24 @@ export default function AsignadorEntrenadores() {
                     {c.sede ? <>{getFlagForSede(c.sede)} {normalizeSede(c.sede)}</> : '—'}
                   </td>
                   <td style={{ padding: '0.6rem 0.9rem', fontWeight: 800, color: c.total === 0 ? 'var(--text-muted)' : 'var(--crear-gold)' }}>{c.total}</td>
-                  <td style={{ padding: '0.6rem 0.9rem' }} className="text-muted">{c.principales}</td>
-                  <td style={{ padding: '0.6rem 0.9rem' }} className="text-muted">{c.mj}</td>
-                  <td style={{ padding: '0.6rem 0.9rem', color: c.complementarios ? 'var(--crear-cyan)' : 'var(--text-muted)' }}>{c.complementarios}</td>
+                  <td style={{ padding: '0.6rem 0.9rem' }} className="text-muted">
+                    <strong>{c.principales}</strong>
+                    <div style={{ fontSize: '.64rem', marginTop: 3 }}>C1: {c.detalle.filter(d => d.categoria === 'Capítulo 1').reduce((n, d) => n + d.total, 0)} · C2: {c.detalle.filter(d => d.categoria === 'Capítulo 2').reduce((n, d) => n + d.total, 0)}</div>
+                  </td>
+                  <td style={{ padding: '0.6rem 0.9rem' }} className="text-muted"><strong>{c.mj}</strong><div style={{ fontSize: '.64rem', marginTop: 3 }}>Creación, Relación, Gratitud y El Viaje</div></td>
+                  <td style={{ padding: '0.6rem 0.9rem', color: c.complementarios ? 'var(--crear-cyan)' : 'var(--text-muted)' }}><strong>{c.complementarios}</strong><div style={{ fontSize: '.64rem', marginTop: 3 }}>Un día: Tanque, Rompimiento, Caída, Caminata, Impactos y Revisiones</div></td>
+                  <td style={{ padding: '0.6rem 0.9rem', minWidth: 290 }}>
+                    <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                      {c.detalle.map(detail => <span key={`${detail.categoria}-${detail.etiqueta}`} title={detail.categoria} style={{ fontSize: '.65rem', padding: '2px 6px', borderRadius: 999, border: '1px solid var(--border-color, rgba(255,255,255,.15))', color: detail.categoria === 'Complementario' ? 'var(--crear-cyan)' : detail.categoria === 'Maestría' ? 'var(--crear-purple)' : 'var(--text-muted)' }}>{detail.etiqueta} ×{detail.total}</span>)}
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
           {cargaVisible.length === 0 && <div className="text-muted" style={{ padding: '2rem', textAlign: 'center' }}>No hay entrenadores que coincidan con el filtro.</div>}
           <div className="text-muted" style={{ padding: '0.7rem 0.9rem', fontSize: '0.74rem', borderTop: '1px solid var(--border-color, rgba(255,255,255,0.08))' }}>
-            Programas principales y complementarios se muestran en contadores separados. La identidad se toma del directorio oficial solo cuando hay una coincidencia única.
+            Cada contador y detalle proviene de asignaciones y calendario oficial: C1/C2, Maestría y complementarios no se fusionan. La identidad se toma del directorio oficial solo cuando hay una coincidencia única; los nombres pendientes se señalan para revisión humana.
           </div>
         </div>
       )}
