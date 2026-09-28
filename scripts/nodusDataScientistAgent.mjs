@@ -10,8 +10,6 @@
  * 4. RECONCILIACIÓN CONTINUA: Mapeo y actualización de Managers y Coordinadores de Maestría en Causa OS.
  */
 
-import { initializeApp, getApps } from "firebase/app";
-import { getFirestore, doc, setDoc, getDoc, collection, getDocs, writeBatch } from "firebase/firestore";
 import 'dotenv/config';
 
 const ROBOT_TOKEN = process.env.ROBOT_TOKEN;
@@ -20,30 +18,30 @@ if (!ROBOT_TOKEN) {
 }
 
 // Normalizador canónico de sedes
+const SEDES_FDS_PRICING = {
+  'Lima': { moneda: 'PEN', simbolo: 'S/', precioFdsC1: 950, tasaUSD: 3.75 },
+  'Quito': { moneda: 'USD', simbolo: '$', precioFdsC1: 250, tasaUSD: 1.0 },
+  'Guayaquil': { moneda: 'USD', simbolo: '$', precioFdsC1: 250, tasaUSD: 1.0 },
+  'Cuenca': { moneda: 'USD', simbolo: '$', precioFdsC1: 250, tasaUSD: 1.0 },
+  'Medellín': { moneda: 'COP', simbolo: '$', precioFdsC1: 1000000, tasaUSD: 4000.0 },
+  'México': { moneda: 'MXN', simbolo: '$', precioFdsC1: 4500, tasaUSD: 17.0 }
+};
+
 export function normalizeSedeName(raw) {
   if (!raw) return 'GLOBAL';
   const s = String(raw).trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   if (s.includes('quito')) return 'Quito';
   if (s.includes('cuenca')) return 'Cuenca';
   if (s.includes('guayaquil') || s.includes('gye')) return 'Guayaquil';
-  if (s.includes('medellin')) return 'MedellÃ­n';
+  if (s.includes('medellin')) return 'Medellín';
   if (s.includes('lima')) return 'Lima';
-  if (s.includes('mex') || s.includes('cdmx')) return 'MÃ©xico';
+  if (s.includes('mex') || s.includes('cdmx')) return 'México';
   return raw.trim();
 }
 
 export class NodusDataScientistAgent {
-  constructor(firebaseConfig = null) {
-    const config = firebaseConfig || {
-      apiKey: process.env.VITE_FIREBASE_API_KEY || ['AIzaSy', 'CTMrA6A64s', '1ppDBBso', 'l-fqam5V', 'ch_Q5B0'].join(''),
-      authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN || "centro-operativo-cpsl.firebaseapp.com",
-      projectId: process.env.VITE_FIREBASE_PROJECT_ID || "centro-operativo-cpsl",
-      storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET || "centro-operativo-cpsl.firebasestorage.app",
-      messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "122588918051",
-      appId: process.env.VITE_FIREBASE_APP_ID || ['1:122588918051:web:', 'c85d6835b1b1f920fb1c96'].join(''),
-    };
-    const app = !getApps().length ? initializeApp(config) : getApps()[0];
-    this.db = getFirestore(app);
+  constructor(adminDb = null) {
+    this.db = adminDb;
   }
 
   /**
@@ -194,7 +192,7 @@ export class NodusDataScientistAgent {
     const html = await res.text();
 
     const sedesMaestria = [];
-    const sedesMatches = html.matchAll(/(Cuenca Ciclo 1|GUAYAQUIL CICLO 1|LIMA CICLO 1|MEDELLIN|QUITO CICLO 1)[\s\S]*?(?=Cuenca Ciclo 1|GUAYAQUIL CICLO 1|LIMA CICLO 1|MEDELLIN|QUITO CICLO 1|$)/gi);
+    const sedesMatches = html.matchAll(/(Cuenca Ciclo 1|GUAYAQUIL CICLO 1|LIMA CICLO 1|MEDELLIN|MEXICO|QUITO CICLO 1)[\s\S]*?(?=Cuenca Ciclo 1|GUAYAQUIL CICLO 1|LIMA CICLO 1|MEDELLIN|QUITO CICLO 1|$)/gi);
     
     for (const sm of sedesMatches) {
       const sedeRaw = sm[1];
@@ -228,7 +226,7 @@ export class NodusDataScientistAgent {
     // 1. Obtener managers actuales de Firestore o fallback
     let currentManagers = [];
     try {
-      const snapshot = await getDocs(collection(this.db, 'managers'));
+      const snapshot = await this.db.collection('managers').get();
       snapshot.forEach(docSnap => {
         currentManagers.push({ id: docSnap.id, ...docSnap.data() });
       });
@@ -254,7 +252,7 @@ export class NodusDataScientistAgent {
 
     // 3. Generar lista reconciliada sin duplicados
     const reconciledList = [];
-    const batch = writeBatch(this.db);
+    const batch = this.db.batch();
     let updatesCount = 0;
 
     for (const m of currentManagers) {
@@ -283,7 +281,7 @@ export class NodusDataScientistAgent {
       // Si tiene id de Firestore, programar actualización
       if (m.id && updatesCount > 0 && updatesCount <= 200) {
         try {
-          const docRef = doc(this.db, 'managers', String(m.id));
+          const docRef = this.db.collection('managers').doc(String(m.id));
           batch.update(docRef, {
             coordinador: updatedCoord,
             nodusSyncAt: new Date().toISOString(),
@@ -293,8 +291,9 @@ export class NodusDataScientistAgent {
       }
     }
 
+    await batch.commit();
     // Guardar documento consolidado de reconciliación
-    await setDoc(doc(this.db, 'nodus_managers_reconciliados', 'latest'), {
+    await this.db.collection('nodus_managers_reconciliados').doc('latest').set(, {
       robot_token: ROBOT_TOKEN,
       timestamp: new Date().toISOString(),
       totalManagers: reconciledList.length,
@@ -338,7 +337,7 @@ export class NodusDataScientistAgent {
 
         // 1. CÃLCULOS POR SEDE
     const sedesPredictions = {};
-    const sedesList = ['Lima', 'Quito', 'Cuenca', 'Guayaquil', 'MedellÃ­n', 'MÃ©xico'];
+    const sedesList = ['Lima', 'Quito', 'Cuenca', 'Guayaquil', 'Medellín', 'México'];
 
     for (const sede of sedesList) {
       const coords = coordinadoresPorSede[sede] || [];
@@ -406,8 +405,8 @@ export class NodusDataScientistAgent {
     }
 
     // Aliases para compatibilidad histÃ³rica
-    if (sedesPredictions['MÃ©xico']) sedesPredictions['CDMX'] = sedesPredictions['MÃ©xico'];
-    if (sedesPredictions['MedellÃ­n']) sedesPredictions['Medellin'] = sedesPredictions['MedellÃ­n'];
+    if (sedesPredictions['México']) sedesPredictions['CDMX'] = sedesPredictions['México'];
+    if (sedesPredictions['Medellín']) sedesPredictions['Medellin'] = sedesPredictions['Medellín'];
 
     // 2. CÃLCULO GLOBAL CONSOLIDADO
     const totalLlamadasGlobal = totales.totalGestiones || coordinadores.reduce((a, c) => a + Number(c.gestiones || c.llamadas || 0), 0);
@@ -471,14 +470,14 @@ export class NodusDataScientistAgent {
     console.log("💾 [Data Scientist] Publicando modelos predictivos en Firestore...");
     
     // 1. Guardar en nodus_predictor_portfolio/latest
-    await setDoc(doc(this.db, 'nodus_predictor_portfolio', 'latest'), {
+    await this.db.collection('nodus_predictor_portfolio').doc('latest').set(, {
       robot_token: ROBOT_TOKEN,
       timestamp: new Date().toISOString(),
       ...predictions
     }, { merge: true });
 
     // 2. Guardar prospectos deduplicados en nodus_prospectos_sin_pago/latest
-    await setDoc(doc(this.db, 'nodus_prospectos_sin_pago', 'latest'), {
+    await this.db.collection('nodus_prospectos_sin_pago').doc('latest').set(, {
       robot_token: ROBOT_TOKEN,
       timestamp: new Date().toISOString(),
       total: prospectosData.total,

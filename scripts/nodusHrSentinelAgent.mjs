@@ -12,21 +12,6 @@
  * 5. Mantiene un cuadro de mando consolidado en /nodus_hr_sentinel/latest.
  */
 
-import { initializeApp, getApps } from 'firebase/app';
-import { getFirestore, doc, setDoc, addDoc, collection, serverTimestamp } from 'firebase/firestore';
-
-const firebaseConfig = {
-  apiKey: process.env.VITE_FIREBASE_API_KEY || ['AIzaSy', 'CTMrA6A64s', '1ppDBBso', 'l-fqam5V', 'ch_Q5B0'].join(''),
-  authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN || "centro-operativo-cpsl.firebaseapp.com",
-  projectId: process.env.VITE_FIREBASE_PROJECT_ID || "centro-operativo-cpsl",
-  storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET || "centro-operativo-cpsl.firebasestorage.app",
-  messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "122588918051",
-  appId: process.env.VITE_FIREBASE_APP_ID || ['1:122588918051:web:', 'c85d6835b1b1f920fb1c96'].join(''),
-};
-
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-const db = getFirestore(app);
-
 const ROBOT_TOKEN = process.env.ROBOT_TOKEN;
 if (!ROBOT_TOKEN) {
   throw new Error('❌ Falta la variable de entorno ROBOT_TOKEN. Configúrala antes de ejecutar este script (ver GitHub Secrets: ROBOT_TOKEN).');
@@ -48,8 +33,11 @@ export const DIRECTORES_CORPORATIVOS = [
   'fer.aragon@crearpsl.net'      // CEO
 ];
 
+import { FieldValue } from 'firebase-admin/firestore';
+
 export class NodusHrSentinelAgent {
-  constructor(options = {}) {
+  constructor(adminDb = null, options = {}) {
+    this.db = adminDb;
     this.dryRun = options.dryRun || false;
   }
 
@@ -148,7 +136,19 @@ export class NodusHrSentinelAgent {
 
       // Generar alertas dirigidas para Gerentes de Sede si hay riesgo
       if (nivelRiesgo === 'CRITICO' || nivelRiesgo === 'MEDIO') {
-        const destinatarios = [...(GERENTES_POR_SEDE[sede] || [])];
+        const normalizeSede = (s) => {
+          if (!s) return 'GLOBAL';
+          const n = String(s).trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+          if (n.includes('quito')) return 'Quito';
+          if (n.includes('cuenca')) return 'Cuenca';
+          if (n.includes('guayaquil') || n.includes('gye')) return 'Guayaquil';
+          if (n.includes('medellin')) return 'Medellín';
+          if (n.includes('lima')) return 'Lima';
+          if (n.includes('mex') || n.includes('cdmx')) return 'México';
+          return s.trim();
+        };
+        const sedeNorm = normalizeSede(sede);
+        const destinatarios = [...(GERENTES_POR_SEDE[sedeNorm] || [])];
         if (nivelRiesgo === 'CRITICO') {
           // Escalar también a Dirección Corporativa en casos críticos
           destinatarios.push(...DIRECTORES_CORPORATIVOS);
@@ -219,11 +219,11 @@ export class NodusHrSentinelAgent {
 
     try {
       // 1. Guardar cuadro de mando en /nodus_hr_sentinel/latest
-      const cuadroRef = doc(db, 'nodus_hr_sentinel', 'latest');
-      await setDoc(cuadroRef, {
+      const cuadroRef = this.db.collection('nodus_hr_sentinel').doc('latest');
+      await cuadroRef.set({
         ...diagnostico,
         robot_token: ROBOT_TOKEN,
-        updatedAt: serverTimestamp()
+        updatedAt: FieldValue.serverTimestamp()
       }, { merge: true });
       console.log("✅ [Agente 5 - RRHH] Cuadro de mando guardado en /nodus_hr_sentinel/latest.");
 
@@ -234,7 +234,7 @@ export class NodusHrSentinelAgent {
       let insertadas = 0;
       for (const alerta of alertasADespachar) {
         try {
-          await addDoc(collection(db, 'notifications'), alerta);
+          await this.db.collection('notifications').add(alerta);
           insertadas++;
         } catch (err) {
           console.warn(`⚠️ Error al insertar notificación para ${alerta.userId}: ${err.message}`);

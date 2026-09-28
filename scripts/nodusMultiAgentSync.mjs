@@ -678,7 +678,7 @@ class NodusNormalizerAgent {
       if (name.includes('admin') || email.includes('admin')) return false;
       if (name.includes('soporte') || email.includes('soporte')) return false;
       if (name.includes('factura') || email.includes('factura')) return false;
-      const hasActivity = (Number(c.c1) > 0 || Number(c.c2) > 0 || Number(c.gestiones) > 0);
+      const hasActivity = (Number(c.c1) > 0 || Number(c.c2) > 0 || Number(c.gestiones) > 0 || Number(c.asignados) > 0);
       const hasEquipos = Array.isArray(c.equipos) && c.equipos.length > 0;
       return hasActivity && hasEquipos;
     });
@@ -1026,7 +1026,7 @@ export async function runMultiAgentSync() {
       const pageCookies = await extractor.page.cookies();
       const cookieStr = pageCookies.map(c => `${c.name}=${c.value}`).join('; ');
       
-      const dataScientist = new NodusDataScientistAgent(firebaseConfig);
+      const dataScientist = new NodusDataScientistAgent(getAdminDbForNodusPublish());
       const prospectosData = await dataScientist.extractProspectosSinPago(cookieStr);
       const fdsData = await dataScientist.extractEntrenadoresFDS(cookieStr);
       const maestriaTeams = await dataScientist.extractMaestriaTeams(cookieStr);
@@ -1044,7 +1044,7 @@ export async function runMultiAgentSync() {
     // =========================================================================
     console.log("\n👔 [Agente 5 - RRHH] Activando auditoría de actividad de coordinadores y alertas para Gerentes...");
     try {
-      const hrSentinel = new NodusHrSentinelAgent();
+      const hrSentinel = new NodusHrSentinelAgent(getAdminDbForNodusPublish());
       const diagnostico = hrSentinel.diagnosticarDesempeno(normalized.coordinadores);
       await hrSentinel.publicarAlertasYCuadroDeMando(diagnostico);
       console.log("✅ [Agente 5 - RRHH] Cuadro de mando de RRHH y alertas inyectadas a Gerentes con éxito.");
