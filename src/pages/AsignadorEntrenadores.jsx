@@ -71,6 +71,8 @@ const tipoComplementario = (nombre = '') => {
   if (value.includes('caida') && value.includes('confianza')) return 'caida_confianza';
   if (value.includes('tanque')) return 'tanque';
   if (value.includes('caminata') && value.includes('fuego')) return 'caminata_fuego';
+  if (value.includes('impacto')) return 'impacto';
+  if (value.includes('revision') || value.includes('revisacion')) return 'revision';
   // El calendario oficial usa tanto "Rompimiento de Barreras" como la
   // abreviatura operativa "ROMPIMIENTO B.". Se reconoce la raíz para no
   // perder el evento cuando la hoja acorta el nombre.
