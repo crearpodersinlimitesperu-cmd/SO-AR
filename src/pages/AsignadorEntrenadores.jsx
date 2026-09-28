@@ -231,18 +231,25 @@ export default function AsignadorEntrenadores() {
           const activo = u.isActive !== false && u.status !== 'inactive';
           return activo && roles.some(r => r === 'entrenador' || r === 'entrenador_llamadas' || r === 'director_maestria');
         });
-        const vistos = new Set();
-        const unicos = [];
+        const porIdentidad = new Map();
         soloEntrenadores.forEach(u => {
           const nombre = (u.name || u.displayName || '').trim();
-          if (!nombre || vistos.has(nombre.toLowerCase())) return;
-          vistos.add(nombre.toLowerCase());
-          unicos.push({ nombre, email: u.email || u.corporateEmail || '', sede: u.sede || '' });
+          const email = String(u.email || u.corporateEmail || '').trim().toLowerCase();
+          const identidad = normalizarIdentidadEntrenador(nombre);
+          if (!nombre || !identidad) return;
+          // Se consolidan únicamente correos iguales o nombres exactamente
+          // normalizados (mayúsculas, tildes y espacios no crean otra persona).
+          // Nunca se usa coincidencia parcial: Andrés Gómez e Idrobo siguen separados.
+          const existing = porIdentidad.get(`email:${email}`) || porIdentidad.get(`name:${identidad}`);
+          const merged = {
+            nombre: existing?.nombre || nombre,
+            email: existing?.email || email,
+            sede: existing?.sede || u.sede || '',
+          };
+          porIdentidad.set(`name:${identidad}`, merged);
+          if (email) porIdentidad.set(`email:${email}`, merged);
         });
-        // INYECCIÓN MOCK: Forzar la aparición de Carlos Brunis
-        if (!vistos.has('carlos brunis')) {
-           unicos.push({ nombre: 'Carlos Brunis', email: 'carlos.brunis@crearpsl.com', sede: 'LIMA' });
-        }
+        const unicos = [...new Set(porIdentidad.values())];
         if (vivo) setEntrenadores(unicos.sort((a, b) => a.nombre.localeCompare(b.nombre)));
       } catch (e) {
         console.error('No se pudo cargar el directorio de entrenadores:', e);
@@ -510,12 +517,17 @@ export default function AsignadorEntrenadores() {
   // --- Carga por entrenador (CÁLCULO explícito sobre las filas) ------------
   const carga = useMemo(() => {
     const m = new Map();
-    entrenadores.forEach(e => m.set(e.nombre, { nombre: e.nombre, sede: e.sede, total: 0, mj: 0, c1c2: 0, proximos: [] }));
+    entrenadores.forEach(e => {
+      const key = normalizarIdentidadEntrenador(e.nombre);
+      if (key) m.set(key, { nombre: e.nombre, sede: e.sede, total: 0, mj: 0, c1c2: 0, proximos: [] });
+    });
     filas.forEach(f => {
       const n = f.entrenadorAsignado || f.entrenadorHoja;
       if (!n) return;
-      if (!m.has(n)) m.set(n, { nombre: n, sede: '', total: 0, mj: 0, c1c2: 0, proximos: [] });
-      const it = m.get(n);
+      const key = normalizarIdentidadEntrenador(n);
+      if (!key) return;
+      if (!m.has(key)) m.set(key, { nombre: n, sede: '', total: 0, mj: 0, c1c2: 0, proximos: [] });
+      const it = m.get(key);
       it.total++;
       if (f.esMJ) it.mj++; else it.c1c2++;
       it.proximos.push(f);
@@ -1175,11 +1187,11 @@ export default function AsignadorEntrenadores() {
               }[row.status];
               const draft = policyExpiryDrafts[row.reviewId] ?? row.stored?.validUntil ?? '';
               return <tr key={row.reviewId} style={{ borderTop: '1px solid var(--border-color, rgba(255,255,255,.06))' }}>
-                <td style={{ padding: '.78rem .9rem', fontWeight: 750 }}>{row.nombre}</td><td style={{ padding: '.78rem .9rem' }}><span style={{ padding: '.22rem .45rem', borderRadius: 99, background: 'rgba(41,171,226,.1)', color: 'var(--crear-cyan)', fontSize: '.7rem', fontWeight: 700 }}>{row.sede || 'Global'}</span></td>
+                <td style={{ padding: '.78rem .9rem', fontWeight: 750, verticalAlign: 'top' }}>{row.nombre}</td><td style={{ padding: '.78rem .9rem', verticalAlign: 'top' }}><span style={{ padding: '.22rem .45rem', borderRadius: 99, background: 'rgba(41,171,226,.1)', color: 'var(--crear-cyan)', fontSize: '.7rem', fontWeight: 700 }}>{row.sede || 'Global'}</span></td>
                 <td style={{ padding: '.78rem .9rem', verticalAlign: 'top', minWidth: 0 }}>{row.file ? <><a href={row.file.webViewLink || `https://drive.google.com/open?id=${row.file.id}`} target="_blank" rel="noreferrer" style={{ color: 'var(--crear-gold)', fontWeight: 650, display: 'block', width: '100%', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', boxSizing: 'border-box' }} title={row.file.name}>{row.file.name}</a><div className="text-muted" style={{ fontSize: '.66rem', marginTop: 4, overflowWrap: 'anywhere' }}>Detectado en Drive · {row.file.modifiedTime ? fmtFecha(row.file.modifiedTime) : 'sin fecha de archivo'}</div></> : <span className="text-muted">No hay archivo asociado</span>}</td>
                 <td style={{ padding: '.78rem .9rem', verticalAlign: 'top', minWidth: 0, overflow: 'hidden' }}><div style={{ color: state[1], fontWeight: 800, overflowWrap: 'anywhere' }}>{state[0]}</div><div className="text-muted" style={{ fontSize: '.66rem', marginTop: 3, overflowWrap: 'anywhere' }}>{state[2]}</div>{row.stored?.verifiedAt && <div className="text-muted" style={{ fontSize: '.64rem', marginTop: 3 }}>Confirmada {fmtFecha(row.stored.verifiedAt)}</div>}</td>
                 <td style={{ padding: '.78rem .9rem' }}>{row.stored?.validUntil ? <strong style={{ color: row.status === 'vencida' ? '#ef4444' : '#e5e7eb' }}>{fmtFecha(row.stored.validUntil)}</strong> : <span className="text-muted">No declarada</span>}</td>
-                <td style={{ padding: '.78rem .9rem' }}>{row.file ? <><div style={{ display: 'flex', gap: '.35rem', alignItems: 'center' }}><input aria-label={`Vigencia de ${row.nombre}`} type="date" value={draft} onChange={e => setPolicyExpiryDrafts(prev => ({ ...prev, [row.reviewId]: e.target.value }))} disabled={policySaving === row.reviewId} style={{ ...selectStyle, width: 132, padding: '.35rem .45rem' }} /><button onClick={() => confirmarVigencia(row)} disabled={policySaving === row.reviewId || !draft} style={{ border: 0, borderRadius: 7, padding: '.38rem .55rem', background: draft ? 'var(--crear-gold)' : 'var(--border-color)', color: '#111827', fontWeight: 750, cursor: draft ? 'pointer' : 'not-allowed' }}>{policySaving === row.reviewId ? 'Guardando…' : 'Confirmar'}</button></div><div className="text-muted" style={{ fontSize: '.65rem', marginTop: 4 }}>Ingresa solo la fecha leída en el documento.</div></> : <span className="text-muted" style={{ fontSize: '.7rem' }}>No se habilita confirmación sin evidencia.</span>}</td>
+                <td style={{ padding: '.78rem .9rem' }}>{row.file ? (['vigente', 'vencida'].includes(row.status) && row.stored?.validUntil && !row.stored?.requiresRevalidation ? <><span style={{ color: row.status === 'vigente' ? '#10b981' : '#ef4444', fontSize: '.72rem', fontWeight: 800 }}>✓ Fecha registrada</span><div className="text-muted" style={{ fontSize: '.65rem', marginTop: 4 }}>La vigencia ya está confirmada.</div></> : <><div style={{ display: 'flex', gap: '.35rem', alignItems: 'center' }}><input aria-label={`Vigencia de ${row.nombre}`} type="date" value={draft} onChange={e => setPolicyExpiryDrafts(prev => ({ ...prev, [row.reviewId]: e.target.value }))} disabled={policySaving === row.reviewId} style={{ ...selectStyle, width: 132, padding: '.35rem .45rem' }} /><button onClick={() => confirmarVigencia(row)} disabled={policySaving === row.reviewId || !draft} style={{ border: 0, borderRadius: 7, padding: '.38rem .55rem', background: draft ? 'var(--crear-gold)' : 'var(--border-color)', color: '#111827', fontWeight: 750, cursor: draft ? 'pointer' : 'not-allowed' }}>{policySaving === row.reviewId ? 'Guardando…' : 'Confirmar'}</button></div><div className="text-muted" style={{ fontSize: '.65rem', marginTop: 4 }}>Ingresa solo la fecha leída en el documento.</div></>) : <span className="text-muted" style={{ fontSize: '.7rem' }}>No se habilita confirmación sin evidencia.</span>}</td>
               </tr>;
             })}</tbody></table>{visiblePolicyRows.length === 0 && <div className="text-muted" style={{ padding: '2rem', textAlign: 'center' }}>No hay pólizas que coincidan con este filtro.</div>}</div>
             {policyAudits.length > 0 && <div style={{ ...card, marginTop: '.8rem', padding: '.75rem .9rem' }}><div style={{ fontWeight: 750, fontSize: '.8rem', marginBottom: '.45rem' }}><History size={14} style={{ verticalAlign: '-2px' }} /> Auditoría reciente</div>{policyAudits.slice(0, 6).map(audit => {
