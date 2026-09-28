@@ -32,6 +32,7 @@
     "googleapis": "^176.0.0",
     "lucide-react": "^1.31.0",
     "nodemailer": "^6.9.13",
+    "pdfjs-dist": "^6.3.289",
     "puppeteer": "^25.10.0",
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2",
