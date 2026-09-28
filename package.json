@@ -21,7 +21,8 @@
     "sync:nodus": "node scripts/nodusMultiAgentSync.mjs",
     "daemon:nodus": "node scripts/nodusDaemon.mjs",
     "sync:kpis": "node scripts/syncKpisLlamadas.mjs",
-    "audit:polizas": "node scripts/trainerPolicyAuditAgent.mjs"
+    "audit:polizas": "node scripts/trainerPolicyAuditAgent.mjs",
+    "import:reunion-madrid": "node scripts/importReunionMadridTasks.mjs"
   },
   "dependencies": {
     "cors": "^2.8.6",
