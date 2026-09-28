@@ -124,10 +124,29 @@ const normalizarIdentidadEntrenador = (value = '') => String(value)
   .replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter(Boolean)
   .map(token => ({ fernando: 'fer', fer: 'fer' }[token] || token))
   .join(' ');
+const NOMBRES_LEGALES_ENTRENADORES = { 'fer mendoza': 'Haydin Fernando Mendoza Clavijo', 'haydin fernando mendoza clavijo': 'Haydin Fernando Mendoza Clavijo' };
+const nombreLegalEntrenador = (value = '') => NOMBRES_LEGALES_ENTRENADORES[normalizarIdentidadEntrenador(value)] || String(value || '').trim();
+const identidadCanonicaEntrenador = (value = '') => normalizarIdentidadEntrenador(nombreLegalEntrenador(value));
 const mismoEntrenador = (a, b) => {
-  const left = normalizarIdentidadEntrenador(a);
-  const right = normalizarIdentidadEntrenador(b);
+  const left = identidadCanonicaEntrenador(a);
+  const right = identidadCanonicaEntrenador(b);
   return Boolean(left && right && left === right);
+};
+
+const formatearNombrePersona = (value = '') => String(value).trim().replace(/\s+/g, ' ').split(' ').map((word, index) => {
+  const lower = word.toLocaleLowerCase('es-ES');
+  return index > 0 && ['de', 'del', 'la', 'las', 'los', 'y'].includes(lower) ? lower : (lower ? lower[0].toLocaleUpperCase('es-ES') + lower.slice(1) : '');
+}).join(' ');
+const resolverNombreDirectorio = (value, directorio) => {
+  const legalName = nombreLegalEntrenador(value);
+  const identity = identidadCanonicaEntrenador(value);
+  const exact = (directorio || []).find(persona => identidadCanonicaEntrenador(persona.nombre) === identity);
+  if (exact) return { ...exact, nombre: nombreLegalEntrenador(exact.nombre) };
+  if (legalName !== String(value || '').trim()) return { nombre: legalName, sede: '' };
+  const tokens = identity.split(' ').filter(Boolean);
+  if (tokens.length < 2) return null;
+  const candidates = (directorio || []).filter(persona => tokens.every(token => identidadCanonicaEntrenador(persona.nombre).split(' ').includes(token)));
+  return candidates.length === 1 ? candidates[0] : null;
 };
 
 // La hoja histórica a veces concentra varias preasignaciones en una misma
@@ -215,6 +234,9 @@ export default function AsignadorEntrenadores() {
   const [filtroTipo, setFiltroTipo] = useState('todos');
   const [filtroEntrenador, setFiltroEntrenador] = useState('todos');
   const [busqueda, setBusqueda] = useState('');
+  const [cargaBusqueda, setCargaBusqueda] = useState('');
+  const [cargaSede, setCargaSede] = useState('todas');
+  const [cargaConAsignacion, setCargaConAsignacion] = useState(true);
 
   const autorizado = canUseAsignadorEntrenadores(currentUser);
 
@@ -235,14 +257,14 @@ export default function AsignadorEntrenadores() {
         soloEntrenadores.forEach(u => {
           const nombre = (u.name || u.displayName || '').trim();
           const email = String(u.email || u.corporateEmail || '').trim().toLowerCase();
-          const identidad = normalizarIdentidadEntrenador(nombre);
+          const identidad = identidadCanonicaEntrenador(nombre);
           if (!nombre || !identidad) return;
           // Se consolidan únicamente correos iguales o nombres exactamente
           // normalizados (mayúsculas, tildes y espacios no crean otra persona).
           // Nunca se usa coincidencia parcial: Andrés Gómez e Idrobo siguen separados.
           const existing = porIdentidad.get(`email:${email}`) || porIdentidad.get(`name:${identidad}`);
           const merged = {
-            nombre: existing?.nombre || nombre,
+            nombre: nombreLegalEntrenador(existing?.nombre || nombre),
             email: existing?.email || email,
             sede: existing?.sede || u.sede || '',
           };
@@ -518,22 +540,30 @@ export default function AsignadorEntrenadores() {
   const carga = useMemo(() => {
     const m = new Map();
     entrenadores.forEach(e => {
-      const key = normalizarIdentidadEntrenador(e.nombre);
-      if (key) m.set(key, { nombre: e.nombre, sede: e.sede, total: 0, mj: 0, c1c2: 0, proximos: [] });
+      const key = identidadCanonicaEntrenador(e.nombre);
+      if (key) m.set(key, { nombre: formatearNombrePersona(nombreLegalEntrenador(e.nombre)), sede: e.sede, total: 0, principales: 0, mj: 0, complementarios: 0, proximos: [], fuenteNombre: 'directorio' });
     });
     filas.forEach(f => {
       const n = f.entrenadorAsignado || f.entrenadorHoja;
       if (!n) return;
-      const key = normalizarIdentidadEntrenador(n);
+      const canonical = resolverNombreDirectorio(n, entrenadores);
+      const nombre = formatearNombrePersona(canonical?.nombre || n);
+      const key = identidadCanonicaEntrenador(canonical?.nombre || n);
       if (!key) return;
-      if (!m.has(key)) m.set(key, { nombre: n, sede: '', total: 0, mj: 0, c1c2: 0, proximos: [] });
+      if (!m.has(key)) m.set(key, { nombre, sede: canonical?.sede || '', total: 0, principales: 0, mj: 0, complementarios: 0, proximos: [], fuenteNombre: canonical ? 'directorio' : 'hoja' });
       const it = m.get(key);
       it.total++;
-      if (f.esMJ) it.mj++; else it.c1c2++;
+      if (f.complementario) it.complementarios++;
+      else { it.principales++; if (f.esMJ) it.mj++; }
       it.proximos.push(f);
     });
     return [...m.values()].sort((a, b) => b.total - a.total);
   }, [entrenadores, filas]);
+
+  const cargaVisible = useMemo(() => {
+    const query = normalizarTexto(cargaBusqueda);
+    return carga.filter(item => (!cargaConAsignacion || item.total > 0) && (cargaSede === 'todas' || normalizeSede(item.sede) === cargaSede) && (!query || normalizarTexto(`${item.nombre} ${item.sede}`).includes(query)));
+  }, [carga, cargaBusqueda, cargaSede, cargaConAsignacion]);
 
   const policyRows = useMemo(() => entrenadores.map(entrenador => {
     const reviewId = policyReviewId(entrenador);
@@ -1093,30 +1123,38 @@ export default function AsignadorEntrenadores() {
       {/* ---------------- CARGA POR ENTRENADOR ---------------- */}
       {tab === 'carga' && (
         <div style={{ ...card, padding: 0, overflowX: 'auto' }}>
+          <div style={{ padding: '.8rem .9rem', display: 'flex', gap: '.55rem', flexWrap: 'wrap', alignItems: 'center', borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.08))' }}>
+            <input value={cargaBusqueda} onChange={e => setCargaBusqueda(e.target.value)} placeholder="Buscar entrenador o sede…" style={{ ...selectStyle, flex: '1 1 240px' }} />
+            <select value={cargaSede} onChange={e => setCargaSede(e.target.value)} style={{ ...selectStyle, width: 'auto' }}><option value="todas">Todas las sedes</option>{OPERATIONAL_SEDES.map(sede => <option key={sede} value={sede}>{sede}</option>)}</select>
+            <button onClick={() => setCargaConAsignacion(value => !value)} style={{ ...selectStyle, width: 'auto', cursor: 'pointer' }}>{cargaConAsignacion ? 'Solo con asignaciones' : 'Incluir sin asignación'}</button>
+            <span className="text-muted" style={{ fontSize: '.72rem', fontWeight: 700 }}>{cargaVisible.length} de {carga.length}</span>
+          </div>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.12))' }}>
-                {['ENTRENADOR', 'SEDE', 'TOTAL', 'MAESTRÍA', 'CAPÍTULO 1 Y 2'].map(h => (
+                {['ENTRENADOR', 'SEDE', 'TOTAL', 'PROGRAMAS PRINCIPALES', 'MAESTRÍA', 'COMPLEMENTARIOS'].map(h => (
                   <th key={h} style={{ textAlign: 'left', padding: '0.7rem 0.9rem', color: 'var(--text-muted)', fontSize: '0.7rem', fontWeight: 800 }}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {carga.map(c => (
+              {cargaVisible.map(c => (
                 <tr key={c.nombre} style={{ borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.06))' }}>
-                  <td style={{ padding: '0.6rem 0.9rem', color: 'var(--text-heading)', fontWeight: 600 }}>{c.nombre}</td>
+                  <td style={{ padding: '0.6rem 0.9rem', color: 'var(--text-heading)', fontWeight: 650 }}>{c.nombre}{c.fuenteNombre === 'hoja' && <div className="text-muted" style={{ fontSize: '.64rem', marginTop: 2 }}>Nombre pendiente de vincular al directorio</div>}</td>
                   <td style={{ padding: '0.6rem 0.9rem' }} className="text-muted">
                     {c.sede ? <>{getFlagForSede(c.sede)} {normalizeSede(c.sede)}</> : '—'}
                   </td>
                   <td style={{ padding: '0.6rem 0.9rem', fontWeight: 800, color: c.total === 0 ? 'var(--text-muted)' : 'var(--crear-gold)' }}>{c.total}</td>
+                  <td style={{ padding: '0.6rem 0.9rem' }} className="text-muted">{c.principales}</td>
                   <td style={{ padding: '0.6rem 0.9rem' }} className="text-muted">{c.mj}</td>
-                  <td style={{ padding: '0.6rem 0.9rem' }} className="text-muted">{c.c1c2}</td>
+                  <td style={{ padding: '0.6rem 0.9rem', color: c.complementarios ? 'var(--crear-cyan)' : 'var(--text-muted)' }}>{c.complementarios}</td>
                 </tr>
               ))}
             </tbody>
           </table>
+          {cargaVisible.length === 0 && <div className="text-muted" style={{ padding: '2rem', textAlign: 'center' }}>No hay entrenadores que coincidan con el filtro.</div>}
           <div className="text-muted" style={{ padding: '0.7rem 0.9rem', fontSize: '0.74rem', borderTop: '1px solid var(--border-color, rgba(255,255,255,0.08))' }}>
-            Conteo sobre los entrenamientos del período seleccionado, sumando tanto lo asignado en Causa OS como lo que ya venía en la hoja.
+            Programas principales y complementarios se muestran en contadores separados. La identidad se toma del directorio oficial solo cuando hay una coincidencia única.
           </div>
         </div>
       )}
