@@ -20,6 +20,33 @@ const format = (date, zone) => new Intl.DateTimeFormat('es-EC', {
 const offset = (date, zone) => new Intl.DateTimeFormat('en-US', { timeZone: zone, timeZoneName: 'longOffset' })
   .formatToParts(date).find(part => part.type === 'timeZoneName')?.value || zone;
 
+const offsetMilliseconds = (date, zone) => {
+  const label = offset(date, zone);
+  const match = label.match(/GMT([+-])(\d{2}):(\d{2})/);
+  if (!match) return 0;
+  const minutes = Number(match[2]) * 60 + Number(match[3]);
+  return (match[1] === '-' ? -1 : 1) * minutes * 60_000;
+};
+
+export const zonedDateInputParts = (iso, zone) => {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return { date: '', time: '' };
+  const parts = new Intl.DateTimeFormat('en-CA', { timeZone: zone, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(date);
+  const part = type => parts.find(item => item.type === type)?.value || '';
+  return { date: `${part('year')}-${part('month')}-${part('day')}`, time: `${part('hour')}:${part('minute')}` };
+};
+
+// Convierte la fecha/hora escrita para la sede a un único instante UTC. Así
+// el mismo límite se ve correctamente desde cualquier país sin duplicar fechas.
+export const zonedDateTimeToIso = (dateValue, timeValue, zone) => {
+  const [year, month, day] = String(dateValue).split('-').map(Number);
+  const [hour, minute] = String(timeValue).split(':').map(Number);
+  const naiveUtc = Date.UTC(year, month - 1, day, hour, minute, 0);
+  let instant = naiveUtc - offsetMilliseconds(new Date(naiveUtc), zone);
+  instant = naiveUtc - offsetMilliseconds(new Date(instant), zone);
+  return new Date(instant).toISOString();
+};
+
 export const deadlineTimeReference = (iso, sede) => {
   if (!iso || Number.isNaN(new Date(iso).getTime())) return null;
   const date = new Date(iso);

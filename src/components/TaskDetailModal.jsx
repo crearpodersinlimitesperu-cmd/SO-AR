@@ -17,7 +17,7 @@ import { usersData, isForeignTask } from '../data/usersData';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { canSendOperationalCommunications } from '../config/permissions';
-import { deadlineTimeReference, timeZoneForSede } from '../utils/timezones';
+import { deadlineTimeReference, timeZoneForSede, zonedDateInputParts, zonedDateTimeToIso } from '../utils/timezones';
 const getCountdown = (deadlineIso) => {
   if (!deadlineIso) return { label: 'Sin fecha límite', color: '#9ca3af', bg: 'rgba(156,163,175,0.12)', border: '#9ca3af', overdue: false };
   const deadline = new Date(deadlineIso).getTime();
@@ -134,9 +134,10 @@ export default function TaskDetailModal({
       
       setProgress(initialProgress);
       setIsCompleted(task.completed === true || task.status === 'Completada' || initialProgress === 100);
-      const existingDeadline = task.deadline ? new Date(task.deadline) : null;
-      setDeadlineDate(existingDeadline && !Number.isNaN(existingDeadline.getTime()) ? existingDeadline.toISOString().slice(0, 10) : '');
-      setDeadlineTime(existingDeadline && !Number.isNaN(existingDeadline.getTime()) ? existingDeadline.toISOString().slice(11, 16) : '');
+      const deadlineZone = timeZoneForSede(task.assignedSede || task.sede)?.zone || 'America/Guayaquil';
+      const existingDeadline = task.deadline ? zonedDateInputParts(task.deadline, deadlineZone) : { date: '', time: '' };
+      setDeadlineDate(existingDeadline.date);
+      setDeadlineTime(existingDeadline.time);
       setEditingDeadline(false);
 
       // Normalizar lista de asignados y mapa de progreso individual
@@ -627,7 +628,7 @@ export default function TaskDetailModal({
       // El valor se guarda como instante ISO único. La referencia visual de la
       // sede y Quito se calcula al mostrarlo, evitando fechas duplicadas.
       await updateTaskDetails(task.id, {
-        deadline: new Date(`${deadlineDate}T${deadlineTime}:00`).toISOString(),
+        deadline: zonedDateTimeToIso(deadlineDate, deadlineTime, timeZoneForSede(task?.assignedSede || task?.sede)?.zone || 'America/Guayaquil'),
         deadlineSede: task?.assignedSede || task?.sede || 'Quito',
         deadlineTimeZone: timeZoneForSede(task?.assignedSede || task?.sede)?.zone || 'America/Guayaquil',
         deadlineUpdatedAt: new Date().toISOString(),
@@ -922,6 +923,7 @@ export default function TaskDetailModal({
               {editingDeadline && <>
                 <input aria-label="Fecha límite" type="date" value={deadlineDate} onChange={event => setDeadlineDate(event.target.value)} style={{ minHeight: 34 }} />
                 <input aria-label="Hora límite" type="time" value={deadlineTime} onChange={event => setDeadlineTime(event.target.value)} style={{ minHeight: 34 }} />
+                <small style={{ color: 'var(--text-muted)' }}>Hora de {timeZoneForSede(task?.assignedSede || task?.sede)?.label || 'Quito'}</small>
                 <button onClick={handleSaveDeadline} style={{ border: 0, borderRadius: 7, padding: '0.4rem 0.65rem', background: 'var(--crear-gold)', color: '#111827', cursor: 'pointer', fontWeight: 800 }}>Guardar</button>
                 <button onClick={() => setEditingDeadline(false)} style={{ border: 0, background: 'transparent', color: 'var(--text-muted)', cursor: 'pointer' }}>Cancelar</button>
               </>}
