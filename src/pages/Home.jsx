@@ -732,6 +732,7 @@ export default function Home() {
   const [selectedTrainingFilter, setSelectedTrainingFilter] = useState('todos');
   const [searchQuery, setSearchQuery] = useState('');
   const [publicTrainerAssignments, setPublicTrainerAssignments] = useState({});
+  const [publicCalendarChanges, setPublicCalendarChanges] = useState({});
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [taskBeingEdited, setTaskBeingEdited] = useState(null); // tarea a editar desde el panel "Tareas que has asignado"
   const [selectedTaskForDetail, setSelectedTaskForDetail] = useState(null);
@@ -771,6 +772,27 @@ export default function Home() {
         // proyección no estuviera disponible temporalmente.
         console.error('No se pudo leer la proyección pública del Asignador:', error);
         setPublicTrainerAssignments({});
+      }
+    );
+    return unsubscribe;
+  }, []);
+
+  // El mismo reflejo en vivo incorpora las fechas/lugares cambiados y los
+  // entrenamientos creados desde el Asignador. La hoja sigue siendo histórica;
+  // esta proyección es el dato operativo publicado por Causa OS.
+  useEffect(() => {
+    const unsubscribe = onSnapshot(
+      collection(db, 'calendario_operativo_publico'),
+      (snapshot) => {
+        const nextChanges = {};
+        snapshot.forEach((change) => {
+          nextChanges[change.id] = { id: change.id, ...change.data() };
+        });
+        setPublicCalendarChanges(nextChanges);
+      },
+      (error) => {
+        console.error('No se pudo leer el calendario operativo publicado:', error);
+        setPublicCalendarChanges({});
       }
     );
     return unsubscribe;
@@ -2422,10 +2444,37 @@ export default function Home() {
                     const isEntrenador = ['entrenador', 'entrenador_llamadas'].includes(role);
                     const isQT = role === 'qt' || (currentUser?.roles || []).includes('qt');
                     const isEquipoRole = ['capitan', 'aliado', 'manager'].includes(role);
-                    const assignmentForEvent = (event) => publicTrainerAssignments[publicAssignmentEventKey(event)] || null;
+                    const publishedOverrides = Object.values(publicCalendarChanges)
+                      .filter(change => change.kind === 'override' && change.sourceEventKey)
+                      .reduce((byEvent, change) => ({ ...byEvent, [change.sourceEventKey]: change }), {});
+                    const publishedCustomEvents = Object.values(publicCalendarChanges)
+                      .filter(change => change.kind === 'custom' && change.fechaInicio && change.nombre)
+                      .map(change => ({
+                        ...change,
+                        nombre: change.nombre,
+                        sede: change.sede,
+                        equipo: change.equipo || '',
+                        lugar: change.lugar || '',
+                        fecha_inicio: change.fechaInicio,
+                        fecha_fin: change.fechaFin || change.fechaInicio,
+                        __assignmentKey: change.id,
+                      }));
+                    const profileEvents = (events || []).map(event => {
+                      const change = publishedOverrides[publicAssignmentEventKey(event)];
+                      if (!change) return event;
+                      return {
+                        ...event,
+                        fecha_inicio: change.fechaInicio || event.fecha_inicio || event.start,
+                        fecha_fin: change.fechaFin || event.fecha_fin || event.end,
+                        sede: change.sede || event.sede || event.sedeTag,
+                        equipo: change.equipo ?? event.equipo ?? event.team,
+                        lugar: change.lugar || event.lugar || event.place,
+                      };
+                    }).concat(publishedCustomEvents);
+                    const assignmentForEvent = (event) => publicTrainerAssignments[event.__assignmentKey || publicAssignmentEventKey(event)] || null;
                     const assignedTrainerNamesForEvent = (event) => confirmedTrainerNames(assignmentForEvent(event));
 
-                    let displayEvents = (events || []).filter(ev => {
+                    let displayEvents = profileEvents.filter(ev => {
                       // 1. Entrenadores: la asignación confirmada en Causa OS
                       // tiene prioridad sobre el texto histórico de Sheets.
                       // Cuando el Asignador ya publicó el evento, una remoción
