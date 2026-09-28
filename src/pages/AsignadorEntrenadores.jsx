@@ -344,6 +344,32 @@ export default function AsignadorEntrenadores() {
     })();
   }, [autorizado]);
 
+  // Los programas operativos son fines de semana: la fecha de cierre es el
+  // domingo que sigue al inicio. La fuente puede traer un fin intermedio
+  // (jueves/sábado) y no debe mostrarse como si el entrenamiento terminara
+  // antes. No se aplica a vuelos ni a revisiones administrativas.
+  const ajustarFechaFinPorRegla = (nombre, inicioRaw, finRaw) => {
+    if (!inicioRaw) return finRaw;
+    const n = String(nombre).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const terminaDomingo = [
+      'capitulo uno', 'capitulo 1', 'c1', 'capitulo dos', 'capitulo 2', 'c2',
+      'maestria', 'mj', 'creacion', 'relacion', 'gratitud', 'viaje',
+      'rompimiento', 'tanque', 'caida', 'confianza', 'caminata', 'fuego',
+      'impacto', 'confesiones'
+    ];
+    if (!terminaDomingo.some(kw => n.includes(kw))) return finRaw;
+    const partes = inicioRaw.slice(0, 10).split('-');
+    if (partes.length !== 3) return finRaw;
+    const d = new Date(parseInt(partes[0], 10), parseInt(partes[1], 10) - 1, parseInt(partes[2], 10));
+    if (Number.isNaN(d.getTime())) return finRaw;
+    const diff = d.getDay() === 0 ? 0 : 7 - d.getDay();
+    d.setDate(d.getDate() + diff);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    const time = inicioRaw.includes('T') ? inicioRaw.substring(10) : 'T00:00:00';
+    return `${y}-${m}-${dd}${time}`;
+  };
   // --- Filas: un entrenamiento = 1 fila, salvo MJ = 3 filas (un FDS c/u) ----
   const filas = useMemo(() => {
     const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
@@ -379,7 +405,7 @@ export default function AsignadorEntrenadores() {
           fdsLabel: slots.length > 1 ? `FDS ${i + 1} · ${slot}` : null,
           nombre, sede,
           fechaInicio: inicio,
-          fechaFin: override.fechaFin ?? (ev.fecha_fin || ev.end || ''),
+          fechaFin: ajustarFechaFinPorRegla(nombre, inicio, override.fechaFin ?? (ev.fecha_fin || ev.end || '')),
           equipo: ev.equipo || ev.team || '',
           lugar: ev.lugar || ev.direccion || '',
           // entrenador de la hoja (lo que hay hoy) vs el asignado en Causa OS
@@ -402,7 +428,7 @@ export default function AsignadorEntrenadores() {
       out.push({
         key: ev.id, slot: 'unico', esMJ: false,
         complementario: tipoComplementario(nombre), capitulo: tipoCapitulo(nombre), programa: tipoPrograma(nombre),
-        fdsLabel: null, nombre, sede: normalizeSede(ev.sede || ''), fechaInicio: inicio, fechaFin: ev.fechaFin || '',
+        fdsLabel: null, nombre, sede: normalizeSede(ev.sede || ''), fechaInicio: inicio, fechaFin: ajustarFechaFinPorRegla(nombre, inicio, ev.fechaFin || ''),
         equipo: ev.equipo || '', lugar: ev.lugar || '', entrenadorHojaRaw: '', entrenadorHoja: '', preasignacionesHoja: [],
         entrenadorAsignado: (asignaciones[ev.id] || {}).unico?.entrenador || '',
         asignadoPor: (asignaciones[ev.id] || {}).unico?.asignadoPor || '',
@@ -1141,15 +1167,15 @@ export default function AsignadorEntrenadores() {
               <button onClick={() => { setPolicyFilter('todos'); setPolicySearch(''); }} style={{ ...selectStyle, width: 'auto', cursor: 'pointer' }}>Ver todo ({policyRows.length})</button>
               {lastPolicyScan && <span className="text-muted" style={{ fontSize: '.72rem', padding: '.2rem .15rem' }}>Última lectura: {fmtFecha(lastPolicyScan)}</span>}
             </div>
-            <div style={{ ...card, padding: 0, overflowX: 'auto' }}><table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem', minWidth: 1160, tableLayout: 'fixed' }}><colgroup><col style={{ width: '18%' }} /><col style={{ width: '10%' }} /><col style={{ width: '23%' }} /><col style={{ width: '20%' }} /><col style={{ width: '11%' }} /><col style={{ width: '18%' }} /></colgroup><thead><tr>{['ENTRENADOR','SEDE','EVIDENCIA','ESTADO DE COBERTURA','VIGENCIA','SIGUIENTE ACCIÓN'].map(h => <th key={h} style={{ textAlign: 'left', padding: '.76rem .9rem', color: 'var(--text-muted)', fontSize: '.66rem', letterSpacing: '.04em', background: 'rgba(255,255,255,.018)' }}>{h}</th>)}</tr></thead><tbody>{visiblePolicyRows.map(row => {
+            <div style={{ ...card, padding: 0, overflowX: 'auto' }}><table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem', minWidth: 1280, tableLayout: 'fixed' }}><colgroup><col style={{ width: '16%' }} /><col style={{ width: '9%' }} /><col style={{ width: '28%' }} /><col style={{ width: '18%' }} /><col style={{ width: '11%' }} /><col style={{ width: '18%' }} /></colgroup><thead><tr>{['ENTRENADOR','SEDE','EVIDENCIA','ESTADO DE COBERTURA','VIGENCIA','SIGUIENTE ACCIÓN'].map(h => <th key={h} style={{ textAlign: 'left', padding: '.76rem .9rem', color: 'var(--text-muted)', fontSize: '.66rem', letterSpacing: '.04em', background: 'rgba(255,255,255,.018)', overflow: 'hidden' }}>{h}</th>)}</tr></thead><tbody>{visiblePolicyRows.map(row => {
               const state = {
                 vigente: ['Vigente confirmada', '#10b981', 'Apta para asignación'], vencida: ['Cobertura vencida', '#ef4444', 'Regularizar antes de asignar'], requiere_revision: ['Cambio de documento', '#f59e0b', 'Comparar y revalidar'], pendiente_fecha: ['Documento localizado', '#f59e0b', 'Falta confirmar vigencia'], sin_documento: ['Sin coincidencia segura', '#ef4444', 'Solicitar documento'],
               }[row.status];
               const draft = policyExpiryDrafts[row.reviewId] ?? row.stored?.validUntil ?? '';
               return <tr key={row.reviewId} style={{ borderTop: '1px solid var(--border-color, rgba(255,255,255,.06))' }}>
                 <td style={{ padding: '.78rem .9rem', fontWeight: 750 }}>{row.nombre}</td><td style={{ padding: '.78rem .9rem' }}><span style={{ padding: '.22rem .45rem', borderRadius: 99, background: 'rgba(41,171,226,.1)', color: 'var(--crear-cyan)', fontSize: '.7rem', fontWeight: 700 }}>{row.sede || 'Global'}</span></td>
-                <td style={{ padding: '.78rem .9rem', maxWidth: 260 }}>{row.file ? <><a href={row.file.webViewLink || `https://drive.google.com/open?id=${row.file.id}`} target="_blank" rel="noreferrer" style={{ color: 'var(--crear-gold)', fontWeight: 650 }}>{row.file.name}</a><div className="text-muted" style={{ fontSize: '.66rem', marginTop: 4 }}>Detectado en Drive · {row.file.modifiedTime ? fmtFecha(row.file.modifiedTime) : 'sin fecha de archivo'}</div></> : <span className="text-muted">No hay archivo asociado</span>}</td>
-                <td style={{ padding: '.78rem .9rem' }}><div style={{ color: state[1], fontWeight: 800 }}>{state[0]}</div><div className="text-muted" style={{ fontSize: '.66rem', marginTop: 3 }}>{state[2]}</div>{row.stored?.verifiedAt && <div className="text-muted" style={{ fontSize: '.64rem', marginTop: 3 }}>Confirmada {fmtFecha(row.stored.verifiedAt)}</div>}</td>
+                <td style={{ padding: '.78rem .9rem', verticalAlign: 'top', minWidth: 0 }}>{row.file ? <><a href={row.file.webViewLink || `https://drive.google.com/open?id=${row.file.id}`} target="_blank" rel="noreferrer" style={{ color: 'var(--crear-gold)', fontWeight: 650, display: 'block', width: '100%', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', boxSizing: 'border-box' }} title={row.file.name}>{row.file.name}</a><div className="text-muted" style={{ fontSize: '.66rem', marginTop: 4, overflowWrap: 'anywhere' }}>Detectado en Drive · {row.file.modifiedTime ? fmtFecha(row.file.modifiedTime) : 'sin fecha de archivo'}</div></> : <span className="text-muted">No hay archivo asociado</span>}</td>
+                <td style={{ padding: '.78rem .9rem', verticalAlign: 'top', minWidth: 0, overflow: 'hidden' }}><div style={{ color: state[1], fontWeight: 800, overflowWrap: 'anywhere' }}>{state[0]}</div><div className="text-muted" style={{ fontSize: '.66rem', marginTop: 3, overflowWrap: 'anywhere' }}>{state[2]}</div>{row.stored?.verifiedAt && <div className="text-muted" style={{ fontSize: '.64rem', marginTop: 3 }}>Confirmada {fmtFecha(row.stored.verifiedAt)}</div>}</td>
                 <td style={{ padding: '.78rem .9rem' }}>{row.stored?.validUntil ? <strong style={{ color: row.status === 'vencida' ? '#ef4444' : '#e5e7eb' }}>{fmtFecha(row.stored.validUntil)}</strong> : <span className="text-muted">No declarada</span>}</td>
                 <td style={{ padding: '.78rem .9rem' }}>{row.file ? <><div style={{ display: 'flex', gap: '.35rem', alignItems: 'center' }}><input aria-label={`Vigencia de ${row.nombre}`} type="date" value={draft} onChange={e => setPolicyExpiryDrafts(prev => ({ ...prev, [row.reviewId]: e.target.value }))} disabled={policySaving === row.reviewId} style={{ ...selectStyle, width: 132, padding: '.35rem .45rem' }} /><button onClick={() => confirmarVigencia(row)} disabled={policySaving === row.reviewId || !draft} style={{ border: 0, borderRadius: 7, padding: '.38rem .55rem', background: draft ? 'var(--crear-gold)' : 'var(--border-color)', color: '#111827', fontWeight: 750, cursor: draft ? 'pointer' : 'not-allowed' }}>{policySaving === row.reviewId ? 'Guardando…' : 'Confirmar'}</button></div><div className="text-muted" style={{ fontSize: '.65rem', marginTop: 4 }}>Ingresa solo la fecha leída en el documento.</div></> : <span className="text-muted" style={{ fontSize: '.7rem' }}>No se habilita confirmación sin evidencia.</span>}</td>
               </tr>;
