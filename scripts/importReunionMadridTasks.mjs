@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import { cert, getApps, initializeApp } from 'firebase-admin/app';
 import { FieldValue, getFirestore } from 'firebase-admin/firestore';
+import { USERS_TO_IMPORT } from '../src/data/usersToImport.js';
 
 const raw = process.env.GOOGLE_SERVICE_ACCOUNT_JSON || process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
 if (!raw) throw new Error('Falta la credencial de servicio; no se importó ninguna tarea.');
@@ -43,6 +44,10 @@ const tasks = [
 ];
 
 const people = [];
+for (const person of USERS_TO_IMPORT) {
+  const email = person.email || person.corporateEmail || person.emails?.[0];
+  if (person.name && email) people.push({ name: person.name, email: String(email).trim().toLowerCase(), sede: person.sede || 'Global' });
+}
 for (const collectionName of ['users', 'qt_directory']) {
   const snapshot = await db.collection(collectionName).get();
   snapshot.forEach(doc => {
@@ -52,13 +57,14 @@ for (const collectionName of ['users', 'qt_directory']) {
     if (name && email) people.push({ name, email: String(email).trim().toLowerCase(), sede: data.sede || 'Global' });
   });
 }
+const uniquePeople = [...new Map(people.map(person => [`${normalize(person.name)}__${person.email}`, person])).values()];
 const resolvePerson = name => {
   const key = normalize(name);
-  const exact = people.filter(person => normalize(person.name) === key);
+  const exact = uniquePeople.filter(person => normalize(person.name) === key);
   if (exact.length === 1) return exact[0];
   const tokens = key.split(' ').filter(Boolean);
   if (tokens.length < 2) return null;
-  const candidates = people.filter(person => tokens.every(token => normalize(person.name).split(' ').includes(token)));
+  const candidates = uniquePeople.filter(person => tokens.every(token => normalize(person.name).split(' ').includes(token)));
   return candidates.length === 1 ? candidates[0] : null;
 };
 const existing = await db.collection('tasks').get();
