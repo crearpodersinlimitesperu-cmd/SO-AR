@@ -152,7 +152,7 @@ export async function runTrainerPolicyAudit() {
     let expiry = null;
     try {
       const media = await drive.files.get({ fileId: file.id, alt: 'media', supportsAllDrives: true }, { responseType: 'arraybuffer' });
-      expiry = extractExpiryFromPdf(media.data);
+      expiry = await extractExpiryFromPdf(media.data);
     } catch (error) {
       console.warn(`No se pudo leer el PDF ${file.name}: ${error.message}`);
     }
