@@ -1,8 +1,9 @@
-﻿﻿import { getWhatsAppUrl } from '../utils/phoneUtils';
+import { getWhatsAppUrl } from '../utils/phoneUtils';
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
+import { useTheme } from '../context/ThemeContext';
 import {
   canAddManagers,
   canAssignTrainer,
@@ -121,6 +122,8 @@ export const normalizeManagerEstado = (estado) => {
 export default function CentroManagers() {
   const { currentUser } = useAuth();
   const { showToast } = useUI();
+  const { activeTheme } = useTheme();
+  const isDarkMode = activeTheme === 'dark';
   const navigate = useNavigate();
   const location = useLocation();
 
