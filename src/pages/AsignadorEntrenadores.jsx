@@ -218,6 +218,7 @@ export default function AsignadorEntrenadores() {
   const [vuelos, setVuelos] = useState(null);             // null = aún no se sabe
   const [vuelosError, setVuelosError] = useState(false);
   const [trazas, setTrazas] = useState([]);
+  const [nodusData, setNodusData] = useState([]);
   const [tab, setTab] = useState('matriz');
   const [guardando, setGuardando] = useState('');
   const [policyFiles, setPolicyFiles] = useState([]);
@@ -386,6 +387,17 @@ export default function AsignadorEntrenadores() {
     })();
   }, [autorizado]);
 
+  // --- Nodus Data (para ver confirmados por equipo) -----------------------
+  useEffect(() => {
+    if (!autorizado) return;
+    const unsub = onSnapshot(doc(db, 'nodus_coordinadores_c1c2', 'latest'), snap => {
+      if (snap.exists()) {
+        setNodusData(snap.data().coordinadores || []);
+      }
+    }, () => {});
+    return () => unsub();
+  }, [autorizado]);
+
   // Los programas principales son fines de semana. Los complementarios
   // operativos indicados abajo duran únicamente el día de su inicio.
   const ajustarFechaFinPorRegla = (nombre, inicioRaw, finRaw) => {
@@ -414,6 +426,23 @@ export default function AsignadorEntrenadores() {
     const time = inicioRaw.includes('T') ? inicioRaw.substring(10) : 'T00:00:00';
     return `${y}-${m}-${dd}${time}`;
   };
+  // --- Confirmados por equipo ----------------------------------------------
+  const nodusEquiposMap = useMemo(() => {
+    const map = {};
+    nodusData.forEach(c => {
+      if (Array.isArray(c.equipos)) {
+        c.equipos.forEach(eq => {
+          if (eq.equipo) {
+            const key = String(eq.equipo).trim().toUpperCase();
+            if (!map[key]) map[key] = 0;
+            map[key] += Number(eq.confirmado || 0);
+          }
+        });
+      }
+    });
+    return map;
+  }, [nodusData]);
+
   // --- Filas: un entrenamiento = 1 fila, salvo MJ = 3 filas (un FDS c/u) ----
   const filas = useMemo(() => {
     const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
@@ -1099,7 +1128,7 @@ export default function AsignadorEntrenadores() {
                         </td>
                         <td style={{ padding: '0.65rem 0.8rem' }}>
                           {f.nombre}
-                          {f.equipo && <span className="text-muted" style={{ fontSize: '0.75rem' }}> · Eq. {f.equipo}</span>}
+                          {f.equipo && <span className="text-muted" style={{ fontSize: '0.75rem' }}> - Eq. {f.equipo} <span style={{ color: '#10b981', fontWeight: 700, marginLeft: 4 }}>({nodusEquiposMap[String(f.equipo).trim().toUpperCase()] || 0} confirmados)</span></span>}
                         </td>
                         <td style={{ padding: '0.65rem 0.8rem', whiteSpace: 'nowrap' }}>
                           {f.fdsLabel

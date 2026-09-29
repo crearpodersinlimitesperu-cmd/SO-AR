@@ -978,7 +978,21 @@ export default function CentroManagers() {
     try {
       const targetManager = managers.find(m => m.id === id) || { id };
       const docRef = doc(db, 'managers_directory', id.toString());
-      await setDoc(docRef, { ...targetManager, [field]: finalValue }, { merge: true });
+      
+      // FIX: Only send fields that exist and are not undefined to prevent Firebase errors
+      // Also ensure we include the core identity fields if upserting a new document
+      const cleanData = {
+        id: targetManager.id || id,
+        nombre: targetManager.nombre || '',
+        equipo: targetManager.equipo || '',
+        sede: targetManager.sede || '',
+        [field]: finalValue
+      };
+      
+      // Remove any strictly undefined fields (Firestore throws if passed undefined)
+      Object.keys(cleanData).forEach(key => cleanData[key] === undefined && delete cleanData[key]);
+
+      await setDoc(docRef, cleanData, { merge: true });
       
       setManagers(prev => prev.map(m => m.id === id ? { ...m, [field]: finalValue } : m));
       
@@ -995,7 +1009,7 @@ export default function CentroManagers() {
 
       showToast(`Actualizado: ${field}`, 'info');
     } catch (e) {
-      console.error(e);
+      console.error("Error al actualizar manager:", e);
       showToast('Error al actualizar en la nube', 'error');
     }
   };

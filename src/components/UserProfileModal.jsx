@@ -424,7 +424,7 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
     }
     setIsSavingBirthday(true);
     try {
-      await updateDoc(doc(db, 'users', user.id), { cumpleanos: birthdayDraft || null });
+      await setDoc(doc(db, 'users', user.id), { cumpleanos: birthdayDraft || null }, { merge: true });
       showToast('Cumpleaños guardado.', 'success');
       setEditingBirthday(false);
     } catch (error) {
@@ -451,14 +451,14 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
     setIsSavingRole(true);
     const selectedRoles = Array.from(new Set([roleDraft, ...rolesDraft].map(normalizeRole).filter(Boolean)));
     try {
-      await updateDoc(doc(db, 'users', user.id), {
+      await setDoc(doc(db, 'users', user.id), {
         role: roleDraft,
         roles: selectedRoles,
         sede: sedeDraft,
         roleSedes: { ...(user.roleSedes || {}), [roleDraft]: sedeDraft },
         rolesUpdatedAt: serverTimestamp(),
         rolesUpdatedBy: currentUser?.email || ''
-      });
+      }, { merge: true });
       await recordAuditEvent({
         email: currentUser?.email,
         name: currentUser?.name,
@@ -502,7 +502,7 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
     }
     setIsSavingQuitoTeams(true);
     try {
-      await updateDoc(doc(db, 'users', user.id), { equiposQuito: quitoTeamsDraft });
+      await setDoc(doc(db, 'users', user.id), { equiposQuito: quitoTeamsDraft }, { merge: true });
       // Si la persona esta editando su PROPIO perfil, reflejamos el cambio de
       // inmediato en el currentUser de la sesion -- si no, CyclesContext.jsx no se
       // entera del equipo elegido hasta que cierre sesion y vuelva a entrar.

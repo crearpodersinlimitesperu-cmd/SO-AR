@@ -9,6 +9,7 @@ import { getFirestore, doc, setDoc } from "firebase/firestore";
 import { initializeApp as initializeAdminApp, cert, getApps as getAdminApps } from 'firebase-admin/app';
 import { getFirestore as getAdminFirestore, FieldValue } from 'firebase-admin/firestore';
 import { NodusDataScientistAgent } from './nodusDataScientistAgent.mjs';
+import { NodusManagersSheetAgent } from './agentSincronizadorSheets.mjs';
 import { NodusHrSentinelAgent } from './nodusHrSentinelAgent.mjs';
 import { NodusFIAgent } from './nodusFIAgent.mjs';
 import { NodusGenealogyAgent } from './nodusGenealogyAgent.mjs';
@@ -592,6 +593,47 @@ class NodusExtractorAgent {
 class NodusNormalizerAgent {
   normalizeData(rawCoordinadores, rawDashboard, rawEquiposReporte) {
     console.log("🧠 [Agente 2 - Normalizador] Procesando y correlacionando información...");
+    // NUEVO (29/09/2026): Inferir sede de cada equipo para verificar coherencia de asignaciones
+    const equipoSedeMap = {};
+    if (rawEquiposReporte && Array.isArray(rawEquiposReporte)) {
+      rawEquiposReporte.forEach(eq => {
+        const sedesTally = {};
+        if (eq.participantes && Array.isArray(eq.participantes)) {
+          eq.participantes.forEach(p => {
+            const coordStr = (p.coordinador || '').toLowerCase();
+            let pSede = null;
+            if (coordStr.includes('lima')) pSede = 'Lima';
+            else if (coordStr.includes('quito')) pSede = 'Quito';
+            else if (coordStr.includes('guayaquil') || coordStr.includes('gye')) pSede = 'Guayaquil';
+            else if (coordStr.includes('cuenca')) pSede = 'Cuenca';
+            else if (coordStr.includes('medellin') || coordStr.includes('medellín')) pSede = 'Medellín';
+            else if (coordStr.includes('mexico') || coordStr.includes('méxico')) pSede = 'México';
+            else if (coordStr.includes('bogota') || coordStr.includes('bogotá')) pSede = 'Bogotá';
+            if (pSede) sedesTally[pSede] = (sedesTally[pSede] || 0) + 1;
+          });
+        }
+        let dominantSede = null;
+        let maxCount = 0;
+        for (const [s, count] of Object.entries(sedesTally)) {
+          if (count > maxCount) {
+            maxCount = count;
+            dominantSede = s;
+          }
+        }
+        if (!dominantSede) {
+          const eqStr = (eq.equipoNombre || '').toUpperCase();
+          const matchNum = eqStr.match(/(\d+)/);
+          if (matchNum) {
+            const num = parseInt(matchNum[1], 10);
+            if (num >= 110 && num <= 140) dominantSede = 'Quito/Guayaquil';
+            else if (num >= 10 && num <= 50) dominantSede = 'Lima';
+          }
+        }
+        if (dominantSede) {
+          equipoSedeMap[eq.equipoNombre.trim().toLowerCase()] = dominantSede;
+        }
+      });
+    }
 
     const rawCoordinadoresList = rawCoordinadores.map(item => {
       const lines = item.fullText.split('\n').map(l => l.trim()).filter(Boolean);
@@ -730,7 +772,20 @@ class NodusNormalizerAgent {
           yaAsistio,
           devolucion
         },
-        equipos: item.equipos || []
+                equipos: (item.equipos || []).map(eq => {
+          const eqKey = (eq.equipo || '').trim().toLowerCase();
+          const sedeInferida = equipoSedeMap[eqKey];
+          let incoherencia = false;
+          if (sedeInferida && sede !== 'Sin Sede') {
+            if (sedeInferida === 'Quito/Guayaquil' && !['Quito', 'Guayaquil'].includes(sede)) {
+              incoherencia = true;
+            } else if (sedeInferida !== 'Quito/Guayaquil' && sedeInferida !== sede) {
+              incoherencia = true;
+            }
+          }
+          if (incoherencia) console.warn(`🚨 [INCOHERENCIA] ${nombre} (${sede}) tiene asignado ${eq.equipo} (${sedeInferida}).`);
+          return { ...eq, sedeInferida: sedeInferida || 'Desconocida', incoherenciaSedes: incoherencia };
+        })
       };
     });
 
@@ -1056,10 +1111,21 @@ export async function runMultiAgentSync() {
   console.log("   Hora de inicio:", new Date().toLocaleString());
   console.log("=======================================================\n");
 
+
+
   const extractor = new NodusExtractorAgent();
   const normalizer = new NodusNormalizerAgent();
   const dispatcher = new NodusDispatcherAgent();
     const identitySentinel = new NodusIdentityAgent();
+
+  try {
+    console.log("?????? [MultiAgent Sync] Sincronizando Managers desde Google Sheets (Master Roster)...");
+    const sheetAgent = new NodusManagersSheetAgent(getAdminDbForNodusPublish());
+    await sheetAgent.syncManagersFromSheet();
+  } catch(e) {
+    console.error("Error no bloqueante en agente de Google Sheets:", e.message);
+  }
+
 
   try {
     const user = process.env.NODUS_GLOBAL_USER || process.env.NODUS_USER || process.env.IMO_USER || 'CREARPSL';
@@ -1253,6 +1319,8 @@ export async function runMultiAgentSync() {
     console.log(`   Confirmados Totales: ${normalized.totales.totalConfirmados}`);
     console.log("=======================================================\n");
 
+
+
     return normalized;
   } catch (error) {
     console.error("❌ ERROR CRÍTICO EN PIPELINE MULTI-AGENTE:", error);
@@ -1277,3 +1345,5 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       process.exit(1);
     });
 }
+
+
