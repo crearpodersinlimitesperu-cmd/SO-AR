@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capítulo Uno | CREAR Poder Sin Límites</title>
+    <meta name="description" content="Da el primer paso hacia tu transformación. Inscríbete en el Capítulo Uno de CREAR Poder Sin Límites y descubre de lo que eres capaz.">
+    
+    <link rel="icon" href="logo_crear_oficial.png" type="image/png">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Outfit:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        crearDark: '#0a0f1c',
+                        crearDarker: '#05080f',
+                        crearBlue: '#0052cc',
+                        crearCyan: '#00d2ff',
+                        crearGold: '#ffb703',
+                        crearGoldLight: '#ffdd77',
+                        crearBorder: 'rgba(0, 210, 255, 0.15)'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        outfit: ['Outfit', 'sans-serif'],
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'glow': 'glow 3s ease-in-out infinite alternate',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        glow: {
+                            '0%': { boxShadow: '0 0 15px rgba(0, 210, 255, 0.2)' },
+                            '100%': { boxShadow: '0 0 30px rgba(0, 210, 255, 0.6)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #05080f; color: #ffffff; overflow-x: hidden; }
+        .glass-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            border-left: 1px solid rgba(255,255,255,0.1);
+        }
+        .text-gradient {
+            background: linear-gradient(to right, #00d2ff, #3385ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .text-gradient-gold {
+            background: linear-gradient(to right, #ffb703, #ffe66d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="antialiased font-sans">
+
+    <!-- FONDOS ANIMADOS -->
+    <div class="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
+        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-crearBlue/20 rounded-full blur-[120px] animate-float"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-crearCyan/20 rounded-full blur-[120px] animate-float" style="animation-delay: 2s;"></div>
+    </div>
+
+    <!-- NAVBAR -->
+    <nav class="fixed top-0 w-full z-50 bg-crearDarker/80 backdrop-blur-md border-b border-crearBorder py-4">
+        <div class="max-w-6xl mx-auto px-6 flex justify-between items-center">
+            <img src="logo_crear_blanco.png" alt="CREAR" class="h-8 md:h-10 object-contain" onerror="this.src='https://via.placeholder.com/150x50?text=CREAR'">
+            <a href="#precios" class="text-sm font-bold bg-crearCyan hover:bg-white text-crearDarker px-5 py-2 rounded-full transition-colors shadow-[0_0_15px_rgba(0,210,255,0.3)]">
+                ASUME EL RETO
+            </a>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <header class="pt-32 pb-20 px-6 max-w-5xl mx-auto text-center reveal active">
+        <span class="inline-block py-1 px-3 rounded-full bg-crearCyan/10 border border-crearCyan/30 text-crearCyan text-xs font-bold tracking-widest uppercase mb-6">
+            Entrenamiento de Liderazgo y Transformación
+        </span>
+        <h1 class="text-5xl md:text-7xl font-black font-outfit tracking-tight mb-6 leading-tight">
+            Tu vida extraordinaria no se va a construir sola. <br class="hidden md:block">
+            <span class="text-gradient">Tienes que CREARLA.</span>
+        </h1>
+        <p class="text-lg md:text-xl text-gray-300 font-light mb-10 max-w-2xl mx-auto">
+            Deja de conformarte. Capítulo Uno es el punto de quiebre donde mueren tus excusas y nace tu verdadero potencial. Tres días de inmersión total para reescribir tu historia.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="#precios" class="bg-crearCyan hover:bg-crearBlue transition-colors text-crearDarker font-bold py-4 px-8 rounded-full animate-glow transform hover:-translate-y-1">
+                SÍ, ESTOY LISTO PARA SALIR DEL PROMEDIO
+            </a>
+        </div>
+    </header>
+
+    <!-- EL DOLOR / IDENTIFICACIÓN -->
+    <section id="que-es" class="py-20 px-6 bg-crearDark/50">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <h2 class="text-3xl md:text-4xl font-black font-outfit text-white mb-4">El costo de no hacer nada es demasiado alto.</h2>
+                <p class="text-gray-400">¿Hasta cuándo vas a posponer la vida que sabes que mereces?</p>
+                <div class="w-20 h-1 bg-crearCyan mx-auto rounded-full mt-6"></div>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-6 reveal">
+                <div class="glass-card p-8 rounded-3xl border-l-4 border-l-crearGold hover:bg-white/5 transition-colors">
+                    <h3 class="text-xl font-bold text-white mb-3">El peso del estancamiento</h3>
+                    <p class="text-gray-400 leading-relaxed">Sabes que tienes el potencial para liderar, generar más ingresos y conectar profundamente, pero una fuerza invisible (miedo, autosabotaje, dudas) te mantiene jugando en pequeño.</p>
+                </div>
+                <div class="glass-card p-8 rounded-3xl border-l-4 border-l-crearGold hover:bg-white/5 transition-colors">
+                    <h3 class="text-xl font-bold text-white mb-3">La trampa del "piloto automático"</h3>
+                    <p class="text-gray-400 leading-relaxed">Sobrevives los días en lugar de vivirlos. La rutina ha apagado tu fuego interior y te estás conformando con una versión diluida de quién realmente eres.</p>
+                </div>
+                <div class="glass-card p-8 rounded-3xl border-l-4 border-l-crearGold bg-crearGold/5 md:col-span-2 text-center mt-4 border border-crearGold/30">
+                    <h3 class="text-2xl font-black text-crearGold mb-3">Aquí no venimos a motivarte. Venimos a despertarte.</h3>
+                    <p class="text-gray-300 leading-relaxed max-w-2xl mx-auto">La motivación dura lo que dura una ducha. El Capítulo Uno es una disrupción total de tus patrones. Te daremos un "andamiaje tecnológico" mental para absorber la fricción de la vida cotidiana y operar desde el poder, no desde el miedo.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- LA SOLUCIÓN: CAPÍTULO UNO -->
+    <section class="py-24 px-6 max-w-5xl mx-auto reveal">
+        <div class="glass-card rounded-3xl p-10 md:p-16 text-center relative overflow-hidden border border-crearBorder">
+            <div class="absolute -right-20 -top-20 w-64 h-64 bg-crearCyan/10 rounded-full blur-3xl"></div>
+            <h2 class="text-xs font-bold tracking-[0.3em] text-crearCyan uppercase mb-4">La Experiencia</h2>
+            <h3 class="text-4xl md:text-5xl font-black font-outfit text-white mb-6">El Entrenamiento que divide tu vida en un Antes y un Después</h3>
+            <p class="text-lg text-gray-300 max-w-3xl mx-auto leading-relaxed mb-10">
+                Capítulo Uno no es una charla ni una conferencia. Es una inmersión vivencial de altísimo impacto. Durante un fin de semana entero te pondremos frente a frente contigo mismo para identificar, quebrar y reprogramar las barreras que te frenan.
+            </p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left mb-10">
+                <div>
+                    <div class="text-crearCyan text-3xl mb-4"><i class="fa-solid fa-eye"></i></div>
+                    <h4 class="text-xl font-black text-white mb-2 font-outfit">1. El Despertar</h4>
+                    <p class="text-gray-400 text-sm">Identificaremos con precisión quirúrgica dónde estás jugando a medias, para que asumas el control absoluto de tus resultados a partir de hoy.</p>
+                </div>
+                <div>
+                    <div class="text-crearCyan text-3xl mb-4"><i class="fa-solid fa-link-slash"></i></div>
+                    <h4 class="text-xl font-black text-white mb-2 font-outfit">2. Diseño y Coherencia</h4>
+                    <p class="text-gray-400 text-sm">Alinearás tus metas con tus acciones. Aprenderás a construir estructuras sólidas que te permitan avanzar con velocidad y certeza hacia tus objetivos.</p>
+                </div>
+                <div>
+                    <div class="text-crearCyan text-3xl mb-4"><i class="fa-solid fa-rocket"></i></div>
+                    <h4 class="text-xl font-black text-white mb-2 font-outfit">3. Diseño de Futuro</h4>
+                    <p class="text-gray-400 text-sm">Construirás una visión inquebrantable. Saldrás con el compromiso de liderar tu vida con integridad, valentía y urgencia.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PRECIOS Y PAQUETES -->
+    <section id="precios" class="py-20 px-6 bg-crearDark/50 border-y border-crearBorder/30 relative">
+        <div class="absolute top-[20%] left-[-10%] w-[30%] h-[30%] bg-crearGold/10 rounded-full blur-[100px] pointer-events-none"></div>
+        <div class="max-w-5xl mx-auto text-center reveal relative z-10">
+            <h2 class="text-3xl md:text-5xl font-black font-outfit text-white mb-4">¿Cuánto vale tu libertad?</h2>
+            <p class="text-gray-400 mb-12 max-w-2xl mx-auto">Da el paso. Elige tu inscripción y comunícate directamente con nuestras coordinadoras para asegurar tu cupo antes de que se agoten.</p>
+            
+            <!-- CONTENEDOR DE PRECIOS -->
+            <div class="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto text-left items-center mt-12">
+                
+                <!-- Ticket Estándar (El Decoy / Señuelo de contraste) -->
+                <div class="glass-card rounded-3xl p-6 border border-white/10 hover:border-white/30 transition-colors relative flex flex-col h-[90%] opacity-80 scale-95 hover:scale-100 hover:opacity-100">
+                    <div class="flex-grow">
+                        <h3 class="text-xl font-bold text-white mb-2">Entrada C1</h3>
+                        <p class="text-gray-400 text-xs mb-4">El primer paso para salir del estancamiento.</p>
+                        <div class="mb-2">
+                            <span class="text-4xl font-black text-white">$420</span><span class="text-gray-400 ml-1">USD</span>
+                        </div>
+                        <p class="text-gray-500 font-bold text-xs mb-6">S/ 1,515 PEN</p>
+                        <ul class="space-y-3 mb-6">
+                            <li class="flex items-start gap-2"><span class="text-gray-500 text-sm"><i class="fa-solid fa-check"></i></span> <span class="text-gray-300 text-xs">3 días de entrenamiento</span></li>
+                        </ul>
+                    </div>
+                    <div class="flex flex-col gap-2 mt-auto">
+                        <div class="grid grid-cols-2 gap-2">
+                            <a href="https://wa.me/51912379744?text=Hola%20Diana,%20quiero%20inscribirme%20al%20C1" target="_blank" class="w-full text-center bg-white/5 hover:bg-white/10 text-gray-300 font-bold py-2 rounded-lg transition-colors border border-white/10 text-xs">Diana</a>
+                            <a href="https://wa.me/51933599903?text=Hola%20Joyce,%20quiero%20inscribirme%20al%20C1" target="_blank" class="w-full text-center bg-white/5 hover:bg-white/10 text-gray-300 font-bold py-2 rounded-lg transition-colors border border-white/10 text-xs">Joyce</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ticket Combo C1+C2 (La Opción Lógica) -->
+                <div class="glass-card rounded-3xl p-6 border border-crearCyan/50 shadow-[0_0_20px_rgba(0,210,255,0.1)] relative flex flex-col h-full transform hover:scale-105 transition-transform z-10">
+                    <div class="absolute top-0 right-6 transform -translate-y-1/2 bg-crearCyan text-crearDarker font-black text-[10px] px-3 py-1 rounded-full uppercase tracking-widest">
+                        El más popular
+                    </div>
+                    <div class="flex-grow">
+                        <h3 class="text-xl font-bold text-gradient mb-2">Combo C1 + C2</h3>
+                        <p class="text-gray-400 text-xs mb-4">Garantiza tu evolución continua.</p>
+                        <div class="mb-2">
+                            <span class="text-4xl font-black text-white">$720</span><span class="text-gray-400 ml-1">USD</span>
+                        </div>
+                        <p class="text-crearCyan font-bold text-xs mb-6">o S/ 2,595 PEN</p>
+                        <ul class="space-y-3 mb-6">
+                            <li class="flex items-start gap-2"><span class="text-crearCyan text-sm"><i class="fa-solid fa-check"></i></span> <span class="text-white text-xs font-bold">Capítulo 1 Asegurado</span></li>
+                            <li class="flex items-start gap-2"><span class="text-crearCyan text-sm"><i class="fa-solid fa-check"></i></span> <span class="text-white text-xs font-bold">Capítulo 2 Asegurado</span></li>
+                            <li class="flex items-start gap-2"><span class="text-crearCyan text-sm"><i class="fa-solid fa-lock"></i></span> <span class="text-gray-300 text-xs">Protección contra alza de precios</span></li>
+                        </ul>
+                    </div>
+                    <div class="flex flex-col gap-2 mt-auto">
+                        <div class="grid grid-cols-2 gap-2">
+                            <a href="https://wa.me/51912379744?text=Hola%20Diana,%20quiero%20el%20Combo%20C1%20y%20C2" target="_blank" class="w-full text-center bg-crearCyan hover:bg-crearBlue text-crearDarker font-bold py-2 rounded-lg transition-colors text-xs">Diana</a>
+                            <a href="https://wa.me/51933599903?text=Hola%20Joyce,%20quiero%20el%20Combo%20C1%20y%20C2" target="_blank" class="w-full text-center bg-crearCyan hover:bg-crearBlue text-crearDarker font-bold py-2 rounded-lg transition-colors text-xs">Joyce</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ticket Combo Total (Neuromarketing: El Ancla Aspiracional) -->
+                <div class="glass-card rounded-3xl p-8 border-2 border-crearGold shadow-[0_0_40px_rgba(255,183,3,0.25)] relative flex flex-col h-[105%] transform md:-translate-y-4 scale-105 z-20">
+                    <div class="absolute top-0 right-6 transform -translate-y-1/2 bg-crearGold text-crearDarker font-black text-[10px] px-3 py-1 rounded-full uppercase tracking-widest animate-pulse">
+                        Compromiso Total
+                    </div>
+                    <div class="flex-grow">
+                        <h3 class="text-2xl font-black text-gradient-gold mb-1">La Trilogía</h3>
+                        <p class="text-gray-300 text-xs mb-4">El camino de los líderes imparables.</p>
+                        <div class="mb-2">
+                            <span class="text-5xl font-black text-white">$1,180</span><span class="text-gray-400 ml-1">USD</span>
+                        </div>
+                        <p class="text-crearGold font-bold text-sm mb-6">o S/ 4,250 PEN</p>
+                        <ul class="space-y-3 mb-6">
+                            <li class="flex items-start gap-2"><span class="text-crearGold text-sm"><i class="fa-solid fa-star"></i></span> <span class="text-white font-bold text-xs">C1: El Despertar</span></li>
+                            <li class="flex items-start gap-2"><span class="text-crearGold text-sm"><i class="fa-solid fa-star"></i></span> <span class="text-white font-bold text-xs">C2: Diseño y Coherencia</span></li>
+                            <li class="flex items-start gap-2"><span class="text-crearGold text-sm"><i class="fa-solid fa-crown"></i></span> <span class="text-white font-black text-xs uppercase tracking-wide border-b border-crearGold/50">Maestría: Simulador de Creación</span></li>
+                            <li class="flex items-start gap-2"><span class="text-crearGold text-sm"><i class="fa-solid fa-bolt"></i></span> <span class="text-gray-300 text-xs">Entrenamiento bajo condiciones de caos</span></li>
+                        </ul>
+                    </div>
+                    <div class="flex flex-col gap-2 mt-auto">
+                        <p class="text-[10px] text-crearGold/80 text-center uppercase tracking-wider mb-1 font-bold">Decide ganar ahora:</p>
+                        <div class="grid grid-cols-2 gap-2">
+                            <a href="https://wa.me/51912379744?text=Hola%20Diana,%20voy%20por%20todo.%20Quiero%20la%20Trilog%C3%ADa%20(C1%2BC2%2BMaestr%C3%ADa)" target="_blank" class="w-full text-center bg-crearGold hover:bg-crearGoldLight text-crearDarker font-black py-3 rounded-lg transition-colors text-xs shadow-[0_0_15px_rgba(255,183,3,0.4)]">DIANA</a>
+                            <a href="https://wa.me/51933599903?text=Hola%20Joyce,%20voy%20por%20todo.%20Quiero%20la%20Trilog%C3%ADa%20(C1%2BC2%2BMaestr%C3%ADa)" target="_blank" class="w-full text-center bg-crearGold hover:bg-crearGoldLight text-crearDarker font-black py-3 rounded-lg transition-colors text-xs shadow-[0_0_15px_rgba(255,183,3,0.4)]">JOYCE</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            
+        </div>
+    </section>
+
+    <!-- PREGUNTAS FRECUENTES (FAQ) -->
+    <section class="py-20 px-6 max-w-4xl mx-auto reveal">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-black font-outfit text-white mb-4">Preguntas Frecuentes</h2>
+            <div class="w-16 h-1 bg-crearGold mx-auto rounded-full"></div>
+        </div>
+        
+        <div class="space-y-6">
+            <!-- FAQ 1 -->
+            <div class="glass-card p-6 rounded-2xl border border-white/10 hover:border-crearCyan/40 transition-colors">
+                <h3 class="text-lg font-bold text-white mb-3 flex items-center gap-3">
+                    <i class="fa-solid fa-bolt text-crearCyan"></i> ¿Qué es exactamente el Capítulo Uno?
+                </h3>
+                <p class="text-gray-400 text-sm leading-relaxed pl-7">
+                    No es una charla motivacional de fin de semana ni un seminario aburrido. Es una experiencia vivencial de alto impacto diseñada para reprogramar tus hábitos, romper el estancamiento y darte las herramientas para que tomes el control de tu vida desde el primer minuto.
+                </p>
+            </div>
+            
+            <!-- FAQ 2 -->
+            <div class="glass-card p-6 rounded-2xl border border-white/10 hover:border-crearCyan/40 transition-colors">
+                <h3 class="text-lg font-bold text-white mb-3 flex items-center gap-3">
+                    <i class="fa-solid fa-lock text-crearCyan"></i> ¿De qué tratan las dinámicas?
+                </h3>
+                <p class="text-gray-400 text-sm leading-relaxed pl-7">
+                    El programa exige tu compromiso al 100%. Las dinámicas están diseñadas para sacarte de tu zona de confort de manera segura pero retadora. Contarte los detalles arruinaría la sorpresa y el impacto del aprendizaje. El único requisito es que vengas con la mente abierta y disposición para transformar tu realidad.
+                </p>
+            </div>
+
+            <!-- FAQ 3 -->
+            <div class="glass-card p-6 rounded-2xl border border-white/10 hover:border-crearCyan/40 transition-colors">
+                <h3 class="text-lg font-bold text-white mb-3 flex items-center gap-3">
+                    <i class="fa-solid fa-user-shield text-crearCyan"></i> ¿Es este entrenamiento para mí?
+                </h3>
+                <p class="text-gray-400 text-sm leading-relaxed pl-7">
+                    Solo si estás genuinamente insatisfecho con jugar a medias. Esto no es para quienes buscan consuelo o parches emocionales temporales. Es exclusivo para quienes están dispuestos a asumir la autoría indiscutible de sus resultados y llevar sus finanzas, relaciones y carrera a un nivel de Maestría.
+                </p>
+            </div>
+
+            <!-- FAQ 4 -->
+            <div class="glass-card p-6 rounded-2xl border border-white/10 hover:border-crearCyan/40 transition-colors">
+                <h3 class="text-lg font-bold text-white mb-3 flex items-center gap-3">
+                    <i class="fa-solid fa-gem text-crearCyan"></i> ¿Por qué los cupos son tan limitados?
+                </h3>
+                <p class="text-gray-400 text-sm leading-relaxed pl-7">
+                    El nivel de disrupción y acompañamiento uno-a-uno que brindamos exige un aforo estrictamente controlado. Protegemos el ecosistema para garantizar la integridad del contexto y la participación absoluta de cada individuo seleccionado.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER CTA -->
+    <footer class="py-20 px-6 text-center reveal">
+        <h2 class="text-3xl md:text-4xl font-black font-outfit text-white mb-6">Tu momento no es mañana. Es HOY.</h2>
+        <p class="text-gray-400 mb-10 max-w-xl mx-auto">Las personas exitosas toman decisiones rápido y las cambian lento. ¿De qué lado vas a estar? Los cupos para el próximo Capítulo Uno son estrictamente limitados.</p>
+        <a href="#precios" class="inline-block bg-crearCyan text-crearDarker font-black px-12 py-5 rounded-full text-lg shadow-[0_0_20px_rgba(0,210,255,0.4)] hover:shadow-[0_0_35px_rgba(0,210,255,0.6)] transform hover:scale-105 transition-all">
+            TOMAR ACCIÓN AHORA
+        </a>
+        <div class="mt-16 border-t border-white/10 pt-8 flex flex-col items-center justify-center gap-4 text-xs text-gray-500">
+            <img src="logo_crear_blanco.png" alt="CREAR" class="h-6 opacity-50" onerror="this.style.display='none'">
+            <p>© 2026 CREAR Poder Sin Límites. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Script de Animación Reveal -->
+    <script>
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                var elementVisible = 100;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add("active");
+                }
+            }
+        }
+        window.addEventListener("scroll", reveal);
+        // Disparar reveal inicial
+        setTimeout(reveal, 100);
+    </script>
+</body>
+</html>
