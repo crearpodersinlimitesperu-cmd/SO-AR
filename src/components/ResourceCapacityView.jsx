@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useCycles } from '../context/CyclesContext';
 import { defaultVenues } from '../data/venuesData';
+import { normalizeTrainerName } from '../data/trainerDictionary';
 import { 
   User, Users, MapPin, Calendar, Plane, CheckCircle2, 
   AlertTriangle, Clock, Search, ShieldCheck, Building2, 
@@ -98,7 +99,9 @@ export default function ResourceCapacityView({ selectedSede = 'GLOBAL', hrSentin
       const rawTrainers = e.trainer.split('/').map(t => t.trim()).filter(Boolean);
       
       rawTrainers.forEach(trainerName => {
-        const cleanName = trainerName.toUpperCase();
+        // Causa OS: Normalizar identidades de entrenadores para evitar duplicados y unificar vuelos
+        const normalizedName = normalizeTrainerName(trainerName);
+        const cleanName = normalizedName.toUpperCase();
         if (!map[cleanName]) {
           map[cleanName] = {
             name: cleanName,
@@ -117,10 +120,13 @@ export default function ResourceCapacityView({ selectedSede = 'GLOBAL', hrSentin
       Object.keys(map).forEach(tName => {
         const nameParts = tName.toLowerCase().split(/\s+/).filter(p => p.length > 2);
         
-        // Buscar vuelo más próximo para este entrenador
+        // Buscar vuelo más próximo para este entrenador (MATCH ESTRICTO - SELLO DE CAUSA)
         const matchingFlights = flightsData.filter(fl => {
           const paxStr = (fl.passengers || []).join(' ').toLowerCase();
-          return nameParts.some(part => paxStr.includes(part));
+          // Causa OS: Regla de Fidelidad de Datos. NO ALUCINAR. NO SUPONER.
+          // Requerimos que TODAS las palabras significativas del trainer estén en el registro del vuelo.
+          if (nameParts.length === 0) return false;
+          return nameParts.every(part => paxStr.includes(part));
         });
 
         if (matchingFlights.length > 0) {

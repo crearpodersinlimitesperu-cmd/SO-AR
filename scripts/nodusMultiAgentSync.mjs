@@ -12,6 +12,7 @@ import { NodusDataScientistAgent } from './nodusDataScientistAgent.mjs';
 import { NodusHrSentinelAgent } from './nodusHrSentinelAgent.mjs';
 import { NodusFIAgent } from './nodusFIAgent.mjs';
 import { NodusGenealogyAgent } from './nodusGenealogyAgent.mjs';
+import { NodusIdentityAgent } from './nodusIdentityAgent.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -47,10 +48,16 @@ const db = getFirestore(app);
 // Firestore. El job de CI debe inyectar una cuenta de servicio de Firebase.
 function getAdminDbForNodusPublish() {
   const rawServiceAccount = process.env.FIREBASE_SERVICE_ACCOUNT_KEY || process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
+  let serviceAccount;
   if (!rawServiceAccount) {
-    throw new Error('Falta FIREBASE_SERVICE_ACCOUNT_KEY/GOOGLE_SERVICE_ACCOUNT_JSON para publicar el snapshot FI.');
+    if (fs.existsSync('centro-operativo-cpsl-3d05655c949c.json')) {
+      serviceAccount = JSON.parse(fs.readFileSync('centro-operativo-cpsl-3d05655c949c.json', 'utf8'));
+    } else {
+      throw new Error('Falta FIREBASE_SERVICE_ACCOUNT_KEY/GOOGLE_SERVICE_ACCOUNT_JSON para publicar el snapshot FI.');
+    }
+  } else {
+    serviceAccount = JSON.parse(rawServiceAccount);
   }
-  const serviceAccount = JSON.parse(rawServiceAccount);
   const adminApp = getAdminApps().length ? getAdminApps()[0] : initializeAdminApp({ credential: cert(serviceAccount) });
   return getAdminFirestore(adminApp);
 }
@@ -84,7 +91,7 @@ class NodusExtractorAgent {
       args.push(`--proxy-server=http://${proxy}`);
     }
     this.browser = await puppeteer.launch({
-      headless: true,
+      headless: false,
       args
     });
     this.page = await this.browser.newPage();
@@ -249,6 +256,47 @@ class NodusExtractorAgent {
     }
   }
 
+  /**
+   * Explora y mapea los módulos de la barra lateral (navegación DOM) de Nodus.
+   * Alerta si encuentra módulos nuevos o cambios estructurales en la UI.
+   */
+  async exploreAndMapModules() {
+    console.log("🗺️ [Agente 1 - Extractor] Iniciando exploración DOM para mapeo de módulos...");
+    try {
+      await this.safeGoto('https://imo.crearpslglobal.com/dashboard', 35000);
+      
+      const navLinks = await this.page.evaluate(() => {
+        // En Nodus, los links suelen estar en un sidebar o navbar
+        const links = Array.from(document.querySelectorAll('a[href]'));
+        const mapped = [];
+        for (const link of links) {
+          const text = link.innerText.trim();
+          const href = link.href;
+          // Ignorar enlaces vacíos, logout o javascript
+          if (text && href && href.includes('imo.crearpslglobal.com') && !href.includes('logout') && !href.includes('javascript')) {
+            mapped.push({ text, href: href.split('imo.crearpslglobal.com')[1] || href });
+          }
+        }
+        // Deduplicar
+        const unique = [];
+        const seen = new Set();
+        for (const item of mapped) {
+          if (!seen.has(item.href)) {
+            seen.add(item.href);
+            unique.push(item);
+          }
+        }
+        return unique;
+      });
+
+      console.log(`✅ [Agente 1 - Extractor] Mapeados ${navLinks.length} enlaces/módulos únicos.`);
+      return navLinks;
+    } catch (e) {
+      console.warn(`⚠️ [Agente 1 - Extractor] Error explorando módulos: ${e.message}`);
+      return [];
+    }
+  }
+
   async extractCoordinadores() {
     console.log("📊 [Agente 1 - Extractor] Extrayendo Actividad de Coordinadores (Todas las Sedes)...");
     await this.safeGoto('https://imo.crearpslglobal.com/actividadcoordinadores', 45000);
@@ -348,10 +396,20 @@ class NodusExtractorAgent {
     return equiposData;
   }
 
-  async extractFuturosImposibles() {
+  async extractFuturosImposibles(coordinadores = null) {
     console.log("🎯 [Agente 1 - Extractor] Extrayendo Futuros Imposibles multi-sede desde NODUS...");
 
     const SEDES_CONOCIDAS = ['Lima', 'Quito', 'Cuenca', 'Guayaquil', 'Medellín', 'México', 'Bogotá'];
+
+    // Mapear equipos a sedes basado en RRHH para inferir sede real de los FIs
+    const equipoSedeMap = new Map();
+    if (coordinadores && Array.isArray(coordinadores)) {
+      coordinadores.forEach(c => {
+        if (c.sede && Array.isArray(c.equipos)) {
+          c.equipos.forEach(eq => equipoSedeMap.set(eq.trim().toLowerCase(), c.sede));
+        }
+      });
+    }
 
     const first = (row, candidates) => {
       const found = Object.entries(row).find(([key]) => candidates.some((candidate) => key.includes(candidate)));
@@ -363,7 +421,11 @@ class NodusExtractorAgent {
     // Infiere sede desde la columna o, si vacía, desde el nombre del equipo
     const inferirSede = (equipo, sedeColumna) => {
       if (sedeColumna && sedeColumna.trim()) return sedeColumna.trim();
-      const eq = (equipo || '').toUpperCase();
+      const eqStr = (equipo || '').trim();
+      const eqLower = eqStr.toLowerCase();
+      if (equipoSedeMap.has(eqLower)) return equipoSedeMap.get(eqLower);
+
+      const eq = eqStr.toUpperCase();
       if (eq.includes('CUENCA')) return 'Cuenca';
       if (eq.includes('QUITO')) return 'Quito';
       if (eq.includes('GUAYAQUIL') || eq.includes('GYE')) return 'Guayaquil';
@@ -577,6 +639,7 @@ class NodusNormalizerAgent {
       const gestiones = findNumberAfter('Gestiones');
       const c1 = findNumberAfter('C1');
       const c2 = findNumberAfter('C2');
+      const mj = findNumberAfter('MJ') || findNumberAfter('Maestría') || findNumberAfter('Maestria') || findNumberAfter('Maestrias') || 0;
       const asignados = findNumberAfter('Asignados');
 
       // Cobertura
@@ -644,10 +707,11 @@ class NodusNormalizerAgent {
         email: infoOficial.email,
         sede,
         ciclo,
-        rol: c2 > 0 ? 'Coordinador C1 / C2' : 'Coordinador C1',
+        rol: (mj > 0 && c1 === 0 && c2 === 0) ? 'Coordinador Maestría' : (c2 > 0 ? 'Coordinador C1 / C2' : 'Coordinador C1'),
         gestiones,
         c1,
         c2,
+        mj,
         asignados,
         coberturaPct,
         coberturaDetalle,
@@ -679,7 +743,7 @@ class NodusNormalizerAgent {
       if (name.includes('admin') || email.includes('admin')) return false;
       if (name.includes('soporte') || email.includes('soporte')) return false;
       if (name.includes('factura') || email.includes('factura')) return false;
-      const hasActivity = (Number(c.c1) > 0 || Number(c.c2) > 0 || Number(c.gestiones) > 0 || Number(c.asignados) > 0);
+      const hasActivity = (Number(c.c1) > 0 || Number(c.c2) > 0 || Number(c.mj) > 0 || Number(c.gestiones) > 0 || Number(c.asignados) > 0);
       const hasEquipos = Array.isArray(c.equipos) && c.equipos.length > 0;
       return hasActivity && hasEquipos;
     });
@@ -698,7 +762,8 @@ class NodusNormalizerAgent {
           porConfirmarTotal: 0,
           asistieronTotal: 0,
           c1Total: 0,
-          c2Total: 0
+          c2Total: 0,
+          mjTotal: 0
         };
       }
       const s = sedesSummary[c.sede];
@@ -711,6 +776,7 @@ class NodusNormalizerAgent {
       s.asistieronTotal += c.asistieron;
       s.c1Total += c.c1;
       s.c2Total += c.c2;
+      s.mjTotal += (c.mj || 0);
     });
 
     // Totales globales
@@ -741,6 +807,55 @@ class NodusNormalizerAgent {
       equiposReporte: rawEquiposReporte || [],
       dashboardRaw: rawDashboard || {}
     };
+  }
+
+  recalculateTotals(normalized) {
+    const coordinadores = normalized.coordinadores;
+    const sedesSummary = {};
+    coordinadores.forEach(c => {
+      if (!sedesSummary[c.sede]) {
+        sedesSummary[c.sede] = {
+          sede: c.sede,
+          coordinadoresCount: 0,
+          gestionesTotal: 0,
+          asignadosTotal: 0,
+          confirmadosTotal: 0,
+          noContestaTotal: 0,
+          porConfirmarTotal: 0,
+          asistieronTotal: 0,
+          c1Total: 0,
+          c2Total: 0
+        };
+      }
+      const s = sedesSummary[c.sede];
+      s.coordinadoresCount += 1;
+      s.gestionesTotal += c.gestiones;
+      s.asignadosTotal += c.asignados;
+      s.confirmadosTotal += c.estados.confirmado;
+      s.noContestaTotal += c.estados.noContesta;
+      s.porConfirmarTotal += c.estados.porConfirmar;
+      s.asistieronTotal += c.asistieron;
+      s.c1Total += c.c1;
+      s.c2Total += c.c2;
+    });
+
+    const totales = {
+      totalCoordinadores: coordinadores.length,
+      totalGestiones: coordinadores.reduce((a, b) => a + b.gestiones, 0),
+      totalAsignados: coordinadores.reduce((a, b) => a + b.asignados, 0),
+      totalConfirmados: coordinadores.reduce((a, b) => a + b.estados.confirmado, 0),
+      totalNoContesta: coordinadores.reduce((a, b) => a + b.estados.noContesta, 0),
+      totalPorConfirmar: coordinadores.reduce((a, b) => a + b.estados.porConfirmar, 0),
+      totalSiguiente: coordinadores.reduce((a, b) => a + b.estados.siguiente, 0),
+      totalNoInteresa: coordinadores.reduce((a, b) => a + b.estados.noInteresa, 0),
+      totalAsistieron: coordinadores.reduce((a, b) => a + b.asistieron, 0),
+      coberturaPromedio: coordinadores.length ? Math.round(coordinadores.reduce((a, b) => a + b.coberturaPct, 0) / coordinadores.length) : 0,
+      productividadPromedio: coordinadores.length ? Math.round(coordinadores.reduce((a, b) => a + b.productividadPct, 0) / coordinadores.length) : 0,
+    };
+
+    normalized.totales = totales;
+    normalized.sedesSummary = Object.values(sedesSummary);
+    return normalized;
   }
 }
 
@@ -1005,6 +1120,7 @@ export async function runMultiAgentSync() {
 
     // Navegación SECUENCIAL blindada para evitar cancelaciones net::ERR_ABORTED
     console.log("Iniciando secuencia de extracción por etapas...");
+    const mapResult = await extractor.exploreAndMapModules();
     const rawDashboard = await extractor.extractDashboardData();
     const rawCoordinadores = await extractor.extractCoordinadores();
     const rawEquiposReporte = await extractor.extractActiveEquiposReporte();
@@ -1020,7 +1136,8 @@ export async function runMultiAgentSync() {
     const normalized = normalizer.normalizeData(rawCoordinadores, rawDashboard, rawEquiposReporte);
 
       // [Agente 8 - Identidad] Validar que NO haya usuarios inventados, y purgar renuncias
-      normalized.coordinadores = await identitySentinel.enforceIdentityTruth(normalized.coordinadores);
+      normalized.coordinadores = await identitySentinel.enforceIdentityTruth(normalized.coordinadores, 'C1_C2');
+      normalizer.recalculateTotals(normalized);
     await dispatcher.dispatch(normalized, rawData);
 
     // =========================================================================
@@ -1064,7 +1181,7 @@ export async function runMultiAgentSync() {
     console.log("\n🎯 [Agente 6 - Futuros Imposibles] Activando auditoría de metas post-PFD...");
     try {
       const fiAgent = new NodusFIAgent();
-      const participantesFI = await extractor.extractFuturosImposibles();
+      const participantesFI = await extractor.extractFuturosImposibles(normalized.coordinadores);
       if (participantesFI.length === 0) {
         throw new Error('NODUS no devolvió asistentes PFD verificables; se conserva el último snapshot FI.');
       }

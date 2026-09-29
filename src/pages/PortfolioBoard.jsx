@@ -114,7 +114,16 @@ export default function PortfolioBoard() {
   const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
   const tabParam = searchParams.get('tab');
-  const [viewMode, setViewMode] = useState(tabParam || 'predictor');
+  const isAuthorizedForPredictor = ['jose.sanchez@crearpsl.net', 'fer.aragon@crearpsl.net', 'fer.aragon@crearpsl.com', 'fer.arango@crearpsl.net', 'paul.sosa@crearpsl.net'].includes((currentUser?.email || '').toLowerCase());
+
+  const resolveTab = (tab) => {
+    if (!isAuthorizedForPredictor && ['predictor', 'active', 'resources'].includes(tab)) {
+      return 'rrhh_sentinel';
+    }
+    return tab || (isAuthorizedForPredictor ? 'predictor' : 'rrhh_sentinel');
+  };
+
+  const [viewMode, setViewMode] = useState(() => resolveTab(tabParam));
   const [coordinadoresRaw, setCoordinadoresRaw] = useState(() => nodusFallbackData?.coordinadores || []);
 
   // Estados de control para Centinela RRHH y Ranking
@@ -137,13 +146,14 @@ export default function PortfolioBoard() {
 
   useEffect(() => {
     if (tabParam && ['predictor', 'active', 'resources', 'rrhh_sentinel', 'futuros_imposibles'].includes(tabParam)) {
-      setViewMode(tabParam);
+      setViewMode(resolveTab(tabParam));
     }
-  }, [tabParam]);
+  }, [tabParam, isAuthorizedForPredictor]);
 
   const handleTabChange = (mode) => {
-    setViewMode(mode);
-    setSearchParams({ tab: mode });
+    const safeMode = resolveTab(mode);
+    setViewMode(safeMode);
+    setSearchParams({ tab: safeMode });
   };
   const [loading, setLoading] = useState(true);
   const [portfolio, setPortfolio] = useState([]);
@@ -533,51 +543,55 @@ export default function PortfolioBoard() {
               </select>
             </div>
             
-            <button 
-              onClick={() => handleTabChange('predictor')} 
-              style={{ 
-                padding: '0.5rem 1rem', 
-                borderRadius: '8px', 
-                border: viewMode === 'predictor' ? '1px solid #d97706' : `1px solid ${borderLight}`, 
-                background: viewMode === 'predictor' ? 'rgba(245, 158, 11, 0.18)' : 'transparent', 
-                color: viewMode === 'predictor' ? '#f59e0b' : textMuted, 
-                fontWeight: 700, 
-                cursor: 'pointer', 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '0.4rem' 
-              }}
-            >
-              <Sparkles size={16} /> Predictor Data Science
-            </button>
-            <button 
-              onClick={() => handleTabChange('active')} 
-              style={{ 
-                padding: '0.5rem 1rem', 
-                borderRadius: '8px', 
-                border: viewMode === 'active' ? '1px solid #3b82f6' : `1px solid ${borderLight}`, 
-                background: viewMode === 'active' ? 'rgba(59, 130, 246, 0.18)' : 'transparent', 
-                color: viewMode === 'active' ? '#38bdf8' : textMuted, 
-                fontWeight: 700, 
-                cursor: 'pointer' 
-              }}
-            >
-              Ciclos Activos
-            </button>
-            <button 
-              onClick={() => handleTabChange('resources')} 
-              style={{ 
-                padding: '0.5rem 1rem', 
-                borderRadius: '8px', 
-                border: viewMode === 'resources' ? '1px solid #3b82f6' : `1px solid ${borderLight}`, 
-                background: viewMode === 'resources' ? 'rgba(59, 130, 246, 0.18)' : 'transparent', 
-                color: viewMode === 'resources' ? '#38bdf8' : textMuted, 
-                fontWeight: 700, 
-                cursor: 'pointer' 
-              }}
-            >
-              Capacidad de Recursos
-            </button>
+            {isAuthorizedForPredictor && (
+              <>
+                <button 
+                  onClick={() => handleTabChange('predictor')} 
+                  style={{ 
+                    padding: '0.5rem 1rem', 
+                    borderRadius: '8px', 
+                    border: viewMode === 'predictor' ? '1px solid #d97706' : `1px solid ${borderLight}`, 
+                    background: viewMode === 'predictor' ? 'rgba(245, 158, 11, 0.18)' : 'transparent', 
+                    color: viewMode === 'predictor' ? '#f59e0b' : textMuted, 
+                    fontWeight: 700, 
+                    cursor: 'pointer', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '0.4rem' 
+                  }}
+                >
+                  <Sparkles size={16} /> Predictor Data Science
+                </button>
+                <button 
+                  onClick={() => handleTabChange('active')} 
+                  style={{ 
+                    padding: '0.5rem 1rem', 
+                    borderRadius: '8px', 
+                    border: viewMode === 'active' ? '1px solid #3b82f6' : `1px solid ${borderLight}`, 
+                    background: viewMode === 'active' ? 'rgba(59, 130, 246, 0.18)' : 'transparent', 
+                    color: viewMode === 'active' ? '#38bdf8' : textMuted, 
+                    fontWeight: 700, 
+                    cursor: 'pointer' 
+                  }}
+                >
+                  Ciclos Activos
+                </button>
+                <button 
+                  onClick={() => handleTabChange('resources')} 
+                  style={{ 
+                    padding: '0.5rem 1rem', 
+                    borderRadius: '8px', 
+                    border: viewMode === 'resources' ? '1px solid #3b82f6' : `1px solid ${borderLight}`, 
+                    background: viewMode === 'resources' ? 'rgba(59, 130, 246, 0.18)' : 'transparent', 
+                    color: viewMode === 'resources' ? '#38bdf8' : textMuted, 
+                    fontWeight: 700, 
+                    cursor: 'pointer' 
+                  }}
+                >
+                  Capacidad de Recursos
+                </button>
+              </>
+            )}
             <button 
               onClick={() => handleTabChange('rrhh_sentinel')} 
               style={{ 

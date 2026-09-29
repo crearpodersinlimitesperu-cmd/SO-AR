@@ -9,6 +9,7 @@
  * 2. Contrasta los usuarios extraídos de Nodus contra la lista oficial.
  * 3. Purga automáticamente a cualquier usuario inventado, falso, o que haya RENUNCIADO.
  * 4. Corrige nombres mal escritos en Nodus utilizando el "Nombre y Apellido Preferido".
+ * 5. Verifica el Cargo de manera estricta para no cruzar C1/C2 con Maestría del Juego.
  */
 
 export class NodusIdentityAgent {
@@ -38,23 +39,25 @@ export class NodusIdentityAgent {
     const idxNombre = headers.indexOf('Nombre');
     const idxPreferido = headers.indexOf('Nombre y Apellido Preferido');
     const idxStatus = headers.indexOf('STATUS');
+    // IMPORTANT: Find by partial match to avoid accent issues
+    const idxCargo = headers.findIndex(h => h.includes('Cargo'));
 
     const roster = [];
     for (let i = 1; i < lines.length; i++) {
-      // Simplistic CSV parse (handles commas inside quotes if needed, though basic split is fine for our specific sheet mostly)
-      // A better regex for CSV splitting:
       const row = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
       if (row.length <= idxNombre) continue;
 
       const fullNombre = row[idxNombre] ? row[idxNombre].replace(/"/g, '').trim() : '';
       const preferido = idxPreferido !== -1 && row[idxPreferido] ? row[idxPreferido].replace(/"/g, '').trim() : fullNombre;
       const status = idxStatus !== -1 && row[idxStatus] ? row[idxStatus].replace(/"/g, '').trim().toUpperCase() : '';
+      const cargo = idxCargo !== -1 && row[idxCargo] ? row[idxCargo].replace(/"/g, '').trim() : '';
 
       if (fullNombre) {
         roster.push({
           fullNombre,
           preferido,
           status,
+          cargo,
           renuncio: status.includes('RENUNCIO') || status.includes('BAJA')
         });
       }
@@ -69,8 +72,9 @@ export class NodusIdentityAgent {
   /**
    * Pasa un escáner de identidad a los coordinadores extraídos de Nodus,
    * eliminando inventados/renunciados y corrigiendo nombres oficiales.
+   * Si se provee tipoCargo ('C1_C2' o 'CMJ'), filtra estrictamente que el cargo en la sábana coincida.
    */
-  async enforceIdentityTruth(coordinadores) {
+  async enforceIdentityTruth(coordinadores, tipoCargo = null) {
     const roster = await this.fetchMasterRoster();
     if (roster.length === 0) {
       console.warn("⚠️ [Agente 8] Sábana maestra vacía o inaccesible, se omite el filtrado estricto por seguridad.");
@@ -85,21 +89,18 @@ export class NodusIdentityAgent {
     for (const c of coordinadores) {
       const nodusNameNorm = this.normalizeString(c.nombre || '');
       
-      // Buscar coincidencia en el roster oficial
       let match = null;
 
       for (const r of roster) {
         const fullNorm = this.normalizeString(r.fullNombre);
         const prefNorm = this.normalizeString(r.preferido);
 
-        // Lógica de coincidencia: si el nombre de Nodus está contenido en el nombre oficial completo o viceversa
         if (fullNorm.includes(nodusNameNorm) || nodusNameNorm.includes(fullNorm) ||
             prefNorm.includes(nodusNameNorm) || nodusNameNorm.includes(prefNorm)) {
           match = r;
           break;
         }
 
-        // Match parcial por primer nombre y primer apellido
         const nodusParts = nodusNameNorm.split(' ');
         if (nodusParts.length >= 2) {
           if (fullNorm.includes(nodusParts[0]) && fullNorm.includes(nodusParts[1])) {
@@ -110,20 +111,34 @@ export class NodusIdentityAgent {
       }
 
       if (!match) {
-        console.log(`   🚫 [Alucinación/Inventado Detectado] Eliminando coordinador Nodus no reconocido: "${c.nombre}"`);
+        console.log(`   ⛔ [Alucinación/Inventado Detectado] Eliminando coordinador Nodus no reconocido: "${c.nombre}"`);
         depurados++;
         continue;
       }
 
       if (match.renuncio) {
-        console.log(`   🛑 [Ex-Colaborador Detectado] Eliminando registro de Nodus para: "${match.preferido}" (RENUNCIÓ)`);
+        console.log(`   🚨 [Ex-Colaborador Detectado] Eliminando registro de Nodus para: "${match.preferido}" (RENUNCIÓ)`);
         depurados++;
         continue;
       }
 
-      // Si existe y no renunció, corregir su nombre al PREFERIDO OFICIAL
+      if (tipoCargo === 'C1_C2') {
+         const cargoOficialNorm = this.normalizeString(match.cargo || '');
+         if (!cargoOficialNorm.includes('capitulo uno y dos') && !cargoOficialNorm.includes('capitulo 1 y 2')) {
+           console.log(`   ❌ [Cruce de Campaña] Excluyendo a "${match.preferido}". Cargo oficial: "${match.cargo}" (NO es CC1/CC2).`);
+           depurados++;
+           continue;
+         }
+      } else if (tipoCargo === 'CMJ') {
+         const cargoOficialNorm = this.normalizeString(match.cargo || '');
+         if (!cargoOficialNorm.includes('maestria del juego')) {
+           console.log(`   ❌ [Cruce de Campaña] Excluyendo a "${match.preferido}". Cargo oficial: "${match.cargo}" (NO es CMJ).`);
+           depurados++;
+           continue;
+         }
+      }
+
       if (c.nombre !== match.preferido) {
-        // console.log(`   ✨ [Identidad Corregida] "${c.nombre}" -> Oficial: "${match.preferido}"`);
         c.nombreOriginalNodus = c.nombre;
         c.nombre = match.preferido;
         corregidos++;
@@ -132,9 +147,9 @@ export class NodusIdentityAgent {
       coordinadoresVerificados.push(c);
     }
 
-    console.log(`✅ [Agente 8 - Identidad] Auditoría de Veracidad Completa.`);
+    console.log(`✨ [Agente 8 - Identidad] Auditoría de Veracidad Completa.`);
     console.log(`   - 🛡️ Coordinadores Reales Confirmados: ${coordinadoresVerificados.length}`);
-    console.log(`   - 🗑️ Registros falsos/ex-empleados eliminados: ${depurados}`);
+    console.log(`   - 🗑️ Registros falsos/ex-empleados/cruzados eliminados: ${depurados}`);
     console.log(`   - ✨ Nombres normalizados a formato oficial: ${corregidos}`);
 
     return coordinadoresVerificados;

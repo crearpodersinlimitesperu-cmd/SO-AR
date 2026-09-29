@@ -718,7 +718,7 @@ export default function Home() {
   const { currentCycle, currentStage, events, loadingEvents, quitoCycles, quitoTeamOptions } = useCycles();
   const { tasks: allTasks, loading: loadingTasks, syncTasksToGoogle, acceptCollaboration, rejectCollaboration } = useChecklist();
   const { showToast, viewMode, setViewMode, customModules } = useUI();
-  const { themeMode, setThemeMode } = useTheme();
+  const { themeMode, setThemeMode, activeTheme } = useTheme();
   const { notifications, unreadCount, markAllAsRead, markAsRead } = useNotifications();
   const navigate = useNavigate();
 
@@ -1209,7 +1209,7 @@ export default function Home() {
     } else if (opt.action === 'venue_modal') {
       setShowVenueModal(true);
     } else if (opt.action === 'toggle_theme') {
-      const nextTheme = themeMode === 'dark' ? 'light' : (themeMode === 'light' ? 'auto' : 'dark');
+      const nextTheme = themeMode === 'dark' ? 'light' : (activeTheme === 'light' ? 'auto' : 'dark');
       setThemeMode?.(nextTheme);
       showToast?.(`Tema cambiado a: ${nextTheme === 'light' ? 'Día (Claro)' : nextTheme === 'dark' ? 'Noche (Oscuro)' : 'Automático'}`, 'info');
     } else if (opt.action === 'change_view') {
@@ -1383,57 +1383,66 @@ export default function Home() {
           </p>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginTop: '0.8rem', flexWrap: 'wrap' }}>
-            {/* ── RELOJ ECUADOR ── */}
+
+            {/* 📍 RELOJ LOCAL (Ubicación del Usuario) 📍 */}
             <div style={{
               display: 'flex', alignItems: 'center', gap: '0.35rem',
-              background: 'rgba(255,255,255,0.05)', borderRadius: '8px',
-              padding: '3px 8px', border: '1px solid rgba(255,255,255,0.1)'
+              background: activeTheme === 'light' ? '#f8fafc' : 'rgba(255,255,255,0.05)', borderRadius: '8px',
+              padding: '3px 8px', border: activeTheme === 'light' ? '1px solid #cbd5e1' : '1px solid rgba(255,255,255,0.1)'
             }}>
-              <img src={flagUrl('ec')} alt="Ecuador" style={{ width: '20px', height: '14px', objectFit: 'cover', borderRadius: '2px', flexShrink: 0 }} />
+              {localCountryCode ? (
+                <img src={flagUrl(localCountryCode)} alt="Tu Ubicación" style={{ width: '20px', height: '14px', objectFit: 'cover', borderRadius: '2px', flexShrink: 0 }} />
+              ) : (
+                <span style={{ fontSize: '14px' }}>📍</span>
+              )}
               <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
-                <span style={{ fontWeight: 'bold', fontSize: '0.92rem', color: '#e2e8f0', letterSpacing: '0.5px' }}>
-                  {getTimeInZone('America/Guayaquil')}
+                <span style={{ fontWeight: 'bold', fontSize: '0.92rem', color: activeTheme === 'light' ? '#0f172a' : '#e2e8f0', letterSpacing: '0.5px' }}>
+                  {time.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                 </span>
-                <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>
-                  {getDateInZone('America/Guayaquil')}
+                <span style={{ fontSize: '0.7rem', color: activeTheme === 'light' ? '#64748b' : '#94a3b8' }}>
+                  {time.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' }).replace('.', '')} (TÚ)
                 </span>
               </div>
             </div>
 
-            <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.9rem' }}>|</span>
+            <span style={{ color: activeTheme === 'light' ? '#cbd5e1' : 'rgba(255,255,255,0.2)', fontSize: '0.9rem' }}>|</span>
 
-            {/* ── RELOJ PERÚ ── */}
+            {/* 🇲🇽 RELOJ CDMX 🇲🇽 */}
             <div style={{
               display: 'flex', alignItems: 'center', gap: '0.35rem',
-              background: 'rgba(255,255,255,0.05)', borderRadius: '8px',
-              padding: '3px 8px', border: '1px solid rgba(255,255,255,0.1)'
+              background: activeTheme === 'light' ? '#f8fafc' : 'rgba(255,255,255,0.05)', borderRadius: '8px',
+              padding: '3px 8px', border: activeTheme === 'light' ? '1px solid #cbd5e1' : '1px solid rgba(255,255,255,0.1)'
             }}>
-              <img src={flagUrl('pe')} alt="Peru" style={{ width: '20px', height: '14px', objectFit: 'cover', borderRadius: '2px', flexShrink: 0 }} />
+              <img src={flagUrl('mx')} alt="Mexico" style={{ width: '20px', height: '14px', objectFit: 'cover', borderRadius: '2px', flexShrink: 0 }} />
               <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
-                <span style={{ fontWeight: 'bold', fontSize: '0.92rem', color: '#e2e8f0', letterSpacing: '0.5px' }}>
+                <span style={{ fontWeight: 'bold', fontSize: '0.92rem', color: activeTheme === 'light' ? '#0f172a' : '#e2e8f0', letterSpacing: '0.5px' }}>
+                  {getTimeInZone('America/Mexico_City')}
+                </span>
+                <span style={{ fontSize: '0.7rem', color: activeTheme === 'light' ? '#64748b' : '#94a3b8' }}>
+                  {getDateInZone('America/Mexico_City')}
+                </span>
+              </div>
+            </div>
+
+            <span style={{ color: activeTheme === 'light' ? '#cbd5e1' : 'rgba(255,255,255,0.2)', fontSize: '0.9rem' }}>|</span>
+
+            {/* 🇪🇨 🇵🇪 🇨🇴 RELOJ ECU/PER/COL (UTC-5) */}
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: '0.35rem',
+              background: activeTheme === 'light' ? '#f8fafc' : 'rgba(255,255,255,0.05)', borderRadius: '8px',
+              padding: '3px 8px', border: activeTheme === 'light' ? '1px solid #cbd5e1' : '1px solid rgba(255,255,255,0.1)'
+            }}>
+              <div style={{ display: 'flex', gap: '3px' }}>
+                <img src={flagUrl('ec')} alt="Ecuador" title="Ecuador" style={{ width: '20px', height: '14px', objectFit: 'cover', borderRadius: '2px', flexShrink: 0 }} />
+                <img src={flagUrl('pe')} alt="Peru" title="Perú" style={{ width: '20px', height: '14px', objectFit: 'cover', borderRadius: '2px', flexShrink: 0 }} />
+                <img src={flagUrl('co')} alt="Colombia" title="Colombia" style={{ width: '20px', height: '14px', objectFit: 'cover', borderRadius: '2px', flexShrink: 0 }} />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2, marginLeft: '2px' }}>
+                <span style={{ fontWeight: 'bold', fontSize: '0.92rem', color: activeTheme === 'light' ? '#0f172a' : '#e2e8f0', letterSpacing: '0.5px' }}>
                   {getTimeInZone('America/Lima')}
                 </span>
-                <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>
+                <span style={{ fontSize: '0.7rem', color: activeTheme === 'light' ? '#64748b' : '#94a3b8' }}>
                   {getDateInZone('America/Lima')}
-                </span>
-              </div>
-            </div>
-
-            <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.9rem' }}>|</span>
-
-            {/* ── RELOJ COLOMBIA ── */}
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: '0.35rem',
-              background: 'rgba(255,255,255,0.05)', borderRadius: '8px',
-              padding: '3px 8px', border: '1px solid rgba(255,255,255,0.1)'
-            }}>
-              <img src={flagUrl('co')} alt="Colombia" style={{ width: '20px', height: '14px', objectFit: 'cover', borderRadius: '2px', flexShrink: 0 }} />
-              <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
-                <span style={{ fontWeight: 'bold', fontSize: '0.92rem', color: '#e2e8f0', letterSpacing: '0.5px' }}>
-                  {getTimeInZone('America/Bogota')}
-                </span>
-                <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>
-                  {getDateInZone('America/Bogota')}
                 </span>
               </div>
             </div>
@@ -1451,7 +1460,7 @@ export default function Home() {
               gap: '5px'
             }}>
               <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981', display: 'inline-block', boxShadow: '0 0 6px #10b981' }}></span>
-              Causa OS v2.8.0
+              Causa OS v3.0.0
             </span>
           </div>
         </div>
@@ -1736,7 +1745,7 @@ export default function Home() {
             
             {/* Notificaciones */}
             <div style={{ position: 'relative' }} ref={notificationsRef}>
-              <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '6px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }} onClick={() => { setShowNotifications(!showNotifications); setShowToolsDropdown(false); }}>
+              <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '6px', background: activeTheme === 'light' ? '#f8fafc' : 'rgba(255,255,255,0.05)', borderRadius: '8px' }} onClick={() => { setShowNotifications(!showNotifications); setShowToolsDropdown(false); }}>
                 <Bell size={20} className="text-white" />
                 {unreadCount > 0 && (
                   <div style={{ position: 'absolute', top: '-4px', right: '-4px', background: 'var(--color-error)', color: 'white', borderRadius: '50%', width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.68rem', fontWeight: 'bold' }}>
@@ -2408,7 +2417,7 @@ export default function Home() {
                 <h3 className="text-main" style={{ margin: 0, fontSize: '1.1rem' }}>Mi Progreso General en el Ciclo</h3>
                 <span className="text-gold" style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>{progressPercentage}%</span>
               </div>
-              <div style={{ width: '100%', height: '10px', background: 'rgba(255,255,255,0.05)', borderRadius: '6px', overflow: 'hidden' }}>
+              <div style={{ width: '100%', height: '10px', background: activeTheme === 'light' ? '#f8fafc' : 'rgba(255,255,255,0.05)', borderRadius: '6px', overflow: 'hidden' }}>
                 <div style={{ height: '100%', width: `${progressPercentage}%`, background: 'var(--crear-gold)', transition: 'width 0.5s ease-out' }} />
               </div>
             </div>
@@ -2521,7 +2530,7 @@ export default function Home() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Buscar evento, trainer o lugar..."
-                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', padding: '0.25rem 0.5rem', borderRadius: '6px', fontSize: '0.78rem', width: '100%' }}
+                    style={{ background: activeTheme === 'light' ? '#f8fafc' : 'rgba(255,255,255,0.05)', border: activeTheme === 'light' ? '1px solid #cbd5e1' : '1px solid rgba(255,255,255,0.1)', color: 'white', padding: '0.25rem 0.5rem', borderRadius: '6px', fontSize: '0.78rem', width: '100%' }}
                   />
                 </div>
               </div>

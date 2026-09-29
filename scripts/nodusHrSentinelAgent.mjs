@@ -1,4 +1,4 @@
-﻿/**
+/**
  * =========================================================================
  * AGENTE 5: CENTINELA DE TALENTO HUMANO Y DESEMPEÑO (NodusHrSentinelAgent)
  * =========================================================================
@@ -19,6 +19,7 @@ if (!ROBOT_TOKEN) {
 
 // Mapeo oficial de Gerentes por Sede y Dirección Corporativa
 export const GERENTES_POR_SEDE = {
+  'Bogotá': ['gerencia.bogota@crearpsl.net'], // Placeholder Bogotá
   'Cuenca': ['emely.leon@crearpsl.net'], // July León
   'Guayaquil': ['josue.vera@crearpsl.net'], // Josué Vera
   'Lima': ['jose.sanchez@crearpsl.net'], // José Sánchez
@@ -79,26 +80,28 @@ export class NodusHrSentinelAgent {
       let motivo = '';
       let coachingFeedback = '';
 
+      const isCMJ = c.rol === 'Coordinador Maestría' || c.rol === 'Coordinador MJ';
       if (asignados > 0 && gestiones === 0) {
         nivelRiesgo = 'CRITICO';
         motivo = `Inactividad absoluta: 0 gestiones registradas teniendo ${asignados} participantes asignados.`;
-        coachingFeedback = `Pauta RRHH: El Gerente debe realizar un check-in 1:1 de 10 min. Verificar barreras de acceso técnico a Nodus, bloqueo emocional o falta de tiempo. Establecer compromiso de 5 llamadas en las próximas 3 horas.`;
+        coachingFeedback = isCMJ ? `Pauta RRHH (Maestría): Check-in urgente. Verificar si hay retención de base PFD/SFD/TFD y por qué no hay llamadas de rescate.` : `Pauta RRHH: El Gerente debe realizar un check-in 1:1 de 10 min. Verificar barreras de acceso técnico a Nodus, bloqueo emocional o falta de tiempo. Establecer compromiso de 5 llamadas en las próximas 3 horas.`;
       } else if (asignados > 10 && cobertura < 35) {
         nivelRiesgo = 'CRITICO';
         motivo = `Cobertura muy rezagada: solo ${cobertura}% (${gestiones}/${asignados}). Riesgo alto de abandono de participantes.`;
-        coachingFeedback = `Pauta RRHH: Revisar distribución de horarios. Asignar 'Power Hour' de llamadas concentradas con apoyo de un mentor o coordinador senior.`;
+        coachingFeedback = isCMJ ? `Pauta RRHH (Maestría): Revisar flujo de Maestría. Un CMJ debe tener contacto estrecho. Requerir barrido inmediato de rezagados.` : `Pauta RRHH: Revisar distribución de horarios. Asignar 'Power Hour' de llamadas concentradas con apoyo de un mentor o coordinador senior.`;
       } else if (gestiones > 5 && (noContesta / gestiones) > 0.6) {
         nivelRiesgo = 'MEDIO';
         motivo = `Cuello de botella en contactabilidad: ${(noContesta / gestiones * 100).toFixed(0)}% de llamadas marcan 'No Contesta'.`;
-        coachingFeedback = `Pauta RRHH: El coordinador está llamando en horarios no convenientes para el perfil de alumnos. Orientar hacia franjas de 12:30-14:00 o 18:30-20:30 y uso de mensaje previo por WhatsApp.`;
+        coachingFeedback = isCMJ ? `Pauta RRHH (Maestría): Revisar horarios de contacto. Maestría requiere seguimiento ejecutivo, intentar contacto asíncrono (WhatsApp) primero.` : `Pauta RRHH: El coordinador está llamando en horarios no convenientes para el perfil de alumnos. Orientar hacia franjas de 12:30-14:00 o 18:30-20:30 y uso de mensaje previo por WhatsApp.`;
       } else if (cobertura < 60) {
         nivelRiesgo = 'MEDIO';
         motivo = `Ritmo de gestión moderado: Cobertura al ${cobertura}%. Aún restan ${asignados - gestiones} participantes por contactar.`;
-        coachingFeedback = `Pauta RRHH: Refuerzo positivo y seguimiento diario al cierre del turno. Validar si requiere reasignación temporal de base.`;
+        coachingFeedback = isCMJ ? `Pauta RRHH (Maestría): Reforzar seguimiento de alumnos en etapa avanzada.` : `Pauta RRHH: Refuerzo positivo y seguimiento diario al cierre del turno. Validar si requiere reasignación temporal de base.`;
       } else {
         nivelRiesgo = 'OPTIMO';
-        motivo = `Excelente ritmo operativo (${cobertura}% de cobertura, ${confirmados} confirmaciones logradas).`;
-        coachingFeedback = `Pauta RRHH: Reconocimiento público en el canal de equipo. Posible candidato a apadrinar a coordinadores rezagados.`;
+        const metricaLograda = isCMJ ? `${c.mj || c.sentadosTotal || 0} sentados (Maestría)` : `${confirmados} confirmaciones logradas`;
+        motivo = `Excelente ritmo operativo (${cobertura}% de cobertura, ${metricaLograda}).`;
+        coachingFeedback = isCMJ ? `Pauta RRHH (Maestría): Excelente retención y contacto de Maestría.` : `Pauta RRHH: Reconocimiento público en el canal de equipo. Posible candidato a apadrinar a coordinadores rezagados.`;
       }
 
       
@@ -126,6 +129,7 @@ export class NodusHrSentinelAgent {
         nombre: c.nombre,
         sede: c.sede,
         ciclo: c.ciclo,
+        rol: c.rol || 'Coordinador',
         asignados,
         gestiones,
         coberturaPct: cobertura,

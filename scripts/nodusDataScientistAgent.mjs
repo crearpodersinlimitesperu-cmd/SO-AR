@@ -192,7 +192,7 @@ export class NodusDataScientistAgent {
     const html = await res.text();
 
     const sedesMaestria = [];
-    const sedesMatches = html.matchAll(/(Cuenca Ciclo 1|GUAYAQUIL CICLO 1|LIMA CICLO 1|MEDELLIN|MEXICO|QUITO CICLO 1)[\s\S]*?(?=Cuenca Ciclo 1|GUAYAQUIL CICLO 1|LIMA CICLO 1|MEDELLIN|QUITO CICLO 1|$)/gi);
+    const sedesMatches = html.matchAll(/(Cuenca Ciclo 1|GUAYAQUIL CICLO 1|LIMA CICLO 1|MEDELLIN|MEXICO|QUITO CICLO 1)[\s\S]*?(?=Cuenca Ciclo 1|GUAYAQUIL CICLO 1|LIMA CICLO 1|MEDELLIN|MEXICO|QUITO CICLO 1|$)/gi);
     
     for (const sm of sedesMatches) {
       const sedeRaw = sm[1];
@@ -293,7 +293,7 @@ export class NodusDataScientistAgent {
 
     await batch.commit();
     // Guardar documento consolidado de reconciliación
-    await this.db.collection('nodus_managers_reconciliados').doc('latest').set(, {
+    await this.db.collection('nodus_managers_reconciliados').doc('latest').set({
       robot_token: ROBOT_TOKEN,
       timestamp: new Date().toISOString(),
       totalManagers: reconciledList.length,
@@ -400,7 +400,7 @@ export class NodusDataScientistAgent {
         carteraTotalLocal,
         scoreSalud,
         semaforo,
-        etaCumplimiento: totalConfirmados > 50 ? 'En Ritmo (ProyecciÃ³n 100% alcanzable)' : 'Requiere aceleraciÃ³n de llamadas'
+        etaCumplimiento: totalConfirmados > 50 ? 'En Ritmo (Proyección 100% alcanzable)' : 'Requiere aceleración de llamadas'
       };
     }
 
@@ -470,14 +470,14 @@ export class NodusDataScientistAgent {
     console.log("💾 [Data Scientist] Publicando modelos predictivos en Firestore...");
     
     // 1. Guardar en nodus_predictor_portfolio/latest
-    await this.db.collection('nodus_predictor_portfolio').doc('latest').set(, {
+    await this.db.collection('nodus_predictor_portfolio').doc('latest').set({
       robot_token: ROBOT_TOKEN,
       timestamp: new Date().toISOString(),
       ...predictions
     }, { merge: true });
 
     // 2. Guardar prospectos deduplicados en nodus_prospectos_sin_pago/latest
-    await this.db.collection('nodus_prospectos_sin_pago').doc('latest').set(, {
+    await this.db.collection('nodus_prospectos_sin_pago').doc('latest').set({
       robot_token: ROBOT_TOKEN,
       timestamp: new Date().toISOString(),
       total: prospectosData.total,

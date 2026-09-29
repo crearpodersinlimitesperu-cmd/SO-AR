@@ -81,36 +81,12 @@ function resolveCoordinatorEmail(coord) {
 // Combinación robusta y resiliente con el catálogo multi-sede de nodusFallbackData
 // Garantiza que JAMÁS se pierdan las 6 sedes (Cuenca, Guayaquil, Lima, Medellín, México, Quito) ni los 22 coordinadores
 function mergeWithFallbackData(remoteData) {
-  if (!remoteData) return nodusFallbackData;
-  const fallbackCoords = Array.isArray(nodusFallbackData?.coordinadores) ? nodusFallbackData.coordinadores : [];
-  const remoteCoords = Array.isArray(remoteData?.coordinadores) ? remoteData.coordinadores : [];
-  
-  // Mapa indexado por nombre normalizado
-  const map = new Map();
-  fallbackCoords.forEach(c => {
-    if (c && c.nombre) map.set(c.nombre.toUpperCase().trim(), c);
-  });
-  remoteCoords.forEach(c => {
-    if (c && c.nombre) {
-      const key = c.nombre.toUpperCase().trim();
-      const existing = map.get(key) || {};
-      map.set(key, { ...existing, ...c });
-    }
-  });
-
-  const mergedCoords = Array.from(map.values());
-  
-  // Sedes combinadas
-  const fallbackSedes = nodusFallbackData?.sedes || {};
-  const remoteSedes = remoteData?.sedes || {};
-  const mergedSedes = { ...fallbackSedes, ...remoteSedes };
-
-  return {
-    ...nodusFallbackData,
-    ...remoteData,
-    coordinadores: mergedCoords,
-    sedes: mergedSedes
-  };
+  if (!remoteData || !remoteData.coordinadores || remoteData.coordinadores.length === 0) {
+    return nodusFallbackData;
+  }
+  // Si tenemos datos remotos, NUNCA combinamos con el fallback.
+  // La base de datos y el Identity Sentinel son la ÚNICA fuente de verdad.
+  return remoteData;
 }
 
 const COLORS = {
