@@ -26,9 +26,9 @@ jobs:
 
       - name: Create Service Account Key
         env:
-          FIREBASE_SERVICE_ACCOUNT_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
         run: |
-          echo "$FIREBASE_SERVICE_ACCOUNT_KEY" > centro-operativo-cpsl-3d05655c949c.json
+          echo "$GOOGLE_SERVICE_ACCOUNT_JSON" > centro-operativo-cpsl-3d05655c949c.json
 
       - name: Run Flight Monitor Agent
         run: |
