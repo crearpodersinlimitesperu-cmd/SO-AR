@@ -1355,7 +1355,10 @@ export default function MonitorVuelosCartas() {
                           <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#fff' }}>{flight.route.origin}</div>
                           <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{flight.route.originCity}</div>
                           <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#e2e8f0', marginTop: '4px' }}>
-                            {schedDep.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            <div style={{ color: '#38bdf8', fontSize: '0.75rem', marginBottom: '2px', fontWeight: 700 }}>
+                              {flight.schedule?.departureDate || schedDep.toLocaleDateString([], { timeZone: 'America/Guayaquil' })}
+                            </div>
+                            {schedDep.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'America/Guayaquil' })}
                           </div>
                         </div>
 
@@ -1373,7 +1376,10 @@ export default function MonitorVuelosCartas() {
                           <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#fff' }}>{flight.route.destination}</div>
                           <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{flight.route.destinationCity}</div>
                           <div style={{ fontSize: '0.85rem', fontWeight: 600, color: isDelayed ? '#f87171' : '#e2e8f0', marginTop: '4px' }}>
-                            {estArr.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            <div style={{ color: '#38bdf8', fontSize: '0.75rem', marginBottom: '2px', fontWeight: 700 }}>
+                              {estArr.toLocaleDateString([], { timeZone: 'America/Guayaquil' })}
+                            </div>
+                            {estArr.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'America/Guayaquil' })}
                           </div>
                         </div>
                       </div>

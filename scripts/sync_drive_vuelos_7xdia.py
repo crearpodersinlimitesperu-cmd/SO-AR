@@ -23,8 +23,8 @@ import fitz  # PyMuPDF
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 
-KEY_PATH = r"C:\Users\josem\Downloads\SO-AR\centro-operativo-cpsl-65ad52160f45.json"
-BASE_DIR = r"C:\Users\josem\Downloads\SO-AR"
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+KEY_PATH = os.path.join(BASE_DIR, "centro-operativo-cpsl-3d05655c949c.json")
 RAW_FILE = os.path.join(BASE_DIR, "vuelos_extracted_raw.json")
 TRACKER_FILES = [
     os.path.join(BASE_DIR, "public", "vuelos_tracker.json"),

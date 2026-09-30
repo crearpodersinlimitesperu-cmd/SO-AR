@@ -1,4 +1,5 @@
 import { getWhatsAppUrl } from '../utils/phoneUtils';
+import { recordAuditEvent } from '../services/auditService';
 import { useState, useEffect, useMemo } from 'react';
 import { calculateAutomaticDeadline } from '../utils/soarDates';
 import { useCycles } from '../context/CyclesContext';
@@ -467,6 +468,13 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
         action: 'USER_ROLES_UPDATED',
         details: `${user.name || user.email}: rol principal ${roleDraft}; roles [${selectedRoles.join(', ')}]; sede ${sedeDraft}.`
       });
+
+      // Mutate local user prop to reflect changes immediately in UI
+      user.role = roleDraft;
+      user.roles = selectedRoles;
+      user.sede = sedeDraft;
+      user.roleSedes = { ...(user.roleSedes || {}), [roleDraft]: sedeDraft };
+
       showToast(`Roles actualizados: ${selectedRoles.map(getRoleDisplayName).join(', ')} — sede principal ${sedeDraft}.`, 'success');
       setEditingRole(false);
     } catch (error) {

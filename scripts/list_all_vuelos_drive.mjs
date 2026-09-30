@@ -1,7 +1,12 @@
 import { google } from 'googleapis';
 import { writeFileSync } from 'fs';
 
-const keyPath = "C:\\Users\\josem\\Downloads\\SO-AR\\centro-operativo-cpsl-65ad52160f45.json";
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const keyPath = join(__dirname, "..", "centro-operativo-cpsl-3d05655c949c.json");
 
 const auth = new google.auth.GoogleAuth({
   keyFile: keyPath,

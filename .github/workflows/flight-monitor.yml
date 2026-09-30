@@ -1,0 +1,43 @@
+name: Nodus Flight Monitor Agent (7x Day)
+
+on:
+  schedule:
+    # 7 times a day. For example: 10:00, 13:00, 16:00, 19:00, 22:00, 01:00, 04:00 UTC
+    - cron: '0 1,4,10,13,16,19,22 * * *'
+  workflow_dispatch: # Permite ejecutarlo manualmente
+
+jobs:
+  sync_flights:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install PyMuPDF google-auth google-api-python-client
+
+      - name: Create Service Account Key
+        env:
+          FIREBASE_SERVICE_ACCOUNT_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
+        run: |
+          echo "$FIREBASE_SERVICE_ACCOUNT_KEY" > centro-operativo-cpsl-3d05655c949c.json
+
+      - name: Run Flight Monitor Agent
+        run: |
+          python scripts/sync_drive_vuelos_7xdia.py
+
+      - name: Commit Tracker File changes
+        run: |
+          git config --global user.name "Nodus Flight Agent"
+          git config --global user.email "nodus-flights@crearpsl.net"
+          git add public/vuelos_tracker.json dist/vuelos_tracker.json public/cartas/vuelos_tracker.json dist/cartas/vuelos_tracker.json
+          git commit -m "🤖 [Nodus] Sincronización automática de vuelos desde Drive" || echo "No changes to commit"
+          git push

@@ -1,0 +1,29 @@
+name: Nodus Traceability & Trust Agent
+
+on:
+  schedule:
+    # Corre todos los días a las 05:00 UTC (Media noche aprox en LatAm)
+    - cron: '0 5 * * *'
+  workflow_dispatch: # Permite ejecutarlo manualmente
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Dependencies
+        run: npm install firebase-admin
+
+      - name: Run Traceability Agent
+        env:
+          FIREBASE_SERVICE_ACCOUNT_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
+        run: |
+          node scripts/nodusTraceabilityAgent.mjs
