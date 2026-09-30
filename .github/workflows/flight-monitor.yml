@@ -38,6 +38,6 @@ jobs:
         run: |
           git config --global user.name "Nodus Flight Agent"
           git config --global user.email "nodus-flights@crearpsl.net"
-          git add public/vuelos_tracker.json dist/vuelos_tracker.json public/cartas/vuelos_tracker.json dist/cartas/vuelos_tracker.json
+          git add public/vuelos_tracker.json public/cartas/vuelos_tracker.json -f
           git commit -m "🤖 [Nodus] Sincronización automática de vuelos desde Drive" || echo "No changes to commit"
           git push
