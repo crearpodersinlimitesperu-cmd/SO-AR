@@ -185,7 +185,26 @@ def normalize_pax(raw_pax, file_path, file_name):
 
     return 'Entrenador Oficial'
 
-def get_destination_logistics(dest_code, orig_code):
+def get_destination_logistics(dest_code, orig_code, passenger_name=""):
+    # Check if passenger is returning to their home base
+    p = passenger_name.upper()
+    if 'BRAVO' in p and dest_code == 'UIO':
+        return {
+            'hotel': 'Retorno a Domicilio (Base Quito)',
+            'direccion': 'Quito, Ecuador',
+            'pickupLocation': 'Terminal de Arribos',
+            'driverPickupEstimated': 'N/A',
+            'driverNote': 'El entrenador retorna a su ciudad de residencia.'
+        }
+    if 'BOADA' in p and dest_code == 'BOG':
+        return {
+            'hotel': 'Retorno a Domicilio (Base Bogotá)',
+            'direccion': 'Bogotá, Colombia',
+            'pickupLocation': 'Terminal de Arribos',
+            'driverPickupEstimated': 'N/A',
+            'driverNote': 'El entrenador retorna a su ciudad de residencia.'
+        }
+
     if dest_code == 'UIO': return SEDES_LOGISTICA['Quito']
     if dest_code == 'GYE': return SEDES_LOGISTICA['Guayaquil']
     if dest_code == 'CUE': return SEDES_LOGISTICA['Cuenca']
@@ -360,7 +379,7 @@ def sync_from_drive():
                         airline_name = get_airline_name(fl_clean)
                         orig_info = AIRPORT_CITIES.get(orig_code, (orig_code, f"Aeropuerto {orig_code}", ""))
                         dest_info = AIRPORT_CITIES.get(dest_code, (dest_code, f"Aeropuerto {dest_code}", ""))
-                        log = get_destination_logistics(dest_code, orig_code)
+                        log = get_destination_logistics(dest_code, orig_code, norm_pax)
 
                         flights_dict[unique_key] = {
                             "flightNumber": fl_number,
@@ -445,9 +464,9 @@ def sync_from_drive():
                             elif not dest_code and w_l != orig_code:
                                 dest_code = w_l
 
-                        m_t1 = re.search(r'Departing At[^\d]*(\d{1,2}:\d{2})', w_l)
+                        m_t1 = re.search(r'(?:Departing At|Salida|Sale|Departure|Hora)[^\d]*(\d{1,2}:\d{2})', w_l, re.IGNORECASE)
                         if m_t1: dep_time = m_t1.group(1)
-                        m_t2 = re.search(r'Arriving At[^\d]*(\d{1,2}:\d{2})', w_l)
+                        m_t2 = re.search(r'(?:Arriving At|Llegada|Llega|Arrival)[^\d]*(\d{1,2}:\d{2})', w_l, re.IGNORECASE)
                         if m_t2: arr_time = m_t2.group(1)
 
                     if fl_num and orig_code and dest_code and orig_code != dest_code:
@@ -456,7 +475,7 @@ def sync_from_drive():
                         airline_name = get_airline_name(fl_clean)
                         orig_info = AIRPORT_CITIES.get(orig_code, (orig_code, f"Aeropuerto {orig_code}", ""))
                         dest_info = AIRPORT_CITIES.get(dest_code, (dest_code, f"Aeropuerto {dest_code}", ""))
-                        log = get_destination_logistics(dest_code, orig_code)
+                        log = get_destination_logistics(dest_code, orig_code, norm_pax)
 
                         dep_t = dep_time or '07:00'
                         arr_t = arr_time or '08:15'
@@ -569,7 +588,7 @@ def sync_from_drive():
                         unique_key = f"{fl_clean}_{dep_iso_date}_{orig_code}_{dest_code}"
                         orig_info = AIRPORT_CITIES.get(orig_code, (orig_code, f"Aeropuerto {orig_code}", ""))
                         dest_info = AIRPORT_CITIES.get(dest_code, (dest_code, f"Aeropuerto {dest_code}", ""))
-                        log = get_destination_logistics(dest_code, orig_code)
+                        log = get_destination_logistics(dest_code, orig_code, norm_pax)
 
                         flights_dict[unique_key] = {
                             "flightNumber": fl_number,
