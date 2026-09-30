@@ -1384,31 +1384,6 @@ export default function MonitorVuelosCartas() {
                         </div>
                       </div>
 
-                      {/* Logística de Arribo y Chofer */}
-                      <div style={{
-                        background: 'rgba(0,0,0,0.25)',
-                        border: '1px solid rgba(255,255,255,0.06)',
-                        borderRadius: '8px',
-                        padding: '10px 12px',
-                        fontSize: '0.8rem',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '6px'
-                      }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#94a3b8' }}>
-                          <MapPin size={13} color="#38bdf8" />
-                          <span>Punto: <strong>{flight.logistics?.pickupLocation || 'Puerta de Arribos'}</strong></span>
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#94a3b8' }}>
-                          <Clock size={13} color="var(--crear-gold)" />
-                          <span>Recojo Chofer: <strong style={{ color: '#fff' }}>{flight.logistics?.driverPickupEstimated || '30 min tras arribo'}</strong></span>
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#94a3b8' }}>
-                          <Building size={13} color="#34d399" />
-                          <span>Destino: <strong>{flight.logistics?.destination || 'Hotel de Sede'}</strong></span>
-                        </div>
-                      </div>
-
                       {flight.sourcePdf && (
                         <div style={{
                           marginTop: '8px',
@@ -1452,23 +1427,6 @@ export default function MonitorVuelosCartas() {
                           Radar en Vivo
                           <ExternalLink size={12} />
                         </a>
-
-                        <button
-                          onClick={() => copyDriverBriefing(flight)}
-                          className="btn-secondary"
-                          style={{
-                            fontSize: '0.8rem',
-                            padding: '8px 12px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '6px',
-                            color: '#25D366'
-                          }}
-                          title="Copiar mensaje de WhatsApp para el chofer"
-                        >
-                          <Share2 size={14} />
-                          WhatsApp Chofer
-                        </button>
                       </div>
 
                       {/* Cartas relacionadas directas */}
