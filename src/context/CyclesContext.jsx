@@ -118,6 +118,7 @@ const applyAsignadorProjection = (sourceEvents, assignments, operationalChanges)
     const confirmedTrainer = trainerFromAssignment(assignmentByKey.get(key));
     return {
       ...event,
+      __assignmentKey: key,
       ...(override ? {
         nombre: override.nombre || event.nombre, name: override.nombre || event.name,
         sede: override.sede || event.sede, sedeTag: override.sede || event.sedeTag,
@@ -132,6 +133,7 @@ const applyAsignadorProjection = (sourceEvents, assignments, operationalChanges)
   });
   (operationalChanges || []).filter(item => item.kind === 'custom').forEach(item => {
     result.push({
+      __assignmentKey: item.id,
       fecha_inicio: item.fechaInicio, fecha_fin: item.fechaFin || '', start: item.fechaInicio, end: item.fechaFin || '',
       nombre: item.nombre, name: item.nombre, sede: item.sede, sedeTag: item.sede,
       equipo: item.equipo || '', lugar: item.lugar || '', direccion: '', trainer: '', origen: 'causa_os'

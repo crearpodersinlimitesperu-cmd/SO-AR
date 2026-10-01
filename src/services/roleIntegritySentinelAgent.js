@@ -19,6 +19,7 @@ function cleanRoleName(role) {
 }
 
 export async function runRoleIntegrityAuditAndHeal(options = { dryRun: true }) {
+  const dryRun = options.dryRun !== false;
   const auditReport = {
     timestamp: new Date().toISOString(),
     totalUsersScanned: 0,
@@ -157,7 +158,7 @@ export async function runRoleIntegrityAuditAndHeal(options = { dryRun: true }) {
           issues
         });
 
-        if (!options.dryRun) {
+        if (!dryRun) {
           const updatePayload = {
             role: targetRole,
             roles: targetRoles,
@@ -173,7 +174,7 @@ export async function runRoleIntegrityAuditAndHeal(options = { dryRun: true }) {
       }
     });
 
-    if (!options.dryRun && pendingUpdates > 0) {
+    if (!dryRun && pendingUpdates > 0) {
       await batch.commit();
       console.log(`🛡️ [RoleIntegritySentinel] Éxito: ${pendingUpdates} usuarios sanados y actualizados en Firestore.`);
     }

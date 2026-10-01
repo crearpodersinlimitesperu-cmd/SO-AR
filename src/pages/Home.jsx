@@ -2565,7 +2565,7 @@ export default function Home() {
                         __assignmentKey: change.id,
                       }));
                     const profileEvents = (events || []).map(event => {
-                      const change = publishedOverrides[publicAssignmentEventKey(event)];
+                      const change = publishedOverrides[event.__assignmentKey || publicAssignmentEventKey(event)];
                       if (!change) return event;
                       return {
                         ...event,
@@ -2575,7 +2575,7 @@ export default function Home() {
                         equipo: change.equipo ?? event.equipo ?? event.team,
                         lugar: change.lugar || event.lugar || event.place,
                       };
-                    }).concat(publishedCustomEvents);
+                    }).concat(publishedCustomEvents.filter(custom => !(events || []).some(event => event.__assignmentKey === custom.__assignmentKey)));
                     const assignmentForEvent = (event) => publicTrainerAssignments[event.__assignmentKey || publicAssignmentEventKey(event)] || null;
                     const assignedTrainerNamesForEvent = (event) => confirmedTrainerNames(assignmentForEvent(event));
 
