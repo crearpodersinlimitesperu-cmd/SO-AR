@@ -1,0 +1,41 @@
+name: Zero-Touch Seguros Sentinel (RPA)
+
+on:
+  schedule:
+    # Run every day at 3:00 AM UTC
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+    # Allow manual triggers from CAUSA Admins
+
+jobs:
+  scan_and_update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Zero-Touch Sentinel
+        env:
+          # Required to authenticate with Google Drive API (GCP Service Account JSON string)
+          GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GCP_SA_CREDENTIALS }}
+          # Required to use the Gemini OCR
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          # Firebase config
+          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+          FIREBASE_CLIENT_EMAIL: ${{ secrets.FIREBASE_CLIENT_EMAIL }}
+          FIREBASE_PRIVATE_KEY: ${{ secrets.FIREBASE_PRIVATE_KEY }}
+        run: |
+          # The node googleapis auth looks for GOOGLE_APPLICATION_CREDENTIALS as a file path
+          echo $GOOGLE_APPLICATION_CREDENTIALS_JSON > sa-key.json
+          export GOOGLE_APPLICATION_CREDENTIALS="sa-key.json"
+          node scripts/segurosSentinelAgent.mjs
