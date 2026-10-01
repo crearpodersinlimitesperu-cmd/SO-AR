@@ -3,7 +3,7 @@ import {
   X, Clock, Shirt, Sparkles, CheckCircle2, ShieldCheck, Calendar, Info, 
   Briefcase, Building, UserCheck, Lock, Eye, Mail, MessageSquare, Send, 
   Save, Plus, Trash2, Edit2, Check, Users, AlertCircle, Copy, UserPlus, 
-  ChevronRight, MapPin
+  ChevronRight, MapPin, Activity, Target
 } from 'lucide-react';
 import { doc, getDoc, setDoc, onSnapshot, collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../services/firebase';
