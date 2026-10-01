@@ -1,0 +1,35 @@
+name: Nodus Massive Data Dump (PCFT)
+
+on:
+  workflow_dispatch:
+    # Triggered manually by CAUSA Admins via GitHub Actions UI
+
+jobs:
+  extract_data:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Nodus Data Dump (Marco PCFT)
+        env:
+          NODUS_USER: ${{ secrets.NODUS_USER }}
+          NODUS_PASSWORD: ${{ secrets.NODUS_PASSWORD }}
+        run: node scripts/nodusFullDataDump.mjs
+
+      - name: Upload Excel Master File
+        uses: actions/upload-artifact@v4
+        with:
+          name: Dump_Maestro_Nodus_${{ github.run_number }}
+          path: Dump_Maestro_Nodus.xlsx
+          retention-days: 7
