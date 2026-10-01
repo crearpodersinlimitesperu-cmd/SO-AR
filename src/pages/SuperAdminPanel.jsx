@@ -16,7 +16,7 @@ import UserProfileModal from '../components/UserProfileModal';
 import IAAuditor from '../components/IAAuditor';
 import TaskAssignmentModal from '../components/TaskAssignmentModal';
 import { getAllAuditLogs, recordAuditEvent, getAllUserConnections } from '../services/auditService';
-import { runRoleIntegrityAuditAndHeal } from '../services/roleIntegritySentinelAgent';
+import { runRoleIntegrityAuditAndHeal, applyReviewedRoleChanges } from '../services/roleIntegritySentinelAgent';
 
 import { USERS_TO_IMPORT } from '../data/usersToImport';
 
@@ -1123,6 +1123,23 @@ export default function SuperAdminPanel() {
   const [isHealingRoles, setIsHealingRoles] = useState(false);
   const [roleAuditModalData, setRoleAuditModalData] = useState(null);
 
+  const handleApplyReviewedRoles = async () => {
+    if (isHealingRoles || !roleAuditModalData?.healedUsers?.length) return;
+    const count = roleAuditModalData.healedUsers.length;
+    if (!window.confirm(`Guardar los cambios de rol mostrados en ${count} registros? Esto cambia los accesos de esas personas.`)) return;
+    setIsHealingRoles(true);
+    try {
+      await applyReviewedRoleChanges(roleAuditModalData, currentUser.email);
+      showToast(`${count} registros actualizados.`, 'success');
+      setRoleAuditModalData(null);
+      setRealUsersData(await getAllCompanyUsers());
+    } catch (error) {
+      showToast(error.message, 'error');
+    } finally {
+      setIsHealingRoles(false);
+    }
+  };
+
   const handleRunRoleIntegrityAgent = async () => {
     try {
       setIsHealingRoles(true);
@@ -1316,7 +1333,7 @@ export default function SuperAdminPanel() {
               title="Supervisa en línea que los roles no estén alterados, perdidos, inválidos ni colapsados en Coordinación Administrativa"
             >
               <ShieldCheck size={18} />
-              {isHealingRoles ? 'Sanando Roles...' : '🛡️ Integridad de Roles'}
+              {isHealingRoles ? 'Revisando roles...' : '🛡️ Integridad de Roles'}
             </button>
             <button 
               onClick={handleManualSync}
@@ -1558,11 +1575,11 @@ export default function SuperAdminPanel() {
               </div>
               <div style={{ background: 'rgba(56, 189, 248, 0.1)', padding: '0.8rem', borderRadius: '8px', textAlign: 'center', border: '1px solid rgba(56, 189, 248, 0.3)' }}>
                 <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: '#38bdf8' }}>{roleAuditModalData.rolesRepaired}</div>
-                <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Cargos Sanados</div>
+                <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Registros por revisar</div>
               </div>
               <div style={{ background: 'rgba(34, 197, 94, 0.1)', padding: '0.8rem', borderRadius: '8px', textAlign: 'center', border: '1px solid rgba(34, 197, 94, 0.3)' }}>
                 <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: '#22c55e' }}>{roleAuditModalData.duplicatesRemoved}</div>
-                <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Depurados</div>
+                <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Con roles inválidos</div>
               </div>
             </div>
 
@@ -1574,7 +1591,7 @@ export default function SuperAdminPanel() {
               </div>
             ) : (
               <div style={{ marginBottom: '1.2rem' }}>
-                <h4 style={{ fontSize: '0.9rem', color: '#f8fafc', marginBottom: '0.6rem' }}>Detalle de Colaboradores Reparados en Línea:</h4>
+                <h4 style={{ fontSize: '0.9rem', color: '#f8fafc', marginBottom: '0.6rem' }}>Cambios propuestos — aún no aplicados:</h4>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', maxHeight: '240px', overflowY: 'auto' }}>
                   {roleAuditModalData.healedUsers.map((u, idx) => (
                     <div key={idx} style={{ background: 'rgba(255,255,255,0.03)', padding: '0.6rem 0.8rem', borderRadius: '6px', borderLeft: '3px solid #38bdf8' }}>
@@ -1597,6 +1614,12 @@ export default function SuperAdminPanel() {
             )}
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1rem' }}>
+              {roleAuditModalData.healedUsers.length > 0 && (
+                <button className="btn-primary" disabled={isHealingRoles} onClick={handleApplyReviewedRoles}>
+                  {isHealingRoles ? 'Guardando...' : 'Aplicar cambios revisados'}
+                </button>
+              )}
+
               <button 
                 onClick={() => setRoleAuditModalData(null)}
                 className="btn-primary"

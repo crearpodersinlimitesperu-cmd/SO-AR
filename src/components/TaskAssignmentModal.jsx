@@ -281,6 +281,13 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
   // Filtrado de usuarios según área, sede y buscador de texto
   const activeArea = OPERATIONAL_AREAS.find(a => a.id === selectedAreaId) || OPERATIONAL_AREAS[0];
 
+  const matchesArea = (user, area) => [user.role, ...(user.roles || [])]
+    .filter(Boolean).some(role => area.filter({ ...user, role }));
+  const eligibleAreaUsers = (area) => activeUsersList.filter(user =>
+    user.isActive !== false && user.active !== false && user.status !== 'inactive' &&
+    (!selectedSedeFilter || normalizeSede(user.sede) === selectedSedeFilter) &&
+    matchesArea(user, area));
+
   const visibleUsers = activeUsersList.filter(u => {
     // Excluir colaboradores dados de baja / inactivos
     if (u.isActive === false || u.status === 'inactive' || u.active === false) return false;
@@ -306,7 +313,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
     }
 
     // 2. Si no hay texto en el buscador: aplicar pestañas de área y sede
-    if (!activeArea.filter(u)) return false;
+    if (!matchesArea(u, activeArea)) return false;
     
     if (selectedSedeFilter && normalizeSede(u.sede) !== selectedSedeFilter) {
       return false;
@@ -408,7 +415,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
     const assignedEmails = canAssignSpecific ? (newTask.assignedToEmails?.length > 0 ? newTask.assignedToEmails : [currentUser?.email]) : (prefilledUser?.email ? [prefilledUser.email] : [currentUser?.email]);
 
     // Obtener sedes y roles automáticos a partir de los colaboradores seleccionados:
-    const assignedUsers = assignedEmails.map(email => usersData.find(usr => usr.email?.toLowerCase() === email.toLowerCase())).filter(Boolean);
+    const assignedUsers = assignedEmails.map(email => activeUsersList.find(usr => usr.email?.toLowerCase() === email.toLowerCase())).filter(Boolean);
     const assignedRolesList = [...new Set(assignedUsers.map(u => normalizeRole(u.role)).filter(Boolean))];
     const assignedSedesList = [...new Set(assignedUsers.map(u => normalizeSede(u.sede)).filter(Boolean))];
 
@@ -423,7 +430,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
     // Inicializar mapa de seguimiento individual en una sola tarjeta:
     const assigneeProgress = {};
     assignedEmails.forEach(email => {
-      const u = usersData.find(usr => usr.email?.toLowerCase() === email.toLowerCase());
+      const u = activeUsersList.find(usr => usr.email?.toLowerCase() === email.toLowerCase());
       assigneeProgress[email] = {
         name: u?.name || email,
         role: u?.role || finalRole || 'colaborador',
@@ -967,7 +974,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                   ) : (
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem', paddingTop: '2px' }}>
                       {newTask.assignedToEmails.map(email => {
-                        const u = usersData.find(usr => usr.email?.toLowerCase() === email.toLowerCase());
+                        const u = activeUsersList.find(usr => usr.email?.toLowerCase() === email.toLowerCase());
                         const roleLabel = u ? getRoleDisplayName(u.role) : '';
                         const sedeLabel = u ? normalizeSede(u.sede) : '';
                         const flag = getSedeFlag(sedeLabel);
@@ -1251,7 +1258,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                   </div>
                   <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
                     {QUICK_ASSIGN_AREAS.map(area => {
-                      const matchingEmails = usersData.filter(area.filter).map(u => u.email).filter(Boolean);
+                      const matchingEmails = eligibleAreaUsers(area).map(u => u.email).filter(Boolean);
                       const isAllSelected = matchingEmails.length > 0 && matchingEmails.every(em => newTask.assignedToEmails?.some(e => e.toLowerCase() === em.toLowerCase()));
                       return (
                         <button
@@ -1362,7 +1369,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                   ) : (
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem', maxHeight: modalViewMode === 'compact' ? '85px' : '110px', overflowY: 'auto', paddingTop: '2px' }}>
                       {newTask.assignedToEmails.map(email => {
-                        const u = usersData.find(usr => usr.email?.toLowerCase() === email.toLowerCase());
+                        const u = activeUsersList.find(usr => usr.email?.toLowerCase() === email.toLowerCase());
                         const roleLabel = u ? getRoleDisplayName(u.role) : '';
                         const sedeLabel = u ? normalizeSede(u.sede) : '';
                         const flag = getSedeFlag(sedeLabel);
@@ -1472,7 +1479,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                     <div style={{ display: 'flex', gap: '0.3rem', overflowX: 'auto', flex: 1, minWidth: '240px', paddingBottom: '2px' }}>
                       {OPERATIONAL_AREAS.map(area => {
                         const isAreaActive = !isSearching && selectedAreaId === area.id;
-                        const areaUsers = usersData.filter(area.filter);
+                        const areaUsers = eligibleAreaUsers(area);
                         const selectedCountInArea = areaUsers.filter(u => newTask.assignedToEmails?.some(em => em.toLowerCase() === u.email?.toLowerCase())).length;
 
                         return (

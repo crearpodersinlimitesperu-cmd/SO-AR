@@ -368,7 +368,7 @@ service cloud.firestore {
     // NODUS: mecanismo del robot y acceso gerencial/autenticado
     match /nodus_kpis_sincronizados/{document=**} {
       allow read: if isAuthenticated();
-      allow write: if isSuperAdmin() || isGerenteODireccion() || (request.resource.data != null && request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET");
+      allow write: if isSuperAdmin() || isGerenteODireccion();
     }
 
     // FUTUROS IMPOSIBLES: NODUS conserva la fuente; Causa OS solo consume
@@ -488,7 +488,7 @@ service cloud.firestore {
     }
     match /nodus_coordinadores_c1c2/{document=**} {
       allow read: if isAuthenticated();
-      allow write: if isSuperAdmin() || isGerenteODireccion() || (request.resource.data != null && request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET");
+      allow write: if isSuperAdmin() || isGerenteODireccion();
     }
     match /graduados_lineage_master/{document=**} {
       allow read: if isAuthenticated();

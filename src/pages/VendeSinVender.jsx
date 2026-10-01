@@ -10,7 +10,7 @@ import { useUI } from '../context/UIContext';
 
 export default function VendeSinVender() {
   const navigate = useNavigate();
-  const { showToast } = useUI ? useUI() : { showToast: (m) => alert(m) };
+  const { showToast } = useUI();
 
   // Capítulo activo: 'bienvenida' | 'cap1' | 'cap2' | 'cap3' | 'cap4' | 'cap5' | 'cap6' | 'epilogo'
   const [activeChapter, setActiveChapter] = useState('bienvenida');

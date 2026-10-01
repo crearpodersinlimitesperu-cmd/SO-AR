@@ -1,3 +1,4 @@
+import { canonicalSede } from './sede.js';
 /**
  * SO-AR - Normalizador Canónico de Usuarios
  * Implementación de la Fase 3 de la Auditoría
@@ -99,24 +100,7 @@ export const normalizeRoles = (rolesArray, mainRole) => {
 };
 
 // 4. Normalización de Sede
-export const normalizeSede = (sede) => {
-  if (!sede) return 'Global';
-  const s = sede.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-  
-  if (s === 'med' || s.includes('medellin')) return 'Medellín';
-  if (s === 'lim' || s.includes('lima')) return 'Lima';
-  if (s === 'cue' || s.includes('cuenca')) return 'Cuenca';
-  if (s === 'gye' || s.includes('guayaquil')) return 'Guayaquil';
-  if (s === 'mex' || s.includes('mexico')) return 'México';
-  if (s === 'uio-c1' || s.includes('ciclo 1') || s.includes('ciclo1')) return 'Quito Ciclo 1';
-  if (s === 'uio-c2' || s.includes('ciclo 2') || s.includes('ciclo2')) return 'Quito Ciclo 2';
-  if (s === 'uio' || s.includes('quito')) return 'Quito Ciclo 1'; // Default as requested
-  if (s === 'int' || s.includes('internacional')) return 'Internacional';
-  if (s.includes('global')) return 'Global';
-  
-  // Si no coincide, capitalizar la primera letra y devolver
-  return sede.trim().charAt(0).toUpperCase() + sede.trim().slice(1);
-};
+export const normalizeSede = canonicalSede;
 
 // 5. Normalizar el Registro Completo (Modelo Canónico)
 export const normalizeUserRecord = (data, source = 'unknown') => {
@@ -127,11 +111,11 @@ export const normalizeUserRecord = (data, source = 'unknown') => {
   const emailsArray = Array.isArray(data.emails) ? data.emails.map(normalizeEmail) : (email ? [email] : []);
   
   // Determinar correo corporativo vs personal de forma heurística simple
-  const corporateEmail = data.corporateEmail ? normalizeEmail(data.corporateEmail) : (emailsArray.find(e => e.includes('@crearpsl.net')) || null);
-  const personalEmail = data.personalEmail ? normalizeEmail(data.personalEmail) : (emailsArray.find(e => !e.includes('@crearpsl.net')) || null);
+  const corporateEmail = data.corporateEmail ? normalizeEmail(data.corporateEmail) : (emailsArray.find(e => e && e.includes('@crearpsl.net')) || null);
+  const personalEmail = data.personalEmail ? normalizeEmail(data.personalEmail) : (emailsArray.find(e => e && !e.includes('@crearpsl.net')) || null);
 
   const nRoles = normalizeRoles(data.roles, data.role);
-  const nRole = nRoles.length > 0 ? nRoles[0] : 'miembro'; // Rol principal por defecto
+  const nRole = data.role ? normalizeRole(data.role) : nRoles[0]; // Respetar el rol principal explícito.
   const activeRole = data.activeRole ? normalizeRole(data.activeRole) : nRole;
   
   const nSede = normalizeSede(data.sede);

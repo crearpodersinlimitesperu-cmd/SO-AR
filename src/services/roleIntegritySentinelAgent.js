@@ -1,5 +1,5 @@
 import { db } from './firebase';
-import { collection, getDocs, doc, writeBatch } from 'firebase/firestore';
+import { collection, getDocs, doc, writeBatch, runTransaction, serverTimestamp } from 'firebase/firestore';
 import { usersData, normalizeRole, findUserByAnyEmail, ROLE_DISPLAY_NAMES } from '../data/usersData';
 import { DUAL_ROLE_TRAINER_EMAILS } from '../config/permissions';
 
@@ -18,7 +18,7 @@ function cleanRoleName(role) {
   return role.toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
 }
 
-export async function runRoleIntegrityAuditAndHeal(options = { dryRun: false }) {
+export async function runRoleIntegrityAuditAndHeal(options = { dryRun: true }) {
   const auditReport = {
     timestamp: new Date().toISOString(),
     totalUsersScanned: 0,
@@ -60,7 +60,7 @@ export async function runRoleIntegrityAuditAndHeal(options = { dryRun: false }) 
       if (targetRoles.length !== originalRolesCount) {
         needsUpdate = true;
         auditReport.duplicatesRemoved++;
-        issues.push("Roles duplicados o inválidos depurados");
+        issues.push("Roles duplicados o inválidos detectados");
       }
 
       // 2. DETECCIÓN DE COLAPSO: Si el rol está en 'coordinador' genérico o alterado
@@ -73,21 +73,21 @@ export async function runRoleIntegrityAuditAndHeal(options = { dryRun: false }) 
         if ((rawRole === 'coordinador' || rawRole === 'coordinadora' || rawRole === 'miembro' || rawRole === 'colaborador') && canonicalOfficial !== 'coordinador') {
           targetRole = canonicalOfficial;
           needsUpdate = true;
-          issues.push(`Rol alterado/colapsado corregido: '${rawRole}' -> '${canonicalOfficial}' (${ROLE_DISPLAY_NAMES[canonicalOfficial] || canonicalOfficial})`);
+          issues.push(`Cambio de rol propuesto: '${rawRole}' -> '${canonicalOfficial}' (${ROLE_DISPLAY_NAMES[canonicalOfficial] || canonicalOfficial})`);
         }
 
         // Asegurar que su rol oficial esté presente en targetRoles
         if (!targetRoles.includes(canonicalOfficial)) {
           targetRoles.push(canonicalOfficial);
           needsUpdate = true;
-          issues.push(`Rol oficial inyectado: '${canonicalOfficial}'`);
+          issues.push(`Rol oficial faltante: '${canonicalOfficial}'`);
         }
 
         // Si tiene un rol de coordinación específico, PURGAR el rol genérico 'coordinador'
         if ((canonicalOfficial === 'coord_c1' || canonicalOfficial === 'coord_maestria' || canonicalOfficial === 'director_maestria') && targetRoles.includes('coordinador')) {
           targetRoles = targetRoles.filter(r => r !== 'coordinador');
           needsUpdate = true;
-          issues.push("Rol genérico 'coordinador' purgado para evitar colapso administrativo");
+          issues.push("Rol genérico 'coordinador' a retirar para evitar colapso administrativo");
         }
 
         // Si es coordinador oficial y NO es dual trainer, PURGAR 'entrenador' espurio
@@ -137,11 +137,11 @@ export async function runRoleIntegrityAuditAndHeal(options = { dryRun: false }) 
       if (email === 'redessociales@crearpsl.net' && targetName !== 'Alex Zapata') {
         targetName = 'Alex Zapata';
         needsUpdate = true;
-        issues.push("Nombre corregido a persona real: 'Alex Zapata'");
+        issues.push("Nombre propuesto a persona real: 'Alex Zapata'");
       } else if (officialProfile?.name && (!targetName || targetName.toLowerCase().trim() === 'redes sociales')) {
         targetName = officialProfile.name;
         needsUpdate = true;
-        issues.push(`Nombre corregido desde catálogo oficial: '${officialProfile.name}'`);
+        issues.push(`Nombre propuesto desde catálogo oficial: '${officialProfile.name}'`);
       }
 
       if (needsUpdate) {
@@ -150,7 +150,8 @@ export async function runRoleIntegrityAuditAndHeal(options = { dryRun: false }) 
           docId,
           name: targetName || name || email,
           email,
-          previousRole: uData.role,
+          previousRole: uData.role || null,
+          previousRoles: Array.isArray(uData.roles) ? uData.roles : null,
           repairedRole: targetRole,
           repairedRoles: targetRoles,
           issues
@@ -184,4 +185,33 @@ export async function runRoleIntegrityAuditAndHeal(options = { dryRun: false }) 
     auditReport.error = error.message;
     return auditReport;
   }
+}
+// Apply only the reviewed role proposals, and reject stale reports atomically.
+export async function applyReviewedRoleChanges(report, actorEmail) {
+  const proposals = report?.healedUsers || [];
+  if (!actorEmail || !proposals.length || proposals.length > 100) {
+    throw new Error('No hay una propuesta válida para guardar.');
+  }
+  await runTransaction(db, async transaction => {
+    const records = await Promise.all(proposals.map(p => transaction.get(doc(db, 'users', p.docId))));
+    records.forEach((snapshot, index) => {
+      const proposal = proposals[index];
+      const current = snapshot.data();
+      if (!snapshot.exists() ||
+          (current.role || null) !== proposal.previousRole ||
+          JSON.stringify(Array.isArray(current.roles) ? current.roles : null) !== JSON.stringify(proposal.previousRoles) ||
+          (current.email || current.correo || '').trim().toLowerCase() !== proposal.email) {
+        throw new Error('Una ficha cambió desde la revisión. Ejecuta otra auditoría antes de guardar.');
+      }
+    });
+    proposals.forEach(proposal => transaction.update(doc(db, 'users', proposal.docId), {
+      role: proposal.repairedRole,
+      roles: proposal.repairedRoles,
+      rolesUpdatedAt: serverTimestamp(),
+      rolesUpdatedBy: actorEmail,
+      rolesAuditPreviousRole: proposal.previousRole,
+      rolesAuditPreviousRoles: proposal.previousRoles
+    }));
+  });
+  return proposals.length;
 }
