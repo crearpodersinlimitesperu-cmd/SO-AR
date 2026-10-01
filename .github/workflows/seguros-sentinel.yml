@@ -2,10 +2,9 @@ name: Zero-Touch Seguros Sentinel (RPA)
 
 on:
   schedule:
-    # Run every day at 3:00 AM UTC
+    # Corre todos los días a las 3:00 AM UTC
     - cron: '0 3 * * *'
   workflow_dispatch:
-    # Allow manual triggers from CAUSA Admins
 
 jobs:
   scan_and_update:
@@ -26,16 +25,24 @@ jobs:
 
       - name: Run Zero-Touch Sentinel
         env:
-          # Required to authenticate with Google Drive API (GCP Service Account JSON string)
-          GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GCP_SA_CREDENTIALS }}
-          # Required to use the Gemini OCR
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          # Firebase config
           FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
           FIREBASE_CLIENT_EMAIL: ${{ secrets.FIREBASE_CLIENT_EMAIL }}
           FIREBASE_PRIVATE_KEY: ${{ secrets.FIREBASE_PRIVATE_KEY }}
         run: |
-          # The node googleapis auth looks for GOOGLE_APPLICATION_CREDENTIALS as a file path
-          echo $GOOGLE_APPLICATION_CREDENTIALS_JSON > sa-key.json
+          # Construir el JSON de la Service Account dinámicamente usando las variables de Firebase ya existentes
+          cat <<EOF > sa-key.json
+          {
+            "type": "service_account",
+            "project_id": "${FIREBASE_PROJECT_ID}",
+            "private_key": "${FIREBASE_PRIVATE_KEY}",
+            "client_email": "${FIREBASE_CLIENT_EMAIL}",
+            "client_id": "1234567890",
+            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+            "token_uri": "https://oauth2.googleapis.com/token",
+            "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+            "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/${FIREBASE_CLIENT_EMAIL}"
+          }
+          EOF
           export GOOGLE_APPLICATION_CREDENTIALS="sa-key.json"
           node scripts/segurosSentinelAgent.mjs
