@@ -23,10 +23,21 @@ const CausaOSTask = () => {
       
       usersSnap.forEach(userDoc => {
         const u = userDoc.data();
+        let userHasTargetRole = false;
+
         if (targetRoles.includes(u.role) || targetRoles.includes(u.appRole)) {
-          if (u.email) {
+            userHasTargetRole = true;
+        }
+
+        // Revisar array de multiples roles si existe
+        if (Array.isArray(u.roles)) {
+            if (u.roles.some(r => targetRoles.includes(r))) {
+                userHasTargetRole = true;
+            }
+        }
+
+        if (userHasTargetRole && u.email) {
             targetEmails.push(u.email.toLowerCase().trim());
-          }
         }
       });
       
