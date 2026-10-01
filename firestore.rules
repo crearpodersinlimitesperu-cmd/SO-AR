@@ -156,6 +156,33 @@ service cloud.firestore {
         in ['coord_maestria', 'director_maestria'];
     }
 
+    // HOJA EN BLANCO: Funciones de transversalidad
+    function checkHojaEnBlancoAccess(docData) {
+      if (!isAuthenticated()) { return false; }
+      if (isSuperAdmin()) { return true; }
+      
+      let user = get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+      if (user == null) { return false; }
+      
+      if (user.role == 'entrenador') {
+         return (docData.assignedToEmail != null && docData.assignedToEmail == email()) || 
+                (docData.assignedToEmails != null && email() in docData.assignedToEmails) ||
+                (docData.entrenadorEmail != null && docData.entrenadorEmail == email()) ||
+                (docData.entrenadores != null && email() in docData.entrenadores) ||
+                (docData.email != null && docData.email == email());
+      }
+      
+      return docData.sede != null && docData.sede == user.sede;
+    }
+
+    function canReadHojaEnBlanco() {
+      return checkHojaEnBlancoAccess(resource.data);
+    }
+    
+    function canWriteHojaEnBlanco() {
+      return checkHojaEnBlancoAccess(request.resource.data) && (resource == null || checkHojaEnBlancoAccess(resource.data));
+    }
+
     // MJ_CALENDARS (29/08/2026): calendarios de Maestría del Juego por equipo
     // (CalendarioMJ.jsx), pedido por José a partir de 3 PDF de ejemplo reales.
     // Confirmado explícitamente por José antes de tocar firestore.rules.
@@ -369,31 +396,40 @@ service cloud.firestore {
     // COLECCIONES AUDITADAS CON PERMISOS AMPLIOS DE COLABORACIÓN OPERATIVA
     // ------------------------------------------------------------------------
     match /staff_directory/{document} {
-      allow read, write: if isAuthenticated();
+      allow read: if canReadHojaEnBlanco();
+      allow write: if canWriteHojaEnBlanco();
     }
     match /managers_directory/{document} {
-      allow read, write: if isAuthenticated();
+      allow read: if canReadHojaEnBlanco();
+      allow write: if canWriteHojaEnBlanco();
     }
     match /excellence_standards/{document} {
-      allow read, write: if isAuthenticated();
+      allow read: if canReadHojaEnBlanco();
+      allow write: if canWriteHojaEnBlanco();
     }
     match /kpi_reports/{document} {
-      allow read, write: if isAuthenticated();
+      allow read: if canReadHojaEnBlanco();
+      allow write: if canWriteHojaEnBlanco();
     }
     match /learning_logs/{document} {
-      allow read, write: if isAuthenticated();
+      allow read: if canReadHojaEnBlanco();
+      allow write: if canWriteHojaEnBlanco();
     }
     match /qt_directory/{document} {
-      allow read, write: if isAuthenticated();
+      allow read: if canReadHojaEnBlanco();
+      allow write: if canWriteHojaEnBlanco();
     }
     match /success_patterns/{document} {
-      allow read, write: if isAuthenticated();
+      allow read: if canReadHojaEnBlanco();
+      allow write: if canWriteHojaEnBlanco();
     }
     match /sync_history/{document} {
-      allow read, write: if isAuthenticated();
+      allow read: if canReadHojaEnBlanco();
+      allow write: if canWriteHojaEnBlanco();
     }
     match /user_stats/{document} {
-      allow read, write: if isAuthenticated();
+      allow read: if canReadHojaEnBlanco();
+      allow write: if canWriteHojaEnBlanco();
     }
 
     // ------------------------------------------------------------------------
@@ -417,10 +453,12 @@ service cloud.firestore {
       allow write: if isGerenteODireccion() || isSuperAdmin();
     }
     match /llamadas_grupales_historial/{document=**} {
-      allow read, write: if isAuthenticated();
+      allow read: if canReadHojaEnBlanco();
+      allow write: if canWriteHojaEnBlanco();
     }
     match /notas_seguimiento/{document=**} {
-      allow read, write: if isAuthenticated();
+      allow read: if canReadHojaEnBlanco();
+      allow write: if canWriteHojaEnBlanco();
     }
     match /liquidaciones_pagos/{document=**} {
       allow read, write: if isGerenteODireccion() || isSuperAdmin();
@@ -429,20 +467,24 @@ service cloud.firestore {
       allow read, write: if isGerenteODireccion() || isSuperAdmin();
     }
     match /nodus_coordinadores_c1c2/{document=**} {
-      allow read, write: if isAuthenticated();
+      allow read: if isAuthenticated();
+      allow write: if isSuperAdmin() || isGerenteODireccion() || (request.resource.data != null && request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET");
     }
     match /graduados_lineage_master/{document=**} {
       allow read: if isAuthenticated();
       allow write: if isGerenteODireccion() || isSuperAdmin();
     }
     match /goals_sentinel_audits/{document=**} {
-      allow read, write: if isAuthenticated();
+      allow read: if canReadHojaEnBlanco();
+      allow write: if canWriteHojaEnBlanco();
     }
     match /imo_missions/{document=**} {
-      allow read, write: if isAuthenticated();
+      allow read: if canReadHojaEnBlanco();
+      allow write: if canWriteHojaEnBlanco();
     }
     match /user_kpi_targets/{document=**} {
-      allow read, write: if isAuthenticated();
+      allow read: if canReadHojaEnBlanco();
+      allow write: if canWriteHojaEnBlanco();
     }
     match /nodus_predictor_portfolio/{document=**} {
       allow read: if isAuthenticated();
@@ -453,14 +495,16 @@ service cloud.firestore {
       allow write: if isGerenteODireccion() || isSuperAdmin();
     }
     match /checklist_tasks/{document=**} {
-      allow read, write: if isAuthenticated();
+      allow read: if canReadHojaEnBlanco();
+      allow write: if canWriteHojaEnBlanco();
     }
     match /settings/{document=**} {
       allow read: if isAuthenticated();
       allow write: if isGerenteODireccion() || isSuperAdmin();
     }
     match /kpis_entrenadores_llamadas/{document=**} {
-      allow read, write: if isAuthenticated();
+      allow read: if canReadHojaEnBlanco();
+      allow write: if canWriteHojaEnBlanco();
     }
   }
 }

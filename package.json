@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prebuild": "(python3 dump_code.py || python dump_code.py || cd .)",
+    "prebuild": "(python dump_code.py || py dump_code.py || echo \"Python no disponible localmente, saltando prebuild...\")",
     "build": "vite build",
     "lint": "oxlint",
     "preview": "vite preview",

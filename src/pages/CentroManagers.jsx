@@ -170,7 +170,13 @@ export default function CentroManagers() {
   const [isLoadingData, setIsLoadingData] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, 'managers_directory'), (querySnapshot) => {
+    if (!currentUser) return;
+    
+    const isGlobal = canViewAllManagers(currentUser) || isDireccionRole(currentUser) || ['jose.sanchez@crearpsl.net', 'armando.pilacuan@gmail.com', 'paul.sosa@crearpsl.net'].includes(currentUser?.email?.toLowerCase());
+    const baseCol = collection(db, 'managers_directory');
+    const q = (!isGlobal && currentUser.sede) ? query(baseCol, where('sede', '==', currentUser.sede)) : baseCol;
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const firestoreManagers = [];
       querySnapshot.forEach((doc) => {
         const data = doc.data() || {};
@@ -252,14 +258,19 @@ export default function CentroManagers() {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [currentUser]);
 
   // (02/09/2026) Historial de llamadas grupales — cada llamada registrada queda como
   // un documento nuevo (nunca se sobrescribe), para poder contar cuántas lleva cada
   // equipo. Es la base de la pestaña de Liquidación de Entrenadores.
   const [llamadasHistorial, setLlamadasHistorial] = useState([]);
   useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, 'llamadas_grupales_historial'), (querySnapshot) => {
+    if (!currentUser) return;
+    const isGlobal = canViewAllManagers(currentUser) || isDireccionRole(currentUser) || ['jose.sanchez@crearpsl.net', 'armando.pilacuan@gmail.com', 'paul.sosa@crearpsl.net'].includes(currentUser?.email?.toLowerCase());
+    const baseCol = collection(db, 'llamadas_grupales_historial');
+    const q = (!isGlobal && currentUser.sede) ? query(baseCol, where('sede', '==', currentUser.sede)) : baseCol;
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const rows = [];
       querySnapshot.forEach((doc) => rows.push({ id: doc.id, ...doc.data() }));
       setLlamadasHistorial(rows);
@@ -267,7 +278,7 @@ export default function CentroManagers() {
       console.error("Error leyendo llamadas_grupales_historial:", error);
     });
     return () => unsubscribe();
-  }, []);
+  }, [currentUser]);
 
   // (02/09/2026) Notas de Seguimiento post-llamada — feedback del entrenador de
   // llamadas (individual o grupal), usado para detectar y anticiparse a quiebres.
@@ -279,9 +290,16 @@ export default function CentroManagers() {
   const [notasSeguimiento, setNotasSeguimiento] = useState([]);
   useEffect(() => {
     if (!currentUser?.email) return;
-    const notasQuery = userCanViewAllNotas
-      ? collection(db, 'notas_seguimiento')
-      : query(collection(db, 'notas_seguimiento'), where('autorEmail', '==', currentUser.email));
+    const isGlobal = canViewAllManagers(currentUser) || isDireccionRole(currentUser) || ['jose.sanchez@crearpsl.net', 'armando.pilacuan@gmail.com', 'paul.sosa@crearpsl.net'].includes(currentUser?.email?.toLowerCase());
+    
+    let notasQuery;
+    if (userCanViewAllNotas) {
+      const baseCol = collection(db, 'notas_seguimiento');
+      notasQuery = (!isGlobal && currentUser.sede) ? query(baseCol, where('sede', '==', currentUser.sede)) : baseCol;
+    } else {
+      notasQuery = query(collection(db, 'notas_seguimiento'), where('autorEmail', '==', currentUser.email));
+    }
+
     const unsubscribe = onSnapshot(notasQuery, (querySnapshot) => {
       const rows = [];
       querySnapshot.forEach((doc) => rows.push({ id: doc.id, ...doc.data() }));
@@ -290,7 +308,7 @@ export default function CentroManagers() {
       console.error("Error leyendo notas_seguimiento:", error);
     });
     return () => unsubscribe();
-  }, [currentUser?.email, userCanViewAllNotas]);
+  }, [currentUser, userCanViewAllNotas]);
 
   // Registro de pagos ya liquidados a entrenadores (solo se carga si el usuario
   // tiene permiso de ver la pestaña, para no pedir datos que no va a poder leer).
