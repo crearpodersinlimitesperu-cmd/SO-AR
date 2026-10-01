@@ -2,6 +2,21 @@ import puppeteer from 'puppeteer';
 import 'dotenv/config';
 import { initializeApp } from "firebase/app";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
+import { initializeApp as initializeAdminApp, cert, getApps as getAdminApps } from 'firebase-admin/app';
+import { getFirestore as getAdminFirestore } from 'firebase-admin/firestore';
+
+function getAdminDb() {
+  const rawServiceAccount = process.env.GOOGLE_SERVICE_ACCOUNT_JSON || process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
+  if (!rawServiceAccount) return null;
+  try {
+    const serviceAccount = JSON.parse(rawServiceAccount);
+    const adminApp = getAdminApps().length ? getAdminApps()[0] : initializeAdminApp({ credential: cert(serviceAccount) });
+    return getAdminFirestore(adminApp);
+  } catch (err) {
+    console.warn("⚠️ No se pudo inicializar Firebase Admin:", err.message);
+    return null;
+  }
+}
 
 const ROBOT_TOKEN = process.env.ROBOT_TOKEN;
 if (!ROBOT_TOKEN) {
@@ -158,22 +173,31 @@ export async function runScraperWithDates(startDate = null, endDate = null, sede
     console.log("\n📊 Extracción finalizada.");
 
     // Si es un scrapeo en vivo (tiene fechas explícitas), no sobreescribimos el 'latest_snapshot' global.
-    if (!startDate && !endDate) {
-      console.log("Enviando a Firebase Firestore...");
-      const docId = `nodus_snapshot_${new Date().getTime()}`;
-      await setDoc(doc(db, 'nodus_kpis_sincronizados', docId), extractedData);
-      await setDoc(doc(db, 'nodus_kpis_sincronizados', 'latest_snapshot'), extractedData);
-      console.log(`✅ ¡Éxito! Datos guardados en la nube bajo el ID: ${docId}`);
+    const adminDb = getAdminDb();
+    if (adminDb) {
+      console.log("Enviando a Firebase Firestore (vía Admin SDK con credenciales de servicio)...");
+      if (!startDate && !endDate) {
+        const docId = `nodus_snapshot_${new Date().getTime()}`;
+        await adminDb.collection('nodus_kpis_sincronizados').doc(docId).set(extractedData);
+        await adminDb.collection('nodus_kpis_sincronizados').doc('latest_snapshot').set(extractedData);
+        console.log(`✅ ¡Éxito! Datos guardados en la nube bajo el ID: ${docId}`);
+      } else {
+        console.log("Enviando resultado filtrado a Firebase Firestore (live_filtered)...");
+        await adminDb.collection('nodus_kpis_sincronizados').doc('live_filtered').set(extractedData);
+        console.log("✅ ¡Éxito! Resultado filtrado guardado en 'live_filtered'.");
+      }
     } else {
-      // (02/09/2026) Scrapeo en vivo CON fechas — pedido de José para ver
-      // avance de CC1Y2/MJ por rango de fechas. Se guarda aparte, en un
-      // documento propio que SIEMPRE se sobreescribe con la última corrida
-      // filtrada, para que el frontend (que no puede correr Puppeteer) lo
-      // lea después de disparar la extracción vía GitHub Actions. Nunca toca
-      // 'latest_snapshot' (ese sigue siendo solo el snapshot diario sin filtro).
-      console.log("Enviando resultado filtrado a Firebase Firestore (live_filtered)...");
-      await setDoc(doc(db, 'nodus_kpis_sincronizados', 'live_filtered'), extractedData);
-      console.log("✅ ¡Éxito! Resultado filtrado guardado en 'live_filtered'.");
+      console.log("Enviando a Firebase Firestore (vía Client SDK)...");
+      if (!startDate && !endDate) {
+        const docId = `nodus_snapshot_${new Date().getTime()}`;
+        await setDoc(doc(db, 'nodus_kpis_sincronizados', docId), extractedData);
+        await setDoc(doc(db, 'nodus_kpis_sincronizados', 'latest_snapshot'), extractedData);
+        console.log(`✅ ¡Éxito! Datos guardados en la nube bajo el ID: ${docId}`);
+      } else {
+        console.log("Enviando resultado filtrado a Firebase Firestore (live_filtered)...");
+        await setDoc(doc(db, 'nodus_kpis_sincronizados', 'live_filtered'), extractedData);
+        console.log("✅ ¡Éxito! Resultado filtrado guardado en 'live_filtered'.");
+      }
     }
 
     return extractedData;
