@@ -1,12 +1,13 @@
 import { google } from 'googleapis';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import admin from 'firebase-admin';
+import { initializeApp, getApps } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore';
 
 // Initialize Firebase Admin (Using ADC in GitHub Actions / GCP)
-if (!admin.apps.length) {
-  admin.initializeApp();
+if (getApps().length === 0) {
+  initializeApp();
 }
-const db = admin.firestore();
+const db = getFirestore();
 
 // Initialize Gemini
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
