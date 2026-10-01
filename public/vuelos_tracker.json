@@ -1,8 +1,8 @@
 {
   "version": "3.2.0-ai-engine",
-  "updatedAt": "2026-10-01T16:53:56.519106Z",
+  "updatedAt": "2026-10-01T23:00:30.927145Z",
   "aiEngineStatus": "ACTIVE",
-  "totalPdfAnalyzed": 437,
+  "totalPdfAnalyzed": 440,
   "totalFlightsIndexed": 318,
   "totalFlights": 318,
   "syncFrequency": "7 veces al día (06:00, 09:00, 12:00, 15:00, 18:00, 21:00, 23:30)",
