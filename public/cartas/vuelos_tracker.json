@@ -1,13 +1,389 @@
 {
   "version": "3.2.0-ai-engine",
-  "updatedAt": "2026-09-30T22:49:44.114869Z",
+  "updatedAt": "2026-10-01T06:50:29.123119Z",
   "aiEngineStatus": "ACTIVE",
-  "totalPdfAnalyzed": 434,
-  "totalFlightsIndexed": 313,
-  "totalFlights": 313,
+  "totalPdfAnalyzed": 437,
+  "totalFlightsIndexed": 318,
+  "totalFlights": 318,
   "syncFrequency": "7 veces al día (06:00, 09:00, 12:00, 15:00, 18:00, 21:00, 23:30)",
   "source": "Google Drive Sync (Carpetas Oficiales Vuelos CPSL)",
   "flights": {
+    "LA1351_2026-10-09_UIO_GYE": {
+      "flightNumber": "LA 1351",
+      "flightCode": "LA1351_2026-10-09_UIO_GYE",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1351_2026-10-09_UIO_GYE",
+      "reservationCode": "NMLGFJ",
+      "passengers": [
+        "ELMER IDROBO ANDRADE"
+      ],
+      "sourcePdf": "Latam Airlines - CUV.pdf",
+      "sourcePath": " / Latam Airlines - CUV.pdf",
+      "route": {
+        "origin": "UIO",
+        "originCity": "Quito",
+        "originAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "destination": "GYE",
+        "destinationCity": "Guayaquil",
+        "destinationAirport": "Aeropuerto Internacional José Joaquín de Olmedo",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-10-09",
+        "scheduledDeparture": "2026-10-09T06:00:00-05:00",
+        "scheduledArrival": "2026-10-09T06:53:00-05:00",
+        "estimatedDeparture": "2026-10-09T06:00:00-05:00",
+        "estimatedArrival": "2026-10-09T06:53:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo con entrenador ELMER IDROBO ANDRADE confirmado ruta UIO → GYE",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Salida de Arribos (Aeropuerto Olmedo GYE)",
+        "destination": "Sede Guayaquil (Hospedaje por coordinar con Dirección de Sede) (Guayaquil, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Coordinación de bienvenida y traslado con Dirección de Sede Guayaquil."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1351",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1430_2026-10-09_GYE_LIM": {
+      "flightNumber": "LA 1430",
+      "flightCode": "LA1430_2026-10-09_GYE_LIM",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1430_2026-10-09_GYE_LIM",
+      "reservationCode": "NMLGFJ",
+      "passengers": [
+        "ELMER IDROBO ANDRADE"
+      ],
+      "sourcePdf": "Latam Airlines - CUV.pdf",
+      "sourcePath": " / Latam Airlines - CUV.pdf",
+      "route": {
+        "origin": "GYE",
+        "originCity": "Guayaquil",
+        "originAirport": "Aeropuerto Internacional José Joaquín de Olmedo",
+        "destination": "LIM",
+        "destinationCity": "Lima",
+        "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-10-09",
+        "scheduledDeparture": "2026-10-09T09:00:00-05:00",
+        "scheduledArrival": "2026-10-09T10:55:00-05:00",
+        "estimatedDeparture": "2026-10-09T09:00:00-05:00",
+        "estimatedArrival": "2026-10-09T10:55:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo con entrenador ELMER IDROBO ANDRADE confirmado ruta GYE → LIM",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe Miraflores (Calle Bellavista 133, Miraflores, Lima 15074, Perú)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1430",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1449_2026-10-12_LIM_GYE": {
+      "flightNumber": "LA 1449",
+      "flightCode": "LA1449_2026-10-12_LIM_GYE",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1449_2026-10-12_LIM_GYE",
+      "reservationCode": "NMLGFJ",
+      "passengers": [
+        "ELMER IDROBO ANDRADE"
+      ],
+      "sourcePdf": "Latam Airlines - CUV.pdf",
+      "sourcePath": " / Latam Airlines - CUV.pdf",
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "GYE",
+        "destinationCity": "Guayaquil",
+        "destinationAirport": "Aeropuerto Internacional José Joaquín de Olmedo",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-10-12",
+        "scheduledDeparture": "2026-10-12T23:35:00-05:00",
+        "scheduledArrival": "2026-10-13T01:45:00-05:00",
+        "estimatedDeparture": "2026-10-12T23:35:00-05:00",
+        "estimatedArrival": "2026-10-13T01:45:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo con entrenador ELMER IDROBO ANDRADE confirmado ruta LIM → GYE",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Salida de Arribos (Aeropuerto Olmedo GYE)",
+        "destination": "Sede Guayaquil (Hospedaje por coordinar con Dirección de Sede) (Guayaquil, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Coordinación de bienvenida y traslado con Dirección de Sede Guayaquil."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1449",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1407_2026-10-13_GYE_UIO": {
+      "flightNumber": "LA 1407",
+      "flightCode": "LA1407_2026-10-13_GYE_UIO",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1407_2026-10-13_GYE_UIO",
+      "reservationCode": "NMLGFJ",
+      "passengers": [
+        "ELMER IDROBO ANDRADE"
+      ],
+      "sourcePdf": "Latam Airlines - CUV.pdf",
+      "sourcePath": " / Latam Airlines - CUV.pdf",
+      "route": {
+        "origin": "GYE",
+        "originCity": "Guayaquil",
+        "originAirport": "Aeropuerto Internacional José Joaquín de Olmedo",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-10-13",
+        "scheduledDeparture": "2026-10-13T05:35:00-05:00",
+        "scheduledArrival": "2026-10-13T06:27:00-05:00",
+        "estimatedDeparture": "2026-10-13T05:35:00-05:00",
+        "estimatedArrival": "2026-10-13T06:27:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo con entrenador ELMER IDROBO ANDRADE confirmado ruta GYE → UIO",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
+        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1407",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1351_2026-09-04_LIM_UIO": {
+      "flightNumber": "LA 1351",
+      "flightCode": "LA1351_2026-09-04_LIM_UIO",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1351_2026-09-04_LIM_UIO",
+      "reservationCode": "DJBJJD",
+      "passengers": [
+        "ELMER IDROBO ANDRADE"
+      ],
+      "sourcePdf": "LA5447247UXQW-ef0ba73e-a3a1-44a6-a400-30bb3ac93841-cuv-bill.pdf",
+      "sourcePath": "",
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-04",
+        "scheduledDeparture": "2026-09-04T08:00:00-05:00",
+        "scheduledArrival": "2026-09-04T10:30:00-05:00",
+        "estimatedDeparture": "2026-09-04T08:00:00-05:00",
+        "estimatedArrival": "2026-09-04T10:30:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo con entrenador ELMER IDROBO ANDRADE confirmado ruta LIM → UIO",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
+        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1351",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1430_2026-09-04_LIM_UIO": {
+      "flightNumber": "LA 1430",
+      "flightCode": "LA1430_2026-09-04_LIM_UIO",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1430_2026-09-04_LIM_UIO",
+      "reservationCode": "AKVVMJ",
+      "passengers": [
+        "HAYDIN MENDOZA CLAVIJO"
+      ],
+      "sourcePdf": "LA5441064TFUW-b207f75d-272f-424c-bab0-5a60e05d2e80-cuv-bill.pdf",
+      "sourcePath": "",
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-04",
+        "scheduledDeparture": "2026-09-04T08:00:00-05:00",
+        "scheduledArrival": "2026-09-04T10:30:00-05:00",
+        "estimatedDeparture": "2026-09-04T08:00:00-05:00",
+        "estimatedArrival": "2026-09-04T10:30:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo con entrenador HAYDIN MENDOZA CLAVIJO confirmado ruta LIM → UIO",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
+        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1430",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1449_2026-09-04_LIM_UIO": {
+      "flightNumber": "LA 1449",
+      "flightCode": "LA1449_2026-09-04_LIM_UIO",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1449_2026-09-04_LIM_UIO",
+      "reservationCode": "AKVVMJ",
+      "passengers": [
+        "HAYDIN MENDOZA CLAVIJO"
+      ],
+      "sourcePdf": "LA5441064TFUW-b207f75d-272f-424c-bab0-5a60e05d2e80-cuv-bill.pdf",
+      "sourcePath": "",
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-04",
+        "scheduledDeparture": "2026-09-04T08:00:00-05:00",
+        "scheduledArrival": "2026-09-04T10:30:00-05:00",
+        "estimatedDeparture": "2026-09-04T08:00:00-05:00",
+        "estimatedArrival": "2026-09-04T10:30:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo con entrenador HAYDIN MENDOZA CLAVIJO confirmado ruta LIM → UIO",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
+        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1449",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1407_2026-09-04_LIM_UIO": {
+      "flightNumber": "LA 1407",
+      "flightCode": "LA1407_2026-09-04_LIM_UIO",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1407_2026-09-04_LIM_UIO",
+      "reservationCode": "NMLGFJ",
+      "passengers": [
+        "ELMER IDROBO ANDRADE"
+      ],
+      "sourcePdf": "Latam Airlines - CUV.pdf",
+      "sourcePath": " / Latam Airlines - CUV.pdf",
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-04",
+        "scheduledDeparture": "2026-09-04T08:00:00-05:00",
+        "scheduledArrival": "2026-09-04T10:30:00-05:00",
+        "estimatedDeparture": "2026-09-04T08:00:00-05:00",
+        "estimatedArrival": "2026-09-04T10:30:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo con entrenador ELMER IDROBO ANDRADE confirmado ruta LIM → UIO",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
+        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1407",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
     "LA4905_2026-10-12_LIM_BOG": {
       "flightNumber": "LA 4905",
       "flightCode": "LA4905_2026-10-12_LIM_BOG",
@@ -760,100 +1136,6 @@
       "radarUrl": "https://www.flightradar24.com/data/flights/la1412",
       "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
     },
-    "LA1351_2026-09-04_LIM_UIO": {
-      "flightNumber": "LA 1351",
-      "flightCode": "LA1351_2026-09-04_LIM_UIO",
-      "airline": "LATAM Airlines",
-      "callsign": "LA1351_2026-09-04_LIM_UIO",
-      "reservationCode": "DJBJJD",
-      "passengers": [
-        "ELMER IDROBO ANDRADE"
-      ],
-      "sourcePdf": "LA5447247UXQW-ef0ba73e-a3a1-44a6-a400-30bb3ac93841-cuv-bill.pdf",
-      "sourcePath": "",
-      "route": {
-        "origin": "LIM",
-        "originCity": "Lima",
-        "originAirport": "Aeropuerto Internacional Jorge Chávez",
-        "destination": "UIO",
-        "destinationCity": "Quito",
-        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
-        "isDirect": true,
-        "stops": 0,
-        "flightDuration": "2h 15m"
-      },
-      "schedule": {
-        "departureDate": "2026-09-04",
-        "scheduledDeparture": "2026-09-04T08:00:00-05:00",
-        "scheduledArrival": "2026-09-04T10:30:00-05:00",
-        "estimatedDeparture": "2026-09-04T08:00:00-05:00",
-        "estimatedArrival": "2026-09-04T10:30:00-05:00",
-        "actualDeparture": null,
-        "actualArrival": null
-      },
-      "status": "ON_TIME",
-      "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo con entrenador ELMER IDROBO ANDRADE confirmado ruta LIM → UIO",
-      "delayMinutes": 0,
-      "terminal": "T1",
-      "gate": "Confirmándose en aeropuerto",
-      "baggageClaim": "Por confirmar en arribo",
-      "logistics": {
-        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
-        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
-        "driverPickupEstimated": "30 min posteriores al aterrizaje",
-        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
-      },
-      "radarUrl": "https://www.flightradar24.com/data/flights/la1351",
-      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
-    },
-    "LA1430_2026-09-04_LIM_UIO": {
-      "flightNumber": "LA 1430",
-      "flightCode": "LA1430_2026-09-04_LIM_UIO",
-      "airline": "LATAM Airlines",
-      "callsign": "LA1430_2026-09-04_LIM_UIO",
-      "reservationCode": "AKVVMJ",
-      "passengers": [
-        "HAYDIN MENDOZA CLAVIJO"
-      ],
-      "sourcePdf": "LA5441064TFUW-b207f75d-272f-424c-bab0-5a60e05d2e80-cuv-bill.pdf",
-      "sourcePath": "",
-      "route": {
-        "origin": "LIM",
-        "originCity": "Lima",
-        "originAirport": "Aeropuerto Internacional Jorge Chávez",
-        "destination": "UIO",
-        "destinationCity": "Quito",
-        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
-        "isDirect": true,
-        "stops": 0,
-        "flightDuration": "2h 15m"
-      },
-      "schedule": {
-        "departureDate": "2026-09-04",
-        "scheduledDeparture": "2026-09-04T08:00:00-05:00",
-        "scheduledArrival": "2026-09-04T10:30:00-05:00",
-        "estimatedDeparture": "2026-09-04T08:00:00-05:00",
-        "estimatedArrival": "2026-09-04T10:30:00-05:00",
-        "actualDeparture": null,
-        "actualArrival": null
-      },
-      "status": "ON_TIME",
-      "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo con entrenador HAYDIN MENDOZA CLAVIJO confirmado ruta LIM → UIO",
-      "delayMinutes": 0,
-      "terminal": "T1",
-      "gate": "Confirmándose en aeropuerto",
-      "baggageClaim": "Por confirmar en arribo",
-      "logistics": {
-        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
-        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
-        "driverPickupEstimated": "30 min posteriores al aterrizaje",
-        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
-      },
-      "radarUrl": "https://www.flightradar24.com/data/flights/la1430",
-      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
-    },
     "LA1412_2026-09-04_LIM_UIO": {
       "flightNumber": "LA 1412",
       "flightCode": "LA1412_2026-09-04_LIM_UIO",
@@ -1416,53 +1698,6 @@
         "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
       },
       "radarUrl": "https://www.flightradar24.com/data/flights/la1369",
-      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
-    },
-    "LA1449_2026-09-04_LIM_UIO": {
-      "flightNumber": "LA 1449",
-      "flightCode": "LA1449_2026-09-04_LIM_UIO",
-      "airline": "LATAM Airlines",
-      "callsign": "LA1449_2026-09-04_LIM_UIO",
-      "reservationCode": "AKVVMJ",
-      "passengers": [
-        "HAYDIN MENDOZA CLAVIJO"
-      ],
-      "sourcePdf": "LA5441064TFUW-b207f75d-272f-424c-bab0-5a60e05d2e80-cuv-bill.pdf",
-      "sourcePath": "",
-      "route": {
-        "origin": "LIM",
-        "originCity": "Lima",
-        "originAirport": "Aeropuerto Internacional Jorge Chávez",
-        "destination": "UIO",
-        "destinationCity": "Quito",
-        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
-        "isDirect": true,
-        "stops": 0,
-        "flightDuration": "2h 15m"
-      },
-      "schedule": {
-        "departureDate": "2026-09-04",
-        "scheduledDeparture": "2026-09-04T08:00:00-05:00",
-        "scheduledArrival": "2026-09-04T10:30:00-05:00",
-        "estimatedDeparture": "2026-09-04T08:00:00-05:00",
-        "estimatedArrival": "2026-09-04T10:30:00-05:00",
-        "actualDeparture": null,
-        "actualArrival": null
-      },
-      "status": "ON_TIME",
-      "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo con entrenador HAYDIN MENDOZA CLAVIJO confirmado ruta LIM → UIO",
-      "delayMinutes": 0,
-      "terminal": "T1",
-      "gate": "Confirmándose en aeropuerto",
-      "baggageClaim": "Por confirmar en arribo",
-      "logistics": {
-        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
-        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
-        "driverPickupEstimated": "30 min posteriores al aterrizaje",
-        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
-      },
-      "radarUrl": "https://www.flightradar24.com/data/flights/la1449",
       "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
     },
     "LA1369_2026-09-04_LIM_UIO": {
