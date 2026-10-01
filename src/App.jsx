@@ -9,6 +9,8 @@ import ExcellenceDashboard from './pages/ExcellenceDashboard'
 import Login from './pages/Login'
 import OptOutPage from './pages/OptOutPage'
 import Home from './pages/Home'
+import CausaOSTask from "./pages/CausaOSTask";
+
 import RoleSelector from './pages/RoleSelector'
 import ChecklistBoard from './pages/ChecklistBoard'
 import GerenteDashboard from './pages/GerenteDashboard'
@@ -193,6 +195,8 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/opt-out" element={<OptOutPage />} />
+          <Route path="/causa-os-task" element={<CausaOSTask />} />
+
           
           <Route path="/" element={<Navigate to="/home" replace />} />
           
