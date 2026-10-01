@@ -158,21 +158,23 @@ service cloud.firestore {
 
     // HOJA EN BLANCO: Funciones de transversalidad
     function checkHojaEnBlancoAccess(docData) {
-      if (!isAuthenticated()) { return false; }
-      if (isSuperAdmin()) { return true; }
-      
-      let user = get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
-      if (user == null) { return false; }
-      
-      if (user.role == 'entrenador') {
-         return (docData.assignedToEmail != null && docData.assignedToEmail == email()) || 
-                (docData.assignedToEmails != null && email() in docData.assignedToEmails) ||
-                (docData.entrenadorEmail != null && docData.entrenadorEmail == email()) ||
-                (docData.entrenadores != null && email() in docData.entrenadores) ||
-                (docData.email != null && docData.email == email());
-      }
-      
-      return docData.sede != null && docData.sede == user.sede;
+      return isAuthenticated() && (
+        isSuperAdmin() ||
+        (
+          exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+          (
+            (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'entrenador' && (
+              docData.get('assignedToEmail', '') == email() || 
+              (docData.keys().hasAll(['assignedToEmails']) && email() in docData.assignedToEmails) ||
+              docData.get('entrenadorEmail', '') == email() ||
+              (docData.keys().hasAll(['entrenadores']) && email() in docData.entrenadores) ||
+              docData.get('email', '') == email()
+            )) ||
+            (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role != 'entrenador' && 
+             docData.keys().hasAll(['sede']) && docData.sede == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.sede)
+          )
+        )
+      );
     }
 
     function canReadHojaEnBlanco() {
@@ -460,11 +462,29 @@ service cloud.firestore {
       allow read: if canReadHojaEnBlanco();
       allow write: if canWriteHojaEnBlanco();
     }
+    // Blindaje Financiero
+    function isValidLiquidacion(data) {
+      return data.monto is number && data.monto > 0 &&
+             data.moneda is string && data.moneda in ['USD', 'PEN', 'COP', 'MXN', 'EUR'] &&
+             data.metodo_pago is string &&
+             data.cajero_user_id == request.auth.uid;
+    }
+
+    function isValidAuditTrail(data) {
+      return data.monto_esperado is number && data.monto_real is number;
+    }
+
     match /liquidaciones_pagos/{document=**} {
-      allow read, write: if isGerenteODireccion() || isSuperAdmin();
+      allow read, delete: if isGerenteODireccion() || isSuperAdmin();
+      allow create, update: if (isGerenteODireccion() || isSuperAdmin()) && isValidLiquidacion(request.resource.data);
+    }
+    match /cajas_diarias/{document=**} {
+      allow read, delete: if isGerenteODireccion() || isSuperAdmin();
+      allow create, update: if (isGerenteODireccion() || isSuperAdmin()) && isValidLiquidacion(request.resource.data);
     }
     match /finanzas_audit_trail/{document=**} {
-      allow read, write: if isGerenteODireccion() || isSuperAdmin();
+      allow read, delete: if isGerenteODireccion() || isSuperAdmin();
+      allow create, update: if (isGerenteODireccion() || isSuperAdmin()) && isValidAuditTrail(request.resource.data);
     }
     match /nodus_coordinadores_c1c2/{document=**} {
       allow read: if isAuthenticated();
