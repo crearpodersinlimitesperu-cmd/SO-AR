@@ -22,7 +22,7 @@ const db = getFirestore(app);
 
 async function extractDataFromPage(page, url, sectionName, startDate, endDate) {
   console.log(`\nNavegando a: ${sectionName} (${url})`);
-  await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+  await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
   await new Promise(r => setTimeout(r, 4000));
   
   if (startDate && endDate) {
@@ -97,20 +97,36 @@ export async function runScraperWithDates(startDate = null, endDate = null, sede
   
   try {
     console.log("🌐 Navegando al Login de Nodus...");
-    await page.goto('https://imo.crearpslglobal.com/dashboard', { waitUntil: 'domcontentloaded', timeout: 60000 });
+    await page.goto('https://imo.crearpslglobal.com/auth/login', { waitUntil: 'networkidle2', timeout: 60000 });
 
     const user = process.env.NODUS_USER;
     const pwd = process.env.NODUS_PASSWORD;
     if (!user || !pwd) throw new Error("❌ Faltan credenciales en .env");
 
+    let currentUrl = page.url();
+    // Protocolo de resolución para SiteGround Anti-Bot Challenge si se presenta
+    if (currentUrl.includes('sgcaptcha') || currentUrl.includes('.well-known/sgcaptcha')) {
+      console.log(`⏳ Detectado desafío Anti-Bot (${currentUrl}), aguardando resolución...`);
+      const waitLimit = Date.now() + 20000;
+      while (Date.now() < waitLimit) {
+        await new Promise(r => setTimeout(r, 2000));
+        currentUrl = page.url();
+        if (!currentUrl.includes('sgcaptcha')) break;
+      }
+    }
+
+    console.log("🔑 Esperando formulario de autenticación...");
+    await page.waitForSelector('input[name="usuario"]', { visible: true, timeout: 30000 });
+
     console.log("🔑 Iniciando sesión...");
-    await page.type('input[name="usuario"]', user);
-    await page.type('input[name="password"]', pwd);
+    await page.type('input[name="usuario"]', user, { delay: 30 });
+    await page.type('input[name="password"]', pwd, { delay: 30 });
     await Promise.all([
+      page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 60000 }).catch(() => {}),
       page.click('button[type="submit"]'),
-      page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 60000 }),
     ]);
-    console.log("✅ Inicio de sesión exitoso.");
+    await new Promise(r => setTimeout(r, 3000));
+    console.log("✅ Inicio de sesión exitoso. URL actual:", page.url());
 
     const extractedData = {
       timestamp: new Date().toISOString(),
