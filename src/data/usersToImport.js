@@ -993,8 +993,9 @@ export const USERS_TO_IMPORT = [
       "qt": "Quito"
     },
     "emails": [
-      "ricardogavilanez1021@gmail.com"
-    ],
+      "ricardogavilanez1021@gmail.com",
+        "ricardo.gavilanez@crearpsl.net"
+      ],
     "email": "ricardogavilanez1021@gmail.com"
   },
   {
