@@ -35,7 +35,29 @@ export default function GoalsBoard() {
     }
   }, [currentUser, canViewGoals, navigate, showToast]);
 
-  const [selectedSedeFilter, setSelectedSedeFilter] = useState('Todas');
+  const userSedeNorm = currentUser?.sede ? normalizeSede(currentUser.sede) : null;
+  const isSuperUser = Boolean(
+    currentUser?.isSuperAdmin || 
+    currentUser?.isDireccion || 
+    currentUser?.appRole === 'direccion' || 
+    currentUser?.appRole === 'consolidado'
+  );
+
+  const [selectedSedeFilter, setSelectedSedeFilter] = useState(() => {
+    if (!isSuperUser && userSedeNorm && userSedeNorm !== 'Sede Global' && userSedeNorm !== 'Global') {
+      return userSedeNorm;
+    }
+    return 'Todas';
+  });
+
+  // Mantener sincronizado el filtro de sede cuando carga el perfil del usuario (ej. Josue Vera -> Guayaquil)
+  useEffect(() => {
+    if (userSedeNorm && userSedeNorm !== 'Sede Global' && userSedeNorm !== 'Global') {
+      if (!isSuperUser) {
+        setSelectedSedeFilter(userSedeNorm);
+      }
+    }
+  }, [userSedeNorm, isSuperUser]);
 
   const canManageGoals = Boolean(
     currentUser?.isSuperAdmin ||
@@ -114,7 +136,27 @@ export default function GoalsBoard() {
       if (cached) {
         const parsed = JSON.parse(cached);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          setGoals(parsed);
+          const isSuper = currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion' || currentUser?.appRole === 'consolidado' || currentUser?.isDireccion;
+          let initialGoals = parsed;
+          if (!isSuper && currentUser?.sede) {
+            const mySedeNorm = normalizeSede(currentUser.sede);
+            initialGoals = initialGoals.filter(g => {
+              const rawSede = g.sede || '';
+              const gSedeNorm = rawSede ? normalizeSede(rawSede) : null;
+              if (!gSedeNorm || gSedeNorm === 'Sede Global') {
+                const titleLower = (g.title || '').toLowerCase();
+                if (titleLower.includes('lima') || titleLower.includes('e30') || titleLower.includes('e31') || titleLower.includes('equipo 30') || titleLower.includes('equipo 31')) {
+                  return mySedeNorm === 'Lima';
+                }
+                if (titleLower.includes('guayaquil') || titleLower.includes('gye')) return mySedeNorm === 'Guayaquil';
+                if (titleLower.includes('quito') || titleLower.includes('uio')) return mySedeNorm === 'Quito';
+                if (titleLower.includes('cuenca')) return mySedeNorm === 'Cuenca';
+                return mySedeNorm === 'Lima';
+              }
+              return gSedeNorm === mySedeNorm;
+            });
+          }
+          setGoals(initialGoals);
           setLoading(false);
         }
       }
@@ -140,7 +182,29 @@ export default function GoalsBoard() {
         const isSuper = currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion' || currentUser?.appRole === 'consolidado' || currentUser?.isDireccion;
         if (!isSuper && currentUser?.sede) {
           const mySedeNorm = normalizeSede(currentUser.sede);
-          loadedGoals = loadedGoals.filter(g => !g.sede || normalizeSede(g.sede) === mySedeNorm || g.sede === 'Global');
+          loadedGoals = loadedGoals.filter(g => {
+            const rawSede = g.sede || '';
+            const gSedeNorm = rawSede ? normalizeSede(rawSede) : null;
+            // Si la meta no tiene sede explícita, verificar si es de Lima legada o de otra sede por su título
+            if (!gSedeNorm || gSedeNorm === 'Sede Global') {
+              const titleLower = (g.title || '').toLowerCase();
+              if (titleLower.includes('lima') || titleLower.includes('e30') || titleLower.includes('e31') || titleLower.includes('equipo 30') || titleLower.includes('equipo 31')) {
+                return mySedeNorm === 'Lima';
+              }
+              if (titleLower.includes('guayaquil') || titleLower.includes('gye')) {
+                return mySedeNorm === 'Guayaquil';
+              }
+              if (titleLower.includes('quito') || titleLower.includes('uio') || titleLower.includes('119') || titleLower.includes('118')) {
+                return mySedeNorm === 'Quito';
+              }
+              if (titleLower.includes('cuenca')) {
+                return mySedeNorm === 'Cuenca';
+              }
+              // Si no tiene sede ni indicio, solo mostrar si es Lima (sede histórica de creación)
+              return mySedeNorm === 'Lima';
+            }
+            return gSedeNorm === mySedeNorm;
+          });
         }
 
         setGoals(loadedGoals);
@@ -392,8 +456,9 @@ export default function GoalsBoard() {
     if (!goal) return null;
     const titleLower = (goal.title || '').toLowerCase();
     const stageLower = (goal.stage || goal.cyclePhase || '').toLowerCase();
-    const sedeNorm = normalizeSede(goal.sede || parentGoal?.sede || 'Lima').toLowerCase();
-    const goalTeam = extractTeamNumber(goal, parentGoal);
+    const effectiveSede = goal.sede || parentGoal?.sede || (selectedSedeFilter !== 'Todas' ? selectedSedeFilter : '') || currentUser?.sede || 'Lima';
+    const sedeNorm = normalizeSede(effectiveSede).toLowerCase();
+    const goalTeam = extractTeamNumber(goal, parentGoal, effectiveSede);
 
     // 1. Calendarios de Maestría (mj_calendars en Firestore)
     const matchingCals = mjCalendars.filter(c => {
@@ -636,11 +701,12 @@ export default function GoalsBoard() {
 
   // Corrección y Re-alineación de Ciclo para coherencia de Equipos
   const handleFixTeamAlignment = async (goal) => {
-    const childTeam = extractTeamNumber(goal);
+    const effectiveSede = goal.sede || (selectedSedeFilter !== 'Todas' ? selectedSedeFilter : '') || currentUser?.sede || 'Lima';
+    const childTeam = extractTeamNumber(goal, null, effectiveSede);
     if (!childTeam) return;
 
     try {
-      const sede = normalizeSede(goal.sede || 'Lima');
+      const sede = normalizeSede(effectiveSede);
       // Buscar si ya existe la meta de ciclo para este equipo
       let targetCycle = goals.find(g => 
         normalizeSede(g.sede || '') === sede && 
@@ -967,7 +1033,7 @@ export default function GoalsBoard() {
   const getTeamCallsData = (goal, parentGoal, forcedTeam = null) => {
     if (!goal) return null;
     
-    const goalSede = normalizeSede(goal.sede || parentGoal?.sede || currentUser?.sede || 'Lima');
+    const goalSede = normalizeSede(goal.sede || parentGoal?.sede || (selectedSedeFilter !== 'Todas' ? selectedSedeFilter : '') || currentUser?.sede || 'Lima');
     
     // Deteccion automatica del equipo
     let targetTeam = forcedTeam;
@@ -1106,10 +1172,11 @@ export default function GoalsBoard() {
     try {
       const batch = writeBatch(db);
       const cycleGoalRef = doc(collection(db, 'goals'));
-      const suffix = currentUser?.sede === 'Quito' ? ` (${quitoCycle})` : '';
+      const effectiveSede = (selectedSedeFilter && selectedSedeFilter !== 'Todas') ? selectedSedeFilter : (currentUser?.sede || '');
+      const suffix = effectiveSede === 'Quito' ? ` (${quitoCycle})` : effectiveSede ? ` (${effectiveSede})` : '';
       const currentUserId = currentUser?.uid || currentUser?.id || 'admin';
       const currentUserName = currentUser?.displayName || currentUser?.name || 'Administrador';
-      const userSede = currentUser?.sede || '';
+      const userSede = effectiveSede;
       
       // 1. Crear Meta Maestra del Ciclo
       batch.set(cycleGoalRef, {
@@ -1229,7 +1296,7 @@ export default function GoalsBoard() {
         cyclePhase: parentGoal?.cyclePhase || 'DIA',
         parentId: dailyData.parentId,
         ownerId: currentUser?.uid || currentUser?.id || 'admin',
-        sede: currentUser?.sede || '',
+        sede: parentGoal?.sede || (selectedSedeFilter !== 'Todas' ? selectedSedeFilter : '') || currentUser?.sede || '',
         assignedCoordinators: [],
         createdAt: new Date().toISOString()
       });
@@ -1571,7 +1638,9 @@ export default function GoalsBoard() {
               const audit = auditSingleGoal(goal, parentGoal, {
                 nodusData,
                 liveManagers: managersList,
-                coordinatorReports
+                coordinatorReports,
+                selectedSede: selectedSedeFilter,
+                currentUserSede: currentUser?.sede
               });
               if (!audit) return null;
 
@@ -1934,7 +2003,7 @@ export default function GoalsBoard() {
           </div>
         </div>
         <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'center', flexWrap: 'wrap' }}>
-          {(selectedSedeFilter === 'Lima' || normalizeSede(currentUser?.sede || '') === 'Lima' || currentUser?.isSuperAdmin || currentUser?.isDireccion) && (
+          {(selectedSedeFilter === 'Lima' || (selectedSedeFilter === 'Todas' && (normalizeSede(currentUser?.sede || '') === 'Lima' || currentUser?.isSuperAdmin || currentUser?.isDireccion))) && (
             <button
               onClick={() => handleSyncLimaGraduadosSheet()}
               disabled={syncingLima}
@@ -1990,7 +2059,13 @@ export default function GoalsBoard() {
               const currentFiltered = goals.filter(g => selectedSedeFilter === 'Todas' || normalizeSede(g.sede || '') === normalizeSede(selectedSedeFilter));
               const mapParents = {};
               goals.forEach(g => { mapParents[g.id] = g; });
-              const globalAudit = auditAllGoals(currentFiltered, mapParents, { nodusData, liveManagers: managersList, coordinatorReports });
+              const globalAudit = auditAllGoals(currentFiltered, mapParents, {
+                nodusData,
+                liveManagers: managersList,
+                coordinatorReports,
+                selectedSede: selectedSedeFilter,
+                currentUserSede: currentUser?.sede
+              });
               if (globalAudit.pendingSyncCount > 0) {
                 return (
                   <span style={{
@@ -2033,7 +2108,7 @@ export default function GoalsBoard() {
         </div>
       </div>
 
-        {(currentUser?.isSuperAdmin || currentUser?.isDireccion) && (
+        {(currentUser?.isSuperAdmin || currentUser?.isDireccion) ? (
           <div style={{ marginBottom: '1.5rem' }}>
             <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>Filtro de Sede (Vista Global):</label>
             <select 
@@ -2051,16 +2126,61 @@ export default function GoalsBoard() {
               <option value="México">México</option>
             </select>
           </div>
+        ) : (
+          currentUser?.sede && (
+            <div style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Sede Operativa:</span>
+              <span style={{ 
+                background: 'rgba(56, 189, 248, 0.15)', 
+                color: '#38bdf8', 
+                padding: '0.3rem 0.8rem', 
+                borderRadius: '6px', 
+                fontWeight: 700, 
+                fontSize: '0.85rem',
+                border: '1px solid rgba(56, 189, 248, 0.3)'
+              }}>
+                📍 {normalizeSede(currentUser.sede)}
+              </span>
+            </div>
+          )
         )}
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem' }}>
         {loading ? <p className="text-muted text-center">Cargando metas...</p> : (() => {
           if (goals.length === 0) {
-            return <p className="text-muted" style={{ textAlign: 'center' }}>No hay metas configuradas. Inicia el Setup de Ciclo.</p>;
+            return (
+              <div className="glass-panel" style={{ padding: '2.5rem', textAlign: 'center' }}>
+                <p className="text-muted" style={{ margin: '0 0 1rem 0' }}>No hay metas configuradas. Inicia el Setup de Ciclo.</p>
+                {canManageGoals && (
+                  <button 
+                    className="btn-primary" 
+                    onClick={() => setShowWizard(true)} 
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.8rem 1.8rem', margin: '0 auto' }}
+                  >
+                    <Settings size={18} /> Iniciar Setup de Ciclo
+                  </button>
+                )}
+              </div>
+            );
           }
           const filteredGoals = goals.filter(g => selectedSedeFilter === 'Todas' || normalizeSede(g.sede || '') === normalizeSede(selectedSedeFilter));
           if (filteredGoals.length === 0) {
-            return <p className="text-muted" style={{ textAlign: 'center' }}>No se encontraron metas para la sede <strong>{selectedSedeFilter}</strong>.</p>;
+            return (
+              <div className="glass-panel" style={{ padding: '2.5rem', textAlign: 'center' }}>
+                <p className="text-muted" style={{ margin: '0 0 1rem 0', fontSize: '1.05rem' }}>
+                  No se encontraron metas configuradas para la sede <strong>{selectedSedeFilter}</strong>.
+                </p>
+                {canManageGoals && (
+                  <button 
+                    className="btn-primary" 
+                    onClick={() => setShowWizard(true)} 
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.8rem 1.8rem', margin: '0 auto' }}
+                  >
+                    <Settings size={18} /> Iniciar Setup de Ciclo para {selectedSedeFilter}
+                  </button>
+                )}
+              </div>
+            );
           }
           return filteredGoals.map(renderGoal);
         })()}
@@ -3020,7 +3140,9 @@ export default function GoalsBoard() {
         const globalAudit = auditAllGoals(currentFiltered, mapParents, {
           nodusData,
           liveManagers: managersList,
-          coordinatorReports
+          coordinatorReports,
+          selectedSede: selectedSedeFilter,
+          currentUserSede: currentUser?.sede
         });
 
         return (
@@ -3143,12 +3265,34 @@ export default function GoalsBoard() {
                   </div>
                 </div>
 
-                <div style={{ background: 'rgba(14, 165, 233, 0.08)', padding: '0.8rem 1rem', borderRadius: '10px', border: '1px solid rgba(14, 165, 233, 0.2)' }}>
-                  <div style={{ fontSize: '0.75rem', color: '#38bdf8', fontWeight: 600 }}>Llamadas Lima (Eq 30)</div>
-                  <div style={{ fontSize: '1.4rem', fontWeight: 900, color: '#38bdf8', marginTop: '2px' }}>
-                    249 <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#94a3b8' }}>(105 OK)</span>
-                  </div>
-                </div>
+                {(() => {
+                  const isTodas = selectedSedeFilter === 'Todas' || !selectedSedeFilter;
+                  const currentSedeName = isTodas ? 'Global' : selectedSedeFilter;
+                  const sedeSummary = !isTodas
+                    ? (nodusData?.sedes || []).find(s => normalizeSede(s.sede || '') === normalizeSede(selectedSedeFilter))
+                    : null;
+                  
+                  const totalCalls = isTodas
+                    ? (nodusData?.totales?.totalGestiones || 0)
+                    : (sedeSummary?.gestionesTotal || 0);
+                  const totalOk = isTodas
+                    ? (nodusData?.totales?.totalConfirmados || 0)
+                    : (sedeSummary?.confirmadosTotal || 0);
+
+                  const label = isTodas ? 'Llamadas Totales (Nodus)' : `Llamadas ${currentSedeName} (Nodus)`;
+
+                  return (
+                    <div style={{ background: 'rgba(14, 165, 233, 0.08)', padding: '0.8rem 1rem', borderRadius: '10px', border: '1px solid rgba(14, 165, 233, 0.2)' }}>
+                      <div style={{ fontSize: '0.75rem', color: '#38bdf8', fontWeight: 600 }}>{label}</div>
+                      <div style={{ fontSize: '1.4rem', fontWeight: 900, color: '#38bdf8', marginTop: '2px' }}>
+                        {totalCalls > 0 ? totalCalls.toLocaleString() : '0'}{' '}
+                        <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#94a3b8' }}>
+                          ({totalOk > 0 ? totalOk.toLocaleString() : '0'} OK)
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
 
               {/* Botón Maestro de Sincronización Segura */}

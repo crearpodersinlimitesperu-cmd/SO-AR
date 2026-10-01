@@ -29,7 +29,7 @@ const getManagersList = () => {
  * Normalizador tolerante de Sedes
  */
 export function normalizeSede(raw) {
-  if (!raw) return 'Lima';
+  if (!raw) return '';
   const s = String(raw).trim().toLowerCase()
     .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
@@ -39,7 +39,7 @@ export function normalizeSede(raw) {
   if (s.includes('medellin')) return 'Medellin';
   if (s.includes('mexico') || s.includes('cdmx')) return 'CDMX';
   if (s.includes('lima')) return 'Lima';
-  return 'Lima';
+  return String(raw).trim();
 }
 
 /**
@@ -58,7 +58,7 @@ export function generateEntityHash(components) {
 /**
  * Extrae el número de equipo de una meta o texto
  */
-export function extractTeamNumber(goal, parentGoal = null) {
+export function extractTeamNumber(goal, parentGoal = null, defaultSede = null) {
   // 1. Título propio de la meta (máxima prioridad)
   const goalTitle = goal?.title || '';
   const matchDirect = goalTitle.match(/C\d+E(\d+)/i) || goalTitle.match(/(?:Equipo|E)\s*(\d+)/i);
@@ -76,7 +76,7 @@ export function extractTeamNumber(goal, parentGoal = null) {
   }
 
   // 4. Default por sede (Ciclos activos vigentes)
-  const sede = normalizeSede(goal?.sede || parentGoal?.sede);
+  const sede = normalizeSede(goal?.sede || parentGoal?.sede || defaultSede) || 'Lima';
   if (sede === 'Lima') return '31'; // Ciclo activo Lima: E31
   if (sede === 'Quito') return '119';
   if (sede === 'Guayaquil') return '24';
@@ -91,11 +91,15 @@ export function auditSingleGoal(goal, parentGoal, options = {}) {
   const {
     nodusData = null,
     liveManagers = null,
-    coordinatorReports = []
+    coordinatorReports = [],
+    selectedSede = null,
+    currentUserSede = null
   } = options;
 
-  const sede = normalizeSede(goal?.sede || parentGoal?.sede || 'Lima');
-  const teamNum = extractTeamNumber(goal, parentGoal);
+  const fallbackSede = selectedSede && selectedSede !== 'Todas' ? selectedSede : (currentUserSede || 'Lima');
+  const rawSede = goal?.sede || parentGoal?.sede || fallbackSede;
+  const sede = normalizeSede(rawSede) || 'Lima';
+  const teamNum = extractTeamNumber(goal, parentGoal, sede);
   const targetTeamLabel = `EQUIPO ${teamNum}`;
   const titleLower = (goal?.title || '').toLowerCase();
   const kpiLower = (goal?.kpi || '').toLowerCase();

@@ -138,6 +138,26 @@ export default function GerenteDashboard() {
     return true;
   };
 
+  const isGoalVisibleToMySede = (g) => {
+    if (!currentUser?.sede) return true;
+    const userSede = normalizeSede(currentUser.sede);
+    if (userSede === 'Sede Global' || currentUser.isSuperAdmin) return true;
+    
+    const rawSede = g.sede || '';
+    const gSedeNorm = rawSede ? normalizeSede(rawSede) : null;
+    if (!gSedeNorm || gSedeNorm === 'Sede Global') {
+      const tLower = (g.title || '').toLowerCase();
+      if (tLower.includes('lima') || tLower.includes('e30') || tLower.includes('e31') || tLower.includes('equipo 30') || tLower.includes('equipo 31')) {
+        return userSede === 'Lima';
+      }
+      if (tLower.includes('guayaquil') || tLower.includes('gye')) return userSede === 'Guayaquil';
+      if (tLower.includes('quito') || tLower.includes('uio') || tLower.includes('119') || tLower.includes('118')) return userSede === 'Quito';
+      if (tLower.includes('cuenca')) return userSede === 'Cuenca';
+      return userSede === 'Lima';
+    }
+    return gSedeNorm === userSede;
+  };
+
   // 2. QUÉ ESTÁ EN RIESGO (Radar)
   // Críticas / Vencidas / Rojas
   const criticalTasks = tasks.filter(t => !t.completed && (t.priority === 'Crítica' || t.isCritical) && isTaskVisibleToMe(t));
@@ -392,11 +412,7 @@ export default function GerenteDashboard() {
                     <Target size={14} /> Metas Globales de Ciclo
                   </h4>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    {cycleGoals.filter(g => {
-                      if (!g.sede || g.sede === 'Global' || g.sede === 'Sede Global') return true;
-                      const userSede = normalizeSede(currentUser?.sede);
-                      return normalizeSede(g.sede) === userSede;
-                    }).map(g => {
+                    {cycleGoals.filter(isGoalVisibleToMySede).map(g => {
                       const teamBadge = resolveGoalTeam(g);
                       return (
                         <div key={g.id} style={{ background: 'rgba(0,0,0,0.2)', padding: '0.6rem 0.8rem', borderRadius: '6px', borderLeft: '3px solid var(--crear-gold)' }}>
@@ -428,13 +444,7 @@ export default function GerenteDashboard() {
                     <Target size={14} /> Metas de Entrenamiento
                   </h4>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    {trainingGoals.filter(g => {
-                      if (g.sede && g.sede !== 'Global' && g.sede !== 'Sede Global') {
-                        const userSede = normalizeSede(currentUser?.sede);
-                        if (normalizeSede(g.sede) !== userSede) return false;
-                      }
-                      return g.cyclePhase === currentStage || !g.cyclePhase || g.cyclePhase.includes('MJ');
-                    }).map(g => {
+                    {trainingGoals.filter(g => isGoalVisibleToMySede(g) && (g.cyclePhase === currentStage || !g.cyclePhase || g.cyclePhase.includes('MJ'))).map(g => {
                       const teamBadge = resolveGoalTeam(g);
                       return (
                         <div key={g.id} style={{ background: 'rgba(0,0,0,0.2)', padding: '0.6rem 0.8rem', borderRadius: '6px', borderLeft: '3px solid var(--crear-cyan)' }}>
@@ -466,7 +476,7 @@ export default function GerenteDashboard() {
                     <Target size={14} /> Metas Diarias Activas
                   </h4>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    {dailyGoals.map(g => (
+                    {dailyGoals.filter(isGoalVisibleToMySede).map(g => (
                       <div key={g.id} style={{ background: 'rgba(0,0,0,0.2)', padding: '0.6rem 0.8rem', borderRadius: '6px', borderLeft: '3px solid #10b981' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '0.3rem' }}>
                           <span style={{ fontWeight: '600', color: 'var(--text-heading)' }}>{g.title}</span>
