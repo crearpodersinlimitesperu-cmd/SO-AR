@@ -577,6 +577,67 @@ class NodusExtractorAgent {
     return resultado;
   }
 
+  async extractAvanzadosYContabilidad() {
+    console.log("💼 [Agente 1 - Extractor] Iniciando extracción profunda: C1, C2, Maestría y Finanzas (BI Auditor)...");
+    
+    const biData = {
+      capitulo1: [],
+      capitulo2: [],
+      maestria: [],
+      finanzas: []
+    };
+
+    try {
+      // Extraer Capítulo 1
+      console.log("   -> Extrayendo histórico y asistencia Capítulo 1...");
+      await this.safeGoto('https://imo.crearpslglobal.com/capitulo1', 25000);
+      biData.capitulo1 = await this.page.evaluate(() => {
+        const rows = Array.from(document.querySelectorAll('table tbody tr'));
+        return rows.map(tr => {
+          const tds = Array.from(tr.querySelectorAll('td')).map(td => td.innerText.trim());
+          return { original: tds[0] || '', info: tds.join('|') };
+        });
+      });
+      
+      // Extraer Capítulo 2
+      console.log("   -> Extrayendo retención y asistencia Capítulo 2...");
+      await this.safeGoto('https://imo.crearpslglobal.com/capitulo2', 25000);
+      biData.capitulo2 = await this.page.evaluate(() => {
+        const rows = Array.from(document.querySelectorAll('table tbody tr'));
+        return rows.map(tr => {
+          const tds = Array.from(tr.querySelectorAll('td')).map(td => td.innerText.trim());
+          return { original: tds[0] || '', info: tds.join('|') };
+        });
+      });
+
+      // Extraer Maestría (Creación, Relación, Gratitud, Viaje)
+      console.log("   -> Extrayendo embudo de Maestría...");
+      await this.safeGoto('https://imo.crearpslglobal.com/maestria', 25000);
+      biData.maestria = await this.page.evaluate(() => {
+        const rows = Array.from(document.querySelectorAll('table tbody tr'));
+        return rows.map(tr => {
+          const tds = Array.from(tr.querySelectorAll('td')).map(td => td.innerText.trim());
+          return { original: tds[0] || '', info: tds.join('|') };
+        });
+      });
+
+      console.log("   -> Extrayendo registros maestros de participantes (para linaje de rezagados)...");
+      await this.safeGoto('https://imo.crearpslglobal.com/participantes/datosTabla?draw=1&start=0&length=1000', 30000);
+      try {
+        const jsonText = await this.page.evaluate(() => document.body.innerText);
+        const parsed = JSON.parse(jsonText);
+        biData.finanzas = parsed.data || [];
+      } catch(e) {
+        console.warn("Aviso: No se pudo parsear JSON de participantes, probablemente es vista HTML.", e.message);
+      }
+
+    } catch (err) {
+      console.warn(`⚠️ Error en extracción profunda BI: ${err.message}`);
+    }
+
+    return biData;
+  }
+
   async close() {
     if (this.browser) {
       await this.browser.close();
@@ -949,6 +1010,27 @@ class NodusDispatcherAgent {
     await adminDb.collection('nodus_kpis_sincronizados').doc('latest_snapshot').set(masterSnapshot);
     console.log("✅ [Agente 3 - Despachador] Guardado 'nodus_kpis_sincronizados/latest_snapshot'");
 
+    // 1.5 Guardar el reporte analítico BI (Marco PCFT)
+    console.log("[Agente 3 - Despachador] Guardando Reporte BI (Marco PCFT)...");
+    if (rawData && rawData.secciones && rawData.secciones.biDeepExtract) {
+      let safeBiExtract = rawData.secciones.biDeepExtract;
+      const biSize = JSON.stringify(safeBiExtract).length;
+      if (biSize > 800000) {
+        console.warn(`[Agente 3 - Despachador] Tamaño de BI Deep Extract (${biSize} bytes) excede umbral. Truncando arrays para evitar límite de 1MB en Firestore.`);
+        if (safeBiExtract.finanzas) safeBiExtract.finanzas = safeBiExtract.finanzas.slice(0, 500);
+      }
+      try {
+        await adminDb.collection('nodus_bi_reports').doc('latest').set({
+          robot_token: ROBOT_TOKEN,
+          timestamp,
+          datos_bi: safeBiExtract
+        });
+        console.log("[Agente 3 - Despachador] Guardado 'nodus_bi_reports/latest'");
+      } catch (e) {
+        console.error("Error guardando nodus_bi_reports:", e);
+      }
+    }
+
     // 2. Guardar en colección optimizada para Dashboard C1/C2: nodus_coordinadores_c1c2 / latest
     let safeEquiposReporte = normalizedData.equiposReporte;
     const serializedSize = JSON.stringify(safeEquiposReporte).length;
@@ -1190,12 +1272,14 @@ export async function runMultiAgentSync() {
     const rawDashboard = await extractor.extractDashboardData();
     const rawCoordinadores = await extractor.extractCoordinadores();
     const rawEquiposReporte = await extractor.extractActiveEquiposReporte();
+    const biDeepExtract = await extractor.extractAvanzadosYContabilidad();
 
     const rawData = {
       secciones: {
         actividadCoordinadores: { kpis: rawCoordinadores },
         dashboardPrincipal: rawDashboard,
-        reporteEquipos: rawEquiposReporte
+        reporteEquipos: rawEquiposReporte,
+        biDeepExtract: biDeepExtract
       }
     };
 
