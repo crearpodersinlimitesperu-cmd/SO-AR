@@ -261,6 +261,27 @@ service cloud.firestore {
     }
 
     // USERS (colección legacy, solo SuperAdmin escribe)
+    
+    // =========================================================================
+    // MODULO LEGAL - Onboarding Legal y Firmas
+    // =========================================================================
+    match /px_legal_signatures/{signatureId} {
+      // 1. Data Admins pueden leer y escribir TODO (acceso irrestricto al panel legal)
+      // 2. Cualquier usuario autenticado puede leer y escribir SUS PROPIOS documentos legales
+      allow read: if request.auth != null && (
+        (request.auth.token.email in ["jose.sanchez@crearpsl.net", "contabilidad.global@crearpsl.net", "legal@crearpsl.net"]) ||
+        (request.auth.token.email != null && resource.data.participant_id == request.auth.token.email.lower())
+      );
+      
+      allow write: if request.auth != null && (
+        (request.auth.token.email in ["jose.sanchez@crearpsl.net", "contabilidad.global@crearpsl.net", "legal@crearpsl.net"]) ||
+        // Permitir que el usuario cree su propio registro
+        (request.resource.data.participant_id == request.auth.token.email.lower()) ||
+        // Permitir que el usuario actualice su propio registro (optimistic updates/PDF)
+        (resource.data.participant_id == request.auth.token.email.lower())
+      );
+    }
+
     match /users/{userId} {
       allow read: if isAuthenticated();
       allow write: if isSuperAdmin();
