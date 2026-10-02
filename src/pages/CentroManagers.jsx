@@ -645,6 +645,7 @@ export default function CentroManagers() {
 
       if (m.entrenador) {
         parseTrainersList(m.entrenador).forEach(t => teams[key].entrenadores.add(t));
+      
       }
       if (m.llamadaFecha && (!teams[key].lastDate || m.llamadaFecha > teams[key].lastDate)) {
         teams[key].lastDate = m.llamadaFecha;
@@ -1297,8 +1298,9 @@ export default function CentroManagers() {
       const sede = normalizeSede(m.sede);
       const key = `${sede}_${m.equipo}`;
       if (!teams[key]) {
-        teams[key] = { equipoKey: key, sede, equipo: m.equipo, numEquipo: m.numEquipo, entrenadores: new Set(), cierreManual: null };
+        teams[key] = { equipoKey: key, sede, equipo: m.equipo, numEquipo: m.numEquipo, entrenadores: new Set(), estados: new Set(), cierreManual: null };
       }
+      teams[key].estados.add(normalizeManagerEstado(m.estado));
       if (m.entrenador) parseTrainersList(m.entrenador).forEach(t => teams[key].entrenadores.add(t));
       if (m.cierreLiquidacionActivo) {
         teams[key].cierreManual = {
@@ -1341,8 +1343,13 @@ export default function CentroManagers() {
       const infoEquipo = equiposParaLiquidacion[equipoKey];
       const cierreManual = infoEquipo?.cierreManual || null;
 
+      const infoEquipoFull = equiposParaLiquidacion[equipoKey] || { estados: new Set() };
+      const sinActivos = !infoEquipoFull.estados.has('Activo');
+      const tieneDesertorOGraduado = infoEquipoFull.estados.has('Desertor') || infoEquipoFull.estados.has('Graduado');
+      const esEquipoInactivo = sinActivos && tieneDesertorOGraduado;
+
       const cumpleLlamadas = count >= 7;
-      const cumpleCierre = !!cierreManual;
+      const cumpleCierre = !!cierreManual || (esEquipoInactivo && count >= 5);
 
       if (!cumpleLlamadas && !cumpleCierre) {
         if ((count === 5 || count === 6) && ultimoLlamada) {
@@ -1377,7 +1384,7 @@ export default function CentroManagers() {
         totalLlamadas: count,
         fechaAlcanzo7: septimo?.fecha || '',
         montoUSD: 400,
-        motivo: cumpleLlamadas ? 'llamadas' : 'cierre_manual',
+        motivo: cumpleLlamadas ? 'llamadas' : (!!cierreManual ? 'cierre_manual' : 'desertor_automatico'),
         cierreManual
       };
 
@@ -3947,6 +3954,10 @@ export default function CentroManagers() {
                                 {item.motivo === 'cierre_manual' ? (
                                   <span title={item.cierreManual?.porNombre ? `Cerrado por ${item.cierreManual.porNombre}` : ''} style={{ background: '#eff6ff', color: '#1d4ed8', padding: '0.2rem 0.5rem', borderRadius: '5px', fontSize: '0.72rem', fontWeight: 700, whiteSpace: 'nowrap' }}>
                                     🔒 Equipo cerrado
+                                  </span>
+                                ) : item.motivo === 'desertor_automatico' ? (
+                                  <span style={{ background: '#fef2f2', color: '#ef4444', padding: '0.2rem 0.5rem', borderRadius: '5px', fontSize: '0.72rem', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                                    ⚠️ Inactivo / Desertor
                                   </span>
                                 ) : (
                                   <span style={{ background: '#fefce8', color: '#a16207', padding: '0.2rem 0.5rem', borderRadius: '5px', fontSize: '0.72rem', fontWeight: 700, whiteSpace: 'nowrap' }} title={item.fechaAlcanzo7 ? `Llegó a 7 el ${item.fechaAlcanzo7}` : ''}>
