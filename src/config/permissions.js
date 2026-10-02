@@ -312,6 +312,10 @@ export const canViewLiquidacionEntrenadores = (currentUser) => {
   if (isDireccionRole(role) || role === 'director_maestria') return true;
   if (roles.some(r => isDireccionRole(r) || r === 'director_maestria')) return true;
 
+  // Coordinadores de Maestría del Juego — pueden ver la liquidación para monitorear sus equipos
+  if (role === 'coord_maestria' || role === 'coordinador_mj') return true;
+  if (roles.some(r => r === 'coord_maestria' || r === 'coordinador_mj')) return true;
+
   // Finanzas / CFO autorizado
   if (LIQUIDACION_ENTRENADORES_EMAILS.includes(email)) return true;
 
