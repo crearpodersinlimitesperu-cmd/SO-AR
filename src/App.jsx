@@ -64,7 +64,7 @@ function PrivateRoute({ children }) {
     return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><p className="text-gold">Cargando...</p></div>;
   }
   
-  return currentUser ? children : <Navigate to="/login" replace />;
+  return currentUser ? children : <Navigate to={`/login?from=${window.location.pathname}`} replace />;
 }
 
 // Componente para proteger autorización por Roles (S3 / Audit Fix)
