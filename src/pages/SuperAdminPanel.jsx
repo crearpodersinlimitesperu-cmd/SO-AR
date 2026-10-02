@@ -7,7 +7,7 @@ import { useUI } from '../context/UIContext';
 import { doc, setDoc, updateDoc, deleteDoc, collection, query, orderBy, limit, getDocs, onSnapshot } from 'firebase/firestore';
 import { db, auth } from '../services/firebase';
 import { normalizeRole, normalizeSede, OPERATIONAL_SEDES } from '../data/usersData';
-import { canViewInactiveUsers } from '../config/permissions';
+import { canViewInactiveUsers, isElizabethEscobar } from '../config/permissions';
 import { getAllCompanyUsers } from '../services/userService';
 import { openOrCreateDirectMessage } from '../services/googleChatService';
 import { getWhatsAppUrl } from '../utils/phoneUtils';
@@ -1107,7 +1107,7 @@ export default function SuperAdminPanel() {
   const navigate = useNavigate();
   const { tasks } = useChecklist();
   const { currentStage } = useCycles();
-  const canAccessGlobal = currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion' || currentUser?.appRole === 'director_maestria' || currentUser?.appRole === 'talento_humano' || (currentUser?.roles || []).includes('talento_humano');
+  const canAccessGlobal = currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion' || currentUser?.appRole === 'director_maestria' || currentUser?.appRole === 'talento_humano' || (currentUser?.roles || []).includes('talento_humano') || isElizabethEscobar(currentUser);
   const [activeView, setActiveView] = useState(canAccessGlobal ? 'global' : 'sede');
   const [selectedUser, setSelectedUser] = useState(null);
   const [assignUser, setAssignUser] = useState(null);
@@ -1275,6 +1275,10 @@ export default function SuperAdminPanel() {
     if (isInactive && !canViewInactiveUsers(currentUser)) return false;
     if (statusFilter === 'ACTIVE') return !isInactive;
     if (statusFilter === 'INACTIVE') return isInactive;
+    // MATRIZ OFICIAL (Fila Directorio de Equipo): Si no es acceso global, solo se muestran colaboradores de su propia sede
+    if (!canAccessGlobal && currentUser?.sede) {
+      if (normalizeSede(u.sede) !== normalizeSede(currentUser.sede)) return false;
+    }
     return true;
   });
 

@@ -95,7 +95,7 @@ const DIRECTORIO_QT_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord
 // Se deja declarada solo por si se necesita revertir a un acceso restringido.
 const CAMPUS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin'];
 const CENTRO_MANAGERS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'director_maestria'];
-const MANUAL_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin', 'director_maestria'];
+const MANUAL_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'superadmin', 'director_maestria'];
 const MANUAL_NODUS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin', 'director_maestria'];
 const REPORTES_VISIBLE = (u) => Boolean(
   u?.isSuperAdmin || u?.isGerente ||

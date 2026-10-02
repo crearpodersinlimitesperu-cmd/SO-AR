@@ -601,171 +601,176 @@ export const getAssignableRoles = (currentUser) => {
 };
 
 /**
+ * Identifica a Nancy Elizabeth Escobar Pérez (CFO / Jefa Financiera Global)
+ * quien cuenta con columna de visibilidad y acceso dedicada en la Matriz Oficial de Google Sheets.
+ */
+export const isElizabethEscobar = (currentUser) => {
+  if (!currentUser) return false;
+  const email = (currentUser.email || '').trim().toLowerCase();
+  const name = (currentUser.name || currentUser.displayName || '').toLowerCase();
+  return email === 'contabilidad.global@crearpsl.net' ||
+         name.includes('elizabeth escobar') ||
+         currentUser.id === 'staff_nancyelizabethescobarprez';
+};
+
+/**
  * MATRIZ OFICIAL DE PERMISOS Y VISTAS POR ROL (CREAR PODER SIN LÍMITES)
  * Fuente: Matriz Oficial de Acceso y Visibilidad Causa OS (roles Causa OS en Google Sheets)
  * ID: 1gt7kJblS5sULWDAZ_Gg1aQMIJTmkOIK2snaM-nnNdfI
  */
 export const OFFICIAL_PERMISSION_MATRIX = {
-  'causa_os': {
-    directivos: 'GLOBAL',
-    gerente: 'SEDE',
-    coord_c1: 'DASHBOARD',
-    coord_maestria: 'DASHBOARD',
-    entrenador: 'DASHBOARD',
-    qt: 'DASHBOARD',
-    capitan: 'DASHBOARD',
-    aliado: 'DASHBOARD',
-    manager: 'DASHBOARD'
-  },
-  'portafolio_pmo': {
-    directivos: 'GLOBAL',
-    gerente: 'SEDE'
-  },
-  'okrs_cascade': {
-    directivos: 'GLOBAL',
-    gerente: 'SEDE'
-  },
-  'auditoria_kpis': {
-    directivos: 'GLOBAL',
-    gerente: 'SEDE'
-  },
-  'manual_qt': {
+  'horarios_vestimenta': {
+    elizabeth: 'GLOBAL',
     directivos: 'GLOBAL',
     gerente: 'GLOBAL',
     coord_c1: 'GLOBAL',
+    coord_maestria: 'GLOBAL'
+  },
+  'causa_os': {
+    gerente: 'GLOBAL',
+    coord_c1: 'GLOBAL',
+    coord_maestria: 'GLOBAL'
+  },
+  'portafolio_pmo': {
+    directivos: 'GLOBAL',
+    gerente: 'GLOBAL'
+  },
+  'okrs_cascade': {},
+  'auditoria_kpis': {
+    directivos: 'GLOBAL',
+    gerente: 'SEDE',
+    coord_c1: 'ASIGNADOS',
+    coord_maestria: 'ASIGNADOS'
+  },
+  'mis_kpis': {
+    directivos: 'GLOBAL',
+    gerente: 'SEDE',
+    coord_c1: 'ASIGNADOS',
+    coord_maestria: 'ASIGNADOS'
+  },
+  'manual_qt': {
+    gerente: 'GLOBAL',
+    coord_c1: 'GLOBAL',
+    coord_maestria: 'GLOBAL',
     qt: 'GLOBAL'
+  },
+  'manual_nodus': {
+    elizabeth: 'GLOBAL',
+    directivos: 'GLOBAL',
+    gerente: 'GLOBAL',
+    coord_c1: 'GLOBAL',
+    coord_maestria: 'GLOBAL'
   },
   'directorio_qt': {
     directivos: 'GLOBAL',
-    gerente: 'GLOBAL',
+    gerente: 'SEDE',
     coord_c1: 'SEDE',
-    qt: 'GLOBAL'
+    coord_maestria: 'SEDE',
+    qt: 'SEDE'
   },
-  'centro_de_mando': {
-    directivos: 'GLOBAL',
-    gerente: 'SEDE'
+  'centro_de_mando': {},
+  'dir_financiera': {
+    elizabeth: 'GLOBAL',
+    directivos: 'GLOBAL'
   },
+  'finanzas': {
+    elizabeth: 'GLOBAL',
+    directivos: 'GLOBAL'
+  },
+  'maestria_andres': {
+    directivos: 'GLOBAL'
+  },
+  'talento_humano': {
+    elizabeth: 'GLOBAL',
+    directivos: 'GLOBAL'
+  },
+  'torre_legal': {
+    directivos: 'GLOBAL'
+  },
+  'hub_qt': {},
+  'crm_llamadas': {},
+  'hub_entrenador': {},
+  'auditoria_legal': {},
   'calendario_global': {
     directivos: 'GLOBAL',
     gerente: 'GLOBAL'
   },
   'campus_interactivo': {
+    elizabeth: 'GLOBAL',
     directivos: 'GLOBAL',
     gerente: 'GLOBAL',
     coord_c1: 'GLOBAL',
     coord_maestria: 'GLOBAL',
     entrenador: 'GLOBAL',
     qt: 'GLOBAL',
-    capitan: 'GLOBAL',
-    aliado: 'GLOBAL',
-    manager: 'GLOBAL'
+    capitan: 'GLOBAL'
   },
   'centro_managers': {
+    elizabeth: 'GLOBAL',
     directivos: 'GLOBAL',
     gerente: 'SEDE',
     coord_maestria: 'SEDE',
     entrenador: 'ASIGNADOS'
   },
-  'hoteles_sede': {
-    directivos: 'GLOBAL',
-    gerente: 'SEDE'
-  },
-  'asignar_meta': {
-    directivos: 'GLOBAL',
-    gerente: 'SEDE'
-  },
-  'directorio_equipo': {
+  'base_maestra_crm': {
     directivos: 'GLOBAL',
     gerente: 'GLOBAL'
   },
-  // 'sistema_cartas': módulo confirmado por José (08/09/2026) como GENUINAMENTE
-  // DISTINTO de "Monitor de Vuelos" ("Son dos cosas distintas de verdad"). Ahora sí
-  // tiene su propia pestaña gateada dentro de /monitor-vuelos (MonitorVuelosCartas.jsx,
-  // pestaña "Repositorio de Cartas y Migraciones") — antes ningún botón la usaba.
-  // CORREGIDO (08/09/2026): la fila real de la Matriz Oficial ("Sistema de Cartas: -
-  // | X | ...") NO le da acceso a Directivos, solo a Gerentes — esta entrada tenía
-  // por error 'directivos: GLOBAL', que nunca se había notado porque nada la leía
-  // todavía. Se removió esa clave.
-  'sistema_cartas': {
-    gerente: 'GLOBAL'
-  },
-  // 'monitor_vuelos': fila "✈️ Monitor de Vuelos" de la Matriz Oficial. Antes,
-  // canAccessMonitorVuelos() leía por error la entrada 'sistema_cartas' (ver nota
-  // arriba) — corregido para usar esta entrada propia (08/09/2026).
-  'monitor_vuelos': {
-    directivos: 'GLOBAL',
-    gerente: 'SEDE'
-  },
-  // 'monitor_imos': fila "🦅 Monitor de IMOs" de la Matriz Oficial. Antes compartía
-  // gate con Monitor de Vuelos (vía canAccessMonitorVuelos/'sistema_cartas'), lo
-  // cual excluía indebidamente a Coordinadores C1Y2 y de MJ. Corregido con su
-  // propia entrada (08/09/2026). El alcance "SOLO LIMA" es un scope declarativo —
-  // no hay enforcement real de sede en el cliente ni en firestore.rules todavía
-  // (Fase 2, fuera de alcance de esta ronda).
-  'monitor_imos': {
-    directivos: 'GLOBAL',
-    gerente: 'SEDE_LIMA',
-    coord_c1: 'SEDE_LIMA',
-    coord_maestria: 'SEDE_LIMA'
-  },
-  'copilot': {
-    directivos: 'GLOBAL',
-    gerente: 'GLOBAL'
-  },
-  'manual_nodus': {
-    directivos: 'GLOBAL',
-    gerente: 'GLOBAL',
-    coord_c1: 'GLOBAL',
+  'calendario_mj': {
     coord_maestria: 'GLOBAL'
   },
-  // (08/09/2026) CORREGIDO — confirmado explícitamente por José: "los Directivos y
-  // Gerentes pueden ver todas las sedes". Antes 'gerente' decía 'SEDE' aquí, pero
-  // Home.jsx ya tenía un botón "GLOBAL" visible para Gerente que no hacía nada real
-  // (el filtro forzaba sede local sin importar la pestaña elegida) — ver el fix
-  // correspondiente en el filtro de eventos de Home.jsx. Ahora la matriz y el
-  // (08/09/2026) CORREGIDO — confirmado explícitamente por José:
-  // "las coordinadoras de cada sede pueden ver todas las fechas de sus sedes tanto de mj como de c1y c2 todas las fechas y entrenadores"
-  // Ahora tanto coord_c1 como coord_maestria tienen acceso completo a todas las fechas y entrenadores de su sede.
-  'eventos_entrenamientos': {
-    directivos: 'GLOBAL',
-    gerente: 'GLOBAL',
-    coord_c1: 'SEDE_TODAS_FECHAS',
-    coord_maestria: 'SEDE_TODAS_FECHAS',
-    entrenador: 'ASIGNADOS',
-    qt: 'SEDE_C1C2_PROXIMOS_SIN_TRAINER',
-    capitan: 'EQUIPO',
-    aliado: 'EQUIPO',
-    manager: 'EQUIPO'
-  },
-  'comunicacion_efectiva': {
-    directivos: 'GOOGLE_CHAT',
-    gerente: 'GOOGLE_CHAT',
-    coord_c1: 'GOOGLE_CHAT',
-    coord_maestria: 'GOOGLE_CHAT',
-    entrenador: 'GOOGLE_CHAT',
-    qt: 'WHATSAPP',
-    capitan: 'WHATSAPP',
-    aliado: 'WHATSAPP',
-    manager: 'WHATSAPP'
-  },
-  // 'flyers_c1': confirmado explícitamente por José (08/09/2026) que Directivos
-  // NO tienen acceso — se removió la clave 'directivos' (antes era 'GLOBAL').
   'flyers_c1': {
     gerente: 'GLOBAL',
     coord_c1: 'GLOBAL',
     coord_maestria: 'GLOBAL'
   },
-  // 'calendario_mj': confirmado explícitamente por José (08/09/2026, "sí, así es
-  // correcto") que SOLO Coordinadores de MJ tienen acceso — se removieron las
-  // claves 'directivos' y 'gerente' (antes GLOBAL y SEDE respectivamente).
-  'calendario_mj': {
-    coord_maestria: 'GLOBAL'
+  'hoteles_sede': {
+    gerente: 'GLOBAL'
   },
-  'agenda_timeboxing': {
+  'asignar_meta': {
     directivos: 'GLOBAL',
+    gerente: 'GLOBAL'
+  },
+  'directorio_equipo': {
+    elizabeth: 'GLOBAL',
+    directivos: 'GLOBAL',
+    gerente: 'SEDE',
+    coord_c1: 'SEDE',
+    coord_maestria: 'SEDE'
+  },
+  'sistema_cartas': {
     gerente: 'GLOBAL',
     coord_c1: 'GLOBAL',
     coord_maestria: 'GLOBAL'
+  },
+  'copilot': {
+    elizabeth: 'GLOBAL',
+    directivos: 'GLOBAL'
+  },
+  'eventos_entrenamientos': {
+    elizabeth: 'GLOBAL',
+    directivos: 'GLOBAL',
+    gerente: 'GLOBAL',
+    coord_c1: 'SEDE',
+    coord_maestria: 'SEDE',
+    entrenador: 'ASIGNADOS',
+    qt: 'SEDE_C1'
+  },
+  'comunicacion_efectiva': {},
+  'agenda_timeboxing': {
+    directivos: 'GLOBAL',
+    gerente: 'SEDE',
+    coord_c1: 'ASIGNADOS',
+    coord_maestria: 'ASIGNADOS'
+  },
+  'monitor_vuelos': {
+    directivos: 'GLOBAL',
+    gerente: 'GLOBAL'
+  },
+  'monitor_imos': {
+    gerente: 'SEDE',
+    coord_c1: 'SEDE',
+    coord_maestria: 'SEDE'
   }
 };
 
@@ -773,7 +778,7 @@ export const OFFICIAL_PERMISSION_MATRIX = {
  * Valida el nivel de acceso de un usuario para un módulo específico según la Matriz Oficial
  * @param {Object} currentUser 
  * @param {string} moduleKey 
- * @returns {{ hasAccess: boolean, scope: 'GLOBAL' | 'SEDE' | 'DASHBOARD' | 'ASIGNADOS' | 'NONE' | string }}
+ * @returns {{ hasAccess: boolean, scope: 'GLOBAL' | 'SEDE' | 'DASHBOARD' | 'ASIGNADOS' | 'SEDE_C1' | 'NONE' | string }}
  */
 export const checkModuleAccess = (currentUser, moduleKey) => {
   if (!currentUser) return { hasAccess: false, scope: 'NONE' };
@@ -788,16 +793,20 @@ export const checkModuleAccess = (currentUser, moduleKey) => {
     return { hasAccess: true, scope: 'GLOBAL' };
   }
 
-  const role = currentUser.appRole || 'participante';
-  // director_maestria se trata como Directivos en TODA la plataforma, confirmado
-  // explícitamente por José (08/09/2026: "Como Directivos"). Antes este rol se
-  // mapeaba más abajo a la clave 'coord_maestria' de la matriz, lo cual le daba
-  // el acceso de Coordinador de MJ en vez de Dirección — corregido aquí.
-  const isDir = isDireccionRole(role) || currentUser.isDireccion || role === 'director_maestria';
-  const isGer = role === 'gerente' || currentUser.isGerente;
-
   const matrixEntry = OFFICIAL_PERMISSION_MATRIX[moduleKey];
   if (!matrixEntry) return { hasAccess: false, scope: 'NONE' };
+
+  // Elizabeth Escobar (CFO) tiene una columna dedicada en la Matriz Oficial de Google Sheets
+  if (isElizabethEscobar(currentUser)) {
+    if (matrixEntry.elizabeth) {
+      return { hasAccess: true, scope: matrixEntry.elizabeth };
+    }
+    return { hasAccess: false, scope: 'NONE' };
+  }
+
+  const role = currentUser.appRole || 'participante';
+  const isDir = isDireccionRole(role) || currentUser.isDireccion || role === 'director_maestria';
+  const isGer = role === 'gerente' || currentUser.isGerente;
 
   if (isDir && matrixEntry.directivos) {
     return { hasAccess: true, scope: matrixEntry.directivos };
@@ -808,7 +817,6 @@ export const checkModuleAccess = (currentUser, moduleKey) => {
   }
 
   // Mapear rol normalizado a claves de matriz
-  // (director_maestria ya no se mapea aquí — ver isDir arriba)
   let roleKey = role;
   if (role === 'coord_c2' || role === 'coordinador_c1c2') roleKey = 'coord_c1';
   if (role === 'coordinador_mj') roleKey = 'coord_maestria';
@@ -889,6 +897,22 @@ export const canAccessManualNodus = (currentUser) => {
 
 export const canAccessCampusInteractivo = (currentUser) => {
   return checkModuleAccess(currentUser, 'campus_interactivo').hasAccess;
+};
+
+export const canAccessCentroManagers = (currentUser) => {
+  return checkModuleAccess(currentUser, 'centro_managers').hasAccess;
+};
+
+export const canAccessDirectorioEquipo = (currentUser) => {
+  return checkModuleAccess(currentUser, 'directorio_equipo').hasAccess;
+};
+
+export const canAccessHorariosVestimenta = (currentUser) => {
+  return checkModuleAccess(currentUser, 'horarios_vestimenta').hasAccess;
+};
+
+export const canAccessCopilot = (currentUser) => {
+  return checkModuleAccess(currentUser, 'copilot').hasAccess;
 };
 
 /**

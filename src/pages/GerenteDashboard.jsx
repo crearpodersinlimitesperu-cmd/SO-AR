@@ -11,6 +11,7 @@ import { usersData, normalizeRole, normalizeSede, isForeignTask } from '../data/
 import TaskAssignmentModal from '../components/TaskAssignmentModal';
 import IAAuditor from '../components/IAAuditor';
 import VenueConfigModal from '../components/VenueConfigModal';
+import { canAccessDirectorioEquipo } from '../config/permissions';
 
 export default function GerenteDashboard() {
   const { currentUser } = useAuth();
@@ -314,7 +315,7 @@ export default function GerenteDashboard() {
               <PlusCircle size={16} /> Asignar Meta
             </button>
           )}
-          {(currentUser?.isSuperAdmin || currentUser?.appRole === 'gerente' || currentUser?.isDireccion || currentUser?.appRole === 'director_maestria') && (
+          {canAccessDirectorioEquipo(currentUser) && (
             <button className="btn-primary" onClick={() => navigate('/superadmin')} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'linear-gradient(135deg, #8b5cf6, #29abe2)', color: 'white', border: 'none' }}>
               👥 Directorio de Equipo
             </button>
