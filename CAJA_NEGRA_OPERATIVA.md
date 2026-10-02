@@ -445,6 +445,19 @@ Con el fin de profesionalizar y escalar la operación sin fricción ni pérdida 
    * **Causa Raíz:** En `src/services/userService.js` se invocaba `canManageUserStatus(currentUser)` en la línea 320 sin haber importado la función desde `src/config/permissions.js`. Esto disparaba un `ReferenceError: canManageUserStatus is not defined` silencioso en el `try/catch` de los componentes consumidores, dejando la lista de personal vacía (`realUsersData = []`).
    * **Solución:** Se importó formalmente `canManageUserStatus` en `userService.js`, se añadió salvaguarda de tipo (`typeof canManageUserStatus === 'function'`) y se vincularon las dependencias de `currentUser` en los hooks `useEffect` de `SuperAdminPanel.jsx` y `Home.jsx`.
 
+10. **Visibilidad e Interconexión de Torres de Control y Centros de Mando:**
+    * Se integraron tarjetas interactivas de exploración en `Home.jsx` (`EXPLORE_OPTIONS`) para los 8 centros especializados.
+    * Se agregaron botones de acceso directo en el menú desplegable de Herramientas y en la Barra de Herramientas PRO de `Home.jsx`.
+    * Se construyó e instaló un **Dock Ejecutivo de Torres de Control** en el `SuperAdminPanel.jsx`, permitiendo a la alta dirección alternar en un solo clic entre:
+      1. Maestría Global (Andrés Gómez) -> `/andres-command-center`
+      2. Talento Humano Global (Lennin Chasi) -> `/hr-command-center`
+      3. Torre de Riesgo y Cumplimiento Legal (Pablo Mendieta) -> `/legal-hub`
+      4. Dirección Financiera Global (CFO) -> `/cfo-dashboard`
+      5. Operativa Financiera y Cierre -> `/finance-workspace`
+      6. Hub Pit-Stop Quantum Team (QT) -> `/qt-hub`
+      7. CRM Entrenadores de Llamadas -> `/call-coach-crm`
+      8. Academia y Hub de Entrenamiento Zen -> `/trainer-hub`
+
 ---
 
 > 📜 **Mandato de la Caja Negra:**

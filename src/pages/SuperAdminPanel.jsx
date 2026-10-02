@@ -1354,6 +1354,44 @@ export default function SuperAdminPanel() {
         prefilledUser={assignUser}
       />
 
+      {/* Dock Ejecutivo: Torres de Control y Centros de Mando Especializados */}
+      <div className="glass-panel" style={{ padding: '0.8rem 1.2rem', marginBottom: '1.2rem', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(15, 23, 42, 0.4)', borderRadius: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.6rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+          <span style={{ fontSize: '0.78rem', letterSpacing: '1px', textTransform: 'uppercase', color: 'var(--crear-gold)', fontWeight: 800 }}>
+            ⚡ Torres de Control y Centros de Mando Especializados
+          </span>
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+            Accesos directos de alta dirección
+          </span>
+        </div>
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
+          <button onClick={() => navigate('/andres-command-center')} className="btn-secondary" style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', borderRadius: '8px', border: '1px solid rgba(56, 189, 248, 0.4)', background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', fontWeight: 600 }}>
+            🌐 Maestría Global (Andrés)
+          </button>
+          <button onClick={() => navigate('/hr-command-center')} className="btn-secondary" style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', borderRadius: '8px', border: '1px solid rgba(167, 139, 250, 0.4)', background: 'rgba(167, 139, 250, 0.1)', color: '#a78bfa', fontWeight: 600 }}>
+            🏢 Talento Humano (Lennin)
+          </button>
+          <button onClick={() => navigate('/legal-hub')} className="btn-secondary" style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', borderRadius: '8px', border: '1px solid rgba(245, 158, 11, 0.4)', background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', fontWeight: 600 }}>
+            ⚖️ Torre Legal (Pablo Mendieta)
+          </button>
+          <button onClick={() => navigate('/cfo-dashboard')} className="btn-secondary" style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', borderRadius: '8px', border: '1px solid rgba(16, 185, 129, 0.4)', background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', fontWeight: 600 }}>
+            🏦 Dirección Financiera (CFO)
+          </button>
+          <button onClick={() => navigate('/finance-workspace')} className="btn-secondary" style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', borderRadius: '8px', border: '1px solid rgba(52, 211, 153, 0.4)', background: 'rgba(52, 211, 153, 0.1)', color: '#34d399', fontWeight: 600 }}>
+            💸 Operativa Finanzas
+          </button>
+          <button onClick={() => navigate('/qt-hub')} className="btn-secondary" style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', borderRadius: '8px', border: '1px solid rgba(249, 115, 22, 0.4)', background: 'rgba(249, 115, 22, 0.1)', color: '#f97316', fontWeight: 600 }}>
+            ⚡ Hub Pit-Stop QT
+          </button>
+          <button onClick={() => navigate('/call-coach-crm')} className="btn-secondary" style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', borderRadius: '8px', border: '1px solid rgba(236, 72, 153, 0.4)', background: 'rgba(236, 72, 153, 0.1)', color: '#ec4899', fontWeight: 600 }}>
+            📞 CRM Llamadas
+          </button>
+          <button onClick={() => navigate('/trainer-hub')} className="btn-secondary" style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', borderRadius: '8px', border: '1px solid rgba(234, 179, 8, 0.4)', background: 'rgba(234, 179, 8, 0.1)', color: '#eab308', fontWeight: 600 }}>
+            🎓 Hub Entrenadores (Zen)
+          </button>
+        </div>
+      </div>
+
       <div className="glass-panel" style={{ padding: '0.8rem 1.2rem', marginBottom: '1.5rem', border: '1px solid var(--border-subtle)', display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
         <div style={{
           flex: 1,

@@ -578,6 +578,94 @@ const CAUSA_OPTIONS_REGISTRY = [
     roles: null
   },
   {
+    id: 'opt-cfo',
+    title: 'Dirección Financiera Global (CFO)',
+    category: 'Finanzas',
+    badge: 'CFO Master',
+    emoji: '🏦',
+    desc: 'Flujo de caja consolidado, auditoría de ingresos/egresos y control de márgenes por sede',
+    keywords: ['cfo', 'finanzas', 'direccion financiera', 'flujo de caja', 'presupuesto', 'tesoreria'],
+    route: '/cfo-dashboard',
+    roles: ['cfo', 'ceo', 'superadmin', 'direccion']
+  },
+  {
+    id: 'opt-finance-workspace',
+    title: 'Operativa Financiera y Cierre',
+    category: 'Finanzas',
+    badge: 'Operativa',
+    emoji: '💸',
+    desc: 'Carga de comprobantes, rendición de cuentas, liquidaciones y conciliación bancaria semanal',
+    keywords: ['finanzas', 'facturacion', 'conciliacion', 'gastos', 'rendicion', 'liquidaciones', 'contabilidad'],
+    route: '/finance-workspace',
+    roles: ['finanzas', 'facturacion', 'contador', 'cfo', 'superadmin', 'direccion']
+  },
+  {
+    id: 'opt-andres-command',
+    title: 'Centro de Comando Global Maestría (Andrés Gómez)',
+    category: 'Maestría',
+    badge: 'Dirección Académica',
+    emoji: '🌐',
+    desc: 'Supervisión de coordinadores C1/C2/MJ, auditoría de Futuros Imposibles y misiones de expansión',
+    keywords: ['andres gomez', 'maestria global', 'futuros imposibles', 'coordinadores', 'misiones', 'expansion'],
+    route: '/andres-command-center',
+    roles: ['coord_maestria_global', 'director_maestria', 'superadmin', 'ceo', 'direccion']
+  },
+  {
+    id: 'opt-trainer-hub',
+    title: 'Academia y Hub de Entrenamiento Zen',
+    category: 'Entrenamiento',
+    badge: 'Zen Mode',
+    emoji: '🎓',
+    desc: 'Espacio minimalista para entrenadores de salón, briefing de sala y canal directo confidencial',
+    keywords: ['entrenador', 'academia de entrenadores', 'hub zen', 'salon', 'briefing', 'entrenamiento'],
+    route: '/trainer-hub',
+    roles: ['entrenador', 'direccion', 'superadmin', 'ceo', 'director_maestria']
+  },
+  {
+    id: 'opt-call-coach-crm',
+    title: 'CRM Entrenadores de Llamadas',
+    category: 'Llamadas',
+    badge: 'Llamadas y Enrolamiento',
+    emoji: '📞',
+    desc: 'Seguimiento de metas, efectividad de llamadas y enrolamiento en tiempo real con Coordinación MJ',
+    keywords: ['llamadas', 'entrenador de llamadas', 'crm llamadas', 'enrolamiento', 'metas llamadas', 'coordinador mj'],
+    route: '/call-coach-crm',
+    roles: ['entrenador_llamadas', 'direccion', 'superadmin', 'ceo', 'coordinador_mj', 'coord_maestria']
+  },
+  {
+    id: 'opt-qt-hub',
+    title: 'Hub Operativo Pit-Stop Quantum Team (QT)',
+    category: 'Operaciones de Piso',
+    badge: 'Mobile-First',
+    emoji: '⚡',
+    desc: 'Checklists tácticos de alta velocidad para sala, auditoría de atención con tareas trampa y control de salón',
+    keywords: ['qt', 'quantum team', 'pit-stop', 'tareas trampa', 'operaciones de piso', 'logistica sala'],
+    route: '/qt-hub',
+    roles: ['qt', 'gerente', 'superadmin', 'ceo', 'direccion']
+  },
+  {
+    id: 'opt-hr-command',
+    title: 'HR Command Center (Talento Humano Global)',
+    category: 'Talento Humano',
+    badge: 'Talento Humano',
+    emoji: '🏢',
+    desc: 'Directorio de colaboradores, índice de atención, pipeline de reclutamiento y radar de pólizas/seguros',
+    keywords: ['talento humano', 'lennin chasi', 'rrhh', 'directorio', 'reclutamiento', 'seguros', 'personal'],
+    route: '/hr-command-center',
+    roles: ['talento_humano', 'rrhh', 'superadmin', 'ceo', 'direccion']
+  },
+  {
+    id: 'opt-legal-hub',
+    title: 'Torre de Riesgo y Cumplimiento Legal',
+    category: 'Legal y Riesgo',
+    badge: 'Zero-Trust',
+    emoji: '⚖️',
+    desc: 'Bóveda Zero-Trust, registro de marcas (NEC, Noda, Neck), panel ARCO y matriz de bloqueo por NDAs',
+    keywords: ['legal', 'pablo mendieta', 'juridico', 'marcas', 'arco', 'nda', 'confidencialidad', 'riesgo'],
+    route: '/legal-hub',
+    roles: ['legal', 'juridico', 'superadmin', 'ceo', 'direccion']
+  },
+  {
     id: 'opt-tema',
     title: 'Cambiar Modo de Tema (Claro / Oscuro / Auto)',
     category: 'Apariencia',
@@ -2070,6 +2158,41 @@ export default function Home() {
                     🏦 Dirección Financiera Global
                   </button>
                 )}
+                {hasRoleAccess(['finanzas', 'facturacion', 'contador', 'cfo', 'superadmin', 'direccion']) && (
+                  <button onClick={() => { setShowToolsDropdown(false); navigate('/finance-workspace'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#34d399', background: 'rgba(52, 211, 153, 0.1)' }}>
+                    💸 Operativa Financiera
+                  </button>
+                )}
+                {hasRoleAccess(['coord_maestria_global', 'director_maestria', 'superadmin', 'ceo', 'direccion']) && (
+                  <button onClick={() => { setShowToolsDropdown(false); navigate('/andres-command-center'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#38bdf8', background: 'rgba(56, 189, 248, 0.1)', fontWeight: 'bold' }}>
+                    🌐 Comando Maestría (Andrés)
+                  </button>
+                )}
+                {hasRoleAccess(['talento_humano', 'rrhh', 'superadmin', 'ceo', 'direccion']) && (
+                  <button onClick={() => { setShowToolsDropdown(false); navigate('/hr-command-center'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#a78bfa', background: 'rgba(167, 139, 250, 0.1)', fontWeight: 'bold' }}>
+                    🏢 Talento Humano Global
+                  </button>
+                )}
+                {hasRoleAccess(['legal', 'juridico', 'superadmin', 'ceo', 'direccion']) && (
+                  <button onClick={() => { setShowToolsDropdown(false); navigate('/legal-hub'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#f59e0b', background: 'rgba(245, 158, 11, 0.1)', fontWeight: 'bold' }}>
+                    ⚖️ Torre de Riesgo (Legal)
+                  </button>
+                )}
+                {hasRoleAccess(['qt', 'gerente', 'superadmin', 'ceo', 'direccion']) && (
+                  <button onClick={() => { setShowToolsDropdown(false); navigate('/qt-hub'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#f97316', background: 'rgba(249, 115, 22, 0.1)', fontWeight: 'bold' }}>
+                    ⚡ Hub Pit-Stop QT
+                  </button>
+                )}
+                {hasRoleAccess(['entrenador_llamadas', 'direccion', 'superadmin', 'ceo', 'coordinador_mj', 'coord_maestria']) && (
+                  <button onClick={() => { setShowToolsDropdown(false); navigate('/call-coach-crm'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#ec4899', background: 'rgba(236, 72, 153, 0.1)' }}>
+                    📞 CRM Entrenadores Llamadas
+                  </button>
+                )}
+                {hasRoleAccess(['entrenador', 'direccion', 'superadmin', 'ceo', 'director_maestria']) && (
+                  <button onClick={() => { setShowToolsDropdown(false); navigate('/trainer-hub'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#eab308', background: 'rgba(234, 179, 8, 0.1)' }}>
+                    🎓 Hub Entrenadores (Zen)
+                  </button>
+                )}
                 {isDataAdmin(currentUser) && (
                   <button onClick={() => { setShowToolsDropdown(false); navigate('/legal-admin'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#f59e0b', background: 'rgba(245, 158, 11, 0.1)' }}>
                     ⚖️ Auditoría Legal
@@ -2202,6 +2325,41 @@ export default function Home() {
           {hasRoleAccess(['cfo', 'ceo', 'superadmin', 'direccion']) && (
             <button onClick={() => navigate('/cfo-dashboard')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #1e293b, #064e3b)', color: '#10b981', border: '1px solid #10b981', fontWeight: 'bold' }}>
               🏦 Dir. Financiera
+            </button>
+          )}
+          {hasRoleAccess(['finanzas', 'facturacion', 'contador', 'cfo', 'superadmin', 'direccion']) && (
+            <button onClick={() => navigate('/finance-workspace')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #1e293b, #065f46)', color: '#34d399', border: '1px solid #34d399' }}>
+              💸 Finanzas
+            </button>
+          )}
+          {hasRoleAccess(['coord_maestria_global', 'director_maestria', 'superadmin', 'ceo', 'direccion']) && (
+            <button onClick={() => navigate('/andres-command-center')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #0c4a6e, #0284c7)', color: '#ffffff', fontWeight: 'bold', border: 'none' }}>
+              🌐 Maestría (Andrés)
+            </button>
+          )}
+          {hasRoleAccess(['talento_humano', 'rrhh', 'superadmin', 'ceo', 'direccion']) && (
+            <button onClick={() => navigate('/hr-command-center')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #4c1d95, #7c3aed)', color: '#ffffff', fontWeight: 'bold', border: 'none' }}>
+              🏢 Talento Humano
+            </button>
+          )}
+          {hasRoleAccess(['legal', 'juridico', 'superadmin', 'ceo', 'direccion']) && (
+            <button onClick={() => navigate('/legal-hub')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #78350f, #d97706)', color: '#ffffff', fontWeight: 'bold', border: 'none' }}>
+              ⚖️ Torre Legal
+            </button>
+          )}
+          {hasRoleAccess(['qt', 'gerente', 'superadmin', 'ceo', 'direccion']) && (
+            <button onClick={() => navigate('/qt-hub')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #7c2d12, #ea580c)', color: '#ffffff', fontWeight: 'bold', border: 'none' }}>
+              ⚡ Hub QT
+            </button>
+          )}
+          {hasRoleAccess(['entrenador_llamadas', 'direccion', 'superadmin', 'ceo', 'coordinador_mj', 'coord_maestria']) && (
+            <button onClick={() => navigate('/call-coach-crm')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #831843, #db2777)', color: '#ffffff', fontWeight: 'bold', border: 'none' }}>
+              📞 CRM Llamadas
+            </button>
+          )}
+          {hasRoleAccess(['entrenador', 'direccion', 'superadmin', 'ceo', 'director_maestria']) && (
+            <button onClick={() => navigate('/trainer-hub')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #713f12, #ca8a04)', color: '#ffffff', fontWeight: 'bold', border: 'none' }}>
+              🎓 Hub Entrenador
             </button>
           )}
           {isDataAdmin(currentUser) && (
