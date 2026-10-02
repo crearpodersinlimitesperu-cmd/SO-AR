@@ -7,6 +7,7 @@ import './index.css'
 
 import LearningDashboard from './pages/LearningDashboard'
 import ExcellenceDashboard from './pages/ExcellenceDashboard'
+import LegalStatusPanel from './pages/LegalStatusPanel';
 import OnboardingLegal from './pages/OnboardingLegal';
 import Login from './pages/Login'
 import OptOutPage from './pages/OptOutPage'
@@ -202,7 +203,12 @@ function App() {
           
           <Route path="/" element={<Navigate to="/home" replace />} />
           
-                    <Route path="/onboarding-legal" element={
+                              <Route path="/legal-admin" element={
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'director_maestria', 'superadmin']} requireSuperAdmin={false}>
+              <LegalStatusPanel />
+            </RoleRoute>
+          } />
+          <Route path="/onboarding-legal" element={
             <PrivateRoute>
               <OnboardingLegal />
             </PrivateRoute>
