@@ -1,17 +1,18 @@
 const fs = require('fs');
-const file = 'src/Home.jsx';
+const file = 'src/pages/Home.jsx';
 let content = fs.readFileSync(file, 'utf8');
 
-const importLegal = `import LegalOnboardingModal from './components/LegalOnboardingModal';
-import { getLegalStatusByParticipant } from './services/legalSignatureService';
+const importLegal = `import LegalOnboardingModal from '../components/LegalOnboardingModal';
+import { getLegalStatusByParticipant } from '../services/legalSignatureService';
 `;
 
-// Insert after other imports
-content = content.replace("import { getVenueForTraining } from '../data/venuesData';", "import { getVenueForTraining } from '../data/venuesData';\n" + importLegal);
+if (!content.includes('LegalOnboardingModal')) {
+  // Insert after other imports
+  content = content.replace("import { getVenueForTraining } from '../data/venuesData';", "import { getVenueForTraining } from '../data/venuesData';\n" + importLegal);
 
-// Now inside the Home component, let's add state and effect for legal check
-const homeComponentStart = `export default function Home() {`;
-const legalState = `
+  // Now inside the Home component
+  const homeComponentStart = `export default function Home() {`;
+  const legalState = `
   const [showLegalModal, setShowLegalModal] = useState(false);
   const [isCheckingLegal, setIsCheckingLegal] = useState(true);
 
@@ -42,14 +43,12 @@ const legalState = `
   }, [currentUser]);
 `;
 
-content = content.replace(homeComponentStart, homeComponentStart + legalState);
+  content = content.replace(homeComponentStart, homeComponentStart + legalState);
 
-// Now in the return block, render LegalOnboardingModal if needed.
-// Find the first return statement of Home
-const returnStart = `return (
+  const returnStart = `return (
     <div className=\`home-dashboard-container view-\${viewMode} theme-\${theme}\`>`;
 
-const renderLegalModal = `
+  const renderLegalModal = `
       {showLegalModal && (
         <LegalOnboardingModal
           currentUser={currentUser}
@@ -59,9 +58,10 @@ const renderLegalModal = `
       )}
 `;
 
-content = content.replace(returnStart, returnStart + renderLegalModal);
+  content = content.replace(returnStart, returnStart + renderLegalModal);
 
-// Also we should block the UI or show loading while checking? No, just showing the modal over the dashboard is fine, because the modal has a dark backdrop.
-
-fs.writeFileSync(file, content);
-console.log('Home.jsx patched with legal onboarding check');
+  fs.writeFileSync(file, content);
+  console.log('src/pages/Home.jsx patched with legal onboarding check');
+} else {
+  console.log('src/pages/Home.jsx already has LegalOnboardingModal');
+}

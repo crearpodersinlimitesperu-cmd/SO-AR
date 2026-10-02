@@ -1,4 +1,7 @@
-import React, { useEffect, useState } from 'react';
+const fs = require('fs');
+const file = 'src/pages/LegalStatusPanel.jsx';
+
+const content = `import React, { useEffect, useState } from 'react';
 import { Shield, Search, Download, CheckCircle, Clock, ShieldAlert, Activity, Users, FileText, ChevronLeft, ExternalLink } from 'lucide-react';
 import { getAllLegalSignatures, generateTemporaryDownloadURL } from '../services/legalSignatureService';
 import { useNavigate } from 'react-router-dom';
@@ -168,7 +171,7 @@ export default function LegalStatusPanel() {
                       </div>
                     )}
                     <button 
-                      onClick={() => window.open(`https://nodus-cpsl.web.app/search?q=${s.participantId}`, '_blank')}
+                      onClick={() => window.open(\`https://nodus-cpsl.web.app/search?q=\${s.participantId}\`, '_blank')}
                       style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', fontSize: '0.75rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '6px', padding: 0, textDecoration: 'underline' }}
                     >
                       <ExternalLink size={12} /> Verificar en Nodus
@@ -193,3 +196,7 @@ export default function LegalStatusPanel() {
     </div>
   );
 }
+`;
+
+fs.writeFileSync(file, content);
+console.log('LegalStatusPanel redesigned');

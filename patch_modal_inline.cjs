@@ -1,122 +1,8 @@
-/**
- * LegalOnboardingModal.jsx — CREAR PSL Legal Module
- * Modal principal de firma legal con scroll obligatorio, opt-in activo y firma digital.
- */
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Shield, Check, X, ChevronDown, FileText, AlertTriangle, Loader, CheckCircle } from 'lucide-react';
-import SignaturePad from './SignaturePad';
-import { getContractsByCountry, getSedePais } from '../data/legalContracts';
-import { processFullLegalSignature } from '../services/legalSignatureService';
+const fs = require('fs');
+const file = 'src/components/LegalOnboardingModal.jsx';
+let content = fs.readFileSync(file, 'utf8');
 
-const LegalOnboardingModal = ({ currentUser, sede, onComplete, onClose }) => {
-  const countryCode = getSedePais(sede);
-  const contracts = getContractsByCountry(countryCode);
-
-  
-  const [step, setStep] = useState(-1); // -1=kyc, 0=intro, 1..N=documentos, N+1=firma, N+2=éxito
-  const [kycData, setKycData] = useState({
-    fullName: currentUser?.name || currentUser?.displayName || '',
-    docType: 'DNI',
-    docNumber: '',
-    birthDate: '',
-    email: currentUser?.email || '',
-    phone: ''
-  });
-
-  const [accepted, setAccepted] = useState({}); // { [docId]: boolean }
-  const [hasScrolled, setHasScrolled] = useState({}); // { [docId]: boolean }
-  const [signatureDataUrl, setSignatureDataUrl] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState(null);
-  const [resultId, setResultId] = useState(null);
-  const scrollRef = useRef(null);
-
-  const totalDocs = contracts.documents.length;
-  const currentDoc = step >= 1 && step <= totalDocs ? contracts.documents[step - 1] : null;
-  
-  const isKyc = step === -1;
-  const isIntro = step === 0;
-
-  const isSignStep = step === totalDocs + 1;
-  const isSuccess = step === totalDocs + 2;
-
-  // Detectar scroll al final del documento
-  const handleScroll = useCallback(() => {
-    const el = scrollRef.current;
-    if (!el || !currentDoc) return;
-    const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 60;
-    if (atBottom) {
-      setHasScrolled(prev => ({ ...prev, [currentDoc.id]: true }));
-    }
-  }, [currentDoc]);
-
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = 0;
-      if (currentDoc) {
-        setHasScrolled(prev => prev[currentDoc.id] ? prev : prev);
-      }
-    }
-  }, [step]);
-
-  const canAcceptCurrent = currentDoc && hasScrolled[currentDoc.id];
-  const allRequiredAccepted = contracts.documents
-    .filter(d => d.required)
-    .every(d => accepted[d.id]);
-
-  const handleAcceptDoc = () => {
-    if (!currentDoc || !canAcceptCurrent) return;
-    setAccepted(prev => ({ ...prev, [currentDoc.id]: true }));
-    setStep(s => s + 1);
-  };
-
-  const handleSign = async (dataUrl) => {
-    setSignatureDataUrl(dataUrl);
-  };
-
-  const handleSubmit = async () => {
-    if (!signatureDataUrl || !allRequiredAccepted) return;
-    setIsSubmitting(true);
-    setError(null);
-
-    try {
-      const docsAccepted = Object.entries(accepted)
-        .filter(([, v]) => v)
-        .map(([k]) => k);
-
-      const termsDoc = contracts.documents.find(d => d.type === 'terms');
-      const ndaDoc = contracts.documents.find(d => d.type === 'nda');
-      const privacyDoc = contracts.documents.find(d => d.type === 'privacy');
-
-      const result = await processFullLegalSignature({
-        ...kycData,
-        participantId: currentUser?.email || '',
-        participantName: currentUser?.name || currentUser?.displayName || '',
-        countryCode,
-        sede: sede || '',
-        signatureDataUrl,
-        docsAccepted,
-        termsAccepted: termsDoc ? !!accepted[termsDoc.id] : false,
-        ndaSigned: ndaDoc ? !!accepted[ndaDoc.id] : false,
-        privacyAccepted: privacyDoc ? !!accepted[privacyDoc.id] : false,
-      });
-
-      if (result.success) {
-        setResultId(result.signatureId);
-        setStep(totalDocs + 2);
-      } else {
-        setError(result.error || 'Error al procesar la firma. Intenta nuevamente.');
-      }
-    } catch (e) {
-      setError(e.message || 'Error inesperado.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const progressPct = step <= 0 ? 0 : Math.round((Math.min(step, totalDocs + 1) / (totalDocs + 1)) * 100);
-
-      return (
+const newReturn = `  return (
     <div style={{
       position: 'fixed', inset: 0, zIndex: 9999,
       background: 'rgba(10, 25, 47, 0.85)', backdropFilter: 'blur(8px)',
@@ -164,88 +50,15 @@ const LegalOnboardingModal = ({ currentUser, sede, onComplete, onClose }) => {
           
           {/* Barra de progreso */}
           <div style={{ marginTop: '1.25rem', background: 'var(--bg-dark)', borderRadius: '4px', height: '6px', border: '1px solid var(--border-subtle)', overflow: 'hidden' }}>
-            <div style={{ height: '100%', background: 'linear-gradient(90deg, var(--crear-gold), #FFD54F)', borderRadius: '4px', width: `${progressPct}%`, transition: 'width 0.4s ease' }} />
+            <div style={{ height: '100%', background: 'linear-gradient(90deg, var(--crear-gold), #FFD54F)', borderRadius: '4px', width: \`\${progressPct}%\`, transition: 'width 0.4s ease' }} />
           </div>
           <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '8px', textAlign: 'right', fontWeight: 600, letterSpacing: '0.05em' }}>
-            {isSuccess ? 'PROCESO COMPLETADO' : `PASO ${Math.max(step, 1)} DE ${totalDocs + 1}`}
+            {isSuccess ? 'PROCESO COMPLETADO' : \`PASO \${Math.max(step, 1)} DE \${totalDocs + 1}\`}
           </div>
         </div>
 
         {/* CUERPO */}
         <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', background: 'var(--bg-dark-alt)' }}>
-
-          
-          {/* PASO -1 — KYC Data Capture */}
-          {isKyc && (
-            <div style={{ padding: '2.5rem', overflowY: 'auto' }}>
-              <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                <h2 style={{ color: 'var(--crear-gold)', margin: 0, fontSize: '1.6rem', fontFamily: 'var(--font-heading)', fontWeight: 800 }}>
-                  Blindaje de Identidad
-                </h2>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '0.5rem' }}>
-                  Para validar legalmente tu firma y sincronizar con Nodus, necesitamos verificar tus datos.
-                </p>
-              </div>
-
-              <div style={{ display: 'grid', gap: '1.2rem' }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px', fontWeight: 600 }}>Nombre Completo (Legal)</label>
-                  <input type="text" value={kycData.fullName} onChange={e => setKycData({...kycData, fullName: e.target.value})} style={{ width: '100%', padding: '0.8rem', background: 'var(--bg-dark)', border: '1px solid var(--border-strong)', color: 'var(--text-main)', borderRadius: 'var(--radius-sm)' }} placeholder="Ejem: Juan Pérez" />
-                </div>
-                
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                  <div style={{ flex: 1 }}>
-                    <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px', fontWeight: 600 }}>Tipo Doc.</label>
-                    <select value={kycData.docType} onChange={e => setKycData({...kycData, docType: e.target.value})} style={{ width: '100%', padding: '0.8rem', background: 'var(--bg-dark)', border: '1px solid var(--border-strong)', color: 'var(--text-main)', borderRadius: 'var(--radius-sm)' }}>
-                      <option>DNI</option>
-                      <option>Cédula</option>
-                      <option>Pasaporte</option>
-                      <option>CE</option>
-                    </select>
-                  </div>
-                  <div style={{ flex: 2 }}>
-                    <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px', fontWeight: 600 }}>Número de Documento</label>
-                    <input type="text" value={kycData.docNumber} onChange={e => setKycData({...kycData, docNumber: e.target.value})} style={{ width: '100%', padding: '0.8rem', background: 'var(--bg-dark)', border: '1px solid var(--border-strong)', color: 'var(--text-main)', borderRadius: 'var(--radius-sm)' }} placeholder="Ej: 45689102" />
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                  <div style={{ flex: 1 }}>
-                    <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px', fontWeight: 600 }}>Fecha de Nacimiento</label>
-                    <input type="date" value={kycData.birthDate} onChange={e => setKycData({...kycData, birthDate: e.target.value})} style={{ width: '100%', padding: '0.8rem', background: 'var(--bg-dark)', border: '1px solid var(--border-strong)', color: 'var(--text-main)', borderRadius: 'var(--radius-sm)', colorScheme: 'dark' }} />
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px', fontWeight: 600 }}>Teléfono (WhatsApp)</label>
-                    <input type="tel" value={kycData.phone} onChange={e => setKycData({...kycData, phone: e.target.value})} style={{ width: '100%', padding: '0.8rem', background: 'var(--bg-dark)', border: '1px solid var(--border-strong)', color: 'var(--text-main)', borderRadius: 'var(--radius-sm)' }} placeholder="+51 999 888 777" />
-                  </div>
-                </div>
-
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px', fontWeight: 600 }}>Correo Electrónico Oficial</label>
-                  <input type="email" value={kycData.email} disabled style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-subtle)', color: 'var(--text-muted)', borderRadius: 'var(--radius-sm)', cursor: 'not-allowed' }} />
-                </div>
-              </div>
-
-              <div style={{ textAlign: 'center', marginTop: '2.5rem' }}>
-                <button
-                  onClick={() => {
-                    if(!kycData.fullName || !kycData.docNumber || !kycData.birthDate || !kycData.phone) {
-                      alert("Por favor, completa todos los campos de identidad.");
-                      return;
-                    }
-                    setStep(0);
-                  }}
-                  style={{
-                    padding: '1rem 3rem', background: 'linear-gradient(135deg, var(--crear-gold), #FF9800)',
-                    color: '#000', border: 'none', borderRadius: 'var(--radius-lg)', fontWeight: 800, fontSize: '1rem',
-                    cursor: 'pointer', boxShadow: '0 4px 15px rgba(255, 193, 7, 0.3)'
-                  }}
-                >
-                  Validar Identidad →
-                </button>
-              </div>
-            </div>
-          )}
 
           {/* PASO 0 — Introducción */}
           {isIntro && (
@@ -479,5 +292,11 @@ const LegalOnboardingModal = ({ currentUser, sede, onComplete, onClose }) => {
     </div>
   );
 };
+`
 
-export default LegalOnboardingModal;
+const returnIndex = content.indexOf('return (');
+if (returnIndex !== -1) {
+  content = content.substring(0, returnIndex) + newReturn;
+  fs.writeFileSync(file, content);
+  console.log('LegalOnboardingModal.jsx inline styles patched');
+}

@@ -380,6 +380,14 @@ export const processFullLegalSignature = async (params) => {
       docsAccepted: params.docsAccepted || [],
       policyVersion: '2026-v1',
       signatureDataUrl: params.signatureDataUrl || '',
+      kycData: {
+        fullName: params.fullName || params.participantName || '',
+        docType: params.docType || '',
+        docNumber: params.docNumber || '',
+        birthDate: params.birthDate || '',
+        phone: params.phone || '',
+        email: params.email || params.participantId || ''
+      },
       ipAddress,
       userAgent,
       timestamp,
