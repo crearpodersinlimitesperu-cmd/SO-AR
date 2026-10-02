@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { db } from '../firebase';
+import { db } from '../services/firebase';
 import { collection, doc, setDoc, getDocs } from 'firebase/firestore';
 
 const CausaOSTask = () => {
