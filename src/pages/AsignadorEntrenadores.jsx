@@ -43,6 +43,7 @@ import {
 import { collection, onSnapshot, doc, setDoc, addDoc, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useAuth } from '../context/AuthContext';
+import { formatTeamString } from '../utils/formatTeam';
 import { useCycles } from '../context/CyclesContext';
 import { useUI } from '../context/UIContext';
 import { getAllCompanyUsers } from '../services/userService';
@@ -483,9 +484,10 @@ export default function AsignadorEntrenadores() {
           lugar: ev.lugar || ev.direccion || '',
           // entrenador de la hoja (lo que hay hoy) vs el asignado en Causa OS
           entrenadorHojaRaw,
-          // Solo una persona de la fuente puede presentarse como asignación.
-          // Las listas múltiples quedan explícitamente pendientes de confirmar.
-          entrenadorHoja: preasignacionesHoja.length === 1 ? preasignacionesHoja[0] : '',
+          // Solo una persona por slot: FDS 1, 2 y 3 toman su respectivo entrenador preasignado
+          entrenadorHoja: preasignacionesHoja.length === 1 
+            ? preasignacionesHoja[0] 
+            : (slots.length > 1 && preasignacionesHoja[i] ? preasignacionesHoja[i] : (preasignacionesHoja[0] || '')),
           preasignacionesHoja,
           entrenadorAsignado: asign.entrenador || '',
           asignadoPor: asign.asignadoPor || '',
@@ -707,22 +709,22 @@ export default function AsignadorEntrenadores() {
 
   const confirmarVigencia = async (row) => {
     const validUntil = policyExpiryDrafts[row.reviewId] ?? row.stored?.validUntil ?? '';
-    if (!row.file) return showToast('Primero debe existir un documento localizado para confirmar su vigencia.', 'error');
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(validUntil)) return showToast('Indica la fecha de vigencia leída en el documento.', 'error');
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(validUntil)) return showToast('Indica una fecha de vigencia válida (AAAA-MM-DD).', 'error');
     setPolicySaving(row.reviewId);
     const verificationStatus = validUntil >= todayIso() ? 'vigente' : 'vencida';
     const occurredAt = new Date().toISOString();
+    const filePayload = row.file || { id: 'manual_directiva', name: 'Validación Directiva Manual' };
     try {
       await setDoc(doc(db, 'trainer_policy_reviews', row.reviewId), {
         trainerName: row.nombre, coachEmail: row.email || null, sede: row.sede || 'Global',
-        file: row.file, verifiedFileId: row.file.id, validUntil, verificationStatus,
+        file: filePayload, verifiedFileId: filePayload.id, validUntil, verificationStatus,
         requiresRevalidation: false, verifiedAt: occurredAt,
         verifiedBy: currentUser?.email || '', verifiedByName: currentUser?.name || '', updatedAt: serverTimestamp(),
       }, { merge: true });
       await addDoc(collection(db, 'trainer_policy_audit'), {
         action: verificationStatus === 'vigente' ? 'POLICY_VERIFIED_VALID' : 'POLICY_VERIFIED_EXPIRED',
         trainerName: row.nombre, coachEmail: row.email || null, reviewId: row.reviewId,
-        fileId: row.file.id, fileName: row.file.name, validUntil, occurredAt,
+        fileId: filePayload.id, fileName: filePayload.name, validUntil, occurredAt,
         actorEmail: currentUser?.email || '', actorName: currentUser?.name || '', immutable: true,
       });
       showToast(verificationStatus === 'vigente' ? `Vigencia de ${row.nombre} confirmada hasta ${validUntil}.` : `La póliza de ${row.nombre} quedó registrada como vencida.`, 'success');
@@ -1128,7 +1130,7 @@ export default function AsignadorEntrenadores() {
                         </td>
                         <td style={{ padding: '0.65rem 0.8rem' }}>
                           {f.nombre}
-                          {f.equipo && <span className="text-muted" style={{ fontSize: '0.75rem' }}> - Eq. {f.equipo} <span style={{ color: '#10b981', fontWeight: 700, marginLeft: 4 }}>({nodusEquiposMap[String(f.equipo).trim().toUpperCase()] || 0} confirmados)</span></span>}
+                          {f.equipo && <span className="text-muted" style={{ fontSize: '0.75rem' }}> - {formatTeamString(f.equipo)} <span style={{ color: '#10b981', fontWeight: 700, marginLeft: 4 }}>({nodusEquiposMap[String(f.equipo).trim().toUpperCase()] || 0} confirmados)</span></span>}
                         </td>
                         <td style={{ padding: '0.65rem 0.8rem', whiteSpace: 'nowrap' }}>
                           {f.fdsLabel
@@ -1284,16 +1286,85 @@ export default function AsignadorEntrenadores() {
               {lastPolicyScan && <span className="text-muted" style={{ fontSize: '.72rem', padding: '.2rem .15rem' }}>Última lectura: {fmtFecha(lastPolicyScan)}</span>}
             </div>
             <div style={{ ...card, padding: 0, overflowX: 'auto' }}><table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem', minWidth: 1280, tableLayout: 'fixed' }}><colgroup><col style={{ width: '16%' }} /><col style={{ width: '9%' }} /><col style={{ width: '28%' }} /><col style={{ width: '18%' }} /><col style={{ width: '11%' }} /><col style={{ width: '18%' }} /></colgroup><thead><tr>{['ENTRENADOR','SEDE','EVIDENCIA','ESTADO DE COBERTURA','VIGENCIA','SIGUIENTE ACCIÓN'].map(h => <th key={h} style={{ textAlign: 'left', padding: '.76rem .9rem', color: 'var(--text-muted)', fontSize: '.66rem', letterSpacing: '.04em', background: 'rgba(255,255,255,.018)', overflow: 'hidden' }}>{h}</th>)}</tr></thead><tbody>{visiblePolicyRows.map(row => {
-              const state = {
-                vigente: ['Vigente confirmada', '#10b981', 'Apta para asignación'], vencida: ['Cobertura vencida', '#ef4444', 'Regularizar antes de asignar'], requiere_revision: ['Cambio de documento', '#f59e0b', 'Comparar y revalidar'], pendiente_fecha: ['Documento localizado', '#f59e0b', 'Falta confirmar vigencia'], sin_documento: ['Sin coincidencia segura', '#ef4444', 'Solicitar documento'],
-              }[row.status];
+              const isActiva = row.status === 'vigente';
+              const isVencida = row.status === 'vencida';
+              const badgeBg = isActiva ? 'rgba(16,185,129,0.15)' : isVencida ? 'rgba(239,68,68,0.15)' : 'rgba(245,158,11,0.15)';
+              const badgeColor = isActiva ? '#10b981' : isVencida ? '#ef4444' : '#f59e0b';
+              const badgeBorder = isActiva ? 'rgba(16,185,129,0.3)' : isVencida ? 'rgba(239,68,68,0.3)' : 'rgba(245,158,11,0.3)';
+              const badgeLabel = isActiva ? '🟢 ACTIVA / VIGENTE' : isVencida ? '🔴 VENCIDA' : '🟡 EN REVISIÓN';
+
               const draft = policyExpiryDrafts[row.reviewId] ?? row.stored?.validUntil ?? '';
               return <tr key={row.reviewId} style={{ borderTop: '1px solid var(--border-color, rgba(255,255,255,.06))' }}>
-                <td style={{ padding: '.78rem .9rem', fontWeight: 750, verticalAlign: 'top' }}>{row.nombre}</td><td style={{ padding: '.78rem .9rem', verticalAlign: 'top' }}><span style={{ padding: '.22rem .45rem', borderRadius: 99, background: 'rgba(41,171,226,.1)', color: 'var(--crear-cyan)', fontSize: '.7rem', fontWeight: 700 }}>{row.sede || 'Global'}</span></td>
-                <td style={{ padding: '.78rem .9rem', verticalAlign: 'top', minWidth: 0 }}>{row.file ? <><a href={row.file.webViewLink || `https://drive.google.com/open?id=${row.file.id}`} target="_blank" rel="noreferrer" style={{ color: 'var(--crear-gold)', fontWeight: 650, display: 'block', width: '100%', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', boxSizing: 'border-box' }} title={row.file.name}>{row.file.name}</a><div className="text-muted" style={{ fontSize: '.66rem', marginTop: 4, overflowWrap: 'anywhere' }}>Detectado en Drive · {row.file.modifiedTime ? fmtFecha(row.file.modifiedTime) : 'sin fecha de archivo'}</div></> : <span className="text-muted">No hay archivo asociado</span>}</td>
-                <td style={{ padding: '.78rem .9rem', verticalAlign: 'top', minWidth: 0, overflow: 'hidden' }}><div style={{ color: state[1], fontWeight: 800, overflowWrap: 'anywhere' }}>{state[0]}</div><div className="text-muted" style={{ fontSize: '.66rem', marginTop: 3, overflowWrap: 'anywhere' }}>{state[2]}</div>{row.stored?.verifiedAt && <div className="text-muted" style={{ fontSize: '.64rem', marginTop: 3 }}>Confirmada {fmtFecha(row.stored.verifiedAt)}</div>}</td>
-                <td style={{ padding: '.78rem .9rem' }}>{row.stored?.validUntil ? <strong style={{ color: row.status === 'vencida' ? '#ef4444' : '#e5e7eb' }}>{fmtFecha(row.stored.validUntil)}</strong> : <span className="text-muted">No declarada</span>}</td>
-                <td style={{ padding: '.78rem .9rem' }}>{row.file ? (['vigente', 'vencida'].includes(row.status) && row.stored?.validUntil && !row.stored?.requiresRevalidation ? <><span style={{ color: row.status === 'vigente' ? '#10b981' : '#ef4444', fontSize: '.72rem', fontWeight: 800 }}>✓ Fecha registrada</span><div className="text-muted" style={{ fontSize: '.65rem', marginTop: 4 }}>La vigencia ya está confirmada.</div></> : <><div style={{ display: 'flex', gap: '.35rem', alignItems: 'center' }}><input aria-label={`Vigencia de ${row.nombre}`} type="date" value={draft} onChange={e => setPolicyExpiryDrafts(prev => ({ ...prev, [row.reviewId]: e.target.value }))} disabled={policySaving === row.reviewId} style={{ ...selectStyle, width: 132, padding: '.35rem .45rem' }} /><button onClick={() => confirmarVigencia(row)} disabled={policySaving === row.reviewId || !draft} style={{ border: 0, borderRadius: 7, padding: '.38rem .55rem', background: draft ? 'var(--crear-gold)' : 'var(--border-color)', color: '#111827', fontWeight: 750, cursor: draft ? 'pointer' : 'not-allowed' }}>{policySaving === row.reviewId ? 'Guardando…' : 'Confirmar'}</button></div><div className="text-muted" style={{ fontSize: '.65rem', marginTop: 4 }}>Ingresa solo la fecha leída en el documento.</div></>) : <span className="text-muted" style={{ fontSize: '.7rem' }}>No se habilita confirmación sin evidencia.</span>}</td>
+                <td style={{ padding: '.78rem .9rem', fontWeight: 750, verticalAlign: 'middle' }}>{row.nombre}</td>
+                <td style={{ padding: '.78rem .9rem', verticalAlign: 'middle' }}>
+                  <span style={{ padding: '.22rem .45rem', borderRadius: 99, background: 'rgba(41,171,226,.1)', color: 'var(--crear-cyan)', fontSize: '.7rem', fontWeight: 700 }}>
+                    {row.sede || 'Global'}
+                  </span>
+                </td>
+                <td style={{ padding: '.78rem .9rem', verticalAlign: 'middle', minWidth: 0 }}>
+                  {row.file && row.file.id !== 'manual_directiva' ? (
+                    <>
+                      <a href={row.file.webViewLink || `https://drive.google.com/open?id=${row.file.id}`} target="_blank" rel="noreferrer" style={{ color: 'var(--crear-gold)', fontWeight: 650, display: 'block', width: '100%', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', boxSizing: 'border-box' }} title={row.file.name}>
+                        {row.file.name}
+                      </a>
+                      <div className="text-muted" style={{ fontSize: '.66rem', marginTop: 4, overflowWrap: 'anywhere' }}>
+                        Detectado en Drive · {row.file.modifiedTime ? fmtFecha(row.file.modifiedTime) : 'sin fecha de archivo'}
+                      </div>
+                    </>
+                  ) : (
+                    <span className="text-muted" style={{ fontSize: '0.75rem', fontStyle: 'italic' }}>
+                      {row.stored?.verifiedBy ? 'Validación Directiva Registrada' : 'Sin archivo adjunto (Validación Manual)'}
+                    </span>
+                  )}
+                </td>
+                <td style={{ padding: '.78rem .9rem', verticalAlign: 'middle', minWidth: 0 }}>
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: badgeBg, color: badgeColor, border: `1px solid ${badgeBorder}`, padding: '4px 8px', borderRadius: '12px', fontSize: '0.74rem', fontWeight: 800 }}>
+                    {badgeLabel}
+                  </div>
+                  {row.stored?.verifiedAt && (
+                    <div className="text-muted" style={{ fontSize: '.64rem', marginTop: 3 }}>
+                      Confirmada por {row.stored?.verifiedByName || row.stored?.verifiedBy || 'Directiva'} ({fmtFecha(row.stored.verifiedAt)})
+                    </div>
+                  )}
+                </td>
+                <td style={{ padding: '.78rem .9rem', verticalAlign: 'middle' }}>
+                  {row.stored?.validUntil ? (
+                    <strong style={{ color: isVencida ? '#ef4444' : '#10b981', fontSize: '0.84rem' }}>
+                      {fmtFecha(row.stored.validUntil)}
+                    </strong>
+                  ) : (
+                    <span className="text-muted" style={{ fontSize: '0.76rem' }}>Pendiente</span>
+                  )}
+                </td>
+                <td style={{ padding: '.78rem .9rem', verticalAlign: 'middle' }}>
+                  <div style={{ display: 'flex', gap: '.4rem', alignItems: 'center', flexWrap: 'nowrap' }}>
+                    <input
+                      aria-label={`Vigencia de ${row.nombre}`}
+                      type="date"
+                      value={draft}
+                      onChange={e => setPolicyExpiryDrafts(prev => ({ ...prev, [row.reviewId]: e.target.value }))}
+                      disabled={policySaving === row.reviewId}
+                      style={{ ...selectStyle, width: 130, padding: '.32rem .45rem', fontSize: '0.76rem' }}
+                    />
+                    <button
+                      onClick={() => confirmarVigencia(row)}
+                      disabled={policySaving === row.reviewId || !draft}
+                      style={{
+                        border: 0,
+                        borderRadius: 6,
+                        padding: '.35rem .65rem',
+                        background: draft ? 'var(--crear-gold)' : 'rgba(255,255,255,0.08)',
+                        color: draft ? '#111827' : 'var(--text-muted)',
+                        fontWeight: 800,
+                        fontSize: '0.74rem',
+                        cursor: draft ? 'pointer' : 'not-allowed',
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
+                      {policySaving === row.reviewId ? 'Guardando…' : 'Guardar'}
+                    </button>
+                  </div>
+                </td>
               </tr>;
             })}</tbody></table>{visiblePolicyRows.length === 0 && <div className="text-muted" style={{ padding: '2rem', textAlign: 'center' }}>No hay pólizas que coincidan con este filtro.</div>}</div>
             {policyAudits.length > 0 && <div style={{ ...card, marginTop: '.8rem', padding: '.75rem .9rem' }}><div style={{ fontWeight: 750, fontSize: '.8rem', marginBottom: '.45rem' }}><History size={14} style={{ verticalAlign: '-2px' }} /> Auditoría reciente</div>{policyAudits.slice(0, 6).map(audit => {

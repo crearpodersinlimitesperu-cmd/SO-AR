@@ -11,7 +11,7 @@ import {
   UserX, UserCheck, ShieldAlert
 } from 'lucide-react';
 import { db } from '../services/firebase';
-import { doc, onSnapshot, setDoc, updateDoc, arrayUnion, arrayRemove, addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { doc, onSnapshot, setDoc, updateDoc, arrayUnion, arrayRemove, addDoc, collection, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
 import { useAuth } from '../context/AuthContext';
 import { useChecklist } from '../context/ChecklistContext';
 import { normalizeRole, normalizeSede, getRoleDisplayName, OPERATIONAL_SEDES } from '../data/usersData';
@@ -28,7 +28,7 @@ import UserStatusModal from './UserStatusModal';
 const ROLE_EDIT_OPTIONS = [
   'direccion', 'cfo', 'gerente', 'director_maestria', 'coord_c1', 'coord_maestria',
   'capitan', 'manager', 'qt', 'coordinador', 'finanzas', 'asistente_impuestos_quito',
-  'talento_humano', 'legal', 'tecnico_sst', 'entrenador', 'entrenador_llamadas'
+  'talento_humano', 'legal', 'tecnico_sst', 'entrenador', 'entrenador_llamadas', 'observador'
 ];
 const SEDE_EDIT_OPTIONS = [...OPERATIONAL_SEDES, 'Sede Global'];
 
@@ -45,6 +45,7 @@ const ROLE_LABELS = {
   legal: 'Legal / Finanzas',
   entrenador: 'Entrenador',
   entrenador_llamadas: 'Entrenador de Llamadas',
+  observador: 'Observador Global (Solo Lectura)',
   qt: 'Quantum Team',
   corporativo: 'Dirección Corporativa',
   direccion: 'Dirección Global',
@@ -68,7 +69,8 @@ const ROLE_COLORS = {
   talento_humano: '#06b6d4',
   legal: '#a855f7',
   entrenador: '#fbbf24',
-  entrenador_llamadas: '#38bdf8'
+  entrenador_llamadas: '#38bdf8',
+  observador: '#64748b'
 };
 
 // Formatea "YYYY-MM-DD" a "17 de marzo" — sin año, por privacidad (no se debe
@@ -216,7 +218,21 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
     normalizeRole(user?.role), ...(Array.isArray(user?.roles) ? user.roles.map(normalizeRole) : [])
   ].filter(Boolean))));
   const [sedeDraft, setSedeDraft] = useState(normalizeSede(user?.sede) || '');
+  const [roleSedesDraft, setRoleSedesDraft] = useState(() => ({ ...(user?.roleSedes || {}) }));
   const [isSavingRole, setIsSavingRole] = useState(false);
+
+  useEffect(() => {
+    if (user && isOpen) {
+      setRoleDraft(normalizeRole(user.role) || '');
+      setRolesDraft(Array.from(new Set([
+        normalizeRole(user.role), ...(Array.isArray(user.roles) ? user.roles.map(normalizeRole) : [])
+      ].filter(Boolean))));
+      setSedeDraft(normalizeSede(user.sede) || '');
+      setRoleSedesDraft({ ...(user.roleSedes || {}) });
+      setBirthdayDraft(user.cumpleanos || '');
+      setQuitoTeamsDraft(Array.isArray(user.equiposQuito) ? user.equiposQuito : []);
+    }
+  }, [user, isOpen]);
 
   // (14/09/2026) Equipo(s) de Quito (editable por la propia persona, o por Super
   // Admin) -- se guarda en users/{id}.equiposQuito. Ver CyclesContext.jsx para el
@@ -413,19 +429,62 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
 
   const pct = userTasks.length > 0 ? Math.round((completedTasks.length / userTasks.length) * 100) : 0;
 
-  // Handler: Guardar Cumpleaños (escribe en la colección "users", no en "user_profiles",
-  // para que quede consistente con userService.getAllCompanyUsers(currentUser) y con el import
-  // desde el Directorio Global). Solo aplica cuando el usuario tiene un id real de
-  // Firestore (user.id) — un registro que solo viene del registro local (usersData.js,
-  // source: 'local_registry') no tiene doc propio en "users" y no se puede editar aquí.
-  const handleSaveBirthday = async () => {
-    if (!user?.id) {
-      showToast('Este perfil no tiene un documento en Firestore para editar (registro local).', 'error');
-      return;
+  // Helper para resolver todos los IDs de documento en Firestore asociados al colaborador
+  const resolveTargetDocIds = async (target) => {
+    const ids = new Set([
+      target?.id,
+      target?.uid,
+      target?.dbId,
+      target?._docId,
+      user?.id,
+      user?.uid,
+      user?.dbId,
+      user?._docId
+    ].filter(Boolean));
+
+    const email = (target?.email || target?.corporateEmail || target?.personalEmail || user?.email || '').trim().toLowerCase();
+    if (email) {
+      try {
+        const usersRef = collection(db, 'users');
+        const q1 = query(usersRef, where('email', '==', email));
+        const snap1 = await getDocs(q1);
+        snap1.forEach(d => ids.add(d.id));
+
+        const q2 = query(usersRef, where('emails', 'array-contains', email));
+        const snap2 = await getDocs(q2);
+        snap2.forEach(d => ids.add(d.id));
+      } catch (e) {
+        console.warn('Error resolviendo documentos de usuario en Firestore:', e);
+      }
     }
+
+    if (ids.size === 0) {
+      if (email) {
+        ids.add(email);
+      } else {
+        ids.add(`user_${Date.now()}`);
+      }
+    }
+    return Array.from(ids);
+  };
+
+  // Handler: Guardar Cumpleaños
+  const handleSaveBirthday = async () => {
     setIsSavingBirthday(true);
     try {
-      await setDoc(doc(db, 'users', user.id), { cumpleanos: birthdayDraft || null }, { merge: true });
+      const targetDocIds = await resolveTargetDocIds(u);
+      for (const docId of targetDocIds) {
+        await setDoc(doc(db, 'users', docId), { cumpleanos: birthdayDraft || null }, { merge: true });
+      }
+
+      const updatedUser = { ...u, ...user, cumpleanos: birthdayDraft || null };
+      if (user) user.cumpleanos = birthdayDraft || null;
+      setTargetUser(updatedUser);
+
+      if (typeof onStatusUpdated === 'function') {
+        onStatusUpdated(updatedUser);
+      }
+
       showToast('Cumpleaños guardado.', 'success');
       setEditingBirthday(false);
     } catch (error) {
@@ -436,46 +495,93 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
     }
   };
 
-  // Handler: Guardar Rol y Sede — mismo patrón que handleSaveBirthday (mismo
-  // doc, mismo guard de user.id). Requiere que ambos campos estén elegidos y
-  // muestra confirmación inline (no hay "deshacer": el rol cambia qué tareas
-  // ve esta persona en toda la plataforma).
+  // Handler: Guardar Rol y Sede
   const handleSaveRole = async () => {
-    if (!user?.id) {
-      showToast('Este perfil no tiene un documento en Firestore para editar (registro local).', 'error');
-      return;
-    }
     if (!roleDraft || !sedeDraft) {
       showToast('Selecciona un rol y una sede antes de guardar.', 'error');
       return;
     }
     setIsSavingRole(true);
     const selectedRoles = Array.from(new Set([roleDraft, ...rolesDraft].map(normalizeRole).filter(Boolean)));
+    const finalRoleSedes = {
+      ...(user.roleSedes || {}),
+      ...roleSedesDraft,
+      [roleDraft]: roleSedesDraft[roleDraft] || sedeDraft
+    };
+    // Asegurar que cada rol seleccionado tenga asignada su sede (o fallback a sedeDraft)
+    selectedRoles.forEach(r => {
+      if (!finalRoleSedes[r]) finalRoleSedes[r] = sedeDraft;
+    });
+
     try {
-      await setDoc(doc(db, 'users', user.id), {
+      const targetDocIds = await resolveTargetDocIds(u);
+      const updatePayload = {
         role: roleDraft,
         roles: selectedRoles,
         sede: sedeDraft,
-        roleSedes: { ...(user.roleSedes || {}), [roleDraft]: sedeDraft },
+        roleSedes: finalRoleSedes,
         rolesUpdatedAt: serverTimestamp(),
         rolesUpdatedBy: currentUser?.email || ''
-      }, { merge: true });
+      };
+
+      for (const docId of targetDocIds) {
+        await setDoc(doc(db, 'users', docId), updatePayload, { merge: true });
+      }
+
       await recordAuditEvent({
         email: currentUser?.email,
         name: currentUser?.name,
         role: currentUser?.appRole || currentUser?.role,
         sede: currentUser?.sede,
         action: 'USER_ROLES_UPDATED',
-        details: `${user.name || user.email}: rol principal ${roleDraft}; roles [${selectedRoles.join(', ')}]; sede ${sedeDraft}.`
+        details: `${user.name || user.email}: rol principal ${roleDraft}; roles [${selectedRoles.join(', ')}]; sedes por rol ${JSON.stringify(finalRoleSedes)}; sede principal ${sedeDraft}.`
       });
+
+      const updatedUser = {
+        ...u,
+        ...user,
+        role: roleDraft,
+        roles: selectedRoles,
+        sede: sedeDraft,
+        roleSedes: finalRoleSedes,
+        rolesUpdatedAt: new Date().toISOString(),
+        rolesUpdatedBy: currentUser?.email || ''
+      };
 
       // Mutate local user prop to reflect changes immediately in UI
       user.role = roleDraft;
       user.roles = selectedRoles;
       user.sede = sedeDraft;
-      user.roleSedes = { ...(user.roleSedes || {}), [roleDraft]: sedeDraft };
+      user.roleSedes = finalRoleSedes;
+      user.rolesUpdatedAt = updatedUser.rolesUpdatedAt;
+      user.rolesUpdatedBy = updatedUser.rolesUpdatedBy;
 
-      showToast(`Roles actualizados: ${selectedRoles.map(getRoleDisplayName).join(', ')} — sede principal ${sedeDraft}.`, 'success');
+      setTargetUser(updatedUser);
+
+      // Notificar reactivamente a la vista padre (SuperAdminPanel, Home, etc.)
+      if (typeof onStatusUpdated === 'function') {
+        onStatusUpdated(updatedUser);
+      }
+
+      // Si la persona editada es el usuario de la sesión, reflejarlo en AuthContext de inmediato
+      const targetEmail = (user?.email || u?.email || '').trim().toLowerCase();
+      const isCurrent = Boolean(
+        (currentUser?.email && targetEmail && currentUser.email.toLowerCase().trim() === targetEmail) ||
+        currentUser?.uid === user?.uid ||
+        currentUser?.id === user?.id
+      );
+      if (isCurrent && typeof updateCurrentUserFields === 'function') {
+        updateCurrentUserFields({
+          role: roleDraft,
+          roles: selectedRoles,
+          sede: sedeDraft,
+          roleSedes: finalRoleSedes,
+          appRole: roleDraft,
+          activeRole: roleDraft
+        });
+      }
+
+      showToast(`Roles actualizados: ${selectedRoles.map(getRoleDisplayName).join(', ')} con sedes configuradas.`, 'success');
       setEditingRole(false);
     } catch (error) {
       console.error('Error guardando rol/sede:', error);
@@ -486,8 +592,7 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
   };
 
   // (14/09/2026) Equipo(s) de Quito -- editable por la propia persona (self-service,
-  // confirmado por Jose) o por Super Admin (para poder ayudar/corregir). Igual que
-  // el cumpleanos, requiere un id real de Firestore.
+  // confirmado por Jose) o por Super Admin (para poder ayudar/corregir).
   const isViewingOwnProfile = Boolean(currentUser?.email && user?.email && currentUser.email.toLowerCase().trim() === user.email.toLowerCase().trim());
   const canEditQuitoTeams = isViewingOwnProfile || Boolean(currentUser?.isSuperAdmin);
   const isQuitoUser = normalizeSede(user?.sede || '').startsWith('Quito');
@@ -504,13 +609,21 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
   };
 
   const handleSaveQuitoTeams = async () => {
-    if (!user?.id) {
-      showToast('Este perfil no tiene un documento en Firestore para editar (registro local).', 'error');
-      return;
-    }
     setIsSavingQuitoTeams(true);
     try {
-      await setDoc(doc(db, 'users', user.id), { equiposQuito: quitoTeamsDraft }, { merge: true });
+      const targetDocIds = await resolveTargetDocIds(u);
+      for (const docId of targetDocIds) {
+        await setDoc(doc(db, 'users', docId), { equiposQuito: quitoTeamsDraft }, { merge: true });
+      }
+
+      const updatedUser = { ...u, ...user, equiposQuito: quitoTeamsDraft };
+      if (user) user.equiposQuito = quitoTeamsDraft;
+      setTargetUser(updatedUser);
+
+      if (typeof onStatusUpdated === 'function') {
+        onStatusUpdated(updatedUser);
+      }
+
       // Si la persona esta editando su PROPIO perfil, reflejamos el cambio de
       // inmediato en el currentUser de la sesion -- si no, CyclesContext.jsx no se
       // entera del equipo elegido hasta que cierre sesion y vuelva a entrar.
@@ -848,32 +961,69 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
                       </div>
                       <select
                         value={sedeDraft}
-                        onChange={(e) => setSedeDraft(e.target.value)}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setSedeDraft(val);
+                          setRoleSedesDraft(prev => ({ ...prev, [roleDraft]: val }));
+                        }}
                         style={{
                           padding: '0.35rem 0.5rem', borderRadius: '6px', border: '1px solid var(--crear-gold)',
                           background: 'var(--bg-input, #1a1a1a)', color: 'var(--text-heading)', fontSize: '0.82rem'
                         }}
                       >
-                        <option value="" disabled>Sede…</option>
+                        <option value="" disabled>Sede principal…</option>
                         {SEDE_EDIT_OPTIONS.map(s => (
                           <option key={s} value={s}>{s}</option>
                         ))}
                       </select>
-                      <button
-                        onClick={handleSaveRole}
-                        disabled={isSavingRole}
-                        style={{ fontSize: '0.75rem', padding: '4px 10px', borderRadius: '6px', border: 'none', background: 'var(--crear-gold)', color: '#000', fontWeight: 700, cursor: 'pointer' }}
-                      >
-                        {isSavingRole ? '...' : 'Guardar'}
-                      </button>
-                      <button
-                        onClick={() => setEditingRole(false)}
-                        style={{ fontSize: '0.75rem', padding: '4px 10px', borderRadius: '6px', border: '1px solid var(--text-muted)', background: 'transparent', color: 'var(--text-muted)', cursor: 'pointer' }}
-                      >
-                        Cancelar
-                      </button>
-                      <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', width: '100%' }}>
-                        El primer selector define el rol de inicio. Las casillas conservan roles adicionales; el cambio se registra en la trazabilidad. Verifica la sede correspondiente antes de guardar.
+
+                      {/* Multi-Sede Assignment per Role */}
+                      <div style={{ width: '100%', marginTop: '0.4rem', background: 'rgba(255,255,255,0.03)', padding: '0.6rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }}>
+                        <div style={{ fontSize: '0.72rem', fontWeight: 800, color: 'var(--crear-gold)', marginBottom: '0.4rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                          📍 Sedes por Rol Asignado (Multi-Sede):
+                        </div>
+                        {Array.from(new Set([roleDraft, ...rolesDraft].filter(Boolean))).map(r => (
+                          <div key={r} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.35rem' }}>
+                            <span style={{ fontSize: '0.74rem', color: '#fff', fontWeight: 600 }}>
+                              {getRoleDisplayName(r)}:
+                            </span>
+                            <select
+                              value={roleSedesDraft[r] || (r === roleDraft ? sedeDraft : (user?.roleSedes?.[r] || sedeDraft))}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                setRoleSedesDraft(prev => ({ ...prev, [r]: val }));
+                                if (r === roleDraft) setSedeDraft(val);
+                              }}
+                              style={{
+                                padding: '0.2rem 0.4rem', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.2)',
+                                background: '#111827', color: '#fff', fontSize: '0.72rem'
+                              }}
+                            >
+                              {SEDE_EDIT_OPTIONS.map(s => (
+                                <option key={s} value={s}>{s}</option>
+                              ))}
+                            </select>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.4rem' }}>
+                        <button
+                          onClick={handleSaveRole}
+                          disabled={isSavingRole}
+                          style={{ fontSize: '0.75rem', padding: '5px 12px', borderRadius: '6px', border: 'none', background: 'var(--crear-gold)', color: '#000', fontWeight: 800, cursor: 'pointer' }}
+                        >
+                          {isSavingRole ? 'Guardando...' : 'Guardar Cambios'}
+                        </button>
+                        <button
+                          onClick={() => setEditingRole(false)}
+                          style={{ fontSize: '0.75rem', padding: '5px 12px', borderRadius: '6px', border: '1px solid var(--text-muted)', background: 'transparent', color: 'var(--text-muted)', cursor: 'pointer' }}
+                        >
+                          Cancelar
+                        </button>
+                      </div>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', width: '100%', marginTop: '0.2rem' }}>
+                        Permite configurar sedes independientes por rol (ej. Gerente en Cuenca y Quantum Team en Quito). Al iniciar sesión con cada rol, la sede se adaptará automáticamente.
                       </span>
                     </div>
                   )}

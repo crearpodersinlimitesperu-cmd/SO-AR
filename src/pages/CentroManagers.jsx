@@ -345,7 +345,7 @@ export default function CentroManagers() {
 
   // UI State
   const [activeTab, setActiveTab] = useState(initialTab);
-  const [liquidacionSubTab, setLiquidacionSubTab] = useState('planilla_sheets'); // 'planilla_sheets' | 'equipos_nodus' | 'consolidado'
+  const [liquidacionSubTab, setLiquidacionSubTab] = useState('equipos_nodus'); // 'equipos_nodus' | 'planilla_sheets' | 'consolidado'
   const [sheetSearch, setSheetSearch] = useState('');
   const [sheetSedeFilter, setSheetSedeFilter] = useState('Todas');
   const [sheetStatusFilter, setSheetStatusFilter] = useState('todos');
@@ -658,7 +658,8 @@ export default function CentroManagers() {
     // 'Todos': Todos los equipos registrados.
     const rawTeamList = Object.values(teams);
     const filteredByLifecycle = rawTeamList.filter(t => {
-      const isTeamActive = t.activeMembers.length > 0;
+      const hasCierreLiquidacion = (t.allMembers || t.managers || []).some(m => m.cierreLiquidacionActivo);
+      const isTeamActive = t.activeMembers.length > 0 && !hasCierreLiquidacion;
       if (groupLifecycleFilter === 'Activos') {
         return isTeamActive;
       } else if (groupLifecycleFilter === 'Archivo') {
@@ -669,7 +670,8 @@ export default function CentroManagers() {
 
     // 4. Mapear cada equipo para su visualización y métricas
     let list = filteredByLifecycle.map(t => {
-      const isTeamActive = t.activeMembers.length > 0;
+      const hasCierreLiquidacion = (t.allMembers || t.managers || []).some(m => m.cierreLiquidacionActivo);
+      const isTeamActive = t.activeMembers.length > 0 && !hasCierreLiquidacion;
 
       // Desglose determinista de Capitanes (Activos y No Activos)
       const allCapitanes = t.allMembers.filter(m => (m.rol || '').toLowerCase().includes('capitan'));
@@ -1296,19 +1298,24 @@ export default function CentroManagers() {
     managers.forEach(m => {
       if (!m.equipo) return;
       const sede = normalizeSede(m.sede);
-      const key = `${sede}_${m.equipo}`;
-      if (!teams[key]) {
-        teams[key] = { equipoKey: key, sede, equipo: m.equipo, numEquipo: m.numEquipo, entrenadores: new Set(), estados: new Set(), cierreManual: null };
-      }
-      teams[key].estados.add(normalizeManagerEstado(m.estado));
-      if (m.entrenador) parseTrainersList(m.entrenador).forEach(t => teams[key].entrenadores.add(t));
-      if (m.cierreLiquidacionActivo) {
-        teams[key].cierreManual = {
-          fecha: m.cierreLiquidacionFecha || '',
-          porNombre: m.cierreLiquidacionPorNombre || '',
-          porEmail: m.cierreLiquidacionPorEmail || ''
-        };
-      }
+      const cleanEquipo = (m.equipo || '').trim();
+      const key = `${sede}_${cleanEquipo}`;
+      const keyUpper = `${sede}_${cleanEquipo.toUpperCase()}`;
+
+      [key, keyUpper].forEach(k => {
+        if (!teams[k]) {
+          teams[k] = { equipoKey: k, sede, equipo: m.equipo, numEquipo: m.numEquipo, entrenadores: new Set(), estados: new Set(), cierreManual: null };
+        }
+        teams[k].estados.add(normalizeManagerEstado(m.estado));
+        if (m.entrenador) parseTrainersList(m.entrenador).forEach(t => teams[k].entrenadores.add(t));
+        if (m.cierreLiquidacionActivo) {
+          teams[k].cierreManual = {
+            fecha: m.cierreLiquidacionFecha || '',
+            porNombre: m.cierreLiquidacionPorNombre || '',
+            porEmail: m.cierreLiquidacionPorEmail || ''
+          };
+        }
+      });
     });
     return teams;
   }, [managers]);
@@ -1332,24 +1339,35 @@ export default function CentroManagers() {
     const enCamino = [];
 
     // Unión de equipos candidatos: los que tienen llamadas registradas + los que el
-    // coordinador cerró manualmente aunque no lleguen a 7 llamadas.
-    const todosLosEquipoKeys = new Set([...Object.keys(porEquipo), ...Object.keys(equiposParaLiquidacion)]);
+    // coordinador cerró manualmente aunque no lleguen a 7 llamadas + los registrados en liquidacionesPagos
+    const todosLosEquipoKeys = new Set([
+      ...Object.keys(porEquipo), 
+      ...Object.keys(equiposParaLiquidacion),
+      ...Object.keys(liquidacionesPagos)
+    ]);
 
     todosLosEquipoKeys.forEach((equipoKey) => {
       const registros = porEquipo[equipoKey] || [];
       const count = registros.length;
       const sorted = [...registros].sort((a, b) => (a.fecha || '').localeCompare(b.fecha || ''));
       const ultimoLlamada = sorted[sorted.length - 1];
-      const infoEquipo = equiposParaLiquidacion[equipoKey];
+      
+      const infoEquipo = equiposParaLiquidacion[equipoKey] || 
+                         equiposParaLiquidacion[equipoKey.toUpperCase()] ||
+                         Object.values(equiposParaLiquidacion).find(e => e.equipoKey?.toUpperCase() === equipoKey?.toUpperCase()) || null;
       const cierreManual = infoEquipo?.cierreManual || null;
+      const pago = liquidacionesPagos[equipoKey] || 
+                   liquidacionesPagos[equipoKey.toUpperCase()] ||
+                   Object.values(liquidacionesPagos).find(p => p.equipoKey?.toUpperCase() === equipoKey?.toUpperCase()) || null;
 
-      const infoEquipoFull = equiposParaLiquidacion[equipoKey] || { estados: new Set() };
+      const infoEquipoFull = infoEquipo || { estados: new Set() };
       const sinActivos = !infoEquipoFull.estados.has('Activo');
       const tieneDesertorOGraduado = infoEquipoFull.estados.has('Desertor') || infoEquipoFull.estados.has('Graduado');
       const esEquipoInactivo = sinActivos && tieneDesertorOGraduado;
 
       const cumpleLlamadas = count >= 7;
-      const cumpleCierre = !!cierreManual || (esEquipoInactivo && count >= 5);
+      const tieneCierreManual = !!cierreManual || (pago && (pago.motivo === 'cierre_manual' || pago.estado === 'pendiente_pago'));
+      const cumpleCierre = tieneCierreManual || (esEquipoInactivo && count >= 5);
 
       if (!cumpleLlamadas && !cumpleCierre) {
         if ((count === 5 || count === 6) && ultimoLlamada) {
@@ -1367,13 +1385,12 @@ export default function CentroManagers() {
       }
 
       // Datos del equipo: preferir el historial de llamadas (más completo); si el equipo
-      // se cerró manualmente sin ninguna llamada registrada, usar equiposParaLiquidacion.
-      const equipo = ultimoLlamada?.equipo || infoEquipo?.equipo || equipoKey;
-      const numEquipo = ultimoLlamada?.numEquipo || infoEquipo?.numEquipo || '';
-      const sede = ultimoLlamada?.sede || infoEquipo?.sede || '';
-      const entrenador = ultimoLlamada?.entrenador || Array.from(infoEquipo?.entrenadores || []).join(', ') || 'Sin Asignar';
+      // se cerró manualmente sin ninguna llamada registrada, usar equiposParaLiquidacion o pago.
+      const equipo = ultimoLlamada?.equipo || infoEquipo?.equipo || pago?.equipo || equipoKey;
+      const numEquipo = ultimoLlamada?.numEquipo || infoEquipo?.numEquipo || pago?.numEquipo || '';
+      const sede = ultimoLlamada?.sede || infoEquipo?.sede || pago?.sede || '';
+      const entrenador = ultimoLlamada?.entrenador || Array.from(infoEquipo?.entrenadores || []).join(', ') || pago?.entrenador || 'Sin Asignar';
       const septimo = sorted[6]; // La llamada #7 (índice 6) es la que dispara el pago, si aplica
-      const pago = liquidacionesPagos[equipoKey];
 
       const item = {
         equipoKey,
@@ -1383,8 +1400,8 @@ export default function CentroManagers() {
         entrenador,
         totalLlamadas: count,
         fechaAlcanzo7: septimo?.fecha || '',
-        montoUSD: 400,
-        motivo: cumpleLlamadas ? 'llamadas' : (!!cierreManual ? 'cierre_manual' : 'desertor_automatico'),
+        montoUSD: Number(pago?.montoUSD || 400),
+        motivo: cumpleLlamadas ? 'llamadas' : (tieneCierreManual ? 'cierre_manual' : 'desertor_automatico'),
         cierreManual
       };
 
@@ -1560,7 +1577,11 @@ export default function CentroManagers() {
         numEquipo: item.numEquipo || '',
         sede: item.sede,
         entrenador: item.entrenador,
-        montoUSD: item.montoUSD,
+        montoUSD: Number(item.montoUSD || 100),
+        monto: Number(item.montoUSD || 100),
+        moneda: 'USD',
+        metodo_pago: 'transferencia',
+        cajero_user_id: currentUser?.uid || '',
         llamadasAlPagar: item.totalLlamadas,
         motivo: item.motivo || 'llamadas',
         fechaAlcanzo7: item.fechaAlcanzo7,
@@ -1630,9 +1651,14 @@ export default function CentroManagers() {
         const docKey = (m.docId || m.id).toString();
         const docRef = doc(db, 'managers_directory', docKey);
         
+        // Al cerrar el equipo para liquidación, los integrantes que estaban activos concluyen su ciclo (Graduado)
+        const currentNormState = normalizeManagerEstado(m.estado);
+        const finalEstado = currentNormState === 'Activo' ? 'Graduado' : m.estado;
+
         // Payload limpio con merge: true para que cree el documento si no existe o actualice si existe
         const payload = {
           ...m,
+          estado: finalEstado,
           cierreLiquidacionActivo: true,
           cierreLiquidacionFecha: nowISO,
           cierreLiquidacionPorNombre: userName,
@@ -1653,15 +1679,17 @@ export default function CentroManagers() {
       setManagers(prev => prev.map(m => {
         const isMatch = normalizeSede(m.sede) === targetSede && 
                         (m.equipo || '').trim().toUpperCase() === targetEquipo;
-        return isMatch
-          ? { 
-              ...m, 
-              cierreLiquidacionActivo: true, 
-              cierreLiquidacionFecha: nowISO, 
-              cierreLiquidacionPorNombre: userName, 
-              cierreLiquidacionPorEmail: userEmail 
-            }
-          : m;
+        if (!isMatch) return m;
+        const currentNormState = normalizeManagerEstado(m.estado);
+        const finalEstado = currentNormState === 'Activo' ? 'Graduado' : m.estado;
+        return { 
+          ...m, 
+          estado: finalEstado,
+          cierreLiquidacionActivo: true, 
+          cierreLiquidacionFecha: nowISO, 
+          cierreLiquidacionPorNombre: userName, 
+          cierreLiquidacionPorEmail: userEmail 
+        };
       }));
 
       try {
@@ -1677,7 +1705,7 @@ export default function CentroManagers() {
         console.warn('Error registrando auditoría de cierre:', auditErr);
       }
 
-      showToast(`Equipo ${team.equipo} cerrado — pasará a "Pendientes de pago" en Liquidación aunque no llegue a 7 llamadas.`, 'success');
+      showToast(`✅ Equipo ${team.equipo} (${team.sede}) cerrado exitosamente y enviado a Liquidación ($400 USD).`, 'success');
     } catch (err) {
       console.error('Error cerrando equipo para liquidación:', err);
       showToast(`No se pudo marcar el equipo como cerrado: ${err.message || 'Error de conexión'}`, 'error');
@@ -1706,7 +1734,9 @@ export default function CentroManagers() {
       coordinador: normalizeCoordinator(newManager.coordinador),
       estado: newManager.estado || 'Activo',
       llamadaFecha: '',
-      llamadaAsistio: ''
+      llamadaAsistio: '',
+      createdAt: new Date().toISOString(),
+      createdBy: currentUser?.email || ''
     };
 
     try {
@@ -1714,7 +1744,11 @@ export default function CentroManagers() {
       await setDoc(docRef, created);
       setManagers(prev => [created, ...prev]);
 
-    } catch(e) { console.error(e); showToast('Error guardando en Firebase', 'error'); return; }
+    } catch(e) {
+      console.error('Error guardando manager en Firebase:', e);
+      showToast(`Error guardando en Firebase: ${e?.message || 'Error de permisos o red'}`, 'error');
+      return;
+    }
 
     recordAuditEvent({
       action: 'NUEVO_INTEGRANTE_MANAGER',
@@ -1810,8 +1844,8 @@ export default function CentroManagers() {
 
       setManagers(prev => [...newRecords, ...prev]);
     } catch(e) {
-      console.error(e);
-      return showToast('Error guardando el equipo en la nube', 'error');
+      console.error('Error guardando equipo en la nube:', e);
+      return showToast(`Error guardando el equipo en la nube: ${e?.message || 'Error de permisos o red'}`, 'error');
     }
 
     recordAuditEvent({
@@ -3138,8 +3172,38 @@ export default function CentroManagers() {
                     {canChangeStatus && (() => {
                       const yaCerrado = (t.allMembers || t.managers || []).some(m => m.cierreLiquidacionActivo);
                       return yaCerrado ? (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 0.7rem', marginBottom: '0.6rem', background: '#dcfce7', border: '1px solid #86efac', borderRadius: '8px', fontSize: '0.75rem', color: '#15803d', fontWeight: 700 }}>
-                          <CheckCircle size={14} /> Cerrado para liquidación
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.4rem', padding: '0.55rem 0.75rem', marginBottom: '0.6rem', background: '#dcfce7', border: '1px solid #86efac', borderRadius: '8px', fontSize: '0.75rem', color: '#15803d', fontWeight: 700 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                            <CheckCircle size={14} color="#16a34a" /> 
+                            <span>Cerrado para liquidación</span>
+                          </div>
+                          {canViewLiquidacion && (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setActiveTab('liquidacion');
+                                setLiquidacionSubTab('equipos_nodus');
+                              }}
+                              style={{
+                                background: '#15803d',
+                                color: '#ffffff',
+                                border: 'none',
+                                borderRadius: '6px',
+                                padding: '0.25rem 0.6rem',
+                                fontSize: '0.72rem',
+                                fontWeight: 800,
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.25rem',
+                                boxShadow: '0 1px 2px rgba(21,128,61,0.2)'
+                              }}
+                              title="Ver este equipo en la lista de Liquidación"
+                            >
+                              Ver en Liquidación ➔
+                            </button>
+                          )}
                         </div>
                       ) : (
                         <button

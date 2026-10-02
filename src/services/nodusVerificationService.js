@@ -202,6 +202,8 @@ export function evaluateEnroladoVerification(enrolado, imoNombre = '', imoEquipo
         llamada1: 'Sin Registro',
         llamada2: '—',
         asistenciaNodus: '—',
+        desertor: '—',
+        pago: '—',
         status: 'PENDIENTE_SYNC',
         statusLabel: '⏳ Pendiente Registro Nodus',
         statusColor: '#a855f7',
@@ -218,6 +220,8 @@ export function evaluateEnroladoVerification(enrolado, imoNombre = '', imoEquipo
       llamada1: '—',
       llamada2: '—',
       asistenciaNodus: '—',
+      desertor: '—',
+      pago: '—',
       status: 'SIN_REGISTRO',
       statusLabel: '⚪ Sin Registro Nodus',
       statusColor: '#94a3b8',
@@ -268,6 +272,18 @@ export function evaluateEnroladoVerification(enrolado, imoNombre = '', imoEquipo
   const coordNombre = nodusRec.coordinador || enrolado.coordinadora_nombre || 'Coordinación';
 
   // Cruce IMO vs Coordinadora
+  const asistioNodus = (asist.includes('SI') || asist.includes('ASIST') || asist.includes('SENTAD'))
+    ? 'SÍ' 
+    : ((asist.includes('NO') || des.includes('SI') || des.includes('DESERT')) ? 'NO' : (nodusRec.asistencia || '—'));
+
+  const desertoNodus = (des.includes('SI') || des.includes('DESERT') || l1.includes('DESERT') || l1.includes('NO LE INTERESA') || l1.includes('NO INTERESA'))
+    ? 'SÍ' 
+    : ((des.includes('NO') || coordConfirmado) ? 'NO' : (nodusRec.desertor || '—'));
+
+  const pagoC2Nodus = (pago.includes('SI') || pago.includes('PAG') || pago.includes('ABON') || l1.includes('PAG') || l2.includes('PAG'))
+    ? 'SÍ' 
+    : (pago.includes('NO') ? 'NO' : (nodusRec.pago || '—'));
+
   if (imoSaysAsiste) {
     if (coordConfirmado) {
       return {
@@ -276,7 +292,12 @@ export function evaluateEnroladoVerification(enrolado, imoNombre = '', imoEquipo
         coordinador: coordNombre,
         llamada1: nodusRec.llamada1 || 'Confirmado',
         llamada2: nodusRec.llamada2 || '—',
-        asistenciaNodus: nodusRec.asistencia || '—',
+        asistenciaNodus,
+        asistioNodus,
+        desertoNodus,
+        pagoC2Nodus,
+        desertor: nodusRec.desertor || '—',
+        pago: nodusRec.pago || '—',
         status: 'VERIFICADO_OK',
         statusLabel: '✅ Verificado Nodus (Confirmado en Llamada)',
         statusColor: '#22c55e',
@@ -294,7 +315,12 @@ export function evaluateEnroladoVerification(enrolado, imoNombre = '', imoEquipo
         coordinador: coordNombre,
         llamada1: nodusRec.llamada1 || 'Desertor',
         llamada2: nodusRec.llamada2 || '—',
-        asistenciaNodus: nodusRec.asistencia || '—',
+        asistenciaNodus,
+        asistioNodus,
+        desertoNodus,
+        pagoC2Nodus,
+        desertor: nodusRec.desertor || '—',
+        pago: nodusRec.pago || '—',
         status: 'DISCREPANCIA',
         statusLabel: '🚨 Discrepancia: Coord. reporta Desertor / No Asiste',
         statusColor: '#ef4444',
@@ -312,7 +338,12 @@ export function evaluateEnroladoVerification(enrolado, imoNombre = '', imoEquipo
       coordinador: coordNombre,
       llamada1: nodusRec.llamada1 || 'Por Confirmar',
       llamada2: nodusRec.llamada2 || '—',
-      asistenciaNodus: nodusRec.asistencia || '—',
+      asistenciaNodus,
+      asistioNodus,
+      desertoNodus,
+      pagoC2Nodus,
+      desertor: nodusRec.desertor || '—',
+      pago: nodusRec.pago || '—',
       status: 'PENDIENTE_COORD',
       statusLabel: `⏳ Falta Confirma de Coord. (${nodusRec.llamada1 || 'Por Confirmar'})`,
       statusColor: '#f59e0b',
@@ -331,7 +362,12 @@ export function evaluateEnroladoVerification(enrolado, imoNombre = '', imoEquipo
       coordinador: coordNombre,
       llamada1: nodusRec.llamada1 || 'Confirmado',
       llamada2: nodusRec.llamada2 || '—',
-      asistenciaNodus: nodusRec.asistencia || '—',
+      asistenciaNodus,
+      asistioNodus,
+      desertoNodus,
+      pagoC2Nodus,
+      desertor: nodusRec.desertor || '—',
+      pago: nodusRec.pago || '—',
       status: 'COORD_CONFIRMO',
       statusLabel: `ℹ️ Confirmado por Coord. ${coordNombre} (Pendiente IMO)`,
       statusColor: '#38bdf8',
@@ -348,7 +384,12 @@ export function evaluateEnroladoVerification(enrolado, imoNombre = '', imoEquipo
     coordinador: coordNombre,
     llamada1: nodusRec.llamada1 || 'Por Confirmar',
     llamada2: nodusRec.llamada2 || '—',
-    asistenciaNodus: nodusRec.asistencia || '—',
+    asistenciaNodus,
+    asistioNodus,
+    desertoNodus,
+    pagoC2Nodus,
+    desertor: nodusRec.desertor || '—',
+    pago: nodusRec.pago || '—',
     status: 'PENDIENTE_AMBOS',
     statusLabel: `⚪ Pendiente de Llamada y de IMO`,
     statusColor: '#94a3b8',

@@ -66,8 +66,9 @@ export async function runRoleIntegrityAuditAndHeal(options = { dryRun: true }) {
 
       // 2. DETECCIÓN DE COLAPSO: Si el rol está en 'coordinador' genérico o alterado
       const rawRole = cleanRoleName(targetRole);
+      const hasAdminConfiguredRoles = Boolean(uData.rolesUpdatedAt || uData.rolesUpdatedBy);
       
-      if (officialProfile) {
+      if (officialProfile && !hasAdminConfiguredRoles) {
         const canonicalOfficial = normalizeRole(officialProfile.role);
 
         // Si en Firestore tiene 'coordinador' pero en el catálogo oficial es coord_c1 o coord_maestria

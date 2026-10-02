@@ -286,7 +286,22 @@ service cloud.firestore {
 
     match /users/{userId} {
       allow read: if isAuthenticated();
-      allow write: if isSuperAdmin();
+      allow create, update: if isSuperAdmin() || (
+        isAuthenticated() && (
+          request.auth.uid == userId ||
+          (resource != null && (
+            resource.data.get('email', '') == email() ||
+            (resource.data.get('emails', []) is list && email() in resource.data.get('emails', [])) ||
+            resource.data.get('uid', '') == request.auth.uid
+          )) ||
+          (request.resource.data != null && (
+            request.resource.data.get('email', '') == email() ||
+            (request.resource.data.get('emails', []) is list && email() in request.resource.data.get('emails', [])) ||
+            request.resource.data.get('uid', '') == request.auth.uid
+          ))
+        )
+      );
+      allow delete: if isSuperAdmin();
 
       match /copilot_chats/{chatId} {
         allow read, write: if isAuthenticated() && request.auth.uid == userId;
@@ -420,41 +435,32 @@ service cloud.firestore {
     // ------------------------------------------------------------------------
     // COLECCIONES AUDITADAS CON PERMISOS AMPLIOS DE COLABORACIÓN OPERATIVA
     // ------------------------------------------------------------------------
-    match /staff_directory/{document} {
-      allow read: if canReadHojaEnBlanco();
-      allow write: if canWriteHojaEnBlanco();
+    match /managers_directory/{document=**} {
+      allow read, write: if isAuthenticated();
     }
-    match /managers_directory/{document} {
-      allow read: if canReadHojaEnBlanco();
-      allow write: if canWriteHojaEnBlanco();
+    match /staff_directory/{document=**} {
+      allow read, write: if isAuthenticated();
     }
-    match /excellence_standards/{document} {
-      allow read: if canReadHojaEnBlanco();
-      allow write: if canWriteHojaEnBlanco();
+    match /excellence_standards/{document=**} {
+      allow read, write: if isAuthenticated();
     }
-    match /kpi_reports/{document} {
-      allow read: if canReadHojaEnBlanco();
-      allow write: if canWriteHojaEnBlanco();
+    match /kpi_reports/{document=**} {
+      allow read, write: if isAuthenticated();
     }
-    match /learning_logs/{document} {
-      allow read: if canReadHojaEnBlanco();
-      allow write: if canWriteHojaEnBlanco();
+    match /learning_logs/{document=**} {
+      allow read, write: if isAuthenticated();
     }
-    match /qt_directory/{document} {
-      allow read: if canReadHojaEnBlanco();
-      allow write: if canWriteHojaEnBlanco();
+    match /qt_directory/{document=**} {
+      allow read, write: if isAuthenticated();
     }
-    match /success_patterns/{document} {
-      allow read: if canReadHojaEnBlanco();
-      allow write: if canWriteHojaEnBlanco();
+    match /success_patterns/{document=**} {
+      allow read, write: if isAuthenticated();
     }
-    match /sync_history/{document} {
-      allow read: if canReadHojaEnBlanco();
-      allow write: if canWriteHojaEnBlanco();
+    match /sync_history/{document=**} {
+      allow read, write: if isAuthenticated();
     }
-    match /user_stats/{document} {
-      allow read: if canReadHojaEnBlanco();
-      allow write: if canWriteHojaEnBlanco();
+    match /user_stats/{document=**} {
+      allow read, write: if isAuthenticated();
     }
 
     // ------------------------------------------------------------------------
@@ -478,12 +484,10 @@ service cloud.firestore {
       allow write: if isGerenteODireccion() || isSuperAdmin();
     }
     match /llamadas_grupales_historial/{document=**} {
-      allow read: if canReadHojaEnBlanco();
-      allow write: if canWriteHojaEnBlanco();
+      allow read, write: if isAuthenticated();
     }
     match /notas_seguimiento/{document=**} {
-      allow read: if canReadHojaEnBlanco();
-      allow write: if canWriteHojaEnBlanco();
+      allow read, write: if isAuthenticated();
     }
     // Blindaje Financiero
     function isValidLiquidacion(data) {
@@ -493,13 +497,26 @@ service cloud.firestore {
              data.cajero_user_id == request.auth.uid;
     }
 
+    function isValidLiquidacionPago(data) {
+      return (
+        // Liquidaciones de entrenadores (CentroManagers)
+        (data.get('estado', '') == 'pagado' &&
+          ((data.get('montoUSD', 0) is number && data.get('montoUSD', 0) > 0) ||
+           (data.get('monto', 0) is number && data.get('monto', 0) > 0))) ||
+        // Retiro u ocultamiento de candidatos de pago en CentroManagers
+        (data.get('estado', '') == 'eliminado') ||
+        // Arqueos y liquidaciones de caja POS tradicional
+        ('cajero_user_id' in data && isValidLiquidacion(data))
+      );
+    }
+
     function isValidAuditTrail(data) {
       return data.monto_esperado is number && data.monto_real is number;
     }
 
     match /liquidaciones_pagos/{document=**} {
       allow read, delete: if isGerenteODireccion() || isSuperAdmin();
-      allow create, update: if (isGerenteODireccion() || isSuperAdmin()) && isValidLiquidacion(request.resource.data);
+      allow create, update: if (isGerenteODireccion() || isSuperAdmin()) && isValidLiquidacionPago(request.resource.data);
     }
     match /cajas_diarias/{document=**} {
       allow read, delete: if isGerenteODireccion() || isSuperAdmin();
@@ -518,16 +535,13 @@ service cloud.firestore {
       allow write: if isGerenteODireccion() || isSuperAdmin();
     }
     match /goals_sentinel_audits/{document=**} {
-      allow read: if canReadHojaEnBlanco();
-      allow write: if canWriteHojaEnBlanco();
+      allow read, write: if isAuthenticated();
     }
     match /imo_missions/{document=**} {
-      allow read: if canReadHojaEnBlanco();
-      allow write: if canWriteHojaEnBlanco();
+      allow read, write: if isAuthenticated();
     }
     match /user_kpi_targets/{document=**} {
-      allow read: if canReadHojaEnBlanco();
-      allow write: if canWriteHojaEnBlanco();
+      allow read, write: if isAuthenticated();
     }
     match /nodus_predictor_portfolio/{document=**} {
       allow read: if isAuthenticated();
@@ -538,16 +552,14 @@ service cloud.firestore {
       allow write: if isGerenteODireccion() || isSuperAdmin();
     }
     match /checklist_tasks/{document=**} {
-      allow read: if canReadHojaEnBlanco();
-      allow write: if canWriteHojaEnBlanco();
+      allow read, write: if isAuthenticated();
     }
     match /settings/{document=**} {
       allow read: if isAuthenticated();
       allow write: if isGerenteODireccion() || isSuperAdmin();
     }
     match /kpis_entrenadores_llamadas/{document=**} {
-      allow read: if canReadHojaEnBlanco();
-      allow write: if canWriteHojaEnBlanco();
+      allow read, write: if isAuthenticated();
     }
 
     // Solo datos institucionales destinados a las cartas públicas, sin documentos personales.

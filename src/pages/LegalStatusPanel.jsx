@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { 
   Shield, Search, Download, CheckCircle, Clock, ShieldAlert, 
-  Activity, Users, FileText, ChevronLeft, ExternalLink, X, Printer, Hash
+  Activity, Users, FileText, ChevronLeft, ExternalLink, X, Printer, Hash, Trash2
 } from 'lucide-react';
+import { doc, deleteDoc } from 'firebase/firestore';
+import { db } from '../services/firebase';
+import { useUI } from '../context/UIContext';
 import { getAllLegalSignatures, generateTemporaryDownloadURL, generateSignedContractHTML } from '../services/legalSignatureService';
 import { useNavigate } from 'react-router-dom';
 
@@ -14,6 +17,7 @@ export default function LegalStatusPanel() {
   const [selectedAuditDoc, setSelectedAuditDoc] = useState(null);
   const [generatingUrl, setGeneratingUrl] = useState(false);
   const navigate = useNavigate();
+  const { showToast } = useUI();
 
   useEffect(() => {
     fetchSignatures();
@@ -24,6 +28,18 @@ export default function LegalStatusPanel() {
     const data = await getAllLegalSignatures();
     setSignatures(data);
     setLoading(false);
+  };
+
+  const handleDeleteSignature = async (id, name) => {
+    if (!window.confirm(`¿Estás seguro de eliminar este registro legal (${name || 'Sin Nombre'})? Esta acción removerá el registro de la base de datos.`)) return;
+    try {
+      await deleteDoc(doc(db, 'px_legal_signatures', id));
+      setSignatures(prev => prev.filter(item => item.id !== id));
+      if (showToast) showToast('Registro legal eliminado exitosamente.', 'success');
+    } catch (err) {
+      console.error("Error eliminando registro legal:", err);
+      if (showToast) showToast('Error al eliminar registro: ' + err.message, 'error');
+    }
   };
 
   const handleOpenAuditModal = (signatureData) => {
@@ -222,14 +238,25 @@ export default function LegalStatusPanel() {
                     </button>
                   </td>
                   <td style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>
-                    <button 
-                      onClick={() => handleOpenAuditModal(s)}
-                      style={{ background: 'var(--bg-card)', border: '1px solid var(--border-strong)', color: 'var(--text-main)', padding: '0.6rem 1rem', borderRadius: '6px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px', fontWeight: 600, fontSize: '0.8rem', transition: 'all 0.2s' }}
-                      onMouseOver={e => e.currentTarget.style.background = 'rgba(255, 193, 7, 0.1)'}
-                      onMouseOut={e => e.currentTarget.style.background = 'var(--bg-card)'}
-                    >
-                      <FileText size={16} color="var(--crear-gold)" /> Auditoría PDF
-                    </button>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                      <button 
+                        onClick={() => handleOpenAuditModal(s)}
+                        style={{ background: 'var(--bg-card)', border: '1px solid var(--border-strong)', color: 'var(--text-main)', padding: '0.6rem 1rem', borderRadius: '6px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px', fontWeight: 600, fontSize: '0.8rem', transition: 'all 0.2s' }}
+                        onMouseOver={e => e.currentTarget.style.background = 'rgba(255, 193, 7, 0.1)'}
+                        onMouseOut={e => e.currentTarget.style.background = 'var(--bg-card)'}
+                      >
+                        <FileText size={16} color="var(--crear-gold)" /> Auditoría PDF
+                      </button>
+                      <button 
+                        onClick={() => handleDeleteSignature(s.id, s.full_name)}
+                        title="Eliminar registro errado o corrupto"
+                        style={{ background: 'rgba(239, 68, 68, 0.12)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#ef4444', padding: '0.6rem 0.8rem', borderRadius: '6px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 700, fontSize: '0.8rem', transition: 'all 0.2s' }}
+                        onMouseOver={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.25)'}
+                        onMouseOut={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.12)'}
+                      >
+                        <Trash2 size={16} /> Eliminar
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))

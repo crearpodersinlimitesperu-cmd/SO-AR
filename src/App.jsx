@@ -11,7 +11,7 @@ import DatosSedesCartas from './pages/DatosSedesCartas';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import { useUI } from './context/UIContext'
-import { PORTFOLIO_FI_REVIEW_EMAILS } from './config/permissions'
+import { PORTFOLIO_FI_REVIEW_EMAILS, isGlobalObserver } from './config/permissions'
 import './index.css'
 
 import LearningDashboard from './pages/LearningDashboard'
@@ -142,8 +142,10 @@ function RoleRoute({ children, allowedRoles = [], allowedEmails = [], requireSup
   // Verificación de Roles permitidos
   if (allowedRoles.length > 0) {
     const hasAllowedEmail = allowedEmails.includes((currentUser.email || '').trim().toLowerCase());
+    const isObserver = isGlobalObserver(currentUser);
     const hasRole = (currentUser.appRole !== 'consolidado' && allowedRoles.includes(currentUser.appRole)) ||
                     currentUser.isSuperAdmin ||
+                    isObserver ||
                     (!excludeDireccionBypass && currentUser.isDireccion) ||
                     (currentUser.roles || []).some(r => allowedRoles.includes(r)) || hasAllowedEmail;
     if (!hasRole) {

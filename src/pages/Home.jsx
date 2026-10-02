@@ -820,7 +820,7 @@ export default function Home() {
     return allowedRoles.includes(currentUser?.appRole);
   };
 
-  const { currentUser, logout, switchRole, reauthenticateGoogle } = useAuth();
+  const { currentUser, logout, switchRole, reauthenticateGoogle, updateCurrentUserFields } = useAuth();
   const [showLegalModal, setShowLegalModal] = useState(false);
   const [isCheckingLegal, setIsCheckingLegal] = useState(true);
 
@@ -1829,12 +1829,35 @@ export default function Home() {
                         const second = current[1] || '';
                         const next = val ? (second && second !== val ? [val, second] : [val]) : [];
                         try {
-                          const uid = currentUser?.uid || currentUser?.id;
-                          if (uid) {
-                            await updateDoc(doc(db, 'users', uid), { equiposQuito: next });
-                            if (currentUser) currentUser.equiposQuito = next;
-                            showToast(`Equipo principal Quito actualizado: ${val ? 'Equipo ' + val : 'Automático'}`, 'success');
+                          const targetIds = [
+                            currentUser?.uid,
+                            currentUser?.id,
+                            currentUser?.dbId,
+                            currentUser?._docId
+                          ].filter(Boolean);
+                          const uniqueTargetIds = [...new Set(targetIds)];
+
+                          let saved = false;
+                          let lastErr = null;
+                          for (const docId of uniqueTargetIds) {
+                            try {
+                              await setDoc(doc(db, 'users', docId), { equiposQuito: next }, { merge: true });
+                              saved = true;
+                            } catch (writeErr) {
+                              lastErr = writeErr;
+                            }
                           }
+
+                          if (!saved && uniqueTargetIds.length > 0 && lastErr) {
+                            throw lastErr;
+                          }
+
+                          if (typeof updateCurrentUserFields === 'function') {
+                            updateCurrentUserFields({ equiposQuito: next });
+                          } else if (currentUser) {
+                            currentUser.equiposQuito = next;
+                          }
+                          showToast(`Equipo principal Quito actualizado: ${val ? 'Equipo ' + val : 'Automático'}`, 'success');
                         } catch (err) {
                           console.error('Error guardando equipo Quito:', err);
                           showToast('No se pudo guardar el equipo seleccionado', 'error');
@@ -3394,7 +3417,13 @@ export default function Home() {
 
       {/* MODAL DE PERFIL DE PERSONA (abierto desde el Buscador Global) */}
       {showSearchUserModal && selectedSearchUser && (
-        <UserProfileModal isOpen={showSearchUserModal} onClose={() => setShowSearchUserModal(false)} user={selectedSearchUser} allTasks={allTasks} />
+        <UserProfileModal 
+          isOpen={showSearchUserModal} 
+          onClose={() => setShowSearchUserModal(false)} 
+          user={selectedSearchUser} 
+          allTasks={allTasks} 
+          onStatusUpdated={(updated) => setSelectedSearchUser(prev => ({ ...prev, ...updated }))}
+        />
       )}
 
       {/* MODAL HORARIOS DE ENTRENAMIENTOS Y CÓDIGO DE VESTIMENTA */}

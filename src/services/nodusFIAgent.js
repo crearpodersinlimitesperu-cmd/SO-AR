@@ -32,73 +32,24 @@ export function ejecutarDiagnosticoFIs(
   // 0. El universo de una auditoría FI nunca es "todos los registros": solo
   // personas con asistencia PFD explícitamente confirmada. Si la fuente no
   // entrega esa señal, no se inventa una conclusión con datos ambiguos.
-  let filtrados = (Array.isArray(todosParticipantes) ? todosParticipantes : [])
+  const universoPfd = (Array.isArray(todosParticipantes) ? todosParticipantes : [])
     .filter((participante) => participante?.asistioPFD === true);
+
+  // 1. Filtrado por Sede
+  let participantesEnSede = universoPfd;
   const esFiltroGlobal = !filtroSede || ['global', 'sede global', 'todas', 'todos', 'all'].includes(normalizarTexto(filtroSede));
   if (!esFiltroGlobal) {
     const sedeNorm = normalizarTexto(filtroSede);
-    filtrados = filtrados.filter(p => normalizarTexto(p.sede).includes(sedeNorm));
+    participantesEnSede = participantesEnSede.filter(p => normalizarTexto(p.sede).includes(sedeNorm));
   }
 
-  // 2. Filtrado por equipo
-  if (filtroEquipo && filtroEquipo !== 'Todos') {
-    filtrados = filtrados.filter(p => (p.equipo || '').toUpperCase().includes(filtroEquipo.toUpperCase()));
-  }
-
-  // 3. Filtrado por estado de FIs
-  if (filtroEstado && filtroEstado !== 'TODOS') {
-    if (filtroEstado === 'SIN_ENTREGA') {
-      filtrados = filtrados.filter(p => (p.totalFi || 0) === 0);
-    } else if (filtroEstado === 'PENDIENTES') {
-      filtrados = filtrados.filter(p => (p.pendientes || 0) > 0);
-    } else if (filtroEstado === 'DEVUELTOS') {
-      filtrados = filtrados.filter(p => (p.devueltos || 0) > 0);
-    } else if (filtroEstado === 'APROBADOS') {
-      filtrados = filtrados.filter(p => (p.aprobados || 0) > 0);
-    }
-  }
-
-  // 4. Filtrado por búsqueda en tiempo real
-  if (queryBusqueda && queryBusqueda.trim() !== '') {
-    const qNorm = normalizarTexto(queryBusqueda);
-    filtrados = filtrados.filter(p => {
-      const nombreNorm = normalizarTexto(p.nombre || '');
-      const dniNorm = normalizarTexto(p.dni || '');
-      const equipoNorm = normalizarTexto(p.equipo || '');
-      return nombreNorm.includes(qNorm) || dniNorm.includes(qNorm) || equipoNorm.includes(qNorm);
-    });
-  }
-
-  // 5. Métricas globales del subconjunto evaluado
-  const totalParticipantes = filtrados.length;
-  let conCeroFIs = 0;
-  let conFIs = 0;
-  let conFIsCompletos = 0;
-  let totalFIsRegistrados = 0;
-  let totalPendientes = 0;
-  let totalDevueltos = 0;
-  let totalAprobados = 0;
-
-  // Mapa de desempeño por equipo
+  // 2. Mapa de desempeño por equipo (calculado sobre la sede completa para alimentar filtros y semáforos)
   const equiposMap = {};
-
-  filtrados.forEach(p => {
+  participantesEnSede.forEach(p => {
     const tot = p.totalFi || 0;
     const pen = p.pendientes || 0;
     const dev = p.devueltos || 0;
     const apr = p.aprobados || 0;
-
-    totalFIsRegistrados += tot;
-    totalPendientes += pen;
-    totalDevueltos += dev;
-    totalAprobados += apr;
-
-    if (tot === 0) {
-      conCeroFIs++;
-    } else {
-      conFIs++;
-      if (tot >= 5) conFIsCompletos++;
-    }
 
     const eqKey = p.equipo || 'Sin Equipo';
     if (!equiposMap[eqKey]) {
@@ -120,17 +71,7 @@ export function ejecutarDiagnosticoFIs(
     equiposMap[eqKey].aprobados += apr;
   });
 
-  const tasaEntrega = totalParticipantes > 0 
-    ? Math.round((conFIs / totalParticipantes) * 100) 
-    : 0;
-  const tasaSinEntrega = totalParticipantes > 0 
-    ? Math.round((conCeroFIs / totalParticipantes) * 100) 
-    : 0;
-  const tasaAprobacion = totalFIsRegistrados > 0 
-    ? Math.round((totalAprobados / totalFIsRegistrados) * 100) 
-    : 0;
-
-  // Calcular semáforo de equipos
+  // Calcular semáforo de equipos de la sede
   const equiposList = Object.values(equiposMap).map(eq => {
     const pctEntrega = eq.total > 0 ? Math.round((eq.conEntrega / eq.total) * 100) : 0;
     let semaforo = 'ROJO';
@@ -141,10 +82,84 @@ export function ejecutarDiagnosticoFIs(
       pctEntrega,
       semaforo
     };
-  }).sort((a, b) => b.pctEntrega - a.pctEntrega);
+  }).sort((a, b) => {
+    const numA = parseInt((a.equipo || '').replace(/\D/g, ''), 10) || 0;
+    const numB = parseInt((b.equipo || '').replace(/\D/g, ''), 10) || 0;
+    return numA - numB || b.pctEntrega - a.pctEntrega;
+  });
+
+  // 3. Aplicar filtro de equipo a los participantes
+  let filtrados = participantesEnSede;
+  if (filtroEquipo && filtroEquipo !== 'Todos') {
+    filtrados = filtrados.filter(p => (p.equipo || '').toUpperCase().includes(filtroEquipo.toUpperCase()));
+  }
+
+  // 4. Filtrado por estado de FIs
+  if (filtroEstado && filtroEstado !== 'TODOS') {
+    if (filtroEstado === 'SIN_ENTREGA') {
+      filtrados = filtrados.filter(p => (p.totalFi || 0) === 0);
+    } else if (filtroEstado === 'PENDIENTES') {
+      filtrados = filtrados.filter(p => (p.pendientes || 0) > 0);
+    } else if (filtroEstado === 'DEVUELTOS') {
+      filtrados = filtrados.filter(p => (p.devueltos || 0) > 0);
+    } else if (filtroEstado === 'APROBADOS') {
+      filtrados = filtrados.filter(p => (p.aprobados || 0) > 0);
+    }
+  }
+
+  // 5. Filtrado por búsqueda en tiempo real
+  if (queryBusqueda && queryBusqueda.trim() !== '') {
+    const qNorm = normalizarTexto(queryBusqueda);
+    filtrados = filtrados.filter(p => {
+      const nombreNorm = normalizarTexto(p.nombre || '');
+      const dniNorm = normalizarTexto(p.dni || '');
+      const equipoNorm = normalizarTexto(p.equipo || '');
+      return nombreNorm.includes(qNorm) || dniNorm.includes(qNorm) || equipoNorm.includes(qNorm);
+    });
+  }
+
+  // 6. Métricas globales del subconjunto evaluado
+  const totalParticipantes = filtrados.length;
+  let conCeroFIs = 0;
+  let conFIs = 0;
+  let conFIsCompletos = 0;
+  let totalFIsRegistrados = 0;
+  let totalPendientes = 0;
+  let totalDevueltos = 0;
+  let totalAprobados = 0;
+
+  filtrados.forEach(p => {
+    const tot = p.totalFi || 0;
+    const pen = p.pendientes || 0;
+    const dev = p.devueltos || 0;
+    const apr = p.aprobados || 0;
+
+    totalFIsRegistrados += tot;
+    totalPendientes += pen;
+    totalDevueltos += dev;
+    totalAprobados += apr;
+
+    if (tot === 0) {
+      conCeroFIs++;
+    } else {
+      conFIs++;
+      if (tot >= 5) conFIsCompletos++;
+    }
+  });
+
+  const tasaEntrega = totalParticipantes > 0 
+    ? Math.round((conFIs / totalParticipantes) * 100) 
+    : 0;
+  const tasaSinEntrega = totalParticipantes > 0 
+    ? Math.round((conCeroFIs / totalParticipantes) * 100) 
+    : 0;
+  const tasaAprobacion = totalFIsRegistrados > 0 
+    ? Math.round((totalAprobados / totalFIsRegistrados) * 100) 
+    : 0;
 
   const metricas = {
     totalParticipantes,
+    totalParticipantesSede: participantesEnSede.length,
     conCeroFIs,
     conFIs,
     conFIsCompletos,

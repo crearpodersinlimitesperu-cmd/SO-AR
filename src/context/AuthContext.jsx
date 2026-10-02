@@ -227,7 +227,15 @@ export function AuthProvider({ children }) {
     ].filter(Boolean).map((email) => email.toString().trim().toLowerCase())));
     const officialProfile = identityEmails.map(findUserByAnyEmail).find(Boolean) || null;
     
-    let canonicalRole = normalizeRole(officialProfile?.role || foundUser.role);
+    // Prioridad: Base de Datos Firestore (cuando ha sido configurada o actualizada) > Catálogo oficial
+    const hasAdminUpdatedRoles = Boolean(foundUser.rolesUpdatedAt || foundUser.rolesUpdatedBy);
+    const hasSpecificDbRole = Boolean(foundUser.role && foundUser.role !== 'colaborador' && foundUser.role !== 'miembro');
+    const hasSpecificDbRoles = Boolean(Array.isArray(foundUser.roles) && foundUser.roles.length > 0);
+    const isRoleConfiguredInDb = hasAdminUpdatedRoles || (hasSpecificDbRole && hasSpecificDbRoles);
+
+    let canonicalRole = normalizeRole(
+      isRoleConfiguredInDb ? foundUser.role : (officialProfile?.role || foundUser.role || 'colaborador')
+    );
     const isSuperAdmin = isSuperAdminEmail(normalizedEmail) || isSuperAdminEmail(foundUser.email);
     const isDualTrainer = DUAL_ROLE_TRAINER_EMAILS.includes(normalizedEmail);
     const isOfficialCoord = Boolean(
@@ -236,8 +244,11 @@ export function AuthProvider({ children }) {
 
     let assignedRoles = [];
 
-    if (officialProfile) {
-      // Si el usuario existe en el catálogo corporativo maestro, sus roles oficiales mandan
+    if (hasSpecificDbRoles && Array.isArray(foundUser.roles) && foundUser.roles.length > 0) {
+      // Roles explícitamente configurados en la base de datos Firestore
+      assignedRoles = foundUser.roles.map(r => normalizeRole(r));
+    } else if (officialProfile) {
+      // Si el usuario existe en el catálogo corporativo maestro y no tiene roles en DB, sus roles oficiales mandan
       const baseOfficialRoles = (officialProfile.roles || [officialProfile.role]).map(r => normalizeRole(r));
       assignedRoles = [...baseOfficialRoles];
 
@@ -280,6 +291,25 @@ export function AuthProvider({ children }) {
       if (!assignedRoles.includes('gerente')) assignedRoles.push('gerente');
       if (!assignedRoles.includes('direccion')) assignedRoles.push('direccion');
       if (!assignedRoles.includes('consolidado')) assignedRoles.push('consolidado');
+    }
+
+    // Jesús Acosta: Rol de Observador Global en toda la plataforma + Entrenador
+    const isJesusAcosta = ['jesus.acosta@crearpsl.net', 'chuyacostar88@gmail.com', 'jesusadrianacosta@gmail.com'].includes(normalizedEmail) || ['jesus.acosta@crearpsl.net', 'chuyacostar88@gmail.com', 'jesusadrianacosta@gmail.com'].includes(rawEmail);
+    if (isJesusAcosta) {
+      if (!assignedRoles.includes('observador')) assignedRoles.push('observador');
+      if (!assignedRoles.includes('entrenador')) assignedRoles.push('entrenador');
+      if (!assignedRoles.includes('consolidado')) assignedRoles.push('consolidado');
+    }
+
+    // Ricardo Gavilánez: Gerente (Cuenca) y Quantum Team (Quito)
+    const isRicardoGavilanez = ['ricardo.gavilanez@crearpsl.net', 'ricardogavilanez1021@gmail.com'].includes(normalizedEmail) || ['ricardo.gavilanez@crearpsl.net', 'ricardogavilanez1021@gmail.com'].includes(rawEmail);
+    if (isRicardoGavilanez) {
+      if (!assignedRoles.includes('gerente')) assignedRoles.push('gerente');
+      if (!assignedRoles.includes('qt')) assignedRoles.push('qt');
+      if (!assignedRoles.includes('consolidado')) assignedRoles.push('consolidado');
+      if (!foundUser.roleSedes) foundUser.roleSedes = {};
+      if (!foundUser.roleSedes.gerente) foundUser.roleSedes.gerente = 'Cuenca';
+      if (!foundUser.roleSedes.qt) foundUser.roleSedes.qt = 'Quito';
     }
 
     // Asegurar que no quede 'coordinador' administrativo si el usuario tiene un cargo específico
@@ -340,8 +370,8 @@ export function AuthProvider({ children }) {
       // La sede efectiva acompaña el rol activo. Ej.: Ricardo Gavilánez es
       // Gerente de Cuenca y QT de Quito; al alternar rol no debe heredar la
       // sede equivocada ni contaminar los filtros de cada operación.
-      sede: (officialProfile?.roleSedes || foundUser.roleSedes)?.[activeRole] || foundUser.sede || officialProfile?.sede || 'Global',
-      roleSedes: officialProfile?.roleSedes || foundUser.roleSedes || {},
+      sede: (foundUser.roleSedes || officialProfile?.roleSedes)?.[activeRole] || foundUser.sede || officialProfile?.sede || 'Global',
+      roleSedes: { ...(officialProfile?.roleSedes || {}), ...(foundUser.roleSedes || {}) },
       // (14/09/2026) NUEVO CAMPO: equiposQuito — José confirmó que, a diferencia de
       // las demás sedes (que corren UN solo equipo a la vez), Quito corre VARIOS
       // equipos en paralelo (ej. C1 Equipo 122 y C1 Equipo 128 el mismo fin de
@@ -428,7 +458,9 @@ export function AuthProvider({ children }) {
         'cardenasgina29@gmail.com',
         'rouz1414@gmail.com',
         'brunische66@gmail.com',
-        'ricardogavilanez1021@gmail.com'
+        'ricardogavilanez1021@gmail.com',
+        'chuyacostar88@gmail.com',
+        'jesusadrianacosta@gmail.com'
       ];
       const normalizedEmail = rawEmail.replace('@crearpsl.com', '@crearpsl.net');
       
@@ -507,7 +539,7 @@ export function AuthProvider({ children }) {
       let canonicalUser = normalizeUserRecord(foundUser, 'login');
 
       // 🕵️‍♂️ AGENTE ONLINE: Validar y sanar multiroles 
-      const updatedRoles = await enforceUserRolesAgent(user, user.uid, canonicalUser.roles);
+      const updatedRoles = await enforceUserRolesAgent(foundUser || user, user.uid, canonicalUser.roles);
       canonicalUser.roles = updatedRoles;
 
       // 🔥 CRÍTICO: Guardar el usuario en la colección "users"

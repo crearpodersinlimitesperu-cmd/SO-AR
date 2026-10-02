@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { collection, query, orderBy, onSnapshot, deleteDoc, doc, writeBatch, addDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
@@ -1617,6 +1617,32 @@ export default function MonitorImos() {
                             1ra: {evalRes.llamada1}
                           </div>
                         )}
+                        <div style={{ display: 'flex', gap: '4px', marginTop: '4px', flexWrap: 'wrap' }}>
+                          <span style={{ 
+                            fontSize: '0.68rem', padding: '1px 5px', borderRadius: '3px', fontWeight: 700,
+                            background: evalRes.asistioNodus === 'SÍ' ? 'rgba(34, 197, 94, 0.2)' : evalRes.asistioNodus === 'NO' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(255,255,255,0.06)',
+                            color: evalRes.asistioNodus === 'SÍ' ? '#4ade80' : evalRes.asistioNodus === 'NO' ? '#f87171' : '#94a3b8',
+                            border: `1px solid ${evalRes.asistioNodus === 'SÍ' ? 'rgba(34, 197, 94, 0.3)' : evalRes.asistioNodus === 'NO' ? 'rgba(239, 68, 68, 0.3)' : 'rgba(255,255,255,0.1)'}`
+                          }}>
+                            Asistió: {evalRes.asistioNodus || '—'}
+                          </span>
+                          <span style={{ 
+                            fontSize: '0.68rem', padding: '1px 5px', borderRadius: '3px', fontWeight: 700,
+                            background: evalRes.desertoNodus === 'SÍ' ? 'rgba(239, 68, 68, 0.25)' : evalRes.desertoNodus === 'NO' ? 'rgba(34, 197, 94, 0.2)' : 'rgba(255,255,255,0.06)',
+                            color: evalRes.desertoNodus === 'SÍ' ? '#ef4444' : evalRes.desertoNodus === 'NO' ? '#4ade80' : '#94a3b8',
+                            border: `1px solid ${evalRes.desertoNodus === 'SÍ' ? 'rgba(239, 68, 68, 0.4)' : evalRes.desertoNodus === 'NO' ? 'rgba(34, 197, 94, 0.3)' : 'rgba(255,255,255,0.1)'}`
+                          }}>
+                            Desertó: {evalRes.desertoNodus || '—'}
+                          </span>
+                          <span style={{ 
+                            fontSize: '0.68rem', padding: '1px 5px', borderRadius: '3px', fontWeight: 700,
+                            background: evalRes.pagoC2Nodus === 'SÍ' ? 'rgba(34, 197, 94, 0.2)' : evalRes.pagoC2Nodus === 'NO' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(255,255,255,0.06)',
+                            color: evalRes.pagoC2Nodus === 'SÍ' ? '#4ade80' : evalRes.pagoC2Nodus === 'NO' ? '#f87171' : '#94a3b8',
+                            border: `1px solid ${evalRes.pagoC2Nodus === 'SÍ' ? 'rgba(34, 197, 94, 0.3)' : evalRes.pagoC2Nodus === 'NO' ? 'rgba(239, 68, 68, 0.3)' : 'rgba(255,255,255,0.1)'}`
+                          }}>
+                            Pagó C2: {evalRes.pagoC2Nodus || '—'}
+                          </span>
+                        </div>
                       </td>
                       <td style={{ padding: '0.75rem 0.85rem', textAlign: 'right' }}>
                         {enr.email ? (
@@ -2161,10 +2187,35 @@ export default function MonitorImos() {
                                           {evalRes.statusLabel}
                                         </span>
                                       </div>
-                                      <div style={{ fontSize: '0.8rem', color: '#fff', marginBottom: '2px' }}>
+                                      <div style={{ fontSize: '0.8rem', color: '#fff', marginBottom: '4px' }}>
                                         <strong>Coord. {evalRes.coordinador}</strong> • 1ra Llamada: <span style={{ color: evalRes.statusColor, fontWeight: 700 }}>{evalRes.llamada1}</span>
                                         {evalRes.llamada2 && evalRes.llamada2 !== '—' && ` • 2da: ${evalRes.llamada2}`}
-                                        {evalRes.asistenciaNodus && evalRes.asistenciaNodus !== '—' && ` • Asistencia: ${evalRes.asistenciaNodus}`}
+                                      </div>
+                                      <div style={{ display: 'flex', gap: '6px', margin: '6px 0', flexWrap: 'wrap' }}>
+                                        <span style={{ 
+                                          fontSize: '0.72rem', padding: '2px 7px', borderRadius: '4px', fontWeight: 700,
+                                          background: evalRes.asistioNodus === 'SÍ' ? 'rgba(34, 197, 94, 0.2)' : evalRes.asistioNodus === 'NO' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(255,255,255,0.06)',
+                                          color: evalRes.asistioNodus === 'SÍ' ? '#4ade80' : evalRes.asistioNodus === 'NO' ? '#f87171' : '#94a3b8',
+                                          border: `1px solid ${evalRes.asistioNodus === 'SÍ' ? 'rgba(34, 197, 94, 0.3)' : evalRes.asistioNodus === 'NO' ? 'rgba(239, 68, 68, 0.3)' : 'rgba(255,255,255,0.1)'}`
+                                        }}>
+                                          Asistió Nodus: {evalRes.asistioNodus || '—'}
+                                        </span>
+                                        <span style={{ 
+                                          fontSize: '0.72rem', padding: '2px 7px', borderRadius: '4px', fontWeight: 700,
+                                          background: evalRes.desertoNodus === 'SÍ' ? 'rgba(239, 68, 68, 0.25)' : evalRes.desertoNodus === 'NO' ? 'rgba(34, 197, 94, 0.2)' : 'rgba(255,255,255,0.06)',
+                                          color: evalRes.desertoNodus === 'SÍ' ? '#ef4444' : evalRes.desertoNodus === 'NO' ? '#4ade80' : '#94a3b8',
+                                          border: `1px solid ${evalRes.desertoNodus === 'SÍ' ? 'rgba(239, 68, 68, 0.4)' : evalRes.desertoNodus === 'NO' ? 'rgba(34, 197, 94, 0.3)' : 'rgba(255,255,255,0.1)'}`
+                                        }}>
+                                          Desertó Nodus: {evalRes.desertoNodus || '—'}
+                                        </span>
+                                        <span style={{ 
+                                          fontSize: '0.72rem', padding: '2px 7px', borderRadius: '4px', fontWeight: 700,
+                                          background: evalRes.pagoC2Nodus === 'SÍ' ? 'rgba(34, 197, 94, 0.2)' : evalRes.pagoC2Nodus === 'NO' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(255,255,255,0.06)',
+                                          color: evalRes.pagoC2Nodus === 'SÍ' ? '#4ade80' : evalRes.pagoC2Nodus === 'NO' ? '#f87171' : '#94a3b8',
+                                          border: `1px solid ${evalRes.pagoC2Nodus === 'SÍ' ? 'rgba(34, 197, 94, 0.3)' : evalRes.pagoC2Nodus === 'NO' ? 'rgba(239, 68, 68, 0.3)' : 'rgba(255,255,255,0.1)'}`
+                                        }}>
+                                          Pagó C2 Nodus: {evalRes.pagoC2Nodus || '—'}
+                                        </span>
                                       </div>
                                       <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
                                         {evalRes.detalle}

@@ -79,6 +79,9 @@ export const normalizeRole = (role) => {
   
   // Entrenador (Coach)
   if (r === 'entrenador' || r === 'coach' || r.includes('entrenador') || r.includes('coach')) return 'entrenador';
+
+  // Observador Global (Solo Lectura)
+  if (r.includes('observador')) return 'observador';
   
   return r;
 };

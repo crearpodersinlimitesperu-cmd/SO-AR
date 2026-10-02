@@ -130,10 +130,10 @@ export default function LegalCommandCenter() {
         <div style={{ gridColumn: 'span 12', background: '#0f172a', borderRadius: '12px', border: '1px solid #334155', padding: '1.5rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
             <h2 style={{ fontSize: '1.2rem', color: '#f8fafc', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0 }}>
-              <FileSignature size={22} color="#f59e0b" /> Matriz de Auditoría NDA & Bloqueo de Salón
+              <FileSignature size={22} color="#f59e0b" /> Matriz de Estatus Contractual y Documentación Legal
             </h2>
-            <div style={{ background: '#f59e0b', color: '#000', padding: '6px 12px', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Ban size={16} /> Kill-Switch Activo
+            <div style={{ background: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', border: '1px solid rgba(59, 130, 246, 0.3)', padding: '6px 12px', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Shield size={16} /> Auditoría Preventiva
             </div>
           </div>
           
@@ -143,7 +143,7 @@ export default function LegalCommandCenter() {
                 <th style={{ padding: '12px 16px' }}>Personal (Staff)</th>
                 <th style={{ padding: '12px 16px' }}>Rol Organizacional</th>
                 <th style={{ padding: '12px 16px' }}>Estatus NDA / Contrato</th>
-                <th style={{ padding: '12px 16px', textAlign: 'right' }}>Asignación de Salón</th>
+                <th style={{ padding: '12px 16px', textAlign: 'right' }}>Estatus Operativo</th>
               </tr>
             </thead>
             <tbody>
@@ -163,11 +163,11 @@ export default function LegalCommandCenter() {
                   <td style={{ padding: '16px', textAlign: 'right' }}>
                     {n.canTrain ? (
                       <span style={{ color: '#10b981', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '6px' }}>
-                        Autorizado
+                        Regularizado
                       </span>
                     ) : (
-                      <span style={{ color: '#ef4444', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '6px' }}>
-                        <Ban size={16} /> BLOQUEADO
+                      <span style={{ color: '#f59e0b', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '6px' }}>
+                        Pendiente Regularizar
                       </span>
                     )}
                   </td>

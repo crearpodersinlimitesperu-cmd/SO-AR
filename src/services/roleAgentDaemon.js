@@ -26,6 +26,12 @@ export async function enforceUserRolesAgent(firebaseUser, userDocId, currentRole
     const userEmail = normalizeString(rawEmail);
     const userName = normalizeString(firebaseUser.displayName);
 
+    // Si los roles del colaborador fueron configurados o actualizados por un Administrador,
+    // la base de datos Firestore es la máxima fuente de verdad y no debe ser sobreescrita.
+    if (firebaseUser?.rolesUpdatedAt || firebaseUser?.rolesUpdatedBy) {
+      return (currentRoles || []).map(r => normalizeRole(r)).filter(Boolean);
+    }
+
     // 0. Respaldo contra el Catálogo Oficial Corporativo (fuente primaria de verdad)
     const staticProfile = findUserByAnyEmail(rawEmail);
     const userSede = normalizeString(staticProfile?.sede || firebaseUser.sede || '');
@@ -130,8 +136,8 @@ export async function enforceUserRolesAgent(firebaseUser, userDocId, currentRole
       );
 
       if (qtEmailMatches || qtNameAndSedeMatches) {
-        // Solo agregar 'qt' si el usuario no es un coordinador exclusivo de sede
-        if (!isOfficialCoordinator || (staticProfile?.roles && staticProfile.roles.includes('qt'))) {
+        // Solo agregar 'qt' si el usuario no es un coordinador exclusivo de sede o si ya lo tiene en DB
+        if (!isOfficialCoordinator || (staticProfile?.roles && staticProfile.roles.includes('qt')) || (currentRoles && currentRoles.includes('qt'))) {
           discoveredRoles.add('qt');
           if (data.rol) discoveredRoles.add(normalizeRole(data.rol));
         }
@@ -151,12 +157,12 @@ export async function enforceUserRolesAgent(firebaseUser, userDocId, currentRole
       discoveredRoles.delete('coordinador');
     }
 
-    // Purgar falsos positivos de 'manager' y 'entrenador' en coordinadores oficiales de sede
+    // Purgar falsos positivos de 'manager' y 'entrenador' en coordinadores oficiales de sede SOLO si no están en DB
     if (isOfficialCoordinator) {
-      if (!isDualTrainer && (!staticProfile.roles || !staticProfile.roles.includes('entrenador'))) {
+      if (!isDualTrainer && (!staticProfile?.roles || !staticProfile.roles.includes('entrenador')) && (!currentRoles || !currentRoles.includes('entrenador'))) {
         discoveredRoles.delete('entrenador');
       }
-      if (!staticProfile.roles || !staticProfile.roles.includes('manager')) {
+      if ((!staticProfile?.roles || !staticProfile.roles.includes('manager')) && (!currentRoles || !currentRoles.includes('manager'))) {
         discoveredRoles.delete('manager');
       }
     }

@@ -231,9 +231,43 @@ export const canChangeManagerStatus = (currentUser) => {
   return false;
 };
 
+/**
+ * Correos con rol de Observador Global (Jesús Acosta)
+ * Habilitado para ver toda la plataforma sin limitaciones (solo lectura en este rol).
+ */
+export const OBSERVER_EMAILS = [
+  'jesus.acosta@crearpsl.net',
+  'chuyacostar88@gmail.com',
+  'jesusadrianacosta@gmail.com'
+];
+
+export const isGlobalObserver = (currentUser) => {
+  if (!currentUser) return false;
+  const email = (currentUser.email || '').toLowerCase().trim();
+  if (OBSERVER_EMAILS.includes(email)) return true;
+  const r = (currentUser.appRole || currentUser.role || '').toLowerCase();
+  const roles = Array.isArray(currentUser.roles) ? currentUser.roles.map(x => String(x).toLowerCase()) : [];
+  return r === 'observador' || roles.includes('observador');
+};
+
+/**
+ * REGLA ESTRICTA DE PRIVACIDAD (Pedido explícito de José Sánchez):
+ * "ojo los inactivos en cualquier rol solo pueden ser vistos por mi y talento humano nadie mas"
+ */
+export const canViewInactiveUsers = (currentUser) => {
+  if (!currentUser) return false;
+  const email = (currentUser.email || '').toLowerCase().trim();
+  if (email === 'jose.sanchez@crearpsl.net' || isSuperAdminEmail(email)) return true;
+  const r = (currentUser.appRole || currentUser.role || '').toLowerCase();
+  const roles = Array.isArray(currentUser.roles) ? currentUser.roles.map(x => String(x).toLowerCase()) : [];
+  if (r === 'talento_humano' || roles.includes('talento_humano')) return true;
+  if (email === 'talento.humano@crearpsl.net' || email === 'karen.moran@crearpsl.net') return true;
+  return false;
+};
+
 export const canViewAllManagers = (currentUser) => {
   if (!currentUser) return false;
-  if (currentUser.isSuperAdmin || currentUser.isDireccion || isSuperAdminEmail(currentUser.email)) return true;
+  if (currentUser.isSuperAdmin || currentUser.isDireccion || isSuperAdminEmail(currentUser.email) || isGlobalObserver(currentUser)) return true;
   const r = currentUser.appRole || currentUser.role;
   return r === 'director_maestria' || isDireccionRole(r);
 };
@@ -243,7 +277,7 @@ export const canViewAllManagers = (currentUser) => {
  */
 export const canViewSede = (currentUser) => {
   if (!currentUser) return false;
-  if (currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email)) return true;
+  if (currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email) || isGlobalObserver(currentUser)) return true;
   const r = currentUser.appRole || currentUser.role;
   const roles = Array.isArray(currentUser.roles) ? currentUser.roles : [];
   // Gerentes, Coordinadores y Capitanes pueden ver su sede
@@ -268,6 +302,9 @@ export const DUAL_ROLE_TRAINER_EMAILS = [
   'carlos.brunis@crearpsl.net',     // Coordinador QT Global + Entrenador (Carlos Brunis)
   'linid.valencia@crearpsl.net',    // Coordinadora MJ + Entrenadora
   'brunische66@gmail.com',
+  'jesus.acosta@crearpsl.net',      // Entrenador + Observador Global
+  'chuyacostar88@gmail.com',        // Entrenador + Observador Global (Gmail oficial)
+  'jesusadrianacosta@gmail.com',    // Entrenador + Observador Global (Gmail alterno)
   'daniela.monroy@crearpsl.net',      // Entrenadora de llamadas
   'erika.gavilanez@crearpsl.net',     // Coordinadora MJ + Entrenadora de llamadas
   'mauricio.ramirez@crearpsl.net',    // Entrenador de llamadas

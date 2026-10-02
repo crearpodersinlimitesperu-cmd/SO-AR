@@ -131,6 +131,34 @@ export default function FuturosImposiblesView({
     return Number.isNaN(date.getTime()) ? 'fecha no verificable' : date.toLocaleString('es-EC');
   };
 
+  // Cálculo dinámico de equipos disponibles según la sede seleccionada
+  const equiposDeSede = useMemo(() => {
+    const esFiltroGlobal = !selectedSede || ['global', 'sede global', 'todas', 'todos', 'all'].includes((selectedSede || '').toLowerCase().trim());
+    const deSede = esFiltroGlobal
+      ? participantesConRevision
+      : participantesConRevision.filter(p => (p.sede || '').toLowerCase().includes(selectedSede.toLowerCase().trim()));
+
+    const eqSet = new Set();
+    deSede.forEach(p => {
+      if (p.equipo) eqSet.add(p.equipo.trim());
+    });
+
+    const sorted = Array.from(eqSet).sort((a, b) => {
+      const numA = parseInt(a.replace(/\D/g, ''), 10) || 0;
+      const numB = parseInt(b.replace(/\D/g, ''), 10) || 0;
+      return numA - numB || a.localeCompare(b);
+    });
+
+    return ['Todos', ...sorted];
+  }, [participantesConRevision, selectedSede]);
+
+  // Si cambia la sede y el equipo seleccionado no pertenece a esa sede, resetear a 'Todos'
+  useEffect(() => {
+    if (equipoFilter !== 'Todos' && !equiposDeSede.includes(equipoFilter)) {
+      setEquipoFilter('Todos');
+    }
+  }, [selectedSede, equiposDeSede, equipoFilter]);
+
   // Ejecución reactiva del diagnóstico del Agente IA
   const diagnostic = useMemo(() => {
     return ejecutarDiagnosticoFIs(
@@ -582,7 +610,7 @@ export default function FuturosImposiblesView({
               whiteSpace: 'nowrap'
             }}
           >
-            Todos ({metricas.totalParticipantes})
+            Todos ({metricas.totalParticipantesSede ?? metricas.totalParticipantes})
           </button>
 
           {metricas.equiposList.map((eq, idx) => {
@@ -697,7 +725,7 @@ export default function FuturosImposiblesView({
                 cursor: 'pointer'
               }}
             >
-              {EQUIPOS_FUTUROS_IMPOSIBLES.map(eq => (
+              {equiposDeSede.map(eq => (
                 <option key={eq} value={eq} style={{ background: '#0f172a', color: '#f8fafc' }}>
                   {eq}
                 </option>
@@ -1194,34 +1222,6 @@ export default function FuturosImposiblesView({
                           </div>
                         </div>
                       )}
-                    </div>
-
-                    {/* Card de Evaluación del Agente IA */}
-                    <div style={{ 
-                      background: 'rgba(15, 23, 42, 0.6)', 
-                      border: '1px solid rgba(56, 189, 248, 0.25)', 
-                      borderRadius: '8px', 
-                      padding: '1rem',
-                      marginBottom: '1.25rem'
-                    }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                        <span style={{ fontSize: '0.78rem', fontWeight: 800, color: '#38bdf8', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                          <Sparkles size={14} /> AUDITORÍA ONTOLÓGICA DEL AGENTE IA
-                        </span>
-                        <span style={{ 
-                          fontSize: '0.75rem', 
-                          fontWeight: 800, 
-                          color: evaluacion.color,
-                          background: `${evaluacion.color}20`,
-                          padding: '0.15rem 0.5rem',
-                          borderRadius: '12px'
-                        }}>
-                          {evaluacion.etiqueta} ({evaluacion.puntaje}/100)
-                        </span>
-                      </div>
-                      <div style={{ fontSize: '0.82rem', color: textMuted, lineHeight: 1.5, whiteSpace: 'pre-line' }}>
-                        {evaluacion.observaciones}
-                      </div>
                     </div>
 
                     {/* Observaciones / Feedback del Mentor */}

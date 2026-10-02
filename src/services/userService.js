@@ -152,11 +152,17 @@ export async function getAllCompanyUsers(currentUser = null) {
       const candidateKeys = emailKeysOf(uData);
       const existingIdx = candidateKeys.size > 0 ? findExistingIndex(candidateKeys) : -1;
       
-      // Respaldo contra catálogo fidedigno oficial para prevenir colapsos de cargos y nombres genéricos
+      // Firestore es la máxima fuente de verdad para roles y sedes cuando el usuario ha sido editado
+      // o cuenta con rol/roles específicos configurados en base de datos.
+      const hasAdminUpdatedRoles = Boolean(uData.rolesUpdatedAt || uData.rolesUpdatedBy);
+      const hasSpecificDbRole = Boolean(uData.role && uData.role !== 'colaborador' && uData.role !== 'miembro');
+      const hasSpecificDbRoles = Boolean(Array.isArray(uData.roles) && uData.roles.length > 0);
+      const isRoleConfiguredInDb = hasAdminUpdatedRoles || (hasSpecificDbRole && hasSpecificDbRoles);
+
       const primaryEmail = deriveEmail(uData);
       const officialProfile = primaryEmail ? findUserByAnyEmail(primaryEmail) : null;
       let finalRole = uData.role;
-      let finalRoles = Array.isArray(uData.roles) ? [...uData.roles] : (uData.role ? [uData.role] : []);
+      let finalRoles = Array.isArray(uData.roles) && uData.roles.length > 0 ? [...uData.roles] : (uData.role ? [uData.role] : []);
       let finalSede = uData.sede;
       let finalName = uData.name || uData.displayName;
 
@@ -167,36 +173,34 @@ export async function getAllCompanyUsers(currentUser = null) {
           finalName = officialProfile.name;
         }
 
-        // El catálogo oficial corporativo es la máxima fuente de verdad contra colapsos
-        finalRole = officialProfile.role || finalRole;
-        if (!finalSede || finalSede === 'Global') {
-          finalSede = officialProfile.sede || finalSede;
-        }
+        // Si NO está configurado explícitamente en Firestore, tomar valores oficiales por defecto
+        if (!isRoleConfiguredInDb) {
+          finalRole = officialProfile.role || finalRole || 'colaborador';
+          const officialRolesSet = new Set(
+            (officialProfile.roles || [officialProfile.role]).map(r => normalizeRole(r))
+          );
+          const isDualTrainer = primaryEmail ? DUAL_ROLE_TRAINER_EMAILS.includes(primaryEmail.toLowerCase()) : false;
+          if (isDualTrainer) officialRolesSet.add('entrenador');
 
-        const canonicalOfficial = normalizeRole(officialProfile.role);
-        const isOfficialCoord = ['coord_c1', 'coord_maestria', 'director_maestria'].includes(canonicalOfficial);
-        const isDualTrainer = primaryEmail ? DUAL_ROLE_TRAINER_EMAILS.includes(primaryEmail.toLowerCase()) : false;
-
-        // Iniciar roles desde los definidos en el perfil oficial
-        const officialRolesSet = new Set(
-          (officialProfile.roles || [officialProfile.role]).map(r => normalizeRole(r))
-        );
-
-        // Si es entrenador dual autorizado por gobernanza, asegurar rol entrenador
-        if (isDualTrainer) officialRolesSet.add('entrenador');
-
-        // Purgar categóricamente roles prohibidos para coordinadores
-        if (isOfficialCoord) {
-          officialRolesSet.delete('coordinador');
-          if (!isDualTrainer) officialRolesSet.delete('entrenador');
-          if (!officialProfile.roles || !officialProfile.roles.includes('manager')) {
-            officialRolesSet.delete('manager');
+          const canonicalOfficial = normalizeRole(officialProfile.role);
+          const isOfficialCoord = ['coord_c1', 'coord_maestria', 'director_maestria'].includes(canonicalOfficial);
+          if (isOfficialCoord) {
+            officialRolesSet.delete('coordinador');
+            if (!isDualTrainer) officialRolesSet.delete('entrenador');
+            if (!officialProfile.roles || !officialProfile.roles.includes('manager')) {
+              officialRolesSet.delete('manager');
+            }
           }
+          finalRoles = Array.from(officialRolesSet);
         }
 
-        finalRoles = Array.from(officialRolesSet);
+        if (!finalSede || finalSede === 'Global') {
+          finalSede = uData.sede || officialProfile.sede || finalSede;
+        }
       } else {
-        // Si no tiene perfil oficial, purgar 'coordinador' genérico si tiene cargo operativo específico
+        // Si no tiene perfil oficial ni configuración previa, fallback a colaborador
+        if (!finalRole) finalRole = 'colaborador';
+        if (finalRoles.length === 0) finalRoles = [finalRole];
         const normRoles = finalRoles.map(r => normalizeRole(r));
         if (normRoles.includes('coord_c1') || normRoles.includes('coord_maestria') || normRoles.includes('director_maestria')) {
           finalRoles = finalRoles.filter(r => r !== 'coordinador');
@@ -204,7 +208,7 @@ export async function getAllCompanyUsers(currentUser = null) {
       }
 
       // Deduplicar y limpiar roles
-      finalRoles = Array.from(new Set(finalRoles.filter(r => r && r !== 'undefined' && r !== 'null' && r !== 'student')));
+      finalRoles = Array.from(new Set(finalRoles.map(normalizeRole).filter(r => r && r !== 'undefined' && r !== 'null' && r !== 'student')));
 
       const isUserActive = uData.isActive !== false && uData.status !== 'inactive' && uData.active !== false;
 
@@ -303,13 +307,14 @@ export async function getAllCompanyUsers(currentUser = null) {
     const existingIndex = candidateKeys.size > 0 ? findExistingIndex(candidateKeys) : -1;
     if (existingIndex >= 0 && localUser.roleSedes) {
       const existing = allUsers[existingIndex];
+      const hasDbRoles = Boolean(existing.rolesUpdatedAt || existing.rolesUpdatedBy || (existing.roles && existing.roles.length > 0));
       allUsers[existingIndex] = {
         ...existing,
-        role: localUser.role || existing.role,
-        roles: Array.from(new Set([...(existing.roles || []), ...(localUser.roles || [localUser.role])].filter(Boolean))),
-        sede: localUser.sede || existing.sede,
-        roleSedes: { ...(existing.roleSedes || {}), ...localUser.roleSedes },
-        canonicalProfileSource: 'local_registry_multi_role'
+        role: existing.role || localUser.role,
+        roles: hasDbRoles ? existing.roles : Array.from(new Set([...(existing.roles || []), ...(localUser.roles || [localUser.role])].filter(Boolean))),
+        sede: existing.sede || localUser.sede,
+        roleSedes: { ...localUser.roleSedes, ...(existing.roleSedes || {}) },
+        canonicalProfileSource: existing.rolesUpdatedAt ? 'firestore_admin_configured' : 'local_registry_multi_role'
       };
     } else if (candidateKeys.size > 0 && existingIndex === -1) {
       allUsers.push(withCanonicalEmail({ ...localUser, id: localUser.id || localUser.email, source: 'local_registry' }));

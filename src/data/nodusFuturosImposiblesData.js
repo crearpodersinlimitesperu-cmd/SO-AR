@@ -45,7 +45,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -96,7 +96,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -147,7 +147,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -198,7 +198,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -249,7 +249,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -300,7 +300,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "Liderazgo de equipo y salto profesional",
                         "feedback":  "Audaz y medible. Aprobado.",
                         "meta":  "Asumir la gerencia de Ã¡rea y liderar a un equipo de 12 personas hacia resultados extraordinarios.",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "aprobado",
@@ -351,7 +351,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -402,7 +402,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -453,7 +453,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -504,7 +504,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -555,7 +555,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -606,7 +606,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -657,7 +657,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "Liderazgo de equipo y salto profesional",
                         "feedback":  "",
                         "meta":  "Asumir la gerencia de Ã¡rea y liderar a un equipo de 12 personas hacia resultados extraordinarios.",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "pendiente",
@@ -708,7 +708,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -759,7 +759,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -810,7 +810,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -861,7 +861,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -912,7 +912,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -963,7 +963,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -1014,7 +1014,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -1065,7 +1065,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -1116,7 +1116,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -1167,7 +1167,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -1218,7 +1218,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -1269,7 +1269,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "Liderazgo de equipo y salto profesional",
                         "feedback":  "",
                         "meta":  "Asumir la gerencia de Ã¡rea y liderar a un equipo de 12 personas hacia resultados extraordinarios.",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -1320,7 +1320,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -1371,7 +1371,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -1422,7 +1422,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -1473,7 +1473,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -1524,7 +1524,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -1575,7 +1575,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -1626,7 +1626,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -1677,7 +1677,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -1728,7 +1728,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -1779,7 +1779,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -1830,7 +1830,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -1881,7 +1881,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -1932,7 +1932,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -1983,7 +1983,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -2034,7 +2034,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -2085,7 +2085,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -2136,7 +2136,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -2187,7 +2187,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "Liderazgo de equipo y salto profesional",
                         "feedback":  "Audaz y medible. Aprobado.",
                         "meta":  "Asumir la gerencia de Ã¡rea y liderar a un equipo de 12 personas hacia resultados extraordinarios.",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "aprobado",
@@ -2238,7 +2238,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -2289,7 +2289,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -2340,7 +2340,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -2391,7 +2391,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -2442,7 +2442,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -2493,7 +2493,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -2544,7 +2544,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -2595,7 +2595,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -2646,7 +2646,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -2697,7 +2697,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -2748,7 +2748,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -2799,7 +2799,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -2850,7 +2850,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "Liderazgo de equipo y salto profesional",
                         "feedback":  "",
                         "meta":  "Asumir la gerencia de Ã¡rea y liderar a un equipo de 12 personas hacia resultados extraordinarios.",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "pendiente",
@@ -2901,7 +2901,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -2952,7 +2952,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -3003,7 +3003,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -3054,7 +3054,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -3105,7 +3105,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -3156,7 +3156,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -3207,7 +3207,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -3258,7 +3258,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -3309,7 +3309,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -3360,7 +3360,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -3411,7 +3411,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -3462,7 +3462,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -3513,7 +3513,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -3564,7 +3564,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -3615,7 +3615,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -3666,7 +3666,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -3717,7 +3717,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -3768,7 +3768,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -3819,7 +3819,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -3870,7 +3870,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -3921,7 +3921,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -3972,7 +3972,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -4023,7 +4023,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "Liderazgo de equipo y salto profesional",
                         "feedback":  "",
                         "meta":  "Asumir la gerencia de Ã¡rea y liderar a un equipo de 12 personas hacia resultados extraordinarios.",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -4074,7 +4074,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -4125,7 +4125,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -4176,7 +4176,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -4227,7 +4227,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -4278,7 +4278,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -4329,7 +4329,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -4380,7 +4380,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -4431,7 +4431,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -4482,7 +4482,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -4533,7 +4533,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "Liderazgo de equipo y salto profesional",
                         "feedback":  "Audaz y medible. Aprobado.",
                         "meta":  "Asumir la gerencia de Ã¡rea y liderar a un equipo de 12 personas hacia resultados extraordinarios.",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "aprobado",
@@ -4584,7 +4584,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -4635,7 +4635,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -4686,7 +4686,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -4737,7 +4737,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -4788,7 +4788,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -4839,7 +4839,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -4890,7 +4890,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -4941,7 +4941,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -4992,7 +4992,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -5043,7 +5043,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -5094,7 +5094,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "Liderazgo de equipo y salto profesional",
                         "feedback":  "",
                         "meta":  "Asumir la gerencia de Ã¡rea y liderar a un equipo de 12 personas hacia resultados extraordinarios.",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "pendiente",
@@ -5145,7 +5145,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -5196,7 +5196,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -5247,7 +5247,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -5298,7 +5298,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -5349,7 +5349,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -5400,7 +5400,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -5451,7 +5451,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -5502,7 +5502,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -5553,7 +5553,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -5604,7 +5604,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -5655,7 +5655,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -5706,7 +5706,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -5757,7 +5757,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -5808,7 +5808,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -5859,7 +5859,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -5910,7 +5910,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -5961,7 +5961,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -6012,7 +6012,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -6063,7 +6063,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -6114,7 +6114,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -6165,7 +6165,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "Liderazgo de equipo y salto profesional",
                         "feedback":  "Audaz y medible. Aprobado.",
                         "meta":  "Asumir la gerencia de Ã¡rea y liderar a un equipo de 12 personas hacia resultados extraordinarios.",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "aprobado",
@@ -6216,7 +6216,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -6267,7 +6267,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -6318,7 +6318,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -6369,7 +6369,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -6420,7 +6420,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -6471,7 +6471,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -6522,7 +6522,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -6573,7 +6573,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -6624,7 +6624,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -6675,7 +6675,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -6726,7 +6726,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -6777,7 +6777,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -6828,7 +6828,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -6879,7 +6879,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -6930,7 +6930,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -6981,7 +6981,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -7032,7 +7032,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -7083,7 +7083,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -7134,7 +7134,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -7185,7 +7185,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "Liderazgo de equipo y salto profesional",
                         "feedback":  "",
                         "meta":  "Asumir la gerencia de Ã¡rea y liderar a un equipo de 12 personas hacia resultados extraordinarios.",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -7236,7 +7236,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -7287,7 +7287,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -7338,7 +7338,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -7389,7 +7389,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -7440,7 +7440,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -7491,7 +7491,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -7542,7 +7542,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -7593,7 +7593,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -7644,7 +7644,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -7695,7 +7695,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -7746,7 +7746,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -7797,7 +7797,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -7848,7 +7848,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -7899,7 +7899,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -7950,7 +7950,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -8001,7 +8001,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -8052,7 +8052,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -8103,7 +8103,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -8154,7 +8154,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -8205,7 +8205,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -8256,7 +8256,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -8307,7 +8307,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -8358,7 +8358,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -8409,7 +8409,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -8460,7 +8460,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "Liderazgo de equipo y salto profesional",
                         "feedback":  "Audaz y medible. Aprobado.",
                         "meta":  "Asumir la gerencia de Ã¡rea y liderar a un equipo de 12 personas hacia resultados extraordinarios.",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "aprobado",
@@ -8511,7 +8511,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -8562,7 +8562,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -8613,7 +8613,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -8664,7 +8664,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -8715,7 +8715,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -8766,7 +8766,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -8817,7 +8817,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -8868,7 +8868,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -8919,7 +8919,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -8970,7 +8970,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "Liderazgo de equipo y salto profesional",
                         "feedback":  "",
                         "meta":  "Asumir la gerencia de Ã¡rea y liderar a un equipo de 12 personas hacia resultados extraordinarios.",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "pendiente",
@@ -9021,7 +9021,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -9072,7 +9072,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -9123,7 +9123,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -9174,7 +9174,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -9225,7 +9225,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -9276,7 +9276,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -9327,7 +9327,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -9378,7 +9378,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -9429,7 +9429,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -9480,7 +9480,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -9531,7 +9531,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -9582,7 +9582,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -9633,7 +9633,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -9684,7 +9684,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -9735,7 +9735,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -9786,7 +9786,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -9837,7 +9837,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -9888,7 +9888,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -9939,7 +9939,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -9990,7 +9990,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "Liderazgo de equipo y salto profesional",
                         "feedback":  "",
                         "meta":  "Asumir la gerencia de Ã¡rea y liderar a un equipo de 12 personas hacia resultados extraordinarios.",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -10041,7 +10041,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -10092,7 +10092,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -10143,7 +10143,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -10194,7 +10194,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -10245,7 +10245,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -10296,7 +10296,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -10347,7 +10347,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -10398,7 +10398,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -10449,7 +10449,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -10500,7 +10500,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -10551,7 +10551,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -10602,7 +10602,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -10653,7 +10653,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -10704,7 +10704,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -10755,7 +10755,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "Liderazgo de equipo y salto profesional",
                         "feedback":  "Audaz y medible. Aprobado.",
                         "meta":  "Asumir la gerencia de Ã¡rea y liderar a un equipo de 12 personas hacia resultados extraordinarios.",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "aprobado",
@@ -10806,7 +10806,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -10857,7 +10857,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -10908,7 +10908,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -10959,7 +10959,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -11010,7 +11010,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -11061,7 +11061,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -11112,7 +11112,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -11163,7 +11163,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -11214,7 +11214,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -11265,7 +11265,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -11316,7 +11316,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -11367,7 +11367,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -11418,7 +11418,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -11469,7 +11469,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -11520,7 +11520,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -11571,7 +11571,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -11622,7 +11622,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -11673,7 +11673,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -11724,7 +11724,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -11775,7 +11775,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "Liderazgo de equipo y salto profesional",
                         "feedback":  "",
                         "meta":  "Asumir la gerencia de Ã¡rea y liderar a un equipo de 12 personas hacia resultados extraordinarios.",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "pendiente",
@@ -11826,7 +11826,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -11877,7 +11877,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -11928,7 +11928,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -11979,7 +11979,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -12030,7 +12030,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -12081,7 +12081,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -12132,7 +12132,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -12183,7 +12183,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -12234,7 +12234,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -12285,7 +12285,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -12336,7 +12336,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -12387,7 +12387,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -12438,7 +12438,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -12489,7 +12489,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -12540,7 +12540,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -12591,7 +12591,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -12642,7 +12642,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -12693,7 +12693,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -12744,7 +12744,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -12795,7 +12795,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -12846,7 +12846,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -12897,7 +12897,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -12948,7 +12948,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -12999,7 +12999,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -13050,7 +13050,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -13101,7 +13101,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -13152,7 +13152,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -13203,7 +13203,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -13254,7 +13254,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -13305,7 +13305,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "Liderazgo de equipo y salto profesional",
                         "feedback":  "",
                         "meta":  "Asumir la gerencia de Ã¡rea y liderar a un equipo de 12 personas hacia resultados extraordinarios.",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -13356,7 +13356,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -13407,7 +13407,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -13458,7 +13458,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -13509,7 +13509,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -13560,7 +13560,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -13611,7 +13611,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -13662,7 +13662,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -13713,7 +13713,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -13764,7 +13764,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -13815,7 +13815,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -13866,7 +13866,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -13917,7 +13917,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -13968,7 +13968,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -14019,7 +14019,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -14070,7 +14070,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -14121,7 +14121,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -14172,7 +14172,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -14223,7 +14223,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -14274,7 +14274,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -14325,7 +14325,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "Liderazgo de equipo y salto profesional",
                         "feedback":  "Audaz y medible. Aprobado.",
                         "meta":  "Asumir la gerencia de Ã¡rea y liderar a un equipo de 12 personas hacia resultados extraordinarios.",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "aprobado",
@@ -14376,7 +14376,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -14427,7 +14427,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -14478,7 +14478,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -14529,7 +14529,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -14580,7 +14580,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -14631,7 +14631,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -14682,7 +14682,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -14733,7 +14733,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -14784,7 +14784,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -14835,7 +14835,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -14886,7 +14886,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -14937,7 +14937,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -14988,7 +14988,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -15039,7 +15039,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -15090,7 +15090,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -15141,7 +15141,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -15192,7 +15192,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -15243,7 +15243,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -15294,7 +15294,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -15345,7 +15345,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -15396,7 +15396,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -15447,7 +15447,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -15498,7 +15498,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -15549,7 +15549,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -15600,7 +15600,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -15651,7 +15651,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -15702,7 +15702,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -15753,7 +15753,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -15804,7 +15804,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -15855,7 +15855,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "Liderazgo de equipo y salto profesional",
                         "feedback":  "",
                         "meta":  "Asumir la gerencia de Ã¡rea y liderar a un equipo de 12 personas hacia resultados extraordinarios.",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "pendiente",
@@ -15906,7 +15906,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -15957,7 +15957,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -16008,7 +16008,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -16059,7 +16059,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -16110,7 +16110,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -16161,7 +16161,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -16212,7 +16212,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -16263,7 +16263,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -16314,7 +16314,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -16365,7 +16365,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -16416,7 +16416,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -16467,7 +16467,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -16518,7 +16518,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -16569,7 +16569,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -16620,7 +16620,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -16671,7 +16671,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -16722,7 +16722,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -16773,7 +16773,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -16824,7 +16824,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -16875,7 +16875,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -16926,7 +16926,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -16977,7 +16977,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -17028,7 +17028,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -17079,7 +17079,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -17130,7 +17130,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -17181,7 +17181,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -17232,7 +17232,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -17283,7 +17283,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -17334,7 +17334,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -17385,7 +17385,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "Liderazgo de equipo y salto profesional",
                         "feedback":  "Audaz y medible. Aprobado.",
                         "meta":  "Asumir la gerencia de Ã¡rea y liderar a un equipo de 12 personas hacia resultados extraordinarios.",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "aprobado",
@@ -17436,7 +17436,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -17487,7 +17487,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -17538,7 +17538,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -17589,7 +17589,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -17640,7 +17640,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -17691,7 +17691,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -17742,7 +17742,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -17793,7 +17793,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -17844,7 +17844,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -17895,7 +17895,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "Liderazgo de equipo y salto profesional",
                         "feedback":  "",
                         "meta":  "Asumir la gerencia de Ã¡rea y liderar a un equipo de 12 personas hacia resultados extraordinarios.",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -17946,7 +17946,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -17997,7 +17997,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -18048,7 +18048,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -18099,7 +18099,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -18150,7 +18150,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -18201,7 +18201,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -18252,7 +18252,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -18303,7 +18303,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -18354,7 +18354,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -18405,7 +18405,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -18456,7 +18456,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -18507,7 +18507,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -18558,7 +18558,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -18609,7 +18609,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -18660,7 +18660,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -18711,7 +18711,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -18762,7 +18762,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -18813,7 +18813,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -18864,7 +18864,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -18915,7 +18915,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -18966,7 +18966,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -19017,7 +19017,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -19068,7 +19068,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -19119,7 +19119,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -19170,7 +19170,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -19221,7 +19221,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -19272,7 +19272,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -19323,7 +19323,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -19374,7 +19374,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -19425,7 +19425,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -19476,7 +19476,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -19527,7 +19527,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -19578,7 +19578,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -19629,7 +19629,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -19680,7 +19680,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -19731,7 +19731,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -19782,7 +19782,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -19833,7 +19833,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -19884,7 +19884,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -19935,7 +19935,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "Liderazgo de equipo y salto profesional",
                         "feedback":  "",
                         "meta":  "Asumir la gerencia de Ã¡rea y liderar a un equipo de 12 personas hacia resultados extraordinarios.",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "pendiente",
@@ -19986,7 +19986,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -20037,7 +20037,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -20088,7 +20088,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -20139,7 +20139,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -20190,7 +20190,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -20241,7 +20241,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -20292,7 +20292,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -20343,7 +20343,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -20394,7 +20394,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -20445,7 +20445,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -20496,7 +20496,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -20547,7 +20547,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -20598,7 +20598,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -20649,7 +20649,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -20700,7 +20700,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -20751,7 +20751,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -20802,7 +20802,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -20853,7 +20853,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -20904,7 +20904,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -20955,7 +20955,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "Liderazgo de equipo y salto profesional",
                         "feedback":  "Audaz y medible. Aprobado.",
                         "meta":  "Asumir la gerencia de Ã¡rea y liderar a un equipo de 12 personas hacia resultados extraordinarios.",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "aprobado",
@@ -21006,7 +21006,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -21057,7 +21057,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -21108,7 +21108,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -21159,7 +21159,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -21210,7 +21210,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -21261,7 +21261,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -21312,7 +21312,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -21363,7 +21363,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -21414,7 +21414,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -21465,7 +21465,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -21516,7 +21516,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -21567,7 +21567,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -21618,7 +21618,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -21669,7 +21669,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -21720,7 +21720,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "Liderazgo de equipo y salto profesional",
                         "feedback":  "",
                         "meta":  "Asumir la gerencia de Ã¡rea y liderar a un equipo de 12 personas hacia resultados extraordinarios.",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "pendiente",
@@ -21771,7 +21771,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -21822,7 +21822,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -21873,7 +21873,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -21924,7 +21924,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -21975,7 +21975,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -22026,7 +22026,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -22077,7 +22077,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "Liderazgo de equipo y salto profesional",
                         "feedback":  "",
                         "meta":  "Asumir la gerencia de Ã¡rea y liderar a un equipo de 12 personas hacia resultados extraordinarios.",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -22128,7 +22128,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -22179,7 +22179,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -22230,7 +22230,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -22281,7 +22281,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -22332,7 +22332,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -22383,7 +22383,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -22434,7 +22434,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
                         "titulo":  "",
                         "feedback":  "",
                         "meta":  "",
-                        "area":  "Carrera \u0026 PropÃ³sito"
+                        "area":  "Carrera & Propósito"
                     },
                     {
                         "estado":  "no_presentado",
@@ -22469,10 +22469,10 @@ export const EQUIPOS_FUTUROS_IMPOSIBLES = [
 
 export const ESTADOS_FI = [
   { id: "TODOS", label: "Todos los Estados" },
-  { id: "SIN_ENTREGA", label: "ðŸš¨ 0 FIs (Sin Entrega - Alerta)" },
-  { id: "PENDIENTES", label: "â³ Con Pendientes de RevisiÃ³n" },
-  { id: "DEVUELTOS", label: "ðŸ”„ Con FIs Devueltos" },
-  { id: "APROBADOS", label: "âœ… Con FIs Aprobados" }
+  { id: "SIN_ENTREGA", label: "🚨 0 FIs (Sin Entrega - Alerta)" },
+  { id: "PENDIENTES", label: "⏳ Con Pendientes de Revisión" },
+  { id: "DEVUELTOS", label: "🔄 Con FIs Devueltos" },
+  { id: "APROBADOS", label: "✅ Con FIs Aprobados" }
 ];
 
 export default NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES;

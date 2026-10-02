@@ -4,13 +4,14 @@ import { useChecklist } from '../context/ChecklistContext';
 import { useAuth } from '../context/AuthContext';
 import { useCycles } from '../context/CyclesContext';
 import { useUI } from '../context/UIContext';
-import { doc, setDoc, updateDoc, collection, query, orderBy, limit, getDocs, onSnapshot } from 'firebase/firestore';
+import { doc, setDoc, updateDoc, deleteDoc, collection, query, orderBy, limit, getDocs, onSnapshot } from 'firebase/firestore';
 import { db, auth } from '../services/firebase';
 import { normalizeRole, normalizeSede, OPERATIONAL_SEDES } from '../data/usersData';
+import { canViewInactiveUsers } from '../config/permissions';
 import { getAllCompanyUsers } from '../services/userService';
 import { openOrCreateDirectMessage } from '../services/googleChatService';
 import { getWhatsAppUrl } from '../utils/phoneUtils';
-import { Globe, Building2, Users, ArrowLeft, ArrowUp, ChevronDown, ChevronRight, Eye, CheckCircle2, Clock, AlertTriangle, TrendingUp, UserCheck, FileText, Search, X, PlusCircle, Mail, MessageCircle, ShieldCheck, RefreshCw } from 'lucide-react';
+import { Globe, Building2, Users, ArrowLeft, ArrowUp, ChevronDown, ChevronRight, Eye, CheckCircle2, Clock, AlertTriangle, TrendingUp, UserCheck, FileText, Search, X, PlusCircle, Mail, MessageCircle, ShieldCheck, RefreshCw, Trash2 } from 'lucide-react';
 import { getFlagForSede } from '../utils/flags';
 import UserProfileModal from '../components/UserProfileModal';
 import IAAuditor from '../components/IAAuditor';
@@ -705,6 +706,17 @@ function SuggestionsView() {
     }
   };
 
+  const handleDeleteSuggestion = async (id) => {
+    if (!window.confirm('¿Estás seguro de eliminar este registro del buzón de soporte / sugerencias?')) return;
+    try {
+      await deleteDoc(doc(db, 'sugerencias_soporte', id));
+      showToast('Registro eliminado correctamente.', 'success');
+    } catch (err) {
+      console.error("Error eliminando sugerencia:", err);
+      showToast('No se pudo eliminar el registro: ' + err.message, 'error');
+    }
+  };
+
   const filtered = suggestions.filter(item => {
     if (filterStatus === 'TODAS') return true;
     return item.status === filterStatus;
@@ -856,8 +868,8 @@ function SuggestionsView() {
                   </div>
                 )}
 
-                <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'center', marginTop: '0.2rem' }}>
-                  {item.userEmail && (
+                <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'center', marginTop: '0.4rem', justifyContent: 'space-between' }}>
+                  {item.userEmail ? (
                     <a
                       href={`mailto:${item.userEmail}?subject=${encodeURIComponent(`Respuesta a tu reporte en Causa OS`)}`}
                       className="btn-secondary"
@@ -865,7 +877,27 @@ function SuggestionsView() {
                     >
                       <Mail size={12} /> Responder por Correo
                     </a>
-                  )}
+                  ) : <div />}
+
+                  <button
+                    onClick={() => handleDeleteSuggestion(item.id)}
+                    title="Eliminar este reporte / sugerencia errada"
+                    style={{
+                      background: 'rgba(239, 68, 68, 0.12)',
+                      border: '1px solid rgba(239, 68, 68, 0.3)',
+                      color: '#ef4444',
+                      padding: '0.3rem 0.6rem',
+                      borderRadius: '6px',
+                      fontSize: '0.75rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.3rem'
+                    }}
+                  >
+                    <Trash2 size={12} /> Eliminar
+                  </button>
                 </div>
               </div>
             );
@@ -1225,59 +1257,6 @@ export default function SuperAdminPanel() {
     setShowUserModal(true);
   };
 
-  const fixKarol = async () => {
-    try {
-      showToast('Buscando TODOS los perfiles ocultos de Karol...', 'info');
-      let count = 0;
-      const batchPromises = [];
-      const foundNames = [];
-
-      // (20/09/2026) Version recuperada del working tree de la PC de Jose (no
-      // estaba commiteada): busca en "users" Y en "qt_directory", detecta por
-      // nombre+apellido en cualquier campo y unifica nombre/estado ademas de
-      // correo y rol.
-      const scanCollection = async (collectionName) => {
-        const snap = await getDocs(collection(db, collectionName));
-        snap.forEach(docSnap => {
-          const data = docSnap.data();
-          const stringified = JSON.stringify(data).toLowerCase();
-
-          if (stringified.includes("karol") && stringified.includes("villarruel")) {
-            count++;
-            foundNames.push(`${data.name || data.displayName || 'Sin nombre'} (${collectionName})`);
-            console.log(`Encontrado duplicado de Karol ID: ${docSnap.id} en ${collectionName}`, data);
-
-            batchPromises.push(updateDoc(doc(db, collectionName, docSnap.id), {
-              email: 'coordinacion.administrativa@crearpsl.net',
-              emails: ['coordinacion.administrativa@crearpsl.net'],
-              correo: 'coordinacion.administrativa@crearpsl.net',
-              role: 'coordinacion_administrativa',
-              roles: ['coordinacion_administrativa'],
-              name: 'Karol Fernanda Villarruel Yánez',
-              displayName: 'Karol Fernanda Villarruel Yánez',
-              isActive: true,
-              active: true,
-              status: 'active'
-            }));
-          }
-        });
-      };
-
-      await scanCollection('users');
-      await scanCollection('qt_directory');
-
-      if (count > 0) {
-        await Promise.all(batchPromises);
-        showToast(`Se unificaron ${count} perfiles (incluyendo ocultos): ${foundNames.join(', ')}`, 'success');
-      } else {
-        showToast('No se encontro ningun perfil de Karol Villarruel en las bases de datos.', 'error');
-      }
-    } catch (error) {
-      console.error(error);
-      showToast('Error: ' + error.message, 'error');
-    }
-  };
-
   const tabStyle = (view) => ({
     padding: '0.6rem 1.2rem',
     borderRadius: '8px',
@@ -1292,6 +1271,8 @@ export default function SuperAdminPanel() {
 
   const displayedUsersData = (realUsersData || []).filter(u => {
     const isInactive = u.isActive === false || u.status === 'inactive' || u.active === false;
+    // REGLA ESTRICTA DE PRIVACIDAD: Usuarios inactivos SOLO visibles para José Sánchez y Talento Humano
+    if (isInactive && !canViewInactiveUsers(currentUser)) return false;
     if (statusFilter === 'ACTIVE') return !isInactive;
     if (statusFilter === 'INACTIVE') return isInactive;
     return true;
@@ -1447,9 +1428,15 @@ export default function SuperAdminPanel() {
               cursor: 'pointer'
             }}
           >
-            <option value="ALL" style={{ color: 'black' }}>👥 Todos ({realUsersData.length})</option>
-            <option value="ACTIVE" style={{ color: 'black' }}>🟢 Solo Activos ({realUsersData.filter(u => !(u.isActive === false || u.status === 'inactive' || u.active === false)).length})</option>
-            <option value="INACTIVE" style={{ color: 'black' }}>🔴 Solo Inactivos / Bajas ({realUsersData.filter(u => u.isActive === false || u.status === 'inactive' || u.active === false).length})</option>
+            {canViewInactiveUsers(currentUser) ? (
+              <>
+                <option value="ALL" style={{ color: 'black' }}>👥 Todos ({realUsersData.length})</option>
+                <option value="ACTIVE" style={{ color: 'black' }}>🟢 Solo Activos ({realUsersData.filter(u => !(u.isActive === false || u.status === 'inactive' || u.active === false)).length})</option>
+                <option value="INACTIVE" style={{ color: 'black' }}>🔴 Solo Inactivos / Bajas ({realUsersData.filter(u => u.isActive === false || u.status === 'inactive' || u.active === false).length})</option>
+              </>
+            ) : (
+              <option value="ACTIVE" style={{ color: 'black' }}>🟢 Colaboradores Activos ({realUsersData.filter(u => !(u.isActive === false || u.status === 'inactive' || u.active === false)).length})</option>
+            )}
           </select>
         </div>
       </div>

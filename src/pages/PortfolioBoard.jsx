@@ -29,7 +29,8 @@ export const KNOWN_COORDINATORS = {
   'JORGE': { formalName: 'Jorge Washington Ramírez', email: 'jorge.ramirez@crearpsl.net', role: 'coord_c1', sede: 'Guayaquil' },
   'JOYCE': { formalName: 'Joyce Marin', email: 'joyce.marin@crearpsl.net', role: 'coord_c1', sede: 'Lima' },
   'DIANA': { formalName: 'Diana Moscoso', email: 'diana.moscoso@crearpsl.net', role: 'coord_c1', sede: 'Lima' },
-  'LEYLA': { formalName: 'Leyla Ochoa', email: 'rouz1414@gmail.com', role: 'coord_c1', sede: 'Lima' },
+  'LEYLA': { formalName: 'Leyla Pasquel', email: 'leyla.pasquel@crearpsl.net', role: 'coord_c1', sede: 'Lima' },
+  'ROSMERY': { formalName: 'Rosmery Ochoa Ferrer', email: 'rouz1414@gmail.com', role: 'qt', sede: 'Lima' },
   'VALENTINA RODRIGUEZ': { formalName: 'Valentina Rodriguez', email: 'valentina.r@crearpsl.net', role: 'coord_c1', sede: 'Medellín' },
   'DAVID GONZALEZ': { formalName: 'David Gonzalez', email: 'david.gonzalez@crearpsl.net', role: 'coord_c1', sede: 'Medellín' },
   'JUAN SEBASTIAN SOTO': { formalName: 'Juan Sebastian Soto', email: 'juansebastian.soto@crearpsl.net', role: 'coord_c1', sede: 'Medellín' },
@@ -1196,7 +1197,7 @@ export default function PortfolioBoard() {
               });
 
               // Filtro por Sede seleccionada
-              const isGlobalCentinela = !selectedSede || selectedSede === 'GLOBAL' || selectedSede === 'Global' || selectedSede === 'Sede Global' || selectedSede === 'Todas' || selectedSede === 'TODAS';
+              const isGlobalCentinela = !selectedSede || selectedSede === 'GLOBAL' || selectedSede === 'Global' || selectedSede === 'Sede Global' || selectedSede === 'Todas' || selectedSede === 'TODAS' || normalizeSede(selectedSede) === 'Sede Global';
               const sedeList = isGlobalCentinela
                 ? mergedList
                 : mergedList.filter(c => normalizeSede(c.sede) === normalizeSede(selectedSede));

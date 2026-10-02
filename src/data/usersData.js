@@ -28,6 +28,9 @@ export const normalizeRole = (role) => {
   // Quantum Team & Coordinación QT Global
   if (r === 'qt' || r === 'quantum_team' || r.includes('quantum') || r.includes('coord_qt') || r.includes('coordinador qt') || r.includes('coordinador_qt') || r.includes('qt global')) return 'qt';
   
+  // Observador Global (Solo Lectura)
+  if (r.includes('observador')) return 'observador';
+
   // Manager
   if (r === 'manager' || r === 'managers') return 'manager';
   
@@ -189,6 +192,7 @@ export const ROLE_DISPLAY_NAMES = {
   tecnico_sst: 'Seguridad y Salud (SST)',
   entrenador: 'Entrenador (Coach)',
   entrenador_llamadas: 'Entrenador de Llamadas',
+  observador: 'Observador Global (Solo Lectura)',
   participante: 'Participantes',
   marketing: 'Marketing'
 };
@@ -226,6 +230,7 @@ export const ROLE_COLORS = {
   tecnico_sst: '#14b8a6',
   entrenador: '#fbbf24',
   entrenador_llamadas: '#38bdf8',
+  observador: '#64748b',
   marketing: '#ec4899',
   // student: eliminado — no es un rol del sistema SO-AR
 };

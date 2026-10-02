@@ -415,7 +415,6 @@ export default function CfoDashboard() {
                       <th style={{ padding: '1rem 1.2rem', fontWeight: 800 }}>Banco Conciliado</th>
                       <th style={{ padding: '1rem 1.2rem', fontWeight: 800 }}>Discrepancia</th>
                       <th style={{ padding: '1rem 1.2rem', fontWeight: 800 }}>SLA Entrega</th>
-                      <th style={{ padding: '1rem 1.2rem', fontWeight: 800, textAlign: 'center' }}>Kill-Switch (Zero-Trust)</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -519,35 +518,6 @@ export default function CfoDashboard() {
                               <span style={{ color: 'var(--crear-gold)', fontSize: '0.8rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                                 <Clock size={14} /> En proceso ({calculateTimeLeft()})
                               </span>
-                            )}
-                          </td>
-
-                          {/* Kill Switch */}
-                          <td style={{ padding: '1.1rem 1.2rem', textAlign: 'center' }}>
-                            <button
-                              onClick={() => handleToggleBlock(hq)}
-                              style={{
-                                background: hq.isBlocked ? 'rgba(239, 68, 68, 0.2)' : 'rgba(255,255,255,0.06)',
-                                color: hq.isBlocked ? '#ef4444' : 'var(--text-heading)',
-                                border: hq.isBlocked ? '1px solid #ef4444' : '1px solid var(--border-subtle)',
-                                padding: '0.5rem 0.9rem',
-                                borderRadius: '8px',
-                                fontWeight: 800,
-                                fontSize: '0.78rem',
-                                cursor: 'pointer',
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: '0.4rem',
-                                transition: 'all 0.2s',
-                                boxShadow: hq.isBlocked ? '0 0 10px rgba(239, 68, 68, 0.3)' : 'none'
-                              }}
-                            >
-                              {hq.isBlocked ? <><Lock size={13} /> DESBLOQUEAR</> : <><Unlock size={13} /> BLOQUEAR SEDE</>}
-                            </button>
-                            {hq.isBlocked && hq.blockedReason && (
-                              <div style={{ fontSize: '0.68rem', color: '#ef4444', marginTop: '4px', maxWidth: '180px' }}>
-                                Motivo: {hq.blockedReason}
-                              </div>
                             )}
                           </td>
                         </tr>

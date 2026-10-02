@@ -53,25 +53,22 @@ export default function FinanceWorkspace() {
 
   const handleCaptureTx = (e) => {
     e.preventDefault();
-    if (isBlocked) return toast.error('OPERACIONES CONGELADAS');
     toast.success('Transacción capturada y enviada a Causa OS.');
     setTxAmount(''); setTxConcept('');
   };
 
   const handleDailyClose = async () => {
-    if (isBlocked) return toast.error('OPERACIONES CONGELADAS');
     const success = await submitDailyClose(sede, {
       totalTransactions: 15,
       montoConciliado: 5400,
       usuario: currentUser.email
     });
     if (success) {
-      toast.success('Cierre de caja encriptado y sellado (SHA-256).');
+      toast.success('Cierre de caja registrado exitosamente.');
     }
   };
 
   const handleWeeklySLA = async () => {
-    if (isBlocked) return toast.error('OPERACIONES CONGELADAS');
     if (!slaBudget || !slaBank) {
       return toast.error('Debes adjuntar ambos reportes para el cierre semanal.');
     }
@@ -110,28 +107,21 @@ export default function FinanceWorkspace() {
         </div>
       </div>
 
-      {/* KILL-SWITCH BANNER */}
-      {isBlocked && (
-        <div style={{ background: '#ef4444', color: '#fff', padding: '1rem', textAlign: 'center', fontWeight: 900, fontSize: '1.1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.75rem', letterSpacing: '1px' }}>
-          <Lock size={24} /> OPERACIONES FINANCIERAS CONGELADAS POR DIRECCIÓN GLOBAL (CFO) <Lock size={24} />
-        </div>
-      )}
-
       <div style={{ maxWidth: '1400px', margin: '2rem auto', padding: '0 3rem', display: 'grid', gridTemplateColumns: '1fr 350px', gap: '2rem' }}>
         
         {/* COLUMNA PRINCIPAL (OPERATIVA) */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
           
           {/* MÓDULO 1: CAPTURA TRANSACCIONAL */}
-          <div style={{ background: '#111827', borderRadius: '12px', padding: '2rem', border: '1px solid rgba(255,255,255,0.05)', opacity: isBlocked ? 0.5 : 1, pointerEvents: isBlocked ? 'none' : 'auto' }}>
-            <h2 style={{ margin: '0 0 1.5rem 0', display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '1.2rem' }}>
+          <div style={{ background: '#111827', borderRadius: '12px', padding: '2rem', border: '1px solid rgba(255,255,255,0.1)' }}>
+            <h2 style={{ margin: '0 0 1.5rem 0', display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '1.2rem', color: '#fff', fontWeight: 800 }}>
               <DollarSign color="#10b981" /> Captura Rápida de Transacciones
             </h2>
             <form onSubmit={handleCaptureTx} style={{ display: 'grid', gridTemplateColumns: '1fr 2fr 150px', gap: '1rem' }}>
               <select 
                 value={txType} 
                 onChange={e => setTxType(e.target.value)}
-                style={{ padding: '0.8rem', background: '#1e293b', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', borderRadius: '6px' }}
+                style={{ padding: '0.8rem', background: '#1e293b', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', borderRadius: '6px', fontSize: '0.9rem', fontWeight: 600 }}
               >
                 <option value="ingreso">Ingreso (Abono)</option>
                 <option value="egreso">Egreso (Gasto)</option>
@@ -142,7 +132,7 @@ export default function FinanceWorkspace() {
                 value={txConcept}
                 onChange={e => setTxConcept(e.target.value)}
                 required
-                style={{ padding: '0.8rem', background: '#1e293b', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', borderRadius: '6px' }}
+                style={{ padding: '0.8rem', background: '#1e293b', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', borderRadius: '6px', fontSize: '0.9rem' }}
               />
               <input 
                 type="number" 
@@ -151,31 +141,31 @@ export default function FinanceWorkspace() {
                 onChange={e => setTxAmount(e.target.value)}
                 required
                 min="0.01" step="0.01"
-                style={{ padding: '0.8rem', background: '#1e293b', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', borderRadius: '6px', fontWeight: 'bold' }}
+                style={{ padding: '0.8rem', background: '#1e293b', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', borderRadius: '6px', fontWeight: 'bold', fontSize: '0.9rem' }}
               />
-              <button type="submit" style={{ gridColumn: '1 / -1', padding: '1rem', background: '#38bdf8', color: '#0f172a', fontWeight: 800, border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '1rem' }}>
+              <button type="submit" style={{ gridColumn: '1 / -1', padding: '1rem', background: 'var(--crear-gold, #f59e0b)', color: '#0f172a', fontWeight: 800, border: 'none', borderRadius: '6px', cursor: 'pointer', fontSize: '1rem', letterSpacing: '0.5px' }}>
                 REGISTRAR TRANSACCIÓN (SYNC NODUS)
               </button>
             </form>
           </div>
 
           {/* MÓDULO 2: SLA SEMANAL (VIERNES 9 AM) */}
-          <div style={{ background: 'linear-gradient(145deg, #1e1b4b, #312e81)', borderRadius: '12px', padding: '2rem', border: '1px solid #4338ca', opacity: isBlocked ? 0.5 : 1, pointerEvents: isBlocked ? 'none' : 'auto' }}>
+          <div style={{ background: '#1e1b4b', borderRadius: '12px', padding: '2rem', border: '1px solid #4338ca' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-              <h2 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '1.2rem', color: '#fff' }}>
+              <h2 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '1.2rem', color: '#fff', fontWeight: 800 }}>
                 <Clock color="#818cf8" /> Checkpoint SLA: Cierre Semanal
               </h2>
-              <div style={{ background: 'rgba(0,0,0,0.3)', padding: '0.5rem 1rem', borderRadius: '20px', fontWeight: 700, color: '#a5b4fc' }}>
+              <div style={{ background: 'rgba(0,0,0,0.4)', padding: '0.5rem 1rem', borderRadius: '20px', fontWeight: 700, color: '#c7d2fe', border: '1px solid rgba(165, 180, 252, 0.2)' }}>
                 Viernes 9:00 AM (Faltan: {calculateTimeLeft()})
               </div>
             </div>
             
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', background: 'rgba(0,0,0,0.2)', padding: '1.5rem', borderRadius: '8px' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', fontSize: '1rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', background: 'rgba(0,0,0,0.3)', padding: '1.5rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', fontSize: '0.95rem', color: '#f8fafc', fontWeight: 600 }}>
                 <input type="checkbox" checked={slaBudget} onChange={e => setSlaBudget(e.target.checked)} style={{ width: '20px', height: '20px', accentColor: '#6366f1' }} />
                 He cargado el Presupuesto Ejecutado consolidado de la Sede.
               </label>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', fontSize: '1rem' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', fontSize: '0.95rem', color: '#f8fafc', fontWeight: 600 }}>
                 <input type="checkbox" checked={slaBank} onChange={e => setSlaBank(e.target.checked)} style={{ width: '20px', height: '20px', accentColor: '#6366f1' }} />
                 Las conciliaciones bancarias cuadran al 100% con los ingresos de Nodus.
               </label>
@@ -184,7 +174,7 @@ export default function FinanceWorkspace() {
                 placeholder="Notas u observaciones para Dirección Financiera (Opcional)..." 
                 value={slaNotes}
                 onChange={e => setSlaNotes(e.target.value)}
-                style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', borderRadius: '6px', minHeight: '80px', marginTop: '0.5rem' }}
+                style={{ width: '100%', padding: '1rem', background: '#0f172a', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', borderRadius: '6px', minHeight: '80px', marginTop: '0.5rem', fontSize: '0.9rem' }}
               />
               
               <button onClick={handleWeeklySLA} style={{ marginTop: '1rem', padding: '1rem', background: '#4f46e5', color: '#fff', fontWeight: 800, border: 'none', borderRadius: '6px', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', fontSize: '1rem', transition: 'all 0.2s' }} onMouseOver={e => e.currentTarget.style.background='#4338ca'} onMouseOut={e => e.currentTarget.style.background='#4f46e5'}>
@@ -199,30 +189,27 @@ export default function FinanceWorkspace() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
           
           {/* MÓDULO 3: CIERRE DIARIO */}
-          <div style={{ background: '#111827', borderRadius: '12px', padding: '1.5rem', border: '1px solid rgba(255,255,255,0.05)', opacity: isBlocked ? 0.5 : 1, pointerEvents: isBlocked ? 'none' : 'auto' }}>
-            <h3 style={{ margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#fff' }}>
+          <div style={{ background: '#111827', borderRadius: '12px', padding: '1.5rem', border: '1px solid rgba(255,255,255,0.1)' }}>
+            <h3 style={{ margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#fff', fontWeight: 800 }}>
               <FileCheck size={18} color="var(--crear-gold)" /> Cierre de Caja Diario
             </h3>
-            <p style={{ fontSize: '0.85rem', color: '#94a3b8', marginBottom: '1.5rem' }}>Estandariza tu caja local y genera un sello criptográfico inmutable en Causa OS.</p>
-            <button onClick={handleDailyClose} style={{ width: '100%', padding: '0.8rem', background: 'transparent', color: 'var(--crear-gold)', fontWeight: 700, border: '1px solid var(--crear-gold)', borderRadius: '6px', cursor: 'pointer' }}>
+            <p style={{ fontSize: '0.85rem', color: '#cbd5e1', marginBottom: '1.5rem', lineHeight: '1.4' }}>Registra tu arqueo diario de caja local para mantener la conciliación en tiempo real.</p>
+            <button onClick={handleDailyClose} style={{ width: '100%', padding: '0.8rem', background: 'transparent', color: 'var(--crear-gold)', fontWeight: 800, border: '1px solid var(--crear-gold)', borderRadius: '6px', cursor: 'pointer' }}>
               EJECUTAR CIERRE DIARIO
             </button>
           </div>
 
           {/* MÓDULO 4: WIKI DE AUDITORÍA */}
-          <div style={{ background: '#0f172a', borderRadius: '12px', padding: '1.5rem', border: '1px solid rgba(255,255,255,0.02)' }}>
-            <h3 style={{ margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#38bdf8' }}>
+          <div style={{ background: '#0f172a', borderRadius: '12px', padding: '1.5rem', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <h3 style={{ margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#38bdf8', fontWeight: 800 }}>
               <BookOpen size={18} /> Wiki: Auditoría Digital
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <div style={{ background: '#1e293b', padding: '0.75rem', borderRadius: '6px', fontSize: '0.85rem', color: '#e2e8f0', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <div style={{ background: '#1e293b', padding: '0.75rem', borderRadius: '6px', fontSize: '0.85rem', color: '#f1f5f9', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <ShieldAlert size={14} color="#10b981" /> Manual de Conciliación Nodus
               </div>
-              <div style={{ background: '#1e293b', padding: '0.75rem', borderRadius: '6px', fontSize: '0.85rem', color: '#e2e8f0', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <ShieldAlert size={14} color="#10b981" /> Política Zero-Trust (CFO)
-              </div>
-              <div style={{ background: '#1e293b', padding: '0.75rem', borderRadius: '6px', fontSize: '0.85rem', color: '#e2e8f0', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <ShieldAlert size={14} color="#10b981" /> Qué hacer en un Bloqueo de Sede
+              <div style={{ background: '#1e293b', padding: '0.75rem', borderRadius: '6px', fontSize: '0.85rem', color: '#f1f5f9', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <ShieldAlert size={14} color="#10b981" /> Protocolo de Auditoría y Control Financiero
               </div>
             </div>
           </div>

@@ -5,8 +5,9 @@ import { normalizeTrainerName } from '../data/trainerDictionary';
 import { 
   User, Users, MapPin, Calendar, Plane, CheckCircle2, 
   AlertTriangle, Clock, Search, ShieldCheck, Building2, 
-  ArrowRight, ExternalLink, Filter, Sparkles
+  ArrowRight, ExternalLink, Filter, Sparkles, X
 } from 'lucide-react';
+import { formatTeamString } from '../utils/formatTeam';
 
 export default function ResourceCapacityView({ selectedSede = 'GLOBAL', hrSentinelData = null }) {
   const { events, loadingEvents } = useCycles();
@@ -14,6 +15,7 @@ export default function ResourceCapacityView({ selectedSede = 'GLOBAL', hrSentin
   const [searchQuery, setSearchQuery] = useState('');
   const [flightsData, setFlightsData] = useState([]);
   const [loadingFlights, setLoadingFlights] = useState(false);
+  const [selectedTrainerForModal, setSelectedTrainerForModal] = useState(null);
 
   // Paleta de estilos adaptativa (Dark / Light)
   const bgCard = "var(--bg-card, rgba(17, 34, 64, 0.75))";
@@ -242,59 +244,101 @@ export default function ResourceCapacityView({ selectedSede = 'GLOBAL', hrSentin
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
-      {/* 4 CARDS EJECUTIVAS DE CAPACIDAD */}
+      {/* 4 CARDS EJECUTIVAS DE CAPACIDAD (Clickeables para filtrar y navegar) */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.25rem' }}>
         
         {/* Entrenadores */}
-        <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.25rem', boxShadow: '0 2px 4px rgba(0,0,0,0.03)' }}>
+        <div 
+          onClick={() => setActiveSubTab('trainers')}
+          style={{ 
+            background: bgCard, 
+            border: activeSubTab === 'trainers' ? '2px solid #38bdf8' : `1px solid ${borderLight}`, 
+            borderRadius: '12px', 
+            padding: '1.25rem', 
+            boxShadow: '0 2px 4px rgba(0,0,0,0.03)',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease'
+          }}
+          title="Ver detalle de Entrenadores Activos"
+        >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 800, color: textMuted, textTransform: 'uppercase' }}>Entrenadores Activos</span>
+            <span style={{ fontSize: '0.75rem', fontWeight: 800, color: activeSubTab === 'trainers' ? '#38bdf8' : textMuted, textTransform: 'uppercase' }}>Entrenadores Activos</span>
             <User size={18} color="#38bdf8" />
           </div>
           <div style={{ fontSize: '2rem', fontWeight: 900, color: '#38bdf8', margin: '0.3rem 0 0' }}>
             {trainersCapacity.length}
           </div>
           <div style={{ fontSize: '0.8rem', color: textMuted, marginTop: '0.2rem' }}>
-            En horizonte de {processedEvents.length} eventos programados
+            En horizonte de {processedEvents.length} eventos programados &bull; <strong style={{ color: '#38bdf8' }}>Ver lista &rarr;</strong>
           </div>
         </div>
 
         {/* Coordinadores */}
-        <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.25rem', boxShadow: '0 2px 4px rgba(0,0,0,0.03)' }}>
+        <div 
+          onClick={() => setActiveSubTab('coordinators')}
+          style={{ 
+            background: bgCard, 
+            border: activeSubTab === 'coordinators' ? '2px solid #10b981' : `1px solid ${borderLight}`, 
+            borderRadius: '12px', 
+            padding: '1.25rem', 
+            boxShadow: '0 2px 4px rgba(0,0,0,0.03)',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease'
+          }}
+          title="Ver detalle de Coordinadores Operativos"
+        >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 800, color: textMuted, textTransform: 'uppercase' }}>Coordinadores Operativos</span>
+            <span style={{ fontSize: '0.75rem', fontWeight: 800, color: activeSubTab === 'coordinators' ? '#10b981' : textMuted, textTransform: 'uppercase' }}>Coordinadores Operativos</span>
             <Users size={18} color="#10b981" />
           </div>
           <div style={{ fontSize: '2rem', fontWeight: 900, color: '#10b981', margin: '0.3rem 0 0' }}>
             {coordinatorsList.length > 0 ? coordinatorsList.length : '18+'}
           </div>
           <div style={{ fontSize: '0.8rem', color: textMuted, marginTop: '0.2rem' }}>
-            {isGlobal ? 'Desplegados en las 6 sedes' : `Asignados a sede ${selectedSede}`}
+            {isGlobal ? 'Desplegados en las 6 sedes' : `Asignados a sede ${selectedSede}`} &bull; <strong style={{ color: '#10b981' }}>Ver lista &rarr;</strong>
           </div>
         </div>
 
         {/* Sedes y Salas */}
-        <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.25rem', boxShadow: '0 2px 4px rgba(0,0,0,0.03)' }}>
+        <div 
+          onClick={() => setActiveSubTab('venues')}
+          style={{ 
+            background: bgCard, 
+            border: activeSubTab === 'venues' ? '2px solid #f59e0b' : `1px solid ${borderLight}`, 
+            borderRadius: '12px', 
+            padding: '1.25rem', 
+            boxShadow: '0 2px 4px rgba(0,0,0,0.03)',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease'
+          }}
+          title="Ver detalle de Salas & Espacios Oficiales"
+        >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 800, color: textMuted, textTransform: 'uppercase' }}>Salas & Espacios Oficiales</span>
+            <span style={{ fontSize: '0.75rem', fontWeight: 800, color: activeSubTab === 'venues' ? '#f59e0b' : textMuted, textTransform: 'uppercase' }}>Salas & Espacios Oficiales</span>
             <Building2 size={18} color="#f59e0b" />
           </div>
           <div style={{ fontSize: '2rem', fontWeight: 900, color: '#f59e0b', margin: '0.3rem 0 0' }}>
             {venuesCapacity.length}
           </div>
           <div style={{ fontSize: '0.8rem', color: textMuted, marginTop: '0.2rem' }}>
-            {isGlobal ? 'Sedes homologadas con salones oficiales' : `Salas operativas en ${selectedSede}`}
+            {isGlobal ? 'Sedes homologadas con salones oficiales' : `Salas operativas en ${selectedSede}`} &bull; <strong style={{ color: '#f59e0b' }}>Ver salas &rarr;</strong>
           </div>
         </div>
 
         {/* Conflictos de Agenda */}
-        <div style={{ 
-          background: bgCard, 
-          border: agendaConflicts.length > 0 ? '1px solid #fecaca' : `1px solid ${borderLight}`, 
-          borderRadius: '12px', 
-          padding: '1.25rem', 
-          boxShadow: '0 2px 4px rgba(0,0,0,0.03)' 
-        }}>
+        <div 
+          onClick={() => setActiveSubTab('conflicts')}
+          style={{ 
+            background: bgCard, 
+            border: activeSubTab === 'conflicts' ? '2px solid #ef4444' : agendaConflicts.length > 0 ? '1px solid #fecaca' : `1px solid ${borderLight}`, 
+            borderRadius: '12px', 
+            padding: '1.25rem', 
+            boxShadow: '0 2px 4px rgba(0,0,0,0.03)',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease'
+          }}
+          title="Ver detalle de Conflictos de Agenda"
+        >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontSize: '0.75rem', fontWeight: 800, color: agendaConflicts.length > 0 ? '#ef4444' : '#10b981', textTransform: 'uppercase' }}>
               Conflictos de Agenda
@@ -305,7 +349,7 @@ export default function ResourceCapacityView({ selectedSede = 'GLOBAL', hrSentin
             {agendaConflicts.length} {agendaConflicts.length === 0 ? '✓' : ''}
           </div>
           <div style={{ fontSize: '0.8rem', color: agendaConflicts.length > 0 ? '#b91c1c' : textMuted, marginTop: '0.2rem' }}>
-            {agendaConflicts.length > 0 ? 'Solapamiento de fechas detectado' : 'Agenda 100% blindada y sincronizada'}
+            {agendaConflicts.length > 0 ? 'Solapamiento de fechas detectado &bull; Resolver \u2192' : 'Agenda 100% blindada y sincronizada'}
           </div>
         </div>
 
@@ -461,17 +505,26 @@ export default function ResourceCapacityView({ selectedSede = 'GLOBAL', hrSentin
                           Sedes asignadas: {Array.from(t.sedes).join(', ') || 'N/A'}
                         </div>
                       </div>
-                      <span style={{ 
-                        background: 'rgba(56, 189, 248, 0.15)', 
-                        color: '#38bdf8', 
-                        padding: '0.25rem 0.6rem', 
-                        borderRadius: '20px', 
-                        fontSize: '0.75rem', 
-                        fontWeight: 800,
-                        whiteSpace: 'nowrap'
-                      }}>
-                        {t.events.length} {t.events.length === 1 ? 'evento' : 'eventos'}
-                      </span>
+                      <button 
+                        onClick={() => setSelectedTrainerForModal(t)}
+                        title="Ver desglose completo de eventos agendados"
+                        style={{ 
+                          background: 'rgba(56, 189, 248, 0.15)', 
+                          color: '#38bdf8', 
+                          padding: '0.25rem 0.6rem', 
+                          borderRadius: '20px', 
+                          fontSize: '0.75rem', 
+                          fontWeight: 800,
+                          whiteSpace: 'nowrap',
+                          border: '1px solid rgba(56, 189, 248, 0.3)',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.3rem'
+                        }}
+                      >
+                        {t.events.length} {t.events.length === 1 ? 'evento' : 'eventos'} &rarr;
+                      </button>
                     </div>
 
                     {/* Próximo Evento */}
@@ -481,7 +534,7 @@ export default function ResourceCapacityView({ selectedSede = 'GLOBAL', hrSentin
                           Próximo Entrenamiento:
                         </div>
                         <div style={{ fontSize: '0.85rem', fontWeight: 700, color: textDark }}>
-                          {nextEv.nombre} {nextEv.equipo ? `(Eq ${nextEv.equipo})` : ''}
+                          {nextEv.nombre} {nextEv.equipo ? `(${formatTeamString(nextEv.equipo)})` : ''}
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: textMuted, marginTop: '0.3rem' }}>
                           <span>📍 {nextEv.sede || 'Sede oficial'}</span>
@@ -519,14 +572,27 @@ export default function ResourceCapacityView({ selectedSede = 'GLOBAL', hrSentin
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', maxHeight: '100px', overflowY: 'auto' }}>
                         {t.events.slice(1, 4).map((ev, i) => (
                           <div key={i} style={{ fontSize: '0.75rem', color: textMuted, display: 'flex', justifyContent: 'space-between' }}>
-                            <span>&bull; {ev.nombre} ({ev.sede})</span>
+                            <span>&bull; {ev.nombre} ({ev.sede}) {ev.equipo ? `- ${formatTeamString(ev.equipo)}` : ''}</span>
                             <span style={{ fontWeight: 600 }}>{(ev.fecha_inicio || ev.start || '').substring(0, 10)}</span>
                           </div>
                         ))}
                         {t.events.length > 4 && (
-                          <div style={{ fontSize: '0.7rem', color: '#38bdf8', fontWeight: 700 }}>
-                            +{t.events.length - 4} eventos adicionales en agenda
-                          </div>
+                          <button 
+                            onClick={() => setSelectedTrainerForModal(t)}
+                            style={{ 
+                              fontSize: '0.75rem', 
+                              color: '#38bdf8', 
+                              fontWeight: 700,
+                              background: 'transparent',
+                              border: 'none',
+                              padding: '0.2rem 0',
+                              textAlign: 'left',
+                              cursor: 'pointer',
+                              textDecoration: 'underline'
+                            }}
+                          >
+                            +{t.events.length - 4} eventos adicionales &bull; Ver todos &rarr;
+                          </button>
                         )}
                       </div>
                     </div>
@@ -764,6 +830,149 @@ export default function ResourceCapacityView({ selectedSede = 'GLOBAL', hrSentin
               ))}
             </div>
           )}
+        </div>
+      )}
+
+      {/* MODAL DETALLE DE EVENTOS DEL ENTRENADOR */}
+      {selectedTrainerForModal && (
+        <div 
+          onClick={() => setSelectedTrainerForModal(null)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.75)',
+            backdropFilter: 'blur(4px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 99999,
+            padding: '1.5rem'
+          }}
+        >
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: '#0B132B',
+              border: '1px solid rgba(56, 189, 248, 0.3)',
+              borderRadius: '16px',
+              maxWidth: '850px',
+              width: '100%',
+              maxHeight: '85vh',
+              overflowY: 'auto',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+              padding: '1.75rem'
+            }}
+          >
+            {/* Modal Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.25rem', borderBottom: `1px solid ${borderLight}`, paddingBottom: '1rem' }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
+                  <span style={{ background: 'rgba(56, 189, 248, 0.2)', color: '#38bdf8', padding: '0.2rem 0.6rem', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 800 }}>
+                    ENTRENADOR ASIGNADO
+                  </span>
+                  <span style={{ fontSize: '0.8rem', color: textMuted }}>
+                    {selectedTrainerForModal.events.length} evento(s) en calendario oficial
+                  </span>
+                </div>
+                <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#f8fafc', margin: 0 }}>
+                  {selectedTrainerForModal.name}
+                </h3>
+                <div style={{ fontSize: '0.82rem', color: textMuted, marginTop: '0.25rem' }}>
+                  Sedes con presencia: {Array.from(selectedTrainerForModal.sedes).join(', ') || 'No registradas'}
+                </div>
+              </div>
+              <button 
+                onClick={() => setSelectedTrainerForModal(null)}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: '36px',
+                  height: '36px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  color: '#94a3b8'
+                }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Event List Table */}
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)', color: '#94a3b8', textAlign: 'left' }}>
+                    <th style={{ padding: '0.75rem 0.5rem' }}>ENTRENAMIENTO</th>
+                    <th style={{ padding: '0.75rem 0.5rem' }}>SEDE</th>
+                    <th style={{ padding: '0.75rem 0.5rem' }}>EQUIPOS</th>
+                    <th style={{ padding: '0.75rem 0.5rem' }}>FECHA INICIO</th>
+                    <th style={{ padding: '0.75rem 0.5rem' }}>FECHA FIN</th>
+                    <th style={{ padding: '0.75rem 0.5rem' }}>ESTADO</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {selectedTrainerForModal.events.map((ev, i) => (
+                    <tr key={i} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)', color: '#f8fafc' }}>
+                      <td style={{ padding: '0.75rem 0.5rem', fontWeight: 700 }}>
+                        {ev.nombre}
+                      </td>
+                      <td style={{ padding: '0.75rem 0.5rem' }}>
+                        <span style={{ background: 'rgba(255, 255, 255, 0.08)', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.78rem' }}>
+                          📍 {ev.sede || 'N/A'}
+                        </span>
+                      </td>
+                      <td style={{ padding: '0.75rem 0.5rem', color: '#38bdf8', fontWeight: 600 }}>
+                        {ev.equipo ? formatTeamString(ev.equipo) : '—'}
+                      </td>
+                      <td style={{ padding: '0.75rem 0.5rem', color: textMuted }}>
+                        {(ev.fecha_inicio || ev.start || '').substring(0, 10) || '—'}
+                      </td>
+                      <td style={{ padding: '0.75rem 0.5rem', color: textMuted }}>
+                        {(ev.fecha_fin || ev.end || '').substring(0, 10) || '—'}
+                      </td>
+                      <td style={{ padding: '0.75rem 0.5rem' }}>
+                        <span style={{
+                          background: ev.status === 'activo' || ev.status === 'confirmado' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(56, 189, 248, 0.15)',
+                          color: ev.status === 'activo' || ev.status === 'confirmado' ? '#10b981' : '#38bdf8',
+                          padding: '0.2rem 0.5rem',
+                          borderRadius: '12px',
+                          fontSize: '0.75rem',
+                          fontWeight: 700
+                        }}>
+                          {ev.status || 'Programado'}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Modal Footer */}
+            <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => setSelectedTrainerForModal(null)}
+                style={{
+                  padding: '0.6rem 1.4rem',
+                  borderRadius: '8px',
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  border: `1px solid ${borderLight}`,
+                  color: '#f8fafc',
+                  fontWeight: 700,
+                  fontSize: '0.85rem',
+                  cursor: 'pointer'
+                }}
+              >
+                Cerrar Detalle
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
