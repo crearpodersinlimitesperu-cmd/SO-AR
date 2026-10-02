@@ -4,6 +4,7 @@ import MaestriaGlobalDashboard from './pages/MaestriaGlobalDashboard';
 import TrainerZenHub from './pages/TrainerZenHub';
 import CallCoachCRM from './pages/CallCoachCRM';
 import QuantumTeamHub from './pages/QuantumTeamHub';
+import HrCommandCenter from './pages/HrCommandCenter';
 import DatosSedesCartas from './pages/DatosSedesCartas';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
@@ -242,6 +243,11 @@ function App() {
           <Route path="/qt-hub" element={
             <RoleRoute allowedRoles={['qt', 'gerente', 'superadmin', 'ceo']} requireSuperAdmin={false}>
               <QuantumTeamHub />
+            </RoleRoute>
+          } />
+          <Route path="/hr-command-center" element={
+            <RoleRoute allowedRoles={['talento_humano', 'rrhh', 'superadmin', 'ceo', 'direccion']} requireSuperAdmin={false}>
+              <HrCommandCenter />
             </RoleRoute>
           } />
           <Route path="/onboarding-legal" element={
