@@ -640,6 +640,7 @@ const MODULE_REGISTRY = [
   // director_maestria, tratado como Directivos) NO tienen acceso a Flyers C1.
   // Solo Gerentes, Coordinadores C1Y2 y Coordinadores de MJ, según la Matriz Oficial.
   { id: 'generador-flyer', label: 'Generador de Flyers Oficiales', emoji: '🎨', route: '/generador-flyer', roles: ['gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj'] },
+  { id: 'cfo-dashboard', label: 'Dirección Financiera Global', emoji: '🏦', route: '/cfo-dashboard', roles: null, visible: (u) => ['cfo', 'ceo', 'superadmin', 'direccion'].includes(u?.appRole) || u?.isSuperAdmin },
   { id: 'panel-legal', label: 'Auditoría Legal (Firmas)', emoji: '⚖️', route: '/legal-admin', roles: null, visible: (u) => isDataAdmin(u) },
 ];
 
@@ -2056,6 +2057,11 @@ export default function Home() {
                     🌐 Centro de Mando
                   </button>
                 )}
+                {hasRoleAccess(['cfo', 'ceo', 'superadmin', 'direccion']) && (
+                  <button onClick={() => { setShowToolsDropdown(false); navigate('/cfo-dashboard'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#10b981', background: 'rgba(16, 185, 129, 0.1)', fontWeight: 'bold' }}>
+                    🏦 Dirección Financiera Global
+                  </button>
+                )}
                 {isDataAdmin(currentUser) && (
                   <button onClick={() => { setShowToolsDropdown(false); navigate('/legal-admin'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#f59e0b', background: 'rgba(245, 158, 11, 0.1)' }}>
                     ⚖️ Auditoría Legal
@@ -2183,6 +2189,11 @@ export default function Home() {
           {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria', 'talento_humano']) && (
             <button onClick={() => navigate('/superadmin')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #8b5cf6, #29abe2)', color: 'white', border: 'none' }}>
               🌐 Centro de Mando
+            </button>
+          )}
+          {hasRoleAccess(['cfo', 'ceo', 'superadmin', 'direccion']) && (
+            <button onClick={() => navigate('/cfo-dashboard')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #1e293b, #064e3b)', color: '#10b981', border: '1px solid #10b981', fontWeight: 'bold' }}>
+              🏦 Dir. Financiera
             </button>
           )}
           {isDataAdmin(currentUser) && (

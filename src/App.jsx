@@ -208,6 +208,11 @@ function App() {
               <LegalStatusPanel />
             </RoleRoute>
           } />
+          <Route path="/cfo-dashboard" element={
+            <RoleRoute allowedRoles={['cfo', 'ceo', 'superadmin', 'direccion']} requireSuperAdmin={false}>
+              <CfoDashboard />
+            </RoleRoute>
+          } />
           <Route path="/onboarding-legal" element={
             <OnboardingLegal />
           } />
