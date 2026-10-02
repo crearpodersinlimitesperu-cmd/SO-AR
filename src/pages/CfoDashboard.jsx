@@ -31,7 +31,7 @@ export default function CfoDashboard() {
     const diff = deadline - now;
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-    return \`\${days}d \${hours}h\`;
+    return `${days}d ${hours}h`;
   };
 
   useEffect(() => {
@@ -56,7 +56,7 @@ export default function CfoDashboard() {
 
   const handleToggleBlock = async (sede, isCurrentlyBlocked) => {
     const newStatus = !isCurrentlyBlocked;
-    const reason = newStatus ? window.prompt(\`Motivo del bloqueo para \${sede} (Auditoría Zero-Trust):\`) : '';
+    const reason = newStatus ? window.prompt(`Motivo del bloqueo para ${sede} (Auditoría Zero-Trust):`) : '';
     
     if (newStatus && !reason) return; // Cancelado
 
@@ -64,7 +64,7 @@ export default function CfoDashboard() {
     
     const success = await toggleHQBlock(sede, newStatus, currentUser?.name || 'CFO_ADMIN', reason);
     if (success) {
-      toast.success(newStatus ? \`Sede \${sede} BLOQUEADA financieramente.\` : \`Bloqueo levantado para \${sede}.\`);
+      toast.success(newStatus ? `Sede ${sede} BLOQUEADA financieramente.` : `Bloqueo levantado para ${sede}.`);
     } else {
       toast.error('Error al actualizar Firestore. Revirtiendo.');
       loadRealStatus();
@@ -227,7 +227,7 @@ export default function CfoDashboard() {
               if (hq.slaStatus === 'WARNING') {
                 slaColor = 'var(--crear-gold)';
                 slaIcon = <Clock size={18} />;
-                slaText = \`Pendiente (\${calculateTimeLeft()} restantes)\`;
+                slaText = `Pendiente (${calculateTimeLeft()} restantes)`;
               } else if (hq.slaStatus === 'VIOLATION') {
                 slaColor = '#ef4444';
                 slaIcon = <AlertOctagon size={18} />;

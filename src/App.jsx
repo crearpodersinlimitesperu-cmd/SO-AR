@@ -2,6 +2,7 @@ import CfoDashboard from './pages/CfoDashboard';
 import FinanceWorkspace from './pages/FinanceWorkspace';
 import MaestriaGlobalDashboard from './pages/MaestriaGlobalDashboard';
 import TrainerZenHub from './pages/TrainerZenHub';
+import CallCoachCRM from './pages/CallCoachCRM';
 import DatosSedesCartas from './pages/DatosSedesCartas';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
@@ -230,6 +231,11 @@ function App() {
           <Route path="/trainer-hub" element={
             <RoleRoute allowedRoles={['entrenador', 'direccion', 'superadmin', 'ceo', 'director_maestria']} requireSuperAdmin={false}>
               <TrainerZenHub />
+            </RoleRoute>
+          } />
+          <Route path="/call-coach-crm" element={
+            <RoleRoute allowedRoles={['entrenador_llamadas', 'direccion', 'superadmin', 'ceo']} requireSuperAdmin={false}>
+              <CallCoachCRM />
             </RoleRoute>
           } />
           <Route path="/onboarding-legal" element={
