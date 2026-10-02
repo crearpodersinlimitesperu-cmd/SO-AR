@@ -743,7 +743,7 @@ export default function Home() {
     }
     fetchUsersForSearch();
     return () => { isMounted = false; };
-  }, []);
+  }, [currentUser]);
 
   // Cerrar el buscador global al hacer click fuera
   useEffect(() => {

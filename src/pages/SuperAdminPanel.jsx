@@ -1182,7 +1182,7 @@ export default function SuperAdminPanel() {
     }
     fetchUsers();
     return () => { isMounted = false; };
-  }, []);
+  }, [currentUser]);
 
   useEffect(() => {
     let isMounted = true;

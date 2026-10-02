@@ -440,6 +440,11 @@ Con el fin de profesionalizar y escalar la operación sin fricción ni pérdida 
 8. **Redirección de Dominio Público (`crearpsl.net/dna`):**
    * Enrutamiento directo y transparente alojado en el repositorio GitHub Pages (`CRM-CREARLIMA..`) que redirige a los participantes hacia el portal blindado de onboarding legal `https://centro-operativo-cpsl.web.app/dna`.
 
+9. **Resolución de Carga en Directorio y Panel Super Admin (Todos: 0 colaboradores):**
+   * **Incidencia:** El Panel Super Admin y los selectores de tareas mostraban `Estado: Todos (0)` y las pestañas "Por Rol" y "Por Sede" aparecían desiertas.
+   * **Causa Raíz:** En `src/services/userService.js` se invocaba `canManageUserStatus(currentUser)` en la línea 320 sin haber importado la función desde `src/config/permissions.js`. Esto disparaba un `ReferenceError: canManageUserStatus is not defined` silencioso en el `try/catch` de los componentes consumidores, dejando la lista de personal vacía (`realUsersData = []`).
+   * **Solución:** Se importó formalmente `canManageUserStatus` en `userService.js`, se añadió salvaguarda de tipo (`typeof canManageUserStatus === 'function'`) y se vincularon las dependencias de `currentUser` en los hooks `useEffect` de `SuperAdminPanel.jsx` y `Home.jsx`.
+
 ---
 
 > 📜 **Mandato de la Caja Negra:**

@@ -1,7 +1,7 @@
 import { db } from './firebase';
 import { doc, getDoc, setDoc, updateDoc, arrayUnion, collection, getDocs, query, where } from 'firebase/firestore';
 import { usersData, normalizeRole, findUserByAnyEmail } from '../data/usersData';
-import { DUAL_ROLE_TRAINER_EMAILS } from '../config/permissions';
+import { DUAL_ROLE_TRAINER_EMAILS, canManageUserStatus } from '../config/permissions';
 import { recordAuditEvent } from './auditService';
 
 
@@ -317,9 +317,14 @@ export async function getAllCompanyUsers(currentUser = null) {
   });
 
   
-  const includeInactive = currentUser ? canManageUserStatus(currentUser) : false;
+  let includeInactive = false;
+  try {
+    includeInactive = currentUser && typeof canManageUserStatus === 'function' ? canManageUserStatus(currentUser) : false;
+  } catch (err) {
+    console.warn("Error evaluando permisos de estado en getAllCompanyUsers:", err);
+    includeInactive = false;
+  }
   return includeInactive ? allUsers : allUsers.filter(u => u.status !== 'inactive');
-
 }
 
 /**
