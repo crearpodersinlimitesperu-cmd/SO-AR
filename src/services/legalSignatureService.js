@@ -167,8 +167,8 @@ export const uploadSignaturePDF = async (signatureId, signatureData) => {
 /**
  * Genera el HTML del contrato firmado con todos los datos de auditoría.
  */
-const generateSignedContractHTML = (data) => {
-  const now = new Date();
+export const generateSignedContractHTML = (data) => {
+  const now = data.signed_at?.toDate ? data.signed_at.toDate() : (data.signed_at ? new Date(data.signed_at) : new Date());
   const docsText = (data.docsAccepted || []).join(', ');
 
   return `<!DOCTYPE html>

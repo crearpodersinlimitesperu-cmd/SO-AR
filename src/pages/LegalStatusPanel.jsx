@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Shield, Search, Download, CheckCircle, Clock, ShieldAlert, Activity, Users, FileText, ChevronLeft, ExternalLink } from 'lucide-react';
-import { getAllLegalSignatures, generateTemporaryDownloadURL } from '../services/legalSignatureService';
+import { getAllLegalSignatures, generateTemporaryDownloadURL, generateSignedContractHTML } from '../services/legalSignatureService';
 import { useNavigate } from 'react-router-dom';
 
 export default function LegalStatusPanel() {
@@ -21,12 +21,29 @@ export default function LegalStatusPanel() {
     setLoading(false);
   };
 
-  const handleDownload = async (docId, storagePath) => {
+    const handleDownload = async (signatureData) => {
     try {
-      const url = await generateTemporaryDownloadURL(storagePath);
-      window.open(url, '_blank');
+      if (signatureData.pdf_storage_path) {
+        const url = await generateTemporaryDownloadURL(signatureData.pdf_storage_path);
+        if (url) {
+          window.open(url, '_blank');
+          return;
+        }
+      }
+      
+      // Fallback: Si no hay PDF en Storage, regeneramos el HTML en memoria y forzamos descarga
+      const htmlContent = generateSignedContractHTML(signatureData);
+      const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+      const urlBlob = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = urlBlob;
+      link.download = `Audit_Legal_${signatureData.kycData?.docNumber || signatureData.id}.html`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(urlBlob);
     } catch (e) {
-      alert('Error obteniendo el PDF: ' + e.message);
+      alert('Error obteniendo el PDF de auditoría: ' + e.message);
     }
   };
 
@@ -176,7 +193,7 @@ export default function LegalStatusPanel() {
                   </td>
                   <td style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>
                     <button 
-                      onClick={() => handleDownload(s.id, s.pdf_storage_path)}
+                      onClick={() => handleDownload(s)}
                       style={{ background: 'var(--bg-card)', border: '1px solid var(--border-strong)', color: 'var(--text-main)', padding: '0.6rem 1rem', borderRadius: '6px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px', fontWeight: 600, fontSize: '0.8rem', transition: 'all 0.2s' }}
                       onMouseOver={e => e.currentTarget.style.background = 'rgba(255, 193, 7, 0.1)'}
                       onMouseOut={e => e.currentTarget.style.background = 'var(--bg-card)'}
