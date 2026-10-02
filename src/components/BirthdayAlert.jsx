@@ -4,7 +4,7 @@
 // aparezca sin importar en qué página esté el usuario al iniciar sesión.
 //
 // Qué hace: al cargar (una vez por sesión de navegador por día, para no repetir
-// la alerta en cada cambio de página), consulta getAllCompanyUsers() y compara
+// la alerta en cada cambio de página), consulta getAllCompanyUsers(currentUser) y compara
 // el mes/día de cada colaborador con "cumpleanos" (campo YYYY-MM-DD, ver
 // UserProfileModal.jsx y scripts/importBirthdays.mjs) contra la fecha de hoy.
 // Si hay coincidencias, muestra un aviso visual + un tono sonoro corto (generado
@@ -90,7 +90,7 @@ export default function BirthdayAlert() {
     }
 
     try {
-      const allUsers = await getAllCompanyUsers();
+      const allUsers = await getAllCompanyUsers(currentUser);
       const todayMD = todayMonthDay();
       const matches = allUsers.filter(u => monthDayOf(u.cumpleanos) === todayMD);
 

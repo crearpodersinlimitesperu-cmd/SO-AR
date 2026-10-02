@@ -196,7 +196,7 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
   const [taskToEdit, setTaskToEdit] = useState(null);
 
   // Cumpleaños (editable solo por Super Admin) — se guarda en users/{id}.cumpleanos
-  // para que quede en el mismo lugar que lee getAllCompanyUsers() y donde escribe
+  // para que quede en el mismo lugar que lee getAllCompanyUsers(currentUser) y donde escribe
   // el script de importación desde el Directorio Global.
   const [editingBirthday, setEditingBirthday] = useState(false);
   const [birthdayDraft, setBirthdayDraft] = useState(user?.cumpleanos || '');
@@ -414,7 +414,7 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
   const pct = userTasks.length > 0 ? Math.round((completedTasks.length / userTasks.length) * 100) : 0;
 
   // Handler: Guardar Cumpleaños (escribe en la colección "users", no en "user_profiles",
-  // para que quede consistente con userService.getAllCompanyUsers() y con el import
+  // para que quede consistente con userService.getAllCompanyUsers(currentUser) y con el import
   // desde el Directorio Global). Solo aplica cuando el usuario tiene un id real de
   // Firestore (user.id) — un registro que solo viene del registro local (usersData.js,
   // source: 'local_registry') no tiene doc propio en "users" y no se puede editar aquí.

@@ -887,12 +887,12 @@ export default function Home() {
     return unsubscribe;
   }, []);
 
-  // Carga de personas para el buscador (misma fuente que Centro de Mando: getAllCompanyUsers())
+  // Carga de personas para el buscador (misma fuente que Centro de Mando: getAllCompanyUsers(currentUser))
   useEffect(() => {
     let isMounted = true;
     async function fetchUsersForSearch() {
       try {
-        const users = await getAllCompanyUsers();
+        const users = await getAllCompanyUsers(currentUser);
         if (isMounted) setRealUsersData(users);
       } catch (err) {
         console.error("Error cargando usuarios para el buscador global:", err);

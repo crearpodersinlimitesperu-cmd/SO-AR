@@ -157,7 +157,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
 
   useEffect(() => {
     let isMounted = true;
-    getAllCompanyUsers().then(users => {
+    getAllCompanyUsers(currentUser).then(users => {
       if (isMounted && Array.isArray(users) && users.length > 0) {
         setActiveUsersList(users);
       }
@@ -921,7 +921,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                           // búsqueda sin nombre visible — solo "• Dirección Global (Sede
                           // Global)". Es un registro real de Firestore al que le falta el
                           // campo "name"/"displayName" (no está en el catálogo oficial de
-                          // usersData.js para que getAllCompanyUsers() lo rellene). Nunca se
+                          // usersData.js para que getAllCompanyUsers(currentUser) lo rellene). Nunca se
                           // inventa un nombre: se usa el correo real como respaldo, que sigue
                           // siendo un dato verdadero de esa persona.
                           const displayLabel = u.name || u.displayName || u.email || 'Sin nombre registrado';

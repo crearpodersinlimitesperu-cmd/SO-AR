@@ -1132,7 +1132,7 @@ export default function SuperAdminPanel() {
       await applyReviewedRoleChanges(roleAuditModalData, currentUser.email);
       showToast(`${count} registros actualizados.`, 'success');
       setRoleAuditModalData(null);
-      setRealUsersData(await getAllCompanyUsers());
+      setRealUsersData(await getAllCompanyUsers(currentUser));
     } catch (error) {
       showToast(error.message, 'error');
     } finally {
@@ -1148,7 +1148,7 @@ export default function SuperAdminPanel() {
       // se realizan desde cada perfil, con sede, roles y trazabilidad visibles.
       const report = await runRoleIntegrityAuditAndHeal({ dryRun: true });
       if (report.status === 'success') {
-        const refreshed = await getAllCompanyUsers();
+        const refreshed = await getAllCompanyUsers(currentUser);
         setRealUsersData(refreshed);
         setRoleAuditModalData(report);
         if (report.rolesRepaired > 0) {
@@ -1172,7 +1172,7 @@ export default function SuperAdminPanel() {
     let isMounted = true;
     async function fetchUsers() {
       try {
-        const users = await getAllCompanyUsers();
+        const users = await getAllCompanyUsers(currentUser);
         if (isMounted) setRealUsersData(users);
       } catch (err) {
         console.error("Error cargando usuarios:", err);

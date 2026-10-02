@@ -77,7 +77,7 @@ export async function getVerifiedUser(email) {
  * Obtiene todos los usuarios de la compañía consultando los tres directorios oficiales de Firestore.
  * Esto reemplaza al archivo estático usersData.js
  */
-export async function getAllCompanyUsers() {
+export async function getAllCompanyUsers(currentUser = null) {
   const allUsers = [];
 
   // NOTA (26/08/2026): normalizamos (trim + minúsculas) todas las comparaciones de
@@ -316,7 +316,10 @@ export async function getAllCompanyUsers() {
     }
   });
 
-  return allUsers;
+  
+  const includeInactive = currentUser ? canManageUserStatus(currentUser) : false;
+  return includeInactive ? allUsers : allUsers.filter(u => u.status !== 'inactive');
+
 }
 
 /**

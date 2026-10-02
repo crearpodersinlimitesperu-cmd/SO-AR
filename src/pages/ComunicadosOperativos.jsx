@@ -23,7 +23,7 @@ export default function ComunicadosOperativos() {
   const [sending, setSending] = useState(false);
 
   useEffect(() => {
-    getAllCompanyUsers().then(users => {
+    getAllCompanyUsers(currentUser).then(users => {
       const seen = new Set();
       setPeople((users || []).filter(user => {
         const email = normal(user.email || user.corporateEmail);

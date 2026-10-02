@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import UserProfileModal from './UserProfileModal';
 import { getAllCompanyUsers } from '../services/userService';
 import { getFlagForSede } from '../utils/flags';
+import { useAuth } from '../context/AuthContext';
 
 export default function GlobalSearch() {
   const [query, setQuery] = useState('');
@@ -13,11 +14,12 @@ export default function GlobalSearch() {
   const [selectedUser, setSelectedUser] = useState(null);
   const wrapperRef = useRef(null);
   const navigate = useNavigate();
+  const { currentUser } = useAuth();
 
   useEffect(() => {
     async function load() {
       try {
-        const u = await getAllCompanyUsers();
+        const u = await getAllCompanyUsers(currentUser);
         setUsers(u);
       } catch(e) {}
     }

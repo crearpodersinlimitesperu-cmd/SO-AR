@@ -13,7 +13,7 @@
 //    del Apps Script oficial (?action=getEventos). Es la misma hoja de Google
 //    que hoy se edita a mano: por eso el encabezado dice "sincronizado con
 //    Google Sheets".
-//  • Entrenadores disponibles     -> getAllCompanyUsers() filtrando por rol
+//  • Entrenadores disponibles     -> getAllCompanyUsers(currentUser) filtrando por rol
 //    entrenador / entrenador_llamadas. Son personas reales del directorio.
 //  • Asignaciones                 -> colección Firestore "asignaciones_entrenadores".
 //    ESTA es la parte que reemplaza al Sheet: lo que se elige acá queda en
@@ -260,7 +260,7 @@ export default function AsignadorEntrenadores() {
     let vivo = true;
     (async () => {
       try {
-        const todos = await getAllCompanyUsers();
+        const todos = await getAllCompanyUsers(currentUser);
         const soloEntrenadores = todos.filter(u => {
           const roles = [u.role, u.appRole, ...(Array.isArray(u.roles) ? u.roles : [])]
             .filter(Boolean).map(r => normalizeRole(r));
