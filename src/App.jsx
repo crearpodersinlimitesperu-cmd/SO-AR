@@ -1,3 +1,7 @@
+import CfoDashboard from './pages/CfoDashboard';
+import FinanceWorkspace from './pages/FinanceWorkspace';
+import MaestriaGlobalDashboard from './pages/MaestriaGlobalDashboard';
+import TrainerZenHub from './pages/TrainerZenHub';
 import DatosSedesCartas from './pages/DatosSedesCartas';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
