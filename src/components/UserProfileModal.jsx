@@ -1258,7 +1258,15 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
                   onClick={() => {
                     simulateUser(user);
                     onClose();
-                    navigate('/home');
+                    const r = (user.role || user.appRole || '').toLowerCase();
+                    if (r === 'cfo') navigate('/cfo-dashboard');
+                    else if (r === 'legal' || r === 'juridico') navigate('/legal-hub');
+                    else if (r === 'talento_humano' || r === 'rrhh') navigate('/hr-command-center');
+                    else if (r === 'coord_maestria_global') navigate('/andres-command-center');
+                    else if (r === 'qt') navigate('/qt-hub');
+                    else if (r === 'entrenador_llamadas') navigate('/call-coach-crm');
+                    else if (r === 'entrenador') navigate('/trainer-hub');
+                    else navigate('/home');
                   }}
                   style={{
                     width: '100%',
@@ -1348,7 +1356,16 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
                       <button 
                         onClick={() => {
                           onClose();
-                          navigate('/home');
+                          const r = (user.role || user.appRole || '').toLowerCase();
+                          let targetRoute = '/home';
+                          if (r === 'cfo') targetRoute = '/cfo-dashboard';
+                          else if (r === 'legal' || r === 'juridico') targetRoute = '/legal-hub';
+                          else if (r === 'talento_humano' || r === 'rrhh') targetRoute = '/hr-command-center';
+                          else if (r === 'coord_maestria_global') targetRoute = '/andres-command-center';
+                          else if (r === 'qt') targetRoute = '/qt-hub';
+                          else if (r === 'entrenador_llamadas') targetRoute = '/call-coach-crm';
+                          else if (r === 'entrenador') targetRoute = '/trainer-hub';
+                          navigate(targetRoute);
                           setTimeout(() => {
                             simulateUser(user);
                           }, 50);

@@ -301,6 +301,15 @@ export default function GerenteDashboard() {
               👥 Directorio de Equipo
             </button>
           )}
+          {(currentUser?.isSuperAdmin || currentUser?.appRole === 'cfo' || currentUser?.isDireccion) && (
+            <button 
+              className="btn-primary" 
+              onClick={() => navigate('/cfo-dashboard')} 
+              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'linear-gradient(135deg, #10b981, #047857)', color: 'white', border: 'none', fontWeight: 'bold' }}
+            >
+              🏦 Dirección Financiera (CFO)
+            </button>
+          )}
           {(currentUser?.appRole === 'gerente') && (
             <button 
               className="btn-primary" 
@@ -317,7 +326,66 @@ export default function GerenteDashboard() {
       <TaskAssignmentModal isOpen={showTaskForm} onClose={() => setShowTaskForm(false)} />
       <VenueConfigModal isOpen={showVenueModal} onClose={() => setShowVenueModal(false)} />
 
-      
+      {/* BANNER ESPECIALIZADO CFO */}
+      {(currentUser?.appRole === 'cfo' || currentUser?.role === 'cfo' || currentUser?.email === 'contabilidad.global@crearpsl.net') && (
+        <div 
+          className="glass-panel" 
+          style={{ 
+            marginBottom: '1.5rem', 
+            padding: '1.2rem 1.5rem', 
+            borderLeft: '5px solid #10b981', 
+            background: 'linear-gradient(90deg, rgba(16,185,129,0.18), rgba(6,78,59,0.4))',
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center', 
+            flexWrap: 'wrap', 
+            gap: '1rem',
+            border: '1px solid rgba(16,185,129,0.4)',
+            boxShadow: '0 0 20px rgba(16,185,129,0.15)'
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <div style={{ background: 'rgba(16,185,129,0.25)', padding: '0.8rem', borderRadius: '12px', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Building size={26} />
+            </div>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <h4 style={{ margin: 0, color: '#fff', fontSize: '1.1rem', fontWeight: 800 }}>
+                  🏦 Dirección Financiera Global (CFO) — Elizabeth Escobar
+                </h4>
+                <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: '12px', background: 'rgba(16,185,129,0.3)', color: '#34d399', fontWeight: 800 }}>
+                  Torre de Control Activa
+                </span>
+              </div>
+              <p style={{ margin: '0.3rem 0 0', fontSize: '0.85rem', color: '#94a3b8' }}>
+                Tienes disponible tu centro financiero para flujo de caja consolidado, auditoría de ingresos/egresos y liquidaciones de entrenadores.
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={() => navigate('/cfo-dashboard')}
+            className="btn-primary"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              padding: '0.6rem 1.3rem',
+              borderRadius: '8px',
+              background: 'linear-gradient(135deg, #10b981, #047857)',
+              color: '#fff',
+              fontWeight: 800,
+              fontSize: '0.9rem',
+              border: 'none',
+              cursor: 'pointer',
+              boxShadow: '0 4px 15px rgba(16,185,129,0.4)'
+            }}
+          >
+            Abrir Dashboard CFO ➔
+          </button>
+        </div>
+      )}
+
       {/* BANNER OPERATIVO REPORTE RELÁMPAGO POST-FDS */}
       <div 
         className="glass-panel" 

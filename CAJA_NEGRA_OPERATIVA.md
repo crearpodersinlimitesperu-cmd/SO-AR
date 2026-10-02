@@ -458,6 +458,11 @@ Con el fin de profesionalizar y escalar la operación sin fricción ni pérdida 
       7. CRM Entrenadores de Llamadas -> `/call-coach-crm`
       8. Academia y Hub de Entrenamiento Zen -> `/trainer-hub`
 
+11. **Enrutamiento Inteligente por Rol en Simulación y Paneles Ejecutivos:**
+    * **Simulación Especializada:** En `UserProfileModal.jsx`, al simular a un usuario clave (ej. Nancy Elizabeth Escobar Pérez / CFO, Pablo Mendieta / Legal, Lennin Chasi / RRHH, Andrés Gómez / Maestría, Entrenadores o QTs), el sistema redirige automáticamente a su Torre de Control o Hub respectivo en vez de dejarlos en una vista genérica o en `/home`.
+    * **Conexión en Dashboard 30 Segundos:** En `GerenteDashboard.jsx`, se agregó el botón `[🏦 Dirección Financiera (CFO)]` en la botonera superior y un banner inteligente destacado para el rol `cfo` que permite abrir en un clic la Torre de Control Financiero.
+    * **Barra PRO Adaptativa:** En `Home.jsx`, el botón de acceso rápido se personaliza dinámicamente según el rol activo (`cfo` ➔ `/cfo-dashboard`, `legal` ➔ `/legal-hub`, `talento_humano` ➔ `/hr-command-center`, `coord_maestria_global` ➔ `/andres-command-center`).
+
 ---
 
 > 📜 **Mandato de la Caja Negra:**

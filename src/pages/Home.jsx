@@ -2264,7 +2264,23 @@ export default function Home() {
               ⏰ Horarios y Vestimenta
             </button>
           )}
-          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) ? (
+          {currentUser?.appRole === 'cfo' ? (
+            <button onClick={() => navigate('/cfo-dashboard')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #10b981, #047857)', color: 'white', fontWeight: 'bold', border: 'none' }}>
+              🏦 Dirección Financiera (CFO)
+            </button>
+          ) : currentUser?.appRole === 'legal' || currentUser?.appRole === 'juridico' ? (
+            <button onClick={() => navigate('/legal-hub')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: 'white', fontWeight: 'bold', border: 'none' }}>
+              ⚖️ Torre Legal
+            </button>
+          ) : currentUser?.appRole === 'talento_humano' || currentUser?.appRole === 'rrhh' ? (
+            <button onClick={() => navigate('/hr-command-center')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #8b5cf6, #6d28d9)', color: 'white', fontWeight: 'bold', border: 'none' }}>
+              🏢 Talento Humano
+            </button>
+          ) : currentUser?.appRole === 'coord_maestria_global' ? (
+            <button onClick={() => navigate('/andres-command-center')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #0284c7, #0369a1)', color: 'white', fontWeight: 'bold', border: 'none' }}>
+              🌐 Comando Maestría
+            </button>
+          ) : hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) ? (
             <button onClick={() => navigate('/gerente')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'var(--crear-gold)', color: 'black' }}>
               💼 Causa OS Gerencial
             </button>
