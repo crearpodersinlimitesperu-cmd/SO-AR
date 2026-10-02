@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
+import {
+  isDataAdmin, useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCycles } from '../context/CyclesContext';
@@ -640,6 +641,7 @@ const MODULE_REGISTRY = [
   // director_maestria, tratado como Directivos) NO tienen acceso a Flyers C1.
   // Solo Gerentes, Coordinadores C1Y2 y Coordinadores de MJ, según la Matriz Oficial.
   { id: 'generador-flyer', label: 'Generador de Flyers Oficiales', emoji: '🎨', route: '/generador-flyer', roles: ['gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj'] },
+  { id: 'panel-legal', label: 'Auditoría Legal (Firmas)', emoji: '⚖️', route: '/legal-admin', roles: null, visible: (u) => isDataAdmin(u) },
 ];
 
 // BUG REAL corregido (08/09/2026, reportado por José: "soy superusuario con
