@@ -213,6 +213,11 @@ function App() {
               <CfoDashboard />
             </RoleRoute>
           } />
+          <Route path="/finance-workspace" element={
+            <RoleRoute allowedRoles={['finanzas', 'facturacion', 'contador', 'cfo', 'superadmin', 'direccion']} requireSuperAdmin={false}>
+              <FinanceWorkspace />
+            </RoleRoute>
+          } />
           <Route path="/onboarding-legal" element={
             <OnboardingLegal />
           } />
