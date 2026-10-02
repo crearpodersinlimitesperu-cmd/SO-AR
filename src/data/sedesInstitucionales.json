@@ -1,0 +1,106 @@
+{
+  "lima": {
+    "sede": "Lima",
+    "ciudad": "Lima",
+    "pais": "Perú",
+    "gerentes": [
+      {
+        "nombre": "Jose Sanchez",
+        "email": "jose.sanchez@crearpsl.net"
+      }
+    ],
+    "razonSocial": "CREACIÓN CUÁNTICA E.I.R.L.",
+    "identificacionFiscal": "RUC 20612592811",
+    "direccionFiscal": "Calle Berlín 965, Int. 302, Miraflores, Lima, Perú",
+    "correoContacto": "jose.sanchez@crearpsl.net",
+    "telefonoContacto": "+51 919 563 284"
+  },
+  "quito": {
+    "sede": "Quito",
+    "ciudad": "Quito",
+    "pais": "Ecuador",
+    "gerentes": [
+      {
+        "nombre": "Emily Campuzano",
+        "email": "emily.campuzano@crearpsl.net"
+      },
+      {
+        "nombre": "David Sosa",
+        "email": "freddy.sosa@crearpsl.net"
+      }
+    ],
+    "razonSocial": "",
+    "identificacionFiscal": "",
+    "direccionFiscal": "",
+    "correoContacto": "",
+    "telefonoContacto": ""
+  },
+  "cuenca": {
+    "sede": "Cuenca",
+    "ciudad": "Cuenca",
+    "pais": "Ecuador",
+    "gerentes": [
+      {
+        "nombre": "July Leon",
+        "email": "emely.leon@crearpsl.net"
+      },
+      {
+        "nombre": "Edison Ricardo Gavilánez Gallardo",
+        "email": "ricardogavilanez1021@gmail.com"
+      }
+    ],
+    "razonSocial": "",
+    "identificacionFiscal": "",
+    "direccionFiscal": "",
+    "correoContacto": "",
+    "telefonoContacto": ""
+  },
+  "guayaquil": {
+    "sede": "Guayaquil",
+    "ciudad": "Guayaquil",
+    "pais": "Ecuador",
+    "gerentes": [
+      {
+        "nombre": "Josue Vera",
+        "email": "josue.vera@crearpsl.net"
+      }
+    ],
+    "razonSocial": "",
+    "identificacionFiscal": "",
+    "direccionFiscal": "",
+    "correoContacto": "",
+    "telefonoContacto": ""
+  },
+  "medellin": {
+    "sede": "Medellín",
+    "ciudad": "Medellín",
+    "pais": "Colombia",
+    "gerentes": [
+      {
+        "nombre": "Yurany G Franco",
+        "email": "yurany.gonzalez@crearpsl.net"
+      }
+    ],
+    "razonSocial": "",
+    "identificacionFiscal": "",
+    "direccionFiscal": "",
+    "correoContacto": "",
+    "telefonoContacto": ""
+  },
+  "mexico": {
+    "sede": "México",
+    "ciudad": "Ciudad de México",
+    "pais": "México",
+    "gerentes": [
+      {
+        "nombre": "Nora Zamora",
+        "email": "nora.zamora@crearpsl.net"
+      }
+    ],
+    "razonSocial": "",
+    "identificacionFiscal": "",
+    "direccionFiscal": "",
+    "correoContacto": "",
+    "telefonoContacto": ""
+  }
+}

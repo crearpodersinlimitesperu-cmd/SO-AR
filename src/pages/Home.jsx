@@ -499,6 +499,11 @@ const CAUSA_OPTIONS_REGISTRY = [
     roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria', 'talento_humano']
   },
   {
+    id: 'opt-datos-cartas', title: 'Datos de sedes para cartas', category: 'Configuración', badge: 'Gerencia', emoji: '📝',
+    desc: 'Completar datos institucionales y responsables de las cartas de invitación',
+    keywords: ['cartas', 'sede', 'razon social', 'ruc', 'responsables'], route: '/datos-sedes-cartas', roles: ['gerente', 'direccion', 'superadmin']
+  },
+  {
     id: 'opt-sedes',
     title: 'Configuración de Sedes y Salones',
     category: 'Configuración',

@@ -1,3 +1,4 @@
+import DatosSedesCartas from './pages/DatosSedesCartas';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import { useUI } from './context/UIContext'
@@ -6,6 +7,7 @@ import './index.css'
 
 import LearningDashboard from './pages/LearningDashboard'
 import ExcellenceDashboard from './pages/ExcellenceDashboard'
+import OnboardingLegal from './pages/OnboardingLegal';
 import Login from './pages/Login'
 import OptOutPage from './pages/OptOutPage'
 import Home from './pages/Home'
@@ -200,6 +202,11 @@ function App() {
           
           <Route path="/" element={<Navigate to="/home" replace />} />
           
+                    <Route path="/onboarding-legal" element={
+            <PrivateRoute>
+              <OnboardingLegal />
+            </PrivateRoute>
+          } />
           <Route path="/home" element={
             <PrivateRoute>
               <Home />
@@ -426,6 +433,7 @@ function App() {
             </RoleRoute>
           } />
           <Route path="/vuelos" element={<Navigate to="/monitor-vuelos" replace />} />
+          <Route path="/datos-sedes-cartas" element={<PrivateRoute><DatosSedesCartas /></PrivateRoute>} />
           <Route path="/cartas" element={<Navigate to="/monitor-vuelos" replace />} />
           
           {/* Ampliado 08/09/2026: la fila "Monitor de IMOs" de la Matriz Oficial

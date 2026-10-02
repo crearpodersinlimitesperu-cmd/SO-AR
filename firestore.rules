@@ -526,5 +526,24 @@ service cloud.firestore {
       allow read: if canReadHojaEnBlanco();
       allow write: if canWriteHojaEnBlanco();
     }
+
+    // Solo datos institucionales destinados a las cartas públicas, sin documentos personales.
+    match /sedes_institucionales/{sedeId} {
+      allow read: if true;
+      allow create, update: if isAuthenticated() && (isSuperAdmin() || (
+        (sedeId == 'lima' && email() in ['jose.sanchez@crearpsl.net']) ||
+        (sedeId == 'quito' && email() in ['emily.campuzano@crearpsl.net', 'freddy.sosa@crearpsl.net']) ||
+        (sedeId == 'cuenca' && email() in ['emely.leon@crearpsl.net', 'ricardogavilanez1021@gmail.com']) ||
+        (sedeId == 'guayaquil' && email() in ['josue.vera@crearpsl.net']) ||
+        (sedeId == 'medellin' && email() in ['yurany.gonzalez@crearpsl.net']) ||
+        (sedeId == 'mexico' && email() in ['nora.zamora@crearpsl.net'])
+      )) && request.resource.data.keys().hasOnly(['razonSocial', 'identificacionFiscal', 'direccionFiscal', 'correoContacto', 'telefonoContacto'])
+      && request.resource.data.razonSocial is string && request.resource.data.razonSocial.size() <= 500
+      && request.resource.data.identificacionFiscal is string && request.resource.data.identificacionFiscal.size() <= 500
+      && request.resource.data.direccionFiscal is string && request.resource.data.direccionFiscal.size() <= 500
+      && request.resource.data.correoContacto is string && request.resource.data.correoContacto.size() <= 500
+      && request.resource.data.telefonoContacto is string && request.resource.data.telefonoContacto.size() <= 500;
+      allow delete: if false;
+    }
   }
 }

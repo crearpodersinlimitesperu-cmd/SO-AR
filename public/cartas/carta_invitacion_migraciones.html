@@ -35,7 +35,10 @@
         <!-- Header -->
         <header class="flex justify-between items-center border-b-2 border-gray-100 pb-6 mb-8">
             <div class="flex items-center gap-4">
-                <img src="https://raw.githubusercontent.com/crearpsl/assets/main/logo_crear.png" alt="Logo CREAR Poder Sin Límites" class="h-16 w-auto object-contain" onerror="this.onerror=null; this.src='logo_crear.png';">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="3000 1100 2000 2300" width="110" height="127" role="img" aria-label="Logo CREAR Poder Sin Límites" style="display:block;flex-shrink:0">
+                    <title>Logo CREAR Poder Sin Límites</title>
+                    <image href="logo_crear_oficial.png" width="8000" height="4500" />
+                </svg>
             </div>
             <div class="text-right">
                 <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Fecha de Emisión</p>
@@ -47,28 +50,26 @@
         <main class="text-gray-700 leading-relaxed space-y-6 text-justify">
             <h1 class="text-xl font-bold uppercase tracking-wide text-gray-900 mb-8">Carta de Invitación Oficial</h1>
             
-            <p class="font-semibold text-gray-900">A las Autoridades de la Superintendencia Nacional de Migraciones de la República del Perú:</p>
+            <p class="font-semibold text-gray-900" id="sede-authority">A las autoridades migratorias:</p>
             
             <p>A quien corresponda,</p>
 
-            <p>
-                Por medio de la presente carta formal, la empresa <strong>CREACIÓN CUÁNTICA E.I.R.L.</strong> (con RUC activo <strong>20612592811</strong> y domicilio fiscal en Lima, Perú), comercialmente conocida como <strong>CREAR Poder Sin Límites</strong>, dedicada al rubro de consultoría, desarrollo personal y formación de liderazgo, emite una invitación oficial a favor del ciudadano extranjero:
-            </p>
+            <p id="sede-invitation"></p>
 
             <div class="bg-gray-50 border border-gray-200 rounded-lg p-5 my-6 mx-2 md:mx-6 shadow-sm">
                 <p class="mb-2"><span class="text-gray-500 uppercase text-xs font-bold tracking-wider">Nombre Completo:</span><br> <span class="text-lg font-bold text-gray-900" id="field-name">[Nombre]</span></p>
-                <p class="mb-2"><span class="text-gray-500 uppercase text-xs font-bold tracking-wider">Nacionalidad:</span><br> <span class="text-lg font-bold text-crearBlue" id="field-nacionalidad">ECUATORIANA</span></p>
+                <p class="mb-2"><span class="text-gray-500 uppercase text-xs font-bold tracking-wider">Nacionalidad:</span><br> <span class="text-lg font-bold text-crearBlue" id="field-nacionalidad">[NACIONALIDAD PENDIENTE]</span></p>
                 <p class="mb-2"><span class="text-gray-500 uppercase text-xs font-bold tracking-wider">Documento de Identidad / Pasaporte:</span><br> <span class="text-lg font-bold text-gray-900 font-mono" id="field-doc">[Documento]</span></p>
                 <p class="mb-2"><span class="text-gray-500 uppercase text-xs font-bold tracking-wider">Calidad de Participación:</span><br> <span class="text-base font-bold text-crearBlue" id="field-role">Invitado Especial Internacional (Invitado Internacional Ad-Honorem)</span></p>
-                <p><span class="text-gray-500 uppercase text-xs font-bold tracking-wider">Hospedaje Reservado:</span><br> <span class="text-base font-bold text-gray-900" id="field-hotel">Hotel José Antonio Deluxe (Calle Bellavista 133, Miraflores, Lima)</span></p>
+                <p><span class="text-gray-500 uppercase text-xs font-bold tracking-wider">Hospedaje Reservado:</span><br> <span class="text-base font-bold text-gray-900" id="field-hotel">[HOSPEDAJE PENDIENTE]</span></p>
             </div>
 
             <p>
-                El motivo de su viaje y estadía en nuestro país obedece a su asistencia como <strong>invitado especial y participante observador</strong> en nuestro evento corporativo denominado <strong>"Entrenamiento de Liderazgo Transformacional"</strong>, el cual se llevará a cabo durante los días <strong id="field-dates">Del 3 al 7 de Septiembre de 2026</strong> en la ciudad de Lima. Cabe resaltar que su visita tiene fines netamente de intercambio vivencial y no contempla ninguna relación laboral, subordinación ni remuneración económica dentro del territorio nacional.
+                El motivo de su viaje y estadía en nuestro país obedece a su asistencia como <strong>invitado especial y participante observador</strong> en nuestro evento corporativo denominado <strong>"Entrenamiento de Liderazgo Transformacional"</strong>, el cual se llevará a cabo durante los días <strong id="field-dates">[FECHAS PENDIENTES]</strong> en <span id="sede-city">la sede de destino</span>. Cabe resaltar que su visita tiene fines netamente de intercambio vivencial y no contempla ninguna relación laboral, subordinación ni remuneración económica dentro del territorio nacional.
             </p>
 
             <p>
-                Dejamos constancia legal y financiera de que <strong>todos los gastos derivados de su estadía en el territorio peruano</strong> —incluyendo hospedaje, transporte interno, alimentación y cualquier viático necesario— <strong>serán asumidos en su totalidad por nuestra organización</strong>. El ciudadano invitado no representará carga económica alguna para el Estado Peruano.
+                Dejamos constancia legal y financiera de que <strong>todos los gastos derivados de su estadía en el país de destino</strong> —incluyendo hospedaje, transporte interno, alimentación y cualquier viático necesario— <strong>serán asumidos en su totalidad por nuestra organización</strong>. El ciudadano invitado no representará carga económica alguna para el país de destino.
             </p>
 
             <p>
@@ -81,29 +82,21 @@
 
             <p class="mt-8">Atentamente,</p>
 
-            <!-- Signature -->
-            <div class="mt-16 mb-4 flex flex-col items-center text-center">
-                <div class="relative w-80 flex flex-col items-center justify-end">
-                    <img src="firma_jose_sanchez.png" alt="Firma José Sánchez" class="h-32 w-auto object-contain -mb-6" style="mix-blend-mode: multiply;">
-                    <div class="w-full border-b-2 border-gray-400 mb-3"></div>
-                </div>
-                <p class="font-bold text-gray-900 uppercase tracking-wide text-lg mt-2">José Sánchez</p>
-                <p class="text-sm text-gray-800 font-semibold">Gerente Administrativo / Apoderado</p>
-                <p class="text-sm text-gray-600">CREACIÓN CUÁNTICA E.I.R.L.</p>
-                <p class="text-sm text-gray-500 mt-1">Lima, Perú | jose.sanchez@crearpsl.com | +51919563284</p>
-            </div>
+            <!-- Sin imagen de firma hasta contar con una firma autorizada de esta sede. -->
+            <div id="sede-signature" class="mt-12 mb-4 text-center"></div>
         </main>
 
         <!-- No Print Controls -->
         <div class="no-print mt-12 pt-6 border-t border-gray-200 flex flex-col md:flex-row gap-4 justify-center items-center">
-            <button onclick="window.print()" class="bg-crearGold hover:bg-yellow-500 text-crearDark font-bold py-3 px-8 rounded-full shadow-lg transition-transform hover:scale-105 flex items-center gap-2">
+            <button id="print-letter" disabled onclick="window.print()" class="bg-crearGold hover:bg-yellow-500 text-crearDark font-bold py-3 px-8 rounded-full shadow-lg transition-transform hover:scale-105 flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z" clip-rule="evenodd" /></svg>
                 Imprimir o PDF
             </button>
-            <p class="text-xs text-gray-400 text-center max-w-sm">Nota: Esta zona de botones y el fondo gris no aparecerán en la impresión. Datos validados automáticamente desde el registro consular oficial.</p>
+            <p class="text-xs text-gray-400 text-center max-w-sm">Nota: Esta zona de botones y el fondo gris no aparecerán en la impresión. Revisa los datos de la invitación antes de imprimir.</p>
         </div>
     </div>
 
+    <script src="carta-sedes.js" defer></script>
     <script>
         const TRAINERS_MASTER = {
             'ERNESTO ALEJANDRO DIAZ PABON': {
@@ -161,22 +154,15 @@
             document.getElementById('current-date').textContent = new Date().toLocaleDateString('es-PE', options);
 
             const params = new URLSearchParams(window.location.search);
-            const rawNombre = (params.get('nombre') || '').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
-
-            let master = null;
-            if (rawNombre.includes('ALEJANDRO') || rawNombre.includes('DIAZ PABON')) {
-                master = TRAINERS_MASTER['ERNESTO ALEJANDRO DIAZ PABON'];
-            } else if (rawNombre.includes('IDROBO') || (rawNombre.includes('ELMER') && rawNombre.includes('ANDRES'))) {
-                master = TRAINERS_MASTER['ELMER ANDRES IDROBO ANDRADE'];
-            } else if (rawNombre.includes('LOURDES') || rawNombre.includes('PATINO') || rawNombre.includes('PATIÑO')) {
-                master = TRAINERS_MASTER['MARIA DE LOURDES PATIÑO GALARRAGA'];
-            } else if (rawNombre.includes('GOMEZ') && rawNombre.includes('ANDRES')) {
-                master = TRAINERS_MASTER['CARLOS ANDRES GOMEZ GOMEZ'];
-            } else if (rawNombre.includes('ARAGON') || rawNombre.includes('FERNANDO')) {
-                master = TRAINERS_MASTER['FERNANDO ARAGON'];
-            } else if (rawNombre.includes('BRAVO') || rawNombre.includes('DIEGO')) {
-                master = TRAINERS_MASTER['DIEGO DAVID BRAVO FIGUEROA'];
-            }
+            const normalizeName = value => value.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().replace(/\s+/g, ' ');
+            const rawNombre = normalizeName(params.get('nombre') || '');
+            // Nationality checked against the identity document on 2026-09-27.
+            // Keep passport scans and identification numbers out of this public registry.
+            const verifiedNationalities = {
+                'MILDRED MUNOZ VASQUEZ': { nacionalidad: 'COLOMBIANA', documento: 'PASAPORTE COLOMBIANO' }
+            };
+            const verifiedIdentity = verifiedNationalities[rawNombre];
+            const master = Object.values(TRAINERS_MASTER).find(person => normalizeName(person.name) === rawNombre);
 
             if (master) {
                 document.getElementById('field-name').textContent = master.name;
@@ -189,7 +175,7 @@
                 const nombreParam = params.get('nombre') ? params.get('nombre').toUpperCase() : '[NOMBRE COMPLETO]';
                 document.getElementById('field-name').textContent = nombreParam;
                 
-                let nac = params.get('nacionalidad') ? params.get('nacionalidad').toUpperCase() : 'ECUATORIANA';
+                let nac = params.get('nacionalidad') ? params.get('nacionalidad').toUpperCase() : '[NACIONALIDAD PENDIENTE]';
                 document.getElementById('field-nacionalidad').textContent = nac;
 
                 let doc = params.get('doc') ? params.get('doc').toUpperCase() : '[DOCUMENTO / PASAPORTE]';
@@ -200,16 +186,23 @@
                 if (params.get('hotel')) document.getElementById('field-hotel').textContent = params.get('hotel');
             }
 
-            // Fallback safety to never allow 'COLOMBIANA' for Alejandro or Elmer Idrobo
-            const displayedName = document.getElementById('field-name').textContent.toUpperCase();
-            if (displayedName.includes('DIAZ PABON') || displayedName.includes('ALEJANDRO') || displayedName.includes('IDROBO')) {
-                document.getElementById('field-nacionalidad').textContent = 'ECUATORIANA';
-                if (displayedName.includes('ALEJANDRO') || displayedName.includes('DIAZ PABON')) {
-                    document.getElementById('field-doc').textContent = 'PASAPORTE ECUATORIANO Nº A4152916 (C.I. 1727274928)';
-                } else if (displayedName.includes('IDROBO')) {
-                    document.getElementById('field-doc').textContent = 'PASAPORTE ECUATORIANO Nº A9919241 (C.I. 1712332350)';
-                }
+            document.getElementById('field-dates').textContent = params.get('fechas')?.trim() || '[FECHAS PENDIENTES]';
+            document.getElementById('field-hotel').textContent = params.get('hotel')?.trim() || '[HOSPEDAJE PENDIENTE]';
+
+            // Explicit form values take priority over saved records.
+            if (params.has('nacionalidad')) {
+                document.getElementById('field-nacionalidad').textContent = params.get('nacionalidad').trim().toUpperCase() || '[NACIONALIDAD PENDIENTE]';
             }
+            if (params.has('doc')) {
+                document.getElementById('field-doc').textContent = params.get('doc').trim().toUpperCase() || '[DOCUMENTO / PASAPORTE]';
+            }
+
+            // Verified identity takes precedence over stale or incorrect URL values.
+            if (verifiedIdentity) {
+                document.getElementById('field-nacionalidad').textContent = verifiedIdentity.nacionalidad;
+                document.getElementById('field-doc').textContent = verifiedIdentity.documento;
+            }
+
         });
     </script>
 </body>
