@@ -271,6 +271,11 @@ export function AuthProvider({ children }) {
     assignedRoles = assignedRoles.filter(r => r != null);
     
     // Si es SuperAdmin, inyectarle los roles gerenciales y de consolidado para que tenga el selector
+    // Si el usuario tiene múltiples roles (más de 1) debe tener acceso a "consolidado"
+    if (assignedRoles.length > 1 && !assignedRoles.includes('consolidado')) {
+      assignedRoles.push('consolidado');
+    }
+
     if (isSuperAdmin) {
       if (!assignedRoles.includes('gerente')) assignedRoles.push('gerente');
       if (!assignedRoles.includes('direccion')) assignedRoles.push('direccion');
@@ -304,6 +309,11 @@ export function AuthProvider({ children }) {
     const enforceDirectorMaestriaDefault = canonicalRole === 'director_maestria';
     if (!enforceDirectorMaestriaDefault && savedActiveRole && (assignedRoles.includes(savedActiveRole) || isSuperAdmin)) {
       activeRole = savedActiveRole;
+    // Si el usuario tiene múltiples roles (más de 1) debe tener acceso a "consolidado"
+    if (assignedRoles.length > 1 && !assignedRoles.includes('consolidado')) {
+      assignedRoles.push('consolidado');
+    }
+
     } else if (isSuperAdmin) {
       activeRole = 'consolidado';
     } else if (assignedRoles.length > 0) {
