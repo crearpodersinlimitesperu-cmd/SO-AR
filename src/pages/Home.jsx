@@ -39,43 +39,26 @@ import EffectiveCommunicationButton from '../components/EffectiveCommunicationBu
 import { getAllCompanyUsers } from '../services/userService';
 import UserProfileModal from '../components/UserProfileModal';
 import HorariosEntrenamientoModal from '../components/HorariosEntrenamientoModal';
-import { INITIAL_MANAGERS } from '../data/managersData';
+import { INITIAL_MANAGERS, normalizeTrainer } from '../data/managersData';
 
 /**
  * Normaliza y verifica si un evento está asignado a un entrenador específico
  */
 const isTrainerMatchingUser = (evTrainer, user) => {
   if (!evTrainer || !user) return false;
-  const normalize = (str) => (str || '')
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .toLowerCase()
-    .trim();
 
-  const trainerStr = normalize(evTrainer);
-  const userName = normalize(user.name || user.displayName || '');
-  const userEmail = normalize(user.email || '');
+  const evTrainerStr = String(evTrainer).trim();
+  if (!evTrainerStr || evTrainerStr.toLowerCase() === 'tba' || /^\d+$/.test(evTrainerStr) || /^eq\s*\d+$/i.test(evTrainerStr)) return false;
 
-  if (!trainerStr || trainerStr === 'tba' || /^\d+$/.test(trainerStr) || /^eq\s*\d+$/i.test(trainerStr)) return false;
-
-  if (userName && (trainerStr.includes(userName) || userName.includes(trainerStr))) return true;
-
-  const nameParts = userName.split(/\s+/).filter(p => p.length >= 3);
-  const trainerParts = trainerStr.split(/[\/\s,\-]+/).filter(p => p.length >= 3);
+  const userIdentity = normalizeTrainer(user.name || user.displayName || '');
   
-  if (nameParts.length > 0) {
-    const matchedTokens = nameParts.filter(part => trainerParts.some(tp => tp.includes(part) || part.includes(tp)));
-    if (matchedTokens.length >= Math.min(2, nameParts.length)) return true;
-  }
+  // Dividir entrenadores si hay múltiples en la celda ("Fer Aragon / Fer Mendoza")
+  const evTrainersList = evTrainerStr
+    .split(/[,/&•]+/)
+    .map(t => normalizeTrainer(t.trim()))
+    .filter(Boolean);
 
-  const emailPrefix = userEmail.split('@')[0];
-  const emailTokens = emailPrefix.split(/[\._\-]/).filter(t => t.length >= 3);
-  if (emailTokens.length > 0) {
-    const matchedEmailTokens = emailTokens.filter(tok => trainerParts.some(tp => tp.includes(tok) || tok.includes(tp)));
-    if (matchedEmailTokens.length >= Math.min(2, emailTokens.length)) return true;
-  }
-
-  return false;
+  return evTrainersList.includes(userIdentity);
 };
 
 // El Asignador guarda una proyección mínima y pública de la asignación

@@ -10801,6 +10801,7 @@ export const normalizeTrainer = (name) => {
   "Daniela Monroy": "Daniela Monroy Fabbri",
   "Daniela Monroy Fabbri": "Daniela Monroy Fabbri",
   "Fernando Mendoza": "Haydin Fernando Mendoza Clavijo",
+  "Fer Mendoza": "Haydin Fernando Mendoza Clavijo",
   "Haydin Fernando Mendoza Clavijo": "Haydin Fernando Mendoza Clavijo",
   "Jonathan La Rosa": "Jonathan Alexander La Rosa Nieto",
   "Jonathan Alexander La Rosa Nieto": "Jonathan Alexander La Rosa Nieto",
