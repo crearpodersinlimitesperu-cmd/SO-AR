@@ -24,6 +24,9 @@ import VenueConfigModal from '../components/VenueConfigModal';
 import ViewModeSelector from '../components/ViewModeSelector';
 import ThemeToggle from '../components/ThemeToggle';
 import { getVenueForTraining } from '../data/venuesData';
+import LegalOnboardingModal from './components/LegalOnboardingModal';
+import { getLegalStatusByParticipant } from './services/legalSignatureService';
+
 import { ROLE_DISPLAY_NAMES, normalizeSede } from '../data/usersData';
 import {
   canAssignTrainer, canViewAllManagers, isDireccionRole, isGlobalQTCoordinator,
@@ -652,6 +655,35 @@ const getCountdownInfo = (deadlineIso, now) => {
 };
 
 export default function Home() {
+  const [showLegalModal, setShowLegalModal] = useState(false);
+  const [isCheckingLegal, setIsCheckingLegal] = useState(true);
+
+  // Check legal status on mount
+  useEffect(() => {
+    let isMounted = true;
+    const checkLegal = async () => {
+      if (!currentUser?.email) {
+        if (isMounted) setIsCheckingLegal(false);
+        return;
+      }
+      try {
+        const sig = await getLegalStatusByParticipant(currentUser.email);
+        if (isMounted) {
+          // Si no tiene firma completada o le faltan campos, mostrar modal
+          if (!sig || !sig.terms_accepted || !sig.nda_signed || !sig.privacy_accepted) {
+            setShowLegalModal(true);
+          }
+          setIsCheckingLegal(false);
+        }
+      } catch (err) {
+        console.error('Error checking legal status:', err);
+        if (isMounted) setIsCheckingLegal(false);
+      }
+    };
+    checkLegal();
+    return () => { isMounted = false; };
+  }, [currentUser]);
+
   const hasRoleAccess = (allowedRoles) => {
     if (currentUser?.isSuperAdmin && !currentUser?.isSimulated) return true;
     if (currentUser?.appRole === 'consolidado') return true;
