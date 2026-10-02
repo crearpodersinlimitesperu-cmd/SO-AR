@@ -30,7 +30,8 @@ import {
   List,
   Flame,
   FileSpreadsheet,
-  MessageSquare
+  MessageSquare,
+  Zap
 } from 'lucide-react';
 
 function InstagramIcon({ size = 14 }) {
@@ -218,6 +219,13 @@ export default function DirectorioQT() {
         </button>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <button 
+            onClick={() => navigate('/qt-hub')}
+            className="btn-primary"
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.55rem 1.1rem', borderRadius: '8px', cursor: 'pointer', fontWeight: 700 }}
+          >
+            <Zap size={16} /> Hub Operativo Pit-Stop (Boxes)
+          </button>
           {currentUser?.isSuperAdmin && !isNonOperationalDirector(currentUser) && (
             <button 
               onClick={() => loadMembers(true)}

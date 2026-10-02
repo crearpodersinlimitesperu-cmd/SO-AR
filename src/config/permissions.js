@@ -1,4 +1,4 @@
-﻿// Configuración centralizada de permisos y roles administrativos
+// Configuración centralizada de permisos y roles administrativos
 // Este archivo es la ÚNICA fuente de verdad para emails con privilegios elevados.
 // Cualquier cambio de SuperAdmin se hace AQUÍ, no disperso en el código.
 
@@ -872,7 +872,6 @@ export const canAccessPagosSemanalesDrive = (currentUser) => {
 export const canManageUserStatus = (currentUser) => {
   if (!currentUser) return false;
   if (currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email)) return true;
-  if (isDireccionRole(currentUser.appRole) || currentUser.isDireccion) return true;
 
   const role = (currentUser.appRole || currentUser.role || '').toLowerCase();
   const roles = Array.isArray(currentUser.roles) ? currentUser.roles.map(r => String(r).toLowerCase()) : [];
@@ -882,7 +881,7 @@ export const canManageUserStatus = (currentUser) => {
   }
 
   const email = (currentUser.email || '').trim().toLowerCase();
-  if (email === 'talento.humano@crearpsl.net' || email.includes('talento.humano') || email.includes('rrhh')) {
+  if (email === 'talento.humano@crearpsl.net' || email.includes('talento.humano') || email.includes('rrhh') || email.includes('lennin')) {
     return true;
   }
 

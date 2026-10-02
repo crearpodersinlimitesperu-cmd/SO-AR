@@ -475,6 +475,25 @@ Con el fin de profesionalizar y escalar la operación sin fricción ni pérdida 
       - **Pasivo Flotante de Entrenadores Real:** $33,250 USD pendiente de pago (2,241 llamadas pendientes a 34 entrenadores de la nómina real de `kpisEntrenadoresData.json` y `liquidaciones_pagos`).
       - **Pestañas Especializadas:** Auditoría Zero-Trust de Sedes con Kill-Switch interactivo conectado a Firestore `hq_operational_status`, desglose de los 34 entrenadores con porcentaje de liquidación y tasa de graduación, y trazabilidad de cierres diarios (`finance_daily_close`).
 
+13. **Auditoría Forense y Ejecución de Tareas Pre-Colapso del Modelo:**
+    * **Restricción Estricta de Personal Inactivo (Mandato Dirección):**
+      - En `src/config/permissions.js`, se removió la permisividad a `isDireccionRole` en `canManageUserStatus`.
+      - Ahora la visibilidad y gestión de colaboradores dados de baja/inactivos está restringida **ÚNICA Y EXCLUSIVAMENTE** a Super Administradores (`jose.sanchez@crearpsl.net` / `isSuperAdmin`) y Talento Humano (`lennin.chasi@crearpsl.net` / `talento_humano` / `director_th`). Ningún otro rol de gerencia o dirección tiene visibilidad de personal inactivo.
+    * **Blindaje de Identidad de Cirilo Agustín Martínez (México):**
+      - En `public/cartas/carta_invitacion_migraciones.html`, se fijó en la tabla inmutable `verifiedNationalities` a `CIRILO AGUSTIN MARTINEZ` y `CIRILO MARTINEZ` con Nacionalidad `MEXICANA` y Documento `PASAPORTE MEXICANO`.
+      - Se blindó contra sobreescritura de parámetros en la URL, asegurando la verdad histórica oficial.
+    * **KPIs Oficiales de Piso Quantum Team — C1E31 Lima:**
+      - Se estructuraron los datos de la hoja de cálculo oficial en `src/data/qtKpis.js`: Rossmery Ochoa (55 PX, 9 desertores, 46 PX fin, 14 pagos, PP: 30%), Gina Cárdenas (62 PX, 15 desertores, 47 PX fin, 18 pagos, PP: 38%) y Totales Consolidados (117 PX, 24 desertores, 93 PX fin, 32 pagos, PP: 34.4%).
+      - En `src/pages/QuantumTeamHub.jsx`, se eliminó el bloqueo por correo individual y se creó un conmutador ejecutivo para que la Dirección, Gerentes y Coordinadores puedan auditar a cada líder o los totales.
+      - Se implementó el doble despachador de notificaciones: encolamiento automático en Firestore `mail` para Nodemailer y apertura directa vía `mailto:` para enviar los feedbacks en un clic.
+      - Se añadió el botón de enlace bidireccional entre el `DirectorioQT.jsx` y el `QuantumTeamHub.jsx` (`/qt-hub`).
+    * **Resolución del Botón "Auditoría de Datos / PDF" en LegalStatusPanel:**
+      - En `src/pages/LegalStatusPanel.jsx`, se sustituyó la llamada asíncrona a `window.open` (bloqueada silenciosamente por las directivas de seguridad de navegadores modernos) por un Visor Modal Interactivo de Certificación Legal.
+      - El modal expone la firma digital SHA-256, traza IP, datos KYC completos del participante, vista previa del acuerdo, impresión directa (`window.print()`) y descarga inmediata de respaldo sin bloqueos.
+    * **Alto Contraste y Normalización Canónica de las Torres de Control:**
+      - `AndresCommandCenter.jsx` y `CallCoachCRM.jsx` fueron migrados a variables de diseño adaptativas (`var(--bg-dark)`, `var(--bg-card)`, etc.) asegurando perfecta legibilidad en modo claro y modo oscuro.
+      - En `andresService.js`, se fijaron las 5 sedes oficiales de CREAR (Lima, Quito, Medellín, Guayaquil, Cuenca) más la base de México con Cirilo Martínez.
+
 ---
 
 > 📜 **Mandato de la Caja Negra:**
