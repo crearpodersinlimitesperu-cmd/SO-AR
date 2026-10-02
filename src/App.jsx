@@ -223,6 +223,11 @@ function App() {
               <MaestriaGlobalDashboard />
             </RoleRoute>
           } />
+          <Route path="/trainer-hub" element={
+            <RoleRoute allowedRoles={['entrenador', 'direccion', 'superadmin', 'ceo', 'director_maestria']} requireSuperAdmin={false}>
+              <TrainerZenHub />
+            </RoleRoute>
+          } />
           <Route path="/onboarding-legal" element={
             <OnboardingLegal />
           } />
