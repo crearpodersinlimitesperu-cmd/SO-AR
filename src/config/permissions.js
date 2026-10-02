@@ -128,23 +128,43 @@ export const isNonOperationalDirector = (currentUser) => {
   return false;
 };
 
+export const MAESTRIA_COORDINATOR_EMAILS = [
+  'linid.valencia@crearpsl.net',
+  'judith.romero@crearpsl.net',
+  'erika.gavilanez@crearpsl.net',
+  'liliana.cubillo@crearpsl.net',
+  'andres.gomez@crearpsl.net'
+];
+
+export const isMaestriaCoordinator = (currentUser) => {
+  if (!currentUser) return false;
+  const email = (currentUser.email || '').toLowerCase().trim();
+  if (MAESTRIA_COORDINATOR_EMAILS.includes(email) || email.includes('linid') || email.includes('maestria') || email.includes('judith.romero')) return true;
+  const r = (currentUser.appRole || currentUser.role || '').toLowerCase();
+  const roles = Array.isArray(currentUser.roles) ? currentUser.roles.map(x => String(x).toLowerCase()) : [];
+  return r === 'coord_maestria' || r === 'coordinador_mj' || r === 'director_maestria' ||
+         roles.includes('coord_maestria') || roles.includes('coordinador_mj') || roles.includes('director_maestria');
+};
+
 /**
  * Verifica si un usuario puede agregar nuevos managers (Coordinador Maestría, Director Maestría o SuperAdmin)
  */
 export const canAddManagers = (currentUser) => {
   if (!currentUser) return false;
   if (currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email)) return true;
+  if (isMaestriaCoordinator(currentUser)) return true;
   const r = currentUser.appRole || currentUser.role;
-  if (r === 'director_maestria' || r === 'coord_maestria' || r === 'coordinador_mj') return true;
+  if (r === 'director_maestria' || r === 'coord_maestria' || r === 'coordinador_mj' || r === 'coord_c1' || r === 'coordinador_c1' || r === 'coordinador_c1c2' || r === 'gerente') return true;
   if (Array.isArray(currentUser.roles) && (
     currentUser.roles.includes('coord_maestria') || 
     currentUser.roles.includes('coordinador_mj') || 
-    currentUser.roles.includes('director_maestria')
+    currentUser.roles.includes('director_maestria') ||
+    currentUser.roles.includes('coord_c1') ||
+    currentUser.roles.includes('coordinador_c1') ||
+    currentUser.roles.includes('gerente')
   )) {
     return true;
   }
-  const email = (currentUser.email || '').toLowerCase();
-  if (email === 'linid.valencia@crearpsl.net' || email.includes('linid') || email.includes('maestria')) return true;
   return false;
 };
 
@@ -161,6 +181,7 @@ export const canAddManagers = (currentUser) => {
 export const canAssignTrainer = (currentUser) => {
   if (!currentUser) return false;
   if (currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email)) return true;
+  if (isMaestriaCoordinator(currentUser)) return true;
 
   // 🎓 REGLA CATEGÓRICA: Coordinadores y Directores de Maestría tienen pleno poder de asignación
   const r = currentUser.appRole || currentUser.role;
@@ -174,14 +195,6 @@ export const canAssignTrainer = (currentUser) => {
   }
 
   const email = (currentUser.email || '').trim().toLowerCase();
-  if (
-    email === 'linid.valencia@crearpsl.net' || 
-    email.includes('linid') || 
-    email.includes('maestria')
-  ) {
-    return true;
-  }
-
   // Fer y Paul autorizados
   const allowedEmails = [
     'fer.aragon@crearpsl.net',
@@ -195,7 +208,9 @@ export const canAssignTrainer = (currentUser) => {
     name.includes('fer aragon') || 
     name.includes('fernando aragon') || 
     name.includes('paul sosa') ||
-    name.includes('linid')
+    name.includes('linid') ||
+    name.includes('judith') ||
+    name.includes('regina romero')
   ) {
     return true;
   }
@@ -217,6 +232,7 @@ export const canAssignTrainer = (currentUser) => {
 export const canChangeManagerStatus = (currentUser) => {
   if (!currentUser) return false;
   if (currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email)) return true;
+  if (isMaestriaCoordinator(currentUser)) return true;
   const r = currentUser.appRole || currentUser.role;
   if (r === 'director_maestria' || r === 'coord_maestria' || r === 'coordinador_mj') return true;
   if (Array.isArray(currentUser.roles) && (
@@ -226,8 +242,6 @@ export const canChangeManagerStatus = (currentUser) => {
   )) {
     return true;
   }
-  const email = (currentUser.email || '').toLowerCase();
-  if (email === 'linid.valencia@crearpsl.net' || email.includes('linid') || email.includes('maestria')) return true;
   return false;
 };
 
@@ -268,6 +282,7 @@ export const canViewInactiveUsers = (currentUser) => {
 export const canViewAllManagers = (currentUser) => {
   if (!currentUser) return false;
   if (currentUser.isSuperAdmin || currentUser.isDireccion || isSuperAdminEmail(currentUser.email) || isGlobalObserver(currentUser)) return true;
+  if (isMaestriaCoordinator(currentUser)) return true;
   const r = currentUser.appRole || currentUser.role;
   return r === 'director_maestria' || isDireccionRole(r);
 };
@@ -278,6 +293,7 @@ export const canViewAllManagers = (currentUser) => {
 export const canViewSede = (currentUser) => {
   if (!currentUser) return false;
   if (currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email) || isGlobalObserver(currentUser)) return true;
+  if (isMaestriaCoordinator(currentUser)) return true;
   const r = currentUser.appRole || currentUser.role;
   const roles = Array.isArray(currentUser.roles) ? currentUser.roles : [];
   // Gerentes, Coordinadores y Capitanes pueden ver su sede

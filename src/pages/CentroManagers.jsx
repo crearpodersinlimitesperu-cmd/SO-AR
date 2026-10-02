@@ -174,7 +174,9 @@ export default function CentroManagers() {
     
     const isGlobal = canViewAllManagers(currentUser) || isDireccionRole(currentUser) || ['jose.sanchez@crearpsl.net', 'armando.pilacuan@gmail.com', 'paul.sosa@crearpsl.net'].includes(currentUser?.email?.toLowerCase());
     const baseCol = collection(db, 'managers_directory');
-    const q = (!isGlobal && currentUser.sede) ? query(baseCol, where('sede', '==', currentUser.sede)) : baseCol;
+    // Cargar coleccion completa: CentroManagers aplica filtrado fino y jerarquico en filteredManagers
+    // Esto previene que ligeras variantes en el texto de la sede (ej. 'Quito' vs 'Quito Ciclo 1') dejen en blanco la vista.
+    const q = baseCol;
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const firestoreManagers = [];
@@ -268,7 +270,7 @@ export default function CentroManagers() {
     if (!currentUser) return;
     const isGlobal = canViewAllManagers(currentUser) || isDireccionRole(currentUser) || ['jose.sanchez@crearpsl.net', 'armando.pilacuan@gmail.com', 'paul.sosa@crearpsl.net'].includes(currentUser?.email?.toLowerCase());
     const baseCol = collection(db, 'llamadas_grupales_historial');
-    const q = (!isGlobal && currentUser.sede) ? query(baseCol, where('sede', '==', currentUser.sede)) : baseCol;
+    const q = baseCol;
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const rows = [];
@@ -295,7 +297,7 @@ export default function CentroManagers() {
     let notasQuery;
     if (userCanViewAllNotas) {
       const baseCol = collection(db, 'notas_seguimiento');
-      notasQuery = (!isGlobal && currentUser.sede) ? query(baseCol, where('sede', '==', currentUser.sede)) : baseCol;
+      notasQuery = baseCol;
     } else {
       notasQuery = query(collection(db, 'notas_seguimiento'), where('autorEmail', '==', currentUser.email));
     }

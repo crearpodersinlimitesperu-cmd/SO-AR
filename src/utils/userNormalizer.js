@@ -117,8 +117,9 @@ export const normalizeUserRecord = (data, source = 'unknown') => {
   const corporateEmail = data.corporateEmail ? normalizeEmail(data.corporateEmail) : (emailsArray.find(e => e && e.includes('@crearpsl.net')) || null);
   const personalEmail = data.personalEmail ? normalizeEmail(data.personalEmail) : (emailsArray.find(e => e && !e.includes('@crearpsl.net')) || null);
 
-  const nRoles = normalizeRoles(data.roles, data.role);
-  const nRole = data.role ? normalizeRole(data.role) : nRoles[0]; // Respetar el rol principal explícito.
+  const explicitRole = data.role || data.rol || data.cargo;
+  const nRoles = normalizeRoles(data.roles, explicitRole);
+  const nRole = explicitRole ? normalizeRole(explicitRole) : nRoles[0]; // Respetar el rol principal explícito.
   const activeRole = data.activeRole ? normalizeRole(data.activeRole) : nRole;
   
   const nSede = normalizeSede(data.sede);

@@ -9,6 +9,7 @@ import { useUI } from './UIContext';
 import { recordAuditEvent, fetchNetworkInfo } from '../services/auditService';
 import { normalizeUserRecord } from '../utils/userNormalizer';
 import { enforceUserRolesAgent } from '../services/roleAgentDaemon';
+import { canonicalSede } from '../utils/sede';
 
 const AuthContext = createContext();
 
@@ -229,12 +230,17 @@ export function AuthProvider({ children }) {
     
     // Prioridad: Base de Datos Firestore (cuando ha sido configurada o actualizada) > Catálogo oficial
     const hasAdminUpdatedRoles = Boolean(foundUser.rolesUpdatedAt || foundUser.rolesUpdatedBy);
-    const hasSpecificDbRole = Boolean(foundUser.role && foundUser.role !== 'colaborador' && foundUser.role !== 'miembro');
-    const hasSpecificDbRoles = Boolean(Array.isArray(foundUser.roles) && foundUser.roles.length > 0);
+    const dbRole = foundUser.role || foundUser.rol || foundUser.cargo;
+    const hasSpecificDbRole = Boolean(dbRole && dbRole !== 'colaborador' && dbRole !== 'miembro');
+    const hasSpecificDbRoles = Boolean(
+      Array.isArray(foundUser.roles) && 
+      foundUser.roles.length > 0 && 
+      !foundUser.roles.every(r => r === 'colaborador' || r === 'miembro')
+    );
     const isRoleConfiguredInDb = hasAdminUpdatedRoles || (hasSpecificDbRole && hasSpecificDbRoles);
 
     let canonicalRole = normalizeRole(
-      isRoleConfiguredInDb ? foundUser.role : (officialProfile?.role || foundUser.role || 'colaborador')
+      isRoleConfiguredInDb ? dbRole : (officialProfile?.role || dbRole || 'colaborador')
     );
     const isSuperAdmin = isSuperAdminEmail(normalizedEmail) || isSuperAdminEmail(foundUser.email);
     const isDualTrainer = DUAL_ROLE_TRAINER_EMAILS.includes(normalizedEmail);
@@ -312,6 +318,13 @@ export function AuthProvider({ children }) {
       if (!foundUser.roleSedes.qt) foundUser.roleSedes.qt = 'Quito';
     }
 
+    // Judith Regina Romero Rosales: Coordinadora de Maestría del Juego (Quito)
+    const isJudithRomero = ['judith.romero@crearpsl.net'].includes(normalizedEmail) || ['judith.romero@crearpsl.net'].includes(rawEmail);
+    if (isJudithRomero) {
+      if (!assignedRoles.includes('coord_maestria')) assignedRoles.push('coord_maestria');
+      canonicalRole = 'coord_maestria';
+    }
+
     // Asegurar que no quede 'coordinador' administrativo si el usuario tiene un cargo específico
     const hasSpecificRole = assignedRoles.some(r => ['coord_c1', 'coord_maestria', 'director_maestria', 'gerente', 'cfo', 'direccion'].includes(r));
     if (hasSpecificRole) {
@@ -370,7 +383,7 @@ export function AuthProvider({ children }) {
       // La sede efectiva acompaña el rol activo. Ej.: Ricardo Gavilánez es
       // Gerente de Cuenca y QT de Quito; al alternar rol no debe heredar la
       // sede equivocada ni contaminar los filtros de cada operación.
-      sede: (foundUser.roleSedes || officialProfile?.roleSedes)?.[activeRole] || foundUser.sede || officialProfile?.sede || 'Global',
+      sede: canonicalSede((foundUser.roleSedes || officialProfile?.roleSedes)?.[activeRole] || foundUser.sede || officialProfile?.sede || 'Global'),
       roleSedes: { ...(officialProfile?.roleSedes || {}), ...(foundUser.roleSedes || {}) },
       // (14/09/2026) NUEVO CAMPO: equiposQuito — José confirmó que, a diferencia de
       // las demás sedes (que corren UN solo equipo a la vez), Quito corre VARIOS

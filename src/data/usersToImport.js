@@ -594,7 +594,8 @@ export const USERS_TO_IMPORT = [
   },
   {
     "id": "staff_judithreginaromerorosales",
-    "name": "Regina Romero",
+    "name": "Judith Regina Romero Rosales",
+    "displayName": "Regina Romero",
     "role": "coord_maestria",
     "roles": [
       "coord_maestria"

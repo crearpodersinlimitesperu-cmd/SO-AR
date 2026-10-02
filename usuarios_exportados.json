@@ -322,9 +322,11 @@
   {
     "id": "judith_romero",
     "nombre": "Judith Regina Romero Rosales",
-    "email": "(sin correo)",
+    "email": "judith.romero@crearpsl.net",
     "rol": "coord_maestria",
-    "sede": "Quito Ciclo 1",
+    "role": "coord_maestria",
+    "roles": ["coord_maestria"],
+    "sede": "Quito",
     "contacto": "(sin contacto)",
     "superAdmin": "No",
     "cumpleanos": ""
