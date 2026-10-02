@@ -251,10 +251,10 @@ const LegalOnboardingModal = ({ currentUser, sede, onComplete, onClose }) => {
           {isIntro && (
             <div style={{ padding: '2rem 2.5rem', overflowY: 'auto' }}>
               <h2 style={{ color: 'var(--text-heading)', marginTop: 0, fontSize: '1.6rem', fontFamily: 'var(--font-heading)', fontWeight: 800, marginBottom: '0.5rem' }}>
-                Bienvenido/a al nivel premium, <span style={{ color: 'var(--crear-gold)' }}>{currentUser?.name?.split(' ')[0] || 'Líder'}</span>
+                Bienvenido/a a la plataforma oficial, <span style={{ color: 'var(--crear-gold)' }}>{currentUser?.name?.split(' ')[0] || 'Líder'}</span>
               </h2>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '2rem' }}>
-                Estás a un paso de iniciar el <strong>Programa de Creación</strong>. Para garantizar tu seguridad, privacidad y blindaje de datos de alto valor en <strong>{contracts.countryName}</strong>, requerimos tu firma en los siguientes acuerdos de neurocomunicación y protección:
+                Para garantizar tu seguridad, privacidad y el blindaje de datos de alto valor en <strong>{contracts.countryName}</strong>, todos los miembros (participantes, aliados, entrenadores y equipo interno) deben confirmar los siguientes acuerdos, privacidad y blindaje de datos de alto valor en <strong>{contracts.countryName}</strong>, requerimos tu firma en los siguientes acuerdos de neurocomunicación y protección:
               </p>
               
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', marginBottom: '2rem' }}>
@@ -447,7 +447,7 @@ const LegalOnboardingModal = ({ currentUser, sede, onComplete, onClose }) => {
                 ¡Tu poder ya no tiene límites!
               </h2>
               <p style={{ color: 'var(--text-muted)', lineHeight: 1.6, maxWidth: '440px', fontSize: '0.95rem' }}>
-                Tus documentos han sido sellados digitalmente bajo altos estándares de neurocomunicación. Tu acceso al <strong>Programa de Creación</strong> es oficial.
+                Tus documentos han sido sellados digitalmente bajo altos estándares de neurocomunicación. Tu acceso a la <strong>Plataforma Oficial (Causa OS / Campus)</strong> ha sido habilitado.
               </p>
               
               <div style={{ background: 'var(--bg-dark)', border: '1px solid var(--border-strong)', borderRadius: 'var(--radius-md)', padding: '1.5rem', fontSize: '0.85rem', color: 'var(--text-main)', width: '100%', maxWidth: '440px', textAlign: 'left', marginTop: '1rem' }}>

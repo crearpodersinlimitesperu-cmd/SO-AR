@@ -91,10 +91,10 @@ export default function Login() {
             CREAR PODER SIN LÍMITES
           </div>
           <h1 style={{ color: 'var(--text-heading)', margin: '0 0 0.5rem', fontSize: '1.6rem', fontFamily: 'var(--font-heading)', fontWeight: 800 }}>
-            Bienvenido al Programa de Creación
+            Plataforma Oficial de Firmas y Accesos
           </h1>
           <p style={{ color: 'var(--text-muted)', marginBottom: '2.5rem', fontSize: '0.95rem', lineHeight: 1.6 }}>
-            Para iniciar tu proceso de revisión y firma de documentos legales, por favor ingresa con tu cuenta de correo asociada.
+            Para iniciar el proceso de revisión y firma digital de tus documentos legales (Aliados, Participantes y Equipo), por favor ingresa con tu cuenta de correo asociada.
           </p>
           
           <button 
