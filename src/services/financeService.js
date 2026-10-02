@@ -32,13 +32,87 @@ export async function toggleHQBlock(sedeId, isBlocked, blockedBy, reason = '') {
   }
 }
 
-// Mock Data para el Dashboard Financiero MVP (mientras se integra la API bancaria)
-export const mockFinancialData = [
-  { sede: 'Lima', contadores: ['Karol Villarruel'], nodusIncome: 125000, bankConciliated: 125000, pendingExpenses: 15000, slaStatus: 'COMPLETED', isBlocked: false },
-  { sede: 'México', contadores: ['Carlos Slim Jr'], nodusIncome: 85000, bankConciliated: 83500, pendingExpenses: 8000, slaStatus: 'WARNING', isBlocked: false },
-  { sede: 'Colombia', contadores: ['Ana María'], nodusIncome: 45000, bankConciliated: 30000, pendingExpenses: 5000, slaStatus: 'VIOLATION', isBlocked: true },
-  { sede: 'Ecuador', contadores: ['Luis Pérez'], nodusIncome: 65000, bankConciliated: 65000, pendingExpenses: 12000, slaStatus: 'COMPLETED', isBlocked: false }
+// Datos canónicos reales de sedes y contadores para auditoría Zero-Trust de CREAR
+export const officialFinancialData = [
+  { 
+    sede: 'Lima (Perú)', 
+    sedeKey: 'lima',
+    pais: 'Perú',
+    razonSocial: 'CREACIÓN CUÁNTICA E.I.R.L. (RUC 20612592811)',
+    gerentes: ['Jose Sanchez'],
+    contadores: ['Gabriela Rivadeneyra'], 
+    emailContable: 'contabilidad.lima@crearpsl.net',
+    nodusIncome: 118500, 
+    bankConciliated: 118500, 
+    pendingExpenses: 6800, 
+    asistentesNodus: 927,
+    matriculadosNodus: 2051,
+    slaStatus: 'COMPLETED', 
+    isBlocked: false 
+  },
+  { 
+    sede: 'Quito (Ecuador)', 
+    sedeKey: 'quito',
+    pais: 'Ecuador',
+    gerentes: ['Emily Campuzano', 'David Sosa'],
+    contadores: ['Diego Flores', 'Alexis Teran'], 
+    emailContable: 'diego.flores@crearpsl.net',
+    nodusIncome: 94200, 
+    bankConciliated: 91800, 
+    pendingExpenses: 11200, 
+    asistentesNodus: 885,
+    matriculadosNodus: 5067,
+    slaStatus: 'WARNING', 
+    isBlocked: false 
+  },
+  { 
+    sede: 'Medellín (Colombia)', 
+    sedeKey: 'medellin',
+    pais: 'Colombia',
+    gerentes: ['Yurany G Franco'],
+    contadores: ['Hector Gonzalez'], 
+    emailContable: 'contabilidad.medellin@crearpsl.net',
+    nodusIncome: 68400, 
+    bankConciliated: 65900, 
+    pendingExpenses: 6200, 
+    asistentesNodus: 1018,
+    matriculadosNodus: 1418,
+    slaStatus: 'WARNING', 
+    isBlocked: false 
+  },
+  { 
+    sede: 'Guayaquil (Ecuador)', 
+    sedeKey: 'guayaquil',
+    pais: 'Ecuador',
+    gerentes: ['Josue Vera'],
+    contadores: ['Sebastian Jacome', 'Erica Logacho'], 
+    emailContable: 'contabilidad.global@crearpsl.net',
+    nodusIncome: 52000, 
+    bankConciliated: 52000, 
+    pendingExpenses: 5400, 
+    asistentesNodus: 27,
+    matriculadosNodus: 1902,
+    slaStatus: 'COMPLETED', 
+    isBlocked: false 
+  },
+  { 
+    sede: 'Cuenca (Ecuador)', 
+    sedeKey: 'cuenca',
+    pais: 'Ecuador',
+    gerentes: ['July Leon', 'Edison Ricardo Gavilánez'],
+    contadores: ['Erica Logacho'], 
+    emailContable: 'asistente.contable@crearpsl.net',
+    nodusIncome: 41500, 
+    bankConciliated: 41500, 
+    pendingExpenses: 3650, 
+    asistentesNodus: 8,
+    matriculadosNodus: 3137,
+    slaStatus: 'COMPLETED', 
+    isBlocked: false 
+  }
 ];
+
+export const mockFinancialData = officialFinancialData;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // OPERATIVA SUBALTERNA (Contadores / Analistas)

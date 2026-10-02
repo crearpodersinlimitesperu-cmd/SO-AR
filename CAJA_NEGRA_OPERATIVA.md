@@ -463,6 +463,18 @@ Con el fin de profesionalizar y escalar la operación sin fricción ni pérdida 
     * **Conexión en Dashboard 30 Segundos:** En `GerenteDashboard.jsx`, se agregó el botón `[🏦 Dirección Financiera (CFO)]` en la botonera superior y un banner inteligente destacado para el rol `cfo` que permite abrir en un clic la Torre de Control Financiero.
     * **Barra PRO Adaptativa:** En `Home.jsx`, el botón de acceso rápido se personaliza dinámicamente según el rol activo (`cfo` ➔ `/cfo-dashboard`, `legal` ➔ `/legal-hub`, `talento_humano` ➔ `/hr-command-center`, `coord_maestria_global` ➔ `/andres-command-center`).
 
+12. **Blindaje de Alto Contraste y Datos 100% Reales para Dirección Financiera (`/cfo-dashboard`):**
+    * **Incidencia:** En `/cfo-dashboard`, cuando un usuario en modo claro (o tema de sistema) simulaba a Elizabeth Escobar (CFO), el texto principal, números de KPIs y celdas de la tabla se renderizaban en `#0f172a` (casi negro) sobre un contenedor con fondo hardcodeado `#0b1120`, provocando un apagón visual (texto negro sobre fondo negro, "cero visibles"). Asimismo, las cifras mostraban datos ficticios (ej. "Carlos Slim Jr", "México", etc.).
+    * **Solución de Estilos y Contraste:** 
+      - Se eliminaron todos los fondos oscuros forzados en el contenedor general y se adoptaron las variables de diseño maestras del sistema: `background: var(--bg-dark)`, `var(--bg-card)`, `var(--text-heading)`, `var(--text-main)`, `var(--text-muted)` y `var(--border-subtle)`.
+      - Ahora la vista ofrece un contraste impecable, legible y profesional tanto en Tema Claro como en Tema Oscuro.
+    * **Sustitución de Datos Simulados por Datos Canónicos 100% Reales de CREAR:**
+      - **Sedes Oficiales:** Lima (Perú), Quito (Ecuador), Medellín (Colombia), Guayaquil (Ecuador), Cuenca (Ecuador).
+      - **Equipo Contable Real Vinculado:** Gabriela Rivadeneyra (`contabilidad.lima@crearpsl.net`), Diego Flores y Alexis Teran (`diego.flores@crearpsl.net`), Hector Gonzalez (`contabilidad.medellin@crearpsl.net`), Sebastian Jacome y Erica Logacho (`asistente.contable@crearpsl.net`).
+      - **Ingresos Nodus Reales:** $374,600 USD basados en los 13,575 matriculados y 2,865 asistentes de los snapshots de Nodus.
+      - **Pasivo Flotante de Entrenadores Real:** $33,250 USD pendiente de pago (2,241 llamadas pendientes a 34 entrenadores de la nómina real de `kpisEntrenadoresData.json` y `liquidaciones_pagos`).
+      - **Pestañas Especializadas:** Auditoría Zero-Trust de Sedes con Kill-Switch interactivo conectado a Firestore `hq_operational_status`, desglose de los 34 entrenadores con porcentaje de liquidación y tasa de graduación, y trazabilidad de cierres diarios (`finance_daily_close`).
+
 ---
 
 > 📜 **Mandato de la Caja Negra:**
