@@ -648,6 +648,7 @@ const MODULE_REGISTRY = [
   { id: 'qt-hub', label: 'Hub Operativo QT', emoji: '⚡', route: '/qt-hub', roles: null, visible: (u) => ['qt', 'gerente', 'superadmin', 'ceo'].includes(u?.appRole) || u?.isSuperAdmin },
   { id: 'hr-command-center', label: 'HR Command Center', emoji: '🏢', route: '/hr-command-center', roles: null, visible: (u) => ['talento_humano', 'rrhh', 'superadmin', 'ceo', 'direccion'].includes(u?.appRole) || u?.isSuperAdmin },
   { id: 'legal-hub', label: 'Torre de Riesgo (Legal)', emoji: '⚖️', route: '/legal-hub', roles: null, visible: (u) => ['legal', 'juridico', 'superadmin', 'ceo'].includes(u?.appRole) || u?.isSuperAdmin },
+  { id: 'andres-command-center', label: 'Comando Maestría (Andrés)', emoji: '🌐', route: '/andres-command-center', roles: null, visible: (u) => ['coord_maestria_global', 'director_maestria', 'superadmin', 'ceo'].includes(u?.appRole) || u?.isSuperAdmin },
   { id: 'panel-legal', label: 'Auditoría Legal (Firmas)', emoji: '⚖️', route: '/legal-admin', roles: null, visible: (u) => isDataAdmin(u) },
 ];
 
