@@ -5,6 +5,7 @@ import TrainerZenHub from './pages/TrainerZenHub';
 import CallCoachCRM from './pages/CallCoachCRM';
 import QuantumTeamHub from './pages/QuantumTeamHub';
 import HrCommandCenter from './pages/HrCommandCenter';
+import LegalCommandCenter from './pages/LegalCommandCenter';
 import DatosSedesCartas from './pages/DatosSedesCartas';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
@@ -248,6 +249,11 @@ function App() {
           <Route path="/hr-command-center" element={
             <RoleRoute allowedRoles={['talento_humano', 'rrhh', 'superadmin', 'ceo', 'direccion']} requireSuperAdmin={false}>
               <HrCommandCenter />
+            </RoleRoute>
+          } />
+          <Route path="/legal-hub" element={
+            <RoleRoute allowedRoles={['legal', 'juridico', 'superadmin', 'ceo']} requireSuperAdmin={false}>
+              <LegalCommandCenter />
             </RoleRoute>
           } />
           <Route path="/onboarding-legal" element={
