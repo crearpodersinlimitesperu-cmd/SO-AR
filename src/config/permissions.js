@@ -292,34 +292,25 @@ export const DUAL_ROLE_TRAINER_EMAILS = [
  * NO pueden verlo coordinadores, entrenadores, gerentes de sede operativos, capitanes ni participantes.
  */
 export const LIQUIDACION_ENTRENADORES_EMAILS = [
-  'jose.sanchez@crearpsl.net',        // JosÃ© SÃ¡nchez
+  'jose.sanchez@crearpsl.net',        // José Sánchez (SuperAdmin)
   'contabilidad.global@crearpsl.net', // Elizabeth Escobar (CFO)
+  'paul.sosa@crearpsl.net',           // Paul Sosa (CCO)
+  'fer.aragon@crearpsl.net',          // Fer Aragón (CEO)
+  'fer.aragon@crearpsl.com',          // Fer Aragón (correo alterno)
+  'andres.gomez@crearpsl.net',        // Andrés Gómez (Director MJ)
+  'gomeznueve@gmail.com',             // Andrés Gómez (cuenta alterna)
 ];
 
+/**
+ * ACCESO ESTRICTAMENTE RESTRINGIDO a 5 personas explícitas.
+ * Pedido de José (01/10/2026): "solo lo puede ver eli, paul, fer y andres gomez y yo"
+ * NO hay bypass por rol — solo por email de la lista LIQUIDACION_ENTRENADORES_EMAILS.
+ */
 export const canViewLiquidacionEntrenadores = (currentUser) => {
   if (!currentUser) return false;
   const email = (currentUser.email || '').trim().toLowerCase();
-
-  // 'yo' / SuperAdmin
-  if (email === 'jose.sanchez@crearpsl.net') return true;
-  if (currentUser.isSuperAdmin || isSuperAdminEmail(email)) return true;
-
-  // 'directores'
-  if (currentUser.isDireccion) return true;
-  const role = (currentUser.appRole || currentUser.role || '').toLowerCase();
-  const roles = (currentUser.roles || []).map(r => String(r).toLowerCase());
-
-  if (isDireccionRole(role) || role === 'director_maestria') return true;
-  if (roles.some(r => isDireccionRole(r) || r === 'director_maestria')) return true;
-
-  // Coordinadores de Maestría del Juego — pueden ver la liquidación para monitorear sus equipos
-  if (role === 'coord_maestria' || role === 'coordinador_mj') return true;
-  if (roles.some(r => r === 'coord_maestria' || r === 'coordinador_mj')) return true;
-
-  // Finanzas / CFO autorizado
-  if (LIQUIDACION_ENTRENADORES_EMAILS.includes(email)) return true;
-
-  return false;
+  // Acceso SOLO para emails explícitamente autorizados (Hard Lock)
+  return LIQUIDACION_ENTRENADORES_EMAILS.includes(email);
 };
 
 /**
