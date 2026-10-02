@@ -10573,12 +10573,10 @@ export const INITIAL_LLAMADOS = {
 export const ENTRENADORES_LIST = [
   "Alejandro Diaz",
   "Alonso Solares",
-  "Ana Cristina Sanchez",
   "Ana Monroy",
   "Andres Gomez",
   "Andres Idrobo",
   "Carlos Brunis",
-  "Christian Tito",
   "Cirilo Agustin Martinez",
   "Daniela Monroy Fabbri",
   "David Sosa",
@@ -10589,27 +10587,41 @@ export const ENTRENADORES_LIST = [
   "Isaac Gabriel Betancourt Patino",
   "Jesus Adrian Acosta",
   "Jose Luis Sanchez Moreno",
-  "Jose Torron",
   "Josue Vera",
   "Juan Angel",
   "Juan Fernando Reinoso",
   "Julio Narvaez",
   "Kerly Carrillo Garzon",
-  "Kriscia Rodas",
   "Leandro Brunis",
   "Lili Cubillo",
   "Linid Valencia",
   "Lourdes Patino",
-  "Maria Jose Roman",
   "Mauricio Perez",
   "Mauricio Ramirez Silva",
   "Mike Boada",
   "Mila Campuzano",
   "Mildred Munoz",
-  "Pamela Carrillo",
   "Paul Sosa",
   "Regina Romero"
 ];
+
+// Personal que ya no forma parte de Crear (Desvinculados / Inactivos)
+// Directiva explícita de José Sánchez: No deben ser asignables y solo son visibles para José y Talento Humano
+export const ENTRENADORES_INACTIVOS_LIST = [
+  "Ana Cristina Sanchez",
+  "Christian Tito",
+  "Jose Torron",
+  "Kriscia Rodas",
+  "Maria Jose Roman",
+  "Pamela Carrillo"
+];
+
+export const isInactiveTrainer = (name) => {
+  if (!name) return false;
+  const foldKey = (s) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
+  const folded = foldKey(normalizeTrainer(name) || name);
+  return ENTRENADORES_INACTIVOS_LIST.some(inactive => foldKey(inactive) === folded);
+};
 
 export const COORDINADORES_LIST = [
   "ALEJANDRO DIAZ",
@@ -10813,7 +10825,20 @@ export const normalizeTrainer = (name) => {
   "Fredy Sosa": "David Sosa",
   "David Sosa": "David Sosa",
   "Edison Paul Sosa": "Paul Sosa",
-  "Paul Sosa": "Paul Sosa"
+  "Paul Sosa": "Paul Sosa",
+  // Ex-colaboradores desvinculados (Directiva: José Sánchez)
+  "Ana Cristina Sanchez": "Ana Cristina Sanchez",
+  "Ana Cristina Sánchez": "Ana Cristina Sanchez",
+  "Christian Tito": "Christian Tito",
+  "Jose Torron": "Jose Torron",
+  "José Torrón": "Jose Torron",
+  "Kriscia Rodas": "Kriscia Rodas",
+  "Kriscia Liszet Rodas Quispe": "Kriscia Rodas",
+  "Kriscia Quispe": "Kriscia Rodas",
+  "Maria Jose Roman": "Maria Jose Roman",
+  "María José Román": "Maria Jose Roman",
+  "Maria Jose Román": "Maria Jose Roman",
+  "Pamela Carrillo": "Pamela Carrillo"
 };
   if (map[clean]) return map[clean];
 

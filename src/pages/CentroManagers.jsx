@@ -19,12 +19,15 @@ import {
   canViewAllNotasSeguimiento,
   canReplyNotaSeguimiento,
   canViewKPIsLlamadas,
-  canAccessPagosSemanalesDrive
+  canAccessPagosSemanalesDrive,
+  canViewInactiveUsers
 } from '../config/permissions';
 import { 
   INITIAL_MANAGERS, 
   INITIAL_LLAMADOS, 
   ENTRENADORES_LIST, 
+  ENTRENADORES_INACTIVOS_LIST,
+  isInactiveTrainer,
   COORDINADORES_LIST,
   TRAINER_METADATA,
   normalizeTrainer,
@@ -355,21 +358,36 @@ export default function CentroManagers() {
   const [filterSede, setFilterSede] = useState(initialSedeQuery ? normalizeSede(initialSedeQuery) : '');
   const [statusFilter, setStatusFilter] = useState('Todos'); // 'Todos' | 'Activo' | 'Graduado' | 'Desertor'
 
-  // Estadísticas por Entrenador (Tab: Entrenadores) y Catálogo Activo de Entrenadores
-  const availableTrainers = useMemo(() => {
+  const canSeeInactives = canViewInactiveUsers(currentUser);
+
+  // Catálogo Activo de Entrenadores para Asignaciones (Excluye desvinculados: Ana Cristina, Tito, Torron, Kriscia, Maria Jose, Pamela)
+  const assignableTrainers = useMemo(() => {
     const set = new Set(ENTRENADORES_LIST);
     set.add('Lili Cubillo');
     set.add('Regina Romero');
-    managers.forEach(m => {
-      if (m.entrenador && m.entrenador.trim() && m.entrenador !== 'Sin Asignar') {
-        parseTrainersList(m.entrenador).forEach(t => {
-          const norm = normalizeTrainer(t);
-          if (norm) set.add(norm);
-        });
-      }
+    ENTRENADORES_INACTIVOS_LIST.forEach(inactive => {
+      set.delete(inactive);
+      set.delete(normalizeTrainer(inactive));
     });
+    return Array.from(set).filter(t => !isInactiveTrainer(t)).sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
+  }, []);
+
+  // Estadísticas por Entrenador (Tab: Entrenadores) y Catálogo General
+  const availableTrainers = useMemo(() => {
+    const set = new Set(assignableTrainers);
+    // Solo si el usuario puede auditar inactivos (José y Talento Humano), incorporar entrenadores inactivos históricos si tienen registros
+    if (canSeeInactives) {
+      managers.forEach(m => {
+        if (m.entrenador && m.entrenador.trim() && m.entrenador !== 'Sin Asignar') {
+          parseTrainersList(m.entrenador).forEach(t => {
+            const norm = normalizeTrainer(t);
+            if (norm) set.add(norm);
+          });
+        }
+      });
+    }
     return Array.from(set).sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
-  }, [managers]);
+  }, [assignableTrainers, canSeeInactives, managers]);
 
   const allTrainerNames = availableTrainers;
 
@@ -879,6 +897,11 @@ export default function CentroManagers() {
       };
     }).filter(t => t.total > 0);
 
+    // Regla estricta de privacidad: los inactivos solo pueden ser vistos por José y Talento Humano
+    if (!canSeeInactives) {
+      list = list.filter(t => !isInactiveTrainer(t.entrenador));
+    }
+
     if (search.trim()) {
       const q = search.toLowerCase();
       list = list.filter(t =>
@@ -888,7 +911,7 @@ export default function CentroManagers() {
       );
     }
     return list;
-  }, [allTrainerNames, managers, search]);
+  }, [allTrainerNames, canSeeInactives, managers, search]);
 
   // Mismo cálculo que trainersStats de arriba pero SIN el filtro de `search` y
   // para un solo nombre — usado por el modal "tarjeta de la persona" que se abre
@@ -4392,7 +4415,7 @@ export default function CentroManagers() {
                   </div>
                   {userCanAssign ? (
                     <div style={{ maxHeight: '140px', overflowY: 'auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '0.4rem' }}>
-                      {availableTrainers.map(e => {
+                      {assignableTrainers.map(e => {
                         const normE = normalizeTrainer(e);
                         const isSelected = (newManager.selectedTrainers || []).some(t => t === e || normalizeTrainer(t) === normE);
                         return (
@@ -4482,7 +4505,7 @@ export default function CentroManagers() {
                   </label>
                   {userCanAssign ? (
                     <div style={{ maxHeight: '130px', overflowY: 'auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '0.4rem' }}>
-                      {availableTrainers.map(e => {
+                      {assignableTrainers.map(e => {
                         const normE = normalizeTrainer(e);
                         const isSelected = (newTeam.selectedTrainers || []).some(t => t === e || normalizeTrainer(t) === normE);
                         return (
@@ -4680,7 +4703,7 @@ export default function CentroManagers() {
                 </div>
                 {userCanAssign ? (
                   <div style={{ maxHeight: '130px', overflowY: 'auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '0.4rem' }}>
-                    {availableTrainers.map(e => {
+                    {assignableTrainers.map(e => {
                       const normE = normalizeTrainer(e);
                       const isSelected = (editTeamModal.selectedTrainers || []).some(t => t === e || normalizeTrainer(t) === normE);
                       return (
@@ -4903,7 +4926,7 @@ export default function CentroManagers() {
                 </div>
                 {userCanAssign ? (
                   <div style={{ maxHeight: '130px', overflowY: 'auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '0.4rem' }}>
-                    {availableTrainers.map(e => {
+                    {assignableTrainers.map(e => {
                       const normE = normalizeTrainer(e);
                       const isSelected = (editIndividualModal.selectedTrainers || []).some(t => t === e || normalizeTrainer(t) === normE);
                       return (

@@ -10,6 +10,7 @@ import { recordAuditEvent, fetchNetworkInfo } from '../services/auditService';
 import { normalizeUserRecord } from '../utils/userNormalizer';
 import { enforceUserRolesAgent } from '../services/roleAgentDaemon';
 import { canonicalSede } from '../utils/sede';
+import { isInactiveTrainer } from '../data/managersData';
 
 const AuthContext = createContext();
 
@@ -554,9 +555,10 @@ export function AuthProvider({ children }) {
       }
 
       // 🚫 VALIDACIÓN DE ESTADO ACTIVO / INACTIVO (Trazabilidad y Control de Acceso)
-      if (foundUser.isActive === false || foundUser.status === 'inactive' || foundUser.active === false) {
+      const esInactivoDesvinculado = isInactiveTrainer(foundUser.name || foundUser.displayName);
+      if (foundUser.isActive === false || foundUser.status === 'inactive' || foundUser.active === false || esInactivoDesvinculado) {
         await auth.signOut();
-        const reason = foundUser.deactivationReason ? ` (Motivo: ${foundUser.deactivationReason})` : '';
+        const reason = esInactivoDesvinculado ? ' (Personal desvinculado de Crear)' : (foundUser.deactivationReason ? ` (Motivo: ${foundUser.deactivationReason})` : '');
         throw new Error(`ACCESO DENEGADO: Tu cuenta de colaborador se encuentra desactivada${reason}. Comunícate con Talento Humano o SuperAdmin.`);
       }
 
@@ -674,7 +676,8 @@ export function AuthProvider({ children }) {
 
           if (foundUser) {
             // 🚫 VALIDACIÓN DE ESTADO ACTIVO / INACTIVO (Trazabilidad y Control de Acceso)
-            if (foundUser.isActive === false || foundUser.status === 'inactive' || foundUser.active === false) {
+            const esInactivoDesvinculado = isInactiveTrainer(foundUser.name || foundUser.displayName);
+            if (foundUser.isActive === false || foundUser.status === 'inactive' || foundUser.active === false || esInactivoDesvinculado) {
               console.warn("Usuario desactivado intentando acceder a la sesión:", normalizedEmail);
               await signOut(auth);
               setCurrentUser(null);

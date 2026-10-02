@@ -51,6 +51,7 @@ import { normalizeSede, normalizeRole, OPERATIONAL_SEDES } from '../data/usersDa
 import { getFlagForSede } from '../utils/flags';
 import { canUseAsignadorEntrenadores } from '../config/permissions';
 import { listTrainerPolicyFiles, TRAINER_POLICIES_FOLDER_ID } from '../services/googleDriveService';
+import { isInactiveTrainer } from '../data/managersData';
 
 // Los 3 fines de semana de Maestría del Juego. El orden es el oficial del
 // entrenamiento y se usa tal cual para numerar los FDS.
@@ -270,7 +271,8 @@ export default function AsignadorEntrenadores() {
           const roles = [u.role, u.appRole, ...(Array.isArray(u.roles) ? u.roles : [])]
             .filter(Boolean).map(r => normalizeRole(r));
           const activo = u.isActive !== false && u.status !== 'inactive';
-          return activo && roles.some(r => r === 'entrenador' || r === 'entrenador_llamadas' || r === 'director_maestria');
+          const inactivoExcluido = isInactiveTrainer(u.name || u.displayName);
+          return activo && !inactivoExcluido && roles.some(r => r === 'entrenador' || r === 'entrenador_llamadas' || r === 'director_maestria');
         });
         const porIdentidad = new Map();
         soloEntrenadores.forEach(u => {

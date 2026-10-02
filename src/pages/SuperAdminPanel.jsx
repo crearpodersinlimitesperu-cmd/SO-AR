@@ -8,6 +8,7 @@ import { doc, setDoc, updateDoc, deleteDoc, collection, query, orderBy, limit, g
 import { db, auth } from '../services/firebase';
 import { normalizeRole, normalizeSede, OPERATIONAL_SEDES } from '../data/usersData';
 import { canViewInactiveUsers, isElizabethEscobar } from '../config/permissions';
+import { isInactiveTrainer } from '../data/managersData';
 import { getAllCompanyUsers } from '../services/userService';
 import { openOrCreateDirectMessage } from '../services/googleChatService';
 import { getWhatsAppUrl } from '../utils/phoneUtils';
@@ -1270,7 +1271,7 @@ export default function SuperAdminPanel() {
   });
 
   const displayedUsersData = (realUsersData || []).filter(u => {
-    const isInactive = u.isActive === false || u.status === 'inactive' || u.active === false;
+    const isInactive = u.isActive === false || u.status === 'inactive' || u.active === false || isInactiveTrainer(u.name || u.displayName);
     // REGLA ESTRICTA DE PRIVACIDAD: Usuarios inactivos SOLO visibles para José Sánchez y Talento Humano
     if (isInactive && !canViewInactiveUsers(currentUser)) return false;
     if (statusFilter === 'ACTIVE') return !isInactive;
