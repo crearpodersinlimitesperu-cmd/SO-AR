@@ -1744,7 +1744,7 @@ export default function Home() {
               ⏰ Horarios y Vestimenta
             </button>
           )}
-          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) ? (
+          {hasRoleAccess(['gerente']) ? (
             <button onClick={() => navigate('/gerente')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'var(--crear-gold)', color: 'black' }}>
               💼 Causa OS Gerencial
             </button>
@@ -1999,8 +1999,9 @@ export default function Home() {
 
             {/* BOTONES PRINCIPALES DE ACCIÓN */}
             <div style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap' }}>
+                  {hasRoleAccess(['gerente']) && (
                   <button 
-                    onClick={() => navigate('/gerente-dashboard')}
+                    onClick={() => navigate('/gerente')}
                     style={{ flex: 1, padding: '0.8rem', background: 'var(--crear-blue)', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', boxShadow: '0 4px 10px rgba(2, 132, 199, 0.3)' }}
                   >
                     <ArrowUpRight size={18} />
@@ -2008,6 +2009,7 @@ export default function Home() {
                       💼 Causa OS Gerencial
                     </span>
                   </button>
+                  )}
               <button 
                 className="btn-primary" 
                 onClick={() => navigate(currentUser?.appRole === 'gerente' ? '/gerente' : `/checklist/${currentUser?.appRole || 'capitan'}`)} 
