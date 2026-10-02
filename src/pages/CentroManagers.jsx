@@ -355,16 +355,23 @@ export default function CentroManagers() {
   const [filterSede, setFilterSede] = useState(initialSedeQuery ? normalizeSede(initialSedeQuery) : '');
   const [statusFilter, setStatusFilter] = useState('Todos'); // 'Todos' | 'Activo' | 'Graduado' | 'Desertor'
 
-  // Estadísticas por Entrenador (Tab: Entrenadores)
-  const allTrainerNames = useMemo(() => {
+  // Estadísticas por Entrenador (Tab: Entrenadores) y Catálogo Activo de Entrenadores
+  const availableTrainers = useMemo(() => {
     const set = new Set(ENTRENADORES_LIST);
+    set.add('Lili Cubillo');
+    set.add('Regina Romero');
     managers.forEach(m => {
       if (m.entrenador && m.entrenador.trim() && m.entrenador !== 'Sin Asignar') {
-        parseTrainersList(m.entrenador).forEach(t => set.add(t));
+        parseTrainersList(m.entrenador).forEach(t => {
+          const norm = normalizeTrainer(t);
+          if (norm) set.add(norm);
+        });
       }
     });
-    return Array.from(set);
+    return Array.from(set).sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
   }, [managers]);
+
+  const allTrainerNames = availableTrainers;
 
   // Determinar el entrenador actual para filtrado
   const currentTrainerName = useMemo(() => {
@@ -378,6 +385,8 @@ export default function CentroManagers() {
     if (email === 'andres.gomez@crearpsl.net') return 'Andres Gomez';
     if (email === 'leandro.brunis@crearpsl.net') return 'Leandro Brunis';
     if (email === 'carlos.brunis@crearpsl.net' || email === 'brunische66@gmail.com') return 'Carlos Brunis';
+    if (email === 'liliana.cubillo@crearpsl.net' || email === 'lili.cubillo@crearpsl.net') return 'Lili Cubillo';
+    if (email === 'judith.romero@crearpsl.net' || email === 'regina.romero@crearpsl.net') return 'Regina Romero';
 
     const userName = currentUser.name || currentUser.displayName || '';
     const cleanUser = userName.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
@@ -2447,7 +2456,7 @@ export default function CentroManagers() {
                 {(canViewAll || canViewOwnSede) && !viewAsTrainer && (
                   <select value={filterEntrenador} onChange={e => { setFilterEntrenador(e.target.value); setCurrentPage(1); }} style={{ padding: '0.55rem 0.75rem', borderRadius: '8px', border: `1px solid ${borderLight}`, background: bgCard, color: textDark, fontSize: '0.85rem' }}>
                     <option value="">Todos los Entrenadores</option>
-                    {ENTRENADORES_LIST.map(e => <option key={e} value={e}>{e}</option>)}
+                    {availableTrainers.map(e => <option key={e} value={e}>{e}</option>)}
                   </select>
                 )}
 
@@ -2792,7 +2801,7 @@ export default function CentroManagers() {
                 {(canViewAll || canViewOwnSede) && !viewAsTrainer && (
                   <select value={filterEntrenador} onChange={e => setFilterEntrenador(e.target.value)} style={{ padding: '0.55rem 0.75rem', borderRadius: '8px', border: `1px solid ${borderLight}`, background: bgCard, color: textDark, fontSize: '0.85rem' }}>
                     <option value="">Todos los Entrenadores</option>
-                    {ENTRENADORES_LIST.map(e => <option key={e} value={e}>{e}</option>)}
+                    {availableTrainers.map(e => <option key={e} value={e}>{e}</option>)}
                   </select>
                 )}
 
@@ -4383,15 +4392,16 @@ export default function CentroManagers() {
                   </div>
                   {userCanAssign ? (
                     <div style={{ maxHeight: '140px', overflowY: 'auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '0.4rem' }}>
-                      {ENTRENADORES_LIST.map(e => {
-                        const isSelected = (newManager.selectedTrainers || []).includes(e);
+                      {availableTrainers.map(e => {
+                        const normE = normalizeTrainer(e);
+                        const isSelected = (newManager.selectedTrainers || []).some(t => t === e || normalizeTrainer(t) === normE);
                         return (
                           <button
                             type="button"
                             key={e}
                             onClick={() => {
                               const current = newManager.selectedTrainers || [];
-                              const updated = isSelected ? current.filter(t => t !== e) : [...current, e];
+                              const updated = isSelected ? current.filter(t => t !== e && normalizeTrainer(t) !== normE) : [...current, e];
                               setNewManager({ ...newManager, selectedTrainers: updated });
                             }}
                             style={{
@@ -4472,15 +4482,16 @@ export default function CentroManagers() {
                   </label>
                   {userCanAssign ? (
                     <div style={{ maxHeight: '130px', overflowY: 'auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '0.4rem' }}>
-                      {ENTRENADORES_LIST.map(e => {
-                        const isSelected = (newTeam.selectedTrainers || []).includes(e);
+                      {availableTrainers.map(e => {
+                        const normE = normalizeTrainer(e);
+                        const isSelected = (newTeam.selectedTrainers || []).some(t => t === e || normalizeTrainer(t) === normE);
                         return (
                           <button
                             type="button"
                             key={e}
                             onClick={() => {
                               const current = newTeam.selectedTrainers || [];
-                              const updated = isSelected ? current.filter(t => t !== e) : [...current, e];
+                              const updated = isSelected ? current.filter(t => t !== e && normalizeTrainer(t) !== normE) : [...current, e];
                               setNewTeam({ ...newTeam, selectedTrainers: updated });
                             }}
                             style={{
@@ -4669,15 +4680,16 @@ export default function CentroManagers() {
                 </div>
                 {userCanAssign ? (
                   <div style={{ maxHeight: '130px', overflowY: 'auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '0.4rem' }}>
-                    {ENTRENADORES_LIST.map(e => {
-                      const isSelected = (editTeamModal.selectedTrainers || []).includes(e);
+                    {availableTrainers.map(e => {
+                      const normE = normalizeTrainer(e);
+                      const isSelected = (editTeamModal.selectedTrainers || []).some(t => t === e || normalizeTrainer(t) === normE);
                       return (
                         <button
                           type="button"
                           key={e}
                           onClick={() => {
                             const current = editTeamModal.selectedTrainers || [];
-                            const updated = isSelected ? current.filter(t => t !== e) : [...current, e];
+                            const updated = isSelected ? current.filter(t => t !== e && normalizeTrainer(t) !== normE) : [...current, e];
                             setEditTeamModal({ ...editTeamModal, selectedTrainers: updated });
                           }}
                           style={{
@@ -4891,15 +4903,16 @@ export default function CentroManagers() {
                 </div>
                 {userCanAssign ? (
                   <div style={{ maxHeight: '130px', overflowY: 'auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '0.4rem' }}>
-                    {ENTRENADORES_LIST.map(e => {
-                      const isSelected = (editIndividualModal.selectedTrainers || []).includes(e);
+                    {availableTrainers.map(e => {
+                      const normE = normalizeTrainer(e);
+                      const isSelected = (editIndividualModal.selectedTrainers || []).some(t => t === e || normalizeTrainer(t) === normE);
                       return (
                         <button
                           type="button"
                           key={e}
                           onClick={() => {
                             const current = editIndividualModal.selectedTrainers || [];
-                            const updated = isSelected ? current.filter(t => t !== e) : [...current, e];
+                            const updated = isSelected ? current.filter(t => t !== e && normalizeTrainer(t) !== normE) : [...current, e];
                             setEditIndividualModal({ ...editIndividualModal, selectedTrainers: updated });
                           }}
                           style={{

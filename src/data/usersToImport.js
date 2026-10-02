@@ -598,7 +598,9 @@ export const USERS_TO_IMPORT = [
     "displayName": "Regina Romero",
     "role": "coord_maestria",
     "roles": [
-      "coord_maestria"
+      "coord_maestria",
+      "entrenador_llamadas",
+      "entrenador"
     ],
     "sede": "Quito",
     "emails": [
@@ -625,7 +627,9 @@ export const USERS_TO_IMPORT = [
     "name": "Lili Cubillo",
     "role": "coord_maestria",
     "roles": [
-      "coord_maestria"
+      "coord_maestria",
+      "entrenador_llamadas",
+      "entrenador"
     ],
     "sede": "Quito",
     "emails": [

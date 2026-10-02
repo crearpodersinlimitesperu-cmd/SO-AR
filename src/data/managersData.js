@@ -10597,6 +10597,7 @@ export const ENTRENADORES_LIST = [
   "Kerly Carrillo Garzon",
   "Kriscia Rodas",
   "Leandro Brunis",
+  "Lili Cubillo",
   "Linid Valencia",
   "Lourdes Patino",
   "Maria Jose Roman",
@@ -10606,7 +10607,8 @@ export const ENTRENADORES_LIST = [
   "Mila Campuzano",
   "Mildred Munoz",
   "Pamela Carrillo",
-  "Paul Sosa"
+  "Paul Sosa",
+  "Regina Romero"
 ];
 
 export const COORDINADORES_LIST = [
@@ -10709,6 +10711,16 @@ export const TRAINER_METADATA = {
   "Mauricio Perez": {
     "email": "mperez.ttw@gmail.com",
     "programa": "C1"
+  },
+  "Lili Cubillo": {
+    "fullName": "Liliana Lilibeth Cubillo Vera",
+    "email": "liliana.cubillo@crearpsl.net",
+    "programa": "MJ"
+  },
+  "Regina Romero": {
+    "fullName": "Judith Regina Romero Rosales",
+    "email": "judith.romero@crearpsl.net",
+    "programa": "MJ"
   }
 };
 
@@ -10782,8 +10794,14 @@ export const normalizeTrainer = (name) => {
   "Jonathan Alexander La Rosa Nieto": "Jonathan Alexander La Rosa Nieto",
   "Leyla Pasquel": "Leyla Kelly Pasquel Alfaro",
   "Leyla Kelly Pasquel Alfaro": "Leyla Kelly Pasquel Alfaro",
-  "Regina Romero": "Judith Regina Romero Rosales",
-  "Judith Regina Romero Rosales": "Judith Regina Romero Rosales",
+  "Lili Cubillo": "Lili Cubillo",
+  "Liliana Cubillo": "Lili Cubillo",
+  "Lilibeth Cubillo": "Lili Cubillo",
+  "Liliana Lilibeth Cubillo Vera": "Lili Cubillo",
+  "Regina Romero": "Regina Romero",
+  "Regi Romero": "Regina Romero",
+  "Judith Regina Romero Rosales": "Regina Romero",
+  "Judith Romero": "Regina Romero",
   "Diego Bravo": "Diego David Bravo Figueroa",
   "Diego David Bravo Figueroa": "Diego David Bravo Figueroa",
   // CONTEXTO (28/08/2026): José indicó que a Fredy Sosa le gusta que le digan
@@ -10845,6 +10863,8 @@ export const normalizeCoordinator = (name) => {
   "LEYLA KELLY PASQUEL ALFARO": "LEYLA KELLY PASQUEL ALFARO",
   "ERIKA GAVILANEZ": "ERIKA GISSELL GAVILANEZ GALLARDO",
   "ERIKA GISSELL GAVILANEZ GALLARDO": "ERIKA GISSELL GAVILANEZ GALLARDO",
+  "LILIANA CUBILLO": "LILI CUBILLO",
+  "LILI CUBILLO": "LILI CUBILLO",
   "REGINA ROMERO": "JUDITH REGINA ROMERO ROSALES",
   "JUDITH REGINA ROMERO ROSALES": "JUDITH REGINA ROMERO ROSALES",
   "DIEGO BRAVO": "DIEGO DAVID BRAVO FIGUEROA",

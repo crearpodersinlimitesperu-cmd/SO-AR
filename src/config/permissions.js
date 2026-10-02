@@ -332,6 +332,8 @@ export const DUAL_ROLE_TRAINER_EMAILS = [
   'direccion@bmbgbrokers.com',        // Entrenador de llamadas
   'milacampuzano21@gmail.com',        // Entrenadora de llamadas
   'kerly.carrillo@crearpsl.net',      // Coordinadora MJ Cuenca + Entrenadora de llamadas (Kerlie Carrillo)
+  'liliana.cubillo@crearpsl.net',     // Coordinadora MJ Quito + Entrenadora de llamadas (Lili Cubillo)
+  'judith.romero@crearpsl.net',       // Coordinadora MJ Quito + Entrenadora de llamadas (Regina Romero)
 ];
 
 /**

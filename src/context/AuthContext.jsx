@@ -319,10 +319,21 @@ export function AuthProvider({ children }) {
       if (!foundUser.roleSedes.qt) foundUser.roleSedes.qt = 'Quito';
     }
 
-    // Judith Regina Romero Rosales: Coordinadora de Maestría del Juego (Quito)
+    // Judith Regina Romero Rosales: Coordinadora de Maestría del Juego y Entrenadora de Llamadas (Quito)
     const isJudithRomero = ['judith.romero@crearpsl.net'].includes(normalizedEmail) || ['judith.romero@crearpsl.net'].includes(rawEmail);
     if (isJudithRomero) {
       if (!assignedRoles.includes('coord_maestria')) assignedRoles.push('coord_maestria');
+      if (!assignedRoles.includes('entrenador_llamadas')) assignedRoles.push('entrenador_llamadas');
+      if (!assignedRoles.includes('entrenador')) assignedRoles.push('entrenador');
+      canonicalRole = 'coord_maestria';
+    }
+
+    // Liliana Cubillo: Coordinadora de Maestría del Juego y Entrenadora de Llamadas (Quito)
+    const isLiliCubillo = ['liliana.cubillo@crearpsl.net', 'lili.cubillo@crearpsl.net'].includes(normalizedEmail) || ['liliana.cubillo@crearpsl.net', 'lili.cubillo@crearpsl.net'].includes(rawEmail);
+    if (isLiliCubillo) {
+      if (!assignedRoles.includes('coord_maestria')) assignedRoles.push('coord_maestria');
+      if (!assignedRoles.includes('entrenador_llamadas')) assignedRoles.push('entrenador_llamadas');
+      if (!assignedRoles.includes('entrenador')) assignedRoles.push('entrenador');
       canonicalRole = 'coord_maestria';
     }
 

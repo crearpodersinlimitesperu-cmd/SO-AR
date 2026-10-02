@@ -138,6 +138,10 @@ const NOMBRES_LEGALES_ENTRENADORES = {
   'paul sosa': 'Edison Paul Sosa Carrera',
   'edison paul sosa': 'Edison Paul Sosa Carrera',
   'edison paul sosa carrera': 'Edison Paul Sosa Carrera',
+  'lili cubillo': 'Liliana Lilibeth Cubillo Vera',
+  'liliana cubillo': 'Liliana Lilibeth Cubillo Vera',
+  'regi romero': 'Judith Regina Romero Rosales',
+  'regina romero': 'Judith Regina Romero Rosales',
 };
 const nombreLegalEntrenador = (value = '') => NOMBRES_LEGALES_ENTRENADORES[normalizarIdentidadEntrenador(value)] || String(value || '').trim();
 const identidadCanonicaEntrenador = (value = '') => normalizarIdentidadEntrenador(nombreLegalEntrenador(value));
