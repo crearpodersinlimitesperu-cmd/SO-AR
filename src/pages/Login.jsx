@@ -52,7 +52,8 @@ export default function Login() {
         showToast("Dominio no autorizado en Firebase Auth.", "error");
         return;
       }
-      showToast(`Error de inicio de sesión: ${error?.code || 'Desconocido'}`, "error");
+      const errorMsg = error?.message || error?.code || 'Desconocido';
+      showToast(`Error de inicio de sesión: ${errorMsg}`, "error");
     }
   };
 

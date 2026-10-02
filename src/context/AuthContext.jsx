@@ -213,6 +213,7 @@ export function AuthProvider({ children }) {
   };
 
   const buildUserObject = (user, foundUser, normalizedEmail) => {
+    const rawEmail = (user?.email || foundUser?.email || normalizedEmail || '').toString().trim().toLowerCase();
     // 0. Respaldo fidedigno contra el catálogo oficial corporativo para erradicar
     // colapsos de cargos. Un documento histórico puede tener el correo de login
     // en un campo y el corporativo/alterno en otro; se consultan todos antes de
