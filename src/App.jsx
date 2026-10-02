@@ -240,7 +240,7 @@ function App() {
             </RoleRoute>
           } />
           <Route path="/call-coach-crm" element={
-            <RoleRoute allowedRoles={['entrenador_llamadas', 'direccion', 'superadmin', 'ceo']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['entrenador_llamadas', 'direccion', 'superadmin', 'ceo', 'coordinador_mj', 'coord_maestria']} requireSuperAdmin={false}>
               <CallCoachCRM />
             </RoleRoute>
           } />
