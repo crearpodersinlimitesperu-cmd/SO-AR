@@ -3,6 +3,7 @@ import FinanceWorkspace from './pages/FinanceWorkspace';
 import MaestriaGlobalDashboard from './pages/MaestriaGlobalDashboard';
 import TrainerZenHub from './pages/TrainerZenHub';
 import CallCoachCRM from './pages/CallCoachCRM';
+import QuantumTeamHub from './pages/QuantumTeamHub';
 import DatosSedesCartas from './pages/DatosSedesCartas';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
@@ -236,6 +237,11 @@ function App() {
           <Route path="/call-coach-crm" element={
             <RoleRoute allowedRoles={['entrenador_llamadas', 'direccion', 'superadmin', 'ceo']} requireSuperAdmin={false}>
               <CallCoachCRM />
+            </RoleRoute>
+          } />
+          <Route path="/qt-hub" element={
+            <RoleRoute allowedRoles={['qt', 'gerente', 'superadmin', 'ceo']} requireSuperAdmin={false}>
+              <QuantumTeamHub />
             </RoleRoute>
           } />
           <Route path="/onboarding-legal" element={
