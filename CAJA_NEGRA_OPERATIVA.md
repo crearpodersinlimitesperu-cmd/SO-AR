@@ -385,7 +385,63 @@ Permite a directores, coordinadores y managers auditar en tiempo real el avance 
   3. Purgar el historial de git para eliminar el valor anterior de commits pasados (explícitamente pospuesto hasta después de completar la rotación).
 * **Pendiente de acción de José (no ejecutable por el asistente — sin acceso a GitHub Settings):** Crear el secreto `ROBOT_TOKEN` en GitHub → repo `SO-AR` → Settings → Secrets and variables → Actions, con el valor generado en la rotación. Sin este secreto, los 3 workflows automáticos fallarán intencionalmente (diseño "fail-loud") hasta que se cree.
 
+
+### 11.5. Resolución de Incidencia de Despliegue en Firebase Hosting & ReferenceError
+* **Fecha:** 02 de Octubre de 2026
+* **Síntoma:** Error `ReferenceError: CfoDashboard is not defined` en `centro-operativo-cpsl.web.app` reportado por el usuario con captura de pantalla. Alertas de falla de GitHub Actions en el workflow `Deploy to Firebase Hosting`.
+* **Causa raíz:**
+  1. Durante la integración modular de `CfoDashboard` y `MaestriaGlobalDashboard`, el archivo `src/services/maestriaService.js` no fue rastreado por git (`untracked`).
+  2. El runner Ubuntu de GitHub Actions no incluye el alias `python`, únicamente `python3`, lo que provocaba fallos de resolución durante el pipeline. Al fallar el build en Actions, Firebase Hosting no actualizaba producción y mantenía una versión previa inconsistente.
+* **Acción ejecutada:**
+  * Se rastreó e incluyó `src/services/maestriaService.js` en el control de versiones.
+  * Se robusteció el script `prebuild` en `package.json` anteponiendo `python3`.
+  * Se validó la compilación íntegra de Vite localmente con 0 errores y se desencadenó el despliegue automático limpio hacia Firebase Hosting.
+
+---
+
+## 12. 🚀 Nueva Arquitectura Modular de Módulos y Roles Corporativos (Octubre 2026)
+
+Con el fin de profesionalizar y escalar la operación sin fricción ni pérdida de datos legacy, se integraron los siguientes centros de mando y estaciones operativas:
+
+1. **Dirección Financiera Global (CFO) & Operativa Financiera (`/cfo-dashboard`, `/finance-workspace`):**
+   * Panel Zero-Trust para Dirección Financiera con auditoría cruzada Nodus vs. Banco Conciliado.
+   * Sistema de "Kill-Switch" para suspender operaciones de sedes con discrepancias financieras.
+   * Estación de trabajo simplificada para asistentes contables con SLA semanal de conciliación (Viernes 9:00 AM).
+
+2. **Hub de Entrenamiento y Academia Zen (`/trainer-hub`):**
+   * Interfaz minimalista ("Zen Mode") para Entrenadores de Salón (C1, C2, MJ).
+   * Briefing operativo del coordinador de sede (temperatura de sala, perfiles clave).
+   * Buzón de alineación directa y confidencial con Dirección Académica ("Zero-Ego").
+
+3. **CRM de Entrenadores de Llamadas (`/call-coach-crm`):**
+   * Hub de seguimiento compartido y bidireccional con los Coordinadores de Maestría del Juego (CMJ).
+   * Pipeline de rendición de cuentas, efectividad de llamadas y enrolamiento en tiempo real.
+
+4. **Hub Operativo Pit-Stop Quantum Team (QT) (`/qt-hub`):**
+   * Interfaz táctica *Mobile-First* de alto contraste estilo F1 para supervisión de piso y sala.
+   * Checklists dinámicos con inserción algorítmica de "Tareas Trampa" para auditar atención y lectura de instrucciones.
+   * Integración de KPIs del ciclo C1E31 Lima (Rossmery Ochoa y Gina Cárdenas).
+
+5. **HR Command Center - Talento Humano Global (`/hr-command-center`):**
+   * Torre de supervisión para Lennin Chasi con Índice de Atención (*Attention Index*) y radar de pólizas/seguros.
+   * Tablero Kanban de reclutamiento y pipeline de expansión a nuevas plazas (Medellín/Bogotá).
+
+6. **Torre de Riesgo y Cumplimiento Legal (`/legal-hub`):**
+   * Bóveda Zero-Trust para Pablo Mendieta.
+   * Tracker de Propiedad Intelectual (Tecnología NEC, Noda, Neck, Wikipedia) y SLA invertido de derechos ARCO (20 días).
+   * Matriz de bloqueo por falta de acuerdos de confidencialidad (NDAs).
+
+7. **Centro de Comando Global de Maestría (`/andres-command-center`, `/maestria-global`):**
+   * Dashboard estratégico para Andrés Gómez.
+   * Auditor algorítmico de "Futuros Imposibles" para detectar aprobaciones anómalas o caídas de estándar por sede.
+   * Limpieza y exclusión automática de grupos no representativos ("Equipo 1000") de los KPIs de efectividad.
+   * Panel confidencial de misiones de expansión y condicionamientos/ultimátums.
+
+8. **Redirección de Dominio Público (`crearpsl.net/dna`):**
+   * Enrutamiento directo y transparente alojado en el repositorio GitHub Pages (`CRM-CREARLIMA..`) que redirige a los participantes hacia el portal blindado de onboarding legal `https://centro-operativo-cpsl.web.app/dna`.
+
 ---
 
 > 📜 **Mandato de la Caja Negra:**
 > Esta Caja Negra es la fuente viva de verdad de CPSL y Causa OS. Debe consultarse antes de cualquier cambio de arquitectura y actualizarse de inmediato tras cada nueva funcionalidad, regla o descubrimiento operativo.
+
