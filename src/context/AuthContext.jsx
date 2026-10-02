@@ -427,7 +427,8 @@ export function AuthProvider({ children }) {
         'cardenaslopezgina@gmail.com',
         'cardenasgina29@gmail.com',
         'rouz1414@gmail.com',
-        'brunische66@gmail.com'
+        'brunische66@gmail.com',
+        'ricardogavilanez1021@gmail.com'
       ];
       const normalizedEmail = rawEmail.replace('@crearpsl.com', '@crearpsl.net');
       
@@ -467,24 +468,18 @@ export function AuthProvider({ children }) {
         }
       }
 
-      // Verificación de política: si no es @crearpsl.net, ni está en la lista blanca, ni en Firestore/QT, se rechaza
-      if (!rawEmail.endsWith('@crearpsl.net') && !allowedGmails.includes(rawEmail) && !foundUser) {
-        await auth.signOut();
-        throw new Error('ACCESO DENEGADO: Por política corporativa, debes iniciar sesión exclusivamente con tu correo corporativo @crearpsl.net');
-      }
-
-      // 🆕 (02/09/2026) Respaldo: catálogo estático usersToImport.js (findUserByAnyEmail).
-      // Antes de este fix, si el correo todavía no existía en Firestore (típicamente
-      // porque nadie corrió una importación manual para esa persona), el login caía
-      // directo al "colaborador" genérico, aunque esa persona ya estuviera correctamente
-      // registrada como entrenador/etc. en el código fuente. Caso real confirmado:
-      // Lourdes Patiño (marylourdespat@gmail.com) — ver managers_directory/liquidacion,
-      // reportado por José el 02/09/2026.
+      // 🆕 Respaldo: catálogo estático usersToImport.js (findUserByAnyEmail).
       if (!foundUser) {
-        const staticUser = findUserByAnyEmail(normalizedEmail);
+        const staticUser = findUserByAnyEmail(normalizedEmail) || findUserByAnyEmail(rawEmail);
         if (staticUser) {
           foundUser = { ...staticUser };
         }
+      }
+
+      // Verificación de política: si no es @crearpsl.net, ni está en la lista blanca, ni en Firestore/QT/catálogo oficial, se rechaza
+      if (!rawEmail.endsWith('@crearpsl.net') && !allowedGmails.includes(rawEmail) && !foundUser) {
+        await auth.signOut();
+        throw new Error('ACCESO DENEGADO: Por política corporativa, debes iniciar sesión exclusivamente con tu correo corporativo @crearpsl.net');
       }
 
       if (!foundUser) {
@@ -601,7 +596,7 @@ export function AuthProvider({ children }) {
           // 🆕 (02/09/2026) Mismo respaldo que en loginWithGoogle: catálogo estático
           // antes de descartar al usuario por completo en esta ruta de sesión persistida.
           if (!foundUser) {
-            const staticUser = findUserByAnyEmail(normalizedEmail);
+            const staticUser = findUserByAnyEmail(normalizedEmail) || findUserByAnyEmail(rawEmail);
             if (staticUser) {
               foundUser = { ...staticUser, uid: user.uid };
             }

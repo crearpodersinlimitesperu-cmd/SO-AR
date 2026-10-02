@@ -2589,7 +2589,7 @@ export default function Home() {
             {/* BOTONES PRINCIPALES DE ACCIÓN */}
             <div style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap' }}>
                   <button 
-                    onClick={() => navigate('/gerente-dashboard')}
+                    onClick={() => navigate('/gerente')}
                     style={{ flex: 1, padding: '0.8rem', background: 'var(--crear-blue)', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', boxShadow: '0 4px 10px rgba(2, 132, 199, 0.3)' }}
                   >
                     <ArrowUpRight size={18} />

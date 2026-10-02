@@ -1259,7 +1259,8 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
                     simulateUser(user);
                     onClose();
                     const r = (user.role || user.appRole || '').toLowerCase();
-                    if (r === 'cfo') navigate('/cfo-dashboard');
+                    if (r === 'gerente') navigate('/gerente');
+                    else if (r === 'cfo') navigate('/cfo-dashboard');
                     else if (r === 'legal' || r === 'juridico') navigate('/legal-hub');
                     else if (r === 'talento_humano' || r === 'rrhh') navigate('/hr-command-center');
                     else if (r === 'coord_maestria_global') navigate('/andres-command-center');
@@ -1358,7 +1359,8 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
                           onClose();
                           const r = (user.role || user.appRole || '').toLowerCase();
                           let targetRoute = '/home';
-                          if (r === 'cfo') targetRoute = '/cfo-dashboard';
+                          if (r === 'gerente') targetRoute = '/gerente';
+                          else if (r === 'cfo') targetRoute = '/cfo-dashboard';
                           else if (r === 'legal' || r === 'juridico') targetRoute = '/legal-hub';
                           else if (r === 'talento_humano' || r === 'rrhh') targetRoute = '/hr-command-center';
                           else if (r === 'coord_maestria_global') targetRoute = '/andres-command-center';

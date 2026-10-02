@@ -980,7 +980,7 @@ export const USERS_TO_IMPORT = [
     "email": "magymqm70@gmail.com"
   },
   {
-    "id": "qt_edisonricardogavilnezgallardo",
+    "id": "staff_edisonricardogavilanezgallardo",
     "name": "Edison Ricardo Gavilánez Gallardo",
     "role": "gerente",
     "roles": [
@@ -993,10 +993,15 @@ export const USERS_TO_IMPORT = [
       "qt": "Quito"
     },
     "emails": [
-      "ricardogavilanez1021@gmail.com",
-        "ricardo.gavilanez@crearpsl.net"
-      ],
-    "email": "ricardogavilanez1021@gmail.com"
+      "ricardo.gavilanez@crearpsl.net",
+      "ricardogavilanez1021@gmail.com"
+    ],
+    "email": "ricardo.gavilanez@crearpsl.net",
+    "corporateEmail": "ricardo.gavilanez@crearpsl.net",
+    "personalEmail": "ricardogavilanez1021@gmail.com",
+    "status": "active",
+    "active": true,
+    "isActive": true
   },
   {
     "id": "qt_williamsjamessncheztrujillo",

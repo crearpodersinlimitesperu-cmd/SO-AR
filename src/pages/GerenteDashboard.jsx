@@ -34,15 +34,33 @@ export default function GerenteDashboard() {
   }, [currentUser, navigate]);
 
   useEffect(() => {
-    const unsubscribeDaily = onSnapshot(query(collection(db, 'goals'), where('scope', '==', 'DIARIA')), (snapshot) => {
-       setDailyGoals(snapshot.docs.map(d => ({id: d.id, ...d.data()})));
-    });
-    const unsubscribeTraining = onSnapshot(query(collection(db, 'goals'), where('scope', '==', 'ENTRENAMIENTO')), (snapshot) => {
-       setTrainingGoals(snapshot.docs.map(d => ({id: d.id, ...d.data()})));
-    });
-    const unsubscribeCycle = onSnapshot(query(collection(db, 'goals'), where('scope', '==', 'CICLO')), (snapshot) => {
-       setCycleGoals(snapshot.docs.map(d => ({id: d.id, ...d.data()})));
-    });
+    const unsubscribeDaily = onSnapshot(
+      query(collection(db, 'goals'), where('scope', '==', 'DIARIA')), 
+      (snapshot) => {
+        setDailyGoals(snapshot.docs.map(d => ({id: d.id, ...d.data()})));
+      },
+      (error) => {
+        console.warn('Goals fetch error (DIARIA):', error);
+      }
+    );
+    const unsubscribeTraining = onSnapshot(
+      query(collection(db, 'goals'), where('scope', '==', 'ENTRENAMIENTO')), 
+      (snapshot) => {
+        setTrainingGoals(snapshot.docs.map(d => ({id: d.id, ...d.data()})));
+      },
+      (error) => {
+        console.warn('Goals fetch error (ENTRENAMIENTO):', error);
+      }
+    );
+    const unsubscribeCycle = onSnapshot(
+      query(collection(db, 'goals'), where('scope', '==', 'CICLO')), 
+      (snapshot) => {
+        setCycleGoals(snapshot.docs.map(d => ({id: d.id, ...d.data()})));
+      },
+      (error) => {
+        console.warn('Goals fetch error (CICLO):', error);
+      }
+    );
     return () => {
       unsubscribeDaily();
       unsubscribeTraining();

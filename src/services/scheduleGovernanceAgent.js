@@ -23,7 +23,7 @@ export const SCHEDULE_SEDE_MANAGERS = {
   'lima': ['jose.sanchez@crearpsl.net', 'contabilidad.lima@crearpsl.net'],
   'quito': ['emily.campuzano@crearpsl.net', 'freddy.sosa@crearpsl.net', 'david.sosa@crearpsl.net'],
   'guayaquil': ['josue.vera@crearpsl.net'],
-  'cuenca': ['emely.leon@crearpsl.net', 'emely.leon@crearpls.com'],
+  'cuenca': ['emely.leon@crearpsl.net', 'emely.leon@crearpls.com', 'ricardo.gavilanez@crearpsl.net', 'ricardogavilanez1021@gmail.com'],
   'medellin': ['yurany.gonzalez@crearpsl.net'],
   'mexico': ['nora.zamora@crearpsl.net']
 };

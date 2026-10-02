@@ -320,6 +320,7 @@ function App() {
               <GerenteDashboard />
             </RoleRoute>
           } />
+          <Route path="/gerente-dashboard" element={<Navigate to="/gerente" replace />} />
           
           <Route path="/checklist/:roleId" element={
             <PrivateRoute>

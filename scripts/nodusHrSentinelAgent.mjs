@@ -20,7 +20,7 @@ if (!ROBOT_TOKEN) {
 // Mapeo oficial de Gerentes por Sede y Dirección Corporativa
 export const GERENTES_POR_SEDE = {
   'Bogotá': ['gerencia.bogota@crearpsl.net'], // Placeholder Bogotá
-  'Cuenca': ['emely.leon@crearpsl.net'], // July León
+  'Cuenca': ['emely.leon@crearpsl.net', 'ricardo.gavilanez@crearpsl.net', 'ricardogavilanez1021@gmail.com'], // July León / Ricardo Gavilánez
   'Guayaquil': ['josue.vera@crearpsl.net'], // Josué Vera
   'Lima': ['jose.sanchez@crearpsl.net'], // José Sánchez
   'Medellín': ['yurany.gonzalez@crearpsl.net'], // Yurany González
