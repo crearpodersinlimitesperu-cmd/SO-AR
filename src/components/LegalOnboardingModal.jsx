@@ -90,8 +90,8 @@ const LegalOnboardingModal = ({ currentUser, sede, onComplete, onClose }) => {
 
       const result = await processFullLegalSignature({
         ...kycData,
-        participantId: currentUser?.email || '',
-        participantName: currentUser?.name || currentUser?.displayName || '',
+        participantId: currentUser?.email || kycData.email || '',
+        participantName: currentUser?.name || currentUser?.displayName || kycData.fullName || '',
         countryCode,
         sede: sede || '',
         signatureDataUrl,
@@ -222,14 +222,14 @@ const LegalOnboardingModal = ({ currentUser, sede, onComplete, onClose }) => {
 
                 <div>
                   <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px', fontWeight: 600 }}>Correo Electrónico Oficial</label>
-                  <input type="email" value={kycData.email} disabled style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-subtle)', color: 'var(--text-muted)', borderRadius: 'var(--radius-sm)', cursor: 'not-allowed' }} />
+                  <input type="email" value={kycData.email} onChange={e => setKycData({...kycData, email: e.target.value})} disabled={!!currentUser?.email} style={{ width: '100%', padding: '0.8rem', background: currentUser?.email ? 'rgba(255,255,255,0.02)' : 'var(--bg-dark)', border: '1px solid var(--border-strong)', color: currentUser?.email ? 'var(--text-muted)' : 'var(--text-main)', borderRadius: 'var(--radius-sm)', cursor: currentUser?.email ? 'not-allowed' : 'text' }} placeholder="correo@ejemplo.com" />
                 </div>
               </div>
 
               <div style={{ textAlign: 'center', marginTop: '2.5rem' }}>
                 <button
                   onClick={() => {
-                    if(!kycData.fullName || !kycData.docNumber || !kycData.birthDate || !kycData.phone) {
+                    if(!kycData.fullName || !kycData.docNumber || !kycData.birthDate || !kycData.phone || !kycData.email) {
                       alert("Por favor, completa todos los campos de identidad.");
                       return;
                     }

@@ -1,4 +1,8 @@
-import React, { useEffect, useState } from 'react';
+const fs = require('fs');
+const file = 'src/pages/OnboardingLegal.jsx';
+let content = fs.readFileSync(file, 'utf8');
+
+const newContent = `import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import LegalOnboardingModal from '../components/LegalOnboardingModal';
@@ -76,3 +80,7 @@ export default function OnboardingLegal() {
 
   return null;
 }
+`;
+
+fs.writeFileSync(file, newContent);
+console.log('OnboardingLegal allows public access');

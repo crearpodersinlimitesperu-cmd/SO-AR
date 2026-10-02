@@ -209,9 +209,7 @@ function App() {
             </RoleRoute>
           } />
           <Route path="/onboarding-legal" element={
-            <PrivateRoute>
-              <OnboardingLegal />
-            </PrivateRoute>
+            <OnboardingLegal />
           } />
           <Route path="/home" element={
             <PrivateRoute>

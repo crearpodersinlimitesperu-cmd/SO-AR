@@ -168,10 +168,10 @@ export default function LegalStatusPanel() {
                       </div>
                     )}
                     <button 
-                      onClick={() => window.open(`https://nodus-cpsl.web.app/search?q=${s.participantId}`, '_blank')}
+                      onClick={() => navigate(`/crm-maestro`)}
                       style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', fontSize: '0.75rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '6px', padding: 0, textDecoration: 'underline' }}
                     >
-                      <ExternalLink size={12} /> Verificar en Nodus
+                      <ExternalLink size={12} /> Verificar en CRM Base (Nodus)
                     </button>
                   </td>
                   <td style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>
