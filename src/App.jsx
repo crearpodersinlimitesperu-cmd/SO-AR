@@ -218,6 +218,11 @@ function App() {
               <FinanceWorkspace />
             </RoleRoute>
           } />
+          <Route path="/maestria-global" element={
+            <RoleRoute allowedRoles={['director_maestria', 'direccion', 'superadmin', 'ceo']} requireSuperAdmin={false}>
+              <MaestriaGlobalDashboard />
+            </RoleRoute>
+          } />
           <Route path="/onboarding-legal" element={
             <OnboardingLegal />
           } />
