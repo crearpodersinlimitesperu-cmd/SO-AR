@@ -2326,13 +2326,32 @@ export default function MonitorImos() {
             <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', marginBottom: '1.5rem', lineHeight: '1.5' }}>
               Comparte este enlace único con los IMOs para que reporten el estado de sus enrolados. 
               <br/><br/>
-              <strong style={{ color: '#38bdf8' }}>Regla de Linaje de 3 Generaciones:</strong> El sistema de registro está configurado automáticamente por equipos. Por ejemplo:
+              <strong style={{ color: '#38bdf8' }}>Regla de Linaje Dinámica (N-1, N-2, N-3):</strong> El sistema de registro está configurado automáticamente para la <strong>{filterSede === 'todos' ? 'Sede' : `Sede ${filterSede}`}</strong> y su linaje correspondiente.
+              <br/><br/>
+              {(() => {
+                const getLineageText = (eqStr) => {
+                  const match = eqStr.match(/EQUIPO\s+(\d+)/i);
+                  if (match) {
+                    const n = parseInt(match[1], 10);
+                    if (n > 3) {
+                      return (
+                        <div style={{ background: 'rgba(56, 189, 248, 0.1)', borderLeft: '4px solid #38bdf8', padding: '10px 15px', borderRadius: '0 6px 6px 0', marginTop: '10px', color: '#e2e8f0' }}>
+                          Configuración detectada para <strong>{eqStr}</strong>:
+                          <br/>
+                          IMOs de Equipos <strong>{n-3}, {n-2} y {n-1}</strong> enrolan para el <strong>Equipo {n}</strong>.
+                        </div>
+                      );
+                    }
+                  }
+                  return (
+                    <div style={{ background: 'rgba(255, 183, 3, 0.1)', borderLeft: '4px solid #ffb703', padding: '10px 15px', borderRadius: '0 6px 6px 0', marginTop: '10px', color: '#e2e8f0', fontSize: '0.85rem' }}>
+                      (Selecciona un Equipo específico en los filtros arriba para ver el cálculo exacto de su linaje generacional).
+                    </div>
+                  );
+                };
+                return getLineageText(filterEquipo);
+              })()}
             </p>
-            <ul style={{ marginTop: '-1rem', marginBottom: '1.5rem', paddingLeft: '1.5rem', color: '#cbd5e1', fontSize: '0.9rem' }}>
-              <li>Equipos <strong>28, 29, 30</strong> enrolan para el <strong>Equipo 31</strong></li>
-              <li>Equipos <strong>27, 28, 29</strong> enrolan para el <strong>Equipo 30</strong></li>
-              <li>Equipos <strong>26, 27, 28</strong> enrolan para el <strong>Equipo 29</strong></li>
-            </ul>
             
             <div style={{ background: '#0f172a', padding: '1rem', borderRadius: '8px', border: '1px solid #334155', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' }}>
               <span style={{ color: '#10b981', fontFamily: 'monospace', fontSize: '0.9rem', overflow: 'hidden', textOverflow: 'ellipsis' }}>
