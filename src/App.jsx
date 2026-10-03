@@ -225,7 +225,7 @@ function App() {
             </RoleRoute>
           } />
           <Route path="/finance-workspace" element={
-            <RoleRoute allowedRoles={['finanzas', 'facturacion', 'contador', 'cfo', 'superadmin', 'direccion']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['finanzas', 'facturacion', 'contador', 'superadmin']} requireSuperAdmin={false}>
               <FinanceWorkspace />
             </RoleRoute>
           } />

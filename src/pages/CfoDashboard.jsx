@@ -754,22 +754,6 @@ export default function CfoDashboard() {
                   </p>
                 </div>
 
-                <button 
-                  onClick={() => navigate('/finance-workspace')}
-                  className="btn-primary"
-                  style={{
-                    padding: '0.5rem 1rem',
-                    fontSize: '0.82rem',
-                    borderRadius: '8px',
-                    background: 'linear-gradient(135deg, #10b981, #047857)',
-                    color: '#fff',
-                    fontWeight: 800,
-                    border: 'none',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Ir al Workspace Contable ➔
-                </button>
               </div>
 
               {loadingCloses ? (

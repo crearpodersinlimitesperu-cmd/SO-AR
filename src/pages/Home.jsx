@@ -580,7 +580,7 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Carga de comprobantes, rendición de cuentas, liquidaciones y conciliación bancaria semanal',
     keywords: ['finanzas', 'facturacion', 'conciliacion', 'gastos', 'rendicion', 'liquidaciones', 'contabilidad'],
     route: '/finance-workspace',
-    roles: ['finanzas', 'facturacion', 'contador', 'cfo', 'superadmin', 'direccion']
+    roles: ['finanzas', 'facturacion', 'contador', 'superadmin']
   },
   {
     id: 'opt-andres-command',
@@ -712,7 +712,7 @@ const MODULE_REGISTRY = [
   // Solo Gerentes, Coordinadores C1Y2 y Coordinadores de MJ, según la Matriz Oficial.
   { id: 'generador-flyer', label: 'Generador de Flyers Oficiales', emoji: '🎨', route: '/generador-flyer', roles: ['gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj'] },
   { id: 'cfo-dashboard', label: 'Dirección Financiera Global', emoji: '🏦', route: '/cfo-dashboard', roles: null, visible: (u) => ['cfo', 'ceo', 'superadmin', 'direccion'].includes(u?.appRole) || u?.isSuperAdmin },
-  { id: 'finance-workspace', label: 'Operativa Financiera', emoji: '💸', route: '/finance-workspace', roles: null, visible: (u) => ['finanzas', 'facturacion', 'contador', 'cfo', 'superadmin'].includes(u?.appRole) },
+  { id: 'finance-workspace', label: 'Operativa Financiera', emoji: '💸', route: '/finance-workspace', roles: null, visible: (u) => ['finanzas', 'facturacion', 'contador', 'superadmin'].includes(u?.appRole) },
   { id: 'maestria-global', label: 'Comando Global Maestría', emoji: '🎯', route: '/maestria-global', roles: null, visible: (u) => ['director_maestria', 'direccion', 'superadmin', 'ceo'].includes(u?.appRole) || u?.isSuperAdmin },
   { id: 'trainer-hub', label: 'Academia y Hub de Entrenamiento', emoji: '🎓', route: '/trainer-hub', roles: null, visible: (u) => ['entrenador', 'direccion', 'superadmin', 'ceo', 'director_maestria'].includes(u?.appRole) || u?.isSuperAdmin },
   { id: 'call-coach-crm', label: 'CRM Entrenadores de Llamadas', emoji: '📞', route: '/call-coach-crm', roles: null, visible: (u) => ['entrenador_llamadas', 'direccion', 'superadmin', 'ceo'].includes(u?.appRole) || u?.isSuperAdmin },
@@ -2164,7 +2164,7 @@ export default function Home() {
                     🏦 Dirección Financiera Global
                   </button>
                 )}
-                {hasRoleAccess(['finanzas', 'facturacion', 'contador', 'cfo', 'superadmin', 'direccion']) && (
+                {hasRoleAccess(['finanzas', 'facturacion', 'contador', 'superadmin']) && (
                   <button onClick={() => { setShowToolsDropdown(false); navigate('/finance-workspace'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#34d399', background: 'rgba(52, 211, 153, 0.1)' }}>
                     💸 Operativa Financiera
                   </button>
@@ -2349,7 +2349,7 @@ export default function Home() {
               🏦 Dir. Financiera
             </button>
           )}
-          {hasRoleAccess(['finanzas', 'facturacion', 'contador', 'cfo', 'superadmin', 'direccion']) && (
+          {hasRoleAccess(['finanzas', 'facturacion', 'contador', 'superadmin']) && (
             <button onClick={() => navigate('/finance-workspace')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #1e293b, #065f46)', color: '#34d399', border: '1px solid #34d399' }}>
               💸 Finanzas
             </button>
