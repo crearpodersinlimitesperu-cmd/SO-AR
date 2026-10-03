@@ -187,7 +187,7 @@ export default function CfoDashboard() {
               </h1>
             </div>
             <p style={{ color: 'var(--text-muted)', margin: '0 0 0 3.2rem', fontSize: '0.9rem', fontWeight: 500 }}>
-              Torre de Control de Riesgo Financiero, Auditoría Zero-Trust y Liquidación de Planilla
+              Supervisión gráfica, amable y clara de los procesos contables y cierres de tu equipo
             </p>
           </div>
           
@@ -338,7 +338,7 @@ export default function CfoDashboard() {
               gap: '0.5rem'
             }}
           >
-            <Building size={16} /> 1. Auditoría Sedes (Zero-Trust)
+            <Building size={16} /> 1. Estado de Conciliaciones
           </button>
 
           <button
@@ -357,7 +357,7 @@ export default function CfoDashboard() {
               gap: '0.5rem'
             }}
           >
-            <Users size={16} /> 2. Pasivo Flotante: Planilla Entrenadores (${trainerPasivoFlotanteUSD.toLocaleString()})
+            <Users size={16} /> 2. Planilla de Entrenadores (${trainerPasivoFlotanteUSD.toLocaleString()})
           </button>
 
           <button
@@ -376,7 +376,7 @@ export default function CfoDashboard() {
               gap: '0.5rem'
             }}
           >
-            <FileText size={16} /> 3. Cierres Diarios y Trazabilidad ({dailyCloses.length})
+            <FileText size={16} /> 3. Cierres Diarios Reportados ({dailyCloses.length})
           </button>
         </div>
 
@@ -393,7 +393,7 @@ export default function CfoDashboard() {
               <div style={{ padding: '1.2rem 1.5rem', borderBottom: '1px solid var(--border-subtle)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
                 <div>
                   <h2 style={{ margin: 0, fontSize: '1.15rem', color: 'var(--text-heading)', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                    <BarChart2 size={20} color="var(--crear-gold)" /> Auditoría Sede por Sede (SLA Contable y Conciliación)
+                    <BarChart2 size={20} color="var(--crear-gold)" /> Estado de Conciliaciones por Sede
                   </h2>
                   <p style={{ margin: '0.3rem 0 0 0', fontSize: '0.82rem', color: 'var(--text-muted)' }}>
                     Cruce de caja real entre facturación Nodus y extractos bancarios oficiales por sede.
@@ -531,7 +531,7 @@ export default function CfoDashboard() {
             {/* SECCIÓN RENDIMIENTO CONTABLE Y SLAS */}
             <div>
               <h2 style={{ fontSize: '1.15rem', color: 'var(--text-heading)', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1rem' }}>
-                <Users size={18} color="var(--crear-gold)" /> Asignación de Responsables y Ventana de Cierre (Viernes 9:00 AM)
+                <Users size={18} color="var(--crear-gold)" /> Equipo Contable y Ventana de Cierre (Viernes 9:00 AM)
               </h2>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.2rem' }}>
                 {sedesData.map(hq => {
@@ -734,7 +734,7 @@ export default function CfoDashboard() {
           </div>
         )}
 
-        {/* ── TAB 3: CIERRES DIARIOS Y TRAZABILIDAD (CONTABILIDAD) ── */}
+        {/* ── TAB 3: CIERRES DIARIOS REPORTADOS ── */}
         {activeTab === 'cierres' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             <div className="glass-panel" style={{ 
@@ -747,7 +747,7 @@ export default function CfoDashboard() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.2rem', flexWrap: 'wrap', gap: '1rem' }}>
                 <div>
                   <h3 style={{ margin: 0, fontSize: '1.15rem', color: 'var(--text-heading)', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <FileText size={18} color="#10b981" /> Historial de Cierres Diarios y Transacciones
+                    <FileText size={18} color="#10b981" /> Cierres Diarios Reportados por el Equipo
                   </h3>
                   <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.82rem', color: 'var(--text-muted)' }}>
                     Cierres de caja y estados de conciliación reportados desde las sedes operativas.
