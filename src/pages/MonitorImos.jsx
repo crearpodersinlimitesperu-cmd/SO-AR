@@ -2375,13 +2375,15 @@ export default function MonitorImos() {
           <div className="glass-panel" style={{ background: 'var(--bg-card)', padding: '2.5rem', borderRadius: '16px', maxWidth: '700px', width: '100%', border: '1px solid var(--border-subtle)', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
               <h2 style={{ margin: 0, color: 'var(--text-heading)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.4rem' }}>
-                🧠 Secuencia Neuromarketing IMO
+                🧠 Secuencia NeuroMkt (Integrada a Calendario)
               </h2>
               <span style={{ fontSize: '0.75rem', background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444', padding: '4px 8px', borderRadius: '4px', fontWeight: 800 }}>HASTA CONFIRMACIÓN NODUS</span>
             </div>
             
             <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem', lineHeight: '1.5' }}>
-              Esta secuencia automática se activa al iniciar el Capítulo. Impacta al IMO con diferentes <strong>gatillos psicológicos</strong> cada 3 días, y <strong>se detiene de inmediato</strong> cuando el participante confirma asistencia y Coordinación lo valida en Nodus.
+              Esta secuencia automática se activa al finalizar el evento de enrolamiento. El sistema <strong>cruza la información del {filterEquipo !== 'todos' ? filterEquipo : 'Equipo Destino'} con el calendario general</strong> para insertar la fecha y hora exacta del próximo C1 en los correos.
+              <br/><br/>
+              Impacta al IMO con gatillos psicológicos cada 3 días y <strong>se detiene de inmediato</strong> cuando Coordinación marca la confirmación en Nodus.
             </p>
 
             <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
@@ -2393,20 +2395,20 @@ export default function MonitorImos() {
             <div style={{ background: '#0f172a', padding: '1.5rem', borderRadius: '8px', border: '1px solid #334155', minHeight: '160px' }}>
               {activeNeuroDay === 1 && (
                 <div>
-                  <h4 style={{ color: '#3b82f6', margin: '0 0 0.5rem 0', fontSize: '0.9rem' }}>ASUNTO: Tu participante te está esperando (Aviso de Coordinación)</h4>
-                  <p style={{ color: '#cbd5e1', fontSize: '0.85rem', margin: 0, lineHeight: '1.5' }}><strong>Gatillo (Identidad y Compromiso):</strong> Se apela a la responsabilidad moral que asumió el IMO. Se le recuerda la nueva fecha del entrenamiento y se le brinda el enlace para que el participante se reporte, enmarcándolo como un acto de cuidado y amor, no como una venta.</p>
+                  <h4 style={{ color: '#3b82f6', margin: '0 0 0.5rem 0', fontSize: '0.9rem' }}>ASUNTO: Tu participante te está esperando en el {filterEquipo !== 'todos' ? filterEquipo : 'próximo entrenamiento'}</h4>
+                  <p style={{ color: '#cbd5e1', fontSize: '0.85rem', margin: 0, lineHeight: '1.5' }}><strong>Gatillo (Identidad y Compromiso):</strong> "Hola, la fecha oficial de inicio para el {filterEquipo !== 'todos' ? filterEquipo : 'entrenamiento'} ya está en calendario. Tu participante confió en ti para este proceso. Te enviamos el enlace para que confirme su asistencia y no pierda su espacio. Esto es un acto de cuidado, ¡gracias por ser su puente!"</p>
                 </div>
               )}
               {activeNeuroDay === 4 && (
                 <div>
-                  <h4 style={{ color: '#f59e0b', margin: '0 0 0.5rem 0', fontSize: '0.9rem' }}>ASUNTO: Falta validación Nodus para tu enrolado [Nombre]</h4>
-                  <p style={{ color: '#cbd5e1', fontSize: '0.85rem', margin: 0, lineHeight: '1.5' }}><strong>Gatillo (Autoridad y Disonancia Cognitiva):</strong> Se introduce el término institucional "Nodus". El mensaje es más formal e indica que Coordinación no tiene registrado el check-in. Genera una leve incomodidad al ver que su gestión está incompleta en el "Sistema Oficial".</p>
+                  <h4 style={{ color: '#f59e0b', margin: '0 0 0.5rem 0', fontSize: '0.9rem' }}>ASUNTO: Falta validación Nodus para tu enrolado</h4>
+                  <p style={{ color: '#cbd5e1', fontSize: '0.85rem', margin: 0, lineHeight: '1.5' }}><strong>Gatillo (Autoridad y Disonancia Cognitiva):</strong> "Notamos que Coordinación aún no tiene el check-in de tu enrolado en el Sistema Nodus oficial. Estando tan cerca de la fecha de inicio del {filterEquipo !== 'todos' ? filterEquipo : 'entrenamiento'}, es vital regularizar esto para no afectar las métricas de tu linaje."</p>
                 </div>
               )}
               {activeNeuroDay === 7 && (
                 <div>
-                  <h4 style={{ color: '#ef4444', margin: '0 0 0.5rem 0', fontSize: '0.9rem' }}>ASUNTO: ÚLTIMO AVISO: Posible baja de [Nombre] del entrenamiento</h4>
-                  <p style={{ color: '#cbd5e1', fontSize: '0.85rem', margin: 0, lineHeight: '1.5' }}><strong>Gatillo (Escasez y Aversión a la Pérdida):</strong> Se activa el miedo a perder el espacio. Se informa que, al no tener confirmación de Coordinación en Nodus, el cupo de su enrolado está en riesgo de ser reasignado. Esto provoca acción inmediata.</p>
+                  <h4 style={{ color: '#ef4444', margin: '0 0 0.5rem 0', fontSize: '0.9rem' }}>ASUNTO: ÚLTIMO AVISO: Posible liberación de cupo para el {filterEquipo !== 'todos' ? filterEquipo : 'entrenamiento'}</h4>
+                  <p style={{ color: '#cbd5e1', fontSize: '0.85rem', margin: 0, lineHeight: '1.5' }}><strong>Gatillo (Escasez y Aversión a la Pérdida):</strong> "Al no tener confirmación de Coordinación en Nodus, el cupo físico (silla) reservado para tu enrolado está a punto de ser reasignado a lista de espera. Si no confirma hoy, perderá su espacio para el evento. Haz clic aquí urgente."</p>
                 </div>
               )}
             </div>
