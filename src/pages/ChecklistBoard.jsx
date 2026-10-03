@@ -239,6 +239,18 @@ export default function ChecklistBoard() {
   const showPhaseTabs = true;
   const isCurrentStageInRole = effectiveStage && PHASE_ORDER.includes(effectiveStage);
 
+  // AUTO-FALLBACK: Si la pestaña actual es 'active', pero el rol no tiene tareas asignadas
+  // para esa fase cronológica, y SÍ tiene tareas en general, cambiamos automáticamente 
+  // la pestaña a 'all' (Todo el Catálogo) para evitar que el usuario vea un tablero vacío.
+  useEffect(() => {
+    if (qtPhaseFilter === 'active' && isCurrentStageInRole && myTasks.length > 0) {
+      const activePhaseTaskCount = myTasks.filter(t => t.cyclePhase === effectiveStage).length;
+      if (activePhaseTaskCount === 0) {
+        setQtPhaseFilter('all');
+      }
+    }
+  }, [qtPhaseFilter, isCurrentStageInRole, effectiveStage, myTasks.length]);
+
   const sortByDeadline = (tasksArray) => {
     return tasksArray.sort((a, b) => {
       const dA = a.deadline || calculateAutomaticDeadline(a, cycleForTask(a));
