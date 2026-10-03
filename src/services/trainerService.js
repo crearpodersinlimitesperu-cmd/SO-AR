@@ -82,16 +82,7 @@ export async function acknowledgeFeedback(feedbackId) {
  * Obtiene el Briefing de Sesión del Coordinador
  */
 export async function getTrainerBriefing(sede) {
-  // Simulamos un briefing cargado por el Coordinador de la Sede
-  return {
-    sede: sede || 'Global',
-    coordinatorName: 'Gabriela Rivadeneyra',
-    week: '1ra Sem. Octubre 2026',
-    temperature: 'Grupo muy analítico. 40 enrolados, 15 de ellos ingenieros/abogados.',
-    criticalProfiles: 'Participante Juan P. (Silla 3): Tiene resistencia severa a las dinámicas de vulnerabilidad.',
-    logisticNotes: 'Salón habilitado desde las 7:00 AM. AC configurado a 18°C como pediste.',
-    updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString() // Ayer
-  };
+  return null;
 }
 
 /**

@@ -54,30 +54,5 @@ export function sanitizeNodusKPIs(rawNodusData) {
 }
 
 export async function getCleanMaestriaKPIs() {
-  // Simulamos la obtención y depuración de datos
-  const mockRawData = [
-    { sede: 'Quito', equipo: 'Alpha', llamadasNoContestadas: 5, retencion: 95 },
-    { sede: 'Quito', equipo: 'Equipo 1000', llamadasNoContestadas: 0, retencion: 100 }, // Dato distorsionado
-    { sede: 'México', equipo: 'Beta', llamadasNoContestadas: 15, retencion: 82 },
-    { sede: 'Lima', equipo: 'Gamma', llamadasNoContestadas: 8, retencion: 89 },
-  ];
-
-  const cleanedData = sanitizeNodusKPIs(mockRawData);
-  
-  // Consolidar por sede
-  const kpisPorSede = cleanedData.reduce((acc, curr) => {
-    if (!acc[curr.sede]) {
-      acc[curr.sede] = { llamadasFallidas: 0, retencionAcum: 0, count: 0 };
-    }
-    acc[curr.sede].llamadasFallidas += curr.llamadasNoContestadas;
-    acc[curr.sede].retencionAcum += curr.retencion;
-    acc[curr.sede].count += 1;
-    return acc;
-  }, {});
-
-  return Object.keys(kpisPorSede).map(sede => ({
-    sede,
-    llamadasFallidas: kpisPorSede[sede].llamadasFallidas,
-    retencionPromedio: (kpisPorSede[sede].retencionAcum / kpisPorSede[sede].count).toFixed(1) + '%'
-  }));
+  return [];
 }
