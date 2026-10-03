@@ -144,8 +144,11 @@ export default function AndresCommandCenter() {
           <h2 style={{ fontSize: '1.2rem', color: 'var(--text-heading)', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 0 1.5rem 0' }}>
             <Users size={22} color="#8b5cf6" /> Board de Supervisión Global (Coordinadores Locales)
           </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
-            {supervision.map(s => (
+          {supervision.length === 0 ? (
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Sincronizando datos reales con coordinadores de sede...</p>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+              {supervision.map(s => (
               <div key={s.id} style={{ background: 'var(--bg-dark-alt)', borderRadius: '8px', borderTop: s.status === 'CRITICAL' ? '4px solid #ef4444' : s.status === 'WARNING' ? '4px solid #f59e0b' : '4px solid #10b981', padding: '1.2rem', border: '1px solid var(--border-subtle)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
                   <div>
@@ -167,7 +170,8 @@ export default function AndresCommandCenter() {
                 </div>
               </div>
             ))}
-          </div>
+            </div>
+          )}
         </div>
 
         {/* LEGACY WRAPPER */}
