@@ -63,6 +63,10 @@ export default function MonitorImos() {
     }
   };
 
+  const [showImoLinkModal, setShowImoLinkModal] = useState(false);
+  const [showNeuroModal, setShowNeuroModal] = useState(false);
+  const [activeNeuroDay, setActiveNeuroDay] = useState(1);
+
   const navigate = useNavigate();
 
   const formatDate = (ts) => {
@@ -759,31 +763,75 @@ export default function MonitorImos() {
           </p>
         </div>
 
-        <button
-          onClick={handleResetAll}
-          disabled={missions.length === 0}
-          style={{
-            background: 'rgba(239, 68, 68, 0.15)',
-            color: '#ef4444',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
-            padding: '0.5rem 1rem',
-            borderRadius: '6px',
-            fontWeight: 600,
-            cursor: missions.length === 0 ? 'not-allowed' : 'pointer',
-            opacity: missions.length === 0 ? 0.5 : 1,
-            transition: 'all 0.2s ease'
-          }}
-          onMouseEnter={(e) => {
-            if (missions.length > 0) {
-              e.currentTarget.style.background = 'rgba(239, 68, 68, 0.25)';
-            }
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'rgba(239, 68, 68, 0.15)';
-          }}
-        >
-          Resetear Todos (Pruebas)
-        </button>
+        <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          <button
+            onClick={() => setShowNeuroModal(true)}
+            style={{
+              background: 'rgba(59, 130, 246, 0.15)',
+              color: '#38bdf8',
+              border: '1px solid rgba(59, 130, 246, 0.3)',
+              padding: '0.5rem 1rem',
+              borderRadius: '6px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(59, 130, 246, 0.25)'}
+            onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(59, 130, 246, 0.15)'}
+          >
+            🧠 Secuencia NeuroMkt
+          </button>
+
+          <button
+            onClick={() => setShowImoLinkModal(true)}
+            style={{
+              background: 'rgba(16, 185, 129, 0.15)',
+              color: '#10b981',
+              border: '1px solid rgba(16, 185, 129, 0.3)',
+              padding: '0.5rem 1rem',
+              borderRadius: '6px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(16, 185, 129, 0.25)'}
+            onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(16, 185, 129, 0.15)'}
+          >
+            🔗 Link IMO (Linaje)
+          </button>
+
+          <button
+            onClick={handleResetAll}
+            disabled={missions.length === 0}
+            style={{
+              background: 'rgba(239, 68, 68, 0.15)',
+              color: '#ef4444',
+              border: '1px solid rgba(239, 68, 68, 0.3)',
+              padding: '0.5rem 1rem',
+              borderRadius: '6px',
+              fontWeight: 600,
+              cursor: missions.length === 0 ? 'not-allowed' : 'pointer',
+              opacity: missions.length === 0 ? 0.5 : 1,
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              if (missions.length > 0) {
+                e.currentTarget.style.background = 'rgba(239, 68, 68, 0.25)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(239, 68, 68, 0.15)';
+            }}
+          >
+            Resetear Todos
+          </button>
+        </div>
       </header>
 
       {/* Estilos para forzar contraste total en select y option en cualquier navegador y modo */}
@@ -2267,6 +2315,92 @@ export default function MonitorImos() {
         </table>
       </div>
       )}
+
+      {/* ── MODAL: LINK REGISTRO IMO ── */}
+      {showImoLinkModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.9)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem', backdropFilter: 'blur(5px)' }}>
+          <div className="glass-panel" style={{ background: 'var(--bg-card)', padding: '2.5rem', borderRadius: '16px', maxWidth: '600px', width: '100%', border: '1px solid var(--border-subtle)', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
+            <h2 style={{ margin: '0 0 1rem 0', color: 'var(--text-heading)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.4rem' }}>
+              🔗 Generador de Link IMO (Linaje)
+            </h2>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', marginBottom: '1.5rem', lineHeight: '1.5' }}>
+              Comparte este enlace único con los IMOs para que reporten el estado de sus enrolados. 
+              <br/><br/>
+              <strong style={{ color: '#38bdf8' }}>Regla de Linaje de 3 Generaciones:</strong> El sistema de registro está configurado automáticamente por equipos. Por ejemplo:
+            </p>
+            <ul style={{ marginTop: '-1rem', marginBottom: '1.5rem', paddingLeft: '1.5rem', color: '#cbd5e1', fontSize: '0.9rem' }}>
+              <li>Equipos <strong>28, 29, 30</strong> enrolan para el <strong>Equipo 31</strong></li>
+              <li>Equipos <strong>27, 28, 29</strong> enrolan para el <strong>Equipo 30</strong></li>
+              <li>Equipos <strong>26, 27, 28</strong> enrolan para el <strong>Equipo 29</strong></li>
+            </ul>
+            
+            <div style={{ background: '#0f172a', padding: '1rem', borderRadius: '8px', border: '1px solid #334155', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' }}>
+              <span style={{ color: '#10b981', fontFamily: 'monospace', fontSize: '0.9rem', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                https://cpsl.com/imo/registro-progreso?sede={filterSede}&linaje=auto
+              </span>
+              <button onClick={() => alert('Link copiado al portapapeles')} style={{ background: '#38bdf8', color: '#0f172a', border: 'none', padding: '0.4rem 0.8rem', borderRadius: '4px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.8rem' }}>Copiar</button>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <button onClick={() => setShowImoLinkModal(false)} className="btn-secondary" style={{ background: 'transparent', border: '1px solid var(--border-subtle)', color: 'var(--text-main)', padding: '0.6rem 1.5rem', borderRadius: '6px', fontWeight: 600, cursor: 'pointer' }}>
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── MODAL: SIMULADOR DE NEUROMARKETING (SEGUIMIENTO 3 DÍAS) ── */}
+      {showNeuroModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.9)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem', backdropFilter: 'blur(5px)' }}>
+          <div className="glass-panel" style={{ background: 'var(--bg-card)', padding: '2.5rem', borderRadius: '16px', maxWidth: '700px', width: '100%', border: '1px solid var(--border-subtle)', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+              <h2 style={{ margin: 0, color: 'var(--text-heading)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.4rem' }}>
+                🧠 Secuencia Neuromarketing IMO
+              </h2>
+              <span style={{ fontSize: '0.75rem', background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444', padding: '4px 8px', borderRadius: '4px', fontWeight: 800 }}>HASTA CONFIRMACIÓN NODUS</span>
+            </div>
+            
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem', lineHeight: '1.5' }}>
+              Esta secuencia automática se activa al iniciar el Capítulo. Impacta al IMO con diferentes <strong>gatillos psicológicos</strong> cada 3 días, y <strong>se detiene de inmediato</strong> cuando el participante confirma asistencia y Coordinación lo valida en Nodus.
+            </p>
+
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
+              <button onClick={() => setActiveNeuroDay(1)} style={{ flex: 1, padding: '0.6rem', border: activeNeuroDay === 1 ? '1px solid #3b82f6' : '1px solid var(--border-subtle)', background: activeNeuroDay === 1 ? 'rgba(59, 130, 246, 0.1)' : 'transparent', color: activeNeuroDay === 1 ? '#3b82f6' : 'var(--text-muted)', borderRadius: '6px', fontWeight: 600, cursor: 'pointer' }}>Día 1: Identidad</button>
+              <button onClick={() => setActiveNeuroDay(4)} style={{ flex: 1, padding: '0.6rem', border: activeNeuroDay === 4 ? '1px solid #f59e0b' : '1px solid var(--border-subtle)', background: activeNeuroDay === 4 ? 'rgba(245, 158, 11, 0.1)' : 'transparent', color: activeNeuroDay === 4 ? '#f59e0b' : 'var(--text-muted)', borderRadius: '6px', fontWeight: 600, cursor: 'pointer' }}>Día 4: Autoridad</button>
+              <button onClick={() => setActiveNeuroDay(7)} style={{ flex: 1, padding: '0.6rem', border: activeNeuroDay === 7 ? '1px solid #ef4444' : '1px solid var(--border-subtle)', background: activeNeuroDay === 7 ? 'rgba(239, 68, 68, 0.1)' : 'transparent', color: activeNeuroDay === 7 ? '#ef4444' : 'var(--text-muted)', borderRadius: '6px', fontWeight: 600, cursor: 'pointer' }}>Día 7: Escasez</button>
+            </div>
+
+            <div style={{ background: '#0f172a', padding: '1.5rem', borderRadius: '8px', border: '1px solid #334155', minHeight: '160px' }}>
+              {activeNeuroDay === 1 && (
+                <div>
+                  <h4 style={{ color: '#3b82f6', margin: '0 0 0.5rem 0', fontSize: '0.9rem' }}>ASUNTO: Tu participante te está esperando (Aviso de Coordinación)</h4>
+                  <p style={{ color: '#cbd5e1', fontSize: '0.85rem', margin: 0, lineHeight: '1.5' }}><strong>Gatillo (Identidad y Compromiso):</strong> Se apela a la responsabilidad moral que asumió el IMO. Se le recuerda la nueva fecha del entrenamiento y se le brinda el enlace para que el participante se reporte, enmarcándolo como un acto de cuidado y amor, no como una venta.</p>
+                </div>
+              )}
+              {activeNeuroDay === 4 && (
+                <div>
+                  <h4 style={{ color: '#f59e0b', margin: '0 0 0.5rem 0', fontSize: '0.9rem' }}>ASUNTO: Falta validación Nodus para tu enrolado [Nombre]</h4>
+                  <p style={{ color: '#cbd5e1', fontSize: '0.85rem', margin: 0, lineHeight: '1.5' }}><strong>Gatillo (Autoridad y Disonancia Cognitiva):</strong> Se introduce el término institucional "Nodus". El mensaje es más formal e indica que Coordinación no tiene registrado el check-in. Genera una leve incomodidad al ver que su gestión está incompleta en el "Sistema Oficial".</p>
+                </div>
+              )}
+              {activeNeuroDay === 7 && (
+                <div>
+                  <h4 style={{ color: '#ef4444', margin: '0 0 0.5rem 0', fontSize: '0.9rem' }}>ASUNTO: ÚLTIMO AVISO: Posible baja de [Nombre] del entrenamiento</h4>
+                  <p style={{ color: '#cbd5e1', fontSize: '0.85rem', margin: 0, lineHeight: '1.5' }}><strong>Gatillo (Escasez y Aversión a la Pérdida):</strong> Se activa el miedo a perder el espacio. Se informa que, al no tener confirmación de Coordinación en Nodus, el cupo de su enrolado está en riesgo de ser reasignado. Esto provoca acción inmediata.</p>
+                </div>
+              )}
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1.5rem' }}>
+              <button onClick={() => setShowNeuroModal(false)} className="btn-secondary" style={{ background: 'transparent', border: '1px solid var(--border-subtle)', color: 'var(--text-main)', padding: '0.6rem 1.5rem', borderRadius: '6px', fontWeight: 600, cursor: 'pointer' }}>
+                Cerrar Simulación
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
