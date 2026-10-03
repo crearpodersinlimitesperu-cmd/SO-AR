@@ -159,6 +159,11 @@ function RoleRoute({ children, allowedRoles = [], allowedEmails = [], requireSup
 
 function App() {
   const { originalAdminUser, currentUser, stopSimulation } = useAuth();
+  useEffect(() => {
+    startCausaNodusAgent();
+    return () => stopCausaNodusAgent();
+  }, []);
+
   const [showHelp, setShowHelp] = useState(false);
   const location = useLocation();
   // /home ya tiene su propio selector "Tema:" inline (junto al selector de Vista) —

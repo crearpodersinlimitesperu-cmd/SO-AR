@@ -8,8 +8,16 @@ import { useAuth } from '../context/AuthContext';
 function generateAssertiveResponse(queryText, nodusData, currentUser, messageHistory = []) {
   let q = (queryText || '').toLowerCase().trim();
   const coords = nodusData?.coordinadores || [];
-  const totales = nodusData?.totales || {};
+  const totales = nodusData?.totales || nodusData?.nodusTotales || {};
   const sedes = nodusData?.sedes || [];
+  const fastCacheEnrolados = nodusData?.enroladosConStatus || [];
+  const fastCacheMissions = nodusData?.imoMissions || [];
+  
+  if (q.includes('discrepancias') || q.includes('verificado') || q.includes('pendientes')) {
+     const verificados = fastCacheEnrolados.filter(e => e.statusIA === 'VERIFICADO_OK').length;
+     const discrepancias = fastCacheEnrolados.filter(e => e.statusIA === 'DISCREPANCIA').length;
+     return `📊 **Reporte Rápido de Status (Nodus + IMO):**\n\n* Enrolados analizados: **${fastCacheEnrolados.length}**\n* Verificados Ok por Coordinación: **${verificados}**\n* Con Discrepancias (IMO dice sí, Nodus dice no): **${discrepancias}**\n\n_(Datos pre-calculados por el Agente Centinela en background)_.`;
+  }
 
   // 0. Resolución contextual de preguntas de seguimiento ("ya tienes respuesta a mi pregunta", "y cuántos son", etc.)
   const followUpTriggers = [
@@ -491,6 +499,12 @@ export default function AICopilot() {
       // Intento 2: Si el backend no respondió, dio error o rechazo defensivo, activar el Motor Autónomo Directo de Nodus (Cero Errores y Cero Alucinación)
       if (!aiText) {
         let nodusData = null;
+        try {
+          const saved = localStorage.getItem("CAUSA_FAST_CACHE");
+          if (saved) {
+             nodusData = JSON.parse(saved);
+          }
+        } catch(e) {}
         try {
           const nodusDoc = await getDocResilient(doc(db, 'nodus_coordinadores_c1c2', 'latest'));
           if (nodusDoc && nodusDoc.exists()) {
