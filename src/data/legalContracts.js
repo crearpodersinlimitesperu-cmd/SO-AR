@@ -207,19 +207,19 @@ Privacidad Integral de CREAR PSL Global, disponible en https://crearpsl.com/priv
         id: 'consentimiento_datos_pe',
         title: 'Consentimiento Expreso para Banco de Datos Personales',
         type: 'privacy',
-        version: '2026-v1',
+        version: '2026-10-04-pe-v2',
         required: true,
         checkboxLabel: 'Otorgo mi consentimiento expreso para el tratamiento de mis datos personales conforme a la Ley N.º 29733.',
         content: `
 CONSENTIMIENTO EXPRESO PARA TRATAMIENTO DE DATOS PERSONALES
-CREAR PSL PERU S.A.C. — Banco de Datos Personales: "PARTICIPANTES PROGRAMA CREACIÓN"
+CREACIÓN CUÁNTICA E.I.R.L. (RUC 20612592811) — Banco de Datos Personales: "PARTICIPANTES PROGRAMA CREACIÓN"
 
 Conforme a lo dispuesto en la Ley N.º 29733, Ley de Protección de Datos Personales, su
 Reglamento aprobado por D.S. N.º 003-2013-JUS, y la Resolución Directoral N.º 016-2024-JUS/ANPD
-de la Autoridad Nacional de Protección de Datos Personales (ANPD), CREAR PSL Peru S.A.C.
+de la Autoridad Nacional de Protección de Datos Personales (ANPD), CREACIÓN CUÁNTICA E.I.R.L. (RUC 20612592811)
 (en adelante "el Titular del Banco"), con domicilio en Lima, Perú, le informa lo siguiente:
 
-TITULAR DEL BANCO DE DATOS: CREAR PSL Peru S.A.C., Lima, Perú.
+TITULAR DEL BANCO DE DATOS: CREACIÓN CUÁNTICA E.I.R.L. (RUC 20612592811), Lima, Perú.
 NOMBRE DEL BANCO: "PARTICIPANTES PROGRAMA CREACIÓN — CPSL PERU"
 FINALIDAD DEL TRATAMIENTO: Gestión del programa de transformación personal y empresarial,
 comunicación con participantes, seguimiento de avance, facturación y cobro.
@@ -244,12 +244,12 @@ hasta 5 años posteriores para cumplimiento de obligaciones legales.
         id: 'nda_pe',
         title: 'Acuerdo de Confidencialidad y No Divulgación',
         type: 'nda',
-        version: '2026-v1',
+        version: '2026-10-04-pe-v2',
         required: true,
         checkboxLabel: 'Firmo el Acuerdo de Confidencialidad y No Divulgación del Programa.',
         content: `
 ACUERDO DE CONFIDENCIALIDAD Y NO DIVULGACIÓN
-Programa de Creación — CREAR PSL Peru S.A.C.
+Programa de Creación — CREACIÓN CUÁNTICA E.I.R.L. (RUC 20612592811)
 
 Regulado conforme al Código Civil del Perú (D. Legislativo N.º 295) y la Ley de la
 Empresa Individual de Responsabilidad Limitada aplicable.
@@ -264,14 +264,14 @@ de Lima Cercado, Perú, renunciando al fuero de domicilio.
         id: 'autorizacion_grabacion_pe',
         title: 'Autorización de Grabación de Video, Voz e Imagen en Actividades',
         type: 'media_auth',
-        version: '2026-v1',
+        version: '2026-10-04-pe-v2',
         required: true,
         checkboxLabel: 'Autorizo a CREAR PSL a grabar mi imagen, voz y video durante las actividades del programa, conforme a la Ley N.º 29733.',
         content: `
 AUTORIZACIÓN DE GRABACIÓN DE VIDEO, VOZ E IMAGEN EN ACTIVIDADES DE SALA
-CREAR PSL Peru S.A.C. — Fundamento: Ley N.º 29733, Art. 5 y Art. 13
+CREACIÓN CUÁNTICA E.I.R.L. (RUC 20612592811) — Fundamento: Ley N.º 29733, Art. 5 y Art. 13
 
-Yo, el/la participante que suscribe, AUTORIZO EXPRESAMENTE a CREAR PSL Peru S.A.C.
+Yo, el/la participante que suscribe, AUTORIZO EXPRESAMENTE a CREACIÓN CUÁNTICA E.I.R.L. (RUC 20612592811)
 a realizar grabaciones de audio, video y fotografía de mi imagen y voz durante las
 actividades del Programa de Creación.
 
@@ -282,21 +282,21 @@ Reglamento D.S. N.º 003-2013-JUS: Artículo 8 — Finalidades del tratamiento.
 ${TEXTO_GRABACION_BASE}
 
 Banco de Datos Personal afectado: "PARTICIPANTES PROGRAMA CREACIÓN — CPSL PERU"
-Titular del Banco: CREAR PSL Peru S.A.C.
+Titular del Banco: CREACIÓN CUÁNTICA E.I.R.L. (RUC 20612592811)
         `,
       },
       {
         id: 'flujo_transfronterizo_pe',
         title: 'Cláusula de Flujo Transfronterizo de Datos',
         type: 'terms',
-        version: '2026-v1',
+        version: '2026-10-04-pe-v2',
         required: true,
         checkboxLabel: 'Acepto la transferencia internacional de mis datos para fines operativos del programa.',
         content: `
 CLÁUSULA DE FLUJO TRANSFRONTERIZO DE DATOS PERSONALES
 Art. 15 Ley N.º 29733 — Perú
 
-CREAR PSL Peru S.A.C. informa que, para la correcta operación del Programa de Creación,
+CREACIÓN CUÁNTICA E.I.R.L. (RUC 20612592811) informa que, para la correcta operación del Programa de Creación,
 sus datos personales podrán ser transferidos a las siguientes entidades internacionales
 del grupo CREAR PSL Global:
 

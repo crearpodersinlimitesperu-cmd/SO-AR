@@ -508,5 +508,28 @@ service cloud.firestore {
       allow read: if canReadHojaEnBlanco();
       allow write: if canWriteHojaEnBlanco();
     }
+    // Cada participante puede crear y consultar únicamente sus propias firmas.
+    match /px_legal_signatures/{signatureId} {
+      allow read: if isSuperAdmin() || (isAuthenticated() && resource.data.participant_id == email());
+      allow create: if isAuthenticated()
+        && request.resource.data.owner_uid == request.auth.uid
+        && request.resource.data.participant_id == email()
+        && request.resource.data.id == signatureId
+        && request.resource.data.signed_at == request.time
+        && request.resource.data.status == 'COMPLETED'
+        && request.resource.data.signature_data_url is string
+        && request.resource.data.signature_data_url.size() > 0
+        && request.resource.data.signature_data_url.size() < 700000
+        && request.resource.data.docs_accepted is list
+        && request.resource.data.docs_accepted.size() > 0;
+      // Los datos de aceptación y la firma son inmutables desde el cliente.
+      allow update: if isAuthenticated()
+        && resource.data.owner_uid == request.auth.uid
+        && resource.data.participant_id == email()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'pdf_storage_path', 'pdf_download_url', 'nodus_synced', 'nodus_synced_at'
+        ]);
+      allow delete: if false;
+    }
   }
 }

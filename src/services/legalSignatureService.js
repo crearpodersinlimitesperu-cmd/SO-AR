@@ -4,7 +4,8 @@
  * Versión: 2026-v1
  */
 
-import { db, storage } from './firebase';
+import { getContractsByCountry } from '../data/legalContracts';
+import { db, storage, auth } from './firebase';
 import {
   collection, doc, setDoc, getDoc, getDocs, query, where,
   serverTimestamp, orderBy
@@ -93,6 +94,8 @@ export const saveLegalSignature = async (payload) => {
   const record = {
     id: signatureId,
     participant_id: payload.participantId || '',
+    owner_uid: auth.currentUser?.uid || '',
+    document_versions: payload.documentVersions || {},
     participant_name: payload.participantName || '',
     country_code: payload.countryCode || 'PE',
     sede: payload.sede || '',
@@ -357,6 +360,9 @@ export const processFullLegalSignature = async (params) => {
   const signatureId = generateUUID();
 
   try {
+    if (!auth.currentUser || auth.currentUser.email?.toLowerCase() !== (params.participantId || '').toLowerCase().trim()) {
+      throw new Error('Inicia sesión con tu propia cuenta antes de guardar la firma.');
+    }
     // (a) Capturar metadatos de auditoría
     const { ipAddress, userAgent, timestamp } = await captureAuditMetadata();
 
@@ -378,7 +384,8 @@ export const processFullLegalSignature = async (params) => {
       ndaSigned: !!params.ndaSigned,
       privacyAccepted: !!params.privacyAccepted,
       docsAccepted: params.docsAccepted || [],
-      policyVersion: '2026-v1',
+      policyVersion: params.countryCode === 'PE' ? '2026-10-04-pe-v2' : '2026-v1',
+      documentVersions: Object.fromEntries(getContractsByCountry(params.countryCode).documents.filter(d => (params.docsAccepted || []).includes(d.id)).map(d => [d.id, d.version])),
       signatureDataUrl: params.signatureDataUrl || '',
       kycData: {
         fullName: params.fullName || params.participantName || '',
@@ -414,7 +421,7 @@ export const processFullLegalSignature = async (params) => {
     return { success: true, signatureId };
   } catch (error) {
     console.error('[LegalSignature] Error en processFullLegalSignature:', error);
-    return { success: false, signatureId: null, error: error.message };
+    return { success: false, signatureId: null, error: error.code === 'permission-denied' ? 'No se pudo guardar la firma por falta de permisos. Tu firma sigue preparada en esta pantalla; vuelve a intentarlo tras actualizar el acceso.' : error.message };
   }
 };
 

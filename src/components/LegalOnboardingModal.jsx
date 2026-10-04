@@ -400,7 +400,7 @@ const LegalOnboardingModal = ({ currentUser, sede, onComplete, onClose }) => {
                   Sello Digital de Excelencia
                 </h3>
                 <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-                  Traza tu firma en el recuadro inferior. Tu firma quedará encriptada y resguardada bajo la máxima seguridad.
+                  Traza tu firma en el recuadro inferior. Se guardará junto con los documentos que aceptaste al finalizar.
                 </p>
               </div>
 
@@ -413,7 +413,7 @@ const LegalOnboardingModal = ({ currentUser, sede, onComplete, onClose }) => {
 
               {signatureDataUrl && (
                 <div style={{ background: 'rgba(34, 197, 94, 0.1)', border: '1px solid rgba(34, 197, 94, 0.3)', borderRadius: 'var(--radius-sm)', padding: '1rem', fontSize: '0.85rem', color: 'var(--color-success)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600 }}>
-                  <CheckCircle size={18} /> Sello biométrico registrado en la base de datos.
+                  <CheckCircle size={18} /> Firma preparada en este dispositivo. Pendiente de guardar al finalizar.
                 </div>
               )}
 
@@ -435,7 +435,7 @@ const LegalOnboardingModal = ({ currentUser, sede, onComplete, onClose }) => {
                   boxShadow: !signatureDataUrl || isSubmitting ? 'none' : '0 10px 25px rgba(34, 197, 94, 0.4)'
                 }}
               >
-                {isSubmitting ? <><Loader size={20} style={{ animation: 'spin 1s linear infinite' }} /> Encriptando...</> : <><Check size={20} /> Finalizar Blindaje</>}
+                {isSubmitting ? <><Loader size={20} style={{ animation: 'spin 1s linear infinite' }} /> Guardando...</> : <><Check size={20} /> Finalizar Blindaje</>}
               </button>
             </div>
           )}
