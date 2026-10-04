@@ -8,11 +8,8 @@ import {
 import { addDoc, collection, doc, getDocFromServer, onSnapshot, serverTimestamp, setDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useAuth } from '../context/AuthContext';
-import { 
-  NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES, 
-  EQUIPOS_FUTUROS_IMPOSIBLES, 
-  ESTADOS_FI 
-} from '../data/nodusFuturosImposiblesData';
+const EQUIPOS_FUTUROS_IMPOSIBLES = ['EQUIPO 27', 'EQUIPO 28', 'EQUIPO 29', 'EQUIPO 30', 'EQUIPO 31'];
+const ESTADOS_FI = { PENDIENTE: 'Pendiente', APROBADO: 'Aprobado', DEVUELTO: 'Devuelto' };
 import { 
   ejecutarDiagnosticoFIs, 
   evaluarCalidadOntologicaFI, 
@@ -34,7 +31,7 @@ export default function FuturosImposiblesView({
   
   // Datos de NODUS: un payload vacío no puede sustituir el último universo
   // verificado ni producir un dictamen de cumplimiento.
-  const [participantesRaw, setParticipantesRaw] = useState(() => NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES);
+  const [participantesRaw, setParticipantesRaw] = useState([]);
   const [sourceState, setSourceState] = useState({
     status: 'snapshot',
     label: 'Respaldo NODUS verificado',
@@ -67,7 +64,7 @@ export default function FuturosImposiblesView({
           setParticipantesRaw(participantes);
           setSourceState({ status: 'live', label: 'NODUS CREAR · fuente en vivo', detail: `${universoPfd.length} participantes con PFD confirmado.`, syncedAt: payload?.syncedAt || payload?.timestamp || payload?.updatedAt || null });
         } else {
-          setParticipantesRaw(NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES);
+          setParticipantesRaw([]);
           setSourceState({ status: 'snapshot', label: 'Respaldo verificado activo', detail: `Operando con el catálogo maestro verificado (${NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES.length} participantes PFD).`, syncedAt: payload?.syncedAt || payload?.timestamp || payload?.updatedAt || null });
         }
       } catch (err) {
@@ -178,7 +175,7 @@ export default function FuturosImposiblesView({
       const participantes = Array.isArray(payload?.participantes) ? payload.participantes : [];
       const universoPfd = participantes.filter((p) => p?.asistioPFD === true);
       if (universoPfd.length === 0) {
-        setParticipantesRaw(NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES);
+        setParticipantesRaw([]);
         setSourceState({ status: 'snapshot', label: 'Respaldo verificado activo', detail: `Operando con el catálogo maestro verificado (${NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES.length} participantes PFD).`, syncedAt: payload?.syncedAt || payload?.timestamp || null });
         triggerToast('No hay universo PFD verificable en la última publicación de NODUS.', 'warning');
         return;

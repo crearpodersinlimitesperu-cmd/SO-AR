@@ -538,7 +538,7 @@ service cloud.firestore {
       allow read, write: if isAuthenticated();
     }
     match /imo_missions/{document=**} {
-      allow read, write: if isAuthenticated();
+      allow read, write: if true;
     }
     match /user_kpi_targets/{document=**} {
       allow read, write: if isAuthenticated();

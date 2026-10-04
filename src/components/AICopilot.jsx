@@ -319,16 +319,16 @@ export default function AICopilot() {
   const [showHistory, setShowHistory] = useState(false);
   const messagesEndRef = useRef(null);
 
-  // Paleta Institucional Premium
+  // Paleta Premium "Caja Negra" (Dark Mode con toques Crear Gold)
   const colors = {
-    primary: '#1e3a8a', // Azul Marino Institucional
-    secondary: '#0ea5e9', // Celeste Vibrante
-    bg: '#ffffff',
-    bgAlt: '#f8fafc',
-    text: '#0f172a',
-    border: '#e2e8f0',
-    botMsg: '#f1f5f9',
-    userMsg: '#1e3a8a'
+    primary: '#fbbf24', // Crear Gold / Premium Amber
+    secondary: '#f59e0b',
+    bg: '#09090b', // Ultra Deep Black
+    bgAlt: '#18181b', // Slightly lighter black for contrast
+    text: '#f8fafc',
+    border: 'rgba(251, 191, 36, 0.15)', // Gold glowing border
+    botMsg: 'rgba(24, 24, 27, 0.9)',
+    userMsg: 'rgba(251, 191, 36, 0.1)'
   };
 
   const scrollToBottom = () => {
@@ -585,7 +585,7 @@ export default function AICopilot() {
   return (
     <div style={{ 
       position: 'fixed', top: 0, right: 0, width: '100%', maxWidth: '400px', height: '100vh', 
-      background: colors.bg, boxShadow: '-5px 0 30px rgba(0,0,0,0.15)', zIndex: 9999, 
+      background: colors.bg, boxShadow: '-5px 0 40px rgba(251, 191, 36, 0.15), inset 0 0 20px rgba(0,0,0,0.5)', zIndex: 9999, 
       display: 'flex', flexDirection: 'column', fontFamily: 'Inter, system-ui, sans-serif'
     }}>
       {/* Header Institucional */}

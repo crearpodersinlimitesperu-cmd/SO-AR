@@ -453,7 +453,11 @@ class NodusExtractorAgent {
         }).filter((row) => Object.values(row).some(Boolean));
       });
       return rawRows.map((row, index) => {
-        const nombre = first(row, ['nombre', 'participante', 'asistente']);
+        const nombrePart = first(row, ['nombre', 'participante', 'asistente']);
+        const apellidoPart = first(row, ['apellido']);
+        const nombre = (apellidoPart && !nombrePart.toLowerCase().includes(apellidoPart.toLowerCase())) 
+          ? `${nombrePart} ${apellidoPart}`.trim() 
+          : nombrePart;
         const asistencia = first(row, ['asistencia pfd', 'asistio pfd', 'asistencia', 'pfd']);
         const sedeCol = first(row, ['sede', 'ciudad']);
         const equipo = first(row, ['equipo', 'team']);
