@@ -76,9 +76,7 @@ service cloud.firestore {
         'nora.zamora@crearpsl.net',
         'emily.campuzano@crearpsl.net',
         'freddy.sosa@crearpsl.net',
-        'diana.moscoso@crearpsl.net',
-        'ricardo.gavilanez@crearpsl.net',
-        'ricardogavilanez1021@gmail.com'
+        'diana.moscoso@crearpsl.net'
       ]);
     }
 
@@ -263,45 +261,9 @@ service cloud.firestore {
     }
 
     // USERS (colección legacy, solo SuperAdmin escribe)
-    
-    // =========================================================================
-    // MODULO LEGAL - Onboarding Legal y Firmas
-    // =========================================================================
-    match /px_legal_signatures/{signatureId} {
-      // 1. Data Admins pueden leer y escribir TODO (acceso irrestricto al panel legal)
-      // 2. Cualquier usuario autenticado puede leer y escribir SUS PROPIOS documentos legales
-      allow read: if request.auth != null && (
-        (request.auth.token.email in ["jose.sanchez@crearpsl.net", "contabilidad.global@crearpsl.net", "legal@crearpsl.net"]) ||
-        (request.auth.token.email != null && resource.data.participant_id == request.auth.token.email.lower())
-      );
-      
-      allow write: if request.auth != null && (
-        (request.auth.token.email in ["jose.sanchez@crearpsl.net", "contabilidad.global@crearpsl.net", "legal@crearpsl.net"]) ||
-        // Permitir que el usuario cree su propio registro
-        (request.resource.data.participant_id == request.auth.token.email.lower()) ||
-        // Permitir que el usuario actualice su propio registro (optimistic updates/PDF)
-        (resource.data.participant_id == request.auth.token.email.lower())
-      );
-    }
-
     match /users/{userId} {
       allow read: if isAuthenticated();
-      allow create, update: if isSuperAdmin() || (
-        isAuthenticated() && (
-          request.auth.uid == userId ||
-          (resource != null && (
-            resource.data.get('email', '') == email() ||
-            (resource.data.get('emails', []) is list && email() in resource.data.get('emails', [])) ||
-            resource.data.get('uid', '') == request.auth.uid
-          )) ||
-          (request.resource.data != null && (
-            request.resource.data.get('email', '') == email() ||
-            (request.resource.data.get('emails', []) is list && email() in request.resource.data.get('emails', [])) ||
-            request.resource.data.get('uid', '') == request.auth.uid
-          ))
-        )
-      );
-      allow delete: if isSuperAdmin();
+      allow write: if isSuperAdmin();
 
       match /copilot_chats/{chatId} {
         allow read, write: if isAuthenticated() && request.auth.uid == userId;
@@ -435,32 +397,41 @@ service cloud.firestore {
     // ------------------------------------------------------------------------
     // COLECCIONES AUDITADAS CON PERMISOS AMPLIOS DE COLABORACIÓN OPERATIVA
     // ------------------------------------------------------------------------
-    match /managers_directory/{document=**} {
-      allow read, write: if isAuthenticated();
-    }
     match /staff_directory/{document=**} {
-      allow read, write: if isAuthenticated();
+      allow read: if canReadHojaEnBlanco();
+      allow write: if canWriteHojaEnBlanco();
+    }
+    match /managers_directory/{document=**} {
+      allow read: if canReadHojaEnBlanco();
+      allow write: if canWriteHojaEnBlanco();
     }
     match /excellence_standards/{document=**} {
-      allow read, write: if isAuthenticated();
+      allow read: if canReadHojaEnBlanco();
+      allow write: if canWriteHojaEnBlanco();
     }
     match /kpi_reports/{document=**} {
-      allow read, write: if isAuthenticated();
+      allow read: if canReadHojaEnBlanco();
+      allow write: if canWriteHojaEnBlanco();
     }
     match /learning_logs/{document=**} {
-      allow read, write: if isAuthenticated();
+      allow read: if canReadHojaEnBlanco();
+      allow write: if canWriteHojaEnBlanco();
     }
     match /qt_directory/{document=**} {
-      allow read, write: if isAuthenticated();
+      allow read: if canReadHojaEnBlanco();
+      allow write: if canWriteHojaEnBlanco();
     }
     match /success_patterns/{document=**} {
-      allow read, write: if isAuthenticated();
+      allow read: if canReadHojaEnBlanco();
+      allow write: if canWriteHojaEnBlanco();
     }
     match /sync_history/{document=**} {
-      allow read, write: if isAuthenticated();
+      allow read: if canReadHojaEnBlanco();
+      allow write: if canWriteHojaEnBlanco();
     }
     match /user_stats/{document=**} {
-      allow read, write: if isAuthenticated();
+      allow read: if canReadHojaEnBlanco();
+      allow write: if canWriteHojaEnBlanco();
     }
 
     // ------------------------------------------------------------------------
@@ -470,61 +441,32 @@ service cloud.firestore {
       allow read: if isAuthenticated();
       allow write: if isGerenteODireccion() || isSuperAdmin();
     }
-    match /sugerencias_soporte/{document} {
+    match /sugerencias_soporte/{document=**} {
       allow read, create: if isAuthenticated();
       allow update, delete: if isSuperAdmin();
     }
-    match /opt_outs/{document} {
+    match /opt_outs/{document=**} {
       allow read: if isAuthenticated();
       allow create: if true;
       allow update, delete: if isSuperAdmin();
     }
-    match /recurring_tasks_templates/{document} {
+    match /recurring_tasks_templates/{document=**} {
       allow read: if isAuthenticated();
       allow write: if isGerenteODireccion() || isSuperAdmin();
     }
     match /llamadas_grupales_historial/{document=**} {
-      allow read, write: if isAuthenticated();
+      allow read: if canReadHojaEnBlanco();
+      allow write: if canWriteHojaEnBlanco();
     }
     match /notas_seguimiento/{document=**} {
-      allow read, write: if isAuthenticated();
+      allow read: if canReadHojaEnBlanco();
+      allow write: if canWriteHojaEnBlanco();
     }
-    // Blindaje Financiero
-    function isValidLiquidacion(data) {
-      return data.monto is number && data.monto > 0 &&
-             data.moneda is string && data.moneda in ['USD', 'PEN', 'COP', 'MXN', 'EUR'] &&
-             data.metodo_pago is string &&
-             data.cajero_user_id == request.auth.uid;
-    }
-
-    function isValidLiquidacionPago(data) {
-      return (
-        // Liquidaciones de entrenadores (CentroManagers)
-        (data.get('estado', '') == 'pagado' &&
-          ((data.get('montoUSD', 0) is number && data.get('montoUSD', 0) > 0) ||
-           (data.get('monto', 0) is number && data.get('monto', 0) > 0))) ||
-        // Retiro u ocultamiento de candidatos de pago en CentroManagers
-        (data.get('estado', '') == 'eliminado') ||
-        // Arqueos y liquidaciones de caja POS tradicional
-        ('cajero_user_id' in data && isValidLiquidacion(data))
-      );
-    }
-
-    function isValidAuditTrail(data) {
-      return data.monto_esperado is number && data.monto_real is number;
-    }
-
     match /liquidaciones_pagos/{document=**} {
-      allow read, delete: if isGerenteODireccion() || isSuperAdmin();
-      allow create, update: if (isGerenteODireccion() || isSuperAdmin()) && isValidLiquidacionPago(request.resource.data);
-    }
-    match /cajas_diarias/{document=**} {
-      allow read, delete: if isGerenteODireccion() || isSuperAdmin();
-      allow create, update: if (isGerenteODireccion() || isSuperAdmin()) && isValidLiquidacion(request.resource.data);
+      allow read, write: if isGerenteODireccion() || isSuperAdmin();
     }
     match /finanzas_audit_trail/{document=**} {
-      allow read, delete: if isGerenteODireccion() || isSuperAdmin();
-      allow create, update: if (isGerenteODireccion() || isSuperAdmin()) && isValidAuditTrail(request.resource.data);
+      allow read, write: if isGerenteODireccion() || isSuperAdmin();
     }
     match /nodus_coordinadores_c1c2/{document=**} {
       allow read: if isAuthenticated();
@@ -535,13 +477,16 @@ service cloud.firestore {
       allow write: if isGerenteODireccion() || isSuperAdmin();
     }
     match /goals_sentinel_audits/{document=**} {
-      allow read, write: if isAuthenticated();
+      allow read: if canReadHojaEnBlanco();
+      allow write: if canWriteHojaEnBlanco();
     }
     match /imo_missions/{document=**} {
-      allow read, write: if true;
+      allow read: if canReadHojaEnBlanco();
+      allow write: if canWriteHojaEnBlanco();
     }
     match /user_kpi_targets/{document=**} {
-      allow read, write: if isAuthenticated();
+      allow read: if canReadHojaEnBlanco();
+      allow write: if canWriteHojaEnBlanco();
     }
     match /nodus_predictor_portfolio/{document=**} {
       allow read: if isAuthenticated();
@@ -552,34 +497,16 @@ service cloud.firestore {
       allow write: if isGerenteODireccion() || isSuperAdmin();
     }
     match /checklist_tasks/{document=**} {
-      allow read, write: if isAuthenticated();
+      allow read: if canReadHojaEnBlanco();
+      allow write: if canWriteHojaEnBlanco();
     }
     match /settings/{document=**} {
       allow read: if isAuthenticated();
       allow write: if isGerenteODireccion() || isSuperAdmin();
     }
     match /kpis_entrenadores_llamadas/{document=**} {
-      allow read, write: if isAuthenticated();
-    }
-
-    // Solo datos institucionales destinados a las cartas públicas, sin documentos personales.
-    match /sedes_institucionales/{sedeId} {
-      allow read: if true;
-      allow create, update: if isAuthenticated() && (isSuperAdmin() || (
-        (sedeId == 'lima' && email() in ['jose.sanchez@crearpsl.net']) ||
-        (sedeId == 'quito' && email() in ['emily.campuzano@crearpsl.net', 'freddy.sosa@crearpsl.net']) ||
-        (sedeId == 'cuenca' && email() in ['emely.leon@crearpsl.net', 'ricardogavilanez1021@gmail.com']) ||
-        (sedeId == 'guayaquil' && email() in ['josue.vera@crearpsl.net']) ||
-        (sedeId == 'medellin' && email() in ['yurany.gonzalez@crearpsl.net']) ||
-        (sedeId == 'mexico' && email() in ['nora.zamora@crearpsl.net'])
-      )) && request.resource.data.keys().hasOnly(['razonSocial', 'identificacionFiscal', 'direccionFiscal', 'correoContacto', 'telefonoContacto'])
-      && request.resource.data.razonSocial is string && request.resource.data.razonSocial.size() <= 500
-      && request.resource.data.identificacionFiscal is string && request.resource.data.identificacionFiscal.size() <= 500
-      && request.resource.data.direccionFiscal is string && request.resource.data.direccionFiscal.size() <= 500
-      && request.resource.data.correoContacto is string && request.resource.data.correoContacto.size() <= 500
-      && request.resource.data.telefonoContacto is string && request.resource.data.telefonoContacto.size() <= 500;
-      allow delete: if false;
+      allow read: if canReadHojaEnBlanco();
+      allow write: if canWriteHojaEnBlanco();
     }
   }
 }
-// force deploy
