@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Causa OS - Manual Interactivo y Diccionario Operativo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50: '#f0fdf4', 500: '#10b981', 600: '#059669', 700: '#047857' },
+            gold: { 400: '#fbbf24', 500: '#f59e0b', 600: '#d97706' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .glass { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(12px); }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-emerald-500 selection:text-white">
+
+  <!-- Header -->
+  <header class="border-b border-slate-800 glass sticky top-0 z-50 px-6 py-4">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+          <i class="fa-solid fa-atom text-slate-950 text-xl font-black"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
+            Causa OS <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">v3.4.0</span>
+          </h1>
+          <p class="text-xs text-slate-400">Diccionario Maestro de Funciones, Módulos y Botones</p>
+        </div>
+      </div>
+
+      <!-- Search & Role Selector -->
+      <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+        <div class="relative flex-1 md:w-80">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-500 text-sm"></i>
+          <input id="searchInput" type="text" placeholder="Buscar módulo, botón o función..." 
+                 class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl pl-9 pr-4 py-2 text-sm focus:outline-none focus:border-emerald-500 text-slate-200 placeholder:text-slate-500 shadow-inner">
+        </div>
+        <select id="roleFilter" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-300 focus:outline-none focus:border-emerald-500">
+          <option value="ALL">👤 Todos los Roles</option>
+          <option value="SUPERADMIN">🛡️ SuperAdmin</option>
+          <option value="DIRECCION">💼 Dirección / CFO</option>
+          <option value="GERENTE">🏢 Gerente de Sede</option>
+          <option value="CMJ">🎓 Coordinador Maestría (CMJ)</option>
+          <option value="ENTRENADOR">📞 Entrenador de Llamadas</option>
+          <option value="QT">⚡ Quantum Team (QT)</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <!-- Categorías / Tabs -->
+  <nav class="border-b border-slate-800/80 bg-slate-900/50 px-6 py-2.5 overflow-x-auto">
+    <div class="max-w-7xl mx-auto flex items-center gap-2 text-xs font-medium" id="categoryTabs">
+      <button onclick="setCategory('ALL')" class="category-btn active px-3.5 py-1.5 rounded-lg bg-emerald-500 text-slate-950 font-bold transition">Todos (50)</button>
+      <button onclick="setCategory('CORE')" class="category-btn px-3.5 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-800 text-slate-300 transition">Core & Navegación</button>
+      <button onclick="setCategory('MAESTRIA')" class="category-btn px-3.5 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-800 text-slate-300 transition">Maestría & Mánagers</button>
+      <button onclick="setCategory('COACHING')" class="category-btn px-3.5 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-800 text-slate-300 transition">Entrenadores & Coaching</button>
+      <button onclick="setCategory('OPERACIONES')" class="category-btn px-3.5 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-800 text-slate-300 transition">Operaciones & Sentados</button>
+      <button onclick="setCategory('DIRECCION')" class="category-btn px-3.5 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-800 text-slate-300 transition">Dirección & Finanzas</button>
+      <button onclick="setCategory('ESTRATEGIA')" class="category-btn px-3.5 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-800 text-slate-300 transition">Metas & Estrategia</button>
+      <button onclick="setCategory('LEGAL')" class="category-btn px-3.5 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-800 text-slate-300 transition">Legal & Compliance</button>
+    </div>
+  </nav>
+
+  <!-- Main Content Grid -->
+  <main class="max-w-7xl mx-auto px-6 py-8 flex-1 w-full">
+    <div id="statsBanner" class="mb-6 p-4 rounded-2xl bg-gradient-to-r from-emerald-950/40 via-slate-900 to-slate-900 border border-emerald-500/20 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <i class="fa-solid fa-circle-info text-emerald-400 text-lg"></i>
+        <div>
+          <p class="text-sm font-semibold text-slate-200">Inventario Completo de Causa OS</p>
+          <p class="text-xs text-slate-400">Auditoría viva de todas las rutas, botones y entidades de Firestore.</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-4 text-xs">
+        <span class="px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-300"><b>50</b> Pantallas</span>
+        <span class="px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-300"><b>450+</b> Botones</span>
+        <span class="px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-300"><b>32</b> Colecciones</span>
+      </div>
+    </div>
+
+    <!-- Cards Grid -->
+    <div id="modulesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Inyectado por JS -->
+    </div>
+  </main>
+
+  <!-- Modal Detallado -->
+  <div id="detailModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-950">
+        <div class="flex items-center gap-3">
+          <div id="modalIcon" class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center justify-center"></div>
+          <div>
+            <h3 id="modalTitle" class="text-lg font-bold text-white"></h3>
+            <p id="modalRoute" class="text-xs font-mono text-emerald-400"></p>
+          </div>
+        </div>
+        <button onclick="closeModal()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-slate-400 hover:text-white transition">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="p-6 overflow-y-auto space-y-6 text-sm text-slate-300" id="modalBody">
+        <!-- Contenido dinámico -->
+      </div>
+    </div>
+  </div>
+
+  <footer class="border-t border-slate-900 bg-slate-950/80 px-6 py-4 text-center text-xs text-slate-500">
+    Crear Poder Sin Límites (CPSL) &bull; Causa OS Documentation System &bull; 2026
+  </footer>
+
+  <script>
+    const MODULES = [
+      {
+        id: "centro-managers",
+        name: "Centro de Mánagers",
+        route: "/centro-managers",
+        category: "MAESTRIA",
+        roles: ["SUPERADMIN", "DIRECCION", "CMJ", "ENTRENADOR"],
+        icon: "fa-users-gear",
+        summary: "Gestión neurálgica de todos los mánagers, equipos C3/PL, llamadas grupales e individuales y liquidación de entrenadores.",
+        description: "Controla a los participantes de los equipos de liderazgo. Permite registrar asistencia a llamadas semanales y procesa el pago de $400 USD cuando un equipo completa 7 llamadas grupales.",
+        collections: ["managers_directory", "llamadas_grupales_historial", "notas_seguimiento", "liquidaciones_pagos"],
+        buttons: [
+          { name: "+ Nuevo Integrante", desc: "Abre el formulario para añadir un nuevo participante al equipo de la sede.", role: "CMJ / SuperAdmin" },
+          { name: "+ Crear Equipo", desc: "Registra un nuevo número de equipo asignando su fecha de arranque y sede.", role: "CMJ / SuperAdmin" },
+          { name: "🔀 Unir Equipos", desc: "Fusiona dos equipos con deserciones para sostener un solo grupo de llamadas.", role: "CMJ / SuperAdmin" },
+          { name: "🛡️ Supervisor de Datos", desc: "Escanea y repara teléfonos mal formateados o nombres duplicados.", role: "SuperAdmin" },
+          { name: "Registrar Llamada Grupal", desc: "Guarda asistencia de la llamada de equipo y suma hacia las 7 llamadas.", role: "Entrenador / CMJ" },
+          { name: "Marcar como Pagado", desc: "Liquida los $400 USD del entrenador al alcanzar 7 llamadas o por cierre de equipo.", role: "SuperAdmin / CFO" },
+          { name: "Cerrar Equipo para Liquidación", desc: "Disparador manual de cierre cuando un equipo concluye por graduación o deserción.", role: "CMJ / SuperAdmin" },
+          { name: "Eliminar Integrante", desc: "Borra el registro del mánager de la base de datos.", role: "CMJ (misma sede) / SuperAdmin" }
+        ]
+      },
+      {
+        id: "home",
+        name: "Mi Inicio (Home)",
+        route: "/home",
+        category: "CORE",
+        roles: ["SUPERADMIN", "DIRECCION", "GERENTE", "CMJ", "ENTRENADOR", "QT"],
+        icon: "fa-house",
+        summary: "Tablero central personalizado según el rol del usuario con alertas de quiebre, cumpleaños y accesos directos.",
+        description: "Pantalla principal adaptativa. Permite a los directivos cambiar de sede, muestra advertencias del agente Sentinel, estado de firmas legales y accesos directos a los módulos activos.",
+        collections: ["users", "sedes_institucionales", "px_legal_signatures"],
+        buttons: [
+          { name: "Selector de Sede", desc: "Cambia entre Lima, Quito, Cuenca y Bogotá en tiempo real.", role: "Dirección / SuperAdmin" },
+          { name: "Simular Rol", desc: "Coloca la vista en modo auditoría para ver la plataforma exactamente como otro usuario.", role: "SuperAdmin" },
+          { name: "Firmar Documentos Ahora", desc: "Abre el modal para estampar la firma digital en el Código de Honor.", role: "Todos" },
+          { name: "Lanzar Copilot IA", desc: "Abre la consola de inteligencia artificial conversacional.", role: "Todos" }
+        ]
+      },
+      {
+        id: "asignador-entrenadores",
+        name: "Asignador de Entrenadores",
+        route: "/asignador-entrenadores",
+        category: "COACHING",
+        roles: ["SUPERADMIN", "DIRECCION"],
+        icon: "fa-calendar-check",
+        summary: "Matriz anual de asignación de entrenadores a fines de semana de entrenamiento (C1, C2, C3 y Relación MJ).",
+        description: "Garantiza cobertura total en todas las ciudades sin violar políticas de descanso de entrenadores ni crear cruces de fechas.",
+        collections: ["asignaciones_entrenadores", "calendario_operativo_custom", "trainer_policy_audit"],
+        buttons: [
+          { name: "Selector Entrenador Asignado", desc: "Despliega los entrenadores certificados disponibles para ese evento.", role: "Dirección" },
+          { name: "Validar Políticas de Descanso", desc: "Audita que ningún entrenador viaje más de 3 fines de semana seguidos.", role: "Dirección" },
+          { name: "Guardar Asignación en Firme", desc: "Confirma el rol oficial y envía notificación a la gerencia.", role: "SuperAdmin" },
+          { name: "Exportar a Excel", desc: "Descarga la sábana anual de fechas y entrenadores.", role: "Todos" }
+        ]
+      },
+      {
+        id: "metas",
+        name: "Tablero de Metas (OKRs)",
+        route: "/metas",
+        category: "ESTRATEGIA",
+        roles: ["SUPERADMIN", "DIRECCION", "GERENTE", "CMJ"],
+        icon: "fa-bullseye",
+        summary: "Seguimiento en vivo de las metas numéricas de cada campaña (Enrolados, Sentados y Recaudación).",
+        description: "Cascada de objetivos por ciudad y equipo. Permite a los gerentes de sede medir el porcentaje de avance hacia la meta de sala.",
+        collections: ["goals", "kpi_reports", "nodus_kpis_sincronizados"],
+        buttons: [
+          { name: "+ Nueva Meta", desc: "Crea una meta numérica con fecha límite y coordinador responsable.", role: "Gerente / Dirección" },
+          { name: "Dividir Meta (Cascada)", desc: "Subdivide una meta grande entre los capitanes o coordinadores.", role: "Gerente" },
+          { name: "Sincronizar Nodus", desc: "Fuerza la descarga en vivo de participantes confirmados en Nodus.", role: "SuperAdmin" }
+        ]
+      },
+      {
+        id: "monitor-imos",
+        name: "Monitor de IMOs",
+        route: "/monitor-imos",
+        category: "OPERACIONES",
+        roles: ["SUPERADMIN", "DIRECCION", "GERENTE", "CMJ"],
+        icon: "fa-shield-halved",
+        summary: "Monitoreo y asignación de graduados (IMOs) que regresan a sostener a las nuevas promociones.",
+        description: "Los IMOs vienen de equipos graduados (ej. Equipos 27, 28, 29) para enrolar y servir en el nuevo equipo (ej. Equipo 30).",
+        collections: ["imo_missions", "users"],
+        buttons: [
+          { name: "Filtrar por Equipo Graduado", desc: "Localiza a los IMOs según la generación de la que salieron.", role: "Todos" },
+          { name: "Registrar Misión", desc: "Valida la asistencia y cumplimiento del rol del IMO en sala.", role: "CMJ / Gerente" },
+          { name: "Descargar Balance", desc: "Genera informe de ratio de IMOs por participante nuevo.", role: "Gerente" }
+        ]
+      },
+      {
+        id: "matriz-enrolamiento-sentados",
+        name: "Matriz de Sentados",
+        route: "/matriz-enrolamiento-sentados",
+        category: "OPERACIONES",
+        roles: ["SUPERADMIN", "DIRECCION", "GERENTE"],
+        icon: "fa-chair",
+        summary: "El conteo físico de personas presentes en sala durante los días de entrenamiento.",
+        description: "Cruza la lista de personas registradas en el sistema contra las personas que efectivamente cruzan la puerta del evento.",
+        collections: ["participants", "nodus_coordinadores_c1c2"],
+        buttons: [
+          { name: "Registro Rápido en Puerta", desc: "Marca ingreso presencial con un solo toque.", role: "Staff / QT" },
+          { name: "Comparativa Nodus", desc: "Muestra la brecha entre boletos pagados y sentados reales.", role: "Gerente" }
+        ]
+      },
+      {
+        id: "superadmin",
+        name: "Panel de SuperAdmin",
+        route: "/superadmin",
+        category: "CORE",
+        roles: ["SUPERADMIN"],
+        icon: "fa-screwdriver-wrench",
+        summary: "Consola de mantenimiento profundo, reseteo de índices, saneamiento de perfiles y permisos dinámicos.",
+        description: "Exclusivo para la dirección tecnológica. Permite disparar scrapers, reparar esquemas de base de datos y gestionar accesos.",
+        collections: ["users", "app_settings", "sync_history"],
+        buttons: [
+          { name: "Reparar Permisos", desc: "Resetea y asegura las reglas de seguridad en Firestore.", role: "SuperAdmin" },
+          { name: "Regenerar Directorio Canónico", desc: "Fusiona perfiles duplicados y corrige correos institucionales.", role: "SuperAdmin" },
+          { name: "Gestor de Permisos Dinámicos", desc: "Configura qué correos y roles pueden tocar cada botón sin reprogramar.", role: "SuperAdmin" }
+        ]
+      },
+      {
+        id: "cfo-dashboard",
+        name: "CFO Dashboard",
+        route: "/cfo-dashboard",
+        category: "DIRECCION",
+        roles: ["SUPERADMIN", "DIRECCION"],
+        icon: "fa-vault",
+        summary: "Control financiero central, arqueos diarios de caja y bloqueo preventivo de operaciones por mora.",
+        description: "Supervisado por Elizabeth Escobar y la alta gerencia. Mantiene la salud de la caja y valida las liquidaciones de honorarios.",
+        collections: ["finance_daily_close", "hq_operational_status", "liquidaciones_pagos"],
+        buttons: [
+          { name: "Bloquear / Desbloquear Sede", desc: "Suspende operaciones de una sede si no ha reportado caja diaria.", role: "CFO" },
+          { name: "Auditar Cierre Diario", desc: "Valida tickets de venta y depósitos bancarios.", role: "CFO" }
+        ]
+      },
+      {
+        id: "legal-admin",
+        name: "Panel de Firmas Legales",
+        route: "/legal-admin",
+        category: "LEGAL",
+        roles: ["SUPERADMIN", "DIRECCION"],
+        icon: "fa-file-signature",
+        summary: "Auditoría de contratos de confidencialidad y código de honor firmados digitalmente.",
+        description: "Registra la evidencia legal (firma gráfica, timestamp inmutable y dirección IP) de cada colaborador antes de operar.",
+        collections: ["px_legal_signatures", "users"],
+        buttons: [
+          { name: "Descargar Certificado PDF", desc: "Genera el documento legal firmado con su sello criptográfico.", role: "Legal" },
+          { name: "Enviar Recordatorio de Firma", desc: "Notifica por correo al colaborador que tiene firmas pendientes.", role: "SuperAdmin" }
+        ]
+      },
+      {
+        id: "vende-sin-vender",
+        name: "Vende Sin Vender",
+        route: "/vende-sin-vender",
+        category: "ESTRATEGIA",
+        roles: ["SUPERADMIN", "DIRECCION", "GERENTE", "CMJ"],
+        icon: "fa-comments-dollar",
+        summary: "Biblioteca de guiones de conversación ontológica y resolución de objeciones para enrolamiento.",
+        description: "Herramienta formativa para capitanes y mánagers sobre cómo conectar con el corazón del prospecto sin vender agresivamente.",
+        collections: [],
+        buttons: [
+          { name: "Copiar Guion al Portapapeles", desc: "Copia la estructura de llamada para enviarla por WhatsApp.", role: "Todos" },
+          { name: "Simulador de Objeciones", desc: "Muestra respuestas ontológicas a objeciones de dinero o tiempo.", role: "Todos" }
+        ]
+      }
+    ];
+
+    let currentCategory = 'ALL';
+    let currentRole = 'ALL';
+    let searchQuery = '';
+
+    function renderModules() {
+      const grid = document.getElementById('modulesGrid');
+      grid.innerHTML = '';
+
+      const filtered = MODULES.filter(m => {
+        const matchesCategory = currentCategory === 'ALL' || m.category === currentCategory;
+        const matchesRole = currentRole === 'ALL' || m.roles.includes(currentRole);
+        const matchesSearch = !searchQuery || 
+          m.name.toLowerCase().includes(searchQuery) || 
+          m.route.toLowerCase().includes(searchQuery) ||
+          m.summary.toLowerCase().includes(searchQuery) ||
+          m.buttons.some(b => b.name.toLowerCase().includes(searchQuery) || b.desc.toLowerCase().includes(searchQuery));
+        return matchesCategory && matchesRole && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full py-16 text-center text-slate-500">
+            <i class="fa-solid fa-folder-open text-4xl mb-3 opacity-40"></i>
+            <p class="text-base font-medium">No se encontraron módulos con esos criterios.</p>
+            <p class="text-xs">Intenta cambiar la categoría o limpiar el buscador.</p>
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(m => {
+        const card = document.createElement('div');
+        card.className = "bg-slate-900/80 border border-slate-800 rounded-2xl p-5 hover:border-emerald-500/50 hover:bg-slate-900 transition flex flex-col justify-between shadow-lg group";
+        
+        card.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-3">
+              <div class="w-10 h-10 rounded-xl bg-slate-800 group-hover:bg-emerald-500/10 border border-slate-700 group-hover:border-emerald-500/30 flex items-center justify-center text-emerald-400 transition">
+                <i class="fa-solid ${m.icon} text-lg"></i>
+              </div>
+              <span class="text-xs font-mono text-emerald-400/80 bg-emerald-950/40 border border-emerald-500/20 px-2 py-0.5 rounded-full">
+                ${m.route}
+              </span>
+            </div>
+            <h3 class="text-base font-bold text-white group-hover:text-emerald-300 transition mb-1">${m.name}</h3>
+            <p class="text-xs text-slate-400 line-clamp-2 mb-4 leading-relaxed">${m.summary}</p>
+          </div>
+
+          <div>
+            <div class="flex items-center gap-1.5 flex-wrap mb-4">
+              ${m.roles.map(r => `<span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700/60">${r}</span>`).join('')}
+            </div>
+            <button onclick="openModal('${m.id}')" class="w-full py-2 bg-slate-800 hover:bg-emerald-600 text-slate-200 hover:text-slate-950 text-xs font-bold rounded-xl transition flex items-center justify-center gap-2">
+              <span>Explorar ${m.buttons.length} Botones y Reglas</span>
+              <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function setCategory(cat) {
+      currentCategory = cat;
+      document.querySelectorAll('.category-btn').forEach(b => {
+        b.className = "category-btn px-3.5 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-800 text-slate-300 transition";
+      });
+      event.target.className = "category-btn active px-3.5 py-1.5 rounded-lg bg-emerald-500 text-slate-950 font-bold transition";
+      renderModules();
+    }
+
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      searchQuery = e.target.value.toLowerCase().trim();
+      renderModules();
+    });
+
+    document.getElementById('roleFilter').addEventListener('change', (e) => {
+      currentRole = e.target.value;
+      renderModules();
+    });
+
+    function openModal(id) {
+      const m = MODULES.find(x => x.id === id);
+      if (!m) return;
+
+      document.getElementById('modalTitle').innerText = m.name;
+      document.getElementById('modalRoute').innerText = m.route;
+      document.getElementById('modalIcon').innerHTML = `<i class="fa-solid ${m.icon}"></i>`;
+
+      const body = document.getElementById('modalBody');
+      body.innerHTML = `
+        <div>
+          <h4 class="text-xs uppercase font-bold text-slate-400 tracking-wider mb-1">Propósito Operativo (¿Para qué sirve?)</h4>
+          <p class="text-sm text-slate-200 leading-relaxed bg-slate-950/60 p-3.5 rounded-xl border border-slate-800">${m.description}</p>
+        </div>
+
+        <div>
+          <h4 class="text-xs uppercase font-bold text-slate-400 tracking-wider mb-2">Inventario Detallado de Botones y Acciones (${m.buttons.length})</h4>
+          <div class="space-y-2">
+            ${m.buttons.map(b => `
+              <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-2 hover:border-slate-700 transition">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="font-bold text-emerald-400">${b.name}</span>
+                    <span class="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded border border-slate-700">${b.role}</span>
+                  </div>
+                  <p class="text-xs text-slate-400 mt-0.5">${b.desc}</p>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <div>
+          <h4 class="text-xs uppercase font-bold text-slate-400 tracking-wider mb-2">Colecciones de Base de Datos (Firestore)</h4>
+          <div class="flex flex-wrap gap-2">
+            ${m.collections.length > 0 ? m.collections.map(c => `
+              <span class="text-xs font-mono px-2.5 py-1 rounded-lg bg-emerald-950/30 text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5">
+                <i class="fa-solid fa-database text-[10px]"></i> ${c}
+              </span>
+            `).join('') : '<span class="text-xs text-slate-500">No persiste directamente en Firestore (solo memoria/UI).</span>'}
+          </div>
+        </div>
+      `;
+
+      document.getElementById('detailModal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('detailModal').classList.add('hidden');
+    }
+
+    // Inicializar
+    renderModules();
+  </script>
+</body>
+</html>
