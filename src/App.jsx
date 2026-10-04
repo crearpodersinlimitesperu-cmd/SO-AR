@@ -64,7 +64,7 @@ import ApdaycPaymentAlert from './components/ApdaycPaymentAlert'
 import HelpModal from './components/HelpModal'
 import ThemeToggle from './components/ThemeToggle'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { HelpCircle } from 'lucide-react'
 
 // Componente para proteger autenticación básica
