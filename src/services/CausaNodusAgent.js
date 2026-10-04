@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { db } from './firebase';
 import { doc, collection, onSnapshot, getDoc } from 'firebase/firestore';
-import { evaluateEnroladoVerification, getEnroladosList } from './nodusVerificationService';
+import { evaluateEnroladoVerification} from './nodusVerificationService';
 
 // Agente Centinela que procesa y cachead datos operativos para Causa OS
 // Mantiene todo pre-calculado en LocalStorage y Memoria para velocidad extrema.

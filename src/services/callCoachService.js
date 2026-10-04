@@ -39,6 +39,7 @@ export async function getManagersPipeline(sede) {
   } catch (error) {
     console.error("Error al obtener pipeline real de managers:", error);
     return [];
+  }
 }
 
 export async function getDualTasks(sede) {
@@ -56,7 +57,6 @@ export async function getDualTasks(sede) {
     console.error("Error al obtener dual tasks:", error);
     return [];
   }
-}
 }
 
 export async function signoffDualTask(taskId, role) {
