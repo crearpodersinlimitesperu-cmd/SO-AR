@@ -1,0 +1,32 @@
+name: 🚀 Desplegar Reglas de Firestore
+on:
+  push:
+    paths:
+      - 'firestore.rules'
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  deploy_rules:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repositorio
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Instalar Firebase CLI
+        run: npm install -g firebase-tools
+
+      - name: Desplegar Reglas de Firestore
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          echo "$GOOGLE_SERVICE_ACCOUNT_JSON" > sa-key.json
+          export GOOGLE_APPLICATION_CREDENTIALS="sa-key.json"
+          firebase deploy --only firestore:rules --project centro-operativo-cpsl
+          rm sa-key.json
