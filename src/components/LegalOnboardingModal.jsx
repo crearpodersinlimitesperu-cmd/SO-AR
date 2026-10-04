@@ -51,13 +51,15 @@ const LegalOnboardingModal = ({ currentUser, sede, onComplete, onClose }) => {
   }, [currentDoc]);
 
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = 0;
-      if (currentDoc) {
-        setHasScrolled(prev => prev[currentDoc.id] ? prev : prev);
-      }
-    }
-  }, [step]);
+    const el = scrollRef.current;
+    if (!el || !currentDoc) return;
+    el.scrollTop = 0;
+    // Los documentos cortos también se pueden leer sin producir un evento scroll.
+    handleScroll();
+    const observer = new ResizeObserver(handleScroll);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [step, currentDoc, handleScroll]);
 
   const canAcceptCurrent = currentDoc && hasScrolled[currentDoc.id];
   const allRequiredAccepted = contracts.documents
@@ -125,7 +127,7 @@ const LegalOnboardingModal = ({ currentUser, sede, onComplete, onClose }) => {
     }}>
       <div style={{
         background: 'var(--bg-dark-alt)', borderRadius: 'var(--radius-lg)', width: '100%', maxWidth: '720px',
-        maxHeight: '92vh', display: 'flex', flexDirection: 'column',
+        height: '92dvh', maxHeight: '92dvh', minHeight: 0, display: 'flex', flexDirection: 'column',
         boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)', border: '1px solid var(--border-strong)', overflow: 'hidden'
       }}>
         
@@ -145,10 +147,10 @@ const LegalOnboardingModal = ({ currentUser, sede, onComplete, onClose }) => {
                 <div style={{ fontSize: '0.65rem', fontWeight: 800, letterSpacing: '0.2em', color: 'var(--crear-gold)', textTransform: 'uppercase', marginBottom: '4px' }}>
                   CREAR PODER SIN LÍMITES
                 </div>
-                <h1 style={{ margin: 0, fontWeight: 800, fontSize: '1.25rem', color: 'var(--text-heading)', fontFamily: 'var(--font-heading)' }}>
+                <h1 style={{ margin: 0, fontWeight: 800, fontSize: '1.25rem', color: '#f8fafc', fontFamily: 'var(--font-heading)' }}>
                   Blindaje Legal y Oficial
                 </h1>
-                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '4px', display: 'flex', gap: '6px', alignItems: 'center' }}>
+                <div style={{ fontSize: '0.8rem', color: '#cbd5e1', marginTop: '4px', display: 'flex', gap: '6px', alignItems: 'center' }}>
                   <span>{contracts.flag}</span>
                   {contracts.countryName} — {contracts.lawReference}
                 </div>
@@ -156,7 +158,7 @@ const LegalOnboardingModal = ({ currentUser, sede, onComplete, onClose }) => {
             </div>
             
             {onClose && (
-              <button onClick={onClose} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
+              <button aria-label="Cerrar formulario legal" onClick={onClose} style={{ background: 'transparent', border: 'none', color: '#cbd5e1', cursor: 'pointer' }}>
                 <X size={20} />
               </button>
             )}
@@ -166,13 +168,13 @@ const LegalOnboardingModal = ({ currentUser, sede, onComplete, onClose }) => {
           <div style={{ marginTop: '1.25rem', background: 'var(--bg-dark)', borderRadius: '4px', height: '6px', border: '1px solid var(--border-subtle)', overflow: 'hidden' }}>
             <div style={{ height: '100%', background: 'linear-gradient(90deg, var(--crear-gold), #FFD54F)', borderRadius: '4px', width: `${progressPct}%`, transition: 'width 0.4s ease' }} />
           </div>
-          <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '8px', textAlign: 'right', fontWeight: 600, letterSpacing: '0.05em' }}>
+          <div style={{ fontSize: '0.7rem', color: '#cbd5e1', marginTop: '8px', textAlign: 'right', fontWeight: 600, letterSpacing: '0.05em' }}>
             {isSuccess ? 'PROCESO COMPLETADO' : `PASO ${Math.max(step, 1)} DE ${totalDocs + 1}`}
           </div>
         </div>
 
         {/* CUERPO */}
-        <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', background: 'var(--bg-dark-alt)' }}>
+        <div style={{ flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', background: 'var(--bg-dark-alt)' }}>
 
           
           {/* PASO -1 — KYC Data Capture */}
@@ -303,7 +305,7 @@ const LegalOnboardingModal = ({ currentUser, sede, onComplete, onClose }) => {
 
           {/* PASOS 1..N — Documentos */}
           {currentDoc && (
-            <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: 'var(--bg-dark-alt)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden', background: 'var(--bg-dark-alt)' }}>
               {/* Título del documento */}
               <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--border-subtle)', background: 'var(--bg-dark)', flexShrink: 0 }}>
                 <div style={{ fontWeight: 700, color: 'var(--text-heading)', fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -321,10 +323,13 @@ const LegalOnboardingModal = ({ currentUser, sede, onComplete, onClose }) => {
               {/* Contenido scrollable */}
               <div
                 ref={scrollRef}
+                role="region"
+                aria-label="Texto del documento legal"
+                tabIndex={0}
                 onScroll={handleScroll}
-                style={{ flex: 1, overflowY: 'auto', padding: '1.5rem', fontSize: '0.85rem', lineHeight: 1.8, color: 'var(--text-main)', background: '#0b162c' }}
+                style={{ flex: 1, minHeight: 0, overflowY: 'auto', overscrollBehavior: 'contain', padding: '1.5rem', fontSize: '0.85rem', lineHeight: 1.8, color: 'var(--text-main)', background: 'var(--bg-dark-alt)' }}
               >
-                <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'var(--font-body)', margin: 0, opacity: 0.9 }}>
+                <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'var(--font-body)', margin: 0, color: 'inherit' }}>
                   {currentDoc.content}
                 </pre>
                 {!hasScrolled[currentDoc.id] && (
@@ -364,8 +369,8 @@ const LegalOnboardingModal = ({ currentUser, sede, onComplete, onClose }) => {
                         disabled={!accepted[currentDoc.id]}
                         style={{
                           flex: 2, padding: '0.8rem', borderRadius: 'var(--radius-sm)', border: 'none',
-                          background: accepted[currentDoc.id] ? 'linear-gradient(135deg, var(--crear-gold), #FF9800)' : 'rgba(255,255,255,0.1)',
-                          color: accepted[currentDoc.id] ? '#000' : 'rgba(255,255,255,0.3)', cursor: accepted[currentDoc.id] ? 'pointer' : 'not-allowed',
+                          background: accepted[currentDoc.id] ? 'linear-gradient(135deg, var(--crear-gold), #FF9800)' : 'var(--bg-card)',
+                          color: accepted[currentDoc.id] ? '#000' : 'var(--text-muted)', cursor: accepted[currentDoc.id] ? 'pointer' : 'not-allowed',
                           fontWeight: 800, fontSize: '0.95rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
                           boxShadow: accepted[currentDoc.id] ? '0 4px 15px rgba(255, 193, 7, 0.3)' : 'none'
                         }}
