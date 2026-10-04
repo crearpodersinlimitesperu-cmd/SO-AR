@@ -168,10 +168,12 @@ service cloud.firestore {
               (docData.keys().hasAll(['assignedToEmails']) && email() in docData.assignedToEmails) ||
               docData.get('entrenadorEmail', '') == email() ||
               (docData.keys().hasAll(['entrenadores']) && email() in docData.entrenadores) ||
-              docData.get('email', '') == email()
+              docData.get('email', '') == email() ||
+              docData.get('autorEmail', '') == email() ||
+              docData.get('registradoPorEmail', '') == email()
             )) ||
             (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role != 'entrenador' && 
-             docData.keys().hasAll(['sede']) && docData.sede == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.sede)
+             docData.get('sede', '') != '' && docData.get('sede', '') == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.sede)
           )
         )
       );
@@ -182,7 +184,9 @@ service cloud.firestore {
     }
     
     function canWriteHojaEnBlanco() {
-      return checkHojaEnBlancoAccess(request.resource.data) && (resource == null || checkHojaEnBlancoAccess(resource.data));
+      return (request.resource == null && resource != null && checkHojaEnBlancoAccess(resource.data)) ||
+             (request.resource != null && resource == null && checkHojaEnBlancoAccess(request.resource.data)) ||
+             (request.resource != null && resource != null && checkHojaEnBlancoAccess(resource.data) && checkHojaEnBlancoAccess(request.resource.data));
     }
 
     // MJ_CALENDARS (29/08/2026): calendarios de Maestría del Juego por equipo
