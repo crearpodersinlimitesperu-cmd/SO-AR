@@ -1,3 +1,5 @@
+import { startCausaNodusAgent, stopCausaNodusAgent } from "./services/CausaNodusAgent";
+
 import CfoDashboard from './pages/CfoDashboard';
 import FinanceWorkspace from './pages/FinanceWorkspace';
 import MaestriaGlobalDashboard from './pages/MaestriaGlobalDashboard';
