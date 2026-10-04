@@ -145,6 +145,89 @@ const buildTaskEmailHtml = ({
   `;
 };
 
+// Genera una plantilla de correo HTML institucional cuando una tarea es COMPLETADA,
+// notificando al lider que la asigno (pedido explicito de Jose: enviar correo al asignador al completarse).
+const buildTaskCompletedEmailHtml = ({
+  taskTitle,
+  assignerName,
+  completedByName,
+  completedByEmail,
+  completedAt,
+  assignedSede,
+  evidenceUrl,
+  notes
+}) => {
+  const greeting = assignerName || 'Líder';
+  const cleanTitle = taskTitle || 'Compromiso Operativo';
+  const completedDateFormatted = formatDeadlineEs(completedAt);
+
+  return `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1e293b; max-width: 620px; margin: 0 auto; border: 1px solid #cbd5e1; border-radius: 12px; overflow: hidden; background-color: #ffffff; box-shadow: 0 4px 12px rgba(0,0,0,0.06);">
+      <!-- Cabecera Institucional Verde Exito -->
+      <div style="background: linear-gradient(135deg, #064e3b 0%, #0f172a 100%); color: #ffffff; padding: 24px; text-align: center; border-bottom: 3px solid #10b981;">
+        <span style="display: inline-block; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #34d399; font-weight: 700; margin-bottom: 6px;">CREAR PODER SIN LÍMITES</span>
+        <h1 style="margin: 0; font-size: 22px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px;">✅ TAREA COMPLETADA</h1>
+        <p style="margin: 6px 0 0 0; font-size: 13px; color: #a7f3d0;">Sistema Operativo Causa OS · Cumplimiento de Acuerdos</p>
+      </div>
+
+      <div style="padding: 26px 28px; background-color: #ffffff;">
+        <p style="font-size: 15px; margin-top: 0; line-height: 1.5;">Hola <strong>${greeting}</strong>,</p>
+        <p style="font-size: 14.5px; color: #475569; line-height: 1.5; margin-bottom: 20px;">
+          Te informamos que la tarea que asignaste en <strong>Causa OS</strong> ha sido marcada como <strong>COMPLETADA</strong> con éxito.
+        </p>
+
+        <!-- Tarjeta de Detalle de Cumplimiento -->
+        <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 18px 20px; margin-bottom: 22px;">
+          <div style="margin-bottom: 12px;">
+            <span style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: #166534; letter-spacing: 0.5px;">Tarea completada:</span>
+            <div style="font-size: 17px; font-weight: 700; color: #064e3b; margin-top: 4px; line-height: 1.35;">${cleanTitle}</div>
+          </div>
+
+          <table style="width: 100%; border-collapse: collapse; font-size: 13.5px; margin-top: 10px;">
+            <tbody>
+              <tr>
+                <td style="padding: 6px 0; color: #166534; width: 140px; font-weight: 600;">👤 Completada por:</td>
+                <td style="padding: 6px 0; color: #0f172a; font-weight: 700;">${completedByName} (${completedByEmail || 'Colaborador'})</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; color: #166534; font-weight: 600;">📅 Fecha y hora:</td>
+                <td style="padding: 6px 0; color: #0f172a; font-weight: 600;">${completedDateFormatted}</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; color: #166534; font-weight: 600;">📍 Sede / Área:</td>
+                <td style="padding: 6px 0; color: #0f172a;">${assignedSede || 'Global'}</td>
+              </tr>
+              ${evidenceUrl ? `
+              <tr>
+                <td style="padding: 6px 0; color: #166534; font-weight: 600;">🔗 Evidencia:</td>
+                <td style="padding: 6px 0;"><a href="${evidenceUrl}" target="_blank" rel="noopener noreferrer" style="color: #059669; font-weight: 700; text-decoration: underline;">Ver Evidencia Adjunta</a></td>
+              </tr>
+              ` : ''}
+            </tbody>
+          </table>
+
+          ${notes ? `
+          <div style="background-color: #ffffff; color: #1e293b; border-left: 4px solid #10b981; padding: 12px 14px; margin-top: 14px; border-radius: 6px; border: 1px solid #e2e8f0; border-left-width: 4px;">
+            <strong style="color: #047857; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px;">💬 Comentarios o Notas de Cierre:</strong>
+            <span style="white-space: pre-wrap; font-size: 13.5px; line-height: 1.5; color: #334155;">${notes}</span>
+          </div>
+          ` : ''}
+        </div>
+
+        <div style="text-align: center; margin: 24px 0 10px 0;">
+          <a href="https://centro-operativo-cpsl.web.app/home" style="background-color: #059669; color: #ffffff; padding: 12px 28px; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 14px; display: inline-block; box-shadow: 0 4px 10px rgba(5, 150, 105, 0.25);">
+            🚀 Ingresar a Causa OS
+          </a>
+        </div>
+      </div>
+
+      <div style="background-color: #f8fafc; border-top: 1px solid #e2e8f0; padding: 12px 20px; text-align: center; font-size: 11px; color: #64748b;">
+        CREAR Poder Sin Límites · Causa OS · Sistema de Gestión Impecable
+      </div>
+    </div>
+  `;
+};
+
 export function ChecklistProvider({ children }) {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -196,10 +279,87 @@ export function ChecklistProvider({ children }) {
   // toque, para no congelar en el doc compartido la fecha del primer equipo que
   // por azar lo haya tocado primero — para cualquier otro caso (default) se sigue
   // usando currentCycle, igual que siempre.
+  // Notifica al asignador/creador de la tarea por correo institucional y notificacion in-app
+  // cuando un colaborador marca la tarea como COMPLETADA (pedido explicito de Jose).
+  const notifyTaskCompletedToAssigner = async (prevData, updates, taskId) => {
+    try {
+      const sanitizeEmail = (e) => (typeof e === 'string' ? e.trim().toLowerCase()
+        .replace('@crearpls.com', '@crearpsl.net')
+        .replace(/ketherine\.aguirre@/gi, 'katherine.aguirre@')
+        .replace(/coodinacion\.administrativa@/gi, 'coordinacion.administrativa@') : '');
+
+      const assignerEmail = sanitizeEmail(prevData.assignedByEmail || prevData.createdBy || updates.assignedByEmail || '');
+      const taskTitle = updates.task || prevData.task || updates.title || prevData.title || 'Compromiso Operativo';
+      const completedByName = currentUser?.displayName || currentUser?.name || currentUser?.email || 'Un colaborador';
+      const completedByEmail = sanitizeEmail(currentUser?.email || '');
+      const assignerName = prevData.assignedByName || prevData.assignerName || updates.assignedByName || 'Líder / Coordinador';
+      const assignedSede = updates.assignedSede || prevData.assignedSede || prevData.sede || currentUser?.sede || 'Global';
+      const nowIso = new Date().toISOString();
+
+      // Si no hay correo de asignador valido, salir
+      if (!assignerEmail || !assignerEmail.includes('@')) {
+        return;
+      }
+
+      // Si quien completo la tarea es el mismo asignador/creador, no generar auto-notificacion redundante
+      if (assignerEmail === completedByEmail) {
+        return;
+      }
+
+      const noteText = (updates.comments || updates.notes || prevData.comments || prevData.notes || '').trim();
+      const evidenceUrl = updates.evidenceUrl || updates.evidence_url || prevData.evidenceUrl || prevData.evidence_url || '';
+
+      const mailDocRef = doc(collection(db, 'mail'));
+      const notifDocRef = doc(collection(db, 'notifications'));
+
+      const htmlContent = buildTaskCompletedEmailHtml({
+        taskTitle,
+        assignerName,
+        completedByName,
+        completedByEmail,
+        completedAt: nowIso,
+        assignedSede,
+        evidenceUrl,
+        notes: noteText
+      });
+
+      // 1. Encolar en coleccion 'mail' (procesado automaticamente por mailerDaemon.js)
+      await setDoc(mailDocRef, {
+        to: [assignerEmail],
+        type: 'task_completed_alert',
+        delivery: { state: 'PENDING' },
+        createdAt: nowIso,
+        message: {
+          subject: `✅ TAREA COMPLETADA: ${taskTitle} — Causa OS`,
+          html: htmlContent
+        }
+      });
+
+      // 2. Notificacion In-App en Firestore 'notifications'
+      await setDoc(notifDocRef, {
+        userId: assignerEmail,
+        title: `✅ Tarea completada: ${taskTitle}`,
+        message: `${completedByName} ha completado la tarea "${taskTitle}" en ${assignedSede}.`,
+        taskId: taskId,
+        type: 'task_completed',
+        read: false,
+        created_at: nowIso
+      });
+
+      console.log(`📧 Notificacion de tarea completada despachada para: ${assignerEmail}`);
+    } catch (error) {
+      console.error("Error al notificar al asignador por correo de tarea completada:", error);
+    }
+  };
+
   const writeTaskDoc = async (taskId, updates, cycleForDeadline = currentCycle) => {
     try {
       const taskRef = doc(db, 'tasks', taskId);
       const snap = await getDoc(taskRef);
+      const prevData = snap.exists() ? snap.data() : (checklistData.find(t => t.id === taskId) || {});
+      const wasCompleted = prevData.completed === true || prevData.status === 'Completada';
+      const isNowCompleted = updates.completed === true || updates.status === 'Completada';
+
       if (!snap.exists()) {
         const baseTask = checklistData.find(t => t.id === taskId);
         await setDoc(taskRef, {
@@ -215,6 +375,11 @@ export function ChecklistProvider({ children }) {
         });
       } else {
         await updateDoc(taskRef, updates);
+      }
+
+      // Si la tarea paso a estado COMPLETADA, notificar inmediatamente por correo al asignador
+      if (isNowCompleted && !wasCompleted) {
+        notifyTaskCompletedToAssigner(prevData, updates, taskId);
       }
     } catch (err) {
       console.warn("writeTaskDoc local update fallback:", err);
@@ -1209,6 +1374,11 @@ export function ChecklistProvider({ children }) {
         completedAt: allCompleted ? (data.completedAt || new Date().toISOString()) : null,
         updatedAt: new Date().toISOString()
       });
+
+      if (allCompleted && !data.completed) {
+        notifyTaskCompletedToAssigner(data, { completed: true, status: 'Completada', progressPercentage: 100 }, taskId);
+      }
+
       showToast(isCompleted ? "¡Completaste tu parte de la tarea!" : "Marcaste tu parte como pendiente.", "success");
       return true;
     } catch (err) {

@@ -134,10 +134,23 @@ async function processMailDoc(docSnap) {
     }
     try {
       const snap = await db.collection('users').where('emails', 'array-contains', to).get();
-      if (snap.empty) {
-        console.warn(`⚠️ Intento de envío a correo no registrado: ${to}`);
-      } else {
+      if (!snap.empty) {
         validRecipients.push(to);
+      } else {
+        const snap2 = await db.collection('users').where('email', '==', to).get();
+        if (!snap2.empty) {
+          validRecipients.push(to);
+        } else {
+          const profileSnap = await db.collection('user_profiles').doc(to).get();
+          if (profileSnap.exists) {
+            validRecipients.push(to);
+          } else if (data.type === 'task_completed_alert' || data.type === 'task_overdue_assigner_alert' || data.type === 'task_reminder') {
+            // No bloquear correos operativos de tareas emitidos por el sistema
+            validRecipients.push(to);
+          } else {
+            console.warn(`⚠️ Intento de envío a correo no registrado: ${to}`);
+          }
+        }
       }
     } catch (error) {
       console.error("Error validando correo contra la base de datos:", error.message);
@@ -529,6 +542,92 @@ async function checkOverdueTaskReminders() {
                   CREAR Poder Sin Límites · Causa OS · Transformación Global
                 </div>
 
+              </div>
+            `
+          },
+          createdAt: FieldValue.serverTimestamp()
+        });
+      }
+
+      // Notificar también al asignador/creador de que la tarea asignada está fuera de plazo (vencida)
+      const assignerEmail = (data.assignedByEmail || data.createdBy || '').toLowerCase().trim();
+      if (assignerEmail && assignerEmail.includes('@') && !emails.map(e => e.toLowerCase().trim()).includes(assignerEmail)) {
+        console.log(`⚠️ Notificando al asignador (${assignerEmail}) sobre vencimiento de tarea: "${taskTitle}"`);
+        await db.collection('mail').add({
+          to: [assignerEmail],
+          type: 'task_overdue_assigner_alert',
+          delivery: { state: 'PENDING' },
+          message: {
+            subject: `⚠️ TAREA FUERA DE PLAZO: ${taskTitle} — Asignada a ${emails.join(', ')}`,
+            html: `
+              <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1e293b; max-width: 620px; margin: 0 auto; border: 1px solid #cbd5e1; border-radius: 12px; overflow: hidden; background-color: #ffffff; box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);">
+                <div style="background: linear-gradient(135deg, #7f1d1d 0%, #0f172a 100%); color: #ffffff; padding: 26px 24px; text-align: center; border-bottom: 3px solid #ef4444;">
+                  <span style="display: inline-block; font-size: 11px; letter-spacing: 2.5px; text-transform: uppercase; color: #fca5a5; font-weight: 700; margin-bottom: 6px;">
+                    CREAR PODER SIN LÍMITES · GESTIÓN DE ACUERDOS
+                  </span>
+                  <h1 style="margin: 0; font-size: 22px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px;">
+                    ⚠️ ALERTA: TAREA FUERA DE PLAZO
+                  </h1>
+                  <p style="margin: 6px 0 0 0; font-size: 13px; color: #94a3b8; font-weight: 500;">
+                    Sistema Operativo Causa OS · Seguimiento de Responsabilidades
+                  </p>
+                </div>
+
+                <div style="padding: 28px 30px; background-color: #ffffff;">
+                  <p style="font-size: 15.5px; margin-top: 0; line-height: 1.5; color: #0f172a;">
+                    Hola <strong>${assigner}</strong>,
+                  </p>
+                  <p style="font-size: 14px; color: #334155; line-height: 1.6; margin-bottom: 18px;">
+                    Te informamos que la fecha límite para la siguiente tarea que asignaste <strong>ha vencido sin registrarse como completada</strong>:
+                  </p>
+
+                  <div style="background-color: #fef2f2; border: 1px solid #fecaca; border-left: 4px solid #ef4444; border-radius: 8px; padding: 14px 16px; margin-bottom: 22px;">
+                    <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; color: #991b1b; letter-spacing: 0.5px; margin-bottom: 4px;">
+                      📌 Tarea no completada:
+                    </div>
+                    <div style="font-size: 16px; font-weight: 700; color: #7f1d1d; margin-top: 2px;">
+                      ${taskTitle}
+                    </div>
+                  </div>
+
+                  <table style="width: 100%; border-collapse: collapse; font-size: 13.5px; margin-bottom: 22px;">
+                    <tbody>
+                      <tr>
+                        <td style="padding: 6px 0; color: #64748b; width: 140px; font-weight: 600;">👥 Asignada a:</td>
+                        <td style="padding: 6px 0; color: #0f172a; font-weight: 700;">${emails.join(', ')}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 6px 0; color: #64748b; font-weight: 600;">⏰ Fecha límite:</td>
+                        <td style="padding: 6px 0; color: #dc2626; font-weight: 700;">${deadlineFormatted}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 6px 0; color: #64748b; font-weight: 600;">📍 Sede / Proyecto:</td>
+                        <td style="padding: 6px 0; color: #0f172a;">${sede}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 6px 0; color: #64748b; font-weight: 600;">🚨 Prioridad:</td>
+                        <td style="padding: 6px 0; color: #0f172a;">${priority}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                  ${notes ? `
+                  <div style="background-color: #0f172a; color: #f8fafc; border-left: 4px solid #f59e0b; padding: 12px 14px; margin-bottom: 22px; border-radius: 6px;">
+                    <strong style="color: #fbbf24; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px;">📝 Instrucciones / Contexto:</strong>
+                    <span style="font-size: 13px; line-height: 1.5; color: #f1f5f9; white-space: pre-wrap;">${notes}</span>
+                  </div>
+                  ` : ''}
+
+                  <div style="text-align: center; margin: 26px 0 10px 0;">
+                    <a href="https://centro-operativo-cpsl.web.app/home" style="background-color: #0f172a; color: #ffffff; padding: 12px 28px; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 14px; display: inline-block;">
+                      Abrir Causa OS para Dar Seguimiento
+                    </a>
+                  </div>
+                </div>
+
+                <div style="background-color: #f8fafc; border-top: 1px solid #e2e8f0; padding: 14px 20px; text-align: center; font-size: 11.5px; color: #64748b;">
+                  CREAR Poder Sin Límites · Causa OS · Transformación Global
+                </div>
               </div>
             `
           },
