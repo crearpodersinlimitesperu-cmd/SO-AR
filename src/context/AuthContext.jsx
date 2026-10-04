@@ -330,12 +330,15 @@ export function AuthProvider({ children }) {
     }
 
     // Liliana Cubillo: Coordinadora de Maestría del Juego y Entrenadora de Llamadas (Quito)
-    const isLiliCubillo = ['liliana.cubillo@crearpsl.net', 'lili.cubillo@crearpsl.net'].includes(normalizedEmail) || ['liliana.cubillo@crearpsl.net', 'lili.cubillo@crearpsl.net'].includes(rawEmail);
+    const isLiliCubillo = ['liliana.cubillo@crearpsl.net', 'lili.cubillo@crearpsl.net'].includes(normalizedEmail) || ['liliana.cubillo@crearpsl.net', 'lili.cubillo@crearpsl.net'].includes(rawEmail) || normalizedEmail.includes('cubillo');
     if (isLiliCubillo) {
       if (!assignedRoles.includes('coord_maestria')) assignedRoles.push('coord_maestria');
       if (!assignedRoles.includes('entrenador_llamadas')) assignedRoles.push('entrenador_llamadas');
       if (!assignedRoles.includes('entrenador')) assignedRoles.push('entrenador');
       canonicalRole = 'coord_maestria';
+      if (!foundUser.sede || foundUser.sede === 'Global' || foundUser.sede === 'Sede Global') {
+        foundUser.sede = 'Quito';
+      }
     }
 
     // Asegurar que no quede 'coordinador' administrativo si el usuario tiene un cargo específico
@@ -396,7 +399,7 @@ export function AuthProvider({ children }) {
       // La sede efectiva acompaña el rol activo. Ej.: Ricardo Gavilánez es
       // Gerente de Cuenca y QT de Quito; al alternar rol no debe heredar la
       // sede equivocada ni contaminar los filtros de cada operación.
-      sede: canonicalSede((foundUser.roleSedes || officialProfile?.roleSedes)?.[activeRole] || foundUser.sede || officialProfile?.sede || 'Global'),
+      sede: canonicalSede((foundUser.roleSedes || officialProfile?.roleSedes)?.[activeRole] || foundUser.sede || officialProfile?.sede || (isLiliCubillo ? 'Quito' : 'Global')),
       roleSedes: { ...(officialProfile?.roleSedes || {}), ...(foundUser.roleSedes || {}) },
       // (14/09/2026) NUEVO CAMPO: equiposQuito — José confirmó que, a diferencia de
       // las demás sedes (que corren UN solo equipo a la vez), Quito corre VARIOS

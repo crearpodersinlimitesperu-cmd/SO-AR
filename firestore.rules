@@ -264,10 +264,10 @@ service cloud.firestore {
       allow write: if isGerenteODireccion() || isSuperAdmin();
     }
 
-    // USERS (colección legacy, solo SuperAdmin escribe)
+    // USERS
     match /users/{userId} {
       allow read: if isAuthenticated();
-      allow write: if isSuperAdmin();
+      allow write: if isSuperAdmin() || (isAuthenticated() && (request.auth.uid == userId || (resource != null && (resource.data.email == email() || (resource.data.emails is list && email() in resource.data.emails) || (resource.data.uid != null && resource.data.uid == request.auth.uid))) || (request.resource.data != null && (request.resource.data.email == email() || (request.resource.data.emails is list && email() in request.resource.data.emails) || (request.resource.data.uid != null && request.resource.data.uid == request.auth.uid)))));
 
       match /copilot_chats/{chatId} {
         allow read, write: if isAuthenticated() && request.auth.uid == userId;
@@ -402,40 +402,31 @@ service cloud.firestore {
     // COLECCIONES AUDITADAS CON PERMISOS AMPLIOS DE COLABORACIÓN OPERATIVA
     // ------------------------------------------------------------------------
     match /staff_directory/{document=**} {
-      allow read: if canReadHojaEnBlanco();
-      allow write: if canWriteHojaEnBlanco();
+      allow read, write: if isAuthenticated();
     }
     match /managers_directory/{document=**} {
-      allow read: if canReadHojaEnBlanco();
-      allow write: if canWriteHojaEnBlanco();
+      allow read, write: if isAuthenticated();
     }
     match /excellence_standards/{document=**} {
-      allow read: if canReadHojaEnBlanco();
-      allow write: if canWriteHojaEnBlanco();
+      allow read, write: if isAuthenticated();
     }
     match /kpi_reports/{document=**} {
-      allow read: if canReadHojaEnBlanco();
-      allow write: if canWriteHojaEnBlanco();
+      allow read, write: if isAuthenticated();
     }
     match /learning_logs/{document=**} {
-      allow read: if canReadHojaEnBlanco();
-      allow write: if canWriteHojaEnBlanco();
+      allow read, write: if isAuthenticated();
     }
     match /qt_directory/{document=**} {
-      allow read: if canReadHojaEnBlanco();
-      allow write: if canWriteHojaEnBlanco();
+      allow read, write: if isAuthenticated();
     }
     match /success_patterns/{document=**} {
-      allow read: if canReadHojaEnBlanco();
-      allow write: if canWriteHojaEnBlanco();
+      allow read, write: if isAuthenticated();
     }
     match /sync_history/{document=**} {
-      allow read: if canReadHojaEnBlanco();
-      allow write: if canWriteHojaEnBlanco();
+      allow read, write: if isAuthenticated();
     }
     match /user_stats/{document=**} {
-      allow read: if canReadHojaEnBlanco();
-      allow write: if canWriteHojaEnBlanco();
+      allow read, write: if isAuthenticated();
     }
 
     // ------------------------------------------------------------------------
@@ -459,12 +450,10 @@ service cloud.firestore {
       allow write: if isGerenteODireccion() || isSuperAdmin();
     }
     match /llamadas_grupales_historial/{document=**} {
-      allow read: if canReadHojaEnBlanco();
-      allow write: if canWriteHojaEnBlanco();
+      allow read, write: if isAuthenticated();
     }
     match /notas_seguimiento/{document=**} {
-      allow read: if canReadHojaEnBlanco();
-      allow write: if canWriteHojaEnBlanco();
+      allow read, write: if isAuthenticated();
     }
     match /liquidaciones_pagos/{document=**} {
       allow read, write: if isGerenteODireccion() || isSuperAdmin();
@@ -481,16 +470,13 @@ service cloud.firestore {
       allow write: if isGerenteODireccion() || isSuperAdmin();
     }
     match /goals_sentinel_audits/{document=**} {
-      allow read: if canReadHojaEnBlanco();
-      allow write: if canWriteHojaEnBlanco();
+      allow read, write: if isAuthenticated();
     }
     match /imo_missions/{document=**} {
-      allow read: if canReadHojaEnBlanco();
-      allow write: if canWriteHojaEnBlanco();
+      allow read, write: if true;
     }
     match /user_kpi_targets/{document=**} {
-      allow read: if canReadHojaEnBlanco();
-      allow write: if canWriteHojaEnBlanco();
+      allow read, write: if isAuthenticated();
     }
     match /nodus_predictor_portfolio/{document=**} {
       allow read: if isAuthenticated();
@@ -501,16 +487,14 @@ service cloud.firestore {
       allow write: if isGerenteODireccion() || isSuperAdmin();
     }
     match /checklist_tasks/{document=**} {
-      allow read: if canReadHojaEnBlanco();
-      allow write: if canWriteHojaEnBlanco();
+      allow read, write: if isAuthenticated();
     }
     match /settings/{document=**} {
       allow read: if isAuthenticated();
       allow write: if isGerenteODireccion() || isSuperAdmin();
     }
     match /kpis_entrenadores_llamadas/{document=**} {
-      allow read: if canReadHojaEnBlanco();
-      allow write: if canWriteHojaEnBlanco();
+      allow read, write: if isAuthenticated();
     }
     // Cada participante puede crear y consultar únicamente sus propias firmas.
     match /px_legal_signatures/{signatureId} {

@@ -133,13 +133,14 @@ export const MAESTRIA_COORDINATOR_EMAILS = [
   'judith.romero@crearpsl.net',
   'erika.gavilanez@crearpsl.net',
   'liliana.cubillo@crearpsl.net',
+  'lili.cubillo@crearpsl.net',
   'andres.gomez@crearpsl.net'
 ];
 
 export const isMaestriaCoordinator = (currentUser) => {
   if (!currentUser) return false;
   const email = (currentUser.email || '').toLowerCase().trim();
-  if (MAESTRIA_COORDINATOR_EMAILS.includes(email) || email.includes('linid') || email.includes('maestria') || email.includes('judith.romero')) return true;
+  if (MAESTRIA_COORDINATOR_EMAILS.includes(email) || email.includes('linid') || email.includes('maestria') || email.includes('judith.romero') || email.includes('cubillo')) return true;
   const r = (currentUser.appRole || currentUser.role || '').toLowerCase();
   const roles = Array.isArray(currentUser.roles) ? currentUser.roles.map(x => String(x).toLowerCase()) : [];
   return r === 'coord_maestria' || r === 'coordinador_mj' || r === 'director_maestria' ||

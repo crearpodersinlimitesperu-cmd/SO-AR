@@ -102,6 +102,11 @@ const isTrainerMatch = (mTrainer, targetTrainer) => {
         return true;
       }
 
+      // Alias conocido: Lili Cubillo / Liliana Cubillo / Lilibeth Cubillo / Liliana Lilibeth Cubillo Vera
+      if ((clean1.includes('cubillo') || clean1.includes('lili')) && (clean2.includes('cubillo') || clean2.includes('lili'))) {
+        return true;
+      }
+
       const w1 = clean1.split(/\s+/);
       const w2 = clean2.split(/\s+/);
       if (w1.length >= 2 && w2.length >= 2) {
@@ -252,11 +257,31 @@ export default function CentroManagers() {
       console.error("Error fetching managers from Firestore in real-time:", error);
       // Fallback a localStorage si falla la conexión
       const saved = localStorage.getItem('cpsl_managers_data_v3');
+      let loaded = false;
       if (saved) {
-        const parsed = JSON.parse(saved);
-        setManagers(parsed.map(m => ({
+        try {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setManagers(parsed.map(m => ({
+              ...m,
+              estado: normalizeManagerEstado(m.estado),
+              entrenador: normalizeTrainer(m.entrenador),
+              coordinador: normalizeCoordinator(m.coordinador),
+              sede: normalizeSede(m.sede)
+            })));
+            loaded = true;
+          }
+        } catch (e) {
+          console.error("Error parsing saved managers:", e);
+        }
+      }
+      if (!loaded) {
+        setManagers(INITIAL_MANAGERS.map(m => ({
           ...m,
-          estado: normalizeManagerEstado(m.estado)
+          estado: normalizeManagerEstado(m.estado),
+          entrenador: normalizeTrainer(m.entrenador),
+          coordinador: normalizeCoordinator(m.coordinador),
+          sede: normalizeSede(m.sede)
         })));
       }
       setIsLoadingData(false);
@@ -403,7 +428,7 @@ export default function CentroManagers() {
     if (email === 'andres.gomez@crearpsl.net') return 'Andres Gomez';
     if (email === 'leandro.brunis@crearpsl.net') return 'Leandro Brunis';
     if (email === 'carlos.brunis@crearpsl.net' || email === 'brunische66@gmail.com') return 'Carlos Brunis';
-    if (email === 'liliana.cubillo@crearpsl.net' || email === 'lili.cubillo@crearpsl.net') return 'Lili Cubillo';
+    if (email === 'liliana.cubillo@crearpsl.net' || email === 'lili.cubillo@crearpsl.net' || email.includes('cubillo')) return 'Lili Cubillo';
     if (email === 'judith.romero@crearpsl.net' || email === 'regina.romero@crearpsl.net') return 'Regina Romero';
 
     const userName = currentUser.name || currentUser.displayName || '';
@@ -538,37 +563,48 @@ export default function CentroManagers() {
 
   // Filtrado principal
   const filteredManagers = useMemo(() => {
-    const userSede = normalizeSede(currentUser?.sede);
+    const userEmail = (currentUser?.email || '').toLowerCase().trim();
+    const isLili = userEmail === 'liliana.cubillo@crearpsl.net' || userEmail === 'lili.cubillo@crearpsl.net' || userEmail.includes('cubillo');
+    let effectiveSede = normalizeSede(currentUser?.sede);
+    if (isLili && (!effectiveSede || effectiveSede === 'Sede Global' || effectiveSede === 'Global')) {
+      effectiveSede = 'Quito';
+    }
 
     return managers.filter(m => {
       const mSede = normalizeSede(m.sede);
+      const isMyTrainerManager = isTrainerMatch(m.entrenador, currentTrainerName) || 
+        (m.entrenadorEmail && userEmail && m.entrenadorEmail.toLowerCase() === userEmail) ||
+        (isLili && ((m.entrenador || '').toLowerCase().includes('cubillo') || (m.entrenador || '').toLowerCase().includes('lili')));
 
       // 1. Filtrado de Visibilidad (Seguridad y Jerarquía)
       if (viewAsTrainer) {
         // Solo ve los suyos como entrenador
-        if (!isTrainerMatch(m.entrenador, currentTrainerName)) return false;
+        if (!isMyTrainerManager) return false;
       } else if (!canViewAll && !isGlobalQTCoordinator(currentUser)) {
         const activeRole = currentUser?.appRole;
-        const isGerente = activeRole === 'gerente';
-        const isCoord = activeRole === 'coord_maestria' || activeRole === 'coordinador_mj' || activeRole === 'coord_c1' || activeRole === 'capitan';
+        const userRoles = currentUser?.roles || (activeRole ? [activeRole] : []);
+        const isGerente = activeRole === 'gerente' || currentUser?.isGerente || userRoles.includes('gerente');
+        const isCoord = activeRole === 'coord_maestria' || activeRole === 'coordinador_mj' || activeRole === 'coord_c1' || activeRole === 'capitan' ||
+          canViewSede(currentUser) || isMaestriaCoordinator(currentUser) ||
+          userRoles.some(r => ['coord_maestria', 'coordinador_mj', 'coord_c1', 'capitan'].includes(r));
         
         if (isGerente) {
-          if (mSede !== userSede && mSede !== 'GLOBAL') return false;
-        } else if (isCoord) {
+          if (mSede !== effectiveSede && mSede !== 'GLOBAL' && mSede !== 'Sede Global') return false;
+        } else if (isCoord || canViewOwnSede) {
           // Coordinadores ven su sede Y a los gerentes (como referencia directiva)
           const mRol = (m.rol || '').toLowerCase();
-          if (mSede !== userSede && !mRol.includes('gerente')) return false;
+          if (mSede !== effectiveSede && !mRol.includes('gerente')) return false;
         } else if (hasQTPrivileges(currentUser)) {
           // QT: ven su sede y al Coordinador Global de QT
           const mRol = (m.rol || '').toLowerCase();
-          const isTargetGlobalQTCoordinator = m.id === 'staff_carlosbrunis' || m.email?.toLowerCase().includes('brunis') || (mRol.includes('qt') && (mSede === 'SEDE GLOBAL' || mSede === 'GLOBAL'));
-          if (mSede !== userSede && !isTargetGlobalQTCoordinator) return false;
+          const isTargetGlobalQTCoordinator = m.id === 'staff_carlosbrunis' || m.email?.toLowerCase().includes('brunis') || (mRol.includes('qt') && (mSede === 'SEDE GLOBAL' || mSede === 'GLOBAL' || mSede === 'Sede Global'));
+          if (mSede !== effectiveSede && !isTargetGlobalQTCoordinator) return false;
         } else if (isTrainerRole && currentTrainerName) {
-          // ⚡ ENTRENADORES: siempre ven sus propios managers, sin importar el rol activo
-          if (!isTrainerMatch(m.entrenador, currentTrainerName)) return false;
+          // ⚡ ENTRENADORES: siempre ven sus propios managers
+          if (!isMyTrainerManager) return false;
         } else {
           // Por defecto solo ven lo suyo
-          if (!isTrainerMatch(m.entrenador, currentTrainerName) && mSede !== userSede) return false;
+          if (!isMyTrainerManager && mSede !== effectiveSede) return false;
         }
       }
 
@@ -597,35 +633,46 @@ export default function CentroManagers() {
   const [groupFilterStatus, setGroupFilterStatus] = useState('Todos'); // 'Todos' | 'Completos' | 'Parciales' | 'Pendientes'
 
   const groupTeams = useMemo(() => {
-    const userSede = normalizeSede(currentUser?.sede);
+    const userEmail = (currentUser?.email || '').toLowerCase().trim();
+    const isLili = userEmail === 'liliana.cubillo@crearpsl.net' || userEmail === 'lili.cubillo@crearpsl.net' || userEmail.includes('cubillo');
+    let effectiveSede = normalizeSede(currentUser?.sede);
+    if (isLili && (!effectiveSede || effectiveSede === 'Sede Global' || effectiveSede === 'Global')) {
+      effectiveSede = 'Quito';
+    }
 
     // 1. Filtrar managers visibles según permisos de rol y filtros de cabecera (Sede, Entrenador)
     const visibleManagers = managers.filter(m => {
       if (!m.equipo) return false;
       const mSede = normalizeSede(m.sede);
+      const isMyTrainerManager = isTrainerMatch(m.entrenador, currentTrainerName) || 
+        (m.entrenadorEmail && userEmail && m.entrenadorEmail.toLowerCase() === userEmail) ||
+        (isLili && ((m.entrenador || '').toLowerCase().includes('cubillo') || (m.entrenador || '').toLowerCase().includes('lili')));
 
       // Permisos base de rol
       if (viewAsTrainer) {
-        if (!isTrainerMatch(m.entrenador, currentTrainerName)) return false;
+        if (!isMyTrainerManager) return false;
       } else if (!canViewAll && !isGlobalQTCoordinator(currentUser)) {
         const activeRole = currentUser?.appRole;
-        const isGerente = activeRole === 'gerente';
-        const isCoord = activeRole === 'coord_maestria' || activeRole === 'coordinador_mj' || activeRole === 'coord_c1' || activeRole === 'capitan';
+        const userRoles = currentUser?.roles || (activeRole ? [activeRole] : []);
+        const isGerente = activeRole === 'gerente' || currentUser?.isGerente || userRoles.includes('gerente');
+        const isCoord = activeRole === 'coord_maestria' || activeRole === 'coordinador_mj' || activeRole === 'coord_c1' || activeRole === 'capitan' ||
+          canViewSede(currentUser) || isMaestriaCoordinator(currentUser) ||
+          userRoles.some(r => ['coord_maestria', 'coordinador_mj', 'coord_c1', 'capitan'].includes(r));
         
         if (isGerente) {
-          if (mSede !== userSede && mSede !== 'GLOBAL') return false;
-        } else if (isCoord) {
+          if (mSede !== effectiveSede && mSede !== 'GLOBAL' && mSede !== 'Sede Global') return false;
+        } else if (isCoord || canViewOwnSede) {
           const mRol = (m.rol || '').toLowerCase();
-          if (mSede !== userSede && !mRol.includes('gerente')) return false;
+          if (mSede !== effectiveSede && !mRol.includes('gerente')) return false;
         } else if (hasQTPrivileges(currentUser)) {
           // QT: ven su sede y al Coordinador Global de QT
           const mRol = (m.rol || '').toLowerCase();
-          const isTargetGlobalQTCoordinator = m.id === 'staff_carlosbrunis' || m.email?.toLowerCase().includes('brunis') || (mRol.includes('qt') && (mSede === 'SEDE GLOBAL' || mSede === 'GLOBAL'));
-          if (mSede !== userSede && !isTargetGlobalQTCoordinator) return false;
+          const isTargetGlobalQTCoordinator = m.id === 'staff_carlosbrunis' || m.email?.toLowerCase().includes('brunis') || (mRol.includes('qt') && (mSede === 'SEDE GLOBAL' || mSede === 'GLOBAL' || mSede === 'Sede Global'));
+          if (mSede !== effectiveSede && !isTargetGlobalQTCoordinator) return false;
         } else if (isTrainerRole && currentTrainerName) {
-          if (!isTrainerMatch(m.entrenador, currentTrainerName)) return false;
+          if (!isMyTrainerManager) return false;
         } else {
-          if (!isTrainerMatch(m.entrenador, currentTrainerName) && mSede !== userSede) return false;
+          if (!isMyTrainerManager && mSede !== effectiveSede) return false;
         }
       }
 
@@ -965,11 +1012,21 @@ export default function CentroManagers() {
   };
 
   const stats = useMemo(() => {
-    const userSede = normalizeSede(currentUser?.sede);
+    const userEmail = (currentUser?.email || '').toLowerCase().trim();
+    const isLili = userEmail === 'liliana.cubillo@crearpsl.net' || userEmail === 'lili.cubillo@crearpsl.net' || userEmail.includes('cubillo');
+    let effectiveSede = normalizeSede(currentUser?.sede);
+    if (isLili && (!effectiveSede || effectiveSede === 'Sede Global' || effectiveSede === 'Global')) {
+      effectiveSede = 'Quito';
+    }
+
+    const isMyTrainerManager = (m) => isTrainerMatch(m.entrenador, currentTrainerName) || 
+      (m.entrenadorEmail && userEmail && m.entrenadorEmail.toLowerCase() === userEmail) ||
+      (isLili && ((m.entrenador || '').toLowerCase().includes('cubillo') || (m.entrenador || '').toLowerCase().includes('lili')));
+
     // Si la vista está restringida, calcular stats solo de lo que puede ver
     const baseList = (viewAsTrainer || (!canViewAll && !canViewOwnSede)) 
-      ? managers.filter(m => isTrainerMatch(m.entrenador, currentTrainerName))
-      : (canViewOwnSede && !canViewAll) ? managers.filter(m => normalizeSede(m.sede) === userSede)
+      ? managers.filter(isMyTrainerManager)
+      : (canViewOwnSede && !canViewAll) ? managers.filter(m => normalizeSede(m.sede) === effectiveSede)
       : managers;
 
     const total = baseList.length;
