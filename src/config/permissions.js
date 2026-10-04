@@ -282,7 +282,7 @@ export const canViewInactiveUsers = (currentUser) => {
 export const canViewAllManagers = (currentUser) => {
   if (!currentUser) return false;
   if (currentUser.isSuperAdmin || currentUser.isDireccion || isSuperAdminEmail(currentUser.email) || isGlobalObserver(currentUser)) return true;
-  if (isMaestriaCoordinator(currentUser)) return true;
+  // ELIMINADO: if (isMaestriaCoordinator(currentUser)) return true; -> Esto daba acceso global a todos los coordinadores locales como Lili.
   const r = currentUser.appRole || currentUser.role;
   return r === 'director_maestria' || isDireccionRole(r);
 };
