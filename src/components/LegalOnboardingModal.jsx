@@ -9,13 +9,18 @@ import { getContractsByCountry, getSedePais } from '../data/legalContracts';
 import { processFullLegalSignature } from '../services/legalSignatureService';
 
 const LegalOnboardingModal = ({ currentUser, sede, onComplete, onClose }) => {
-  const countryCode = getSedePais(sede);
+  const [selectedSede, setSelectedSede] = useState(
+    sede && sede !== 'ALL' && sede !== 'Global' 
+      ? sede 
+      : (currentUser?.sede && currentUser.sede !== 'Global' && currentUser.sede !== 'ALL' ? currentUser.sede : 'Lima')
+  );
+  const countryCode = getSedePais(selectedSede);
   const contracts = getContractsByCountry(countryCode);
 
   
   const [step, setStep] = useState(-1); // -1=kyc, 0=intro, 1..N=documentos, N+1=firma, N+2=éxito
   const [kycData, setKycData] = useState({
-    fullName: currentUser?.name || currentUser?.displayName || '',
+    fullName: (currentUser?.name && currentUser.name !== 'Colaborador CREAR') ? currentUser.name : (currentUser?.displayName || ''),
     docType: 'DNI',
     docNumber: '',
     birthDate: '',
@@ -90,12 +95,16 @@ const LegalOnboardingModal = ({ currentUser, sede, onComplete, onClose }) => {
       const ndaDoc = contracts.documents.find(d => d.type === 'nda');
       const privacyDoc = contracts.documents.find(d => d.type === 'privacy');
 
+      const participantName = (kycData.fullName || currentUser?.name || currentUser?.displayName || '').trim();
+      const participantId = (currentUser?.email || kycData.email || '').toLowerCase().trim();
+
       const result = await processFullLegalSignature({
         ...kycData,
-        participantId: currentUser?.email || kycData.email || '',
-        participantName: currentUser?.name || currentUser?.displayName || kycData.fullName || '',
+        fullName: participantName,
+        participantId,
+        participantName,
         countryCode,
-        sede: sede || '',
+        sede: selectedSede,
         signatureDataUrl,
         docsAccepted,
         termsAccepted: termsDoc ? !!accepted[termsDoc.id] : false,
@@ -225,6 +234,23 @@ const LegalOnboardingModal = ({ currentUser, sede, onComplete, onClose }) => {
                 <div>
                   <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px', fontWeight: 600 }}>Correo Electrónico Oficial</label>
                   <input type="email" value={kycData.email} onChange={e => setKycData({...kycData, email: e.target.value})} disabled={!!currentUser?.email} style={{ width: '100%', padding: '0.8rem', background: currentUser?.email ? 'rgba(255,255,255,0.02)' : 'var(--bg-dark)', border: '1px solid var(--border-strong)', color: currentUser?.email ? 'var(--text-muted)' : 'var(--text-main)', borderRadius: 'var(--radius-sm)', cursor: currentUser?.email ? 'not-allowed' : 'text' }} placeholder="correo@ejemplo.com" />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px', fontWeight: 600 }}>Sede / Ciudad de Operación</label>
+                  <select 
+                    value={selectedSede} 
+                    onChange={e => setSelectedSede(e.target.value)} 
+                    style={{ width: '100%', padding: '0.8rem', background: 'var(--bg-dark)', border: '1px solid var(--border-strong)', color: 'var(--text-main)', borderRadius: 'var(--radius-sm)' }}
+                  >
+                    <option value="Lima">Lima (Perú)</option>
+                    <option value="Quito">Quito (Ecuador)</option>
+                    <option value="Guayaquil">Guayaquil (Ecuador)</option>
+                    <option value="Cuenca">Cuenca (Ecuador)</option>
+                    <option value="CDMX">CDMX (México)</option>
+                    <option value="Medellín">Medellín (Colombia)</option>
+                    <option value="Madrid">Madrid (España)</option>
+                  </select>
                 </div>
               </div>
 

@@ -87,12 +87,18 @@ export default function LegalStatusPanel() {
   };
 
   const filtered = signatures.filter(s => {
-    if (sedeFilter !== 'TODAS' && s.countryCode !== sedeFilter && s.sede !== sedeFilter) return false;
+    if (sedeFilter !== 'TODAS' && s.countryCode !== sedeFilter && s.sede !== sedeFilter && s.country_code !== sedeFilter) return false;
     if (searchTerm) {
       const q = searchTerm.toLowerCase();
       return (s.participantName || '').toLowerCase().includes(q) || 
+             (s.participant_name || '').toLowerCase().includes(q) ||
+             (s.full_name || '').toLowerCase().includes(q) ||
              (s.participantId || '').toLowerCase().includes(q) ||
-             (s.kycData?.docNumber || '').includes(q);
+             (s.participant_id || '').toLowerCase().includes(q) ||
+             (s.kycData?.fullName || '').toLowerCase().includes(q) ||
+             (s.kycData?.docNumber || '').includes(q) ||
+             (s.docNumber || '').includes(q) ||
+             (s.doc_number || '').includes(q);
     }
     return true;
   });
@@ -203,14 +209,14 @@ export default function LegalStatusPanel() {
                 <tr key={s.id} style={{ borderBottom: '1px solid var(--border-subtle)', transition: 'background 0.2s' }}>
                   <td style={{ padding: '1rem 1.5rem' }}>
                     <div style={{ fontWeight: 700, color: 'var(--text-heading)' }}>
-                      {s.kycData?.fullName || s.participantName || 'Sin Nombre'}
+                      {s.kycData?.fullName || s.participantName || s.participant_name || s.full_name || 'Sin Nombre'}
                     </div>
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>
-                      {s.kycData?.docType || 'DOC'}: {s.kycData?.docNumber || 'No reg.'} • {s.kycData?.email || s.participantId || ''}
+                      {s.kycData?.docType || s.doc_type || 'DOC'}: {s.kycData?.docNumber || s.doc_number || 'No reg.'} • {s.kycData?.email || s.participantId || s.participant_id || ''}
                     </div>
                   </td>
                   <td style={{ padding: '1rem 1.5rem' }}>
-                    <div style={{ fontWeight: 600 }}>{s.sede || s.countryCode || 'Global'}</div>
+                    <div style={{ fontWeight: 600 }}>{s.sede || s.countryCode || s.country_code || 'Global'}</div>
                   </td>
                   <td style={{ padding: '1rem 1.5rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--color-success)', fontWeight: 600, fontSize: '0.8rem', background: 'rgba(34, 197, 94, 0.1)', padding: '4px 10px', borderRadius: '12px', width: 'fit-content' }}>
@@ -248,7 +254,7 @@ export default function LegalStatusPanel() {
                         <FileText size={16} color="var(--crear-gold)" /> Auditoría PDF
                       </button>
                       <button 
-                        onClick={() => handleDeleteSignature(s.id, s.full_name)}
+                        onClick={() => handleDeleteSignature(s.id, s.kycData?.fullName || s.participantName || s.participant_name || s.full_name || 'Sin Nombre')}
                         title="Eliminar registro errado o corrupto"
                         style={{ background: 'rgba(239, 68, 68, 0.12)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#ef4444', padding: '0.6rem 0.8rem', borderRadius: '6px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 700, fontSize: '0.8rem', transition: 'all 0.2s' }}
                         onMouseOver={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.25)'}
@@ -290,25 +296,31 @@ export default function LegalStatusPanel() {
                 <div>
                   <span style={{ color: 'var(--text-muted)', fontWeight: 600 }}>Participante (KYC):</span>
                   <div style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--text-heading)' }}>
-                    {selectedAuditDoc.kycData?.fullName || selectedAuditDoc.participantName || 'Sin Nombre'}
+                    {selectedAuditDoc.kycData?.fullName || selectedAuditDoc.participantName || selectedAuditDoc.participant_name || selectedAuditDoc.full_name || 'Sin Nombre'}
                   </div>
                 </div>
                 <div>
                   <span style={{ color: 'var(--text-muted)', fontWeight: 600 }}>Documento de Identidad:</span>
                   <div style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--text-heading)' }}>
-                    {selectedAuditDoc.kycData?.docType || 'DOC'}: {selectedAuditDoc.kycData?.docNumber || 'No reg.'}
+                    {selectedAuditDoc.kycData?.docType || selectedAuditDoc.doc_type || 'DOC'}: {selectedAuditDoc.kycData?.docNumber || selectedAuditDoc.doc_number || 'No reg.'}
                   </div>
                 </div>
                 <div>
                   <span style={{ color: 'var(--text-muted)', fontWeight: 600 }}>Correo Electrónico:</span>
                   <div style={{ fontWeight: 600, color: 'var(--text-main)' }}>
-                    {selectedAuditDoc.kycData?.email || selectedAuditDoc.participantId || 'No registrado'}
+                    {selectedAuditDoc.kycData?.email || selectedAuditDoc.participantId || selectedAuditDoc.participant_id || 'No registrado'}
+                  </div>
+                </div>
+                <div>
+                  <span style={{ color: 'var(--text-muted)', fontWeight: 600 }}>Teléfono / WhatsApp:</span>
+                  <div style={{ fontWeight: 600, color: 'var(--text-main)' }}>
+                    {selectedAuditDoc.kycData?.phone || selectedAuditDoc.phone || 'No registrado'}
                   </div>
                 </div>
                 <div>
                   <span style={{ color: 'var(--text-muted)', fontWeight: 600 }}>Sede / Jurisdicción:</span>
                   <div style={{ fontWeight: 600, color: 'var(--text-main)' }}>
-                    {selectedAuditDoc.sede || selectedAuditDoc.countryCode || 'Global'}
+                    {selectedAuditDoc.sede || selectedAuditDoc.countryCode || selectedAuditDoc.country_code || 'Global'}
                   </div>
                 </div>
                 <div>
@@ -317,9 +329,9 @@ export default function LegalStatusPanel() {
                     {selectedAuditDoc.signed_at?.toDate ? selectedAuditDoc.signed_at.toDate().toLocaleString() : 'Fecha no disp.'}
                   </div>
                 </div>
-                <div>
+                <div style={{ gridColumn: 'span 2' }}>
                   <span style={{ color: 'var(--text-muted)', fontWeight: 600 }}>Estado Criptográfico:</span>
-                  <div style={{ color: 'var(--color-success)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <div style={{ color: 'var(--color-success)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
                     <CheckCircle size={14} /> Firmado Digitalmente (SHA-256)
                   </div>
                 </div>
@@ -328,7 +340,7 @@ export default function LegalStatusPanel() {
               <div style={{ marginTop: '1rem', paddingTop: '0.8rem', borderTop: '1px solid var(--border-subtle)' }}>
                 <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>Firma Hash / Traza IP:</span>
                 <div style={{ background: 'var(--bg-dark)', padding: '6px 10px', borderRadius: '6px', fontSize: '0.75rem', fontFamily: 'monospace', color: 'var(--crear-gold)', marginTop: '4px', wordBreak: 'break-all' }}>
-                  {selectedAuditDoc.audit_hash || selectedAuditDoc.ip_address || selectedAuditDoc.id}
+                  {selectedAuditDoc.hashSha256 || selectedAuditDoc.hash_sha256 || selectedAuditDoc.audit_hash || selectedAuditDoc.ip_address || selectedAuditDoc.id}
                 </div>
               </div>
             </div>

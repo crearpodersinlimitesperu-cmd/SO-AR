@@ -4,7 +4,8 @@
  * Versión: 2026-v1
  */
 
-import { getContractsByCountry } from '../data/legalContracts';
+import { getContractsByCountry, getSedePais } from '../data/legalContracts';
+import { findUserByAnyEmail } from '../data/usersData';
 import { db, storage, auth } from './firebase';
 import {
   collection, doc, setDoc, getDoc, getDocs, query, where,
@@ -91,14 +92,81 @@ export const saveLegalSignature = async (payload) => {
   const signatureId = payload.signatureId || generateUUID();
   const docRef = doc(db, 'px_legal_signatures', signatureId);
 
+  const rawKyc = payload.kycData || payload.kyc_data || {};
+  let participantName = (payload.participantName || payload.participant_name || rawKyc.fullName || rawKyc.full_name || payload.fullName || '').trim();
+  const participantId = (payload.participantId || payload.participant_id || rawKyc.email || payload.email || '').toLowerCase().trim();
+  let sede = payload.sede || '';
+  let countryCode = payload.countryCode || payload.country_code || (sede ? getSedePais(sede) : 'PE');
+  let docType = rawKyc.docType || rawKyc.doc_type || payload.docType || payload.doc_type || 'DNI';
+  let docNumber = (rawKyc.docNumber || rawKyc.doc_number || payload.docNumber || payload.doc_number || '').toString().trim();
+  let birthDate = rawKyc.birthDate || rawKyc.birth_date || payload.birthDate || payload.birth_date || '';
+  let phone = (rawKyc.phone || payload.phone || '').toString().trim();
+
+  // Enriquecer automáticamente si el nombre vino como "Sin Nombre", vacío o genérico
+  if ((!participantName || participantName.toLowerCase() === 'sin nombre' || participantName.toLowerCase() === 'colaborador crear') && participantId) {
+    const matchedUser = findUserByAnyEmail(participantId);
+    if (matchedUser) {
+      participantName = matchedUser.name || matchedUser.displayName || participantName;
+      if (!sede || sede === 'Global' || sede === 'ALL') {
+        sede = matchedUser.sede || sede;
+        if (sede && sede !== 'Global' && sede !== 'ALL') countryCode = getSedePais(sede);
+      }
+      if (!docNumber || docNumber === 'No reg.') {
+        docNumber = matchedUser.document || matchedUser.docNumber || docNumber;
+        docType = matchedUser.docType || docType;
+      }
+      if (!phone) {
+        phone = matchedUser.phone || phone;
+      }
+    }
+  }
+
+  const finalName = participantName || 'Participante';
+
   const record = {
     id: signatureId,
-    participant_id: payload.participantId || '',
+    participant_id: participantId,
+    participantId: participantId,
+    email: participantId,
     owner_uid: auth.currentUser?.uid || '',
     document_versions: payload.documentVersions || {},
-    participant_name: payload.participantName || '',
-    country_code: payload.countryCode || 'PE',
-    sede: payload.sede || '',
+    participant_name: finalName,
+    participantName: finalName,
+    full_name: finalName,
+    country_code: countryCode,
+    countryCode: countryCode,
+    sede: sede,
+    doc_type: docType,
+    docType: docType,
+    doc_number: docNumber,
+    docNumber: docNumber,
+    birth_date: birthDate,
+    birthDate: birthDate,
+    phone: phone,
+    kyc_data: {
+      fullName: finalName,
+      full_name: finalName,
+      docType: docType,
+      doc_type: docType,
+      docNumber: docNumber,
+      doc_number: docNumber,
+      birthDate: birthDate,
+      birth_date: birthDate,
+      phone: phone,
+      email: participantId
+    },
+    kycData: {
+      fullName: finalName,
+      full_name: finalName,
+      docType: docType,
+      doc_type: docType,
+      docNumber: docNumber,
+      doc_number: docNumber,
+      birthDate: birthDate,
+      birth_date: birthDate,
+      phone: phone,
+      email: participantId
+    },
     terms_accepted: payload.termsAccepted || false,
     nda_signed: payload.ndaSigned || false,
     privacy_accepted: payload.privacyAccepted || false,
@@ -110,6 +178,8 @@ export const saveLegalSignature = async (payload) => {
     pdf_storage_path: payload.pdfStoragePath || '',
     pdf_download_url: payload.pdfDownloadUrl || '',
     hash_sha256: payload.hashSha256 || '',
+    audit_hash: payload.hashSha256 || '',
+    hashSha256: payload.hashSha256 || '',
     signed_at: serverTimestamp(),
     nodus_synced: false,
     nodus_synced_at: null,
@@ -168,17 +238,18 @@ export const uploadSignaturePDF = async (signatureId, signatureData) => {
 };
 
 /**
- * Genera el HTML del contrato firmado con todos los datos de auditoría.
+ * Genera el HTML del contrato firmado con todos los datos de auditoría y KYC.
  */
 export const generateSignedContractHTML = (data) => {
-  const now = data.signed_at?.toDate ? data.signed_at.toDate() : (data.signed_at ? new Date(data.signed_at) : new Date());
-  const docsText = (data.docsAccepted || []).join(', ');
+  const norm = normalizeSignatureDoc ? normalizeSignatureDoc(data) : data;
+  const now = norm.signed_at?.toDate ? norm.signed_at.toDate() : (norm.signed_at ? new Date(norm.signed_at) : new Date());
+  const docsText = (norm.docsAccepted || norm.docs_accepted || []).join(', ');
 
   return `<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Contrato Firmado — ${data.participantName || ''}</title>
+  <title>Comprobante Legal de Firma Digital — ${norm.participantName || ''}</title>
   <style>
     body { font-family: Arial, sans-serif; max-width: 900px; margin: 40px auto; color: #1a1a2e; padding: 20px; }
     .header { text-align: center; border-bottom: 3px solid #001f5b; padding-bottom: 20px; margin-bottom: 30px; }
@@ -207,43 +278,46 @@ export const generateSignedContractHTML = (data) => {
   </div>
 
   <div class="section">
-    <h3>📋 Datos del Participante</h3>
+    <h3>📋 Datos de Identidad del Participante (KYC)</h3>
     <div class="metadata">
-      <div class="meta-item"><strong>Nombre Completo</strong>${data.participantName || 'N/A'}</div>
-      <div class="meta-item"><strong>Correo Electrónico</strong>${data.participantId || 'N/A'}</div>
-      <div class="meta-item"><strong>Sede</strong>${data.sede || 'N/A'}</div>
-      <div class="meta-item"><strong>País / Marco Legal</strong>${data.countryCode || 'N/A'}</div>
+      <div class="meta-item"><strong>Nombre Completo</strong>${norm.kycData?.fullName || norm.participantName || 'N/A'}</div>
+      <div class="meta-item"><strong>Documento de Identidad</strong>${norm.kycData?.docType || 'DOC'}: ${norm.kycData?.docNumber || 'N/A'}</div>
+      <div class="meta-item"><strong>Correo Electrónico</strong>${norm.kycData?.email || norm.participantId || 'N/A'}</div>
+      <div class="meta-item"><strong>Teléfono / WhatsApp</strong>${norm.kycData?.phone || 'N/A'}</div>
+      <div class="meta-item"><strong>Fecha de Nacimiento</strong>${norm.kycData?.birthDate || 'N/A'}</div>
+      <div class="meta-item"><strong>Sede</strong>${norm.sede || 'N/A'}</div>
+      <div class="meta-item"><strong>País / Marco Legal</strong>${norm.countryCode || 'N/A'}</div>
       <div class="meta-item"><strong>Fecha y Hora de Firma</strong>${now.toLocaleString('es-MX', { timeZone: 'America/Mexico_City' })} (Hora México)</div>
-      <div class="meta-item"><strong>ID de Firma</strong>${data.signatureId || 'N/A'}</div>
+      <div class="meta-item"><strong>ID de Firma</strong>${norm.signatureId || norm.id || 'N/A'}</div>
     </div>
   </div>
 
   <div class="section">
     <h3>📝 Documentos Aceptados</h3>
     <ul class="doc-list">
-      ${(data.docsAccepted || []).map(d => `<li>${d}</li>`).join('')}
+      ${(norm.docsAccepted || norm.docs_accepted || []).map(d => `<li>${d}</li>`).join('')}
     </ul>
   </div>
 
   <div class="section">
     <h3>🔒 Metadatos de Auditoría</h3>
     <div class="metadata">
-      <div class="meta-item"><strong>Dirección IP</strong>${data.ipAddress || 'N/A'}</div>
-      <div class="meta-item"><strong>Dispositivo / Navegador</strong>${(data.userAgent || '').slice(0, 80)}...</div>
-      <div class="meta-item"><strong>Versión de Política</strong>${data.policyVersion || '2026-v1'}</div>
-      <div class="meta-item"><strong>Timestamp UTC</strong>${data.timestamp || now.toISOString()}</div>
+      <div class="meta-item"><strong>Dirección IP</strong>${norm.ipAddress || norm.ip_address || 'N/A'}</div>
+      <div class="meta-item"><strong>Dispositivo / Navegador</strong>${(norm.userAgent || norm.user_agent || '').slice(0, 80)}...</div>
+      <div class="meta-item"><strong>Versión de Política</strong>${norm.policyVersion || norm.privacy_policy_version || '2026-v1'}</div>
+      <div class="meta-item"><strong>Timestamp UTC</strong>${norm.timestamp || now.toISOString()}</div>
     </div>
     <div style="margin-top:12px;">
       <strong style="font-size:0.8rem; color:#64748b; display:block; margin-bottom:6px;">HASH SHA-256 DE INTEGRIDAD:</strong>
-      <div class="hash-box">${data.hashSha256 || 'N/A'}</div>
+      <div class="hash-box">${norm.hashSha256 || norm.hash_sha256 || norm.audit_hash || 'N/A'}</div>
     </div>
   </div>
 
-  ${data.signatureDataUrl ? `
+  ${(norm.signatureDataUrl || norm.signature_data_url) ? `
   <div class="section">
     <h3>✍️ Firma Manuscrita Digital</h3>
     <div class="signature-img">
-      <img src="${data.signatureDataUrl}" alt="Firma del participante" style="max-width:100%; max-height:200px;" />
+      <img src="${norm.signatureDataUrl || norm.signature_data_url}" alt="Firma del participante" style="max-width:100%; max-height:200px;" />
     </div>
   </div>
   ` : ''}
@@ -251,7 +325,7 @@ export const generateSignedContractHTML = (data) => {
   <div class="footer">
     <p>Este documento tiene valor legal como comprobante de aceptación de contratos digitales.</p>
     <p>CREAR PSL Global | legal@crearpsl.com | https://crearpsl.com</p>
-    <p>Generado el ${now.toISOString()} | ID: ${data.signatureId || generateUUID()}</p>
+    <p>Generado el ${now.toISOString()} | ID: ${norm.signatureId || norm.id || generateUUID()}</p>
   </div>
 </body>
 </html>`;
@@ -288,8 +362,104 @@ export const sendNodusWebhook = async (participantId, status = 'LEGAL_DOCS_COMPL
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 6. CONSULTAS
+// 6. NORMALIZACIÓN Y CONSULTAS
 // ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Normaliza cualquier documento de firma legal (legado o nuevo)
+ * garantizando compatibilidad total snake_case / camelCase, enriquecimiento KYC
+ * y resolución de nombres/sedes para evitar registros anónimos o vacíos.
+ */
+export const normalizeSignatureDoc = (raw) => {
+  if (!raw) return null;
+  const kyc = raw.kycData || raw.kyc_data || {};
+  let participantId = (raw.participantId || raw.participant_id || kyc.email || raw.email || '').toLowerCase().trim();
+  let participantName = (raw.participantName || raw.participant_name || kyc.fullName || kyc.full_name || raw.full_name || '').trim();
+  let sede = raw.sede || '';
+  let countryCode = raw.countryCode || raw.country_code || (sede ? getSedePais(sede) : 'PE');
+  let docType = kyc.docType || kyc.doc_type || raw.docType || raw.doc_type || 'DOC';
+  let docNumber = (kyc.docNumber || kyc.doc_number || raw.docNumber || raw.doc_number || '').toString().trim();
+  let birthDate = kyc.birthDate || kyc.birth_date || raw.birthDate || raw.birth_date || '';
+  let phone = (kyc.phone || raw.phone || '').toString().trim();
+
+  // Si el nombre viene como "Sin Nombre", vacío o genérico "Colaborador CREAR",
+  // lo enriquecemos buscando en usersData oficial por correo
+  if ((!participantName || participantName.toLowerCase() === 'sin nombre' || participantName.toLowerCase() === 'colaborador crear') && participantId) {
+    const matchedUser = findUserByAnyEmail(participantId);
+    if (matchedUser) {
+      participantName = matchedUser.name || matchedUser.displayName || participantName;
+      if (!sede || sede === 'Global' || sede === 'ALL') {
+        sede = matchedUser.sede || sede;
+        if (sede && sede !== 'Global' && sede !== 'ALL') countryCode = getSedePais(sede);
+      }
+      if (!docNumber || docNumber === 'No reg.') {
+        docNumber = matchedUser.document || matchedUser.docNumber || docNumber;
+        docType = matchedUser.docType || docType;
+      }
+      if (!phone) {
+        phone = matchedUser.phone || phone;
+      }
+    }
+  }
+
+  // Si la sede sigue siendo Global / ALL / vacía pero tenemos countryCode
+  if (!sede || sede === 'Global' || sede === 'ALL') {
+    if (countryCode === 'MX') sede = 'CDMX';
+    else if (countryCode === 'EC') sede = 'Quito';
+    else if (countryCode === 'CO') sede = 'Medellín';
+    else if (countryCode === 'ES') sede = 'Madrid';
+    else if (countryCode === 'PE') sede = 'Lima';
+    else sede = 'Global';
+  }
+
+  const finalName = participantName || 'Participante';
+
+  return {
+    ...raw,
+    participantName: finalName,
+    participant_name: finalName,
+    full_name: finalName,
+    participantId: participantId,
+    participant_id: participantId,
+    email: participantId,
+    countryCode: countryCode,
+    country_code: countryCode,
+    sede: sede,
+    docType: docType || 'DOC',
+    doc_type: docType || 'DOC',
+    docNumber: docNumber || 'No reg.',
+    doc_number: docNumber || 'No reg.',
+    birthDate: birthDate,
+    birth_date: birthDate,
+    phone: phone,
+    hashSha256: raw.hashSha256 || raw.hash_sha256 || raw.audit_hash || raw.id,
+    audit_hash: raw.hashSha256 || raw.hash_sha256 || raw.audit_hash || raw.id,
+    kycData: {
+      fullName: finalName,
+      full_name: finalName,
+      docType: docType || 'DOC',
+      doc_type: docType || 'DOC',
+      docNumber: docNumber || 'No reg.',
+      doc_number: docNumber || 'No reg.',
+      birthDate: birthDate,
+      birth_date: birthDate,
+      phone: phone,
+      email: participantId
+    },
+    kyc_data: {
+      fullName: finalName,
+      full_name: finalName,
+      docType: docType || 'DOC',
+      doc_type: docType || 'DOC',
+      docNumber: docNumber || 'No reg.',
+      doc_number: docNumber || 'No reg.',
+      birthDate: birthDate,
+      birth_date: birthDate,
+      phone: phone,
+      email: participantId
+    }
+  };
+};
 
 /**
  * Retorna el estado legal de un participante por su email.
@@ -302,7 +472,7 @@ export const getLegalStatusByParticipant = async (participantId) => {
     );
     const snap = await getDocs(q);
     if (snap.empty) return null;
-    return { id: snap.docs[0].id, ...snap.docs[0].data() };
+    return normalizeSignatureDoc({ id: snap.docs[0].id, ...snap.docs[0].data() });
   } catch (e) {
     console.error('[LegalSignature] Error getLegalStatusByParticipant:', e);
     return null;
@@ -329,7 +499,7 @@ export const getAllLegalSignatures = async (filters = {}) => {
     }
 
     const snap = await getDocs(q);
-    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    return snap.docs.map(d => normalizeSignatureDoc({ id: d.id, ...d.data() }));
   } catch (e) {
     console.error('[LegalSignature] Error getAllLegalSignatures:', e);
     return [];
@@ -374,10 +544,12 @@ export const processFullLegalSignature = async (params) => {
       params.docsAccepted
     );
 
+    const finalParticipantName = (params.fullName || params.participantName || '').trim();
+
     const fullPayload = {
       signatureId,
       participantId: (params.participantId || '').toLowerCase().trim(),
-      participantName: params.participantName || '',
+      participantName: finalParticipantName,
       countryCode: params.countryCode || 'PE',
       sede: params.sede || '',
       termsAccepted: !!params.termsAccepted,
@@ -388,7 +560,7 @@ export const processFullLegalSignature = async (params) => {
       documentVersions: Object.fromEntries(getContractsByCountry(params.countryCode).documents.filter(d => (params.docsAccepted || []).includes(d.id)).map(d => [d.id, d.version])),
       signatureDataUrl: params.signatureDataUrl || '',
       kycData: {
-        fullName: params.fullName || params.participantName || '',
+        fullName: finalParticipantName,
         docType: params.docType || '',
         docNumber: params.docNumber || '',
         birthDate: params.birthDate || '',

@@ -498,7 +498,7 @@ service cloud.firestore {
     }
     // Cada participante puede crear y consultar únicamente sus propias firmas.
     match /px_legal_signatures/{signatureId} {
-      allow read: if isSuperAdmin() || (isAuthenticated() && resource.data.participant_id == email());
+      allow read: if isSuperAdmin() || isGerenteODireccion() || (isAuthenticated() && resource.data.participant_id == email());
       allow create: if isAuthenticated()
         && request.resource.data.owner_uid == request.auth.uid
         && request.resource.data.participant_id == email()
@@ -511,13 +511,14 @@ service cloud.firestore {
         && request.resource.data.docs_accepted is list
         && request.resource.data.docs_accepted.size() > 0;
       // Los datos de aceptación y la firma son inmutables desde el cliente.
-      allow update: if isAuthenticated()
+      allow update: if isSuperAdmin() || (isAuthenticated()
         && resource.data.owner_uid == request.auth.uid
         && resource.data.participant_id == email()
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-          'pdf_storage_path', 'pdf_download_url', 'nodus_synced', 'nodus_synced_at'
-        ]);
-      allow delete: if false;
+          'pdf_storage_path', 'pdf_download_url', 'pdfStoragePath', 'pdfDownloadUrl',
+          'nodus_synced', 'nodus_synced_at', 'nodusSynced', 'nodusSyncedAt'
+        ]));
+      allow delete: if isSuperAdmin();
     }
   }
 }

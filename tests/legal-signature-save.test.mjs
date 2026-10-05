@@ -39,3 +39,26 @@ test('las cuatro plantillas peruanas usan la empresa y versión corregidas',()=>
   assert.match(pe,/CREACIÓN CUÁNTICA E\.I\.R\.L\. \(RUC 20612592811\)/);
   assert.equal((pe.match(/version: '2026-10-04-pe-v2'/g)||[]).length,4);
 });
+
+test('persistencia y normalizacion completa de datos KYC', async () => {
+  const kycParams = {
+    ...params,
+    fullName: 'Juan Perez',
+    docType: 'DNI',
+    docNumber: '12345678',
+    birthDate: '1990-01-01',
+    phone: '+51987654321',
+    sede: 'Lima'
+  };
+  const h = harness();
+  const res = await h.context.process(kycParams);
+  assert.equal(res.success, true);
+  const record = h.writes[0].data;
+  assert.equal(record.participant_name, 'Juan Perez');
+  assert.equal(record.doc_number, '12345678');
+  assert.equal(record.doc_type, 'DNI');
+  assert.equal(record.phone, '+51987654321');
+  assert.equal(record.sede, 'Lima');
+  assert.equal(record.kyc_data.fullName, 'Juan Perez');
+  assert.equal(record.kycData.docNumber, '12345678');
+});

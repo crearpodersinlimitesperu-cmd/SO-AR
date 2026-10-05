@@ -274,6 +274,9 @@ function App() {
           <Route path="/onboarding-legal" element={
             <OnboardingLegal />
           } />
+          <Route path="/dna" element={
+            <OnboardingLegal />
+          } />
           <Route path="/home" element={
             <PrivateRoute>
               <Home />
