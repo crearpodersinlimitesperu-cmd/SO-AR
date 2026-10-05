@@ -612,17 +612,30 @@ Tras el reporte de incidencias donde firmas completadas figuraban en el panel ad
      - `hashSha256` / `hash_sha256` / `audit_hash`
    * Esto garantiza compatibilidad retroactiva y futura con cualquier script, exportador o componente.
 
-3. **Motor de Auto-Recuperación y Auto-Sanación (`normalizeSignatureDoc`):**
+3. **Motor de Auto-Recuperación y Auto-Sanación Multi-Fuente (`resolveParticipantKYC` y `normalizeSignatureDoc`):**
    * En `src/services/legalSignatureService.js`, toda lectura (`getLegalStatusByParticipant`, `getAllLegalSignatures`) pasa por `normalizeSignatureDoc`.
-   * Si un registro antiguo o defectuoso contiene *"Sin Nombre"* o carece de documento/sede, el motor cruza su correo con el directorio oficial `findUserByAnyEmail` e inyecta dinámicamente el nombre real, sede, documento y teléfono. Los registros existentes se auto-reparan inmediatamente en la interfaz sin necesidad de migraciones destructivas.
+   * Si un registro antiguo o defectuoso contiene *"Sin Nombre"* o carece de documento/sede, el motor ejecuta una búsqueda cruzada en cascada a través de 5 fuentes:
+     1. `usersData.js` (`USERS_TO_IMPORT`): Colaboradores oficiales, directivos y coordinadores.
+     2. `googleWorkspaceUsers.json`: Directorio institucional corporativo de Google Workspace.
+     3. `nodusEnroladosRecords.json`: CRM Base con más de 3,000 registros, teléfonos y asignaciones por sede.
+     4. `INITIAL_MANAGERS` de `managersData.js`: Directorio de managers y líderes territoriales.
+     5. Parser heurístico de correos (`formatEmailToName`): Descompone `nombre.apellido@dominio` en formato capitalizado.
+   * **Auto-Sanación Silenciosa en Firestore:** Al consultar `getAllLegalSignatures`, si el sistema detecta que un documento persistido en Firestore tenía campos incompletos o "Sin Nombre" y ahora se cuenta con su resolución fidedigna, dispara automáticamente una actualización `{ merge: true }` en background para sanar la base de datos de manera definitiva.
 
-4. **Experiencia de Usuario y Captura Fidedigna:**
+4. **Herramienta de Recuperación y Blindaje Manual en `LegalStatusPanel.jsx`:**
+   * Se incorporó el botón **[✏️ Recuperar KYC]** en cada fila de la bóveda legal.
+   * Permite a SuperAdmin y Dirección:
+     - Consultar y editar el nombre completo, documento, teléfono, correo y sede.
+     - Botón inteligente **[✨ Auto-completar]** que consulta en tiempo real los directorios y precarga los datos oficiales.
+     - Función `updateLegalSignatureKYC` que persiste el blindaje en Firestore preservando inalterable la firma criptográfica (canvas vectorial y hash SHA-256).
+
+5. **Experiencia de Usuario y Captura Fidedigna:**
    * **Selector de Sede Oficial:** En el Paso -1 de `LegalOnboardingModal.jsx`, el usuario selecciona su ciudad de operación (`Lima`, `Quito`, `Guayaquil`, `Cuenca`, `CDMX`, `Medellín`, `Madrid`), la cual actualiza dinámicamente los contratos legales de su país y queda grabada en su expediente.
    * **Prevalencia del Nombre Legal:** El valor digitado en el campo KYC toma prioridad absoluta sobre alias genéricos de sesión.
    * **Puerta Segura de Autenticación:** `OnboardingLegal.jsx` detecta si el usuario no tiene sesión activa y ofrece un acceso limpio con Google antes de firmar, garantizando que el `owner_uid` y `participant_id` correspondan a un usuario real autenticado.
    * **Ruta Canónica:** Se habilitó `<Route path="/dna" element={<OnboardingLegal />} />` en `App.jsx`.
 
-5. **Reglas de Seguridad Actualizadas (`firestore.rules`):**
+6. **Reglas de Seguridad Actualizadas (`firestore.rules`):**
    * `allow read`: SuperAdmin, Gerente/Dirección y el propio participante.
    * `allow delete`: Exclusivo para SuperAdmin (permite purgar registros de prueba o corrompidos desde `LegalStatusPanel`).
    * `allow update`: SuperAdmin y el participante sobre campos de sincronización con Nodus y PDF.

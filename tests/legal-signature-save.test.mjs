@@ -62,3 +62,20 @@ test('persistencia y normalizacion completa de datos KYC', async () => {
   assert.equal(record.kyc_data.fullName, 'Juan Perez');
   assert.equal(record.kycData.docNumber, '12345678');
 });
+
+test('normalizeSignatureDoc reconstituye nombre desde email cuando viene Sin Nombre', () => {
+  const h = harness();
+  vm.runInContext('this.normalize = normalizeSignatureDoc;', h.context);
+  const raw = {
+    id: 'sig-test-123',
+    participant_id: 'carlos.mendoza@crearpsl.net',
+    participant_name: 'Sin Nombre',
+    sede: 'Global',
+    status: 'COMPLETED'
+  };
+  const norm = h.context.normalize(raw);
+  assert.equal(norm.participantName, 'Carlos Mendoza');
+  assert.equal(norm.participant_name, 'Carlos Mendoza');
+  assert.equal(norm.kycData.fullName, 'Carlos Mendoza');
+});
+

@@ -6,12 +6,23 @@
 
 import { getContractsByCountry, getSedePais } from '../data/legalContracts';
 import { findUserByAnyEmail } from '../data/usersData';
+import googleWorkspaceUsers from '../data/googleWorkspaceUsers.json';
+import nodusEnroladosFallback from '../data/nodusEnroladosRecords.json';
+import { INITIAL_MANAGERS } from '../data/managersData.js';
 import { db, storage, auth } from './firebase';
 import {
   collection, doc, setDoc, getDoc, getDocs, query, where,
   serverTimestamp, orderBy
 } from 'firebase/firestore';
 import { ref, uploadString, getDownloadURL } from 'firebase/storage';
+
+const safeGetSedePais = (sede) => {
+  try {
+    return typeof getSedePais === 'function' ? (getSedePais(sede) || 'PE') : 'PE';
+  } catch {
+    return 'PE';
+  }
+};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 1. UTILIDADES CRIPTOGRÁFICAS
@@ -79,6 +90,124 @@ export const captureAuditMetadata = async () => {
   };
 };
 
+export const formatEmailToName = (email) => {
+  if (!email || !email.includes('@')) return '';
+  const prefix = email.split('@')[0];
+  const cleaned = prefix.replace(/[\._\-]+/g, ' ').replace(/\d+/g, '').trim();
+  if (!cleaned) return '';
+  return cleaned
+    .split(' ')
+    .filter(Boolean)
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(' ');
+};
+
+export const resolveParticipantKYC = (emailOrId) => {
+  if (!emailOrId) return null;
+  const search = emailOrId.toLowerCase().trim();
+
+  // 1. usersData (Personal institucional, directivos, coordinadores)
+  try {
+    if (typeof findUserByAnyEmail === 'function') {
+      const u = findUserByAnyEmail(search);
+      if (u) {
+        const sede = u.sede && u.sede !== 'Global' && u.sede !== 'ALL' ? u.sede : '';
+        return {
+          source: 'usersData',
+          fullName: (u.name || u.displayName || '').trim(),
+          docType: u.docType || u.documentType || 'DNI',
+          docNumber: (u.document || u.docNumber || '').toString().trim(),
+          phone: (u.phone || u.contacto || '').toString().trim(),
+          sede: sede,
+          countryCode: sede ? safeGetSedePais(sede) : 'PE',
+          email: search,
+        };
+      }
+    }
+  } catch {}
+
+  // 2. Google Workspace Users (Directorio institucional corporativo)
+  try {
+    if (typeof googleWorkspaceUsers !== 'undefined' && Array.isArray(googleWorkspaceUsers)) {
+      const gw = googleWorkspaceUsers.find(g => g.email?.toLowerCase().trim() === search);
+      if (gw && gw.name) {
+        return {
+          source: 'googleWorkspace',
+          fullName: gw.name.trim(),
+          docType: 'DNI',
+          docNumber: '',
+          phone: '',
+          sede: '',
+          countryCode: 'PE',
+          email: search,
+        };
+      }
+    }
+  } catch {}
+
+  // 3. Nodus Enrolados (CRM Base de participantes)
+  try {
+    if (typeof nodusEnroladosFallback !== 'undefined' && Array.isArray(nodusEnroladosFallback)) {
+      const nodus = nodusEnroladosFallback.find(n => n.email?.toLowerCase().trim() === search);
+      if (nodus && nodus.nombre) {
+        let s = '';
+        if (nodus.equipo?.includes('LIMA')) s = 'Lima';
+        else if (nodus.equipo?.includes('QUITO')) s = 'Quito';
+        else if (nodus.equipo?.includes('CUENCA')) s = 'Cuenca';
+        else if (nodus.equipo?.includes('GUAYAQUIL')) s = 'Guayaquil';
+        else if (nodus.equipo?.includes('MEDELLIN')) s = 'Medellín';
+        else if (nodus.equipo?.includes('CDMX') || nodus.equipo?.includes('MEXICO')) s = 'CDMX';
+        return {
+          source: 'nodus',
+          fullName: nodus.nombre.trim(),
+          docType: 'DNI',
+          docNumber: '',
+          phone: (nodus.telefono || '').toString().trim(),
+          sede: s,
+          countryCode: s ? safeGetSedePais(s) : 'PE',
+          email: search,
+        };
+      }
+    }
+  } catch {}
+
+  // 4. Managers Directory (Directorio de managers y coordinadores en campo)
+  try {
+    if (typeof INITIAL_MANAGERS !== 'undefined' && Array.isArray(INITIAL_MANAGERS)) {
+      const mgr = INITIAL_MANAGERS.find(m => m.email?.toLowerCase().trim() === search);
+      if (mgr && mgr.nombre) {
+        return {
+          source: 'managersData',
+          fullName: mgr.nombre.trim(),
+          docType: 'DNI',
+          docNumber: '',
+          phone: (mgr.telefono || '').toString().trim(),
+          sede: mgr.sede || '',
+          countryCode: mgr.sede ? safeGetSedePais(mgr.sede) : 'PE',
+          email: search,
+        };
+      }
+    }
+  } catch {}
+
+  // 5. Inferencia heurística por email (nombre.apellido@dominio.com -> Nombre Apellido)
+  const heurName = formatEmailToName(search);
+  if (heurName) {
+    return {
+      source: 'email_heuristic',
+      fullName: heurName,
+      docType: 'DOC',
+      docNumber: '',
+      phone: '',
+      sede: '',
+      countryCode: 'PE',
+      email: search,
+    };
+  }
+
+  return null;
+};
+
 // ─────────────────────────────────────────────────────────────────────────────
 // 3. GUARDAR EN FIRESTORE
 // ─────────────────────────────────────────────────────────────────────────────
@@ -95,33 +224,35 @@ export const saveLegalSignature = async (payload) => {
   const rawKyc = payload.kycData || payload.kyc_data || {};
   let participantName = (payload.participantName || payload.participant_name || rawKyc.fullName || rawKyc.full_name || payload.fullName || '').trim();
   const participantId = (payload.participantId || payload.participant_id || rawKyc.email || payload.email || '').toLowerCase().trim();
-  let sede = payload.sede || '';
-  let countryCode = payload.countryCode || payload.country_code || (sede ? getSedePais(sede) : 'PE');
+  let sede = payload.sede || rawKyc.sede || '';
+  let countryCode = payload.countryCode || payload.country_code || (sede ? safeGetSedePais(sede) : 'PE');
   let docType = rawKyc.docType || rawKyc.doc_type || payload.docType || payload.doc_type || 'DNI';
   let docNumber = (rawKyc.docNumber || rawKyc.doc_number || payload.docNumber || payload.doc_number || '').toString().trim();
   let birthDate = rawKyc.birthDate || rawKyc.birth_date || payload.birthDate || payload.birth_date || '';
   let phone = (rawKyc.phone || payload.phone || '').toString().trim();
 
-  // Enriquecer automáticamente si el nombre vino como "Sin Nombre", vacío o genérico
-  if ((!participantName || participantName.toLowerCase() === 'sin nombre' || participantName.toLowerCase() === 'colaborador crear') && participantId) {
-    const matchedUser = findUserByAnyEmail(participantId);
-    if (matchedUser) {
-      participantName = matchedUser.name || matchedUser.displayName || participantName;
+  // Enriquecer automáticamente usando la bóveda multi-fuente si falta algún dato
+  if (participantId) {
+    const kyc = resolveParticipantKYC(participantId);
+    if (kyc) {
+      if (!participantName || participantName.toLowerCase() === 'sin nombre' || participantName.toLowerCase() === 'colaborador crear' || participantName.toLowerCase() === 'participante') {
+        participantName = kyc.fullName || participantName;
+      }
       if (!sede || sede === 'Global' || sede === 'ALL') {
-        sede = matchedUser.sede || sede;
-        if (sede && sede !== 'Global' && sede !== 'ALL') countryCode = getSedePais(sede);
+        sede = kyc.sede || sede;
+        if (sede && sede !== 'Global' && sede !== 'ALL') countryCode = safeGetSedePais(sede);
       }
       if (!docNumber || docNumber === 'No reg.') {
-        docNumber = matchedUser.document || matchedUser.docNumber || docNumber;
-        docType = matchedUser.docType || docType;
+        docNumber = kyc.docNumber || docNumber;
+        docType = kyc.docType || docType;
       }
       if (!phone) {
-        phone = matchedUser.phone || phone;
+        phone = kyc.phone || phone;
       }
     }
   }
 
-  const finalName = participantName || 'Participante';
+  const finalName = participantName || (participantId ? formatEmailToName(participantId) : '') || 'Participante';
 
   const record = {
     id: signatureId,
@@ -376,28 +507,29 @@ export const normalizeSignatureDoc = (raw) => {
   let participantId = (raw.participantId || raw.participant_id || kyc.email || raw.email || '').toLowerCase().trim();
   let participantName = (raw.participantName || raw.participant_name || kyc.fullName || kyc.full_name || raw.full_name || '').trim();
   let sede = raw.sede || '';
-  let countryCode = raw.countryCode || raw.country_code || (sede ? getSedePais(sede) : 'PE');
+  let countryCode = raw.countryCode || raw.country_code || (sede ? safeGetSedePais(sede) : 'PE');
   let docType = kyc.docType || kyc.doc_type || raw.docType || raw.doc_type || 'DOC';
   let docNumber = (kyc.docNumber || kyc.doc_number || raw.docNumber || raw.doc_number || '').toString().trim();
   let birthDate = kyc.birthDate || kyc.birth_date || raw.birthDate || raw.birth_date || '';
   let phone = (kyc.phone || raw.phone || '').toString().trim();
 
-  // Si el nombre viene como "Sin Nombre", vacío o genérico "Colaborador CREAR",
-  // lo enriquecemos buscando en usersData oficial por correo
-  if ((!participantName || participantName.toLowerCase() === 'sin nombre' || participantName.toLowerCase() === 'colaborador crear') && participantId) {
-    const matchedUser = findUserByAnyEmail(participantId);
-    if (matchedUser) {
-      participantName = matchedUser.name || matchedUser.displayName || participantName;
+  // Enriquecer automáticamente usando la bóveda multi-fuente si falta el nombre o KYC
+  if (participantId) {
+    const resolved = resolveParticipantKYC(participantId);
+    if (resolved) {
+      if (!participantName || participantName.toLowerCase() === 'sin nombre' || participantName.toLowerCase() === 'colaborador crear' || participantName.toLowerCase() === 'participante') {
+        participantName = resolved.fullName || participantName;
+      }
       if (!sede || sede === 'Global' || sede === 'ALL') {
-        sede = matchedUser.sede || sede;
-        if (sede && sede !== 'Global' && sede !== 'ALL') countryCode = getSedePais(sede);
+        sede = resolved.sede || sede;
+        if (sede && sede !== 'Global' && sede !== 'ALL') countryCode = safeGetSedePais(sede);
       }
       if (!docNumber || docNumber === 'No reg.') {
-        docNumber = matchedUser.document || matchedUser.docNumber || docNumber;
-        docType = matchedUser.docType || docType;
+        docNumber = resolved.docNumber || docNumber;
+        docType = resolved.docType || docType;
       }
       if (!phone) {
-        phone = matchedUser.phone || phone;
+        phone = resolved.phone || phone;
       }
     }
   }
@@ -412,7 +544,7 @@ export const normalizeSignatureDoc = (raw) => {
     else sede = 'Global';
   }
 
-  const finalName = participantName || 'Participante';
+  const finalName = participantName || (participantId ? formatEmailToName(participantId) : '') || 'Participante';
 
   return {
     ...raw,
@@ -444,7 +576,8 @@ export const normalizeSignatureDoc = (raw) => {
       birthDate: birthDate,
       birth_date: birthDate,
       phone: phone,
-      email: participantId
+      email: participantId,
+      sede: sede
     },
     kyc_data: {
       fullName: finalName,
@@ -456,7 +589,8 @@ export const normalizeSignatureDoc = (raw) => {
       birthDate: birthDate,
       birth_date: birthDate,
       phone: phone,
-      email: participantId
+      email: participantId,
+      sede: sede
     }
   };
 };
@@ -480,7 +614,8 @@ export const getLegalStatusByParticipant = async (participantId) => {
 };
 
 /**
- * Retorna todas las firmas (solo para DATA_ADMIN).
+ * Retorna todas las firmas (para Dirección / SuperAdmin / Data Admin).
+ * Auto-sana registros huérfanos o desactualizados en Firestore silenciosamente.
  * @param {object} filters - { sede, countryCode, status }
  */
 export const getAllLegalSignatures = async (filters = {}) => {
@@ -499,10 +634,121 @@ export const getAllLegalSignatures = async (filters = {}) => {
     }
 
     const snap = await getDocs(q);
-    return snap.docs.map(d => normalizeSignatureDoc({ id: d.id, ...d.data() }));
+    const list = [];
+    for (const d of snap.docs) {
+      const raw = { id: d.id, ...d.data() };
+      const normalized = normalizeSignatureDoc(raw);
+      list.push(normalized);
+
+      // Auto-reparación permanente en Firestore: si en BD faltaban campos o decía "Sin Nombre"
+      // y hemos resuelto el nombre real, persistimos el parche sin bloquear la interfaz.
+      if (
+        auth.currentUser &&
+        ((!raw.participant_name || raw.participant_name === 'Sin Nombre' || !raw.kycData || !raw.participantName) &&
+         normalized.participantName && normalized.participantName !== 'Sin Nombre' && normalized.participantName !== 'Participante')
+      ) {
+        setDoc(doc(db, 'px_legal_signatures', d.id), {
+          participant_name: normalized.participantName,
+          participantName: normalized.participantName,
+          full_name: normalized.participantName,
+          participant_id: normalized.participantId,
+          participantId: normalized.participantId,
+          email: normalized.participantId,
+          sede: normalized.sede,
+          country_code: normalized.countryCode,
+          countryCode: normalized.countryCode,
+          doc_type: normalized.docType,
+          docType: normalized.docType,
+          doc_number: normalized.docNumber,
+          docNumber: normalized.docNumber,
+          phone: normalized.phone,
+          kyc_data: normalized.kycData,
+          kycData: normalized.kycData,
+          healed_at: serverTimestamp()
+        }, { merge: true }).catch(err => {
+          console.warn('[LegalSignature] Auto-heal notice:', err.message);
+        });
+      }
+    }
+    return list;
   } catch (e) {
     console.error('[LegalSignature] Error getAllLegalSignatures:', e);
     return [];
+  }
+};
+
+/**
+ * Actualiza y blinda manualmente los datos KYC de un participante en Firestore.
+ */
+export const updateLegalSignatureKYC = async (signatureId, kycUpdates) => {
+  try {
+    const docRef = doc(db, 'px_legal_signatures', signatureId);
+    const snap = await getDoc(docRef);
+    if (!snap.exists()) {
+      throw new Error(`Firma ${signatureId} no encontrada.`);
+    }
+    const currentData = snap.data();
+    const finalName = (kycUpdates.fullName || kycUpdates.participantName || currentData.participant_name || currentData.participantName || '').trim();
+    const finalDocType = kycUpdates.docType || currentData.doc_type || currentData.docType || 'DOC';
+    const finalDocNumber = (kycUpdates.docNumber || currentData.doc_number || currentData.docNumber || '').trim();
+    const finalPhone = (kycUpdates.phone || currentData.phone || '').trim();
+    const finalEmail = (kycUpdates.email || currentData.participant_id || currentData.participantId || '').toLowerCase().trim();
+    const finalSede = kycUpdates.sede || currentData.sede || 'Global';
+    const finalCountryCode = kycUpdates.countryCode || currentData.country_code || currentData.countryCode || (finalSede ? safeGetSedePais(finalSede) : 'PE');
+    const finalBirthDate = kycUpdates.birthDate || currentData.birth_date || currentData.birthDate || '';
+
+    const patch = {
+      participant_name: finalName,
+      participantName: finalName,
+      full_name: finalName,
+      doc_type: finalDocType,
+      docType: finalDocType,
+      doc_number: finalDocNumber,
+      docNumber: finalDocNumber,
+      phone: finalPhone,
+      participant_id: finalEmail,
+      participantId: finalEmail,
+      email: finalEmail,
+      sede: finalSede,
+      country_code: finalCountryCode,
+      countryCode: finalCountryCode,
+      birth_date: finalBirthDate,
+      birthDate: finalBirthDate,
+      kyc_data: {
+        fullName: finalName,
+        full_name: finalName,
+        docType: finalDocType,
+        doc_type: finalDocType,
+        docNumber: finalDocNumber,
+        doc_number: finalDocNumber,
+        phone: finalPhone,
+        email: finalEmail,
+        birthDate: finalBirthDate,
+        birth_date: finalBirthDate,
+        sede: finalSede,
+      },
+      kycData: {
+        fullName: finalName,
+        full_name: finalName,
+        docType: finalDocType,
+        doc_type: finalDocType,
+        docNumber: finalDocNumber,
+        doc_number: finalDocNumber,
+        phone: finalPhone,
+        email: finalEmail,
+        birthDate: finalBirthDate,
+        birth_date: finalBirthDate,
+        sede: finalSede,
+      },
+      updated_at: serverTimestamp(),
+      healed_at: serverTimestamp(),
+    };
+
+    await setDoc(docRef, patch, { merge: true });
+    return patch;
+  } catch (err) {
+    console.error('[LegalSignature] Error updateLegalSignatureKYC:', err);
+    throw err;
   }
 };
 

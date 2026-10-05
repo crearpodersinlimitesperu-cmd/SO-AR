@@ -1,12 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { 
   Shield, Search, Download, CheckCircle, Clock, ShieldAlert, 
-  Activity, Users, FileText, ChevronLeft, ExternalLink, X, Printer, Hash, Trash2
+  Activity, Users, FileText, ChevronLeft, ExternalLink, X, Printer, Hash, Trash2,
+  Edit3, Save, Sparkles
 } from 'lucide-react';
 import { doc, deleteDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useUI } from '../context/UIContext';
-import { getAllLegalSignatures, generateTemporaryDownloadURL, generateSignedContractHTML } from '../services/legalSignatureService';
+import { 
+  getAllLegalSignatures, 
+  generateTemporaryDownloadURL, 
+  generateSignedContractHTML,
+  updateLegalSignatureKYC,
+  resolveParticipantKYC
+} from '../services/legalSignatureService';
 import { useNavigate } from 'react-router-dom';
 
 export default function LegalStatusPanel() {
@@ -15,6 +22,17 @@ export default function LegalStatusPanel() {
   const [sedeFilter, setSedeFilter] = useState('TODAS');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedAuditDoc, setSelectedAuditDoc] = useState(null);
+  const [editingKycDoc, setEditingKycDoc] = useState(null);
+  const [kycForm, setKycForm] = useState({
+    fullName: '',
+    docType: 'DNI',
+    docNumber: '',
+    email: '',
+    phone: '',
+    sede: 'Lima',
+    birthDate: ''
+  });
+  const [savingKyc, setSavingKyc] = useState(false);
   const [generatingUrl, setGeneratingUrl] = useState(false);
   const navigate = useNavigate();
   const { showToast } = useUI();
@@ -39,6 +57,84 @@ export default function LegalStatusPanel() {
     } catch (err) {
       console.error("Error eliminando registro legal:", err);
       if (showToast) showToast('Error al eliminar registro: ' + err.message, 'error');
+    }
+  };
+
+  const handleOpenEditKyc = (s) => {
+    setEditingKycDoc(s);
+    setKycForm({
+      fullName: s.kycData?.fullName || s.participantName || s.participant_name || s.full_name || '',
+      docType: s.kycData?.docType || s.doc_type || 'DNI',
+      docNumber: s.kycData?.docNumber || s.doc_number || '',
+      email: s.kycData?.email || s.participantId || s.participant_id || '',
+      phone: s.kycData?.phone || s.phone || '',
+      sede: s.sede || s.countryCode || 'Lima',
+      birthDate: s.kycData?.birthDate || s.birthDate || s.birth_date || ''
+    });
+  };
+
+  const handleAutoFillFromDirectory = () => {
+    if (!kycForm.email) {
+      if (showToast) showToast('Ingresa un correo primero para buscar en el directorio.', 'warning');
+      return;
+    }
+    const resolved = resolveParticipantKYC(kycForm.email);
+    if (resolved && resolved.fullName) {
+      setKycForm(prev => ({
+        ...prev,
+        fullName: resolved.fullName || prev.fullName,
+        docType: resolved.docType || prev.docType,
+        docNumber: resolved.docNumber || prev.docNumber,
+        phone: resolved.phone || prev.phone,
+        sede: resolved.sede || prev.sede,
+      }));
+      if (showToast) showToast(`Identidad encontrada en directorio (${resolved.source})`, 'success');
+    } else {
+      if (showToast) showToast('No se encontró coincidencia automática en los directorios.', 'info');
+    }
+  };
+
+  const handleSaveKyc = async (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!editingKycDoc) return;
+    setSavingKyc(true);
+    try {
+      await updateLegalSignatureKYC(editingKycDoc.id, kycForm);
+      setSignatures(prev => prev.map(item => {
+        if (item.id === editingKycDoc.id) {
+          return {
+            ...item,
+            participantName: kycForm.fullName,
+            participant_name: kycForm.fullName,
+            full_name: kycForm.fullName,
+            docNumber: kycForm.docNumber,
+            doc_number: kycForm.docNumber,
+            docType: kycForm.docType,
+            doc_type: kycForm.docType,
+            phone: kycForm.phone,
+            sede: kycForm.sede,
+            participantId: kycForm.email,
+            participant_id: kycForm.email,
+            email: kycForm.email,
+            kycData: {
+              ...(item.kycData || {}),
+              ...kycForm
+            },
+            kyc_data: {
+              ...(item.kyc_data || {}),
+              ...kycForm
+            }
+          };
+        }
+        return item;
+      }));
+      if (showToast) showToast('✅ Datos KYC blindados y actualizados en Firestore con éxito.', 'success');
+      setEditingKycDoc(null);
+    } catch (err) {
+      console.error('Error actualizando KYC:', err);
+      if (showToast) showToast('Error al guardar datos KYC: ' + err.message, 'error');
+    } finally {
+      setSavingKyc(false);
     }
   };
 
@@ -246,6 +342,15 @@ export default function LegalStatusPanel() {
                   <td style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>
                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
                       <button 
+                        onClick={() => handleOpenEditKyc(s)}
+                        title="Editar o Recuperar Datos KYC del Participante"
+                        style={{ background: 'rgba(56, 189, 248, 0.12)', border: '1px solid rgba(56, 189, 248, 0.3)', color: '#38bdf8', padding: '0.6rem 0.8rem', borderRadius: '6px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 700, fontSize: '0.8rem', transition: 'all 0.2s' }}
+                        onMouseOver={e => e.currentTarget.style.background = 'rgba(56, 189, 248, 0.25)'}
+                        onMouseOut={e => e.currentTarget.style.background = 'rgba(56, 189, 248, 0.12)'}
+                      >
+                        <Edit3 size={15} /> Recuperar KYC
+                      </button>
+                      <button 
                         onClick={() => handleOpenAuditModal(s)}
                         style={{ background: 'var(--bg-card)', border: '1px solid var(--border-strong)', color: 'var(--text-main)', padding: '0.6rem 1rem', borderRadius: '6px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px', fontWeight: 600, fontSize: '0.8rem', transition: 'all 0.2s' }}
                         onMouseOver={e => e.currentTarget.style.background = 'rgba(255, 193, 7, 0.1)'}
@@ -370,6 +475,177 @@ export default function LegalStatusPanel() {
                 <Download size={16} /> {generatingUrl ? 'Generando...' : 'Descargar Archivo Oficial'}
               </button>
             </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* MODAL DE EDICIÓN Y RECUPERACIÓN MANUAL / AUTOMÁTICA DE KYC */}
+      {editingKycDoc && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.75)', zIndex: 110, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '1.5rem' }}>
+          <div style={{ background: 'var(--bg-card)', borderRadius: '16px', border: '1px solid var(--border-strong)', width: '100%', maxWidth: '650px', maxHeight: '92vh', overflowY: 'auto', padding: '2rem', boxShadow: '0 25px 50px rgba(0,0,0,0.5)', color: 'var(--text-main)' }}>
+            
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '1rem', marginBottom: '1.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <Edit3 size={24} color="#38bdf8" />
+                <div>
+                  <h3 style={{ margin: 0, color: 'var(--text-heading)', fontSize: '1.25rem', fontWeight: 800 }}>
+                    Recuperación y Blindaje de Datos KYC
+                  </h3>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                    ID Registro: <span style={{ fontFamily: 'monospace', color: '#38bdf8' }}>{editingKycDoc.id}</span>
+                  </div>
+                </div>
+              </div>
+              <button 
+                onClick={() => setEditingKycDoc(null)} 
+                style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '4px' }}
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div style={{ background: 'rgba(56, 189, 248, 0.08)', border: '1px solid rgba(56, 189, 248, 0.25)', borderRadius: '10px', padding: '1rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: '0.85rem', color: '#38bdf8' }}>
+                  Auto-detección desde Directorio Institucional
+                </div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                  Cruza con usuarios corporativos, CRM Nodus y directorio de managers.
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={handleAutoFillFromDirectory}
+                style={{ background: '#38bdf8', color: '#000', border: 'none', padding: '8px 14px', borderRadius: '6px', fontWeight: 800, fontSize: '0.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}
+              >
+                <Sparkles size={14} /> Auto-completar
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveKyc}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
+                <div style={{ gridColumn: 'span 2' }}>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '4px' }}>
+                    Nombre Completo del Participante *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={kycForm.fullName}
+                    onChange={e => setKycForm(p => ({ ...p, fullName: e.target.value }))}
+                    placeholder="Ej. Juan Pérez González"
+                    style={{ width: '100%', padding: '10px 12px', background: 'var(--bg-dark-alt)', border: '1px solid var(--border-strong)', borderRadius: '8px', color: 'var(--text-main)', fontSize: '0.9rem', outline: 'none' }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '4px' }}>
+                    Tipo de Documento
+                  </label>
+                  <select
+                    value={kycForm.docType}
+                    onChange={e => setKycForm(p => ({ ...p, docType: e.target.value }))}
+                    style={{ width: '100%', padding: '10px 12px', background: 'var(--bg-dark-alt)', border: '1px solid var(--border-strong)', borderRadius: '8px', color: 'var(--text-main)', fontSize: '0.9rem', outline: 'none' }}
+                  >
+                    <option value="DNI">DNI (Perú / España / Argentina)</option>
+                    <option value="Cédula">Cédula (Colombia / Ecuador / Vzla)</option>
+                    <option value="CURP">CURP / RFC (México)</option>
+                    <option value="Pasaporte">Pasaporte Internacional</option>
+                    <option value="DOC">Otro Documento</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '4px' }}>
+                    Número de Documento *
+                  </label>
+                  <input
+                    type="text"
+                    value={kycForm.docNumber}
+                    onChange={e => setKycForm(p => ({ ...p, docNumber: e.target.value }))}
+                    placeholder="Ej. 72345678 o 1718293041"
+                    style={{ width: '100%', padding: '10px 12px', background: 'var(--bg-dark-alt)', border: '1px solid var(--border-strong)', borderRadius: '8px', color: 'var(--text-main)', fontSize: '0.9rem', outline: 'none' }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '4px' }}>
+                    Correo Electrónico (participant_id) *
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={kycForm.email}
+                    onChange={e => setKycForm(p => ({ ...p, email: e.target.value }))}
+                    placeholder="correo@ejemplo.com"
+                    style={{ width: '100%', padding: '10px 12px', background: 'var(--bg-dark-alt)', border: '1px solid var(--border-strong)', borderRadius: '8px', color: 'var(--text-main)', fontSize: '0.9rem', outline: 'none' }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '4px' }}>
+                    Teléfono / WhatsApp
+                  </label>
+                  <input
+                    type="text"
+                    value={kycForm.phone}
+                    onChange={e => setKycForm(p => ({ ...p, phone: e.target.value }))}
+                    placeholder="Ej. +51 987 654 321"
+                    style={{ width: '100%', padding: '10px 12px', background: 'var(--bg-dark-alt)', border: '1px solid var(--border-strong)', borderRadius: '8px', color: 'var(--text-main)', fontSize: '0.9rem', outline: 'none' }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '4px' }}>
+                    Sede
+                  </label>
+                  <select
+                    value={kycForm.sede}
+                    onChange={e => setKycForm(p => ({ ...p, sede: e.target.value }))}
+                    style={{ width: '100%', padding: '10px 12px', background: 'var(--bg-dark-alt)', border: '1px solid var(--border-strong)', borderRadius: '8px', color: 'var(--text-main)', fontSize: '0.9rem', outline: 'none' }}
+                  >
+                    <option value="Lima">Lima (Perú)</option>
+                    <option value="Quito">Quito (Ecuador)</option>
+                    <option value="Cuenca">Cuenca (Ecuador)</option>
+                    <option value="Guayaquil">Guayaquil (Ecuador)</option>
+                    <option value="CDMX">CDMX (México)</option>
+                    <option value="Medellín">Medellín (Colombia)</option>
+                    <option value="Madrid">Madrid (España)</option>
+                    <option value="Global">Global / Remoto</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '4px' }}>
+                    Fecha de Nacimiento
+                  </label>
+                  <input
+                    type="date"
+                    value={kycForm.birthDate}
+                    onChange={e => setKycForm(p => ({ ...p, birthDate: e.target.value }))}
+                    style={{ width: '100%', padding: '10px 12px', background: 'var(--bg-dark-alt)', border: '1px solid var(--border-strong)', borderRadius: '8px', color: 'var(--text-main)', fontSize: '0.9rem', outline: 'none' }}
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', borderTop: '1px solid var(--border-subtle)', paddingTop: '1.2rem' }}>
+                <button
+                  type="button"
+                  onClick={() => setEditingKycDoc(null)}
+                  style={{ background: 'var(--bg-dark-alt)', border: '1px solid var(--border-strong)', color: 'var(--text-main)', padding: '10px 18px', borderRadius: '8px', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer' }}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingKyc}
+                  style={{ background: '#38bdf8', border: 'none', color: '#000', padding: '10px 20px', borderRadius: '8px', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+                >
+                  <Save size={16} /> {savingKyc ? 'Guardando en Firestore...' : 'Guardar y Blindar en Firestore'}
+                </button>
+              </div>
+            </form>
 
           </div>
         </div>
