@@ -541,7 +541,8 @@
           const date = String(ev.start || ev.fecha_inicio || '').slice(0, 10);
           const sede = normalizeSedeAsignador(ev.sede || ev.sedeTag || sedeKey || '');
           const name = String(ev.name || ev.nombre || '').trim();
-          return `${date}__${sede}__${name}`.replace(/\//g, '-');
+          const eq = String(ev.team || ev.equipo || '').trim();
+          return `${date}__${sede}__${name}${eq ? '__' + eq : ''}`.replace(/\//g, '-');
         }
 
         function googleVizDateToIso(value) {
