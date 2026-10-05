@@ -588,6 +588,47 @@ Tras auditoría de compatibilidad con las suscripciones reactivas (`onSnapshot`)
 
 ---
 
+### 13.6. Blindaje Legal KYC, Auto-recuperación y Arquitectura de Cero Pérdida de Datos (`px_legal_signatures`)
+
+Tras el reporte de incidencias donde firmas completadas figuraban en el panel administrativo (`LegalStatusPanel.jsx`) como *"Sin Nombre"*, *"DOC: No reg."* y sede *"Global"*, se ejecutó una intervención forense y de blindaje estructural:
+
+1. **Causas Raíz Detectadas:**
+   * **Descarte de campos en `saveLegalSignature`:** La función destructuraba únicamente campos legacy de contratos y omitía `kycData`, `docNumber`, `docType`, `birthDate` y `phone` antes de llamar a `setDoc`.
+   * **Incompatibilidad snake_case vs camelCase:** El backend guardaba `participant_name` y `participant_id`, mientras que `LegalStatusPanel.jsx` leía `participantName` y `participantId`.
+   * **Prevalencia errónea en `LegalOnboardingModal.jsx`:** `currentUser?.name` (que por defecto en `AuthContext` asignaba `'Colaborador CREAR'`) tenía mayor precedencia que el nombre legal tipeado por el usuario en el paso KYC.
+   * **Sede no parametrizada en onboarding:** El formulario inicial no permitía elegir sede, cayendo a `'ALL'` y asignando por defecto sede `'Global'` y código `'PE'`.
+   * **Ruta de acceso directa desalineada:** El enlace institucional `crearpsl.net/dna` no estaba registrado en el enrutador principal de React (`App.jsx`).
+
+2. **Garantía de Persistencia Dual (`snake_case` y `camelCase`):**
+   * Toda escritura en Firestore (`px_legal_signatures`) ahora almacena **ambas variantes simultáneamente**:
+     - `participantName` / `participant_name` / `full_name`
+     - `participantId` / `participant_id` / `email`
+     - `docType` / `doc_type`
+     - `docNumber` / `doc_number`
+     - `birthDate` / `birth_date`
+     - `phone`
+     - `sede` y `countryCode` / `country_code`
+     - `kycData` y `kyc_data`
+     - `hashSha256` / `hash_sha256` / `audit_hash`
+   * Esto garantiza compatibilidad retroactiva y futura con cualquier script, exportador o componente.
+
+3. **Motor de Auto-Recuperación y Auto-Sanación (`normalizeSignatureDoc`):**
+   * En `src/services/legalSignatureService.js`, toda lectura (`getLegalStatusByParticipant`, `getAllLegalSignatures`) pasa por `normalizeSignatureDoc`.
+   * Si un registro antiguo o defectuoso contiene *"Sin Nombre"* o carece de documento/sede, el motor cruza su correo con el directorio oficial `findUserByAnyEmail` e inyecta dinámicamente el nombre real, sede, documento y teléfono. Los registros existentes se auto-reparan inmediatamente en la interfaz sin necesidad de migraciones destructivas.
+
+4. **Experiencia de Usuario y Captura Fidedigna:**
+   * **Selector de Sede Oficial:** En el Paso -1 de `LegalOnboardingModal.jsx`, el usuario selecciona su ciudad de operación (`Lima`, `Quito`, `Guayaquil`, `Cuenca`, `CDMX`, `Medellín`, `Madrid`), la cual actualiza dinámicamente los contratos legales de su país y queda grabada en su expediente.
+   * **Prevalencia del Nombre Legal:** El valor digitado en el campo KYC toma prioridad absoluta sobre alias genéricos de sesión.
+   * **Puerta Segura de Autenticación:** `OnboardingLegal.jsx` detecta si el usuario no tiene sesión activa y ofrece un acceso limpio con Google antes de firmar, garantizando que el `owner_uid` y `participant_id` correspondan a un usuario real autenticado.
+   * **Ruta Canónica:** Se habilitó `<Route path="/dna" element={<OnboardingLegal />} />` en `App.jsx`.
+
+5. **Reglas de Seguridad Actualizadas (`firestore.rules`):**
+   * `allow read`: SuperAdmin, Gerente/Dirección y el propio participante.
+   * `allow delete`: Exclusivo para SuperAdmin (permite purgar registros de prueba o corrompidos desde `LegalStatusPanel`).
+   * `allow update`: SuperAdmin y el participante sobre campos de sincronización con Nodus y PDF.
+
+---
+
 > 📜 **Mandato de la Caja Negra:**
 > Esta Caja Negra es la fuente viva de verdad de CPSL y Causa OS. Debe consultarse antes de cualquier cambio de arquitectura y actualizarse de inmediato tras cada nueva funcionalidad, regla o descubrimiento operativo.
 
