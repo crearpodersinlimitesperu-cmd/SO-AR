@@ -356,19 +356,43 @@ export function CyclesProvider({ children }) {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
+        // 1. Cargar cache inmediata para no mostrar 0 eventos mientras conecta
+        try {
+          const cached = localStorage.getItem('causa_official_calendar_cache');
+          if (cached) {
+            const parsedCache = JSON.parse(cached);
+            if (Array.isArray(parsedCache) && parsedCache.length > 0) {
+              setSourceEvents(parsedCache);
+            }
+          }
+        } catch (_) {}
+
         const API_URL = 'https://script.google.com/macros/s/AKfycbxSZFhddMYyspZpkW-qPHEi8hycLGfnhFeCPSYc4VbckWIeiiZAbxyJY71XRb2-Ya4U/exec?action=getEventos';
+        
+        // Timeout defensivo de 4s para Apps Script (evita que la pantalla se quede en "Cargando..." si Google bloquea/demora)
+        const scriptController = new AbortController();
+        const scriptTimeout = setTimeout(() => scriptController.abort(), 4000);
+
         const [apiResult, sheetResult] = await Promise.allSettled([
-          fetch(API_URL).then(res => {
-            if (!res.ok) throw new Error(`Apps Script respondió ${res.status}`);
+          fetch(API_URL, { signal: scriptController.signal }).then(res => {
+            clearTimeout(scriptTimeout);
+            if (!res.ok) throw new Error();
             return res.json();
+          }).catch(err => {
+            clearTimeout(scriptTimeout);
+            throw err;
           }),
           fetch(OFFICIAL_CALENDAR_SHEET_URL).then(res => {
-            if (!res.ok) throw new Error(`Calendario oficial respondió ${res.status}`);
+            if (!res.ok) throw new Error();
             return res.text();
           })
         ]);
-        const apiJson = apiResult.status === 'fulfilled' ? apiResult.value : [];
-        const data = apiJson.data || apiJson;
+        const apiJson = apiResult.status === 'fulfilled' ? apiResult.value : null;
+        const apiData = apiJson ? (apiJson.data || apiJson) : null;
+        const validApiEvents = Array.isArray(apiData) && apiData.length > 0
+          ? apiData.filter(ev => ev.fecha_inicio || ev.start)
+          : [];
+
         const sheetEvents = sheetResult.status === 'fulfilled'
           ? parseOfficialCalendarSheet(sheetResult.value)
           : [];
@@ -376,17 +400,19 @@ export function CyclesProvider({ children }) {
           console.warn('No se pudo contrastar la agenda actual de Sheets:', sheetResult.reason);
         }
 
-        if (Array.isArray(data)) {
-           const allEvents = mergeOfficialCalendar(
-             data.filter(ev => ev.fecha_inicio || ev.start),
-             sheetEvents
-           ).sort((a, b) => new Date(a.fecha_inicio || a.start) - new Date(b.fecha_inicio || b.start));
-           setSourceEvents(allEvents);
-        } else if (sheetEvents.length) {
-          // Si el histórico del Apps Script falla, seguimos mostrando la
-          // programación actual verificable de la hoja, sin fabricar datos.
-          const allEvents = sheetEvents.sort((a, b) => new Date(a.fecha_inicio) - new Date(b.fecha_inicio));
+        let allEvents = [];
+        if (validApiEvents.length > 0) {
+           allEvents = mergeOfficialCalendar(validApiEvents, sheetEvents)
+             .sort((a, b) => new Date(a.fecha_inicio || a.start) - new Date(b.fecha_inicio || b.start));
+        } else if (sheetEvents.length > 0) {
+          allEvents = sheetEvents.sort((a, b) => new Date(a.fecha_inicio) - new Date(b.fecha_inicio));
+        }
+
+        if (allEvents.length > 0) {
           setSourceEvents(allEvents);
+          try {
+            localStorage.setItem('causa_official_calendar_cache', JSON.stringify(allEvents));
+          } catch (_) {}
         }
       } catch (e) {
         console.error("Error fetching calendar for cycles", e);
