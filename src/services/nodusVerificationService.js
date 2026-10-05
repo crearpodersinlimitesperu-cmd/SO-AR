@@ -1,3 +1,4 @@
+import { confirmedStatus } from '../features/imo/missionModel.js';
 /**
  * nodusVerificationService.js
  * ===========================
@@ -8,7 +9,6 @@
  * en Nodus (1ra y 2da llamada, asistencia y estado en CRM/Nodus).
  */
 
-import baseRecords from '../data/nodusEnroladosRecords.json';
 import { db } from './firebase';
 import { doc, collection, onSnapshot } from 'firebase/firestore';
 
@@ -36,35 +36,32 @@ const masterMap = new Map();
 // Helper para indexar un registro Nodus en el mapa maestro
 function indexRecord(rec) {
   if (!rec) return;
-
-  // 1. Clave por nombre normalizado completo
-  if (rec.nombreNorm) {
-    masterMap.set(rec.nombreNorm, rec);
-  }
-
-  // 2. Clave por teléfono normalizado
-  if (rec.telefonoNorm && rec.telefonoNorm.length >= 7) {
-    masterMap.set(`TEL_${rec.telefonoNorm}`, rec);
-    if (rec.telefonoNorm.length > 9) {
-      masterMap.set(`TEL_${rec.telefonoNorm.slice(-9)}`, rec);
-      masterMap.set(`TEL_${rec.telefonoNorm.slice(-10)}`, rec);
-    }
-  }
-
-  // 3. Clave por email
-  if (rec.email && rec.email.includes('@')) {
-    masterMap.set(`EMAIL_${rec.email.toLowerCase().trim()}`, rec);
-  }
+  const keys = [];
+  if (rec.nombreNorm) keys.push(rec.nombreNorm);
+  if (rec.telefonoNorm?.length >= 7) keys.push(`TEL_${rec.telefonoNorm}`);
+  if (rec.email?.includes('@')) keys.push(`EMAIL_${rec.email.toLowerCase().trim()}`);
+  keys.forEach(key => {
+    const rows = masterMap.get(key) || [];
+    const index = rows.findIndex(r => r.nombreNorm === rec.nombreNorm && r.equipo === rec.equipo && r.telefonoNorm === rec.telefonoNorm);
+    if (index >= 0) rows[index] = rec; else rows.push(rec);
+    masterMap.set(key, rows);
+  });
 }
 
-// Indexar datos base empaquetados
-baseRecords.forEach(indexRecord);
+// Verification uses live records only; a bundled snapshot cannot certify current attendance.
 
 // Suscripción en tiempo real a Firestore para recibir actualizaciones de Nodus en vivo
-let isListening = false;
+let subscribers = new Set();
+let stopListeners = [];
+let liveRoot = [], liveTeams = [];
+function notifySubscribers() { subscribers.forEach(callback => callback(masterMap.size)); }
 export function initNodusRealtimeListener(onUpdateCallback) {
-  if (isListening) return;
-  isListening = true;
+  subscribers.add(onUpdateCallback);
+  const unsubscribe = () => {
+    subscribers.delete(onUpdateCallback);
+    if (!subscribers.size) { stopListeners.forEach(stop => stop()); stopListeners = []; liveRoot = []; liveTeams = []; }
+  };
+  if (stopListeners.length) return unsubscribe;
 
   const processParticipante = (p, equipoNombre) => {
     const fullName = (p.n || `${p.nombres || ''} ${p.apellidos || ''}`).trim();
@@ -87,86 +84,49 @@ export function initNodusRealtimeListener(onUpdateCallback) {
     indexRecord(rec);
   };
 
+  const rebuild = () => {
+    masterMap.clear();
+    [...liveRoot, ...liveTeams].forEach(eq => (eq.participantes || []).forEach(p => processParticipante(p, eq.equipoNombre)));
+    notifySubscribers();
+  };
   try {
     // 1. Escuchar documento raíz 'latest'
     const docRef = doc(db, 'nodus_coordinadores_c1c2', 'latest');
-    onSnapshot(docRef, (docSnap) => {
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        if (Array.isArray(data.equiposReporte)) {
-          data.equiposReporte.forEach(eq => {
-            if (Array.isArray(eq.participantes)) {
-              eq.participantes.forEach(p => processParticipante(p, eq.equipoNombre));
-            }
-          });
-          if (typeof onUpdateCallback === 'function') {
-            onUpdateCallback(masterMap.size);
-          }
-        }
-      }
-    }, (err) => {
-      console.warn('Lectura Firestore nodus_coordinadores_c1c2 usando caché local:', err?.message);
-    });
+    stopListeners.push(onSnapshot(docRef, snapshot => {
+      liveRoot = snapshot.exists() ? snapshot.data().equiposReporte || [] : [];
+      rebuild();
+    }, err => console.warn('No se pudo consultar Nodus:', err.message)));
 
     // 2. Escuchar subcolección 'equipos' (persistencia desacoplada para evitar límite de 1MB)
     const colRef = collection(db, 'nodus_coordinadores_c1c2', 'latest', 'equipos');
-    onSnapshot(colRef, (colSnap) => {
-      colSnap.forEach(docSnap => {
-        const eq = docSnap.data();
-        if (Array.isArray(eq.participantes)) {
-          eq.participantes.forEach(p => processParticipante(p, eq.equipoNombre));
-        }
-      });
-      if (typeof onUpdateCallback === 'function') {
-        onUpdateCallback(masterMap.size);
-      }
-    }, (err) => {
-      console.warn('Lectura subcolección equipos nodus usando caché local:', err?.message);
-    });
+    stopListeners.push(onSnapshot(colRef, snapshot => {
+      liveTeams = snapshot.docs.map(d => d.data());
+      rebuild();
+    }, err => console.warn('No se pudo consultar equipos Nodus:', err.message)));
+
   } catch (e) {
     console.warn('Error inicializando listener de Nodus:', e);
   }
+  return unsubscribe;
 }
 
 /**
  * Busca un enrolado en el índice maestro de Nodus por Nombre, Teléfono o Email
  */
-export function findParticipantInNodus(enrolado, imoNombre = '') {
+export function findParticipantInNodus(enrolado, imoNombre = '', imoEquipo = '') {
   if (!enrolado) return null;
-
-  // 1. Búsqueda por Nombre exacto normalizado
-  const nameNorm = normText(enrolado.nombre);
-  if (nameNorm && masterMap.has(nameNorm)) {
-    return masterMap.get(nameNorm);
-  }
-
-  // 2. Búsqueda por Teléfono (9 dígitos)
-  const phone = normPhone(enrolado.telefono);
-  if (phone && masterMap.has(`TEL_${phone}`)) {
-    return masterMap.get(`TEL_${phone}`);
-  }
-
-  // 3. Búsqueda por Email
-  const email = (enrolado.email || '').toLowerCase().trim();
-  if (email && email.includes('@') && masterMap.has(`EMAIL_${email}`)) {
-    return masterMap.get(`EMAIL_${email}`);
-  }
-
-  // 4. Búsqueda difusa por tokens de nombre (coincidencia de 2 o más palabras clave)
-  if (nameNorm) {
-    const tokens = nameNorm.split(' ').filter(t => t.length > 2);
-    if (tokens.length >= 2) {
-      for (const [key, val] of masterMap.entries()) {
-        if (!key.startsWith('TEL_') && !key.startsWith('EMAIL_')) {
-          const matchCount = tokens.filter(tok => key.includes(tok)).length;
-          if (matchCount >= 2 && matchCount >= tokens.length - 1) {
-            return val;
-          }
-        }
-      }
+  const name = normText(enrolado.nombre), phone = normPhone(enrolado.telefono), email = (enrolado.email || '').toLowerCase().trim();
+  const teamKey = value => normText(value).replace(/\bCICLO\s*1\b/g, 'C1').replace(/\s+V$/, '').replace(/[^A-Z0-9]/g, '');
+  const scoped = rows => rows.filter(r => (!imoEquipo || teamKey(r.equipo) === teamKey(imoEquipo)) && (!r.imo || !imoNombre || normText(r.imo) === normText(imoNombre)));
+  for (const key of [email && `EMAIL_${email}`, phone && `TEL_${phone}`, name].filter(Boolean)) {
+    const rows = scoped(masterMap.get(key) || []);
+    if (rows.length > 1) return null;
+    if (rows.length === 1) {
+      const r = rows[0];
+      if (phone && r.telefonoNorm && phone !== r.telefonoNorm) return null;
+      return r;
     }
   }
-
   return null;
 }
 
@@ -176,7 +136,7 @@ export function findParticipantInNodus(enrolado, imoNombre = '') {
 export function evaluateEnroladoVerification(enrolado, imoNombre = '', imoEquipo = '') {
   // 1. Buscar en índice maestro de Nodus
   // 2. Si aún no está en el índice maestro, verificar si el enrolado ya trae sus datos de Nodus incrustados
-  const nodusRec = findParticipantInNodus(enrolado, imoNombre) || (
+  const nodusRec = findParticipantInNodus(enrolado, imoNombre, imoEquipo) || (
     (enrolado?.llamada1 || enrolado?.asistenciaNodus || enrolado?.desertor || enrolado?.pago) ? {
       nombre: enrolado.nombre,
       telefono: enrolado.telefono,
@@ -191,7 +151,6 @@ export function evaluateEnroladoVerification(enrolado, imoNombre = '', imoEquipo
   );
 
   const imoSaysAsiste = Boolean(enrolado.asistencia);
-  const imoSaysContacto = Boolean(enrolado.contacto);
 
   if (!nodusRec) {
     if (imoSaysAsiste) {
@@ -239,50 +198,13 @@ export function evaluateEnroladoVerification(enrolado, imoNombre = '', imoEquipo
   const des = normText(nodusRec.desertor || '');
   const pago = normText(nodusRec.pago || '');
 
-  const coordConfirmado =
-    l1.includes('CONFIRM') ||
-    l2.includes('CONFIRM') ||
-    asist.includes('ASIST') ||
-    asist.includes('SENTAD') ||
-    asist.includes('SI') ||
-    l1.includes('ASIST') ||
-    l2.includes('ASIST') ||
-    l1.includes('PAG') ||
-    l2.includes('PAG') ||
-    asist.includes('PAG') ||
-    pago.includes('SI') ||
-    pago.includes('PAG');
-
-  const coordDesercion =
-    des.includes('SI') ||
-    des.includes('DESERT') ||
-    l1.includes('DESERT') ||
-    l1.includes('NO LE INTERESA') ||
-    l1.includes('NO INTERESA');
-
-  const coordPendiente =
-    !coordConfirmado && !coordDesercion && (
-      l1.includes('POR CONFIRMAR') ||
-      l1.includes('NO CONT') ||
-      l1.includes('SIGUIENTE') ||
-      l1 === '' ||
-      l1 === '—'
-    );
-
+  const coordDesercion = confirmedStatus(des) || /\b(DESERTOR|DESERTO|NO ASISTE|NO ASISTIO|NO INTERESA|NO LE INTERESA)\b/.test([des, l1, l2, asist].join(' '));
+  const coordConfirmado = !coordDesercion && (confirmedStatus(asist) || [l1, l2].some(v => /^(SI|CONFIRMADO|CONFIRMADA|ASISTE|ASISTIO|SENTADO|SENTADA)$/.test(v)));
   const coordNombre = nodusRec.coordinador || enrolado.coordinadora_nombre || 'Coordinación';
-
-  // Cruce IMO vs Coordinadora
-  const asistioNodus = (asist.includes('SI') || asist.includes('ASIST') || asist.includes('SENTAD'))
-    ? 'SÍ' 
-    : ((asist.includes('NO') || des.includes('SI') || des.includes('DESERT')) ? 'NO' : (nodusRec.asistencia || '—'));
-
-  const desertoNodus = (des.includes('SI') || des.includes('DESERT') || l1.includes('DESERT') || l1.includes('NO LE INTERESA') || l1.includes('NO INTERESA'))
-    ? 'SÍ' 
-    : ((des.includes('NO') || coordConfirmado) ? 'NO' : (nodusRec.desertor || '—'));
-
-  const pagoC2Nodus = (pago.includes('SI') || pago.includes('PAG') || pago.includes('ABON') || l1.includes('PAG') || l2.includes('PAG'))
-    ? 'SÍ' 
-    : (pago.includes('NO') ? 'NO' : (nodusRec.pago || '—'));
+  const asistenciaNodus = nodusRec.asistencia || '—';
+  const asistioNodus = confirmedStatus(asist) ? 'SÍ' : (/^NO\b/.test(asist) || coordDesercion ? 'NO' : '—');
+  const desertoNodus = coordDesercion ? 'SÍ' : (/^NO\b/.test(des) ? 'NO' : '—');
+  const pagoC2Nodus = confirmedStatus(pago) ? 'SÍ' : (/^NO\b/.test(pago) ? 'NO' : '—');
 
   if (imoSaysAsiste) {
     if (coordConfirmado) {

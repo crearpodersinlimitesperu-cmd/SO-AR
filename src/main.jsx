@@ -14,7 +14,11 @@ const isPublicSigning = path === '/dna' || path === '/onboarding-legal'
 
 const root = ReactDOM.createRoot(document.getElementById('root'))
 
-if (isPublicSigning) {
+if (path === '/mision-imo') {
+  import('./features/imo/MissionPortal.jsx').then(({ default: MissionPortal }) => {
+    root.render(<React.StrictMode><ErrorBoundary><MissionPortal /></ErrorBoundary></React.StrictMode>)
+  })
+} else if (isPublicSigning) {
   import('./PublicSigningApp.jsx').then(({ default: PublicSigningApp }) => {
     root.render(
       <React.StrictMode>

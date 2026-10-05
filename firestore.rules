@@ -473,8 +473,83 @@ service cloud.firestore {
     match /goals_sentinel_audits/{document=**} {
       allow read, write: if isAuthenticated();
     }
-    match /imo_missions/{document=**} {
-      allow read, write: if true;
+    // Shared capability links: a random 20-character campaign id grants access
+    // only to that campaign. Profile selection is self-declared, NOT Firebase identity.
+    // No public listing of campaigns or canonical missions is permitted.
+    function activeImoCampaign(campaignId) {
+      return get(/databases/$(database)/documents/imo_campaigns/$(campaignId)).data.status == 'active';
+    }
+    function validImoProfile(campaignId, missionId, enroladoId, reportedName) {
+      let m = get(/databases/$(database)/documents/imo_campaigns/$(campaignId)/profiles/$(missionId)).data;
+      return activeImoCampaign(campaignId) && enroladoId in m.enroladoIds && reportedName == m.imoNombre;
+    }
+    match /imo_campaign_keys/{key} {
+      allow read: if isGerenteODireccion();
+      allow create: if isGerenteODireccion() && request.resource.data.createdBy == request.auth.uid && request.resource.data.createdAt == request.time;
+      allow update, delete: if false;
+    }
+    match /imo_campaigns/{campaignId} {
+      allow get: if isGerenteODireccion() || (campaignId.matches('^[A-Za-z0-9]{20}$') && resource.data.status == 'active');
+      allow list: if isGerenteODireccion();
+      allow create: if isGerenteODireccion() && campaignId.matches('^[A-Za-z0-9]{20}$') && request.resource.data.keys().hasOnly([
+        'schemaVersion', 'sede', 'targetTeam', 'c1Date', 'status', 'createdAt', 'createdBy', 'count'
+      ]) && request.resource.data.schemaVersion == 2 && request.resource.data.status == 'active' &&
+        request.resource.data.targetTeam is int && request.resource.data.targetTeam > 0 &&
+        request.resource.data.sede is string && request.resource.data.sede.size() > 0 &&
+        request.resource.data.c1Date is string && request.resource.data.c1Date.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$') &&
+        request.resource.data.count is int && request.resource.data.count > 0 && request.resource.data.count <= 100 &&
+        request.resource.data.createdAt == request.time && request.resource.data.createdBy == request.auth.uid;
+      allow update: if isGerenteODireccion() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']) && request.resource.data.status in ['active', 'closed'];
+      allow delete: if false;
+      match /profiles/{missionId} {
+        allow read: if isGerenteODireccion() || activeImoCampaign(campaignId);
+        allow create: if isGerenteODireccion() && request.resource.data.keys().hasOnly(['schemaVersion', 'campaignId', 'imoNombre', 'originTeam', 'targetTeam', 'sede', 'c1Date', 'enroladoIds', 'enrolados']) &&
+          request.resource.data.schemaVersion == 2 && request.resource.data.campaignId == campaignId &&
+          request.resource.data.targetTeam == getAfter(/databases/$(database)/documents/imo_campaigns/$(campaignId)).data.targetTeam &&
+          request.resource.data.sede == getAfter(/databases/$(database)/documents/imo_campaigns/$(campaignId)).data.sede &&
+          request.resource.data.enroladoIds is list && request.resource.data.enroladoIds.size() > 0 && request.resource.data.enroladoIds.size() <= 100 && request.resource.data.enrolados.size() == request.resource.data.enroladoIds.size();
+        allow update, delete: if false;
+        match /imo_confirmations/{enroladoId} {
+          allow read: if isGerenteODireccion() || activeImoCampaign(campaignId);
+          allow create, update: if validImoProfile(campaignId, missionId, enroladoId, request.resource.data.reportedName) &&
+            request.resource.data.keys().hasOnly(['contacto', 'asistencia', 'reportedName', 'sessionId', 'updatedAt', 'eventId']) &&
+            request.resource.data.contacto is bool && request.resource.data.asistencia is bool &&
+            request.resource.data.sessionId is string && request.resource.data.sessionId.size() >= 20 && request.resource.data.sessionId.size() <= 64 &&
+            request.resource.data.updatedAt == request.time &&
+            !exists(/databases/$(database)/documents/imo_campaigns/$(campaignId)/profiles/$(missionId)/imo_events/$(request.resource.data.eventId)) &&
+            getAfter(/databases/$(database)/documents/imo_campaigns/$(campaignId)/profiles/$(missionId)/imo_events/$(request.resource.data.eventId)).data.after == {'contacto': request.resource.data.contacto, 'asistencia': request.resource.data.asistencia} &&
+            getAfter(/databases/$(database)/documents/imo_campaigns/$(campaignId)/profiles/$(missionId)/imo_events/$(request.resource.data.eventId)).data.enroladoId == enroladoId &&
+            getAfter(/databases/$(database)/documents/imo_campaigns/$(campaignId)/profiles/$(missionId)/imo_events/$(request.resource.data.eventId)).data.sessionId == request.resource.data.sessionId;
+          allow delete: if false;
+        }
+        match /imo_events/{eventId} {
+          allow read: if isGerenteODireccion();
+          allow create: if validImoProfile(campaignId, missionId, request.resource.data.enroladoId, request.resource.data.reportedName) &&
+            request.resource.data.keys().hasOnly(['enroladoId', 'before', 'after', 'reportedName', 'sessionId', 'identity', 'at', 'source']) &&
+            request.resource.data.at == request.time && request.resource.data.identity == 'self-selected' && request.resource.data.source == 'mision-imo-v2' &&
+            request.resource.data.after.keys().hasOnly(['contacto', 'asistencia']) &&
+            request.resource.data.after.contacto is bool && request.resource.data.after.asistencia is bool &&
+            request.resource.data.before == (exists(/databases/$(database)/documents/imo_campaigns/$(campaignId)/profiles/$(missionId)/imo_confirmations/$(request.resource.data.enroladoId)) ?
+              {'contacto': get(/databases/$(database)/documents/imo_campaigns/$(campaignId)/profiles/$(missionId)/imo_confirmations/$(request.resource.data.enroladoId)).data.contacto, 'asistencia': get(/databases/$(database)/documents/imo_campaigns/$(campaignId)/profiles/$(missionId)/imo_confirmations/$(request.resource.data.enroladoId)).data.asistencia} : {'contacto': false, 'asistencia': false}) &&
+            getAfter(/databases/$(database)/documents/imo_campaigns/$(campaignId)/profiles/$(missionId)/imo_confirmations/$(request.resource.data.enroladoId)).data.eventId == eventId;
+          allow update, delete: if false;
+        }
+      }
+    }
+    match /imo_missions/{missionId} {
+      allow read: if isGerenteODireccion();
+      allow create: if isGerenteODireccion() && request.resource.data.schemaVersion == 2 &&
+        request.resource.data.createdBy == request.auth.uid && request.resource.data.createdAt == request.time &&
+        request.resource.data.originTeam is int && request.resource.data.originTeam > 0 &&
+        request.resource.data.originTeam != request.resource.data.targetTeam &&
+        request.resource.data.enroladoIds is list && request.resource.data.enroladoIds.size() > 0 && request.resource.data.enroladoIds.size() <= 100 &&
+        request.resource.data.enrolados.size() == request.resource.data.enroladoIds.size() &&
+        getAfter(/databases/$(database)/documents/imo_campaigns/$(request.resource.data.campaignId)).data.targetTeam == request.resource.data.targetTeam &&
+        getAfter(/databases/$(database)/documents/imo_campaigns/$(request.resource.data.campaignId)).data.sede == request.resource.data.sede;
+      allow update, delete: if isGerenteODireccion() && resource.data.get('schemaVersion', 1) != 2;
+    }
+    match /{path=**}/imo_confirmations/{enroladoId} {
+      allow read: if isGerenteODireccion();
     }
     match /user_kpi_targets/{document=**} {
       allow read, write: if isAuthenticated();

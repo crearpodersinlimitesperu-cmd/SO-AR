@@ -1,8 +1,11 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { collection, query, orderBy, onSnapshot, deleteDoc, doc, writeBatch, addDoc, updateDoc } from 'firebase/firestore';
+import { collection, collectionGroup, query, orderBy, onSnapshot, deleteDoc, doc, writeBatch, addDoc } from 'firebase/firestore';
+import MissionHistory from '../features/imo/MissionHistory';
+import CampaignGenerator from '../features/imo/CampaignGenerator';
+import { isMissionComplete } from '../features/imo/missionModel';
 import { db } from '../services/firebase';
-import { Search, Filter, X, ShieldCheck, AlertTriangle, PhoneCall, CheckCircle, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { Search, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { normalizeSede } from '../data/usersData';
 import {
@@ -14,13 +17,18 @@ import {
 
 export default function MonitorImos() {
   const { currentUser } = useAuth();
-  const [missions, setMissions] = useState([]);
+  const [rawMissions, setMissions] = useState([]);
+  const [missionChecks, setMissionChecks] = useState({});
+  const [missionLoadError, setMissionLoadError] = useState('');
+  const missions = useMemo(() => rawMissions.map(m => m.schemaVersion === 2 ? { ...m, checks: missionChecks[m.id] || {} } : m), [rawMissions, missionChecks]);
   const [loading, setLoading] = useState(true);
+  const [historyMission, setHistoryMission] = useState(null);
   const [expandedImo, setExpandedImo] = useState(null);
   const [sendingEmail, setSendingEmail] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterSede, setFilterSede] = useState('Lima');
-  const [filterEquipo, setFilterEquipo] = useState('EQUIPO 31 - LIMA CICLO 1');
+  const [filterEquipo, setFilterEquipo] = useState('todos');
+  const [campaignFilter, setCampaignFilter] = useState('legacy');
   const [filterEstado, setFilterEstado] = useState('todos');
   const [filterNodus, setFilterNodus] = useState('todos');
   const [viewMode, setViewMode] = useState('imos'); // 'imos' | 'enrolados'
@@ -76,7 +84,7 @@ export default function MonitorImos() {
       return new Intl.DateTimeFormat('es-PE', { 
         day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' 
       }).format(date);
-    } catch(e) { return 'Fecha inválida'; }
+    } catch { return 'Fecha inválida'; }
   };
 
   const getUbicacion = (m) => {
@@ -93,11 +101,13 @@ export default function MonitorImos() {
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const data = [];
       snapshot.forEach((doc) => {
-        data.push({ id: doc.id, ...doc.data() });
+        data.push({ ...doc.data(), id: doc.id });
       });
+      setMissionLoadError('');
       setMissions(data);
       setLoading(false);
     }, (error) => {
+      setMissionLoadError("No se pudieron consultar las misiones. Revisa los permisos de tu cuenta y la conexión.");
       console.error("Error fetching IMO missions:", error);
       setLoading(false);
     });
@@ -105,9 +115,15 @@ export default function MonitorImos() {
     return () => unsubscribe();
   }, []);
 
+  useEffect(() => onSnapshot(collectionGroup(db, 'imo_confirmations'), snap => {
+    const checks = {};
+    snap.docs.forEach(d => { const mid = d.ref.parent.parent.id; (checks[mid] ||= {})[d.id] = d.data(); });
+    setMissionChecks(checks);
+  }, () => setMissionLoadError('No se pudo consultar el avance de las campañas. No interpretes las casillas vacías como ausencia de gestión.')), []);
+
   // Escuchar actualizaciones de llamadas de Coordinadoras en Nodus
   useEffect(() => {
-    initNodusRealtimeListener(() => {
+    return initNodusRealtimeListener(() => {
       setNodusSyncTick(t => t + 1);
     });
   }, []);
@@ -156,11 +172,11 @@ export default function MonitorImos() {
         const chk = (m.checks && m.checks[enr.id]) || {};
         return {
           ...enr,
-          contacto: Boolean(chk.contacto),
-          asistencia: Boolean(chk.asistencia),
+          contacto: chk.contacto === true,
+          asistencia: chk.asistencia === true,
         };
       });
-      return dedupeEnrolados(mapped);
+      return m.schemaVersion === 2 ? mapped : dedupeEnrolados(mapped);
     }
     const keys = Object.keys(m.checks || {});
     return keys.map((k, index) => {
@@ -169,8 +185,8 @@ export default function MonitorImos() {
       return {
         id: `${m.id}_enr_${index}_${k}`,
         nombre: cleanName,
-        contacto: Boolean(chk.contacto),
-        asistencia: Boolean(chk.asistencia),
+        contacto: chk.contacto === true,
+        asistencia: chk.asistencia === true,
         email: chk.email || '',
         telefono: chk.telefono || '',
         coordinadora_nombre: chk.coordinadora_nombre || m.equipo || 'Coordinación'
@@ -256,30 +272,14 @@ export default function MonitorImos() {
       else if (eqUpper.includes("BOGOTA") || eqUpper.includes("BOGOTÁ")) s = "Bogotá";
       else if (eqUpper.includes("MEDELLIN") || eqUpper.includes("MEDELLÍN")) s = "Medellín";
       else if (eqUpper.includes("MEXICO") || eqUpper.includes("MÉXICO") || eqUpper.includes("CDMX")) s = "México";
-      else s = "Lima";
+      else s = "No especificada";
     }
     return normalizeSede(s);
   };
 
   // Helper para normalizar nombres de equipo evitando duplicidades o fragmentación
   // (ej: EQUIPO 29 y EQUIPO 29 - LIMA CICLO 1 V corresponden al mismo equipo operativo)
-  const normalizeEquipoName = (raw) => {
-    if (!raw) return 'Sin Equipo';
-    const clean = raw.trim().replace(/\s+/g, ' ');
-    if (/^EQUIPO\s+28(\b|\s|$)/i.test(clean) && !clean.toUpperCase().includes('QUITO')) {
-      return 'EQUIPO 28 - LIMA CICLO 1';
-    }
-    if (/^EQUIPO\s+29(\b|\s|$)/i.test(clean)) {
-      return 'EQUIPO 29 - LIMA CICLO 1';
-    }
-    if (/^EQUIPO\s+30(\b|\s|$)/i.test(clean)) {
-      return 'EQUIPO 30 - LIMA CICLO 1';
-    }
-    if (/^EQUIPO\s+31(\b|\s|$)/i.test(clean)) {
-      return 'EQUIPO 31 - LIMA CICLO 1';
-    }
-    return clean.replace(/\s+V$/i, '').replace(/[✓✔]/g, '').trim();
-  };
+  const normalizeEquipoName = raw => String(raw || '').trim().replace(/\s+/g, ' ').replace(/\s+V$/i, '').replace(/[✓✔]/g, '').trim();
 
   const isGlobalScopeUser = !!(currentUser?.isSuperAdmin || currentUser?.isConsolidatedView || currentUser?.appRole === 'consolidado' || currentUser?.isDireccion);
   const sedeScopedMissions = useMemo(() => {
@@ -324,6 +324,7 @@ export default function MonitorImos() {
 
     // 1. Filtrar misiones de base segun Sede, Estado y Nodus
     const baseMissions = sedeScopedMissions.filter((m) => {
+      if (campaignFilter === 'legacy' ? m.schemaVersion === 2 : m.campaignId !== campaignFilter) return false;
       // Filtro Sede
       if (filterSede !== 'todos' && resolveMissionSede(m) !== filterSede) {
         return false;
@@ -331,8 +332,7 @@ export default function MonitorImos() {
 
       // Filtro Estado
       const enrolados = getEnroladosList(m);
-      const assisted = enrolados.filter(e => e.asistencia).length;
-      const isCompleted = enrolados.length > 0 && assisted === enrolados.length;
+      const isCompleted = isMissionComplete(enrolados);
       if (filterEstado === 'completado' && !isCompleted) return false;
       if (filterEstado === 'en_progreso' && isCompleted) return false;
 
@@ -384,7 +384,8 @@ export default function MonitorImos() {
       const enrolados = getEnroladosList(m);
       return isMissionSearchMatch(m, enrolados, qNorm, qDigits);
     });
-  }, [sedeScopedMissions, searchTerm, filterSede, filterEquipo, filterEstado, filterNodus, nodusSyncTick]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Nodus uses an external index; this tick invalidates the memo.
+  }, [sedeScopedMissions, campaignFilter, searchTerm, filterSede, filterEquipo, filterEstado, filterNodus, nodusSyncTick]);
 
   // Deduplicacion global estricta de enrolados (por telefono o nombre)
   // Filtrado reactivo al termino de busqueda para la Lista Plana
@@ -412,7 +413,7 @@ export default function MonitorImos() {
 
         const tel = (e.telefono || '').replace(/\D/g, '');
         const nom = (e.nombre || '').trim().toUpperCase().replace(/\s+/g, ' ');
-        const key = (tel && tel.length >= 7) ? `tel:${tel}` : (nom ? `nom:${nom}` : `id:${e.id}`);
+        const key = m.schemaVersion === 2 ? `mission:${m.id}:${e.id}` : (tel && tel.length >= 7) ? `tel:${tel}` : (nom ? `nom:${nom}` : `id:${e.id}`);
         if (!seen.has(key)) {
           seen.set(key, {
             ...e,
@@ -453,8 +454,8 @@ export default function MonitorImos() {
         case 'avance': {
           const enrA = getEnroladosList(a);
           const enrB = getEnroladosList(b);
-          const progA = enrA.length > 0 ? (enrA.filter(e => e.asistencia).length / enrA.length) * 100 : 0;
-          const progB = enrB.length > 0 ? (enrB.filter(e => e.asistencia).length / enrB.length) * 100 : 0;
+          const progA = enrA.length > 0 ? (enrA.filter(e => e.asistencia && e.contacto).length / enrA.length) * 100 : 0;
+          const progB = enrB.length > 0 ? (enrB.filter(e => e.asistencia && e.contacto).length / enrB.length) * 100 : 0;
           comparison = progA - progB;
           break;
         }
@@ -469,8 +470,8 @@ export default function MonitorImos() {
         case 'estado': {
           const enrA = getEnroladosList(a);
           const enrB = getEnroladosList(b);
-          const isCompA = enrA.length > 0 && enrA.every(e => e.asistencia);
-          const isCompB = enrB.length > 0 && enrB.every(e => e.asistencia);
+          const isCompA = enrA.length > 0 && enrA.every(e => e.asistencia && e.contacto);
+          const isCompB = enrB.length > 0 && enrB.every(e => e.asistencia && e.contacto);
           comparison = (isCompA ? 1 : 0) - (isCompB ? 1 : 0);
           break;
         }
@@ -512,6 +513,7 @@ export default function MonitorImos() {
       return imoSortDirection === 'asc' ? comparison : -comparison;
     });
     return list;
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Nodus uses an external index; this tick invalidates the memo.
   }, [filteredMissions, imoSortField, imoSortDirection, nodusSyncTick]);
 
   // Lista plana de enrolados filtrada y ordenada por columna seleccionada
@@ -571,6 +573,7 @@ export default function MonitorImos() {
       return enroladoSortDirection === 'asc' ? comparison : -comparison;
     });
     return list;
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Nodus uses an external index; this tick invalidates the memo.
   }, [uniqueEnroladosList, enroladoSortField, enroladoSortDirection, nodusSyncTick]);
 
 
@@ -583,7 +586,7 @@ export default function MonitorImos() {
   const completadosCount = useMemo(() => {
     return filteredMissions.filter(m => {
       const enr = getEnroladosList(m);
-      return enr.length > 0 && enr.every(e => e.asistencia);
+      return enr.length > 0 && enr.every(e => e.asistencia && e.contacto);
     }).length;
   }, [filteredMissions]);
 
@@ -609,20 +612,11 @@ export default function MonitorImos() {
   // Estadísticas globales de verificación cruzada Nodus
   const globalNodusStats = useMemo(() => {
     return getGlobalNodusStats(filteredMissions, getEnroladosList);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Nodus uses an external index; this tick invalidates the memo.
   }, [filteredMissions, nodusSyncTick]);
 
-  const handleToggleVerificado = async (missionId, currentValue) => {
-    try {
-      await updateDoc(doc(db, 'imo_missions', missionId), {
-        verificadoNodus: !currentValue
-      });
-    } catch (error) {
-      console.error('Error al actualizar verificación:', error);
-      alert('No se pudo actualizar el estado de verificación.');
-    }
-  };
-
   const handleResetMission = async (missionId) => {
+    if (missions.find(m => m.id === missionId)?.schemaVersion === 2) { alert('Las campañas conservan su historial y no se pueden borrar desde el Monitor.'); return; }
     if (window.confirm('⚠️ ¿Estás seguro de que deseas resetear los datos de prueba de este IMO? Esto eliminará la telemetría actual y el tiempo volverá a cero.')) {
       try {
         await deleteDoc(doc(db, 'imo_missions', missionId));
@@ -636,7 +630,7 @@ export default function MonitorImos() {
     if (window.confirm('⚠️ ADVERTENCIA CRÍTICA: ¿Estás seguro de resetear TODOS los IMOs? Toda la trazabilidad de prueba se perderá y todos los contadores volverán a cero.')) {
       try {
         const batch = writeBatch(db);
-        missions.forEach(m => {
+        missions.filter(m => m.schemaVersion !== 2).forEach(m => {
           batch.delete(doc(db, 'imo_missions', m.id));
         });
         await batch.commit();
@@ -1095,6 +1089,12 @@ export default function MonitorImos() {
           </button>
         </div>
 
+        <label style={{ color: 'var(--text-main)' }}>Campaña
+          <select className="form-input" value={campaignFilter} onChange={e => { setCampaignFilter(e.target.value); setFilterEquipo('todos'); }}>
+            <option value="legacy">Registros anteriores (sin campaña)</option>
+            {[...new Map(sedeScopedMissions.filter(m => m.schemaVersion === 2).map(m => [m.campaignId, m])).values()].map(m => <option key={m.campaignId} value={m.campaignId}>{m.sede} · C1 Equipo {m.targetTeam} · {m.c1Date}</option>)}
+          </select>
+        </label>
         {/* Buscador de IMOs y Enrolados */}
         <div style={{ position: 'relative', flex: '1 1 260px', minWidth: '200px' }}>
           <Search size={16} color="var(--text-muted)" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
@@ -2031,8 +2031,8 @@ export default function MonitorImos() {
               // Evaluación automática contra llamadas de Coordinadoras en Nodus
               const nodusSummary = evaluateMissionVerification(m, enroladosList);
 
-              const progreso = totalEnrolled > 0 ? Math.round((assisted / totalEnrolled) * 100) : 0;
-              const isCompleted = totalEnrolled > 0 && assisted === totalEnrolled;
+              const progreso = totalEnrolled > 0 ? Math.round((enroladosList.filter(e => e.asistencia && e.contacto).length / totalEnrolled) * 100) : 0;
+              const isCompleted = isMissionComplete(enroladosList);
               const isExpanded = expandAll || expandedImo === m.id || (Boolean(searchTerm.trim()) && filteredMissions.length <= 4);
 
 
@@ -2052,6 +2052,7 @@ export default function MonitorImos() {
                     </td>
                     <td style={{ padding: '1rem', fontSize: '0.9rem', color: 'var(--crear-blue)', fontWeight: 600 }}>
                       {normalizeEquipoName(m.equipo)}
+                      {m.schemaVersion === 2 && <><div style={{ fontSize: '0.75rem' }}>Origen IMO: Equipo {m.originTeam} · C1 {m.c1Date}</div><button className="btn-secondary" onClick={() => setHistoryMission(m)}>Ver historial</button></>}
                     </td>
                     <td style={{ padding: '1rem' }}>
                       <div style={{ fontWeight: 600 }}>Progreso: {progreso}%</div>
@@ -2119,6 +2120,7 @@ export default function MonitorImos() {
                         {isExpanded ? 'Ocultar Enrolados' : `Ver Enrolados (${enroladosList.length})`}
                       </button>
                       <button
+                        disabled={m.schemaVersion === 2}
                         onClick={() => handleResetMission(m.id)}
                         title="Resetear telemetría de prueba de este IMO"
                         style={{
@@ -2317,93 +2319,9 @@ export default function MonitorImos() {
       )}
 
       {/* ── MODAL: LINK REGISTRO IMO ── */}
-      {showImoLinkModal && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.9)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem', backdropFilter: 'blur(5px)' }}>
-          <div className="glass-panel" style={{ background: 'var(--bg-card)', padding: '2.5rem', borderRadius: '16px', maxWidth: '600px', width: '100%', border: '1px solid var(--border-subtle)', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
-            <h2 style={{ margin: '0 0 1rem 0', color: 'var(--text-heading)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.4rem' }}>
-              🔗 Generador de Link IMO (Linaje)
-            </h2>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', marginBottom: '1.5rem', lineHeight: '1.5' }}>
-              Comparte este enlace único con los IMOs para que reporten el estado de sus enrolados. 
-              <br/><br/>
-              <strong style={{ color: '#38bdf8' }}>Regla de Linaje Dinámica (N-3, N-2, N-1):</strong> El sistema generará el link automáticamente para el equipo destino actual.
-              <br/><br/>
-              {(() => {
-                if (filterSede === 'todos' || filterEquipo === 'todos') {
-                   return (
-                     <div style={{ background: 'rgba(255, 183, 3, 0.1)', borderLeft: '4px solid #ffb703', padding: '10px 15px', borderRadius: '0 6px 6px 0', marginTop: '10px', color: '#e2e8f0', fontSize: '0.9rem' }}>
-                       ⚠️ <strong>Atención:</strong> Por favor selecciona una <strong>Sede específica</strong> y un <strong>Equipo específico</strong> en los filtros arriba para poder generar el enlace coherente.
-                     </div>
-                   );
-                }
-                
-                const match = filterEquipo.match(/\d+/);
-                if (match) {
-                  const n = parseInt(match[0], 10);
-                  if (n > 3) {
-                    return (
-                      <div style={{ background: 'rgba(56, 189, 248, 0.1)', borderLeft: '4px solid #38bdf8', padding: '10px 15px', borderRadius: '0 6px 6px 0', marginTop: '10px', color: '#e2e8f0' }}>
-                        Configuración detectada para <strong>Equipo {n} ({filterSede})</strong>:
-                        <br/>
-                        IMOs de Equipos <strong>{n-3}, {n-2} y {n-1}</strong> enrolan para el <strong>Equipo {n}</strong>.
-                      </div>
-                    );
-                  }
-                }
-                return null;
-              })()}
-            </p>
-            
-            {(filterSede !== 'todos' && filterEquipo !== 'todos') ? (
-              <div style={{ background: '#0f172a', padding: '1.2rem', borderRadius: '8px', border: '1px solid #334155', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' }}>
-                {(() => {
-                    let sedeStr = filterSede.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z]/g, '');
-                    let eqStr = '';
-                    const match = filterEquipo.match(/\d+/);
-                    if (match) {
-                      eqStr = 'e' + match[1];
-                    } else {
-                      eqStr = filterEquipo.replace(/\s+/g, '').toLowerCase();
-                    }
-                    const dynamicLink = `https://crearpsl.net/imos${eqStr}${sedeStr}/`;
-                    
-                    return (
-                      <>
-                        <span style={{ color: '#10b981', fontFamily: 'monospace', fontSize: '0.9rem', fontWeight: 'bold', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {dynamicLink}
-                      </span>
-                      <div style={{ marginTop: '8px', fontSize: '0.75rem', color: '#ffb703' }}>
-                        (Asegúrate de que la landing <strong>/{eqStr}{sedeStr}/</strong> esté creada en tu servidor, de lo contrario dará error 404).
-                      </div>
-                        <button 
-                          onClick={() => {
-                            navigator.clipboard.writeText(dynamicLink);
-                            alert('¡Link copiado al portapapeles!');
-                          }} 
-                          style={{ background: '#38bdf8', color: '#0f172a', border: 'none', padding: '0.6rem 1.2rem', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.85rem', transition: 'background 0.2s', boxShadow: '0 4px 6px rgba(56, 189, 248, 0.3)' }}
-                          onMouseOver={(e) => e.currentTarget.style.background = '#0ea5e9'}
-                          onMouseOut={(e) => e.currentTarget.style.background = '#38bdf8'}
-                        >
-                          Copiar Link
-                        </button>
-                      </>
-                    );
-                })()}
-              </div>
-            ) : (
-              <div style={{ background: 'rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '8px', border: '1px dashed rgba(255,255,255,0.1)', textAlign: 'center', color: '#64748b', marginBottom: '2rem', fontStyle: 'italic' }}>
-                El enlace dinámico aparecerá aquí cuando selecciones el equipo.
-              </div>
-            )}
-
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <button onClick={() => setShowImoLinkModal(false)} className="btn-secondary" style={{ background: 'transparent', border: '1px solid var(--border-subtle)', color: 'var(--text-main)', padding: '0.6rem 1.5rem', borderRadius: '6px', fontWeight: 600, cursor: 'pointer' }}>
-                Cerrar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {historyMission && <MissionHistory mission={historyMission} onClose={() => setHistoryMission(null)} />}
+      {missionLoadError && <div role="alert" style={{ position: 'fixed', bottom: 12, left: 16, background: '#7f1d1d', color: 'white', padding: 16, zIndex: 9000 }}>{missionLoadError}</div>}
+      {showImoLinkModal && <CampaignGenerator missions={sedeScopedMissions} defaultSede={filterSede} defaultEquipo={filterEquipo} sedes={isGlobalScopeUser ? [...new Set([...sedesDisponibles, 'Lima', 'Quito', 'Cuenca', 'Guayaquil', 'Medellín', 'México', 'Bogotá'])] : [normalizeSede(currentUser?.sede)].filter(Boolean)} getEnrolados={getEnroladosList} onCreated={id => { setCampaignFilter(id); setFilterEquipo('todos'); }} onClose={() => setShowImoLinkModal(false)} />}
 
       {/* ── MODAL: SIMULADOR DE NEUROMARKETING (SEGUIMIENTO 3 DÍAS) ── */}
       {showNeuroModal && (
