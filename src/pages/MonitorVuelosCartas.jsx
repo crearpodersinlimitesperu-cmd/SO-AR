@@ -37,27 +37,27 @@ const SEDES_CONFIG = [
   { id: 'Quito', label: 'Quito', flag: 'ðŸ‡ªðŸ‡¨', code: 'UIO' },
   { id: 'Cuenca', label: 'Cuenca', flag: 'ðŸ‡ªðŸ‡¨', code: 'CUE' },
   { id: 'Guayaquil', label: 'Guayaquil', flag: 'ðŸ‡ªðŸ‡¨', code: 'GYE' },
-  { id: 'MedellÃ­n', label: 'MedellÃ­n', flag: 'ðŸ‡¨ðŸ‡´', code: 'MDE' },
-  { id: 'México', label: 'México', flag: 'ðŸ‡²ðŸ‡½', code: 'MEX' }
+  { id: 'Medellín', label: 'Medellín', flag: '🇨🇴', code: 'MDE' },
+  { id: 'México', label: 'México', flag: '🇲🇽', code: 'MEX' }
 ];
 
 // Carpetas Oficiales de Google Drive
 const DRIVE_REPOSITORIES = [
   {
-    name: 'Vuelos y DocumentaciÃƒÂ³n Entrenadores Multi-Sede',
-    desc: 'Carpetas organizadas por sede (Cuenca, Quito, Guayaquil, MedellÃƒÂ­n, MÃƒÂ©xico, Lima) con itinerarios, pases de abordar y documentos oficiales.',
+    name: 'Vuelos y Documentación Entrenadores Multi-Sede',
+    desc: 'Carpetas organizadas por sede (Cuenca, Quito, Guayaquil, Medellín, México, Lima) con itinerarios, pases de abordar y documentos oficiales.',
     url: 'https://drive.google.com/drive/folders/1oi7mUG619dQ2ZVzHzUyO5Xkwti-jgDFl?usp=drive_link',
-    badge: 'Multi-Sede Ecuador / Colombia / MÃƒÂ©xico'
+    badge: 'Multi-Sede Ecuador / Colombia / México'
   },
   {
-    name: 'Pasajes, Facturas y LogÃƒÂ­stica AÃƒÂ©rea General',
-    desc: '331+ boletos de aviÃƒÂ³n LATAM/Avianca/Copa, facturas de hospedaje y comprobantes de traslado de todas las sedes.',
+    name: 'Pasajes, Facturas y Logística Aérea General',
+    desc: '331+ boletos de avión LATAM/Avianca/Copa, facturas de hospedaje y comprobantes de traslado de todas las sedes.',
     url: 'https://drive.google.com/drive/folders/1i60YXyxRrFP1LxmXUVuHK5eRyeUBzR0r?usp=drive_link',
     badge: 'Facturas & Tickets Oficiales'
   },
   {
     name: 'Planilla Oficial: LLAMADOS MANAGERS (Entrenadores y Sedes)',
-    desc: 'Matriz de asignaciÃƒÂ³n de llamados, control de tarifas, graduados y desertores sincronizada automÃƒÂ¡ticamente con Causa OS.',
+    desc: 'Matriz de asignación de llamados, control de tarifas, graduados y desertores sincronizada automáticamente con Causa OS.',
     url: 'https://docs.google.com/spreadsheets/d/1lWAHh1PSAKu9eU6DOBxZExrHMbCYc3f2Sr8GdghNxD0/edit?usp=drive_link',
     badge: 'Google Sheets Sincronizado'
   }
@@ -138,11 +138,11 @@ const SEDES_LOGISTICA = {
     salonCaminata: 'Sede de Campo Guayaquil'
   },
   Medellín: {
-    nombre: 'MedellÃ­n',
+    nombre: 'Medellín',
     pais: 'Colombia',
-    bandera: 'ðŸ‡¨ðŸ‡´',
-    hotel: 'Hotel Dann Carlton Belfort MedellÃ­n',
-    direccion: 'Cl. 17 #40b-300, El Poblado, MedellÃ­n, Antioquia, Colombia',
+    bandera: '🇨🇴',
+    hotel: 'Hotel Dann Carlton Belfort Medellín',
+    direccion: 'Cl. 17 #40b-300, El Poblado, Medellín, Antioquia, Colombia',
     mapsUrl: 'https://maps.google.com/?q=Hotel+Dann+Carlton+Belfort+Medellin',
     checkIn: '15:00',
     checkOut: '13:00',
@@ -151,23 +151,23 @@ const SEDES_LOGISTICA = {
     servicios: 'Desayuno Buffet Paisa & Internacional â€¢ Business Center â€¢ Piscina',
     aeropuerto: 'Aeropuerto Internacional JosÃ© MarÃ­a CÃ³rdova (MDE - Rionegro)',
     puntoEspera: 'Salida Puerta 1 Llegadas Internacionales / Nacionales MDE',
-    salonOficial: 'SalÃ³n Principal de Entrenamiento MedellÃ­n (El Poblado)',
+    salonOficial: 'SalÃ³n Principal de Entrenamiento Medellín (El Poblado)',
     salonViaje: 'Finca Campestre de Retiro El Viaje (Antioquia)',
-    salonCaminata: 'Espacio Abierto de TransformaciÃ³n MedellÃ­n'
+    salonCaminata: 'Espacio Abierto de TransformaciÃ³n Medellín'
   },
   México: {
     nombre: 'México',
     pais: 'México',
-    bandera: 'ðŸ‡²ðŸ‡½',
+    bandera: '🇲🇽',
     hotel: 'Hotel Fiesta Americana Reforma',
-    direccion: 'P.Âº de la Reforma 80, JuÃ¡rez, CuauhtÃ©moc, 06600 Ciudad de México, CDMX',
+    direccion: 'P.Âº de la Reforma 80, Juárez, CuauhtÃ©moc, 06600 Ciudad de México, CDMX',
     mapsUrl: 'https://maps.google.com/?q=Hotel+Fiesta+Americana+Reforma+CDMX',
     checkIn: '15:00',
     checkOut: '12:00',
     notaCheckIn: 'UbicaciÃ³n estratÃ©gica sobre Paseo de la Reforma',
     telefono: '(+52 55) 5140-4100',
     servicios: 'Centro de Negocios â€¢ Concierge 24h â€¢ Room Service de Alta Gama',
-    aeropuerto: 'Aeropuerto Internacional Benito JuÃ¡rez (MEX / AICM)',
+    aeropuerto: 'Aeropuerto Internacional Benito Juárez (MEX / AICM)',
     puntoEspera: 'Puerta E1/E2 Llegadas Internacionales Terminal 1 o Terminal 2 (AICM)',
     salonOficial: 'Salones de CapacitaciÃ³n y Eventos CDMX',
     salonViaje: 'Sede Campestre México (El Viaje)',
@@ -450,7 +450,7 @@ const OFICIAL_LETTERS = [
     url: '/cartas/carta_invitacion_migraciones.html',
     badge: 'Documento Legal Migratorio',
     fecha: 'Oficial 2026',
-    descripcion: 'Carta de respaldo institucional, personerÃ­a jurÃ­dica y acreditaciÃ³n oficial de conferencistas extranjeros ante autoridades peruanas.',
+    descripcion: 'Carta de respaldo institucional, personerÃ­a jurÃ­dica y acreditación oficial de conferencistas extranjeros ante autoridades peruanas.',
     vuelos: ['LA 1437', 'AV 108', 'LA 1449']
   },
 
@@ -706,12 +706,12 @@ const OFICIAL_LETTERS = [
     id: 'carta-ana-monroy-mde',
     entrenador: 'Ana Elena Monroy Thompson',
     rol: 'Directora AcadÃ©mica Internacional',
-    equipo: 'MedellÃ­n Kids & Liderazgo Juvenil',
-    sede: 'MedellÃ­n',
+    equipo: 'Medellín Kids & Liderazgo Juvenil',
+    sede: 'Medellín',
     url: 'https://drive.google.com/drive/folders/1cONlxQGyWNmqcYoF2oD4Mmi_pPyH--Jo',
     badge: 'MDE Kids Oficial',
     fecha: 'Septiembre - Octubre 2026',
-    descripcion: 'Itinerario aÃ©reo hacia MedellÃ­n JosÃ© MarÃ­a CÃ³rdova (MDE), hospedaje en Hotel Dann Carlton Belfort y logÃ­stica de sala.',
+    descripcion: 'Itinerario aÃ©reo hacia Medellín JosÃ© MarÃ­a CÃ³rdova (MDE), hospedaje en Hotel Dann Carlton Belfort y logÃ­stica de sala.',
     vuelos: ['AV 108']
   },
   {
@@ -719,7 +719,7 @@ const OFICIAL_LETTERS = [
     entrenador: 'Alejandro DÃ­az PabÃ³n',
     rol: 'Entrenador Senior',
     equipo: 'CoordinaciÃ³n Colombia',
-    sede: 'MedellÃ­n',
+    sede: 'Medellín',
     url: 'https://drive.google.com/drive/folders/1i60YXyxRrFP1LxmXUVuHK5eRyeUBzR0r',
     badge: 'MDE ConexiÃ³n',
     fecha: 'Enero - Febrero 2027',
@@ -749,7 +749,7 @@ const OFICIAL_LETTERS = [
     url: 'https://drive.google.com/drive/folders/1oi7mUG619dQ2ZVzHzUyO5Xkwti-jgDFl',
     badge: 'MEX Internacional',
     fecha: 'Oficial 2026',
-    descripcion: 'Carta oficial de acreditaciÃ³n para vuelos internacionales desde Aeropuerto Benito JuÃ¡rez (MEX).',
+    descripcion: 'Carta oficial de acreditación para vuelos internacionales desde Aeropuerto Benito Juárez (MEX).',
     vuelos: ['LA 1437']
   }
 ];
@@ -768,7 +768,7 @@ export default function MonitorVuelosCartas() {
   const [flightStatusFilter, setFlightStatusFilter] = useState('activos');
   
   // Selector de Sede Operativa
-  const [selectedSede, setSelectedSede] = useState('TODAS'); // 'TODAS' | 'Lima' | 'Quito' | 'Cuenca' | 'Guayaquil' | 'MedellÃ­n' | 'México'
+  const [selectedSede, setSelectedSede] = useState('TODAS'); // 'TODAS' | 'Lima' | 'Quito' | 'Cuenca' | 'Guayaquil' | 'Medellín' | 'México'
   const [logisticaSede, setLogisticaSede] = useState('Lima');
 
   const puedeVerRadar = canAccessMonitorVuelos(currentUser);
@@ -862,7 +862,7 @@ export default function MonitorVuelosCartas() {
         (selectedSede === 'Quito' && f.route?.origin === 'UIO') ||
         (selectedSede === 'Cuenca' && f.route?.origin === 'CUE') ||
         (selectedSede === 'Guayaquil' && f.route?.origin === 'GYE') ||
-        (selectedSede === 'MedellÃ­n' && f.route?.origin === 'MDE') ||
+        (selectedSede === 'Medellín' && f.route?.origin === 'MDE') ||
         (selectedSede === 'México' && f.route?.origin === 'MEX');
 
       const destMatch = f.route?.destinationCity?.toLowerCase().includes(sedeNorm) ||
@@ -870,7 +870,7 @@ export default function MonitorVuelosCartas() {
         (selectedSede === 'Quito' && f.route?.destination === 'UIO') ||
         (selectedSede === 'Cuenca' && f.route?.destination === 'CUE') ||
         (selectedSede === 'Guayaquil' && f.route?.destination === 'GYE') ||
-        (selectedSede === 'MedellÃ­n' && f.route?.destination === 'MDE') ||
+        (selectedSede === 'Medellín' && f.route?.destination === 'MDE') ||
         (selectedSede === 'México' && f.route?.destination === 'MEX');
 
       if (!originMatch && !destMatch) return false;
@@ -944,12 +944,12 @@ export default function MonitorVuelosCartas() {
         { id: 'LIM-GYE', label: 'Lima âž” GYE' }
       ];
     }
-    if (selectedSede === 'MedellÃ­n') {
+    if (selectedSede === 'Medellín') {
       return [
-        { id: 'ALL', label: 'Todos en MedellÃ­n' },
-        { id: 'MDE-BOG', label: 'MedellÃ­n âž” BogotÃ¡' },
-        { id: 'UIO-MDE', label: 'Quito âž” MedellÃ­n' },
-        { id: 'MDE-LIM', label: 'MedellÃ­n âž” Lima' }
+        { id: 'ALL', label: 'Todos en Medellín' },
+        { id: 'MDE-BOG', label: 'Medellín âž” BogotÃ¡' },
+        { id: 'UIO-MDE', label: 'Quito âž” Medellín' },
+        { id: 'MDE-LIM', label: 'Medellín âž” Lima' }
       ];
     }
     if (selectedSede === 'México') {
