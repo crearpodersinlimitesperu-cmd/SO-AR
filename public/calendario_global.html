@@ -523,6 +523,153 @@
         // Esta clave es exactamente la misma que usa el Asignador React. La
         // agenda de Sheets aporta el contexto del evento; Causa OS decide el
         // entrenador confirmado. Nunca se escribe nada desde esta pantalla.
+        // CANONICAL TRAINER DIRECTORY & LEGAL NAMES (24 OFFICIAL TRAINERS)
+        const CANONICAL_TRAINERS = [
+            'Alejandro Díaz',
+            'Alonso Solares Salazar',
+            'Ana Elena Monroy',
+            'Andrés Gómez',
+            'Andrés Idrobo',
+            'Carlos Brunis',
+            'Cirilo Agustín Martínez',
+            'Diego Bravo',
+            'Erika Gissell Gavilánez Gallardo',
+            'Fer Aragón',
+            'Haydin Fernando Mendoza Clavijo',
+            'Jesús Adrián Acosta',
+            'José Sánchez',
+            'Juan Angel',
+            'Julio César Narváez',
+            'Leandro Brunis',
+            'Linid Valencia',
+            'Marcos Josué Vera Avilés',
+            'María De Lourdes Patiño Patiño Galarraga',
+            'Mauricio Pérez',
+            'Mauricio Ramirez Silva',
+            'Mike Boada',
+            'Mildred Muñoz Vasquez',
+            'Paul Sosa'
+        ];
+
+        const TRAINER_CANONICAL_MAP = {
+            'ALEJANDRO DIAZ': 'Alejandro Díaz',
+            'ALEJANDRO DIAZ PABON': 'Alejandro Díaz',
+            'ERNESTO ALEJANDRO DIAZ PABON': 'Alejandro Díaz',
+            'ALEJO': 'Alejandro Díaz',
+            'ALONSO SOLARES': 'Alonso Solares Salazar',
+            'ALONSO SOLARES SALAZAR': 'Alonso Solares Salazar',
+            'ANA ELENA MONROY': 'Ana Elena Monroy',
+            'ANA MONROY': 'Ana Elena Monroy',
+            'ANA ELENA MONROY THOMPSON': 'Ana Elena Monroy',
+            'ANA': 'Ana Elena Monroy',
+            'ANDRES GOMEZ': 'Andrés Gómez',
+            'CARLOS ANDRES GOMEZ': 'Andrés Gómez',
+            'CARLOS ANDRES GOMEZ GOMEZ': 'Andrés Gómez',
+            'ANDRES G': 'Andrés Gómez',
+            'ANDRES IDROBO': 'Andrés Idrobo',
+            'ANDRES I': 'Andrés Idrobo',
+            'ELMER ANDRES IDROBO': 'Andrés Idrobo',
+            'ELMER ANDRES IDROBO ANDRADE': 'Andrés Idrobo',
+            'IDROBO': 'Andrés Idrobo',
+            'CARLOS BRUNIS': 'Carlos Brunis',
+            'CARLOS EMILIO BRUNIS VILLACIS': 'Carlos Brunis',
+            'CIRILO AGUSTIN MARTINEZ': 'Cirilo Agustín Martínez',
+            'CIRILO AGUSTIN': 'Cirilo Agustín Martínez',
+            'CIRILO MARTINEZ': 'Cirilo Agustín Martínez',
+            'CIRILO': 'Cirilo Agustín Martínez',
+            'DIEGO BRAVO': 'Diego Bravo',
+            'DIEGO DAVID BRAVO FIGUEROA': 'Diego Bravo',
+            'ERIKA GAVILANEZ': 'Erika Gissell Gavilánez Gallardo',
+            'ERICA GAVILANEZ': 'Erika Gissell Gavilánez Gallardo',
+            'ERIKA GAVILANES': 'Erika Gissell Gavilánez Gallardo',
+            'ERICA GAVILANES': 'Erika Gissell Gavilánez Gallardo',
+            'ERIKA GISSELL GAVILANEZ GALLARDO': 'Erika Gissell Gavilánez Gallardo',
+            'ERIKA GISSELL GAVILANEZ': 'Erika Gissell Gavilánez Gallardo',
+            'ERIKA GISSELL GAVILANES': 'Erika Gissell Gavilánez Gallardo',
+            'ERIKA': 'Erika Gissell Gavilánez Gallardo',
+            'ERICA': 'Erika Gissell Gavilánez Gallardo',
+            'FER ARAGON': 'Fer Aragón',
+            'FERNANDO ARAGON': 'Fer Aragón',
+            'FER': 'Fer Aragón',
+            'HAYDIN FERNANDO MENDOZA CLAVIJO': 'Haydin Fernando Mendoza Clavijo',
+            'FERNANDO MENDOZA': 'Haydin Fernando Mendoza Clavijo',
+            'FER MENDOZA': 'Haydin Fernando Mendoza Clavijo',
+            'HAYDIN MENDOZA': 'Haydin Fernando Mendoza Clavijo',
+            'JESUS ADRIAN ACOSTA': 'Jesús Adrián Acosta',
+            'JESUS ACOSTA': 'Jesús Adrián Acosta',
+            'CHUY ACOSTA': 'Jesús Adrián Acosta',
+            'CHUY': 'Jesús Adrián Acosta',
+            'JOSE SANCHEZ': 'José Sánchez',
+            'JOSE LUIS SANCHEZ': 'José Sánchez',
+            'JOSE': 'José Sánchez',
+            'JUAN ANGEL': 'Juan Angel',
+            'JUAN ANGEL ARREOLA MORALES': 'Juan Angel',
+            'JUAN ARREOLA': 'Juan Angel',
+            'JULIO CESAR NARVAEZ': 'Julio César Narváez',
+            'JULIO CESAR NARVAEZ MORA': 'Julio César Narváez',
+            'JULIO NARVAEZ': 'Julio César Narváez',
+            'JULIO': 'Julio César Narváez',
+            'LEANDRO BRUNIS': 'Leandro Brunis',
+            'LEO BRUNIS': 'Leandro Brunis',
+            'LEO': 'Leandro Brunis',
+            'LINID VALENCIA': 'Linid Valencia',
+            'LINID': 'Linid Valencia',
+            'MARCOS JOSUE VERA AVILES': 'Marcos Josué Vera Avilés',
+            'JOSUE VERA': 'Marcos Josué Vera Avilés',
+            'MARCOS VERA': 'Marcos Josué Vera Avilés',
+            'MARIA DE LOURDES PATINO PATINO GALARRAGA': 'María De Lourdes Patiño Patiño Galarraga',
+            'MARIA DE LOURDES PATINO': 'María De Lourdes Patiño Patiño Galarraga',
+            'MARIA LOURDES': 'María De Lourdes Patiño Patiño Galarraga',
+            'LOURDES PATINO': 'María De Lourdes Patiño Patiño Galarraga',
+            'LOURDES': 'María De Lourdes Patiño Patiño Galarraga',
+            'MAURICIO PEREZ': 'Mauricio Pérez',
+            'MAU PEREZ': 'Mauricio Pérez',
+            'MAU': 'Mauricio Pérez',
+            'MAURICIO RAMIREZ SILVA': 'Mauricio Ramirez Silva',
+            'MAURICIO RAMIREZ': 'Mauricio Ramirez Silva',
+            'MIKE BOADA': 'Mike Boada',
+            'MICHAEL BOADA': 'Mike Boada',
+            'MILDRED MUNOZ VASQUEZ': 'Mildred Muñoz Vasquez',
+            'MILDRED MUNOZ': 'Mildred Muñoz Vasquez',
+            'PAUL SOSA': 'Paul Sosa',
+            'EDISON PAUL SOSA CARRERA': 'Paul Sosa'
+        };
+
+        function normalizarTextoBusqueda(str) {
+            return String(str || '')
+                .normalize('NFD')
+                .replace(/[̀-ͯ]/g, '')
+                .toUpperCase()
+                .trim()
+                .replace(/\s+/g, ' ');
+        }
+
+        function formatSingleTrainerLegalName(rawName) {
+            const raw = String(rawName || '').trim();
+            if (!raw) return '';
+            const norm = normalizarTextoBusqueda(raw);
+            if (TRAINER_CANONICAL_MAP[norm]) return TRAINER_CANONICAL_MAP[norm];
+            for (const key of Object.keys(TRAINER_CANONICAL_MAP)) {
+                if (norm === key || norm.includes(key) || key.includes(norm)) {
+                    return TRAINER_CANONICAL_MAP[key];
+                }
+            }
+            return raw;
+        }
+
+        function formatTrainerDisplayName(trainerStr) {
+            if (!trainerStr) return '';
+            const str = String(trainerStr).trim();
+            if (!str) return '';
+            if (str.includes('/')) {
+                return str.split('/')
+                    .map(part => formatSingleTrainerLegalName(part.trim()))
+                    .filter(Boolean)
+                    .join(' / ');
+            }
+            return formatSingleTrainerLegalName(str);
+        }
+
         function normalizeSedeAsignador(sede) {
           const raw = String(sede || '').trim();
           const clean = raw.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -647,10 +794,16 @@
           Object.keys(data || {}).forEach(sede => {
             (data[sede] || []).forEach(ev => {
               if (typeof ev.sheetTrainer === 'undefined') ev.sheetTrainer = ev.trainer || '';
-              // Un nombre en Sheets es una referencia importada; no puede
-              // presentarse como asignación final si Causa OS no la confirma.
-              ev.trainer = '';
-              ev.assignmentSource = 'sheet_crosscheck';
+              // Sincronizar con nombre legal canónico del cronograma oficial
+              const formattedSheetTrainer = formatTrainerDisplayName(ev.trainer || ev.sheetTrainer || '');
+              if (formattedSheetTrainer) {
+                ev.sheetTrainer = formattedSheetTrainer;
+                ev.trainer = formattedSheetTrainer;
+                ev.assignmentSource = 'sheet_synced';
+              } else {
+                ev.trainer = '';
+                ev.assignmentSource = 'none';
+              }
               ev.causaAssignments = [];
             });
           });
@@ -659,8 +812,9 @@
         function restoreSheetReference(data) {
           Object.keys(data || {}).forEach(sede => {
             (data[sede] || []).forEach(ev => {
-              ev.trainer = ev.sheetTrainer || '';
-              ev.assignmentSource = 'sheet_fallback';
+              const formatted = formatTrainerDisplayName(ev.sheetTrainer || '');
+              ev.trainer = formatted || '';
+              ev.assignmentSource = formatted ? 'sheet_synced' : 'none';
               ev.causaAssignments = [];
             });
           });
@@ -685,13 +839,21 @@
                 .map(slot => ({ slot, ...slots[slot] }));
               ev.causaAssignments = confirmedSlots;
               if (!confirmedSlots.length) {
-                ev.trainer = '';
-                ev.assignmentSource = 'sheet_crosscheck';
+                // Si no hay confirmación directa en Causa OS, sincronizar el entrenador oficial de Sheets normalizado
+                const formattedSheet = formatTrainerDisplayName(ev.sheetTrainer || '');
+                if (formattedSheet) {
+                  ev.trainer = formattedSheet;
+                  ev.assignmentSource = 'sheet_synced';
+                } else {
+                  ev.trainer = '';
+                  ev.assignmentSource = 'none';
+                }
                 return;
               }
-              ev.trainer = confirmedSlots.length === 1 && confirmedSlots[0].slot === 'unico'
-                ? confirmedSlots[0].entrenador
-                : confirmedSlots.map(item => `${item.slot === 'unico' ? '' : `${item.slot}: `}${item.entrenador}`).join(' · ');
+              const formattedConfirmed = confirmedSlots.length === 1 && confirmedSlots[0].slot === 'unico'
+                ? formatTrainerDisplayName(confirmedSlots[0].entrenador)
+                : confirmedSlots.map(item => `${item.slot === 'unico' ? '' : `${item.slot}: `}${formatTrainerDisplayName(item.entrenador)}`).join(' · ');
+              ev.trainer = formattedConfirmed;
               ev.assignmentSource = 'causa_os';
               confirmed++;
             });
@@ -2907,9 +3069,9 @@
                 const placeName = ev.place || "Por confirmar";
                 const trainerSource = ev.assignmentSource === 'causa_os'
                   ? '<span class="mt-1 inline-flex items-center gap-1 text-[9px] font-bold text-emerald-400"><ion-icon name="checkmark-circle-outline"></ion-icon> Confirmado en Asignador Causa OS</span>'
-                  : ev.sheetTrainer
-                    ? `<p class="mt-1 text-[10px] text-amber-400/90">Referencia Sheets · pendiente de confirmar en Causa OS</p>`
-                    : '<p class="mt-1 text-[10px] text-gray-500">Sin referencia en Sheets ni confirmación en Causa OS</p>';
+                  : (ev.trainer || ev.sheetTrainer)
+                    ? '<span class="mt-1 inline-flex items-center gap-1 text-[9px] font-semibold text-sky-400"><ion-icon name="sync-outline"></ion-icon> Sincronizado Cronograma Oficial</span>'
+                    : '<p class="mt-1 text-[10px] text-gray-500">Sin entrenador asignado</p>';
                 
                 const log = ev.logistics || { ticket: "pending", hotel: "pending", trainer_notified: false, trainer_arrival: "" };
                 
@@ -3137,13 +3299,38 @@
             
             body.innerHTML = '';
             
-            const trainersList = trainerName.split('/').map(t => t.trim().toUpperCase());
-            const validTrainers = trainersList.filter(t => trainerData[t]);
+            const trainersList = String(trainerName || '').split('/').map(t => t.trim()).filter(Boolean);
+            const resolvedTrainers = [];
+            trainersList.forEach(rawT => {
+                const upper = rawT.toUpperCase();
+                const legal = formatSingleTrainerLegalName ? formatSingleTrainerLegalName(rawT) : rawT;
+                const legalUpper = legal.toUpperCase();
+                let foundKey = Object.keys(trainerData || {}).find(k => k === upper || k === legalUpper);
+                if (!foundKey) {
+                    const normSearch = typeof normalizarTextoBusqueda === 'function' ? normalizarTextoBusqueda(rawT) : upper;
+                    foundKey = Object.keys(trainerData || {}).find(k => {
+                        const kn = typeof normalizarTextoBusqueda === 'function' ? normalizarTextoBusqueda(k) : k;
+                        return kn === normSearch || kn.includes(normSearch) || normSearch.includes(kn);
+                    });
+                }
+                const td = foundKey ? trainerData[foundKey] : {
+                    name: legal,
+                    country_code: '',
+                    nationality: 'Equipo Oficial CREAR',
+                    id: 'N/A',
+                    dob: 'N/A',
+                    expiry: 'VIGENTE',
+                    insurance_provider: 'CREAR Seguro Colectivo',
+                    insurance_expiry: 'VIGENTE'
+                };
+                resolvedTrainers.push({ rawName: rawT, legalName: legal, td });
+            });
             
-            if(validTrainers.length === 0) return;
+            if (resolvedTrainers.length === 0) return;
             
-            validTrainers.forEach(tName => {
-                const td = trainerData[tName];
+            resolvedTrainers.forEach(item => {
+                const tName = item.rawName;
+                const td = item.td;
                 
                 // Parse Passport Expiry
                 const expiryParts = td.expiry ? td.expiry.split('/') : null;
@@ -3184,25 +3371,15 @@
                     <div class="p-5">
                         <div class="flex gap-4 mb-4">
                             <div class="shrink-0 flex -space-x-4 relative">
-                                ${ev.trainer && ev.trainer.includes('/') ? 
-                                    ev.trainer.split(/[\/-]/).slice(0, 3).map((t, i) => {
-                                        const tName = t.trim();
-                                        const tPhoto = (typeof photoDB !== 'undefined' && photoDB[normalizeStr(tName)]) ? photoDB[normalizeStr(tName)].photo : null;
-                                        return tPhoto ? 
-                                        `<img src="${tPhoto}" alt="${tName}" class="passport-photo-3d w-24 h-28 object-cover object-top rounded-lg border-2 shadow-md ${hasAlert ? 'border-red-500/40' : 'border-crearCyan/30'} relative z-${30-i*10} hover:z-40 hover:scale-105 transition-transform" style="margin-left: ${i > 0 ? '-3rem' : '0'}; z-index: ${30-i}">` :
-                                        `<div class="shrink-0 w-24 h-28 rounded-lg border-2 ${hasAlert ? 'border-red-500/40' : 'border-crearCyan/30'} bg-crearBlue/10 flex items-center justify-center passport-photo-3d relative z-${30-i*10} hover:z-40" style="margin-left: ${i > 0 ? '-3rem' : '0'}; z-index: ${30-i}">
-                                            <ion-icon name="person" class="text-crearCyan text-3xl"></ion-icon>
-                                        </div>`;
-                                    }).join('')
-                                :
-                                    (typeof td !== 'undefined' && td && td.photo ? `
-                                        <img src="${td.photo}" alt="${td.name}" class="passport-photo-3d w-24 h-28 object-cover object-top rounded-lg border-2 shadow-md ${hasAlert ? 'border-red-500/40' : 'border-crearCyan/30'}">
-                                    ` : `
-                                        <div class="shrink-0 w-24 h-28 rounded-lg border-2 ${hasAlert ? 'border-red-500/40' : 'border-crearCyan/30'} bg-crearBlue/10 flex items-center justify-center passport-photo-3d">
-                                            <ion-icon name="person" class="text-crearCyan text-3xl"></ion-icon>
-                                        </div>
-                                    `)
-                                }
+                                ${typeof td !== 'undefined' && td && td.photo ? `
+                                    <img src="${td.photo}" alt="${td.name}" class="passport-photo-3d w-24 h-28 object-cover object-top rounded-lg border-2 shadow-md ${hasAlert ? 'border-red-500/40' : 'border-crearCyan/30'}">
+                                ` : (typeof photoDB !== 'undefined' && photoDB[normalizeStr(item.legalName || td.name || tName)]) ? `
+                                    <img src="${photoDB[normalizeStr(item.legalName || td.name || tName)].photo}" alt="${td.name}" class="passport-photo-3d w-24 h-28 object-cover object-top rounded-lg border-2 shadow-md ${hasAlert ? 'border-red-500/40' : 'border-crearCyan/30'}">
+                                ` : `
+                                    <div class="shrink-0 w-24 h-28 rounded-lg border-2 ${hasAlert ? 'border-red-500/40' : 'border-crearCyan/30'} bg-crearBlue/10 flex items-center justify-center passport-photo-3d">
+                                        <ion-icon name="person" class="text-crearCyan text-3xl"></ion-icon>
+                                    </div>
+                                `}
                             </div>
                             <div class="flex-1 min-w-0">
                                 <p class="text-white font-black text-sm leading-tight mb-1">${td.name}</p>
