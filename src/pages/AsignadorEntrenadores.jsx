@@ -396,7 +396,12 @@ export default function AsignadorEntrenadores() {
         });
 
         // 3. Obtener lista consolidada única
-        const unicos = [...new Set(porIdentidad.values())];
+        const unicosMap = new Map();
+        for (const val of porIdentidad.values()) {
+          const id = identidadCanonicaEntrenador(val.nombre);
+          if (id) unicosMap.set(id, val);
+        }
+        const unicos = [...unicosMap.values()];
         if (vivo) setEntrenadores(unicos.sort((a, b) => a.nombre.localeCompare(b.nombre)));
       } catch (e) {
         console.error('No se pudo cargar el directorio de entrenadores:', e);
