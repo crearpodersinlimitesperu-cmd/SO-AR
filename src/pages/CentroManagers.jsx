@@ -46,7 +46,8 @@ import {
   Sparkles, ToggleLeft, ToggleRight, Archive, RotateCcw, X,
   Edit3, Trash2, UserPlus, Shield, Crown, Check, CheckSquare, Square,
   ShieldCheck, Lock, AlertTriangle, Target, ArrowUpDown, ArrowUp, ArrowDown,
-  BarChart3, GitMerge, ArrowRight, FileSpreadsheet, ExternalLink
+  BarChart3, GitMerge, ArrowRight, FileSpreadsheet, ExternalLink,
+  List, LayoutGrid
 } from 'lucide-react';
 import CMJDashboard from '../components/CMJDashboard';
 import KPIsEntrenadoresLlamadas from '../components/KPIsEntrenadoresLlamadas';
@@ -126,6 +127,38 @@ export const normalizeManagerEstado = (estado) => {
   if (s.includes('ACTIV') || s.includes('EN_JUEGO') || s === 'SI') return 'Activo';
   return estado ? String(estado).trim() : 'Activo';
 };
+
+// Obtiene el valor numérico de un equipo para ordenamiento numérico estricto (#79, #80, #81, #91, #92...)
+export const getTeamNumericValue = (item) => {
+  if (!item) return 999999;
+  if (item.numEquipo !== undefined && item.numEquipo !== null && String(item.numEquipo).trim() !== '') {
+    const parsed = parseInt(String(item.numEquipo).replace(/\D/g, ''), 10);
+    if (!isNaN(parsed)) return parsed;
+  }
+  const match = String(item.equipo || '').match(/\d+/);
+  if (match) {
+    const parsed = parseInt(match[0], 10);
+    if (!isNaN(parsed)) return parsed;
+  }
+  return 999999;
+};
+
+// Formatea el nombre de equipo anteponiendo el número de equipo de forma destacada (ej: "#91 · HAMSA TADAKATSU")
+export const formatTeamDisplay = (equipo, numEquipo) => {
+  const num = numEquipo !== undefined && numEquipo !== null && String(numEquipo).trim() !== ''
+    ? String(numEquipo).trim()
+    : (String(equipo || '').match(/\d+/)?.[0] || '');
+  const cleanName = String(equipo || '').replace(/\s*\(#\d+\)\s*/g, '').trim();
+
+  if (num && cleanName && !cleanName.startsWith('#')) {
+    return `#${num} · ${cleanName}`;
+  }
+  if (num && !cleanName) {
+    return `Equipo #${num}`;
+  }
+  return cleanName || 'Sin Equipo';
+};
+
 
 export default function CentroManagers() {
   const { currentUser } = useAuth();
@@ -448,6 +481,52 @@ export default function CentroManagers() {
   }, [currentUser, allTrainerNames]);
 
   const [filterEntrenador, setFilterEntrenador] = useState(viewAsTrainer ? currentTrainerName : '');
+  const [filterEquipo, setFilterEquipo] = useState('');
+  const [directorioViewMode, setDirectorioViewMode] = useState('tabla'); // 'tabla' | 'equipos'
+
+  // Catálogo de equipos disponibles ordenados numéricamente para filtrado rápido (#79, #80, #81, #91, #92...)
+  const availableEquipos = useMemo(() => {
+    const userEmail = (currentUser?.email || '').toLowerCase().trim();
+    const isLili = userEmail === 'liliana.cubillo@crearpsl.net' || userEmail === 'lili.cubillo@crearpsl.net' || userEmail.includes('cubillo');
+    let effectiveSede = normalizeSede(currentUser?.sede);
+    if (isLili && (!effectiveSede || effectiveSede === 'Sede Global' || effectiveSede === 'Global')) {
+      effectiveSede = 'Quito';
+    }
+
+    const map = new Map();
+    managers.forEach(m => {
+      if (!m.equipo) return;
+      const mSede = normalizeSede(m.sede);
+      if (!canViewAll && !isGlobalQTCoordinator(currentUser)) {
+        if (mSede !== effectiveSede && mSede !== 'GLOBAL' && mSede !== 'Sede Global') return;
+      }
+      if (filterSede && mSede !== normalizeSede(filterSede)) return;
+      if (filterEntrenador && !isTrainerMatch(m.entrenador, filterEntrenador)) return;
+
+      const cleanName = String(m.equipo).replace(/\s*\(#\d+\)\s*/g, '').trim();
+      const num = getTeamNumericValue(m);
+      const numStr = m.numEquipo !== undefined && m.numEquipo !== null && String(m.numEquipo).trim() !== ''
+        ? String(m.numEquipo).trim()
+        : (num !== 999999 ? String(num) : '');
+      const key = `${mSede}_${cleanName}`;
+      if (!map.has(key)) {
+        map.set(key, {
+          key,
+          sede: mSede,
+          equipo: cleanName,
+          numEquipo: numStr,
+          num
+        });
+      }
+    });
+
+    return Array.from(map.values()).sort((a, b) => {
+      const s = a.sede.localeCompare(b.sede);
+      if (s !== 0) return s;
+      if (a.num !== b.num) return a.num - b.num;
+      return a.equipo.localeCompare(b.equipo);
+    });
+  }, [managers, currentUser, canViewAll, filterSede, filterEntrenador]);
 
   // Efecto para actualizar el filtro si cambia el toggle de dual role
   useEffect(() => {
@@ -457,6 +536,7 @@ export default function CentroManagers() {
       setFilterEntrenador('');
     }
   }, [viewAsTrainer, currentTrainerName]);
+
 
 
   // Modales y estados de edición
@@ -614,10 +694,19 @@ export default function CentroManagers() {
       // 3. Filtro Sede (UI dropdown)
       if (filterSede && mSede !== normalizeSede(filterSede)) return false;
 
-      // 4. Filtro Estado (Todos / Activo / Graduado / Desertor)
+      // 4. Filtro de Equipo (UI dropdown)
+      if (filterEquipo) {
+        const cleanEqName = String(m.equipo || '').replace(/\s*\(#\d+\)\s*/g, '').trim().toLowerCase();
+        const cleanFilter = String(filterEquipo).replace(/\s*\(#\d+\)\s*/g, '').trim().toLowerCase();
+        const key = `${mSede}_${cleanEqName}`.toLowerCase();
+        const num = getTeamNumericValue(m);
+        if (key !== filterEquipo.toLowerCase() && cleanEqName !== cleanFilter && String(m.numEquipo || num) !== filterEquipo) return false;
+      }
+
+      // 5. Filtro Estado (Todos / Activo / Graduado / Desertor)
       if (statusFilter !== 'Todos' && normalizeManagerEstado(m.estado) !== statusFilter) return false;
 
-      // 5. Búsqueda texto
+      // 6. Búsqueda texto
       if (search.trim()) {
         const q = search.toLowerCase();
         const str = `${m.nombre} ${m.rol || ''} ${m.equipo || ''} ${m.entrenador || ''} ${m.telefono || ''} ${mSede}`.toLowerCase();
@@ -626,7 +715,7 @@ export default function CentroManagers() {
 
       return true;
     });
-  }, [managers, search, filterSede, filterEntrenador, statusFilter, viewAsTrainer, canViewAll, canViewOwnSede, currentTrainerName, currentUser]);
+  }, [managers, search, filterSede, filterEntrenador, filterEquipo, statusFilter, viewAsTrainer, canViewAll, canViewOwnSede, currentTrainerName, currentUser]);
 
   // Agrupación de equipos
   const [groupLifecycleFilter, setGroupLifecycleFilter] = useState('Activos'); // 'Activos' | 'Archivo' | 'Todos'
@@ -833,10 +922,20 @@ export default function CentroManagers() {
     }
 
     // 6. Filtro por estado de conexión
-    if (groupFilterStatus === 'Completos') return list.filter(t => t.statusType === 'Completo');
-    if (groupFilterStatus === 'Parciales') return list.filter(t => t.statusType === 'Parcial' || t.statusType === 'Ausente');
-    if (groupFilterStatus === 'Pendientes') return list.filter(t => t.statusType === 'Pendiente');
-    return list;
+    let finalList = list;
+    if (groupFilterStatus === 'Completos') finalList = list.filter(t => t.statusType === 'Completo');
+    else if (groupFilterStatus === 'Parciales') finalList = list.filter(t => t.statusType === 'Parcial' || t.statusType === 'Ausente');
+    else if (groupFilterStatus === 'Pendientes') finalList = list.filter(t => t.statusType === 'Pendiente');
+
+    // 7. Ordenar equipos estrictamente por sede y número de equipo ascendente (#79, #80, #81, #91, #92...)
+    return [...finalList].sort((a, b) => {
+      const sComp = (a.sede || '').localeCompare(b.sede || '');
+      if (sComp !== 0) return sComp;
+      const numA = getTeamNumericValue(a);
+      const numB = getTeamNumericValue(b);
+      if (numA !== numB) return numA - numB;
+      return (a.equipo || '').localeCompare(b.equipo || '');
+    });
   }, [managers, search, filterSede, filterEntrenador, groupLifecycleFilter, groupFilterStatus, viewAsTrainer, canViewAll, canViewOwnSede, currentTrainerName, currentUser]);
 
   const groupStats = useMemo(() => {
@@ -2382,34 +2481,109 @@ export default function CentroManagers() {
   };
 
   const sortedManagers = useMemo(() => {
-    if (!sortField) return filteredManagers;
-
     return [...filteredManagers].sort((a, b) => {
-      let valA = '';
-      let valB = '';
+      // 1. Si no hay ordenamiento manual de columna (o al pulsar "Restaurar Filtros"),
+      // el orden NATURAL DE CAUSA OS es estrictamente organizado:
+      // Sede -> Número de Equipo (#79, #80, #81, #91, #92...) -> Rol (👑 Capitán primero) -> Nombre del Integrante
+      if (!sortField) {
+        const sedeA = normalizeSede(a.sede);
+        const sedeB = normalizeSede(b.sede);
+        const sComp = sedeA.localeCompare(sedeB);
+        if (sComp !== 0) return sComp;
 
-      if (sortField === 'nombre') {
-        valA = (a.nombre || '').toLowerCase();
-        valB = (b.nombre || '').toLowerCase();
-      } else if (sortField === 'sede') {
-        valA = `${a.sede || ''} ${a.equipo || ''}`.toLowerCase();
-        valB = `${b.sede || ''} ${b.equipo || ''}`.toLowerCase();
-      } else if (sortField === 'entrenador') {
-        valA = (a.entrenador || '').toLowerCase();
-        valB = (b.entrenador || '').toLowerCase();
-      } else if (sortField === 'estado') {
-        valA = (a.estado || '').toLowerCase();
-        valB = (b.estado || '').toLowerCase();
-      } else if (sortField === 'llamada') {
-        valA = `${a.llamadaAsistio || 'NO'} ${a.llamadaFecha || ''}`.toLowerCase();
-        valB = `${b.llamadaAsistio || 'NO'} ${b.llamadaFecha || ''}`.toLowerCase();
+        const numA = getTeamNumericValue(a);
+        const numB = getTeamNumericValue(b);
+        if (numA !== numB) return numA - numB;
+
+        const eqA = (a.equipo || '').trim().toLowerCase();
+        const eqB = (b.equipo || '').trim().toLowerCase();
+        const eqComp = eqA.localeCompare(eqB);
+        if (eqComp !== 0) return eqComp;
+
+        const isCapA = (a.rol || '').toLowerCase().includes('capitan');
+        const isCapB = (b.rol || '').toLowerCase().includes('capitan');
+        if (isCapA && !isCapB) return -1;
+        if (!isCapA && isCapB) return 1;
+
+        return (a.nombre || '').localeCompare(b.nombre || '');
       }
 
-      if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
-      if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
+      if (sortField === 'nombre') {
+        const valA = (a.nombre || '').toLowerCase();
+        const valB = (b.nombre || '').toLowerCase();
+        if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
+        if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
+        return 0;
+      } else if (sortField === 'sede' || sortField === 'equipo') {
+        const sedeA = normalizeSede(a.sede);
+        const sedeB = normalizeSede(b.sede);
+        if (sortField === 'sede') {
+          const sComp = sedeA.localeCompare(sedeB);
+          if (sComp !== 0) return sortDirection === 'asc' ? sComp : -sComp;
+        }
+
+        const numA = getTeamNumericValue(a);
+        const numB = getTeamNumericValue(b);
+        if (numA !== numB) return sortDirection === 'asc' ? numA - numB : numB - numA;
+
+        const eqA = (a.equipo || '').trim().toLowerCase();
+        const eqB = (b.equipo || '').trim().toLowerCase();
+        const eqComp = eqA.localeCompare(eqB);
+        if (eqComp !== 0) return sortDirection === 'asc' ? eqComp : -eqComp;
+
+        const isCapA = (a.rol || '').toLowerCase().includes('capitan');
+        const isCapB = (b.rol || '').toLowerCase().includes('capitan');
+        if (isCapA && !isCapB) return -1;
+        if (!isCapA && isCapB) return 1;
+
+        return (a.nombre || '').localeCompare(b.nombre || '');
+      } else if (sortField === 'entrenador') {
+        const valA = (a.entrenador || '').toLowerCase();
+        const valB = (b.entrenador || '').toLowerCase();
+        if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
+        if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
+        return 0;
+      } else if (sortField === 'estado') {
+        const priority = { 'Activo': 1, 'Graduado': 2, 'Desertor': 3 };
+        const valA = priority[normalizeManagerEstado(a.estado)] || 99;
+        const valB = priority[normalizeManagerEstado(b.estado)] || 99;
+        if (valA !== valB) return sortDirection === 'asc' ? valA - valB : valB - valA;
+        return (a.nombre || '').localeCompare(b.nombre || '');
+      } else if (sortField === 'llamada') {
+        const valA = `${a.llamadaAsistio || 'NO'} ${a.llamadaFecha || ''}`.toLowerCase();
+        const valB = `${b.llamadaAsistio || 'NO'} ${b.llamadaFecha || ''}`.toLowerCase();
+        if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
+        if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
+        return 0;
+      }
+
       return 0;
     });
   }, [filteredManagers, sortField, sortDirection]);
+
+  // Agrupación de managers por equipo para la vista "Por Equipos" del Directorio
+  const groupedManagersByTeam = useMemo(() => {
+    const map = new Map();
+    sortedManagers.forEach(m => {
+      const mSede = normalizeSede(m.sede);
+      const cleanEq = String(m.equipo || 'Sin Equipo').replace(/\s*\(#\d+\)\s*/g, '').trim();
+      const num = getTeamNumericValue(m);
+      const key = `${mSede}_${cleanEq}`;
+      if (!map.has(key)) {
+        map.set(key, {
+          key,
+          sede: mSede,
+          equipo: cleanEq,
+          numEquipo: m.numEquipo || (num !== 999999 ? num : ''),
+          num,
+          members: []
+        });
+      }
+      map.get(key).members.push(m);
+    });
+    return Array.from(map.values());
+  }, [sortedManagers]);
+
 
   const totalPages = Math.ceil(sortedManagers.length / PAGE_SIZE) || 1;
   const paginatedManagers = useMemo(() => {
@@ -2540,6 +2714,19 @@ export default function CentroManagers() {
                   </select>
                 )}
 
+                <select
+                  value={filterEquipo}
+                  onChange={e => { setFilterEquipo(e.target.value); setCurrentPage(1); }}
+                  style={{ padding: '0.55rem 0.75rem', borderRadius: '8px', border: `1px solid ${borderLight}`, background: bgCard, color: textDark, fontSize: '0.85rem' }}
+                >
+                  <option value="">Todos los Equipos ({availableEquipos.length})</option>
+                  {availableEquipos.map(eq => (
+                    <option key={eq.key} value={eq.key}>
+                      {formatTeamDisplay(eq.equipo, eq.numEquipo)} ({eq.sede})
+                    </option>
+                  ))}
+                </select>
+
                 {/* FILTROS DE ESTADO RÁPIDOS */}
                 <div style={{ display: 'flex', gap: '0.25rem', background: '#f1f5f9', padding: '0.25rem', borderRadius: '8px', flexShrink: 0 }}>
                   {[
@@ -2562,15 +2749,51 @@ export default function CentroManagers() {
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                {/* SELECTOR DE VISTA DIRECTORIO: TABLA vs TARJETAS DE EQUIPO */}
+                <div style={{ display: 'flex', background: '#f1f5f9', padding: '0.2rem', borderRadius: '8px', border: `1px solid ${borderLight}` }}>
+                  <button
+                    onClick={() => setDirectorioViewMode('tabla')}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: '0.35rem', padding: '0.45rem 0.75rem',
+                      borderRadius: '6px', border: 'none',
+                      background: directorioViewMode === 'tabla' ? '#ffffff' : 'transparent',
+                      color: directorioViewMode === 'tabla' ? '#0f172a' : textMuted,
+                      fontWeight: directorioViewMode === 'tabla' ? 700 : 500,
+                      boxShadow: directorioViewMode === 'tabla' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                      cursor: 'pointer', fontSize: '0.78rem'
+                    }}
+                    title="Vista en tabla continua ordenada"
+                  >
+                    <List size={14} /> Tabla
+                  </button>
+                  <button
+                    onClick={() => setDirectorioViewMode('equipos')}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: '0.35rem', padding: '0.45rem 0.75rem',
+                      borderRadius: '6px', border: 'none',
+                      background: directorioViewMode === 'equipos' ? '#ffffff' : 'transparent',
+                      color: directorioViewMode === 'equipos' ? '#0f172a' : textMuted,
+                      fontWeight: directorioViewMode === 'equipos' ? 700 : 500,
+                      boxShadow: directorioViewMode === 'equipos' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                      cursor: 'pointer', fontSize: '0.78rem'
+                    }}
+                    title="Vista organizada por tarjetas de equipo"
+                  >
+                    <LayoutGrid size={14} /> Por Equipos ({groupedManagersByTeam.length})
+                  </button>
+                </div>
+
                 <button onClick={() => {
                     setFilterSede('');
                     setFilterEntrenador('');
+                    setFilterEquipo('');
                     setStatusFilter('Todos');
                     setSearch('');
                     setSortField(null);
                     setSortDirection('asc');
-                  }} title="Limpiar Filtros de Búsqueda y Ordenamiento" style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', padding: '0.55rem 0.8rem', borderRadius: '6px', border: `1px solid ${borderLight}`, background: 'transparent', color: textMuted, fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}>
+                    setCurrentPage(1);
+                  }} title="Limpiar Filtros y Restaurar Orden Natural por Número de Equipo" style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', padding: '0.55rem 0.8rem', borderRadius: '6px', border: `1px solid ${borderLight}`, background: 'transparent', color: textMuted, fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}>
                     <RotateCcw size={14} /> Restaurar Filtros
                   </button>
 
@@ -2592,7 +2815,9 @@ export default function CentroManagers() {
               </div>
             </div>
 
-            <div style={{ overflowX: 'auto' }}>
+            {directorioViewMode === 'tabla' ? (
+              <>
+                <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
                 <thead>
                   <tr style={{ background: '#f1f5f9', color: '#475569', borderBottom: `2px solid ${borderLight}` }}>
@@ -2611,13 +2836,13 @@ export default function CentroManagers() {
                       </div>
                     </th>
                     <th 
-                      onClick={() => handleSort('sede')} 
-                      style={{ padding: '1rem', cursor: 'pointer', userSelect: 'none', color: sortField === 'sede' ? '#b45309' : '#475569', background: sortField === 'sede' ? '#fef3c7' : 'transparent', transition: 'all 0.15s ease' }} 
-                      title="Ordenar por Sede y Equipo"
+                      onClick={() => handleSort('equipo')} 
+                      style={{ padding: '1rem', cursor: 'pointer', userSelect: 'none', color: (sortField === 'sede' || sortField === 'equipo') ? '#b45309' : '#475569', background: (sortField === 'sede' || sortField === 'equipo') ? '#fef3c7' : 'transparent', transition: 'all 0.15s ease' }} 
+                      title="Ordenar por # Número de Equipo y Sede"
                     >
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                        <span>Sede & Equipo</span>
-                        {sortField === 'sede' ? (
+                        <span># Equipo & Sede</span>
+                        {(sortField === 'sede' || sortField === 'equipo') ? (
                           sortDirection === 'asc' ? <ArrowUp size={14} color="#b45309" /> : <ArrowDown size={14} color="#b45309" />
                         ) : (
                           <ArrowUpDown size={14} style={{ opacity: 0.35 }} />
@@ -2699,12 +2924,17 @@ export default function CentroManagers() {
                           </div>
                         </td>
                         <td style={{ padding: '1rem' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', fontWeight: 600, color: textDark }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
+                            <span style={{ display: 'inline-flex', alignItems: 'center', background: '#eff6ff', color: '#1e40af', border: '1px solid #bfdbfe', padding: '0.15rem 0.5rem', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 800 }}>
+                              {m.numEquipo ? `#${m.numEquipo}` : (getTeamNumericValue(m) !== 999999 ? `#${getTeamNumericValue(m)}` : 'S/N')}
+                            </span>
+                            <span style={{ fontWeight: 700, color: textDark, fontSize: '0.88rem' }}>
+                              {String(m.equipo || 'Sin Equipo').replace(/\s*\(#\d+\)\s*/g, '').trim()}
+                            </span>
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.75rem', color: textMuted, marginTop: '0.25rem' }}>
                             <CountryFlag sede={m.sede} />
                             <span>{m.sede}</span>
-                          </div>
-                          <div style={{ fontSize: '0.8rem', color: '#475569', marginTop: '0.2rem', fontWeight: 600 }}>
-                            {m.equipo || 'Sin Equipo'} {m.numEquipo ? `(#${m.numEquipo})` : ''}
                           </div>
                         </td>
                         <td style={{ padding: '1rem' }}>
@@ -2783,13 +3013,222 @@ export default function CentroManagers() {
               </table>
             </div>
 
-            <div style={{ padding: '1rem', display: 'flex', justifyContent: 'space-between', borderTop: `1px solid ${borderLight}` }}>
-               <span style={{ fontSize: '0.85rem', color: textMuted }}>Página {currentPage} de {totalPages}</span>
-               <div style={{ display: 'flex', gap: '0.5rem' }}>
-                 <button disabled={currentPage===1} onClick={() => setCurrentPage(p=>p-1)} style={{ padding: '0.3rem 0.8rem', borderRadius: '4px', border: `1px solid ${borderLight}`, background: '#fff', cursor: 'pointer' }}>Ant</button>
-                 <button disabled={currentPage>=totalPages} onClick={() => setCurrentPage(p=>p+1)} style={{ padding: '0.3rem 0.8rem', borderRadius: '4px', border: `1px solid ${borderLight}`, background: '#fff', cursor: 'pointer' }}>Sig</button>
-               </div>
-            </div>
+                <div style={{ padding: '1rem', display: 'flex', justifyContent: 'space-between', borderTop: `1px solid ${borderLight}` }}>
+                   <span style={{ fontSize: '0.85rem', color: textMuted }}>Página {currentPage} de {totalPages}</span>
+                   <div style={{ display: 'flex', gap: '0.5rem' }}>
+                     <button disabled={currentPage===1} onClick={() => setCurrentPage(p=>p-1)} style={{ padding: '0.3rem 0.8rem', borderRadius: '4px', border: `1px solid ${borderLight}`, background: '#fff', cursor: 'pointer' }}>Ant</button>
+                     <button disabled={currentPage>=totalPages} onClick={() => setCurrentPage(p=>p+1)} style={{ padding: '0.3rem 0.8rem', borderRadius: '4px', border: `1px solid ${borderLight}`, background: '#fff', cursor: 'pointer' }}>Sig</button>
+                   </div>
+                </div>
+              </>
+            ) : (
+              /* VISTA POR EQUIPOS (ORGANIZADA POR TARJETAS Y EQUIPO NUMÉRICO) */
+              <div style={{ padding: '1.5rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '1.5rem' }}>
+                {groupedManagersByTeam.map(team => {
+                  const capitanes = team.members.filter(m => (m.rol || '').toLowerCase().includes('capitan'));
+                  const teamTrainers = Array.from(new Set(
+                    team.members.flatMap(m => m.entrenador ? m.entrenador.split(',').map(t => t.trim()) : []).filter(Boolean)
+                  ));
+
+                  return (
+                    <div 
+                      key={team.key} 
+                      style={{ 
+                        background: '#ffffff', 
+                        borderRadius: '12px', 
+                        border: `1px solid ${borderLight}`, 
+                        borderTop: `4px solid ${SEDE_COLORS[team.sede] || '#3b82f6'}`,
+                        boxShadow: '0 2px 5px rgba(0,0,0,0.05)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between'
+                      }}
+                    >
+                      <div style={{ padding: '1.2rem' }}>
+                        {/* HEADER DE EQUIPO */}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.8rem', gap: '0.5rem' }}>
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
+                              <CountryFlag sede={team.sede} />
+                              <span style={{ color: '#1e40af', background: '#eff6ff', padding: '0.15rem 0.45rem', borderRadius: '6px', fontSize: '0.85rem', fontWeight: 800, border: '1px solid #bfdbfe' }}>
+                                {team.numEquipo ? `#${team.numEquipo}` : (team.num !== 999999 ? `#${team.num}` : 'S/N')}
+                              </span>
+                              <h4 style={{ margin: 0, color: textDark, fontSize: '1rem', fontWeight: 800 }}>
+                                {team.equipo}
+                              </h4>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.3rem', fontSize: '0.75rem', color: textMuted }}>
+                              <span>📍 {team.sede}</span>
+                              <span>•</span>
+                              <span>👥 {team.members.length} {team.members.length === 1 ? 'integrante' : 'integrantes'}</span>
+                            </div>
+                          </div>
+
+                          {(userCanAdd || userCanAssign || canChangeStatus) && (
+                            <button
+                              onClick={() => handleOpenMergeTeams({ sede: team.sede, equipo: team.equipo, numEquipo: team.numEquipo, managers: team.members })}
+                              title="Unir este equipo"
+                              style={{ background: '#fffbeb', border: '1px solid #fde68a', color: '#b45309', padding: '0.2rem 0.5rem', borderRadius: '6px', cursor: 'pointer', fontSize: '0.72rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}
+                            >
+                              <GitMerge size={12} /> Unir
+                            </button>
+                          )}
+                        </div>
+
+                        {/* ENTRENADORES ASIGNADOS AL EQUIPO */}
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem', marginBottom: '1rem', alignItems: 'center' }}>
+                          <span style={{ fontSize: '0.72rem', color: textMuted, fontWeight: 600 }}>Entrenadores:</span>
+                          {teamTrainers.length > 0 ? (
+                            teamTrainers.map(t => (
+                              <button
+                                key={t}
+                                type="button"
+                                onClick={() => setTrainerCardModal(t)}
+                                style={{ background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe', padding: '0.15rem 0.45rem', borderRadius: '4px', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer' }}
+                              >
+                                🎓 {t}
+                              </button>
+                            ))
+                          ) : (
+                            <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>Sin Asignar</span>
+                          )}
+                        </div>
+
+                        {/* LISTA DE INTEGRANTES */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                          {team.members.map(m => {
+                            const isCap = (m.rol || '').toLowerCase().includes('capitan');
+                            return (
+                              <div 
+                                key={m.id} 
+                                style={{ 
+                                  padding: '0.6rem 0.8rem', 
+                                  borderRadius: '8px', 
+                                  background: isCap ? '#fffdf7' : '#f8fafc',
+                                  border: `1px solid ${isCap ? '#fef08a' : '#e2e8f0'}`,
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'space-between',
+                                  gap: '0.5rem'
+                                }}
+                              >
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                                    {isCap ? (
+                                      <span title="Capitán de Equipo" style={{ display: 'inline-flex', color: '#b45309' }}>
+                                        <Crown size={14} />
+                                      </span>
+                                    ) : null}
+                                    <span style={{ fontWeight: 700, color: textDark, fontSize: '0.85rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                      {m.nombre}
+                                    </span>
+                                  </div>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.2rem', fontSize: '0.72rem' }}>
+                                    {m.telefono ? (
+                                      <a href={getWhatsAppUrl(m.telefono, m.sede || filterSede)} target="_blank" rel="noreferrer" style={{ color: '#10b981', textDecoration: 'none', fontWeight: 600 }}>
+                                        📱 {m.telefono}
+                                      </a>
+                                    ) : (
+                                      <span style={{ color: '#94a3b8' }}>Sin tel</span>
+                                    )}
+                                    <span style={{ 
+                                      padding: '0.1rem 0.35rem', 
+                                      borderRadius: '4px', 
+                                      fontSize: '0.68rem', 
+                                      fontWeight: 700,
+                                      background: m.estado === 'Activo' ? '#dbeafe' : m.estado === 'Graduado' ? '#dcfce7' : '#fee2e2',
+                                      color: m.estado === 'Activo' ? '#2563eb' : m.estado === 'Graduado' ? '#16a34a' : '#dc2626'
+                                    }}>
+                                      {m.estado}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                                  <button
+                                    onClick={() => handleToggleLlamada(m.id, m.llamadaAsistio)}
+                                    title={`Llamada: ${m.llamadaAsistio || 'NO'}`}
+                                    style={{
+                                      padding: '0.25rem 0.5rem',
+                                      borderRadius: '6px',
+                                      border: 'none',
+                                      background: m.llamadaAsistio === 'SI' ? '#dcfce7' : '#fee2e2',
+                                      color: m.llamadaAsistio === 'SI' ? '#15803d' : '#b91c1c',
+                                      fontWeight: 700,
+                                      fontSize: '0.72rem',
+                                      cursor: 'pointer'
+                                    }}
+                                  >
+                                    {m.llamadaAsistio === 'SI' ? '✅ Asistió' : '❌ Falta'}
+                                  </button>
+                                  {(userCanWriteNota || userCanViewAllNotas) && (
+                                    <button
+                                      onClick={() => setNotaModal(m)}
+                                      title="Notas"
+                                      style={{ background: '#fefce8', border: '1px solid #fde047', color: '#854d0e', padding: '0.3rem', borderRadius: '5px', cursor: 'pointer', fontSize: '0.7rem' }}
+                                    >
+                                      📝
+                                    </button>
+                                  )}
+                                  {userCanAdd && (
+                                    <button
+                                      onClick={() => handleOpenEditIndividual(m)}
+                                      title="Editar Integrante"
+                                      style={{ background: '#f1f5f9', border: `1px solid ${borderLight}`, color: '#0f172a', padding: '0.3rem', borderRadius: '5px', cursor: 'pointer' }}
+                                    >
+                                      <Edit3 size={13} />
+                                    </button>
+                                  )}
+                                  {userCanAdd && (
+                                    <button
+                                      onClick={() => setDeleteConfirm({ type: 'manager', id: m.id, name: m.nombre })}
+                                      title="Eliminar Integrante"
+                                      style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626', padding: '0.3rem', borderRadius: '5px', cursor: 'pointer' }}
+                                    >
+                                      <Trash2 size={13} />
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* PIE DE TARJETA CON ACCIONES */}
+                      <div style={{ padding: '0.8rem 1.2rem', background: '#f8fafc', borderTop: `1px solid ${borderLight}`, borderBottomLeftRadius: '12px', borderBottomRightRadius: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: '0.72rem', color: textMuted }}>
+                          {capitanes.length > 0 ? `👑 ${capitanes.map(c => c.nombre).join(', ')}` : '⚠️ Sin Capitán'}
+                        </span>
+                        {userCanAdd && (
+                          <button
+                            onClick={() => {
+                              setNewManager(prev => ({
+                                ...prev,
+                                sede: team.sede,
+                                equipo: team.equipo,
+                                numEquipo: team.numEquipo || '',
+                                rol: 'Manager'
+                              }));
+                              setAddMode('individual');
+                              setShowModal(true);
+                            }}
+                            style={{ background: 'transparent', border: 'none', color: '#2563eb', fontWeight: 700, fontSize: '0.75rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}
+                          >
+                            <Plus size={13} /> Agregar Integrante
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+                {groupedManagersByTeam.length === 0 && (
+                  <div style={{ gridColumn: '1 / -1', padding: '3rem', textAlign: 'center', color: textMuted }}>
+                    No hay equipos con los filtros seleccionados.
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 
@@ -2973,7 +3412,10 @@ export default function CentroManagers() {
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                             <h3 style={{ margin: 0, color: textDark, fontSize: '1.15rem', display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 800 }}>
                               <CountryFlag sede={t.sede} />
-                              {t.equipo || 'Equipo'} {t.numEquipo ? `(#${t.numEquipo})` : ''}
+                              <span style={{ color: '#1e40af', background: '#eff6ff', padding: '0.15rem 0.5rem', borderRadius: '6px', fontSize: '0.9rem', border: '1px solid #bfdbfe' }}>
+                                {t.numEquipo ? `#${t.numEquipo}` : (getTeamNumericValue(t) !== 999999 ? `#${getTeamNumericValue(t)}` : 'S/N')}
+                              </span>
+                              <span>{String(t.equipo || 'Equipo').replace(/\s*\(#\d+\)\s*/g, '').trim()}</span>
                             </h3>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                               {(userCanAdd || userCanAssign || canChangeStatus) && (
@@ -5108,7 +5550,7 @@ export default function CentroManagers() {
           <div style={{ background: bgCard, width: '100%', maxWidth: '540px', borderRadius: '12px', padding: '2rem', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.15)', border: `1px solid ${borderLight}` }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
               <h2 style={{ margin: 0, color: textDark, fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 800 }}>
-                <CountryFlag sede={groupModal.sede} /> {groupModal.equipo} {groupModal.numEquipo ? `(#${groupModal.numEquipo})` : ''}
+                <CountryFlag sede={groupModal.sede} /> {formatTeamDisplay(groupModal.equipo, groupModal.numEquipo)}
               </h2>
               <span style={{ fontSize: '0.8rem', background: '#f1f5f9', padding: '0.2rem 0.6rem', borderRadius: '12px', fontWeight: 700, color: '#475569' }}>
                 {groupModal.managers.length} Integrantes
@@ -5245,7 +5687,7 @@ export default function CentroManagers() {
                 </button>
               </div>
               <p style={{ margin: '0 0 1rem 0', fontSize: '0.8rem', color: textMuted }}>
-                {notaModal.equipo || 'Sin equipo'} {notaModal.numEquipo ? `(#${notaModal.numEquipo})` : ''} · {notaModal.sede}
+                {formatTeamDisplay(notaModal.equipo, notaModal.numEquipo)} · {notaModal.sede}
                 {!userCanViewAllNotas && ' · Solo ves las notas que TÚ escribiste'}
               </p>
 

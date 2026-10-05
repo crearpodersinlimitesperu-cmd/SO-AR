@@ -27,7 +27,7 @@ import { getVenueForTraining } from '../data/venuesData';
 import LegalOnboardingModal from '../components/LegalOnboardingModal';
 import { getLegalStatusByParticipant } from '../services/legalSignatureService';
 
-import { ROLE_DISPLAY_NAMES, normalizeSede } from '../data/usersData';
+import { ROLE_DISPLAY_NAMES, normalizeSede, findUserByAnyEmail } from '../data/usersData';
 import {
   canAssignTrainer, canViewAllManagers, isDireccionRole, isGlobalQTCoordinator,
   canAccessAgendaTimeBoxing, canAccessFlyersC1, canAccessCalendarioMJ,
@@ -1149,20 +1149,35 @@ export default function Home() {
 
   // Cálculo de tareas del usuario
   const userEmail = (currentUser?.email || '').toLowerCase().trim();
-  // FIX 16/09/2026: normaliza el typo de dominio conocido (crearpls.com ->
-  // crearpsl.net, ver ChecklistContext.jsx/TaskDetailModal.jsx) también aquí,
-  // para que "Mis Tareas Asignadas" no pierda silenciosamente tareas creadas
-  // o asignadas con el dominio viejo/typo guardado en Firestore.
-  const normalizeEm = (e) => (e || '').toLowerCase().trim().replace('@crearpls.com', '@crearpsl.net');
+  // Normaliza errores tipográficos en dominios (@crearpls.com / @crearpsl.com -> @crearpsl.net)
+  const normalizeEm = (e) => (e || '').toLowerCase().trim()
+    .replace('@crearpls.com', '@crearpsl.net')
+    .replace('@crearpsl.com', '@crearpsl.net');
+
+  const isEmailMatch = (e1, e2) => {
+    const n1 = normalizeEm(e1);
+    const n2 = normalizeEm(e2);
+    if (!n1 || !n2) return false;
+    if (n1 === n2) return true;
+    try {
+      const u1 = findUserByAnyEmail(n1);
+      const u2 = findUserByAnyEmail(n2);
+      if (u1 && u2 && (u1.id === u2.id || normalizeEm(u1.email) === normalizeEm(u2.email))) {
+        return true;
+      }
+    } catch (err) {}
+    return false;
+  };
+
   const activeRole = currentUser?.appRole || currentUser?.role || 'gerente';
   const isExecutiveUser = ['ceo', 'cco', 'socio', 'super_admin', 'direccion'].includes(activeRole) ||
                           userEmail === 'fer.aragon@crearpsl.net' ||
                           userEmail === 'paul.sosa@crearpsl.net';
 
   const myTasksForProgress = allTasks.filter(t => {
-    const isAssigned = (t.assignedToEmails && t.assignedToEmails.some(e => normalizeEm(e) === normalizeEm(userEmail))) ||
-                       (t.assignedToEmail && normalizeEm(t.assignedToEmail) === normalizeEm(userEmail)) ||
-                       (t.collaborators && t.collaborators.map(c => normalizeEm(c)).includes(normalizeEm(userEmail)));
+    const isAssigned = (t.assignedToEmails && t.assignedToEmails.some(e => isEmailMatch(e, userEmail))) ||
+                       (t.assignedToEmail && isEmailMatch(t.assignedToEmail, userEmail)) ||
+                       (t.collaborators && t.collaborators.some(c => isEmailMatch(c, userEmail)));
     if (isAssigned) return true;
     if (isExecutiveUser) return false; // Roles ejecutivos / Fer y Paul no tienen tareas operativas por defecto
     if (activeRole === 'consolidado') {
@@ -1420,15 +1435,15 @@ export default function Home() {
 
   const tareasQueHeAsignado = [
     ...(allTasks || [])
-      .filter(t => normalizeEm(t.createdBy) === normalizeEm(userEmail) && userEmail)
+      .filter(t => isEmailMatch(t.createdBy, userEmail) && userEmail)
       .map(t => ({ ...t, __direction: 'asignada_por_mi' })),
     ...(allTasks || [])
       .filter(t => {
-        const yaEsCreador = normalizeEm(t.createdBy) === normalizeEm(userEmail);
+        const yaEsCreador = isEmailMatch(t.createdBy, userEmail);
         if (yaEsCreador || !userEmail) return false; // evita duplicar autoasignadas
-        return (t.assignedToEmails && t.assignedToEmails.some(e => normalizeEm(e) === normalizeEm(userEmail))) ||
-               (t.assignedToEmail && normalizeEm(t.assignedToEmail) === normalizeEm(userEmail)) ||
-               (t.collaborators && t.collaborators.map(c => normalizeEm(c)).includes(normalizeEm(userEmail)));
+        return (t.assignedToEmails && t.assignedToEmails.some(e => isEmailMatch(e, userEmail))) ||
+               (t.assignedToEmail && isEmailMatch(t.assignedToEmail, userEmail)) ||
+               (t.collaborators && t.collaborators.some(c => isEmailMatch(c, userEmail)));
       })
       .map(t => ({ ...t, __direction: 'asignada_a_mi' }))
   ]

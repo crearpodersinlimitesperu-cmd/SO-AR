@@ -1,4 +1,4 @@
-﻿import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import { db, auth } from '../services/firebase';
 import { collection, onSnapshot, doc, updateDoc, setDoc, writeBatch, addDoc, query, where, orderBy, limit, getDocs, getDoc } from 'firebase/firestore';
 import { checklistData } from '../data/checklistData';
@@ -285,6 +285,7 @@ export function ChecklistProvider({ children }) {
     try {
       const sanitizeEmail = (e) => (typeof e === 'string' ? e.trim().toLowerCase()
         .replace('@crearpls.com', '@crearpsl.net')
+        .replace('@crearpsl.com', '@crearpsl.net')
         .replace(/ketherine\.aguirre@/gi, 'katherine.aguirre@')
         .replace(/coodinacion\.administrativa@/gi, 'coordinacion.administrativa@') : '');
 
@@ -382,8 +383,9 @@ export function ChecklistProvider({ children }) {
         notifyTaskCompletedToAssigner(prevData, updates, taskId);
       }
     } catch (err) {
-      console.warn("writeTaskDoc local update fallback:", err);
+      console.error("writeTaskDoc error:", err);
       setTasks(prev => prev.map(t => t.id === taskId ? { ...t, ...updates } : t));
+      throw err;
     }
   };
 
@@ -400,15 +402,17 @@ export function ChecklistProvider({ children }) {
           let sedeCompleted = data.completed;
           let sedeStatus = data.status;
           
-          if (data.completions) {
+          if (data.completions && !data.isCustom && !doc.id.startsWith('custom_') && !data.assignedToEmail && !data.assignedToEmails) {
             const cycleKey = currentCycle?.id ? `${userSede}__${currentCycle.id}` : null;
             const myCycleData = cycleKey ? data.completions[cycleKey] : null;
             const mySedeData = data.completions[userSede];
-            const effective = (myCycleData && myCycleData.completed !== undefined)
-              ? myCycleData
-              : (mySedeData || { completed: false, status: 'Pendiente' });
-            sedeCompleted = effective.completed;
-            sedeStatus = effective.status;
+            if (myCycleData && myCycleData.completed !== undefined) {
+              sedeCompleted = myCycleData.completed;
+              sedeStatus = myCycleData.status;
+            } else if (mySedeData && mySedeData.completed !== undefined) {
+              sedeCompleted = mySedeData.completed;
+              sedeStatus = mySedeData.status;
+            }
           }
 
           return {
@@ -601,6 +605,7 @@ export function ChecklistProvider({ children }) {
     } catch (error) {
       console.error("Error updating task details:", error);
       showToast("No se pudo actualizar la tarea.", "error");
+      throw error;
     }
   };
 
@@ -684,6 +689,7 @@ export function ChecklistProvider({ children }) {
       // Sanitizar correos para prevenir errores de dominio y ortografía (ej: crearpls.com -> crearpsl.net, ketherine -> katherine, coodinacion -> coordinacion)
       const sanitizeEmail = (e) => (typeof e === 'string' ? e.trim().toLowerCase()
         .replace('@crearpls.com', '@crearpsl.net')
+        .replace('@crearpsl.com', '@crearpsl.net')
         .replace(/ketherine\.aguirre@/gi, 'katherine.aguirre@')
         .replace(/coodinacion\.administrativa@/gi, 'coordinacion.administrativa@') : '');
       const cleanData = { ...taskData };
@@ -815,6 +821,7 @@ export function ChecklistProvider({ children }) {
 
       const sanitizeEmail = (e) => (typeof e === 'string' ? e.trim().toLowerCase()
         .replace('@crearpls.com', '@crearpsl.net')
+        .replace('@crearpsl.com', '@crearpsl.net')
         .replace(/ketherine\.aguirre@/gi, 'katherine.aguirre@')
         .replace(/coodinacion\.administrativa@/gi, 'coordinacion.administrativa@') : '');
       const cleanUpdatedData = { ...updatedData };
@@ -1367,6 +1374,7 @@ export function ChecklistProvider({ children }) {
         completed: allCompleted,
         status: allCompleted ? 'Completada' : (anyCompleted ? 'En Progreso' : 'Pendiente'),
         progressPercentage: overallPercent,
+        progress: overallPercent,
         // FIX 16/09/2026: fecha real de cumplimiento a nivel de tarea (no solo
         // por colaborador), trazabilidad pedida por Jose. Conserva la fecha
         // si ya existia (no se pisa en actualizaciones posteriores); nunca se

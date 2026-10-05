@@ -642,6 +642,40 @@ Tras el reporte de incidencias donde firmas completadas figuraban en el panel ad
 
 ---
 
+## 16. Centro de Managers: Organización Numérica de Equipos y Blindaje de Persistencia en Checklist (Zero-Loss)
+
+### 16.1. Organización Numérica Estricta y Vista por Equipos en Centro de Managers (`/centro-managers`)
+* **Problema:** En el Centro de Managers, las escuadras aparecían desordenadas alfabéticamente (por ejemplo, el equipo 91 y 92 aparecían antes del 81, o agrupaciones mezcladas), dificultando la auditoría de coordinadores y directores territoriales.
+* **Solución Implementada (`src/pages/CentroManagers.jsx`):**
+  1. **Algoritmo de Ordenamiento Natural Numérico (`getTeamNumericValue`):**
+     - Extrae la cifra entera del nombre o identificador del equipo (ej. `"Equipo 30 Lima" -> 30`, `"UIO-EQ-126" -> 126`, `"Equipo 81" -> 81`).
+     - Ordena de manera estrictamente ascendente (1, 2, 3 ... 81, 91, 92 ... 126).
+  2. **Formato Visual Canónico de Badges:**
+     - El número de equipo siempre se visualiza de primero destacado: `#{numEquipo} - {Nombre / Sede}` (ej. `#30 Equipo 30 Lima`, `#126 UIO-EQ-126`).
+  3. **Selector de Vistas:**
+     - `[📋 Vista Tabla]`: Tabla compacta ordenada ascendentemente por número de equipo.
+     - `[🗂️ Por Equipos]`: Vista en cuadrícula de tarjetas de equipos (`groupedManagersByTeam`), mostrando resumen de managers, llamada al 7mo día, coordinadores y entrenadores asociados.
+
+---
+
+### 16.2. Blindaje de Persistencia y Progreso en Tareas de Checklist (Zero Data Loss)
+* **Problema Reportado:** Los usuarios (como Erika Gavilánez) completaban su tarea reiteradas veces y siempre volvía al 0%, perdiendo la información tras recargar o cerrar la ventana.
+* **Causas Identificadas y Subsanadas:**
+  1. **Reglas de Seguridad Firestore (`firestore.rules`):**
+     - `isOperationalProgressUpdate()` rechazaba escrituras porque los clientes enviaban campos de auditoría temporal (`updatedAt`, `updated_at`, `deadline`) no incluidos en la lista blanca de `hasOnly()`.
+     - Se actualizó la función para permitir explícitamente `'updatedAt'`, `'updated_at'`, `'deadline'` sin generar errores `PERMISSION_DENIED`.
+  2. **Resolución y Normalización de Correos (`findUserByAnyEmail`):**
+     - Corrección del error tipográfico histórico `@crearpls.com` y `@crearpsl.com` a `@crearpsl.net`.
+     - Soporte cruzado de aliases (ej. correos personales de Gmail mapeados a sus correos institucionales de Causa OS).
+     - En `TaskDetailModal.jsx`, `myEmailKey` y `collaboratorsList` ahora utilizan concordancia semántica multi-correo, impidiendo que el colaborador autenticado sea omitido de `assigneeProgress`.
+  3. **Protección en `ChecklistContext.jsx`:**
+     - En `writeTaskDoc` y `updateTaskDetails`, los errores de Firestore se propagan con `throw err` para que la interfaz nunca finja un éxito falso.
+     - En el listener `onSnapshot`, se blindó la resolución de tareas personalizadas (`custom_`) y con asignaciones directas (`assignedToEmail` / `assignedToEmails`) para que un `data.completions` vacío o sin la clave de la sede activa no fuerce indebidamente `completed: false` y `status: 'Pendiente'`.
+  4. **Script de Auto-Recuperación de Datos (`scripts/recoverErikaTask.mjs`):**
+     - Integrado en el pipeline de despliegue (`deploy-rules.yml`) con credenciales de cuenta de servicio para restaurar automáticamente a 100% el avance de colaboradores cuyas tareas hubiesen quedado congeladas en 0%.
+
+---
+
 > 📜 **Mandato de la Caja Negra:**
 > Esta Caja Negra es la fuente viva de verdad de CPSL y Causa OS. Debe consultarse antes de cualquier cambio de arquitectura y actualizarse de inmediato tras cada nueva funcionalidad, regla o descubrimiento operativo.
 

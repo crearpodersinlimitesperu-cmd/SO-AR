@@ -135,7 +135,8 @@ service cloud.firestore {
           'completed', 'status', 'completions', 'progress', 'progressPercentage',
           'evidence_url', 'evidenceUrl', 'date', 'googleSynced',
           'assigneeProgress', 'evidences', 'comments', 'notes', 'description',
-          'progressNotes', 'completedAt', 'lastUpdated', 'lastUpdatedBy'
+          'progressNotes', 'completedAt', 'lastUpdated', 'lastUpdatedBy',
+          'updatedAt', 'updated_at', 'deadline'
         ]);
     }
 

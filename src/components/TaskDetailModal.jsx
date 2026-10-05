@@ -13,11 +13,35 @@ import { useUI } from '../context/UIContext';
 import { getFlagForSede } from '../utils/flags';
 import { uploadEvidenceDocument } from '../services/googleDriveService';
 import { celebrateVictory } from '../utils/neuroFeedback';
-import { usersData, isForeignTask } from '../data/usersData';
+import { usersData, isForeignTask, findUserByAnyEmail } from '../data/usersData';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { canSendOperationalCommunications } from '../config/permissions';
 import { deadlineTimeReference, timeZoneForSede, zonedDateInputParts, zonedDateTimeToIso } from '../utils/timezones';
+
+export const normalizeTaskEmail = (e) => {
+  if (!e) return '';
+  return String(e).toLowerCase().trim()
+    .replace('@crearpls.com', '@crearpsl.net')
+    .replace('@crearpsl.com', '@crearpsl.net');
+};
+
+export const isSameUserEmail = (e1, e2) => {
+  const n1 = normalizeTaskEmail(e1);
+  const n2 = normalizeTaskEmail(e2);
+  if (!n1 || !n2) return false;
+  if (n1 === n2) return true;
+  try {
+    const u1 = findUserByAnyEmail(n1);
+    const u2 = findUserByAnyEmail(n2);
+    if (u1 && u2 && (u1.id === u2.id || normalizeTaskEmail(u1.email) === normalizeTaskEmail(u2.email))) {
+      return true;
+    }
+  } catch (e) {
+    // fallback
+  }
+  return false;
+};
 const getCountdown = (deadlineIso) => {
   if (!deadlineIso) return { label: 'Sin fecha límite', color: '#9ca3af', bg: 'rgba(156,163,175,0.12)', border: '#9ca3af', overdue: false };
   const deadline = new Date(deadlineIso).getTime();
@@ -145,25 +169,39 @@ export default function TaskDetailModal({
         ? task.assignedToEmails
         : (task.assignedToEmail ? [task.assignedToEmail] : []);
 
-      const uEmail = (currentUser?.email || '').toLowerCase().trim();
-      const normalizeEm = (e) => (e || '').toLowerCase().trim().replace('@crearpls.com', '@crearpsl.net');
+      const uEmail = normalizeTaskEmail(currentUser?.email);
 
       const existingMap = task.assigneeProgress || {};
       const newMap = {};
       let foundMyProgress = initialProgress;
       let foundMyCompleted = task.completed === true || initialProgress === 100;
 
-      rawAssigned.forEach(email => {
-        const clean = (email || '').toLowerCase().trim();
-        const existingKey = Object.keys(existingMap).find(k => 
-          k.toLowerCase().trim() === clean || normalizeEm(k) === normalizeEm(clean)
-        );
-        const u = usersData.find(usr => usr.email?.toLowerCase() === clean);
+      // Unir todas las posibles claves: asignados formales + claves existentes en el mapa
+      const allCandidateEmails = [...new Set([
+        ...rawAssigned.map(normalizeTaskEmail),
+        ...Object.keys(existingMap).map(normalizeTaskEmail)
+      ])].filter(Boolean);
+
+      // Si el usuario actual está en la tarea pero no está en la lista de candidatos, agregarlo
+      if (uEmail && !allCandidateEmails.some(e => isSameUserEmail(e, uEmail))) {
+        if (
+          (task.assignedToEmail && isSameUserEmail(task.assignedToEmail, uEmail)) ||
+          (Array.isArray(task.collaborators) && task.collaborators.some(c => isSameUserEmail(c, uEmail)))
+        ) {
+          allCandidateEmails.push(uEmail);
+        }
+      }
+
+      allCandidateEmails.forEach(clean => {
+        const existingKey = Object.keys(existingMap).find(k => isSameUserEmail(k, clean));
+        const u = findUserByAnyEmail(clean);
         const entry = existingKey ? existingMap[existingKey] : null;
 
         const entryProg = typeof entry?.progress === 'number'
           ? entry.progress
-          : (entry?.completed ? 100 : (task.completed ? 100 : 0));
+          : (typeof entry?.progressPercentage === 'number'
+              ? entry.progressPercentage
+              : (entry?.completed ? 100 : (task.completed ? 100 : 0)));
         const entryComp = entry?.completed === true || entryProg === 100;
 
         newMap[clean] = {
@@ -175,7 +213,7 @@ export default function TaskDetailModal({
           progress: entryProg
         };
 
-        if (clean === uEmail || normalizeEm(clean) === normalizeEm(uEmail)) {
+        if (isSameUserEmail(clean, uEmail)) {
           foundMyProgress = entryProg;
           foundMyCompleted = entryComp;
         }
@@ -366,8 +404,7 @@ export default function TaskDetailModal({
     }
   };
 
-  const userEmail = (currentUser?.email || '').toLowerCase().trim();
-  const normalizeEm = (e) => (e || '').toLowerCase().trim().replace('@crearpls.com', '@crearpsl.net');
+  const userEmail = normalizeTaskEmail(currentUser?.email);
 
   // Formateo de asignados y logica de avance colaborativo
   const assignedList = useMemo(() => {
@@ -385,15 +422,13 @@ export default function TaskDetailModal({
 
   // Identificar si el usuario actual es uno de los asignados
   const myEmailKey = useMemo(() => {
-    return Object.keys(assigneeProgressMap).find(k => 
-      k.toLowerCase().trim() === userEmail || normalizeEm(k) === normalizeEm(userEmail)
-    ) || null;
+    return Object.keys(assigneeProgressMap).find(k => isSameUserEmail(k, userEmail)) || null;
   }, [assigneeProgressMap, userEmail]);
 
   // Lista estructurada de colaboradores para renderizado
   const collaboratorsList = useMemo(() => {
     return Object.entries(assigneeProgressMap).map(([email, info]) => {
-      const isMe = email.toLowerCase().trim() === userEmail || normalizeEm(email) === normalizeEm(userEmail);
+      const isMe = isSameUserEmail(email, userEmail);
       return {
         email,
         name: info.name || (resolveAssigneeName ? resolveAssigneeName(email) : email),
@@ -461,14 +496,18 @@ export default function TaskDetailModal({
     const isDone = val === 100;
     setMyCompleted(isDone);
 
-    if (myEmailKey) {
+    const targetKey = myEmailKey || normalizeTaskEmail(userEmail);
+    if (targetKey) {
       setAssigneeProgressMap(prev => ({
         ...prev,
-        [myEmailKey]: {
-          ...(prev[myEmailKey] || {}),
+        [targetKey]: {
+          ...(prev[targetKey] || {}),
+          name: prev[targetKey]?.name || currentUser?.displayName || currentUser?.name || targetKey,
+          role: prev[targetKey]?.role || currentUser?.role || '',
+          sede: prev[targetKey]?.sede || currentUser?.sede || task?.sede || 'Global',
           progress: val,
           completed: isDone,
-          completedAt: isDone ? (prev[myEmailKey]?.completedAt || new Date().toISOString()) : null
+          completedAt: isDone ? (prev[targetKey]?.completedAt || new Date().toISOString()) : null
         }
       }));
     }
@@ -648,21 +687,48 @@ export default function TaskDetailModal({
       const mainEvidenceUrl = evidencesList.length > 0 ? evidencesList[0].url : '';
       const latestComment = notesList.length > 0 ? notesList[0].text : (task.comments || '');
 
-      const finalOverall = isMultiAssignee ? computedOverallProgress : progress;
-      const allDone = isMultiAssignee 
-        ? (totalAssigneesCount > 0 && Object.values(assigneeProgressMap).every(v => v.completed === true || v.progress === 100))
-        : isCompleted;
+      // Garantizar que el mapa incluya siempre el avance actual del usuario
+      const targetKey = myEmailKey || normalizeTaskEmail(userEmail);
+      let mapToSave = { ...assigneeProgressMap };
+      if (isMultiAssignee && targetKey && typeof myProgress === 'number') {
+        const isDone = myProgress === 100 || myCompleted;
+        mapToSave[targetKey] = {
+          ...(mapToSave[targetKey] || {}),
+          name: mapToSave[targetKey]?.name || currentUser?.displayName || currentUser?.name || targetKey,
+          role: mapToSave[targetKey]?.role || currentUser?.role || '',
+          sede: mapToSave[targetKey]?.sede || currentUser?.sede || task?.sede || 'Global',
+          progress: myProgress,
+          completed: isDone,
+          completedAt: isDone ? (mapToSave[targetKey]?.completedAt || new Date().toISOString()) : null
+        };
+      }
+
+      let finalOverall = progress;
+      let allDone = isCompleted;
+
+      if (isMultiAssignee) {
+        const entries = Object.values(mapToSave);
+        if (entries.length > 0) {
+          const sum = entries.reduce((acc, c) => {
+            const val = typeof c.progress === 'number' ? c.progress : (c.completed ? 100 : 0);
+            return acc + val;
+          }, 0);
+          finalOverall = Math.round(sum / entries.length);
+          allDone = entries.every(v => v.completed === true || v.progress === 100);
+        }
+      }
 
       const finalCompleted = allDone || finalOverall === 100;
 
       // Registrar avance en la bitácora de notas si el usuario actual avanzó
       let updatedNotesList = [...notesList];
-      if (isMultiAssignee && myAssigneeEntry) {
+      if (isMultiAssignee && targetKey) {
+        const myName = mapToSave[targetKey]?.name || currentUser?.displayName || currentUser?.name || currentUser?.email || 'Usuario';
         const autoNote = {
           id: `note_auto_${Date.now()}`,
-          text: `Avance individual registrado por ${myAssigneeEntry.name}: ${myProgress}%. Avance general del equipo: ${finalOverall}%.`,
+          text: `Avance individual registrado por ${myName}: ${myProgress}%. Avance general del equipo: ${finalOverall}%.`,
           createdAt: new Date().toISOString(),
-          authorName: currentUser?.displayName || currentUser?.name || currentUser?.email || 'Usuario',
+          authorName: myName,
           authorEmail: currentUser?.email || '',
           progressPercentage: finalOverall
         };
@@ -671,6 +737,7 @@ export default function TaskDetailModal({
 
       const updates = {
         progressPercentage: finalOverall,
+        progress: finalOverall,
         completed: finalCompleted,
         status: finalCompleted ? 'Completada' : (finalOverall > 0 ? 'En progreso' : 'Pendiente'),
         // FIX 16/09/2026: registrar fecha real de cumplimiento (trazabilidad,
@@ -681,7 +748,7 @@ export default function TaskDetailModal({
         // (finalCompleted=false), se limpia -- se resetea al volver a
         // completarse, nunca se inventa una fecha.
         completedAt: finalCompleted ? (task.completedAt || new Date().toISOString()) : null,
-        assigneeProgress: isMultiAssignee ? assigneeProgressMap : (task.assigneeProgress || {}),
+        assigneeProgress: isMultiAssignee ? mapToSave : (task.assigneeProgress || {}),
         evidenceUrl: mainEvidenceUrl,
         evidence_url: mainEvidenceUrl,
         evidences: evidencesList,
@@ -690,7 +757,8 @@ export default function TaskDetailModal({
         description: task.description || task.notes || task.comments || '',
         progressNotes: updatedNotesList,
         lastUpdated: new Date().toISOString(),
-        lastUpdatedBy: currentUser?.email || ''
+        lastUpdatedBy: currentUser?.email || '',
+        updatedAt: new Date().toISOString()
       };
 
       await updateTaskDetails(task.id, updates);
