@@ -272,7 +272,32 @@ function buildCycleForEquipo(sedeEvents, equipoStr, sedeCode, anchorDate) {
 
   const c1 = equipoEvents.find(e => (e.nombre || e.name) === 'CAPITULO UNO');
   const c2 = equipoEvents.find(e => (e.nombre || e.name) === 'CAPITULO DOS');
-  const mj = equipoEvents.find(e => (e.nombre || e.name) === 'MAESTRIA DEL JUEGO');
+  let mj = equipoEvents.find(e => (e.nombre || e.name) === 'MAESTRIA DEL JUEGO');
+
+  // Si no tiene MJ explícito con el número de equipo (en el Sheet el MJ suele tener equipo en blanco),
+  // buscamos la Maestría del Juego de la sede que corresponde a este ciclo:
+  // la que inicia inmediatamente después o simultáneamente a C2 (hasta +60 días)
+  if (!mj) {
+    let refDt = null;
+    if (c2) {
+      refDt = new Date((c2.fecha_inicio || c2.start).replace('Z', ''));
+    } else if (c1) {
+      refDt = new Date((c1.fecha_inicio || c1.start).replace('Z', ''));
+      refDt.setDate(refDt.getDate() + 14);
+    } else if (anchorDate) {
+      refDt = new Date(anchorDate);
+    }
+
+    if (refDt) {
+      const minMjTime = refDt.getTime() - (2 * 24 * 60 * 60 * 1000);
+      const maxMjTime = refDt.getTime() + (60 * 24 * 60 * 60 * 1000);
+      mj = sedeEvents.find(e => {
+        if ((e.nombre || e.name) !== 'MAESTRIA DEL JUEGO') return false;
+        const eDt = new Date((e.fecha_inicio || e.start).replace('Z', ''));
+        return eDt.getTime() >= minMjTime && eDt.getTime() <= maxMjTime;
+      });
+    }
+  }
 
   // Mejoramos la visualización del nombre si viene con asteriscos o delimitadores
   let displayNombre = equipoStr.replace(/\*/g, ', ');
@@ -300,21 +325,28 @@ function buildCycleForEquipo(sedeEvents, equipoStr, sedeCode, anchorDate) {
 // ciclo ya armado, para poder calcularla tanto para el ciclo único de siempre como
 // para cada equipo elegido manualmente en Quito.
 function computeStageForCycle(active, today) {
-  if (!active.c1_start) {
-      return 'PRE-C1';
-  }
-
-  const c1Start = new Date(active.c1_start.replace('Z', ''));
-  const c1End = new Date((active.c1_end || active.c1_start).replace('Z', ''));
-  c1End.setHours(23, 59, 59);
+  let c1Start = active.c1_start ? new Date(active.c1_start.replace('Z', '')) : null;
+  let c1End = active.c1_end ? new Date((active.c1_end || active.c1_start).replace('Z', '')) : null;
+  if (c1End) c1End.setHours(23, 59, 59);
 
   const c2Start = active.c2_start ? new Date(active.c2_start.replace('Z', '')) : new Date('2099-01-01');
-  const c2End = active.c2_end ? new Date((active.c2_end || active.c2_start).replace('Z', '')) : new Date('2099-01-01');
+  const c2End = active.c2_end ? new Date((active.c2_end || active.c2_start).replace('Z', '')) : new Date(c2Start.getTime() + 3 * 24 * 60 * 60 * 1000);
   c2End.setHours(23, 59, 59);
 
   const maestriaStart = active.maestria_start ? new Date(active.maestria_start.replace('Z', '')) : new Date('2099-01-01');
-  const maestriaEnd = active.maestria_end ? new Date((active.maestria_end || active.maestria_start).replace('Z', '')) : new Date('2099-01-01');
+  const maestriaEnd = active.maestria_end ? new Date((active.maestria_end || active.maestria_start).replace('Z', '')) : new Date(maestriaStart.getTime() + 2 * 24 * 60 * 60 * 1000);
   maestriaEnd.setHours(23, 59, 59);
+
+  // Si c1_start no vino en la hoja (porque ocurrió en meses previos o solo se listó desde C2):
+  if (!c1Start) {
+    if (active.c2_start) {
+      c1Start = new Date(c2Start.getTime() - 21 * 24 * 60 * 60 * 1000);
+      c1End = new Date(c1Start.getTime() + 2 * 24 * 60 * 60 * 1000);
+      c1End.setHours(23, 59, 59);
+    } else {
+      return 'PRE-C1';
+    }
+  }
 
   const gate1Date = new Date(c1Start);
   gate1Date.setDate(gate1Date.getDate() - 21);
