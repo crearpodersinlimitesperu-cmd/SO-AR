@@ -3313,7 +3313,18 @@
                     const normSearch = typeof normalizarTextoBusqueda === 'function' ? normalizarTextoBusqueda(rawT) : upper;
                     foundKey = Object.keys(trainerData || {}).find(k => {
                         const kn = typeof normalizarTextoBusqueda === 'function' ? normalizarTextoBusqueda(k) : k;
-                        return kn === normSearch || kn.includes(normSearch) || normSearch.includes(kn);
+                        if (kn === normSearch || kn.includes(normSearch) || normSearch.includes(kn)) return true;
+                        
+                        const normLegal = typeof normalizarTextoBusqueda === 'function' ? normalizarTextoBusqueda(legal) : legalUpper;
+                        if (kn === normLegal || kn.includes(normLegal) || normLegal.includes(kn)) return true;
+
+                        const wordsK = kn.split(/\s+/).filter(Boolean);
+                        const wordsL = normSearch.split(/\s+/).filter(Boolean);
+                        const wordsLegal = normLegal.split(/\s+/).filter(Boolean);
+
+                        const allKinL = wordsK.every(w => wordsL.includes(w) || wordsLegal.includes(w));
+                        const allLinK = wordsL.every(w => wordsK.includes(w)) || wordsLegal.every(w => wordsK.includes(w));
+                        return allKinL || allLinK;
                     });
                 }
                 const td = foundKey ? trainerData[foundKey] : {

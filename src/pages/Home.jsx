@@ -2856,10 +2856,29 @@ export default function Home() {
                     const rawProfileEvents = (events || []).map(event => {
                       const keyWithTeam = publicAssignmentEventKey(event);
                       const keyNoTeam = publicAssignmentEventKeyNoTeam(event);
-                      const change =
-                        publishedOverrides[event.__assignmentKey] ||
-                        publishedOverrides[keyWithTeam] ||
-                        publishedOverrides[keyNoTeam];
+                      
+                      const findLooseMatch = (dict) => {
+                        const datePrefixEnd = keyWithTeam.indexOf('__');
+                        if (datePrefixEnd === -1) return null;
+                        const suffixWithTeam = keyWithTeam.slice(datePrefixEnd);
+                        const suffixNoTeam = keyNoTeam.slice(keyNoTeam.indexOf('__'));
+                        
+                        // Exact match
+                        if (dict[event.__assignmentKey]) return dict[event.__assignmentKey];
+                        if (dict[keyWithTeam]) return dict[keyWithTeam];
+                        if (dict[keyNoTeam]) return dict[keyNoTeam];
+                        
+                        // Loose match (ignore date)
+                        for (const k of Object.keys(dict)) {
+                          if (k.endsWith(suffixWithTeam)) return dict[k];
+                        }
+                        for (const k of Object.keys(dict)) {
+                          if (k.endsWith(suffixNoTeam)) return dict[k];
+                        }
+                        return null;
+                      };
+
+                      const change = findLooseMatch(publishedOverrides);
                       if (!change) return event;
                       return {
                         ...event,
@@ -2874,12 +2893,29 @@ export default function Home() {
                     const assignmentForEvent = (event) => {
                       const keyWithTeam = publicAssignmentEventKey(event);
                       const keyNoTeam = publicAssignmentEventKeyNoTeam(event);
-                      return (
-                        publicTrainerAssignments[event.__assignmentKey] ||
-                        publicTrainerAssignments[keyWithTeam] ||
-                        publicTrainerAssignments[keyNoTeam] ||
-                        null
-                      );
+                      
+                      const findLooseMatch = (dict) => {
+                        const datePrefixEnd = keyWithTeam.indexOf('__');
+                        if (datePrefixEnd === -1) return null;
+                        const suffixWithTeam = keyWithTeam.slice(datePrefixEnd);
+                        const suffixNoTeam = keyNoTeam.slice(keyNoTeam.indexOf('__'));
+                        
+                        // Exact match
+                        if (dict[event.__assignmentKey]) return dict[event.__assignmentKey];
+                        if (dict[keyWithTeam]) return dict[keyWithTeam];
+                        if (dict[keyNoTeam]) return dict[keyNoTeam];
+                        
+                        // Loose match (ignore date)
+                        for (const k of Object.keys(dict)) {
+                          if (k.endsWith(suffixWithTeam)) return dict[k];
+                        }
+                        for (const k of Object.keys(dict)) {
+                          if (k.endsWith(suffixNoTeam)) return dict[k];
+                        }
+                        return null;
+                      };
+                      
+                      return findLooseMatch(publicTrainerAssignments);
                     };
                     const assignedTrainerNamesForEvent = (event) => confirmedTrainerNames(assignmentForEvent(event));
 
