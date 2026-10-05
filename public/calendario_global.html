@@ -645,7 +645,7 @@
             (data[sede] || []).forEach(ev => {
               if (typeof ev.sheetTrainer === 'undefined') ev.sheetTrainer = ev.trainer || '';
               const assignment = byEvent.get(ev.sourceEventKey || assignmentEventKey(ev, sede));
-              const slots = assignment?.slots || {};
+              const slots = assignment || {};
               const orderedSlots = ['unico', 'Creación', 'Relación', 'Gratitud'];
               const confirmedSlots = orderedSlots
                 .filter(slot => slots[slot]?.entrenador)
