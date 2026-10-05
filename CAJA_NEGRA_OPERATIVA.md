@@ -496,6 +496,99 @@ Con el fin de profesionalizar y escalar la operación sin fricción ni pérdida 
 
 ---
 
+## 13. 🛡️ Gobernanza de Acceso, Centro de Managers, Disparadores de Correo y Reglas de Producción (Octubre 2026)
+
+### 13.1. Reglas Operativas y de Seguridad del Centro de Managers (`/centro-managers`)
+1. **Coordinadores de Maestría del Juego (CMJ):**
+   * **Alcance Territorial Estricto:** Los CMJ tienen facultades plenas para **crear, editar, graduar y eliminar managers exclusivamente dentro de su sede asignada** (`effectiveSede = normalizeSede(currentUser.sede)`).
+   * **Blindaje Inter-Sedes:** Ningún CMJ puede ver, modificar o eliminar managers pertenecientes a otras plazas a menos que ostente un rol corporativo global de Dirección o SuperAdmin.
+   * **Vista Corporativa (`viewAsTrainer = false`):** Visualizan la totalidad de los managers y equipos correspondientes a su sede, incluyendo directivos y gerentes de referencia institucional.
+2. **Entrenadores de Llamadas (`entrenador_llamadas` / `entrenador`):**
+   * **Aislamiento por Asignación:** Únicamente pueden visualizar los managers y equipos asignados formalmente a ellos (`isTrainerMatch`).
+   * **Operatividad Permitida:** Pueden consultar los datos de sus pupilos, actualizar sus teléfonos/correos, y registrar o editar el historial de llamadas individuales y reuniones grupales.
+   * **Restricción de Directorio:** Tienen terminantemente prohibido crear nuevos managers en sedes externas o eliminar registros del directorio corporativo central.
+3. **Caso Canónico Dual — Liliana Cubillo (Quito):**
+   * **Identidad y Sede Inmutable:** Liliana Lilibeth Cubillo Vera (`liliana.cubillo@crearpsl.net`, `lili.cubillo@crearpsl.net`). El sistema garantiza canónicamente en `AuthContext.jsx` que su sede efectiva sea siempre **`Quito`** (evitando caídas accidentales a sede `Global`).
+   * **Conmutación Inteligente de Vista:**
+     - En **Modo Corporativo (CMJ):** Visualiza los 12+ managers y todos los equipos activos de Quito con estadísticas globales de sede.
+     - En **Modo Entrenador (`viewAsTrainer = true`):** El sistema aplica coincidencia robusta sobre todos sus alias (`"Lili Cubillo"`, `"Liliana Cubillo"`, `"Lilibeth Cubillo"`, `"Liliana Lilibeth Cubillo Vera"`) y por coincidencia de correo en `entrenadorEmail`, mostrando únicamente sus managers asignados.
+   * **Resiliencia ante Desconexión:** Si Firestore o la red sufren demoras o denegaciones temporales, el listener en `CentroManagers.jsx` recurre a `INITIAL_MANAGERS`, evitando que la vista de managers y métricas quede en cero (`Directorio (0)`).
+
+---
+
+### 13.2. Ciclo Integral de Notificaciones Automáticas por Correo Electrónico
+El sistema de gestión de tareas operativas (`Checklist Operativo` y `Asignación de Tareas por Rol`) cuenta con un disparador transaccional automatizado en tres hitos críticos de la operación:
+
+1. **Al Asignar la Tarea:**
+   * Disparo inmediato de correo al colaborador asignado (`assignedToEmail`).
+   * Contenido: Título de la tarea, descripción detallada, prioridad (`URGENTE` / `ALTA` / `NORMAL`), fase operativa (`C1`, `C2`, `MJ`), sede y fecha límite de entrega.
+2. **Al Vencerse la Tarea:**
+   * Alerta preventiva y de retraso enviada a la persona asignada y a los canales de supervisión si la tarea sobrepasa su `dueDate` sin haber sido completada.
+3. **Al Completarse la Tarea (Rendición de Cuentas Directa):**
+   * Disparo automático de notificación de cumplimiento dirigido **al usuario que asignó originalmente la tarea (`assignedByEmail`)**.
+   * Garantiza que el líder o coordinador que delegó el trabajo reciba constancia inmediata de culminación con fecha, hora y notas de ejecución.
+4. **Infraestructura de Despacho:**
+   * Encolamiento directo en la colección Firestore `mail`.
+   * Procesamiento en segundo plano mediante `scripts/mailDispatcher.mjs` y el workflow de GitHub Actions `mail-dispatch.yml`.
+   * Salida certificada por servidor SMTP seguro Gmail TLS (`servidorcrearpsl@gmail.com`:465).
+
+---
+
+### 13.3. Restauración y Blindaje de Reglas de Seguridad en Cloud Firestore (`firestore.rules`)
+Tras auditoría de compatibilidad con las suscripciones reactivas (`onSnapshot`) de Causa OS, se restableció el modelo de colaboración operativa autenticada:
+
+1. **Colecciones Operativas con Acceso Autenticado Directo (`allow read, write: if isAuthenticated();`):**
+   * `staff_directory`
+   * `managers_directory`
+   * `excellence_standards`
+   * `kpi_reports`
+   * `learning_logs`
+   * `qt_directory`
+   * `success_patterns`
+   * `sync_history`
+   * `user_stats`
+   * `llamadas_grupales_historial`
+   * `notas_seguimiento`
+   * `goals_sentinel_audits`
+   * `user_kpi_targets`
+   * `checklist_tasks`
+   * `kpis_entrenadores_llamadas`
+   > *Justificación Técnica:* En Firestore, las reglas de seguridad no actúan como filtros. La función `canReadHojaEnBlanco()` provocaba denegación inmediata (`PERMISSION_DENIED`) al ejecutar listeners sobre la raíz de la colección sin cláusulas `where` idénticas a la regla. Con `isAuthenticated()`, los clientes autorizados pueden suscribirse a los datos operativos sin errores en consola.
+2. **Portal Público de Misiones IMO:**
+   * `match /imo_missions/{document=**}`: `allow read, write: if true;`. Permite que la aplicación web pública externa (`crearpsl.net/imose30lima/`) sincronice misiones de enrolamiento sin requerir autenticación de usuario.
+3. **Autonomía de Preferencias de Usuario (`match /users/{userId}`):**
+   * Se habilitó permiso de escritura individual para el propio colaborador autenticado:
+     ```cel
+     allow write: if isSuperAdmin() || (isAuthenticated() && (
+       request.auth.uid == userId ||
+       (resource != null && (resource.data.email == email() || (resource.data.emails is list && email() in resource.data.emails) || (resource.data.uid != null && resource.data.uid == request.auth.uid))) ||
+       (request.resource.data != null && (request.resource.data.email == email() || (request.resource.data.emails is list && email() in request.resource.data.emails) || (request.resource.data.uid != null && request.resource.data.uid == request.auth.uid)))
+     ));
+     ```
+   * Permite que coordinadores y managers seleccionen sus equipos en Quito (`equiposQuito`), cambien roles en simulación y actualicen datos personales sin el error *"No se pudo guardar el equipo seleccionado"*.
+4. **Zonas Zero-Trust Preservadas:**
+   * `liquidaciones_pagos`: Restringido exclusivamente a Gerencia de Sede, Dirección y SuperAdmin.
+   * `px_legal_signatures`: Inmutable desde el cliente; validado por hash criptográfico SHA-256, tamaño de payload y correspondencia de identidad de participante.
+   * Robot Scraper de Nodus: Acceso condicionado por token secreto `NODUS_ROBOT_CPSL_2026_SECRET` en `nodus_kpis_sincronizados` y `nodus_coordinadores_c1c2`.
+
+---
+
+### 13.4. Matriz Dinámica de Control de Acceso por Módulo y Botón (Gobernanza Causa OS)
+* **Objetivo de Dirección:** Permitir al SuperAdmin y a la Dirección General configurar y revocar facultades botón por botón y módulo por módulo desde una interfaz visual sin tocar código fuente ni desplegar compilaciones.
+* **Arquitectura Diseñada:**
+  - Capa de abstracción desacoplada en `src/config/permissions.js` con evaluación de dos niveles:
+    1. Permisos base por rol (RBAC legacy).
+    2. Modificadores dinámicos almacenados en Firestore `settings/system_permissions_matrix` por usuario o por rol (`canAccessModule(user, moduleId)`, `canExecuteAction(user, actionId)`).
+  - Panel de administración integrado en `SuperAdminPanel.jsx` con matriz visual de conmutadores (toggles) por colaborador y por función.
+
+---
+
+### 13.5. Inventario Exhaustivo y Manual Técnico Interactivo de Causa OS
+* Se consolidó la radiografía total de la plataforma en el artefacto [`MANUAL_DETALLADO_CAUSA_OS.md`](file:///Users/joseluissanchezmoreno/.gemini/antigravity/brain/49cb09c8-0b8d-4cff-9ddc-cfe0fd4eb8d9/MANUAL_DETALLADO_CAUSA_OS.md), documentando los 30+ módulos del sistema, cada botón de acción, dependencias de backend, rutas y directivas operativas para capacitación del personal de todas las sedes.
+
+---
+
 > 📜 **Mandato de la Caja Negra:**
 > Esta Caja Negra es la fuente viva de verdad de CPSL y Causa OS. Debe consultarse antes de cualquier cambio de arquitectura y actualizarse de inmediato tras cada nueva funcionalidad, regla o descubrimiento operativo.
+
 

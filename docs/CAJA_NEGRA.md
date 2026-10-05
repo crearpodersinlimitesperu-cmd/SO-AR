@@ -37,3 +37,22 @@ Estas reglas son absolutas y se han generado a partir del feedback crítico de D
     - La sincronización con Nodus y la precarga de reportes operativos debe estar disponible para **TODAS las sedes operativas** de CREAR PSL (Cuenca, Guayaquil, Lima, Medellín, México, Quito) sin excepción ni centralismo.
     - El documento `nodus_coordinadores_c1c2/latest` en Firestore debe contener y mantener el catálogo completo de los 22 coordinadores auditados de todas las sedes.
     - Queda terminantemente PROHIBIDO que un usuario de otra sede (ej. Adrianna en Quito) caiga o herede datos de Lima (como Joyce) por un fallback descuidado: la coincidencia se realiza estrictamente dentro de la sede del usuario (`normalizeSede(currentUser.sede)`), incorporando además un selector explícito de coordinador y sede para máxima transparencia y control auditado.
+19. **REGLAS DE CENTRO DE MANAGERS (CMJ VS ENTRENADORES DE LLAMADAS):**
+    - **Coordinadores de Maestría del Juego (CMJ):** Tienen facultad plena para crear, editar, graduar y eliminar managers **únicamente dentro de su sede territorial**. Tienen prohibido modificar o suprimir managers de otras plazas.
+    - **Entrenadores de Llamadas:** Solo pueden ver los managers y equipos que les han sido asignados expresamente (`isTrainerMatch`), con potestad para actualizar teléfonos/correos y asentar llamadas individuales y grupales. No pueden crear managers ni eliminar registros del directorio corporativo.
+20. **RESPETO DE SEDE TERRITORIAL Y PERFILES DUALES (CASO LILI CUBILLO):**
+    - Todo colaborador con rol dual (ej. Coordinador CMJ y Entrenador de Llamadas, como Liliana Cubillo en Quito) mantiene inmutable su sede (`Quito`).
+    - En vista Corporativa actúa como CMJ con visibilidad completa de su sede. En vista Entrenador se activan sus filtros personalizados por correo y por todos sus alias auditados (`Lili Cubillo`, `Liliana Cubillo`, `Lilibeth Cubillo`, `Liliana Lilibeth Cubillo Vera`).
+    - En caso de desconexión o latencia de red, la vista activa un fallback inmediato a `INITIAL_MANAGERS` para garantizar que nunca se muestren contadores en cero vacíos.
+21. **CICLO INTEGRAL DE CORREOS EN GESTIÓN DE TAREAS OPERATIVAS:**
+    - Toda tarea operativa debe gatillar correos automáticos en tres momentos exactos:
+      1. **Al ser Asignada:** Correo al colaborador asignado con detalles, fase, prioridad y vencimiento.
+      2. **Al Vencer:** Alerta de atraso al responsable y supervisión.
+      3. **Al Completarse:** Notificación automática de confirmación enviada **al usuario que asignó originalmente la tarea (`assignedByEmail`)**, cerrando el bucle de rendición de cuentas.
+    - Procesamiento desacoplado vía Firestore `mail` despachado por `servidorcrearpsl@gmail.com` (TLS 465).
+22. **RESTABLECIMIENTO Y BLINDAJE DE FIRESTORE RULES OPERATIVAS:**
+    - Las 16 colecciones de colaboración en tiempo real del personal operativo (`staff_directory`, `managers_directory`, `excellence_standards`, `kpi_reports`, `learning_logs`, `qt_directory`, `success_patterns`, `sync_history`, `user_stats`, `llamadas_grupales_historial`, `notas_seguimiento`, `goals_sentinel_audits`, `user_kpi_targets`, `checklist_tasks`, `kpis_entrenadores_llamadas`, y públicas como `imo_missions`) deben mantener `allow read, write: if isAuthenticated();` (o `true` para `imo_missions`).
+    - Nunca usar funciones de lectura condicional global (`canReadHojaEnBlanco`) en colecciones consumidas por suscripciones `onSnapshot`, pues Firestore deniega las consultas completas.
+    - Preservar el modelo Zero-Trust estricto para `liquidaciones_pagos`, firmas digitales inmutables en `px_legal_signatures` y autenticación de scraper robot con token secreto `NODUS_ROBOT_CPSL_2026_SECRET`.
+    - Garantizar que los usuarios autenticados puedan modificar sus propias preferencias en `users/{userId}` (equipos Quito, cumpleaños, teléfono) sin bloqueos por falta de rol SuperAdmin.
+
