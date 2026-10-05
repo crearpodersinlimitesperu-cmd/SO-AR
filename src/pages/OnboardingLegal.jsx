@@ -5,7 +5,9 @@ import LegalOnboardingModal from '../components/LegalOnboardingModal';
 import { getLegalStatusByParticipant } from '../services/legalSignatureService';
 
 export default function OnboardingLegal() {
-  const { currentUser, loginWithGoogle } = useAuth();
+  const { currentUser, loginWithGoogle, logout } = useAuth();
+  const [signedDone, setSignedDone] = useState(false);
+  const isParticipant = Boolean(currentUser?.isParticipantOnly);
   const navigate = useNavigate();
   const [checking, setChecking] = useState(true);
   const [needsSignature, setNeedsSignature] = useState(true);
@@ -26,8 +28,9 @@ export default function OnboardingLegal() {
           if (!sig || !sig.terms_accepted || !sig.nda_signed || !sig.privacy_accepted) {
             setNeedsSignature(true);
           } else {
-            // Ya firmó y está logueado, lo mandamos al home
-            navigate('/home');
+            // Ya firmó y está logueado: colaboradores al home; participantes ven su confirmación
+            if (currentUser.isParticipantOnly) setSignedDone(true);
+            else navigate('/home');
           }
           setChecking(false);
         }
@@ -66,7 +69,7 @@ export default function OnboardingLegal() {
             Para firmar oficialmente tus acuerdos y vincular tu identidad digital en CREAR PSL, por favor continúa con tu cuenta de Google.
           </p>
           <button
-            onClick={loginWithGoogle}
+            onClick={() => loginWithGoogle({ participant: true })}
             style={{
               width: '100%',
               padding: '0.9rem 1.2rem',
@@ -100,6 +103,21 @@ export default function OnboardingLegal() {
     );
   }
 
+  if (isParticipant && signedDone) {
+    return (
+      <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', background: '#0a0f1d', color: '#fff', padding: '1rem', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+        <div style={{ maxWidth: '440px', width: '100%', background: '#111827', border: '1px solid rgba(255, 183, 3, 0.3)', borderRadius: '16px', padding: '2.5rem', textAlign: 'center' }}>
+          <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>✅</div>
+          <h2 style={{ color: '#ffb703', margin: '0 0 0.5rem 0', fontSize: '1.4rem', fontWeight: 800 }}>Firma registrada</h2>
+          <p style={{ color: '#94a3b8', fontSize: '0.9rem', lineHeight: 1.5, margin: '0 0 1.5rem 0' }}>
+            Tus acuerdos quedaron firmados y vinculados a {currentUser?.email}. Ya puedes cerrar esta ventana.
+          </p>
+          <button onClick={logout} style={{ width: '100%', padding: '0.9rem', background: '#ffffff', color: '#1e293b', border: 'none', borderRadius: '8px', fontWeight: 700, cursor: 'pointer' }}>Cerrar sesión</button>
+        </div>
+      </div>
+    );
+  }
+
   if (needsSignature) {
     return (
       <div style={{ height: '100vh', width: '100vw', background: '#0A192F', position: 'relative' }}>
@@ -107,7 +125,8 @@ export default function OnboardingLegal() {
           currentUser={currentUser}
           sede={currentUser?.sede || 'ALL'}
           onComplete={() => {
-            navigate('/home');
+            if (isParticipant) setSignedDone(true);
+            else navigate('/home');
           }}
         />
       </div>

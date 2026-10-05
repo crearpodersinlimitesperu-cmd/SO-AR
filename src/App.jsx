@@ -75,6 +75,9 @@ function PrivateRoute({ children }) {
     return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><p className="text-gold">Cargando...</p></div>;
   }
   
+  if (currentUser?.isParticipantOnly) {
+    return <Navigate to="/onboarding-legal" replace />;
+  }
   return currentUser ? children : <Navigate to={`/login?from=${window.location.pathname}`} replace />;
 }
 
@@ -101,6 +104,10 @@ function RoleRoute({ children, allowedRoles = [], allowedEmails = [], requireSup
 
   if (!currentUser) {
     return <Navigate to="/login" replace />;
+  }
+
+  if (currentUser.isParticipantOnly) {
+    return <Navigate to="/onboarding-legal" replace />;
   }
 
   // ACCESO TOTAL INCONDICIONAL PARA SUPER ADMIN:

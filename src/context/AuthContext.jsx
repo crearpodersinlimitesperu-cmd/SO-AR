@@ -453,14 +453,39 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const loginWithGoogle = async () => {
+  // Perfil de PARTICIPANTE (miembros, clientes, usuarios de cualquier sede que no
+  // están en la base de colaboradores). Solo les permite firmar sus contratos en
+  // /onboarding-legal: no tienen rol operativo y los guards de ruta los devuelven
+  // a esa pantalla si intentan entrar a cualquier otra sección.
+  const PARTICIPANT_FLAG = 'cpsl_participant_flow';
+  const buildParticipantUser = (user, email) => ({
+    id: user.uid,
+    uid: user.uid,
+    name: user.displayName || 'Participante',
+    displayName: user.displayName || 'Participante',
+    email,
+    emails: [email],
+    role: 'participante',
+    appRole: 'participante',
+    roles: ['participante'],
+    sede: 'Global',
+    isActive: true,
+    isParticipantOnly: true
+  });
+
+  const loginWithGoogle = async (options) => {
+    // Cuando se usa como onClick llega un evento; solo { participant: true } lo activa.
+    const participantFlow = options?.participant === true;
     const provider = new GoogleAuthProvider();
-    provider.addScope('https://www.googleapis.com/auth/calendar.events');
-    provider.addScope('https://www.googleapis.com/auth/tasks');
-    provider.addScope('https://www.googleapis.com/auth/drive.file');
-    provider.addScope('https://www.googleapis.com/auth/drive.metadata.readonly');
+    if (!participantFlow) {
+      provider.addScope('https://www.googleapis.com/auth/calendar.events');
+      provider.addScope('https://www.googleapis.com/auth/tasks');
+      provider.addScope('https://www.googleapis.com/auth/drive.file');
+      provider.addScope('https://www.googleapis.com/auth/drive.metadata.readonly');
+    }
 
     try {
+      if (participantFlow) sessionStorage.setItem(PARTICIPANT_FLAG, '1');
       const result = await signInWithPopup(auth, provider);
 
       // Extract Google Access Token for API calls
@@ -535,6 +560,15 @@ export function AuthProvider({ children }) {
         if (staticUser) {
           foundUser = { ...staticUser };
         }
+      }
+
+      // Participante externo (cliente/miembro de cualquier sede) que solo viene a
+      // firmar sus contratos: se admite cualquier cuenta Google, con perfil limitado
+      // y sin escribir en la colección "users".
+      if (participantFlow && !rawEmail.endsWith('@crearpsl.net') && !allowedGmails.includes(rawEmail) && !foundUser) {
+        const participantUser = buildParticipantUser(user, normalizedEmail);
+        setCurrentUser(participantUser);
+        return user;
       }
 
       // Verificación de política: si no es @crearpsl.net, ni está en la lista blanca, ni en Firestore/QT/catálogo oficial, se rechaza
@@ -626,6 +660,7 @@ export function AuthProvider({ children }) {
     }
     sessionStorage.removeItem('googleAccessToken');
     sessionStorage.removeItem('cpsl_active_role');
+    sessionStorage.removeItem(PARTICIPANT_FLAG);
     return signOut(auth);
   };
 
@@ -725,6 +760,9 @@ export function AuthProvider({ children }) {
             } catch(e) {
               console.error("Error actualizando login en auditoría:", e);
             }
+          } else if (sessionStorage.getItem(PARTICIPANT_FLAG) === '1') {
+            // Participante externo con sesión persistida: perfil limitado, solo firma.
+            setCurrentUser(buildParticipantUser(user, normalizedEmail));
           } else {
             sessionStorage.removeItem('googleAccessToken');
             sessionStorage.removeItem('cpsl_active_role');
