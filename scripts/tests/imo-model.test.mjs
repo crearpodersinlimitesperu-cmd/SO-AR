@@ -33,3 +33,23 @@ test('Nodus verification never crashes on known enrollee and refuses negated con
   assert.equal(ctx.findParticipantInNodus({ nombre: 'Ana Pérez' }), null);
   assert.equal(ctx.findParticipantInNodus({ nombre: 'Ana Pérez' }, '', 'EQUIPO 31').asistencia, 'NO');
 });
+
+test('background agent processes real snapshot shapes even when local cache is full', async () => {
+  const { getEnroladosList } = await import('../../src/features/imo/missionEnrolados.js');
+  const listeners = [];
+  const source = readFileSync(new URL('../../src/services/CausaNodusAgent.js', import.meta.url), 'utf8').replace(/^import .*;$/mg, '').replace(/export /g, '');
+  const ctx = {
+    getEnroladosList, db: {}, collection: () => 'missions', doc: () => 'nodus',
+    onSnapshot: (ref, cb) => { listeners.push({ ref, cb }); return () => {}; },
+    evaluateEnroladoVerification: e => ({ status: e.asistencia ? 'CONFIRMED' : 'PENDING', detalle: 'test detail' }),
+    localStorage: { getItem: () => null, setItem: () => { throw Error('quota exceeded'); } },
+    window: { dispatchEvent: () => {} }, Event: class {}, console: { log() {}, warn() {} }
+  };
+  vm.createContext(ctx); vm.runInContext(source, ctx); ctx.startCausaNodusAgent();
+  const mission = { schemaVersion: 2, enrolados: [{ id: 'a', nombre: 'TEST' }], checks: { a: { contacto: true, asistencia: false } } };
+  assert.doesNotThrow(() => listeners.find(l => l.ref === 'missions').cb({ docs: [{ id: 'm1', data: () => mission }] }));
+  assert.equal(vm.runInContext('globalCache.enroladosConStatus[0].statusIA', ctx), 'PENDING');
+  assert.equal(vm.runInContext('globalCache.enroladosConStatus[0].statusRazon', ctx), 'test detail');
+  assert.equal(getEnroladosList({ id: 'legacy', checks: { TEST_PERSON: { asistencia: true } } })[0].nombre, 'TEST PERSON');
+  ctx.stopCausaNodusAgent();
+});

@@ -1,6 +1,7 @@
+import { getEnroladosList } from '../features/imo/missionEnrolados';
 import { useEffect, useState } from 'react';
 import { db } from './firebase';
-import { doc, collection, onSnapshot, getDoc } from 'firebase/firestore';
+import { doc, collection, onSnapshot } from 'firebase/firestore';
 import { evaluateEnroladoVerification} from './nodusVerificationService';
 
 // Agente Centinela que procesa y cachead datos operativos para Causa OS
@@ -45,7 +46,7 @@ export function startCausaNodusAgent() {
           equipoRef: m.equipo,
           sedeRef: m.sede,
           statusIA: evalRes.status, 
-          statusRazon: evalRes.razon
+          statusRazon: evalRes.detalle
         });
       });
     });
@@ -57,7 +58,9 @@ export function startCausaNodusAgent() {
       lastUpdate: Date.now()
     };
 
-    localStorage.setItem('CAUSA_FAST_CACHE', JSON.stringify(globalCache));
+    // A full cache must not interrupt Firestore's snapshot delivery.
+    try { localStorage.setItem('CAUSA_FAST_CACHE', JSON.stringify(globalCache)); }
+    catch (error) { console.warn('No se pudo guardar la caché local de Causa:', error.message); }
     
     // Disparar evento global para que las UIs se actualicen instantáneamente
     window.dispatchEvent(new Event('CAUSA_AGENT_UPDATED'));
