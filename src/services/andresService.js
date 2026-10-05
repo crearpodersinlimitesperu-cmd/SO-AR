@@ -5,43 +5,25 @@ import { doc, getDoc, collection, getDocs, query, orderBy, limit } from 'firebas
 // SERVICIO DE COMANDO GLOBAL DE MAESTRÍA (ANDRÉS GÓMEZ)
 // ============================================================================
 
-import { CMJ_METADATA } from './cmjDataService';
+import { CMJ_METADATA, getSedesBenchmark } from './cmjDataService';
 
 export async function getGlobalSupervision() {
-  try {
-    const docRef = doc(db, 'nodus_kpis_sincronizados', 'latest_snapshot');
-    const snap = await getDoc(docRef);
-    let mockCriticals = {};
-    if (snap.exists()) {
-      const metrics = snap.data().sedesMetrics || [];
-      metrics.forEach(m => {
-        mockCriticals[m.sede] = m.retencion < 80 ? 7 : (m.retencion < 85 ? 2 : 0);
-      });
-    }
-
-    return Object.values(CMJ_METADATA).map((cmjMeta, i) => {
-      let critCount = mockCriticals[cmjMeta.sede] || 0;
-      let status = 'HEALTHY';
-      if (critCount > 5) status = 'CRITICAL';
-      else if (critCount > 0) status = 'WARNING';
-      
-      return {
-        id: `sup_${i}`,
-        hq: cmjMeta.nombreLargo,
-        coordinator: cmjMeta.cmj,
-        status: status
-      };
-    });
-  } catch (error) {
-    console.error('Error fetching global supervision:', error);
-  }
-  
-  return Object.values(CMJ_METADATA).map((cmjMeta, i) => ({
-    id: `sup_${i}`,
-    hq: cmjMeta.nombreLargo,
-    coordinator: cmjMeta.cmj,
-    status: 'HEALTHY'
-  }));
+  const benchmark = getSedesBenchmark();
+  return benchmark.map((m, i) => {
+    // Definimos el estatus basado en la tasa de retención real.
+    let status = 'HEALTHY';
+    if (m.tasaRetencion < 80) status = 'CRITICAL';
+    else if (m.tasaRetencion < 85) status = 'WARNING';
+    
+    return {
+      id: `sup_${i}`,
+      hq: m.nombreLargo,
+      coordinator: m.cmj,
+      status: status,
+      compliance: Math.round(m.tasaRetencion), // Usamos la retención como proxy de cumplimiento operativo
+      pendingCritical: m.tasaRetencion < 80 ? 3 : (m.tasaRetencion < 85 ? 1 : 0) // Proxy de tareas vencidas
+    };
+  });
 }
 
 export async function getFuturosImposiblesAudit() {
@@ -94,22 +76,11 @@ export async function getTalentAndUltimatums() {
 }
 
 export async function getNodusCleanKpis() {
-  try {
-    const docRef = doc(db, 'nodus_kpis_sincronizados', 'latest_snapshot');
-    const snap = await getDoc(docRef);
-    if (snap.exists()) {
-      const metrics = snap.data().sedesMetrics || [];
-      return metrics.map((m, i) => ({
-        id: `kpi_${i}`,
-        hq: m.sede,
-        enrolled: m.matriculados || 0,
-        seated: m.asistentes || 0,
-        dropout: m.bajas || 0,
-        trend: m.asistentes >= (m.matriculados * 0.9) ? 'up' : 'down'
-      }));
-    }
-  } catch (error) {
-    console.error('Error fetching clean KPIs:', error);
-  }
-  return [];
+  const benchmark = getSedesBenchmark();
+  return benchmark.map((m, i) => ({
+    id: `kpi_${i}`,
+    hq: m.nombreLargo,
+    tasaRetencion: m.tasaRetencion,
+    tasaDesercion: m.tasaDesercion
+  }));
 }

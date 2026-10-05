@@ -108,18 +108,18 @@ export default function AndresCommandCenter() {
         {/* SECOND FOLD: RADAR NODUS & FUTUROS IMPOSIBLES */}
         <div style={{ gridColumn: 'span 8', background: 'var(--bg-card)', borderRadius: '12px', border: '1px solid var(--border-strong)', padding: '1.5rem', boxShadow: 'var(--shadow-sm)' }}>
           <h2 style={{ fontSize: '1.1rem', color: 'var(--text-heading)', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 0 1rem 0' }}>
-            <BarChart3 size={20} color="#38bdf8" /> Efectividad de Llamadas (Depurado: Excluye Eq.1000)
+            <BarChart3 size={20} color="#38bdf8" /> Rendimiento Global CMJs (Retención vs Deserción)
           </h2>
           <div style={{ height: '250px' }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={kpis} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle)" />
                 <XAxis dataKey="hq" stroke="var(--text-muted)" />
-                <YAxis stroke="var(--text-muted)" />
+                <YAxis stroke="var(--text-muted)" domain={[0, 100]} />
                 <Tooltip contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border-strong)', borderRadius: '8px', color: 'var(--text-heading)' }} />
                 <Legend wrapperStyle={{ paddingTop: '10px' }} />
-                <Bar dataKey="llamadasEfectivas" name="Efectivas (%)" fill="#10b981" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="llamadasSinRespuesta" name="Sin Respuesta (%)" fill="#ef4444" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="tasaRetencion" name="Retención (%)" fill="#10b981" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="tasaDesercion" name="Deserción (%)" fill="#ef4444" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
