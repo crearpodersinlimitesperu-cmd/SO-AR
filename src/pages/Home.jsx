@@ -914,6 +914,8 @@ export default function Home() {
   const [selectedTaskForDetail, setSelectedTaskForDetail] = useState(null);
   const [showTaskDetailModal, setShowTaskDetailModal] = useState(false);
   const [tareasAsignadasFilter, setTareasAsignadasFilter] = useState('Activas'); // 'Activas' | 'Vencidas' | 'Cumplidas' | 'Todas'
+  const [tareasAsignadasSearch, setTareasAsignadasSearch] = useState('');
+  const [tareasAsignadasSort, setTareasAsignadasSort] = useState('urgencia'); // 'urgencia' | 'recientes' | 'antiguas' | 'deadline_asc' | 'deadline_desc' | 'avance_desc' | 'avance_asc' | 'titulo'
   const [showVenueModal, setShowVenueModal] = useState(false);
   const [showHorariosModal, setShowHorariosModal] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -3236,24 +3238,205 @@ export default function Home() {
               const isOverdue = !isDone && getCountdownInfo(task.deadline, time).overdue;
               return { task, isDone, isOverdue };
             });
+
+            // Conteo por pestaña sobre el universo completo de mis tareas
             const counts = {
               Activas: clasificadas.filter(c => !c.isDone && !c.isOverdue).length,
               Vencidas: clasificadas.filter(c => c.isOverdue).length,
               Cumplidas: clasificadas.filter(c => c.isDone).length,
               Todas: clasificadas.length
             };
-            const visibles = clasificadas.filter(c => {
-              if (tareasAsignadasFilter === 'Activas') return !c.isDone && !c.isOverdue;
-              if (tareasAsignadasFilter === 'Vencidas') return c.isOverdue;
-              if (tareasAsignadasFilter === 'Cumplidas') return c.isDone;
-              return true; // Todas
+
+            // Filtrado por búsqueda de texto (título, descripción, asignado a, asignado por)
+            const searchClean = (tareasAsignadasSearch || '').toLowerCase().trim();
+            const filteredBySearchAndTab = clasificadas.filter(c => {
+              // Filtro de pestaña
+              if (tareasAsignadasFilter === 'Activas' && (c.isDone || c.isOverdue)) return false;
+              if (tareasAsignadasFilter === 'Vencidas' && !c.isOverdue) return false;
+              if (tareasAsignadasFilter === 'Cumplidas' && !c.isDone) return false;
+
+              // Filtro de búsqueda
+              if (!searchClean) return true;
+              const t = c.task;
+              const title = (t.task || t.title || '').toLowerCase();
+              const desc = (t.description || '').toLowerCase();
+              const creator = resolveAssigneeName(t.createdBy).toLowerCase();
+              const emails = t.assignedToEmails && t.assignedToEmails.length > 0
+                ? t.assignedToEmails
+                : (t.assignedToEmail ? [t.assignedToEmail] : []);
+              const assignees = emails.map(e => resolveAssigneeName(e).toLowerCase()).join(' ');
+
+              return title.includes(searchClean) ||
+                     desc.includes(searchClean) ||
+                     creator.includes(searchClean) ||
+                     assignees.includes(searchClean);
+            });
+
+            // Ordenamiento dinámico intuitivo y cronológico
+            const visibles = [...filteredBySearchAndTab].sort((a, b) => {
+              const ta = a.task;
+              const tb = b.task;
+
+              if (tareasAsignadasSort === 'urgencia') {
+                // Prioridad por cuenta regresiva / urgencia:
+                // Si ninguna está cumplida: la que vence antes va primero
+                if (a.isDone !== b.isDone) return a.isDone ? 1 : -1;
+                const da = ta.deadline ? new Date(ta.deadline).getTime() : Infinity;
+                const dbTime = tb.deadline ? new Date(tb.deadline).getTime() : Infinity;
+                return da - dbTime;
+              }
+
+              if (tareasAsignadasSort === 'recientes') {
+                // Cronológico: Creadas o actualizadas más recientemente primero
+                const dateA = new Date(ta.createdAt || ta.created_at || ta.lastUpdated || ta.deadline || 0).getTime();
+                const dateB = new Date(tb.createdAt || tb.created_at || tb.lastUpdated || tb.deadline || 0).getTime();
+                return dateB - dateA;
+              }
+
+              if (tareasAsignadasSort === 'antiguas') {
+                // Cronológico: Más antiguas primero
+                const dateA = new Date(ta.createdAt || ta.created_at || ta.lastUpdated || ta.deadline || 0).getTime();
+                const dateB = new Date(tb.createdAt || tb.created_at || tb.lastUpdated || tb.deadline || 0).getTime();
+                return dateA - dateB;
+              }
+
+              if (tareasAsignadasSort === 'deadline_asc') {
+                // Fecha de vencimiento más próxima primero
+                const da = ta.deadline ? new Date(ta.deadline).getTime() : Infinity;
+                const dbTime = tb.deadline ? new Date(tb.deadline).getTime() : Infinity;
+                return da - dbTime;
+              }
+
+              if (tareasAsignadasSort === 'deadline_desc') {
+                // Fecha de vencimiento más lejana primero
+                const da = ta.deadline ? new Date(ta.deadline).getTime() : -Infinity;
+                const dbTime = tb.deadline ? new Date(tb.deadline).getTime() : -Infinity;
+                return dbTime - da;
+              }
+
+              if (tareasAsignadasSort === 'avance_desc') {
+                const pctA = typeof ta.progressPercentage === 'number' ? ta.progressPercentage : (a.isDone ? 100 : 0);
+                const pctB = typeof tb.progressPercentage === 'number' ? tb.progressPercentage : (b.isDone ? 100 : 0);
+                return pctB - pctA;
+              }
+
+              if (tareasAsignadasSort === 'avance_asc') {
+                const pctA = typeof ta.progressPercentage === 'number' ? ta.progressPercentage : (a.isDone ? 100 : 0);
+                const pctB = typeof tb.progressPercentage === 'number' ? tb.progressPercentage : (b.isDone ? 100 : 0);
+                return pctA - pctB;
+              }
+
+              if (tareasAsignadasSort === 'titulo') {
+                const nameA = (ta.task || ta.title || '').toLowerCase();
+                const nameB = (tb.task || tb.title || '').toLowerCase();
+                return nameA.localeCompare(nameB);
+              }
+
+              return 0;
             });
 
             return (
             <div className="glass-panel" style={{ padding: '1.2rem', marginBottom: '2rem' }}>
-              <h3 className="text-blue" style={{ marginTop: 0, borderBottom: '1px solid rgba(0,212,255,0.2)', paddingBottom: '0.4rem', fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                📋 MIS TAREAS ASIGNADAS ({tareasQueHeAsignado.length})
-              </h3>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.6rem', borderBottom: '1px solid rgba(0,212,255,0.2)', paddingBottom: '0.5rem' }}>
+                <h3 className="text-blue" style={{ margin: 0, fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                  <span>📋</span> MIS TAREAS ASIGNADAS ({tareasQueHeAsignado.length})
+                </h3>
+                {searchClean && (
+                  <span style={{ fontSize: '0.75rem', color: 'var(--crear-cyan)', background: 'rgba(41, 171, 226, 0.12)', padding: '0.2rem 0.6rem', borderRadius: '12px', border: '1px solid rgba(41, 171, 226, 0.3)' }}>
+                    Mostrando {visibles.length} de {counts[tareasAsignadasFilter]}
+                  </span>
+                )}
+              </div>
+
+              {/* BARRA DE HERRAMIENTAS: BÚSQUEDA Y ORDENAMIENTO PREMIUM */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.6rem', marginTop: '0.8rem', alignItems: 'center' }}>
+                {/* BUSCADOR */}
+                <div style={{ position: 'relative', width: '100%' }}>
+                  <span style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', opacity: 0.6, fontSize: '0.85rem' }}>
+                    🔍
+                  </span>
+                  <input
+                    type="text"
+                    placeholder="Buscar por título, asignado, creador..."
+                    value={tareasAsignadasSearch}
+                    onChange={(e) => setTareasAsignadasSearch(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '0.42rem 2rem 0.42rem 2.2rem',
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      border: '1px solid var(--border-subtle)',
+                      borderRadius: '8px',
+                      color: '#fff',
+                      fontSize: '0.8rem',
+                      outline: 'none',
+                      transition: 'border-color 0.2s ease, background 0.2s ease'
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = 'var(--crear-cyan)';
+                      e.target.style.background = 'rgba(41, 171, 226, 0.08)';
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = 'var(--border-subtle)';
+                      e.target.style.background = 'rgba(255, 255, 255, 0.05)';
+                    }}
+                  />
+                  {tareasAsignadasSearch && (
+                    <button
+                      type="button"
+                      onClick={() => setTareasAsignadasSearch('')}
+                      style={{
+                        position: 'absolute',
+                        right: '0.6rem',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'transparent',
+                        border: 'none',
+                        color: 'var(--text-muted)',
+                        cursor: 'pointer',
+                        fontSize: '0.85rem',
+                        padding: '0 0.2rem'
+                      }}
+                      title="Limpiar búsqueda"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+
+                {/* SELECTOR DE ORDEN CRONOLÓGICO */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', justifyContent: 'flex-start' }}>
+                  <span style={{ fontSize: '0.76rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
+                    ↕️ Orden:
+                  </span>
+                  <select
+                    value={tareasAsignadasSort}
+                    onChange={(e) => setTareasAsignadasSort(e.target.value)}
+                    style={{
+                      flex: 1,
+                      padding: '0.42rem 0.6rem',
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      border: '1px solid var(--border-subtle)',
+                      borderRadius: '8px',
+                      color: 'var(--text-main, #e2e8f0)',
+                      fontSize: '0.78rem',
+                      fontWeight: 600,
+                      outline: 'none',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <option value="urgencia" style={{ background: '#1a1f2c', color: '#fff' }}>⚡ Por Urgencia (Próximas a vencer)</option>
+                    <option value="recientes" style={{ background: '#1a1f2c', color: '#fff' }}>🕒 Más recientes primero (Cronológico)</option>
+                    <option value="antiguas" style={{ background: '#1a1f2c', color: '#fff' }}>⏳ Más antiguas primero</option>
+                    <option value="deadline_asc" style={{ background: '#1a1f2c', color: '#fff' }}>📅 Fecha límite (Ascendente)</option>
+                    <option value="deadline_desc" style={{ background: '#1a1f2c', color: '#fff' }}>📅 Fecha límite (Descendente)</option>
+                    <option value="avance_desc" style={{ background: '#1a1f2c', color: '#fff' }}>📊 Mayor avance (%)</option>
+                    <option value="avance_asc" style={{ background: '#1a1f2c', color: '#fff' }}>📊 Menor avance (%)</option>
+                    <option value="titulo" style={{ background: '#1a1f2c', color: '#fff' }}>🔤 Alfabético (A - Z)</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* TABS DE ESTADO */}
               <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', marginTop: '0.8rem' }}>
                 {['Activas', 'Vencidas', 'Cumplidas', 'Todas'].map(f => (
                   <button
@@ -3264,20 +3447,43 @@ export default function Home() {
                       border: `1px solid ${tareasAsignadasFilter === f ? 'var(--crear-cyan)' : 'var(--border-subtle)'}`,
                       background: tareasAsignadasFilter === f ? 'rgba(41, 171, 226, 0.18)' : 'transparent',
                       color: tareasAsignadasFilter === f ? 'var(--crear-cyan)' : 'var(--text-muted)',
-                      cursor: 'pointer'
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease'
                     }}
                   >
                     {f} ({counts[f]})
                   </button>
                 ))}
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.8rem', maxHeight: '360px', overflowY: 'auto' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.8rem', maxHeight: '420px', overflowY: 'auto' }}>
                 {visibles.length === 0 && (
-                  <p className="text-muted" style={{ fontSize: '0.82rem', padding: '0.5rem 0' }}>
-                    {tareasQueHeAsignado.length === 0
-                      ? 'No tienes tareas asignadas todavía (ni creadas por ti, ni asignadas a ti).'
-                      : `No hay tareas en "${tareasAsignadasFilter}".`}
-                  </p>
+                  <div style={{ padding: '1.2rem 0.5rem', textAlign: 'center' }}>
+                    <p className="text-muted" style={{ fontSize: '0.84rem', margin: 0 }}>
+                      {tareasQueHeAsignado.length === 0
+                        ? 'No tienes tareas asignadas todavía (ni creadas por ti, ni asignadas a ti).'
+                        : searchClean
+                          ? `No se encontraron tareas que coincidan con "${tareasAsignadasSearch}" en "${tareasAsignadasFilter}".`
+                          : `No hay tareas en "${tareasAsignadasFilter}".`}
+                    </p>
+                    {searchClean && (
+                      <button
+                        type="button"
+                        onClick={() => setTareasAsignadasSearch('')}
+                        style={{
+                          marginTop: '0.5rem',
+                          background: 'rgba(41, 171, 226, 0.15)',
+                          border: '1px solid rgba(41, 171, 226, 0.4)',
+                          color: 'var(--crear-cyan)',
+                          padding: '0.25rem 0.65rem',
+                          borderRadius: '6px',
+                          fontSize: '0.75rem',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Limpiar búsqueda
+                      </button>
+                    )}
+                  </div>
                 )}
                 {visibles.map(({ task, isDone }) => {
                   const countdown = getCountdownInfo(task.deadline, time);
