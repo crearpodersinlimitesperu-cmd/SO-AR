@@ -40,6 +40,7 @@ import { getAllCompanyUsers } from '../services/userService';
 import UserProfileModal from '../components/UserProfileModal';
 import HorariosEntrenamientoModal from '../components/HorariosEntrenamientoModal';
 import { INITIAL_MANAGERS, normalizeTrainer } from '../data/managersData';
+import { formatTrainerDisplayName, nombreLegalEntrenador, normalizarIdentidadEntrenador } from '../data/trainerAliases';
 
 /**
  * Normaliza y verifica si un evento está asignado a un entrenador específico
@@ -50,15 +51,23 @@ const isTrainerMatchingUser = (evTrainer, user) => {
   const evTrainerStr = String(evTrainer).trim();
   if (!evTrainerStr || evTrainerStr.toLowerCase() === 'tba' || /^\d+$/.test(evTrainerStr) || /^eq\s*\d+$/i.test(evTrainerStr)) return false;
 
+  const userLegal = nombreLegalEntrenador(user.name || user.displayName || '');
+  const userKey = normalizarIdentidadEntrenador(userLegal || user.name || user.displayName || '');
   const userIdentity = normalizeTrainer(user.name || user.displayName || '');
   
   // Dividir entrenadores si hay múltiples en la celda ("Fer Aragon / Fer Mendoza")
   const evTrainersList = evTrainerStr
     .split(/[,/&•]+/)
-    .map(t => normalizeTrainer(t.trim()))
+    .map(t => t.trim())
     .filter(Boolean);
 
-  return evTrainersList.includes(userIdentity);
+  return evTrainersList.some(t => {
+    const legalT = nombreLegalEntrenador(t);
+    const keyT = normalizarIdentidadEntrenador(legalT || t);
+    if (keyT && userKey && keyT === userKey) return true;
+    const normT = normalizeTrainer(t);
+    return Boolean(normT && userIdentity && normT === userIdentity);
+  });
 };
 
 // El Asignador guarda una proyección mínima y pública de la asignación
@@ -80,17 +89,19 @@ const publicAssignmentEventKeyNoTeam = (event = {}) => {
   return `${date}__${sede}__${training}`.replace(/\//g, '-');
 };
 
-const trainerIdentityKey = (value) => String(value || '')
-  .normalize('NFD')
-  .replace(/[\u0300-\u036f]/g, '')
-  .toLowerCase()
-  .replace(/[^a-z0-9]+/g, ' ')
-  .trim();
+const trainerIdentityKey = (value) => {
+  const legal = nombreLegalEntrenador(value);
+  return normalizarIdentidadEntrenador(legal || value);
+};
 
 const isExactAssignedTrainer = (trainer, user) => {
   const trainerKey = trainerIdentityKey(trainer);
   const userKey = trainerIdentityKey(user?.name || user?.displayName || '');
-  return Boolean(trainerKey && userKey && trainerKey === userKey);
+  if (trainerKey && userKey && trainerKey === userKey) return true;
+  // Fallback a cotejo normalizado de trainer
+  const norm1 = normalizeTrainer(trainer || '');
+  const norm2 = normalizeTrainer(user?.name || user?.displayName || '');
+  return Boolean(norm1 && norm2 && norm1 === norm2);
 };
 
 const confirmedTrainerNames = (assignment) => {
@@ -3128,7 +3139,7 @@ export default function Home() {
                                   (currentUser?.roles || []).some(r => ['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'director_maestria', 'entrenador', 'entrenador_llamadas', 'gerente'].includes(r)) ||
                                   (currentUser?.isSuperAdmin && !currentUser?.isSimulated)) && (
                                   <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginTop: '0.1rem' }}>
-                                    🎙️ Trainer: {confirmedTrainerLabel || ev.trainer || ev.entrenador || 'Por confirmar'}
+                                    🎙️ Trainer: {formatTrainerDisplayName(confirmedTrainerLabel || ev.trainer || ev.entrenador) || 'Por confirmar'}
                                   </span>
                                 )}
                               </div>
