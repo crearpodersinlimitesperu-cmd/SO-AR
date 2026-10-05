@@ -73,6 +73,13 @@ const publicAssignmentEventKey = (event = {}) => {
   return `${date}__${sede}__${training}${team ? `__${team}` : ''}`.replace(/\//g, '-');
 };
 
+const publicAssignmentEventKeyNoTeam = (event = {}) => {
+  const date = String(event.fecha_inicio || event.start || event.fechaInicio || '').slice(0, 10);
+  const sede = normalizeSede(event.sede || event.sedeTag || '');
+  const training = String(event.nombre || event.name || event.entrenamiento || '').trim();
+  return `${date}__${sede}__${training}`.replace(/\//g, '-');
+};
+
 const trainerIdentityKey = (value) => String(value || '')
   .normalize('NFD')
   .replace(/[\u0300-\u036f]/g, '')
@@ -2826,8 +2833,13 @@ export default function Home() {
                         fecha_fin: change.fechaFin || change.fechaInicio,
                         __assignmentKey: change.id,
                       }));
-                    const profileEvents = (events || []).map(event => {
-                      const change = publishedOverrides[event.__assignmentKey || publicAssignmentEventKey(event)];
+                    const rawProfileEvents = (events || []).map(event => {
+                      const keyWithTeam = publicAssignmentEventKey(event);
+                      const keyNoTeam = publicAssignmentEventKeyNoTeam(event);
+                      const change =
+                        publishedOverrides[event.__assignmentKey] ||
+                        publishedOverrides[keyWithTeam] ||
+                        publishedOverrides[keyNoTeam];
                       if (!change) return event;
                       return {
                         ...event,
@@ -2838,8 +2850,44 @@ export default function Home() {
                         lugar: change.lugar || event.lugar || event.place,
                       };
                     }).concat(publishedCustomEvents.filter(custom => !(events || []).some(event => event.__assignmentKey === custom.__assignmentKey)));
-                    const assignmentForEvent = (event) => publicTrainerAssignments[event.__assignmentKey || publicAssignmentEventKey(event)] || null;
+
+                    const assignmentForEvent = (event) => {
+                      const keyWithTeam = publicAssignmentEventKey(event);
+                      const keyNoTeam = publicAssignmentEventKeyNoTeam(event);
+                      return (
+                        publicTrainerAssignments[event.__assignmentKey] ||
+                        publicTrainerAssignments[keyWithTeam] ||
+                        publicTrainerAssignments[keyNoTeam] ||
+                        null
+                      );
+                    };
                     const assignedTrainerNamesForEvent = (event) => confirmedTrainerNames(assignmentForEvent(event));
+
+                    // Deduplicación estricta de eventos mostrados para evitar registros duplicados
+                    // (misma fecha, sede y entrenamiento). Causa OS siempre tiene prioridad.
+                    const profileEvents = [];
+                    const seenProfileMap = new Map();
+                    for (const ev of rawProfileEvents) {
+                      const d = String(ev.fecha_inicio || ev.start || '').slice(0, 10);
+                      const s = normalizeSede(ev.sede || ev.sedeTag || '').toUpperCase();
+                      const n = String(ev.nombre || ev.name || '').trim().toUpperCase();
+                      const dedupKey = `${d}__${s}__${n}`;
+                      if (!seenProfileMap.has(dedupKey)) {
+                        seenProfileMap.set(dedupKey, ev);
+                        profileEvents.push(ev);
+                      } else {
+                        const existing = seenProfileMap.get(dedupKey);
+                        const evAssigned = assignedTrainerNamesForEvent(ev).length > 0;
+                        const existingAssigned = assignedTrainerNamesForEvent(existing).length > 0;
+                        if (evAssigned && !existingAssigned) {
+                          Object.assign(existing, ev);
+                        } else {
+                          existing.equipo = existing.equipo || ev.equipo;
+                          existing.lugar = existing.lugar || ev.lugar;
+                          if (!existing.trainer && ev.trainer) existing.trainer = ev.trainer;
+                        }
+                      }
+                    }
 
                     let displayEvents = profileEvents.filter(ev => {
                       // 1. Entrenadores: la asignación confirmada en Causa OS

@@ -545,6 +545,13 @@
           return `${date}__${sede}__${name}${eq ? '__' + eq : ''}`.replace(/\//g, '-');
         }
 
+        function assignmentEventKeyNoTeam(ev, sedeKey) {
+          const date = String(ev.start || ev.fecha_inicio || '').slice(0, 10);
+          const sede = normalizeSedeAsignador(ev.sede || ev.sedeTag || sedeKey || '');
+          const name = String(ev.name || ev.nombre || '').trim();
+          return `${date}__${sede}__${name}`.replace(/\//g, '-');
+        }
+
         function googleVizDateToIso(value) {
           const match = String(value || '').match(/^Date\((\d+),(\d+),(\d+)\)$/);
           if (!match) return '';
@@ -560,6 +567,14 @@
           ].join('__');
         }
 
+        function currentCalendarMergeKeyNoTeam(event, sedeKey) {
+          return [
+            String(event.start || event.fecha_inicio || '').slice(0, 10),
+            normalizeSedeAsignador(event.sede || event.sedeTag || sedeKey || ''),
+            String(event.name || event.nombre || '').trim().toUpperCase()
+          ].join('__');
+        }
+
         // El Apps Script conserva el historial; esta publicación de la misma
         // hoja aporta las fechas vigentes sin escribir ni alterar el histórico.
         async function mergeCurrentOfficialSchedule(data) {
@@ -571,7 +586,12 @@
           if (first < 0 || last < first) throw new Error('Formato de calendario vigente inválido');
           const rows = JSON.parse(text.slice(first, last + 1)).table?.rows || [];
           const index = new Map();
-          Object.keys(data || {}).forEach(sede => (data[sede] || []).forEach(event => index.set(currentCalendarMergeKey(event, sede), event)));
+          const indexNoTeam = new Map();
+          Object.keys(data || {}).forEach(sede => (data[sede] || []).forEach(event => {
+            index.set(currentCalendarMergeKey(event, sede), event);
+            const noTeam = currentCalendarMergeKeyNoTeam(event, sede);
+            if (!indexNoTeam.has(noTeam)) indexNoTeam.set(noTeam, event);
+          }));
           rows.forEach(row => {
             const cells = row.c || [];
             const value = column => cells[column]?.v ?? '';
@@ -585,13 +605,20 @@
               address: String(value(6) || '').trim(), sedeTag: sede, sede: sourceSede
             };
             const key = currentCalendarMergeKey(incoming, sede);
-            const existing = index.get(key);
+            const keyNoTeam = currentCalendarMergeKeyNoTeam(incoming, sede);
+            const existing = index.get(key) || indexNoTeam.get(keyNoTeam);
             if (existing) {
-              Object.assign(existing, { ...incoming, end: existing.end || incoming.end, logistics: existing.logistics || {} });
+              Object.assign(existing, {
+                ...incoming,
+                equipo: existing.equipo || incoming.equipo,
+                end: existing.end || incoming.end,
+                logistics: existing.logistics || {}
+              });
             } else {
               if (!data[sede]) data[sede] = [];
               data[sede].push(incoming);
               index.set(key, incoming);
+              indexNoTeam.set(keyNoTeam, incoming);
             }
           });
         }
@@ -645,7 +672,12 @@
           Object.keys(data || {}).forEach(sede => {
             (data[sede] || []).forEach(ev => {
               if (typeof ev.sheetTrainer === 'undefined') ev.sheetTrainer = ev.trainer || '';
-              const assignment = byEvent.get(ev.sourceEventKey || assignmentEventKey(ev, sede));
+              const keyWithTeam = assignmentEventKey(ev, sede);
+              const keyNoTeam = assignmentEventKeyNoTeam(ev, sede);
+              const assignment =
+                byEvent.get(ev.sourceEventKey) ||
+                byEvent.get(keyWithTeam) ||
+                byEvent.get(keyNoTeam);
               const slots = assignment || {};
               const orderedSlots = ['unico', 'Creación', 'Relación', 'Gratitud'];
               const confirmedSlots = orderedSlots
@@ -663,6 +695,28 @@
               ev.assignmentSource = 'causa_os';
               confirmed++;
             });
+
+            // Deduplicación de eventos en la misma sede (misma fecha y nombre)
+            const seen = new Map();
+            const unique = [];
+            (data[sede] || []).forEach(ev => {
+              const d = String(ev.start || ev.fecha_inicio || '').slice(0, 10);
+              const n = String(ev.name || ev.nombre || '').trim().toUpperCase();
+              const k = `${d}__${n}`;
+              if (!seen.has(k)) {
+                seen.set(k, ev);
+                unique.push(ev);
+              } else {
+                const existing = seen.get(k);
+                if (ev.assignmentSource === 'causa_os' && existing.assignmentSource !== 'causa_os') {
+                  Object.assign(existing, ev);
+                } else {
+                  existing.equipo = existing.equipo || ev.equipo;
+                  existing.place = existing.place || ev.place;
+                }
+              }
+            });
+            data[sede] = unique;
           });
           return confirmed;
         }
@@ -672,7 +726,8 @@
           Object.keys(data || {}).forEach(sede => {
             (data[sede] || []).forEach(ev => {
               const sourceEventKey = ev.sourceEventKey || assignmentEventKey(ev, sede);
-              const change = overrides.get(sourceEventKey);
+              const sourceEventKeyNoTeam = assignmentEventKeyNoTeam(ev, sede);
+              const change = overrides.get(sourceEventKey) || overrides.get(sourceEventKeyNoTeam);
               if (!change) return;
               ev.sourceEventKey = sourceEventKey;
               ev.start = change.fechaInicio || ev.start;

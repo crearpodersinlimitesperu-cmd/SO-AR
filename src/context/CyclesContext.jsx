@@ -29,6 +29,12 @@ const calendarMergeKey = (event = {}) => [
   String(event.nombre || event.name || '').trim().toUpperCase()
 ].join('__');
 
+const calendarMergeKeyNoTeam = (event = {}) => [
+  String(event.fecha_inicio || event.start || '').slice(0, 10),
+  String(event.sede || event.sedeTag || '').trim().toUpperCase(),
+  String(event.nombre || event.name || '').trim().toUpperCase()
+].join('__');
+
 const parseOfficialCalendarSheet = (text) => {
   const first = text.indexOf('{');
   const last = text.lastIndexOf('}');
@@ -56,24 +62,47 @@ const parseOfficialCalendarSheet = (text) => {
 };
 
 const mergeOfficialCalendar = (apiEvents, sheetEvents) => {
-  const byKey = new Map((apiEvents || []).map(event => [calendarMergeKey(event), event]));
+  const byKey = new Map();
+  const byKeyNoTeam = new Map();
+
+  for (const event of apiEvents || []) {
+    const fullKey = calendarMergeKey(event);
+    const noTeamKey = calendarMergeKeyNoTeam(event);
+    byKey.set(fullKey, event);
+    if (!byKeyNoTeam.has(noTeamKey)) {
+      byKeyNoTeam.set(noTeamKey, event);
+    }
+  }
+
   for (const sheetEvent of sheetEvents || []) {
-    const key = calendarMergeKey(sheetEvent);
-    const previous = byKey.get(key);
-    // La hoja es más reciente en los campos de programación. Conservamos los
-    // datos logísticos del API, porque pertenecen a otro flujo y no existen
-    // en el calendario de Sheets.
-    byKey.set(key, {
+    const fullKey = calendarMergeKey(sheetEvent);
+    const noTeamKey = calendarMergeKeyNoTeam(sheetEvent);
+    // Búsqueda inteligente: match exacto por equipo o match por fecha+sede+nombre
+    // para evitar duplicar eventos cuando la hoja viene sin número de equipo.
+    const previous = byKey.get(fullKey) || byKeyNoTeam.get(noTeamKey);
+
+    const merged = {
       ...(previous || {}),
       ...sheetEvent,
-      fecha_fin: previous?.fecha_fin || previous?.end || '',
+      // Preservar equipo existente si la hoja lo trae en blanco
+      equipo: sheetEvent.equipo || previous?.equipo || previous?.team || '',
+      fecha_fin: previous?.fecha_fin || previous?.end || sheetEvent.fecha_fin || '',
       ticket: previous?.ticket || 'pending',
       hotel: previous?.hotel || 'pending',
       notified: previous?.notified || false,
       arrival: previous?.arrival || '',
       ticket_url: previous?.ticket_url || ''
-    });
+    };
+
+    if (previous) {
+      const prevFullKey = calendarMergeKey(previous);
+      byKey.delete(prevFullKey);
+    }
+    const mergedFullKey = calendarMergeKey(merged);
+    byKey.set(mergedFullKey, merged);
+    byKeyNoTeam.set(noTeamKey, merged);
   }
+
   return [...byKey.values()];
 };
 
@@ -99,6 +128,13 @@ const asignadorEventKey = (event = {}) => {
   return `${f}__${s}__${n}${eq ? '__' + eq : ''}`.replace(/\//g, '-');
 };
 
+const asignadorEventKeyNoTeam = (event = {}) => {
+  const f = String(event.fecha_inicio || event.start || '').slice(0, 10);
+  const s = normalizeAssignmentSede(event.sede || event.sedeTag || '');
+  const n = String(event.nombre || event.name || '').trim();
+  return `${f}__${s}__${n}`.replace(/\//g, '-');
+};
+
 const trainerFromAssignment = assignment => {
   const slots = assignment || {};
   const ordered = ['unico', 'Creación', 'Relación', 'Gratitud']
@@ -112,13 +148,16 @@ const applyAsignadorProjection = (sourceEvents, assignments, operationalChanges)
   const overridesBySourceKey = new Map((operationalChanges || [])
     .filter(item => item.kind === 'override' && item.sourceEventKey)
     .map(item => [item.sourceEventKey, item]));
+
   const result = (sourceEvents || []).map(event => {
-    const key = asignadorEventKey(event);
-    const override = overridesBySourceKey.get(key);
-    const confirmedTrainer = trainerFromAssignment(assignmentByKey.get(key));
-    return {
+    const sourceKey = asignadorEventKey(event);
+    const sourceKeyNoTeam = asignadorEventKeyNoTeam(event);
+
+    const override = overridesBySourceKey.get(sourceKey) || overridesBySourceKey.get(sourceKeyNoTeam);
+
+    const updatedEvent = {
       ...event,
-      __assignmentKey: key,
+      __assignmentKey: sourceKey,
       ...(override ? {
         nombre: override.nombre || event.nombre, name: override.nombre || event.name,
         sede: override.sede || event.sede, sedeTag: override.sede || event.sedeTag,
@@ -127,19 +166,78 @@ const applyAsignadorProjection = (sourceEvents, assignments, operationalChanges)
         fecha_fin: override.fechaFin || event.fecha_fin || event.end || '',
         start: override.fechaInicio || event.start || event.fecha_inicio,
         end: override.fechaFin || event.end || event.fecha_fin || '',
-      } : {}),
-      ...(confirmedTrainer ? { trainer: confirmedTrainer, entrenador: confirmedTrainer, assignmentSource: 'causa_os' } : {})
+      } : {})
     };
+
+    // Búsqueda cruzada de la asignación confirmada en Causa OS:
+    // 1. Clave actual (con fecha actualizada tras override si aplica)
+    const currentKey = asignadorEventKey(updatedEvent);
+    const currentKeyNoTeam = asignadorEventKeyNoTeam(updatedEvent);
+    // 2. Clave original fuente
+    const assignmentDoc =
+      assignmentByKey.get(currentKey) ||
+      assignmentByKey.get(currentKeyNoTeam) ||
+      assignmentByKey.get(sourceKey) ||
+      assignmentByKey.get(sourceKeyNoTeam);
+
+    const confirmedTrainer = trainerFromAssignment(assignmentDoc);
+
+    if (confirmedTrainer) {
+      updatedEvent.trainer = confirmedTrainer;
+      updatedEvent.entrenador = confirmedTrainer;
+      updatedEvent.assignmentSource = 'causa_os';
+      updatedEvent.__assignmentKey = assignmentDoc.id || currentKey;
+    } else {
+      updatedEvent.__assignmentKey = currentKey;
+    }
+
+    return updatedEvent;
   });
+
   (operationalChanges || []).filter(item => item.kind === 'custom').forEach(item => {
+    const customKey = item.id;
+    const assignmentDoc = assignmentByKey.get(customKey);
+    const confirmedTrainer = trainerFromAssignment(assignmentDoc);
     result.push({
       __assignmentKey: item.id,
       fecha_inicio: item.fechaInicio, fecha_fin: item.fechaFin || '', start: item.fechaInicio, end: item.fechaFin || '',
       nombre: item.nombre, name: item.nombre, sede: item.sede, sedeTag: item.sede,
-      equipo: item.equipo || '', lugar: item.lugar || '', direccion: '', trainer: '', origen: 'causa_os'
+      equipo: item.equipo || '', lugar: item.lugar || '', direccion: '',
+      trainer: confirmedTrainer || '', entrenador: confirmedTrainer || '',
+      assignmentSource: confirmedTrainer ? 'causa_os' : 'custom', origen: 'causa_os'
     });
   });
-  return result.sort((a, b) => new Date(a.fecha_inicio || a.start) - new Date(b.fecha_inicio || b.start));
+
+  // Deduplicación estricta: un mismo entrenamiento (fecha + sede + nombre) nunca debe
+  // aparecer dos veces. Si hay conflicto, la proyección de Causa OS prevalece sobre
+  // referencias provisionales de Sheets.
+  const deduplicated = [];
+  const seenMap = new Map();
+
+  for (const ev of result) {
+    const d = String(ev.fecha_inicio || ev.start || '').slice(0, 10);
+    const s = normalizeAssignmentSede(ev.sede || ev.sedeTag || '').toUpperCase();
+    const n = String(ev.nombre || ev.name || '').trim().toUpperCase();
+    const dedupKey = `${d}__${s}__${n}`;
+
+    if (!seenMap.has(dedupKey)) {
+      seenMap.set(dedupKey, ev);
+      deduplicated.push(ev);
+    } else {
+      const existing = seenMap.get(dedupKey);
+      if (ev.assignmentSource === 'causa_os' && existing.assignmentSource !== 'causa_os') {
+        Object.assign(existing, ev);
+      } else {
+        existing.equipo = existing.equipo || ev.equipo;
+        existing.lugar = existing.lugar || ev.lugar;
+        existing.direccion = existing.direccion || ev.direccion;
+        if (!existing.trainer && ev.trainer) existing.trainer = ev.trainer;
+        if (!existing.entrenador && ev.entrenador) existing.entrenador = ev.entrenador;
+      }
+    }
+  }
+
+  return deduplicated.sort((a, b) => new Date(a.fecha_inicio || a.start) - new Date(b.fecha_inicio || b.start));
 };
 
 // (14/09/2026) EXTRAÍDO de calculateCycleAndStage() sin cambiar su lógica, para
