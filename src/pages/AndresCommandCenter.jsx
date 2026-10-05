@@ -139,40 +139,6 @@ export default function AndresCommandCenter() {
           </div>
         </div>
 
-        {/* THIRD FOLD: SUPERVISION BOARD */}
-        <div style={{ gridColumn: 'span 12', background: 'var(--bg-card)', borderRadius: '12px', border: '1px solid var(--border-strong)', padding: '1.5rem', boxShadow: 'var(--shadow-sm)' }}>
-          <h2 style={{ fontSize: '1.2rem', color: 'var(--text-heading)', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 0 1.5rem 0' }}>
-            <Users size={22} color="#8b5cf6" /> Board de Supervisión Global (Coordinadores Locales)
-          </h2>
-          {supervision.length === 0 ? (
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Sincronizando datos reales con coordinadores de sede...</p>
-          ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
-              {supervision.map(s => (
-              <div key={s.id} style={{ background: 'var(--bg-dark-alt)', borderRadius: '8px', borderTop: s.status === 'CRITICAL' ? '4px solid #ef4444' : s.status === 'WARNING' ? '4px solid #f59e0b' : '4px solid #10b981', padding: '1.2rem', border: '1px solid var(--border-subtle)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
-                  <div>
-                    <div style={{ fontSize: '1.1rem', fontWeight: 900, color: 'var(--text-heading)' }}>{s.hq}</div>
-                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{s.coordinator}</div>
-                  </div>
-                  {s.status === 'CRITICAL' && <AlertTriangle size={20} color="#ef4444" />}
-                  {s.status === 'HEALTHY' && <CheckCircle2 size={20} color="#10b981" />}
-                </div>
-                
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg-card)', padding: '0.8rem', borderRadius: '6px', marginBottom: '0.5rem', border: '1px solid var(--border-subtle)' }}>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Cumplimiento</span>
-                  <span style={{ fontSize: '1rem', fontWeight: 800, color: s.compliance >= 90 ? '#10b981' : s.compliance >= 70 ? '#f59e0b' : '#ef4444' }}>{s.compliance}%</span>
-                </div>
-                
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg-card)', padding: '0.8rem', borderRadius: '6px', border: '1px solid var(--border-subtle)' }}>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Tareas Críticas Vencidas</span>
-                  <span style={{ fontSize: '1rem', fontWeight: 800, color: s.pendingCritical > 0 ? '#ef4444' : 'var(--text-muted)' }}>{s.pendingCritical}</span>
-                </div>
-              </div>
-            ))}
-            </div>
-          )}
-        </div>
 
         {/* LEGACY WRAPPER */}
         <div style={{ gridColumn: 'span 12', marginTop: '1rem' }}>
