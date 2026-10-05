@@ -136,11 +136,13 @@ const asignadorEventKeyNoTeam = (event = {}) => {
 };
 
 const trainerFromAssignment = assignment => {
+  if (!assignment) return '';
   const slots = assignment || {};
   const ordered = ['unico', 'Creación', 'Relación', 'Gratitud']
     .filter(slot => slots[slot]?.entrenador)
     .map(slot => slots[slot].entrenador);
-  return ordered.length ? ordered.join(' / ') : '';
+  if (ordered.length) return ordered.join(' / ');
+  return assignment.entrenador || assignment.trainer || '';
 };
 
 const applyAsignadorProjection = (sourceEvents, assignments, operationalChanges) => {

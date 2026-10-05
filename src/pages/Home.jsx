@@ -93,9 +93,16 @@ const isExactAssignedTrainer = (trainer, user) => {
   return Boolean(trainerKey && userKey && trainerKey === userKey);
 };
 
-const confirmedTrainerNames = (assignment) => ['unico', 'Creación', 'Relación', 'Gratitud']
-  .map(slot => assignment?.[slot]?.entrenador)
-  .filter(Boolean);
+const confirmedTrainerNames = (assignment) => {
+  if (!assignment) return [];
+  const fromSlots = ['unico', 'Creación', 'Relación', 'Gratitud']
+    .map(slot => assignment[slot]?.entrenador)
+    .filter(Boolean);
+  if (fromSlots.length > 0) return fromSlots;
+  if (assignment.entrenador) return [assignment.entrenador];
+  if (assignment.trainer) return [assignment.trainer];
+  return [];
+};
 
 // ============================================================================
 // BUSCADOR GLOBAL — Registro de módulos/páginas (28/08/2026)
@@ -3111,7 +3118,15 @@ export default function Home() {
                                     en vez de tocar hasRoleAccess() en sí (usado en muchos otros lugares,
                                     cambiar su comportamiento general es más riesgo del que pide este bug
                                     puntual). */}
-                                {(!hasRoleAccess(['qt', 'capitan', 'manager', 'aliado']) || (currentUser?.isSuperAdmin && !currentUser?.isSimulated)) && (
+                                {/* Visibilidad de Trainer:
+                                    Directiva oficial de José Sánchez: Las coordinadoras de cada sede (como Lili Cubillo y Judith Romero),
+                                    así como gerentes, directores y entrenadores deben ver siempre a los entrenadores asignados
+                                    en los eventos y entrenamientos de sus perfiles y sedes.
+                                    Solo se oculta a participantes de equipo rasos (capitán/aliado que no coordinan). */}
+                                {(!hasRoleAccess(['capitan', 'aliado']) || 
+                                  isCoordC1C2 || isCoordMJ || isEntrenador || isGerente || isSuperOrDir || 
+                                  (currentUser?.roles || []).some(r => ['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'director_maestria', 'entrenador', 'entrenador_llamadas', 'gerente'].includes(r)) ||
+                                  (currentUser?.isSuperAdmin && !currentUser?.isSimulated)) && (
                                   <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginTop: '0.1rem' }}>
                                     🎙️ Trainer: {confirmedTrainerLabel || ev.trainer || ev.entrenador || 'Por confirmar'}
                                   </span>
