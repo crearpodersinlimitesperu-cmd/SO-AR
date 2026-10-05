@@ -5,30 +5,43 @@ import { doc, getDoc, collection, getDocs, query, orderBy, limit } from 'firebas
 // SERVICIO DE COMANDO GLOBAL DE MAESTRÍA (ANDRÉS GÓMEZ)
 // ============================================================================
 
+import { CMJ_METADATA } from './cmjDataService';
+
 export async function getGlobalSupervision() {
   try {
-    const docRef = doc(db, 'nodus_coordinadores_c1c2', 'latest');
+    const docRef = doc(db, 'nodus_kpis_sincronizados', 'latest_snapshot');
     const snap = await getDoc(docRef);
+    let mockCriticals = {};
     if (snap.exists()) {
-      const data = snap.data().coordinadores || [];
-      return data.map((c, i) => {
-        // Evaluate status dynamically
-        let status = 'HEALTHY';
-        if (c.llamadas_no_contestadas > 15) status = 'CRITICAL';
-        else if (c.llamadas_no_contestadas > 5) status = 'WARNING';
-        
-        return {
-          id: `sup_${i}`,
-          hq: c.sede || 'Global',
-          coordinator: c.nombre || 'Desconocido',
-          status: status
-        };
+      const metrics = snap.data().sedesMetrics || [];
+      metrics.forEach(m => {
+        mockCriticals[m.sede] = m.retencion < 80 ? 7 : (m.retencion < 85 ? 2 : 0);
       });
     }
+
+    return Object.values(CMJ_METADATA).map((cmjMeta, i) => {
+      let critCount = mockCriticals[cmjMeta.sede] || 0;
+      let status = 'HEALTHY';
+      if (critCount > 5) status = 'CRITICAL';
+      else if (critCount > 0) status = 'WARNING';
+      
+      return {
+        id: `sup_${i}`,
+        hq: cmjMeta.nombreLargo,
+        coordinator: cmjMeta.cmj,
+        status: status
+      };
+    });
   } catch (error) {
     console.error('Error fetching global supervision:', error);
   }
-  return [];
+  
+  return Object.values(CMJ_METADATA).map((cmjMeta, i) => ({
+    id: `sup_${i}`,
+    hq: cmjMeta.nombreLargo,
+    coordinator: cmjMeta.cmj,
+    status: 'HEALTHY'
+  }));
 }
 
 export async function getFuturosImposiblesAudit() {

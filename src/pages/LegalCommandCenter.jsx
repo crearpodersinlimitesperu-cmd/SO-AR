@@ -5,7 +5,7 @@ import { getArcoTickets, getIpTracker, getNdaMatrix } from '../services/legalSer
 import ChecklistBoard from './ChecklistBoard';
 import { 
   ShieldAlert, Lock, Scale, AlertTriangle, FileWarning, Fingerprint,
-  ChevronLeft, FileSignature, EyeOff, ChevronDown, ChevronRight, Ban
+  ChevronLeft, FileSignature, EyeOff, ChevronDown, ChevronRight, Ban, Shield
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
