@@ -132,18 +132,95 @@ const normalizarIdentidadEntrenador = (value = '') => String(value)
   .map(token => ({ fernando: 'fer', fer: 'fer' }[token] || token))
   .join(' ');
 const NOMBRES_LEGALES_ENTRENADORES = {
+  'alejandro diaz': 'Alejandro Díaz',
+  'alonso solares': 'Alonso Solares Salazar',
+  'alonso solares salazar': 'Alonso Solares Salazar',
+  'ana elena monroy': 'Ana Elena Monroy',
+  'ana elena monroy thompson': 'Ana Elena Monroy',
+  'ana monroy': 'Ana Elena Monroy',
+  'andres gomez': 'Andrés Gómez',
+  'andres i': 'Andrés Idrobo',
+  'andres idrobo': 'Andrés Idrobo',
+  'carlos brunis': 'Carlos Brunis',
+  'chuy acosta': 'Jesús Adrián Acosta',
+  'cirilo agustin': 'Cirilo Agustín Martínez',
+  'cirilo agustin martinez': 'Cirilo Agustín Martínez',
+  'diego bravo': 'Diego Bravo',
+  'diego david bravo figueroa': 'Diego Bravo',
+  'edison paul sosa': 'Paul Sosa',
+  'edison paul sosa carrera': 'Paul Sosa',
+  'elmer andres idrobo andrade': 'Andrés Idrobo',
+  'erika gavilanez': 'Erika Gissell Gavilánez Gallardo',
+  'erika gissell gavilanez gallardo': 'Erika Gissell Gavilánez Gallardo',
+  'ernesto alejandro diaz pabon': 'Alejandro Díaz',
+  'fer aragon': 'Fer Aragón',
   'fer mendoza': 'Haydin Fernando Mendoza Clavijo',
+  'fernando aragon': 'Fer Aragón',
+  'haydin fer mendoza clavijo': 'Haydin Fernando Mendoza Clavijo',
   'haydin fernando mendoza clavijo': 'Haydin Fernando Mendoza Clavijo',
+  'jesus acosta': 'Jesús Adrián Acosta',
+  'jesus adrian acosta': 'Jesús Adrián Acosta',
+  'jose sanchez': 'José Sánchez',
   'josue vera': 'Marcos Josué Vera Avilés',
-  'marcos josue vera aviles': 'Marcos Josué Vera Avilés',
-  'paul sosa': 'Edison Paul Sosa Carrera',
-  'edison paul sosa': 'Edison Paul Sosa Carrera',
-  'edison paul sosa carrera': 'Edison Paul Sosa Carrera',
+  'juan angel': 'Juan Angel',
+  'juan angel arreola': 'Juan Angel',
+  'juan angel arreola morales': 'Juan Angel',
+  'julio cesar narvaez': 'Julio César Narváez',
+  'julio narvaez': 'Julio César Narváez',
+  'leandro brunis': 'Leandro Brunis',
   'lili cubillo': 'Liliana Lilibeth Cubillo Vera',
   'liliana cubillo': 'Liliana Lilibeth Cubillo Vera',
+  'linid valencia': 'Linid Valencia',
+  'lourdes patino': 'María De Lourdes Patiño Patiño Galarraga',
+  'marcos josue vera aviles': 'Marcos Josué Vera Avilés',
+  'maria de lourdes patino': 'María De Lourdes Patiño Patiño Galarraga',
+  'maria de lourdes patino galarraga': 'María De Lourdes Patiño Patiño Galarraga',
+  'maria de lourdes patino patino galarraga': 'María De Lourdes Patiño Patiño Galarraga',
+  'mary lourdes patino': 'María De Lourdes Patiño Patiño Galarraga',
+  'mau perez': 'Mauricio Pérez',
+  'mauricio perez': 'Mauricio Pérez',
+  'mauricio ramirez': 'Mauricio Ramirez Silva',
+  'mauricio ramirez silva': 'Mauricio Ramirez Silva',
+  'michael boada': 'Mike Boada',
+  'mike boada': 'Mike Boada',
+  'mildred munoz': 'Mildred Muñoz Vasquez',
+  'mildred munoz v': 'Mildred Muñoz Vasquez',
+  'mildred munoz vasquez': 'Mildred Muñoz Vasquez',
+  'paul sosa': 'Paul Sosa',
   'regi romero': 'Judith Regina Romero Rosales',
   'regina romero': 'Judith Regina Romero Rosales',
 };
+
+// Nómina oficial canónica de los 24 entrenadores de Causa OS (Plan Maestro 2026).
+// Garantiza que todos los entrenadores oficiales aparezcan siempre disponibles
+// en el selector, filtros y matriz de asignación, independientemente de si su rol
+// principal en Firestore es 'direccion', 'gerente', 'qt' o 'entrenador'.
+export const ENTRENADORES_OFICIALES_CPSL = [
+  { nombre: 'Alejandro Díaz', email: 'emalejodiaz@gmail.com', emails: ['emalejodiaz@gmail.com'], tipo: 'MJ', llamadas: 'SI' },
+  { nombre: 'Alonso Solares Salazar', email: 'solaresalonso@gmail.com', emails: ['solaresalonso@gmail.com'], tipo: 'MJ', llamadas: 'SI' },
+  { nombre: 'Ana Elena Monroy', email: 'anamonroyt@gmail.com', emails: ['anamonroyt@gmail.com'], tipo: 'MJ', llamadas: 'SI' },
+  { nombre: 'Andrés Gómez', email: 'gomeznueve@gmail.com', emails: ['gomeznueve@gmail.com', 'andres.gomez@crearpsl.net'], tipo: 'C2+MJ', llamadas: 'SI' },
+  { nombre: 'Andrés Idrobo', email: 'e.andresid@gmail.com', emails: ['e.andresid@gmail.com'], tipo: 'MJ', llamadas: 'SI' },
+  { nombre: 'Carlos Brunis', email: 'brunische66@gmail.com', emails: ['brunische66@gmail.com', 'carlos.brunis@crearpsl.net'], tipo: 'El Viaje', llamadas: 'NO' },
+  { nombre: 'Cirilo Agustín Martínez', email: 'ciriloagustin21@gmail.com', emails: ['ciriloagustin21@gmail.com'], tipo: 'MJ', llamadas: 'NO' },
+  { nombre: 'Diego Bravo', email: 'dibrafi@gmail.com', emails: ['dibrafi@gmail.com'], tipo: 'El Viaje', llamadas: 'SI' },
+  { nombre: 'Erika Gissell Gavilánez Gallardo', email: 'erika.gavilanez@crearpsl.net', emails: ['erika.gavilanez@crearpsl.net'], tipo: 'El Viaje', llamadas: 'SI' },
+  { nombre: 'Fer Aragón', email: 'fer.aragon@crearpsl.net', emails: ['fer.aragon@crearpsl.net', 'fer.aragon@crearpsl.com'], tipo: 'C1', llamadas: 'NO' },
+  { nombre: 'Haydin Fernando Mendoza Clavijo', email: 'fernandomendozaclavijo22@gmail.com', emails: ['fernandomendozaclavijo22@gmail.com'], tipo: 'El Viaje', llamadas: 'SI' },
+  { nombre: 'Jesús Adrián Acosta', email: 'chuyacostar88@gmail.com', emails: ['chuyacostar88@gmail.com'], tipo: 'MJ', llamadas: 'SI' },
+  { nombre: 'José Sánchez', email: 'jose.sanchez@crearpsl.net', emails: ['jose.sanchez@crearpsl.net'], tipo: 'Entrenamietos Complementarios', llamadas: 'SI' },
+  { nombre: 'Juan Angel', email: 'jarreolamorales@gmail.com', emails: ['jarreolamorales@gmail.com'], tipo: 'C2+MJ', llamadas: 'NO' },
+  { nombre: 'Julio César Narváez', email: 'coor.operaciones2023@gmail.com', emails: ['coor.operaciones2023@gmail.com'], tipo: 'El Viaje', llamadas: 'SI' },
+  { nombre: 'Leandro Brunis', email: 'leandro.brunis@crearpsl.net', emails: ['leandro.brunis@crearpsl.net'], tipo: 'C1', llamadas: 'NO' },
+  { nombre: 'Linid Valencia', email: 'linid.valencia@crearpsl.net', emails: ['linid.valencia@crearpsl.net'], tipo: 'Entrenamietos Complementarios', llamadas: 'SI' },
+  { nombre: 'Marcos Josué Vera Avilés', email: 'josue.vera@crearpsl.net', emails: ['josue.vera@crearpsl.net'], tipo: 'Entrenamietos Complementarios', llamadas: 'SI' },
+  { nombre: 'María De Lourdes Patiño Patiño Galarraga', email: 'marylourdespat@gmail.com', emails: ['marylourdespat@gmail.com'], tipo: 'MJ', llamadas: 'SI' },
+  { nombre: 'Mauricio Pérez', email: 'mperez.ttw@gmail.com', emails: ['mperez.ttw@gmail.com'], tipo: 'C1', llamadas: 'NO' },
+  { nombre: 'Mauricio Ramirez Silva', email: 'mauricio.ramirez@crearpsl.net', emails: ['mauricio.ramirez@crearpsl.net'], tipo: 'El Viaje', llamadas: 'SI' },
+  { nombre: 'Mike Boada', email: 'maboadar@gmail.com', emails: ['maboadar@gmail.com', 'direccion@bmbgbrokers.com'], tipo: 'MJ', llamadas: 'SI' },
+  { nombre: 'Mildred Muñoz Vasquez', email: 'mildredmunozv@gmail.com', emails: ['mildredmunozv@gmail.com'], tipo: 'C2+MJ', llamadas: 'NO' },
+  { nombre: 'Paul Sosa', email: 'paul.sosa@crearpsl.net', emails: ['paul.sosa@crearpsl.net'], tipo: 'C2+MJ', llamadas: 'NO' },
+];
 const nombreLegalEntrenador = (value = '') => NOMBRES_LEGALES_ENTRENADORES[normalizarIdentidadEntrenador(value)] || String(value || '').trim();
 const identidadCanonicaEntrenador = (value = '') => normalizarIdentidadEntrenador(nombreLegalEntrenador(value));
 const mismoEntrenador = (a, b) => {
@@ -275,28 +352,60 @@ export default function AsignadorEntrenadores() {
           return activo && !inactivoExcluido && roles.some(r => r === 'entrenador' || r === 'entrenador_llamadas' || r === 'director_maestria');
         });
         const porIdentidad = new Map();
+
+        // 1. Sembrar primero la nómina oficial canónica de los 24 entrenadores
+        ENTRENADORES_OFICIALES_CPSL.forEach(oficial => {
+          const identidad = identidadCanonicaEntrenador(oficial.nombre);
+          const registro = {
+            nombre: oficial.nombre,
+            email: oficial.email,
+            emails: oficial.emails,
+            sede: '',
+            tipo: oficial.tipo,
+            llamadas: oficial.llamadas,
+            esOficial: true,
+          };
+          if (identidad) porIdentidad.set(`name:${identidad}`, registro);
+          oficial.emails.forEach(em => {
+            if (em) porIdentidad.set(`email:${String(em).toLowerCase().trim()}`, registro);
+          });
+        });
+
+        // 2. Fusionar metadatos (como sede real u otros entrenadores válidos) desde la base de datos
         soloEntrenadores.forEach(u => {
           const nombre = (u.name || u.displayName || '').trim();
           const email = String(u.email || u.corporateEmail || '').trim().toLowerCase();
           const identidad = identidadCanonicaEntrenador(nombre);
           if (!nombre || !identidad) return;
-          // Se consolidan únicamente correos iguales o nombres exactamente
-          // normalizados (mayúsculas, tildes y espacios no crean otra persona).
-          // Nunca se usa coincidencia parcial: Andrés Gómez e Idrobo siguen separados.
-          const existing = porIdentidad.get(`email:${email}`) || porIdentidad.get(`name:${identidad}`);
+
+          const existing = (email ? porIdentidad.get(`email:${email}`) : null) || porIdentidad.get(`name:${identidad}`);
           const merged = {
-            nombre: nombreLegalEntrenador(existing?.nombre || nombre),
+            ...existing,
+            nombre: existing?.nombre || nombreLegalEntrenador(nombre),
             email: existing?.email || email,
-            sede: existing?.sede || u.sede || '',
+            sede: u.sede || existing?.sede || '',
           };
           porIdentidad.set(`name:${identidad}`, merged);
           if (email) porIdentidad.set(`email:${email}`, merged);
         });
+
+        // 3. Obtener lista consolidada única
         const unicos = [...new Set(porIdentidad.values())];
         if (vivo) setEntrenadores(unicos.sort((a, b) => a.nombre.localeCompare(b.nombre)));
       } catch (e) {
         console.error('No se pudo cargar el directorio de entrenadores:', e);
-        if (vivo) showToast('No se pudo cargar la lista de entrenadores.', 'error');
+        // Respaldo inmediato: si falla la consulta a Firestore, mostrar los 24 oficiales
+        if (vivo) {
+          setEntrenadores(ENTRENADORES_OFICIALES_CPSL.map(o => ({
+            nombre: o.nombre,
+            email: o.email,
+            emails: o.emails,
+            sede: '',
+            tipo: o.tipo,
+            llamadas: o.llamadas,
+            esOficial: true,
+          })).sort((a, b) => a.nombre.localeCompare(b.nombre)));
+        }
       }
     })();
     return () => { vivo = false; };
