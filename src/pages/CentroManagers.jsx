@@ -3001,6 +3001,13 @@ export default function CentroManagers() {
                         </td>
                         <td style={{ padding: '1rem', textAlign: 'center' }}>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}>
+                            <button
+                              onClick={() => setManagerCardModal(m)}
+                              title="Ver Tarjeta del Integrante"
+                              style={{ background: '#e0e7ff', border: '1px solid #bfdbfe', color: '#1d4ed8', padding: '0.4rem', borderRadius: '6px', cursor: 'pointer' }}
+                            >
+                              <UserCheck size={15} />
+                            </button>
                             {(userCanWriteNota || userCanViewAllNotas) && (
                               <button
                                 onClick={() => setNotaModal(m)}
@@ -3187,6 +3194,13 @@ export default function CentroManagers() {
                                     }}
                                   >
                                     {m.llamadaAsistio === 'SI' ? '✅ Asistió' : '❌ Falta'}
+                                  </button>
+                                  <button
+                                    onClick={() => setManagerCardModal(m)}
+                                    title="Tarjeta del Integrante"
+                                    style={{ background: '#e0e7ff', border: '1px solid #bfdbfe', color: '#1d4ed8', padding: '0.3rem', borderRadius: '5px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                  >
+                                    <UserCheck size={13} />
                                   </button>
                                   {(userCanWriteNota || userCanViewAllNotas) && (
                                     <button
