@@ -1,7 +1,7 @@
 // Read-only contract inspection. Output contains field names/counts, never people or credentials.
 import puppeteer from 'puppeteer';
 const origin = 'https://imo.crearpslglobal.com';
-const browser = await puppeteer.launch({headless:true,args:['--no-sandbox','--disable-setuid-sandbox']});
+const browser = await puppeteer.launch({executablePath:process.env.CHROME_BIN,headless:true,args:['--no-sandbox','--disable-setuid-sandbox']});
 try {
   if (!process.env.NODUS_USER || !process.env.NODUS_PASSWORD) throw new Error('Missing configured Nodus credentials');
   const page = await browser.newPage();

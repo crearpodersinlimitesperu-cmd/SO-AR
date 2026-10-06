@@ -13,7 +13,11 @@ jobs:
         with:
           node-version: '22'
       - run: npm install --ignore-scripts --include=optional
-      - run: npx puppeteer browsers install chrome --install-deps
+      - name: Locate Chrome installed on the GitHub runner
+        run: |
+          CHROME_BIN="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
+          test -n "$CHROME_BIN"
+          echo "CHROME_BIN=$CHROME_BIN" >> "$GITHUB_ENV"
       - name: Inspect identity contract without importing records
         env:
           NODUS_USER: ${{ secrets.NODUS_USER }}
