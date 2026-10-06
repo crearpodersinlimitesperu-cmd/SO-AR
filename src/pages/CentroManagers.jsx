@@ -534,7 +534,8 @@ export default function CentroManagers() {
   // Auto-Graduación de Equipos cuando finaliza "El Viaje"
   useEffect(() => {
     if (!events || events.length === 0 || !managers || managers.length === 0) return;
-    if (!canChangeManagerStatus) return; 
+    // Solo permitimos que el CMJ/SuperAdmin desencadene el motor de auto-graduacion
+    if (!canChangeStatus) return; 
 
     const activeTeams = new Map(); 
     managers.forEach(m => {
@@ -611,7 +612,7 @@ export default function CentroManagers() {
     };
 
     procesarGraduacion();
-  }, [events, managers, llamadasHistorial, currentUser, canChangeManagerStatus]);
+  }, [events, managers, llamadasHistorial, currentUser, canChangeStatus]);
 
   // Efecto para actualizar el filtro si cambia el toggle de dual role
   useEffect(() => {
@@ -1899,7 +1900,8 @@ export default function CentroManagers() {
       return;
     }
     const targetSede = normalizeSede(team.sede);
-    const targetEquipo = (team.equipo || '').trim().toUpperCase();
+    // FIX: use numeric value matching to be immune to GYE-24 vs 24 discrepancies
+    const targetEquipoNum = getTeamNumericValue(team);
 
     // Obtener miembros del equipo de manera robusta
     let miembros = [];
@@ -1910,7 +1912,8 @@ export default function CentroManagers() {
     } else {
       miembros = managers.filter(m => 
         normalizeSede(m.sede) === targetSede && 
-        (m.equipo || '').trim().toUpperCase() === targetEquipo
+        getTeamNumericValue(m) === targetEquipoNum && 
+        getTeamNumericValue(m) !== 999999
       );
     }
 
@@ -1957,7 +1960,7 @@ export default function CentroManagers() {
       // Actualizar estado local inmediatamente
       setManagers(prev => prev.map(m => {
         const isMatch = normalizeSede(m.sede) === targetSede && 
-                        (m.equipo || '').trim().toUpperCase() === targetEquipo;
+                        getTeamNumericValue(m) === targetEquipoNum && getTeamNumericValue(m) !== 999999;
         if (!isMatch) return m;
         const currentNormState = normalizeManagerEstado(m.estado);
         const finalEstado = currentNormState === 'Activo' ? 'Graduado' : m.estado;
