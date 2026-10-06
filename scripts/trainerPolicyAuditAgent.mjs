@@ -160,8 +160,19 @@ export async function runTrainerPolicyAudit() {
   const files = (listed.data.files || []).filter(file => file.mimeType === 'application/pdf');
   const ambiguous = new Set();
   const candidates = new Map();
+  console.log(`Descargando y leyendo ${files.length} PDFs para hacer OCR profundo...`);
+  for (let i = 0; i < files.length; i++) {
+    try {
+      const media = await drive.files.get({ fileId: files[i].id, alt: 'media', supportsAllDrives: true }, { responseType: 'arraybuffer' });
+      files[i].textContent = await extractTextFromPdf(media.data);
+    } catch (e) {
+      files[i].textContent = '';
+      console.warn(`No se pudo leer texto del PDF ${files[i].name}`);
+    }
+  }
+
   for (const file of files) {
-        let matches = coaches.filter(coach => fullNameMatch(coach, file.name).high);
+    let matches = coaches.filter(coach => fullNameMatch(coach, file.name).high || (file.textContent && fullNameMatch(coach, file.textContent).high));
     if (matches.length === 0) {
         // Fallback robust alias matching
         const fname = file.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -202,11 +213,8 @@ export async function runTrainerPolicyAudit() {
 
     const { file } = candidate;
     let expiry = null;
-    try {
-      const media = await drive.files.get({ fileId: file.id, alt: 'media', supportsAllDrives: true }, { responseType: 'arraybuffer' });
-      expiry = await extractExpiryFromPdf(media.data);
-    } catch (error) {
-      console.warn(`No se pudo leer el PDF ${file.name}: ${error.message}`);
+    if (file.textContent) {
+      expiry = extractExpiryFromText(file.textContent);
     }
     const base = {
       trainerName: coach.name, coachEmail: coach.email, sede: coach.sede,
