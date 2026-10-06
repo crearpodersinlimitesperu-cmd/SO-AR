@@ -558,7 +558,7 @@ export default function CentroManagers() {
 
       const viajeEvent = events.find(e => {
         const eNombre = String(e.nombre || e.name || '').toUpperCase();
-        if (!eNombre.includes('VIAJE')) return false;
+        if (!eNombre.includes('VIAJE') && !eNombre.includes('FIN DE SEMANA') && !eNombre.includes('RETIRO')) return false;
         
         const eSede = normalizeSede(e.sede || e.sedeTag);
         if (eSede !== sede) return false;
