@@ -1,0 +1,21 @@
+name: IMO Nodus identity contract (read only)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --ignore-scripts --include=optional
+      - run: npx puppeteer browsers install chrome --install-deps
+      - name: Inspect identity contract without importing records
+        env:
+          NODUS_USER: ${{ secrets.NODUS_USER }}
+          NODUS_PASSWORD: ${{ secrets.NODUS_PASSWORD }}
+        run: node scripts/auditImoNodusContract.mjs
