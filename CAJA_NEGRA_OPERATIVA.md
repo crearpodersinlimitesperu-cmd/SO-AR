@@ -676,6 +676,33 @@ Tras el reporte de incidencias donde firmas completadas figuraban en el panel ad
 
 ---
 
+
+---
+
+## 17. Avances de Octubre 2026: Auditoría de Seguros Inteligente, Auto-Graduación de Equipos y Estabilización de la Nómina
+
+### 17.1. Auditoría Inteligente de Pólizas de Seguro (Gemini Vision AI)
+* **Problema Original:** El sistema validaba las pólizas basándose en si el archivo se llamaba de cierta forma o buscando fechas con expresiones regulares muy débiles, generando que usuarios con seguros vigentes quedaran en rojo ("En Revisión") de manera injusta, o que se aprobaran archivos falsos.
+* **Solución Definitiva (Causa OS + Gemini AI):**
+  1. Se implementó un agente basado en `@google/generative-ai` (`gemini-1.5-flash`) en `scripts/trainerPolicyAuditAgent.mjs`.
+  2. Este agente no lee el nombre del archivo, lee **EL CONTENIDO VISUAL Y DE TEXTO DEL PDF**, buscando literalmente la fecha de vencimiento y el nombre del asegurado para hacer match estricto con el entrenador.
+  3. Se vincularon las fechas **REALES** en Firestore (`validUntil`). 
+  4. Los entrenadores sin archivo, con archivos de imagen no válidos, o sin fechas legibles fueron regresados irreversiblemente a `EN REVISIÓN`. **Ninguna fecha falsa de "2026-12-31" está permitida en la base de datos.** 
+
+### 17.2. Auto-Graduación de Equipos (Centro de Managers)
+* **Problema Original:** Los Coordinadores o Entrenadores debían marcar manualmente que un equipo se graduó o cerró al terminar su proceso, para que las finanzas procedieran a la liquidación, lo que llevaba a errores y retrasos.
+* **Solución Implementada (`src/pages/CentroManagers.jsx`):**
+  1. **Opción 100% Automática:** El sistema ahora lee el calendario en vivo (Sheets/`CyclesContext`). 
+  2. Si detecta que un equipo cursó el evento de **"EL VIAJE"** y ya transcurrieron 3 días de esa fecha, el sistema de CAUSA de forma autónoma y silenciosa marca al equipo como `Graduado` y los envía a la cola de **Liquidación/Pagos**.
+  3. Se añadió una **Alerta Visual Verde** ("¡Graduación Automática Detectada!") en la parte superior del módulo de Managers que detalla al CMJ qué equipos se graduaron recientemente de manera automática y cuántas llamadas tenían registradas.
+
+### 17.3. Estabilización de la Nómina del Asignador (El caso Emily Campuzano)
+* **Problema:** En el Asignador de Entrenadores, ciertos entrenadores (como Emily Campuzano) desaparecían del listado oficial impidiendo que se les asignara a eventos.
+* **Solución Estructural:**
+  1. **Nombres Legales Estrictos:** Se mapeó `'emily campuzano': 'Emily Campuzano'` en `NOMBRES_LEGALES_ENTRENADORES` (`src/pages/AsignadorEntrenadores.jsx`).
+  2. **Inclusión en Plan Maestro 2026:** Se inyectó formalmente en el array `ENTRENADORES_OFICIALES_CPSL` etiquetada para "El Viaje" y habilitada para recibir llamadas.
+  3. **Corrección de Directorio Activo:** Se normalizó a los usuarios en Firestore (`users` y `staff_directory`) inyectándoles el `displayName` correcto si venían de cuentas importadas con campos en blanco. 
+
 > 📜 **Mandato de la Caja Negra:**
 > Esta Caja Negra es la fuente viva de verdad de CPSL y Causa OS. Debe consultarse antes de cualquier cambio de arquitectura y actualizarse de inmediato tras cada nueva funcionalidad, regla o descubrimiento operativo.
 
