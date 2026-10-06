@@ -1,0 +1,37 @@
+# Misión IMO: centro de control autenticado
+
+## Alcance confirmado por José (5 octubre 2026)
+
+- Precargar fecha C1 desde calendario oficial al elegir sede/equipo, incorporando cambios de Causa.
+- Entrada con documento + código al contacto registrado. Nunca basta elegir un nombre.
+- Consultar solo enrolados vinculados al IMO autenticado, mediante identificadores estables de Nodus.
+- Separar estado oficial Nodus, confirmación reportada por IMO y solicitud pendiente.
+- Cambiar de equipo mediante solicitud al C1/C2 asignado. No modificar Nodus automáticamente.
+- Notificar al coordinador asignado y registrar antes/después, actor verificado, origen y fecha.
+- Confirmar aplicación oficial solamente tras una nueva sincronización de Nodus que verifique el cambio.
+
+## Evidencia de integración
+
+La ficha `/participantessede/perfil/{id}` de Nodus muestra identificación, correo, equipo actual, coordinador y la identificación del invitador. La tabla general separa equipo de origen, equipo actual, IMO, equipo IMO, asistencia C1 y asistencia C2. Estos son conceptos distintos.
+
+La sesión de usuario en Nodus se confirmó mediante navegación autorizada. No se extrajeron cookies ni se copiaron credenciales del navegador. La lectura HTTP de login sin sesión recibió 403; no se intentó evadir esa respuesta. El repositorio ya tiene una sincronización horaria con credenciales NODUS_USER/NODUS_PASSWORD en GitHub Secrets. Hay que ampliar y verificar su salida privada antes de abrirla a IMOs.
+
+## Publicado
+
+Precarga de fechas oficiales con manejo de ausencia/ambigüedad de fechas, cambios operativos Causa, pruebas por sede/equipo; búsqueda y filtros de confirmaciones propias.
+
+## Implementado y probado, aún sin conectar
+
+`cloudflare-worker/src/imoControlModel.mjs`: contrato de solicitud, verificación de dueño de enrolado, proyección mínima sin documentos/contactos privados, resolución por coordinador asignado y conciliación posterior con Nodus. No existen rutas activas ni escrituras de producción para este contrato todavía.
+
+## Trabajo pendiente antes de activar
+
+1. Verificar extracción privada de IDs de participante/IMO, documento IMO, contacto de verificación y coordinador por el sincronizador autorizado. No resolver identidades por parecido de nombres.
+2. Implementar y probar puerta de entrada en servidor: límites por IP/documento, código aleatorio, expiración, límite de intentos, uso único, sesión corta con acceso solo a sus enrolados y revocación.
+3. Comprobar entrega del código. La cola actual de correos se procesa por GitHub Actions cada cinco minutos y puede retrasarse; no prometer entrega instantánea. Evaluar canal apropiado antes de habilitar.
+4. Implementar transacción de solicitud + auditoría + notificación idempotente; bandeja C1/C2 con revisión protegida.
+5. Adaptar portal a sesiones verificadas y fuente Nodus privada, búsqueda/filtros de estados oficiales y novedades; cerrar las lecturas públicas de perfiles en las reglas como parte del mismo lanzamiento.
+6. Probar extremos: homónimos, documentos con ceros iniciales, datos faltantes, cambios de coordinador, solicitudes duplicadas, reenvíos de OTP, intentos concurrentes, caída de Nodus, nueva fecha C1 y estados Nodus desactualizados.
+7. Publicar servidor/frontend/reglas en orden que no exponga datos; verificar con una cuenta de prueba autorizada antes de habilitar el acceso real.
+
+No anunciar documento + código, estados oficiales privados ni notificaciones automáticas como activos mientras esos pasos estén pendientes.
