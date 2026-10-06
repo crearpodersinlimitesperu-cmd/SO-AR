@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
 import { useTheme } from '../context/ThemeContext';
+import { useCycles } from '../context/CyclesContext';
 import {
   canAddManagers,
   canAssignTrainer,
@@ -162,6 +163,7 @@ export const formatTeamDisplay = (equipo, numEquipo) => {
 
 export default function CentroManagers() {
   const { currentUser } = useAuth();
+  const { events } = useCycles();
   const { showToast } = useUI();
   const { activeTheme } = useTheme();
   const isDarkMode = activeTheme === 'dark';
@@ -622,6 +624,9 @@ export default function CentroManagers() {
   // que cambiar de pestaña. Solo guarda el NOMBRE del entrenador seleccionado; el
   // resumen se recalcula al vuelo con getTrainerCardStats() más abajo.
   const [trainerCardModal, setTrainerCardModal] = useState(null); // string | null (nombre del entrenador)
+
+
+  const [autoGraduatedAlert, setAutoGraduatedAlert] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const PAGE_SIZE = 40;
@@ -2642,6 +2647,27 @@ export default function CentroManagers() {
           </div>
         </div>
       </header>
+
+      
+      {autoGraduatedAlert && (
+        <div style={{ margin: '0 2rem 1.5rem 2rem', padding: '1.25rem', background: '#ecfdf5', border: '1px solid #22c55e', borderRadius: '10px', display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+          <Sparkles size={28} color="#16a34a" style={{ flexShrink: 0, marginTop: '2px' }} />
+          <div style={{ flex: 1 }}>
+            <h4 style={{ margin: '0 0 0.5rem 0', color: '#166534', fontSize: '1.15rem' }}>
+              ¡Graduación Automática Detectada!
+            </h4>
+            <p style={{ margin: 0, color: '#15803d', fontSize: '0.95rem', marginBottom: '0.5rem' }}>
+              El calendario indica que {autoGraduatedAlert.count} equipo{autoGraduatedAlert.count > 1 ? 's' : ''} acaba{autoGraduatedAlert.count > 1 ? 'n' : ''} de terminar "El Viaje". CAUSA los ha graduado automáticamente y enviado a la cola de Liquidación:
+            </p>
+            <ul style={{ margin: 0, paddingLeft: '1.2rem', color: '#166534', fontSize: '0.9rem' }}>
+              {autoGraduatedAlert.resumen.map((r, i) => <li key={i} style={{ marginBottom: '0.25rem' }}><strong>{r}</strong></li>)}
+            </ul>
+          </div>
+          <button onClick={() => setAutoGraduatedAlert(null)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#166534', padding: '0.2rem' }}>
+            <X size={24} />
+          </button>
+        </div>
+      )}
 
       {/* TABS */}
       <div style={{ background: bgCard, borderBottom: `1px solid ${borderLight}`, padding: '0 2rem' }}>
