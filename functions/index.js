@@ -41,11 +41,12 @@
 const { onCall, HttpsError } = require("firebase-functions/v2/https");
 const { defineSecret } = require("firebase-functions/params");
 const { setGlobalOptions } = require("firebase-functions/v2");
-const admin = require("firebase-admin");
+const { initializeApp } = require("firebase-admin/app");
+const { FieldValue, getFirestore } = require("firebase-admin/firestore");
 const { notebookKnowledge } = require("./notebookKnowledge");
 
-admin.initializeApp();
-const db = admin.firestore();
+initializeApp();
+const db = getFirestore();
 
 setGlobalOptions({ region: "us-central1", maxInstances: 10 });
 
@@ -214,7 +215,7 @@ ${notebookKnowledge}`;
       sede,
       action: "COPILOTO_CONSULTA",
       pregunta: (recientes[recientes.length - 1] && recientes[recientes.length - 1].content || "").slice(0, 500),
-      timestamp: admin.firestore.FieldValue.serverTimestamp()
+      timestamp: FieldValue.serverTimestamp()
     });
   } catch (err) {
     console.error("[askCopiloto] Error guardando auditoría (no bloqueante):", err);
