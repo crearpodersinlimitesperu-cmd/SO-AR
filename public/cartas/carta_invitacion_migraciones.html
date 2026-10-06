@@ -110,7 +110,7 @@
             'ERNESTO ALEJANDRO DIAZ PABON': {
                 name: 'ERNESTO ALEJANDRO DIAZ PABON',
                 nacionalidad: 'ECUATORIANA',
-                doc: 'PASAPORTE ECUATORIANO Nº A4152916 (C.I. 1727274928)',
+                doc: 'PASAPORTE ECUATORIANO',
                 fechas: 'Del 3 al 7 de Septiembre de 2026',
                 rol: 'Invitado Especial Internacional (Invitado Internacional Ad-Honorem)',
                 hotel: 'Hotel José Antonio Deluxe (Calle Bellavista 133, Miraflores, Lima)'
@@ -118,7 +118,7 @@
             'ELMER ANDRES IDROBO ANDRADE': {
                 name: 'ELMER ANDRES IDROBO ANDRADE',
                 nacionalidad: 'ECUATORIANA',
-                doc: 'PASAPORTE ECUATORIANO Nº A9919241 (C.I. 1712332350)',
+                doc: 'PASAPORTE ECUATORIANO',
                 fechas: 'Del 4 al 6 de Septiembre de 2026',
                 rol: 'Invitado Especial Internacional (Invitado Internacional Ad-Honorem)',
                 hotel: 'Hotel José Antonio Deluxe (Calle Bellavista 133, Miraflores, Lima)'
@@ -126,7 +126,7 @@
             'MARIA DE LOURDES PATIÑO GALARRAGA': {
                 name: 'MARIA DE LOURDES PATIÑO GALARRAGA',
                 nacionalidad: 'ECUATORIANA',
-                doc: 'PASAPORTE ECUATORIANO Nº B0857192 (C.I. 1712863404)',
+                doc: 'PASAPORTE ECUATORIANO',
                 fechas: 'Del 3 al 7 de Septiembre de 2026',
                 rol: 'Invitada Especial Internacional (Invitada Internacional Ad-Honorem)',
                 hotel: 'Hotel José Antonio Deluxe (Calle Bellavista 133, Miraflores, Lima)'
@@ -134,7 +134,7 @@
             'CARLOS ANDRES GOMEZ GOMEZ': {
                 name: 'CARLOS ANDRES GOMEZ GOMEZ',
                 nacionalidad: 'COLOMBIANA',
-                doc: 'PASAPORTE COLOMBIANO Nº BG726399 (C.C. 3482169)',
+                doc: 'PASAPORTE COLOMBIANO',
                 fechas: 'Del 26 al 31 de Agosto de 2026',
                 rol: 'Invitado Especial Internacional (Invitado Internacional Ad-Honorem)',
                 hotel: 'Hotel José Antonio Deluxe (Calle Bellavista 133, Miraflores, Lima)'
@@ -142,7 +142,7 @@
             'FERNANDO ARAGON': {
                 name: 'FERNANDO ARAGON',
                 nacionalidad: 'ARGENTINA',
-                doc: 'DNI MERCOSUR Nº 17.856.159 (Trámite 00518899392)',
+                doc: 'DNI MERCOSUR',
                 fechas: 'Del 14 al 16 de Agosto de 2026',
                 rol: 'Líder Capítulo Uno (Invitado Internacional Ad-Honorem)',
                 hotel: 'Hotel José Antonio Deluxe (Calle Bellavista 133, Miraflores, Lima)'
@@ -150,7 +150,7 @@
             'DIEGO DAVID BRAVO FIGUEROA': {
                 name: 'DIEGO DAVID BRAVO FIGUEROA',
                 nacionalidad: 'ECUATORIANA',
-                doc: 'PASAPORTE ECUATORIANO Nº A9025643 (C.I. 1713803847)',
+                doc: 'PASAPORTE ECUATORIANO',
                 fechas: 'Del 14 al 16 de Agosto de 2026',
                 rol: 'Líder El Viaje (Invitado Internacional Ad-Honorem)',
                 hotel: 'Hotel José Antonio Deluxe (Calle Bellavista 133, Miraflores, Lima)'
@@ -164,6 +164,20 @@
             const params = new URLSearchParams(window.location.search);
             const normalizeName = value => value.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().replace(/\s+/g, ' ');
             const rawNombre = normalizeName(params.get('nombre') || '');
+            const nameAliases = {
+                'ELMER IDROBO ANDRADE': 'ELMER ANDRES IDROBO ANDRADE'
+            };
+            const lookupName = nameAliases[rawNombre] || rawNombre;
+            const documentTypeOnly = value => {
+                const normalized = (value || '').toUpperCase().replace(/\s+/g, ' ').trim();
+                const patterns = [
+                    /\bPASAPORTE(?:\s+[A-ZÁÉÍÓÚÜÑ]+)?\b/,
+                    /\bDNI(?:\s+MERCOSUR)?\b/,
+                    /\bC[ÉE]DULA(?:\s+DE\s+IDENTIDAD)?\b/,
+                    /\bDOCUMENTO\s+DE\s+IDENTIDAD\b/
+                ];
+                return patterns.map(pattern => normalized.match(pattern)).find(Boolean)?.[0] || '[DOCUMENTO PENDIENTE]';
+            };
             // Nationality checked against the identity document on 2026-09-27.
             // Keep passport scans and identification numbers out of this public registry.
             const verifiedNationalities = {
@@ -172,7 +186,7 @@
                 'CIRILO MARTINEZ': { nacionalidad: 'MEXICANA', documento: 'PASAPORTE MEXICANO' }
             };
             const verifiedIdentity = verifiedNationalities[rawNombre];
-            const master = Object.values(TRAINERS_MASTER).find(person => normalizeName(person.name) === rawNombre);
+            const master = Object.values(TRAINERS_MASTER).find(person => normalizeName(person.name) === lookupName);
 
             if (master) {
                 document.getElementById('field-name').textContent = master.name;
@@ -185,10 +199,10 @@
                 const nombreParam = params.get('nombre') ? params.get('nombre').toUpperCase() : '[NOMBRE COMPLETO]';
                 document.getElementById('field-name').textContent = nombreParam;
                 
-                let nac = params.get('nacionalidad') ? params.get('nacionalidad').toUpperCase() : '[NACIONALIDAD PENDIENTE]';
+                let nac = params.get('nacionalidad')?.trim() ? params.get('nacionalidad').trim().toUpperCase() : '[NACIONALIDAD PENDIENTE]';
                 document.getElementById('field-nacionalidad').textContent = nac;
 
-                let doc = params.get('doc') ? params.get('doc').toUpperCase() : '[DOCUMENTO / PASAPORTE]';
+                let doc = documentTypeOnly(params.get('doc'));
                 document.getElementById('field-doc').textContent = doc;
 
                 if (params.get('fechas')) document.getElementById('field-dates').textContent = params.get('fechas');
@@ -199,18 +213,13 @@
             document.getElementById('field-dates').textContent = params.get('fechas')?.trim() || '[FECHAS PENDIENTES]';
             document.getElementById('field-hotel').textContent = params.get('hotel')?.trim() || '[HOSPEDAJE PENDIENTE]';
 
-            // Explicit form values take priority over saved records.
-            if (params.has('nacionalidad')) {
-                document.getElementById('field-nacionalidad').textContent = params.get('nacionalidad').trim().toUpperCase() || '[NACIONALIDAD PENDIENTE]';
-            }
-            if (params.has('doc')) {
-                document.getElementById('field-doc').textContent = params.get('doc').trim().toUpperCase() || '[DOCUMENTO / PASAPORTE]';
-            }
-
-            // Verified identity takes precedence over stale or incorrect URL values.
+            // Verified records take precedence over stale values; blank URL fields never erase them.
             if (verifiedIdentity) {
                 document.getElementById('field-nacionalidad').textContent = verifiedIdentity.nacionalidad;
                 document.getElementById('field-doc').textContent = verifiedIdentity.documento;
+            } else if (master) {
+                document.getElementById('field-nacionalidad').textContent = master.nacionalidad;
+                document.getElementById('field-doc').textContent = master.doc;
             }
 
         });
