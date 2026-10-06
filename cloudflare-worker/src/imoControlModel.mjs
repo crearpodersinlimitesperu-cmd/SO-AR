@@ -13,11 +13,11 @@ export function projectEnrollee(row) {
   // Do not disclose documents, emails, payment amounts, addresses or other profiles.
   return {
     id: row.id, nombre: row.nombre, sede: row.sede,
-    originTeam: row.originTeam, currentTeam: row.currentTeam,
+    originTeam: row.originTeam ?? null, currentTeam: row.currentTeam ?? null,
     asistenciaC1: row.asistenciaC1 ?? null, asistenciaC2: row.asistenciaC2 ?? null,
     llamada1: row.llamada1 || '', llamada2: row.llamada2 || '',
     coordinadorNombre: row.coordinadorNombre || '',
-    source: 'Nodus', sourceUpdatedAt: row.sourceUpdatedAt,
+    source: 'Nodus', sourceUpdatedAt: row.sourceUpdatedAt ?? null,
   };
 }
 export function buildImoRequest({ requestId, actorId, enrollee, type, targetEvent, attendance, note, at }) {
@@ -46,6 +46,9 @@ export function reviewImoRequest(request, coordinator, decision, note, at) {
 }
 export function reconcileApprovedRequest(request, nodusEnrollee, at) {
   if (request.status !== 'approved_pending_nodus' || request.type !== 'team_change') return request;
-  if (request.enrolleeId !== nodusEnrollee.id || request.imoId !== nodusEnrollee.imoId || request.sede !== nodusEnrollee.sede || request.requested.team !== nodusEnrollee.currentTeam || Date.parse(nodusEnrollee.sourceUpdatedAt) <= Date.parse(request.reviewedAt)) return request;
+  const sourceTime = Date.parse(nodusEnrollee.sourceUpdatedAt);
+  const reviewTime = Date.parse(request.reviewedAt);
+  if (!Number.isFinite(sourceTime) || !Number.isFinite(reviewTime) || sourceTime <= reviewTime) return request;
+  if (request.enrolleeId !== nodusEnrollee.id || request.imoId !== nodusEnrollee.imoId || request.sede !== nodusEnrollee.sede || request.requested.team !== nodusEnrollee.currentTeam) return request;
   return { ...request, status: 'confirmed_in_nodus', updatedAt: at, confirmedAt: at, nodusSourceUpdatedAt: nodusEnrollee.sourceUpdatedAt };
 }

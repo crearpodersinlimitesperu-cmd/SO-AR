@@ -26,3 +26,11 @@ test('only assigned coordinator resolves; acceptance remains pending until a fre
   assert.equal(reconcileApprovedRequest(approved, { ...person, currentTeam: 32 }, at).status, 'approved_pending_nodus');
   assert.equal(reconcileApprovedRequest(approved, { ...person, currentTeam: 32, sourceUpdatedAt: '2026-10-06T00:00:00Z' }, at).status, 'confirmed_in_nodus');
 });
+
+test('missing or invalid source timestamps cannot confirm an approved change', () => {
+  const approved = reviewImoRequest(makeRequest(), { id: 'coord1', email: 'coord@example.test', active: true, sede: 'Lima' }, 'approve', '', at);
+  for (const sourceUpdatedAt of [undefined, null, '', 'invalid', at]) {
+    assert.equal(reconcileApprovedRequest(approved, { ...person, currentTeam: 32, sourceUpdatedAt }, at).status, 'approved_pending_nodus');
+  }
+  assert.equal(reconcileApprovedRequest({ ...approved, reviewedAt: undefined }, { ...person, currentTeam: 32, sourceUpdatedAt: '2026-10-06T00:00:00Z' }, at).status, 'approved_pending_nodus');
+});
