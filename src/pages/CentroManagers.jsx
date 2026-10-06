@@ -530,6 +530,89 @@ export default function CentroManagers() {
     });
   }, [managers, currentUser, canViewAll, filterSede, filterEntrenador]);
 
+
+  // Auto-Graduación de Equipos cuando finaliza "El Viaje"
+  useEffect(() => {
+    if (!events || events.length === 0 || !managers || managers.length === 0) return;
+    if (!canChangeManagerStatus) return; 
+
+    const activeTeams = new Map(); 
+    managers.forEach(m => {
+      if (normalizeManagerEstado(m.estado) === 'Activo' && !m.cierreLiquidacionActivo && m.equipo) {
+        const key = `${normalizeSede(m.sede)}_${String(m.equipo).trim().toUpperCase()}`;
+        if (!activeTeams.has(key)) activeTeams.set(key, []);
+        activeTeams.get(key).push(m);
+      }
+    });
+
+    if (activeTeams.size === 0) return;
+
+    const today = new Date().getTime();
+    const thresholdDaysMs = 3 * 24 * 60 * 60 * 1000;
+    const equiposAGraduar = [];
+
+    activeTeams.forEach((teamMembers, key) => {
+      const [sede, equipoStr] = key.split('_');
+      // Extraemos el numero real del equipo para comparar exacto
+      const equipoNum = getTeamNumericValue({ equipo: equipoStr });
+
+      const viajeEvent = events.find(e => {
+        const eNombre = String(e.nombre || e.name || '').toUpperCase();
+        if (!eNombre.includes('VIAJE')) return false;
+        
+        const eSede = normalizeSede(e.sede || e.sedeTag);
+        if (eSede !== sede) return false;
+        
+        const eNum = getTeamNumericValue({ equipo: e.equipo || e.team || '' });
+        return eNum === equipoNum && eNum !== 999999;
+      });
+
+      if (viajeEvent) {
+        const start = new Date(viajeEvent.fecha_inicio || viajeEvent.start).getTime();
+        if (!isNaN(start) && today > (start + thresholdDaysMs)) {
+           equiposAGraduar.push({ teamMembers, equipo: equipoStr, sede, event: viajeEvent });
+        }
+      }
+    });
+
+    if (equiposAGraduar.length === 0) return;
+
+    const procesarGraduacion = async () => {
+      const batch = writeBatch(db);
+      let count = 0;
+      let resumen = [];
+
+      for (const group of equiposAGraduar) {
+        const keyUpper = `${group.sede}_${group.equipo}`;
+        const llamadasDelEquipo = llamadasHistorial.filter(l => (l.equipoKey || '').toUpperCase() === keyUpper);
+        
+        for (const m of group.teamMembers) {
+          const docKey = (m.docId || m.id).toString();
+          const docRef = doc(db, 'managers_directory', docKey);
+          batch.update(docRef, {
+            estado: 'Graduado',
+            cierreLiquidacionActivo: true,
+            cierreLiquidacionFecha: new Date().toISOString(),
+            cierreLiquidacionPorEmail: 'sistema@crearpsl.net',
+            cierreLiquidacionMotivo: 'graduacion_automatica',
+            cierreLiquidacionPorNombre: 'CAUSA Automático'
+          });
+        }
+        resumen.push(`Equipo ${group.equipo} (${group.sede}): ${llamadasDelEquipo.length} llamadas registradas`);
+        count++;
+      }
+
+      try {
+        await batch.commit();
+        setAutoGraduatedAlert({ count, resumen });
+      } catch (e) {
+        console.error("Error en auto graduación:", e);
+      }
+    };
+
+    procesarGraduacion();
+  }, [events, managers, llamadasHistorial, currentUser, canChangeManagerStatus]);
+
   // Efecto para actualizar el filtro si cambia el toggle de dual role
   useEffect(() => {
     if (viewAsTrainer) {
