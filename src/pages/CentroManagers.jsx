@@ -549,7 +549,6 @@ export default function CentroManagers() {
     if (activeTeams.size === 0) return;
 
     const today = new Date().getTime();
-    const thresholdDaysMs = 3 * 24 * 60 * 60 * 1000;
     const equiposAGraduar = [];
 
     activeTeams.forEach((teamMembers, key) => {
@@ -569,8 +568,10 @@ export default function CentroManagers() {
       });
 
       if (viajeEvent) {
-        const start = new Date(viajeEvent.fecha_inicio || viajeEvent.start).getTime();
-        if (!isNaN(start) && today > (start + thresholdDaysMs)) {
+        // Usar fecha fin si existe, sino fecha inicio
+        const targetDate = new Date(viajeEvent.fecha_fin || viajeEvent.end || viajeEvent.fecha_inicio || viajeEvent.start).getTime();
+        // Si el día actual superó la fecha del evento, graduar inmediatamente sin esperar 3 días
+        if (!isNaN(targetDate) && today > targetDate) {
            equiposAGraduar.push({ teamMembers, equipo: equipoStr, sede, event: viajeEvent });
         }
       }
