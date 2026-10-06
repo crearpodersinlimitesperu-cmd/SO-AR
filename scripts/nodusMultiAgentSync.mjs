@@ -18,11 +18,6 @@ import { NodusIdentityAgent } from './nodusIdentityAgent.mjs';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const ROBOT_TOKEN = process.env.ROBOT_TOKEN;
-if (!ROBOT_TOKEN) {
-  throw new Error('❌ Falta la variable de entorno ROBOT_TOKEN. Configúrala antes de ejecutar este script (ver GitHub Secrets: ROBOT_TOKEN).');
-}
-
 puppeteer.use(StealthPlugin());
 
 // Configuración Resiliente de Firebase
@@ -1000,7 +995,6 @@ class NodusDispatcherAgent {
     }));
 
     const masterSnapshot = {
-      robot_token: ROBOT_TOKEN,
       timestamp,
       fuente: "Sistema Autónomo Multi-Agente Nodus CPSL 2026",
       usuarioExtraccion: "jsanchez (Super Administrador Global)",
@@ -1025,7 +1019,6 @@ class NodusDispatcherAgent {
       }
       try {
         await adminDb.collection('nodus_bi_reports').doc('latest').set({
-          robot_token: ROBOT_TOKEN,
           timestamp,
           datos_bi: safeBiExtract
         });
@@ -1044,7 +1037,6 @@ class NodusDispatcherAgent {
     }
 
     await adminDb.collection('nodus_coordinadores_c1c2').doc('latest').set({
-      robot_token: ROBOT_TOKEN,
       timestamp,
       totales: normalizedData.totales,
       sedes: normalizedData.sedesSummary,
@@ -1056,7 +1048,6 @@ class NodusDispatcherAgent {
     // 3. Guardar en historial horario: nodus_kpis_history / snapshot_<timestamp>
     const historyId = `snap_${new Date().getTime()}`;
     await adminDb.collection('nodus_kpis_history').doc(historyId).set({
-      robot_token: ROBOT_TOKEN,
       timestamp,
       totales: normalizedData.totales,
       sedes: normalizedData.sedesSummary
@@ -1433,5 +1424,3 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       process.exit(1);
     });
 }
-
-

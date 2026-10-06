@@ -14,6 +14,30 @@ import { isInactiveTrainer } from '../data/managersData';
 
 const AuthContext = createContext();
 
+async function saveSelfProfile(user, canonicalUser, normalizedEmail) {
+  const profileRef = doc(db, 'users', user.uid);
+  const profileSnapshot = await getDoc(profileRef);
+  const profileFields = {
+    name: canonicalUser.name || user.displayName || '',
+    displayName: canonicalUser.displayName || canonicalUser.name || user.displayName || '',
+    photoURL: user.photoURL || null,
+    lastLoginAt: serverTimestamp()
+  };
+
+  if (profileSnapshot.exists()) {
+    await setDoc(profileRef, profileFields, { merge: true });
+    return;
+  }
+
+  await setDoc(profileRef, {
+    uid: user.uid,
+    email: normalizedEmail,
+    ...profileFields,
+    createdAt: serverTimestamp(),
+    provider: user.providerData?.[0]?.providerId || 'google'
+  });
+}
+
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [originalAdminUser, setOriginalAdminUser] = useState(null);
@@ -603,15 +627,15 @@ export function AuthProvider({ children }) {
       let canonicalUser = normalizeUserRecord(foundUser, 'login');
 
       // 🕵️‍♂️ AGENTE ONLINE: Validar y sanar multiroles 
-      const updatedRoles = await enforceUserRolesAgent(foundUser || user, user.uid, canonicalUser.roles);
+      const updatedRoles = await enforceUserRolesAgent(foundUser || user, canonicalUser.roles);
       canonicalUser.roles = updatedRoles;
 
-      // 🔥 CRÍTICO: Guardar el usuario en la colección "users"
-      // Si no existe aquí, las reglas de Firestore (Hito 0) rechazarán todas sus peticiones.
+      // Persistir solo metadatos de perfil; los roles y la sede son administrados
+      // por SuperAdmins y nunca se escriben desde el inicio de sesión del cliente.
       try {
-        await setDoc(doc(db, 'users', user.uid), canonicalUser, { merge: true });
+        await saveSelfProfile(user, canonicalUser, normalizedEmail);
       } catch (e) {
-        console.warn('Cannot update /users since only superadmin can, continuing login');
+        console.warn('Cannot update self-service profile fields; continuing login', e);
       }
 
       const userObj = buildUserObject(user, canonicalUser, normalizedEmail);
@@ -726,15 +750,15 @@ export function AuthProvider({ children }) {
             let canonicalUser = normalizeUserRecord(foundUser, 'onAuthStateChanged');
             
             // 🕵️‍♂️ AGENTE ONLINE: Validar y sanar multiroles 
-            const updatedRoles = await enforceUserRolesAgent(user, user.uid, canonicalUser.roles);
+            const updatedRoles = await enforceUserRolesAgent(user, canonicalUser.roles);
             canonicalUser.roles = updatedRoles;
 
-            // 🔥 CRÍTICO: Guardar el usuario en la colección "users"
+            // Persistir solo metadatos de perfil, nunca roles ni sede.
             try {
               try {
-                await setDoc(doc(db, 'users', user.uid), canonicalUser, { merge: true });
+                await saveSelfProfile(user, canonicalUser, normalizedEmail);
               } catch (e) {
-                console.warn('Cannot update /users since only superadmin can, continuing login');
+                console.warn('Cannot update self-service profile fields; continuing login', e);
               }
             } catch (err) {
               console.error("Error guardando perfil de usuario en auth state:", err);
@@ -830,4 +854,3 @@ export function AuthProvider({ children }) {
 export function useAuth() {
   return useContext(AuthContext);
 }
-

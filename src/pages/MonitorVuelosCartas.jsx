@@ -32,11 +32,11 @@ import {
 
 // ConfiguraciÃ³n de las 6 Sedes Operativas Oficiales
 const SEDES_CONFIG = [
-  { id: 'TODAS', label: 'Todas las Sedes', flag: 'ðŸŒ', code: 'ALL' },
-  { id: 'Lima', label: 'Lima', flag: 'ðŸ‡µðŸ‡ª', code: 'LIM' },
-  { id: 'Quito', label: 'Quito', flag: 'ðŸ‡ªðŸ‡¨', code: 'UIO' },
-  { id: 'Cuenca', label: 'Cuenca', flag: 'ðŸ‡ªðŸ‡¨', code: 'CUE' },
-  { id: 'Guayaquil', label: 'Guayaquil', flag: 'ðŸ‡ªðŸ‡¨', code: 'GYE' },
+  { id: 'TODAS', label: 'Todas las Sedes', flag: '🌎', code: 'ALL' },
+  { id: 'Lima', label: 'Lima', flag: '🇵🇪', code: 'LIM' },
+  { id: 'Quito', label: 'Quito', flag: '🇪🇨', code: 'UIO' },
+  { id: 'Cuenca', label: 'Cuenca', flag: '🇪🇨', code: 'CUE' },
+  { id: 'Guayaquil', label: 'Guayaquil', flag: '🇪🇨', code: 'GYE' },
   { id: 'Medellín', label: 'Medellín', flag: '🇨🇴', code: 'MDE' },
   { id: 'México', label: 'México', flag: '🇲🇽', code: 'MEX' }
 ];
@@ -259,7 +259,7 @@ const FALLBACK_TRACKER = {
         actualArrival: null
       },
       status: "ON_TIME",
-      statusLabel: "Programado Â· A tiempo",
+      statusLabel: "Programado · A tiempo",
       statusDescription: "Vuelo de retorno programado",
       delayMinutes: 0,
       terminal: "T1",
@@ -918,72 +918,72 @@ export default function MonitorVuelosCartas() {
     return true;
   });
 
-  // Obtener rutas rÃ¡pidas dinÃ¡micas segÃºn la sede seleccionada
+  // Obtener rutas rápidas dinámicas según la sede seleccionada
   const getDynamicQuickRoutes = () => {
     if (selectedSede === 'Quito') {
       return [
         { id: 'ALL', label: 'Todos en Quito' },
-        { id: 'UIO-LIM', label: 'Quito âž” Lima' },
-        { id: 'LIM-UIO', label: 'Lima âž” Quito' },
-        { id: 'UIO-GYE', label: 'Quito âž” GYE' },
-        { id: 'GYE-UIO', label: 'GYE âž” Quito' },
-        { id: 'UIO-CUE', label: 'Quito âž” Cuenca' },
-        { id: 'CUE-UIO', label: 'Cuenca âž” Quito' },
-        { id: 'BOG-UIO', label: 'BogotÃ¡ âž” Quito' }
+        { id: 'UIO-LIM', label: 'Quito → Lima' },
+        { id: 'LIM-UIO', label: 'Lima → Quito' },
+        { id: 'UIO-GYE', label: 'Quito → GYE' },
+        { id: 'GYE-UIO', label: 'GYE → Quito' },
+        { id: 'UIO-CUE', label: 'Quito → Cuenca' },
+        { id: 'CUE-UIO', label: 'Cuenca → Quito' },
+        { id: 'BOG-UIO', label: 'Bogotá → Quito' }
       ];
     }
     if (selectedSede === 'Guayaquil') {
       return [
         { id: 'ALL', label: 'Todos en Guayaquil' },
-        { id: 'BOG-GYE', label: 'BogotÃ¡ âž” GYE' },
-        { id: 'GYE-BOG', label: 'GYE âž” BogotÃ¡' },
-        { id: 'PTY-GYE', label: 'PanamÃ¡ âž” GYE' },
-        { id: 'GYE-PTY', label: 'GYE âž” PanamÃ¡' },
-        { id: 'GYE-UIO', label: 'GYE âž” Quito' },
-        { id: 'UIO-GYE', label: 'Quito âž” GYE' },
-        { id: 'LIM-GYE', label: 'Lima âž” GYE' }
+        { id: 'BOG-GYE', label: 'Bogotá → GYE' },
+        { id: 'GYE-BOG', label: 'GYE → Bogotá' },
+        { id: 'PTY-GYE', label: 'Panamá → GYE' },
+        { id: 'GYE-PTY', label: 'GYE → Panamá' },
+        { id: 'GYE-UIO', label: 'GYE → Quito' },
+        { id: 'UIO-GYE', label: 'Quito → GYE' },
+        { id: 'LIM-GYE', label: 'Lima → GYE' }
       ];
     }
     if (selectedSede === 'Medellín') {
       return [
         { id: 'ALL', label: 'Todos en Medellín' },
-        { id: 'MDE-BOG', label: 'Medellín âž” BogotÃ¡' },
-        { id: 'UIO-MDE', label: 'Quito âž” Medellín' },
-        { id: 'MDE-LIM', label: 'Medellín âž” Lima' }
+        { id: 'MDE-BOG', label: 'Medellín → Bogotá' },
+        { id: 'UIO-MDE', label: 'Quito → Medellín' },
+        { id: 'MDE-LIM', label: 'Medellín → Lima' }
       ];
     }
     if (selectedSede === 'México') {
       return [
         { id: 'ALL', label: 'Todos en México' },
-        { id: 'MEX-PTY', label: 'México âž” PanamÃ¡' },
-        { id: 'PTY-MEX', label: 'PanamÃ¡ âž” México' },
-        { id: 'MEX-LIM', label: 'México âž” Lima' }
+        { id: 'MEX-PTY', label: 'México → Panamá' },
+        { id: 'PTY-MEX', label: 'Panamá → México' },
+        { id: 'MEX-LIM', label: 'México → Lima' }
       ];
     }
     if (selectedSede === 'Cuenca') {
       return [
         { id: 'ALL', label: 'Todos en Cuenca' },
-        { id: 'UIO-CUE', label: 'Quito âž” Cuenca' },
-        { id: 'CUE-UIO', label: 'Cuenca âž” Quito' }
+        { id: 'UIO-CUE', label: 'Quito → Cuenca' },
+        { id: 'CUE-UIO', label: 'Cuenca → Quito' }
       ];
     }
     return [
       { id: 'ALL', label: `Todos los Vuelos (${flightsList.length})` },
-      { id: 'UIO-LIM', label: 'Quito âž” Lima' },
-      { id: 'LIM-UIO', label: 'Lima âž” Quito' },
-      { id: 'GYE-UIO', label: 'GYE âž” Quito' },
-      { id: 'LIM-GYE', label: 'Lima âž” GYE' },
-      { id: 'BOG-LIM', label: 'BogotÃ¡ âž” Lima' },
-      { id: 'MEX-LIM', label: 'México âž” Lima' }
+      { id: 'UIO-LIM', label: 'Quito → Lima' },
+      { id: 'LIM-UIO', label: 'Lima → Quito' },
+      { id: 'GYE-UIO', label: 'GYE → Quito' },
+      { id: 'LIM-GYE', label: 'Lima → GYE' },
+      { id: 'BOG-LIM', label: 'Bogotá → Lima' },
+      { id: 'MEX-LIM', label: 'México → Lima' }
     ];
   };
 
   const quickRoutes = getDynamicQuickRoutes();
 
   return (
-    <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '1.5rem', minHeight: '90vh' }}>
+    <div className="flight-monitor-page" style={{ maxWidth: '1280px', margin: '0 auto', padding: '1.5rem', minHeight: '90vh' }}>
       
-      {/* HEADER DE PÃGINA */}
+      {/* ENCABEZADO DE PÁGINA */}
       <div style={{ marginBottom: '2rem' }}>
         <button
           onClick={() => navigate('/home')}
@@ -1013,7 +1013,7 @@ export default function MonitorVuelosCartas() {
                 fontWeight: 'bold',
                 letterSpacing: '0.05em'
               }}>
-                CREAR PODER SIN LÃMITES
+                CREAR PODER SIN LÍMITES
               </span>
               <span style={{
                 background: 'rgba(56, 189, 248, 0.15)',
@@ -1023,14 +1023,14 @@ export default function MonitorVuelosCartas() {
                 fontSize: '0.8rem',
                 fontWeight: 'bold'
               }}>
-                LOGÃSTICA DE ENTRENADORES MULTI-SEDE 2026
+                LOGÍSTICA DE ENTRENADORES MULTI-SEDE 2026
               </span>
             </div>
-            <h1 style={{ fontSize: '2.4rem', margin: '0.2rem 0', fontWeight: 800, color: '#fff' }}>
-              âœˆï¸ Monitor de Vuelos y Cartas Oficiales
+            <h1 style={{ fontSize: '2.4rem', margin: '0.2rem 0', fontWeight: 800, color: 'var(--text-heading)' }}>
+              Monitor de Vuelos y Cartas Oficiales
             </h1>
             <p className="text-muted" style={{ margin: 0, fontSize: '1rem' }}>
-              Centro operativo de arribos de conferencistas internacionales, logÃ­stica de transporte y repositorio oficial de cartas en todas las sedes operativas.
+              Centro operativo de arribos de conferencistas internacionales, logística de transporte y repositorio oficial de cartas en todas las sedes operativas.
             </p>
           </div>
 
@@ -1107,7 +1107,7 @@ export default function MonitorVuelosCartas() {
           </div>
         </div>
 
-        {/* NAVEGACIÃ“N POR PESTAÃ‘AS */}
+        {/* NAVEGACIÓN POR PESTAÑAS */}
         <div style={{
           display: 'flex',
           gap: '10px',
@@ -1222,18 +1222,19 @@ export default function MonitorVuelosCartas() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           
           {/* Barra de Filtros y BÃºsqueda de Vuelos */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div className="flight-filters" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
               
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                 {[
-                  { id: 'activos', label: 'âœˆï¸ Activos / PrÃ³ximos' },
-                  { id: 'pasados', label: 'ðŸ›¬ Pasados' },
-                  { id: 'todos', label: 'ðŸ—„ï¸ Todos' }
+                  { id: 'activos', label: 'Activos / Próximos' },
+                  { id: 'pasados', label: 'Pasados' },
+                  { id: 'todos', label: 'Todos' }
                 ].map(t => (
                   <button
                     key={t.id}
                     onClick={() => setFlightStatusFilter(t.id)}
+                    className="flight-filter-chip"
                     style={{
                       padding: '6px 14px',
                       borderRadius: '8px',
@@ -1256,6 +1257,7 @@ export default function MonitorVuelosCartas() {
                   <button
                     key={r.id}
                     onClick={() => setRouteFilter(r.id)}
+                    className="flight-filter-chip"
                     style={{
                       padding: '6px 14px',
                       borderRadius: '8px',
@@ -1286,10 +1288,10 @@ export default function MonitorVuelosCartas() {
                   gap: '5px'
                 }}>
                   <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#34d399', display: 'inline-block' }}></span>
-                  ðŸ¤– Motor IA Vuelos ({trackerData?.totalFlightsIndexed || flightsList.length} Indexados Â· Multi-Sede)
+                  Motor IA · Vuelos ({trackerData?.totalFlightsIndexed || flightsList.length} indexados · Multisede)
                 </span>
                 <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                  Sincronizado: <span style={{ color: '#fff' }}>{new Date(trackerData?.updatedAt || Date.now()).toLocaleTimeString()}</span>
+                  Sincronizado: <span style={{ color: 'var(--text-main)' }}>{new Date(trackerData?.updatedAt || Date.now()).toLocaleTimeString()}</span>
                 </div>
               </div>
             </div>
@@ -1301,7 +1303,7 @@ export default function MonitorVuelosCartas() {
                 type="text"
                 value={searchFilter}
                 onChange={(e) => setSearchFilter(e.target.value)}
-                placeholder="Buscar por entrenador (ej. Elmer Idrovo, MarÃ­a PatiÃ±o, Mike Boada, Diego Bravo, Mildred MuÃ±oz...), vuelo o PNR..."
+                placeholder="Buscar entrenador, vuelo o código de reserva (PNR)…"
                 style={{
                   width: '100%',
                   padding: '10px 16px 10px 42px',
@@ -1340,11 +1342,11 @@ export default function MonitorVuelosCartas() {
               <p className="text-muted" style={{ margin: 0 }}>
                 {selectedSede !== 'TODAS'
                   ? `No hay vuelos registrados para la sede ${selectedSede} con los filtros aplicados.`
-                  : 'No hay vuelos con los filtros o bÃºsqueda actuales.'}
+                  : 'No hay vuelos con los filtros o búsqueda actuales.'}
               </p>
             </div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '1.2rem' }}>
+            <div className="flight-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '1.2rem' }}>
               {filteredFlights.map((flight, idx) => {
                 const isDelayed = flight.status === 'DELAYED';
                 const isLanded = flight.status === 'LANDED';
@@ -1400,7 +1402,7 @@ export default function MonitorVuelosCartas() {
                 return (
                   <div
                     key={idx}
-                    className="glass-panel"
+                    className="glass-panel flight-card"
                     style={{
                       padding: '1.5rem',
                       display: 'flex',
@@ -1412,15 +1414,15 @@ export default function MonitorVuelosCartas() {
                     }}
                   >
                     <div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                        <div>
+                      <div className="flight-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                        <div className="flight-card-date">
                           <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Fecha y Hora</div>
-                          <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#fff' }}>
+                          <div className="flight-card-date-value" style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-main)' }}>
                             {schedDep.toLocaleDateString([], { timeZone: 'America/Guayaquil' })} {schedDep.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'America/Guayaquil' })}
                           </div>
                         </div>
-                        <div style={{ textAlign: 'right' }}>
-                          <span style={{
+                        <div className="flight-status-wrap">
+                          <span className="flight-status-badge" style={{
                             background: isDelayed ? 'rgba(239, 68, 68, 0.15)' : isLanded ? 'rgba(16, 185, 129, 0.15)' : 'rgba(56, 189, 248, 0.15)',
                             color: isDelayed ? '#f87171' : isLanded ? '#34d399' : '#38bdf8',
                             padding: '4px 12px',
@@ -1436,11 +1438,11 @@ export default function MonitorVuelosCartas() {
                       <div style={{ background: 'rgba(255,255,255,0.02)', padding: '1rem', borderRadius: '12px', marginBottom: '1rem' }}>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                           <div>
-                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>AerolÃ­nea</div>
+                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Aerolínea</div>
                             <div style={{ fontSize: '0.95rem', color: '#38bdf8', fontWeight: 600 }}>{flight.airline || 'N/A'}</div>
                           </div>
                           <div>
-                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>CÃ³digo Reserva (PNR)</div>
+                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Código de reserva (PNR)</div>
                             <div style={{ fontSize: '1.1rem', color: 'var(--crear-gold)', fontWeight: 800 }}>{flight.reservationCode || 'N/A'}</div>
                           </div>
                         </div>
@@ -1448,32 +1450,32 @@ export default function MonitorVuelosCartas() {
 
                       {matchedAsignaciones.length > 0 ? (
                         <div style={{ padding: '12px', background: 'rgba(16, 185, 129, 0.1)', borderRadius: '8px', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
-                          <h4 style={{ margin: '0 0 8px 0', color: '#34d399', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            âœ“ AsignaciÃ³n Verificada
+                          <h4 style={{ margin: '0 0 8px 0', color: '#059669', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <CheckCircle size={16} /> Asignación verificada
                           </h4>
                           {matchedAsignaciones.map((asig, i) => (
-                            <div key={i} style={{ fontSize: '0.9rem', color: '#fff', marginBottom: i !== matchedAsignaciones.length - 1 ? '6px' : '0' }}>
+                            <div key={i} style={{ fontSize: '0.9rem', color: 'var(--text-main)', marginBottom: i !== matchedAsignaciones.length - 1 ? '6px' : '0' }}>
                               <span style={{ fontWeight: 600 }}>{asig.entrenador}</span> asignado a <span style={{ color: '#38bdf8' }}>{asig.entrenamiento || asig.equipo}</span> {asig.sede && `en ${asig.sede}`}
                             </div>
                           ))}
                         </div>
                       ) : suggestedAsignaciones.length > 0 ? (
                         <div style={{ padding: '12px', background: 'rgba(56, 189, 248, 0.1)', borderRadius: '8px', border: '1px solid rgba(56, 189, 248, 0.3)' }}>
-                          <h4 style={{ margin: '0 0 8px 0', color: '#38bdf8', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            ðŸ’¡ Sugerencia del Sistema
+                          <h4 style={{ margin: '0 0 8px 0', color: '#0284c7', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <Compass size={16} /> Sugerencia del sistema
                           </h4>
-                          <div style={{ fontSize: '0.82rem', color: '#e2e8f0', marginBottom: '8px' }}>
-                            Este vuelo podrÃ­a pertenecer a:
+                          <div className="flight-alert-copy" style={{ fontSize: '0.82rem', marginBottom: '8px' }}>
+                            Este vuelo podría pertenecer a:
                           </div>
                           {suggestedAsignaciones.map((asig, i) => (
-                            <div key={i} style={{ fontSize: '0.9rem', color: '#fff', marginBottom: i !== suggestedAsignaciones.length - 1 ? '6px' : '0' }}>
+                            <div key={i} style={{ fontSize: '0.9rem', color: 'var(--text-main)', marginBottom: i !== suggestedAsignaciones.length - 1 ? '6px' : '0' }}>
                               <span style={{ fontWeight: 600 }}>{asig.entrenador}</span> para <span style={{ color: '#34d399' }}>{asig.entrenamiento || asig.equipo}</span> {asig.sede && `(${asig.sede})`}
                             </div>
                           ))}
                           <button 
                             onClick={(e) => {
                                 e.preventDefault();
-                                alert('Enlace confirmado por heurÃ­stica (IntegraciÃ³n en desarrollo)');
+                                alert('Enlace confirmado por heurística (integración en desarrollo)');
                             }}
                             style={{ marginTop: '10px', background: 'rgba(56, 189, 248, 0.15)', border: '1px solid rgba(56,189,248,0.4)', color: '#38bdf8', padding: '6px 12px', borderRadius: '6px', fontSize: '0.75rem', cursor: 'pointer', width: '100%', fontWeight: '600' }}
                           >
@@ -1482,10 +1484,10 @@ export default function MonitorVuelosCartas() {
                         </div>
                       ) : (
                         <div style={{ padding: '12px', background: 'rgba(245, 158, 11, 0.1)', borderRadius: '8px', border: '1px solid rgba(245, 158, 11, 0.3)' }}>
-                          <h4 style={{ margin: '0 0 8px 0', color: '#fbbf24', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            âš ï¸ Requiere RevisiÃ³n Manual
+                          <h4 style={{ margin: '0 0 8px 0', color: '#b45309', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <AlertTriangle size={16} /> Requiere revisión manual
                           </h4>
-                          <div style={{ fontSize: '0.85rem', color: '#e2e8f0' }}>
+                          <div className="flight-alert-copy" style={{ fontSize: '0.85rem' }}>
                             No se encontraron similitudes para: <strong>{(flight.passengers || []).join(', ')}</strong>.
                           </div>
                         </div>
@@ -2131,7 +2133,3 @@ export default function MonitorVuelosCartas() {
     </div>
   );
 }
-
-
-
-

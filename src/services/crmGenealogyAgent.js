@@ -224,10 +224,11 @@ class CRMGenealogyAgent {
     await this.getGraduadosLineageData();
 
     // 1. Filtrar participantes por sede si no es 'ALL'
-    let filteredList = participants;
+    const realParticipants = participants.filter(p => !p.isManager);
+    let filteredList = realParticipants;
     if (targetSede && targetSede !== 'ALL') {
       const targetNorm = normalizeSedeName(targetSede);
-      filteredList = participants.filter(p => normalizeSedeName(p.sede || p.ciudad) === targetNorm);
+      filteredList = realParticipants.filter(p => normalizeSedeName(p.sede || p.ciudad) === targetNorm);
     }
 
     // 2. Detección de duplicados (intra-sede e inter-sede)
@@ -236,7 +237,7 @@ class CRMGenealogyAgent {
     const nameMap = new Map();
     const crossSedeDuplicates = [];
 
-    participants.forEach(p => {
+    realParticipants.forEach(p => {
       const dni = (p.dni || p.documento || '').trim();
       const phone = (p.telefono || p.celular || '').replace(/\D/g, '');
       const name = (p.nombreCompleto || p.nombre || '').trim().toLowerCase()
@@ -260,19 +261,23 @@ class CRMGenealogyAgent {
     });
 
     // Detectar duplicados que cruzan sedes
-    dniMap.forEach((list, dni) => {
-      if (list.length > 1) {
+    const addCrossSedeDuplicates = (recordsMap, tipo) => {
+      recordsMap.forEach((list, valor) => {
+        if (list.length <= 1) return;
         const sedesEncontradas = new Set(list.map(x => x.normalizedSede));
         if (sedesEncontradas.size > 1) {
           crossSedeDuplicates.push({
-            tipo: 'DNI',
-            valor: dni,
+            tipo,
+            valor,
             sedes: Array.from(sedesEncontradas),
             registros: list
           });
         }
-      }
-    });
+      });
+    };
+
+    addCrossSedeDuplicates(dniMap, 'DNI');
+    addCrossSedeDuplicates(phoneMap, 'Teléfono');
 
     // 3. Auditoría de Linaje de Graduados CPSL
     const imosGraduadosSet = new Set();
@@ -308,7 +313,7 @@ class CRMGenealogyAgent {
     SEDES_CATALOG.forEach(s => {
       if (s.key === 'ALL') return;
       const normKey = normalizeSedeName(s.key);
-      const partsSede = participants.filter(p => normalizeSedeName(p.sede || p.ciudad) === normKey);
+      const partsSede = realParticipants.filter(p => normalizeSedeName(p.sede || p.ciudad) === normKey);
       const coordsSede = coordinadores.filter(c => normalizeSedeName(c.sede) === normKey);
       const nodusSede = (nodus?.sedes || []).find(ns => normalizeSedeName(ns.sede) === normKey);
 
@@ -317,9 +322,19 @@ class CRMGenealogyAgent {
       const pendientes = partsSede.filter(p => String(p.estadoC1 || '').toUpperCase().includes('PENDIENTE')).length;
 
       // Cruce con totales de coordinadoras y sedes Nodus
-      const nodusAsignados = nodusSede?.asignadosTotal || coordsSede.reduce((acc, c) => acc + Number(c.asignados || 0), 0);
-      const nodusSentados = nodusSede?.asistieronTotal || nodusSede?.sentadosC1Total || coordsSede.reduce((acc, c) => acc + Number(c.sentadosTotal || c.asistieron || 0), 0);
-      const nodusPendientes = nodusSede?.porConfirmarTotal || coordsSede.reduce((acc, c) => acc + Number(c.estados?.porConfirmar || 0), 0);
+      const sumCoordinatorMetric = values => {
+        const presentValues = values.filter(value => value !== undefined && value !== null && value !== '' && Number.isFinite(Number(value)));
+        return presentValues.length ? presentValues.reduce((sum, value) => sum + Number(value), 0) : undefined;
+      };
+      const nodusAsignados = nodusSede?.asignadosTotal ?? sumCoordinatorMetric(coordsSede.map(c => c.asignados));
+      const nodusSentados = nodusSede?.asistieronTotal
+        ?? nodusSede?.sentadosC1Total
+        ?? sumCoordinatorMetric(coordsSede.map(c => c.sentadosTotal ?? c.asistieron));
+      const nodusPendientes = nodusSede?.porConfirmarTotal
+        ?? sumCoordinatorMetric(coordsSede.map(c => c.estados?.porConfirmar));
+      const metricTotal = nodusAsignados ?? totalParts;
+      const metricSentados = nodusSentados ?? sentados;
+      const metricPendientes = nodusPendientes ?? pendientes;
 
       // Agrupación de IMOs para esta sede
       const imosSet = new Set();
@@ -330,31 +345,31 @@ class CRMGenealogyAgent {
         }
       });
 
-      const conversion = totalParts > 0 
-        ? Math.round((sentados / totalParts) * 100) 
-        : (nodusAsignados > 0 ? Math.round((nodusSentados / nodusAsignados) * 100) : 0);
+      const conversion = metricTotal > 0 ? Math.round((metricSentados / metricTotal) * 100) : 0;
 
       sedesMetrics[normKey] = {
         sede: normKey,
         label: s.label,
         flag: s.flag,
         pais: s.pais,
-        totalParticipantes: totalParts || nodusAsignados,
-        sentados: sentados || nodusSentados,
-        pendientes: pendientes || nodusPendientes,
+        totalParticipantes: metricTotal,
+        sentados: metricSentados,
+        pendientes: metricPendientes,
         conversionPorcentaje: conversion,
-        imosActivos: imosSet.size > 0 ? imosSet.size : (coordsSede.length > 0 ? coordsSede.length : 1),
+        imosActivos: imosSet.size,
         coordinadorasNodus: coordsSede.map(c => c.nombre || c.name),
-        saludEstructural: conversion >= 50 ? 'EXCELENTE' : (conversion >= 30 ? 'REGULAR' : 'EN_SEGUIMIENTO')
+        saludEstructural: metricTotal > 0
+          ? (conversion >= 50 ? 'EXCELENTE' : (conversion >= 30 ? 'REGULAR' : 'EN_SEGUIMIENTO'))
+          : 'SIN_DATOS'
       };
     });
 
     // Métricas del conjunto filtrado actual
-    let currentTotal = filteredList.length;
-    let currentSentados = filteredList.filter(p => String(p.estadoC1 || '').toUpperCase().includes('SENTADO')).length;
-    let currentPendientes = filteredList.filter(p => String(p.estadoC1 || '').toUpperCase().includes('PENDIENTE')).length;
+    let currentTotal;
+    let currentSentados;
+    let currentPendientes;
 
-    if (currentTotal === 0 && targetSede !== 'ALL') {
+    if (targetSede !== 'ALL') {
       const sNorm = normalizeSedeName(targetSede);
       const sMetric = sedesMetrics[sNorm];
       if (sMetric) {
@@ -362,13 +377,16 @@ class CRMGenealogyAgent {
         currentSentados = sMetric.sentados;
         currentPendientes = sMetric.pendientes;
       }
-    } else if (currentTotal === 0 && targetSede === 'ALL') {
-      currentTotal = nodus?.totales?.totalAsignados || 13616;
-      currentSentados = nodus?.totales?.totalAsistieron || 5704;
-      currentPendientes = nodus?.totales?.totalPorConfirmar || 2219;
+    } else {
+      currentTotal = nodus?.totales?.totalAsignados ?? filteredList.length;
+      currentSentados = nodus?.totales?.totalAsistieron
+        ?? nodus?.totales?.totalSentadosC1
+        ?? filteredList.filter(p => String(p.estadoC1 || '').toUpperCase().includes('SENTADO')).length;
+      currentPendientes = nodus?.totales?.totalPorConfirmar
+        ?? filteredList.filter(p => String(p.estadoC1 || '').toUpperCase().includes('PENDIENTE')).length;
     }
 
-    const currentConversion = currentTotal > 0 ? ((currentSentados / currentTotal) * 100).toFixed(1) : '57.2';
+    const currentConversion = currentTotal > 0 ? ((currentSentados / currentTotal) * 100).toFixed(1) : null;
 
     const auditResult = {
       timestamp: new Date().toISOString(),
@@ -379,11 +397,13 @@ class CRMGenealogyAgent {
       conversionPct: currentConversion,
       sedesMetrics,
       crossSedeDuplicates,
-      totalDuplicadosGlobal: Array.from(dniMap.values()).filter(l => l.length > 1).length,
+      totalDuplicadosGlobal: Array.from(dniMap.values()).filter(l => l.length > 1).length
+        + Array.from(phoneMap.values()).filter(l => l.length > 1).length
+        + Array.from(nameMap.values()).filter(l => l.length > 1).length,
       coordinadoresTotalesNodus: coordinadores.length,
-      coherenciaEstructural: '99.8%',
+      coherenciaEstructural: null,
       lineageAudit: {
-        totalGraduadosEnCatalogo: limaGraduadosFallback?.graduados?.length || 399,
+        totalGraduadosEnCatalogo: limaGraduadosFallback?.graduados?.length || 0,
         imosGraduadosActivos: imosGraduadosSet.size,
         participantesGraduadosActivos: participantsGraduadosSet.size,
         topTeamsLineage

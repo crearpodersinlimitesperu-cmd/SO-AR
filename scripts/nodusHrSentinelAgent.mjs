@@ -12,11 +12,6 @@
  * 5. Mantiene un cuadro de mando consolidado en /nodus_hr_sentinel/latest.
  */
 
-const ROBOT_TOKEN = process.env.ROBOT_TOKEN;
-if (!ROBOT_TOKEN) {
-  throw new Error('❌ Falta la variable de entorno ROBOT_TOKEN. Configúrala antes de ejecutar este script (ver GitHub Secrets: ROBOT_TOKEN).');
-}
-
 // Mapeo oficial de Gerentes por Sede y Dirección Corporativa
 export const GERENTES_POR_SEDE = {
   'Bogotá': ['gerencia.bogota@crearpsl.net'], // Placeholder Bogotá
@@ -196,7 +191,6 @@ export class NodusHrSentinelAgent {
             read: false,
             createdAt: new Date().toISOString(),
             actionUrl: '/coordinadores',
-            robot_token: ROBOT_TOKEN,
             metadata: {
               coordinador: c.nombre,
               sede: c.sede,
@@ -250,7 +244,6 @@ export class NodusHrSentinelAgent {
       const cuadroRef = this.db.collection('nodus_hr_sentinel').doc('latest');
       await cuadroRef.set({
         ...diagnostico,
-        robot_token: ROBOT_TOKEN,
         updatedAt: FieldValue.serverTimestamp()
       }, { merge: true });
       console.log("✅ [Agente 5 - RRHH] Cuadro de mando guardado en /nodus_hr_sentinel/latest.");

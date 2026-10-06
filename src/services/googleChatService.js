@@ -136,7 +136,7 @@ export async function getGoogleChatWebhookConfig() {
   return {
     webhookUrl: localUrl || envUrl || '',
     sedesWebhooks: {},
-    enabled: true
+    enabled: Boolean(localUrl || envUrl)
   };
 }
 
@@ -182,8 +182,7 @@ export async function sendReportToGoogleChat(report) {
     let webhookUrl = '';
     if (isLima) {
       webhookUrl = (config.sedesWebhooks && (config.sedesWebhooks['Lima'] || config.sedesWebhooks['LIM'])) ||
-                   config.webhookUrl ||
-                   'https://chat.googleapis.com/v1/spaces/AAQAOaOPrZU/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=kQPcLjhngGrsBm_xH23mzXmVF4AjUOCofQnt3N0SBww';
+                   config.webhookUrl || '';
     } else {
       // Para otras sedes (Quito, GYE, etc.), solo enviar si esa sede específica tiene su webhook registrado
       const sedeKey = Object.keys(config.sedesWebhooks || {}).find(
@@ -195,6 +194,10 @@ export async function sendReportToGoogleChat(report) {
         console.info(`Google Chat: Sede "${report.sede}" aún no tiene espacio configurado. Omitiendo envío para no mezclar con Lima.`);
         return { success: false, reason: 'sede_webhook_pending', sede: report.sede };
       }
+    }
+
+    if (!webhookUrl) {
+      return { success: false, reason: 'missing_webhook', sede: report.sede };
     }
 
     const { type, submitted_by, sede, cycle_id, stage, created_at, data } = report;

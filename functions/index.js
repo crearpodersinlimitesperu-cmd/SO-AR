@@ -59,15 +59,27 @@ const GROQ_API_KEY = defineSecret("GROQ_API_KEY");
 // vuelve a retirar este modelo, este es el único lugar que hay que tocar.
 const GROQ_MODEL = "groq/compound";
 
-const ROLES_GERENCIA = [
-  "gerente", "direccion", "cfo", "cco", "ceo",
-  "director_maestria", "socio", "consolidado"
+const GERENCIA_EMAILS = [
+  'emely.leon@crearpsl.net',
+  'fer.aragon@crearpsl.net',
+  'andres.gomez@crearpsl.net',
+  'gomeznueve@gmail.com',
+  'contabilidad.global@crearpsl.net',
+  'leandro.brunis@crearpsl.net',
+  'josue.vera@crearpsl.net',
+  'yurany.gonzalez@crearpsl.net',
+  'nora.zamora@crearpsl.net',
+  'emily.campuzano@crearpsl.net',
+  'freddy.sosa@crearpsl.net',
+  'diana.moscoso@crearpsl.net',
+  'jose.sanchez@crearpsl.net',
+  'armando.pilacuan@gmail.com',
+  'paul.sosa@crearpsl.net'
 ];
 
 function esGerencia(userData) {
-  if (userData.isSuperAdmin || userData.isDireccion || userData.isGerente) return true;
-  const roles = userData.roles || [userData.role || userData.appRole || ""];
-  return roles.some((r) => ROLES_GERENCIA.includes(String(r).toLowerCase()));
+  const email = String(userData?.email || '').trim().toLowerCase();
+  return GERENCIA_EMAILS.includes(email);
 }
 
 function esCoordinador(userData) {

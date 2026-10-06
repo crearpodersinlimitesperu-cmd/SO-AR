@@ -1,5 +1,5 @@
 import { db } from './firebase';
-import { doc, getDocs, collection, updateDoc } from 'firebase/firestore';
+import { getDocs, collection } from 'firebase/firestore';
 import { findUserByAnyEmail, normalizeRole } from '../data/usersData';
 import { DUAL_ROLE_TRAINER_EMAILS } from '../config/permissions';
 
@@ -10,7 +10,8 @@ function normalizeString(str) {
 
 /**
  * Agente en línea de Causa OS para Integridad de Roles.
- * Se ejecuta en cada inicio de sesión y audita la coherencia operativa.
+ * Se ejecuta en cada inicio de sesión y normaliza los roles para la sesión actual.
+ * La persistencia de roles queda reservada a los flujos administrativos.
  * Garantiza:
  * 1. Cero colapso de cargos: No inyecta 'coordinador' genérico si la persona es coord_c1, coord_maestria o manager.
  * 2. Cero falsos positivos: Los managers no son marcados como entrenadores o coordinadores por error de homonimia.
@@ -18,8 +19,8 @@ function normalizeString(str) {
  * 4. Sanitización activa: Elimina duplicados, valores inválidos (null, undefined, student) y roles espurios.
  * 5. Preserva multi-perfiles reales autorizados (ej. coordinador + entrenador) con roles específicos.
  */
-export async function enforceUserRolesAgent(firebaseUser, userDocId, currentRoles) {
-  if (!firebaseUser || !userDocId) return currentRoles;
+export async function enforceUserRolesAgent(firebaseUser, currentRoles) {
+  if (!firebaseUser) return currentRoles;
 
   try {
     const rawEmail = (firebaseUser.email || '').trim().toLowerCase();
@@ -175,10 +176,7 @@ export async function enforceUserRolesAgent(firebaseUser, userDocId, currentRole
     const newSorted = cleanedRoles.slice().sort().join(',');
 
     if (currentSorted !== newSorted) {
-      console.log(`🛡️ [RoleIntegrityAgent] Roles sanados y coherentes para ${userEmail || userName}:`, cleanedRoles);
-      await updateDoc(doc(db, 'users', userDocId), {
-        roles: cleanedRoles
-      });
+      console.log(`🛡️ [RoleIntegrityAgent] Roles normalizados para la sesión de ${userEmail || userName}:`, cleanedRoles);
       return cleanedRoles;
     }
 
@@ -188,4 +186,3 @@ export async function enforceUserRolesAgent(firebaseUser, userDocId, currentRole
     return currentRoles;
   }
 }
-

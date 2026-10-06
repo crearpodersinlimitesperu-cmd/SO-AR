@@ -1,23 +1,14 @@
-import { initializeApp } from 'firebase/app';
-import { getFirestore, doc, setDoc } from 'firebase/firestore';
+import { initializeApp, cert, getApps } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore';
 import fs from 'fs';
 import path from 'path';
 
-const ROBOT_TOKEN = process.env.ROBOT_TOKEN;
-if (!ROBOT_TOKEN) {
-  throw new Error('❌ Falta la variable de entorno ROBOT_TOKEN. Configúrala antes de ejecutar este script (ver GitHub Secrets: ROBOT_TOKEN).');
+const rawServiceAccount = process.env.GOOGLE_SERVICE_ACCOUNT_JSON || process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
+if (!rawServiceAccount) {
+  throw new Error('Falta GOOGLE_SERVICE_ACCOUNT_JSON para publicar datos de Nodus con permisos de backend.');
 }
-
-const firebaseConfig = {
-  apiKey: ['AIzaSy', 'CTMrA6A64s', '1ppDBBso', 'l-fqam5V', 'ch_Q5B0'].join(''),
-  authDomain: 'centro-operativo-cpsl.firebaseapp.com',
-  projectId: 'centro-operativo-cpsl',
-  storageBucket: 'centro-operativo-cpsl.firebasestorage.app',
-  messagingSenderId: '122588918051',
-  appId: ['1:122588918051:web:', 'c85d6835b1b1f920fb1c96'].join(''),
-};
-
-const app = initializeApp(firebaseConfig);
+const serviceAccount = JSON.parse(rawServiceAccount);
+const app = getApps().length ? getApps()[0] : initializeApp({ credential: cert(serviceAccount) });
 const db = getFirestore(app);
 
 const snapshotPath = path.resolve('nodus_latest_snapshot.json');
@@ -156,7 +147,6 @@ const cleanTotales = {
 const timestamp = new Date().toISOString();
 
 const payload = {
-  robot_token: ROBOT_TOKEN,
   timestamp,
   totales: cleanTotales,
   sedes: Object.values(cleanSedes),
@@ -166,10 +156,10 @@ const payload = {
 
 async function push() {
   console.log(`Subiendo ${cleanCoords.length} coordinadores limpios a Firestore...`);
-  await setDoc(doc(db, 'nodus_coordinadores_c1c2', 'latest'), payload);
+  await db.collection('nodus_coordinadores_c1c2').doc('latest').set(payload);
   console.log("✅ 'nodus_coordinadores_c1c2/latest' actualizado con éxito!");
 
-  await setDoc(doc(db, 'nodus_kpis_sincronizados', 'latest_snapshot'), payload);
+  await db.collection('nodus_kpis_sincronizados').doc('latest_snapshot').set(payload);
   console.log("✅ 'nodus_kpis_sincronizados/latest_snapshot' actualizado con éxito!");
 
   // Guardar en JSON locales
