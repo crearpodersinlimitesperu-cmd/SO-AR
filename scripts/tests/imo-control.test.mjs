@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { normalizeDocument, scopedEnrollee, projectEnrollee, buildImoRequest, reviewImoRequest, reconcileApprovedRequest } from '../../cloudflare-worker/src/imoControlModel.mjs';
+import { normalizeDocument, scopedEnrollee, projectEnrollee, buildImoRequest, reviewImoRequest, reconcileApprovedRequest } from '../../functions-imo/controlModel.mjs';
 const person = { id: 'person1', imoId: 'imo1', nombre: 'PRUEBA', sede: 'Lima', currentTeam: 30, coordinadorId: 'coord1', coordinadorEmail: 'coord@example.test', sourceUpdatedAt: '2026-10-01T00:00:00Z', documento: '00123456', email: 'private@example.test' };
 const at = '2026-10-05T00:00:00Z';
 const makeRequest = () => buildImoRequest({ requestId: 'req1', actorId: 'imo1', enrollee: person, type: 'team_change', targetEvent: { id: 'event32', stage: 'C1', sede: 'Lima', team: 32, date: '2026-10-23' }, at });

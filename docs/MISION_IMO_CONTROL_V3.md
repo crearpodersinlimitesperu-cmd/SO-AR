@@ -22,7 +22,7 @@ Precarga de fechas oficiales con manejo de ausencia/ambigüedad de fechas, cambi
 
 ## Implementado y probado, aún sin conectar
 
-`cloudflare-worker/src/imoControlModel.mjs`: contrato de solicitud, verificación de dueño de enrolado, proyección mínima sin documentos/contactos privados, resolución por coordinador asignado y conciliación posterior con Nodus. No existen rutas activas ni escrituras de producción para este contrato todavía.
+`functions-imo/controlModel.mjs`: contrato de solicitud, verificación de dueño de enrolado, proyección mínima sin documentos/contactos privados, resolución por coordinador asignado y conciliación posterior con Nodus. No existen rutas activas ni escrituras de producción para este contrato todavía.
 
 ## Trabajo pendiente antes de activar
 
@@ -35,3 +35,14 @@ Precarga de fechas oficiales con manejo de ausencia/ambigüedad de fechas, cambi
 7. Publicar servidor/frontend/reglas en orden que no exponga datos; verificar con una cuenta de prueba autorizada antes de habilitar el acceso real.
 
 No anunciar documento + código, estados oficiales privados ni notificaciones automáticas como activos mientras esos pasos estén pendientes.
+
+## Infraestructura verificada el 6 de octubre de 2026
+
+- La sesión correcta de Firebase muestra el proyecto `centro-operativo-cpsl` en **Blaze**. Los comentarios de agosto sobre Spark no describen el estado actual.
+- GitHub Actions tiene permisos de crear/actualizar Cloud Functions, Cloud Build, habilitar servicios y actuar como la cuenta de ejecución predeterminada. Auditoría de solo lectura: run `37470940428`.
+- Las cuatro funciones existentes reportan `CloudRunServiceNotFound`; dos figuran FAILED y dos UNKNOWN. No se han modificado ni eliminado durante esta revisión. No asumir que una entrada en la consola equivale a un backend operativo.
+- El backend IMO se prepara en `functions-imo/`, separado del Copiloto. No requiere Cloudflare.
+- `authModel.mjs` implementa primitivas de códigos de un uso (10 minutos, 5 intentos), claves HMAC por documento/país emisor y sesiones revocables (30 minutos). El país emisor del documento no es la nacionalidad ni debe inferirse de la sede. Los cambios de desafío, límites y sesión deberán persistirse transaccionalmente para evitar concurrencia.
+- 16 pruebas locales pasan. Estas primitivas no son todavía endpoints desplegados ni una integración de correo operativa.
+- La auditoría devuelve 0 campañas v2 y 0 registros en `imo_identities_private` y `imo_enrollees_private`. El snapshot de coordinación existe con 15 coordinadores, pero los nombres de las misiones antiguas no acreditan la identidad de un IMO.
+- Queda pendiente la extracción y validación de identidad/contacto/relación estable desde Nodus, los endpoints Firebase, la entrega real del código y el despliegue conjunto del portal y las reglas.
