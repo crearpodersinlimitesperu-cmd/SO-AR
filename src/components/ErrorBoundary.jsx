@@ -14,10 +14,28 @@ export class ErrorBoundary extends React.Component {
   componentDidCatch(error, errorInfo) {
     console.error("ErrorBoundary caught an error:", error, errorInfo);
     this.setState({ errorInfo });
+
+    if (/failed to fetch dynamically imported module|importing a module script failed|loading chunk .+ failed/i.test(String(error))) {
+      const reloadKey = `causa:chunk-reload:${window.location.pathname}`;
+      try {
+        const previousReload = Number(sessionStorage.getItem(reloadKey));
+        const now = Date.now();
+        if (!previousReload || now - previousReload > 30000) {
+          sessionStorage.setItem(reloadKey, String(now));
+          const currentUrl = new URL(window.location.href);
+          currentUrl.searchParams.set('_app_reload', String(now));
+          window.location.replace(currentUrl.toString());
+        }
+      } catch (storageError) {
+        console.warn('No se pudo recuperar automáticamente el módulo desactualizado:', storageError);
+      }
+    }
   }
 
   handleReload = () => {
-    window.location.reload();
+    const currentUrl = new URL(window.location.href);
+    currentUrl.searchParams.set('_app_reload', String(Date.now()));
+    window.location.replace(currentUrl.toString());
   };
 
   handleGoHome = () => {

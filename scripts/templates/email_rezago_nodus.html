@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Alerta de Rezago Operativo - Nodus</title>
+<title>Alerta crítica de gestión - Nodus</title>
 <style>
   body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -121,44 +121,44 @@
 
 <div class="container">
   <div class="header">
-    <h1>🚨 ALERTA CRÍTICA: DATOS DESACTUALIZADOS EN NODUS</h1>
+    <h1>🚨 ALERTA CRÍTICA DE GESTIÓN - NODUS</h1>
   </div>
   
   <div class="content">
     <p class="greeting">Hola {{nombre_gerente}},</p>
     
     <p class="message">
-      El <strong>Sistema Autónomo Nodus (Causa OS)</strong> acaba de realizar su auditoría global y ha detectado un <strong>rezago operativo grave</strong> en tu sede (<strong>{{sede}}</strong>). 
-      Varios de tus coordinadores no han registrado actividad ni actualizado sus gestiones en el sistema durante las últimas 24 horas.
+      El Centinela RRHH detectó coordinadores que cumplen una regla de alerta crítica en el corte de Nodus para <strong>{{sede}}</strong>.
+      Este resumen refleja los datos disponibles al <strong>{{corte_nodus}}</strong>; no confirma inactividad actual ni abandono de participantes.
     </p>
 
     <div class="stats-box">
-      <p>⚠️ <strong>Coordinadores inactivos:</strong> {{coordinadores_inactivos}} de {{total_coordinadores}}</p>
-      <p>⏱️ <strong>Tiempo promedio sin gestión:</strong> {{tiempo_promedio_inactividad}} horas</p>
-      <p>📉 <strong>Participantes a la deriva (Sin contactar):</strong> {{participantes_riesgo}}</p>
+      <p>⚠️ <strong>Coordinadores con alerta crítica en este corte:</strong> {{coordinadores_criticos}} de {{total_coordinadores}}</p>
+      <p>📬 <strong>Alertas nuevas incluidas en este correo:</strong> {{alertas_nuevas}}</p>
+      <p>📋 <strong>Participantes asignados a esos nuevos casos (según Nodus):</strong> {{asignados_reportados}}</p>
     </div>
 
-    <p class="message"><strong>Detalle de coordinadores con mayor rezago:</strong></p>
+    <p class="message"><strong>Datos que sustentan la alerta:</strong></p>
     
     <div class="table-container">
       <table>
         <thead>
           <tr>
             <th>Coordinador</th>
-            <th>Última Gestión</th>
+            <th>Última gestión informada</th>
             <th>Asignados</th>
-            <th>Px sin gestión</th>
-            <th>Estado</th>
+            <th>Gestiones / asignados</th>
+            <th>Regla registrada</th>
           </tr>
         </thead>
         <tbody>
           {{#each coordinadores_rezagados}}
           <tr>
             <td>{{nombre}}</td>
-            <td>Hace {{horas_inactivo}} hrs</td>
+            <td>{{ult_gestion}}</td>
             <td>{{asignados}}</td>
-            <td><span style="font-size: 12px; color: #52525b; display: block; max-width: 150px; word-wrap: break-word;">{{px_sin_gestionar}}</span></td>
-            <td><span class="badge-critical">Bloqueo Operativo</span></td>
+            <td>{{gestiones}} / {{asignados}}</td>
+            <td>{{motivo}}</td>
           </tr>
           {{/each}}
         </tbody>
@@ -166,15 +166,15 @@
     </div>
 
     <p class="message">
-      <strong>Impacto Real:</strong> Los datos desactualizados rompen los modelos predictivos de la Dirección Corporativa y ocultan posibles fugas de participantes. Si no hay registro, el participante se considera abandonado.
+      Valida este corte directamente en Nodus y con el equipo antes de tomar medidas. Los datos agregados no identifican por sí solos participantes sin contactar ni explican la causa del resultado.
     </p>
 
-    <a href="https://imo.crearpslglobal.com/" class="action-btn">Ir a Nodus y Exigir Actualización</a>
+    <a href="https://imo.crearpslglobal.com/" class="action-btn">Revisar el corte en Nodus</a>
   </div>
   
   <div class="footer">
     Reporte generado automáticamente por Agente 5 (Centinela RRHH) • Causa OS 2026<br>
-    Este correo fue enviado porque tu sede superó el 30% de inactividad tolerada.
+    Aviso informativo basado en la regla Centinela RRHH; no constituye una evaluación individual.
   </div>
 </div>
 

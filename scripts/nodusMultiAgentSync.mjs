@@ -14,14 +14,10 @@ import { NodusHrSentinelAgent } from './nodusHrSentinelAgent.mjs';
 import { NodusFIAgent } from './nodusFIAgent.mjs';
 import { NodusGenealogyAgent } from './nodusGenealogyAgent.mjs';
 import { NodusIdentityAgent } from './nodusIdentityAgent.mjs';
+import { resolveUniqueNameMatch } from '../shared/rrhhSentinelRules.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-const ROBOT_TOKEN = process.env.ROBOT_TOKEN;
-if (!ROBOT_TOKEN) {
-  throw new Error('❌ Falta la variable de entorno ROBOT_TOKEN. Configúrala antes de ejecutar este script (ver GitHub Secrets: ROBOT_TOKEN).');
-}
 
 puppeteer.use(StealthPlugin());
 
@@ -740,33 +736,48 @@ class NodusNormalizerAgent {
         if (idx >= 0 && idx < lines.length - 1 && /^[0-9]+$/.test(lines[idx + 1])) {
           return parseInt(lines[idx + 1], 10);
         }
-        return 0;
+        return null;
       };
 
-      const gestiones = findNumberAfter('Gestiones');
-      const c1 = findNumberAfter('C1');
-      const c2 = findNumberAfter('C2');
-      const mj = findNumberAfter('MJ') || findNumberAfter('Maestría') || findNumberAfter('Maestria') || findNumberAfter('Maestrias') || 0;
-      const asignados = findNumberAfter('Asignados');
+      const gestionesValue = findNumberAfter('Gestiones');
+      const c1Value = findNumberAfter('C1');
+      const c2Value = findNumberAfter('C2');
+      const mjValue = ['MJ', 'Maestría', 'Maestria', 'Maestrias']
+        .map(findNumberAfter)
+        .find(value => value !== null) ?? null;
+      const asignadosValue = findNumberAfter('Asignados');
+      const gestiones = gestionesValue ?? 0;
+      const c1 = c1Value ?? 0;
+      const c2 = c2Value ?? 0;
+      const mj = mjValue ?? 0;
+      const asignados = asignadosValue ?? 0;
 
       // Cobertura
       const cobLine = lines.find(l => l.includes('/') && l.includes('%'));
       let coberturaPct = 0;
+      let coberturaPctAvailable = false;
       let coberturaDetalle = '';
       if (cobLine) {
         coberturaDetalle = cobLine;
         const match = cobLine.match(/\((\d+)%\)/);
-        if (match) coberturaPct = parseInt(match[1], 10);
+        if (match) {
+          coberturaPct = parseInt(match[1], 10);
+          coberturaPctAvailable = true;
+        }
       }
 
       // Productividad
       const prodLines = lines.filter(l => l.includes('/') && l.includes('%'));
       let productividadPct = 0;
+      let productividadPctAvailable = false;
       let productividadDetalle = '';
       if (prodLines.length > 1) {
         productividadDetalle = prodLines[1];
         const match = prodLines[1].match(/\((\d+)%\)/);
-        if (match) productividadPct = parseInt(match[1], 10);
+        if (match) {
+          productividadPct = parseInt(match[1], 10);
+          productividadPctAvailable = true;
+        }
       }
 
       const ultConexionLine = lines.find(l => l.toLowerCase().includes('últ. conexión'));
@@ -777,23 +788,32 @@ class NodusNormalizerAgent {
 
       const parseStatus = (statusLabel) => {
         const l = lines.find(line => line.toLowerCase().startsWith(statusLabel.toLowerCase() + ':'));
-        if (!l) return 0;
+        if (!l) return null;
         const parts = l.split(':');
-        return parseInt(parts[1]?.trim() || '0', 10) || 0;
+        const parsed = Number.parseInt(parts[1]?.trim() || '', 10);
+        return Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
       };
 
-      const confirmado = parseStatus('Confirmado');
-      const noContesta = parseStatus('No Contesta');
-      const siguiente = parseStatus('Siguiente');
-      const noInteresa = parseStatus('No le Interesa');
-      const porConfirmar = parseStatus('Por Confirmar');
-      const yaAsistio = parseStatus('Ya Asistió');
-      const devolucion = parseStatus('Devolución');
+      const confirmadoValue = parseStatus('Confirmado');
+      const noContestaValue = parseStatus('No Contesta');
+      const siguienteValue = parseStatus('Siguiente');
+      const noInteresaValue = parseStatus('No le Interesa');
+      const porConfirmarValue = parseStatus('Por Confirmar');
+      const yaAsistioValue = parseStatus('Ya Asistió');
+      const devolucionValue = parseStatus('Devolución');
+      const confirmado = confirmadoValue ?? 0;
+      const noContesta = noContestaValue ?? 0;
+      const siguiente = siguienteValue ?? 0;
+      const noInteresa = noInteresaValue ?? 0;
+      const porConfirmar = porConfirmarValue ?? 0;
+      const yaAsistio = yaAsistioValue ?? 0;
+      const devolucion = devolucionValue ?? 0;
 
       let officialEmail = '';
       let officialName = nombre;
-      const cleanSearchName = nombre.toLowerCase().trim();
-      const match = workspaceDirectory.find(u => u.name.toLowerCase().includes(cleanSearchName));
+      const match = resolveUniqueNameMatch(nombre, workspaceDirectory, {
+        getName: user => user?.name || ''
+      });
       if (match) {
         officialEmail = match.email;
         officialName = match.name;
@@ -806,6 +826,13 @@ class NodusNormalizerAgent {
       };
 
       const totalAsistieron = (item.equipos || []).reduce((acc, eq) => acc + (eq.asistieron || 0), 0);
+      const coordinatorRole = mjValue > 0 && c1Value === 0 && c2Value === 0
+        ? 'Coordinador Maestría'
+        : c2Value > 0
+          ? 'Coordinador C1 / C2'
+          : c1Value > 0
+            ? 'Coordinador C1'
+            : 'Coordinador';
 
       return {
         id: `coord_${nombre.toLowerCase().replace(/[^a-z0-9]/g, '_')}_${sede.toLowerCase()}`,
@@ -814,7 +841,7 @@ class NodusNormalizerAgent {
         email: infoOficial.email,
         sede,
         ciclo,
-        rol: (mj > 0 && c1 === 0 && c2 === 0) ? 'Coordinador Maestría' : (c2 > 0 ? 'Coordinador C1 / C2' : 'Coordinador C1'),
+        rol: coordinatorRole,
         gestiones,
         c1,
         c2,
@@ -825,9 +852,27 @@ class NodusNormalizerAgent {
         productividadPct,
         productividadDetalle,
         asistieron: totalAsistieron,
-        tasaEfectividad: gestiones > 0 ? Math.round((confirmado / gestiones) * 100) : 0,
+        tasaEfectividad: gestionesValue !== null && confirmadoValue !== null && gestionesValue > 0
+          ? Math.round((confirmadoValue / gestionesValue) * 100)
+          : null,
         ultConexion,
         ultGestion,
+        metricasDisponibles: {
+          gestiones: gestionesValue !== null,
+          asignados: asignadosValue !== null,
+          coberturaPct: coberturaPctAvailable,
+          productividadPct: productividadPctAvailable,
+          confirmados: confirmadoValue !== null,
+          noContesta: noContestaValue !== null,
+          siguiente: siguienteValue !== null,
+          noInteresa: noInteresaValue !== null,
+          porConfirmar: porConfirmarValue !== null,
+          yaAsistio: yaAsistioValue !== null,
+          devolucion: devolucionValue !== null,
+          gestionesC1: c1Value !== null,
+          gestionesC2: c2Value !== null,
+          sentadosTotal: (item.equipos || []).length > 0
+        },
         estados: {
           confirmado,
           noContesta,
@@ -864,8 +909,11 @@ class NodusNormalizerAgent {
       if (name.includes('soporte') || email.includes('soporte')) return false;
       if (name.includes('factura') || email.includes('factura')) return false;
       const hasActivity = (Number(c.c1) > 0 || Number(c.c2) > 0 || Number(c.mj) > 0 || Number(c.gestiones) > 0 || Number(c.asignados) > 0);
+      const explicitlyNoBase = c.metricasDisponibles.asignados && c.asignados === 0 &&
+        c.metricasDisponibles.gestiones && c.gestiones === 0;
       const hasEquipos = Array.isArray(c.equipos) && c.equipos.length > 0;
-      return hasActivity && hasEquipos;
+      const requiredMetricsMissing = !c.metricasDisponibles.asignados || !c.metricasDisponibles.gestiones;
+      return hasEquipos && (hasActivity || explicitlyNoBase || requiredMetricsMissing);
     });
 
     // Consolidado por Sedes
@@ -1000,7 +1048,6 @@ class NodusDispatcherAgent {
     }));
 
     const masterSnapshot = {
-      robot_token: ROBOT_TOKEN,
       timestamp,
       fuente: "Sistema Autónomo Multi-Agente Nodus CPSL 2026",
       usuarioExtraccion: "jsanchez (Super Administrador Global)",
@@ -1025,7 +1072,6 @@ class NodusDispatcherAgent {
       }
       try {
         await adminDb.collection('nodus_bi_reports').doc('latest').set({
-          robot_token: ROBOT_TOKEN,
           timestamp,
           datos_bi: safeBiExtract
         });
@@ -1044,7 +1090,6 @@ class NodusDispatcherAgent {
     }
 
     await adminDb.collection('nodus_coordinadores_c1c2').doc('latest').set({
-      robot_token: ROBOT_TOKEN,
       timestamp,
       totales: normalizedData.totales,
       sedes: normalizedData.sedesSummary,
@@ -1056,7 +1101,6 @@ class NodusDispatcherAgent {
     // 3. Guardar en historial horario: nodus_kpis_history / snapshot_<timestamp>
     const historyId = `snap_${new Date().getTime()}`;
     await adminDb.collection('nodus_kpis_history').doc(historyId).set({
-      robot_token: ROBOT_TOKEN,
       timestamp,
       totales: normalizedData.totales,
       sedes: normalizedData.sedesSummary
@@ -1182,7 +1226,7 @@ class NodusDispatcherAgent {
       console.warn("Aviso al guardar respaldo local:", fsErr.message);
     }
 
-    return true;
+    return timestamp;
   }
 }
 
@@ -1292,7 +1336,7 @@ export async function runMultiAgentSync() {
       // [Agente 8 - Identidad] Validar que NO haya usuarios inventados, y purgar renuncias
       normalized.coordinadores = await identitySentinel.enforceIdentityTruth(normalized.coordinadores, 'C1_C2');
       normalizer.recalculateTotals(normalized);
-    await dispatcher.dispatch(normalized, rawData);
+    const nodusSourceTimestamp = await dispatcher.dispatch(normalized, rawData);
 
     // =========================================================================
     // AGENTE 4: DATA SCIENTIST, INTEGRIDAD, PREDICTOR Y RECONCILIADOR
@@ -1321,7 +1365,7 @@ export async function runMultiAgentSync() {
     console.log("\n👔 [Agente 5 - RRHH] Activando auditoría de actividad de coordinadores y alertas para Gerentes...");
     try {
       const hrSentinel = new NodusHrSentinelAgent(getAdminDbForNodusPublish());
-      const diagnostico = hrSentinel.diagnosticarDesempeno(normalized.coordinadores, normalized.equiposReporte);
+      const diagnostico = hrSentinel.diagnosticarDesempeno(normalized.coordinadores, nodusSourceTimestamp);
       await hrSentinel.publicarAlertasYCuadroDeMando(diagnostico);
       console.log("✅ [Agente 5 - RRHH] Cuadro de mando de RRHH y alertas inyectadas a Gerentes con éxito.");
     } catch (hrErr) {
@@ -1434,5 +1478,3 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       process.exit(1);
     });
 }
-
-

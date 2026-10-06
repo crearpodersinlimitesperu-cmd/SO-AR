@@ -9,7 +9,7 @@ import {
   Search, UserCheck
 } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { doc, collection, setDoc, addDoc } from 'firebase/firestore';
+import { doc, collection, writeBatch } from 'firebase/firestore';
 import { db, getDocResilient } from '../services/firebase';
 import { OPERATIONAL_SEDES, normalizeSede, usersData, normalizeRole } from '../data/usersData';
 import { SEDES_FDS_PRICING, getSedePricing, formatCurrencyAmount } from '../data/sedesPricingData';
@@ -17,6 +17,13 @@ import nodusFallbackData from '../data/nodusFallbackData.json';
 import ResourceCapacityView from '../components/ResourceCapacityView';
 import FuturosImposiblesView from '../components/FuturosImposiblesView';
 import { PORTFOLIO_FI_REVIEW_EMAILS } from '../config/permissions';
+import {
+  classifyCoordinatorPerformance,
+  getCoordinatorMetrics,
+  isSnapshotFresh,
+  resolveUniqueNameMatch,
+  timestampToMillis
+} from '../../shared/rrhhSentinelRules.mjs';
 
 export const KNOWN_COORDINATORS = {
   'MARIBEL': { formalName: 'Maribel Catota', email: 'viviana.catota@crearpsl.net', role: 'coord_c1', sede: 'Cuenca' },
@@ -65,48 +72,55 @@ function formatRoleLabel(role) {
 }
 
 function resolveCausaUser(rawName, sede) {
-  const clean = (s) => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
-  const rawClean = clean(rawName);
+  const knownEntries = Object.entries(KNOWN_COORDINATORS).map(([name, details]) => ({ name, ...details }));
+  const known = resolveUniqueNameMatch(rawName, knownEntries, { sede });
+  const directoryMatch = known || resolveUniqueNameMatch(rawName, Array.isArray(usersData) ? usersData : [], {
+    getName: user => user?.name || user?.displayName || '',
+    getSede: user => user?.sede || '',
+    sede
+  });
 
-  for (const [key, val] of Object.entries(KNOWN_COORDINATORS)) {
-    const keyClean = clean(key);
-    if (rawClean === keyClean || rawClean.includes(keyClean) || keyClean.includes(rawClean)) {
-      return {
-        formalName: val.formalName,
-        email: val.email,
-        role: val.role || 'coord_c1',
-        roleLabel: formatRoleLabel(val.role || 'coord_c1'),
-        sede: val.sede || sede || 'Sin Sede',
-        nodusName: rawName
-      };
-    }
-  }
-
-  if (Array.isArray(usersData)) {
-    const match = usersData.find(u => {
-      const uName = clean(u.name || u.displayName);
-      return uName && (uName.includes(rawClean) || rawClean.includes(uName));
-    });
-    if (match) {
-      return {
-        formalName: match.name || match.displayName || rawName,
-        email: match.email || (Array.isArray(match.emails) ? match.emails[0] : `${rawClean}@crearpsl.net`),
-        role: match.role || 'coord_c1',
-        roleLabel: formatRoleLabel(match.role || 'coord_c1'),
-        sede: normalizeSede(match.sede || sede),
-        nodusName: rawName
-      };
-    }
+  if (directoryMatch) {
+    const role = directoryMatch.role || 'coord_c1';
+    const email = directoryMatch.email || directoryMatch.emails?.[0] || '';
+    return {
+      formalName: directoryMatch.formalName || directoryMatch.name || directoryMatch.displayName || rawName,
+      email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? email : '',
+      role,
+      roleLabel: formatRoleLabel(role),
+      sede: normalizeSede(directoryMatch.sede || sede),
+      nodusName: rawName,
+      identityVerified: Boolean(email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+    };
   }
 
   return {
     formalName: rawName.charAt(0).toUpperCase() + rawName.slice(1).toLowerCase(),
-    email: `${rawClean.replace(/\s+/g, '.')}@crearpsl.net`,
-    role: 'coord_c1',
-    roleLabel: 'Coordinador C1 / C2',
+    email: '',
+    role: '',
+    roleLabel: 'Identidad no vinculada',
     sede: normalizeSede(sede),
-    nodusName: rawName
+    nodusName: rawName,
+    identityVerified: false
   };
+}
+
+function getTaskRecipients(coordinator) {
+  const manager = GERENTES_POR_SEDE[normalizeSede(coordinator.sede)];
+  const recipients = [];
+  if (manager?.email) recipients.push({ email: manager.email, name: manager.name, role: 'gerente', label: 'Gerente de Sede' });
+  if (coordinator.identityVerified && coordinator.email) {
+    recipients.push({ email: coordinator.email, name: coordinator.formalName, role: coordinator.role || 'coord_c1', label: 'Coordinador' });
+  }
+  recipients.push({
+    email: 'andres.gomez@crearpsl.net',
+    name: 'Andrés Gómez',
+    role: 'direccion',
+    label: 'Dirección General'
+  });
+  return recipients.filter((recipient, index, list) =>
+    list.findIndex(candidate => candidate.email === recipient.email) === index
+  );
 }
 
 export default function PortfolioBoard() {
@@ -125,7 +139,7 @@ export default function PortfolioBoard() {
   };
 
   const [viewMode, setViewMode] = useState(() => resolveTab(tabParam));
-  const [coordinadoresRaw, setCoordinadoresRaw] = useState(() => nodusFallbackData?.coordinadores || []);
+  const [coordinadoresRaw, setCoordinadoresRaw] = useState([]);
 
   // Estados de control para Centinela RRHH y Ranking
   const [rankingFilter, setRankingFilter] = useState('ALL'); // ALL, CRITICO, REZAGO, OPTIMO
@@ -164,6 +178,7 @@ export default function PortfolioBoard() {
   // Estado para datos del Predictor de Inteligencia Nodus
   const [predictorData, setPredictorData] = useState(null);
   const [hrSentinelData, setHrSentinelData] = useState(null);
+  const [coordinatorSnapshot, setCoordinatorSnapshot] = useState({ source: 'loading', timestamp: null });
   const [customPricing, setCustomPricing] = useState(() => {
     try {
       const saved = localStorage.getItem('nodus_custom_fds_pricing');
@@ -198,13 +213,29 @@ export default function PortfolioBoard() {
   const borderLight = "var(--border-subtle, rgba(255, 255, 255, 0.08))";
 
   const [errorObj, setErrorObj] = useState(null);
+  const coordinatorSnapshotTime = timestampToMillis(coordinatorSnapshot.timestamp);
+  const coordinatorSnapshotIsFresh = coordinatorSnapshot.source === 'nodus' && isSnapshotFresh(coordinatorSnapshot.timestamp);
+  const hrAgentSnapshotTime = timestampToMillis(hrSentinelData?.timestamp);
+  const coordinatorSnapshotStatus = coordinatorSnapshot.source === 'fallback'
+    ? 'Respaldo local histórico — no representa una extracción en vivo'
+    : coordinatorSnapshot.source !== 'nodus'
+      ? 'Sin una extracción fechada de Nodus'
+      : coordinatorSnapshotIsFresh
+        ? 'Snapshot Nodus vigente'
+        : coordinatorSnapshotTime === null
+          ? 'Snapshot Nodus sin fecha verificable'
+          : 'Snapshot Nodus vencido (más de 24 horas)';
 
   useEffect(() => {
     async function fetchData() {
       try {
         setLoading(true);
+        setPredictorData(null);
+        setHrSentinelData(null);
+        setCoordinadoresRaw([]);
+        setCoordinatorSnapshot({ source: 'loading', timestamp: null });
 
-                // 1. Cargar snapshot de coordinadores C1/C2 con resiliencia garantizada
+        // 1. El Centinela necesita una fuente fechada; el respaldo local se identifica como histórico.
         const docRef = doc(db, 'nodus_coordinadores_c1c2', 'latest');
         const docSnap = await getDocResilient(docRef);
         
@@ -215,8 +246,13 @@ export default function PortfolioBoard() {
 
         if (data && Array.isArray(data.coordinadores) && data.coordinadores.length > 0) {
           setCoordinadoresRaw(data.coordinadores);
+          setCoordinatorSnapshot({ source: 'nodus', timestamp: data.timestamp || data.updatedAt || null });
         } else if (nodusFallbackData?.coordinadores) {
           setCoordinadoresRaw(nodusFallbackData.coordinadores);
+          setCoordinatorSnapshot({ source: 'fallback', timestamp: nodusFallbackData.timestamp || null });
+        } else {
+          setCoordinadoresRaw([]);
+          setCoordinatorSnapshot({ source: 'unavailable', timestamp: null });
         }
 
         let totalEnrolados = 0;
@@ -1090,82 +1126,37 @@ export default function PortfolioBoard() {
               </div>
             </div>
 
+            <div style={{
+              background: coordinatorSnapshotIsFresh ? '#f0fdf4' : '#fff7ed',
+              border: `1px solid ${coordinatorSnapshotIsFresh ? '#86efac' : '#fdba74'}`,
+              borderRadius: '10px',
+              padding: '0.75rem 1rem',
+              marginBottom: '1.25rem',
+              color: coordinatorSnapshotIsFresh ? '#166534' : '#9a3412',
+              fontSize: '0.82rem'
+            }}>
+              <strong>{coordinatorSnapshotStatus}</strong>
+              {coordinatorSnapshotTime !== null && (
+                <span> · Corte: {new Date(coordinatorSnapshotTime).toLocaleString('es-PE')}</span>
+              )}
+              <span>
+                {' · '}Última ejecución del agente RRHH:{' '}
+                {hrAgentSnapshotTime !== null
+                  ? new Date(hrAgentSnapshotTime).toLocaleString('es-PE')
+                  : 'sin registro'}
+              </span>
+              {!coordinatorSnapshotIsFresh && <span> · Las tareas están deshabilitadas hasta una extracción reciente.</span>}
+            </div>
+
             {/* CÁLCULO DINÁMICO DE DATOS DE COORDINADORES */}
             {(() => {
               // 1. Mapeo y fusión con datos cuantitativos de C1/C2 y diagnóstico RRHH
-              const rawList = coordinadoresRaw.length > 0 
-                ? coordinadoresRaw 
-                : (nodusFallbackData?.coordinadores || []);
-
-              const critList = hrSentinelData?.enAlertaCritica || [];
-              const medList = hrSentinelData?.enAlertaMedia || [];
-              const optList = hrSentinelData?.desempenoOptimo || [];
-
-              const clean = (s) => (s || '').toUpperCase().trim();
+              const rawList = coordinadoresRaw;
 
               const mergedList = rawList.map((c, idx) => {
-                const cName = clean(c.nombre);
                 const userMeta = resolveCausaUser(c.nombre, c.sede);
-
-                const foundCrit = critList.find(a => clean(a.nombre) === cName);
-                const foundMed = medList.find(a => clean(a.nombre) === cName);
-                const foundOpt = optList.find(a => clean(a.nombre) === cName);
-
-                const asignados = c.asignados || 0;
-                const gestiones = c.gestiones || 0;
-                const coberturaPct = c.coberturaPct || (asignados > 0 ? Math.round((gestiones / asignados) * 100) : 0);
-                const confirmadosC1 = c.confirmadosC1 || 0;
-                const confirmadosC2 = c.confirmadosC2 || 0;
-                const confirmados = c.confirmados || (confirmadosC1 + confirmadosC2);
-                const sentadosC1 = c.sentadosC1 || 0;
-                const sentadosC2 = c.sentadosC2 || 0;
-                const sentadosTotal = c.sentadosTotal || (sentadosC1 + sentadosC2) || c.asistieron || 0;
-                const gestionesC1 = c.gestionesC1 || 0;
-                const gestionesC2 = c.gestionesC2 || 0;
-                const noContesta = c.noContesta || 0;
-                const porConfirmar = c.porConfirmar || 0;
-                const noInteresa = c.noInteresa || 0;
-                const devolucion = c.devolucion || 0;
-
-                let nivelRiesgo = 'OPTIMO';
-                let motivo = '';
-                let coachingFeedback = '';
-
-                if (foundCrit) {
-                  nivelRiesgo = 'CRITICO';
-                  motivo = foundCrit.motivo;
-                  coachingFeedback = foundCrit.coachingFeedback;
-                } else if (foundMed) {
-                  nivelRiesgo = 'MEDIO';
-                  motivo = foundMed.motivo;
-                  coachingFeedback = foundMed.coachingFeedback;
-                } else if (foundOpt) {
-                  nivelRiesgo = 'OPTIMO';
-                  motivo = foundOpt.motivo;
-                  coachingFeedback = foundOpt.coachingFeedback;
-                } else {
-                  if (asignados > 0 && gestiones === 0) {
-                    nivelRiesgo = 'CRITICO';
-                    motivo = `Sin llamadas registradas con ${asignados} asignados (0% cobertura). Inactividad total en Nodus.`;
-                    coachingFeedback = `Pauta RRHH: Intervención inmediata 1:1 del Gerente de Sede para descartar bloqueo técnico o falta de inducción.`;
-                  } else if (asignados > 10 && coberturaPct < 35) {
-                    nivelRiesgo = 'CRITICO';
-                    motivo = `Ritmo crítico de cobertura (${coberturaPct}% con ${asignados} prospectos). Base en alto riesgo de pérdida.`;
-                    coachingFeedback = `Pauta RRHH: Reasignar 50% de la base y programar sesión de destrabe telefónico con el Gerente.`;
-                  } else if (gestiones > 5 && (noContesta / gestiones) > 0.55) {
-                    nivelRiesgo = 'MEDIO';
-                    motivo = `Fricción severa de contacto: ${noContesta} llamadas en No Contesta (${Math.round((noContesta / gestiones) * 100)}%).`;
-                    coachingFeedback = `Pauta RRHH: Ajustar franja de llamadas (18:00 a 21:00) y activar plantilla de reactivación por WhatsApp.`;
-                  } else if (coberturaPct < 60) {
-                    nivelRiesgo = 'MEDIO';
-                    motivo = `Avance por debajo de la meta de velocidad operativa (${coberturaPct}% de cobertura).`;
-                    coachingFeedback = `Pauta RRHH: Check-in matutino de 15 minutos para garantizar ritmo de 30 llamadas diarias.`;
-                  } else {
-                    nivelRiesgo = 'OPTIMO';
-                    motivo = `Excelente ritmo de avance (${coberturaPct}% de cobertura, ${confirmados} confirmaciones logradas).`;
-                    coachingFeedback = `Pauta RRHH: Reconocimiento público en canal de sede. Ritmo sólido para llenar la sala.`;
-                  }
-                }
+                const metrics = getCoordinatorMetrics(c);
+                const diagnosis = classifyCoordinatorPerformance(c);
 
                 return {
                   id: `coord_${idx}_${c.nombre}`,
@@ -1174,25 +1165,12 @@ export default function PortfolioBoard() {
                   formalRole: userMeta.roleLabel,
                   role: userMeta.role,
                   email: userMeta.email,
+                  identityVerified: userMeta.identityVerified,
                   sede: c.sede || userMeta.sede,
-                  asignados,
-                  gestiones,
-                  coberturaPct,
-                  confirmados,
-                  confirmadosC1,
-                  confirmadosC2,
-                  sentadosC1,
-                  sentadosC2,
-                  sentadosTotal,
-                  gestionesC1,
-                  gestionesC2,
-                  noContesta,
-                  porConfirmar,
-                  noInteresa,
-                  devolucion,
-                  nivelRiesgo,
-                  motivo,
-                  coachingFeedback
+                  ...metrics,
+                  nivelRiesgo: diagnosis.nivelRiesgo,
+                  motivo: diagnosis.motivo,
+                  coachingFeedback: diagnosis.coachingFeedback
                 };
               });
 
@@ -1207,15 +1185,17 @@ export default function PortfolioBoard() {
               const criticosList = sedeList.filter(c => c.nivelRiesgo === 'CRITICO');
               const rezagosList = sedeList.filter(c => c.nivelRiesgo === 'MEDIO');
               const optimosList = sedeList.filter(c => c.nivelRiesgo === 'OPTIMO');
-              // Sin universo real no existe una métrica de salud. Mostrar 100%
-              // cuando Nodus devolvió cero personas era un falso positivo.
-              const saludPct = totalCoords > 0 ? Math.round((optimosList.length / totalCoords) * 100) : null;
+              const sinBaseList = sedeList.filter(c => c.nivelRiesgo === 'SIN_BASE');
+              const indeterminadosList = sedeList.filter(c => c.nivelRiesgo === 'INDETERMINADO');
+              const totalEvaluables = criticosList.length + rezagosList.length + optimosList.length;
+              const saludPct = totalEvaluables > 0 ? Math.round((optimosList.length / totalEvaluables) * 100) : null;
 
               // Filtrado por tab y búsqueda
               let displayList = [...sedeList];
               if (rankingFilter === 'CRITICO') displayList = displayList.filter(c => c.nivelRiesgo === 'CRITICO');
               if (rankingFilter === 'REZAGO') displayList = displayList.filter(c => c.nivelRiesgo === 'MEDIO');
               if (rankingFilter === 'OPTIMO') displayList = displayList.filter(c => c.nivelRiesgo === 'OPTIMO');
+              if (rankingFilter === 'NO_EVALUABLES') displayList = displayList.filter(c => ['SIN_BASE', 'INDETERMINADO'].includes(c.nivelRiesgo));
 
               if (searchTerm.trim()) {
                 const q = searchTerm.toLowerCase();
@@ -1230,47 +1210,52 @@ export default function PortfolioBoard() {
               // Ordenamiento
               displayList.sort((a, b) => {
                 if (rankingSort === 'salud') {
-                  const order = { 'OPTIMO': 1, 'MEDIO': 2, 'CRITICO': 3 };
+                  const order = { 'OPTIMO': 1, 'MEDIO': 2, 'CRITICO': 3, 'SIN_BASE': 4, 'INDETERMINADO': 5 };
                   if (order[a.nivelRiesgo] !== order[b.nivelRiesgo]) {
                     return order[a.nivelRiesgo] - order[b.nivelRiesgo];
                   }
-                  return b.coberturaPct - a.coberturaPct || b.confirmados - a.confirmados;
+                  return (b.coberturaPct ?? -1) - (a.coberturaPct ?? -1) || (b.confirmados ?? -1) - (a.confirmados ?? -1);
                 }
-                if (rankingSort === 'cobertura') return b.coberturaPct - a.coberturaPct;
-                if (rankingSort === 'confirmados') return b.confirmados - a.confirmados;
-                if (rankingSort === 'sentados') return b.sentadosTotal - a.sentadosTotal;
-                if (rankingSort === 'asignados') return b.asignados - a.asignados;
+                if (rankingSort === 'cobertura') return (b.coberturaPct ?? -1) - (a.coberturaPct ?? -1);
+                if (rankingSort === 'confirmados') return (b.confirmados ?? -1) - (a.confirmados ?? -1);
+                if (rankingSort === 'sentados') return (b.sentadosTotal ?? -1) - (a.sentadosTotal ?? -1);
+                if (rankingSort === 'asignados') return (b.asignados ?? -1) - (a.asignados ?? -1);
                 return 0;
               });
 
               const handleOpenTask = (coord) => {
-                setSelectedCoordForTask(coord);
-                const gerente = GERENTES_POR_SEDE[coord.sede] || { name: `Gerente de ${coord.sede}`, email: 'gerencia@crearpsl.net' };
-                const defaultEmail = coord.nivelRiesgo === 'CRITICO' ? gerente.email : coord.email;
-                const defaultName = coord.nivelRiesgo === 'CRITICO' ? gerente.name : coord.formalName;
-                const defaultRole = coord.nivelRiesgo === 'CRITICO' ? 'gerente' : coord.role;
+                if (coordinatorSnapshot.source !== 'nodus' || !isSnapshotFresh(coordinatorSnapshot.timestamp)) return;
+                const recipients = getTaskRecipients(coord);
+                const manager = recipients.find(recipient => recipient.role === 'gerente');
+                const coordinator = recipients.find(recipient => recipient.label === 'Coordinador');
+                const defaultRecipient = coord.nivelRiesgo === 'CRITICO'
+                  ? manager || coordinator
+                  : coordinator || manager;
+                const taskId = doc(collection(db, 'tasks')).id;
+                setSelectedCoordForTask({ ...coord, taskId });
                 const todayPlusTwo = new Date(Date.now() + 2 * 86400000).toISOString().split('T')[0];
 
                 const desc = `DIAGNÓSTICO OPERATIVO NODUS:
-• Coordinador Causa OS: ${coord.formalName} (ID Nodus: ${coord.nodusName})
-• Sede: ${coord.sede} | Rol Causa OS: ${coord.formalRole}
-• Correo Corporativo: ${coord.email}
-• Base Asignada: ${coord.asignados} prospectos
-• Gestiones Realizadas: ${coord.gestiones} llamadas (${coord.coberturaPct}% cobertura)
-• Integridad de Sala (Sentados): C1 = ${coord.sentadosC1} | C2 = ${coord.sentadosC2} (Total: ${coord.sentadosTotal} sentados en sala)
-• Confirmados: C1 = ${coord.confirmadosC1} | C2 = ${coord.confirmadosC2} (Total: ${coord.confirmados} confirmados)
-• Fricción Telefónica: No Contesta = ${coord.noContesta} | Por Confirmar = ${coord.porConfirmar} | No Interesa = ${coord.noInteresa}
-• Diagnóstico Empírico: ${coord.motivo}
+• Nombre en Nodus: ${coord.nodusName}
+• Identidad Causa OS: ${coord.identityVerified ? `${coord.formalName} (${coord.email})` : 'No vinculada; confirmar identidad antes de asignar a la persona'}
+• Sede reportada por Nodus: ${coord.sede}
+• Base asignada: ${coord.asignados ?? 'Sin dato'}
+• Gestiones registradas: ${coord.gestiones ?? 'Sin dato'}
+• Cobertura ${coord.coberturaOrigen === 'nodus' ? 'informada por Nodus' : coord.coberturaOrigen === 'calculada' ? 'calculada desde gestiones/asignados' : 'no disponible'}: ${coord.coberturaPct === null ? 'No calculable' : `${coord.coberturaPct}%`}
+• Sentados C1/C2: ${coord.sentadosC1 ?? 'Sin dato'} / ${coord.sentadosC2 ?? 'Sin dato'}
+• Confirmados C1/C2: ${coord.confirmadosC1 ?? 'Sin dato'} / ${coord.confirmadosC2 ?? 'Sin dato'}
+• No Contesta / Por Confirmar / No Interesa: ${coord.noContesta ?? 'Sin dato'} / ${coord.porConfirmar ?? 'Sin dato'} / ${coord.noInteresa ?? 'Sin dato'}
+• Regla Centinela aplicada: ${coord.motivo}
 
-PAUTA DE COACHING Y LIDERAZGO (RRHH):
+PAUTA SUGERIDA (revisar antes de ejecutar):
 ${coord.coachingFeedback}`;
 
                 setTaskForm({
                   title: `[Centinela RRHH] Intervención Operativa & Coaching: ${coord.formalName} (${coord.sede})`,
                   description: desc,
-                  assignedToEmail: defaultEmail,
-                  assignedToName: defaultName,
-                  assignedRole: defaultRole,
+                  assignedToEmail: defaultRecipient?.email || '',
+                  assignedToName: defaultRecipient?.name || '',
+                  assignedRole: defaultRecipient?.role || '',
                   priority: coord.nivelRiesgo === 'CRITICO' ? 'urgent' : coord.nivelRiesgo === 'MEDIO' ? 'high' : 'medium',
                   dueDate: todayPlusTwo
                 });
@@ -1289,17 +1274,17 @@ ${coord.coachingFeedback}`;
                       </div>
                       <div style={{ fontSize: '0.8rem', color: textMuted }}>
                         {saludPct === null
-                          ? `Sin universo verificable desde Nodus para ${isGlobalCentinela ? 'operación global' : selectedSede}; no se emite diagnóstico.`
-                          : `${optimosList.length} de ${totalCoords} coordinadores con ritmo activo (${isGlobalCentinela ? 'Operación Global' : selectedSede})`}
+                          ? `Sin personas con base y métricas evaluables para ${isGlobalCentinela ? 'operación global' : selectedSede}.`
+                          : `${optimosList.length} de ${totalEvaluables} evaluables con cobertura registrada ≥60%; no certifica metas de confirmación.`}
                       </div>
                     </div>
 
                     <div style={{ background: bgCard, border: '1px solid #fecaca', borderRadius: '12px', padding: '1.25rem', boxShadow: '0 2px 4px rgba(239,68,68,0.05)' }}>
-                      <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#dc2626', textTransform: 'uppercase' }}>🚨 Inactividad Crítica</div>
+                      <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#dc2626', textTransform: 'uppercase' }}>🚨 Riesgo crítico</div>
                       <div style={{ fontSize: '2rem', fontWeight: 900, color: '#dc2626', margin: '0.2rem 0' }}>
                         {criticosList.length}
                       </div>
-                      <div style={{ fontSize: '0.8rem', color: '#b91c1c' }}>Requieren intervención 1:1 inmediata del Gerente</div>
+                      <div style={{ fontSize: '0.8rem', color: '#b91c1c' }}>Umbral de cobertura crítico; validar el corte con la persona.</div>
                     </div>
 
                     <div style={{ background: bgCard, border: '1px solid #fed7aa', borderRadius: '12px', padding: '1.25rem', boxShadow: '0 2px 4px rgba(245,158,11,0.05)' }}>
@@ -1307,7 +1292,7 @@ ${coord.coachingFeedback}`;
                       <div style={{ fontSize: '2rem', fontWeight: 900, color: '#d97706', margin: '0.2rem 0' }}>
                         {rezagosList.length}
                       </div>
-                      <div style={{ fontSize: '0.8rem', color: '#b45309' }}>En riesgo de no cubrir su base a tiempo</div>
+                      <div style={{ fontSize: '0.8rem', color: '#b45309' }}>Umbral de cobertura o contactabilidad; requiere revisión.</div>
                     </div>
 
                     <div style={{ background: bgCard, border: '1px solid #bbf7d0', borderRadius: '12px', padding: '1.25rem', boxShadow: '0 2px 4px rgba(16,185,129,0.05)' }}>
@@ -1315,7 +1300,17 @@ ${coord.coachingFeedback}`;
                       <div style={{ fontSize: '2rem', fontWeight: 900, color: '#16a34a', margin: '0.2rem 0' }}>
                         {optimosList.length}
                       </div>
-                      <div style={{ fontSize: '0.8rem', color: '#15803d' }}>Cumpliendo metas de confirmación y ritmo</div>
+                      <div style={{ fontSize: '0.8rem', color: '#15803d' }}>Cobertura sobre el umbral; no valida metas de confirmación.</div>
+                    </div>
+
+                    <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.25rem', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+                      <div style={{ fontSize: '0.75rem', fontWeight: 800, color: textMuted, textTransform: 'uppercase' }}>Sin diagnóstico evaluable</div>
+                      <div style={{ fontSize: '2rem', fontWeight: 900, color: textMuted, margin: '0.2rem 0' }}>
+                        {sinBaseList.length + indeterminadosList.length}
+                      </div>
+                      <div style={{ fontSize: '0.8rem', color: textMuted }}>
+                        {sinBaseList.length} sin base · {indeterminadosList.length} con datos incompletos
+                      </div>
                     </div>
                   </div>
 
@@ -1399,6 +1394,21 @@ ${coord.coachingFeedback}`;
                         }}
                       >
                         🟢 Óptimos ({optimosList.length})
+                      </button>
+                      <button
+                        onClick={() => setRankingFilter('NO_EVALUABLES')}
+                        style={{
+                          padding: '0.4rem 0.8rem',
+                          borderRadius: '6px',
+                          border: rankingFilter === 'NO_EVALUABLES' ? `1px solid ${borderLight}` : `1px solid ${borderLight}`,
+                          background: rankingFilter === 'NO_EVALUABLES' ? 'rgba(148, 163, 184, 0.15)' : 'transparent',
+                          color: textDark,
+                          fontSize: '0.8rem',
+                          fontWeight: 700,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Sin diagnóstico ({sinBaseList.length + indeterminadosList.length})
                       </button>
                     </div>
 
@@ -1488,6 +1498,7 @@ ${coord.coachingFeedback}`;
                               const rankMedal = idx === 0 ? '🥇 #1' : idx === 1 ? '🥈 #2' : idx === 2 ? '🥉 #3' : `#${idx + 1}`;
                               const isCrit = item.nivelRiesgo === 'CRITICO';
                               const isMed = item.nivelRiesgo === 'MEDIO';
+                              const isUnassessed = ['SIN_BASE', 'INDETERMINADO'].includes(item.nivelRiesgo);
 
                               return (
                                 <tr 
@@ -1524,7 +1535,8 @@ ${coord.coachingFeedback}`;
                                         </span>
                                       </div>
                                       <div style={{ fontSize: '0.72rem', color: textMuted }}>
-                                        <span style={{ color: '#d97706', fontWeight: 600 }}>Nodus: {item.nodusName}</span> &bull; {item.email}
+                                        <span style={{ color: '#d97706', fontWeight: 600 }}>Nodus: {item.nodusName}</span>
+                                        {' · '}{item.identityVerified ? item.email : 'Identidad/contacto no verificado'}
                                       </div>
                                     </div>
                                   </td>
@@ -1541,17 +1553,17 @@ ${coord.coachingFeedback}`;
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
                                       <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap' }}>
                                         <span style={{ background: 'rgba(16, 185, 129, 0.18)', color: '#10b981', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 800 }}>
-                                          C1: {item.sentadosC1}
+                                          C1: {item.sentadosC1 ?? '—'}
                                         </span>
                                         <span style={{ background: 'rgba(59, 130, 246, 0.18)', color: '#38bdf8', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 800 }}>
-                                          C2: {item.sentadosC2}
+                                          C2: {item.sentadosC2 ?? '—'}
                                         </span>
                                       </div>
                                       <div style={{ fontSize: '0.75rem', fontWeight: 700, color: textDark }}>
-                                        Total Sentados: {item.sentadosTotal}
+                                        Total Sentados: {item.sentadosTotal ?? '—'}
                                       </div>
                                       <div style={{ fontSize: '0.7rem', color: textMuted }}>
-                                        ✅ {item.confirmadosC1} conf. C1 &bull; {item.confirmadosC2} conf. C2
+                                        ✅ {item.confirmadosC1 ?? '—'} conf. C1 &bull; {item.confirmadosC2 ?? '—'} conf. C2
                                       </div>
                                     </div>
                                   </td>
@@ -1560,23 +1572,26 @@ ${coord.coachingFeedback}`;
                                   <td style={{ padding: '1rem 0.8rem' }}>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
                                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: 700 }}>
-                                        <span>{item.gestiones} / {item.asignados}</span>
-                                        <span style={{ color: item.coberturaPct >= 70 ? '#10b981' : item.coberturaPct >= 35 ? '#f59e0b' : '#ef4444' }}>
-                                          {item.coberturaPct}%
+                                        <span>{item.gestiones ?? '—'} / {item.asignados ?? '—'}</span>
+                                        <span
+                                          title={item.coberturaOrigen === 'nodus' ? 'Porcentaje informado por Nodus' : item.coberturaOrigen === 'calculada' ? 'Porcentaje calculado desde gestiones y asignados' : 'Cobertura no disponible'}
+                                          style={{ color: item.coberturaPct === null ? textMuted : item.coberturaPct >= 70 ? '#10b981' : item.coberturaPct >= 35 ? '#f59e0b' : '#ef4444' }}
+                                        >
+                                          {item.coberturaPct === null ? '—' : `${item.coberturaPct}%`}
                                         </span>
                                       </div>
                                       {/* Barra de progreso */}
                                       <div style={{ width: '100%', height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '3px', overflow: 'hidden' }}>
                                         <div style={{ 
-                                          width: `${Math.min(100, item.coberturaPct)}%`, 
+                                          width: `${Math.min(100, item.coberturaPct ?? 0)}%`,
                                           height: '100%', 
-                                          background: item.coberturaPct >= 70 ? '#10b981' : item.coberturaPct >= 35 ? '#f59e0b' : '#ef4444' 
+                                          background: item.coberturaPct === null ? '#94a3b8' : item.coberturaPct >= 70 ? '#10b981' : item.coberturaPct >= 35 ? '#f59e0b' : '#ef4444'
                                         }} />
                                       </div>
                                       <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap', fontSize: '0.68rem', color: textMuted }}>
-                                        <span>⚠️ NC: {item.noContesta}</span>
-                                        <span>⏳ Pend: {item.porConfirmar}</span>
-                                        <span>❌ NoInt: {item.noInteresa}</span>
+                                        <span>⚠️ NC: {item.noContesta ?? '—'}</span>
+                                        <span>⏳ Pend: {item.porConfirmar ?? '—'}</span>
+                                        <span>❌ NoInt: {item.noInteresa ?? '—'}</span>
                                       </div>
                                     </div>
                                   </td>
@@ -1584,15 +1599,15 @@ ${coord.coachingFeedback}`;
                                   {/* ESTADO OPERATIVO */}
                                   <td style={{ padding: '1rem 0.8rem' }}>
                                     <span style={{
-                                      background: isCrit ? 'rgba(239, 68, 68, 0.18)' : isMed ? 'rgba(245, 158, 11, 0.18)' : 'rgba(16, 185, 129, 0.18)',
-                                      color: isCrit ? '#ef4444' : isMed ? '#fbbf24' : '#34d399',
+                                      background: isCrit ? 'rgba(239, 68, 68, 0.18)' : isMed ? 'rgba(245, 158, 11, 0.18)' : isUnassessed ? 'rgba(148, 163, 184, 0.18)' : 'rgba(16, 185, 129, 0.18)',
+                                      color: isCrit ? '#ef4444' : isMed ? '#fbbf24' : isUnassessed ? '#cbd5e1' : '#34d399',
                                       padding: '0.25rem 0.6rem',
                                       borderRadius: '4px',
                                       fontSize: '0.72rem',
                                       fontWeight: 800,
                                       display: 'inline-block'
                                     }}>
-                                      {isCrit ? '🚨 CRÍTICO' : isMed ? '⚠️ REZAGO' : '🟢 ÓPTIMO'}
+                                      {isCrit ? '🚨 CRÍTICO' : isMed ? '⚠️ REZAGO' : item.nivelRiesgo === 'SIN_BASE' ? 'SIN BASE' : item.nivelRiesgo === 'INDETERMINADO' ? 'SIN DATOS' : '🟢 ÓPTIMO'}
                                     </span>
                                   </td>
 
@@ -1603,7 +1618,7 @@ ${coord.coachingFeedback}`;
                                         {item.motivo}
                                       </div>
                                       <div style={{ 
-                                        color: isCrit ? '#f87171' : isMed ? '#fbbf24' : '#38bdf8', 
+                                        color: isCrit ? '#f87171' : isMed ? '#fbbf24' : isUnassessed ? textMuted : '#38bdf8',
                                         background: 'rgba(255, 255, 255, 0.04)', 
                                         padding: '0.4rem 0.6rem', 
                                         borderRadius: '6px', 
@@ -1618,6 +1633,8 @@ ${coord.coachingFeedback}`;
                                   <td style={{ padding: '1rem 0.8rem', textAlign: 'center' }}>
                                     <button
                                       onClick={() => handleOpenTask(item)}
+                                      disabled={!coordinatorSnapshotIsFresh}
+                                      title={coordinatorSnapshotIsFresh ? 'Crear tarea usando este corte de Nodus' : 'Requiere un snapshot Nodus fechado y menor de 24 horas'}
                                       style={{
                                         display: 'inline-flex',
                                         alignItems: 'center',
@@ -1633,7 +1650,8 @@ ${coord.coachingFeedback}`;
                                         fontSize: '0.75rem',
                                         fontWeight: 800,
                                         border: 'none',
-                                        cursor: 'pointer',
+                                        cursor: coordinatorSnapshotIsFresh ? 'pointer' : 'not-allowed',
+                                        opacity: coordinatorSnapshotIsFresh ? 1 : 0.5,
                                         boxShadow: isCrit ? '0 2px 6px rgba(220, 38, 38, 0.4)' : '0 2px 4px rgba(0,0,0,0.2)',
                                         whiteSpace: 'nowrap'
                                       }}
@@ -1735,29 +1753,18 @@ ${coord.coachingFeedback}`;
                               Asignado Principal (Responsable de Ejecución):
                             </label>
                             {(() => {
-                              const gerenteSede = GERENTES_POR_SEDE[selectedCoordForTask.sede] || { name: `Gerente de ${selectedCoordForTask.sede}`, email: 'gerencia@crearpsl.net' };
+                              const recipients = getTaskRecipients(selectedCoordForTask);
                               return (
                                 <select
                                   value={taskForm.assignedToEmail}
                                   onChange={(e) => {
                                     const val = e.target.value;
-                                    let name = val;
-                                    let role = 'gerente';
-                                    if (val === selectedCoordForTask.email) {
-                                      name = selectedCoordForTask.formalName;
-                                      role = selectedCoordForTask.role;
-                                    } else if (val === gerenteSede.email) {
-                                      name = gerenteSede.name;
-                                      role = 'gerente';
-                                    } else if (val === 'andres.gomez@crearpsl.net') {
-                                      name = 'Andrés Gómez';
-                                      role = 'direccion';
-                                    }
+                                    const recipient = recipients.find(candidate => candidate.email === val);
                                     setTaskForm(prev => ({
                                       ...prev,
                                       assignedToEmail: val,
-                                      assignedToName: name,
-                                      assignedRole: role
+                                      assignedToName: recipient?.name || '',
+                                      assignedRole: recipient?.role || ''
                                     }));
                                   }}
                                   style={{
@@ -1771,15 +1778,17 @@ ${coord.coachingFeedback}`;
                                     color: '#f8fafc'
                                   }}
                                 >
-                                  <option value={gerenteSede.email}>
-                                    🏛️ Gerente de Sede: {gerenteSede.name} ({gerenteSede.email})
-                                  </option>
-                                  <option value={selectedCoordForTask.email}>
-                                    👤 Coordinador: {selectedCoordForTask.formalName} ({selectedCoordForTask.email})
-                                  </option>
-                                  <option value="andres.gomez@crearpsl.net">
-                                    🏢 Dirección General: Andrés Gómez (andres.gomez@crearpsl.net)
-                                  </option>
+                                  <option value="">Selecciona responsable verificado</option>
+                                  {recipients.map(recipient => (
+                                    <option key={recipient.email} value={recipient.email}>
+                                      {recipient.label}: {recipient.name} ({recipient.email})
+                                    </option>
+                                  ))}
+                                  {!selectedCoordForTask.identityVerified && (
+                                    <option disabled value="unverified">
+                                      La identidad del coordinador Nodus no está vinculada a Causa OS
+                                    </option>
+                                  )}
                                 </select>
                               );
                             })()}
@@ -1908,16 +1917,20 @@ ${coord.coachingFeedback}`;
                           </button>
                           <button
                             onClick={async () => {
-                              if (!taskForm.title || !taskForm.assignedToEmail) {
-                                alert('Por favor completa el título y el responsable.');
+                              if (!taskForm.title || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(taskForm.assignedToEmail)) {
+                                alert('Completa el título y selecciona un responsable verificado.');
+                                return;
+                              }
+                              if (coordinatorSnapshot.source !== 'nodus' || !isSnapshotFresh(coordinatorSnapshot.timestamp)) {
+                                alert('El snapshot de Nodus ya no está vigente. Actualiza los datos antes de crear una tarea.');
                                 return;
                               }
 
                               try {
                                 setIsSavingTask(true);
-                                const taskId = `task_rrhh_${Date.now()}`;
-                                
-                                await setDoc(doc(db, 'tasks', taskId), {
+                                const taskId = selectedCoordForTask.taskId;
+                                const batch = writeBatch(db);
+                                batch.set(doc(db, 'tasks', taskId), {
                                   id: taskId,
                                   task: taskForm.title,
                                   title: taskForm.title,
@@ -1944,19 +1957,21 @@ ${coord.coachingFeedback}`;
                                   }
                                 });
 
-                                await addDoc(collection(db, 'notifications'), {
+                                batch.set(doc(db, 'notifications', `rrhh_task_${taskId}`), {
                                   userId: taskForm.assignedToEmail,
                                   title: `🚨 Tarea RRHH: ${taskForm.title}`,
                                   message: `Se ha asignado una tarea de intervención operativa y coaching para la sede ${selectedCoordForTask?.sede}.`,
                                   type: 'task_assigned',
                                   taskId: taskId,
                                   read: false,
-                                  createdAt: new Date().toISOString()
+                                  createdAt: new Date().toISOString(),
+                                  created_at: new Date().toISOString()
                                 });
+                                await batch.commit();
 
                                 setToastMessage({
                                   type: 'success',
-                                  text: `¡Tarea asignada con éxito a ${taskForm.assignedToName} en Causa OS!`
+                                  text: `Tarea y notificación guardadas para ${taskForm.assignedToName}.`
                                 });
                                 setTaskModalOpen(false);
 
@@ -2196,7 +2211,3 @@ ${coord.coachingFeedback}`;
     </div>
   );
 }
-
-
-
-
