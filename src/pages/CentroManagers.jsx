@@ -623,6 +623,7 @@ export default function CentroManagers() {
   // para la pestaña "Entrenadores", pero accesible desde cualquier vista sin tener
   // que cambiar de pestaña. Solo guarda el NOMBRE del entrenador seleccionado; el
   // resumen se recalcula al vuelo con getTrainerCardStats() más abajo.
+  const [managerCardModal, setManagerCardModal] = useState(null);
   const [trainerCardModal, setTrainerCardModal] = useState(null); // string | null (nombre del entrenador)
 
 
@@ -5795,6 +5796,84 @@ export default function CentroManagers() {
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+        );
+      })()}
+
+      
+      {/* TARJETA DEL MANAGER/CAPITÁN */}
+      {managerCardModal && (() => {
+        const m = managerCardModal;
+        const equipoKey = m.equipo ? `${normalizeSede(m.sede)}_${String(m.equipo).trim().toUpperCase()}` : null;
+        // Llamadas de este equipo
+        const llamadasEquipo = llamadasHistorial
+          .filter(l => (l.equipoKey || '').toUpperCase() === equipoKey)
+          .sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
+        
+        // Notas del manager
+        const notasManager = notasSeguimiento
+          .filter(n => (n.tipo === 'individual' && n.managerId === m.id) || (n.tipo === 'grupal' && n.equipoKey === equipoKey))
+          .sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
+
+        return (
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(3px)', zIndex: 1250, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }} onClick={() => setManagerCardModal(null)}>
+            <div onClick={e => e.stopPropagation()} style={{ background: bgCard, width: '100%', maxWidth: '420px', borderRadius: '12px', padding: '1.8rem', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.15)', border: `1px solid ${borderLight}`, borderTop: '4px solid #3b82f6' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                <div>
+                  <h2 style={{ margin: 0, color: textDark, fontSize: '1.2rem', fontWeight: 800 }}>
+                    {m.nombre}
+                  </h2>
+                  <span style={{ fontSize: '0.8rem', color: textMuted, fontWeight: 600 }}>
+                    {m.rol} · {formatTeamDisplay(m.equipo, m.numEquipo)} · {m.sede}
+                  </span>
+                </div>
+                <button onClick={() => setManagerCardModal(null)} style={{ background: '#f1f5f9', border: 'none', borderRadius: '6px', padding: '0.3rem', cursor: 'pointer', color: textMuted }}>
+                  <X size={16} />
+                </button>
+              </div>
+
+              <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
+                <span style={{ background: normalizeManagerEstado(m.estado) === 'Activo' ? '#dcfce7' : '#f1f5f9', color: normalizeManagerEstado(m.estado) === 'Activo' ? '#059669' : textMuted, padding: '0.2rem 0.6rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700 }}>
+                  {m.estado}
+                </span>
+                {m.telefono && (
+                  <a href={getWhatsAppUrl(m.telefono)} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', background: '#ecfccb', color: '#b45309', padding: '0.2rem 0.6rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700 }}>
+                    📱 WA
+                  </a>
+                )}
+                <button onClick={() => { setManagerCardModal(null); setNotaModal(m); }} style={{ border: 'none', background: '#e0e7ff', color: '#1d4ed8', padding: '0.2rem 0.6rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' }}>
+                  📝 {notasManager.length} Notas
+                </button>
+              </div>
+
+              <h3 style={{ fontSize: '0.9rem', color: textDark, borderBottom: `1px solid ${borderLight}`, paddingBottom: '0.3rem', marginBottom: '0.8rem' }}>
+                📊 Resumen de Llamadas ({llamadasEquipo.length} registradas al equipo)
+              </h3>
+              
+              <div style={{ background: '#f8fafc', padding: '0.8rem', borderRadius: '8px', border: `1px solid ${borderLight}`, marginBottom: '1rem' }}>
+                <div style={{ fontSize: '0.8rem', color: textMuted, marginBottom: '0.3rem' }}>
+                  Última llamada grupal del equipo: <strong>{llamadasEquipo[0]?.fecha || 'N/A'}</strong>
+                </div>
+                <div style={{ fontSize: '0.8rem', color: textMuted }}>
+                  Asistencia de este integrante (último reporte): <strong style={{ color: m.llamadaAsistio === 'SI' ? '#10b981' : (m.llamadaAsistio === 'NO' ? '#ef4444' : textMuted) }}>{m.llamadaAsistio || 'Sin registro'}</strong>
+                </div>
+              </div>
+
+              <div style={{ maxHeight: '180px', overflowY: 'auto' }}>
+                {llamadasEquipo.map((l, i) => (
+                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.4rem 0', borderBottom: `1px solid ${borderLight}` }}>
+                    <span style={{ fontSize: '0.8rem', color: textDark, fontWeight: 600 }}>Llamada {llamadasEquipo.length - i}</span>
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ fontSize: '0.75rem', color: textMuted }}>{l.fecha}</div>
+                      <div style={{ fontSize: '0.7rem', color: l.asistieron >= l.totalIntegrantes * 0.7 ? '#10b981' : '#f59e0b' }}>
+                        Equipo: {l.asistieron}/{l.totalIntegrantes} asist.
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
             </div>
           </div>
         );
