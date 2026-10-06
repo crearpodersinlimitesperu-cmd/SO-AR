@@ -68,6 +68,21 @@ const SUPER_ADMIN_EMAILS_WORKER = [
   'paul.sosa@crearpsl.net'
 ];
 
+const GERENCIA_EMAILS_WORKER = [
+  'emely.leon@crearpsl.net',
+  'fer.aragon@crearpsl.net',
+  'andres.gomez@crearpsl.net',
+  'gomeznueve@gmail.com',
+  'contabilidad.global@crearpsl.net',
+  'leandro.brunis@crearpsl.net',
+  'josue.vera@crearpsl.net',
+  'yurany.gonzalez@crearpsl.net',
+  'nora.zamora@crearpsl.net',
+  'emily.campuzano@crearpsl.net',
+  'freddy.sosa@crearpsl.net',
+  'diana.moscoso@crearpsl.net'
+];
+
 function corsHeaders(origin) {
   return {
     'Access-Control-Allow-Origin': origin,
@@ -272,19 +287,17 @@ async function firestoreAdd(collectionPath, obj, accessToken) {
 }
 
 function esGerencia(userData) {
-  if (userData.isSuperAdmin || userData.isDireccion || userData.isGerente) return true;
-  const roles = userData.roles || [userData.role || userData.appRole || ''];
-  return roles.some((r) => ROLES_GERENCIA.includes(String(r).toLowerCase()));
+  const email = String(userData?.email || '').toLowerCase().trim();
+  return SUPER_ADMIN_EMAILS_WORKER.includes(email) || GERENCIA_EMAILS_WORKER.includes(email);
 }
 
-// Mismo criterio que ya usaba el botón "Extraer Nodus" en el cliente
-// (SuperAdminPanel.jsx: currentUser?.isSuperAdmin) — no se amplía el acceso,
-// solo se verifica también en el servidor. Ese criterio del cliente es por
-// EMAIL (isSuperAdminEmail en src/config/permissions.js), no por un campo de
-// Firestore — por eso aquí se aceptan ambos: el campo userData.isSuperAdmin
-// (si algún día se empieza a escribir) O el email en SUPER_ADMIN_EMAILS_WORKER.
+// Nunca se acepta un campo mutable del perfil del usuario como fuente de verdad
+// para privilegios de administración. El criterio real del backend es el correo
+// corporativo y el rol administrativo que ya está definido en la lista de
+// Super Admins del repo.
 function esSuperAdmin(userData, email) {
-  return !!userData.isSuperAdmin || SUPER_ADMIN_EMAILS_WORKER.includes(String(email || '').toLowerCase().trim());
+  const normalizedEmail = String(email || userData?.email || '').toLowerCase().trim();
+  return SUPER_ADMIN_EMAILS_WORKER.includes(normalizedEmail);
 }
 
 function esCoordinador(userData) {

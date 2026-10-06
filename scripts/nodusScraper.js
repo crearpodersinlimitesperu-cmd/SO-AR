@@ -1,39 +1,17 @@
 import puppeteer from 'puppeteer';
 import 'dotenv/config';
-import { initializeApp } from "firebase/app";
-import { getFirestore, doc, setDoc } from "firebase/firestore";
 import { initializeApp as initializeAdminApp, cert, getApps as getAdminApps } from 'firebase-admin/app';
 import { getFirestore as getAdminFirestore } from 'firebase-admin/firestore';
 
 function getAdminDb() {
   const rawServiceAccount = process.env.GOOGLE_SERVICE_ACCOUNT_JSON || process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
-  if (!rawServiceAccount) return null;
-  try {
-    const serviceAccount = JSON.parse(rawServiceAccount);
-    const adminApp = getAdminApps().length ? getAdminApps()[0] : initializeAdminApp({ credential: cert(serviceAccount) });
-    return getAdminFirestore(adminApp);
-  } catch (err) {
-    console.warn("⚠️ No se pudo inicializar Firebase Admin:", err.message);
-    return null;
+  if (!rawServiceAccount) {
+    throw new Error('Falta GOOGLE_SERVICE_ACCOUNT_JSON para publicar datos de Nodus con permisos de backend.');
   }
+  const serviceAccount = JSON.parse(rawServiceAccount);
+  const adminApp = getAdminApps().length ? getAdminApps()[0] : initializeAdminApp({ credential: cert(serviceAccount) });
+  return getAdminFirestore(adminApp);
 }
-
-const ROBOT_TOKEN = process.env.ROBOT_TOKEN;
-if (!ROBOT_TOKEN) {
-  throw new Error('❌ Falta la variable de entorno ROBOT_TOKEN. Configúrala antes de ejecutar este script (ver GitHub Secrets: ROBOT_TOKEN).');
-}
-
-// Inicializar Firebase
-const firebaseConfig = {
-  apiKey: process.env.VITE_FIREBASE_API_KEY || ['AIzaSy', 'CTMrA6A64s', '1ppDBBso', 'l-fqam5V', 'ch_Q5B0'].join(''),
-  authDomain: "centro-operativo-cpsl.firebaseapp.com",
-  projectId: "centro-operativo-cpsl",
-  storageBucket: "centro-operativo-cpsl.firebasestorage.app",
-  messagingSenderId: "122588918051",
-  appId: ['1:122588918051:web:', 'c85d6835b1b1f920fb1c96'].join(''),
-};
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 
 async function extractDataFromPage(page, url, sectionName, startDate, endDate) {
   console.log(`\nNavegando a: ${sectionName} (${url})`);
@@ -107,6 +85,7 @@ async function extractDataFromPage(page, url, sectionName, startDate, endDate) {
 
 export async function runScraperWithDates(startDate = null, endDate = null, sede = null) {
   console.log("🚀 Iniciando Robot de Extracción NODUS (Modo Avanzado)...");
+  const adminDb = getAdminDb();
   const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox', '--start-maximized'] });
   const page = await browser.newPage();
   
@@ -146,7 +125,6 @@ export async function runScraperWithDates(startDate = null, endDate = null, sede
     const extractedData = {
       timestamp: new Date().toISOString(),
       fuente: "Robot de Nodus V2 (Reportes y Facturación)",
-      robot_token: ROBOT_TOKEN,
       fechasFiltro: { startDate, endDate },
       secciones: {}
     };
@@ -173,31 +151,16 @@ export async function runScraperWithDates(startDate = null, endDate = null, sede
     console.log("\n📊 Extracción finalizada.");
 
     // Si es un scrapeo en vivo (tiene fechas explícitas), no sobreescribimos el 'latest_snapshot' global.
-    const adminDb = getAdminDb();
-    if (adminDb) {
-      console.log("Enviando a Firebase Firestore (vía Admin SDK con credenciales de servicio)...");
-      if (!startDate && !endDate) {
-        const docId = `nodus_snapshot_${new Date().getTime()}`;
-        await adminDb.collection('nodus_kpis_sincronizados').doc(docId).set(extractedData);
-        await adminDb.collection('nodus_kpis_sincronizados').doc('latest_snapshot').set(extractedData);
-        console.log(`✅ ¡Éxito! Datos guardados en la nube bajo el ID: ${docId}`);
-      } else {
-        console.log("Enviando resultado filtrado a Firebase Firestore (live_filtered)...");
-        await adminDb.collection('nodus_kpis_sincronizados').doc('live_filtered').set(extractedData);
-        console.log("✅ ¡Éxito! Resultado filtrado guardado en 'live_filtered'.");
-      }
+    console.log("Enviando a Firebase Firestore vía Admin SDK...");
+    if (!startDate && !endDate) {
+      const docId = `nodus_snapshot_${new Date().getTime()}`;
+      await adminDb.collection('nodus_kpis_sincronizados').doc(docId).set(extractedData);
+      await adminDb.collection('nodus_kpis_sincronizados').doc('latest_snapshot').set(extractedData);
+      console.log(`✅ ¡Éxito! Datos guardados en la nube bajo el ID: ${docId}`);
     } else {
-      console.log("Enviando a Firebase Firestore (vía Client SDK)...");
-      if (!startDate && !endDate) {
-        const docId = `nodus_snapshot_${new Date().getTime()}`;
-        await setDoc(doc(db, 'nodus_kpis_sincronizados', docId), extractedData);
-        await setDoc(doc(db, 'nodus_kpis_sincronizados', 'latest_snapshot'), extractedData);
-        console.log(`✅ ¡Éxito! Datos guardados en la nube bajo el ID: ${docId}`);
-      } else {
-        console.log("Enviando resultado filtrado a Firebase Firestore (live_filtered)...");
-        await setDoc(doc(db, 'nodus_kpis_sincronizados', 'live_filtered'), extractedData);
-        console.log("✅ ¡Éxito! Resultado filtrado guardado en 'live_filtered'.");
-      }
+      console.log("Enviando resultado filtrado a Firebase Firestore (live_filtered)...");
+      await adminDb.collection('nodus_kpis_sincronizados').doc('live_filtered').set(extractedData);
+      console.log("✅ ¡Éxito! Resultado filtrado guardado en 'live_filtered'.");
     }
 
     return extractedData;

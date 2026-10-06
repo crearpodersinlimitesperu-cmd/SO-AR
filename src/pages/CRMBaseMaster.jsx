@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../services/firebase';
-import { collection, query, limit, getDocs, where, getCountFromServer } from 'firebase/firestore';
+import { collection, query, limit, getDocs, where, getCountFromServer, orderBy, documentId, startAfter } from 'firebase/firestore';
 import { 
   Search, RefreshCw, ArrowLeft, Users, CheckCircle, XCircle, Clock, 
-  ChevronDown, ChevronRight, Award, Bot, AlertTriangle, ShieldCheck, 
-  Copy, Check, MapPin, Globe, Sparkles, Filter, Database, TrendingUp,
-  Building2, Phone, Mail, UserCheck
+  ChevronDown, ChevronRight, Award, Bot, AlertTriangle, ShieldCheck,
+  Copy, Check, Globe, Sparkles, Database, TrendingUp, Building2
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-hot-toast';
@@ -24,7 +23,11 @@ import {
 import nodusEnroladosFallback from '../data/nodusEnroladosRecords.json';
 import { INITIAL_MANAGERS } from '../data/managersData';
 
+const INITIAL_VISIBLE_PARTICIPANTS = 50;
+const VISIBLE_PARTICIPANTS_INCREMENT = 100;
+
 export default function CRMBaseMaster() {
+  const PARTICIPANT_PAGE_SIZE = 500;
   const navigate = useNavigate();
   const { currentUser } = useAuth();
   const hasAccess = canViewCRMMaestro(currentUser);
@@ -33,12 +36,19 @@ export default function CRMBaseMaster() {
   const isZen = activeTheme === 'zen';
 
   const [data, setData] = useState([]);
+  const [loadedParticipantCount, setLoadedParticipantCount] = useState(0);
+  const [participantsCursor, setParticipantsCursor] = useState(null);
+  const [hasMoreParticipants, setHasMoreParticipants] = useState(false);
+  const [loadingMoreParticipants, setLoadingMoreParticipants] = useState(false);
+  const [participantDataSource, setParticipantDataSource] = useState('firestore');
   const [nodusData, setNodusData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSede, setSelectedSede] = useState('ALL');
   const [globalStats, setGlobalStats] = useState({ total: 0, sentados: 0, pendientes: 0 });
+  const [globalStatsLoaded, setGlobalStatsLoaded] = useState(false);
   const [expandedNodes, setExpandedNodes] = useState({});
+  const [visibleParticipantsByNode, setVisibleParticipantsByNode] = useState({});
   const [activeTab, setActiveTab] = useState('tree'); // 'tree' | 'duplicates' | 'agent'
   const [filterDuplicatesOnly, setFilterDuplicatesOnly] = useState(false);
   const [copiedAudit, setCopiedAudit] = useState(false);
@@ -59,6 +69,10 @@ export default function CRMBaseMaster() {
 
   const loadAllData = async () => {
     setLoading(true);
+    setGlobalStatsLoaded(false);
+    setGlobalStats({ total: 0, sentados: 0, pendientes: 0 });
+    setData([]);
+    setAgentAuditReport(null);
     try {
       await Promise.all([
         fetchGlobalStats(),
@@ -75,26 +89,37 @@ export default function CRMBaseMaster() {
   const fetchGlobalStats = async () => {
     try {
       const coll = collection(db, 'participants');
-      const totalSnap = await getCountFromServer(coll);
       const sentadosQ = query(coll, where('estadoC1', '==', 'SENTADO'));
-      const sentadosSnap = await getCountFromServer(sentadosQ);
       const pendientesQ = query(coll, where('estadoC1', '==', 'PENDIENTE'));
-      const pendientesSnap = await getCountFromServer(pendientesQ);
+      const [totalSnap, sentadosSnap, pendientesSnap] = await Promise.all([
+        getCountFromServer(coll),
+        getCountFromServer(sentadosQ),
+        getCountFromServer(pendientesQ)
+      ]);
 
       setGlobalStats({
         total: totalSnap.data().count,
         sentados: sentadosSnap.data().count,
         pendientes: pendientesSnap.data().count
       });
+      setGlobalStatsLoaded(true);
     } catch (e) {
       console.warn("Aviso obteniendo estadísticas Firestore:", e);
+      setGlobalStatsLoaded(false);
     }
   };
 
   const fetchParticipantsData = async () => {
+    setParticipantsCursor(null);
+    setHasMoreParticipants(false);
+    setLoadedParticipantCount(0);
+    setParticipantDataSource('firestore');
     try {
-      // Obtenemos un conjunto representativo de participantes
-      const q = query(collection(db, 'participants'), limit(2500));
+      const q = query(
+        collection(db, 'participants'),
+        orderBy(documentId()),
+        limit(PARTICIPANT_PAGE_SIZE)
+      );
       const snap = await getDocs(q);
       const docs = [];
       snap.forEach(d => {
@@ -107,6 +132,9 @@ export default function CRMBaseMaster() {
           normalizedSede: detected
         });
       });
+      setLoadedParticipantCount(docs.length);
+      setParticipantsCursor(snap.docs[snap.docs.length - 1] || null);
+      setHasMoreParticipants(snap.size === PARTICIPANT_PAGE_SIZE);
 
       // Mapear managers operativos como parte del ecosistema genealÃ³gico multi-sede
       const managersList = (INITIAL_MANAGERS || []).map(m => {
@@ -133,6 +161,7 @@ export default function CRMBaseMaster() {
       if (docs.length > 0) {
         setData([...docs, ...managersList]);
       } else if (nodusEnroladosFallback && nodusEnroladosFallback.length > 0) {
+        setParticipantDataSource('fallback');
         const fallbackDocs = nodusEnroladosFallback.map((item, idx) => {
           const detSede = detectItemSede(item);
           return {
@@ -149,12 +178,17 @@ export default function CRMBaseMaster() {
             normalizedSede: detSede
           };
         });
+        setLoadedParticipantCount(fallbackDocs.length);
         setData([...fallbackDocs, ...managersList]);
       } else {
         setData(managersList);
       }
     } catch (e) {
       console.warn("Aviso cargando participantes Firestore:", e);
+      setParticipantsCursor(null);
+      setHasMoreParticipants(false);
+      setLoadedParticipantCount(0);
+      setParticipantDataSource('unavailable');
       const managersList = (INITIAL_MANAGERS || []).map(m => {
         const mgrSede = normalizeSedeName(m.sede);
         return {
@@ -179,6 +213,39 @@ export default function CRMBaseMaster() {
     }
   };
 
+  const loadMoreParticipants = async () => {
+    if (!participantsCursor || loadingMoreParticipants) return;
+    setLoadingMoreParticipants(true);
+    try {
+      const q = query(
+        collection(db, 'participants'),
+        orderBy(documentId()),
+        startAfter(participantsCursor),
+        limit(PARTICIPANT_PAGE_SIZE)
+      );
+      const snap = await getDocs(q);
+      const nextParticipants = snap.docs.map(d => {
+        const item = d.data();
+        const detected = detectItemSede(item);
+        return {
+          id: d.id,
+          ...item,
+          sede: item.sede || detected,
+          normalizedSede: detected
+        };
+      });
+      setData(previous => [...previous, ...nextParticipants]);
+      setLoadedParticipantCount(previous => previous + nextParticipants.length);
+      setParticipantsCursor(snap.docs[snap.docs.length - 1] || participantsCursor);
+      setHasMoreParticipants(snap.size === PARTICIPANT_PAGE_SIZE);
+    } catch (error) {
+      console.error('Error cargando la siguiente página de participantes:', error);
+      toast.error('No se pudo cargar la siguiente página del CRM. Intenta nuevamente.');
+    } finally {
+      setLoadingMoreParticipants(false);
+    }
+  };
+
   const fetchNodusMasterData = async () => {
     try {
       const nodus = await crmGenealogyAgent.getNodusData();
@@ -188,22 +255,26 @@ export default function CRMBaseMaster() {
     }
   };
 
-  // Ejecución de auditoría profunda del Agente
+  // La auditoría completa es costosa; ejecutarla solo cuando se consulta su informe.
   useEffect(() => {
-    if (data.length > 0 || nodusData) {
-      crmGenealogyAgent.auditGenealogy(data, selectedSede).then(res => {
-        setAgentAuditReport(res);
-      });
-    }
-  }, [data, nodusData, selectedSede]);
+    if (!['duplicates', 'agent'].includes(activeTab) || (!data.length && !nodusData)) return undefined;
+    let cancelled = false;
+    crmGenealogyAgent.auditGenealogy(data, selectedSede).then(res => {
+      if (!cancelled) setAgentAuditReport(res);
+    }).catch(error => {
+      console.error('Error preparando auditoría del CRM:', error);
+    });
+    return () => { cancelled = true; };
+  }, [activeTab, data, nodusData, selectedSede]);
 
   const handleRunLiveAudit = async () => {
     setRunningAgentAudit(true);
     try {
       const res = await crmGenealogyAgent.auditGenealogy(data, selectedSede);
       setAgentAuditReport(res);
-      toast.success('Auditoría Multi-Sede Nodus completada sin discrepancias');
+      toast.success('Auditoría Nodus finalizada sobre los registros cargados');
     } catch (err) {
+      console.error('Error al ejecutar auditoría Nodus:', err);
       toast.error('Error al ejecutar auditoría');
     } finally {
       setRunningAgentAudit(false);
@@ -282,6 +353,16 @@ export default function CRMBaseMaster() {
     );
   };
 
+  const loadedCountsBySede = useMemo(() => {
+    const counts = new Map();
+    data.forEach(participant => {
+      if (participant.isManager) return;
+      const sede = normalizeSedeName(participant.sede || participant.ciudad);
+      counts.set(sede, (counts.get(sede) || 0) + 1);
+    });
+    return counts;
+  }, [data]);
+
   // Agente Global de Árbol: Auditoría y Detección de Duplicados en Tiempo Real
   const agentAnalysis = useMemo(() => {
     const dniMap = new Map();
@@ -292,8 +373,10 @@ export default function CRMBaseMaster() {
     const dataset = selectedSede === 'ALL' 
       ? data 
       : data.filter(p => normalizeSedeName(p.sede || p.ciudad) === selectedSede);
+    const analysisParticipants = dataset.filter(p => !p.isManager);
 
     dataset.forEach(p => {
+      if (p.isManager) return;
       const dni = (p.dni || p.documento || '').trim();
       const name = (p.nombreCompleto || p.nombre || '').trim().toLowerCase();
       const phone = (p.telefono || p.celular || '').replace(/[^0-9]/g, '');
@@ -321,6 +404,7 @@ export default function CRMBaseMaster() {
     const uniqueDuplicateIds = new Set();
     duplicateDnis.forEach(([_, list]) => list.forEach(p => uniqueDuplicateIds.add(p.id)));
     duplicateNames.forEach(([_, list]) => list.forEach(p => uniqueDuplicateIds.add(p.id)));
+    duplicatePhones.forEach(([_, list]) => list.forEach(p => uniqueDuplicateIds.add(p.id)));
 
     // Métricas dinámicas para la sede seleccionada
     // Cruce con Nodus de forma infalible
@@ -329,32 +413,56 @@ export default function CRMBaseMaster() {
       nodusMatch = nodusData.sedes.find(s => normalizeSedeName(s.sede) === normalizeSedeName(selectedSede));
     }
 
-    const nodusAsignados = nodusMatch?.asignadosTotal || 0;
-    const nodusSentados = nodusMatch?.asistieronTotal || nodusMatch?.sentadosC1Total || 0;
-    const nodusPendientes = nodusMatch?.porConfirmarTotal || 0;
+    const nodusAsignados = nodusMatch?.asignadosTotal;
+    const nodusSentados = nodusMatch?.asistieronTotal ?? nodusMatch?.sentadosC1Total;
+    const nodusPendientes = nodusMatch?.porConfirmarTotal;
+    const loadedSentados = analysisParticipants.filter(p => String(p.estadoC1 || '').toUpperCase().includes('SENTADO')).length;
+    const loadedPendientes = analysisParticipants.filter(p => String(p.estadoC1 || '').toUpperCase().includes('PENDIENTE')).length;
 
     let totalEnrolados = 0;
     let sentadosCount = 0;
     let pendientesCount = 0;
 
     if (selectedSede === 'ALL') {
-      totalEnrolados = nodusData?.totales?.totalAsignados || 13616;
-      sentadosCount = nodusData?.totales?.totalAsistieron || nodusData?.totales?.totalSentadosC1 || 5704;
-      pendientesCount = nodusData?.totales?.totalPorConfirmar || 2219;
-    } else if (normalizeSedeName(selectedSede) === 'Lima') {
-      const limaDirects = dataset.filter(p => !p.isManager);
-      totalEnrolados = Math.max(limaDirects.length, nodusAsignados || 2500);
-      sentadosCount = dataset.filter(p => String(p.estadoC1 || '').toUpperCase().includes('SENTADO')).length || nodusSentados || 847;
-      pendientesCount = dataset.filter(p => String(p.estadoC1 || '').toUpperCase().includes('PENDIENTE')).length || nodusPendientes || 448;
+      totalEnrolados = nodusData?.totales?.totalAsignados ?? (globalStatsLoaded ? globalStats.total : loadedParticipantCount);
+      sentadosCount = nodusData?.totales?.totalAsistieron ?? nodusData?.totales?.totalSentadosC1 ?? (globalStatsLoaded ? globalStats.sentados : loadedSentados);
+      pendientesCount = nodusData?.totales?.totalPorConfirmar ?? (globalStatsLoaded ? globalStats.pendientes : loadedPendientes);
     } else {
-      totalEnrolados = nodusAsignados || dataset.length || 0;
-      sentadosCount = nodusSentados || dataset.filter(p => String(p.estadoC1 || '').toUpperCase().includes('SENTADO')).length;
-      pendientesCount = nodusPendientes || dataset.filter(p => String(p.estadoC1 || '').toUpperCase().includes('PENDIENTE')).length;
+      totalEnrolados = nodusAsignados ?? analysisParticipants.length;
+      sentadosCount = nodusSentados ?? loadedSentados;
+      pendientesCount = nodusPendientes ?? loadedPendientes;
     }
 
-    const coherencePercentage = totalEnrolados > 0 
-      ? ((sentadosCount / totalEnrolados) * 100).toFixed(1) 
-      : (nodusMatch?.tasaEfectiva || '57.2');
+    const nodusTotal = selectedSede === 'ALL' ? nodusData?.totales?.totalAsignados : nodusAsignados;
+    const nodusAttendance = selectedSede === 'ALL'
+      ? nodusData?.totales?.totalAsistieron ?? nodusData?.totales?.totalSentadosC1
+      : nodusSentados;
+    const statsTotal = selectedSede === 'ALL' && globalStatsLoaded ? globalStats.total : undefined;
+    const statsAttendance = selectedSede === 'ALL' && globalStatsLoaded ? globalStats.sentados : undefined;
+    const conversionTotal = nodusTotal != null && nodusAttendance != null
+      ? nodusTotal
+      : statsTotal != null && statsAttendance != null
+        ? statsTotal
+        : analysisParticipants.length;
+    const conversionSentados = nodusTotal != null && nodusAttendance != null
+      ? nodusAttendance
+      : statsTotal != null && statsAttendance != null
+        ? statsAttendance
+        : loadedSentados;
+    const coherencePercentage = conversionTotal > 0
+      ? ((conversionSentados / conversionTotal) * 100).toFixed(1)
+      : null;
+    const coherenceSource = nodusTotal != null && nodusAttendance != null
+      ? 'Nodus'
+      : statsTotal != null && statsAttendance != null
+        ? 'conteo global de Firestore'
+        : analysisParticipants.length > 0
+          ? participantDataSource === 'firestore' && hasMoreParticipants
+            ? 'registros cargados (parcial)'
+            : participantDataSource === 'fallback'
+              ? 'respaldo local'
+              : 'registros cargados'
+          : null;
 
     return {
       dataset,
@@ -366,9 +474,10 @@ export default function CRMBaseMaster() {
       duplicatePhones,
       totalDuplicatesCount: uniqueDuplicateIds.size,
       duplicateIdsSet: uniqueDuplicateIds,
-      coherencePercentage
+      coherencePercentage,
+      coherenceSource
     };
-  }, [data, selectedSede, globalStats, nodusData]);
+  }, [data, selectedSede, globalStats, globalStatsLoaded, loadedParticipantCount, nodusData, participantDataSource, hasMoreParticipants]);
 
   // Construcción del árbol genealógico filtrado por Sede y Búsqueda Omnidireccional
   const treeData = useMemo(() => {
@@ -502,10 +611,17 @@ export default function CRMBaseMaster() {
     // Ordenar: mayor cantidad de participantes primero
     arr.sort((a, b) => b.participants.length - a.participants.length);
     return arr;
-  }, [agentAnalysis, searchTerm, filterDuplicatesOnly, selectedLineageFilter]);
+  }, [agentAnalysis, searchTerm, filterDuplicatesOnly, selectedLineageFilter, selectedSede, nodusData?.coordinadores]);
 
   const toggleNode = (imoName) => {
     setExpandedNodes(prev => ({ ...prev, [imoName]: !prev[imoName] }));
+  };
+
+  const showMoreParticipants = (imoName, total) => {
+    setVisibleParticipantsByNode(previous => ({
+      ...previous,
+      [imoName]: Math.min((previous[imoName] || INITIAL_VISIBLE_PARTICIPANTS) + VISIBLE_PARTICIPANTS_INCREMENT, total)
+    }));
   };
 
   if (!hasAccess) {
@@ -568,7 +684,7 @@ export default function CRMBaseMaster() {
               {runningAgentAudit ? "Auditoría en Curso..." : "Auditoría Nodus en Vivo"}
             </button>
 
-            <button onClick={loadAllData} className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#f59e0b', color: '#000', border: 'none', padding: '0.6rem 1.2rem', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
+            <button onClick={loadAllData} disabled={loading || loadingMoreParticipants} className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#f59e0b', color: '#000', border: 'none', padding: '0.6rem 1.2rem', borderRadius: '8px', fontWeight: 'bold', cursor: loading || loadingMoreParticipants ? 'wait' : 'pointer' }}>
               <RefreshCw size={16} /> Refrescar Árbol
             </button>
           </div>
@@ -592,15 +708,15 @@ export default function CRMBaseMaster() {
             {SEDES_CATALOG.map((sede) => {
               const isSelected = selectedSede === sede.key;
               const nodusSede = nodusData?.sedes?.find(ns => normalizeSedeName(ns.sede) === sede.key);
-              const localCount = data.filter(p => normalizeSedeName(p.sede || p.ciudad) === sede.key).length;
+              const localCount = loadedCountsBySede.get(sede.key) || 0;
               
               let countForSede = 0;
               if (sede.key === 'ALL') {
-                countForSede = nodusData?.totales?.totalAsignados || (data.length >= 2500 ? 14218 : data.length);
+                countForSede = nodusData?.totales?.totalAsignados ?? (globalStatsLoaded ? globalStats.total : loadedParticipantCount);
               } else if (sede.key === 'Lima') {
-                countForSede = Math.max(localCount, nodusSede?.asignadosTotal || 2500);
+                countForSede = Math.max(localCount, nodusSede?.asignadosTotal ?? 0);
               } else {
-                countForSede = nodusSede?.asignadosTotal || localCount || 0;
+                countForSede = nodusSede?.asignadosTotal ?? localCount;
               }
 
               return (
@@ -646,7 +762,7 @@ export default function CRMBaseMaster() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
           <div style={{ background: bgCard, border: `1px solid ${borderCard}`, borderRadius: '12px', padding: '1.2rem', boxShadow: cardShadow }}>
             <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: isLight ? '#2563eb' : '#3b82f6', fontWeight: 800, marginBottom: '0.3rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-              <Database size={14} /> Sincronizados Nodus
+              <Database size={14} /> Enrolados en vista
             </div>
             <div style={{ fontSize: '2.2rem', fontWeight: 800, color: textMain }}>
               {agentAnalysis.totalEnrolados}
@@ -664,7 +780,7 @@ export default function CRMBaseMaster() {
               {agentAnalysis.sentadosCount}
             </div>
             <div style={{ fontSize: '0.75rem', color: isLight ? '#047857' : '#34d399', marginTop: '0.2rem', fontWeight: 600 }}>
-              {agentAnalysis.coherencePercentage}% de conversión efectiva
+              {agentAnalysis.coherencePercentage === null ? 'Conversión sin datos suficientes' : `${agentAnalysis.coherencePercentage}% de conversión (${agentAnalysis.coherenceSource})`}
             </div>
           </div>
 
@@ -694,13 +810,53 @@ export default function CRMBaseMaster() {
 
           <div style={{ background: bgCard, border: `1px solid ${borderCard}`, borderRadius: '12px', padding: '1.2rem', cursor: 'pointer', boxShadow: cardShadow }} onClick={() => setActiveTab('agent')}>
             <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: gold, fontWeight: 800, marginBottom: '0.3rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-              <Bot size={14} /> Salud del Árbol Nodus
+              <Bot size={14} /> Auditoría Nodus
             </div>
-            <div style={{ fontSize: '2.2rem', fontWeight: 800, color: gold }}>99.8%</div>
+            <div style={{ fontSize: '1.2rem', fontWeight: 800, color: gold }}>{agentAuditReport ? 'Informe listo' : 'Pendiente'}</div>
             <div style={{ fontSize: '0.75rem', color: isLight ? '#047857' : '#10b981', marginTop: '0.2rem', fontWeight: 600 }}>
-              Auditado por Agente Multi-Sede
+              Abrir pestaña para revisar
             </div>
           </div>
+        </div>
+
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '0.75rem',
+          padding: '0.85rem 1rem',
+          marginBottom: '1.5rem',
+          border: `1px solid ${borderSubtle}`,
+          borderRadius: '10px',
+          background: bgCard,
+          color: textMuted,
+          fontSize: '0.85rem'
+        }}>
+          <span>
+            {participantDataSource === 'fallback'
+              ? `Mostrando ${loadedParticipantCount.toLocaleString()} registros de respaldo local; el padrón de Firestore no está cargado.`
+              : participantDataSource === 'unavailable'
+              ? 'No se pudo cargar el padrón de Firestore; solo se muestran los managers locales.'
+              : globalStats.total > 0
+              ? `Participantes cargados: ${loadedParticipantCount.toLocaleString()} de ${globalStats.total.toLocaleString()}. El árbol y la auditoría local cubren los registros cargados.`
+              : `Participantes cargados: ${loadedParticipantCount.toLocaleString()}. El total de Firestore no está disponible.`}
+          </span>
+          {hasMoreParticipants && (
+            <button
+              type="button"
+              onClick={loadMoreParticipants}
+              disabled={loadingMoreParticipants}
+              className="btn-secondary"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.55rem 0.9rem', border: `1px solid ${borderSubtle}`, borderRadius: '8px', color: textMain, cursor: loadingMoreParticipants ? 'wait' : 'pointer' }}
+            >
+              <RefreshCw size={15} className={loadingMoreParticipants ? 'animate-spin' : ''} />
+              {loadingMoreParticipants ? 'Cargando...' : `Cargar ${PARTICIPANT_PAGE_SIZE} más`}
+            </button>
+          )}
+          {!hasMoreParticipants && participantDataSource === 'firestore' && loadedParticipantCount > 0 && globalStats.total > 0 && loadedParticipantCount >= globalStats.total && (
+            <span style={{ color: isLight ? '#047857' : '#34d399', fontWeight: 700 }}>Padrón completo cargado</span>
+          )}
         </div>
 
         {/* NAVEGACIÓN DE PESTAÑAS DEL AGENTE */}
@@ -723,7 +879,7 @@ export default function CRMBaseMaster() {
               boxShadow: isLight ? '0 1px 3px rgba(0,0,0,0.04)' : 'none'
             }}
           >
-            <Users size={16} /> Árbol Genealógico Completo ({treeData.length} Grupos)
+            <Users size={16} /> Árbol Genealógico ({treeData.length} Grupos)
           </button>
 
           <button 
@@ -780,7 +936,7 @@ export default function CRMBaseMaster() {
                 <div>
                   <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', color: gold, fontWeight: 800 }}>IMOs con Linaje Verificado</div>
                   <div style={{ fontSize: '1.25rem', fontWeight: 800, color: textMain }}>
-                    {agentAuditReport?.lineageAudit?.imosGraduadosActivos || 57} Líderes
+                    {agentAuditReport ? agentAuditReport.lineageAudit.imosGraduadosActivos : '—'} Líderes
                   </div>
                   <div style={{ fontSize: '0.7rem', color: textMuted }}>Graduados CPSL activos en Nodus</div>
                 </div>
@@ -791,7 +947,7 @@ export default function CRMBaseMaster() {
                 <div>
                   <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', color: isLight ? '#047857' : '#34d399', fontWeight: 800 }}>Enrolados Graduados</div>
                   <div style={{ fontSize: '1.25rem', fontWeight: 800, color: textMain }}>
-                    {agentAuditReport?.lineageAudit?.participantesGraduadosActivos || 73} Participantes
+                    {agentAuditReport ? agentAuditReport.lineageAudit.participantesGraduadosActivos : '—'} Participantes
                   </div>
                   <div style={{ fontSize: '0.7rem', color: textMuted }}>Reentrenamiento / Maestría</div>
                 </div>
@@ -914,6 +1070,10 @@ export default function CRMBaseMaster() {
                   {treeData.map((node) => {
                     const isExpanded = expandedNodes[node.imoName] || searchTerm !== '' || filterDuplicatesOnly;
                     const isDirecto = node.imoName.includes('DIRECTOS') || node.imoName.includes('CORPORATIVA');
+                    const visibleParticipantCount = Math.min(
+                      visibleParticipantsByNode[node.imoName] || INITIAL_VISIBLE_PARTICIPANTS,
+                      node.participants.length
+                    );
 
                     return (
                       <div key={node.imoName} style={{ border: `1px solid ${borderSubtle}`, borderRadius: '10px', overflow: 'hidden', background: isLight ? '#ffffff' : 'rgba(255,255,255,0.01)', boxShadow: isLight ? '0 1px 3px rgba(0,0,0,0.03)' : 'none' }}>
@@ -1051,7 +1211,7 @@ export default function CRMBaseMaster() {
                                   </tr>
                                 </thead>
                                 <tbody>
-                                  {node.participants.map((p, idx) => {
+                                  {node.participants.slice(0, visibleParticipantCount).map((p, idx) => {
                                     const isDup = agentAnalysis.duplicateIdsSet.has(p.id);
                                     const pLineage = findGraduadoLineage(p.nombreCompleto || p.nombre);
 
@@ -1099,6 +1259,21 @@ export default function CRMBaseMaster() {
                                 </tbody>
                               </table>
                             </div>
+                            {visibleParticipantCount < node.participants.length && (
+                              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap', padding: '0.9rem 0.25rem 0.1rem', color: textMuted, fontSize: '0.8rem' }}>
+                                <span>
+                                  Mostrando {visibleParticipantCount.toLocaleString()} de {node.participants.length.toLocaleString()} participantes de este grupo
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => showMoreParticipants(node.imoName, node.participants.length)}
+                                  className="btn-secondary"
+                                  style={{ padding: '0.45rem 0.8rem', border: `1px solid ${borderSubtle}`, borderRadius: '7px', color: textMain, cursor: 'pointer' }}
+                                >
+                                  Mostrar {Math.min(VISIBLE_PARTICIPANTS_INCREMENT, node.participants.length - visibleParticipantCount)} más
+                                </button>
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>
@@ -1117,7 +1292,7 @@ export default function CRMBaseMaster() {
                   <AlertTriangle size={22} /> Auditoría de Registros Duplicados ({selectedSedeObj.label})
                 </h2>
                 <p style={{ margin: '0.3rem 0 0', fontSize: '0.85rem', color: textMuted }}>
-                  El Agente analizó los registros cruzando DNI, Nombre Completo y Teléfono de contacto de forma matemática e infalible.
+                  La auditoría compara DNI, nombre completo y teléfono entre los registros actualmente cargados.
                 </p>
               </div>
               <div style={{ background: isLight ? '#ffe4e6' : 'rgba(244,63,94,0.1)', color: isLight ? '#be123c' : '#fb7185', border: isLight ? '1px solid #fecaca' : '1px solid rgba(244,63,94,0.3)', padding: '0.5rem 1rem', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 'bold' }}>
@@ -1129,26 +1304,30 @@ export default function CRMBaseMaster() {
             {agentAuditReport?.crossSedeDuplicates?.length > 0 && (
               <div style={{ background: isLight ? '#fef2f2' : 'rgba(239, 68, 68, 0.1)', border: isLight ? '1px solid #fecaca' : '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '10px', padding: '1rem', marginBottom: '1.5rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: isLight ? '#991b1b' : '#f87171', fontWeight: 700, marginBottom: '0.5rem' }}>
-                  <AlertTriangle size={18} /> Inconsistencias Inter-Sede Detectadas ({agentAuditReport.crossSedeDuplicates.length} casos)
+                  <AlertTriangle size={18} /> Coincidencias Inter-Sede para Revisar ({agentAuditReport.crossSedeDuplicates.length} casos)
                 </div>
                 <p style={{ margin: 0, fontSize: '0.85rem', color: isLight ? '#b91c1c' : '#fca5a5' }}>
-                  Se detectaron registros con el mismo DNI inscritos en diferentes sedes operativas simultáneamente:
+                  Se detectaron DNI o teléfonos compartidos entre diferentes sedes operativas. Revísalos antes de consolidar; esta auditoría no modifica registros.
                 </p>
                 <div style={{ marginTop: '0.6rem', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                   {agentAuditReport.crossSedeDuplicates.map(cs => (
-                    <div key={cs.valor} style={{ fontSize: '0.8rem', color: textMain, background: isLight ? '#ffffff' : 'rgba(0,0,0,0.3)', border: isLight ? '1px solid #fecaca' : 'none', padding: '0.4rem 0.8rem', borderRadius: '6px' }}>
-                      <strong>DNI {cs.valor}</strong> registrado en sedes: <span style={{ color: gold, fontWeight: 'bold' }}>{cs.sedes.join(', ')}</span>
+                    <div key={`${cs.tipo}:${cs.valor}`} style={{ fontSize: '0.8rem', color: textMain, background: isLight ? '#ffffff' : 'rgba(0,0,0,0.3)', border: isLight ? '1px solid #fecaca' : 'none', padding: '0.4rem 0.8rem', borderRadius: '6px' }}>
+                      <strong>{cs.tipo} {cs.valor}</strong> compartido entre sedes: <span style={{ color: gold, fontWeight: 'bold' }}>{cs.sedes.join(', ')}</span>
                     </div>
                   ))}
                 </div>
               </div>
             )}
 
-            {agentAnalysis.duplicateDnis.length === 0 && agentAnalysis.duplicateNames.length === 0 ? (
+            {agentAnalysis.duplicateDnis.length === 0 && agentAnalysis.duplicateNames.length === 0 && agentAnalysis.duplicatePhones.length === 0 ? (
               <div style={{ padding: '3rem', textAlign: 'center', color: isLight ? '#047857' : '#10b981' }}>
                 <CheckCircle size={48} style={{ margin: '0 auto 1rem', display: 'block' }} />
                 <h3>¡No se detectaron registros duplicados en {selectedSedeObj.label}!</h3>
-                <p style={{ color: textMuted }}>La base de datos del árbol genealógico se encuentra 100% desduplicada para este filtro.</p>
+                <p style={{ color: textMuted }}>
+                  {hasMoreParticipants
+                    ? `No hay duplicados entre los ${loadedParticipantCount.toLocaleString()} participantes cargados. Carga el resto del padrón para completar esta auditoría.`
+                    : 'No se encontraron duplicados en los registros cargados para este filtro.'}
+                </p>
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -1239,6 +1418,45 @@ export default function CRMBaseMaster() {
                     </div>
                   </div>
                 )}
+
+                {agentAnalysis.duplicatePhones.length > 0 && (
+                  <div>
+                    <h3 style={{ fontSize: '1.05rem', color: isLight ? '#7c3aed' : '#c4b5fd', marginBottom: '0.8rem', fontWeight: 800 }}>
+                      Teléfonos Compartidos ({agentAnalysis.duplicatePhones.length} casos)
+                    </h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                      {agentAnalysis.duplicatePhones.map(([phone, list]) => (
+                        <div key={phone} style={{ background: isLight ? '#f8fafc' : 'rgba(0,0,0,0.2)', border: `1px solid ${borderSubtle}`, borderRadius: '8px', padding: '1rem' }}>
+                          <div style={{ fontWeight: 'bold', color: isLight ? '#7c3aed' : '#c4b5fd', marginBottom: '0.5rem', fontSize: '0.9rem' }}>
+                            Teléfono: {phone} ({list.length} registros)
+                          </div>
+                          <div className="table-responsive" style={{ overflowX: 'auto' }}>
+                            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+                              <thead>
+                                <tr style={{ color: isLight ? '#475569' : textMuted, borderBottom: `1px solid ${borderSubtle}`, textAlign: 'left' }}>
+                                  <th style={{ padding: '0.4rem' }}>Nombre</th>
+                                  <th style={{ padding: '0.4rem' }}>DNI</th>
+                                  <th style={{ padding: '0.4rem' }}>Sede</th>
+                                  <th style={{ padding: '0.4rem' }}>Coordinadora</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {list.map(p => (
+                                  <tr key={p.id} style={{ borderBottom: `1px solid ${borderSubtle}` }}>
+                                    <td style={{ padding: '0.4rem', color: textMain, fontWeight: 600 }}>{p.nombreCompleto || p.nombre || 'Sin nombre'}</td>
+                                    <td style={{ padding: '0.4rem', color: textMuted }}>{p.dni || p.documento || '-'}</td>
+                                    <td style={{ padding: '0.4rem' }}>{getSedeBadge(p.sede || p.ciudad)}</td>
+                                    <td style={{ padding: '0.4rem', color: textMuted }}>{p.coordinadora || p.coordinador || '-'}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -1263,7 +1481,10 @@ export default function CRMBaseMaster() {
               <button 
                 type="button" 
                 onClick={() => {
-                  const report = `DICTAMEN OFICIAL: AGENTE GUARDIÁN NODUS MULTI-SEDE (CAUSA OS)\nFecha: ${new Date().toLocaleString()}\nFiltro Sede: ${selectedSedeObj.label}\nTotal Enrolados Sincronizados: ${agentAnalysis.totalEnrolados}\nSentados en Sala: ${agentAnalysis.sentadosCount} (${agentAnalysis.coherencePercentage}%)\nPendientes: ${agentAnalysis.pendientesCount}\nDuplicados Totales: ${agentAnalysis.totalDuplicatesCount}\nCoherencia Estructural: 99.8%\nLíderes de Red (IMOs): ${treeData.filter(t => !t.imoName.includes('DIRECTOS') && !t.imoName.includes('CORPORATIV')).length}\nSedes Auditadas: Lima, Quito, Guayaquil, Cuenca, Medellín, México.\nEstado Nodus: Totalmente Integrado sin Alucinaciones.`;
+                  const coverage = participantDataSource === 'firestore'
+                    ? `${loadedParticipantCount} participantes cargados${hasMoreParticipants ? ' (carga parcial)' : ''}`
+                    : `Fuente: ${participantDataSource}`;
+                  const report = `RESUMEN DE AUDITORÍA CRM\nFecha: ${new Date().toLocaleString()}\nSede seleccionada: ${selectedSedeObj.label}\nCobertura: ${coverage}\nTotal enrolados informado: ${agentAnalysis.totalEnrolados}\nSentados informados: ${agentAnalysis.sentadosCount} (${agentAnalysis.coherencePercentage ?? 'sin dato'}%, fuente: ${agentAnalysis.coherenceSource ?? 'sin dato'})\nPendientes informados: ${agentAnalysis.pendientesCount}\nDuplicados en los registros cargados: ${agentAnalysis.totalDuplicatesCount}\nGrupos IMO visibles: ${treeData.filter(t => !t.imoName.includes('DIRECTOS') && !t.imoName.includes('CORPORATIV')).length}\nNota: los duplicados se limitan a los registros cargados; carga el padrón completo para una auditoría integral.`;
                   navigator.clipboard.writeText(report);
                   setCopiedAudit(true);
                   toast.success('Dictamen Oficial del Agente Multi-Sede copiado al portapapeles');
@@ -1273,7 +1494,7 @@ export default function CRMBaseMaster() {
                 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#8b5cf6', color: '#fff', border: 'none', padding: '0.6rem 1.2rem', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
               >
                 {copiedAudit ? <Check size={16} /> : <Copy size={16} />}
-                {copiedAudit ? 'Copiado al Portapapeles' : 'Copiar Dictamen Oficial Multi-Sede'}
+                {copiedAudit ? 'Copiado al Portapapeles' : 'Copiar resumen de auditoría'}
               </button>
             </div>
 
@@ -1291,7 +1512,7 @@ export default function CRMBaseMaster() {
                       <th style={{ padding: '0.8rem 1rem' }}>Sentados</th>
                       <th style={{ padding: '0.8rem 1rem' }}>Pendientes</th>
                       <th style={{ padding: '0.8rem 1rem' }}>Conversión %</th>
-                      <th style={{ padding: '0.8rem 1rem' }}>IMOs Activos</th>
+                      <th style={{ padding: '0.8rem 1rem' }}>IMOs Observados</th>
                       <th style={{ padding: '0.8rem 1rem' }}>Coordinación Nodus</th>
                       <th style={{ padding: '0.8rem 1rem' }}>Salud</th>
                     </tr>
@@ -1339,11 +1560,15 @@ export default function CRMBaseMaster() {
                               fontWeight: 800, 
                               padding: '0.2rem 0.5rem', 
                               borderRadius: '6px', 
-                              background: isLight ? '#dcfce7' : 'rgba(16, 185, 129, 0.15)', 
-                              color: isLight ? '#047857' : '#34d399',
-                              border: isLight ? '1px solid #bbf7d0' : 'none'
+                              background: m.saludEstructural === 'EXCELENTE'
+                                ? (isLight ? '#dcfce7' : 'rgba(16, 185, 129, 0.15)')
+                                : (isLight ? '#f1f5f9' : 'rgba(148, 163, 184, 0.15)'),
+                              color: m.saludEstructural === 'EXCELENTE'
+                                ? (isLight ? '#047857' : '#34d399')
+                                : textMuted,
+                              border: m.saludEstructural === 'EXCELENTE' && isLight ? '1px solid #bbf7d0' : 'none'
                             }}>
-                              🟢 COHERENTE
+                              {m.saludEstructural || 'SIN DATO'}
                             </span>
                           </td>
                         </tr>
@@ -1359,8 +1584,8 @@ export default function CRMBaseMaster() {
               <div style={{ background: isLight ? '#f8fafc' : 'rgba(0,0,0,0.25)', border: `1px solid ${borderSubtle}`, borderRadius: '10px', padding: '1.2rem' }}>
                 <h4 style={{ margin: '0 0 0.5rem', color: isLight ? '#7c3aed' : '#a78bfa', fontSize: '0.95rem', fontWeight: 700 }}>Estatus de Enrolamiento ({selectedSedeObj.label})</h4>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.3rem', fontSize: '0.85rem', color: textMuted }}>
-                  <span>Efectividad Sentados:</span>
-                  <span style={{ color: isLight ? '#047857' : '#34d399', fontWeight: 'bold' }}>{agentAnalysis.coherencePercentage}%</span>
+                  <span>Efectividad Sentados ({agentAnalysis.coherenceSource ?? 'sin datos'}):</span>
+                  <span style={{ color: isLight ? '#047857' : '#34d399', fontWeight: 'bold' }}>{agentAnalysis.coherencePercentage ?? 'Sin dato'}{agentAnalysis.coherencePercentage === null ? '' : '%'}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.3rem', fontSize: '0.85rem', color: textMuted }}>
                   <span>Participantes Pendientes:</span>
@@ -1380,11 +1605,11 @@ export default function CRMBaseMaster() {
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.3rem', fontSize: '0.85rem', color: textMuted }}>
                   <span>Nodos Limpiados (Anomalías '-'):</span>
-                  <span style={{ color: isLight ? '#047857' : '#34d399', fontWeight: 'bold' }}>0 Huérfanos</span>
+                  <span style={{ color: textMain, fontWeight: 'bold' }}>Ver auditoría de duplicados</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', color: textMuted }}>
                   <span>Integridad con Nodus:</span>
-                  <span style={{ color: isLight ? '#047857' : '#34d399', fontWeight: 'bold' }}>99.8% Sincronizado</span>
+                  <span style={{ color: isLight ? '#047857' : '#34d399', fontWeight: 'bold' }}>{agentAuditReport?.coherenciaEstructural || 'Sin auditoría cuantificada'}</span>
                 </div>
               </div>
 
@@ -1407,10 +1632,10 @@ export default function CRMBaseMaster() {
 
             <div style={{ background: isLight ? '#ecfdf5' : 'rgba(16, 185, 129, 0.08)', border: isLight ? '1px solid #a7f3d0' : '1px solid rgba(16, 185, 129, 0.2)', borderRadius: '10px', padding: '1.2rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: isLight ? '#047857' : '#10b981', fontWeight: 'bold', marginBottom: '0.4rem' }}>
-                <ShieldCheck size={20} /> Certificación de Coherencia Operativa Infallible
+              <ShieldCheck size={20} /> Alcance de la auditoría
               </div>
               <p style={{ margin: 0, fontSize: '0.9rem', color: isLight ? '#065f46' : '#cbd5e1', lineHeight: '1.5' }}>
-                El Agente Guardián Nodus certifica que el árbol genealógico del CRM representa con exactitud matemática las 6 sedes operativas de Causa OS (Lima, Quito, Guayaquil, Cuenca, Medellín, México). Los registros huérfanos e inconsistencias con guiones aislados han sido completamente normalizados. Toda métrica está anclada directamente a las bases maestras sin aproximaciones arbitrarias ni alucinaciones.
+                El informe se calcula con la información Nodus disponible y los participantes cargados en esta sesión. Las auditorías de duplicados y linaje cubren solo los registros cargados; carga las páginas restantes antes de usar los resultados como una revisión integral.
               </p>
             </div>
           </div>
@@ -1419,4 +1644,3 @@ export default function CRMBaseMaster() {
     </div>
   );
 }
-

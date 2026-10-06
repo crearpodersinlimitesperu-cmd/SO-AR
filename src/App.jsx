@@ -1,71 +1,77 @@
 import { startCausaNodusAgent, stopCausaNodusAgent } from "./services/CausaNodusAgent";
 
-import CfoDashboard from './pages/CfoDashboard';
-import FinanceWorkspace from './pages/FinanceWorkspace';
-import MaestriaGlobalDashboard from './pages/MaestriaGlobalDashboard';
-import TrainerZenHub from './pages/TrainerZenHub';
-import CallCoachCRM from './pages/CallCoachCRM';
-import QuantumTeamHub from './pages/QuantumTeamHub';
-import HrCommandCenter from './pages/HrCommandCenter';
-import LegalCommandCenter from './pages/LegalCommandCenter';
-import AndresCommandCenter from './pages/AndresCommandCenter';
-import DatosSedesCartas from './pages/DatosSedesCartas';
+import { lazy, Suspense, useState, useEffect } from 'react'
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import { useUI } from './context/UIContext'
 import { PORTFOLIO_FI_REVIEW_EMAILS, isGlobalObserver } from './config/permissions'
 import './index.css'
-
-import LearningDashboard from './pages/LearningDashboard'
-import ExcellenceDashboard from './pages/ExcellenceDashboard'
-import LegalStatusPanel from './pages/LegalStatusPanel';
-import OnboardingLegal from './pages/OnboardingLegal';
-import Login from './pages/Login'
-import OptOutPage from './pages/OptOutPage'
-import Home from './pages/Home'
-import CausaOSTask from "./pages/CausaOSTask";
-
-import RoleSelector from './pages/RoleSelector'
-import ChecklistBoard from './pages/ChecklistBoard'
-import GerenteDashboard from './pages/GerenteDashboard'
-import GoalsBoard from './pages/GoalsBoard'
-import ReportesBoard from './pages/ReportesBoard'
-import SuperAdminPanel from './pages/SuperAdminPanel'
-import ManualGuia from './pages/ManualGuia'
-import ManualNodus from './pages/ManualNodus'
-import MisKPIs from './pages/MisKPIs'
-import AuditoriaKPIs from './pages/AuditoriaKPIs'
-import CentroManagers from './pages/CentroManagers'
-import ManagerGuide from './pages/ManagerGuide'
-import DirectorioQT from './pages/DirectorioQT'
-import ProtocoloEmergencias from './pages/ProtocoloEmergencias'
-import PortfolioBoard from './pages/PortfolioBoard'
-import StrategyBoard from './pages/StrategyBoard'
-import OfficialAgreements from './pages/OfficialAgreements'
-import TeamCalendar from './pages/TeamCalendar'
-import EmbudoConversionBoard from './pages/EmbudoConversionBoard'
-import BrandScriptBoard from './pages/BrandScriptBoard'
-import NodusDataMap from './pages/NodusDataMap'
-import CalendarioMJ from './pages/CalendarioMJ'
-import GeneradorFlyer from './pages/GeneradorFlyer'
-import MonitorVuelosCartas from './pages/MonitorVuelosCartas'
-import VendeSinVender from './pages/VendeSinVender'
-import MasterclassDistinciones from './pages/MasterclassDistinciones'
-import DashboardKpisLima from './pages/DashboardKpisLima'
-import CRMBaseMaster from './pages/CRMBaseMaster'
-import MonitorImos from './pages/MonitorImos'
-import MatrizEnrolamientoSentados from './pages/MatrizEnrolamientoSentados'
-import AsignadorEntrenadores from './pages/AsignadorEntrenadores'
-import ComunicadosOperativos from './pages/ComunicadosOperativos'
-import AICopilot from './components/AICopilot'
 import PromptModal from './components/PromptModal'
 import BirthdayAlert from './components/BirthdayAlert'
 import ApdaycPaymentAlert from './components/ApdaycPaymentAlert'
 import HelpModal from './components/HelpModal'
 import ThemeToggle from './components/ThemeToggle'
-
-import { useState, useEffect } from 'react'
 import { HelpCircle } from 'lucide-react'
+
+const CfoDashboard = lazy(() => import('./pages/CfoDashboard'));
+const AICopilot = lazy(() => import('./components/AICopilot'));
+const FinanceWorkspace = lazy(() => import('./pages/FinanceWorkspace'));
+const MaestriaGlobalDashboard = lazy(() => import('./pages/MaestriaGlobalDashboard'));
+const TrainerZenHub = lazy(() => import('./pages/TrainerZenHub'));
+const CallCoachCRM = lazy(() => import('./pages/CallCoachCRM'));
+const QuantumTeamHub = lazy(() => import('./pages/QuantumTeamHub'));
+const HrCommandCenter = lazy(() => import('./pages/HrCommandCenter'));
+const LegalCommandCenter = lazy(() => import('./pages/LegalCommandCenter'));
+const AndresCommandCenter = lazy(() => import('./pages/AndresCommandCenter'));
+const DatosSedesCartas = lazy(() => import('./pages/DatosSedesCartas'));
+const LearningDashboard = lazy(() => import('./pages/LearningDashboard'));
+const ExcellenceDashboard = lazy(() => import('./pages/ExcellenceDashboard'));
+const LegalStatusPanel = lazy(() => import('./pages/LegalStatusPanel'));
+const OnboardingLegal = lazy(() => import('./pages/OnboardingLegal'));
+const Login = lazy(() => import('./pages/Login'));
+const OptOutPage = lazy(() => import('./pages/OptOutPage'));
+const Home = lazy(() => import('./pages/Home'));
+const CausaOSTask = lazy(() => import('./pages/CausaOSTask'));
+const RoleSelector = lazy(() => import('./pages/RoleSelector'));
+const ChecklistBoard = lazy(() => import('./pages/ChecklistBoard'));
+const GerenteDashboard = lazy(() => import('./pages/GerenteDashboard'));
+const GoalsBoard = lazy(() => import('./pages/GoalsBoard'));
+const ReportesBoard = lazy(() => import('./pages/ReportesBoard'));
+const SuperAdminPanel = lazy(() => import('./pages/SuperAdminPanel'));
+const ManualGuia = lazy(() => import('./pages/ManualGuia'));
+const ManualNodus = lazy(() => import('./pages/ManualNodus'));
+const MisKPIs = lazy(() => import('./pages/MisKPIs'));
+const AuditoriaKPIs = lazy(() => import('./pages/AuditoriaKPIs'));
+const CentroManagers = lazy(() => import('./pages/CentroManagers'));
+const ManagerGuide = lazy(() => import('./pages/ManagerGuide'));
+const DirectorioQT = lazy(() => import('./pages/DirectorioQT'));
+const ProtocoloEmergencias = lazy(() => import('./pages/ProtocoloEmergencias'));
+const PortfolioBoard = lazy(() => import('./pages/PortfolioBoard'));
+const StrategyBoard = lazy(() => import('./pages/StrategyBoard'));
+const OfficialAgreements = lazy(() => import('./pages/OfficialAgreements'));
+const TeamCalendar = lazy(() => import('./pages/TeamCalendar'));
+const EmbudoConversionBoard = lazy(() => import('./pages/EmbudoConversionBoard'));
+const BrandScriptBoard = lazy(() => import('./pages/BrandScriptBoard'));
+const NodusDataMap = lazy(() => import('./pages/NodusDataMap'));
+const CalendarioMJ = lazy(() => import('./pages/CalendarioMJ'));
+const GeneradorFlyer = lazy(() => import('./pages/GeneradorFlyer'));
+const MonitorVuelosCartas = lazy(() => import('./pages/MonitorVuelosCartas'));
+const VendeSinVender = lazy(() => import('./pages/VendeSinVender'));
+const MasterclassDistinciones = lazy(() => import('./pages/MasterclassDistinciones'));
+const DashboardKpisLima = lazy(() => import('./pages/DashboardKpisLima'));
+const CRMBaseMaster = lazy(() => import('./pages/CRMBaseMaster'));
+const MonitorImos = lazy(() => import('./pages/MonitorImos'));
+const MatrizEnrolamientoSentados = lazy(() => import('./pages/MatrizEnrolamientoSentados'));
+const AsignadorEntrenadores = lazy(() => import('./pages/AsignadorEntrenadores'));
+const ComunicadosOperativos = lazy(() => import('./pages/ComunicadosOperativos'));
+
+function RouteLoadingFallback() {
+  return (
+    <div style={{ minHeight: '50vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <p className="text-gold">Cargando módulo...</p>
+    </div>
+  );
+}
 
 // Componente para proteger autenticación básica
 function PrivateRoute({ children }) {
@@ -220,6 +226,7 @@ function App() {
       {currentUser && <BirthdayAlert />}
       {currentUser && <ApdaycPaymentAlert />}
       <main style={{ flex: 1 }}>
+        <Suspense fallback={<RouteLoadingFallback />}>
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/opt-out" element={<OptOutPage />} />
@@ -567,6 +574,7 @@ function App() {
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        </Suspense>
       </main>
       
       {/* Botón flotante de ayuda */}
@@ -584,7 +592,9 @@ function App() {
           {/* Copiloto SO-AR: restringido a Gerentes y Directivos por decisión explícita (26/08/2026) */}
           {(currentUser.isSuperAdmin || currentUser.isGerente || currentUser.isDireccion) && (
             <div className="no-print">
-              <AICopilot />
+              <Suspense fallback={null}>
+                <AICopilot />
+              </Suspense>
             </div>
           )}
           <button

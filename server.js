@@ -4,16 +4,43 @@ import { runScraperWithDates } from './scripts/nodusScraper.js';
 import { spawn } from 'child_process';
 
 const app = express();
-app.use(cors());
+const expectedToken = process.env.ROBOT_TOKEN || process.env.CAUSA_OS_SERVER_TOKEN || '';
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || /^https?:\/\/localhost(:\d+)?$/.test(origin) || /^http:\/\/127\.0\.0\.1(:\d+)?$/.test(origin)) {
+      callback(null, true);
+      return;
+    }
+    callback(new Error('Origin not allowed by CORS'));
+  },
+  credentials: true,
+  methods: ['POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 
-app.post('/api/scrape-nodus', async (req, res) => {
+function requireRobotToken(req, res, next) {
+  const header = req.headers.authorization || '';
+  const token = header.startsWith('Bearer ') ? header.slice(7).trim() : '';
+
+  if (!expectedToken) {
+    return res.status(500).json({ success: false, message: 'ROBOT_TOKEN not configured.' });
+  }
+
+  if (token !== expectedToken) {
+    return res.status(401).json({ success: false, message: 'Unauthorized.' });
+  }
+
+  next();
+}
+
+app.post('/api/scrape-nodus', requireRobotToken, async (req, res) => {
   const { startDate, endDate, sede } = req.body;
   
   try {
     console.log(`[API] Solicitud de scrapeo recibida: Desde ${startDate} Hasta ${endDate} para la sede ${sede}`);
     
-    // Ejecutar el robot
     const scrapedData = await runScraperWithDates(startDate, endDate, sede);
     
     res.json({ success: true, data: scrapedData });
@@ -23,9 +50,8 @@ app.post('/api/scrape-nodus', async (req, res) => {
   }
 });
 
-app.post('/api/run-nodus-scraper', (req, res) => {
+app.post('/api/run-nodus-scraper', requireRobotToken, (req, res) => {
   console.log('[API] Manual execution of nodusScraper started');
-  // Optional: check Authorization header if we implemented requireSuperAdmin
   const child = spawn('node', ['scripts/nodusScraper.js'], { detached: true, stdio: 'ignore' });
   child.unref();
   res.json({ status: 'started', message: 'Nodus scraper is running in the background.' });

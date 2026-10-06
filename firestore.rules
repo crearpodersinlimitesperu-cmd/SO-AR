@@ -11,9 +11,8 @@ rules_version = '2';
 //  1. Elimina el `match /{document=**} { allow read, write: if request.auth != null; }`
 //     que permite a CUALQUIER usuario autenticado (sin importar rol o sede) leer y
 //     escribir CUALQUIER documento de CUALQUIER colecci├│n.
-//  2. Cierra la escritura sin autenticaci├│n en `nodus_kpis_sincronizados` para
-//     cualquiera que NO tenga el robot_token (se mantiene el mecanismo del robot,
-//     solo se le agrega tambi├®n exigir lectura autenticada, igual que ya ten├¡a).
+//  2. Cierra la escritura p├║blica en colecciones de Nodus; las automatizaciones
+//     deben publicar con credenciales de backend, no con secretos en documentos.
 //  3. Usa el correo (request.auth.token.email) para verificar due├▒o/rol en vez de
 //     request.auth.uid ÔÇö porque toda la app (AuthContext, ChecklistContext,
 //     NotificationContext, auditService, etc.) guarda userId/ownerId/assignedToEmail
@@ -143,18 +142,17 @@ service cloud.firestore {
     // (29/08/2026) MJ_CALENDARS: el rol operativo del usuario (coord_maestria,
     // director_maestria, etc.) no viaja en el token de autenticación ni se
     // puede inferir de una lista fija de correos como isGerenteODireccion().
-    // La única forma correcta de verificarlo desde las reglas es leer el rol
-    // real guardado en users/{uid} — y esta es la única colección donde el ID
-    // de documento SÍ es el uid real de Firebase Auth (igual que ya se explica
-    // arriba para copilot_chats), porque AuthContext.jsx crea/actualiza esos
-    // documentos con doc(db, 'users', user.uid) usando el uid crudo de
-    // Firebase Auth, no el correo. get() para lectura de reglas no depende de
-    // la regla "allow read" de esa colección, así que esto funciona aunque
-    // "users" solo permita escritura a SuperAdmin.
+    // El perfil users/{uid} es la fuente de roles administrada; las reglas de
+    // users impiden que el propio usuario pueda cambiar sus roles.
     function callerRole() {
       return isAuthenticated() &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role
-        in ['coord_maestria', 'director_maestria'];
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        (
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', '')
+            in ['coord_maestria', 'director_maestria'] ||
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('roles', [])
+            .hasAny(['coord_maestria', 'director_maestria'])
+        );
     }
 
     // HOJA EN BLANCO: Funciones de transversalidad
@@ -266,9 +264,38 @@ service cloud.firestore {
     }
 
     // USERS
+    // Los campos de rol y estado solo los pueden modificar SuperAdmins.
+    // Los usuarios pueden mantener sus datos de perfil y elegir una vista entre
+    // los roles que ya tienen asignados, sin poder ampliar esos roles.
     match /users/{userId} {
       allow read: if isAuthenticated();
-      allow write: if isSuperAdmin() || (isAuthenticated() && (request.auth.uid == userId || (resource != null && (resource.data.email == email() || (resource.data.emails is list && email() in resource.data.emails) || (resource.data.uid != null && resource.data.uid == request.auth.uid))) || (request.resource.data != null && (request.resource.data.email == email() || (request.resource.data.emails is list && email() in request.resource.data.emails) || (request.resource.data.uid != null && request.resource.data.uid == request.auth.uid)))));
+      allow create: if isSuperAdmin() || (
+        isAuthenticated() && request.auth.uid == userId &&
+        request.resource.data.uid == request.auth.uid &&
+        request.resource.data.email == email() &&
+        request.resource.data.keys().hasOnly([
+          'uid', 'email', 'name', 'displayName', 'photoURL', 'avatarUrl',
+          'createdAt', 'lastLoginAt', 'updatedAt', 'lastSeenAt', 'preferences',
+          'phone', 'provider', 'providerId'
+        ])
+      );
+      allow update: if isSuperAdmin() || (
+        isAuthenticated() && request.auth.uid == userId &&
+        request.resource.data.uid == request.auth.uid &&
+        request.resource.data.email == email() &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'name', 'displayName', 'photoURL', 'avatarUrl', 'lastLoginAt',
+          'updatedAt', 'lastSeenAt', 'preferences', 'phone', 'provider',
+          'providerId', 'activeRoleOverride'
+        ]) &&
+        (
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['activeRoleOverride']) ||
+          request.resource.data.activeRoleOverride in resource.data.get('roles', []) ||
+          request.resource.data.activeRoleOverride == resource.data.get('role', '') ||
+          request.resource.data.activeRoleOverride == resource.data.get('appRole', '')
+        )
+      );
+      allow delete: if isSuperAdmin();
 
       match /copilot_chats/{chatId} {
         allow read, write: if isAuthenticated() && request.auth.uid == userId;
@@ -370,10 +397,12 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
-    // NODUS: mecanismo del robot y acceso gerencial/autenticado
+    // NODUS: acceso gerencial/autenticado. Las escrituras del robot se ejecutan
+    // vía backend con credenciales de servicio y no se aceptan tokens públicos en
+    // Firestore Rules.
     match /nodus_kpis_sincronizados/{document=**} {
       allow read: if isAuthenticated();
-      allow write: if isSuperAdmin() || isGerenteODireccion() || (request.resource.data != null && request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET");
+      allow write: if isSuperAdmin() || isGerenteODireccion();
     }
 
     // FUTUROS IMPOSIBLES: NODUS conserva la fuente; Causa OS solo consume
@@ -464,7 +493,7 @@ service cloud.firestore {
     }
     match /nodus_coordinadores_c1c2/{document=**} {
       allow read: if isAuthenticated();
-      allow write: if isSuperAdmin() || isGerenteODireccion() || (request.resource.data != null && request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET");
+      allow write: if isSuperAdmin() || isGerenteODireccion();
     }
     match /graduados_lineage_master/{document=**} {
       allow read: if isAuthenticated();
