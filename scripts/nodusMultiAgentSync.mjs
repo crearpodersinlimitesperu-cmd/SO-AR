@@ -1261,8 +1261,8 @@ export async function runMultiAgentSync() {
       if (!authenticated) {
         console.warn("\n=======================================================");
         console.warn("🛡️ [SISTEMA DE RESILIENCIA MULTI-AGENTE]");
-        console.warn("   El perímetro de SiteGround (Anti-Bot WAF) requirió validación adicional");
-        console.warn("   en esta ventana horaria.");
+        console.warn("   La conexión a Nodus no se completó en esta ventana horaria.");
+        console.warn("   Consulte el error de conexión anterior; no implica necesariamente un bloqueo WAF.");
         console.warn("   Acción de Salvaguarda: Preservando 100% de los datos en Firestore,");
         console.warn("   snapshots locales y dashboards operativos sin interrupción.");
         console.warn("=======================================================\n");
@@ -1422,7 +1422,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   runMultiAgentSync()
     .then((result) => {
       if (result && result.handled) {
-        console.log("🛡️ Ciclo horario protegido: datos preservados en Firestore sin interrupción de servicios.");
+        console.error("Sincronización incompleta: se conservaron los datos anteriores, pero no se obtuvieron datos actuales de Nodus.");
+        process.exit(1);
       } else {
         console.log("🎉 Proceso finalizado exitosamente.");
       }

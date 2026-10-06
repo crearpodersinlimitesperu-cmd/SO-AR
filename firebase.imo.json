@@ -1,0 +1,7 @@
+{
+  "functions": [{
+    "source": "functions-imo",
+    "codebase": "imo",
+    "ignore": ["node_modules", ".git", "*.local", "firebase-debug*.log"]
+  }]
+}

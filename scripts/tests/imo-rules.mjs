@@ -52,5 +52,12 @@ try {
   await assertFails(save('contacto', false, 'event-3'));
   await assertFails(getDoc(doc(anon, profilePath)));
   if (process.env.IMO_UI_PREVIEW === '1') await updateDoc(doc(staff, 'imo_campaigns', cid), { status: 'active' });
+  for (const path of ['imo_system/control', 'imo_private_challenges/test', 'imo_private_deliveries/test', 'imo_private_sessions/test', 'imo_private_limits/test', 'imo_private_snapshots/test/identities/test', 'imo_private_snapshots/test/enrollees/test']) {
+    for (const client of [anon, other, staff]) {
+      await assertFails(getDoc(doc(client, path)));
+      await assertFails(setDoc(doc(client, path), { injected: true }));
+    }
+  }
+  console.log('PASS: private verification documents denied to all browser clients.');
   console.log('PASS: generated campaign, shared access, restore, atomic history, forbidden reads/writes, closed campaign.');
 } finally { await env.cleanup(); }

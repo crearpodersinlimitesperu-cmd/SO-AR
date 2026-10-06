@@ -1,0 +1,39 @@
+name: Deploy isolated IMO Firebase backend
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: imo-backend-deploy
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --ignore-scripts --include=optional
+      - run: npm install --prefix functions-imo --ignore-scripts
+      - name: Validate IMO models
+        run: node --test scripts/tests/imo-auth.test.mjs scripts/tests/imo-identity.test.mjs scripts/tests/imo-control.test.mjs
+      - name: Configure private verification and mail secrets
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_PASS: ${{ secrets.GMAIL_PASS }}
+        run: node scripts/provisionImoSecrets.mjs
+      - name: Prepare deployment credential
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          node -e "require('fs').writeFileSync(process.env.RUNNER_TEMP + '/imo-deploy-credential.json', process.env.GOOGLE_SERVICE_ACCOUNT_JSON, {mode: 0o600})"
+      - name: Deploy only the IMO codebase
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/imo-deploy-credential.json
+        run: npx --yes firebase-tools@latest deploy --config firebase.imo.json --only functions:imo --project centro-operativo-cpsl --non-interactive
+      - name: Remove temporary credential
+        if: always()
+        run: rm -f "$RUNNER_TEMP/imo-deploy-credential.json"
