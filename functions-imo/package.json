@@ -1,0 +1,14 @@
+{
+  "name": "causa-imo-backend",
+  "private": true,
+  "type": "module",
+  "main": "index.mjs",
+  "engines": {
+    "node": "22"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.0.0",
+    "firebase-functions": "^6.3.1",
+    "nodemailer": "^6.9.13"
+  }
+}

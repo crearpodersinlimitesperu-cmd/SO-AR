@@ -46,3 +46,24 @@ No anunciar documento + código, estados oficiales privados ni notificaciones au
 - 16 pruebas locales pasan. Estas primitivas no son todavía endpoints desplegados ni una integración de correo operativa.
 - La auditoría devuelve 0 campañas v2 y 0 registros en `imo_identities_private` y `imo_enrollees_private`. El snapshot de coordinación existe con 15 coordinadores, pero los nombres de las misiones antiguas no acreditan la identidad de un IMO.
 - Queda pendiente la extracción y validación de identidad/contacto/relación estable desde Nodus, los endpoints Firebase, la entrega real del código y el despliegue conjunto del portal y las reglas.
+
+## Implementación Firebase del acceso (6 octubre, pendiente de activación)
+
+- `firebase.imo.json` despliega únicamente el codebase `imo` para no reemplazar las funciones de otros módulos.
+- `functions-imo/index.mjs`: callable `imoAccess` (código, validación, consulta propia, calendario, solicitudes, salida) y trigger `imoDeliverCode` (correo privado).
+- El acceso exige `imo_system/control.enabled`, un snapshot de Nodus de menos de 24 horas y campaña schemaVersion 3 con IDs autorizados. Sin estos datos rechaza el acceso.
+- Desafíos, sesiones, entregas cifradas, límites y snapshots usan colecciones `imo_private_*`, sin permisos de lectura/escritura desde ningún cliente web. La prueba de reglas confirmó denegación incluso para gerencia.
+- Solicitud, evento inmutable y notificación para el correo del coordinador se crean en una transacción idempotente. Una solicitud NO escribe el equipo en Nodus.
+- 20 pruebas unitarias y 7 pruebas con emulador verifican límites concurrentes, un solo uso, aislamiento de enrolados/sedes, revocación, rechazo de fuentes viejas, cifrado de entrega y notificación única.
+- La prueba de reglas requiere Java con `-Duser.language=en -Duser.country=US`; el emulador 1.22 falla al compilar mensajes con locale `es_CO`.
+- El acceso automático de Nodus con las credenciales de CI no confirmó sesión en los runs 37474990222 y 37475349856. No se importaron registros ni se probaron contraseñas alternativas. Se solicitó actualizar los secretos existentes al usuario.
+- La sincronización horaria anterior daba éxito tras fallo de arranque de Chrome por ausencia de X server. Se corrigió la salida de error para que preservar datos antiguos no se reporte como sincronización exitosa. El arranque y las credenciales de ese proceso aún requieren reparación/verificación.
+- Pendiente: importador real verificado, campañas v3, revisión autenticada por C1/C2 y portal con código. El frontend actual sigue siendo v2; no anunciar autenticación ni avisos activos hasta completar la conexión y prueba integral.
+
+### Resultado del despliegue aislado
+
+Run `37511911253`: creación/configuración de los secretos IMO correcta y carga del código correcta. Despliegue detenido antes de crear las funciones porque la cuenta de CI no tiene `secretmanager.secrets.setIamPolicy`.
+
+Permiso mínimo preparado para aprobación: rol `roles/secretmanager.secretAccessor` de la cuenta de ejecución `122588918051-compute@developer.gserviceaccount.com` exclusivamente en `IMO_VERIFICATION_SECRET`, `IMO_MAIL_USER`, `IMO_MAIL_PASS`. No hace falta conceder administración general de secretos a GitHub. Se solicitó autorización explícita para este acceso; aún pendiente. La consola de Google Cloud solicita reautenticación del usuario antes de abrir Secret Manager.
+
+No se ha activado `imo_system/control`, no se enviaron códigos reales y no se importaron identidades. Reanudar desde la verificación de identidad de Google y los secretos NODUS_USER/NODUS_PASSWORD. No repetir la creación de secretos ni sustituir sus valores al reintentar.
