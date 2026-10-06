@@ -9,6 +9,7 @@
  * en GOOGLE_SERVICE_ACCOUNT_JSON (solo permiso lector).
  */
 import { google } from 'googleapis';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { initializeApp, cert, getApps } from 'firebase-admin/app';
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
@@ -87,6 +88,31 @@ function parseDate(value) {
   return null;
 }
 
+async function processPdfWithGemini(buffer, fileName) {
+  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY || '');
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  const prompt = `
+    Eres un experto auditor logístico evaluando una póliza de seguro de viaje, médico o un pasaporte.
+    Por favor, analiza este documento.
+    Devuelve SOLO un JSON estrictamente estructurado así:
+    {
+      "nombre_asegurado": "Nombre de la persona cubierta",
+      "fecha_vencimiento": "YYYY-MM-DD", // La fecha final de vigencia, si existe
+      "requiere_revision": false // true si es ilegible o dudoso
+    }
+  `;
+  const filePart = { inlineData: { data: Buffer.from(buffer).toString("base64"), mimeType: 'application/pdf' } };
+  try {
+    const result = await model.generateContent([prompt, filePart]);
+    let responseText = result.response.text();
+    responseText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
+    return JSON.parse(responseText);
+  } catch (e) {
+    console.warn(`Error de Gemini en ${fileName}: ${e.message}`);
+    return null;
+  }
+}
+
 function datesIn(value) {
   const patterns = [
     /\b20\d{2}[\/-]\d{1,2}[\/-]\d{1,2}\b/gi,
@@ -160,11 +186,13 @@ export async function runTrainerPolicyAudit() {
   const files = (listed.data.files || []).filter(file => file.mimeType === 'application/pdf');
   const ambiguous = new Set();
   const candidates = new Map();
-  console.log(`Descargando y leyendo ${files.length} PDFs para hacer OCR profundo...`);
+  console.log(`Descargando e inspeccionando ${files.length} PDFs con Gemini AI para máxima precisión...`);
   for (let i = 0; i < files.length; i++) {
     try {
       const media = await drive.files.get({ fileId: files[i].id, alt: 'media', supportsAllDrives: true }, { responseType: 'arraybuffer' });
-      files[i].textContent = await extractTextFromPdf(media.data);
+      const geminiData = await processPdfWithGemini(media.data, files[i].name);
+      files[i].geminiData = geminiData;
+      files[i].textContent = geminiData ? geminiData.nombre_asegurado : '';
     } catch (e) {
       files[i].textContent = '';
       console.warn(`No se pudo leer texto del PDF ${files[i].name}`);
@@ -172,7 +200,7 @@ export async function runTrainerPolicyAudit() {
   }
 
   for (const file of files) {
-    let matches = coaches.filter(coach => fullNameMatch(coach, file.name).high || (file.textContent && fullNameMatch(coach, file.textContent).high));
+    let matches = coaches.filter(coach => fullNameMatch(coach, file.name).high || (file.geminiData && file.geminiData.nombre_asegurado && fullNameMatch(coach, file.geminiData.nombre_asegurado).high));
     if (matches.length === 0) {
         // Fallback robust alias matching
         const fname = file.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -213,8 +241,11 @@ export async function runTrainerPolicyAudit() {
 
     const { file } = candidate;
     let expiry = null;
-    if (file.textContent) {
-      expiry = extractExpiryFromText(file.textContent);
+    if (file.geminiData && file.geminiData.fecha_vencimiento && !file.geminiData.requiere_revision) {
+      expiry = {
+        validUntil: file.geminiData.fecha_vencimiento,
+        evidence: `Gemini AI: ${file.geminiData.nombre_asegurado}`
+      };
     }
     const base = {
       trainerName: coach.name, coachEmail: coach.email, sede: coach.sede,

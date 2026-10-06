@@ -23,4 +23,5 @@ jobs:
       - name: Auditar pólizas de Drive sin modificar archivos
         env:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: node scripts/trainerPolicyAuditAgent.mjs
