@@ -1,17 +1,20 @@
 import { google } from 'googleapis';
-import { initializeApp, cert } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore';
 import { readFileSync, existsSync } from 'fs';
 
 export class NodusManagersSheetAgent {
   constructor(adminDb) {
     this.db = adminDb;
     this.spreadsheetId = '1KF58QXAiIk4KP_9G2aiAM3ERVoptcqKlIraszNKq2Ow';
-    const credentialsPath = 'C:/Users/josem/Documents/SO-AR/centro-operativo-cpsl-3d05655c949c.json';
-    if (!existsSync(credentialsPath)) {
-      throw new Error("No se encontro la llave de servicio de Google Cloud.");
+    const credentialsPath = 'centro-operativo-cpsl-3d05655c949c.json';
+    const serviceAccountJson = process.env.GOOGLE_SERVICE_ACCOUNT_JSON || process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
+    const credentials = serviceAccountJson
+      ? JSON.parse(serviceAccountJson)
+      : existsSync(credentialsPath)
+        ? JSON.parse(readFileSync(credentialsPath, 'utf8'))
+        : null;
+    if (!credentials) {
+      throw new Error('Falta GOOGLE_SERVICE_ACCOUNT_JSON/FIREBASE_SERVICE_ACCOUNT_KEY para sincronizar Managers desde Google Sheets.');
     }
-    const credentials = JSON.parse(readFileSync(credentialsPath, 'utf8'));
     this.auth = new google.auth.GoogleAuth({
       credentials,
       scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
