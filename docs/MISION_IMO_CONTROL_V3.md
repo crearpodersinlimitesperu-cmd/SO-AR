@@ -59,3 +59,11 @@ No anunciar documento + código, estados oficiales privados ni notificaciones au
 - El acceso automático de Nodus con las credenciales de CI no confirmó sesión en los runs 37474990222 y 37475349856. No se importaron registros ni se probaron contraseñas alternativas. Se solicitó actualizar los secretos existentes al usuario.
 - La sincronización horaria anterior daba éxito tras fallo de arranque de Chrome por ausencia de X server. Se corrigió la salida de error para que preservar datos antiguos no se reporte como sincronización exitosa. El arranque y las credenciales de ese proceso aún requieren reparación/verificación.
 - Pendiente: importador real verificado, campañas v3, revisión autenticada por C1/C2 y portal con código. El frontend actual sigue siendo v2; no anunciar autenticación ni avisos activos hasta completar la conexión y prueba integral.
+
+### Resultado del despliegue aislado
+
+Run `37511911253`: creación/configuración de los secretos IMO correcta y carga del código correcta. Despliegue detenido antes de crear las funciones porque la cuenta de CI no tiene `secretmanager.secrets.setIamPolicy`.
+
+Permiso mínimo preparado para aprobación: rol `roles/secretmanager.secretAccessor` de la cuenta de ejecución `122588918051-compute@developer.gserviceaccount.com` exclusivamente en `IMO_VERIFICATION_SECRET`, `IMO_MAIL_USER`, `IMO_MAIL_PASS`. No hace falta conceder administración general de secretos a GitHub. Se solicitó autorización explícita para este acceso; aún pendiente. La consola de Google Cloud solicita reautenticación del usuario antes de abrir Secret Manager.
+
+No se ha activado `imo_system/control`, no se enviaron códigos reales y no se importaron identidades. Reanudar desde la verificación de identidad de Google y los secretos NODUS_USER/NODUS_PASSWORD. No repetir la creación de secretos ni sustituir sus valores al reintentar.
