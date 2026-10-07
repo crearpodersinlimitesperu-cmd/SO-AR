@@ -542,6 +542,7 @@ export default function PortfolioBoard() {
 
   // Extraer métricas predictivas según la sede seleccionada o Global
   const activePrediction = useMemo(() => {
+    if (!predictorMatrixData) return null;
     const isGlobalSelected = !selectedSede || selectedSede === 'GLOBAL' || selectedSede === 'Global' || selectedSede === 'Sede Global' || selectedSede === 'Todas' || selectedSede === 'TODAS';
     if (isGlobalSelected) {
       return predictorMatrixData.global;
@@ -679,6 +680,12 @@ export default function PortfolioBoard() {
             <AlertCircle size={40} style={{ margin: '0 auto 1rem auto' }} />
             <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem' }}>Error de Sincronización</h2>
             <p>{errorObj}</p>
+          </div>
+        ) : viewMode === 'predictor' && !predictorMatrixData ? (
+          <div style={{ background: bgCard, border: `1px solid ${borderLight}`, color: textMuted, padding: '2rem', borderRadius: '12px', textAlign: 'center' }}>
+            <AlertCircle size={40} style={{ margin: '0 auto 1rem auto', color: '#f59e0b' }} />
+            <h2 style={{ color: textDark, fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.75rem' }}>Datos del predictor no disponibles</h2>
+            <p style={{ margin: 0 }}>No hay un corte de Nodus ni datos locales suficientes para calcular estas métricas. No se mostrarán valores estimados sin fuente.</p>
           </div>
         ) : viewMode === 'predictor' ? (
           /* =========================================================================
