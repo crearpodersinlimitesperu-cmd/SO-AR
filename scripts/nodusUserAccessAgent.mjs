@@ -195,7 +195,7 @@ export async function runNodusUserAccessReport() {
       });
     });
     page.setDefaultNavigationTimeout(45000);
-    await loginNodusReadOnly(page);
+    await loginNodusReadOnly(page, '/usuarios');
 
     let nextUrl = NODUS_USERS_URL;
     const visited = new Set();
