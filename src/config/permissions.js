@@ -356,43 +356,31 @@ export const DUAL_ROLE_TRAINER_EMAILS = [
 ];
 
 /**
- * Emails o roles autorizados a ver la pestaÃ±a 'LiquidaciÃ³n de Entrenadores' (auditorÃ­a financiera,
- * pagos realizados extraÃ­dos de la planilla de llamados, $77,550 USD pagados y pagos por equipo Nodus).
- * REGLA ESTRICTA (pedido explÃ­cito de JosÃ©, 12/09/2026):
- * 'de aqui extraer todos los pagos realizados y agregarlos a liquidacion sin rendudar y que se pueda revisar solo visible para mi y directores'
- * Ãšnicamente SuperAdmin (JosÃ© SÃ¡nchez / Armando PilacuÃ¡n / Paul Sosa), el email de JosÃ© SÃ¡nchez
- * ('jose.sanchez@crearpsl.net'), roles de DirecciÃ³n (director_maestria, direccion, ceo, cco, cfo),
- * y el email contable autorizado (Elizabeth Escobar / contabilidad.global@crearpsl.net).
- * NO pueden verlo coordinadores, entrenadores, gerentes de sede operativos, capitanes ni participantes.
+ * La pestaña de liquidación comparte el acceso de dirección de los KPIs del
+ * Centro de Managers. Coordinadores y gerentes locales no pueden verla.
  */
-export const LIQUIDACION_ENTRENADORES_EMAILS = [
-  'jose.sanchez@crearpsl.net',        // José Sánchez (SuperAdmin)
-  'contabilidad.global@crearpsl.net', // Elizabeth Escobar (CFO)
-  'paul.sosa@crearpsl.net',           // Paul Sosa (CCO)
-  'fer.aragon@crearpsl.net',          // Fer Aragón (CEO)
-  'fer.aragon@crearpsl.com',          // Fer Aragón (correo alterno)
-  'andres.gomez@crearpsl.net',        // Andrés Gómez (Director MJ)
-  'gomeznueve@gmail.com',             // Andrés Gómez (cuenta alterna)
+export const canViewLiquidacionEntrenadores = (currentUser) =>
+  canViewKPIsLlamadas(currentUser);
+
+const LIQUIDACION_REVERSAR_EMAILS = [
+  'jose.sanchez@crearpsl.net',
+  'contabilidad.global@crearpsl.net',
+  'paul.sosa@crearpsl.net',
+  'fer.aragon@crearpsl.net',
+  'fer.aragon@crearpsl.com',
+  'andres.gomez@crearpsl.net',
+  'gomeznueve@gmail.com'
 ];
 
 /**
- * ACCESO ESTRICTAMENTE RESTRINGIDO a 5 personas explícitas.
- * Pedido de José (01/10/2026): "solo lo puede ver eli, paul, fer y andres gomez y yo"
- * NO hay bypass por rol — solo por email de la lista LIQUIDACION_ENTRENADORES_EMAILS.
- */
-export const canViewLiquidacionEntrenadores = (currentUser) => {
-  if (!currentUser) return false;
-  const email = (currentUser.email || '').trim().toLowerCase();
-  // Acceso SOLO para emails explícitamente autorizados (Hard Lock)
-  return LIQUIDACION_ENTRENADORES_EMAILS.includes(email);
-};
-
-/**
- * Revertir un pago marcado por error: requiere ver la liquidación (allowlist)
- * Y acceso global de Director/SuperAdmin. No amplía la visibilidad de la sección.
+ * Revertir un pago conserva su allowlist explícita además de requerir acceso
+ * global. Ver la pestaña no concede por sí solo permiso para revertir.
  */
 export const canReverseLiquidacionEntrenadores = (currentUser) =>
-  canViewLiquidacionEntrenadores(currentUser) && canViewAllManagers(currentUser);
+  !!currentUser &&
+  LIQUIDACION_REVERSAR_EMAILS.includes((currentUser.email || '').trim().toLowerCase()) &&
+  canViewLiquidacionEntrenadores(currentUser) &&
+  canViewAllManagers(currentUser);
 
 /**
  * Emails autorizados a ver "Base Maestra CRM (Nodus)" (/crm-maestro): el listado
@@ -400,8 +388,7 @@ export const canReverseLiquidacionEntrenadores = (currentUser) =>
  * teléfono, estado C1, coordinadora e IMO enrolador, sin distinción de sede.
  * REGLA ESTRICTA (pedido explícito de José, 08/09/2026): "esta base solo la puedo
  * ver yo" — únicamente este correo, sin excepción automática para otros
- * SuperAdmin ni Dirección (mismo patrón que LIQUIDACION_ENTRENADORES_EMAILS
- * arriba). NOTA: esto solo controla el acceso en la interfaz (el componente
+ * SuperAdmin ni Dirección. NOTA: esto solo controla el acceso en la interfaz (el componente
  * CRMBaseMaster.jsx). A nivel de base de datos, firestore.rules todavía permite
  * leer la colección "participants" a CUALQUIER SuperAdmin o Gerente/Dirección
  * (regla existente: isSuperAdmin() || isGerenteODireccion()) — restringirla ahí
