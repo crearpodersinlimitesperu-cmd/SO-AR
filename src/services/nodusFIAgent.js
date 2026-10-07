@@ -19,6 +19,13 @@ export const normalizarTexto = (texto = '') => {
     .trim();
 };
 
+// Convierte la clave sede|equipo en "Sede · EQUIPO n" para mostrarla.
+export const etiquetaEquipo = (filtroEquipo, participantes = []) => {
+  if (!filtroEquipo || filtroEquipo === 'Todos' || !String(filtroEquipo).includes('|')) return filtroEquipo;
+  const p = participantes.find((x) => equipoKeyDe(x) === filtroEquipo);
+  return p ? `${p.sede} · ${p.equipo}` : filtroEquipo;
+};
+
 export const equipoKeyDe = (p = {}) => `${normalizarTexto(p.sede || 'sin sede')}|${normalizarTexto(p.equipo || 'sin equipo')}`;
 
 /**
@@ -182,7 +189,7 @@ export function ejecutarDiagnosticoFIs(
   };
 
   // 6. Generar dictamen de inteligencia artificial
-  const dictamenIA = generarDictamenEjecutivoIA(metricas, filtroSede, filtroEquipo);
+  const dictamenIA = generarDictamenEjecutivoIA(metricas, filtroSede, etiquetaEquipo(filtroEquipo, universoPfd));
 
   return {
     participantes: filtrados,

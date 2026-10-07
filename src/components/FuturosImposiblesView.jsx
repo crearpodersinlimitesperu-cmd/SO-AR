@@ -847,7 +847,7 @@ export default function FuturosImposiblesView({
                       <td style={{ padding: '0.85rem 1rem' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
                           <span style={{ fontSize: '0.78rem', fontWeight: 600, color: '#38bdf8' }}>{p.sede}</span>
-                          <span style={{ fontSize: '0.72rem', color: textMuted }}>{p.equipo}</span>
+                          <span style={{ fontSize: '0.78rem', fontWeight: 700, color: textDark }}>{p.equipo || 'Sin equipo'}</span>
                         </div>
                       </td>
 

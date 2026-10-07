@@ -9,7 +9,7 @@ import {
   rowsToFiParticipants,
   summarizeSedeEquipoDiscrepancies
 } from '../scripts/nodusFuturosImposiblesParser.mjs';
-import { ejecutarDiagnosticoFIs } from '../src/services/nodusFIAgent.js';
+import { ejecutarDiagnosticoFIs, etiquetaEquipo } from '../src/services/nodusFIAgent.js';
 import { opcionesEquipo, resolveFISource } from '../src/services/nodusFISnapshot.js';
 
 const row = (nombre, dni, sede, equipo, total = 0, extra = {}) => ({
@@ -124,4 +124,15 @@ test('source resolution: live, partial and clearly-labelled static fallback', ()
   const fb = resolveFISource(null, universo);
   assert.equal(fb.sourceState.status, 'fallback');
   assert.match(fb.sourceState.label, /RESPALDO ESTÁTICO PARCIAL/);
+});
+
+test('team number stays visible: selector, semaphore data and dictamen label keep "EQUIPO 22" with sede', () => {
+  const extra = [...universo, ...rowsToFiParticipants([row('M22', '22222223', 'Medellín', 'MEDELLÍN CICLO 1 — EQUIPO 22', 1)])];
+  const key = opcionesEquipo(extra, 'Medellín').find((o) => o.label === 'EQUIPO 22').value;
+  assert.equal(opcionesEquipo(extra, 'GLOBAL').some((o) => o.label === 'Medellín · EQUIPO 22'), true);
+  const diag = ejecutarDiagnosticoFIs(extra, 'Medellín', key);
+  assert.deepEqual(diag.participantes.map((p) => [p.sede, p.equipo]), [['Medellín', 'EQUIPO 22']]);
+  assert.equal(etiquetaEquipo(key, extra), 'Medellín · EQUIPO 22');
+  assert.match(diag.dictamenIA.resumen, /Medellín · EQUIPO 22/);
+  assert.ok(diag.metricas.equiposList.every((e) => /EQUIPO \d+/.test(e.equipo) && e.sede));
 });
