@@ -444,6 +444,25 @@ service cloud.firestore {
       }
     }
 
+    // Auditoría de accesos y estadísticas de cuentas NODUS: se limita la
+    // lectura por contener identidades y marcas de conexión de usuarios.
+    match /nodus_user_access_latest/{documentId} {
+      allow read: if isGerenteODireccion() || isSuperAdmin();
+      allow write: if false;
+    }
+    match /nodus_user_access_runs/{runId} {
+      allow read: if isGerenteODireccion() || isSuperAdmin();
+      allow write: if false;
+      match /pages/{pageId} {
+        allow read: if isGerenteODireccion() || isSuperAdmin();
+        allow write: if false;
+        match /chunks/{chunkId} {
+          allow read: if isGerenteODireccion() || isSuperAdmin();
+          allow write: if false;
+        }
+      }
+    }
+
     // ------------------------------------------------------------------------
     // COLECCIONES AUDITADAS CON PERMISOS AMPLIOS DE COLABORACIÓN OPERATIVA
     // ------------------------------------------------------------------------

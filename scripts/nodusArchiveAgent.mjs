@@ -5,7 +5,7 @@ import { FieldValue, getFirestore } from 'firebase-admin/firestore';
 
 const NODUS_ORIGIN = 'https://imo.crearpslglobal.com';
 const MAX_ROUTES = 200;
-const MAX_CHUNK_BYTES = 350 * 1024;
+export const MAX_CHUNK_BYTES = 350 * 1024;
 const MAX_FALLBACK_TEXT_BYTES = 250 * 1024;
 const PAGE_DELAY_MS = 900;
 
@@ -64,7 +64,7 @@ function archiveRunId() {
   return `${new Date().toISOString().replace(/[-:.TZ]/g, '')}-${run}`.replace(/[^a-zA-Z0-9_-]/g, '-');
 }
 
-function getAdminDb() {
+export function getNodusAdminDb() {
   const raw = process.env.GOOGLE_SERVICE_ACCOUNT_JSON || process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
   if (!raw) throw new Error('Falta GOOGLE_SERVICE_ACCOUNT_JSON/FIREBASE_SERVICE_ACCOUNT_KEY.');
   const serviceAccount = JSON.parse(raw);
@@ -76,7 +76,7 @@ function stableId(value) {
   return createHash('sha256').update(value).digest('hex').slice(0, 32);
 }
 
-async function login(page) {
+export async function loginNodusReadOnly(page) {
   const user = process.env.NODUS_USER;
   const password = process.env.NODUS_PASSWORD;
   if (!user || !password) throw new Error('Faltan los secretos NODUS_USER/NODUS_PASSWORD.');
@@ -247,7 +247,7 @@ async function savePage(runRef, pageUrl, resolvedUrl, routeIndex, inspected, res
 }
 
 export async function runNodusArchive() {
-  const db = getAdminDb();
+  const db = getNodusAdminDb();
   const runId = archiveRunId();
   const runRef = db.collection('nodus_archive_runs').doc(runId);
   const startedAt = new Date().toISOString();
@@ -290,13 +290,13 @@ export async function runNodusArchive() {
       const result = isExternalNavigation ? request.abort() : request.continue();
       result.catch(() => {
         if (browser?.connected()) {
-          console.warn('Una solicitud del navegador no pudo completarse; se revisará el estado de la ruta.');
+          console.warn('No se pudo completar una solicitud del navegador; se revisará el estado de la ruta.');
         }
       });
     });
     await page.setViewport({ width: 1440, height: 1000 });
     page.setDefaultNavigationTimeout(45000);
-    await login(page);
+    await loginNodusReadOnly(page);
 
     const dashboard = new URL('/dashboard', NODUS_ORIGIN);
     const queue = [dashboard.href];
