@@ -8,7 +8,7 @@ import { isMissionComplete } from '../features/imo/missionModel';
 import { db } from '../services/firebase';
 import { Search, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { normalizeSede } from '../data/usersData';
+import { normalizeSede, parseTeamNumber, normalizeEquipoLabel } from '../data/usersData';
 import {
   initNodusRealtimeListener,
   evaluateEnroladoVerification,
@@ -213,8 +213,12 @@ export default function MonitorImos() {
   };
 
   // Helper para normalizar nombres de equipo evitando duplicidades o fragmentación
-  // (ej: EQUIPO 29 y EQUIPO 29 - LIMA CICLO 1 V corresponden al mismo equipo operativo)
-  const normalizeEquipoName = raw => String(raw || '').trim().replace(/\s+/g, ' ').replace(/\s+V$/i, '').replace(/[✓✔]/g, '').trim();
+  // Unifica variantes como 'EQUIPO 16 — MEDELLIN' y 'EQUIPO 16 — MEDELLIN CICLO 1' bajo el mismo equipo operativo
+  const normalizeEquipoName = raw => {
+    const num = parseTeamNumber(raw);
+    if (num) return `Equipo ${num}`;
+    return String(raw || '').trim().replace(/\s+/g, ' ').replace(/\s+V$/i, '').replace(/[✓✔]/g, '').trim();
+  };
 
   const isGlobalScopeUser = !!(currentUser?.isSuperAdmin || currentUser?.isConsolidatedView || currentUser?.appRole === 'consolidado' || currentUser?.isDireccion);
   const sedeScopedMissions = useMemo(() => {
@@ -232,7 +236,7 @@ export default function MonitorImos() {
       if (s && s !== 'Sede Global') setSedes.add(s);
     });
     // Sedes oficiales de operación
-    ['Lima', 'Quito', 'Cuenca', 'Guayaquil', 'Medellín', 'México'].forEach(s => {
+    ['Quito', 'Guayaquil', 'Cuenca', 'Lima', 'Medellín', 'México'].forEach(s => {
       const exists = sourceList.some(m => resolveMissionSede(m) === s);
       if (exists) setSedes.add(s);
     });
@@ -240,16 +244,25 @@ export default function MonitorImos() {
   }, [missions, sedeScopedMissions, isGlobalScopeUser]);
 
   const equiposDisponibles = useMemo(() => {
-    const setEq = new Set();
+    const mapEquipos = new Map();
     sedeScopedMissions.forEach(m => {
       if (filterSede !== 'todos' && resolveMissionSede(m) !== filterSede) return;
-      if (m.equipo) setEq.add(normalizeEquipoName(m.equipo));
+      if (!m.equipo) return;
+      const canonicalKey = normalizeEquipoName(m.equipo);
+      const num = parseTeamNumber(m.equipo);
+      if (!mapEquipos.has(canonicalKey)) {
+        mapEquipos.set(canonicalKey, {
+          key: canonicalKey,
+          num: num || 9999,
+          count: 0
+        });
+      }
+      mapEquipos.get(canonicalKey).count++;
     });
-    return Array.from(setEq).sort((a, b) => {
-      if (a.includes('31')) return -1;
-      if (b.includes('31')) return 1;
-      return a.localeCompare(b);
-    });
+
+    return Array.from(mapEquipos.values())
+      .sort((a, b) => b.num - a.num) // Más recientes primero
+      .map(item => item.key);
   }, [sedeScopedMissions, filterSede]);
 
   // Filtrado de misiones en tiempo real por busqueda y selectores
@@ -1134,21 +1147,13 @@ export default function MonitorImos() {
               }}
             >
               <option value="todos" style={{ backgroundColor: '#0f172a', color: '#f8fafc' }}>
-                {filterSede === 'Lima' ? 'Todos los Equipos (Histórico: 291)' : 'Todos los Equipos'}
+                Todos los Equipos
               </option>
-              {equiposDisponibles.map(eq => {
-                let label = eq;
-                if (eq === 'EQUIPO 31 - LIMA CICLO 1') {
-                  label = '⭐ EQUIPO 31 - LIMA (Misión Activa • 133 Enrolamientos)';
-                } else if (eq.includes('LIMA')) {
-                  label = `${eq} (Ciclo Anterior)`;
-                }
-                return (
-                  <option key={eq} value={eq} style={{ backgroundColor: '#0f172a', color: eq.includes('31') ? '#38bdf8' : '#f8fafc', fontWeight: eq.includes('31') ? 700 : 400 }}>
-                    {label}
-                  </option>
-                );
-              })}
+              {equiposDisponibles.map(eq => (
+                <option key={eq} value={eq} style={{ backgroundColor: '#0f172a', color: '#f8fafc' }}>
+                  {eq}
+                </option>
+              ))}
             </select>
           </div>
 
