@@ -246,8 +246,8 @@ service cloud.firestore {
              'inviterName', 'sede', 'standardId', 'priority', 'requiresAction', 'communicationId'])
         && request.resource.data.userId is string
         && request.resource.data.userId.matches('.+@.+')
-        && request.resource.data.title is string && request.resource.data.title.size() <= 500
-        && request.resource.data.message is string && request.resource.data.message.size() <= 5000
+        && request.resource.data.title is string && request.resource.data.title.size() <= 1000
+        && request.resource.data.message is string && request.resource.data.message.size() <= 20000
         && request.resource.data.read == false
         && request.resource.data.created_at is string;
       allow update: if isAuthenticated() && resource.data.userId == email();
