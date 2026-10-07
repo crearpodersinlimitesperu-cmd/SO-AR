@@ -103,15 +103,23 @@ const getRelatedEventTeamLabels = (event, allEvents) => {
   if (directLabels.length) return directLabels;
 
   const stage = eventTrainingStage(event);
-  if (!stage) return [];
   const date = new Date(event.fecha_inicio || event.start || '');
-  if (Number.isNaN(date.getTime())) return [];
+  const eventSede = event.sede || event.sedeTag || '';
+  if (!eventSede || Number.isNaN(date.getTime())) return [];
 
-  const relatedStages = stage === 'MJ' ? ['C2'] : [stage === 'C1' ? 'C2' : 'C1'];
+  const relatedStages = stage === 'MJ'
+    ? ['C2']
+    : stage === 'C1' || stage === 'C2'
+      ? [stage === 'C1' ? 'C2' : 'C1']
+      : null;
   const candidates = allEvents.flatMap((candidate) => {
-    if (candidate === event || eventTrainingStage(candidate) === '' ||
-        !relatedStages.includes(eventTrainingStage(candidate)) ||
-        normalizeSede(candidate.sede || candidate.sedeTag || '') !== normalizeSede(event.sede || event.sedeTag || '')) {
+    const candidateStage = eventTrainingStage(candidate);
+    const candidateSede = candidate.sede || candidate.sedeTag || '';
+    if (candidate === event ||
+        (relatedStages && !relatedStages.includes(candidateStage)) ||
+        (stage === 'MJ' && candidateStage !== 'C2') ||
+        !candidateSede ||
+        normalizeSede(candidateSede) !== normalizeSede(eventSede)) {
       return [];
     }
     const candidateDate = new Date(candidate.fecha_inicio || candidate.start || '');
