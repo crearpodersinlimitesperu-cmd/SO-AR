@@ -5,6 +5,7 @@ import {
   chunkRows,
   getNodusAdminDb,
   isSafeNodusUrl,
+  isNodusVerificationUrl,
   loginNodusReadOnly,
   MAX_CHUNK_BYTES
 } from './nodusArchiveAgent.mjs';
@@ -179,7 +180,9 @@ export async function runNodusUserAccessReport() {
       let externalNavigation = false;
       if (request.isNavigationRequest() && request.frame() === page.mainFrame()) {
         try {
-          externalNavigation = new URL(request.url()).origin !== 'https://imo.crearpslglobal.com';
+          const url = new URL(request.url());
+          externalNavigation = url.origin !== 'https://imo.crearpslglobal.com'
+            && !isNodusVerificationUrl(url.href);
         } catch {
           externalNavigation = true;
         }
@@ -284,11 +287,13 @@ export async function runNodusUserAccessReport() {
       status: 'failed',
       coverage: 'incomplete',
       completedAt: FieldValue.serverTimestamp(),
-      failureCode: /login|inicio de sesión|secretos|autentic/i.test(error.message)
-        ? 'authentication_failed'
-        : /captcha|anti-bot/i.test(error.message)
-          ? 'verification_challenge'
-          : 'account_list_unavailable'
+      failureCode: /captcha|anti-bot|turnstile|verificaci[oó]n/i.test(error.message)
+        ? 'verification_challenge'
+        : /NODUS no confirmó el inicio de sesión/i.test(error.message)
+          ? 'login_not_confirmed'
+          : /login|inicio de sesión|secretos|autentic/i.test(error.message)
+            ? 'authentication_failed'
+            : 'account_list_unavailable'
     });
     throw error;
   } finally {

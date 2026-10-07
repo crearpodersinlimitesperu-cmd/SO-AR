@@ -4,6 +4,7 @@ import { cert, getApps, initializeApp } from 'firebase-admin/app';
 import { FieldValue, getFirestore } from 'firebase-admin/firestore';
 
 const NODUS_ORIGIN = 'https://imo.crearpslglobal.com';
+const NODUS_VERIFICATION_ORIGIN = 'https://challenges.cloudflare.com';
 const MAX_ROUTES = 200;
 export const MAX_CHUNK_BYTES = 350 * 1024;
 const MAX_FALLBACK_TEXT_BYTES = 250 * 1024;
@@ -76,14 +77,24 @@ function stableId(value) {
   return createHash('sha256').update(value).digest('hex').slice(0, 32);
 }
 
+export function isNodusVerificationUrl(value) {
+  try {
+    const url = new URL(value);
+    return url.origin === NODUS_VERIFICATION_ORIGIN
+      && /captcha|turnstile|challenge-platform/i.test(url.pathname);
+  } catch {
+    return false;
+  }
+}
+
 export async function loginNodusReadOnly(page) {
   const user = process.env.NODUS_USER;
   const password = process.env.NODUS_PASSWORD;
   if (!user || !password) throw new Error('Faltan los secretos NODUS_USER/NODUS_PASSWORD.');
 
   await page.goto(`${NODUS_ORIGIN}/auth/login`, { waitUntil: 'domcontentloaded', timeout: 45000 });
-  if (/sgcaptcha|captcha/i.test(page.url())) {
-    throw new Error('NODUS solicitó una verificación anti-bot; el agente se detuvo sin intentar resolverla.');
+  if (/sgcaptcha|captcha/i.test(page.url()) || isNodusVerificationUrl(page.url())) {
+    throw new Error('NODUS solicitó una verificación anti-bot; requiere revisión humana y el agente se detuvo sin resolverla.');
   }
   if (/\/auth\/login\/?$/i.test(new URL(page.url()).pathname)) {
     await page.waitForSelector('input[name="usuario"]', { visible: true, timeout: 15000 });
@@ -94,6 +105,9 @@ export async function loginNodusReadOnly(page) {
       page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 45000 }).catch(() => {})
     ]);
     await page.waitForNetworkIdle({ idleTime: 500, timeout: 5000 }).catch(() => {});
+    if (/sgcaptcha|captcha/i.test(page.url()) || isNodusVerificationUrl(page.url())) {
+      throw new Error('NODUS solicitó una verificación anti-bot; requiere revisión humana y el agente se detuvo sin resolverla.');
+    }
   }
 
   const dashboardResponse = await page.goto(`${NODUS_ORIGIN}/dashboard`, {
@@ -101,8 +115,8 @@ export async function loginNodusReadOnly(page) {
     timeout: 45000
   });
   await page.waitForNetworkIdle({ idleTime: 500, timeout: 5000 }).catch(() => {});
-  if (/sgcaptcha|captcha/i.test(page.url())) {
-    throw new Error('NODUS solicitó una verificación anti-bot; el agente se detuvo sin intentar resolverla.');
+  if (/sgcaptcha|captcha/i.test(page.url()) || isNodusVerificationUrl(page.url())) {
+    throw new Error('NODUS solicitó una verificación anti-bot; requiere revisión humana y el agente se detuvo sin resolverla.');
   }
   if (
     new URL(page.url()).origin !== NODUS_ORIGIN
@@ -282,7 +296,9 @@ export async function runNodusArchive() {
       let isExternalNavigation = false;
       if (request.isNavigationRequest() && request.frame() === page.mainFrame()) {
         try {
-          isExternalNavigation = new URL(request.url()).origin !== NODUS_ORIGIN;
+          const url = new URL(request.url());
+          isExternalNavigation = url.origin !== NODUS_ORIGIN
+            && !(url.origin === NODUS_VERIFICATION_ORIGIN && /captcha|turnstile|challenge-platform/i.test(url.pathname));
         } catch {
           isExternalNavigation = true;
         }
