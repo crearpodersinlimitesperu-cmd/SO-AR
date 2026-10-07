@@ -87,6 +87,39 @@ export function isNodusVerificationUrl(value) {
   }
 }
 
+export function classifyNodusLoginFeedback(feedback, loginFormVisible) {
+  const text = String(feedback ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+  if (/captcha|turnstile|verificacion|challenge/.test(text)) return 'verification_required';
+  if (/bloquead|suspendid|acceso denegado|access denied|demasiados intentos|no autorizado/.test(text)) {
+    return 'access_restricted';
+  }
+  if (/incorrect|invalido|invalida|no coincide|credencial|bad credential/.test(text)) {
+    return 'credentials_rejected';
+  }
+  if (loginFormVisible) return 'login_form_returned';
+  return text ? 'login_error_unclassified' : 'login_not_confirmed';
+}
+
+async function getNodusLoginDiagnostic(page) {
+  const loginState = await page.evaluate(() => {
+    const visible = (element) => Boolean(element.getClientRects().length);
+    const feedback = Array.from(document.querySelectorAll(
+      '[role="alert"], .alert, .invalid-feedback, .text-danger'
+    ))
+      .filter(visible)
+      .map((element) => element.innerText || element.textContent || '')
+      .join(' ');
+    return {
+      feedback,
+      loginFormVisible: Boolean(document.querySelector('form input[name="usuario"]'))
+    };
+  });
+  return classifyNodusLoginFeedback(loginState.feedback, loginState.loginFormVisible);
+}
+
 export async function loginNodusReadOnly(page, landingPath = '/dashboard') {
   const user = process.env.NODUS_USER;
   const password = process.env.NODUS_PASSWORD;
@@ -125,7 +158,10 @@ export async function loginNodusReadOnly(page, landingPath = '/dashboard') {
   ) {
     const finalUrl = new URL(page.url());
     const status = landingResponse?.status() ?? 'sin respuesta HTTP';
-    throw new Error(`NODUS no confirmó el inicio al abrir ${landingPath}; respuesta ${status}, ruta final ${finalUrl.pathname}. No se reintentó para evitar bloqueo de cuenta.`);
+    const diagnostic = /\/auth\/login\/?$/i.test(finalUrl.pathname)
+      ? await getNodusLoginDiagnostic(page)
+      : 'landing_route_rejected';
+    throw new Error(`NODUS no confirmó el inicio al abrir ${landingPath}; respuesta ${status}, ruta final ${finalUrl.pathname}, diagnóstico ${diagnostic}. No se reintentó para evitar bloqueo de cuenta.`);
   }
 }
 
