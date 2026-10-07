@@ -30,7 +30,7 @@ import {
   FileSpreadsheet
 } from 'lucide-react';
 
-// ConfiguraciÃ³n de las 6 Sedes Operativas Oficiales
+// Configuración de las 6 Sedes Operativas Oficiales
 const SEDES_CONFIG = [
   { id: 'TODAS', label: 'Todas las Sedes', flag: '🌎', code: 'ALL' },
   { id: 'Lima', label: 'Lima', flag: '🇵🇪', code: 'LIM' },
@@ -63,23 +63,23 @@ const DRIVE_REPOSITORIES = [
   }
 ];
 
-// InformaciÃ³n LogÃ­stica Completa de Hoteles, Salones y Choferes por Sede
+// Información Logística Completa de Hoteles, Salones y Choferes por Sede
 const SEDES_LOGISTICA = {
   Lima: {
     nombre: 'Lima',
-    pais: 'PerÃº',
+    pais: 'Perú',
     bandera: 'ðŸ‡µðŸ‡ª',
     hotel: 'Hotel Jose Antonio Deluxe Miraflores',
-    direccion: 'Calle Bellavista 133, Miraflores, Lima 15074, PerÃº',
+    direccion: 'Calle Bellavista 133, Miraflores, Lima 15074, Perú',
     mapsUrl: 'https://maps.google.com/?q=Hotel+Jose+Antonio+Deluxe+Miraflores+Lima',
     checkIn: '15:00',
     checkOut: '12:00',
-    notaCheckIn: 'Coordinado Early Check-in segÃºn arribo de vuelo',
+    notaCheckIn: 'Coordinado Early Check-in según arribo de vuelo',
     telefono: '(+51 1) 712-4400',
-    servicios: 'Desayuno Buffet & WiFi Alta Velocidad â€¢ Room Service 24h',
-    aeropuerto: 'Aeropuerto Internacional Jorge ChÃ¡vez (LIM)',
-    puntoEspera: 'Puerta de Llegadas Internacionales (Cartel oficial CREAR PODER SIN LÃMITES)',
-    salonOficial: 'Hotel JosÃ© Antonio Deluxe Miraflores (Salones Principales)',
+    servicios: 'Desayuno Buffet & WiFi Alta Velocidad • Room Service 24h',
+    aeropuerto: 'Aeropuerto Internacional Jorge Chávez (LIM)',
+    puntoEspera: 'Puerta de Llegadas Internacionales (Cartel oficial CREAR PODER SIN LÍMITES)',
+    salonOficial: 'Hotel José Antonio Deluxe Miraflores (Salones Principales)',
     salonViaje: 'Hostal Sol y Luna (Cieneguilla, Lima)',
     salonCaminata: 'Casona Blanca, C. Las Perdices 1126, Lima'
   },
@@ -87,18 +87,18 @@ const SEDES_LOGISTICA = {
     nombre: 'Quito',
     pais: 'Ecuador',
     bandera: 'ðŸ‡ªðŸ‡¨',
-    hotel: 'Fortaleza CuÃ¡ntica / SwissÃ´tel Quito',
+    hotel: 'Fortaleza Cuántica / Swissôtel Quito',
     direccion: 'De los Naranjos, 170124 Quito, Ecuador',
     mapsUrl: 'https://maps.google.com/?q=De+los+Naranjos+170124+Quito+Ecuador',
     checkIn: '14:00',
     checkOut: '12:00',
-    notaCheckIn: 'RecepciÃ³n y coordinaciÃ³n de llaves directa con Gerencia de Sede',
+    notaCheckIn: 'Recepción y coordinación de llaves directa con Gerencia de Sede',
     telefono: '(+593 2) 256-7600',
-    servicios: 'SalÃ³n Plenario CuÃ¡ntico â€¢ Sala VIP Entrenadores â€¢ Catering Completo',
+    servicios: 'Salón Plenario Cuántico • Sala VIP Entrenadores • Catering Completo',
     aeropuerto: 'Aeropuerto Internacional Mariscal Sucre (UIO - Tababela)',
     puntoEspera: 'Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)',
-    salonOficial: 'CREAR PODER SIN LÃMITES Fortaleza CuÃ¡ntica (De los Naranjos, Quito)',
-    salonViaje: 'HosterÃ­a Oficial de Retiro El Viaje (Quito)',
+    salonOficial: 'CREAR PODER SIN LÍMITES Fortaleza Cuántica (De los Naranjos, Quito)',
+    salonViaje: 'Hostería Oficial de Retiro El Viaje (Quito)',
     salonCaminata: 'Zona de Empoderamiento y Fuego (Quito)'
   },
   Cuenca: {
@@ -106,13 +106,13 @@ const SEDES_LOGISTICA = {
     pais: 'Ecuador',
     bandera: 'ðŸ‡ªðŸ‡¨',
     hotel: 'Hotel Oro Verde Cuenca',
-    direccion: 'Av. OrdÃ³Ã±ez Lasso s/n, Cuenca 010150, Ecuador',
+    direccion: 'Av. Ordóñez Lasso s/n, Cuenca 010150, Ecuador',
     mapsUrl: 'https://maps.google.com/?q=Hotel+Oro+Verde+Cuenca+Ecuador',
     checkIn: '15:00',
     checkOut: '12:00',
     notaCheckIn: 'Habitaciones ejecutivas asignadas para entrenadores',
     telefono: '(+593 7) 409-0000',
-    servicios: 'Restaurante Gourmet â€¢ ConexiÃ³n Fibra Ã“ptica â€¢ Traslado Coordinado',
+    servicios: 'Restaurante Gourmet • Conexión Fibra Óptica • Traslado Coordinado',
     aeropuerto: 'Aeropuerto Mariscal La Mar (CUE)',
     puntoEspera: 'Hall Principal de Salida de Pasajeros (Aeropuerto CUE)',
     salonOficial: 'Salones de Entrenamiento Oficiales Cuenca',
@@ -124,17 +124,17 @@ const SEDES_LOGISTICA = {
     pais: 'Ecuador',
     bandera: 'ðŸ‡ªðŸ‡¨',
     hotel: 'Hotel Wyndham Guayaquil (Puerto Santa Ana)',
-    direccion: 'Calle Numa Pompilio Llona, Ciudad del RÃ­o, Puerto Santa Ana, Guayaquil',
+    direccion: 'Calle Numa Pompilio Llona, Ciudad del Río, Puerto Santa Ana, Guayaquil',
     mapsUrl: 'https://maps.google.com/?q=Hotel+Wyndham+Guayaquil+Puerto+Santa+Ana',
     checkIn: '15:00',
     checkOut: '12:00',
-    notaCheckIn: 'Vista al rÃ­o Guayas, check-in express para facilitadores',
+    notaCheckIn: 'Vista al río Guayas, check-in express para facilitadores',
     telefono: '(+593 4) 371-7800',
-    servicios: 'Desayuno Buffet Ejecutivo â€¢ Piscina & Spa â€¢ Acceso Puerto Santa Ana',
-    aeropuerto: 'Aeropuerto Internacional JosÃ© JoaquÃ­n de Olmedo (GYE)',
+    servicios: 'Desayuno Buffet Ejecutivo • Piscina & Spa • Acceso Puerto Santa Ana',
+    aeropuerto: 'Aeropuerto Internacional José Joaquín de Olmedo (GYE)',
     puntoEspera: 'Puerta de Salida Internacional / Nacional (Aeropuerto Olmedo GYE)',
-    salonOficial: 'SalÃ³n de Eventos y Convenciones Guayaquil',
-    salonViaje: 'HosterÃ­a Guayaquil (El Viaje)',
+    salonOficial: 'Salón de Eventos y Convenciones Guayaquil',
+    salonViaje: 'Hostería Guayaquil (El Viaje)',
     salonCaminata: 'Sede de Campo Guayaquil'
   },
   Medellín: {
@@ -146,32 +146,32 @@ const SEDES_LOGISTICA = {
     mapsUrl: 'https://maps.google.com/?q=Hotel+Dann+Carlton+Belfort+Medellin',
     checkIn: '15:00',
     checkOut: '13:00',
-    notaCheckIn: 'UbicaciÃ³n en El Poblado con acceso rÃ¡pido por TÃºnel de Oriente',
+    notaCheckIn: 'Ubicación en El Poblado con acceso rápido por Túnel de Oriente',
     telefono: '(+57 604) 444-5151',
-    servicios: 'Desayuno Buffet Paisa & Internacional â€¢ Business Center â€¢ Piscina',
-    aeropuerto: 'Aeropuerto Internacional JosÃ© MarÃ­a CÃ³rdova (MDE - Rionegro)',
+    servicios: 'Desayuno Buffet Paisa & Internacional • Business Center • Piscina',
+    aeropuerto: 'Aeropuerto Internacional José María Córdova (MDE - Rionegro)',
     puntoEspera: 'Salida Puerta 1 Llegadas Internacionales / Nacionales MDE',
-    salonOficial: 'SalÃ³n Principal de Entrenamiento Medellín (El Poblado)',
+    salonOficial: 'Salón Principal de Entrenamiento Medellín (El Poblado)',
     salonViaje: 'Finca Campestre de Retiro El Viaje (Antioquia)',
-    salonCaminata: 'Espacio Abierto de TransformaciÃ³n Medellín'
+    salonCaminata: 'Espacio Abierto de Transformación Medellín'
   },
   México: {
     nombre: 'México',
     pais: 'México',
     bandera: '🇲🇽',
     hotel: 'Hotel Fiesta Americana Reforma',
-    direccion: 'P.Âº de la Reforma 80, Juárez, CuauhtÃ©moc, 06600 Ciudad de México, CDMX',
+    direccion: 'P.º de la Reforma 80, Juárez, Cuauhtémoc, 06600 Ciudad de México, CDMX',
     mapsUrl: 'https://maps.google.com/?q=Hotel+Fiesta+Americana+Reforma+CDMX',
     checkIn: '15:00',
     checkOut: '12:00',
-    notaCheckIn: 'UbicaciÃ³n estratÃ©gica sobre Paseo de la Reforma',
+    notaCheckIn: 'Ubicación estratégica sobre Paseo de la Reforma',
     telefono: '(+52 55) 5140-4100',
-    servicios: 'Centro de Negocios â€¢ Concierge 24h â€¢ Room Service de Alta Gama',
+    servicios: 'Centro de Negocios • Concierge 24h • Room Service de Alta Gama',
     aeropuerto: 'Aeropuerto Internacional Benito Juárez (MEX / AICM)',
     puntoEspera: 'Puerta E1/E2 Llegadas Internacionales Terminal 1 o Terminal 2 (AICM)',
-    salonOficial: 'Salones de CapacitaciÃ³n y Eventos CDMX',
+    salonOficial: 'Salones de Capacitación y Eventos CDMX',
     salonViaje: 'Sede Campestre México (El Viaje)',
-    salonCaminata: 'Centro de TransformaciÃ³n al Aire Libre CDMX'
+    salonCaminata: 'Centro de Transformación al Aire Libre CDMX'
   }
 };
 
@@ -186,7 +186,7 @@ const FALLBACK_TRACKER = {
       reservationCode: "DJBJJD",
       passengers: [
         "Elmer Andrés Idrovo Andrade",
-        "MarÃ­a de Lourdes Patiño"
+        "María de Lourdes Patiño"
       ],
       route: {
         origin: "UIO",
@@ -194,7 +194,7 @@ const FALLBACK_TRACKER = {
         originAirport: "Aeropuerto Internacional Mariscal Sucre",
         destination: "LIM",
         destinationCity: "Lima",
-        destinationAirport: "Aeropuerto Internacional Jorge ChÃ¡vez",
+        destinationAirport: "Aeropuerto Internacional Jorge Chávez",
         isDirect: true,
         stops: 0,
         flightDuration: "2h 15m"
@@ -210,22 +210,22 @@ const FALLBACK_TRACKER = {
       },
       status: "ON_TIME",
       statusLabel: "A tiempo",
-      statusDescription: "Vuelo confirmado y a tiempo para despegue directo UIO â†’ LIM",
+      statusDescription: "Vuelo confirmado y a tiempo para despegue directo UIO → LIM",
       delayMinutes: 0,
       terminal: "T1",
-      gate: "ConfirmÃ¡ndose en aeropuerto",
+      gate: "Confirmándose en aeropuerto",
       baggageClaim: "Por confirmar en arribo",
       logistics: {
-        pickupLocation: "Puerta de Llegadas Internacionales (Aeropuerto Jorge ChÃ¡vez)",
+        pickupLocation: "Puerta de Llegadas Internacionales (Aeropuerto Jorge Chávez)",
         destination: "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
         driverPickupEstimated: "10:35 AM",
-        driverNote: "El conductor te contactarÃ¡ 1h antes por WhatsApp con datos del auto y placa oficial."
+        driverNote: "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
       },
       radarUrl: "https://www.flightradar24.com/data/flights/la1437",
       checkInUrl: "https://www.latamairlines.com/pe/es/check-in",
       relatedLetters: [
-        { name: "Carta AndrÃ©s Idrovo", url: "/cartas/carta_andres_idrobo_e30.html" },
-        { name: "Carta Lourdes PatiÃ±o", url: "/cartas/carta_lourdes_patino_e29.html" }
+        { name: "Carta Andrés Idrovo", url: "/cartas/carta_andres_idrobo_e30.html" },
+        { name: "Carta Lourdes Patiño", url: "/cartas/carta_lourdes_patino_e29.html" }
       ]
     },
     LA1449: {
@@ -235,12 +235,12 @@ const FALLBACK_TRACKER = {
       callsign: "LAN1449",
       reservationCode: "DJBJJD",
       passengers: [
-        "Elmer AndrÃ©s Idrovo Andrade"
+        "Elmer Andrés Idrovo Andrade"
       ],
       route: {
         origin: "LIM",
         originCity: "Lima",
-        originAirport: "Aeropuerto Internacional Jorge ChÃ¡vez",
+        originAirport: "Aeropuerto Internacional Jorge Chávez",
         destination: "UIO",
         destinationCity: "Quito",
         destinationAirport: "Aeropuerto Internacional Mariscal Sucre",
@@ -268,13 +268,13 @@ const FALLBACK_TRACKER = {
       logistics: {
         pickupLocation: "Lobby del Hotel Jose Antonio Deluxe",
         driverPickupEstimated: "8:30 PM (20:30 hrs)",
-        destination: "Aeropuerto Jorge ChÃ¡vez",
+        destination: "Aeropuerto Jorge Chávez",
         driverNote: "Recojo 3h antes para vuelo internacional nocturno."
       },
       radarUrl: "https://www.flightradar24.com/data/flights/la1449",
       checkInUrl: "https://www.latamairlines.com/pe/es/check-in",
       relatedLetters: [
-        { name: "Carta AndrÃ©s Idrovo (Retorno)", url: "/cartas/carta_andres_idrobo_e30.html" }
+        { name: "Carta Andrés Idrovo (Retorno)", url: "/cartas/carta_andres_idrobo_e30.html" }
       ]
     },
     AV108: {
@@ -284,15 +284,15 @@ const FALLBACK_TRACKER = {
       callsign: "AVA108",
       reservationCode: "AVCONF",
       passengers: [
-        "Alejandro DÃ­az PabÃ³n"
+        "Alejandro Díaz Pabón"
       ],
       route: {
         origin: "BOG",
-        originCity: "BogotÃ¡",
+        originCity: "Bogotá",
         originAirport: "Aeropuerto Internacional El Dorado",
         destination: "LIM",
         destinationCity: "Lima",
-        destinationAirport: "Aeropuerto Internacional Jorge ChÃ¡vez",
+        destinationAirport: "Aeropuerto Internacional Jorge Chávez",
         isDirect: true,
         stops: 0,
         flightDuration: "3h 05m"
@@ -314,21 +314,21 @@ const FALLBACK_TRACKER = {
       gate: "Por confirmar",
       baggageClaim: "Por confirmar",
       logistics: {
-        pickupLocation: "Puerta de Llegadas Internacionales (Aeropuerto Jorge ChÃ¡vez)",
+        pickupLocation: "Puerta de Llegadas Internacionales (Aeropuerto Jorge Chávez)",
         destination: "Hotel Jose Antonio Deluxe",
         driverPickupEstimated: "09:45 AM",
-        driverNote: "Conductor esperarÃ¡ en llegadas internacionales con cartel oficial CPSL."
+        driverNote: "Conductor esperará en llegadas internacionales con cartel oficial CPSL."
       },
       radarUrl: "https://www.flightradar24.com/data/flights/av108",
       checkInUrl: "https://www.avianca.com",
       relatedLetters: [
-        { name: "Carta Alejandro DÃ­az", url: "/cartas/carta_alejandro_diaz_e28.html" }
+        { name: "Carta Alejandro Díaz", url: "/cartas/carta_alejandro_diaz_e28.html" }
       ]
     }
   }
 };
 
-// CatÃ¡logo Completo Multi-Sede de Cartas Oficiales y DocumentaciÃ³n Migratoria
+// Catálogo Completo Multi-Sede de Cartas Oficiales y Documentación Migratoria
 const OFICIAL_LETTERS = [
 
     {
@@ -371,14 +371,14 @@ const OFICIAL_LETTERS = [
   // SEDE LIMA
   {
     id: 'carta-andres-idrovo',
-    entrenador: 'Elmer AndrÃ©s Idrovo Andrade',
+    entrenador: 'Elmer Andrés Idrovo Andrade',
     rol: 'Entrenador Principal',
-    equipo: 'Equipo 30 - CreaciÃ³n',
+    equipo: 'Equipo 30 - Creación',
     sede: 'Lima',
     url: '/cartas/carta_andres_idrobo_e30.html',
     badge: 'Volaris DD7FPP',
     fecha: 'Enero - Febrero 2027',
-    descripcion: 'Carta oficial de invitaciÃ³n, itinerario de vuelos TIJ âž” LIM (Y4 181) y LIM âž” TIJ (Y4 3919), hotel y logÃ­stica de chofer.',
+    descripcion: 'Carta oficial de invitación, itinerario de vuelos TIJ ➔ LIM (Y4 181) y LIM ➔ TIJ (Y4 3919), hotel y logística de chofer.',
     vuelos: ['Y4 181', 'Y4 3919']
   },
   {
@@ -395,75 +395,75 @@ const OFICIAL_LETTERS = [
   },
   {
     id: 'carta-lourdes-patino',
-    entrenador: 'MarÃ­a de Lourdes PatiÃ±o',
+    entrenador: 'María de Lourdes Patiño',
     rol: 'Entrenadora de Sala',
-    equipo: 'Equipo 29 - RelaciÃ³n',
+    equipo: 'Equipo 29 - Relación',
     sede: 'Lima',
     url: '/cartas/carta_lourdes_patino_e29.html',
     badge: 'LATAM DJBJJD',
     fecha: 'Septiembre 2026',
-    descripcion: 'Carta oficial de invitaciÃ³n, itinerario de vuelo internacional UIO âž” LIM (LA 1437), hospedaje y viÃ¡ticos de coordinaciÃ³n.',
+    descripcion: 'Carta oficial de invitación, itinerario de vuelo internacional UIO ➔ LIM (LA 1437), hospedaje y viáticos de coordinación.',
     vuelos: ['LA 1437']
   },
   {
     id: 'carta-alejandro-diaz',
-    entrenador: 'Alejandro DÃ­az PabÃ³n',
+    entrenador: 'Alejandro Díaz Pabón',
     rol: 'Entrenador Senior',
     equipo: 'Equipo 28 - Gratitud',
     sede: 'Lima',
     url: '/cartas/carta_alejandro_diaz_e28.html',
     badge: 'Avianca AVCONF',
     fecha: 'Enero - Febrero 2027',
-    descripcion: 'Carta de facilitaciÃ³n e itinerario de vuelo BOG âž” LIM (AV 108), transporte en Lima y agenda del fin de semana.',
+    descripcion: 'Carta de facilitación e itinerario de vuelo BOG ➔ LIM (AV 108), transporte en Lima y agenda del fin de semana.',
     vuelos: ['AV 108']
   },
   {
     id: 'carta-julio-narvaez',
-    entrenador: 'Julio NarvÃ¡ez',
+    entrenador: 'Julio Narváez',
     rol: 'Entrenador / Facilitador',
     equipo: 'Equipo 28 - El Viaje',
     sede: 'Lima',
     url: '/cartas/julio-narvaez-elviaje-e28.html',
-    badge: 'MaestrÃ­a del Juego',
+    badge: 'Maestría del Juego',
     fecha: 'Enero - Febrero 2027',
-    descripcion: 'Carta de confirmaciÃ³n logÃ­stica y requerimientos de sala para MaestrÃ­a del Juego El Viaje en Cieneguilla.',
+    descripcion: 'Carta de confirmación logística y requerimientos de sala para Maestría del Juego El Viaje en Cieneguilla.',
     vuelos: []
   },
   {
     id: 'carta-fernando-aragon',
-    entrenador: 'Fernando AragÃ³n',
-    rol: 'Coach de TransformaciÃ³n',
-    equipo: 'CC1 - TransformaciÃ³n',
+    entrenador: 'Fernando Aragón',
+    rol: 'Coach de Transformación',
+    equipo: 'CC1 - Transformación',
     sede: 'Lima',
     url: '/cartas/fernando-aragon-c1.html',
     badge: 'CC1 Oficial',
     fecha: 'Agosto - Enero - Febrero 2027',
-    descripcion: 'Carta oficial de asignaciÃ³n y cronograma de intervenciÃ³n ontolÃ³gica para CC1.',
+    descripcion: 'Carta oficial de asignación y cronograma de intervención ontológica para CC1.',
     vuelos: []
   },
   {
     id: 'carta-migraciones-oficial',
-    entrenador: 'Superintendencia Nacional de Migraciones (PerÃº)',
+    entrenador: 'Superintendencia Nacional de Migraciones (Perú)',
     rol: 'Respaldo Institucional Oficial',
-    equipo: 'CREAR PODER SIN LÃMITES S.A.C.',
+    equipo: 'CREAR PODER SIN LÍMITES S.A.C.',
     sede: 'Lima',
     url: '/cartas/carta_invitacion_migraciones.html',
     badge: 'Documento Legal Migratorio',
     fecha: 'Oficial 2026',
-    descripcion: 'Carta de respaldo institucional, personerÃ­a jurÃ­dica y acreditación oficial de conferencistas extranjeros ante autoridades peruanas.',
+    descripcion: 'Carta de respaldo institucional, personería jurídica y acreditación oficial de conferencistas extranjeros ante autoridades peruanas.',
     vuelos: ['LA 1437', 'AV 108', 'LA 1449']
   },
 
   {
     id: 'carpeta-pagos-semanales-lima',
-    entrenador: 'Gerencia de Lima (JosÃƒÂ© SÃƒÂ¡nchez)',
+    entrenador: 'Gerencia de Lima (José Sánchez)',
     rol: 'Gerente de Sede',
     equipo: 'PAGOS SEMANALES LIMA',
     sede: 'Lima',
     url: 'https://drive.google.com/drive/folders/1c3wkWITxPTdtvZ41o-MTcftRPkQtmpgi?usp=drive_link',
     badge: 'PAGOS SEMANALES LIMA',
     fecha: 'Acceso Exclusivo Gerente',
-    descripcion: 'Carpeta oficial de liquidaciÃƒÂ³n y pagos semanales restringida exclusivamente para el Gerente de Lima.',
+    descripcion: 'Carpeta oficial de liquidación y pagos semanales restringida exclusivamente para el Gerente de Lima.',
     vuelos: [],
     soloGerenteLima: true
   },
@@ -477,43 +477,43 @@ const OFICIAL_LETTERS = [
     url: 'https://drive.google.com/drive/folders/1N64i0WfN_x-WOQ1ULeOIQSADnMw2mSw4',
     badge: 'UIO E128-E129',
     fecha: 'Septiembre - Octubre 2026',
-    descripcion: 'Itinerario de vuelos, asignaciÃ³n de salas en Fortaleza CuÃ¡ntica Quito (De los Naranjos) y agenda logÃ­stica de entrenadores.',
+    descripcion: 'Itinerario de vuelos, asignación de salas en Fortaleza Cuántica Quito (De los Naranjos) y agenda logística de entrenadores.',
     vuelos: ['LA 1437', 'LA 1414']
   },
   {
     id: 'carta-mauricio-perez-uio',
-    entrenador: 'Mauricio PÃ©rez',
+    entrenador: 'Mauricio Pérez',
     rol: 'Entrenador de Sala',
     equipo: 'UIO CAP 1 E128',
     sede: 'Quito',
     url: 'https://drive.google.com/drive/folders/1tjYp0VIugfs7hQ3PLTZKqp1oQkWIvRak',
     badge: 'UIO E128',
     fecha: 'Enero - Febrero 2027',
-    descripcion: 'Carta de confirmaciÃ³n logÃ­stica y vuelo hacia Quito (UIO) para entrenamiento CAP 1 en Fortaleza CuÃ¡ntica.',
+    descripcion: 'Carta de confirmación logística y vuelo hacia Quito (UIO) para entrenamiento CAP 1 en Fortaleza Cuántica.',
     vuelos: ['LA 1429']
   },
   {
     id: 'carta-andres-gomez-uio',
-    entrenador: 'AndrÃ©s GÃ³mez',
+    entrenador: 'Andrés Gómez',
     rol: 'Entrenador de Impacto',
     equipo: 'UIO CAP 2 E128 & Academia',
     sede: 'Quito',
     url: 'https://drive.google.com/drive/folders/1YCq9xVMWZXgD_T7HDrnVn9NnVVz_8W41',
     badge: 'UIO Academia',
     fecha: 'Enero - Febrero 2027',
-    descripcion: 'Itinerario de vuelo, agenda de formaciÃ³n en Fortaleza CuÃ¡ntica y traslado desde aeropuerto Mariscal Sucre (UIO).',
+    descripcion: 'Itinerario de vuelo, agenda de formación en Fortaleza Cuántica y traslado desde aeropuerto Mariscal Sucre (UIO).',
     vuelos: ['LA 1437']
   },
   {
     id: 'carta-cirilo-martinez-uio',
-    entrenador: 'Cirilo MartÃ­nez',
+    entrenador: 'Cirilo Martínez',
     rol: 'Facilitador Internacional',
     equipo: 'UIO FDS E124 - E126',
     sede: 'Quito',
     url: 'https://drive.google.com/drive/folders/1Oo7gTTY2F0ciag7oCboaFIpgB08Z61N1',
     badge: 'UIO FDS E126',
     fecha: 'Septiembre - Octubre 2026',
-    descripcion: 'Itinerario de vuelos internacionales, agenda en Quito y coordinaciÃ³n logÃ­stica de hospedaje en SwissÃ´tel Quito.',
+    descripcion: 'Itinerario de vuelos internacionales, agenda en Quito y coordinación logística de hospedaje en Swissôtel Quito.',
     vuelos: ['LA 1414']
   },
   {
@@ -531,25 +531,25 @@ const OFICIAL_LETTERS = [
   {
     id: 'carta-chuy-acosta-uio',
     entrenador: 'Chuy Acosta',
-    rol: 'Entrenador OntolÃ³gico',
+    rol: 'Entrenador Ontológico',
     equipo: 'UIO Academia & FDS 127',
     sede: 'Quito',
     url: 'https://drive.google.com/drive/folders/1Q9kiTKVKbHDKm4jsi7WboYDk-yj-vQQr',
     badge: 'UIO E127',
     fecha: 'Octubre 2026',
-    descripcion: 'Itinerario de vuelos y asignaciÃ³n de sala para FDS 127 en sede Quito Fortaleza CuÃ¡ntica.',
+    descripcion: 'Itinerario de vuelos y asignación de sala para FDS 127 en sede Quito Fortaleza Cuántica.',
     vuelos: ['LA 1437']
   },
   {
     id: 'carta-ana-monroy-uio',
     entrenador: 'Ana Elena Monroy Thompson',
-    rol: 'Directora AcadÃ©mica Internacional',
-    equipo: 'Academia UIO & FormaciÃ³n Kids',
+    rol: 'Directora Académica Internacional',
+    equipo: 'Academia UIO & Formación Kids',
     sede: 'Quito',
     url: 'https://drive.google.com/drive/folders/1cONlxQGyWNmqcYoF2oD4Mmi_pPyH--Jo',
     badge: 'Academia UIO',
     fecha: 'Enero - Febrero 2027',
-    descripcion: 'Itinerario oficial de vuelos, traslados y agenda de formaciÃ³n acadÃ©mica en sede Quito.',
+    descripcion: 'Itinerario oficial de vuelos, traslados y agenda de formación académica en sede Quito.',
     vuelos: ['LA 1414']
   },
 
@@ -563,7 +563,7 @@ const OFICIAL_LETTERS = [
     url: 'https://drive.google.com/drive/folders/1AI57KdM7u572KULm5aE20TpmaaWVj10F',
     badge: 'CUE 4FDS',
     fecha: 'Septiembre - Octubre 2026',
-    descripcion: 'Boleto aÃ©reo e itinerario de traslados a Cuenca (CUE), hospedaje en Hotel Oro Verde Cuenca y coordinaciÃ³n de sala.',
+    descripcion: 'Boleto aéreo e itinerario de traslados a Cuenca (CUE), hospedaje en Hotel Oro Verde Cuenca y coordinación de sala.',
     vuelos: ['LA 1414']
   },
   {
@@ -580,14 +580,14 @@ const OFICIAL_LETTERS = [
   },
   {
     id: 'carta-mildred-munoz-cue',
-    entrenador: 'Mildred MuÃ±oz',
+    entrenador: 'Mildred Muñoz',
     rol: 'Entrenadora de Alto Impacto',
     equipo: 'CAP 2 CUE E23',
     sede: 'Cuenca',
     url: 'https://drive.google.com/drive/folders/1crElNGKJGrtLG-_BBgqUPjHDn9WsfcyV',
     badge: 'CUE E23',
     fecha: 'Enero - Febrero 2027',
-    descripcion: 'Carta de vuelo y agenda logÃ­stica para entrenamiento CAP 2 en sede Cuenca.',
+    descripcion: 'Carta de vuelo y agenda logística para entrenamiento CAP 2 en sede Cuenca.',
     vuelos: ['LA 1437']
   },
   {
@@ -599,31 +599,31 @@ const OFICIAL_LETTERS = [
     url: 'https://drive.google.com/drive/folders/1vMwDSynVEdK1tiBhPV3u0Y1dk9iQP2LV',
     badge: 'CUE CAP 1',
     fecha: 'Octubre 2026',
-    descripcion: 'Itinerario aÃ©reo para sede Cuenca (CUE) y plan de recojo con chofer oficial en aeropuerto Mariscal La Mar.',
+    descripcion: 'Itinerario aéreo para sede Cuenca (CUE) y plan de recojo con chofer oficial en aeropuerto Mariscal La Mar.',
     vuelos: ['LA 1414']
   },
   {
     id: 'carta-juan-angel-arreola-cue',
-    entrenador: 'Juan Ãngel Arreola',
+    entrenador: 'Juan Ángel Arreola',
     rol: 'Facilitador Internacional',
     equipo: 'CUE CAP 2 E24',
     sede: 'Cuenca',
     url: 'https://drive.google.com/drive/folders/1X9MROEm3agkqEEbYOFsKD7eAhw3VAjB1',
     badge: 'CUE CAP 2',
     fecha: 'Septiembre - Octubre 2026',
-    descripcion: 'Documento oficial de vuelo internacional hacia Cuenca y agenda de intervenciÃ³n transformacional.',
+    descripcion: 'Documento oficial de vuelo internacional hacia Cuenca y agenda de intervención transformacional.',
     vuelos: ['LA 1429']
   },
   {
     id: 'carta-andres-idrovo-cue',
-    entrenador: 'Elmer AndrÃ©s Idrovo Andrade',
+    entrenador: 'Elmer Andrés Idrovo Andrade',
     rol: 'Entrenador Principal',
     equipo: 'CUE FDS E21',
     sede: 'Cuenca',
     url: 'https://drive.google.com/drive/folders/1-82Q9FS9s1YOHliXFm4vwiMvxDGoD_7r',
     badge: 'CUE FDS E21',
     fecha: 'Enero - Febrero 2027',
-    descripcion: 'Itinerario de vuelo, logÃ­stica de chofer en aeropuerto Mariscal La Mar y hospedaje en Cuenca.',
+    descripcion: 'Itinerario de vuelo, logística de chofer en aeropuerto Mariscal La Mar y hospedaje en Cuenca.',
     vuelos: ['LA 1437']
   },
 
@@ -637,24 +637,24 @@ const OFICIAL_LETTERS = [
     url: 'https://drive.google.com/drive/folders/1N64i0WfN_x-WOQ1ULeOIQSADnMw2mSw4',
     badge: 'GYE FDS E37',
     fecha: 'Enero - Febrero 2027',
-    descripcion: 'Carta de confirmaciÃ³n aÃ©rea UIO âž” GYE, hospedaje en Hotel Wyndham Guayaquil y chofer asignado.',
+    descripcion: 'Carta de confirmación aérea UIO ➔ GYE, hospedaje en Hotel Wyndham Guayaquil y chofer asignado.',
     vuelos: ['LA 1429']
   },
   {
     id: 'carta-mauricio-perez-gye',
-    entrenador: 'Mauricio PÃ©rez',
+    entrenador: 'Mauricio Pérez',
     rol: 'Entrenador de Sala',
     equipo: 'GYE CAP 1 E38',
     sede: 'Guayaquil',
     url: 'https://drive.google.com/drive/folders/1tjYp0VIugfs7hQ3PLTZKqp1oQkWIvRak',
     badge: 'GYE E38',
     fecha: 'Octubre 2026',
-    descripcion: 'Vuelo hacia Guayaquil (GYE), traslado en aeropuerto JosÃ© JoaquÃ­n de Olmedo y agenda operativa.',
+    descripcion: 'Vuelo hacia Guayaquil (GYE), traslado en aeropuerto José Joaquín de Olmedo y agenda operativa.',
     vuelos: ['LA 1414']
   },
   {
     id: 'carta-lourdes-patino-gye',
-    entrenador: 'MarÃ­a de Lourdes PatiÃ±o',
+    entrenador: 'María de Lourdes Patiño',
     rol: 'Entrenadora de Sala',
     equipo: 'GYE FDS E37',
     sede: 'Guayaquil',
@@ -667,82 +667,82 @@ const OFICIAL_LETTERS = [
   {
     id: 'carta-ana-monroy-gye',
     entrenador: 'Ana Elena Monroy Thompson',
-    rol: 'Directora AcadÃ©mica',
+    rol: 'Directora Académica',
     equipo: 'GYE FDS E35 & E38',
     sede: 'Guayaquil',
     url: 'https://drive.google.com/drive/folders/1cONlxQGyWNmqcYoF2oD4Mmi_pPyH--Jo',
     badge: 'GYE FDS E38',
     fecha: 'Enero - Febrero 2027',
-    descripcion: 'Itinerario de pasaje aÃ©reo Guayaquil, traslados y agenda del fin de semana.',
+    descripcion: 'Itinerario de pasaje aéreo Guayaquil, traslados y agenda del fin de semana.',
     vuelos: ['LA 1429']
   },
   {
     id: 'carta-juan-angel-arreola-gye',
-    entrenador: 'Juan Ãngel Arreola',
+    entrenador: 'Juan Ángel Arreola',
     rol: 'Facilitador Internacional',
     equipo: 'GYE CAP 2 E37 / E38',
     sede: 'Guayaquil',
     url: 'https://drive.google.com/drive/folders/1X9MROEm3agkqEEbYOFsKD7eAhw3VAjB1',
     badge: 'GYE CAP 2',
     fecha: 'Enero - Febrero 2027',
-    descripcion: 'Boleto aÃ©reo, logÃ­stica de transporte aeropuerto JosÃ© JoaquÃ­n de Olmedo y hotel oficial.',
+    descripcion: 'Boleto aéreo, logística de transporte aeropuerto José Joaquín de Olmedo y hotel oficial.',
     vuelos: ['LA 1414']
   },
   {
     id: 'carta-andres-idrovo-gye',
-    entrenador: 'Elmer AndrÃ©s Idrovo Andrade',
+    entrenador: 'Elmer Andrés Idrovo Andrade',
     rol: 'Entrenador Principal',
     equipo: 'GYE FDS E36',
     sede: 'Guayaquil',
     url: 'https://drive.google.com/drive/folders/1-82Q9FS9s1YOHliXFm4vwiMvxDGoD_7r',
     badge: 'GYE FDS E36',
     fecha: 'Enero - Febrero 2027',
-    descripcion: 'Vuelo directo Guayaquil, traslado hacia hotel y salÃ³n de entrenamiento oficial.',
+    descripcion: 'Vuelo directo Guayaquil, traslado hacia hotel y salón de entrenamiento oficial.',
     vuelos: ['LA 1437']
   },
 
-  // SEDE MEDELLÃN
+  // SEDE MEDELLÍN
   {
     id: 'carta-ana-monroy-mde',
     entrenador: 'Ana Elena Monroy Thompson',
-    rol: 'Directora AcadÃ©mica Internacional',
+    rol: 'Directora Académica Internacional',
     equipo: 'Medellín Kids & Liderazgo Juvenil',
     sede: 'Medellín',
     url: 'https://drive.google.com/drive/folders/1cONlxQGyWNmqcYoF2oD4Mmi_pPyH--Jo',
     badge: 'MDE Kids Oficial',
     fecha: 'Septiembre - Octubre 2026',
-    descripcion: 'Itinerario aÃ©reo hacia Medellín JosÃ© MarÃ­a CÃ³rdova (MDE), hospedaje en Hotel Dann Carlton Belfort y logÃ­stica de sala.',
+    descripcion: 'Itinerario aéreo hacia Medellín José María Córdova (MDE), hospedaje en Hotel Dann Carlton Belfort y logística de sala.',
     vuelos: ['AV 108']
   },
   {
     id: 'carta-alejandro-diaz-mde',
-    entrenador: 'Alejandro DÃ­az PabÃ³n',
+    entrenador: 'Alejandro Díaz Pabón',
     rol: 'Entrenador Senior',
-    equipo: 'CoordinaciÃ³n Colombia',
+    equipo: 'Coordinación Colombia',
     sede: 'Medellín',
     url: 'https://drive.google.com/drive/folders/1i60YXyxRrFP1LxmXUVuHK5eRyeUBzR0r',
-    badge: 'MDE ConexiÃ³n',
+    badge: 'MDE Conexión',
     fecha: 'Enero - Febrero 2027',
-    descripcion: 'Carta oficial de coordinaciÃ³n, vuelos de enlace BOG-MDE-LIM y protocolo de chofer en Rionegro.',
+    descripcion: 'Carta oficial de coordinación, vuelos de enlace BOG-MDE-LIM y protocolo de chofer en Rionegro.',
     vuelos: ['AV 108']
   },
 
-  // SEDE MÃ‰XICO
+  // SEDE MÉXICO
   {
     id: 'carta-lourdes-patino-mex',
-    entrenador: 'MarÃ­a de Lourdes PatiÃ±o',
+    entrenador: 'María de Lourdes Patiño',
     rol: 'Entrenadora Internacional',
-    equipo: 'Enlace México - PerÃº',
+    equipo: 'Enlace México - Perú',
     sede: 'México',
     url: 'https://drive.google.com/file/d/1GGakOnjKwxr-tOK7bBijlWpy5Mym2T_9/view?usp=drivesdk',
-    badge: 'MEX âž” LIM',
+    badge: 'MEX ➔ LIM',
     fecha: 'Julio - Enero - Febrero 2027',
-    descripcion: 'Pasaje aÃ©reo internacional México âž” Lima, confirmaciÃ³n de vuelo y respaldo institucional de facilitaciÃ³n.',
+    descripcion: 'Pasaje aéreo internacional México ➔ Lima, confirmación de vuelo y respaldo institucional de facilitación.',
     vuelos: ['LA 1437']
   },
   {
     id: 'carta-arreola-martinez-mex',
-    entrenador: 'Juan Ãngel Arreola / Cirilo MartÃ­nez',
+    entrenador: 'Juan Ángel Arreola / Cirilo Martínez',
     rol: 'Facilitadores Internacionales',
     equipo: 'Red Internacional México',
     sede: 'México',
@@ -816,7 +816,7 @@ export default function MonitorVuelosCartas() {
     fetchTrackerData();
   }, []);
 
-  const copyToClipboard = (text, label = 'InformaciÃ³n') => {
+  const copyToClipboard = (text, label = 'Información') => {
     navigator.clipboard.writeText(text);
     showToast(`${label} copiado al portapapeles`, 'success');
   };
@@ -830,23 +830,23 @@ export default function MonitorVuelosCartas() {
 
     const arrivalTime = new Date(flight.schedule?.estimatedArrival || flight.schedule?.scheduledArrival).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-    const text = `âœˆï¸ *CREAR PODER SIN LÃMITES - BRIEFING DE RECOJO DE ENTRENADOR*\n` +
-      `ðŸ“ *Sede de Llegada:* ${info.nombre} ${info.bandera}\n\n` +
-      `ðŸ“Œ *Vuelo:* ${flight.flightNumber} (${flight.airline})\n` +
+    const text = `✈️ *CREAR PODER SIN LÍMITES - BRIEFING DE RECOJO DE ENTRENADOR*\n` +
+      `📍 *Sede de Llegada:* ${info.nombre} ${info.bandera}\n\n` +
+      `📍Œ *Vuelo:* ${flight.flightNumber} (${flight.airline})\n` +
       `ðŸ‘¤ *Pasajero(s):* ${flight.passengers.join(', ')}\n` +
-      `ðŸ›« *Ruta:* ${flight.route.originCity} (${flight.route.origin}) âž” ${flight.route.destinationCity} (${flight.route.destination})\n` +
-      `â° *Llegada Estimada:* ${arrivalTime}\n` +
-      `ðŸ“ *Punto de Recojo:* ${flight.logistics?.pickupLocation || info.puntoEspera}\n` +
+      `ðŸ›« *Ruta:* ${flight.route.originCity} (${flight.route.origin}) ➔ ${flight.route.destinationCity} (${flight.route.destination})\n` +
+      `⏰ *Llegada Estimada:* ${arrivalTime}\n` +
+      `📍 *Punto de Recojo:* ${flight.logistics?.pickupLocation || info.puntoEspera}\n` +
       `ðŸ¨ *Destino:* ${info.hotel} (${info.direccion})\n` +
       `ðŸš— *Hora Chofer:* ${flight.logistics?.driverPickupEstimated || '30 min posteriores al aterrizaje'}\n` +
-      `â„¹ï¸ *Nota de Protocolo:* ${flight.logistics?.driverNote || 'Conductor esperarÃ¡ en llegadas con cartel oficial CREAR PODER SIN LÃMITES.'}\n` +
-      `ðŸ”— *Radar en vivo:* ${flight.radarUrl}`;
+      `ℹ️ *Nota de Protocolo:* ${flight.logistics?.driverNote || 'Conductor esperará en llegadas con cartel oficial CREAR PODER SIN LÍMITES.'}\n` +
+      `🔍— *Radar en vivo:* ${flight.radarUrl}`;
     copyToClipboard(text, `Briefing de WhatsApp para chofer (${info.nombre})`);
   };
 
   const flightsList = Object.values(trackerData?.flights || {});
 
-  // Filtro de vuelos segÃºn Sede seleccionada, estado y rutas
+  // Filtro de vuelos según Sede seleccionada, estado y rutas
   const filteredFlights = flightsList.filter(f => {
     const ahora = new Date();
     const fechaLlegada = new Date(f.schedule?.estimatedArrival || f.schedule?.scheduledArrival);
@@ -876,7 +876,7 @@ export default function MonitorVuelosCartas() {
       if (!originMatch && !destMatch) return false;
     }
 
-    // Filtros rÃ¡pidos de ruta dinÃ¡micos
+    // Filtros rápidos de ruta dinámicos
     if (routeFilter && routeFilter !== 'ALL') {
       const parts = routeFilter.split('-');
       if (parts.length === 2) {
@@ -897,7 +897,7 @@ export default function MonitorVuelosCartas() {
   });
   filteredFlights.sort((a, b) => new Date(a.schedule?.scheduledDeparture || new Date()).getTime() - new Date(b.schedule?.scheduledDeparture || new Date()).getTime());
 
-  // Filtro de cartas segÃºn Sede seleccionada y bÃºsqueda
+  // Filtro de cartas según Sede seleccionada y búsqueda
   const filteredLetters = OFICIAL_LETTERS.filter(l => {
     // Si la carta o recurso es exclusivo para Gerente de Lima
     if (l.soloGerenteLima && !canAccessPagosSemanalesDrive(currentUser)) {
@@ -1216,12 +1216,12 @@ export default function MonitorVuelosCartas() {
       </div>
 
       {/* ========================================================= */}
-      {/* PESTAÃ‘A 1: RADAR DE VUELOS EN TIEMPO REAL                 */}
+      {/* PESTAÑA 1: RADAR DE VUELOS EN TIEMPO REAL                 */}
       {/* ========================================================= */}
       {activeTab === 'radar' && puedeVerRadar && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           
-          {/* Barra de Filtros y BÃºsqueda de Vuelos */}
+          {/* Barra de Filtros y Búsqueda de Vuelos */}
           <div className="flight-filters" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
               
@@ -1296,7 +1296,7 @@ export default function MonitorVuelosCartas() {
               </div>
             </div>
 
-            {/* Input de BÃºsqueda de Pasajero/Vuelo */}
+            {/* Input de Búsqueda de Pasajero/Vuelo */}
             <div style={{ position: 'relative', width: '100%' }}>
               <Search size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
               <input
@@ -1359,7 +1359,7 @@ export default function MonitorVuelosCartas() {
                   )
                 );
 
-                // Motor de Inferencia (HeurÃ­stica)
+                // Motor de Inferencia (Heurística)
                 let suggestedAsignaciones = [];
                 if (matchedAsignaciones.length === 0) {
                     suggestedAsignaciones = (asignaciones || []).filter(asig => {
@@ -1368,7 +1368,7 @@ export default function MonitorVuelosCartas() {
                         const flightDest = (flight.route?.destinationCity || '').toLowerCase();
                         const flightOrig = (flight.route?.originCity || '').toLowerCase();
                         
-                        // Validacion GeogrÃ¡fica
+                        // Validacion Geográfica
                         if (asigSede && (flightDest.includes(asigSede) || flightOrig.includes(asigSede))) {
                             matchScore += 1;
                         }
@@ -1377,7 +1377,7 @@ export default function MonitorVuelosCartas() {
                         const passMatch = (flight.passengers || []).some(p => {
                            const pParts = p.toLowerCase().split(' ');
                            const eLower = (asig.entrenador || '').toLowerCase();
-                           // Coincide si el nombre o apellido parcial estÃ¡ en la carta, ignorando "de", "la" etc
+                           // Coincide si el nombre o apellido parcial está en la carta, ignorando "de", "la" etc
                            return pParts.some(part => part.length >= 3 && eLower.includes(part));
                         });
                         
@@ -1544,7 +1544,7 @@ export default function MonitorVuelosCartas() {
       )}
 
       {/* ========================================================= */}
-      {/* PESTAÃ‘A 2: REPOSITORIO DE CARTAS Y MIGRACIONES MULTI-SEDE  */}
+      {/* PESTAÑA 2: REPOSITORIO DE CARTAS Y MIGRACIONES MULTI-SEDE  */}
       {/* ========================================================= */}
       {activeTab === 'cartas' && puedeVerCartas && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -1564,13 +1564,13 @@ export default function MonitorVuelosCartas() {
           }}>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                <span style={{ fontSize: '1.3rem' }}>ðŸ“‚</span>
+                <span style={{ fontSize: '1.3rem' }}>📍‚</span>
                 <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#fff', fontWeight: 800 }}>
                   Carpetas Oficiales de Google Drive (Todas las Sedes)
                 </h3>
               </div>
               <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted)', maxWidth: '620px' }}>
-                Acceso directo a los repositorios en la nube: cartas de facilitaciÃ³n migratoria, boletos aÃ©reos y comprobantes de logÃ­stica para Ecuador, Colombia, México y PerÃº.
+                Acceso directo a los repositorios en la nube: cartas de facilitación migratoria, boletos aéreos y comprobantes de logística para Ecuador, Colombia, México y Perú.
               </p>
             </div>
 
@@ -1722,7 +1722,7 @@ export default function MonitorVuelosCartas() {
                     </h3>
 
                     <div style={{ fontSize: '0.85rem', color: '#38bdf8', fontWeight: 600, marginBottom: '0.5rem' }}>
-                      {letter.rol} â€¢ <span style={{ color: 'var(--text-muted)' }}>{letter.equipo}</span>
+                      {letter.rol} • <span style={{ color: 'var(--text-muted)' }}>{letter.equipo}</span>
                     </div>
 
                     <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0, lineHeight: '1.5' }}>
@@ -1819,12 +1819,12 @@ export default function MonitorVuelosCartas() {
       )}
 
       {/* ========================================================= */}
-      {/* PESTAÃ‘A 3: LOGÃSTICA DE HOTEL Y CHOFERES MULTI-SEDE       */}
+      {/* PESTAÑA 3: LOGÍSTICA DE HOTEL Y CHOFERES MULTI-SEDE       */}
       {/* ========================================================= */}
       {activeTab === 'logistica' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
           
-          {/* Selector de Sede para LogÃ­stica */}
+          {/* Selector de Sede para Logística */}
           <div style={{
             display: 'flex',
             alignItems: 'center',
@@ -1839,7 +1839,7 @@ export default function MonitorVuelosCartas() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Building size={18} color="#34d399" />
               <span style={{ fontWeight: 700, color: '#fff', fontSize: '1rem' }}>
-                Seleccionar Sede para LogÃ­stica y Hospedaje:
+                Seleccionar Sede para Logística y Hospedaje:
               </span>
             </div>
 
@@ -1890,7 +1890,7 @@ export default function MonitorVuelosCartas() {
                         fontSize: '0.75rem',
                         fontWeight: 800
                       }}>
-                        SEDE OFICIAL DE HOSPEDAJE 2026 â€¢ {currentLogistica.bandera} {currentLogistica.nombre.toUpperCase()}
+                        SEDE OFICIAL DE HOSPEDAJE 2026 • {currentLogistica.bandera} {currentLogistica.nombre.toUpperCase()}
                       </span>
                     </div>
                     <h2 style={{ fontSize: '1.8rem', margin: '0.4rem 0 0', color: '#fff' }}>
@@ -1933,9 +1933,9 @@ export default function MonitorVuelosCartas() {
                   </div>
 
                   <div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>TelÃ©fono RecepciÃ³n</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Teléfono Recepción</div>
                     <div style={{ fontSize: '1rem', fontWeight: 700, color: '#fff', marginTop: '2px' }}>{currentLogistica.telefono}</div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>AtenciÃ³n 24 Horas</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Atención 24 Horas</div>
                   </div>
 
                   <div>
@@ -1948,7 +1948,7 @@ export default function MonitorVuelosCartas() {
             );
           })()}
 
-          {/* Protocolo de OperaciÃ³n Chofer y Recojo por Sede */}
+          {/* Protocolo de Operación Chofer y Recojo por Sede */}
           {(() => {
             const currentLogistica = SEDES_LOGISTICA[logisticaSede] || SEDES_LOGISTICA['Lima'];
             return (
@@ -1956,7 +1956,7 @@ export default function MonitorVuelosCartas() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.2rem', flexWrap: 'wrap', gap: '1rem' }}>
                   <div>
                     <h3 style={{ fontSize: '1.4rem', margin: 0, color: '#fff' }}>
-                      Protocolo Oficial de Traslado y Bienvenida â€¢ {currentLogistica.bandera} {currentLogistica.nombre}
+                      Protocolo Oficial de Traslado y Bienvenida • {currentLogistica.bandera} {currentLogistica.nombre}
                     </h3>
                     <p style={{ margin: '4px 0 0', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
                       {currentLogistica.aeropuerto}
@@ -1966,10 +1966,10 @@ export default function MonitorVuelosCartas() {
                     onClick={() => {
                       const text = `ðŸš— *CPSL PROTOCOLO CHOFER - SEDE ${currentLogistica.nombre.toUpperCase()}*\n` +
                         `ðŸ¨ *Hotel:* ${currentLogistica.hotel}\n` +
-                        `ðŸ“ *DirecciÃ³n:* ${currentLogistica.direccion}\n` +
-                        `âœˆï¸ *Aeropuerto:* ${currentLogistica.aeropuerto}\n` +
-                        `ðŸ“Œ *Punto de Espera:* ${currentLogistica.puntoEspera}\n` +
-                        `ðŸ“ž *TelÃ©fono Hotel:* ${currentLogistica.telefono}`;
+                        `📍 *Dirección:* ${currentLogistica.direccion}\n` +
+                        `✈️ *Aeropuerto:* ${currentLogistica.aeropuerto}\n` +
+                        `📍Œ *Punto de Espera:* ${currentLogistica.puntoEspera}\n` +
+                        `📍ž *Teléfono Hotel:* ${currentLogistica.telefono}`;
                       copyToClipboard(text, `Protocolo de sede ${currentLogistica.nombre}`);
                     }}
                     className="btn-secondary"
@@ -1986,7 +1986,7 @@ export default function MonitorVuelosCartas() {
                       <span>1. Contacto Previo (1h antes)</span>
                     </div>
                     <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0, lineHeight: '1.5' }}>
-                      El chofer oficial contacta al entrenador vÃ­a WhatsApp indicando modelo de vehÃ­culo, color, nÃºmero de placa oficial y foto del conductor en sede <strong>{currentLogistica.nombre}</strong>.
+                      El chofer oficial contacta al entrenador vía WhatsApp indicando modelo de vehículo, color, número de placa oficial y foto del conductor en sede <strong>{currentLogistica.nombre}</strong>.
                     </p>
                   </div>
 
@@ -1996,7 +1996,7 @@ export default function MonitorVuelosCartas() {
                       <span>2. Punto de Espera en Aeropuerto</span>
                     </div>
                     <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0, lineHeight: '1.5' }}>
-                      UbicaciÃ³n exacta: <strong>{currentLogistica.puntoEspera}</strong> con cartel oficial de <strong>CREAR PODER SIN LÃMITES</strong>.
+                      Ubicación exacta: <strong>{currentLogistica.puntoEspera}</strong> con cartel oficial de <strong>CREAR PODER SIN LÍMITES</strong>.
                     </p>
                   </div>
 
@@ -2014,10 +2014,10 @@ export default function MonitorVuelosCartas() {
             );
           })()}
 
-          {/* Directorio RÃ¡pido de Todas las Sedes */}
+          {/* Directorio Rápido de Todas las Sedes */}
           <div className="glass-panel" style={{ padding: '1.5rem' }}>
             <h4 style={{ margin: '0 0 1rem', fontSize: '1.1rem', color: '#fff', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Globe size={18} color="var(--crear-gold)" /> Directorio LogÃ­stico Completo de Sedes CPSL
+              <Globe size={18} color="var(--crear-gold)" /> Directorio Logístico Completo de Sedes CPSL
             </h4>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
               {Object.keys(SEDES_LOGISTICA).map(key => {
@@ -2053,7 +2053,7 @@ export default function MonitorVuelosCartas() {
       )}
 
       {/* ========================================================= */}
-      {/* MODAL DE PREVISUALIZACIÃ“N DE CARTAS                       */}
+      {/* MODAL DE PREVISUALIZACIÓN DE CARTAS                       */}
       {/* ========================================================= */}
       {previewLetter && (
         <div style={{
@@ -2095,7 +2095,7 @@ export default function MonitorVuelosCartas() {
                   {previewLetter.entrenador || previewLetter.name}
                 </h3>
                 <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                  {previewLetter.rol || 'Documento Oficial de FacilitaciÃ³n'} {previewLetter.sede ? `â€¢ Sede ${previewLetter.sede}` : ''}
+                  {previewLetter.rol || 'Documento Oficial de Facilitación'} {previewLetter.sede ? `• Sede ${previewLetter.sede}` : ''}
                 </div>
               </div>
 
