@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       run_report:
-        description: "Iniciar sesión en Nodus y publicar el reporte; déjalo desactivado para ejecutar solo las pruebas."
+        description: "Leer Nodus y publicar el reporte. Requiere un runner propio con etiqueta nodus-authorized; desactivado solo ejecuta pruebas."
         required: false
         type: boolean
         default: false
@@ -17,10 +17,10 @@ permissions:
   contents: read
 
 jobs:
-  report:
+  validate:
     name: Validate NODUS user report
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -33,8 +33,22 @@ jobs:
         run: node --test tests/nodusUserAccessAgent.test.mjs tests/nodusArchiveAgent.test.mjs
       - name: Build Causa OS
         run: npm run build
-      - name: Install Chromium for authenticated report
-        if: ${{ inputs.run_report == true }}
+
+  report:
+    name: Read NODUS accounts from authorized network
+    needs: validate
+    if: ${{ inputs.run_report == true }}
+    runs-on: [self-hosted, nodus-authorized]
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Install Linux Chromium libraries
+        if: ${{ runner.os == 'Linux' }}
         run: |
           sudo apt-get update
           sudo apt-get install -y \
@@ -42,9 +56,10 @@ jobs:
             libcups2 libdrm2 libxkbcommon0 libxcomposite1 \
             libxdamage1 libxrandr2 libgbm1
           sudo apt-get install -y libasound2t64 || sudo apt-get install -y libasound2
+      - name: Install Chromium
+        run: |
           npx puppeteer browsers install chrome
       - name: Read account list and publish verified report
-        if: ${{ inputs.run_report == true }}
         env:
           NODUS_USER: ${{ secrets.NODUS_USER }}
           NODUS_PASSWORD: ${{ secrets.NODUS_PASSWORD }}
