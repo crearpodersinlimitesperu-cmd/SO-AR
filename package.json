@@ -8,6 +8,7 @@
     "prebuild": "(python3 dump_code.py || python dump_code.py || py dump_code.py || echo \"Python no disponible localmente, saltando prebuild...\")",
     "build": "vite build",
     "lint": "oxlint",
+    "test": "node --test src/utils/overdueTasks.test.js",
     "preview": "vite preview",
     "sync:qt": "node scripts/qtSyncDaemon.js",
     "mailer": "node scripts/mailerDaemon.js",
