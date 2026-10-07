@@ -660,5 +660,23 @@ service cloud.firestore {
         ]));
       allow delete: if isSuperAdmin();
     }
+    // Reportes de diagnóstico (Centro de Mando). Solo Super Admin lee.
+    // "automatic" lo escribe únicamente el Admin SDK (bypass de reglas).
+    // "copilot_deep": solo Super Admin, append-only y validado.
+    match /platform_diagnostic_reports/{reportId} {
+      allow read: if isSuperAdmin();
+      allow create: if isSuperAdmin()
+        && request.resource.data.keys().hasOnly(['source', 'title', 'content', 'createdAt', 'createdBy'])
+        && request.resource.data.source == 'copilot_deep'
+        && request.resource.data.title is string
+        && request.resource.data.title.size() > 0
+        && request.resource.data.title.size() <= 150
+        && request.resource.data.content is string
+        && request.resource.data.content.size() >= 50
+        && request.resource.data.content.size() <= 50000
+        && request.resource.data.createdBy == email()
+        && request.resource.data.createdAt == request.time;
+      allow update, delete: if false;
+    }
   }
 }
