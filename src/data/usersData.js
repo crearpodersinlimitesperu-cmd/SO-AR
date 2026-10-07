@@ -93,13 +93,15 @@ export const normalizeUserRecord = (data) => {
   };
 };
 
+export { OFFICIAL_SEDES, OFFICIAL_SEDES_TEAMS, parseTeamNumber, normalizeEquipoLabel, isTeamConsistentWithSede, inferSedeFromTeamNumber } from './officialSedesTeams';
+
 export const OPERATIONAL_SEDES = [
-  'Lima',
   'Quito',
-  'Cuenca',
   'Guayaquil',
-  'Medell\u00EDn',
-  'M\u00E9xico'
+  'Cuenca',
+  'Lima',
+  'Medellín',
+  'México'
 ];
 
 /**

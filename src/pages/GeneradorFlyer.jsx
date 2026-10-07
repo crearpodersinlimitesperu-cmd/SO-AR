@@ -10,24 +10,24 @@ import {
   Calendar, Zap, CheckCircle2, Award, X
 } from 'lucide-react';
 
-// Preset 1: Próximas Fechas de Enrolamiento (Octubre para sedes que ya cerraron Septiembre)
+// Preset 1: Próximas Fechas de Enrolamiento (Octubre 2026 - Calendario Maestro Causa OS)
 const SEDES_ENROLAMIENTO_PROXIMO = [
-  { id: 'mex', ciudad: 'México', fechas: '18, 19 y 20 de septiembre', activo: true, equipo: 'Equipo 8' },
-  { id: 'lim', ciudad: 'Lima', fechas: '18, 19 y 20 de septiembre', activo: true, equipo: 'Equipo 31' },
-  { id: 'uio', ciudad: 'Quito', fechas: '25, 26 y 27 de septiembre', activo: true, equipo: 'Equipo 128' },
+  { id: 'uio', ciudad: 'Quito', fechas: '2, 3 y 4 de octubre', activo: true, equipo: 'Equipo 129' },
   { id: 'gye', ciudad: 'Guayaquil', fechas: '9, 10 y 11 de octubre', activo: true, equipo: 'Equipo 38' },
   { id: 'cue', ciudad: 'Cuenca', fechas: '16, 17 y 18 de octubre', activo: true, equipo: 'Equipo 24' },
-  { id: 'med', ciudad: 'Medellín', fechas: '16, 17 y 18 de octubre', activo: true, equipo: 'Equipo 20' }
+  { id: 'med', ciudad: 'Medellín', fechas: '16, 17 y 18 de octubre', activo: true, equipo: 'Equipo 20' },
+  { id: 'lim', ciudad: 'Lima', fechas: '23, 24 y 25 de octubre', activo: true, equipo: 'Equipo 32' },
+  { id: 'mex', ciudad: 'México', fechas: '23, 24 y 25 de octubre', activo: true, equipo: 'Equipo 9' }
 ];
 
-// Preset 2: Ciclo Inmediato (Septiembre en todas las sedes)
+// Preset 2: Ciclo Inmediato Previo (Septiembre en todas las sedes)
 const SEDES_CICLO_INMEDIATO = [
-  { id: 'gye', ciudad: 'Guayaquil', fechas: '4, 5 y 6 de septiembre', activo: true, equipo: 'Equipo 37' },
+  { id: 'uio', ciudad: 'Quito', fechas: '25, 26 y 27 de septiembre', activo: true, equipo: 'Equipo 128' },
+  { id: 'lim', ciudad: 'Lima', fechas: '18, 19 y 20 de septiembre', activo: true, equipo: 'Equipo 31' },
+  { id: 'mex', ciudad: 'México', fechas: '18, 19 y 20 de septiembre', activo: true, equipo: 'Equipo 8' },
   { id: 'cue', ciudad: 'Cuenca', fechas: '11, 12 y 13 de septiembre', activo: true, equipo: 'Equipo 23' },
   { id: 'med', ciudad: 'Medellín', fechas: '11, 12 y 13 de septiembre', activo: true, equipo: 'Equipo 19' },
-  { id: 'mex', ciudad: 'México', fechas: '18, 19 y 20 de septiembre', activo: true, equipo: 'Equipo 8' },
-  { id: 'lim', ciudad: 'Lima', fechas: '18, 19 y 20 de septiembre', activo: true, equipo: 'Equipo 31' },
-  { id: 'uio', ciudad: 'Quito', fechas: '25, 26 y 27 de septiembre', activo: true, equipo: 'Equipo 128' }
+  { id: 'gye', ciudad: 'Guayaquil', fechas: '4, 5 y 6 de septiembre', activo: true, equipo: 'Equipo 37' }
 ];
 
 const MESES = [
