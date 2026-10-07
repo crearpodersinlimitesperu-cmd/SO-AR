@@ -428,6 +428,22 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // Respaldo bruto de NODUS: puede contener identificadores y contactos de
+    // participantes. Solo gerencia/superadministración puede leerlo; el agente
+    // lo escribe mediante Admin SDK y ningún cliente puede modificarlo.
+    match /nodus_archive_runs/{runId} {
+      allow read: if isGerenteODireccion() || isSuperAdmin();
+      allow write: if false;
+      match /pages/{pageId} {
+        allow read: if isGerenteODireccion() || isSuperAdmin();
+        allow write: if false;
+        match /chunks/{chunkId} {
+          allow read: if isGerenteODireccion() || isSuperAdmin();
+          allow write: if false;
+        }
+      }
+    }
+
     // ------------------------------------------------------------------------
     // COLECCIONES AUDITADAS CON PERMISOS AMPLIOS DE COLABORACIÓN OPERATIVA
     // ------------------------------------------------------------------------

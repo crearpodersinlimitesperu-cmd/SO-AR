@@ -20,6 +20,7 @@
     "flyer:generate": "node scripts/generar_flyer.mjs",
     "sync:nodus": "node scripts/nodusMultiAgentSync.mjs",
     "daemon:nodus": "node scripts/nodusDaemon.mjs",
+    "archive:nodus": "node scripts/nodusArchiveAgent.mjs",
     "sync:kpis": "node scripts/syncKpisLlamadas.mjs",
     "audit:polizas": "node scripts/trainerPolicyAuditAgent.mjs",
     "import:reunion-madrid": "node scripts/importReunionMadridTasks.mjs",

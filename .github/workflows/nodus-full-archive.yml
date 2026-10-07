@@ -1,0 +1,41 @@
+name: NODUS full read-only archive
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: nodus-hourly-sync
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  archive:
+    name: Read-only NODUS archive to Causa
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Install Chromium and runtime libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libnss3 libatk1.0-0 libatk-bridge2.0-0 \
+            libcups2 libdrm2 libxkbcommon0 libxcomposite1 \
+            libxdamage1 libxrandr2 libgbm1
+          sudo apt-get install -y libasound2t64 || sudo apt-get install -y libasound2
+          npx puppeteer browsers install chrome
+      - name: Validate archive safety helpers
+        run: node --test tests/nodusArchiveAgent.test.mjs
+      - name: Crawl visible NODUS routes and archive into Causa
+        env:
+          NODUS_USER: ${{ secrets.NODUS_USER }}
+          NODUS_PASSWORD: ${{ secrets.NODUS_PASSWORD }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: node scripts/nodusArchiveAgent.mjs
