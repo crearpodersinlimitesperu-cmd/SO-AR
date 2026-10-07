@@ -37,7 +37,7 @@ jobs:
       - name: Deploy only the IMO codebase
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/imo-deploy-credential.json
-        run: npx --yes firebase-tools@latest deploy --config firebase.imo.json --only functions:imo --project centro-operativo-cpsl --non-interactive
+        run: node scripts/deployImoBackend.mjs
       - name: Remove temporary credential
         if: always()
         run: rm -f "$RUNNER_TEMP/imo-deploy-credential.json"

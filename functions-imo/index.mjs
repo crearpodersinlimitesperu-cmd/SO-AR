@@ -12,7 +12,7 @@ const secret=defineSecret('IMO_VERIFICATION_SECRET');
 const mailUser=defineSecret('IMO_MAIL_USER'),mailPass=defineSecret('IMO_MAIL_PASS');
 const options={region:'us-central1',maxInstances:2,minInstances:0,memory:'256MiB',cpu:'gcf_gen1',concurrency:1,timeoutSeconds:30};
 
-export const imoAccess=onCall({...options,secrets:[secret],cors:['https://centro-operativo-cpsl.web.app','https://centro-operativo-cpsl.firebaseapp.com']},async request=>{
+export const imoAccess=onCall({...options,invoker:"public",secrets:[secret],cors:['https://centro-operativo-cpsl.web.app','https://centro-operativo-cpsl.firebaseapp.com']},async request=>{
   const data=request.data || {};
   if(!['requestCode','verifyCode','roster','events','requests','report','logout'].includes(data.action))throw new HttpsError('invalid-argument','Acción inválida.');
   try{return await createAccessService({db,secret:secret.value()})[data.action](data,String(request.rawRequest.ip || 'unknown'));}
