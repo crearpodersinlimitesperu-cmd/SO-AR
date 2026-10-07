@@ -48,3 +48,7 @@ Escribe el informe en español claro y concreto:
 5. **No verificado:** lista explícita de funciones, módulos, datos o integraciones que no se pudieron comprobar y la evidencia/acceso seguro necesario para hacerlo.
 
 Si no encuentras problemas en un área, informa qué comprobaste y con qué evidencia; nunca uses “sin problemas” para una parte que no alcanzaste a inspeccionar.
+
+## Destino del informe
+
+Entrega el informe completo en Markdown, listo para que un Super Admin lo copie y lo pegue en Centro de Mando (`/superadmin` → pestaña **Diagnósticos**). Este agente no puede guardar ni publicar el informe por sí mismo: la publicación la hace manualmente el Super Admin. El contenido no debe superar 50.000 caracteres; si se excede, prioriza resumen ejecutivo, hallazgos críticos/altos y backlog.

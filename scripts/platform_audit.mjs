@@ -20,7 +20,7 @@
 
 import dotenv from 'dotenv';
 import { initializeApp, cert, getApps } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore';
+import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 import { readFileSync, existsSync } from 'fs';
 
 dotenv.config();
@@ -39,6 +39,56 @@ try {
   db = getFirestore();
 } catch (e) {
   console.warn("⚠️ Firebase Admin init:", e.message);
+}
+
+// ----------------------------------------------------------------------------
+// Persistencia del reporte para el Centro de Mando (/superadmin → Diagnósticos).
+// Usa la credencial Admin ya existente (las reglas de Firestore no permiten
+// escrituras de cliente a source "automatic"). Nunca guarda stack traces.
+// ----------------------------------------------------------------------------
+const REPORTS_COLLECTION = 'platform_diagnostic_reports';
+const MAX_REPORT_CHARS = 60000;
+let reportSaved = false;
+
+function sanitizeErrorMessage(err) {
+  const raw = (err?.message || String(err || 'error desconocido')).toString().split('\n')[0];
+  return raw
+    .replace(/(Bearer|token|key|secret|password|authorization)[^\s]*\s*[:=]?\s*\S+/gi, '$1 [redactado]')
+    .replace(/gh[pousr]_[A-Za-z0-9_]{20,}/g, '[redactado]')
+    .replace(/AIza[0-9A-Za-z_-]{20,}/g, '[redactado]')
+    .replace(/-----BEGIN[\s\S]*/g, '[redactado]')
+    .slice(0, 300);
+}
+
+async function saveReportSnapshot({ status, summary, content, errores = 0, advertencias = 0 }) {
+  if (reportSaved) return;
+  if (!db) {
+    console.warn('⚠️ Sin conexión a Firestore: el reporte no se guardó en Centro de Mando.');
+    return;
+  }
+  try {
+    const server = process.env.GITHUB_SERVER_URL || 'https://github.com';
+    const runUrl = process.env.GITHUB_REPOSITORY && process.env.GITHUB_RUN_ID
+      ? `${server}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`
+      : null;
+    await db.collection(REPORTS_COLLECTION).add({
+      source: 'automatic',
+      status, // 'ok' | 'warn' | 'error' | 'failed'
+      summary: String(summary).slice(0, 300),
+      content: String(content).slice(0, MAX_REPORT_CHARS),
+      errores,
+      advertencias,
+      runUrl,
+      commit: process.env.GITHUB_SHA || null,
+      runId: process.env.GITHUB_RUN_ID || null,
+      trigger: process.env.GITHUB_EVENT_NAME || 'local',
+      createdAt: FieldValue.serverTimestamp(),
+    });
+    reportSaved = true;
+    console.log('✅ Reporte guardado en Firestore para Centro de Mando.');
+  } catch (e) {
+    console.error('⚠️ No se pudo guardar el reporte en Firestore:', sanitizeErrorMessage(e));
+  }
 }
 
 const KNOWN_ROLES = new Set([
@@ -611,6 +661,13 @@ async function main() {
   console.log('\n' + md);
 
   await upsertAuditIssue(md, findings.length > 0);
+  await saveReportSnapshot({
+    status: errores.length > 0 ? 'error' : (warns.length > 0 ? 'warn' : 'ok'),
+    summary: `${estadoGeneral} (${errores.length} error(es), ${warns.length} advertencia(s))`,
+    content: md,
+    errores: errores.length,
+    advertencias: warns.length,
+  });
 
   console.log('\n=================================================');
   console.log(`✅ Auditoría finalizada. Estado: ${estadoGeneral}`);
@@ -623,15 +680,17 @@ async function main() {
 }
 
 main().catch(async (err) => {
-  console.error('❌ Advertencia en platform_audit.mjs:', err.message || err);
+  console.error('❌ Advertencia en platform_audit.mjs:', sanitizeErrorMessage(err));
+  const safeMessage = sanitizeErrorMessage(err);
   try {
     const errorMd = `# 🔍 Auditoría de Plataforma y Nodus — Estado Actual\n\n` +
       `**Última corrida:** ${new Date().toISOString()}\n` +
       `**Estado general:** 🟡 AUDITORÍA REQUIRIÓ ATENCIÓN\n\n` +
-      `\`\`\`\n${err?.stack || err?.message || String(err)}\n\`\`\`\n`;
+      `La auditoría falló: ${safeMessage}\n\nRevisa el log del run de GitHub Actions para el detalle.\n`;
     await upsertAuditIssue(errorMd, true);
+    await saveReportSnapshot({ status: 'failed', summary: `Auditoría fallida: ${safeMessage}`, content: errorMd, errores: 1 });
   } catch (reportErr) {
-    console.error('⚠️ Tampoco se pudo dejar constancia del error en el Issue:', reportErr.message);
+    console.error('⚠️ Tampoco se pudo dejar constancia del error en el Issue:', sanitizeErrorMessage(reportErr));
   }
   process.exit(0);
 });
