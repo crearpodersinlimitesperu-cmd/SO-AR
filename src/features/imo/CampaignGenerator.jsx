@@ -175,6 +175,22 @@ export default function CampaignGenerator({ missions, defaultSede, defaultEquipo
     });
   }, [missions, sede, origins, search]);
 
+  // Resumen de equipos disponibles dentro de los candidatos
+  const originTeamsSummary = useMemo(() => {
+    const map = new Map();
+    candidates.forEach(m => {
+      const t = parseTeamNumber(m.originTeam) || parseTeamNumber(m.equipo);
+      if (!t) return;
+      if (!map.has(t)) {
+        map.set(t, { team: t, count: 0, candidates: [] });
+      }
+      const item = map.get(t);
+      item.count++;
+      item.candidates.push(m);
+    });
+    return [...map.values()].sort((a, b) => b.team - a.team);
+  }, [candidates]);
+
   // Selección individual
   function choose(m, value) {
     setReviewed(false);
@@ -208,6 +224,26 @@ export default function CampaignGenerator({ missions, defaultSede, defaultEquipo
         originTeam: m.originTeam || parseTeamNumber(m.equipo) || (target ? target - 1 : 1),
         enrolados: getEnrolados(m).map(e => ({ ...e, id: String(e.id || '').replace(/\//g, '_') }))
       };
+    });
+    setChosen(next);
+  }
+
+  // Selección rápida para un Equipo Completo
+  function handleSelectTeam(teamNum, select = true) {
+    setReviewed(false);
+    const next = { ...chosen };
+    const teamCandidates = candidates.filter(m => (parseTeamNumber(m.originTeam) || parseTeamNumber(m.equipo)) === Number(teamNum));
+    teamCandidates.forEach(m => {
+      if (select) {
+        next[m.id] = {
+          sourceMissionId: m.id,
+          nombre: m.imoNombre || '',
+          originTeam: Number(teamNum),
+          enrolados: getEnrolados(m).map(e => ({ ...e, id: String(e.id || '').replace(/\//g, '_') }))
+        };
+      } else {
+        delete next[m.id];
+      }
     });
     setChosen(next);
   }
@@ -376,6 +412,46 @@ export default function CampaignGenerator({ missions, defaultSede, defaultEquipo
             Deseleccionar
           </button>
         </div>
+
+        {/* Acceso Rápido para Equipos Completos */}
+        {originTeamsSummary.length > 0 && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', margin: '6px 0 10px' }}>
+            <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#475569' }}>
+              ⚡ Link para Equipo Completo:
+            </span>
+            {originTeamsSummary.map(ts => {
+              const selectedCount = ts.candidates.filter(c => !!chosen[c.id]).length;
+              const isAllSelected = selectedCount === ts.count && ts.count > 0;
+              return (
+                <button
+                  key={`team_btn_${ts.team}`}
+                  type="button"
+                  disabled={busy}
+                  onClick={() => handleSelectTeam(ts.team, !isAllSelected)}
+                  style={{
+                    background: isAllSelected ? '#2563eb' : '#eff6ff',
+                    color: isAllSelected ? '#ffffff' : '#1d4ed8',
+                    border: isAllSelected ? '1px solid #1d4ed8' : '1px solid #bfdbfe',
+                    borderRadius: '6px',
+                    padding: '4px 10px',
+                    fontSize: '0.78rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                  title={isAllSelected ? `Deseleccionar Equipo ${ts.team}` : `Seleccionar todos los ${ts.count} IMOs del Equipo ${ts.team}`}
+                >
+                  <span>Equipo {ts.team} ({ts.count})</span>
+                  <span style={{ fontSize: '0.72rem', opacity: 0.9 }}>
+                    {isAllSelected ? '✓ Todo' : `+${ts.count}`}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
 
         <p style={{ fontSize: '0.85rem', fontWeight: 600, margin: '8px 0' }}>
           {candidates.length} registros candidatos · {Object.keys(chosen).length} seleccionados. Solo se incluirán los seleccionados en la campaña.
