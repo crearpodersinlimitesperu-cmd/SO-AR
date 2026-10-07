@@ -87,7 +87,7 @@ export function isNodusVerificationUrl(value) {
   }
 }
 
-export async function loginNodusReadOnly(page) {
+export async function loginNodusReadOnly(page, landingPath = '/dashboard') {
   const user = process.env.NODUS_USER;
   const password = process.env.NODUS_PASSWORD;
   if (!user || !password) throw new Error('Faltan los secretos NODUS_USER/NODUS_PASSWORD.');
@@ -110,7 +110,7 @@ export async function loginNodusReadOnly(page) {
     }
   }
 
-  const dashboardResponse = await page.goto(`${NODUS_ORIGIN}/dashboard`, {
+  const landingResponse = await page.goto(new URL(landingPath, NODUS_ORIGIN).href, {
     waitUntil: 'domcontentloaded',
     timeout: 45000
   });
@@ -121,9 +121,11 @@ export async function loginNodusReadOnly(page) {
   if (
     new URL(page.url()).origin !== NODUS_ORIGIN
     || /\/auth\/login\/?$/i.test(new URL(page.url()).pathname)
-    || (dashboardResponse && dashboardResponse.status() >= 400)
+    || (landingResponse && landingResponse.status() >= 400)
   ) {
-    throw new Error('NODUS no confirmó el inicio de sesión; no se reintentó para evitar bloqueo de cuenta.');
+    const finalUrl = new URL(page.url());
+    const status = landingResponse?.status() ?? 'sin respuesta HTTP';
+    throw new Error(`NODUS no confirmó el inicio al abrir ${landingPath}; respuesta ${status}, ruta final ${finalUrl.pathname}. No se reintentó para evitar bloqueo de cuenta.`);
   }
 }
 
