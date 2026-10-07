@@ -694,5 +694,40 @@ service cloud.firestore {
         && request.resource.data.createdAt == request.time;
       allow update, delete: if false;
     }
+
+    // SEDES_INSTITUCIONALES: datos de cartas de invitación. Lectura pública (las
+    // cartas se abren sin sesión). Escribe Super Admin o el gerente de ESA sede,
+    // según users/{uid} (role/roles/sede), nunca según datos enviados por el cliente.
+    function sedeInstitucionalNombre(sedeId) {
+      return {'lima': 'Lima', 'quito': 'Quito', 'cuenca': 'Cuenca',
+              'guayaquil': 'Guayaquil', 'medellin': 'Medellín', 'mexico': 'México'}.get(sedeId, '');
+    }
+    function canEditSedeInstitucional(sedeId) {
+      return isSuperAdmin() || (
+        isAuthenticated() &&
+        sedeInstitucionalNombre(sedeId) != '' &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        (
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', '') == 'gerente' ||
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('appRole', '') == 'gerente' ||
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('roles', []).hasAny(['gerente'])
+        ) &&
+        (
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('sede', '') == sedeInstitucionalNombre(sedeId) ||
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('roleSedes', {}).get('gerente', '') == sedeInstitucionalNombre(sedeId)
+        )
+      );
+    }
+    match /sedes_institucionales/{sedeId} {
+      allow read: if true;
+      allow create, update: if canEditSedeInstitucional(sedeId)
+        && request.resource.data.keys().hasOnly(['razonSocial', 'identificacionFiscal', 'direccionFiscal', 'correoContacto', 'telefonoContacto'])
+        && request.resource.data.razonSocial is string && request.resource.data.razonSocial.size() <= 500
+        && request.resource.data.identificacionFiscal is string && request.resource.data.identificacionFiscal.size() <= 500
+        && request.resource.data.direccionFiscal is string && request.resource.data.direccionFiscal.size() <= 500
+        && request.resource.data.correoContacto is string && request.resource.data.correoContacto.size() <= 500
+        && request.resource.data.telefonoContacto is string && request.resource.data.telefonoContacto.size() <= 500;
+      allow delete: if isSuperAdmin();
+    }
   }
 }
