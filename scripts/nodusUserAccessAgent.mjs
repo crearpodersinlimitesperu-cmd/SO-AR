@@ -287,13 +287,17 @@ export async function runNodusUserAccessReport() {
       status: 'failed',
       coverage: 'incomplete',
       completedAt: FieldValue.serverTimestamp(),
-      failureCode: /captcha|anti-bot|turnstile|verificaci[oó]n/i.test(error.message)
+      failureCode: /diagn[oó]stico verification_required/i.test(error.message)
         ? 'verification_challenge'
-        : /NODUS no confirmó el inicio de sesión/i.test(error.message)
-          ? 'login_not_confirmed'
-          : /login|inicio de sesión|secretos|autentic/i.test(error.message)
-            ? 'authentication_failed'
-            : 'account_list_unavailable'
+        : /diagn[oó]stico access_restricted/i.test(error.message)
+          ? 'access_restricted'
+          : /diagn[oó]stico credentials_rejected/i.test(error.message)
+            ? 'credentials_rejected'
+            : /diagn[oó]stico (login_form_returned|login_error_unclassified|login_not_confirmed|landing_route_rejected)/i.test(error.message)
+              ? 'login_not_confirmed'
+              : /login|inicio de sesión|secretos|autentic/i.test(error.message)
+                ? 'authentication_failed'
+                : 'account_list_unavailable'
     });
     throw error;
   } finally {

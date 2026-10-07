@@ -1,6 +1,11 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { chunkRows, isNodusVerificationUrl, isSafeNodusUrl } from '../scripts/nodusArchiveAgent.mjs';
+import {
+  chunkRows,
+  classifyNodusLoginFeedback,
+  isNodusVerificationUrl,
+  isSafeNodusUrl
+} from '../scripts/nodusArchiveAgent.mjs';
 
 test('only allows HTTPS links inside NODUS and blocks mutation-like routes', () => {
   assert.equal(isSafeNodusUrl('/dashboard'), true);
@@ -17,6 +22,14 @@ test('recognizes only Cloudflare verification routes for NODUS authentication', 
   assert.equal(isNodusVerificationUrl('https://challenges.cloudflare.com/cdn-cgi/challenge-platform/h/g/turnstile/test'), true);
   assert.equal(isNodusVerificationUrl('https://challenges.cloudflare.com/ordinary-page'), false);
   assert.equal(isNodusVerificationUrl('https://example.com/captcha'), false);
+});
+
+test('classifies visible NODUS login feedback without retaining its text', () => {
+  assert.equal(classifyNodusLoginFeedback('Usuario o contraseña incorrectos', true), 'credentials_rejected');
+  assert.equal(classifyNodusLoginFeedback('Verificación Turnstile requerida', true), 'verification_required');
+  assert.equal(classifyNodusLoginFeedback('Acceso denegado', true), 'access_restricted');
+  assert.equal(classifyNodusLoginFeedback('', true), 'login_form_returned');
+  assert.equal(classifyNodusLoginFeedback('', false), 'login_not_confirmed');
 });
 
 test('splits Firestore payloads without dropping rows', () => {
