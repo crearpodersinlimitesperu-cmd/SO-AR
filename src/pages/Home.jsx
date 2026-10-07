@@ -71,16 +71,62 @@ const getEventTeamLabels = (event = {}) => {
     if (value == null) return;
     const text = String(value).trim();
     if (!text) return;
+    const teamPattern = /^(?:(?:equipo|equipos|eq\.?|team|teams)\s*:?\s*)?#?\d+(?:(?:\s*[,/&•-]\s*|\s+y\s+)(?:(?:equipo|equipos|eq\.?|team|teams)\s*:?\s*)?#?\d+)*$/i;
+    if (!teamPattern.test(text)) return;
     const numbers = text.match(/\d+/g) || [];
-    if (numbers.length) {
-      numbers.forEach((number) => labels.add(`#${number}`));
+    if (numbers.length === 1 && [4, 6].includes(numbers[0].length)) {
+      for (let i = 0; i < numbers[0].length; i += 2) {
+        labels.add(`#${numbers[0].slice(i, i + 2)}`);
+      }
     } else {
-      labels.add(text.replace(/^equipo\s*/i, '').trim());
+      numbers.forEach((number) => labels.add(`#${number}`));
     }
   };
   rawValues.forEach(addValue);
 
   return [...labels];
+};
+
+const eventTrainingStage = (event = {}) => {
+  const name = String(event.nombre || event.name || event.entrenamiento || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toUpperCase();
+  if (name.includes('CAPITULO UNO') || /\bC1\b/.test(name)) return 'C1';
+  if (name.includes('CAPITULO DOS') || /\bC2\b/.test(name)) return 'C2';
+  if (name.includes('MAESTRIA DEL JUEGO') || /\bMJ\b/.test(name)) return 'MJ';
+  return '';
+};
+
+const getRelatedEventTeamLabels = (event, allEvents) => {
+  const directLabels = getEventTeamLabels(event);
+  if (directLabels.length) return directLabels;
+
+  const stage = eventTrainingStage(event);
+  if (!stage) return [];
+  const date = new Date(event.fecha_inicio || event.start || '');
+  if (Number.isNaN(date.getTime())) return [];
+
+  const relatedStages = stage === 'MJ' ? ['C2'] : [stage === 'C1' ? 'C2' : 'C1'];
+  const candidates = allEvents.flatMap((candidate) => {
+    if (candidate === event || eventTrainingStage(candidate) === '' ||
+        !relatedStages.includes(eventTrainingStage(candidate)) ||
+        normalizeSede(candidate.sede || candidate.sedeTag || '') !== normalizeSede(event.sede || event.sedeTag || '')) {
+      return [];
+    }
+    const candidateDate = new Date(candidate.fecha_inicio || candidate.start || '');
+    if (Number.isNaN(candidateDate.getTime())) return [];
+    const dayGap = (candidateDate.getTime() - date.getTime()) / 86400000;
+    if (stage === 'MJ' ? dayGap > 0 || dayGap < -60 : Math.abs(dayGap) > 45) return [];
+    return getEventTeamLabels(candidate).map((team) => ({ team, distance: Math.abs(dayGap) }));
+  });
+  if (!candidates.length) return [];
+
+  const nearestDistance = Math.min(...candidates.map((candidate) => candidate.distance));
+  const nearestTeams = new Set(
+    candidates.filter((candidate) => candidate.distance === nearestDistance).map((candidate) => candidate.team)
+  );
+  return [...nearestTeams];
 };
 
 /**
@@ -3198,7 +3244,7 @@ export default function Home() {
                           let evEndDate = new Date(ev.fecha_fin || baseDate || new Date());
                           const hotelVenue = getVenueForTraining(ev.sede || ev.sedeTag || currentUser?.sede, ev.nombre || ev.name, ev.lugar, ev.direccion);
                           const confirmedTrainerLabel = assignedTrainerNamesForEvent(ev).join(' / ');
-                          const teamLabels = getEventTeamLabels(ev);
+                          const teamLabels = getRelatedEventTeamLabels(ev, profileEvents);
 
                           return (
                             <li key={i} style={{ padding: '0.6rem 0', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.8rem' }}>
