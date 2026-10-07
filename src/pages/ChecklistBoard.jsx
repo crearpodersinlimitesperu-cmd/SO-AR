@@ -9,6 +9,7 @@ import { useUI } from '../context/UIContext';
 import { roles } from '../data/checklistData';
 import { usersData, normalizeRole, normalizeSede, OPERATIONAL_SEDES, isForeignTask, ROLE_COLORS, ROLE_DISPLAY_NAMES, getRoleDisplayName } from '../data/usersData';
 import { calculateAutomaticDeadline } from '../utils/soarDates';
+import { isTaskVisibleForUser } from '../utils/taskPrivacy';
 import { ArrowLeft, Target, Link as LinkIcon, Edit3, Clock, ShieldAlert, Users, Sparkles, MapPin, Search, X } from 'lucide-react';
 import TaskAssignmentModal from '../components/TaskAssignmentModal';
 import TaskCollaborationModal from '../components/TaskCollaborationModal';
@@ -96,7 +97,7 @@ export default function ChecklistBoard() {
   });
   const [searchQuery, setSearchQuery] = useState('');
 
-  const { tasks, toggleTask, updateTaskDetails, inviteCollaborator, syncTasksToGoogle, updateIndividualProgress, acceptCollaboration, rejectCollaboration } = useChecklist();
+  const { tasks, taskLoadError, toggleTask, updateTaskDetails, inviteCollaborator, syncTasksToGoogle, updateIndividualProgress, acceptCollaboration, rejectCollaboration } = useChecklist();
   const { currentCycle, currentStage, quitoCycles } = useCycles();
   const { showPrompt } = useUI();
 
@@ -132,27 +133,24 @@ export default function ChecklistBoard() {
 
   // Verificación de Autorización por Rol (N7)
   const isAuthorized = currentUser?.canAccessRole ? currentUser.canAccessRole(roleId) : true;
-  if (!isAuthorized) {
-    return (
-      <div style={{ maxWidth: '600px', margin: '4rem auto', padding: '2rem', textAlign: 'center' }} className="glass-panel">
-        <ShieldAlert size={48} color="#ef4444" style={{ marginBottom: '1rem' }} />
-        <h2 style={{ color: '#fff', margin: '0 0 0.5rem' }}>Acceso Restringido</h2>
-        <p className="text-muted" style={{ marginBottom: '1.5rem' }}>
-          Tu rol asignado ({currentUser?.appRole}) no tiene autorización para acceder al checklist de <strong>{role?.name || roleId}</strong>.
-        </p>
-        <button className="btn-secondary" onClick={() => navigate('/home')}>Volver a Mi Inicio</button>
-      </div>
-    );
-  }
 
   // Las tareas mías incluyen: rol directo, asignadas a mi correo O donde soy colaborador aceptado
   const myTasks = tasks.filter(t => {
+    if (!isTaskVisibleForUser(t, currentUser)) return false;
+
     const userEmailCom = currentUser?.email?.replace('@crearpsl.net', '@crearpsl.com')?.toLowerCase();
     const userEmailNet = currentUser?.email?.replace('@crearpsl.com', '@crearpsl.net')?.toLowerCase();
-
-    const isAssigned = (t.assignedToEmails && t.assignedToEmails.some(e => e.toLowerCase() === userEmailCom || e.toLowerCase() === userEmailNet)) || t.assignedToEmail?.toLowerCase() === userEmailCom || t.assignedToEmail?.toLowerCase() === userEmailNet;
-    const isCollaborator = t.collaborators?.some(c => c.toLowerCase() === userEmailCom || c.toLowerCase() === userEmailNet);
-    const isMyCreation = t.createdBy?.toLowerCase() === userEmailCom || t.createdBy?.toLowerCase() === userEmailNet;
+    const userEmails = new Set([userEmailCom, userEmailNet].filter(Boolean));
+    const matchesUser = (value) => {
+      const values = Array.isArray(value) ? value : [value];
+      return values.some(entry => {
+        const email = typeof entry === 'string' ? entry : entry?.email;
+        return email && userEmails.has(email.toLowerCase());
+      });
+    };
+    const isAssigned = matchesUser(t.assignedToEmails) || matchesUser(t.assignedToEmail);
+    const isCollaborator = matchesUser(t.collaborators);
+    const isMyCreation = matchesUser([t.createdBy, t.createdByEmail]);
 
     // FIX (16/09/2026): José reportó, con captura, que su Consolidado (filtrado
     // a "Mi Sede (Lima)") mostraba tareas de otras sedes con personas de otras
@@ -238,18 +236,29 @@ export default function ChecklistBoard() {
   // Pestañas de fases operativas: permanentemente activas para todos los usuarios de oficina (PRE-C1, C1, POST-C1, PRE-C2, C2, PRE-MJ, MJ, POST-MJ)
   const showPhaseTabs = true;
   const isCurrentStageInRole = effectiveStage && PHASE_ORDER.includes(effectiveStage);
+  const hasTasksForCurrentStage = myTasks.some(task => task.cyclePhase === effectiveStage);
 
   // AUTO-FALLBACK: Si la pestaña actual es 'active', pero el rol no tiene tareas asignadas
   // para esa fase cronológica, y SÍ tiene tareas en general, cambiamos automáticamente 
   // la pestaña a 'all' (Todo el Catálogo) para evitar que el usuario vea un tablero vacío.
   useEffect(() => {
-    if (qtPhaseFilter === 'active' && isCurrentStageInRole && myTasks.length > 0) {
-      const activePhaseTaskCount = myTasks.filter(t => t.cyclePhase === effectiveStage).length;
-      if (activePhaseTaskCount === 0) {
-        setQtPhaseFilter('all');
-      }
+    if (isAuthorized && qtPhaseFilter === 'active' && isCurrentStageInRole && myTasks.length > 0 && !hasTasksForCurrentStage) {
+      setQtPhaseFilter('all');
     }
-  }, [qtPhaseFilter, isCurrentStageInRole, effectiveStage, myTasks.length]);
+  }, [isAuthorized, qtPhaseFilter, isCurrentStageInRole, myTasks.length, hasTasksForCurrentStage]);
+
+  if (!isAuthorized) {
+    return (
+      <div style={{ maxWidth: '600px', margin: '4rem auto', padding: '2rem', textAlign: 'center' }} className="glass-panel">
+        <ShieldAlert size={48} color="#ef4444" style={{ marginBottom: '1rem' }} />
+        <h2 style={{ color: '#fff', margin: '0 0 0.5rem' }}>Acceso Restringido</h2>
+        <p className="text-muted" style={{ marginBottom: '1.5rem' }}>
+          Tu rol asignado ({currentUser?.appRole}) no tiene autorización para acceder al checklist de <strong>{role?.name || roleId}</strong>.
+        </p>
+        <button className="btn-secondary" onClick={() => navigate('/home')}>Volver a Mi Inicio</button>
+      </div>
+    );
+  }
 
   const sortByDeadline = (tasksArray) => {
     return tasksArray.sort((a, b) => {
@@ -472,6 +481,12 @@ export default function ChecklistBoard() {
       <button onClick={() => navigate(-1)} className="btn-secondary" style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem' }}>
         <ArrowLeft size={18} /> Volver
       </button>
+
+      {taskLoadError && (
+        <div role="alert" style={{ marginBottom: '1rem', padding: '0.85rem 1rem', borderRadius: '8px', color: '#fef3c7', background: 'rgba(245, 158, 11, 0.12)', border: '1px solid rgba(245, 158, 11, 0.4)' }}>
+          {taskLoadError}
+        </div>
+      )}
 
       <div className="glass-panel" style={{ padding: '2rem', marginBottom: '2rem' }}>
         <h1 className="text-gold uppercase" style={{ fontSize: '1.8rem', margin: '0 0 0.5rem 0' }}>{role.name}</h1>
@@ -1390,4 +1405,3 @@ export default function ChecklistBoard() {
     </div>
   );
 }
-

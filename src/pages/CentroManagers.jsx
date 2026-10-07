@@ -185,7 +185,7 @@ export default function CentroManagers() {
   const canChangeStatus = canChangeManagerStatus(currentUser);
   const userCanAdd = canAddManagers(currentUser);
   const userCanAssign = canAssignTrainer(currentUser);
-  // Pestaña de Liquidación de Entrenadores: solo José Sánchez y Elizabeth Escobar (02/09/2026)
+  // Liquidación y KPIs comparten el permiso reservado a Dirección/SuperAdmin.
   const canViewLiquidacion = canViewLiquidacionEntrenadores(currentUser);
   const canReversarPago = canReverseLiquidacionEntrenadores(currentUser);
   // Pestaña de KPIs de Llamadas: REGLA ESTRICTA (05/09/2026) solo Directores y José Sánchez / SuperAdmin
@@ -4348,8 +4348,7 @@ export default function CentroManagers() {
           )
         )}
 
-        {/* LIQUIDACIÓN DE ENTRENADORES (02/09/2026, rediseño 09/09/2026) — solo José Sánchez y Elizabeth Escobar */}
-        {/* LIQUIDACIÓN DE ENTRENADORES Y PAGOS OFICIALES (Actualizado 12/09/2026 - Solo José Sánchez y Directores) */}
+        {/* Liquidación de entrenadores y pagos oficiales: mismo acceso restringido que los KPIs de llamadas. */}
         {activeTab === 'liquidacion' && canViewLiquidacion && (
           <div>
             {/* ENCABEZADO CON SEGURIDAD Y ACCESO DIRECTO A LA PLANILLA OFICIAL */}

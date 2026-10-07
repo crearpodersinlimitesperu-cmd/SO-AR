@@ -911,7 +911,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                         boxShadow: '0 10px 25px rgba(0,0,0,0.8)',
                         zIndex: 100,
                         padding: '4px'
-                      }}>
+                      }} className="task-assignee-results">
                         {filteredLiteUsers.slice(0, 15).map(u => {
                           const isSelected = newTask.assignedToEmails?.some(em => em.toLowerCase() === u.email?.toLowerCase());
                           const roleDisplay = getRoleDisplayName(u.role);
@@ -928,6 +928,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                           return (
                             <div
                               key={u.email}
+                              className={`task-assignee-result${isSelected ? ' is-selected' : ''}`}
                               onClick={() => {
                                 toggleUserSelection(u.email);
                                 setLiteSearch('');
@@ -948,10 +949,10 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                             >
                               <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', minWidth: 0 }}>
                                 <span style={{ fontWeight: isSelected ? 700 : 500 }}>{displayLabel}</span>
-                                <span style={{ fontSize: '0.66rem', color: 'var(--text-muted)' }}>• {roleDisplay}</span>
-                                <span style={{ fontSize: '0.66rem', color: 'var(--text-muted)' }}>({flag} {sedeDisplay})</span>
+                                <span className="task-assignee-meta" style={{ fontSize: '0.66rem', color: 'var(--text-muted)' }}>• {roleDisplay}</span>
+                                <span className="task-assignee-meta" style={{ fontSize: '0.66rem', color: 'var(--text-muted)' }}>({flag} {sedeDisplay})</span>
                               </div>
-                              <span style={{ fontSize: '0.7rem', color: isSelected ? 'var(--crear-gold)' : 'var(--crear-cyan)', fontWeight: 700, flexShrink: 0 }}>
+                              <span className="task-assignee-action" style={{ fontSize: '0.7rem', color: isSelected ? 'var(--crear-gold)' : 'var(--crear-cyan)', fontWeight: 700, flexShrink: 0 }}>
                                 {isSelected ? '✓ Asignado' : '+ Asignar'}
                               </span>
                             </div>

@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { getFlagForSede } from '../utils/flags';
 import { getTaskProgressRoles } from '../utils/taskProgressRoles';
+import { isTaskVisibleForUser } from '../utils/taskPrivacy';
 import { createGoogleEvent } from '../services/googleSync';
 import { calculateAutomaticDeadline } from '../utils/soarDates';
 import TaskAssignmentModal from '../components/TaskAssignmentModal';
@@ -43,6 +44,99 @@ import { getOverdueAssignedTasks } from '../utils/overdueTasks';
 import HorariosEntrenamientoModal from '../components/HorariosEntrenamientoModal';
 import { INITIAL_MANAGERS, normalizeTrainer } from '../data/managersData';
 import { formatTrainerDisplayName, nombreLegalEntrenador, normalizarIdentidadEntrenador } from '../data/trainerAliases';
+
+const getEventTeamLabels = (event = {}) => {
+  const rawValues = [
+    event.equipos,
+    event.numEquipos,
+    event.equipo,
+    event.team,
+    event.numEquipo,
+    event.teamNum,
+    event.data?.equipos,
+    event.data?.equipo,
+    event.data?.team,
+    event.data?.numEquipo
+  ];
+  const labels = new Set();
+
+  const addValue = (value) => {
+    if (Array.isArray(value)) {
+      value.forEach(addValue);
+      return;
+    }
+    if (value && typeof value === 'object') {
+      addValue(value.numEquipo ?? value.teamNum ?? value.equipo ?? value.team);
+      return;
+    }
+    if (value == null) return;
+    const text = String(value).trim();
+    if (!text) return;
+    const teamPattern = /^(?:(?:equipo|equipos|eq\.?|team|teams)\s*:?\s*)?#?\d+(?:(?:\s*[,/&•-]\s*|\s+y\s+)(?:(?:equipo|equipos|eq\.?|team|teams)\s*:?\s*)?#?\d+)*$/i;
+    if (!teamPattern.test(text)) return;
+    const numbers = text.match(/\d+/g) || [];
+    if (numbers.length === 1 && [4, 6].includes(numbers[0].length)) {
+      for (let i = 0; i < numbers[0].length; i += 2) {
+        labels.add(`#${numbers[0].slice(i, i + 2)}`);
+      }
+    } else {
+      numbers.forEach((number) => labels.add(`#${number}`));
+    }
+  };
+  rawValues.forEach(addValue);
+
+  return [...labels];
+};
+
+const eventTrainingStage = (event = {}) => {
+  const name = String(event.nombre || event.name || event.entrenamiento || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toUpperCase();
+  if (name.includes('CAPITULO UNO') || /\bC1\b/.test(name)) return 'C1';
+  if (name.includes('CAPITULO DOS') || /\bC2\b/.test(name)) return 'C2';
+  if (name.includes('MAESTRIA DEL JUEGO') || /\bMJ\b/.test(name)) return 'MJ';
+  return '';
+};
+
+const getRelatedEventTeamLabels = (event, allEvents) => {
+  const directLabels = getEventTeamLabels(event);
+  if (directLabels.length) return directLabels;
+
+  const stage = eventTrainingStage(event);
+  const date = new Date(event.fecha_inicio || event.start || '');
+  const eventSede = event.sede || event.sedeTag || '';
+  if (!eventSede || Number.isNaN(date.getTime())) return [];
+
+  const relatedStages = stage === 'MJ'
+    ? ['C2']
+    : stage === 'C1' || stage === 'C2'
+      ? [stage === 'C1' ? 'C2' : 'C1']
+      : null;
+  const candidates = allEvents.flatMap((candidate) => {
+    const candidateStage = eventTrainingStage(candidate);
+    const candidateSede = candidate.sede || candidate.sedeTag || '';
+    if (candidate === event ||
+        (relatedStages && !relatedStages.includes(candidateStage)) ||
+        (stage === 'MJ' && candidateStage !== 'C2') ||
+        !candidateSede ||
+        normalizeSede(candidateSede) !== normalizeSede(eventSede)) {
+      return [];
+    }
+    const candidateDate = new Date(candidate.fecha_inicio || candidate.start || '');
+    if (Number.isNaN(candidateDate.getTime())) return [];
+    const dayGap = (candidateDate.getTime() - date.getTime()) / 86400000;
+    if (stage === 'MJ' ? dayGap > 0 || dayGap < -60 : Math.abs(dayGap) > 45) return [];
+    return getEventTeamLabels(candidate).map((team) => ({ team, distance: Math.abs(dayGap) }));
+  });
+  if (!candidates.length) return [];
+
+  const nearestDistance = Math.min(...candidates.map((candidate) => candidate.distance));
+  const nearestTeams = new Set(
+    candidates.filter((candidate) => candidate.distance === nearestDistance).map((candidate) => candidate.team)
+  );
+  return [...nearestTeams];
+};
 
 /**
  * Normaliza y verifica si un evento está asignado a un entrenador específico
@@ -1082,11 +1176,13 @@ export default function Home() {
       try {
         const snap = await getDoc(doc(db, 'checklist_tasks', notif.taskId));
         if (snap.exists()) {
-          targetTask = { id: snap.id, ...snap.data() };
+          const candidate = { id: snap.id, ...snap.data() };
+          if (isTaskVisibleForUser(candidate, currentUser)) targetTask = candidate;
         } else {
           const snap2 = await getDoc(doc(db, 'tasks', notif.taskId));
           if (snap2.exists()) {
-            targetTask = { id: snap2.id, ...snap2.data() };
+            const candidate = { id: snap2.id, ...snap2.data() };
+            if (isTaskVisibleForUser(candidate, currentUser)) targetTask = candidate;
           }
         }
       } catch (err) {
@@ -3159,12 +3255,18 @@ export default function Home() {
                           let evEndDate = new Date(ev.fecha_fin || baseDate || new Date());
                           const hotelVenue = getVenueForTraining(ev.sede || ev.sedeTag || currentUser?.sede, ev.nombre || ev.name, ev.lugar, ev.direccion);
                           const confirmedTrainerLabel = assignedTrainerNamesForEvent(ev).join(' / ');
+                          const teamLabels = getRelatedEventTeamLabels(ev, profileEvents);
 
                           return (
                             <li key={i} style={{ padding: '0.6rem 0', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.8rem' }}>
                               <div style={{ minWidth: 0 }}>
                                 <span className="text-white" style={{ fontWeight: 'bold', fontSize: '0.92rem', display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                   {ev.nombre || ev.name || 'Entrenamiento'}
+                                </span>
+                                <span style={{ fontSize: '0.75rem', color: teamLabels.length ? 'var(--crear-cyan)' : '#f59e0b', display: 'block', marginTop: '0.15rem', fontWeight: 700 }}>
+                                  {teamLabels.length
+                                    ? `${teamLabels.length > 1 ? 'Equipos' : 'Equipo'} ${teamLabels.join(' · ')}`
+                                    : 'Equipo: número no especificado en el calendario'}
                                 </span>
                                 <span style={{ fontSize: '0.75rem', color: 'var(--crear-cyan)', display: 'block', marginTop: '0.1rem' }}>
                                   🏨 {hotelVenue}
