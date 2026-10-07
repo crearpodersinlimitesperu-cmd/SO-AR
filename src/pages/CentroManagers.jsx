@@ -38,7 +38,7 @@ import {
 import { OPERATIONAL_SEDES, normalizeRole, normalizeSede } from '../data/usersData';
 import { recordAuditEvent } from '../services/auditService';
 import { db } from '../services/firebase';
-import { collection, getDocs, doc, addDoc, setDoc, updateDoc, deleteDoc, writeBatch, onSnapshot, serverTimestamp, query, where, arrayUnion, runTransaction } from 'firebase/firestore';
+import { collection, getDocs, doc, addDoc, setDoc, updateDoc, deleteDoc, deleteField, writeBatch, onSnapshot, serverTimestamp, query, where, arrayUnion, runTransaction } from 'firebase/firestore';
 import CountryFlag from '../components/CountryFlag';
 import { 
   FolderOpen,
@@ -1595,7 +1595,9 @@ export default function CentroManagers() {
           teams[k].cierreManual = {
             fecha: m.cierreLiquidacionFecha || '',
             porNombre: m.cierreLiquidacionPorNombre || '',
-            porEmail: m.cierreLiquidacionPorEmail || ''
+            porEmail: m.cierreLiquidacionPorEmail || '',
+            motivo: m.cierreLiquidacionMotivo || '',
+            reabrible: m.cierreLiquidacionMotivo !== 'graduacion_automatica'
           };
         }
       });
@@ -1677,6 +1679,7 @@ export default function CentroManagers() {
 
       const item = {
         equipoKey,
+        pagoDocId: pago?.id || equipoKey,
         equipo,
         numEquipo,
         sede,
@@ -1991,6 +1994,13 @@ export default function CentroManagers() {
       return;
     }
 
+    const confirmado = window.confirm(
+      `¿Cerrar el equipo ${team.equipo} (${team.sede}) para enviarlo a Liquidación?\n\n` +
+      `Los integrantes activos pasarán a estado Graduado y el equipo aparecerá en Pendientes de pago. ` +
+      `Si fue un error, un coordinador podrá volver a abrirlo desde Liquidación para que continúe su curso.`
+    );
+    if (!confirmado) return;
+
     try {
       const batch = writeBatch(db);
       const nowISO = new Date().toISOString();
@@ -2010,10 +2020,12 @@ export default function CentroManagers() {
         const payload = {
           ...m,
           estado: finalEstado,
+          estadoAntesCierreLiquidacion: m.estado || 'Activo',
           cierreLiquidacionActivo: true,
           cierreLiquidacionFecha: nowISO,
           cierreLiquidacionPorNombre: userName,
-          cierreLiquidacionPorEmail: userEmail
+          cierreLiquidacionPorEmail: userEmail,
+          cierreLiquidacionMotivo: 'cierre_manual'
         };
 
         // Eliminar valores undefined para evitar rechazo estricto de Firestore
@@ -2036,10 +2048,12 @@ export default function CentroManagers() {
         return { 
           ...m, 
           estado: finalEstado,
+          estadoAntesCierreLiquidacion: m.estado || 'Activo',
           cierreLiquidacionActivo: true, 
           cierreLiquidacionFecha: nowISO, 
           cierreLiquidacionPorNombre: userName, 
-          cierreLiquidacionPorEmail: userEmail 
+          cierreLiquidacionPorEmail: userEmail,
+          cierreLiquidacionMotivo: 'cierre_manual'
         };
       }));
 
@@ -2060,6 +2074,111 @@ export default function CentroManagers() {
     } catch (err) {
       console.error('Error cerrando equipo para liquidación:', err);
       showToast(`No se pudo marcar el equipo como cerrado: ${err.message || 'Error de conexión'}`, 'error');
+    }
+  };
+
+  const handleReabrirEquipoLiquidacion = async (item) => {
+    if (!canChangeStatus || !item.cierreManual?.reabrible) {
+      showToast('No tienes permiso para volver a abrir este equipo.', 'warning');
+      return;
+    }
+    const confirmado = window.confirm(
+      `¿Volver a abrir el equipo ${item.equipo} (${item.sede})?\n\n` +
+      `Se quitará el cierre de Liquidación y el equipo dejará de estar pendiente por cierre. ` +
+      `Los estados previos de sus integrantes se restaurarán para que continúe su curso.`
+    );
+    if (!confirmado) return;
+
+    const targetSede = normalizeSede(item.sede);
+    const targetEquipoNum = getTeamNumericValue(item);
+    const miembros = managers.filter((m) =>
+      m.cierreLiquidacionActivo &&
+      normalizeSede(m.sede) === targetSede &&
+      getTeamNumericValue(m) === targetEquipoNum &&
+      getTeamNumericValue(m) !== 999999
+    );
+    if (miembros.length === 0) {
+      showToast(`No se encontraron integrantes con cierre activo para ${item.equipo}.`, 'warning');
+      return;
+    }
+
+    const userName = currentUser?.name || currentUser?.displayName || 'Coordinador';
+    const userEmail = currentUser?.email || '';
+    const nowISO = new Date().toISOString();
+    try {
+      const batch = writeBatch(db);
+      miembros.forEach((m) => {
+        const docRef = doc(db, 'managers_directory', (m.docId || m.id).toString());
+        const estadoAnterior = m.estadoAntesCierreLiquidacion;
+        const estadoRestaurado = estadoAnterior || (
+          normalizeManagerEstado(m.estado) === 'Graduado' ? 'Activo' : m.estado
+        );
+        batch.set(docRef, {
+          estado: estadoRestaurado || 'Activo',
+          cierreLiquidacionActivo: false,
+          cierreLiquidacionReabiertoFecha: nowISO,
+          cierreLiquidacionReabiertoPorNombre: userName,
+          cierreLiquidacionReabiertoPorEmail: userEmail,
+          estadoAntesCierreLiquidacion: deleteField()
+        }, { merge: true });
+      });
+
+      // Un disparador de cierre previo no debe mantener al equipo en la cola;
+      // el umbral normal de siete llamadas seguirá activándolo cuando corresponda.
+      batch.set(doc(db, 'liquidaciones_pagos', item.pagoDocId || item.equipoKey), {
+        equipoKey: item.equipoKey,
+        equipo: item.equipo,
+        numEquipo: item.numEquipo || '',
+        sede: item.sede,
+        estado: 'reabierto',
+        motivo: 'reabierto',
+        reabiertoFecha: nowISO,
+        reabiertoPorNombre: userName,
+        reabiertoPorEmail: userEmail,
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+      await batch.commit();
+
+      setManagers((prev) => prev.map((m) => {
+        const matches = m.cierreLiquidacionActivo &&
+          normalizeSede(m.sede) === targetSede &&
+          getTeamNumericValue(m) === targetEquipoNum &&
+          getTeamNumericValue(m) !== 999999;
+        if (!matches) return m;
+        const estadoRestaurado = m.estadoAntesCierreLiquidacion || (
+          normalizeManagerEstado(m.estado) === 'Graduado' ? 'Activo' : m.estado
+        );
+        const managerSinEstadoPrevio = { ...m };
+        delete managerSinEstadoPrevio.estadoAntesCierreLiquidacion;
+        return {
+          ...managerSinEstadoPrevio,
+          estado: estadoRestaurado || 'Activo',
+          cierreLiquidacionActivo: false,
+          cierreLiquidacionReabiertoFecha: nowISO,
+          cierreLiquidacionReabiertoPorNombre: userName,
+          cierreLiquidacionReabiertoPorEmail: userEmail
+        };
+      }));
+
+      try {
+        await recordAuditEvent({
+          action: 'REAPERTURA_EQUIPO_LIQUIDACION',
+          email: userEmail,
+          name: userName,
+          role: currentUser?.appRole || currentUser?.role || '',
+          sede: item.sede,
+          details: `Equipo ${item.equipo} (${item.sede}) reabierto desde Liquidación por ${userName}; puede continuar su curso.`,
+          module: 'Liquidacion_Equipos'
+        });
+      } catch (auditErr) {
+        console.error('Auditoría de reapertura falló (la reapertura sí se guardó):', auditErr);
+        showToast(`Equipo reabierto, pero falló el registro de auditoría. Avisa a soporte.`, 'warning');
+        return;
+      }
+      showToast(`Equipo ${item.equipo} (${item.sede}) reabierto; puede continuar su curso.`, 'success');
+    } catch (err) {
+      console.error('Error reabriendo equipo desde liquidación:', err);
+      showToast(`No se pudo volver a abrir el equipo: ${err.message || 'Error de conexión'}`, 'error');
     }
   };
 
@@ -4762,6 +4881,15 @@ export default function CentroManagers() {
                               <td style={{ padding: '0.65rem 0.6rem', fontWeight: 700, color: '#059669' }}>${item.montoUSD}</td>
                               <td style={{ padding: '0.65rem 0.6rem' }}>
                                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'nowrap' }}>
+                                  {item.cierreManual?.reabrible && canChangeStatus && (
+                                    <button
+                                      onClick={() => handleReabrirEquipoLiquidacion(item)}
+                                      title="Quita el cierre y restaura los estados previos para que el equipo continúe su curso"
+                                      style={{ padding: '0.4rem 0.7rem', borderRadius: '6px', border: '1px solid #2563eb', background: '#eff6ff', color: '#1d4ed8', fontWeight: 700, cursor: 'pointer', fontSize: '0.8rem', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
+                                    >
+                                      <RotateCcw size={13} /> Volver a abrir
+                                    </button>
+                                  )}
                                   <button
                                     onClick={() => handleMarcarPagado(item)}
                                     style={{ padding: '0.4rem 0.8rem', borderRadius: '6px', border: 'none', background: '#10b981', color: '#fff', fontWeight: 700, cursor: 'pointer', fontSize: '0.8rem', whiteSpace: 'nowrap' }}
