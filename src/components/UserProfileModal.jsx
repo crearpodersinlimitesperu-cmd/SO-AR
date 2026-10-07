@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { calculateAutomaticDeadline } from '../utils/soarDates';
 import { useCycles } from '../context/CyclesContext';
 import { cyclesData } from '../data/cyclesData';
+import { getOverdueAssignedTasks, getTaskDisplayName } from '../utils/overdueTasks';
 import { 
   X, User, Users, CheckCircle2, Clock, AlertTriangle, 
   FileText, Link2, Plus, Trash2, ExternalLink, Calendar, 
@@ -396,6 +397,11 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
       return (a.task || a.title || '').localeCompare(b.task || b.title || '');
     });
   }, [allTasks, user, currentUser, canonicalRole, currentCycle, taskSortOrder]);
+
+  const overdueAlertTasks = useMemo(
+    () => getOverdueAssignedTasks(allTasks, user?.email),
+    [allTasks, user?.email]
+  );
 
   const completedTasks = useMemo(() => {
     if (!user) return [];
@@ -1494,6 +1500,20 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
 
           {/* Modal Body with scroll */}
           <div style={{ padding: '1.5rem 2rem', overflowY: 'auto', flex: 1 }}>
+
+            {overdueAlertTasks.length > 0 && (
+              <div role="alert" style={{ marginBottom: '1rem', padding: '1rem 1.1rem', borderRadius: '10px', background: 'linear-gradient(135deg, #b91c1c, #c2410c)', border: '3px solid #fecaca', borderLeft: '10px solid #fde047', boxShadow: '0 0 0 1px #7f1d1d, 0 4px 14px rgba(220,38,38,0.45)', color: '#ffffff' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 800, fontSize: '1.05rem', color: '#ffffff' }}>
+                  <AlertTriangle size={20} aria-hidden="true" />
+                  {overdueAlertTasks.length === 1
+                    ? '1 tarea vencida hace más de 72 horas'
+                    : `${overdueAlertTasks.length} tareas vencidas hace más de 72 horas`}
+                </div>
+                <ul style={{ margin: '0.5rem 0 0', paddingLeft: '1.2rem', fontSize: '0.9rem', fontWeight: 600, color: '#fff' }}>
+                  {overdueAlertTasks.map(t => <li key={t.id || getTaskDisplayName(t)}>{getTaskDisplayName(t)}</li>)}
+                </ul>
+              </div>
+            )}
 
             {/* TAB 1: TASKS */}
             {activeTab === 'tasks' && (

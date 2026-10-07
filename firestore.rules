@@ -232,8 +232,24 @@ service cloud.firestore {
 
     // NOTIFICATIONS (userId siempre es el correo, nunca el uid)
     match /notifications/{notifId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated();
+      allow read: if isAuthenticated() && resource.data.userId == email();
+      // TRADEOFF: los productores (ChecklistContext, PortfolioBoard, ComunicadosOperativos,
+      // scheduleGovernanceAgent, ExcellenceService) escriben desde el cliente a OTROS
+      // destinatarios y no registran remitente verificable, así que Rules no puede validar
+      // remitente->destinatario. Se limita al máximo: solo esquema conocido, sin leídas,
+      // textos acotados. El destinatario es el único que puede leer/actualizar/borrar.
+      // Pendiente recomendado: mover la publicación a backend (Cloud Function).
+      allow create: if isAuthenticated()
+        && request.resource.data.keys().hasAll(['userId', 'title', 'message', 'read', 'created_at'])
+        && request.resource.data.keys().hasOnly(['userId', 'title', 'message', 'read', 'created_at',
+             'createdAt', 'timestamp', 'type', 'taskId', 'taskMessageId', 'taskTitle', 'inviterEmail',
+             'inviterName', 'sede', 'standardId', 'priority', 'requiresAction', 'communicationId'])
+        && request.resource.data.userId is string
+        && request.resource.data.userId.matches('.+@.+')
+        && request.resource.data.title is string && request.resource.data.title.size() <= 1000
+        && request.resource.data.message is string && request.resource.data.message.size() <= 20000
+        && request.resource.data.read == false
+        && request.resource.data.created_at is string;
       allow update: if isAuthenticated() && resource.data.userId == email();
       allow delete: if isAuthenticated() && resource.data.userId == email();
     }
@@ -658,6 +674,59 @@ service cloud.firestore {
           'pdf_storage_path', 'pdf_download_url', 'pdfStoragePath', 'pdfDownloadUrl',
           'nodus_synced', 'nodus_synced_at', 'nodusSynced', 'nodusSyncedAt'
         ]));
+      allow delete: if isSuperAdmin();
+    }
+    // Reportes de diagnóstico (Centro de Mando). Solo Super Admin lee.
+    // "automatic" lo escribe únicamente el Admin SDK (bypass de reglas).
+    // "copilot_deep": solo Super Admin, append-only y validado.
+    match /platform_diagnostic_reports/{reportId} {
+      allow read: if isSuperAdmin();
+      allow create: if isSuperAdmin()
+        && request.resource.data.keys().hasOnly(['source', 'title', 'content', 'createdAt', 'createdBy'])
+        && request.resource.data.source == 'copilot_deep'
+        && request.resource.data.title is string
+        && request.resource.data.title.size() > 0
+        && request.resource.data.title.size() <= 150
+        && request.resource.data.content is string
+        && request.resource.data.content.size() >= 50
+        && request.resource.data.content.size() <= 50000
+        && request.resource.data.createdBy == email()
+        && request.resource.data.createdAt == request.time;
+      allow update, delete: if false;
+    }
+
+    // SEDES_INSTITUCIONALES: datos de cartas de invitación. Lectura pública (las
+    // cartas se abren sin sesión). Escribe Super Admin o el gerente de ESA sede,
+    // según users/{uid} (role/roles/sede), nunca según datos enviados por el cliente.
+    function sedeInstitucionalNombre(sedeId) {
+      return {'lima': 'Lima', 'quito': 'Quito', 'cuenca': 'Cuenca',
+              'guayaquil': 'Guayaquil', 'medellin': 'Medellín', 'mexico': 'México'}.get(sedeId, '');
+    }
+    function canEditSedeInstitucional(sedeId) {
+      return isSuperAdmin() || (
+        isAuthenticated() &&
+        sedeInstitucionalNombre(sedeId) != '' &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        (
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', '') == 'gerente' ||
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('appRole', '') == 'gerente' ||
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('roles', []).hasAny(['gerente'])
+        ) &&
+        (
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('sede', '') == sedeInstitucionalNombre(sedeId) ||
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('roleSedes', {}).get('gerente', '') == sedeInstitucionalNombre(sedeId)
+        )
+      );
+    }
+    match /sedes_institucionales/{sedeId} {
+      allow read: if true;
+      allow create, update: if canEditSedeInstitucional(sedeId)
+        && request.resource.data.keys().hasOnly(['razonSocial', 'identificacionFiscal', 'direccionFiscal', 'correoContacto', 'telefonoContacto'])
+        && request.resource.data.razonSocial is string && request.resource.data.razonSocial.size() <= 500
+        && request.resource.data.identificacionFiscal is string && request.resource.data.identificacionFiscal.size() <= 500
+        && request.resource.data.direccionFiscal is string && request.resource.data.direccionFiscal.size() <= 500
+        && request.resource.data.correoContacto is string && request.resource.data.correoContacto.size() <= 500
+        && request.resource.data.telefonoContacto is string && request.resource.data.telefonoContacto.size() <= 500;
       allow delete: if isSuperAdmin();
     }
   }

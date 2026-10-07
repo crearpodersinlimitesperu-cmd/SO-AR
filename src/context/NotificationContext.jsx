@@ -3,6 +3,7 @@ import { db } from '../services/firebase';
 import { collection, query, where, onSnapshot, doc, updateDoc, writeBatch } from 'firebase/firestore';
 import { useAuth } from './AuthContext';
 import { useUI } from './UIContext';
+import { getNotificationToast, normalizeEmail } from '../utils/notificationMessages';
 
 const NotificationContext = createContext();
 
@@ -46,7 +47,7 @@ export function NotificationProvider({ children }) {
 
     const q = query(
       collection(db, 'notifications'),
-      where('userId', '==', currentUser.email)
+      where('userId', '==', normalizeEmail(currentUser.email))
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -62,7 +63,7 @@ export function NotificationProvider({ children }) {
              const isRecent = (new Date() - new Date(data.created_at)) < 10000;
              if (isRecent) {
                  hasNew = true;
-                 showToast(`Nueva tarea asignada: ${data.title}`, "info");
+                 showToast(getNotificationToast(data), "info");
              }
           }
         }

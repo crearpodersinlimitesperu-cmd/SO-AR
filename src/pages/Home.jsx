@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCycles } from '../context/CyclesContext';
@@ -13,9 +13,10 @@ import {
   AlertCircle, Circle, RefreshCw, CalendarPlus, Bell, Users, AtSign, 
   BookOpen, Lightbulb, Search, X, Filter, ChevronDown, Sparkles,
   Zap, LayoutGrid, Sliders, CheckSquare, ArrowRight, ArrowUpRight, ShieldCheck,
-  TrendingUp, Compass, HelpCircle, User
+  TrendingUp, Compass, HelpCircle, User, AlertTriangle
 } from 'lucide-react';
 import { getFlagForSede } from '../utils/flags';
+import { getTaskProgressRoles } from '../utils/taskProgressRoles';
 import { createGoogleEvent } from '../services/googleSync';
 import { calculateAutomaticDeadline } from '../utils/soarDates';
 import TaskAssignmentModal from '../components/TaskAssignmentModal';
@@ -38,6 +39,7 @@ import {
 import EffectiveCommunicationButton from '../components/EffectiveCommunicationButton';
 import { getAllCompanyUsers } from '../services/userService';
 import UserProfileModal from '../components/UserProfileModal';
+import { getOverdueAssignedTasks } from '../utils/overdueTasks';
 import HorariosEntrenamientoModal from '../components/HorariosEntrenamientoModal';
 import { INITIAL_MANAGERS, normalizeTrainer } from '../data/managersData';
 import { formatTrainerDisplayName, nombreLegalEntrenador, normalizarIdentidadEntrenador } from '../data/trainerAliases';
@@ -1197,6 +1199,7 @@ export default function Home() {
   };
 
   const activeRole = currentUser?.appRole || currentUser?.role || 'gerente';
+  const taskProgressRoles = getTaskProgressRoles(activeRole, currentUser?.roles);
   const isExecutiveUser = ['ceo', 'cco', 'socio', 'super_admin', 'direccion'].includes(activeRole) ||
                           userEmail === 'fer.aragon@crearpsl.net' ||
                           userEmail === 'paul.sosa@crearpsl.net';
@@ -1207,9 +1210,6 @@ export default function Home() {
                        (t.collaborators && t.collaborators.some(c => isEmailMatch(c, userEmail)));
     if (isAssigned) return true;
     if (isExecutiveUser) return false; // Roles ejecutivos / Fer y Paul no tienen tareas operativas por defecto
-    if (activeRole === 'consolidado') {
-      return true;
-    }
 
     // 1. Si la tarea fue asignada nominalmente a alguien más, no computar en mi progreso
     const hasSpecificAssignees = (Array.isArray(t.assignedToEmails) && t.assignedToEmails.length > 0) || Boolean(t.assignedToEmail);
@@ -1245,7 +1245,7 @@ export default function Home() {
       }
     }
 
-    return t.role === activeRole;
+    return taskProgressRoles.includes(t.role);
   });
   const completedForProgress = myTasksForProgress.filter(t => t.completed || t.status === 'Completada').length;
   const progressPercentage = myTasksForProgress.length > 0 ? Math.round((completedForProgress / myTasksForProgress.length) * 100) : 0;
@@ -1405,6 +1405,11 @@ export default function Home() {
   // Si por algún motivo el registro no aparece todavía en realUsersData (ej. aún
   // cargando), cae de vuelta a currentUser tal cual — UserProfileModal ya sabe
   // mostrar un aviso si ese objeto no tiene un id real de Firestore para guardar.
+  const myOverdueCount = useMemo(
+    () => getOverdueAssignedTasks(allTasks, currentUser?.email).length,
+    [allTasks, currentUser?.email, time]
+  );
+
   const handleOpenMyProfile = () => {
     const myEmail = (currentUser?.email || '').toLowerCase().trim();
     const ownRecord = myEmail
@@ -1643,16 +1648,28 @@ export default function Home() {
                 (ej. elegir equipo(s) de Quito). Pedido explícito de José. */}
             <button
               onClick={handleOpenMyProfile}
-              title="Ver y editar mi perfil"
+              className={myOverdueCount > 0 ? 'overdue-profile-btn' : undefined}
+              title={myOverdueCount > 0 ? `Tienes ${myOverdueCount} tarea(s) vencida(s) hace más de 72 h` : 'Ver y editar mi perfil'}
+              aria-label={myOverdueCount > 0
+                ? `Mi Perfil: ${myOverdueCount} ${myOverdueCount === 1 ? 'tarea vencida' : 'tareas vencidas'} hace más de 72 horas`
+                : 'Mi Perfil'}
               style={{
-                display: 'flex', alignItems: 'center', gap: '0.35rem',
-                background: 'rgba(255,255,255,0.06)', border: '1px solid var(--border-strong)',
+                display: 'flex', alignItems: 'center', gap: '0.4rem',
+                background: myOverdueCount > 0 ? 'linear-gradient(135deg, #dc2626, #ea580c)' : 'rgba(255,255,255,0.06)',
+                border: myOverdueCount > 0 ? '2px solid #fecaca' : '1px solid var(--border-strong)',
                 borderRadius: '8px', padding: '0.35rem 0.7rem', cursor: 'pointer',
-                color: 'var(--text-main)', fontSize: '0.75rem', fontWeight: 600
+                color: myOverdueCount > 0 ? '#ffffff' : 'var(--text-main)', fontSize: '0.78rem', fontWeight: myOverdueCount > 0 ? 800 : 600
               }}
             >
-              <User size={14} style={{ color: 'var(--crear-gold)' }} />
+              {myOverdueCount > 0
+                ? <AlertTriangle size={15} aria-hidden="true" style={{ color: '#fff' }} />
+                : <User size={14} aria-hidden="true" style={{ color: 'var(--crear-gold)' }} />}
               Mi Perfil
+              {myOverdueCount > 0 && (
+                <span aria-hidden="true" style={{ background: '#fff', color: '#b91c1c', borderRadius: '999px', padding: '0 0.5rem', fontSize: '0.75rem', fontWeight: 900, minWidth: '1.3rem', textAlign: 'center' }}>
+                  {myOverdueCount}
+                </span>
+              )}
             </button>
           </div>
 

@@ -40,16 +40,7 @@
         ]
       },
       {
-        "source": "/",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "no-cache, no-store, must-revalidate"
-          }
-        ]
-      },
-      {
-        "source": "/monitor-vuelos",
+        "source": "**/!(*.*)",
         "headers": [
           {
             "key": "Cache-Control",

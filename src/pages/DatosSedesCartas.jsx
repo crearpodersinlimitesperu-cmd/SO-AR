@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { doc, getDoc, setDoc, runTransaction } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useAuth } from '../context/AuthContext';
+import { canEditSedeDatos } from '../utils/sedeDatosPermissions';
 import sedes from '../data/sedesInstitucionales.json';
 
 const fields = {razonSocial:'Razón social',identificacionFiscal:'Identificación fiscal (RUC, RFC o NIT)',direccionFiscal:'Dirección fiscal completa',correoContacto:'Correo institucional de contacto',telefonoContacto:'Teléfono de contacto con código de país'};
@@ -10,10 +11,10 @@ export default function DatosSedesCartas() {
   const { currentUser } = useAuth();
   const email=(currentUser?.email || '').toLowerCase();
   const admin=Boolean(currentUser?.isSuperAdmin);
-  const initial=Object.keys(sedes).find(id=>sedes[id].gerentes.some(g=>g.email===email)) || 'lima';
+  const initial=Object.keys(sedes).find(id=>sedes[id].gerentes.some(g=>g.email===email) || canEditSedeDatos(currentUser,sedes[id].sede)) || 'lima';
   const [id,setId]=useState(new URLSearchParams(location.search).get('sede') in sedes ? new URLSearchParams(location.search).get('sede') : initial);
   const [draft,setDraft]=useState({}); const [busy,setBusy]=useState(false); const [loading,setLoading]=useState(true); const [message,setMessage]=useState('');
-  const sede=sedes[id]; const editable=admin || sede.gerentes.some(g=>g.email===email);
+  const sede=sedes[id]; const editable=canEditSedeDatos(currentUser,sede.sede);
   useEffect(()=>{
     let active=true;setLoading(true);setMessage('');
     getDoc(doc(db,'sedes_institucionales',id)).then(snapshot=>{if(active){setDraft({...sede,...(snapshot.exists()?snapshot.data():{})});setLoading(false);}}).catch(()=>{if(active){setMessage('No se pudieron cargar los datos. Recarga antes de guardar.');setLoading(true);}});
