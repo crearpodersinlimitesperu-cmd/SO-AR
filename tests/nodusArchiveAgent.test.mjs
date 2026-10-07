@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { chunkRows, isSafeNodusUrl } from '../scripts/nodusArchiveAgent.mjs';
+import { chunkRows, isNodusVerificationUrl, isSafeNodusUrl } from '../scripts/nodusArchiveAgent.mjs';
 
 test('only allows HTTPS links inside NODUS and blocks mutation-like routes', () => {
   assert.equal(isSafeNodusUrl('/dashboard'), true);
@@ -11,6 +11,12 @@ test('only allows HTTPS links inside NODUS and blocks mutation-like routes', () 
   assert.equal(isSafeNodusUrl('/participantes/123?method=GET'), false);
   assert.equal(isSafeNodusUrl('/logout'), false);
   assert.equal(isSafeNodusUrl('/reporte?token=secret'), false);
+});
+
+test('recognizes only Cloudflare verification routes for NODUS authentication', () => {
+  assert.equal(isNodusVerificationUrl('https://challenges.cloudflare.com/cdn-cgi/challenge-platform/h/g/turnstile/test'), true);
+  assert.equal(isNodusVerificationUrl('https://challenges.cloudflare.com/ordinary-page'), false);
+  assert.equal(isNodusVerificationUrl('https://example.com/captcha'), false);
 });
 
 test('splits Firestore payloads without dropping rows', () => {
