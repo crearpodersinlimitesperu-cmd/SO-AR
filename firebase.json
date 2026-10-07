@@ -49,7 +49,7 @@
         ]
       },
       {
-        "source": "/monitor-vuelos",
+        "source": "**/!(*.*)",
         "headers": [
           {
             "key": "Cache-Control",
