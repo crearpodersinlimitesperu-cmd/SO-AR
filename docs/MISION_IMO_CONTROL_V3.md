@@ -78,3 +78,13 @@ No se ha activado `imo_system/control`, no se enviaron códigos reales y no se i
 - Run `37549555841`: recuperación correcta; compilación falló leyendo el archivo fuente. Los registros ya funcionan y muestran denegación de `storage.objects.get` en `gcf-v2-sources-122588918051-us-central1`.
 - Se dejó preparado, sin guardar, `roles/storage.objectViewer` para `122588918051-compute@developer.gserviceaccount.com` exclusivamente en ese bucket. Pendiente de autorización del usuario para este nuevo acceso.
 - No hay funciones IMO operativas confirmadas. No se habilitó el control ni se enviaron códigos reales. La autenticación/sincronización Nodus y el portal v3 siguen pendientes.
+
+### Backend desplegado y verificado — 7 de octubre de 2026
+
+- Confirmados permisos de secretos, Logs Writer, Storage Object Viewer (solo bucket de fuentes) y Artifact Registry Writer (solo gcf-artifacts).
+- El usuario autorizó solicitudes públicas solo para `imoAccess`. Se aplicó en Cloud Run; `imoDeliverCode` mantiene su trigger privado.
+- Run `37684978829`: SUCCESS. Ambas funciones ACTIVE; trigger Firestore de entrega comprobado y endpoint público devuelve INVALID_ARGUMENT (400) a una acción inválida.
+- Consulta sin sesión/datos de prueba a `roster`: FAILED_PRECONDITION, verificación de Nodus no disponible; no reveló enrolados, no se enviaron códigos.
+- La advertencia de retención de imágenes se conserva. El wrapper solo acepta ese error específico tras éxito de ambas operaciones y verificación independiente de estado/trigger/endpoint. No se modificaron políticas de borrado.
+- Los metadatos de NODUS_USER y NODUS_PASSWORD siguen fechados 1 de octubre; no se repitieron intentos de login con las mismas credenciales que fallaron.
+- Pendiente funcional: acceso válido a Nodus, importador verificado, campañas/portal v3, revisión de coordinadores y prueba integral. Backend activo no equivale a portal terminado.
