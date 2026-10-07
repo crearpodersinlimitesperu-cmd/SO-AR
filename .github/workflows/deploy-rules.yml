@@ -29,5 +29,4 @@ jobs:
           echo "$GOOGLE_SERVICE_ACCOUNT_JSON" > sa-key.json
           export GOOGLE_APPLICATION_CREDENTIALS="sa-key.json"
           firebase deploy --only firestore:rules --project centro-operativo-cpsl
-          node scripts/recoverErikaTask.mjs
           rm sa-key.json
