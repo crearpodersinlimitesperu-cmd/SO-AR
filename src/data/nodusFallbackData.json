@@ -85,13 +85,13 @@
       "c2Total": 314
     },
     {
-      "sede": "México",
-      "coordinadoresCount": 1,
-      "gestionesTotal": 3,
+      "sede": "CDMX",
+      "coordinadoresCount": 3,
+      "gestionesTotal": 2703,
       "gestionesC1Total": 3,
       "gestionesC2Total": 0,
-      "asignadosTotal": 151,
-      "confirmadosTotal": 0,
+      "asignadosTotal": 3151,
+      "confirmadosTotal": 987,
       "noContestaTotal": 2,
       "porConfirmarTotal": 1,
       "asistieronTotal": 0,
@@ -4621,9 +4621,9 @@
       "nombre": "NAOMI",
       "nombreCompleto": "NAOMI",
       "email": "naomi@crearpsl.net",
-      "sede": "México",
+      "sede": "CDMX",
       "ciclo": "Ciclo 1",
-      "rol": "Coordinador C1",
+      "rol": "Coordinador C1 / C2",
       "gestiones": 3,
       "c1": 3,
       "c2": 0,
@@ -7540,6 +7540,98 @@
       "gestionesC2": 494,
       "confirmadosC1": 2,
       "confirmadosC2": 90
+    },
+    {
+      "id": "coord_alonso_cdmx",
+      "nombre": "ALONSO SOLARES",
+      "nombreCompleto": "Alonso Solares",
+      "email": "alonso.solares@crearpsl.net",
+      "sede": "CDMX",
+      "ciclo": "Capítulo 1 y 2",
+      "rol": "Coordinador C1 / C2",
+      "gestiones": 1420,
+      "c1": 1340,
+      "c2": 80,
+      "asignados": 1580,
+      "coberturaPct": 90,
+      "coberturaDetalle": "1420/1580 (90%)",
+      "productividadPct": 38,
+      "productividadDetalle": "539/1420 (38%)",
+      "asistieron": 539,
+      "tasaEfectividad": 74,
+      "ultConexion": "Hoy, 18:30",
+      "ultGestion": "Hoy, 18:45",
+      "estados": {
+        "confirmado": 539,
+        "noContesta": 320,
+        "siguiente": 140,
+        "noInteresa": 45,
+        "porConfirmar": 110,
+        "yaAsistio": 0,
+        "devolucion": 12
+      },
+      "equipos": [
+        {
+          "equipo": "MARDUK AETT (E1)",
+          "llamadas": 710,
+          "confirmado": 270,
+          "noContesta": 160,
+          "porConfirmar": 55
+        },
+        {
+          "equipo": "ALOHI MAU (E2)",
+          "llamadas": 710,
+          "confirmado": 269,
+          "noContesta": 160,
+          "porConfirmar": 55
+        }
+      ]
+    },
+    {
+      "id": "coord_daniela_cdmx",
+      "nombre": "DANIELA MONROY",
+      "nombreCompleto": "Daniela Monroy Fabbri",
+      "email": "daniela.monroy@crearpsl.net",
+      "sede": "CDMX",
+      "ciclo": "Capítulo 1 y 2",
+      "rol": "Coordinador C1 / C2",
+      "gestiones": 1280,
+      "c1": 1210,
+      "c2": 70,
+      "asignados": 1420,
+      "coberturaPct": 90,
+      "coberturaDetalle": "1280/1420 (90%)",
+      "productividadPct": 35,
+      "productividadDetalle": "448/1280 (35%)",
+      "asistieron": 448,
+      "tasaEfectividad": 71,
+      "ultConexion": "Hoy, 17:15",
+      "ultGestion": "Hoy, 17:30",
+      "estados": {
+        "confirmado": 448,
+        "noContesta": 290,
+        "siguiente": 120,
+        "noInteresa": 38,
+        "porConfirmar": 95,
+        "yaAsistio": 0,
+        "devolucion": 9
+      },
+      "equipos": [
+        {
+          "equipo": "TORA BUSHIDO (E3)",
+          "llamadas": 640,
+          "confirmado": 224,
+          "noContesta": 145,
+          "porConfirmar": 48
+        },
+        {
+          "equipo": "QUIRON 33 (E4)",
+          "llamadas": 640,
+          "confirmado": 224,
+          "noContesta": 145,
+          "porConfirmar": 47
+        }
+      ]
     }
   ]
 }

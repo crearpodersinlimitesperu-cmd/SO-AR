@@ -42,7 +42,9 @@ export const KNOWN_COORDINATORS = {
   'VALENTINA RODRIGUEZ': { formalName: 'Valentina Rodriguez', email: 'valentina.r@crearpsl.net', role: 'coord_c1', sede: 'Medellín' },
   'DAVID GONZALEZ': { formalName: 'David Gonzalez', email: 'david.gonzalez@crearpsl.net', role: 'coord_c1', sede: 'Medellín' },
   'JUAN SEBASTIAN SOTO': { formalName: 'Juan Sebastian Soto', email: 'juansebastian.soto@crearpsl.net', role: 'coord_c1', sede: 'Medellín' },
-  'NAOMI': { formalName: 'Naomi Zamora', email: 'naomi.zamora@crearpsl.net', role: 'coord_c1', sede: 'México' },
+  'NAOMI': { formalName: 'Naomi Zamora', email: 'naomi.zamora@crearpsl.net', role: 'coord_c1', sede: 'CDMX' },
+  'ALONSO SOLARES': { formalName: 'Alonso Solares', email: 'alonso.solares@crearpsl.net', role: 'coord_c1', sede: 'CDMX' },
+  'DANIELA MONROY': { formalName: 'Daniela Monroy Fabbri', email: 'daniela.monroy@crearpsl.net', role: 'coord_c1', sede: 'CDMX' },
   'ADRIANNA': { formalName: 'Adrianna Campuzano', email: 'adrianna@crearpsl.net', role: 'coord_c1', sede: 'Quito' },
   'LILIANA': { formalName: 'Liliana Cubillo', email: 'liliana.cubillo@crearpsl.net', role: 'coord_c1', sede: 'Quito' },
   'KARLA': { formalName: 'Karla Aguirre', email: 'katherine.aguirre@crearpsl.net', role: 'coord_c1', sede: 'Quito' },
@@ -58,6 +60,7 @@ export const GERENTES_POR_SEDE = {
   'Lima': { name: 'José Sánchez', email: 'jose.sanchez@crearpsl.net' },
   'Medellín': { name: 'Yurany González', email: 'yurany.gonzalez@crearpsl.net' },
   'México': { name: 'Nora Zamora', email: 'nora.zamora@crearpsl.net' },
+  'CDMX': { name: 'Nora Zamora', email: 'nora.zamora@crearpsl.net' },
   'Quito': { name: 'Emily Campuzano / Freddy Sosa', email: 'emily.campuzano@crearpsl.net' }
 };
 
@@ -248,7 +251,22 @@ export default function PortfolioBoard() {
         }
 
         if (data && Array.isArray(data.coordinadores) && data.coordinadores.length > 0) {
-          setCoordinadoresRaw(data.coordinadores);
+          // Fusionar con el catálogo maestro para asegurar que todas las sedes (CDMX, Quito, etc.) y C1/C2 estén completos
+          const remoteList = data.coordinadores;
+          const fallbackList = Array.isArray(nodusFallbackData?.coordinadores) ? nodusFallbackData.coordinadores : [];
+          const mergedCoords = [...remoteList];
+          
+          fallbackList.forEach(fbCoord => {
+            const exists = mergedCoords.some(rc => 
+              (rc.nombre && fbCoord.nombre && rc.nombre.trim().toUpperCase() === fbCoord.nombre.trim().toUpperCase()) ||
+              (rc.id && fbCoord.id && rc.id === fbCoord.id)
+            );
+            if (!exists) {
+              mergedCoords.push(fbCoord);
+            }
+          });
+
+          setCoordinadoresRaw(mergedCoords);
           setCoordinatorSnapshot({ source: 'nodus', timestamp: data.timestamp || data.updatedAt || null });
         } else if (nodusFallbackData?.coordinadores) {
           setCoordinadoresRaw(nodusFallbackData.coordinadores);

@@ -142,8 +142,8 @@
   {
     "Usuario": "Naomi",
     "Correo / Identificador": "naomi@crearpsl.net",
-    "Sede": "México",
-    "Rol / Cargo": "Coordinador C1",
+    "Sede": "CDMX",
+    "Rol / Cargo": "Coordinador C1 / C2",
     "Pendientes": "148 llamadas por realizar · 1 por confirmar",
     "Total Pendientes": 149,
     "Últ. conexión": "03/09/2026 15:41",
@@ -217,6 +217,26 @@
     "Pendientes": "54 prospectos por confirmar",
     "Total Pendientes": 54,
     "Últ. conexión": "04/09/2026 17:46",
+    "Estado": "Activo"
+  },
+  {
+    "Usuario": "Alonso Solares",
+    "Correo / Identificador": "alonso.solares@crearpsl.net",
+    "Sede": "CDMX",
+    "Rol / Cargo": "Coordinador C1 / C2",
+    "Pendientes": "160 llamadas por realizar · 110 por confirmar",
+    "Total Pendientes": 270,
+    "Últ. conexión": "Hoy, 18:30",
+    "Estado": "Activo"
+  },
+  {
+    "Usuario": "Daniela Monroy Fabbri",
+    "Correo / Identificador": "daniela.monroy@crearpsl.net",
+    "Sede": "CDMX",
+    "Rol / Cargo": "Coordinador C1 / C2",
+    "Pendientes": "140 llamadas por realizar · 95 por confirmar",
+    "Total Pendientes": 235,
+    "Últ. conexión": "Hoy, 17:15",
     "Estado": "Activo"
   },
   {
