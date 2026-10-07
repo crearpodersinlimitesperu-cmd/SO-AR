@@ -51,6 +51,14 @@ service cloud.firestore {
       return request.auth.token.email.lower();
     }
 
+    function callerEmailAliases() {
+      let parts = email().split('@');
+      return parts.size() == 2 &&
+        (parts[1] == 'crearpsl.net' || parts[1] == 'crearpsl.com')
+        ? [email(), parts[0] + '@crearpsl.net', parts[0] + '@crearpsl.com']
+        : [email()];
+    }
+
     // Debe coincidir con SUPER_ADMIN_EMAILS en src/config/permissions.js
     function isSuperAdmin() {
       return isAuthenticated() && email() in [
@@ -81,8 +89,8 @@ service cloud.firestore {
 
     function isOwner(resourceData) {
       return isAuthenticated() && (
-        resourceData.assignedToEmail == email() ||
-        (resourceData.assigned_to != null && resourceData.assigned_to == email()) ||
+        (resourceData.get('assignedToEmail', '') is string && resourceData.assignedToEmail.lower() in callerEmailAliases()) ||
+        (resourceData.get('assigned_to', '') is string && resourceData.assigned_to.lower() in callerEmailAliases()) ||
         // FIX (16/09/2026): las tareas "Personalizada (Directa)" compartidas entre
         // varias personas (ej. un mismo aviso mandado a varios gerentes a la vez)
         // usan el campo assignedToEmails (arreglo), nunca el singular
@@ -91,14 +99,169 @@ service cloud.firestore {
         // cumplía isOwner() ni isCollaborator() con nada, así que Firestore
         // rechazaba el guardado de su evidencia/avance en esas tareas. Ahora
         // cuenta como dueño igual que si estuviera en el campo singular.
-        (resourceData.assignedToEmails != null && email() in resourceData.assignedToEmails) ||
+        (resourceData.get('assignedToEmails', []) is list &&
+         resourceData.assignedToEmails.hasAny(callerEmailAliases())) ||
         // Se conserva por compatibilidad si alg├║n flujo futuro s├¡ llega a usar el uid real:
-        (resourceData.ownerId != null && resourceData.ownerId == request.auth.uid)
+        resourceData.get('ownerId', '') == request.auth.uid ||
+        (resourceData.get('createdBy', '') is string && resourceData.createdBy.lower() in callerEmailAliases()) ||
+        (resourceData.get('createdByEmail', '') is string && resourceData.createdByEmail.lower() in callerEmailAliases()) ||
+        (resourceData.get('created_by', '') is string && resourceData.created_by.lower() in callerEmailAliases())
       );
     }
 
     function isCollaborator(resourceData) {
-      return isAuthenticated() && resourceData.collaborators != null && email() in resourceData.collaborators;
+      return isAuthenticated() &&
+        resourceData.get('collaborators', []) is list &&
+        resourceData.collaborators.hasAny(callerEmailAliases());
+    }
+
+    function callerHasTaskRole(roleName) {
+      return isAuthenticated() &&
+         exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         (
+           get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', '') == roleName ||
+           get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('rol', '') == roleName ||
+           (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('roles', []) is list &&
+            roleName in get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles)
+         );
+    }
+
+    function isKnownChecklistTaskIdForRole(taskId, roleName) {
+      return taskId is string && (
+        (roleName == 'capitan' && (
+          taskId in ['soar_14', 'soar_19'] ||
+          taskId.matches('cap_chk_([1-9]|[1-4][0-9]|5[0-7])')
+        )) ||
+        (roleName == 'coord_c1' && (
+          taskId in [
+          'cc1y2_pre1', 'cc1y2_pre1_b', 'cc1y2_pre2', 'cc1y2_pre3', 'cc1y2_pre4', 'cc1y2_rutina_diaria', 'soar_12', 'soar_13',
+          'cc1y2_c1_1', 'cc1y2_c1_2', 'cc1y2_c1_3', 'cc1y2_c1_4', 'cc1y2_c1_5', 'cc1y2_c1_6', 'cc1y2_c1_7', 'cc1y2_c1_8',
+          'soar_18', 'cc1y2_post1', 'cc1y2_post2', 'cc1y2_post3', 'cc1y2_post4', 'soar_21', 'cc1y2_c2_1', 'cc1y2_c2_1_b',
+          'cc1y2_c2_2', 'cc1y2_c2_3', 'cc1y2_c2_4', 'cc1y2_c2_5', 'sala_ent_c1_1', 'sala_ent_c1_2', 'sala_ent_c1_3', 'sala_ent_c1_4',
+          'sala_ent_c1_5', 'sala_ent_c1_6', 'sala_ent_c2_1', 'sala_ent_c2_2', 'sala_ent_c2_3', 'sala_ent_c2_4', 'sala_ent_c2_5', 'sala_ent_c2_6',
+          'sala_pc_c1_1', 'sala_pc_c1_2', 'sala_pc_c1_3', 'sala_pc_c1_4', 'sala_pc_c1_5', 'sala_pc_c1_6', 'sala_pc_c1_7', 'sala_pc_c2_1',
+          'sala_pc_c2_2', 'sala_pc_c2_3', 'sala_pc_c2_4', 'sala_pc_c2_5', 'sala_pc_c2_6', 'sala_pc_c2_7', 'sala_proy_c1_1', 'sala_proy_c1_2',
+          'sala_proy_c1_3', 'sala_proy_c1_4', 'sala_proy_c1_5', 'sala_proy_c2_1', 'sala_proy_c2_2', 'sala_proy_c2_3', 'sala_proy_c2_4', 'sala_proy_c2_5',
+          'sala_son_c1_1', 'sala_son_c1_2', 'sala_son_c1_3', 'sala_son_c1_4', 'sala_son_c1_5', 'sala_son_c1_6', 'sala_son_c1_7', 'sala_son_c2_1',
+          'sala_son_c2_2', 'sala_son_c2_3', 'sala_son_c2_4', 'sala_son_c2_5', 'sala_son_c2_6', 'sala_son_c2_7', 'sala_std_c1_1', 'sala_std_c1_2',
+          'sala_std_c1_3', 'sala_std_c1_4', 'sala_std_c1_5', 'sala_std_c1_6', 'sala_std_c1_7', 'sala_std_c1_8', 'sala_std_c1_9', 'sala_std_c2_1',
+          'sala_std_c2_2', 'sala_std_c2_3', 'sala_std_c2_4', 'sala_std_c2_5', 'sala_std_c2_6', 'sala_std_c2_7', 'sala_std_c2_8', 'sala_std_c2_9',
+          'sala_equipo_c1_1', 'sala_equipo_c1_2', 'sala_equipo_c1_3', 'sala_equipo_c1_4', 'sala_equipo_c1_5', 'sala_equipo_c1_6', 'sala_equipo_c1_7', 'sala_equipo_c1_8',
+          'sala_equipo_c2_1', 'sala_equipo_c2_2', 'sala_equipo_c2_3', 'sala_equipo_c2_4', 'sala_equipo_c2_5', 'sala_equipo_c2_6', 'sala_equipo_c2_7', 'sala_alim_c1_1',
+          'sala_alim_c1_2', 'sala_alim_c1_3', 'sala_alim_c1_4', 'sala_alim_c1_5', 'sala_alim_c1_6', 'sala_alim_c2_1', 'sala_alim_c2_2', 'sala_alim_c2_3',
+          'sala_alim_c2_4', 'sala_alim_c2_5', 'sala_alim_c2_6', 'sala_seg_c1_1', 'sala_seg_c1_2', 'sala_seg_c1_3', 'sala_seg_c1_4', 'sala_seg_c1_5',
+          'sala_seg_c1_6', 'sala_seg_c1_7', 'sala_seg_c1_8', 'sala_seg_c1_9', 'sala_seg_c2_1', 'sala_seg_c2_2', 'sala_seg_c2_3', 'sala_seg_c2_4',
+          'sala_seg_c2_5', 'sala_seg_c2_6', 'sala_seg_c2_7', 'sala_seg_c2_8', 'c1v2_th_1', 'c1v2_th_2', 'c1v2_th_3', 'c1v2_th_4',
+          'c1v2_th_5', 'c1v2_th_6', 'c1v2_th_7', 'c1v2_vi_1', 'c1v2_vi_2', 'c1v2_vi_3', 'c1v2_vi_4', 'c1v2_vi_5',
+          'c1v2_vi_6', 'c1v2_vi_7', 'c1v2_vi_8', 'c1v2_sa_1', 'c1v2_sa_2', 'c1v2_sa_3', 'c1v2_sa_4', 'c1v2_sa_5',
+          'c1v2_sa_6', 'c1v2_do_1', 'c1v2_do_2', 'c1v2_do_3', 'c1v2_do_4', 'c1v2_do_5', 'c1v2_do_6', 'c2v2_mi_1',
+          'c2v2_mi_2', 'c2v2_mi_4', 'c2v2_ju_1', 'c2v2_ju_2', 'c2v2_ju_3', 'c2v2_ju_4', 'c2v2_ju_5', 'c2v2_ju_6',
+          'c2v2_ju_7', 'c2v2_vi_1', 'c2v2_vi_2', 'c2v2_vi_3', 'c2v2_vi_4', 'c2v2_vi_5', 'c2v2_vi_6', 'c2v2_sa_1',
+          'c2v2_sa_2', 'c2v2_sa_3', 'c2v2_sa_4', 'c2v2_do_1', 'c2v2_do_2', 'c2v2_do_3'
+          ] ||
+          taskId.matches('cc1_chk_([1-9]|[1-4][0-9]|5[0-2])')
+        )) ||
+        (roleName == 'coord_maestria' && (
+          taskId in [
+          'soar_24', 'soar_26', 'cmj_pre1', 'cmj_pre2', 'cmj_pre3', 'cmj_pre4', 'cmj_pre5', 'soar_28',
+          'soar_30', 'sala_ent_mj_1', 'sala_ent_mj_2', 'sala_ent_mj_3', 'sala_ent_mj_4', 'sala_ent_mj_5', 'sala_ent_mj_6', 'sala_pc_mj_1',
+          'sala_pc_mj_2', 'sala_pc_mj_3', 'sala_pc_mj_4', 'sala_pc_mj_5', 'sala_pc_mj_6', 'sala_pc_mj_7', 'sala_proy_mj_1', 'sala_proy_mj_2',
+          'sala_proy_mj_3', 'sala_proy_mj_4', 'sala_proy_mj_5', 'sala_son_mj_1', 'sala_son_mj_2', 'sala_son_mj_3', 'sala_son_mj_4', 'sala_son_mj_5',
+          'sala_son_mj_6', 'sala_son_mj_7', 'sala_std_mj_1', 'sala_std_mj_2', 'sala_std_mj_3', 'sala_std_mj_4', 'sala_std_mj_5', 'sala_std_mj_6',
+          'sala_std_mj_7', 'sala_std_mj_8', 'sala_std_mj_9', 'sala_equipo_mj_1', 'sala_equipo_mj_2', 'sala_equipo_mj_3', 'sala_equipo_mj_4', 'sala_equipo_mj_5',
+          'sala_equipo_mj_6', 'sala_seg_mj_1', 'sala_seg_mj_2', 'sala_seg_mj_3', 'sala_seg_mj_4', 'sala_seg_mj_5', 'sala_seg_mj_6', 'sala_seg_mj_7',
+          'c2v2_mi_3', 'cmjv2_sem_1', 'cmjv2_sem_2', 'cmjv2_sem_3', 'cmjv2_sem_4', 'cmjv2_sem_5', 'cmjv2_f1_1', 'cmjv2_f1_2',
+          'cmjv2_f1_3', 'cmjv2_f1_4', 'cmjv2_f1_5', 'cmjv2_f1_6', 'cmjv2_f2_1', 'cmjv2_f2_2', 'cmjv2_f3_1', 'cmjv2_f3_2',
+          'cmjv2_f3_3', 'cmjv2_f3_4', 'cmjv2_f3_5', 'cmjv2_f4_1', 'cmjv2_f4_2', 'cmjv2_f4_3', 'cmjv2_f4_4', 'cmjv2_f4_5',
+          'cmjv2_f4_6', 'cmjv2_f4_7', 'cmjv2_f4_8', 'cmjv2_f4_9', 'cmjv2_f4_10', 'cmjv2_f4_11', 'cmjv2_f4_12', 'cmj_prec1_1',
+          'cmj_prec1_2', 'cmj_prec1_3', 'cmj_prec1_4', 'cmj_prec1_5', 'cmj_prec1_6', 'cmj_prec1_7', 'cmj_prec1_8', 'cmj_prec1_9',
+          'cmj_prec1_10', 'cmj_prec1_11', 'cmj_prec1_12', 'cmj_prec1_13', 'cmj_prec1_14', 'cmj_prec1_15', 'cmj_prec1_16', 'cmj_prec1_17',
+          'cmj_prec1_18', 'cmj_c1_1', 'cmj_c1_2', 'cmj_c1_3', 'cmj_c1_4', 'cmj_c1_5', 'cmj_c1_6', 'cmj_c1_7',
+          'cmj_c1_8', 'cmj_c1_9', 'cmj_postc1_1', 'cmj_postc1_2', 'cmj_postc1_3', 'cmj_postc1_4', 'cmj_postc1_5', 'cmj_postc1_6',
+          'cmj_postc1_7', 'cmj_postc1_8', 'cmj_postc1_9', 'cmj_postc1_10', 'cmj_postc1_11', 'cmj_postc1_12', 'cmj_postc1_13'
+          ] ||
+          taskId.matches('cmj_chk_([1-9]|1[0-6])')
+        )) ||
+        (roleName == 'director_maestria' && taskId in [
+          'dir_m_1', 'dir_m_2', 'dir_m_3'
+        ]) ||
+        (roleName == 'entrenador' && taskId in [
+          'coach_1', 'coach_2', 'coach_3', 'coach_4', 'coach_5'
+        ]) ||
+        (roleName == 'entrenador_llamadas' && taskId in [
+          'coach_ll_1', 'coach_ll_2', 'coach_ll_3', 'coach_ll_4'
+        ]) ||
+        (roleName == 'gerente' && (
+          taskId in [
+          'soar_1', 'soar_2', 'soar_3', 'soar_4', 'soar_5', 'soar_6', 'soar_7', 'soar_8',
+          'soar_9', 'soar_10', 'soar_11', 'soar_16', 'soar_17', 'soar_20', 'soar_22', 'soar_23',
+          'soar_25', 'soar_27', 'soar_29', 'gerente_post_mj_1'
+          ] ||
+          taskId.matches('ger_chk_([1-9]|[1-5][0-9]|60)')
+        )) ||
+        (roleName == 'manager' && taskId in [
+          'mngr_1', 'mngr_2', 'mngr_3'
+        ]) ||
+        (roleName == 'qt' && (
+          taskId in ['soar_15'] ||
+          taskId.matches('qt_chk_([1-9]|[1-3][0-9]|4[0-4])')
+        ))
+      );
+    }
+
+    function isReservedChecklistTaskId(taskId) {
+      return taskId is string && (
+        taskId.matches('soar_[0-9]+') || taskId.matches('gerente_[A-Za-z0-9_]+') ||
+        taskId.matches('cc1y2_[A-Za-z0-9_]+') || taskId.matches('sala_[A-Za-z0-9_]+') ||
+        taskId.matches('c1v2_[A-Za-z0-9_]+') || taskId.matches('c2v2_[A-Za-z0-9_]+') ||
+        taskId.matches('cmj_[A-Za-z0-9_]+') || taskId.matches('cmjv2_[A-Za-z0-9_]+') ||
+        taskId.matches('cap_chk_[0-9]+') || taskId.matches('cc1_chk_[0-9]+') ||
+        taskId.matches('cmj_chk_[0-9]+') || taskId.matches('ger_chk_[0-9]+') ||
+        taskId.matches('qt_chk_[0-9]+') ||
+        taskId.matches('coach_[0-9]+') || taskId.matches('coach_ll_[0-9]+') ||
+        taskId.matches('dir_[A-Za-z0-9_]+') || taskId.matches('mngr_[A-Za-z0-9_]+')
+      );
+    }
+
+    function isChecklistCatalogTask(taskData) {
+      let taskRole = taskData.get('role', '');
+      return isAuthenticated() &&
+        taskRole is string &&
+        callerHasTaskRole(taskRole) &&
+        isKnownChecklistTaskIdForRole(taskData.get('id', ''), taskRole) &&
+        taskData.get('isCustom', false) == false &&
+        !taskData.keys().hasAny([
+          'assignedToEmail', 'assignedToEmails', 'assigned_to', 'ownerId',
+          'assignedTo', 'assignedRoles', 'assignedSede', 'assignedByEmail',
+          'assignedByName', 'createdBy', 'createdByEmail', 'created_by', 'collaborators',
+          'pendingCollaborations', 'assigneeProgress', 'source', 'metadata'
+        ]);
+    }
+
+    function canReadTask(taskData) {
+      return isOwner(taskData) ||
+        isCollaborator(taskData) ||
+        isChecklistCatalogTask(taskData) ||
+        ((isGerenteODireccion() || callerHasTaskRole('gerente') ||
+          callerHasTaskRole('direccion')) &&
+         taskData.get('isValidation', false) == true);
+    }
+
+    function canReadDualTask(taskData) {
+      let callerSede = isAuthenticated() && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        ? get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('sede', '')
+        : '';
+      return isAuthenticated() &&
+        taskData.get('isDualTask', false) == true &&
+        (isGerenteODireccion() ||
+         callerHasTaskRole('manager') ||
+         callerHasTaskRole('entrenador') ||
+         callerHasTaskRole('entrenador_llamadas')) &&
+        (
+          taskData.get('sede', '') == 'Global' ||
+          taskData.get('sede', '') == 'Sede Global' ||
+          taskData.get('sede', '') == callerSede
+        );
     }
 
     // (29/08/2026) FIX: las tareas del catálogo base (checklistData.js) son compartidas por
@@ -107,7 +270,7 @@ service cloud.firestore {
     // % de avance, evidencia) nunca cumplía isOwner() ni isCollaborator(), así que Firestore
     // rechazaba la escritura con permission-denied ("Revisa los permisos de Firestore") en
     // cuanto el documento de la tarea ya existía (después del primer toque, o si "Reiniciar
-    // Ciclo" ya corrió). Este helper permite a CUALQUIER autenticado tocar SOLO estos campos
+    // Ciclo" ya corrió). Este helper solo permite cambios al rol dueño del catálogo de tareas.
     // operativos de progreso/completitud — nunca campos estructurales (dueño, rol, sede,
     // plazo, título), que siguen exigiendo isOwner()/isGerenteODireccion()/isSuperAdmin().
     //
@@ -198,14 +361,18 @@ service cloud.firestore {
 
     // TASKS
     match /tasks/{taskId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated();
+      allow read: if canReadTask(resource.data);
+      allow create: if isSuperAdmin() || isGerenteODireccion() ||
+                    (isOwner(request.resource.data) &&
+                     !isReservedChecklistTaskId(request.resource.data.get('id', ''))) ||
+                    isCollaborator(request.resource.data) ||
+                    isChecklistCatalogTask(request.resource.data);
       allow update: if isSuperAdmin() || isGerenteODireccion() ||
                     isOwner(resource.data) ||
                     (isCollaborator(resource.data) &&
                      request.resource.data.diff(resource.data).affectedKeys().hasAny(['status', 'progress', 'evidence_url', 'evidenceUrl', 'completions']) &&
                      !request.resource.data.diff(resource.data).affectedKeys().hasAny(['assignedToEmail', 'role', 'sede', 'ownerId'])) ||
-                    isOperationalProgressUpdate();
+                    (isChecklistCatalogTask(resource.data) && isOperationalProgressUpdate());
       allow delete: if isGerenteODireccion() || isSuperAdmin();
     }
 
@@ -643,7 +810,8 @@ service cloud.firestore {
       allow write: if isGerenteODireccion() || isSuperAdmin();
     }
     match /checklist_tasks/{document=**} {
-      allow read, write: if isAuthenticated();
+      allow read: if canReadTask(resource.data) || canReadDualTask(resource.data);
+      allow write: if isSuperAdmin() || isGerenteODireccion();
     }
     match /settings/{document=**} {
       allow read: if isAuthenticated();

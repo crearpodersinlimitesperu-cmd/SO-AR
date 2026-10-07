@@ -12,6 +12,7 @@ import TaskAssignmentModal from '../components/TaskAssignmentModal';
 import IAAuditor from '../components/IAAuditor';
 import VenueConfigModal from '../components/VenueConfigModal';
 import { canAccessDirectorioEquipo } from '../config/permissions';
+import { isTaskVisibleForUser } from '../utils/taskPrivacy';
 
 export default function GerenteDashboard() {
   const { currentUser } = useAuth();
@@ -128,6 +129,7 @@ export default function GerenteDashboard() {
     // Si el usuario está simulado, evaluamos siempre con el perfil simulado (ej. Emily)
     const activeUser = currentUser;
     if (!activeUser) return false;
+    if (!isTaskVisibleForUser(t, activeUser)) return false;
     if (activeUser.isSuperAdmin && !activeUser.isSimulated) return true;
     if (activeUser.appRole === 'consolidado') return true;
 
@@ -928,5 +930,4 @@ export default function GerenteDashboard() {
     </div>
   );
 }
-
 

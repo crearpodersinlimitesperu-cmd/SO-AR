@@ -929,3 +929,30 @@ h1, h2, h3, h4, h5, h6 {
   background-color: #064e3b !important;
   color: #34d399 !important;
 }
+
+[data-theme="light"] .task-assignee-results {
+  background: #ffffff !important;
+  border-color: #b45309 !important;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.24) !important;
+}
+
+[data-theme="light"] .task-assignee-result {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .task-assignee-result.is-selected {
+  color: #78350f !important;
+  background: #fef3c7 !important;
+}
+
+[data-theme="light"] .task-assignee-meta {
+  color: #475569 !important;
+}
+
+[data-theme="light"] .task-assignee-action {
+  color: #0369a1 !important;
+}
+
+[data-theme="light"] .task-assignee-result.is-selected .task-assignee-action {
+  color: #92400e !important;
+}

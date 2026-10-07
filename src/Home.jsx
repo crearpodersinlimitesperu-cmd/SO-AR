@@ -16,6 +16,7 @@ import {
   TrendingUp, Compass, HelpCircle
 } from 'lucide-react';
 import { getFlagForSede } from '../utils/flags';
+import { isTaskVisibleForUser } from '../utils/taskPrivacy';
 import { createGoogleEvent } from '../services/googleSync';
 import { calculateAutomaticDeadline } from '../utils/soarDates';
 import TaskAssignmentModal from '../components/TaskAssignmentModal';
@@ -814,11 +815,13 @@ export default function Home() {
       try {
         const snap = await getDoc(doc(db, 'checklist_tasks', notif.taskId));
         if (snap.exists()) {
-          targetTask = { id: snap.id, ...snap.data() };
+          const candidate = { id: snap.id, ...snap.data() };
+          if (isTaskVisibleForUser(candidate, currentUser)) targetTask = candidate;
         } else {
           const snap2 = await getDoc(doc(db, 'tasks', notif.taskId));
           if (snap2.exists()) {
-            targetTask = { id: snap2.id, ...snap2.data() };
+            const candidate = { id: snap2.id, ...snap2.data() };
+            if (isTaskVisibleForUser(candidate, currentUser)) targetTask = candidate;
           }
         }
       } catch (err) {
@@ -2731,4 +2734,3 @@ export default function Home() {
     </div>
   );
 }
-

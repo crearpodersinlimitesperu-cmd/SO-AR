@@ -1,0 +1,21 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "tasks",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "role", "order": "ASCENDING" },
+        { "fieldPath": "id", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "checklist_tasks",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "isDualTask", "order": "ASCENDING" },
+        { "fieldPath": "sede", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}
