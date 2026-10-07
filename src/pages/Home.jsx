@@ -44,6 +44,45 @@ import HorariosEntrenamientoModal from '../components/HorariosEntrenamientoModal
 import { INITIAL_MANAGERS, normalizeTrainer } from '../data/managersData';
 import { formatTrainerDisplayName, nombreLegalEntrenador, normalizarIdentidadEntrenador } from '../data/trainerAliases';
 
+const getEventTeamLabels = (event = {}) => {
+  const rawValues = [
+    event.equipos,
+    event.numEquipos,
+    event.equipo,
+    event.team,
+    event.numEquipo,
+    event.teamNum,
+    event.data?.equipos,
+    event.data?.equipo,
+    event.data?.team,
+    event.data?.numEquipo
+  ];
+  const labels = new Set();
+
+  const addValue = (value) => {
+    if (Array.isArray(value)) {
+      value.forEach(addValue);
+      return;
+    }
+    if (value && typeof value === 'object') {
+      addValue(value.numEquipo ?? value.teamNum ?? value.equipo ?? value.team);
+      return;
+    }
+    if (value == null) return;
+    const text = String(value).trim();
+    if (!text) return;
+    const numbers = text.match(/\d+/g) || [];
+    if (numbers.length) {
+      numbers.forEach((number) => labels.add(`#${number}`));
+    } else {
+      labels.add(text.replace(/^equipo\s*/i, '').trim());
+    }
+  };
+  rawValues.forEach(addValue);
+
+  return [...labels];
+};
+
 /**
  * Normaliza y verifica si un evento está asignado a un entrenador específico
  */
@@ -3159,12 +3198,18 @@ export default function Home() {
                           let evEndDate = new Date(ev.fecha_fin || baseDate || new Date());
                           const hotelVenue = getVenueForTraining(ev.sede || ev.sedeTag || currentUser?.sede, ev.nombre || ev.name, ev.lugar, ev.direccion);
                           const confirmedTrainerLabel = assignedTrainerNamesForEvent(ev).join(' / ');
+                          const teamLabels = getEventTeamLabels(ev);
 
                           return (
                             <li key={i} style={{ padding: '0.6rem 0', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.8rem' }}>
                               <div style={{ minWidth: 0 }}>
                                 <span className="text-white" style={{ fontWeight: 'bold', fontSize: '0.92rem', display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                   {ev.nombre || ev.name || 'Entrenamiento'}
+                                </span>
+                                <span style={{ fontSize: '0.75rem', color: teamLabels.length ? 'var(--crear-cyan)' : '#f59e0b', display: 'block', marginTop: '0.15rem', fontWeight: 700 }}>
+                                  {teamLabels.length
+                                    ? `${teamLabels.length > 1 ? 'Equipos' : 'Equipo'} ${teamLabels.join(' · ')}`
+                                    : 'Equipo: número no especificado en el calendario'}
                                 </span>
                                 <span style={{ fontSize: '0.75rem', color: 'var(--crear-cyan)', display: 'block', marginTop: '0.1rem' }}>
                                   🏨 {hotelVenue}
