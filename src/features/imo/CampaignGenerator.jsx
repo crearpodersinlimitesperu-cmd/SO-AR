@@ -70,24 +70,34 @@ export default function CampaignGenerator({ missions, defaultSede, defaultEquipo
     return calendarChanges ? applyCalendarChanges(calendar, calendarChanges) : calendar;
   }, [calendar, calendarChanges]);
 
-  // Lista de todos los C1 oficiales para la sede seleccionada
+  // Lista de todos los C1 oficiales para la sede seleccionada (priorizando las fechas actuales y futuras)
   const sedeC1Options = useMemo(() => {
     if (!activeCalendarEvents.length || !sede) return [];
     const targetSede = calendarSede(sede);
     const map = new Map();
+    const todayStr = new Date().toISOString().slice(0, 10);
+
     for (const e of activeCalendarEvents) {
       if (calendarSede(e.sede) !== targetSede) continue;
       const isC1 = /^(CAPITULO UNO|CAPITULO 1|C1)$/i.test(normalizeText(e.name));
       if (!isC1 || !e.team || !e.date) continue;
       const key = `${e.team}__${e.date}`;
       if (!map.has(key)) {
-        map.set(key, { team: e.team, date: e.date, source: e.source, label: `Equipo ${e.team} · Inicio C1: ${e.date}` });
+        map.set(key, { team: Number(e.team), date: e.date, source: e.source, label: `Equipo ${e.team} · Inicio C1: ${e.date}` });
       }
     }
-    return [...map.values()].sort((a, b) => a.date.localeCompare(b.date));
+
+    const allEvents = [...map.values()].sort((a, b) => a.date.localeCompare(b.date));
+    // Priorizar eventos futuros o de los últimos 7 días
+    const upcomingEvents = allEvents.filter(e => e.date >= todayStr || (() => {
+      const diffMs = new Date(todayStr) - new Date(e.date);
+      return diffMs >= 0 && diffMs <= 7 * 86400000;
+    })());
+
+    return upcomingEvents.length > 0 ? upcomingEvents : allEvents;
   }, [activeCalendarEvents, sede]);
 
-  // Si no hay target seleccionado y hay opciones C1 para esta sede, preseleccionar la primera
+  // Si no hay target seleccionado y hay opciones C1 para esta sede, preseleccionar la próxima oficial
   useEffect(() => {
     if (!target && sedeC1Options.length > 0) {
       const nextOpt = sedeC1Options[0];
@@ -395,7 +405,7 @@ export default function CampaignGenerator({ missions, defaultSede, defaultEquipo
               />
               <span style={{ fontWeight: 600, color: '#0f172a' }}>{m.imoNombre || 'IMO sin nombre'}</span>
               <span style={{ color: '#64748b', fontSize: '0.8rem' }}>
-                · Equipo: {m.equipo || 'Sin equipo'} · {getEnrolados(m).length} enrolados
+                · {parseTeamNumber(m.equipo) ? `Equipo ${parseTeamNumber(m.equipo)}` : (m.equipo || 'Sin equipo')} · {getEnrolados(m).length} enrolados
               </span>
             </label>
           ))}
