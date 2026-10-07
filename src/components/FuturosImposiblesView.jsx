@@ -9,7 +9,13 @@ import { addDoc, collection, doc, getDocFromServer, onSnapshot, serverTimestamp,
 import { db } from '../services/firebase';
 import { useAuth } from '../context/AuthContext';
 const EQUIPOS_FUTUROS_IMPOSIBLES = ['EQUIPO 27', 'EQUIPO 28', 'EQUIPO 29', 'EQUIPO 30', 'EQUIPO 31'];
-const ESTADOS_FI = { PENDIENTE: 'Pendiente', APROBADO: 'Aprobado', DEVUELTO: 'Devuelto' };
+const ESTADOS_FI = [
+  { id: 'TODOS', label: 'Todos los estados' },
+  { id: 'SIN_ENTREGA', label: 'Sin entregas' },
+  { id: 'PENDIENTES', label: 'Pendientes' },
+  { id: 'DEVUELTOS', label: 'Devueltos' },
+  { id: 'APROBADOS', label: 'Aprobados' }
+];
 import { 
   ejecutarDiagnosticoFIs, 
   evaluarCalidadOntologicaFI, 
