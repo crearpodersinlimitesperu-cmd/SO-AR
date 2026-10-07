@@ -16,6 +16,7 @@ import {
   hasQTPrivileges,
   DUAL_ROLE_TRAINER_EMAILS,
   canViewLiquidacionEntrenadores,
+  canReverseLiquidacionEntrenadores,
   canWriteNotaSeguimiento,
   canViewAllNotasSeguimiento,
   canReplyNotaSeguimiento,
@@ -37,7 +38,7 @@ import {
 import { OPERATIONAL_SEDES, normalizeRole, normalizeSede } from '../data/usersData';
 import { recordAuditEvent } from '../services/auditService';
 import { db } from '../services/firebase';
-import { collection, getDocs, doc, addDoc, setDoc, updateDoc, deleteDoc, writeBatch, onSnapshot, serverTimestamp, query, where, arrayUnion } from 'firebase/firestore';
+import { collection, getDocs, doc, addDoc, setDoc, updateDoc, deleteDoc, writeBatch, onSnapshot, serverTimestamp, query, where, arrayUnion, runTransaction } from 'firebase/firestore';
 import CountryFlag from '../components/CountryFlag';
 import { 
   FolderOpen,
@@ -186,6 +187,7 @@ export default function CentroManagers() {
   const userCanAssign = canAssignTrainer(currentUser);
   // Pestaña de Liquidación de Entrenadores: solo José Sánchez y Elizabeth Escobar (02/09/2026)
   const canViewLiquidacion = canViewLiquidacionEntrenadores(currentUser);
+  const canReversarPago = canReverseLiquidacionEntrenadores(currentUser);
   // Pestaña de KPIs de Llamadas: REGLA ESTRICTA (05/09/2026) solo Directores y José Sánchez / SuperAdmin
   const userCanViewKPIsLlamadas = canViewKPIsLlamadas(currentUser);
   // Notas de Seguimiento post-llamada (02/09/2026): quién puede dejar una nota,
@@ -1886,6 +1888,72 @@ export default function CentroManagers() {
     } catch (e) {
       console.error(e);
       showToast('Error al marcar como pagado', 'error');
+    }
+  };
+
+  // Revertir en pantalla SOLO quita el estado "pagado" (vuelve a pendientes); no ejecuta ninguna
+  // reversión bancaria. Conserva quién/cuándo pagó y no toca llamadas ni documentos fuente.
+  const handleReversarPago = async (item) => {
+    if (!canReversarPago) return;
+    const confirmado = window.confirm(
+      `¿Reversar el pago de ${item.equipo} (${item.sede}) por $${item.montoUSD} USD?\n\n` +
+      `El equipo volverá a la cola de pendientes. Esto NO realiza ninguna transferencia bancaria inversa: solo quita el estado "pagado" en la plataforma. ` +
+      `Se conservará quién pagó y cuándo, y quedará registrado que tú reversaste.`
+    );
+    if (!confirmado) return;
+    const motivo = (window.prompt('Motivo de la reversión (obligatorio):') || '').trim();
+    if (!motivo) {
+      showToast('Reversión cancelada: el motivo es obligatorio.', 'warning');
+      return;
+    }
+    const ref = doc(db, 'liquidaciones_pagos', item.equipoKey);
+    try {
+      const antes = await runTransaction(db, async (tx) => {
+        const snap = await tx.get(ref);
+        const data = snap.exists() ? snap.data() : null;
+        if (!data || data.estado !== 'pagado') return null;
+        tx.update(ref, {
+          estado: 'pendiente',
+          reversadoDePagadoPorEmail: data.pagadoPorEmail || '',
+          reversadoDePagadoPorNombre: data.pagadoPorNombre || '',
+          reversadoDeFechaPago: data.fechaPago || '',
+          reversadoAt: serverTimestamp(),
+          reversadoFecha: new Date().toISOString(),
+          reversadoPorEmail: currentUser?.email || '',
+          reversadoPorNombre: currentUser?.name || '',
+          reversadoPorRole: currentUser?.appRole || currentUser?.role || '',
+          reversadoMotivo: motivo,
+          updatedAt: serverTimestamp()
+        });
+        return data;
+      });
+      if (!antes) {
+        showToast(`${item.equipo} ya no está en estado pagado; no se realizó ningún cambio.`, 'warning');
+        return;
+      }
+
+      let auditOk = true;
+      try {
+        await recordAuditEvent({
+        action: 'LIQUIDACION_ENTRENADOR_REVERSADA',
+        email: currentUser?.email || '',
+        name: currentUser?.name || '',
+        role: currentUser?.appRole || currentUser?.role || '',
+        sede: item.sede,
+        details: `Pago reversado en plataforma (sin reversión bancaria): ${item.equipo} (${item.sede}) - $${item.montoUSD} USD. Antes: estado=pagado, pagadoPor=${antes.pagadoPorEmail || '-'}, fechaPago=${antes.fechaPago || '-'}. Después: estado=pendiente. Motivo: ${motivo}`,
+        module: 'Liquidacion_Equipos'
+      });
+      } catch (auditErr) {
+        auditOk = false;
+        console.error('Auditoría de reversión falló (la reversión sí se guardó):', auditErr);
+      }
+
+      showToast(auditOk
+        ? `Pago reversado: ${item.equipo} volvió a pendientes.`
+        : `Pago reversado: ${item.equipo} volvió a pendientes, pero el registro de auditoría falló. Avisa a soporte.`, auditOk ? 'success' : 'warning');
+    } catch (e) {
+      console.error(e);
+      showToast('Error al reversar el pago; no se aplicó ningún cambio.', 'error');
     }
   };
 
@@ -4769,6 +4837,7 @@ export default function CentroManagers() {
                             <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Monto</th>
                             <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Pagado el</th>
                             <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Pagado por</th>
+                            {canReversarPago && <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Acción</th>}
                           </tr>
                         </thead>
                         <tbody>
@@ -4780,13 +4849,24 @@ export default function CentroManagers() {
                               <td style={{ padding: '0.65rem 0.6rem', fontWeight: 700, color: '#059669' }}>${item.montoUSD}</td>
                               <td style={{ padding: '0.65rem 0.6rem' }}>{item.fechaPago || '-'}</td>
                               <td style={{ padding: '0.65rem 0.6rem' }}>{item.pagadoPorNombre || item.pagadoPorEmail || '-'}</td>
+                              {canReversarPago && (
+                                <td style={{ padding: '0.65rem 0.6rem' }}>
+                                  <button
+                                    onClick={() => handleReversarPago(item)}
+                                    title="Devuelve el equipo a pendientes. No revierte la transferencia bancaria."
+                                    style={{ padding: '0.35rem 0.7rem', borderRadius: '6px', border: '1px solid #dc2626', background: 'transparent', color: '#dc2626', fontWeight: 700, fontSize: '0.78rem', cursor: 'pointer' }}
+                                  >
+                                    Reversar pago
+                                  </button>
+                                </td>
+                              )}
                             </tr>
                           ))}
                         </tbody>
                         <tfoot>
                           <tr style={{ borderTop: `2px solid ${borderLight}` }}>
                             <td colSpan={3} style={{ padding: '0.65rem 0.6rem', textAlign: 'right', fontWeight: 700, color: textMuted }}>Total pagado:</td>
-                            <td colSpan={3} style={{ padding: '0.65rem 0.6rem', fontWeight: 800, color: '#059669' }}>${liquidacionData.totalPagadoUSD.toLocaleString('en-US')}</td>
+                            <td colSpan={canReversarPago ? 4 : 3} style={{ padding: '0.65rem 0.6rem', fontWeight: 800, color: '#059669' }}>${liquidacionData.totalPagadoUSD.toLocaleString('en-US')}</td>
                           </tr>
                         </tfoot>
                       </table>
