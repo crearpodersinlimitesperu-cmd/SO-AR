@@ -13,7 +13,7 @@ import {
   AlertCircle, Circle, RefreshCw, CalendarPlus, Bell, Users, AtSign, 
   BookOpen, Lightbulb, Search, X, Filter, ChevronDown, Sparkles,
   Zap, LayoutGrid, Sliders, CheckSquare, ArrowRight, ArrowUpRight, ShieldCheck,
-  TrendingUp, Compass, HelpCircle, User
+  TrendingUp, Compass, HelpCircle, User, AlertTriangle
 } from 'lucide-react';
 import { getFlagForSede } from '../utils/flags';
 import { getTaskProgressRoles } from '../utils/taskProgressRoles';
@@ -1648,19 +1648,25 @@ export default function Home() {
                 (ej. elegir equipo(s) de Quito). Pedido explícito de José. */}
             <button
               onClick={handleOpenMyProfile}
+              className={myOverdueCount > 0 ? 'overdue-profile-btn' : undefined}
               title={myOverdueCount > 0 ? `Tienes ${myOverdueCount} tarea(s) vencida(s) hace más de 72 h` : 'Ver y editar mi perfil'}
+              aria-label={myOverdueCount > 0
+                ? `Mi Perfil: ${myOverdueCount} ${myOverdueCount === 1 ? 'tarea vencida' : 'tareas vencidas'} hace más de 72 horas`
+                : 'Mi Perfil'}
               style={{
-                display: 'flex', alignItems: 'center', gap: '0.35rem',
-                background: myOverdueCount > 0 ? 'rgba(239,68,68,0.15)' : 'rgba(255,255,255,0.06)',
-                border: myOverdueCount > 0 ? '1px solid #ef4444' : '1px solid var(--border-strong)',
+                display: 'flex', alignItems: 'center', gap: '0.4rem',
+                background: myOverdueCount > 0 ? 'linear-gradient(135deg, #dc2626, #ea580c)' : 'rgba(255,255,255,0.06)',
+                border: myOverdueCount > 0 ? '2px solid #fecaca' : '1px solid var(--border-strong)',
                 borderRadius: '8px', padding: '0.35rem 0.7rem', cursor: 'pointer',
-                color: myOverdueCount > 0 ? '#fca5a5' : 'var(--text-main)', fontSize: '0.75rem', fontWeight: 600
+                color: myOverdueCount > 0 ? '#ffffff' : 'var(--text-main)', fontSize: '0.78rem', fontWeight: myOverdueCount > 0 ? 800 : 600
               }}
             >
-              <User size={14} style={{ color: myOverdueCount > 0 ? '#ef4444' : 'var(--crear-gold)' }} />
+              {myOverdueCount > 0
+                ? <AlertTriangle size={15} aria-hidden="true" style={{ color: '#fff' }} />
+                : <User size={14} aria-hidden="true" style={{ color: 'var(--crear-gold)' }} />}
               Mi Perfil
               {myOverdueCount > 0 && (
-                <span style={{ background: '#ef4444', color: '#fff', borderRadius: '999px', padding: '0 0.4rem', fontSize: '0.65rem', fontWeight: 700 }}>
+                <span aria-hidden="true" style={{ background: '#fff', color: '#b91c1c', borderRadius: '999px', padding: '0 0.5rem', fontSize: '0.75rem', fontWeight: 900, minWidth: '1.3rem', textAlign: 'center' }}>
                   {myOverdueCount}
                 </span>
               )}
