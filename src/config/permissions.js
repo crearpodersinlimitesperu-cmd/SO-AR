@@ -388,6 +388,13 @@ export const canViewLiquidacionEntrenadores = (currentUser) => {
 };
 
 /**
+ * Revertir un pago marcado por error: requiere ver la liquidación (allowlist)
+ * Y acceso global de Director/SuperAdmin. No amplía la visibilidad de la sección.
+ */
+export const canReverseLiquidacionEntrenadores = (currentUser) =>
+  canViewLiquidacionEntrenadores(currentUser) && canViewAllManagers(currentUser);
+
+/**
  * Emails autorizados a ver "Base Maestra CRM (Nodus)" (/crm-maestro): el listado
  * completo y SIN filtrar de participantes de TODA la plataforma — nombre, DNI,
  * teléfono, estado C1, coordinadora e IMO enrolador, sin distinción de sede.
