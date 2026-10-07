@@ -39,6 +39,7 @@ import {
 import EffectiveCommunicationButton from '../components/EffectiveCommunicationButton';
 import { getAllCompanyUsers } from '../services/userService';
 import UserProfileModal from '../components/UserProfileModal';
+import { getOverdueAssignedTasks } from '../utils/overdueTasks';
 import HorariosEntrenamientoModal from '../components/HorariosEntrenamientoModal';
 import { INITIAL_MANAGERS, normalizeTrainer } from '../data/managersData';
 import { formatTrainerDisplayName, nombreLegalEntrenador, normalizarIdentidadEntrenador } from '../data/trainerAliases';
@@ -1404,6 +1405,11 @@ export default function Home() {
   // Si por algún motivo el registro no aparece todavía en realUsersData (ej. aún
   // cargando), cae de vuelta a currentUser tal cual — UserProfileModal ya sabe
   // mostrar un aviso si ese objeto no tiene un id real de Firestore para guardar.
+  const myOverdueCount = useMemo(
+    () => getOverdueAssignedTasks(allTasks, currentUser?.email).length,
+    [allTasks, currentUser?.email, time]
+  );
+
   const handleOpenMyProfile = () => {
     const myEmail = (currentUser?.email || '').toLowerCase().trim();
     const ownRecord = myEmail
@@ -1642,16 +1648,22 @@ export default function Home() {
                 (ej. elegir equipo(s) de Quito). Pedido explícito de José. */}
             <button
               onClick={handleOpenMyProfile}
-              title="Ver y editar mi perfil"
+              title={myOverdueCount > 0 ? `Tienes ${myOverdueCount} tarea(s) vencida(s) hace más de 72 h` : 'Ver y editar mi perfil'}
               style={{
                 display: 'flex', alignItems: 'center', gap: '0.35rem',
-                background: 'rgba(255,255,255,0.06)', border: '1px solid var(--border-strong)',
+                background: myOverdueCount > 0 ? 'rgba(239,68,68,0.15)' : 'rgba(255,255,255,0.06)',
+                border: myOverdueCount > 0 ? '1px solid #ef4444' : '1px solid var(--border-strong)',
                 borderRadius: '8px', padding: '0.35rem 0.7rem', cursor: 'pointer',
-                color: 'var(--text-main)', fontSize: '0.75rem', fontWeight: 600
+                color: myOverdueCount > 0 ? '#fca5a5' : 'var(--text-main)', fontSize: '0.75rem', fontWeight: 600
               }}
             >
-              <User size={14} style={{ color: 'var(--crear-gold)' }} />
+              <User size={14} style={{ color: myOverdueCount > 0 ? '#ef4444' : 'var(--crear-gold)' }} />
               Mi Perfil
+              {myOverdueCount > 0 && (
+                <span style={{ background: '#ef4444', color: '#fff', borderRadius: '999px', padding: '0 0.4rem', fontSize: '0.65rem', fontWeight: 700 }}>
+                  {myOverdueCount}
+                </span>
+              )}
             </button>
           </div>
 
