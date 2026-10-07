@@ -2256,7 +2256,7 @@ export default function MonitorImos() {
       {/* ── MODAL: LINK REGISTRO IMO ── */}
       {historyMission && <MissionHistory mission={historyMission} onClose={() => setHistoryMission(null)} />}
       {missionLoadError && <div role="alert" style={{ position: 'fixed', bottom: 12, left: 16, background: '#7f1d1d', color: 'white', padding: 16, zIndex: 9000 }}>{missionLoadError}</div>}
-      {showImoLinkModal && <CampaignGenerator missions={sedeScopedMissions} defaultSede={filterSede} defaultEquipo={filterEquipo} sedes={isGlobalScopeUser ? [...new Set([...sedesDisponibles, 'Lima', 'Quito', 'Cuenca', 'Guayaquil', 'Medellín', 'México', 'Bogotá'])] : [normalizeSede(currentUser?.sede)].filter(Boolean)} getEnrolados={getEnroladosList} onCreated={id => { setCampaignFilter(id); setFilterEquipo('todos'); }} onClose={() => setShowImoLinkModal(false)} />}
+      {showImoLinkModal && <CampaignGenerator missions={isGlobalScopeUser ? missions : sedeScopedMissions} defaultSede={filterSede === 'todos' ? (normalizeSede(currentUser?.sede) || 'Quito') : filterSede} defaultEquipo={filterEquipo} sedes={isGlobalScopeUser ? [...new Set([...sedesDisponibles, 'Quito', 'Guayaquil', 'Cuenca', 'Lima', 'Medellín', 'México', 'Bogotá'])] : [normalizeSede(currentUser?.sede)].filter(Boolean)} getEnrolados={getEnroladosList} onCreated={id => { setCampaignFilter(id); setFilterEquipo('todos'); }} onClose={() => setShowImoLinkModal(false)} />}
 
       {/* ── MODAL: SIMULADOR DE NEUROMARKETING (SEGUIMIENTO 3 DÍAS) ── */}
       {showNeuroModal && (
