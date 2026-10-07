@@ -67,3 +67,14 @@ Run `37511911253`: creación/configuración de los secretos IMO correcta y carga
 Permiso mínimo preparado para aprobación: rol `roles/secretmanager.secretAccessor` de la cuenta de ejecución `122588918051-compute@developer.gserviceaccount.com` exclusivamente en `IMO_VERIFICATION_SECRET`, `IMO_MAIL_USER`, `IMO_MAIL_PASS`. No hace falta conceder administración general de secretos a GitHub. Se solicitó autorización explícita para este acceso; aún pendiente. La consola de Google Cloud solicita reautenticación del usuario antes de abrir Secret Manager.
 
 No se ha activado `imo_system/control`, no se enviaron códigos reales y no se importaron identidades. Reanudar desde la verificación de identidad de Google y los secretos NODUS_USER/NODUS_PASSWORD. No repetir la creación de secretos ni sustituir sus valores al reintentar.
+
+### Avance de permisos y recuperación (6 de octubre, tarde)
+
+- Secret Accessor confirmado en consola: cuenta de ejecución, 3 de 3 secretos IMO.
+- Run `37546616866`: las dos compilaciones fallaron; Google identificó ausencia de `roles/logging.logWriter`.
+- El usuario autorizó continuar y Google confirmó la concesión de Logs Writer.
+- Run `37549241719`: el recurso fallido de `imoDeliverCode` no tenía eventTrigger; Firebase interpretó el stub como HTTPS e impidió actualizarlo a trigger.
+- Se añadió recuperación acotada: solo elimina/recrea `imoDeliverCode` cuando es FAILED, sin eventTrigger, con codebase `imo` y entryPoint exacto. Nunca elimina una función operativa.
+- Run `37549555841`: recuperación correcta; compilación falló leyendo el archivo fuente. Los registros ya funcionan y muestran denegación de `storage.objects.get` en `gcf-v2-sources-122588918051-us-central1`.
+- Se dejó preparado, sin guardar, `roles/storage.objectViewer` para `122588918051-compute@developer.gserviceaccount.com` exclusivamente en ese bucket. Pendiente de autorización del usuario para este nuevo acceso.
+- No hay funciones IMO operativas confirmadas. No se habilitó el control ni se enviaron códigos reales. La autenticación/sincronización Nodus y el portal v3 siguen pendientes.
