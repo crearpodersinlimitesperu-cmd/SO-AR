@@ -28,7 +28,7 @@ export default function NodusUserAccessReport() {
           lastConnectionColumn: 'Últ. conexión',
           statusColumn: 'Estado',
           statusCounts: { Activo: fallbackAccounts.length },
-          columns: ['Usuario', 'Correo / Identificador', 'Sede', 'Rol / Cargo', 'Últ. conexión', 'Estado'],
+          columns: ['Usuario', 'Correo / Identificador', 'Sede', 'Rol / Cargo', 'Pendientes', 'Últ. conexión', 'Estado'],
           coverage: 'complete',
           publishedAt: new Date(),
           source: 'Respaldo verificado del directorio maestro NODUS'
@@ -61,7 +61,7 @@ export default function NodusUserAccessReport() {
         lastConnectionColumn: 'Últ. conexión',
         statusColumn: 'Estado',
         statusCounts: { Activo: fallbackAccounts.length },
-        columns: ['Usuario', 'Correo / Identificador', 'Sede', 'Rol / Cargo', 'Últ. conexión', 'Estado'],
+        columns: ['Usuario', 'Correo / Identificador', 'Sede', 'Rol / Cargo', 'Pendientes', 'Últ. conexión', 'Estado'],
         coverage: 'complete',
         publishedAt: new Date(),
         source: 'Respaldo verificado del directorio maestro NODUS'

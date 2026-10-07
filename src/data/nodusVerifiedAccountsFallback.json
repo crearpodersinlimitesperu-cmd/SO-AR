@@ -4,6 +4,8 @@
     "Correo / Identificador": "coordinacion.cuenca@crearpsl.net",
     "Sede": "Cuenca",
     "Rol / Cargo": "Coordinador C1",
+    "Pendientes": "352 llamadas por realizar · 44 por confirmar",
+    "Total Pendientes": 396,
     "Últ. conexión": "04/09/2026 13:46",
     "Estado": "Activo"
   },
@@ -12,46 +14,58 @@
     "Correo / Identificador": "coordinacion.cuenca@crearpsl.net",
     "Sede": "Cuenca",
     "Rol / Cargo": "Coordinador C1",
+    "Pendientes": "884 llamadas por realizar · 29 por confirmar",
+    "Total Pendientes": 913,
     "Últ. conexión": "03/09/2026 11:38",
     "Estado": "Activo"
   },
   {
-    "Usuario": "Juan Fernando",
+    "Usuario": "Juan Fernando Solano",
     "Correo / Identificador": "coordinacion.cuenca@crearpsl.net",
     "Sede": "Cuenca",
     "Rol / Cargo": "Coordinador C1",
+    "Pendientes": "140 llamadas por realizar · 14 por confirmar",
+    "Total Pendientes": 154,
     "Últ. conexión": "03/09/2026 12:33",
     "Estado": "Activo"
   },
   {
-    "Usuario": "EVELYN PAULINA",
+    "Usuario": "Evelyn Paulina Morales",
     "Correo / Identificador": "evelyn.paulina@crearpsl.net",
     "Sede": "Cuenca",
     "Rol / Cargo": "Coordinador C1",
+    "Pendientes": "837 llamadas por realizar · 6 por confirmar",
+    "Total Pendientes": 843,
     "Últ. conexión": "04/09/2026 12:29",
     "Estado": "Activo"
   },
   {
-    "Usuario": "DIANA MACAS",
+    "Usuario": "Diana Macas",
     "Correo / Identificador": "diana.macas@crearpsl.net",
     "Sede": "Guayaquil",
     "Rol / Cargo": "Coordinador C1",
+    "Pendientes": "129 prospectos por confirmar",
+    "Total Pendientes": 129,
     "Últ. conexión": "04/09/2026 08:15",
     "Estado": "Activo"
   },
   {
-    "Usuario": "BRENDA RODRIGUEZ",
+    "Usuario": "Brenda Rodriguez",
     "Correo / Identificador": "brenda.rodriguez@crearpsl.net",
     "Sede": "Guayaquil",
     "Rol / Cargo": "Coordinador C1",
+    "Pendientes": "86 prospectos por confirmar",
+    "Total Pendientes": 86,
     "Últ. conexión": "04/09/2026 17:26",
     "Estado": "Activo"
   },
   {
-    "Usuario": "JONATHAN LA ROSA",
+    "Usuario": "Jonathan La Rosa",
     "Correo / Identificador": "jonathan.la.rosa@crearpsl.net",
     "Sede": "Guayaquil",
     "Rol / Cargo": "Coordinador C1",
+    "Pendientes": "86 prospectos por confirmar",
+    "Total Pendientes": 86,
     "Últ. conexión": "04/09/2026 14:22",
     "Estado": "Activo"
   },
@@ -60,6 +74,8 @@
     "Correo / Identificador": "jorge@crearpsl.net",
     "Sede": "Guayaquil",
     "Rol / Cargo": "Coordinador C1",
+    "Pendientes": "39 prospectos por confirmar",
+    "Total Pendientes": 39,
     "Últ. conexión": "04/09/2026 12:03",
     "Estado": "Activo"
   },
@@ -68,6 +84,8 @@
     "Correo / Identificador": "coordinacion.lima@crearpsl.net",
     "Sede": "Lima",
     "Rol / Cargo": "Coordinador C1 / C2",
+    "Pendientes": "324 prospectos por confirmar",
+    "Total Pendientes": 324,
     "Últ. conexión": "04/09/2026 16:28",
     "Estado": "Activo"
   },
@@ -76,62 +94,78 @@
     "Correo / Identificador": "coordinacion.lima@crearpsl.net",
     "Sede": "Lima",
     "Rol / Cargo": "Coordinador C1 / C2",
+    "Pendientes": "53 prospectos por confirmar",
+    "Total Pendientes": 53,
     "Últ. conexión": "04/09/2026 18:36",
     "Estado": "Activo"
   },
   {
-    "Usuario": "LEYLA",
+    "Usuario": "Leyla",
     "Correo / Identificador": "leyla@crearpsl.net",
     "Sede": "Lima",
     "Rol / Cargo": "Coordinador C1 / C2",
+    "Pendientes": "71 prospectos por confirmar",
+    "Total Pendientes": 71,
     "Últ. conexión": "04/09/2026 18:40",
     "Estado": "Activo"
   },
   {
-    "Usuario": "VALENTINA RODRIGUEZ",
+    "Usuario": "Valentina Rodriguez",
     "Correo / Identificador": "valentina.rodriguez@crearpsl.net",
     "Sede": "Medellín",
     "Rol / Cargo": "Coordinador C1 / C2",
+    "Pendientes": "135 prospectos por confirmar",
+    "Total Pendientes": 135,
     "Últ. conexión": "03/09/2026 14:29",
     "Estado": "Activo"
   },
   {
-    "Usuario": "DAVID GONZALEZ",
+    "Usuario": "David Gonzalez",
     "Correo / Identificador": "david.gonzalez@crearpsl.net",
     "Sede": "Medellín",
     "Rol / Cargo": "Coordinador C1 / C2",
+    "Pendientes": "66 prospectos por confirmar",
+    "Total Pendientes": 66,
     "Últ. conexión": "03/09/2026 14:53",
     "Estado": "Activo"
   },
   {
-    "Usuario": "JUAN SEBASTIAN SOTO",
+    "Usuario": "Juan Sebastian Soto",
     "Correo / Identificador": "juan.sebastian.soto@crearpsl.net",
     "Sede": "Medellín",
     "Rol / Cargo": "Coordinador C1 / C2",
-    "Últ. conexión": "Registrada en ciclo",
+    "Pendientes": "12 prospectos por confirmar",
+    "Total Pendientes": 12,
+    "Últ. conexión": "",
     "Estado": "Activo"
   },
   {
-    "Usuario": "NAOMI",
+    "Usuario": "Naomi",
     "Correo / Identificador": "naomi@crearpsl.net",
     "Sede": "México",
     "Rol / Cargo": "Coordinador C1",
+    "Pendientes": "148 llamadas por realizar · 1 por confirmar",
+    "Total Pendientes": 149,
     "Últ. conexión": "03/09/2026 15:41",
     "Estado": "Activo"
   },
   {
-    "Usuario": "ADRIANNA",
+    "Usuario": "Adrianna",
     "Correo / Identificador": "adrianna@crearpsl.net",
     "Sede": "Quito",
     "Rol / Cargo": "Coordinador C1",
+    "Pendientes": "113 prospectos por confirmar",
+    "Total Pendientes": 113,
     "Últ. conexión": "04/09/2026 09:22",
     "Estado": "Activo"
   },
   {
-    "Usuario": "LILIANA",
+    "Usuario": "Liliana",
     "Correo / Identificador": "liliana@crearpsl.net",
     "Sede": "Quito",
     "Rol / Cargo": "Coordinador C1 / C2",
+    "Pendientes": "212 prospectos por confirmar",
+    "Total Pendientes": 212,
     "Últ. conexión": "03/09/2026 07:45",
     "Estado": "Activo"
   },
@@ -140,6 +174,8 @@
     "Correo / Identificador": "coordinacion.quito@crearpsl.net",
     "Sede": "Quito",
     "Rol / Cargo": "Coordinador C1",
+    "Pendientes": "216 prospectos por confirmar",
+    "Total Pendientes": 216,
     "Últ. conexión": "04/09/2026 09:26",
     "Estado": "Activo"
   },
@@ -148,31 +184,69 @@
     "Correo / Identificador": "coordinacion.quito@crearpsl.net",
     "Sede": "Quito",
     "Rol / Cargo": "Coordinador C1 / C2",
+    "Pendientes": "268 prospectos por confirmar",
+    "Total Pendientes": 268,
     "Últ. conexión": "04/09/2026 14:35",
     "Estado": "Activo"
   },
   {
-    "Usuario": "DANIELA",
+    "Usuario": "Daniela",
     "Correo / Identificador": "daniela@crearpsl.net",
     "Sede": "Quito",
     "Rol / Cargo": "Coordinador C1",
+    "Pendientes": "111 prospectos por confirmar",
+    "Total Pendientes": 111,
     "Últ. conexión": "03/09/2026 18:19",
     "Estado": "Activo"
   },
   {
-    "Usuario": "DANNA",
+    "Usuario": "Danna",
     "Correo / Identificador": "danna@crearpsl.net",
     "Sede": "Quito",
     "Rol / Cargo": "Coordinador C1",
+    "Pendientes": "150 prospectos por confirmar",
+    "Total Pendientes": 150,
     "Últ. conexión": "04/09/2026 09:48",
     "Estado": "Activo"
   },
   {
-    "Usuario": "MARCELA",
+    "Usuario": "Marcela",
     "Correo / Identificador": "marcela@crearpsl.net",
     "Sede": "Quito",
     "Rol / Cargo": "Coordinador C1",
+    "Pendientes": "54 prospectos por confirmar",
+    "Total Pendientes": 54,
     "Últ. conexión": "04/09/2026 17:46",
+    "Estado": "Activo"
+  },
+  {
+    "Usuario": "Ricardo Gavilánez",
+    "Correo / Identificador": "ricardo.gavilanez@crearpsl.net",
+    "Sede": "GLOBAL",
+    "Rol / Cargo": "Director General / Gerencia",
+    "Pendientes": "Auditoría de liquidaciones y cierre de ciclos",
+    "Total Pendientes": 1,
+    "Últ. conexión": "Hoy, en línea",
+    "Estado": "Activo"
+  },
+  {
+    "Usuario": "Liliana Cubillo",
+    "Correo / Identificador": "liliana.cubillo@crearpsl.net",
+    "Sede": "Quito",
+    "Rol / Cargo": "Manager de Sede / Entrenadora",
+    "Pendientes": "Revisión de graduados Equipo 122",
+    "Total Pendientes": 1,
+    "Últ. conexión": "Hoy, en línea",
+    "Estado": "Activo"
+  },
+  {
+    "Usuario": "Viviana Ruiz",
+    "Correo / Identificador": "viviana.ruiz@crearpsl.net",
+    "Sede": "Quito",
+    "Rol / Cargo": "Manager de Operaciones",
+    "Pendientes": "Validación de vuelos y seguros",
+    "Total Pendientes": 1,
+    "Últ. conexión": "Hoy, en línea",
     "Estado": "Activo"
   }
 ]
