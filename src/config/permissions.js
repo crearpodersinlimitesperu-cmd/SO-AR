@@ -301,8 +301,9 @@ export const canViewAllManagers = (currentUser) => {
   if (!currentUser) return false;
   if (currentUser.isSuperAdmin || currentUser.isDireccion || isSuperAdminEmail(currentUser.email) || isGlobalObserver(currentUser)) return true;
   // ELIMINADO: if (isMaestriaCoordinator(currentUser)) return true; -> Esto daba acceso global a todos los coordinadores locales como Lili.
-  const r = currentUser.appRole || currentUser.role;
-  return r === 'director_maestria' || isDireccionRole(r);
+  const r = String(currentUser.appRole || currentUser.role || '').toLowerCase();
+  const assigned = Array.isArray(currentUser.roles) ? currentUser.roles.map(x => String(x).toLowerCase()) : [];
+  return [r, ...assigned].some(x => x === 'director_maestria' || isDireccionRole(x));
 };
 
 /**
