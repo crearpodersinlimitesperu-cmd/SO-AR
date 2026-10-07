@@ -16,6 +16,7 @@ import {
   TrendingUp, Compass, HelpCircle, User
 } from 'lucide-react';
 import { getFlagForSede } from '../utils/flags';
+import { getTaskProgressRoles } from '../utils/taskProgressRoles';
 import { createGoogleEvent } from '../services/googleSync';
 import { calculateAutomaticDeadline } from '../utils/soarDates';
 import TaskAssignmentModal from '../components/TaskAssignmentModal';
@@ -1197,6 +1198,7 @@ export default function Home() {
   };
 
   const activeRole = currentUser?.appRole || currentUser?.role || 'gerente';
+  const taskProgressRoles = getTaskProgressRoles(activeRole, currentUser?.roles);
   const isExecutiveUser = ['ceo', 'cco', 'socio', 'super_admin', 'direccion'].includes(activeRole) ||
                           userEmail === 'fer.aragon@crearpsl.net' ||
                           userEmail === 'paul.sosa@crearpsl.net';
@@ -1207,9 +1209,6 @@ export default function Home() {
                        (t.collaborators && t.collaborators.some(c => isEmailMatch(c, userEmail)));
     if (isAssigned) return true;
     if (isExecutiveUser) return false; // Roles ejecutivos / Fer y Paul no tienen tareas operativas por defecto
-    if (activeRole === 'consolidado') {
-      return true;
-    }
 
     // 1. Si la tarea fue asignada nominalmente a alguien más, no computar en mi progreso
     const hasSpecificAssignees = (Array.isArray(t.assignedToEmails) && t.assignedToEmails.length > 0) || Boolean(t.assignedToEmail);
@@ -1245,7 +1244,7 @@ export default function Home() {
       }
     }
 
-    return t.role === activeRole;
+    return taskProgressRoles.includes(t.role);
   });
   const completedForProgress = myTasksForProgress.filter(t => t.completed || t.status === 'Completada').length;
   const progressPercentage = myTasksForProgress.length > 0 ? Math.round((completedForProgress / myTasksForProgress.length) * 100) : 0;
