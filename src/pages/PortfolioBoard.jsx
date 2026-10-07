@@ -16,7 +16,8 @@ import { SEDES_FDS_PRICING, getSedePricing, formatCurrencyAmount } from '../data
 import nodusFallbackData from '../data/nodusFallbackData.json';
 import ResourceCapacityView from '../components/ResourceCapacityView';
 import FuturosImposiblesView from '../components/FuturosImposiblesView';
-import { PORTFOLIO_FI_REVIEW_EMAILS } from '../config/permissions';
+import NodusUserAccessReport from '../components/NodusUserAccessReport';
+import { NODUS_REPORT_ADMIN_EMAILS, PORTFOLIO_FI_REVIEW_EMAILS } from '../config/permissions';
 import {
   classifyCoordinatorPerformance,
   getCoordinatorMetrics,
@@ -130,8 +131,10 @@ export default function PortfolioBoard() {
     const [searchParams, setSearchParams] = useSearchParams();
   const tabParam = searchParams.get('tab');
   const isAuthorizedForPredictor = ['jose.sanchez@crearpsl.net', 'fer.aragon@crearpsl.net', 'fer.aragon@crearpsl.com', 'fer.arango@crearpsl.net', 'paul.sosa@crearpsl.net'].includes((currentUser?.email || '').toLowerCase());
+  const canViewNodusUserAccess = NODUS_REPORT_ADMIN_EMAILS.includes((currentUser?.email || '').trim().toLowerCase());
 
   const resolveTab = (tab) => {
+    if (!canViewNodusUserAccess && tab === 'nodus_users') return 'rrhh_sentinel';
     if (!isAuthorizedForPredictor && ['predictor', 'active', 'resources'].includes(tab)) {
       return 'rrhh_sentinel';
     }
@@ -160,10 +163,10 @@ export default function PortfolioBoard() {
   const [toastMessage, setToastMessage] = useState(null);
 
   useEffect(() => {
-    if (tabParam && ['predictor', 'active', 'resources', 'rrhh_sentinel', 'futuros_imposibles'].includes(tabParam)) {
+    if (tabParam && ['predictor', 'active', 'resources', 'rrhh_sentinel', 'futuros_imposibles', 'nodus_users'].includes(tabParam)) {
       setViewMode(resolveTab(tabParam));
     }
-  }, [tabParam, isAuthorizedForPredictor]);
+  }, [tabParam, isAuthorizedForPredictor, canViewNodusUserAccess]);
 
   const handleTabChange = (mode) => {
     const safeMode = resolveTab(mode);
@@ -664,6 +667,22 @@ export default function PortfolioBoard() {
             >
               <Target size={16} /> Futuros Imposibles (IA)
             </button>
+            {canViewNodusUserAccess && (
+              <button
+                onClick={() => handleTabChange('nodus_users')}
+                style={{
+                  padding: '0.5rem 1rem',
+                  borderRadius: '8px',
+                  border: viewMode === 'nodus_users' ? '1px solid #0ea5e9' : `1px solid ${borderLight}`,
+                  background: viewMode === 'nodus_users' ? 'rgba(14, 165, 233, 0.18)' : 'transparent',
+                  color: viewMode === 'nodus_users' ? '#38bdf8' : textMuted,
+                  fontWeight: 700,
+                  cursor: 'pointer'
+                }}
+              >
+                Usuarios Nodus
+              </button>
+            )}
           </div>
         </div>
       </header>
@@ -681,6 +700,8 @@ export default function PortfolioBoard() {
             <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem' }}>Error de Sincronización</h2>
             <p>{errorObj}</p>
           </div>
+        ) : viewMode === 'nodus_users' ? (
+          <NodusUserAccessReport />
         ) : viewMode === 'predictor' && !predictorMatrixData ? (
           <div style={{ background: bgCard, border: `1px solid ${borderLight}`, color: textMuted, padding: '2rem', borderRadius: '12px', textAlign: 'center' }}>
             <AlertCircle size={40} style={{ margin: '0 auto 1rem auto', color: '#f59e0b' }} />

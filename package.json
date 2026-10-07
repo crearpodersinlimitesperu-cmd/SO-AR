@@ -21,6 +21,7 @@
     "sync:nodus": "node scripts/nodusMultiAgentSync.mjs",
     "daemon:nodus": "node scripts/nodusDaemon.mjs",
     "archive:nodus": "node scripts/nodusArchiveAgent.mjs",
+    "report:nodus-users": "node scripts/nodusUserAccessAgent.mjs",
     "sync:kpis": "node scripts/syncKpisLlamadas.mjs",
     "audit:polizas": "node scripts/trainerPolicyAuditAgent.mjs",
     "import:reunion-madrid": "node scripts/importReunionMadridTasks.mjs",

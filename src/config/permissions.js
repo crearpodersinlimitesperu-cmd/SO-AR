@@ -13,6 +13,23 @@ export const SUPER_ADMIN_EMAILS = [
   'paul.sosa@crearpsl.net'       // Paul Sosa — SuperAdmin
 ];
 
+// Mantener sincronizada con isGerenteODireccion() en firestore.rules.
+export const NODUS_REPORT_ADMIN_EMAILS = [
+  ...SUPER_ADMIN_EMAILS,
+  'emely.leon@crearpsl.net',
+  'fer.aragon@crearpsl.net',
+  'andres.gomez@crearpsl.net',
+  'gomeznueve@gmail.com',
+  'contabilidad.global@crearpsl.net',
+  'leandro.brunis@crearpsl.net',
+  'josue.vera@crearpsl.net',
+  'yurany.gonzalez@crearpsl.net',
+  'nora.zamora@crearpsl.net',
+  'emily.campuzano@crearpsl.net',
+  'freddy.sosa@crearpsl.net',
+  'diana.moscoso@crearpsl.net'
+];
+
 /**
  * Roles que otorgan privilegios de Dirección (equivalente a SuperAdmin por rol)
  */
