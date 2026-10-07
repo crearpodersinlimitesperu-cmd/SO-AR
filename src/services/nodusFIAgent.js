@@ -19,6 +19,8 @@ export const normalizarTexto = (texto = '') => {
     .trim();
 };
 
+export const equipoKeyDe = (p = {}) => `${normalizarTexto(p.sede || 'sin sede')}|${normalizarTexto(p.equipo || 'sin equipo')}`;
+
 /**
  * Motor principal de diagnóstico del Agente IA
  */
@@ -51,10 +53,13 @@ export function ejecutarDiagnosticoFIs(
     const dev = p.devueltos || 0;
     const apr = p.aprobados || 0;
 
-    const eqKey = p.equipo || 'Sin Equipo';
+    const eqNombre = p.equipo || 'Sin Equipo';
+    const eqKey = equipoKeyDe(p);
     if (!equiposMap[eqKey]) {
       equiposMap[eqKey] = {
-        equipo: eqKey,
+        key: eqKey,
+        sede: p.sede || 'Sin sede',
+        equipo: eqNombre,
         total: 0,
         sinEntrega: 0,
         conEntrega: 0,
@@ -91,7 +96,10 @@ export function ejecutarDiagnosticoFIs(
   // 3. Aplicar filtro de equipo a los participantes
   let filtrados = participantesEnSede;
   if (filtroEquipo && filtroEquipo !== 'Todos') {
-    filtrados = filtrados.filter(p => (p.equipo || '').toUpperCase().includes(filtroEquipo.toUpperCase()));
+    // Empareja por sede+equipo: el mismo código puede existir en varias sedes.
+    filtrados = filtrados.filter(p => String(filtroEquipo).includes('|')
+      ? equipoKeyDe(p) === filtroEquipo
+      : (p.equipo || '').toUpperCase().includes(filtroEquipo.toUpperCase()));
   }
 
   // 4. Filtrado por estado de FIs

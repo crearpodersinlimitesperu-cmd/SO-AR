@@ -14,6 +14,15 @@ import { NodusHrSentinelAgent } from './nodusHrSentinelAgent.mjs';
 import { NodusFIAgent } from './nodusFIAgent.mjs';
 import { NodusGenealogyAgent } from './nodusGenealogyAgent.mjs';
 import { NodusIdentityAgent } from './nodusIdentityAgent.mjs';
+import {
+  assessFiCompleteness,
+  buildEquipoSedeIndex,
+  canonicalSede,
+  mergeParticipants,
+  parseDataTablesInfo,
+  rowsToFiParticipants,
+  summarizeSedeEquipoDiscrepancies
+} from './nodusFuturosImposiblesParser.mjs';
 import { resolveUniqueNameMatch } from '../shared/rrhhSentinelRules.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -395,186 +404,124 @@ class NodusExtractorAgent {
 
   async extractFuturosImposibles(coordinadores = null) {
     console.log("🎯 [Agente 1 - Extractor] Extrayendo Futuros Imposibles multi-sede desde NODUS...");
+    const FI_URL = 'https://imo.crearpslglobal.com/futurosimposibles';
+    const equipoSedeIndex = buildEquipoSedeIndex(coordinadores);
+    const expectedSedes = [...new Set((coordinadores || []).map((c) => c?.sede).filter((s) => s && canonicalSede(s) !== 'Sin sede'))];
+    const acumulador = new Map();
+    const blocked = [];
+    const pasadas = [];
+    let expectedTotal = null;
 
-    const SEDES_CONOCIDAS = ['Lima', 'Quito', 'Cuenca', 'Guayaquil', 'Medellín', 'México', 'Bogotá'];
+    const isBlocked = () => /sgcaptcha/.test(this.page.url());
+    const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
-    // Mapear equipos a sedes basado en RRHH para inferir sede real de los FIs
-    const equipoSedeMap = new Map();
-    if (coordinadores && Array.isArray(coordinadores)) {
-      coordinadores.forEach(c => {
-        if (c.sede && Array.isArray(c.equipos)) {
-          c.equipos.forEach(eq => equipoSedeMap.set(eq.trim().toLowerCase(), c.sede));
-        }
+    // Lee la página actual de DataTables (cabeceras, filas, info y estado de paginación).
+    const leerPagina = () => this.page.evaluate(() => {
+      const key = (v = '') => v.toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+      const table = Array.from(document.querySelectorAll('table')).find((t) => {
+        const h = key(t.querySelector('thead')?.innerText || '');
+        return h.includes('nombre') || h.includes('participante') || h.includes('asistente');
       });
-    }
+      if (!table) return { found: false, rows: [], info: '', hasNext: false };
+      const headers = Array.from(table.querySelectorAll('thead th')).map((h, i) => key(h.innerText || `col_${i}`));
+      const rows = Array.from(table.querySelectorAll('tbody tr')).map((tr) => {
+        const cells = Array.from(tr.querySelectorAll('td')).map((c) => c.innerText.trim());
+        return headers.reduce((rec, h, i) => ({ ...rec, [h]: cells[i] || '' }), {});
+      }).filter((r) => Object.values(r).some(Boolean) && !/ningun dato|no hay datos|no data/.test(key(Object.values(r)[0])));
+      const info = document.querySelector('.dataTables_info')?.innerText || '';
+      const next = document.querySelector('.paginate_button.next, #DataTables_Table_0_next');
+      return { found: true, rows, info, hasNext: !!next && !/disabled/.test(next.className || '') };
+    });
 
-    const first = (row, candidates) => {
-      const found = Object.entries(row).find(([key]) => candidates.some((candidate) => key.includes(candidate)));
-      return found?.[1] || '';
-    };
-    const yes = (value) => /^(si|s[ií]|true|1|asistio|asistió|confirmad[oa])$/i.test(String(value).trim());
-    const number = (value) => Number.parseInt(String(value).replace(/[^0-9-]/g, ''), 10) || 0;
-
-    // Infiere sede desde la columna o, si vacía, desde el nombre del equipo
-    const inferirSede = (equipo, sedeColumna) => {
-      if (sedeColumna && sedeColumna.trim()) return sedeColumna.trim();
-      const eqStr = (equipo || '').trim();
-      const eqLower = eqStr.toLowerCase();
-      if (equipoSedeMap.has(eqLower)) return equipoSedeMap.get(eqLower);
-
-      const eq = eqStr.toUpperCase();
-      if (eq.includes('CUENCA')) return 'Cuenca';
-      if (eq.includes('QUITO')) return 'Quito';
-      if (eq.includes('GUAYAQUIL') || eq.includes('GYE')) return 'Guayaquil';
-      if (eq.includes('BOGOTA') || eq.includes('BOGOTÁ')) return 'Bogotá';
-      if (eq.includes('MEDELLIN') || eq.includes('MEDELLÍN')) return 'Medellín';
-      if (eq.includes('MEXICO') || eq.includes('MÉXICO') || eq.includes('CDMX')) return 'México';
-      return 'Lima';
-    };
-
-    // Extrae la tabla de la página actual y mapea a participantes
-    const extraerTablaActual = async (sedeForzada) => {
-      const rawRows = await this.page.evaluate(() => {
-        const key = (value = '') => value.toString().toLowerCase()
-          .normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
-        const table = Array.from(document.querySelectorAll('table')).find((candidate) => {
-          const heading = key(candidate.querySelector('thead')?.innerText || '');
-          return heading.includes('nombre') || heading.includes('participante') || heading.includes('asistente');
-        });
-        if (!table) return [];
-        const headers = Array.from(table.querySelectorAll('thead th')).map((header, index) => key(header.innerText || `col_${index}`));
-        return Array.from(table.querySelectorAll('tbody tr')).map((row) => {
-          const cells = Array.from(row.querySelectorAll('td')).map((cell) => cell.innerText.trim());
-          return headers.reduce((record, header, index) => ({ ...record, [header]: cells[index] || '' }), {});
-        }).filter((row) => Object.values(row).some(Boolean));
+    // Muestra el máximo de filas por página y recorre todas las páginas.
+    const leerTodasLasPaginas = async () => {
+      await this.page.evaluate(() => {
+        const sel = document.querySelector('select[name$="_length"]');
+        if (!sel) return;
+        const max = Array.from(sel.options).map((o) => ({ v: o.value, n: parseInt(o.value, 10) }))
+          .sort((a, b) => (b.n === -1 ? Infinity : b.n) - (a.n === -1 ? Infinity : a.n))[0];
+        if (max) { sel.value = max.v; sel.dispatchEvent(new Event('change', { bubbles: true })); }
       });
-      return rawRows.map((row, index) => {
-        const nombrePart = first(row, ['nombre', 'participante', 'asistente']);
-        const apellidoPart = first(row, ['apellido']);
-        const nombre = (apellidoPart && !nombrePart.toLowerCase().includes(apellidoPart.toLowerCase())) 
-          ? `${nombrePart} ${apellidoPart}`.trim() 
-          : nombrePart;
-        const asistencia = first(row, ['asistencia pfd', 'asistio pfd', 'asistencia', 'pfd']);
-        const sedeCol = first(row, ['sede', 'ciudad']);
-        const equipo = first(row, ['equipo', 'team']);
-        return {
-          id: first(row, ['id', 'dni', 'cedula']) || `nodus_fi_${index}`,
-          dni: first(row, ['dni', 'cedula', 'documento']),
-          nombre,
-          sede: sedeForzada || inferirSede(equipo, sedeCol),
-          equipo,
-          fechaPFD: first(row, ['fecha pfd', 'pfd fecha']),
-          asistioPFD: yes(asistencia),
-          totalFi: number(first(row, ['total fi', 'fis cargados', 'futuros cargados'])),
-          pendientes: number(first(row, ['pendiente'])),
-          devueltos: number(first(row, ['devuelto'])),
-          aprobados: number(first(row, ['aprobado'])),
-          fis: []
-        };
-      }).filter((p) => p.nombre && p.asistioPFD);
+      await wait(1500);
+      const rows = [];
+      let total = null;
+      for (let page = 0; page < 300; page++) {
+        const snap = await leerPagina();
+        if (!snap.found) break;
+        rows.push(...snap.rows);
+        total = parseDataTablesInfo(snap.info) ?? total;
+        if (!snap.hasNext) break;
+        await this.page.evaluate(() => document.querySelector('.paginate_button.next, #DataTables_Table_0_next')?.click());
+        await wait(700);
+      }
+      return { rows, total };
     };
 
-    // ── PASO 1: Navegar a la página de FIs ───────────────────────────────────
-    await this.safeGoto('https://imo.crearpslglobal.com/futurosimposibles', 45000);
-    if (this.page.url().includes('sgcaptcha') || this.page.url().includes('.well-known/sgcaptcha')) {
+    const registrarPasada = async (etiqueta) => {
+      if (isBlocked()) { blocked.push(etiqueta); return; }
+      const { rows, total } = await leerTodasLasPaginas();
+      const parsed = rowsToFiParticipants(rows, { equipoSedeIndex });
+      const nuevos = mergeParticipants(acumulador, parsed);
+      pasadas.push({ etiqueta, filasLeidas: rows.length, totalDeclarado: total, nuevos });
+      console.log(`📍 [Agente 6 - FI] ${etiqueta}: ${rows.length} filas (declaradas: ${total ?? 'n/d'}), ${nuevos} nuevos. Total: ${acumulador.size}`);
+      return total;
+    };
+
+    // Cambia un <select> de la página a la opción indicada y espera a que recargue.
+    const elegirOpcion = async (selectIndex, optionValue) => {
+      await this.page.evaluate((i, v) => {
+        const sel = document.querySelectorAll('select:not([name$="_length"])')[i];
+        if (!sel) return;
+        sel.value = v; sel.dispatchEvent(new Event('change', { bubbles: true }));
+      }, selectIndex, optionValue);
+      await wait(2000);
+    };
+
+    await this.safeGoto(FI_URL, 45000);
+    if (isBlocked()) {
       throw new Error('El WAF de NODUS/SiteGround bloqueó la lectura de Futuros Imposibles; no se interpretó como universo vacío.');
     }
 
-    // ── PASO 2: Intentar seleccionar "Todas las sedes" en el filtro de NODUS ─
-    try {
-      const filterActivated = await this.page.evaluate(() => {
-        const selects = Array.from(document.querySelectorAll('select'));
-        for (const sel of selects) {
-          const allOpt = Array.from(sel.options).find(o => /todas|all|global|sin filtro|todos/i.test(o.text));
-          if (allOpt) {
-            sel.value = allOpt.value;
-            sel.dispatchEvent(new Event('change', { bubbles: true }));
-            return true;
-          }
-        }
-        return false;
-      });
-      if (filterActivated) {
-        await new Promise(r => setTimeout(r, 2500));
-        const resultado = await extraerTablaActual(null);
-        const sedesFound = new Set(resultado.map(p => p.sede).filter(Boolean));
-        if (resultado.length > 0) {
-          console.log(`✅ [Agente 6 - FI] Filtro "Todas" activado. Sedes: ${[...sedesFound].join(', ')} (${resultado.length} participantes)`);
-          return resultado;
+    // Pasada base: vista por defecto (equipo "Todos"), todas las páginas. No
+    // se retorna aquí: es solo la primera de varias pasadas.
+    expectedTotal = await registrarPasada('Vista completa');
+
+    // Filtros de la página (sede y/o equipo): se recorre cada opción concreta
+    // para no depender de que "Todos" entregue el universo completo.
+    const filtros = await this.page.evaluate(() => Array.from(document.querySelectorAll('select:not([name$="_length"])')).map((sel, index) => ({
+      index,
+      options: Array.from(sel.options).map((o) => ({ value: o.value, text: o.text.trim() }))
+        .filter((o) => o.value !== '' && !/^(todas?|todos|all|global|sin filtro|seleccione.*)$/i.test(o.text))
+    })));
+    for (const filtro of filtros) {
+      for (const opt of filtro.options) {
+        try {
+          await this.safeGoto(FI_URL, 35000);
+          if (isBlocked()) { blocked.push(`filtro ${opt.text}`); continue; }
+          await elegirOpcion(filtro.index, opt.value);
+          await registrarPasada(`Filtro ${opt.text}`);
+        } catch (err) {
+          blocked.push(`filtro ${opt.text}: ${err.message}`);
         }
       }
-    } catch (filterErr) {
-      console.warn(`⚠️ [Agente 6 - FI] Filtro "Todas" no disponible: ${filterErr.message}`);
     }
 
-    // ── PASO 3: Leer tabla inicial (puede tener todas las sedes si NODUS es global) ─
-    const resultadoInicial = await extraerTablaActual(null);
-    const sedesIniciales = new Set(resultadoInicial.map(p => p.sede).filter(s => s && s !== ''));
-    console.log(`📋 [Agente 6 - FI] Extracción inicial: ${resultadoInicial.length} participantes. Sedes detectadas: ${[...sedesIniciales].join(', ') || 'ninguna'}`);
-
-    // Si ya tenemos 2+ sedes reales en columna sede, no necesitamos iterar
-    if ([...sedesIniciales].filter(s => s !== 'Lima').length >= 2) {
-      console.log(`✅ [Agente 6 - FI] Tabla multi-sede en carga directa. No se requiere iteración.`);
-      return resultadoInicial;
-    }
-
-    // ── PASO 4: Iteración por sede con parámetro URL o selector UI ───────────
-    console.log("🔄 [Agente 6 - FI] Extracción iterativa por sede...");
-    const acumulador = new Map();
-    const clavePart = (p) => {
-      const dni = (p.dni || '').replace(/\D/g, '');
-      const nombre = (p.nombre || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
-      return dni.length >= 6 ? `dni:${dni}` : `nombre:${nombre}`;
+    const participantes = Array.from(acumulador.values());
+    const evaluacion = assessFiCompleteness({ participantes, expectedTotal, blocked, expectedSedes });
+    const discrepancias = summarizeSedeEquipoDiscrepancies(participantes);
+    if (discrepancias.sinSede > 0) evaluacion.reasons.push(`${discrepancias.sinSede} registros sin sede resoluble.`);
+    const completeness = evaluacion.reasons.length ? 'partial' : 'complete';
+    console.log(`${completeness === 'complete' ? '✅' : '⚠️'} [Agente 6 - FI] ${participantes.length} participantes únicos; cobertura: ${evaluacion.coverage.map((c) => `${c.sede}=${c.participantes}`).join(', ')}; estado: ${completeness}. ${evaluacion.reasons.join(' ')}`);
+    return {
+      participantes,
+      completeness,
+      completenessReasons: evaluacion.reasons,
+      coverage: evaluacion.coverage,
+      expectedTotal,
+      passes: pasadas,
+      blocked,
+      sedeEquipoDiscrepancies: discrepancias
     };
-    for (const p of resultadoInicial) acumulador.set(clavePart(p), p);
-
-    for (const sede of SEDES_CONOCIDAS) {
-      try {
-        // Estrategia A: parámetro URL ?sede=
-        const urlSede = `https://imo.crearpslglobal.com/futurosimposibles?sede=${encodeURIComponent(sede)}`;
-        await this.safeGoto(urlSede, 40000);
-        if (this.page.url().includes('sgcaptcha')) {
-          console.warn(`⚠️ WAF bloqueó sede ${sede}, omitiendo.`);
-          continue;
-        }
-        await new Promise(r => setTimeout(r, 1500));
-
-        // Estrategia B: si NODUS ignoró el parámetro, buscar selector en UI
-        if (!this.page.url().includes('sede=') && !this.page.url().includes(encodeURIComponent(sede))) {
-          await this.safeGoto('https://imo.crearpslglobal.com/futurosimposibles', 35000);
-          const sedeSeleccionada = await this.page.evaluate((sedeName) => {
-            const selects = Array.from(document.querySelectorAll('select'));
-            for (const sel of selects) {
-              const opt = Array.from(sel.options).find(o => o.text.trim().toLowerCase() === sedeName.toLowerCase());
-              if (opt) { sel.value = opt.value; sel.dispatchEvent(new Event('change', { bubbles: true })); return true; }
-            }
-            const btn = Array.from(document.querySelectorAll('button, a, [role="tab"]'))
-              .find(b => b.textContent.trim().toLowerCase() === sedeName.toLowerCase());
-            if (btn) { btn.click(); return true; }
-            return false;
-          }, sede);
-          if (!sedeSeleccionada) {
-            console.warn(`⚠️ [Agente 6 - FI] Sin selector UI para "${sede}", omitiendo.`);
-            continue;
-          }
-          await new Promise(r => setTimeout(r, 2000));
-        }
-
-        const parts = await extraerTablaActual(sede);
-        let nuevos = 0;
-        for (const p of parts) {
-          if (!acumulador.has(clavePart(p))) { acumulador.set(clavePart(p), p); nuevos++; }
-        }
-        console.log(`📍 [Agente 6 - FI] ${sede}: ${parts.length} extraídos, ${nuevos} nuevos. Total: ${acumulador.size}`);
-      } catch (sedeErr) {
-        console.warn(`⚠️ [Agente 6 - FI] Error en sede "${sede}": ${sedeErr.message}`);
-      }
-    }
-
-    const resultado = Array.from(acumulador.values());
-    const sedesFinales = new Set(resultado.map(p => p.sede).filter(Boolean));
-    console.log(`✅ [Agente 6 - FI] ${resultado.length} participantes únicos. Sedes: ${[...sedesFinales].join(', ')}`);
-    return resultado;
   }
 
   async extractAvanzadosYContabilidad() {
@@ -1379,7 +1326,8 @@ export async function runMultiAgentSync() {
     console.log("\n🎯 [Agente 6 - Futuros Imposibles] Activando auditoría de metas post-PFD...");
     try {
       const fiAgent = new NodusFIAgent();
-      const participantesFI = await extractor.extractFuturosImposibles(normalized.coordinadores);
+      const fiResult = await extractor.extractFuturosImposibles(normalized.coordinadores);
+      const participantesFI = fiResult.participantes;
       if (participantesFI.length === 0) {
         throw new Error('NODUS no devolvió asistentes PFD verificables; se conserva el último snapshot FI.');
       }
@@ -1387,30 +1335,43 @@ export async function runMultiAgentSync() {
       const fiDiag = await fiAgent.runAudit(participantesFI);
       const adminDb = getAdminDbForNodusPublish();
       const syncId = new Date().toISOString();
-
-      // Escritura atómica a través de Firebase Admin. El documento latest se
-      // toca únicamente después de completar extracción y validación; así una
-      // respuesta parcial, una pantalla de login o un bloqueo WAF no borran
-      // el universo ya publicado.
-      await adminDb.collection('nodus_futuros_imposibles').doc('latest').set({
+      const snapshotMeta = {
+        completeness: fiResult.completeness,
+        completenessReasons: fiResult.completenessReasons,
+        coverage: fiResult.coverage,
+        expectedTotal: fiResult.expectedTotal ?? null,
+        passes: fiResult.passes,
+        blocked: fiResult.blocked,
+        sedeEquipoDiscrepancies: fiResult.sedeEquipoDiscrepancies
+      };
+      const snapshot = {
         participantes: participantesFI,
         source: 'nodus_futuros_imposibles',
-        sourceVersion: 'fi-sync-v2',
+        sourceVersion: 'fi-sync-v3',
         sourceUrl: 'https://imo.crearpslglobal.com/futurosimposibles',
         extractedAt: syncId,
         syncedAt: FieldValue.serverTimestamp(),
         universePfd: participantesFI.length,
-        summary: fiDiag.resumen
-      }, { merge: false });
+        summary: fiDiag.resumen,
+        ...snapshotMeta
+      };
+
+      // Solo una lectura verificada como completa reemplaza `latest`. Una
+      // lectura parcial se guarda aparte (latest_partial) para diagnóstico y
+      // el último snapshot verificado sigue siendo el que consume Causa OS.
+      const publishedDoc = fiResult.completeness === 'complete' ? 'latest' : 'latest_partial';
+      await adminDb.collection('nodus_futuros_imposibles').doc(publishedDoc).set(snapshot, { merge: false });
       await adminDb.collection('nodus_fi_sync_history').add({
-        status: 'published',
+        status: fiResult.completeness === 'complete' ? 'published' : 'partial_not_published',
         source: 'nodus_futuros_imposibles',
         extractedAt: syncId,
         universePfd: participantesFI.length,
         summary: fiDiag.resumen,
+        ...snapshotMeta,
+        sedeEquipoDiscrepancies: { total: fiResult.sedeEquipoDiscrepancies.total, sinSede: fiResult.sedeEquipoDiscrepancies.sinSede },
         createdAt: FieldValue.serverTimestamp()
       });
-      console.log(`✅ [Agente 6 - Futuros Imposibles] Snapshot publicado: ${participantesFI.length} asistentes PFD.`);
+      console.log(`✅ [Agente 6 - Futuros Imposibles] ${fiResult.completeness === 'complete' ? 'Snapshot completo publicado' : 'Lectura PARCIAL guardada en latest_partial (latest intacto)'}: ${participantesFI.length} participantes.`);
     } catch (fiErr) {
       console.error("⚠️ [Agente 6 - Futuros Imposibles] No se publicó ningún snapshot FI:", fiErr.message);
       // El registro de fallo es aislado del snapshot: permite diagnóstico sin
