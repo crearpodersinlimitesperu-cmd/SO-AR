@@ -96,9 +96,17 @@ service cloud.firestore {
     }
 
     function isOwner(resourceData) {
+      let callerEmails = isAuthenticated() ? callerEmailAliases() : [];
+      let assignedToEmail = resourceData.get('assignedToEmail', '');
+      let assignedTo = resourceData.get('assigned_to', '');
+      let ownerId = resourceData.get('ownerId', '');
+      let assignedByEmail = resourceData.get('assignedByEmail', '');
+      let createdBy = resourceData.get('createdBy', '');
+      let createdByEmail = resourceData.get('createdByEmail', '');
+      let createdByLegacy = resourceData.get('created_by', '');
       return isAuthenticated() && (
-        (resourceData.get('assignedToEmail', '') is string && resourceData.assignedToEmail.lower() in callerEmailAliases()) ||
-        (resourceData.get('assigned_to', '') is string && resourceData.assigned_to.lower() in callerEmailAliases()) ||
+        (assignedToEmail is string && assignedToEmail.lower() in callerEmails) ||
+        (assignedTo is string && assignedTo.lower() in callerEmails) ||
         // FIX (16/09/2026): las tareas "Personalizada (Directa)" compartidas entre
         // varias personas (ej. un mismo aviso mandado a varios gerentes a la vez)
         // usan el campo assignedToEmails (arreglo), nunca el singular
@@ -108,19 +116,37 @@ service cloud.firestore {
         // rechazaba el guardado de su evidencia/avance en esas tareas. Ahora
         // cuenta como dueño igual que si estuviera en el campo singular.
         (resourceData.get('assignedToEmails', []) is list &&
-         resourceData.assignedToEmails.hasAny(callerEmailAliases())) ||
+         (email() in resourceData.get('assignedToEmails', []) ||
+          resourceData.get('assignedToEmails', []).hasAny(callerEmails))) ||
         // Se conserva por compatibilidad si alg├║n flujo futuro s├¡ llega a usar el uid real:
-        resourceData.get('ownerId', '') == request.auth.uid ||
-        (resourceData.get('createdBy', '') is string && resourceData.createdBy.lower() in callerEmailAliases()) ||
-        (resourceData.get('createdByEmail', '') is string && resourceData.createdByEmail.lower() in callerEmailAliases()) ||
-        (resourceData.get('created_by', '') is string && resourceData.created_by.lower() in callerEmailAliases())
+        ownerId == request.auth.uid ||
+        (assignedByEmail is string && assignedByEmail.lower() in callerEmails) ||
+        (createdBy is string && createdBy.lower() in callerEmails) ||
+        (createdByEmail is string && createdByEmail.lower() in callerEmails) ||
+        (createdByLegacy is string && createdByLegacy.lower() in callerEmails)
       );
     }
 
     function isCollaborator(resourceData) {
+      let collaborators = resourceData.get('collaborators', []);
       return isAuthenticated() &&
-        resourceData.get('collaborators', []) is list &&
-        resourceData.collaborators.hasAny(callerEmailAliases());
+        collaborators is list &&
+        collaborators.hasAny(callerEmailAliases());
+    }
+
+    function isTaskRecipient(resourceData) {
+      let callerEmail = isAuthenticated() ? email() : '';
+      let emailParts = callerEmail.split('@');
+      let callerAlias = emailParts.size() == 2 &&
+        (emailParts[1] == 'crearpsl.net' || emailParts[1] == 'crearpsl.com')
+        ? emailParts[0] + (emailParts[1] == 'crearpsl.net' ? '@crearpsl.com' : '@crearpsl.net')
+        : callerEmail;
+      return isAuthenticated() && (
+        resourceData.get('assignedToEmail', '').lower() == callerEmail ||
+        (resourceData.keys().hasAny(['assignedToEmails']) &&
+         (callerEmail in resourceData.assignedToEmails ||
+          callerAlias in resourceData.assignedToEmails))
+      );
     }
 
     function callerHasTaskRole(roleName) {
@@ -231,36 +257,45 @@ service cloud.firestore {
       );
     }
 
-    function isChecklistCatalogTask(taskData) {
-      let taskRole = taskData.get('role', '');
-      return isAuthenticated() &&
-        taskRole is string &&
-        callerHasTaskRole(taskRole) &&
-        isKnownChecklistTaskIdForRole(taskData.get('id', ''), taskRole) &&
-        taskData.get('isCustom', false) == false &&
-        !taskData.keys().hasAny([
+    function isPersonalTask(taskData) {
+      return taskData.get('isCustom', false) == true ||
+        (taskData.get('id', '') is string && taskData.get('id', '').matches('custom_.*')) ||
+        taskData.keys().hasAny([
           'assignedToEmail', 'assignedToEmails', 'assigned_to', 'ownerId',
-          'assignedTo', 'assignedRoles', 'assignedSede', 'assignedByEmail',
-          'assignedByName', 'createdBy', 'createdByEmail', 'created_by', 'collaborators',
-          'pendingCollaborations', 'assigneeProgress', 'source', 'metadata'
+          'assignedByEmail', 'createdBy', 'createdByEmail', 'created_by'
         ]);
     }
 
+    function isChecklistCatalogTask(taskData, personalTask) {
+      let taskRole = taskData.get('role', '');
+      return isAuthenticated() &&
+        taskData.get('isCustom', false) == false &&
+        !personalTask &&
+        taskRole is string &&
+        callerHasTaskRole(taskRole) &&
+        isKnownChecklistTaskIdForRole(taskData.get('id', ''), taskRole);
+    }
+
     function canReadTask(taskData) {
-      return isSuperAdmin() ||
-        isGerenteODireccion() ||
+      let personalTask = isPersonalTask(taskData);
+      return isTaskRecipient(taskData) ||
         isOwner(taskData) ||
-        isCollaborator(taskData) ||
-        isChecklistCatalogTask(taskData) ||
-        ((callerHasTaskRole('gerente') || callerHasTaskRole('direccion')) &&
-         taskData.get('isValidation', false) == true);
+        (!personalTask && (
+          isSuperAdmin() ||
+          isGerenteODireccion() ||
+          isCollaborator(taskData) ||
+          isChecklistCatalogTask(taskData, personalTask) ||
+          ((callerHasTaskRole('gerente') || callerHasTaskRole('direccion')) &&
+           taskData.get('isValidation', false) == true)
+        ));
     }
 
     function canReadDualTask(taskData) {
       let callerSede = isAuthenticated() && exists(/databases/$(database)/documents/users/$(request.auth.uid))
         ? get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('sede', '')
         : '';
-      return isAuthenticated() &&
+      return !isPersonalTask(taskData) &&
+        isAuthenticated() &&
         taskData.get('isDualTask', false) == true &&
         (isGerenteODireccion() ||
          callerHasTaskRole('manager') ||
@@ -391,7 +426,8 @@ service cloud.firestore {
     // TASKS
     match /tasks/{taskId} {
       allow read: if canReadTask(resource.data);
-      allow create: if isChecklistCatalogTask(request.resource.data) ||
+      allow create: if (request.resource.data.get('isCustom', false) == false &&
+                        isChecklistCatalogTask(request.resource.data, isPersonalTask(request.resource.data))) ||
                     (requiresTaskAdminForCreate(request.resource.data)
                       ? (isGerenteODireccion() || hasVerifiedTaskAdminProfile())
                       : (isSuperAdmin() || isGerenteODireccion() ||
@@ -403,7 +439,9 @@ service cloud.firestore {
                     (isCollaborator(resource.data) &&
                      request.resource.data.diff(resource.data).affectedKeys().hasAny(['status', 'progress', 'evidence_url', 'evidenceUrl', 'completions']) &&
                      !request.resource.data.diff(resource.data).affectedKeys().hasAny(['assignedToEmail', 'role', 'sede', 'ownerId'])) ||
-                    (isChecklistCatalogTask(resource.data) && isOperationalProgressUpdate());
+                    (resource.data.get('isCustom', false) == false &&
+                     isChecklistCatalogTask(resource.data, isPersonalTask(resource.data)) &&
+                     isOperationalProgressUpdate());
       allow delete: if isGerenteODireccion() || isSuperAdmin();
     }
 
@@ -841,7 +879,9 @@ service cloud.firestore {
       allow write: if isGerenteODireccion() || isSuperAdmin();
     }
     match /checklist_tasks/{document=**} {
-      allow read: if canReadTask(resource.data) || canReadDualTask(resource.data);
+      allow read: if isPersonalTask(resource.data)
+        ? canReadTask(resource.data)
+        : canReadDualTask(resource.data) || canReadTask(resource.data);
       allow write: if isSuperAdmin() || isGerenteODireccion();
     }
     match /settings/{document=**} {
