@@ -1164,7 +1164,7 @@ export default function Home() {
     }
 
     // 3b. Por título / nombre de tarea
-    if (!targetTask && notif.title && allTasks && allTasks.length > 0) {
+    if (!targetTask && notif.type !== 'schedule_update' && notif.title && allTasks && allTasks.length > 0) {
       const notifTitleNorm = notif.title.toLowerCase().trim();
       targetTask = allTasks.find(t => {
         const taskName = (t.task || t.title || '').toLowerCase().trim();
@@ -1191,17 +1191,22 @@ export default function Home() {
       }
     }
 
-    // 4. Si encontramos la tarea o construimos una tarea coherente para abrir
-    const taskToOpen = targetTask || {
-      id: notif.taskId || notif.id,
-      task: notif.title || notif.message,
-      title: notif.title || notif.message,
-      description: notif.message || '',
-      assignedSede: notif.assignedSede || 'Lima',
-      deadline: notif.deadline || notif.created_at || new Date().toISOString(),
-      priority: notif.priority || 'Urgente',
-      createdBy: notif.createdBy || 'Sistema'
-    };
+    // 4. Las notificaciones informativas (p. ej. "Horarios Actualizados") no
+    // son tareas: abrirlas como tarea ficticia mostraba "VENCIDA" y "Guardar
+    // Avances" fallaba porque el documento no existe en checklist_tasks.
+    if (!targetTask) {
+      if (notif.type === 'schedule_update') {
+        setShowHorariosModal(true);
+      } else if (notif.link && typeof notif.link === 'string' && notif.link.startsWith('/')) {
+        navigate(notif.link);
+      } else if (notif.taskId) {
+        showToast?.('Esta tarea ya no existe o no tienes acceso a ella.', 'warning');
+      } else {
+        showToast?.(notif.message || notif.title || 'Notificación leída.', 'info');
+      }
+      return;
+    }
+    const taskToOpen = targetTask;
 
     // Abrir modal de detalles y avances de la tarea SÍ O SÍ
     setSelectedTaskForDetail(taskToOpen);
