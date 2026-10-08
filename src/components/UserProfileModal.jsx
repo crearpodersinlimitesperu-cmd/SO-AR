@@ -98,10 +98,12 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
   // provista por CyclesContext.jsx a partir del calendario oficial en vivo -- se usa
   // mas abajo para el selector de "Equipo(s) en Quito" (equiposQuito).
   let quitoTeamOptions = [];
+  let quitoCycles = [];
   try {
     const cyclesCtx = useCycles();
     currentCycle = cyclesCtx?.currentCycle || cyclesData[0];
     quitoTeamOptions = cyclesCtx?.quitoTeamOptions || [];
+    quitoCycles = cyclesCtx?.quitoCycles || [];
   } catch (e) {
     currentCycle = cyclesData[0];
   }
@@ -437,8 +439,14 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
     const seen = new Set();
     const list = [];
     emails.forEach(em => {
-      getOverdueAssignedTasks(allTasks, em).forEach(t => {
+      getOverdueAssignedTasks(allTasks, em, Date.now(), {
+        sede: user?.sede,
+        cycleId: currentCycle?.id,
+        cycleIds: quitoCycles.map(qc => qc?.cycle?.id)
+      }).forEach(t => {
         const id = t.id || t.title || t.name;
+        // Nunca alertar una tarea que la matriz ya muestra como completada.
+        if (isTaskCompleted(t, user?.sede)) return;
         if (!seen.has(id)) {
           seen.add(id);
           list.push(t);
@@ -446,7 +454,7 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
       });
     });
     return list;
-  }, [allTasks, user?.email, user?.corporateEmail, user?.personalEmail, user?.emails]);
+  }, [allTasks, user?.email, user?.corporateEmail, user?.personalEmail, user?.emails, user?.sede, currentCycle?.id, quitoCycles, localTaskOverrides]);
 
   const completedTasks = useMemo(() => {
     if (!user) return [];

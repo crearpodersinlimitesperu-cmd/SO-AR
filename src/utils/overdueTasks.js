@@ -43,18 +43,21 @@ const isCompletedFlag = (e) => !!e && (
 );
 
 // Completion escrita por el usuario actual: por sede (`completions.<sede>`)
-// o por ciclo (`completions.<sede>__<cycleId>`).
-const isDoneInCompletions = (task, sede, cycleId) => {
+// o por ciclo (`completions.<sede>__<cycleId>`). toggleTask usa 'Global'
+// cuando el usuario no tiene sede, así que se aplica el mismo valor por defecto.
+const isDoneInCompletions = (task, sede, cycleIds) => {
   const map = task.completions;
-  if (!map || typeof map !== 'object' || !sede) return false;
-  const key = cycleId ? `${sede}__${cycleId}` : null;
-  return isCompletedFlag(map[sede]) || (key !== null && isCompletedFlag(map[key]));
+  if (!map || typeof map !== 'object') return false;
+  const s = (typeof sede === 'string' ? sede.trim() : '') || 'Global';
+  if (isCompletedFlag(map[s])) return true;
+  return cycleIds.some(id => isCompletedFlag(map[`${s}__${id}`]));
 };
 
-const isDoneForUser = (task, email, { sede, cycleId } = {}) => {
+const isDoneForUser = (task, email, { sede, cycleId, cycleIds } = {}) => {
   const entry = findProgressEntry(task, email);
   if (isCompletedFlag(entry)) return true;
-  if (isDoneInCompletions(task, sede, cycleId)) return true;
+  const ids = [cycleId, ...(Array.isArray(cycleIds) ? cycleIds : [])].filter(Boolean);
+  if (isDoneInCompletions(task, sede, ids)) return true;
   if (entry) return false;
   return !!(task.completed || task.status === 'Completada');
 };
