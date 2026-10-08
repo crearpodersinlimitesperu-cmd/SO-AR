@@ -1,5 +1,3 @@
-import { startCausaNodusAgent, stopCausaNodusAgent } from "./services/CausaNodusAgent";
-
 import { lazy, Suspense, useState, useEffect } from 'react'
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
@@ -171,9 +169,9 @@ function RoleRoute({ children, allowedRoles = [], allowedEmails = [], requireSup
 
 function App() {
   const { originalAdminUser, currentUser, stopSimulation } = useAuth();
+  // Libera la caché heredada del antiguo agente global (varios MB por navegador).
   useEffect(() => {
-    startCausaNodusAgent();
-    return () => stopCausaNodusAgent();
+    try { localStorage.removeItem('CAUSA_FAST_CACHE'); } catch { /* sin acceso a storage */ }
   }, []);
 
   const [showHelp, setShowHelp] = useState(false);
