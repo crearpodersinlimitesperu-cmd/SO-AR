@@ -223,6 +223,14 @@ class NodusExtractorAgent {
           console.log(`✅ [Agente 1 - Extractor] Sesión iniciada con éxito. URL: ${postLoginUrl}`);
           return true;
         }
+
+        // Sigue en /auth/login: registrar el aviso visible de NODUS (sin credenciales)
+        // para distinguir credenciales rechazadas, cuenta bloqueada o límite de intentos.
+        const loginNotice = await this.page.evaluate(() => {
+          const nodes = document.querySelectorAll('.alert, .invalid-feedback, .text-danger, .error, [role="alert"]');
+          return Array.from(nodes).map(n => (n.textContent || '').replace(/\s+/g, ' ').trim()).filter(Boolean).join(' | ').slice(0, 300);
+        }).catch(() => '');
+        throw new Error(`[LOGIN_REJECTED] NODUS mantuvo /auth/login tras enviar el formulario. Aviso: ${loginNotice || '(sin mensaje visible)'}`);
       } catch (err) {
         console.warn(`⚠️ [Agente 1 - Extractor] Intento ${attempts} de inicio de sesión falló: ${err.message}`);
         await new Promise(r => setTimeout(r, 3000));
@@ -1206,8 +1214,11 @@ export async function runMultiAgentSync() {
 
 
   try {
-    const user = process.env.NODUS_GLOBAL_USER || process.env.NODUS_USER || process.env.IMO_USER || 'CREARPSL';
-    const pwd = process.env.NODUS_GLOBAL_PASS || process.env.NODUS_PASSWORD || process.env.IMO_PASSWORD || 'CREARPSL26*';
+    const user = process.env.NODUS_GLOBAL_USER || process.env.NODUS_USER || process.env.IMO_USER;
+    const pwd = process.env.NODUS_GLOBAL_PASS || process.env.NODUS_PASSWORD || process.env.IMO_PASSWORD;
+    if (!user || !pwd) {
+      throw new Error('[MISSING_CREDENTIALS] Faltan los secrets NODUS_USER/NODUS_PASSWORD.');
+    }
 
     let authenticated = false;
     // 1. Intento inicial de conexión directa con navegador blindado
