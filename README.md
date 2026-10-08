@@ -1,5 +1,24 @@
 # React + Vite
 
+## Ayuda del Centro de Managers
+
+La guía rápida se adapta a la vista de entrenador, CMJ/coordinación, dirección
+o consulta usando los permisos existentes. Puedes plegarla y volver a abrirla;
+solo esta preferencia visual se recuerda en `localStorage` por vista.
+
+Enfoca un campo o botón con el teclado, o pasa el cursor, para consultar su
+explicación. En móvil, activa **Aprender botones**: al tocar un botón aparece
+su ayuda sin ejecutar su acción. **Cerrar**, **Cancelar** y **Aceptar reporte**
+siguen funcionando; los campos continúan editables. Usa **Volver a trabajar**
+antes de guardar. La misma opción está disponible dentro de los formularios.
+`Escape` cierra la explicación.
+
+Los textos y ejemplos están centralizados en `src/data/managersHelpContent.js`;
+los controles reutilizables y la guía están en `src/components/ManagersHelp.jsx`.
+La ayuda no modifica permisos, validaciones ni reglas de Firestore. No solicita
+documentos de identidad: recomienda transcribir el nombre oficial, no subirlos.
+El test de contenido y cobertura se ejecuta con `npm test`.
+
 This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
 
 Currently, two official plugins are available:
