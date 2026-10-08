@@ -590,23 +590,48 @@ export function ChecklistProvider({ children }) {
   // sedes fuera de Quito, Quito con 0 o 1 equipo) el comportamiento es idéntico
   // al de siempre: se usa currentCycle.
   const toggleTask = async (taskId, currentStatus, equipoQuito = null) => {
+    const nextStatus = !currentStatus;
+    const userSede = currentUser?.sede?.trim() || 'Global';
+
+    // ACTUALIZACIÓN OPTIMISTA INMEDIATA (Cero latencia visual en UI)
+    setTasks(prev => prev.map(t => {
+      if (t.id === taskId || t.uiKey === taskId) {
+        const nextCompletions = { ...(t.completions || {}) };
+        if (userSede) {
+          nextCompletions[userSede] = {
+            ...(nextCompletions[userSede] || {}),
+            completed: nextStatus,
+            status: nextStatus ? 'Completada' : 'Pendiente',
+            updatedAt: new Date().toISOString()
+          };
+        }
+        return {
+          ...t,
+          completed: nextStatus,
+          status: nextStatus ? 'Completada' : 'Pendiente',
+          completedAt: nextStatus ? new Date().toISOString() : null,
+          completions: nextCompletions
+        };
+      }
+      return t;
+    }));
+
     try {
-      const userSede = currentUser?.sede?.trim() || 'Global';
       const cycleForThisToggle = equipoQuito
         ? (quitoCycles.find(qc => qc.equipo === equipoQuito)?.cycle || currentCycle)
         : currentCycle;
       const cycleKey = cycleForThisToggle?.id ? `${userSede}__${cycleForThisToggle.id}` : null;
 
       const updates = {
-        completed: !currentStatus,
-        status: !currentStatus ? 'Completada' : 'Pendiente',
+        completed: nextStatus,
+        status: nextStatus ? 'Completada' : 'Pendiente',
         // FIX 16/09/2026: fecha real de cumplimiento (trazabilidad, pedido
         // explicito de Jose). Se limpia al reabrir para no dejar una fecha
         // vieja "pegada"; se vuelve a fijar (con la fecha real del momento)
         // si se vuelve a completar.
-        completedAt: !currentStatus ? new Date().toISOString() : null,
-        [`completions.${userSede}.completed`]: !currentStatus,
-        [`completions.${userSede}.status`]: !currentStatus ? 'Completada' : 'Pendiente',
+        completedAt: nextStatus ? new Date().toISOString() : null,
+        [`completions.${userSede}.completed`]: nextStatus,
+        [`completions.${userSede}.status`]: nextStatus ? 'Completada' : 'Pendiente',
         [`completions.${userSede}.updatedAt`]: new Date().toISOString()
       };
 

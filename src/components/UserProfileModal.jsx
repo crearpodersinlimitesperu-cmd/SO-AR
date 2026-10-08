@@ -163,11 +163,32 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
     return { deadlineStr: null, dateObj: null, timestamp: Infinity, isAutomatic: false };
   };
 
+  // Estado optimista local para que los clicks en el checkbox respondan al instante sin delay
+  const [localTaskOverrides, setLocalTaskOverrides] = useState({});
+
   const isTaskCompleted = (t, userSede) => {
+    if (localTaskOverrides[t.id] !== undefined) {
+      return !!localTaskOverrides[t.id];
+    }
     if (t.completions && userSede && t.completions[userSede]) {
       return !!t.completions[userSede].completed;
     }
     return !!(t.completed || t.status === 'Completada');
+  };
+
+  const handleToggleTaskOptimistic = async (task, currentStatus) => {
+    const nextStatus = !currentStatus;
+    setLocalTaskOverrides(prev => ({ ...prev, [task.id]: nextStatus }));
+    try {
+      await toggleTask(task.id, currentStatus, task.equipoQuito);
+    } catch (e) {
+      // Revertir en caso de falla
+      setLocalTaskOverrides(prev => {
+        const next = { ...prev };
+        delete next[task.id];
+        return next;
+      });
+    }
   };
 
   const [targetUser, setTargetUser] = useState(user);
@@ -1771,7 +1792,7 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
                             <input 
                               type="checkbox"
                               checked={isCompleted}
-                              onChange={() => toggleTask(task.id, isCompleted)}
+                              onChange={() => handleToggleTaskOptimistic(task, isCompleted)}
                               style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: 'var(--crear-gold)' }}
                             />
                             <div style={{ flex: 1 }}>
