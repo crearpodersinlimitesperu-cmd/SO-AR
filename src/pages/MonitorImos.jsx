@@ -1992,7 +1992,7 @@ export default function MonitorImos() {
                     </td>
                     <td style={{ padding: '1rem', fontSize: '0.9rem', color: 'var(--crear-blue)', fontWeight: 600 }}>
                       {normalizeEquipoName(m.equipo)}
-                      {m.schemaVersion === 2 && <><div style={{ fontSize: '0.75rem' }}>Origen IMO: Equipo {m.originTeam} · C1 {m.c1Date}</div><button className="btn-secondary" onClick={() => setHistoryMission(m)}>Ver historial</button></>}
+                      {m.schemaVersion === 2 && <><div style={{ fontSize: '0.75rem' }}>Origen IMO: {m.originTeam ? `Equipo ${m.originTeam}` : 'por confirmar'} · C1 {m.c1Date}</div><button className="btn-secondary" onClick={() => setHistoryMission(m)}>Ver historial</button></>}
                     </td>
                     <td style={{ padding: '1rem' }}>
                       <div style={{ fontWeight: 600 }}>Progreso: {progreso}%</div>

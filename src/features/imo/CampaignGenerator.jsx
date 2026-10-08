@@ -5,6 +5,7 @@ import './mission.css';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../../services/firebase';
 import { OFFICIAL_CALENDAR_URL, parseOfficialCalendar, applyCalendarChanges, findC1Dates, calendarSede } from './missionCalendar';
+import { buildCampaignCandidates, teamsWithRecords, MAX_CAMPAIGN_IMOS } from './campaignCandidates';
 
 // Helper robusto para resolver sede desde m.sede o m.equipo
 function resolveMissionSede(m) {
@@ -34,7 +35,6 @@ export default function CampaignGenerator({ missions, defaultSede, defaultEquipo
   const [sede, setSede] = useState(defaultSede === 'todos' ? 'Lima' : (defaultSede || 'Lima'));
   const [target, setTarget] = useState(initialTeam);
   const [date, setDate] = useState('');
-  const [origins, setOrigins] = useState(initialTeam > 3 ? `${initialTeam - 1}, ${initialTeam - 2}, ${initialTeam - 3}` : '');
   const [search, setSearch] = useState('');
   const [chosen, setChosen] = useState({});
   const [reviewed, setReviewed] = useState(false);
@@ -103,7 +103,6 @@ export default function CampaignGenerator({ missions, defaultSede, defaultEquipo
       const nextOpt = sedeC1Options[0];
       setTarget(nextOpt.team);
       setDate(nextOpt.date);
-      setOrigins([1, 2, 3].map(n => nextOpt.team - n).filter(n => n > 0).join(', '));
     }
   }, [sedeC1Options, target]);
 
@@ -139,77 +138,29 @@ export default function CampaignGenerator({ missions, defaultSede, defaultEquipo
     setTarget(opt.team);
     setDate(opt.date);
     setReviewed(false);
-    if (!Object.keys(chosen).length) {
-      setOrigins([1, 2, 3].map(n => opt.team - n).filter(n => n > 0).join(', '));
-    }
+    setChosen({});
   }
 
-  // Candidatos disponibles: IMOs de la sede y equipos consultados
-  const candidates = useMemo(() => {
-    const teams = origins.split(',').map(s => parseTeamNumber(s)).filter(n => n && n > 0);
-    const targetSedeNorm = normalizeText(calendarSede(sede));
+  // Candidatos: IMOs cuyos enrolados ingresan al equipo C1 elegido (registros de Nodus),
+  // un candidato por IMO aunque Nodus lo haya guardado en varios registros.
+  const { candidates, conflicts } = useMemo(
+    () => buildCampaignCandidates(missions, { sede, targetTeam: target, resolveSede: resolveMissionSede, getEnrolados, search }),
+    [missions, sede, target, search, getEnrolados]
+  );
+  const sedeTeams = useMemo(() => teamsWithRecords(missions, sede, resolveMissionSede, getEnrolados), [missions, sede, getEnrolados]);
 
-    return missions.filter(m => {
-      // Ignorar versiones secundarias de campañas
-      if (m.schemaVersion === 2) return false;
+  const copyCandidate = c => ({ ...c, enrolados: c.enrolados.map(e => ({ ...e })) });
 
-      // Cruce de sede exacto o deducido
-      const mSede = resolveMissionSede(m);
-      if (normalizeText(mSede) !== targetSedeNorm) return false;
-
-      // Filtro de equipos: si el usuario especificó equipos en origins, filtrar por ellos; si no, mostrar todos
-      if (teams.length > 0) {
-        const tNum = parseTeamNumber(m.originTeam) || parseTeamNumber(m.equipo);
-        if (!tNum || !teams.includes(tNum)) return false;
-      }
-
-      // Filtro de búsqueda por texto libre
-      if (search) {
-        const query = normalizeText(search);
-        const nameMatch = normalizeText(m.imoNombre).includes(query);
-        const teamMatch = normalizeText(m.equipo).includes(query);
-        if (!nameMatch && !teamMatch) return false;
-      }
-
-      return true;
-    });
-  }, [missions, sede, origins, search]);
-
-  // Resumen de equipos disponibles dentro de los candidatos
-  const originTeamsSummary = useMemo(() => {
-    const map = new Map();
-    candidates.forEach(m => {
-      const t = parseTeamNumber(m.originTeam) || parseTeamNumber(m.equipo);
-      if (!t) return;
-      if (!map.has(t)) {
-        map.set(t, { team: t, count: 0, candidates: [] });
-      }
-      const item = map.get(t);
-      item.count++;
-      item.candidates.push(m);
-    });
-    return [...map.values()].sort((a, b) => b.team - a.team);
-  }, [candidates]);
-
-  // Selección individual
-  function choose(m, value) {
+  function choose(c, value) {
     setReviewed(false);
     setChosen(previous => {
       const next = { ...previous };
-      if (!value) delete next[m.id];
-      else {
-        next[m.id] = {
-          sourceMissionId: m.id,
-          nombre: m.imoNombre || '',
-          originTeam: m.originTeam || parseTeamNumber(m.equipo) || (target ? target - 1 : 1),
-          enrolados: getEnrolados(m).map(e => ({ ...e, id: String(e.id || '').replace(/\//g, '_') }))
-        };
-      }
+      if (!value) delete next[c.id];
+      else next[c.id] = copyCandidate(c);
       return next;
     });
   }
 
-  // Selección masiva (Todos / Ninguno)
   function handleSelectAll(select) {
     setReviewed(false);
     if (!select) {
@@ -217,35 +168,16 @@ export default function CampaignGenerator({ missions, defaultSede, defaultEquipo
       return;
     }
     const next = { ...chosen };
-    candidates.forEach(m => {
-      next[m.id] = {
-        sourceMissionId: m.id,
-        nombre: m.imoNombre || '',
-        originTeam: m.originTeam || parseTeamNumber(m.equipo) || (target ? target - 1 : 1),
-        enrolados: getEnrolados(m).map(e => ({ ...e, id: String(e.id || '').replace(/\//g, '_') }))
-      };
-    });
+    candidates.forEach(c => { next[c.id] = copyCandidate(c); });
     setChosen(next);
   }
 
-  // Selección rápida para un Equipo Completo
-  function handleSelectTeam(teamNum, select = true) {
+  function handleSelectTarget(team) {
+    setTarget(team);
     setReviewed(false);
-    const next = { ...chosen };
-    const teamCandidates = candidates.filter(m => (parseTeamNumber(m.originTeam) || parseTeamNumber(m.equipo)) === Number(teamNum));
-    teamCandidates.forEach(m => {
-      if (select) {
-        next[m.id] = {
-          sourceMissionId: m.id,
-          nombre: m.imoNombre || '',
-          originTeam: Number(teamNum),
-          enrolados: getEnrolados(m).map(e => ({ ...e, id: String(e.id || '').replace(/\//g, '_') }))
-        };
-      } else {
-        delete next[m.id];
-      }
-    });
-    setChosen(next);
+    setChosen({});
+    const official = sedeC1Options.find(o => Number(o.team) === Number(team));
+    setDate(official ? official.date : '');
   }
 
   function edit(id, field, value) {
@@ -339,9 +271,7 @@ export default function CampaignGenerator({ missions, defaultSede, defaultEquipo
                 const val = e.target.value;
                 setTarget(val);
                 setReviewed(false);
-                if (!Object.keys(chosen).length && val) {
-                  setOrigins([1, 2, 3].map(n => Number(val) - n).filter(n => n > 0).join(', '));
-                }
+                setChosen({});
               }}
             />
           </label>
@@ -363,15 +293,6 @@ export default function CampaignGenerator({ missions, defaultSede, defaultEquipo
             )}
           </label>
 
-          <label>
-            Equipos de origen a consultar
-            <input
-              value={origins}
-              placeholder="31, 30, 29 (o vacío para todos)"
-              disabled={busy}
-              onChange={e => setOrigins(e.target.value)}
-            />
-          </label>
         </div>
 
         {c1Dates.length === 1 && (
@@ -381,7 +302,7 @@ export default function CampaignGenerator({ missions, defaultSede, defaultEquipo
         )}
 
         <small style={{ color: '#64748b', fontSize: '0.8rem', display: 'block', margin: '6px 0 14px' }}>
-          Los equipos anteriores son una sugerencia de búsqueda. No se reutilizan confirmaciones de otras campañas. Quien reciba el enlace podrá registrar sus confirmaciones directamente.
+          Se listan los IMOs cuyos enrolados figuran en Nodus para el Equipo {target || '…'} de {sede}. El equipo de origen de cada IMO se deduce de Nodus cuando el IMO figura como participante de un equipo anterior; si no, queda «por confirmar». No se reutilizan confirmaciones de otras campañas.
         </small>
 
         {/* Buscador de IMO y botones de selección masiva */}
@@ -390,7 +311,7 @@ export default function CampaignGenerator({ missions, defaultSede, defaultEquipo
             Buscar IMO en los registros disponibles
             <input
               value={search}
-              placeholder="Nombre del IMO o Equipo..."
+              placeholder="Nombre del IMO o del enrolado..."
               onChange={e => setSearch(e.target.value)}
               style={{ margin: '4px 0 0' }}
             />
@@ -413,53 +334,52 @@ export default function CampaignGenerator({ missions, defaultSede, defaultEquipo
           </button>
         </div>
 
-        {/* Acceso Rápido para Equipos Completos */}
-        {originTeamsSummary.length > 0 && (
+        {sedeTeams.length > 0 && (
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', margin: '6px 0 10px' }}>
             <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#475569' }}>
-              ⚡ Link para Equipo Completo:
+              Equipos de {sede} con enrolados en Nodus:
             </span>
-            {originTeamsSummary.map(ts => {
-              const selectedCount = ts.candidates.filter(c => !!chosen[c.id]).length;
-              const isAllSelected = selectedCount === ts.count && ts.count > 0;
+            {sedeTeams.map(ts => {
+              const isSelected = Number(target) === ts.team;
               return (
                 <button
                   key={`team_btn_${ts.team}`}
                   type="button"
                   disabled={busy}
-                  onClick={() => handleSelectTeam(ts.team, !isAllSelected)}
+                  aria-pressed={isSelected}
+                  onClick={() => handleSelectTarget(ts.team)}
                   style={{
-                    background: isAllSelected ? '#2563eb' : '#eff6ff',
-                    color: isAllSelected ? '#ffffff' : '#1d4ed8',
-                    border: isAllSelected ? '1px solid #1d4ed8' : '1px solid #bfdbfe',
-                    borderRadius: '6px',
-                    padding: '4px 10px',
-                    fontSize: '0.78rem',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '4px'
+                    background: isSelected ? '#2563eb' : '#eff6ff',
+                    color: isSelected ? '#ffffff' : '#1d4ed8',
+                    border: isSelected ? '1px solid #1d4ed8' : '1px solid #bfdbfe',
+                    borderRadius: '6px', padding: '4px 10px', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer'
                   }}
-                  title={isAllSelected ? `Deseleccionar Equipo ${ts.team}` : `Seleccionar todos los ${ts.count} IMOs del Equipo ${ts.team}`}
                 >
-                  <span>Equipo {ts.team} ({ts.count})</span>
-                  <span style={{ fontSize: '0.72rem', opacity: 0.9 }}>
-                    {isAllSelected ? '✓ Todo' : `+${ts.count}`}
-                  </span>
+                  Equipo {ts.team} {isSelected ? '✓' : ''}
                 </button>
               );
             })}
           </div>
         )}
 
+        {conflicts.length > 0 && (
+          <details style={{ background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: '8px', padding: '8px 12px', margin: '6px 0 10px', fontSize: '0.8rem' }}>
+            <summary style={{ cursor: 'pointer', fontWeight: 700, color: '#92400e' }}>
+              {conflicts.length} enrolado(s) figuran con más de un IMO en Nodus: se mantienen con el registro más reciente. Revisa antes de generar.
+            </summary>
+            <ul style={{ margin: '6px 0 0', paddingLeft: '18px' }}>
+              {conflicts.slice(0, 30).map((c, i) => <li key={i}>{c.enrolado}: queda con {c.keptWith} (no se incluye en {c.skippedFrom})</li>)}
+            </ul>
+          </details>
+        )}
+
         <p style={{ fontSize: '0.85rem', fontWeight: 600, margin: '8px 0' }}>
-          {candidates.length} registros candidatos · {Object.keys(chosen).length} seleccionados. Solo se incluirán los seleccionados en la campaña.
+          {candidates.length} IMOs con enrolados para el Equipo {target || '…'} · {Object.keys(chosen).length} seleccionados (máximo {MAX_CAMPAIGN_IMOS}). Solo se incluirán los seleccionados.
         </p>
 
         {/* Lista de candidatos con checkbox */}
         <div style={{ maxHeight: 220, overflow: 'auto', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '4px 8px', background: '#f8fafc' }}>
-          {candidates.slice(0, 100).map(m => (
+          {candidates.slice(0, MAX_CAMPAIGN_IMOS).map(m => (
             <label
               key={m.id}
               style={{
@@ -479,20 +399,20 @@ export default function CampaignGenerator({ missions, defaultSede, defaultEquipo
                 checked={!!chosen[m.id]}
                 onChange={e => choose(m, e.target.checked)}
               />
-              <span style={{ fontWeight: 600, color: '#0f172a' }}>{m.imoNombre || 'IMO sin nombre'}</span>
+              <span style={{ fontWeight: 600, color: '#0f172a' }}>{m.nombre}</span>
               <span style={{ color: '#64748b', fontSize: '0.8rem' }}>
-                · {parseTeamNumber(m.equipo) ? `Equipo ${parseTeamNumber(m.equipo)}` : (m.equipo || 'Sin equipo')} · {getEnrolados(m).length} enrolados
+                · {m.originTeam ? `origen Equipo ${m.originTeam}` : 'origen por confirmar'} · {m.enrolados.length} enrolados
               </span>
             </label>
           ))}
-          {candidates.length > 100 && (
+          {candidates.length > MAX_CAMPAIGN_IMOS && (
             <small style={{ padding: '6px', textAlign: 'center', color: '#64748b' }}>
-              Se muestran 100 de {candidates.length} registros. Acota la búsqueda por nombre para ver otros específicos.
+              Se muestran {MAX_CAMPAIGN_IMOS} de {candidates.length} IMOs. Acota la búsqueda por nombre para ver otros.
             </small>
           )}
           {!candidates.length && (
             <p style={{ padding: '16px', color: '#64748b', textAlign: 'center', margin: 0 }}>
-              No hay registros de origen con esos filtros. Deja en blanco "Equipos de origen" para ver todos los de {sede}.
+              {target ? `Nodus todavía no registra enrolados con IMO para el Equipo ${target} de ${sede}. Cuando la sincronización de Nodus los traiga aparecerán aquí.` : 'Elige el equipo que ingresa a C1.'}
             </p>
           )}
         </div>
@@ -519,10 +439,10 @@ export default function CampaignGenerator({ missions, defaultSede, defaultEquipo
                   </div>
                   <div className="imo-grid" style={{ margin: '6px 0' }}>
                     <label style={{ fontSize: '0.8rem', margin: 0 }}>
-                      Equipo de origen confirmado
+                      Equipo de origen (0 = por confirmar)
                       <input
                         type="number"
-                        min="1"
+                        min="0"
                         value={a.originTeam}
                         disabled={busy}
                         onChange={e => edit(id, 'originTeam', e.target.value)}

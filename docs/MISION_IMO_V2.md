@@ -2,11 +2,11 @@
 
 ## Lógica acordada con José (5 de octubre de 2026)
 
-IMO es la persona que enrola a alguien a entrenarse, como mínimo en C1. Su rol de PX, manager o capitán no cambia esa relación. El equipo de origen del IMO y el equipo de ingreso del enrolado se guardan por separado. Creación, Relación, Gratitud y El Viaje son fines de semana de MJ, no etiquetas permanentes de equipos. Los números N−1/N−2/N−3 solo sugieren una búsqueda; nunca asignan automáticamente personas ni etapas.
+IMO es la persona que enrola a alguien a entrenarse, como mínimo en C1. Su rol de PX, manager o capitán no cambia esa relación. El equipo de origen del IMO y el equipo de ingreso del enrolado se guardan por separado. Creación, Relación, Gratitud y El Viaje son fines de semana de MJ, no etiquetas permanentes de equipos. En Nodus, `reporte?id_equipo=X` lista a los participantes del equipo X con su IMO: por eso el equipo de un registro sincronizado es el **equipo de ingreso** (C1), no el equipo del IMO. El equipo de origen se deduce del equipo anterior de la misma sede donde el IMO figura como enrolado; si no aparece, queda en 0 = "por confirmar" y se puede corregir antes de generar.
 
 ## Uso
 
-En Monitor de IMOs, abrir Generar enlace. Elegir sede, equipo de ingreso, fecha C1 y equipos de origen a consultar. Seleccionar los IMOs disponibles, revisar sus enrolados y quitar los que correspondan a otro C1. Confirmar revisión y generar. No se crean carpetas ni se editan paquetes JavaScript. Las campañas ya generadas se listan para reutilizar el enlace. Se puede cerrar su acceso conservando el historial.
+En Monitor de IMOs, abrir Generar enlace. Elegir sede y equipo de ingreso (botones con los equipos que ya tienen enrolados en Nodus); la fecha C1 se toma del calendario oficial. Se listan los IMOs con enrolados en ese equipo, unificando registros repetidos del mismo IMO. Si un enrolado aparece con dos IMOs se conserva en el registro más reciente y se avisa. Revisar, quitar lo que corresponda a otro C1 y generar (hasta 200 IMOs por enlace). Confirmar revisión y generar. No se crean carpetas ni se editan paquetes JavaScript. Las campañas ya generadas se listan para reutilizar el enlace. Se puede cerrar su acceso conservando el historial.
 
 El usuario pidió acceso mediante enlace compartido y selección de nombre, sin Google. El identificador aleatorio de campaña limita el acceso al grupo que recibe el enlace; **no verifica identidad**. Quien tenga el enlace puede seleccionar cualquier perfil de esa campaña. Compartir solo con ese grupo. Cada cambio registra perfil declarado, sesión de navegador, hora de servidor, antes y después. No se atribuye a una cuenta autenticada.
 
@@ -22,7 +22,7 @@ Una campaña nueva empieza sin confirmaciones. Los registros anteriores permanec
 
 El Monitor recibe confirmaciones mediante collection-group y muestra historial. Asistencia confirmada y contacto deben ser verdaderos para completar. No se equipara confirmación con asistencia efectiva ni con graduación.
 
-La gestión privada usa la lista de gerencia/dirección ya existente en `isGerenteODireccion()` de Firestore. Los roles del navegador no conceden permisos adicionales. Esa lista debe mantenerse actualizada; esta entrega no modifica cargos de usuarios.
+La gestión privada usa `isImoStaff()` en Firestore: la lista de gerencia/dirección (`isGerenteODireccion()`) o un perfil `users/{uid}` con rol `direccion`, `cfo`, `ceo`, `cco`, `gerente`, `superadmin`, `consolidado`, `director_maestria`, `coord_c1` o `coord_maestria` (los mismos de la ruta `/monitor-imos`). Solo gerencia/dirección puede editar o borrar registros v1 heredados. La prueba `scripts/tests/imo-rules.mjs` corre en CI (`npm run test:rules`).
 
 ## Pruebas
 

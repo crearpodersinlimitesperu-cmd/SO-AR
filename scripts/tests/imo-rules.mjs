@@ -51,6 +51,40 @@ try {
   await assertSucceeds(updateDoc(doc(staff, 'imo_campaigns', cid), { status: 'closed' }));
   await assertFails(save('contacto', false, 'event-3'));
   await assertFails(getDoc(doc(anon, profilePath)));
+  // Roles de la ruta /monitor-imos: coordinadores leen y generan; otros roles no.
+  await env.withSecurityRulesDisabled(async ctx => {
+    await setDoc(doc(ctx.firestore(), 'users', 'coord'), { role: 'coord_c1', sede: 'Quito' });
+    await setDoc(doc(ctx.firestore(), 'users', 'capitan'), { role: 'capitan', sede: 'Quito' });
+    await setDoc(doc(ctx.firestore(), 'imo_missions', 'legacy-v1'), { imoNombre: 'IMO V1', equipo: 'EQUIPO 130', sede: 'Quito', enrolados: [] });
+  });
+  const coord = env.authenticatedContext('coord', { email: 'coord@crearpsl.net' }).firestore();
+  const capitan = env.authenticatedContext('capitan', { email: 'capitan@crearpsl.net' }).firestore();
+  await assertSucceeds(getDocs(collection(coord, 'imo_missions')));
+  await assertSucceeds(getDocs(query(collectionGroup(coord, 'imo_confirmations'))));
+  await assertFails(getDocs(collection(capitan, 'imo_missions')));
+  await assertFails(updateDoc(doc(coord, 'imo_missions', 'legacy-v1'), { imoNombre: 'CAMBIO' }));
+  async function generate(db, uid, size) {
+    const ref = doc(collection(db, 'imo_campaigns'));
+    await runTransaction(db, async tx => {
+      const registry = doc(db, 'imo_campaign_keys', `quito_130_2026-10-30_${uid}_${size}`);
+      await tx.get(registry);
+      tx.set(registry, { campaignId: ref.id, createdBy: uid, createdAt: serverTimestamp() });
+      tx.set(ref, { schemaVersion: 2, sede: 'Quito', targetTeam: 130, c1Date: '2026-10-30', status: 'active', createdAt: serverTimestamp(), createdBy: uid, count: size });
+      for (let i = 0; i < size; i++) {
+        const mission = doc(collection(db, 'imo_missions'));
+        const enrolados = [{ id: `e${i}`, nombre: `ENROLADO ${i}`, coordinadora_nombre: 'C1', coordinadora_telefono: '' }];
+        const data = { schemaVersion: 2, campaignId: ref.id, imoNombre: `IMO ${i}`, originTeam: i % 2 ? 0 : 129, targetTeam: 130, sede: 'Quito', c1Date: '2026-10-30', enroladoIds: [`e${i}`], enrolados };
+        tx.set(mission, { ...data, equipo: 'EQUIPO 130 - QUITO C1', sourceMissionId: `src${i}`, createdBy: uid, createdByEmail: 'x@crearpsl.net', createdAt: serverTimestamp(), lastUpdated: serverTimestamp(), checks: {} });
+        tx.set(doc(db, 'imo_campaigns', ref.id, 'profiles', mission.id), data);
+      }
+    });
+    return ref.id;
+  }
+  const big = await assertSucceeds(generate(coord, 'coord', 200));
+  assert.equal((await getDocs(collection(anon, `imo_campaigns/${big}/profiles`))).size, 200);
+  await assertFails(generate(capitan, 'capitan', 1));
+  await assertFails(generate(coord, 'coord', 201));
+  console.log('PASS: coordinadores del Monitor generan campañas de hasta 200 IMOs; otros roles denegados.');
   if (process.env.IMO_UI_PREVIEW === '1') await updateDoc(doc(staff, 'imo_campaigns', cid), { status: 'active' });
   for (const path of ['imo_system/control', 'imo_private_challenges/test', 'imo_private_deliveries/test', 'imo_private_sessions/test', 'imo_private_limits/test', 'imo_private_snapshots/test/identities/test', 'imo_private_snapshots/test/enrollees/test']) {
     for (const client of [anon, other, staff]) {
