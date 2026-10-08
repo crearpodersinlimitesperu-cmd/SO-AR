@@ -41,6 +41,9 @@ export function opcionesEquipo(participantes = [], sede = 'GLOBAL') {
   const map = new Map();
   for (const p of participantes) {
     if (!p?.equipo) continue;
+    // Directiva de Gobernanza: Aislar Equipo 1000 de los selectores operativos
+    const eqNorm = (p.equipo || '').toLowerCase();
+    if (eqNorm.includes('equipo 1000') || eqNorm.includes('1000')) continue;
     if (!global && !normalizarTexto(p.sede).includes(sedeNorm)) continue;
     const value = equipoKeyDe(p);
     if (!map.has(value)) map.set(value, { value, equipo: p.equipo.trim(), sede: p.sede || 'Sin sede' });

@@ -42,7 +42,13 @@ export function ejecutarDiagnosticoFIs(
   // personas con asistencia PFD explícitamente confirmada. Si la fuente no
   // entrega esa señal, no se inventa una conclusión con datos ambiguos.
   const universoPfd = (Array.isArray(todosParticipantes) ? todosParticipantes : [])
-    .filter((participante) => participante?.asistioPFD === true);
+    .filter((participante) => {
+      if (participante?.asistioPFD !== true) return false;
+      // Directiva de Gobernanza: Segregar y aislar equipos de soporte/aliados (ej. Equipo 1000)
+      const eqNorm = (participante.equipo || '').toLowerCase();
+      if (eqNorm.includes('equipo 1000') || eqNorm.includes('1000')) return false;
+      return true;
+    });
 
   // 1. Filtrado por Sede
   let participantesEnSede = universoPfd;
