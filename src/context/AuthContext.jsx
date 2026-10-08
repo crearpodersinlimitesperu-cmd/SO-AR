@@ -6,7 +6,7 @@ import { db } from '../services/firebase';
 import { normalizeRole, ROLE_DISPLAY_NAMES, findUserByAnyEmail } from '../data/usersData';
 import { isSuperAdminEmail, isDireccionRole, isGerenciaRole, canSimulate, DUAL_ROLE_TRAINER_EMAILS } from '../config/permissions';
 import { useUI } from './UIContext';
-import { recordAuditEvent, fetchNetworkInfo } from '../services/auditService';
+import { recordAuditEvent } from '../services/auditService';
 import { normalizeUserRecord } from '../utils/userNormalizer';
 import { enforceUserRolesAgent } from '../services/roleAgentDaemon';
 import { canonicalSede } from '../utils/sede';
