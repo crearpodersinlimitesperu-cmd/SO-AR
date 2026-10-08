@@ -45,9 +45,23 @@ export function opcionesEquipo(participantes = [], sede = 'GLOBAL') {
     const value = equipoKeyDe(p);
     if (!map.has(value)) map.set(value, { value, equipo: p.equipo.trim(), sede: p.sede || 'Sin sede' });
   }
+  const SEDE_ORDER = {
+    'lima': 1,
+    'quito': 2,
+    'guayaquil': 3,
+    'cuenca': 4,
+    'medellin': 5,
+    'medellín': 5,
+    'cdmx': 6
+  };
   const num = (t) => parseInt(t.replace(/\D/g, ''), 10) || 0;
   const list = [...map.values()]
-    .sort((a, b) => a.sede.localeCompare(b.sede, 'es') || num(a.equipo) - num(b.equipo) || a.equipo.localeCompare(b.equipo))
+    .sort((a, b) => {
+      const orderA = SEDE_ORDER[normalizarTexto(a.sede)] || 99;
+      const orderB = SEDE_ORDER[normalizarTexto(b.sede)] || 99;
+      if (orderA !== orderB) return orderA - orderB;
+      return num(a.equipo) - num(b.equipo) || a.equipo.localeCompare(b.equipo);
+    })
     .map((o) => ({ value: o.value, label: global ? `${o.sede} · ${o.equipo}` : o.equipo }));
   return [{ value: 'Todos', label: 'Todos' }, ...list];
 }

@@ -83,6 +83,17 @@ export function ejecutarDiagnosticoFIs(
     equiposMap[eqKey].aprobados += apr;
   });
 
+  // Orden jerárquico canónico por Sede institucional
+  const SEDE_ORDER = {
+    'lima': 1,
+    'quito': 2,
+    'guayaquil': 3,
+    'cuenca': 4,
+    'medellin': 5,
+    'medellín': 5,
+    'cdmx': 6
+  };
+
   // Calcular semáforo de equipos de la sede
   const equiposList = Object.values(equiposMap).map(eq => {
     const pctEntrega = eq.total > 0 ? Math.round((eq.conEntrega / eq.total) * 100) : 0;
@@ -95,6 +106,12 @@ export function ejecutarDiagnosticoFIs(
       semaforo
     };
   }).sort((a, b) => {
+    // Si estamos en vista GLOBAL, agrupar primero coherentemente por Sede
+    if (esFiltroGlobal) {
+      const orderA = SEDE_ORDER[normalizarTexto(a.sede)] || 99;
+      const orderB = SEDE_ORDER[normalizarTexto(b.sede)] || 99;
+      if (orderA !== orderB) return orderA - orderB;
+    }
     const numA = parseInt((a.equipo || '').replace(/\D/g, ''), 10) || 0;
     const numB = parseInt((b.equipo || '').replace(/\D/g, ''), 10) || 0;
     return numA - numB || b.pctEntrega - a.pctEntrega;
