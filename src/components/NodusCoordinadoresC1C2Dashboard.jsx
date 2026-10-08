@@ -25,7 +25,7 @@ const KNOWN_COORDINATOR_EMAILS = {
   'LILIANA': 'liliana.cubillo@crearpsl.net',
   'LILIANA CUBILLO': 'liliana.cubillo@crearpsl.net',
   'ADAMS': 'coordinacion.quito@crearpsl.net',
-  'DIANA': 'diana.macas@crearpsl.net',
+  'DIANA': 'diana.moscoso@crearpsl.net',
   'DIANA MOSCOSO': 'diana.moscoso@crearpsl.net',
   'JOSUE VERA': 'josue.vera@crearpsl.net',
   'MARCOS VERA': 'josue.vera@crearpsl.net',
@@ -38,7 +38,20 @@ const KNOWN_COORDINATOR_EMAILS = {
 };
 
 function resolveCoordinatorEmail(coord) {
-  if (coord?.email && coord.email.includes('@') && !coord.email.toLowerCase().includes('solicitar')) {
+  const sedeClean = (coord?.sede || '').toLowerCase();
+  const rawN = (coord?.nombre || coord?.nombreCompleto || '').toLowerCase();
+
+  // Desambiguación estricta de homónimos entre Sedes
+  if (rawN.includes('diana')) {
+    if (sedeClean.includes('guayaquil') || sedeClean.includes('gye')) {
+      return 'diana.macas@crearpsl.net';
+    }
+    if (sedeClean.includes('lima')) {
+      return 'diana.moscoso@crearpsl.net';
+    }
+  }
+
+  if (coord?.email && coord.email.includes('@') && !coord.email.toLowerCase().includes('solicitar') && !coord.email.toLowerCase().includes('coordinacion.')) {
     return coord.email.trim();
   }
 
