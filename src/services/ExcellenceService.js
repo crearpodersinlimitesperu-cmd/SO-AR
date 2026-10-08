@@ -1,8 +1,9 @@
 import { db } from './firebase';
 import { fetchRoleRecipients } from './directoryService';
+import { validateRecipientRoles } from '../utils/recipientRoles';
 import { 
-  collection, addDoc, getDocs, updateDoc, doc, getDoc,
-  query, where, orderBy, arrayUnion, writeBatch, increment
+  collection, addDoc, doc, getDoc,
+  arrayUnion, writeBatch, increment
 } from 'firebase/firestore';
 
 export const ExcellenceService = {
@@ -10,6 +11,7 @@ export const ExcellenceService = {
   // 1. REGISTRAR NUEVO ESTÁNDAR DE EXCELENCIA
   async captureNewStandard(task, standardData, currentUser) {
     try {
+      const recipientRoles = validateRecipientRoles(standardData.roles || [currentUser.appRole]);
       const standardEntry = {
         taskId: task.id,
         taskTitle: task.task || task.title || 'Sin Título',
@@ -49,7 +51,7 @@ export const ExcellenceService = {
         
         // EXPANSIÓN AUTOMÁTICA
         expansion: {
-          roles: standardData.roles || [currentUser.appRole],
+          roles: recipientRoles,
           sedes: standardData.sedes || ['Todas'],
           phases: standardData.phases || [task.cyclePhase || 'GLOBAL'],
           autoApply: standardData.autoApply !== false
@@ -156,6 +158,7 @@ export const ExcellenceService = {
       }
       
       const standard = standardSnap.data();
+      validateRecipientRoles(standard.expansion?.roles);
       const batch = writeBatch(db);
       
       // 1. Actualizar estado del estándar
@@ -212,7 +215,7 @@ export const ExcellenceService = {
       if (!standard.expansion || !standard.expansion.roles || standard.expansion.roles.length === 0) return;
       
       // Notificar a todos los roles aplicables
-      const recipients = await fetchRoleRecipients(standard.expansion.roles);
+      const recipients = await fetchRoleRecipients(validateRecipientRoles(standard.expansion.roles));
       
       const batch = writeBatch(db);
       
@@ -235,6 +238,7 @@ export const ExcellenceService = {
       
     } catch (error) {
       console.error('Error notifying manada:', error);
+      throw error;
     }
   }
 };

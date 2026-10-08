@@ -8,7 +8,7 @@
     "prebuild": "(python3 dump_code.py || python dump_code.py || py dump_code.py || echo \"Python no disponible localmente, saltando prebuild...\")",
     "build": "vite build",
     "lint": "oxlint",
-    "test": "node --test src/utils/overdueTasks.test.js tests/nodus-fi-multisede.test.mjs tests/directory-scope.test.mjs tests/centro-managers-global-director.test.mjs tests/liquidacion-reversar-permissions.test.mjs tests/task-privacy.test.mjs",
+    "test": "node --test src/utils/overdueTasks.test.js tests/nodus-fi-multisede.test.mjs tests/directory-scope.test.mjs tests/directory-client.test.mjs tests/centro-managers-global-director.test.mjs tests/liquidacion-reversar-permissions.test.mjs tests/task-privacy.test.mjs",
     "test:rules": "node --test tests/firestore-task-privacy.test.mjs tests/firestore-users-privacy.test.mjs",
     "preview": "vite preview",
     "sync:qt": "node scripts/qtSyncDaemon.js",

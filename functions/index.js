@@ -235,6 +235,9 @@ async function loadCallerScope(request) {
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "Debes iniciar sesión.");
   }
+  if (!request.auth.token || request.auth.token.email_verified !== true) {
+    throw new HttpsError("permission-denied", "Debes verificar tu correo para consultar el directorio.");
+  }
   const snap = await db.collection("users").doc(request.auth.uid).get();
   if (!snap.exists) {
     throw new HttpsError("permission-denied", "Tu usuario no está registrado en el sistema.");
@@ -266,11 +269,12 @@ async function loadUserDocs() {
 // toda la colección; los roles ya vienen validados contra la allowlist.
 async function loadRecipientDocs(roles) {
   const byId = new Map();
-  const [byRole, byRoles] = await Promise.all([
-    db.collection("users").where("role", "in", roles).limit(directoryScope.MAX_DIRECTORY_DOCS + 1).get(),
-    db.collection("users").where("roles", "array-contains-any", roles).limit(directoryScope.MAX_DIRECTORY_DOCS + 1).get()
-  ]);
-  [byRole, byRoles].forEach((snap) => {
+  const snapshots = await Promise.all(
+    [["role", "in"], ["roles", "array-contains-any"], ["appRole", "in"]].map(([field, operator]) =>
+      db.collection("users").where(field, operator, roles).select("email", "role", "roles", "appRole", "status", "isActive", "active")
+        .limit(directoryScope.MAX_DIRECTORY_DOCS + 1).get())
+  );
+  snapshots.forEach((snap) => {
     if (snap.size > directoryScope.MAX_DIRECTORY_DOCS) {
       throw new HttpsError("failed-precondition", "Demasiados destinatarios para el rol solicitado.");
     }
@@ -284,7 +288,7 @@ const DIRECTORY_CALL_OPTIONS = { maxInstances: 5, timeoutSeconds: 30, memory: "2
 exports.getCompanyDirectory = onCall(DIRECTORY_CALL_OPTIONS, async (request) => {
   const scope = await loadCallerScope(request);
   const users = directoryScope.buildDirectory(scope, scope.level === "none" || scope.level === "self" ? [] : await loadUserDocs());
-  return { scope: scope.level, sede: scope.sede, users };
+  return { scope: scope.level, sede: scope.sede, canSeeCrossSede: scope.level === "global" || scope.crossSedeRoster, users };
 });
 
 exports.getRoleRecipients = onCall(DIRECTORY_CALL_OPTIONS, async (request) => {

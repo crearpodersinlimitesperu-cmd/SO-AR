@@ -10,6 +10,7 @@ import {
 } from '../src/config/permissions.js';
 import { canonicalSede } from '../src/utils/sede.js';
 import { SEDE_ALIASES, sedeAliasList } from '../src/utils/sedeAliases.js';
+import { RECIPIENT_ROLES, validateRecipientRoles } from '../src/utils/recipientRoles.js';
 
 const require = createRequire(import.meta.url);
 const d = require('../functions/directoryScope.js');
@@ -118,7 +119,7 @@ test('getRoleRecipients authz: global and coordination callers pass, but only wi
   const coord = d.resolveScope({ role: 'coord_c1', sede: 'Lima' }, 'c@x.com');
   for (const scope of [global, coord]) {
     assert.deepEqual(d.checkRecipientRequest(scope, ['Gerente', 'gerente', 'Dirección']).roles, ['gerente', 'direccion']);
-    for (const bad of ['sheriff', 'colaborador', 'student', '', '  ']) {
+    for (const bad of ['sheriff', 'arbitrary_role', '', '  ']) {
       assert.equal(d.checkRecipientRequest(scope, ['gerente', bad]).error, 'invalid-argument', bad);
     }
     assert.equal(d.checkRecipientRequest(scope, 'gerente').error, 'invalid-argument');
@@ -132,6 +133,16 @@ test('the roles ExcellenceService asks for are allowlisted', () => {
   for (const r of ['gerente', 'direccion', 'director_maestria', 'superadmin']) {
     assert.ok(d.RECIPIENT_ROLE_ALLOWLIST.includes(r), r);
   }
+});
+
+test('notification policy preserves supported operational roles without arbitrary enumeration', () => {
+  assert.deepEqual([...RECIPIENT_ROLES].sort(), [...d.RECIPIENT_ROLE_ALLOWLIST].sort());
+  const scope = d.resolveScope({ role: 'coord_c1', sede: 'Lima' }, 'c@x.com');
+  for (const role of RECIPIENT_ROLES) {
+    assert.deepEqual(d.checkRecipientRequest(scope, [role]), { roles: [role] });
+    assert.deepEqual(validateRecipientRoles([role]), [role]);
+  }
+  assert.throws(() => validateRecipientRoles(['unknown']), /no soportados/);
 });
 
 test('scale safety: bounded reads are declared and callables fail loudly instead of returning partial data', () => {

@@ -4,7 +4,8 @@ import { usersData, normalizeRole, findUserByAnyEmail } from '../data/usersData'
 import { DUAL_ROLE_TRAINER_EMAILS, canManageUserStatus, isSuperAdminEmail, NODUS_REPORT_ADMIN_EMAILS } from '../config/permissions';
 import { recordAuditEvent } from './auditService';
 import { fetchCrossSedeDirectory } from './directoryService';
-import { sedeAliasList, hasUsableSede, sameCanonicalSede } from '../utils/sedeAliases';
+import { sedeAliasList } from '../utils/sedeAliases';
+import { isInDirectoryScope, projectDirectoryUser } from '../utils/directoryScope';
 
 
 /**
@@ -138,14 +139,6 @@ const readScopedUsersDocs = async () => {
   return docs;
 };
 
-const isInDirectoryScope = (localUser, scope, ownEmails) => {
-  if (scope.global || scope.crossSede) return true;
-  const emails = [localUser.email, ...(Array.isArray(localUser.emails) ? localUser.emails : [])]
-    .filter(Boolean).map(e => String(e).trim().toLowerCase());
-  if (emails.some(e => ownEmails.has(e))) return true;
-  return hasUsableSede(scope.sede) && sameCanonicalSede(localUser.sede, scope.sede);
-};
-
 /**
  * Obtiene todos los usuarios de la compañía consultando los tres directorios oficiales de Firestore.
  * Esto reemplaza al archivo estático usersData.js
@@ -245,9 +238,9 @@ export async function getAllCompanyUsers(currentUser = null) {
       // coordinación/gerencia; si no está disponible se queda el alcance de sede.
       try {
         const seen = new Set(userDocs.map(d => d.id));
-        const crossSede = await fetchCrossSedeDirectory();
-        scope.crossSede = crossSede.length > 0;
-        crossSede.forEach(({ id, ...data }) => {
+        const directory = await fetchCrossSedeDirectory();
+        scope.crossSede = directory.canSeeCrossSede === true;
+        directory.users.forEach(({ id, ...data }) => {
           if (!seen.has(id)) userDocs.push({ id, data });
         });
       } catch (err) {
@@ -379,6 +372,7 @@ export async function getAllCompanyUsers(currentUser = null) {
     const CONTACT_FIELDS_FROM_QT = ['whatsapp', 'whatsappUrl', 'cleanPhone', 'phone', 'telefono', 'email', 'correo', 'corporateEmail', 'personalEmail', 'cumpleanos'];
     qtSnap.forEach(docSnap => {
       const qtData = docSnap.data();
+      if (!isInDirectoryScope(qtData, scope, ownEmails)) return;
       const candidateKeys = emailKeysOf(qtData);
       const existingIdx = candidateKeys.size > 0 ? findExistingIndex(candidateKeys) : -1;
       if (existingIdx !== -1) {
@@ -436,7 +430,8 @@ export async function getAllCompanyUsers(currentUser = null) {
     console.warn("Error evaluando permisos de estado en getAllCompanyUsers:", err);
     includeInactive = false;
   }
-  return includeInactive ? allUsers : allUsers.filter(u => u.status !== 'inactive');
+  const visibleUsers = includeInactive ? allUsers : allUsers.filter(u => u.status !== 'inactive');
+  return visibleUsers.map(user => projectDirectoryUser(user, scope, ownEmails));
 }
 
 /**

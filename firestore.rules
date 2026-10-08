@@ -604,10 +604,12 @@ service cloud.firestore {
     match /users/{userId} {
       allow read: if isAuthenticated() && (
         request.auth.uid == userId ||
-        isOwnUserProfile(resource.data) ||
-        isSuperAdmin() ||
-        callerIsDirectoryGlobal() ||
-        canReadUserSameSede(resource.data)
+        (request.auth.token.get('email_verified', false) == true && (
+          isOwnUserProfile(resource.data) ||
+          isSuperAdmin() ||
+          callerIsDirectoryGlobal() ||
+          canReadUserSameSede(resource.data)
+        ))
       );
       allow create: if isSuperAdmin() || (
         isAuthenticated() && request.auth.uid == userId &&

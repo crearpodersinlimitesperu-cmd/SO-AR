@@ -35,7 +35,9 @@ const MAX_RECIPIENT_ROLES = 20;
 // Roles que se pueden pedir como destinatarios (notificaciones de excelencia).
 // Cualquier otro valor se rechaza: nunca se enumera por rol arbitrario.
 const RECIPIENT_ROLE_ALLOWLIST = Array.from(new Set([
-  ...GLOBAL_ROLES, ...CROSS_SEDE_ROSTER_ROLES, "superadmin", "entrenador"
+  ...GLOBAL_ROLES, ...CROSS_SEDE_ROSTER_ROLES, "superadmin", "entrenador",
+  "entrenador_llamadas", "observador", "colaborador", "legal",
+  "asistente_impuestos_quito", "tecnico_sst", "student", "participante", "marketing"
 ]));
 
 // Tope duro de documentos leídos por llamada: si la colección lo supera se

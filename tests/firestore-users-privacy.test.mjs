@@ -64,7 +64,7 @@ beforeEach(async () => {
   });
 });
 
-const dbFor = (uid, email) => testEnv.authenticatedContext(uid, { email }).firestore();
+const dbFor = (uid, email) => testEnv.authenticatedContext(uid, { email, email_verified: true }).firestore();
 const asLima = () => dbFor('lima-1', 'lima1@example.com');
 const users = db => collection(db, 'users');
 
@@ -76,6 +76,24 @@ test('unauthenticated clients cannot read or list users', async () => {
 
 test('an ordinary user cannot list the global users collection', async () => {
   await assertFails(getDocs(users(asLima())));
+});
+
+test('unverified or missing verification cannot use email whitelists or profile lookups', async () => {
+  for (const token of [
+    { email: 'jose.sanchez@crearpsl.net', email_verified: false },
+    { email: 'jose.sanchez@crearpsl.net' },
+    { email: 'fer.aragon@crearpsl.net', email_verified: false }
+  ]) {
+    const db = testEnv.authenticatedContext('unverified', token).firestore();
+    await assertFails(getDocs(users(db)));
+    await assertFails(getDoc(doc(db, 'users', 'quito-1')));
+    await assertFails(getDocs(query(users(db), where('email', '==', token.email))));
+  }
+  const own = testEnv.authenticatedContext('lima-1', {
+    email: 'lima1@example.com', email_verified: false
+  }).firestore();
+  await assertSucceeds(getDoc(doc(own, 'users', 'lima-1')));
+  await assertFails(getDoc(doc(own, 'users', 'lima-2')));
 });
 
 test('a user keeps access to their own profile by UID', async () => {
