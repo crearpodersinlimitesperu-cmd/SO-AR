@@ -4395,7 +4395,7 @@ export default function CentroManagers() {
                   href="https://drive.google.com/drive/folders/1c3wkWITxPTdtvZ41o-MTcftRPkQtmpgi?usp=drive_link"
                   target="_blank"
                   rel="noopener noreferrer"
-                  title="Acceso restringido: Solo para el Gerente de Lima y DirecciÃ³n"
+                  title="Acceso restringido: Solo para el Gerente de Lima y Dirección"
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',

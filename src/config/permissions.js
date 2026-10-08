@@ -120,7 +120,7 @@ export const hasQTPrivileges = (currentUser) => {
   
   // Usuario inactivo o desvinculado no tiene privilegios
   if (currentUser.active === false || currentUser.estado === 'inactivo' || currentUser.role === 'inactivo') return false;
-  // Leyla renunciÃ³ a QT y a Oficina (12/09/2026)
+  // Leyla renunció a QT y a Oficina (12/09/2026)
   if (email.includes('leylakellypasquel') || email.includes('leyla.pasquel') || name.includes('leyla pasquel')) return false;
   
   if (r === 'qt') return true;
@@ -931,7 +931,7 @@ export const canAccessCopilot = (currentUser) => {
 };
 
 /**
- * Verifica si el usuario actual es Gerente de Lima, SuperAdmin o DirecciÃ³n autorizada.
+ * Verifica si el usuario actual es Gerente de Lima, SuperAdmin o Dirección autorizada.
  * Solicitud directa: "https://drive.google.com/drive/folders/1c3wkWITxPTdtvZ41o-MTcftRPkQtmpgi?usp=drive_link esto es solo para el gerente de lima"
  */
 export const isGerenteLima = (currentUser) => {

@@ -136,7 +136,7 @@ export default function CRMBaseMaster() {
       setParticipantsCursor(snap.docs[snap.docs.length - 1] || null);
       setHasMoreParticipants(snap.size === PARTICIPANT_PAGE_SIZE);
 
-      // Mapear managers operativos como parte del ecosistema genealÃ³gico multi-sede
+      // Mapear managers operativos como parte del ecosistema genealógico multi-sede
       const managersList = (INITIAL_MANAGERS || []).map(m => {
         const mgrSede = normalizeSedeName(m.sede);
         return {
@@ -149,7 +149,7 @@ export default function CRMBaseMaster() {
           sede: m.sede || mgrSede,
           normalizedSede: mgrSede,
           estadoC1: m.estado === 'Desertor' ? 'DESERTOR' : 'SENTADO',
-          coordinadora: m.coordinador || ('CoordinaciÃ³n ' + mgrSede),
+          coordinadora: m.coordinador || ('Coordinación ' + mgrSede),
           imoEnrolador: m.coordinador ? ('COORDINACIÃ“N ' + m.coordinador.toUpperCase()) : (m.entrenador ? ('RED ENTRENADOR: ' + m.entrenador.toUpperCase()) : ('EQUIPO ' + (m.numEquipo || 1) + ' - ' + (m.equipo || 'GENERAL'))),
           equipo: m.equipo,
           entrenador: m.entrenador,
@@ -201,7 +201,7 @@ export default function CRMBaseMaster() {
           sede: m.sede || mgrSede,
           normalizedSede: mgrSede,
           estadoC1: m.estado === 'Desertor' ? 'DESERTOR' : 'SENTADO',
-          coordinadora: m.coordinador || ('CoordinaciÃ³n ' + mgrSede),
+          coordinadora: m.coordinador || ('Coordinación ' + mgrSede),
           imoEnrolador: m.coordinador ? ('COORDINACIÃ“N ' + m.coordinador.toUpperCase()) : (m.entrenador ? ('RED ENTRENADOR: ' + m.entrenador.toUpperCase()) : ('EQUIPO ' + (m.numEquipo || 1) + ' - ' + (m.equipo || 'GENERAL'))),
           equipo: m.equipo,
           entrenador: m.entrenador,
@@ -542,7 +542,7 @@ export default function CRMBaseMaster() {
       };
     });
 
-    // InyecciÃ³n de Nodos de CoordinaciÃ³n Nodus Multi-Sede
+    // Inyección de Nodos de Coordinación Nodus Multi-Sede
     if (nodusData?.coordinadores && nodusData.coordinadores.length > 0) {
       const coordsToInclude = selectedSede === 'ALL'
         ? nodusData.coordinadores
@@ -552,7 +552,7 @@ export default function CRMBaseMaster() {
         const normSede = normalizeSedeName(c.sede);
         const coordTitle = 'COORDINACIÃ“N ' + (c.nombreCompleto || c.nombre) + ' (' + normSede.toUpperCase() + ')';
         
-        // Mapear equipos como participantes de telemetrÃ­a viva Nodus
+        // Mapear equipos como participantes de telemetría viva Nodus
         const teamParticipants = (c.equipos || []).map((eq, eqIdx) => ({
           id: 'nodus_eq_' + (c.id || c.nombre) + '_' + eqIdx,
           nombreCompleto: (eq.equipo || 'Equipo') + ' â€¢ ' + (eq.llamadas || 0) + ' Llamadas',

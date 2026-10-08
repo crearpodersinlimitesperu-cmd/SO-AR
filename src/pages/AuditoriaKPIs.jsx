@@ -622,7 +622,7 @@ export default function AuditoriaKPIs({ defaultTab }) {
     return null;
   };
 
-  // Helpers de visualizaciÃ³n con soporte de metas individuales
+  // Helpers de visualización con soporte de metas individuales
   const renderC1Data = (report = {}) => {
     const data = report.data || report;
     const customMetas = report.customMetas || {};
