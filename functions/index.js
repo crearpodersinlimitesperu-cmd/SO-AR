@@ -44,6 +44,7 @@ const { setGlobalOptions } = require("firebase-functions/v2");
 const { initializeApp } = require("firebase-admin/app");
 const { FieldValue, getFirestore } = require("firebase-admin/firestore");
 const { notebookKnowledge } = require("./notebookKnowledge");
+const directoryScope = require("./directoryScope");
 
 initializeApp();
 const db = getFirestore();
@@ -222,4 +223,78 @@ ${notebookKnowledge}`;
   }
 
   return { text: aiText };
+});
+
+// ---------------------------------------------------------------------------
+// C-02: directorio de usuarios servido por backend. Las reglas de Firestore ya
+// no permiten listar /users entre sedes; estas dos funciones devuelven solo la
+// proyección mínima que necesitan los flujos legítimos entre sedes (asignación
+// de tareas, comunicados, búsqueda, notificaciones de excelencia).
+// ---------------------------------------------------------------------------
+async function loadCallerScope(request) {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "Debes iniciar sesión.");
+  }
+  const snap = await db.collection("users").doc(request.auth.uid).get();
+  if (!snap.exists) {
+    throw new HttpsError("permission-denied", "Tu usuario no está registrado en el sistema.");
+  }
+  return directoryScope.resolveScope(snap.data(), request.auth.token && request.auth.token.email);
+}
+
+// Lectura acotada: tope duro (falla explícito, nunca resultado parcial) y caché
+// de 60 s por instancia para que ráfagas de llamadas no multipliquen lecturas.
+const DIRECTORY_CACHE_TTL_MS = 60 * 1000;
+let directoryCache = { at: 0, docs: null };
+
+async function loadUserDocs() {
+  if (directoryCache.docs && Date.now() - directoryCache.at < DIRECTORY_CACHE_TTL_MS) {
+    return directoryCache.docs;
+  }
+  const max = directoryScope.MAX_DIRECTORY_DOCS;
+  const snap = await db.collection("users").select(...directoryScope.MINIMAL_FIELDS).limit(max + 1).get();
+  if (snap.size > max) {
+    console.error("getCompanyDirectory: users supera el tope de " + max + " documentos");
+    throw new HttpsError("failed-precondition", "El directorio supera el límite soportado; contacta a soporte.");
+  }
+  const docs = snap.docs.map((d) => ({ id: d.id, data: d.data() }));
+  directoryCache = { at: Date.now(), docs };
+  return docs;
+}
+
+// Destinatarios por rol: consultas indexadas (campo único) en vez de recorrer
+// toda la colección; los roles ya vienen validados contra la allowlist.
+async function loadRecipientDocs(roles) {
+  const byId = new Map();
+  const [byRole, byRoles] = await Promise.all([
+    db.collection("users").where("role", "in", roles).limit(directoryScope.MAX_DIRECTORY_DOCS + 1).get(),
+    db.collection("users").where("roles", "array-contains-any", roles).limit(directoryScope.MAX_DIRECTORY_DOCS + 1).get()
+  ]);
+  [byRole, byRoles].forEach((snap) => {
+    if (snap.size > directoryScope.MAX_DIRECTORY_DOCS) {
+      throw new HttpsError("failed-precondition", "Demasiados destinatarios para el rol solicitado.");
+    }
+    snap.docs.forEach((d) => byId.set(d.id, { id: d.id, data: d.data() }));
+  });
+  return Array.from(byId.values());
+}
+
+const DIRECTORY_CALL_OPTIONS = { maxInstances: 5, timeoutSeconds: 30, memory: "256MiB" };
+
+exports.getCompanyDirectory = onCall(DIRECTORY_CALL_OPTIONS, async (request) => {
+  const scope = await loadCallerScope(request);
+  const users = directoryScope.buildDirectory(scope, scope.level === "none" || scope.level === "self" ? [] : await loadUserDocs());
+  return { scope: scope.level, sede: scope.sede, users };
+});
+
+exports.getRoleRecipients = onCall(DIRECTORY_CALL_OPTIONS, async (request) => {
+  const scope = await loadCallerScope(request);
+  const check = directoryScope.checkRecipientRequest(scope, request.data && request.data.roles);
+  if (check.error === "permission-denied") {
+    throw new HttpsError("permission-denied", "No tienes permiso para consultar destinatarios.");
+  }
+  if (check.error) {
+    throw new HttpsError("invalid-argument", "Lista de roles destinatarios inválida.");
+  }
+  return { recipients: directoryScope.buildRecipients(check.roles, await loadRecipientDocs(check.roles)) };
 });

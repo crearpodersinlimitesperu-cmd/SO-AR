@@ -1,4 +1,5 @@
 import { db } from './firebase';
+import { fetchRoleRecipients } from './directoryService';
 import { 
   collection, addDoc, getDocs, updateDoc, doc, getDoc,
   query, where, orderBy, arrayUnion, writeBatch, increment
@@ -95,16 +96,12 @@ export const ExcellenceService = {
   async notifyLeadershipChain(standard) {
     try {
       // Buscar líderes de alto rendimiento
-      const leadersQuery = query(
-        collection(db, 'users'),
-        where('role', 'in', ['gerente', 'direccion', 'director_maestria', 'superadmin'])
-      );
-      const leadersSnap = await getDocs(leadersQuery);
+      // C-02: los destinatarios los resuelve el backend (users ya no es listable).
+      const leaders = await fetchRoleRecipients(['gerente', 'direccion', 'director_maestria', 'superadmin']);
       
       const batch = writeBatch(db);
       
-      leadersSnap.forEach((docSnapshot) => {
-        const leader = docSnapshot.data();
+      leaders.forEach((leader) => {
         if (!leader.email) return;
         const notifRef = doc(collection(db, 'notifications'));
         batch.set(notifRef, {
@@ -215,16 +212,11 @@ export const ExcellenceService = {
       if (!standard.expansion || !standard.expansion.roles || standard.expansion.roles.length === 0) return;
       
       // Notificar a todos los roles aplicables
-      const usersQuery = query(
-        collection(db, 'users'),
-        where('role', 'in', standard.expansion.roles)
-      );
-      const usersSnap = await getDocs(usersQuery);
+      const recipients = await fetchRoleRecipients(standard.expansion.roles);
       
       const batch = writeBatch(db);
       
-      usersSnap.forEach((docSnapshot) => {
-        const user = docSnapshot.data();
+      recipients.forEach((user) => {
         if (!user.email) return;
         const notifRef = doc(collection(db, 'notifications'));
         batch.set(notifRef, {

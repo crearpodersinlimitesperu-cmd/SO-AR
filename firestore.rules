@@ -481,8 +481,134 @@ service cloud.firestore {
     // Los campos de rol y estado solo los pueden modificar SuperAdmins.
     // Los usuarios pueden mantener sus datos de perfil y elegir una vista entre
     // los roles que ya tienen asignados, sin poder ampliar esos roles.
+    //
+    // C-02: lectura restringida. Antes cualquier autenticado podía listar todo
+    // /users (emails, roles, sedes, teléfonos, cumpleaños). Ahora solo:
+    //  - SuperAdmin / gerencia-dirección global;
+    //  - el propio perfil (por UID) y la consulta propia por correo que hacen
+    //    AuthContext/getVerifiedUser (email, emails[], corporateEmail,
+    //    personalEmail), incluyendo el alias @crearpsl.net/.com;
+    //  - documentos de la misma sede que el perfil autenticado del llamador.
+    // No se usa ningún custom claim de sede: en el repo no se asigna ninguno
+    // (solo scratch/invite_qts.mjs fija {role:'qt'}), así que la sede sale
+    // únicamente de users/{request.auth.uid}.sede.
+    function emailAsNet() {
+      let parts = email().split('@');
+      return parts.size() == 2 && parts[1] in ['crearpsl.net', 'crearpsl.com']
+        ? parts[0] + '@crearpsl.net' : email();
+    }
+
+    function emailAsCom() {
+      let parts = email().split('@');
+      return parts.size() == 2 && parts[1] in ['crearpsl.net', 'crearpsl.com']
+        ? parts[0] + '@crearpsl.com' : email();
+    }
+
+    function isOwnUserProfile(userData) {
+      return userData.get('email', '') == email() ||
+        userData.get('email', '') == emailAsNet() ||
+        userData.get('email', '') == emailAsCom() ||
+        userData.get('corporateEmail', '') == email() ||
+        userData.get('corporateEmail', '') == emailAsNet() ||
+        userData.get('corporateEmail', '') == emailAsCom() ||
+        userData.get('personalEmail', '') == email() ||
+        userData.get('personalEmail', '') == emailAsNet() ||
+        userData.get('personalEmail', '') == emailAsCom() ||
+        (userData.get('emails', []) is list &&
+         (email() in userData.emails || emailAsNet() in userData.emails || emailAsCom() in userData.emails));
+    }
+
+    function callerProfileExists() {
+      return isAuthenticated() &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function callerProfileData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    // Roles que ven todo el directorio (sin límite de sede). 'gerente' NO está
+    // aquí: es un rol de sede y entra por canReadUserSameSede().
+    // Misma lista que isGerenteODireccion(), pero con alias @crearpsl.net/.com:
+    // fer.aragon@crearpsl.com ya puede enviar comunicados operativos y no debe
+    // perder el directorio global por entrar con el dominio alterno.
+    function isDirectoryWhitelistedEmail() {
+      return emailAsNet() in [
+        'emely.leon@crearpsl.net',
+        'fer.aragon@crearpsl.net',
+        'andres.gomez@crearpsl.net',
+        'gomeznueve@gmail.com',
+        'contabilidad.global@crearpsl.net',
+        'leandro.brunis@crearpsl.net',
+        'josue.vera@crearpsl.net',
+        'yurany.gonzalez@crearpsl.net',
+        'nora.zamora@crearpsl.net',
+        'emily.campuzano@crearpsl.net',
+        'freddy.sosa@crearpsl.net',
+        'diana.moscoso@crearpsl.net'
+      ];
+    }
+
+    function callerIsDirectoryGlobal() {
+      return isGerenteODireccion() || isDirectoryWhitelistedEmail() || (callerProfileExists() && (
+        callerProfileData().get('role', '') in ['direccion', 'cfo', 'cco', 'ceo', 'director_maestria', 'talento_humano'] ||
+        callerProfileData().get('appRole', '') in ['direccion', 'cfo', 'cco', 'ceo', 'director_maestria', 'talento_humano'] ||
+        (callerProfileData().get('roles', []) is list &&
+         callerProfileData().roles.hasAny(['direccion', 'cfo', 'cco', 'ceo', 'director_maestria', 'talento_humano']))
+      ));
+    }
+
+    function callerDirectorySede() {
+      return callerProfileExists() && callerProfileData().get('sede', '') is string
+        ? callerProfileData().get('sede', '') : '';
+    }
+
+    // Réplica de canonicalSede() (src/utils/sede.js): Quito Ciclo 1/C1/C2/UIO -> Quito,
+    // Medellin/Medellín/MED -> Medellín, etc. '' = sin sede utilizable (vacía,
+    // Global, Sede Global, Sin Sede). Las listas de sedeAliasList() deben coincidir con
+    // SEDE_ALIASES (functions/directoryScope.js, src/utils/sedeAliases.js); un test lo verifica.
+    function sedeFolded(s) {
+      return s.lower().replace('á', 'a').replace('é', 'e').replace('í', 'i')
+              .replace('ó', 'o').replace('ú', 'u').trim();
+    }
+
+    function sedeCanonical(k) {
+      return k == '' || k == 'sin sede' || k.matches('.*global.*') ? '' :
+        k == 'med' || k.matches('.*medellin.*') ? 'medellin' :
+        k == 'lim' || k.matches('.*lima.*') ? 'lima' :
+        k == 'cue' || k.matches('.*cuenca.*') ? 'cuenca' :
+        k == 'gye' || k.matches('.*guayaquil.*') ? 'guayaquil' :
+        k == 'mex' || k == 'cdmx' || k.matches('.*mexico.*') ? 'mexico' :
+        k.matches('.*uio.*') || k.matches('.*quito.*') || k.matches('.*ciclo\\s*[12].*') ? 'quito' :
+        k == 'int' || k.matches('.*internacional.*') ? 'internacional' : k;
+    }
+
+    function sedeAliasList(raw) {
+      return sedeCanonical(sedeFolded(raw)) == 'quito' ?
+          ['Quito', 'QUITO', 'quito', 'UIO', 'uio', 'Quito C1', 'Quito C2', 'Quito Ciclo 1', 'Quito Ciclo 2', 'QUITO C1', 'QUITO C2', 'Quito ciclo 1', 'Quito ciclo 2'] :
+        sedeCanonical(sedeFolded(raw)) == 'medellin' ?
+          ['Medellín', 'Medellin', 'MEDELLIN', 'MEDELLÍN', 'medellin', 'medellín', 'MED', 'Med'] :
+        sedeCanonical(sedeFolded(raw)) == 'lima' ? ['Lima', 'LIMA', 'lima', 'LIM'] :
+        sedeCanonical(sedeFolded(raw)) == 'cuenca' ? ['Cuenca', 'CUENCA', 'cuenca', 'CUE'] :
+        sedeCanonical(sedeFolded(raw)) == 'guayaquil' ? ['Guayaquil', 'GUAYAQUIL', 'guayaquil', 'GYE'] :
+        sedeCanonical(sedeFolded(raw)) == 'mexico' ? ['México', 'Mexico', 'MEXICO', 'MÉXICO', 'mexico', 'CDMX', 'MEX'] :
+        sedeCanonical(sedeFolded(raw)) == 'internacional' ? ['Internacional', 'INTERNACIONAL', 'INT'] :
+        [raw];
+    }
+
+    function canReadUserSameSede(userData) {
+      return sedeCanonical(sedeFolded(callerDirectorySede())) != '' &&
+        userData.get('sede', '') in sedeAliasList(callerDirectorySede());
+    }
+
     match /users/{userId} {
-      allow read: if isAuthenticated();
+      allow read: if isAuthenticated() && (
+        request.auth.uid == userId ||
+        isOwnUserProfile(resource.data) ||
+        isSuperAdmin() ||
+        callerIsDirectoryGlobal() ||
+        canReadUserSameSede(resource.data)
+      );
       allow create: if isSuperAdmin() || (
         isAuthenticated() && request.auth.uid == userId &&
         request.resource.data.uid == request.auth.uid &&
