@@ -1,15 +1,10 @@
-name: Nodus CRM Hourly Delta Sync (CausaNodusCRMSyncAgent)
+name: Nodus CRM Hourly Delta Sync
 
 on:
   schedule:
-    # Ejecución automática cada hora exacta en el minuto 0
+    # Runs every hour at minute 0
     - cron: '0 * * * *'
   workflow_dispatch:
-    inputs:
-      force_full:
-        description: 'Forzar sincronización completa ignorando ventana delta'
-        required: false
-        default: 'false'
 
 concurrency:
   group: nodus-crm-hourly-sync
@@ -17,7 +12,7 @@ concurrency:
 
 jobs:
   hourly-delta-sync:
-    name: Delta Sync Horario (CausaNodusCRMSyncAgent)
+    name: Delta Sync Horario CausaNodusCRMSyncAgent
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -42,7 +37,6 @@ jobs:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
           VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
           VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
-          FORCE_FULL_SYNC: ${{ github.event.inputs.force_full || 'false' }}
         run: node scripts/CausaNodusCRMSyncAgent.mjs
 
       - name: Audit Trail Notification
