@@ -52,6 +52,12 @@ import { getFlagForSede } from '../utils/flags';
 import { canUseAsignadorEntrenadores } from '../config/permissions';
 import { listTrainerPolicyFiles, TRAINER_POLICIES_FOLDER_ID } from '../services/googleDriveService';
 import { isInactiveTrainer } from '../data/managersData';
+import {
+  campoAsignacionSlot,
+  extraerPreasignaciones,
+  normalizarIdentidadEntrenador,
+  resolverSugerenciaEntrenador,
+} from '../utils/trainerAssignments';
 
 // Los 3 fines de semana de Maestría del Juego. El orden es el oficial del
 // entrenamiento y se usa tal cual para numerar los FDS.
@@ -126,11 +132,6 @@ const fmtFecha = (v) => {
 // El calendario histórico puede traer "FERNANDO ARAGON" y el directorio
 // "Fer Aragon". Para filtrar se compara una identidad normalizada; no altera
 // el nombre original mostrado ni una asignación guardada.
-const normalizarIdentidadEntrenador = (value = '') => String(value)
-  .toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-  .replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter(Boolean)
-  .map(token => ({ fernando: 'fer', fer: 'fer' }[token] || token))
-  .join(' ');
 const NOMBRES_LEGALES_ENTRENADORES = {
   'alejandro diaz': 'Alejandro Díaz',
   'alonso solares': 'Alonso Solares Salazar',
@@ -259,20 +260,6 @@ const resolverNombreDirectorio = (value, directorio) => {
 // no una asignación válida: un FDS debe tener exactamente una persona.
 // Conservamos el texto original y mostramos cada candidato, pero jamás
 // escogemos uno automáticamente ni lo escribimos en Firestore.
-const extraerPreasignaciones = (value = '') => {
-  const seen = new Set();
-  return String(value)
-    .split(/[\/;,\n]+/)
-    .map(name => name.trim())
-    .filter(Boolean)
-    .filter(name => {
-      const key = normalizarIdentidadEntrenador(name);
-      if (!key || seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
-};
-
 const normalizarTexto = (value = '') => String(value).toLowerCase().normalize('NFD')
   .replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
 const tokensNombre = value => normalizarTexto(value).split(' ')
@@ -599,9 +586,11 @@ export default function AsignadorEntrenadores() {
         const asign = guardado[slot] || {};
         const entrenadorHojaRaw = ev.trainer || ev.entrenador || '';
         const preasignacionesHoja = extraerPreasignaciones(entrenadorHojaRaw);
+        const sugerencia = resolverSugerenciaEntrenador(preasignacionesHoja, i, slots.length > 1);
         out.push({
           key, slot,
           esMJ: esProgramaMaestria(nombre),
+          tieneSlotsMaestria: slots.length > 1,
           complementario,
           capitulo,
           programa: slots.length > 1 ? `mj_${slot === 'Creación' ? 'creacion' : slot === 'Relación' ? 'relacion' : 'gratitud'}` : programa,
@@ -613,10 +602,11 @@ export default function AsignadorEntrenadores() {
           lugar: ev.lugar || ev.direccion || '',
           // entrenador de la hoja (lo que hay hoy) vs el asignado en Causa OS
           entrenadorHojaRaw,
-          // Solo una persona por slot: FDS 1, 2 y 3 toman su respectivo entrenador preasignado
-          entrenadorHoja: preasignacionesHoja.length === 1 
-            ? preasignacionesHoja[0] 
-            : (slots.length > 1 && preasignacionesHoja[i] ? preasignacionesHoja[i] : (preasignacionesHoja[0] || '')),
+          // La sugerencia candidata se asigna solo a su slot. Un nombre legado
+          // permanece como referencia general, no como entrenador confirmado de los tres FDS.
+          entrenadorHoja: sugerencia.candidato,
+          sugerenciaCronograma: sugerencia.referencia,
+          sugerenciaGeneral: sugerencia.referenciaGeneral,
           preasignacionesHoja,
           entrenadorAsignado: asign.entrenador || '',
           asignadoPor: asign.asignadoPor || '',
@@ -633,7 +623,7 @@ export default function AsignadorEntrenadores() {
         key: ev.id, slot: 'unico', esMJ: esProgramaMaestria(nombre),
         complementario: tipoComplementario(nombre), capitulo: tipoCapitulo(nombre), programa: tipoPrograma(nombre),
         fdsLabel: null, nombre, sede: normalizeSede(ev.sede || ''), fechaInicio: inicio, fechaFin: ajustarFechaFinPorRegla(nombre, inicio, ev.fechaFin || ''),
-        equipo: ev.equipo || '', lugar: ev.lugar || '', entrenadorHojaRaw: '', entrenadorHoja: '', preasignacionesHoja: [],
+        equipo: ev.equipo || '', lugar: ev.lugar || '', entrenadorHojaRaw: '', entrenadorHoja: '', sugerenciaCronograma: '', sugerenciaGeneral: false, preasignacionesHoja: [], tieneSlotsMaestria: false,
         entrenadorAsignado: (asignaciones[ev.id] || {}).unico?.entrenador || '',
         asignadoPor: (asignaciones[ev.id] || {}).unico?.asignadoPor || '',
         asignadoEn: (asignaciones[ev.id] || {}).unico?.fechaIso || '', esPersonalizado: true,
@@ -654,7 +644,7 @@ export default function AsignadorEntrenadores() {
       if (['mj_creacion', 'mj_relacion', 'mj_gratitud', 'mj_el_viaje', 'vuelos'].includes(filtroTipo) && f.programa !== filtroTipo) return false;
       if (filtroTipo === 'complementarios' && !f.complementario) return false;
       if (['caida_confianza', 'tanque', 'caminata_fuego', 'rompimiento'].includes(filtroTipo) && f.complementario !== filtroTipo) return false;
-      if (filtroEntrenador === 'pendientes' && (f.entrenadorAsignado || f.entrenadorHoja)) return false;
+      if (filtroEntrenador === 'pendientes' && f.entrenadorAsignado) return false;
       if (filtroEntrenador !== 'todos' && filtroEntrenador !== 'pendientes') {
         // Token-based partial matching: any candidate sharing ≥1 significant token (>2 chars) with the
         // selected filter name is accepted. Handles name variants, initials and casing differences.
@@ -698,7 +688,7 @@ export default function AsignadorEntrenadores() {
   // --- KPIs (todos calculados sobre las filas reales) ----------------------
   const kpis = useMemo(() => {
     const total = filas.length;
-    const conEntrenador = filas.filter(f => f.entrenadorAsignado || f.entrenadorHoja).length;
+    const conEntrenador = filas.filter(f => f.entrenadorAsignado).length;
     const sedes = new Set(filas.map(f => f.sede).filter(Boolean));
     return {
       total,
@@ -717,7 +707,7 @@ export default function AsignadorEntrenadores() {
       if (key) m.set(key, { nombre: formatearNombrePersona(nombreLegalEntrenador(e.nombre)), sede: e.sede, total: 0, principales: 0, mj: 0, complementarios: 0, detalle: new Map(), proximos: [], fuenteNombre: 'directorio' });
     });
     filas.forEach(f => {
-      const n = f.entrenadorAsignado || f.entrenadorHoja;
+      const n = f.entrenadorAsignado;
       if (!n) return;
       const canonical = resolverNombreDirectorio(n, entrenadores);
       const nombre = formatearNombrePersona(canonical?.nombre || n);
@@ -931,8 +921,7 @@ export default function AsignadorEntrenadores() {
   // --- Guardar una asignación (con trazabilidad) ---------------------------
   const asignar = async (fila, nuevoEntrenador) => {
     if (!autorizado) return;
-    const anterior = fila.entrenadorAsignado || fila.entrenadorHoja
-      || (fila.preasignacionesHoja?.length ? `preasignación pendiente: ${fila.preasignacionesHoja.join(' / ')}` : '(sin asignar)');
+    const anterior = fila.entrenadorAsignado || '(sin asignar)';
     if (nuevoEntrenador === fila.entrenadorAsignado) return;
     setGuardando(`${fila.key}__${fila.slot}`);
     try {
@@ -945,14 +934,14 @@ export default function AsignadorEntrenadores() {
         fechaFin: fila.fechaFin || null,
         equipo: fila.equipo || null,
         actualizadoEn: serverTimestamp(),
-        [fila.slot]: nuevoEntrenador
+        ...campoAsignacionSlot(fila.slot, nuevoEntrenador
           ? {
               entrenador: nuevoEntrenador,
               asignadoPor: currentUser?.name || currentUser?.email || 'desconocido',
               asignadoPorEmail: currentUser?.email || '',
               fechaIso: now,
             }
-          : null,
+          : null),
       };
       const projectionRef = doc(db, 'calendario_asignaciones_publicas', fila.key);
       const assignmentLogRef = doc(collection(db, 'asignaciones_entrenadores_log'));
@@ -969,7 +958,7 @@ export default function AsignadorEntrenadores() {
         fechaInicio: fila.fechaInicio,
         fechaFin: fila.fechaFin || null,
         equipo: fila.equipo || null,
-        [fila.slot]: nuevoEntrenador ? { entrenador: nuevoEntrenador, fechaIso: now } : null,
+        ...campoAsignacionSlot(fila.slot, nuevoEntrenador ? { entrenador: nuevoEntrenador, fechaIso: now } : null),
         source: 'causa_os_asignador',
         actualizadoEn: serverTimestamp(),
       }, { merge: true });
@@ -982,6 +971,8 @@ export default function AsignadorEntrenadores() {
         fechaEntrenamiento: fila.fechaInicio,
         anterior,
         nuevo: nuevoEntrenador || '(sin asignar)',
+        sugeridoCronograma: fila.sugerenciaCronograma || null,
+        sugerenciaGeneral: Boolean(fila.sugerenciaGeneral),
         porNombre: currentUser?.name || '',
         porEmail: currentUser?.email || '',
         fechaIso: now,
@@ -1245,7 +1236,9 @@ export default function AsignadorEntrenadores() {
                   {filasFiltradas.map(f => {
                     const idFila = `${f.key}__${f.slot}`;
                     const actual = f.entrenadorAsignado || '';
-                    const tienePreasignacionAmbigua = !actual && (f.preasignacionesHoja?.length || 0) > 1;
+                    const tienePreasignacionAmbigua = !actual
+                      && (f.preasignacionesHoja?.length || 0) > 1
+                      && (!f.tieneSlotsMaestria || !f.entrenadorHoja);
                     const sinAsignar = !actual && !f.entrenadorHoja;
                     return (
                       <tr key={idFila} style={{ borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.06))' }}>
@@ -1276,7 +1269,7 @@ export default function AsignadorEntrenadores() {
                             <option value="">
                               {tienePreasignacionAmbigua
                                 ? `— Confirmar entrenador (${f.preasignacionesHoja.length} en nómina) —`
-                                : f.entrenadorHoja ? `📋 ${f.entrenadorHoja} (Sugerido de Cronograma)` : '— Sin asignar —'}
+                                : f.entrenadorHoja ? `📋 ${f.entrenadorHoja} (sugerencia; seleccionar para confirmar)` : '— Sin asignar —'}
                             </option>
                             {entrenadores.map(e => <option key={e.nombre} value={e.nombre}>{e.nombre}</option>)}
                           </select>
@@ -1290,9 +1283,14 @@ export default function AsignadorEntrenadores() {
                               <span>ℹ️</span> Preasignación: {f.preasignacionesHoja.join(' · ')}
                             </div>
                           )}
-                          {!actual && !tienePreasignacionAmbigua && f.entrenadorHoja && (
+                          {f.sugerenciaCronograma && (
                             <div style={{ fontSize: '0.68rem', marginTop: 4, color: '#f59e0b', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                              <span>📋</span> Registrado en cronograma · Seleccionar para confirmar
+                              <span>📋</span>
+                              {f.sugerenciaGeneral
+                                ? <>Sugerencia original del cronograma: {f.sugerenciaCronograma} (referencia general; no confirma este FDS)</>
+                                : actual
+                                  ? <>Sugerencia original del cronograma: {f.sugerenciaCronograma}</>
+                                  : <>Sugerido por cronograma: {f.sugerenciaCronograma} · seleccionar para confirmar</>}
                             </div>
                           )}
                         </td>
@@ -1365,7 +1363,7 @@ export default function AsignadorEntrenadores() {
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.83rem' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.12))' }}>
-                  {['CUÁNDO', 'QUIÉN', 'ENTRENAMIENTO', 'ANTES', 'DESPUÉS'].map(h => (
+                  {['CUÁNDO', 'QUIÉN', 'ENTRENAMIENTO', 'ANTES', 'SUGERIDO EN CRONOGRAMA', 'DESPUÉS'].map(h => (
                     <th key={h} style={{ textAlign: 'left', padding: '0.7rem 0.9rem', color: 'var(--text-muted)', fontSize: '0.7rem', fontWeight: 800 }}>{h}</th>
                   ))}
                 </tr>
@@ -1382,6 +1380,10 @@ export default function AsignadorEntrenadores() {
                       {t.fds && <span style={{ color: '#a78bfa' }}> · {t.fds}</span>}
                     </td>
                     <td style={{ padding: '0.6rem 0.9rem' }} className="text-muted">{t.anterior}</td>
+                    <td style={{ padding: '0.6rem 0.9rem' }} className="text-muted">
+                      {t.sugeridoCronograma || '—'}
+                      {t.sugerenciaGeneral && t.sugeridoCronograma ? ' (referencia general)' : ''}
+                    </td>
                     <td style={{ padding: '0.6rem 0.9rem', color: '#10b981', fontWeight: 600 }}>{t.nuevo}</td>
                   </tr>
                 ))}
@@ -1543,7 +1545,7 @@ export default function AsignadorEntrenadores() {
         filas.forEach(f => {
           if (!f.fechaInicio) return;
           if (filtroSede !== 'todas' && f.sede !== filtroSede) return;
-          if (filtroEntrenador === 'pendientes' && (f.entrenadorAsignado || f.entrenadorHoja)) return;
+          if (filtroEntrenador === 'pendientes' && f.entrenadorAsignado) return;
           if (filtroEntrenador !== 'todos' && filtroEntrenador !== 'pendientes') {
             const ft = normalizarTexto(filtroEntrenador).split(' ').filter(t => t.length > 2);
             const cands = [f.entrenadorAsignado, f.entrenadorHoja, ...(f.preasignacionesHoja || [])].filter(Boolean);
@@ -1653,7 +1655,7 @@ export default function AsignadorEntrenadores() {
                     return (
                       <div key={si}
                         onClick={() => setCalTooltip(calTooltip?.key === `seg-${semanaIdx}-${si}` ? null : { key: `seg-${semanaIdx}-${si}`, ev: seg.ev })}
-                        title={`${seg.ev.nombre}\n${fmtFecha(seg.ev.fechaInicio)} → ${fmtFecha(seg.ev.fechaFin || seg.ev.fechaInicio)}\n${seg.ev.entrenadorAsignado || seg.ev.entrenadorHoja || 'Sin asignar'}`}
+                        title={`${seg.ev.nombre}\n${fmtFecha(seg.ev.fechaInicio)} → ${fmtFecha(seg.ev.fechaFin || seg.ev.fechaInicio)}\n${seg.ev.entrenadorAsignado || seg.ev.entrenadorHoja || 'Sin asignar'}${seg.ev.sugerenciaGeneral && seg.ev.sugerenciaCronograma ? `\nReferencia general del cronograma: ${seg.ev.sugerenciaCronograma}` : ''}`}
                         style={{
                           position: 'absolute',
                           top: topOffset,
@@ -1707,11 +1709,15 @@ export default function AsignadorEntrenadores() {
                     <strong style={{ color: 'var(--text-heading)' }}>Entrenador:</strong>{' '}
                     {calTooltip.ev.entrenadorAsignado
                       ? <span style={{ color: '#10b981', fontWeight: 700 }}>✓ {calTooltip.ev.entrenadorAsignado} <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>(asignado en Causa OS)</span></span>
-                      : calTooltip.ev.entrenadorHoja
-                        ? <span style={{ color: '#f59e0b', fontWeight: 700 }}>{calTooltip.ev.entrenadorHoja} <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>(de la hoja)</span></span>
-                        : <span style={{ color: '#ef4444' }}>Sin asignar</span>
-                    }
+                      : <span style={{ color: '#ef4444' }}>Sin asignar</span>}
                   </span>
+                  {calTooltip.ev.sugerenciaCronograma && (
+                    <span style={{ gridColumn: '1/-1' }}>
+                      <strong style={{ color: 'var(--text-heading)' }}>Sugerencia original del cronograma:</strong>{' '}
+                      <span style={{ color: '#f59e0b' }}>{calTooltip.ev.sugerenciaCronograma}</span>
+                      {calTooltip.ev.sugerenciaGeneral && ' (referencia general; no confirma este FDS)'}
+                    </span>
+                  )}
                   {(calTooltip.ev.preasignacionesHoja || []).length > 1 && (
                     <span style={{ gridColumn: '1/-1' }}>
                       <strong style={{ color: 'var(--text-heading)' }}>Preasignados en hoja:</strong> {calTooltip.ev.preasignacionesHoja.join(', ')}
