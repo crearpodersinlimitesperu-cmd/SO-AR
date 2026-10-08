@@ -368,14 +368,37 @@ service cloud.firestore {
       allow write: if isSuperAdmin() || isGerenteODireccion() || callerRole();
     }
 
+    // C-01: tareas críticas/masivas solo las crean SuperAdmin o perfiles gerenciales verificados.
+    // Los documentos con forma de catálogo (isChecklistCatalogTask) no se ven afectados.
+    function hasVerifiedTaskAdminProfile() {
+      let profilePath = /databases/$(database)/documents/users/$(request.auth.uid);
+      let adminRoles = ['gerente', 'direccion', 'director_maestria', 'cfo', 'cco', 'ceo', 'socio'];
+      return isAuthenticated() && exists(profilePath) &&
+        (get(profilePath).data.get('role', '') in adminRoles ||
+         get(profilePath).data.get('rol', '') in adminRoles ||
+         get(profilePath).data.get('appRole', '') in adminRoles ||
+         (get(profilePath).data.get('roles', []) is list &&
+          get(profilePath).data.roles.hasAny(adminRoles)));
+    }
+
+    function requiresTaskAdminForCreate(taskData) {
+      return (taskData.get('isCritical', false) == true ||
+              taskData.get('priority', '') == '🔴 ROJO' ||
+              (taskData.get('assignedToEmails', []) is list &&
+               taskData.get('assignedToEmails', []).size() > 1)) &&
+             !isChecklistCatalogTask(taskData);
+    }
+
     // TASKS
     match /tasks/{taskId} {
       allow read: if canReadTask(resource.data);
-      allow create: if isSuperAdmin() || isGerenteODireccion() ||
-                    (isOwner(request.resource.data) &&
-                     !isReservedChecklistTaskId(request.resource.data.get('id', ''))) ||
-                    isCollaborator(request.resource.data) ||
-                    isChecklistCatalogTask(request.resource.data);
+      allow create: if requiresTaskAdminForCreate(request.resource.data)
+                    ? (isSuperAdmin() || hasVerifiedTaskAdminProfile())
+                    : (isSuperAdmin() || isGerenteODireccion() ||
+                       (isOwner(request.resource.data) &&
+                        !isReservedChecklistTaskId(request.resource.data.get('id', ''))) ||
+                       isCollaborator(request.resource.data) ||
+                       isChecklistCatalogTask(request.resource.data));
       allow update: if isSuperAdmin() || isGerenteODireccion() ||
                     isOwner(resource.data) ||
                     (isCollaborator(resource.data) &&
