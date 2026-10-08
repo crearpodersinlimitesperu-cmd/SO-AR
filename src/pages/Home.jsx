@@ -40,7 +40,7 @@ import {
 import EffectiveCommunicationButton from '../components/EffectiveCommunicationButton';
 import { getAllCompanyUsers } from '../services/userService';
 import UserProfileModal from '../components/UserProfileModal';
-import { getOverdueAssignedTasks } from '../utils/overdueTasks';
+import { getOverdueAssignedTasks, isTaskDoneForUser } from '../utils/overdueTasks';
 import HorariosEntrenamientoModal from '../components/HorariosEntrenamientoModal';
 import { INITIAL_MANAGERS, normalizeTrainer } from '../data/managersData';
 import { formatTrainerDisplayName, nombreLegalEntrenador, normalizarIdentidadEntrenador } from '../data/trainerAliases';
@@ -1029,6 +1029,7 @@ export default function Home() {
   const [showTaskDetailModal, setShowTaskDetailModal] = useState(false);
   const [tareasAsignadasFilter, setTareasAsignadasFilter] = useState('Activas'); // 'Activas' | 'Vencidas' | 'Cumplidas' | 'Todas'
   const [tareasAsignadasSearch, setTareasAsignadasSearch] = useState('');
+  const [tareasAsignadasDireccion, setTareasAsignadasDireccion] = useState('todas'); // 'todas' | 'a_mi' | 'por_mi'
   const [tareasAsignadasSort, setTareasAsignadasSort] = useState('urgencia'); // 'urgencia' | 'recientes' | 'antiguas' | 'deadline_asc' | 'deadline_desc' | 'avance_desc' | 'avance_asc' | 'titulo'
   const [showVenueModal, setShowVenueModal] = useState(false);
   const [showHorariosModal, setShowHorariosModal] = useState(false);
@@ -1568,7 +1569,13 @@ export default function Home() {
   const tareasQueHeAsignado = [
     ...(allTasks || [])
       .filter(t => isEmailMatch(t.createdBy, userEmail) && userEmail)
-      .map(t => ({ ...t, __direction: 'asignada_por_mi' })),
+      .map(t => ({
+        ...t,
+        __direction: 'asignada_por_mi',
+        // Autoasignada: también cuenta como "asignada a mí".
+        __assignedToMe: (Array.isArray(t.assignedToEmails) && t.assignedToEmails.some(e => isEmailMatch(e, userEmail))) ||
+          (t.assignedToEmail && isEmailMatch(t.assignedToEmail, userEmail)) || false
+      })),
     ...(allTasks || [])
       .filter(t => {
         const yaEsCreador = isEmailMatch(t.createdBy, userEmail);
@@ -1577,7 +1584,7 @@ export default function Home() {
                (t.assignedToEmail && isEmailMatch(t.assignedToEmail, userEmail)) ||
                (t.collaborators && t.collaborators.some(c => isEmailMatch(c, userEmail)));
       })
-      .map(t => ({ ...t, __direction: 'asignada_a_mi' }))
+      .map(t => ({ ...t, __direction: 'asignada_a_mi', __assignedToMe: true }))
   ]
     .sort((a, b) => {
       const da = a.deadline ? new Date(a.deadline).getTime() : Infinity;
@@ -3413,13 +3420,31 @@ export default function Home() {
               Coordinadores MJ recién dados de alta). */}
           {(() => {
             // Clasificación para las pestañas de filtro (Activas/Vencidas/Cumplidas/Todas).
-            const clasificadas = tareasQueHeAsignado.map(task => {
+            const overdueOpts = {
+              sede: currentUser?.sede,
+              cycleId: currentCycle?.id,
+              cycleIds: (quitoCycles || []).map(qc => qc?.cycle?.id)
+            };
+            const direccionCounts = {
+              todas: tareasQueHeAsignado.length,
+              a_mi: tareasQueHeAsignado.filter(t => t.__assignedToMe).length,
+              por_mi: tareasQueHeAsignado.filter(t => t.__direction === 'asignada_por_mi').length
+            };
+            const porDireccion = tareasQueHeAsignado.filter(t =>
+              tareasAsignadasDireccion === 'a_mi' ? t.__assignedToMe
+                : tareasAsignadasDireccion === 'por_mi' ? t.__direction === 'asignada_por_mi'
+                  : true);
+            const clasificadas = porDireccion.map(task => {
               // FIX 16/09/2026: José confirmó (captura "Feliz Cumpleaños !!",
               // 100% avance pero seguía en "Vencidas") que una tarea al 100%
               // de avance debe contar como cumplida aunque completed/status
               // no estén sincronizados. Red de seguridad, no reemplaza
               // completed/status (que siguen siendo la fuente principal).
-              const isDone = task.completed || task.status === 'Completada' || task.progressPercentage === 100;
+              // Mismo criterio que la alerta de vencidas (overdueTasks.js): para lo
+              // asignado a mí también cuenta mi avance individual.
+              const isDone = task.__assignedToMe
+                ? isTaskDoneForUser(task, userEmail, overdueOpts)
+                : !!(task.completed || task.status === 'Completada' || task.progressPercentage === 100);
               const isOverdue = !isDone && getCountdownInfo(task.deadline, time).overdue;
               return { task, isDone, isOverdue };
             });
@@ -3621,7 +3646,27 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* TABS DE ESTADO */}
+              {/* FILTRO POR DIRECCIÓN: asignadas a mí / por mí */}
+              <div role="group" aria-label="Filtrar por quién asignó" style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginTop: '0.8rem' }}>
+                {[['todas', 'Todas'], ['a_mi', 'Asignadas a mí'], ['por_mi', 'Asignadas por mí']].map(([key, label]) => (
+                  <button
+                    key={key}
+                    type="button"
+                    aria-pressed={tareasAsignadasDireccion === key}
+                    onClick={() => setTareasAsignadasDireccion(key)}
+                    style={{
+                      padding: '0.3rem 0.75rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700,
+                      border: `1px solid ${tareasAsignadasDireccion === key ? 'var(--crear-gold)' : 'var(--border-subtle)'}`,
+                      background: tareasAsignadasDireccion === key ? 'rgba(245, 158, 11, 0.15)' : 'transparent',
+                      color: tareasAsignadasDireccion === key ? 'var(--crear-gold)' : 'var(--text-muted)',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease'
+                    }}
+                  >
+                    {label} ({direccionCounts[key]})
+                  </button>
+                ))}
+              </div>
               <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', marginTop: '0.8rem' }}>
                 {['Activas', 'Vencidas', 'Cumplidas', 'Todas'].map(f => (
                   <button

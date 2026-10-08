@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { getOverdueAssignedTasks } from './overdueTasks.js';
+import { getOverdueAssignedTasks, isTaskDoneForUser } from './overdueTasks.js';
 
 const NOW = Date.parse('2026-10-10T12:00:00Z');
 const H = 3600 * 1000;
@@ -30,7 +30,7 @@ test('respects per-assignee progress', () => {
   const r = getOverdueAssignedTasks([
     { id: 'a', assignedToEmails: [me, 'x@crearpsl.net'], deadline: at(100), completed: false,
       assigneeProgress: { [me]: { completed: true }, 'x@crearpsl.net': { completed: false } } },
-    { id: 'b', assignedToEmails: [me, 'x@crearpsl.net'], deadline: at(100), completed: true,
+    { id: 'b', assignedToEmails: [me, 'x@crearpsl.net'], deadline: at(100),
       assigneeProgress: { [me]: { completed: false, progress: 20 } } },
     { id: 'c', assignedToEmails: [me], deadline: at(100), assigneeProgress: { [me]: { progress: 100 } } }
   ], me, NOW);
@@ -89,7 +89,7 @@ test('completion by another user does not hide task for other recipient', () => 
 });
 
 test('user without sede matches completions written under Global', () => {
-  const t = { id: 'a', assignedToEmails: [me], deadline: at(100), completed: true,
+  const t = { id: 'a', assignedToEmails: [me], deadline: at(100),
     assigneeProgress: { [me]: { completed: false } }, completions: { Global: { completed: true } } };
   assert.deepEqual(getOverdueAssignedTasks([t], me, NOW), []);
   assert.deepEqual(getOverdueAssignedTasks([t], me, NOW, { sede: '  ' }), []);
@@ -100,4 +100,23 @@ test('completion in any active Quito team cycle hides the alert', () => {
     assigneeProgress: { [me]: { completed: false } }, completions: { Quito__q124: { completed: true } } };
   assert.deepEqual(getOverdueAssignedTasks([t], me, NOW, { sede: 'Quito', cycleId: 'c1' }).length, 1);
   assert.deepEqual(getOverdueAssignedTasks([t], me, NOW, { sede: 'Quito', cycleId: 'c1', cycleIds: ['q122', 'q124'] }), []);
+});
+
+test('task shown as completed by the platform never triggers the alert', () => {
+  const pending = { assigneeProgress: { [me]: { completed: false, progress: 20 } } };
+  const r = getOverdueAssignedTasks([
+    { id: 'a', assignedToEmails: [me], deadline: at(100), completed: true, ...pending },
+    { id: 'b', assignedToEmails: [me], deadline: at(100), status: 'Completada', ...pending },
+    { id: 'c', assignedToEmails: [me], deadline: at(100), progressPercentage: 100, ...pending },
+    { id: 'd', assignedToEmails: [me], deadline: at(100), ...pending }
+  ], me, NOW);
+  assert.deepEqual(ids(r), ['d']);
+});
+
+test('isTaskDoneForUser matches per-user and global completion', () => {
+  assert.equal(isTaskDoneForUser({ completed: true }, me), true);
+  assert.equal(isTaskDoneForUser({ assigneeProgress: { [me]: { completed: true } } }, me), true);
+  assert.equal(isTaskDoneForUser({ completions: { Lima: { completed: true } } }, me, { sede: 'Lima' }), true);
+  assert.equal(isTaskDoneForUser({ assigneeProgress: { 'x@crearpsl.net': { completed: true } } }, me), false);
+  assert.equal(isTaskDoneForUser(null, me), false);
 });
