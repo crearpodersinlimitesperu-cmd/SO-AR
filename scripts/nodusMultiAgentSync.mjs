@@ -1,3 +1,4 @@
+import { runCausaNodusCRMSync } from './CausaNodusCRMSyncAgent.mjs';
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import 'dotenv/config';
@@ -1403,6 +1404,17 @@ export async function runMultiAgentSync() {
       const linajeReport = await genealogyAgent.runCoherenceAndLineage(normalized); // Solo usamos normalizados por ahora (tiene equiposReporte)
       await genealogyAgent.publicarLinajeYCoherencia(linajeReport);
     } catch (genErr) {
+      console.error("⚠️ [Agente 7 - Genealogista] Error no bloqueante al construir el linaje:", genErr.message);
+    }
+
+    // 8. AGENTE DE INTELIGENCIA DE DATOS Y DELTA SYNC CRM (CausaNodusCRMSyncAgent)
+    try {
+      console.log("🚀 [Agente 8 - CausaNodusCRMSyncAgent] Ejecutando sincronización delta CRM...");
+      await runCausaNodusCRMSync();
+      console.log("✅ [Agente 8 - CausaNodusCRMSyncAgent] Sincronización CRM y Árbol Genealógico exitosa.");
+    } catch (crmErr) {
+      console.error("⚠️ [Agente 8 - CausaNodusCRMSyncAgent] Error no bloqueante en CRM sync:", crmErr.message);
+    }
       console.error("⚠️ [Agente 7 - Genealogista] Error no bloqueante al construir el linaje:", genErr.message);
     }
 
