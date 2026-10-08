@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { HelpButton, HelpInput, HelpSelect, HelpLink, HelpSortHeader, ManagersHelpMode } from './ManagersHelp';
 import {
   TrendingUp, BarChart3, Users, DollarSign, CheckCircle2,
   Clock, Calendar, Search, Filter, ExternalLink, RefreshCw,
@@ -360,7 +361,7 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
         </div>
 
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center' }}>
-          <a
+          <HelpLink helpKey="planillaManagers"
             href={SHEET_LLAMADOS_URL}
             target="_blank"
             rel="noopener noreferrer"
@@ -379,9 +380,9 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
             }}
           >
             <ExternalLink size={14} /> Hoja Llamados
-          </a>
+          </HelpLink>
 
-          <a
+          <HelpLink helpKey="planillaLlamadas"
             href={SHEET_MANAGERS_URL}
             target="_blank"
             rel="noopener noreferrer"
@@ -400,9 +401,9 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
             }}
           >
             <ExternalLink size={14} /> Hoja Managers
-          </a>
+          </HelpLink>
 
-          <button
+          <HelpButton helpKey="actualizarIndicador"
             onClick={handleRefresh}
             disabled={isRefreshing}
             style={{
@@ -423,7 +424,7 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
           >
             <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} />
             {isRefreshing ? 'Actualizando...' : 'Actualizar'}
-          </button>
+          </HelpButton>
         </div>
       </div>
 
@@ -585,7 +586,7 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
         gap: '0.75rem'
       }}>
         <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <button
+          <HelpButton helpKey="resumenKpis"
             onClick={() => setActiveSubView('entrenadores')}
             style={{
               padding: '0.55rem 1rem',
@@ -603,9 +604,9 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
             }}
           >
             <Award size={16} /> Entrenadores & Llamadas (34)
-          </button>
+          </HelpButton>
 
-          <button
+          <HelpButton helpKey="retencion"
             onClick={() => setActiveSubView('graficas_retencion')}
             style={{
               padding: '0.55rem 1rem',
@@ -623,9 +624,9 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
             }}
           >
             <BarChart3 size={16} /> Gráficas de Retención & Deserción
-          </button>
+          </HelpButton>
 
-          <button
+          <HelpButton helpKey="estadosKpis"
             onClick={() => setActiveSubView('directorio_estados')}
             style={{
               padding: '0.55rem 1rem',
@@ -643,7 +644,7 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
             }}
           >
             <Users size={16} /> Directorio de Managers por Estado ({data.managersSheet1?.length || 699})
-          </button>
+          </HelpButton>
         </div>
 
         {/* Contador Rápido de Estados */}
@@ -674,7 +675,7 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
       }}>
         <div style={{ position: 'relative', minWidth: '260px', flex: '1 1 280px', maxWidth: '380px' }}>
           <Search size={15} style={{ position: 'absolute', left: '12px', top: '11px', color: '#94a3b8' }} />
-          <input
+          <HelpInput helpKey="buscar"
             type="text"
             placeholder={activeSubView === 'directorio_estados' ? "Buscar manager, equipo, entrenador o sede..." : "Buscar entrenador o sede..."}
             value={search}
@@ -691,12 +692,12 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
             }}
           />
           {search && (
-            <button
+            <HelpButton helpKey="limpiarBusqueda"
               onClick={() => setSearch('')}
               style={{ position: 'absolute', right: '10px', top: '9px', background: 'transparent', border: 'none', cursor: 'pointer', color: '#94a3b8' }}
             >
               <X size={14} />
-            </button>
+            </HelpButton>
           )}
         </div>
 
@@ -704,7 +705,7 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
           {/* Filtro Sede */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
             <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>Sede:</span>
-            <select
+            <HelpSelect helpKey="filtroSede"
               value={filterSede}
               onChange={(e) => setFilterSede(e.target.value)}
               style={{
@@ -725,14 +726,14 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
               <option value="Cuenca">Cuenca</option>
               <option value="Medellín">Medellín</option>
               <option value="CDMX">CDMX</option>
-            </select>
+            </HelpSelect>
           </div>
 
           {activeSubView === 'directorio_estados' ? (
             /* Filtro de Estado para Directorio de Managers */
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
               <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>Estado:</span>
-              <select
+              <HelpSelect helpKey="filtroEstado"
                 value={filterManagerStatus}
                 onChange={(e) => setFilterManagerStatus(e.target.value)}
                 style={{
@@ -751,13 +752,13 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
                 <option value="DESERTOR">⚠️ Desertores ({statsGlobal.totalDesertores})</option>
                 <option value="EN_JUEGO">⚡ En Juego ({statsGlobal.totalActivos})</option>
                 <option value="sin_entrenador">🚫 Sin Entrenador ({statsGlobal.totalSinAsignar})</option>
-              </select>
+              </HelpSelect>
             </div>
           ) : (
             /* Filtro de Desempeño para Entrenadores */
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
               <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>Rendimiento:</span>
-              <select
+              <HelpSelect helpKey="filtroRendimiento"
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
                 style={{
@@ -776,7 +777,7 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
                 <option value="alta_desercion">⚠️ Alerta Deserción (≥30%)</option>
                 <option value="con_pendientes">Con Llamadas Pendientes</option>
                 <option value="completados">100% Pagados</option>
-              </select>
+              </HelpSelect>
             </div>
           )}
 
@@ -803,43 +804,43 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.86rem' }}>
               <thead>
                 <tr style={{ background: '#f8fafc', borderBottom: '2px solid #e2e8f0', color: '#475569', fontWeight: 700, fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                  <th style={{ padding: '0.9rem 1.25rem', cursor: 'pointer' }} onClick={() => handleSort('entrenador')}>
+                  <HelpSortHeader style={{ padding: '0.9rem 1.25rem', cursor: 'pointer' }} onClick={() => handleSort('entrenador')}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                       Entrenador <ArrowUpDown size={12} />
                     </div>
-                  </th>
+                  </HelpSortHeader>
                   <th style={{ padding: '0.9rem 0.8rem' }}>Sede</th>
-                  <th style={{ padding: '0.9rem 0.8rem', textAlign: 'center', cursor: 'pointer' }} onClick={() => handleSort('totalAsignados')}>
+                  <HelpSortHeader style={{ padding: '0.9rem 0.8rem', textAlign: 'center', cursor: 'pointer' }} onClick={() => handleSort('totalAsignados')}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem' }}>
                       Asignados <ArrowUpDown size={12} />
                     </div>
-                  </th>
-                  <th style={{ padding: '0.9rem 0.8rem', textAlign: 'center', cursor: 'pointer' }} onClick={() => handleSort('graduados')}>
+                  </HelpSortHeader>
+                  <HelpSortHeader style={{ padding: '0.9rem 0.8rem', textAlign: 'center', cursor: 'pointer' }} onClick={() => handleSort('graduados')}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem' }}>
                       Graduados <ArrowUpDown size={12} />
                     </div>
-                  </th>
-                  <th style={{ padding: '0.9rem 0.8rem', textAlign: 'center', cursor: 'pointer' }} onClick={() => handleSort('desertores')}>
+                  </HelpSortHeader>
+                  <HelpSortHeader style={{ padding: '0.9rem 0.8rem', textAlign: 'center', cursor: 'pointer' }} onClick={() => handleSort('desertores')}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem' }}>
                       Desertores <ArrowUpDown size={12} />
                     </div>
-                  </th>
-                  <th style={{ padding: '0.9rem 0.8rem', textAlign: 'center', cursor: 'pointer' }} onClick={() => handleSort('activos')}>
+                  </HelpSortHeader>
+                  <HelpSortHeader style={{ padding: '0.9rem 0.8rem', textAlign: 'center', cursor: 'pointer' }} onClick={() => handleSort('activos')}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem' }}>
                       En Juego <ArrowUpDown size={12} />
                     </div>
-                  </th>
-                  <th style={{ padding: '0.9rem 0.8rem', textAlign: 'center', cursor: 'pointer' }} onClick={() => handleSort('totalLlamadas')}>
+                  </HelpSortHeader>
+                  <HelpSortHeader style={{ padding: '0.9rem 0.8rem', textAlign: 'center', cursor: 'pointer' }} onClick={() => handleSort('totalLlamadas')}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem' }}>
                       Llamadas <ArrowUpDown size={12} />
                     </div>
-                  </th>
+                  </HelpSortHeader>
                   <th style={{ padding: '0.9rem 0.8rem', textAlign: 'center' }}>Pag / Pend</th>
-                  <th style={{ padding: '0.9rem 1rem', textAlign: 'right', cursor: 'pointer' }} onClick={() => handleSort('montoTotal')}>
+                  <HelpSortHeader style={{ padding: '0.9rem 1rem', textAlign: 'right', cursor: 'pointer' }} onClick={() => handleSort('montoTotal')}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.3rem' }}>
                       Monto ($) <ArrowUpDown size={12} />
                     </div>
-                  </th>
+                  </HelpSortHeader>
                   <th style={{ padding: '0.9rem 1rem', textAlign: 'center' }}>% Éxito</th>
                   <th style={{ padding: '0.9rem 1.25rem', textAlign: 'center' }}>Acción</th>
                 </tr>
@@ -990,7 +991,7 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
 
                         {/* Acciones */}
                         <td style={{ padding: '0.85rem 1.25rem', textAlign: 'center' }}>
-                          <button
+                          <HelpButton helpKey="detalleKpis"
                             onClick={() => { setSelectedTrainer(t); setModalSearch(''); setModalFilterStatus('todos'); }}
                             style={{
                               background: '#7c3aed',
@@ -1008,7 +1009,7 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
                             }}
                           >
                             <Eye size={12} /> Ver Detalle
-                          </button>
+                          </HelpButton>
                         </td>
                       </tr>
                     );
@@ -1254,7 +1255,7 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
         }}>
           {/* Quick Filter Buttons with Counts */}
           <div style={{ padding: '1rem 1.5rem', background: '#f8fafc', borderBottom: '1px solid #e2e8f0', display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-            <button
+            <HelpButton helpKey="filtroEstado"
               onClick={() => setFilterManagerStatus('todos')}
               style={{
                 padding: '0.4rem 0.85rem',
@@ -1268,9 +1269,9 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
               }}
             >
               Todos ({statsGlobal.totalManagers})
-            </button>
+            </HelpButton>
 
-            <button
+            <HelpButton helpKey="filtroEstado"
               onClick={() => setFilterManagerStatus('GRADUADO')}
               style={{
                 padding: '0.4rem 0.85rem',
@@ -1284,9 +1285,9 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
               }}
             >
               🎓 Graduados ({statsGlobal.totalGraduados})
-            </button>
+            </HelpButton>
 
-            <button
+            <HelpButton helpKey="filtroEstado"
               onClick={() => setFilterManagerStatus('DESERTOR')}
               style={{
                 padding: '0.4rem 0.85rem',
@@ -1300,9 +1301,9 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
               }}
             >
               ⚠️ Desertores ({statsGlobal.totalDesertores})
-            </button>
+            </HelpButton>
 
-            <button
+            <HelpButton helpKey="filtroEstado"
               onClick={() => setFilterManagerStatus('EN_JUEGO')}
               style={{
                 padding: '0.4rem 0.85rem',
@@ -1316,9 +1317,9 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
               }}
             >
               ⚡ En Juego ({statsGlobal.totalActivos})
-            </button>
+            </HelpButton>
 
-            <button
+            <HelpButton helpKey="filtroEstado"
               onClick={() => setFilterManagerStatus('sin_entrenador')}
               style={{
                 padding: '0.4rem 0.85rem',
@@ -1332,7 +1333,7 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
               }}
             >
               🚫 Sin Entrenador ({statsGlobal.totalSinAsignar})
-            </button>
+            </HelpButton>
           </div>
 
           <div style={{ overflowX: 'auto' }}>
@@ -1408,7 +1409,7 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
                         </td>
                         <td style={{ padding: '0.85rem 1.25rem', textAlign: 'right' }}>
                           {m.telefono ? (
-                            <a
+                            <HelpLink helpKey="whatsapp"
                               href={`https://wa.me/${m.telefono.replace(/[^0-9]/g, '')}`}
                               target="_blank"
                               rel="noopener noreferrer"
@@ -1426,7 +1427,7 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
                               }}
                             >
                               <Phone size={12} /> {m.telefono}
-                            </a>
+                            </HelpLink>
                           ) : (
                             <span style={{ fontSize: '0.72rem', color: '#cbd5e1' }}>Sin tel</span>
                           )}
@@ -1512,7 +1513,7 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
                 </div>
               </div>
 
-              <button
+              <HelpButton helpKey="cerrar"
                 onClick={() => setSelectedTrainer(null)}
                 style={{
                   background: '#f1f5f9',
@@ -1528,14 +1529,15 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
                 }}
               >
                 <X size={20} />
-              </button>
+              </HelpButton>
             </div>
 
             {/* Modal Controls */}
+            <div style={{ padding: '0 2rem' }}><ManagersHelpMode /></div>
             <div style={{ padding: '0.85rem 2rem', background: '#ffffff', borderBottom: '1px solid #e2e8f0', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem' }}>
               <div style={{ position: 'relative', flex: '1', maxWidth: '340px' }}>
                 <Search size={14} style={{ position: 'absolute', left: '10px', top: '10px', color: '#94a3b8' }} />
-                <input
+                <HelpInput helpKey="buscar"
                   type="text"
                   placeholder="Buscar manager en este entrenador..."
                   value={modalSearch}
@@ -1552,7 +1554,7 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <select
+                <HelpSelect helpKey="filtroEstado"
                   value={modalFilterStatus}
                   onChange={(e) => setModalFilterStatus(e.target.value)}
                   style={{
@@ -1568,7 +1570,7 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
                   <option value="GRADUADO">Solo Graduados</option>
                   <option value="DESERTOR">Solo Desertores</option>
                   <option value="EN_JUEGO">Solo En Juego</option>
-                </select>
+                </HelpSelect>
 
                 <div style={{ fontSize: '0.75rem', color: '#64748b', display: 'flex', gap: '0.75rem', alignItems: 'center', marginLeft: '0.5rem' }}>
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
@@ -1663,7 +1665,7 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
                           </td>
                           <td style={{ padding: '0.65rem 0.8rem', textAlign: 'right' }}>
                             {phone ? (
-                              <a
+                              <HelpLink helpKey="whatsapp"
                                 href={`https://wa.me/${phone.replace(/[^0-9]/g, '')}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
@@ -1681,7 +1683,7 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
                                 }}
                               >
                                 <Phone size={11} /> WhatsApp
-                              </a>
+                              </HelpLink>
                             ) : (
                               <span style={{ fontSize: '0.72rem', color: '#cbd5e1' }}>Sin tel</span>
                             )}
@@ -1695,7 +1697,7 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
 
             {/* Modal Footer */}
             <div style={{ padding: '0.85rem 2rem', background: '#f8fafc', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'flex-end' }}>
-              <button
+              <HelpButton helpKey="cerrar"
                 onClick={() => setSelectedTrainer(null)}
                 style={{
                   background: '#334155',
@@ -1709,7 +1711,7 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
                 }}
               >
                 Cerrar Detalle
-              </button>
+              </HelpButton>
             </div>
           </div>
         </div>
