@@ -87,3 +87,17 @@ test('completion by another user does not hide task for other recipient', () => 
   assert.deepEqual(ids(getOverdueAssignedTasks([t], me, NOW)), ['a']);
   assert.deepEqual(ids(getOverdueAssignedTasks([t], 'x@crearpsl.net', NOW)), []);
 });
+
+test('user without sede matches completions written under Global', () => {
+  const t = { id: 'a', assignedToEmails: [me], deadline: at(100), completed: true,
+    assigneeProgress: { [me]: { completed: false } }, completions: { Global: { completed: true } } };
+  assert.deepEqual(getOverdueAssignedTasks([t], me, NOW), []);
+  assert.deepEqual(getOverdueAssignedTasks([t], me, NOW, { sede: '  ' }), []);
+});
+
+test('completion in any active Quito team cycle hides the alert', () => {
+  const t = { id: 'a', assignedToEmails: [me], deadline: at(100),
+    assigneeProgress: { [me]: { completed: false } }, completions: { Quito__q124: { completed: true } } };
+  assert.deepEqual(getOverdueAssignedTasks([t], me, NOW, { sede: 'Quito', cycleId: 'c1' }).length, 1);
+  assert.deepEqual(getOverdueAssignedTasks([t], me, NOW, { sede: 'Quito', cycleId: 'c1', cycleIds: ['q122', 'q124'] }), []);
+});
