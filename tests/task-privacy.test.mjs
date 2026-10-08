@@ -22,14 +22,21 @@ const reservedCatalogPrefixes = ['cap_chk', 'cc1_chk', 'cmj_chk', 'ger_chk', 'qt
 
 test('a user sees catalog tasks only for their assigned role', () => {
   assert.equal(isTaskVisibleForUser({ id: 'soar_12', role: 'coord_c1' }, coordinator), true);
+  assert.equal(isTaskVisibleForUser({
+    id: 'soar_12',
+    role: 'coord_c1',
+    assignedRoles: ['coord_c1'],
+    assignedSede: 'Lima'
+  }, coordinator), true);
   assert.equal(isTaskVisibleForUser({ id: 'soar_1', role: 'gerente' }, coordinator), false);
 });
 
-test('a personalized task is hidden unless the user is assigned, collaborating, or its creator', () => {
+test('a personalized task is visible only to its assignees and assigner', () => {
   const privateTask = {
     id: 'custom_private',
     role: 'coord_c1',
     assignedToEmails: ['other@example.com'],
+    assignedByEmail: 'manager@example.com',
     createdBy: 'manager@example.com'
   };
 
@@ -42,10 +49,15 @@ test('a personalized task is hidden unless the user is assigned, collaborating, 
     ...privateTask,
     assignedToEmails: ['other@example.com'],
     collaborators: [{ email: 'coord@example.com' }]
-  }, coordinator), true);
+  }, coordinator), false);
   assert.equal(isTaskVisibleForUser({
     ...privateTask,
     createdBy: 'coord@example.com'
+  }, coordinator), true);
+  assert.equal(isTaskVisibleForUser({
+    ...privateTask,
+    createdBy: 'other@example.com',
+    assignedByEmail: 'coord@example.com'
   }, coordinator), true);
 });
 

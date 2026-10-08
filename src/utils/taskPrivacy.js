@@ -41,13 +41,11 @@ export const isTaskVisibleForUser = (task, user) => {
   const taskRole = normalizeTaskRole(task.role);
   const hasRole = Boolean(taskRole && roles.includes(taskRole));
 
-  if (task.isValidation === true) return hasRole;
-
   const isPersonallyRelated = Boolean(
     hasEmailIn(task.assignedToEmail, userEmails) ||
     hasEmailIn(task.assignedToEmails, userEmails) ||
     hasEmailIn(task.assigned_to, userEmails) ||
-    hasEmailIn(task.collaborators, userEmails) ||
+    hasEmailIn(task.assignedByEmail, userEmails) ||
     hasEmailIn([task.createdBy, task.createdByEmail, task.created_by], userEmails) ||
     (task.ownerId && task.ownerId === user.uid)
   );
@@ -57,24 +55,17 @@ export const isTaskVisibleForUser = (task, user) => {
     (typeof task.id === 'string' && task.id.startsWith('custom_')) ||
     task.assignedToEmail ||
     (Array.isArray(task.assignedToEmails) && task.assignedToEmails.length > 0) ||
-    task.assignedTo ||
-    (Array.isArray(task.assignedRoles) && task.assignedRoles.length > 0) ||
-    task.assignedSede ||
     task.assignedByEmail ||
-    task.assignedByName ||
     task.assigned_to ||
-    (Array.isArray(task.collaborators) && task.collaborators.length > 0) ||
-    (Array.isArray(task.pendingCollaborations) && task.pendingCollaborations.length > 0) ||
-    task.assigneeProgress ||
-    task.metadata ||
-    task.source ||
     task.ownerId ||
     task.createdBy ||
     task.createdByEmail ||
-    task.created_by
+    task.created_by ||
+    task.collaborators
   );
 
   if (hasPersonalMetadata) return isPersonallyRelated;
+  if (task.isValidation === true) return hasRole;
 
   const isCatalogTask = catalogRoleById.get(task.id) === taskRole;
   return isCatalogTask && hasRole;

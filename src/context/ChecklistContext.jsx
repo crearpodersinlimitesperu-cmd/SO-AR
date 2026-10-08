@@ -497,8 +497,8 @@ export function ChecklistProvider({ children }) {
         ['assignedToEmail', exactOperator, exactOperator === 'in' ? authEmails : authEmails[0]],
         ['assignedToEmails', arrayOperator, arrayOperator === 'array-contains-any' ? authEmails : authEmails[0]],
         ['assigned_to', exactOperator, exactOperator === 'in' ? authEmails : authEmails[0]],
-        ['collaborators', arrayOperator, arrayOperator === 'array-contains-any' ? authEmails : authEmails[0]],
         ['createdBy', exactOperator, exactOperator === 'in' ? authEmails : authEmails[0]],
+        ['assignedByEmail', exactOperator, exactOperator === 'in' ? authEmails : authEmails[0]],
         ['createdByEmail', exactOperator, exactOperator === 'in' ? authEmails : authEmails[0]],
         ['created_by', exactOperator, exactOperator === 'in' ? authEmails : authEmails[0]]
       ].forEach(([field, operator, value]) => querySpecs.push({
