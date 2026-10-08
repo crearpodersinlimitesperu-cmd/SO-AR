@@ -498,24 +498,15 @@ service cloud.firestore {
         ? parts[0] + '@crearpsl.net' : email();
     }
 
-    function emailAsCom() {
-      let parts = email().split('@');
-      return parts.size() == 2 && parts[1] in ['crearpsl.net', 'crearpsl.com']
-        ? parts[0] + '@crearpsl.com' : email();
-    }
-
     function isOwnUserProfile(userData) {
-      return userData.get('email', '') == email() ||
-        userData.get('email', '') == emailAsNet() ||
-        userData.get('email', '') == emailAsCom() ||
-        userData.get('corporateEmail', '') == email() ||
-        userData.get('corporateEmail', '') == emailAsNet() ||
-        userData.get('corporateEmail', '') == emailAsCom() ||
-        userData.get('personalEmail', '') == email() ||
-        userData.get('personalEmail', '') == emailAsNet() ||
-        userData.get('personalEmail', '') == emailAsCom() ||
-        (userData.get('emails', []) is list &&
-         (email() in userData.emails || emailAsNet() in userData.emails || emailAsCom() in userData.emails));
+      let aliases = callerEmailAliases();
+      let emails = userData.get('emails', []);
+      return userData.get('email', '') in aliases ||
+        userData.get('corporateEmail', '') in aliases ||
+        userData.get('personalEmail', '') in aliases ||
+        // hasAny is list-only and query-provable; an additional "is list"
+        // guard cannot be proven for array-contains queries.
+        emails.hasAny(aliases);
     }
 
     function callerProfileExists() {
@@ -584,21 +575,23 @@ service cloud.firestore {
     }
 
     function sedeAliasList(raw) {
-      return sedeCanonical(sedeFolded(raw)) == 'quito' ?
+      let canonical = sedeCanonical(sedeFolded(raw));
+      return canonical == 'quito' ?
           ['Quito', 'QUITO', 'quito', 'UIO', 'uio', 'Quito C1', 'Quito C2', 'Quito Ciclo 1', 'Quito Ciclo 2', 'QUITO C1', 'QUITO C2', 'Quito ciclo 1', 'Quito ciclo 2'] :
-        sedeCanonical(sedeFolded(raw)) == 'medellin' ?
+        canonical == 'medellin' ?
           ['Medellín', 'Medellin', 'MEDELLIN', 'MEDELLÍN', 'medellin', 'medellín', 'MED', 'Med'] :
-        sedeCanonical(sedeFolded(raw)) == 'lima' ? ['Lima', 'LIMA', 'lima', 'LIM'] :
-        sedeCanonical(sedeFolded(raw)) == 'cuenca' ? ['Cuenca', 'CUENCA', 'cuenca', 'CUE'] :
-        sedeCanonical(sedeFolded(raw)) == 'guayaquil' ? ['Guayaquil', 'GUAYAQUIL', 'guayaquil', 'GYE'] :
-        sedeCanonical(sedeFolded(raw)) == 'mexico' ? ['México', 'Mexico', 'MEXICO', 'MÉXICO', 'mexico', 'CDMX', 'MEX'] :
-        sedeCanonical(sedeFolded(raw)) == 'internacional' ? ['Internacional', 'INTERNACIONAL', 'INT'] :
+        canonical == 'lima' ? ['Lima', 'LIMA', 'lima', 'LIM'] :
+        canonical == 'cuenca' ? ['Cuenca', 'CUENCA', 'cuenca', 'CUE'] :
+        canonical == 'guayaquil' ? ['Guayaquil', 'GUAYAQUIL', 'guayaquil', 'GYE'] :
+        canonical == 'mexico' ? ['México', 'Mexico', 'MEXICO', 'MÉXICO', 'mexico', 'CDMX', 'MEX'] :
+        canonical == 'internacional' ? ['Internacional', 'INTERNACIONAL', 'INT'] :
         [raw];
     }
 
     function canReadUserSameSede(userData) {
-      return sedeCanonical(sedeFolded(callerDirectorySede())) != '' &&
-        userData.get('sede', '') in sedeAliasList(callerDirectorySede());
+      let sede = callerDirectorySede();
+      return sedeCanonical(sedeFolded(sede)) != '' &&
+        userData.get('sede', '') in sedeAliasList(sede);
     }
 
     match /users/{userId} {
@@ -606,7 +599,6 @@ service cloud.firestore {
         request.auth.uid == userId ||
         (request.auth.token.get('email_verified', false) == true && (
           isOwnUserProfile(resource.data) ||
-          isSuperAdmin() ||
           callerIsDirectoryGlobal() ||
           canReadUserSameSede(resource.data)
         ))

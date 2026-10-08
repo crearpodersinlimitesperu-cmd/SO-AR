@@ -9,6 +9,7 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - 'src/**'
+      - 'functions/**'
       - 'tests/**'
       - '.github/workflows/validate-task-privacy.yml'
 
@@ -38,6 +39,11 @@ jobs:
 
       - name: Run tests
         run: npm test
+
+      - name: Check backend syntax
+        run: |
+          node --check functions/index.js
+          node --check functions/directoryScope.js
 
       - name: Build production app
         run: npm run build

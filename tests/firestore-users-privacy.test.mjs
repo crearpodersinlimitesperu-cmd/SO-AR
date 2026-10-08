@@ -1,6 +1,7 @@
 import test, { after, before, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { SEDE_ALIASES } from '../src/utils/sedeAliases.js';
 import {
   assertFails,
   assertSucceeds,
@@ -11,8 +12,10 @@ import {
   doc,
   getDoc,
   getDocs,
+  FieldPath,
   query,
   setDoc,
+  serverTimestamp,
   where
 } from 'firebase/firestore';
 
@@ -104,8 +107,16 @@ test('AuthContext/getVerifiedUser email lookups still work for the caller', asyn
   const db = asLima();
   await assertSucceeds(getDocs(query(users(db), where('emails', 'array-contains', 'lima1@example.com'))));
   await assertSucceeds(getDocs(query(users(db), where('email', '==', 'lima1@example.com'))));
-  await assertSucceeds(getDocs(query(users(db), where('corporateEmail', '==', 'lima1@corp.example.com'))));
-  await assertSucceeds(getDocs(query(users(db), where('personalEmail', '==', 'lima1.personal@example.com'))));
+  await assertSucceeds(getDocs(query(users(db), where('corporateEmail', '==', 'lima1@example.com'))));
+  await assertSucceeds(getDocs(query(users(db), where('personalEmail', '==', 'lima1@example.com'))));
+  for (const [field, email] of [
+    ['corporateEmail', 'lima1@corp.example.com'],
+    ['personalEmail', 'lima1.personal@example.com']
+  ]) {
+    const aliasDb = dbFor('lima-1', email);
+    const snap = await assertSucceeds(getDocs(query(users(aliasDb), where(field, '==', email))));
+    assert.equal(snap.size, 1);
+  }
 });
 
 test('a first-time user with no profile can still run the login lookups', async () => {
@@ -116,6 +127,35 @@ test('a first-time user with no profile can still run the login lookups', async 
   assert.equal(snap.size, 0);
   await assertSucceeds(getDocs(emails));
   await assertFails(getDocs(users(db)));
+  const ref = doc(db, 'users', 'nuevo-1');
+  await assertSucceeds(setDoc(ref, {
+    uid: 'nuevo-1', email: 'nuevo@example.com', name: 'Nuevo',
+    displayName: 'Nuevo', photoURL: null, provider: 'google',
+    createdAt: serverTimestamp(), lastLoginAt: serverTimestamp()
+  }));
+  await assertSucceeds(setDoc(ref, {
+    name: 'Nuevo actualizado', displayName: 'Nuevo actualizado',
+    photoURL: null, lastLoginAt: serverTimestamp()
+  }, { merge: true }));
+  const ownSnap = await assertSucceeds(getDocs(email));
+  assert.equal(ownSnap.size, 1);
+  await assertFails(getDocs(users(db)));
+});
+
+test('malformed email maps cannot impersonate an owned profile or widen query access', async () => {
+  await testEnv.withSecurityRulesDisabled(async context => {
+    await setDoc(doc(context.firestore(), 'users', 'malformed'), {
+      email: 'foreign@example.com', sede: 'Quito',
+      emails: { 'lima1@example.com': true }
+    });
+  });
+  const db = asLima();
+  await assertFails(getDoc(doc(db, 'users', 'malformed')));
+  await assertFails(getDocs(query(users(db), where('email', '==', 'foreign@example.com'))));
+  await assertFails(getDocs(query(users(db), where('emails', '==', { 'lima1@example.com': true }))));
+  await assertFails(getDocs(query(users(db), where(new FieldPath('emails', 'lima1@example.com'), '==', true))));
+  const snap = await assertSucceeds(getDocs(query(users(db), where('emails', 'array-contains', 'lima1@example.com'))));
+  assert.deepEqual(snap.docs.map(doc => doc.id), ['lima-1']);
 });
 
 test('the crearpsl.com login alias can look up the crearpsl.net profile as AuthContext does', async () => {
@@ -190,6 +230,22 @@ test('sede aliases: querying another sede\'s aliases, or a mixed set, is denied'
   await assertFails(getDocs(query(users(db), where('sede', 'in', MEDELLIN_ALIASES))));
   await assertFails(getDocs(query(users(db), where('sede', 'in', [...QUITO_ALIASES.slice(0, 3), 'Lima']))));
   await assertFails(getDocs(query(users(db), where('sede', '==', 'Lima'))));
+});
+
+test('every canonical sede alias query stays within the Rules expression budget', async () => {
+  for (const [sede, aliases] of Object.entries(SEDE_ALIASES)) {
+    const uid = `budget-${sede}`;
+    const email = `${uid}@example.com`;
+    await testEnv.withSecurityRulesDisabled(async context => {
+      await setDoc(doc(context.firestore(), 'users', uid), {
+        email, role: 'entrenador', sede: aliases.at(-1)
+      });
+    });
+    const db = dbFor(uid, email);
+    const snap = await assertSucceeds(getDocs(query(users(db), where('sede', 'in', aliases))));
+    assert.ok(snap.docs.some(doc => doc.id === uid), sede);
+    await assertFails(getDocs(users(db)));
+  }
 });
 
 test('"Sin Sede" is not a shared sede', async () => {
