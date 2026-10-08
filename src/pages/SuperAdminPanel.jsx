@@ -644,10 +644,10 @@ function AuditLogView() {
                     <td style={{ padding: '0.8rem' }}>
                       <strong>{log.sede || 'Global'}</strong>
                       <br />
-                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{log.location || 'Acceso Seguro'} ({log.ip || '127.0.0.1'})</span>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{log.location || 'No recopilada'} ({log.ip || 'No recopilada'})</span>
                     </td>
                     <td style={{ padding: '0.8rem', fontSize: '0.75rem', color: 'var(--text-muted)', maxWidth: '160px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={log.userAgent}>
-                      {log.userAgent || 'Web Browser'}
+                      {log.userAgent || 'No recopilado'}
                     </td>
                   </tr>
                 );

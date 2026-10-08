@@ -7,36 +7,11 @@ import { collection, addDoc, getDocs, query, orderBy, limit, doc, setDoc, server
 const LOCAL_CONNECTIONS_KEY = 'cpsl_user_connections';
 
 /**
- * Obtiene la IP y ubicación geográfica real del usuario
- */
-export async function fetchNetworkInfo() {
-  try {
-    const res = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(3000) });
-    if (res.ok) {
-      const data = await res.json();
-      return {
-        ip: data.ip || 'Desconocida',
-        location: data.city && data.country_name ? `${data.city}, ${data.country_name}` : (data.country_name || 'Ubicación Segura')
-      };
-    }
-  } catch (e) {
-    try {
-      const res2 = await fetch('https://api.ipify.org?format=json', { signal: AbortSignal.timeout(2000) });
-      const data2 = await res2.json();
-      return { ip: data2.ip || '127.0.0.1', location: 'Acceso Conectado' };
-    } catch (e2) {}
-  }
-  return { ip: 'IP Directa', location: 'Conexión Segura' };
-}
-
-/**
  * Registra un evento de auditoría REAL en Cloud Firestore
  */
-export async function recordAuditEvent({ uid, email, name, role, sede, action, details = '', ip, location, userAgent, isSimulation = false }) {
+export async function recordAuditEvent({ uid, email, name, role, sede, action, details = '', isSimulation = false }) {
   if (!email) return null;
 
-  const netInfo = (ip && location) ? { ip, location } : await fetchNetworkInfo();
-  const agent = userAgent || (typeof navigator !== 'undefined' ? navigator.userAgent : 'Desconocido');
   const nowIso = new Date().toISOString();
 
   const logEntry = {
@@ -46,9 +21,6 @@ export async function recordAuditEvent({ uid, email, name, role, sede, action, d
     sede: sede || 'Sede Global',
     action: action || 'ACCESO',
     details: details || '',
-    ip: netInfo.ip,
-    location: netInfo.location,
-    userAgent: agent,
     timestamp: nowIso
   };
 
@@ -70,10 +42,7 @@ export async function recordAuditEvent({ uid, email, name, role, sede, action, d
         sede: sede || 'Sede Global',
         lastLoginAt: serverTimestamp(),
         lastLoginAtIso: nowIso,
-        lastAction: 'LOGIN_REAL',
-        lastIp: netInfo.ip,
-        lastLocation: netInfo.location,
-        lastUserAgent: agent
+        lastAction: 'LOGIN_REAL'
       }, { merge: true });
     }
   } catch (e) {
