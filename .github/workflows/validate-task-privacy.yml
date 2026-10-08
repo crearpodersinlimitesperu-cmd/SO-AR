@@ -2,8 +2,6 @@ name: Validate task privacy and build
 
 on:
   pull_request:
-    branches:
-      - master
     paths:
       - 'firebase.json'
       - 'firestore.rules'
