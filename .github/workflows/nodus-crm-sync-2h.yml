@@ -1,0 +1,44 @@
+name: Nodus CRM Autonomous Sync (Every 2 Hours)
+
+on:
+  schedule:
+    # 12 veces al día (cada 2 horas exactas en el minuto 0)
+    - cron: '0 */2 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: nodus-crm-sync
+  cancel-in-progress: false
+
+jobs:
+  sync-crm-nodus:
+    name: CausaNodusCRMSyncAgent (12x al Día)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Execute CausaNodusCRMSyncAgent
+        env:
+          NODUS_USER: ${{ secrets.NODUS_USER }}
+          NODUS_PASSWORD: ${{ secrets.NODUS_PASSWORD }}
+          NODUS_ROBOT_SECRET: ${{ secrets.NODUS_ROBOT_SECRET || 'NODUS_ROBOT_CPSL_2026_SECRET' }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+        run: node scripts/CausaNodusCRMSyncAgent.mjs
+
+      - name: Report Status
+        if: success()
+        run: echo "🎉 CausaNodusCRMSyncAgent ejecutado exitosamente a las $(date)"
