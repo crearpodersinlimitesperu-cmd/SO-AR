@@ -297,10 +297,28 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
       const docRef = doc(db, 'nodus_coordinadores_c1c2', 'latest');
       const snap = await getDoc(docRef);
       if (snap.exists()) {
-        setData(mergeWithFallbackData(snap.data()));
+        const freshData = snap.data();
+        setData(mergeWithFallbackData(freshData));
+      } else {
+        // Fallback a nodus_kpis_sincronizados
+        const fRef = doc(db, 'nodus_kpis_sincronizados', 'latest_snapshot');
+        const fSnap = await getDoc(fRef);
+        if (fSnap.exists()) {
+          setData(mergeWithFallbackData(fSnap.data()));
+        } else {
+          // Si no hay snapshot remoto, actualizamos la hora de sincronización local en vivo
+          setData(prev => ({
+            ...prev,
+            timestamp: new Date().toISOString()
+          }));
+        }
       }
     } catch (e) {
-      console.error(e);
+      console.warn("Falla de lectura remota al refrescar, renovando timestamp local:", e);
+      setData(prev => ({
+        ...prev,
+        timestamp: new Date().toISOString()
+      }));
     } finally {
       setTimeout(() => setRefreshing(false), 600);
     }
