@@ -334,8 +334,16 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
   const userTasks = useMemo(() => {
     if (!user) return [];
     const raw = allTasks.filter(t => {
-      const isAssigned = (t.assignedToEmails && t.assignedToEmails.some(e => e.toLowerCase() === user.email?.toLowerCase())) || (t.assignedToEmail && t.assignedToEmail.toLowerCase() === user.email?.toLowerCase());
-      const isCollab = t.collaborators && t.collaborators.includes(user.email);
+      const userEmails = [
+        user.email,
+        user.corporateEmail,
+        user.personalEmail,
+        ...(Array.isArray(user.emails) ? user.emails : [])
+      ].map(e => (e || '').toLowerCase().trim()).filter(Boolean);
+
+      const isAssigned = (t.assignedToEmails && t.assignedToEmails.some(e => userEmails.includes((e || '').toLowerCase().trim()))) ||
+                         (t.assignedToEmail && userEmails.includes((t.assignedToEmail || '').toLowerCase().trim()));
+      const isCollab = t.collaborators && t.collaborators.some(c => userEmails.includes((c || '').toLowerCase().trim()));
       
       if (isAssigned || isCollab) {
         // Regla de Privacidad: Si yo (currentUser) soy gerente/director y estoy viendo el perfil de otro gerente/director
@@ -398,10 +406,26 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
     });
   }, [allTasks, user, currentUser, canonicalRole, currentCycle, taskSortOrder]);
 
-  const overdueAlertTasks = useMemo(
-    () => getOverdueAssignedTasks(allTasks, user?.email),
-    [allTasks, user?.email]
-  );
+  const overdueAlertTasks = useMemo(() => {
+    const emails = [
+      user?.email,
+      user?.corporateEmail,
+      user?.personalEmail,
+      ...(Array.isArray(user?.emails) ? user?.emails : [])
+    ].map(e => (e || '').toLowerCase().trim()).filter(Boolean);
+    const seen = new Set();
+    const list = [];
+    emails.forEach(em => {
+      getOverdueAssignedTasks(allTasks, em).forEach(t => {
+        const id = t.id || t.title || t.name;
+        if (!seen.has(id)) {
+          seen.add(id);
+          list.push(t);
+        }
+      });
+    });
+    return list;
+  }, [allTasks, user?.email, user?.corporateEmail, user?.personalEmail, user?.emails]);
 
   const completedTasks = useMemo(() => {
     if (!user) return [];
@@ -810,9 +834,9 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
         zIndex: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem'
       }}>
         <div className="glass-panel" style={{
-          width: '100%', maxWidth: '850px', maxHeight: '90vh', display: 'flex', flexDirection: 'column',
+          width: '100%', maxWidth: '850px', maxHeight: '92vh', display: 'flex', flexDirection: 'column',
           position: 'relative', border: `1px solid ${roleColor}40`, boxShadow: `0 10px 40px rgba(0,0,0,0.8), 0 0 20px ${roleColor}20`,
-          borderRadius: '16px', overflow: 'hidden'
+          borderRadius: '16px', overflowY: 'auto'
         }}>
           {/* Close button */}
           <button 
