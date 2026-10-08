@@ -445,12 +445,12 @@ const OFICIAL_LETTERS = [
     id: 'carta-migraciones-oficial',
     entrenador: 'Superintendencia Nacional de Migraciones (Perú)',
     rol: 'Respaldo Institucional Oficial',
-    equipo: 'CREAR PODER SIN LÍMITES S.A.C.',
+    equipo: 'Datos de sede: /datos-sedes-cartas',
     sede: 'Lima',
-    url: '/cartas/carta_invitacion_migraciones.html',
+    url: '/cartas/carta_invitacion_migraciones.html?sede=lima',
     badge: 'Documento Legal Migratorio',
     fecha: 'Oficial 2026',
-    descripcion: 'Carta de respaldo institucional, personería jurídica y acreditación oficial de conferencistas extranjeros ante autoridades peruanas.',
+    descripcion: 'Carta de invitación migratoria. La razón social, identificación fiscal, dirección y responsables se leen de la ficha de cada sede en Datos de sedes para cartas.',
     vuelos: ['LA 1437', 'AV 108', 'LA 1449']
   },
 
