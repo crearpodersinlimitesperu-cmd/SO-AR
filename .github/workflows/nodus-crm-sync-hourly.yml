@@ -1,20 +1,25 @@
-name: Nodus CRM Autonomous Sync (Every 2 Hours)
+name: Nodus CRM Hourly Delta Sync (CausaNodusCRMSyncAgent)
 
 on:
   schedule:
-    # 12 veces al día (cada 2 horas exactas en el minuto 0)
-    - cron: '0 */2 * * *'
+    # Ejecución automática cada hora exacta en el minuto 0
+    - cron: '0 * * * *'
   workflow_dispatch:
+    inputs:
+      force_full:
+        description: 'Forzar sincronización completa ignorando ventana delta'
+        required: false
+        default: 'false'
 
 concurrency:
-  group: nodus-crm-sync
+  group: nodus-crm-hourly-sync
   cancel-in-progress: false
 
 jobs:
-  sync-crm-nodus:
-    name: CausaNodusCRMSyncAgent (12x al Día)
+  hourly-delta-sync:
+    name: Delta Sync Horario (CausaNodusCRMSyncAgent)
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 15
 
     steps:
       - name: Checkout repository
@@ -29,7 +34,7 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Execute CausaNodusCRMSyncAgent
+      - name: Execute Autonomous CausaNodusCRMSyncAgent
         env:
           NODUS_USER: ${{ secrets.NODUS_USER }}
           NODUS_PASSWORD: ${{ secrets.NODUS_PASSWORD }}
@@ -37,8 +42,13 @@ jobs:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
           VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
           VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          FORCE_FULL_SYNC: ${{ github.event.inputs.force_full || 'false' }}
         run: node scripts/CausaNodusCRMSyncAgent.mjs
 
-      - name: Report Status
+      - name: Audit Trail Notification
         if: success()
-        run: echo "🎉 CausaNodusCRMSyncAgent ejecutado exitosamente a las $(date)"
+        run: echo "🎉 Delta Sync Horario completado exitosamente a las $(date)"
+
+      - name: Fallback Notification on Error
+        if: failure()
+        run: echo "⚠️ Alerta silenciosa: Falla en ventana horaria Nodus. Snapshots en Firestore preservados intactos."
