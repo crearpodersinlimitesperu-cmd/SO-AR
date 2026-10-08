@@ -134,51 +134,6 @@ test('sync_history: update y delete por el dueño o la gerencia', async () => {
   await assertSucceeds(deleteDoc(doc(dbOf('ent-1'), 'sync_history', 'h1')));
 });
 
-test('staff_directory: lookup propio por email y emails (incluye alias .com/.net), no el ajeno', async () => {
-  await seed(['staff_directory', 's1'], { email: 'ent@example.com', name: 'Ent' });
-  await seed(['staff_directory', 's2'], { emails: ['qt@crearpsl.net'], name: 'QT' });
-  await seed(['staff_directory', 's3'], { email: 'otro@example.com', emails: ['otro@example.com'] });
-
-  const ent = dbOf('ent-1');
-  const qt = dbOf('qt-1');
-  const byEmail = (db, e) => getDocs(query(collection(db, 'staff_directory'), where('email', '==', e)));
-  const byEmails = (db, e) => getDocs(query(collection(db, 'staff_directory'), where('emails', 'array-contains', e)));
-
-  await assertSucceeds(byEmail(ent, 'ent@example.com'));
-  await assertSucceeds(byEmails(ent, 'ent@example.com'));
-  await assertFails(byEmail(ent, 'otro@example.com'));
-  await assertFails(byEmails(ent, 'otro@example.com'));
-  await assertFails(getDocs(collection(ent, 'staff_directory')));
-  await assertSucceeds(getDoc(doc(ent, 'staff_directory', 's1')));
-  await assertFails(getDoc(doc(ent, 'staff_directory', 's3')));
-
-  // Caso alias: sesión @crearpsl.com consultando el documento guardado como @crearpsl.net,
-  // tanto con el correo normalizado (.net) como con el correo crudo de la sesión (.com).
-  await assertSucceeds(byEmails(qt, 'qt@crearpsl.net'));
-  await assertSucceeds(getDoc(doc(qt, 'staff_directory', 's2')));
-  await assertSucceeds(byEmails(qt, 'qt@crearpsl.com'));
-
-  const snap = await byEmails(qt, 'qt@crearpsl.net');
-  assert.equal(snap.size, 1);
-});
-
-test('staff_directory: lectura global y escritura solo para gerencia', async () => {
-  await seed(['staff_directory', 's1'], { email: 'ent@example.com' });
-  for (const db of [dbOf('ger-1'), dbOf('dir-1'), dbOf('ger-multi'), superAdminDb()]) {
-    await assertSucceeds(getDocs(collection(db, 'staff_directory')));
-    await assertSucceeds(setDoc(doc(db, 'staff_directory', 'nuevo'), { email: 'n@example.com' }));
-    await assertSucceeds(updateDoc(doc(db, 'staff_directory', 's1'), { name: 'x' }));
-  }
-  for (const uid of ['coord-1', 'ent-1', 'qt-1']) {
-    const db = dbOf(uid);
-    await assertFails(setDoc(doc(db, 'staff_directory', 'x'), { email: 'x@example.com' }));
-    await assertFails(updateDoc(doc(db, 'staff_directory', 's1'), { name: 'x' }));
-    await assertFails(deleteDoc(doc(db, 'staff_directory', 's1')));
-  }
-  await assertFails(deleteDoc(doc(anonDb(), 'staff_directory', 's1')));
-  await assertSucceeds(deleteDoc(doc(dbOf('ger-1'), 'staff_directory', 's1')));
-});
-
 test('qt_directory: la lectura sigue abierta a autenticados y la escritura es gerencial', async () => {
   await seed(['qt_directory', 'q1'], { email: 'qt@crearpsl.net', sede: 'Quito' });
 

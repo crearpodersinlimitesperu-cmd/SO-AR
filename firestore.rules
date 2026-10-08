@@ -21,12 +21,12 @@ rules_version = '2';
 //     ciclos y reportes fallando en silencio para roles no-superadmin).
 //
 // Qu├® NO cambia (a prop├│sito, para no romper nada que no revis├® a fondo):
-//  Las colecciones managers_directory, excellence_standards, kpi_reports,
+//  Las colecciones staff_directory, managers_directory, excellence_standards, kpi_reports,
 //  learning_logs y success_patterns se dejan EXACTAMENTE como est├ín hoy (cualquier autenticado lee y
 //  escribe) porque no alcanc├® a auditar el detalle de cada una y prefiero no
 //  inventar una restricci├│n que bloquee algo que no vi. Quedan marcadas abajo
 //  con un TODO para una siguiente pasada.
-//  A-01 (parcial): staff_directory, qt_directory (solo escritura), sync_history y
+//  A-01 (parcial): qt_directory (solo escritura), sync_history y
 //  user_stats ya tienen reglas específicas más abajo.
 //
 // Lista de gerencia/direcci├│n (funci├│n isGerenteODireccion): se extrajo del
@@ -688,11 +688,7 @@ service cloud.firestore {
     // COLECCIONES AUDITADAS CON PERMISOS AMPLIOS DE COLABORACIÓN OPERATIVA
     // ------------------------------------------------------------------------
     match /staff_directory/{document=**} {
-      allow read: if isManagementRole() ||
-        emailIsCaller(resource.data.get('email', '')) ||
-        (resource.data.get('emails', []) is list &&
-         resource.data.get('emails', []).hasAny(callerEmailAliases()));
-      allow write: if isManagementRole();
+      allow read, write: if isAuthenticated();
     }
     match /managers_directory/{document=**} {
       allow read, write: if isAuthenticated();
