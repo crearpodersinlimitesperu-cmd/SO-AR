@@ -171,3 +171,37 @@ test('checklist_tasks uses the same per-user read authorization', async () => {
   await assertSucceeds(getDoc(doc(db, 'checklist_tasks', 'mine')));
   await assertFails(getDoc(doc(db, 'checklist_tasks', 'other')));
 });
+
+test('C-01: ordinary self-owned task is creatable, critical/mass requires admin profile', async () => {
+  await testEnv.withSecurityRulesDisabled(async context => {
+    await setDoc(doc(context.firestore(), 'users', 'gerente-1'), {
+      uid: 'gerente-1', email: 'gerente.nuevo@example.com', role: 'gerente', roles: ['gerente']
+    });
+  });
+  const db = coordinatorDb();
+  const base = { assignedToEmail: 'coord@example.com', role: 'coord_c1', isCustom: true };
+
+  await assertSucceeds(setDoc(doc(db, 'tasks', 'custom_ordinary'), { id: 'custom_ordinary', ...base, priority: '🟡 AMARILLO', isCritical: false }));
+  await assertFails(setDoc(doc(db, 'tasks', 'custom_critical'), { id: 'custom_critical', ...base, priority: '🔴 ROJO', isCritical: true }));
+  await assertFails(setDoc(doc(db, 'tasks', 'custom_mass'), {
+    id: 'custom_mass', ...base, assignedToEmails: ['a@example.com', 'b@example.com']
+  }));
+  // Catalog-shaped critical docs (first-touch by a coordinator) keep working
+  await assertSucceeds(setDoc(doc(db, 'tasks', 'soar_12'), {
+    id: 'soar_12', role: 'coord_c1', isCustom: false, isCritical: true, priority: '🔴 ROJO', status: 'Pendiente'
+  }));
+
+  const gerenteDb = testEnv.authenticatedContext('gerente-1', { email: 'gerente.nuevo@example.com' }).firestore();
+  await assertSucceeds(setDoc(doc(gerenteDb, 'tasks', 'custom_mass_ok'), {
+    id: 'custom_mass_ok', isCustom: true, priority: '🔴 ROJO', isCritical: true,
+    assignedToEmails: ['a@example.com', 'b@example.com']
+  }));
+});
+
+test('C-01: whitelisted manager without users/{uid} profile can create a critical mass task', async () => {
+  const db = testEnv.authenticatedContext('whitelist-1', { email: 'emely.leon@crearpsl.net' }).firestore();
+  await assertSucceeds(setDoc(doc(db, 'tasks', 'custom_whitelist_mass'), {
+    id: 'custom_whitelist_mass', isCustom: true, priority: '🔴 ROJO', isCritical: true,
+    assignedToEmails: ['a@example.com', 'b@example.com']
+  }));
+});

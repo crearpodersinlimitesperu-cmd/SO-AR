@@ -227,7 +227,11 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/opt-out" element={<OptOutPage />} />
-          <Route path="/causa-os-task" element={<CausaOSTask />} />
+          <Route path="/causa-os-task" element={
+            <RoleRoute allowedRoles={['gerente', 'direccion', 'director_maestria', 'cfo', 'cco', 'ceo', 'socio', 'superadmin']}>
+              <CausaOSTask />
+            </RoleRoute>
+          } />
 
           
           <Route path="/" element={<Navigate to="/home" replace />} />
