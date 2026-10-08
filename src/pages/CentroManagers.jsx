@@ -54,6 +54,7 @@ import {
 import CMJDashboard from '../components/CMJDashboard';
 import KPIsEntrenadoresLlamadas from '../components/KPIsEntrenadoresLlamadas';
 import { auditAndDeduplicateManagers } from '../services/dataIntegrityAgent';
+import { buildTeamKeyResolver } from '../utils/teamGrouping';
 import defaultKpisData from '../data/kpisEntrenadoresData.json';
 
 
@@ -486,6 +487,7 @@ export default function CentroManagers() {
 
   const [filterEntrenador, setFilterEntrenador] = useState(viewAsTrainer ? currentTrainerName : '');
   const [filterEquipo, setFilterEquipo] = useState('');
+  const teamKeyOf = useMemo(() => buildTeamKeyResolver(managers, normalizeSede), [managers]);
   const [directorioViewMode, setDirectorioViewMode] = useState('tabla'); // 'tabla' | 'equipos'
 
   // Catálogo de equipos disponibles ordenados numéricamente para filtrado rápido (#79, #80, #81, #91, #92...)
@@ -512,7 +514,7 @@ export default function CentroManagers() {
       const numStr = m.numEquipo !== undefined && m.numEquipo !== null && String(m.numEquipo).trim() !== ''
         ? String(m.numEquipo).trim()
         : (num !== 999999 ? String(num) : '');
-      const key = `${mSede}_${cleanName}`;
+      const key = teamKeyOf(m);
       if (!map.has(key)) {
         map.set(key, {
           key,
@@ -530,7 +532,7 @@ export default function CentroManagers() {
       if (a.num !== b.num) return a.num - b.num;
       return a.equipo.localeCompare(b.equipo);
     });
-  }, [managers, currentUser, canViewAll, filterSede, filterEntrenador]);
+  }, [managers, currentUser, canViewAll, filterSede, filterEntrenador, teamKeyOf]);
 
 
   // Auto-Graduación de Equipos cuando finaliza "El Viaje"
@@ -793,7 +795,9 @@ export default function CentroManagers() {
         const cleanFilter = String(filterEquipo).replace(/\s*\(#\d+\)\s*/g, '').trim().toLowerCase();
         const key = `${mSede}_${cleanEqName}`.toLowerCase();
         const num = getTeamNumericValue(m);
-        if (key !== filterEquipo.toLowerCase() && cleanEqName !== cleanFilter && String(m.numEquipo || num) !== filterEquipo) return false;
+        if (filterEquipo.includes('#')) {
+          if (teamKeyOf(m) !== filterEquipo) return false;
+        } else if (key !== filterEquipo.toLowerCase() && cleanEqName !== cleanFilter && String(m.numEquipo || num) !== filterEquipo) return false;
       }
 
       // 5. Filtro Estado (Todos / Activo / Graduado / Desertor)
@@ -808,7 +812,7 @@ export default function CentroManagers() {
 
       return true;
     });
-  }, [managers, search, filterSede, filterEntrenador, filterEquipo, statusFilter, viewAsTrainer, canViewAll, canViewOwnSede, currentTrainerName, currentUser]);
+  }, [managers, search, filterSede, filterEntrenador, filterEquipo, statusFilter, viewAsTrainer, canViewAll, canViewOwnSede, currentTrainerName, currentUser, teamKeyOf]);
 
   // Agrupación de equipos
   const [groupLifecycleFilter, setGroupLifecycleFilter] = useState('Activos'); // 'Activos' | 'Archivo' | 'Todos'
@@ -868,7 +872,7 @@ export default function CentroManagers() {
     // 2. Agrupar managers en equipos identificando miembros activos vs archivo
     const teams = {};
     visibleManagers.forEach(m => {
-      const key = `${normalizeSede(m.sede)}_${m.equipo}`;
+      const key = teamKeyOf(m);
       if (!teams[key]) {
         teams[key] = {
           sede: normalizeSede(m.sede),
@@ -1029,7 +1033,7 @@ export default function CentroManagers() {
       if (numA !== numB) return numA - numB;
       return (a.equipo || '').localeCompare(b.equipo || '');
     });
-  }, [managers, search, filterSede, filterEntrenador, groupLifecycleFilter, groupFilterStatus, viewAsTrainer, canViewAll, canViewOwnSede, currentTrainerName, currentUser]);
+  }, [managers, search, filterSede, filterEntrenador, groupLifecycleFilter, groupFilterStatus, viewAsTrainer, canViewAll, canViewOwnSede, currentTrainerName, currentUser, teamKeyOf]);
 
   const groupStats = useMemo(() => {
     let totalEq = groupTeams.length;
@@ -2848,7 +2852,7 @@ export default function CentroManagers() {
       const mSede = normalizeSede(m.sede);
       const cleanEq = String(m.equipo || 'Sin Equipo').replace(/\s*\(#\d+\)\s*/g, '').trim();
       const num = getTeamNumericValue(m);
-      const key = `${mSede}_${cleanEq}`;
+      const key = m.equipo ? teamKeyOf(m) : `${mSede}_${cleanEq}`;
       if (!map.has(key)) {
         map.set(key, {
           key,
@@ -2862,7 +2866,7 @@ export default function CentroManagers() {
       map.get(key).members.push(m);
     });
     return Array.from(map.values());
-  }, [sortedManagers]);
+  }, [sortedManagers, teamKeyOf]);
 
 
   const totalPages = Math.ceil(sortedManagers.length / PAGE_SIZE) || 1;
