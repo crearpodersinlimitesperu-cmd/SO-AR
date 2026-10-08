@@ -66,3 +66,24 @@ test('ignores invalid or missing deadlines and bad input', () => {
   assert.deepEqual(getOverdueAssignedTasks(null, me, NOW), []);
   assert.deepEqual(getOverdueAssignedTasks([{ assignedToEmail: me, deadline: at(100) }], '', NOW), []);
 });
+
+test('task completed by current user via sede/cycle completions or status is not overdue', () => {
+  const base = { assignedToEmails: [me, 'x@crearpsl.net'], deadline: at(100), assigneeProgress: { [me]: { completed: false, progress: 0 } } };
+  const opts = { sede: 'Lima', cycleId: 'c1' };
+  const r = getOverdueAssignedTasks([
+    { id: 'a', ...base, completions: { Lima: { completed: true } } },
+    { id: 'b', ...base, completions: { Lima__c1: { completed: true } } },
+    { id: 'c', ...base, assigneeProgress: { [me]: { status: 'Completada' } } },
+    { id: 'd', ...base, assigneeProgress: { [me]: { progressPercentage: 100 } } },
+    { id: 'e', ...base, completions: { Lima: { completed: false } } },
+    { id: 'f', ...base, completions: { Quito: { completed: true } } }
+  ], me, NOW, opts);
+  assert.deepEqual(ids(r), ['e', 'f']);
+});
+
+test('completion by another user does not hide task for other recipient', () => {
+  const t = { id: 'a', assignedToEmails: [me, 'x@crearpsl.net'], deadline: at(100),
+    assigneeProgress: { 'x@crearpsl.net': { completed: true }, [me]: { completed: false } } };
+  assert.deepEqual(ids(getOverdueAssignedTasks([t], me, NOW)), ['a']);
+  assert.deepEqual(ids(getOverdueAssignedTasks([t], 'x@crearpsl.net', NOW)), []);
+});
