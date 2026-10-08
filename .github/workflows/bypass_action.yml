@@ -1,0 +1,36 @@
+name: Nodus Cloudflare Bypass
+
+on:
+  workflow_dispatch:
+
+jobs:
+  run-bypass:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install Puppeteer Stealth
+        run: npm install puppeteer puppeteer-extra puppeteer-extra-plugin-stealth
+
+      - name: Run Scraper
+        run: |
+          cat << 'JS' > scrape.js
+          const puppeteer = require('puppeteer-extra');
+          const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+          puppeteer.use(StealthPlugin());
+          
+          (async () => {
+            const browser = await puppeteer.launch({ headless: "new" });
+            const page = await browser.newPage();
+            await page.goto('https://imo.crearpslglobal.com/auth/login');
+            console.log("Status:", await page.title());
+            await browser.close();
+          })();
+          JS
+          node scrape.js
