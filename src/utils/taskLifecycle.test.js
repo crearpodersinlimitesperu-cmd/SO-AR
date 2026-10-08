@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createCycleCompletion, getEffectiveCompletion, isCompletionTransition } from './taskLifecycle.js';
+import { createCycleCompletion, getEffectiveCompletion, getNextCompletionState, isCompletionTransition } from './taskLifecycle.js';
 
 test('catalog tasks use the active cycle and never inherit legacy completion', () => {
   const task = {
@@ -38,6 +38,14 @@ test('completion notifications are reserved for pending-to-complete transitions'
   assert.equal(isCompletionTransition(undefined, true), true);
   assert.equal(isCompletionTransition(true, true), false);
   assert.equal(isCompletionTransition(true, false), false);
+});
+
+test('progress-only updates to 100% complete the task', () => {
+  assert.equal(getNextCompletionState({ progressPercentage: 100 }), true);
+  assert.equal(getNextCompletionState({ progress: 100 }), true);
+  assert.equal(getNextCompletionState({ completed: true, progress: 30 }), true);
+  assert.equal(getNextCompletionState({ completed: false, progressPercentage: 100 }), false);
+  assert.equal(getNextCompletionState({ progressPercentage: 99 }), false);
 });
 
 test('cycle completion entries retain cycle identity and audit metadata', () => {

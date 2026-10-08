@@ -12,6 +12,7 @@ import {
   getDoc,
   getDocs,
   query,
+  runTransaction,
   setDoc,
   where
 } from 'firebase/firestore';
@@ -109,6 +110,46 @@ test('role-and-ID scoped catalog queries succeed without exposing other roles', 
   const snapshot = await assertSucceeds(getDocs(ownRoleQuery));
   assert.deepEqual(snapshot.docs.map(task => task.id), ['soar_12']);
   await assertFails(getDocs(otherRoleQuery));
+});
+
+test('catalog completion transaction can update task and enqueue mail and notification', async () => {
+  await seedTasks([{ id: 'soar_12', role: 'coord_c1', isCustom: false, completed: false, status: 'Pendiente' }]);
+  const db = coordinatorDb();
+  const completedAt = new Date().toISOString();
+
+  await assertSucceeds(runTransaction(db, async transaction => {
+    transaction.update(doc(db, 'tasks', 'soar_12'), {
+      completed: true,
+      status: 'Completada',
+      progressPercentage: 100,
+      completions: {
+        'Lima__cycle-1': {
+          completed: true,
+          status: 'Completada',
+          cycleId: 'cycle-1',
+          cycleName: 'Cycle 1',
+          completedAt
+        }
+      },
+      completedAt
+    });
+    transaction.set(doc(db, 'mail', 'task_completed_event-1'), {
+      to: ['assigner@example.com'],
+      type: 'task_completed_alert',
+      delivery: { state: 'PENDING' },
+      createdAt: completedAt,
+      message: { subject: 'Task completed', html: '<p>Completed</p>' }
+    });
+    transaction.set(doc(db, 'notifications', 'task_completed_event-1'), {
+      userId: 'assigner@example.com',
+      title: 'Task completed',
+      message: 'A task was completed.',
+      taskId: 'soar_12',
+      type: 'task_completed',
+      read: false,
+      created_at: completedAt
+    });
+  }));
 });
 
 test('checklist_tasks uses the same per-user read authorization', async () => {

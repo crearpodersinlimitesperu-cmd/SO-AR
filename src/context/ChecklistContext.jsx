@@ -11,7 +11,7 @@ import { createGoogleTask } from '../services/googleSync';
 import { useUI } from './UIContext';
 import { useAuth } from './AuthContext';
 import { useCycles } from './CyclesContext';
-import { createCycleCompletion, getEffectiveCompletion, isCompletionTransition } from '../utils/taskLifecycle';
+import { createCycleCompletion, getEffectiveCompletion, getNextCompletionState, isCompletionTransition } from '../utils/taskLifecycle';
 
 const ChecklistContext = createContext();
 
@@ -372,13 +372,16 @@ export function ChecklistProvider({ children }) {
         const snapshot = await transaction.get(taskRef);
         const prevData = snapshot.exists() ? snapshot.data() : (baseTask || {});
         const nextUpdates = { ...updates };
-        const nextCompleted = updates.completed === true || updates.status === 'Completada';
+        const nextCompleted = getNextCompletionState(updates);
+        const includesProgressUpdate = updates.progress !== undefined || updates.progressPercentage !== undefined;
+        const includesCompletionUpdate = updates.completed !== undefined ||
+          updates.status !== undefined || includesProgressUpdate;
         let completionTransition = false;
 
         const hasDirectAssignees = Boolean(prevData.assignedToEmail) ||
           (Array.isArray(prevData.assignedToEmails) && prevData.assignedToEmails.length > 0);
         const scopeThisCompletion = isCycleScoped && !prevData.isCustom && !hasDirectAssignees;
-        if (scopeThisCompletion && (updates.completed !== undefined || updates.status !== undefined)) {
+        if (scopeThisCompletion && includesCompletionUpdate) {
           const previous = getEffectiveCompletion(prevData, {
             sede: cycleScope.sede,
             cycleId: cycleScope.cycle.id,
@@ -392,7 +395,7 @@ export function ChecklistProvider({ children }) {
             completionId: completionTransition ? completionId : prevData.completions?.[cycleKey]?.completionId
           });
           nextUpdates[`completions.${cycleKey}`] = completionEntry;
-        } else {
+        } else if (includesCompletionUpdate) {
           completionTransition = isCompletionTransition(
             prevData.completed === true || prevData.status === 'Completada',
             nextCompleted

@@ -33,6 +33,12 @@ export function isCompletionTransition(previousCompleted, nextCompleted) {
   return previousCompleted !== true && nextCompleted === true;
 }
 
+export function getNextCompletionState(updates) {
+  if (typeof updates?.completed === 'boolean') return updates.completed;
+  if (updates?.status === 'Completada') return true;
+  return updates?.progressPercentage === 100 || updates?.progress === 100;
+}
+
 export function createCycleCompletion(current = {}, { cycle, completed, updatedAt, completionId } = {}) {
   return {
     ...current,
