@@ -313,7 +313,7 @@ export default function GerenteDashboard() {
             </button>
           )}
           {(currentUser?.isSuperAdmin || currentUser?.appRole === 'gerente' || currentUser?.isDireccion || currentUser?.appRole === 'director_maestria') && (
-            <button className="btn-primary" onClick={() => setShowTaskForm(true)} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <button className="btn-primary" onClick={() => navigate('/metas')} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <PlusCircle size={16} /> Asignar Meta
             </button>
           )}
