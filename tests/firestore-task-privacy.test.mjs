@@ -197,3 +197,11 @@ test('C-01: ordinary self-owned task is creatable, critical/mass requires admin 
     assignedToEmails: ['a@example.com', 'b@example.com']
   }));
 });
+
+test('C-01: whitelisted manager without users/{uid} profile can create a critical mass task', async () => {
+  const db = testEnv.authenticatedContext('whitelist-1', { email: 'emely.leon@crearpsl.net' }).firestore();
+  await assertSucceeds(setDoc(doc(db, 'tasks', 'custom_whitelist_mass'), {
+    id: 'custom_whitelist_mass', isCustom: true, priority: '🔴 ROJO', isCritical: true,
+    assignedToEmails: ['a@example.com', 'b@example.com']
+  }));
+});

@@ -393,7 +393,7 @@ service cloud.firestore {
       allow read: if canReadTask(resource.data);
       allow create: if isChecklistCatalogTask(request.resource.data) ||
                     (requiresTaskAdminForCreate(request.resource.data)
-                      ? (isSuperAdmin() || hasVerifiedTaskAdminProfile())
+                      ? (isGerenteODireccion() || hasVerifiedTaskAdminProfile())
                       : (isSuperAdmin() || isGerenteODireccion() ||
                          (isOwner(request.resource.data) &&
                           !isReservedChecklistTaskId(request.resource.data.get('id', ''))) ||
