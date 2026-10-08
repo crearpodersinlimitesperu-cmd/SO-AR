@@ -281,9 +281,17 @@ const DEFAULT_SCHEDULE_TEMPLATE = [
     horario: '8:30 AM - 12:00 PM / 4:00 PM - Cierre',
     assignments: {},
     vestimenta: 'Camiseta negra + pantalón negro',
-    nota: 'FDS 4 El Viaje con Paul Sosa y Pase de Antorcha'
+    nota: 'Jornada Dominical MJ'
   }
 ];
+
+// Etiqueta errónea que quedó guardada en horarios de sedes; se reemplaza al cargar.
+const LEGACY_MJ_SUNDAY_NOTE = /FDS\s*4\s*El Viaje con Paul Sosa/i;
+const sanitizeScheduleRows = (rows) => rows.map(r => (
+  r && typeof r.nota === 'string' && LEGACY_MJ_SUNDAY_NOTE.test(r.nota)
+    ? { ...r, nota: 'Jornada Dominical MJ' }
+    : r
+));
 
 export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUser }) {
   const [activeTab, setActiveTab] = useState('matriz_equipos');
@@ -379,7 +387,7 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
           }
 
           if (data.rows && Array.isArray(data.rows) && data.rows.length > 0) {
-            setScheduleRows(data.rows);
+            setScheduleRows(sanitizeScheduleRows(data.rows));
           } else {
             // Inicializar filas con el equipo de la sede
             setScheduleRows(DEFAULT_SCHEDULE_TEMPLATE);
@@ -1799,7 +1807,7 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
               <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', margin: 0, lineHeight: '1.7' }}>
                 • Viernes: 3:00 PM - 9:00 PM (Alineamiento, Negro formal)<br/>
                 • Sábado: 8:30 AM - 12:00 PM y 4:00 PM - 9:00 PM (Camiseta negra + pantalón negro)<br/>
-                • Domingo: 8:30 AM - 12:00 PM y 4:00 PM - Cierre (FDS 4 El Viaje con Paul Sosa y Pase de Antorcha a las 18:00 PM)
+                • Domingo: 8:30 AM - 12:00 PM y 4:00 PM - Cierre (Camiseta negra + pantalón negro)
               </p>
             </div>
           )}
