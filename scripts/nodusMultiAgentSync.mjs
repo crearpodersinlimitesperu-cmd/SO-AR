@@ -1415,8 +1415,6 @@ export async function runMultiAgentSync() {
     } catch (crmErr) {
       console.error("⚠️ [Agente 8 - CausaNodusCRMSyncAgent] Error no bloqueante en CRM sync:", crmErr.message);
     }
-      console.error("⚠️ [Agente 7 - Genealogista] Error no bloqueante al construir el linaje:", genErr.message);
-    }
 
     console.log("✨ PIPELINE MULTI-AGENTE COMPLETADO EXITOSAMENTE");
     console.log(`   Coordinadores: ${normalized.coordinadores.length}`);
