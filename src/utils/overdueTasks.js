@@ -79,3 +79,22 @@ export const getOverdueAssignedTasks = (tasks, userEmail, now = Date.now(), opti
 };
 
 export const getTaskDisplayName = (t) => t.title || t.task || t.name || 'Tarea sin título';
+
+export const OVERDUE_GROWTH_PER_HOUR = 0.06;
+export const OVERDUE_MAX_SCALE = 2;
+
+/**
+ * Escala de la alerta: crece cada hora completa desde que la tarea vencida más
+ * antigua superó el umbral de 72 h, hasta OVERDUE_MAX_SCALE. Vuelve a 1 al
+ * completar todas las tareas vencidas.
+ */
+export const getOverdueEscalation = (overdueTasks, now = Date.now()) => {
+  const nowMs = now instanceof Date ? now.getTime() : now;
+  const deadlines = (Array.isArray(overdueTasks) ? overdueTasks : [])
+    .map(t => toMs(t?.deadline))
+    .filter(ms => ms !== null);
+  if (deadlines.length === 0) return { hours: 0, scale: 1 };
+  const hours = Math.max(0, Math.floor((nowMs - Math.min(...deadlines) - OVERDUE_THRESHOLD_MS) / 3600000));
+  const scale = Math.min(OVERDUE_MAX_SCALE, 1 + hours * OVERDUE_GROWTH_PER_HOUR);
+  return { hours, scale: Math.round(scale * 100) / 100 };
+};

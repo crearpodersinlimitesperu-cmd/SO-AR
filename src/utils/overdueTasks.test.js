@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { getOverdueAssignedTasks, isTaskDoneForUser } from './overdueTasks.js';
+import { getOverdueAssignedTasks, isTaskDoneForUser, getOverdueEscalation } from './overdueTasks.js';
 
 const NOW = Date.parse('2026-10-10T12:00:00Z');
 const H = 3600 * 1000;
@@ -119,4 +119,11 @@ test('isTaskDoneForUser matches per-user and global completion', () => {
   assert.equal(isTaskDoneForUser({ completions: { Lima: { completed: true } } }, me, { sede: 'Lima' }), true);
   assert.equal(isTaskDoneForUser({ assigneeProgress: { 'x@crearpsl.net': { completed: true } } }, me), false);
   assert.equal(isTaskDoneForUser(null, me), false);
+});
+
+test('alert grows each full hour after 72h, capped at 2x, resets when none', () => {
+  assert.deepEqual(getOverdueEscalation([], NOW), { hours: 0, scale: 1 });
+  assert.deepEqual(getOverdueEscalation([{ deadline: at(72.5) }], NOW), { hours: 0, scale: 1 });
+  assert.deepEqual(getOverdueEscalation([{ deadline: at(73) }, { deadline: at(80) }], NOW), { hours: 8, scale: 1.48 });
+  assert.equal(getOverdueEscalation([{ deadline: at(500) }], NOW).scale, 2);
 });

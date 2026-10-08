@@ -40,7 +40,7 @@ import {
 import EffectiveCommunicationButton from '../components/EffectiveCommunicationButton';
 import { getAllCompanyUsers } from '../services/userService';
 import UserProfileModal from '../components/UserProfileModal';
-import { getOverdueAssignedTasks, isTaskDoneForUser } from '../utils/overdueTasks';
+import { getOverdueAssignedTasks, isTaskDoneForUser, getOverdueEscalation } from '../utils/overdueTasks';
 import HorariosEntrenamientoModal from '../components/HorariosEntrenamientoModal';
 import { INITIAL_MANAGERS, normalizeTrainer } from '../data/managersData';
 import { formatTrainerDisplayName, nombreLegalEntrenador, normalizarIdentidadEntrenador } from '../data/trainerAliases';
@@ -1507,13 +1507,18 @@ export default function Home() {
   // Si por algún motivo el registro no aparece todavía en realUsersData (ej. aún
   // cargando), cae de vuelta a currentUser tal cual — UserProfileModal ya sabe
   // mostrar un aviso si ese objeto no tiene un id real de Firestore para guardar.
-  const myOverdueCount = useMemo(
+  const myOverdueTasks = useMemo(
     () => getOverdueAssignedTasks(allTasks, currentUser?.email, Date.now(), {
       sede: currentUser?.sede,
       cycleId: currentCycle?.id,
       cycleIds: (quitoCycles || []).map(qc => qc?.cycle?.id)
-    }).length,
+    }),
     [allTasks, currentUser?.email, currentUser?.sede, currentCycle?.id, quitoCycles, time]
+  );
+  const myOverdueCount = myOverdueTasks.length;
+  const overdueEscalation = useMemo(
+    () => getOverdueEscalation(myOverdueTasks, Date.now()),
+    [myOverdueTasks, time]
   );
 
   const handleOpenMyProfile = () => {
@@ -1761,7 +1766,9 @@ export default function Home() {
             <button
               onClick={handleOpenMyProfile}
               className={myOverdueCount > 0 ? 'overdue-profile-btn' : undefined}
-              title={myOverdueCount > 0 ? `Tienes ${myOverdueCount} tarea(s) vencida(s) hace más de 72 h` : 'Ver y editar mi perfil'}
+              title={myOverdueCount > 0
+                ? `Tienes ${myOverdueCount} tarea(s) vencida(s) hace más de 72 h${overdueEscalation.hours > 0 ? ` · la alerta crece cada hora (+${overdueEscalation.hours} h)` : ''}`
+                : 'Ver y editar mi perfil'}
               aria-label={myOverdueCount > 0
                 ? `Mi Perfil: ${myOverdueCount} ${myOverdueCount === 1 ? 'tarea vencida' : 'tareas vencidas'} hace más de 72 horas`
                 : 'Mi Perfil'}
@@ -1769,16 +1776,17 @@ export default function Home() {
                 display: 'flex', alignItems: 'center', gap: '0.4rem',
                 background: myOverdueCount > 0 ? 'linear-gradient(135deg, #dc2626, #ea580c)' : 'rgba(255,255,255,0.06)',
                 border: myOverdueCount > 0 ? '2px solid #fecaca' : '1px solid var(--border-strong)',
-                borderRadius: '8px', padding: '0.35rem 0.7rem', cursor: 'pointer',
-                color: myOverdueCount > 0 ? '#ffffff' : 'var(--text-main)', fontSize: '0.78rem', fontWeight: myOverdueCount > 0 ? 800 : 600
+                borderRadius: '8px', padding: myOverdueCount > 0 ? `${0.35 * overdueEscalation.scale}rem ${0.7 * overdueEscalation.scale}rem` : '0.35rem 0.7rem', cursor: 'pointer',
+                color: myOverdueCount > 0 ? '#ffffff' : 'var(--text-main)', fontSize: myOverdueCount > 0 ? `${0.78 * overdueEscalation.scale}rem` : '0.78rem', fontWeight: myOverdueCount > 0 ? 800 : 600,
+                transition: 'font-size 0.6s ease, padding 0.6s ease'
               }}
             >
               {myOverdueCount > 0
-                ? <AlertTriangle size={15} aria-hidden="true" style={{ color: '#fff' }} />
+                ? <AlertTriangle size={Math.round(15 * overdueEscalation.scale)} aria-hidden="true" style={{ color: '#fff' }} />
                 : <User size={14} aria-hidden="true" style={{ color: 'var(--crear-gold)' }} />}
               Mi Perfil
               {myOverdueCount > 0 && (
-                <span aria-hidden="true" style={{ background: '#fff', color: '#b91c1c', borderRadius: '999px', padding: '0 0.5rem', fontSize: '0.75rem', fontWeight: 900, minWidth: '1.3rem', textAlign: 'center' }}>
+                <span aria-hidden="true" style={{ background: '#fff', color: '#b91c1c', borderRadius: '999px', padding: '0 0.5rem', fontSize: `${0.75 * overdueEscalation.scale}rem`, fontWeight: 900, minWidth: '1.3em', textAlign: 'center' }}>
                   {myOverdueCount}
                 </span>
               )}
