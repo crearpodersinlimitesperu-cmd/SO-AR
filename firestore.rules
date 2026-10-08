@@ -61,11 +61,19 @@ service cloud.firestore {
 
     // Debe coincidir con SUPER_ADMIN_EMAILS en src/config/permissions.js
     function isSuperAdmin() {
-      return isAuthenticated() && email() in [
-        'jose.sanchez@crearpsl.net',
-        'armando.pilacuan@gmail.com',
-        'paul.sosa@crearpsl.net'
-      ];
+      return isAuthenticated() && (
+        email() in [
+          'jose.sanchez@crearpsl.net',
+          'jose.sanchez@crearpsl.com',
+          'armando.pilacuan@gmail.com',
+          'paul.sosa@crearpsl.net'
+        ] ||
+        callerEmailAliases().hasAny([
+          'jose.sanchez@crearpsl.net',
+          'armando.pilacuan@gmail.com',
+          'paul.sosa@crearpsl.net'
+        ])
+      );
     }
 
     // Lista extra├¡da de usersToImport.js (snapshot GitHub, roles gerente/direccion/
@@ -239,11 +247,12 @@ service cloud.firestore {
     }
 
     function canReadTask(taskData) {
-      return isOwner(taskData) ||
+      return isSuperAdmin() ||
+        isGerenteODireccion() ||
+        isOwner(taskData) ||
         isCollaborator(taskData) ||
         isChecklistCatalogTask(taskData) ||
-        ((isGerenteODireccion() || callerHasTaskRole('gerente') ||
-          callerHasTaskRole('direccion')) &&
+        ((callerHasTaskRole('gerente') || callerHasTaskRole('direccion')) &&
          taskData.get('isValidation', false) == true);
     }
 
