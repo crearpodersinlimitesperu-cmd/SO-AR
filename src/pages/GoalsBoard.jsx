@@ -10,6 +10,7 @@ import GoalDivisionModal from '../components/GoalDivisionModal';
 import { normalizeSede } from '../data/usersData';
 import nodusFallbackData from '../data/nodusFallbackData.json';
 import { auditSingleGoal, auditAllGoals, extractTeamNumber } from '../services/goalsSentinelAgent';
+import { organizeGoalsByTeam, mjStageForTeam, explicitGoalTeam, goalStageKey, localDateKey } from '../services/goalsTimeline';
 
 export default function GoalsBoard() {
   const { currentUser } = useAuth();
@@ -69,6 +70,8 @@ export default function GoalsBoard() {
   // Modal de Asignación / División de Metas
   const [selectedGoalForAssignment, setSelectedGoalForAssignment] = useState(null);
   const [showDivisionModal, setShowDivisionModal] = useState(false);
+  const [expandedTeamGroups, setExpandedTeamGroups] = useState({});
+  const [aligningGroupKey, setAligningGroupKey] = useState(null);
 
   // Calendarios y Reportes para sincronización y avance automático
   const [mjCalendars, setMjCalendars] = useState([]);
@@ -429,24 +432,11 @@ export default function GoalsBoard() {
       const eqStr = String(ev.equipo || '').trim();
       if (!eqStr.includes(String(teamNum))) continue;
 
-      let teams = [];
-      if (eqStr.length === 6) {
-        teams = [eqStr.slice(0, 2), eqStr.slice(2, 4), eqStr.slice(4, 6)];
-      } else if (eqStr.length === 9) {
-        teams = [eqStr.slice(0, 3), eqStr.slice(3, 6), eqStr.slice(6, 9)];
-      } else {
-        teams = [eqStr];
-      }
-
-      const idx = teams.indexOf(String(teamNum));
-      if (idx === -1) continue;
-
-      // idx 0 = 3er FDS Gratitud
-      // idx 1 = 2do FDS Relación
-      // idx 2 = 1er FDS Creación
-      if ((stageNorm.includes('creac') || stageNorm === 'c1_mj') && idx === 2) return ev;
-      if ((stageNorm.includes('relac') || stageNorm === 'c2_mj') && idx === 1) return ev;
-      if ((stageNorm.includes('grat') || stageNorm === 'c3_mj') && idx === 0) return ev;
+      const cohortStage = mjStageForTeam(eqStr, teamNum);
+      if (!cohortStage) continue;
+      if ((stageNorm.includes('creac') || stageNorm === 'c1_mj') && cohortStage === 'MJ_CREACION') return ev;
+      if ((stageNorm.includes('relac') || stageNorm === 'c2_mj') && cohortStage === 'MJ_RELACION') return ev;
+      if ((stageNorm.includes('grat') || stageNorm === 'c3_mj') && cohortStage === 'MJ_GRATITUD') return ev;
     }
     return null;
   };
@@ -700,18 +690,19 @@ export default function GoalsBoard() {
   };
 
   // Corrección y Re-alineación de Ciclo para coherencia de Equipos
-  const handleFixTeamAlignment = async (goal) => {
+  const handleFixTeamAlignment = async (goal, { cycleOverride = null, silent = false } = {}) => {
     const effectiveSede = goal.sede || (selectedSedeFilter !== 'Todas' ? selectedSedeFilter : '') || currentUser?.sede || 'Lima';
-    const childTeam = extractTeamNumber(goal, null, effectiveSede);
-    if (!childTeam) return;
+    const childTeam = explicitGoalTeam(goal) || extractTeamNumber(goal, null, effectiveSede);
+    if (!childTeam) return null;
 
     try {
       const sede = normalizeSede(effectiveSede);
       // Buscar si ya existe la meta de ciclo para este equipo
-      let targetCycle = goals.find(g => 
-        normalizeSede(g.sede || '') === sede && 
-        g.scope === 'CICLO' && 
-        (g.title.includes(childTeam) || extractTeamNumber(g) === childTeam)
+      let targetCycle = cycleOverride || goals.find(g =>
+        normalizeSede(g.sede || '') === sede &&
+        g.scope === 'CICLO' &&
+        !g.parentId &&
+        explicitGoalTeam(g) === String(Number(childTeam))
       );
 
       if (!targetCycle) {
@@ -740,11 +731,28 @@ export default function GoalsBoard() {
         updatedAt: new Date().toISOString()
       });
 
-      showToast(`✅ Meta re-alineada con éxito al Ciclo del Equipo ${childTeam}.`, 'success');
+      if (!silent) showToast(`✅ Meta re-alineada con éxito al Ciclo del Equipo ${childTeam}.`, 'success');
+      return targetCycle;
     } catch (err) {
       console.error('Error re-alineando meta al ciclo:', err);
       showToast('Error al re-alinear meta: ' + err.message, 'error');
+      return null;
     }
+  };
+
+  const handleAlignTeamGroup = async (group) => {
+    if (!group?.misaligned?.length) return;
+    const names = group.misaligned.map(g => `• ${g.title}`).join('\n');
+    if (!window.confirm(`Mover ${group.misaligned.length} meta(s) al Ciclo del Equipo ${group.team} (${group.sede}):\n\n${names}\n\nSolo cambia a qué ciclo aportan; no borra avances.`)) return;
+    setAligningGroupKey(group.key);
+    let cycle = group.cycles[0] || null;
+    let moved = 0;
+    for (const goal of group.misaligned) {
+      const result = await handleFixTeamAlignment(goal, { cycleOverride: cycle, silent: true });
+      if (result) { cycle = result; moved += 1; }
+    }
+    setAligningGroupKey(null);
+    showToast(`✅ ${moved} meta(s) alineadas al Ciclo del Equipo ${group.team}.`, moved ? 'success' : 'error');
   };
 
   const handleSyncReportsProgress = async (goal, totalOk) => {
@@ -836,10 +844,15 @@ export default function GoalsBoard() {
       setLimaAliadosData(parsedAliados);
 
       // Buscar la meta de Aliados C1 para Lima
-      const limaGoal = targetGoal || goals.find(g => 
-        (normalizeSede(g.sede || '') === 'Lima') && 
-        (g.title?.toLowerCase().includes('aliados') && (g.title?.includes('1') || g.title?.toLowerCase().includes('c1') || g.stage === 'C1'))
-      );
+      const isLimaAliadosC1 = (g) =>
+        normalizeSede(g.sede || '') === 'Lima' &&
+        g.title?.toLowerCase().includes('aliados') &&
+        goalStageKey(g) === 'C1';
+      // La hoja oficial GID_ALIADOS corresponde al equipo C1E31 de Lima.
+      const sheetTeam = '31';
+      const limaGoal = targetGoal ||
+        goals.find(g => isLimaAliadosC1(g) && explicitGoalTeam(g) === sheetTeam) ||
+        goals.find(g => isLimaAliadosC1(g) && g.autoSyncedFromLimaSheet && !explicitGoalTeam(g));
 
       const assignedCoordinators = [
         {
@@ -900,10 +913,10 @@ export default function GoalsBoard() {
         await performRollUp(limaGoal.id, newProgress);
         showToast('Metas de Lima sincronizadas: ' + totalOk + ' Aliados confirmados (' + newProgress + '%). Joyce: ' + coordStats.JOYCE.ok + ', Diana: ' + coordStats.DIANA.ok + '.', 'success');
       } else {
-        const limaCycle = goals.find(g => normalizeSede(g.sede || '') === 'Lima' && g.scope === 'CICLO');
+        const limaCycle = goals.find(g => normalizeSede(g.sede || '') === 'Lima' && g.scope === 'CICLO' && !g.parentId && explicitGoalTeam(g) === sheetTeam);
         const newRef = doc(collection(db, 'goals'));
         await setDoc(newRef, {
-          title: 'Aliados - Capítulo 1',
+          title: `Aliados C1E${sheetTeam} Lima (Oficial Sheet)`,
           kpi: 'Cantidad de Aliados',
           targetValue: 32,
           currentValue: totalOk,
@@ -1420,6 +1433,131 @@ export default function GoalsBoard() {
   const openAssignmentModal = (goal) => {
     setSelectedGoalForAssignment(goal);
     setShowDivisionModal(true);
+  };
+
+  const TEAM_GROUP_STATUS = {
+    activo: { label: 'Ciclo en curso', color: '#22c55e' },
+    proximo: { label: 'Próximo ciclo', color: '#38bdf8' },
+    sin_calendario: { label: 'Sin fechas en el calendario oficial', color: '#eab308' },
+    finalizado: { label: 'Ciclo finalizado', color: '#94a3b8' },
+    legado: { label: 'Metas sin sede', color: '#f97316' }
+  };
+
+  const renderTeamGroup = (group) => {
+    const statusInfo = TEAM_GROUP_STATUS[group.status] || TEAM_GROUP_STATUS.sin_calendario;
+    const defaultOpen = group.status !== 'finalizado' && group.status !== 'legado';
+    const isOpen = expandedTeamGroups[group.key] ?? defaultOpen;
+    const todayStr = localDateKey();
+    const stageDates = Object.fromEntries((group.schedule?.stages || []).map(st => [st.key, st]));
+    const earlyGoals = group.children.filter(g => {
+      const st = stageDates[goalStageKey(g)];
+      return st && st.start > todayStr && Number(g.progress || 0) > 0;
+    });
+    const title = group.key === 'legado'
+      ? 'Metas sin sede asignada'
+      : group.team ? `Equipo ${group.team} · ${group.sede}` : `${group.sede} · sin equipo identificado`;
+    const goalCount = group.cycles.length + group.children.length;
+    const momentText = group.current
+      ? `En sala: ${group.current.label} (${formatCalendarDateRange(group.current.start, group.current.end)})`
+      : group.next
+        ? `Próxima etapa: ${group.next.label} · ${formatCalendarDateRange(group.next.start, group.next.end)}`
+        : null;
+
+    return (
+      <section key={group.key} aria-label={title} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <div className="glass-panel" style={{ padding: '1rem 1.25rem', borderLeft: `4px solid ${statusInfo.color}` }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+            <button
+              type="button"
+              onClick={() => setExpandedTeamGroups(prev => ({ ...prev, [group.key]: !isOpen }))}
+              aria-expanded={isOpen}
+              style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: 0, textAlign: 'left' }}
+            >
+              <ChevronRight size={18} style={{ transform: isOpen ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }} />
+              <span style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-heading)' }}>{title}</span>
+              <span style={{ fontSize: '0.72rem', fontWeight: 700, color: statusInfo.color, border: `1px solid ${statusInfo.color}`, borderRadius: '999px', padding: '2px 8px' }}>{statusInfo.label}</span>
+              <span className="text-muted" style={{ fontSize: '0.8rem' }}>{goalCount} meta{goalCount === 1 ? '' : 's'}</span>
+            </button>
+            {group.childProgress !== null && (
+              <span className="text-muted" style={{ fontSize: '0.82rem' }} title="Promedio del avance de las metas que aportan a este ciclo">
+                Avance de sus metas: <strong style={{ color: 'var(--text-heading)' }}>{group.childProgress}%</strong>
+              </span>
+            )}
+          </div>
+
+          {momentText && (
+            <div style={{ marginTop: '0.5rem', fontSize: '0.85rem', color: group.current ? '#22c55e' : '#38bdf8', fontWeight: 600 }}>
+              <Calendar size={13} style={{ verticalAlign: '-2px', marginRight: 4 }} />{momentText}
+            </div>
+          )}
+
+          {group.schedule && (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginTop: '0.6rem' }}>
+              {group.schedule.stages.map(st => {
+                const past = st.end < todayStr;
+                const live = st.start <= todayStr && st.end >= todayStr;
+                return (
+                  <span key={st.key} style={{
+                    fontSize: '0.72rem', padding: '3px 8px', borderRadius: '6px',
+                    background: live ? 'rgba(34,197,94,0.18)' : 'rgba(255,255,255,0.05)',
+                    border: `1px solid ${live ? 'rgba(34,197,94,0.5)' : 'rgba(255,255,255,0.1)'}`,
+                    color: past ? '#94a3b8' : 'var(--text-heading)',
+                    textDecoration: past ? 'line-through' : 'none'
+                  }}>
+                    {st.label}: {formatCalendarDateRange(st.start, st.end)}
+                  </span>
+                );
+              })}
+            </div>
+          )}
+
+          {group.key === 'legado' && (
+            <p className="text-muted" style={{ margin: '0.6rem 0 0', fontSize: '0.8rem' }}>
+              Estas metas no tienen sede. Revisa si duplican un ciclo existente antes de usarlas; no se modifican automáticamente.
+            </p>
+          )}
+          {group.duplicateCycles && (
+            <p style={{ margin: '0.6rem 0 0', fontSize: '0.8rem', color: '#f59e0b' }}>
+              ⚠️ Hay {group.cycles.length} metas globales para este mismo equipo y sede.
+            </p>
+          )}
+          {earlyGoals.length > 0 && (
+            <p style={{ margin: '0.6rem 0 0', fontSize: '0.8rem', color: '#f59e0b' }}>
+              ⚠️ {earlyGoals.length} meta(s) tienen avance en una etapa que este equipo aún no vive: {earlyGoals.map(g => g.title).join(', ')}. Revisa si pertenecen a otro equipo.
+            </p>
+          )}
+          {group.misaligned.length > 0 && (
+            <div style={{ marginTop: '0.6rem', display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+              <span style={{ fontSize: '0.8rem', color: '#f59e0b' }}>
+                ⚠️ {group.misaligned.length} meta(s) del Equipo {group.team} aportan al ciclo de otro equipo.
+              </span>
+              {canManageGoals && (
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  disabled={aligningGroupKey === group.key}
+                  onClick={() => handleAlignTeamGroup(group)}
+                  style={{ fontSize: '0.75rem', padding: '0.3rem 0.7rem' }}
+                >
+                  {aligningGroupKey === group.key ? 'Alineando…' : `Alinear al Ciclo Eq. ${group.team}`}
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+
+        {isOpen && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {group.cycles.map(renderGoal)}
+            {group.children.length > 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', paddingLeft: group.cycles.length ? '1rem' : 0, borderLeft: group.cycles.length ? '2px solid rgba(255,255,255,0.08)' : 'none' }}>
+                {group.children.map(renderGoal)}
+              </div>
+            )}
+          </div>
+        )}
+      </section>
+    );
   };
 
   const renderGoal = (goal) => {
@@ -2182,7 +2320,7 @@ export default function GoalsBoard() {
               </div>
             );
           }
-          return filteredGoals.map(renderGoal);
+          return organizeGoalsByTeam(filteredGoals, { events, today: localDateKey() }).map(renderTeamGroup);
         })()}
       </div>
 
