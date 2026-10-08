@@ -852,27 +852,32 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
       <div style={{
         position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
         backgroundColor: 'rgba(5, 10, 25, 0.85)', backdropFilter: 'blur(8px)',
-        zIndex: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem'
+        zIndex: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem',
+        boxSizing: 'border-box', overflowY: 'auto'
       }}>
-        <div className="glass-panel" style={{
-          width: '100%', maxWidth: '850px', maxHeight: '92vh', display: 'flex', flexDirection: 'column',
+        <div className="glass-panel" role="dialog" aria-label={`Perfil de ${user.name}`} tabIndex={0} style={{
+          width: '100%', maxWidth: '850px', maxHeight: 'calc(100dvh - 2rem)', boxSizing: 'border-box',
           position: 'relative', border: `1px solid ${roleColor}40`, boxShadow: `0 10px 40px rgba(0,0,0,0.8), 0 0 20px ${roleColor}20`,
-          borderRadius: '16px', overflowY: 'auto'
+          borderRadius: '16px', overflowY: 'auto', overscrollBehavior: 'contain'
         }}>
-          {/* Close button */}
-          <button 
-            onClick={onClose}
-            style={{
-              position: 'absolute', top: '1.2rem', right: '1.2rem', background: 'rgba(255,255,255,0.08)',
-              border: 'none', color: '#fff', borderRadius: '50%', width: '36px', height: '36px',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10,
-              transition: 'background 0.2s'
-            }}
-            onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
-            onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
-          >
-            <X size={20} />
-          </button>
+          {/* Keep the close button visible while the entire profile scrolls. */}
+          <div style={{ position: 'sticky', top: 0, height: 0, zIndex: 10 }}>
+            <button
+              type="button"
+              aria-label="Cerrar perfil"
+              onClick={onClose}
+              style={{
+                position: 'absolute', top: '1.2rem', right: '1.2rem', background: 'rgba(255,255,255,0.08)',
+                border: 'none', color: '#fff', borderRadius: '50%', width: '36px', height: '36px',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10,
+                transition: 'background 0.2s'
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
+            >
+              <X size={20} />
+            </button>
+          </div>
 
           {/* User Header Profile Card */}
           <div style={{
@@ -1543,8 +1548,8 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
             </div>
           </div>
 
-          {/* Modal Body with scroll */}
-          <div style={{ padding: '1.5rem 2rem', overflowY: 'auto', flex: 1 }}>
+          {/* Modal Body */}
+          <div style={{ padding: '1.5rem 2rem' }}>
 
             {overdueAlertTasks.length > 0 && (
               <div role="alert" style={{ marginBottom: '1rem', padding: '1rem 1.1rem', borderRadius: '10px', background: 'linear-gradient(135deg, #b91c1c, #c2410c)', border: '3px solid #fecaca', borderLeft: '10px solid #fde047', boxShadow: '0 0 0 1px #7f1d1d, 0 4px 14px rgba(220,38,38,0.45)', color: '#ffffff' }}>
