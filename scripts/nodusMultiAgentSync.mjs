@@ -1070,6 +1070,9 @@ class NodusDispatcherAgent {
       if (!eq.participantes) continue;
       for (const p of eq.participantes) {
         if (!p.imo) continue;
+        // Filas de estado de pago ("Pagado (S/. ...)", "Sin pago ...") no son personas.
+        if (/^(sin pago|pagado|pago)\b|S\/\.|\d/i.test(`${p.nombres || ''} ${p.apellidos || ''}`.trim())) continue;
+        if (/^sin (invitador|imo|enrolador)\b/i.test(String(p.imo).trim())) continue;
         const imoName = p.imo.trim();
         if (!imoName) continue;
 
@@ -1097,19 +1100,21 @@ class NodusDispatcherAgent {
         else if (eqUpper.includes("MEDELLIN") || eqUpper.includes("MEDELLÍN")) sedeDetectada = "Medellín";
         else if (eqUpper.includes("MEXICO") || eqUpper.includes("MÉXICO")) sedeDetectada = "México";
 
-        if (!imoMissionsMap[imoName]) {
-          imoMissionsMap[imoName] = {
+        // Un registro por IMO y equipo de ingreso: el reporte de Nodus lista a los
+        // participantes del equipo que entra a C1, no el equipo propio del IMO.
+        const missionKey = `${imoName}__${eq.equipoId}`;
+        const targetTeamMatch = String(eq.equipoNombre || '').match(/EQUIPO\s+(\d+)/i);
+        if (!imoMissionsMap[missionKey]) {
+          imoMissionsMap[missionKey] = {
             id: `imo_${imoName.toLowerCase().replace(/[^a-z0-9]/g, '_')}_${eq.equipoId}`,
             imoNombre: imoName,
             equipo: normalizedEquipo,
+            ...(targetTeamMatch ? { targetTeam: Number(targetTeamMatch[1]) } : {}),
             sede: sedeDetectada,
             enrolados: [],
             checks: {},
             lastUpdated: timestamp,
           };
-        } else if (imoMissionsMap[imoName].sede === "No especificada" || imoMissionsMap[imoName].sede === "Lima") {
-          imoMissionsMap[imoName].sede = sedeDetectada;
-          imoMissionsMap[imoName].equipo = normalizedEquipo;
         }
 
         const cleanPhone = (p.telefono || '').replace(/\D/g, '');
@@ -1119,7 +1124,7 @@ class NodusDispatcherAgent {
         const hasContacto = (p.llamada1 && p.llamada1.trim() !== '') || (p.llamada2 && p.llamada2.trim() !== '');
 
         // Evitar duplicados dentro de la misión
-        const yaExiste = imoMissionsMap[imoName].enrolados.some(e => {
+        const yaExiste = imoMissionsMap[missionKey].enrolados.some(e => {
           const eCleanPhone = (e.telefono || '').replace(/\D/g, '');
           if (cleanPhone.length >= 7 && eCleanPhone.length >= 7 && (cleanPhone === eCleanPhone || cleanPhone.endsWith(eCleanPhone) || eCleanPhone.endsWith(cleanPhone))) {
             return true;
@@ -1132,7 +1137,7 @@ class NodusDispatcherAgent {
         });
 
         if (!yaExiste) {
-          imoMissionsMap[imoName].enrolados.push({
+          imoMissionsMap[missionKey].enrolados.push({
             id: enroladoId,
             nombre: `${p.nombres || ''} ${p.apellidos || ''}`.trim(),
             telefono: p.telefono || '',
@@ -1142,16 +1147,16 @@ class NodusDispatcherAgent {
         }
 
         // Registrar o actualizar checks
-        imoMissionsMap[imoName].checks[enroladoId] = {
-          contacto: !!hasContacto || (imoMissionsMap[imoName].checks[enroladoId]?.contacto || false),
-          asistencia: !!hasAsistencia || (imoMissionsMap[imoName].checks[enroladoId]?.asistencia || false)
+        imoMissionsMap[missionKey].checks[enroladoId] = {
+          contacto: !!hasContacto || (imoMissionsMap[missionKey].checks[enroladoId]?.contacto || false),
+          asistencia: !!hasAsistencia || (imoMissionsMap[missionKey].checks[enroladoId]?.asistencia || false)
         };
       }
     }
 
     let misionesGuardadas = 0;
-    for (const imoName in imoMissionsMap) {
-      const mission = imoMissionsMap[imoName];
+    for (const missionKey in imoMissionsMap) {
+      const mission = imoMissionsMap[missionKey];
       mission.totalEnrolados = mission.enrolados.length;
       
       // Contar completados solo entre los enrolados vigentes y únicos
