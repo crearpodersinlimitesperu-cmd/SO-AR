@@ -8,6 +8,7 @@ on:
       - 'firestore.indexes.json'
       - 'package.json'
       - 'package-lock.json'
+      - 'scripts/nodusMultiAgentSync.mjs'
       - 'src/**'
       - 'tests/**'
       - '.github/workflows/validate-task-privacy.yml'
