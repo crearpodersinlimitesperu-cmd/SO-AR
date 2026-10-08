@@ -10,7 +10,7 @@ import { roles } from '../data/checklistData';
 import { usersData, normalizeRole, normalizeSede, OPERATIONAL_SEDES, isForeignTask, ROLE_COLORS, ROLE_DISPLAY_NAMES, getRoleDisplayName } from '../data/usersData';
 import { calculateAutomaticDeadline } from '../utils/soarDates';
 import { isTaskVisibleForUser } from '../utils/taskPrivacy';
-import { ArrowLeft, Target, Link as LinkIcon, Edit3, Clock, ShieldAlert, Users, Sparkles, MapPin, Search, X } from 'lucide-react';
+import { ArrowLeft, Target, Link as LinkIcon, Edit3, Clock, ShieldAlert, Users, Sparkles, MapPin, Search, X, ChevronDown, ChevronUp } from 'lucide-react';
 import TaskAssignmentModal from '../components/TaskAssignmentModal';
 import TaskCollaborationModal from '../components/TaskCollaborationModal';
 import LearningReflectionModal from '../components/LearningReflectionModal';
@@ -65,6 +65,7 @@ export default function ChecklistBoard() {
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState(null);
   const [processingTasks, setProcessingTasks] = useState(new Set());
+  const [collapsedTaskCards, setCollapsedTaskCards] = useState(new Set());
   const [showCollabModal, setShowCollabModal] = useState(false);
   const [showSyncHistoryModal, setShowSyncHistoryModal] = useState(false);
   const [selectedTaskForCollab, setSelectedTaskForCollab] = useState(null);
@@ -236,16 +237,6 @@ export default function ChecklistBoard() {
   // Pestañas de fases operativas: permanentemente activas para todos los usuarios de oficina (PRE-C1, C1, POST-C1, PRE-C2, C2, PRE-MJ, MJ, POST-MJ)
   const showPhaseTabs = true;
   const isCurrentStageInRole = effectiveStage && PHASE_ORDER.includes(effectiveStage);
-  const hasTasksForCurrentStage = myTasks.some(task => task.cyclePhase === effectiveStage);
-
-  // AUTO-FALLBACK: Si la pestaña actual es 'active', pero el rol no tiene tareas asignadas
-  // para esa fase cronológica, y SÍ tiene tareas en general, cambiamos automáticamente 
-  // la pestaña a 'all' (Todo el Catálogo) para evitar que el usuario vea un tablero vacío.
-  useEffect(() => {
-    if (isAuthorized && qtPhaseFilter === 'active' && isCurrentStageInRole && myTasks.length > 0 && !hasTasksForCurrentStage) {
-      setQtPhaseFilter('all');
-    }
-  }, [isAuthorized, qtPhaseFilter, isCurrentStageInRole, myTasks.length, hasTasksForCurrentStage]);
 
   if (!isAuthorized) {
     return (
@@ -364,7 +355,7 @@ export default function ChecklistBoard() {
     if (task.completed || task.status === 'Completada') {
       try {
         setProcessingTasks(prev => new Set(prev).add(task.id));
-        await toggleTask(task.id, true, task.equipoQuito);
+        await toggleTask(task.uiKey || task.id, true, task.equipoQuito);
       } catch (err) {
         console.error("Error toggling task status:", err);
       } finally {
@@ -393,7 +384,7 @@ export default function ChecklistBoard() {
     if (!task) return;
     try {
       setProcessingTasks(prev => new Set(prev).add(task.id));
-      await toggleTask(task.id, false, task.equipoQuito);
+      await toggleTask(task.uiKey || task.id, false, task.equipoQuito);
       celebrateVictory();
     } catch (err) {
       console.error("Error al forzar completado de tarea ajena:", err);
@@ -411,7 +402,7 @@ export default function ChecklistBoard() {
     setTaskForCompletionChoice(null);
     try {
       setProcessingTasks(prev => new Set(prev).add(task.id));
-      await toggleTask(task.id, false, task.equipoQuito);
+      await toggleTask(task.uiKey || task.id, false, task.equipoQuito);
       celebrateVictory();
     } catch (err) {
       console.error("Error al completar tarea:", err);
@@ -928,8 +919,10 @@ export default function ChecklistBoard() {
           activeTasks.map(task => {
             const isForeign = isForeignTask(task, currentUser);
             const taskSede = task.assignedSede || task.sede;
+            const taskKey = task.uiKey || task.id;
+            const isCollapsed = collapsedTaskCards.has(taskKey);
             return (
-            <div key={task.uiKey || task.id} className="glass-panel hover-glow" style={{ padding: '1.5rem', borderLeft: `4px solid ${isForeign ? '#ef4444' : getPriorityColor(task.priority)}`, opacity: task.completed ? 0.6 : 1, transition: 'all 0.3s' }}>
+            <div key={taskKey} className={`glass-panel hover-glow task-card${isCollapsed ? ' task-card-collapsed' : ''}`} style={{ padding: '1.5rem', borderLeft: `4px solid ${isForeign ? '#ef4444' : getPriorityColor(task.priority)}`, opacity: task.completed ? 0.6 : 1, transition: 'all 0.3s' }}>
               
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
                 <div style={{ flex: 1, display: 'flex', gap: '1rem' }}>
@@ -1014,8 +1007,24 @@ export default function ChecklistBoard() {
                           <Edit3 size={16} />
                         </button>
                       )}
+                      <button
+                        type="button"
+                        className="task-card-collapse-toggle"
+                        aria-expanded={!isCollapsed}
+                        aria-label={`${isCollapsed ? 'Mostrar' : 'Ocultar'} detalles de ${task.task || task.title}`}
+                        onClick={() => setCollapsedTaskCards(previous => {
+                          const next = new Set(previous);
+                          if (next.has(taskKey)) next.delete(taskKey);
+                          else next.add(taskKey);
+                          return next;
+                        })}
+                      >
+                        {isCollapsed ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
+                        <span>{isCollapsed ? 'Detalles' : 'Ocultar'}</span>
+                      </button>
                     </div>
 
+                    <div className="task-card-detail-content">
                       {/* FECHA Y HORA LÍMITE AUTOMÁTICA Causa OS */}
                       {(() => {
                         const effectiveDeadline = task.deadline || calculateAutomaticDeadline(task, cycleForTask(task));
@@ -1261,6 +1270,7 @@ export default function ChecklistBoard() {
                         </div>
                       );
                     })()}
+                    </div>
                   </div>
                 </div>
 
@@ -1280,7 +1290,7 @@ export default function ChecklistBoard() {
 
               {/* Botones de Acción */}
               {!task.completed && (
-                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem', marginLeft: '36px', flexWrap: 'wrap' }}>
+                <div className="task-card-detail-content" style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem', marginLeft: '36px', flexWrap: 'wrap' }}>
                   <button 
                     onClick={() => { setSelectedTaskForCollab(task); setShowCollabModal(true); }}
                     style={{ background: 'rgba(0, 210, 255, 0.08)', border: '1px solid rgba(0, 210, 255, 0.35)', color: 'var(--crear-blue)', padding: '0.3rem 0.8rem', borderRadius: '4px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem', cursor: 'pointer' }}
@@ -1371,7 +1381,7 @@ export default function ChecklistBoard() {
         onClose={() => setTaskForReflection(null)}
         task={taskForReflection}
         onComplete={async (taskId) => {
-          await toggleTask(taskId, false, taskForReflection?.equipoQuito); // false porque antes no estaba completada
+          await toggleTask(taskForReflection?.uiKey || taskId, false, taskForReflection?.equipoQuito);
           setTaskForReflection(null);
         }}
       />

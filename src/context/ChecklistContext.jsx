@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { db, auth } from '../services/firebase';
-import { collection, onSnapshot, doc, updateDoc, setDoc, writeBatch, addDoc, query, where, orderBy, limit, getDocs, getDoc } from 'firebase/firestore';
+import { collection, onSnapshot, doc, updateDoc, setDoc, writeBatch, addDoc, query, where, orderBy, limit, getDocs, getDoc, runTransaction } from 'firebase/firestore';
 import { checklistData } from '../data/checklistData';
 import { usersData, normalizeRole } from '../data/usersData';
 import { isSuperAdminEmail, isGerenciaRole } from '../config/permissions';
@@ -11,6 +11,7 @@ import { createGoogleTask } from '../services/googleSync';
 import { useUI } from './UIContext';
 import { useAuth } from './AuthContext';
 import { useCycles } from './CyclesContext';
+import { createCycleCompletion, getEffectiveCompletion, isCompletionTransition } from '../utils/taskLifecycle';
 
 const ChecklistContext = createContext();
 
@@ -283,108 +284,153 @@ export function ChecklistProvider({ children }) {
   // usando currentCycle, igual que siempre.
   // Notifica al asignador/creador de la tarea por correo institucional y notificacion in-app
   // cuando un colaborador marca la tarea como COMPLETADA (pedido explicito de Jose).
-  const notifyTaskCompletedToAssigner = async (prevData, updates, taskId) => {
-    try {
-      const sanitizeEmail = (e) => (typeof e === 'string' ? e.trim().toLowerCase()
-        .replace('@crearpls.com', '@crearpsl.net')
-        .replace('@crearpsl.com', '@crearpsl.net')
-        .replace(/ketherine\.aguirre@/gi, 'katherine.aguirre@')
-        .replace(/coodinacion\.administrativa@/gi, 'coordinacion.administrativa@') : '');
+  const buildCompletionDelivery = (prevData, updates, taskId, completionId) => {
+    const sanitizeEmail = (email) => (typeof email === 'string' ? email.trim().toLowerCase()
+      .replace('@crearpls.com', '@crearpsl.net')
+      .replace('@crearpsl.com', '@crearpsl.net')
+      .replace(/ketherine\.aguirre@/gi, 'katherine.aguirre@')
+      .replace(/coodinacion\.administrativa@/gi, 'coordinacion.administrativa@') : '');
+    const assignerEmail = sanitizeEmail(prevData.assignedByEmail || '');
+    const completedByName = currentUser?.displayName || currentUser?.name || currentUser?.email || 'Un colaborador';
+    const completedByEmail = sanitizeEmail(currentUser?.email || '');
+    const taskTitle = updates.task || prevData.task || updates.title || prevData.title || 'Compromiso Operativo';
+    const assignedSede = updates.assignedSede || prevData.assignedSede || prevData.sede || currentUser?.sede || 'Global';
+    const nowIso = updates.completedAt || new Date().toISOString();
+    if (!assignerEmail.includes('@') || assignerEmail === completedByEmail) return null;
 
-      const assignerEmail = sanitizeEmail(prevData.assignedByEmail || prevData.createdBy || updates.assignedByEmail || '');
-      const taskTitle = updates.task || prevData.task || updates.title || prevData.title || 'Compromiso Operativo';
-      const completedByName = currentUser?.displayName || currentUser?.name || currentUser?.email || 'Un colaborador';
-      const completedByEmail = sanitizeEmail(currentUser?.email || '');
-      const assignerName = prevData.assignedByName || prevData.assignerName || updates.assignedByName || 'Líder / Coordinador';
-      const assignedSede = updates.assignedSede || prevData.assignedSede || prevData.sede || currentUser?.sede || 'Global';
-      const nowIso = new Date().toISOString();
-
-      // Si no hay correo de asignador valido, salir
-      if (!assignerEmail || !assignerEmail.includes('@')) {
-        return;
-      }
-
-      // Si quien completo la tarea es el mismo asignador/creador, no generar auto-notificacion redundante
-      if (assignerEmail === completedByEmail) {
-        return;
-      }
-
-      const noteText = (updates.comments || updates.notes || prevData.comments || prevData.notes || '').trim();
-      const evidenceUrl = updates.evidenceUrl || updates.evidence_url || prevData.evidenceUrl || prevData.evidence_url || '';
-
-      const mailDocRef = doc(collection(db, 'mail'));
-      const notifDocRef = doc(collection(db, 'notifications'));
-
-      const htmlContent = buildTaskCompletedEmailHtml({
-        taskTitle,
-        assignerName,
-        completedByName,
-        completedByEmail,
-        completedAt: nowIso,
-        assignedSede,
-        evidenceUrl,
-        notes: noteText
-      });
-
-      // 1. Encolar en coleccion 'mail' (procesado automaticamente por mailerDaemon.js)
-      await setDoc(mailDocRef, {
+    const noteText = (updates.comments || updates.notes || prevData.comments || prevData.notes || '').trim();
+    const evidenceUrl = updates.evidenceUrl || updates.evidence_url || prevData.evidenceUrl || prevData.evidence_url || '';
+    return {
+      mailRef: doc(db, 'mail', `task_completed_${completionId}`),
+      mailData: {
         to: [assignerEmail],
         type: 'task_completed_alert',
         delivery: { state: 'PENDING' },
         createdAt: nowIso,
         message: {
           subject: `✅ TAREA COMPLETADA: ${taskTitle} — Causa OS`,
-          html: htmlContent
+          html: buildTaskCompletedEmailHtml({
+            taskTitle,
+            assignerName: prevData.assignedByName || prevData.assignerName || 'Líder / Coordinador',
+            completedByName,
+            completedByEmail,
+            completedAt: nowIso,
+            assignedSede,
+            evidenceUrl,
+            notes: noteText
+          })
         }
-      });
-
-      // 2. Notificacion In-App en Firestore 'notifications'
-      await setDoc(notifDocRef, {
+      },
+      notificationRef: doc(db, 'notifications', `task_completed_${completionId}`),
+      notificationData: {
         userId: assignerEmail,
         title: `✅ Tarea completada: ${taskTitle}`,
         message: `${completedByName} ha completado la tarea "${taskTitle}" en ${assignedSede}.`,
-        taskId: taskId,
+        taskId,
         type: 'task_completed',
         read: false,
         created_at: nowIso
-      });
+      }
+    };
+  };
 
-      console.log(`📧 Notificacion de tarea completada despachada para: ${assignerEmail}`);
+  const notifyTaskCompletedToAssigner = async (prevData, updates, taskId, completionId) => {
+    try {
+      const delivery = buildCompletionDelivery(prevData, updates, taskId, completionId);
+      if (!delivery) return;
+      await Promise.all([
+        setDoc(delivery.mailRef, delivery.mailData),
+        setDoc(delivery.notificationRef, delivery.notificationData)
+      ]);
+      console.log(`📧 Notificacion de tarea completada despachada para: ${delivery.mailData.to[0]}`);
     } catch (error) {
       console.error("Error al notificar al asignador por correo de tarea completada:", error);
     }
   };
 
-  const writeTaskDoc = async (taskId, updates, cycleForDeadline = currentCycle) => {
+  const writeTaskDoc = async (taskId, updates, cycleForDeadline = currentCycle, cycleScope = null) => {
     try {
       const taskRef = doc(db, 'tasks', taskId);
-      const snap = await getDoc(taskRef);
-      const prevData = snap.exists() ? snap.data() : (checklistData.find(t => t.id === taskId) || {});
-      const wasCompleted = prevData.completed === true || prevData.status === 'Completada';
-      const isNowCompleted = updates.completed === true || updates.status === 'Completada';
+      const baseTask = checklistData.find(task => task.id === taskId);
+      const isCycleScoped = Boolean(baseTask && cycleScope?.sede && cycleScope?.cycle?.id);
+      const cycleKey = isCycleScoped ? `${cycleScope.sede}__${cycleScope.cycle.id}` : null;
+      const completionId = doc(collection(db, 'task_completion_events')).id;
+      let completionDelivery = null;
 
-      if (!snap.exists()) {
-        const baseTask = checklistData.find(t => t.id === taskId);
-        await setDoc(taskRef, {
-          ...(baseTask || {}),
-          id: taskId,
-          ...(baseTask ? { catalogTask: true } : {}),
-          completed: false,
-          status: 'Pendiente',
-          priority: baseTask?.isCritical ? '🔴 ROJO' : '🟡 AMARILLO',
-          progressPercentage: 0,
-          deadline: baseTask ? calculateAutomaticDeadline(baseTask, cycleForDeadline) : null,
-          created_at: new Date().toISOString(),
-          ...updates
+      const expandDottedFields = (fields) => Object.entries(fields).reduce((result, [path, value]) => {
+        const keys = path.split('.');
+        let cursor = result;
+        keys.slice(0, -1).forEach(key => {
+          cursor[key] = cursor[key] || {};
+          cursor = cursor[key];
         });
-      } else {
-        await updateDoc(taskRef, updates);
-      }
+        cursor[keys[keys.length - 1]] = value;
+        return result;
+      }, {});
 
-      // Si la tarea paso a estado COMPLETADA, notificar inmediatamente por correo al asignador
-      if (isNowCompleted && !wasCompleted) {
-        notifyTaskCompletedToAssigner(prevData, updates, taskId);
-      }
+      await runTransaction(db, async transaction => {
+        const snapshot = await transaction.get(taskRef);
+        const prevData = snapshot.exists() ? snapshot.data() : (baseTask || {});
+        const nextUpdates = { ...updates };
+        const nextCompleted = updates.completed === true || updates.status === 'Completada';
+        let completionTransition = false;
+
+        const hasDirectAssignees = Boolean(prevData.assignedToEmail) ||
+          (Array.isArray(prevData.assignedToEmails) && prevData.assignedToEmails.length > 0);
+        const scopeThisCompletion = isCycleScoped && !prevData.isCustom && !hasDirectAssignees;
+        if (scopeThisCompletion && (updates.completed !== undefined || updates.status !== undefined)) {
+          const previous = getEffectiveCompletion(prevData, {
+            sede: cycleScope.sede,
+            cycleId: cycleScope.cycle.id,
+            cycleScoped: true
+          });
+          completionTransition = isCompletionTransition(previous.completed, nextCompleted);
+          const completionEntry = createCycleCompletion(prevData.completions?.[cycleKey], {
+            cycle: cycleScope.cycle,
+            completed: nextCompleted,
+            updatedAt: new Date().toISOString(),
+            completionId: completionTransition ? completionId : prevData.completions?.[cycleKey]?.completionId
+          });
+          nextUpdates[`completions.${cycleKey}`] = completionEntry;
+        } else {
+          completionTransition = isCompletionTransition(
+            prevData.completed === true || prevData.status === 'Completada',
+            nextCompleted
+          );
+        }
+
+        if (completionTransition) {
+          completionDelivery = buildCompletionDelivery(
+            prevData,
+            { ...nextUpdates, completedAt: new Date().toISOString() },
+            taskId,
+            completionId
+          );
+        }
+
+        if (snapshot.exists()) {
+          transaction.update(taskRef, nextUpdates);
+        } else {
+          const initialData = {
+            ...(baseTask || {}),
+            id: taskId,
+            ...(baseTask ? { catalogTask: true } : {}),
+            completed: false,
+            status: 'Pendiente',
+            priority: baseTask?.isCritical ? '🔴 ROJO' : '🟡 AMARILLO',
+            progressPercentage: 0,
+            deadline: baseTask ? calculateAutomaticDeadline(baseTask, cycleForDeadline) : null,
+            created_at: new Date().toISOString(),
+            ...expandDottedFields(nextUpdates)
+          };
+          transaction.set(taskRef, initialData);
+        }
+
+        if (completionTransition && completionDelivery) {
+          transaction.set(completionDelivery.mailRef, completionDelivery.mailData);
+          transaction.set(completionDelivery.notificationRef, completionDelivery.notificationData);
+        }
+      });
     } catch (err) {
       console.error("writeTaskDoc error:", err);
       setTasks(prev => prev.map(t => t.id === taskId ? { ...t, ...updates } : t));
@@ -485,17 +531,18 @@ export function ChecklistProvider({ children }) {
         let sedeStatus = data.status;
         const taskId = data.id;
 
-        if (data.completions && !data.isCustom && !taskId.startsWith('custom_') && !data.assignedToEmail && !data.assignedToEmails) {
-          const cycleKey = currentCycle?.id ? `${userSede}__${currentCycle.id}` : null;
-          const myCycleData = cycleKey ? data.completions[cycleKey] : null;
-          const mySedeData = data.completions[userSede];
-          if (myCycleData && myCycleData.completed !== undefined) {
-            sedeCompleted = myCycleData.completed;
-            sedeStatus = myCycleData.status;
-          } else if (mySedeData && mySedeData.completed !== undefined) {
-            sedeCompleted = mySedeData.completed;
-            sedeStatus = mySedeData.status;
-          }
+        const isBaseCatalogTask = checklistData.some(task => task.id === taskId) &&
+          !data.isCustom && !taskId.startsWith('custom_') &&
+          !data.assignedToEmail &&
+          !(Array.isArray(data.assignedToEmails) && data.assignedToEmails.length > 0);
+        if (isBaseCatalogTask) {
+          const effective = getEffectiveCompletion(data, {
+            sede: userSede,
+            cycleId: currentCycle?.id,
+            cycleScoped: true
+          });
+          sedeCompleted = effective.completed;
+          sedeStatus = effective.status;
         }
 
         return { ...data, completed: sedeCompleted, status: sedeStatus };
@@ -523,12 +570,11 @@ export function ChecklistProvider({ children }) {
           }
           const isPersisted = loadedTaskIds.has(task.id);
           quitoCycles.forEach(({ equipo, cycle }) => {
-            const cycleKey = cycle?.id ? `${userSede}__${cycle.id}` : null;
-            const myCycleData = cycleKey && task.completions ? task.completions[cycleKey] : null;
-            const mySedeData = task.completions ? task.completions[userSede] : null;
-            const effective = (myCycleData && myCycleData.completed !== undefined)
-              ? myCycleData
-              : (mySedeData || { completed: false, status: 'Pendiente' });
+            const effective = getEffectiveCompletion(task, {
+              sede: userSede,
+              cycleId: cycle?.id,
+              cycleScoped: Boolean(baseTaskDef)
+            });
             const perTeamDeadline = isPersisted
               ? (task.deadline || calculateAutomaticDeadline(baseTaskDef, cycle))
               : calculateAutomaticDeadline(baseTaskDef, cycle);
@@ -589,15 +635,29 @@ export function ChecklistProvider({ children }) {
   // misma tarea de catálogo. Para cualquier otro caso (equipoQuito ausente,
   // sedes fuera de Quito, Quito con 0 o 1 equipo) el comportamiento es idéntico
   // al de siempre: se usa currentCycle.
-  const toggleTask = async (taskId, currentStatus, equipoQuito = null) => {
+  const toggleTask = async (taskKey, currentStatus, equipoQuito = null) => {
+    const taskId = taskKey.includes('__EQ') ? taskKey.split('__EQ')[0] : taskKey;
     const nextStatus = !currentStatus;
     const userSede = currentUser?.sede?.trim() || 'Global';
+    const cycleForThisToggle = equipoQuito
+      ? (quitoCycles.find(qc => qc.equipo === equipoQuito)?.cycle || currentCycle)
+      : currentCycle;
+    const cycleKey = cycleForThisToggle?.id ? `${userSede}__${cycleForThisToggle.id}` : null;
+    const isBaseCatalogTask = checklistData.some(task => task.id === taskId);
 
     // ACTUALIZACIÓN OPTIMISTA INMEDIATA (Cero latencia visual en UI)
     setTasks(prev => prev.map(t => {
-      if (t.id === taskId || t.uiKey === taskId) {
+      if (t.uiKey === taskKey || (!t.uiKey && t.id === taskId)) {
         const nextCompletions = { ...(t.completions || {}) };
-        if (userSede) {
+        if (cycleKey && isBaseCatalogTask) {
+          nextCompletions[cycleKey] = {
+            ...(nextCompletions[cycleKey] || {}),
+            completed: nextStatus,
+            status: nextStatus ? 'Completada' : 'Pendiente',
+            cycleId: cycleForThisToggle.id,
+            updatedAt: new Date().toISOString()
+          };
+        } else if (userSede) {
           nextCompletions[userSede] = {
             ...(nextCompletions[userSede] || {}),
             completed: nextStatus,
@@ -617,11 +677,6 @@ export function ChecklistProvider({ children }) {
     }));
 
     try {
-      const cycleForThisToggle = equipoQuito
-        ? (quitoCycles.find(qc => qc.equipo === equipoQuito)?.cycle || currentCycle)
-        : currentCycle;
-      const cycleKey = cycleForThisToggle?.id ? `${userSede}__${cycleForThisToggle.id}` : null;
-
       const updates = {
         completed: nextStatus,
         status: nextStatus ? 'Completada' : 'Pendiente',
@@ -635,25 +690,22 @@ export function ChecklistProvider({ children }) {
         [`completions.${userSede}.updatedAt`]: new Date().toISOString()
       };
 
-      if (cycleKey) {
-        updates[`completions.${cycleKey}.completed`] = !currentStatus;
-        updates[`completions.${cycleKey}.status`] = !currentStatus ? 'Completada' : 'Pendiente';
-        updates[`completions.${cycleKey}.cycleId`] = cycleForThisToggle.id;
-        updates[`completions.${cycleKey}.cycleName`] = cycleForThisToggle.name || '';
-        updates[`completions.${cycleKey}.updatedAt`] = new Date().toISOString();
-      }
-
       // Update both legacy and map formats just in case it's a custom task
-      await writeTaskDoc(taskId, updates, cycleForThisToggle);
+      await writeTaskDoc(
+        taskId,
+        updates,
+        cycleForThisToggle,
+        isBaseCatalogTask && cycleKey ? { sede: userSede, cycle: cycleForThisToggle } : null
+      );
     } catch (error) {
       console.error("Error updating task:", error);
       showToast("No se pudo actualizar la tarea. Revisa los permisos de Firestore.", "error");
     }
   };
 
-  const updateTaskDetails = async (taskId, updates) => {
+  const updateTaskDetails = async (taskId, updates, cycleScope = null) => {
     try {
-      await writeTaskDoc(taskId, updates);
+      await writeTaskDoc(taskId, updates, currentCycle, cycleScope);
     } catch (error) {
       console.error("Error updating task details:", error);
       showToast("No se pudo actualizar la tarea.", "error");
@@ -798,7 +850,7 @@ export function ChecklistProvider({ children }) {
           completed: false,
           status: 'Pendiente',
           created_at: new Date().toISOString()
-        });
+        }, { merge: true });
       }
 
       // Si la tarea tiene asignaciones directas a uno o más usuarios y no es una plantilla
@@ -1039,16 +1091,16 @@ export function ChecklistProvider({ children }) {
     });
     if (roleTasks.length === 0) return 0;
 
-    const cycleKey = currentCycle?.id ? `${targetSede}__${currentCycle.id}` : null;
-
     const completed = roleTasks.filter(t => {
-      if (t.completions) {
-        if (cycleKey && t.completions[cycleKey] !== undefined) {
-          return t.completions[cycleKey].completed === true;
-        }
-        if (t.completions[targetSede] !== undefined) {
-          return t.completions[targetSede].completed === true;
-        }
+      const catalogScoped = checklistData.some(task => task.id === t.id) &&
+        !t.isCustom && !t.assignedToEmail &&
+        !(Array.isArray(t.assignedToEmails) && t.assignedToEmails.length > 0);
+      if (catalogScoped) {
+        return getEffectiveCompletion(t, {
+          sede: targetSede,
+          cycleId: t.quitoCycleId || currentCycle?.id,
+          cycleScoped: true
+        }).completed;
       }
       return t.completed || t.status === 'Completada';
     }).length;
@@ -1439,7 +1491,12 @@ export function ChecklistProvider({ children }) {
       });
 
       if (allCompleted && !data.completed) {
-        notifyTaskCompletedToAssigner(data, { completed: true, status: 'Completada', progressPercentage: 100 }, taskId);
+        notifyTaskCompletedToAssigner(
+          data,
+          { completed: true, status: 'Completada', progressPercentage: 100 },
+          taskId,
+          doc(collection(db, 'task_completion_events')).id
+        );
       }
 
       showToast(isCompleted ? "¡Completaste tu parte de la tarea!" : "Marcaste tu parte como pendiente.", "success");

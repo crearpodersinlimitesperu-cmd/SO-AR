@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useChecklist } from '../context/ChecklistContext';
+import { useCycles } from '../context/CyclesContext';
 import { useUI } from '../context/UIContext';
 import { getFlagForSede } from '../utils/flags';
 import { uploadEvidenceDocument } from '../services/googleDriveService';
@@ -101,6 +102,7 @@ export default function TaskDetailModal({
 }) {
   const { currentUser, reauthenticateGoogle } = useAuth();
   const { updateTaskDetails, toggleTask, sendTaskMessage, sendTaskReminderEmail } = useChecklist();
+  const { currentCycle } = useCycles();
   const { showToast } = useUI();
 
   // Estados locales editables para avances y evidencias
@@ -761,7 +763,19 @@ export default function TaskDetailModal({
         updatedAt: new Date().toISOString()
       };
 
-      await updateTaskDetails(task.id, updates);
+      const cycleScope = task.catalogTask || (
+        !task.isCustom &&
+        !task.assignedToEmail &&
+        !(Array.isArray(task.assignedToEmails) && task.assignedToEmails.length > 0)
+      )
+        ? {
+            sede: currentUser?.sede?.trim() || 'Global',
+            cycle: task.quitoCycleId
+              ? { id: task.quitoCycleId, name: task.cycleName || '' }
+              : currentCycle
+          }
+        : null;
+      await updateTaskDetails(task.id, updates, cycleScope);
       if (finalCompleted || (myAssigneeEntry && myProgress === 100) || (!isMultiAssignee && progress === 100)) {
         celebrateVictory();
       }
@@ -2211,4 +2225,3 @@ export default function TaskDetailModal({
     </div>
   );
 }
-

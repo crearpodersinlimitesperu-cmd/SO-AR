@@ -11,7 +11,8 @@ import BirthdayAlert from './components/BirthdayAlert'
 import ApdaycPaymentAlert from './components/ApdaycPaymentAlert'
 import HelpModal from './components/HelpModal'
 import ThemeToggle from './components/ThemeToggle'
-import { HelpCircle } from 'lucide-react'
+import MagicalLoadingScreen from './components/MagicalLoadingScreen'
+import { HelpCircle, RefreshCw } from 'lucide-react'
 
 const CfoDashboard = lazy(() => import('./pages/CfoDashboard'));
 const AICopilot = lazy(() => import('./components/AICopilot'));
@@ -66,11 +67,7 @@ const AsignadorEntrenadores = lazy(() => import('./pages/AsignadorEntrenadores')
 const ComunicadosOperativos = lazy(() => import('./pages/ComunicadosOperativos'));
 
 function RouteLoadingFallback() {
-  return (
-    <div style={{ minHeight: '50vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <p className="text-gold">Cargando módulo...</p>
-    </div>
-  );
+  return <MagicalLoadingScreen message="Abriendo el módulo…" />;
 }
 
 // Componente para proteger autenticación básica
@@ -78,7 +75,7 @@ function PrivateRoute({ children }) {
   const { currentUser, loading } = useAuth();
   
   if (loading) {
-    return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><p className="text-gold">Cargando...</p></div>;
+    return <MagicalLoadingScreen message="Preparando tu espacio de creación…" />;
   }
   
   if (currentUser?.isParticipantOnly) {
@@ -105,7 +102,7 @@ function RoleRoute({ children, allowedRoles = [], allowedEmails = [], requireSup
   const { showToast } = useUI();
 
   if (loading) {
-    return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><p className="text-gold">Verificando permisos...</p></div>;
+    return <MagicalLoadingScreen message="Verificando permisos…" />;
   }
 
   if (!currentUser) {
@@ -589,6 +586,32 @@ function App() {
               <ThemeToggle />
             </div>
           )}
+          <button
+            type="button"
+            className="no-print floating-refresh-btn"
+            onClick={() => window.location.reload()}
+            title="Actualizar Causa OS sin cerrar la sesión"
+            aria-label="Actualizar Causa OS; la sesión se conserva"
+            style={{
+              position: 'fixed',
+              top: '4.5rem',
+              right: '1.25rem',
+              width: '44px',
+              height: '44px',
+              borderRadius: '50%',
+              background: 'var(--bg-dark-alt)',
+              color: 'var(--text-main)',
+              border: '1px solid var(--border-strong)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: 'var(--card-shadow)',
+              cursor: 'pointer',
+              zIndex: 8500
+            }}
+          >
+            <RefreshCw size={19} />
+          </button>
           {/* Copiloto SO-AR: restringido a Gerentes y Directivos por decisión explícita (26/08/2026) */}
           {(currentUser.isSuperAdmin || currentUser.isGerente || currentUser.isDireccion) && (
             <div className="no-print">
