@@ -906,6 +906,15 @@ const getCountdownInfo = (deadlineIso, now) => {
   return { label: `🟢 ${timeStr} restantes`, color: '#ffffff', bg: '#16a34a', border: '#166534', overdue: false };
 };
 
+function LiveClock() {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+  return now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+
 export default function Home() {
   // (15/09/2026) BUG CRITICO CORREGIDO: la linea de 'consolidado' devolvia true
   // para CUALQUIER lista de roles pedida, sin verificar los roles reales del
@@ -1261,7 +1270,8 @@ export default function Home() {
   };
 
   useEffect(() => {
-    const timer = setInterval(() => setTime(new Date()), 1000);
+    // Home completo se recalcula cada minuto; el reloj con segundos vive en LiveClock.
+    const timer = setInterval(() => setTime(new Date()), 60000);
     return () => clearInterval(timer);
   }, []);
 
@@ -1679,7 +1689,7 @@ export default function Home() {
               )}
               <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
                 <span style={{ fontWeight: 'bold', fontSize: '0.92rem', color: activeTheme === 'light' ? '#0f172a' : '#e2e8f0', letterSpacing: '0.5px' }}>
-                  {time.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                  <LiveClock />
                 </span>
                 <span style={{ fontSize: '0.7rem', color: activeTheme === 'light' ? '#64748b' : '#94a3b8' }}>
                   {time.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' }).replace('.', '')} (TÚ)
