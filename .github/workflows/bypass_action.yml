@@ -20,7 +20,7 @@ jobs:
 
       - name: Run Scraper
         run: |
-          cat << 'JS' > scrape.js
+          cat << 'JS' > scrape.cjs
           const puppeteer = require('puppeteer-extra');
           const StealthPlugin = require('puppeteer-extra-plugin-stealth');
           puppeteer.use(StealthPlugin());
@@ -28,9 +28,16 @@ jobs:
           (async () => {
             const browser = await puppeteer.launch({ headless: "new" });
             const page = await browser.newPage();
+            await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
             await page.goto('https://imo.crearpslglobal.com/auth/login');
-            console.log("Status:", await page.title());
+            const title = await page.title();
+            console.log("Status Title:", title);
+            if (title.includes("Cloudflare") || title.includes("Just a moment")) {
+                console.log("❌ Bloqueado por Cloudflare en MacOS Runner");
+            } else {
+                console.log("✅ ¡Bypass Exitoso!");
+            }
             await browser.close();
           })();
           JS
-          node scrape.js
+          node scrape.cjs
