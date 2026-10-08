@@ -1502,8 +1502,8 @@ export default function Home() {
   // cargando), cae de vuelta a currentUser tal cual — UserProfileModal ya sabe
   // mostrar un aviso si ese objeto no tiene un id real de Firestore para guardar.
   const myOverdueCount = useMemo(
-    () => getOverdueAssignedTasks(allTasks, currentUser?.email).length,
-    [allTasks, currentUser?.email, time]
+    () => getOverdueAssignedTasks(allTasks, currentUser?.email, Date.now(), { sede: currentUser?.sede?.trim() }).length,
+    [allTasks, currentUser?.email, currentUser?.sede, time]
   );
 
   const handleOpenMyProfile = () => {

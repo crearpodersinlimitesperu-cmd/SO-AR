@@ -37,14 +37,30 @@ const findProgressEntry = (task, email) => {
   return key ? map[key] : null;
 };
 
-const isDoneForUser = (task, email) => {
+const isCompletedFlag = (e) => !!e && (
+  e.completed === true || e.status === 'Completada' ||
+  e.progress === 100 || e.progressPercentage === 100
+);
+
+// Completion escrita por el usuario actual: por sede (`completions.<sede>`)
+// o por ciclo (`completions.<sede>__<cycleId>`).
+const isDoneInCompletions = (task, sede, cycleId) => {
+  const map = task.completions;
+  if (!map || typeof map !== 'object' || !sede) return false;
+  const key = cycleId ? `${sede}__${cycleId}` : null;
+  return isCompletedFlag(map[sede]) || (key !== null && isCompletedFlag(map[key]));
+};
+
+const isDoneForUser = (task, email, { sede, cycleId } = {}) => {
   const entry = findProgressEntry(task, email);
-  if (entry) return entry.completed === true || entry.progress === 100;
+  if (isCompletedFlag(entry)) return true;
+  if (isDoneInCompletions(task, sede, cycleId)) return true;
+  if (entry) return false;
   return !!(task.completed || task.status === 'Completada');
 };
 
 /** Tareas asignadas/colaborativas del usuario, incompletas y vencidas hace MÁS de 72 h. */
-export const getOverdueAssignedTasks = (tasks, userEmail, now = Date.now()) => {
+export const getOverdueAssignedTasks = (tasks, userEmail, now = Date.now(), options = {}) => {
   const email = normalizeTaskEmail(userEmail);
   if (!email || !Array.isArray(tasks)) return [];
   const nowMs = now instanceof Date ? now.getTime() : now;
@@ -53,7 +69,7 @@ export const getOverdueAssignedTasks = (tasks, userEmail, now = Date.now()) => {
     const deadline = toMs(t.deadline);
     if (deadline === null) return false;
     if (nowMs - deadline <= OVERDUE_THRESHOLD_MS) return false;
-    return !isDoneForUser(t, email);
+    return !isDoneForUser(t, email, options);
   });
 };
 
