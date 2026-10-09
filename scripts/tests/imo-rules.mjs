@@ -40,22 +40,18 @@ try {
   await assertFails(deleteDoc(windowState));
   const state = doc(anon, `${profilePath}/imo_confirmations`, eid);
   const sessionId = '00000000-0000-4000-8000-000000000000';
-  console.log('IMO rules: rejecting a confirmation without its paired event');
   await assertFails(setDoc(state, { contacto: true, asistencia: true, reportedName: 'IMO SINTETICO', sessionId, updatedAt: serverTimestamp(), eventId: 'missing' }));
-  async function save(field, value, eventId, eventBeforeOverride) {
-    console.log(`IMO rules: transaction read ${eventId}`);
+  async function save(field, value, eventId) {
     return runTransaction(anon, async tx => {
       const old = await tx.get(state);
-      console.log(`IMO rules: transaction writes ${eventId}`);
       const before = old.exists() ? { contacto: old.data().contacto, asistencia: old.data().asistencia } : { contacto: false, asistencia: false };
       const after = { ...before, [field]: value };
       tx.set(state, { ...after, campaignId: cid, reportedName: 'IMO SINTETICO', sessionId, updatedAt: serverTimestamp(), eventId });
-      tx.set(doc(anon, `${profilePath}/imo_events`, eventId), { campaignId: cid, enroladoId: eid, before: eventBeforeOverride || before, after, reportedName: 'IMO SINTETICO', sessionId, identity: 'self-selected', at: serverTimestamp(), source: 'mision-imo-v2' });
+      tx.set(doc(anon, `${profilePath}/imo_events`, eventId), { campaignId: cid, enroladoId: eid, before, after, reportedName: 'IMO SINTETICO', sessionId, identity: 'self-selected', at: serverTimestamp(), source: 'mision-imo-v2' });
     });
   }
-  console.log('IMO rules: accepting the first atomic confirmation and event');
   await assertSucceeds(save('contacto', true, 'event-1'));
-  await assertSucceeds(save('asistencia', true, 'event-2', { contacto: true, asistencia: true }));
+  await assertSucceeds(save('asistencia', true, 'event-2'));
   const restored = (await getDoc(state)).data();
   assert.equal(restored.contacto, true); assert.equal(restored.asistencia, true);
   assert.equal((await getDocs(collection(staff, `${profilePath}/imo_events`))).size, 2);

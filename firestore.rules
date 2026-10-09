@@ -855,15 +855,15 @@ service cloud.firestore {
     }
     function imoWindowOpen(campaignId, missionId) {
       let windowPath = /databases/$(database)/documents/imo_campaigns/$(campaignId)/profiles/$(missionId)/imo_progress/window;
-      return exists(windowPath) && get(windowPath).data.openedAt is timestamp &&
-        request.time <= get(windowPath).data.openedAt + duration.value(30600, 's');
+      let openedAt = get(windowPath).data.openedAt;
+      return openedAt is timestamp && request.time <= openedAt + duration.value(30600, 's');
     }
     function matchingImoEvent(campaignId, missionId, eventId, enroladoId, sessionId, contacto, asistencia) {
       let eventPath = /databases/$(database)/documents/imo_campaigns/$(campaignId)/profiles/$(missionId)/imo_events/$(eventId);
-      return existsAfter(eventPath) ?
-        getAfter(eventPath).data.after == {'contacto': contacto, 'asistencia': asistencia} &&
-        getAfter(eventPath).data.enroladoId == enroladoId &&
-        getAfter(eventPath).data.sessionId == sessionId : false;
+      let eventData = getAfter(eventPath).data;
+      return eventData.get('after', {}) == {'contacto': contacto, 'asistencia': asistencia} &&
+        eventData.get('enroladoId', '') == enroladoId &&
+        eventData.get('sessionId', '') == sessionId;
     }
     match /imo_campaign_keys/{key} {
       allow read: if isImoStaff();
