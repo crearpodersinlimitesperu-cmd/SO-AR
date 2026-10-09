@@ -1,10 +1,11 @@
 import { Children, useEffect, useMemo, useState } from 'react';
-import { ArrowRight, CalendarClock, CheckCircle2, Clock3, ListChecks, Users } from 'lucide-react';
+import { ArrowRight, CalendarClock, CheckCircle2, Clock3, ListChecks, Users, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useChecklist } from '../context/ChecklistContext';
 import { isElizabethEscobar } from '../config/permissions';
 import { findUserByAnyEmail } from '../data/usersData';
+import TaskAssignmentModal from '../components/TaskAssignmentModal';
 import {
   getTaskAssigneeEmails,
   getTasksAssignedBy,
@@ -74,9 +75,16 @@ export default function ElizabethDashboard() {
   const [preferences, setPreferences] = useState(defaultPreferences);
   const [preferenceError, setPreferenceError] = useState('');
   const [preferenceOwner, setPreferenceOwner] = useState(null);
+  const [creationOpen, setCreationOpen] = useState(false);
+  const [creationNotice, setCreationNotice] = useState('');
   const userKey = currentUser?.isSimulated ? null : currentUser?.uid;
   const activePreferences = preferenceOwner === userKey ? preferences : defaultPreferences();
   const canLearn = canLearnPreferences(currentUser) && preferenceOwner === userKey;
+
+  useEffect(() => {
+    setCreationOpen(false);
+    setCreationNotice('');
+  }, [currentUser?.uid, currentUser?.email, currentUser?.isSimulated]);
 
   useEffect(() => {
     setPreferenceError('');
@@ -134,7 +142,9 @@ export default function ElizabethDashboard() {
     [tasks, currentUser?.email, currentUser?.name, currentUser?.displayName]
   );
   const ownTasks = useMemo(() => getTasksAssignedTo(tasks, currentUser?.email), [tasks, currentUser?.email]);
-  const readState = getTaskReadState({ loading, taskLoadError, taskReadRestricted });
+  const readState = getTaskReadState({
+    loading, taskLoadError, taskReadRestricted, isSimulated: currentUser?.isSimulated
+  });
   const teamMembers = useMemo(() => getTeamMembers(assignedTasks), [assignedTasks]);
   const summary = useMemo(() => getTeamTimingSummary(assignedTasks, now), [assignedTasks, now]);
   const filter = activePreferences.filter;
@@ -158,7 +168,17 @@ export default function ElizabethDashboard() {
             <p className="elizabeth-dashboard__intro">Aquí puedes ver lo que encargaste y cómo avanza tu equipo.</p>
           </div>
           <nav className="elizabeth-dashboard__actions" aria-label="Tus otros espacios">
-            <button type="button" onClick={() => navigate('/cfo-dashboard')}>
+            <button type="button" className="elizabeth-dashboard__create" onClick={() => {
+              if (currentUser?.isSimulated) {
+                setCreationNotice('No se puede crear una tarea en simulación. Entra con tu cuenta real para asignarla.');
+                return;
+              }
+              setCreationNotice('');
+              setCreationOpen(true);
+            }}>
+              <Plus size={24} aria-hidden="true" /> Crear tarea
+            </button>
+            <button type="button" className="elizabeth-dashboard__secondary" onClick={() => navigate('/cfo-dashboard')}>
               <ArrowRight size={18} aria-hidden="true" /> Panel financiero y liquidaciones
             </button>
             <button type="button" className="elizabeth-dashboard__secondary" onClick={() => navigate('/home-completo')}>
@@ -167,6 +187,16 @@ export default function ElizabethDashboard() {
           </nav>
         </header>
 
+        {creationNotice && <p className="elizabeth-dashboard__notice" role="status">{creationNotice}</p>}
+        {creationOpen && !currentUser?.isSimulated && (
+          <TaskAssignmentModal
+            key={userKey}
+            isOpen
+            simple
+            teamMembers={teamMembers}
+            onClose={() => setCreationOpen(false)}
+          />
+        )}
         {readState.notice && (
           <p className="elizabeth-dashboard__notice" role="status">
             {readState.notice}

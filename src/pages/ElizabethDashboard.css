@@ -79,6 +79,34 @@
   color: var(--text-heading);
 }
 
+.elizabeth-dashboard__actions .elizabeth-dashboard__create {
+  min-height: 64px;
+  font-size: 1.2rem;
+}
+
+.elizabeth-create-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.elizabeth-create-form label {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.elizabeth-create-form input,
+.elizabeth-create-form select,
+.elizabeth-create-form textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.8rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  background: var(--bg-dark);
+  color: var(--text-main);
+  font: inherit;
+}
+
 .elizabeth-dashboard__actions button:focus-visible {
   outline: 3px solid #fcd34d;
   outline-offset: 3px;

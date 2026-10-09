@@ -79,3 +79,10 @@ export const hasSimulatedTaskIdentityMismatch = (user, authenticatedEmail) =>
     !authenticatedEmail ||
     !emailAliases(user.email).includes(normalizeEmail(authenticatedEmail))
   ));
+
+export const getTaskReadIdentity = (user) =>
+  JSON.stringify([user?.uid || '', normalizeEmail(user?.email), Boolean(user?.isSimulated)]);
+
+export const canCreateTaskAsUser = (user, authenticatedEmail) =>
+  Boolean(user?.email && authenticatedEmail && !user.isSimulated &&
+    emailAliases(user.email).includes(normalizeEmail(authenticatedEmail)));

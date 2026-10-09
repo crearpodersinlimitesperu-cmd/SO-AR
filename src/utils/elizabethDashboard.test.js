@@ -122,7 +122,10 @@ test('simulator identifies the Firebase session mismatch, without broadening tas
 });
 
 test('loading, failed and restricted views never claim zero totals or confirmed emptiness', () => {
-  for (const input of [{ loading: true }, { taskLoadError: 'denied' }, { taskReadRestricted: true }]) {
+  for (const input of [
+    { loading: true }, { taskLoadError: 'denied' }, { taskReadRestricted: true },
+    { isSimulated: true, taskReadRestricted: false, loading: false }
+  ]) {
     const state = getTaskReadState(input);
     assert.equal(state.canShowTotals, false);
     assert.notEqual(state.emptyLabel, '');

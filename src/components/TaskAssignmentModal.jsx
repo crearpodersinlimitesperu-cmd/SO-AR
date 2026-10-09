@@ -11,6 +11,7 @@ import { getAssignableRoles } from '../config/permissions';
 import { usersData, normalizeRole, normalizeSede, OPERATIONAL_SEDES, getRoleDisplayName } from '../data/usersData';
 import { recordAuditEvent } from '../services/auditService';
 import { getAllCompanyUsers } from '../services/userService';
+import { normalizeTaskEmail } from '../utils/elizabethDashboard';
 
 export const OPERATIONAL_AREAS = [
   {
@@ -125,7 +126,7 @@ export const getSedeFlag = (sede) => {
   return '🌐';
 };
 
-export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = null, taskToEdit = null }) {
+export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = null, taskToEdit = null, simple = false, teamMembers = [] }) {
   const { currentUser } = useAuth();
   const { addCustomTask, editCustomTask } = useChecklist();
 
@@ -271,6 +272,10 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
 
   const assignableRoles = getAssignableRoles(currentUser);
   const canAssignSpecific = true; // Habilitado para todos por solicitud institucional
+  const eligibleTeamMembers = teamMembers.filter(person => {
+    const user = activeUsersList.find(entry => normalizeTaskEmail(entry.email) === normalizeTaskEmail(person.email));
+    return user?.isActive !== false && user?.active !== false && user?.status !== 'inactive';
+  });
 
   const stripAccents = (str) => {
     return (str || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
@@ -404,7 +409,19 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (isSubmitting) return;
-    if (!newTask.title.trim()) return;
+    if (currentUser?.isSimulated) {
+      globalUI?.showToast('No se puede crear una tarea en simulación. Entra con tu cuenta real.', 'error');
+      return;
+    }
+    if (!newTask.title.trim()) {
+      if (simple) globalUI?.showToast('Escribe el título de la tarea.', 'error');
+      return;
+    }
+    if (simple && (newTask.assignedToEmails.length !== 1 ||
+      !eligibleTeamMembers.some(person => normalizeTaskEmail(person.email) === normalizeTaskEmail(newTask.assignedToEmails[0])))) {
+      globalUI?.showToast('Selecciona una persona de tu equipo.', 'error');
+      return;
+    }
     setIsSubmitting(true);
     
     const finalRole = newTask.role || currentUser?.appRole || 'gerente';
@@ -543,6 +560,59 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
     }
     setIsSubmitting(false);
   };
+
+  if (simple) return (
+    <div className="elizabeth-create-overlay" style={{
+      position: 'fixed', inset: 0, zIndex: 10050, background: 'rgba(0, 0, 0, 0.85)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem'
+    }}>
+      <section role="dialog" aria-modal="true" aria-labelledby="elizabeth-create-title" style={{
+        width: '100%', maxWidth: '560px', maxHeight: '90dvh', overflowY: 'auto',
+        padding: '1.5rem', borderRadius: '16px', background: 'var(--bg-dark-alt)'
+      }}>
+        <div className="elizabeth-dashboard__section-heading">
+          <h2 id="elizabeth-create-title">Crear tarea</h2>
+          <button type="button" aria-label="Cerrar" onClick={onClose} disabled={isSubmitting}><X size={24} /></button>
+        </div>
+        <form className="elizabeth-create-form" onSubmit={handleSubmit}>
+          <label>Título
+            <input autoFocus required value={newTask.title}
+              onChange={event => setNewTask(prev => ({ ...prev, title: event.target.value }))} />
+          </label>
+          <label>Persona de tu equipo
+            <select required value={newTask.assignedToEmails[0] || ''}
+              onChange={event => setNewTask(prev => ({ ...prev, assignedToEmails: event.target.value ? [event.target.value] : [] }))}>
+              <option value="">Selecciona una persona</option>
+              {eligibleTeamMembers.map(person => {
+                const directoryUser = activeUsersList.find(user => normalizeTaskEmail(user.email) === normalizeTaskEmail(person.email));
+                return <option key={person.email} value={person.email}>
+                  {directoryUser?.name || person.name || person.email}
+                </option>;
+              })}
+            </select>
+          </label>
+          {eligibleTeamMembers.length === 0 && <p role="status">
+            Aún no hay personas disponibles en las tareas que asignaste. Puedes usar «Abrir Causa OS completo» para asignar la primera desde el directorio.
+          </p>}
+          <label>Fecha límite
+            <input type="date" required value={newTask.deadlineDate}
+              onChange={event => setNewTask(prev => ({ ...prev, deadlineDate: event.target.value }))} />
+          </label>
+          <p>La tarea vence a las 18:00 de la fecha seleccionada, en tu hora local.</p>
+          <label>Nota opcional
+            <textarea rows={3} value={newTask.notes}
+              onChange={event => setNewTask(prev => ({ ...prev, notes: event.target.value }))} />
+          </label>
+          <div className="elizabeth-dashboard__actions">
+            <button type="submit" disabled={isSubmitting || eligibleTeamMembers.length === 0}>
+              {isSubmitting ? 'Creando tarea…' : 'Crear tarea'}
+            </button>
+            <button type="button" className="elizabeth-dashboard__secondary" onClick={onClose} disabled={isSubmitting}>Cancelar</button>
+          </div>
+        </form>
+      </section>
+    </div>
+  );
 
   return (
     <div style={{

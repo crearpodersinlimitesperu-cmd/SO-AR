@@ -155,6 +155,30 @@ test('assignedByEmail task listener query succeeds for the assigner', async () =
   assert.deepEqual(assignedByTasks.docs.map(task => task.id), ['custom_multi']);
 });
 
+test('creator/assigner alias queries load all three synthetic tasks, but not through an admin simulation', async () => {
+  const email = 'synthetic-finance@crearpsl.net';
+  const aliases = [email, 'synthetic-finance@crearpsl.com'];
+  await seedTasks([0, 1, 2].map(index => ({
+    id: `custom_finance_${index}`,
+    createdBy: email,
+    ...(index < 2 ? { assignedByEmail: email, assignedByName: 'Synthetic Finance' } : {}),
+    assignedToEmails: ['synthetic-recipient@example.com'],
+    role: 'gerente',
+    isCustom: true
+  })));
+  const financeDb = userDb('synthetic-finance', email);
+  const creatorQuery = db => query(collection(db, 'tasks'), where('createdBy', 'in', aliases));
+  const assignerQuery = db => query(collection(db, 'tasks'), where('assignedByEmail', 'in', aliases));
+  const created = await assertSucceeds(getDocs(creatorQuery(financeDb)));
+  const assigned = await assertSucceeds(getDocs(assignerQuery(financeDb)));
+  assert.equal(created.size, 3);
+  assert.equal(assigned.size, 2);
+  const adminDb = userDb('synthetic-admin', 'jose.sanchez@crearpsl.net');
+  await assertFails(getDocs(creatorQuery(adminDb)));
+  await assertFails(getDocs(assignerQuery(adminDb)));
+  await assertFails(getDocs(creatorQuery(userDb('unrelated', 'unrelated@example.com'))));
+});
+
 test('a user can read their role catalog task but not another role or a fabricated catalog ID', async () => {
   await seedTasks([
     { id: 'soar_12', role: 'coord_c1', isCustom: false, assignedRoles: ['coord_c1'], assignedSede: 'Lima' },
