@@ -9,9 +9,12 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - 'scripts/nodusMultiAgentSync.mjs'
+      - 'scripts/mailQueue.js'
+      - 'scripts/mailerDaemon.js'
       - 'src/**'
       - 'tests/**'
       - '.github/workflows/validate-task-privacy.yml'
+      - '.github/workflows/mail-dispatch.yml'
 
 permissions:
   contents: read

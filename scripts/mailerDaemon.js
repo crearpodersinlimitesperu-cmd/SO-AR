@@ -4,6 +4,7 @@ import sanitizeHtml from 'sanitize-html';
 import { initializeApp, cert } from 'firebase-admin/app';
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 import { readFileSync, existsSync } from 'fs';
+import { claimPendingMail, selectMailAction, STALE_REASON } from './mailQueue.js';
 
 dotenv.config();
 
@@ -99,8 +100,27 @@ function buildIcsAttachment(calendarEvent) {
 
 // --- 3. PROCESAMIENTO DE CORREOS EN COLA ---
 async function processMailDoc(docSnap) {
-  const data = docSnap.data();
-  if (data.delivery && data.delivery.state) return;
+  const claim = await claimPendingMail(db, docSnap.ref);
+  if (!claim) return null;
+  if (claim.state === 'SKIPPED_STALE') {
+    console.log(`⏭️ SKIPPED_STALE doc=${docSnap.id}: ${STALE_REASON}`);
+    return claim.state;
+  }
+  console.log(`📬 SENDING doc=${docSnap.id} previousState=${claim.data.delivery?.state || 'UNSET'}`);
+  try {
+    return await sendClaimedMail(docSnap, claim.data);
+  } catch (error) {
+    console.error(`❌ Error procesando correo doc=${docSnap.id}:`, error.message);
+    await docSnap.ref.update({
+      'delivery.state': 'ERROR',
+      'delivery.error': error.message,
+      'delivery.endTime': new Date().toISOString()
+    });
+    return 'ERROR';
+  }
+}
+
+async function sendClaimedMail(docSnap, data) {
 
   const rawRecipients = (Array.isArray(data.to) ? data.to : [data.to]).filter(Boolean);
 
@@ -110,7 +130,7 @@ async function processMailDoc(docSnap) {
       'delivery.state': 'REJECTED',
       reason: 'Documento de correo sin campo "to" válido'
     });
-    return;
+    return 'REJECTED';
   }
 
   const isImoWelcome = data.type === 'imo_welcome';
@@ -163,10 +183,10 @@ async function processMailDoc(docSnap) {
       'delivery.state': 'REJECTED',
       reason: 'Ningún destinatario pertenece a un usuario registrado'
     });
-    return;
+    return 'REJECTED';
   }
 
-  console.log(`📧 Procesando correo para: ${validRecipients.join(', ')}`);
+  console.log(`📧 Procesando correo doc=${docSnap.id}`);
 
   const rawHtml = data.message?.html || '<p>Tienes una notificación del sistema Causa OS.</p>';
   const cleanHtml = sanitizeHtml(rawHtml, {
@@ -214,20 +234,13 @@ async function processMailDoc(docSnap) {
     mailOptions.icalEvent = { method: 'PUBLISH', filename: icsAttachment.filename, content: icsAttachment.content };
   }
 
-  try {
-    await currentTransporter.sendMail(mailOptions);
-    console.log(`✅ Correo enviado con éxito a ${validRecipients.join(', ')}`);
-    await db.collection('mail').doc(docSnap.id).update({
-      'delivery.state': 'SUCCESS',
-      'delivery.endTime': new Date().toISOString()
-    });
-  } catch (error) {
-    console.error(`❌ Error enviando a ${validRecipients.join(', ')}:`, error.message);
-    await db.collection('mail').doc(docSnap.id).update({
-      'delivery.state': 'ERROR',
-      'delivery.error': error.message
-    });
-  }
+  await currentTransporter.sendMail(mailOptions);
+  await docSnap.ref.update({
+    'delivery.state': 'SUCCESS',
+    'delivery.endTime': new Date().toISOString()
+  });
+  console.log(`✅ SUCCESS doc=${docSnap.id} communicationId=${data.communicationId || 'UNSET'}`);
+  return 'SUCCESS';
 }
 
 async function processPendingMails() {
@@ -235,16 +248,48 @@ async function processPendingMails() {
   try {
     const snap = await db.collection('mail').get();
     let pendingCount = 0;
+    const outcomes = {};
+    const succeededIds = new Set();
     for (const docSnap of snap.docs) {
       const d = docSnap.data();
-      if (!d.delivery || !d.delivery.state) {
+      if (selectMailAction(d)) {
         pendingCount++;
-        await processMailDoc(docSnap);
+        const state = await processMailDoc(docSnap);
+        const outcome = state || 'ALREADY_CLAIMED';
+        outcomes[outcome] = (outcomes[outcome] || 0) + 1;
+        if (state === 'SUCCESS') succeededIds.add(docSnap.id);
       }
     }
     console.log(`📊 Correos procesados: ${pendingCount}`);
+    console.log(`📊 Resultados del lote: ${JSON.stringify(outcomes)}`);
+    const finalSnapshot = await db.collection('mail').get();
+    const states = {};
+    const verificationStates = {};
+    const verificationId = process.env.VERIFY_COMMUNICATION_ID;
+    for (const doc of finalSnapshot.docs) {
+      const data = doc.data();
+      const state = data.delivery?.state || 'UNSET';
+      states[state] = (states[state] || 0) + 1;
+      if (verificationId && data.communicationId === verificationId) {
+        verificationStates[state] = (verificationStates[state] || 0) + 1;
+      }
+      if (succeededIds.has(doc.id) && state === 'SUCCESS' && data.communicationId) {
+        console.log(`📋 Estado persistido: doc=${doc.id} communicationId=${data.communicationId} state=SUCCESS`);
+      }
+    }
+    console.log(`📊 Estados persistidos de mail: ${JSON.stringify(states)}`);
+    if (verificationId) {
+      console.log(`📋 Verificacion communicationId=${verificationId}: ${JSON.stringify(verificationStates)}`);
+      if (!verificationStates.SUCCESS || Object.keys(verificationStates).some(state => state !== 'SUCCESS')) {
+        throw new Error('El comunicado solicitado no tiene todos sus correos en SUCCESS');
+      }
+    }
+    if (isOneShot && outcomes.ERROR) {
+      throw new Error(`${outcomes.ERROR} correos terminaron en ERROR`);
+    }
   } catch (e) {
     console.error("Error al procesar lote de correos:", e.message);
+    if (isOneShot) throw e;
   }
 }
 
@@ -668,7 +713,9 @@ if (isOneShot) {
   db.collection('mail').onSnapshot((snapshot) => {
     snapshot.docChanges().forEach((change) => {
       if (change.type === 'added') {
-        processMailDoc(change.doc);
+        processMailDoc(change.doc).catch(error => {
+          console.error(`❌ Error procesando correo doc=${change.doc.id}:`, error.message);
+        });
       }
     });
   });
