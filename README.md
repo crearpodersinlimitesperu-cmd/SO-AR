@@ -1,5 +1,32 @@
 # React + Vite
 
+## Espacio personal por uso
+
+El agente local observa solo entradas a módulos del catálogo que realmente
+se muestran tras autorizar la ruta. Guarda ID de módulo, visitas, puntuación
+y fecha en `causa:module-usage:v1:<UID>` en el navegador; nunca guarda URLs,
+consultas, personas ni tareas. No usa IA externa ni Firestore y no modifica
+permisos. Cada navegador aprende por separado.
+
+Los hábitos requieren al menos dos visitas y una puntuación reciente de 1,5.
+La puntuación pierde la mitad de su peso cada 14 días. Con cuatro módulos
+habituales aparecen **Tus accesos rápidos** (hasta seis); antes solo se sugiere
+**Sueles ir a X** si existe un hábito real. El menú existente **Más Módulos y
+Herramientas** destaca los frecuentes al principio, sin crear un sidebar.
+Catálogo y autorizaciones de las rutas vuelven a filtrar las recomendaciones
+al cambiar de rol; los módulos externos y personalizados no se aprenden.
+
+Sin historial se conserva la presentación anterior. **Restablecer mi espacio**
+borra únicamente este historial de módulos; no toca el aprendizaje específico
+del panel Elizabeth. Los errores de almacenamiento se muestran con una alerta
+y permiten restablecer el historial corrupto.
+
+En simulación no se lee, registra ni restablece el uso de ninguna cuenta:
+se muestra navegación por defecto y un aviso en la barra del simulador.
+No se alteran las escrituras existentes de otros módulos. Las pruebas de
+aislamiento, decaimiento, permisos, simulación y almacenamiento corren en
+`npm test`.
+
 ## Cola de correo
 
 `scripts/mailerDaemon.js --one-shot` procesa documentos de `mail` sin estado

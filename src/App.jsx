@@ -1,8 +1,8 @@
-import { lazy, Suspense, useState, useEffect } from 'react'
+import { Children, lazy, Suspense, useState, useEffect } from 'react'
 import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import { useUI } from './context/UIContext'
-import { PORTFOLIO_FI_REVIEW_EMAILS, isElizabethEscobar, isGlobalObserver } from './config/permissions'
+import { PORTFOLIO_FI_REVIEW_EMAILS, isElizabethEscobar } from './config/permissions'
 import './index.css'
 import PromptModal from './components/PromptModal'
 import BirthdayAlert from './components/BirthdayAlert'
@@ -11,6 +11,8 @@ import HelpModal from './components/HelpModal'
 import ThemeToggle from './components/ThemeToggle'
 import MagicalLoadingScreen from './components/MagicalLoadingScreen'
 import { HelpCircle, RefreshCw } from 'lucide-react'
+import { ModuleUsageProvider, ModuleVisit } from './context/ModuleUsageContext'
+import { canEnterRoleRoute } from './utils/routeAccess'
 
 const CfoDashboard = lazy(() => import('./pages/CfoDashboard'));
 const AICopilot = lazy(() => import('./components/AICopilot'));
@@ -88,7 +90,7 @@ function PrivateRoute({ children }) {
   if (currentUser?.isParticipantOnly) {
     return <Navigate to="/onboarding-legal" replace />;
   }
-  return currentUser ? children : <Navigate to={`/login?from=${window.location.pathname}`} replace />;
+  return currentUser ? <ModuleVisit>{children}</ModuleVisit> : <Navigate to={`/login?from=${window.location.pathname}`} replace />;
 }
 
 // Componente para proteger autorización por Roles (S3 / Audit Fix)
@@ -124,7 +126,7 @@ function RoleRoute({ children, allowedRoles = [], allowedEmails = [], requireSup
   // Salvo que esté simulando explícitamente a otro colaborador (currentUser.isSimulated),
   // el Super Administrador jamás es bloqueado ni redirigido de ninguna sección.
   if (currentUser.isSuperAdmin && !currentUser.isSimulated) {
-    return children;
+    return <ModuleVisit>{children}</ModuleVisit>;
   }
 
   // (15/09/2026) BUG CRITICO CORREGIDO: este bloque otorgaba "return children"
@@ -152,7 +154,7 @@ function RoleRoute({ children, allowedRoles = [], allowedEmails = [], requireSup
   // Verificación de Super Admin
   if (requireSuperAdmin) {
     if (currentUser.isSuperAdmin) {
-      return children;
+      return <ModuleVisit>{children}</ModuleVisit>;
     }
     showToast("ACCESO DENEGADO: Esta sección requiere privilegios de Super Administrador.", "error");
     return <Navigate to="/home" replace />;
@@ -160,20 +162,30 @@ function RoleRoute({ children, allowedRoles = [], allowedEmails = [], requireSup
 
   // Verificación de Roles permitidos
   if (allowedRoles.length > 0) {
-    const hasAllowedEmail = allowedEmails.includes((currentUser.email || '').trim().toLowerCase());
-    const isObserver = isGlobalObserver(currentUser);
-    const hasRole = (currentUser.appRole !== 'consolidado' && allowedRoles.includes(currentUser.appRole)) ||
-                    currentUser.isSuperAdmin ||
-                    isObserver ||
-                    (!excludeDireccionBypass && currentUser.isDireccion) ||
-                    (currentUser.roles || []).some(r => allowedRoles.includes(r)) || hasAllowedEmail;
+    const hasRole = canEnterRoleRoute(currentUser, { allowedRoles, allowedEmails, requireSuperAdmin, excludeDireccionBypass });
     if (!hasRole) {
       showToast(`ACCESO DENEGADO: Tu rol actual (${currentUser.appRole}) no tiene acceso a esta sección.`, "error");
       return <Navigate to="/home" replace />;
     }
   }
 
-  return children;
+  return <ModuleVisit>{children}</ModuleVisit>;
+}
+
+function PersonalizedRoutes({ children }) {
+  // Derive policy from the actual guarded routes, not a second role matrix.
+  const routePolicies = Children.toArray(children).flatMap(route => {
+    const element = route.props.element;
+    if (element?.type !== RoleRoute && element?.type !== PrivateRoute) return [];
+    return [{ path: route.props.path, access: element.type === RoleRoute ? element.props : {} }];
+  });
+  return (
+    <ModuleUsageProvider routePolicies={routePolicies}>
+      <Suspense fallback={<RouteLoadingFallback />}>
+        <Routes>{children}</Routes>
+      </Suspense>
+    </ModuleUsageProvider>
+  );
 }
 
 function App() {
@@ -209,6 +221,7 @@ function App() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <span>⚠️ MODO SIMULADOR ACTIVO:</span>
             <span>Estás viendo la plataforma como <strong>{currentUser?.name}</strong></span>
+            <span>Las preferencias viven en el navegador de cada usuario y no aplican al simular.</span>
           </div>
           <button 
             onClick={() => {
@@ -234,8 +247,7 @@ function App() {
       {currentUser && <BirthdayAlert />}
       {currentUser && <ApdaycPaymentAlert />}
       <main style={{ flex: 1 }}>
-        <Suspense fallback={<RouteLoadingFallback />}>
-        <Routes>
+        <PersonalizedRoutes>
           <Route path="/login" element={<Login />} />
           <Route path="/opt-out" element={<OptOutPage />} />
           <Route path="/causa-os-task" element={
@@ -595,8 +607,7 @@ function App() {
           <Route path="/coordinadores-nodus" element={<Navigate to="/auditoria-kpis" replace />} />
 
           <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-        </Suspense>
+        </PersonalizedRoutes>
       </main>
       
       {/* Botón flotante de ayuda */}
