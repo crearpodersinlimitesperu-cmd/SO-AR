@@ -23,7 +23,7 @@ try {
    if(!response.ok) throw new Error('Read failed');
    const payload=await response.json();
    if(!Array.isArray(payload.data)) throw new Error('Unexpected contract');
-   const keys=['id','nombres','apellidos','telefono','id_invitador','asistio_c1','asistenciaC1','estadoC1','estado_c1','desertorC1','desertor_c1'];
+   const keys=['id','nombres','apellidos','telefono','id_invitador','nombre_imo','asistio_c1','asistenciaC1','estadoC1','estado_c1','desertorC1','desertor_c1'];
    return {total:payload.recordsTotal,filtered:payload.recordsFiltered,rows:payload.data.map(row=>Object.fromEntries(keys.filter(key=>row[key]!==undefined).map(key=>[key,row[key]])))};
   },start));
  console.log('IMO_C1_SOURCE_COMPLETE '+JSON.stringify({read:rows.length}));

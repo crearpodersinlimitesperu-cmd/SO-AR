@@ -20,8 +20,10 @@ export function reconcileC1(enrollee, mission, index, sourceUpdatedAt) {
   const candidates = enrollee.nodusParticipantId ? [index.byId.get(String(enrollee.nodusParticipantId))].filter(Boolean) : index.byIdentity.get(`${name(enrollee.nombre)}|${phone(enrollee.telefono)}`) || [];
   if (candidates.length !== 1) return unknown;
   const row = candidates[0];
-  const inviter = index.byId.get(String(row.id_invitador));
-  if (!inviter || fullName(inviter) !== name(mission.imoNombre)) return unknown;
+  // Use the inviter label explicitly supplied by Nodus; id_invitador must not
+  // be assumed to share the participant-ID namespace. This is evidence-only,
+  // never a grant of identity/authentication or a reassignment of an enrollee.
+  if (!row.id_invitador || !row.nombre_imo || name(row.nombre_imo) !== name(mission.imoNombre)) return unknown;
   // Before adopting a stable ID, all three source values must agree exactly.
   if (!enrollee.nodusParticipantId && (fullName(row) !== name(enrollee.nombre) || phone(row.telefono) !== phone(enrollee.telefono))) return unknown;
   const evidence = c1Evidence(row);
