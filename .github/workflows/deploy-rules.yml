@@ -17,7 +17,10 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
+
+      - name: Install verification dependencies
+        run: npm ci --ignore-scripts --include=optional
 
       - name: Instalar Firebase CLI
         run: npm install -g firebase-tools
@@ -26,7 +29,11 @@ jobs:
         env:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
         run: |
-          echo "$GOOGLE_SERVICE_ACCOUNT_JSON" > sa-key.json
-          export GOOGLE_APPLICATION_CREDENTIALS="sa-key.json"
-          firebase deploy --only firestore:rules,firestore:indexes --project centro-operativo-cpsl
-          rm sa-key.json
+          node -e "require('fs').writeFileSync(process.env.RUNNER_TEMP + '/access-rules-credential.json', process.env.GOOGLE_SERVICE_ACCOUNT_JSON, {mode: 0o600})"
+          export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/access-rules-credential.json"
+          firebase deploy --only firestore:rules,firestore:indexes --project centro-operativo-cpsl --non-interactive
+          node scripts/verifyPublishedAccessRules.mjs
+
+      - name: Remove temporary credential
+        if: always()
+        run: rm -f "$RUNNER_TEMP/access-rules-credential.json"

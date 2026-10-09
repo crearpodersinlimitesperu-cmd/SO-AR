@@ -21,12 +21,13 @@ rules_version = '2';
 //     ciclos y reportes fallando en silencio para roles no-superadmin).
 //
 // Qu├® NO cambia (a prop├│sito, para no romper nada que no revis├® a fondo):
-//  Las colecciones staff_directory, managers_directory, excellence_standards,
-//  kpi_reports, learning_logs, qt_directory, success_patterns, sync_history y
-//  user_stats se dejan EXACTAMENTE como est├ín hoy (cualquier autenticado lee y
+//  Las colecciones staff_directory, managers_directory, excellence_standards, kpi_reports,
+//  learning_logs y success_patterns se dejan EXACTAMENTE como est├ín hoy (cualquier autenticado lee y
 //  escribe) porque no alcanc├® a auditar el detalle de cada una y prefiero no
 //  inventar una restricci├│n que bloquee algo que no vi. Quedan marcadas abajo
 //  con un TODO para una siguiente pasada.
+//  A-01 (parcial): qt_directory (solo escritura), sync_history y
+//  user_stats ya tienen reglas específicas más abajo.
 //
 // Lista de gerencia/direcci├│n (funci├│n isGerenteODireccion): se extrajo del
 // ├║ltimo snapshot de src/data/usersToImport.js en GitHub (anterior a la
@@ -715,6 +716,34 @@ service cloud.firestore {
       }
     }
 
+    // A-01: roles administrados en users/{uid} (nunca datos enviados por el cliente).
+    function callerHasAnyRole(roleNames) {
+      let profilePath = /databases/$(database)/documents/users/$(request.auth.uid);
+      return isAuthenticated() &&
+        exists(profilePath) &&
+        (
+          get(profilePath).data.get('role', '') in roleNames ||
+          get(profilePath).data.get('appRole', '') in roleNames ||
+          (get(profilePath).data.get('roles', []) is list &&
+           get(profilePath).data.get('roles', []).hasAny(roleNames))
+        );
+    }
+    function isManagementRole() {
+      return isGerenteODireccion() || callerHasAnyRole([
+        'gerente', 'direccion', 'cfo', 'cco', 'ceo',
+        'director_maestria', 'consolidado', 'superadmin'
+      ]);
+    }
+    function isLearningReaderRole() {
+      return isManagementRole() || callerHasAnyRole([
+        'coord_c1', 'coord_c2', 'coordinador_c1c2',
+        'coord_maestria', 'coordinador_mj'
+      ]);
+    }
+    function emailIsCaller(value) {
+      return value is string && value.lower() in callerEmailAliases();
+    }
+
     // ------------------------------------------------------------------------
     // COLECCIONES AUDITADAS CON PERMISOS AMPLIOS DE COLABORACIÓN OPERATIVA
     // ------------------------------------------------------------------------
@@ -734,16 +763,26 @@ service cloud.firestore {
       allow read, write: if isAuthenticated();
     }
     match /qt_directory/{document=**} {
-      allow read, write: if isAuthenticated();
+      allow read: if isAuthenticated();
+      allow write: if isManagementRole();
     }
     match /success_patterns/{document=**} {
       allow read, write: if isAuthenticated();
     }
-    match /sync_history/{document=**} {
-      allow read, write: if isAuthenticated();
+    match /sync_history/{entryId} {
+      allow read, delete: if isAuthenticated() && (isManagementRole() ||
+        emailIsCaller(resource.data.get('userEmail', '')));
+      allow update: if isAuthenticated() && (isManagementRole() ||
+        (emailIsCaller(resource.data.get('userEmail', '')) &&
+         request.resource.data.get('userEmail', '') == resource.data.get('userEmail', '')));
+      allow create: if isAuthenticated() && (isManagementRole() ||
+        emailIsCaller(request.resource.data.get('userEmail', '')));
     }
-    match /user_stats/{document=**} {
-      allow read, write: if isAuthenticated();
+    match /user_stats/{statsId} {
+      allow read: if isAuthenticated() && (isLearningReaderRole() ||
+        statsId == request.auth.uid || emailIsCaller(statsId));
+      allow write: if isAuthenticated() && (isManagementRole() ||
+        statsId == request.auth.uid || emailIsCaller(statsId));
     }
 
     // ------------------------------------------------------------------------
