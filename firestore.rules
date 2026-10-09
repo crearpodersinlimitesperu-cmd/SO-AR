@@ -21,12 +21,13 @@ rules_version = '2';
 //     ciclos y reportes fallando en silencio para roles no-superadmin).
 //
 // Qu├® NO cambia (a prop├│sito, para no romper nada que no revis├® a fondo):
-//  Las colecciones staff_directory, managers_directory, excellence_standards,
-//  kpi_reports, learning_logs, qt_directory, success_patterns, sync_history y
-//  user_stats se dejan EXACTAMENTE como est├ín hoy (cualquier autenticado lee y
+//  Las colecciones staff_directory, managers_directory, excellence_standards, kpi_reports,
+//  learning_logs y success_patterns se dejan EXACTAMENTE como est├ín hoy (cualquier autenticado lee y
 //  escribe) porque no alcanc├® a auditar el detalle de cada una y prefiero no
 //  inventar una restricci├│n que bloquee algo que no vi. Quedan marcadas abajo
 //  con un TODO para una siguiente pasada.
+//  A-01 (parcial): qt_directory (solo escritura), sync_history y
+//  user_stats ya tienen reglas específicas más abajo.
 //
 // Lista de gerencia/direcci├│n (funci├│n isGerenteODireccion): se extrajo del
 // ├║ltimo snapshot de src/data/usersToImport.js en GitHub (anterior a la
@@ -519,8 +520,128 @@ service cloud.firestore {
     // Los campos de rol y estado solo los pueden modificar SuperAdmins.
     // Los usuarios pueden mantener sus datos de perfil y elegir una vista entre
     // los roles que ya tienen asignados, sin poder ampliar esos roles.
+    //
+    // C-02: lectura restringida. Antes cualquier autenticado podía listar todo
+    // /users (emails, roles, sedes, teléfonos, cumpleaños). Ahora solo:
+    //  - SuperAdmin / gerencia-dirección global;
+    //  - el propio perfil (por UID) y la consulta propia por correo que hacen
+    //    AuthContext/getVerifiedUser (email, emails[], corporateEmail,
+    //    personalEmail), incluyendo el alias @crearpsl.net/.com;
+    //  - documentos de la misma sede que el perfil autenticado del llamador.
+    // No se usa ningún custom claim de sede: en el repo no se asigna ninguno
+    // (solo scratch/invite_qts.mjs fija {role:'qt'}), así que la sede sale
+    // únicamente de users/{request.auth.uid}.sede.
+    function emailAsNet() {
+      let parts = email().split('@');
+      return parts.size() == 2 && parts[1] in ['crearpsl.net', 'crearpsl.com']
+        ? parts[0] + '@crearpsl.net' : email();
+    }
+
+    function isOwnUserProfile(userData) {
+      let aliases = callerEmailAliases();
+      let emails = userData.get('emails', []);
+      return userData.get('email', '') in aliases ||
+        userData.get('corporateEmail', '') in aliases ||
+        userData.get('personalEmail', '') in aliases ||
+        // hasAny is list-only and query-provable; an additional "is list"
+        // guard cannot be proven for array-contains queries.
+        emails.hasAny(aliases);
+    }
+
+    function callerProfileExists() {
+      return isAuthenticated() &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function callerProfileData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    // Roles que ven todo el directorio (sin límite de sede). 'gerente' NO está
+    // aquí: es un rol de sede y entra por canReadUserSameSede().
+    // Misma lista que isGerenteODireccion(), pero con alias @crearpsl.net/.com:
+    // fer.aragon@crearpsl.com ya puede enviar comunicados operativos y no debe
+    // perder el directorio global por entrar con el dominio alterno.
+    function isDirectoryWhitelistedEmail() {
+      return emailAsNet() in [
+        'emely.leon@crearpsl.net',
+        'fer.aragon@crearpsl.net',
+        'andres.gomez@crearpsl.net',
+        'gomeznueve@gmail.com',
+        'contabilidad.global@crearpsl.net',
+        'leandro.brunis@crearpsl.net',
+        'josue.vera@crearpsl.net',
+        'yurany.gonzalez@crearpsl.net',
+        'nora.zamora@crearpsl.net',
+        'emily.campuzano@crearpsl.net',
+        'freddy.sosa@crearpsl.net',
+        'diana.moscoso@crearpsl.net'
+      ];
+    }
+
+    function callerIsDirectoryGlobal() {
+      return isGerenteODireccion() || isDirectoryWhitelistedEmail() || (callerProfileExists() && (
+        callerProfileData().get('role', '') in ['direccion', 'cfo', 'cco', 'ceo', 'director_maestria', 'talento_humano'] ||
+        callerProfileData().get('appRole', '') in ['direccion', 'cfo', 'cco', 'ceo', 'director_maestria', 'talento_humano'] ||
+        (callerProfileData().get('roles', []) is list &&
+         callerProfileData().roles.hasAny(['direccion', 'cfo', 'cco', 'ceo', 'director_maestria', 'talento_humano']))
+      ));
+    }
+
+    function callerDirectorySede() {
+      return callerProfileExists() && callerProfileData().get('sede', '') is string
+        ? callerProfileData().get('sede', '') : '';
+    }
+
+    // Réplica de canonicalSede() (src/utils/sede.js): Quito Ciclo 1/C1/C2/UIO -> Quito,
+    // Medellin/Medellín/MED -> Medellín, etc. '' = sin sede utilizable (vacía,
+    // Global, Sede Global, Sin Sede). Las listas de sedeAliasList() deben coincidir con
+    // SEDE_ALIASES (functions/directoryScope.js, src/utils/sedeAliases.js); un test lo verifica.
+    function sedeFolded(s) {
+      return s.lower().replace('á', 'a').replace('é', 'e').replace('í', 'i')
+              .replace('ó', 'o').replace('ú', 'u').trim();
+    }
+
+    function sedeCanonical(k) {
+      return k == '' || k == 'sin sede' || k.matches('.*global.*') ? '' :
+        k == 'med' || k.matches('.*medellin.*') ? 'medellin' :
+        k == 'lim' || k.matches('.*lima.*') ? 'lima' :
+        k == 'cue' || k.matches('.*cuenca.*') ? 'cuenca' :
+        k == 'gye' || k.matches('.*guayaquil.*') ? 'guayaquil' :
+        k == 'mex' || k == 'cdmx' || k.matches('.*mexico.*') ? 'mexico' :
+        k.matches('.*uio.*') || k.matches('.*quito.*') || k.matches('.*ciclo\\s*[12].*') ? 'quito' :
+        k == 'int' || k.matches('.*internacional.*') ? 'internacional' : k;
+    }
+
+    function sedeAliasList(raw) {
+      let canonical = sedeCanonical(sedeFolded(raw));
+      return canonical == 'quito' ?
+          ['Quito', 'QUITO', 'quito', 'UIO', 'uio', 'Quito C1', 'Quito C2', 'Quito Ciclo 1', 'Quito Ciclo 2', 'QUITO C1', 'QUITO C2', 'Quito ciclo 1', 'Quito ciclo 2'] :
+        canonical == 'medellin' ?
+          ['Medellín', 'Medellin', 'MEDELLIN', 'MEDELLÍN', 'medellin', 'medellín', 'MED', 'Med'] :
+        canonical == 'lima' ? ['Lima', 'LIMA', 'lima', 'LIM'] :
+        canonical == 'cuenca' ? ['Cuenca', 'CUENCA', 'cuenca', 'CUE'] :
+        canonical == 'guayaquil' ? ['Guayaquil', 'GUAYAQUIL', 'guayaquil', 'GYE'] :
+        canonical == 'mexico' ? ['México', 'Mexico', 'MEXICO', 'MÉXICO', 'mexico', 'CDMX', 'MEX'] :
+        canonical == 'internacional' ? ['Internacional', 'INTERNACIONAL', 'INT'] :
+        [raw];
+    }
+
+    function canReadUserSameSede(userData) {
+      let sede = callerDirectorySede();
+      return sedeCanonical(sedeFolded(sede)) != '' &&
+        userData.get('sede', '') in sedeAliasList(sede);
+    }
+
     match /users/{userId} {
-      allow read: if isAuthenticated();
+      allow read: if isAuthenticated() && (
+        request.auth.uid == userId ||
+        (request.auth.token.get('email_verified', false) == true && (
+          isOwnUserProfile(resource.data) ||
+          callerIsDirectoryGlobal() ||
+          canReadUserSameSede(resource.data)
+        ))
+      );
       allow create: if isSuperAdmin() || (
         isAuthenticated() && request.auth.uid == userId &&
         request.resource.data.uid == request.auth.uid &&
@@ -715,6 +836,34 @@ service cloud.firestore {
       }
     }
 
+    // A-01: roles administrados en users/{uid} (nunca datos enviados por el cliente).
+    function callerHasAnyRole(roleNames) {
+      let profilePath = /databases/$(database)/documents/users/$(request.auth.uid);
+      return isAuthenticated() &&
+        exists(profilePath) &&
+        (
+          get(profilePath).data.get('role', '') in roleNames ||
+          get(profilePath).data.get('appRole', '') in roleNames ||
+          (get(profilePath).data.get('roles', []) is list &&
+           get(profilePath).data.get('roles', []).hasAny(roleNames))
+        );
+    }
+    function isManagementRole() {
+      return isGerenteODireccion() || callerHasAnyRole([
+        'gerente', 'direccion', 'cfo', 'cco', 'ceo',
+        'director_maestria', 'consolidado', 'superadmin'
+      ]);
+    }
+    function isLearningReaderRole() {
+      return isManagementRole() || callerHasAnyRole([
+        'coord_c1', 'coord_c2', 'coordinador_c1c2',
+        'coord_maestria', 'coordinador_mj'
+      ]);
+    }
+    function emailIsCaller(value) {
+      return value is string && value.lower() in callerEmailAliases();
+    }
+
     // ------------------------------------------------------------------------
     // COLECCIONES AUDITADAS CON PERMISOS AMPLIOS DE COLABORACIÓN OPERATIVA
     // ------------------------------------------------------------------------
@@ -734,16 +883,26 @@ service cloud.firestore {
       allow read, write: if isAuthenticated();
     }
     match /qt_directory/{document=**} {
-      allow read, write: if isAuthenticated();
+      allow read: if isAuthenticated();
+      allow write: if isManagementRole();
     }
     match /success_patterns/{document=**} {
       allow read, write: if isAuthenticated();
     }
-    match /sync_history/{document=**} {
-      allow read, write: if isAuthenticated();
+    match /sync_history/{entryId} {
+      allow read, delete: if isAuthenticated() && (isManagementRole() ||
+        emailIsCaller(resource.data.get('userEmail', '')));
+      allow update: if isAuthenticated() && (isManagementRole() ||
+        (emailIsCaller(resource.data.get('userEmail', '')) &&
+         request.resource.data.get('userEmail', '') == resource.data.get('userEmail', '')));
+      allow create: if isAuthenticated() && (isManagementRole() ||
+        emailIsCaller(request.resource.data.get('userEmail', '')));
     }
-    match /user_stats/{document=**} {
-      allow read, write: if isAuthenticated();
+    match /user_stats/{statsId} {
+      allow read: if isAuthenticated() && (isLearningReaderRole() ||
+        statsId == request.auth.uid || emailIsCaller(statsId));
+      allow write: if isAuthenticated() && (isManagementRole() ||
+        statsId == request.auth.uid || emailIsCaller(statsId));
     }
 
     // ------------------------------------------------------------------------
