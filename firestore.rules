@@ -858,6 +858,13 @@ service cloud.firestore {
       return exists(windowPath) && get(windowPath).data.openedAt is timestamp &&
         request.time <= get(windowPath).data.openedAt + duration.value(30600, 's');
     }
+    function matchingImoEvent(campaignId, missionId, eventId, enroladoId, sessionId, contacto, asistencia) {
+      let eventPath = /databases/$(database)/documents/imo_campaigns/$(campaignId)/profiles/$(missionId)/imo_events/$(eventId);
+      return existsAfter(eventPath) ?
+        getAfter(eventPath).data.after == {'contacto': contacto, 'asistencia': asistencia} &&
+        getAfter(eventPath).data.enroladoId == enroladoId &&
+        getAfter(eventPath).data.sessionId == sessionId : false;
+    }
     match /imo_campaign_keys/{key} {
       allow read: if isImoStaff();
       allow create: if isImoStaff() && request.resource.data.createdBy == request.auth.uid && request.resource.data.createdAt == request.time;
@@ -906,9 +913,7 @@ service cloud.firestore {
             request.resource.data.sessionId is string && request.resource.data.sessionId.size() >= 20 && request.resource.data.sessionId.size() <= 64 &&
             request.resource.data.updatedAt == request.time &&
             !exists(/databases/$(database)/documents/imo_campaigns/$(campaignId)/profiles/$(missionId)/imo_events/$(request.resource.data.eventId)) &&
-            getAfter(/databases/$(database)/documents/imo_campaigns/$(campaignId)/profiles/$(missionId)/imo_events/$(request.resource.data.eventId)).data.after == {'contacto': request.resource.data.contacto, 'asistencia': request.resource.data.asistencia} &&
-            getAfter(/databases/$(database)/documents/imo_campaigns/$(campaignId)/profiles/$(missionId)/imo_events/$(request.resource.data.eventId)).data.enroladoId == enroladoId &&
-            getAfter(/databases/$(database)/documents/imo_campaigns/$(campaignId)/profiles/$(missionId)/imo_events/$(request.resource.data.eventId)).data.sessionId == request.resource.data.sessionId;
+            matchingImoEvent(campaignId, missionId, request.resource.data.eventId, enroladoId, request.resource.data.sessionId, request.resource.data.contacto, request.resource.data.asistencia);
           allow delete: if false;
         }
         match /imo_events/{eventId} {
