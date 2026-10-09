@@ -858,12 +858,14 @@ service cloud.firestore {
       let openedAt = get(windowPath).data.openedAt;
       return openedAt is timestamp && request.time <= openedAt + duration.value(30600, 's');
     }
-    function matchingImoEvent(campaignId, missionId, eventId, enroladoId, sessionId, contacto, asistencia) {
-      let eventPath = /databases/$(database)/documents/imo_campaigns/$(campaignId)/profiles/$(missionId)/imo_events/$(eventId);
-      return existsAfter(eventPath) ?
-        getAfter(eventPath).data.after == {'contacto': contacto, 'asistencia': asistencia} &&
-        getAfter(eventPath).data.enroladoId == enroladoId &&
-        getAfter(eventPath).data.sessionId == sessionId : false;
+    function matchingImoConfirmation(campaignId, missionId, enroladoId, eventId, after, sessionId, reportedName) {
+      let confirmationPath = /databases/$(database)/documents/imo_campaigns/$(campaignId)/profiles/$(missionId)/imo_confirmations/$(enroladoId);
+      let confirmation = getAfter(confirmationPath).data;
+      return confirmation.get('eventId', '') == eventId &&
+        confirmation.get('contacto', null) == after.contacto &&
+        confirmation.get('asistencia', null) == after.asistencia &&
+        confirmation.get('sessionId', '') == sessionId &&
+        confirmation.get('reportedName', '') == reportedName;
     }
     function matchesPreviousImoState(path, before) {
       let previous = get(path).data;
@@ -923,7 +925,7 @@ service cloud.firestore {
             request.resource.data.sessionId is string && request.resource.data.sessionId.size() >= 20 && request.resource.data.sessionId.size() <= 64 &&
             request.resource.data.updatedAt == request.time &&
             !exists(/databases/$(database)/documents/imo_campaigns/$(campaignId)/profiles/$(missionId)/imo_events/$(request.resource.data.eventId)) &&
-            matchingImoEvent(campaignId, missionId, request.resource.data.eventId, enroladoId, request.resource.data.sessionId, request.resource.data.contacto, request.resource.data.asistencia);
+            existsAfter(/databases/$(database)/documents/imo_campaigns/$(campaignId)/profiles/$(missionId)/imo_events/$(request.resource.data.eventId));
           allow delete: if false;
         }
         match /imo_events/{eventId} {
@@ -936,7 +938,8 @@ service cloud.firestore {
             request.resource.data.at == request.time && request.resource.data.identity == 'self-selected' && request.resource.data.source == 'mision-imo-v2' &&
             request.resource.data.after.keys().hasOnly(['contacto', 'asistencia']) &&
             request.resource.data.after.contacto is bool && request.resource.data.after.asistencia is bool &&
-            getAfter(/databases/$(database)/documents/imo_campaigns/$(campaignId)/profiles/$(missionId)/imo_confirmations/$(request.resource.data.enroladoId)).data.eventId == eventId;
+            matchingImoBefore(campaignId, missionId, request.resource.data.enroladoId, request.resource.data.before) &&
+            matchingImoConfirmation(campaignId, missionId, request.resource.data.enroladoId, eventId, request.resource.data.after, request.resource.data.sessionId, request.resource.data.reportedName);
           allow update, delete: if false;
         }
       }
