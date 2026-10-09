@@ -29,6 +29,7 @@ const USERS = {
   'ger-multi': { email: 'gm@example.com', role: 'coord_c1', roles: ['coord_c1', 'gerente'] },
   'ent-1': { email: 'ent@example.com', role: 'entrenador', roles: ['entrenador'] },
   'qt-1': { email: 'qt@crearpsl.com', role: 'qt', roles: ['qt'] },
+  'metadata-1': { email: 'nuevo@crearpsl.com', name: 'Nuevo' },
   'dir-1': { email: 'dir@example.com', appRole: 'direccion' }
 };
 
@@ -101,6 +102,21 @@ test('user_stats: la gerencia escribe a terceros y el coordinador no', async () 
   }
   await assertFails(setDoc(doc(dbOf('coord-1'), 'user_stats', 'otro-uid'), { totalTasks: 1 }));
   await assertFails(setDoc(doc(anonDb(), 'user_stats', 'otro-uid'), { totalTasks: 1 }));
+});
+
+test('metadata-only UID profiles preserve own learning, sync and directory access without inferred roles', async () => {
+  const db = dbOf('metadata-1');
+  await assertSucceeds(setDoc(doc(db, 'user_stats', 'metadata-1'), { totalTasks: 1 }));
+  await assertSucceeds(getDoc(doc(db, 'user_stats', 'metadata-1')));
+  await assertSucceeds(setDoc(doc(db, 'user_stats', 'nuevo@crearpsl.net'), { totalTasks: 1 }));
+  await assertSucceeds(addDoc(collection(db, 'sync_history'), {
+    userEmail: 'nuevo@crearpsl.net', timestamp: '2026-10-09T00:00:00.000Z'
+  }));
+  await assertSucceeds(getDocs(query(collection(db, 'sync_history'), where('userEmail', '==', 'nuevo@crearpsl.net'))));
+  await assertSucceeds(getDocs(collection(db, 'users')));
+  await assertSucceeds(getDocs(collection(db, 'qt_directory')));
+  await assertFails(setDoc(doc(db, 'qt_directory', 'forged'), { email: 'foreign@example.com' }));
+  await assertFails(setDoc(doc(db, 'user_stats', 'foreign-uid'), { totalTasks: 1 }));
 });
 
 test('sync_history: create y consulta solo con el correo propio (alias incluido)', async () => {
@@ -179,4 +195,16 @@ test('staff_directory keeps both first-login email query forms unchanged', async
     const snap = await assertSucceeds(getDocs(query(collection(db, 'staff_directory'), where(field, operator, 'ent@example.com'))));
     assert.equal(snap.size, 1);
   }
+});
+
+test('anonymous callers cannot access stats/history and whitelist management needs no UID profile', async () => {
+  await seed(['user_stats', 'own'], { learningContributions: 1 });
+  await seed(['sync_history', 'own'], { userEmail: 'ent@example.com' });
+  const db = anonDb();
+  await assertFails(getDoc(doc(db, 'user_stats', 'own')));
+  await assertFails(getDoc(doc(db, 'sync_history', 'own')));
+  await assertFails(addDoc(collection(db, 'sync_history'), { userEmail: 'ent@example.com' }));
+  const management = testEnv.authenticatedContext('without-profile', { email: 'fer.aragon@crearpsl.net' }).firestore();
+  await assertSucceeds(getDocs(collection(management, 'user_stats')));
+  await assertSucceeds(setDoc(doc(management, 'qt_directory', 'managed'), { email: 'qt@example.com' }));
 });

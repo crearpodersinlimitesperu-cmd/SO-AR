@@ -22,6 +22,13 @@ It failed before any function or rule deployment. This is a **data-readiness
 blocker**, not a claim that credentials are missing. No roles, sedes or
 assignments were inferred or changed.
 
+The [latest preflight](https://github.com/crearpodersinlimitesperu-cmd/SO-AR/actions/runs/37945046288)
+at head `419ff86` also included registered legacy identities without a configured
+UID: **54 registered active accounts, 11 unconfigured, 1 unverified** (206
+documents, 13 configured test cohorts). It again stopped before deployment.
+C-02 [CI for that exact head](https://github.com/crearpodersinlimitesperu-cmd/SO-AR/actions/runs/37944893990)
+passed: application/client tests, build, backend syntax and Firestore emulator.
+
 C-02 remains in draft #97, retargeted from the historical C-01 branch to
 `master`, with the original history and adapted implementation preserved.
 Its initial adapted [CI run](https://github.com/crearpodersinlimitesperu-cmd/SO-AR/actions/runs/37944663082)
