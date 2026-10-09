@@ -960,7 +960,7 @@ service cloud.firestore {
       allow read: if isImoStaff();
     }
     match /imo_private_mission_windows/{campaignId}/profiles/{windowId} {
-      allow read: if isImoStaff() && resource.data.campaignId == campaignId;
+      allow read: if isImoStaff();
       allow write: if false;
     }
     match /user_kpi_targets/{document=**} {
