@@ -298,42 +298,11 @@ export default function MonitorImos() {
       return true;
     });
 
-    // 2. Si NO hay busqueda activa, aplicar el filtro de equipo estrictamente
-    if (!qNorm) {
-      if (filterEquipo === 'todos') return baseMissions;
-      return baseMissions.filter(m => normalizeEquipoName(m.equipo) === filterEquipo);
-    }
-
-    // 3. SI HAY BUSQUEDA ACTIVA:
-    // a. Si hay un equipo seleccionado (ej. EQUIPO 31), verificar si la busqueda coincide dentro de ese equipo
-    if (filterEquipo !== 'todos') {
-      const inCurrentEquipo = baseMissions.filter(m => {
-        if (normalizeEquipoName(m.equipo) !== filterEquipo) return false;
-        const enrolados = getEnroladosList(m);
-        return isMissionSearchMatch(m, enrolados, qNorm, qDigits);
-      });
-
-      // Si se encuentra en el equipo seleccionado, devolvemos esos
-      if (inCurrentEquipo.length > 0) {
-        return inCurrentEquipo;
-      }
-
-      // Si NO se encuentra en el equipo seleccionado, pero SI en otros equipos de la sede:
-      const inOtherEquipos = baseMissions.filter(m => {
-        const enrolados = getEnroladosList(m);
-        return isMissionSearchMatch(m, enrolados, qNorm, qDigits);
-      });
-
-      if (inOtherEquipos.length > 0) {
-        return inOtherEquipos;
-      }
-    }
-
-    // Si el filtro de equipo es 'todos' o no hubo match en el equipo seleccionado
-    return baseMissions.filter(m => {
-      const enrolados = getEnroladosList(m);
-      return isMissionSearchMatch(m, enrolados, qNorm, qDigits);
-    });
+    // Searching never widens the explicitly selected team.
+    return baseMissions.filter(m =>
+      (filterEquipo === 'todos' || normalizeEquipoName(m.equipo) === filterEquipo) &&
+      (!qNorm || isMissionSearchMatch(m, getEnroladosList(m), qNorm, qDigits))
+    );
   // eslint-disable-next-line react-hooks/exhaustive-deps -- Nodus uses an external index; this tick invalidates the memo.
   }, [sedeScopedMissions, campaignFilter, searchTerm, filterSede, filterEquipo, filterEstado, filterNodus, nodusSyncTick]);
 
@@ -695,7 +664,7 @@ export default function MonitorImos() {
               SISTEMA OPERATIVO CAUSA
             </span>
             <span style={{ background: 'rgba(34, 197, 94, 0.15)', color: '#22c55e', padding: '3px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 800 }}>
-              ● VALIDACIÓN AUTOMÁTICA NODUS
+              CRUCE CON REGISTROS NODUS
             </span>
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Misión IMO</span>
           </div>
@@ -703,7 +672,7 @@ export default function MonitorImos() {
             MONITOR DE IMOS
           </h1>
           <p className="text-muted" style={{ fontSize: '0.95rem', margin: 0 }}>
-            Supervisión en tiempo real de IMOs y <strong style={{ color: '#22c55e' }}>validación automática</strong> cruzada con llamadas de Coordinadoras registradas en Nodus.
+            Seguimiento de confirmaciones IMO y cruce con los registros disponibles de Nodus. El cruce no acredita que la sincronización esté al día.
           </p>
         </div>
 
@@ -918,60 +887,10 @@ export default function MonitorImos() {
             🎯 <strong style={{ color: '#ffb703' }}>{completadosCount} IMOs al 100%</strong> ({filteredMissions.length - completadosCount} con pendientes).
           </div>
 
-          {filterSede === 'Lima' && (
-            <div style={{ marginTop: '0.75rem', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: '0.75rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>
-                Foco Lima:
-              </span>
-              <button
-                onClick={() => setFilterEquipo('EQUIPO 31 - LIMA CICLO 1')}
-                style={{
-                  padding: '5px 12px',
-                  borderRadius: '6px',
-                  border: filterEquipo === 'EQUIPO 31 - LIMA CICLO 1' ? '2px solid #38bdf8' : '1px solid rgba(255,255,255,0.15)',
-                  background: filterEquipo === 'EQUIPO 31 - LIMA CICLO 1' ? 'rgba(56, 189, 248, 0.25)' : 'rgba(255,255,255,0.03)',
-                  color: filterEquipo === 'EQUIPO 31 - LIMA CICLO 1' ? '#38bdf8' : '#94a3b8',
-                  fontSize: '0.78rem',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px'
-                }}
-              >
-                <span>🎯 Misión Activa (133 Enrolamientos)</span>
-                <span style={{ background: '#38bdf8', color: '#0f172a', padding: '1px 5px', borderRadius: '3px', fontSize: '0.68rem', fontWeight: 800 }}>En Curso</span>
-              </button>
-
-              <button
-                onClick={() => setFilterEquipo('todos')}
-                style={{
-                  padding: '5px 12px',
-                  borderRadius: '6px',
-                  border: filterEquipo === 'todos' ? '2px solid #ffb703' : '1px solid rgba(255,255,255,0.15)',
-                  background: filterEquipo === 'todos' ? 'rgba(255, 183, 3, 0.2)' : 'rgba(255,255,255,0.03)',
-                  color: filterEquipo === 'todos' ? '#ffb703' : '#94a3b8',
-                  fontSize: '0.78rem',
-                  fontWeight: 600,
-                  cursor: 'pointer'
-                }}
-              >
-                📚 Histórico Acumulado (291 Enrolamientos)
-              </button>
-
-              <span style={{
-                fontSize: '0.72rem',
-                background: 'rgba(34, 197, 94, 0.15)',
-                color: '#22c55e',
-                border: '1px solid rgba(34, 197, 94, 0.3)',
-                padding: '3px 8px',
-                borderRadius: '4px',
-                fontWeight: 700
-              }}>
-                🛡️ Control de Integridad: 0 Duplicados • 0 Redundancias • 0 Omisiones
-              </span>
-            </div>
-          )}
+          <p style={{ color: '#cbd5e1', marginTop: '0.75rem', fontSize: '0.85rem' }}>
+            Esta vista contiene {totalEnroladosCount} enrolamientos según la campaña y los filtros seleccionados.
+            Los registros anteriores se consultan por separado. Estos conteos no certifican ausencia de duplicados u omisiones en Nodus.
+          </p>
         </div>
 
         {/* Botones de Filtro Rápido */}

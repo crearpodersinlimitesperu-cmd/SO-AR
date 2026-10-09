@@ -4,6 +4,7 @@ import { db } from '../../services/firebase';
 import { listenCampaignMissions, listenConfirmations, saveConfirmation } from './missionService';
 import { isMissionComplete, missionProgress, normalizeText } from './missionModel';
 import './mission.css';
+import VerifiedMissionPortal from './VerifiedMissionPortal';
 
 export default function MissionPortal() {
   const campaignId = new URLSearchParams(window.location.search).get('campana');
@@ -24,13 +25,13 @@ export default function MissionPortal() {
     if (!validId) return;
     return onSnapshot(doc(db, 'imo_campaigns', campaignId), snap => {
       if (!snap.exists()) { setError('La campaña no existe. Solicita a gerencia el enlace vigente.'); setLoaded(true); return; }
-      setCampaign(snap.data());
+      setCampaign(snap.data()); setLoaded(true);
     }, () => { setError('El enlace no está disponible o la campaña está cerrada. Solicita a gerencia el enlace vigente.'); setLoaded(true); });
   }, [campaignId, validId]);
   useEffect(() => {
-    if (!validId) return;
+    if (!validId || campaign?.schemaVersion !== 2) return;
     return listenCampaignMissions(campaignId, data => { setMissions(data); setLoaded(true); }, () => { setError('No se pudieron consultar los perfiles. Revisa tu conexión o solicita el enlace vigente.'); setLoaded(true); });
-  }, [campaignId, validId]);
+  }, [campaignId, validId, campaign?.schemaVersion]);
   const mission = missions.find(m => m.id === selected);
   useEffect(() => {
     setChecks({}); setChecksLoaded(false);
@@ -49,7 +50,7 @@ export default function MissionPortal() {
   }
   return <main className="imo-page"><section className="imo-card">
     <header><span className="imo-brand">CREAR · PODER SIN LÍMITES</span><h1>Misión IMO</h1><p>IMO es la persona que enrola a alguien para entrenarse, como mínimo, en Capítulo Uno.</p></header>
-    {!validId ? <><h2>Solicita el enlace vigente de tu equipo</h2><p>Las misiones ahora se generan desde Causa OS por sede, equipo de ingreso y fecha de Capítulo Uno. Pide a gerencia el enlace de tu campaña.</p><p>Las direcciones antiguas no identifican una campaña vigente. No se han modificado tus registros anteriores.</p></> : !loaded ? <p role="status">Consultando la campaña…</p> : <>
+    {!validId ? <><h2>Solicita el enlace vigente de tu equipo</h2><p>Las misiones ahora se generan desde Causa OS por sede, equipo de ingreso y fecha de Capítulo Uno. Pide a gerencia el enlace de tu campaña.</p><p>Las direcciones antiguas no identifican una campaña vigente. No se han modificado tus registros anteriores.</p></> : !loaded ? <p role="status">Consultando la campaña…</p> : campaign?.schemaVersion === 3 ? <VerifiedMissionPortal key={campaignId} campaignId={campaignId} /> : campaign?.schemaVersion !== 2 ? <p>Campaña no disponible. Solicita el enlace vigente a gerencia.</p> : <>
       {campaign && <h2>{campaign.sede} · Capítulo Uno · Equipo {campaign.targetTeam}<br/><small>Inicio de C1: {campaign.c1Date}</small></h2>}
       {!confirmedProfile ? <><label>Selecciona tu nombre<select value={selected} onChange={e => setSelected(e.target.value)}><option value="">Elige tu perfil IMO</option>{missions.map(m => <option key={m.id} value={m.id}>{m.imoNombre} · {m.originTeam ? `Equipo de origen ${m.originTeam}` : 'Equipo de origen por confirmar'}</option>)}</select></label>
         <p>Si tu nombre no aparece, solicita a gerencia que revise tu asignación. No selecciones el perfil de otra persona.</p>

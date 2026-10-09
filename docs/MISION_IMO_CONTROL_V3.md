@@ -88,3 +88,11 @@ No se ha activado `imo_system/control`, no se enviaron códigos reales y no se i
 - La advertencia de retención de imágenes se conserva. El wrapper solo acepta ese error específico tras éxito de ambas operaciones y verificación independiente de estado/trigger/endpoint. No se modificaron políticas de borrado.
 - Los metadatos de NODUS_USER y NODUS_PASSWORD siguen fechados 1 de octubre; no se repitieron intentos de login con las mismas credenciales que fallaron.
 - Pendiente funcional: acceso válido a Nodus, importador verificado, campañas/portal v3, revisión de coordinadores y prueba integral. Backend activo no equivale a portal terminado.
+
+## Portal conectado al backend — 8 octubre 2026
+
+- Se añadió `VerifiedMissionPortal` para campañas schemaVersion 3: documento, código, sesión en memoria de 30 minutos, consulta propia, calendario, búsqueda, filtros y solicitudes idempotentes de cambio/contacto/asistencia.
+- No se leen perfiles públicos en campañas v3. Los enlaces v2 existentes mantienen su flujo explícitamente no verificado; no fueron convertidos ni activados con identidades inferidas.
+- Monitor: eliminados los textos fijos 133/291 y la afirmación no calculada de cero duplicados/omisiones. Buscar ya no amplía silenciosamente el filtro de equipo.
+- Validación: 23 pruebas de contratos existentes; recorrido de navegador con respuestas sintéticas locales (documento, código, consulta, ausencia de datos, cambio 30→32 pendiente y cierre de sesión); compilación de producción.
+- Pendientes reales: acceso válido al sincronizador Nodus, importación privada verificada, habilitación de campaña v3, bandeja autenticada de revisión C1/C2 y prueba integral de correo/notificación con datos autorizados. No se habilitó el control ni se enviaron mensajes durante esta comprobación.
