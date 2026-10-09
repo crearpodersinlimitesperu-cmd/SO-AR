@@ -56,11 +56,9 @@ export default function NewExcellenceModal({ isOpen, onClose, task, onComplete }
           'success'
         );
         onClose();
-      } else {
-        showToast(result.error || 'Error al registrar la nueva excelencia', 'error');
       }
     } catch (error) {
-      showToast(error.message || 'Error al registrar la nueva excelencia', 'error');
+      showToast('Error al registrar la nueva excelencia', 'error');
     } finally {
       setIsSubmitting(false);
     }

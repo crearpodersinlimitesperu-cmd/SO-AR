@@ -13,8 +13,28 @@ UID profiles and sede alias `in` queries in the emulator. C-02 is not authorized
 for activation solely by passing those tests: real registered UID profiles and
 authenticated callables must also pass `scripts/verifyDirectoryAccess.mjs`
 before changing `/users` access. This verification logs only aggregate counts,
-not production identities or credentials. Backend, rules and Hosting deployment
-evidence will be recorded separately when available.
+not production identities or credentials.
+
+The [read-only production preflight](https://github.com/crearpodersinlimitesperu-cmd/SO-AR/actions/runs/37944773168)
+at C-02 commit `ae243f4` examined 206 user documents and 51 active registered
+UID accounts: 8 lacked administered roles/sede and 1 had an unverified email.
+It failed before any function or rule deployment. This is a **data-readiness
+blocker**, not a claim that credentials are missing. No roles, sedes or
+assignments were inferred or changed.
+
+C-02 remains in draft #97, retargeted from the historical C-01 branch to
+`master`, with the original history and adapted implementation preserved.
+Its initial adapted [CI run](https://github.com/crearpodersinlimitesperu-cmd/SO-AR/actions/runs/37944663082)
+passed application tests, build and the emulator (including own-login aliases
+and all canonical sede alias `in` queries). Further regressions cover the
+actual caller UID preference, legacy recipient emails, and explicit backend
+failures. The backend is **not deployed or smoke-tested in production**.
+
+The independently deployable replacement for #96 contains A-01 and this audit
+log only; it does not change `/users`, AuthContext, functions or the directory
+client. `staff_directory` stays readable/writable by authenticated users;
+`qt_directory` reads are unchanged. The learning page reports a restricted
+ranking rather than displaying a misleading empty leaderboard.
 
 No IMO, letters/campus, production data migration or new broad audit is included.
 
