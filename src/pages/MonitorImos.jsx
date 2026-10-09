@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { collection, collectionGroup, query, orderBy, onSnapshot, deleteDoc, doc, writeBatch, addDoc } from 'firebase/firestore';
 import MissionHistory from '../features/imo/MissionHistory';
 import CampaignGenerator from '../features/imo/CampaignGenerator';
+import PublicLinksPanel from '../features/imo/PublicLinksPanel';
 import { isMissionComplete } from '../features/imo/missionModel';
 import { db } from '../services/firebase';
 import { Search, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
@@ -73,6 +74,7 @@ export default function MonitorImos() {
   };
 
   const [showImoLinkModal, setShowImoLinkModal] = useState(false);
+  const [showPublicLinks, setShowPublicLinks] = useState(false);
   const [showNeuroModal, setShowNeuroModal] = useState(false);
   const [activeNeuroDay, setActiveNeuroDay] = useState(1);
 
@@ -746,6 +748,27 @@ export default function MonitorImos() {
             onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(16, 185, 129, 0.15)'}
           >
             🔗 Link IMO (Linaje)
+          </button>
+
+          <button
+            onClick={() => setShowPublicLinks(true)}
+            style={{
+              background: 'rgba(37, 99, 235, 0.15)',
+              color: '#3b82f6',
+              border: '1px solid rgba(37, 99, 235, 0.3)',
+              padding: '0.5rem 1rem',
+              borderRadius: '6px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(37, 99, 235, 0.25)'}
+            onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(37, 99, 235, 0.15)'}
+          >
+            🌐 Enlaces públicos por equipo
           </button>
 
           <button
@@ -2262,6 +2285,7 @@ export default function MonitorImos() {
       {historyMission && <MissionHistory mission={historyMission} onClose={() => setHistoryMission(null)} />}
       {missionLoadError && <div role="alert" style={{ position: 'fixed', bottom: 12, left: 16, background: '#7f1d1d', color: 'white', padding: 16, zIndex: 9000 }}>{missionLoadError}</div>}
       {showImoLinkModal && <CampaignGenerator missions={isGlobalScopeUser ? missions : sedeScopedMissions} defaultSede={filterSede === 'todos' ? (normalizeSede(currentUser?.sede) || 'Quito') : filterSede} defaultEquipo={filterEquipo} sedes={isGlobalScopeUser ? [...new Set([...sedesDisponibles, 'Quito', 'Guayaquil', 'Cuenca', 'Lima', 'Medellín', 'México', 'Bogotá'])] : [normalizeSede(currentUser?.sede)].filter(Boolean)} getEnrolados={getEnroladosList} onCreated={id => { setCampaignFilter(id); setFilterEquipo('todos'); }} onClose={() => setShowImoLinkModal(false)} />}
+      {showPublicLinks && <PublicLinksPanel defaultSede={filterSede === 'todos' ? (normalizeSede(currentUser?.sede) || 'Quito') : filterSede} sedes={isGlobalScopeUser ? [...new Set([...sedesDisponibles, 'Quito', 'Guayaquil', 'Cuenca', 'Lima', 'Medellín', 'México', 'Bogotá'])] : [normalizeSede(currentUser?.sede)].filter(Boolean)} onClose={() => setShowPublicLinks(false)} />}
 
       {/* ── MODAL: SIMULADOR DE NEUROMARKETING (SEGUIMIENTO 3 DÍAS) ── */}
       {showNeuroModal && (
