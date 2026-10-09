@@ -938,8 +938,7 @@ service cloud.firestore {
             request.resource.data.at == request.time && request.resource.data.identity == 'self-selected' && request.resource.data.source == 'mision-imo-v2' &&
             request.resource.data.after.keys().hasOnly(['contacto', 'asistencia']) &&
             request.resource.data.after.contacto is bool && request.resource.data.after.asistencia is bool &&
-            matchingImoBefore(campaignId, missionId, request.resource.data.enroladoId, request.resource.data.before) &&
-            matchingImoConfirmation(campaignId, missionId, request.resource.data.enroladoId, eventId, request.resource.data.after, request.resource.data.sessionId, request.resource.data.reportedName);
+            matchingImoBefore(campaignId, missionId, request.resource.data.enroladoId, request.resource.data.before);
           allow update, delete: if false;
         }
       }
