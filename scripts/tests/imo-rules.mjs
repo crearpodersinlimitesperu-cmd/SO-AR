@@ -73,7 +73,6 @@ try {
   });
   await assertFails(save('contacto', false, 'event-3'));
   console.log('IMO rules: expired report was rejected');
-  console.log('IMO rules: expired report was rejected');
   await assertSucceeds(updateDoc(doc(staff, 'imo_campaigns', cid), { status: 'closed' }));
   console.log('IMO rules: campaign closed');
   await assertFails(save('contacto', false, 'event-3'));

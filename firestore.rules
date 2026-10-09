@@ -956,6 +956,9 @@ service cloud.firestore {
     match /{path=**}/imo_confirmations/{enroladoId} {
       allow read: if isImoStaff();
     }
+    match /{path=**}/imo_progress/{progressId} {
+      allow read: if isImoStaff();
+    }
     match /imo_private_mission_windows/{campaignId}/profiles/{windowId} {
       allow read: if isImoStaff() && resource.data.campaignId == campaignId;
       allow write: if false;
