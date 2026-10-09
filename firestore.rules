@@ -930,7 +930,6 @@ service cloud.firestore {
             request.resource.data.get('campaignId', '') == campaignId &&
             request.resource.data.contacto is bool && request.resource.data.asistencia is bool &&
             request.resource.data.updatedAt == request.time &&
-            imoWindowOpen(campaignId, missionId) &&
             existsAfter(/databases/$(database)/documents/imo_campaigns/$(campaignId)/profiles/$(missionId)/imo_events/$(request.resource.data.eventId));
           allow delete: if false;
         }
