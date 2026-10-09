@@ -79,6 +79,12 @@ No se ha activado `imo_system/control`, no se enviaron códigos reales y no se i
 - Se dejó preparado, sin guardar, `roles/storage.objectViewer` para `122588918051-compute@developer.gserviceaccount.com` exclusivamente en ese bucket. Pendiente de autorización del usuario para este nuevo acceso.
 - No hay funciones IMO operativas confirmadas. No se habilitó el control ni se enviaron códigos reales. La autenticación/sincronización Nodus y el portal v3 siguen pendientes.
 
+## Plazo del portal verificado
+
+Al completar la primera verificación OTP, el backend crea una sola ventana en `imo_private_mission_windows/{campaignId}/profiles/{imoHash}` con `openedAt` de hora del servidor. Una verificación posterior no reinicia el plazo. El backend permite reportes hasta el instante exacto de las 8.5 horas y rechaza nuevas solicitudes después; los reportes anteriores siguen visibles. La ventana se entrega con la respuesta privada del roster y el portal muestra el contador de 7 horas, la prórroga automática de 90 minutos y el modo de solo lectura.
+
+El Monitor puede leer las fechas/nombre de esas ventanas para personal autorizado; ningún cliente puede escribirlas y los perfiles privados completos siguen fuera del navegador. Este límite del portal es adicional al estado de operación v3: no habilita el snapshot, no crea campañas, no acredita una integración activa de Nodus ni sustituye la revisión C1/C2.
+
 ### Backend desplegado y verificado — 7 de octubre de 2026
 
 - Confirmados permisos de secretos, Logs Writer, Storage Object Viewer (solo bucket de fuentes) y Artifact Registry Writer (solo gcf-artifacts).

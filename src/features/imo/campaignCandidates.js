@@ -70,19 +70,22 @@ export function isPersonName(name) {
 
 export function buildCampaignCandidates(missions, { sede, targetTeam, resolveSede, getEnrolados, search = '' }) {
   const target = Number(targetTeam);
-  if (!target || !sede) return { candidates: [], conflicts: [] };
+  if (!target || !sede) return { candidates: [], conflicts: [], phoneConflicts: [] };
   const sedeNorm = normalizeText(sede);
   const index = buildOriginIndex(missions, resolveSede);
   const records = (missions || [])
     .filter(m => m.schemaVersion !== 2 && recordTeamNumber(m) === target)
     .filter(m => !resolveSede || normalizeText(resolveSede(m)) === sedeNorm)
     .filter(m => personKey(m.imoNombre) && !isPlaceholderImo(m.imoNombre))
-    .sort((a, b) => updatedMs(b) - updatedMs(a));
+    .sort((a, b) => updatedMs(b) - updatedMs(a) || String(a.id || '').localeCompare(String(b.id || '')));
 
   const byImo = new Map();
   const ownerByPerson = new Map();
+  const ownerByPhone = new Map();
   const conflicts = [];
+  const phoneConflicts = [];
   const seenConflicts = new Set();
+  const seenPhoneConflicts = new Set();
   for (const m of records) {
     const imoKey = personKey(m.imoNombre);
     if (!byImo.has(imoKey)) {
@@ -99,21 +102,56 @@ export function buildCampaignCandidates(missions, { sede, targetTeam, resolveSed
     candidate.sourceMissionIds.push(m.id);
     for (const e of getEnrolados(m)) {
       const key = personKey(e.nombre);
-      if (!key || !isPersonName(e.nombre) || !isAvailableForC1(e)) continue;
-      const phone = phoneKey(e.telefono);
-      const owner = ownerByPerson.get(key) || (phone.length >= 7 ? ownerByPerson.get(`tel:${phone}`) : null);
-      if (owner === imoKey) continue;
+      if (!key || !isPersonName(e.nombre)) continue;
+      const owner = ownerByPerson.get(key);
       if (owner) {
-        const conflictKey = `${key}|${imoKey}`;
-        if (seenConflicts.has(conflictKey)) continue;
-        seenConflicts.add(conflictKey);
-        conflicts.push({ enrolado: e.nombre, keptWith: byImo.get(owner).nombre, skippedFrom: candidate.nombre });
+        if (owner.imoKey !== imoKey) {
+          const conflictKey = `${key}|${imoKey}`;
+          if (seenConflicts.has(conflictKey)) continue;
+          seenConflicts.add(conflictKey);
+          conflicts.push({
+            enrolado: e.nombre,
+            keptWith: owner.imoNombre,
+            skippedFrom: candidate.nombre,
+            ...(owner.available ? {} : { keptEligible: false }),
+          });
+        }
         continue;
       }
-      ownerByPerson.set(key, imoKey);
-      if (phone.length >= 7) ownerByPerson.set(`tel:${phone}`, imoKey);
+
+      const available = isAvailableForC1(e);
+      ownerByPerson.set(key, { imoKey, imoNombre: candidate.nombre, available });
+      if (!available) continue;
+
+      const phone = phoneKey(e.telefono);
+      if (phone.length >= 7) {
+        const phoneOwner = ownerByPhone.get(phone);
+        if (phoneOwner && phoneOwner.personKey !== key) {
+          const conflictKey = `${phone}|${phoneOwner.personKey}|${key}`;
+          if (!seenPhoneConflicts.has(conflictKey)) {
+            seenPhoneConflicts.add(conflictKey);
+            phoneConflicts.push({
+              enrolado: String(e.nombre).trim(),
+              otherEnrolado: phoneOwner.nombre,
+              imoNombre: candidate.nombre,
+              otherImoNombre: phoneOwner.imoNombre,
+            });
+          }
+        } else if (!phoneOwner) {
+          ownerByPhone.set(phone, { personKey: key, nombre: String(e.nombre).trim(), imoNombre: candidate.nombre });
+        }
+      }
+
+      const idBase = String(e.id || `enr_${key.replace(/ /g, '_').toLowerCase()}`).replace(/\//g, '_');
+      let id = idBase;
+      if (candidate.enrolados.some(existing => existing.id === id)) {
+        const suffix = key.replace(/[^A-Z0-9]+/g, '_').replace(/^_|_$/g, '').toLowerCase() || 'person';
+        id = `${idBase}_${suffix}`;
+        let disambiguator = 2;
+        while (candidate.enrolados.some(existing => existing.id === id)) id = `${idBase}_${suffix}_${disambiguator++}`;
+      }
       candidate.enrolados.push({
-        id: String(e.id || `enr_${key.replace(/ /g, '_').toLowerCase()}`).replace(/\//g, '_'),
+        id,
         nombre: String(e.nombre).trim(),
         ...c1Evidence(e),
         telefono: e.telefono || '',
@@ -126,14 +164,9 @@ export function buildCampaignCandidates(missions, { sede, targetTeam, resolveSed
   const query = normalizeText(search);
   const candidates = [...byImo.values()]
     .filter(c => c.enrolados.length > 0)
-    .map(c => {
-      const ids = new Set();
-      c.enrolados = c.enrolados.filter(e => (ids.has(e.id) ? false : ids.add(e.id)));
-      return c;
-    })
     .filter(c => !query || normalizeText(c.nombre).includes(query) || c.enrolados.some(e => normalizeText(e.nombre).includes(query)))
     .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
-  return { candidates, conflicts };
+  return { candidates, conflicts, phoneConflicts };
 }
 
 // Teams of a sede that already have Nodus enrollee records, with counts.

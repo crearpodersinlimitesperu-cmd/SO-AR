@@ -39,6 +39,18 @@ export async function createCampaign(input) {
 }
 export const listenCampaignMissions = (campaignId, next, error) => onSnapshot(collection(db, 'imo_campaigns', campaignId, 'profiles'), snap => next(snap.docs.map(d => ({ ...d.data(), id: d.id }))), error);
 export const listenConfirmations = (campaignId, id, next, error) => onSnapshot(collection(db, 'imo_campaigns', campaignId, 'profiles', id, 'imo_confirmations'), { includeMetadataChanges: true }, snap => next(Object.fromEntries(snap.docs.map(d => [d.id, { ...d.data(), pending: d.metadata.hasPendingWrites }]))), error);
+export const listenMissionWindow = (campaignId, id, next, error) => onSnapshot(
+  doc(db, 'imo_campaigns', campaignId, 'profiles', id, 'imo_progress', 'window'),
+  snap => next(snap.exists() ? snap.data().openedAt || null : null),
+  error
+);
+export async function startMissionWindow(campaignId, missionId) {
+  const ref = doc(db, 'imo_campaigns', campaignId, 'profiles', missionId, 'imo_progress', 'window');
+  await runTransaction(db, async tx => {
+    const existing = await tx.get(ref);
+    if (!existing.exists()) tx.set(ref, { campaignId, openedAt: serverTimestamp() });
+  });
+}
 export async function saveConfirmation(campaignId, missionId, enroladoId, field, value, reportedName, sessionId) {
   if (!['contacto', 'asistencia'].includes(field) || typeof value !== 'boolean') throw new Error('Confirmación inválida.');
   const ref = doc(db, 'imo_campaigns', campaignId, 'profiles', missionId, 'imo_confirmations', enroladoId);
@@ -47,8 +59,8 @@ export async function saveConfirmation(campaignId, missionId, enroladoId, field,
     const previous = await tx.get(ref);
     const before = previous.exists() ? { contacto: previous.data().contacto, asistencia: previous.data().asistencia } : { contacto: false, asistencia: false };
     const after = { ...before, [field]: value };
-    tx.set(ref, { ...after, reportedName, sessionId, updatedAt: serverTimestamp(), eventId: eventRef.id });
-    tx.set(eventRef, { enroladoId, before, after, reportedName, sessionId, identity: 'self-selected', at: serverTimestamp(), source: 'mision-imo-v2' });
+    tx.set(ref, { ...after, campaignId, reportedName, sessionId, updatedAt: serverTimestamp(), eventId: eventRef.id });
+    tx.set(eventRef, { campaignId, enroladoId, before, after, reportedName, sessionId, identity: 'self-selected', at: serverTimestamp(), source: 'mision-imo-v2' });
   });
 }
 export async function getSedeCampaigns(sede) {

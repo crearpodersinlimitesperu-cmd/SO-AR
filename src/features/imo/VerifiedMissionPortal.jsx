@@ -3,6 +3,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { app } from '../../services/firebase';
 import { normalizeText } from './missionModel';
+import MissionWindowNotice from './MissionWindowNotice';
+import { useMissionWindow } from './useMissionWindow';
 
 const access = httpsCallable(getFunctions(app, 'us-central1'), 'imoAccess');
 const absent = '[DATO NO REGISTRADO EN NODUS]';
@@ -63,6 +65,8 @@ export default function VerifiedMissionPortal({ campaignId, invoke = access }) {
     setNotice('Solicitud registrada para revisión de C1/C2. El estado oficial de Nodus no ha cambiado.');
   }
   const visible = (roster?.enrolados || []).filter(isAvailableForC1).filter(row => normalizeText(row.nombre).includes(normalizeText(search)) && (filter === 'all' || requests.some(r => r.enrolleeId === row.id && r.status === filter)));
+  const missionWindow = useMissionWindow(roster?.missionWindow?.openedAt);
+  const canReport = !!roster?.missionWindow?.openedAt && missionWindow?.phase !== 'expired';
   return <>
     <h2>Acceso verificado a tu misión</h2>
     {!session ? <form onSubmit={event => { event.preventDefault(); perform(async () => {
@@ -77,16 +81,17 @@ export default function VerifiedMissionPortal({ campaignId, invoke = access }) {
       <div className="imo-row"><button disabled={busy} onClick={() => perform(() => refresh())}>Actualizar consulta</button><button className="imo-secondary" disabled={busy} onClick={() => perform(async () => { await call('logout'); setSession(null); setRoster(null); setRequests([]); setEvents([]); setChallenge(''); })}>Cerrar sesión</button></div>
       {roster && <>
         <h2>{roster.nombre}</h2><p>{roster.sede} · Equipo de ingreso {roster.targetTeam} · C1: {roster.c1Date}</p>
+        <MissionWindowNotice openedAt={roster.missionWindow?.openedAt} notStartedMessage="No hay un plazo activo para esta sesión. Cierra sesión y vuelve a verificar tu acceso; al verificar empieza el reloj."/>
         <p>Fuente Nodus: {recorded(roster.sourceUpdatedAt)}. Confirmar intención de asistencia no acredita asistencia efectiva.</p>
         <div className="imo-grid"><label>Buscar enrolado<input type="search" value={search} onChange={e => setSearch(e.target.value)} /></label><label>Estado de la solicitud<select value={filter} onChange={e => setFilter(e.target.value)}><option value="all">Todos</option>{Object.entries(statuses).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></label></div>
         <p>{visible.length} de {roster.enrolados.length} enrolados vinculados a tu identidad. Solo pendientes de sentarse o desertores de C1 con registro explícito en Nodus.</p>
         {visible.map(row => { const draft = drafts[row.id] || {}; return <article className="imo-enrolado" key={row.id}>
           <h3>{row.nombre}</h3><p>Equipo actual Nodus: {recorded(row.currentTeam)}<br/>Asistencia C1: {recorded(row.asistenciaC1)} · C2: {recorded(row.asistenciaC2)}<br/>Primera llamada: {recorded(row.llamada1)}<br/>Segunda llamada: {recorded(row.llamada2)}<br/>Coordinación: {recorded(row.coordinadorNombre)}</p>
           {requests.filter(r => r.enrolleeId === row.id).map(r => <p className="imo-note" key={r.id}>{statuses[r.status] || r.status}{r.requested?.team ? ` · Equipo solicitado: ${r.requested.team} · ${r.requested.c1Date}` : ''}{r.reviewNote ? ` · ${r.reviewNote}` : ''}</p>)}
-          <label>Reportar novedad<select value={draft.type || 'attendance_confirmation'} onChange={e => draftFor(row.id, 'type', e.target.value)}><option value="attendance_confirmation">Intención de asistencia</option><option value="team_change">Solicitar cambio de equipo</option><option value="contact_update">Reportar contacto</option></select></label>
-          {draft.type === 'team_change' ? <label>Equipo y fecha C1 del calendario<select value={draft.event || ''} onChange={e => draftFor(row.id, 'event', e.target.value)}><option value="">Selecciona equipo y fecha</option>{events.filter(e => String(e.team) !== String(row.currentTeam)).map(e => <option key={e.id} value={e.id}>Equipo {e.team} · {e.date}</option>)}</select></label> : (!draft.type || draft.type === 'attendance_confirmation') && <label>Mi enrolado indica<select value={draft.attendance || 'yes'} onChange={e => draftFor(row.id, 'attendance', e.target.value)}><option value="yes">Que asistirá</option><option value="no">Que no asistirá</option></select></label>}
-          <label>Comentario<textarea maxLength={1000} value={draft.note || ''} onChange={e => draftFor(row.id, 'note', e.target.value)} /></label>
-          <button disabled={busy || (draft.type === 'team_change' && !draft.event)} onClick={() => perform(() => report(row))}>Enviar solicitud a C1/C2</button>
+          <label>Reportar novedad<select disabled={busy || !canReport} value={draft.type || 'attendance_confirmation'} onChange={e => draftFor(row.id, 'type', e.target.value)}><option value="attendance_confirmation">Intención de asistencia</option><option value="team_change">Solicitar cambio de equipo</option><option value="contact_update">Reportar contacto</option></select></label>
+          {draft.type === 'team_change' ? <label>Equipo y fecha C1 del calendario<select disabled={busy || !canReport} value={draft.event || ''} onChange={e => draftFor(row.id, 'event', e.target.value)}><option value="">Selecciona equipo y fecha</option>{events.filter(e => String(e.team) !== String(row.currentTeam)).map(e => <option key={e.id} value={e.id}>Equipo {e.team} · {e.date}</option>)}</select></label> : (!draft.type || draft.type === 'attendance_confirmation') && <label>Mi enrolado indica<select disabled={busy || !canReport} value={draft.attendance || 'yes'} onChange={e => draftFor(row.id, 'attendance', e.target.value)}><option value="yes">Que asistirá</option><option value="no">Que no asistirá</option></select></label>}
+          <label>Comentario<textarea disabled={busy || !canReport} maxLength={1000} value={draft.note || ''} onChange={e => draftFor(row.id, 'note', e.target.value)} /></label>
+          <button disabled={busy || !canReport || (draft.type === 'team_change' && !draft.event)} onClick={() => perform(() => report(row))}>Enviar solicitud a C1/C2</button>
         </article>; })}
       </>}
     </>}

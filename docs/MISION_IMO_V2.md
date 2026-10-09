@@ -20,7 +20,15 @@ Una campaña nueva empieza sin confirmaciones. Los registros anteriores permanec
 - `imo_campaigns/{id}/profiles/{missionId}`: proyección mínima compartida, sin teléfonos personales de enrolados ni correos internos.
 - `imo_confirmations` y `imo_events`, bajo cada perfil: confirmación e historial en una transacción; las reglas obligan a guardar ambos y verifican el estado anterior. No permiten borrar eventos.
 
-El Monitor recibe confirmaciones mediante collection-group y muestra historial. Asistencia confirmada y contacto deben ser verdaderos para completar. No se equipara confirmación con asistencia efectiva ni con graduación.
+El Monitor consulta las confirmaciones y los plazos de la campaña seleccionada mediante collection-group filtrado por `campaignId`, y conserva opciones de campañas cerradas para historial. Asistencia confirmada y contacto deben ser verdaderos para completar. No se equipara confirmación con asistencia efectiva ni con graduación.
+
+## Instrucciones y plazo de la misión
+
+El portal presenta el logo CREAR y una guía breve, en lenguaje simple, para seleccionar el perfil IMO, confirmar contacto y asistencia y entender qué significa el avance. En v2, el reloj empieza cuando se pulsa «Soy … · Ver mi misión», no al abrir el enlace compartido: el enlace no autentica a una persona y puede mostrar varios perfiles.
+
+El inicio se crea una sola vez en `imo_campaigns/{campaignId}/profiles/{missionId}/imo_progress/window`. Firestore Rules solo aceptan la creación con `openedAt == request.time`; no permiten actualizar ni borrar ese documento. Hay 7 horas de plazo y luego una única prórroga automática de 90 minutos. Las reglas permiten guardar hasta el instante exacto de las 8.5 horas y bloquean escrituras cuando `request.time > openedAt + 30.600 segundos`. Al vencer, el portal queda en solo lectura y conserva lo ya reportado. El contador del navegador es orientativo; Firestore Rules es la autoridad. El Monitor muestra inicio, fase y hora final cuando se selecciona la campaña.
+
+El Monitor vincula el calendario FDS Creación, Relación y Gratitud con el equipo de **origen del IMO**, no con el equipo C1 de destino, e indica fechas disponibles sin afirmar que la persona asistió al FDS. El alcance de elegibilidad C1 permanece independiente.
 
 La gestión privada usa `isImoStaff()` en Firestore: la lista de gerencia/dirección (`isGerenteODireccion()`) o un perfil `users/{uid}` con rol `direccion`, `cfo`, `ceo`, `cco`, `gerente`, `superadmin`, `consolidado`, `director_maestria`, `coord_c1` o `coord_maestria` (los mismos de la ruta `/monitor-imos`). Solo gerencia/dirección puede editar o borrar registros v1 heredados. La prueba `scripts/tests/imo-rules.mjs` corre en CI (`npm run test:rules`).
 
@@ -30,4 +38,4 @@ La gestión privada usa `isImoStaff()` en Firestore: la lista de gerencia/direcc
 
 Las reglas se prueban con `scripts/tests/imo-rules.mjs`, un proyecto **demo-imo** y `FIRESTORE_EMULATOR_HOST`. El script rechaza ejecución sin emulador. Requiere `@firebase/rules-unit-testing`, Firebase SDK y Java 21 para el emulador. `IMO_TEST_DEPENDENCIES` admite la ruta a un package.json con dependencias de pruebas aisladas.
 
-Pruebas: generación atómica, acceso por enlace, rechazo de enumeración pública, recuperación de checks, cambios acompañados de historial, inmutabilidad de eventos y cierre de campañas. Se verificó el flujo del portal en navegador con datos sintéticos y persistencia después de recargar. No se crean campañas de prueba en producción.
+Pruebas: generación atómica, acceso por enlace, rechazo de enumeración pública, recuperación de checks, cambios acompañados de historial, inmutabilidad de eventos, cierre de campañas, inicio del reloj únicamente con hora del servidor, inmutabilidad del inicio y rechazo de escrituras vencidas. Se verificó el flujo del portal con datos sintéticos y persistencia después de recargar. No se crean campañas de prueba en producción.

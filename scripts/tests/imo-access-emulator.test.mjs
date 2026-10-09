@@ -78,6 +78,36 @@ test('concurrent code requests cannot exceed the shared document limit',async()=
  assert.equal(results.filter(r=>r.status==='fulfilled').length,5);
  assert.equal(results.filter(r=>r.status==='rejected'&&r.reason.code==='resource-exhausted').length,3);
 });
+test('the first verified access starts one server window and reports stop after 8.5 hours',async()=>{
+ const firstChallenge=await requestSent();
+ const firstSession=await service.verifyCode({campaignId,...firstChallenge},'test-ip');
+ const firstRoster=await service.roster({campaignId,token:firstSession.token});
+ const openedAt=Date.parse(firstRoster.missionWindow.openedAt);
+ assert.equal(openedAt,now);
+ const stored=await db.collection('imo_private_mission_windows').doc(campaignId).collection('profiles').get();
+ assert.equal(stored.size,1);
+
+ now=openedAt+7*60*60*1000+30*60*1000;
+ const extensionChallenge=await requestSent('extension-ip');
+ const extensionSession=await service.verifyCode({campaignId,...extensionChallenge},'extension-ip');
+ const extensionRequest={campaignId,token:extensionSession.token,requestId:'11111111-1111-4111-8111-111111111111',enrolleeId:'own',type:'attendance_confirmation',attendance:true};
+ await service.report(extensionRequest);
+ assert.equal((await service.roster({campaignId,token:extensionSession.token})).missionWindow.openedAt,new Date(openedAt).toISOString());
+
+ now=openedAt+(8*60+30)*60*1000;
+ const deadlineChallenge=await requestSent('deadline-ip');
+ const deadlineSession=await service.verifyCode({campaignId,...deadlineChallenge},'deadline-ip');
+ await service.report({...extensionRequest,token:deadlineSession.token,requestId:'22222222-2222-4222-8222-222222222222'});
+
+ now+=1;
+ const expiredChallenge=await requestSent('expired-ip');
+ const expiredSession=await service.verifyCode({campaignId,...expiredChallenge},'expired-ip');
+ await assert.rejects(
+  service.report({...extensionRequest,token:expiredSession.token,requestId:'33333333-3333-4333-8333-333333333333'}),
+  {code:'failed-precondition'}
+ );
+ assert.equal((await db.collection('imo_private_mission_windows').doc(campaignId).collection('profiles').get()).size,1);
+});
 test('team change is atomic, idempotent and notifies once without altering Nodus',async()=>{
  const challenge=await requestSent();const session=await service.verifyCode({campaignId,...challenge},'test-ip');
  const data={campaignId,token:session.token,requestId:'00000000-0000-4000-8000-000000000001',enrolleeId:'own',type:'team_change',targetEventId:'event32',note:'Prueba sintética'};
