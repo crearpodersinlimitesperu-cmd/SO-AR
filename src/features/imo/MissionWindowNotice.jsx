@@ -14,9 +14,10 @@ export default function MissionWindowNotice({ openedAt, compact = false, notStar
   if (!window) return <p role="status">{notStartedMessage}</p>;
 
   const finalDeadline = new Date(window.finalDeadlineMs).toLocaleString('es-PE');
+  const startedAt = new Date(window.openedAtMs).toLocaleString('es-PE');
   if (compact) {
     const label = window.phase === 'active' ? 'Plazo inicial' : window.phase === 'extension' ? 'Prórroga automática' : 'Plazo vencido';
-    return <small>{label}: {formatRemaining(window.remainingMs)} · vence {finalDeadline}</small>;
+    return <small>Inició {startedAt} · {label}: {formatRemaining(window.remainingMs)} · vence {finalDeadline}</small>;
   }
 
   return <div
@@ -26,7 +27,7 @@ export default function MissionWindowNotice({ openedAt, compact = false, notStar
     {window.phase === 'active' && <strong>Tiempo disponible: {formatRemaining(window.remainingMs)}</strong>}
     {window.phase === 'extension' && <strong>Prórroga automática de 1 h 30 min: {formatRemaining(window.remainingMs)}</strong>}
     {window.phase === 'expired' && <strong>El plazo terminó. La misión quedó en solo lectura; lo que ya reportaste se conserva.</strong>}
-    {window.phase !== 'expired' && <span>Plazo final: {finalDeadline}</span>}
+    <span>Inicio según el servidor: {startedAt} · plazo final: {finalDeadline}</span>
     <small>El reloj empezó al confirmar que eres el IMO seleccionado. No se reinicia al cerrar la página, cambiar de dispositivo o volver al enlace. La hora del servidor es la que permite guardar.</small>
   </div>;
 }

@@ -143,7 +143,7 @@ export default function CampaignGenerator({ missions, defaultSede, defaultEquipo
 
   // Candidatos: IMOs cuyos enrolados ingresan al equipo C1 elegido (registros de Nodus),
   // un candidato por IMO aunque Nodus lo haya guardado en varios registros.
-  const { candidates, conflicts } = useMemo(
+  const { candidates, conflicts, phoneConflicts } = useMemo(
     () => buildCampaignCandidates(missions, { sede, targetTeam: target, resolveSede: resolveMissionSede, getEnrolados, search }),
     [missions, sede, target, search, getEnrolados]
   );
@@ -369,6 +369,16 @@ export default function CampaignGenerator({ missions, defaultSede, defaultEquipo
             </summary>
             <ul style={{ margin: '6px 0 0', paddingLeft: '18px' }}>
               {conflicts.slice(0, 30).map((c, i) => <li key={i}>{c.enrolado}: queda con {c.keptWith} (no se incluye en {c.skippedFrom})</li>)}
+            </ul>
+          </details>
+        )}
+        {phoneConflicts.length > 0 && (
+          <details style={{ background: '#eff6ff', border: '1px solid #93c5fd', borderRadius: '8px', padding: '8px 12px', margin: '6px 0 10px', fontSize: '0.8rem' }}>
+            <summary style={{ cursor: 'pointer', fontWeight: 700, color: '#1e3a8a' }}>
+              {phoneConflicts.length} pares de personas comparten un teléfono: se conservaron por separado. Revisa antes de generar.
+            </summary>
+            <ul style={{ margin: '6px 0 0', paddingLeft: '18px' }}>
+              {phoneConflicts.slice(0, 30).map((c, i) => <li key={i}>{c.enrolado} y {c.otherEnrolado} · IMO: {c.imoNombre}</li>)}
             </ul>
           </details>
         )}

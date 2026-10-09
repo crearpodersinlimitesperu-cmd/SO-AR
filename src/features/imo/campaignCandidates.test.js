@@ -106,6 +106,19 @@ test('conserva personas distintas que comparten teléfono y avisa sin fusionarla
   }]);
 });
 
+test('no asigna a una sola persona cuando dos enrolados de distintos IMOs comparten teléfono', () => {
+  const source = [
+    rec('imo-a', 'IMO A', 'EQUIPO 31', [['ANA ROJAS', '999111222']]),
+    rec('imo-b', 'IMO B', 'EQUIPO 31', [['BEA DIAZ', '999111222']]),
+  ];
+  const result = buildCampaignCandidates(source, {
+    sede: 'Lima', targetTeam: 31, resolveSede: sedeOf, getEnrolados: getEnroladosList,
+  });
+
+  assert.deepEqual(result.candidates.map(candidate => candidate.enrolados.map(enrolado => enrolado.nombre)), [['ANA ROJAS'], ['BEA DIAZ']]);
+  assert.equal(result.phoneConflicts.length, 1);
+});
+
 test('calcula 7 horas iniciales, prórroga única de 90 minutos y vencimiento', () => {
   const openedAt = Date.parse('2026-10-09T09:00:00Z');
 
