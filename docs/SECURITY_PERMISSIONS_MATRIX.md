@@ -21,10 +21,34 @@ Los destinatarios de Excelencia se consultan por `role`, `roles` y `appRole`,
 con límites de lectura y una política fija de roles operativos; solo se devuelven
 correo y rol. Las selecciones no soportadas se rechazan explícitamente antes de
 guardar un estándar y los errores al notificar se propagan al llamador.
+Un usuario ordinario puede consultar únicamente los roles fijos de liderazgo
+para registrar Excelencia; esto no concede un directorio entre sedes.
+
+**Autoridad y bloqueo de activación:** exclusivamente `users/{auth.uid}`,
+administrado por el backend/SuperAdmin, junto al correo verificado del token.
+El catálogo cliente, un rol de sesión, un documento slug o un alias no crean
+permisos. El login actual solo escribe metadatos. Antes de activar C-02, los
+usuarios operativos deben tener roles y sede administrados en ese documento
+UID; los usuarios de alcance global no necesitan sede. El preflight cuenta
+también cuentas registradas solo por documentos históricos y falla si carecen
+de UID configurado. No migra datos ni infiere autoridad.
+
+Orden obligatorio: emulador y CI, preflight de perfiles reales, despliegue de
+las dos funciones de directorio, pruebas autenticadas del backend, Hosting con
+el cliente actualizado y finalmente reglas e inspección de accesos reales.
+Una falla previa deja las reglas actuales intactas. `deploy-rules` es manual;
+su etapa predeterminada `profiles` solo verifica datos agregados.
 
 Cobertura: `tests/directory-scope.test.mjs`, `tests/directory-client.test.mjs` y
 `tests/firestore-users-privacy.test.mjs` (incluye regresiones de login y denegaciones
-entre sedes). Esta PR no despliega reglas ni funciones.
+entre sedes). C-02 sigue en draft hasta demostrar los prerrequisitos reales.
+
+## Notas históricas del Hito 2
+
+Las afirmaciones de esta sección son históricas y no constituyen evidencia de
+los permisos desplegados. En particular, `staff_directory` y
+`managers_directory` no se restringen en A-01, y `isAuthenticated()` comprueba
+la sesión, no la existencia de un perfil.
 
 El sistema SO-AR ha sido blindado en tres capas (Frontend, Enrutamiento, y Backend) para asegurar que ningún usuario pueda acceder a datos o secciones para los que no está autorizado.
 

@@ -26,7 +26,20 @@ do {
   const page = await auth.listUsers(1000, pageToken);
   for (const user of page.users) {
     const profile = byId.get(user.uid);
-    if (user.disabled || !profile || scopePolicy.isInactive(profile)) continue;
+    if (user.disabled || (profile && scopePolicy.isInactive(profile))) continue;
+    if (!profile) {
+      const aliases = [user.email?.toLowerCase(),
+        user.email?.toLowerCase().replace(/@crearpsl\.com$/, '@crearpsl.net'),
+        user.email?.toLowerCase().replace(/@crearpsl\.net$/, '@crearpsl.com')].filter(Boolean);
+      const registeredLegacy = [...byId.values()].some(record => {
+        const emails = [record.email, record.corporateEmail, record.personalEmail,
+          ...(Array.isArray(record.emails) ? record.emails : [])];
+        return !scopePolicy.isInactive(record) &&
+          emails.some(email => typeof email === 'string' && aliases.includes(email.trim().toLowerCase()));
+      });
+      if (registeredLegacy) { registered++; unconfigured++; }
+      continue;
+    }
     registered++;
     if (!user.emailVerified) { unverified++; continue; }
     const scope = scopePolicy.resolveScope(profile, user.email);

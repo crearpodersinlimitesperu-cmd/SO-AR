@@ -92,6 +92,33 @@ test('legacy or malformed callable responses fail closed rather than granting cr
   await assert.rejects(service.fetchCrossSedeDirectory(), /inválida/);
 });
 
+test('directory failures are surfaced rather than returning a successful static fallback', async () => {
+  const error = Object.assign(new Error('backend unavailable'), { code: 'functions/unavailable' });
+  const service = loadService('../src/services/userService.js', {
+    db: {}, auth: { currentUser: { uid: 'own' } },
+    doc: () => ({}), getDoc: async () => ({ exists: () => true, id: 'own', data: () => own }),
+    collection: (_db, name) => name, where: () => ({}), query: name => name,
+    getDocs: async () => snapshot([]),
+    usersData: [own], normalizeRole: role => role, findUserByAnyEmail: () => null,
+    DUAL_ROLE_TRAINER_EMAILS: [], NODUS_REPORT_ADMIN_EMAILS: [],
+    isSuperAdminEmail: () => false, canManageUserStatus: () => false,
+    sedeAliasList, isInDirectoryScope, projectDirectoryUser,
+    fetchCrossSedeDirectory: async () => { throw error; }
+  }, ['getAllCompanyUsers']);
+  await assert.rejects(service.getAllCompanyUsers(own), error);
+});
+
+test('AuthContext selects the real caller UID before the historical UID heuristic', () => {
+  const source = readFileSync(new URL('../src/context/AuthContext.jsx', import.meta.url), 'utf8');
+  const start = source.indexOf('  const pareceUidFirebase =');
+  const end = source.indexOf('  // Búsqueda progresiva', start);
+  const select = runInNewContext(`${source.slice(start, end)}; elegirDocumentoCanonico`, {
+    auth: { currentUser: { uid: 'actual-caller' } }
+  });
+  const docs = [{ id: 'AAAAAAAAAAAAAAAAAAAAAA' }, { id: 'actual-caller' }];
+  assert.equal(select({ empty: false, size: 2, docs }).id, 'actual-caller');
+});
+
 test('recipient loader queries all role fields, deduplicates and keeps minimal recipient output', async () => {
   const source = readFileSync(new URL('../functions/index.js', import.meta.url), 'utf8');
   const body = source.slice(source.indexOf('async function loadRecipientDocs('),

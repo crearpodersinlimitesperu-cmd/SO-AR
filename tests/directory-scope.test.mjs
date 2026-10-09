@@ -176,6 +176,18 @@ test('recipients expose only email and role, skip inactive and duplicates', () =
   assert.deepEqual(d.buildRecipients([], docs), []);
 });
 
+test('minimal roster and recipients preserve legacy email and appRole identities', () => {
+  const legacy = [{ id: 'legacy', data: {
+    corporateEmail: 'LEGACY@x.com', appRole: 'gerente', sede: 'Quito', phone: 'private'
+  } }];
+  const roster = d.buildDirectory(d.resolveScope({ role: 'coord_c1', sede: 'Lima' }, 'c@x.com'), legacy);
+  assert.equal(roster[0].email, 'LEGACY@x.com');
+  assert.equal(roster[0].role, 'gerente');
+  assert.equal('corporateEmail' in roster[0], false);
+  assert.equal('phone' in roster[0], false);
+  assert.deepEqual(d.buildRecipients(['gerente'], legacy), [{ email: 'legacy@x.com', role: 'gerente' }]);
+});
+
 test('global roles stay aligned across rules, backend and client', async () => {
   const { readFileSync } = await import('node:fs');
   const rules = readFileSync(new URL('../firestore.rules', import.meta.url), 'utf8');
