@@ -29,7 +29,8 @@ export const getTasksAssignedBy = (tasks, assignerEmail, assignerName = '') => {
   if (!email || !Array.isArray(tasks)) return [];
   const name = normalizeFullName(assignerName);
   return tasks.filter(task => {
-    if (!task || !getAssigneeEmails(task).length) return false;
+    if (!task || (!getAssigneeEmails(task).length &&
+        !(Array.isArray(task.assignedRoles) && task.assignedRoles.length))) return false;
     const assigners = getAssignerEmails(task);
     return assigners.includes(email) ||
       (assigners.length === 0 && name !== '' && normalizeFullName(task.assignedByName) === name);

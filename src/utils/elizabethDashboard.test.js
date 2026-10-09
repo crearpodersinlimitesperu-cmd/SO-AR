@@ -149,6 +149,13 @@ test('reads the real single, multiple, and legacy assignee fields without duplic
   }), ['ana@crearpsl.net', 'luis@crearpsl.net']);
 });
 
+test('role-assigned tasks without a named responsible person are not lost', () => {
+  const task = { id: 'role-only', createdBy: 'lead@example.com', assignedRoles: ['finanzas'], task: 'Revisar cierre' };
+  assert.deepEqual(getTasksAssignedBy([task], 'lead@example.com'), [task]);
+  assert.deepEqual(getTaskAssigneeEmails(task), []);
+  assert.equal(getTaskTiming(task, NOW).key, 'noDeadline');
+});
+
 test('labels due dates in human language and keeps date-only deadlines local', () => {
   assert.deepEqual(getTaskTiming({ deadline: '2026-10-09' }, NOW), { key: 'today', label: 'Vence hoy', days: 0 });
   assert.deepEqual(getTaskTiming({ deadline: '2026-10-10' }, NOW), { key: 'tomorrow', label: 'Vence mañana', days: 1 });

@@ -3,6 +3,8 @@
   padding: clamp(1rem, 4vw, 3rem);
   background: var(--bg-dark);
   color: var(--text-main);
+  font-size: 1.0625rem;
+  overflow-wrap: anywhere;
 }
 
 .elizabeth-dashboard__content {
@@ -216,7 +218,7 @@
   padding: 0.45rem 0.65rem;
   border: 1px solid currentColor;
   border-radius: 999px;
-  font-size: 0.82rem;
+  font-size: 0.95rem;
   font-weight: 800;
 }
 
@@ -284,6 +286,105 @@
   gap: 0.5rem;
   padding: 1rem 0.25rem;
   font-size: 0.9rem;
+}
+
+.elizabeth-dashboard__preferences {
+  margin-top: 1rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.elizabeth-dashboard__preferences button,
+.elizabeth-dashboard__quick-links button,
+.elizabeth-dashboard__filter select,
+.elizabeth-person-card summary {
+  min-height: 48px;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  background: var(--bg-dark-alt);
+  color: var(--text-heading);
+  font: inherit;
+  cursor: pointer;
+}
+
+.elizabeth-dashboard__quick-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.elizabeth-dashboard__quick-links button {
+  flex: 1 1 130px;
+}
+
+.elizabeth-dashboard__filter {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-weight: 700;
+}
+
+.elizabeth-dashboard__filter select {
+  min-width: 0;
+  max-width: 100%;
+  height: 50px;
+  appearance: none;
+  border: 2px solid var(--border-strong);
+  padding-right: 2.4rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 18 18'%3E%3Cpath d='m4 7 5 5 5-5' fill='none' stroke='%23858585' stroke-width='2'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.7rem center;
+}
+
+.elizabeth-dashboard button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.elizabeth-dashboard :is(button, select, summary):focus-visible {
+  outline: 3px solid var(--crear-gold);
+  outline-offset: 3px;
+}
+
+.elizabeth-dashboard h2 {
+  scroll-margin-top: 6rem;
+}
+
+.elizabeth-dashboard__followed {
+  color: #fbbf24;
+  font-weight: 700;
+}
+
+.elizabeth-person-card details {
+  margin-top: 0.8rem;
+}
+
+[data-theme="light"] .elizabeth-dashboard__eyebrow,
+[data-theme="light"] .elizabeth-dashboard__followed,
+[data-theme="light"] .elizabeth-person-card__avatar,
+[data-theme="light"] .elizabeth-summary-card--today,
+[data-theme="light"] .elizabeth-badge--today,
+[data-theme="light"] .elizabeth-badge--tomorrow,
+[data-theme="light"] .elizabeth-dashboard__notice {
+  color: #854d0e;
+}
+
+[data-theme="light"] .elizabeth-summary-card--overdue,
+[data-theme="light"] .elizabeth-badge--overdue {
+  color: #991b1b;
+}
+
+[data-theme="light"] .elizabeth-summary-card--ontime,
+[data-theme="light"] .elizabeth-badge--onTime,
+[data-theme="light"] .elizabeth-person-card__heading > svg {
+  color: #166534;
+}
+
+[data-theme="light"] .elizabeth-summary-card--completed,
+[data-theme="light"] .elizabeth-badge--completed {
+  color: #5b21b6;
 }
 
 @media (max-width: 700px) {
