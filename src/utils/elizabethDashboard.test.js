@@ -45,6 +45,27 @@ test('Hosting revalidates SPA routes and only caches fingerprinted build assets 
   assert.doesNotMatch(main, /serviceWorker\.register|registerSW/);
 });
 
+test('report visibility follows the target profile equally in real and simulated sessions', () => {
+  const reports = readFileSync(new URL('../pages/ReportesBoard.jsx', import.meta.url), 'utf8');
+  const selector = reports.match(/const canSwitchAnyCoord = Boolean\(([\s\S]*?)\);/)?.[1];
+  assert.ok(selector);
+  assert.doesNotMatch(selector, /isSimulated/);
+  assert.match(selector, /currentUser\?\.isSuperAdmin \|\| isDireccion/);
+  const fallback = reports.match(/const hasGlobalReportView = Boolean\((.*?)\);/)?.[1];
+  assert.ok(fallback);
+  assert.doesNotMatch(fallback, /isSimulated/);
+  assert.match(fallback, /currentUser\?\.isSuperAdmin \|\| isDireccion/);
+});
+
+test('exiting simulation restores the original admin and returns to their own home', () => {
+  const app = readFileSync(new URL('../App.jsx', import.meta.url), 'utf8');
+  assert.match(app, /stopSimulation\(\);\s*navigate\('\/home', \{ replace: true \}\);/);
+  const auth = readFileSync(new URL('../context/AuthContext.jsx', import.meta.url), 'utf8');
+  assert.match(auth, /setOriginalAdminUser\(originalAdminUser \|\| currentUser\)/);
+  assert.match(auth, /setCurrentUser\(originalAdminUser\)/);
+  assert.match(auth, /setOriginalAdminUser\(null\)/);
+});
+
 test('only returns tasks assigned or created by the signed-in assigner', () => {
   const tasks = [
     { id: 'assigned', ...assignedByElizabeth },

@@ -43,3 +43,7 @@ sencillo**. La vista utiliza solo las tareas autorizadas por `ChecklistContext`.
 
 Hosting no almacena las rutas del SPA; solo los archivos compilados con nombre
 versionado bajo `/assets/` usan caché inmutable. No se registra un service worker.
+
+El selector y la vista de reportes de un perfil directivo se conservan en la
+simulación. **Terminar Simulación** restaura la cuenta administradora original
+y regresa a `/home`, también después de simular más de un perfil.
