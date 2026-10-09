@@ -1,3 +1,4 @@
+import { recordedPhase, snapshotFreshness } from '../utils/nodusIntegrity.js';
 import React, { useState, useEffect, useMemo } from 'react';
 import { db } from '../services/firebase';
 import { doc, getDoc, onSnapshot } from 'firebase/firestore';
@@ -299,26 +300,22 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
       if (snap.exists()) {
         const freshData = snap.data();
         setData(mergeWithFallbackData(freshData));
+        setError(null);
       } else {
         // Fallback a nodus_kpis_sincronizados
         const fRef = doc(db, 'nodus_kpis_sincronizados', 'latest_snapshot');
         const fSnap = await getDoc(fRef);
         if (fSnap.exists()) {
           setData(mergeWithFallbackData(fSnap.data()));
+          setError(null);
         } else {
-          // Si no hay snapshot remoto, actualizamos la hora de sincronización local en vivo
-          setData(prev => ({
-            ...prev,
-            timestamp: new Date().toISOString()
-          }));
+          setError('No hay una sincronización remota disponible. Se conserva el último registro y su fecha original.');
         }
       }
     } catch (e) {
-      console.warn("Falla de lectura remota al refrescar, renovando timestamp local:", e);
-      setData(prev => ({
-        ...prev,
-        timestamp: new Date().toISOString()
-      }));
+      console.warn('No se pudo consultar la sincronización de Nodus:', e);
+      setError('No se pudo consultar Nodus. Los datos mostrados conservan su fecha original.');
+
     } finally {
       setTimeout(() => setRefreshing(false), 600);
     }
@@ -357,8 +354,9 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
       if (sentadosC1 === undefined || sentadosC2 === undefined) {
         let sc1 = 0, sc2 = 0, gc1 = 0, gc2 = 0, cc1 = 0, cc2 = 0;
         (c.equipos || []).forEach(eq => {
-          const num = parseInt(eq.equipo.replace(/[^0-9]/g, '')) || 0;
-          const isC2 = num >= 100;
+          const phase = recordedPhase(eq);
+          if (!phase || phase === 'MJ') return;
+          const isC2 = phase === 'C2';
           if (isC2) {
             sc2 += (eq.asistieron || 0);
             gc2 += (eq.llamadas || 0);
@@ -508,11 +506,11 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
     coords.forEach(c => {
       (c.equipos || []).forEach(eq => {
         if (!eq.equipo) return;
-        const eqNum = parseInt(eq.equipo.replace(/\D/g, '')) || 0;
+        const phase = recordedPhase(eq);
         
-        // Filtro estricto por capítulo C1 (< 100) vs C2 (>= 100)
-        if (selectedEntrenamiento === 'C1' && eqNum >= 100) return;
-        if (selectedEntrenamiento === 'C2' && eqNum < 100) return;
+        // Usar la fase registrada, nunca el número del equipo.
+        if (selectedEntrenamiento === 'C1' && phase !== 'C1') return;
+        if (selectedEntrenamiento === 'C2' && phase !== 'C2') return;
 
         set.add(eq.equipo);
       });
@@ -569,7 +567,7 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
       if (selectedEntrenamiento === 'C2' && (c.sentadosC2 === 0 && c.gestionesC2 === 0)) continue;
 
       // 4. Filtro por Equipo
-      let matchingEquipos = c.equipos || [];
+      let matchingEquipos = (c.equipos || []).filter(eq => selectedEntrenamiento === 'TODOS' || recordedPhase(eq) === selectedEntrenamiento);
       if (selectedEquipo !== 'TODOS') {
         matchingEquipos = matchingEquipos.filter(eq => eq.equipo === selectedEquipo);
         if (matchingEquipos.length === 0) continue;
@@ -617,18 +615,22 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
         dispNoInteresa = matchingEquipos.reduce((s, e) => s + (e.noInteresa || 0), 0);
         dispAsistieron = matchingEquipos.reduce((s, e) => s + (e.asistieron || 0), 0);
         dispAsignados = dispGestiones;
-        dispSentadosC1 = matchingEquipos.filter(e => (parseInt(e.equipo.replace(/[^0-9]/g, '')) || 0) < 100).reduce((s, e) => s + (e.asistieron || 0), 0);
-        dispSentadosC2 = matchingEquipos.filter(e => (parseInt(e.equipo.replace(/[^0-9]/g, '')) || 0) >= 100).reduce((s, e) => s + (e.asistieron || 0), 0);
-        dispGestionesC1 = matchingEquipos.filter(e => (parseInt(e.equipo.replace(/[^0-9]/g, '')) || 0) < 100).reduce((s, e) => s + (e.llamadas || 0), 0);
-        dispGestionesC2 = matchingEquipos.filter(e => (parseInt(e.equipo.replace(/[^0-9]/g, '')) || 0) >= 100).reduce((s, e) => s + (e.llamadas || 0), 0);
+        dispSentadosC1 = matchingEquipos.filter(e => recordedPhase(e) === 'C1').reduce((s, e) => s + (e.asistieron || 0), 0);
+        dispSentadosC2 = matchingEquipos.filter(e => recordedPhase(e) === 'C2').reduce((s, e) => s + (e.asistieron || 0), 0);
+        dispGestionesC1 = matchingEquipos.filter(e => recordedPhase(e) === 'C1').reduce((s, e) => s + (e.llamadas || 0), 0);
+        dispGestionesC2 = matchingEquipos.filter(e => recordedPhase(e) === 'C2').reduce((s, e) => s + (e.llamadas || 0), 0);
       } else if (selectedEntrenamiento === 'C1') {
         dispGestiones = c.gestionesC1;
         dispConfirmados = c.confirmadosC1;
         dispAsistieron = c.sentadosC1;
+        dispSentadosC2 = 0;
+        dispGestionesC2 = 0;
       } else if (selectedEntrenamiento === 'C2') {
         dispGestiones = c.gestionesC2;
         dispConfirmados = c.confirmadosC2;
         dispAsistieron = c.sentadosC2;
+        dispSentadosC1 = 0;
+        dispGestionesC1 = 0;
       }
 
       const coberturaPct = dispAsignados > 0 && isEquipoFiltered
@@ -742,11 +744,12 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
       const name = eq.equipo;
       if (!name) return;
       const num = parseInt(name.replace(/\D/g, '')) || 0;
-      const isC1 = num < 100;
+      const phase = recordedPhase(eq);
+      const isC1 = phase === 'C1';
 
       // Filtros por capítulo si aplica
       if (selectedEntrenamiento === 'C1' && !isC1) return;
-      if (selectedEntrenamiento === 'C2' && isC1) return;
+      if (selectedEntrenamiento === 'C2' && phase !== 'C2') return;
       if (selectedEquipo !== 'TODOS' && name !== selectedEquipo) return;
 
       if (!teamAggMap[name]) {
@@ -754,7 +757,7 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
           name,
           teamNum: num,
           isTeam: true,
-          capitulo: isC1 ? 'Capítulo 1' : 'Capítulo 2',
+          capitulo: phase || 'Fase no registrada',
           sede: coord.sede,
           sentadosC1: 0,
           sentadosC2: 0,
@@ -778,8 +781,8 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
         teamAggMap[name].sentadosC1 += asist;
         teamAggMap[name].gestionesC1 += llam;
       } else {
-        teamAggMap[name].sentadosC2 += asist;
-        teamAggMap[name].gestionesC2 += llam;
+        teamAggMap[name].sentadosC2 += phase === 'C2' ? asist : 0;
+        teamAggMap[name].gestionesC2 += phase === 'C2' ? llam : 0;
       }
       teamAggMap[name].totalSentados += asist;
       teamAggMap[name].gestiones += llam;
@@ -842,24 +845,14 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
     ].filter(item => item.value > 0);
   }, [aggregatedStats]);
 
-  // Cálculo de tiempo transcurrido desde la última sincronización
-  const timeSinceSync = useMemo(() => {
-    if (!data?.timestamp) return 'Reciente';
-    try {
-      const syncDate = new Date(data.timestamp);
-      const now = new Date();
-      const diffMs = now.getTime() - syncDate.getTime();
-      const diffMins = Math.floor(diffMs / 60000);
-
-      if (diffMins < 1) return 'Hace instantes';
-      if (diffMins === 1) return 'Hace 1 min';
-      if (diffMins < 60) return `Hace ${diffMins} min`;
-      const diffHours = Math.floor(diffMins / 60);
-      return `Hace ${diffHours} h ${diffMins % 60} m`;
-    } catch (e) {
-      return 'Reciente';
-    }
-  }, [data]);
+  const [auditNow, setAuditNow] = useState(Date.now);
+  useEffect(() => {
+    const timer = setInterval(() => setAuditNow(Date.now()), 60000);
+    return () => clearInterval(timer);
+  }, []);
+  const freshness = snapshotFreshness(data?.timestamp, auditNow);
+  const timeSinceSync = freshness.label;
+  const unclassifiedTeams = (data?.coordinadores || []).flatMap(c => c.equipos || []).filter(eq => !recordedPhase(eq)).length;
 
   if (loading) {
     return (
@@ -882,10 +875,10 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
           <div>
             <h2 className="nodus-header-title">
               Panel de Coordinadores C1 & C2
-              <span className="nodus-badge-live">Nodus Live Global</span>
+              <span className="nodus-badge-live">{freshness.stale ? 'Nodus · Datos atrasados o sin fecha' : 'Nodus · Último registro'}</span>
             </h2>
             <p className="nodus-header-subtitle">
-              Auditoría horaria multi-agente de gestiones, llamadas, confirmaciones y cobertura en tiempo real
+              Gestiones, llamadas y confirmaciones del último registro disponible. Consultar la web no equivale a sincronizar Nodus.
             </p>
           </div>
         </div>
@@ -893,14 +886,14 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
         <div className="nodus-header-right">
           <div className="nodus-sync-indicator">
             <span className="nodus-pulse-dot" />
-            <span>Sincronizado: <strong style={{ color: '#10b981' }}>{timeSinceSync}</strong></span>
+            <span>Sincronizado: <strong style={{ color: freshness.stale ? '#f59e0b' : '#10b981' }}>{timeSinceSync}</strong></span>
           </div>
 
           <button
             onClick={handleManualRefresh}
             disabled={refreshing}
             className="nodus-btn-refresh"
-            title="Refrescar datos en vivo"
+            title="Consultar el último registro guardado"
           >
             <RefreshCw size={14} style={{ animation: refreshing ? 'spin 1s linear infinite' : 'none' }} />
             <span>{refreshing ? 'Actualizando...' : 'Refrescar'}</span>
@@ -908,7 +901,10 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
         </div>
       </div>
 
+      {error && <p role="alert" style={{ color: '#f59e0b' }}>{error}</p>}
+      {freshness.stale && <p role="alert" style={{ color: '#f59e0b' }}>Estos datos no están actualizados. No representan la actividad actual de Nodus.</p>}
       {/* 2. SCORECARDS EJECUTIVAS REACTIVAS A FILTROS */}
+      {unclassifiedTeams > 0 && <p role="status">{unclassifiedTeams} registros de equipo no tienen fase explícita. El desglose C1/C2 puede ser incompleto; no se deduce la fase por el número de equipo.</p>}
       <div className="nodus-scorecards-grid">
         <div className="nodus-card">
           <div className="nodus-card-header">
@@ -1636,14 +1632,15 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
                                   <tbody>
                                     {coord.visibleEquipos.map((eq, eqIdx) => {
                                       const teamNum = parseInt(eq.equipo.replace(/[^0-9]/g, '')) || 0;
-                                      const isC2 = teamNum >= 100;
+                                      const phase = recordedPhase(eq);
+                                      const isC2 = phase === 'C2';
                                       const tasaAsist = eq.confirmado > 0 ? Math.round((eq.asistieron / eq.confirmado) * 100) : 0;
                                       return (
                                         <tr key={eqIdx} style={{ transition: 'background 0.15s ease' }}>
                                           <td className="nodus-nested-td" style={{ fontWeight: 700, color: 'var(--nodus-text-title)' }}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
                                               <span className={isC2 ? "nodus-badge-c2-small" : "nodus-badge-c1-small"}>
-                                                {isC2 ? 'C2' : 'C1'}
+                                                {phase || 'Sin fase'}
                                               </span>
                                               <span>{eq.equipo}</span>
                                             </div>

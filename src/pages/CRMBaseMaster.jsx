@@ -21,7 +21,7 @@ import {
   findGraduadoLineage 
 } from '../services/crmGenealogyAgent';
 import nodusEnroladosFallback from '../data/nodusEnroladosRecords.json';
-import { INITIAL_MANAGERS } from '../data/managersData';
+import { fallbackAttendance, isSpecialTeam, participantMetrics } from '../utils/nodusIntegrity.js';
 
 const INITIAL_VISIBLE_PARTICIPANTS = 50;
 const VISIBLE_PARTICIPANTS_INCREMENT = 100;
@@ -136,30 +136,8 @@ export default function CRMBaseMaster() {
       setParticipantsCursor(snap.docs[snap.docs.length - 1] || null);
       setHasMoreParticipants(snap.size === PARTICIPANT_PAGE_SIZE);
 
-      // Mapear managers operativos como parte del ecosistema genealógico multi-sede
-      const managersList = (INITIAL_MANAGERS || []).map(m => {
-        const mgrSede = normalizeSedeName(m.sede);
-        return {
-          id: 'mgr_' + m.id,
-          nombreCompleto: m.nombre,
-          nombre: m.nombre,
-          dni: 'MGR-' + (m.numEquipo || m.id),
-          telefono: m.telefono || '',
-          email: m.email || '',
-          sede: m.sede || mgrSede,
-          normalizedSede: mgrSede,
-          estadoC1: m.estado === 'Desertor' ? 'DESERTOR' : 'SENTADO',
-          coordinadora: m.coordinador || ('Coordinación ' + mgrSede),
-          imoEnrolador: m.coordinador ? ('COORDINACIÃ“N ' + m.coordinador.toUpperCase()) : (m.entrenador ? ('RED ENTRENADOR: ' + m.entrenador.toUpperCase()) : ('EQUIPO ' + (m.numEquipo || 1) + ' - ' + (m.equipo || 'GENERAL'))),
-          equipo: m.equipo,
-          entrenador: m.entrenador,
-          rol: m.rol || 'MANAGER',
-          isManager: true
-        };
-      });
-
       if (docs.length > 0) {
-        setData([...docs, ...managersList]);
+        setData(docs);
       } else if (nodusEnroladosFallback && nodusEnroladosFallback.length > 0) {
         setParticipantDataSource('fallback');
         const fallbackDocs = nodusEnroladosFallback.map((item, idx) => {
@@ -171,17 +149,17 @@ export default function CRMBaseMaster() {
             telefono: item.telefono || '',
             email: item.email || '',
             sede: item.sede || detSede,
-            estadoC1: (item.asistencia && item.asistencia.includes('Asist')) || (item.llamada1 && item.llamada1.includes('Confirmado')) ? 'SENTADO' : ((item.desertor && item.desertor !== '-') ? 'DESERTOR' : 'PENDIENTE'),
+            estadoC1: fallbackAttendance(item),
             coordinadora: item.coordinador || 'Sin Asignar',
             imoEnrolador: item.imo || 'INSCRIPCION DIRECTA CORPORATIVA',
-            equipo: item.equipo || 'EQUIPO 30 - LIMA CICLO 1 V',
+            equipo: item.equipo || '[DATO NO REGISTRADO EN NODUS]',
             normalizedSede: detSede
           };
         });
         setLoadedParticipantCount(fallbackDocs.length);
-        setData([...fallbackDocs, ...managersList]);
+        setData(fallbackDocs);
       } else {
-        setData(managersList);
+        setData([]);
       }
     } catch (e) {
       console.warn("Aviso cargando participantes Firestore:", e);
@@ -189,27 +167,7 @@ export default function CRMBaseMaster() {
       setHasMoreParticipants(false);
       setLoadedParticipantCount(0);
       setParticipantDataSource('unavailable');
-      const managersList = (INITIAL_MANAGERS || []).map(m => {
-        const mgrSede = normalizeSedeName(m.sede);
-        return {
-          id: 'mgr_' + m.id,
-          nombreCompleto: m.nombre,
-          nombre: m.nombre,
-          dni: 'MGR-' + (m.numEquipo || m.id),
-          telefono: m.telefono || '',
-          email: m.email || '',
-          sede: m.sede || mgrSede,
-          normalizedSede: mgrSede,
-          estadoC1: m.estado === 'Desertor' ? 'DESERTOR' : 'SENTADO',
-          coordinadora: m.coordinador || ('Coordinación ' + mgrSede),
-          imoEnrolador: m.coordinador ? ('COORDINACIÃ“N ' + m.coordinador.toUpperCase()) : (m.entrenador ? ('RED ENTRENADOR: ' + m.entrenador.toUpperCase()) : ('EQUIPO ' + (m.numEquipo || 1) + ' - ' + (m.equipo || 'GENERAL'))),
-          equipo: m.equipo,
-          entrenador: m.entrenador,
-          rol: m.rol || 'MANAGER',
-          isManager: true
-        };
-      });
-      setData(managersList);
+      setData([]);
     }
   };
 
@@ -356,7 +314,7 @@ export default function CRMBaseMaster() {
   const loadedCountsBySede = useMemo(() => {
     const counts = new Map();
     data.forEach(participant => {
-      if (participant.isManager) return;
+      if (participant.isManager || isSpecialTeam(participant)) return;
       const sede = normalizeSedeName(participant.sede || participant.ciudad);
       counts.set(sede, (counts.get(sede) || 0) + 1);
     });
@@ -371,8 +329,8 @@ export default function CRMBaseMaster() {
 
     // Filtramos la data base de análisis según la sede seleccionada (o todas)
     const dataset = selectedSede === 'ALL' 
-      ? data 
-      : data.filter(p => normalizeSedeName(p.sede || p.ciudad) === selectedSede);
+      ? data.filter(p => !isSpecialTeam(p))
+      : data.filter(p => !isSpecialTeam(p) && normalizeSedeName(p.sede || p.ciudad) === selectedSede);
     const analysisParticipants = dataset.filter(p => !p.isManager);
 
     dataset.forEach(p => {
@@ -406,63 +364,14 @@ export default function CRMBaseMaster() {
     duplicateNames.forEach(([_, list]) => list.forEach(p => uniqueDuplicateIds.add(p.id)));
     duplicatePhones.forEach(([_, list]) => list.forEach(p => uniqueDuplicateIds.add(p.id)));
 
-    // Métricas dinámicas para la sede seleccionada
-    // Cruce con Nodus de forma infalible
-    let nodusMatch = null;
-    if (nodusData?.sedes) {
-      nodusMatch = nodusData.sedes.find(s => normalizeSedeName(s.sede) === normalizeSedeName(selectedSede));
-    }
-
-    const nodusAsignados = nodusMatch?.asignadosTotal;
-    const nodusSentados = nodusMatch?.asistieronTotal ?? nodusMatch?.sentadosC1Total;
-    const nodusPendientes = nodusMatch?.porConfirmarTotal;
-    const loadedSentados = analysisParticipants.filter(p => String(p.estadoC1 || '').toUpperCase().includes('SENTADO')).length;
-    const loadedPendientes = analysisParticipants.filter(p => String(p.estadoC1 || '').toUpperCase().includes('PENDIENTE')).length;
-
-    let totalEnrolados = 0;
-    let sentadosCount = 0;
-    let pendientesCount = 0;
-
-    if (selectedSede === 'ALL') {
-      totalEnrolados = nodusData?.totales?.totalAsignados ?? (globalStatsLoaded ? globalStats.total : loadedParticipantCount);
-      sentadosCount = nodusData?.totales?.totalAsistieron ?? nodusData?.totales?.totalSentadosC1 ?? (globalStatsLoaded ? globalStats.sentados : loadedSentados);
-      pendientesCount = nodusData?.totales?.totalPorConfirmar ?? (globalStatsLoaded ? globalStats.pendientes : loadedPendientes);
-    } else {
-      totalEnrolados = nodusAsignados ?? analysisParticipants.length;
-      sentadosCount = nodusSentados ?? loadedSentados;
-      pendientesCount = nodusPendientes ?? loadedPendientes;
-    }
-
-    const nodusTotal = selectedSede === 'ALL' ? nodusData?.totales?.totalAsignados : nodusAsignados;
-    const nodusAttendance = selectedSede === 'ALL'
-      ? nodusData?.totales?.totalAsistieron ?? nodusData?.totales?.totalSentadosC1
-      : nodusSentados;
-    const statsTotal = selectedSede === 'ALL' && globalStatsLoaded ? globalStats.total : undefined;
-    const statsAttendance = selectedSede === 'ALL' && globalStatsLoaded ? globalStats.sentados : undefined;
-    const conversionTotal = nodusTotal != null && nodusAttendance != null
-      ? nodusTotal
-      : statsTotal != null && statsAttendance != null
-        ? statsTotal
-        : analysisParticipants.length;
-    const conversionSentados = nodusTotal != null && nodusAttendance != null
-      ? nodusAttendance
-      : statsTotal != null && statsAttendance != null
-        ? statsAttendance
-        : loadedSentados;
-    const coherencePercentage = conversionTotal > 0
-      ? ((conversionSentados / conversionTotal) * 100).toFixed(1)
-      : null;
-    const coherenceSource = nodusTotal != null && nodusAttendance != null
-      ? 'Nodus'
-      : statsTotal != null && statsAttendance != null
-        ? 'conteo global de Firestore'
-        : analysisParticipants.length > 0
-          ? participantDataSource === 'firestore' && hasMoreParticipants
-            ? 'registros cargados (parcial)'
-            : participantDataSource === 'fallback'
-              ? 'respaldo local'
-              : 'registros cargados'
-          : null;
+    // Las tarjetas y el árbol comparten exactamente las personas cargadas.
+    // Los agregados de otros snapshots nunca se mezclan con esta muestra.
+    const metrics = participantMetrics(analysisParticipants);
+    const totalEnrolados = metrics.total;
+    const sentadosCount = metrics.seated;
+    const pendientesCount = metrics.pending;
+    const coherencePercentage = null;
+    const coherenceSource = participantDataSource === 'fallback' ? 'respaldo local' : 'registros cargados';
 
     return {
       dataset,
@@ -521,7 +430,7 @@ export default function CRMBaseMaster() {
 
     const grouped = {};
     list.forEach(p => {
-      const enrolador = cleanEnrolador(p.imoEnrolador || p.imo);
+      const enrolador = `${cleanEnrolador(p.imoEnrolador || p.imo)} · ${normalizeSedeName(p.sede || p.ciudad) || 'Sin sede'}`;
       if (!grouped[enrolador]) {
         grouped[enrolador] = [];
       }
@@ -529,11 +438,11 @@ export default function CRMBaseMaster() {
     });
 
     let arr = Object.keys(grouped).map(key => {
-      const lineage = findGraduadoLineage(key);
+      const lineage = findGraduadoLineage(cleanEnrolador(grouped[key][0]?.imoEnrolador || grouped[key][0]?.imo));
       return {
         imoName: key,
         participants: grouped[key],
-        totalSentados: grouped[key].filter(p => (p.estadoC1 || '').toUpperCase().includes('SENTADO')).length,
+        totalSentados: grouped[key].filter(p => (p.estadoC1 || '').toUpperCase() === 'SENTADO').length,
         totalPendientes: grouped[key].filter(p => (p.estadoC1 || '').toUpperCase().includes('PENDIENTE')).length,
         hasDuplicates: grouped[key].some(p => agentAnalysis.duplicateIdsSet.has(p.id)),
         lineage: lineage || null,
@@ -541,62 +450,6 @@ export default function CRMBaseMaster() {
         totalRoles: lineage ? lineage.totalParticipaciones : 0
       };
     });
-
-    // Inyección de Nodos de Coordinación Nodus Multi-Sede
-    if (nodusData?.coordinadores && nodusData.coordinadores.length > 0) {
-      const coordsToInclude = selectedSede === 'ALL'
-        ? nodusData.coordinadores
-        : nodusData.coordinadores.filter(c => normalizeSedeName(c.sede) === normalizeSedeName(selectedSede));
-
-      coordsToInclude.forEach(c => {
-        const normSede = normalizeSedeName(c.sede);
-        const coordTitle = 'COORDINACIÃ“N ' + (c.nombreCompleto || c.nombre) + ' (' + normSede.toUpperCase() + ')';
-        
-        // Mapear equipos como participantes de telemetría viva Nodus
-        const teamParticipants = (c.equipos || []).map((eq, eqIdx) => ({
-          id: 'nodus_eq_' + (c.id || c.nombre) + '_' + eqIdx,
-          nombreCompleto: (eq.equipo || 'Equipo') + ' â€¢ ' + (eq.llamadas || 0) + ' Llamadas',
-          dni: 'CONFIRMADOS: ' + (eq.confirmado || 0),
-          telefono: 'No Contesta: ' + (eq.noContesta || 0) + ' | Por Confirmar: ' + (eq.porConfirmar || 0),
-          sede: c.sede,
-          normalizedSede: normSede,
-          estadoC1: (eq.asistieron > 0 || eq.confirmado > 0) ? 'SENTADO' : (eq.porConfirmar > 0 ? 'PENDIENTE' : 'REZAGADO'),
-          coordinadora: c.nombre,
-          imoEnrolador: coordTitle,
-          isNodusTeam: true,
-          detalles: eq
-        }));
-
-        const existingNodeIdx = arr.findIndex(node => 
-          node.imoName.toUpperCase().includes((c.nombre || '').toUpperCase())
-        );
-
-        const totalSent = c.asistieron || c.sentadosTotal || teamParticipants.filter(p => p.estadoC1 === 'SENTADO').length;
-        const totalPend = c.estados?.porConfirmar || teamParticipants.filter(p => p.estadoC1 === 'PENDIENTE').length;
-
-        if (existingNodeIdx >= 0) {
-          arr[existingNodeIdx].participants = [...teamParticipants, ...arr[existingNodeIdx].participants];
-          arr[existingNodeIdx].totalSentados = Math.max(arr[existingNodeIdx].totalSentados, totalSent);
-          arr[existingNodeIdx].totalPendientes = Math.max(arr[existingNodeIdx].totalPendientes, totalPend);
-        } else {
-          arr.push({
-            imoName: coordTitle,
-            participants: teamParticipants,
-            totalSentados: totalSent,
-            totalPendientes: totalPend,
-            hasDuplicates: false,
-            lineage: {
-              rolesSummary: { coordinador: 1, manager: (c.equipos || []).length },
-              totalParticipaciones: (c.equipos || []).length,
-              participaciones: [{ edicion: normSede, rolLabel: (c.rol || 'Coord C1/C2') + ' (' + (c.equipos?.length || 0) + ' Equipos)' }]
-            },
-            equipoOriginal: normSede,
-            totalRoles: (c.equipos || []).length,
-            isNodusCoordNode: true
-          });
-        }
-      });
-    }
 
     // Filtro por Linaje
     if (selectedLineageFilter === 'GRADUADOS_ONLY') {
@@ -656,7 +509,7 @@ export default function CRMBaseMaster() {
                 <Users size={24} /> Red Genealógica de Enrolamiento (CRM Multi-Sede)
               </h1>
               <p style={{ margin: 0, fontSize: '0.85rem', color: textMuted }}>
-                Base Maestra Estructurada: Árbol interactivo auditado por el Agente Nodus para todas las sedes
+                Personas registradas por sede. La búsqueda y los conteos cubren únicamente las páginas cargadas.
               </p>
             </div>
           </div>
@@ -707,17 +560,8 @@ export default function CRMBaseMaster() {
           <div style={{ display: 'flex', gap: '0.6rem', overflowX: 'auto', paddingBottom: '0.3rem', scrollbarWidth: 'thin' }}>
             {SEDES_CATALOG.map((sede) => {
               const isSelected = selectedSede === sede.key;
-              const nodusSede = nodusData?.sedes?.find(ns => normalizeSedeName(ns.sede) === sede.key);
               const localCount = loadedCountsBySede.get(sede.key) || 0;
-              
-              let countForSede = 0;
-              if (sede.key === 'ALL') {
-                countForSede = nodusData?.totales?.totalAsignados ?? (globalStatsLoaded ? globalStats.total : loadedParticipantCount);
-              } else if (sede.key === 'Lima') {
-                countForSede = Math.max(localCount, nodusSede?.asignadosTotal ?? 0);
-              } else {
-                countForSede = nodusSede?.asignadosTotal ?? localCount;
-              }
+              const countForSede = sede.key === 'ALL' ? [...loadedCountsBySede.values()].reduce((sum, count) => sum + count, 0) : localCount;
 
               return (
                 <button
@@ -780,7 +624,7 @@ export default function CRMBaseMaster() {
               {agentAnalysis.sentadosCount}
             </div>
             <div style={{ fontSize: '0.75rem', color: isLight ? '#047857' : '#34d399', marginTop: '0.2rem', fontWeight: 600 }}>
-              {agentAnalysis.coherencePercentage === null ? 'Conversión sin datos suficientes' : `${agentAnalysis.coherencePercentage}% de conversión (${agentAnalysis.coherenceSource})`}
+              {agentAnalysis.coherencePercentage === null ? 'Conversión no certificada: requiere seguimiento de la misma cohorte' : `${agentAnalysis.coherencePercentage}% de conversión (${agentAnalysis.coherenceSource})`}
             </div>
           </div>
 
@@ -839,7 +683,7 @@ export default function CRMBaseMaster() {
               : participantDataSource === 'unavailable'
               ? 'No se pudo cargar el padrón de Firestore; solo se muestran los managers locales.'
               : globalStats.total > 0
-              ? `Participantes cargados: ${loadedParticipantCount.toLocaleString()} de ${globalStats.total.toLocaleString()}. El árbol y la auditoría local cubren los registros cargados.`
+              ? `Participantes cargados: ${loadedParticipantCount.toLocaleString()} de ${globalStats.total.toLocaleString()}. El árbol, los filtros y la auditoría cubren solo los registros cargados. Equipo 1000 excluido de esta muestra; no se agregan managers ni equipos como personas.`
               : `Participantes cargados: ${loadedParticipantCount.toLocaleString()}. El total de Firestore no está disponible.`}
           </span>
           {hasMoreParticipants && (
