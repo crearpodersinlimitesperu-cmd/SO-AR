@@ -71,7 +71,7 @@ function RouteLoadingFallback() {
 
 function HomeEntry() {
   const { currentUser } = useAuth();
-  if (isElizabethEscobar(currentUser) && !currentUser?.isSimulated) {
+  if (isElizabethEscobar(currentUser)) {
     return <Navigate to="/elizabeth-dashboard" replace />;
   }
   return <Home />;
