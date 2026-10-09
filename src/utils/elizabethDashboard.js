@@ -45,8 +45,8 @@ export const getTasksAssignedTo = (tasks, assigneeEmail) => {
   return tasks.filter(task => task && getAssigneeEmails(task).includes(email));
 };
 
-export const getTaskReadState = ({ loading, taskReadRestricted, taskLoadError }) => {
-  if (taskReadRestricted) return {
+export const getTaskReadState = ({ loading, taskReadRestricted, taskLoadError, isSimulated }) => {
+  if (isSimulated || taskReadRestricted) return {
     canShowTotals: false,
     emptyLabel: 'Vista simulada: tareas privadas no visibles. No podemos confirmar si hay tareas.',
     notice: 'Vista simulada: tareas privadas no visibles. La sesión del administrador no permite ver todas las tareas privadas de este perfil. Solo se muestran las tareas que esa sesión puede leer; los totales no están disponibles.'

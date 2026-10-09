@@ -6,7 +6,7 @@ import { usersData, normalizeRole } from '../data/usersData';
 import { isSuperAdminEmail, isGerenciaRole } from '../config/permissions';
 import { canSendOperationalCommunications } from '../config/permissions';
 import { calculateAutomaticDeadline } from '../utils/soarDates';
-import { filterTasksForUser, getChecklistRolesForUser, hasSimulatedTaskIdentityMismatch } from '../utils/taskPrivacy';
+import { filterTasksForUser, getChecklistRolesForUser, hasSimulatedTaskIdentityMismatch, getTaskReadIdentity, canCreateTaskAsUser } from '../utils/taskPrivacy';
 import { createGoogleTask } from '../services/googleSync';
 import { useUI } from './UIContext';
 import { useAuth } from './AuthContext';
@@ -236,6 +236,8 @@ export function ChecklistProvider({ children }) {
   const [taskLoadError, setTaskLoadError] = useState('');
   const { showToast, showPrompt } = useUI();
   const { currentUser, reauthenticateGoogle } = useAuth();
+  const taskReadIdentity = getTaskReadIdentity(currentUser);
+  const [loadedTaskIdentity, setLoadedTaskIdentity] = useState(null);
   // (28/08/2026, restaurado 29/08/2026) CORRECCIÓN: antes calculateAutomaticDeadline()
   // se llamaba SIN el ciclo activo real, así que siempre usaba el único ciclo de
   // ejemplo hardcodeado en src/data/cyclesData.js ("Equipo 30", fechas fijas) para
@@ -442,6 +444,7 @@ export function ChecklistProvider({ children }) {
   };
 
   useEffect(() => {
+    setLoadedTaskIdentity(null);
     setTaskLoadError('');
     const executiveRolesWithoutChecklist = ['ceo', 'cco', 'socio', 'super_admin', 'direccion'];
     const userRole = currentUser?.appRole || currentUser?.role || '';
@@ -463,6 +466,7 @@ export function ChecklistProvider({ children }) {
 
     setTasks(fallbackTasks);
     if (!currentUser) {
+      setLoadedTaskIdentity(taskReadIdentity);
       setLoading(false);
       return undefined;
     }
@@ -514,6 +518,7 @@ export function ChecklistProvider({ children }) {
     }
 
     if (querySpecs.length === 0) {
+      setLoadedTaskIdentity(taskReadIdentity);
       setLoading(false);
       return undefined;
     }
@@ -597,6 +602,7 @@ export function ChecklistProvider({ children }) {
       }
 
       setTasks(finalTasks);
+      setLoadedTaskIdentity(taskReadIdentity);
       setLoading(pendingQueries.size > 0);
     };
 
@@ -630,7 +636,7 @@ export function ChecklistProvider({ children }) {
     // elige/cambia su(s) equipo(s) en su perfil, este listener se vuelva a
     // suscribir y reconstruya "tasks" con la expansión multi-equipo correcta —
     // igual que ya hacía currentCycle?.id, pero para quitoCycles.
-  }, [currentUser?.sede, currentUser?.email, currentUser?.appRole, currentUser?.role, currentUser?.roles?.join('|'), currentUser?.uid, currentUser?.isSimulated, currentCycle?.id, currentCycle?.name, quitoCyclesKey]);
+  }, [currentUser?.sede, currentUser?.email, currentUser?.appRole, currentUser?.role, currentUser?.roles?.join('|'), currentUser?.uid, currentUser?.isSimulated, taskReadIdentity, currentCycle?.id, currentCycle?.name, quitoCyclesKey]);
 
   // (14/09/2026) equipoQuito (opcional): cuando el usuario de Quito tiene 2 equipos
   // elegidos, ChecklistBoard.jsx pasa aquí a cuál de los dos pertenece la fila que
@@ -790,6 +796,10 @@ export function ChecklistProvider({ children }) {
   };
 
   const addCustomTask = async (taskData) => {
+    if (!canCreateTaskAsUser(currentUser, auth.currentUser?.email)) {
+      showToast('No se puede crear una tarea en simulación o sin una sesión real de tu cuenta.', 'error');
+      return false;
+    }
     try {
       const batch = writeBatch(db);
       // Creamos un ID único usando timestamp
@@ -804,7 +814,9 @@ export function ChecklistProvider({ children }) {
         .replace(/coodinacion\.administrativa@/gi, 'coordinacion.administrativa@') : '');
       const cleanData = { ...taskData };
       cleanData.isCustom = true;
-      cleanData.createdBy = cleanData.createdBy || currentUser?.email || '';
+      cleanData.createdBy = currentUser.email;
+      cleanData.assignedByEmail = currentUser.email;
+      cleanData.assignedByName = currentUser.name || currentUser.displayName || currentUser.email;
       if (Array.isArray(cleanData.assignedToEmails)) {
         cleanData.assignedToEmails = [...new Set(cleanData.assignedToEmails.map(sanitizeEmail).filter(Boolean))];
       }
@@ -1514,7 +1526,8 @@ export function ChecklistProvider({ children }) {
     }
   };
 
-  const visibleTasks = filterTasksForUser(tasks, currentUser);
+  const hasCurrentTaskSnapshot = loadedTaskIdentity === taskReadIdentity;
+  const visibleTasks = hasCurrentTaskSnapshot ? filterTasksForUser(tasks, currentUser) : [];
 
   return (
     <ChecklistContext.Provider value={{ 
@@ -1526,7 +1539,7 @@ export function ChecklistProvider({ children }) {
       editCustomTask, 
       submitEvidence, 
       getProgressByRole, 
-      loading, 
+      loading: loading || !hasCurrentTaskSnapshot,
       initializeFirestore, 
       addCustomTask, 
       syncTasksToGoogle,

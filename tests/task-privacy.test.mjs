@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { checklistData } from '../src/data/checklistData.js';
-import { filterTasksForUser, isTaskVisibleForUser } from '../src/utils/taskPrivacy.js';
+import { filterTasksForUser, isTaskVisibleForUser, getTaskReadIdentity, canCreateTaskAsUser } from '../src/utils/taskPrivacy.js';
 
 const coordinator = {
   uid: 'coord-1',
@@ -10,6 +10,21 @@ const coordinator = {
   appRole: 'coord_c1',
   roles: ['coord_c1']
 };
+
+test('task snapshots belong to an identity, including simulation transitions with the same email', () => {
+  assert.notEqual(getTaskReadIdentity(coordinator), getTaskReadIdentity({ ...coordinator, isSimulated: true }));
+  assert.notEqual(getTaskReadIdentity(coordinator), getTaskReadIdentity({ ...coordinator, uid: 'other' }));
+  assert.notEqual(getTaskReadIdentity(coordinator), getTaskReadIdentity({ ...coordinator, email: 'other@example.com' }));
+});
+
+test('task creation requires the real authenticated identity, never a simulated profile', () => {
+  assert.equal(canCreateTaskAsUser(coordinator, coordinator.email), true);
+  assert.equal(canCreateTaskAsUser({ ...coordinator, isSimulated: true }, coordinator.email), false);
+  assert.equal(canCreateTaskAsUser(coordinator, 'admin@example.com'), false);
+  assert.equal(canCreateTaskAsUser(coordinator, ''), false);
+  assert.equal(canCreateTaskAsUser(null, coordinator.email), false);
+  assert.equal(canCreateTaskAsUser({ email: 'synthetic@crearpsl.net' }, 'synthetic@crearpsl.com'), true);
+});
 
 const rangedCatalogAllowlist = [
   { role: 'capitan', pattern: 'cap_chk_([1-9]|[1-4][0-9]|5[0-7])', idPattern: /^cap_chk_(?:[1-9]|[1-4][0-9]|5[0-7])$/ },
