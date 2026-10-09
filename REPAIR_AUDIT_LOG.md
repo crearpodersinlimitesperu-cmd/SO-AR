@@ -29,7 +29,7 @@ documents, 13 configured test cohorts). It again stopped before deployment.
 C-02 [CI for that exact head](https://github.com/crearpodersinlimitesperu-cmd/SO-AR/actions/runs/37944893990)
 passed: application/client tests, build, backend syntax and Firestore emulator.
 
-C-02 remains in draft #97, retargeted from the historical C-01 branch to
+C-02 was kept in draft #97 during preparation, retargeted from the historical C-01 branch to
 `master`, with the original history and adapted implementation preserved.
 Its initial adapted [CI run](https://github.com/crearpodersinlimitesperu-cmd/SO-AR/actions/runs/37944663082)
 passed application tests, build and the emulator (including own-login aliases
@@ -44,6 +44,35 @@ client. `staff_directory` stays readable/writable by authenticated users;
 ranking rather than displaying a misleading empty leaderboard.
 
 No IMO, letters/campus, production data migration or new broad audit is included.
+
+## Verified A-01 release on 2026-10-09
+
+Replacement [PR #119](https://github.com/crearpodersinlimitesperu-cmd/SO-AR/pull/119)
+merged as `69e1fba3f0c5e785714d3ad64788563cd1738887`.
+[Exact-head CI](https://github.com/crearpodersinlimitesperu-cmd/SO-AR/actions/runs/37945447117)
+passed 71 application tests, 24 rules tests, the existing IMO rules suite and
+the production build. Regression coverage includes metadata-only UID profiles,
+own UID/email/aliases, unchanged login/directories, management without a UID
+profile, unauthorized cross-user writes, anonymous denial and immutable sync
+history ownership.
+
+[Hosting deployment](https://github.com/crearpodersinlimitesperu-cmd/SO-AR/actions/runs/37945693171)
+and [rules deployment](https://github.com/crearpodersinlimitesperu-cmd/SO-AR/actions/runs/37945693149)
+succeeded on that merge commit. The rules job fetched the actual Firestore
+release and compared its source with the commit:
+
+- Ruleset: `f9fb12c8-997a-4f7d-b221-db0b2eb41d6a`
+- Source SHA-256: `9d688ea703faa833478d49491746d5293794e8d664fa6303b6655d785f11658e`
+- `verified: true`; temporary deployment credential removed.
+
+**C-02 is not deployed.** GitHub marked #97 merged through commit ancestry when
+#119 integrated the independently deployable snapshot; #119 explicitly removes
+the C-02 implementation from its final tree. This automatic PR status is not
+evidence of feature activation. The complete adapted C-02 implementation and
+its unique history remain preserved at `419ff86` on
+`crearpodersinlimitesperu-cmd-improved-chainsaw` and require a separate draft
+release after the documented profile/backend prerequisites are satisfied.
+Production `/users` and `staff_directory` access remain unchanged.
 
 **Snapshot as of:** 2026-10-07 23:35 (-05:00) / 2026-10-08 04:35 UTC
 
