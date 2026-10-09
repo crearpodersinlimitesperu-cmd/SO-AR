@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import {
   getTasksAssignedBy,
   getTaskAssigneeEmails,
@@ -16,6 +17,33 @@ const assignedByElizabeth = {
   assignedByEmail: 'contabilidad.global@crearpsl.net',
   assignedToEmails: ['ana@crearpsl.net', 'luis@crearpsl.net']
 };
+
+test('Elizabeth enters her dashboard when simulated or consolidated and retains the full home', () => {
+  const app = readFileSync(new URL('../App.jsx', import.meta.url), 'utf8');
+  const entry = app.slice(app.indexOf('function HomeEntry()'), app.indexOf('// Componente para proteger autenticación básica'));
+  assert.match(entry, /if \(isElizabethEscobar\(currentUser\)\)/);
+  assert.doesNotMatch(entry, /isSimulated|appRole/);
+  assert.match(entry, /Navigate to="\/elizabeth-dashboard"/);
+  assert.match(app, /path="\/home-completo"/);
+  const home = readFileSync(new URL('../pages/Home.jsx', import.meta.url), 'utf8');
+  assert.match(home, /isElizabethEscobar\(currentUser\) && \(/);
+  assert.match(home, /Mi panel sencillo/);
+  assert.match(home, /navigate\('\/elizabeth-dashboard'\)/);
+});
+
+test('Hosting revalidates SPA routes and only caches fingerprinted build assets long-term', () => {
+  const config = JSON.parse(readFileSync(new URL('../../firebase.json', import.meta.url), 'utf8'));
+  const headers = config.hosting.headers;
+  assert.ok(headers.some(rule => rule.source === '**' &&
+    rule.headers.some(header => header.key === 'Cache-Control' && header.value.includes('no-store'))));
+  const immutableRules = headers.filter(rule =>
+    rule.headers.some(header => header.key === 'Cache-Control' && header.value.includes('immutable')));
+  assert.deepEqual(immutableRules.map(rule => rule.source), ['/assets/**']);
+  const vite = readFileSync(new URL('../../vite.config.js', import.meta.url), 'utf8');
+  const main = readFileSync(new URL('../main.jsx', import.meta.url), 'utf8');
+  assert.doesNotMatch(vite, /VitePWA/);
+  assert.doesNotMatch(main, /serviceWorker\.register|registerSW/);
+});
 
 test('only returns tasks assigned or created by the signed-in assigner', () => {
   const tasks = [
