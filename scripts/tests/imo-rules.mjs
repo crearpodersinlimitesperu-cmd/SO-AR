@@ -43,8 +43,10 @@ try {
   console.log('IMO rules: rejecting a confirmation without its paired event');
   await assertFails(setDoc(state, { contacto: true, asistencia: true, reportedName: 'IMO SINTETICO', sessionId, updatedAt: serverTimestamp(), eventId: 'missing' }));
   async function save(field, value, eventId) {
+    console.log(`IMO rules: transaction read ${eventId}`);
     return runTransaction(anon, async tx => {
       const old = await tx.get(state);
+      console.log(`IMO rules: transaction writes ${eventId}`);
       const before = old.exists() ? { contacto: old.data().contacto, asistencia: old.data().asistencia } : { contacto: false, asistencia: false };
       const after = { ...before, [field]: value };
       tx.set(state, { ...after, campaignId: cid, reportedName: 'IMO SINTETICO', sessionId, updatedAt: serverTimestamp(), eventId });
