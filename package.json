@@ -8,7 +8,7 @@
     "prebuild": "(python3 dump_code.py || python dump_code.py || py dump_code.py || echo \"Python no disponible localmente, saltando prebuild...\")",
     "build": "vite build",
     "lint": "oxlint",
-    "test": "node --test src/features/imo/campaignCandidates.test.js src/features/imo/publicLinks.test.js src/services/goalsTimeline.test.js src/utils/overdueTasks.test.js src/utils/trainerAssignments.test.js src/utils/teamGrouping.test.js src/utils/elizabethDashboard.test.js src/data/managersHelpContent.test.js tests/nodus-fi-multisede.test.mjs tests/centro-managers-global-director.test.mjs tests/liquidacion-reversar-permissions.test.mjs tests/task-privacy.test.mjs tests/cartas-sedes.test.mjs tests/mail-queue.test.mjs",
+    "test": "node --test src/features/imo/campaignCandidates.test.js src/features/imo/publicLinks.test.js src/services/goalsTimeline.test.js src/utils/overdueTasks.test.js src/utils/trainerAssignments.test.js src/utils/teamGrouping.test.js src/utils/elizabethDashboard.test.js src/utils/elizabethPreferences.test.js src/data/managersHelpContent.test.js tests/nodus-fi-multisede.test.mjs tests/centro-managers-global-director.test.mjs tests/liquidacion-reversar-permissions.test.mjs tests/task-privacy.test.mjs tests/cartas-sedes.test.mjs tests/mail-queue.test.mjs",
     "test:rules": "node --test tests/firestore-task-privacy.test.mjs tests/firestore-a01-hardening.test.mjs && node --test scripts/tests/imo-access-emulator.test.mjs && node scripts/tests/imo-rules.mjs",
     "preview": "vite preview",
     "sync:qt": "node scripts/qtSyncDaemon.js",

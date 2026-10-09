@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { Children, useEffect, useMemo, useState } from 'react';
 import { ArrowRight, CalendarClock, CheckCircle2, Clock3, ListChecks, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -17,6 +17,10 @@ import {
   normalizeTaskEmail
 } from '../utils/elizabethDashboard';
 import './ElizabethDashboard.css';
+import {
+  canLearnPreferences, defaultPreferences, readPreferences, savePreferences, resetPreferences,
+  recordPreference, orderSections, orderPeople, filterDashboardTasks, getReviewSuggestion
+} from '../utils/elizabethPreferences';
 
 const numberLabel = (count, singular, plural = `${singular}s`) => `${count} ${count === 1 ? singular : plural}`;
 
@@ -55,11 +59,70 @@ function TaskList({ tasks, now, emptyLabel, assigneeEmail }) {
   );
 }
 
+function OrderedSections({ order, children }) {
+  const sections = Children.toArray(children);
+  return <div className="elizabeth-dashboard__sections">
+    {order.map(section => sections.find(child => child.props['data-section'] === section))}
+  </div>;
+}
+
 export default function ElizabethDashboard() {
   const { currentUser } = useAuth();
   const { tasks = [], loading, taskLoadError, taskReadRestricted } = useChecklist();
   const navigate = useNavigate();
   const [now, setNow] = useState(() => new Date());
+  const [preferences, setPreferences] = useState(defaultPreferences);
+  const [preferenceError, setPreferenceError] = useState('');
+  const [preferenceOwner, setPreferenceOwner] = useState(null);
+  const userKey = currentUser?.isSimulated ? null : currentUser?.uid;
+  const activePreferences = preferenceOwner === userKey ? preferences : defaultPreferences();
+  const canLearn = canLearnPreferences(currentUser) && preferenceOwner === userKey;
+
+  useEffect(() => {
+    setPreferenceError('');
+    try {
+      setPreferences(userKey
+        ? readPreferences(window.localStorage, { uid: userKey })
+        : defaultPreferences());
+    } catch (error) {
+      console.error('No se pudieron leer las preferencias del panel:', error);
+      setPreferences(defaultPreferences());
+      setPreferenceError('No se pudieron leer tus preferencias. Puedes restablecerlas para empezar de nuevo.');
+    }
+    setPreferenceOwner(userKey);
+  }, [userKey, currentUser?.isSimulated]);
+
+  const remember = (field, key) => {
+    if (!canLearn) return;
+    const next = recordPreference(activePreferences, field, key);
+    setPreferences(next);
+    try {
+      savePreferences(window.localStorage, currentUser, next);
+      setPreferenceError('');
+    } catch (error) {
+      console.error('No se pudieron guardar las preferencias del panel:', error);
+      setPreferenceError('No se pudieron guardar tus preferencias en este navegador.');
+    }
+  };
+  const restorePreferences = () => {
+    if (!canLearn) return;
+    try {
+      resetPreferences(window.localStorage, currentUser);
+      setPreferences(defaultPreferences());
+      setPreferenceError('');
+    } catch (error) {
+      console.error('No se pudieron restablecer las preferencias del panel:', error);
+      setPreferenceError('No se pudieron restablecer tus preferencias en este navegador.');
+    }
+  };
+  const openSection = (section) => {
+    remember('sections', section);
+    window.requestAnimationFrame(() => {
+      const heading = document.getElementById(`elizabeth-${section}-title`);
+      heading?.scrollIntoView({ block: 'start' });
+      heading?.focus({ preventScroll: true });
+    });
+  };
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 60_000);
@@ -74,6 +137,13 @@ export default function ElizabethDashboard() {
   const readState = getTaskReadState({ loading, taskLoadError, taskReadRestricted });
   const teamMembers = useMemo(() => getTeamMembers(assignedTasks), [assignedTasks]);
   const summary = useMemo(() => getTeamTimingSummary(assignedTasks, now), [assignedTasks, now]);
+  const filter = activePreferences.filter;
+  const visibleAssignedTasks = filterDashboardTasks(assignedTasks, filter, now);
+  const visibleOwnTasks = filterDashboardTasks(ownTasks, filter, now, currentUser?.email);
+  const sectionOrder = orderSections(activePreferences);
+  const peopleOrder = orderPeople(teamMembers, activePreferences);
+  const suggestion = readState.canShowTotals
+    ? getReviewSuggestion(teamMembers, activePreferences, now) : null;
   const firstName = isElizabethEscobar(currentUser)
     ? 'Elizabeth'
     : (currentUser?.name || currentUser?.displayName || 'Elizabeth').trim().split(/\s+/)[0];
@@ -102,12 +172,45 @@ export default function ElizabethDashboard() {
             {readState.notice}
           </p>
         )}
+        <div className="elizabeth-dashboard__preferences">
+          <p>{currentUser?.isSimulated
+            ? 'En simulación no se aprenden ni se guardan preferencias.'
+            : 'Este panel recuerda lo que abres y el último filtro, solo en este navegador y para tu cuenta. No usa IA ni comparte tus hábitos.'}</p>
+          {suggestion && <p role="status">
+            Sueles revisar a <strong>{suggestion.name}</strong>; {suggestion.dueSoon > 0
+              ? `tiene ${numberLabel(suggestion.dueSoon, 'tarea')} por vencer hoy o mañana.`
+              : 'no tiene tareas por vencer hoy o mañana.'}
+          </p>}
+          <button type="button" onClick={restorePreferences} disabled={!canLearn}>Restablecer mis preferencias</button>
+          {preferenceError && <p className="elizabeth-dashboard__notice" role="alert">{preferenceError}</p>}
+        </div>
+        <nav className="elizabeth-dashboard__quick-links" aria-label="Ir a una sección">
+          {sectionOrder.map(section => (
+            <button type="button" key={section} onClick={() => openSection(section)}>
+              {{ timing: 'Los tiempos', assigned: 'Lo que encargué', own: 'Mis tareas', team: 'Mi equipo' }[section]}
+            </button>
+          ))}
+        </nav>
+        <label className="elizabeth-dashboard__filter">
+          Mostrar tareas
+          <select value={filter} onChange={event => {
+            if (canLearn) remember('filter', event.target.value);
+            else setPreferences(previous => ({ ...previous, filter: event.target.value }));
+          }}>
+            <option value="all">Todas</option>
+            <option value="pending">Pendientes</option>
+            <option value="today">Vencen hoy</option>
+            <option value="overdue">Atrasadas</option>
+            <option value="completed">Completadas</option>
+          </select>
+        </label>
 
-        <section className="elizabeth-dashboard__section" aria-labelledby="elizabeth-timing-title">
+        <OrderedSections order={sectionOrder}>
+        <section className="elizabeth-dashboard__section" data-section="timing" aria-labelledby="elizabeth-timing-title">
           <div className="elizabeth-dashboard__section-heading">
             <div>
               <p className="elizabeth-dashboard__eyebrow">DE UN VISTAZO</p>
-              <h2 id="elizabeth-timing-title">Los tiempos de tu equipo</h2>
+              <h2 id="elizabeth-timing-title" tabIndex={-1}>Los tiempos de tu equipo</h2>
             </div>
             <CalendarClock size={26} aria-hidden="true" />
           </div>
@@ -132,33 +235,33 @@ export default function ElizabethDashboard() {
           )}
         </section>
 
-        <section className="elizabeth-dashboard__section" aria-labelledby="elizabeth-assigned-title">
+        <section className="elizabeth-dashboard__section" data-section="assigned" aria-labelledby="elizabeth-assigned-title">
           <div className="elizabeth-dashboard__section-heading">
             <div>
               <p className="elizabeth-dashboard__eyebrow">LO QUE TÚ ENCARGASTE</p>
-              <h2 id="elizabeth-assigned-title">Tareas que asignaste</h2>
+              <h2 id="elizabeth-assigned-title" tabIndex={-1}>Tareas que asignaste</h2>
             </div>
             <ListChecks size={26} aria-hidden="true" />
           </div>
-          <TaskList tasks={assignedTasks} now={now} emptyLabel={readState.emptyLabel || 'No hay tareas que hayas asignado.'} />
+          <TaskList tasks={visibleAssignedTasks} now={now} emptyLabel={readState.emptyLabel || (assignedTasks.length ? 'No hay tareas con este filtro.' : 'No hay tareas que hayas asignado.')} />
         </section>
 
-        <section className="elizabeth-dashboard__section" aria-labelledby="elizabeth-own-title">
+        <section className="elizabeth-dashboard__section" data-section="own" aria-labelledby="elizabeth-own-title">
           <div className="elizabeth-dashboard__section-heading">
             <div>
               <p className="elizabeth-dashboard__eyebrow">LO QUE TE ENCARGARON</p>
-              <h2 id="elizabeth-own-title">Tus propias tareas</h2>
+              <h2 id="elizabeth-own-title" tabIndex={-1}>Tus propias tareas</h2>
             </div>
             <ListChecks size={26} aria-hidden="true" />
           </div>
-          <TaskList tasks={ownTasks} now={now} assigneeEmail={currentUser?.email} emptyLabel={readState.emptyLabel || 'No hay tareas asignadas a ti.'} />
+          <TaskList tasks={visibleOwnTasks} now={now} assigneeEmail={currentUser?.email} emptyLabel={readState.emptyLabel || (ownTasks.length ? 'No hay tareas con este filtro.' : 'No hay tareas asignadas a ti.')} />
         </section>
 
-        <section className="elizabeth-dashboard__section" aria-labelledby="elizabeth-team-title">
+        <section className="elizabeth-dashboard__section" data-section="team" aria-labelledby="elizabeth-team-title">
           <div className="elizabeth-dashboard__section-heading">
             <div>
               <p className="elizabeth-dashboard__eyebrow">AVANCE POR PERSONA</p>
-              <h2 id="elizabeth-team-title">Lo que tiene tu equipo</h2>
+              <h2 id="elizabeth-team-title" tabIndex={-1}>Lo que tiene tu equipo</h2>
             </div>
             <Users size={26} aria-hidden="true" />
           </div>
@@ -171,7 +274,7 @@ export default function ElizabethDashboard() {
             </p>
           ) : (
             <div className="elizabeth-dashboard__team-grid">
-              {teamMembers.map(person => (
+              {peopleOrder.map(person => (
                 <article className="elizabeth-person-card" key={person.email}>
                   <div className="elizabeth-person-card__heading">
                     <span className="elizabeth-person-card__avatar" aria-hidden="true">
@@ -183,19 +286,29 @@ export default function ElizabethDashboard() {
                     </div>
                     <CheckCircle2 size={20} aria-hidden="true" />
                   </div>
+                  {(activePreferences.people[person.email] || 0) >= 2 &&
+                    <p className="elizabeth-dashboard__followed">Una de las personas que más revisas</p>}
+                  <details onToggle={event => {
+                    if (event.currentTarget.open) remember('people', person.email);
+                  }}>
+                  <summary>Ver sus {numberLabel(person.taskCount, 'tarea')}</summary>
                   <ul>
-                    {person.tasks.map((task, index) => (
+                    {filterDashboardTasks(person.tasks, filter, now, person.email).map((task, index) => (
                       <li key={`${task.id || task.task || 'task'}-${index}`}>
                         <span>{task.title || task.task || task.name || 'Tarea sin título'}</span>
                         <TaskTiming task={{ ...task, assignedToEmail: null, assigned_to: null, assignedToEmails: [person.email] }} now={now} />
                       </li>
                     ))}
                   </ul>
+                  {filterDashboardTasks(person.tasks, filter, now, person.email).length === 0 &&
+                    <p className="elizabeth-dashboard__empty">No hay tareas con este filtro.</p>}
+                  </details>
                 </article>
               ))}
             </div>
           )}
         </section>
+        </OrderedSections>
 
         <footer className="elizabeth-dashboard__footer">
           <Clock3 size={17} aria-hidden="true" />
