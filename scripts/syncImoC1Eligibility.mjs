@@ -3,7 +3,7 @@
 import puppeteer from 'puppeteer';
 import {initializeApp,cert} from 'firebase-admin/app';
 import {getFirestore} from 'firebase-admin/firestore';
-import {buildC1Index,reconcileC1} from './imoC1Reconciliation.mjs';
+import {buildC1Index,reconcileC1,loadCompleteC1Source} from './imoC1Reconciliation.mjs';
 import {c1Eligibility} from '../functions-imo/c1Eligibility.mjs';
 const apply=process.argv.includes('--apply');
 const credentials=JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON || '{}');
@@ -18,25 +18,15 @@ try {
  await page.locator('input[name="password"]').fill(process.env.NODUS_PASSWORD);
  await Promise.all([page.waitForNavigation({waitUntil:'networkidle2',timeout:60000}),page.locator('button[type="submit"]').click()]);
  if(/login|captcha|challenge/i.test(page.url())) throw new Error('Authorized session unavailable');
- const rows=[];let total=null;
- for(let start=0;start<100000;) {
-  const result=await page.evaluate(async start=>{
-   const response=await fetch(`/participantessede/datosTabla?draw=1&start=${start}&length=500&id_sede=0&id_equipo=0`, {signal:AbortSignal.timeout(20000)});
+ const rows=await loadCompleteC1Source(start=>page.evaluate(async start=>{
+   const response=await fetch(`/participantessede/datosTabla?draw=1&start=${start}&length=500&id_sede=0&id_equipo=0`, {signal:AbortSignal.timeout(60000)});
    if(!response.ok) throw new Error('Read failed');
    const payload=await response.json();
    if(!Array.isArray(payload.data)) throw new Error('Unexpected contract');
    const keys=['id','nombres','apellidos','telefono','id_invitador','asistio_c1','asistenciaC1','estadoC1','estado_c1','desertorC1','desertor_c1'];
    return {total:payload.recordsTotal,filtered:payload.recordsFiltered,rows:payload.data.map(row=>Object.fromEntries(keys.filter(key=>row[key]!==undefined).map(key=>[key,row[key]])))};
-  },start);
-  const count=Number(result.total);
-  if(!Number.isInteger(count)||count<1||count>100000||(total!==null&&count!==total))throw new Error('Source total missing or changed');
-  if(result.filtered!==undefined && Number(result.filtered)!==count)throw new Error('Incomplete source filter');
-  total=count;rows.push(...result.rows);start=rows.length;
-  if(start%5000===0)console.log('IMO_C1_SOURCE_PROGRESS '+JSON.stringify({read:start,total}));
-  if(start===total)break;
-  if(!result.rows.length||start>total)throw new Error('Incomplete source pagination');
- }
- if(rows.length!==total)throw new Error('Source incomplete');
+  },start));
+ console.log('IMO_C1_SOURCE_COMPLETE '+JSON.stringify({read:rows.length}));
  const index=buildC1Index(rows),sourceUpdatedAt=new Date().toISOString();
  const missions=await db.collection('imo_missions').get();
  const stats={sourceRows:rows.length,missions:missions.size,eligible:0,already_attended:0,unverified:0,profilesUpdated:0,writes:0,apply};

@@ -27,3 +27,21 @@ export function reconcileC1(enrollee, mission, index, sourceUpdatedAt) {
   const evidence = c1Evidence(row);
   return { ...unknown, ...evidence, nodusParticipantId: String(row.id), c1Source: 'Nodus /participantessede/datosTabla', c1Verification: c1Eligibility(evidence) === 'unverified' ? 'unverified' : 'verified' };
 }
+
+export async function loadCompleteC1Source(readPage) {
+  const first=await readPage(0),total=Number(first.total),size=first.rows?.length;
+  if(!Number.isInteger(total)||total<1||total>100000||!size||size>total)throw new Error('Source total missing or changed');
+  const validate=(result,start)=>{
+    if(Number(result.total)!==total || (result.filtered!==undefined && Number(result.filtered)!==total))throw new Error('Incomplete source filter');
+    if(!Array.isArray(result.rows)||result.rows.length!==Math.min(size,total-start))throw new Error('Incomplete source pagination');
+    return result.rows;
+  };
+  const rows=validate(first,0);
+  for(let start=size;start<total;start+=size*4){
+    const offsets=Array.from({length:4},(_,i)=>start+i*size).filter(n=>n<total);
+    const results=await Promise.all(offsets.map(readPage));
+    results.forEach((result,i)=>rows.push(...validate(result,offsets[i])));
+  }
+  buildC1Index(rows); // Reject repeated pages/IDs before any publication.
+  return rows;
+}
