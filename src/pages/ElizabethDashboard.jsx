@@ -8,9 +8,12 @@ import { findUserByAnyEmail } from '../data/usersData';
 import {
   getTaskAssigneeEmails,
   getTasksAssignedBy,
+  getTasksAssignedTo,
+  getTaskReadState,
   getTaskTiming,
   getTeamMembers,
   getTeamTimingSummary,
+  isTaskCompleteForAssignee,
   normalizeTaskEmail
 } from '../utils/elizabethDashboard';
 import './ElizabethDashboard.css';
@@ -28,9 +31,33 @@ function TaskTiming({ task, now }) {
   return <span className={`elizabeth-badge elizabeth-badge--${timing.key}`}>{timing.label}</span>;
 }
 
+function TaskList({ tasks, now, emptyLabel, assigneeEmail }) {
+  if (tasks.length === 0) return <p className="elizabeth-dashboard__empty" role="status">{emptyLabel}</p>;
+  return (
+    <div className="elizabeth-dashboard__task-list">
+      {tasks.map(task => {
+        const assignees = getTaskAssigneeEmails(task);
+        return (
+          <article className="elizabeth-task-card" key={task.id}>
+            <div className="elizabeth-task-card__main">
+              <h3>{task.title || task.task || task.name || 'Tarea sin título'}</h3>
+              <p>{assignees.length
+                ? `Para: ${assignees.map(email => assigneeName(task, email)).join(', ')}`
+                : 'Sin una persona asignada registrada'}</p>
+            </div>
+            <TaskTiming task={assigneeEmail
+              ? { ...task, completed: isTaskCompleteForAssignee(task, assigneeEmail) }
+              : task} now={now} />
+          </article>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function ElizabethDashboard() {
   const { currentUser } = useAuth();
-  const { tasks = [], loading, taskLoadError } = useChecklist();
+  const { tasks = [], loading, taskLoadError, taskReadRestricted } = useChecklist();
   const navigate = useNavigate();
   const [now, setNow] = useState(() => new Date());
 
@@ -40,9 +67,11 @@ export default function ElizabethDashboard() {
   }, []);
 
   const assignedTasks = useMemo(
-    () => getTasksAssignedBy(tasks, currentUser?.email),
-    [tasks, currentUser?.email]
+    () => getTasksAssignedBy(tasks, currentUser?.email, currentUser?.name || currentUser?.displayName),
+    [tasks, currentUser?.email, currentUser?.name, currentUser?.displayName]
   );
+  const ownTasks = useMemo(() => getTasksAssignedTo(tasks, currentUser?.email), [tasks, currentUser?.email]);
+  const readState = getTaskReadState({ loading, taskLoadError, taskReadRestricted });
   const teamMembers = useMemo(() => getTeamMembers(assignedTasks), [assignedTasks]);
   const summary = useMemo(() => getTeamTimingSummary(assignedTasks, now), [assignedTasks, now]);
   const firstName = isElizabethEscobar(currentUser)
@@ -68,9 +97,9 @@ export default function ElizabethDashboard() {
           </nav>
         </header>
 
-        {taskLoadError && (
+        {readState.notice && (
           <p className="elizabeth-dashboard__notice" role="status">
-            No se pudo cargar toda la información de tareas. Algunos datos pueden faltar.
+            {readState.notice}
           </p>
         )}
 
@@ -84,19 +113,19 @@ export default function ElizabethDashboard() {
           </div>
           <div className="elizabeth-dashboard__summary">
             <article className="elizabeth-summary-card elizabeth-summary-card--today">
-              <span>Vencen hoy</span><strong>{summary.today}</strong>
+              <span>Vencen hoy</span><strong>{readState.canShowTotals ? summary.today : '—'}</strong>
             </article>
             <article className="elizabeth-summary-card elizabeth-summary-card--overdue">
-              <span>Atrasadas</span><strong>{summary.overdue}</strong>
+              <span>Atrasadas</span><strong>{readState.canShowTotals ? summary.overdue : '—'}</strong>
             </article>
             <article className="elizabeth-summary-card elizabeth-summary-card--ontime">
-              <span>A tiempo</span><strong>{summary.onTime}</strong>
+              <span>A tiempo</span><strong>{readState.canShowTotals ? summary.onTime : '—'}</strong>
             </article>
             <article className="elizabeth-summary-card elizabeth-summary-card--completed">
-              <span>Completadas</span><strong>{summary.completed}</strong>
+              <span>Completadas</span><strong>{readState.canShowTotals ? summary.completed : '—'}</strong>
             </article>
           </div>
-          {summary.noDeadline > 0 && (
+          {readState.canShowTotals && summary.noDeadline > 0 && (
             <p className="elizabeth-dashboard__footnote">
               {numberLabel(summary.noDeadline, 'tarea')} sin fecha límite.
             </p>
@@ -111,29 +140,18 @@ export default function ElizabethDashboard() {
             </div>
             <ListChecks size={26} aria-hidden="true" />
           </div>
-          {loading ? (
-            <p className="elizabeth-dashboard__empty" role="status">Cargando tus tareas…</p>
-          ) : assignedTasks.length === 0 ? (
-            <p className="elizabeth-dashboard__empty">Todavía no aparecen tareas que hayas asignado.</p>
-          ) : (
-            <div className="elizabeth-dashboard__task-list">
-              {assignedTasks.map(task => {
-                const assignees = getTaskAssigneeEmails(task);
-                const title = task.title || task.task || task.name || 'Tarea sin título';
-                return (
-                  <article className="elizabeth-task-card" key={task.id}>
-                    <div className="elizabeth-task-card__main">
-                      <h3>{title}</h3>
-                      <p>{assignees.length
-                        ? `Para: ${assignees.map(email => assigneeName(task, email)).join(', ')}`
-                        : 'Sin una persona asignada registrada'}</p>
-                    </div>
-                    <TaskTiming task={task} now={now} />
-                  </article>
-                );
-              })}
+          <TaskList tasks={assignedTasks} now={now} emptyLabel={readState.emptyLabel || 'No hay tareas que hayas asignado.'} />
+        </section>
+
+        <section className="elizabeth-dashboard__section" aria-labelledby="elizabeth-own-title">
+          <div className="elizabeth-dashboard__section-heading">
+            <div>
+              <p className="elizabeth-dashboard__eyebrow">LO QUE TE ENCARGARON</p>
+              <h2 id="elizabeth-own-title">Tus propias tareas</h2>
             </div>
-          )}
+            <ListChecks size={26} aria-hidden="true" />
+          </div>
+          <TaskList tasks={ownTasks} now={now} assigneeEmail={currentUser?.email} emptyLabel={readState.emptyLabel || 'No hay tareas asignadas a ti.'} />
         </section>
 
         <section className="elizabeth-dashboard__section" aria-labelledby="elizabeth-team-title">
@@ -148,7 +166,9 @@ export default function ElizabethDashboard() {
             El equipo se forma con las personas que figuran como asignadas en las tareas que tú encargaste.
           </p>
           {teamMembers.length === 0 ? (
-            <p className="elizabeth-dashboard__empty">Cuando asignes una tarea, aquí verás a quién se la encargaste y su avance.</p>
+            <p className="elizabeth-dashboard__empty" role="status">
+              {readState.emptyLabel || 'No hay personas asignadas en las tareas que encargaste.'}
+            </p>
           ) : (
             <div className="elizabeth-dashboard__team-grid">
               {teamMembers.map(person => (

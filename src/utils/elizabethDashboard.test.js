@@ -1,8 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { filterTasksForUser, hasSimulatedTaskIdentityMismatch } from './taskPrivacy.js';
 import {
   getTasksAssignedBy,
+  getTasksAssignedTo,
+  getTaskReadState,
   getTaskAssigneeEmails,
   getTaskTiming,
   getTeamMembers,
@@ -75,6 +78,66 @@ test('only returns tasks assigned or created by the signed-in assigner', () => {
   ];
   assert.deepEqual(getTasksAssignedBy(tasks, 'contabilidad.global@crearpsl.com').map(task => task.id), ['assigned', 'legacy']);
   assert.deepEqual(getTasksAssignedBy(tasks, ''), []);
+});
+
+test('three synthetic created/assigned-by tasks survive the real identity privacy filter', () => {
+  const user = { email: 'lead@example.com', name: 'Ana María López', appRole: 'cfo', uid: 'lead-uid' };
+  const recipients = ['one@example.com', 'two@example.com', 'three@example.com'];
+  const tasks = [
+    { id: 'created', createdBy: 'lead@example.com', assignedToEmails: recipients, status: 'Pendiente' },
+    { id: 'created-and-assigned', createdBy: 'lead@example.com', assignedByEmail: 'lead@example.com', assignedByName: user.name, assignedToEmails: recipients, status: 'En Progreso' },
+    { id: 'assigned', assignedByEmail: 'LEAD@example.com', assignedByName: user.name, assignedToEmails: recipients, completed: true },
+    ...['personal-one', 'personal-two', 'personal-three'].map(id => ({
+      id, createdBy: 'other@example.com', assignedToEmails: [user.email], status: 'Pendiente'
+    })),
+    { id: 'private-team-task', createdBy: 'other@example.com', assignedToEmails: recipients }
+  ];
+  const visible = filterTasksForUser(tasks, user);
+  assert.equal(getTasksAssignedBy(visible, user.email, user.name).length, 3);
+  assert.equal(getTasksAssignedTo(visible, user.email).length, 3);
+  assert.equal(getTasksAssignedBy(filterTasksForUser(tasks, { ...user, isSimulated: true }), user.email, user.name).length, 3);
+  assert.ok(!visible.some(task => task.id === 'private-team-task'));
+});
+
+test('full assigner name is only a fallback on already-authorized tasks without assigner email', () => {
+  const name = 'Ana María López';
+  const tasks = [
+    { id: 'exact', assignedByName: name, assignedToEmail: 'lead@example.com' },
+    { id: 'surname', assignedByName: 'Carlos López', assignedToEmail: 'lead@example.com' },
+    { id: 'partial', assignedByName: 'Ana', assignedToEmail: 'lead@example.com' },
+    { id: 'conflict', assignedByName: name, assignedByEmail: 'other@example.com', assignedToEmail: 'lead@example.com' }
+  ];
+  assert.deepEqual(getTasksAssignedBy(tasks, 'lead@example.com', name).map(task => task.id), ['exact']);
+  assert.deepEqual(getTasksAssignedBy(tasks, 'lead@example.com').map(task => task.id), []);
+});
+
+test('simulator identifies the Firebase session mismatch, without broadening task visibility', () => {
+  const target = { email: 'target@crearpsl.net', isSimulated: true };
+  assert.equal(hasSimulatedTaskIdentityMismatch(target, 'admin@example.com'), true);
+  assert.equal(hasSimulatedTaskIdentityMismatch(target, undefined), true);
+  assert.equal(hasSimulatedTaskIdentityMismatch(target, 'target@crearpsl.com'), false);
+  assert.equal(hasSimulatedTaskIdentityMismatch({ ...target, isSimulated: false }, 'admin@example.com'), false);
+  const privateTask = { id: 'private', createdBy: target.email, assignedToEmails: ['team@example.com'] };
+  assert.deepEqual(filterTasksForUser([privateTask], { email: 'admin@example.com', isSuperAdmin: true }), []);
+});
+
+test('loading, failed and restricted views never claim zero totals or confirmed emptiness', () => {
+  for (const input of [{ loading: true }, { taskLoadError: 'denied' }, { taskReadRestricted: true }]) {
+    const state = getTaskReadState(input);
+    assert.equal(state.canShowTotals, false);
+    assert.notEqual(state.emptyLabel, '');
+  }
+  assert.match(getTaskReadState({ taskReadRestricted: true }).notice, /Vista simulada: tareas privadas no visibles/);
+  assert.equal(getTaskReadState({ loading: false, taskLoadError: '', taskReadRestricted: false }).canShowTotals, true);
+  const context = readFileSync(new URL('../context/ChecklistContext.jsx', import.meta.url), 'utf8');
+  assert.match(context, /\['createdBy', exactOperator/);
+  assert.match(context, /\['assignedByEmail', exactOperator/);
+  assert.match(context, /\['assignedToEmails', arrayOperator/);
+  assert.match(context, /setLoading\(pendingQueries\.size > 0\)/);
+  assert.match(context, /pendingQueries\.delete\(key\)/);
+  const page = readFileSync(new URL('../pages/ElizabethDashboard.jsx', import.meta.url), 'utf8');
+  assert.match(page, /Tus propias tareas/);
+  assert.match(page, /readState\.canShowTotals \? summary\.today : '—'/);
 });
 
 test('reads the real single, multiple, and legacy assignee fields without duplicates', () => {

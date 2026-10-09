@@ -6,7 +6,7 @@ import { usersData, normalizeRole } from '../data/usersData';
 import { isSuperAdminEmail, isGerenciaRole } from '../config/permissions';
 import { canSendOperationalCommunications } from '../config/permissions';
 import { calculateAutomaticDeadline } from '../utils/soarDates';
-import { filterTasksForUser, getChecklistRolesForUser } from '../utils/taskPrivacy';
+import { filterTasksForUser, getChecklistRolesForUser, hasSimulatedTaskIdentityMismatch } from '../utils/taskPrivacy';
 import { createGoogleTask } from '../services/googleSync';
 import { useUI } from './UIContext';
 import { useAuth } from './AuthContext';
@@ -519,8 +519,8 @@ export function ChecklistProvider({ children }) {
     }
 
     const snapshotsByQuery = new Map();
+    const pendingQueries = new Set(querySpecs.map(({ key }) => key));
     let active = true;
-    let hasReceivedSnapshot = false;
     const publishTasks = () => {
       if (!active) return;
       const docsById = new Map();
@@ -597,21 +597,24 @@ export function ChecklistProvider({ children }) {
       }
 
       setTasks(finalTasks);
-      setLoading(false);
+      setLoading(pendingQueries.size > 0);
     };
 
     setLoading(true);
     const unsubscribers = querySpecs.map(({ key, constraints }) => onSnapshot(
       query(taskCollection, ...constraints),
       snapshot => {
+        if (!active) return;
         snapshotsByQuery.set(key, snapshot.docs);
-        hasReceivedSnapshot = true;
+        pendingQueries.delete(key);
         publishTasks();
       },
       error => {
+        if (!active) return;
         console.error(`Error fetching authorized tasks (${key}):`, error);
+        pendingQueries.delete(key);
         setTaskLoadError('No se pudieron cargar todas las tareas autorizadas; el listado puede estar incompleto.');
-        if (!hasReceivedSnapshot) setLoading(false);
+        publishTasks();
       }
     ));
 
@@ -627,7 +630,7 @@ export function ChecklistProvider({ children }) {
     // elige/cambia su(s) equipo(s) en su perfil, este listener se vuelva a
     // suscribir y reconstruya "tasks" con la expansión multi-equipo correcta —
     // igual que ya hacía currentCycle?.id, pero para quitoCycles.
-  }, [currentUser?.sede, currentUser?.email, currentUser?.appRole, currentUser?.role, currentUser?.roles?.join('|'), currentUser?.uid, currentCycle?.id, currentCycle?.name, quitoCyclesKey]);
+  }, [currentUser?.sede, currentUser?.email, currentUser?.appRole, currentUser?.role, currentUser?.roles?.join('|'), currentUser?.uid, currentUser?.isSimulated, currentCycle?.id, currentCycle?.name, quitoCyclesKey]);
 
   // (14/09/2026) equipoQuito (opcional): cuando el usuario de Quito tiene 2 equipos
   // elegidos, ChecklistBoard.jsx pasa aquí a cuál de los dos pertenece la fila que
@@ -1532,7 +1535,8 @@ export function ChecklistProvider({ children }) {
       acceptCollaboration,
       rejectCollaboration,
       updateIndividualProgress,
-      taskLoadError
+      taskLoadError,
+      taskReadRestricted: hasSimulatedTaskIdentityMismatch(currentUser, auth.currentUser?.email)
     }}>
       {children}
     </ChecklistContext.Provider>

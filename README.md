@@ -69,3 +69,15 @@ versionado bajo `/assets/` usan caché inmutable. No se registra un service work
 El selector y la vista de reportes de un perfil directivo se conservan en la
 simulación. **Terminar Simulación** restaura la cuenta administradora original
 y regresa a `/home`, también después de simular más de un perfil.
+
+El panel separa tareas **asignadas por ti** de **Tus propias tareas** (asignadas a
+tu correo). La identidad de quien asignó usa `createdBy`/`assignedByEmail` y
+variantes históricas de correo; `assignedByName` solo sirve como respaldo por
+nombre completo exacto si no hay correo de asignador, sobre datos ya autorizados.
+No se emparejan personas por apellido ni nombre parcial.
+
+Simular un perfil no cambia la identidad de Firebase. Si la sesión del
+administrador difiere del perfil mostrado, el panel indica **Vista simulada:
+tareas privadas no visibles**, muestra solo datos autorizados y no afirma totales
+cero. Durante la carga o ante un error tampoco se presentan totales ni se afirma
+que no hay tareas. Las reglas de privacidad siguen intactas.

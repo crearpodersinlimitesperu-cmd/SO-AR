@@ -73,3 +73,9 @@ export const isTaskVisibleForUser = (task, user) => {
 
 export const filterTasksForUser = (tasks, user) =>
   (Array.isArray(tasks) ? tasks : []).filter(task => isTaskVisibleForUser(task, user));
+
+export const hasSimulatedTaskIdentityMismatch = (user, authenticatedEmail) =>
+  Boolean(user?.isSimulated && (
+    !authenticatedEmail ||
+    !emailAliases(user.email).includes(normalizeEmail(authenticatedEmail))
+  ));

@@ -22,13 +22,42 @@ const getAssignerEmails = (task) => [
   ...getEmailValues(task?.created_by)
 ];
 
-export const getTasksAssignedBy = (tasks, assignerEmail) => {
+const normalizeFullName = (value) => typeof value === 'string' ? value.trim().toLowerCase() : '';
+
+export const getTasksAssignedBy = (tasks, assignerEmail, assignerName = '') => {
   const email = normalizeTaskEmail(assignerEmail);
   if (!email || !Array.isArray(tasks)) return [];
-  return tasks.filter(task => task && getAssignerEmails(task).includes(email) && getAssigneeEmails(task).length > 0);
+  const name = normalizeFullName(assignerName);
+  return tasks.filter(task => {
+    if (!task || !getAssigneeEmails(task).length) return false;
+    const assigners = getAssignerEmails(task);
+    return assigners.includes(email) ||
+      (assigners.length === 0 && name !== '' && normalizeFullName(task.assignedByName) === name);
+  });
 };
 
 export const getTaskAssigneeEmails = getAssigneeEmails;
+
+export const getTasksAssignedTo = (tasks, assigneeEmail) => {
+  const email = normalizeTaskEmail(assigneeEmail);
+  if (!email || !Array.isArray(tasks)) return [];
+  return tasks.filter(task => task && getAssigneeEmails(task).includes(email));
+};
+
+export const getTaskReadState = ({ loading, taskReadRestricted, taskLoadError }) => {
+  if (taskReadRestricted) return {
+    canShowTotals: false,
+    emptyLabel: 'Vista simulada: tareas privadas no visibles. No podemos confirmar si hay tareas.',
+    notice: 'Vista simulada: tareas privadas no visibles. La sesión del administrador no permite ver todas las tareas privadas de este perfil. Solo se muestran las tareas que esa sesión puede leer; los totales no están disponibles.'
+  };
+  if (loading) return { canShowTotals: false, emptyLabel: 'Cargando tus tareas…', notice: '' };
+  if (taskLoadError) return {
+    canShowTotals: false,
+    emptyLabel: 'No se pudieron cargar todas las tareas. No podemos confirmar si hay tareas.',
+    notice: 'No se pudo cargar toda la información de tareas. Los listados pueden estar incompletos y los totales no están disponibles.'
+  };
+  return { canShowTotals: true, emptyLabel: '', notice: '' };
+};
 
 const findAssigneeProgress = (task, email) => {
   const progress = task?.assigneeProgress;
