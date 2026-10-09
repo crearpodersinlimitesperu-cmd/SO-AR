@@ -924,7 +924,6 @@ service cloud.firestore {
             request.resource.data.contacto is bool && request.resource.data.asistencia is bool &&
             request.resource.data.sessionId is string && request.resource.data.sessionId.size() >= 20 && request.resource.data.sessionId.size() <= 64 &&
             request.resource.data.updatedAt == request.time &&
-            !exists(/databases/$(database)/documents/imo_campaigns/$(campaignId)/profiles/$(missionId)/imo_events/$(request.resource.data.eventId)) &&
             existsAfter(/databases/$(database)/documents/imo_campaigns/$(campaignId)/profiles/$(missionId)/imo_events/$(request.resource.data.eventId));
           allow delete: if false;
         }
@@ -938,7 +937,8 @@ service cloud.firestore {
             request.resource.data.at == request.time && request.resource.data.identity == 'self-selected' && request.resource.data.source == 'mision-imo-v2' &&
             request.resource.data.after.keys().hasOnly(['contacto', 'asistencia']) &&
             request.resource.data.after.contacto is bool && request.resource.data.after.asistencia is bool &&
-            matchingImoBefore(campaignId, missionId, request.resource.data.enroladoId, request.resource.data.before);
+            matchingImoBefore(campaignId, missionId, request.resource.data.enroladoId, request.resource.data.before) &&
+            matchingImoConfirmation(campaignId, missionId, request.resource.data.enroladoId, eventId, request.resource.data.after, request.resource.data.sessionId, request.resource.data.reportedName);
           allow update, delete: if false;
         }
       }
