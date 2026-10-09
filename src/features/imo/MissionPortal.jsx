@@ -5,6 +5,21 @@ import { listenCampaignMissions, listenConfirmations, saveConfirmation } from '.
 import { isMissionComplete, missionProgress, normalizeText } from './missionModel';
 import './mission.css';
 
+function HowItWorks({ open = false }) {
+  return <details className="imo-how" open={open}>
+    <summary>¿Cómo funciona tu Misión IMO?</summary>
+    <ol>
+      <li><strong>Elige tu nombre</strong> en la lista y entra a tu misión. Selecciona solo tu propio perfil.</li>
+      <li>Verás a las personas que <strong>tú enrolaste</strong> para este Capítulo Uno y quién es su coordinadora.</li>
+      <li>Comunícate con cada enrolado y pídele que <strong>hable con su coordinación</strong>. Puedes usar el botón «Contactar a coordinación» (WhatsApp).</li>
+      <li>Marca <strong>«se comunicó con coordinación»</strong> cuando lo haya hecho.</li>
+      <li>Marca <strong>«confirmó que asistirá»</strong> cuando te confirme que estará en Capítulo Uno.</li>
+      <li>Tu misión se completa cuando todos tus enrolados tienen las dos marcas. <strong>Todo se guarda solo</strong>: puedes volver con este mismo enlace cuando quieras.</li>
+    </ol>
+    <p>Tus marcas son tu compromiso como IMO; no reemplazan el registro de asistencia de coordinación.</p>
+  </details>;
+}
+
 export default function MissionPortal() {
   const campaignId = new URLSearchParams(window.location.search).get('campana');
   const validId = /^[A-Za-z0-9]{20}$/.test(campaignId || '');
@@ -48,14 +63,14 @@ export default function MissionPortal() {
     finally { setSaving(false); }
   }
   return <main className="imo-page"><section className="imo-card">
-    <header><span className="imo-brand">CREAR · PODER SIN LÍMITES</span><h1>Misión IMO</h1><p>IMO es la persona que enrola a alguien para entrenarse, como mínimo, en Capítulo Uno.</p></header>
+    <header><img className="imo-logo" src="/imo/logo-crear.png" alt="CREAR · Poder sin límites" width="151" height="180"/><span className="imo-brand">CREAR · PODER SIN LÍMITES</span><h1>Misión IMO</h1><p>IMO es la persona que enrola a alguien para entrenarse, como mínimo, en Capítulo Uno.</p></header>
     {!validId ? <><h2>Solicita el enlace vigente de tu equipo</h2><p>Las misiones ahora se generan desde Causa OS por sede, equipo de ingreso y fecha de Capítulo Uno. Pide a gerencia el enlace de tu campaña.</p><p>Las direcciones antiguas no identifican una campaña vigente. No se han modificado tus registros anteriores.</p></> : !loaded ? <p role="status">Consultando la campaña…</p> : <>
       {campaign && <h2>{campaign.sede} · Capítulo Uno · Equipo {campaign.targetTeam}<br/><small>Inicio de C1: {campaign.c1Date}</small></h2>}
-      {!confirmedProfile ? <><label>Selecciona tu nombre<select value={selected} onChange={e => setSelected(e.target.value)}><option value="">Elige tu perfil IMO</option>{missions.map(m => <option key={m.id} value={m.id}>{m.imoNombre} · {m.originTeam ? `Equipo de origen ${m.originTeam}` : 'Equipo de origen por confirmar'}</option>)}</select></label>
+      {!confirmedProfile ? <><HowItWorks open /><label>Selecciona tu nombre<select value={selected} onChange={e => setSelected(e.target.value)}><option value="">Elige tu perfil IMO</option>{missions.map(m => <option key={m.id} value={m.id}>{m.imoNombre} · {m.originTeam ? `Equipo de origen ${m.originTeam}` : 'Equipo de origen por confirmar'}</option>)}</select></label>
         <p>Si tu nombre no aparece, solicita a gerencia que revise tu asignación. No selecciones el perfil de otra persona.</p>
         <button disabled={!mission || campaign?.status !== 'active'} onClick={() => { setError(''); setConfirmedProfile(true); }}>Soy {mission?.imoNombre || 'el IMO seleccionado'} · Ver mi misión</button></> : mission && <>
         <div className="imo-row"><h2>{mission.imoNombre}</h2><button className="imo-secondary" disabled={saving || pending} onClick={() => setConfirmedProfile(false)}>Cambiar perfil</button></div>
-        <p><strong>Tu equipo de origen: {mission.originTeam || 'por confirmar'}</strong><br/>Tus enrolados ingresan a <strong>Capítulo Uno · Equipo {mission.targetTeam} · {mission.sede}</strong>.</p>
+        <HowItWorks /><p><strong>Tu equipo de origen: {mission.originTeam || 'por confirmar'}</strong><br/>Tus enrolados ingresan a <strong>Capítulo Uno · Equipo {mission.targetTeam} · {mission.sede}</strong>.</p>
         <p className="imo-note">Creación, Relación y Gratitud son fines de semana por los que pasa cada equipo. Esta misión registra contacto y confirmación de asistencia; no determina la graduación ni acredita asistencia efectiva.</p>
         <p role="status">{!checksLoaded ? 'Recuperando avance…' : saving || pending ? 'Guardando; esperando confirmación del servidor…' : complete ? 'Misión completada y guardada: contacto y asistencia confirmados para todos tus enrolados.' : `Avance guardado: ${missionProgress(enrolados)}%`}</p>
         <div className="imo-grid"><label>Buscar enrolado<input type="search" value={search} onChange={ev => setSearch(ev.target.value)} placeholder="Nombre de tu enrolado"/></label><label>Confirmación del IMO<select value={statusFilter} onChange={ev => setStatusFilter(ev.target.value)}><option value="all">Todos</option><option value="confirmed">Asistencia confirmada por mí</option><option value="pending">Asistencia pendiente de confirmar</option><option value="contact">Contacto pendiente</option></select></label></div>
