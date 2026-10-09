@@ -6,6 +6,10 @@ on:
       - master
   workflow_dispatch: # Permite lanzar manualmente desde GitHub UI
 
+concurrency:
+  group: causa-access-deploy
+  cancel-in-progress: false
+
 jobs:
   build-and-deploy:
     name: Build & Deploy
@@ -78,9 +82,14 @@ jobs:
       - name: 🚀 Deploy to Firebase Hosting
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/centro-operativo-cpsl-65ad52160f45.json
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          npx --yes firebase-tools@latest deploy --only hosting,firestore:rules,firestore:indexes --project centro-operativo-cpsl --non-interactive 2>&1 | tee /tmp/deploy_output.log
+          npm install --prefix functions --ignore-scripts
+          node scripts/verifyDirectoryAccess.mjs profiles
+          npx --yes firebase-tools@latest deploy --only functions:default:getCompanyDirectory,functions:default:getRoleRecipients --project centro-operativo-cpsl --non-interactive
+          node scripts/verifyDirectoryAccess.mjs backend
+          npx --yes firebase-tools@latest deploy --only hosting --project centro-operativo-cpsl --non-interactive 2>&1 | tee /tmp/deploy_output.log
           DEPLOY_EXIT=${PIPESTATUS[0]}
 
           # (04/09/2026) FIX — antes este paso terminaba SIEMPRE con "exit 0",
@@ -96,6 +105,14 @@ jobs:
           fi
 
           exit "$DEPLOY_EXIT"
+
+      - name: Deploy access rules only after backend and Hosting
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/centro-operativo-cpsl-65ad52160f45.json
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+        run: |
+          npx --yes firebase-tools@latest deploy --only firestore:rules,firestore:indexes --project centro-operativo-cpsl --non-interactive
+          node scripts/verifyDirectoryAccess.mjs rules
 
       - name: 🗑️ Borrar la llave del runner
         if: always()
