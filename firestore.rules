@@ -925,8 +925,13 @@ service cloud.firestore {
             request.resource.data.sessionId is string && request.resource.data.sessionId.size() >= 20 && request.resource.data.sessionId.size() <= 64 &&
             request.resource.data.updatedAt == request.time &&
             existsAfter(/databases/$(database)/documents/imo_campaigns/$(campaignId)/profiles/$(missionId)/imo_events/$(request.resource.data.eventId));
-          allow update: if validImoProfile(campaignId, missionId, enroladoId, request.resource.data.reportedName) &&
-            imoWindowOpen(campaignId, missionId) && request.resource.data.get('campaignId', '') == campaignId;
+          allow update: if request.resource.data.keys().hasAll(['contacto', 'asistencia', 'campaignId', 'reportedName', 'sessionId', 'updatedAt', 'eventId']) &&
+            request.resource.data.keys().hasOnly(['contacto', 'asistencia', 'campaignId', 'reportedName', 'sessionId', 'updatedAt', 'eventId']) &&
+            request.resource.data.get('campaignId', '') == campaignId &&
+            request.resource.data.contacto is bool && request.resource.data.asistencia is bool &&
+            request.resource.data.updatedAt == request.time &&
+            imoWindowOpen(campaignId, missionId) &&
+            existsAfter(/databases/$(database)/documents/imo_campaigns/$(campaignId)/profiles/$(missionId)/imo_events/$(request.resource.data.eventId));
           allow delete: if false;
         }
         match /imo_events/{eventId} {
