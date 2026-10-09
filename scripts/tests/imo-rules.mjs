@@ -59,16 +59,20 @@ try {
   const restored = (await getDoc(state)).data();
   assert.equal(restored.contacto, true); assert.equal(restored.asistencia, true);
   assert.equal((await getDocs(collection(staff, `${profilePath}/imo_events`))).size, 2);
+  console.log('IMO rules: event history and persisted state verified');
   await assertSucceeds(getDocs(query(collectionGroup(staff, 'imo_confirmations'))));
   await assertSucceeds(getDocs(query(collectionGroup(staff, 'imo_progress'))));
   await assertFails(getDocs(query(collectionGroup(anon, 'imo_confirmations'))));
   await assertFails(getDocs(query(collectionGroup(anon, 'imo_progress'))));
+  console.log('IMO rules: collection group access verified');
   await assertFails(deleteDoc(doc(staff, `${profilePath}/imo_events/event-1`)));
   await assertFails(updateDoc(doc(anon, `${profilePath}/imo_events/event-1`), { source: 'changed' }));
+  console.log('IMO rules: immutable event enforcement verified');
   await env.withSecurityRulesDisabled(async ctx => {
     await updateDoc(doc(ctx.firestore(), `${profilePath}/imo_progress/window`), { openedAt: Timestamp.fromMillis(Date.now() - (8 * 60 * 60 + 30 * 60 + 1) * 1000) });
   });
   await assertFails(save('contacto', false, 'event-3'));
+  console.log('IMO rules: expired report was rejected');
   console.log('IMO rules: expired report was rejected');
   await assertSucceeds(updateDoc(doc(staff, 'imo_campaigns', cid), { status: 'closed' }));
   console.log('IMO rules: campaign closed');
