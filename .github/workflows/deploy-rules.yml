@@ -1,11 +1,21 @@
 name: 🚀 Desplegar Reglas de Firestore
 on:
-  push:
-    paths:
-      - 'firestore.rules'
-    branches:
-      - master
   workflow_dispatch:
+    inputs:
+      stage:
+        description: 'Verify profiles/backend first; rules only after verified backend and Hosting'
+        type: choice
+        options:
+          - profiles
+          - backend
+          - rules
+        default: profiles
+
+permissions:
+  contents: read
+concurrency:
+  group: causa-access-deploy
+  cancel-in-progress: false
 
 jobs:
   deploy_rules:
@@ -19,21 +29,68 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Install verification dependencies
-        run: npm ci --ignore-scripts --include=optional
+      - name: Install dependencies
+        run: npm ci --include=optional
+
+      - name: Install backend dependencies
+        if: github.event_name == 'push' || inputs.stage != 'profiles'
+        run: npm install --prefix functions --ignore-scripts
+
+      - name: Setup Java
+        if: github.event_name == 'push' || inputs.stage != 'profiles'
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Validate client and rules in staging emulator
+        if: github.event_name == 'push' || inputs.stage != 'profiles'
+        run: npm test && npm run build && npx --yes firebase-tools@latest emulators:exec --only firestore --project demo-task-privacy "npm run test:rules"
 
       - name: Instalar Firebase CLI
+        if: github.event_name == 'push' || inputs.stage != 'profiles'
         run: npm install -g firebase-tools
 
-      - name: Desplegar Reglas de Firestore
+      - name: Prepare private credential
         env:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
         run: |
-          node -e "require('fs').writeFileSync(process.env.RUNNER_TEMP + '/access-rules-credential.json', process.env.GOOGLE_SERVICE_ACCOUNT_JSON, {mode: 0o600})"
-          export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/access-rules-credential.json"
+          node -e "require('fs').writeFileSync(process.env.RUNNER_TEMP + '/access-credential.json', process.env.GOOGLE_SERVICE_ACCOUNT_JSON, {mode: 0o600})"
+
+      - name: Check real registered UID profiles before changing access
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/access-credential.json
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+        run: node scripts/verifyDirectoryAccess.mjs profiles
+
+      - name: Deploy only directory callables
+        if: github.event_name == 'push' || inputs.stage != 'profiles'
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/access-credential.json
+        run: firebase deploy --only functions:default:getCompanyDirectory,functions:default:getRoleRecipients --project centro-operativo-cpsl --non-interactive
+
+      - name: Verify real authenticated backend cohorts
+        if: github.event_name == 'push' || inputs.stage != 'profiles'
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/access-credential.json
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+        run: node scripts/verifyDirectoryAccess.mjs backend
+
+      - name: Desplegar Reglas de Firestore
+        if: github.event_name == 'push' || inputs.stage == 'rules'
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/access-credential.json
+        run: |
           firebase deploy --only firestore:rules,firestore:indexes --project centro-operativo-cpsl --non-interactive
           node scripts/verifyPublishedAccessRules.mjs
 
+      - name: Verify deployed access rules
+        if: github.event_name == 'push' || inputs.stage == 'rules'
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/access-credential.json
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+        run: node scripts/verifyDirectoryAccess.mjs rules
+
       - name: Remove temporary credential
         if: always()
-        run: rm -f "$RUNNER_TEMP/access-rules-credential.json"
+        run: rm -f "$RUNNER_TEMP/access-credential.json"

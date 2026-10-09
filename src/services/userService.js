@@ -1,8 +1,11 @@
-import { db } from './firebase';
+import { db, auth } from './firebase';
 import { doc, getDoc, setDoc, updateDoc, arrayUnion, collection, getDocs, query, where } from 'firebase/firestore';
 import { usersData, normalizeRole, findUserByAnyEmail } from '../data/usersData';
-import { DUAL_ROLE_TRAINER_EMAILS, canManageUserStatus } from '../config/permissions';
+import { DUAL_ROLE_TRAINER_EMAILS, canManageUserStatus, isSuperAdminEmail, NODUS_REPORT_ADMIN_EMAILS } from '../config/permissions';
 import { recordAuditEvent } from './auditService';
+import { fetchCrossSedeDirectory } from './directoryService';
+import { sedeAliasList } from '../utils/sedeAliases';
+import { isInDirectoryScope, projectDirectoryUser } from '../utils/directoryScope';
 
 
 /**
@@ -73,12 +76,74 @@ export async function getVerifiedUser(email) {
   return null;
 }
 
+// C-02: debe coincidir con callerIsDirectoryGlobal() en firestore.rules.
+const DIRECTORY_GLOBAL_ROLES = ['direccion', 'cfo', 'cco', 'ceo', 'director_maestria', 'talento_humano'];
+
+// NODUS_REPORT_ADMIN_EMAILS = SuperAdmin + lista de isGerenteODireccion() en las
+// reglas (ver el test de coherencia). Se aceptan los alias @crearpsl.net/.com
+// igual que la regla isDirectoryWhitelistedEmail().
+const emailToNetAlias = (email) => {
+  const e = String(email || '').trim().toLowerCase();
+  return e.endsWith('@crearpsl.com') ? e.replace(/@crearpsl\.com$/, '@crearpsl.net') : e;
+};
+
+const isDirectoryGlobalCaller = (currentUser) => {
+  if (!currentUser) return false;
+  if (currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email)) return true;
+  if (NODUS_REPORT_ADMIN_EMAILS.includes(emailToNetAlias(currentUser.email))) return true;
+  const roles = [currentUser.role, currentUser.appRole, ...(Array.isArray(currentUser.roles) ? currentUser.roles : [])]
+    .filter(Boolean).map(r => normalizeRole(r));
+  return roles.some(r => DIRECTORY_GLOBAL_ROLES.includes(r));
+};
+
+// Las reglas comparan contra users/{uid}.sede tal cual está guardada, así que
+// se lee el propio perfil (siempre permitido) en vez de confiar en la sede
+// normalizada de la sesión.
+const readOwnProfileRaw = async () => {
+  const uid = auth?.currentUser?.uid;
+  if (!uid) return null;
+  try {
+    const snap = await getDoc(doc(db, 'users', uid));
+    return snap.exists() ? { id: snap.id, ...snap.data() } : null;
+  } catch (err) {
+    console.error('No se pudo leer el perfil propio:', err);
+    throw err;
+  }
+};
+
+/**
+ * Lecturas de /users permitidas por las reglas para quien no es global:
+ * solo documentos de su misma sede, o su propio perfil si no tiene sede.
+ */
+const readScopedUsersDocs = async () => {
+  const own = await readOwnProfileRaw();
+  if (!own) return [];
+  const docs = [own];
+  const aliases = sedeAliasList(own.sede);
+  if (aliases.length > 0) {
+    const seen = new Set([own.id]);
+    const collect = (snap) => snap.forEach(d => {
+      if (!seen.has(d.id)) { seen.add(d.id); docs.push({ id: d.id, ...d.data() }); }
+    });
+    const usersRef = collection(db, 'users');
+    try {
+      collect(await getDocs(query(usersRef, where('sede', 'in', aliases))));
+    } catch (err) {
+      console.error('No se pudo cargar el directorio de la sede:', err);
+      throw err;
+    }
+  }
+  return docs;
+};
+
 /**
  * Obtiene todos los usuarios de la compañía consultando los tres directorios oficiales de Firestore.
  * Esto reemplaza al archivo estático usersData.js
  */
 export async function getAllCompanyUsers(currentUser = null) {
   const allUsers = [];
+  const scope = { global: isDirectoryGlobalCaller(currentUser), crossSede: false, sede: null };
+  const ownEmails = new Set(currentUser?.email ? [String(currentUser.email).trim().toLowerCase()] : []);
 
   // NOTA (26/08/2026): normalizamos (trim + minúsculas) todas las comparaciones de
   // email para evitar duplicados por diferencias de mayúsculas/espacios entre
@@ -146,9 +211,42 @@ export async function getAllCompanyUsers(currentUser = null) {
     // Admin. Se fusionan por correo igual que ya se hace con qt_directory abajo,
     // sin perder ningún campo: el primer doc encontrado manda, y el duplicado
     // solo rellena los campos que al primero le falten.
-    const usersSnap = await getDocs(collection(db, 'users'));
-    usersSnap.forEach(docSnap => {
-      const uData = docSnap.data();
+    let userDocs;
+    if (scope.global) {
+      try {
+        const usersSnap = await getDocs(collection(db, 'users'));
+        userDocs = usersSnap.docs.map(d => ({ id: d.id, data: d.data() }));
+      } catch (err) {
+        if (err.code !== 'permission-denied') throw err;
+        // El perfil en Firestore no concede alcance global: degradar a su sede.
+        console.warn('Directorio global denegado; usando alcance de sede:', err.message);
+        scope.global = false;
+      }
+    }
+    if (!userDocs) {
+      const scoped = await readScopedUsersDocs();
+      userDocs = scoped.map(({ id, ...data }) => ({ id, data }));
+      const own = scoped[0];
+      if (own) {
+        scope.sede = own.sede || null;
+        [own.email, own.corporateEmail, own.personalEmail, ...(Array.isArray(own.emails) ? own.emails : [])]
+          .filter(Boolean).forEach(e => ownEmails.add(String(e).trim().toLowerCase()));
+      }
+      // Otras sedes (proyección mínima) las sirve el backend solo a roles de
+      // coordinación/gerencia; si no está disponible se queda el alcance de sede.
+      try {
+        const seen = new Set(userDocs.map(d => d.id));
+        const directory = await fetchCrossSedeDirectory();
+        scope.crossSede = directory.canSeeCrossSede === true;
+        directory.users.forEach(({ id, ...data }) => {
+          if (!seen.has(id)) userDocs.push({ id, data });
+        });
+      } catch (err) {
+        console.error('No se pudo cargar el directorio entre sedes:', err);
+        throw err;
+      }
+    }
+    userDocs.forEach(({ id: docId, data: uData }) => {
       const candidateKeys = emailKeysOf(uData);
       const existingIdx = candidateKeys.size > 0 ? findExistingIndex(candidateKeys) : -1;
       
@@ -251,7 +349,7 @@ export async function getAllCompanyUsers(currentUser = null) {
         });
         return;
       }
-      allUsers.push(withCanonicalEmail({ id: docSnap.id, ...enrichedUser }));
+      allUsers.push(withCanonicalEmail({ id: docId, ...enrichedUser }));
     });
 
 
@@ -273,6 +371,7 @@ export async function getAllCompanyUsers(currentUser = null) {
     const CONTACT_FIELDS_FROM_QT = ['whatsapp', 'whatsappUrl', 'cleanPhone', 'phone', 'telefono', 'email', 'correo', 'corporateEmail', 'personalEmail', 'cumpleanos'];
     qtSnap.forEach(docSnap => {
       const qtData = docSnap.data();
+      if (!isInDirectoryScope(qtData, scope, ownEmails)) return;
       const candidateKeys = emailKeysOf(qtData);
       const existingIdx = candidateKeys.size > 0 ? findExistingIndex(candidateKeys) : -1;
       if (existingIdx !== -1) {
@@ -296,6 +395,7 @@ export async function getAllCompanyUsers(currentUser = null) {
 
   } catch (error) {
     console.error("Error fetching company users:", error);
+    throw error;
   }
 
   // Merge fallback con registro estático local para usuarios que aún no están en Firestore.
@@ -303,6 +403,7 @@ export async function getAllCompanyUsers(currentUser = null) {
   // los roles y sus sedes aun cuando exista un documento histórico incompleto.
   // Es un merge no destructivo: el resto de campos del usuario vivo se conserva.
   usersData.forEach(localUser => {
+    if (!isInDirectoryScope(localUser, scope, ownEmails)) return;
     const candidateKeys = emailKeysOf(localUser);
     const existingIndex = candidateKeys.size > 0 ? findExistingIndex(candidateKeys) : -1;
     if (existingIndex >= 0 && localUser.roleSedes) {
@@ -329,7 +430,8 @@ export async function getAllCompanyUsers(currentUser = null) {
     console.warn("Error evaluando permisos de estado en getAllCompanyUsers:", err);
     includeInactive = false;
   }
-  return includeInactive ? allUsers : allUsers.filter(u => u.status !== 'inactive');
+  const visibleUsers = includeInactive ? allUsers : allUsers.filter(u => u.status !== 'inactive');
+  return visibleUsers.map(user => projectDirectoryUser(user, scope, ownEmails));
 }
 
 /**

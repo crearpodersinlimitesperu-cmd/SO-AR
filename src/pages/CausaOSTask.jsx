@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../services/firebase';
-import { collection, doc, setDoc, getDocs } from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore';
+import { fetchRoleRecipients } from '../services/directoryService';
 
 const CausaOSTask = () => {
   const { currentUser } = useAuth();
@@ -17,29 +18,9 @@ const CausaOSTask = () => {
     
     try {
       // Obtener usuarios
-      const usersSnap = await getDocs(collection(db, 'users'));
       const targetRoles = ["coord_maestria", "coordinador_mj", "director_maestria", "gerente", "direccion", "entrenador"];
-      const targetEmails = [];
-      
-      usersSnap.forEach(userDoc => {
-        const u = userDoc.data();
-        let userHasTargetRole = false;
-
-        if (targetRoles.includes(u.role) || targetRoles.includes(u.appRole)) {
-            userHasTargetRole = true;
-        }
-
-        // Revisar array de multiples roles si existe
-        if (Array.isArray(u.roles)) {
-            if (u.roles.some(r => targetRoles.includes(r))) {
-                userHasTargetRole = true;
-            }
-        }
-
-        if (userHasTargetRole && u.email) {
-            targetEmails.push(u.email.toLowerCase().trim());
-        }
-      });
+      const recipients = await fetchRoleRecipients(targetRoles);
+      const targetEmails = recipients.map(user => user.email.toLowerCase().trim());
       
       // Eliminar duplicados
       const uniqueEmails = [...new Set(targetEmails)];
