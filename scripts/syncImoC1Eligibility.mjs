@@ -21,7 +21,7 @@ try {
  const rows=[];let total=null;
  for(let start=0;start<100000;) {
   const result=await page.evaluate(async start=>{
-   const response=await fetch(`/participantessede/datosTabla?draw=1&start=${start}&length=500&id_sede=0&id_equipo=0`);
+   const response=await fetch(`/participantessede/datosTabla?draw=1&start=${start}&length=500&id_sede=0&id_equipo=0`, {signal:AbortSignal.timeout(20000)});
    if(!response.ok) throw new Error('Read failed');
    const payload=await response.json();
    if(!Array.isArray(payload.data)) throw new Error('Unexpected contract');
@@ -32,6 +32,7 @@ try {
   if(!Number.isInteger(count)||count<1||count>100000||(total!==null&&count!==total))throw new Error('Source total missing or changed');
   if(result.filtered!==undefined && Number(result.filtered)!==count)throw new Error('Incomplete source filter');
   total=count;rows.push(...result.rows);start=rows.length;
+  if(start%5000===0)console.log('IMO_C1_SOURCE_PROGRESS '+JSON.stringify({read:start,total}));
   if(start===total)break;
   if(!result.rows.length||start>total)throw new Error('Incomplete source pagination');
  }
@@ -69,4 +70,4 @@ try {
  if(apply)await db.collection('imo_c1_sync_history').add({...stats,sourceUpdatedAt});
  console.log('IMO_C1_SYNC '+JSON.stringify(stats));
 } catch(error){console.error('IMO_C1_SYNC_FAILED '+JSON.stringify({type:error.name,message:['Source incomplete','Incomplete source pagination','Source total missing or changed','Incomplete source filter','Human verification required','Authorized session unavailable','Incomplete or duplicate Nodus IDs'].includes(error.message)?error.message:'Source or publication failed; private details suppressed'}));process.exitCode=1;}
-finally{await browser.close();}
+finally{await browser.close();await db.terminate();}
