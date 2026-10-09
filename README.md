@@ -1,5 +1,27 @@
 # React + Vite
 
+## Cola de correo
+
+`scripts/mailerDaemon.js --one-shot` procesa documentos de `mail` sin estado
+o con `delivery.state: PENDING`. Cada documento se reserva en una transacción
+como `SENDING` antes de enviarlo, para que ejecuciones solapadas no lo envíen
+dos veces. El resultado queda en `SUCCESS`, `ERROR` o `REJECTED`.
+
+Las alertas `task_overdue_assigner_alert` y `task_completed_alert` de más de
+48 horas se marcan `SKIPPED_STALE`, con motivo, sin enviar. `createdAt` admite
+ISO string y Timestamp de Firestore. Los demás tipos no caducan; sin una fecha
+válida no se presume antigüedad. El lote registra conteos agregados y confirma
+el estado persistido de los comunicados enviados, sin registrar destinatarios.
+Los errores de procesamiento hacen fallar el modo one-shot.
+La ejecución manual de `mail-dispatch.yml` admite `communication_id` para
+verificar por lectura que los correos de ese comunicado quedaron en `SUCCESS`;
+si no existen o tienen otro estado, el job falla.
+
+No se reintentan automáticamente documentos en `SENDING` ni estados terminales.
+Si un proceso se interrumpe después de reservar un correo, hay que comprobar
+primero si se entregó antes de cambiar su estado: SMTP y Firestore no comparten
+una transacción. Las pruebas de selección y reserva se ejecutan con `npm test`.
+
 ## Ayuda del Centro de Managers
 
 La guía rápida se adapta a la vista de entrenador, CMJ/coordinación, dirección
