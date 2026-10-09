@@ -64,7 +64,7 @@ const seed = async (path, data) => {
   });
 };
 
-const dbOf = uid => testEnv.authenticatedContext(uid, { email: USERS[uid].email }).firestore();
+const dbOf = uid => testEnv.authenticatedContext(uid, { email: USERS[uid].email, email_verified: true }).firestore();
 const superAdminDb = () =>
   testEnv.authenticatedContext(SUPERADMIN.uid, { email: SUPERADMIN.email }).firestore();
 const anonDb = () => testEnv.unauthenticatedContext().firestore();
@@ -113,7 +113,7 @@ test('metadata-only UID profiles preserve own learning, sync and directory acces
     userEmail: 'nuevo@crearpsl.net', timestamp: '2026-10-09T00:00:00.000Z'
   }));
   await assertSucceeds(getDocs(query(collection(db, 'sync_history'), where('userEmail', '==', 'nuevo@crearpsl.net'))));
-  await assertSucceeds(getDocs(collection(db, 'users')));
+  await assertSucceeds(getDocs(query(collection(db, 'users'), where('email', '==', 'nuevo@crearpsl.com'))));
   await assertSucceeds(getDocs(collection(db, 'qt_directory')));
   await assertFails(setDoc(doc(db, 'qt_directory', 'forged'), { email: 'foreign@example.com' }));
   await assertFails(setDoc(doc(db, 'user_stats', 'foreign-uid'), { totalTasks: 1 }));

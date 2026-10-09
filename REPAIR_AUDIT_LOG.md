@@ -74,6 +74,12 @@ its unique history remain preserved at `419ff86` on
 release after the documented profile/backend prerequisites are satisfied.
 Production `/users` and `staff_directory` access remain unchanged.
 
+After the release, #96 was closed as superseded only after checking both
+deployment jobs and the actual published rule source. #98 preserved the
+historical snapshot and merged the receipt. C-02 has been restored on top of
+that released master as a **new draft**, with all implementation and tests
+preserved rather than treating #97's automatic closure as completion.
+
 **Snapshot as of:** 2026-10-07 23:35 (-05:00) / 2026-10-08 04:35 UTC
 
 ## Status and scope

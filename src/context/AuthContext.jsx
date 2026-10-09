@@ -66,6 +66,8 @@ export function AuthProvider({ children }) {
 
   const elegirDocumentoCanonico = (snap) => {
     if (snap.empty) return null;
+    const propio = snap.docs.find((d) => d.id === auth.currentUser?.uid);
+    if (propio) return propio;
     if (snap.size === 1) return snap.docs[0];
     // Si hay varios documentos para el mismo correo, preferir el que tiene
     // forma de UID de Firebase Auth (el mismo que usan las reglas de
