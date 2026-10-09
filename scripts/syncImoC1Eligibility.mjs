@@ -40,13 +40,13 @@ try {
  const missions=await db.collection('imo_missions').get();
  const stats={sourceRows:rows.length,missions:missions.size,eligible:0,already_attended:0,unverified:0,profilesUpdated:0,writes:0,apply};
  // Transact per mission so concurrent human confirmations are never overwritten.
- for(const snapshot of missions.docs) {
-  if(!snapshot.data().enrolados?.length)continue;
+ async function processMission(snapshot) {
+  if(!snapshot.data().enrolados?.length)return;
   const ref=snapshot.ref;
-  const outcome=await db.runTransaction(async tx=>{
-   const doc=await tx.get(ref),m=doc.data();if(!m?.enrolados?.length)return;
+  const operation=async tx=>{
+   const doc=tx?await tx.get(ref):snapshot,m=doc.data();if(!m?.enrolados?.length)return;
    const profileRef=m.schemaVersion===2&&m.campaignId?db.doc(`imo_campaigns/${m.campaignId}/profiles/${doc.id}`):null;
-   const profile=profileRef?await tx.get(profileRef):null;
+   const profile=tx&&profileRef?await tx.get(profileRef):null;
    const enrolados=m.enrolados.map(e=>({...e,...reconcileC1(e,m,index,sourceUpdatedAt)}));
    // Only publish source status fields. Keep the original mission, owners and checks.
    const outcome={statuses:enrolados.map(c1Eligibility),profile:false};
@@ -58,8 +58,13 @@ try {
     tx.update(profileRef,{enrolados:(profile.data().enrolados || []).map(e=>{const verified=evidence.get(e.id)||{};return {...e,...Object.fromEntries(publicFields.map(k=>[k,verified[k]??null]))};})});outcome.profile=true;
    }
    return outcome;
-  });
+  };
+  const outcome=apply?await db.runTransaction(operation):await operation(null);
   if(outcome){for(const status of outcome.statuses)stats[status]++;if(apply)stats.writes++;if(outcome.profile)stats.profilesUpdated++;}
+ }
+ for(let start=0;start<missions.docs.length;start+=8){
+  const results=await Promise.allSettled(missions.docs.slice(start,start+8).map(processMission));
+  const failed=results.find(r=>r.status==='rejected');if(failed)throw failed.reason;
  }
  if(apply)await db.collection('imo_c1_sync_history').add({...stats,sourceUpdatedAt});
  console.log('IMO_C1_SYNC '+JSON.stringify(stats));
