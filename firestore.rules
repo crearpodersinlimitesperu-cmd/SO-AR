@@ -860,10 +860,10 @@ service cloud.firestore {
     }
     function matchingImoEvent(campaignId, missionId, eventId, enroladoId, sessionId, contacto, asistencia) {
       let eventPath = /databases/$(database)/documents/imo_campaigns/$(campaignId)/profiles/$(missionId)/imo_events/$(eventId);
-      let eventData = getAfter(eventPath).data;
-      return eventData.get('after', {}) == {'contacto': contacto, 'asistencia': asistencia} &&
-        eventData.get('enroladoId', '') == enroladoId &&
-        eventData.get('sessionId', '') == sessionId;
+      return existsAfter(eventPath) ?
+        getAfter(eventPath).data.after == {'contacto': contacto, 'asistencia': asistencia} &&
+        getAfter(eventPath).data.enroladoId == enroladoId &&
+        getAfter(eventPath).data.sessionId == sessionId : false;
     }
     function matchesPreviousImoState(path, before) {
       let previous = get(path).data;

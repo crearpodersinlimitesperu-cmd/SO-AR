@@ -40,6 +40,7 @@ try {
   await assertFails(deleteDoc(windowState));
   const state = doc(anon, `${profilePath}/imo_confirmations`, eid);
   const sessionId = '00000000-0000-4000-8000-000000000000';
+  console.log('IMO rules: rejecting confirmation without paired event');
   await assertFails(setDoc(state, { contacto: true, asistencia: true, reportedName: 'IMO SINTETICO', sessionId, updatedAt: serverTimestamp(), eventId: 'missing' }));
   async function save(field, value, eventId) {
     return runTransaction(anon, async tx => {
@@ -50,7 +51,9 @@ try {
       tx.set(doc(anon, `${profilePath}/imo_events`, eventId), { campaignId: cid, enroladoId: eid, before, after, reportedName: 'IMO SINTETICO', sessionId, identity: 'self-selected', at: serverTimestamp(), source: 'mision-imo-v2' });
     });
   }
+  console.log('IMO rules: accepting first atomic report');
   await assertSucceeds(save('contacto', true, 'event-1'));
+  console.log('IMO rules: accepting update with second atomic report');
   await assertSucceeds(save('asistencia', true, 'event-2'));
   const restored = (await getDoc(state)).data();
   assert.equal(restored.contacto, true); assert.equal(restored.asistencia, true);
