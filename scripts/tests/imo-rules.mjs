@@ -55,6 +55,7 @@ try {
   await assertSucceeds(save('contacto', true, 'event-1'));
   console.log('IMO rules: accepting update with second atomic report');
   await assertSucceeds(save('asistencia', true, 'event-2'));
+  console.log('IMO rules: second report succeeded');
   const restored = (await getDoc(state)).data();
   assert.equal(restored.contacto, true); assert.equal(restored.asistencia, true);
   assert.equal((await getDocs(collection(staff, `${profilePath}/imo_events`))).size, 2);
@@ -68,7 +69,9 @@ try {
     await updateDoc(doc(ctx.firestore(), `${profilePath}/imo_progress/window`), { openedAt: Timestamp.fromMillis(Date.now() - (8 * 60 * 60 + 30 * 60 + 1) * 1000) });
   });
   await assertFails(save('contacto', false, 'event-3'));
+  console.log('IMO rules: expired report was rejected');
   await assertSucceeds(updateDoc(doc(staff, 'imo_campaigns', cid), { status: 'closed' }));
+  console.log('IMO rules: campaign closed');
   await assertFails(save('contacto', false, 'event-3'));
   await assertFails(getDoc(doc(anon, profilePath)));
   // Roles de la ruta /monitor-imos: coordinadores leen y generan; otros roles no.
