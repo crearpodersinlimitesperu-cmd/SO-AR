@@ -1,8 +1,8 @@
 import { lazy, Suspense, useState, useEffect } from 'react'
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import { useUI } from './context/UIContext'
-import { PORTFOLIO_FI_REVIEW_EMAILS, isGlobalObserver } from './config/permissions'
+import { PORTFOLIO_FI_REVIEW_EMAILS, isElizabethEscobar, isGlobalObserver } from './config/permissions'
 import './index.css'
 import PromptModal from './components/PromptModal'
 import BirthdayAlert from './components/BirthdayAlert'
@@ -30,6 +30,7 @@ const OnboardingLegal = lazy(() => import('./pages/OnboardingLegal'));
 const Login = lazy(() => import('./pages/Login'));
 const OptOutPage = lazy(() => import('./pages/OptOutPage'));
 const Home = lazy(() => import('./pages/Home'));
+const ElizabethDashboard = lazy(() => import('./pages/ElizabethDashboard'));
 const CausaOSTask = lazy(() => import('./pages/CausaOSTask'));
 const RoleSelector = lazy(() => import('./pages/RoleSelector'));
 const ChecklistBoard = lazy(() => import('./pages/ChecklistBoard'));
@@ -66,6 +67,14 @@ const ComunicadosOperativos = lazy(() => import('./pages/ComunicadosOperativos')
 
 function RouteLoadingFallback() {
   return <MagicalLoadingScreen message="Abriendo el módulo…" />;
+}
+
+function HomeEntry() {
+  const { currentUser } = useAuth();
+  if (isElizabethEscobar(currentUser)) {
+    return <Navigate to="/elizabeth-dashboard" replace />;
+  }
+  return <Home />;
 }
 
 // Componente para proteger autenticación básica
@@ -169,6 +178,7 @@ function RoleRoute({ children, allowedRoles = [], allowedEmails = [], requireSup
 
 function App() {
   const { originalAdminUser, currentUser, stopSimulation } = useAuth();
+  const navigate = useNavigate();
   // Libera la caché heredada del antiguo agente global (varios MB por navegador).
   useEffect(() => {
     try { localStorage.removeItem('CAUSA_FAST_CACHE'); } catch { /* sin acceso a storage */ }
@@ -201,7 +211,10 @@ function App() {
             <span>Estás viendo la plataforma como <strong>{currentUser?.name}</strong></span>
           </div>
           <button 
-            onClick={stopSimulation}
+            onClick={() => {
+              stopSimulation();
+              navigate('/home', { replace: true });
+            }}
             style={{
               background: '#000',
               color: 'var(--crear-gold)',
@@ -292,8 +305,18 @@ function App() {
           } />
           <Route path="/home" element={
             <PrivateRoute>
+              <HomeEntry />
+            </PrivateRoute>
+          } />
+          <Route path="/home-completo" element={
+            <PrivateRoute>
               <Home />
             </PrivateRoute>
+          } />
+          <Route path="/elizabeth-dashboard" element={
+            <RoleRoute allowedRoles={['cfo']} allowedEmails={['contabilidad.global@crearpsl.net']} requireSuperAdmin={false}>
+              <ElizabethDashboard />
+            </RoleRoute>
           } />
 
           <Route path="/manual" element={

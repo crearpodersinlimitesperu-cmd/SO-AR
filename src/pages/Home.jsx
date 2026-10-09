@@ -35,7 +35,7 @@ import {
   canAccessAgendaTimeBoxing, canAccessFlyersC1, canAccessCalendarioMJ,
   canAccessMonitorVuelos, canAccessMonitorIMOs, canAccessHotelesSede, canAccessManualQT,
   canAccessDirectorioQT, canAccessManualNodus, canAccessCampusInteractivo,
-  canUseAsignadorEntrenadores, PORTFOLIO_FI_REVIEW_EMAILS, isDataAdmin
+  canUseAsignadorEntrenadores, PORTFOLIO_FI_REVIEW_EMAILS, isDataAdmin, isElizabethEscobar
 } from '../config/permissions';
 import EffectiveCommunicationButton from '../components/EffectiveCommunicationButton';
 import { getAllCompanyUsers } from '../services/userService';
@@ -1614,6 +1614,20 @@ export default function Home() {
 
   return (
     <div style={{ maxWidth: viewMode === 'lite' ? '780px' : '960px', margin: '0 auto', padding: viewMode === 'lite' ? '1.5rem 1rem' : '2rem 1rem' }}>
+      {isElizabethEscobar(currentUser) && (
+        <button
+          type="button"
+          className="btn-primary"
+          onClick={() => navigate('/elizabeth-dashboard')}
+          style={{
+            width: '100%', minHeight: '64px', padding: '1rem', marginBottom: '1.5rem',
+            fontSize: '1.3rem', fontWeight: 800, borderRadius: '16px',
+            background: '#fbbf24', color: '#211407', whiteSpace: 'normal'
+          }}
+        >
+          Mi panel sencillo — tareas y tiempos de mi equipo
+        </button>
+      )}
       
       {/* CABECERA PRINCIPAL */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>

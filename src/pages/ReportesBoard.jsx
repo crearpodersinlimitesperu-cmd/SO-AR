@@ -84,7 +84,7 @@ export default function ReportesBoard() {
   );
 
   const canSwitchAnyCoord = Boolean(
-    (currentUser?.isSuperAdmin || isDireccion) && !currentUser?.isSimulated
+    currentUser?.isSuperAdmin || isDireccion
   );
 
   // Micro-pulso state (selección aleatoria de 3 preguntas)
@@ -211,7 +211,7 @@ export default function ReportesBoard() {
 
       let coord = null;
 
-      // 0. Si se especificó un coordinador manualmente por ID (solo si tiene permisos y no es simulado)
+      // 0. Si se especificó un coordinador manualmente por ID y el perfil tiene permisos.
       const targetCoordId = canSwitchAnyCoord ? (coordIdOverride || selectedNodusCoordId) : null;
       if (targetCoordId) {
         coord = coords.find(c => c.id === targetCoordId);
@@ -372,9 +372,9 @@ export default function ReportesBoard() {
         matched = llamadas.find(r => normalizeSede(r.sede || r.data?.sede_id || '') === uSede);
       }
 
-      // 3. Fallback solo si el usuario es Global o SuperAdmin (NO simulado)
-      const isSuperAdminNonSimulated = (currentUser?.isSuperAdmin || isDireccion) && !currentUser?.isSimulated;
-      if (!matched && (!uSede || uSede === 'Global' || isSuperAdminNonSimulated)) {
+      // 3. Fallback solo si el perfil es Global, SuperAdmin o Dirección.
+      const hasGlobalReportView = Boolean(currentUser?.isSuperAdmin || isDireccion);
+      if (!matched && (!uSede || uSede === 'Global' || hasGlobalReportView)) {
         matched = llamadas[0];
       }
 
@@ -1207,7 +1207,7 @@ export default function ReportesBoard() {
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
-                {/* Selector de Coordinador solo para SuperAdmin/Dirección no simulado; Badge privado para coordinadores */}
+                {/* Selector de Coordinador para perfiles SuperAdmin/Dirección; badge privado para coordinadores. */}
                 {canSwitchAnyCoord && nodusAllCoords.length > 0 ? (
                   <select
                     value={selectedNodusCoordId || nodusMatchedCoord?.id || ''}

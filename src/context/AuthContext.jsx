@@ -191,7 +191,7 @@ export function AuthProvider({ children }) {
       showToast('Acceso Denegado: solo José Sánchez puede simular usuarios.', 'error');
       return;
     }
-    setOriginalAdminUser(currentUser);
+    setOriginalAdminUser(originalAdminUser || currentUser);
     sessionStorage.removeItem('cpsl_active_role');
     
     const targetEmail = targetUser.emails?.[0] || targetUser.email || '';
