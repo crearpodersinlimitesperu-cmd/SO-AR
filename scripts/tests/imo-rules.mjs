@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
 const require = createRequire(process.env.IMO_TEST_DEPENDENCIES || import.meta.url);
 const { initializeTestEnvironment, assertFails, assertSucceeds } = require('@firebase/rules-unit-testing');
-const { doc, collection, getDoc, getDocs, setDoc, updateDoc, deleteDoc, writeBatch, runTransaction, serverTimestamp, query, collectionGroup } = require('firebase/firestore');
+const { doc, collection, getDoc, getDocs, setDoc, updateDoc, deleteDoc, writeBatch, runTransaction, serverTimestamp, Timestamp, query, collectionGroup } = require('firebase/firestore');
 if (!process.env.FIRESTORE_EMULATOR_HOST) throw new Error('Emulator required; refusing production.');
 const env = await initializeTestEnvironment({ projectId: 'demo-imo', firestore: { rules: readFileSync(new URL('../../firestore.rules', import.meta.url), 'utf8') } });
 const staff = env.authenticatedContext('manager', { email: 'jose.sanchez@crearpsl.net', email_verified: true }).firestore();
@@ -27,6 +27,17 @@ try {
   await assertFails(getDocs(collection(anon, 'imo_missions')));
   await assertFails(getDoc(doc(other, 'imo_missions', mid)));
   await assertFails(updateDoc(doc(anon, profilePath), { imoNombre: 'IMPOSTOR' }));
+  await env.withSecurityRulesDisabled(async ctx => {
+    await setDoc(doc(ctx.firestore(), 'imo_campaigns', cid, 'profiles', 'timer-forged'), { ...data, imoNombre: 'IMO TIMER TEST' });
+  });
+  const forgedWindow = doc(anon, `imo_campaigns/${cid}/profiles/timer-forged/imo_progress/window`);
+  await assertFails(setDoc(forgedWindow, { campaignId: cid, openedAt: Timestamp.fromMillis(Date.now() + 7 * 60 * 60 * 1000) }));
+  const windowState = doc(anon, `${profilePath}/imo_progress/window`);
+  await assertSucceeds(setDoc(windowState, { campaignId: cid, openedAt: serverTimestamp() }));
+  assert.equal((await getDoc(windowState)).data().openedAt instanceof Timestamp, true);
+  await assertSucceeds(getDoc(doc(staff, `${profilePath}/imo_progress/window`)));
+  await assertFails(updateDoc(windowState, { openedAt: serverTimestamp() }));
+  await assertFails(deleteDoc(windowState));
   const state = doc(anon, `${profilePath}/imo_confirmations`, eid);
   const sessionId = '00000000-0000-4000-8000-000000000000';
   await assertFails(setDoc(state, { contacto: true, asistencia: true, reportedName: 'IMO SINTETICO', sessionId, updatedAt: serverTimestamp(), eventId: 'missing' }));
@@ -35,8 +46,8 @@ try {
       const old = await tx.get(state);
       const before = old.exists() ? { contacto: old.data().contacto, asistencia: old.data().asistencia } : { contacto: false, asistencia: false };
       const after = { ...before, [field]: value };
-      tx.set(state, { ...after, reportedName: 'IMO SINTETICO', sessionId, updatedAt: serverTimestamp(), eventId });
-      tx.set(doc(anon, `${profilePath}/imo_events`, eventId), { enroladoId: eid, before, after, reportedName: 'IMO SINTETICO', sessionId, identity: 'self-selected', at: serverTimestamp(), source: 'mision-imo-v2' });
+      tx.set(state, { ...after, campaignId: cid, reportedName: 'IMO SINTETICO', sessionId, updatedAt: serverTimestamp(), eventId });
+      tx.set(doc(anon, `${profilePath}/imo_events`, eventId), { campaignId: cid, enroladoId: eid, before, after, reportedName: 'IMO SINTETICO', sessionId, identity: 'self-selected', at: serverTimestamp(), source: 'mision-imo-v2' });
     });
   }
   await assertSucceeds(save('contacto', true, 'event-1'));
@@ -45,9 +56,15 @@ try {
   assert.equal(restored.contacto, true); assert.equal(restored.asistencia, true);
   assert.equal((await getDocs(collection(staff, `${profilePath}/imo_events`))).size, 2);
   await assertSucceeds(getDocs(query(collectionGroup(staff, 'imo_confirmations'))));
+  await assertSucceeds(getDocs(query(collectionGroup(staff, 'imo_progress'))));
   await assertFails(getDocs(query(collectionGroup(anon, 'imo_confirmations'))));
+  await assertFails(getDocs(query(collectionGroup(anon, 'imo_progress'))));
   await assertFails(deleteDoc(doc(staff, `${profilePath}/imo_events/event-1`)));
   await assertFails(updateDoc(doc(anon, `${profilePath}/imo_events/event-1`), { source: 'changed' }));
+  await env.withSecurityRulesDisabled(async ctx => {
+    await updateDoc(doc(ctx.firestore(), `${profilePath}/imo_progress/window`), { openedAt: Timestamp.fromMillis(Date.now() - (8 * 60 * 60 + 30 * 60 + 1) * 1000) });
+  });
+  await assertFails(save('contacto', false, 'event-3'));
   await assertSucceeds(updateDoc(doc(staff, 'imo_campaigns', cid), { status: 'closed' }));
   await assertFails(save('contacto', false, 'event-3'));
   await assertFails(getDoc(doc(anon, profilePath)));
@@ -92,6 +109,15 @@ try {
       await assertFails(setDoc(doc(client, path), { injected: true }));
     }
   }
+  const privateWindowPath = `imo_private_mission_windows/${cid}/profiles/window-test`;
+  await env.withSecurityRulesDisabled(async ctx => {
+    await setDoc(doc(ctx.firestore(), privateWindowPath), { campaignId: cid, imoId: 'private-id', imoNombre: 'IMO SINTETICO', openedAt: Timestamp.fromMillis(Date.now()) });
+  });
+  await assertSucceeds(getDoc(doc(staff, privateWindowPath)));
+  await assertFails(getDoc(doc(anon, privateWindowPath)));
+  await assertSucceeds(getDocs(collection(staff, `imo_private_mission_windows/${cid}/profiles`)));
+  await assertFails(getDocs(collection(anon, `imo_private_mission_windows/${cid}/profiles`)));
+  await assertFails(setDoc(doc(staff, `imo_private_mission_windows/${cid}/profiles/forged`), { campaignId: cid, openedAt: serverTimestamp() }));
   console.log('PASS: private verification documents denied to all browser clients.');
   console.log('PASS: generated campaign, shared access, restore, atomic history, forbidden reads/writes, closed campaign.');
 } finally { await env.cleanup(); }

@@ -4,6 +4,7 @@ import { newChallenge, verifyChallenge, issueSession, sessionKey, validSession, 
 import { nodusDocumentKey } from './nodusIdentityModel.mjs';
 import { projectEnrollee, buildImoRequest } from './controlModel.mjs';
 import { OFFICIAL_CALENDAR_URL, parseOfficialCalendar, applyCalendarChanges, findC1Dates } from './calendarModel.mjs';
+import { isMissionWindowOpen } from './missionWindow.mjs';
 
 const MAX_SOURCE_AGE=24*60*60*1000;
 const safeId=value=>typeof value==='string' && /^[A-Za-z0-9_-]{1,100}$/.test(value);
@@ -23,7 +24,7 @@ export function decryptDelivery(secret,id,payload){
   return JSON.parse(Buffer.concat([decipher.update(Buffer.from(payload.content,'base64')),decipher.final()]).toString('utf8'));
 }
 
-export function createAccessService({db,secret,clock=Date.now,loadCalendar}){
+export function createAccessService({db,secret,clock=Date.now,loadCalendar,serverTimestamp=()=>new Date(clock())}){
   if(typeof secret!=='string'||secret.length<32)throw new Error('IMO verification secret unavailable');
   async function scope(campaignId){
     if(!safeId(campaignId))throw unavailable();
@@ -47,6 +48,8 @@ export function createAccessService({db,secret,clock=Date.now,loadCalendar}){
     if(identity?.active!==true || !current.campaign.allowedImoIds.includes(identity.id) || !validSession(session,{campaignId,revision:identity.revision,now:clock()}))throw unauthorized();
     return {...current,identity};
   }
+  const missionWindowRef=(campaignId,imoId)=>db.doc(`imo_private_mission_windows/${campaignId}/profiles/${fingerprint(secret,'missionWindow',imoId)}`);
+  const isoTimestamp=value=>value?.toDate?value.toDate().toISOString():value instanceof Date?value.toISOString():null;
   async function calendar(sede){
     let events;
     if(loadCalendar)events=await loadCalendar();
@@ -83,6 +86,8 @@ export function createAccessService({db,secret,clock=Date.now,loadCalendar}){
       const result=await db.runTransaction(async tx=>{
         const ref=db.doc(`imo_private_challenges/${challengeId}`),doc=await tx.get(ref),challenge=doc.data();
         const identity=challenge?.lookupKey?(await tx.get(current.root.collection('identities').doc(challenge.lookupKey))).data():null;
+        const windowRef=identity?.id?missionWindowRef(campaignId,identity.id):null;
+        const window=windowRef?await tx.get(windowRef):null;
         // All reads precede writes, including the distributed rate window.
         await limits(tx,[['verifyIp',ip]]);
         if(identity?.active!==true || !current.campaign.allowedImoIds.includes(identity.id))return null;
@@ -91,6 +96,7 @@ export function createAccessService({db,secret,clock=Date.now,loadCalendar}){
         if(!checked.ok)return null;
         const session=issueSession(secret,checked.record,clock());
         tx.create(db.doc(`imo_private_sessions/${session.key}`),{...session.record,lookupKey:challenge.lookupKey});
+        if(!window.exists)tx.create(windowRef,{campaignId,imoId:identity.id,imoNombre:identity.nombre,openedAt:serverTimestamp()});
         return {token:session.token,expiresAt:session.record.expiresAt};
       });
       // Throw only AFTER committing a failed attempt, never roll it back.
@@ -99,8 +105,12 @@ export function createAccessService({db,secret,clock=Date.now,loadCalendar}){
     },
     async roster(data){
       const current=await authorized(data),{identity}=current;
-      const rows=await current.root.collection('enrollees').where('imoId','==',identity.id).get();
+      const [rows,window]=await Promise.all([
+        current.root.collection('enrollees').where('imoId','==',identity.id).get(),
+        missionWindowRef(data.campaignId,identity.id).get()
+      ]);
       return {nombre:identity.nombre,sede:current.campaign.sede,targetTeam:current.campaign.targetTeam,c1Date:current.campaign.c1Date,sourceUpdatedAt:current.config.sourceUpdatedAt,
+        missionWindow:{openedAt:isoTimestamp(window.data()?.openedAt)},
         enrolados:rows.docs.map(doc=>doc.data()).filter(row=>row.sede===current.campaign.sede && isAvailableForC1(row)).map(projectEnrollee)};
     },
     async events(data){const current=await authorized(data);return {events:await calendar(current.campaign.sede)};},
@@ -117,8 +127,13 @@ export function createAccessService({db,secret,clock=Date.now,loadCalendar}){
       const payloadFingerprint=fingerprint(secret,'payload',JSON.stringify([data.campaignId,data.enrolleeId,data.type,data.targetEventId||'',data.attendance??null,data.note||'']));
       return db.runTransaction(async tx=>{
         const ref=db.doc(`imo_private_requests/${id}`);
-        const [existing,person]=await Promise.all([tx.get(ref),tx.get(current.root.collection('enrollees').doc(data.enrolleeId))]);
+        const [existing,person,window]=await Promise.all([
+          tx.get(ref),
+          tx.get(current.root.collection('enrollees').doc(data.enrolleeId)),
+          tx.get(missionWindowRef(data.campaignId,current.identity.id))
+        ]);
         if(existing.exists){if(existing.data().payloadFingerprint!==payloadFingerprint)throw new AccessError('already-exists','El identificador ya corresponde a otra solicitud.');return {id,status:existing.data().status};}
+        if(!isMissionWindowOpen(window.data()?.openedAt,clock()))throw new AccessError('failed-precondition','El plazo de esta misión venció. El avance anterior se conserva en solo lectura.');
         const enrollee=person.data();
         if(enrollee?.imoId!==current.identity.id||enrollee.sede!==current.campaign.sede)throw unauthorized();
         if (!isAvailableForC1(enrollee)) throw new AccessError('failed-precondition','El enrolado no tiene disponibilidad para C1 verificada en Nodus. Actualiza la consulta.');

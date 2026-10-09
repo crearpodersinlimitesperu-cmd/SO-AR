@@ -2,10 +2,10 @@
 const dedupeEnrolados = (list) => {
   const seen = new Map();
   list.forEach((e) => {
+    const idNorm = String(e.id || '').trim();
     const nombreNorm = (e.nombre || '').trim().toUpperCase().replace(/\s+/g, ' ');
-    const telNorm = (e.telefono || '').replace(/\D/g, '');
-    const key = telNorm ? `tel:${telNorm}` : `nom:${nombreNorm}`;
-    if (!key.trim() || key === 'tel:' || key === 'nom:') {
+    const key = idNorm ? `id:${idNorm}` : (nombreNorm ? `nom:${nombreNorm}` : '');
+    if (!key) {
       // Sin nombre ni teléfono para agrupar — se conserva tal cual, por su propio id.
       seen.set(`id:${e.id}`, e);
       return;
@@ -53,4 +53,3 @@ export const getEnroladosList = (m) => {
     };
   });
 };
-

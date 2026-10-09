@@ -1,5 +1,5 @@
 import {initializeApp} from 'firebase-admin/app';
-import {getFirestore} from 'firebase-admin/firestore';
+import {FieldValue,getFirestore} from 'firebase-admin/firestore';
 import {onCall,HttpsError} from 'firebase-functions/v2/https';
 import {onDocumentCreated} from 'firebase-functions/v2/firestore';
 import {defineSecret} from 'firebase-functions/params';
@@ -15,7 +15,7 @@ const options={region:'us-central1',maxInstances:2,minInstances:0,memory:'256MiB
 export const imoAccess=onCall({...options,invoker:"public",secrets:[secret],cors:['https://centro-operativo-cpsl.web.app','https://centro-operativo-cpsl.firebaseapp.com']},async request=>{
   const data=request.data || {};
   if(!['requestCode','verifyCode','roster','events','requests','report','logout'].includes(data.action))throw new HttpsError('invalid-argument','Acción inválida.');
-  try{return await createAccessService({db,secret:secret.value()})[data.action](data,String(request.rawRequest.ip || 'unknown'));}
+  try{return await createAccessService({db,secret:secret.value(),serverTimestamp:()=>FieldValue.serverTimestamp()})[data.action](data,String(request.rawRequest.ip || 'unknown'));}
   catch(error){if(error instanceof AccessError)throw new HttpsError(error.code,error.message);throw new HttpsError('internal','No se pudo completar la operación. Intenta más tarde.');}
 });
 

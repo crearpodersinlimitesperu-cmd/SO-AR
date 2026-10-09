@@ -2,15 +2,17 @@ import { isAvailableForC1, c1Eligibility } from '../../functions-imo/c1Eligibili
 import { getEnroladosList as getAllEnrolados } from '../features/imo/missionEnrolados';
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { collection, collectionGroup, query, orderBy, onSnapshot, deleteDoc, doc, writeBatch, addDoc } from 'firebase/firestore';
+import { collection, collectionGroup, query, where, onSnapshot, deleteDoc, doc, writeBatch, addDoc } from 'firebase/firestore';
 import MissionHistory from '../features/imo/MissionHistory';
 import CampaignGenerator from '../features/imo/CampaignGenerator';
 import PublicLinksPanel from '../features/imo/PublicLinksPanel';
 import { isMissionComplete } from '../features/imo/missionModel';
+import { buildMissionFdsContexts } from '../features/imo/missionFds';
+import MissionWindowNotice from '../features/imo/MissionWindowNotice';
 import { db } from '../services/firebase';
 import { Search, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { normalizeSede, parseTeamNumber, normalizeEquipoLabel } from '../data/usersData';
+import { normalizeSede, parseTeamNumber } from '../data/usersData';
 import {
   initNodusRealtimeListener,
   evaluateEnroladoVerification,
@@ -19,11 +21,37 @@ import {
 } from '../services/nodusVerificationService';
 
 const getEnroladosList = m => getAllEnrolados(m).filter(isAvailableForC1);
+const firestoreSedeAliases = sede => {
+  const canonical = normalizeSede(sede);
+  if (canonical === 'Guayaquil') return [canonical, 'GYE'];
+  if (canonical === 'Medellín') return [canonical, 'Medellin'];
+  if (canonical === 'México') return [canonical, 'Mexico'];
+  return canonical ? [canonical] : [];
+};
+const resolveMissionSede = m => {
+  let s = m.sede;
+  if (!s || s === 'No especificada') {
+    const eqUpper = (m.equipo || '').toUpperCase();
+    if (eqUpper.includes('CUENCA')) s = 'Cuenca';
+    else if (eqUpper.includes('QUITO')) s = 'Quito';
+    else if (eqUpper.includes('GUAYAQUIL') || eqUpper.includes('GYE')) s = 'Guayaquil';
+    else if (eqUpper.includes('LIMA')) s = 'Lima';
+    else if (eqUpper.includes('BOGOTA') || eqUpper.includes('BOGOTÁ')) s = 'Bogotá';
+    else if (eqUpper.includes('MEDELLIN') || eqUpper.includes('MEDELLÍN')) s = 'Medellín';
+    else if (eqUpper.includes('MEXICO') || eqUpper.includes('MÉXICO') || eqUpper.includes('CDMX')) s = 'México';
+    else s = 'No especificada';
+  }
+  return normalizeSede(s);
+};
 
 export default function MonitorImos() {
   const { currentUser } = useAuth();
   const [rawMissions, setMissions] = useState([]);
   const [missionChecks, setMissionChecks] = useState({});
+  const [missionWindows, setMissionWindows] = useState({});
+  const [verifiedMissionWindows, setVerifiedMissionWindows] = useState([]);
+  const [campaigns, setCampaigns] = useState([]);
+  const [calendars, setCalendars] = useState([]);
   const [missionLoadError, setMissionLoadError] = useState('');
   const missions = useMemo(() => rawMissions.map(m => m.schemaVersion === 2 ? { ...m, checks: missionChecks[m.id] || {} } : m), [rawMissions, missionChecks]);
   const [loading, setLoading] = useState(true);
@@ -82,6 +110,7 @@ export default function MonitorImos() {
   const [activeNeuroDay, setActiveNeuroDay] = useState(1);
 
   const navigate = useNavigate();
+  const isGlobalScopeUser = !!(currentUser?.isSuperAdmin || currentUser?.isConsolidatedView || currentUser?.appRole === 'consolidado' || currentUser?.isDireccion);
 
   const formatDate = (ts) => {
     if (!ts) return 'Sin registro';
@@ -102,12 +131,25 @@ export default function MonitorImos() {
 
   // Escuchar misiones IMO en Firestore en tiempo real
   useEffect(() => {
-    const q = query(collection(db, 'imo_missions'), orderBy('lastUpdated', 'desc'));
+    if (!currentUser) { setMissions([]); setLoading(false); return; }
+    const sede = normalizeSede(currentUser.sede);
+    if (!isGlobalScopeUser && !sede) {
+      setMissions([]);
+      setMissionLoadError('Tu cuenta no tiene una sede asignada para consultar Misión IMO.');
+      setLoading(false);
+      return;
+    }
+    const base = collection(db, 'imo_missions');
+    const q = isGlobalScopeUser ? query(base) : query(base, where('sede', 'in', firestoreSedeAliases(sede)));
     
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const data = [];
       snapshot.forEach((doc) => {
         data.push({ ...doc.data(), id: doc.id });
+      });
+      data.sort((a, b) => {
+        const time = value => value?.toMillis?.() ?? (typeof value?.seconds === 'number' ? value.seconds * 1000 : Date.parse(value || '') || 0);
+        return time(b.lastUpdated) - time(a.lastUpdated);
       });
       setMissionLoadError('');
       setMissions(data);
@@ -119,13 +161,52 @@ export default function MonitorImos() {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [currentUser, isGlobalScopeUser]);
 
-  useEffect(() => onSnapshot(collectionGroup(db, 'imo_confirmations'), snap => {
+  useEffect(() => {
+    if (!currentUser) { setCampaigns([]); return undefined; }
+    const sede = normalizeSede(currentUser.sede);
+    if (!isGlobalScopeUser && !sede) { setCampaigns([]); return undefined; }
+    const ref = collection(db, 'imo_campaigns');
+    const q = isGlobalScopeUser ? query(ref) : query(ref, where('sede', 'in', firestoreSedeAliases(sede)));
+    return onSnapshot(q, snap => setCampaigns(snap.docs.map(d => {
+      const data = d.data();
+      return { id: d.id, schemaVersion: data.schemaVersion, sede: data.sede, targetTeam: data.targetTeam, c1Date: data.c1Date, status: data.status, createdAt: data.createdAt };
+    })), () => {
+      setMissionLoadError('No se pudieron consultar las campañas IMO de tu sede.');
+    });
+  }, [currentUser, isGlobalScopeUser]);
+
+  useEffect(() => {
+    setMissionChecks({});
+    if (campaignFilter === 'legacy') return undefined;
+    const q = query(collectionGroup(db, 'imo_confirmations'), where('campaignId', '==', campaignFilter));
+    return onSnapshot(q, snap => {
     const checks = {};
     snap.docs.forEach(d => { const mid = d.ref.parent.parent.id; (checks[mid] ||= {})[d.id] = d.data(); });
     setMissionChecks(checks);
-  }, () => setMissionLoadError('No se pudo consultar el avance de las campañas. No interpretes las casillas vacías como ausencia de gestión.')), []);
+    }, () => setMissionLoadError('No se pudo consultar el avance de esta campaña. No interpretes las casillas vacías como ausencia de gestión.'));
+  }, [campaignFilter]);
+
+  useEffect(() => {
+    setMissionWindows({});
+    if (campaignFilter === 'legacy') return undefined;
+    const q = query(collectionGroup(db, 'imo_progress'), where('campaignId', '==', campaignFilter));
+    return onSnapshot(q, snap => {
+      const windows = {};
+      snap.docs.forEach(d => { const mid = d.ref.parent.parent.id; windows[mid] = d.data().openedAt || null; });
+      setMissionWindows(windows);
+    }, () => setMissionLoadError('No se pudo consultar el plazo de esta campaña.'));
+  }, [campaignFilter]);
+
+  useEffect(() => {
+    setVerifiedMissionWindows([]);
+    if (campaignFilter === 'legacy') return undefined;
+    const q = collection(db, 'imo_private_mission_windows', campaignFilter, 'profiles');
+    return onSnapshot(q, snap => setVerifiedMissionWindows(snap.docs.map(d => ({ ...d.data(), id: d.id }))), () => {
+      setMissionLoadError('No se pudo consultar el plazo de la campaña verificada.');
+    });
+  }, [campaignFilter]);
 
   // Escuchar actualizaciones de llamadas de Coordinadoras en Nodus
   useEffect(() => {
@@ -200,23 +281,6 @@ export default function MonitorImos() {
   // Coordinador, etc.) solo ve las misiones cuya sede coincide con currentUser.sede,
   // normalizada con normalizeSede() (la misma función que usa el resto del código para
   // que "GYE" y "Guayaquil" se traten como la misma sede).
-  // Helper para resolver la sede exacta de cada misión (m.sede o deducida del equipo)
-  const resolveMissionSede = (m) => {
-    let s = m.sede;
-    if (!s || s === 'No especificada') {
-      const eqUpper = (m.equipo || '').toUpperCase();
-      if (eqUpper.includes("CUENCA")) s = "Cuenca";
-      else if (eqUpper.includes("QUITO")) s = "Quito";
-      else if (eqUpper.includes("GUAYAQUIL") || eqUpper.includes("GYE")) s = "Guayaquil";
-      else if (eqUpper.includes("LIMA")) s = "Lima";
-      else if (eqUpper.includes("BOGOTA") || eqUpper.includes("BOGOTÁ")) s = "Bogotá";
-      else if (eqUpper.includes("MEDELLIN") || eqUpper.includes("MEDELLÍN")) s = "Medellín";
-      else if (eqUpper.includes("MEXICO") || eqUpper.includes("MÉXICO") || eqUpper.includes("CDMX")) s = "México";
-      else s = "No especificada";
-    }
-    return normalizeSede(s);
-  };
-
   // Helper para normalizar nombres de equipo evitando duplicidades o fragmentación
   // Unifica variantes como 'EQUIPO 16 — MEDELLIN' y 'EQUIPO 16 — MEDELLIN CICLO 1' bajo el mismo equipo operativo
   const normalizeEquipoName = raw => {
@@ -225,12 +289,42 @@ export default function MonitorImos() {
     return String(raw || '').trim().replace(/\s+/g, ' ').replace(/\s+V$/i, '').replace(/[✓✔]/g, '').trim();
   };
 
-  const isGlobalScopeUser = !!(currentUser?.isSuperAdmin || currentUser?.isConsolidatedView || currentUser?.appRole === 'consolidado' || currentUser?.isDireccion);
   const sedeScopedMissions = useMemo(() => {
     if (isGlobalScopeUser) return missions;
     const mySede = normalizeSede(currentUser?.sede);
     return missions.filter(m => resolveMissionSede(m) === mySede);
   }, [missions, isGlobalScopeUser, currentUser?.sede]);
+  useEffect(() => {
+    if (!isGlobalScopeUser && currentUser?.sede) setFilterSede(normalizeSede(currentUser.sede));
+  }, [currentUser?.sede, isGlobalScopeUser]);
+
+  useEffect(() => {
+    const calendarsRef = collection(db, 'mj_calendars');
+    const calendarQuery = filterSede === 'todos'
+      ? query(calendarsRef)
+      : query(calendarsRef, where('sede', 'in', firestoreSedeAliases(filterSede)));
+    return onSnapshot(calendarQuery, snap => setCalendars(snap.docs.map(d => ({ ...d.data(), id: d.id }))), () => {
+      setMissionLoadError('No se pudo consultar el calendario FDS del equipo de origen.');
+    });
+  }, [filterSede]);
+
+  const fdsContexts = useMemo(
+    () => buildMissionFdsContexts(sedeScopedMissions, calendars, resolveMissionSede),
+    [sedeScopedMissions, calendars]
+  );
+  const campaignOptions = useMemo(() => {
+    const options = new Map();
+    campaigns.filter(c => [2, 3].includes(c.schemaVersion)).forEach(c => options.set(c.id, c));
+    sedeScopedMissions.filter(m => m.schemaVersion === 2 && m.campaignId && !options.has(m.campaignId)).forEach(m => {
+      options.set(m.campaignId, { id: m.campaignId, schemaVersion: 2, sede: m.sede, targetTeam: m.targetTeam, c1Date: m.c1Date, status: 'unknown' });
+    });
+    return Array.from(options.values()).sort((a, b) => {
+      const dateA = a.createdAt?.toMillis?.() || Date.parse(a.createdAt || '') || 0;
+      const dateB = b.createdAt?.toMillis?.() || Date.parse(b.createdAt || '') || 0;
+      return dateB - dateA;
+    });
+  }, [campaigns, sedeScopedMissions]);
+  const selectedCampaign = campaignOptions.find(c => c.id === campaignFilter);
 
   // Sedes disponibles para el selector de sede (dinámico según misiones existentes)
   const sedesDisponibles = useMemo(() => {
@@ -240,13 +334,17 @@ export default function MonitorImos() {
       const s = resolveMissionSede(m);
       if (s && s !== 'Sede Global') setSedes.add(s);
     });
+    campaigns.forEach(c => {
+      const s = normalizeSede(c.sede);
+      if (s && s !== 'Sede Global') setSedes.add(s);
+    });
     // Sedes oficiales de operación
     ['Quito', 'Guayaquil', 'Cuenca', 'Lima', 'Medellín', 'México'].forEach(s => {
       const exists = sourceList.some(m => resolveMissionSede(m) === s);
       if (exists) setSedes.add(s);
     });
     return Array.from(setSedes).sort();
-  }, [missions, sedeScopedMissions, isGlobalScopeUser]);
+  }, [missions, sedeScopedMissions, campaigns, isGlobalScopeUser]);
 
   const equiposDisponibles = useMemo(() => {
     const mapEquipos = new Map();
@@ -992,11 +1090,23 @@ export default function MonitorImos() {
         </div>
 
         <label style={{ color: 'var(--text-main)' }}>Campaña
-          <select className="form-input" value={campaignFilter} onChange={e => { setCampaignFilter(e.target.value); setFilterEquipo('todos'); }}>
+          <select className="form-input" value={campaignFilter} onChange={e => {
+            const next = campaignOptions.find(c => c.id === e.target.value);
+            setCampaignFilter(e.target.value); setFilterEquipo('todos');
+            if (next?.sede) setFilterSede(normalizeSede(next.sede));
+          }}>
             <option value="legacy">Registros anteriores (sin campaña)</option>
-            {[...new Map(sedeScopedMissions.filter(m => m.schemaVersion === 2).map(m => [m.campaignId, m])).values()].map(m => <option key={m.campaignId} value={m.campaignId}>{m.sede} · C1 Equipo {m.targetTeam} · {m.c1Date}</option>)}
+            {campaignOptions.map(c => <option key={c.id} value={c.id}>{c.sede} · C1 Equipo {c.targetTeam} · {c.c1Date} · {c.status === 'closed' ? 'Cerrada' : c.status === 'active' ? 'Activa' : 'Estado no disponible'}</option>)}
           </select>
         </label>
+        {selectedCampaign?.schemaVersion === 3 && <section style={{ flexBasis: '100%', background: 'rgba(0,0,0,0.24)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, padding: 14 }}>
+          <strong>Plazos de misión IMO verificada · {selectedCampaign.sede} · C1 Equipo {selectedCampaign.targetTeam}</strong>
+          <p style={{ color: 'var(--text-muted)', margin: '6px 0 10px' }}>El reloj empieza al verificar el primer código. Las solicitudes quedan bloqueadas después de 8 horas y 30 minutos; la información ya enviada se conserva.</p>
+          {!verifiedMissionWindows.length ? <span style={{ color: 'var(--text-muted)' }}>Aún no hay misiones verificadas iniciadas.</span> : verifiedMissionWindows.map(w => <div key={w.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, padding: '6px 0', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+            <strong>{w.imoNombre || 'IMO verificado'}</strong>
+            <MissionWindowNotice compact openedAt={w.openedAt} notStartedMessage="Plazo no disponible"/>
+          </div>)}
+        </section>}
         {/* Buscador de IMOs y Enrolados */}
         <div style={{ position: 'relative', flex: '1 1 260px', minWidth: '200px' }}>
           <Search size={16} color="var(--text-muted)" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
@@ -1947,6 +2057,12 @@ export default function MonitorImos() {
                     <td style={{ padding: '1rem', fontSize: '0.9rem', color: 'var(--crear-blue)', fontWeight: 600 }}>
                       {normalizeEquipoName(m.equipo)}
                       {m.schemaVersion === 2 && <><div style={{ fontSize: '0.75rem' }}>Origen IMO: {m.originTeam ? `Equipo ${m.originTeam}` : 'por confirmar'} · C1 {m.c1Date}</div><button className="btn-secondary" onClick={() => setHistoryMission(m)}>Ver historial</button></>}
+                      {fdsContexts.has(m.id) && <div style={{ fontSize: '0.75rem', marginTop: 6, color: 'var(--text-muted)' }}>
+                        FDS del equipo de origen {fdsContexts.get(m.id).originTeam || 'por confirmar'}: {fdsContexts.get(m.id).calendarFound
+                          ? (fdsContexts.get(m.id).fds.map(fds => `${fds.title} (${fds.startDate || 'fecha por confirmar'}${fds.endDate ? `–${fds.endDate}` : ''})`).join(' · ') || 'Sin etapas FDS registradas')
+                          : 'calendario no disponible'}
+                      </div>}
+                      {m.schemaVersion === 2 && campaignFilter !== 'legacy' && <div style={{ fontSize: '0.75rem', marginTop: 5 }}><MissionWindowNotice compact openedAt={missionWindows[m.id]} notStartedMessage="Plazo aún no iniciado"/></div>}
                     </td>
                     <td style={{ padding: '1rem' }}>
                       <div style={{ fontWeight: 600 }}>Progreso: {progreso}%</div>
@@ -2274,4 +2390,3 @@ export default function MonitorImos() {
     </div>
   );
 }
-
