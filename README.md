@@ -81,3 +81,11 @@ administrador difiere del perfil mostrado, el panel indica **Vista simulada:
 tareas privadas no visibles**, muestra solo datos autorizados y no afirma totales
 cero. Durante la carga o ante un error tampoco se presentan totales ni se afirma
 que no hay tareas. Las reglas de privacidad siguen intactas.
+
+El panel aprende solo de acciones explícitas: abrir secciones, abrir las tareas
+de una persona y cambiar el filtro. Las preferencias se guardan en `localStorage`,
+con una clave por UID, únicamente en ese navegador. Las secciones y personas más
+revisadas se ordenan primero; las sugerencias requieren revisiones repetidas y
+usan solo tareas reales por vencer hoy o mañana. **Restablecer mis preferencias**
+borra ese historial local. En simulación no se leen ni se escriben preferencias.
+No se utiliza IA externa ni se añaden permisos a Firestore.
