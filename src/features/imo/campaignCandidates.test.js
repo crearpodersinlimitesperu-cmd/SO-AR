@@ -6,7 +6,7 @@ import { getEnroladosList } from './missionEnrolados.js';
 
 const sedeOf = m => m.sede;
 const rec = (id, imo, equipo, enrolados, lastUpdated = '2026-09-28T00:00:00Z', sede = 'Lima') =>
-  ({ id, imoNombre: imo, equipo, sede, lastUpdated, enrolados: enrolados.map(([nombre, telefono = '', coord = 'DIANA']) => ({ id: `enr_${nombre.replace(/ /g, '_').toLowerCase()}`, nombre, telefono, coordinadora_nombre: coord })), checks: {} });
+  ({ id, imoNombre: imo, equipo, sede, lastUpdated, enrolados: enrolados.map(([nombre, telefono = '', coord = 'DIANA']) => ({ id: `enr_${nombre.replace(/ /g, '_').toLowerCase()}`, nombre, telefono, asistenciaC1: false, coordinadora_nombre: coord })), checks: {} });
 
 const missions = [
   rec('a1', 'ANA PEREZ', 'EQUIPO 31 - LIMA CICLO 1', [['LUIS ROJAS', '+51 999 111 222'], ['EVA DIAZ'], ['Pagado (S/. 3,530.00) (C2 + MJ) —']]),
@@ -60,3 +60,13 @@ test('validación admite origen por confirmar y hasta 200 IMOs', () => {
   assert.throws(() => validateCampaign({ sede: 'Quito', targetTeam: 130, c1Date: '2026-10-30', assignments: Array.from({ length: 201 }, (_, i) => one(i)) }));
   assert.throws(() => validateCampaign({ sede: 'Quito', targetTeam: 130, c1Date: '2026-10-30', assignments: [{ ...one(1), originTeam: 130 }] }));
 });
+
+ test('excluye sentados y estados ausentes, conserva desertores C1', () => {
+ const source = rec('eligible', 'IMO REAL', 'EQUIPO 31', [['PENDIENTE'], ['SENTADO'], ['DESERTOR'], ['SIN DATO']]);
+ source.enrolados[1].asistenciaC1 = true;
+ source.enrolados[2].asistenciaC1 = true; source.enrolados[2].desertorC1 = true;
+ delete source.enrolados[3].asistenciaC1;
+ const result = buildCampaignCandidates([source], {sede:'Lima',targetTeam:31,resolveSede:sedeOf,getEnrolados:getEnroladosList});
+ assert.deepEqual(result.candidates[0].enrolados.map(e=>e.nombre), ['PENDIENTE','DESERTOR']);
+ assert.equal(result.candidates[0].enrolados[1].desertorC1,true);
+ });

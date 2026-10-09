@@ -25,7 +25,7 @@ beforeEach(async()=>{
  batch.set(db.doc(`imo_campaigns/${campaignId}`),{schemaVersion:3,status:'active',sede:'Lima',targetTeam:32,c1Date:'2026-10-23',allowedImoIds:['1']});
  batch.set(db.doc(`imo_private_snapshots/snapshot-test/identities/${lookupKey}`),{id:'1',active:true,revision:'verified-contact-v1',nombre:'IMO PRUEBA',email:'imo@example.test'});
  for(const row of [{id:'own',imoId:'1',sede:'Lima'},{id:'other-imo',imoId:'2',sede:'Lima'},{id:'other-sede',imoId:'1',sede:'Quito'}]){
-  batch.set(db.doc(`imo_private_snapshots/snapshot-test/enrollees/${row.id}`),{...row,nombre:'ENROLADO PRUEBA',sourceUpdatedAt:new Date(now).toISOString(),currentTeam:30,coordinadorId:'5',coordinadorEmail:'coordinator@example.test',telefono:'PRIVATE',documento:'PRIVATE'});
+  batch.set(db.doc(`imo_private_snapshots/snapshot-test/enrollees/${row.id}`),{...row,nombre:'ENROLADO PRUEBA',sourceUpdatedAt:new Date(now).toISOString(),currentTeam:30,asistenciaC1:false,coordinadorId:'5',coordinadorEmail:'coordinator@example.test',telefono:'PRIVATE',documento:'PRIVATE'});
  }
  await batch.commit();
 });
@@ -97,4 +97,16 @@ test('foreign enrollee, foreign calendar event and unassigned coordinator cannot
  await db.doc('imo_private_snapshots/snapshot-test/enrollees/own').update({coordinadorEmail:null});
  await assert.rejects(()=>service.report(data),{code:'failed-precondition'});
  assert.equal((await db.collection('notifications').get()).size,0);
+});
+
+test('C1 attendance removes enrollee from roster and blocks requests; C1 dropout restores availability',async()=>{
+ const challenge=await requestSent();
+ const session=await service.verifyCode({campaignId,...challenge},'test-ip');
+ const credentials={campaignId,token:session.token};
+ const ref=db.doc('imo_private_snapshots/snapshot-test/enrollees/own');
+ await ref.update({asistenciaC1:true});
+ assert.equal((await service.roster(credentials)).enrolados.length,0);
+ await assert.rejects(service.report({...credentials,enrolleeId:'own',requestId:'11111111-1111-4111-8111-111111111111',type:'attendance_confirmation',attendance:true}),e=>e.code==='failed-precondition');
+ await ref.update({desertorC1:true});
+ assert.equal((await service.roster(credentials)).enrolados.length,1);
 });

@@ -1,3 +1,4 @@
+import { isAvailableForC1 } from '../../../functions-imo/c1Eligibility.mjs';
 import React, { useEffect, useState } from 'react';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../../services/firebase';
@@ -38,7 +39,7 @@ export default function MissionPortal() {
     if (!mission || !confirmedProfile) return;
     return listenConfirmations(campaignId, mission.id, data => { setChecks(data); setChecksLoaded(true); }, () => { setError('No se pudieron recuperar las confirmaciones. Los cambios están deshabilitados.'); setChecksLoaded(false); });
   }, [campaignId, mission, confirmedProfile]);
-  const enrolados = (mission?.enrolados || []).map(e => ({ ...e, contacto: checks[e.id]?.contacto === true, asistencia: checks[e.id]?.asistencia === true }));
+  const enrolados = (mission?.enrolados || []).filter(isAvailableForC1).map(e => ({ ...e, contacto: checks[e.id]?.contacto === true, asistencia: checks[e.id]?.asistencia === true }));
   const visibleEnrolados = enrolados.filter(e => (!search || normalizeText(e.nombre).includes(normalizeText(search))) && (statusFilter === 'all' || (statusFilter === 'confirmed' ? e.asistencia : statusFilter === 'contact' ? !e.contacto : !e.asistencia)));
   const pending = Object.values(checks).some(c => c.pending);
   const complete = checksLoaded && !saving && !pending && !error && isMissionComplete(enrolados);
@@ -60,7 +61,7 @@ export default function MissionPortal() {
         <p className="imo-note">Creación, Relación y Gratitud son fines de semana por los que pasa cada equipo. Esta misión registra contacto y confirmación de asistencia; no determina la graduación ni acredita asistencia efectiva.</p>
         <p role="status">{!checksLoaded ? 'Recuperando avance…' : saving || pending ? 'Guardando; esperando confirmación del servidor…' : complete ? 'Misión completada y guardada: contacto y asistencia confirmados para todos tus enrolados.' : `Avance guardado: ${missionProgress(enrolados)}%`}</p>
         <div className="imo-grid"><label>Buscar enrolado<input type="search" value={search} onChange={ev => setSearch(ev.target.value)} placeholder="Nombre de tu enrolado"/></label><label>Confirmación del IMO<select value={statusFilter} onChange={ev => setStatusFilter(ev.target.value)}><option value="all">Todos</option><option value="confirmed">Asistencia confirmada por mí</option><option value="pending">Asistencia pendiente de confirmar</option><option value="contact">Contacto pendiente</option></select></label></div>
-        <p>{visibleEnrolados.length} de {enrolados.length} enrolados. El avance corresponde a tu lista completa.</p>
+        <p>Solo se muestran personas con C1 pendiente o deserción de C1 registrada en Nodus. Sin un estado C1 explícito no se acredita disponibilidad.</p><p>{visibleEnrolados.length} de {enrolados.length} enrolados disponibles. El avance corresponde a tu lista completa.</p>
         {!visibleEnrolados.length && <p>No hay enrolados que coincidan con esta búsqueda y filtro.</p>}
         {visibleEnrolados.map(e => <article className="imo-enrolado" key={e.id}><h3>{e.nombre}</h3><p>Coordinación: {e.coordinadora_nombre || 'Pendiente de asignación por gerencia'}</p>
           {e.coordinadora_telefono && <a href={`https://wa.me/${e.coordinadora_telefono.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola, soy ${mission.imoNombre}. Quisiera confirmar la comunicación y asistencia de ${e.nombre} a C1 del Equipo ${mission.targetTeam} de ${mission.sede}.`)}`} target="_blank" rel="noreferrer">Contactar a coordinación</a>}

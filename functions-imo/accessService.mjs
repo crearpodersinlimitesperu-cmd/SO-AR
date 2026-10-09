@@ -1,3 +1,4 @@
+import { isAvailableForC1 } from './c1Eligibility.mjs';
 import { createHmac, randomBytes, createCipheriv, createDecipheriv, createHash } from 'node:crypto';
 import { newChallenge, verifyChallenge, issueSession, sessionKey, validSession, consumeRateWindow } from './authModel.mjs';
 import { nodusDocumentKey } from './nodusIdentityModel.mjs';
@@ -100,7 +101,7 @@ export function createAccessService({db,secret,clock=Date.now,loadCalendar}){
       const current=await authorized(data),{identity}=current;
       const rows=await current.root.collection('enrollees').where('imoId','==',identity.id).get();
       return {nombre:identity.nombre,sede:current.campaign.sede,targetTeam:current.campaign.targetTeam,c1Date:current.campaign.c1Date,sourceUpdatedAt:current.config.sourceUpdatedAt,
-        enrolados:rows.docs.map(doc=>doc.data()).filter(row=>row.sede===current.campaign.sede).map(projectEnrollee)};
+        enrolados:rows.docs.map(doc=>doc.data()).filter(row=>row.sede===current.campaign.sede && isAvailableForC1(row)).map(projectEnrollee)};
     },
     async events(data){const current=await authorized(data);return {events:await calendar(current.campaign.sede)};},
     async requests(data){
@@ -120,6 +121,7 @@ export function createAccessService({db,secret,clock=Date.now,loadCalendar}){
         if(existing.exists){if(existing.data().payloadFingerprint!==payloadFingerprint)throw new AccessError('already-exists','El identificador ya corresponde a otra solicitud.');return {id,status:existing.data().status};}
         const enrollee=person.data();
         if(enrollee?.imoId!==current.identity.id||enrollee.sede!==current.campaign.sede)throw unauthorized();
+        if (!isAvailableForC1(enrollee)) throw new AccessError('failed-precondition','El enrolado no tiene disponibilidad para C1 verificada en Nodus. Actualiza la consulta.');
         await limits(tx,[['reportIdentity',current.identity.id]]);
         let request;
         try{request=buildImoRequest({requestId:id,actorId:current.identity.id,enrollee,type:data.type,targetEvent,attendance:data.attendance,note:data.note,at:new Date(clock()).toISOString()});}

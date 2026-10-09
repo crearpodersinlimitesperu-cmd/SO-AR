@@ -1,9 +1,11 @@
+import { isAvailableForC1, c1Evidence } from '../../../functions-imo/c1Eligibility.mjs';
 import { collection, doc, getDocs, query, where, serverTimestamp, runTransaction, onSnapshot, updateDoc } from 'firebase/firestore';
 import { auth, db } from '../../services/firebase';
 import { validateCampaign } from './missionModel';
 
 export async function createCampaign(input) {
   validateCampaign(input);
+  if (input.assignments.some(a => a.enrolados.some(e => !isAvailableForC1(e)))) throw new Error('Solo se pueden incluir personas con C1 pendiente o deserción de C1 registrada en Nodus.');
   const user = auth.currentUser;
   if (!user) throw new Error('Inicia sesión para generar la campaña.');
   // A stable campaign key prevents duplicate campaigns on retries/double clicks.
@@ -23,7 +25,7 @@ export async function createCampaign(input) {
         equipo: `EQUIPO ${Number(input.targetTeam)} - ${input.sede.toUpperCase()} C1`, c1Date: input.c1Date,
         sourceMissionId: a.sourceMissionId, createdBy: user.uid, createdByEmail: user.email.toLowerCase(),
         createdAt: serverTimestamp(), lastUpdated: serverTimestamp(),
-        enrolados: a.enrolados.map(e => ({ id: e.id, nombre: e.nombre, coordinadora_nombre: e.coordinadora_nombre || '', coordinadora_telefono: e.coordinadora_telefono || '', telefono: e.telefono || '' })),
+        enrolados: a.enrolados.map(e => ({ id: e.id, nombre: e.nombre, ...c1Evidence(e), coordinadora_nombre: e.coordinadora_nombre || '', coordinadora_telefono: e.coordinadora_telefono || '', telefono: e.telefono || '' })),
         enroladoIds: a.enrolados.map(e => e.id), checks: {},
       };
       tx.set(mission, data);

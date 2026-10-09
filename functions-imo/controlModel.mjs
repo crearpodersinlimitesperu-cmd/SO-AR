@@ -14,7 +14,9 @@ export function projectEnrollee(row) {
   return {
     id: row.id, nombre: row.nombre, sede: row.sede,
     originTeam: row.originTeam ?? null, currentTeam: row.currentTeam ?? null,
-    asistenciaC1: row.asistenciaC1 ?? null, asistenciaC2: row.asistenciaC2 ?? null,
+    desertorC1: row.desertorC1 ?? row.desertor_c1 ?? null,
+    estadoC1: row.estadoC1 ?? row.estado_c1 ?? null,
+    asistenciaC1: row.asistenciaC1 ?? row.asistio_c1 ?? null, asistenciaC2: row.asistenciaC2 ?? null,
     llamada1: row.llamada1 || '', llamada2: row.llamada2 || '',
     coordinadorNombre: row.coordinadorNombre || '',
     source: 'Nodus', sourceUpdatedAt: row.sourceUpdatedAt ?? null,

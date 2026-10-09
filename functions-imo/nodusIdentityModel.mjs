@@ -1,3 +1,4 @@
+import { c1Evidence } from './c1Eligibility.mjs';
 import { createHmac } from 'node:crypto';
 import { documentKey } from './authModel.mjs';
 
@@ -51,6 +52,7 @@ export function buildPrivateIdentitySnapshot(rows, { secret, sourceUpdatedAt, se
     if(!validCoord)stats.missingCoordinator++;
     enrollees.push({id:id(row.id),imoId,nombre:[row.nombres,row.apellidos].filter(Boolean).join(' ').trim(),sede,
       originTeam:teamNumber(row.equipo_origen),currentTeam:teamNumber(row.equipo_participante),nodusTeamId:id(row.id_equipo),
+      ...c1Evidence(row),
       asistenciaC1:attendance(row.asistio_c1),asistenciaC2:attendance(row.asistio_c2),sourceUpdatedAt,
       coordinadorId:validCoord?coordinatorId:null,coordinadorEmail:validCoord?email(coord.email):null,coordinadorNombre:validCoord?coord.nombre:'',
       canReportChange:!!validCoord});

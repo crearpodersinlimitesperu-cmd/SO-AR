@@ -1,4 +1,5 @@
-import { getEnroladosList } from '../features/imo/missionEnrolados';
+import { isAvailableForC1, c1Eligibility } from '../../functions-imo/c1Eligibility.mjs';
+import { getEnroladosList as getAllEnrolados } from '../features/imo/missionEnrolados';
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { collection, collectionGroup, query, orderBy, onSnapshot, deleteDoc, doc, writeBatch, addDoc } from 'firebase/firestore';
@@ -16,6 +17,8 @@ import {
   evaluateMissionVerification,
   getGlobalNodusStats
 } from '../services/nodusVerificationService';
+
+const getEnroladosList = m => getAllEnrolados(m).filter(isAvailableForC1);
 
 export default function MonitorImos() {
   const { currentUser } = useAuth();
@@ -267,6 +270,14 @@ export default function MonitorImos() {
       .map(item => item.key);
   }, [sedeScopedMissions, filterSede]);
 
+  const excludedC1 = useMemo(() => {
+    const counts = { already_attended: 0, unverified: 0 };
+    sedeScopedMissions.filter(m => (campaignFilter === 'legacy' ? m.schemaVersion !== 2 : m.campaignId === campaignFilter) && (filterSede === 'todos' || resolveMissionSede(m) === filterSede)).forEach(m => {
+      getAllEnrolados(m).forEach(e => { const status = c1Eligibility(e); if (status in counts) counts[status]++; });
+    });
+    return counts;
+  }, [sedeScopedMissions, campaignFilter, filterSede]);
+
   // Filtrado de misiones en tiempo real por busqueda y selectores
   const filteredMissions = useMemo(() => {
     const qNorm = cleanSearchStr(searchTerm);
@@ -282,6 +293,7 @@ export default function MonitorImos() {
 
       // Filtro Estado
       const enrolados = getEnroladosList(m);
+      if (!enrolados.length) return false;
       const isCompleted = isMissionComplete(enrolados);
       if (filterEstado === 'completado' && !isCompleted) return false;
       if (filterEstado === 'en_progreso' && isCompleted) return false;
@@ -888,7 +900,7 @@ export default function MonitorImos() {
           </div>
 
           <p style={{ color: '#cbd5e1', marginTop: '0.75rem', fontSize: '0.85rem' }}>
-            Esta vista contiene {totalEnroladosCount} enrolamientos según la campaña y los filtros seleccionados.
+            Esta vista contiene {totalEnroladosCount} enrolamientos disponibles para C1 según la campaña y los filtros seleccionados. Solo C1 pendiente o deserción de C1 registrada. Los estados ausentes se excluyen hasta verificarlos en Nodus. Registros excluidos de la sede/campaña: {excludedC1.already_attended} ya sentados y {excludedC1.unverified} sin estado C1 verificable.
             Los registros anteriores se consultan por separado. Estos conteos no certifican ausencia de duplicados u omisiones en Nodus.
           </p>
         </div>

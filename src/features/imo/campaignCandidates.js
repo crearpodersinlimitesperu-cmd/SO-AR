@@ -1,3 +1,4 @@
+import { isAvailableForC1, c1Evidence } from '../../../functions-imo/c1Eligibility.mjs';
 // Builds Misión IMO campaign candidates from Nodus (v1) mission records.
 // In Nodus "reporte por equipo", a v1 record's `equipo` is the team the
 // ENROLLEES join (C1 target), not the IMO's own team. The IMO's origin team is
@@ -98,7 +99,7 @@ export function buildCampaignCandidates(missions, { sede, targetTeam, resolveSed
     candidate.sourceMissionIds.push(m.id);
     for (const e of getEnrolados(m)) {
       const key = personKey(e.nombre);
-      if (!key || !isPersonName(e.nombre)) continue;
+      if (!key || !isPersonName(e.nombre) || !isAvailableForC1(e)) continue;
       const phone = phoneKey(e.telefono);
       const owner = ownerByPerson.get(key) || (phone.length >= 7 ? ownerByPerson.get(`tel:${phone}`) : null);
       if (owner === imoKey) continue;
@@ -114,6 +115,7 @@ export function buildCampaignCandidates(missions, { sede, targetTeam, resolveSed
       candidate.enrolados.push({
         id: String(e.id || `enr_${key.replace(/ /g, '_').toLowerCase()}`).replace(/\//g, '_'),
         nombre: String(e.nombre).trim(),
+        ...c1Evidence(e),
         telefono: e.telefono || '',
         coordinadora_nombre: e.coordinadora_nombre || '',
         coordinadora_telefono: e.coordinadora_telefono || '',
@@ -142,7 +144,7 @@ export function teamsWithRecords(missions, sede, resolveSede, getEnrolados) {
     if (m.schemaVersion === 2) continue;
     if (resolveSede && normalizeText(resolveSede(m)) !== sedeNorm) continue;
     if (!personKey(m.imoNombre) || isPlaceholderImo(m.imoNombre)) continue;
-    if (getEnrolados && !getEnrolados(m).some(e => isPersonName(e.nombre))) continue;
+    if (getEnrolados && !getEnrolados(m).some(e => isPersonName(e.nombre) && isAvailableForC1(e))) continue;
     const team = recordTeamNumber(m);
     if (!team) continue;
     map.set(team, (map.get(team) || 0) + 1);

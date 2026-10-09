@@ -1,3 +1,4 @@
+import { isAvailableForC1 } from '../../../functions-imo/c1Eligibility.mjs';
 import React, { useEffect, useRef, useState } from 'react';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { app } from '../../services/firebase';
@@ -61,7 +62,7 @@ export default function VerifiedMissionPortal({ campaignId, invoke = access }) {
     setRequests((await call('requests')).requests);
     setNotice('Solicitud registrada para revisión de C1/C2. El estado oficial de Nodus no ha cambiado.');
   }
-  const visible = (roster?.enrolados || []).filter(row => normalizeText(row.nombre).includes(normalizeText(search)) && (filter === 'all' || requests.some(r => r.enrolleeId === row.id && r.status === filter)));
+  const visible = (roster?.enrolados || []).filter(isAvailableForC1).filter(row => normalizeText(row.nombre).includes(normalizeText(search)) && (filter === 'all' || requests.some(r => r.enrolleeId === row.id && r.status === filter)));
   return <>
     <h2>Acceso verificado a tu misión</h2>
     {!session ? <form onSubmit={event => { event.preventDefault(); perform(async () => {
@@ -78,7 +79,7 @@ export default function VerifiedMissionPortal({ campaignId, invoke = access }) {
         <h2>{roster.nombre}</h2><p>{roster.sede} · Equipo de ingreso {roster.targetTeam} · C1: {roster.c1Date}</p>
         <p>Fuente Nodus: {recorded(roster.sourceUpdatedAt)}. Confirmar intención de asistencia no acredita asistencia efectiva.</p>
         <div className="imo-grid"><label>Buscar enrolado<input type="search" value={search} onChange={e => setSearch(e.target.value)} /></label><label>Estado de la solicitud<select value={filter} onChange={e => setFilter(e.target.value)}><option value="all">Todos</option>{Object.entries(statuses).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></label></div>
-        <p>{visible.length} de {roster.enrolados.length} enrolados vinculados a tu identidad.</p>
+        <p>{visible.length} de {roster.enrolados.length} enrolados vinculados a tu identidad. Solo pendientes de sentarse o desertores de C1 con registro explícito en Nodus.</p>
         {visible.map(row => { const draft = drafts[row.id] || {}; return <article className="imo-enrolado" key={row.id}>
           <h3>{row.nombre}</h3><p>Equipo actual Nodus: {recorded(row.currentTeam)}<br/>Asistencia C1: {recorded(row.asistenciaC1)} · C2: {recorded(row.asistenciaC2)}<br/>Primera llamada: {recorded(row.llamada1)}<br/>Segunda llamada: {recorded(row.llamada2)}<br/>Coordinación: {recorded(row.coordinadorNombre)}</p>
           {requests.filter(r => r.enrolleeId === row.id).map(r => <p className="imo-note" key={r.id}>{statuses[r.status] || r.status}{r.requested?.team ? ` · Equipo solicitado: ${r.requested.team} · ${r.requested.c1Date}` : ''}{r.reviewNote ? ` · ${r.reviewNote}` : ''}</p>)}

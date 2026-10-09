@@ -96,3 +96,7 @@ No se ha activado `imo_system/control`, no se enviaron códigos reales y no se i
 - Monitor: eliminados los textos fijos 133/291 y la afirmación no calculada de cero duplicados/omisiones. Buscar ya no amplía silenciosamente el filtro de equipo.
 - Validación: 23 pruebas de contratos existentes; recorrido de navegador con respuestas sintéticas locales (documento, código, consulta, ausencia de datos, cambio 30→32 pendiente y cierre de sesión); compilación de producción.
 - Pendientes reales: acceso válido al sincronizador Nodus, importación privada verificada, habilitación de campaña v3, bandeja autenticada de revisión C1/C2 y prueba integral de correo/notificación con datos autorizados. No se habilitó el control ni se enviaron mensajes durante esta comprobación.
+
+## Disponibilidad para C1 — regla del usuario, 8 octubre
+
+Solo se muestran enrolados con inasistencia C1 explícita o deserción C1 registrada. Una deserción C1 tiene precedencia sobre asistencia de apertura. Ya sentados sin deserción se excluyen; estado ausente, intención IMO, pagos, llamadas y estado C2 no acreditan disponibilidad. Misma regla en Monitor, candidatos, generación, portal v2/v3 y servidor (consulta y solicitudes). No se borran fichas ni historial. Las campañas antiguas que no guardaron estado C1 quedan pendientes de verificación, no se reclasifican como disponibles. Las proyecciones nuevas conservan la evidencia C1. Pruebas de modelo/candidatos/identidad/control: 22 aprobadas; compilación aprobada. Prueba adicional de emulador añadida; no ejecutada localmente por ausencia de Java.
