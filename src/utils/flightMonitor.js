@@ -3,6 +3,32 @@ export const FLIGHT_DISCLAIMER = 'Estado real del vuelo no disponible; consultar
 const timestamp = value => typeof value === 'string' ? Date.parse(value) : NaN;
 const isRecord = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 
+export function flightDepartureCountdown(flight, now = Date.now()) {
+  const departure = timestamp(flight?.schedule?.scheduledDeparture);
+  if (!Number.isFinite(departure) || !Number.isFinite(now)) {
+    return { state: 'unknown', text: 'Hora programada no disponible' };
+  }
+  if (departure <= now) {
+    return { state: 'past', text: 'La hora programada ya pasó' };
+  }
+  // Round up so a future departure never displays zero seconds remaining.
+  const remaining = Math.ceil((departure - now) / 1000);
+  const days = Math.floor(remaining / 86400);
+  const hours = Math.floor((remaining % 86400) / 3600);
+  const minutes = Math.floor((remaining % 3600) / 60);
+  const seconds = remaining % 60;
+  const units = [
+    ...(days > 0 ? [[days, 'día', 'días']] : []),
+    ...(days > 0 || hours > 0 ? [[hours, 'hora', 'horas']] : []),
+    ...(days > 0 || hours > 0 || minutes > 0 ? [[minutes, 'minuto', 'minutos']] : []),
+    [seconds, 'segundo', 'segundos'],
+  ];
+  return {
+    state: 'upcoming',
+    text: units.map(([value, singular, plural]) => `${value} ${value === 1 ? singular : plural}`).join(' · '),
+  };
+}
+
 // These sources contain itinerary PDFs, not airline observations (including legacy ON_TIME).
 export function normalizeFlightTracker(data) {
   if (!data || !Number.isFinite(timestamp(data.updatedAt)) || !isRecord(data.flights)) {

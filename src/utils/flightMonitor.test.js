@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
-import { FLIGHT_DISCLAIMER, normalizeFlightTracker, flightTimeWindow, matchesFlightTimeFilter, loadFlightTracker } from './flightMonitor.js';
+import { FLIGHT_DISCLAIMER, normalizeFlightTracker, flightTimeWindow, matchesFlightTimeFilter, loadFlightTracker, flightDepartureCountdown } from './flightMonitor.js';
 
 const now = Date.parse('2026-10-10T17:00:00Z');
 const flight = (departure, arrival) => ({
@@ -10,6 +10,63 @@ const flight = (departure, arrival) => ({
 });
 const upcoming = flight('2026-10-11T12:00:00-05:00', '2026-10-11T14:00:00-05:00');
 const payload = { updatedAt: '2026-10-10T16:00:00Z', flights: { test: upcoming } };
+
+test('departure countdown converts seconds through days with readable singular/plural units', () => {
+  for (const [seconds, text] of [
+    [1, '1 segundo'],
+    [59, '59 segundos'],
+    [60, '1 minuto · 0 segundos'],
+    [61, '1 minuto · 1 segundo'],
+    [3600, '1 hora · 0 minutos · 0 segundos'],
+    [3661, '1 hora · 1 minuto · 1 segundo'],
+    [86399, '23 horas · 59 minutos · 59 segundos'],
+    [86400, '1 día · 0 horas · 0 minutos · 0 segundos'],
+    [183845, '2 días · 3 horas · 4 minutos · 5 segundos'],
+  ]) {
+    const scheduled = flight(new Date(now + seconds * 1000).toISOString());
+    assert.deepEqual(flightDepartureCountdown(scheduled, now), { state: 'upcoming', text });
+  }
+});
+
+test('departure countdown respects offsets and rolls over honestly at scheduled departure', () => {
+  const scheduled = flight('2026-10-10T12:00:00-05:00');
+  assert.equal(flightDepartureCountdown(scheduled, now - 1001).text, '2 segundos');
+  assert.equal(flightDepartureCountdown(scheduled, now - 1).text, '1 segundo');
+  for (const time of [now, now + 1, now + 86400000]) {
+    assert.deepEqual(flightDepartureCountdown(scheduled, time),
+      { state: 'past', text: 'La hora programada ya pasó' });
+  }
+  assert.deepEqual(flightDepartureCountdown(upcoming, now),
+    flightDepartureCountdown(flight('2026-10-11T17:00:00Z'), now));
+});
+
+test('departure countdown never falls back to estimated, actual, arrival or live status', () => {
+  for (const departure of [undefined, null, '', 'invalid', 0, NaN]) {
+    const scheduled = { ...flight(departure, '2999-01-01T00:00:00Z'), status: 'AIRBORNE' };
+    scheduled.schedule.estimatedDeparture = '2999-01-01T00:00:00Z';
+    scheduled.schedule.actualDeparture = '2999-01-01T00:00:00Z';
+    assert.deepEqual(flightDepartureCountdown(scheduled, now),
+      { state: 'unknown', text: 'Hora programada no disponible' });
+  }
+  for (const missing of [null, undefined, {}]) {
+    assert.equal(flightDepartureCountdown(missing, now).state, 'unknown');
+  }
+  for (const invalidNow of [NaN, Infinity]) {
+    assert.equal(flightDepartureCountdown(upcoming, invalidNow).state, 'unknown');
+  }
+  assert.deepEqual(flightDepartureCountdown({ ...upcoming, status: 'LANDED',
+    schedule: { ...upcoming.schedule, estimatedDeparture: '2000-01-01T00:00:00Z' } }, now),
+    flightDepartureCountdown(upcoming, now));
+});
+
+test('all filtered cards use the shared clock, independent of optional data refresh', () => {
+  const source = readFileSync(new URL('../pages/MonitorVuelosCartas.jsx', import.meta.url), 'utf8');
+  assert.match(source, /filteredFlights\.map[\s\S]*flightDepartureCountdown\(flight, now\)[\s\S]*\{countdown\.text\}/);
+  assert.match(source, /role="timer" aria-live="off" aria-label=/);
+  assert.match(source, /const tick = \(\) => setNow\(Date\.now\(\)\);[\s\S]*setInterval\(tick, 1000\)/);
+  assert.match(source, /removeEventListener\('visibilitychange', tick\)/);
+  assert.match(source, /if \(!puedeVerRadar \|\| !autoRefresh\) return;[\s\S]*\}, 300000\)/);
+});
 
 test('legacy status and delay claims are normalized without losing links or schedules', () => {
   for (const status of ['ON_TIME', 'SCHEDULED', 'DELAYED', 'AIRBORNE', 'LANDED']) {
