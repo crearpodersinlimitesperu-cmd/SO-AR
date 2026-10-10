@@ -490,7 +490,7 @@ service cloud.firestore {
     // REPORTS
     match /reports/{reportId} {
       allow read: if isAuthenticated() &&
-        (resource.data.get('type', '') != 'Llamadas' || reportScopeAllowed(resource.data));
+        (resource.data.type != 'Llamadas' || reportScopeAllowed(resource.data));
       allow create: if isAuthenticated() &&
         (request.resource.data.get('type', '') != 'Llamadas' ||
          (reportScopeAllowed(request.resource.data) &&
