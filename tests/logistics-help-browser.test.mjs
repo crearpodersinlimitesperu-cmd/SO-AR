@@ -40,7 +40,7 @@ test('guides open, close and reopen by keyboard on desktop and mobile', async ()
   try {
     await server.listen();
     browser = await puppeteer.launch({
-      executablePath: process.env.CHROME_BIN || puppeteer.executablePath(),
+      executablePath: process.env.CHROME_BIN || await puppeteer.executablePath(),
       headless: true,
       args: ['--no-sandbox']
     });
