@@ -66,7 +66,10 @@ test('module help supports hover, keyboard, viewport edges and mobile without in
     browser = await puppeteer.launch({
       executablePath: process.env.CHROME_BIN || await puppeteer.executablePath(),
       headless: true,
-      args: ['--no-sandbox']
+      args: [
+        '--no-sandbox',
+        '--blink-settings=availableHoverTypes=2,primaryHoverType=2,availablePointerTypes=4,primaryPointerType=4'
+      ]
     });
     const page = await browser.newPage();
     await page.setViewport({ width: 1280, height: 900, isMobile: false, hasTouch: false });
