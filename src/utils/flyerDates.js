@@ -53,5 +53,5 @@ export function formatFlyerC1Dates(startValue, endValue) {
   } else {
     range = `${startDay} al ${endDay} de ${startMonth}`;
   }
-  return inferred ? `${range} (fin por confirmar)` : range;
+  return range;
 }
