@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useCycles } from '../context/CyclesContext';
 import { useUI } from '../context/UIContext';
 import { useTheme } from '../context/ThemeContext';
-import { formatFlyerC1Dates, nextFlyerC1Event } from '../utils/flyerDates';
+import { FLYER_PROGRAMS, FLYER_VENUES, flyerCalendarEvents, flyerCalendarRow, flyerEventDates, flyerEventKey, flyerEventTeam, synchronizeFlyerRows } from '../utils/flyerPrograms';
 import { FLYER_MODE_ALL, FLYER_MODE_SINGLE, flyerFileName, selectFlyerSedes } from '../utils/flyerSedes';
 import {
   Sparkles, Download, ArrowLeft, RefreshCw, Plus, Trash2,
@@ -78,78 +78,66 @@ export default function GeneradorFlyer() {
   };
 
   // Estados del flyer
+  const [tipoPrograma, setTipoPrograma] = useState('C1');
   const [programa, setPrograma] = useState('CAPÍTULO UNO');
   const [outline, setOutline] = useState('UNO');
   const [eyebrow, setEyebrow] = useState('FECHAS');
   const [hashtag, setHashtag] = useState('#SOYCREADOR');
-  const [sedes, setSedes] = useState(SEDES_ENROLAMIENTO_PROXIMO);
+  const [sedes, setSedes] = useState(() => synchronizeFlyerRows([], 'C1'));
   const [descargando, setDescargando] = useState(false);
   const [modoFlyer, setModoFlyer] = useState(FLYER_MODE_ALL);
   const [sedeIndividualId, setSedeIndividualId] = useState('');
-  const [presetActivo, setPresetActivo] = useState('enrolamiento');
+  const [presetActivo, setPresetActivo] = useState('calendario');
   const [showCliModal, setShowCliModal] = useState(false);
 
-  // Sincronizar automáticamente con eventos del calendario de Causa OS
-  const sincronizarConCalendario = () => {
-    if (!events || !events.length) {
-      showToast?.('Cargando eventos del calendario... intenta de nuevo en unos segundos.', 'info');
-      return;
-    }
+  const selectedProgram = FLYER_PROGRAMS.find(program => program.id === tipoPrograma);
+  const calendarRows = synchronizeFlyerRows(events, tipoPrograma);
+  const sinFechas = calendarRows.every(row => row.source === 'sin-fechas');
 
-    const sedesConfig = [
-      { id: 'mex', ciudad: 'México', patterns: ['MEX', 'CDMX', 'MÉXICO', 'MEXICO'] },
-      { id: 'lim', ciudad: 'Lima', patterns: ['LIM', 'LIMA'] },
-      { id: 'uio', ciudad: 'Quito', patterns: ['UIO', 'QUITO'] },
-      { id: 'gye', ciudad: 'Guayaquil', patterns: ['GYE', 'GUAYAQUIL'] },
-      { id: 'cue', ciudad: 'Cuenca', patterns: ['CUE', 'CUENCA'] },
-      { id: 'med', ciudad: 'Medellín', patterns: ['MED', 'MEDELL'] }
-    ];
-
-    const nuevasSedes = sedesConfig.map(sc => {
-      const nextEv = nextFlyerC1Event(events, sc.patterns);
-      if (nextEv) {
-        const fechaFormateada = formatFlyerC1Dates(nextEv.fecha_inicio || nextEv.start, nextEv.fecha_fin || nextEv.end);
-        return {
-          id: sc.id,
-          ciudad: sc.ciudad,
-          fechas: fechaFormateada || 'Próximamente',
-          activo: true,
-          equipo: nextEv.equipo || nextEv.team ? `Equipo ${nextEv.equipo || nextEv.team}` : ''
-        };
-      }
-
-      const actual = sedes.find(s => s.id === sc.id);
-      return actual || { id: sc.id, ciudad: sc.ciudad, fechas: 'Próximamente', activo: true };
+  useEffect(() => {
+    const rows = synchronizeFlyerRows(events, tipoPrograma);
+    setSedes(previous => {
+      const sameType = previous.every(row => row.programType === tipoPrograma);
+      if (!sameType) return rows;
+      return [
+        ...rows.map(row => {
+          const existing = previous.find(item => item.id === row.id);
+          if (existing?.source === 'manual') return existing;
+          const venue = FLYER_VENUES.find(item => item.id === row.id);
+          const selectedEvent = flyerCalendarEvents(events, tipoPrograma, venue)
+            .find(event => flyerEventKey(event) === existing?.eventKey);
+          return selectedEvent ? flyerCalendarRow(venue, selectedEvent, tipoPrograma) : row;
+        }),
+        ...previous.filter(row => row.source === 'manual' && !FLYER_VENUES.some(venue => venue.id === row.id))
+      ];
     });
+  }, [events, tipoPrograma]);
 
-    setSedes(nuevasSedes);
+  const sincronizarConCalendario = () => {
+    setSedes(synchronizeFlyerRows(events, tipoPrograma));
     setPresetActivo('calendario');
-    const pendingDates = nuevasSedes.some(sede => sede.fechas.includes('por confirmar'));
-    showToast?.(pendingDates
-      ? 'Fechas sincronizadas. Algunas fechas requieren revisión antes de publicar.'
-      : '¡Fechas sincronizadas con los próximos Capítulos 1 de Causa OS!', pendingDates ? 'info' : 'success');
+    showToast?.(sinFechas ? `Sin fechas de ${selectedProgram.label} en el calendario`
+      : `Fechas de ${selectedProgram.label} sincronizadas con el calendario.`, sinFechas ? 'info' : 'success');
   };
 
   const aplicarPreset = (tipo) => {
     setPresetActivo(tipo);
     if (tipo === 'enrolamiento') {
-      setSedes(SEDES_ENROLAMIENTO_PROXIMO);
+      setSedes(SEDES_ENROLAMIENTO_PROXIMO.map(row => ({ ...row, source: 'manual', programType: 'C1' })));
       showToast?.('Fechas configuradas para Enrolamiento Próximo (Octubre para sedes que cerraron Septiembre)', 'info');
     } else if (tipo === 'inmediato') {
-      setSedes(SEDES_CICLO_INMEDIATO);
+      setSedes(SEDES_CICLO_INMEDIATO.map(row => ({ ...row, source: 'manual', programType: 'C1' })));
       showToast?.('Fechas configuradas para Ciclo Inmediato de Septiembre', 'info');
     }
   };
 
-  const handleProgramaChange = (val) => {
-    setPrograma(val);
-    const upper = val.toUpperCase().trim();
-    if (upper.startsWith('CAPÍTULO')) {
-      const rest = upper.replace(/^CAPÍTULO\s*/, '').trim();
-      if (rest) setOutline(rest);
-    } else if (upper.includes('MAESTRÍA')) {
-      setOutline('MJ');
-    }
+  const handleProgramaChange = (id) => {
+    const program = FLYER_PROGRAMS.find(item => item.id === id);
+    setTipoPrograma(id);
+    setPrograma(program.label.toUpperCase());
+    setOutline(program.outline);
+    setPresetActivo('calendario');
+    setSedes(synchronizeFlyerRows(events, id));
   };
 
   const toggleSedeActiva = (id) => {
@@ -157,7 +145,7 @@ export default function GeneradorFlyer() {
   };
 
   const updateSede = (id, field, value) => {
-    setSedes(prev => prev.map(s => s.id === id ? { ...s, [field]: value } : s));
+    setSedes(prev => prev.map(s => s.id === id ? { ...s, [field]: value, source: 'manual', notice: '', programType: tipoPrograma } : s));
   };
 
   const removeSede = (id) => {
@@ -166,7 +154,7 @@ export default function GeneradorFlyer() {
 
   const addSede = () => {
     const newId = 'sede_' + Date.now();
-    setSedes(prev => [...prev, { id: newId, ciudad: 'Nueva Sede', fechas: 'Próximamente', activo: true, equipo: '' }]);
+    setSedes(prev => [...prev, { id: newId, ciudad: 'Nueva Sede', fechas: '', activo: true, equipo: '', source: 'manual', programType: tipoPrograma }]);
   };
 
   const loadImage = (src) => {
@@ -193,7 +181,7 @@ export default function GeneradorFlyer() {
 
     try {
       const canvas = canvasRef.current;
-      if (!canvas) return;
+      if (!canvas) throw new Error('Canvas de exportación no disponible.');
       canvas.width = 1080;
       canvas.height = 1920;
       const ctx = canvas.getContext('2d');
@@ -235,7 +223,7 @@ export default function GeneradorFlyer() {
       ctx.lineWidth = 1.2;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.strokeText(outline, 540, 565);
+      ctx.strokeText(outline, 540, 565, 960);
       ctx.restore();
 
       // 5. Título Principal con resplandor dorado (Primer Plano)
@@ -249,16 +237,16 @@ export default function GeneradorFlyer() {
       ctx.shadowColor = 'rgba(245, 180, 70, 0.4)';
       ctx.shadowBlur = 32;
       ctx.fillStyle = '#ffffff';
-      ctx.fillText(programa, 540, 565);
+      ctx.fillText(programa, 540, 565, 960);
 
       // Glow intenso central
       ctx.shadowColor = 'rgba(255, 240, 200, 0.85)';
       ctx.shadowBlur = 15;
-      ctx.fillText(programa, 540, 565);
+      ctx.fillText(programa, 540, 565, 960);
 
       // Texto sólido frontal
       ctx.shadowBlur = 0;
-      ctx.fillText(programa, 540, 565);
+      ctx.fillText(programa, 540, 565, 960);
       ctx.restore();
 
       // 6. Lista flotante de Sedes y Fechas
@@ -278,7 +266,7 @@ export default function GeneradorFlyer() {
         ctx.textBaseline = 'middle';
         ctx.shadowColor = 'rgba(242, 164, 59, 0.45)';
         ctx.shadowBlur = 16;
-        ctx.fillText(s.ciudad, 540, y);
+        ctx.fillText(s.ciudad, 540, y, 940);
         ctx.restore();
 
         // Fechas (blanco elegante)
@@ -290,8 +278,16 @@ export default function GeneradorFlyer() {
         ctx.textBaseline = 'middle';
         ctx.shadowColor = 'rgba(255, 255, 255, 0.35)';
         ctx.shadowBlur = 12;
-        ctx.fillText(s.fechas, 540, y + (esIndividual ? 70 : 46));
+        ctx.fillText(s.fechas, 540, y + (esIndividual ? 70 : 46), 940);
         ctx.restore();
+        if (s.equipo) {
+          ctx.save();
+          ctx.font = esIndividual ? '500 32px "Montserrat", sans-serif' : '500 24px "Montserrat", sans-serif';
+          ctx.fillStyle = '#ffffff';
+          ctx.textAlign = 'center';
+          ctx.fillText(s.equipo, 540, y + (esIndividual ? 122 : 82), 940);
+          ctx.restore();
+        }
       });
 
       // 7. Banderas Metálicas Circulares Oficiales
@@ -313,6 +309,11 @@ export default function GeneradorFlyer() {
 
       // Generar link de descarga
       canvas.toBlob((blob) => {
+        if (!blob) {
+          showToast?.('No se pudo codificar el PNG del flyer.', 'error');
+          setDescargando(false);
+          return;
+        }
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.download = flyerFileName(programa, modoFlyer, sedesFlyer[0]);
@@ -405,7 +406,7 @@ export default function GeneradorFlyer() {
                   OFICIAL CREAR PODER SIN LÍMITES
                 </span>
                 <span style={{ fontSize: '0.78rem', color: themeStyles.textMuted, fontWeight: 600 }}>
-                  &bull; Capítulos Uno de Cada Sede
+                  &bull; {selectedProgram.label} por sede y equipo
                 </span>
               </div>
 
@@ -423,7 +424,7 @@ export default function GeneradorFlyer() {
                 Generador de Flyers Oficiales HD
               </h1>
               <p style={{ fontSize: '0.82rem', color: themeStyles.textMuted, margin: '0.2rem 0 0 0' }}>
-                Modifica únicamente las fechas de los Capítulos Uno más próximos para que la gente pueda enrolarse.
+                Elige el programa y sus próximas fechas reales por sede y equipo, o edita una fecha manual.
               </p>
             </div>
           </div>
@@ -446,7 +447,7 @@ export default function GeneradorFlyer() {
                 boxShadow: '0 0 16px rgba(245, 158, 11, 0.25)',
                 transition: 'all 0.2s'
               }}
-              title="Obtener fechas de los próximos Capítulos 1 directamente del calendario oficial de Causa OS"
+              title="Obtener las próximas fechas del programa seleccionado desde el calendario oficial"
             >
               <Zap size={15} style={{ fill: '#f59e0b' }} /> Sincronizar Calendario Causa OS
             </button>
@@ -488,10 +489,14 @@ export default function GeneradorFlyer() {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.82rem', color: themeStyles.textTitle, fontWeight: 700 }}>
             <Calendar size={17} style={{ color: '#f59e0b' }} />
-            <span>Estrategia de Enrolamiento:</span>
+            <label htmlFor="flyer-program">Tipo de programa:</label>
+            <select id="flyer-program" value={tipoPrograma} onChange={e => handleProgramaChange(e.target.value)}
+              style={{ background: themeStyles.inputBg, color: themeStyles.inputColor, padding: '0.6rem', borderRadius: '8px' }}>
+              {FLYER_PROGRAMS.map(program => <option key={program.id} value={program.id}>{program.label}</option>)}
+            </select>
           </div>
 
-          <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+          {tipoPrograma === 'C1' && <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
             <button
               onClick={() => aplicarPreset('enrolamiento')}
               style={{
@@ -511,7 +516,7 @@ export default function GeneradorFlyer() {
               }}
             >
               {presetActivo === 'enrolamiento' && <CheckCircle2 size={14} />}
-              Próximo Enrolamiento (Oficial)
+              Preset manual: Octubre 2026
             </button>
 
             <button
@@ -533,10 +538,16 @@ export default function GeneradorFlyer() {
               }}
             >
               {presetActivo === 'inmediato' && <CheckCircle2 size={14} />}
-              Ciclo Inmediato (Septiembre)
+              Preset manual: Septiembre 2026
             </button>
-          </div>
+          </div>}
         </div>
+        <p role="status" style={{ margin: 0, color: themeStyles.textMuted }}>
+          {sinFechas ? `Sin fechas de ${selectedProgram.label} en el calendario. ` : ''}
+          Solo se reconocen programas explícitos; Maestría genérica e impactos no se desglosan en fases.
+          {tipoPrograma === 'C1' ? ' Capítulo Uno conserva tres días inclusivos si falta el fin.' : ' Si falta el fin, se muestra la fecha de inicio y «fin por confirmar».'}
+          {' '}Los presets y los campos editados son manuales.
+        </p>
 
         {/* GRID DE 2 COLUMNAS: ESTUDIO DE CONTROL (IZQUIERDA) + PREVIEW FLYER STICKY (DERECHA) */}
         <div style={{
@@ -593,7 +604,7 @@ export default function GeneradorFlyer() {
                       letterSpacing: '0.8px',
                       margin: 0
                     }}>
-                      Calendario Oficial de Capítulos Uno
+                      Calendario de {selectedProgram.label}
                     </h2>
                   </div>
                   <p style={{ fontSize: '0.78rem', color: themeStyles.textMuted, margin: 0 }}>
@@ -743,11 +754,28 @@ export default function GeneradorFlyer() {
 
                       {/* Campo Fechas de Capítulo */}
                       <div style={{ flex: 1, position: 'relative' }}>
+                        <div style={{ fontSize: '0.72rem', color: themeStyles.textMuted, marginBottom: '0.35rem' }}>
+                          {s.notice || (s.source === 'manual' ? 'Manual — no sincronizado' : 'Sincronizado del calendario')}
+                        </div>
+                        {FLYER_VENUES.some(venue => venue.id === s.id) && (
+                          <select aria-label={`Evento de ${s.ciudad}`} value=""
+                            onChange={e => {
+                              if (!e.target.value) return;
+                              const venue = FLYER_VENUES.find(item => item.id === s.id);
+                              const options = flyerCalendarEvents(events, tipoPrograma, venue);
+                              const row = flyerCalendarRow(venue, options[Number(e.target.value) - 1], tipoPrograma);
+                              setSedes(previous => previous.map(item => item.id === s.id ? row : item));
+                            }}
+                            style={{ width: '100%', background: themeStyles.inputBg, color: themeStyles.inputColor, marginBottom: '0.35rem' }}>
+                            <option value="">Elegir otra fecha/equipo del calendario</option>
+                            {flyerCalendarEvents(events, tipoPrograma, FLYER_VENUES.find(venue => venue.id === s.id)).map((event, index) =>
+                              <option key={index} value={index + 1}>{flyerEventDates(event, tipoPrograma)}{flyerEventTeam(event) ? ` — ${flyerEventTeam(event)}` : ''}</option>)}
+                          </select>
+                        )}
                         <div style={{
                           position: 'absolute',
                           left: '12px',
-                          top: '50%',
-                          transform: 'translateY(-50%)',
+                          bottom: '12px',
                           color: '#f59e0b',
                           pointerEvents: 'none',
                           display: 'flex',
@@ -758,9 +786,9 @@ export default function GeneradorFlyer() {
                         <input
                           type="text"
                           value={s.fechas}
-                          disabled={!s.activo}
+                          disabled={!s.activo && s.source !== 'sin-fechas'}
                           onChange={(e) => updateSede(s.id, 'fechas', e.target.value)}
-                          placeholder="Fechas (ej: 18, 19 y 20 de septiembre)"
+                          placeholder="Escribe una fecha manual y activa la sede"
                           style={{
                             width: '100%',
                             boxSizing: 'border-box',
@@ -837,7 +865,7 @@ export default function GeneradorFlyer() {
                   <input
                     type="text"
                     value={programa}
-                    onChange={(e) => handleProgramaChange(e.target.value)}
+                    readOnly
                     placeholder="CAPÍTULO UNO"
                     style={{
                       width: '100%',
@@ -1062,7 +1090,7 @@ export default function GeneradorFlyer() {
                       color: 'transparent',
                       userSelect: 'none',
                       pointerEvents: 'none',
-                      fontSize: '58px',
+                      fontSize: outline.length > 4 ? '34px' : '58px',
                       WebkitTextStroke: '1px rgba(255, 255, 255, 0.15)'
                     }}>
                       {outline}
@@ -1072,7 +1100,7 @@ export default function GeneradorFlyer() {
                     <h2 style={{
                       position: 'relative',
                       zIndex: 10,
-                      fontSize: '17px',
+                      fontSize: programa.length > 14 ? '14px' : '17px',
                       fontWeight: 900,
                       letterSpacing: '0.20em',
                       paddingLeft: '0.20em',
@@ -1098,12 +1126,14 @@ export default function GeneradorFlyer() {
                   padding: '0 1.5rem'
                 }}>
                   {activeSedesList.map(s => (
-                    <div key={s.id} style={{ textAlign: 'center' }}>
+                    <div key={s.id} style={{ textAlign: 'center', width: '100%', overflow: 'hidden', whiteSpace: 'nowrap' }}>
                       <p style={{
                         fontSize: esFlyerIndividual ? '22px' : (activeSedesList.length > 5 ? '13px' : '14.5px'),
                         fontWeight: 700,
                         color: '#f29e2e',
                         lineHeight: 1.15,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
                         margin: 0,
                         textShadow: '0 0 10px rgba(242, 164, 59, 0.45), 0 1px 4px rgba(0,0,0,0.8)'
                       }}>
@@ -1114,11 +1144,14 @@ export default function GeneradorFlyer() {
                         fontWeight: 300,
                         color: '#ffffff',
                         letterSpacing: '0.3px',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
                         margin: '2px 0 0 0',
                         textShadow: '0 0 8px rgba(255, 255, 255, 0.35), 0 1px 4px rgba(0,0,0,0.9)'
                       }}>
                         {s.fechas}
                       </p>
+                      {s.equipo && <p style={{ fontSize: esFlyerIndividual ? '12px' : '8.5px', color: '#ffffff', margin: '3px 0 0', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.equipo}</p>}
                     </div>
                   ))}
                 </div>
