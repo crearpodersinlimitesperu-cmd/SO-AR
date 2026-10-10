@@ -91,7 +91,7 @@ test('module help supports hover, keyboard, viewport edges and mobile without in
     assert.equal(new Set(descriptionIds).size, controls.length);
 
     await controls[0].hover();
-    await page.waitForSelector('[role="tooltip"]');
+    await page.waitForSelector('[role="tooltip"]', { visible: true });
     assert.equal(await page.$eval('[role="tooltip"]', el => el.textContent), homeModuleHelp.horarios);
     await page.hover('[role="tooltip"]');
     await new Promise(resolve => setTimeout(resolve, 250));
@@ -100,7 +100,7 @@ test('module help supports hover, keyboard, viewport edges and mobile without in
     await page.waitForSelector('[role="tooltip"]', { hidden: true });
 
     await controls[1].focus();
-    await page.waitForSelector('[role="tooltip"]');
+    await page.waitForSelector('[role="tooltip"]', { visible: true });
     assert.equal(await controls[1].evaluate(el => getComputedStyle(el).outlineWidth), '3px');
     await page.keyboard.press('Escape');
     await page.waitForSelector('[role="tooltip"]', { hidden: true });
@@ -116,7 +116,7 @@ test('module help supports hover, keyboard, viewport edges and mobile without in
       el.style.bottom = '0';
     });
     await controls.at(-1).focus();
-    await page.waitForSelector('[role="tooltip"]');
+    await page.waitForSelector('[role="tooltip"]', { visible: true });
     assert.equal(await page.$eval('[role="tooltip"]', el => {
       const rect = el.getBoundingClientRect();
       return rect.left >= 0 && rect.right <= innerWidth && rect.top >= 0 && rect.bottom <= innerHeight;
