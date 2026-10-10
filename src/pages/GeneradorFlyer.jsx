@@ -6,6 +6,7 @@ import { useUI } from '../context/UIContext';
 import { useTheme } from '../context/ThemeContext';
 import { FLYER_PROGRAMS, FLYER_VENUES, flyerCalendarEvents, flyerCalendarRow, flyerEventDates, flyerEventKey, flyerEventTeam, synchronizeFlyerRows } from '../utils/flyerPrograms';
 import { FLYER_MODE_ALL, FLYER_MODE_SINGLE, flyerFileName, selectFlyerSedes } from '../utils/flyerSedes';
+import { flyerTeamsForVenue, flyerTeamLabel, selectTeamFlyer, teamFlyerPages } from '../utils/flyerTeams';
 import {
   Sparkles, Download, ArrowLeft, RefreshCw, Plus, Trash2,
   Copy, Sliders, Eye, Terminal, Check,
@@ -89,6 +90,16 @@ export default function GeneradorFlyer() {
   const [sedeIndividualId, setSedeIndividualId] = useState('');
   const [presetActivo, setPresetActivo] = useState('calendario');
   const [showCliModal, setShowCliModal] = useState(false);
+  const [porEquipo, setPorEquipo] = useState(true);
+  const [equipoSedeId, setEquipoSedeId] = useState('lim');
+  const [equipoId, setEquipoId] = useState('');
+  const [previewPage, setPreviewPage] = useState(0);
+  const equiposDisponibles = flyerTeamsForVenue(events, equipoSedeId);
+  const seleccionEquipo = selectTeamFlyer(events, equipoSedeId, equipoId);
+  const paginasEquipo = teamFlyerPages(seleccionEquipo.sedes);
+  const tituloFlyer = porEquipo ? (seleccionEquipo.error ? 'ENTRENAMIENTOS' : flyerTeamLabel(equipoId).toUpperCase()) : programa;
+  const outlineFlyer = porEquipo ? 'EQUIPO' : outline;
+  const paginaActual = Math.min(previewPage, Math.max(0, paginasEquipo.length - 1));
 
   const selectedProgram = FLYER_PROGRAMS.find(program => program.id === tipoPrograma);
   const calendarRows = synchronizeFlyerRows(events, tipoPrograma);
@@ -169,13 +180,13 @@ export default function GeneradorFlyer() {
 
   // Descarga en Alta Resolución 1080x1920 (PNG Oficial)
   const descargarFlyerHD = async () => {
-    const seleccion = selectFlyerSedes(sedes, modoFlyer, sedeIndividualId);
+    const seleccion = porEquipo ? seleccionEquipo : selectFlyerSedes(sedes, modoFlyer, sedeIndividualId);
     if (seleccion.error) {
       showToast?.(seleccion.error, 'error');
       return;
     }
-    const sedesFlyer = seleccion.sedes;
-    const esIndividual = modoFlyer === FLYER_MODE_SINGLE;
+    const pages = porEquipo ? teamFlyerPages(seleccion.sedes) : [seleccion.sedes];
+    const esIndividual = !porEquipo && modoFlyer === FLYER_MODE_SINGLE;
     setDescargando(true);
     showToast?.('Generando Flyer Oficial HD (1080x1920) sin alterar el diseño original...', 'info');
 
@@ -194,6 +205,7 @@ export default function GeneradorFlyer() {
 
       await document.fonts.ready;
 
+      for (const [pageIndex, sedesFlyer] of pages.entries()) {
       // 1. Fondo cósmico
       ctx.clearRect(0, 0, 1080, 1920);
       ctx.drawImage(bgImg, 0, 0, 1080, 1920);
@@ -223,7 +235,7 @@ export default function GeneradorFlyer() {
       ctx.lineWidth = 1.2;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.strokeText(outline, 540, 565, 960);
+      ctx.strokeText(outlineFlyer, 540, 565, 960);
       ctx.restore();
 
       // 5. Título Principal con resplandor dorado (Primer Plano)
@@ -237,16 +249,16 @@ export default function GeneradorFlyer() {
       ctx.shadowColor = 'rgba(245, 180, 70, 0.4)';
       ctx.shadowBlur = 32;
       ctx.fillStyle = '#ffffff';
-      ctx.fillText(programa, 540, 565, 960);
+      ctx.fillText(tituloFlyer, 540, 565, 960);
 
       // Glow intenso central
       ctx.shadowColor = 'rgba(255, 240, 200, 0.85)';
       ctx.shadowBlur = 15;
-      ctx.fillText(programa, 540, 565, 960);
+      ctx.fillText(tituloFlyer, 540, 565, 960);
 
       // Texto sólido frontal
       ctx.shadowBlur = 0;
-      ctx.fillText(programa, 540, 565, 960);
+      ctx.fillText(tituloFlyer, 540, 565, 960);
       ctx.restore();
 
       // 6. Lista flotante de Sedes y Fechas
@@ -308,23 +320,19 @@ export default function GeneradorFlyer() {
       ctx.restore();
 
       // Generar link de descarga
-      canvas.toBlob((blob) => {
-        if (!blob) {
-          showToast?.('No se pudo codificar el PNG del flyer.', 'error');
-          setDescargando(false);
-          return;
-        }
+      const blob = await new Promise((resolve, reject) => canvas.toBlob(value =>
+        value ? resolve(value) : reject(new Error('No se pudo codificar el PNG del flyer.')), 'image/png'));
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
-        link.download = flyerFileName(programa, modoFlyer, sedesFlyer[0]);
+        link.download = porEquipo
+          ? `Flyer_${equipoSedeId}_${encodeURIComponent(equipoId)}_${pageIndex + 1}_1080x1920.png`
+          : flyerFileName(programa, modoFlyer, sedesFlyer[0]);
         link.href = url;
         link.click();
         URL.revokeObjectURL(url);
-        showToast?.(esIndividual
-          ? `¡Flyer de ${sedesFlyer[0].ciudad} descargado con éxito en 1080x1920!`
-          : '¡Flyer Oficial descargado con éxito en 1080x1920!', 'success');
-        setDescargando(false);
-      }, 'image/png');
+      }
+      showToast?.(`Flyer descargado en ${pages.length} PNG de 1080x1920.`, 'success');
+      setDescargando(false);
 
     } catch (err) {
       console.error('Error generando flyer:', err);
@@ -333,9 +341,9 @@ export default function GeneradorFlyer() {
     }
   };
 
-  const seleccionFlyer = selectFlyerSedes(sedes, modoFlyer, sedeIndividualId);
-  const activeSedesList = seleccionFlyer.sedes;
-  const esFlyerIndividual = modoFlyer === FLYER_MODE_SINGLE;
+  const seleccionFlyer = porEquipo ? seleccionEquipo : selectFlyerSedes(sedes, modoFlyer, sedeIndividualId);
+  const activeSedesList = porEquipo ? (paginasEquipo[paginaActual] || []) : seleccionFlyer.sedes;
+  const esFlyerIndividual = !porEquipo && modoFlyer === FLYER_MODE_SINGLE;
   const sedesSeleccionables = sedes.filter(s => s.activo);
   const exportBloqueado = Boolean(seleccionFlyer.error);
 
@@ -424,12 +432,12 @@ export default function GeneradorFlyer() {
                 Generador de Flyers Oficiales HD
               </h1>
               <p style={{ fontSize: '0.82rem', color: themeStyles.textMuted, margin: '0.2rem 0 0 0' }}>
-                Elige el programa y sus próximas fechas reales por sede y equipo, o edita una fecha manual.
+                Elige sede y equipo para ver C1, C2 y MJ, o usa el editor separado por fase.
               </p>
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+          {!porEquipo && <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
             <button
               onClick={sincronizarConCalendario}
               style={{
@@ -470,10 +478,36 @@ export default function GeneradorFlyer() {
             >
               <Terminal size={15} /> Bot CLI
             </button>
-          </div>
+          </div>}
         </header>
 
         {/* ESTRATEGIA DE ENROLAMIENTO SEGMENTADA */}
+        <div style={{ color: themeStyles.textTitle, display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+          <label>Vista{' '}
+            <select aria-label="Vista del flyer" value={porEquipo ? 'equipo' : 'fase'} onChange={e => setPorEquipo(e.target.value === 'equipo')}>
+              <option value="equipo">Por sede y equipo: C1, C2 y MJ</option>
+              <option value="fase">Por fase: una sede o todas (editor manual)</option>
+            </select>
+          </label>
+          {porEquipo && <>
+            <label>Sede{' '}
+              <select aria-label="Sede del equipo" value={equipoSedeId} onChange={e => {
+                setEquipoSedeId(e.target.value); setEquipoId(''); setPreviewPage(0);
+              }}>
+                {FLYER_VENUES.map(venue => <option key={venue.id} value={venue.id}>{venue.ciudad}</option>)}
+              </select>
+            </label>
+            <label>Equipo{' '}
+              <select aria-label="Equipo del calendario" value={equiposDisponibles.includes(equipoId) ? equipoId : ''} onChange={e => {
+                setEquipoId(e.target.value); setPreviewPage(0);
+              }}>
+                <option value="">Selecciona un equipo</option>
+                {equiposDisponibles.map(id => <option key={id} value={id}>{flyerTeamLabel(id)}</option>)}
+              </select>
+            </label>
+          </>}
+        </div>
+        {!porEquipo && <>
         <div style={{
           background: themeStyles.cardBg,
           backdropFilter: 'blur(12px)',
@@ -548,6 +582,7 @@ export default function GeneradorFlyer() {
           {tipoPrograma === 'C1' ? ' Capítulo Uno conserva tres días inclusivos si falta el fin.' : ' Si falta el fin, se muestra la fecha de inicio y «fin por confirmar».'}
           {' '}Los presets y los campos editados son manuales.
         </p>
+        </>}
 
         {/* GRID DE 2 COLUMNAS: ESTUDIO DE CONTROL (IZQUIERDA) + PREVIEW FLYER STICKY (DERECHA) */}
         <div style={{
@@ -561,7 +596,16 @@ export default function GeneradorFlyer() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             
             {/* CARD 1: CALENDARIO DE SEDES */}
-            <div style={{
+            {porEquipo ? <div style={{ background: themeStyles.cardBg, padding: '1.5rem', borderRadius: '20px', color: themeStyles.textTitle }}>
+              <h2>Entrenamientos por equipo</h2>
+              <p role="status">Fechas explícitas del calendario, incluidas las históricas. MJ = Maestría del Juego.
+                No se calculan FDS ni se vinculan eventos por cercanía. Una fase sin vínculo explícito aparece como no disponible.</p>
+              {seleccionEquipo.error ? <p>{seleccionEquipo.error}</p> : <table style={{ width: '100%', textAlign: 'left' }}>
+                <caption>{FLYER_VENUES.find(venue => venue.id === equipoSedeId)?.ciudad} — {flyerTeamLabel(equipoId)}</caption>
+                <thead><tr><th>Tipo</th><th>Fechas de entrenamiento</th></tr></thead>
+                <tbody>{seleccionEquipo.sedes.map(row => <tr key={row.id}><td>{row.ciudad}</td><td>{row.fechas}</td></tr>)}</tbody>
+              </table>}
+            </div> : <div style={{
               background: themeStyles.cardBg,
               backdropFilter: 'blur(16px)',
               WebkitBackdropFilter: 'blur(16px)',
@@ -831,7 +875,7 @@ export default function GeneradorFlyer() {
                   );
                 })}
               </div>
-            </div>
+            </div>}
 
             {/* CARD 2: BRANDING, TEXTOS Y MARCA DE AGUA */}
             <div style={{
@@ -864,7 +908,7 @@ export default function GeneradorFlyer() {
                   </label>
                   <input
                     type="text"
-                    value={programa}
+                    value={tituloFlyer}
                     readOnly
                     placeholder="CAPÍTULO UNO"
                     style={{
@@ -890,7 +934,8 @@ export default function GeneradorFlyer() {
                   </label>
                   <input
                     type="text"
-                    value={outline}
+                    value={outlineFlyer}
+                    readOnly={porEquipo}
                     onChange={(e) => setOutline(e.target.value)}
                     placeholder="UNO"
                     style={{
@@ -1090,17 +1135,17 @@ export default function GeneradorFlyer() {
                       color: 'transparent',
                       userSelect: 'none',
                       pointerEvents: 'none',
-                      fontSize: outline.length > 4 ? '34px' : '58px',
+                      fontSize: outlineFlyer.length > 4 ? '34px' : '58px',
                       WebkitTextStroke: '1px rgba(255, 255, 255, 0.15)'
                     }}>
-                      {outline}
+                      {outlineFlyer}
                     </span>
 
                     {/* Título Principal con Halo Luminous */}
                     <h2 style={{
                       position: 'relative',
                       zIndex: 10,
-                      fontSize: programa.length > 14 ? '14px' : '17px',
+                      fontSize: tituloFlyer.length > 14 ? '14px' : '17px',
                       fontWeight: 900,
                       letterSpacing: '0.20em',
                       paddingLeft: '0.20em',
@@ -1110,7 +1155,7 @@ export default function GeneradorFlyer() {
                       margin: 0,
                       textShadow: '0 0 10px rgba(255, 240, 200, 0.95), 0 0 20px rgba(245, 180, 70, 0.6), 0 2px 4px rgba(0, 0, 0, 0.9)'
                     }}>
-                      {programa}
+                      {tituloFlyer}
                     </h2>
                   </div>
                 </div>
@@ -1192,11 +1237,17 @@ export default function GeneradorFlyer() {
 
             {/* BOTÓN DE DESCARGA EJECUTIVO */}
             <div style={{ width: '100%', maxWidth: '380px' }}>
+              {porEquipo && paginasEquipo.length > 1 && <label style={{ color: themeStyles.textTitle }}>
+                Página de preview (la descarga incluye todas){' '}
+                <select aria-label="Página del flyer" value={paginaActual} onChange={e => setPreviewPage(Number(e.target.value))}>
+                  {paginasEquipo.map((_, index) => <option key={index} value={index}>{index + 1} / {paginasEquipo.length}</option>)}
+                </select>
+              </label>}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '0.75rem' }}>
                 <label style={{ fontSize: '0.72rem', fontWeight: 700, color: themeStyles.textMuted, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                   Generar flyer
                 </label>
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                {!porEquipo && <div style={{ display: 'flex', gap: '0.5rem' }}>
                   {[[FLYER_MODE_ALL, 'Todas las sedes'], [FLYER_MODE_SINGLE, 'Una sede']].map(([value, label]) => (
                     <button
                       key={value}
@@ -1223,7 +1274,7 @@ export default function GeneradorFlyer() {
                       {label}
                     </button>
                   ))}
-                </div>
+                </div>}
                 {esFlyerIndividual && (
                   <select
                     value={sedeIndividualId}
