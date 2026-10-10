@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { db } from '../services/firebase';
 import { collection, addDoc, getDocs, getDoc, updateDoc, doc, query, where, orderBy, limit, onSnapshot } from 'firebase/firestore';
@@ -12,7 +12,8 @@ import {
   ChevronDown, ChevronUp, Check, Users, PhoneCall, MessageSquare
 } from 'lucide-react';
 import { OPERATIONAL_SEDES, normalizeSede } from '../data/usersData';
-import nodusFallbackData from '../data/nodusFallbackData.json';
+import { calendarSede } from '../../functions-imo/calendarModel.mjs';
+import { callTotal, currentReportTeams, reportStages, reportSourceStatus, validCallCounts } from '../services/nodusReportModel.js';
 import { sendReportToGoogleChat, getGoogleChatWebhookConfig, saveGoogleChatWebhookConfig } from '../services/googleChatService';
 
 // POOL MAESTRO DE 12 PREGUNTAS ROTATIVAS (NODUS & CAUSA OS V1.0)
@@ -39,7 +40,7 @@ const POOL_PREGUNTAS = {
 
 export default function ReportesBoard() {
   const { currentUser } = useAuth();
-  const { currentCycle, currentStage } = useCycles();
+  const { currentCycle, currentStage, events, loadingEvents } = useCycles();
   const { showToast } = useUI();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -107,9 +108,16 @@ export default function ReportesBoard() {
   const [nodusStatusMsg, setNodusStatusMsg] = useState('');
   const [nodusEquiposDisponibles, setNodusEquiposDisponibles] = useState([]);
   const [selectedNodusTeam, setSelectedNodusTeam] = useState('auto');
-  const [nodusMatchedCoord, setNodusMatchedCoord] = useState(null);
-  const [nodusAllCoords, setNodusAllCoords] = useState([]);
-  const [selectedNodusCoordId, setSelectedNodusCoordId] = useState('');
+  const [reportSede, setReportSede] = useState(calendarSede(currentUser?.sede));
+  const [reportStage, setReportStage] = useState(reportStages(currentUser)[0] || '');
+  const [nodusSource, setNodusSource] = useState(null);
+  const [reviewedCounts, setReviewedCounts] = useState(false);
+  const nodusRequest = useRef(0);
+  const allowedStages = reportStages(currentUser);
+  const reportTargets = useMemo(() => currentReportTeams(events || [], reportSede, reportStage), [events, reportSede, reportStage]);
+  const reportTarget = reportTargets.find(t => t.team === selectedNodusTeam) || (reportTargets.length === 1 ? reportTargets[0] : null);
+  const sourceStatus = reportSourceStatus(nodusSource, reportTarget);
+  const isSimulation = Boolean(currentUser?.isSimulated || currentUser?.isSimulation);
 
   // Configuración de Webhook Google Chat
   const [showChatWebhookModal, setShowChatWebhookModal] = useState(false);
@@ -125,6 +133,7 @@ export default function ReportesBoard() {
   }, []);
 
   const handleTestChatWebhook = async () => {
+    if (isSimulation) { showToast('Simulación: no se enviará ni guardará nada.', 'info'); return; }
     if (!chatWebhookUrl.trim()) {
       showToast('Ingresa primero la URL del Webhook de Google Chat.', 'warning');
       return;
@@ -170,6 +179,7 @@ export default function ReportesBoard() {
   };
 
   const handleSaveChatWebhook = async () => {
+    if (isSimulation) { showToast('Simulación: no se guardará nada.', 'info'); return; }
     const ok = await saveGoogleChatWebhookConfig({
       webhookUrl: chatWebhookUrl.trim(),
       enabled: chatWebhookEnabled
@@ -182,170 +192,51 @@ export default function ReportesBoard() {
     }
   };
 
-  const handleExtraerDeNodus = async (teamOverride = null, coordIdOverride = null, isSilent = false) => {
+  const handleExtraerDeNodus = async (teamOverride = null, unused = null, isSilent = false) => {
+    const requestId = ++nodusRequest.current;
     setLoadingNodus(true);
     setNodusStatusMsg('');
+    setNodusSource(null);
+    setFormData({});
+    setReviewedCounts(false);
     try {
-      let nodusData = null;
-      try {
-        const docRef = doc(db, 'nodus_coordinadores_c1c2', 'latest');
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          nodusData = docSnap.data();
-        }
-      } catch (err) {
-        console.warn("Lectura Firestore nodus_coordinadores_c1c2 falló, usando respaldo local:", err);
-      }
-
-      // Si Firestore tiene menos de los 22 coordinadores completos, combinamos con el catálogo local
-      // para garantizar que NINGUNA sede (Quito, Guayaquil, Cuenca, Medellín, México, Lima) quede excluida jamás.
-      let coords = (nodusData && Array.isArray(nodusData.coordinadores) && nodusData.coordinadores.length >= 22)
-        ? nodusData.coordinadores
-        : nodusFallbackData.coordinadores;
-
-      setNodusAllCoords(coords);
-
-      const userEmail = (currentUser?.email || '').toLowerCase().trim();
-      const userName = (currentUser?.displayName || currentUser?.name || '').toLowerCase().trim();
-      const userSede = normalizeSede(currentUser?.sede || '');
-
-      let coord = null;
-
-      // 0. Si se especificó un coordinador manualmente por ID y el perfil tiene permisos.
-      const targetCoordId = canSwitchAnyCoord ? (coordIdOverride || selectedNodusCoordId) : null;
-      if (targetCoordId) {
-        coord = coords.find(c => c.id === targetCoordId);
-      }
-
-      // 1. Filtrar estrictamente los coordinadores de la sede del usuario si tiene sede definida
-      const sedeCoords = (userSede && userSede !== 'Global' && userSede !== 'Sede Global')
-        ? coords.filter(c => normalizeSede(c.sede) === userSede)
-        : coords;
-
-      if (!coord) {
-        // Buscar dentro de su sede (o global) por coincidencia de email o nombre
-        coord = sedeCoords.find(c => {
-          const cEmail = (c.email || '').toLowerCase();
-          const cNombre = (c.nombre || '').toLowerCase();
-          const cNombreComp = (c.nombreCompleto || '').toLowerCase();
-          const cId = (c.id || '').toLowerCase();
-
-          // Coincidencia de email: completo o prefijo antes del @
-          const userPrefix = userEmail.split('@')[0] || '';
-          const coordPrefix = cEmail.split('@')[0] || '';
-          const emailMatch = userEmail && (
-            cEmail === userEmail ||
-            (userPrefix && (userPrefix === coordPrefix || userPrefix.includes(coordPrefix) || coordPrefix.includes(userPrefix))) ||
-            (cId && userPrefix && cId.includes(userPrefix))
-          );
-
-          // Coincidencia de nombre: cualquier palabra del nombre del usuario (longitud >= 3)
-          const userWords = userName.split(/[\s,]+/).filter(w => w.length >= 3);
-          const nameMatch = userName && (
-            cNombreComp.includes(userName) ||
-            userName.includes(cNombreComp) ||
-            cNombre.includes(userName) ||
-            userName.includes(cNombre) ||
-            userWords.some(w => cNombre.includes(w) || cNombreComp.includes(w) || cId.includes(w))
-          );
-
-          return emailMatch || nameMatch;
-        });
-
-        // Si no hubo coincidencia nominal pero está en una sede específica:
-        // Seleccionar el primer coordinador de SU MISMA SEDE (¡NUNCA caer a otra sede ajena!)
-        if (!coord && sedeCoords.length > 0) {
-          coord = sedeCoords[0];
-        }
-
-        // Fallback general solo si la sede es Global
-        if (!coord && coords.length > 0) {
-          coord = coords[0];
-        }
-      }
-
-      if (!coord) {
-        showToast('No se encontró información registrada en Nodus para esta sede.', 'error');
-        setLoadingNodus(false);
-        return;
-      }
-
-      setNodusMatchedCoord(coord);
-      setSelectedNodusCoordId(coord.id);
-      const equipos = coord.equipos || [];
-      setNodusEquiposDisponibles(equipos);
-
-      const targetTeamName = teamOverride !== null ? teamOverride : selectedNodusTeam;
-      let targetData = null;
-      let labelTarget = '';
-
-      if (targetTeamName && targetTeamName !== 'auto' && targetTeamName !== 'acumulado') {
-        targetData = equipos.find(e => e.equipo === targetTeamName);
-        labelTarget = targetTeamName;
-      } else if (targetTeamName === 'acumulado' || equipos.length === 0) {
-        targetData = coord.estados;
-        labelTarget = 'Total Acumulado';
-      } else {
-        // 'auto': primer equipo o el que tenga mayor actividad reciente
-        targetData = equipos.find(e => (e.confirmado || 0) > 0) || equipos[0] || coord.estados;
-        labelTarget = targetData?.equipo || 'Último Equipo';
-      }
-
-      if (!targetData) {
-        targetData = coord.estados || {};
-        labelTarget = 'General';
-      }
-
-      // SOLO actualizamos las métricas de "Nuevos" auditadas por Nodus.
-      // Preservamos estrictamente Rezagados y cualquier valor previo registrado.
-      const nuevosValores = {
-        nuevos_OK: Number(targetData.confirmado || 0),
-        nuevos_XC: Number(targetData.porConfirmar || 0),
-        nuevos_NC: Number(targetData.noContesta || 0),
-        nuevos_NI: Number(targetData.noInteresa || 0),
-        nuevos_SIG: Number(targetData.siguiente || 0),
-        nuevos_OS: Number(targetData.yaAsistio || 0),
-        sede_id: coord.sede || currentUser?.sede || 'Lima'
-      };
-
-      if (targetData.pendientes !== undefined) {
-        nuevosValores.nuevos_PENDIENTES = Number(targetData.pendientes);
-      } else if (targetData.asignados !== undefined && targetData.llamadas !== undefined) {
-        nuevosValores.nuevos_PENDIENTES = Math.max(0, Number(targetData.asignados) - Number(targetData.llamadas));
-      }
-
-      setFormData(prev => ({
-        ...prev,
-        ...nuevosValores
-      }));
-
-      const coordLabel = coord.nombreCompleto || coord.nombre;
-      const msg = `Nodus Sincronizado: ${coordLabel} (${coord.sede}) • ${labelTarget} -> Nuevos actualizados: ${nuevosValores.nuevos_OK} OK, ${nuevosValores.nuevos_XC} XC, ${nuevosValores.nuevos_NC} NC. (Rezagados y avances previos conservados).`;
-      setNodusStatusMsg(msg);
-      if (!isSilent) {
-        showToast(`¡Datos extraídos de Nodus con éxito! (${coordLabel} • ${labelTarget})`, 'success');
-      }
+      if (!allowedStages.includes(reportStage) || (!canSwitchAnyCoord && calendarSede(currentUser?.sede) !== reportSede)) throw new Error('Sede o etapa no autorizada.');
+      const targets = currentReportTeams(events || [], reportSede, reportStage);
+      const target = targets.find(t => t.team === teamOverride) || (targets.length === 1 ? targets[0] : null);
+      const docSnap = await getDoc(doc(db, 'nodus_report_sources', `${reportSede}_${reportStage}`));
+      if (requestId !== nodusRequest.current) return;
+      const source = docSnap.exists() ? docSnap.data() : null;
+      const result = reportSourceStatus(source, target);
+      setNodusSource(source);
+      setNodusEquiposDisponibles(targets);
+      setFormData(result.ready ? { ...result.counts, sede_id: reportSede } : {});
+      setNodusStatusMsg(result.message);
+      if (!isSilent) showToast(result.message, result.ready ? 'success' : 'warning');
     } catch (e) {
       console.error("Error al extraer datos de Nodus:", e);
-      showToast('Error al extraer datos de Nodus.', 'error');
+      if (requestId === nodusRequest.current) {
+        setNodusStatusMsg('No se pudo leer Nodus. No se usará ningún respaldo histórico.');
+        showToast('Error al extraer datos de Nodus.', 'error');
+      }
     } finally {
-      setLoadingNodus(false);
+      if (requestId === nodusRequest.current) setLoadingNodus(false);
     }
   };
 
   // Función para precargar datos del último reporte de llamadas existente
   const fetchUltimoReporteLlamadas = async () => {
+    const requestId = nodusRequest.current;
     setLoadingUltimoReporte(true);
     try {
-      const q = query(
-        collection(db, 'reports'),
-        orderBy('created_at', 'desc'),
-        limit(20)
-      );
+      const q = canSwitchAnyCoord
+        ? query(collection(db, 'reports'), where('type', '==', 'Llamadas'), limit(100))
+        : query(collection(db, 'reports'), where('type', '==', 'Llamadas'), where('sede', '==', reportSede), where('stage', '==', reportStage), limit(100));
       const snap = await getDocs(q);
+      if (requestId !== nodusRequest.current) return;
       const llamadas = snap.docs
         .map(d => ({ id: d.id, ...d.data() }))
-        .filter(d => d.type === 'Llamadas');
+        .filter(d => d.type === 'Llamadas' && d.sede === reportSede && d.stage === reportStage)
+        .sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)));
 
       if (llamadas.length === 0) {
         setLoadingUltimoReporte(false);
@@ -387,28 +278,19 @@ export default function ReportesBoard() {
           data: matched.data
         });
 
-        // Precargar en formData
-        setFormData(prev => ({
-          ...matched.data,
-          ...prev
-        }));
-
-        showToast(`Último reporte de llamadas precargado (${matched.submitted_by} • ${matched.sede})`, 'info');
       }
     } catch (err) {
       console.warn("Error al precargar último reporte de llamadas:", err);
+      if (requestId === nodusRequest.current) showToast('No se pudo cargar la referencia histórica.', 'warning');
     } finally {
-      setLoadingUltimoReporte(false);
+      if (requestId === nodusRequest.current) setLoadingUltimoReporte(false);
     }
   };
 
   const handleLimpiarFormulario = () => {
-    setFormData({
-      nuevos_OK: 0, nuevos_XC: 0, nuevos_NC: 0, nuevos_NI: 0, nuevos_SIG: 0, nuevos_OS: 0, nuevos_PENDIENTES: 0,
-      rezagados_OK: 0, rezagados_XC: 0, rezagados_NC: 0, rezagados_NI: 0, rezagados_SIG: 0, rezagados_PENDIENTES: 0
-    });
-    setUltimoReporteInfo(null);
-    showToast('Campos restablecidos en cero.', 'info');
+    setReviewedCounts(false);
+    setFormData({});
+    showToast('Campos vaciados. No se interpretan como cero participantes.', 'info');
   };
 
   // Inicializar o regenerar preguntas del Micro-Pulso
@@ -422,18 +304,30 @@ export default function ReportesBoard() {
 
   // Al cambiar de usuario, simulación o tipo de reporte, sincronizar datos de su sede
   useEffect(() => {
-    setSelectedNodusCoordId('');
+    setReportSede(calendarSede(currentUser?.sede));
+    setReportStage(reportStages(currentUser)[0] || '');
+    setFormData({});
+    setNodusSource(null);
+    setReviewedCounts(false);
+    nodusRequest.current++;
+  }, [currentUser?.uid, currentUser?.sede, currentUser?.activeRole, currentUser?.appRole, currentUser?.role, currentUser?.isSimulated]);
+
+  useEffect(() => {
     setSelectedNodusTeam('auto');
-    setNodusMatchedCoord(null);
     setNodusEquiposDisponibles([]);
     setNodusStatusMsg('');
+    setUltimoReporteInfo(null);
+    setLoadingUltimoReporte(false);
+    setFormData({});
+    setNodusSource(null);
+    setReviewedCounts(false);
 
     let isCancelled = false;
     const initLlamadas = async () => {
-      if (reportType === 'Llamadas') {
-        await fetchUltimoReporteLlamadas();
+      if (reportType === 'Llamadas' && !loadingEvents && reportSede && allowedStages.includes(reportStage)) {
         if (!isCancelled) {
           await handleExtraerDeNodus(null, null, true);
+          if (!isCancelled) await fetchUltimoReporteLlamadas();
         }
       } else {
         setFormData({});
@@ -445,8 +339,8 @@ export default function ReportesBoard() {
     };
 
     initLlamadas();
-    return () => { isCancelled = true; };
-  }, [reportType, currentUser?.uid, currentUser?.email, currentUser?.sede, currentUser?.isSimulated]);
+    return () => { isCancelled = true; nodusRequest.current++; };
+  }, [reportType, reportSede, reportStage, events, loadingEvents, currentUser?.uid, currentUser?.email, currentUser?.sede, currentUser?.activeRole, currentUser?.isSimulated]);
 
   // Cargar datos para el dashboard de evolución (solo si tiene permisos de directivo o gerente)
   useEffect(() => {
@@ -485,12 +379,15 @@ export default function ReportesBoard() {
 
   // Escuchar reportes en tiempo real para Directivos y Gerentes
   useEffect(() => {
-    if (!canViewEvolucionDashboard && !isDireccion && !isGerente) return;
+    setDailyReports([]);
+    if (!canSwitchAnyCoord && !isGerente) return;
     try {
-      const qReports = query(collection(db, 'reports'), orderBy('created_at', 'desc'), limit(50));
+      const qReports = canSwitchAnyCoord
+        ? query(collection(db, 'reports'), orderBy('created_at', 'desc'), limit(50))
+        : query(collection(db, 'reports'), where('sede', '==', calendarSede(currentUser?.sede)), limit(50));
       const unsub = onSnapshot(qReports, (snapshot) => {
         const reps = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-        setDailyReports(reps);
+        setDailyReports(reps.sort((a, b) => String(b.created_at).localeCompare(String(a.created_at))));
         setLoadingDailyReports(false);
       }, (err) => {
         console.warn("Error escuchando reports en tiempo real:", err);
@@ -501,9 +398,10 @@ export default function ReportesBoard() {
       console.warn("Error iniciando listener de reports:", err);
       setLoadingDailyReports(false);
     }
-  }, [canViewEvolucionDashboard, isDireccion, isGerente]);
+  }, [canViewEvolucionDashboard, isDireccion, isGerente, canSwitchAnyCoord, currentUser?.sede]);
 
   const handleMarkReviewed = async (reportId) => {
+    if (isSimulation) { showToast('Simulación: no se guardará nada.', 'info'); return; }
     try {
       const repRef = doc(db, 'reports', reportId);
       await updateDoc(repRef, {
@@ -518,18 +416,14 @@ export default function ReportesBoard() {
   };
 
   const handleChange = (e) => {
+    setReviewedCounts(false);
     const { name, value } = e.target;
     const val = isNaN(value) || value === '' ? value : Number(value);
     setFormData(prev => ({ ...prev, [name]: val }));
   };
 
   const calculateTotalLlamadas = (seccion) => {
-    const keys = ['OK', 'XC', 'NC', 'NI', 'SIG', 'OS', 'PENDIENTES'];
-    let total = 0;
-    keys.forEach(k => {
-      total += (formData[`${seccion}_${k}`] || 0);
-    });
-    return total;
+    return callTotal(formData, seccion) ?? 'Sin datos completos';
   };
 
   // Cálculo de Tasa de Retención Operativa (TRO) para Reporte Relámpago
@@ -543,6 +437,17 @@ export default function ReportesBoard() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!reportType) return;
+    if (isSimulation) { showToast('Simulación: reporte revisado, sin escrituras ni envíos.', 'info'); return; }
+    if (reportType === 'Llamadas' && (!reportTarget || !allowedStages.includes(reportStage) || !reviewedCounts || !validCallCounts(formData) || loadingNodus || (!canSwitchAnyCoord && reportSede !== calendarSede(currentUser?.sede)))) {
+      showToast('Selecciona un equipo autorizado y revisa los 14 conteos antes de enviar.', 'warning');
+      return;
+    }
+    const submissionSource = reportSourceStatus(nodusSource, reportTarget);
+    if (reportType === 'Llamadas' && sourceStatus.ready && !submissionSource.ready) {
+      setReviewedCounts(false);
+      showToast('La fuente Nodus venció durante la revisión. Extrae los datos nuevamente.', 'warning');
+      return;
+    }
     setLoading(true);
 
     try {
@@ -568,61 +473,33 @@ export default function ReportesBoard() {
         finalData.sede_id = currentUser?.sede || 'SEDE-LIMA-01';
       }
 
-      // 1. Guardar en Firestore
-      const newReportRef = await addDoc(collection(db, 'reports'), {
+      const report = {
         type: reportType,
-        cycle_id: currentCycle?.id || 'CICLO-2026',
-        stage: currentStage || 'C1',
+        cycle_id: reportType === 'Llamadas' ? `${reportSede}-${reportTarget.label.replace(' ', '-')}` : currentCycle?.id || 'CICLO-2026',
+        stage: reportType === 'Llamadas' ? reportStage : currentStage || 'C1',
         submitted_by: currentUser?.displayName || currentUser?.email || 'Staff Autorizado',
-        sede: currentUser?.sede || formData.sede_id || 'Global',
+        submitted_by_email: currentUser?.email || '',
+        sede: reportType === 'Llamadas' ? reportSede : currentUser?.sede || formData.sede_id || 'Global',
         created_at: new Date().toISOString(),
-        data: finalData
-      });
+        data: finalData,
+        ...(reportType === 'Llamadas' ? {
+          team_number: reportTarget.team,
+          fds_start: reportTarget.start,
+          source: sourceStatus.ready ? 'nodus-reviewed' : 'manual-reviewed',
+          source_updated_at: nodusSource?.sourceUpdatedAt || null,
+          nodus_counts: sourceStatus.counts || null,
+          counts_edited: sourceStatus.ready && Object.keys(sourceStatus.counts).some(key => sourceStatus.counts[key] !== finalData[key])
+        } : {})
+      };
+      const newReportRef = await addDoc(collection(db, 'reports'), report);
 
       // 1.1 Enviar automáticamente al espacio de Google Chat configurado
-      sendReportToGoogleChat({
-        id: newReportRef.id,
-        type: reportType,
-        cycle_id: currentCycle?.id || 'CICLO-2026',
-        stage: currentStage || 'C1',
-        submitted_by: currentUser?.displayName || currentUser?.email || 'Staff Autorizado',
-        sede: currentUser?.sede || formData.sede_id || 'Global',
-        created_at: new Date().toISOString(),
-        data: finalData
+      sendReportToGoogleChat({ id: newReportRef.id, ...report }).then(result => {
+        if (!result.success && result.reason !== 'disabled' && result.reason !== 'not_configured') showToast('Reporte guardado; Google Chat no confirmó la entrega.', 'warning');
       }).catch(chatErr => {
-        console.warn('Google Chat notification fallback:', chatErr);
+        console.warn('Google Chat notification failed:', chatErr);
+        showToast('Reporte guardado; falló el envío a Google Chat.', 'warning');
       });
-
-      // 2. Regla para Llamadas
-      if (reportType === 'Llamadas') {
-        const totalOkNuevos = formData['nuevos_OK'] || 0;
-        const totalOkRezagados = formData['rezagados_OK'] || 0;
-        const totalOk = totalOkNuevos + totalOkRezagados;
-
-        if (totalOk > 0) {
-          const goalsQ = query(collection(db, 'goals'), where('scope', '==', 'ENTRENAMIENTO'));
-          const snapshot = await getDocs(goalsQ);
-          const entGoalDoc = snapshot.docs.find(d => {
-            const dData = d.data();
-            const stageMatches = dData.stage === currentStage || (currentStage?.includes('C1') && dData.stage === 'C1');
-            return stageMatches && (dData.title?.includes('Px') || dData.title?.includes('Sentados') || dData.kpi?.includes('Px'));
-          });
-          
-          if (entGoalDoc) {
-            const data = entGoalDoc.data();
-            const currentVal = data.currentValue || 0;
-            const newVal = currentVal + totalOk;
-            const target = data.targetValue || 1;
-            const newProgress = Math.min(100, Math.round((newVal / target) * 100));
-
-            await updateDoc(doc(db, 'goals', entGoalDoc.id), {
-              currentValue: newVal,
-              progress: newProgress,
-              updatedAt: new Date().toISOString()
-            });
-          }
-        }
-      }
 
       showToast('¡Reporte enviado exitosamente con protocolo Cero Pereza!', 'success');
       setUltimoReporteInfo({
@@ -1079,7 +956,7 @@ export default function ReportesBoard() {
               fontSize: '0.88rem'
             }}>
               <RefreshCw size={16} className="spin" />
-              <span>Buscando y precargando tu último reporte de llamadas registrado...</span>
+              <span>Buscando referencia histórica; no se copiará al formulario.</span>
             </div>
           )}
 
@@ -1099,10 +976,10 @@ export default function ReportesBoard() {
                 <CheckCircle2 size={18} color="#22c55e" />
                 <div>
                   <div>
-                    <strong>Último Reporte Precargado:</strong> {ultimoReporteInfo.submitted_by} ({ultimoReporteInfo.sede})
+                    <strong>Referencia histórica (no precargada):</strong> {ultimoReporteInfo.submitted_by} ({ultimoReporteInfo.sede})
                   </div>
                   <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.1rem' }}>
-                    Registrado: {new Date(ultimoReporteInfo.fecha).toLocaleString()} • Rezagados y datos previos cargados en el formulario.
+                    Registrado: {new Date(ultimoReporteInfo.fecha).toLocaleString()} • No representa al equipo en curso.
                   </div>
                 </div>
               </div>
@@ -1120,9 +997,9 @@ export default function ReportesBoard() {
                   fontWeight: 600,
                   transition: 'all 0.2s'
                 }}
-                title="Limpiar todos los campos e iniciar en cero"
+                title="Vaciar campos sin copiar la referencia histórica"
               >
-                🔄 Limpiar / Nuevo en 0
+                🔄 Vaciar formulario
               </button>
             </div>
           )}
@@ -1135,11 +1012,14 @@ export default function ReportesBoard() {
                   <label className="text-muted" style={{ fontSize: '0.8rem', display: 'block', marginBottom: '0.2rem' }}>{m}</label>
                   <input 
                     type="number" 
+                    min="0"
+                    step="1"
+                    required
                     name={`nuevos_${m}`} 
                     value={formData[`nuevos_${m}`] !== undefined ? formData[`nuevos_${m}`] : ''} 
                     onChange={handleChange} 
                     className="form-input" 
-                    placeholder="0" 
+                    placeholder="Sin dato"
                   />
                 </div>
               ))}
@@ -1152,16 +1032,19 @@ export default function ReportesBoard() {
           <div>
             <h4 className="text-blue" style={{ marginBottom: '1rem', borderBottom: '1px solid rgba(0,212,255,0.2)' }}>Rezagados</h4>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem' }}>
-              {metrics.filter(m => m !== 'OS').map(m => (
+              {metrics.map(m => (
                 <div key={`rezagados_${m}`}>
                   <label className="text-muted" style={{ fontSize: '0.8rem', display: 'block', marginBottom: '0.2rem' }}>{m}</label>
                   <input 
                     type="number" 
                     name={`rezagados_${m}`} 
+                    min="0"
+                    step="1"
+                    required
                     value={formData[`rezagados_${m}`] !== undefined ? formData[`rezagados_${m}`] : ''} 
                     onChange={handleChange} 
                     className="form-input" 
-                    placeholder="0" 
+                    placeholder="Sin dato"
                   />
                 </div>
               ))}
@@ -1174,7 +1057,7 @@ export default function ReportesBoard() {
 
           <div style={{ background: 'rgba(52, 168, 83, 0.1)', border: '1px solid #34a853', padding: '1rem', borderRadius: '8px' }}>
             <p style={{ margin: 0, color: '#34a853', fontSize: '0.9rem' }}>
-              💡 Al enviar este reporte, los "OK" se sumarán automáticamente a la Meta de Entrenamiento activa para evitar doble digitación.
+              Revisa y edita los conteos antes de enviar. Un reporte es una fotografía, no se suman sus OK nuevamente a las metas.
             </p>
           </div>
 
@@ -1201,30 +1084,26 @@ export default function ReportesBoard() {
                     </span>
                   </div>
                   <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-                    Auto-completa los campos de llamadas directamente con los datos auditados en Nodus.
+                    Precarga desde Nodus solo cuando existen conteos verificables. Envío con revisión + clic, no desatendido.
+                  </div>
+                  <div style={{ color: '#fbbf24', fontSize: '0.8rem' }}>
+                    Envío programado bloqueado: falta una política confirmada de destinatarios y frecuencia de reportes.
                   </div>
                 </div>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
                 {/* Selector de Coordinador para perfiles SuperAdmin/Dirección; badge privado para coordinadores. */}
-                {canSwitchAnyCoord && nodusAllCoords.length > 0 ? (
+                {canSwitchAnyCoord ? (
                   <select
-                    value={selectedNodusCoordId || nodusMatchedCoord?.id || ''}
-                    onChange={(e) => {
-                      const newCoordId = e.target.value;
-                      setSelectedNodusCoordId(newCoordId);
-                      handleExtraerDeNodus(null, newCoordId);
-                    }}
+                    value={reportSede}
+                    onChange={e => setReportSede(e.target.value)}
                     className="form-input"
                     style={{ width: 'auto', minWidth: '180px', padding: '0.5rem 0.8rem', fontSize: '0.85rem' }}
-                    title="Seleccionar Coordinador y Sede Nodus"
+                    title="Seleccionar sede"
                   >
-                    {nodusAllCoords.map(c => (
-                      <option key={c.id} value={c.id}>
-                        👤 {c.nombreCompleto || c.nombre} ({c.sede})
-                      </option>
-                    ))}
+                    <option value="">Selecciona sede</option>
+                    {OPERATIONAL_SEDES.map(s => <option key={s} value={calendarSede(s)}>{s}</option>)}
                   </select>
                 ) : (
                   <div style={{
@@ -1239,27 +1118,30 @@ export default function ReportesBoard() {
                     color: '#fff',
                     fontWeight: 600
                   }}>
-                    <span style={{ color: 'var(--crear-cyan, #29abe2)' }}>📍 {nodusMatchedCoord?.sede || currentUser?.sede || 'Mi Sede'}</span>
+                    <span style={{ color: 'var(--crear-cyan, #29abe2)' }}>📍 {reportSede || 'Sin sede autorizada'}</span>
                     <span style={{ color: 'var(--text-muted)' }}>•</span>
-                    <span>👤 {nodusMatchedCoord?.nombreCompleto || nodusMatchedCoord?.nombre || currentUser?.displayName || currentUser?.name}</span>
+                    <span>{reportTarget?.label || 'Selecciona equipo'}</span>
                   </div>
                 )}
+                <select className="form-input" value={reportStage} onChange={e => setReportStage(e.target.value)} aria-label="Etapa del reporte" style={{ width: 'auto' }}>
+                  {!allowedStages.length && <option value="">Sin etapa autorizada</option>}
+                  {allowedStages.map(stage => <option key={stage} value={stage}>{stage}</option>)}
+                </select>
 
                 {nodusEquiposDisponibles.length > 0 && (
                   <select
                     value={selectedNodusTeam}
                     onChange={(e) => {
                       setSelectedNodusTeam(e.target.value);
-                      handleExtraerDeNodus(e.target.value, selectedNodusCoordId);
+                      handleExtraerDeNodus(e.target.value);
                     }}
                     className="form-input"
                     style={{ width: 'auto', minWidth: '170px', padding: '0.5rem 0.8rem', fontSize: '0.85rem' }}
                   >
-                    <option value="auto">⚡ Equipo Activo</option>
-                    <option value="acumulado">📊 Total Acumulado</option>
+                    <option value="auto">{nodusEquiposDisponibles.length === 1 ? 'Equipo del calendario' : 'Selecciona equipo paralelo'}</option>
                     {nodusEquiposDisponibles.map(eq => (
-                      <option key={eq.equipo} value={eq.equipo}>
-                        {eq.equipo} ({eq.confirmado || 0} OK)
+                      <option key={eq.team} value={eq.team}>
+                        {eq.label} · FDS {eq.start}
                       </option>
                     ))}
                   </select>
@@ -1267,8 +1149,8 @@ export default function ReportesBoard() {
 
                 <button
                   type="button"
-                  onClick={() => handleExtraerDeNodus(selectedNodusTeam, selectedNodusCoordId)}
-                  disabled={loadingNodus}
+                  onClick={() => handleExtraerDeNodus(selectedNodusTeam)}
+                  disabled={loadingNodus || loadingEvents || !reportSede || !reportStage}
                   style={{
                     background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
                     color: '#fff',
@@ -1293,11 +1175,15 @@ export default function ReportesBoard() {
 
             {nodusStatusMsg && (
               <div style={{ background: 'rgba(0, 0, 0, 0.35)', padding: '0.6rem 0.9rem', borderRadius: '6px', fontSize: '0.82rem', color: '#38bdf8', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <CheckCircle2 size={16} color="#34d399" />
+                {sourceStatus.ready ? <CheckCircle2 size={16} color="#34d399" /> : <AlertTriangle size={16} color="#fbbf24" />}
                 <span>{nodusStatusMsg}</span>
               </div>
             )}
           </div>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+            <input type="checkbox" checked={reviewedCounts} onChange={e => setReviewedCounts(e.target.checked)} disabled={!reportTarget || !validCallCounts(formData) || loadingNodus} />
+            Revisé sede, etapa, equipo y los conteos de Nuevos y Rezagados{!sourceStatus.ready ? ' (carga manual; Nodus no aporta conteos verificables)' : ''}.
+          </label>
         </div>
       );
     }
@@ -1590,7 +1476,7 @@ export default function ReportesBoard() {
               </div>
               <h3 style={{ margin: '0 0 0.3rem', fontSize: '1.1rem', color: '#fff' }}>📞 Reporte Diario de Llamadas</h3>
               <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.4 }}>
-                Revisión diaria a las 12:00 M (Nuevos y Rezagados). Precarga automática del último reporte y enlace directo a Nodus.
+                Revisión diaria a las 12:00 M (Nuevos y Rezagados). Equipo del calendario y conteos verificables desde Nodus; sin copiar reportes anteriores.
               </p>
             </div>
             )}
@@ -1869,7 +1755,7 @@ export default function ReportesBoard() {
             )}
 
             {reportType && (
-              <button type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', padding: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', fontSize: '1.05rem' }}>
+              <button type="submit" disabled={loading || (reportType === 'Llamadas' && (loadingNodus || loadingEvents || !reportTarget || !reviewedCounts || !validCallCounts(formData)))} className="btn-primary" style={{ width: '100%', padding: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', fontSize: '1.05rem' }}>
                 <Send size={18} /> {loading ? 'Enviando...' : 'Enviar Reporte y Registrar en Causa OS'}
               </button>
             )}

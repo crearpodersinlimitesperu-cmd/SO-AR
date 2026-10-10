@@ -116,3 +116,31 @@ revisadas se ordenan primero; las sugerencias requieren revisiones repetidas y
 usan solo tareas reales por vencer hoy o mañana. **Restablecer mis preferencias**
 borra ese historial local. En simulación no se leen ni se escriben preferencias.
 No se utiliza IA externa ni se añaden permisos a Firestore.
+# Reportes de llamadas desde Nodus
+
+Reportes selecciona el FDS vigente (o el próximo FDS publicado) de la sede y
+etapa autorizadas en el calendario oficial. Si hay equipos paralelos, exige
+selección explícita. El historial es referencia, nunca precarga de Nuevos o
+Rezagados. Los 14 conteos se revisan y pueden editarse antes de enviar; la
+simulación no guarda reportes, metas, revisiones ni configuración, ni envía Chat.
+
+La sincronización publica `nodus_report_sources/{sede}_{stage}`, sin nombres,
+teléfonos ni correos, con reglas por sede y C1/C2. Para la publicación inicial,
+usar el workflow **Nodus report sources and read-only evidence**, modo `publish`;
+modo `audit` realiza únicamente lecturas de producción y muestra evidencia
+agregada. `node scripts/publishNodusReportSources.mjs` también es de solo lectura
+por defecto; `--apply` publica únicamente estas fuentes derivadas.
+
+Se bloquea la precarga si el snapshot supera 24 horas, falta el equipo o Nodus
+no declara la cohorte Nuevos/Rezagados o contiene estados no reconocidos. La
+extracción legacy de `/reporte` no incluye una cohorte explícita: esos registros
+se muestran como **no clasificables**, no como cero ni como datos verificados.
+No se infiere Rezagados a partir de asistencia, del número de equipo o de otro
+reporte. Hasta contar con esa clasificación de Nodus, los conteos requieren
+revisión y carga manual, identificada como `manual-reviewed`.
+
+Se mantiene la revisión diaria existente a las 12:00 y el envío al webhook de
+Chat configurado por sede. No se activa correo programado: `mail-dispatch`
+procesa la cola cada cinco minutos pero no declara destinatarios ni frecuencia
+de reportes de llamadas. Tampoco se vuelven a sumar los OK a metas: son snapshots,
+no incrementos, y hacerlo en cada envío duplicaba participantes.

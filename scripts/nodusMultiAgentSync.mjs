@@ -25,6 +25,7 @@ import {
   summarizeSedeEquipoDiscrepancies
 } from './nodusFuturosImposiblesParser.mjs';
 import { resolveUniqueNameMatch } from '../shared/rrhhSentinelRules.mjs';
+import { publishNodusReportSources } from './publishNodusReportSources.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -1053,6 +1054,7 @@ class NodusDispatcherAgent {
       equiposReporte: safeEquiposReporte
     });
     console.log("✅ [Agente 3 - Despachador] Guardado 'nodus_coordinadores_c1c2/latest'");
+    await publishNodusReportSources(adminDb, { ...normalizedData, timestamp });
 
     // 3. Guardar en historial horario: nodus_kpis_history / snapshot_<timestamp>
     const historyId = `snap_${new Date().getTime()}`;
