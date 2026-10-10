@@ -59,21 +59,9 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
     return () => unsub();
   }, [hasAccess]);
 
-  // Mapeo rápido de managers por teléfono / sede desde allManagersList o managersSheet1
-  const phoneByManagerName = useMemo(() => {
-    const map = {};
-    (data?.managersSheet1 || []).forEach(m => {
-      if (m.nombre) {
-        map[m.nombre.trim().toLowerCase()] = m.telefono || '';
-      }
-    });
-    (allManagersList || []).forEach(m => {
-      if (m.nombre && !map[m.nombre.trim().toLowerCase()]) {
-        map[m.nombre.trim().toLowerCase()] = m.telefono || '';
-      }
-    });
-    return map;
-  }, [data, allManagersList]);
+  const phoneByManagerId = useMemo(() => new Map(
+    allManagersList.filter(m => m.docId).map(m => [m.docId, m.telefono || ''])
+  ), [allManagersList]);
 
   // Lista de entrenadores procesada con filtros y orden
   const processedTrainers = useMemo(() => {
@@ -1608,7 +1596,7 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
                       return m.manager.toLowerCase().includes(q) || m.equipo.toLowerCase().includes(q);
                     })
                     .map((item, idx) => {
-                      const phone = phoneByManagerName[item.manager.trim().toLowerCase()] || item.telefono || '';
+                      const phone = (item.managerDocId && phoneByManagerId.get(item.managerDocId)) || item.telefono || '';
                       const isGrad = item.estado === 'GRADUADO';
                       const isDes = item.estado === 'DESERTOR';
                       return (

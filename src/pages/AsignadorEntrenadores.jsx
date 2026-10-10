@@ -925,6 +925,10 @@ export default function AsignadorEntrenadores() {
     if (nuevoEntrenador === fila.entrenadorAsignado) return;
     setGuardando(`${fila.key}__${fila.slot}`);
     try {
+      const selected = entrenadores.filter(person => person.nombre === nuevoEntrenador);
+      if (nuevoEntrenador && (selected.length !== 1 || !selected[0].email)) {
+        throw new Error('Identidad ambigua o sin email explícito: no se guardó la asignación.');
+      }
       const ref = doc(db, 'asignaciones_entrenadores', fila.key);
       const now = new Date().toISOString();
       const payload = {
@@ -937,6 +941,7 @@ export default function AsignadorEntrenadores() {
         ...campoAsignacionSlot(fila.slot, nuevoEntrenador
           ? {
               entrenador: nuevoEntrenador,
+              entrenadorEmail: selected[0].email.toLowerCase(),
               asignadoPor: currentUser?.name || currentUser?.email || 'desconocido',
               asignadoPorEmail: currentUser?.email || '',
               fechaIso: now,

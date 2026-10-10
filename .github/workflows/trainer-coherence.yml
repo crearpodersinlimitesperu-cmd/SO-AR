@@ -1,0 +1,41 @@
+name: Trainer coherence
+on:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      audit:
+        description: Read-only aggregate production audit (no PII)
+        type: boolean
+        default: false
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --include=optional
+      - run: npm test && node --test src/utils/trainerCoherence.test.js
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - run: npx --yes firebase-tools@15.11.0 emulators:exec --only firestore --project demo-trainer-coherence 'node --test tests/firestore-trainer-coherence.test.mjs'
+      - run: npm run build
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+      - name: Aggregate authorized read-only audit
+        if: github.event_name == 'workflow_dispatch' && inputs.audit
+        run: node scripts/auditTrainerCoherence.mjs
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
