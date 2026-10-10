@@ -606,6 +606,21 @@ service cloud.firestore {
       allow read: if isSuperAdmin();
       allow create: if isAuthenticated();
     }
+    match /trainer_coherence_log/{logId} {
+      allow read: if isSuperAdmin();
+      allow create: if isSuperAdmin()
+        && request.resource.data.keys().hasOnly([
+          'action', 'managerDocId', 'trainerDocId', 'before', 'after', 'actorEmail', 'occurredAt'
+        ])
+        && request.resource.data.action == 'repair_trainer_label'
+        && request.resource.data.actorEmail == email()
+        && request.resource.data.occurredAt == request.time
+        && request.resource.data.managerDocId is string
+        && request.resource.data.trainerDocId is string
+        && request.resource.data.before is string
+        && request.resource.data.after is string;
+      allow update, delete: if false;
+    }
 
     // ASIGNADOR OFICIAL DE ENTRENADORES. La pantalla guarda confirmaciones
     // separadas del calendario fuente y un log inmutable. Solo las personas

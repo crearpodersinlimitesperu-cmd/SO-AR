@@ -28,7 +28,7 @@ test('guide selection follows the existing active view and visibility flags', ()
 });
 
 test('every Managers tab has a specific purpose, not only a generic navigation hint', () => {
-  for (const tab of ['directorio', 'grupales', 'dashboard', 'entrenadores', 'kpis_llamadas', 'liquidacion']) {
+  for (const tab of ['directorio', 'grupales', 'dashboard', 'entrenadores', 'kpis_llamadas', 'coherencia', 'liquidacion']) {
     const help = managersActionHelp[managersTabHelpKeys[tab]];
     assert.ok(help?.label?.trim(), tab);
     assert.ok(help?.text?.trim(), tab);

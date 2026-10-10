@@ -53,6 +53,8 @@ import {
 } from 'lucide-react';
 import CMJDashboard from '../components/CMJDashboard';
 import KPIsEntrenadoresLlamadas from '../components/KPIsEntrenadoresLlamadas';
+import TrainerCoherencePanel from '../components/TrainerCoherencePanel';
+import { isCoherenceAdmin, assertLegacyTrainerEdit, matchesExplicitTrainer } from '../utils/trainerCoherence';
 import { auditAndDeduplicateManagers } from '../services/dataIntegrityAgent';
 import { buildTeamKeyResolver } from '../utils/teamGrouping';
 import defaultKpisData from '../data/kpisEntrenadoresData.json';
@@ -274,7 +276,7 @@ export default function CentroManagers() {
             llamadaFecha: fm.llamadaFecha || prev.llamadaFecha,
             llamadaAsistio: fm.llamadaAsistio || prev.llamadaAsistio,
             telefono: fm.telefono || prev.telefono,
-            entrenador: fm.entrenador || prev.entrenador
+            entrenador: Object.hasOwn(fm, 'entrenador') ? fm.entrenador : prev.entrenador
           };
           canonicalMap.set(key, merged);
         }
@@ -749,9 +751,9 @@ export default function CentroManagers() {
 
     return managers.filter(m => {
       const mSede = normalizeSede(m.sede);
-      const isMyTrainerManager = isTrainerMatch(m.entrenador, currentTrainerName) || 
+      const isMyTrainerManager = matchesExplicitTrainer(m, currentUser) ?? (isTrainerMatch(m.entrenador, currentTrainerName) ||
         (m.entrenadorEmail && userEmail && m.entrenadorEmail.toLowerCase() === userEmail) ||
-        (isLili && ((m.entrenador || '').toLowerCase().includes('cubillo') || (m.entrenador || '').toLowerCase().includes('lili')));
+        (isLili && ((m.entrenador || '').toLowerCase().includes('cubillo') || (m.entrenador || '').toLowerCase().includes('lili'))));
 
       // 1. Filtrado de Visibilidad (Seguridad y Jerarquía)
       if (viewAsTrainer) {
@@ -832,9 +834,9 @@ export default function CentroManagers() {
     const visibleManagers = managers.filter(m => {
       if (!m.equipo) return false;
       const mSede = normalizeSede(m.sede);
-      const isMyTrainerManager = isTrainerMatch(m.entrenador, currentTrainerName) || 
+      const isMyTrainerManager = matchesExplicitTrainer(m, currentUser) ?? (isTrainerMatch(m.entrenador, currentTrainerName) ||
         (m.entrenadorEmail && userEmail && m.entrenadorEmail.toLowerCase() === userEmail) ||
-        (isLili && ((m.entrenador || '').toLowerCase().includes('cubillo') || (m.entrenador || '').toLowerCase().includes('lili')));
+        (isLili && ((m.entrenador || '').toLowerCase().includes('cubillo') || (m.entrenador || '').toLowerCase().includes('lili'))));
 
       // Permisos base de rol
       if (viewAsTrainer) {
@@ -1217,9 +1219,9 @@ export default function CentroManagers() {
       effectiveSede = 'Quito';
     }
 
-    const isMyTrainerManager = (m) => isTrainerMatch(m.entrenador, currentTrainerName) || 
+    const isMyTrainerManager = (m) => matchesExplicitTrainer(m, currentUser) ?? (isTrainerMatch(m.entrenador, currentTrainerName) ||
       (m.entrenadorEmail && userEmail && m.entrenadorEmail.toLowerCase() === userEmail) ||
-      (isLili && ((m.entrenador || '').toLowerCase().includes('cubillo') || (m.entrenador || '').toLowerCase().includes('lili')));
+      (isLili && ((m.entrenador || '').toLowerCase().includes('cubillo') || (m.entrenador || '').toLowerCase().includes('lili'))));
 
     // Si la vista está restringida, calcular stats solo de lo que puede ver
     const baseList = (viewAsTrainer || (!canViewAll && !canViewOwnSede)) 
@@ -1298,6 +1300,7 @@ export default function CentroManagers() {
         sede: targetManager.sede || '',
         [field]: finalValue
       };
+      if (field === 'entrenador') assertLegacyTrainerEdit(targetManager, finalValue);
       
       // Remove any strictly undefined fields (Firestore throws if passed undefined)
       Object.keys(cleanData).forEach(key => cleanData[key] === undefined && delete cleanData[key]);
@@ -2421,6 +2424,7 @@ export default function CentroManagers() {
       const updatedMembers = validMembers.map(m => {
         const memberId = m.id || m.docId || Date.now() + Math.floor(Math.random() * 10000);
         const trainerToUse = userCanAssign ? finalTrainers : (m.entrenador || finalTrainers);
+        assertLegacyTrainerEdit(managers.find(existing => String(existing.docId || existing.id) === String(m.docId || m.id)), trainerToUse);
         return {
           id: memberId,
           docId: m.docId || memberId.toString(),
@@ -2600,6 +2604,7 @@ export default function CentroManagers() {
         };
 
         if (mergeModal.reassignCoach && targetTrainer) {
+          assertLegacyTrainerEdit(m, targetTrainer);
           updatePayload.entrenador = targetTrainer;
           updatePayload.tieneEntrenador = 'Si';
         }
@@ -2684,6 +2689,7 @@ export default function CentroManagers() {
 
     try {
       const trainerToUse = userCanAssign ? finalTrainers : editIndividualModal.entrenador;
+      assertLegacyTrainerEdit(managers.find(m => String(m.id) === String(editIndividualModal.id)), trainerToUse);
       const updatedData = {
         nombre: editIndividualModal.nombre.trim(),
         rol: editIndividualModal.rol || 'Manager',
@@ -2964,6 +2970,9 @@ export default function CentroManagers() {
             ...(userCanViewKPIsLlamadas ? [
               { id: 'kpis_llamadas', icon: BarChart3, label: 'KPIs Llamadas' }
             ] : []),
+            ...(isCoherenceAdmin(currentUser) ? [
+              { id: 'coherencia', icon: ShieldCheck, label: 'Coherencia' }
+            ] : []),
             ...(canViewLiquidacion ? [
               { id: 'liquidacion', icon: DollarSign, label: `Liquidación (${liquidacionData.pendientes.length})` }
             ] : [])
@@ -2986,6 +2995,8 @@ export default function CentroManagers() {
           key={getManagersGuideRole({ viewAsTrainer, canViewAll, canViewOwnSede })}
           role={getManagersGuideRole({ viewAsTrainer, canViewAll, canViewOwnSede })}
         />
+
+        {activeTab === 'coherencia' && isCoherenceAdmin(currentUser) && <TrainerCoherencePanel />}
 
         {/* DIRECTORIO */}
         {activeTab === 'directorio' && (

@@ -3,6 +3,7 @@ import { initializeApp, cert, getApps } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import fs from 'fs';
 import path from 'path';
+import { preserveExplicitTrainerAssignment, coherenceSede, coherenceTeam } from '../src/utils/trainerCoherence.js';
 
 const KEY_FILE = './centro-operativo-cpsl-65ad52160f45.json';
 
@@ -266,7 +267,10 @@ export async function syncKpisLlamadas() {
     }
 
     const mClean = cleanStr(manager);
-    const sheet1Meta = statusByManagerCleanName.get(mClean) || {};
+    const scopedCandidates = managersSheet1.filter(m => cleanStr(m.nombre) === mClean &&
+      coherenceSede(m.sede) === coherenceSede(r[2]) &&
+      coherenceTeam({ equipo: m.nombreEquipo }) === coherenceTeam({ equipo: r[3] }));
+    const sheet1Meta = scopedCandidates.length === 1 ? scopedCandidates[0] : {};
 
     llamadosDetalle.push({
       id: `llam_${i}`,
@@ -460,10 +464,16 @@ export async function syncKpisLlamadas() {
     if (!nodusMgr.nombre || nodusMgr.nombre === '') continue;
     
     // Find if it exists in Firebase (match by exact name and sede)
-    const match = existingManagers.find(em => 
+    const matches = existingManagers.filter(em =>
       normalizeStr(em.nombre) === normalizeStr(nodusMgr.nombre) && 
-      normalizeStr(em.sede) === normalizeStr(nodusMgr.sede)
+      coherenceSede(em.sede) === coherenceSede(nodusMgr.sede) &&
+      coherenceTeam(em) === coherenceTeam(nodusMgr)
     );
+    if (matches.length > 1) {
+      console.warn('Manager ambiguo por sede/equipo: omitido sin escritura.');
+      continue;
+    }
+    const match = matches[0];
 
     const updateData = {
       nombre: nodusMgr.nombre,
@@ -482,7 +492,7 @@ export async function syncKpisLlamadas() {
     if (match) {
       // Update existing
       const docRef = db.collection('managers_directory').doc(match.docId);
-      batch.set(docRef, updateData, { merge: true });
+      batch.set(docRef, preserveExplicitTrainerAssignment(match, updateData), { merge: true });
       updated++;
     } else {
       // Insert new

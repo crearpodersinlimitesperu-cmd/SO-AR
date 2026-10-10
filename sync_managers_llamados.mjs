@@ -31,6 +31,7 @@ import { initializeApp, cert, getApps } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import fs from 'fs';
 import { INITIAL_MANAGERS, INITIAL_LLAMADOS } from './src/data/managersData.js';
+import { preserveExplicitTrainerAssignment, coherenceSede } from './src/utils/trainerCoherence.js';
 
 const KEY_FILE = './centro-operativo-cpsl-65ad52160f45.json';
 
@@ -160,7 +161,10 @@ async function syncManagers() {
   effectiveById.forEach((m, id) => {
     const numId = Number(id);
     if (Number.isFinite(numId) && numId > maxId) maxId = numId;
-    if (m.nombre) keyToId.set(managerMatchKey(m.nombre, m.equipo), id);
+    if (m.nombre) {
+      const scopedKey = `${coherenceSede(m.sede)}__${managerMatchKey(m.nombre, m.equipo)}`;
+      keyToId.set(scopedKey, keyToId.has(scopedKey) ? null : id);
+    }
   });
 
   // 2. Leer la hoja.
@@ -208,10 +212,16 @@ async function syncManagers() {
     const nombre = toProperCase(nombreRaw); // nombre normalizado a formato "Nombre Propio"
     const equipoRaw = col.equipo !== undefined ? (row[col.equipo] || '').toString().trim() : '';
 
-    const key = managerMatchKey(nombreRaw, equipoRaw);
+    const sedeRaw = col.sede !== undefined ? (row[col.sede] || '').toString().trim() : '';
+    const key = `${coherenceSede(sedeRaw)}__${managerMatchKey(nombreRaw, equipoRaw)}`;
+    if (keyToId.has(key) && keyToId.get(key) === null) {
+      console.warn('Manager ambiguo por sede/equipo: omitido sin escritura.');
+      continue;
+    }
     if (seenKeys.has(key)) {
       duplicadosEnHoja++;
-      console.log(`  AVISO: fila ${r + 1} repite a "${nombre}" en el mismo equipo "${equipoRaw}" (ya vista en fila ${seenKeys.get(key) + 1}) — se conserva la ultima version.`);
+      console.warn('Fila duplicada por nombre/sede/equipo: omitida sin sobrescribir.');
+      continue;
     }
     seenKeys.set(key, r);
 
@@ -248,7 +258,7 @@ async function syncManagers() {
       _syncUpdatedAt: new Date().toISOString(),
     };
 
-    batch.set(db.collection('managers_directory').doc(String(docId)), data, { merge: true });
+    batch.set(db.collection('managers_directory').doc(String(docId)), preserveExplicitTrainerAssignment(existingM, data), { merge: true });
     batchCount++;
     if (isNew) creados++; else actualizados++;
 
