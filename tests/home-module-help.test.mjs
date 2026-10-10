@@ -69,7 +69,7 @@ test('module help supports hover, keyboard, viewport edges and mobile without in
       args: ['--no-sandbox']
     });
     const page = await browser.newPage();
-    await page.setViewport({ width: 1280, height: 900 });
+    await page.setViewport({ width: 1280, height: 900, isMobile: false, hasTouch: false });
     const url = `${server.resolvedUrls.local[0]}home-module-help-test`;
     await page.goto(url);
     await page.waitForSelector('[data-module-help]');
@@ -91,6 +91,12 @@ test('module help supports hover, keyboard, viewport edges and mobile without in
     assert.equal(new Set(descriptionIds).size, controls.length);
 
     await controls[0].hover();
+    assert.deepEqual(await page.evaluate(() => ({
+      hoverNone: matchMedia('(hover: none)').matches,
+      coarse: matchMedia('(pointer: coarse)').matches,
+      tooltip: document.querySelector('[role="tooltip"]')?.textContent,
+      display: document.querySelector('[role="tooltip"]') && getComputedStyle(document.querySelector('[role="tooltip"]')).display
+    })), { hoverNone: false, coarse: false, tooltip: homeModuleHelp.horarios, display: 'block' });
     await page.waitForSelector('[role="tooltip"]', { visible: true });
     assert.equal(await page.$eval('[role="tooltip"]', el => el.textContent), homeModuleHelp.horarios);
     await page.hover('[role="tooltip"]');
