@@ -4,6 +4,7 @@ import { formatFlyerC1Dates, parseCalendarDay } from './flyerDates.js';
 const normalize = value => String(value ?? '').normalize('NFD')
   .replace(/[\u0300-\u036f]/g, '').toUpperCase().trim().replace(/\s+/g, ' ');
 const teamPattern = /^(?:EQUIPO\s*#?\s*|EQ\.?\s*#?\s*|E\s*)?(\d+)$/;
+const mjHeading = /^(?:MJ|MAESTRIA DEL JUEGO)(?:\s*#?\s*(\d+)(?:\s*,\s*(\d+)\s*,\s*(\d+))?)?(?:\s*(?:[-:·]\s*)?(?:EQUIPO\s*#?\s*\d+|EQ\.?\s*#?\s*\d+|E\s*\d+))?\.?$/;
 
 function parseTeams(value) {
   const parts = normalize(value).split('*');
@@ -42,8 +43,30 @@ export function flyerTeamVenue(event = {}) {
 export function flyerTeamType(event = {}) {
   const phase = flyerEventType(event);
   if (phase) return phase;
-  return /^(?:MJ|MAESTRIA DEL JUEGO)(?:\s*(?:[-:·]\s*)?(?:EQUIPO\s*#?\s*\d+|EQ\.?\s*#?\s*\d+|E\s*\d+))?\.?$/
+  return mjHeading
     .test(normalize(event.nombre || event.name)) ? 'MJ' : null;
+}
+
+export function flyerMJNumber(event = {}) {
+  if (flyerTeamType(event) !== 'MJ') return null;
+  const heading = normalize(event.nombre || event.name).match(mjHeading);
+  const fields = [event.mjNumero, event.numeroMJ, event.mjNumber]
+    .filter(value => value !== undefined && value !== null && String(value).trim() !== '');
+  if (heading?.[1]) fields.push(heading[1]);
+  if (!fields.length || fields.some(value => !/^\d+$/.test(String(value).trim()))) return null;
+  const numbers = fields.map(value => Number(value));
+  const number = numbers[0];
+  if (!Number.isSafeInteger(number) || number < 1 || numbers.some(value => value !== number)) return null;
+  if (heading?.[2] && (Number(heading[2]) !== number - 1 || Number(heading[3]) !== number - 2)) return null;
+  return number;
+}
+
+export function flyerMJPhases(event) {
+  const number = flyerMJNumber(event);
+  if (number === null) return [];
+  return ['CREACION', 'RELACION', 'GRATITUD'].map((type, offset) => ({
+    type, number: number > offset ? number - offset : null
+  }));
 }
 
 export function flyerTeamsForVenue(events, venueId) {
@@ -88,17 +111,27 @@ export function selectTeamFlyer(events, venueId, teamId) {
       const eventType = flyerTeamType(event);
       const start = event.fecha_inicio || event.start;
       const end = event.fecha_fin || event.end;
-      const key = JSON.stringify([eventType, start, end]);
+      const mjNumber = flyerMJNumber(event);
+      const key = JSON.stringify([eventType, start, end, mjNumber]);
       if (seen.has(key)) continue;
       seen.add(key);
       const validStart = parseCalendarDay(start);
       const dates = validStart ? formatFlyerC1Dates(start, end || start) : 'Fecha no disponible';
-      rows.push({
-        id: `${venueId}-${teamId}-${rows.length}`, ciudad: labels[eventType],
-        fechas: validStart ? `${dates} (${String(start).slice(0, 4)})${end ? '' : ' · fin por confirmar'}` : dates,
-        equipo: `${venue.ciudad} — ${flyerTeamLabel(teamId)}`, source: 'calendario',
-        programType: eventType, activo: true
-      });
+      const phases = flyerMJPhases(event);
+      const entries = phases.length ? phases : [{ type: eventType }];
+      for (const phase of entries) {
+        const unavailable = phase.number === null;
+        rows.push({
+          id: `${venueId}-${teamId}-${rows.length}`,
+          ciudad: `${labels[phase.type]}${phase.number ? ` ${phase.number}` : ''}`,
+          fechas: unavailable ? `Sin fase derivable para MJ ${mjNumber}`
+            : `${validStart ? `${dates} (${String(start).slice(0, 4)})${end ? '' : ' · fin por confirmar'}` : dates}${eventType === 'MJ' && !phases.length ? ' · sin número MJ explícito; sin fases derivables' : ''}`,
+          equipo: `${venue.ciudad} — ${flyerTeamLabel(teamId)}`,
+          source: unavailable ? 'sin-fechas' : 'calendario',
+          programType: phase.type, activo: true,
+          ...(phases.length ? { mjNumber, phaseNumber: phase.number, derivedFrom: 'MJ' } : {})
+        });
+      }
     }
     if (!phaseEvents.length) rows.push({
       id: `${venueId}-${teamId}-${type}`, ciudad: labels[type],

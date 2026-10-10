@@ -6,9 +6,20 @@ exclusivamente esa sede e identidad; cambiar sede borra la selección de equipo.
 Se incluyen fechas históricas y futuras, sin elegir automáticamente el equipo
 más cercano a hoy.
 
-MJ significa **Maestría del Juego**. Un evento genérico de MJ no se convierte
-en Creación, Relación ni Gratitud. Esas fases solo aparecen cuando el evento
-las declara explícitamente. Sin vínculo de equipo se muestra
+MJ significa **Maestría del Juego**. Por regla explícita del dueño del
+10/10/2026, **MJ N → Creación N, Relación N−1, Gratitud N−2**, usando la
+misma fecha del MJ asociado exactamente a sede/equipo. MJ3 produce 3/2/1,
+MJ4 produce 4/3/2 y MJ5 produce 5/4/3. Para MJ1/MJ2, las fases cuyo número
+sería cero o negativo indican `Sin fase derivable para MJ N`, sin fecha.
+No se calculan fechas desplazadas.
+
+El número debe estar explícito en el encabezado `MJ3`, `MJ 3`,
+`MJ 3,2,1` (terna descendente válida), `MAESTRIA DEL JUEGO 3`, o en
+`mjNumero`/`numeroMJ`/`mjNumber`. Campos o encabezados contradictorios
+impiden derivarlo. **`equipo` no es un número MJ**; el ID de evento
+tampoco. Un MJ genérico conserva su fecha e indica
+`sin número MJ explícito; sin fases derivables`. Se conservan las
+subfases etiquetadas explícitamente en los eventos. Sin vínculo de equipo se muestra
 `Fechas no disponibles · sin vínculo explícito`.
 
 La descarga usa PNG 1080x1920; más de seis entradas se distribuyen en páginas
@@ -57,6 +68,14 @@ reconocidos por el clasificador. El Apps Script no expuso `equipoNombre`
 ni `equipoId`; esos campos son compatibilidad probada con fixtures, no
 evidencia de producción.
 
+Una segunda lectura read-only, posterior a la nueva regla, confirmó que
+los 210 MJ del Apps Script y los 84 MJ de la hoja se llaman exclusivamente
+`MAESTRIA DEL JUEGO`. No exponen `mjNumero`, `numeroMJ` ni `mjNumber`;
+el Apps Script solo tiene `equipo` numérico y la hoja lo deja vacío.
+Por tanto, **no hay número MJ explícito verificable para derivar fases
+en esas fuentes actuales**. El soporte de números MJ y ternas está probado
+con fixtures; no se atribuye a los datos productivos.
+
 Para **Lima E32**, ambas fuentes expusieron C1 el **23 de octubre de 2026**
 y C2 el **5 de noviembre de 2026**. El Apps Script declaró finales
 **25 de octubre** y **7 de noviembre**, respectivamente. Ninguna de las dos
@@ -72,7 +91,8 @@ que MJ no exista en la operación, sino que no se puede atribuir con estos datos
 
 `npm run test:flyer-teams` cubre clasificación C1/C2/MJ y FDS explícitos,
 variantes de campos/nombres, E32/E132, sedes paralelas, ausencia,
-contradicciones, fechas históricas, no inferencia de duración y paginación
+contradicciones, fechas históricas, no inferencia de duración, MJ3/4/5,
+bordes MJ1/2, ausencia/conflicto de número MJ y paginación
 sin pérdida. CI ejecuta esta suite además de las regresiones existentes.
 Los fixtures contienen las tres fases y las subfases MJ; los datos leídos
 solo acreditan C1/C2 para Lima E32.

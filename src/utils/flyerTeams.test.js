@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   flyerTeamIds, flyerTeamType, flyerTeamVenue, flyerTeamsForVenue,
-  flyerTeamEvents, selectTeamFlyer, teamFlyerPages
+  flyerTeamEvents, selectTeamFlyer, teamFlyerPages, flyerMJNumber, flyerMJPhases
 } from './flyerTeams.js';
 
 const event = (nombre, equipo = '32', sede = 'LIM', start = '2026-10-23') =>
@@ -97,4 +97,54 @@ test('historical, concurrent and explicit MJ phase dates all persist, with six r
   assert.deepEqual(pages.map(page => page.length), [6, 1]);
   assert.deepEqual(pages.flat(), rows);
   assert.deepEqual(teamFlyerPages([]), []);
+});
+
+test('MJ 3/2/1, 4/3/2 and 5/4/3 derive owner-defined phases using only the exact event date', () => {
+  for (const n of [3, 4, 5]) {
+    for (const nombre of [`MJ ${n}`, `MJ${n}`, `MJ ${n},${n - 1},${n - 2}`, `MAESTRÍA DEL JUEGO ${n} Equipo 32`]) {
+      const source = Object.freeze({ ...event(nombre), fecha_fin: '2026-10-25' });
+      assert.equal(flyerMJNumber(source), n);
+      assert.deepEqual(flyerMJPhases(source), [
+        { type: 'CREACION', number: n }, { type: 'RELACION', number: n - 1 }, { type: 'GRATITUD', number: n - 2 }
+      ]);
+      const fixture = [source, event('MJ 99', '132'), event('MJ 98', '32', 'UIO')];
+      const rows = selectTeamFlyer(fixture, 'lim', 'E32').sedes.filter(row => row.derivedFrom);
+      assert.deepEqual(rows.map(row => row.phaseNumber), [n, n - 1, n - 2]);
+      assert.ok(rows.every(row => row.mjNumber === n && row.equipo === 'Lima — Equipo 32'
+        && row.fechas === '23, 24 y 25 de octubre (2026)'));
+    }
+  }
+});
+
+test('MJ 1 and MJ 2 have no zero/negative phases and missing phases are explicitly labelled', () => {
+  for (const n of [1, 2]) {
+    const rows = selectTeamFlyer([event(`MJ${n}`)], 'lim', 'E32').sedes.filter(row => row.derivedFrom);
+    assert.equal(rows.length, 3);
+    assert.deepEqual(rows.map(row => row.phaseNumber), n === 1 ? [1, null, null] : [2, 1, null]);
+    assert.ok(rows.filter(row => row.phaseNumber === null).every(row =>
+      row.source === 'sin-fechas' && row.fechas === `Sin fase derivable para MJ ${n}`));
+  }
+});
+
+test('MJ number is never inferred from team or unrelated numbers; explicit field conflicts fail closed', () => {
+  for (const source of [
+    event('MJ'), event('MAESTRIA DEL JUEGO'), event('MJ Equipo 32'),
+    event('MJ 0'), event('MJ 3,1,2'), event('MJ -3'),
+    { ...event('MJ 3'), mjNumber: 4 }, { ...event('MJ'), mjNumero: '3x' },
+    { ...event('MJ'), mjNumber: 0 }, { ...event('MJ'), mjNumber: 9007199254740992 }
+  ]) assert.equal(flyerMJNumber(source), null);
+  for (const field of ['mjNumero', 'numeroMJ', 'mjNumber']) {
+    assert.equal(flyerMJNumber({ ...event('MJ'), [field]: 3 }), 3);
+  }
+  assert.equal(flyerMJNumber({ ...event('C1'), mjNumero: 3 }), null);
+  const rows = selectTeamFlyer([event('MAESTRIA DEL JUEGO')], 'lim', 'E32').sedes;
+  assert.match(rows[2].fechas, /sin número MJ explícito; sin fases derivables/);
+  assert.equal(rows[2].derivedFrom, undefined);
+});
+
+test('simultaneous numbered MJ events preserve both phase sets without mutation or date fabrication', () => {
+  const fixture = Object.freeze([Object.freeze(event('MJ3')), Object.freeze(event('MJ4')), Object.freeze(event('MJ4'))]);
+  const rows = selectTeamFlyer(fixture, 'lim', 'E32').sedes.filter(row => row.derivedFrom);
+  assert.deepEqual(rows.map(row => row.phaseNumber), [3, 2, 1, 4, 3, 2]);
+  assert.ok(rows.every(row => row.fechas.includes('fin por confirmar') && !row.fechas.includes('24')));
 });

@@ -599,7 +599,9 @@ export default function GeneradorFlyer() {
             {porEquipo ? <div style={{ background: themeStyles.cardBg, padding: '1.5rem', borderRadius: '20px', color: themeStyles.textTitle }}>
               <h2>Entrenamientos por equipo</h2>
               <p role="status">Fechas explícitas del calendario, incluidas las históricas. MJ = Maestría del Juego.
-                No se calculan FDS ni se vinculan eventos por cercanía. Una fase sin vínculo explícito aparece como no disponible.</p>
+                MJ N declara Creación N, Relación N−1 y Gratitud N−2 con la fecha del mismo evento.
+                Sin número MJ explícito o sin fase positiva se indica que no es derivable.
+                No se calculan otras fechas ni se vinculan eventos por cercanía.</p>
               {seleccionEquipo.error ? <p>{seleccionEquipo.error}</p> : <table style={{ width: '100%', textAlign: 'left' }}>
                 <caption>{FLYER_VENUES.find(venue => venue.id === equipoSedeId)?.ciudad} — {flyerTeamLabel(equipoId)}</caption>
                 <thead><tr><th>Tipo</th><th>Fechas de entrenamiento</th></tr></thead>
