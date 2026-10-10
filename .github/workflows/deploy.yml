@@ -5,9 +5,23 @@ on:
     branches:
       - master
   workflow_dispatch: # Permite lanzar manualmente desde GitHub UI
+  workflow_run:
+    workflows: ["Nodus Flight Monitor Agent (7x Day)"]
+    types: [completed]
+    branches: [master]
+
+concurrency:
+  group: firebase-production-deploy
+  cancel-in-progress: false
 
 jobs:
   build-and-deploy:
+    if: >-
+      github.event_name != 'workflow_run' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.name == 'Nodus Flight Monitor Agent (7x Day)' &&
+       github.event.workflow_run.head_branch == 'master' &&
+       github.event.workflow_run.head_repository.full_name == github.repository)
     name: Build & Deploy
     runs-on: ubuntu-latest
     permissions:
@@ -17,6 +31,13 @@ jobs:
     steps:
       - name: ⬇️ Checkout código
         uses: actions/checkout@v4
+        with:
+          # El sync hace commit después de head_sha: publicar el master actual,
+          # nunca artifacts ni código de la rama que originó un workflow ajeno.
+          ref: ${{ github.event_name == 'workflow_run' && 'refs/heads/master' || github.ref }}
+
+      - name: Registrar revisión publicada
+        run: echo "Deployment source SHA=$(git rev-parse HEAD)" >> "$GITHUB_STEP_SUMMARY"
 
       - name: 🟢 Setup Node.js 22
         uses: actions/setup-node@v4

@@ -6,6 +6,8 @@ import { canAccessMonitorVuelos, canAccessSistemaCartas, canAccessPagosSemanales
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { FLIGHT_DISCLAIMER, loadFlightTracker, flightTimeWindow, matchesFlightTimeFilter, flightDepartureCountdown } from '../utils/flightMonitor';
+import ModuleQuickGuide from '../components/ModuleQuickGuide';
+import { flightMonitorGuide } from '../data/logisticsHelpContent';
 import {
   Plane,
   FileText,
@@ -1113,6 +1115,7 @@ export default function MonitorVuelosCartas() {
       {/* ========================================================= */}
       {activeTab === 'radar' && puedeVerRadar && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          <ModuleQuickGuide guide={flightMonitorGuide} />
           
           {/* Barra de Filtros y Búsqueda de Vuelos */}
           <div className="flight-filters" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
