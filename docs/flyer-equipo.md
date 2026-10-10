@@ -89,6 +89,14 @@ que MJ no exista en la operación, sino que no se puede atribuir con estos datos
 
 ## Cobertura
 
+La guía contextual **Indicaciones de uso**, abierta por defecto y plegable
+con teclado, explica en ambas vistas la selección, preview y descarga.
+Para habilitar el vínculo MJ, el responsable confirma sede/equipo exactos,
+fechas y número MJ explícito en la fuente; el administrador verifica que
+la integración entregue ese campo o nombre admitido a los eventos de Causa OS.
+Agregar una columna no consumida no habilita el vínculo. No se modifican
+la fuente ni su esquema desde la guía.
+
 `npm run test:flyer-teams` cubre clasificación C1/C2/MJ y FDS explícitos,
 variantes de campos/nombres, E32/E132, sedes paralelas, ausencia,
 contradicciones, fechas históricas, no inferencia de duración, MJ3/4/5,

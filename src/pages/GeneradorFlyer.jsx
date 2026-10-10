@@ -7,6 +7,8 @@ import { useTheme } from '../context/ThemeContext';
 import { FLYER_PROGRAMS, FLYER_VENUES, flyerCalendarEvents, flyerCalendarRow, flyerEventDates, flyerEventKey, flyerEventTeam, synchronizeFlyerRows } from '../utils/flyerPrograms';
 import { FLYER_MODE_ALL, FLYER_MODE_SINGLE, flyerFileName, selectFlyerSedes } from '../utils/flyerSedes';
 import { flyerTeamsForVenue, flyerTeamLabel, selectTeamFlyer, teamFlyerPages } from '../utils/flyerTeams';
+import ModuleQuickGuide from '../components/ModuleQuickGuide';
+import { flyerGuide } from '../data/logisticsHelpContent';
 import {
   Sparkles, Download, ArrowLeft, RefreshCw, Plus, Trash2,
   Copy, Sliders, Eye, Terminal, Check,
@@ -480,6 +482,8 @@ export default function GeneradorFlyer() {
             </button>
           </div>}
         </header>
+
+        <ModuleQuickGuide guide={flyerGuide} />
 
         {/* ESTRATEGIA DE ENROLAMIENTO SEGMENTADA */}
         <div style={{ color: themeStyles.textTitle, display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
