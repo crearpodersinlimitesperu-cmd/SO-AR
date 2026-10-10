@@ -454,10 +454,40 @@ service cloud.firestore {
       allow delete: if isSuperAdmin();
     }
 
+    function isReportAdmin() {
+      return isSuperAdmin() || callerHasTaskRole('direccion');
+    }
+
+    function reportScopeAllowed(data) {
+      let profile = exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        ? get(/databases/$(database)/documents/users/$(request.auth.uid)).data : {};
+      let stage = data.get('stage', '');
+      return isReportAdmin() || (
+        isAuthenticated() &&
+        profile.get('sede', '') == data.get('sede', '') &&
+        ((stage == 'C1' && callerHasTaskRole('coord_c1')) ||
+         (stage == 'C2' && callerHasTaskRole('coord_c2')) ||
+         (stage in ['C1', 'C2'] && callerHasTaskRole('coordinador_c1c2')) ||
+         (stage in ['C1', 'C2'] && callerHasTaskRole('gerente')))
+      );
+    }
+
+    match /nodus_report_sources/{sourceId} {
+      allow read: if isAuthenticated() && reportScopeAllowed(resource.data);
+      allow write: if false;
+    }
+
     // REPORTS
     match /reports/{reportId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated();
+      allow read: if isAuthenticated() &&
+        (resource.data.get('type', '') != 'Llamadas' || reportScopeAllowed(resource.data));
+      allow create: if isAuthenticated() &&
+        (request.resource.data.get('type', '') != 'Llamadas' ||
+         (reportScopeAllowed(request.resource.data) &&
+          request.resource.data.get('submitted_by_email', '').lower() == email() &&
+          request.resource.data.get('team_number', '') is string &&
+          request.resource.data.get('team_number', '').matches('[1-9][0-9]*') &&
+          request.resource.data.get('source', '') in ['nodus-reviewed', 'manual-reviewed']));
       allow update, delete: if isGerenteODireccion() || isSuperAdmin();
     }
 

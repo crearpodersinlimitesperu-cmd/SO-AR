@@ -1,0 +1,31 @@
+name: Nodus report sources and read-only evidence
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        type: choice
+        options: [audit, publish]
+        default: audit
+        description: Audit reads only; publish refreshes aggregate sources without modifying Nodus
+permissions:
+  contents: read
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts --include=optional
+      - name: Read-only evidence
+        if: inputs.mode == 'audit'
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: node scripts/publishNodusReportSources.mjs
+      - name: Publish aggregate sources and evidence
+        if: inputs.mode == 'publish'
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: node scripts/publishNodusReportSources.mjs --apply
