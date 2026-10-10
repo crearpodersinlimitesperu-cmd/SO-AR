@@ -157,7 +157,7 @@
                             <span class="text-xs text-gray-300">Disponible 48h antes de cada vuelo con tu código <strong>JYUAGO</strong> y apellido <strong>PATINO</strong>.</span>
                         </div>
                         <div class="grid md:grid-cols-2 gap-5 mt-5">
-                                                        <!-- Ida: Quito -> Lima (Directo LA 1437 con Actualizador Automático en Tiempo Real) -->
+                                                        <!-- Itinerario de ida sincronizado desde Drive -->
                             <div class="bg-gradient-to-br from-gray-800/40 to-gray-900/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden" id="flight-card-la1437">
                                 <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 via-indigo-500 to-cyan-400"></div>
                                 <div class="flex items-center justify-between mb-3">
@@ -166,15 +166,15 @@
                                 </div>
                                 <div class="space-y-3 text-xs">
                                     <div class="p-3.5 bg-gray-900/70 rounded-xl border border-gray-800">
-                                        <!-- Header de estado en tiempo real -->
+                                        <!-- Estado de carga del itinerario -->
                                         <div class="flex justify-between items-center mb-3">
                                             <div class="flex items-center gap-2">
                                                 <span class="font-bold text-crear-accent text-sm tracking-wide">LATAM LA 1437</span>
                                                 <span class="text-[10px] text-gray-400 bg-gray-800 px-1.5 py-0.5 rounded font-mono">UIO &rarr; LIM</span>
                                             </div>
                                             <div class="flex items-center gap-2">
-                                                <span id="flight-live-badge" class="bg-green-500/20 text-green-400 border border-green-500/30 font-bold px-2.5 py-1 rounded-full text-[11px] flex items-center gap-1.5">
-                                                    <i class="fa-solid fa-circle text-[7px] text-green-400 animate-pulse"></i> A tiempo · Directo
+                                                <span id="flight-live-badge" role="status" class="text-cyan-300 font-bold text-[11px]">
+                                                    Cargando itinerario…
                                                 </span>
                                             </div>
                                         </div>
@@ -207,7 +207,7 @@
                                         <div class="space-y-1 mb-3 pt-1 border-t border-gray-800/80">
                                             <div class="flex justify-between items-center text-[10px] text-gray-400">
                                                 <span>Progreso en ruta:</span>
-                                                <span id="flight-live-label" class="font-mono text-cyan-300">Monitoreando estado...</span>
+                                                <span id="flight-live-label" class="font-mono text-cyan-300">Estado real del vuelo no disponible; consultar aerolínea/radar externo</span>
                                             </div>
                                             <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden p-0.5 border border-gray-700/40">
                                                 <div id="flight-live-bar" class="h-full bg-gradient-to-r from-purple-500 via-indigo-500 to-cyan-400 rounded-full transition-all duration-700" style="width: 0%"></div>
@@ -221,7 +221,7 @@
                                                 <span>Recojo estimado para chofer: <strong id="flight-live-pickup" class="text-white font-bold">10:35 AM</strong></span>
                                             </div>
                                             <div class="flex items-center gap-2 text-[10px] text-gray-400">
-                                                <span id="flight-live-sync">Sincronizado</span>
+                                                <span id="flight-live-sync">Sincronización pendiente de carga</span>
                                                 <button id="btn-refresh-flight" onclick="FlightTracker.refresh('LA1437')" class="text-crear-accent hover:text-white bg-gray-800 hover:bg-gray-700 px-2 py-0.5 rounded border border-gray-700 flex items-center gap-1 transition-all" title="Verificar estado del vuelo ahora">
                                                     <i class="fa-solid fa-arrows-rotate"></i> Actualizar
                                                 </button>
