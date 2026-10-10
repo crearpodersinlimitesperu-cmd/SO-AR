@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
 import { canAccessMonitorVuelos, canAccessSistemaCartas, canAccessPagosSemanalesDrive } from '../config/permissions';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../services/firebase';
+import { FLIGHT_DISCLAIMER, loadFlightTracker, flightTimeWindow, matchesFlightTimeFilter } from '../utils/flightMonitor';
 import {
   Plane,
   FileText,
@@ -172,159 +173,6 @@ const SEDES_LOGISTICA = {
     salonOficial: 'Salones de Capacitación y Eventos CDMX',
     salonViaje: 'Sede Campestre México (El Viaje)',
     salonCaminata: 'Centro de Transformación al Aire Libre CDMX'
-  }
-};
-
-const FALLBACK_TRACKER = {
-  updatedAt: "2026-09-03T20:21:23.790Z",
-  flights: {
-    LA1437: {
-      flightNumber: "LA 1437",
-      flightCode: "LA1437",
-      airline: "LATAM Airlines",
-      callsign: "LAN1437",
-      reservationCode: "DJBJJD",
-      passengers: [
-        "Elmer Andrés Idrovo Andrade",
-        "María de Lourdes Patiño"
-      ],
-      route: {
-        origin: "UIO",
-        originCity: "Quito",
-        originAirport: "Aeropuerto Internacional Mariscal Sucre",
-        destination: "LIM",
-        destinationCity: "Lima",
-        destinationAirport: "Aeropuerto Internacional Jorge Chávez",
-        isDirect: true,
-        stops: 0,
-        flightDuration: "2h 15m"
-      },
-      schedule: {
-        departureDate: "2026-09-04",
-        scheduledDeparture: "2026-09-04T07:55:00-05:00",
-        scheduledArrival: "2026-09-04T10:10:00-05:00",
-        estimatedDeparture: "2026-09-04T07:55:00-05:00",
-        estimatedArrival: "2026-09-04T10:10:00-05:00",
-        actualDeparture: null,
-        actualArrival: null
-      },
-      status: "ON_TIME",
-      statusLabel: "A tiempo",
-      statusDescription: "Vuelo confirmado y a tiempo para despegue directo UIO → LIM",
-      delayMinutes: 0,
-      terminal: "T1",
-      gate: "Confirmándose en aeropuerto",
-      baggageClaim: "Por confirmar en arribo",
-      logistics: {
-        pickupLocation: "Puerta de Llegadas Internacionales (Aeropuerto Jorge Chávez)",
-        destination: "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
-        driverPickupEstimated: "10:35 AM",
-        driverNote: "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
-      },
-      radarUrl: "https://www.flightradar24.com/data/flights/la1437",
-      checkInUrl: "https://www.latamairlines.com/pe/es/check-in",
-      relatedLetters: [
-        { name: "Carta Andrés Idrovo", url: "/cartas/carta_andres_idrobo_e30.html" },
-        { name: "Carta Lourdes Patiño", url: "/cartas/carta_lourdes_patino_e29.html" }
-      ]
-    },
-    LA1449: {
-      flightNumber: "LA 1449",
-      flightCode: "LA1449",
-      airline: "LATAM Airlines",
-      callsign: "LAN1449",
-      reservationCode: "DJBJJD",
-      passengers: [
-        "Elmer Andrés Idrovo Andrade"
-      ],
-      route: {
-        origin: "LIM",
-        originCity: "Lima",
-        originAirport: "Aeropuerto Internacional Jorge Chávez",
-        destination: "UIO",
-        destinationCity: "Quito",
-        destinationAirport: "Aeropuerto Internacional Mariscal Sucre",
-        isDirect: false,
-        stops: 1,
-        stopover: "Guayaquil (GYE) - Escala de 4h 00m",
-        flightDuration: "7h 02m (con escala)"
-      },
-      schedule: {
-        departureDate: "2026-09-06",
-        scheduledDeparture: "2026-09-06T23:35:00-05:00",
-        scheduledArrival: "2026-09-07T06:37:00-05:00",
-        estimatedDeparture: "2026-09-06T23:35:00-05:00",
-        estimatedArrival: "2026-09-07T06:37:00-05:00",
-        actualDeparture: null,
-        actualArrival: null
-      },
-      status: "ON_TIME",
-      statusLabel: "Programado · A tiempo",
-      statusDescription: "Vuelo de retorno programado",
-      delayMinutes: 0,
-      terminal: "T1",
-      gate: "Por confirmar",
-      baggageClaim: null,
-      logistics: {
-        pickupLocation: "Lobby del Hotel Jose Antonio Deluxe",
-        driverPickupEstimated: "8:30 PM (20:30 hrs)",
-        destination: "Aeropuerto Jorge Chávez",
-        driverNote: "Recojo 3h antes para vuelo internacional nocturno."
-      },
-      radarUrl: "https://www.flightradar24.com/data/flights/la1449",
-      checkInUrl: "https://www.latamairlines.com/pe/es/check-in",
-      relatedLetters: [
-        { name: "Carta Andrés Idrovo (Retorno)", url: "/cartas/carta_andres_idrobo_e30.html" }
-      ]
-    },
-    AV108: {
-      flightNumber: "AV 108",
-      flightCode: "AV108",
-      airline: "Avianca",
-      callsign: "AVA108",
-      reservationCode: "AVCONF",
-      passengers: [
-        "Alejandro Díaz Pabón"
-      ],
-      route: {
-        origin: "BOG",
-        originCity: "Bogotá",
-        originAirport: "Aeropuerto Internacional El Dorado",
-        destination: "LIM",
-        destinationCity: "Lima",
-        destinationAirport: "Aeropuerto Internacional Jorge Chávez",
-        isDirect: true,
-        stops: 0,
-        flightDuration: "3h 05m"
-      },
-      schedule: {
-        departureDate: "2026-09-04",
-        scheduledDeparture: "2026-09-04T06:15:00-05:00",
-        scheduledArrival: "2026-09-04T09:20:00-05:00",
-        estimatedDeparture: "2026-09-04T06:15:00-05:00",
-        estimatedArrival: "2026-09-04T09:20:00-05:00",
-        actualDeparture: null,
-        actualArrival: null
-      },
-      status: "ON_TIME",
-      statusLabel: "A tiempo",
-      statusDescription: "Vuelo confirmado y a tiempo",
-      delayMinutes: 0,
-      terminal: "T1",
-      gate: "Por confirmar",
-      baggageClaim: "Por confirmar",
-      logistics: {
-        pickupLocation: "Puerta de Llegadas Internacionales (Aeropuerto Jorge Chávez)",
-        destination: "Hotel Jose Antonio Deluxe",
-        driverPickupEstimated: "09:45 AM",
-        driverNote: "Conductor esperará en llegadas internacionales con cartel oficial CPSL."
-      },
-      radarUrl: "https://www.flightradar24.com/data/flights/av108",
-      checkInUrl: "https://www.avianca.com",
-      relatedLetters: [
-        { name: "Carta Alejandro Díaz", url: "/cartas/carta_alejandro_diaz_e28.html" }
-      ]
-    }
   }
 };
 
@@ -759,9 +607,16 @@ export default function MonitorVuelosCartas() {
   const { showToast } = useUI();
   const { currentUser } = useAuth();
   const [activeTab, setActiveTab] = useState('radar'); // 'radar' | 'cartas' | 'logistica'
-  const [trackerData, setTrackerData] = useState(FALLBACK_TRACKER);
+  const [trackerData, setTrackerData] = useState(null);
   const [asignaciones, setAsignaciones] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [trackerError, setTrackerError] = useState('');
+  const [assignmentError, setAssignmentError] = useState('');
+  const [assignmentLoading, setAssignmentLoading] = useState(false);
+  const [autoRefresh, setAutoRefresh] = useState(false);
+  const [now, setNow] = useState(Date.now);
+  const fetchingTracker = useRef(false);
+  const fetchingAssignments = useRef(false);
   const [previewLetter, setPreviewLetter] = useState(null);
   const [searchFilter, setSearchFilter] = useState('');
   const [routeFilter, setRouteFilter] = useState('ALL');
@@ -782,39 +637,68 @@ export default function MonitorVuelosCartas() {
     }
   }, [activeTab, puedeVerRadar, puedeVerCartas]);
 
-  const fetchTrackerData = async () => {
+  const fetchTrackerData = useCallback(async () => {
+    if (!puedeVerRadar || fetchingTracker.current) return;
+    fetchingTracker.current = true;
     setLoading(true);
+    setTrackerError('');
     try {
-      const res = await fetch('/vuelos_tracker.json?t=' + Date.now());
-      if (res.ok) {
-        const data = await res.json();
-        setTrackerData(data);
-        showToast('Radar de vuelos sincronizado en tiempo real', 'success');
-      } else {
-        const res2 = await fetch('/cartas/vuelos_tracker.json?t=' + Date.now());
-        if (res2.ok) {
-          const data2 = await res2.json();
-          setTrackerData(data2);
-          showToast('Radar de vuelos sincronizado', 'success');
-        }
-      }
-    } catch (e) {
-      console.warn('Usando datos de respaldo para tracker de vuelos:', e);
-    } 
-
-    try {
-      const snap = await getDocs(collection(db, 'asignaciones_entrenadores'));
-      setAsignaciones(snap.docs.map(doc => doc.data()));
-    } catch (e) {
-      console.warn('Error fetching asignaciones_entrenadores:', e);
+      setTrackerData(await loadFlightTracker());
+      setNow(Date.now());
+    } catch (error) {
+      setTrackerData(null);
+      setTrackerError(error.message);
     } finally {
       setLoading(false);
+      fetchingTracker.current = false;
     }
-  };
+  }, [puedeVerRadar]);
+
+  const fetchAssignments = useCallback(async () => {
+    if (!puedeVerRadar || fetchingAssignments.current) return;
+    fetchingAssignments.current = true;
+    setAssignmentLoading(true);
+    setAssignmentError('');
+    let timeout;
+    try {
+      const snap = await Promise.race([
+        getDocs(collection(db, 'asignaciones_entrenadores')),
+        new Promise((_, reject) => {
+          timeout = setTimeout(() => reject(new Error('Tiempo de espera agotado')), 15000);
+        })
+      ]);
+      setAsignaciones(snap.docs.map(doc => doc.data()));
+    } catch {
+      setAsignaciones([]);
+      setAssignmentError('Asignaciones de entrenadores no disponibles. La coordinación puede estar incompleta.');
+    } finally {
+      clearTimeout(timeout);
+      setAssignmentLoading(false);
+      fetchingAssignments.current = false;
+    }
+  }, [puedeVerRadar]);
 
   useEffect(() => {
     fetchTrackerData();
-  }, []);
+    fetchAssignments();
+  }, [fetchTrackerData, fetchAssignments]);
+
+  useEffect(() => {
+    if (!puedeVerRadar) return;
+    const timer = setInterval(() => {
+      setNow(Date.now());
+      if (autoRefresh && activeTab === 'radar' && document.visibilityState === 'visible') {
+        fetchTrackerData();
+        fetchAssignments();
+      }
+    }, autoRefresh ? 300000 : 60000);
+    return () => clearInterval(timer);
+  }, [autoRefresh, activeTab, puedeVerRadar, fetchTrackerData, fetchAssignments]);
+
+  const refreshMonitor = () => {
+    fetchTrackerData();
+    fetchAssignments();
+  };
 
   const copyToClipboard = (text, label = 'Información') => {
     navigator.clipboard.writeText(text);
@@ -828,19 +712,21 @@ export default function MonitorVuelosCartas() {
     if (!matchedSede) matchedSede = 'Lima';
     const info = SEDES_LOGISTICA[matchedSede];
 
-    const arrivalTime = new Date(flight.schedule?.estimatedArrival || flight.schedule?.scheduledArrival).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const arrivalDate = new Date(flight.schedule?.scheduledArrival);
+    const arrivalTime = Number.isFinite(arrivalDate.getTime()) ? arrivalDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'No disponible';
 
     const text = `✈️ *CREAR PODER SIN LÍMITES - BRIEFING DE RECOJO DE ENTRENADOR*\n` +
       `📍 *Sede de Llegada:* ${info.nombre} ${info.bandera}\n\n` +
       `📍Œ *Vuelo:* ${flight.flightNumber} (${flight.airline})\n` +
       `ðŸ‘¤ *Pasajero(s):* ${flight.passengers.join(', ')}\n` +
       `ðŸ›« *Ruta:* ${flight.route.originCity} (${flight.route.origin}) ➔ ${flight.route.destinationCity} (${flight.route.destination})\n` +
-      `⏰ *Llegada Estimada:* ${arrivalTime}\n` +
+      `⏰ *Llegada según itinerario:* ${arrivalTime}\n` +
       `📍 *Punto de Recojo:* ${flight.logistics?.pickupLocation || info.puntoEspera}\n` +
       `ðŸ¨ *Destino:* ${info.hotel} (${info.direccion})\n` +
       `ðŸš— *Hora Chofer:* ${flight.logistics?.driverPickupEstimated || '30 min posteriores al aterrizaje'}\n` +
       `ℹ️ *Nota de Protocolo:* ${flight.logistics?.driverNote || 'Conductor esperará en llegadas con cartel oficial CREAR PODER SIN LÍMITES.'}\n` +
-      `🔍— *Radar en vivo:* ${flight.radarUrl}`;
+      `ℹ️ *Estado:* ${FLIGHT_DISCLAIMER}\n` +
+      `🔍— *Radar externo:* ${flight.radarUrl || 'Consultar aerolínea'}`;
     copyToClipboard(text, `Briefing de WhatsApp para chofer (${info.nombre})`);
   };
 
@@ -848,11 +734,7 @@ export default function MonitorVuelosCartas() {
 
   // Filtro de vuelos según Sede seleccionada, estado y rutas
   const filteredFlights = flightsList.filter(f => {
-    const ahora = new Date();
-    const fechaLlegada = new Date(f.schedule?.estimatedArrival || f.schedule?.scheduledArrival);
-    const esPasado = fechaLlegada < ahora;
-    if (flightStatusFilter === 'activos' && esPasado) return false;
-    if (flightStatusFilter === 'pasados' && !esPasado) return false;
+    if (!matchesFlightTimeFilter(f, flightStatusFilter, now)) return false;
 
     // Filtro por Sede seleccionada
     if (selectedSede !== 'TODAS') {
@@ -1034,9 +916,9 @@ export default function MonitorVuelosCartas() {
             </p>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          {puedeVerRadar && <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <button
-              onClick={fetchTrackerData}
+              onClick={refreshMonitor}
               disabled={loading}
               className="btn-secondary"
               style={{
@@ -1049,9 +931,9 @@ export default function MonitorVuelosCartas() {
               }}
             >
               <RefreshCw size={15} className={loading ? 'animate-spin' : ''} />
-              {loading ? 'Actualizando...' : 'Actualizar Radar'}
+              {loading ? 'Actualizando...' : 'Actualizar itinerarios'}
             </button>
-          </div>
+          </div>}
         </div>
 
         {/* SELECTOR GLOBAL DE SEDE OPERATIVA */}
@@ -1139,7 +1021,7 @@ export default function MonitorVuelosCartas() {
               }}
             >
               <Plane size={18} />
-              <span>Radar de Vuelos en Vivo</span>
+              <span>Itinerarios de Vuelos</span>
               <span style={{
                 background: '#38bdf8',
                 color: '#000',
@@ -1227,7 +1109,7 @@ export default function MonitorVuelosCartas() {
               
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                 {[
-                  { id: 'activos', label: 'Activos / Próximos' },
+                  { id: 'activos', label: 'Próximos / En horario estimado' },
                   { id: 'pasados', label: 'Pasados' },
                   { id: 'todos', label: 'Todos' }
                 ].map(t => (
@@ -1277,8 +1159,8 @@ export default function MonitorVuelosCartas() {
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={{
-                  background: 'rgba(52, 211, 153, 0.15)',
-                  color: '#34d399',
+                  background: 'rgba(56, 189, 248, 0.15)',
+                  color: '#38bdf8',
                   padding: '3px 10px',
                   borderRadius: '12px',
                   fontSize: '0.75rem',
@@ -1287,11 +1169,10 @@ export default function MonitorVuelosCartas() {
                   alignItems: 'center',
                   gap: '5px'
                 }}>
-                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#34d399', display: 'inline-block' }}></span>
-                  Motor IA · Vuelos ({trackerData?.totalFlightsIndexed || flightsList.length} indexados · Multisede)
+                  Itinerarios: {flightsList.filter(f => flightTimeWindow(f, now) === 'upcoming').length} próximos · {flightsList.filter(f => flightTimeWindow(f, now) === 'estimated').length} en horario estimado
                 </span>
                 <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                  Sincronizado: <span style={{ color: 'var(--text-main)' }}>{new Date(trackerData?.updatedAt || Date.now()).toLocaleTimeString()}</span>
+                  Itinerarios sincronizados desde Drive · Última sincronización: <span style={{ color: 'var(--text-main)' }}>{trackerData ? new Date(trackerData.updatedAt).toLocaleString() : 'No disponible'}</span>
                 </div>
               </div>
             </div>
@@ -1334,8 +1215,22 @@ export default function MonitorVuelosCartas() {
             </div>
           </div>
 
+          <p>{FLIGHT_DISCLAIMER}. Los horarios no confirman despegue ni aterrizaje.</p>
+          <label>
+            <input type="checkbox" checked={autoRefresh} onChange={e => setAutoRefresh(e.target.checked)} />
+            {' '}Actualizar automáticamente cada 5 minutos (panel visible)
+          </label>
+          {assignmentLoading && <p role="status">Cargando asignaciones; los itinerarios pueden consultarse independientemente.</p>}
+          {assignmentError && <div role="alert"><p>{assignmentError}</p><button onClick={fetchAssignments} disabled={assignmentLoading}>Reintentar asignaciones</button></div>}
           {/* Grid de Vuelos */}
-          {filteredFlights.length === 0 ? (
+          {loading ? (
+            <div className="glass-panel animate-pulse" role="status" aria-busy="true" style={{ padding: '3rem' }}>Cargando itinerarios…</div>
+          ) : trackerError ? (
+            <div className="glass-panel" role="alert" style={{ padding: '2rem' }}>
+              <p>{trackerError}</p>
+              <button onClick={refreshMonitor}>Reintentar</button>
+            </div>
+          ) : filteredFlights.length === 0 ? (
             <div className="glass-panel" style={{ padding: '3rem', textAlign: 'center' }}>
               <Plane size={48} style={{ opacity: 0.3, margin: '0 auto 1rem', display: 'block' }} />
               <h3 style={{ margin: '0 0 0.5rem', color: '#fff' }}>No se encontraron vuelos</h3>
@@ -1348,9 +1243,7 @@ export default function MonitorVuelosCartas() {
           ) : (
             <div className="flight-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '1.2rem' }}>
               {filteredFlights.map((flight, idx) => {
-                const isDelayed = flight.status === 'DELAYED';
-                const isLanded = flight.status === 'LANDED';
-                const schedDep = new Date(flight.schedule?.scheduledDeparture || new Date());
+                const schedDep = new Date(flight.schedule?.scheduledDeparture);
                 
                 // Match exacto
                 const matchedAsignaciones = (asignaciones || []).filter(asig => 
@@ -1418,19 +1311,19 @@ export default function MonitorVuelosCartas() {
                         <div className="flight-card-date">
                           <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Fecha y Hora</div>
                           <div className="flight-card-date-value" style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-main)' }}>
-                            {schedDep.toLocaleDateString([], { timeZone: 'America/Guayaquil' })} {schedDep.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'America/Guayaquil' })}
+                            {Number.isFinite(schedDep.getTime()) ? `${schedDep.toLocaleDateString([], { timeZone: 'America/Guayaquil' })} ${schedDep.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'America/Guayaquil' })}` : 'Fecha no disponible'}
                           </div>
                         </div>
                         <div className="flight-status-wrap">
                           <span className="flight-status-badge" style={{
-                            background: isDelayed ? 'rgba(239, 68, 68, 0.15)' : isLanded ? 'rgba(16, 185, 129, 0.15)' : 'rgba(56, 189, 248, 0.15)',
-                            color: isDelayed ? '#f87171' : isLanded ? '#34d399' : '#38bdf8',
+                            background: 'rgba(56, 189, 248, 0.15)',
+                            color: '#38bdf8',
                             padding: '4px 12px',
                             borderRadius: '12px',
                             fontSize: '0.8rem',
                             fontWeight: 700
                           }}>
-                            {flight.statusLabel || 'PROGRAMADO'}
+                            {flightTimeWindow(flight, now) === 'estimated' ? 'En horario estimado' : flight.statusLabel}
                           </span>
                         </div>
                       </div>
@@ -1531,7 +1424,7 @@ export default function MonitorVuelosCartas() {
                             textDecoration: 'none'
                           }}
                         >
-                          Ver Radar
+                          Consultar radar externo
                         </a>
                       )}
                     </div>

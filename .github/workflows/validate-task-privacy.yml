@@ -11,6 +11,9 @@ on:
       - 'package-lock.json'
       - 'scripts/nodusMultiAgentSync.mjs'
       - 'scripts/mailQueue.js'
+      - 'scripts/sync_drive_vuelos_7xdia.py'
+      - 'public/flight-tracker.js'
+      - 'public/cartas/flight-tracker.js'
       - 'scripts/mailerDaemon.js'
       - 'scripts/publishNodusReportSources.mjs'
       - 'scripts/tests/nodus-report-rules.test.mjs'
@@ -44,7 +47,7 @@ jobs:
         run: npm ci --include=optional
 
       - name: Run tests
-        run: npm test && npm run test:flyer-teams && npm run test:nodus-reports
+        run: npm test && npm run test:flyer-teams && npm run test:nodus-reports && npm run test:flight-monitor
 
       - name: Build production app
         run: npm run build

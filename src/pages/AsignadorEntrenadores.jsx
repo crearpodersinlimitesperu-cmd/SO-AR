@@ -493,11 +493,11 @@ export default function AsignadorEntrenadores() {
     if (!autorizado) return;
     (async () => {
       try {
-        let res = await fetch('/vuelos_tracker.json?t=' + Date.now());
-        if (!res.ok) res = await fetch('/cartas/vuelos_tracker.json?t=' + Date.now());
+        let res = await fetch('/vuelos_tracker.json?t=' + Date.now(), { cache: 'no-store' });
+        if (!res.ok) res = await fetch('/cartas/vuelos_tracker.json?t=' + Date.now(), { cache: 'no-store' });
         if (!res.ok) { setVuelosError(true); return; }
         const data = await res.json();
-        setVuelos(Array.isArray(data) ? data : (data.vuelos || []));
+        setVuelos(Array.isArray(data) ? data : (data.vuelos || Object.values(data.flights || {})));
       } catch {
         setVuelosError(true);
       }

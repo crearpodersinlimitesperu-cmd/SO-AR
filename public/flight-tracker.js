@@ -1,6 +1,6 @@
 /**
- * CREAR PODER SIN LIMITES - Live Flight Tracker Module
- * Sincronizador automatico de vuelos en tiempo real para cartas y Centro Operativo.
+ * CREAR PODER SIN LIMITES - Itinerarios sincronizados desde Drive.
+ * No integra observaciones de estado real de aerolineas.
  */
 
 (function() {
@@ -19,7 +19,7 @@
 
             for (const url of urls) {
                 try {
-                    const res = await fetch(url, { cache: 'no-store' });
+                    const res = await fetch(url, { cache: 'no-store', signal: AbortSignal.timeout(15000) });
                     if (res.ok) {
                         const json = await res.json();
                         if (json && json.flights) {
@@ -27,18 +27,22 @@
                             return json.flights[flightCode] || null;
                         }
                     }
-                } catch (e) {
+                } catch {
                     // Try next URL fallback
                 }
             }
+            this.data = null;
             return null;
         },
 
         calculateProgress(depTimeStr, arrTimeStr) {
             const now = Date.now();
-            const dep = new Date(depTimeStr).getTime();
-            const arr = new Date(arrTimeStr).getTime();
+            const dep = typeof depTimeStr === 'string' ? Date.parse(depTimeStr) : NaN;
+            const arr = typeof arrTimeStr === 'string' ? Date.parse(arrTimeStr) : NaN;
 
+            if (!Number.isFinite(dep) || !Number.isFinite(arr) || arr <= dep) {
+                return { state: 'UNKNOWN', percent: 0, text: 'Horario no disponible' };
+            }
             if (now < dep) {
                 const diffMs = dep - now;
                 const hours = Math.floor(diffMs / 3600000);
@@ -46,13 +50,13 @@
                 return {
                     state: 'PRE_FLIGHT',
                     percent: 0,
-                    text: hours > 0 ? ('Despegue en ' + hours + 'h ' + mins + 'm') : ('Despegue en ' + mins + ' min')
+                    text: hours > 0 ? ('Salida programada en ' + hours + 'h ' + mins + 'm') : ('Salida programada en ' + mins + ' min')
                 };
             } else if (now >= arr) {
                 return {
                     state: 'COMPLETED',
                     percent: 100,
-                    text: 'Vuelo completado / Aterrizado'
+                    text: 'Horario de llegada programado pasado (no confirma aterrizaje)'
                 };
             } else {
                 const total = arr - dep;
@@ -63,7 +67,7 @@
                 return {
                     state: 'IN_FLIGHT',
                     percent: pct,
-                    text: 'En vuelo (' + pct + '%) · Arribo en ' + remMins + ' min'
+                    text: 'En horario estimado (' + pct + '%) · Llegada programada en ' + remMins + ' min'
                 };
             }
         },
@@ -78,94 +82,88 @@
                 hours = hours % 12;
                 hours = hours ? hours : 12;
                 return hours.toString().padStart(2, '0') + ':' + minutes + ' ' + ampm;
-            } catch (e) {
+            } catch {
                 return isoStr;
             }
         },
 
         render(flight) {
-            if (!flight) return;
             this.currentFlight = flight;
 
+            if (!flight) {
+                const badge = document.getElementById('flight-live-badge');
+                if (badge) {
+                    badge.className = 'text-amber-300';
+                    badge.setAttribute('role', 'alert');
+                    badge.textContent = 'Itinerario no disponible; reintentar';
+                }
+                const label = document.getElementById('flight-live-label');
+                if (label) label.textContent = 'Estado real del vuelo no disponible; consultar aerolínea/radar externo';
+                const sync = document.getElementById('flight-live-sync');
+                if (sync) sync.textContent = 'No se pudo cargar la sincronización desde Drive';
+                const bar = document.getElementById('flight-live-bar');
+                if (bar) bar.style.width = '0%';
+                return;
+            }
             const prog = this.calculateProgress(
-                flight.schedule.estimatedDeparture || flight.schedule.scheduledDeparture,
-                flight.schedule.estimatedArrival || flight.schedule.scheduledArrival
+                flight.schedule?.scheduledDeparture,
+                flight.schedule?.scheduledArrival
             );
 
             // Badge element
             const badgeEl = document.getElementById('flight-live-badge');
             if (badgeEl) {
-                if (flight.status === 'DELAYED' || flight.delayMinutes > 0) {
-                    badgeEl.className = 'bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold px-2.5 py-1 rounded-full text-[11px] flex items-center gap-1.5 shadow-[0_0_12px_rgba(245,158,11,0.3)] animate-pulse';
-                    badgeEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-amber-400"></i> Demorado (+' + flight.delayMinutes + ' min)';
-                } else if (prog.state === 'IN_FLIGHT' || flight.status === 'AIRBORNE') {
-                    badgeEl.className = 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-bold px-2.5 py-1 rounded-full text-[11px] flex items-center gap-1.5 shadow-[0_0_12px_rgba(6,182,212,0.3)]';
-                    badgeEl.innerHTML = '<i class="fa-solid fa-plane text-cyan-400 animate-pulse"></i> En vuelo · En ruta';
-                } else if (prog.state === 'COMPLETED' || flight.status === 'LANDED') {
-                    badgeEl.className = 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold px-2.5 py-1 rounded-full text-[11px] flex items-center gap-1.5 shadow-[0_0_12px_rgba(16,185,129,0.3)]';
-                    badgeEl.innerHTML = '<i class="fa-solid fa-check-circle text-emerald-400"></i> Aterrizado en Lima';
-                } else {
-                    badgeEl.className = 'bg-green-500/20 text-green-400 border border-green-500/30 font-bold px-2.5 py-1 rounded-full text-[11px] flex items-center gap-1.5';
-                    badgeEl.innerHTML = '<i class="fa-solid fa-circle text-[7px] text-green-400 animate-pulse"></i> A tiempo · Directo';
-                }
+                badgeEl.className = 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-bold px-2.5 py-1 rounded-full text-[11px]';
+                badgeEl.setAttribute('role', 'status');
+                badgeEl.textContent = prog.state === 'IN_FLIGHT' ? 'En horario estimado' : 'Programado según itinerario';
             }
 
             // Times
             const depEl = document.getElementById('flight-live-dep');
             if (depEl) {
-                depEl.textContent = this.formatTime12h(flight.schedule.estimatedDeparture || flight.schedule.scheduledDeparture);
+                depEl.textContent = this.formatTime12h(flight.schedule?.scheduledDeparture);
             }
             const arrEl = document.getElementById('flight-live-arr');
             if (arrEl) {
-                arrEl.textContent = this.formatTime12h(flight.schedule.estimatedArrival || flight.schedule.scheduledArrival);
-                if (flight.delayMinutes > 0) {
-                    arrEl.className = 'text-amber-400 text-base font-black';
-                } else {
-                    arrEl.className = 'text-green-400 text-base font-black';
-                }
+                arrEl.textContent = this.formatTime12h(flight.schedule?.scheduledArrival);
+                arrEl.className = 'text-cyan-300 text-base font-black';
             }
 
             // Progress bar
             const barEl = document.getElementById('flight-live-bar');
             if (barEl) {
                 barEl.style.width = prog.percent + '%';
-                if (flight.delayMinutes > 0) {
-                    barEl.className = 'h-full bg-gradient-to-r from-amber-500 to-yellow-400 rounded-full transition-all duration-700';
-                } else {
-                    barEl.className = 'h-full bg-gradient-to-r from-purple-500 via-indigo-500 to-cyan-400 rounded-full transition-all duration-700';
-                }
+                barEl.className = 'h-full bg-gradient-to-r from-purple-500 via-indigo-500 to-cyan-400 rounded-full transition-all duration-700';
             }
 
             // Progress label
             const labelEl = document.getElementById('flight-live-label');
             if (labelEl) {
-                labelEl.textContent = prog.text;
+                labelEl.textContent = prog.text + ' · Estado real del vuelo no disponible; consultar aerolínea/radar externo';
             }
 
             // Logistics pickup recalculation
             const pickupEl = document.getElementById('flight-live-pickup');
             if (pickupEl && flight.logistics) {
-                pickupEl.textContent = flight.logistics.driverPickupEstimated || '10:35 AM';
+                pickupEl.textContent = flight.logistics.driverPickupEstimated || 'Horario de recojo no disponible';
             }
 
             // Last sync timestamp
             const syncEl = document.getElementById('flight-live-sync');
             if (syncEl) {
-                const d = new Date();
-                const syncTime = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                syncEl.textContent = 'Actualizado ' + syncTime;
+                const d = new Date(this.data?.updatedAt);
+                syncEl.textContent = 'Itinerarios sincronizados desde Drive · ' +
+                    (Number.isFinite(d.getTime()) ? d.toLocaleString() : 'Fecha no disponible');
             }
         },
 
         async init(flightCode = 'LA1437') {
             const flight = await this.fetchStatus(flightCode);
-            if (flight) {
-                this.render(flight);
-            }
+            this.render(flight);
             if (this.intervalId) clearInterval(this.intervalId);
             this.intervalId = setInterval(async () => {
                 const updated = await this.fetchStatus(flightCode);
-                if (updated) this.render(updated);
+                this.render(updated);
             }, 60000);
         },
 
@@ -177,9 +175,7 @@
                 btn.disabled = true;
             }
             const flight = await this.fetchStatus(flightCode);
-            if (flight) {
-                this.render(flight);
-            }
+            this.render(flight);
             setTimeout(() => {
                 if (btn) {
                     const icon = btn.querySelector('i');

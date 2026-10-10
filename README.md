@@ -1,5 +1,29 @@
 # React + Vite
 
+## Monitor de itinerarios de vuelos
+
+`/monitor-vuelos` conserva los permisos existentes y consulta los itinerarios
+PDF sincronizados desde Drive siete veces al día. No hay proveedor de estado
+en vivo configurado: `SCHEDULED` significa **Programado según itinerario**,
+no confirmado ni a tiempo; retrasos y horarios reales/estimados son `null`.
+El panel normaliza también los archivos antiguos que decían `ON_TIME`.
+Seguimiento real requiere una integración/contrato y credenciales autorizadas.
+
+La última sincronización es la fecha del archivo, no la hora de consulta.
+**Próximos / En horario estimado** incluye salidas futuras y el intervalo
+salida–llegada programado, sin afirmar que el avión está en el aire.
+Al llegar al horario de llegada se clasifica como pasado; si falta una llegada
+válida, una salida ya pasada tampoco se considera activa. Fechas desconocidas
+se consultan en **Todos**. El contador distingue próximos de horario estimado.
+No se presumen vuelos terminados ni aterrizajes.
+
+La carga usa `no-store`, sin respaldo personal hardcodeado, con error accesible
+y reintento. Las asignaciones de Firestore cargan independientemente con aviso
+de degradación. La actualización automática es opcional, cada cinco minutos
+y solo con permiso de monitor y el panel visible. Las cartas usan el mismo
+criterio de horarios y señalan que el radar es una fuente externa.
+Pruebas sin datos personales: `npm run test:flight-monitor`.
+
 ## Espacio personal por uso
 
 El agente local observa solo entradas a módulos del catálogo que realmente
