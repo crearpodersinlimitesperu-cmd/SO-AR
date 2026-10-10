@@ -44,7 +44,7 @@ jobs:
         run: npm ci --include=optional
 
       - name: Run tests
-        run: npm test && npm run test:nodus-reports
+        run: npm test && npm run test:flyer-teams && npm run test:nodus-reports
 
       - name: Build production app
         run: npm run build
