@@ -88,8 +88,13 @@ export function auditTrainerCoherence({ managers = [], users = [], calls = [], c
     });
   }
   const counts = {};
-  for (const finding of findings) counts[finding.code] = (counts[finding.code] || 0) + 1;
-  return { findings, counts, records: { managers: managers.length, users: users.length, calls: calls.length, cmj: cmj.length, sessions: sessions.length } };
+  const countsBySource = {};
+  for (const finding of findings) {
+    counts[finding.code] = (counts[finding.code] || 0) + 1;
+    countsBySource[finding.source] ||= {};
+    countsBySource[finding.source][finding.code] = (countsBySource[finding.source][finding.code] || 0) + 1;
+  }
+  return { findings, counts, countsBySource, records: { managers: managers.length, users: users.length, calls: calls.length, cmj: cmj.length, sessions: sessions.length } };
 }
 
 export function flattenSessionAssignments(documents) {

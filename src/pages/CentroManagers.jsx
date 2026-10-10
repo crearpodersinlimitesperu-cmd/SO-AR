@@ -2462,7 +2462,7 @@ export default function CentroManagers() {
 
     } catch(e) {
       console.error(e);
-      return showToast('Error actualizando equipo en la nube', 'error');
+      return showToast(e.message || 'Error actualizando equipo en la nube', 'error');
     }
 
     recordAuditEvent({

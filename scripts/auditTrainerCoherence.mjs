@@ -18,6 +18,7 @@ const cmj = (historical.Hoja1 || []).slice(2).filter(row => row['MAESTRIA DEL JU
 const report = auditTrainerCoherence({ managers, users, calls, cmj, sessions: flattenSessionAssignments(assignments) });
 console.log(JSON.stringify({
   generatedAt: new Date().toISOString(), mode: 'read-only', records: report.records, counts: report.counts,
+  countsBySource: report.countsBySource,
   repairableLabels: report.findings.filter(finding => finding.repair).length,
   cmjSource: 'repository historical SEGUIMIENTO_EQUIPOS; not live assignments',
   writes: 0,
