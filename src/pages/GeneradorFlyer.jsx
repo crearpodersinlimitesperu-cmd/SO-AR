@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useCycles } from '../context/CyclesContext';
 import { useUI } from '../context/UIContext';
 import { useTheme } from '../context/ThemeContext';
+import { formatFlyerC1Dates, nextFlyerC1Event } from '../utils/flyerDates';
 import {
   Sparkles, Download, ArrowLeft, RefreshCw, Plus, Trash2,
   Copy, Sliders, Eye, Terminal, Check,
@@ -30,11 +31,6 @@ const SEDES_CICLO_INMEDIATO = [
   { id: 'gye', ciudad: 'Guayaquil', fechas: '4, 5 y 6 de septiembre', activo: true, equipo: 'Equipo 37' }
 ];
 
-const MESES = [
-  'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
-  'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
-];
-
 function getCountryFlag(ciudad = '') {
   const c = ciudad.toLowerCase();
   if (c.includes('lima') || c.includes('arequipa') || c.includes('trujillo') || c.includes('cusco') || c.includes('peru') || c.includes('perú')) return '🇵🇪';
@@ -42,25 +38,6 @@ function getCountryFlag(ciudad = '') {
   if (c.includes('medell') || c.includes('bogot') || c.includes('cali') || c.includes('colombia')) return '🇨🇴';
   if (c.includes('méx') || c.includes('mex') || c.includes('guadalajara') || c.includes('monterrey')) return '🇲🇽';
   return '🌐';
-}
-
-function formatEventDates(startStr, endStr) {
-  if (!startStr) return '';
-  const dStart = new Date(startStr.replace('Z', ''));
-  const dEnd = endStr ? new Date(endStr.replace('Z', '')) : dStart;
-
-  const dayStart = dStart.getDate();
-  const dayEnd = dEnd.getDate();
-  const mStart = dStart.getMonth();
-  const mEnd = dEnd.getMonth();
-
-  if (mStart === mEnd) {
-    if (dayEnd - dayStart === 2) {
-      return `${dayStart}, ${dayStart + 1} y ${dayEnd} de ${MESES[mStart]}`;
-    }
-    return `${dayStart} al ${dayEnd} de ${MESES[mStart]}`;
-  }
-  return `${dayStart} de ${MESES[mStart]} al ${dayEnd} de ${MESES[mEnd]}`;
 }
 
 export default function GeneradorFlyer() {
@@ -116,7 +93,6 @@ export default function GeneradorFlyer() {
       return;
     }
 
-    const todayStr = new Date().toISOString().slice(0, 10);
     const sedesConfig = [
       { id: 'mex', ciudad: 'México', patterns: ['MEX', 'CDMX', 'MÉXICO', 'MEXICO'] },
       { id: 'lim', ciudad: 'Lima', patterns: ['LIM', 'LIMA'] },
@@ -127,27 +103,15 @@ export default function GeneradorFlyer() {
     ];
 
     const nuevasSedes = sedesConfig.map(sc => {
-      const c1Events = events.filter(e => {
-        const evName = (e.nombre || e.name || '').toUpperCase();
-        const evSede = (e.sede || e.place || e.sedeTag || '').toUpperCase();
-        const start = (e.fecha_inicio || e.start || '').slice(0, 10);
-
-        const isC1 = evName.includes('CAPITULO UNO') || evName.includes('CAPÍTULO UNO') || evName.startsWith('C1 ');
-        const isSede = sc.patterns.some(p => evSede.includes(p));
-        return isC1 && isSede && start >= todayStr;
-      });
-
-      c1Events.sort((a, b) => new Date(a.fecha_inicio || a.start) - new Date(b.fecha_inicio || b.start));
-
-      if (c1Events.length > 0) {
-        const nextEv = c1Events[0];
-        const fechaFormateada = formatEventDates(nextEv.fecha_inicio || nextEv.start, nextEv.fecha_fin || nextEv.end);
+      const nextEv = nextFlyerC1Event(events, sc.patterns);
+      if (nextEv) {
+        const fechaFormateada = formatFlyerC1Dates(nextEv.fecha_inicio || nextEv.start, nextEv.fecha_fin || nextEv.end);
         return {
           id: sc.id,
           ciudad: sc.ciudad,
           fechas: fechaFormateada || 'Próximamente',
           activo: true,
-          equipo: nextEv.equipo ? `Equipo ${nextEv.equipo}` : ''
+          equipo: nextEv.equipo || nextEv.team ? `Equipo ${nextEv.equipo || nextEv.team}` : ''
         };
       }
 
@@ -157,7 +121,10 @@ export default function GeneradorFlyer() {
 
     setSedes(nuevasSedes);
     setPresetActivo('calendario');
-    showToast?.('¡Fechas sincronizadas con los próximos Capítulos 1 de Causa OS!', 'success');
+    const pendingDates = nuevasSedes.some(sede => sede.fechas.includes('por confirmar'));
+    showToast?.(pendingDates
+      ? 'Fechas sincronizadas. Donde falta el fin se muestran 3 días habituales de C1, con fin por confirmar; verifica antes de publicar.'
+      : '¡Fechas sincronizadas con los próximos Capítulos 1 de Causa OS!', pendingDates ? 'info' : 'success');
   };
 
   const aplicarPreset = (tipo) => {

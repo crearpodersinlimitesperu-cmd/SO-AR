@@ -5,6 +5,20 @@
 3. **Mi Checklist:** Marca tus tareas a medida que las completes. Si requieren evidencia, sube el archivo.
 4. **Mis Metas:** Actualiza el % de avance de tus indicadores.
 
+## Fechas del Generador de Flyer
+
+**Sincronizar con calendario** selecciona el próximo Capítulo Uno por sede y
+conserva su equipo e inicio oficiales. Las fechas se leen como días civiles,
+sin desplazarlas por la zona horaria del navegador. El fin explícito tiene
+prioridad: Quito, Equipo 130, se muestra **30 de octubre al 1 de noviembre**.
+Un evento de un solo día se muestra sin repetirlo como rango.
+
+Si la hoja de respaldo no incluye fin, el flyer aplica únicamente como
+presentación los tres días inclusivos habituales de C1 y añade **(fin por
+confirmar)**, también en la imagen descargada. Verifica ese fin antes de
+publicar. Un fin inválido o anterior al inicio muestra **Fecha por confirmar**,
+sin inventar un rango. No se escriben fechas ni duraciones al calendario remoto.
+
 ## Panel sencillo de Elizabeth
 
 Pulsa **Crear tarea**, escribe el título, selecciona una persona de tu equipo,
