@@ -14,8 +14,17 @@ La última sincronización es la fecha del archivo, no la hora de consulta.
 salida–llegada programado, sin afirmar que el avión está en el aire.
 Al llegar al horario de llegada se clasifica como pasado; si falta una llegada
 válida, una salida ya pasada tampoco se considera activa. Fechas desconocidas
-se consultan en **Todos**. El contador distingue próximos de horario estimado.
+se consultan en **Todos**. El resumen distingue próximos de horario estimado.
 No se presumen vuelos terminados ni aterrizajes.
+
+Todas las tarjetas visibles incluyen una cuenta regresiva hasta
+`schedule.scheduledDeparture`, con días, horas, minutos y segundos según
+corresponda. Se recalcula cada segundo con el reloj del dispositivo y al
+regresar a la pestaña, independientemente de la actualización de itinerarios
+y sin nuevas consultas de datos. Respeta los filtros existentes.
+Al alcanzar la salida muestra **La hora programada ya pasó**; sin fecha válida,
+**Hora programada no disponible**. No usa estados en vivo ni horas estimadas.
+El temporizador tiene etiqueta accesible y no anuncia cada segundo.
 
 La carga usa `no-store`, sin respaldo personal hardcodeado, con error accesible
 y reintento. Las asignaciones de Firestore cargan independientemente con aviso

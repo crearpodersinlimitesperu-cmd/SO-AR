@@ -5,7 +5,7 @@ import { useUI } from '../context/UIContext';
 import { canAccessMonitorVuelos, canAccessSistemaCartas, canAccessPagosSemanalesDrive } from '../config/permissions';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../services/firebase';
-import { FLIGHT_DISCLAIMER, loadFlightTracker, flightTimeWindow, matchesFlightTimeFilter } from '../utils/flightMonitor';
+import { FLIGHT_DISCLAIMER, loadFlightTracker, flightTimeWindow, matchesFlightTimeFilter, flightDepartureCountdown } from '../utils/flightMonitor';
 import {
   Plane,
   FileText,
@@ -685,13 +685,24 @@ export default function MonitorVuelosCartas() {
 
   useEffect(() => {
     if (!puedeVerRadar) return;
+    const tick = () => setNow(Date.now());
+    tick();
+    const timer = setInterval(tick, 1000);
+    document.addEventListener('visibilitychange', tick);
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener('visibilitychange', tick);
+    };
+  }, [puedeVerRadar]);
+
+  useEffect(() => {
+    if (!puedeVerRadar || !autoRefresh) return;
     const timer = setInterval(() => {
-      setNow(Date.now());
-      if (autoRefresh && activeTab === 'radar' && document.visibilityState === 'visible') {
+      if (activeTab === 'radar' && document.visibilityState === 'visible') {
         fetchTrackerData();
         fetchAssignments();
       }
-    }, autoRefresh ? 300000 : 60000);
+    }, 300000);
     return () => clearInterval(timer);
   }, [autoRefresh, activeTab, puedeVerRadar, fetchTrackerData, fetchAssignments]);
 
@@ -1244,6 +1255,7 @@ export default function MonitorVuelosCartas() {
             <div className="flight-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '1.2rem' }}>
               {filteredFlights.map((flight, idx) => {
                 const schedDep = new Date(flight.schedule?.scheduledDeparture);
+                const countdown = flightDepartureCountdown(flight, now);
                 
                 // Match exacto
                 const matchedAsignaciones = (asignaciones || []).filter(asig => 
@@ -1325,6 +1337,28 @@ export default function MonitorVuelosCartas() {
                           }}>
                             {flightTimeWindow(flight, now) === 'estimated' ? 'En horario estimado' : flight.statusLabel}
                           </span>
+                        </div>
+                      </div>
+
+                      <div className="flight-departure-countdown" style={{
+                        background: 'rgba(56,189,248,0.08)',
+                        border: '1px solid rgba(56,189,248,0.25)',
+                        padding: '0.85rem 1rem',
+                        borderRadius: '12px',
+                        marginBottom: '1rem'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: 'var(--text-main)', marginBottom: '6px' }}>
+                          <Clock size={16} aria-hidden="true" />
+                          Hasta la salida programada
+                        </div>
+                        <div role="timer" aria-live="off" aria-label={`Hasta la salida programada: ${countdown.text}`} style={{
+                          fontSize: '1.15rem',
+                          fontWeight: 800,
+                          fontVariantNumeric: 'tabular-nums',
+                          color: countdown.state === 'upcoming' ? '#38bdf8' : 'var(--text-main)',
+                          overflowWrap: 'anywhere'
+                        }}>
+                          {countdown.text}
                         </div>
                       </div>
 
