@@ -5,6 +5,16 @@
 3. **Mi Checklist:** Marca tus tareas a medida que las completes. Si requieren evidencia, sube el archivo.
 4. **Mis Metas:** Actualiza el % de avance de tus indicadores.
 
+## Ayuda de los módulos de Inicio
+
+En la cuadrícula de accesos del modo Pro, pasa el cursor sobre un módulo o
+enfócalo con Tab para leer qué hace. Escape cierra la explicación; Enter,
+Espacio o un clic mantienen la apertura habitual del módulo. En dispositivos
+táctiles, la descripción aparece bajo el nombre sin necesitar un toque previo:
+el primer toque sigue abriendo el módulo. Las descripciones también están
+asociadas a cada botón para lectores de pantalla. No cambian los permisos,
+el orden de los módulos ni sus destinos.
+
 ## Panel sencillo de Elizabeth
 
 Pulsa **Crear tarea**, escribe el título, selecciona una persona de tu equipo,
