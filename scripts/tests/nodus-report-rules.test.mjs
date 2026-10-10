@@ -11,7 +11,7 @@ beforeEach(async () => {
   await env.clearFirestore();
   await env.withSecurityRulesDisabled(async context => {
     const db = context.firestore();
-    for (const [id, role, sede] of [['c1', 'coord_c1', 'Lima'], ['c2', 'coord_c2', 'Lima'], ['other', 'coord_c1', 'Quito']]) {
+    for (const [id, role, sede] of [['c1', 'coord_c1', 'Lima'], ['c2', 'coord_c2', 'Lima'], ['other', 'coord_c1', 'Quito'], ['manager', 'gerente', 'LIM']]) {
       await setDoc(doc(db, 'users', id), { uid: id, email: `${id}@example.test`, role, roles: [role], sede });
     }
     for (const sede of ['Lima', 'Quito']) for (const stage of ['C1', 'C2']) {
@@ -45,4 +45,10 @@ test('C2 is not blocked, admin reads all, anonymous and unassigned users are den
   await assertSucceeds(getDocs(collection(admin, 'reports')));
   await assertFails(getDoc(doc(client('unknown'), 'nodus_report_sources', 'Lima_C1')));
   await assertFails(getDoc(doc(env.unauthenticatedContext().firestore(), 'nodus_report_sources', 'Lima_C1')));
+});
+test('manager views remain scoped to their own sede and source writes stay forbidden', async () => {
+  const db = client('manager');
+  await assertSucceeds(getDocs(query(collection(db, 'reports'), where('sede', '==', 'Lima'))));
+  await assertFails(getDoc(doc(db, 'reports', 'Quito_C1')));
+  await assertFails(setDoc(doc(db, 'nodus_report_sources', 'Lima_C2'), { sede: 'Lima', stage: 'C2' }));
 });

@@ -41,7 +41,7 @@ test('missing/partial/ambiguous data is unavailable, not zero or historic precar
   assert.equal(countNodusTeam({ participantes: [] }).status, 'missing');
   assert.equal(countNodusTeam({ participantes: [], extractionComplete: true }).status, 'ready');
   assert.equal(reportSourceStatus(null, target, now).message, 'Sin datos de Nodus para C1 E32 aún');
-  const source = { sourceUpdatedAt: timestamp, teams: [{ team: '31', status: 'ready', counts: { nuevos_OK: 53 } }] };
+  const source = { sede: 'Lima', stage: 'C1', sourceUpdatedAt: timestamp, teams: [{ team: '31', status: 'ready', counts: { nuevos_OK: 53 } }] };
   assert.equal(reportSourceStatus(source, target, now).ready, false);
   assert.equal(reportSourceStatus({ ...source, sourceUpdatedAt: '2026-09-16T12:00:00Z' }, target, now).ready, false);
 });
@@ -51,6 +51,8 @@ test('published sources have no personal data; duplicate team IDs fail closed', 
   assert.equal(sources.length, 12);
   assert.equal(JSON.stringify(sources).includes('PRIVATE'), false);
   assert.equal(reportSourceStatus(sources[0], target, now).counts.nuevos_OK, 1);
+  assert.equal(reportSourceStatus({ ...sources[0], sede: 'Quito' }, target, now).ready, false);
+  assert.equal(reportSourceStatus({ ...sources[0], stage: 'C2' }, target, now).ready, false);
   assert.deepEqual(buildReportSources({ timestamp, equiposReporte: [team, team] })[0].teams, []);
 });
 test('role stage access is exact and complete numeric counts are required', () => {

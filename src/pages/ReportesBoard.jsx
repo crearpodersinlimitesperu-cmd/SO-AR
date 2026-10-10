@@ -380,11 +380,11 @@ export default function ReportesBoard() {
   // Escuchar reportes en tiempo real para Directivos y Gerentes
   useEffect(() => {
     setDailyReports([]);
-    if (!canViewEvolucionDashboard && !isDireccion && !isGerente) return;
+    if (!canSwitchAnyCoord && !isGerente) return;
     try {
       const qReports = canSwitchAnyCoord
         ? query(collection(db, 'reports'), orderBy('created_at', 'desc'), limit(50))
-        : query(collection(db, 'reports'), where('sede', '==', calendarSede(currentUser?.sede)), where('stage', 'in', ['C1', 'C2']), limit(50));
+        : query(collection(db, 'reports'), where('sede', '==', calendarSede(currentUser?.sede)), limit(50));
       const unsub = onSnapshot(qReports, (snapshot) => {
         const reps = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
         setDailyReports(reps.sort((a, b) => String(b.created_at).localeCompare(String(a.created_at))));

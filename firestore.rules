@@ -458,17 +458,27 @@ service cloud.firestore {
       return isSuperAdmin() || callerHasTaskRole('direccion');
     }
 
+    function reportSedeName(value) {
+      let sede = value.lower();
+      return sede in ['lima', 'lim', 'sede-lima-01'] ? 'Lima' :
+        sede in ['quito', 'uio', 'uio c1', 'uio c2', 'uioc1', 'uioc2'] ? 'Quito' :
+        sede in ['cuenca', 'cue'] ? 'Cuenca' :
+        sede in ['méxico', 'mexico', 'mex', 'cdmx'] ? 'México' :
+        sede in ['guayaquil', 'gye'] ? 'Guayaquil' :
+        sede in ['medellín', 'medellin', 'med'] ? 'Medellín' : value;
+    }
+
     function reportScopeAllowed(data) {
       let profile = exists(/databases/$(database)/documents/users/$(request.auth.uid))
         ? get(/databases/$(database)/documents/users/$(request.auth.uid)).data : {};
       let stage = data.get('stage', '');
       return isReportAdmin() || (
         isAuthenticated() &&
-        profile.get('sede', '') == data.get('sede', '') &&
+        reportSedeName(profile.get('sede', '')) == data.get('sede', '') &&
         ((stage == 'C1' && callerHasTaskRole('coord_c1')) ||
          (stage == 'C2' && callerHasTaskRole('coord_c2')) ||
          (stage in ['C1', 'C2'] && callerHasTaskRole('coordinador_c1c2')) ||
-         (stage in ['C1', 'C2'] && callerHasTaskRole('gerente')))
+         callerHasTaskRole('gerente'))
       );
     }
 
@@ -484,11 +494,17 @@ service cloud.firestore {
       allow create: if isAuthenticated() &&
         (request.resource.data.get('type', '') != 'Llamadas' ||
          (reportScopeAllowed(request.resource.data) &&
+          request.resource.data.get('stage', '') in ['C1', 'C2'] &&
           request.resource.data.get('submitted_by_email', '').lower() == email() &&
           request.resource.data.get('team_number', '') is string &&
           request.resource.data.get('team_number', '').matches('[1-9][0-9]*') &&
           request.resource.data.get('source', '') in ['nodus-reviewed', 'manual-reviewed']));
-      allow update, delete: if isGerenteODireccion() || isSuperAdmin();
+      allow update: if (isGerenteODireccion() || isSuperAdmin()) &&
+        (resource.data.get('type', '') != 'Llamadas' ||
+         (reportScopeAllowed(resource.data) &&
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['sede', 'stage', 'type', 'submitted_by_email', 'team_number'])));
+      allow delete: if (isGerenteODireccion() || isSuperAdmin()) &&
+        (resource.data.get('type', '') != 'Llamadas' || reportScopeAllowed(resource.data));
     }
 
     // USER PROFILES (registro de ├║ltimo login / conexi├│n, doc ID = correo)

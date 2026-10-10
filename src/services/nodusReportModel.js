@@ -76,6 +76,7 @@ export function reportSourceStatus(source, target, now = Date.now()) {
   if (!target) return { ready: false, message: 'Sin equipo vigente o próximo en el calendario para esta sede y etapa.' };
   const missing = `Sin datos de Nodus para ${target.label} aún`;
   if (!source) return { ready: false, message: missing };
+  if (source.sede !== target.sede || source.stage !== target.stage) return { ready: false, message: missing };
   const updated = Date.parse(source.sourceUpdatedAt);
   if (!Number.isFinite(updated) || now - updated > 24 * 60 * 60 * 1000 || updated > now + 60000) {
     return { ready: false, message: `Datos de Nodus desactualizados para ${target.label}. Actualiza la sincronización.` };
