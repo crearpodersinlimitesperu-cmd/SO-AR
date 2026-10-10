@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import { OPERATIONAL_SEDES, normalizeSede } from '../data/usersData';
 import { calendarSede } from '../../functions-imo/calendarModel.mjs';
-import { currentReportTeams, reportStages, reportSourceStatus, validCallCounts } from '../services/nodusReportModel.js';
+import { callTotal, currentReportTeams, reportStages, reportSourceStatus, validCallCounts } from '../services/nodusReportModel.js';
 import { sendReportToGoogleChat, getGoogleChatWebhookConfig, saveGoogleChatWebhookConfig } from '../services/googleChatService';
 
 // POOL MAESTRO DE 12 PREGUNTAS ROTATIVAS (NODUS & CAUSA OS V1.0)
@@ -423,12 +423,7 @@ export default function ReportesBoard() {
   };
 
   const calculateTotalLlamadas = (seccion) => {
-    const keys = ['OK', 'XC', 'NC', 'NI', 'SIG', 'OS', 'PENDIENTES'];
-    let total = 0;
-    keys.forEach(k => {
-      total += (formData[`${seccion}_${k}`] || 0);
-    });
-    return total;
+    return callTotal(formData, seccion) ?? 'Sin datos completos';
   };
 
   // Cálculo de Tasa de Retención Operativa (TRO) para Reporte Relámpago
@@ -1024,7 +1019,7 @@ export default function ReportesBoard() {
                     value={formData[`nuevos_${m}`] !== undefined ? formData[`nuevos_${m}`] : ''} 
                     onChange={handleChange} 
                     className="form-input" 
-                    placeholder="0" 
+                    placeholder="Sin dato"
                   />
                 </div>
               ))}
@@ -1049,7 +1044,7 @@ export default function ReportesBoard() {
                     value={formData[`rezagados_${m}`] !== undefined ? formData[`rezagados_${m}`] : ''} 
                     onChange={handleChange} 
                     className="form-input" 
-                    placeholder="0" 
+                    placeholder="Sin dato"
                   />
                 </div>
               ))}
@@ -1089,7 +1084,10 @@ export default function ReportesBoard() {
                     </span>
                   </div>
                   <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-                    Auto-completa los campos de llamadas directamente con los datos auditados en Nodus.
+                    Precarga desde Nodus solo cuando existen conteos verificables. Envío con revisión + clic, no desatendido.
+                  </div>
+                  <div style={{ color: '#fbbf24', fontSize: '0.8rem' }}>
+                    Envío programado bloqueado: falta una política confirmada de destinatarios y frecuencia de reportes.
                   </div>
                 </div>
               </div>

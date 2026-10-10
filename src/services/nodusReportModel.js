@@ -90,3 +90,8 @@ export function reportSourceStatus(source, target, now = Date.now()) {
 export function validCallCounts(data) {
   return ['nuevos', 'rezagados'].every(group => CALL_METRICS.every(metric => Number.isInteger(data[`${group}_${metric}`]) && data[`${group}_${metric}`] >= 0));
 }
+
+export function callTotal(data, group) {
+  const values = CALL_METRICS.map(metric => data[`${group}_${metric}`]);
+  return values.every(value => Number.isInteger(value) && value >= 0) ? values.reduce((sum, value) => sum + value, 0) : null;
+}

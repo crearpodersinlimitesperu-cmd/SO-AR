@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildReportSources, countNodusTeam, currentReportTeams, nodusTeamScope, reportSourceStatus, reportStages, validCallCounts, REPORT_SEDES, CALL_METRICS } from '../src/services/nodusReportModel.js';
+import { buildReportSources, callTotal, countNodusTeam, currentReportTeams, nodusTeamScope, reportSourceStatus, reportStages, validCallCounts, REPORT_SEDES, CALL_METRICS } from '../src/services/nodusReportModel.js';
 
 const timestamp = '2026-10-10T14:00:00Z';
 const now = Date.parse(timestamp);
@@ -62,5 +62,8 @@ test('role stage access is exact and complete numeric counts are required', () =
   assert.deepEqual(reportStages({ role: 'manager' }), []);
   const counts = Object.fromEntries(['nuevos', 'rezagados'].flatMap(group => CALL_METRICS.map(metric => [`${group}_${metric}`, 0])));
   assert.equal(validCallCounts(counts), true);
+  assert.equal(callTotal(counts, 'nuevos'), 0);
+  assert.equal(callTotal({}, 'nuevos'), null);
+  assert.equal(callTotal({ nuevos_OK: 53 }, 'nuevos'), null);
   for (const value of [-1, 1.5, '', NaN, undefined]) assert.equal(validCallCounts({ ...counts, nuevos_OK: value }), false);
 });

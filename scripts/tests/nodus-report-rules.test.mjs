@@ -26,6 +26,8 @@ test('coordinators can read only their sede and stage, including filtered querie
   await assertSucceeds(getDoc(doc(db, 'nodus_report_sources', 'Lima_C1')));
   await assertFails(getDoc(doc(db, 'nodus_report_sources', 'Lima_C2')));
   await assertFails(getDoc(doc(db, 'nodus_report_sources', 'Quito_C1')));
+  await assertFails(getDocs(collection(db, 'nodus_report_sources')));
+  await assertSucceeds(getDocs(query(collection(db, 'nodus_report_sources'), where('sede', '==', 'Lima'), where('stage', '==', 'C1'))));
   await assertSucceeds(getDocs(query(collection(db, 'reports'), where('type', '==', 'Llamadas'), where('sede', '==', 'Lima'), where('stage', '==', 'C1'))));
   await assertFails(getDocs(collection(db, 'reports')));
   await assertFails(getDoc(doc(db, 'reports', 'Lima_C2')));
