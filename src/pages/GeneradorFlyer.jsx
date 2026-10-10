@@ -5,6 +5,7 @@ import { useCycles } from '../context/CyclesContext';
 import { useUI } from '../context/UIContext';
 import { useTheme } from '../context/ThemeContext';
 import { formatFlyerC1Dates, nextFlyerC1Event } from '../utils/flyerDates';
+import { FLYER_MODE_ALL, FLYER_MODE_SINGLE, flyerFileName, selectFlyerSedes } from '../utils/flyerSedes';
 import {
   Sparkles, Download, ArrowLeft, RefreshCw, Plus, Trash2,
   Copy, Sliders, Eye, Terminal, Check,
@@ -83,6 +84,8 @@ export default function GeneradorFlyer() {
   const [hashtag, setHashtag] = useState('#SOYCREADOR');
   const [sedes, setSedes] = useState(SEDES_ENROLAMIENTO_PROXIMO);
   const [descargando, setDescargando] = useState(false);
+  const [modoFlyer, setModoFlyer] = useState(FLYER_MODE_ALL);
+  const [sedeIndividualId, setSedeIndividualId] = useState('');
   const [presetActivo, setPresetActivo] = useState('enrolamiento');
   const [showCliModal, setShowCliModal] = useState(false);
 
@@ -178,6 +181,13 @@ export default function GeneradorFlyer() {
 
   // Descarga en Alta Resolución 1080x1920 (PNG Oficial)
   const descargarFlyerHD = async () => {
+    const seleccion = selectFlyerSedes(sedes, modoFlyer, sedeIndividualId);
+    if (seleccion.error) {
+      showToast?.(seleccion.error, 'error');
+      return;
+    }
+    const sedesFlyer = seleccion.sedes;
+    const esIndividual = modoFlyer === FLYER_MODE_SINGLE;
     setDescargando(true);
     showToast?.('Generando Flyer Oficial HD (1080x1920) sin alterar el diseño original...', 'info');
 
@@ -252,17 +262,16 @@ export default function GeneradorFlyer() {
       ctx.restore();
 
       // 6. Lista flotante de Sedes y Fechas
-      const activeSedes = sedes.filter(s => s.activo);
-      const totalSedes = activeSedes.length;
-      const startY = 726;
+      const totalSedes = sedesFlyer.length;
+      const startY = esIndividual ? 900 : 726;
       const step = totalSedes > 5 ? 122 : 140;
 
-      activeSedes.forEach((s, idx) => {
+      sedesFlyer.forEach((s, idx) => {
         const y = startY + idx * step;
 
         // Nombre de la Ciudad (dorado/ámbar)
         ctx.save();
-        ctx.font = '700 41px "Montserrat", sans-serif';
+        ctx.font = esIndividual ? '700 64px "Montserrat", sans-serif' : '700 41px "Montserrat", sans-serif';
         if ('letterSpacing' in ctx) ctx.letterSpacing = '1.5px';
         ctx.fillStyle = '#f29e2e';
         ctx.textAlign = 'center';
@@ -274,14 +283,14 @@ export default function GeneradorFlyer() {
 
         // Fechas (blanco elegante)
         ctx.save();
-        ctx.font = '300 30px "Montserrat", sans-serif';
+        ctx.font = esIndividual ? '300 40px "Montserrat", sans-serif' : '300 30px "Montserrat", sans-serif';
         if ('letterSpacing' in ctx) ctx.letterSpacing = '0.5px';
         ctx.fillStyle = '#ffffff';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.shadowColor = 'rgba(255, 255, 255, 0.35)';
         ctx.shadowBlur = 12;
-        ctx.fillText(s.fechas, 540, y + 46);
+        ctx.fillText(s.fechas, 540, y + (esIndividual ? 70 : 46));
         ctx.restore();
       });
 
@@ -306,11 +315,13 @@ export default function GeneradorFlyer() {
       canvas.toBlob((blob) => {
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
-        link.download = `Flyer_Oficial_CPSL_${programa.replace(/\s+/g, '_')}_1080x1920.png`;
+        link.download = flyerFileName(programa, modoFlyer, sedesFlyer[0]);
         link.href = url;
         link.click();
         URL.revokeObjectURL(url);
-        showToast?.('¡Flyer Oficial descargado con éxito en 1080x1920!', 'success');
+        showToast?.(esIndividual
+          ? `¡Flyer de ${sedesFlyer[0].ciudad} descargado con éxito en 1080x1920!`
+          : '¡Flyer Oficial descargado con éxito en 1080x1920!', 'success');
         setDescargando(false);
       }, 'image/png');
 
@@ -321,7 +332,11 @@ export default function GeneradorFlyer() {
     }
   };
 
-  const activeSedesList = sedes.filter(s => s.activo);
+  const seleccionFlyer = selectFlyerSedes(sedes, modoFlyer, sedeIndividualId);
+  const activeSedesList = seleccionFlyer.sedes;
+  const esFlyerIndividual = modoFlyer === FLYER_MODE_SINGLE;
+  const sedesSeleccionables = sedes.filter(s => s.activo);
+  const exportBloqueado = Boolean(seleccionFlyer.error);
 
   return (
     <div style={{
@@ -1085,7 +1100,7 @@ export default function GeneradorFlyer() {
                   {activeSedesList.map(s => (
                     <div key={s.id} style={{ textAlign: 'center' }}>
                       <p style={{
-                        fontSize: activeSedesList.length > 5 ? '13px' : '14.5px',
+                        fontSize: esFlyerIndividual ? '22px' : (activeSedesList.length > 5 ? '13px' : '14.5px'),
                         fontWeight: 700,
                         color: '#f29e2e',
                         lineHeight: 1.15,
@@ -1095,7 +1110,7 @@ export default function GeneradorFlyer() {
                         {s.ciudad}
                       </p>
                       <p style={{
-                        fontSize: activeSedesList.length > 5 ? '9.5px' : '10.5px',
+                        fontSize: esFlyerIndividual ? '14px' : (activeSedesList.length > 5 ? '9.5px' : '10.5px'),
                         fontWeight: 300,
                         color: '#ffffff',
                         letterSpacing: '0.3px',
@@ -1144,9 +1159,69 @@ export default function GeneradorFlyer() {
 
             {/* BOTÓN DE DESCARGA EJECUTIVO */}
             <div style={{ width: '100%', maxWidth: '380px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                <label style={{ fontSize: '0.72rem', fontWeight: 700, color: themeStyles.textMuted, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  Generar flyer
+                </label>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  {[[FLYER_MODE_ALL, 'Todas las sedes'], [FLYER_MODE_SINGLE, 'Una sede']].map(([value, label]) => (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => {
+                        setModoFlyer(value);
+                        if (value === FLYER_MODE_SINGLE && !sedesSeleccionables.some(s => s.id === sedeIndividualId)) {
+                          setSedeIndividualId(sedesSeleccionables[0]?.id || '');
+                        }
+                      }}
+                      aria-pressed={modoFlyer === value}
+                      style={{
+                        flex: 1,
+                        padding: '0.55rem 0.75rem',
+                        borderRadius: '10px',
+                        border: `1px solid ${modoFlyer === value ? '#f59e0b' : themeStyles.cardBorder}`,
+                        background: modoFlyer === value ? 'rgba(245, 158, 11, 0.18)' : 'transparent',
+                        color: modoFlyer === value ? '#f59e0b' : themeStyles.textTitle,
+                        fontWeight: 700,
+                        fontSize: '0.8rem',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+                {esFlyerIndividual && (
+                  <select
+                    value={sedeIndividualId}
+                    onChange={(e) => setSedeIndividualId(e.target.value)}
+                    disabled={!sedesSeleccionables.length}
+                    aria-label="Sede del flyer individual"
+                    style={{
+                      padding: '0.55rem 0.75rem',
+                      borderRadius: '10px',
+                      border: `1px solid ${themeStyles.cardBorder}`,
+                      background: themeStyles.rowBg,
+                      color: themeStyles.textTitle,
+                      fontWeight: 600,
+                      fontSize: '0.85rem'
+                    }}
+                  >
+                    <option value="">Selecciona una sede activa</option>
+                    {sedesSeleccionables.map(s => (
+                      <option key={s.id} value={s.id}>{s.ciudad}{s.equipo ? ` — ${s.equipo}` : ''}</option>
+                    ))}
+                  </select>
+                )}
+                {exportBloqueado && (
+                  <p role="alert" style={{ fontSize: '0.75rem', color: '#ef4444', margin: 0, fontWeight: 600 }}>
+                    {seleccionFlyer.error}
+                  </p>
+                )}
+              </div>
               <button
                 onClick={descargarFlyerHD}
-                disabled={descargando}
+                disabled={descargando || exportBloqueado}
                 style={{
                   width: '100%',
                   padding: '0.9rem 1.25rem',
@@ -1156,18 +1231,22 @@ export default function GeneradorFlyer() {
                   fontSize: '0.88rem',
                   borderRadius: '14px',
                   border: 'none',
-                  cursor: descargando ? 'not-allowed' : 'pointer',
+                  cursor: (descargando || exportBloqueado) ? 'not-allowed' : 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '0.6rem',
                   boxShadow: '0 0 25px rgba(255, 193, 7, 0.45)',
                   transition: 'all 0.2s',
-                  opacity: descargando ? 0.6 : 1
+                  opacity: (descargando || exportBloqueado) ? 0.6 : 1
                 }}
               >
                 <Download size={18} />
-                {descargando ? 'Generando 1080x1920 HD...' : 'Descargar Flyer Oficial (1080×1920 PNG)'}
+                {descargando
+                  ? 'Generando 1080x1920 HD...'
+                  : esFlyerIndividual && activeSedesList[0]
+                    ? `Descargar Flyer ${activeSedesList[0].ciudad} (1080×1920 PNG)`
+                    : 'Descargar Flyer Oficial (1080×1920 PNG)'}
               </button>
               <p style={{ fontSize: '0.72rem', color: themeStyles.textMuted, textAlign: 'center', margin: '0.5rem 0 0 0' }}>
                 Formato 9:16 listo para Instagram Stories, Estados de WhatsApp y Redes Oficiales.
