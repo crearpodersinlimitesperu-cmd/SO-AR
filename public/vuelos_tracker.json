@@ -1,13 +1,389 @@
 {
   "version": "3.2.0-ai-engine",
-  "updatedAt": "2026-10-10T06:41:55.358909Z",
+  "updatedAt": "2026-10-10T15:43:28.135858Z",
   "aiEngineStatus": "ACTIVE",
-  "totalPdfAnalyzed": 463,
-  "totalFlightsIndexed": 322,
-  "totalFlights": 322,
+  "totalPdfAnalyzed": 468,
+  "totalFlightsIndexed": 327,
+  "totalFlights": 327,
   "syncFrequency": "7 veces al día (06:00, 09:00, 12:00, 15:00, 18:00, 21:00, 23:30)",
   "source": "Google Drive Sync (Carpetas Oficiales Vuelos CPSL)",
   "flights": {
+    "LA2393_2026-11-11_MDE_LIM": {
+      "flightNumber": "LA 2393",
+      "flightCode": "LA2393_2026-11-11_MDE_LIM",
+      "airline": "LATAM Airlines",
+      "callsign": "LA2393_2026-11-11_MDE_LIM",
+      "reservationCode": "FEPVBL",
+      "passengers": [
+        "CARLOS GOMEZ GOMEZ"
+      ],
+      "sourcePdf": "Latam Airlines - CUV.pdf",
+      "sourcePath": " / Latam Airlines - CUV.pdf",
+      "route": {
+        "origin": "MDE",
+        "originCity": "Medellín",
+        "originAirport": "Aeropuerto Internacional José María Córdova",
+        "destination": "LIM",
+        "destinationCity": "Lima",
+        "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-11",
+        "scheduledDeparture": "2026-11-11T18:10:00-05:00",
+        "scheduledArrival": "2026-11-11T21:25:00-05:00",
+        "estimatedDeparture": "2026-11-11T18:10:00-05:00",
+        "estimatedArrival": "2026-11-11T21:25:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo con entrenador CARLOS GOMEZ GOMEZ confirmado ruta MDE → LIM",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe Miraflores (Calle Bellavista 133, Miraflores, Lima 15074, Perú)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la2393",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA2392_2026-11-16_LIM_MDE": {
+      "flightNumber": "LA 2392",
+      "flightCode": "LA2392_2026-11-16_LIM_MDE",
+      "airline": "LATAM Airlines",
+      "callsign": "LA2392_2026-11-16_LIM_MDE",
+      "reservationCode": "FEPVBL",
+      "passengers": [
+        "CARLOS GOMEZ GOMEZ"
+      ],
+      "sourcePdf": "Latam Airlines - CUV.pdf",
+      "sourcePath": " / Latam Airlines - CUV.pdf",
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "MDE",
+        "destinationCity": "Medellín",
+        "destinationAirport": "Aeropuerto Internacional José María Córdova",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-16",
+        "scheduledDeparture": "2026-11-16T13:10:00-05:00",
+        "scheduledArrival": "2026-11-16T16:25:00-05:00",
+        "estimatedDeparture": "2026-11-16T13:10:00-05:00",
+        "estimatedArrival": "2026-11-16T16:25:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo con entrenador CARLOS GOMEZ GOMEZ confirmado ruta LIM → MDE",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Salida Puerta 1 Llegadas Internacionales / Nacionales MDE",
+        "destination": "Sede Medellín (Hospedaje por coordinar con Dirección de Sede) (Medellín, Colombia)",
+        "driverPickupEstimated": "35 min posteriores al aterrizaje",
+        "driverNote": "Coordinación de bienvenida y traslado con Sede Medellín."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la2392",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA2393_2026-09-04_LIM_UIO": {
+      "flightNumber": "LA 2393",
+      "flightCode": "LA2393_2026-09-04_LIM_UIO",
+      "airline": "LATAM Airlines",
+      "callsign": "LA2393_2026-09-04_LIM_UIO",
+      "reservationCode": "IRKDAM",
+      "passengers": [
+        "MILDRED MUNOZ VASQUEZ"
+      ],
+      "sourcePdf": "LA5449083OZNK-0499025c-1f89-4513-8926-030f0d0dc5d7-cuv-bill.pdf",
+      "sourcePath": "",
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-04",
+        "scheduledDeparture": "2026-09-04T08:00:00-05:00",
+        "scheduledArrival": "2026-09-04T10:30:00-05:00",
+        "estimatedDeparture": "2026-09-04T08:00:00-05:00",
+        "estimatedArrival": "2026-09-04T10:30:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo con entrenador MILDRED MUNOZ VASQUEZ confirmado ruta LIM → UIO",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
+        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la2393",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA2392_2026-09-04_LIM_UIO": {
+      "flightNumber": "LA 2392",
+      "flightCode": "LA2392_2026-09-04_LIM_UIO",
+      "airline": "LATAM Airlines",
+      "callsign": "LA2392_2026-09-04_LIM_UIO",
+      "reservationCode": "IRKDAM",
+      "passengers": [
+        "MILDRED MUNOZ VASQUEZ"
+      ],
+      "sourcePdf": "LA5449083OZNK-0499025c-1f89-4513-8926-030f0d0dc5d7-cuv-bill.pdf",
+      "sourcePath": "",
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-04",
+        "scheduledDeparture": "2026-09-04T08:00:00-05:00",
+        "scheduledArrival": "2026-09-04T10:30:00-05:00",
+        "estimatedDeparture": "2026-09-04T08:00:00-05:00",
+        "estimatedArrival": "2026-09-04T10:30:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo con entrenador MILDRED MUNOZ VASQUEZ confirmado ruta LIM → UIO",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
+        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la2392",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1445_2026-11-12_UIO_LIM": {
+      "flightNumber": "LA 1445",
+      "flightCode": "LA1445_2026-11-12_UIO_LIM",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1445_2026-11-12_UIO_LIM",
+      "reservationCode": "DXWUSX",
+      "passengers": [
+        "ELMER IDROBO ANDRADE"
+      ],
+      "sourcePdf": "Latam Airlines - CUV.pdf",
+      "sourcePath": " / Latam Airlines - CUV.pdf",
+      "route": {
+        "origin": "UIO",
+        "originCity": "Quito",
+        "originAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "destination": "LIM",
+        "destinationCity": "Lima",
+        "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-12",
+        "scheduledDeparture": "2026-11-12T19:50:00-05:00",
+        "scheduledArrival": "2026-11-12T22:05:00-05:00",
+        "estimatedDeparture": "2026-11-12T19:50:00-05:00",
+        "estimatedArrival": "2026-11-12T22:05:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo con entrenador ELMER IDROBO ANDRADE confirmado ruta UIO → LIM",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe Miraflores (Calle Bellavista 133, Miraflores, Lima 15074, Perú)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1445",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1444_2026-11-15_LIM_UIO": {
+      "flightNumber": "LA 1444",
+      "flightCode": "LA1444_2026-11-15_LIM_UIO",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1444_2026-11-15_LIM_UIO",
+      "reservationCode": "DXWUSX",
+      "passengers": [
+        "ELMER IDROBO ANDRADE"
+      ],
+      "sourcePdf": "Latam Airlines - CUV.pdf",
+      "sourcePath": " / Latam Airlines - CUV.pdf",
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-15",
+        "scheduledDeparture": "2026-11-15T23:30:00-05:00",
+        "scheduledArrival": "2026-11-16T01:55:00-05:00",
+        "estimatedDeparture": "2026-11-15T23:30:00-05:00",
+        "estimatedArrival": "2026-11-16T01:55:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo con entrenador ELMER IDROBO ANDRADE confirmado ruta LIM → UIO",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
+        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1444",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1445_2026-09-04_LIM_UIO": {
+      "flightNumber": "LA 1445",
+      "flightCode": "LA1445_2026-09-04_LIM_UIO",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1445_2026-09-04_LIM_UIO",
+      "reservationCode": "DXWUSX",
+      "passengers": [
+        "ELMER IDROBO ANDRADE"
+      ],
+      "sourcePdf": "Latam Airlines - CUV.pdf",
+      "sourcePath": " / Latam Airlines - CUV.pdf",
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-04",
+        "scheduledDeparture": "2026-09-04T08:00:00-05:00",
+        "scheduledArrival": "2026-09-04T10:30:00-05:00",
+        "estimatedDeparture": "2026-09-04T08:00:00-05:00",
+        "estimatedArrival": "2026-09-04T10:30:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo con entrenador ELMER IDROBO ANDRADE confirmado ruta LIM → UIO",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
+        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1445",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1444_2026-09-04_LIM_UIO": {
+      "flightNumber": "LA 1444",
+      "flightCode": "LA1444_2026-09-04_LIM_UIO",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1444_2026-09-04_LIM_UIO",
+      "reservationCode": "YVCUJD",
+      "passengers": [
+        "LEANDRO BRUNIS AVILES"
+      ],
+      "sourcePdf": "Latam Airlines - CUV.pdf",
+      "sourcePath": " / Latam Airlines - CUV.pdf",
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-04",
+        "scheduledDeparture": "2026-09-04T08:00:00-05:00",
+        "scheduledArrival": "2026-09-04T10:30:00-05:00",
+        "estimatedDeparture": "2026-09-04T08:00:00-05:00",
+        "estimatedArrival": "2026-09-04T10:30:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo con entrenador LEANDRO BRUNIS AVILES confirmado ruta LIM → UIO",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
+        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1444",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
     "LA1351_2026-10-23_UIO_GYE": {
       "flightNumber": "LA 1351",
       "flightCode": "LA1351_2026-10-23_UIO_GYE",
@@ -523,53 +899,6 @@
         "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
       },
       "radarUrl": "https://www.flightradar24.com/data/flights/la1425",
-      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
-    },
-    "LA1444_2026-09-04_LIM_UIO": {
-      "flightNumber": "LA 1444",
-      "flightCode": "LA1444_2026-09-04_LIM_UIO",
-      "airline": "LATAM Airlines",
-      "callsign": "LA1444_2026-09-04_LIM_UIO",
-      "reservationCode": "YVCUJD",
-      "passengers": [
-        "LEANDRO BRUNIS AVILES"
-      ],
-      "sourcePdf": "Latam Airlines - CUV.pdf",
-      "sourcePath": " / Latam Airlines - CUV.pdf",
-      "route": {
-        "origin": "LIM",
-        "originCity": "Lima",
-        "originAirport": "Aeropuerto Internacional Jorge Chávez",
-        "destination": "UIO",
-        "destinationCity": "Quito",
-        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
-        "isDirect": true,
-        "stops": 0,
-        "flightDuration": "2h 15m"
-      },
-      "schedule": {
-        "departureDate": "2026-09-04",
-        "scheduledDeparture": "2026-09-04T08:00:00-05:00",
-        "scheduledArrival": "2026-09-04T10:30:00-05:00",
-        "estimatedDeparture": "2026-09-04T08:00:00-05:00",
-        "estimatedArrival": "2026-09-04T10:30:00-05:00",
-        "actualDeparture": null,
-        "actualArrival": null
-      },
-      "status": "ON_TIME",
-      "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo con entrenador LEANDRO BRUNIS AVILES confirmado ruta LIM → UIO",
-      "delayMinutes": 0,
-      "terminal": "T1",
-      "gate": "Confirmándose en aeropuerto",
-      "baggageClaim": "Por confirmar en arribo",
-      "logistics": {
-        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
-        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
-        "driverPickupEstimated": "30 min posteriores al aterrizaje",
-        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
-      },
-      "radarUrl": "https://www.flightradar24.com/data/flights/la1444",
       "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
     },
     "LA1351_2026-10-09_UIO_GYE": {
@@ -1179,100 +1508,6 @@
         "destination": "Sede Medellín (Hospedaje por coordinar con Dirección de Sede) (Medellín, Colombia)",
         "driverPickupEstimated": "35 min posteriores al aterrizaje",
         "driverNote": "Coordinación de bienvenida y traslado con Sede Medellín."
-      },
-      "radarUrl": "https://www.flightradar24.com/data/flights/la2392",
-      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
-    },
-    "LA2393_2026-09-04_LIM_UIO": {
-      "flightNumber": "LA 2393",
-      "flightCode": "LA2393_2026-09-04_LIM_UIO",
-      "airline": "LATAM Airlines",
-      "callsign": "LA2393_2026-09-04_LIM_UIO",
-      "reservationCode": "IRKDAM",
-      "passengers": [
-        "MILDRED MUNOZ VASQUEZ"
-      ],
-      "sourcePdf": "LA5449083OZNK-0499025c-1f89-4513-8926-030f0d0dc5d7-cuv-bill.pdf",
-      "sourcePath": "",
-      "route": {
-        "origin": "LIM",
-        "originCity": "Lima",
-        "originAirport": "Aeropuerto Internacional Jorge Chávez",
-        "destination": "UIO",
-        "destinationCity": "Quito",
-        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
-        "isDirect": true,
-        "stops": 0,
-        "flightDuration": "2h 15m"
-      },
-      "schedule": {
-        "departureDate": "2026-09-04",
-        "scheduledDeparture": "2026-09-04T08:00:00-05:00",
-        "scheduledArrival": "2026-09-04T10:30:00-05:00",
-        "estimatedDeparture": "2026-09-04T08:00:00-05:00",
-        "estimatedArrival": "2026-09-04T10:30:00-05:00",
-        "actualDeparture": null,
-        "actualArrival": null
-      },
-      "status": "ON_TIME",
-      "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo con entrenador MILDRED MUNOZ VASQUEZ confirmado ruta LIM → UIO",
-      "delayMinutes": 0,
-      "terminal": "T1",
-      "gate": "Confirmándose en aeropuerto",
-      "baggageClaim": "Por confirmar en arribo",
-      "logistics": {
-        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
-        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
-        "driverPickupEstimated": "30 min posteriores al aterrizaje",
-        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
-      },
-      "radarUrl": "https://www.flightradar24.com/data/flights/la2393",
-      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
-    },
-    "LA2392_2026-09-04_LIM_UIO": {
-      "flightNumber": "LA 2392",
-      "flightCode": "LA2392_2026-09-04_LIM_UIO",
-      "airline": "LATAM Airlines",
-      "callsign": "LA2392_2026-09-04_LIM_UIO",
-      "reservationCode": "IRKDAM",
-      "passengers": [
-        "MILDRED MUNOZ VASQUEZ"
-      ],
-      "sourcePdf": "LA5449083OZNK-0499025c-1f89-4513-8926-030f0d0dc5d7-cuv-bill.pdf",
-      "sourcePath": "",
-      "route": {
-        "origin": "LIM",
-        "originCity": "Lima",
-        "originAirport": "Aeropuerto Internacional Jorge Chávez",
-        "destination": "UIO",
-        "destinationCity": "Quito",
-        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
-        "isDirect": true,
-        "stops": 0,
-        "flightDuration": "2h 15m"
-      },
-      "schedule": {
-        "departureDate": "2026-09-04",
-        "scheduledDeparture": "2026-09-04T08:00:00-05:00",
-        "scheduledArrival": "2026-09-04T10:30:00-05:00",
-        "estimatedDeparture": "2026-09-04T08:00:00-05:00",
-        "estimatedArrival": "2026-09-04T10:30:00-05:00",
-        "actualDeparture": null,
-        "actualArrival": null
-      },
-      "status": "ON_TIME",
-      "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo con entrenador MILDRED MUNOZ VASQUEZ confirmado ruta LIM → UIO",
-      "delayMinutes": 0,
-      "terminal": "T1",
-      "gate": "Confirmándose en aeropuerto",
-      "baggageClaim": "Por confirmar en arribo",
-      "logistics": {
-        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
-        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
-        "driverPickupEstimated": "30 min posteriores al aterrizaje",
-        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
       },
       "radarUrl": "https://www.flightradar24.com/data/flights/la2392",
       "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
