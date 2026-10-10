@@ -123,7 +123,7 @@ export default function GeneradorFlyer() {
     setPresetActivo('calendario');
     const pendingDates = nuevasSedes.some(sede => sede.fechas.includes('por confirmar'));
     showToast?.(pendingDates
-      ? 'Fechas sincronizadas. Donde falta el fin se muestran 3 días habituales de C1, con fin por confirmar; verifica antes de publicar.'
+      ? 'Fechas sincronizadas. Algunas fechas requieren revisión antes de publicar.'
       : '¡Fechas sincronizadas con los próximos Capítulos 1 de Causa OS!', pendingDates ? 'info' : 'success');
   };
 
