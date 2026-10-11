@@ -7,8 +7,9 @@ import { useCycles } from '../context/CyclesContext';
 import { useUI } from '../context/UIContext';
 import { ArrowLeft, Target, Settings, GitMerge, Users, UserPlus, Award, CheckCircle2, Plus, Edit3, Calendar, Clock, Sparkles, Check, FileSpreadsheet, Eye, RefreshCw, X, Search, Filter, PhoneCall, ChevronRight, Phone, MessageSquare, BarChart2, TrendingUp, UserCheck, Shield, Bot, Zap, ShieldCheck, Activity } from 'lucide-react';
 import GoalDivisionModal from '../components/GoalDivisionModal';
-import { normalizeSede } from '../data/usersData';
-import nodusFallbackData from '../data/nodusFallbackData.json';
+import { normalizeSede, getRoleDisplayName } from '../data/usersData';
+import { goalProgress, assignedQuotaTotals, isCallConfirmationGoal } from '../services/goalProgress';
+import { goalsAccess, visibleGoalsForUser } from '../services/goalsVisibility';
 import { auditSingleGoal, auditAllGoals, extractTeamNumber } from '../services/goalsSentinelAgent';
 import { organizeGoalsByTeam, mjStageForTeam, explicitGoalTeam, goalStageKey, localDateKey } from '../services/goalsTimeline';
 
@@ -19,15 +20,9 @@ export default function GoalsBoard() {
   const navigate = useNavigate();
   const [goals, setGoals] = useState([]);
   const [loading, setLoading] = useState(true);
-  const role = (currentUser?.activeRole || currentUser?.appRole || currentUser?.role || '').toLowerCase();
-  const roles = (currentUser?.roles || []).map(r => String(r).toLowerCase());
-  const canViewGoals = Boolean(
-    currentUser?.isSuperAdmin ||
-    currentUser?.isDireccion ||
-    currentUser?.isGerente ||
-    ['gerente', 'direccion', 'cfo', 'ceo', 'cco', 'director_maestria', 'superadmin', 'consolidado', 'coord_c1', 'coordinador_c1c2', 'coord_c2', 'coord_maestria', 'coordinador_mj'].includes(role) ||
-    roles.some(r => ['gerente', 'direccion', 'cfo', 'ceo', 'cco', 'director_maestria', 'superadmin', 'consolidado', 'coord_c1', 'coordinador_c1c2', 'coord_c2', 'coord_maestria', 'coordinador_mj'].includes(r))
-  );
+  const [goalsStatus, setGoalsStatus] = useState('loading');
+  const [sourceErrors, setSourceErrors] = useState({});
+  const { canView: canViewGoals, canManage: canManageGoals, isGlobal: isSuperUser } = goalsAccess(currentUser);
 
   useEffect(() => {
     if (currentUser && !canViewGoals) {
@@ -37,12 +32,6 @@ export default function GoalsBoard() {
   }, [currentUser, canViewGoals, navigate, showToast]);
 
   const userSedeNorm = currentUser?.sede ? normalizeSede(currentUser.sede) : null;
-  const isSuperUser = Boolean(
-    currentUser?.isSuperAdmin || 
-    currentUser?.isDireccion || 
-    currentUser?.appRole === 'direccion' || 
-    currentUser?.appRole === 'consolidado'
-  );
 
   const [selectedSedeFilter, setSelectedSedeFilter] = useState(() => {
     if (!isSuperUser && userSedeNorm && userSedeNorm !== 'Sede Global' && userSedeNorm !== 'Global') {
@@ -59,13 +48,6 @@ export default function GoalsBoard() {
       }
     }
   }, [userSedeNorm, isSuperUser]);
-
-  const canManageGoals = Boolean(
-    currentUser?.isSuperAdmin ||
-    currentUser?.isDireccion ||
-    ['gerente', 'direccion', 'cfo', 'ceo', 'cco', 'director_maestria', 'superadmin', 'consolidado'].includes(currentUser?.appRole) ||
-    (currentUser?.roles || []).some(r => ['gerente', 'direccion', 'cfo', 'ceo', 'cco', 'director_maestria', 'superadmin', 'consolidado'].includes(r))
-  );
 
   // Modal de Asignación / División de Metas
   const [selectedGoalForAssignment, setSelectedGoalForAssignment] = useState(null);
@@ -123,8 +105,8 @@ export default function GoalsBoard() {
   const [limaStatusFilter, setLimaStatusFilter] = useState('ALL');
 
   // Estado para llamadas de Nodus por equipo y auditoria en tiempo real
-  const [nodusData, setNodusData] = useState(nodusFallbackData);
-  const [managersList, setManagersList] = useState([]);
+  const [nodusData, setNodusData] = useState(null);
+  const [managersList, setManagersList] = useState(null);
   const [showTeamCallsModal, setShowTeamCallsModal] = useState(false);
   const [selectedGoalForTeamCalls, setSelectedGoalForTeamCalls] = useState(null);
   const [selectedTeamCallsData, setSelectedTeamCallsData] = useState(null);
@@ -133,34 +115,21 @@ export default function GoalsBoard() {
 
 
   useEffect(() => {
+    if (!currentUser || !canViewGoals) return;
+    const cacheKey = `cpsl_goals_cache:${currentUser.uid || currentUser.email}`;
+    setGoals([]);
+    setLoading(true);
+    setGoalsStatus('loading');
     // Cargar caché local inmediato si existe
     try {
-      const cached = localStorage.getItem('cpsl_goals_cache');
+      const cached = localStorage.getItem(cacheKey);
       if (cached) {
         const parsed = JSON.parse(cached);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          const isSuper = currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion' || currentUser?.appRole === 'consolidado' || currentUser?.isDireccion;
-          let initialGoals = parsed;
-          if (!isSuper && currentUser?.sede) {
-            const mySedeNorm = normalizeSede(currentUser.sede);
-            initialGoals = initialGoals.filter(g => {
-              const rawSede = g.sede || '';
-              const gSedeNorm = rawSede ? normalizeSede(rawSede) : null;
-              if (!gSedeNorm || gSedeNorm === 'Sede Global') {
-                const titleLower = (g.title || '').toLowerCase();
-                if (titleLower.includes('lima') || titleLower.includes('e30') || titleLower.includes('e31') || titleLower.includes('equipo 30') || titleLower.includes('equipo 31')) {
-                  return mySedeNorm === 'Lima';
-                }
-                if (titleLower.includes('guayaquil') || titleLower.includes('gye')) return mySedeNorm === 'Guayaquil';
-                if (titleLower.includes('quito') || titleLower.includes('uio')) return mySedeNorm === 'Quito';
-                if (titleLower.includes('cuenca')) return mySedeNorm === 'Cuenca';
-                return mySedeNorm === 'Lima';
-              }
-              return gSedeNorm === mySedeNorm;
-            });
-          }
+          const initialGoals = visibleGoalsForUser(parsed, currentUser);
           setGoals(initialGoals);
           setLoading(false);
+          setGoalsStatus('cache');
         }
       }
     } catch (e) {
@@ -181,60 +150,44 @@ export default function GoalsBoard() {
           return dateB - dateA;
         });
 
-        // Filtrar por sede si no es SuperAdmin ni Dirección ni Consolidado
-        const isSuper = currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion' || currentUser?.appRole === 'consolidado' || currentUser?.isDireccion;
-        if (!isSuper && currentUser?.sede) {
-          const mySedeNorm = normalizeSede(currentUser.sede);
-          loadedGoals = loadedGoals.filter(g => {
-            const rawSede = g.sede || '';
-            const gSedeNorm = rawSede ? normalizeSede(rawSede) : null;
-            // Si la meta no tiene sede explícita, verificar si es de Lima legada o de otra sede por su título
-            if (!gSedeNorm || gSedeNorm === 'Sede Global') {
-              const titleLower = (g.title || '').toLowerCase();
-              if (titleLower.includes('lima') || titleLower.includes('e30') || titleLower.includes('e31') || titleLower.includes('equipo 30') || titleLower.includes('equipo 31')) {
-                return mySedeNorm === 'Lima';
-              }
-              if (titleLower.includes('guayaquil') || titleLower.includes('gye')) {
-                return mySedeNorm === 'Guayaquil';
-              }
-              if (titleLower.includes('quito') || titleLower.includes('uio') || titleLower.includes('119') || titleLower.includes('118')) {
-                return mySedeNorm === 'Quito';
-              }
-              if (titleLower.includes('cuenca')) {
-                return mySedeNorm === 'Cuenca';
-              }
-              // Si no tiene sede ni indicio, solo mostrar si es Lima (sede histórica de creación)
-              return mySedeNorm === 'Lima';
-            }
-            return gSedeNorm === mySedeNorm;
-          });
-        }
+        loadedGoals = visibleGoalsForUser(loadedGoals, currentUser);
 
         setGoals(loadedGoals);
+        setGoalsStatus(snapshot.metadata.fromCache ? 'cache' : 'loaded');
         try {
-          localStorage.setItem('cpsl_goals_cache', JSON.stringify(loadedGoals));
-        } catch(e) {}
+          localStorage.setItem(cacheKey, JSON.stringify(loadedGoals));
+        } catch(e) { console.warn('No se pudo guardar la caché de metas:', e); }
         setLoading(false);
       },
       (error) => {
         console.warn("Error en onSnapshot de goals (fallback a caché):", error);
+        setGoalsStatus('error');
         setLoading(false);
       }
     );
 
-    // Timeout de seguridad: Si Firestore tarda más de 2.5s, quitar spinner
     const timer = setTimeout(() => {
-      setLoading(false);
+      setGoalsStatus(status => status === 'loading' ? 'waiting' : status);
     }, 2500);
 
     return () => {
       unsubscribe();
       clearTimeout(timer);
     };
-  }, [currentUser?.sede, currentUser?.isSuperAdmin, currentUser?.appRole, currentUser?.isDireccion]);
+  }, [currentUser, canViewGoals]);
 
   // Escuchar calendarios oficiales de Maestría y reportes de coordinadoras
   useEffect(() => {
+    if (!currentUser || !canViewGoals) return;
+    setNodusData(null);
+    setManagersList(null);
+    setCoordinatorReports([]);
+    setSourceErrors({});
+    const sourceError = (source, err) => {
+      console.warn(`Error leyendo ${source}:`, err);
+      setSourceErrors(prev => ({ ...prev, [source]: true }));
+    };
+    const sourceReady = source => setSourceErrors(prev => ({ ...prev, [source]: false }));
     let unsubMJ = () => {};
     let unsubRep = () => {};
     let unsubNodus = () => {};
@@ -242,34 +195,34 @@ export default function GoalsBoard() {
     try {
       unsubMJ = onSnapshot(collection(db, 'mj_calendars'), (snap) => {
         setMjCalendars(snap.docs.map(d => ({ id: d.id, ...d.data() })));
-      }, (err) => console.warn("Error leyendo mj_calendars:", err));
+        sourceReady('calendario');
+      }, (err) => sourceError('calendario', err));
 
       const qRep = query(collection(db, 'reports'), orderBy('created_at', 'desc'), limit(50));
       unsubRep = onSnapshot(qRep, (snap) => {
-        setCoordinatorReports(snap.docs.map(d => ({ id: d.id, ...d.data() })));
-      }, (err) => console.warn("Error leyendo reports en GoalsBoard:", err));
-    } catch (e) {
+        setCoordinatorReports(snap.metadata.fromCache ? [] : snap.docs.map(d => ({ id: d.id, ...d.data() })));
+        sourceReady('reportes');
+      }, (err) => { setCoordinatorReports([]); sourceError('reportes', err); });
       // Listener en tiempo real a Nodus Coordinadores C1/C2
       const nodusDocRef = doc(db, 'nodus_coordinadores_c1c2', 'latest');
       unsubNodus = onSnapshot(nodusDocRef, (snap) => {
-        if (snap.exists()) {
-          const d = snap.data();
-          if (d && Array.isArray(d.coordinadores) && d.coordinadores.length > 0) {
-            setNodusData(d);
-          }
-        }
+        const d = snap.exists() && !snap.metadata.fromCache ? snap.data() : null;
+        setNodusData(d && Array.isArray(d.coordinadores) ? d : null);
+        sourceReady('Nodus');
       }, (err) => {
-        console.warn('Realtime listener nodus_coordinadores_c1c2 (usando fallback):', err.message);
+        setNodusData(null);
+        sourceError('Nodus', err);
       });
 
       // Listener a managers_directory
       const qManagers = query(collection(db, 'managers_directory'), limit(300));
       unsubManagers = onSnapshot(qManagers, (snap) => {
-        if (!snap.empty) {
-          setManagersList(snap.docs.map(d => ({ id: d.id, ...d.data() })));
-        }
-      }, (err) => console.warn('Listener managers_directory:', err));
-
+        setManagersList(snap.metadata.fromCache || snap.size >= 300 ? null : snap.docs.map(d => ({ id: d.id, ...d.data() })));
+        if (snap.size >= 300) sourceError('directorio', new Error('La consulta alcanzó el límite; no representa un directorio completo.'));
+        else sourceReady('directorio');
+      }, (err) => { setManagersList(null); sourceError('directorio', err); });
+    } catch (e) {
+      sourceError('fuentes adicionales', e);
       console.warn("Error iniciando listeners adicionales:", e);
     }
     return () => {
@@ -278,7 +231,7 @@ export default function GoalsBoard() {
       unsubManagers();
       unsubRep();
     };
-  }, []);
+  }, [currentUser, canViewGoals]);
 
   // Helper: Formato en español claro y legible para rangos de fechas (ej: "04 al 06 Sep 2026")
   const formatCalendarDateRange = (fInicio, fFin) => {
@@ -543,6 +496,10 @@ export default function GoalsBoard() {
 
   // Sincronización individual del Agente Centinela
   const handleApplySentinelSync = async (goal, audit) => {
+    if (!audit.requiresUpdate) {
+      showToast('No hay evidencia comparable para actualizar esta meta.', 'error');
+      return;
+    }
     setSyncingSentinelGoalId(goal.id);
     try {
       const targetVal = Number(audit.detectedTarget || goal.targetValue || 1);
@@ -615,7 +572,7 @@ export default function GoalsBoard() {
           }
         }
       }
-      showToast(`🚀 ¡Auditoría masiva aplicada! ${count} metas sincronizadas con datos certificados de Nodus.`, 'success');
+      showToast(`${count} metas actualizadas con las fuentes disponibles.`, 'success');
       setShowSentinelModal(false);
     } catch (err) {
       console.error('Error en sync masivo de Agente Centinela:', err);
@@ -627,7 +584,7 @@ export default function GoalsBoard() {
 
   // Avance acumulado desde reportes de coordinadoras (Control de Coherencia de KPIs)
   const getGoalReportsSummary = (goal) => {
-    if (!goal || !coordinatorReports.length) return null;
+    if (!goal || !coordinatorReports.length || !isCallConfirmationGoal(goal)) return null;
 
     // REGLA FUNDAMENTAL DE KPIS:
     // Metas de Aliados, Managers o Apoyos de Sala NO deben vincularse a reportes brutos de llamadas telefónicas.
@@ -647,12 +604,12 @@ export default function GoalsBoard() {
 
     const matchingReports = coordinatorReports.filter(r => {
       const rSede = (r.sede || r.data?.sede_id || '').toLowerCase();
-      const matchSede = !sedeNorm || rSede.includes(sedeNorm) || sedeNorm.includes(rSede);
+      const matchSede = Boolean(sedeNorm && rSede) && normalizeSede(rSede) === normalizeSede(sedeNorm);
       if (!matchSede) return false;
 
       // Filtrar estrictamente por equipo
       const rEquipo = String(r.equipo || r.data?.numEquipo || r.data?.equipo || '').replace(/\D/g, '');
-      if (rEquipo && goalTeam && rEquipo !== String(goalTeam)) {
+      if (!rEquipo || !goalTeam || rEquipo !== String(goalTeam)) {
         return false;
       }
 
@@ -1014,6 +971,8 @@ export default function GoalsBoard() {
         goal_id: selectedGoalForSentados.id,
         goal_title: selectedGoalForSentados.title,
         sede: selectedGoalForSentados.sede || currentUser?.sede || 'Global',
+        equipo: extractTeamNumber(selectedGoalForSentados, goals.find(g => g.id === selectedGoalForSentados.parentId)) || '',
+        etapa: selectedGoalForSentados.stage || '',
         cycle_id: currentCycle?.name || selectedGoalForSentados.cyclePhase || 'CICLO-2026',
         submitted_by: currentUser?.displayName || currentUser?.email || 'Gerencia de Sede',
         created_at: new Date().toISOString(),
@@ -1046,28 +1005,22 @@ export default function GoalsBoard() {
   const getTeamCallsData = (goal, parentGoal, forcedTeam = null) => {
     if (!goal) return null;
     
-    const goalSede = normalizeSede(goal.sede || parentGoal?.sede || (selectedSedeFilter !== 'Todas' ? selectedSedeFilter : '') || currentUser?.sede || 'Lima');
+    const rawSede = goal.sede || parentGoal?.sede;
+    if (!rawSede || /global/i.test(rawSede)) return null;
+    const goalSede = normalizeSede(rawSede);
     
     // Deteccion automatica del equipo
     let targetTeam = forcedTeam;
     if (!targetTeam) {
-      const fullText = `${goal.title || ''} ${parentGoal?.title || ''} ${goal.cyclePhase || ''} ${currentCycle?.name || ''}`;
-      const match = fullText.match(/(?:Equipo|E)\s*(\d+|[A-Za-z0-9]+)/i);
-      if (match) {
-        targetTeam = `EQUIPO ${match[1]}`.toUpperCase();
-      } else {
-        if (goalSede === 'Lima') targetTeam = 'EQUIPO 30';
-        else if (goalSede === 'Quito') targetTeam = 'EQUIPO 119';
-        else if (goalSede === 'Guayaquil') targetTeam = 'EQUIPO 24';
-        else if (goalSede === 'Cuenca') targetTeam = 'EQUIPO 23';
-        else targetTeam = 'EQUIPO 30';
-      }
+      const team = extractTeamNumber(goal, parentGoal);
+      if (!team || !nodusData) return null;
+      targetTeam = `EQUIPO ${team}`;
     }
 
     const cleanTargetTeam = targetTeam.replace(/\s+/g, '').toUpperCase();
     
     // Coordinadores de la sede en Nodus
-    const allCoords = nodusData?.coordinadores || nodusFallbackData?.coordinadores || [];
+    const allCoords = nodusData?.coordinadores || [];
     const sedeCoords = allCoords.filter(c => normalizeSede(c.sede || '') === goalSede);
     
     // Lista de todos los equipos disponibles para esta sede
@@ -1110,7 +1063,7 @@ export default function GoalsBoard() {
           nombre: c.nombre,
           nombreCompleto: c.nombreCompleto || c.nombre,
           email: c.email || '',
-          rol: c.rol || 'Coordinador C1 / C2',
+          rol: c.rol || 'Rol no registrado',
           sede: c.sede || goalSede,
           llamadas,
           confirmados: confirmado,
@@ -1128,13 +1081,14 @@ export default function GoalsBoard() {
 
     const sedeReports = coordinatorReports.filter(r => 
       normalizeSede(r.sede || '') === goalSede && 
+      String(r.equipo || r.data?.numEquipo || r.data?.equipo || '').replace(/\D/g, '') === cleanTargetTeam.replace('EQUIPO', '') &&
       (r.type === 'Llamadas' || r.type === 'ReporteSentadosSala' || !r.type)
     );
 
-    const teamManagers = managersList.filter(m => {
+    const teamManagers = (managersList || []).filter(m => {
       const mSede = normalizeSede(m.sede || '');
       const mEq = String(m.numEquipo || m.equipo || '').toUpperCase().replace(/\s+/g, '');
-      return mSede === goalSede && (mEq === cleanTargetTeam || mEq.includes(cleanTargetTeam.replace('EQUIPO', '')));
+      return mSede === goalSede && (mEq === cleanTargetTeam || mEq === cleanTargetTeam.replace('EQUIPO', ''));
     });
 
     return {
@@ -1345,6 +1299,7 @@ export default function GoalsBoard() {
     } catch (err) {
       console.error(err);
       showToast('Error al guardar la asignación de meta.', 'error');
+      throw err;
     }
   };
 
@@ -1355,9 +1310,14 @@ export default function GoalsBoard() {
       currentQuota || 0
     );
 
-    if (newVal !== null && newVal !== '' && !isNaN(newVal)) {
+    if (newVal === null) return;
+    if (newVal === '' || !Number.isFinite(Number(newVal)) || Number(newVal) < 0) {
+      showToast('Ingresa un número válido, igual o mayor que cero.', 'error');
+      return;
+    }
+    {
       try {
-        const numericVal = Math.max(0, Number(newVal));
+        const numericVal = Number(newVal);
         const updatedCoordinators = (goal.assignedCoordinators || []).map(c => {
           if (c.email === coordEmail) {
             return { ...c, currentQuota: numericVal };
@@ -1480,7 +1440,7 @@ export default function GoalsBoard() {
             </button>
             {group.childProgress !== null && (
               <span className="text-muted" style={{ fontSize: '0.82rem' }} title="Promedio del avance de las metas que aportan a este ciclo">
-                Avance de sus metas: <strong style={{ color: 'var(--text-heading)' }}>{group.childProgress}%</strong>
+                Promedio de metas (máx. 100% por meta): <strong style={{ color: 'var(--text-heading)' }}>{group.childProgress}%</strong>
               </span>
             )}
           </div>
@@ -1516,6 +1476,11 @@ export default function GoalsBoard() {
               Estas metas no tienen sede. Revisa si duplican un ciclo existente antes de usarlas; no se modifican automáticamente.
             </p>
           )}
+          {!group.schedule && group.key !== 'legado' && (
+            <p className="text-muted" style={{ margin: '0.6rem 0 0', fontSize: '0.8rem' }}>
+              No encontramos fechas para este equipo. El avance registrado no confirma que el ciclo esté en curso.
+            </p>
+          )}
           {group.duplicateCycles && (
             <p style={{ margin: '0.6rem 0 0', fontSize: '0.8rem', color: '#f59e0b' }}>
               ⚠️ Hay {group.cycles.length} metas globales para este mismo equipo y sede.
@@ -1529,7 +1494,7 @@ export default function GoalsBoard() {
           {group.misaligned.length > 0 && (
             <div style={{ marginTop: '0.6rem', display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
               <span style={{ fontSize: '0.8rem', color: '#f59e0b' }}>
-                ⚠️ {group.misaligned.length} meta(s) del Equipo {group.team} aportan al ciclo de otro equipo.
+                {group.misaligned.length} meta(s) de este equipo están vinculadas a otro ciclo. Revisa el vínculo antes de alinearlas; el avance se conserva.
               </span>
               {canManageGoals && (
                 <button
@@ -1565,6 +1530,10 @@ export default function GoalsBoard() {
     const isAssigned = goal.assignedCoordinators && Array.isArray(goal.assignedCoordinators) && goal.assignedCoordinators.length > 0;
     const calInfo = getGoalCalendarInfo(goal, parentGoal);
     const repSummary = getGoalReportsSummary(goal);
+    const quotaTotals = assignedQuotaTotals(goal.assignedCoordinators);
+    const progress = goal.scope === 'CICLO' && !goal.parentId
+      ? { percent: Number.isFinite(Number(goal.progress)) ? Number(goal.progress) : null, barPercent: Math.min(100, Math.max(0, Number(goal.progress) || 0)) }
+      : goalProgress(goal.currentValue, goal.targetValue);
     
     return (
       <div key={goal.id} className="glass-panel" style={{ padding: '1.5rem', transition: 'all 0.3s ease' }}>
@@ -1631,7 +1600,7 @@ export default function GoalsBoard() {
                   background: 'rgba(0, 210, 255, 0.15)', color: 'var(--crear-blue)', border: '1px solid rgba(0, 210, 255, 0.3)',
                   display: 'inline-flex', alignItems: 'center', gap: '4px'
                 }}>
-                  <Users size={12} /> Dividido en {goal.assignedCoordinators.length} Coordinadoras
+                  <Users size={12} /> Repartido entre {goal.assignedCoordinators.length} responsables
                 </span>
               )}
 
@@ -1787,8 +1756,8 @@ export default function GoalsBoard() {
                   marginTop: '0.65rem',
                   padding: '0.65rem 0.9rem',
                   borderRadius: '10px',
-                  background: audit.requiresUpdate ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(217, 119, 6, 0.06) 100%)' : 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.05) 100%)',
-                  border: `1px solid ${audit.requiresUpdate ? 'rgba(245, 158, 11, 0.4)' : 'rgba(16, 185, 129, 0.3)'}`,
+                  background: 'rgba(148, 163, 184, 0.08)',
+                  border: `1px solid ${audit.badgeColor}55`,
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '0.45rem',
@@ -1800,7 +1769,7 @@ export default function GoalsBoard() {
                         display: 'inline-flex',
                         alignItems: 'center',
                         gap: '5px',
-                        background: audit.requiresUpdate ? 'rgba(245, 158, 11, 0.25)' : 'rgba(16, 185, 129, 0.22)',
+                        background: `${audit.badgeColor}22`,
                         color: audit.badgeColor,
                         padding: '2px 8px',
                         borderRadius: '6px',
@@ -1811,7 +1780,7 @@ export default function GoalsBoard() {
                         <span>Agente Nodus</span>
                       </div>
                       <span style={{ fontSize: '0.83rem', fontWeight: 700, color: '#f8fafc' }}>
-                        {audit.detectedRealValue} de {audit.detectedTarget} detectados en Nodus
+                        {audit.detectedRealValue === null ? 'Sin evidencia comparable' : `${audit.detectedRealValue} registrados · objetivo ${audit.detectedTarget}`}
                       </span>
                       <span style={{
                         fontSize: '0.72rem',
@@ -1821,7 +1790,7 @@ export default function GoalsBoard() {
                         padding: '1px 6px',
                         borderRadius: '4px'
                       }}>
-                        {audit.newProgress}% verificado
+                        {audit.newProgress === null ? 'Sin verificar' : `${audit.newProgress}% según fuente disponible`}
                       </span>
                       {audit.callsDetails.totalLlamadas > 0 && (
                         <span style={{ fontSize: '0.73rem', color: '#94a3b8' }}>
@@ -1877,7 +1846,7 @@ export default function GoalsBoard() {
                           }}
                         >
                           <Zap size={13} />
-                          <span>{syncingSentinelGoalId === goal.id ? 'Sincronizando...' : `⚡ Sincronizar Avance Real (${audit.detectedRealValue}/${audit.detectedTarget})`}</span>
+                          <span>{syncingSentinelGoalId === goal.id ? 'Actualizando...' : `Aplicar dato disponible (${audit.detectedRealValue}/${audit.detectedTarget})`}</span>
                         </button>
                       )}
                     </div>
@@ -1886,8 +1855,8 @@ export default function GoalsBoard() {
                   <div style={{ fontSize: '0.71rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                     <span>Fuentes: <strong style={{ color: '#cbd5e1' }}>{audit.sources.join(' + ')}</strong></span>
                     <span>• Hash: <code style={{ color: '#38bdf8', background: 'rgba(56, 189, 248, 0.1)', padding: '1px 5px', borderRadius: '4px', fontFamily: 'monospace' }}>{audit.auditHash}</code></span>
-                    <span style={{ color: '#10b981', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
-                      <ShieldCheck size={11} /> 100% Confiable / Sin Alucinaciones
+                    <span style={{ color: audit.badgeColor, display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                      <ShieldCheck size={11} /> {audit.statusMessage}
                     </span>
                   </div>
                 </div>
@@ -2019,7 +1988,7 @@ export default function GoalsBoard() {
           <div style={{ flex: 1, height: '12px', background: 'rgba(255,255,255,0.06)', borderRadius: '6px', overflow: 'hidden' }}>
             <div style={{ 
               height: '100%', 
-              width: `${Math.min(Number(goal.progress) || 0, 100)}%`, 
+              width: `${progress.barPercent}%`,
               background: (Number(goal.progress) || 0) >= 100 
                 ? 'linear-gradient(90deg, #22c55e, #16a34a)' 
                 : 'linear-gradient(90deg, #00d2ff, #0284c7)', 
@@ -2027,7 +1996,7 @@ export default function GoalsBoard() {
             }} />
           </div>
           <span className="text-gold" style={{ fontWeight: 'bold', minWidth: '45px', fontSize: '1.05rem' }}>
-            {Number(goal.progress) || 0}%
+            {progress.percent === null ? 'Sin cálculo' : `${progress.percent}%`}
           </span>
         </div>
 
@@ -2042,19 +2011,23 @@ export default function GoalsBoard() {
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
               <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                📌 Cuotas Individuales & Reporte de Avance en Tiempo Real:
+                Cuotas individuales · avance registrado
               </span>
               <span style={{ fontSize: '0.75rem', color: 'var(--crear-blue)' }}>
-                Suma total: {goal.currentValue || 0} / {goal.targetValue}
+                Logro total: {quotaTotals.current ?? 'Sin dato'} · objetivo de la meta: {goal.targetValue ?? 'Sin definir'}
               </span>
             </div>
+            <p className="text-muted" style={{ fontSize: '0.78rem', margin: '0 0 0.75rem' }}>
+              Cada tarjeta muestra el rol guardado en esta asignación, no un cambio de rol del perfil.
+              {' '}Las cuotas asignadas suman {quotaTotals.target ?? 'un valor pendiente de revisión'}.
+              {quotaTotals.target !== null && Number(goal.targetValue) !== quotaTotals.target && ' Esta suma difiere del objetivo de la meta; revisa el reparto.'}
+              {quotaTotals.current !== null && Number(goal.currentValue) !== quotaTotals.current && ' El avance global guardado difiere de la suma de cuotas.'}
+            </p>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '0.75rem' }}>
               {goal.assignedCoordinators.map(coord => {
-                const current = Number(coord.currentQuota || 0);
-                const target = Number(coord.targetQuota || 1);
-                const pct = Math.min(100, Math.round((current / target) * 100));
-                const isC1 = coord.role === 'coord_c1';
+                const quota = goalProgress(coord.currentQuota, coord.targetQuota);
+                const { current, target, percent: pct } = quota;
 
                 return (
                   <div
@@ -2074,8 +2047,8 @@ export default function GoalsBoard() {
                         <div style={{ fontWeight: 'bold', fontSize: '0.85rem', color: 'var(--text-heading)' }}>
                           {coord.name}
                         </div>
-                        <div style={{ fontSize: '0.7rem', color: isC1 ? 'var(--crear-blue)' : 'var(--role-mj)', fontWeight: 'bold' }}>
-                          {isC1 ? 'Coordinadora C1/C2' : 'Coordinadora CMJ'} ({coord.sede || 'Sede'})
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+                          {coord.role ? getRoleDisplayName(coord.role) : 'Rol no registrado'} · {coord.sede || 'Sede no registrada'}
                         </div>
                       </div>
 
@@ -2094,14 +2067,14 @@ export default function GoalsBoard() {
                           color: 'var(--crear-blue)'
                         }}
                       >
-                        <Edit3 size={11} /> Reportar
+                        <Edit3 size={11} /> Registrar avance
                       </button>
                     </div>
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginTop: '0.2rem' }}>
-                      <span className="text-muted">Avance:</span>
+                      <span className="text-muted">Logro / objetivo:</span>
                       <span>
-                        <strong style={{ color: current >= target ? '#22c55e' : 'var(--crear-gold)' }}>{current}</strong> / {target} ({pct}%)
+                        <strong>{current ?? 'Sin dato'}</strong> / {target ?? 'Sin definir'} {pct !== null && `(${pct}%)`}
                       </span>
                     </div>
 
@@ -2109,11 +2082,12 @@ export default function GoalsBoard() {
                     <div style={{ height: '6px', background: 'rgba(255,255,255,0.08)', borderRadius: '3px', overflow: 'hidden' }}>
                       <div style={{
                         height: '100%',
-                        width: `${pct}%`,
+                        width: `${quota.barPercent}%`,
                         background: pct >= 100 ? '#22c55e' : 'var(--crear-blue)',
                         transition: 'width 0.3s ease'
                       }} />
                     </div>
+                    <span className="text-muted" style={{ fontSize: '0.75rem' }}>{quota.label}</span>
                   </div>
                 );
               })}
@@ -2188,8 +2162,7 @@ export default function GoalsBoard() {
             title="Consola del Agente Centinela: Seguimiento de Metas y Llamadas Nodus"
           >
             <div style={{
-              width: '8px', height: '8px', borderRadius: '50%', background: '#10b981',
-              boxShadow: '0 0 8px #10b981'
+              width: '8px', height: '8px', borderRadius: '50%', background: '#94a3b8'
             }} />
             <Bot size={16} />
             <span>Agente Centinela Nodus</span>
@@ -2220,14 +2193,14 @@ export default function GoalsBoard() {
               }
               return (
                 <span style={{
-                  background: 'rgba(16, 185, 129, 0.2)',
-                  color: '#10b981',
+                  background: 'rgba(148, 163, 184, 0.15)',
+                  color: '#cbd5e1',
                   fontSize: '0.72rem',
                   fontWeight: 900,
                   padding: '1px 6px',
                   borderRadius: '9999px'
                 }}>
-                  Al día
+                  {globalAudit.unverifiedCount > 0 ? `${globalAudit.unverifiedCount} sin verificar` : globalAudit.totalAuditadas ? 'Comparación disponible' : 'Sin metas para comparar'}
                 </span>
               );
             })()}
@@ -2284,11 +2257,22 @@ export default function GoalsBoard() {
         )}
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem' }}>
+        {goalsStatus !== 'loaded' && (
+          <p role="status" className="text-muted">
+            {goalsStatus === 'error' ? 'No pudimos actualizar las metas. Los datos guardados, si aparecen, pueden estar desactualizados.' :
+              goalsStatus === 'cache' ? 'Mostrando datos guardados. Esperando confirmación del servidor.' :
+              goalsStatus === 'waiting' ? 'La carga está tardando más de lo habitual. Aún no podemos confirmar si hay metas.' : 'Consultando metas…'}
+          </p>
+        )}
+        {Object.values(sourceErrors).some(Boolean) && (
+          <p role="alert" className="text-muted">No pudimos actualizar: {Object.keys(sourceErrors).filter(key => sourceErrors[key]).join(', ')}. No se confirma su vigencia.</p>
+        )}
         {loading ? <p className="text-muted text-center">Cargando metas...</p> : (() => {
           if (goals.length === 0) {
+            if (goalsStatus !== 'loaded') return null;
             return (
               <div className="glass-panel" style={{ padding: '2.5rem', textAlign: 'center' }}>
-                <p className="text-muted" style={{ margin: '0 0 1rem 0' }}>No hay metas configuradas. Inicia el Setup de Ciclo.</p>
+                <p className="text-muted" style={{ margin: '0 0 1rem 0' }}>Todavía no hay metas en esta vista. {canManageGoals ? 'Puedes configurar un ciclo para empezar.' : 'Cuando se registre una meta para tu sede, aparecerá aquí.'}</p>
                 {canManageGoals && (
                   <button 
                     className="btn-primary" 
@@ -2306,7 +2290,7 @@ export default function GoalsBoard() {
             return (
               <div className="glass-panel" style={{ padding: '2.5rem', textAlign: 'center' }}>
                 <p className="text-muted" style={{ margin: '0 0 1rem 0', fontSize: '1.05rem' }}>
-                  No se encontraron metas configuradas para la sede <strong>{selectedSedeFilter}</strong>.
+                  {goalsStatus === 'loaded' ? 'No hay metas configuradas' : 'No hay metas en los datos guardados'} para la sede <strong>{selectedSedeFilter}</strong>.
                 </p>
                 {canManageGoals && (
                   <button 
@@ -2570,7 +2554,7 @@ export default function GoalsBoard() {
                   <h2 style={{ margin: 0, fontSize: '1.3rem', color: '#fff' }}>Directorio Oficial de Aliados (Graduados Lima)</h2>
                 </div>
                 <p className="text-muted" style={{ margin: '0.2rem 0 0 0', fontSize: '0.85rem' }}>
-                  Alimentado en tiempo real desde la hoja de cálculo oficial: <code>GRADUADOS LIMA</code>
+                  Datos de la última consulta a la hoja oficial: <code>GRADUADOS LIMA</code>. Se actualizan al consultar, no continuamente.
                 </p>
               </div>
               <button
@@ -2817,7 +2801,7 @@ export default function GoalsBoard() {
                     </span>
                   </h3>
                   <p style={{ margin: '2px 0 0 0', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                    Meta: <strong>{selectedTeamCallsData.goalTitle}</strong> • Auditoría de llamadas y confirmaciones en tiempo real
+                    Meta: <strong>{selectedTeamCallsData.goalTitle}</strong> • Llamadas y confirmaciones del último registro disponible
                   </p>
                 </div>
               </div>
@@ -3218,7 +3202,7 @@ export default function GoalsBoard() {
                 <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
                   Avance Actual de la Meta: <strong>{selectedGoalForTeamCalls?.currentValue || 0}</strong> de <strong>{selectedGoalForTeamCalls?.targetValue || 0}</strong>
                 </span>
-                {canManageGoals && selectedTeamCallsData.totalConfirmados > 0 && (
+                {canManageGoals && isCallConfirmationGoal(selectedGoalForTeamCalls) && selectedTeamCallsData.totalConfirmados > 0 && (
                   <button
                     type="button"
                     onClick={async () => {
@@ -3346,11 +3330,11 @@ export default function GoalsBoard() {
                         alignItems: 'center',
                         gap: '4px'
                       }}>
-                        <ShieldCheck size={12} /> 100% Confiable / Sin Alucinaciones
+                        <ShieldCheck size={12} /> Comparación de fuentes disponibles
                       </span>
                     </div>
                     <p style={{ margin: '4px 0 0 0', fontSize: '0.84rem', color: '#94a3b8' }}>
-                      Auditoría determinista de metas vs. llamadas reales de coordinadoras y entrenadores en Nodus.
+                      Las confirmaciones telefónicas no acreditan asistencia. Sin evidencia comparable, se conserva el avance registrado.
                     </p>
                   </div>
                 </div>
@@ -3390,9 +3374,9 @@ export default function GoalsBoard() {
                 </div>
 
                 <div style={{ background: 'rgba(16, 185, 129, 0.08)', padding: '0.8rem 1rem', borderRadius: '10px', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
-                  <div style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 600 }}>Metas al Día con Nodus</div>
+                  <div style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600 }}>Metas coincidentes / sin verificar</div>
                   <div style={{ fontSize: '1.4rem', fontWeight: 900, color: '#10b981', marginTop: '2px' }}>
-                    {globalAudit.totalAuditadas - globalAudit.pendingSyncCount}
+                    {globalAudit.matchingCount} / {globalAudit.unverifiedCount}
                   </div>
                 </div>
 
@@ -3423,9 +3407,9 @@ export default function GoalsBoard() {
                     <div style={{ background: 'rgba(14, 165, 233, 0.08)', padding: '0.8rem 1rem', borderRadius: '10px', border: '1px solid rgba(14, 165, 233, 0.2)' }}>
                       <div style={{ fontSize: '0.75rem', color: '#38bdf8', fontWeight: 600 }}>{label}</div>
                       <div style={{ fontSize: '1.4rem', fontWeight: 900, color: '#38bdf8', marginTop: '2px' }}>
-                        {totalCalls > 0 ? totalCalls.toLocaleString() : '0'}{' '}
+                        {nodusData ? totalCalls.toLocaleString() : 'Sin datos'}{' '}
                         <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#94a3b8' }}>
-                          ({totalOk > 0 ? totalOk.toLocaleString() : '0'} OK)
+                          {nodusData && `(${totalOk.toLocaleString()} confirmaciones)`}
                         </span>
                       </div>
                     </div>
@@ -3513,10 +3497,10 @@ export default function GoalsBoard() {
                           </td>
                           <td style={{ padding: '0.8rem 0.5rem' }}>
                             <div style={{ fontWeight: 800, color: '#38bdf8', fontSize: '0.92rem' }}>
-                              {audit.detectedRealValue} de {audit.detectedTarget}
+                              {audit.detectedRealValue === null ? 'Sin evidencia comparable' : `${audit.detectedRealValue} / ${audit.detectedTarget}`}
                             </div>
                             <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
-                              ({audit.newProgress}% verificado)
+                              {audit.newProgress !== null && `${audit.newProgress}% según fuente`}
                             </div>
                           </td>
                           <td style={{ padding: '0.8rem 0.5rem' }}>
@@ -3530,7 +3514,7 @@ export default function GoalsBoard() {
                               border: `1px solid ${audit.badgeColor}44`,
                               display: 'inline-block'
                             }}>
-                              {audit.syncStatus === 'AL_DIA' ? '✓ AL DÍA' : audit.syncStatus === 'PENDIENTE_SYNC' ? '⚡ PENDIENTE SYNC' : audit.syncStatus === 'DESACTUALIZADO' ? '🔄 DESACTUALIZADO' : '⚠️ EN RIESGO'}
+                              {audit.syncStatus === 'COINCIDE' ? 'Coincide con la fuente' : audit.syncStatus === 'PENDIENTE_SYNC' ? 'Revisar diferencia' : 'Sin verificar'}
                             </span>
                           </td>
                           <td style={{ padding: '0.8rem 0.5rem' }}>
@@ -3580,7 +3564,7 @@ export default function GoalsBoard() {
                 alignItems: 'center'
               }}>
                 <div style={{ fontSize: '0.76rem', color: '#94a3b8' }}>
-                  Auditoría generada por el Agente Centinela v3.2 Enterprise • Protocolo Determinista SHA-256.
+                  Comparación de datos disponibles · El identificador de comparación no certifica los datos ni la actividad del daemon.
                 </div>
                 <button
                   type="button"
