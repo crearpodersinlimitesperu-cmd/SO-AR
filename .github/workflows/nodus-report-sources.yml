@@ -6,12 +6,13 @@ on:
         type: choice
         options: [audit, publish, discover-goals]
         default: audit
-        description: Audit reads only; publish refreshes aggregate sources without modifying Nodus
+        description: Audit reads snapshots; publish refreshes aggregates; discover-goals reads Nodus schema without personal records
 permissions:
   contents: read
 jobs:
   report:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -19,6 +20,9 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci --ignore-scripts --include=optional
+      - name: Test read-only goals discovery contract
+        if: inputs.mode == 'discover-goals'
+        run: node --test tests/nodus-goal-discovery.test.mjs
       - name: Install browser for read-only goals discovery
         if: inputs.mode == 'discover-goals'
         run: npx puppeteer browsers install chrome

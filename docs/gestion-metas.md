@@ -32,3 +32,23 @@ declaran seguras en este cambio. Tampoco se migran registros productivos.
 
 Regresiones sintéticas:
 `node --test src/services/goalsBoard.test.js src/services/goalsTimeline.test.js`.
+
+## Buscar el contrato en Nodus
+
+El workflow `nodus-report-sources.yml`, modo `discover-goals`, utiliza únicamente
+los secretos del runner autorizado. `discoverNodusGoalSources.mjs` abre rutas de
+lectura conocidas y sigue enlaces seguros de calendario/equipos/aliados, hasta
+20 rutas. Emite solo rutas, respuesta HTTP, cabeceras de tablas y conteos de filas
+visibles; no publica nombres, contactos, registros ni credenciales. Los conteos
+visibles **no** representan totales completos ni logros de metas. No escribe en
+Nodus, Firestore o metas.
+
+La consulta de 2026-10-11 (run `38155744260`) quedó bloqueada antes de inspeccionar
+las fuentes: `/dashboard` respondió HTTP 403 (`landing_route_rejected`). Se
+detuvo sin reintentar el inicio de sesión ni eludir controles. No se verificó el
+contrato de calendario/aliados y no se conecta una fuente supuesta a la página.
+Para continuar hace falta un acceso de lectura autorizado que pueda abrir esa
+ruta, o un contrato/API/exportación autorizado con sede, equipo, etapa, medida,
+fechas y marcas de actualización explícitas. Corregir el acceso debe hacerse por
+el administrador de Nodus; no implica sustituir el dato ausente por cuotas
+guardadas ni por confirmaciones telefónicas.

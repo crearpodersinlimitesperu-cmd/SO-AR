@@ -57,7 +57,7 @@ jobs:
         run: npm test && npm run test:flyer-teams && npm run test:nodus-reports && npm run test:flight-monitor && npm run test:loading && node --test tests/logistics-help-deploy.test.mjs tests/logistics-help-browser.test.mjs tests/home-module-help.test.mjs
 
       - name: Test goals roles, progress and source evidence
-        run: node --test src/services/goalsBoard.test.js src/services/goalsTimeline.test.js tests/goals-board-browser.test.mjs
+        run: node --test src/services/goalsBoard.test.js src/services/goalsTimeline.test.js tests/goals-board-browser.test.mjs tests/nodus-goal-discovery.test.mjs
 
       - name: Build production app
         run: npm run build

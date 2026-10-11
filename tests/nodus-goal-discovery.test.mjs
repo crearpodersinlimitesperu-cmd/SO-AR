@@ -36,3 +36,24 @@ test('discovery stops at authentication or anti-bot challenges', async () => {
   };
   await assert.rejects(discoverNodusGoalSources(page), /verificación o una nueva sesión/);
 });
+
+test('HTTP denial is recorded as denial, not empty or complete data', async () => {
+  let url;
+  const page = {
+    goto: async next => { url = next; return { status: () => 403 }; },
+    url: () => url,
+    evaluate: async () => { throw new Error('Denied pages must not be inspected'); }
+  };
+  const result = await discoverNodusGoalSources(page);
+  assert.equal(result.evidence.length, 1);
+  assert.equal(result.accessBlocked, true);
+  assert.ok(result.evidence.every(e => e.status === 403 && !e.tables.length));
+});
+
+test('discovery never follows external origin after a redirect', async () => {
+  const page = {
+    goto: async () => ({ status: () => 200 }),
+    url: () => 'https://example.invalid/dashboard'
+  };
+  await assert.rejects(discoverNodusGoalSources(page), /fuera del origen autorizado/);
+});

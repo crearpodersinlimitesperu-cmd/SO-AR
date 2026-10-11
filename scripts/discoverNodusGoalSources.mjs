@@ -14,6 +14,7 @@ export function goalSourcePath(href) {
 export async function discoverNodusGoalSources(page) {
   const paths = [...INITIAL_PATHS];
   const evidence = [];
+  let accessBlocked = false;
   for (let i = 0; i < paths.length && i < 20; i++) {
     const path = paths[i];
     const response = await page.goto(`${ORIGIN}${path}`, { waitUntil: 'domcontentloaded', timeout: 45000 });
@@ -23,6 +24,10 @@ export async function discoverNodusGoalSources(page) {
     if (new URL(page.url()).origin !== ORIGIN) throw new Error('Nodus redirigió fuera del origen autorizado.');
     if (!response || response.status() >= 400) {
       evidence.push({ path, status: response?.status() || null, tables: [] });
+      if ([401, 403].includes(response?.status())) {
+        accessBlocked = true;
+        break;
+      }
       continue;
     }
     await page.waitForNetworkIdle({ idleTime: 500, timeout: 10000 });
@@ -45,7 +50,7 @@ export async function discoverNodusGoalSources(page) {
       if (next && !paths.includes(next)) paths.push(next);
     }
   }
-  return { source: 'Nodus', searchedAt: new Date().toISOString(), pathsSearched: evidence.length, evidence };
+  return { source: 'Nodus', searchedAt: new Date().toISOString(), accessBlocked, pathsSearched: evidence.length, evidence };
 }
 
 async function main() {
@@ -53,7 +58,9 @@ async function main() {
   try {
     const page = await browser.newPage();
     await loginNodusReadOnly(page);
-    console.log(JSON.stringify(await discoverNodusGoalSources(page), null, 2));
+    const result = await discoverNodusGoalSources(page);
+    console.log(JSON.stringify(result, null, 2));
+    if (result.accessBlocked) process.exitCode = 1;
   } finally {
     await browser.close();
   }
