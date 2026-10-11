@@ -78,7 +78,7 @@ test('premium Home grid renders real accesses with responsive themes, focus and 
       headless: true,
       args: ['--no-sandbox']
     });
-    const page = await browser.newPage();
+    let page = await browser.newPage();
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
     const url = `${server.resolvedUrls.local[0]}home-premium-test`;
@@ -131,6 +131,15 @@ test('premium Home grid renders real accesses with responsive themes, focus and 
         }
       }
     }
+    await browser.close();
+    browser = await puppeteer.launch({
+      executablePath: process.env.CHROME_BIN || await puppeteer.executablePath(),
+      headless: true,
+      args: ['--no-sandbox',
+        '--blink-settings=availableHoverTypes=2,primaryHoverType=2,availablePointerTypes=4,primaryPointerType=4']
+    });
+    page = await browser.newPage();
+    page.on('pageerror', error => errors.push(error.message));
     await page.setViewport({ width: 1280, height: 1000, isMobile: false, hasTouch: false });
     await page.goto(url);
     const card = await page.waitForSelector('[data-module-help="gerencial"]');
