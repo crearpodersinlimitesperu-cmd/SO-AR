@@ -35,6 +35,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # The startup regression executes the pinned PR145 callback for comparison.
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
