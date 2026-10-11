@@ -23,7 +23,7 @@ test('discovery exports schema and counts only, not raw people or body text', as
     })
   };
   const result = await discoverNodusGoalSources(page);
-  assert.equal(result.pathsSearched, 6);
+  assert.equal(result.pathsSearched, 7);
   assert.equal(result.evidence.at(-1).path, '/calendario');
   assert.deepEqual(Object.keys(result.evidence[0]).sort(), ['path', 'status', 'tables']);
   assert.equal(JSON.stringify(result).includes('links'), false);

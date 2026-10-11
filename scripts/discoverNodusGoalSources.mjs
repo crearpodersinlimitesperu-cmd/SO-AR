@@ -2,7 +2,7 @@ import puppeteer from 'puppeteer';
 import { isSafeNodusUrl, isNodusVerificationUrl, loginNodusReadOnly } from './nodusArchiveAgent.mjs';
 
 const ORIGIN = 'https://imo.crearpslglobal.com';
-const INITIAL_PATHS = ['/dashboard', '/sedes', '/capitulo1', '/capitulo2', '/maestria'];
+const INITIAL_PATHS = ['/sedes', '/equipos', '/aliados', '/capitulo1', '/capitulo2', '/maestria'];
 
 export function goalSourcePath(href) {
   if (!isSafeNodusUrl(href)) return null;
@@ -57,7 +57,7 @@ async function main() {
   const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
   try {
     const page = await browser.newPage();
-    await loginNodusReadOnly(page);
+    await loginNodusReadOnly(page, '/sedes');
     const result = await discoverNodusGoalSources(page);
     console.log(JSON.stringify(result, null, 2));
     if (result.accessBlocked) process.exitCode = 1;

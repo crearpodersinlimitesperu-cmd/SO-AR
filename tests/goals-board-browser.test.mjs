@@ -15,7 +15,7 @@ test('GoalsBoard renders synthetic roles, overachievement, source absence and sc
     { email: 'three@example.invalid', name: 'Fixture Three', sede: 'Lima', currentQuota: 1, targetQuota: 2 }
   ];
   const goals = [
-    { id: 'lima', title: 'Aliados Equipo 31', sede: 'Lima', scope: 'ENTRENAMIENTO', targetValue: 25, currentValue: 13, progress: 52, assignedCoordinators: quotas },
+    { id: 'lima', title: 'Aliados C1E31', sede: 'Lima', scope: 'ENTRENAMIENTO', targetValue: 25, currentValue: 13, progress: 52, assignedCoordinators: quotas },
     { id: 'quito', title: 'Synthetic Quito Equipo 119', sede: 'Quito', scope: 'ENTRENAMIENTO', targetValue: 10, currentValue: 0, progress: 0 }
   ];
   const mocks = {
@@ -33,12 +33,14 @@ test('GoalsBoard renders synthetic roles, overachievement, source absence and sc
     'firebase/firestore': `
       const goals = ${JSON.stringify(goals)};
       export const collection = (_db, path) => ({ path });
-      export const doc = (_db, path) => ({ path });
+      export const doc = (_db, path, id) => ({ path, id });
       export const query = ref => ref;
       export const where = () => ({});
       export const orderBy = () => ({});
       export const limit = () => ({});
-      export const onSnapshot = (ref, callback, onError) => {
+      export const onSnapshot = (ref, optionsOrCallback, callbackOrError, maybeError) => {
+        const callback = typeof optionsOrCallback === 'function' ? optionsOrCallback : callbackOrError;
+        const onError = typeof optionsOrCallback === 'function' ? callbackOrError : maybeError;
         let active = true;
         queueMicrotask(() => {
           if (!active) return;
@@ -46,7 +48,15 @@ test('GoalsBoard renders synthetic roles, overachievement, source absence and sc
             onError(new Error('Synthetic offline')); return;
           }
           const docs = (ref.path === 'goals' ? goals : []).map(g => ({ id: g.id, data: () => g }));
-          callback({ docs, size: docs.length, empty: !docs.length, metadata: { fromCache: false }, exists: () => false });
+          const hasSource = ref.id === 'goal_sources' && new URLSearchParams(location.search).has('nodus');
+          const stale = new URLSearchParams(location.search).has('stale');
+          callback({ docs, size: docs.length, empty: !docs.length, metadata: { fromCache: false }, exists: () => hasSource,
+            data: () => ({ schemaVersion: 1, source: 'https://imo.crearpslglobal.com',
+              queriedAt: new Date(Date.now() - (stale ? 2 * 86400000 : 0)).toISOString(), sourceUpdatedAt: null,
+              teams: [{ sede: 'Lima', team: '31', stage: 'C1', teamId: '141', path: '/equipos/detalle/141', start: '2026-09-01', end: '2026-09-20' }],
+              allies: [{ sede: 'Lima', team: '31', stage: 'C1', teamId: '141', path: '/aliados?id_equipo=141', metric: 'assignedAllies', value: 17, complete: true }]
+            })
+          });
         });
         return () => { active = false; };
       };
@@ -110,6 +120,19 @@ test('GoalsBoard renders synthetic roles, overachievement, source absence and sc
     text = await page.evaluate(() => document.body.innerText);
     assert.match(text, /Ajuste Manual/);
     assert.doesNotMatch(text, /Synthetic Quito/);
+    await page.goto(`${origin}goals-test?nodus=1`, { waitUntil: 'networkidle0' });
+    await page.waitForFunction(() => document.body.innerText.includes('Aliados asignados: 17'));
+    text = await page.evaluate(() => document.body.innerText);
+    assert.match(text, /período registrado del equipo: 2026-09-01 al 2026-09-20/);
+    assert.match(text, /No equivale a las fechas de cada etapa/);
+    assert.match(text, /no acredita asistencia ni reemplaza el avance 13 \/ 25/);
+    assert.match(text, /fecha de modificación no disponible/);
+    const links = await page.$$eval('a[href]', elements => elements.map(e => e.href));
+    assert.ok(links.includes('https://imo.crearpslglobal.com/aliados?id_equipo=141'));
+    await page.goto(`${origin}goals-test?nodus=1&stale=1`, { waitUntil: 'networkidle0' });
+    await page.waitForFunction(() => document.body.innerText.includes('desactualizada'));
+    text = await page.evaluate(() => document.body.innerText);
+    assert.doesNotMatch(text, /Aliados asignados: 17|período registrado del equipo/);
     await page.goto(`${origin}goals-test?error=1`, { waitUntil: 'networkidle0' });
     await page.waitForFunction(() => document.body.innerText.includes('No pudimos actualizar las metas'));
     text = await page.evaluate(() => document.body.innerText);

@@ -52,3 +52,35 @@ ruta, o un contrato/API/exportación autorizado con sede, equipo, etapa, medida,
 fechas y marcas de actualización explícitas. Corregir el acceso debe hacerse por
 el administrador de Nodus; no implica sustituir el dato ausente por cuotas
 guardadas ni por confirmaciones telefónicas.
+
+### Contrato verificado mediante acceso autorizado en navegador (2026-10-11)
+
+La cuenta autorizada abrió `/sedes`, `/equipos` y `/aliados` sin modificar datos.
+La denegación anterior de `/dashboard` no probaba que todas las rutas fueran
+inaccesibles. No se almacenan las credenciales suministradas.
+
+`/equipos`: tabla `#tablaEquipos`, DataTables en modo cliente (no server-side).
+Columnas `EQUIPO`, `SEDE`, `INICIO`, `FIN`; enlace de lectura
+`/equipos/detalle/{id}`. Para E31 Lima, id 141: 01/09/2026 a 20/09/2026.
+Son fechas del registro de equipo, **no fechas C1/C2/MJ del calendario**.
+
+`/aliados?id_equipo=141`: selector `select[name="id_equipo"]` verifica la
+identidad del filtro. Cabeceras `Aliados Asignados (17)` y
+`Aliados Confirmados para C2 (1)` son categorías distintas.
+`Pagaron C2 / C2+MJ (40)` no se usa como aliados ni asistencia.
+No se recogen nombres, teléfonos, correos ni filas de personas.
+Nodus no expuso una marca de modificación de estas medidas: `sourceUpdatedAt`
+queda `null`, y `queriedAt` informa solo cuándo se consultó.
+
+`publishNodusGoalSources.mjs` genera una proyección agregada en
+`nodus_coordinadores_c1c2/goal_sources`, colección ya legible por los mismos
+usuarios autenticados; no cambia reglas ni metas. El workflow es **manual**:
+sin `publish=true` solo audita; publicar requiere una decisión explícita.
+No hay publicación programada ni login repetido tras un 401/403.
+
+La UI presenta período/conteos Nodus con enlaces y fecha de consulta, separados
+del calendario y de las cuotas/avances guardados. Una consulta de más de 24 horas
+no se aplica a esta comparación, lo cual no demuestra que la fuente se haya
+modificado o esté vigente. No se considera aliado asignado como logro/asistencia
+ni se ofrece sincronizarlo a `currentValue`. Calendario por etapa y asistencia
+siguen sin contrato Nodus verificado.

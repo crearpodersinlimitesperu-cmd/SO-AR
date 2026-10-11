@@ -10,6 +10,7 @@ import GoalDivisionModal from '../components/GoalDivisionModal';
 import { normalizeSede, getRoleDisplayName } from '../data/usersData';
 import { goalProgress, assignedQuotaTotals, isCallConfirmationGoal } from '../services/goalProgress';
 import { goalsAccess, visibleGoalsForUser } from '../services/goalsVisibility';
+import { nodusGoalSourceStatus, findNodusTeam, findNodusAllyEvidence, NODUS_GOAL_SOURCE } from '../services/nodusGoalSources';
 import { auditSingleGoal, auditAllGoals, extractTeamNumber } from '../services/goalsSentinelAgent';
 import { organizeGoalsByTeam, mjStageForTeam, explicitGoalTeam, goalStageKey, localDateKey } from '../services/goalsTimeline';
 
@@ -22,6 +23,7 @@ export default function GoalsBoard() {
   const [loading, setLoading] = useState(true);
   const [goalsStatus, setGoalsStatus] = useState('loading');
   const [sourceErrors, setSourceErrors] = useState({});
+  const [nodusGoalSources, setNodusGoalSources] = useState(null);
   const { canView: canViewGoals, canManage: canManageGoals, isGlobal: isSuperUser } = goalsAccess(currentUser);
 
   useEffect(() => {
@@ -182,6 +184,7 @@ export default function GoalsBoard() {
     setNodusData(null);
     setManagersList(null);
     setCoordinatorReports([]);
+    setNodusGoalSources(null);
     setSourceErrors({});
     const sourceError = (source, err) => {
       console.warn(`Error leyendo ${source}:`, err);
@@ -192,6 +195,7 @@ export default function GoalsBoard() {
     let unsubRep = () => {};
     let unsubNodus = () => {};
     let unsubManagers = () => {};
+    let unsubGoalSources = () => {};
     try {
       unsubMJ = onSnapshot(collection(db, 'mj_calendars'), (snap) => {
         setMjCalendars(snap.docs.map(d => ({ id: d.id, ...d.data() })));
@@ -221,6 +225,10 @@ export default function GoalsBoard() {
         if (snap.size >= 300) sourceError('directorio', new Error('La consulta alcanzó el límite; no representa un directorio completo.'));
         else sourceReady('directorio');
       }, (err) => { setManagersList(null); sourceError('directorio', err); });
+      unsubGoalSources = onSnapshot(doc(db, 'nodus_coordinadores_c1c2', 'goal_sources'), { includeMetadataChanges: true }, (snap) => {
+        setNodusGoalSources(snap.exists() && !snap.metadata.fromCache ? snap.data() : null);
+        sourceReady('fuentes de metas Nodus');
+      }, (err) => { setNodusGoalSources(null); sourceError('fuentes de metas Nodus', err); });
     } catch (e) {
       sourceError('fuentes adicionales', e);
       console.warn("Error iniciando listeners adicionales:", e);
@@ -230,6 +238,7 @@ export default function GoalsBoard() {
       unsubNodus();
       unsubManagers();
       unsubRep();
+      unsubGoalSources();
     };
   }, [currentUser, canViewGoals]);
 
@@ -1422,6 +1431,8 @@ export default function GoalsBoard() {
       : group.next
         ? `Próxima etapa: ${group.next.label} · ${formatCalendarDateRange(group.next.start, group.next.end)}`
         : null;
+    const nodusSourceState = nodusGoalSourceStatus(nodusGoalSources);
+    const nodusTeams = nodusSourceState.ready ? findNodusTeam(nodusGoalSources, group.sede, group.team) : [];
 
     return (
       <section key={group.key} aria-label={title} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -1481,6 +1492,18 @@ export default function GoalsBoard() {
               No encontramos fechas para este equipo. El avance registrado no confirma que el ciclo esté en curso.
             </p>
           )}
+          {nodusTeams.length > 0 && (
+            <div style={{ marginTop: '0.6rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+              {nodusTeams.map(team => (
+                <p key={team.teamId} style={{ margin: '0.35rem 0' }}>
+                  Nodus · {team.stage} · período registrado del equipo: {team.start || 'inicio no disponible'} al {team.end || 'fin no disponible'}.
+                  {' '}No equivale a las fechas de cada etapa.
+                  {' '}<a href={`${NODUS_GOAL_SOURCE}${team.path}`} target="_blank" rel="noopener noreferrer">Ver equipo en Nodus</a>
+                </p>
+              ))}
+              <span>{nodusSourceState.message}</span>
+            </div>
+          )}
           {group.duplicateCycles && (
             <p style={{ margin: '0.6rem 0 0', fontSize: '0.8rem', color: '#f59e0b' }}>
               ⚠️ Hay {group.cycles.length} metas globales para este mismo equipo y sede.
@@ -1531,6 +1554,7 @@ export default function GoalsBoard() {
     const calInfo = getGoalCalendarInfo(goal, parentGoal);
     const repSummary = getGoalReportsSummary(goal);
     const quotaTotals = assignedQuotaTotals(goal.assignedCoordinators);
+    const nodusAllyEvidence = findNodusAllyEvidence(nodusGoalSources, goal, parentGoal);
     const progress = goal.scope === 'CICLO' && !goal.parentId
       ? { percent: Number.isFinite(Number(goal.progress)) ? Number(goal.progress) : null, barPercent: Math.min(100, Math.max(0, Number(goal.progress) || 0)) }
       : goalProgress(goal.currentValue, goal.targetValue);
@@ -1740,7 +1764,21 @@ export default function GoalsBoard() {
               );
             })()}
 
-            {/* AUDITORIA Y SEGUIMIENTO EN TIEMPO REAL: AGENTE CENTINELA NODUS */}
+            {nodusAllyEvidence && (
+              <div style={{ marginTop: '0.65rem', padding: '0.8rem', border: '1px solid var(--border-subtle)', borderRadius: '10px', color: 'var(--text-heading)' }}>
+                <strong>Nodus · {nodusAllyEvidence.metric === 'assignedAllies' ? 'Aliados asignados' : 'Aliados confirmados para C2'}: {nodusAllyEvidence.value}</strong>
+                <p className="text-muted" style={{ margin: '0.35rem 0', fontSize: '0.8rem' }}>
+                  Sede {nodusAllyEvidence.sede} · equipo {nodusAllyEvidence.team} · {nodusAllyEvidence.stage}.
+                  {' '}Este conteo no acredita asistencia ni reemplaza el avance {goal.currentValue ?? 'no registrado'} / {goal.targetValue ?? 'sin objetivo'} guardado en esta meta.
+                </p>
+                <div className="text-muted" style={{ fontSize: '0.78rem' }}>
+                  Consultado: {nodusAllyEvidence.queriedAt} (fecha de modificación no disponible).
+                  {' '}<a href={`${NODUS_GOAL_SOURCE}${nodusAllyEvidence.path}`} target="_blank" rel="noopener noreferrer">Ver fuente en Nodus</a>
+                </div>
+              </div>
+            )}
+
+            {/* Comparación conservadora con las fuentes disponibles */}
             {(() => {
               const audit = auditSingleGoal(goal, parentGoal, {
                 nodusData,
@@ -2266,6 +2304,11 @@ export default function GoalsBoard() {
         )}
         {Object.values(sourceErrors).some(Boolean) && (
           <p role="alert" className="text-muted">No pudimos actualizar: {Object.keys(sourceErrors).filter(key => sourceErrors[key]).join(', ')}. No se confirma su vigencia.</p>
+        )}
+        {!nodusGoalSourceStatus(nodusGoalSources).ready && (
+          <p role="status" className="text-muted">
+            {nodusGoalSourceStatus(nodusGoalSources).message} Los datos registrados en las metas se mantienen separados de esta consulta.
+          </p>
         )}
         {loading ? <p className="text-muted text-center">Cargando metas...</p> : (() => {
           if (goals.length === 0) {
