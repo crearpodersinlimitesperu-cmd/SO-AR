@@ -29,8 +29,13 @@ export function summarizeWorkbookStructure(workbook) {
 async function main() {
   const raw = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
   if (!raw) throw new Error('Falta la cuenta de servicio configurada.');
+  const credentials = JSON.parse(raw);
+  console.log(JSON.stringify({
+    configuredIdentityMatchesSharedAccount: credentials.client_email ===
+      'causa-drive-sync@centro-operativo-cpsl.iam.gserviceaccount.com'
+  }));
   const auth = new google.auth.GoogleAuth({
-    credentials: JSON.parse(raw), scopes: [
+    credentials, scopes: [
       'https://www.googleapis.com/auth/spreadsheets.readonly',
       'https://www.googleapis.com/auth/drive.readonly'
     ]
@@ -45,10 +50,10 @@ async function main() {
   } catch (error) {
     if (error.response?.status !== 400) throw error;
     const drive = google.drive({ version: 'v3', auth });
-    const file = await drive.files.get({ fileId: spreadsheetId, fields: 'mimeType,size' });
+    const file = await drive.files.get({ fileId: spreadsheetId, fields: 'mimeType,size', supportsAllDrives: true });
     if (file.data.mimeType !== 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
         !Number.isFinite(Number(file.data.size)) || Number(file.data.size) > 10 * 1024 * 1024) throw error;
-    const response = await drive.files.get({ fileId: spreadsheetId, alt: 'media' }, { responseType: 'arraybuffer' });
+    const response = await drive.files.get({ fileId: spreadsheetId, alt: 'media', supportsAllDrives: true }, { responseType: 'arraybuffer' });
     const workbook = XLSX.read(Buffer.from(response.data), { type: 'buffer', sheetRows: 20 });
     console.log(JSON.stringify({ queriedAt: new Date().toISOString(), format: 'xlsx',
       requestedGoogleGidApplicable: false, sheets: summarizeWorkbookStructure(workbook) }, null, 2));
