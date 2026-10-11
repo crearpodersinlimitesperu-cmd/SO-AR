@@ -1,5 +1,15 @@
 # React + Vite
 
+## Accesos del Home
+
+El panel **Módulos y herramientas** del modo Pro usa las superficies,
+tipografías y colores del tema existente, con tarjetas alineadas en un grid
+responsivo. `src/pages/HomeModules.css` limita los estilos a este panel;
+no cambia permisos, etiquetas, destinos ni el modo Lite. Las ayudas mantienen
+hover/teclado en escritorio y descripción visible en dispositivos táctiles.
+Los estados de foco, pulsación y movimiento reducido no dependen de animaciones.
+Validación visual y de ayudas: `node --test tests/home-module-help.test.mjs`.
+
 ## Monitor de itinerarios de vuelos
 
 `/monitor-vuelos` conserva los permisos existentes y consulta los itinerarios
