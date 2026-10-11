@@ -173,6 +173,10 @@ MIME en Drive con la misma cuenta. Solo si es Excel (.xlsx), descarga en
 memoria (máximo 10 MB) y reporta la estructura de sus primeras 20 filas,
 sin títulos o celdas personales. No convierte el archivo, no cambia permisos
 y no aplica un gid de Google a índices de pestañas Excel.
+La ejecución con esa cuenta confirmó que Sheets respondió 400 y Drive 404
+para el segundo archivo. No fue posible leerlo con los permisos existentes;
+no se repitieron intentos ni se publicaron datos supuestos. Para utilizarlo,
+debe ser accesible a la cuenta de servicio ya configurada.
 
 `/reporte` ofrece un formulario GET con `select[name="id_equipo"]`.
 Incluye E31 Lima id 141, E30 Lima id 134 y E32 Lima id 149; esto no significa
