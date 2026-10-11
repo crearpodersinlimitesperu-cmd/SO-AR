@@ -34,6 +34,14 @@ estos presupuestos (sin descarga de JS, TLS, CPU, token refresh ni payload):
 | users.personalEmail | 6 RTT | 2 RTT | 420 / 180 ms |
 | staff.email | 8 RTT | 3 RTT | 540 / 240 ms |
 
+Primera ejecucion CI Node 22, run `38153536740`: tiempos observados (una muestra
+por ruta, incluyendo Auth simulado) `emails` 242.4 -> 182.2 ms, `email`
+301.7 -> 181.2 ms, `corporateEmail` 361.5 -> 181.0 ms, `personalEmail`
+422.0 -> 181.0 ms y `staff.email` 542.2 -> 241.5 ms. Son observaciones de timers
+en runner, no medianas ni datos productivos. Requests de lectura respectivos:
+4 -> 4, 5 -> 4, 6 -> 4, 7 -> 4 y 9 -> 5. `npm test` paso 142/142,
+build y emulador OR/reglas pasaron en ese run.
+
 Una creacion inicial suma 1 RTT esperado a ambas versiones. Roles conserva
 dos lecturas de directorios en paralelo, no se descarga el directorio completo
 de users. OR puede devolver mas documentos coincidentes que la antigua consulta
