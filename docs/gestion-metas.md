@@ -122,6 +122,21 @@ desconocida. Se mantiene PR borrador, sin publicación ni despliegue.
 
 ### Preparar metas del siguiente equipo sin mover el histórico
 
+La edición «Editar meta» permite título, indicador y objetivo a los roles
+de gestión existentes. Revalida la sede y el documento en transacción,
+rechaza cambios concurrentes de esos campos y conserva avances, reparto,
+equipo y etapa. El porcentaje se recalcula con el objetivo sin recortar
+sobrecumplimiento. Dirección puede gestionar todas las sedes; gerencia,
+solo la propia. La vista global muestra preparación por cada sede.
+
+Por autorización expresa de actualización automática para todas las sedes,
+el workflow de fuentes Nodus consulta y publica agregados cada seis horas
+(cron UTC), además del dispatch manual. Sus scopes proceden de metas de
+todas las sedes, nunca del filtro de pantalla. Solo publica fuentes
+verificadas: no crea objetivos, roles, cuotas ni convierte las medidas
+Nodus en avance manual. Un error de acceso/esquema cancela la publicación;
+la última consulta caduca a las 24 horas y no se presenta como tiempo real.
+
 El módulo muestra el próximo período C1 de equipo de la sede cuando existe
 una consulta Nodus reciente, inequívoca y con fechas válidas. Lo identifica
 como **preparación**, no como evento confirmado. Si aún no tiene un ciclo

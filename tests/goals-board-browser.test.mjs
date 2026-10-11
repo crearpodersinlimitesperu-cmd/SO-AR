@@ -70,7 +70,15 @@ test('GoalsBoard renders synthetic roles, overachievement, source absence and sc
       export const addDoc = async () => { throw new Error('Fixture must not write'); };
       export const updateDoc = addDoc;
       export const setDoc = addDoc;
-      export const runTransaction = addDoc;
+      export const runTransaction = async (_db, callback) => {
+        const writes = [];
+        const result = await callback({
+          get: async ref => ({ exists: () => true, data: () => goals.find(g => g.id === ref.id) }),
+          update: (ref, patch) => writes.push({ id: ref.id, patch })
+        });
+        window.fixtureWrites = writes;
+        return result;
+      };
       export const writeBatch = addDoc;
     `
   };
@@ -121,11 +129,31 @@ test('GoalsBoard renders synthetic roles, overachievement, source absence and sc
     assert.match(text, /Sin evidencia comparable/);
     assert.match(text, /Sin verificar/);
     assert.doesNotMatch(text, /Synthetic Quito|100% Confiable|Al día|Ajuste Manual|Asignar \/ Dividir/);
+    assert.doesNotMatch(text, /Editar meta/i);
     assert.match(text, /No encontramos fechas/);
     await page.goto(`${origin}goals-test?role=gerente`, { waitUntil: 'networkidle0' });
     await page.waitForFunction(() => document.body.innerText.includes('Ajuste Manual'));
     text = await page.evaluate(() => document.body.innerText);
     assert.match(text, /Ajuste Manual/);
+    assert.match(text, /Editar meta/i);
+    await page.evaluate(() => Array.from(document.querySelectorAll('button')).find(b => b.textContent === 'Editar meta').click());
+    assert.match(await page.evaluate(() => document.body.innerText), /Se conservan el equipo, la etapa, las cuotas y los avances/);
+    await page.evaluate(() => Array.from(document.querySelectorAll('button')).find(b => b.textContent === 'Cancelar').click());
+    await page.evaluate(() => Array.from(document.querySelectorAll('button')).find(b => b.textContent === 'Editar meta').click());
+    await page.evaluate(() => {
+      const input = document.querySelector('form input[type="number"]');
+      Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(input, '6');
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      const indicator = document.querySelectorAll('form input[type="text"]')[1];
+      Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(indicator, 'Cantidad');
+      indicator.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+    await page.evaluate(() => Array.from(document.querySelectorAll('button')).find(b => b.textContent === 'Guardar meta').click());
+    await page.waitForFunction(() => window.fixtureWrites?.length === 1);
+    const [edit] = await page.evaluate(() => window.fixtureWrites);
+    assert.equal(edit.patch.targetValue, 6);
+    assert.equal('currentValue' in edit.patch, false);
+    assert.equal('assignedCoordinators' in edit.patch, false);
     assert.doesNotMatch(text, /Synthetic Quito/);
     await page.goto(`${origin}goals-test?nodus=1`, { waitUntil: 'networkidle0' });
     await page.waitForFunction(() => document.body.innerText.includes('Aliados asignados: 17'));

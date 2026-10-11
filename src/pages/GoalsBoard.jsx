@@ -11,7 +11,7 @@ import { normalizeSede, getRoleDisplayName } from '../data/usersData';
 import { goalProgress, assignedQuotaTotals, isCallConfirmationGoal } from '../services/goalProgress';
 import { goalsAccess, visibleGoalsForUser } from '../services/goalsVisibility';
 import { nodusGoalSourceStatus, findNodusTeam, findNodusAllyEvidence, findNodusAttendanceEvidence, nextNodusC1Team, NODUS_GOAL_SOURCE } from '../services/nodusGoalSources';
-import { buildTeamGoalPlan } from '../services/goalsSetup';
+import { buildTeamGoalPlan, buildGoalEdit } from '../services/goalsSetup';
 import { auditSingleGoal, auditAllGoals, extractTeamNumber } from '../services/goalsSentinelAgent';
 import { organizeGoalsByTeam, mjStageForTeam, explicitGoalTeam, goalStageKey, localDateKey } from '../services/goalsTimeline';
 
@@ -78,6 +78,9 @@ export default function GoalsBoard() {
   const [showWizard, setShowWizard] = useState(false);
   const [wizardTeam, setWizardTeam] = useState('');
   const [generatingGoals, setGeneratingGoals] = useState(false);
+  const [editingGoal, setEditingGoal] = useState(null);
+  const [goalEditValues, setGoalEditValues] = useState({ title: '', kpi: '', targetValue: '' });
+  const [savingGoalEdit, setSavingGoalEdit] = useState(false);
   const [wizardStep, setWizardStep] = useState(0);
   const [showDailyModal, setShowDailyModal] = useState(false);
   const [dailyData, setDailyData] = useState({ parentId: '', title: '', kpi: '', targetValue: 1 });
@@ -100,10 +103,10 @@ export default function GoalsBoard() {
   );
   
   const [quitoCycle, setQuitoCycle] = useState('C1');
-  const nextNodusTeam = nextNodusC1Team(nodusGoalSources, selectedSedeFilter, localDateKey());
-  const nextTeamHasGoals = nextNodusTeam && goals.some(goal =>
-    explicitGoalTeam(goal) === nextNodusTeam.team &&
-    normalizeSede(goal.sede || '') === normalizeSede(nextNodusTeam.sede) && goal.scope === 'CICLO');
+  const preparationSedes = selectedSedeFilter === 'Todas'
+    ? [...new Set((nodusGoalSources?.teams || []).map(team => team.sede))]
+    : [selectedSedeFilter];
+  const nextNodusTeams = preparationSedes.map(sede => nextNodusC1Team(nodusGoalSources, sede, localDateKey())).filter(Boolean);
 
   // Sincronizacion oficial para Sede LIMA desde Google Sheet GRADUADOS LIMA (C1E31)
   const [syncingLima, setSyncingLima] = useState(false);
@@ -1179,6 +1182,36 @@ export default function GoalsBoard() {
     }
   };
 
+  const handleSaveGoalEdit = async (event) => {
+    event.preventDefault();
+    if (savingGoalEdit) return;
+    setSavingGoalEdit(true);
+    try {
+      if (goalsStatus !== 'loaded') throw new Error('Espera la confirmación del servidor.');
+      const ref = doc(db, 'goals', editingGoal.id);
+      const savedProgress = await runTransaction(db, async transaction => {
+        const snapshot = await transaction.get(ref);
+        if (!snapshot.exists()) throw new Error('La meta ya no existe.');
+        const latest = snapshot.data();
+        if (latest.title !== editingGoal.title || latest.kpi !== editingGoal.kpi ||
+            latest.targetValue !== editingGoal.targetValue) {
+          throw new Error('Otra persona cambió esta meta. Cierra y vuelve a abrir la edición.');
+        }
+        const patch = buildGoalEdit(currentUser, latest, goalEditValues, new Date().toISOString());
+        transaction.update(ref, patch);
+        return patch.progress;
+      });
+      if (savedProgress !== undefined) await performRollUp(editingGoal.id, savedProgress);
+      setEditingGoal(null);
+      showToast('Objetivo actualizado. Avances y asignaciones se conservan.', 'success');
+    } catch (error) {
+      console.error('Error editando objetivo:', error);
+      showToast(`No se guardó la meta: ${error.message}`, 'error');
+    } finally {
+      setSavingGoalEdit(false);
+    }
+  };
+
   const handleCreateDailyGoal = async (e) => {
     e.preventDefault();
     if (!dailyData.parentId || !dailyData.title || dailyData.targetValue <= 0) {
@@ -1490,6 +1523,12 @@ export default function GoalsBoard() {
       <div key={goal.id} className="glass-panel" style={{ padding: '1.5rem', transition: 'all 0.3s ease' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1rem' }}>
           <div style={{ flex: 1, minWidth: '280px' }}>
+            {canManageGoals && (
+              <button className="btn-secondary" onClick={() => {
+                setEditingGoal(goal);
+                setGoalEditValues({ title: goal.title || '', kpi: goal.kpi || '', targetValue: goal.targetValue ?? '' });
+              }}>Editar meta</button>
+            )}
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
               <span style={{ 
                 fontSize: '0.7rem', fontWeight: 'bold', padding: '0.2rem 0.6rem', borderRadius: '4px',
@@ -2253,8 +2292,11 @@ export default function GoalsBoard() {
             {nodusGoalSourceStatus(nodusGoalSources).message} Los datos registrados en las metas se mantienen separados de esta consulta.
           </p>
         )}
-        {nextNodusTeam && (
-          <div className="glass-panel" style={{ padding: '1.5rem' }}>
+        {nextNodusTeams.map(nextNodusTeam => {
+          const nextTeamHasGoals = goals.some(goal => goal.scope === 'CICLO' &&
+            explicitGoalTeam(goal) === nextNodusTeam.team && normalizeSede(goal.sede || '') === normalizeSede(nextNodusTeam.sede));
+          return (
+          <div key={`${nextNodusTeam.sede}|${nextNodusTeam.team}`} className="glass-panel" style={{ padding: '1.5rem' }}>
             <h3>Preparación · Equipo {nextNodusTeam.team} · {nextNodusTeam.sede} · C1</h3>
             <p>Próximo período de equipo registrado en Nodus: {nextNodusTeam.start} al {nextNodusTeam.end}. No confirma la fecha del evento C1.</p>
             <p>{nextTeamHasGoals ? 'Este equipo ya tiene un ciclo de metas configurado.' : 'Objetivos pendientes de gerencia. No se copian cuotas ni avances de equipos anteriores.'}</p>
@@ -2262,12 +2304,13 @@ export default function GoalsBoard() {
             {canManageGoals && !nextTeamHasGoals && (
               <button className="btn-primary" style={{ margin: '1rem' }} onClick={() => {
                 setWizardTeam(nextNodusTeam.team);
+                setSelectedSedeFilter(nextNodusTeam.sede);
                 setWizardData(stages.reduce((acc, stage) => ({ ...acc, [stage.id]: { px: '', aliados: '', managers: '', apoyos: '' } }), {}));
                 setShowWizard(true);
               }}>Configurar metas del equipo {nextNodusTeam.team}</button>
             )}
           </div>
-        )}
+        ); })}
         {loading ? <p className="text-muted text-center">Cargando metas...</p> : (() => {
           if (goals.length === 0) {
             if (goalsStatus !== 'loaded') return null;
@@ -2319,6 +2362,22 @@ export default function GoalsBoard() {
       />
 
       {/* MODAL WIZARD SETUP DE CICLO */}
+      {editingGoal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }}>
+          <form onSubmit={handleSaveGoalEdit} className="glass-panel" style={{ padding: '2rem', width: '100%', maxWidth: '600px' }}>
+            <h2>Editar meta · {editingGoal.sede}</h2>
+            <p>Se conservan el equipo, la etapa, las cuotas y los avances. Si cambias el objetivo, revisa el reparto de cuotas.</p>
+            {[['title', 'Título'], ['kpi', 'Indicador'], ['targetValue', 'Objetivo']].map(([key, label]) => (
+              <label key={key} style={{ display: 'block', margin: '1rem 0' }}>{label}
+                <input className="form-input" required type={key === 'targetValue' ? 'number' : 'text'} min={key === 'targetValue' ? '1' : undefined} step={key === 'targetValue' ? '1' : undefined}
+                  value={goalEditValues[key]} onChange={event => setGoalEditValues(previous => ({ ...previous, [key]: event.target.value }))} />
+              </label>
+            ))}
+            <button type="button" className="btn-secondary" disabled={savingGoalEdit} onClick={() => setEditingGoal(null)}>Cancelar</button>
+            <button className="btn-primary" disabled={savingGoalEdit}>{savingGoalEdit ? 'Guardando…' : 'Guardar meta'}</button>
+          </form>
+        </div>
+      )}
       {showWizard && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, padding: '1rem' }}>
           <div className="glass-panel" style={{ width: '100%', maxWidth: '600px', padding: '2rem', maxHeight: '90vh', overflowY: 'auto' }}>
