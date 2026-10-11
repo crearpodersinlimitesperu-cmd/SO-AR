@@ -87,3 +87,23 @@ test('agrupa metas por equipo y detecta las que aportan a otro ciclo', () => {
   assert.equal(g30.childProgress, 52);
   assert.equal(groups[2].status, 'legado');
 });
+import { findOfficialMJEvent } from './mjCalendarSource.js';
+
+test('MJ preload identifies Creación exactly, never a substring or another cohort stage', () => {
+  const event = { nombre: 'Maestría del Juego', sede: 'LIM', equipo: '293031', fecha_inicio: '2026-10-23' };
+  assert.equal(findOfficialMJEvent([event], 'Lima', '31'), event);
+  assert.equal(findOfficialMJEvent([event], 'Lima', '30'), null);
+  assert.equal(findOfficialMJEvent([event], 'Lima', '29'), null);
+  assert.equal(findOfficialMJEvent([event], 'Quito', '31'), null);
+  assert.equal(findOfficialMJEvent([{ ...event, equipo: '131' }], 'Lima', '31'), null);
+  assert.equal(findOfficialMJEvent([{ ...event, equipo: '' }], 'Lima', '31'), null);
+  assert.equal(findOfficialMJEvent([{ ...event, nombre: 'CAPITULO UNO', equipo: '31' }], 'Lima', '31'), null);
+});
+
+test('MJ preload rejects conflicting dates, invalid dates and missing source', () => {
+  const event = { name: 'MAESTRIA DEL JUEGO', sedeTag: 'Lima', team: 31, start: '2026-10-23' };
+  assert.equal(findOfficialMJEvent([event], 'Lima', 31), event);
+  assert.equal(findOfficialMJEvent([event, { ...event, start: '2026-11-27' }], 'Lima', '31'), null);
+  assert.equal(findOfficialMJEvent([{ ...event, start: '2026-02-31' }], 'Lima', '31'), null);
+  assert.equal(findOfficialMJEvent([], 'Lima', '31'), null);
+});
