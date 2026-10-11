@@ -4,7 +4,7 @@ on:
     inputs:
       mode:
         type: choice
-        options: [audit, publish]
+        options: [audit, publish, discover-goals]
         default: audit
         description: Audit reads only; publish refreshes aggregate sources without modifying Nodus
 permissions:
@@ -19,6 +19,15 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci --ignore-scripts --include=optional
+      - name: Install browser for read-only goals discovery
+        if: inputs.mode == 'discover-goals'
+        run: npx puppeteer browsers install chrome --install-deps
+      - name: Discover Nodus goals source schema without personal records
+        if: inputs.mode == 'discover-goals'
+        env:
+          NODUS_USER: ${{ secrets.NODUS_USER }}
+          NODUS_PASSWORD: ${{ secrets.NODUS_PASSWORD }}
+        run: node scripts/discoverNodusGoalSources.mjs
       - name: Read-only evidence
         if: inputs.mode == 'audit'
         env:
