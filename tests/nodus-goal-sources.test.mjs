@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { parseNodusTeamRows, parseAllyHeadings, collectNodusGoalSources } from '../scripts/publishNodusGoalSources.mjs';
+import { parseNodusTeamRows, parseAllyHeadings, collectNodusGoalSources, nodusAllyScopes } from '../scripts/publishNodusGoalSources.mjs';
 import { nodusDate, nodusGoalSourceStatus, findNodusTeam, findNodusAllyEvidence, NODUS_GOAL_SOURCE } from '../src/services/nodusGoalSources.js';
 
 const team = { sede: 'Lima', team: '31', teamId: '141', stage: 'C1', path: '/equipos/detalle/141' };
@@ -43,6 +43,25 @@ test('team grouping distinguishes stages and rejects duplicated or mismatched id
   assert.deepEqual(findNodusTeam({ ...snapshot, teams: [team, { ...team, teamId: '999', path: '/equipos/detalle/999' }, c2] }, 'Lima', '31'), [c2]);
   assert.deepEqual(findNodusTeam({ ...snapshot, teams: [{ ...team, path: '/equipos/detalle/999' }] }, 'Lima', '31'), []);
   assert.deepEqual(findNodusTeam(snapshot, 'Quito', '31'), []);
+});
+
+test('publisher scopes inherit explicit parent identity only and deduplicate child stages', () => {
+  const goals = [
+    { id: 'parent', title: 'Ciclo Equipo 31', sede: 'Lima' },
+    { id: 'child', title: 'Aliados - Capítulo 1', parentId: 'parent' },
+    { id: 'duplicate-scope', title: 'Aliados C1E31', sede: 'Lima' },
+    { id: 'own-scope', title: 'Aliados C2E30', sede: 'Quito', parentId: 'parent' },
+    { id: 'missing-parent', title: 'Aliados - Capítulo 1', parentId: 'missing' },
+    { id: 'missing-stage', title: 'Aliados Equipo 31', sede: 'Lima' }
+  ];
+  assert.deepEqual(nodusAllyScopes(goals), [
+    { sede: 'Lima', team: '31', stage: 'C1' }, { sede: 'Quito', team: '30', stage: 'C2' }
+  ]);
+  assert.deepEqual(nodusAllyScopes([
+    { id: 'ambiguous', title: 'Equipo 31', sede: 'Lima' },
+    { id: 'ambiguous', title: 'Equipo 30', sede: 'Quito' },
+    { id: 'child', title: 'Aliados - Capítulo 1', parentId: 'ambiguous' }
+  ]), []);
 });
 
 test('collector publishes no personal data and reads only known source paths', async () => {

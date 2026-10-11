@@ -43,19 +43,20 @@ visibles; no publica nombres, contactos, registros ni credenciales. Los conteos
 visibles **no** representan totales completos ni logros de metas. No escribe en
 Nodus, Firestore o metas.
 
-La consulta de 2026-10-11 (run `38155744260`) quedó bloqueada antes de inspeccionar
+La primera consulta de 2026-10-11 (run `38155744260`) quedó bloqueada antes de inspeccionar
 las fuentes: `/dashboard` respondió HTTP 403 (`landing_route_rejected`). Se
-detuvo sin reintentar el inicio de sesión ni eludir controles. No se verificó el
-contrato de calendario/aliados y no se conecta una fuente supuesta a la página.
-Para continuar hace falta un acceso de lectura autorizado que pueda abrir esa
-ruta, o un contrato/API/exportación autorizado con sede, equipo, etapa, medida,
-fechas y marcas de actualización explícitas. Corregir el acceso debe hacerse por
-el administrador de Nodus; no implica sustituir el dato ausente por cuotas
-guardadas ni por confirmaciones telefónicas.
+detuvo sin reintentar el inicio de sesión ni eludir controles. Ese intento no
+aportó contratos de datos. Posteriormente el usuario proporcionó un acceso
+autorizado y se verificaron las rutas descritas debajo desde el navegador.
+No se requiere que esta cuenta tenga permiso sobre `/dashboard` para utilizar
+las rutas de lectura verificadas. El contrato de calendario por etapa y
+asistencia permanece sin verificar; no se sustituye por cuotas ni llamadas.
 
 ### Contrato verificado mediante acceso autorizado en navegador (2026-10-11)
 
 La cuenta autorizada abrió `/sedes`, `/equipos` y `/aliados` sin modificar datos.
+La cabecera de aliados se reconfirmó a las `2026-10-11T16:39:32.189Z`:
+hora de consulta en navegador, no ejecución en runner ni modificación de Nodus.
 La denegación anterior de `/dashboard` no probaba que todas las rutas fueran
 inaccesibles. No se almacenan las credenciales suministradas.
 
@@ -77,6 +78,8 @@ queda `null`, y `queriedAt` informa solo cuándo se consultó.
 usuarios autenticados; no cambia reglas ni metas. El workflow es **manual**:
 sin `publish=true` solo audita; publicar requiere una decisión explícita.
 No hay publicación programada ni login repetido tras un 401/403.
+La implementación permanece en PR borrador, sin publicar esa proyección ni
+desplegar la nueva UI. No hay datos nuevos productivos provenientes de este PR.
 
 La UI presenta período/conteos Nodus con enlaces y fecha de consulta, separados
 del calendario y de las cuotas/avances guardados. Una consulta de más de 24 horas

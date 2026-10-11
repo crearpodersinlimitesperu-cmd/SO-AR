@@ -1,6 +1,6 @@
 import puppeteer from 'puppeteer';
 import { loginNodusReadOnly, getNodusAdminDb, isNodusVerificationUrl } from './nodusArchiveAgent.mjs';
-import { canonicalSede, explicitTeamFromText, goalStageKey } from '../src/services/goalsTimeline.js';
+import { canonicalSede, explicitGoalTeam, explicitTeamFromText, goalStageKey } from '../src/services/goalsTimeline.js';
 import { nodusDate, NODUS_GOAL_SOURCE } from '../src/services/nodusGoalSources.js';
 
 async function readPage(page, path) {
@@ -34,6 +34,19 @@ export function parseAllyHeadings(headings, team) {
     return [{ sede: team.sede, team: team.team, teamId: team.teamId, stage, metric,
       value: Number(matches[0][1]), complete: true, path: `/aliados?id_equipo=${team.teamId}` }];
   });
+}
+
+export function nodusAllyScopes(goals) {
+  const byId = new Map(goals.filter(g => goals.filter(other => other.id === g.id).length === 1).map(g => [g.id, g]));
+  return [...new Map(goals.flatMap(goal => {
+    if (!`${goal.title || ''} ${goal.kpi || ''}`.toLowerCase().includes('aliado')) return [];
+    const parent = byId.get(goal.parentId);
+    const team = explicitGoalTeam(goal) || explicitGoalTeam(parent);
+    const stage = goalStageKey(goal);
+    const sede = canonicalSede(goal.sede || parent?.sede || '');
+    return team && sede && !/global/i.test(sede) && ['C1', 'C2'].includes(stage)
+      ? [[`${sede}|${team}|${stage}`, { sede, team, stage }]] : [];
+  })).values()];
 }
 
 export async function collectNodusGoalSources(page, desiredScopes) {
@@ -74,14 +87,7 @@ export async function collectNodusGoalSources(page, desiredScopes) {
 async function main() {
   const db = getNodusAdminDb();
   const goals = await db.collection('goals').get();
-  const scopes = [...new Map(goals.docs.flatMap(doc => {
-    const goal = doc.data();
-    if (!`${goal.title || ''} ${goal.kpi || ''}`.toLowerCase().includes('aliado')) return [];
-    const team = explicitTeamFromText(goal.title);
-    const stage = goalStageKey(goal);
-    const sede = canonicalSede(goal.sede);
-    return team && sede && ['C1', 'C2'].includes(stage) ? [[`${sede}|${team}|${stage}`, { sede, team, stage }]] : [];
-  })).values()];
+  const scopes = nodusAllyScopes(goals.docs.map(doc => ({ ...doc.data(), id: doc.id })));
   const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
   try {
     const page = await browser.newPage();
