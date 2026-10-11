@@ -88,6 +88,38 @@ test('agrupa metas por equipo y detecta las que aportan a otro ciclo', () => {
   assert.equal(groups[2].status, 'legado');
 });
 import { findOfficialMJEvent } from './mjCalendarSource.js';
+import { parseOfficialCalendarSheet } from './officialCalendarSheet.js';
+import { summarizeSheetStructure } from '../../scripts/inspectMJSheetSource.mjs';
+
+test('service-account sheet inspection never returns private cells or document titles', () => {
+  const summary = summarizeSheetStructure([{ properties: { sheetId: 1960233176, title: 'Private fixture', gridProperties: { rowCount: 100, columnCount: 10 } },
+    data: [{ rowData: [{ values: [{ formattedValue: 'PRIMER FDS' }, { formattedValue: 'Private fixture' }] }] }] }]);
+  assert.deepEqual(summary[0].markers, [{ row: 1, column: 1, label: 'PRIMER FDS' }]);
+  assert.equal(JSON.stringify(summary).includes('Private fixture'), false);
+});
+
+test('official CSV keeps past records and mixed cohort text for E31 and E32 creation dates', () => {
+  const csv = 'Fecha,Fecha,Equipo,Entrenamiento,Entrenador,Lugar,Direccion \r\n' +
+    '2026-09-04,LIM,"28, 29 y 30",MAESTRIA DEL JUEGO,,,\r\n' +
+    '2026-10-09,LIM,"29, 30 y 31",MAESTRIA DEL JUEGO,,,\r\n' +
+    '2026-11-13,LIM,"30, 31 y 32",MAESTRIA DEL JUEGO,,,\r\n' +
+    '2026-10-23,LIM,32,CAPITULO UNO,,,\r\n';
+  const events = parseOfficialCalendarSheet(csv);
+  assert.equal(events.length, 4);
+  assert.equal(findOfficialMJEvent(events, 'Lima', '31').fecha_inicio, '2026-10-09T00:00:00');
+  assert.equal(findOfficialMJEvent(events, 'Lima', '32').fecha_inicio, '2026-11-13T00:00:00');
+  assert.equal(events[1].equipo, '29, 30 y 31');
+  assert.equal(events[1].fecha_fin, '');
+});
+
+test('official CSV preserves escaped multiline cells and rejects invalid or truncated sources', () => {
+  const header = '\uFEFFFecha,Fecha,Equipo,Entrenamiento,Entrenador,Lugar,Direccion \n';
+  const [event] = parseOfficialCalendarSheet(header + '2026-10-09,LIM,31,MAESTRIA DEL JUEGO,,"Sala ""A""\nPiso 2",');
+  assert.equal(event.lugar, 'Sala "A"\nPiso 2');
+  for (const value of ['<html>login</html>', header + '"incompleto', header + '2026-02-31,LIM,31,MJ,,,']) {
+    assert.throws(() => parseOfficialCalendarSheet(value));
+  }
+});
 
 test('MJ preload identifies Creación exactly, never a substring or another cohort stage', () => {
   const event = { nombre: 'Maestría del Juego', sede: 'LIM', equipo: '293031', fecha_inicio: '2026-10-23' };
