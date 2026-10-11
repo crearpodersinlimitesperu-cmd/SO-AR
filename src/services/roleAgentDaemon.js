@@ -59,8 +59,14 @@ export async function enforceUserRolesAgent(firebaseUser, currentRoles) {
       }
     }
 
+    // Ambos directorios son lecturas independientes: se piden en paralelo para
+    // no sumar dos viajes de red al arranque de sesión.
+    const [managersSnap, qtSnap] = await Promise.all([
+      getDocs(collection(db, 'managers_directory')),
+      getDocs(collection(db, 'qt_directory'))
+    ]);
+
     // 1. Escanear Directorio de Managers y Equipos con Idoneidad Estricta y Aislamiento Territorial
-    const managersSnap = await getDocs(collection(db, 'managers_directory'));
     let isManagerInDB = false;
     let isTrainerInDB = false;
     let isCoordInDB = false;
@@ -123,7 +129,6 @@ export async function enforceUserRolesAgent(firebaseUser, currentRoles) {
     }
 
     // 2. Escanear Directorio QT con Validación Estricta
-    const qtSnap = await getDocs(collection(db, 'qt_directory'));
     qtSnap.forEach(docSnap => {
       const data = docSnap.data();
       const qName = normalizeString(data.nombre);

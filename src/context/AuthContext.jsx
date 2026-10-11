@@ -24,8 +24,12 @@ async function saveSelfProfile(user, canonicalUser, normalizedEmail) {
     lastLoginAt: serverTimestamp()
   };
 
+  // El documento users/{uid} ya existe, así que las reglas que lo leen no
+  // dependen de esta escritura de metadatos: se envía sin bloquear el arranque.
+  // La creación (primer ingreso) sí se espera porque las reglas usan ese doc.
   if (profileSnapshot.exists()) {
-    await setDoc(profileRef, profileFields, { merge: true });
+    setDoc(profileRef, profileFields, { merge: true })
+      .catch((e) => console.warn('Cannot update self-service profile fields; continuing login', e));
     return;
   }
 
@@ -771,14 +775,16 @@ export function AuthProvider({ children }) {
               const todayStr = new Date().toISOString().slice(0, 10);
               const sessionLogKey = `audit_login_${normalizedEmail}_${todayStr}`;
               if (!sessionStorage.getItem(sessionLogKey)) {
-                await recordAuditEvent({
+                // Auditoría no bloqueante: el usuario ya fue verificado y
+                // recordAuditEvent captura sus propios errores de Firestore.
+                recordAuditEvent({
                   email: foundUser.email || normalizedEmail,
                   name: foundUser.name || user.displayName || 'Desconocido',
                   role: foundUser.role || 'Desconocido',
                   sede: foundUser.sede || 'Desconocida',
                   action: 'LOGIN',
                   details: 'Inicio de sesión / Actividad diaria'
-                });
+                }).catch((e) => console.error("Error actualizando login en auditoría:", e));
                 sessionStorage.setItem(sessionLogKey, 'true');
               }
             } catch(e) {
