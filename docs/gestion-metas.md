@@ -147,6 +147,12 @@ objetivos aprobados y la revisión/publicación del PR borrador.
 
 ### Reporte histórico de asistencia verificado
 
+Calendario de Maestría usa el calendario de eventos, no la proyección de
+períodos Nodus. Su búsqueda del Primer FDS reconoce solo el equipo exacto
+o su etapa Creación dentro de una cohorte, normaliza el nombre del evento
+y rechaza fechas ambiguas. Sin evento inequívoco presenta un aviso dentro
+del formulario; no afirma que el equipo no exista ni precarga C1 como MJ.
+
 `/reporte` ofrece un formulario GET con `select[name="id_equipo"]`.
 Incluye E31 Lima id 141, E30 Lima id 134 y E32 Lima id 149; esto no significa
 que el selector de Aliados tenga las mismas opciones.
