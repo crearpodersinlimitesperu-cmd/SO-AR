@@ -168,6 +168,11 @@ Sheets de solo lectura y reporta únicamente estructura/etiquetas conocidas,
 sin celdas personales ni credenciales. El JSON Apps Script del calendario
 permanece como fuente principal; el CSV solo sustituye el contraste
 Visualization que perdía histórico y cohortes.
+Si Sheets rechaza el documento con 400, la inspección verifica primero su
+MIME en Drive con la misma cuenta. Solo si es Excel (.xlsx), descarga en
+memoria (máximo 10 MB) y reporta la estructura de sus primeras 20 filas,
+sin títulos o celdas personales. No convierte el archivo, no cambia permisos
+y no aplica un gid de Google a índices de pestañas Excel.
 
 `/reporte` ofrece un formulario GET con `select[name="id_equipo"]`.
 Incluye E31 Lima id 141, E30 Lima id 134 y E32 Lima id 149; esto no significa

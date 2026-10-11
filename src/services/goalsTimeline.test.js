@@ -89,7 +89,7 @@ test('agrupa metas por equipo y detecta las que aportan a otro ciclo', () => {
 });
 import { findOfficialMJEvent } from './mjCalendarSource.js';
 import { parseOfficialCalendarSheet } from './officialCalendarSheet.js';
-import { summarizeSheetStructure } from '../../scripts/inspectMJSheetSource.mjs';
+import { summarizeSheetStructure, summarizeWorkbookStructure } from '../../scripts/inspectMJSheetSource.mjs';
 
 test('service-account sheet inspection never returns private cells or document titles', () => {
   const summary = summarizeSheetStructure([{ properties: { sheetId: 1960233176, title: 'Private fixture', gridProperties: { rowCount: 100, columnCount: 10 } },
@@ -98,6 +98,14 @@ test('service-account sheet inspection never returns private cells or document t
   assert.equal(JSON.stringify(summary).includes('Private fixture'), false);
 });
 
+test('Office structure inspection uses existing JSON safely without exporting private cells', () => {
+  const result = summarizeWorkbookStructure({
+    SheetNames: ['Private fixture'],
+    Sheets: { 'Private fixture': { '!ref': 'A1:B1', A1: { t: 's', v: 'PRIMER FDS' }, B1: { t: 's', v: 'Private fixture' } } }
+  });
+  assert.equal(result[0].markers[0].label, 'PRIMER FDS');
+  assert.equal(JSON.stringify(result).includes('Private fixture'), false);
+});
 test('official CSV keeps past records and mixed cohort text for E31 and E32 creation dates', () => {
   const csv = 'Fecha,Fecha,Equipo,Entrenamiento,Entrenador,Lugar,Direccion \r\n' +
     '2026-09-04,LIM,"28, 29 y 30",MAESTRIA DEL JUEGO,,,\r\n' +
