@@ -21,6 +21,160 @@ test('every Home Pro access has a concise description, including role-specific a
   assert.match(homeModuleHelp.campus, /externa/);
 });
 
+test('premium Home grid renders real accesses with responsive themes, focus and reduced motion', async () => {
+  const home = readFileSync(new URL('../src/pages/Home.jsx', import.meta.url), 'utf8');
+  const pro = home.split('{/* BARRA PRO COMPLETA')[1].split('{/* BANNER INTERACTIVO')[0];
+  const grid = pro.slice(pro.indexOf('<section'), pro.lastIndexOf('</section>') + '</section>'.length);
+  const fixture = '/home-premium-fixture.jsx';
+  const server = await createServer({
+    configFile: false,
+    server: { host: '127.0.0.1', port: 0, hmr: false },
+    plugins: [react(), {
+      name: 'home-premium-fixture',
+      resolveId: id => id === fixture ? `${process.cwd()}${fixture}` : undefined,
+      load: id => id === `${process.cwd()}${fixture}` ? `
+        import React from 'react';
+        import { createRoot } from 'react-dom/client';
+        import { LayoutGrid, Users } from 'lucide-react';
+        import ModuleHelpButton from '/src/components/ModuleHelpButton.jsx';
+        import '/src/index.css';
+        import '/src/pages/HomeModules.css';
+        const params = new URLSearchParams(location.search);
+        document.documentElement.dataset.theme = params.get('theme') || 'dark';
+        const currentUser = { appRole: params.get('role') || 'superadmin' };
+        const hasRoleAccess = roles => roles.includes(currentUser.appRole);
+        const canAccessAgendaTimeBoxing = () => true;
+        const canAccessManualQT = () => true;
+        const canAccessManualNodus = () => true;
+        const canAccessDirectorioQT = () => true;
+        const canAccessCalendarioMJ = () => true;
+        const canAccessFlyersC1 = () => true;
+        const canAccessMonitorVuelos = () => true;
+        const canAccessMonitorIMOs = () => true;
+        const canUseAsignadorEntrenadores = () => true;
+        const isDataAdmin = () => currentUser.appRole === 'superadmin';
+        window.openedModules = [];
+        const navigate = path => window.openedModules.push(path);
+        const setShowHorariosModal = value => window.openedModules.push(value);
+        function Fixture() { return ${grid}; }
+        createRoot(document.getElementById('root')).render(<Fixture />);
+      ` : undefined,
+      configureServer: vite => {
+        vite.middlewares.use((req, res, next) => {
+          if (!req.url.startsWith('/home-premium-test')) return next();
+          res.setHeader('Content-Type', 'text/html');
+          res.end(`<meta name="viewport" content="width=device-width,initial-scale=1">
+            <div id="root" style="max-width:960px;margin:auto;padding:2rem 1rem"></div>
+            <script type="module" src="${fixture}"></script>`);
+        });
+      }
+    }]
+  });
+  let browser;
+  try {
+    await server.listen();
+    browser = await puppeteer.launch({
+      executablePath: process.env.CHROME_BIN || await puppeteer.executablePath(),
+      headless: true,
+      args: ['--no-sandbox']
+    });
+    let page = await browser.newPage();
+    const errors = [];
+    page.on('pageerror', error => errors.push(error.message));
+    const url = `${server.resolvedUrls.local[0]}home-premium-test`;
+    for (const theme of ['dark', 'light']) {
+      for (const width of [1280, 768, 640, 390, 320]) {
+        const touch = width <= 390;
+        await page.setViewport({ width, height: 1000, isMobile: touch, hasTouch: touch });
+        await page.goto(`${url}?theme=${theme}`);
+        await page.waitForSelector('.home-module-card');
+        assert.equal(await page.$eval('#home-modules-title', el => el.textContent), 'Módulos y herramientas');
+        const layout = await page.$$eval('.home-module-card', cards => cards.map(el => {
+          const rect = el.getBoundingClientRect();
+          return { x: rect.x, width: rect.width, height: rect.height,
+            inside: rect.left >= 0 && rect.right <= innerWidth,
+            labelFits: el.scrollWidth <= el.clientWidth };
+        }));
+        assert.ok(layout.every(card => card.inside && card.labelFits && card.height >= 44), `${theme}/${width}`);
+        assert.ok(layout.every(card => Math.abs(card.width - layout[0].width) < 1), 'aligned equal-width cards');
+        assert.equal(new Set(layout.map(card => card.x)).size, width >= 768 ? 3 : width >= 640 ? 2 : 1);
+        assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+        const contrast = await page.$eval('.home-module-card', el => {
+          const rgb = value => value.match(/[\d.]+/g).map(Number);
+          const foreground = rgb(getComputedStyle(el).color);
+          const probe = document.createElement('div');
+          probe.style.color = 'var(--bg-dark-alt)';
+          document.body.append(probe);
+          const base = rgb(getComputedStyle(probe).color);
+          probe.remove();
+          const surface = rgb(getComputedStyle(el).backgroundColor);
+          const alpha = surface[3] ?? 1;
+          const background = base.map((channel, i) => surface[i] * alpha + channel * (1 - alpha));
+          const luminance = channels => channels.slice(0, 3).map(c => {
+            const value = c / 255;
+            return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+          }).reduce((sum, value, i) => sum + value * [0.2126, 0.7152, 0.0722][i], 0);
+          return (Math.max(luminance(foreground), luminance(background)) + 0.05) /
+            (Math.min(luminance(foreground), luminance(background)) + 0.05);
+        });
+        assert.ok(contrast >= 4.5, `${theme} text contrast: ${contrast}`);
+        if (touch) {
+          assert.equal(await page.$$eval('.home-modules .module-help-description', nodes =>
+            nodes.every(el => getComputedStyle(el).position === 'static' && el.getBoundingClientRect().height > 0)), true);
+          await page.tap('[data-module-help="horarios"]');
+          assert.deepEqual(await page.evaluate(() => window.openedModules), [true]);
+          assert.equal(await page.$eval('.module-help-description',
+            el => getComputedStyle(el).position), 'static', 'touch descriptions remain visible after navigation');
+        }
+        if (process.env.HOME_SCREENSHOT_DIR && [1280, 390].includes(width)) {
+          await page.screenshot({ path: `${process.env.HOME_SCREENSHOT_DIR}/home-${theme}-${width}.png`, fullPage: true });
+        }
+      }
+    }
+    await browser.close();
+    browser = await puppeteer.launch({
+      executablePath: process.env.CHROME_BIN || await puppeteer.executablePath(),
+      headless: true,
+      args: ['--no-sandbox',
+        '--blink-settings=availableHoverTypes=2,primaryHoverType=2,availablePointerTypes=4,primaryPointerType=4']
+    });
+    page = await browser.newPage();
+    page.on('pageerror', error => errors.push(error.message));
+    await page.setViewport({ width: 1280, height: 1000, isMobile: false, hasTouch: false });
+    await page.goto(url);
+    const card = await page.waitForSelector('[data-module-help="gerencial"]');
+    await card.focus();
+    assert.equal(await card.evaluate(el => getComputedStyle(el).outlineWidth), '3px');
+    await page.keyboard.press('Enter');
+    assert.deepEqual(await page.evaluate(() => window.openedModules), ['/gerente']);
+    await card.hover();
+    await new Promise(resolve => setTimeout(resolve, 200));
+    assert.equal(await card.evaluate(el => getComputedStyle(el).transform), 'matrix(1, 0, 0, 1, 0, -2)');
+    await page.mouse.down();
+    await new Promise(resolve => setTimeout(resolve, 200));
+    assert.equal(await card.evaluate(el => getComputedStyle(el).transform), 'matrix(1, 0, 0, 1, 0, 0)');
+    await page.mouse.up();
+    await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
+    assert.equal(await card.evaluate(el => getComputedStyle(el).transitionDuration), '0s');
+    assert.equal(await card.evaluate(el => getComputedStyle(el).transform), 'none');
+    for (const [role, key, path] of [
+      ['cfo', 'cfo', '/cfo-dashboard'], ['legal', 'legal', '/legal-hub'],
+      ['rrhh', 'talento', '/hr-command-center'],
+      ['coord_maestria_global', 'maestria', '/andres-command-center'],
+      ['capitan', 'checklist', '/checklist/capitan']
+    ]) {
+      await page.goto(`${url}?role=${role}`);
+      await page.waitForSelector(`[data-module-help="${key}"]`);
+      await page.click(`[data-module-help="${key}"]`);
+      assert.deepEqual(await page.evaluate(() => window.openedModules), [path]);
+    }
+    assert.deepEqual(errors, []);
+  } finally {
+    await browser?.close();
+    await server.close();
+  }
+});
+
 test('module help supports hover, keyboard, viewport edges and mobile without intercepting navigation', async () => {
   const fixture = '/home-module-help-fixture.jsx';
   const server = await createServer({

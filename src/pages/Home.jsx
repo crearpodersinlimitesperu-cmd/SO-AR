@@ -2,6 +2,7 @@ import { MODULE_REGISTRY, isModuleVisible, REPORTES_VISIBLE } from '../config/mo
 import { useModuleUsage } from '../context/ModuleUsageContext';
 import ModuleQuickAccess from '../components/ModuleQuickAccess';
 import ModuleHelpButton from '../components/ModuleHelpButton';
+import './HomeModules.css';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -2419,53 +2420,62 @@ export default function Home() {
 
       {/* BARRA PRO COMPLETA (SI ESTÁ EN MODO PRO) */}
       {viewMode === 'pro' && customModules.advancedTools !== false && (
-        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap', marginBottom: '1.5rem', padding: '0.75rem', background: 'rgba(255,255,255,0.02)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.06)' }}>
+        <section className="home-modules" aria-labelledby="home-modules-title">
+          <header className="home-modules-header">
+            <div>
+              <p className="home-modules-eyebrow">CAUSA OS / TU ESPACIO DE TRABAJO</p>
+              <h2 id="home-modules-title">Módulos y herramientas</h2>
+              <p className="home-modules-intro">Accede a lo que necesitas, desde un solo lugar.</p>
+            </div>
+            <LayoutGrid className="home-modules-mark" size={24} aria-hidden="true" />
+          </header>
+          <div className="home-modules-grid">
           {canAccessAgendaTimeBoxing(currentUser) && (
-            <ModuleHelpButton helpKey="horarios" onClick={() => setShowHorariosModal(true)} className="btn-primary" title="Horarios oficiales de entrenamiento y código de vestimenta" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #06b6d4, #0284c7)', color: 'white', fontWeight: 'bold', border: 'none' }}>
+            <ModuleHelpButton helpKey="horarios" onClick={() => setShowHorariosModal(true)} className="home-module-card" title="Horarios oficiales de entrenamiento y código de vestimenta">
               ⏰ Horarios y Vestimenta
             </ModuleHelpButton>
           )}
           {currentUser?.appRole === 'cfo' ? (
-            <ModuleHelpButton helpKey="cfo" onClick={() => navigate('/cfo-dashboard')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #10b981, #047857)', color: 'white', fontWeight: 'bold', border: 'none' }}>
+            <ModuleHelpButton helpKey="cfo" onClick={() => navigate('/cfo-dashboard')} className="home-module-card">
               🏦 Dirección Financiera (CFO)
             </ModuleHelpButton>
           ) : currentUser?.appRole === 'legal' || currentUser?.appRole === 'juridico' ? (
-            <ModuleHelpButton helpKey="legal" onClick={() => navigate('/legal-hub')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: 'white', fontWeight: 'bold', border: 'none' }}>
+            <ModuleHelpButton helpKey="legal" onClick={() => navigate('/legal-hub')} className="home-module-card">
               ⚖️ Torre Legal
             </ModuleHelpButton>
           ) : currentUser?.appRole === 'talento_humano' || currentUser?.appRole === 'rrhh' ? (
-            <ModuleHelpButton helpKey="talento" onClick={() => navigate('/hr-command-center')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #8b5cf6, #6d28d9)', color: 'white', fontWeight: 'bold', border: 'none' }}>
+            <ModuleHelpButton helpKey="talento" onClick={() => navigate('/hr-command-center')} className="home-module-card">
               🏢 Talento Humano
             </ModuleHelpButton>
           ) : currentUser?.appRole === 'coord_maestria_global' ? (
-            <ModuleHelpButton helpKey="maestria" onClick={() => navigate('/andres-command-center')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #0284c7, #0369a1)', color: 'white', fontWeight: 'bold', border: 'none' }}>
+            <ModuleHelpButton helpKey="maestria" onClick={() => navigate('/andres-command-center')} className="home-module-card">
               🌐 Comando Maestría
             </ModuleHelpButton>
           ) : hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) ? (
-            <ModuleHelpButton helpKey="gerencial" onClick={() => navigate('/gerente')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'var(--crear-gold)', color: 'black' }}>
+            <ModuleHelpButton helpKey="gerencial" onClick={() => navigate('/gerente')} className="home-module-card">
               💼 Causa OS Gerencial
             </ModuleHelpButton>
           ) : (
-            <ModuleHelpButton helpKey="checklist" onClick={() => navigate(`/checklist/${currentUser?.appRole || 'capitan'}`)} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'var(--crear-gold)', color: 'black' }}>
+            <ModuleHelpButton helpKey="checklist" onClick={() => navigate(`/checklist/${currentUser?.appRole || 'capitan'}`)} className="home-module-card">
               💼 Mi Dashboard
             </ModuleHelpButton>
           )}
           {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) && (
             <>
-              <ModuleHelpButton helpKey="portafolio" onClick={() => navigate('/portafolio')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #0ea5e9, #0369a1)', color: 'white', border: 'none' }}>
+              <ModuleHelpButton helpKey="portafolio" onClick={() => navigate('/portafolio')} className="home-module-card">
                 📈 Portafolio PMO
               </ModuleHelpButton>
-              <ModuleHelpButton helpKey="estrategia" onClick={() => navigate('/estrategia')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #10b981, #047857)', color: 'white', border: 'none' }}>
+              <ModuleHelpButton helpKey="estrategia" onClick={() => navigate('/estrategia')} className="home-module-card">
                 🎯 OKRs (Cascade)
               </ModuleHelpButton>
-              <ModuleHelpButton helpKey="auditoria" onClick={() => navigate('/auditoria-kpis')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'transparent', border: '1px solid #10b981', color: '#10b981' }}>
+              <ModuleHelpButton helpKey="auditoria" onClick={() => navigate('/auditoria-kpis')} className="home-module-card">
                 📉 Auditoría KPIs
               </ModuleHelpButton>
             </>
           )}
 
           {hasRoleAccess(['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan']) && (
-            <ModuleHelpButton helpKey="kpis" onClick={() => navigate('/mis-kpis')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #10b981, #047857)', color: 'white', border: 'none' }}>
+            <ModuleHelpButton helpKey="kpis" onClick={() => navigate('/mis-kpis')} className="home-module-card">
               📊 Mis KPIs
             </ModuleHelpButton>
           )}
@@ -2477,116 +2487,116 @@ export default function Home() {
             // Causa OS — la sección exclusiva de QT existe ahí (pestaña "Guía por Rol"), pero
             // no es lo primero que se ve. José eligió la opción de llevar directo al Manual QT
             // externo completo (el mismo enlace que ya existía dentro de esa sección).
-            <ModuleHelpButton helpKey="manualQT" onClick={() => window.open('https://crearpsl.net/manual_quantum_team.html', '_blank', 'noopener,noreferrer')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #0284c7, #2563eb)', color: 'white', border: 'none' }}>
+            <ModuleHelpButton helpKey="manualQT" onClick={() => window.open('https://crearpsl.net/manual_quantum_team.html', '_blank', 'noopener,noreferrer')} className="home-module-card">
               📘 Manual QT
             </ModuleHelpButton>
           )}
 
           {canAccessManualNodus(currentUser) && (
-            <ModuleHelpButton helpKey="manualNodus" onClick={() => navigate('/manual-nodus')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #10b981, #047857)', color: 'white', border: 'none' }}>
+            <ModuleHelpButton helpKey="manualNodus" onClick={() => navigate('/manual-nodus')} className="home-module-card">
               📗 Manual Nodus
             </ModuleHelpButton>
           )}
 
           {canAccessDirectorioQT(currentUser) && (
-            <ModuleHelpButton helpKey="directorioQT" onClick={() => navigate('/directorio-qt')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: 'white', border: 'none' }}>
+            <ModuleHelpButton helpKey="directorioQT" onClick={() => navigate('/directorio-qt')} className="home-module-card">
               ⚡ Directorio QT
             </ModuleHelpButton>
           )}
 
           {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria', 'talento_humano']) && (
-            <ModuleHelpButton helpKey="mando" onClick={() => navigate('/superadmin')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #8b5cf6, #29abe2)', color: 'white', border: 'none' }}>
+            <ModuleHelpButton helpKey="mando" onClick={() => navigate('/superadmin')} className="home-module-card">
               🌐 Centro de Mando
             </ModuleHelpButton>
           )}
           {hasRoleAccess(['cfo', 'ceo', 'superadmin', 'direccion']) && (
-            <ModuleHelpButton helpKey="cfo" onClick={() => navigate('/cfo-dashboard')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #1e293b, #064e3b)', color: '#10b981', border: '1px solid #10b981', fontWeight: 'bold' }}>
+            <ModuleHelpButton helpKey="cfo" onClick={() => navigate('/cfo-dashboard')} className="home-module-card">
               🏦 Dir. Financiera
             </ModuleHelpButton>
           )}
           {hasRoleAccess(['finanzas', 'facturacion', 'contador', 'superadmin']) && (
-            <ModuleHelpButton helpKey="finanzas" onClick={() => navigate('/finance-workspace')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #1e293b, #065f46)', color: '#34d399', border: '1px solid #34d399' }}>
+            <ModuleHelpButton helpKey="finanzas" onClick={() => navigate('/finance-workspace')} className="home-module-card">
               💸 Finanzas
             </ModuleHelpButton>
           )}
           {hasRoleAccess(['coord_maestria_global', 'director_maestria', 'superadmin', 'ceo', 'direccion']) && (
-            <ModuleHelpButton helpKey="maestria" onClick={() => navigate('/andres-command-center')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #0c4a6e, #0284c7)', color: '#ffffff', fontWeight: 'bold', border: 'none' }}>
+            <ModuleHelpButton helpKey="maestria" onClick={() => navigate('/andres-command-center')} className="home-module-card">
               🌐 Maestría (Andrés)
             </ModuleHelpButton>
           )}
           {hasRoleAccess(['talento_humano', 'rrhh', 'superadmin', 'ceo', 'direccion']) && (
-            <ModuleHelpButton helpKey="talento" onClick={() => navigate('/hr-command-center')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #4c1d95, #7c3aed)', color: '#ffffff', fontWeight: 'bold', border: 'none' }}>
+            <ModuleHelpButton helpKey="talento" onClick={() => navigate('/hr-command-center')} className="home-module-card">
               🏢 Talento Humano
             </ModuleHelpButton>
           )}
           {hasRoleAccess(['legal', 'juridico', 'superadmin', 'ceo', 'direccion']) && (
-            <ModuleHelpButton helpKey="legal" onClick={() => navigate('/legal-hub')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #78350f, #d97706)', color: '#ffffff', fontWeight: 'bold', border: 'none' }}>
+            <ModuleHelpButton helpKey="legal" onClick={() => navigate('/legal-hub')} className="home-module-card">
               ⚖️ Torre Legal
             </ModuleHelpButton>
           )}
           {hasRoleAccess(['qt', 'gerente', 'superadmin', 'ceo', 'direccion']) && (
-            <ModuleHelpButton helpKey="hubQT" onClick={() => navigate('/qt-hub')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #7c2d12, #ea580c)', color: '#ffffff', fontWeight: 'bold', border: 'none' }}>
+            <ModuleHelpButton helpKey="hubQT" onClick={() => navigate('/qt-hub')} className="home-module-card">
               ⚡ Hub QT
             </ModuleHelpButton>
           )}
           {hasRoleAccess(['entrenador_llamadas', 'direccion', 'superadmin', 'ceo', 'coordinador_mj', 'coord_maestria']) && (
-            <ModuleHelpButton helpKey="llamadas" onClick={() => navigate('/call-coach-crm')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #831843, #db2777)', color: '#ffffff', fontWeight: 'bold', border: 'none' }}>
+            <ModuleHelpButton helpKey="llamadas" onClick={() => navigate('/call-coach-crm')} className="home-module-card">
               📞 CRM Llamadas
             </ModuleHelpButton>
           )}
           {hasRoleAccess(['entrenador', 'direccion', 'superadmin', 'ceo', 'director_maestria']) && (
-            <ModuleHelpButton helpKey="entrenador" onClick={() => navigate('/trainer-hub')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #713f12, #ca8a04)', color: '#ffffff', fontWeight: 'bold', border: 'none' }}>
+            <ModuleHelpButton helpKey="entrenador" onClick={() => navigate('/trainer-hub')} className="home-module-card">
               🎓 Hub Entrenador
             </ModuleHelpButton>
           )}
           {isDataAdmin(currentUser) && (
-            <ModuleHelpButton helpKey="auditoriaLegal" onClick={() => navigate('/legal-admin')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #1e293b, #0f172a)', color: '#fbbf24', border: '1px solid #fbbf24' }}>
+            <ModuleHelpButton helpKey="auditoriaLegal" onClick={() => navigate('/legal-admin')} className="home-module-card">
               ⚖️ Auditoría Legal
             </ModuleHelpButton>
           )}
 
           {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) && (
-            <ModuleHelpButton helpKey="calendarioGlobal" onClick={() => window.open('/calendario_global.html?v=' + Date.now() + '&email=' + encodeURIComponent(currentUser?.email || '') + '&name=' + encodeURIComponent(currentUser?.displayName || currentUser?.name || ''), '_blank')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #ef4444)', color: 'white', border: 'none' }}>
+            <ModuleHelpButton helpKey="calendarioGlobal" onClick={() => window.open('/calendario_global.html?v=' + Date.now() + '&email=' + encodeURIComponent(currentUser?.email || '') + '&name=' + encodeURIComponent(currentUser?.displayName || currentUser?.name || ''), '_blank')} className="home-module-card">
               📅 Calendario Global
             </ModuleHelpButton>
           )}
 
           {/* Campus Interactivo: abierto a TODOS los 9 roles */}
-          <ModuleHelpButton helpKey="campus" onClick={() => window.open('https://cpsl-campus-interactivo.vercel.app/ruta', '_blank')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #10b981, #059669)', color: 'white', border: 'none' }}>
+          <ModuleHelpButton helpKey="campus" onClick={() => window.open('https://cpsl-campus-interactivo.vercel.app/ruta', '_blank')} className="home-module-card">
             🎓 Campus Interactivo
           </ModuleHelpButton>
 
           {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'director_maestria']) && (
-            <ModuleHelpButton helpKey="managers" onClick={() => navigate('/centro-managers')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#000', fontWeight: 'bold', border: 'none' }}>
+            <ModuleHelpButton helpKey="managers" onClick={() => navigate('/centro-managers')} className="home-module-card">
               👑 Centro Managers
             </ModuleHelpButton>
           )}
 
           {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) && (
-            <ModuleHelpButton helpKey="crm" onClick={() => navigate('/crm-maestro')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #10b981, #047857)', color: 'white', fontWeight: 'bold', border: 'none' }}>
+            <ModuleHelpButton helpKey="crm" onClick={() => navigate('/crm-maestro')} className="home-module-card">
               <Users size={14} style={{ display: 'inline', marginRight: '4px' }} /> BASE MAESTRA CRM
             </ModuleHelpButton>
           )}
 
           {canAccessCalendarioMJ(currentUser) && (
-            <ModuleHelpButton helpKey="calendarioMJ" onClick={() => navigate('/calendario-mj')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #1a75bc, #29abe2)', color: 'white', border: 'none' }}>
+            <ModuleHelpButton helpKey="calendarioMJ" onClick={() => navigate('/calendario-mj')} className="home-module-card">
               📅 Calendario MJ
             </ModuleHelpButton>
           )}
 
           {canAccessFlyersC1(currentUser) && (
-            <ModuleHelpButton helpKey="flyers" onClick={() => navigate('/generador-flyer')} className="btn-primary" title="Generador de Flyers Oficiales para Capítulos Uno" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #ec4899)', color: 'white', fontWeight: 'bold', border: 'none', boxShadow: '0 0 15px rgba(245, 158, 11, 0.4)' }}>
+            <ModuleHelpButton helpKey="flyers" onClick={() => navigate('/generador-flyer')} className="home-module-card" title="Generador de Flyers Oficiales para Capítulos Uno">
               🎨 Flyers C1 Globales
             </ModuleHelpButton>
           )}
 
           {canAccessMonitorVuelos(currentUser) && (
-            <ModuleHelpButton helpKey="vuelos" onClick={() => navigate('/monitor-vuelos')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #38bdf8, #0284c7)', color: 'white', fontWeight: 'bold', border: 'none' }}>
+            <ModuleHelpButton helpKey="vuelos" onClick={() => navigate('/monitor-vuelos')} className="home-module-card">
               ✈️ Monitor de Vuelos
             </ModuleHelpButton>
           )}
           {canAccessMonitorIMOs(currentUser) && (
-            <ModuleHelpButton helpKey="imos" onClick={() => navigate('/monitor-imos')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #a855f7, #7e22ce)', color: 'white', fontWeight: 'bold', border: 'none' }}>
+            <ModuleHelpButton helpKey="imos" onClick={() => navigate('/monitor-imos')} className="home-module-card">
               🦅 Monitor de IMOs
             </ModuleHelpButton>
           )}
@@ -2594,11 +2604,12 @@ export default function Home() {
           {/* (20/09/2026) Asignador Oficial de Entrenadores — solo Fer, Paul y José
               (canUseAsignadorEntrenadores, lista cerrada de correos). */}
           {canUseAsignadorEntrenadores(currentUser) && (
-            <ModuleHelpButton helpKey="asignador" onClick={() => navigate('/asignador-entrenadores')} className="btn-primary" title="Asignar qué entrenador va a cada entrenamiento y a cada FDS de Maestría" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #6366f1, #4338ca)', color: 'white', fontWeight: 'bold', border: 'none' }}>
+            <ModuleHelpButton helpKey="asignador" onClick={() => navigate('/asignador-entrenadores')} className="home-module-card" title="Asignar qué entrenador va a cada entrenamiento y a cada FDS de Maestría">
               🎯 Asignador de Entrenadores
             </ModuleHelpButton>
           )}
-        </div>
+          </div>
+        </section>
       )}
 
       {/* BANNER INTERACTIVO DE SOLICITUDES DE COLABORACIÓN */}
