@@ -1186,6 +1186,7 @@ export default function GoalsBoard() {
     event.preventDefault();
     if (savingGoalEdit) return;
     setSavingGoalEdit(true);
+    let goalSaved = false;
     try {
       if (goalsStatus !== 'loaded') throw new Error('Espera la confirmación del servidor.');
       const ref = doc(db, 'goals', editingGoal.id);
@@ -1201,12 +1202,13 @@ export default function GoalsBoard() {
         transaction.update(ref, patch);
         return patch.progress;
       });
-      if (savedProgress !== undefined) await performRollUp(editingGoal.id, savedProgress);
+      goalSaved = true;
+      if (savedProgress !== undefined && savedProgress !== null) await performRollUp(editingGoal.id, savedProgress, true);
       setEditingGoal(null);
       showToast('Objetivo actualizado. Avances y asignaciones se conservan.', 'success');
     } catch (error) {
       console.error('Error editando objetivo:', error);
-      showToast(`No se guardó la meta: ${error.message}`, 'error');
+      showToast(`${goalSaved ? 'Meta guardada, pero no se actualizó el avance del ciclo' : 'No se guardó la meta'}: ${error.message}`, 'error');
     } finally {
       setSavingGoalEdit(false);
     }
@@ -1315,7 +1317,7 @@ export default function GoalsBoard() {
     }
   };
 
-  const performRollUp = async (goalId, newProgress) => {
+  const performRollUp = async (goalId, newProgress, propagateError = false) => {
     try {
       const currentGoal = goals.find(g => g.id === goalId);
       if (currentGoal && currentGoal.parentId) {
@@ -1332,6 +1334,7 @@ export default function GoalsBoard() {
       }
     } catch (e) {
       console.error("Rollup error:", e);
+      if (propagateError) throw e;
     }
   };
 

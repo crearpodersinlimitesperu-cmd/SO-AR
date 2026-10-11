@@ -37,6 +37,9 @@ test('goal editing preserves identity, assignments and achievements across every
     assert.equal(patch.targetValue, 6);
     assert.equal('assignedCoordinators' in patch, false);
     assert.equal('currentValue' in patch, false);
+    for (const currentValue of [undefined, null, 'invalid']) {
+      assert.equal(buildGoalEdit({ appRole: 'gerente', sede }, { ...goal, currentValue }, patch).progress, null);
+    }
     assert.throws(() => buildGoalEdit({ appRole: 'coord_c1', sede }, goal, patch));
     assert.throws(() => buildGoalEdit({ appRole: 'gerente', sede: 'Otra sede' }, goal, patch));
     assert.throws(() => buildGoalEdit({ appRole: 'gerente', sede }, goal, { ...patch, title: 'Aliados C1E31' }));

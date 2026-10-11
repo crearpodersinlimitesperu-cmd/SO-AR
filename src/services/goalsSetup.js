@@ -18,7 +18,7 @@ export function buildGoalEdit(user, goal, values, updatedAt) {
   if (explicitGoalTeam(changed) !== explicitGoalTeam(goal) || goalStageKey(changed) !== goalStageKey(goal)) {
     throw new Error('La edición no puede cambiar el equipo o la etapa de la meta.');
   }
-  const progress = goalProgress(goal.currentValue ?? 0, target);
+  const progress = goalProgress(goal.currentValue, target);
   return { title, kpi, targetValue: target, updatedAt,
     ...(goal.scope === 'CICLO' ? {} : { progress: progress.percent }) };
 }
