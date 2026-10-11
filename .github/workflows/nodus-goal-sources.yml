@@ -1,5 +1,7 @@
 name: Nodus goal sources read-only sync
 on:
+  schedule:
+    - cron: '17 */6 * * *'
   workflow_dispatch:
     inputs:
       publish:
@@ -28,7 +30,7 @@ jobs:
           NODUS_USER: ${{ secrets.NODUS_USER }}
           NODUS_PASSWORD: ${{ secrets.NODUS_PASSWORD }}
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
-          PUBLISH: ${{ inputs.publish }}
+          PUBLISH: ${{ github.event_name == 'schedule' || inputs.publish }}
         run: |
           if [ "$PUBLISH" = "true" ]; then
             node scripts/publishNodusGoalSources.mjs --apply

@@ -1,5 +1,27 @@
 import { goalsAccess } from './goalsVisibility.js';
-import { canonicalSede, explicitGoalTeam } from './goalsTimeline.js';
+import { canonicalSede, explicitGoalTeam, goalStageKey } from './goalsTimeline.js';
+import { goalProgress } from './goalProgress.js';
+
+export function buildGoalEdit(user, goal, values, updatedAt) {
+  const access = goalsAccess(user);
+  if (!access.canManage || (!access.isGlobal && canonicalSede(user?.sede) !== canonicalSede(goal.sede))) {
+    throw new Error('Tu rol no permite editar metas de esta sede.');
+  }
+  const title = String(values.title || '').trim();
+  const kpi = String(values.kpi || '').trim();
+  const target = Number(values.targetValue);
+  if (!title || !kpi || !Number.isSafeInteger(target) || target <= 0) {
+    throw new Error('Completa título, indicador y un objetivo entero positivo.');
+  }
+  if (goal.scope === 'CICLO' && target !== 100) throw new Error('El objetivo del ciclo debe mantenerse en 100%.');
+  const changed = { ...goal, title };
+  if (explicitGoalTeam(changed) !== explicitGoalTeam(goal) || goalStageKey(changed) !== goalStageKey(goal)) {
+    throw new Error('La edición no puede cambiar el equipo o la etapa de la meta.');
+  }
+  const progress = goalProgress(goal.currentValue, target);
+  return { title, kpi, targetValue: target, updatedAt,
+    ...(goal.scope === 'CICLO' ? {} : { progress: progress.percent }) };
+}
 
 export function buildTeamGoalPlan({ user, sede, team, goals, stages, targets, cycleName = '', createdAt }) {
   if (!goalsAccess(user).canManage) throw new Error('Tu rol no permite configurar metas.');

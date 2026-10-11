@@ -3,7 +3,49 @@ import assert from 'node:assert/strict';
 import { runInNewContext } from 'node:vm';
 import { parseNodusTeamRows, parseAllyHeadings, collectNodusGoalSources, nodusAllyScopes, nodusAttendanceScopes } from '../scripts/publishNodusGoalSources.mjs';
 import { nodusDate, nodusGoalSourceStatus, findNodusTeam, findNodusAllyEvidence, findNodusAttendanceEvidence, nextNodusC1Team, NODUS_GOAL_SOURCE } from '../src/services/nodusGoalSources.js';
-import { buildTeamGoalPlan } from '../src/services/goalsSetup.js';
+import { buildTeamGoalPlan, buildGoalEdit } from '../src/services/goalsSetup.js';
+import { readFileSync } from 'node:fs';
+
+test('authorized automatic source workflow is bounded and never writes goals', () => {
+  const workflow = readFileSync(new URL('../.github/workflows/nodus-goal-sources.yml', import.meta.url), 'utf8');
+  assert.match(workflow, /cron: '17 \*\/6 \* \* \*'/);
+  assert.match(workflow, /github\.event_name == 'schedule' \|\| inputs\.publish/);
+  assert.match(workflow, /timeout-minutes: 10/);
+  const publisher = readFileSync(new URL('../scripts/publishNodusGoalSources.mjs', import.meta.url), 'utf8');
+  assert.match(publisher, /db\.doc\('nodus_coordinadores_c1c2\/goal_sources'\)\.set/);
+  assert.doesNotMatch(publisher, /db\.collection\('goals'\)\.(add|set|update)|updateDoc|writeBatch/);
+});
+
+test('publisher scopes cover multiple sedes without cross-team or stage inheritance', () => {
+  assert.deepEqual(nodusAllyScopes([
+    { title: 'Aliados C1E32', sede: 'Lima' },
+    { title: 'Aliados C1E32', sede: 'Guayaquil' },
+    { title: 'Aliados C2E126', sede: 'Quito' }
+  ]), [
+    { sede: 'Lima', team: '32', stage: 'C1' },
+    { sede: 'Guayaquil', team: '32', stage: 'C1' },
+    { sede: 'Quito', team: '126', stage: 'C2' }
+  ]);
+});
+
+test('goal editing preserves identity, assignments and achievements across every sede', () => {
+  for (const sede of ['Lima', 'Quito', 'Guayaquil', 'Cuenca', 'Medellin', 'CDMX']) {
+    const goal = { title: 'Aliados C1E32', sede, targetValue: 10, currentValue: 11, scope: 'ENTRENAMIENTO', assignedCoordinators: [{ targetQuota: 10 }] };
+    const patch = buildGoalEdit({ appRole: 'gerente', sede }, goal,
+      { title: 'Aliados C1E32 revisados', kpi: 'Cantidad de Aliados', targetValue: 6 }, '2026-10-11T22:00:00Z');
+    assert.equal(patch.progress, 183);
+    assert.equal(patch.targetValue, 6);
+    assert.equal('assignedCoordinators' in patch, false);
+    assert.equal('currentValue' in patch, false);
+    for (const currentValue of [undefined, null, 'invalid']) {
+      assert.equal(buildGoalEdit({ appRole: 'gerente', sede }, { ...goal, currentValue }, patch).progress, null);
+    }
+    assert.throws(() => buildGoalEdit({ appRole: 'coord_c1', sede }, goal, patch));
+    assert.throws(() => buildGoalEdit({ appRole: 'gerente', sede: 'Otra sede' }, goal, patch));
+    assert.throws(() => buildGoalEdit({ appRole: 'gerente', sede }, goal, { ...patch, title: 'Aliados C1E31' }));
+    assert.throws(() => buildGoalEdit({ appRole: 'gerente', sede }, goal, { ...patch, title: 'Aliados C2E32' }));
+  }
+});
 
 const team = { sede: 'Lima', team: '31', teamId: '141', stage: 'C1', path: '/equipos/detalle/141' };
 const now = Date.parse('2026-10-11T17:00:00Z');
