@@ -15,6 +15,7 @@ import {
   getDocs,
   limit,
   orderBy,
+  or,
   query,
   setDoc,
   updateDoc,
@@ -68,6 +69,32 @@ const dbOf = uid => testEnv.authenticatedContext(uid, { email: USERS[uid].email 
 const superAdminDb = () =>
   testEnv.authenticatedContext(SUPERADMIN.uid, { email: SUPERADMIN.email }).firestore();
 const anonDb = () => testEnv.unauthenticatedContext().firestore();
+
+test('auth startup: OR identity query supports all aliases with unchanged authenticated rules', async () => {
+  const target = 'alias@example.com';
+  await Promise.all([
+    seed(['users', 'alias-array'], { emails: [target] }),
+    seed(['users', 'alias-email'], { email: target }),
+    seed(['users', 'alias-corporate'], { corporateEmail: target }),
+    seed(['users', 'alias-personal'], { personalEmail: target }),
+    seed(['staff_directory', 'alias-array'], { emails: [target] }),
+    seed(['staff_directory', 'alias-email'], { email: target })
+  ]);
+  const lookup = db => query(collection(db, 'users'), or(
+    where('emails', 'array-contains', target),
+    where('email', '==', target),
+    where('corporateEmail', '==', target),
+    where('personalEmail', '==', target)
+  ));
+  const snap = await assertSucceeds(getDocs(lookup(dbOf('ent-1'))));
+  assert.deepEqual(snap.docs.map(d => d.id), ['alias-array', 'alias-corporate', 'alias-email', 'alias-personal']);
+  await assertFails(getDocs(lookup(anonDb())));
+  const staffQuery = db => query(collection(db, 'staff_directory'), or(
+    where('emails', 'array-contains', target), where('email', '==', target)
+  ));
+  assert.equal((await assertSucceeds(getDocs(staffQuery(dbOf('ent-1'))))).size, 2);
+  await assertFails(getDocs(staffQuery(anonDb())));
+});
 
 test('user_stats: el dueño por uid o por correo escribe lo suyo y no lo ajeno', async () => {
   const ent = dbOf('ent-1');

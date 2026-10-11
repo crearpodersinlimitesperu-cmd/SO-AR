@@ -85,10 +85,10 @@ test('persisted session keeps verification order and does not await the daily au
   const start = authSource.indexOf('onAuthStateChanged(auth, async');
   const effect = authSource.slice(start, authSource.indexOf('return unsubscribe', start));
   const order = [
-    'await findUserInFirestore(normalizedEmail)',
+    "startupTrace.measure('users-lookup'",
     'foundUser.isActive === false',
-    'await enforceUserRolesAgent(user, canonicalUser.roles)',
-    'await saveSelfProfile(user, canonicalUser, normalizedEmail)',
+    "startupTrace.measure('roles'",
+    'saveSelfProfile(user, canonicalUser, normalizedEmail, profileResult.snapshot)',
     'setCurrentUser(userObj)',
     'recordAuditEvent({',
     'setLoading(false);\n      }'

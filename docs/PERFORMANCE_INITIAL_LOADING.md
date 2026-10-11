@@ -1,5 +1,66 @@
 # Carga inicial de Causa OS
 
+## Sesion autenticada: segunda optimizacion posterior a PR #145
+
+La base de comparacion es `d1c07eaa128038df90d6a5db0a1c6b2a39b824f9`.
+Quedaban hasta cuatro consultas indexadas consecutivas a `users`, dos a
+`staff_directory` en fallback y una lectura de `users/{uid}` iniciada solo al
+terminar el agente de roles. Ahora cada busqueda usa una consulta OR; se conserva
+la prioridad `emails > email > corporateEmail > personalEmail` y, dentro del
+campo ganador, el mismo desempate UID/slug. No se usa un UID como atajo que
+pueda saltarse un perfil de mayor prioridad. Staff conserva `emails > email`.
+Normalizacion `.com/.net`, fallback estatico, participantes y directorios
+de roles no cambian.
+
+Despues del gate de inactivos, solo la **lectura** self-profile se solapa con
+roles. Ambas terminan antes de persistir y dar acceso. La creacion inicial sigue
+esperandose; los metadatos de un documento existente siguen enviandose con el
+mismo SDK/reintentos y reporte de error no bloqueante de PR #145. Un fallo en
+busqueda, roles o lectura/creacion inicial ahora aborta con registro y aviso:
+no se confunde con ausencia de perfil ni se concede acceso sin verificacion.
+No cambian reglas, permisos, roles escritos ni el spinner por timeout.
+
+`tests/auth-startup-critical-path.test.mjs` ejecuta los helpers y el callback
+real de ambas versiones contra Firestore/Auth simulados a 60 ms por RTT.
+Incluye 60 ms separados para restaurar Auth; es una entrada simulada, **no**
+una medicion del SDK autenticado. El test imprime tiempos observados y verifica
+estos presupuestos (sin descarga de JS, TLS, CPU, token refresh ni payload):
+
+| Perfil encontrado en | Firestore PR145 | Firestore nuevo | Total con Auth simulado, antes / despues |
+| --- | ---: | ---: | ---: |
+| users.emails | 3 RTT | 2 RTT | 240 / 180 ms |
+| users.email | 4 RTT | 2 RTT | 300 / 180 ms |
+| users.corporateEmail | 5 RTT | 2 RTT | 360 / 180 ms |
+| users.personalEmail | 6 RTT | 2 RTT | 420 / 180 ms |
+| staff.email | 8 RTT | 3 RTT | 540 / 240 ms |
+
+Una creacion inicial suma 1 RTT esperado a ambas versiones. Roles conserva
+dos lecturas de directorios en paralelo, no se descarga el directorio completo
+de users. OR puede devolver mas documentos coincidentes que la antigua consulta
+que acertaba en el primer campo; todos estan limitados al mismo correo, sin
+lecturas especulativas de directorios de fallback. Los tests verifican paridad
+de perfil/roles, prioridad y duplicados, escritura critica, errores, inactivos
+y ausencia de acceso prematuro. El emulador comprueba OR con reglas existentes,
+incluyendo denegacion anonima. CI obtiene el historial para ejecutar la base
+fijada, y ejecuta las pruebas junto al build y suites de reglas.
+
+```sh
+node --test tests/auth-startup-latency.test.mjs tests/auth-startup-critical-path.test.mjs
+```
+
+Instrumentacion local (sin enviar datos ni incluir identidad): en DevTools,
+`performance.getEntriesByType('measure').filter(e => e.name.startsWith('causa-auth:'))`
+muestra `auth-state-wait` (registro del observer hasta primer callback),
+`users-lookup`, `staff-lookup` si aplica, `roles`, `self-profile-read`,
+`profile-metadata` y `total-to-gate`. Roles y self-read se solapan: no sumar sus
+duraciones. Metadata mide lanzamiento en existentes o creacion awaited en nuevos.
+Son tiempos de operaciones SDK, no RTT de red puros: incluyen caché, token,
+conectividad y procesamiento. Total termina al liberar el gate de React, no al
+pintar la pagina. No hay credenciales personales/productivas ni medicion real
+de una sesion autenticada en este cambio; no se garantiza igual reduccion en vivo.
+
+## Medicion publica previa (PR #144)
+
 Medición del 11 de octubre de 2026, base `3809dd4`, sin sesión ni credenciales.
 
 ## Resultado reproducible

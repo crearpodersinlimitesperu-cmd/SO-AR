@@ -188,6 +188,6 @@ export async function enforceUserRolesAgent(firebaseUser, currentRoles) {
     return currentRoles;
   } catch (error) {
     console.error("🛡️ [RoleIntegrityAgent] Error validando integridad de roles:", error);
-    return currentRoles;
+    throw error;
   }
 }
