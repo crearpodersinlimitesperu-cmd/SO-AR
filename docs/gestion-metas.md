@@ -153,6 +153,22 @@ o su etapa Creación dentro de una cohorte, normaliza el nombre del evento
 y rechaza fechas ambiguas. Sin evento inequívoco presenta un aviso dentro
 del formulario; no afirma que el equipo no exista ni precarga C1 como MJ.
 
+La lectura de la hoja oficial usa CSV, no Google Visualization: la consulta
+del 11/10/2026 confirmó 2.508 filas CSV frente a 1.028 filas Visualization,
+que además perdía cohortes de texto en la columna de equipo numérica.
+El CSV conserva `29, 30 y 31` para Lima MJ del 09/10/2026 (Creación E31)
+y `30, 31 y 32` del 13/11/2026 (Creación E32). La app carga esas filas de
+la fuente, sin fechas hardcodeadas ni escrituras en la hoja. Fechas de fin
+ausentes no se inventan en el calendario fuente.
+La segunda hoja suministrada (`10JVeVpdyMpA25rU6CwMIyoa3-dO2EUt9`,
+gid 1960233176) devolvió 401 y solicitó iniciar sesión; no se integró
+su contenido ni se intentó eludir sus permisos. La inspección manual del
+runner usa la cuenta `GOOGLE_SERVICE_ACCOUNT_JSON` existente con scope
+Sheets de solo lectura y reporta únicamente estructura/etiquetas conocidas,
+sin celdas personales ni credenciales. El JSON Apps Script del calendario
+permanece como fuente principal; el CSV solo sustituye el contraste
+Visualization que perdía histórico y cohortes.
+
 `/reporte` ofrece un formulario GET con `select[name="id_equipo"]`.
 Incluye E31 Lima id 141, E30 Lima id 134 y E32 Lima id 149; esto no significa
 que el selector de Aliados tenga las mismas opciones.
