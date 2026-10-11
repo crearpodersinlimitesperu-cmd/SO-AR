@@ -168,6 +168,21 @@ Sheets de solo lectura y reporta únicamente estructura/etiquetas conocidas,
 sin celdas personales ni credenciales. El JSON Apps Script del calendario
 permanece como fuente principal; el CSV solo sustituye el contraste
 Visualization que perdía histórico y cohortes.
+Si Sheets rechaza el documento con 400, la inspección verifica primero su
+MIME en Drive con la misma cuenta. Solo si es Excel (.xlsx), descarga en
+memoria (máximo 10 MB) y reporta la estructura de sus primeras 20 filas,
+sin títulos o celdas personales. No convierte el archivo, no cambia permisos
+y no aplica un gid de Google a índices de pestañas Excel.
+La primera ejecución respondió Sheets 400 y Drive 404. Después de la
+confirmación de acceso compartido del usuario, la lectura Drive con
+`supportsAllDrives=true` tuvo éxito: run 38181031989, consulta
+11/10/2026 22:36:23.094Z. Se confirmó que el JSON configurado corresponde
+a la cuenta compartida y que el documento es XLSX; se leyeron etiquetas y
+estructura de 10 pestañas. No se cambiaron permisos ni se convirtió el
+archivo. El gid del enlace no se interpreta como índice de pestaña Excel.
+Esta verificación de acceso/estructura no afirma que se hayan contrastado
+todas las fechas del archivo: el calendario publicado mantiene el JSON
+oficial como fuente, con su contraste CSV.
 
 `/reporte` ofrece un formulario GET con `select[name="id_equipo"]`.
 Incluye E31 Lima id 141, E30 Lima id 134 y E32 Lima id 149; esto no significa
