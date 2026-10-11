@@ -7,13 +7,22 @@
 
 ## Ayuda de los módulos de Inicio
 
-En la cuadrícula de accesos del modo Pro, pasa el cursor sobre un módulo o
+En el modo Pro, el directorio de módulos empieza con las categorías cerradas
+para dejar espacio a tu trabajo. Busca por nombre, descripción o categoría
+(con o sin acentos): aparecen todos los accesos autorizados que coincidan.
+Sin búsqueda, pulsa una categoría para abrirla; abrir otra cierra la anterior.
+Tab recorre la búsqueda, las categorías y sus accesos visibles; Enter o Espacio
+abre o cierra una categoría. No se guardan favoritos nuevos ni se duplican los
+accesos frecuentes existentes.
+
+Dentro de una categoría, pasa el cursor sobre un módulo o
 enfócalo con Tab para leer qué hace. Escape cierra la explicación; Enter,
 Espacio o un clic mantienen la apertura habitual del módulo. En dispositivos
 táctiles, la descripción aparece bajo el nombre sin necesitar un toque previo:
 el primer toque sigue abriendo el módulo. Las descripciones también están
 asociadas a cada botón para lectores de pantalla. No cambian los permisos,
-el orden de los módulos ni sus destinos.
+sus etiquetas ni sus destinos. Los accesos se agrupan por intención y conservan
+su orden relativo dentro de cada categoría.
 
 ## Panel sencillo de Elizabeth
 

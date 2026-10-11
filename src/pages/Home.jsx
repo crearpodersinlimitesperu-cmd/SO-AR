@@ -2,7 +2,7 @@ import { MODULE_REGISTRY, isModuleVisible, REPORTES_VISIBLE } from '../config/mo
 import { useModuleUsage } from '../context/ModuleUsageContext';
 import ModuleQuickAccess from '../components/ModuleQuickAccess';
 import ModuleHelpButton from '../components/ModuleHelpButton';
-import './HomeModules.css';
+import HomeModuleWorkspace from '../components/HomeModuleWorkspace';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -17,7 +17,7 @@ import {
   FileText, LogOut, Clock, Calendar as CalendarIcon, MapPin, CheckCircle2, 
   AlertCircle, Circle, RefreshCw, CalendarPlus, Bell, Users, AtSign, 
   BookOpen, Lightbulb, Search, X, Filter, ChevronDown, Sparkles,
-  Zap, LayoutGrid, Sliders, CheckSquare, ArrowRight, ArrowUpRight, ShieldCheck,
+  Zap, Sliders, CheckSquare, ArrowRight, ArrowUpRight, ShieldCheck,
   TrendingUp, Compass, HelpCircle, User, AlertTriangle
 } from 'lucide-react';
 import { getFlagForSede } from '../utils/flags';
@@ -2420,16 +2420,7 @@ export default function Home() {
 
       {/* BARRA PRO COMPLETA (SI ESTÁ EN MODO PRO) */}
       {viewMode === 'pro' && customModules.advancedTools !== false && (
-        <section className="home-modules" aria-labelledby="home-modules-title">
-          <header className="home-modules-header">
-            <div>
-              <p className="home-modules-eyebrow">CAUSA OS / TU ESPACIO DE TRABAJO</p>
-              <h2 id="home-modules-title">Módulos y herramientas</h2>
-              <p className="home-modules-intro">Accede a lo que necesitas, desde un solo lugar.</p>
-            </div>
-            <LayoutGrid className="home-modules-mark" size={24} aria-hidden="true" />
-          </header>
-          <div className="home-modules-grid">
+        <HomeModuleWorkspace>
           {canAccessAgendaTimeBoxing(currentUser) && (
             <ModuleHelpButton helpKey="horarios" onClick={() => setShowHorariosModal(true)} className="home-module-card" title="Horarios oficiales de entrenamiento y código de vestimenta">
               ⏰ Horarios y Vestimenta
@@ -2608,8 +2599,7 @@ export default function Home() {
               🎯 Asignador de Entrenadores
             </ModuleHelpButton>
           )}
-          </div>
-        </section>
+        </HomeModuleWorkspace>
       )}
 
       {/* BANNER INTERACTIVO DE SOLICITUDES DE COLABORACIÓN */}
