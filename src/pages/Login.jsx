@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
 import { Loader2, Shield } from 'lucide-react';
+import loginBackground from '../assets/login-background.webp';
 
 export default function Login() {
   const { currentUser, loginWithGoogle } = useAuth();
@@ -134,7 +135,7 @@ export default function Login() {
       flexDirection: 'column', 
       justifyContent: 'flex-end', 
       alignItems: 'center', 
-      background: 'url(/leones_bg_v2.jpg) no-repeat center center fixed',
+      background: `url(${loginBackground}) no-repeat center center fixed`,
       backgroundSize: 'cover',
       paddingBottom: '10vh'
     }}>

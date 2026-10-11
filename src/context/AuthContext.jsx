@@ -10,7 +10,7 @@ import { recordAuditEvent } from '../services/auditService';
 import { normalizeUserRecord } from '../utils/userNormalizer';
 import { enforceUserRolesAgent } from '../services/roleAgentDaemon';
 import { canonicalSede } from '../utils/sede';
-import { isInactiveTrainer } from '../data/managersData';
+import { isInactiveTrainer } from '../data/trainerIdentity';
 
 const AuthContext = createContext();
 
