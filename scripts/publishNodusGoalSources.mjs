@@ -36,10 +36,10 @@ export function parseAllyHeadings(headings, team) {
   });
 }
 
-export function nodusAllyScopes(goals) {
+function nodusScopes(goals, matchesGoal) {
   const byId = new Map(goals.filter(g => goals.filter(other => other.id === g.id).length === 1).map(g => [g.id, g]));
   return [...new Map(goals.flatMap(goal => {
-    if (!`${goal.title || ''} ${goal.kpi || ''}`.toLowerCase().includes('aliado')) return [];
+    if (!matchesGoal(goal)) return [];
     const parent = byId.get(goal.parentId);
     const team = explicitGoalTeam(goal) || explicitGoalTeam(parent);
     const stage = goalStageKey(goal);
@@ -49,7 +49,15 @@ export function nodusAllyScopes(goals) {
   })).values()];
 }
 
-export async function collectNodusGoalSources(page, desiredScopes) {
+export function nodusAllyScopes(goals) {
+  return nodusScopes(goals, goal => `${goal.title || ''} ${goal.kpi || ''}`.toLowerCase().includes('aliado'));
+}
+
+export function nodusAttendanceScopes(goals) {
+  return nodusScopes(goals, goal => /\bsentados\b/i.test(goal.title || ''));
+}
+
+export async function collectNodusGoalSources(page, desiredScopes, attendanceScopes = []) {
   await readPage(page, '/equipos');
   const rows = await page.evaluate(() => {
     const table = document.querySelector('#tablaEquipos');
@@ -68,6 +76,39 @@ export async function collectNodusGoalSources(page, desiredScopes) {
   const teams = parseNodusTeamRows(rows);
   if (!teams.length) throw new Error('Nodus no devolvió equipos identificables; no se publica un universo vacío.');
   const allies = [];
+  const attendance = [];
+  for (const scope of attendanceScopes) {
+    const matches = teams.filter(t => t.sede === canonicalSede(scope.sede) && t.team === scope.team && t.stage === 'C1');
+    if (matches.length !== 1 || !matches[0].end || matches[0].end >= new Date().toISOString().slice(0, 10)) continue;
+    const team = matches[0];
+    await readPage(page, `/reporte?id_equipo=${team.teamId}`);
+    const counts = await page.evaluate(({ teamId, stage }) => {
+      if (document.querySelector('select[name="id_equipo"]')?.value !== teamId) {
+        throw new Error('El filtro de asistencia no corresponde al equipo solicitado.');
+      }
+      const table = document.getElementById(`tblReporte${stage}`);
+      const headers = Array.from(table?.querySelectorAll('thead th') || []).map(t => t.textContent.trim().toUpperCase());
+      const column = headers.indexOf('ASISTENCIA');
+      const dt = table && window.jQuery?.fn?.dataTable?.isDataTable(table) ? window.jQuery(table).DataTable() : null;
+      if (column < 0 || !dt || dt.settings()[0].oFeatures.bServerSide) throw new Error('No se puede confirmar el reporte completo de asistencia.');
+      let marked = 0;
+      let unmarked = 0;
+      for (const row of dt.rows().nodes().toArray()) {
+        const cell = row.cells[column];
+        const checkboxes = cell?.querySelectorAll('input[type="checkbox"]');
+        if (checkboxes?.length !== 1 || !['Asistió', '—'].includes(cell.textContent.trim()) ||
+            (cell.textContent.trim() === 'Asistió') !== checkboxes[0].checked) {
+          throw new Error('Cambió el estado de asistencia esperado; no se estima el resultado.');
+        }
+        if (checkboxes[0].checked) marked++;
+        else unmarked++;
+      }
+      return { marked, unmarked };
+    }, { teamId: team.teamId, stage: scope.stage });
+    attendance.push({ sede: team.sede, team: team.team, teamId: team.teamId, stage: scope.stage,
+      metric: 'markedAttendance', value: counts.marked, unmarked: counts.unmarked,
+      complete: true, path: `/reporte?id_equipo=${team.teamId}` });
+  }
   for (const scope of desiredScopes) {
     const matches = teams.filter(t => t.sede === canonicalSede(scope.sede) && t.team === scope.team && t.stage === scope.stage);
     if (matches.length !== 1) continue;
@@ -81,22 +122,24 @@ export async function collectNodusGoalSources(page, desiredScopes) {
     }, team.teamId);
     allies.push(...parseAllyHeadings(headings, team).filter(a => a.stage === scope.stage));
   }
-  return { schemaVersion: 1, source: NODUS_GOAL_SOURCE, queriedAt: new Date().toISOString(), sourceUpdatedAt: null, teams, allies };
+  return { schemaVersion: 1, source: NODUS_GOAL_SOURCE, queriedAt: new Date().toISOString(), sourceUpdatedAt: null, teams, allies, attendance };
 }
 
 async function main() {
   const db = getNodusAdminDb();
   const goals = await db.collection('goals').get();
-  const scopes = nodusAllyScopes(goals.docs.map(doc => ({ ...doc.data(), id: doc.id })));
+  const goalData = goals.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+  const scopes = nodusAllyScopes(goalData);
+  const attendanceScopes = nodusAttendanceScopes(goalData);
   const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
   try {
     const page = await browser.newPage();
     await loginNodusReadOnly(page, '/sedes');
-    const snapshot = await collectNodusGoalSources(page, scopes);
+    const snapshot = await collectNodusGoalSources(page, scopes, attendanceScopes);
     if (process.argv.includes('--apply')) await db.doc('nodus_coordinadores_c1c2/goal_sources').set(snapshot);
     console.log(JSON.stringify({ mode: process.argv.includes('--apply') ? 'publish' : 'audit',
       queriedAt: snapshot.queriedAt, sourceUpdatedAt: null, teams: snapshot.teams.length, allyMeasures: snapshot.allies.length,
-      scopesRequested: scopes.length }, null, 2));
+      scopesRequested: scopes.length, attendanceMeasures: snapshot.attendance.length }, null, 2));
   } finally {
     await browser.close();
   }

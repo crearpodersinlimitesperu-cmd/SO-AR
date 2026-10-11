@@ -1,8 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { runInNewContext } from 'node:vm';
-import { parseNodusTeamRows, parseAllyHeadings, collectNodusGoalSources, nodusAllyScopes } from '../scripts/publishNodusGoalSources.mjs';
-import { nodusDate, nodusGoalSourceStatus, findNodusTeam, findNodusAllyEvidence, NODUS_GOAL_SOURCE } from '../src/services/nodusGoalSources.js';
+import { parseNodusTeamRows, parseAllyHeadings, collectNodusGoalSources, nodusAllyScopes, nodusAttendanceScopes } from '../scripts/publishNodusGoalSources.mjs';
+import { nodusDate, nodusGoalSourceStatus, findNodusTeam, findNodusAllyEvidence, findNodusAttendanceEvidence, nextNodusC1Team, NODUS_GOAL_SOURCE } from '../src/services/nodusGoalSources.js';
+import { buildTeamGoalPlan } from '../src/services/goalsSetup.js';
 
 const team = { sede: 'Lima', team: '31', teamId: '141', stage: 'C1', path: '/equipos/detalle/141' };
 const now = Date.parse('2026-10-11T17:00:00Z');
@@ -76,6 +77,86 @@ test('collector stops when E32 exists in teams but not in the ally selector', as
   await assert.rejects(collectNodusGoalSources(page, [{ sede: 'Lima', team: '32', stage: 'C1' }]),
     /El filtro de aliados no corresponde al equipo solicitado/);
   assert.deepEqual(paths, [`${NODUS_GOAL_SOURCE}/equipos`, `${NODUS_GOAL_SOURCE}/aliados?id_equipo=149`]);
+});
+
+test('next team preparation uses only unique future C1 periods, never stale or past teams', () => {
+  const upcoming = { ...team, team: '32', teamId: '149', path: '/equipos/detalle/149', start: '2026-10-23', end: '2026-11-05' };
+  const source = { ...snapshot, teams: [{ ...team, start: '2026-09-01', end: '2026-09-20' }, upcoming] };
+  assert.deepEqual(nextNodusC1Team(source, 'Lima', '2026-10-11', now), upcoming);
+  assert.equal(nextNodusC1Team(source, 'Quito', '2026-10-11', now), null);
+  assert.equal(nextNodusC1Team(source, 'Lima', '2026-11-06', now), null);
+  assert.equal(nextNodusC1Team({ ...source, queriedAt: '2026-10-09T00:00:00Z' }, 'Lima', '2026-10-11', now), null);
+  for (const changed of [{ stage: 'C2' }, { start: '2026-13-23' }, { end: '2026-10-01' }]) {
+    assert.equal(nextNodusC1Team({ ...source, teams: [{ ...upcoming, ...changed }] }, 'Lima', '2026-10-11', now), null);
+  }
+  assert.equal(nextNodusC1Team({ ...source, teams: [upcoming, { ...upcoming, team: '33', teamId: '150', path: '/equipos/detalle/150' }] }, 'Lima', '2026-10-11', now), null);
+});
+
+test('new team setup requires approved objectives and preserves all older goals and assignments', () => {
+  const oldGoal = { id: 'old', title: 'Equipo 31', scope: 'CICLO', sede: 'Lima', currentValue: 24, assignedCoordinators: [] };
+  const options = { user: { uid: 'fixture-manager', appRole: 'gerente', sede: 'Lima' }, sede: 'Lima', team: '32',
+    goals: [oldGoal], stages: [{ id: 'C1', name: 'Capítulo 1' }], targets: { C1: { aliados: '25' } }, createdAt: snapshot.queriedAt };
+  const before = structuredClone(oldGoal);
+  const plan = buildTeamGoalPlan(options);
+  assert.equal(plan.cycle.teamNumber, '32');
+  assert.equal(plan.children[0].teamNumber, '32');
+  assert.equal(plan.children[0].stage, 'C1');
+  assert.equal(plan.children[0].targetValue, 25);
+  assert.equal(plan.children[0].currentValue, 0);
+  assert.deepEqual(plan.children[0].assignedCoordinators, []);
+  assert.deepEqual(oldGoal, before);
+  for (const changed of [
+    { team: '' }, { team: '31' }, { targets: {} }, { targets: { C1: { aliados: '-1' } } },
+    { targets: { C1: { aliados: '1.5' } } }, { sede: 'Quito' },
+    { user: { uid: 'fixture-coordinator', appRole: 'coord_c1', sede: 'Lima' } }
+  ]) assert.throws(() => buildTeamGoalPlan({ ...options, ...changed }));
+});
+
+test('historical attendance is a separate scoped measure, not confirmed allies or unmarked absences', () => {
+  const record = { sede: 'Lima', team: '31', teamId: '141', stage: 'C1', metric: 'markedAttendance',
+    value: 7, unmarked: 3, complete: true, path: '/reporte?id_equipo=141' };
+  const source = { ...snapshot, teams: [{ ...team, end: '2026-09-20' }], attendance: [record] };
+  const goal = { title: 'Sentados C1E31', sede: 'Lima', currentValue: 9 };
+  assert.equal(findNodusAttendanceEvidence(source, goal, null, now).value, 7);
+  assert.equal(findNodusAttendanceEvidence(source, goal, null, now).unmarked, 3);
+  assert.equal(goal.currentValue, 9);
+  for (const changed of [{ title: 'Aliados C1E31' }, { title: 'Sentados C2E31' }, { title: 'Sentados C1E32' }, { sede: 'Quito' }]) {
+    assert.equal(findNodusAttendanceEvidence(source, { ...goal, ...changed }, null, now), null);
+  }
+  assert.equal(findNodusAttendanceEvidence({ ...source, attendance: [record, record] }, goal, null, now), null);
+  assert.equal(findNodusAttendanceEvidence({ ...source, teams: [{ ...team, end: '2026-11-05' }] }, goal, null, now), null);
+  assert.deepEqual(nodusAttendanceScopes([{ id: 'parent', title: 'Equipo 31', sede: 'Lima' },
+    { title: 'Sentados - Capítulo 2', parentId: 'parent' }]), [{ sede: 'Lima', team: '31', stage: 'C2' }]);
+});
+
+test('collector reads complete attendance cells only and rejects schema drift', async () => {
+  const table = {
+    querySelectorAll: () => [{ textContent: 'ASISTENCIA' }]
+  };
+  const makeRow = checked => ({ cells: [{ textContent: checked ? 'Asistió' : '—',
+    querySelectorAll: () => [{ checked }] }] });
+  let rows = [makeRow(true), makeRow(false)];
+  const jQuery = () => ({ DataTable: () => ({
+    settings: () => [{ oFeatures: { bServerSide: false } }],
+    rows: () => ({ nodes: () => ({ toArray: () => rows }) })
+  }) });
+  jQuery.fn = { dataTable: { isDataTable: () => true } };
+  let url;
+  const page = {
+    goto: async next => { url = next; return { status: () => 200 }; },
+    url: () => url, waitForNetworkIdle: async () => {},
+    evaluate: async (fn, args) => args
+      ? runInNewContext(`(${fn.toString()})(args)`, { args, window: { jQuery },
+        document: { querySelector: () => ({ value: '141' }), getElementById: () => table } })
+      : [{ equipo: 'EQUIPO 31', sede: 'LIMA CICLO 1', start: '01/09/2026', end: '20/09/2026', path: '/equipos/detalle/141' }]
+  };
+  const result = await collectNodusGoalSources(page, [], [{ sede: 'Lima', team: '31', stage: 'C1' }]);
+  assert.equal(result.attendance[0].value, 1);
+  assert.equal(result.attendance[0].unmarked, 1);
+  assert.deepEqual(Object.keys(result.attendance[0]).sort(),
+    ['sede', 'team', 'teamId', 'stage', 'metric', 'value', 'unmarked', 'complete', 'path'].sort());
+  rows = [{ cells: [{ textContent: 'Confirmado', querySelectorAll: () => [{ checked: true }] }] }];
+  await assert.rejects(collectNodusGoalSources(page, [], [{ sede: 'Lima', team: '31', stage: 'C1' }]), /Cambió el estado de asistencia/);
 });
 
 test('publisher scopes inherit explicit parent identity only and deduplicate child stages', () => {

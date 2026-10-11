@@ -10,7 +10,8 @@ import GoalDivisionModal from '../components/GoalDivisionModal';
 import { normalizeSede, getRoleDisplayName } from '../data/usersData';
 import { goalProgress, assignedQuotaTotals, isCallConfirmationGoal } from '../services/goalProgress';
 import { goalsAccess, visibleGoalsForUser } from '../services/goalsVisibility';
-import { nodusGoalSourceStatus, findNodusTeam, findNodusAllyEvidence, NODUS_GOAL_SOURCE } from '../services/nodusGoalSources';
+import { nodusGoalSourceStatus, findNodusTeam, findNodusAllyEvidence, findNodusAttendanceEvidence, nextNodusC1Team, NODUS_GOAL_SOURCE } from '../services/nodusGoalSources';
+import { buildTeamGoalPlan } from '../services/goalsSetup';
 import { auditSingleGoal, auditAllGoals, extractTeamNumber } from '../services/goalsSentinelAgent';
 import { organizeGoalsByTeam, mjStageForTeam, explicitGoalTeam, goalStageKey, localDateKey } from '../services/goalsTimeline';
 
@@ -75,6 +76,8 @@ export default function GoalsBoard() {
 
   // Wizard State
   const [showWizard, setShowWizard] = useState(false);
+  const [wizardTeam, setWizardTeam] = useState('');
+  const [generatingGoals, setGeneratingGoals] = useState(false);
   const [wizardStep, setWizardStep] = useState(0);
   const [showDailyModal, setShowDailyModal] = useState(false);
   const [dailyData, setDailyData] = useState({ parentId: '', title: '', kpi: '', targetValue: 1 });
@@ -97,6 +100,10 @@ export default function GoalsBoard() {
   );
   
   const [quitoCycle, setQuitoCycle] = useState('C1');
+  const nextNodusTeam = nextNodusC1Team(nodusGoalSources, selectedSedeFilter, localDateKey());
+  const nextTeamHasGoals = nextNodusTeam && goals.some(goal =>
+    explicitGoalTeam(goal) === nextNodusTeam.team &&
+    normalizeSede(goal.sede || '') === normalizeSede(nextNodusTeam.sede) && goal.scope === 'CICLO');
 
   // Sincronizacion oficial para Sede LIMA desde Google Sheet GRADUADOS LIMA (C1E31)
   const [syncingLima, setSyncingLima] = useState(false);
@@ -1145,111 +1152,30 @@ export default function GoalsBoard() {
   };
 
   const handleGenerateGoals = async () => {
+    if (generatingGoals) return;
+    setGeneratingGoals(true);
     try {
-      const batch = writeBatch(db);
-      const cycleGoalRef = doc(collection(db, 'goals'));
       const effectiveSede = (selectedSedeFilter && selectedSedeFilter !== 'Todas') ? selectedSedeFilter : (currentUser?.sede || '');
-      const suffix = effectiveSede === 'Quito' ? ` (${quitoCycle})` : effectiveSede ? ` (${effectiveSede})` : '';
-      const currentUserId = currentUser?.uid || currentUser?.id || 'admin';
-      const currentUserName = currentUser?.displayName || currentUser?.name || 'Administrador';
-      const userSede = effectiveSede;
-      
-      // 1. Crear Meta Maestra del Ciclo
-      batch.set(cycleGoalRef, {
-        title: `Meta Global del Ciclo ${currentCycle?.name || ''}${suffix}`,
-        kpi: 'Cumplimiento General (%)',
-        progress: 0,
-        targetValue: 100,
-        currentValue: 0,
-        scope: 'CICLO',
-        parentId: null,
-        ownerId: currentUserId,
-        ownerName: currentUserName,
-        sede: userSede,
+      if (goalsStatus !== 'loaded') throw new Error('Espera la confirmación del servidor antes de crear metas.');
+      const plan = buildTeamGoalPlan({
+        user: currentUser, sede: effectiveSede, team: wizardTeam, goals, stages,
+        targets: wizardData, cycleName: effectiveSede === 'Quito' ? quitoCycle : '',
         createdAt: new Date().toISOString()
       });
-
-      // 2. Crear las metas de ENTRENAMIENTO basadas en el Wizard
-      for (const stage of stages) {
-        const data = wizardData[stage.id];
-        const phaseCode = stage.id.startsWith('MJ') ? 'MJ' : stage.id;
-        
-        if (data.px && Number(data.px) > 0) {
-          batch.set(doc(collection(db, 'goals')), {
-             title: `Sentados (Px) - ${stage.name}`,
-             kpi: 'Cantidad de Px',
-             targetValue: Number(data.px),
-             currentValue: 0,
-             progress: 0,
-             scope: 'ENTRENAMIENTO',
-             cyclePhase: phaseCode,
-             parentId: cycleGoalRef.id,
-             stage: stage.id,
-             ownerId: currentUserId,
-             sede: userSede,
-             assignedCoordinators: [],
-             createdAt: new Date().toISOString()
-          });
-        }
-        if (data.aliados && Number(data.aliados) > 0) {
-          batch.set(doc(collection(db, 'goals')), {
-             title: `Aliados - ${stage.name}`,
-             kpi: 'Cantidad de Aliados',
-             targetValue: Number(data.aliados),
-             currentValue: 0,
-             progress: 0,
-             scope: 'ENTRENAMIENTO',
-             cyclePhase: phaseCode,
-             parentId: cycleGoalRef.id,
-             stage: stage.id,
-             ownerId: currentUserId,
-             sede: userSede,
-             assignedCoordinators: [],
-             createdAt: new Date().toISOString()
-          });
-        }
-        if (data.managers && Number(data.managers) > 0) {
-          batch.set(doc(collection(db, 'goals')), {
-             title: `Managers - ${stage.name}${suffix}`,
-             kpi: 'Cantidad de Managers',
-             targetValue: Number(data.managers),
-             currentValue: 0,
-             progress: 0,
-             scope: 'ENTRENAMIENTO',
-             cyclePhase: phaseCode,
-             parentId: cycleGoalRef.id,
-             stage: stage.id,
-             ownerId: currentUserId,
-             sede: userSede,
-             assignedCoordinators: [],
-             createdAt: new Date().toISOString()
-          });
-        }
-        if (data.apoyos && Number(data.apoyos) > 0) {
-          batch.set(doc(collection(db, 'goals')), {
-             title: `Apoyos en Mesa - ${stage.name}${suffix}`,
-             kpi: 'Cantidad de Apoyos',
-             targetValue: Number(data.apoyos),
-             currentValue: 0,
-             progress: 0,
-             scope: 'ENTRENAMIENTO',
-             cyclePhase: phaseCode,
-             parentId: cycleGoalRef.id,
-             stage: stage.id,
-             ownerId: currentUserId,
-             sede: userSede,
-             assignedCoordinators: [],
-             createdAt: new Date().toISOString()
-          });
-        }
+      const batch = writeBatch(db);
+      const cycleGoalRef = doc(collection(db, 'goals'));
+      batch.set(cycleGoalRef, plan.cycle);
+      for (const child of plan.children) {
+        batch.set(doc(collection(db, 'goals')), { ...child, parentId: cycleGoalRef.id });
       }
-
       await batch.commit();
-      showToast('Metas de Ciclo generadas correctamente.', 'success');
+      showToast(`Metas del equipo ${wizardTeam} creadas. Los equipos anteriores se conservan.`, 'success');
       setShowWizard(false);
     } catch (e) {
       console.error(e);
-      showToast('Error generando metas.', 'error');
+      showToast(`No se crearon metas: ${e.message || 'Error al guardar.'}`, 'error');
+    } finally {
+      setGeneratingGoals(false);
     }
   };
 
@@ -1555,6 +1481,7 @@ export default function GoalsBoard() {
     const repSummary = getGoalReportsSummary(goal);
     const quotaTotals = assignedQuotaTotals(goal.assignedCoordinators);
     const nodusAllyEvidence = findNodusAllyEvidence(nodusGoalSources, goal, parentGoal);
+    const nodusAttendanceEvidence = findNodusAttendanceEvidence(nodusGoalSources, goal, parentGoal);
     const progress = goal.scope === 'CICLO' && !goal.parentId
       ? { percent: Number.isFinite(Number(goal.progress)) ? Number(goal.progress) : null, barPercent: Math.min(100, Math.max(0, Number(goal.progress) || 0)) }
       : goalProgress(goal.currentValue, goal.targetValue);
@@ -1775,6 +1702,20 @@ export default function GoalsBoard() {
                   Consultado: {nodusAllyEvidence.queriedAt} (fecha de modificación no disponible).
                   {' '}<a href={`${NODUS_GOAL_SOURCE}${nodusAllyEvidence.path}`} target="_blank" rel="noopener noreferrer">Ver fuente en Nodus</a>
                 </div>
+              </div>
+            )}
+
+            {nodusAttendanceEvidence && (
+              <div style={{ marginTop: '0.65rem', padding: '0.8rem', border: '1px solid var(--border-subtle)', borderRadius: '10px' }}>
+                <strong>Nodus · Asistencia marcada ({nodusAttendanceEvidence.stage}): {nodusAttendanceEvidence.value}</strong>
+                <p className="text-muted">
+                  {nodusAttendanceEvidence.unmarked} registros sin marca de asistencia; no equivalen a ausencias confirmadas.
+                  {' '}Es el estado del reporte histórico, no el conteo inicial de sentados ni una modificación del avance guardado.
+                </p>
+                <p className="text-muted">
+                  Consultado: {nodusAttendanceEvidence.queriedAt}. Fecha de modificación no disponible.
+                  {' '}<a href={`${NODUS_GOAL_SOURCE}${nodusAttendanceEvidence.path}`} target="_blank" rel="noopener noreferrer">Ver reporte de asistencia en Nodus</a>
+                </p>
               </div>
             )}
 
@@ -2244,13 +2185,15 @@ export default function GoalsBoard() {
             })()}
           </button>
 
-          {currentUser?.appRole === 'gerente' && (
+          {canManageGoals && (
             <div style={{ display: 'flex', gap: '1rem' }}>
-              <button className="btn-secondary" onClick={() => setShowDailyModal(true)} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.8rem 1.5rem' }}>
-                <Plus size={18} /> Meta Diaria
-              </button>
+              {currentUser?.appRole === 'gerente' && (
+                <button className="btn-secondary" onClick={() => setShowDailyModal(true)} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.8rem 1.5rem' }}>
+                  <Plus size={18} /> Meta Diaria
+                </button>
+              )}
               <button className="btn-primary" onClick={() => setShowWizard(true)} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.8rem 1.5rem' }}>
-                <Settings size={18} /> Setup de Ciclo
+                <Settings size={18} /> Preparar metas de otro equipo
               </button>
             </div>
           )}
@@ -2310,6 +2253,21 @@ export default function GoalsBoard() {
             {nodusGoalSourceStatus(nodusGoalSources).message} Los datos registrados en las metas se mantienen separados de esta consulta.
           </p>
         )}
+        {nextNodusTeam && (
+          <div className="glass-panel" style={{ padding: '1.5rem' }}>
+            <h3>Preparación · Equipo {nextNodusTeam.team} · {nextNodusTeam.sede} · C1</h3>
+            <p>Próximo período de equipo registrado en Nodus: {nextNodusTeam.start} al {nextNodusTeam.end}. No confirma la fecha del evento C1.</p>
+            <p>{nextTeamHasGoals ? 'Este equipo ya tiene un ciclo de metas configurado.' : 'Objetivos pendientes de gerencia. No se copian cuotas ni avances de equipos anteriores.'}</p>
+            <a href={`${NODUS_GOAL_SOURCE}${nextNodusTeam.path}`} target="_blank" rel="noopener noreferrer">Ver registro de equipo en Nodus</a>
+            {canManageGoals && !nextTeamHasGoals && (
+              <button className="btn-primary" style={{ margin: '1rem' }} onClick={() => {
+                setWizardTeam(nextNodusTeam.team);
+                setWizardData(stages.reduce((acc, stage) => ({ ...acc, [stage.id]: { px: '', aliados: '', managers: '', apoyos: '' } }), {}));
+                setShowWizard(true);
+              }}>Configurar metas del equipo {nextNodusTeam.team}</button>
+            )}
+          </div>
+        )}
         {loading ? <p className="text-muted text-center">Cargando metas...</p> : (() => {
           if (goals.length === 0) {
             if (goalsStatus !== 'loaded') return null;
@@ -2364,8 +2322,10 @@ export default function GoalsBoard() {
       {showWizard && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, padding: '1rem' }}>
           <div className="glass-panel" style={{ width: '100%', maxWidth: '600px', padding: '2rem', maxHeight: '90vh', overflowY: 'auto' }}>
-            <h2 className="text-gold" style={{ marginTop: 0 }}>Wizard: Setup de Ciclo</h2>
-            <p className="text-muted">Define las metas de Entrenamiento para cada fase.</p>
+            <h2 className="text-gold" style={{ marginTop: 0 }}>Configurar metas de un equipo</h2>
+            <p className="text-muted">Define objetivos aprobados por gerencia. Los avances empiezan en cero; los datos históricos de Nodus se muestran por separado, sin reemplazar asistencia ni cuotas.</p>
+            <label htmlFor="goal-team">Número de equipo</label>
+            <input id="goal-team" type="number" min="1" max="999" step="1" className="form-input" value={wizardTeam} onChange={e => setWizardTeam(e.target.value)} />
             
             {currentUser?.sede === 'Quito' && (
               <div style={{ marginTop: '1rem', padding: '1rem', background: 'rgba(255, 215, 0, 0.1)', borderRadius: '8px', border: '1px solid rgba(255, 215, 0, 0.3)' }}>
@@ -2404,8 +2364,8 @@ export default function GoalsBoard() {
               ))}
             </div>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '2rem' }}>
-              <button className="btn-secondary" onClick={() => setShowWizard(false)}>Cancelar</button>
-              <button className="btn-primary" onClick={handleGenerateGoals}>Generar Metas</button>
+              <button className="btn-secondary" disabled={generatingGoals} onClick={() => setShowWizard(false)}>Cancelar</button>
+              <button className="btn-primary" disabled={generatingGoals || goalsStatus !== 'loaded'} onClick={handleGenerateGoals}>{generatingGoals ? 'Guardando…' : 'Crear metas para este equipo'}</button>
             </div>
           </div>
         </div>

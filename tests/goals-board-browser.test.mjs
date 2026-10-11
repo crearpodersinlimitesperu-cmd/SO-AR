@@ -16,6 +16,7 @@ test('GoalsBoard renders synthetic roles, overachievement, source absence and sc
   ];
   const goals = [
     { id: 'lima', title: 'Aliados C1E31', sede: 'Lima', scope: 'ENTRENAMIENTO', targetValue: 25, currentValue: 13, progress: 52, assignedCoordinators: quotas },
+    { id: 'attendance', title: 'Sentados C1E31', sede: 'Lima', scope: 'ENTRENAMIENTO', targetValue: 10, currentValue: 9, progress: 90 },
     { id: 'quito', title: 'Synthetic Quito Equipo 119', sede: 'Quito', scope: 'ENTRENAMIENTO', targetValue: 10, currentValue: 0, progress: 0 }
   ];
   const mocks = {
@@ -25,7 +26,7 @@ test('GoalsBoard renders synthetic roles, overachievement, source absence and sc
       export const useAuth = () => ({ currentUser: user });
     `,
     '../context/CyclesContext': 'const events = []; export const useCycles = () => ({ currentCycle: null, events });',
-    '../context/UIContext': 'const ui = { showToast: () => {}, showPrompt: async () => null }; export const useUI = () => ui;',
+    '../context/UIContext': 'const ui = { showToast: message => { window.fixtureToast = message; }, showPrompt: async () => null }; export const useUI = () => ui;',
     '../data/usersData': `${roleFunctions}
       export const usersData = [];
       export const normalizeSede = value => value || '';
@@ -53,8 +54,14 @@ test('GoalsBoard renders synthetic roles, overachievement, source absence and sc
           callback({ docs, size: docs.length, empty: !docs.length, metadata: { fromCache: false }, exists: () => hasSource,
             data: () => ({ schemaVersion: 1, source: 'https://imo.crearpslglobal.com',
               queriedAt: new Date(Date.now() - (stale ? 2 * 86400000 : 0)).toISOString(), sourceUpdatedAt: null,
-              teams: [{ sede: 'Lima', team: '31', stage: 'C1', teamId: '141', path: '/equipos/detalle/141', start: '2026-09-01', end: '2026-09-20' }],
-              allies: [{ sede: 'Lima', team: '31', stage: 'C1', teamId: '141', path: '/aliados?id_equipo=141', metric: 'assignedAllies', value: 17, complete: true }]
+              teams: [
+                { sede: 'Lima', team: '31', stage: 'C1', teamId: '141', path: '/equipos/detalle/141', start: '2026-09-01', end: '2026-09-20' },
+                { sede: 'Lima', team: '32', stage: 'C1', teamId: '149', path: '/equipos/detalle/149',
+                  start: new Date(Date.now() + 12 * 86400000).toISOString().slice(0, 10),
+                  end: new Date(Date.now() + 25 * 86400000).toISOString().slice(0, 10) }
+              ],
+              allies: [{ sede: 'Lima', team: '31', stage: 'C1', teamId: '141', path: '/aliados?id_equipo=141', metric: 'assignedAllies', value: 17, complete: true }],
+              attendance: [{ sede: 'Lima', team: '31', stage: 'C1', teamId: '141', path: '/reporte?id_equipo=141', metric: 'markedAttendance', value: 7, unmarked: 3, complete: true }]
             })
           });
         });
@@ -127,12 +134,25 @@ test('GoalsBoard renders synthetic roles, overachievement, source absence and sc
     assert.match(text, /No equivale a las fechas de cada etapa/);
     assert.match(text, /no acredita asistencia ni reemplaza el avance 13 \/ 25/);
     assert.match(text, /fecha de modificación no disponible/);
+    assert.match(text, /Asistencia marcada \(C1\): 7/);
+    assert.match(text, /3 registros sin marca de asistencia; no equivalen a ausencias confirmadas/);
+    assert.match(text, /Avance Acumulado: 9 de 10/);
     const links = await page.$$eval('a[href]', elements => elements.map(e => e.href));
     assert.ok(links.includes('https://imo.crearpslglobal.com/aliados?id_equipo=141'));
+    assert.match(text, /Preparación · Equipo 32/);
+    assert.match(text, /Objetivos pendientes de gerencia/);
+    assert.doesNotMatch(text, /Configurar metas del equipo 32/i);
+    await page.goto(`${origin}goals-test?role=gerente&nodus=1`, { waitUntil: 'networkidle0' });
+    assert.match(await page.evaluate(() => document.body.innerText), /Configurar metas del equipo 32/i);
+    await page.evaluate(() => Array.from(document.querySelectorAll('button')).find(b => b.textContent.includes('Configurar metas del equipo 32')).click());
+    assert.equal(await page.$eval('#goal-team', e => e.value), '32');
+    await page.evaluate(() => Array.from(document.querySelectorAll('button')).find(b => b.textContent.includes('Crear metas para este equipo')).click());
+    await page.waitForFunction(() => window.fixtureToast?.includes('Define al menos un objetivo aprobado'));
+    assert.match(await page.evaluate(() => window.fixtureToast), /No se crearon metas/);
     await page.goto(`${origin}goals-test?nodus=1&stale=1`, { waitUntil: 'networkidle0' });
     await page.waitForFunction(() => document.body.innerText.includes('desactualizada'));
     text = await page.evaluate(() => document.body.innerText);
-    assert.doesNotMatch(text, /Aliados asignados: 17|período registrado del equipo/);
+    assert.doesNotMatch(text, /Aliados asignados: 17|Asistencia marcada|período registrado del equipo|Preparación · Equipo 32/);
     await page.goto(`${origin}goals-test?error=1`, { waitUntil: 'networkidle0' });
     await page.waitForFunction(() => document.body.innerText.includes('No pudimos actualizar las metas'));
     text = await page.evaluate(() => document.body.innerText);

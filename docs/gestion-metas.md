@@ -50,7 +50,8 @@ aportó contratos de datos. Posteriormente el usuario proporcionó un acceso
 autorizado y se verificaron las rutas descritas debajo desde el navegador.
 No se requiere que esta cuenta tenga permiso sobre `/dashboard` para utilizar
 las rutas de lectura verificadas. El contrato de calendario por etapa y
-asistencia permanece sin verificar; no se sustituye por cuotas ni llamadas.
+asistencia permanecía sin verificar en esa revisión; no se sustituye por cuotas
+ni llamadas. La revisión posterior de `/reporte` se detalla al final.
 
 ### Contrato verificado mediante acceso autorizado en navegador (2026-10-11)
 
@@ -85,8 +86,9 @@ La UI presenta período/conteos Nodus con enlaces y fecha de consulta, separados
 del calendario y de las cuotas/avances guardados. Una consulta de más de 24 horas
 no se aplica a esta comparación, lo cual no demuestra que la fuente se haya
 modificado o esté vigente. No se considera aliado asignado como logro/asistencia
-ni se ofrece sincronizarlo a `currentValue`. Calendario por etapa y asistencia
-siguen sin contrato Nodus verificado.
+ni se ofrece sincronizarlo a `currentValue`. Calendario poblado por etapa
+sigue sin contrato Nodus verificado; el estado de asistencia del reporte se
+verificó posteriormente (véase abajo).
 
 ### Revisión específica E32 Lima C1
 
@@ -117,3 +119,58 @@ actualización del directorio; no demuestra ausencia de E32 en Nodus.
 No se renumeran metas antiguas, asignaciones o roles con esta evidencia.
 Las horas anteriores son de consulta; la modificación del origen sigue
 desconocida. Se mantiene PR borrador, sin publicación ni despliegue.
+
+### Preparar metas del siguiente equipo sin mover el histórico
+
+El módulo muestra el próximo período C1 de equipo de la sede cuando existe
+una consulta Nodus reciente, inequívoca y con fechas válidas. Lo identifica
+como **preparación**, no como evento confirmado. Si aún no tiene un ciclo
+de metas, gerencia puede abrir la configuración con ese número de equipo.
+Sin proyección publicada no se ofrece una selección Nodus ficticia; la
+configuración manual permite indicar el equipo expresamente.
+
+El asistente exige sede, equipo y al menos un objetivo aprobado por gerencia.
+Guarda `teamNumber` en el ciclo y en cada meta hija, con avance cero y sin
+copiar asignaciones. Rechaza el ciclo duplicado conocido, objetivos negativos
+o fraccionarios y creación desde datos de metas aún no confirmados por el
+servidor. Conserva las etapas y controles de rol existentes; no cambia reglas.
+
+La petición de rellenar entrenamientos pasados no autoriza convertir aliados
+asignados o confirmados en asistencia, graduación, managers o apoyos. La
+proyección ya muestra los períodos y las métricas raw verificadas junto al
+histórico por sede/equipo/etapa, sin sobrescribir `currentValue`. Sigue
+pendiente acordar la equivalencia entre el estado histórico del reporte y el
+conteo inicial de sentados para sobrescribir avances, y verificar los demás
+resultados para un backfill.
+No se han creado metas E32 ni modificado históricos productivos: faltan los
+objetivos aprobados y la revisión/publicación del PR borrador.
+
+### Reporte histórico de asistencia verificado
+
+`/reporte` ofrece un formulario GET con `select[name="id_equipo"]`.
+Incluye E31 Lima id 141, E30 Lima id 134 y E32 Lima id 149; esto no significa
+que el selector de Aliados tenga las mismas opciones.
+`/reporte?id_equipo=141` confirmó filtro 141 a las 17:02:02.043Z del
+11/10/2026. `#tblReporteC1` y `#tblReporteC2` son DataTables cliente
+(`bServerSide=false`), con columna ASISTENCIA. Las celdas contienen
+«Asistió» y checkbox marcado o «—» y checkbox sin marcar:
+
+| Equipo | Reporte | Filas completas | Asistió marcado | Sin marca |
+|---|---|---:|---:|---:|
+| E31 Lima (141) | C1 | 180 | 119 | 61 |
+| E31 Lima (141) | C2 | 40 | 30 | 10 |
+| E30 Lima (134) | C1 | 159 | 89 | 70 |
+| E30 Lima (134) | C2 | 49 | 29 | 20 |
+
+E30 se consultó a las 17:03:03.827Z, con filtro 134 confirmado.
+No se exportaron filas ni identificadores de personas. Son estados del
+reporte al consultar; no se conoce su modificación ni son ausencias
+confirmadas los registros sin marca. No se deduce calendario de esos estados.
+
+El colector agrega únicamente esa columna para metas de Sentados C1/C2 de
+equipos cuyo período registrado haya terminado, con identidad C1 del equipo
+única y filtro exacto. Rechaza tablas incompletas/server-side, filtros erróneos
+y estados/checkboxes contradictorios. La UI muestra `markedAttendance` y
+`unmarked` separados del avance guardado. No consulta E32 futuro para
+presentar ceros como resultados. No modifica metas, cuotas ni roles; se
+mantiene la publicación manual desactivada por defecto y sin ejecutar.
