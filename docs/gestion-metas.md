@@ -87,3 +87,33 @@ no se aplica a esta comparación, lo cual no demuestra que la fuente se haya
 modificado o esté vigente. No se considera aliado asignado como logro/asistencia
 ni se ofrece sincronizarlo a `currentValue`. Calendario por etapa y asistencia
 siguen sin contrato Nodus verificado.
+
+### Revisión específica E32 Lima C1
+
+Consulta autorizada de navegador el 11/10/2026 (no ejecución del runner):
+`/equipos`, `#tablaEquipos`, 132 filas cliente, confirmó a las
+16:49:15.185Z `EQUIPO 32`, `LIMA CICLO 1`, id 149,
+`/equipos/detalle/149`, INICIO 23/10/2026 y FIN 05/11/2026.
+Es el **período del registro de equipo**, no un evento C1 confirmado.
+E31 Lima C1 conserva otro id, 141, y otro período; no se sustituye por E32.
+
+En `/aliados?id_equipo=149`, a las 16:49:29.541Z,
+`select[name="id_equipo"]` quedó con valor vacío y sin opción id 149.
+La opción de EQUIPO 32 disponible corresponde a Guayaquil (id 96), no Lima.
+No hubo cabeceras de conteos para E32 Lima: esto significa **fuente no
+disponible para ese filtro**, no cero aliados. El colector rechaza ese
+desajuste y no publica una consulta parcialmente exitosa.
+
+La ruta `/cronograma` expone las columnas SEDE / CICLO, ENTRENAMIENTO,
+EQUIPO, INICIO y FIN (se omiten campos personales). Su formulario GET
+ofrece Lima Ciclo 1 como `id_sede=7` y Capítulo 1 como
+`id_entrenamiento=1`. `/cronograma?id_sede=7&id_entrenamiento=1` confirmó
+ambos filtros a las 16:49:58.453Z y devolvió «Sin registros en el cronograma».
+Se verificó la ruta y el estado vacío, **no un calendario poblado ni fecha
+de C1 E32**. No se integra como calendario ni asistencia.
+
+La captura de Gestión de Metas muestra E31/E30 guardados y un error de
+actualización del directorio; no demuestra ausencia de E32 en Nodus.
+No se renumeran metas antiguas, asignaciones o roles con esta evidencia.
+Las horas anteriores son de consulta; la modificación del origen sigue
+desconocida. Se mantiene PR borrador, sin publicación ni despliegue.

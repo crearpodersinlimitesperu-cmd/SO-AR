@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { runInNewContext } from 'node:vm';
 import { parseNodusTeamRows, parseAllyHeadings, collectNodusGoalSources, nodusAllyScopes } from '../scripts/publishNodusGoalSources.mjs';
 import { nodusDate, nodusGoalSourceStatus, findNodusTeam, findNodusAllyEvidence, NODUS_GOAL_SOURCE } from '../src/services/nodusGoalSources.js';
 
@@ -43,6 +44,38 @@ test('team grouping distinguishes stages and rejects duplicated or mismatched id
   assert.deepEqual(findNodusTeam({ ...snapshot, teams: [team, { ...team, teamId: '999', path: '/equipos/detalle/999' }, c2] }, 'Lima', '31'), [c2]);
   assert.deepEqual(findNodusTeam({ ...snapshot, teams: [{ ...team, path: '/equipos/detalle/999' }] }, 'Lima', '31'), []);
   assert.deepEqual(findNodusTeam(snapshot, 'Quito', '31'), []);
+});
+
+test('upcoming E32 Lima never inherits E31 ally counts or equipment period as stage calendar', () => {
+  const [upcoming] = parseNodusTeamRows([
+    { equipo: 'EQUIPO 32', sede: 'LIMA CICLO 1', start: '23/10/2026', end: '05/11/2026', path: '/equipos/detalle/149' }
+  ]);
+  const source = { ...snapshot, teams: [team, upcoming] };
+  assert.deepEqual(findNodusTeam(source, 'Lima', '32', 'C1'), [upcoming]);
+  assert.equal(upcoming.start, '2026-10-23');
+  assert.equal(upcoming.end, '2026-11-05');
+  assert.equal('calendar' in upcoming, false);
+  assert.equal(findNodusAllyEvidence(source, { title: 'Aliados C1E32', sede: 'Lima' }, null, now), null);
+  assert.deepEqual(findNodusTeam(source, 'Lima', '32', 'C2'), []);
+  assert.deepEqual(findNodusTeam(source, 'Guayaquil', '32', 'C1'), []);
+});
+
+test('collector stops when E32 exists in teams but not in the ally selector', async () => {
+  const paths = [];
+  let url;
+  const page = {
+    goto: async next => { paths.push(next); url = next; return { status: () => 200 }; },
+    url: () => url,
+    waitForNetworkIdle: async () => {},
+    evaluate: async (fn, teamId) => teamId
+      ? runInNewContext(`(${fn.toString()})(teamId)`, {
+        teamId, document: { querySelector: () => ({ value: '' }) }
+      })
+      : [{ equipo: 'EQUIPO 32', sede: 'LIMA CICLO 1', start: '23/10/2026', end: '05/11/2026', path: '/equipos/detalle/149' }]
+  };
+  await assert.rejects(collectNodusGoalSources(page, [{ sede: 'Lima', team: '32', stage: 'C1' }]),
+    /El filtro de aliados no corresponde al equipo solicitado/);
+  assert.deepEqual(paths, [`${NODUS_GOAL_SOURCE}/equipos`, `${NODUS_GOAL_SOURCE}/aliados?id_equipo=149`]);
 });
 
 test('publisher scopes inherit explicit parent identity only and deduplicate child stages', () => {
