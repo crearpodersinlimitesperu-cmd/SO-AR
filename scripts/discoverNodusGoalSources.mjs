@@ -25,6 +25,7 @@ export async function discoverNodusGoalSources(page) {
       evidence.push({ path, status: response?.status() || null, tables: [] });
       continue;
     }
+    await page.waitForNetworkIdle({ idleTime: 500, timeout: 10000 });
     const inspected = await page.evaluate(() => {
       const visible = element => Boolean(element.getClientRects().length);
       return {

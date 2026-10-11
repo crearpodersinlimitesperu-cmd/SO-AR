@@ -21,7 +21,7 @@ jobs:
       - run: npm ci --ignore-scripts --include=optional
       - name: Install browser for read-only goals discovery
         if: inputs.mode == 'discover-goals'
-        run: npx puppeteer browsers install chrome --install-deps
+        run: npx puppeteer browsers install chrome
       - name: Discover Nodus goals source schema without personal records
         if: inputs.mode == 'discover-goals'
         env:

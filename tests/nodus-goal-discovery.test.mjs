@@ -16,6 +16,7 @@ test('discovery exports schema and counts only, not raw people or body text', as
   const page = {
     goto: async next => { url = next; return { status: () => 200 }; },
     url: () => url,
+    waitForNetworkIdle: async () => {},
     evaluate: async () => ({
       tables: [{ headers: ['Equipo', 'Sede', 'Fecha C1'], visibleRows: 3, paginated: false }],
       links: ['https://imo.crearpslglobal.com/calendario']
