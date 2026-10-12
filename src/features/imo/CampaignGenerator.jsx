@@ -8,6 +8,7 @@ import { OFFICIAL_CALENDAR_URL, parseOfficialCalendar, applyCalendarChanges, fin
 import { buildCampaignCandidates, teamsWithRecords, recordTeamNumber, MAX_CAMPAIGN_IMOS } from './campaignCandidates';
 import { getEnroladosList as getSourceEnrolados } from './missionEnrolados';
 import { c1Eligibility } from '../../../functions-imo/c1Eligibility.mjs';
+import { CONTACT_MISSION, contactRegistration, contactCandidateReason } from '../../../functions-imo/contactEligibility.mjs';
 
 // Helper robusto para resolver sede desde m.sede o m.equipo
 function resolveMissionSede(m) {
@@ -135,6 +136,10 @@ export default function CampaignGenerator({ missions, defaultSede, defaultEquipo
   }, [sede]);
 
   // Manejar cambio de opción oficial C1 (equipo + fecha simultáneos)
+  useEffect(() => {
+    setChosen({}); setReviewed(false); setLink('');
+  }, [target, date]);
+
   function handleSelectC1Option(opt) {
     if (!opt) return;
     setTarget(opt.team);
@@ -146,17 +151,22 @@ export default function CampaignGenerator({ missions, defaultSede, defaultEquipo
   // Candidatos: IMOs cuyos enrolados ingresan al equipo C1 elegido (registros de Nodus),
   // un candidato por IMO aunque Nodus lo haya guardado en varios registros.
   const { candidates, conflicts, phoneConflicts } = useMemo(
-    () => buildCampaignCandidates(missions, { sede, targetTeam: target, resolveSede: resolveMissionSede, getEnrolados, search }),
-    [missions, sede, target, search, getEnrolados]
+    () => buildCampaignCandidates(missions, { sede, targetTeam: target, resolveSede: resolveMissionSede,
+      getEnrolados: getSourceEnrolados, search, missionKind: CONTACT_MISSION, c1Date: date }),
+    [missions, sede, target, search, date]
   );
   const sedeTeams = useMemo(() => teamsWithRecords(missions, sede, resolveMissionSede, getEnrolados), [missions, sede, getEnrolados]);
   const sourceStatus = useMemo(() => {
     const records = missions.filter(m => m.schemaVersion !== 2 &&
       recordTeamNumber(m) === Number(target) && normalizeText(resolveMissionSede(m)) === normalizeText(sede));
-    const counts = { eligible: 0, already_attended: 0, unverified: 0 };
-    records.forEach(m => getSourceEnrolados(m).forEach(e => counts[c1Eligibility(e)]++));
+    const counts = { eligible: 0, already_attended: 0, unverified: 0, unsupportedIntention: 0 };
+    records.forEach(m => getSourceEnrolados(m).forEach(e => {
+      counts[c1Eligibility(e)]++;
+      const reason = contactCandidateReason({ ...e, c1Registration: contactRegistration(e, m) }, { sede, targetTeam: target, c1Date: date });
+      if (reason === 'attendance_intention_unsupported' || reason === 'attendance_intention_missing') counts.unsupportedIntention++;
+    }));
     return { records: records.length, ...counts };
-  }, [missions, sede, target]);
+  }, [missions, sede, target, date]);
 
   const copyCandidate = c => ({ ...c, enrolados: c.enrolados.map(e => ({ ...e })) });
 
@@ -202,6 +212,7 @@ export default function CampaignGenerator({ missions, defaultSede, defaultEquipo
         sede,
         targetTeam: Number(target),
         c1Date: date,
+        missionKind: CONTACT_MISSION,
         assignments: Object.values(chosen)
       });
       setLink(campaignUrl(id));
@@ -399,8 +410,10 @@ export default function CampaignGenerator({ missions, defaultSede, defaultEquipo
           <p role="status" style={{ color: '#475569', margin: '8px 0' }}>
             Fuentes sincronizadas para {sede} · Equipo {target}: {sourceStatus.records} registros IMO.
             {' '}Enrolados: {sourceStatus.eligible} con C1 pendiente verificado, {sourceStatus.already_attended} con C1 cursado,
-            {' '}{sourceStatus.unverified} pendientes de verificar.
-            {' '}La inscripción a Capítulo 1 no confirma asistencia histórica. Solo los candidatos verificados pueden incluirse en el enlace.
+            {' '}{sourceStatus.unverified} con historial C1 por verificar.
+            {' '}Esta es una misión de contacto: también admite inscritos verificados para esta sede, equipo y fecha, sin declarar verificada su asistencia histórica.
+            {' '}{candidates.reduce((total, candidate) => total + candidate.enrolados.length, 0)} enrolados disponibles para contacto en esta búsqueda.
+            {sourceStatus.unsupportedIntention > 0 && <span> {sourceStatus.unsupportedIntention} no incluidos: estado de intención Nodus ausente o no reconocido; requiere revisión, no se transforma automáticamente.</span>}
           </p>
         )}
 
@@ -439,7 +452,7 @@ export default function CampaignGenerator({ missions, defaultSede, defaultEquipo
           )}
           {!candidates.length && (
             <p style={{ padding: '16px', color: '#64748b', textAlign: 'center', margin: 0 }}>
-              {target ? `No hay candidatos elegibles en los registros sincronizados de Causa OS para el Equipo ${target} de ${sede}${search ? ' con esta búsqueda' : ''}. Esto no confirma que Nodus esté vacío: revisa la sincronización y la evidencia de C1 antes de compartir el enlace.` : 'Elige el equipo que ingresa a C1.'}
+              {target ? `No hay candidatos para contacto en los registros sincronizados de Causa OS para el Equipo ${target} de ${sede}${search ? ' con esta búsqueda' : ''}. Esto no confirma que Nodus esté vacío: revisa la sincronización, la inscripción y la fecha C1 antes de compartir el enlace.` : 'Elige el equipo que ingresa a C1.'}
             </p>
           )}
         </div>

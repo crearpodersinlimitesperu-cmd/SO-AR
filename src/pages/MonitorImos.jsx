@@ -1,4 +1,5 @@
-import { isAvailableForC1, c1Eligibility } from '../../functions-imo/c1Eligibility.mjs';
+import { c1Eligibility } from '../../functions-imo/c1Eligibility.mjs';
+import { isMissionCandidate, contactRegistration, CONTACT_MISSION } from '../../functions-imo/contactEligibility.mjs';
 import { getEnroladosList as getAllEnrolados } from '../features/imo/missionEnrolados';
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -20,7 +21,10 @@ import {
   getGlobalNodusStats
 } from '../services/nodusVerificationService';
 
-const getEnroladosList = m => getAllEnrolados(m).filter(isAvailableForC1);
+const getEnroladosList = m => getAllEnrolados(m).filter(e => isMissionCandidate({ ...e, c1Registration: contactRegistration(e, m) }, {
+  ...m, c1Date: m.c1Date || e.c1Registration?.date,
+  missionKind: m.schemaVersion === 2 ? m.missionKind : (!m.schemaVersion || m.schemaVersion === 1 ? CONTACT_MISSION : undefined),
+}));
 const firestoreSedeAliases = sede => {
   const canonical = normalizeSede(sede);
   if (canonical === 'Guayaquil') return [canonical, 'GYE'];
@@ -371,7 +375,10 @@ export default function MonitorImos() {
   const excludedC1 = useMemo(() => {
     const counts = { already_attended: 0, unverified: 0 };
     sedeScopedMissions.filter(m => (campaignFilter === 'legacy' ? m.schemaVersion !== 2 : m.campaignId === campaignFilter) && (filterSede === 'todos' || resolveMissionSede(m) === filterSede)).forEach(m => {
-      getAllEnrolados(m).forEach(e => { const status = c1Eligibility(e); if (status in counts) counts[status]++; });
+      getAllEnrolados(m).forEach(e => {
+        const status = c1Eligibility(e);
+        if (status in counts && !getEnroladosList(m).some(included => included.id === e.id)) counts[status]++;
+      });
     });
     return counts;
   }, [sedeScopedMissions, campaignFilter, filterSede]);
@@ -998,7 +1005,7 @@ export default function MonitorImos() {
           </div>
 
           <p style={{ color: '#cbd5e1', marginTop: '0.75rem', fontSize: '0.85rem' }}>
-            Esta vista contiene {totalEnroladosCount} enrolamientos disponibles para C1 según la campaña y los filtros seleccionados. Solo C1 pendiente o deserción de C1 registrada. Los estados ausentes se excluyen hasta verificarlos en Nodus. Registros excluidos de la sede/campaña: {excludedC1.already_attended} ya sentados y {excludedC1.unverified} sin estado C1 verificable.
+            Esta vista contiene {totalEnroladosCount} enrolamientos para contacto según la campaña y los filtros seleccionados. Incluye inscripción verificada para la sede, equipo y fecha, sin acreditar asistencia histórica. Registros excluidos de la sede/campaña: {excludedC1.already_attended} con C1 cursado y {excludedC1.unverified} sin inscripción o evidencia C1 verificable.
             Los registros anteriores se consultan por separado. Estos conteos no certifican ausencia de duplicados u omisiones en Nodus.
           </p>
         </div>
@@ -1626,6 +1633,7 @@ export default function MonitorImos() {
                       </td>
                       <td style={{ padding: '0.75rem 0.85rem', fontWeight: 600 }}>
                         <div style={{ color: '#fff', fontSize: '0.88rem' }}>{enr.nombre || 'Sin Nombre'}</div>
+                        {c1Eligibility(enr) === 'unverified' && <small>Inscripción verificada · historial C1 por verificar</small>}
                         {enr.email && <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>{enr.email}</div>}
                       </td>
                       <td style={{ padding: '0.75rem 0.85rem', fontSize: '0.82rem', color: enr.telefono ? '#cbd5e1' : '#64748b' }}>
@@ -2203,6 +2211,7 @@ export default function MonitorImos() {
                                   }}>
                                       <div style={{ fontWeight: 700, fontSize: '0.95rem', marginBottom: '6px', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                         <span>{enrolado.nombre}</span>
+                                        {c1Eligibility(enrolado) === 'unverified' && <small>Inscripción verificada · historial C1 por verificar</small>}
                                         {isMatchedInSearch && <span style={{ fontSize: '0.7rem', padding: '2px 6px', borderRadius: '4px', background: '#38bdf8', color: '#0f172a', fontWeight: 800 }}>🎯 Coincidencia</span>}
                                     </div>
                                     

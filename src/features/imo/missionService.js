@@ -1,11 +1,13 @@
-import { isAvailableForC1, c1Evidence } from '../../../functions-imo/c1Eligibility.mjs';
+import { c1Evidence } from '../../../functions-imo/c1Eligibility.mjs';
 import { collection, doc, getDocs, query, where, serverTimestamp, runTransaction, onSnapshot, updateDoc } from 'firebase/firestore';
 import { auth, db } from '../../services/firebase';
 import { validateCampaign } from './missionModel';
+import { isMissionCandidate, CONTACT_MISSION } from '../../../functions-imo/contactEligibility.mjs';
 
 export async function createCampaign(input) {
   validateCampaign(input);
-  if (input.assignments.some(a => a.enrolados.some(e => !isAvailableForC1(e)))) throw new Error('Solo se pueden incluir personas con C1 pendiente o deserción de C1 registrada en Nodus.');
+  if (input.missionKind !== undefined && input.missionKind !== CONTACT_MISSION) throw new Error('Tipo de misión inválido.');
+  if (input.assignments.some(a => a.enrolados.some(e => !isMissionCandidate(e, input)))) throw new Error('Revisa la inscripción o evidencia C1 de los enrolados para esta sede, equipo y fecha.');
   const user = auth.currentUser;
   if (!user) throw new Error('Inicia sesión para generar la campaña.');
   // A stable campaign key prevents duplicate campaigns on retries/double clicks.
@@ -16,21 +18,23 @@ export async function createCampaign(input) {
     const existing = await tx.get(registry);
     if (existing.exists()) throw new Error('Ya existe una campaña para esta sede, equipo y fecha. Abre su enlace en Campañas generadas.');
     tx.set(registry, { campaignId: ref.id, createdBy: user.uid, createdAt: serverTimestamp() });
-    tx.set(ref, { schemaVersion: 2, sede: input.sede, targetTeam: Number(input.targetTeam), c1Date: input.c1Date, status: 'active', createdAt: serverTimestamp(), createdBy: user.uid, count: input.assignments.length });
+    tx.set(ref, { schemaVersion: 2, ...(input.missionKind ? { missionKind: input.missionKind } : {}), sede: input.sede, targetTeam: Number(input.targetTeam), c1Date: input.c1Date, status: 'active', createdAt: serverTimestamp(), createdBy: user.uid, count: input.assignments.length });
     for (const a of input.assignments) {
       const mission = doc(collection(db, 'imo_missions'));
       const data = {
-        schemaVersion: 2, campaignId: ref.id, imoNombre: a.nombre,
+        schemaVersion: 2, ...(input.missionKind ? { missionKind: input.missionKind } : {}), campaignId: ref.id, imoNombre: a.nombre,
         originTeam: Number(a.originTeam), targetTeam: Number(input.targetTeam), sede: input.sede,
         equipo: `EQUIPO ${Number(input.targetTeam)} - ${input.sede.toUpperCase()} C1`, c1Date: input.c1Date,
         sourceMissionId: a.sourceMissionId, createdBy: user.uid, createdByEmail: user.email.toLowerCase(),
         createdAt: serverTimestamp(), lastUpdated: serverTimestamp(),
-        enrolados: a.enrolados.map(e => ({ id: e.id, nombre: e.nombre, ...c1Evidence(e), coordinadora_nombre: e.coordinadora_nombre || '', coordinadora_telefono: e.coordinadora_telefono || '', telefono: e.telefono || '' })),
+        enrolados: a.enrolados.map(e => ({ id: e.id, nombre: e.nombre, ...c1Evidence(e),
+          ...(e.c1Registration ? { c1Registration: { ...e.c1Registration } } : {}),
+          coordinadora_nombre: e.coordinadora_nombre || '', coordinadora_telefono: e.coordinadora_telefono || '', telefono: e.telefono || '' })),
         enroladoIds: a.enrolados.map(e => e.id), checks: {},
       };
       tx.set(mission, data);
       tx.set(doc(db, 'imo_campaigns', ref.id, 'profiles', mission.id), {
-        schemaVersion: 2, campaignId: ref.id, imoNombre: a.nombre, originTeam: data.originTeam, targetTeam: data.targetTeam, sede: input.sede, c1Date: input.c1Date,
+        schemaVersion: 2, ...(input.missionKind ? { missionKind: input.missionKind } : {}), campaignId: ref.id, imoNombre: a.nombre, originTeam: data.originTeam, targetTeam: data.targetTeam, sede: input.sede, c1Date: input.c1Date,
         enroladoIds: data.enroladoIds, enrolados: data.enrolados.map(({ telefono: _telefono, ...e }) => e),
       });
     }

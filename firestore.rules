@@ -947,8 +947,9 @@ service cloud.firestore {
       allow get: if isImoStaff() || (campaignId.matches('^[A-Za-z0-9]{20}$') && resource.data.status == 'active');
       allow list: if isImoStaff();
       allow create: if isImoStaff() && campaignId.matches('^[A-Za-z0-9]{20}$') && request.resource.data.keys().hasOnly([
-        'schemaVersion', 'sede', 'targetTeam', 'c1Date', 'status', 'createdAt', 'createdBy', 'count'
+        'schemaVersion', 'sede', 'targetTeam', 'c1Date', 'status', 'createdAt', 'createdBy', 'count', 'missionKind'
       ]) && request.resource.data.schemaVersion == 2 && request.resource.data.status == 'active' &&
+        (!('missionKind' in request.resource.data) || request.resource.data.missionKind == 'registered-c1-contact') &&
         request.resource.data.targetTeam is int && request.resource.data.targetTeam > 0 &&
         request.resource.data.sede is string && request.resource.data.sede.size() > 0 &&
         request.resource.data.c1Date is string && request.resource.data.c1Date.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$') &&
@@ -958,10 +959,12 @@ service cloud.firestore {
       allow delete: if false;
       match /profiles/{missionId} {
         allow read: if isImoStaff() || activeImoCampaign(campaignId);
-        allow create: if isImoStaff() && request.resource.data.keys().hasOnly(['schemaVersion', 'campaignId', 'imoNombre', 'originTeam', 'targetTeam', 'sede', 'c1Date', 'enroladoIds', 'enrolados']) &&
+        allow create: if isImoStaff() && request.resource.data.keys().hasOnly(['schemaVersion', 'campaignId', 'imoNombre', 'originTeam', 'targetTeam', 'sede', 'c1Date', 'enroladoIds', 'enrolados', 'missionKind']) &&
+          request.resource.data.get('missionKind', '') == getAfter(/databases/$(database)/documents/imo_campaigns/$(campaignId)).data.get('missionKind', '') &&
           request.resource.data.schemaVersion == 2 && request.resource.data.campaignId == campaignId &&
           request.resource.data.targetTeam == getAfter(/databases/$(database)/documents/imo_campaigns/$(campaignId)).data.targetTeam &&
           request.resource.data.sede == getAfter(/databases/$(database)/documents/imo_campaigns/$(campaignId)).data.sede &&
+          request.resource.data.c1Date == getAfter(/databases/$(database)/documents/imo_campaigns/$(campaignId)).data.c1Date &&
           request.resource.data.enroladoIds is list && request.resource.data.enroladoIds.size() > 0 && request.resource.data.enroladoIds.size() <= 100 && request.resource.data.enrolados.size() == request.resource.data.enroladoIds.size();
         allow update, delete: if false;
         match /imo_progress/{progressId} {
@@ -1010,7 +1013,9 @@ service cloud.firestore {
         request.resource.data.originTeam != request.resource.data.targetTeam &&
         request.resource.data.enroladoIds is list && request.resource.data.enroladoIds.size() > 0 && request.resource.data.enroladoIds.size() <= 100 &&
         request.resource.data.enrolados.size() == request.resource.data.enroladoIds.size() &&
+        request.resource.data.get('missionKind', '') == getAfter(/databases/$(database)/documents/imo_campaigns/$(request.resource.data.campaignId)).data.get('missionKind', '') &&
         getAfter(/databases/$(database)/documents/imo_campaigns/$(request.resource.data.campaignId)).data.targetTeam == request.resource.data.targetTeam &&
+        getAfter(/databases/$(database)/documents/imo_campaigns/$(request.resource.data.campaignId)).data.c1Date == request.resource.data.c1Date &&
         getAfter(/databases/$(database)/documents/imo_campaigns/$(request.resource.data.campaignId)).data.sede == request.resource.data.sede;
       allow update, delete: if isGerenteODireccion() && resource.data.get('schemaVersion', 1) != 2;
     }

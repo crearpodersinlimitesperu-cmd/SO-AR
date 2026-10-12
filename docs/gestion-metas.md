@@ -141,7 +141,27 @@ el `data-info.id` de Nodus, nombre e IMO; el teléfono visible puede diferir
 de la ficha y no sustituye esa identidad. Se espera la inicialización
 DataTables antes de exigir filas completas. El generador muestra conteos
 de fuentes importadas y de evidencia pendiente por separado de candidatos
-elegibles, sin permitir compartir un enlace de registros no verificados.
+históricamente elegibles.
+
+La política explícita `registered-c1-contact` prepara misiones de **contacto**
+para inscritos verificados en el detalle Nodus, con sede, equipo destino y
+fecha C1 coincidentes. No habilita desconocidos sin esa inscripción ni
+personas con C1 ya cursado (salvo deserción explícita, como antes).
+Monitor, generador, validación al guardar y portal schema2 usan el mismo
+contrato; la inscripción viaja al perfil y el historial desconocido se
+etiqueta «por verificar». Las intenciones conocidas se comparan sin espacios
+externos ni diferencias de mayúsculas, sin modificar el valor fuente;
+estados ausentes o no reconocidos permanecen fuera del enlace con aviso.
+La política histórica y el portal privado schema3
+no cambian. Las confirmaciones del IMO siguen siendo contacto e intención,
+no asistencia efectiva. Se conserva la revisión humana antes de crear o
+compartir. Un adapter compatible con la importación scoped existente exige
+ID Nodus, fuente de reconciliación, timestamp válido, sede y equipo destino
+almacenados antes de proyectar la inscripción al candidato. No vuelve a
+consultar Nodus ni escribe datos de origen; conserva IDs/checks/owners.
+Las reglas admiten únicamente ese
+tipo adicional de misión y exigen que perfiles/misiones coincidan con la
+campaña; sus gates de identidad y rol permanecen iguales.
 
 Por autorización expresa de actualización automática para todas las sedes,
 el workflow de fuentes Nodus consulta y publica agregados cada seis horas
