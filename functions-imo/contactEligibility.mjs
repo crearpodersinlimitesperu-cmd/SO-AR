@@ -15,20 +15,26 @@ export function contactRegistration(row, source) {
     sede: source.sede, targetTeam: source.targetTeam };
 }
 
-export function isContactCandidate(row, context = {}) {
+export function contactCandidateReason(row, context = {}) {
   const history = c1Eligibility(row);
-  if (history === 'already_attended') return false;
-  if (history === 'eligible') return true;
+  if (history === 'already_attended') return 'already_attended';
+  if (history === 'eligible') return 'historical_eligible';
   const registration = row?.c1Registration;
-  return registration?.source === 'Nodus /participantessede/datos' &&
-    registration.chapter === true &&
-    registration.sede === context.sede &&
-    Number.isInteger(registration.targetTeam) && registration.targetTeam === Number(context.targetTeam) &&
-    /^\d{4}-\d{2}-\d{2}$/.test(registration.date || '') &&
-    Number.isFinite(Date.parse(registration.date)) &&
-    new Date(registration.date).toISOString().slice(0, 10) === registration.date &&
-    registration.date === context.c1Date &&
-    ['pendiente', 'confirmado'].includes(registration.status);
+  if (!registration || registration.source !== 'Nodus /participantessede/datos') return 'registration_source_unverified';
+  if (registration.chapter !== true) return 'not_registered';
+  if (registration.sede !== context.sede || !Number.isInteger(registration.targetTeam) ||
+      registration.targetTeam !== Number(context.targetTeam)) return 'registration_scope_mismatch';
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(registration.date || '') ||
+      !Number.isFinite(Date.parse(registration.date)) ||
+      new Date(registration.date).toISOString().slice(0, 10) !== registration.date ||
+      registration.date !== context.c1Date) return 'registration_date_mismatch';
+  if (registration.status == null || registration.status === '') return 'attendance_intention_missing';
+  if (!['pendiente', 'confirmado'].includes(registration.status)) return 'attendance_intention_unsupported';
+  return 'registered_contact';
+}
+
+export function isContactCandidate(row, context = {}) {
+  return ['historical_eligible', 'registered_contact'].includes(contactCandidateReason(row, context));
 }
 
 export function isMissionCandidate(row, context = {}) {
