@@ -6,16 +6,29 @@ sedes, equipos, participantes por equipo, ficha por identificación y pagos por 
 
 ## Credencial y perímetro
 
-Las llamadas se hacen desde Node.js en servicios o automatizaciones de servidor con
-`NODUS_API_KEY` inyectada como secreto. No usar variables `VITE_*`, Firestore abierto,
-URLs con token ni llamadas directas desde el navegador. No registrar cabeceras, cuerpo
-de participantes, identificaciones, pagos ni el texto libre de errores del servidor.
+Las llamadas se hacen desde Node.js en servicios o automatizaciones de servidor, o
+desde el Worker autenticado usando `NODUS_API_KEY` como secreto de Cloudflare. No usar
+variables `VITE_*`, Firestore abierto, URLs con token ni llamadas directas desde el
+navegador. No registrar cabeceras, cuerpo de participantes, identificaciones, pagos ni
+el texto libre de errores del servidor.
 
 En la última revisión del repositorio, Actions contiene `NODUS_USER` y
 `NODUS_PASSWORD`, pero no `NODUS_API_KEY`. Esas credenciales de navegador no sustituyen
 el token de API. No se debe ejecutar una integración productiva ni declarar conectado
 un consumidor JSON hasta que el responsable agregue `NODUS_API_KEY` por el gestor
 seguro de secretos.
+
+El Worker ofrece `/nodus-json/catalog` y `/nodus-json/team-metrics` mediante POST con
+Bearer ID token de Firebase. El catálogo devuelve totales generales a otros roles,
+limita coordinadores a la sede guardada en su usuario y reserva la vista global a
+gerencia; las métricas detalladas solo están disponibles para coordinadores con sede y
+gerencia. Los agregados no incluyen identificaciones, teléfonos, correos ni nombres.
+El endpoint de métricas calcula conteos únicamente desde booleanos documentados y
+separa valores desconocidos; no infiere llamadas, graduación ni etapas que la API no
+expone. La pantalla Embudo de Conversión usa esta fuente y ya no rotula snapshots como
+“live” ni presenta proyecciones fijas como resultados Nodus. Configura el secreto del
+Worker con `npx wrangler secret put NODUS_API_KEY` antes de desplegar; sin él, las rutas
+devuelven un estado explícito de servicio no configurado.
 
 ## Contrato fail-closed
 
@@ -52,3 +65,6 @@ validación de fechas y precedencia de filtros. No hace peticiones productivas.
 El workflow manual `Nodus JSON API audit (read only)` valida únicamente `/sedes` y
 `/equipos?en_actividad=1`, contrasta sus IDs y publica solo conteos y `meta.generado`
 en el log sanitizado. No actualiza Firestore ni elige un equipo de la interfaz.
+`cloudflare-worker/src/nodusJsonModel.test.js` cubre los alcances global/sede/general,
+el filtrado de sedes y agregados que preservan estados desconocidos. Ejecuta
+`npm run test:nodus-json` para las pruebas sintéticas de esta integración.
