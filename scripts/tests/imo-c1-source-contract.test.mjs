@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { adaptC1Participant } from '../imoC1SourceContract.mjs';
+import { adaptC1Participant, matchReportParticipant } from '../imoC1SourceContract.mjs';
 import { buildC1Index, reconcileC1 } from '../imoC1Reconciliation.mjs';
 import { c1Eligibility } from '../../functions-imo/c1Eligibility.mjs';
 import { readFileSync } from 'node:fs';
@@ -24,6 +24,15 @@ test('detail for a different person or destination is rejected', () => {
   for (const patch of [{ id: '8' }, { id_equipo: '141' }, { nombres: 'Inviter' }, { telefono: '11111111' }]) {
     assert.throws(() => adaptC1Participant(row, { ...detail, ...patch }));
   }
+});
+test('stable participant ID resolves stale display phone without allowing different owners or people', () => {
+  const report = { ...row, imo: row.nombre_imo, nodusParticipantId: row.id, telefono: 'old display' };
+  assert.equal(matchReportParticipant(report, [row]).length, 1);
+  assert.equal(matchReportParticipant({ ...report, nodusParticipantId: '8' }, [row]).length, 0);
+  assert.equal(matchReportParticipant({ ...report, imo: 'Other Inviter' }, [row]).length, 0);
+  assert.equal(matchReportParticipant({ ...report, nombres: 'Other' }, [row]).length, 0);
+  assert.equal(matchReportParticipant({ ...report, nodusParticipantId: undefined }, [row]).length, 0);
+  assert.equal(matchReportParticipant({ ...report, nodusParticipantId: undefined, telefono: row.telefono }, [row]).length, 1);
 });
 test('scoped import cannot create campaigns or promote pending registration to eligibility', () => {
   const source = readFileSync(new URL('../syncImoLimaE32.mjs', import.meta.url), 'utf8');

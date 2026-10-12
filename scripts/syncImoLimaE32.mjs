@@ -2,7 +2,7 @@
 import puppeteer from 'puppeteer';
 import { initializeApp, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
-import { adaptC1Participant } from './imoC1SourceContract.mjs';
+import { adaptC1Participant, matchReportParticipant } from './imoC1SourceContract.mjs';
 import { readNodusC1Report, waitForC1Report } from './nodusC1Report.mjs';
 import { buildC1Index, reconcileC1 } from './imoC1Reconciliation.mjs';
 import { c1Eligibility } from '../functions-imo/c1Eligibility.mjs';
@@ -88,10 +88,7 @@ try {
   stage = 'complete-relation-validation';
   for (const p of report) {
     if (!p.imo || /^sin (invitador|imo|enrolador)\b/i.test(p.imo)) continue;
-    const matches = adapted.filter(r => norm(`${r.nombres} ${r.apellidos}`) === norm(`${p.nombres} ${p.apellidos}`) &&
-      (p.nodusParticipantId ? String(r.id) === p.nodusParticipantId :
-        String(r.telefono).replace(/\D/g, '') === String(p.telefono).replace(/\D/g, '')) &&
-      norm(r.nombre_imo) === norm(p.imo));
+    const matches = matchReportParticipant(p, adapted);
     relationCounts.reportRows++;
     if (matches.length !== 1) {
       const names = adapted.filter(r => norm(`${r.nombres} ${r.apellidos}`) === norm(`${p.nombres} ${p.apellidos}`));
