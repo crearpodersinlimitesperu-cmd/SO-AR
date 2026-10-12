@@ -24,7 +24,13 @@ try {
    const payload=await response.json();
    if(!Array.isArray(payload.data)) throw new Error('Unexpected contract');
    const keys=['id','nombres','apellidos','telefono','id_invitador','nombre_imo','asistio_c1','asistenciaC1','estadoC1','estado_c1','desertorC1','desertor_c1'];
-   return {total:payload.recordsTotal,filtered:payload.recordsFiltered,rows:payload.data.map(row=>Object.fromEntries(keys.filter(key=>row[key]!==undefined).map(key=>[key,row[key]])))};
+   // datosTabla exposes chapter registration as asistio_c1, not effective
+   // historical attendance. Do not reinstate it as attendance on later syncs.
+   return {total:payload.recordsTotal,filtered:payload.recordsFiltered,rows:payload.data.map(row=>{
+    const safe=Object.fromEntries(keys.filter(key=>row[key]!==undefined).map(key=>[key,row[key]]));
+    safe.asistio_c1=null;
+    return safe;
+   })};
   },start));
  console.log('IMO_C1_SOURCE_COMPLETE '+JSON.stringify({read:rows.length}));
  const index=buildC1Index(rows),sourceUpdatedAt=new Date().toISOString();

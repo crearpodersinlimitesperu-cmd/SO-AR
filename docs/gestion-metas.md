@@ -129,6 +129,14 @@ equipo y etapa. El porcentaje se recalcula con el objetivo sin recortar
 sobrecumplimiento. Dirección puede gestionar todas las sedes; gerencia,
 solo la propia. La vista global muestra preparación por cada sede.
 
+En Misión IMO, el equipo del IMO no es el equipo de ingreso de sus enrolados.
+La revisión de Lima E32 identificó `capitulo1`/`fecha_c1` como campos de
+registro separados de `asistencia` (`pendiente`/`confirmado`). El alias
+`asistio_c1` de la tabla de participantes no certifica asistencia histórica.
+El importador específico Lima149 conserva la inscripción y deja desconocida
+la asistencia histórica sin evidencia válida; no genera campañas ni altera
+Nodus. La reconciliación recurrente tampoco convierte ese alias en asistencia.
+
 Por autorización expresa de actualización automática para todas las sedes,
 el workflow de fuentes Nodus consulta y publica agregados cada seis horas
 (cron UTC), además del dispatch manual. Sus scopes proceden de metas de
