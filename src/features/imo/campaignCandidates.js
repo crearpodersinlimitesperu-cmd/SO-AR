@@ -4,6 +4,7 @@ import { isAvailableForC1, c1Evidence } from '../../../functions-imo/c1Eligibili
 // ENROLLEES join (C1 target), not the IMO's own team. The IMO's origin team is
 // inferred only when the IMO appears as a participant of another team.
 import { normalizeText } from './missionModel.js';
+import { isContactCandidate, contactRegistration, CONTACT_MISSION } from '../../../functions-imo/contactEligibility.mjs';
 
 export const MAX_CAMPAIGN_IMOS = 200;
 
@@ -68,7 +69,7 @@ export function isPersonName(name) {
   return !!raw && !/^(sin pago|pagado|pago)\b|S\/\.|\d/i.test(raw);
 }
 
-export function buildCampaignCandidates(missions, { sede, targetTeam, resolveSede, getEnrolados, search = '' }) {
+export function buildCampaignCandidates(missions, { sede, targetTeam, resolveSede, getEnrolados, search = '', missionKind, c1Date }) {
   const target = Number(targetTeam);
   if (!target || !sede) return { candidates: [], conflicts: [], phoneConflicts: [] };
   const sedeNorm = normalizeText(sede);
@@ -119,7 +120,9 @@ export function buildCampaignCandidates(missions, { sede, targetTeam, resolveSed
         continue;
       }
 
-      const available = isAvailableForC1(e);
+      const registration = contactRegistration(e, m);
+      const available = missionKind === CONTACT_MISSION
+        ? isContactCandidate({ ...e, c1Registration: registration }, { sede, targetTeam: target, c1Date }) : isAvailableForC1(e);
       ownerByPerson.set(key, { imoKey, imoNombre: candidate.nombre, available });
       if (!available) continue;
 
@@ -154,6 +157,7 @@ export function buildCampaignCandidates(missions, { sede, targetTeam, resolveSed
         id,
         nombre: String(e.nombre).trim(),
         ...c1Evidence(e),
+        ...(registration ? { c1Registration: { ...registration } } : {}),
         telefono: e.telefono || '',
         coordinadora_nombre: e.coordinadora_nombre || '',
         coordinadora_telefono: e.coordinadora_telefono || '',
@@ -177,7 +181,9 @@ export function teamsWithRecords(missions, sede, resolveSede, getEnrolados) {
     if (m.schemaVersion === 2) continue;
     if (resolveSede && normalizeText(resolveSede(m)) !== sedeNorm) continue;
     if (!personKey(m.imoNombre) || isPlaceholderImo(m.imoNombre)) continue;
-    if (getEnrolados && !getEnrolados(m).some(e => isPersonName(e.nombre) && isAvailableForC1(e))) continue;
+    if (getEnrolados && !getEnrolados(m).some(e => isPersonName(e.nombre) &&
+      (isAvailableForC1(e) || isContactCandidate({ ...e, c1Registration: contactRegistration(e, m) },
+        { sede, targetTeam: recordTeamNumber(m), c1Date: m.c1Date || e.c1Registration?.date })))) continue;
     const team = recordTeamNumber(m);
     if (!team) continue;
     map.set(team, (map.get(team) || 0) + 1);

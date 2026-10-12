@@ -5,6 +5,7 @@ import { buildCampaignCandidates, recordTeamNumber } from '../src/features/imo/c
 import { c1Eligibility, isAvailableForC1 } from '../functions-imo/c1Eligibility.mjs';
 import { calendarSede, OFFICIAL_CALENDAR_URL, parseOfficialCalendar, applyCalendarChanges, findC1Dates } from '../functions-imo/calendarModel.mjs';
 import { getEnroladosList } from '../src/features/imo/missionEnrolados.js';
+import { CONTACT_MISSION } from '../functions-imo/contactEligibility.mjs';
 
 export function summarizeReadiness(missions, events, campaigns, sede, targetTeam) {
   const resolveSede = m => calendarSede(m.sede);
@@ -18,12 +19,25 @@ export function summarizeReadiness(missions, events, campaigns, sede, targetTeam
     sede, targetTeam, resolveSede, getEnrolados: m => getEnroladosList(m).filter(isAvailableForC1),
   });
   const dates = findC1Dates(events, sede, targetTeam).map(e => ({ date: e.date, source: e.source }));
+  const contact = buildCampaignCandidates(missions, {
+    sede, targetTeam, resolveSede, getEnrolados: getEnroladosList,
+    missionKind: CONTACT_MISSION, c1Date: dates.length === 1 ? dates[0].date : '',
+  });
   const timestamps = scoped.map(m => m.c1SourceUpdatedAt).filter(v => typeof v === 'string' && Number.isFinite(Date.parse(v))).sort();
   return {
     sede, targetTeam, scope: 'explicit stored sede only; inferred sede not certified',
     sourceMissions: scoped.length, unknownSedeRecords, statuses,
     candidateImos: candidates.length, candidateEnrollees: candidates.reduce((n, c) => n + c.enrolados.length, 0),
     ownershipConflicts: conflicts.length, phoneConflicts: phoneConflicts.length,
+    contactMission: {
+      candidateImos: contact.candidates.length,
+      candidateEnrollees: contact.candidates.reduce((n, c) => n + c.enrolados.length, 0),
+      ownershipConflicts: contact.conflicts.length, phoneConflicts: contact.phoneConflicts.length,
+      historicalAttendanceUnchanged: true,
+      readyForManagerReview: contact.candidates.length > 0 && dates.length === 1 &&
+        !unknownSedeRecords && !contact.conflicts.length && !contact.phoneConflicts.length &&
+        timestamps.length === scoped.length,
+    },
     c1SourceTimestamps: { known: timestamps.length, missing: scoped.length - timestamps.length,
       oldest: timestamps[0] || null, newest: timestamps.at(-1) || null },
     c1Dates: dates,
