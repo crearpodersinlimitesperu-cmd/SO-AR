@@ -136,6 +136,12 @@ registro separados de `asistencia` (`pendiente`/`confirmado`). El alias
 El importador específico Lima149 conserva la inscripción y deja desconocida
 la asistencia histórica sin evidencia válida; no genera campañas ni altera
 Nodus. La reconciliación recurrente tampoco convierte ese alias en asistencia.
+El cruce del reporte C1 usa el ID numérico del participante contrastado con
+el `data-info.id` de Nodus, nombre e IMO; el teléfono visible puede diferir
+de la ficha y no sustituye esa identidad. Se espera la inicialización
+DataTables antes de exigir filas completas. El generador muestra conteos
+de fuentes importadas y de evidencia pendiente por separado de candidatos
+elegibles, sin permitir compartir un enlace de registros no verificados.
 
 Por autorización expresa de actualización automática para todas las sedes,
 el workflow de fuentes Nodus consulta y publica agregados cada seis horas

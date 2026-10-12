@@ -2,8 +2,8 @@
 import puppeteer from 'puppeteer';
 import { initializeApp, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
-import { adaptC1Participant } from './imoC1SourceContract.mjs';
-import { readNodusC1Report } from './nodusC1Report.mjs';
+import { adaptC1Participant, matchReportParticipant } from './imoC1SourceContract.mjs';
+import { readNodusC1Report, waitForC1Report } from './nodusC1Report.mjs';
 import { buildC1Index, reconcileC1 } from './imoC1Reconciliation.mjs';
 import { c1Eligibility } from '../functions-imo/c1Eligibility.mjs';
 import { OFFICIAL_CALENDAR_URL, parseOfficialCalendar, findC1Dates } from '../functions-imo/calendarModel.mjs';
@@ -16,6 +16,7 @@ const browser = await puppeteer.launch({ executablePath: process.env.CHROME_BIN,
   args: ['--no-sandbox', '--disable-setuid-sandbox'] });
 let stage = 'login';
 let writes = 0;
+const relationCounts = { reportRows: 0, matched: 0, missingName: 0, missingPhone: 0, missingInviter: 0, duplicate: 0 };
 try {
   const page = await browser.newPage();
   const origin = 'https://imo.crearpslglobal.com';
@@ -39,6 +40,7 @@ try {
   if (!/EQUIPO\s*32\b/i.test(selected) || !/\bLIMA\b/i.test(selected) || !/CICLO\s*1\b/i.test(selected)) {
     throw new Error('Exact Lima E32 C1 scope unavailable');
   }
+  await waitForC1Report(page);
   const report = await page.evaluate(readNodusC1Report, '149');
   stage = 'scoped-participant-details';
   const source = await page.evaluate(async expectedCount => {
@@ -86,10 +88,18 @@ try {
   stage = 'complete-relation-validation';
   for (const p of report) {
     if (!p.imo || /^sin (invitador|imo|enrolador)\b/i.test(p.imo)) continue;
-    const matches = adapted.filter(r => norm(`${r.nombres} ${r.apellidos}`) === norm(`${p.nombres} ${p.apellidos}`) &&
-      String(r.telefono).replace(/\D/g, '') === String(p.telefono).replace(/\D/g, '') &&
-      norm(r.nombre_imo) === norm(p.imo));
-    if (matches.length !== 1) throw new Error('Participant relation ambiguous');
+    const matches = matchReportParticipant(p, adapted);
+    relationCounts.reportRows++;
+    if (matches.length !== 1) {
+      const names = adapted.filter(r => norm(`${r.nombres} ${r.apellidos}`) === norm(`${p.nombres} ${p.apellidos}`));
+      const phones = names.filter(r => String(r.telefono).replace(/\D/g, '') === String(p.telefono).replace(/\D/g, ''));
+      if (!names.length) relationCounts.missingName++;
+      else if (!phones.length) relationCounts.missingPhone++;
+      else if (!matches.length) relationCounts.missingInviter++;
+      else relationCounts.duplicate++;
+      continue;
+    }
+    relationCounts.matched++;
     const row = matches[0];
     if (row.c1Registration.date !== dates[0].date || !row.c1Registration.chapter) throw new Error('Registration scope mismatch');
     const key = p.imo.trim();
@@ -98,10 +108,11 @@ try {
     const group = groups.get(id);
     if (group.imoNombre !== key) throw new Error('Inviter key collision');
     group.enrolados.push({ id: `enr_nodus_${row.id}`, nodusParticipantId: String(row.id),
-      nombre: `${p.nombres} ${p.apellidos}`.trim(), telefono: p.telefono,
+      nombre: `${p.nombres} ${p.apellidos}`.trim(), telefono: row.telefono,
       coordinadora_nombre: p.coordinador || '', c1Registration: row.c1Registration,
       ...reconcileC1({ nodusParticipantId: String(row.id) }, group, index, at) });
   }
+  if (relationCounts.matched !== relationCounts.reportRows) throw new Error('Participant relation ambiguous');
   const stats = { apply, teamId: 149, sede: 'Lima', targetTeam: 32, sourceRows: adapted.length,
     sourceMissions: groups.size, eligible: 0, already_attended: 0, unverified: 0, writes: 0,
     c1Date: dates[0].date, queriedAt: at, campaignsCreated: 0 };
@@ -135,6 +146,7 @@ try {
     'Participant relation ambiguous', 'Registration scope mismatch', 'Inviter key collision',
     'Existing mission scope mismatch', 'Existing enrollee identity ambiguous'];
   console.error('IMO_LIMA_E32_SYNC_FAILED ' + JSON.stringify({ stage, apply, writes,
+    relationCounts,
     reason: safeReasons.includes(error.message) ? error.message : 'Source unavailable; private details suppressed',
     campaignsCreated: 0 }));
   process.exitCode = 1;

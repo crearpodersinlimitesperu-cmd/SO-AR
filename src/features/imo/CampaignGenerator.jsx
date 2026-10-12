@@ -5,7 +5,9 @@ import './mission.css';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../../services/firebase';
 import { OFFICIAL_CALENDAR_URL, parseOfficialCalendar, applyCalendarChanges, findC1Dates, calendarSede } from './missionCalendar';
-import { buildCampaignCandidates, teamsWithRecords, MAX_CAMPAIGN_IMOS } from './campaignCandidates';
+import { buildCampaignCandidates, teamsWithRecords, recordTeamNumber, MAX_CAMPAIGN_IMOS } from './campaignCandidates';
+import { getEnroladosList as getSourceEnrolados } from './missionEnrolados';
+import { c1Eligibility } from '../../../functions-imo/c1Eligibility.mjs';
 
 // Helper robusto para resolver sede desde m.sede o m.equipo
 function resolveMissionSede(m) {
@@ -148,6 +150,13 @@ export default function CampaignGenerator({ missions, defaultSede, defaultEquipo
     [missions, sede, target, search, getEnrolados]
   );
   const sedeTeams = useMemo(() => teamsWithRecords(missions, sede, resolveMissionSede, getEnrolados), [missions, sede, getEnrolados]);
+  const sourceStatus = useMemo(() => {
+    const records = missions.filter(m => m.schemaVersion !== 2 &&
+      recordTeamNumber(m) === Number(target) && normalizeText(resolveMissionSede(m)) === normalizeText(sede));
+    const counts = { eligible: 0, already_attended: 0, unverified: 0 };
+    records.forEach(m => getSourceEnrolados(m).forEach(e => counts[c1Eligibility(e)]++));
+    return { records: records.length, ...counts };
+  }, [missions, sede, target]);
 
   const copyCandidate = c => ({ ...c, enrolados: c.enrolados.map(e => ({ ...e })) });
 
@@ -386,6 +395,14 @@ export default function CampaignGenerator({ missions, defaultSede, defaultEquipo
         <p style={{ fontSize: '0.85rem', fontWeight: 600, margin: '8px 0' }}>
           {candidates.length} IMOs con enrolados para el Equipo {target || '…'} · {Object.keys(chosen).length} seleccionados (máximo {MAX_CAMPAIGN_IMOS}). Solo se incluirán los seleccionados.
         </p>
+        {Number(target) > 0 && (
+          <p role="status" style={{ color: '#475569', margin: '8px 0' }}>
+            Fuentes sincronizadas para {sede} · Equipo {target}: {sourceStatus.records} registros IMO.
+            {' '}Enrolados: {sourceStatus.eligible} con C1 pendiente verificado, {sourceStatus.already_attended} con C1 cursado,
+            {' '}{sourceStatus.unverified} pendientes de verificar.
+            {' '}La inscripción a Capítulo 1 no confirma asistencia histórica. Solo los candidatos verificados pueden incluirse en el enlace.
+          </p>
+        )}
 
         {/* Lista de candidatos con checkbox */}
         <div style={{ maxHeight: 220, overflow: 'auto', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '4px 8px', background: '#f8fafc' }}>
