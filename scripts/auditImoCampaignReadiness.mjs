@@ -1,11 +1,11 @@
 // Read-only scoped audit. Output is counts and timestamps, never participant data.
 import { initializeApp, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
-import { buildCampaignCandidates, recordTeamNumber } from '../src/features/imo/campaignCandidates.js';
+import { buildCampaignCandidates, recordTeamNumber, isPersonName } from '../src/features/imo/campaignCandidates.js';
 import { c1Eligibility, isAvailableForC1 } from '../functions-imo/c1Eligibility.mjs';
 import { calendarSede, OFFICIAL_CALENDAR_URL, parseOfficialCalendar, applyCalendarChanges, findC1Dates } from '../functions-imo/calendarModel.mjs';
 import { getEnroladosList } from '../src/features/imo/missionEnrolados.js';
-import { CONTACT_MISSION } from '../functions-imo/contactEligibility.mjs';
+import { CONTACT_MISSION, contactRegistration, isContactCandidate } from '../functions-imo/contactEligibility.mjs';
 
 export function summarizeReadiness(missions, events, campaigns, sede, targetTeam) {
   const resolveSede = m => calendarSede(m.sede);
@@ -24,6 +24,13 @@ export function summarizeReadiness(missions, events, campaigns, sede, targetTeam
     missionKind: CONTACT_MISSION, c1Date: dates.length === 1 ? dates[0].date : '',
   });
   const timestamps = scoped.map(m => m.c1SourceUpdatedAt).filter(v => typeof v === 'string' && Number.isFinite(Date.parse(v))).sort();
+  const contactRows = scoped.flatMap(m => getEnroladosList(m).map(e => ({
+    nameValid: isPersonName(e.nombre),
+    available: isContactCandidate({ ...e, c1Registration: contactRegistration(e, m) },
+      { sede, targetTeam, c1Date: dates.length === 1 ? dates[0].date : '' }),
+    nameKey: String(e.nombre || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().replace(/[^A-Z0-9 ]/g, '').trim(),
+    stableId: /^\d+$/.test(e.nodusParticipantId || '') ? String(e.nodusParticipantId) : null,
+  })));
   return {
     sede, targetTeam, scope: 'explicit stored sede only; inferred sede not certified',
     sourceMissions: scoped.length, unknownSedeRecords, statuses,
@@ -34,6 +41,12 @@ export function summarizeReadiness(missions, events, campaigns, sede, targetTeam
       candidateEnrollees: contact.candidates.reduce((n, c) => n + c.enrolados.length, 0),
       ownershipConflicts: contact.conflicts.length, phoneConflicts: contact.phoneConflicts.length,
       historicalAttendanceUnchanged: true,
+      diagnostics: {
+        availableSourceRows: contactRows.filter(e => e.available).length,
+        rejectedNameRows: contactRows.filter(e => !e.nameValid).length,
+        distinctNameKeys: new Set(contactRows.map(e => e.nameKey)).size,
+        distinctStableIds: new Set(contactRows.filter(e => e.stableId).map(e => e.stableId)).size,
+      },
       readyForManagerReview: contact.candidates.length > 0 && dates.length === 1 &&
         !unknownSedeRecords && !contact.conflicts.length && !contact.phoneConflicts.length &&
         timestamps.length === scoped.length,
