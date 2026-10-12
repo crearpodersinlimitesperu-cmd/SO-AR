@@ -16,6 +16,7 @@ const browser = await puppeteer.launch({ executablePath: process.env.CHROME_BIN,
   args: ['--no-sandbox', '--disable-setuid-sandbox'] });
 let stage = 'login';
 let writes = 0;
+const relationCounts = { reportRows: 0, matched: 0, missingName: 0, missingPhone: 0, missingInviter: 0, duplicate: 0 };
 try {
   const page = await browser.newPage();
   const origin = 'https://imo.crearpslglobal.com';
@@ -89,7 +90,17 @@ try {
     const matches = adapted.filter(r => norm(`${r.nombres} ${r.apellidos}`) === norm(`${p.nombres} ${p.apellidos}`) &&
       String(r.telefono).replace(/\D/g, '') === String(p.telefono).replace(/\D/g, '') &&
       norm(r.nombre_imo) === norm(p.imo));
-    if (matches.length !== 1) throw new Error('Participant relation ambiguous');
+    relationCounts.reportRows++;
+    if (matches.length !== 1) {
+      const names = adapted.filter(r => norm(`${r.nombres} ${r.apellidos}`) === norm(`${p.nombres} ${p.apellidos}`));
+      const phones = names.filter(r => String(r.telefono).replace(/\D/g, '') === String(p.telefono).replace(/\D/g, ''));
+      if (!names.length) relationCounts.missingName++;
+      else if (!phones.length) relationCounts.missingPhone++;
+      else if (!matches.length) relationCounts.missingInviter++;
+      else relationCounts.duplicate++;
+      continue;
+    }
+    relationCounts.matched++;
     const row = matches[0];
     if (row.c1Registration.date !== dates[0].date || !row.c1Registration.chapter) throw new Error('Registration scope mismatch');
     const key = p.imo.trim();
@@ -102,6 +113,7 @@ try {
       coordinadora_nombre: p.coordinador || '', c1Registration: row.c1Registration,
       ...reconcileC1({ nodusParticipantId: String(row.id) }, group, index, at) });
   }
+  if (relationCounts.matched !== relationCounts.reportRows) throw new Error('Participant relation ambiguous');
   const stats = { apply, teamId: 149, sede: 'Lima', targetTeam: 32, sourceRows: adapted.length,
     sourceMissions: groups.size, eligible: 0, already_attended: 0, unverified: 0, writes: 0,
     c1Date: dates[0].date, queriedAt: at, campaignsCreated: 0 };
@@ -135,6 +147,7 @@ try {
     'Participant relation ambiguous', 'Registration scope mismatch', 'Inviter key collision',
     'Existing mission scope mismatch', 'Existing enrollee identity ambiguous'];
   console.error('IMO_LIMA_E32_SYNC_FAILED ' + JSON.stringify({ stage, apply, writes,
+    relationCounts,
     reason: safeReasons.includes(error.message) ? error.message : 'Source unavailable; private details suppressed',
     campaignsCreated: 0 }));
   process.exitCode = 1;
