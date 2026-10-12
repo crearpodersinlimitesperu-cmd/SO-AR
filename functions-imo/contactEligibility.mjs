@@ -29,7 +29,7 @@ export function contactCandidateReason(row, context = {}) {
       new Date(registration.date).toISOString().slice(0, 10) !== registration.date ||
       registration.date !== context.c1Date) return 'registration_date_mismatch';
   if (registration.status == null || registration.status === '') return 'attendance_intention_missing';
-  if (!['pendiente', 'confirmado'].includes(registration.status)) return 'attendance_intention_unsupported';
+  if (!['pendiente', 'confirmado'].includes(String(registration.status).trim().toLowerCase())) return 'attendance_intention_unsupported';
   return 'registered_contact';
 }
 

@@ -11,7 +11,7 @@ const person = { id: 'synthetic-person', nombre: 'Synthetic Enrollee', asistenci
     sede: 'Lima', targetTeam: 32, date: '2026-10-23', status: 'pendiente' } };
 
 test('verified registration enables contact without changing unknown historical attendance', () => {
-  for (const status of ['pendiente', 'confirmado']) {
+  for (const status of ['pendiente', 'confirmado', 'Pendiente', ' CONFIRMADO ']) {
     const e = { ...person, c1Registration: { ...person.c1Registration, status } };
     assert.equal(c1Eligibility(e), 'unverified');
     assert.equal(isContactCandidate(e, context), true);

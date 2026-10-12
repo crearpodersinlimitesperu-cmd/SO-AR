@@ -149,7 +149,10 @@ fecha C1 coincidentes. No habilita desconocidos sin esa inscripción ni
 personas con C1 ya cursado (salvo deserción explícita, como antes).
 Monitor, generador, validación al guardar y portal schema2 usan el mismo
 contrato; la inscripción viaja al perfil y el historial desconocido se
-etiqueta «por verificar». La política histórica y el portal privado schema3
+etiqueta «por verificar». Las intenciones conocidas se comparan sin espacios
+externos ni diferencias de mayúsculas, sin modificar el valor fuente;
+estados ausentes o no reconocidos permanecen fuera del enlace con aviso.
+La política histórica y el portal privado schema3
 no cambian. Las confirmaciones del IMO siguen siendo contacto e intención,
 no asistencia efectiva. Se conserva la revisión humana antes de crear o
 compartir. Un adapter compatible con la importación scoped existente exige

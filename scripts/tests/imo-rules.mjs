@@ -2,6 +2,7 @@
 import { createRequire } from 'node:module';
 import { readFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
+import { isMissionCandidate, CONTACT_MISSION } from '../../functions-imo/contactEligibility.mjs';
 const require = createRequire(process.env.IMO_TEST_DEPENDENCIES || import.meta.url);
 const { initializeTestEnvironment, assertFails, assertSucceeds } = require('@firebase/rules-unit-testing');
 const { doc, collection, getDoc, getDocs, setDoc, updateDoc, deleteDoc, writeBatch, runTransaction, serverTimestamp, Timestamp, query, collectionGroup } = require('firebase/firestore');
@@ -90,8 +91,14 @@ try {
       tx.set(ref, { ...policy, schemaVersion: 2, sede: 'Quito', targetTeam: 130, c1Date: '2026-10-30', status: 'active', createdAt: serverTimestamp(), createdBy: uid, count: size });
       for (let i = 0; i < size; i++) {
         const mission = doc(collection(db, 'imo_missions'));
-        const enrolados = [{ id: `e${i}`, nombre: `ENROLADO ${i}`, coordinadora_nombre: 'C1', coordinadora_telefono: '' }];
-        const data = { ...policy, schemaVersion: 2, campaignId: ref.id, imoNombre: `IMO ${i}`, originTeam: i % 2 ? 0 : 129, targetTeam: 130, sede: 'Quito', c1Date: '2026-10-30', enroladoIds: [`e${i}`], enrolados };
+        const enrolados = Array.from({ length: missionKind === CONTACT_MISSION && size === 62 ? (i < 59 ? 2 : 1) : 1 }, (_, j) => ({
+          id: `e${i}_${j}`, nombre: `ENROLADO ${i}_${j}`, coordinadora_nombre: 'C1', coordinadora_telefono: '',
+          ...(missionKind === CONTACT_MISSION ? { asistenciaC1: null, c1Registration: {
+            source: 'Nodus /participantessede/datos', chapter: true, sede: 'Quito',
+            targetTeam: 130, date: '2026-10-30', status: 'pendiente',
+          } } : {}),
+        }));
+        const data = { ...policy, schemaVersion: 2, campaignId: ref.id, imoNombre: `IMO ${i}`, originTeam: i % 2 ? 0 : 129, targetTeam: 130, sede: 'Quito', c1Date: '2026-10-30', enroladoIds: enrolados.map(e => e.id), enrolados };
         tx.set(mission, { ...data, equipo: 'EQUIPO 130 - QUITO C1', sourceMissionId: `src${i}`, createdBy: uid, createdByEmail: 'x@crearpsl.net', createdAt: serverTimestamp(), lastUpdated: serverTimestamp(), checks: {} });
         tx.set(doc(db, 'imo_campaigns', ref.id, 'profiles', mission.id), data);
       }
@@ -103,7 +110,12 @@ try {
   await assertFails(generate(capitan, 'capitan', 1));
   await assertFails(generate(coord, 'coord', 201));
   const contactCampaign = await assertSucceeds(generate(coord, 'coord', 62, 'registered-c1-contact'));
-  assert.equal((await getDocs(collection(anon, `imo_campaigns/${contactCampaign}/profiles`))).size, 62);
+  const contactProfiles = await getDocs(collection(anon, `imo_campaigns/${contactCampaign}/profiles`));
+  const contactContext = (await getDoc(doc(anon, 'imo_campaigns', contactCampaign))).data();
+  assert.equal(contactProfiles.size, 62);
+  const restoredContacts = contactProfiles.docs.flatMap(d => d.data().enrolados);
+  assert.equal(restoredContacts.length, 121);
+  assert.ok(restoredContacts.every(e => e.asistenciaC1 === null && isMissionCandidate(e, contactContext)));
   await assertFails(generate(capitan, 'capitan', 62, 'registered-c1-contact'));
   await assertFails(generate(coord, 'coord', 1, 'attendance-override'));
   const mismatch = doc(coord, 'imo_campaigns', contactCampaign, 'profiles', 'policy-mismatch');
