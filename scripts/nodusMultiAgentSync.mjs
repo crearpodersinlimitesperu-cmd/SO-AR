@@ -26,7 +26,7 @@ import {
 } from './nodusFuturosImposiblesParser.mjs';
 import { resolveUniqueNameMatch } from '../shared/rrhhSentinelRules.mjs';
 import { publishNodusReportSources } from './publishNodusReportSources.mjs';
-import { readNodusC1Report } from './nodusC1Report.mjs';
+import { readNodusC1Report, waitForC1Report } from './nodusC1Report.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -377,6 +377,7 @@ class NodusExtractorAgent {
     for (const eq of activeEquipos) {
       try {
         await this.safeGoto(`https://imo.crearpslglobal.com/reporte?id_equipo=${eq.id}`, 25000);
+        await waitForC1Report(this.page);
         const participantes = await this.page.evaluate(readNodusC1Report, eq.id);
 
         equiposData.push({

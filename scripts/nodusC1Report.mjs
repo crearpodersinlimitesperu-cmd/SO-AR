@@ -27,12 +27,30 @@ export function readNodusC1Report(expectedTeamId) {
     if (cells.length !== headers.length) throw new Error('Malformed C1 report row');
     const result = Object.fromEntries(Object.entries(columns).map(([field, label]) =>
       [field, cells[headers.indexOf(label)].textContent.trim()]));
+    const identity = row.querySelector('.chk-pago-c1');
+    if (identity) {
+      let info;
+      try { info = JSON.parse(identity.getAttribute('data-info') || '{}'); }
+      catch { throw new Error('C1 report identity invalid'); }
+      if (!/^\d+$/.test(identity.value) || String(info.id) !== identity.value) {
+        throw new Error('C1 report identity mismatch');
+      }
+      result.nodusParticipantId = identity.value;
+    }
     // Source checkbox state is retained separately from IMO intention/call checks.
     for (const [label, field] of [['asistencia', 'reportAttendanceC1'], ['desertor', 'reportDropoutC1']]) {
       const checkbox = cells[headers.indexOf(label)].querySelector('input[type="checkbox"]');
       if (!checkbox) throw new Error('C1 report state unverified');
       result[field] = checkbox.checked;
     }
+
     return result;
   });
+}
+
+export async function waitForC1Report(page) {
+  await page.waitForFunction(() => {
+    const table = document.querySelector('#tblReporteC1');
+    return !!table && !!window.jQuery?.fn?.dataTable?.isDataTable(table);
+  }, { timeout: 30000 });
 }

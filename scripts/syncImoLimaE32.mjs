@@ -3,7 +3,7 @@ import puppeteer from 'puppeteer';
 import { initializeApp, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { adaptC1Participant } from './imoC1SourceContract.mjs';
-import { readNodusC1Report } from './nodusC1Report.mjs';
+import { readNodusC1Report, waitForC1Report } from './nodusC1Report.mjs';
 import { buildC1Index, reconcileC1 } from './imoC1Reconciliation.mjs';
 import { c1Eligibility } from '../functions-imo/c1Eligibility.mjs';
 import { OFFICIAL_CALENDAR_URL, parseOfficialCalendar, findC1Dates } from '../functions-imo/calendarModel.mjs';
@@ -40,6 +40,7 @@ try {
   if (!/EQUIPO\s*32\b/i.test(selected) || !/\bLIMA\b/i.test(selected) || !/CICLO\s*1\b/i.test(selected)) {
     throw new Error('Exact Lima E32 C1 scope unavailable');
   }
+  await waitForC1Report(page);
   const report = await page.evaluate(readNodusC1Report, '149');
   stage = 'scoped-participant-details';
   const source = await page.evaluate(async expectedCount => {
@@ -88,7 +89,8 @@ try {
   for (const p of report) {
     if (!p.imo || /^sin (invitador|imo|enrolador)\b/i.test(p.imo)) continue;
     const matches = adapted.filter(r => norm(`${r.nombres} ${r.apellidos}`) === norm(`${p.nombres} ${p.apellidos}`) &&
-      String(r.telefono).replace(/\D/g, '') === String(p.telefono).replace(/\D/g, '') &&
+      (p.nodusParticipantId ? String(r.id) === p.nodusParticipantId :
+        String(r.telefono).replace(/\D/g, '') === String(p.telefono).replace(/\D/g, '')) &&
       norm(r.nombre_imo) === norm(p.imo));
     relationCounts.reportRows++;
     if (matches.length !== 1) {
@@ -109,7 +111,7 @@ try {
     const group = groups.get(id);
     if (group.imoNombre !== key) throw new Error('Inviter key collision');
     group.enrolados.push({ id: `enr_nodus_${row.id}`, nodusParticipantId: String(row.id),
-      nombre: `${p.nombres} ${p.apellidos}`.trim(), telefono: p.telefono,
+      nombre: `${p.nombres} ${p.apellidos}`.trim(), telefono: row.telefono,
       coordinadora_nombre: p.coordinador || '', c1Registration: row.c1Registration,
       ...reconcileC1({ nodusParticipantId: String(row.id) }, group, index, at) });
   }
