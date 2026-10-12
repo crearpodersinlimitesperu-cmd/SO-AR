@@ -12,11 +12,9 @@ variables `VITE_*`, Firestore abierto, URLs con token ni llamadas directas desde
 navegador. No registrar cabeceras, cuerpo de participantes, identificaciones, pagos ni
 el texto libre de errores del servidor.
 
-En la última revisión del repositorio, Actions contiene `NODUS_USER` y
-`NODUS_PASSWORD`, pero no `NODUS_API_KEY`. Esas credenciales de navegador no sustituyen
-el token de API. No se debe ejecutar una integración productiva ni declarar conectado
-un consumidor JSON hasta que el responsable agregue `NODUS_API_KEY` por el gestor
-seguro de secretos.
+`NODUS_USER` y `NODUS_PASSWORD` son credenciales de navegador y no sustituyen el token
+de API. `NODUS_API_KEY` debe configurarse como secreto de Cloudflare Workers, fuera de
+Actions; nunca debe copiarse al bundle, a Firestore ni a logs.
 
 El Worker ofrece `/nodus-json/catalog` y `/nodus-json/team-metrics` mediante POST con
 Bearer ID token de Firebase. El catálogo devuelve totales generales a otros roles,
@@ -29,6 +27,12 @@ expone. La pantalla Embudo de Conversión usa esta fuente y ya no rotula snapsho
 “live” ni presenta proyecciones fijas como resultados Nodus. Configura el secreto del
 Worker con `npx wrangler secret put NODUS_API_KEY` antes de desplegar; sin él, las rutas
 devuelven un estado explícito de servicio no configurado.
+
+Para desplegar el Worker sin exponer la clave se añadió el workflow manual
+`.github/workflows/deploy-nodus-json-worker.yml`. Requiere los secretos Actions
+`CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` y `NODUS_API_KEY`; instala el secreto en
+Cloudflare, ejecuta las pruebas del Worker y despliega, y verifica que la ruta protegida
+conteste con autenticación requerida. No activa el despliegue automáticamente.
 
 ## Contrato fail-closed
 
