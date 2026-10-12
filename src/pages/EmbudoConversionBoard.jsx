@@ -58,7 +58,12 @@ export default function EmbudoConversionBoard() {
     } catch {
       throw new Error('El servicio de Nodus respondió con un formato no válido.');
     }
-    if (!response.ok) throw new Error(result.message || 'No se pudo consultar Nodus.');
+    if (!response.ok) {
+      if (path === '/nodus-json/catalog' && result.error === 'invalid-argument') {
+        throw new Error('El Worker seguro de Nodus aún no está actualizado. No se mostrarán datos de respaldo como si fueran actuales.');
+      }
+      throw new Error(result.message || 'No se pudo consultar Nodus.');
+    }
     return result;
   }, []);
 
