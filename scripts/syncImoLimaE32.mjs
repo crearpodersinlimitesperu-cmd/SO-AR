@@ -14,6 +14,8 @@ const db = getFirestore(initializeApp({ credential: cert(credentials) }));
 const apply = process.argv.includes('--apply');
 const browser = await puppeteer.launch({ executablePath: process.env.CHROME_BIN, headless: true,
   args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+let stage = 'login';
+let writes = 0;
 try {
   const page = await browser.newPage();
   const origin = 'https://imo.crearpslglobal.com';
@@ -31,12 +33,14 @@ try {
   ]);
   await checkAccess(navigation);
   if (/login/i.test(page.url())) throw new Error('Authorized access or human verification required');
+  stage = 'team-report';
   await checkAccess(await page.goto(origin + '/reporte?id_equipo=149', { waitUntil: 'networkidle2' }));
   const selected = await page.$eval('select[name="id_equipo"] option:checked', e => e.textContent);
   if (!/EQUIPO\s*32\b/i.test(selected) || !/\bLIMA\b/i.test(selected) || !/CICLO\s*1\b/i.test(selected)) {
     throw new Error('Exact Lima E32 C1 scope unavailable');
   }
   const report = await page.evaluate(readNodusC1Report, '149');
+  stage = 'scoped-participant-details';
   const source = await page.evaluate(async expectedCount => {
     const read = async start => {
       const r = await fetch(`/participantessede/datosTabla?draw=1&start=${start}&length=500&id_sede=7&id_equipo=149`);
@@ -68,8 +72,10 @@ try {
     }
     return results;
   }, report.length);
+  stage = 'identity-validation';
   const adapted = source.map(({ row, detail }) => adaptC1Participant(row, detail));
   const index = buildC1Index(adapted);
+  stage = 'official-calendar';
   const response = await fetch(OFFICIAL_CALENDAR_URL);
   if (!response.ok) throw new Error('Calendar unavailable');
   const dates = findC1Dates(parseOfficialCalendar(await response.text()), 'Lima', 32);
@@ -77,6 +83,7 @@ try {
   const at = new Date().toISOString();
   const norm = v => String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().replace(/\s+/g, ' ').trim();
   const groups = new Map();
+  stage = 'complete-relation-validation';
   for (const p of report) {
     if (!p.imo || /^sin (invitador|imo|enrolador)\b/i.test(p.imo)) continue;
     const matches = adapted.filter(r => norm(`${r.nombres} ${r.apellidos}`) === norm(`${p.nombres} ${p.apellidos}`) &&
@@ -98,6 +105,7 @@ try {
   const stats = { apply, teamId: 149, sede: 'Lima', targetTeam: 32, sourceRows: adapted.length,
     sourceMissions: groups.size, eligible: 0, already_attended: 0, unverified: 0, writes: 0,
     c1Date: dates[0].date, queriedAt: at, campaignsCreated: 0 };
+  stage = 'projection';
   for (const [id, group] of groups) {
     group.enrolados.forEach(e => stats[c1Eligibility(e)]++);
     if (!apply) continue;
@@ -117,10 +125,18 @@ try {
         lastUpdated: at, c1SourceUpdatedAt: at }, { merge: true });
     });
     stats.writes++;
+    writes++;
   }
   console.log('IMO_LIMA_E32_SYNC ' + JSON.stringify(stats));
-} catch {
-  console.error('IMO_LIMA_E32_SYNC_FAILED: scoped source or authorized access unavailable; no campaign created; private details suppressed');
+} catch (error) {
+  const safeReasons = ['Authorized access or human verification required', 'Configured access unavailable',
+    'Exact Lima E32 C1 scope unavailable', 'Participant detail mismatch', 'Participant identity changed',
+    'Participant team mismatch', 'Calendar unavailable', 'Official date ambiguous',
+    'Participant relation ambiguous', 'Registration scope mismatch', 'Inviter key collision',
+    'Existing mission scope mismatch', 'Existing enrollee identity ambiguous'];
+  console.error('IMO_LIMA_E32_SYNC_FAILED ' + JSON.stringify({ stage, apply, writes,
+    reason: safeReasons.includes(error.message) ? error.message : 'Source unavailable; private details suppressed',
+    campaignsCreated: 0 }));
   process.exitCode = 1;
 } finally {
   await browser.close();
