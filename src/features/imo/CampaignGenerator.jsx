@@ -422,7 +422,7 @@ export default function CampaignGenerator({ missions, defaultSede, defaultEquipo
           )}
           {!candidates.length && (
             <p style={{ padding: '16px', color: '#64748b', textAlign: 'center', margin: 0 }}>
-              {target ? `Nodus todavía no registra enrolados con IMO para el Equipo ${target} de ${sede}. Cuando la sincronización de Nodus los traiga aparecerán aquí.` : 'Elige el equipo que ingresa a C1.'}
+              {target ? `No hay candidatos elegibles en los registros sincronizados de Causa OS para el Equipo ${target} de ${sede}${search ? ' con esta búsqueda' : ''}. Esto no confirma que Nodus esté vacío: revisa la sincronización y la evidencia de C1 antes de compartir el enlace.` : 'Elige el equipo que ingresa a C1.'}
             </p>
           )}
         </div>

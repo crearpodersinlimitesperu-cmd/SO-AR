@@ -26,6 +26,7 @@ import {
 } from './nodusFuturosImposiblesParser.mjs';
 import { resolveUniqueNameMatch } from '../shared/rrhhSentinelRules.mjs';
 import { publishNodusReportSources } from './publishNodusReportSources.mjs';
+import { readNodusC1Report } from './nodusC1Report.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -362,40 +363,21 @@ class NodusExtractorAgent {
 
     const activeEquipos = await this.page.evaluate(() => {
       const select = document.querySelector('select[name="id_equipo"]');
-      if (!select) return [];
+      if (!select) throw new Error('Report team selector unavailable');
       return Array.from(select.options)
         .filter(o => o.value && o.text.includes('✓'))
         .map(o => ({ id: o.value, nombre: o.text.trim() }));
     });
 
     console.log(`🔍 [Agente 1 - Extractor] Encontrados ${activeEquipos.length} equipos activos para C1 y C2.`);
+    if (!activeEquipos.length) throw new Error('Active report teams unavailable');
     
     const equiposData = [];
     // Extraemos de los equipos activos de forma segura
     for (const eq of activeEquipos) {
       try {
         await this.safeGoto(`https://imo.crearpslglobal.com/reporte?id_equipo=${eq.id}`, 25000);
-        const participantes = await this.page.evaluate(() => {
-          const trs = Array.from(document.querySelectorAll('table tbody tr'));
-          return trs.map(tr => {
-            const tds = Array.from(tr.querySelectorAll('td')).map(td => td.innerText.trim());
-            const item = {};
-            if (tds[1]) item.apellidos = tds[1];
-            if (tds[2]) item.nombres = tds[2];
-            if (tds[3]) item.nombrePreferido = tds[3];
-            if (tds[4]) item.telefono = tds[4];
-            if (tds[5]) item.coordinador = tds[5];
-            if (tds[6]) item.imo = tds[6];
-            if (tds[7]) item.telefonoImo = tds[7];
-            if (tds[8]) item.llamada1 = tds[8];
-            if (tds[9]) item.llamada2 = tds[9];
-            if (tds[10]) item.finDeSemana = tds[10];
-            if (tds[11]) item.asistencia = tds[11];
-            if (tds[12]) item.desertor = tds[12];
-            if (tds[13]) item.pago = tds[13];
-            return item;
-          }).filter(p => p.nombres || p.apellidos || p.telefono || p.imo);
-        });
+        const participantes = await this.page.evaluate(readNodusC1Report, eq.id);
 
         equiposData.push({
           equipoId: eq.id,
@@ -404,7 +386,7 @@ class NodusExtractorAgent {
           participantes: participantes
         });
       } catch (err) {
-        console.warn(`Aviso al extraer equipo ${eq.nombre}: ${err.message}`);
+        throw new Error(`C1 source extraction failed for team ${eq.id}; publication stopped`, { cause: err });
       }
     }
 
