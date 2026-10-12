@@ -1,17 +1,20 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
-import { collection, addDoc, serverTimestamp, query, where, getDocs, orderBy, doc, getDoc, setDoc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, getDocs, doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { 
   CheckCircle2, TrendingUp, AlertCircle, ArrowLeft, Users, Target, PhoneCall, 
-  Award, ShieldCheck, RefreshCw, Database, Sparkles, Zap, ChevronRight, 
-  Settings, Edit3, Save, X, Search, UserCheck, BarChart2, Filter, Info
+  Award, ShieldCheck, RefreshCw, Database,
+  Settings, Save, X, Search, BarChart2, Info
 } from 'lucide-react';
 import { recordAuditEvent } from '../services/auditService';
 import { USERS_TO_IMPORT } from '../data/usersToImport';
-import nodusFallbackData from '../data/nodusFallbackData.json';
+import { findFreshNodusMetrics, extractNodusMetrics } from '../services/nodusMetricsModel.js';
+import { operationalRole, resolveCoordinatorKpiAssignment } from '../services/nodusKpiDirectory.js';
+import { snapshotFreshness } from '../utils/nodusIntegrity.js';
+export { extractNodusMetrics };
 
 // Metas base por defecto por rol (cuando la persona aún no tiene metas personalizadas)
 export const DEFAULT_KPI_METAS = {
@@ -52,82 +55,6 @@ export const DEFAULT_KPI_METAS = {
 };
 
 // Extractor robusto y verificado de métricas reales de Nodus por persona
-export function extractNodusMetrics(coord) {
-  if (!coord) return null;
-  const est = coord.estados || {};
-  
-  // 1. Asignados reales: de la raíz, de asignadosTotal o suma de llamadas de equipos
-  let asignados = Number(coord.asignadosTotal || coord.asignados || 0);
-  if (asignados === 0 && Array.isArray(coord.equipos) && coord.equipos.length > 0) {
-    asignados = coord.equipos.reduce((acc, eq) => acc + (Number(eq.llamadas) || 0), 0);
-  }
-  if (asignados === 0 && est.asignados) {
-    asignados = Number(est.asignados);
-  }
-
-  // 2. Confirmados reales: de confirmadosTotal, raíz, o suma de estados
-  let confirmados = Number(coord.confirmadosTotal || coord.confirmados || est.confirmado || est.confirmados || 0);
-  if (confirmados === 0 && Array.isArray(coord.equipos) && coord.equipos.length > 0) {
-    confirmados = coord.equipos.reduce((acc, eq) => acc + (Number(eq.confirmado) || 0), 0);
-  }
-
-  // 3. Por confirmar
-  let porConfirmar = Number(est.porConfirmar || coord.porConfirmar || 0);
-  if (porConfirmar === 0 && Array.isArray(coord.equipos) && coord.equipos.length > 0) {
-    porConfirmar = coord.equipos.reduce((acc, eq) => acc + (Number(eq.porConfirmar) || 0), 0);
-  }
-
-  // 4. No contesta
-  let noContesta = Number(est.noContesta || coord.noContesta || 0);
-  if (noContesta === 0 && Array.isArray(coord.equipos) && coord.equipos.length > 0) {
-    noContesta = coord.equipos.reduce((acc, eq) => acc + (Number(eq.noContesta) || 0), 0);
-  }
-
-  // 5. No interesa
-  let noInteresa = Number(est.noInteresa || coord.noInteresa || 0);
-  if (noInteresa === 0 && Array.isArray(coord.equipos) && coord.equipos.length > 0) {
-    noInteresa = coord.equipos.reduce((acc, eq) => acc + (Number(eq.noInteresa) || 0), 0);
-  }
-
-  // 6. Gestiones / Llamadas
-  let llamadas = Number(coord.gestionesTotal || coord.gestiones || est.llamadas || 0);
-  if (llamadas === 0 && Array.isArray(coord.equipos) && coord.equipos.length > 0) {
-    llamadas = coord.equipos.reduce((acc, eq) => acc + (Number(eq.llamadas) || 0), 0);
-  }
-
-  // 7. Asistieron / Sentados en sala
-  let asistieron = Number(coord.sentadosTotal || coord.asistieron || coord.sentadosC1 || 0);
-  if (asistieron === 0 && Array.isArray(coord.equipos) && coord.equipos.length > 0) {
-    asistieron = coord.equipos.reduce((acc, eq) => acc + (Number(eq.asistieron) || 0), 0);
-  }
-
-  // 8. Contactabilidad & Conversión con fallbacks calculados
-  let contactabilidad = coord.coberturaPct ? Number(coord.coberturaPct) : 0;
-  if (!contactabilidad && asignados > 0 && llamadas > 0) {
-    contactabilidad = Math.min(100, Math.round((llamadas / asignados) * 100));
-  }
-
-  let conversion = coord.tasaEfectividad ? Number(coord.tasaEfectividad) : 0;
-  if (!conversion && asignados > 0 && confirmados > 0) {
-    conversion = Math.min(100, Math.round((confirmados / asignados) * 100));
-  }
-
-  return {
-    asignados,
-    confirmados,
-    porConfirmar,
-    noContesta,
-    noInteresa,
-    llamadas,
-    asistieron,
-    contactabilidad,
-    conversion,
-    sede: coord.sede || 'Sede',
-    nombre: coord.nombre || coord.name || 'Coordinador',
-    equipos: coord.equipos || []
-  };
-}
-
 export default function MisKPIs() {
   const { currentUser } = useAuth();
   const { showToast } = useUI();
@@ -163,29 +90,28 @@ export default function MisKPIs() {
 
   // 1. Construir lista unificada de personas reales
   const allStaffDirectory = useMemo(() => {
-    const coordsNodus = (nodusData?.coordinadores || nodusFallbackData.coordinadores || []);
+    const coordsNodus = Array.isArray(nodusData?.coordinadores) ? nodusData.coordinadores : [];
     const list = [];
     const seenEmails = new Set();
 
     // Coordinadores C1/C2 con datos de Nodus
     coordsNodus.forEach(c => {
       const email = (c.email || '').toLowerCase().trim();
-      const normName = (c.nombre || '').toUpperCase().trim();
-      const staffMatch = USERS_TO_IMPORT.find(u => {
-        const uEmail = (u.email || '').toLowerCase().trim();
-        const uName = (u.name || '').toUpperCase().trim();
-        return (email && uEmail === email) || (uName.includes(normName) || normName.includes(uName));
-      });
+      const normName = (c.nombreCompleto || c.nombre || c.name || '').trim();
+      if (!email || !normName || seenEmails.has(email)) return;
+      const staffMatches = USERS_TO_IMPORT.filter(u => (u.email || '').toLowerCase().trim() === email);
+      const staffMatch = staffMatches.length === 1 ? staffMatches[0] : null;
+      const canonicalRole = resolveCoordinatorKpiAssignment(c, USERS_TO_IMPORT);
 
       const personObj = {
-        id: c.id || staffMatch?.id || `nodus_${normName.toLowerCase().replace(/\s+/g, '_')}`,
-        name: staffMatch?.name || c.nombreCompleto || c.nombre,
-        nombre: c.nombre,
-        email: email || staffMatch?.email || `${c.nombre.toLowerCase().replace(/\s+/g, '.')}@crearpsl.net`,
-        sede: c.sede || staffMatch?.sede || 'Lima',
-        role: 'coord_c1',
-        tabCategory: 'c1',
-        roleName: 'Coordinador C1 / C2',
+        id: c.id || staffMatch?.id || `nodus_${email}`,
+        name: staffMatch?.name || normName,
+        nombre: normName,
+        email,
+        sede: c.sede || staffMatch?.sede || 'Sede no informada',
+        role: staffMatch?.role || 'nodus_coordinacion_c1c2',
+        tabCategory: canonicalRole?.tabCategory || 'c1',
+        roleName: canonicalRole?.roleName || 'Coordinación C1/C2 según el origen Nodus',
         hasNodus: true,
         rawNodus: c
       };
@@ -199,28 +125,8 @@ export default function MisKPIs() {
       const email = (u.email || '').toLowerCase().trim();
       if (email && seenEmails.has(email)) return; // Evitar duplicar
       
-      let tabCategory = 'c1';
-      let roleName = 'Coordinador C1 / C2';
-      const r = (u.role || '').toLowerCase();
-
-      if (r.includes('maestria') || r.includes('mj') || r.includes('director_maestria')) {
-        tabCategory = 'mj';
-        roleName = 'Coordinador Maestría del Juego (CMJ)';
-      } else if (r.includes('capitan')) {
-        tabCategory = 'capitan';
-        roleName = 'Capitán de Sede';
-      } else if (r.includes('qt')) {
-        tabCategory = 'qt';
-        roleName = 'Quantum Team (QT)';
-      } else if (r.includes('gerente') || r.includes('direccion') || r.includes('ceo') || r.includes('cfo')) {
-        tabCategory = 'gerencia';
-        roleName = 'Gerencia de Sede';
-      } else if (r === 'coord_c1') {
-        tabCategory = 'c1';
-        roleName = 'Coordinador C1 / C2';
-      } else {
-        return; // Excluir roles no operativos en KPIs
-      }
+      const canonicalRole = operationalRole(u.role);
+      if (!canonicalRole) return;
 
       seenEmails.add(email);
       list.push({
@@ -230,8 +136,8 @@ export default function MisKPIs() {
         email: u.email,
         sede: u.sede || 'Sede',
         role: u.role,
-        tabCategory,
-        roleName,
+        tabCategory: canonicalRole.tabCategory,
+        roleName: canonicalRole.roleName,
         hasNodus: false,
         rawNodus: null
       });
@@ -264,11 +170,10 @@ export default function MisKPIs() {
     try {
       const docRef = doc(db, 'nodus_coordinadores_c1c2', 'latest');
       const snap = await getDoc(docRef);
-      let data = snap.exists() ? snap.data() : nodusFallbackData;
-      setNodusData(data);
+      setNodusData(snap.exists() ? snap.data() : null);
     } catch (e) {
-      console.warn("Aviso: usando fallback local para Nodus en MisKPIs:", e);
-      setNodusData(nodusFallbackData);
+      console.warn("No se pudo verificar Nodus en MisKPIs:", e);
+      setNodusData(null);
     } finally {
       setLoadingNodus(false);
     }
@@ -277,43 +182,31 @@ export default function MisKPIs() {
   // Seleccionar persona por defecto según el usuario logueado o primera disponible
   useEffect(() => {
     if (allStaffDirectory.length === 0) return;
-    if (selectedPerson) return; // ya seleccionado
 
     const uEmail = (currentUser?.email || '').toLowerCase().trim();
-    const uSede = (currentUser?.sede || '').toLowerCase().trim();
-    const uName = (currentUser?.displayName || currentUser?.name || '').toLowerCase().trim();
+    const uName = (currentUser?.displayName || currentUser?.name || '').normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
 
-    // Intentar encontrar match exacto por email
-    let matched = allStaffDirectory.find(p => (p.email || '').toLowerCase() === uEmail);
-    
-    // Si no, por nombre
+    let matched = uEmail
+      ? allStaffDirectory.find(p => (p.email || '').toLowerCase() === uEmail)
+      : null;
     if (!matched && uName) {
-      matched = allStaffDirectory.find(p => (p.name || '').toLowerCase().includes(uName));
+      const exactNameMatches = allStaffDirectory.filter(p => {
+        const name = (p.name || p.nombre || '').normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
+        return name === uName;
+      });
+      if (exactNameMatches.length === 1) matched = exactNameMatches[0];
     }
 
-    // Si no, por sede
-    if (!matched && uSede && uSede !== 'global' && uSede !== 'sede global') {
-      matched = allStaffDirectory.find(p => (p.sede || '').toLowerCase() === uSede);
-    }
-
-    // Fallback: Joyce (Lima) o primer elemento
-    if (!matched) {
-      matched = allStaffDirectory.find(p => (p.nombre || '').toUpperCase().includes('JOYCE')) || allStaffDirectory[0];
-    }
-
+    if (selectedPerson) return;
+    setSelectedPerson(matched || null);
     if (matched) {
-      setSelectedPerson(matched);
       setActiveTab(matched.tabCategory);
     }
-  }, [allStaffDirectory, currentUser]);
+  }, [allStaffDirectory, currentUser, selectedPerson]);
 
-  // Cargar metas personalizadas cuando cambia la persona seleccionada
-  useEffect(() => {
-    if (!selectedPerson) return;
-    loadPersonMetas(selectedPerson);
-  }, [selectedPerson, activeTab]);
-
-  const loadPersonMetas = async (person) => {
+  const loadPersonMetas = useCallback(async (person) => {
     const roleCat = person.tabCategory || activeTab;
     const defaultMetasForRole = DEFAULT_KPI_METAS[roleCat] || DEFAULT_KPI_METAS.c1;
     
@@ -323,7 +216,9 @@ export default function MisKPIs() {
       const localKey = `cpsl_kpi_targets_${person.id}`;
       const saved = localStorage.getItem(localKey);
       if (saved) stored = JSON.parse(saved);
-    } catch (e) {}
+    } catch (error) {
+      console.warn('No se pudieron leer metas personalizadas locales:', error);
+    }
 
     // 2. Intentar desde Firestore
     try {
@@ -344,7 +239,13 @@ export default function MisKPIs() {
     const effective = { ...defaultMetasForRole, ...(stored || {}) };
     setCustomMetas(effective);
     setMetasDraft(effective);
-  };
+  }, [activeTab]);
+
+  // Cargar metas personalizadas cuando cambia la persona seleccionada
+  useEffect(() => {
+    if (!selectedPerson) return;
+    loadPersonMetas(selectedPerson);
+  }, [selectedPerson, loadPersonMetas]);
 
   const handleSaveCustomMetas = async () => {
     if (!selectedPerson) return;
@@ -385,93 +286,30 @@ export default function MisKPIs() {
 
   // Métricas reales de Nodus calculadas con precisión matemática
   const nodusMetrics = useMemo(() => {
-    if (!selectedPerson) return null;
-    if (selectedPerson.rawNodus) {
-      return extractNodusMetrics(selectedPerson.rawNodus);
-    }
-
-    // Buscar si hay match en los coordinadores de Nodus
-    const coords = nodusData?.coordinadores || nodusFallbackData.coordinadores || [];
-    const pName = (selectedPerson.name || selectedPerson.nombre || '').toLowerCase();
-    const pEmail = (selectedPerson.email || '').toLowerCase();
-    const matched = coords.find(c => {
-      const cName = (c.nombre || '').toLowerCase();
-      const cEmail = (c.email || '').toLowerCase();
-      return (pEmail && cEmail === pEmail) || (pName && (cName.includes(pName) || pName.includes(cName)));
-    });
-
-    if (matched) {
-      return extractNodusMetrics(matched);
-    }
-
-    return null;
+    return findFreshNodusMetrics(nodusData, selectedPerson);
   }, [selectedPerson, nodusData]);
+  const nodusSnapshotAge = nodusData
+    ? snapshotFreshness(nodusData.extractedAt || nodusData.syncedAt || nodusData.timestamp || nodusData.updatedAt)
+    : null;
+  const nodusStatusLabel = loadingNodus
+    ? 'Nodus · consultando snapshot publicado'
+    : nodusMetrics
+      ? `Nodus · snapshot reciente verificado (${nodusMetrics.freshness})`
+      : nodusData && nodusSnapshotAge?.stale
+        ? `Nodus · snapshot antiguo o sin fecha verificable (${nodusSnapshotAge.label})`
+        : nodusData
+          ? 'Nodus · snapshot reciente; sin coincidencia única para esta persona'
+          : 'Nodus · snapshot no disponible';
 
   // Función para auto-llenar el formulario con las métricas reales
   const handleAutoFillFromNodus = () => {
-    const personName = selectedPerson?.name || selectedPerson?.nombre || 'Coordinador';
-    
-    if (activeTab === 'c1') {
-      const conv = nodusMetrics?.conversion || 46;
-      const contact = nodusMetrics?.contactabilidad || 93;
-      const asist = nodusMetrics?.asistieron && nodusMetrics?.confirmados 
-        ? Math.min(100, Math.round((nodusMetrics.asistieron / nodusMetrics.confirmados) * 100))
-        : 95;
-
-      setC1Data(prev => ({
-        ...prev,
-        asistencia: String(asist),
-        retencion: '7',
-        conversionC1C2: String(conv),
-        conversionC2MJ: '72',
-        declaracionBreakthrough: '94',
-        declaracionAliados: '42',
-        palabrasRotas: '3',
-        eficienciaGestion: String(contact)
-      }));
-      showToast(`¡Métricas auditadas de Nodus cargadas para ${personName}!`, 'success');
-    } else if (activeTab === 'mj') {
-      const conv = nodusMetrics?.conversion || 55;
-      const contact = nodusMetrics?.contactabilidad || 95;
-      setMjData(prev => ({
-        ...prev,
-        asistenciaMJ: '94',
-        retencionMJ: '6',
-        enroladosPorIMO: '3.2',
-        conversionALider: String(conv > 50 ? conv : 62),
-        quiebresResueltos: '100',
-        eficienciaSeguimiento: String(contact)
-      }));
-      showToast(`¡Datos personalizados cargados en Maestría para ${personName}!`, 'success');
-    } else if (activeTab === 'qt') {
-      setQtData(prev => ({
-        ...prev,
-        efectividadLlamadas: String(nodusMetrics?.contactabilidad || 85),
-        futurosImposibles: '88',
-        resolucionQuiebres: `Soporte y rescate activo en sede ${selectedPerson?.sede || 'Sede'}. 12 futuros imposibles acompañados.`
-      }));
-      showToast(`¡Métricas personalizadas cargadas para QT!`, 'success');
-    } else if (activeTab === 'capitan') {
-      setCapitanData(prev => ({
-        ...prev,
-        puntualidadEquipo: '98',
-        cumplimientoMetas: '92',
-        participacionActiva: '96',
-        soporteCoaches: '100',
-        observaciones: `Capitanía activa en sede ${selectedPerson?.sede || 'Sede'}. Seguimiento y respaldo integral.`
-      }));
-      showToast(`¡Métricas de Capitanía cargadas!`, 'success');
-    } else if (activeTab === 'gerencia') {
-      const conv = nodusMetrics?.conversion || 80;
-      setGerenciaData(prev => ({
-        ...prev,
-        cumplimientoGlobalSede: String(conv),
-        eficienciaOperativa: String(nodusMetrics?.contactabilidad || 94),
-        controlDeQuiebres: '96',
-        resumenDirectivo: `Auditoría directa para ${personName} en sede ${selectedPerson?.sede || 'Sede'}: ${nodusMetrics?.confirmados || 0} confirmados sobre ${nodusMetrics?.asignados || 0} asignados (${conv}% de conversión auditada).`
-      }));
-      showToast(`¡Dictamen gerencial cargado!`, 'success');
-    }
+    const hasVerifiedSource = Boolean(nodusMetrics?.timestamp);
+    showToast(
+      hasVerifiedSource
+        ? 'Nodus está disponible, pero no hay equivalencias validadas para estos campos. No se modificó ningún dato.'
+        : 'No hay un snapshot Nodus reciente y verificable para esta persona. No se modificó ningún dato.',
+      'info'
+    );
   };
 
   // Formularios de datos
@@ -851,6 +689,7 @@ export default function MisKPIs() {
                 cursor: 'pointer'
               }}
             >
+              {!selectedPerson && <option value="">Selecciona una persona</option>}
               {filteredPersonsForTab.map(p => (
                 <option key={p.id} value={p.id}>
                   {p.sede}: {p.name || p.nombre} ({p.roleName || p.role})
@@ -888,13 +727,13 @@ export default function MisKPIs() {
           </div>
         </div>
 
-        {/* TARJETA INFORMATIVA: DATOS AUDITADOS EN TIEMPO REAL (NODUS LIVE SYNC) */}
+        {/* Estado del snapshot publicado de Nodus; no es una consulta directa al sistema origen. */}
         <div style={{ marginBottom: '1.75rem', padding: '1.25rem', borderRadius: '12px', background: 'linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01))', border: '1px solid rgba(212, 175, 55, 0.25)', boxShadow: '0 4px 20px rgba(0,0,0,0.2)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.8rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
               <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: nodusMetrics ? '#22c55e' : '#f59e0b', boxShadow: nodusMetrics ? '0 0 10px #22c55e' : 'none' }} />
               <span style={{ fontSize: '0.9rem', fontWeight: 'bold', color: 'var(--crear-gold)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                <Database size={15} /> Nodus Live Sync: Información Auditada
+                <Database size={15} /> {nodusStatusLabel}
               </span>
               <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                 ({personSede} - {personName})
@@ -907,18 +746,18 @@ export default function MisKPIs() {
                 onClick={fetchNodusData}
                 disabled={loadingNodus}
                 style={{ padding: '0.35rem 0.7rem', borderRadius: '6px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.15)', color: '#fff', fontSize: '0.78rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
-                title="Actualizar datos directamente desde Nodus"
+                title="Volver a leer el snapshot publicado en la plataforma"
               >
-                <RefreshCw size={13} className={loadingNodus ? 'animate-spin' : ''} /> Refrescar
+                <RefreshCw size={13} className={loadingNodus ? 'animate-spin' : ''} /> Leer snapshot
               </button>
 
               <button
                 type="button"
                 onClick={handleAutoFillFromNodus}
                 style={{ padding: '0.35rem 0.8rem', borderRadius: '6px', background: 'linear-gradient(135deg, var(--crear-gold), #b8860b)', border: 'none', color: '#000', fontSize: '0.78rem', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
-                title="Cargar automáticamente estos números en los campos de tu reporte"
+                title="Consulta por qué no se autocompletan campos sin equivalencia validada con Nodus"
               >
-                <Zap size={13} /> Auto-llenar KPIs
+                <Info size={13} /> Ver disponibilidad de Nodus
               </button>
             </div>
           </div>
@@ -927,32 +766,32 @@ export default function MisKPIs() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '0.75rem', marginBottom: '1rem' }}>
             <div style={{ padding: '0.75rem', borderRadius: '8px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)' }}>
               <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>📞 Asignados</div>
-              <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: '#fff' }}>{nodusMetrics ? nodusMetrics.asignados : '--'}</div>
+              <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: '#fff' }}>{nodusMetrics?.asignados != null ? nodusMetrics.asignados : '--'}</div>
               <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>Contactos totales</div>
             </div>
 
             <div style={{ padding: '0.75rem', borderRadius: '8px', background: 'rgba(34,197,94,0.05)', border: '1px solid rgba(34,197,94,0.25)' }}>
-              <div style={{ fontSize: '0.72rem', color: '#22c55e', textTransform: 'uppercase' }}>✅ Confirmados</div>
-              <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: '#22c55e' }}>{nodusMetrics ? nodusMetrics.confirmados : '--'}</div>
-              <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>Enrolados a Sala</div>
+              <div style={{ fontSize: '0.72rem', color: '#22c55e', textTransform: 'uppercase' }}>✅ Confirmados en Nodus</div>
+              <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: '#22c55e' }}>{nodusMetrics?.confirmados != null ? nodusMetrics.confirmados : '--'}</div>
+              <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>Valor informado; no equivale a asistencia</div>
             </div>
 
             <div style={{ padding: '0.75rem', borderRadius: '8px', background: 'rgba(245,158,11,0.05)', border: '1px solid rgba(245,158,11,0.25)' }}>
               <div style={{ fontSize: '0.72rem', color: '#f59e0b', textTransform: 'uppercase' }}>⏳ Por Confirmar</div>
-              <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: '#f59e0b' }}>{nodusMetrics ? nodusMetrics.porConfirmar : '--'}</div>
+              <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: '#f59e0b' }}>{nodusMetrics?.porConfirmar != null ? nodusMetrics.porConfirmar : '--'}</div>
               <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>En seguimiento activo</div>
             </div>
 
             <div style={{ padding: '0.75rem', borderRadius: '8px', background: 'rgba(0, 210, 255, 0.05)', border: '1px solid rgba(0, 210, 255, 0.25)' }}>
-              <div style={{ fontSize: '0.72rem', color: 'var(--crear-blue)', textTransform: 'uppercase' }}>📶 Contactabilidad</div>
-              <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: 'var(--crear-blue)' }}>{nodusMetrics ? `${nodusMetrics.contactabilidad}%` : '--'}</div>
-              <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>Llamadas efectivas</div>
+              <div style={{ fontSize: '0.72rem', color: 'var(--crear-blue)', textTransform: 'uppercase' }}>📶 Contactabilidad Nodus</div>
+              <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: 'var(--crear-blue)' }}>{nodusMetrics?.contactabilidad != null ? `${nodusMetrics.contactabilidad}%` : '--'}</div>
+              <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>Solo si el snapshot informa este campo</div>
             </div>
 
             <div style={{ padding: '0.75rem', borderRadius: '8px', background: 'rgba(168, 85, 247, 0.05)', border: '1px solid rgba(168, 85, 247, 0.25)' }}>
-              <div style={{ fontSize: '0.72rem', color: '#c084fc', textTransform: 'uppercase' }}>🎯 Conversión Real</div>
-              <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: '#c084fc' }}>{nodusMetrics ? `${nodusMetrics.conversion}%` : '--'}</div>
-              <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>Ratio confirmado / total</div>
+              <div style={{ fontSize: '0.72rem', color: '#c084fc', textTransform: 'uppercase' }}>🎯 Conversión Nodus</div>
+              <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: '#c084fc' }}>{nodusMetrics?.conversion != null ? `${nodusMetrics.conversion}%` : '--'}</div>
+              <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>Solo si el snapshot informa este campo</div>
             </div>
           </div>
 
@@ -960,10 +799,11 @@ export default function MisKPIs() {
           {nodusMetrics ? (
             <div style={{ padding: '0.75rem 1rem', borderRadius: '8px', background: 'rgba(0,0,0,0.3)', borderLeft: '4px solid var(--crear-gold)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
               <div style={{ fontSize: '0.8rem', color: '#e2e8f0' }}>
-                💡 <strong>Diagnóstico Objetivo:</strong> Coordinación <strong>{nodusMetrics.sede} ({personName})</strong> registra {nodusMetrics.confirmados} confirmados sobre {nodusMetrics.asignados} asignados ({nodusMetrics.conversion}%). Hay {nodusMetrics.porConfirmar} contactos prioritarios por cerrar y {nodusMetrics.noContesta} en remarcación.
-              </div>
-              <div style={{ fontSize: '0.75rem', fontWeight: 'bold', color: nodusMetrics.conversion >= (customMetas?.conversionC1C2 || 40) ? '#22c55e' : '#f59e0b' }}>
-                {nodusMetrics.conversion >= (customMetas?.conversionC1C2 || 40) ? '✓ Ritmo de sala en meta personal' : '⚠️ Acelerar cierre de por confirmar'}
+                <strong>Datos informados por Nodus:</strong> Coordinación <strong>{nodusMetrics.sede || 'sede no informada'} ({personName})</strong>.
+                {' Confirmados: '}{nodusMetrics.confirmados ?? 'sin dato'}{' / asignados: '}{nodusMetrics.asignados ?? 'sin dato'}.
+                {' Contactabilidad: '}{nodusMetrics.contactabilidad != null ? `${nodusMetrics.contactabilidad}%` : 'no informada'}.
+                {' Conversión: '}{nodusMetrics.conversion != null ? `${nodusMetrics.conversion}%` : 'no informada'}.
+                {' Por confirmar: '}{nodusMetrics.porConfirmar ?? 'sin dato'}{' · No contesta: '}{nodusMetrics.noContesta ?? 'sin dato'}.
               </div>
             </div>
           ) : (
