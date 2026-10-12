@@ -59,6 +59,9 @@ jobs:
       - name: Test goals roles, progress and source evidence
         run: node --test src/services/goalsBoard.test.js src/services/goalsTimeline.test.js tests/goals-board-browser.test.mjs tests/nodus-goal-discovery.test.mjs tests/nodus-goal-sources.test.mjs
 
+      - name: Test IMO candidate readiness and complete C1 report extraction
+        run: node --test scripts/tests/nodus-c1-report.test.mjs scripts/tests/imo-campaign-readiness.test.mjs scripts/tests/imo-c1-eligibility.test.mjs scripts/tests/imo-c1-reconciliation.test.mjs scripts/tests/imo-model.test.mjs scripts/tests/imo-calendar.test.mjs
+
       - name: Build production app
         run: npm run build
 
