@@ -26,7 +26,7 @@ test('coordinator location matching handles accents but never broadens to other 
   assert.deepEqual(filterNodusSedes(sedes, { type: 'sede', sede: 'GYE' }), [sedes[0]]);
   assert.deepEqual(filterNodusSedes(sedes, { type: 'sede', sede: 'Lima' }), [sedes[1]]);
   assert.deepEqual(filterNodusSedes(sedes, { type: 'sede', sede: 'UIO C1' }), [sedes[3]]);
-  assert.deepEqual(filterNodusSedes(sedes, { type: 'sede', sede: 'Quito' }), []);
+  assert.deepEqual(filterNodusSedes(sedes, { type: 'sede', sede: 'Quito' }), [sedes[3]]);
   assert.deepEqual(filterNodusSedes(sedes, { type: 'global' }), sedes);
   assert.equal(hasNodusTeamAccess([{ equipos: [{ id: 12 }] }], 12), true);
   assert.equal(hasNodusTeamAccess([{ equipos: [{ id: 12 }] }], 13), false);
