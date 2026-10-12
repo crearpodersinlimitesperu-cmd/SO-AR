@@ -119,11 +119,26 @@ test('diagnosis filters by sede+equipo and does not mix same team code across se
 });
 
 test('source resolution: live, partial and clearly-labelled static fallback', () => {
-  assert.equal(resolveFISource({ participantes: universo }, []).sourceState.status, 'live');
-  assert.equal(resolveFISource({ participantes: universo, completeness: 'partial', completenessReasons: ['x'] }, []).sourceState.status, 'partial');
+  const now = Date.parse('2026-10-12T17:00:00Z');
+  const recent = { participantes: universo, extractedAt: new Date(now - 60_000).toISOString() };
+  assert.equal(resolveFISource(recent, [], now).sourceState.status, 'live');
+  assert.equal(resolveFISource({ ...recent, completeness: 'partial', completenessReasons: ['partial source'] }, [], now).sourceState.status, 'partial');
   const fb = resolveFISource(null, universo);
   assert.equal(fb.sourceState.status, 'fallback');
   assert.match(fb.sourceState.label, /RESPALDO ESTÁTICO PARCIAL/);
+});
+
+test('old or absent timestamps never label an FI snapshot as live', () => {
+  const now = Date.parse('2026-10-12T17:00:00Z');
+  const p = [{ asistioPFD: true, sede: 'Sede sintética' }];
+  const fresh = resolveFISource({ participantes: p, extractedAt: new Date(now - 119 * 60_000).toISOString() }, [], now);
+  const stale = resolveFISource({ participantes: p, extractedAt: new Date(now - 120 * 60_000).toISOString() }, [], now);
+  const missing = resolveFISource({ participantes: p }, [], now);
+  assert.equal(fresh.sourceState.status, 'live');
+  assert.equal(stale.sourceState.status, 'stale');
+  assert.equal(missing.sourceState.status, 'stale');
+  assert.match(stale.sourceState.label, /snapshot antiguo/);
+  assert.equal(stale.participantes, p);
 });
 
 test('team number stays visible: selector, semaphore data and dictamen label keep "EQUIPO 22" with sede', () => {

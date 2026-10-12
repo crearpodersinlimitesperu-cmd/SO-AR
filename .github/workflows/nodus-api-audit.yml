@@ -1,0 +1,19 @@
+name: Nodus JSON API audit (read only)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test scripts/tests/nodus-api-client.test.mjs scripts/tests/nodus-api-audit.test.mjs
+      - name: Verify documented aggregate endpoints
+        env:
+          NODUS_API_KEY: ${{ secrets.NODUS_API_KEY }}
+        run: node scripts/auditNodusApi.mjs

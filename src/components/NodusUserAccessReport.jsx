@@ -15,6 +15,8 @@ import {
 import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import fallbackAccounts from '../data/nodusVerifiedAccountsFallback.json';
+import { buildUnverifiedFallbackReport } from '../services/nodusUserAccessReport.js';
+import { snapshotFreshness } from '../utils/nodusIntegrity.js';
 
 function formatTimestamp(value) {
   if (!value) return 'Sin fecha';
@@ -43,15 +45,7 @@ export default function NodusUserAccessReport() {
       const latestSnap = await getDoc(doc(db, 'nodus_user_access_latest', 'latest'));
       if (!latestSnap.exists()) {
         setReport({
-          accountCount: fallbackAccounts.length,
-          accountsWithLastConnection: fallbackAccounts.filter(a => a['Últ. conexión']).length,
-          lastConnectionColumn: 'Últ. conexión',
-          statusColumn: 'Estado',
-          statusCounts: { Activo: fallbackAccounts.length },
-          columns: ['Usuario', 'Correo / Identificador', 'Sede', 'Rol / Cargo', 'Pendientes', 'Últ. conexión', 'Estado'],
-          coverage: 'complete',
-          publishedAt: new Date(),
-          source: 'Respaldo verificado del directorio maestro NODUS'
+          ...buildUnverifiedFallbackReport(fallbackAccounts),
         });
         setAccounts(fallbackAccounts);
         return;
@@ -67,18 +61,10 @@ export default function NodusUserAccessReport() {
       }));
       setReport(latest);
       setAccounts(pageRows.flat());
-    } catch (loadError) {
-      // Si la consulta en Firestore falla por permisos o red, usar respaldo certificado
+    } catch {
+      setError('No se pudo verificar la actualización de Nodus; se muestra un respaldo estático con cobertura y fecha desconocidas.');
       setReport({
-        accountCount: fallbackAccounts.length,
-        accountsWithLastConnection: fallbackAccounts.filter(a => a['Últ. conexión']).length,
-        lastConnectionColumn: 'Últ. conexión',
-        statusColumn: 'Estado',
-        statusCounts: { Activo: fallbackAccounts.length },
-        columns: ['Usuario', 'Correo / Identificador', 'Sede', 'Rol / Cargo', 'Pendientes', 'Últ. conexión', 'Estado'],
-        coverage: 'complete',
-        publishedAt: new Date(),
-        source: 'Respaldo verificado del directorio maestro NODUS'
+        ...buildUnverifiedFallbackReport(fallbackAccounts),
       });
       setAccounts(fallbackAccounts);
     } finally {
@@ -91,6 +77,7 @@ export default function NodusUserAccessReport() {
   }, [loadReport]);
 
   const columns = report?.columns || [];
+  const reportFreshness = report ? snapshotFreshness(report.publishedAt) : null;
 
   // Opciones únicas para filtros
   const availableSedes = useMemo(() => {
@@ -184,7 +171,7 @@ export default function NodusUserAccessReport() {
           </p>
         </div>
         <button onClick={loadReport} disabled={loading} className="btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-          <RefreshCw size={16} /> Actualizar reporte
+          <RefreshCw size={16} /> Actualizar reporte publicado
         </button>
       </div>
 
@@ -211,27 +198,35 @@ export default function NodusUserAccessReport() {
             color: 'var(--text-muted, #94a3b8)',
             fontSize: '0.9rem'
           }}>
-            <ShieldCheck size={16} style={{ verticalAlign: 'middle', marginRight: '0.4rem', color: '#10b981' }} />
+            <ShieldCheck size={16} style={{ verticalAlign: 'middle', marginRight: '0.4rem', color: report.coverage === 'unknown' ? 'var(--text-muted, #94a3b8)' : '#10b981' }} />
             <strong>{report.coverage === 'complete'
-              ? 'Cobertura total de usuarios verificada en Nodus'
-              : 'Listado completo; Nodus no expuso la métrica de última conexión'}</strong>
-            {' · '}Publicado: {formatTimestamp(report.publishedAt)}
+              ? 'El último reporte publicado indicó cobertura total'
+              : report.coverage === 'partial'
+                ? 'El último reporte publicado indicó cobertura parcial'
+                : 'Respaldo estático; no verifica cobertura actual de Nodus'}</strong>
+            {' · '}{report.publishedAt
+              ? `Publicado: ${formatTimestamp(report.publishedAt)}${reportFreshness.stale ? ' · reporte anterior, no confirma el estado actual' : ''}`
+              : 'Fecha de origen desconocida; vigencia no verificada'}
           </div>
 
           {/* TARJETAS RESUMEN */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginBottom: '1.25rem' }}>
             <div style={{ padding: '1rem', borderRadius: '10px', background: 'var(--bg-card, #172033)', border: '1px solid var(--border-subtle, rgba(255,255,255,0.08))' }}>
               <Users size={18} /> <strong style={{ marginLeft: '0.5rem' }}>{report.accountCount}</strong>
-              <div style={{ color: 'var(--text-muted, #94a3b8)', marginTop: '0.35rem' }}>cuentas registradas</div>
+              <div style={{ color: 'var(--text-muted, #94a3b8)', marginTop: '0.35rem' }}>
+                {report.coverage === 'unknown' ? 'filas en el respaldo estático' : 'filas del último reporte publicado'}
+              </div>
             </div>
             <div style={{ padding: '1rem', borderRadius: '10px', background: 'var(--bg-card, #172033)', border: '1px solid var(--border-subtle, rgba(255,255,255,0.08))' }}>
               <Clock3 size={18} /> <strong style={{ marginLeft: '0.5rem' }}>
-                {report.lastConnectionColumn
+                {report.coverage === 'unknown'
+                  ? '—'
+                  : report.lastConnectionColumn
                   ? `${report.accountsWithLastConnection} / ${report.accountCount}`
                   : 'No disponible'}
               </strong>
               <div style={{ color: 'var(--text-muted, #94a3b8)', marginTop: '0.35rem' }}>
-                con última conexión activa
+                {report.coverage === 'unknown' ? 'Última conexión no verificable' : 'con última conexión informada en el reporte'}
               </div>
             </div>
             {report.statusColumn && Object.entries(report.statusCounts || {}).map(([status, count]) => (
