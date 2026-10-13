@@ -61,6 +61,13 @@ global. Los agentes que necesitan campos no cubiertos mantienen su fuente actual
 que Nodus documente y autorice su equivalente JSON. La fuente actual debe seguir
 identificada y sus errores/frescura no se deben ocultar.
 
+El Centinela RRHH de `PortfolioBoard` conserva una sola fuente por lista: si el
+snapshot remoto trae coordinadores (incluso una lista vacía), no lo completa con
+el respaldo local. El respaldo solo se muestra cuando no hay una lista remota,
+mantiene su fecha histórica y no habilita tareas. Una fecha remota nunca vuelve
+vigentes los coordinadores, equipos o roles del respaldo. Esto no modifica la
+matriz de acceso ni las asignaciones en los datos de origen.
+
 ## Pruebas
 
 `scripts/tests/nodus-api-client.test.mjs` usa respuestas sintéticas. Cubre transporte,
