@@ -260,3 +260,36 @@ y estados/checkboxes contradictorios. La UI muestra `markedAttendance` y
 `unmarked` separados del avance guardado. No consulta E32 futuro para
 presentar ceros como resultados. No modifica metas, cuotas ni roles; se
 mantiene la publicación manual desactivada por defecto y sin ejecutar.
+
+### Diagnóstico de la extracción C1 horaria
+
+El fallo del equipo 150 en los runs 38488371714 y 38459907384 ocurrió
+esperando que `#tblReporteC1` se registrase como DataTables durante 30 segundos.
+La evidencia histórica anterior (incluido E32 id 149) no demuestra el contrato
+actual del equipo 150 ni la causa de ese timeout. No se cambia el ID de equipo
+ni se deducen cantidades a partir de esos datos.
+
+`scripts/nodusC1Report.mjs` centraliza la navegación C1 instrumentada para
+el extractor horario y la sincronización explícita Lima149. Espera filtro
+exacto e inicialización completa (`_bInitComplete`): el registro de DataTables
+por sí solo puede preceder a la carga asíncrona de idioma/Ajax. Mantiene
+el límite de 30 segundos, los controles de esquema, filas completas,
+identidad y asistencia, y rechaza navegación HTTP fallida o ruta inesperada.
+No inicializa tablas por su cuenta ni usa filas DOM como alternativa.
+
+En caso de fallo emite `C1_REPORT_FAILED` con equipo, etapa
+(`navigation`, `readiness`, `extraction`), motivo permitido, estado HTTP,
+clasificación de ruta/filtro, indicadores de tabla/bibliotecas/inicialización
+y contadores de errores de página, scripts y peticiones de datos. No incluye
+URLs completas, contenido de errores de navegador, etiquetas de equipos,
+filas, nombres, teléfonos ni credenciales. Si la página no permite inspección,
+lo indica explícitamente; los listeners se eliminan al terminar cada equipo.
+
+Verificación local: `npm run test:nodus-reports`. La extracción de todos los
+equipos debe terminar antes de publicar: un fallo conserva el snapshot
+anterior y su fecha, sin promoverlo como actual. Tras la revisión/integración,
+el siguiente run horario autorizado debe aportar los diagnósticos o completar
+la extracción y publicación; todavía hace falta esa verificación externa
+para afirmar que el equipo 150 está actualizado. No se despacha extracción
+ni despliegue manual, no se modifican registros Nodus y no se habilitan envíos
+sin política confirmada de destinos y frecuencia.

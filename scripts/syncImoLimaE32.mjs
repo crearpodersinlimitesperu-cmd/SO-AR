@@ -3,7 +3,7 @@ import puppeteer from 'puppeteer';
 import { initializeApp, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { adaptC1Participant, matchReportParticipant } from './imoC1SourceContract.mjs';
-import { readNodusC1Report, waitForC1Report } from './nodusC1Report.mjs';
+import { extractNodusC1Report } from './nodusC1Report.mjs';
 import { buildC1Index, reconcileC1 } from './imoC1Reconciliation.mjs';
 import { c1Eligibility } from '../functions-imo/c1Eligibility.mjs';
 import { OFFICIAL_CALENDAR_URL, parseOfficialCalendar, findC1Dates } from '../functions-imo/calendarModel.mjs';
@@ -35,13 +35,15 @@ try {
   await checkAccess(navigation);
   if (/login/i.test(page.url())) throw new Error('Authorized access or human verification required');
   stage = 'team-report';
-  await checkAccess(await page.goto(origin + '/reporte?id_equipo=149', { waitUntil: 'networkidle2' }));
+  const report = await extractNodusC1Report(page, '149', async () => {
+    const response = await page.goto(origin + '/reporte?id_equipo=149', { waitUntil: 'networkidle2' });
+    await checkAccess(response);
+    return response;
+  });
   const selected = await page.$eval('select[name="id_equipo"] option:checked', e => e.textContent);
   if (!/EQUIPO\s*32\b/i.test(selected) || !/\bLIMA\b/i.test(selected) || !/CICLO\s*1\b/i.test(selected)) {
     throw new Error('Exact Lima E32 C1 scope unavailable');
   }
-  await waitForC1Report(page);
-  const report = await page.evaluate(readNodusC1Report, '149');
   stage = 'scoped-participant-details';
   const source = await page.evaluate(async expectedCount => {
     const read = async start => {
@@ -147,7 +149,8 @@ try {
     'Existing mission scope mismatch', 'Existing enrollee identity ambiguous'];
   console.error('IMO_LIMA_E32_SYNC_FAILED ' + JSON.stringify({ stage, apply, writes,
     relationCounts,
-    reason: safeReasons.includes(error.message) ? error.message : 'Source unavailable; private details suppressed',
+    reason: safeReasons.includes(error.message) || error.message.startsWith('C1_REPORT_FAILED ')
+      ? error.message : 'Source unavailable; private details suppressed',
     campaignsCreated: 0 }));
   process.exitCode = 1;
 } finally {

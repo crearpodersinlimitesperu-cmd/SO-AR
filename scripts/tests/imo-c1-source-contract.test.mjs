@@ -37,7 +37,8 @@ test('stable participant ID resolves stale display phone without allowing differ
 test('scoped import cannot create campaigns or promote pending registration to eligibility', () => {
   const source = readFileSync(new URL('../syncImoLimaE32.mjs', import.meta.url), 'utf8');
   assert.match(source, /id_sede=7&id_equipo=149/);
-  assert.match(source, /readNodusC1Report, '149'/);
+  assert.match(source, /extractNodusC1Report\(page, '149', async \(\) =>/);
+  assert.match(source, /\/reporte\?id_equipo=149/);
   assert.match(source, /adaptC1Participant\(row, detail\)/);
   assert.match(source, /db\.doc\(`imo_missions\/\$\{id\}`\)/);
   assert.doesNotMatch(source, /db\.(doc|collection)\(['"`](imo_campaign|goals)/);

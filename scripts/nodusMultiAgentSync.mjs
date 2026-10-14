@@ -26,7 +26,7 @@ import {
 } from './nodusFuturosImposiblesParser.mjs';
 import { resolveUniqueNameMatch } from '../shared/rrhhSentinelRules.mjs';
 import { publishNodusReportSources } from './publishNodusReportSources.mjs';
-import { readNodusC1Report, waitForC1Report } from './nodusC1Report.mjs';
+import { extractNodusC1Report } from './nodusC1Report.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -129,15 +129,14 @@ class NodusExtractorAgent {
     while (attempts < 3) {
       try {
         attempts++;
-        await this.page.goto(url, { waitUntil: 'domcontentloaded', timeout });
+        const response = await this.page.goto(url, { waitUntil: 'domcontentloaded', timeout });
         await new Promise(r => setTimeout(r, 2000));
-        return;
+        return response;
       } catch (e) {
         console.warn(`[SafeGoto] Intento ${attempts} para ${url} falló (${e.message}). Reintentando...`);
         if (attempts >= 3) {
           try {
-            await this.page.goto(url, { waitUntil: 'load', timeout });
-            return;
+            return await this.page.goto(url, { waitUntil: 'load', timeout });
           } catch (e2) {
             throw e2;
           }
@@ -376,9 +375,8 @@ class NodusExtractorAgent {
     // Extraemos de los equipos activos de forma segura
     for (const eq of activeEquipos) {
       try {
-        await this.safeGoto(`https://imo.crearpslglobal.com/reporte?id_equipo=${eq.id}`, 25000);
-        await waitForC1Report(this.page);
-        const participantes = await this.page.evaluate(readNodusC1Report, eq.id);
+        const participantes = await extractNodusC1Report(this.page, eq.id, () =>
+          this.safeGoto(`https://imo.crearpslglobal.com/reporte?id_equipo=${eq.id}`, 25000));
 
         equiposData.push({
           equipoId: eq.id,
