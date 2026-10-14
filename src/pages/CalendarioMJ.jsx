@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
 import { useCycles } from '../context/CyclesContext';
 import { findOfficialMJEvent } from '../services/mjCalendarSource';
+import { visibleMJCalendars } from '../utils/mjCalendarVisibility';
 import { db } from '../services/firebase';
 import {
   collection, query, onSnapshot, doc, setDoc, deleteDoc, serverTimestamp
@@ -320,6 +321,7 @@ export default function CalendarioMJ() {
 
   const [calendars, setCalendars] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
   const [editing, setEditing] = useState(null); // null = lista; 'new' o docId = editor
   const [form, setForm] = useState(emptyForm());
   const [saving, setSaving] = useState(false);
@@ -401,23 +403,17 @@ export default function CalendarioMJ() {
       const rows = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       rows.sort((a, b) => (a.sede || '').localeCompare(b.sede || '') || (Number(a.equipoNumero) || 0) - (Number(b.equipoNumero) || 0));
       setCalendars(rows);
+      setLoadError(null);
       setLoading(false);
     }, (err) => {
       console.error('Error cargando calendarios MJ:', err);
+      setLoadError('No se pudieron cargar los calendarios. Revisa tu conexión y los permisos de acceso antes de crear otro calendario.');
       setLoading(false);
     });
     return () => unsub();
   }, []);
 
-  const visibleCalendars = useMemo(() => {
-    if (!currentUser) return [];
-    if (currentUser.isSuperAdmin || ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'consolidado', 'director_maestria'].includes(currentUser.appRole)) {
-      return calendars;
-    }
-    // Coordinador de Maestría: solo su sede
-    const userSede = (currentUser.sede || '').trim().toLowerCase();
-    return calendars.filter(c => (c.sede || '').trim().toLowerCase() === userSede);
-  }, [calendars, currentUser]);
+  const visibleCalendars = useMemo(() => visibleMJCalendars(calendars, currentUser), [calendars, currentUser]);
 
   const startNew = () => {
     setForm(emptyForm());
@@ -653,6 +649,8 @@ export default function CalendarioMJ() {
         <div className="no-print">
           {loading ? (
             <p>Cargando calendarios...</p>
+          ) : loadError ? (
+            <p role="alert" style={{ color: '#ef4444' }}>{loadError}</p>
           ) : visibleCalendars.length === 0 ? (
             <div style={{ padding: '2rem', textAlign: 'center', opacity: 0.7 }}>
               Todavía no hay calendarios guardados{userCanEdit ? ' — crea el primero con "Nuevo calendario".' : '.'}

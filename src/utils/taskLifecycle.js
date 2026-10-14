@@ -33,20 +33,54 @@ export function isCompletionTransition(previousCompleted, nextCompleted) {
   return previousCompleted !== true && nextCompleted === true;
 }
 
+export function getTaskProgress(task) {
+  if (typeof task?.progressPercentage === 'number') return task.progressPercentage;
+  if (typeof task?.progress === 'number') return task.progress;
+  return task?.completed === true || task?.status === 'Completada' ? 100 : 0;
+}
+
+export function applyCycleCompletion(task, { sede, cycleId } = {}) {
+  const effective = getEffectiveCompletion(task, { sede, cycleId, cycleScoped: true });
+  const entry = effective.completion;
+  // Older entries stored progress only at the root. Recover it only when
+  // there is a single cycle entry, so it cannot leak from another cycle.
+  const legacyProgress = entry && Object.keys(task.completions || {}).filter(key => key.includes('__')).length === 1
+    ? task : null;
+  const progressPercentage = effective.completed ? 100 : entry
+    ? getTaskProgress({
+        progressPercentage: entry.progressPercentage ?? entry.progress ?? legacyProgress?.progressPercentage ?? legacyProgress?.progress,
+        completed: effective.completed
+      })
+    : 0;
+  return {
+    ...task,
+    completed: effective.completed,
+    status: effective.completed ? 'Completada' : (progressPercentage > 0 ? 'En progreso' : effective.status),
+    progressPercentage,
+    progress: progressPercentage,
+    completedAt: entry?.completedAt || null
+  };
+}
+
 export function getNextCompletionState(updates) {
   if (typeof updates?.completed === 'boolean') return updates.completed;
   if (updates?.status === 'Completada') return true;
   return updates?.progressPercentage === 100 || updates?.progress === 100;
 }
 
-export function createCycleCompletion(current = {}, { cycle, completed, updatedAt, completionId } = {}) {
+export function createCycleCompletion(current = {}, { cycle, completed, updatedAt, completionId, updates = {} } = {}) {
+  const progress = typeof updates.progressPercentage === 'number'
+    ? updates.progressPercentage
+    : (typeof updates.progress === 'number' ? updates.progress : (completed ? 100 : 0));
   return {
     ...current,
     completed: completed === true,
-    status: completed === true ? 'Completada' : 'Pendiente',
+    status: completed === true ? 'Completada' : (progress > 0 ? 'En progreso' : 'Pendiente'),
+    progressPercentage: progress,
+    progress,
     cycleId: cycle?.id || current.cycleId || '',
     cycleName: cycle?.name || current.cycleName || '',
     updatedAt,
-    ...(completed === true ? { completedAt: updatedAt, completionId } : { completedAt: null })
+    ...(completed === true ? { completedAt: current.completedAt || updatedAt, completionId } : { completedAt: null })
   };
 }

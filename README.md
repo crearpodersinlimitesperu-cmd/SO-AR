@@ -1,5 +1,24 @@
 # React + Vite
 
+## Persistencia de calendarios y avances
+
+El listado de calendarios MJ compara sedes con `canonicalSede`, conservando
+la visibilidad por rol y sede. Un error del listener se muestra como error,
+no como ausencia de calendarios. No se modifican los documentos existentes
+ni las reglas de Firestore.
+
+Las tareas de catálogo guardan y recuperan porcentaje, estado y fecha de
+cumplimiento en la misma entrada `completions.<sede>__<ciclo>`, también para
+cada equipo de Quito. Las tareas personalizadas o asignadas directamente
+conservan su progreso general. Un ciclo nuevo no hereda el avance anterior.
+El porcentaje general antiguo solo se recupera si hay una única entrada de
+ciclo coincidente; los registros históricos ambiguos requieren revisión,
+sin migración automática ni escritura en producción.
+
+Regresiones: `npm run test:persistence`. Antes de publicar, verificar con una
+cuenta autorizada que un calendario reaparece al recargar y que un avance
+parcial permanece al cerrar, reabrir y recargar la tarea.
+
 ## Accesos del Home
 
 El panel **Módulos y herramientas** del modo Pro usa las superficies,

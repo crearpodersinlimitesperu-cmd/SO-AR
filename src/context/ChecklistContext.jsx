@@ -11,7 +11,7 @@ import { createGoogleTask } from '../services/googleSync';
 import { useUI } from './UIContext';
 import { useAuth } from './AuthContext';
 import { useCycles } from './CyclesContext';
-import { createCycleCompletion, getEffectiveCompletion, getNextCompletionState, isCompletionTransition } from '../utils/taskLifecycle';
+import { applyCycleCompletion, createCycleCompletion, getEffectiveCompletion, getNextCompletionState, isCompletionTransition } from '../utils/taskLifecycle';
 
 const ChecklistContext = createContext();
 
@@ -382,6 +382,9 @@ export function ChecklistProvider({ children }) {
 
         const hasDirectAssignees = Boolean(prevData.assignedToEmail) ||
           (Array.isArray(prevData.assignedToEmails) && prevData.assignedToEmails.length > 0);
+        if (baseTask && cycleScope && !prevData.isCustom && !hasDirectAssignees && !isCycleScoped) {
+          throw new Error('Espera a que cargue el ciclo de la tarea antes de guardar los avances.');
+        }
         const scopeThisCompletion = isCycleScoped && !prevData.isCustom && !hasDirectAssignees;
         if (scopeThisCompletion && includesCompletionUpdate) {
           const previous = getEffectiveCompletion(prevData, {
@@ -394,7 +397,8 @@ export function ChecklistProvider({ children }) {
             cycle: cycleScope.cycle,
             completed: nextCompleted,
             updatedAt: new Date().toISOString(),
-            completionId: completionTransition ? completionId : prevData.completions?.[cycleKey]?.completionId
+            completionId: completionTransition ? completionId : prevData.completions?.[cycleKey]?.completionId,
+            updates
           });
           nextUpdates[`completions.${cycleKey}`] = completionEntry;
         } else if (includesCompletionUpdate) {
@@ -543,14 +547,11 @@ export function ChecklistProvider({ children }) {
           !data.isCustom && !taskId.startsWith('custom_') &&
           !data.assignedToEmail &&
           !(Array.isArray(data.assignedToEmails) && data.assignedToEmails.length > 0);
-        if (isBaseCatalogTask) {
-          const effective = getEffectiveCompletion(data, {
+        if (isBaseCatalogTask && !isMultiTeamQuito) {
+          return applyCycleCompletion(data, {
             sede: userSede,
-            cycleId: currentCycle?.id,
-            cycleScoped: true
+            cycleId: currentCycle?.id
           });
-          sedeCompleted = effective.completed;
-          sedeStatus = effective.status;
         }
 
         return { ...data, completed: sedeCompleted, status: sedeStatus };
@@ -572,29 +573,26 @@ export function ChecklistProvider({ children }) {
         const expanded = [];
         allTasks.forEach(task => {
           const baseTaskDef = checklistData.find(baseTask => baseTask.id === task.id);
-          if (!baseTaskDef) {
+          if (!baseTaskDef || task.isCustom || task.assignedToEmail || task.assignedToEmails?.length) {
             expanded.push(task);
             return;
           }
           const isPersisted = loadedTaskIds.has(task.id);
           quitoCycles.forEach(({ equipo, cycle }) => {
-            const effective = getEffectiveCompletion(task, {
+            const effectiveTask = applyCycleCompletion(task, {
               sede: userSede,
-              cycleId: cycle?.id,
-              cycleScoped: Boolean(baseTaskDef)
+              cycleId: cycle?.id
             });
             const perTeamDeadline = isPersisted
               ? (task.deadline || calculateAutomaticDeadline(baseTaskDef, cycle))
               : calculateAutomaticDeadline(baseTaskDef, cycle);
 
             expanded.push({
-              ...task,
+              ...effectiveTask,
               uiKey: `${task.id}__EQ${equipo}`,
               equipoQuito: equipo,
               quitoCycleId: cycle?.id || null,
-              deadline: perTeamDeadline,
-              completed: effective.completed,
-              status: effective.status
+              deadline: perTeamDeadline
             });
           });
         });
