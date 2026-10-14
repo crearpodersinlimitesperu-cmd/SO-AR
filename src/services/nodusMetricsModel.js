@@ -1,5 +1,23 @@
 import { snapshotFreshness } from '../utils/nodusIntegrity.js';
 
+export function selectCoordinatorSnapshot(remote, fallback) {
+  if (Array.isArray(remote?.coordinadores)) {
+    return {
+      coordinadores: remote.coordinadores,
+      source: 'nodus',
+      timestamp: remote.timestamp || remote.updatedAt || null,
+    };
+  }
+  if (Array.isArray(fallback?.coordinadores)) {
+    return {
+      coordinadores: fallback.coordinadores,
+      source: 'fallback',
+      timestamp: fallback.timestamp || null,
+    };
+  }
+  return { coordinadores: [], source: 'unavailable', timestamp: null };
+}
+
 const count = (...values) => {
   const value = values.find(candidate => candidate !== undefined && candidate !== null && candidate !== '');
   if (value === undefined) return null;

@@ -1,7 +1,51 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { extractNodusMetrics, findFreshNodusMetrics } from './nodusMetricsModel.js';
+import { extractNodusMetrics, findFreshNodusMetrics, selectCoordinatorSnapshot } from './nodusMetricsModel.js';
+import { readFileSync } from 'node:fs';
 import { snapshotFreshness } from '../utils/nodusIntegrity.js';
+
+test('a remote snapshot never promotes historical rows or their roles into its current source', () => {
+  const remote = { timestamp: '2026-10-13T20:00:00Z', coordinadores: [
+    { id: 'remote', email: 'current@example.test', sede: 'Lima', role: 'coord_c2', equipos: [{ equipo: '31' }] },
+  ] };
+  const fallback = { timestamp: '2026-01-01T00:00:00Z', coordinadores: [
+    { id: 'historical', email: 'old@example.test', sede: 'Quito', role: 'coord_c1' },
+    { id: 'remote', email: 'current@example.test', role: 'gerente' },
+  ] };
+  const selected = selectCoordinatorSnapshot(remote, fallback);
+  assert.deepEqual(selected, { coordinadores: remote.coordinadores, source: 'nodus', timestamp: remote.timestamp });
+  assert.equal(selected.coordinadores[0].role, 'coord_c2');
+  assert.deepEqual(selected.coordinadores[0].equipos, [{ equipo: '31' }]);
+  assert.equal(selected.coordinadores.some(row => row.id === 'historical'), false);
+});
+
+test('an explicit empty remote list remains empty instead of restoring historical assignments', () => {
+  assert.deepEqual(selectCoordinatorSnapshot({ coordinadores: [], timestamp: '2026-10-13T20:00:00Z' },
+    { coordinadores: [{ id: 'historical' }] }), {
+    coordinadores: [], source: 'nodus', timestamp: '2026-10-13T20:00:00Z',
+  });
+});
+
+test('missing or invalid remote lists keep fallback provenance and never borrow a remote timestamp', () => {
+  const fallback = { coordinadores: [{ id: 'historical' }], timestamp: '2026-01-01T00:00:00Z' };
+  for (const remote of [null, {}, { coordinadores: {}, timestamp: '2026-10-13T20:00:00Z' }]) {
+    assert.deepEqual(selectCoordinatorSnapshot(remote, fallback), {
+      coordinadores: fallback.coordinadores, source: 'fallback', timestamp: fallback.timestamp,
+    });
+  }
+  assert.deepEqual(selectCoordinatorSnapshot({}, {}), { coordinadores: [], source: 'unavailable', timestamp: null });
+  assert.equal(selectCoordinatorSnapshot({ coordinadores: [] }, fallback).timestamp, null);
+});
+
+test('Portfolio binds its rows and task freshness to the same selected source', () => {
+  const board = readFileSync(new URL('../pages/PortfolioBoard.jsx', import.meta.url), 'utf8');
+  assert.match(board, /selectCoordinatorSnapshot\(data, nodusFallbackData\)/);
+  assert.match(board, /setCoordinadoresRaw\(coordinatorSource\.coordinadores\)/);
+  assert.match(board, /source: coordinatorSource\.source, timestamp: coordinatorSource\.timestamp/);
+  assert.doesNotMatch(board, /fallbackList\.forEach|mergedCoords/);
+  assert.match(board, /coordinatorSnapshot\.source === 'nodus' && isSnapshotFresh/);
+  assert.match(board, /if \(coordinatorSnapshot\.source !== 'nodus' \|\| !isSnapshotFresh\(coordinatorSnapshot\.timestamp\)\) return/);
+});
 
 test('missing metrics stay missing and explicit zero stays zero', () => {
   const metrics = extractNodusMetrics({ asignados: 0, coberturaPct: 0, tasaEfectividad: 0, equipos: [] });

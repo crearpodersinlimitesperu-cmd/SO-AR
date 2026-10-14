@@ -14,6 +14,7 @@ import { db, getDocResilient } from '../services/firebase';
 import { OPERATIONAL_SEDES, normalizeSede, usersData, normalizeRole } from '../data/usersData';
 import { SEDES_FDS_PRICING, getSedePricing, formatCurrencyAmount } from '../data/sedesPricingData';
 import nodusFallbackData from '../data/nodusFallbackData.json';
+import { selectCoordinatorSnapshot } from '../services/nodusMetricsModel.js';
 import ResourceCapacityView from '../components/ResourceCapacityView';
 import FuturosImposiblesView from '../components/FuturosImposiblesView';
 import NodusUserAccessReport from '../components/NodusUserAccessReport';
@@ -250,31 +251,9 @@ export default function PortfolioBoard() {
           data = docSnap.data();
         }
 
-        if (data && Array.isArray(data.coordinadores) && data.coordinadores.length > 0) {
-          // Fusionar con el catálogo maestro para asegurar que todas las sedes (CDMX, Quito, etc.) y C1/C2 estén completos
-          const remoteList = data.coordinadores;
-          const fallbackList = Array.isArray(nodusFallbackData?.coordinadores) ? nodusFallbackData.coordinadores : [];
-          const mergedCoords = [...remoteList];
-          
-          fallbackList.forEach(fbCoord => {
-            const exists = mergedCoords.some(rc => 
-              (rc.nombre && fbCoord.nombre && rc.nombre.trim().toUpperCase() === fbCoord.nombre.trim().toUpperCase()) ||
-              (rc.id && fbCoord.id && rc.id === fbCoord.id)
-            );
-            if (!exists) {
-              mergedCoords.push(fbCoord);
-            }
-          });
-
-          setCoordinadoresRaw(mergedCoords);
-          setCoordinatorSnapshot({ source: 'nodus', timestamp: data.timestamp || data.updatedAt || null });
-        } else if (nodusFallbackData?.coordinadores) {
-          setCoordinadoresRaw(nodusFallbackData.coordinadores);
-          setCoordinatorSnapshot({ source: 'fallback', timestamp: nodusFallbackData.timestamp || null });
-        } else {
-          setCoordinadoresRaw([]);
-          setCoordinatorSnapshot({ source: 'unavailable', timestamp: null });
-        }
+        const coordinatorSource = selectCoordinatorSnapshot(data, nodusFallbackData);
+        setCoordinadoresRaw(coordinatorSource.coordinadores);
+        setCoordinatorSnapshot({ source: coordinatorSource.source, timestamp: coordinatorSource.timestamp });
 
         let totalEnrolados = 0;
         let totalBajasReales = 0;
