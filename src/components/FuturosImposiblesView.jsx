@@ -5,7 +5,7 @@ import {
   Filter, ShieldAlert, Award, FileText, UserCheck, AlertTriangle,
   Loader2, ThumbsUp, Send, Check
 } from 'lucide-react';
-import { addDoc, collection, doc, getDocFromServer, onSnapshot, serverTimestamp, setDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, getDocFromServer, getDocsFromServer, onSnapshot, serverTimestamp, setDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useAuth } from '../context/AuthContext';
 const EQUIPOS_FUTUROS_IMPOSIBLES = ['EQUIPO 27', 'EQUIPO 28', 'EQUIPO 29', 'EQUIPO 30', 'EQUIPO 31'];
@@ -29,6 +29,20 @@ export default function FuturosImposiblesView({
   textDark = 'var(--text-main, #f8fafc)',
   textMuted = 'var(--text-muted, #94a3b8)'
 }) {
+  const readLiveFISnapshot = async () => {
+    const snap = await getDocFromServer(doc(db, 'nodus_futuros_imposibles', 'latest'));
+    const payload = snap.exists() ? snap.data() : null;
+    let participantes = Array.isArray(payload?.participantes) ? payload.participantes : [];
+    if (!participantes.length && Number(payload?.participantChunks || 0) > 0) {
+      const chunksSnap = await getDocsFromServer(collection(db, 'nodus_futuros_imposibles', 'latest', 'participantes'));
+      participantes = chunksSnap.docs
+        .map((chunk) => chunk.data())
+        .sort((a, b) => Number(a.index) - Number(b.index))
+        .flatMap((chunk) => Array.isArray(chunk.participantes) ? chunk.participantes : []);
+    }
+    return { payload, participantes };
+  };
+
   const { currentUser } = useAuth();
   // Estados de filtrado y búsqueda
   const [equipoFilter, setEquipoFilter] = useState('Todos');
@@ -61,9 +75,7 @@ export default function FuturosImposiblesView({
     let isMounted = true;
     async function fetchNodusFIData() {
       try {
-        const snap = await getDocFromServer(doc(db, 'nodus_futuros_imposibles', 'latest'));
-        const payload = snap.exists() ? snap.data() : null;
-        const participantes = Array.isArray(payload?.participantes) ? payload.participantes : [];
+        const { payload, participantes } = await readLiveFISnapshot();
         const universoPfd = participantes.filter((p) => p?.asistioPFD === true);
         if (!isMounted) return;
         if (universoPfd.length > 0) {
@@ -176,9 +188,7 @@ export default function FuturosImposiblesView({
   const handleReevaluate = async () => {
     setIsEvaluating(true);
     try {
-      const snap = await getDocFromServer(doc(db, 'nodus_futuros_imposibles', 'latest'));
-      const payload = snap.exists() ? snap.data() : null;
-      const participantes = Array.isArray(payload?.participantes) ? payload.participantes : [];
+      const { payload, participantes } = await readLiveFISnapshot();
       const universoPfd = participantes.filter((p) => p?.asistioPFD === true);
       if (universoPfd.length === 0) {
         setParticipantesRaw([]);

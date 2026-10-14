@@ -15,11 +15,25 @@ import { NodusFIAgent } from './nodusFIAgent.mjs';
 import { NodusGenealogyAgent } from './nodusGenealogyAgent.mjs';
 import { NodusIdentityAgent } from './nodusIdentityAgent.mjs';
 import { resolveUniqueNameMatch } from '../shared/rrhhSentinelRules.mjs';
+import {
+  buildPendingEnrolleeRecords,
+  hasCompleteNodusTeamExtraction
+} from '../shared/nodusPendingEnrollees.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 puppeteer.use(StealthPlugin());
+
+const FI_PARTICIPANT_CHUNK_SIZE = 100;
+
+function chunkArray(items, size) {
+  const chunks = [];
+  for (let index = 0; index < items.length; index += size) {
+    chunks.push(items.slice(index, index + size));
+  }
+  return chunks;
+}
 
 // Configuración Resiliente de Firebase
 // Diccionario dinámico cargado desde workspace
@@ -57,6 +71,26 @@ function getAdminDbForNodusPublish() {
   }
   const adminApp = getAdminApps().length ? getAdminApps()[0] : initializeAdminApp({ credential: cert(serviceAccount) });
   return getAdminFirestore(adminApp);
+}
+
+export function buildFiSnapshotChunks(participantesFI = []) {
+  return chunkArray(participantesFI, FI_PARTICIPANT_CHUNK_SIZE).map((participantes, index) => ({
+    index,
+    participantes
+  }));
+}
+
+export function buildFiLatestSnapshot(participantesFI = [], fiDiag = {}, syncId = '') {
+  return {
+    source: 'nodus_futuros_imposibles',
+    sourceVersion: 'fi-sync-v3',
+    sourceUrl: 'https://imo.crearpslglobal.com/futurosimposibles',
+    extractedAt: syncId,
+    syncedAt: FieldValue.serverTimestamp(),
+    universePfd: participantesFI.length,
+    participantChunks: buildFiSnapshotChunks(participantesFI).length,
+    summary: fiDiag.resumen
+  };
 }
 
 
@@ -341,24 +375,40 @@ class NodusExtractorAgent {
     console.log("👥 [Agente 1 - Extractor] Extrayendo lista de equipos de la sección /reporte...");
     await this.safeGoto('https://imo.crearpslglobal.com/reporte', 35000);
 
-    const activeEquipos = await this.page.evaluate(() => {
+    const teamList = await this.page.evaluate(() => {
       const select = document.querySelector('select[name="id_equipo"]');
-      if (!select) return [];
-      return Array.from(select.options)
-        .filter(o => o.value && o.text.includes('✓'))
-        .map(o => ({ id: o.value, nombre: o.text.trim() }));
+      if (!select) return { available: false, equipos: [] };
+      return {
+        available: true,
+        equipos: Array.from(select.options)
+          .filter(o => o.value && o.text.includes('✓'))
+          .map(o => ({ id: o.value, nombre: o.text.trim() }))
+      };
     });
+    const activeEquipos = teamList.equipos;
 
     console.log(`🔍 [Agente 1 - Extractor] Encontrados ${activeEquipos.length} equipos activos para C1 y C2.`);
-    
+    let failedTeamCount = 0;
+
     const equiposData = [];
     // Extraemos de los equipos activos de forma segura
     for (const eq of activeEquipos) {
       try {
         await this.safeGoto(`https://imo.crearpslglobal.com/reporte?id_equipo=${eq.id}`, 25000);
-        const participantes = await this.page.evaluate(() => {
+        const report = await this.page.evaluate(() => {
+          const normalizeHeader = value => String(value || '').normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
+          const headers = Array.from(document.querySelectorAll('table thead th'))
+            .map(th => th.innerText.trim());
+          const enrollmentDateIndex = headers.findIndex(header =>
+            /fecha.*(enrol|inscrip|registro|alta)/i.test(normalizeHeader(header))
+          );
+          const siteIndex = headers.findIndex(header => /^(sede|ciudad)$/i.test(normalizeHeader(header)));
+          const weekendDateIndex = headers.findIndex(header =>
+            /(fin de semana|fecha fds|fds fecha)/i.test(normalizeHeader(header))
+          );
           const trs = Array.from(document.querySelectorAll('table tbody tr'));
-          return trs.map(tr => {
+          const participantes = trs.map(tr => {
             const tds = Array.from(tr.querySelectorAll('td')).map(td => td.innerText.trim());
             const item = {};
             if (tds[1]) item.apellidos = tds[1];
@@ -374,9 +424,17 @@ class NodusExtractorAgent {
             if (tds[11]) item.asistencia = tds[11];
             if (tds[12]) item.desertor = tds[12];
             if (tds[13]) item.pago = tds[13];
+            if (enrollmentDateIndex >= 0 && tds[enrollmentDateIndex]) {
+              item[headers[enrollmentDateIndex]] = tds[enrollmentDateIndex];
+            }
+            if (siteIndex >= 0 && tds[siteIndex]) item[headers[siteIndex]] = tds[siteIndex];
+            if (weekendDateIndex >= 0 && tds[weekendDateIndex]) item[headers[weekendDateIndex]] = tds[weekendDateIndex];
             return item;
           }).filter(p => p.nombres || p.apellidos || p.telefono || p.imo);
+          return { hasHeaders: headers.length > 0, participantes };
         });
+        if (!report.hasHeaders) throw new Error('NODUS no presentó encabezados de reporte');
+        const participantes = report.participantes;
 
         equiposData.push({
           equipoId: eq.id,
@@ -386,11 +444,27 @@ class NodusExtractorAgent {
         });
       } catch (err) {
         console.warn(`Aviso al extraer equipo ${eq.nombre}: ${err.message}`);
+        failedTeamCount += 1;
       }
     }
-
     console.log(`✅ [Agente 1 - Extractor] Datos de ${equiposData.length} equipos extraídos con éxito.`);
-    return equiposData;
+    let reason = '';
+    if (!teamList.available) reason = 'NODUS no mostró la lista de equipos activos.';
+    else if (activeEquipos.length === 0) reason = 'NODUS no mostró equipos activos.';
+    else if (failedTeamCount > 0) reason = 'No se pudo extraer el detalle de todos los equipos activos.';
+
+    return {
+      equipos: equiposData,
+      teamListAvailable: teamList.available,
+      expectedTeamCount: activeEquipos.length,
+      extractedTeamCount: equiposData.length,
+      failedTeamCount,
+      complete: teamList.available && hasCompleteNodusTeamExtraction({
+        expectedTeamCount: activeEquipos.length,
+        extractedTeamCount: equiposData.length
+      }),
+      reason
+    };
   }
 
   async extractFuturosImposibles(coordinadores = null) {
@@ -1032,6 +1106,93 @@ class NodusNormalizerAgent {
  * AGENTE 3: DESPACHADOR Y PERSISTENCIA ATÓMICA (NodusDispatcherAgent)
  * =========================================================================
  */
+async function deletePendingEnrolleeRun(adminDb, runId) {
+  if (!runId || runId === 'latest') return;
+  const runRef = adminDb.collection('nodus_pending_enrollee_reports').doc(runId);
+  const pages = await runRef.collection('pages').get();
+  for (let offset = 0; offset < pages.docs.length; offset += 450) {
+    const batch = adminDb.batch();
+    pages.docs.slice(offset, offset + 450).forEach(page => batch.delete(page.ref));
+    await batch.commit();
+  }
+  await runRef.delete();
+}
+
+async function publishPendingEnrolleeReport(adminDb, normalizedData, sourceTimestamp, generatedAt) {
+  const latestRef = adminDb.collection('nodus_pending_enrollee_reports').doc('latest');
+  const previousSnap = await latestRef.get();
+  const previous = previousSnap.exists ? previousSnap.data() : {};
+  const previousReadyRunId = previous.status === 'ready'
+    ? previous.runId
+    : previous.lastReadyRunId || null;
+  const previousReadyGeneratedAt = previous.status === 'ready'
+    ? previous.generatedAt
+    : previous.lastReadyGeneratedAt || null;
+  const teams = Array.isArray(normalizedData.equiposReporte) ? normalizedData.equiposReporte : [];
+  const extraction = normalizedData.pendingEnrolleeExtraction || {};
+  const reportId = `run_${Date.now()}`;
+
+  if (!extraction.complete || !teams.length) {
+    await latestRef.set({
+      schemaVersion: 1,
+      status: 'unavailable',
+      reason: 'La extracción NODUS no verificó todos los equipos activos; no se publica como reporte completo.',
+      runId: null,
+      extractionReason: extraction.reason || '',
+      teamListAvailable: extraction.teamListAvailable ?? false,
+      expectedTeamCount: extraction.expectedTeamCount ?? 0,
+      extractedTeamCount: extraction.extractedTeamCount ?? teams.length,
+      failedTeamCount: extraction.failedTeamCount ?? 0,
+      lastReadyRunId: previousReadyRunId,
+      lastReadyGeneratedAt: previousReadyGeneratedAt,
+      sourceTimestamp: sourceTimestamp || null,
+      generatedAt
+    });
+    return;
+  }
+
+  const coordinadores = Array.isArray(normalizedData.coordinadores) ? normalizedData.coordinadores : [];
+  const { records, withoutNameCount } = buildPendingEnrolleeRecords(teams, coordinadores);
+  const runRef = adminDb.collection('nodus_pending_enrollee_reports').doc(reportId);
+  const PAGE_SIZE = 60;
+  const pages = [];
+  for (let offset = 0; offset < records.length; offset += PAGE_SIZE) {
+    pages.push(records.slice(offset, offset + PAGE_SIZE));
+  }
+
+  await runRef.set({
+    schemaVersion: 1,
+    source: 'NODUS /reporte por equipo',
+    sourceTimestamp: sourceTimestamp || null,
+    generatedAt
+  });
+  for (let index = 0; index < pages.length; index += 1) {
+    await runRef.collection('pages').doc(`page_${String(index + 1).padStart(4, '0')}`).set({
+      pageIndex: index,
+      records: pages[index]
+    });
+  }
+
+  await latestRef.set({
+    schemaVersion: 1,
+    status: 'ready',
+    runId: reportId,
+    source: 'NODUS /reporte por equipo',
+    sourceTimestamp: sourceTimestamp || null,
+    generatedAt,
+    pendingCount: records.length,
+    verifiedTeamCount: teams.length,
+    unidentifiableCount: withoutNameCount,
+    chronologicalCount: records.filter(record => record.fechaEnrolamiento || record.fechaFds).length,
+    enrollmentDateCount: records.filter(record => record.fechaEnrolamiento).length,
+    pages: pages.length
+  });
+
+  if (previousReadyRunId && previousReadyRunId !== reportId) {
+    await deletePendingEnrolleeRun(adminDb, previousReadyRunId);
+  }
+}
+
 class NodusDispatcherAgent {
   async dispatch(normalizedData, rawData) {
     console.log("☁️ [Agente 3 - Despachador] Guardando datos en Firestore y respaldos locales...");
@@ -1040,6 +1201,12 @@ class NodusDispatcherAgent {
     // de servicio se limita al entorno de CI y nunca se expone al cliente.
     const adminDb = getAdminDbForNodusPublish();
     const timestamp = new Date().toISOString();
+    await publishPendingEnrolleeReport(
+      adminDb,
+      normalizedData,
+      rawData?.timestamp || timestamp,
+      timestamp
+    );
 
     const equiposSummary = (normalizedData.equiposReporte || []).map(eq => ({
       equipoId: eq.equipoId,
@@ -1326,12 +1493,20 @@ export async function runMultiAgentSync() {
       secciones: {
         actividadCoordinadores: { kpis: rawCoordinadores },
         dashboardPrincipal: rawDashboard,
-        reporteEquipos: rawEquiposReporte,
+        reporteEquipos: rawEquiposReporte.equipos,
         biDeepExtract: biDeepExtract
       }
     };
 
-    const normalized = normalizer.normalizeData(rawCoordinadores, rawDashboard, rawEquiposReporte);
+    const normalized = normalizer.normalizeData(rawCoordinadores, rawDashboard, rawEquiposReporte.equipos);
+    normalized.pendingEnrolleeExtraction = {
+      complete: rawEquiposReporte.complete,
+      teamListAvailable: rawEquiposReporte.teamListAvailable,
+      expectedTeamCount: rawEquiposReporte.expectedTeamCount,
+      extractedTeamCount: rawEquiposReporte.extractedTeamCount,
+      failedTeamCount: rawEquiposReporte.failedTeamCount,
+      reason: rawEquiposReporte.reason
+    };
 
       // [Agente 8 - Identidad] Validar que NO haya usuarios inventados, y purgar renuncias
       normalized.coordinadores = await identitySentinel.enforceIdentityTruth(normalized.coordinadores, 'C1_C2');
@@ -1391,17 +1566,30 @@ export async function runMultiAgentSync() {
       // Escritura atómica a través de Firebase Admin. El documento latest se
       // toca únicamente después de completar extracción y validación; así una
       // respuesta parcial, una pantalla de login o un bloqueo WAF no borran
-      // el universo ya publicado.
-      await adminDb.collection('nodus_futuros_imposibles').doc('latest').set({
-        participantes: participantesFI,
-        source: 'nodus_futuros_imposibles',
-        sourceVersion: 'fi-sync-v2',
-        sourceUrl: 'https://imo.crearpslglobal.com/futurosimposibles',
-        extractedAt: syncId,
-        syncedAt: FieldValue.serverTimestamp(),
-        universePfd: participantesFI.length,
-        summary: fiDiag.resumen
-      }, { merge: false });
+      // el universo ya publicado. Los participantes se particionan en chunks
+      // para no exceder el tamaño máximo de Firestore.
+      const latestRef = adminDb.collection('nodus_futuros_imposibles').doc('latest');
+      const chunkCollection = latestRef.collection('participantes');
+      const chunks = buildFiSnapshotChunks(participantesFI);
+      const previousChunks = await chunkCollection.get();
+      const cleanupBatch = adminDb.batch();
+      previousChunks.forEach(doc => cleanupBatch.delete(doc.ref));
+      await cleanupBatch.commit();
+      const writeBatch = adminDb.batch();
+      chunks.forEach(({ index, participantes }) => {
+        const chunkRef = chunkCollection.doc(`chunk_${String(index).padStart(4, '0')}`);
+        writeBatch.set(chunkRef, {
+          index,
+          participantes,
+          source: 'nodus_futuros_imposibles',
+          sourceVersion: 'fi-sync-v3',
+          extractedAt: syncId,
+          syncedAt: FieldValue.serverTimestamp(),
+          universePfd: participantesFI.length
+        }, { merge: false });
+      });
+      await writeBatch.commit();
+      await latestRef.set(buildFiLatestSnapshot(participantesFI, fiDiag, syncId), { merge: false });
       await adminDb.collection('nodus_fi_sync_history').add({
         status: 'published',
         source: 'nodus_futuros_imposibles',
