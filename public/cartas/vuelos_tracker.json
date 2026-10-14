@@ -1,14 +1,296 @@
 {
   "version": "3.2.0-ai-engine",
-  "updatedAt": "2026-10-13T19:46:13.678258Z",
+  "updatedAt": "2026-10-14T00:52:49.688725Z",
   "liveStatusAvailable": false,
   "aiEngineStatus": "ACTIVE",
-  "totalPdfAnalyzed": 470,
-  "totalFlightsIndexed": 327,
-  "totalFlights": 327,
+  "totalPdfAnalyzed": 473,
+  "totalFlightsIndexed": 332,
+  "totalFlights": 332,
   "syncFrequency": "7 veces al día (01:00, 04:00, 10:00, 13:00, 16:00, 19:00, 22:00 UTC)",
   "source": "Google Drive Sync (Carpetas Oficiales Vuelos CPSL)",
   "flights": {
+    "LA2393_2026-11-04_MDE_LIM": {
+      "flightNumber": "LA 2393",
+      "flightCode": "LA2393_2026-11-04_MDE_LIM",
+      "airline": "LATAM Airlines",
+      "callsign": "LA2393_2026-11-04_MDE_LIM",
+      "reservationCode": "KISDVI",
+      "passengers": [
+        "MILDRED MUNOZ VASQUEZ"
+      ],
+      "sourcePdf": "Latam Airlines - CUV.pdf",
+      "sourcePath": " / Latam Airlines - CUV.pdf",
+      "route": {
+        "origin": "MDE",
+        "originCity": "Medellín",
+        "originAirport": "Aeropuerto Internacional José María Córdova",
+        "destination": "LIM",
+        "destinationCity": "Lima",
+        "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-04",
+        "scheduledDeparture": "2026-11-04T18:10:00-05:00",
+        "scheduledArrival": "2026-11-04T21:25:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe Miraflores (Calle Bellavista 133, Miraflores, Lima 15074, Perú)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la2393",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA4972_2026-11-09_LIM_BOG": {
+      "flightNumber": "LA 4972",
+      "flightCode": "LA4972_2026-11-09_LIM_BOG",
+      "airline": "LATAM Airlines",
+      "callsign": "LA4972_2026-11-09_LIM_BOG",
+      "reservationCode": "KISDVI",
+      "passengers": [
+        "MILDRED MUNOZ VASQUEZ"
+      ],
+      "sourcePdf": "Latam Airlines - CUV.pdf",
+      "sourcePath": " / Latam Airlines - CUV.pdf",
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "BOG",
+        "destinationCity": "Bogotá",
+        "destinationAirport": "Aeropuerto Internacional El Dorado",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-09",
+        "scheduledDeparture": "2026-11-09T13:00:00-05:00",
+        "scheduledArrival": "2026-11-09T16:20:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe Miraflores (Calle Bellavista 133, Miraflores, Lima 15074, Perú)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la4972",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA4018_2026-11-09_BOG_MDE": {
+      "flightNumber": "LA 4018",
+      "flightCode": "LA4018_2026-11-09_BOG_MDE",
+      "airline": "LATAM Airlines",
+      "callsign": "LA4018_2026-11-09_BOG_MDE",
+      "reservationCode": "KISDVI",
+      "passengers": [
+        "MILDRED MUNOZ VASQUEZ"
+      ],
+      "sourcePdf": "Latam Airlines - CUV.pdf",
+      "sourcePath": " / Latam Airlines - CUV.pdf",
+      "route": {
+        "origin": "BOG",
+        "originCity": "Bogotá",
+        "originAirport": "Aeropuerto Internacional El Dorado",
+        "destination": "MDE",
+        "destinationCity": "Medellín",
+        "destinationAirport": "Aeropuerto Internacional José María Córdova",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-09",
+        "scheduledDeparture": "2026-11-09T18:15:00-05:00",
+        "scheduledArrival": "2026-11-09T19:20:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Salida Puerta 1 Llegadas Internacionales / Nacionales MDE",
+        "destination": "Sede Medellín (Hospedaje por coordinar con Dirección de Sede) (Medellín, Colombia)",
+        "driverPickupEstimated": "35 min posteriores al aterrizaje",
+        "driverNote": "Coordinación de bienvenida y traslado con Sede Medellín."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la4018",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA2393_2026-09-04_LIM_UIO": {
+      "flightNumber": "LA 2393",
+      "flightCode": "LA2393_2026-09-04_LIM_UIO",
+      "airline": "LATAM Airlines",
+      "callsign": "LA2393_2026-09-04_LIM_UIO",
+      "reservationCode": "IRKDAM",
+      "passengers": [
+        "MILDRED MUNOZ VASQUEZ"
+      ],
+      "sourcePdf": "LA5449083OZNK-0499025c-1f89-4513-8926-030f0d0dc5d7-cuv-bill.pdf",
+      "sourcePath": "",
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-04",
+        "scheduledDeparture": "2026-09-04T08:00:00-05:00",
+        "scheduledArrival": "2026-09-04T10:30:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
+        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la2393",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA4972_2026-09-04_LIM_UIO": {
+      "flightNumber": "LA 4972",
+      "flightCode": "LA4972_2026-09-04_LIM_UIO",
+      "airline": "LATAM Airlines",
+      "callsign": "LA4972_2026-09-04_LIM_UIO",
+      "reservationCode": "KISDVI",
+      "passengers": [
+        "MILDRED MUNOZ VASQUEZ"
+      ],
+      "sourcePdf": "Latam Airlines - CUV.pdf",
+      "sourcePath": " / Latam Airlines - CUV.pdf",
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-04",
+        "scheduledDeparture": "2026-09-04T08:00:00-05:00",
+        "scheduledArrival": "2026-09-04T10:30:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
+        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la4972",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA4018_2026-09-04_LIM_UIO": {
+      "flightNumber": "LA 4018",
+      "flightCode": "LA4018_2026-09-04_LIM_UIO",
+      "airline": "LATAM Airlines",
+      "callsign": "LA4018_2026-09-04_LIM_UIO",
+      "reservationCode": "KISDVI",
+      "passengers": [
+        "MILDRED MUNOZ VASQUEZ"
+      ],
+      "sourcePdf": "Latam Airlines - CUV.pdf",
+      "sourcePath": " / Latam Airlines - CUV.pdf",
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-04",
+        "scheduledDeparture": "2026-09-04T08:00:00-05:00",
+        "scheduledArrival": "2026-09-04T10:30:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
+        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la4018",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
     "LA2393_2026-11-11_MDE_LIM": {
       "flightNumber": "LA 2393",
       "flightCode": "LA2393_2026-11-11_MDE_LIM",
@@ -101,53 +383,6 @@
         "driverNote": "Coordinación de bienvenida y traslado con Sede Medellín."
       },
       "radarUrl": "https://www.flightradar24.com/data/flights/la2392",
-      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
-    },
-    "LA2393_2026-09-04_LIM_UIO": {
-      "flightNumber": "LA 2393",
-      "flightCode": "LA2393_2026-09-04_LIM_UIO",
-      "airline": "LATAM Airlines",
-      "callsign": "LA2393_2026-09-04_LIM_UIO",
-      "reservationCode": "IRKDAM",
-      "passengers": [
-        "MILDRED MUNOZ VASQUEZ"
-      ],
-      "sourcePdf": "LA5449083OZNK-0499025c-1f89-4513-8926-030f0d0dc5d7-cuv-bill.pdf",
-      "sourcePath": "",
-      "route": {
-        "origin": "LIM",
-        "originCity": "Lima",
-        "originAirport": "Aeropuerto Internacional Jorge Chávez",
-        "destination": "UIO",
-        "destinationCity": "Quito",
-        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
-        "isDirect": true,
-        "stops": 0,
-        "flightDuration": "2h 15m"
-      },
-      "schedule": {
-        "departureDate": "2026-09-04",
-        "scheduledDeparture": "2026-09-04T08:00:00-05:00",
-        "scheduledArrival": "2026-09-04T10:30:00-05:00",
-        "estimatedDeparture": null,
-        "estimatedArrival": null,
-        "actualDeparture": null,
-        "actualArrival": null
-      },
-      "status": "SCHEDULED",
-      "statusLabel": "Programado según itinerario",
-      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
-      "delayMinutes": null,
-      "terminal": "T1",
-      "gate": "Confirmándose en aeropuerto",
-      "baggageClaim": "Por confirmar en arribo",
-      "logistics": {
-        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
-        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
-        "driverPickupEstimated": "30 min posteriores al aterrizaje",
-        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
-      },
-      "radarUrl": "https://www.flightradar24.com/data/flights/la2393",
       "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
     },
     "LA2392_2026-09-04_LIM_UIO": {
