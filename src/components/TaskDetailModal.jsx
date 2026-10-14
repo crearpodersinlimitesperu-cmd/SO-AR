@@ -19,6 +19,8 @@ import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { canSendOperationalCommunications } from '../config/permissions';
 import { deadlineTimeReference, timeZoneForSede, zonedDateInputParts, zonedDateTimeToIso } from '../utils/timezones';
+import { getTaskProgress } from '../utils/taskLifecycle';
+import { checklistData } from '../data/checklistData';
 
 export const normalizeTaskEmail = (e) => {
   if (!e) return '';
@@ -154,9 +156,7 @@ export default function TaskDetailModal({
   // Sincronizar estado cuando se abre el modal o cambia la tarea
   useEffect(() => {
     if (task && isOpen) {
-      const initialProgress = typeof task.progressPercentage === 'number' 
-        ? task.progressPercentage 
-        : (task.completed || task.status === 'Completada' ? 100 : 0);
+      const initialProgress = getTaskProgress(task);
       
       setProgress(initialProgress);
       setIsCompleted(task.completed === true || task.status === 'Completada' || initialProgress === 100);
@@ -763,11 +763,10 @@ export default function TaskDetailModal({
         updatedAt: new Date().toISOString()
       };
 
-      const cycleScope = task.catalogTask || (
+      const cycleScope = checklistData.some(base => base.id === task.id) &&
         !task.isCustom &&
         !task.assignedToEmail &&
         !(Array.isArray(task.assignedToEmails) && task.assignedToEmails.length > 0)
-      )
         ? {
             sede: currentUser?.sede?.trim() || 'Global',
             cycle: task.quitoCycleId
