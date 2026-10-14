@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import { runInNewContext } from 'node:vm';
 import { readFileSync } from 'node:fs';
 import { EventEmitter } from 'node:events';
+import { createServer } from 'node:http';
+import puppeteer from 'puppeteer';
 import { extractNodusC1Report, inspectNodusC1Report, readNodusC1Report, waitForC1Report } from '../nodusC1Report.mjs';
 
 const headers = ['', 'Acciones', 'Pago', 'Asistencia', 'Desertor', 'Apellidos', 'Nombres',
@@ -182,6 +184,78 @@ test('diagnostic route scope must match the exact origin and team, not merely an
     const context = browserContext({ selected: '150' });
     Object.assign(context.location, location);
     assert.equal(evaluate(inspectNodusC1Report, '150', context).route, 'unexpected');
+  }
+});
+
+test('hourly browser headers preserve native script and Ajax fetch metadata', async () => {
+  const source = readFileSync(new URL('../nodusMultiAgentSync.mjs', import.meta.url), 'utf8');
+  const match = source.match(/setExtraHTTPHeaders\((\{[\s\S]*?\})\);/);
+  assert.ok(match, 'Hourly browser header configuration must be explicit');
+  const headers = runInNewContext(`(${match[1]})`);
+  assert.deepEqual(Object.keys(headers), ['Accept-Language']);
+  assert.equal(headers['Accept-Language'], 'es-ES,es;q=0.9,en;q=0.8');
+  assert.doesNotMatch(source, /setRequestInterception|\.abort\(/);
+
+  const requests = [];
+  const server = createServer((request, response) => {
+    requests.push({ path: request.url, dest: request.headers['sec-fetch-dest'],
+      mode: request.headers['sec-fetch-mode'], site: request.headers['sec-fetch-site'],
+      user: request.headers['sec-fetch-user'] });
+    if (request.url === '/dependency.js') {
+      response.setHeader('Content-Type', 'text/javascript');
+      // Model a server rejecting navigation metadata on subresource requests.
+      if (request.headers['sec-fetch-dest'] !== 'script') {
+        response.writeHead(403);
+        response.end();
+      } else response.end('window.dependencyReady = true; fetch("/data");');
+    } else if (request.url === '/data') {
+      response.setHeader('Content-Type', 'application/json');
+      response.end('{}');
+    } else {
+      response.setHeader('Content-Type', 'text/html');
+      response.end('<!doctype html><script src="/dependency.js"></script>');
+    }
+  });
+  let browser;
+  try {
+    await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+    browser = await puppeteer.launch({
+      executablePath: process.env.CHROME_BIN || undefined,
+      headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    });
+    const origin = `http://127.0.0.1:${server.address().port}`;
+    const page = await browser.newPage();
+    const scriptFailures = [];
+    page.on('requestfailed', request => {
+      if (request.resourceType() === 'script') scriptFailures.push(request.failure()?.errorText);
+    });
+    await page.setExtraHTTPHeaders({ 'Sec-Fetch-Dest': 'document', 'Sec-Fetch-Mode': 'navigate',
+      'Sec-Fetch-Site': 'none', 'Sec-Fetch-User': '?1' });
+    await page.goto(origin, { waitUntil: 'networkidle0' });
+    assert.equal(await page.evaluate(() => window.dependencyReady === true), false);
+    const legacyScript = requests.find(r => r.path === '/dependency.js');
+    if (legacyScript) assert.equal(legacyScript.dest, 'document');
+    else assert.deepEqual(scriptFailures, ['net::ERR_INVALID_ARGUMENT']);
+
+    requests.length = 0;
+    scriptFailures.length = 0;
+    await page.setExtraHTTPHeaders(headers);
+    await page.goto(origin, { waitUntil: 'networkidle0' });
+    assert.equal(await page.evaluate(() => window.dependencyReady === true), true);
+    assert.deepEqual(scriptFailures, []);
+    const script = requests.find(r => r.path === '/dependency.js');
+    assert.equal(script.dest, 'script');
+    assert.equal(script.mode, 'no-cors');
+    assert.equal(script.site, 'same-origin');
+    assert.equal(script.user, undefined);
+    const data = requests.find(r => r.path === '/data');
+    assert.equal(data.dest, 'empty');
+    assert.equal(data.mode, 'cors');
+    assert.equal(data.site, 'same-origin');
+    assert.equal(data.user, undefined);
+  } finally {
+    if (browser) await browser.close();
+    await new Promise((resolve, reject) => server.close(error => error ? reject(error) : resolve()));
   }
 });
 test('empty candidate notice describes Causa projection rather than claiming Nodus is empty', () => {

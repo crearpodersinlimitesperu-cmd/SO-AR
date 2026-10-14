@@ -293,3 +293,23 @@ la extracción y publicación; todavía hace falta esa verificación externa
 para afirmar que el equipo 150 está actualizado. No se despacha extracción
 ni despliegue manual, no se modifican registros Nodus y no se habilitan envíos
 sin política confirmada de destinos y frecuencia.
+
+El run 38522049498 aportó evidencia nueva: HTTP 200, ruta y filtro correctos,
+tabla con 15 cabeceras, pero jQuery/DataTables ausentes, ocho fallos de scripts
+y un error de página. El extractor horario no intercepta ni aborta requests.
+El HTML histórico declara jQuery en `code.jquery.com` y DataTables en
+`cdn.datatables.net`; esos recursos son dependencias del origen, no librerías
+que el extractor deba inyectar.
+
+Se retiraron los headers globales `Sec-Fetch-*`, `Sec-Ch-Ua-*` y
+`Upgrade-Insecure-Requests` del extractor. Forzar `Sec-Fetch-Dest: document`
+y `Sec-Fetch-Mode: navigate` en todos los requests también falseaba los
+requests de scripts/Ajax. Chromium ahora calcula sus metadatos por request;
+se conserva únicamente la preferencia de idioma. Chromium local rechazó el
+script antes de llegar al servidor con `net::ERR_INVALID_ARGUMENT` usando
+los headers antiguos. Una regresión con Chromium y servidor local reproduce
+ese fallo (o el rechazo HTTP de metadatos de navegación en un script), y
+verifica script/Ajax con metadatos nativos y carga correcta tras el cambio.
+No demuestra qué política aplican hoy los CDN: el siguiente run autorizado
+debe confirmar la recuperación, sin reducir comprobaciones ni publicar datos
+parciales si continúa el fallo.
