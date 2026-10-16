@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { createAuthStartupTrace } from '../src/utils/authStartupTiming.js';
+import { mergeAuthenticatedRoleProfile } from '../src/utils/userNormalizer.js';
 
 const RTT = 60;
 const baselineRef = 'd1c07eaa128038df90d6a5db0a1c6b2a39b824f9';
@@ -41,7 +42,7 @@ function harness(source, { rows = [], staff = [], exists = true, fail = '', inac
     event('read:self-profile');
     await pause(RTT);
     if (fail === 'self-profile') throw new Error('simulated profile failure');
-    return { exists: () => exists };
+    return { exists: () => exists, data: () => ({}) };
   };
   const setDoc = async (ref, payload, options) => {
     event('write:profile');
@@ -70,14 +71,14 @@ function harness(source, { rows = [], staff = [], exists = true, fail = '', inac
     'query', 'where', 'getDocs', 'getDoc', 'doc', 'findUserByAnyEmail', 'isSuperAdminEmail', 'isInactiveTrainer',
     'signOut', 'setCurrentUser', 'setLoading', 'normalizeUserRecord', 'enforceUserRolesAgent', 'saveSelfProfile',
     'buildUserObject', 'recordAuditEvent', 'sessionStorage', 'localStorage', 'PARTICIPANT_FLAG',
-    'buildParticipantUser', 'console', 'showToast', 'startupTrace', effectBody)(
+    'buildParticipantUser', 'mergeAuthenticatedRoleProfile', 'console', 'showToast', 'startupTrace', effectBody)(
     (_, cb) => { callback = cb; return () => {}; }, { signOut: async () => event('signout') },
     helpers.findUserInFirestore, helpers.findStaffInFirestore, {}, collection, query, where, getDocs, getDoc, doc,
     () => null, () => false, () => inactive, async () => event('signout'),
     user => { currentUser = user; event(user ? 'access' : 'no-access'); },
     () => event('gate-finished'), user => ({ ...user, roles: ['colaborador'] }),
     agent, saveSelfProfile, (_, user) => user, async () => event('audit'),
-    storage, storage, 'participant', () => ({ participant: true }), logger,
+    storage, storage, 'participant', () => ({ participant: true }), mergeAuthenticatedRoleProfile, logger,
     () => event('toast'), createAuthStartupTrace());
   return {
     helpers, events, writes, user: () => currentUser,
