@@ -60,6 +60,7 @@ import { buildTeamKeyResolver } from '../utils/teamGrouping';
 import defaultKpisData from '../data/kpisEntrenadoresData.json';
 import { ManagersHelpProvider, ManagersQuickGuide, ManagersHelpMode, HelpButton, HelpInput, HelpSelect, HelpTextarea, HelpLink, HelpSortHeader } from '../components/ManagersHelp';
 import { getManagersGuideRole, managersTabHelpKeys } from '../data/managersHelpContent';
+import { managerDocumentRef } from '../services/managerPersistence';
 
 
 const SEDE_COLORS = {
@@ -1289,7 +1290,7 @@ export default function CentroManagers() {
       
     try {
       const targetManager = managers.find(m => m.id === id) || { id };
-      const docRef = doc(db, 'managers_directory', id.toString());
+      const docRef = managerDocumentRef(db, targetManager);
       
       // FIX: Only send fields that exist and are not undefined to prevent Firebase errors
       // Also ensure we include the core identity fields if upserting a new document
@@ -1330,7 +1331,7 @@ export default function CentroManagers() {
   const handleUpdateLlamada = async (id, fecha, asistio) => {
     try {
       const targetManager = managers.find(m => m.id === id) || { id };
-      const docRef = doc(db, 'managers_directory', id.toString());
+      const docRef = managerDocumentRef(db, targetManager);
       // (02/09/2026) FIX: antes se escribía el manager completo con
       // setDoc({...targetManager, llamadaFecha, llamadaAsistio}, {merge:true}).
       // "managers" es una MEZCLA de INITIAL_MANAGERS (catálogo estático) +
@@ -1389,7 +1390,7 @@ export default function CentroManagers() {
       const batch = writeBatch(db);
       groupModal.managers.forEach(m => {
         if (groupCallAttendance.hasOwnProperty(m.id)) {
-          const docRef = doc(db, 'managers_directory', m.id.toString());
+          const docRef = managerDocumentRef(db, m);
           // (02/09/2026) FIX: mismo problema que handleUpdateLlamada — escribir
           // el manager completo ({...m, ...}) con merge:true hace que el diff
           // contra firestore.rules incluya campos fuera de
@@ -2703,7 +2704,7 @@ export default function CentroManagers() {
         estado: canChangeStatus ? (editIndividualModal.estado || 'Activo') : editIndividualModal.estado
       };
 
-      const docRef = doc(db, 'managers_directory', editIndividualModal.id.toString());
+      const docRef = managerDocumentRef(db, editIndividualModal);
       await setDoc(docRef, updatedData, { merge: true });
 
       setManagers(prev => prev.map(m => m.id === editIndividualModal.id ? { ...m, ...updatedData } : m));
