@@ -7,6 +7,7 @@ import { collection, collectionGroup, query, where, onSnapshot, deleteDoc, doc, 
 import MissionHistory from '../features/imo/MissionHistory';
 import CampaignGenerator from '../features/imo/CampaignGenerator';
 import PublicLinksPanel from '../features/imo/PublicLinksPanel';
+import { nodusValidationLabel } from '../features/imo/monitorPresentation';
 import { isMissionComplete } from '../features/imo/missionModel';
 import { buildMissionFdsContexts } from '../features/imo/missionFds';
 import MissionWindowNotice from '../features/imo/MissionWindowNotice';
@@ -55,6 +56,7 @@ export default function MonitorImos() {
   const [missionWindows, setMissionWindows] = useState({});
   const [verifiedMissionWindows, setVerifiedMissionWindows] = useState([]);
   const [campaigns, setCampaigns] = useState([]);
+  const [campaignsLoading, setCampaignsLoading] = useState(true);
   const [calendars, setCalendars] = useState([]);
   const [missionLoadError, setMissionLoadError] = useState('');
   const missions = useMemo(() => rawMissions.map(m => m.schemaVersion === 2 ? { ...m, checks: missionChecks[m.id] || {} } : m), [rawMissions, missionChecks]);
@@ -63,9 +65,9 @@ export default function MonitorImos() {
   const [expandedImo, setExpandedImo] = useState(null);
   const [sendingEmail, setSendingEmail] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterSede, setFilterSede] = useState('Lima');
+  const [filterSede, setFilterSede] = useState('todos');
   const [filterEquipo, setFilterEquipo] = useState('todos');
-  const [campaignFilter, setCampaignFilter] = useState('legacy');
+  const [campaignFilter, setCampaignFilter] = useState('');
   const [filterEstado, setFilterEstado] = useState('todos');
   const [filterNodus, setFilterNodus] = useState('todos');
   const [viewMode, setViewMode] = useState('imos'); // 'imos' | 'enrolados'
@@ -168,22 +170,24 @@ export default function MonitorImos() {
   }, [currentUser, isGlobalScopeUser]);
 
   useEffect(() => {
-    if (!currentUser) { setCampaigns([]); return undefined; }
+    if (!currentUser) { setCampaigns([]); setCampaignsLoading(false); return undefined; }
     const sede = normalizeSede(currentUser.sede);
-    if (!isGlobalScopeUser && !sede) { setCampaigns([]); return undefined; }
+    if (!isGlobalScopeUser && !sede) { setCampaigns([]); setCampaignsLoading(false); return undefined; }
+    setCampaignsLoading(true);
     const ref = collection(db, 'imo_campaigns');
     const q = isGlobalScopeUser ? query(ref) : query(ref, where('sede', 'in', firestoreSedeAliases(sede)));
-    return onSnapshot(q, snap => setCampaigns(snap.docs.map(d => {
+    return onSnapshot(q, snap => { setCampaignsLoading(false); setCampaigns(snap.docs.map(d => {
       const data = d.data();
       return { id: d.id, schemaVersion: data.schemaVersion, sede: data.sede, targetTeam: data.targetTeam, c1Date: data.c1Date, status: data.status, createdAt: data.createdAt };
-    })), () => {
+    })); }, () => {
+      setCampaignsLoading(false);
       setMissionLoadError('No se pudieron consultar las campañas IMO de tu sede.');
     });
   }, [currentUser, isGlobalScopeUser]);
 
   useEffect(() => {
     setMissionChecks({});
-    if (campaignFilter === 'legacy') return undefined;
+    if (!campaignFilter || campaignFilter === 'legacy') return undefined;
     const q = query(collectionGroup(db, 'imo_confirmations'), where('campaignId', '==', campaignFilter));
     return onSnapshot(q, snap => {
     const checks = {};
@@ -194,7 +198,7 @@ export default function MonitorImos() {
 
   useEffect(() => {
     setMissionWindows({});
-    if (campaignFilter === 'legacy') return undefined;
+    if (!campaignFilter || campaignFilter === 'legacy') return undefined;
     const q = query(collectionGroup(db, 'imo_progress'), where('campaignId', '==', campaignFilter));
     return onSnapshot(q, snap => {
       const windows = {};
@@ -205,7 +209,7 @@ export default function MonitorImos() {
 
   useEffect(() => {
     setVerifiedMissionWindows([]);
-    if (campaignFilter === 'legacy') return undefined;
+    if (!campaignFilter || campaignFilter === 'legacy') return undefined;
     const q = collection(db, 'imo_private_mission_windows', campaignFilter, 'profiles');
     return onSnapshot(q, snap => setVerifiedMissionWindows(snap.docs.map(d => ({ ...d.data(), id: d.id }))), () => {
       setMissionLoadError('No se pudo consultar el plazo de la campaña verificada.');
@@ -329,6 +333,7 @@ export default function MonitorImos() {
     });
   }, [campaigns, sedeScopedMissions]);
   const selectedCampaign = campaignOptions.find(c => c.id === campaignFilter);
+  const visibleCampaigns = campaignOptions.filter(c => filterSede === 'todos' || normalizeSede(c.sede) === filterSede);
 
   // Sedes disponibles para el selector de sede (dinámico según misiones existentes)
   const sedesDisponibles = useMemo(() => {
@@ -750,6 +755,27 @@ export default function MonitorImos() {
     );
   }
 
+  if (!campaignFilter) {
+    return <main className="p-8" style={{ maxWidth: 1100, margin: '0 auto', color: 'var(--text-main)' }}>
+      <button onClick={() => navigate('/')}>← Volver al Centro Operativo</button>
+      <h1>MONITOR DE IMOS</h1>
+      <p>Selecciona una campaña para consultar sus enrolamientos y avances. Los registros anteriores se consultan por separado.</p>
+      {missionLoadError && <p role="alert">{missionLoadError}</p>}
+      <label>Sede <select className="form-input" value={filterSede} onChange={e => { setFilterSede(e.target.value); setFilterEquipo('todos'); }}>
+        {isGlobalScopeUser && <option value="todos">Todas las Sedes</option>}
+        {[...new Set([...sedesDisponibles, ...(isGlobalScopeUser ? ['Quito', 'Guayaquil', 'Cuenca', 'Lima', 'Medellín', 'México', 'Bogotá'] : [normalizeSede(currentUser?.sede)])])].filter(Boolean).map(s => <option key={s} value={s}>{s}</option>)}
+      </select></label>
+      <section aria-label="Campañas disponibles" style={{ display: 'grid', gap: 12, margin: '20px 0' }}>
+        {visibleCampaigns.map(c => <button key={c.id} style={{ padding: 16, textAlign: 'left' }} onClick={() => { setCampaignFilter(c.id); setFilterSede(normalizeSede(c.sede)); setFilterEquipo('todos'); }}>
+          {c.sede} · C1 Equipo {c.targetTeam} · {c.c1Date || 'Fecha no registrada'} · {c.status === 'active' ? 'Activa' : c.status === 'closed' ? 'Cerrada' : 'Estado no disponible'}
+        </button>)}
+        {campaignsLoading && <p role="status">Cargando campañas…</p>}
+        {!campaignsLoading && !missionLoadError && !visibleCampaigns.length && <p>No hay campañas cargadas para este ámbito. Esto no significa que no haya personas disponibles para entrenarse.</p>}
+      </section>
+      <button onClick={() => setCampaignFilter('legacy')}>Consultar registros anteriores y gestionar enlaces</button>
+    </main>;
+  }
+
   return (
     <div className="animate-fade-in p-8" style={{ maxWidth: '1440px', margin: '0 auto' }}>
       <button
@@ -774,6 +800,7 @@ export default function MonitorImos() {
         ← Volver al Centro Operativo
       </button>
 
+      <button onClick={() => { setCampaignFilter(''); setFilterEquipo('todos'); setSearchTerm(''); }}>Seleccionar otra campaña</button>
       <header style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.25rem' }}>
@@ -930,8 +957,8 @@ export default function MonitorImos() {
         {/* Tarjeta de Validación Automática Nodus vs Coordinadoras */}
         <div className="glass-panel" style={{
           padding: '0.9rem 1.2rem',
-          border: globalNodusStats.totalDiscrepancias > 0 ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid rgba(34, 197, 94, 0.3)',
-          background: globalNodusStats.totalDiscrepancias > 0 ? 'rgba(239, 68, 68, 0.05)' : 'rgba(34, 197, 94, 0.05)'
+          border: !globalNodusStats.totalReportadosImo ? '1px solid #64748b' : globalNodusStats.totalDiscrepancias > 0 ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid rgba(34, 197, 94, 0.3)',
+          background: !globalNodusStats.totalReportadosImo ? 'transparent' : globalNodusStats.totalDiscrepancias > 0 ? 'rgba(239, 68, 68, 0.05)' : 'rgba(34, 197, 94, 0.05)'
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
             <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Validación Nodus</span>
@@ -943,7 +970,7 @@ export default function MonitorImos() {
               background: globalNodusStats.porcentajeGlobal >= 80 ? 'rgba(34, 197, 94, 0.2)' : 'rgba(245, 158, 11, 0.2)',
               color: globalNodusStats.porcentajeGlobal >= 80 ? '#22c55e' : '#f59e0b'
             }}>
-              {globalNodusStats.porcentajeGlobal}% Coincide
+              {globalNodusStats.totalReportadosImo > 0 ? `${globalNodusStats.porcentajeGlobal}% Coincide` : 'Sin comparación'}
             </span>
           </div>
           <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#22c55e' }}>
@@ -953,7 +980,7 @@ export default function MonitorImos() {
             {globalNodusStats.totalDiscrepancias > 0 ? (
               <span style={{ color: '#ef4444', fontWeight: 700 }}>🚨 {globalNodusStats.totalDiscrepancias} Discrepancia(s)</span>
             ) : (
-              <span>✅ Coordinadoras coinciden</span>
+              <span>{nodusValidationLabel(globalNodusStats)}</span>
             )}
           </div>
         </div>
@@ -1103,7 +1130,7 @@ export default function MonitorImos() {
             if (next?.sede) setFilterSede(normalizeSede(next.sede));
           }}>
             <option value="legacy">Registros anteriores (sin campaña)</option>
-            {campaignOptions.map(c => <option key={c.id} value={c.id}>{c.sede} · C1 Equipo {c.targetTeam} · {c.c1Date} · {c.status === 'closed' ? 'Cerrada' : c.status === 'active' ? 'Activa' : 'Estado no disponible'}</option>)}
+            {visibleCampaigns.map(c => <option key={c.id} value={c.id}>{c.sede} · C1 Equipo {c.targetTeam} · {c.c1Date} · {c.status === 'closed' ? 'Cerrada' : c.status === 'active' ? 'Activa' : 'Estado no disponible'}</option>)}
           </select>
         </label>
         {selectedCampaign?.schemaVersion === 3 && <section style={{ flexBasis: '100%', background: 'rgba(0,0,0,0.24)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, padding: 14 }}>
@@ -1146,11 +1173,8 @@ export default function MonitorImos() {
               onChange={(e) => {
                 const newSede = e.target.value;
                 setFilterSede(newSede);
-                if (newSede === 'Lima') {
-                  setFilterEquipo('EQUIPO 31 - LIMA CICLO 1');
-                } else {
-                  setFilterEquipo('todos');
-                }
+                setFilterEquipo('todos');
+                if (campaignFilter !== 'legacy' && selectedCampaign && newSede !== 'todos' && normalizeSede(selectedCampaign.sede) !== newSede) setCampaignFilter('');
               }}
               className="form-input"
               style={{
