@@ -54,6 +54,8 @@ test('shows missing, summary, partial, unknown and duplicate evidence as null, n
   assert.equal(review([source('Lima', 1, 'C1', [{}])]).confirmed, null);
   assert.equal(review([source('Lima', 1, 'C1'), source('Lima', 1, 'C1')]).status, 'duplicate');
   assert.equal(review([source('Quito', 1, 'C1')]).rows, null);
+  assert.equal(review([{ ...source('Quito', 1, 'C1'), sede: 'Lima' }]).rows, null);
+  assert.equal(review([{ ...source('Lima', 1, 'C1'), equipoNombre: 'EQUIPO 1 Lima Quito C1' }]).rows, null);
   assert.equal(review([source('Lima', 1, 'C2')]).rows, null);
   assert.equal(review([source('Lima', 1, 'C1')]).rows, 0); // Explicitly complete empty report.
   assert.equal(review([source('Lima', 1, 'C1', [{ grupoReporte: 'Nuevo', llamada1: 'Confirmado' }])]).confirmed, 1);

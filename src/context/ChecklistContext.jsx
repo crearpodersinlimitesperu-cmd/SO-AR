@@ -949,7 +949,7 @@ export function ChecklistProvider({ children }) {
     try {
       const taskRef = doc(db, 'tasks', taskId);
       const taskSnap = await getDoc(taskRef);
-      if (!taskSnap.exists()) return false;
+      if (!taskSnap.exists()) throw new Error('La tarea ya no existe; no se pudo guardar la edición.');
       const currentTask = taskSnap.data();
 
       const sanitizeEmail = (e) => (typeof e === 'string' ? e.trim().toLowerCase()

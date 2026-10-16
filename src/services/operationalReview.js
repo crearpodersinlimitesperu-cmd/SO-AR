@@ -43,6 +43,10 @@ export function latestTeamsBySede(events = [], now = Date.now()) {
 
 function stageEvidence(snapshot, sede, team, stage, stale) {
   const matches = (Array.isArray(snapshot?.equiposReporte) ? snapshot.equiposReporte : []).filter(row => {
+    const name = String(row.equipoNombre || row.equipo || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    const namedSedes = REPORT_SEDES.filter(candidate =>
+      name.includes(candidate.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()));
+    if (namedSedes.length > 1 || (row.sede && namedSedes.length === 1 && canonicalSede(row.sede) !== namedSedes[0])) return false;
     const scope = nodusTeamScope(row);
     return scope && canonicalSede(scope.sede) === sede && scope.team === team && scope.stage === stage;
   });
