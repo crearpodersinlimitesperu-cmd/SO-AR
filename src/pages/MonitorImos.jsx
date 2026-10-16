@@ -3,7 +3,7 @@ import { isMissionCandidate, contactRegistration, CONTACT_MISSION } from '../../
 import { getEnroladosList as getAllEnrolados } from '../features/imo/missionEnrolados';
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { collection, collectionGroup, query, where, onSnapshot, deleteDoc, doc, writeBatch, addDoc } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, deleteDoc, doc, writeBatch, addDoc } from 'firebase/firestore';
 import MissionHistory from '../features/imo/MissionHistory';
 import CampaignGenerator from '../features/imo/CampaignGenerator';
 import PublicLinksPanel from '../features/imo/PublicLinksPanel';
@@ -191,13 +191,13 @@ export default function MonitorImos() {
   useEffect(() => {
     setMissionChecks({});
     if (!campaignFilter || campaignFilter === 'legacy') return undefined;
-    const q = query(collectionGroup(db, 'imo_confirmations'), where('campaignId', '==', campaignFilter));
-    return onSnapshot(q, snap => {
-    const checks = {};
-    snap.docs.forEach(d => { const mid = d.ref.parent.parent.id; (checks[mid] ||= {})[d.id] = d.data(); });
-    setMissionChecks(checks);
-    }, () => setCampaignReadError('No se pudo consultar el avance de esta campaña. No interpretes las casillas vacías como ausencia de gestión.'));
-  }, [campaignFilter]);
+    const unsubscribe = campaignMissionIds.map(id => onSnapshot(
+      collection(db, 'imo_campaigns', campaignFilter, 'profiles', id, 'imo_confirmations'),
+      snap => setMissionChecks(previous => ({ ...previous, [id]: Object.fromEntries(snap.docs.map(d => [d.id, d.data()])) })),
+      () => setCampaignReadError('No se pudo consultar el avance de esta campaña. No interpretes las casillas vacías como ausencia de gestión.')
+    ));
+    return () => unsubscribe.forEach(stop => stop());
+  }, [campaignFilter, campaignMissionIds]);
 
   useEffect(() => {
     setMissionWindows({});
