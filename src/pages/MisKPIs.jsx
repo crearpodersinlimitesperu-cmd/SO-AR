@@ -14,6 +14,7 @@ import { USERS_TO_IMPORT } from '../data/usersToImport';
 import { findFreshNodusMetrics, extractNodusMetrics } from '../services/nodusMetricsModel.js';
 import { operationalRole, resolveCoordinatorKpiAssignment } from '../services/nodusKpiDirectory.js';
 import { snapshotFreshness } from '../utils/nodusIntegrity.js';
+import OperationalReview from '../components/OperationalReview';
 export { extractNodusMetrics };
 
 // Metas base por defecto por rol (cuando la persona aún no tiene metas personalizadas)
@@ -79,6 +80,7 @@ export default function MisKPIs() {
   // Detección automática del rol para preseleccionar la pestaña adecuada
   const detectDefaultTab = (role) => {
     const r = (role || '').toLowerCase();
+    if (r === 'ceo' || r === 'cco') return 'ejecutivo';
     if (r.includes('maestr') || r.includes('mj')) return 'mj';
     if (r.includes('capitan')) return 'capitan';
     if (r.includes('qt') || r.includes('quantum')) return 'qt';
@@ -208,6 +210,11 @@ export default function MisKPIs() {
 
   const loadPersonMetas = useCallback(async (person) => {
     const roleCat = person.tabCategory || activeTab;
+    if (roleCat === 'ejecutivo') {
+      setCustomMetas(null);
+      setIsEditingMetas(false);
+      return;
+    }
     const defaultMetasForRole = DEFAULT_KPI_METAS[roleCat] || DEFAULT_KPI_METAS.c1;
     
     // 1. Intentar desde localStorage
@@ -249,6 +256,10 @@ export default function MisKPIs() {
 
   const handleSaveCustomMetas = async () => {
     if (!selectedPerson) return;
+    if (selectedPerson.tabCategory === 'ejecutivo') {
+      showToast('No hay fórmula ni metas personales aprobadas para CEO / CCO en esta fuente.', 'error');
+      return;
+    }
     setSavingMetas(true);
     const roleCat = selectedPerson.tabCategory || activeTab;
 
@@ -405,6 +416,10 @@ export default function MisKPIs() {
   // Guardar reporte con atribución exacta a la persona seleccionada
   const saveReport = async (roleName, roleCategory, dataPayload) => {
     if (loading) return;
+    if (selectedPerson?.tabCategory === 'ejecutivo') {
+      showToast('No se puede registrar un KPI personal ejecutivo sin una fuente y fórmula aprobadas.', 'error');
+      return;
+    }
     setLoading(true);
 
     const targetPerson = selectedPerson || {
@@ -561,6 +576,7 @@ export default function MisKPIs() {
 
         <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center', flexWrap: 'wrap' }}>
           <button
+            disabled={!selectedPerson || selectedPerson.tabCategory === 'ejecutivo'}
             onClick={() => setIsEditingMetas(true)}
             style={{ 
               display: 'flex', 
@@ -599,7 +615,7 @@ export default function MisKPIs() {
               <TrendingUp /> Reporte de KPIs Operativos
             </h2>
             <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-              Cada persona tiene sus propios KPIs, metas personalizadas y auditoría individual de desempeño.
+              Reportes por persona y rol; la revisión CEO / CCO distingue evidencia institucional de desempeño personal no verificable.
             </p>
           </div>
 
@@ -815,6 +831,9 @@ export default function MisKPIs() {
 
         {/* PESTAÑAS DE ROLES OPERATIVOS */}
         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '1rem', marginBottom: '1.5rem' }}>
+          <button type="button" className="btn-secondary" onClick={() => setActiveTab('ejecutivo')}>
+            Dirección CEO / CCO · evidencia por sede
+          </button>
           <button 
             type="button" 
             onClick={() => setActiveTab('c1')}
@@ -857,7 +876,7 @@ export default function MisKPIs() {
         </div>
 
         {/* 1. FORMULARIO C1 / C2 */}
-        {activeTab === 'c1' && (
+        {selectedPerson?.tabCategory !== 'ejecutivo' && activeTab === 'c1' && (
           <form onSubmit={(e) => { e.preventDefault(); saveReport('Coordinador C1 / C2', 'coord_c1', c1Data); }} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
             <div className="form-group">
               <label>
@@ -940,7 +959,7 @@ export default function MisKPIs() {
         )}
 
         {/* 2. FORMULARIO MAESTRÍA DEL JUEGO */}
-        {activeTab === 'mj' && (
+        {selectedPerson?.tabCategory !== 'ejecutivo' && activeTab === 'mj' && (
           <form onSubmit={(e) => { e.preventDefault(); saveReport('Coordinador Maestría del Juego', 'coord_maestria', mjData); }} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
             <div className="form-group">
               <label>
@@ -1004,7 +1023,7 @@ export default function MisKPIs() {
         )}
 
         {/* 3. FORMULARIO CAPITANÍA */}
-        {activeTab === 'capitan' && (
+        {selectedPerson?.tabCategory !== 'ejecutivo' && activeTab === 'capitan' && (
           <form onSubmit={(e) => { e.preventDefault(); saveReport('Capitanía de Sede', 'capitan', capitanData); }} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
             <div className="form-group">
               <label>
@@ -1056,7 +1075,7 @@ export default function MisKPIs() {
         )}
 
         {/* 4. FORMULARIO QT */}
-        {activeTab === 'qt' && (
+        {selectedPerson?.tabCategory !== 'ejecutivo' && activeTab === 'qt' && (
           <form onSubmit={(e) => { e.preventDefault(); saveReport('Quantum Team (QT)', 'qt', qtData); }} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
             <div className="form-group">
               <label>
@@ -1090,7 +1109,8 @@ export default function MisKPIs() {
         )}
 
         {/* 5. FORMULARIO GERENCIA DE SEDE */}
-        {activeTab === 'gerencia' && (
+        {(activeTab === 'ejecutivo' || selectedPerson?.tabCategory === 'ejecutivo') && <OperationalReview />}
+        {activeTab === 'gerencia' && selectedPerson?.tabCategory !== 'ejecutivo' && (
           <form onSubmit={(e) => { e.preventDefault(); saveReport('Gerencia de Sede', 'gerente', gerenciaData); }} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
             <div className="form-group">
               <label>

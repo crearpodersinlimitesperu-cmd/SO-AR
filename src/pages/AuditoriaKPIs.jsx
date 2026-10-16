@@ -14,6 +14,7 @@ import CMJDashboard from '../components/CMJDashboard';
 import NodusCoordinadoresC1C2Dashboard from '../components/NodusCoordinadoresC1C2Dashboard';
 import ThemeSelector from '../components/ThemeSelector';
 import ZenModeSelector from '../components/ZenModeSelector';
+import OperationalReview from '../components/OperationalReview';
 
 export default function AuditoriaKPIs({ defaultTab }) {
   const { currentUser } = useAuth();
@@ -867,6 +868,10 @@ export default function AuditoriaKPIs({ defaultTab }) {
         </div>
 
         {/* Dashboards Content */}
+        <button type="button" className="btn-secondary" onClick={() => setActiveTab('six_teams')}>
+          Revisar últimos 6 equipos por sede
+        </button>
+        {activeTab === 'six_teams' && <OperationalReview globalFilterSede={filterSede} />}
         {activeTab === 'coordinadores_nodus' && <NodusCoordinadoresC1C2Dashboard globalFilterSede={filterSede} />}
         {activeTab === 'cmj' && <CMJDashboard globalFilterSede={filterSede} />}
   

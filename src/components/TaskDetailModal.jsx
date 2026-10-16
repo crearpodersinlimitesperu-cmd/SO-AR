@@ -19,6 +19,7 @@ import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { canSendOperationalCommunications } from '../config/permissions';
 import { deadlineTimeReference, timeZoneForSede, zonedDateInputParts, zonedDateTimeToIso } from '../utils/timezones';
+import { taskLocationLabel, taskPath } from '../utils/taskLocation';
 import { getTaskProgress } from '../utils/taskLifecycle';
 import { checklistData } from '../data/checklistData';
 
@@ -915,6 +916,10 @@ export default function TaskDetailModal({
                   <strong style={{ color: 'var(--crear-cyan)' }}>{getDisplayName(task.createdBy)}</strong>
                 </div>
               )}
+              <div style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
+                Ubicación declarada: <strong>{taskLocationLabel(task)}</strong>
+              </div>
+              <a href={taskPath(task.id)}>Enlace interno a esta tarea</a>
               {assignedList.length > 0 && (
                 <div>
                   <span style={{ color: 'var(--text-muted)' }}>👥 Asignada a: </span>
@@ -1087,7 +1092,7 @@ export default function TaskDetailModal({
                   background: messageSending || !messageText.trim() ? 'rgba(41,171,226,.14)' : 'var(--crear-cyan)',
                   color: messageSending || !messageText.trim() ? 'var(--text-muted)' : '#06121a', fontWeight: 800,
                   cursor: messageSending || !messageText.trim() ? 'not-allowed' : 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.35rem'
-                }}><Send size={14} /> {messageSending ? 'Enviando…' : 'Enviar'}</button>
+                }}><Send size={14} /> {messageSending ? 'Enviando…' : 'Recordar en plataforma'}</button>
                 {canSendOperationalCommunications(currentUser) && (
                   <button type="button" onClick={handleSendTaskEmail} disabled={emailSending || !messageText.trim()} style={{
                     border: '1px solid rgba(245,158,11,.7)', borderRadius: '7px', padding: '0.5rem 0.8rem',

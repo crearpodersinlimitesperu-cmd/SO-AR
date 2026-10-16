@@ -12,6 +12,7 @@ import { usersData, normalizeRole, normalizeSede, OPERATIONAL_SEDES, getRoleDisp
 import { recordAuditEvent } from '../services/auditService';
 import { getAllCompanyUsers } from '../services/userService';
 import { normalizeTaskEmail } from '../utils/elizabethDashboard';
+import { normalizeTaskLocation, TASK_LOCATION_MAX_LENGTH } from '../utils/taskLocation';
 
 export const OPERATIONAL_AREAS = [
   {
@@ -202,6 +203,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
   const [newTask, setNewTask] = useState({
     title: '',
     notes: '',
+    location: '',
     role: currentUser?.appRole || 'gerente',
     deadlineDate: getTodayStr(),
     deadlineTime: '18:00',
@@ -236,6 +238,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
         }
         setNewTask({
           title: taskToEdit.task || taskToEdit.title || '',
+          location: typeof taskToEdit.location === 'string' ? taskToEdit.location : '',
           notes: taskToEdit.notes || taskToEdit.description || taskToEdit.comments || (Array.isArray(taskToEdit.progressNotes) && taskToEdit.progressNotes[0]?.text) || '',
           role: normalizeRole(taskToEdit.role) || taskToEdit.role || currentUser?.appRole || 'gerente',
           deadlineDate: dDate,
@@ -248,6 +251,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
         setNewTask({
           title: '',
           notes: '',
+          location: '',
           role: normalizeRole(prefilledUser.role) || prefilledUser.role || currentUser?.appRole || 'gerente',
           deadlineDate: getTodayStr(),
           deadlineTime: '18:00',
@@ -258,6 +262,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
       } else {
         setNewTask(prev => ({
           ...prev,
+          location: '',
           role: currentUser?.appRole || prev.role || 'gerente',
           deadlineDate: prev.deadlineDate || getTodayStr(),
           assignedSede: currentUser?.sede || prev.assignedSede || '',
@@ -422,6 +427,13 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
       globalUI?.showToast('Selecciona una persona de tu equipo.', 'error');
       return;
     }
+    let location;
+    try {
+      location = normalizeTaskLocation(newTask.location);
+    } catch (error) {
+      globalUI?.showToast(error.message, 'error');
+      return;
+    }
     setIsSubmitting(true);
     
     const finalRole = newTask.role || currentUser?.appRole || 'gerente';
@@ -462,6 +474,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
 
     const taskData = {
       task: newTask.title.trim(),
+      location,
       notes: trimmedNotes,
       description: trimmedNotes,
       comments: trimmedNotes,
@@ -549,6 +562,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
       setNewTask({
         title: '',
         notes: '',
+        location: '',
         role: currentUser?.appRole || 'gerente',
         deadlineDate: getTodayStr(),
         deadlineTime: '18:00',
@@ -602,6 +616,11 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
           <label>Nota opcional
             <textarea rows={3} value={newTask.notes}
               onChange={event => setNewTask(prev => ({ ...prev, notes: event.target.value }))} />
+          </label>
+          <label>Ubicación declarada (opcional)
+            <input value={newTask.location || ''} maxLength={TASK_LOCATION_MAX_LENGTH}
+              placeholder="Sede, sala o dirección; sin seguimiento GPS"
+              onChange={event => setNewTask(prev => ({ ...prev, location: event.target.value }))} />
           </label>
           <div className="elizabeth-dashboard__actions">
             <button type="submit" disabled={isSubmitting || eligibleTeamMembers.length === 0}>
@@ -845,6 +864,14 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
             overscrollBehavior: 'contain',
             scrollbarWidth: 'thin'
           }}>
+
+            <label style={{ display: 'grid', gap: '0.35rem', color: 'var(--text-muted)' }}>
+              Ubicación declarada (opcional)
+              <input value={newTask.location || ''} maxLength={TASK_LOCATION_MAX_LENGTH}
+                placeholder="Sede, sala o dirección; sin seguimiento GPS"
+                onChange={event => setNewTask(prev => ({ ...prev, location: event.target.value }))} />
+              <small>No se deduce de las personas asignadas ni captura tu ubicación.</small>
+            </label>
 
             {/* -------------------------------------------------------------
                 CASO 1: MODO LITE (ULTRA-LIMPIO, RÁPIDO, SIN SATURACIÓN)

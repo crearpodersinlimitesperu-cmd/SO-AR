@@ -73,7 +73,8 @@ function RouteLoadingFallback() {
 
 function HomeEntry() {
   const { currentUser } = useAuth();
-  if (isElizabethEscobar(currentUser)) {
+  const location = useLocation();
+  if (isElizabethEscobar(currentUser) && !new URLSearchParams(location.search).has('taskId')) {
     return <Navigate to="/elizabeth-dashboard" replace />;
   }
   return <Home />;
@@ -90,7 +91,7 @@ function PrivateRoute({ children }) {
   if (currentUser?.isParticipantOnly) {
     return <Navigate to="/onboarding-legal" replace />;
   }
-  return currentUser ? <ModuleVisit>{children}</ModuleVisit> : <Navigate to={`/login?from=${window.location.pathname}`} replace />;
+  return currentUser ? <ModuleVisit>{children}</ModuleVisit> : <Navigate to={`/login?from=${encodeURIComponent(window.location.pathname + window.location.search)}`} replace />;
 }
 
 // Componente para proteger autorización por Roles (S3 / Audit Fix)

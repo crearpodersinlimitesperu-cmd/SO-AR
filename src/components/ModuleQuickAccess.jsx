@@ -9,6 +9,8 @@ export default function ModuleQuickAccess() {
   const openModule = mod => navigate(mod.route);
   return (
     <div style={{ marginBottom: '1rem' }}>
+      <p className="text-muted">Preferencias de tu cuenta en este navegador; no es un ranking global de usuarios.
+        Frecuencia ponderada con vida media de 14 días, sin un período de medición global.</p>
       {frequent.length >= 4 && (
         <nav aria-label="Tus accesos rápidos" style={{ marginBottom: '0.5rem' }}>
           <strong>Tus accesos rápidos</strong>

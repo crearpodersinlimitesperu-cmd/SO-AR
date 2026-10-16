@@ -670,11 +670,15 @@ function AuditLogView() {
 function SuggestionsView() {
   const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
+  const [retry, setRetry] = useState(0);
   const [filterStatus, setFilterStatus] = useState('TODAS'); // 'TODAS' | 'Pendiente' | 'En Revisión' | 'Resuelto'
   const [selectedImg, setSelectedImg] = useState(null);
   const { showToast } = useUI();
 
   useEffect(() => {
+    setLoading(true);
+    setLoadError('');
     try {
       const q = query(collection(db, 'sugerencias_soporte'), orderBy('createdAt', 'desc'), limit(100));
       const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -683,17 +687,20 @@ function SuggestionsView() {
           ...doc.data()
         }));
         setSuggestions(list);
+        setLoadError('');
         setLoading(false);
       }, (err) => {
         console.error("Error escuchando sugerencias:", err);
+        setLoadError('No se pudo leer el feedback. No se puede afirmar que no existan pendientes.');
         setLoading(false);
       });
       return () => unsubscribe();
     } catch (e) {
       console.error(e);
+      setLoadError('No se pudo consultar el buzón de feedback.');
       setLoading(false);
     }
-  }, []);
+  }, [retry]);
 
   const handleUpdateStatus = async (id, newStatus) => {
     try {
@@ -743,6 +750,10 @@ function SuggestionsView() {
           <p style={{ color: 'var(--text-muted)', margin: '0.3rem 0 0 0', fontSize: '0.9rem' }}>
             Retroalimentación, ideas y reportes enviados por colaboradores desde el Centro de Ayuda Causa OS en tiempo real.
           </p>
+          <p className="text-muted">
+            Fuente: sugerencias_soporte · Hasta 100 envíos más recientes, no el historial completo.
+            Este buzón no incluye chats privados del copiloto. «Resuelto» es el estado declarado, no una certificación técnica.
+          </p>
         </div>
         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
           <select
@@ -765,7 +776,12 @@ function SuggestionsView() {
         </div>
       </div>
 
-      {loading ? (
+      {loadError ? (
+        <div role="alert">
+          <p>{loadError}</p>
+          <button type="button" onClick={() => setRetry(value => value + 1)}>Reintentar lectura</button>
+        </div>
+      ) : loading ? (
         <p style={{ color: 'var(--text-muted)' }}>Cargando sugerencias en tiempo real...</p>
       ) : filtered.length === 0 ? (
         <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>
