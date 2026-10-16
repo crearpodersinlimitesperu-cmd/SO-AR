@@ -59,6 +59,7 @@ export default function MonitorImos() {
   const [campaignsLoading, setCampaignsLoading] = useState(true);
   const [calendars, setCalendars] = useState([]);
   const [missionLoadError, setMissionLoadError] = useState('');
+  const [campaignReadError, setCampaignReadError] = useState('');
   const missions = useMemo(() => rawMissions.map(m => m.schemaVersion === 2 ? { ...m, checks: missionChecks[m.id] || {} } : m), [rawMissions, missionChecks]);
   const [loading, setLoading] = useState(true);
   const [historyMission, setHistoryMission] = useState(null);
@@ -68,6 +69,8 @@ export default function MonitorImos() {
   const [filterSede, setFilterSede] = useState('todos');
   const [filterEquipo, setFilterEquipo] = useState('todos');
   const [campaignFilter, setCampaignFilter] = useState('');
+  const campaignMissionIds = useMemo(() => rawMissions.filter(m => m.schemaVersion === 2 && m.campaignId === campaignFilter).map(m => m.id), [rawMissions, campaignFilter]);
+  useEffect(() => { setCampaignReadError(''); }, [campaignFilter]);
   const [filterEstado, setFilterEstado] = useState('todos');
   const [filterNodus, setFilterNodus] = useState('todos');
   const [viewMode, setViewMode] = useState('imos'); // 'imos' | 'enrolados'
@@ -193,28 +196,29 @@ export default function MonitorImos() {
     const checks = {};
     snap.docs.forEach(d => { const mid = d.ref.parent.parent.id; (checks[mid] ||= {})[d.id] = d.data(); });
     setMissionChecks(checks);
-    }, () => setMissionLoadError('No se pudo consultar el avance de esta campaña. No interpretes las casillas vacías como ausencia de gestión.'));
+    }, () => setCampaignReadError('No se pudo consultar el avance de esta campaña. No interpretes las casillas vacías como ausencia de gestión.'));
   }, [campaignFilter]);
 
   useEffect(() => {
     setMissionWindows({});
     if (!campaignFilter || campaignFilter === 'legacy') return undefined;
-    const q = query(collectionGroup(db, 'imo_progress'), where('campaignId', '==', campaignFilter));
-    return onSnapshot(q, snap => {
-      const windows = {};
-      snap.docs.forEach(d => { const mid = d.ref.parent.parent.id; windows[mid] = d.data().openedAt || null; });
-      setMissionWindows(windows);
-    }, () => setMissionLoadError('No se pudo consultar el plazo de esta campaña.'));
-  }, [campaignFilter]);
+    // Exact window documents avoid requiring a collection-group index.
+    const unsubscribe = campaignMissionIds.map(id => onSnapshot(
+      doc(db, 'imo_campaigns', campaignFilter, 'profiles', id, 'imo_progress', 'window'),
+      snap => setMissionWindows(previous => ({ ...previous, [id]: snap.data()?.openedAt || null })),
+      () => setCampaignReadError('No se pudo consultar el plazo de esta campaña.')
+    ));
+    return () => unsubscribe.forEach(stop => stop());
+  }, [campaignFilter, campaignMissionIds]);
 
   useEffect(() => {
     setVerifiedMissionWindows([]);
-    if (!campaignFilter || campaignFilter === 'legacy') return undefined;
+    if (!campaignFilter || !campaigns.some(c => c.id === campaignFilter && c.schemaVersion === 3)) return undefined;
     const q = collection(db, 'imo_private_mission_windows', campaignFilter, 'profiles');
     return onSnapshot(q, snap => setVerifiedMissionWindows(snap.docs.map(d => ({ ...d.data(), id: d.id }))), () => {
-      setMissionLoadError('No se pudo consultar el plazo de la campaña verificada.');
+      setCampaignReadError('No se pudo consultar el plazo de la campaña verificada.');
     });
-  }, [campaignFilter]);
+  }, [campaignFilter, campaigns]);
 
   // Escuchar actualizaciones de llamadas de Coordinadoras en Nodus
   useEffect(() => {
@@ -2363,7 +2367,7 @@ export default function MonitorImos() {
 
       {/* ── MODAL: LINK REGISTRO IMO ── */}
       {historyMission && <MissionHistory mission={historyMission} onClose={() => setHistoryMission(null)} />}
-      {missionLoadError && <div role="alert" style={{ position: 'fixed', bottom: 12, left: 16, background: '#7f1d1d', color: 'white', padding: 16, zIndex: 9000 }}>{missionLoadError}</div>}
+      {(missionLoadError || campaignReadError) && <div role="alert" style={{ position: 'fixed', bottom: 12, left: 16, background: '#7f1d1d', color: 'white', padding: 16, zIndex: 9000 }}>{missionLoadError || campaignReadError}</div>}
       {showImoLinkModal && <CampaignGenerator missions={isGlobalScopeUser ? missions : sedeScopedMissions} defaultSede={filterSede === 'todos' ? (normalizeSede(currentUser?.sede) || 'Quito') : filterSede} defaultEquipo={filterEquipo} sedes={isGlobalScopeUser ? [...new Set([...sedesDisponibles, 'Quito', 'Guayaquil', 'Cuenca', 'Lima', 'Medellín', 'México', 'Bogotá'])] : [normalizeSede(currentUser?.sede)].filter(Boolean)} getEnrolados={getEnroladosList} onCreated={id => { setCampaignFilter(id); setFilterEquipo('todos'); }} onClose={() => setShowImoLinkModal(false)} />}
       {showPublicLinks && <PublicLinksPanel defaultSede={filterSede === 'todos' ? (normalizeSede(currentUser?.sede) || 'Quito') : filterSede} sedes={isGlobalScopeUser ? [...new Set([...sedesDisponibles, 'Quito', 'Guayaquil', 'Cuenca', 'Lima', 'Medellín', 'México', 'Bogotá'])] : [normalizeSede(currentUser?.sede)].filter(Boolean)} onClose={() => setShowPublicLinks(false)} />}
 
