@@ -136,7 +136,11 @@ export const normalizeUserRecord = (data, source = 'unknown') => {
     role: nRole,
     roles: nRoles,
     activeRole: activeRole,
+    activeRoleOverride: data.activeRoleOverride ? normalizeRole(data.activeRoleOverride) : null,
+    rolesUpdatedAt: data.rolesUpdatedAt || null,
+    rolesUpdatedBy: data.rolesUpdatedBy || null,
     sede: nSede,
+    roleSedes: data.roleSedes && typeof data.roleSedes === 'object' ? data.roleSedes : {},
     sedeTag: nSede.substring(0, 3).toUpperCase(),
     // (14/09/2026) equiposQuito: a diferencia de las demás sedes (un solo equipo
     // activo a la vez), Quito corre VARIOS equipos en paralelo (ej. C1 Equipo 122 y
@@ -165,6 +169,45 @@ export const normalizeUserRecord = (data, source = 'unknown') => {
     updatedAt: new Date().toISOString(),
     schemaVersion: 1,
     _source: source // Meta-dato útil para la auditoría
+  };
+};
+
+export const mergeAuthenticatedRoleProfile = (user, profileData, fallbackRoles) => {
+  if (!profileData) return { ...user, roles: fallbackRoles };
+
+  const merged = { ...user };
+  const roleFields = [
+    'role', 'rol', 'cargo', 'appRole', 'roles', 'activeRoleOverride',
+    'rolesUpdatedAt', 'rolesUpdatedBy', 'roleSedes', 'sede'
+  ];
+  roleFields.forEach((field) => {
+    if (Object.hasOwn(profileData, field)) merged[field] = profileData[field];
+  });
+
+  const isSpecificRole = role => Boolean(role) &&
+    !['colaborador', 'miembro'].includes(String(role).trim().toLowerCase());
+  const configuredRoles = [
+    ...(Array.isArray(profileData.roles) ? profileData.roles : []),
+    profileData.role,
+    profileData.appRole
+  ].filter(isSpecificRole);
+  const hasConfiguredRoles = Boolean(
+    profileData.rolesUpdatedAt ||
+    profileData.rolesUpdatedBy ||
+    configuredRoles.length
+  );
+  if (hasConfiguredRoles) {
+    if (!Object.hasOwn(profileData, 'roles')) {
+      merged.roles = configuredRoles;
+    }
+    if (!profileData.role && !profileData.appRole) {
+      merged.role = configuredRoles[0] || 'miembro';
+    }
+  }
+  const normalized = normalizeUserRecord(merged, 'authenticated-profile');
+  return {
+    ...normalized,
+    roles: hasConfiguredRoles ? normalized.roles : fallbackRoles
   };
 };
 

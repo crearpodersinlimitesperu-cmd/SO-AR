@@ -7,11 +7,12 @@ import { normalizeRole, ROLE_DISPLAY_NAMES, findUserByAnyEmail } from '../data/u
 import { isSuperAdminEmail, isDireccionRole, isGerenciaRole, canSimulate, DUAL_ROLE_TRAINER_EMAILS } from '../config/permissions';
 import { useUI } from './UIContext';
 import { recordAuditEvent } from '../services/auditService';
-import { normalizeUserRecord } from '../utils/userNormalizer';
+import { mergeAuthenticatedRoleProfile, normalizeUserRecord } from '../utils/userNormalizer';
 import { enforceUserRolesAgent } from '../services/roleAgentDaemon';
 import { canonicalSede } from '../utils/sede';
 import { isInactiveTrainer } from '../data/trainerIdentity';
 import { createAuthStartupTrace } from '../utils/authStartupTiming';
+import { addConsolidatedRole, resolveActiveRole } from '../utils/activeRole';
 
 const AuthContext = createContext();
 
@@ -130,30 +131,31 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const switchRole = (newRole) => {
+  const switchRole = async (newRole) => {
     const canonicalNewRole = normalizeRole(newRole);
-    sessionStorage.setItem('cpsl_active_role', canonicalNewRole);
+    const userBeforeSwitch = currentUser;
+    if (!userBeforeSwitch) return;
 
-    // (07/09/2026) Confirmado explícitamente por José: hasta ahora este selector solo
-    // cambiaba el estado local de React (lo que se VE), nunca escribía a Firestore — así
-    // que cualquier acción protegida por firestore.rules (por ejemplo guardar en
-    // mj_calendars o gestionar managers_directory) seguía evaluándose con el rol
-    // "oficial" guardado en el login, sin importar qué eligiera la persona aquí. Este
-    // setDoc hace que el cambio sea real: guarda el rol elegido en users/{uid}, en un
-    // campo NUEVO y separado (activeRoleOverride) — nunca en "role", porque ese campo
-    // también lo usan SuperAdminPanel.jsx, GerenteDashboard.jsx, UserAuditReport.jsx y
-    // causa_sync_bot.mjs como el cargo oficial de la persona, no como su vista de
-    // sesión. Ver effectiveRole() en firestore.rules para el lado que lo consume.
-    // Es "fire and forget": no bloquea el cambio visual si la escritura tarda o falla
-    // (queda igual que antes en ese caso — decorativo pero sin romper la sesión), y el
-    // error se registra en consola para poder diagnosticarlo si pasa seguido.
-    if (auth.currentUser?.uid) {
-      setDoc(doc(db, 'users', auth.currentUser.uid), { activeRoleOverride: canonicalNewRole }, { merge: true })
-        .catch((err) => {
-          console.error('No se pudo guardar el rol activo en Firestore (el cambio de vista sigue funcionando localmente):', err);
-        });
+    const canSelectRole = userBeforeSwitch.isSuperAdmin ||
+      (userBeforeSwitch.roles || []).includes(canonicalNewRole);
+    if (!canSelectRole) {
+      showToast('No tienes asignado ese rol.', 'error');
+      return false;
     }
 
+    let persisted = false;
+    // Consolidated is a session view synthesized from multiple existing roles;
+    // Firestore only permits persisting overrides already present in the profile.
+    if (!userBeforeSwitch.isSimulated && canonicalNewRole !== 'consolidado' && auth.currentUser?.uid) {
+      try {
+        await setDoc(doc(db, 'users', auth.currentUser.uid), { activeRoleOverride: canonicalNewRole }, { merge: true });
+        persisted = true;
+      } catch (err) {
+        console.error('No se pudo guardar el rol activo en Firestore:', err);
+      }
+    }
+
+    sessionStorage.setItem('cpsl_active_role', canonicalNewRole);
     setCurrentUser(prev => {
       if (!prev) return null;
       const isConsolidated = canonicalNewRole === 'consolidado';
@@ -193,7 +195,13 @@ export function AuthProvider({ children }) {
 
       return updated;
     });
-    showToast(`Rol activo cambiado a: ${ROLE_DISPLAY_NAMES[canonicalNewRole] || canonicalNewRole}`, 'info');
+    showToast(
+      persisted || canonicalNewRole === 'consolidado' || userBeforeSwitch.isSimulated
+        ? `Rol activo cambiado a: ${ROLE_DISPLAY_NAMES[canonicalNewRole] || canonicalNewRole}`
+        : `Rol cambiado solo en esta sesión; no se pudo guardar la selección.`,
+      persisted || canonicalNewRole === 'consolidado' || userBeforeSwitch.isSimulated ? 'info' : 'warning'
+    );
+    return true;
   };
 
   const simulateUser = (targetUser) => {
@@ -291,6 +299,10 @@ export function AuthProvider({ children }) {
     if (hasSpecificDbRoles && Array.isArray(foundUser.roles) && foundUser.roles.length > 0) {
       // Roles explícitamente configurados en la base de datos Firestore
       assignedRoles = foundUser.roles.map(r => normalizeRole(r));
+    } else if (hasAdminUpdatedRoles) {
+      // Un perfil administrado no debe recuperar roles del catálogo ni del
+      // agente cuando el perfil autenticado no concede ninguno adicional.
+      assignedRoles = hasSpecificDbRole ? [canonicalRole] : [];
     } else if (officialProfile) {
       // Si el usuario existe en el catálogo corporativo maestro y no tiene roles en DB, sus roles oficiales mandan
       const baseOfficialRoles = (officialProfile.roles || [officialProfile.role]).map(r => normalizeRole(r));
@@ -393,27 +405,22 @@ export function AuthProvider({ children }) {
     const hasDireccion = assignedRoles.some(r => isDireccionRole(r)) || isDireccionRole(canonicalRole);
     const hasGerente = assignedRoles.some(r => isGerenciaRole(r)) || isGerenciaRole(canonicalRole);
 
+    assignedRoles = addConsolidatedRole(assignedRoles);
+
     const savedActiveRole = sessionStorage.getItem('cpsl_active_role');
-    
-    // Por defecto, SuperAdmin inicia SIEMPRE en 'consolidado' para ver todas las opciones sin límites
-    let activeRole = isSuperAdmin ? 'consolidado' : canonicalRole;
     // Dirección de Maestría es el cargo institucional principal de Andrés.
     // Una preferencia histórica de sesión como "coord_maestria" no debe
     // degradarlo al entrar; el cargo de coordinación permanece disponible en
     // el selector cuando necesite operar esa vista.
     const enforceDirectorMaestriaDefault = canonicalRole === 'director_maestria';
-    if (!enforceDirectorMaestriaDefault && savedActiveRole && (assignedRoles.includes(savedActiveRole) || isSuperAdmin)) {
-      activeRole = savedActiveRole;
-    // Si el usuario tiene múltiples roles (más de 1) debe tener acceso a "consolidado"
-    if (assignedRoles.length > 1 && !assignedRoles.includes('consolidado')) {
-      assignedRoles.push('consolidado');
-    }
-
-    } else if (isSuperAdmin) {
-      activeRole = 'consolidado';
-    } else if (assignedRoles.length > 0) {
-      activeRole = assignedRoles[0];
-    }
+    const activeRole = resolveActiveRole({
+      assignedRoles,
+      defaultRole: canonicalRole,
+      isSuperAdmin,
+      sessionRole: savedActiveRole,
+      persistedRole: foundUser.activeRoleOverride,
+      enforceDefaultRole: enforceDirectorMaestriaDefault
+    });
     const isConsolidated = activeRole === 'consolidado';
 
     // Para SuperAdmin, isDireccion y isGerente son SIEMPRE true; nunca se limitan
@@ -632,7 +639,11 @@ export function AuthProvider({ children }) {
           error => ({ error })
         )
       ]);
-      canonicalUser.roles = updatedRoles;
+      canonicalUser = mergeAuthenticatedRoleProfile(
+        canonicalUser,
+        profileResult.snapshot?.exists() ? profileResult.snapshot.data() : null,
+        updatedRoles
+      );
 
       // Persistir solo metadatos de perfil; los roles y la sede son administrados
       // por SuperAdmins y nunca se escriben desde el inicio de sesión del cliente.
@@ -746,13 +757,17 @@ export function AuthProvider({ children }) {
             
             // 🕵️‍♂️ AGENTE ONLINE: Validar y sanar multiroles 
             const [updatedRoles, profileResult] = await Promise.all([
-              startupTrace.measure('roles', () => enforceUserRolesAgent(user, canonicalUser.roles)),
+              startupTrace.measure('roles', () => enforceUserRolesAgent({ ...user, ...foundUser }, canonicalUser.roles)),
               startupTrace.measure('self-profile-read', () => getDoc(doc(db, 'users', user.uid))).then(
                 snapshot => ({ snapshot }),
                 error => ({ error })
               )
             ]);
-            canonicalUser.roles = updatedRoles;
+            canonicalUser = mergeAuthenticatedRoleProfile(
+              canonicalUser,
+              profileResult.snapshot?.exists() ? profileResult.snapshot.data() : null,
+              updatedRoles
+            );
 
             // Persistir solo metadatos de perfil, nunca roles ni sede.
             if (profileResult.error) throw profileResult.error;

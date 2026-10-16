@@ -21,6 +21,7 @@ import {
   updateDoc,
   where
 } from 'firebase/firestore';
+import { managerDocumentRef } from '../src/services/managerPersistence.js';
 
 let testEnv;
 
@@ -213,6 +214,25 @@ test('regresión: kpi_reports y managers_directory no cambian (sigue abierto a a
   await assertSucceeds(setDoc(doc(ent, 'managers_directory', 'm2'), { nombre: 'N' }));
   await assertSucceeds(updateDoc(doc(ent, 'managers_directory', 'm1'), { estado: 'Activo' }));
   await assertSucceeds(deleteDoc(doc(ent, 'managers_directory', 'm1')));
+});
+
+test('graduar manager actualiza y lee el documento real cuando id de catálogo difiere del docId', async () => {
+  await seed(['managers_directory', 'firestore-manager-key'], {
+    id: 'legacy-catalog-key',
+    nombre: 'Manager de prueba',
+    sede: 'Quito',
+    estado: 'Activo'
+  });
+  const db = dbOf('coord-1');
+  const manager = { id: 'legacy-catalog-key', docId: 'firestore-manager-key' };
+  const ref = managerDocumentRef(db, manager);
+
+  await assertSucceeds(setDoc(ref, { id: manager.id, estado: 'Graduado' }, { merge: true }));
+
+  const saved = await assertSucceeds(getDoc(ref));
+  assert.equal(saved.data().estado, 'Graduado');
+  const stalePath = await assertSucceeds(getDoc(doc(db, 'managers_directory', manager.id)));
+  assert.equal(stalePath.exists(), false);
 });
 
 test('staff_directory keeps both first-login email query forms unchanged', async () => {
