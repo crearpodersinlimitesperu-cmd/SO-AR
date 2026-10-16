@@ -80,6 +80,21 @@ test('authenticated profile roles override stale lookup roles without adding inf
   assert.equal(merged.rolesUpdatedBy, 'authorized-admin');
 });
 
+test('authenticated profile replaces an old primary role when roles are explicitly configured', () => {
+  const user = normalizeUserRecord({
+    email: 'someone@example.test',
+    role: 'gerente',
+    roles: ['gerente']
+  });
+  const merged = mergeAuthenticatedRoleProfile(user, {
+    roles: ['coord_maestria'],
+    rolesUpdatedBy: 'authorized-admin'
+  }, ['gerente']);
+
+  assert.deepEqual(merged.roles, ['coord_maestria']);
+  assert.equal(merged.role, 'coord_maestria');
+});
+
 test('authenticated profile active-role selection survives reload only for an assigned role', () => {
   const user = normalizeUserRecord({
     email: 'daniela@example.test',
@@ -117,6 +132,30 @@ test('admin-configured empty profile does not inherit lookup roles', () => {
   }, ['gerente', 'consolidado']);
 
   assert.deepEqual(merged.roles, ['miembro']);
+});
+
+test('metadata-only UID profile keeps normalized lookup identity and roles intact', () => {
+  const lookup = normalizeUserRecord({
+    id: 'directory-key',
+    uid: 'firebase-uid',
+    email: 'ana@example.test',
+    name: 'Ana',
+    role: 'coord_maestria',
+    roles: ['coord_maestria'],
+    activeRoleOverride: 'coord_maestria'
+  });
+  const merged = mergeAuthenticatedRoleProfile(lookup, {
+    uid: 'firebase-uid',
+    email: 'ana@example.test',
+    name: 'Ana'
+  }, lookup.roles);
+
+  assert.equal(merged.id, lookup.id);
+  assert.equal(merged.uid, lookup.uid);
+  assert.equal(merged.email, lookup.email);
+  assert.equal(merged.name, lookup.name);
+  assert.deepEqual(merged.roles, lookup.roles);
+  assert.equal(merged.activeRoleOverride, null);
 });
 
 test('explicit profile role array is not merged with an unlisted lookup primary role', () => {

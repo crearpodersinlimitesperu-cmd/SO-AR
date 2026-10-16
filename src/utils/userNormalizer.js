@@ -175,11 +175,17 @@ export const normalizeUserRecord = (data, source = 'unknown') => {
 export const mergeAuthenticatedRoleProfile = (user, profileData, fallbackRoles) => {
   if (!profileData) return { ...user, roles: fallbackRoles };
 
-  const merged = { ...user };
   const roleFields = [
     'role', 'rol', 'cargo', 'appRole', 'roles', 'activeRoleOverride',
     'rolesUpdatedAt', 'rolesUpdatedBy', 'roleSedes', 'sede'
   ];
+  if (!roleFields.some(field => Object.hasOwn(profileData, field))) {
+    const merged = { ...user, roles: fallbackRoles };
+    if (Object.hasOwn(user, 'activeRoleOverride')) merged.activeRoleOverride = null;
+    return merged;
+  }
+
+  const merged = { ...user };
   roleFields.forEach((field) => {
     if (Object.hasOwn(profileData, field)) merged[field] = profileData[field];
   });
@@ -207,6 +213,8 @@ export const mergeAuthenticatedRoleProfile = (user, profileData, fallbackRoles) 
   const normalized = normalizeUserRecord(merged, 'authenticated-profile');
   return {
     ...normalized,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
     roles: hasConfiguredRoles ? normalized.roles : fallbackRoles
   };
 };

@@ -143,15 +143,21 @@ export function AuthProvider({ children }) {
       return false;
     }
 
-    let persisted = false;
+    let persisted = canonicalNewRole === 'consolidado' || userBeforeSwitch.isSimulated;
     // Consolidated is a session view synthesized from multiple existing roles;
     // Firestore only permits persisting overrides already present in the profile.
-    if (!userBeforeSwitch.isSimulated && canonicalNewRole !== 'consolidado' && auth.currentUser?.uid) {
+    if (!userBeforeSwitch.isSimulated && canonicalNewRole !== 'consolidado') {
+      if (!auth.currentUser?.uid) {
+        showToast('No se pudo confirmar el rol en Firestore; no se cambió el rol activo.', 'error');
+        return false;
+      }
       try {
         await setDoc(doc(db, 'users', auth.currentUser.uid), { activeRoleOverride: canonicalNewRole }, { merge: true });
         persisted = true;
       } catch (err) {
         console.error('No se pudo guardar el rol activo en Firestore:', err);
+        showToast('No se pudo confirmar el rol en Firestore; no se cambió el rol activo.', 'error');
+        return false;
       }
     }
 
@@ -196,10 +202,8 @@ export function AuthProvider({ children }) {
       return updated;
     });
     showToast(
-      persisted || canonicalNewRole === 'consolidado' || userBeforeSwitch.isSimulated
-        ? `Rol activo cambiado a: ${ROLE_DISPLAY_NAMES[canonicalNewRole] || canonicalNewRole}`
-        : `Rol cambiado solo en esta sesión; no se pudo guardar la selección.`,
-      persisted || canonicalNewRole === 'consolidado' || userBeforeSwitch.isSimulated ? 'info' : 'warning'
+      `Rol activo cambiado a: ${ROLE_DISPLAY_NAMES[canonicalNewRole] || canonicalNewRole}`,
+      persisted ? 'info' : 'warning'
     );
     return true;
   };
