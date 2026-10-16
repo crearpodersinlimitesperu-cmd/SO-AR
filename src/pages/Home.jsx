@@ -4,7 +4,8 @@ import ModuleQuickAccess from '../components/ModuleQuickAccess';
 import ModuleHelpButton from '../components/ModuleHelpButton';
 import HomeModuleWorkspace from '../components/HomeModuleWorkspace';
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { resolveTaskLink } from '../services/taskNavigation';
 import { useAuth } from '../context/AuthContext';
 import { useCycles } from '../context/CyclesContext';
 import { useChecklist } from '../context/ChecklistContext';
@@ -1091,6 +1092,33 @@ export default function Home() {
   }, []);
 
   // Manejo de clic sobre una notificación para llevar SI O SI a la tarea
+  const [taskLinkParams, setTaskLinkParams] = useSearchParams();
+  const linkedTaskId = taskLinkParams.get('taskId');
+  useEffect(() => {
+    if (!linkedTaskId || !currentUser || loadingTasks) return;
+    let cancelled = false;
+    resolveTaskLink(linkedTaskId, allTasks || [], currentUser, async id => {
+      const snapshot = await getDoc(doc(db, 'tasks', id));
+      return snapshot.exists() ? { ...snapshot.data(), id: snapshot.id } : null;
+    }).then(task => {
+      if (cancelled) return;
+      setSelectedTaskForDetail(task);
+      setShowTaskDetailModal(true);
+    }).catch(error => {
+      if (cancelled) return;
+      console.error('No se pudo abrir el enlace de tarea:', error);
+      showToast('Esta tarea ya no existe o no tienes acceso a ella.', 'error');
+    }).finally(() => {
+      if (cancelled) return;
+      setTaskLinkParams(previous => {
+        const next = new URLSearchParams(previous);
+        next.delete('taskId');
+        return next;
+      }, { replace: true });
+    });
+    return () => { cancelled = true; };
+  }, [linkedTaskId, currentUser, loadingTasks, allTasks, setTaskLinkParams, showToast]);
+
   const handleNotificationClick = async (notif) => {
     if (!notif) return;
 
@@ -1111,31 +1139,25 @@ export default function Home() {
 
     // 3a. Por taskId exacto en allTasks
     if (notif.taskId && allTasks && allTasks.length > 0) {
-      targetTask = allTasks.find(t => t.id === notif.taskId);
+      targetTask = allTasks.find(t => t.id === notif.taskId && isTaskVisibleForUser(t, currentUser));
     }
 
     // 3b. Por título / nombre de tarea
-    if (!targetTask && notif.type !== 'schedule_update' && notif.title && allTasks && allTasks.length > 0) {
+    if (!targetTask && !notif.taskId && notif.type !== 'schedule_update' && notif.title && allTasks && allTasks.length > 0) {
       const notifTitleNorm = notif.title.toLowerCase().trim();
       targetTask = allTasks.find(t => {
         const taskName = (t.task || t.title || '').toLowerCase().trim();
-        return taskName && (taskName === notifTitleNorm || notifTitleNorm.includes(taskName) || taskName.includes(notifTitleNorm));
+        return isTaskVisibleForUser(t, currentUser) && taskName && (taskName === notifTitleNorm || notifTitleNorm.includes(taskName) || taskName.includes(notifTitleNorm));
       });
     }
 
     // 3c. Si no está en memoria pero tiene taskId, consultar Firestore directamente
     if (!targetTask && notif.taskId) {
       try {
-        const snap = await getDoc(doc(db, 'checklist_tasks', notif.taskId));
+        const snap = await getDoc(doc(db, 'tasks', notif.taskId));
         if (snap.exists()) {
           const candidate = { id: snap.id, ...snap.data() };
           if (isTaskVisibleForUser(candidate, currentUser)) targetTask = candidate;
-        } else {
-          const snap2 = await getDoc(doc(db, 'tasks', notif.taskId));
-          if (snap2.exists()) {
-            const candidate = { id: snap2.id, ...snap2.data() };
-            if (isTaskVisibleForUser(candidate, currentUser)) targetTask = candidate;
-          }
         }
       } catch (err) {
         console.warn("Error obteniendo tarea desde Firestore:", err);

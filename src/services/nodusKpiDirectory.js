@@ -6,6 +6,9 @@ const SOURCE_ROLE = {
 
 export function operationalRole(role) {
   const normalizedRole = (role || '').toLowerCase();
+  if (normalizedRole === 'ceo' || normalizedRole === 'cco') {
+    return { tabCategory: 'ejecutivo', roleName: normalizedRole === 'ceo' ? 'Dirección ejecutiva (CEO)' : 'Dirección operativa (CCO)' };
+  }
   if (normalizedRole.includes('maestria') || normalizedRole.includes('mj') || normalizedRole.includes('director_maestria')) {
     return { tabCategory: 'mj', roleName: 'Coordinador Maestría del Juego (CMJ)' };
   }
