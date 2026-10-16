@@ -193,10 +193,14 @@ test('actual task context persists location, updates reminders and reads links; 
       const task = window.fixtureApi.tasks.find(task => task.isCustom);
       const saved = await window.fixtureApi.editCustomTask(task.id, { location: '' });
       return { saved, task: window.fixtureStore.get('tasks/' + task.id),
+        mail: [...window.fixtureStore].filter(([key]) => key.startsWith('mail/')).at(-1)[1],
         notification: [...window.fixtureStore].filter(([key]) => key.startsWith('notifications/')).at(-1)[1] };
     });
     assert.equal(cleared.saved, true);
     assert.equal(cleared.task.location, '');
+    assert.equal(cleared.mail.calendarEvent.location, '');
+    assert.match(cleared.mail.message.html, /Ubicación no declarada/);
+    assert.doesNotMatch(cleared.mail.message.html, /Sala B/);
     assert.match(cleared.notification.message, /Ubicación no declarada/);
 
     const failed = await page.evaluate(async () => {

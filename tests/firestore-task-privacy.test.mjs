@@ -72,8 +72,11 @@ test('declared location survives create/edit/readback without exposing a task to
   await assertSucceeds(updateDoc(ref, { location: 'Sala B' }));
   const recipientRef = doc(userDb('recipient', 'recipient@example.com'), 'tasks', 'custom_location');
   assert.equal((await assertSucceeds(getDoc(recipientRef))).data().location, 'Sala B');
-  await assertFails(getDoc(doc(userDb('other', 'other@example.com'), 'tasks', 'custom_location')));
-  await assertFails(updateDoc(recipientRef, { location: 'Changed without ownership' }));
+  const unrelatedRef = doc(userDb('other', 'other@example.com'), 'tasks', 'custom_location');
+  await assertFails(getDoc(unrelatedRef));
+  await assertFails(updateDoc(unrelatedRef, { location: 'Changed without authorization' }));
+  await assertSucceeds(updateDoc(recipientRef, { location: 'Sala C' }));
+  assert.equal((await assertSucceeds(getDoc(ref))).data().location, 'Sala C');
   await assertSucceeds(updateDoc(ref, { location: '' }));
   assert.equal((await assertSucceeds(getDoc(recipientRef))).data().location, '');
 });

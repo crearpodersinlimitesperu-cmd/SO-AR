@@ -44,6 +44,11 @@ Dirección CEO / CCO**, cada sede muestra el período entre los inicios C1
 seleccionados, cuántos de seis equipos constan en el calendario y cuántos tienen
 ambos reportes C1/C2 legibles. No se afirma que esos seis sean todo el histórico
 de Nodus si la fuente accesible está incompleta.
+`CyclesContext` combina Apps Script y la hoja oficial sin filtrar fechas pasadas,
+con proyecciones públicas de asignación/operación y caché local como respaldo.
+La selección descarta futuros, pero no acredita retención histórica completa ni
+frescura del calendario en caché; si solo quedan futuros, muestra 0/6, no los
+presenta como los últimos equipos históricos.
 
 Los conteos requieren snapshot fechado de menos de dos horas (política existente
 `snapshotFreshness`), una coincidencia única sede/equipo/etapa y registros
@@ -82,7 +87,11 @@ incluyendo el `ChecklistProvider` real con transporte Firestore simulado.
 Comprueba creación, edición, lectura, ubicación en notificaciones/correo,
 enlace con aislamiento de identidad, rechazo de escritura y cobertura ausente.
 `test:rules` añade lectura/edición/borrado de ubicación en Emulator y rechazo
-para identidades ajenas y destinatarios sin propiedad. CI ejecuta ambas capas.
+de lectura y escritura para identidades ajenas. Las reglas existentes consideran
+propietarios operativos a los destinatarios asignados (`isOwner`), por lo que
+pueden editar la ubicación, además del creador/asignador. Esta PR conserva ese
+contrato y lo comprueba con lectura posterior; no restringe sus flujos de
+edición/evidencias. CI ejecuta ambas capas.
 Estas comprobaciones no escriben en producción.
 
 Pendientes que esta PR **no cierra**: ranking agregado real; revisión del
