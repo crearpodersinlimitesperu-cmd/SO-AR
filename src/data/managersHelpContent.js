@@ -34,6 +34,7 @@ export const managersFieldHelp = {
 };
 
 export const managersActionHelp = {
+  recargarDirectorio: help('Reintentar conexión', 'Vuelve a consultar Firestore. No restaura catálogos antiguos ni modifica registros del directorio.'),
   inicio: help('Volver a Inicio', 'Regresa al inicio de Causa OS. Guarda primero los cambios pendientes del formulario.'),
   vistaRol: help('Cambiar vista', 'Alterna entre tu vista de entrenador y corporativa si tienes doble rol. No cambia tu identidad ni tus permisos.'),
   cerrar: help('Cerrar', 'Cierra este panel. Si hay un formulario abierto, guarda primero los cambios que quieras conservar.'),

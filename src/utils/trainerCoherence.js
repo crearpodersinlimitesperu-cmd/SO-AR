@@ -1,7 +1,7 @@
 const text = value => String(value ?? '').trim();
 const key = value => text(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ');
 
-export const coherenceSede = value => key(value).replace(/^(mexico|ciudad de mexico)$/, 'cdmx')
+export const coherenceSede = value => key(value).replace(/^(mex|mexico|ciudad de mexico)$/, 'cdmx')
   .replace(/^gye$/, 'guayaquil').replace(/^uio$/, 'quito');
 export const coherenceTeam = row => text(row.numEquipo ?? row.equipoNum) || key(row.equipo || row.nombreEquipo);
 export const hasTrainerIdentity = row => Boolean(text(row.entrenadorId) || text(row.entrenadorEmail));

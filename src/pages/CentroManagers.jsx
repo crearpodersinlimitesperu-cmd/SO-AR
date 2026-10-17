@@ -25,7 +25,6 @@ import {
   canViewInactiveUsers
 } from '../config/permissions';
 import { 
-  INITIAL_MANAGERS, 
   INITIAL_LLAMADOS, 
   ENTRENADORES_LIST, 
   ENTRENADORES_INACTIVOS_LIST,
@@ -60,7 +59,8 @@ import { buildTeamKeyResolver } from '../utils/teamGrouping';
 import defaultKpisData from '../data/kpisEntrenadoresData.json';
 import { ManagersHelpProvider, ManagersQuickGuide, ManagersHelpMode, HelpButton, HelpInput, HelpSelect, HelpTextarea, HelpLink, HelpSortHeader } from '../components/ManagersHelp';
 import { getManagersGuideRole, managersTabHelpKeys } from '../data/managersHelpContent';
-import { managerDocumentRef } from '../services/managerPersistence';
+import { managerDocumentRef, managerNoteMatches } from '../services/managerPersistence';
+import { manualManagerPatch } from '../services/managerSyncPolicy';
 
 
 const SEDE_COLORS = {
@@ -219,75 +219,41 @@ export default function CentroManagers() {
   const [managers, setManagers] = useState([]);
   const [llamadosData, setLlamadosData] = useState([]);
   const [isLoadingData, setIsLoadingData] = useState(true);
+  const [managersError, setManagersError] = useState('');
+  const [managersReload, setManagersReload] = useState(0);
 
   useEffect(() => {
+    setManagers([]);
+    setIsLoadingData(true);
+    setManagersError('');
     if (!currentUser) return;
     
-    const isGlobal = canViewAllManagers(currentUser) || isDireccionRole(currentUser) || ['jose.sanchez@crearpsl.net', 'armando.pilacuan@gmail.com', 'paul.sosa@crearpsl.net'].includes(currentUser?.email?.toLowerCase());
     const baseCol = collection(db, 'managers_directory');
     // Cargar coleccion completa: CentroManagers aplica filtrado fino y jerarquico en filteredManagers
     // Esto previene que ligeras variantes en el texto de la sede (ej. 'Quito' vs 'Quito Ciclo 1') dejen en blanco la vista.
     const q = baseCol;
 
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    const unsubscribe = onSnapshot(q, { includeMetadataChanges: true }, (querySnapshot) => {
+      // A cached empty/old collection is not confirmation of the current directory.
+      if (querySnapshot.metadata.fromCache) {
+        setIsLoadingData(true);
+        return;
+      }
+      if (querySnapshot.metadata.hasPendingWrites) return;
       const firestoreManagers = [];
       querySnapshot.forEach((doc) => {
         const data = doc.data() || {};
         firestoreManagers.push({
           ...data,
-          id: data.id ?? doc.id,
-          docId: doc.id
+          id: doc.id,
+          docId: doc.id,
+          _legacyDirectoryId: data.id ?? null
         });
       });
 
-      // Merge inteligente y CERO DUPLICADOS:
-      // Si el mismo colaborador existe en el catálogo inicial y en Firestore, o si hay documentos duplicados en Firestore,
-      // se consolida en un único registro canónico priorizando Firestore y el registro más actualizado.
-      const canonicalMap = new Map();
-
-      const getCanonicalKey = (m) => {
-        const cleanName = (m.nombre || '').normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
-        const cleanSede = normalizeSede(m.sede || '').toLowerCase();
-        const cleanTeam = (m.equipo || '').trim().toLowerCase();
-        return `${cleanSede}__${cleanTeam}__${cleanName}`;
-      };
-
-      // 1. Base del catálogo inicial
-      INITIAL_MANAGERS.forEach(initM => {
-        const key = getCanonicalKey(initM);
-        if (key && !canonicalMap.has(key)) {
-          canonicalMap.set(key, initM);
-        }
-      });
-
-      // 2. Fusionar con firestoreManagers (Firestore siempre manda y sobreescribe datos base)
-      firestoreManagers.forEach(fm => {
-        const key = getCanonicalKey(fm);
-        if (!key) return;
-        if (!canonicalMap.has(key)) {
-          canonicalMap.set(key, fm);
-        } else {
-          const prev = canonicalMap.get(key);
-          const merged = {
-            ...prev,
-            ...fm,
-            id: fm.id ?? prev.id,
-            docId: fm.docId || prev.docId,
-            estado: (fm.estado || '').trim() ? fm.estado : prev.estado,
-            llamadaFecha: fm.llamadaFecha || prev.llamadaFecha,
-            llamadaAsistio: fm.llamadaAsistio || prev.llamadaAsistio,
-            telefono: fm.telefono || prev.telefono,
-            entrenador: Object.hasOwn(fm, 'entrenador') ? fm.entrenador : prev.entrenador
-          };
-          canonicalMap.set(key, merged);
-        }
-      });
-
-      const mergedManagers = Array.from(canonicalMap.values());
-
-
-      // Mapear y normalizar
-      const normalized = mergedManagers.map(m => ({
+      // Only persisted documents are editable. Do not resurrect static catalogue
+      // entries or collapse distinct document identities by mutable name/team.
+      const normalized = firestoreManagers.map(m => ({
         ...m,
         estado: normalizeManagerEstado(m.estado),
         entrenador: normalizeTrainer(m.entrenador),
@@ -295,43 +261,17 @@ export default function CentroManagers() {
         sede: normalizeSede(m.sede)
       }));
       setManagers(normalized);
+      setManagersError('');
       setIsLoadingData(false);
     }, (error) => {
       console.error("Error fetching managers from Firestore in real-time:", error);
-      // Fallback a localStorage si falla la conexión
-      const saved = localStorage.getItem('cpsl_managers_data_v3');
-      let loaded = false;
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            setManagers(parsed.map(m => ({
-              ...m,
-              estado: normalizeManagerEstado(m.estado),
-              entrenador: normalizeTrainer(m.entrenador),
-              coordinador: normalizeCoordinator(m.coordinador),
-              sede: normalizeSede(m.sede)
-            })));
-            loaded = true;
-          }
-        } catch (e) {
-          console.error("Error parsing saved managers:", e);
-        }
-      }
-      if (!loaded) {
-        setManagers(INITIAL_MANAGERS.map(m => ({
-          ...m,
-          estado: normalizeManagerEstado(m.estado),
-          entrenador: normalizeTrainer(m.entrenador),
-          coordinador: normalizeCoordinator(m.coordinador),
-          sede: normalizeSede(m.sede)
-        })));
-      }
+      setManagers([]);
+      setManagersError('No se pudo verificar el directorio en Firestore. No mostraremos datos antiguos como si fueran actuales. Reintenta la conexión.');
       setIsLoadingData(false);
     });
 
     return () => unsubscribe();
-  }, [currentUser]);
+  }, [currentUser, managersReload]);
 
   // (02/09/2026) Historial de llamadas grupales — cada llamada registrada queda como
   // un documento nuevo (nunca se sobrescribe), para poder contar cuántas lleva cada
@@ -666,6 +606,7 @@ export default function CentroManagers() {
 
   // Modal para editar integrante individual (Manager o Capitán)
   const [editIndividualModal, setEditIndividualModal] = useState(null);
+  const [isSavingIndividual, setIsSavingIndividual] = useState(false);
 
   // Modal de confirmación para eliminar
   const [deleteConfirm, setDeleteConfirm] = useState(null);
@@ -1238,41 +1179,6 @@ export default function CentroManagers() {
     return { total, graduados, desertores, activos, pct };
   }, [managers, viewAsTrainer, canViewAll, canViewOwnSede, currentTrainerName, currentUser]);
 
-  const handleResetMasterData = async () => {
-    if (window.confirm("¿Deseas restablecer la lista completa de managers originales desde la base maestra a LA NUBE? Esto sobreescribirá la base de datos.")) {
-      try {
-        showToast('Subiendo datos a la nube... por favor espera', 'info');
-        const batchArray = [];
-        batchArray.push(writeBatch(db));
-        let operationCounter = 0;
-        let batchIndex = 0;
-        
-        for (const m of INITIAL_MANAGERS) {
-          const docRef = doc(db, 'managers_directory', m.id.toString());
-          batchArray[batchIndex].set(docRef, m);
-          operationCounter++;
-          
-          if (operationCounter === 490) {
-            batchArray.push(writeBatch(db));
-            batchIndex++;
-            operationCounter = 0;
-          }
-        }
-        
-        for (const batch of batchArray) {
-          await batch.commit();
-        }
-        
-        setManagers(INITIAL_MANAGERS);
-        localStorage.removeItem('cpsl_managers_data_v3');
-        showToast('✅ Datos maestros subidos a Firebase con éxito', 'success');
-      } catch (error) {
-        console.error(error);
-        showToast('Error subiendo a Firebase', 'error');
-      }
-    }
-  };
-
   // Acciones
   const handleUpdateManagerField = async (id, field, value) => {
     if (field === 'entrenador' && !userCanAssign) {
@@ -1289,24 +1195,16 @@ export default function CentroManagers() {
       : value;
       
     try {
-      const targetManager = managers.find(m => m.id === id) || { id };
+      const targetManager = managers.find(m => m.id === id);
       const docRef = managerDocumentRef(db, targetManager);
       
-      // FIX: Only send fields that exist and are not undefined to prevent Firebase errors
-      // Also ensure we include the core identity fields if upserting a new document
-      const cleanData = {
-        id: targetManager.id || id,
-        nombre: targetManager.nombre || '',
-        equipo: targetManager.equipo || '',
-        sede: targetManager.sede || '',
-        [field]: finalValue
-      };
+      const cleanData = { [field]: finalValue };
       if (field === 'entrenador') assertLegacyTrainerEdit(targetManager, finalValue);
       
       // Remove any strictly undefined fields (Firestore throws if passed undefined)
       Object.keys(cleanData).forEach(key => cleanData[key] === undefined && delete cleanData[key]);
 
-      await setDoc(docRef, cleanData, { merge: true });
+      await updateDoc(docRef, manualManagerPatch(targetManager, cleanData));
       
       setManagers(prev => prev.map(m => m.id === id ? { ...m, [field]: finalValue } : m));
       
@@ -1330,21 +1228,9 @@ export default function CentroManagers() {
 
   const handleUpdateLlamada = async (id, fecha, asistio) => {
     try {
-      const targetManager = managers.find(m => m.id === id) || { id };
+      const targetManager = managers.find(m => m.id === id);
       const docRef = managerDocumentRef(db, targetManager);
-      // (02/09/2026) FIX: antes se escribía el manager completo con
-      // setDoc({...targetManager, llamadaFecha, llamadaAsistio}, {merge:true}).
-      // "managers" es una MEZCLA de INITIAL_MANAGERS (catálogo estático) +
-      // Firestore + valores normalizados (normalizeTrainer/Coordinator/Sede),
-      // así que casi siempre trae campos que no existen o no coinciden
-      // exactamente con el documento real en Firestore. Eso hacía que
-      // request.resource.data.diff(resource.data).affectedKeys() incluyera
-      // MUCHOS más campos que llamadaFecha/llamadaAsistio, violando el
-      // hasOnly(['llamadaFecha','llamadaAsistio']) de firestore.rules para
-      // cualquiera que no sea SuperAdmin/Gerencia/Coordinación de Maestría —
-      // es decir, fallaba (permission-denied) para entrenadores y
-      // entrenadores de llamadas, que son justo quienes deben poder guardar
-      // esto. Ahora se actualizan SOLO esos dos campos.
+      // Attendance edits must not rewrite normalized identity or assignment fields.
       try {
         await updateDoc(docRef, { llamadaFecha: fecha, llamadaAsistio: asistio });
       } catch (updateErr) {
@@ -1498,6 +1384,7 @@ export default function CentroManagers() {
     await addDoc(collection(db, 'notas_seguimiento'), {
       tipo, // 'individual' | 'grupal'
       managerId: managerId || null,
+      managerDocId: tipo === 'individual' ? managerId || null : null,
       managerNombre: managerNombre || null,
       equipoKey: equipoKey || null,
       equipo: equipo || null,
@@ -2026,9 +1913,8 @@ export default function CentroManagers() {
         const currentNormState = normalizeManagerEstado(m.estado);
         const finalEstado = currentNormState === 'Activo' ? 'Graduado' : m.estado;
 
-        // Payload limpio con merge: true para que cree el documento si no existe o actualice si existe
+        // Update only this operation's fields; never upsert a missing member.
         const payload = {
-          ...m,
           estado: finalEstado,
           estadoAntesCierreLiquidacion: m.estado || 'Activo',
           cierreLiquidacionActivo: true,
@@ -2043,7 +1929,7 @@ export default function CentroManagers() {
           if (payload[k] === undefined) delete payload[k];
         });
 
-        batch.set(docRef, payload, { merge: true });
+        batch.update(docRef, manualManagerPatch(m, payload));
       });
 
       await batch.commit();
@@ -2123,14 +2009,14 @@ export default function CentroManagers() {
         const estadoRestaurado = estadoAnterior || (
           normalizeManagerEstado(m.estado) === 'Graduado' ? 'Activo' : m.estado
         );
-        batch.set(docRef, {
+        batch.update(docRef, manualManagerPatch(m, {
           estado: estadoRestaurado || 'Activo',
           cierreLiquidacionActivo: false,
           cierreLiquidacionReabiertoFecha: nowISO,
           cierreLiquidacionReabiertoPorNombre: userName,
           cierreLiquidacionReabiertoPorEmail: userEmail,
           estadoAntesCierreLiquidacion: deleteField()
-        }, { merge: true });
+        }));
       });
 
       // Un disparador de cierre previo no debe mantener al equipo en la cola;
@@ -2221,8 +2107,7 @@ export default function CentroManagers() {
 
     try {
       const docRef = doc(db, 'managers_directory', created.id.toString());
-      await setDoc(docRef, created);
-      setManagers(prev => [created, ...prev]);
+      await setDoc(docRef, manualManagerPatch(null, created));
 
     } catch(e) {
       console.error('Error guardando manager en Firebase:', e);
@@ -2318,11 +2203,10 @@ export default function CentroManagers() {
       const batch = writeBatch(db);
       newRecords.forEach(record => {
         const docRef = doc(db, 'managers_directory', record.id.toString());
-        batch.set(docRef, record);
+        batch.set(docRef, manualManagerPatch(null, record));
       });
       await batch.commit();
 
-      setManagers(prev => [...newRecords, ...prev]);
     } catch(e) {
       console.error('Error guardando equipo en la nube:', e);
       return showToast(`Error guardando el equipo en la nube: ${e?.message || 'Error de permisos o red'}`, 'error');
@@ -2447,7 +2331,10 @@ export default function CentroManagers() {
       updatedMembers.forEach(member => {
         const docKey = String(member.docId || member.id);
         const docRef = doc(db, 'managers_directory', docKey);
-        batch.set(docRef, member, { merge: true });
+        const existing = managers.find(m => String(m.docId || m.id) === docKey);
+        const payload = manualManagerPatch(existing, member);
+        if (existing) batch.update(docRef, payload);
+        else batch.set(docRef, payload);
       });
 
       await batch.commit();
@@ -2610,7 +2497,7 @@ export default function CentroManagers() {
           updatePayload.tieneEntrenador = 'Si';
         }
 
-        batch.set(docRef, updatePayload, { merge: true });
+        batch.update(docRef, manualManagerPatch(m, updatePayload));
       });
 
       await batch.commit();
@@ -2681,13 +2568,14 @@ export default function CentroManagers() {
   // Guardar edición individual
   const handleSaveEditIndividual = async (e) => {
     e.preventDefault();
-    if (!editIndividualModal) return;
+    if (!editIndividualModal || isSavingIndividual) return;
     if (!editIndividualModal.nombre.trim()) return showToast('El nombre es obligatorio', 'error');
 
     const finalTrainers = editIndividualModal.selectedTrainers && editIndividualModal.selectedTrainers.length > 0
       ? editIndividualModal.selectedTrainers.map(t => normalizeTrainer(t)).filter(Boolean).join(', ')
       : '';
 
+    setIsSavingIndividual(true);
     try {
       const trainerToUse = userCanAssign ? finalTrainers : editIndividualModal.entrenador;
       assertLegacyTrainerEdit(managers.find(m => String(m.id) === String(editIndividualModal.id)), trainerToUse);
@@ -2704,13 +2592,16 @@ export default function CentroManagers() {
         estado: canChangeStatus ? (editIndividualModal.estado || 'Activo') : editIndividualModal.estado
       };
 
-      const docRef = managerDocumentRef(db, editIndividualModal);
-      await setDoc(docRef, updatedData, { merge: true });
+      const original = managers.find(m => String(m.id) === String(editIndividualModal.id));
+      const docRef = managerDocumentRef(db, original);
+      await updateDoc(docRef, manualManagerPatch(original, updatedData));
 
       setManagers(prev => prev.map(m => m.id === editIndividualModal.id ? { ...m, ...updatedData } : m));
     } catch(e) {
       console.error(e);
-      return showToast('Error actualizando integrante en la nube', 'error');
+      return showToast('No se guardaron los cambios en la nube. Revisa la conexión y los permisos; el formulario sigue abierto.', 'error');
+    } finally {
+      setIsSavingIndividual(false);
     }
 
     recordAuditEvent({
@@ -2726,7 +2617,8 @@ export default function CentroManagers() {
   // Eliminar manager individual
   const handleDeleteManager = async (id) => {
     try {
-      const docRef = doc(db, 'managers_directory', id.toString());
+      const manager = managers.find(m => m.id === id);
+      const docRef = managerDocumentRef(db, manager);
       await deleteDoc(docRef);
       
       setManagers(prev => prev.filter(m => m.id !== id));
@@ -2753,7 +2645,7 @@ export default function CentroManagers() {
       if (toDelete.length > 0) {
         const batch = writeBatch(db);
         toDelete.forEach(m => {
-          const docRef = doc(db, 'managers_directory', m.id.toString());
+          const docRef = managerDocumentRef(db, m);
           batch.delete(docRef);
         });
         await batch.commit();
@@ -2891,6 +2783,21 @@ export default function CentroManagers() {
   const textMuted = "#64748b";
   const borderLight = "#e2e8f0";
 
+  if (isLoadingData || managersError) {
+    return (
+      <ManagersHelpProvider>
+      <main style={{ padding: '2rem', maxWidth: '720px', margin: 'auto' }}>
+        <h1>Centro de Managers</h1>
+        <p role={managersError ? 'alert' : 'status'}>
+          {managersError || 'Verificando datos actuales del directorio en Firestore…'}
+        </p>
+        <HelpButton helpKey="recargarDirectorio" onClick={() => setManagersReload(value => value + 1)}>Reintentar conexión</HelpButton>
+        <HelpButton helpKey="inicio" onClick={() => navigate('/home')}>Volver al inicio</HelpButton>
+      </main>
+      </ManagersHelpProvider>
+    );
+  }
+
   return (
     <ManagersHelpProvider>
     <div style={{ minHeight: '100vh', background: bgLight, color: textDark, paddingBottom: '4rem', fontFamily: 'Inter, system-ui, sans-serif' }}>
@@ -2902,6 +2809,9 @@ export default function CentroManagers() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <HelpButton helpKey="inicio" onClick={() => navigate('/home')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.4rem 0.8rem', fontSize: '0.85rem', color: textDark, borderColor: borderLight }}>
               <ArrowLeft size={16} /> Inicio
+            </HelpButton>
+            <HelpButton helpKey="recargarDirectorio" onClick={() => setManagersReload(value => value + 1)} className="btn-secondary" style={{ color: textDark, borderColor: borderLight }}>
+              Actualizar directorio
             </HelpButton>
             <div>
               <h1 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#d97706', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -5855,7 +5765,7 @@ export default function CentroManagers() {
 
               <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '1rem' }}>
                 <HelpButton helpKey="cancelar" type="button" onClick={() => setEditIndividualModal(null)} style={{ padding: '0.6rem 1.2rem', borderRadius: '8px', border: `1px solid ${borderLight}`, background: '#fff', color: textDark, fontWeight: 600, cursor: 'pointer' }}>Cancelar</HelpButton>
-                <HelpButton helpKey="guardarCambios" type="submit" style={{ padding: '0.6rem 1.5rem', borderRadius: '8px', border: 'none', background: '#3b82f6', color: '#fff', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 4px rgba(59,130,246,0.3)' }}>Guardar Cambios</HelpButton>
+                <HelpButton helpKey="guardarCambios" type="submit" disabled={isSavingIndividual} style={{ padding: '0.6rem 1.5rem', borderRadius: '8px', border: 'none', background: '#3b82f6', color: '#fff', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 4px rgba(59,130,246,0.3)' }}>{isSavingIndividual ? 'Guardando en Firestore…' : 'Guardar Cambios'}</HelpButton>
               </div>
             </form>
 
@@ -6035,7 +5945,7 @@ export default function CentroManagers() {
       {notaModal && (() => {
         const equipoKeyManager = notaModal.equipo ? `${normalizeSede(notaModal.sede)}_${notaModal.equipo}` : null;
         const notasDeEstaPersona = notasSeguimiento
-          .filter(n => (n.tipo === 'individual' && n.managerId === notaModal.id) || (n.tipo === 'grupal' && equipoKeyManager && n.equipoKey === equipoKeyManager))
+          .filter(n => managerNoteMatches(n, notaModal, managers) || (n.tipo === 'grupal' && equipoKeyManager && n.equipoKey === equipoKeyManager))
           .sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
         const CATEGORIA_LABEL = { operativo: 'Quiebre operativo', equipo: 'Quiebre de equipo', participante: 'Quiebre de participante' };
         const ESTADO_LABEL = { riesgo_alto: 'Riesgo Alto', vencido: 'Vencido', bloqueado: 'Bloqueado', requiere_escalamiento: 'Requiere Escalamiento' };
@@ -6151,7 +6061,7 @@ export default function CentroManagers() {
         
         // Notas del manager
         const notasManager = notasSeguimiento
-          .filter(n => (n.tipo === 'individual' && n.managerId === m.id) || (n.tipo === 'grupal' && n.equipoKey === equipoKey))
+          .filter(n => managerNoteMatches(n, m, managers) || (n.tipo === 'grupal' && n.equipoKey === equipoKey))
           .sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
 
         return (

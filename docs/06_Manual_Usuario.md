@@ -24,6 +24,27 @@ asociadas a cada botón para lectores de pantalla. No cambian los permisos,
 sus etiquetas ni sus destinos. Los accesos se agrupan por intención y conservan
 su orden relativo dentro de cada categoría.
 
+## Datos y guardado en Centro de Managers
+
+El directorio muestra solo documentos confirmados de `managers_directory` en
+Firestore, sin completar la lista con el catálogo histórico del código ni una
+copia de `localStorage`. Mientras se verifica la conexión no se habilita la
+edición; si falla la lectura, se muestra el error y **Reintentar conexión**.
+Una colección vacía confirmada no se rellena con personas antiguas.
+
+Los cambios guardados desde Causa OS tienen precedencia por campo sobre las
+importaciones periódicas de hojas. Esto incluye borrar deliberadamente un
+teléfono o entrenador y cambiar nombre, sede o equipo: se conserva la identidad
+de origen para que la siguiente importación encuentre el mismo documento.
+Los campos no editados siguen actualizándose desde la fuente. Esta precedencia
+no es una sincronización de vuelta a la hoja ni una verificación de Nodus.
+Los datos incorrectos ya almacenados requieren cotejo con su fuente; no se
+corrigen ni se borran automáticamente.
+
+El aviso de guardado aparece después de la confirmación de Firestore; un error
+mantiene el formulario abierto. La sincronización informa fallo real si no
+puede ejecutarse: un workflow verde no sustituye la verificación de los datos.
+
 ## Panel sencillo de Elizabeth
 
 Pulsa **Crear tarea**, escribe el título, selecciona una persona de tu equipo,
