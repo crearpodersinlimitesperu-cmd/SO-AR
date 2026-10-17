@@ -70,6 +70,9 @@ jobs:
       - name: Test declared task locations and evidence-based operational review
         run: npm run test:operational
 
+      - name: Test Managers persistence and sheet precedence
+        run: npm run test:managers
+
       - name: Test goals roles, progress and source evidence
         run: node --test src/services/goalsBoard.test.js src/services/goalsTimeline.test.js tests/goals-board-browser.test.mjs tests/nodus-goal-discovery.test.mjs tests/nodus-goal-sources.test.mjs
 
@@ -80,4 +83,4 @@ jobs:
         run: npm run build
 
       - name: Test Firestore security rules in Emulator
-        run: npx --yes firebase-tools@latest emulators:exec --only firestore --project demo-task-privacy "npm run test:rules && node --test scripts/tests/nodus-report-rules.test.mjs"
+        run: npx --yes firebase-tools@latest emulators:exec --only firestore --project demo-task-privacy "npm run test:rules && node --test tests/firestore-manager-persistence.test.mjs scripts/tests/nodus-report-rules.test.mjs"

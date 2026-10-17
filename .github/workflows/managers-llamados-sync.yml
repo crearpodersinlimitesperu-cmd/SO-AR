@@ -33,16 +33,16 @@ jobs:
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
         run: |
           if [ -z "$GOOGLE_SERVICE_ACCOUNT_JSON" ]; then
-            echo "GOOGLE_SERVICE_ACCOUNT_JSON no esta configurado en GitHub Secrets. Omitiendo."
-            exit 0
+            echo "::error::GOOGLE_SERVICE_ACCOUNT_JSON no esta configurado; no se puede sincronizar."
+            exit 1
           fi
           echo "$GOOGLE_SERVICE_ACCOUNT_JSON" > centro-operativo-cpsl-65ad52160f45.json
           echo "=== 1. sync_managers_llamados.mjs ==="
-          node sync_managers_llamados.mjs || echo "Aviso: sync_managers_llamados.mjs completado con observaciones"
+          node sync_managers_llamados.mjs
           echo "=== 2. scripts/syncKpisLlamadas.mjs ==="
-          node scripts/syncKpisLlamadas.mjs || echo "Aviso: syncKpisLlamadas.mjs completado con observaciones"
+          node scripts/syncKpisLlamadas.mjs
           echo "=== 3. scripts/syncLimaAliadosStaff.mjs ==="
-          node scripts/syncLimaAliadosStaff.mjs || echo "Aviso: syncLimaAliadosStaff.mjs completado con observaciones"
+          node scripts/syncLimaAliadosStaff.mjs
 
       - name: Borrar la llave del runner
         if: always()
