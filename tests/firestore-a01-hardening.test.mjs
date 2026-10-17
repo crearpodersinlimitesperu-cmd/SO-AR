@@ -15,11 +15,13 @@ import {
   getDocs,
   limit,
   orderBy,
+  or,
   query,
   setDoc,
   updateDoc,
   where
 } from 'firebase/firestore';
+import { managerDocumentRef } from '../src/services/managerPersistence.js';
 
 let testEnv;
 
@@ -68,6 +70,32 @@ const dbOf = uid => testEnv.authenticatedContext(uid, { email: USERS[uid].email 
 const superAdminDb = () =>
   testEnv.authenticatedContext(SUPERADMIN.uid, { email: SUPERADMIN.email }).firestore();
 const anonDb = () => testEnv.unauthenticatedContext().firestore();
+
+test('auth startup: OR identity query supports all aliases with unchanged authenticated rules', async () => {
+  const target = 'alias@example.com';
+  await Promise.all([
+    seed(['users', 'alias-array'], { emails: [target] }),
+    seed(['users', 'alias-email'], { email: target }),
+    seed(['users', 'alias-corporate'], { corporateEmail: target }),
+    seed(['users', 'alias-personal'], { personalEmail: target }),
+    seed(['staff_directory', 'alias-array'], { emails: [target] }),
+    seed(['staff_directory', 'alias-email'], { email: target })
+  ]);
+  const lookup = db => query(collection(db, 'users'), or(
+    where('emails', 'array-contains', target),
+    where('email', '==', target),
+    where('corporateEmail', '==', target),
+    where('personalEmail', '==', target)
+  ));
+  const snap = await assertSucceeds(getDocs(lookup(dbOf('ent-1'))));
+  assert.deepEqual(snap.docs.map(d => d.id), ['alias-array', 'alias-corporate', 'alias-email', 'alias-personal']);
+  await assertFails(getDocs(lookup(anonDb())));
+  const staffQuery = db => query(collection(db, 'staff_directory'), or(
+    where('emails', 'array-contains', target), where('email', '==', target)
+  ));
+  assert.equal((await assertSucceeds(getDocs(staffQuery(dbOf('ent-1'))))).size, 2);
+  await assertFails(getDocs(staffQuery(anonDb())));
+});
 
 test('user_stats: el dueño por uid o por correo escribe lo suyo y no lo ajeno', async () => {
   const ent = dbOf('ent-1');
@@ -186,6 +214,25 @@ test('regresión: kpi_reports y managers_directory no cambian (sigue abierto a a
   await assertSucceeds(setDoc(doc(ent, 'managers_directory', 'm2'), { nombre: 'N' }));
   await assertSucceeds(updateDoc(doc(ent, 'managers_directory', 'm1'), { estado: 'Activo' }));
   await assertSucceeds(deleteDoc(doc(ent, 'managers_directory', 'm1')));
+});
+
+test('graduar manager actualiza y lee el documento real cuando id de catálogo difiere del docId', async () => {
+  await seed(['managers_directory', 'firestore-manager-key'], {
+    id: 'legacy-catalog-key',
+    nombre: 'Manager de prueba',
+    sede: 'Quito',
+    estado: 'Activo'
+  });
+  const db = dbOf('coord-1');
+  const manager = { id: 'legacy-catalog-key', docId: 'firestore-manager-key' };
+  const ref = managerDocumentRef(db, manager);
+
+  await assertSucceeds(setDoc(ref, { id: manager.id, estado: 'Graduado' }, { merge: true }));
+
+  const saved = await assertSucceeds(getDoc(ref));
+  assert.equal(saved.data().estado, 'Graduado');
+  const stalePath = await assertSucceeds(getDoc(doc(db, 'managers_directory', manager.id)));
+  assert.equal(stalePath.exists(), false);
 });
 
 test('staff_directory keeps both first-login email query forms unchanged', async () => {

@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { useAuth } from './AuthContext';
 import { db } from '../services/firebase';
+import { OFFICIAL_CALENDAR_SHEET_URL, parseOfficialCalendarSheet } from '../services/officialCalendarSheet';
 
 // Genera un id estable para un evento del calendario oficial (viene de una hoja
 // de Google, sin "id" propio de Firestore), para poder recordar cuáles ya se
@@ -13,15 +14,6 @@ const getEventSyncId = (ev) =>
 // republicar cambios de la agenda. Esta vista pública de la MISMA hoja es el
 // contraste de actualidad: solamente complementa/actualiza eventos, nunca
 // escribe en Sheets y nunca toca las asignaciones de Causa OS.
-const OFFICIAL_CALENDAR_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1u0tc4GeooPmSwNxZ0CErKGtRU4oD-mO3l--ZSQM-KPs/gviz/tq?tqx=out:json&gid=1326951636';
-
-const googleVizDateToIso = (value) => {
-  const match = String(value || '').match(/^Date\((\d+),(\d+),(\d+)\)$/);
-  if (!match) return '';
-  const [, year, monthZeroBased, day] = match;
-  return `${year}-${String(Number(monthZeroBased) + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}T00:00:00`;
-};
-
 const calendarMergeKey = (event = {}) => [
   String(event.fecha_inicio || event.start || '').slice(0, 10),
   String(event.sede || event.sedeTag || '').trim().toUpperCase(),
@@ -34,32 +26,6 @@ const calendarMergeKeyNoTeam = (event = {}) => [
   String(event.sede || event.sedeTag || '').trim().toUpperCase(),
   String(event.nombre || event.name || '').trim().toUpperCase()
 ].join('__');
-
-const parseOfficialCalendarSheet = (text) => {
-  const first = text.indexOf('{');
-  const last = text.lastIndexOf('}');
-  if (first < 0 || last < first) throw new Error('Respuesta de calendario oficial inválida.');
-  const payload = JSON.parse(text.slice(first, last + 1));
-  return (payload.table?.rows || []).map(row => {
-    const cells = row.c || [];
-    const value = index => cells[index]?.v ?? '';
-    const fechaInicio = googleVizDateToIso(value(0));
-    if (!fechaInicio) return null;
-    return {
-      fecha_inicio: fechaInicio,
-      // La hoja de contraste no declara fecha de fin. Se deja vacía: no se
-      // inventa duración ni se altera la que ya provea el Apps Script.
-      fecha_fin: '',
-      sede: String(value(1) || '').trim(),
-      equipo: String(value(2) ?? '').trim(),
-      nombre: String(value(3) || '').trim(),
-      trainer: String(value(4) || '').trim(),
-      lugar: String(value(5) || '').trim(),
-      direccion: String(value(6) || '').trim(),
-      source: 'official_sheet_crosscheck'
-    };
-  }).filter(Boolean);
-};
 
 const mergeOfficialCalendar = (apiEvents, sheetEvents) => {
   const byKey = new Map();

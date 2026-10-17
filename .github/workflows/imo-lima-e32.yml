@@ -1,0 +1,41 @@
+name: IMO Lima E32 scoped source import
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        type: boolean
+        default: false
+        description: Import only Lima149 registration evidence; never create a campaign
+permissions:
+  contents: read
+concurrency:
+  group: imo-lima-e32
+  cancel-in-progress: false
+jobs:
+  scoped:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci --ignore-scripts --include=optional
+      - run: node --test scripts/tests/imo-c1-source-contract.test.mjs scripts/tests/nodus-c1-report.test.mjs
+      - name: Locate installed Chrome
+        run: |
+          CHROME_BIN="$(command -v google-chrome || command -v chromium)"
+          test -n "$CHROME_BIN"
+          echo "CHROME_BIN=$CHROME_BIN" >> "$GITHUB_ENV"
+      - name: Read verified scope and optionally import registration evidence
+        env:
+          NODUS_USER: ${{ secrets.NODUS_USER }}
+          NODUS_PASSWORD: ${{ secrets.NODUS_PASSWORD }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          APPLY: ${{ inputs.apply }}
+        run: |
+          if [ "$APPLY" = "true" ]; then
+            node scripts/syncImoLimaE32.mjs --apply
+          else
+            node scripts/syncImoLimaE32.mjs
+          fi

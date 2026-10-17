@@ -11,7 +11,8 @@ import { createGoogleTask } from '../services/googleSync';
 import { useUI } from './UIContext';
 import { useAuth } from './AuthContext';
 import { useCycles } from './CyclesContext';
-import { createCycleCompletion, getEffectiveCompletion, getNextCompletionState, isCompletionTransition } from '../utils/taskLifecycle';
+import { applyCycleCompletion, createCycleCompletion, getEffectiveCompletion, getNextCompletionState, isCompletionTransition } from '../utils/taskLifecycle';
+import { normalizeTaskLocation, taskLocationLabel, taskReminderMessage, taskUrl, escapeTaskHtml } from '../utils/taskLocation';
 
 const ChecklistContext = createContext();
 
@@ -33,6 +34,8 @@ const formatDeadlineEs = (iso) => {
 // con detalles completos de la tarea, botón de acceso directo e indicaciones
 // paso a paso de inicio de sesión en Causa OS (clave para colaboradores nuevos o sin conexión).
 const buildTaskEmailHtml = ({
+  taskId,
+  location,
   taskTitle,
   notes,
   deadline,
@@ -86,6 +89,10 @@ const buildTaskEmailHtml = ({
                 <td style="padding: 6px 0; color: #0f172a;">${assignedSede || 'Global'}</td>
               </tr>
               <tr>
+                <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Ubicación declarada:</td>
+                <td style="padding: 6px 0; color: #0f172a;">${escapeTaskHtml(taskLocationLabel({ location }))}</td>
+              </tr>
+              <tr>
                 <td style="padding: 6px 0; color: #64748b; font-weight: 600;">🚨 Prioridad:</td>
                 <td style="padding: 6px 0; color: #0f172a; font-weight: 600;">${priority || 'Normal'}</td>
               </tr>
@@ -102,7 +109,7 @@ const buildTaskEmailHtml = ({
 
         <!-- Botón de Acción Principal -->
         <div style="text-align: center; margin: 26px 0 28px 0;">
-          <a href="https://centro-operativo-cpsl.web.app" style="background-color: #2563eb; color: #ffffff; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 15px; display: inline-block; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.35);">
+          <a href="${escapeTaskHtml(taskUrl(taskId))}" style="background-color: #2563eb; color: #ffffff; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 15px; display: inline-block; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.35);">
             🚀 Ingresar a Causa OS
           </a>
         </div>
@@ -382,6 +389,9 @@ export function ChecklistProvider({ children }) {
 
         const hasDirectAssignees = Boolean(prevData.assignedToEmail) ||
           (Array.isArray(prevData.assignedToEmails) && prevData.assignedToEmails.length > 0);
+        if (baseTask && cycleScope && !prevData.isCustom && !hasDirectAssignees && !isCycleScoped) {
+          throw new Error('Espera a que cargue el ciclo de la tarea antes de guardar los avances.');
+        }
         const scopeThisCompletion = isCycleScoped && !prevData.isCustom && !hasDirectAssignees;
         if (scopeThisCompletion && includesCompletionUpdate) {
           const previous = getEffectiveCompletion(prevData, {
@@ -394,7 +404,8 @@ export function ChecklistProvider({ children }) {
             cycle: cycleScope.cycle,
             completed: nextCompleted,
             updatedAt: new Date().toISOString(),
-            completionId: completionTransition ? completionId : prevData.completions?.[cycleKey]?.completionId
+            completionId: completionTransition ? completionId : prevData.completions?.[cycleKey]?.completionId,
+            updates
           });
           nextUpdates[`completions.${cycleKey}`] = completionEntry;
         } else if (includesCompletionUpdate) {
@@ -543,14 +554,11 @@ export function ChecklistProvider({ children }) {
           !data.isCustom && !taskId.startsWith('custom_') &&
           !data.assignedToEmail &&
           !(Array.isArray(data.assignedToEmails) && data.assignedToEmails.length > 0);
-        if (isBaseCatalogTask) {
-          const effective = getEffectiveCompletion(data, {
+        if (isBaseCatalogTask && !isMultiTeamQuito) {
+          return applyCycleCompletion(data, {
             sede: userSede,
-            cycleId: currentCycle?.id,
-            cycleScoped: true
+            cycleId: currentCycle?.id
           });
-          sedeCompleted = effective.completed;
-          sedeStatus = effective.status;
         }
 
         return { ...data, completed: sedeCompleted, status: sedeStatus };
@@ -572,29 +580,26 @@ export function ChecklistProvider({ children }) {
         const expanded = [];
         allTasks.forEach(task => {
           const baseTaskDef = checklistData.find(baseTask => baseTask.id === task.id);
-          if (!baseTaskDef) {
+          if (!baseTaskDef || task.isCustom || task.assignedToEmail || task.assignedToEmails?.length) {
             expanded.push(task);
             return;
           }
           const isPersisted = loadedTaskIds.has(task.id);
           quitoCycles.forEach(({ equipo, cycle }) => {
-            const effective = getEffectiveCompletion(task, {
+            const effectiveTask = applyCycleCompletion(task, {
               sede: userSede,
-              cycleId: cycle?.id,
-              cycleScoped: Boolean(baseTaskDef)
+              cycleId: cycle?.id
             });
             const perTeamDeadline = isPersisted
               ? (task.deadline || calculateAutomaticDeadline(baseTaskDef, cycle))
               : calculateAutomaticDeadline(baseTaskDef, cycle);
 
             expanded.push({
-              ...task,
+              ...effectiveTask,
               uiKey: `${task.id}__EQ${equipo}`,
               equipoQuito: equipo,
               quitoCycleId: cycle?.id || null,
-              deadline: perTeamDeadline,
-              completed: effective.completed,
-              status: effective.status
+              deadline: perTeamDeadline
             });
           });
         });
@@ -760,7 +765,7 @@ export function ChecklistProvider({ children }) {
       batch.set(doc(collection(db, 'notifications')), {
         userId: email,
         title: `Mensaje sobre: ${title}`,
-        message: `${senderName}: ${body}`,
+        message: taskReminderMessage(task, `${senderName}: ${body}`),
         taskId: task.id,
         taskMessageId: messageRef.id,
         type: 'task_message',
@@ -787,9 +792,9 @@ export function ChecklistProvider({ children }) {
     recipients.forEach(email => {
       batch.set(doc(collection(db, 'mail')), {
         to: [email], type: 'task_reminder', delivery: { state: 'PENDING' }, createdAt: now,
-        message: { subject: `Recordatorio de tarea: ${title} — Causa OS`, html: `<div style="font-family:Arial,sans-serif;max-width:620px;margin:auto;color:#172033"><h2 style="color:#078ac6">Recordatorio de tarea</h2><p><strong>${escapeHtml(senderName)}</strong> te escribió sobre:</p><p style="font-weight:bold">${escapeHtml(title)}</p><div style="white-space:pre-wrap;background:#f3f7fa;border-left:4px solid #078ac6;padding:14px">${escapeHtml(body)}</div><p style="color:#5b6673;font-size:12px">Mensaje enviado desde Causa OS.</p></div>` }
+        message: { subject: `Recordatorio de tarea: ${title} — Causa OS`, html: `<div style="font-family:Arial,sans-serif;max-width:620px;margin:auto;color:#172033"><h2 style="color:#078ac6">Recordatorio de tarea</h2><p><strong>${escapeHtml(senderName)}</strong> te escribió sobre:</p><p style="font-weight:bold">${escapeHtml(title)}</p><div style="white-space:pre-wrap;background:#f3f7fa;border-left:4px solid #078ac6;padding:14px">${escapeHtml(body)}</div><p>Ubicación: ${escapeHtml(taskLocationLabel(task))}</p><a href="${escapeHtml(taskUrl(task.id))}">Abrir tarea en Causa OS</a><p style="color:#5b6673;font-size:12px">Mensaje enviado desde Causa OS.</p></div>` }
       });
-      batch.set(doc(collection(db, 'notifications')), { userId: email, title: `Recordatorio: ${title}`, message: `${senderName}: ${body}`, taskId: task.id, type: 'task_email_reminder', read: false, created_at: now });
+      batch.set(doc(collection(db, 'notifications')), { userId: email, title: `Recordatorio: ${title}`, message: taskReminderMessage(task, `${senderName}: ${body}`), taskId: task.id, type: 'task_email_reminder', read: false, created_at: now });
     });
     await batch.commit();
     return { recipients: recipients.length };
@@ -813,6 +818,7 @@ export function ChecklistProvider({ children }) {
         .replace(/ketherine\.aguirre@/gi, 'katherine.aguirre@')
         .replace(/coodinacion\.administrativa@/gi, 'coordinacion.administrativa@') : '');
       const cleanData = { ...taskData };
+      cleanData.location = normalizeTaskLocation(taskData.location);
       cleanData.isCustom = true;
       cleanData.createdBy = currentUser.email;
       cleanData.assignedByEmail = currentUser.email;
@@ -885,7 +891,7 @@ export function ChecklistProvider({ children }) {
           batch.set(notifRef, {
             userId: cleanEmail,
             title: cleanData.task || cleanData.title,
-            message: notifMsg,
+            message: taskReminderMessage({ ...cleanData, id: customId }, notifMsg),
             read: false,
             taskId: customId,
             created_at: new Date().toISOString()
@@ -902,6 +908,8 @@ export function ChecklistProvider({ children }) {
             message: {
               subject: `📋 NUEVA TAREA ASIGNADA: ${cleanData.task || cleanData.title} — Causa OS`,
               html: buildTaskEmailHtml({
+                taskId: customId,
+                location: cleanData.location,
                 taskTitle: cleanData.task || cleanData.title,
                 notes: noteSnippet,
                 deadline: cleanData.deadline,
@@ -919,6 +927,7 @@ export function ChecklistProvider({ children }) {
             // simplemente no adjunta nada, no rompe el envío del correo).
             calendarEvent: {
               taskId: customId,
+              location: cleanData.location,
               title: cleanData.task || cleanData.title,
               deadline: cleanData.deadline || null,
               description: `Tarea Causa OS — Sede: ${cleanData.assignedSede || 'Global'}. Asignado por: ${assignerName}. Prioridad: ${cleanData.priority || 'Normal'}.${noteSnippet ? ' \nNotas: ' + noteSnippet : ''}`
@@ -940,7 +949,7 @@ export function ChecklistProvider({ children }) {
     try {
       const taskRef = doc(db, 'tasks', taskId);
       const taskSnap = await getDoc(taskRef);
-      if (!taskSnap.exists()) return false;
+      if (!taskSnap.exists()) throw new Error('La tarea ya no existe; no se pudo guardar la edición.');
       const currentTask = taskSnap.data();
 
       const sanitizeEmail = (e) => (typeof e === 'string' ? e.trim().toLowerCase()
@@ -949,6 +958,7 @@ export function ChecklistProvider({ children }) {
         .replace(/ketherine\.aguirre@/gi, 'katherine.aguirre@')
         .replace(/coodinacion\.administrativa@/gi, 'coordinacion.administrativa@') : '');
       const cleanUpdatedData = { ...updatedData };
+      if ('location' in updatedData) cleanUpdatedData.location = normalizeTaskLocation(updatedData.location);
       if (Array.isArray(cleanUpdatedData.assignedToEmails)) {
         cleanUpdatedData.assignedToEmails = [...new Set(cleanUpdatedData.assignedToEmails.map(sanitizeEmail).filter(Boolean))];
       }
@@ -961,7 +971,7 @@ export function ChecklistProvider({ children }) {
 
       // Calcular asignados: nuevos (recién agregados) vs los que ya estaban.
       const oldEmails = (currentTask.assignedToEmails || (currentTask.assignedToEmail ? [currentTask.assignedToEmail] : [])).map(sanitizeEmail).filter(Boolean);
-      const newEmails = (cleanUpdatedData.assignedToEmails || (cleanUpdatedData.assignedToEmail ? [cleanUpdatedData.assignedToEmail] : [])).map(sanitizeEmail).filter(Boolean);
+      const newEmails = (cleanUpdatedData.assignedToEmails || (cleanUpdatedData.assignedToEmail ? [cleanUpdatedData.assignedToEmail] : oldEmails)).map(sanitizeEmail).filter(Boolean);
 
       const newlyAddedEmails = newEmails.filter(email => !oldEmails.includes(email));
       const stillAssignedEmails = newEmails.filter(email => oldEmails.includes(email));
@@ -972,7 +982,7 @@ export function ChecklistProvider({ children }) {
       // Ahora, cualquier edición de un campo relevante (fecha límite, título,
       // prioridad, sede) también notifica a quienes ya estaban asignados —
       // no solo a los que se agregan de nuevo.
-      const relevantFieldChanged = ['deadline', 'task', 'title', 'priority', 'assignedSede', 'notes', 'description', 'comments'].some(
+      const relevantFieldChanged = ['deadline', 'task', 'title', 'priority', 'assignedSede', 'location', 'notes', 'description', 'comments'].some(
         field => field in cleanUpdatedData && cleanUpdatedData[field] !== currentTask[field]
       );
 
@@ -989,7 +999,7 @@ export function ChecklistProvider({ children }) {
         batch.set(notifRef, {
           userId: cleanEmail,
           title: cleanUpdatedData.task || currentTask.task,
-          message: notifMsg,
+          message: taskReminderMessage({ ...currentTask, ...cleanUpdatedData, id: taskId }, notifMsg),
           read: false,
           taskId: taskId,
           created_at: new Date().toISOString()
@@ -1006,6 +1016,8 @@ export function ChecklistProvider({ children }) {
           message: {
             subject: `📋 NUEVA TAREA ASIGNADA: ${cleanUpdatedData.task || currentTask.task} — Causa OS`,
             html: buildTaskEmailHtml({
+              taskId,
+              location: cleanUpdatedData.location ?? currentTask.location,
               taskTitle: cleanUpdatedData.task || currentTask.task,
               notes: activeNote,
               deadline: cleanUpdatedData.deadline || currentTask.deadline,
@@ -1019,6 +1031,7 @@ export function ChecklistProvider({ children }) {
           },
           calendarEvent: {
             taskId: taskId,
+            location: cleanUpdatedData.location ?? currentTask.location ?? '',
             title: cleanUpdatedData.task || currentTask.task,
             deadline: cleanUpdatedData.deadline || currentTask.deadline || null,
             description: `Tarea Causa OS — Sede: ${cleanUpdatedData.assignedSede || currentTask.assignedSede || 'Global'}. Asignado por: ${assignerName}. Prioridad: ${cleanUpdatedData.priority || currentTask.priority || 'Normal'}.${activeNote ? ' \nNotas: ' + activeNote : ''}`
@@ -1038,7 +1051,7 @@ export function ChecklistProvider({ children }) {
           batch.set(notifRef, {
             userId: cleanEmail,
             title: cleanUpdatedData.task || currentTask.task,
-            message: notifMsg,
+            message: taskReminderMessage({ ...currentTask, ...cleanUpdatedData, id: taskId }, notifMsg),
             read: false,
             taskId: taskId,
             created_at: new Date().toISOString()
@@ -1055,6 +1068,8 @@ export function ChecklistProvider({ children }) {
             message: {
               subject: `📋 TAREA ACTUALIZADA: ${cleanUpdatedData.task || currentTask.task} — Causa OS`,
               html: buildTaskEmailHtml({
+                taskId,
+                location: cleanUpdatedData.location ?? currentTask.location,
                 taskTitle: cleanUpdatedData.task || currentTask.task,
                 notes: activeNote,
                 deadline: cleanUpdatedData.deadline || currentTask.deadline,
@@ -1068,6 +1083,7 @@ export function ChecklistProvider({ children }) {
             },
             calendarEvent: {
               taskId: taskId,
+              location: cleanUpdatedData.location ?? currentTask.location ?? '',
               title: cleanUpdatedData.task || currentTask.task,
               deadline: cleanUpdatedData.deadline || currentTask.deadline || null,
               description: `Tarea Causa OS — Sede: ${cleanUpdatedData.assignedSede || currentTask.assignedSede || 'Global'}. Actualizado por: ${assignerName}. Prioridad: ${cleanUpdatedData.priority || currentTask.priority || 'Normal'}.${activeNote ? ' \nNotas: ' + activeNote : ''}`

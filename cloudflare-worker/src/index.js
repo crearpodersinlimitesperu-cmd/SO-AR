@@ -35,6 +35,8 @@
 
 import { jwtVerify, createRemoteJWKSet, SignJWT, importPKCS8 } from 'jose';
 import { notebookKnowledge } from './notebookKnowledge.js';
+import { createNodusApiClient, NodusApiError } from './nodusApiClient.js';
+import { filterNodusSedes, hasNodusTeamAccess, nodusAccessScope, summarizeNodusCatalog, summarizeNodusTeam } from './nodusJsonModel.js';
 
 const FIREBASE_PROJECT_ID = 'centro-operativo-cpsl';
 const FIREBASE_JWKS = createRemoteJWKSet(
@@ -346,17 +348,10 @@ function resumirSecciones(secciones) {
 // Worker, mismo login/Firestore/Groq ya desplegados, en vez de un Worker
 // nuevo. La página en la app SÍ es independiente del chat del copiloto.)
 //
-// ADAPTACIÓN REAL DEL PEDIDO ORIGINAL (léase antes de asumir que esto hace
-// exactamente lo que pedía el prompt pegado por José): ese prompt describe un
-// agente que "navega" Nodus en un loop hasta agotar módulos, equipos y
-// personas. Este Worker no tiene navegador ni credenciales de Nodus — el
-// único dato disponible es el snapshot que scripts/nodusScraper.js ya
-// sincroniza una vez al día en nodus_kpis_sincronizados/latest_snapshot (el
-// mismo dato que usa el chat del copiloto). Por eso este endpoint NO explora
-// Nodus en vivo: genera el reporte a partir de ese snapshot diario. Lo que sí
-// se implementa fielmente son las reglas centrales del prompt original: no
-// inventar, clasificar cada dato por su estado real, no convertir un vacío en
-// cero, mostrar de dónde sale cada afirmación y su nivel de confianza.
+// Este reporte sigue usando nodus_kpis_sincronizados/latest_snapshot: sus
+// tablas no son equivalentes a todos los endpoints del JSON oficial. La API
+// JSON se consume por separado en /nodus-json/* y no se presenta como fuente
+// para este mapa generado desde el snapshot.
 //
 // El reporte se pide en VARIOS bloques pequeños (una llamada a Groq por
 // bloque) en vez de una sola llamada gigante, por el mismo límite de 8,000
@@ -514,6 +509,113 @@ async function handleNodusDataMap(request, env, origin) {
     huboErrores: errores.length > 0,
     fraseCierre: 'Este mapa representa únicamente la información verificada y accesible en el snapshot de Nodus sincronizado el ' + timestamp + '. Los campos vacíos, datos contradictorios o no visibles no deben interpretarse como ausencia de actividad, responsabilidad o resultado hasta contar con validación adicional.'
   }, 200, origin);
+}
+
+async function handleNodusJson(request, env, origin, path) {
+  const authHeader = request.headers.get('Authorization') || '';
+  const idToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+  if (!idToken) {
+    return json({ error: 'unauthenticated', message: 'Inicia sesión en Causa OS para consultar Nodus.' }, 401, origin);
+  }
+
+  let uid, tokenEmail;
+  try {
+    const payload = await verifyFirebaseToken(idToken);
+    uid = payload.sub;
+    tokenEmail = payload.email;
+  } catch (err) {
+    console.error('[nodus-json] Token inválido:', err);
+    return json({ error: 'unauthenticated', message: 'La sesión de Causa OS expiró.' }, 401, origin);
+  }
+
+  let accessToken;
+  try {
+    accessToken = await getServiceAccountAccessToken(env);
+  } catch (err) {
+    console.error('[nodus-json] Error de credenciales de servidor:', err);
+    return json({ error: 'internal', message: 'No se pudo validar el acceso a Nodus.' }, 500, origin);
+  }
+
+  const userData = await firestoreGet(`users/${uid}`, accessToken);
+  if (!userData) {
+    return json({ error: 'permission-denied', message: 'Tu usuario no está registrado en Causa OS.' }, 403, origin);
+  }
+
+  const email = String(tokenEmail || '').toLowerCase().trim();
+  const managerEmailAllowed = SUPER_ADMIN_EMAILS_WORKER.includes(email) || GERENCIA_EMAILS_WORKER.includes(email);
+  const scope = nodusAccessScope(userData, managerEmailAllowed);
+  if (scope.type === 'denied') {
+    return json({ error: 'permission-denied', message: 'Tu cuenta coordinadora no tiene una sede asignada en Causa OS.' }, 403, origin);
+  }
+  if (path === '/nodus-json/team-metrics' && scope.type === 'general') {
+    return json({ error: 'permission-denied', message: 'El detalle de equipo está disponible para coordinación de su sede y gerencia.' }, 403, origin);
+  }
+  if (!env.NODUS_API_KEY) {
+    console.error('[nodus-json] Falta el Secret NODUS_API_KEY en Cloudflare.');
+    return json({ error: 'nodus_not_configured', message: 'La conexión segura con Nodus aún no está configurada.' }, 503, origin);
+  }
+
+  let client;
+  try {
+    client = createNodusApiClient({ apiKey: env.NODUS_API_KEY });
+  } catch (err) {
+    console.error('[nodus-json] Configuración de cliente inválida:', err.code || 'unknown');
+    return json({ error: 'nodus_not_configured', message: 'La conexión segura con Nodus aún no está configurada.' }, 503, origin);
+  }
+
+  try {
+    const result = await client.getSedes();
+    const visibleSedes = filterNodusSedes(result.data, scope);
+    if (scope.type === 'sede' && visibleSedes.length === 0) {
+      return json({ error: 'permission-denied', message: 'No hay sedes Nodus que coincidan con la sede asignada a tu cuenta.' }, 403, origin);
+    }
+    const totals = summarizeNodusCatalog(visibleSedes);
+
+    if (path === '/nodus-json/catalog') {
+      return json({
+        source: result.source,
+        generatedAt: result.meta.generado,
+        retrievedAt: result.retrievedAt,
+        scope: scope.type,
+        totals: scope.type === 'general' ? summarizeNodusCatalog(result.data) : totals,
+        ...(scope.type === 'general' ? {} : { sedes: visibleSedes })
+      }, 200, origin);
+    }
+
+    let body;
+    try {
+      body = await request.json();
+    } catch {
+      return json({ error: 'invalid-argument', message: 'Se requiere un identificador de equipo válido.' }, 400, origin);
+    }
+    const teamId = Number(body?.teamId);
+    if (!Number.isSafeInteger(teamId) || teamId < 1) {
+      return json({ error: 'invalid-argument', message: 'Se requiere un identificador de equipo válido.' }, 400, origin);
+    }
+    if (!hasNodusTeamAccess(visibleSedes, teamId)) {
+      return json({ error: 'permission-denied', message: 'Ese equipo no está disponible dentro de tu alcance.' }, 403, origin);
+    }
+    const participantResult = await client.getParticipantes(teamId);
+    if (Number(participantResult.data.equipo.id) !== teamId) {
+      return json({ error: 'nodus_invalid_response', message: 'Nodus devolvió un equipo distinto al solicitado.' }, 502, origin);
+    }
+    return json({
+      source: participantResult.source,
+      generatedAt: participantResult.meta.generado,
+      retrievedAt: participantResult.retrievedAt,
+      metrics: summarizeNodusTeam(participantResult.data)
+    }, 200, origin);
+  } catch (err) {
+    const code = err instanceof NodusApiError && /^[a-z0-9_]{1,64}$/.test(err.code) ? err.code : 'request_failed';
+    console.error('[nodus-json] Solicitud fallida:', code);
+    return json({
+      error: 'nodus_unavailable',
+      code,
+      message: code === 'stale_data'
+        ? 'La última respuesta de Nodus es antigua; no se mostrarán esos datos como actuales.'
+        : 'No se pudieron verificar los datos de Nodus. Intenta más tarde.'
+    }, 503, origin);
+  }
 }
 
 // ============================================================================
@@ -762,6 +864,9 @@ export default {
     }
     if (url.pathname === '/calendar-assignments') {
       return handleCalendarAssignments(request, env, origin);
+    }
+    if (url.pathname === '/nodus-json/catalog' || url.pathname === '/nodus-json/team-metrics') {
+      return handleNodusJson(request, env, origin, url.pathname);
     }
 
     const authHeader = request.headers.get('Authorization') || '';

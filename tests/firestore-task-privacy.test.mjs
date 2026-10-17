@@ -14,6 +14,7 @@ import {
   query,
   runTransaction,
   setDoc,
+  updateDoc,
   where
 } from 'firebase/firestore';
 
@@ -58,6 +59,27 @@ const coordinatorDb = () =>
   testEnv.authenticatedContext('coord-1', { email: 'coord@example.com' }).firestore();
 const userDb = (uid, email) =>
   testEnv.authenticatedContext(uid, { email }).firestore();
+
+test('declared location survives create/edit/readback without exposing a task to another identity', async () => {
+  const owner = coordinatorDb();
+  const ref = doc(owner, 'tasks', 'custom_location');
+  await assertSucceeds(setDoc(ref, {
+    id: 'custom_location', task: 'Synthetic location task', role: 'coord_c1',
+    isCustom: true, createdBy: 'coord@example.com', assignedByEmail: 'coord@example.com',
+    assignedToEmails: ['recipient@example.com'], location: 'Sala A', priority: 'Normal'
+  }));
+  assert.equal((await assertSucceeds(getDoc(ref))).data().location, 'Sala A');
+  await assertSucceeds(updateDoc(ref, { location: 'Sala B' }));
+  const recipientRef = doc(userDb('recipient', 'recipient@example.com'), 'tasks', 'custom_location');
+  assert.equal((await assertSucceeds(getDoc(recipientRef))).data().location, 'Sala B');
+  const unrelatedRef = doc(userDb('other', 'other@example.com'), 'tasks', 'custom_location');
+  await assertFails(getDoc(unrelatedRef));
+  await assertFails(updateDoc(unrelatedRef, { location: 'Changed without authorization' }));
+  await assertSucceeds(updateDoc(recipientRef, { location: 'Sala C' }));
+  assert.equal((await assertSucceeds(getDoc(ref))).data().location, 'Sala C');
+  await assertSucceeds(updateDoc(ref, { location: '' }));
+  assert.equal((await assertSucceeds(getDoc(recipientRef))).data().location, '');
+});
 
 test('only a personal task’s assigner and assigned recipients can read it', async () => {
   await seedTasks([{

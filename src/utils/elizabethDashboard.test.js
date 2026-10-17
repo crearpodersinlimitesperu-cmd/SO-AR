@@ -21,10 +21,10 @@ const assignedByElizabeth = {
   assignedToEmails: ['ana@crearpsl.net', 'luis@crearpsl.net']
 };
 
-test('Elizabeth enters her dashboard when simulated or consolidated and retains the full home', () => {
+test('Elizabeth enters her dashboard unless following an exact task link and retains the full home', () => {
   const app = readFileSync(new URL('../App.jsx', import.meta.url), 'utf8');
   const entry = app.slice(app.indexOf('function HomeEntry()'), app.indexOf('// Componente para proteger autenticación básica'));
-  assert.match(entry, /if \(isElizabethEscobar\(currentUser\)\)/);
+  assert.match(entry, /if \(isElizabethEscobar\(currentUser\) && !new URLSearchParams\(location\.search\)\.has\('taskId'\)\)/);
   assert.doesNotMatch(entry, /isSimulated|appRole/);
   assert.match(entry, /Navigate to="\/elizabeth-dashboard"/);
   assert.match(app, /path="\/home-completo"/);

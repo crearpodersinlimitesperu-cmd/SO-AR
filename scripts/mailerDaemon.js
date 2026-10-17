@@ -86,6 +86,7 @@ function buildIcsAttachment(calendarEvent) {
     `DTSTART:${dtStart}`,
     `DTEND:${dtEnd}`,
     `SUMMARY:${escapeIcsText(calendarEvent.title)}`,
+    `LOCATION:${escapeIcsText(calendarEvent.location || '')}`,
     `DESCRIPTION:${escapeIcsText(calendarEvent.description || 'Compromiso de Causa OS — CREAR PODER SIN LÍMITES.')}`,
     'STATUS:CONFIRMED',
     'END:VEVENT',

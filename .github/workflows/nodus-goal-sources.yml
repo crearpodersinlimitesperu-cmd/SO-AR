@@ -1,0 +1,39 @@
+name: Nodus goal sources read-only sync
+on:
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+    inputs:
+      publish:
+        type: boolean
+        default: false
+        description: Publish aggregate source evidence in Causa OS; never modify Nodus or goals
+permissions:
+  contents: read
+concurrency:
+  group: nodus-goal-sources
+  cancel-in-progress: false
+jobs:
+  sources:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci --ignore-scripts --include=optional
+      - run: node --test tests/nodus-goal-sources.test.mjs tests/nodus-goal-discovery.test.mjs
+      - run: npx puppeteer browsers install chrome
+      - name: Read Nodus and publish only aggregate evidence
+        env:
+          NODUS_USER: ${{ secrets.NODUS_USER }}
+          NODUS_PASSWORD: ${{ secrets.NODUS_PASSWORD }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          PUBLISH: ${{ github.event_name == 'schedule' || inputs.publish }}
+        run: |
+          if [ "$PUBLISH" = "true" ]; then
+            node scripts/publishNodusGoalSources.mjs --apply
+          else
+            node scripts/publishNodusGoalSources.mjs
+          fi

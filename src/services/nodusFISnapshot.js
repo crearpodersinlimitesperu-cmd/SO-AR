@@ -1,21 +1,26 @@
 import { equipoKeyDe, normalizarTexto } from './nodusFIAgent.js';
 
+import { snapshotFreshness } from '../utils/nodusIntegrity.js';
+
 // Decide qué universo FI muestra el módulo y cómo se rotula su origen.
 const hasPfd = (list) => list.filter((p) => p?.asistioPFD === true);
 
-export function resolveFISource(payload, fallback = []) {
+export function resolveFISource(payload, fallback = [], now = Date.now()) {
   const participantes = Array.isArray(payload?.participantes) ? payload.participantes : [];
   const universo = hasPfd(participantes);
-  const syncedAt = payload?.syncedAt || payload?.timestamp || payload?.updatedAt || null;
+  const syncedAt = payload?.extractedAt || payload?.syncedAt || payload?.timestamp || payload?.updatedAt || null;
+  const freshness = snapshotFreshness(syncedAt, now);
   if (universo.length > 0) {
     const sedes = new Set(universo.map((p) => p.sede).filter(Boolean)).size;
     const partial = payload?.completeness === 'partial';
+    const stale = freshness.stale;
     return {
       participantes,
       sourceState: {
-        status: partial ? 'partial' : 'live',
-        label: partial ? 'NODUS CREAR · lectura PARCIAL' : 'NODUS CREAR · fuente en vivo',
-        detail: `${universo.length} participantes con PFD confirmado en ${sedes} sede(s).${partial && payload?.completenessReasons?.length ? ` ${payload.completenessReasons.join(' ')}` : ''}`,
+        status: stale ? 'stale' : partial ? 'partial' : 'live',
+        label: stale ? 'NODUS CREAR · snapshot antiguo o sin fecha verificable'
+          : partial ? 'NODUS CREAR · lectura PARCIAL' : 'NODUS CREAR · fuente en vivo',
+        detail: `${universo.length} participantes con PFD confirmado en ${sedes} sede(s). ${freshness.label}.${partial && payload?.completenessReasons?.length ? ` ${payload.completenessReasons.join(' ')}` : ''}`,
         syncedAt
       }
     };
@@ -25,8 +30,8 @@ export function resolveFISource(payload, fallback = []) {
     sourceState: {
       status: 'fallback',
       label: 'RESPALDO ESTÁTICO PARCIAL · no es NODUS en vivo',
-      detail: `No hay una publicación completa de NODUS; se muestra un respaldo estático de ${fallback.length} participantes que NO incluye todas las sedes ni los FI reales.`,
-      syncedAt: syncedAt || '04/10/2026'
+      detail: `No hay participantes PFD confirmados en una publicación verificable de NODUS; se muestra un respaldo estático de ${fallback.length} participantes que NO incluye todas las sedes ni los FI reales.${syncedAt ? ` Última marca disponible: ${freshness.label}.` : ' Fecha de sincronización desconocida.'}`,
+      syncedAt
     }
   };
 }

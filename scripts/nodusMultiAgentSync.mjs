@@ -26,6 +26,7 @@ import {
 } from './nodusFuturosImposiblesParser.mjs';
 import { resolveUniqueNameMatch } from '../shared/rrhhSentinelRules.mjs';
 import { publishNodusReportSources } from './publishNodusReportSources.mjs';
+import { extractNodusC1Report } from './nodusC1Report.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -111,14 +112,6 @@ class NodusExtractorAgent {
     await this.page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36');
     await this.page.setExtraHTTPHeaders({
       'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8',
-      'Sec-Ch-Ua': '"Chromium";v="130", "Google Chrome";v="130", "Not?A_Brand";v="99"',
-      'Sec-Ch-Ua-Mobile': '?0',
-      'Sec-Ch-Ua-Platform': '"Windows"',
-      'Sec-Fetch-Dest': 'document',
-      'Sec-Fetch-Mode': 'navigate',
-      'Sec-Fetch-Site': 'none',
-      'Sec-Fetch-User': '?1',
-      'Upgrade-Insecure-Requests': '1'
     });
     await this.page.setViewport({ width: 1920, height: 1080 });
   }
@@ -128,15 +121,14 @@ class NodusExtractorAgent {
     while (attempts < 3) {
       try {
         attempts++;
-        await this.page.goto(url, { waitUntil: 'domcontentloaded', timeout });
+        const response = await this.page.goto(url, { waitUntil: 'domcontentloaded', timeout });
         await new Promise(r => setTimeout(r, 2000));
-        return;
+        return response;
       } catch (e) {
         console.warn(`[SafeGoto] Intento ${attempts} para ${url} falló (${e.message}). Reintentando...`);
         if (attempts >= 3) {
           try {
-            await this.page.goto(url, { waitUntil: 'load', timeout });
-            return;
+            return await this.page.goto(url, { waitUntil: 'load', timeout });
           } catch (e2) {
             throw e2;
           }
@@ -362,40 +354,21 @@ class NodusExtractorAgent {
 
     const activeEquipos = await this.page.evaluate(() => {
       const select = document.querySelector('select[name="id_equipo"]');
-      if (!select) return [];
+      if (!select) throw new Error('Report team selector unavailable');
       return Array.from(select.options)
         .filter(o => o.value && o.text.includes('✓'))
         .map(o => ({ id: o.value, nombre: o.text.trim() }));
     });
 
     console.log(`🔍 [Agente 1 - Extractor] Encontrados ${activeEquipos.length} equipos activos para C1 y C2.`);
+    if (!activeEquipos.length) throw new Error('Active report teams unavailable');
     
     const equiposData = [];
     // Extraemos de los equipos activos de forma segura
     for (const eq of activeEquipos) {
       try {
-        await this.safeGoto(`https://imo.crearpslglobal.com/reporte?id_equipo=${eq.id}`, 25000);
-        const participantes = await this.page.evaluate(() => {
-          const trs = Array.from(document.querySelectorAll('table tbody tr'));
-          return trs.map(tr => {
-            const tds = Array.from(tr.querySelectorAll('td')).map(td => td.innerText.trim());
-            const item = {};
-            if (tds[1]) item.apellidos = tds[1];
-            if (tds[2]) item.nombres = tds[2];
-            if (tds[3]) item.nombrePreferido = tds[3];
-            if (tds[4]) item.telefono = tds[4];
-            if (tds[5]) item.coordinador = tds[5];
-            if (tds[6]) item.imo = tds[6];
-            if (tds[7]) item.telefonoImo = tds[7];
-            if (tds[8]) item.llamada1 = tds[8];
-            if (tds[9]) item.llamada2 = tds[9];
-            if (tds[10]) item.finDeSemana = tds[10];
-            if (tds[11]) item.asistencia = tds[11];
-            if (tds[12]) item.desertor = tds[12];
-            if (tds[13]) item.pago = tds[13];
-            return item;
-          }).filter(p => p.nombres || p.apellidos || p.telefono || p.imo);
-        });
+        const participantes = await extractNodusC1Report(this.page, eq.id, () =>
+          this.safeGoto(`https://imo.crearpslglobal.com/reporte?id_equipo=${eq.id}`, 25000));
 
         equiposData.push({
           equipoId: eq.id,
@@ -404,7 +377,7 @@ class NodusExtractorAgent {
           participantes: participantes
         });
       } catch (err) {
-        console.warn(`Aviso al extraer equipo ${eq.nombre}: ${err.message}`);
+        throw new Error(`C1 source extraction failed for team ${eq.id}; publication stopped`, { cause: err });
       }
     }
 
