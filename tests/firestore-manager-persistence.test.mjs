@@ -47,6 +47,7 @@ test('anonymous write is denied and updating a missing row never creates a catal
   const unauthenticated = env.unauthenticatedContext().firestore();
   await assertFails(setDoc(doc(unauthenticated, 'managers_directory', 'denied'), { nombre: 'No permitido' }));
   const db = env.authenticatedContext('operator', { email: 'operator@example.test' }).firestore();
-  await assertFails(updateDoc(doc(db, 'managers_directory', 'missing'), { telefono: 'No upsert' }));
+  await assert.rejects(updateDoc(doc(db, 'managers_directory', 'missing'), { telefono: 'No upsert' }),
+    error => error.code === 'not-found');
   assert.equal((await getDocFromServer(doc(db, 'managers_directory', 'missing'))).exists(), false);
 });
