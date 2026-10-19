@@ -588,7 +588,27 @@ Tras auditoría de compatibilidad con las suscripciones reactivas (`onSnapshot`)
 
 ---
 
+### 13.6. Auditorías y archivo de diagnósticos (Centro de Mando)
+
+* **Agente de integridad:** `.github/agents/causa-auditor-integridad.agent.md` define `CausaAuditorAgent`, que revisa evidencia accesible en modo de solo lectura. No ejecuta sincronizaciones, no cambia registros y no escribe directamente en Nodus, Firestore ni en este documento. Distingue datos verificados en Nodus, Firestore y código de inferencias y puntos no verificables; no etiqueta una ausencia en Nodus sin consulta autorizada y suficientemente completa.
+* **Panel de destino:** Centro de Mando → Super Admin → Diagnósticos (`src/pages/SuperAdminPanel.jsx`, `DiagnosticsView`). Los informes automáticos de `.github/workflows/platform-audit.yml` se guardan en `platform_diagnostic_reports` por `scripts/platform_audit.mjs`. Los informes de `CausaAuditorAgent` y del agente `Diagnóstico integral de Causa OS` se pegan, revisan y publican por un Super Admin desde el mismo panel; publicar crea un registro `copilot_deep`. Ambos aparecen en “Reportes recientes”.
+* **Acceso y límites:** `firestore.rules`, regla `platform_diagnostic_reports`, reserva la lectura a Super Admin, limita la creación cliente a informes profundos con campos/tamaño validados y niega update/delete desde cliente. El job automático usa Admin SDK y escribe por separado; por tanto, la regla cliente no hace inmutable la colección frente al Admin SDK. La vista no dispara el workflow ni las auditorías. Un reporte publicado no prueba por sí solo que se haya revisado toda la plataforma o que sus hallazgos sean actuales; debe incluir alcance, hora, fuente y límites.
+* **Manejo seguro:** redactar datos personales, comprobantes, credenciales y secretos antes de pegar. No publicar identificadores personales en informes generales. No copiar registros crudos ni datos personales a esta Caja Negra: aquí se mantiene arquitectura, reglas, procedimientos y resúmenes agregados no identificables; el historial detallado de hallazgos vive en `platform_diagnostic_reports`. No crear colecciones ni permisos de escritura nuevos para cumplir este flujo.
+* **Ciclo de actualización:** después de modificar el agente, el flujo del panel, el esquema o las reglas de publicación, actualizar esta sección en el mismo cambio. Para registrar un hallazgo, usar el panel solo después de revisión humana y con el alcance/fuente documentados.
+
+#### Registro de auditoría con corte al 2026-10-17
+
+Este registro resume evidencia histórica y no certifica el estado actual de producción. La auditoría se basó en código, ejecuciones de CI y un respaldo Firestore con captura del 2026-10-16; no hubo consulta autenticada actual a Nodus ni conciliación completa de los datos operativos.
+
+| Área | Hallazgo al corte | Estado / cautela |
+|---|---|---|
+| Centro Managers México | El respaldo contenía 12 documentos de directorio; el catálogo estático incorporaba una fila adicional no coincidente y el algoritmo anterior podía presentar 13 claves frente a 12 documentos. | Corrección de fuente, persistencia por docId y precedencia de ediciones manuales fusionada en [PR #169](https://github.com/crearpodersinlimitesperu-cmd/SO-AR/pull/169) y publicada por [deploy 38986982284](https://github.com/crearpodersinlimitesperu-cmd/SO-AR/actions/runs/38986982284). La verificación fue con tests y Firestore Emulator; no se editó un registro real ni se concilió el directorio actual. |
+| Acceso por rol/sede | Revisión estática encontró reglas amplias en colecciones operativas, IMO y completitudes de tareas; el filtrado de UI no constituye aislamiento backend. | Riesgo pendiente de matriz de permisos, pruebas negativas por sede/rol y revisión de consumidores antes de cambiar reglas. No se documentó explotación productiva. |
+| FI y Equipo 1000 | Se observó lógica de FI derivada de aprobaciones sin evidencia física en un flujo y exclusión de Equipo 1000 inconsistente entre fuentes. | Revisar procedencia, identificadores y denominadores; no afirmar integridad o segregación global hasta validar cada fuente. |
+| Nodus, pagos y operación | No se verificaron en línea paginación completa, latencia autenticada, conversión C1→C2→MJ, pólizas/pagos, entrega de correo, Palabra Rota en horario/zona local ni cuadre físico de caja. | **NO VERIFICADO** al corte; no tratarlo como ausencia de registro ni inferir falta de pago/actividad. |
+| Perfiles de prueba | El respaldo revisado no contenía coincidencia exacta del ejemplo “Leyla Ochoa” ni marcas nominales explícitas de prueba en los campos examinados. | Esto no prueba ausencia en Nodus, otras colecciones ni datos actuales. No se acusó ni eliminó a ninguna persona. |
+
+Los conteos del respaldo son históricos y no representan personas activas, ventas, conversión ni integridad total. El exportador de respaldo puede convertir errores de lectura en listas vacías; por ello, un cero exportado no basta para afirmar `[DATO NO REGISTRADO EN NODUS]`. La evidencia detallada solo debe publicarse en el panel después de revisión y saneamiento de datos sensibles.
+
 > 📜 **Mandato de la Caja Negra:**
 > Esta Caja Negra es la fuente viva de verdad de CPSL y Causa OS. Debe consultarse antes de cualquier cambio de arquitectura y actualizarse de inmediato tras cada nueva funcionalidad, regla o descubrimiento operativo.
-
-
