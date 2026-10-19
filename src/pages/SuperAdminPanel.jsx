@@ -1234,8 +1234,9 @@ function DiagnosticsView() {
       <div style={box}>
         <h3 style={{ marginTop: 0 }}>Publicar reporte profundo de Copilot</h3>
         <p className="text-muted text-sm">
-          El agente "Diagnóstico integral de Causa OS" se ejecuta a demanda en Copilot y no puede publicar por sí mismo.
-          Pega aquí su informe (Markdown se muestra como texto plano). Los reportes publicados no se pueden editar ni borrar.
+          Los agentes "Diagnóstico integral de Causa OS" y "CausaAuditorAgent" se ejecutan a demanda en Copilot y no publican por sí mismos.
+          Pega aquí el informe revisado; se guarda en el historial de Diagnósticos de Centro de Mando (Markdown como texto plano).
+          Retira datos personales y secretos antes de publicarlo. Los reportes publicados no se pueden editar ni borrar desde esta pantalla.
         </p>
         <input
           value={title}
@@ -1248,7 +1249,7 @@ function DiagnosticsView() {
           value={content}
           onChange={(e) => setContent(e.target.value)}
           rows={12}
-          placeholder="Pega el informe aquí…"
+          placeholder="Pega el informe revisado de cualquiera de los agentes aquí…"
           style={{ width: '100%', padding: '0.5rem', fontFamily: 'monospace' }}
         />
         <div className="text-muted text-sm" style={{ margin: '0.25rem 0 0.5rem' }}>

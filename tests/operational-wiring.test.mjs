@@ -27,6 +27,22 @@ test('feedback read errors cannot masquerade as an empty or globally resolved in
   assert.match(inbox, /Reintentar lectura/);
 });
 
+test('both audit agents feed the Super Admin diagnostics archive and Caja Negra documents the flow', () => {
+  const panel = read('src/pages/SuperAdminPanel.jsx');
+  const diagnostics = panel.slice(panel.indexOf('function DiagnosticsView()'));
+  assert.match(diagnostics, /Diagnóstico integral de Causa OS/);
+  assert.match(diagnostics, /CausaAuditorAgent/);
+  assert.match(diagnostics, /platform_diagnostic_reports/);
+
+  const agent = read('.github/agents/causa-auditor-integridad.agent.md');
+  assert.match(agent, /Super Admin → Diagnósticos/);
+  assert.match(agent, /no tiene autorización implícita para escribir directamente en Firestore ni en Nodus/);
+
+  const blackBox = read('docs/caja_negra_operativa_cpsl.md');
+  assert.match(blackBox, /13\.6\. Auditorías y archivo de diagnósticos/);
+  assert.match(blackBox, /platform_diagnostic_reports/);
+});
+
 test('executive missing definitions cannot use a generic operational input form', () => {
   const source = read('src/pages/MisKPIs.jsx');
   assert.match(source, /selectedPerson\?\.tabCategory === 'ejecutivo'[\s\S]*?No se puede registrar un KPI personal ejecutivo/);
