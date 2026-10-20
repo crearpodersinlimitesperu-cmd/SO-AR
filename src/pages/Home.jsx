@@ -865,10 +865,8 @@ export default function Home() {
   // mostrar ("todo lo que sus roles reales abarcan"), no todo sin excepcion.
   const hasRoleAccess = (allowedRoles) => {
     if (currentUser?.isSuperAdmin && !currentUser?.isSimulated) return true;
-    if (currentUser?.appRole === 'consolidado') {
-      return (currentUser?.roles || []).some(r => allowedRoles.includes(r));
-    }
-    return allowedRoles.includes(currentUser?.appRole);
+    return allowedRoles.includes(currentUser?.appRole) ||
+           (currentUser?.roles || []).some(r => allowedRoles.includes(r));
   };
 
   const { currentUser, logout, switchRole, reauthenticateGoogle, updateCurrentUserFields } = useAuth();
@@ -1440,6 +1438,8 @@ export default function Home() {
     setGlobalSearchTerm('');
     if (opt.action === 'open_horarios_modal') {
       setShowHorariosModal(true);
+    } else if (opt.action === 'open_guia_llamadas') {
+      handleOpenGuiaLlamadas();
     } else if (opt.action === 'new_task') {
       setShowTaskModal(true);
     } else if (opt.action === 'venue_modal') {
@@ -1495,12 +1495,25 @@ export default function Home() {
     [myOverdueTasks, time]
   );
 
+  const [profileInitialTab, setProfileInitialTab] = useState(null);
+
   const handleOpenMyProfile = () => {
     const myEmail = (currentUser?.email || '').toLowerCase().trim();
     const ownRecord = myEmail
       ? realUsersData.find(u => (u.email || '').toLowerCase().trim() === myEmail)
       : null;
     setSelectedSearchUser(ownRecord || currentUser);
+    setProfileInitialTab(null);
+    setShowSearchUserModal(true);
+  };
+
+  const handleOpenGuiaLlamadas = () => {
+    const myEmail = (currentUser?.email || '').toLowerCase().trim();
+    const ownRecord = myEmail
+      ? realUsersData.find(u => (u.email || '').toLowerCase().trim() === myEmail)
+      : null;
+    setSelectedSearchUser(ownRecord || currentUser);
+    setProfileInitialTab('guia_rezagados');
     setShowSearchUserModal(true);
   };
 
@@ -2166,6 +2179,104 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/* BANNER ESPECIAL DESTACADO: GUÍA DE LLAMADAS Y NODUS REZAGADOS C1 (GINA CÁRDENAS / COORD JR) */}
+      {(currentUser?.isSuperAdmin || currentUser?.appRole === 'coord_jr' || currentUser?.role === 'coord_jr' || Boolean(currentUser?.email && (currentUser.email.includes('cardenasgina29') || currentUser.email.includes('cardenaslopezgina')))) && (
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(2, 132, 199, 0.28), rgba(15, 23, 42, 0.95))',
+          border: '1.5px solid #0284c7',
+          borderRadius: '16px',
+          padding: '1.25rem 1.5rem',
+          marginBottom: '1.5rem',
+          boxShadow: '0 8px 30px rgba(2, 132, 199, 0.3)',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '1.25rem'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1, minWidth: '280px' }}>
+            <div style={{ background: 'linear-gradient(135deg, #0284c7, #06b6d4)', color: '#ffffff', padding: '0.85rem', borderRadius: '14px', fontSize: '1.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 15px rgba(2, 132, 199, 0.4)', flexShrink: 0 }}>
+              📞
+            </div>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.2rem' }}>
+                <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.3px' }}>
+                  Centro de Operaciones Rezagados C1
+                </h3>
+                <span style={{ background: 'rgba(56, 189, 248, 0.2)', color: '#38bdf8', border: '1px solid rgba(56, 189, 248, 0.4)', fontSize: '0.72rem', padding: '2px 8px', borderRadius: '12px', fontWeight: 800 }}>
+                  Gina Cárdenas
+                </span>
+              </div>
+              <p style={{ margin: 0, fontSize: '0.88rem', color: '#cbd5e1', lineHeight: '1.45' }}>
+                Acceso directo a tu <strong>Guía Oficial de Llamadas C1</strong>, scripts de reencuadre, objeciones, protocolo legal Indecopi y reporte live Nodus.
+              </p>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap', alignItems: 'center' }}>
+            <button
+              onClick={handleOpenGuiaLlamadas}
+              style={{
+                background: 'linear-gradient(45deg, #0284c7, #06b6d4)',
+                color: '#ffffff',
+                border: 'none',
+                padding: '0.65rem 1.2rem',
+                borderRadius: '10px',
+                fontWeight: 800,
+                fontSize: '0.9rem',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.55rem',
+                boxShadow: '0 4px 15px rgba(2, 132, 199, 0.4)'
+              }}
+            >
+              📖 Abrir Guía Oficial de Llamadas C1
+            </button>
+
+            <a
+              href="https://imo.crearpslglobal.com/reporterezagados"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                background: 'rgba(255, 255, 255, 0.08)',
+                color: '#ffffff',
+                border: '1px solid rgba(255, 255, 255, 0.25)',
+                padding: '0.65rem 1.1rem',
+                borderRadius: '10px',
+                fontWeight: 700,
+                fontSize: '0.88rem',
+                textDecoration: 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}
+            >
+              🌐 Base Nodus Rezagados C1
+            </a>
+
+            <button
+              onClick={() => navigate('/manual-nodus')}
+              style={{
+                background: 'rgba(255, 255, 255, 0.04)',
+                color: '#e0f2fe',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                padding: '0.65rem 1rem',
+                borderRadius: '10px',
+                fontWeight: 600,
+                fontSize: '0.85rem',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.4rem'
+              }}
+            >
+              📘 Manual Nodus
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* BARRA DE HERRAMIENTAS ADAPTABLE SEGÚN MODO */}
       {viewMode === 'compact' && (
@@ -3909,12 +4020,13 @@ export default function Home() {
       {/* MODAL CONFIGURACIÓN DE HOTELES Y SALONES */}
       <VenueConfigModal isOpen={showVenueModal} onClose={() => setShowVenueModal(false)} />
 
-      {/* MODAL DE PERFIL DE PERSONA (abierto desde el Buscador Global) */}
+      {/* MODAL DE PERFIL DE PERSONA (abierto desde el Buscador Global o Guía Oficial) */}
       {showSearchUserModal && selectedSearchUser && (
         <UserProfileModal 
           isOpen={showSearchUserModal} 
-          onClose={() => setShowSearchUserModal(false)} 
+          onClose={() => { setShowSearchUserModal(false); setProfileInitialTab(null); }} 
           user={selectedSearchUser} 
+          initialTab={profileInitialTab}
           allTasks={allTasks} 
           onStatusUpdated={(updated) => setSelectedSearchUser(prev => ({ ...prev, ...updated }))}
         />

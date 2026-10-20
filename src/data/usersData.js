@@ -8,6 +8,9 @@ export const normalizeRole = (role) => {
   
   const r = role.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
 
+  // Coordinadora Junior (Rezagados C1 & QT)
+  if (r === 'coord_jr' || r === 'coordinador_junior' || r === 'coordinadora_junior' || r.includes('coordinador junior') || r.includes('coordinadora junior') || r.includes('coord junior')) return 'coord_jr';
+
   // Coordinadores Capítulo 1 / Capítulo 2 (C1 / C2)
   if (r === 'coordinador_c1c2' || r === 'coord_c1' || r === 'coord_c2' || r === 'coordinador_c1' || r === 'coordinador_c2' || r.includes('capitulo uno') || r.includes('capitulo 1') || r.includes('capitulo dos') || r.includes('capitulo 2') || r === 'c1' || r === 'c2' || r === 'c1/c2' || r === 'c1c2') return 'coord_c1';
   
@@ -174,6 +177,8 @@ export const isForeignTask = (task, currentUser) => {
 };
 
 export const ROLE_DISPLAY_NAMES = {
+  coord_jr: 'Coordinadora Junior (Rezagados C1 & QT)',
+  coordinador_junior: 'Coordinadora Junior (Rezagados C1 & QT)',
   coord_c1: 'Coordinador Capítulo 1 y 2 (C1 / C2)',
   coordinador_c1c2: 'Coordinador Capítulo 1 y 2 (C1 / C2)',
   coord_maestria: 'Coordinador Maestría del Juego (MJ)',
@@ -213,6 +218,7 @@ export const getRoleDisplayName = (role) => {
 };
 
 export const ROLE_COLORS = {
+  coord_jr: '#0ea5e9',
   direccion: '#ef4444',
   cfo: '#eab308',
   gerente: '#f59e0b',

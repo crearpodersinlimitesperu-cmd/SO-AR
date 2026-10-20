@@ -32,7 +32,7 @@ const normalize = text => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').
 export default function HomeModuleWorkspace({ children }) {
   const id = useId();
   const [query, setQuery] = useState('');
-  const [expanded, setExpanded] = useState(null);
+  const [expanded, setExpanded] = useState('personas');
   const [collapsedResults, setCollapsedResults] = useState([]);
   const terms = normalize(query).trim().split(/\s+/).filter(Boolean);
   const searching = terms.length > 0;

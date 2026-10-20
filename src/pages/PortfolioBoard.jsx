@@ -48,11 +48,10 @@ export const KNOWN_COORDINATORS = {
   'DANIELA MONROY': { formalName: 'Daniela Monroy Fabbri', email: 'daniela.monroy@crearpsl.net', role: 'coord_c1', sede: 'CDMX' },
   'ADRIANNA': { formalName: 'Adrianna Campuzano', email: 'adrianna@crearpsl.net', role: 'coord_c1', sede: 'Quito' },
   'LILIANA': { formalName: 'Liliana Cubillo', email: 'liliana.cubillo@crearpsl.net', role: 'coord_c1', sede: 'Quito' },
-  'KARLA': { formalName: 'Karla Aguirre', email: 'katherine.aguirre@crearpsl.net', role: 'coord_c1', sede: 'Quito' },
+  'KATHERINE': { formalName: 'Katherine Aguirre', email: 'katherine.aguirre@crearpsl.net', role: 'coord_c1', sede: 'Quito' },
   'ADAMS': { formalName: 'Adams (Coordinación)', email: 'coordinacion.quito@crearpsl.net', role: 'coord_c1', sede: 'Quito' },
   'DANIELA': { formalName: 'Daniela Villa', email: 'dayapamae.villarodriguez14@gmail.com', role: 'coord_c1', sede: 'Quito' },
-  'DANNA': { formalName: 'Dayana Zambrano', email: 'dayizambrano24@gmail.com', role: 'coord_c1', sede: 'Quito' },
-  'MARCELA': { formalName: 'Marcela Robbys', email: 'marobel.studio@gmail.com', role: 'coord_c1', sede: 'Quito' }
+  'DANNA': { formalName: 'Dayana Zambrano', email: 'dayizambrano24@gmail.com', role: 'coord_c1', sede: 'Quito' }
 };
 
 export const GERENTES_POR_SEDE = {
@@ -62,7 +61,7 @@ export const GERENTES_POR_SEDE = {
   'Medellín': { name: 'Yurany González', email: 'yurany.gonzalez@crearpsl.net' },
   'México': { name: 'Nora Zamora', email: 'nora.zamora@crearpsl.net' },
   'CDMX': { name: 'Nora Zamora', email: 'nora.zamora@crearpsl.net' },
-  'Quito': { name: 'Emily Campuzano / Freddy Sosa', email: 'emily.campuzano@crearpsl.net' }
+  'Quito': { name: 'Mila Campuzano / David Sosa', email: 'emily.campuzano@crearpsl.net' }
 };
 
 function formatRoleLabel(role) {

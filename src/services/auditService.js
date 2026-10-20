@@ -9,7 +9,7 @@ const LOCAL_CONNECTIONS_KEY = 'cpsl_user_connections';
 /**
  * Registra un evento de auditoría REAL en Cloud Firestore
  */
-export async function recordAuditEvent({ uid, email, name, role, sede, action, details = '', isSimulation = false }) {
+export async function recordAuditEvent({ uid, email, name, role, sede, action, details = '', isSimulation = false, simulatedBy = null }) {
   if (!email) return null;
 
   const nowIso = new Date().toISOString();
@@ -21,6 +21,8 @@ export async function recordAuditEvent({ uid, email, name, role, sede, action, d
     sede: sede || 'Sede Global',
     action: action || 'ACCESO',
     details: details || '',
+    isSimulation: Boolean(isSimulation),
+    simulatedBy: simulatedBy || (isSimulation ? 'jose.sanchez@crearpsl.net' : null),
     timestamp: nowIso
   };
 

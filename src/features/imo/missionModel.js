@@ -23,7 +23,7 @@ export function validateCampaign({ sede, targetTeam, c1Date, assignments }) {
     if (!a.nombre || !a.sourceMissionId || sources.has(a.sourceMissionId)) throw new Error('Hay una misión de origen repetida o incompleta.');
     sources.add(a.sourceMissionId);
     // 0 = equipo de origen por confirmar (el IMO no figura como enrolado en Nodus).
-    if (!Number.isInteger(Number(a.originTeam)) || Number(a.originTeam) < 0 || Number(a.originTeam) === Number(targetTeam)) throw new Error(`Revisa el equipo de origen de ${a.nombre}.`);
+    if (!Number.isInteger(Number(a.originTeam)) || Number(a.originTeam) < 0) throw new Error(`Revisa el equipo de origen de ${a.nombre}.`);
     if (!a.enrolados?.length || a.enrolados.length > 100) throw new Error(`Revisa los enrolados de ${a.nombre} (entre 1 y 100).`);
     const ids = new Set();
     for (const e of a.enrolados) {

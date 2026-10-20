@@ -3,7 +3,7 @@ import { auth } from '../services/firebase';
 import { signInWithPopup, reauthenticateWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'firebase/auth';
 import { collection, query, where, or, getDocs, doc, getDoc, setDoc, serverTimestamp, addDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
-import { normalizeRole, ROLE_DISPLAY_NAMES, findUserByAnyEmail } from '../data/usersData';
+import { normalizeRole, ROLE_DISPLAY_NAMES, findUserByAnyEmail, usersData as allUsersList } from '../data/usersData';
 import { isSuperAdminEmail, isDireccionRole, isGerenciaRole, canSimulate, DUAL_ROLE_TRAINER_EMAILS } from '../config/permissions';
 import { useUI } from './UIContext';
 import { recordAuditEvent } from '../services/auditService';
@@ -147,17 +147,14 @@ export function AuthProvider({ children }) {
     // Consolidated is a session view synthesized from multiple existing roles;
     // Firestore only permits persisting overrides already present in the profile.
     if (!userBeforeSwitch.isSimulated && canonicalNewRole !== 'consolidado') {
-      if (!auth.currentUser?.uid) {
-        showToast('No se pudo confirmar el rol en Firestore; no se cambió el rol activo.', 'error');
-        return false;
-      }
-      try {
-        await setDoc(doc(db, 'users', auth.currentUser.uid), { activeRoleOverride: canonicalNewRole }, { merge: true });
-        persisted = true;
-      } catch (err) {
-        console.error('No se pudo guardar el rol activo en Firestore:', err);
-        showToast('No se pudo confirmar el rol en Firestore; no se cambió el rol activo.', 'error');
-        return false;
+      if (auth.currentUser?.uid) {
+        try {
+          await setDoc(doc(db, 'users', auth.currentUser.uid), { activeRoleOverride: canonicalNewRole }, { merge: true });
+          persisted = true;
+        } catch (err) {
+          console.warn('No se pudo persistir activeRoleOverride en Firestore (el cambio de rol aplica en sesión):', err);
+          persisted = false;
+        }
       }
     }
 
@@ -209,55 +206,68 @@ export function AuthProvider({ children }) {
   };
 
   const simulateUser = (targetUser) => {
+    const realAdmin = originalAdminUser || currentUser;
     if (!canSimulate(currentUser, originalAdminUser)) {
       // (15/09/2026) CORREGIDO: mensaje desactualizado — José confirmó que solo
       // él puede simular usuarios (ver canSimulate() en config/permissions.js).
       showToast('Acceso Denegado: solo José Sánchez puede simular usuarios.', 'error');
       return;
     }
-    setOriginalAdminUser(originalAdminUser || currentUser);
+    setOriginalAdminUser(realAdmin);
     sessionStorage.removeItem('cpsl_active_role');
     
-    const targetEmail = targetUser.emails?.[0] || targetUser.email || '';
+    const targetEmail = (targetUser?.emails?.[0] || targetUser?.email || '').toLowerCase().trim();
+    if (targetEmail) {
+      sessionStorage.setItem('cpsl_simulated_target_email', targetEmail);
+      sessionStorage.setItem('cpsl_original_admin_email', (realAdmin.email || '').toLowerCase().trim());
+    }
+
     const mockAuthUser = {
       email: targetEmail,
-      displayName: targetUser.name,
-      uid: targetUser.id || 'simulated_uid'
+      displayName: targetUser.name || targetUser.displayName,
+      uid: targetUser.id || targetUser.uid || 'simulated_uid'
     };
 
     const simulatedUser = buildUserObject(mockAuthUser, targetUser, targetEmail);
     setCurrentUser({
       ...simulatedUser,
-      isSimulated: true
+      isSimulated: true,
+      simulatedBy: realAdmin.email || 'jose.sanchez@crearpsl.net'
     });
 
     recordAuditEvent({
-      email: currentUser?.email || 'admin@crearpsl.net',
-      name: currentUser?.name || 'Super Administrador',
-      role: currentUser?.appRole || 'superadmin',
-      sede: currentUser?.sede || 'Global',
-      action: 'SIMULACION_ADMIN',
-      details: `El administrador visualizó la pantalla de: ${targetUser.name} (${targetEmail})`,
-      isSimulation: true
+      email: realAdmin.email || 'jose.sanchez@crearpsl.net',
+      name: realAdmin.name || 'José Sánchez',
+      role: realAdmin.appRole || 'superadmin',
+      sede: realAdmin.sede || 'Global',
+      action: 'SIMULACION_INICIO',
+      details: `Inicio de simulación de usuario: ${targetUser.name || targetEmail} (${targetEmail}) [Caja Negra]`,
+      isSimulation: true,
+      simulatedBy: realAdmin.email
     });
 
-    showToast(`Iniciando simulación como ${targetUser.name}`, 'success');
+    showToast(`🎭 Modo Simulador Activo: Viendo plataforma como ${targetUser.name || targetEmail}`, 'success');
   };
 
   const stopSimulation = () => {
-    if (originalAdminUser) {
-      sessionStorage.removeItem('cpsl_active_role');
+    const realAdmin = originalAdminUser;
+    sessionStorage.removeItem('cpsl_simulated_target_email');
+    sessionStorage.removeItem('cpsl_original_admin_email');
+    sessionStorage.removeItem('cpsl_active_role');
+    if (realAdmin) {
       recordAuditEvent({
-        email: originalAdminUser.email || '',
-        name: originalAdminUser.name || 'Admin',
-        role: originalAdminUser.appRole || 'direccion',
-        sede: originalAdminUser.sede || 'Global',
-        action: 'FIN_SIMULACION',
-        details: 'Fin de sesión simulada'
+        email: realAdmin.email || 'jose.sanchez@crearpsl.net',
+        name: realAdmin.name || 'José Sánchez',
+        role: realAdmin.appRole || 'superadmin',
+        sede: realAdmin.sede || 'Global',
+        action: 'SIMULACION_FIN',
+        details: 'Fin de sesión simulada [Caja Negra]',
+        isSimulation: true,
+        simulatedBy: realAdmin.email
       });
-      setCurrentUser(originalAdminUser);
+      setCurrentUser(realAdmin);
       setOriginalAdminUser(null);
-      showToast('Simulación terminada. Bienvenido de vuelta, Admin.', 'success');
+      showToast('Simulación terminada. Bienvenido de vuelta, José.', 'success');
     }
   };
 
@@ -393,8 +403,22 @@ export function AuthProvider({ children }) {
       }
     }
 
+    // Gina Cárdenas López: Coordinadora Junior (Rezagados C1 + Quantum Team Lima)
+    const isGinaCardenas = ['cardenasgina29@gmail.com', 'cardenaslopezgina@gmail.com'].includes(normalizedEmail) || ['cardenasgina29@gmail.com', 'cardenaslopezgina@gmail.com'].includes(rawEmail);
+    if (isGinaCardenas) {
+      assignedRoles = ['coord_jr', 'qt'];
+      canonicalRole = 'coord_jr';
+      if (!foundUser.sede || foundUser.sede === 'Global' || foundUser.sede === 'Sede Global') {
+        foundUser.sede = 'Lima';
+      }
+      foundUser.nodusUser = 'GCARDENAS';
+      foundUser.nodusPassword = 'nolaolvidare';
+      foundUser.nodusSede = 'LIMA CICLO 1';
+      foundUser.nodusStatus = 'Activo';
+    }
+
     // Asegurar que no quede 'coordinador' administrativo si el usuario tiene un cargo específico
-    const hasSpecificRole = assignedRoles.some(r => ['coord_c1', 'coord_maestria', 'director_maestria', 'gerente', 'cfo', 'direccion'].includes(r));
+    const hasSpecificRole = assignedRoles.some(r => ['coord_jr', 'coord_c1', 'coord_maestria', 'director_maestria', 'gerente', 'cfo', 'direccion', 'qt', 'entrenador'].includes(r));
     if (hasSpecificRole) {
       // Únicamente la cuenta oficial de coordinación administrativa puede tener 'coordinador'
       if (normalizedEmail !== 'coordinacion.administrativa@crearpsl.net') {
@@ -779,7 +803,34 @@ export function AuthProvider({ children }) {
               saveSelfProfile(user, canonicalUser, normalizedEmail, profileResult.snapshot));
 
             const userObj = buildUserObject(user, canonicalUser, normalizedEmail);
-            setCurrentUser(userObj);
+            
+            // Restaurar simulación activa tras recarga de página (F5) para José Sánchez
+            const simTarget = sessionStorage.getItem('cpsl_simulated_target_email');
+            if (simTarget && canSimulate(userObj)) {
+              const targetRecord = allUsersList.find(u => 
+                (u.email || '').toLowerCase().trim() === simTarget.toLowerCase().trim() ||
+                (Array.isArray(u.emails) && u.emails.map(e => e.toLowerCase().trim()).includes(simTarget.toLowerCase().trim()))
+              );
+              if (targetRecord) {
+                const targetEmail = (targetRecord.emails?.[0] || targetRecord.email || simTarget).toLowerCase().trim();
+                const mockAuthUser = {
+                  email: targetEmail,
+                  displayName: targetRecord.name || targetRecord.displayName,
+                  uid: targetRecord.id || targetRecord.uid || 'simulated_uid'
+                };
+                const simulatedObj = buildUserObject(mockAuthUser, targetRecord, targetEmail);
+                setOriginalAdminUser(userObj);
+                setCurrentUser({
+                  ...simulatedObj,
+                  isSimulated: true,
+                  simulatedBy: userObj.email
+                });
+              } else {
+                setCurrentUser(userObj);
+              }
+            } else {
+              setCurrentUser(userObj);
+            }
             
             try {
               const todayStr = new Date().toISOString().slice(0, 10);

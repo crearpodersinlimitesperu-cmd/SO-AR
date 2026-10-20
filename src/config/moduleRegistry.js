@@ -64,7 +64,9 @@ export const isModuleVisible = (mod, currentUser) => {
   // Respaldo nominal únicamente para el acceso de revisión FI de Andrés Gómez.
   // No convierte su cuenta en superadmin ni altera otros módulos.
   if (mod.id === 'portafolio' && PORTFOLIO_FI_REVIEW_EMAILS.includes((currentUser?.email || '').trim().toLowerCase())) return true;
-  if (currentUser?.appRole === 'consolidado') return true;
-  return allowedRoles.includes(currentUser?.appRole);
+  if (currentUser?.appRole === 'consolidado') {
+    return (currentUser?.roles || []).some(r => allowedRoles.includes(r));
+  }
+  return allowedRoles.includes(currentUser?.appRole) || (currentUser?.roles || []).some(r => allowedRoles.includes(r));
 };
 
