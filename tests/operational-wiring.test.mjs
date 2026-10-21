@@ -43,6 +43,27 @@ test('both audit agents feed the Super Admin diagnostics archive and Caja Negra 
   assert.match(blackBox, /platform_diagnostic_reports/);
 });
 
+test('pending-audit agent covers all unresolved domains with strict read-only execution limits', () => {
+  const agent = read('.github/agents/causa-auditoria-pendientes.agent.md');
+  for (const coverage of [
+    'Permisos y segregación por sede/rol',
+    'Consistencia de tareas, progreso y colaboración',
+    'Nodus, paginación, sincronización y trazabilidad',
+    'Conversión, pagos y caja',
+    'Futuro Imposible y Equipo 1000',
+    'Palabra Rota, pólizas y correo',
+    'Interfaz y calidad visible',
+    'Estado de los agentes y workflows',
+  ]) {
+    assert.ok(agent.includes(coverage), `agent covers ${coverage}`);
+  }
+  assert.match(agent, /no permanece ejecutándose en segundo plano/);
+  assert.match(agent, /No cambiar ni desplegar reglas/);
+  assert.match(agent, /No iniciar workflows manuales/);
+  assert.match(agent, /NO VERIFICABLE/);
+  assert.match(read('docs/caja_negra_operativa_cpsl.md'), /causa-auditoria-pendientes\.agent\.md/);
+});
+
 test('executive missing definitions cannot use a generic operational input form', () => {
   const source = read('src/pages/MisKPIs.jsx');
   assert.match(source, /selectedPerson\?\.tabCategory === 'ejecutivo'[\s\S]*?No se puede registrar un KPI personal ejecutivo/);

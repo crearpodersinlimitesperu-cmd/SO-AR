@@ -1011,7 +1011,7 @@ service cloud.firestore {
       }
     }
     match /imo_missions/{missionId} {
-      allow read: if true;
+      allow read: if isImoStaff();
       allow create: if isImoStaff() && request.resource.data.schemaVersion == 2 &&
         request.resource.data.createdBy == request.auth.uid && request.resource.data.createdAt == request.time &&
         request.resource.data.originTeam is int && request.resource.data.originTeam >= 0 &&
@@ -1025,10 +1025,10 @@ service cloud.firestore {
       allow update, delete: if isGerenteODireccion() && resource.data.get('schemaVersion', 1) != 2;
     }
     match /{path=**}/imo_confirmations/{enroladoId} {
-      allow read: if true;
+      allow read: if isImoStaff();
     }
     match /{path=**}/imo_progress/{progressId} {
-      allow read: if isAuthenticated() || isImoStaff();
+      allow read: if isImoStaff();
     }
     match /imo_private_mission_windows/{campaignId}/profiles/{windowId} {
       allow read: if isImoStaff();
