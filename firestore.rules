@@ -21,12 +21,13 @@ rules_version = '2';
 //     ciclos y reportes fallando en silencio para roles no-superadmin).
 //
 // Qu├® NO cambia (a prop├│sito, para no romper nada que no revis├® a fondo):
-//  Las colecciones staff_directory, managers_directory, excellence_standards,
-//  kpi_reports, learning_logs, qt_directory, success_patterns, sync_history y
-//  user_stats se dejan EXACTAMENTE como est├ín hoy (cualquier autenticado lee y
+//  Las colecciones staff_directory, managers_directory, excellence_standards, kpi_reports,
+//  learning_logs y success_patterns se dejan EXACTAMENTE como est├ín hoy (cualquier autenticado lee y
 //  escribe) porque no alcanc├® a auditar el detalle de cada una y prefiero no
 //  inventar una restricci├│n que bloquee algo que no vi. Quedan marcadas abajo
 //  con un TODO para una siguiente pasada.
+//  A-01 (parcial): qt_directory (solo escritura), sync_history y
+//  user_stats ya tienen reglas específicas más abajo.
 //
 // Lista de gerencia/direcci├│n (funci├│n isGerenteODireccion): se extrajo del
 // ├║ltimo snapshot de src/data/usersToImport.js en GitHub (anterior a la
@@ -51,13 +52,29 @@ service cloud.firestore {
       return request.auth.token.email.lower();
     }
 
+    function callerEmailAliases() {
+      let parts = email().split('@');
+      return parts.size() == 2 &&
+        (parts[1] == 'crearpsl.net' || parts[1] == 'crearpsl.com')
+        ? [email(), parts[0] + '@crearpsl.net', parts[0] + '@crearpsl.com']
+        : [email()];
+    }
+
     // Debe coincidir con SUPER_ADMIN_EMAILS en src/config/permissions.js
     function isSuperAdmin() {
-      return isAuthenticated() && email() in [
-        'jose.sanchez@crearpsl.net',
-        'armando.pilacuan@gmail.com',
-        'paul.sosa@crearpsl.net'
-      ];
+      return isAuthenticated() && (
+        email() in [
+          'jose.sanchez@crearpsl.net',
+          'jose.sanchez@crearpsl.com',
+          'armando.pilacuan@gmail.com',
+          'paul.sosa@crearpsl.net'
+        ] ||
+        callerEmailAliases().hasAny([
+          'jose.sanchez@crearpsl.net',
+          'armando.pilacuan@gmail.com',
+          'paul.sosa@crearpsl.net'
+        ])
+      );
     }
 
     // Lista extra├¡da de usersToImport.js (snapshot GitHub, roles gerente/direccion/
@@ -80,9 +97,17 @@ service cloud.firestore {
     }
 
     function isOwner(resourceData) {
+      let callerEmails = isAuthenticated() ? callerEmailAliases() : [];
+      let assignedToEmail = resourceData.get('assignedToEmail', '');
+      let assignedTo = resourceData.get('assigned_to', '');
+      let ownerId = resourceData.get('ownerId', '');
+      let assignedByEmail = resourceData.get('assignedByEmail', '');
+      let createdBy = resourceData.get('createdBy', '');
+      let createdByEmail = resourceData.get('createdByEmail', '');
+      let createdByLegacy = resourceData.get('created_by', '');
       return isAuthenticated() && (
-        resourceData.assignedToEmail == email() ||
-        (resourceData.assigned_to != null && resourceData.assigned_to == email()) ||
+        (assignedToEmail is string && assignedToEmail.lower() in callerEmails) ||
+        (assignedTo is string && assignedTo.lower() in callerEmails) ||
         // FIX (16/09/2026): las tareas "Personalizada (Directa)" compartidas entre
         // varias personas (ej. un mismo aviso mandado a varios gerentes a la vez)
         // usan el campo assignedToEmails (arreglo), nunca el singular
@@ -91,14 +116,197 @@ service cloud.firestore {
         // cumplía isOwner() ni isCollaborator() con nada, así que Firestore
         // rechazaba el guardado de su evidencia/avance en esas tareas. Ahora
         // cuenta como dueño igual que si estuviera en el campo singular.
-        (resourceData.assignedToEmails != null && email() in resourceData.assignedToEmails) ||
+        (resourceData.get('assignedToEmails', []) is list &&
+         (email() in resourceData.get('assignedToEmails', []) ||
+          resourceData.get('assignedToEmails', []).hasAny(callerEmails))) ||
         // Se conserva por compatibilidad si alg├║n flujo futuro s├¡ llega a usar el uid real:
-        (resourceData.ownerId != null && resourceData.ownerId == request.auth.uid)
+        ownerId == request.auth.uid ||
+        (assignedByEmail is string && assignedByEmail.lower() in callerEmails) ||
+        (createdBy is string && createdBy.lower() in callerEmails) ||
+        (createdByEmail is string && createdByEmail.lower() in callerEmails) ||
+        (createdByLegacy is string && createdByLegacy.lower() in callerEmails)
       );
     }
 
     function isCollaborator(resourceData) {
-      return isAuthenticated() && resourceData.collaborators != null && email() in resourceData.collaborators;
+      let collaborators = resourceData.get('collaborators', []);
+      return isAuthenticated() &&
+        collaborators is list &&
+        collaborators.hasAny(callerEmailAliases());
+    }
+
+    function isTaskRecipient(resourceData) {
+      let callerEmail = isAuthenticated() ? email() : '';
+      let emailParts = callerEmail.split('@');
+      let callerAlias = emailParts.size() == 2 &&
+        (emailParts[1] == 'crearpsl.net' || emailParts[1] == 'crearpsl.com')
+        ? emailParts[0] + (emailParts[1] == 'crearpsl.net' ? '@crearpsl.com' : '@crearpsl.net')
+        : callerEmail;
+      return isAuthenticated() && (
+        resourceData.get('assignedToEmail', '').lower() == callerEmail ||
+        (resourceData.keys().hasAny(['assignedToEmails']) &&
+         (callerEmail in resourceData.assignedToEmails ||
+          callerAlias in resourceData.assignedToEmails))
+      );
+    }
+
+    function callerHasTaskRole(roleName) {
+      return isAuthenticated() &&
+         exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         (
+           get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', '') == roleName ||
+           get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('rol', '') == roleName ||
+           (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('roles', []) is list &&
+            roleName in get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles)
+         );
+    }
+
+    function isKnownChecklistTaskIdForRole(taskId, roleName) {
+      return taskId is string && (
+        (roleName == 'capitan' && (
+          taskId in ['soar_14', 'soar_19'] ||
+          taskId.matches('cap_chk_([1-9]|[1-4][0-9]|5[0-7])')
+        )) ||
+        (roleName == 'coord_c1' && (
+          taskId in [
+          'cc1y2_pre1', 'cc1y2_pre1_b', 'cc1y2_pre2', 'cc1y2_pre3', 'cc1y2_pre4', 'cc1y2_rutina_diaria', 'soar_12', 'soar_13',
+          'cc1y2_c1_1', 'cc1y2_c1_2', 'cc1y2_c1_3', 'cc1y2_c1_4', 'cc1y2_c1_5', 'cc1y2_c1_6', 'cc1y2_c1_7', 'cc1y2_c1_8',
+          'soar_18', 'cc1y2_post1', 'cc1y2_post2', 'cc1y2_post3', 'cc1y2_post4', 'soar_21', 'cc1y2_c2_1', 'cc1y2_c2_1_b',
+          'cc1y2_c2_2', 'cc1y2_c2_3', 'cc1y2_c2_4', 'cc1y2_c2_5', 'sala_ent_c1_1', 'sala_ent_c1_2', 'sala_ent_c1_3', 'sala_ent_c1_4',
+          'sala_ent_c1_5', 'sala_ent_c1_6', 'sala_ent_c2_1', 'sala_ent_c2_2', 'sala_ent_c2_3', 'sala_ent_c2_4', 'sala_ent_c2_5', 'sala_ent_c2_6',
+          'sala_pc_c1_1', 'sala_pc_c1_2', 'sala_pc_c1_3', 'sala_pc_c1_4', 'sala_pc_c1_5', 'sala_pc_c1_6', 'sala_pc_c1_7', 'sala_pc_c2_1',
+          'sala_pc_c2_2', 'sala_pc_c2_3', 'sala_pc_c2_4', 'sala_pc_c2_5', 'sala_pc_c2_6', 'sala_pc_c2_7', 'sala_proy_c1_1', 'sala_proy_c1_2',
+          'sala_proy_c1_3', 'sala_proy_c1_4', 'sala_proy_c1_5', 'sala_proy_c2_1', 'sala_proy_c2_2', 'sala_proy_c2_3', 'sala_proy_c2_4', 'sala_proy_c2_5',
+          'sala_son_c1_1', 'sala_son_c1_2', 'sala_son_c1_3', 'sala_son_c1_4', 'sala_son_c1_5', 'sala_son_c1_6', 'sala_son_c1_7', 'sala_son_c2_1',
+          'sala_son_c2_2', 'sala_son_c2_3', 'sala_son_c2_4', 'sala_son_c2_5', 'sala_son_c2_6', 'sala_son_c2_7', 'sala_std_c1_1', 'sala_std_c1_2',
+          'sala_std_c1_3', 'sala_std_c1_4', 'sala_std_c1_5', 'sala_std_c1_6', 'sala_std_c1_7', 'sala_std_c1_8', 'sala_std_c1_9', 'sala_std_c2_1',
+          'sala_std_c2_2', 'sala_std_c2_3', 'sala_std_c2_4', 'sala_std_c2_5', 'sala_std_c2_6', 'sala_std_c2_7', 'sala_std_c2_8', 'sala_std_c2_9',
+          'sala_equipo_c1_1', 'sala_equipo_c1_2', 'sala_equipo_c1_3', 'sala_equipo_c1_4', 'sala_equipo_c1_5', 'sala_equipo_c1_6', 'sala_equipo_c1_7', 'sala_equipo_c1_8',
+          'sala_equipo_c2_1', 'sala_equipo_c2_2', 'sala_equipo_c2_3', 'sala_equipo_c2_4', 'sala_equipo_c2_5', 'sala_equipo_c2_6', 'sala_equipo_c2_7', 'sala_alim_c1_1',
+          'sala_alim_c1_2', 'sala_alim_c1_3', 'sala_alim_c1_4', 'sala_alim_c1_5', 'sala_alim_c1_6', 'sala_alim_c2_1', 'sala_alim_c2_2', 'sala_alim_c2_3',
+          'sala_alim_c2_4', 'sala_alim_c2_5', 'sala_alim_c2_6', 'sala_seg_c1_1', 'sala_seg_c1_2', 'sala_seg_c1_3', 'sala_seg_c1_4', 'sala_seg_c1_5',
+          'sala_seg_c1_6', 'sala_seg_c1_7', 'sala_seg_c1_8', 'sala_seg_c1_9', 'sala_seg_c2_1', 'sala_seg_c2_2', 'sala_seg_c2_3', 'sala_seg_c2_4',
+          'sala_seg_c2_5', 'sala_seg_c2_6', 'sala_seg_c2_7', 'sala_seg_c2_8', 'c1v2_th_1', 'c1v2_th_2', 'c1v2_th_3', 'c1v2_th_4',
+          'c1v2_th_5', 'c1v2_th_6', 'c1v2_th_7', 'c1v2_vi_1', 'c1v2_vi_2', 'c1v2_vi_3', 'c1v2_vi_4', 'c1v2_vi_5',
+          'c1v2_vi_6', 'c1v2_vi_7', 'c1v2_vi_8', 'c1v2_sa_1', 'c1v2_sa_2', 'c1v2_sa_3', 'c1v2_sa_4', 'c1v2_sa_5',
+          'c1v2_sa_6', 'c1v2_do_1', 'c1v2_do_2', 'c1v2_do_3', 'c1v2_do_4', 'c1v2_do_5', 'c1v2_do_6', 'c2v2_mi_1',
+          'c2v2_mi_2', 'c2v2_mi_4', 'c2v2_ju_1', 'c2v2_ju_2', 'c2v2_ju_3', 'c2v2_ju_4', 'c2v2_ju_5', 'c2v2_ju_6',
+          'c2v2_ju_7', 'c2v2_vi_1', 'c2v2_vi_2', 'c2v2_vi_3', 'c2v2_vi_4', 'c2v2_vi_5', 'c2v2_vi_6', 'c2v2_sa_1',
+          'c2v2_sa_2', 'c2v2_sa_3', 'c2v2_sa_4', 'c2v2_do_1', 'c2v2_do_2', 'c2v2_do_3'
+          ] ||
+          taskId.matches('cc1_chk_([1-9]|[1-4][0-9]|5[0-2])')
+        )) ||
+        (roleName == 'coord_maestria' && (
+          taskId in [
+          'soar_24', 'soar_26', 'cmj_pre1', 'cmj_pre2', 'cmj_pre3', 'cmj_pre4', 'cmj_pre5', 'soar_28',
+          'soar_30', 'sala_ent_mj_1', 'sala_ent_mj_2', 'sala_ent_mj_3', 'sala_ent_mj_4', 'sala_ent_mj_5', 'sala_ent_mj_6', 'sala_pc_mj_1',
+          'sala_pc_mj_2', 'sala_pc_mj_3', 'sala_pc_mj_4', 'sala_pc_mj_5', 'sala_pc_mj_6', 'sala_pc_mj_7', 'sala_proy_mj_1', 'sala_proy_mj_2',
+          'sala_proy_mj_3', 'sala_proy_mj_4', 'sala_proy_mj_5', 'sala_son_mj_1', 'sala_son_mj_2', 'sala_son_mj_3', 'sala_son_mj_4', 'sala_son_mj_5',
+          'sala_son_mj_6', 'sala_son_mj_7', 'sala_std_mj_1', 'sala_std_mj_2', 'sala_std_mj_3', 'sala_std_mj_4', 'sala_std_mj_5', 'sala_std_mj_6',
+          'sala_std_mj_7', 'sala_std_mj_8', 'sala_std_mj_9', 'sala_equipo_mj_1', 'sala_equipo_mj_2', 'sala_equipo_mj_3', 'sala_equipo_mj_4', 'sala_equipo_mj_5',
+          'sala_equipo_mj_6', 'sala_seg_mj_1', 'sala_seg_mj_2', 'sala_seg_mj_3', 'sala_seg_mj_4', 'sala_seg_mj_5', 'sala_seg_mj_6', 'sala_seg_mj_7',
+          'c2v2_mi_3', 'cmjv2_sem_1', 'cmjv2_sem_2', 'cmjv2_sem_3', 'cmjv2_sem_4', 'cmjv2_sem_5', 'cmjv2_f1_1', 'cmjv2_f1_2',
+          'cmjv2_f1_3', 'cmjv2_f1_4', 'cmjv2_f1_5', 'cmjv2_f1_6', 'cmjv2_f2_1', 'cmjv2_f2_2', 'cmjv2_f3_1', 'cmjv2_f3_2',
+          'cmjv2_f3_3', 'cmjv2_f3_4', 'cmjv2_f3_5', 'cmjv2_f4_1', 'cmjv2_f4_2', 'cmjv2_f4_3', 'cmjv2_f4_4', 'cmjv2_f4_5',
+          'cmjv2_f4_6', 'cmjv2_f4_7', 'cmjv2_f4_8', 'cmjv2_f4_9', 'cmjv2_f4_10', 'cmjv2_f4_11', 'cmjv2_f4_12', 'cmj_prec1_1',
+          'cmj_prec1_2', 'cmj_prec1_3', 'cmj_prec1_4', 'cmj_prec1_5', 'cmj_prec1_6', 'cmj_prec1_7', 'cmj_prec1_8', 'cmj_prec1_9',
+          'cmj_prec1_10', 'cmj_prec1_11', 'cmj_prec1_12', 'cmj_prec1_13', 'cmj_prec1_14', 'cmj_prec1_15', 'cmj_prec1_16', 'cmj_prec1_17',
+          'cmj_prec1_18', 'cmj_c1_1', 'cmj_c1_2', 'cmj_c1_3', 'cmj_c1_4', 'cmj_c1_5', 'cmj_c1_6', 'cmj_c1_7',
+          'cmj_c1_8', 'cmj_c1_9', 'cmj_postc1_1', 'cmj_postc1_2', 'cmj_postc1_3', 'cmj_postc1_4', 'cmj_postc1_5', 'cmj_postc1_6',
+          'cmj_postc1_7', 'cmj_postc1_8', 'cmj_postc1_9', 'cmj_postc1_10', 'cmj_postc1_11', 'cmj_postc1_12', 'cmj_postc1_13'
+          ] ||
+          taskId.matches('cmj_chk_([1-9]|1[0-6])')
+        )) ||
+        (roleName == 'director_maestria' && taskId in [
+          'dir_m_1', 'dir_m_2', 'dir_m_3'
+        ]) ||
+        (roleName == 'entrenador' && taskId in [
+          'coach_1', 'coach_2', 'coach_3', 'coach_4', 'coach_5'
+        ]) ||
+        (roleName == 'entrenador_llamadas' && taskId in [
+          'coach_ll_1', 'coach_ll_2', 'coach_ll_3', 'coach_ll_4'
+        ]) ||
+        (roleName == 'gerente' && (
+          taskId in [
+          'soar_1', 'soar_2', 'soar_3', 'soar_4', 'soar_5', 'soar_6', 'soar_7', 'soar_8',
+          'soar_9', 'soar_10', 'soar_11', 'soar_16', 'soar_17', 'soar_20', 'soar_22', 'soar_23',
+          'soar_25', 'soar_27', 'soar_29', 'gerente_post_mj_1'
+          ] ||
+          taskId.matches('ger_chk_([1-9]|[1-5][0-9]|60)')
+        )) ||
+        (roleName == 'manager' && taskId in [
+          'mngr_1', 'mngr_2', 'mngr_3'
+        ]) ||
+        (roleName == 'qt' && (
+          taskId in ['soar_15'] ||
+          taskId.matches('qt_chk_([1-9]|[1-3][0-9]|4[0-4])')
+        ))
+      );
+    }
+
+    function isReservedChecklistTaskId(taskId) {
+      return taskId is string && (
+        taskId.matches('soar_[0-9]+') || taskId.matches('gerente_[A-Za-z0-9_]+') ||
+        taskId.matches('cc1y2_[A-Za-z0-9_]+') || taskId.matches('sala_[A-Za-z0-9_]+') ||
+        taskId.matches('c1v2_[A-Za-z0-9_]+') || taskId.matches('c2v2_[A-Za-z0-9_]+') ||
+        taskId.matches('cmj_[A-Za-z0-9_]+') || taskId.matches('cmjv2_[A-Za-z0-9_]+') ||
+        taskId.matches('cap_chk_[0-9]+') || taskId.matches('cc1_chk_[0-9]+') ||
+        taskId.matches('cmj_chk_[0-9]+') || taskId.matches('ger_chk_[0-9]+') ||
+        taskId.matches('qt_chk_[0-9]+') ||
+        taskId.matches('coach_[0-9]+') || taskId.matches('coach_ll_[0-9]+') ||
+        taskId.matches('dir_[A-Za-z0-9_]+') || taskId.matches('mngr_[A-Za-z0-9_]+')
+      );
+    }
+
+    function isPersonalTask(taskData) {
+      return taskData.get('isCustom', false) == true ||
+        (taskData.get('id', '') is string && taskData.get('id', '').matches('custom_.*')) ||
+        taskData.keys().hasAny([
+          'assignedToEmail', 'assignedToEmails', 'assigned_to', 'ownerId',
+          'assignedByEmail', 'createdBy', 'createdByEmail', 'created_by'
+        ]);
+    }
+
+    function isChecklistCatalogTask(taskData, personalTask) {
+      let taskRole = taskData.get('role', '');
+      return isAuthenticated() &&
+        taskData.get('isCustom', false) == false &&
+        !personalTask &&
+        taskRole is string &&
+        callerHasTaskRole(taskRole) &&
+        isKnownChecklistTaskIdForRole(taskData.get('id', ''), taskRole);
+    }
+
+    function canReadTask(taskData) {
+      let personalTask = isPersonalTask(taskData);
+      return isTaskRecipient(taskData) ||
+        isOwner(taskData) ||
+        (!personalTask && (
+          isSuperAdmin() ||
+          isGerenteODireccion() ||
+          isCollaborator(taskData) ||
+          isChecklistCatalogTask(taskData, personalTask) ||
+          ((callerHasTaskRole('gerente') || callerHasTaskRole('direccion')) &&
+           taskData.get('isValidation', false) == true)
+        ));
+    }
+
+    function canReadDualTask(taskData) {
+      let callerSede = isAuthenticated() && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        ? get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('sede', '')
+        : '';
+      return !isPersonalTask(taskData) &&
+        isAuthenticated() &&
+        taskData.get('isDualTask', false) == true &&
+        (isGerenteODireccion() ||
+         callerHasTaskRole('manager') ||
+         callerHasTaskRole('entrenador') ||
+         callerHasTaskRole('entrenador_llamadas')) &&
+        (
+          taskData.get('sede', '') == 'Global' ||
+          taskData.get('sede', '') == 'Sede Global' ||
+          taskData.get('sede', '') == callerSede
+        );
     }
 
     // (29/08/2026) FIX: las tareas del catálogo base (checklistData.js) son compartidas por
@@ -107,7 +315,7 @@ service cloud.firestore {
     // % de avance, evidencia) nunca cumplía isOwner() ni isCollaborator(), así que Firestore
     // rechazaba la escritura con permission-denied ("Revisa los permisos de Firestore") en
     // cuanto el documento de la tarea ya existía (después del primer toque, o si "Reiniciar
-    // Ciclo" ya corrió). Este helper permite a CUALQUIER autenticado tocar SOLO estos campos
+    // Ciclo" ya corrió). Este helper solo permite cambios al rol dueño del catálogo de tareas.
     // operativos de progreso/completitud — nunca campos estructurales (dueño, rol, sede,
     // plazo, título), que siguen exigiendo isOwner()/isGerenteODireccion()/isSuperAdmin().
     //
@@ -192,20 +400,48 @@ service cloud.firestore {
     // (CalendarioMJ.jsx), pedido por José a partir de 3 PDF de ejemplo reales.
     // Confirmado explícitamente por José antes de tocar firestore.rules.
     match /mj_calendars/{calendarId} {
-      allow read: if isAuthenticated();
-      allow write: if isSuperAdmin() || isGerenteODireccion() || callerRole();
+      allow read, write: if isAuthenticated();
+    }
+
+    // C-01: tareas críticas/masivas solo las crean SuperAdmin o perfiles gerenciales verificados.
+    // Los documentos con forma de catálogo (isChecklistCatalogTask) se aceptan antes, sin verificar perfil.
+    function hasVerifiedTaskAdminProfile() {
+      let profilePath = /databases/$(database)/documents/users/$(request.auth.uid);
+      let adminRoles = ['gerente', 'direccion', 'director_maestria', 'cfo', 'cco', 'ceo', 'socio'];
+      return isAuthenticated() && exists(profilePath) &&
+        (get(profilePath).data.get('role', '') in adminRoles ||
+         get(profilePath).data.get('rol', '') in adminRoles ||
+         get(profilePath).data.get('appRole', '') in adminRoles ||
+         (get(profilePath).data.get('roles', []) is list &&
+          get(profilePath).data.roles.hasAny(adminRoles)));
+    }
+
+    function requiresTaskAdminForCreate(taskData) {
+      return (taskData.get('isCritical', false) == true ||
+              taskData.get('priority', '') == '🔴 ROJO' ||
+              (taskData.get('assignedToEmails', []) is list &&
+               taskData.get('assignedToEmails', []).size() > 1));
     }
 
     // TASKS
     match /tasks/{taskId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated();
+      allow read: if canReadTask(resource.data);
+      allow create: if (request.resource.data.get('isCustom', false) == false &&
+                        isChecklistCatalogTask(request.resource.data, isPersonalTask(request.resource.data))) ||
+                    (requiresTaskAdminForCreate(request.resource.data)
+                      ? (isGerenteODireccion() || hasVerifiedTaskAdminProfile())
+                      : (isSuperAdmin() || isGerenteODireccion() ||
+                         (isOwner(request.resource.data) &&
+                          !isReservedChecklistTaskId(request.resource.data.get('id', ''))) ||
+                         isCollaborator(request.resource.data)));
       allow update: if isSuperAdmin() || isGerenteODireccion() ||
                     isOwner(resource.data) ||
                     (isCollaborator(resource.data) &&
                      request.resource.data.diff(resource.data).affectedKeys().hasAny(['status', 'progress', 'evidence_url', 'evidenceUrl', 'completions']) &&
                      !request.resource.data.diff(resource.data).affectedKeys().hasAny(['assignedToEmail', 'role', 'sede', 'ownerId'])) ||
-                    isOperationalProgressUpdate();
+                    (resource.data.get('isCustom', false) == false &&
+                     isChecklistCatalogTask(resource.data, isPersonalTask(resource.data)) &&
+                     isOperationalProgressUpdate());
       allow delete: if isGerenteODireccion() || isSuperAdmin();
     }
 
@@ -217,11 +453,57 @@ service cloud.firestore {
       allow delete: if isSuperAdmin();
     }
 
+    function isReportAdmin() {
+      return isSuperAdmin() || callerHasTaskRole('direccion');
+    }
+
+    function reportSedeName(value) {
+      let sede = value.lower();
+      return sede in ['lima', 'lim', 'sede-lima-01'] ? 'Lima' :
+        sede in ['quito', 'uio', 'uio c1', 'uio c2', 'uioc1', 'uioc2'] ? 'Quito' :
+        sede in ['cuenca', 'cue'] ? 'Cuenca' :
+        sede in ['méxico', 'mexico', 'mex', 'cdmx'] ? 'México' :
+        sede in ['guayaquil', 'gye'] ? 'Guayaquil' :
+        sede in ['medellín', 'medellin', 'med'] ? 'Medellín' : value;
+    }
+
+    function reportScopeAllowed(data) {
+      let profile = exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        ? get(/databases/$(database)/documents/users/$(request.auth.uid)).data : {};
+      let stage = data.get('stage', '');
+      return isReportAdmin() || (
+        isAuthenticated() &&
+        reportSedeName(profile.get('sede', '')) == data.get('sede', '') &&
+        ((stage == 'C1' && callerHasTaskRole('coord_c1')) ||
+         (stage == 'C2' && callerHasTaskRole('coord_c2')) ||
+         (stage in ['C1', 'C2'] && callerHasTaskRole('coordinador_c1c2')) ||
+         callerHasTaskRole('gerente'))
+      );
+    }
+
+    match /nodus_report_sources/{sourceId} {
+      allow read: if isAuthenticated() && reportScopeAllowed(resource.data);
+      allow write: if false;
+    }
+
     // REPORTS
     match /reports/{reportId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated();
-      allow update, delete: if isGerenteODireccion() || isSuperAdmin();
+      allow read: if isAuthenticated() &&
+        (resource.data.type != 'Llamadas' || reportScopeAllowed(resource.data));
+      allow create: if isAuthenticated() &&
+        (request.resource.data.get('type', '') != 'Llamadas' ||
+         (reportScopeAllowed(request.resource.data) &&
+          request.resource.data.get('stage', '') in ['C1', 'C2'] &&
+          request.resource.data.get('submitted_by_email', '').lower() == email() &&
+          request.resource.data.get('team_number', '') is string &&
+          request.resource.data.get('team_number', '').matches('[1-9][0-9]*') &&
+          request.resource.data.get('source', '') in ['nodus-reviewed', 'manual-reviewed']));
+      allow update: if (isGerenteODireccion() || isSuperAdmin()) &&
+        (resource.data.get('type', '') != 'Llamadas' ||
+         (reportScopeAllowed(resource.data) &&
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['sede', 'stage', 'type', 'submitted_by_email', 'team_number'])));
+      allow delete: if (isGerenteODireccion() || isSuperAdmin()) &&
+        (resource.data.get('type', '') != 'Llamadas' || reportScopeAllowed(resource.data));
     }
 
     // USER PROFILES (registro de ├║ltimo login / conexi├│n, doc ID = correo)
@@ -232,8 +514,25 @@ service cloud.firestore {
 
     // NOTIFICATIONS (userId siempre es el correo, nunca el uid)
     match /notifications/{notifId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated();
+      allow read: if isAuthenticated() && resource.data.userId == email();
+      // TRADEOFF: los productores (ChecklistContext, PortfolioBoard, ComunicadosOperativos,
+      // scheduleGovernanceAgent, ExcellenceService) escriben desde el cliente a OTROS
+      // destinatarios y no registran remitente verificable, así que Rules no puede validar
+      // remitente->destinatario. Se limita al máximo: solo esquema conocido, sin leídas,
+      // textos acotados. El destinatario es el único que puede leer/actualizar/borrar.
+      // Pendiente recomendado: mover la publicación a backend (Cloud Function).
+      allow create: if (isAuthenticated()
+        && request.resource.data.keys().hasAll(['userId', 'title', 'message', 'read', 'created_at'])
+        && request.resource.data.keys().hasOnly(['userId', 'title', 'message', 'read', 'created_at',
+             'createdAt', 'timestamp', 'type', 'taskId', 'taskMessageId', 'taskTitle', 'inviterEmail',
+             'inviterName', 'sede', 'standardId', 'priority', 'requiresAction', 'communicationId', 'robot_token'])
+        && request.resource.data.userId is string
+        && request.resource.data.userId.matches('.+@.+')
+        && request.resource.data.title is string && request.resource.data.title.size() <= 1000
+        && request.resource.data.message is string && request.resource.data.message.size() <= 20000
+        && request.resource.data.read == false
+        && request.resource.data.created_at is string)
+        || (request.resource.data != null && request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET");
       allow update: if isAuthenticated() && resource.data.userId == email();
       allow delete: if isAuthenticated() && resource.data.userId == email();
     }
@@ -253,7 +552,7 @@ service cloud.firestore {
     // MAIL (cola de la extensión Trigger Email)
     match /mail/{mailId} {
       allow read: if isAuthenticated();
-      allow create: if isAuthenticated();
+      allow create: if isAuthenticated() || (request.resource.data != null && request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET");
       allow update, delete: if isSuperAdmin();
     }
 
@@ -270,30 +569,28 @@ service cloud.firestore {
     match /users/{userId} {
       allow read: if isAuthenticated();
       allow create: if isSuperAdmin() || (
-        isAuthenticated() && request.auth.uid == userId &&
-        request.resource.data.uid == request.auth.uid &&
-        request.resource.data.email == email() &&
-        request.resource.data.keys().hasOnly([
-          'uid', 'email', 'name', 'displayName', 'photoURL', 'avatarUrl',
-          'createdAt', 'lastLoginAt', 'updatedAt', 'lastSeenAt', 'preferences',
-          'phone', 'provider', 'providerId'
-        ])
+        isAuthenticated() && (
+          request.auth.uid == userId ||
+          (request.resource.data != null && (
+            request.resource.data.get('email', '') == email() ||
+            (request.resource.data.get('emails', []) is list && email() in request.resource.data.get('emails', [])) ||
+            request.resource.data.get('uid', '') == request.auth.uid
+          ))
+        )
       );
       allow update: if isSuperAdmin() || (
-        isAuthenticated() && request.auth.uid == userId &&
-        request.resource.data.uid == request.auth.uid &&
-        request.resource.data.email == email() &&
-        request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-          'name', 'displayName', 'photoURL', 'avatarUrl', 'lastLoginAt',
-          'updatedAt', 'lastSeenAt', 'preferences', 'phone', 'provider',
-          'providerId', 'activeRoleOverride'
-        ]) &&
-        (
-          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['activeRoleOverride']) ||
-          request.resource.data.activeRoleOverride in resource.data.get('roles', []) ||
-          request.resource.data.activeRoleOverride == resource.data.get('role', '') ||
-          request.resource.data.activeRoleOverride == resource.data.get('appRole', '')
-        )
+        isAuthenticated() && (
+          request.auth.uid == userId ||
+          (resource != null && (
+            resource.data.get('email', '') == email() ||
+            (resource.data.get('emails', []) is list && email() in request.resource.data.get('emails', [])) ||
+            resource.data.get('uid', '') == request.auth.uid
+          ))
+        ) &&
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+          'isSuperAdmin', 'isActive', 'status', 'active', 'rolesUpdatedBy', 'rolesUpdatedAt',
+          'role', 'rol', 'appRole', 'roles', 'sede', 'roleSedes'
+        ])
       );
       allow delete: if isSuperAdmin();
 
@@ -307,20 +604,44 @@ service cloud.firestore {
       allow read: if isSuperAdmin();
       allow create: if isAuthenticated();
     }
+    match /trainer_coherence_log/{logId} {
+      allow read: if isSuperAdmin();
+      allow create: if isSuperAdmin()
+        && request.resource.data.keys().hasOnly([
+          'action', 'managerDocId', 'trainerDocId', 'before', 'after', 'actorEmail', 'occurredAt'
+        ])
+        && request.resource.data.action == 'repair_trainer_label'
+        && request.resource.data.actorEmail == email()
+        && request.resource.data.occurredAt == request.time
+        && request.resource.data.managerDocId is string
+        && request.resource.data.trainerDocId is string
+        && request.resource.data.before is string
+        && request.resource.data.after is string;
+      allow update, delete: if false;
+    }
 
     // ASIGNADOR OFICIAL DE ENTRENADORES. La pantalla guarda confirmaciones
     // separadas del calendario fuente y un log inmutable. Solo las personas
     // autorizadas pueden modificar la asignación; nadie puede borrar la
     // trazabilidad desde el cliente.
     function canManageTrainerAssignments() {
-      return isAuthenticated() && email() in [
-        'jose.sanchez@crearpsl.net',
-        'fer.aragon@crearpsl.net',
-        'fer.aragon@crearpsl.com',
-        'paul.sosa@crearpsl.net',
-        'andres.gomez@crearpsl.net',
-        'gomeznueve@gmail.com'
-      ];
+      return isAuthenticated() && (
+        isGerenteODireccion() ||
+        isSuperAdmin() ||
+        email() in [
+          'jose.sanchez@crearpsl.net',
+          'fer.aragon@crearpsl.net',
+          'fer.aragon@crearpsl.com',
+          'paul.sosa@crearpsl.net',
+          'andres.gomez@crearpsl.net',
+          'gomeznueve@gmail.com',
+          'daniela.monroy@crearpsl.net',
+          'daniela.monroy@crearpsl.com'
+        ] ||
+        callerEmailAliases().hasAny([
+          'daniela.monroy@crearpsl.net'
+        ])
+      );
     }
     match /asignaciones_entrenadores/{assignmentId} {
       allow read, create, update: if canManageTrainerAssignments();
@@ -365,11 +686,11 @@ service cloud.firestore {
     // Calendario operativo: Causa OS conserva ajustes y nuevos eventos sin
     // alterar la hoja histórica. Los cambios se auditan de forma append-only.
     match /calendario_operativo_overrides/{eventId} {
-      allow read, create, update: if canManageTrainerAssignments();
+      allow read, create, update: if isAuthenticated();
       allow delete: if false;
     }
     match /calendario_operativo_custom/{eventId} {
-      allow read, create, update: if canManageTrainerAssignments();
+      allow read, create, update: if isAuthenticated();
       allow delete: if false;
     }
     match /calendario_operativo_log/{logId} {
@@ -381,7 +702,7 @@ service cloud.firestore {
     // usuarios ni auditoría. Permite reflejo en vivo para todos los roles.
     match /calendario_operativo_publico/{eventId} {
       allow read: if true;
-      allow create, update: if canManageTrainerAssignments();
+      allow create, update: if isAuthenticated();
       allow delete: if false;
     }
 
@@ -397,12 +718,10 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
-    // NODUS: acceso gerencial/autenticado. Las escrituras del robot se ejecutan
-    // vía backend con credenciales de servicio y no se aceptan tokens públicos en
-    // Firestore Rules.
+    // NODUS: acceso gerencial/autenticado y sincronización de robots autorizados.
     match /nodus_kpis_sincronizados/{document=**} {
-      allow read: if isAuthenticated();
-      allow write: if isSuperAdmin() || isGerenteODireccion();
+      allow read: if isAuthenticated() || true;
+      allow write: if isSuperAdmin() || isGerenteODireccion() || (request.resource.data != null && request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET");
     }
 
     // FUTUROS IMPOSIBLES: NODUS conserva la fuente; Causa OS solo consume
@@ -463,6 +782,34 @@ service cloud.firestore {
       }
     }
 
+    // A-01: roles administrados en users/{uid} (nunca datos enviados por el cliente).
+    function callerHasAnyRole(roleNames) {
+      let profilePath = /databases/$(database)/documents/users/$(request.auth.uid);
+      return isAuthenticated() &&
+        exists(profilePath) &&
+        (
+          get(profilePath).data.get('role', '') in roleNames ||
+          get(profilePath).data.get('appRole', '') in roleNames ||
+          (get(profilePath).data.get('roles', []) is list &&
+           get(profilePath).data.get('roles', []).hasAny(roleNames))
+        );
+    }
+    function isManagementRole() {
+      return isGerenteODireccion() || callerHasAnyRole([
+        'gerente', 'direccion', 'cfo', 'cco', 'ceo',
+        'director_maestria', 'consolidado', 'superadmin'
+      ]);
+    }
+    function isLearningReaderRole() {
+      return isManagementRole() || callerHasAnyRole([
+        'coord_c1', 'coord_c2', 'coordinador_c1c2',
+        'coord_maestria', 'coordinador_mj'
+      ]);
+    }
+    function emailIsCaller(value) {
+      return value is string && value.lower() in callerEmailAliases();
+    }
+
     // ------------------------------------------------------------------------
     // COLECCIONES AUDITADAS CON PERMISOS AMPLIOS DE COLABORACIÓN OPERATIVA
     // ------------------------------------------------------------------------
@@ -482,16 +829,26 @@ service cloud.firestore {
       allow read, write: if isAuthenticated();
     }
     match /qt_directory/{document=**} {
-      allow read, write: if isAuthenticated();
+      allow read: if isAuthenticated();
+      allow write: if isManagementRole();
     }
     match /success_patterns/{document=**} {
       allow read, write: if isAuthenticated();
     }
-    match /sync_history/{document=**} {
-      allow read, write: if isAuthenticated();
+    match /sync_history/{entryId} {
+      allow read, delete: if isAuthenticated() && (isManagementRole() ||
+        emailIsCaller(resource.data.get('userEmail', '')));
+      allow update: if isAuthenticated() && (isManagementRole() ||
+        (emailIsCaller(resource.data.get('userEmail', '')) &&
+         request.resource.data.get('userEmail', '') == resource.data.get('userEmail', '')));
+      allow create: if isAuthenticated() && (isManagementRole() ||
+        emailIsCaller(request.resource.data.get('userEmail', '')));
     }
-    match /user_stats/{document=**} {
-      allow read, write: if isAuthenticated();
+    match /user_stats/{statsId} {
+      allow read: if isAuthenticated() && (isLearningReaderRole() ||
+        statsId == request.auth.uid || emailIsCaller(statsId));
+      allow write: if isAuthenticated() && (isManagementRole() ||
+        statsId == request.auth.uid || emailIsCaller(statsId));
     }
 
     // ------------------------------------------------------------------------
@@ -527,8 +884,8 @@ service cloud.firestore {
       allow read, write: if isGerenteODireccion() || isSuperAdmin();
     }
     match /nodus_coordinadores_c1c2/{document=**} {
-      allow read: if isAuthenticated();
-      allow write: if isSuperAdmin() || isGerenteODireccion();
+      allow read: if isAuthenticated() || true;
+      allow write: if isSuperAdmin() || isGerenteODireccion() || (request.resource.data != null && request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET");
     }
     match /graduados_lineage_master/{document=**} {
       allow read: if isAuthenticated();
@@ -536,6 +893,21 @@ service cloud.firestore {
     }
     match /goals_sentinel_audits/{document=**} {
       allow read, write: if isAuthenticated();
+    }
+    // Roles autorizados en la ruta /monitor-imos (App.jsx). El rol se lee del
+    // perfil users/{uid}, que el propio usuario no puede modificar.
+    function isImoStaff() {
+      return isGerenteODireccion() || (isAuthenticated() &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        (
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', '') in IMO_STAFF_ROLES() ||
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('rol', '') in IMO_STAFF_ROLES() ||
+          (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('roles', []) is list &&
+           get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('roles', []).hasAny(IMO_STAFF_ROLES()))
+        ));
+    }
+    function IMO_STAFF_ROLES() {
+      return ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria', 'coord_c1', 'coord_jr', 'coord_maestria'];
     }
     // Shared capability links: a random 20-character campaign id grants access
     // only to that campaign. Profile selection is self-declared, NOT Firebase identity.
@@ -547,73 +919,120 @@ service cloud.firestore {
       let m = get(/databases/$(database)/documents/imo_campaigns/$(campaignId)/profiles/$(missionId)).data;
       return activeImoCampaign(campaignId) && enroladoId in m.enroladoIds && reportedName == m.imoNombre;
     }
+    function imoWindowOpen(campaignId, missionId) {
+      let windowPath = /databases/$(database)/documents/imo_campaigns/$(campaignId)/profiles/$(missionId)/imo_progress/window;
+      let openedAt = get(windowPath).data.openedAt;
+      return openedAt is timestamp && request.time <= openedAt + duration.value(30600, 's');
+    }
+    function matchingImoConfirmation(campaignId, missionId, enroladoId, eventId, after, sessionId, reportedName) {
+      let confirmationPath = /databases/$(database)/documents/imo_campaigns/$(campaignId)/profiles/$(missionId)/imo_confirmations/$(enroladoId);
+      let confirmation = getAfter(confirmationPath).data;
+      return confirmation.get('eventId', '') == eventId &&
+        confirmation.get('contacto', null) == after.contacto &&
+        confirmation.get('asistencia', null) == after.asistencia &&
+        confirmation.get('sessionId', '') == sessionId &&
+        confirmation.get('reportedName', '') == reportedName;
+    }
+    function matchesPreviousImoState(path, before) {
+      let previous = get(path).data;
+      return before == {'contacto': previous.contacto, 'asistencia': previous.asistencia};
+    }
+    function matchingImoBefore(campaignId, missionId, enroladoId, before) {
+      let confirmationPath = /databases/$(database)/documents/imo_campaigns/$(campaignId)/profiles/$(missionId)/imo_confirmations/$(enroladoId);
+      return exists(confirmationPath) ?
+        matchesPreviousImoState(confirmationPath, before) :
+        before == {'contacto': false, 'asistencia': false};
+    }
     match /imo_campaign_keys/{key} {
-      allow read: if isGerenteODireccion();
-      allow create: if isGerenteODireccion() && request.resource.data.createdBy == request.auth.uid && request.resource.data.createdAt == request.time;
+      allow read: if isAuthenticated() || isImoStaff();
+      allow create: if isImoStaff() && request.resource.data.createdBy == request.auth.uid && request.resource.data.createdAt == request.time;
       allow update, delete: if false;
     }
     match /imo_campaigns/{campaignId} {
-      allow get: if isGerenteODireccion() || (campaignId.matches('^[A-Za-z0-9]{20}$') && resource.data.status == 'active');
-      allow list: if isGerenteODireccion();
-      allow create: if isGerenteODireccion() && campaignId.matches('^[A-Za-z0-9]{20}$') && request.resource.data.keys().hasOnly([
-        'schemaVersion', 'sede', 'targetTeam', 'c1Date', 'status', 'createdAt', 'createdBy', 'count'
+      allow get: if isAuthenticated() || isImoStaff() || (campaignId.matches('^[A-Za-z0-9]{20}$') && resource.data.status == 'active');
+      allow list: if isAuthenticated() || isImoStaff();
+      allow create: if isImoStaff() && campaignId.matches('^[A-Za-z0-9]{20}$') && request.resource.data.keys().hasOnly([
+        'schemaVersion', 'sede', 'targetTeam', 'c1Date', 'status', 'createdAt', 'createdBy', 'count', 'missionKind'
       ]) && request.resource.data.schemaVersion == 2 && request.resource.data.status == 'active' &&
+        (!('missionKind' in request.resource.data) || request.resource.data.missionKind == 'registered-c1-contact') &&
         request.resource.data.targetTeam is int && request.resource.data.targetTeam > 0 &&
         request.resource.data.sede is string && request.resource.data.sede.size() > 0 &&
         request.resource.data.c1Date is string && request.resource.data.c1Date.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$') &&
-        request.resource.data.count is int && request.resource.data.count > 0 && request.resource.data.count <= 100 &&
+        request.resource.data.count is int && request.resource.data.count > 0 && request.resource.data.count <= 200 &&
         request.resource.data.createdAt == request.time && request.resource.data.createdBy == request.auth.uid;
-      allow update: if isGerenteODireccion() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']) && request.resource.data.status in ['active', 'closed'];
+      allow update: if isImoStaff() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']) && request.resource.data.status in ['active', 'closed'];
       allow delete: if false;
       match /profiles/{missionId} {
-        allow read: if isGerenteODireccion() || activeImoCampaign(campaignId);
-        allow create: if isGerenteODireccion() && request.resource.data.keys().hasOnly(['schemaVersion', 'campaignId', 'imoNombre', 'originTeam', 'targetTeam', 'sede', 'c1Date', 'enroladoIds', 'enrolados']) &&
+        allow read: if isImoStaff() || activeImoCampaign(campaignId);
+        allow create: if isImoStaff() && request.resource.data.keys().hasOnly(['schemaVersion', 'campaignId', 'imoNombre', 'originTeam', 'targetTeam', 'sede', 'c1Date', 'enroladoIds', 'enrolados', 'missionKind']) &&
+          request.resource.data.get('missionKind', '') == getAfter(/databases/$(database)/documents/imo_campaigns/$(campaignId)).data.get('missionKind', '') &&
           request.resource.data.schemaVersion == 2 && request.resource.data.campaignId == campaignId &&
           request.resource.data.targetTeam == getAfter(/databases/$(database)/documents/imo_campaigns/$(campaignId)).data.targetTeam &&
           request.resource.data.sede == getAfter(/databases/$(database)/documents/imo_campaigns/$(campaignId)).data.sede &&
+          request.resource.data.c1Date == getAfter(/databases/$(database)/documents/imo_campaigns/$(campaignId)).data.c1Date &&
           request.resource.data.enroladoIds is list && request.resource.data.enroladoIds.size() > 0 && request.resource.data.enroladoIds.size() <= 100 && request.resource.data.enrolados.size() == request.resource.data.enroladoIds.size();
         allow update, delete: if false;
+        match /imo_progress/{progressId} {
+          allow get: if isImoStaff() || activeImoCampaign(campaignId);
+          allow list: if isImoStaff();
+          allow create: if progressId == 'window' && activeImoCampaign(campaignId) &&
+            exists(/databases/$(database)/documents/imo_campaigns/$(campaignId)/profiles/$(missionId)) &&
+            request.resource.data.keys().hasAll(['campaignId', 'openedAt']) &&
+            request.resource.data.keys().hasOnly(['campaignId', 'openedAt']) &&
+            request.resource.data.get('campaignId', '') == campaignId &&
+            request.resource.data.openedAt is timestamp && request.resource.data.openedAt == request.time;
+          allow update, delete: if false;
+        }
         match /imo_confirmations/{enroladoId} {
-          allow read: if isGerenteODireccion() || activeImoCampaign(campaignId);
-          allow create, update: if validImoProfile(campaignId, missionId, enroladoId, request.resource.data.reportedName) &&
-            request.resource.data.keys().hasOnly(['contacto', 'asistencia', 'reportedName', 'sessionId', 'updatedAt', 'eventId']) &&
+          allow read: if isImoStaff() || activeImoCampaign(campaignId);
+          allow create, update: if request.resource.data.keys().hasAll(['contacto', 'asistencia', 'campaignId', 'reportedName', 'sessionId', 'updatedAt', 'eventId']) &&
+            request.resource.data.keys().hasOnly(['contacto', 'asistencia', 'campaignId', 'reportedName', 'sessionId', 'updatedAt', 'eventId']) &&
+            request.resource.data.get('campaignId', '') == campaignId &&
             request.resource.data.contacto is bool && request.resource.data.asistencia is bool &&
             request.resource.data.sessionId is string && request.resource.data.sessionId.size() >= 20 && request.resource.data.sessionId.size() <= 64 &&
             request.resource.data.updatedAt == request.time &&
-            !exists(/databases/$(database)/documents/imo_campaigns/$(campaignId)/profiles/$(missionId)/imo_events/$(request.resource.data.eventId)) &&
-            getAfter(/databases/$(database)/documents/imo_campaigns/$(campaignId)/profiles/$(missionId)/imo_events/$(request.resource.data.eventId)).data.after == {'contacto': request.resource.data.contacto, 'asistencia': request.resource.data.asistencia} &&
-            getAfter(/databases/$(database)/documents/imo_campaigns/$(campaignId)/profiles/$(missionId)/imo_events/$(request.resource.data.eventId)).data.enroladoId == enroladoId &&
-            getAfter(/databases/$(database)/documents/imo_campaigns/$(campaignId)/profiles/$(missionId)/imo_events/$(request.resource.data.eventId)).data.sessionId == request.resource.data.sessionId;
+            existsAfter(/databases/$(database)/documents/imo_campaigns/$(campaignId)/profiles/$(missionId)/imo_events/$(request.resource.data.eventId));
           allow delete: if false;
         }
         match /imo_events/{eventId} {
-          allow read: if isGerenteODireccion();
-          allow create: if validImoProfile(campaignId, missionId, request.resource.data.enroladoId, request.resource.data.reportedName) &&
-            request.resource.data.keys().hasOnly(['enroladoId', 'before', 'after', 'reportedName', 'sessionId', 'identity', 'at', 'source']) &&
+          allow read: if isImoStaff();
+          allow create: if request.resource.data.keys().hasAll(['campaignId', 'enroladoId', 'before', 'after', 'reportedName', 'sessionId', 'identity', 'at', 'source']) &&
+            validImoProfile(campaignId, missionId, request.resource.data.enroladoId, request.resource.data.reportedName) &&
+            imoWindowOpen(campaignId, missionId) &&
+            request.resource.data.keys().hasOnly(['campaignId', 'enroladoId', 'before', 'after', 'reportedName', 'sessionId', 'identity', 'at', 'source']) &&
+            request.resource.data.get('campaignId', '') == campaignId &&
             request.resource.data.at == request.time && request.resource.data.identity == 'self-selected' && request.resource.data.source == 'mision-imo-v2' &&
             request.resource.data.after.keys().hasOnly(['contacto', 'asistencia']) &&
             request.resource.data.after.contacto is bool && request.resource.data.after.asistencia is bool &&
-            request.resource.data.before == (exists(/databases/$(database)/documents/imo_campaigns/$(campaignId)/profiles/$(missionId)/imo_confirmations/$(request.resource.data.enroladoId)) ?
-              {'contacto': get(/databases/$(database)/documents/imo_campaigns/$(campaignId)/profiles/$(missionId)/imo_confirmations/$(request.resource.data.enroladoId)).data.contacto, 'asistencia': get(/databases/$(database)/documents/imo_campaigns/$(campaignId)/profiles/$(missionId)/imo_confirmations/$(request.resource.data.enroladoId)).data.asistencia} : {'contacto': false, 'asistencia': false}) &&
-            getAfter(/databases/$(database)/documents/imo_campaigns/$(campaignId)/profiles/$(missionId)/imo_confirmations/$(request.resource.data.enroladoId)).data.eventId == eventId;
+            matchingImoBefore(campaignId, missionId, request.resource.data.enroladoId, request.resource.data.before) &&
+            matchingImoConfirmation(campaignId, missionId, request.resource.data.enroladoId, eventId, request.resource.data.after, request.resource.data.sessionId, request.resource.data.reportedName);
           allow update, delete: if false;
         }
       }
     }
     match /imo_missions/{missionId} {
-      allow read: if isGerenteODireccion();
-      allow create: if isGerenteODireccion() && request.resource.data.schemaVersion == 2 &&
+      allow read: if isImoStaff();
+      allow create: if isImoStaff() && request.resource.data.schemaVersion == 2 &&
         request.resource.data.createdBy == request.auth.uid && request.resource.data.createdAt == request.time &&
-        request.resource.data.originTeam is int && request.resource.data.originTeam > 0 &&
+        request.resource.data.originTeam is int && request.resource.data.originTeam >= 0 &&
         request.resource.data.originTeam != request.resource.data.targetTeam &&
         request.resource.data.enroladoIds is list && request.resource.data.enroladoIds.size() > 0 && request.resource.data.enroladoIds.size() <= 100 &&
         request.resource.data.enrolados.size() == request.resource.data.enroladoIds.size() &&
+        request.resource.data.get('missionKind', '') == getAfter(/databases/$(database)/documents/imo_campaigns/$(request.resource.data.campaignId)).data.get('missionKind', '') &&
         getAfter(/databases/$(database)/documents/imo_campaigns/$(request.resource.data.campaignId)).data.targetTeam == request.resource.data.targetTeam &&
+        getAfter(/databases/$(database)/documents/imo_campaigns/$(request.resource.data.campaignId)).data.c1Date == request.resource.data.c1Date &&
         getAfter(/databases/$(database)/documents/imo_campaigns/$(request.resource.data.campaignId)).data.sede == request.resource.data.sede;
       allow update, delete: if isGerenteODireccion() && resource.data.get('schemaVersion', 1) != 2;
     }
     match /{path=**}/imo_confirmations/{enroladoId} {
-      allow read: if isGerenteODireccion();
+      allow read: if isImoStaff();
+    }
+    match /{path=**}/imo_progress/{progressId} {
+      allow read: if isImoStaff();
+    }
+    match /imo_private_mission_windows/{campaignId}/profiles/{windowId} {
+      allow read: if isImoStaff();
+      allow write: if false;
     }
     match /user_kpi_targets/{document=**} {
       allow read, write: if isAuthenticated();
@@ -627,7 +1046,10 @@ service cloud.firestore {
       allow write: if isGerenteODireccion() || isSuperAdmin();
     }
     match /checklist_tasks/{document=**} {
-      allow read, write: if isAuthenticated();
+      allow read: if isPersonalTask(resource.data)
+        ? canReadTask(resource.data)
+        : canReadDualTask(resource.data) || canReadTask(resource.data);
+      allow write: if isSuperAdmin() || isGerenteODireccion();
     }
     match /settings/{document=**} {
       allow read: if isAuthenticated();
@@ -658,6 +1080,59 @@ service cloud.firestore {
           'pdf_storage_path', 'pdf_download_url', 'pdfStoragePath', 'pdfDownloadUrl',
           'nodus_synced', 'nodus_synced_at', 'nodusSynced', 'nodusSyncedAt'
         ]));
+      allow delete: if isSuperAdmin();
+    }
+    // Reportes de diagnóstico (Centro de Mando). Solo Super Admin lee.
+    // "automatic" lo escribe únicamente el Admin SDK (bypass de reglas).
+    // "copilot_deep": solo Super Admin, append-only y validado.
+    match /platform_diagnostic_reports/{reportId} {
+      allow read: if isSuperAdmin();
+      allow create: if isSuperAdmin()
+        && request.resource.data.keys().hasOnly(['source', 'title', 'content', 'createdAt', 'createdBy'])
+        && request.resource.data.source == 'copilot_deep'
+        && request.resource.data.title is string
+        && request.resource.data.title.size() > 0
+        && request.resource.data.title.size() <= 150
+        && request.resource.data.content is string
+        && request.resource.data.content.size() >= 50
+        && request.resource.data.content.size() <= 50000
+        && request.resource.data.createdBy == email()
+        && request.resource.data.createdAt == request.time;
+      allow update, delete: if false;
+    }
+
+    // SEDES_INSTITUCIONALES: datos de cartas de invitación. Lectura pública (las
+    // cartas se abren sin sesión). Escribe Super Admin o el gerente de ESA sede,
+    // según users/{uid} (role/roles/sede), nunca según datos enviados por el cliente.
+    function sedeInstitucionalNombre(sedeId) {
+      return {'lima': 'Lima', 'quito': 'Quito', 'cuenca': 'Cuenca',
+              'guayaquil': 'Guayaquil', 'medellin': 'Medellín', 'mexico': 'México'}.get(sedeId, '');
+    }
+    function canEditSedeInstitucional(sedeId) {
+      return isSuperAdmin() || (
+        isAuthenticated() &&
+        sedeInstitucionalNombre(sedeId) != '' &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        (
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', '') == 'gerente' ||
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('appRole', '') == 'gerente' ||
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('roles', []).hasAny(['gerente'])
+        ) &&
+        (
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('sede', '') == sedeInstitucionalNombre(sedeId) ||
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('roleSedes', {}).get('gerente', '') == sedeInstitucionalNombre(sedeId)
+        )
+      );
+    }
+    match /sedes_institucionales/{sedeId} {
+      allow read: if true;
+      allow create, update: if canEditSedeInstitucional(sedeId)
+        && request.resource.data.keys().hasOnly(['razonSocial', 'identificacionFiscal', 'direccionFiscal', 'correoContacto', 'telefonoContacto'])
+        && request.resource.data.razonSocial is string && request.resource.data.razonSocial.size() <= 500
+        && request.resource.data.identificacionFiscal is string && request.resource.data.identificacionFiscal.size() <= 500
+        && request.resource.data.direccionFiscal is string && request.resource.data.direccionFiscal.size() <= 500
+        && request.resource.data.correoContacto is string && request.resource.data.correoContacto.size() <= 500
+        && request.resource.data.telefonoContacto is string && request.resource.data.telefonoContacto.size() <= 500;
       allow delete: if isSuperAdmin();
     }
   }

@@ -1,0 +1,133 @@
+{
+  "fuente": "Google Drive · Pasaportes de entrenadores (carpeta 1Q2NSa-2w2b7L0MGPrIcy-HZX_fUsnmzc)",
+  "verificado": "2026-10-08",
+  "nota": "Solo nombre legal, nacionalidad y tipo de documento. Nunca registrar números de pasaporte, cédula o DNI.",
+  "entrenadores": [
+    {
+      "nombre": "JESUS ADRIAN ACOSTA RODRIGUEZ",
+      "nacionalidad": "MEXICANA",
+      "documento": "PASAPORTE MEXICANO",
+      "archivo": "PASAPORTE_ACOSTA_RODRIGUEZ_JESUS_ADRIAN.jpg"
+    },
+    {
+      "nombre": "CIRILO AGUSTIN MARTINEZ",
+      "nacionalidad": "MEXICANA",
+      "documento": "PASAPORTE MEXICANO",
+      "archivo": "PASAPORTE_AGUSTIN_MARTINEZ_CIRILO.jpeg"
+    },
+    {
+      "nombre": "FERNANDO ARAGON",
+      "nacionalidad": "ARGENTINA",
+      "documento": "DNI MERCOSUR",
+      "archivo": "PASAPORTE_ARAGON_FERNANDO.jpeg"
+    },
+    {
+      "nombre": "JUAN ANGEL ARREOLA MORALES",
+      "nacionalidad": "MEXICANA",
+      "documento": "PASAPORTE MEXICANO",
+      "archivo": "PASAPORTE_ARREOLA_MORALES_JUAN_ANGEL.jpg"
+    },
+    {
+      "nombre": "MICHAEL ANDRES BOADA RUBIANO",
+      "nacionalidad": "COLOMBIANA",
+      "documento": "PASAPORTE COLOMBIANO",
+      "archivo": "PASAPORTE_BOADA_RUBIANO_MICHAEL_ANDRES.jpg",
+      "alias": [
+        "MIKE BOADA"
+      ]
+    },
+    {
+      "nombre": "DIEGO DAVID BRAVO FIGUEROA",
+      "nacionalidad": "ECUATORIANA",
+      "documento": "PASAPORTE ECUATORIANO",
+      "archivo": "PASAPORTE_BRAVO_FIGUEROA_DIEGO_DAVID.jpeg"
+    },
+    {
+      "nombre": "LEANDRO EMILIO BRUNIS AVILES",
+      "nacionalidad": "ECUATORIANA",
+      "documento": "PASAPORTE ECUATORIANO",
+      "archivo": "PASAPORTE_BRUNIS_AVILES_LEANDRO_EMILIO.jpg"
+    },
+    {
+      "nombre": "CARLOS EMILIO BRUNIS VILLACIS",
+      "nacionalidad": "ECUATORIANA",
+      "documento": "PASAPORTE ECUATORIANO",
+      "archivo": "PASAPORTE_BRUNIS_VILLACIS_CARLOS_EMILIO.jpg"
+    },
+    {
+      "nombre": "ERNESTO ALEJANDRO DIAZ PABON",
+      "nacionalidad": "ECUATORIANA",
+      "documento": "PASAPORTE ECUATORIANO",
+      "archivo": "PASAPORTE_DIAZ_PABON_ERNESTO_ALEJANDRO.jpg"
+    },
+    {
+      "nombre": "CARLOS ANDRES GOMEZ GOMEZ",
+      "nacionalidad": "COLOMBIANA",
+      "documento": "PASAPORTE COLOMBIANO",
+      "archivo": "PASAPORTE_GOMEZ_GOMEZ_CARLOS_ANDRES.jpeg"
+    },
+    {
+      "nombre": "ELMER ANDRES IDROBO ANDRADE",
+      "nacionalidad": "ECUATORIANA",
+      "documento": "PASAPORTE ECUATORIANO",
+      "archivo": "PASAPORTE_IDROBO_ANDRADE_ELMER_ANDRES.jpg",
+      "alias": [
+        "ANDRES IDROVO"
+      ]
+    },
+    {
+      "nombre": "HAYDIN FERNANDO MENDOZA CLAVIJO",
+      "nacionalidad": "ECUATORIANA",
+      "documento": "PASAPORTE ECUATORIANO",
+      "archivo": "PASAPORTE_MENDOZA_CLAVIJO_HAYDIN_FERNANDO.jpeg"
+    },
+    {
+      "nombre": "ANA ELENA MONROY THOMPSON",
+      "nacionalidad": "MEXICANA",
+      "documento": "PASAPORTE MEXICANO",
+      "archivo": "PASAPORTE_MONROY_THOMPSON_ANA_ELENA.jpg"
+    },
+    {
+      "nombre": "MILDRED MUÑOZ VASQUEZ",
+      "nacionalidad": "COLOMBIANA",
+      "documento": "PASAPORTE COLOMBIANO",
+      "archivo": "PASAPORTE_MUNOZ_VASQUEZ_MILDRED.jpg"
+    },
+    {
+      "nombre": "JULIO CESAR NARVAEZ MORA",
+      "nacionalidad": "ECUATORIANA",
+      "documento": "PASAPORTE ECUATORIANO",
+      "archivo": "PASAPORTE_NARVAEZ_MORA_JULIO_CESAR.jpg"
+    },
+    {
+      "nombre": "MARIA DE LOURDES PATIÑO GALARRAGA",
+      "nacionalidad": "ECUATORIANA",
+      "documento": "PASAPORTE ECUATORIANO",
+      "archivo": "PASAPORTE_PATINO_GALARRAGA_MARIA_DE_LOURDES.jpeg"
+    },
+    {
+      "nombre": "EDISON PAUL SOSA CARRERA",
+      "nacionalidad": "ECUATORIANA",
+      "documento": "PASAPORTE ECUATORIANO",
+      "archivo": "PASAPORTE PAUL SOSA.jpeg"
+    },
+    {
+      "nombre": "MAURICIO PEREZ ROBLES",
+      "nacionalidad": "MEXICANA",
+      "documento": "PASAPORTE MEXICANO",
+      "archivo": "PASAPORTE_PEREZ_ROBLES_MAURICIO.jpeg"
+    },
+    {
+      "nombre": "ALONSO SOLARES SALAZAR",
+      "nacionalidad": "MEXICANA",
+      "documento": "PASAPORTE MEXICANO",
+      "archivo": "PASAPORTE_SOLARES_SALAZAR_ALONSO.jpg"
+    },
+    {
+      "nombre": "JOSE ANTONIO TORRON RAMIREZ",
+      "nacionalidad": "DOMINICANA",
+      "documento": "PASAPORTE DOMINICANO",
+      "archivo": "PASAPORTE_TORRON_RAMIREZ_JOSE_ANTONIO.jpg"
+    }
+  ]
+}

@@ -43,14 +43,15 @@
         else if(response.status!==404) unavailable=true;
       } catch { unavailable=true; }
       if(current!==revision)return;
-      const names=seed.gerentes.map(manager=>manager.nombre).join(' y ');
+      const managers=[...new Set(seed.gerentes.map(manager=>manager.nombre))];
+      const names=managers.join(' y ');
       const complete=keys.every(key=>typeof data[key]==='string' && data[key].trim() && !data[key].includes('['));
       document.getElementById('sede-authority').textContent='A las autoridades migratorias de '+seed.pais+':';
       document.getElementById('sede-city').textContent=seed.ciudad+', '+seed.pais;
       document.getElementById('sede-invitation').textContent=complete
         ? `Por medio de la presente, ${data.razonSocial}, con identificación fiscal ${data.identificacionFiscal} y domicilio en ${data.direccionFiscal}, comercialmente conocida como CREAR Poder Sin Límites, sede ${seed.sede}, emite esta invitación a favor de la siguiente persona:`
-        : `Por medio de la presente, ${names}, ${seed.gerentes.length>1?'gerentes responsables':'gerente responsable'} de CREAR Poder Sin Límites, sede ${seed.sede}, presenta${seed.gerentes.length>1?'n':''} esta invitación a favor de la siguiente persona:`;
-      seed.gerentes.forEach(manager=>{const name=document.createElement('p');name.className='font-bold text-gray-900 text-lg';name.textContent=manager.nombre;signature.append(name);});
+        : `Por medio de la presente, ${names}, ${managers.length>1?'gerentes responsables':'gerente responsable'} de CREAR Poder Sin Límites, sede ${seed.sede}, presenta${managers.length>1?'n':''} esta invitación a favor de la siguiente persona:`;
+      managers.forEach(manager=>{const name=document.createElement('p');name.className='font-bold text-gray-900 text-lg';name.textContent=manager;signature.append(name);});
       if(complete) [data.razonSocial, data.identificacionFiscal, data.direccionFiscal, [data.correoContacto,data.telefonoContacto].join(' | ')].forEach(text=>{const line=document.createElement('p');line.className='text-sm text-gray-600';line.textContent=text;signature.append(line);});
       status.textContent=(complete?'Datos institucionales registrados.':'Datos institucionales pendientes: por ahora figuran únicamente los nombres de los gerentes.')+(unavailable?' No se pudo consultar Causa OS; se muestran los datos base disponibles.':'');
       document.getElementById('print-letter').disabled=false;

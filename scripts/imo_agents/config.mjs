@@ -1,8 +1,8 @@
 export const CONFIG = {
   IMO_URL: 'https://imo.crearpslglobal.com/',
   CREDENTIALS: {
-    username: 'CREARPSL',
-    password: 'CREARPSL26*'
+    username: process.env.NODUS_USER || process.env.NODUS_GLOBAL_USER,
+    password: process.env.NODUS_PASSWORD || process.env.NODUS_GLOBAL_PASS
   },
   PATHS: {
     metricsOutput: '../src/data/kpisNodus.json',

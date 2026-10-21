@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useChecklist } from '../context/ChecklistContext';
+import { useCycles } from '../context/CyclesContext';
 import { useUI } from '../context/UIContext';
 import { getFlagForSede } from '../utils/flags';
 import { uploadEvidenceDocument } from '../services/googleDriveService';
@@ -18,6 +19,9 @@ import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { canSendOperationalCommunications } from '../config/permissions';
 import { deadlineTimeReference, timeZoneForSede, zonedDateInputParts, zonedDateTimeToIso } from '../utils/timezones';
+import { taskLocationLabel, taskPath } from '../utils/taskLocation';
+import { getTaskProgress } from '../utils/taskLifecycle';
+import { checklistData } from '../data/checklistData';
 
 export const normalizeTaskEmail = (e) => {
   if (!e) return '';
@@ -101,6 +105,7 @@ export default function TaskDetailModal({
 }) {
   const { currentUser, reauthenticateGoogle } = useAuth();
   const { updateTaskDetails, toggleTask, sendTaskMessage, sendTaskReminderEmail } = useChecklist();
+  const { currentCycle } = useCycles();
   const { showToast } = useUI();
 
   // Estados locales editables para avances y evidencias
@@ -152,9 +157,7 @@ export default function TaskDetailModal({
   // Sincronizar estado cuando se abre el modal o cambia la tarea
   useEffect(() => {
     if (task && isOpen) {
-      const initialProgress = typeof task.progressPercentage === 'number' 
-        ? task.progressPercentage 
-        : (task.completed || task.status === 'Completada' ? 100 : 0);
+      const initialProgress = getTaskProgress(task);
       
       setProgress(initialProgress);
       setIsCompleted(task.completed === true || task.status === 'Completada' || initialProgress === 100);
@@ -720,6 +723,15 @@ export default function TaskDetailModal({
 
       const finalCompleted = allDone || finalOverall === 100;
 
+      if (!isMultiAssignee && targetKey && mapToSave[targetKey]) {
+        mapToSave[targetKey] = {
+          ...mapToSave[targetKey],
+          progress: finalOverall,
+          completed: finalCompleted,
+          completedAt: finalCompleted ? (mapToSave[targetKey]?.completedAt || new Date().toISOString()) : null
+        };
+      }
+
       // Registrar avance en la bitácora de notas si el usuario actual avanzó
       let updatedNotesList = [...notesList];
       if (isMultiAssignee && targetKey) {
@@ -748,7 +760,7 @@ export default function TaskDetailModal({
         // (finalCompleted=false), se limpia -- se resetea al volver a
         // completarse, nunca se inventa una fecha.
         completedAt: finalCompleted ? (task.completedAt || new Date().toISOString()) : null,
-        assigneeProgress: isMultiAssignee ? mapToSave : (task.assigneeProgress || {}),
+        assigneeProgress: Object.keys(mapToSave).length > 0 ? mapToSave : (task.assigneeProgress || {}),
         evidenceUrl: mainEvidenceUrl,
         evidence_url: mainEvidenceUrl,
         evidences: evidencesList,
@@ -761,7 +773,18 @@ export default function TaskDetailModal({
         updatedAt: new Date().toISOString()
       };
 
-      await updateTaskDetails(task.id, updates);
+      const cycleScope = checklistData.some(base => base.id === task.id) &&
+        !task.isCustom &&
+        !task.assignedToEmail &&
+        !(Array.isArray(task.assignedToEmails) && task.assignedToEmails.length > 0)
+        ? {
+            sede: currentUser?.sede?.trim() || 'Global',
+            cycle: task.quitoCycleId
+              ? { id: task.quitoCycleId, name: task.cycleName || '' }
+              : currentCycle
+          }
+        : null;
+      await updateTaskDetails(task.id, updates, cycleScope);
       if (finalCompleted || (myAssigneeEntry && myProgress === 100) || (!isMultiAssignee && progress === 100)) {
         celebrateVictory();
       }
@@ -902,6 +925,10 @@ export default function TaskDetailModal({
                   <strong style={{ color: 'var(--crear-cyan)' }}>{getDisplayName(task.createdBy)}</strong>
                 </div>
               )}
+              <div style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
+                Ubicación declarada: <strong>{taskLocationLabel(task)}</strong>
+              </div>
+              <a href={taskPath(task.id)}>Enlace interno a esta tarea</a>
               {assignedList.length > 0 && (
                 <div>
                   <span style={{ color: 'var(--text-muted)' }}>👥 Asignada a: </span>
@@ -1074,7 +1101,7 @@ export default function TaskDetailModal({
                   background: messageSending || !messageText.trim() ? 'rgba(41,171,226,.14)' : 'var(--crear-cyan)',
                   color: messageSending || !messageText.trim() ? 'var(--text-muted)' : '#06121a', fontWeight: 800,
                   cursor: messageSending || !messageText.trim() ? 'not-allowed' : 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.35rem'
-                }}><Send size={14} /> {messageSending ? 'Enviando…' : 'Enviar'}</button>
+                }}><Send size={14} /> {messageSending ? 'Enviando…' : 'Recordar en plataforma'}</button>
                 {canSendOperationalCommunications(currentUser) && (
                   <button type="button" onClick={handleSendTaskEmail} disabled={emailSending || !messageText.trim()} style={{
                     border: '1px solid rgba(245,158,11,.7)', borderRadius: '7px', padding: '0.5rem 0.8rem',
@@ -2211,4 +2238,3 @@ export default function TaskDetailModal({
     </div>
   );
 }
-

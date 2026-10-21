@@ -219,7 +219,6 @@ Supervisión del flujo de caja, pagos de honorarios y arqueos diarios de taquill
 
 | Agente | Archivo Fuente | Misión | Frecuencia |
 |---|---|---|---|
-| **CausaNodusAgent** | `src/services/CausaNodusAgent.js` | Extrae y normaliza enrolados, pagos y estados desde el backend de Nodus. | Cada 1 hora / Automático |
 | **cmjSentinelAgent** | `src/services/cmjSentinelAgent.js` | Monitorea que ningún equipo de Maestría quede sin llamada semanal registrada. | Diario |
 | **goalsSentinelAgent** | `src/services/goalsSentinelAgent.js` | Alerta si una meta semanal tiene una brecha mayor al 25% respecto al plan. | Diario |
 | **GuardianConfidencialidad** | `src/services/GuardianConfidencialidadAgent.js` | Verifica que todos los usuarios con roles operativos tengan firma legal activa. | Tiempo Real |

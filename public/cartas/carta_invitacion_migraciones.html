@@ -97,131 +97,37 @@
     </div>
 
     <script src="carta-sedes.js" defer></script>
+    <script src="entrenadores-match.js"></script>
     <script>
-        const TRAINERS_MASTER = {
-            'CIRILO AGUSTIN MARTINEZ': {
-                name: 'CIRILO AGUSTIN MARTINEZ',
-                nacionalidad: 'MEXICANA',
-                doc: 'PASAPORTE MEXICANO',
-                fechas: 'Del 15 al 19 de Octubre de 2026',
-                rol: 'Líder Capítulo Uno (Invitado Internacional Ad-Honorem)',
-                hotel: 'Hotel José Antonio Deluxe (Calle Bellavista 133, Miraflores, Lima)'
-            },
-            'ERNESTO ALEJANDRO DIAZ PABON': {
-                name: 'ERNESTO ALEJANDRO DIAZ PABON',
-                nacionalidad: 'ECUATORIANA',
-                doc: 'PASAPORTE ECUATORIANO',
-                fechas: 'Del 3 al 7 de Septiembre de 2026',
-                rol: 'Invitado Especial Internacional (Invitado Internacional Ad-Honorem)',
-                hotel: 'Hotel José Antonio Deluxe (Calle Bellavista 133, Miraflores, Lima)'
-            },
-            'ELMER ANDRES IDROBO ANDRADE': {
-                name: 'ELMER ANDRES IDROBO ANDRADE',
-                nacionalidad: 'ECUATORIANA',
-                doc: 'PASAPORTE ECUATORIANO',
-                fechas: 'Del 4 al 6 de Septiembre de 2026',
-                rol: 'Invitado Especial Internacional (Invitado Internacional Ad-Honorem)',
-                hotel: 'Hotel José Antonio Deluxe (Calle Bellavista 133, Miraflores, Lima)'
-            },
-            'MARIA DE LOURDES PATIÑO GALARRAGA': {
-                name: 'MARIA DE LOURDES PATIÑO GALARRAGA',
-                nacionalidad: 'ECUATORIANA',
-                doc: 'PASAPORTE ECUATORIANO',
-                fechas: 'Del 3 al 7 de Septiembre de 2026',
-                rol: 'Invitada Especial Internacional (Invitada Internacional Ad-Honorem)',
-                hotel: 'Hotel José Antonio Deluxe (Calle Bellavista 133, Miraflores, Lima)'
-            },
-            'CARLOS ANDRES GOMEZ GOMEZ': {
-                name: 'CARLOS ANDRES GOMEZ GOMEZ',
-                nacionalidad: 'COLOMBIANA',
-                doc: 'PASAPORTE COLOMBIANO',
-                fechas: 'Del 26 al 31 de Agosto de 2026',
-                rol: 'Invitado Especial Internacional (Invitado Internacional Ad-Honorem)',
-                hotel: 'Hotel José Antonio Deluxe (Calle Bellavista 133, Miraflores, Lima)'
-            },
-            'FERNANDO ARAGON': {
-                name: 'FERNANDO ARAGON',
-                nacionalidad: 'ARGENTINA',
-                doc: 'DNI MERCOSUR',
-                fechas: 'Del 14 al 16 de Agosto de 2026',
-                rol: 'Líder Capítulo Uno (Invitado Internacional Ad-Honorem)',
-                hotel: 'Hotel José Antonio Deluxe (Calle Bellavista 133, Miraflores, Lima)'
-            },
-            'DIEGO DAVID BRAVO FIGUEROA': {
-                name: 'DIEGO DAVID BRAVO FIGUEROA',
-                nacionalidad: 'ECUATORIANA',
-                doc: 'PASAPORTE ECUATORIANO',
-                fechas: 'Del 14 al 16 de Agosto de 2026',
-                rol: 'Líder El Viaje (Invitado Internacional Ad-Honorem)',
-                hotel: 'Hotel José Antonio Deluxe (Calle Bellavista 133, Miraflores, Lima)'
-            }
-        };
-
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             const options = { year: 'numeric', month: 'long', day: 'numeric' };
             document.getElementById('current-date').textContent = new Date().toLocaleDateString('es-PE', options);
-
             const params = new URLSearchParams(window.location.search);
-            const normalizeName = value => value.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().replace(/\s+/g, ' ');
-            const rawNombre = normalizeName(params.get('nombre') || '');
-            const nameAliases = {
-                'ELMER IDROBO ANDRADE': 'ELMER ANDRES IDROBO ANDRADE'
-            };
-            const lookupName = nameAliases[rawNombre] || rawNombre;
+            const set = (id, text) => { document.getElementById(id).textContent = text; };
             const documentTypeOnly = value => {
                 const normalized = (value || '').toUpperCase().replace(/\s+/g, ' ').trim();
-                const patterns = [
-                    /\bPASAPORTE(?:\s+[A-ZÁÉÍÓÚÜÑ]+)?\b/,
-                    /\bDNI(?:\s+MERCOSUR)?\b/,
-                    /\bC[ÉE]DULA(?:\s+DE\s+IDENTIDAD)?\b/,
-                    /\bDOCUMENTO\s+DE\s+IDENTIDAD\b/
-                ];
+                const patterns = [/\bPASAPORTE(?:\s+[A-ZÁÉÍÓÚÜÑ]+)?\b/, /\bDNI(?:\s+MERCOSUR)?\b/, /\bC[ÉE]DULA(?:\s+DE\s+IDENTIDAD)?\b/, /\bDOCUMENTO\s+DE\s+IDENTIDAD\b/];
                 return patterns.map(pattern => normalized.match(pattern)).find(Boolean)?.[0] || '[DOCUMENTO PENDIENTE]';
             };
-            // Nationality checked against the identity document on 2026-09-27.
-            // Keep passport scans and identification numbers out of this public registry.
-            const verifiedNationalities = {
-                'MILDRED MUNOZ VASQUEZ': { nacionalidad: 'COLOMBIANA', documento: 'PASAPORTE COLOMBIANO' },
-                'CIRILO AGUSTIN MARTINEZ': { nacionalidad: 'MEXICANA', documento: 'PASAPORTE MEXICANO' },
-                'CIRILO MARTINEZ': { nacionalidad: 'MEXICANA', documento: 'PASAPORTE MEXICANO' }
-            };
-            const verifiedIdentity = verifiedNationalities[rawNombre];
-            const master = Object.values(TRAINERS_MASTER).find(person => normalizeName(person.name) === lookupName);
-
-            if (master) {
-                document.getElementById('field-name').textContent = master.name;
-                document.getElementById('field-nacionalidad').textContent = master.nacionalidad;
-                document.getElementById('field-doc').textContent = master.doc;
-                if (master.fechas) document.getElementById('field-dates').textContent = master.fechas;
-                if (master.rol) document.getElementById('field-role').textContent = master.rol;
-                if (master.hotel) document.getElementById('field-hotel').textContent = master.hotel;
-            } else {
-                const nombreParam = params.get('nombre') ? params.get('nombre').toUpperCase() : '[NOMBRE COMPLETO]';
-                document.getElementById('field-name').textContent = nombreParam;
-                
-                let nac = params.get('nacionalidad')?.trim() ? params.get('nacionalidad').trim().toUpperCase() : '[NACIONALIDAD PENDIENTE]';
-                document.getElementById('field-nacionalidad').textContent = nac;
-
-                let doc = documentTypeOnly(params.get('doc'));
-                document.getElementById('field-doc').textContent = doc;
-
-                if (params.get('fechas')) document.getElementById('field-dates').textContent = params.get('fechas');
-                if (params.get('rol')) document.getElementById('field-role').textContent = params.get('rol') + ' (Invitado Internacional Ad-Honorem)';
-                if (params.get('hotel')) document.getElementById('field-hotel').textContent = params.get('hotel');
-            }
-
-            document.getElementById('field-dates').textContent = params.get('fechas')?.trim() || '[FECHAS PENDIENTES]';
-            document.getElementById('field-hotel').textContent = params.get('hotel')?.trim() || '[HOSPEDAJE PENDIENTE]';
-
-            // Verified records take precedence over stale values; blank URL fields never erase them.
-            if (verifiedIdentity) {
-                document.getElementById('field-nacionalidad').textContent = verifiedIdentity.nacionalidad;
-                document.getElementById('field-doc').textContent = verifiedIdentity.documento;
-            } else if (master) {
-                document.getElementById('field-nacionalidad').textContent = master.nacionalidad;
-                document.getElementById('field-doc').textContent = master.doc;
-            }
-
+            const requested = params.get('nombre')?.trim() || '';
+            set('field-name', requested ? requested.toUpperCase() : '[NOMBRE COMPLETO]');
+            set('field-nacionalidad', params.get('nacionalidad')?.trim().toUpperCase() || '[NACIONALIDAD PENDIENTE]');
+            set('field-doc', documentTypeOnly(params.get('doc')));
+            set('field-dates', params.get('fechas')?.trim() || '[FECHAS PENDIENTES]');
+            set('field-hotel', params.get('hotel')?.trim() || '[HOSPEDAJE PENDIENTE]');
+            if (params.get('rol')?.trim()) set('field-role', params.get('rol').trim() + ' (Invitado Internacional Ad-Honorem)');
+            if (!requested) return;
+            // Identidad tomada de los pasaportes de la carpeta de entrenadores en Drive (sin números de documento).
+            try {
+                const response = await fetch('entrenadores-documentos.json', { cache: 'no-store' });
+                if (!response.ok) throw Error();
+                const trainer = window.findTrainerIdentity((await response.json()).entrenadores, requested);
+                if (trainer) {
+                    set('field-name', trainer.nombre);
+                    set('field-nacionalidad', trainer.nacionalidad);
+                    set('field-doc', trainer.documento);
+                }
+            } catch { /* se conservan los datos del enlace */ }
         });
     </script>
 </body>

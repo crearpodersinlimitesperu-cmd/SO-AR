@@ -1,22 +1,24 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { auth } from '../services/firebase';
 import { signInWithPopup, reauthenticateWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'firebase/auth';
-import { collection, query, where, getDocs, doc, getDoc, setDoc, serverTimestamp, addDoc } from 'firebase/firestore';
+import { collection, query, where, or, getDocs, doc, getDoc, setDoc, serverTimestamp, addDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
-import { normalizeRole, ROLE_DISPLAY_NAMES, findUserByAnyEmail } from '../data/usersData';
+import { normalizeRole, ROLE_DISPLAY_NAMES, findUserByAnyEmail, usersData as allUsersList } from '../data/usersData';
 import { isSuperAdminEmail, isDireccionRole, isGerenciaRole, canSimulate, DUAL_ROLE_TRAINER_EMAILS } from '../config/permissions';
 import { useUI } from './UIContext';
-import { recordAuditEvent, fetchNetworkInfo } from '../services/auditService';
-import { normalizeUserRecord } from '../utils/userNormalizer';
+import { recordAuditEvent } from '../services/auditService';
+import { mergeAuthenticatedRoleProfile, normalizeUserRecord } from '../utils/userNormalizer';
 import { enforceUserRolesAgent } from '../services/roleAgentDaemon';
 import { canonicalSede } from '../utils/sede';
-import { isInactiveTrainer } from '../data/managersData';
+import { isInactiveTrainer } from '../data/trainerIdentity';
+import { createAuthStartupTrace } from '../utils/authStartupTiming';
+import { addConsolidatedRole, resolveActiveRole } from '../utils/activeRole';
 
 const AuthContext = createContext();
 
-async function saveSelfProfile(user, canonicalUser, normalizedEmail) {
+async function saveSelfProfile(user, canonicalUser, normalizedEmail, existingSnapshot) {
   const profileRef = doc(db, 'users', user.uid);
-  const profileSnapshot = await getDoc(profileRef);
+  const profileSnapshot = existingSnapshot || await getDoc(profileRef);
   const profileFields = {
     name: canonicalUser.name || user.displayName || '',
     displayName: canonicalUser.displayName || canonicalUser.name || user.displayName || '',
@@ -24,8 +26,12 @@ async function saveSelfProfile(user, canonicalUser, normalizedEmail) {
     lastLoginAt: serverTimestamp()
   };
 
+  // El documento users/{uid} ya existe, así que las reglas que lo leen no
+  // dependen de esta escritura de metadatos: se envía sin bloquear el arranque.
+  // La creación (primer ingreso) sí se espera porque las reglas usan ese doc.
   if (profileSnapshot.exists()) {
-    await setDoc(profileRef, profileFields, { merge: true });
+    setDoc(profileRef, profileFields, { merge: true })
+      .catch((e) => console.warn('Cannot update self-service profile fields; continuing login', e));
     return;
   }
 
@@ -80,68 +86,79 @@ export function AuthProvider({ children }) {
     try {
       const usersRef = collection(db, "users");
 
-      // 1. emails array-contains
-      let q = query(usersRef, where("emails", "array-contains", normalizedEmail));
-      let snap = await getDocs(q);
-      if (!snap.empty) {
-        const elegido = elegirDocumentoCanonico(snap);
-        return { ...elegido.data(), _docId: elegido.id };
-      }
-
-      // 2. email ==
-      q = query(usersRef, where("email", "==", normalizedEmail));
-      snap = await getDocs(q);
-      if (!snap.empty) {
-        const elegido = elegirDocumentoCanonico(snap);
-        return { ...elegido.data(), _docId: elegido.id };
-      }
-
-      // 3. corporateEmail ==
-      q = query(usersRef, where("corporateEmail", "==", normalizedEmail));
-      snap = await getDocs(q);
-      if (!snap.empty) {
-        const elegido = elegirDocumentoCanonico(snap);
-        return { ...elegido.data(), _docId: elegido.id };
-      }
-
-      // 4. personalEmail ==
-      q = query(usersRef, where("personalEmail", "==", normalizedEmail));
-      snap = await getDocs(q);
-      if (!snap.empty) {
-        const elegido = elegirDocumentoCanonico(snap);
-        return { ...elegido.data(), _docId: elegido.id };
+      const snap = await getDocs(query(usersRef, or(
+        where("emails", "array-contains", normalizedEmail),
+        where("email", "==", normalizedEmail),
+        where("corporateEmail", "==", normalizedEmail),
+        where("personalEmail", "==", normalizedEmail)
+      )));
+      // Un solo viaje de red, pero la misma prioridad entre campos y el mismo
+      // desempate UID/slug dentro del campo ganador que la búsqueda progresiva.
+      for (const field of ['emails', 'email', 'corporateEmail', 'personalEmail']) {
+        const docs = snap.docs.filter((d) => {
+          const value = d.data()[field];
+          return field === 'emails'
+            ? Array.isArray(value) && value.includes(normalizedEmail)
+            : value === normalizedEmail;
+        });
+        if (docs.length) {
+          const elegido = elegirDocumentoCanonico({ empty: false, size: docs.length, docs });
+          return { ...elegido.data(), _docId: elegido.id };
+        }
       }
 
     } catch (err) {
       console.error("Error consultando Firestore:", err);
+      throw err;
     }
     return null;
   };
 
-  const switchRole = (newRole) => {
-    const canonicalNewRole = normalizeRole(newRole);
-    sessionStorage.setItem('cpsl_active_role', canonicalNewRole);
+  const findStaffInFirestore = async (email) => {
+    try {
+      const snap = await getDocs(query(collection(db, 'staff_directory'), or(
+        where('emails', 'array-contains', email),
+        where('email', '==', email)
+      )));
+      const preferred = snap.docs.find((d) => {
+        const emails = d.data().emails;
+        return Array.isArray(emails) && emails.includes(email);
+      });
+      return (preferred || snap.docs[0])?.data() || null;
+    } catch (err) {
+      console.error("Error consultando staff_directory:", err);
+      throw err;
+    }
+  };
 
-    // (07/09/2026) Confirmado explícitamente por José: hasta ahora este selector solo
-    // cambiaba el estado local de React (lo que se VE), nunca escribía a Firestore — así
-    // que cualquier acción protegida por firestore.rules (por ejemplo guardar en
-    // mj_calendars o gestionar managers_directory) seguía evaluándose con el rol
-    // "oficial" guardado en el login, sin importar qué eligiera la persona aquí. Este
-    // setDoc hace que el cambio sea real: guarda el rol elegido en users/{uid}, en un
-    // campo NUEVO y separado (activeRoleOverride) — nunca en "role", porque ese campo
-    // también lo usan SuperAdminPanel.jsx, GerenteDashboard.jsx, UserAuditReport.jsx y
-    // causa_sync_bot.mjs como el cargo oficial de la persona, no como su vista de
-    // sesión. Ver effectiveRole() en firestore.rules para el lado que lo consume.
-    // Es "fire and forget": no bloquea el cambio visual si la escritura tarda o falla
-    // (queda igual que antes en ese caso — decorativo pero sin romper la sesión), y el
-    // error se registra en consola para poder diagnosticarlo si pasa seguido.
-    if (auth.currentUser?.uid) {
-      setDoc(doc(db, 'users', auth.currentUser.uid), { activeRoleOverride: canonicalNewRole }, { merge: true })
-        .catch((err) => {
-          console.error('No se pudo guardar el rol activo en Firestore (el cambio de vista sigue funcionando localmente):', err);
-        });
+  const switchRole = async (newRole) => {
+    const canonicalNewRole = normalizeRole(newRole);
+    const userBeforeSwitch = currentUser;
+    if (!userBeforeSwitch) return;
+
+    const canSelectRole = userBeforeSwitch.isSuperAdmin ||
+      (userBeforeSwitch.roles || []).includes(canonicalNewRole);
+    if (!canSelectRole) {
+      showToast('No tienes asignado ese rol.', 'error');
+      return false;
     }
 
+    let persisted = canonicalNewRole === 'consolidado' || userBeforeSwitch.isSimulated;
+    // Consolidated is a session view synthesized from multiple existing roles;
+    // Firestore only permits persisting overrides already present in the profile.
+    if (!userBeforeSwitch.isSimulated && canonicalNewRole !== 'consolidado') {
+      if (auth.currentUser?.uid) {
+        try {
+          await setDoc(doc(db, 'users', auth.currentUser.uid), { activeRoleOverride: canonicalNewRole }, { merge: true });
+          persisted = true;
+        } catch (err) {
+          console.warn('No se pudo persistir activeRoleOverride en Firestore (el cambio de rol aplica en sesión):', err);
+          persisted = false;
+        }
+      }
+    }
+
+    sessionStorage.setItem('cpsl_active_role', canonicalNewRole);
     setCurrentUser(prev => {
       if (!prev) return null;
       const isConsolidated = canonicalNewRole === 'consolidado';
@@ -181,59 +198,76 @@ export function AuthProvider({ children }) {
 
       return updated;
     });
-    showToast(`Rol activo cambiado a: ${ROLE_DISPLAY_NAMES[canonicalNewRole] || canonicalNewRole}`, 'info');
+    showToast(
+      `Rol activo cambiado a: ${ROLE_DISPLAY_NAMES[canonicalNewRole] || canonicalNewRole}`,
+      persisted ? 'info' : 'warning'
+    );
+    return true;
   };
 
   const simulateUser = (targetUser) => {
+    const realAdmin = originalAdminUser || currentUser;
     if (!canSimulate(currentUser, originalAdminUser)) {
       // (15/09/2026) CORREGIDO: mensaje desactualizado — José confirmó que solo
       // él puede simular usuarios (ver canSimulate() en config/permissions.js).
       showToast('Acceso Denegado: solo José Sánchez puede simular usuarios.', 'error');
       return;
     }
-    setOriginalAdminUser(currentUser);
+    setOriginalAdminUser(originalAdminUser || currentUser);
     sessionStorage.removeItem('cpsl_active_role');
     
-    const targetEmail = targetUser.emails?.[0] || targetUser.email || '';
+    const targetEmail = (targetUser?.emails?.[0] || targetUser?.email || '').toLowerCase().trim();
+    if (targetEmail) {
+      sessionStorage.setItem('cpsl_simulated_target_email', targetEmail);
+      sessionStorage.setItem('cpsl_original_admin_email', (realAdmin.email || '').toLowerCase().trim());
+    }
+
     const mockAuthUser = {
       email: targetEmail,
-      displayName: targetUser.name,
-      uid: targetUser.id || 'simulated_uid'
+      displayName: targetUser.name || targetUser.displayName,
+      uid: targetUser.id || targetUser.uid || 'simulated_uid'
     };
 
     const simulatedUser = buildUserObject(mockAuthUser, targetUser, targetEmail);
     setCurrentUser({
       ...simulatedUser,
-      isSimulated: true
+      isSimulated: true,
+      simulatedBy: realAdmin.email || 'jose.sanchez@crearpsl.net'
     });
 
     recordAuditEvent({
-      email: currentUser?.email || 'admin@crearpsl.net',
-      name: currentUser?.name || 'Super Administrador',
-      role: currentUser?.appRole || 'superadmin',
-      sede: currentUser?.sede || 'Global',
-      action: 'SIMULACION_ADMIN',
-      details: `El administrador visualizó la pantalla de: ${targetUser.name} (${targetEmail})`,
-      isSimulation: true
+      email: realAdmin.email || 'jose.sanchez@crearpsl.net',
+      name: realAdmin.name || 'José Sánchez',
+      role: realAdmin.appRole || 'superadmin',
+      sede: realAdmin.sede || 'Global',
+      action: 'SIMULACION_INICIO',
+      details: `Inicio de simulación de usuario: ${targetUser.name || targetEmail} (${targetEmail}) [Caja Negra]`,
+      isSimulation: true,
+      simulatedBy: realAdmin.email
     });
 
-    showToast(`Iniciando simulación como ${targetUser.name}`, 'success');
+    showToast(`🎭 Modo Simulador Activo: Viendo plataforma como ${targetUser.name || targetEmail}`, 'success');
   };
 
   const stopSimulation = () => {
-    if (originalAdminUser) {
-      sessionStorage.removeItem('cpsl_active_role');
+    const realAdmin = originalAdminUser;
+    sessionStorage.removeItem('cpsl_simulated_target_email');
+    sessionStorage.removeItem('cpsl_original_admin_email');
+    sessionStorage.removeItem('cpsl_active_role');
+    if (realAdmin) {
       recordAuditEvent({
-        email: originalAdminUser.email || '',
-        name: originalAdminUser.name || 'Admin',
-        role: originalAdminUser.appRole || 'direccion',
-        sede: originalAdminUser.sede || 'Global',
-        action: 'FIN_SIMULACION',
-        details: 'Fin de sesión simulada'
+        email: realAdmin.email || 'jose.sanchez@crearpsl.net',
+        name: realAdmin.name || 'José Sánchez',
+        role: realAdmin.appRole || 'superadmin',
+        sede: realAdmin.sede || 'Global',
+        action: 'SIMULACION_FIN',
+        details: 'Fin de sesión simulada [Caja Negra]',
+        isSimulation: true,
+        simulatedBy: realAdmin.email
       });
       setCurrentUser(originalAdminUser);
       setOriginalAdminUser(null);
-      showToast('Simulación terminada. Bienvenido de vuelta, Admin.', 'success');
+      showToast('Simulación terminada. Bienvenido de vuelta, José.', 'success');
     }
   };
 
@@ -279,6 +313,10 @@ export function AuthProvider({ children }) {
     if (hasSpecificDbRoles && Array.isArray(foundUser.roles) && foundUser.roles.length > 0) {
       // Roles explícitamente configurados en la base de datos Firestore
       assignedRoles = foundUser.roles.map(r => normalizeRole(r));
+    } else if (hasAdminUpdatedRoles) {
+      // Un perfil administrado no debe recuperar roles del catálogo ni del
+      // agente cuando el perfil autenticado no concede ninguno adicional.
+      assignedRoles = hasSpecificDbRole ? [canonicalRole] : [];
     } else if (officialProfile) {
       // Si el usuario existe en el catálogo corporativo maestro y no tiene roles en DB, sus roles oficiales mandan
       const baseOfficialRoles = (officialProfile.roles || [officialProfile.role]).map(r => normalizeRole(r));
@@ -365,8 +403,22 @@ export function AuthProvider({ children }) {
       }
     }
 
+    // Gina Cárdenas López: Coordinadora Junior (Rezagados C1 + Quantum Team Lima)
+    const isGinaCardenas = ['cardenasgina29@gmail.com', 'cardenaslopezgina@gmail.com'].includes(normalizedEmail) || ['cardenasgina29@gmail.com', 'cardenaslopezgina@gmail.com'].includes(rawEmail);
+    if (isGinaCardenas) {
+      assignedRoles = ['coord_jr', 'qt'];
+      canonicalRole = 'coord_jr';
+      if (!foundUser.sede || foundUser.sede === 'Global' || foundUser.sede === 'Sede Global') {
+        foundUser.sede = 'Lima';
+      }
+      foundUser.nodusUser = 'GCARDENAS';
+      foundUser.nodusPassword = 'nolaolvidare';
+      foundUser.nodusSede = 'LIMA CICLO 1';
+      foundUser.nodusStatus = 'Activo';
+    }
+
     // Asegurar que no quede 'coordinador' administrativo si el usuario tiene un cargo específico
-    const hasSpecificRole = assignedRoles.some(r => ['coord_c1', 'coord_maestria', 'director_maestria', 'gerente', 'cfo', 'direccion'].includes(r));
+    const hasSpecificRole = assignedRoles.some(r => ['coord_jr', 'coord_c1', 'coord_maestria', 'director_maestria', 'gerente', 'cfo', 'direccion', 'qt', 'entrenador'].includes(r));
     if (hasSpecificRole) {
       // Únicamente la cuenta oficial de coordinación administrativa puede tener 'coordinador'
       if (normalizedEmail !== 'coordinacion.administrativa@crearpsl.net') {
@@ -381,27 +433,22 @@ export function AuthProvider({ children }) {
     const hasDireccion = assignedRoles.some(r => isDireccionRole(r)) || isDireccionRole(canonicalRole);
     const hasGerente = assignedRoles.some(r => isGerenciaRole(r)) || isGerenciaRole(canonicalRole);
 
+    assignedRoles = addConsolidatedRole(assignedRoles);
+
     const savedActiveRole = sessionStorage.getItem('cpsl_active_role');
-    
-    // Por defecto, SuperAdmin inicia SIEMPRE en 'consolidado' para ver todas las opciones sin límites
-    let activeRole = isSuperAdmin ? 'consolidado' : canonicalRole;
     // Dirección de Maestría es el cargo institucional principal de Andrés.
     // Una preferencia histórica de sesión como "coord_maestria" no debe
     // degradarlo al entrar; el cargo de coordinación permanece disponible en
     // el selector cuando necesite operar esa vista.
     const enforceDirectorMaestriaDefault = canonicalRole === 'director_maestria';
-    if (!enforceDirectorMaestriaDefault && savedActiveRole && (assignedRoles.includes(savedActiveRole) || isSuperAdmin)) {
-      activeRole = savedActiveRole;
-    // Si el usuario tiene múltiples roles (más de 1) debe tener acceso a "consolidado"
-    if (assignedRoles.length > 1 && !assignedRoles.includes('consolidado')) {
-      assignedRoles.push('consolidado');
-    }
-
-    } else if (isSuperAdmin) {
-      activeRole = 'consolidado';
-    } else if (assignedRoles.length > 0) {
-      activeRole = assignedRoles[0];
-    }
+    const activeRole = resolveActiveRole({
+      assignedRoles,
+      defaultRole: canonicalRole,
+      isSuperAdmin,
+      sessionRole: savedActiveRole,
+      persistedRole: foundUser.activeRoleOverride,
+      enforceDefaultRole: enforceDirectorMaestriaDefault
+    });
     const isConsolidated = activeRole === 'consolidado';
 
     // Para SuperAdmin, isDireccion y isGerente son SIEMPRE true; nunca se limitan
@@ -550,21 +597,7 @@ export function AuthProvider({ children }) {
 
       // Fallback a directorio de staff migrado
       if (!foundUser) {
-        try {
-          const staffRef = collection(db, "staff_directory");
-          
-          let sq = query(staffRef, where("emails", "array-contains", rawEmail));
-          let sSnap = await getDocs(sq);
-          if (!sSnap.empty) {
-            foundUser = sSnap.docs[0].data();
-          } else {
-            sq = query(staffRef, where("email", "==", rawEmail));
-            sSnap = await getDocs(sq);
-            if (!sSnap.empty) foundUser = sSnap.docs[0].data();
-          }
-        } catch (err) {
-          console.error("Error consultando staff_directory:", err);
-        }
+        foundUser = await findStaffInFirestore(rawEmail);
       }
 
       // Fallback a directorio de QT
@@ -627,15 +660,27 @@ export function AuthProvider({ children }) {
       let canonicalUser = normalizeUserRecord(foundUser, 'login');
 
       // 🕵️‍♂️ AGENTE ONLINE: Validar y sanar multiroles 
-      const updatedRoles = await enforceUserRolesAgent(foundUser || user, canonicalUser.roles);
-      canonicalUser.roles = updatedRoles;
+      const [updatedRoles, profileResult] = await Promise.all([
+        enforceUserRolesAgent(foundUser || user, canonicalUser.roles),
+        getDoc(doc(db, 'users', user.uid)).then(
+          snapshot => ({ snapshot }),
+          error => ({ error })
+        )
+      ]);
+      canonicalUser = mergeAuthenticatedRoleProfile(
+        canonicalUser,
+        profileResult.snapshot?.exists() ? profileResult.snapshot.data() : null,
+        updatedRoles
+      );
 
       // Persistir solo metadatos de perfil; los roles y la sede son administrados
       // por SuperAdmins y nunca se escriben desde el inicio de sesión del cliente.
       try {
-        await saveSelfProfile(user, canonicalUser, normalizedEmail);
+        if (profileResult.error) throw profileResult.error;
+        await saveSelfProfile(user, canonicalUser, normalizedEmail, profileResult.snapshot);
       } catch (e) {
-        console.warn('Cannot update self-service profile fields; continuing login', e);
+        console.error('Cannot verify or create self-service profile; aborting login', e);
+        throw e;
       }
 
       const userObj = buildUserObject(user, canonicalUser, normalizedEmail);
@@ -689,29 +734,28 @@ export function AuthProvider({ children }) {
   };
 
   useEffect(() => {
+    const startupTrace = createAuthStartupTrace();
+    let sessionVersion = 0;
+    let disposed = false;
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      const version = ++sessionVersion;
+      const isCurrentSession = () => !disposed && version === sessionVersion;
+      if (!isCurrentSession()) return;
+      setLoading(true);
+      setCurrentUser(null);
+      setOriginalAdminUser(null);
+      startupTrace.authReady();
       try {
         if (user) {
           const rawEmail = user.email.trim().toLowerCase();
           const normalizedEmail = rawEmail.replace('@crearpsl.com', '@crearpsl.net');
           
-          let foundUser = await findUserInFirestore(normalizedEmail);
+          let foundUser = await startupTrace.measure('users-lookup', () => findUserInFirestore(normalizedEmail));
+          if (!isCurrentSession()) return;
           
           if (!foundUser) {
-            try {
-              const staffRef = collection(db, "staff_directory");
-              let sq = query(staffRef, where("emails", "array-contains", normalizedEmail));
-              let sSnap = await getDocs(sq);
-              if (!sSnap.empty) {
-                foundUser = sSnap.docs[0].data();
-              } else {
-                sq = query(staffRef, where("email", "==", normalizedEmail));
-                sSnap = await getDocs(sq);
-                if (!sSnap.empty) foundUser = sSnap.docs[0].data();
-              }
-            } catch (err) {
-              console.error("Error consultando staff_directory:", err);
-            }
+            foundUser = await startupTrace.measure('staff-lookup', () => findStaffInFirestore(normalizedEmail));
+            if (!isCurrentSession()) return;
           }
           
           // 🆕 (02/09/2026) Mismo respaldo que en loginWithGoogle: catálogo estático
@@ -742,6 +786,7 @@ export function AuthProvider({ children }) {
             if (foundUser.isActive === false || foundUser.status === 'inactive' || foundUser.active === false || esInactivoDesvinculado) {
               console.warn("Usuario desactivado intentando acceder a la sesión:", normalizedEmail);
               await signOut(auth);
+              if (!isCurrentSession()) return;
               setCurrentUser(null);
               setLoading(false);
               return;
@@ -750,35 +795,70 @@ export function AuthProvider({ children }) {
             let canonicalUser = normalizeUserRecord(foundUser, 'onAuthStateChanged');
             
             // 🕵️‍♂️ AGENTE ONLINE: Validar y sanar multiroles 
-            const updatedRoles = await enforceUserRolesAgent(user, canonicalUser.roles);
-            canonicalUser.roles = updatedRoles;
+            const [updatedRoles, profileResult] = await Promise.all([
+              startupTrace.measure('roles', () => enforceUserRolesAgent({ ...user, ...foundUser }, canonicalUser.roles)),
+              startupTrace.measure('self-profile-read', () => getDoc(doc(db, 'users', user.uid))).then(
+                snapshot => ({ snapshot }),
+                error => ({ error })
+              )
+            ]);
+            if (!isCurrentSession()) return;
+            canonicalUser = mergeAuthenticatedRoleProfile(
+              canonicalUser,
+              profileResult.snapshot?.exists() ? profileResult.snapshot.data() : null,
+              updatedRoles
+            );
 
             // Persistir solo metadatos de perfil, nunca roles ni sede.
-            try {
-              try {
-                await saveSelfProfile(user, canonicalUser, normalizedEmail);
-              } catch (e) {
-                console.warn('Cannot update self-service profile fields; continuing login', e);
-              }
-            } catch (err) {
-              console.error("Error guardando perfil de usuario en auth state:", err);
-            }
+            if (profileResult.error) throw profileResult.error;
+            await startupTrace.measure('profile-metadata', () =>
+              saveSelfProfile(user, canonicalUser, normalizedEmail, profileResult.snapshot));
+            if (!isCurrentSession()) return;
 
             const userObj = buildUserObject(user, canonicalUser, normalizedEmail);
-            setCurrentUser(userObj);
+            
+            // Restaurar simulación activa tras recarga de página (F5) para José Sánchez
+            const simTarget = sessionStorage.getItem('cpsl_simulated_target_email');
+            if (simTarget && canSimulate(userObj)) {
+              const targetRecord = allUsersList.find(u => 
+                (u.email || '').toLowerCase().trim() === simTarget.toLowerCase().trim() ||
+                (Array.isArray(u.emails) && u.emails.map(e => e.toLowerCase().trim()).includes(simTarget.toLowerCase().trim()))
+              );
+              if (targetRecord) {
+                const targetEmail = (targetRecord.emails?.[0] || targetRecord.email || simTarget).toLowerCase().trim();
+                const mockAuthUser = {
+                  email: targetEmail,
+                  displayName: targetRecord.name || targetRecord.displayName,
+                  uid: targetRecord.id || targetRecord.uid || 'simulated_uid'
+                };
+                const simulatedObj = buildUserObject(mockAuthUser, targetRecord, targetEmail);
+                setOriginalAdminUser(userObj);
+                setCurrentUser({
+                  ...simulatedObj,
+                  isSimulated: true,
+                  simulatedBy: userObj.email
+                });
+              } else {
+                setCurrentUser(userObj);
+              }
+            } else {
+              setCurrentUser(userObj);
+            }
             
             try {
               const todayStr = new Date().toISOString().slice(0, 10);
               const sessionLogKey = `audit_login_${normalizedEmail}_${todayStr}`;
               if (!sessionStorage.getItem(sessionLogKey)) {
-                await recordAuditEvent({
+                // Auditoría no bloqueante: el usuario ya fue verificado y
+                // recordAuditEvent captura sus propios errores de Firestore.
+                recordAuditEvent({
                   email: foundUser.email || normalizedEmail,
                   name: foundUser.name || user.displayName || 'Desconocido',
                   role: foundUser.role || 'Desconocido',
                   sede: foundUser.sede || 'Desconocida',
                   action: 'LOGIN',
                   details: 'Inicio de sesión / Actividad diaria'
-                });
+                }).catch((e) => console.error("Error actualizando login en auditoría:", e));
                 sessionStorage.setItem(sessionLogKey, 'true');
               }
             } catch(e) {
@@ -790,7 +870,8 @@ export function AuthProvider({ children }) {
           } else {
             sessionStorage.removeItem('googleAccessToken');
             sessionStorage.removeItem('cpsl_active_role');
-            auth.signOut();
+            await auth.signOut();
+            if (!isCurrentSession()) return;
             setCurrentUser(null);
           }
         } else {
@@ -807,13 +888,24 @@ export function AuthProvider({ children }) {
           setCurrentUser(null);
         }
       } catch (authErr) {
+        if (!isCurrentSession()) return;
         console.error("Error crítico durante autenticación en Causa OS:", authErr);
+        setCurrentUser(null);
+        showToast('No se pudo verificar tu acceso. Vuelve a iniciar sesión.', 'error');
       } finally {
-        setLoading(false);
+        if (isCurrentSession()) {
+          startupTrace.finish();
+          setLoading(false);
+        }
       }
     });
     
-    return unsubscribe;
+    return () => {
+      // Unsubscribe no cancela las lecturas async que ya estaban en curso.
+      disposed = true;
+      sessionVersion += 1;
+      unsubscribe();
+    };
   }, []);
 
   return (

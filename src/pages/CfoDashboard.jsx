@@ -207,6 +207,14 @@ export default function CfoDashboard() {
               <CheckCircle size={15} />
               CFO: Elizabeth Escobar
             </div>
+            <button
+              type="button"
+              onClick={() => navigate('/elizabeth-dashboard')}
+              className="btn-secondary"
+              style={{ padding: '0.45rem 0.9rem', fontWeight: 800 }}
+            >
+              Resumen de tareas
+            </button>
 
             <div style={{ 
               background: 'rgba(239, 68, 68, 0.12)', 

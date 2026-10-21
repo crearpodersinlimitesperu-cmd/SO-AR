@@ -1414,5 +1414,26 @@ export const USERS_TO_IMPORT = [
       "alex.zapata@crearpsl.net"
     ],
     "email": "redessociales@crearpsl.net"
+  },
+  {
+    "id": "staff_ginacardenaslopez",
+    "name": "Gina Cardenas Lopez",
+    "role": "coord_jr",
+    "roles": [
+      "coord_jr",
+      "qt"
+    ],
+    "sede": "Lima",
+    "emails": [
+      "gina.cardenas@crearpsl.net",
+      "cardenasgina29@gmail.com",
+      "cardenaslopezgina@gmail.com"
+    ],
+    "email": "cardenasgina29@gmail.com",
+    "telefono": "+51999699649",
+    "nodusUser": "GCARDENAS",
+    "nodusPassword": "nolaolvidare",
+    "nodusSede": "LIMA CICLO 1",
+    "nodusStatus": "Activo"
   }
 ];

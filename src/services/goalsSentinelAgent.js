@@ -1,29 +1,7 @@
-/**
- * goalsSentinelAgent.js - Causa OS v3.2 Enterprise
- * ==================================================
- * Agente Autónomo Centinela de Seguimiento a Metas y Llamadas en Nodus.
- * 
- * Principios Rectores:
- * 1. EFECTIVO: Resuelve la brecha entre las llamadas/participantes reales en Nodus y el avance
- *    de las metas en Causa OS (ej. Managers Creación: 10, Relación: 8, Sentados: 105/94).
- * 2. REAL: Cero alucinaciones. Cruce estricto y determinista con:
- *    - nodus_coordinadores_c1c2 (llamadas nominales por coordinadora y equipo)
- *    - kpisEntrenadoresData (llamadas de entrenadores a managers)
- *    - managersData (directorio maestro con estados, equipos y entrenadores)
- *    - SEGUIMIENTO_EQUIPOS (histórico oficial de escuadras)
- * 3. CONFIABLE: Algoritmo de unicidad basado en Hashing determinista anti-redundancias.
- *    Ningún participante ni llamada se contabiliza dos veces.
- */
+// Comparación conservadora: una fuente ausente no acredita avance ni vigencia.
 
-import nodusFallback from '../data/nodusFallbackData.json';
-import { INITIAL_MANAGERS } from '../data/managersData.js';
-import kpisLimaFallback from '../data/kpisLima.json';
-
-// Extraer arreglo seguro de managers oficiales
-const getManagersList = () => {
-  if (Array.isArray(INITIAL_MANAGERS)) return INITIAL_MANAGERS;
-  return [];
-};
+import { explicitGoalTeam, explicitTeamFromText } from './goalsTimeline.js';
+import { goalProgress } from './goalProgress.js';
 
 /**
  * Normalizador tolerante de Sedes
@@ -58,30 +36,8 @@ export function generateEntityHash(components) {
 /**
  * Extrae el número de equipo de una meta o texto
  */
-export function extractTeamNumber(goal, parentGoal = null, defaultSede = null) {
-  // 1. Título propio de la meta (máxima prioridad)
-  const goalTitle = goal?.title || '';
-  const matchDirect = goalTitle.match(/C\d+E(\d+)/i) || goalTitle.match(/(?:Equipo|E)\s*(\d+)/i);
-  if (matchDirect) return matchDirect[1];
-
-  // 2. Descripción o ciclo propio
-  const ownText = `${goal?.description || ''} ${goal?.cyclePhase || ''}`;
-  const matchOwn = ownText.match(/C\d+E(\d+)/i) || ownText.match(/(?:Equipo|E)\s*(\d+)/i);
-  if (matchOwn) return matchOwn[1];
-
-  // 3. Título del parentGoal si existe
-  if (parentGoal?.title) {
-    const matchParent = parentGoal.title.match(/(?:Equipo|E)\s*(\d+)/i);
-    if (matchParent) return matchParent[1];
-  }
-
-  // 4. Default por sede (Ciclos activos vigentes)
-  const sede = normalizeSede(goal?.sede || parentGoal?.sede || defaultSede) || 'Lima';
-  if (sede === 'Lima') return '31'; // Ciclo activo Lima: E31
-  if (sede === 'Quito') return '119';
-  if (sede === 'Guayaquil') return '24';
-  if (sede === 'Cuenca') return '23';
-  return '31';
+export function extractTeamNumber(goal, parentGoal = null) {
+  return explicitGoalTeam(goal) || explicitGoalTeam(parentGoal);
 }
 
 /**
@@ -91,23 +47,20 @@ export function auditSingleGoal(goal, parentGoal, options = {}) {
   const {
     nodusData = null,
     liveManagers = null,
-    coordinatorReports = [],
-    selectedSede = null,
-    currentUserSede = null
+    coordinatorReports = []
   } = options;
 
-  const fallbackSede = selectedSede && selectedSede !== 'Todas' ? selectedSede : (currentUserSede || 'Lima');
-  const rawSede = goal?.sede || parentGoal?.sede || fallbackSede;
-  const sede = normalizeSede(rawSede) || 'Lima';
-  const teamNum = extractTeamNumber(goal, parentGoal, sede);
-  const targetTeamLabel = `EQUIPO ${teamNum}`;
+  const rawSede = goal?.sede || parentGoal?.sede || '';
+  const sede = normalizeSede(rawSede);
+  const teamNum = extractTeamNumber(goal, parentGoal);
+  const targetTeamLabel = teamNum ? `EQUIPO ${teamNum}` : 'Equipo no registrado';
   const titleLower = (goal?.title || '').toLowerCase();
   const kpiLower = (goal?.kpi || '').toLowerCase();
 
-  const allCoords = nodusData?.coordinadores || nodusFallback?.coordinadores || [];
+  const allCoords = nodusData?.coordinadores || [];
   const sedeCoords = allCoords.filter(c => normalizeSede(c.sede || '') === sede);
 
-  const managers = liveManagers && liveManagers.length > 0 ? liveManagers : getManagersList();
+  const managers = Array.isArray(liveManagers) ? liveManagers : [];
   const sedeManagers = managers.filter(m => normalizeSede(m.sede || '') === sede);
 
   // Clasificación del Tipo de Meta con precedencia estricta:
@@ -128,7 +81,7 @@ export function auditSingleGoal(goal, parentGoal, options = {}) {
     (titleLower.includes('px') && !titleLower.includes('aliado'))
   );
 
-  let detectedRealValue = 0;
+  let detectedRealValue = null;
   let detectedTarget = Number(goal?.targetValue) || 0;
   let callsDetails = {
     totalLlamadas: 0,
@@ -146,7 +99,7 @@ export function auditSingleGoal(goal, parentGoal, options = {}) {
   sedeCoords.forEach(c => {
     const eq = (c.equipos || []).find(e => {
       const eName = (e.equipo || '').toUpperCase().replace(/\s+/g, '');
-      return eName === targetTeamLabel.replace(/\s+/g, '') || eName.includes(`EQUIPO${teamNum}`);
+      return teamNum && eName === targetTeamLabel.replace(/\s+/g, '');
     });
 
     if (eq) {
@@ -179,12 +132,12 @@ export function auditSingleGoal(goal, parentGoal, options = {}) {
   // 2. AUDITORÍA ESPECÍFICA SEGÚN TIPO DE META
   if (isManagersCreation || isManagersRelacion || isManagersGeneral) {
     category = isManagersCreation ? 'MANAGERS_CREACION' : isManagersRelacion ? 'MANAGERS_RELACION' : 'MANAGERS_GENERAL';
-    sources.push('Directorio Nodus Managers', 'KPIs Entrenadores');
+    sources.push('Directorio de managers disponible');
 
     // Filtrar managers de esta sede
     const activeSedeManagers = sedeManagers.filter(m => {
       const mEq = String(m.numEquipo || m.equipo || '');
-      const eqMatches = mEq === teamNum || mEq.includes(teamNum);
+      const eqMatches = mEq === teamNum || explicitTeamFromText(mEq) === teamNum;
       const isAct = m.estado === 'Activo' || m.estado === 'EN_JUEGO' || !m.estado || m.isActivo;
       return eqMatches && isAct;
     });
@@ -192,7 +145,7 @@ export function auditSingleGoal(goal, parentGoal, options = {}) {
     // Hash anti-redundancia para no duplicar managers
     const uniqueManagersMap = new Map();
     activeSedeManagers.forEach(m => {
-      const mHash = generateEntityHash(['manager', sede, teamNum, m.nombre || m.id]);
+      const mHash = generateEntityHash(['manager', sede, teamNum, m.id || m.email || m.nombre]);
       if (!uniqueManagersMap.has(mHash)) {
         uniqueManagersMap.set(mHash, {
           ...m,
@@ -204,72 +157,61 @@ export function auditSingleGoal(goal, parentGoal, options = {}) {
 
     managersDetails = Array.from(uniqueManagersMap.values());
 
-    // Regla de negocio CPSL:
-    // Para Equipo 30 Lima:
-    // Creación meta es 10 managers (cuota de sala completa).
-    // Relación meta es 8 managers (cuota post-creación).
-    if (isManagersCreation) {
-      detectedTarget = detectedTarget || 10;
-      detectedRealValue = managersDetails.length > 0 ? managersDetails.length : detectedTarget;
-    } else if (isManagersRelacion) {
-      detectedTarget = detectedTarget || 8;
-      detectedRealValue = managersDetails.length > 0 ? Math.min(managersDetails.length, detectedTarget) : detectedTarget;
-    } else {
-      detectedRealValue = managersDetails.length > 0 ? managersDetails.length : (Number(goal?.targetValue) || 1);
+    // El directorio general no prueba asistencia ni una fase de Maestría.
+    if (!isManagersCreation && !isManagersRelacion && Array.isArray(liveManagers)) {
+      detectedRealValue = managersDetails.length;
     }
 
   } else if (isSentadosPx) {
     category = 'SENTADOS_PX';
     sources.push('Nodus Coordinadores C1/C2', 'Reportes de Sala');
 
-    // Confirmados por llamadas telefónicas en Nodus
-    const confirmedByCalls = callsDetails.totalConfirmados;
+    const roomReports = coordinatorReports.filter(r => {
+      const reportTeam = String(r.equipo || r.data?.numEquipo || r.data?.equipo || '');
+      const sameGoal = Boolean(goal.id && r.goal_id === goal.id);
+      const reportStage = r.etapa || r.stage;
+      const teamMatches = (sameGoal && !reportTeam) || reportTeam === teamNum || explicitTeamFromText(reportTeam) === teamNum;
+      const stageMatches = (sameGoal && !reportStage) || (Boolean(goal.stage) && reportStage === goal.stage);
+      return r.type === 'ReporteSentadosSala' &&
+        normalizeSede(r.sede || r.data?.sede_id || '') === sede &&
+        teamMatches && stageMatches &&
+        goalProgress(r.data?.sentados, goal.targetValue).current !== null;
+    }).sort((a, b) => String(b.created_at || '').localeCompare(String(a.created_at || '')));
 
-    // Reportes oficiales en sala si existen
-    const repSnapTotal = coordinatorReports.reduce((acc, r) => {
-      if (r.type === 'ReporteSentadosSala' && r.data?.sentados) {
-        return Math.max(acc, Number(r.data.sentados) || 0);
-      }
-      return acc;
-    }, 0);
-
-    // Detección real: El valor de sala reportado o el total confirmado por llamadas
-    detectedRealValue = repSnapTotal > 0 ? repSnapTotal : confirmedByCalls;
-    if (detectedRealValue === 0 && sede === 'Lima' && teamNum === '30') {
-      detectedRealValue = 94; // Certificado oficial kpisLima
-    }
+    // Confirmar una llamada no acredita estar sentado en sala.
+    detectedRealValue = roomReports.length ? Number(roomReports[0].data.sentados) : null;
   } else if (isAliados) {
     category = 'ALIADOS';
-    sources.push('Hoja Oficial Aliados (GID 488639774)');
-    const coordsConfirmed = (goal?.assignedCoordinators || []).reduce((acc, c) => acc + (Number(c.currentQuota) || 0), 0);
-    const coordsTarget = (goal?.assignedCoordinators || []).reduce((acc, c) => acc + (Number(c.targetQuota) || 0), 0);
-    detectedTarget = coordsTarget > 0 ? coordsTarget : (Number(goal?.targetValue) || 25);
-    detectedRealValue = coordsConfirmed > 0 ? coordsConfirmed : (Number(goal?.currentValue) || 0);
+    sources.push('Cuotas guardadas en la meta (sin contraste externo)');
+    // Las cuotas guardadas se muestran en la tarjeta; no son verificación externa.
+    detectedTarget = Number(goal?.targetValue) || 0;
+    detectedRealValue = null;
   } else {
-    detectedRealValue = Number(goal?.currentValue) || 0;
+    detectedRealValue = null;
   }
 
-  const currentValue = Number(goal?.currentValue) || 0;
-  const currentProgress = Number(goal?.progress) || 0;
-  const newProgress = detectedTarget > 0 ? Math.min(100, Math.round((detectedRealValue / detectedTarget) * 100)) : 0;
+  const hasScope = Boolean(teamNum && rawSede && !/global/i.test(rawSede));
+  if (!hasScope) detectedRealValue = null;
+
+  const currentValue = goalProgress(goal?.currentValue, goal?.targetValue).current;
+  const currentProgress = goalProgress(goal?.currentValue, goal?.targetValue).percent;
+  const newProgress = goalProgress(detectedRealValue, detectedTarget).percent;
 
   // Detección de Estado de Sincronización
-  let syncStatus = 'AL_DIA';
-  let statusMessage = 'Sincronizado y verificado con Nodus';
-  let badgeColor = '#10b981';
+  let syncStatus = 'SIN_VERIFICAR';
+  let statusMessage = 'Sin evidencia suficiente para comparar. El avance registrado se conserva.';
+  let badgeColor = '#94a3b8';
 
-  if (currentValue === 0 && detectedRealValue > 0) {
+  if (detectedRealValue === null || newProgress === null) {
+    statusMessage = hasScope ? statusMessage : 'Falta sede o equipo explícito para comparar con la fuente.';
+  } else if (currentValue !== detectedRealValue) {
     syncStatus = 'PENDIENTE_SYNC';
-    statusMessage = `Nodus detecta ${detectedRealValue} ${goal?.kpi || 'elementos'} confirmados. ¡Requiere sincronizar!`;
+    statusMessage = `La fuente disponible registra ${detectedRealValue}; la meta registra ${currentValue}. Revisa antes de actualizar.`;
     badgeColor = '#f59e0b';
-  } else if (currentValue < detectedRealValue) {
-    syncStatus = 'DESACTUALIZADO';
-    statusMessage = `Avance en sistema (${currentValue}) inferior a lo verificado en Nodus (${detectedRealValue}).`;
+  } else {
+    syncStatus = 'COINCIDE';
+    statusMessage = 'El avance coincide con la fuente disponible; esto no confirma la vigencia del daemon.';
     badgeColor = '#38bdf8';
-  } else if (newProgress < 35) {
-    syncStatus = 'EN_RIESGO';
-    statusMessage = `Avance al ${newProgress}%. Requiere aceleración telefónica.`;
-    badgeColor = '#ef4444';
   }
 
   const auditHash = generateEntityHash([
@@ -298,11 +240,11 @@ export function auditSingleGoal(goal, parentGoal, options = {}) {
     statusMessage,
     badgeColor,
     auditHash,
-    confidenceScore: 100,
+    confidenceScore: null,
     sources,
     callsDetails,
     managersDetails,
-    requiresUpdate: currentValue !== detectedRealValue
+    requiresUpdate: detectedRealValue !== null && newProgress !== null && currentValue !== detectedRealValue
   };
 }
 
@@ -323,7 +265,9 @@ export function auditAllGoals(goals = [], parentGoalsMap = {}, options = {}) {
     if (audit.requiresUpdate) {
       pendingSyncCount++;
     }
-    totalConfirmadosAuditados += audit.detectedRealValue;
+    if (Number.isFinite(audit.detectedRealValue)) {
+      totalConfirmadosAuditados += audit.detectedRealValue;
+    }
   });
 
   return {
@@ -331,7 +275,9 @@ export function auditAllGoals(goals = [], parentGoalsMap = {}, options = {}) {
     totalAuditadas,
     pendingSyncCount,
     totalConfirmadosAuditados,
-    overallHealthPct: totalAuditadas > 0 ? Math.round(((totalAuditadas - pendingSyncCount) / totalAuditadas) * 100) : 100,
+    unverifiedCount: auditedList.filter(a => a.syncStatus === 'SIN_VERIFICAR').length,
+    matchingCount: auditedList.filter(a => a.syncStatus === 'COINCIDE').length,
+    overallHealthPct: null,
     timestamp: new Date().toISOString()
   };
 }

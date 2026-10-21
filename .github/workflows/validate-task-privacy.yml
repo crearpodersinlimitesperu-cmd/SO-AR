@@ -1,0 +1,86 @@
+name: Validate task privacy and build
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'firebase.json'
+      - 'firestore.rules'
+      - 'firestore.indexes.json'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'cloudflare-worker/src/**'
+      - 'cloudflare-worker/package.json'
+      - 'index.html'
+      - 'scripts/measure-public-loading.mjs'
+      - 'scripts/optimize-login-background.mjs'
+      - 'scripts/nodusMultiAgentSync.mjs'
+      - 'scripts/nodusC1Report.mjs'
+      - 'scripts/imoC1SourceContract.mjs'
+      - 'scripts/syncImoLimaE32.mjs'
+      - 'scripts/syncImoC1Eligibility.mjs'
+      - 'scripts/auditImoCampaignReadiness.mjs'
+      - 'scripts/tests/imo-*.test.mjs'
+      - 'scripts/tests/nodus-c1-report.test.mjs'
+      - '.github/workflows/imo-lima-e32.yml'
+      - 'scripts/mailQueue.js'
+      - 'scripts/sync_drive_vuelos_7xdia.py'
+      - 'public/flight-tracker.js'
+      - 'public/cartas/flight-tracker.js'
+      - 'scripts/mailerDaemon.js'
+      - 'scripts/publishNodusReportSources.mjs'
+      - 'scripts/tests/nodus-report-rules.test.mjs'
+      - 'src/**'
+      - 'tests/**'
+      - '.github/workflows/validate-task-privacy.yml'
+      - '.github/workflows/deploy-nodus-json-worker.yml'
+      - '.github/workflows/mail-dispatch.yml'
+      - '.github/workflows/deploy.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # The startup regression executes the pinned PR145 callback for comparison.
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Install dependencies
+        run: npm ci --include=optional
+
+      - name: Run tests
+        run: npm run test:persistence && npm test && npm run test:nodus-json && npm run test:flyer-teams && npm run test:nodus-reports && npm run test:flight-monitor && npm run test:loading && node --test tests/logistics-help-deploy.test.mjs tests/logistics-help-browser.test.mjs tests/home-module-help.test.mjs
+
+      - name: Test declared task locations and evidence-based operational review
+        run: npm run test:operational
+
+      - name: Test Managers persistence and sheet precedence
+        run: npm run test:managers
+
+      - name: Test goals roles, progress and source evidence
+        run: node --test src/services/goalsBoard.test.js src/services/goalsTimeline.test.js tests/goals-board-browser.test.mjs tests/nodus-goal-discovery.test.mjs tests/nodus-goal-sources.test.mjs
+
+      - name: Test IMO candidate readiness and complete C1 report extraction
+        run: node --test scripts/tests/nodus-c1-report.test.mjs scripts/tests/imo-campaign-readiness.test.mjs scripts/tests/imo-c1-source-contract.test.mjs scripts/tests/imo-contact-eligibility.test.mjs scripts/tests/imo-c1-eligibility.test.mjs scripts/tests/imo-c1-reconciliation.test.mjs scripts/tests/imo-model.test.mjs scripts/tests/imo-calendar.test.mjs
+
+      - name: Build production app
+        run: npm run build
+
+      - name: Test Firestore security rules in Emulator
+        run: npx --yes firebase-tools@latest emulators:exec --only firestore --project demo-task-privacy "npm run test:rules && node --test tests/firestore-manager-persistence.test.mjs scripts/tests/nodus-report-rules.test.mjs"

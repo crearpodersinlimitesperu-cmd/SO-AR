@@ -11,6 +11,7 @@ export default function LearningDashboard() {
   const [learnings, setLearnings] = useState([]);
   const [patterns, setPatterns] = useState([]);
   const [topContributors, setTopContributors] = useState([]);
+  const [statsError, setStatsError] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -43,8 +44,16 @@ export default function LearningDashboard() {
         orderBy('learningContributions', 'desc'),
         limit(10)
       );
-      const statsSnap = await getDocs(statsQuery);
-      setTopContributors(statsSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+      try {
+        const statsSnap = await getDocs(statsQuery);
+        setTopContributors(statsSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+        setStatsError('');
+      } catch (error) {
+        console.error('No se pudo consultar el ranking de aprendizaje:', error);
+        setStatsError(error.code === 'permission-denied'
+          ? 'El ranking está disponible para gerencia y coordinación. Tus aportes siguen registrándose.'
+          : 'No se pudo cargar el ranking de aprendizaje.');
+      }
 
     } catch (error) {
       console.error('Error fetching learning data:', error);
@@ -107,7 +116,9 @@ export default function LearningDashboard() {
                 <Users size={20} /> Líderes de Aprendizaje
               </h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                {topContributors.length === 0 ? (
+                {statsError ? (
+                  <p className="text-muted" role="status">{statsError}</p>
+                ) : topContributors.length === 0 ? (
                   <p className="text-muted">Nadie ha contribuido todavía.</p>
                 ) : (
                   topContributors.map((user, idx) => (

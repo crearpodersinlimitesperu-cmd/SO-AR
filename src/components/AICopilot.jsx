@@ -500,12 +500,6 @@ export default function AICopilot() {
       if (!aiText) {
         let nodusData = null;
         try {
-          const saved = localStorage.getItem("CAUSA_FAST_CACHE");
-          if (saved) {
-             nodusData = JSON.parse(saved);
-          }
-        } catch(e) {}
-        try {
           const nodusDoc = await getDocResilient(doc(db, 'nodus_coordinadores_c1c2', 'latest'));
           if (nodusDoc && nodusDoc.exists()) {
             nodusData = nodusDoc.data();

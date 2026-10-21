@@ -14,6 +14,7 @@ import { db, getDocResilient } from '../services/firebase';
 import { OPERATIONAL_SEDES, normalizeSede, usersData, normalizeRole } from '../data/usersData';
 import { SEDES_FDS_PRICING, getSedePricing, formatCurrencyAmount } from '../data/sedesPricingData';
 import nodusFallbackData from '../data/nodusFallbackData.json';
+import { selectCoordinatorSnapshot } from '../services/nodusMetricsModel.js';
 import ResourceCapacityView from '../components/ResourceCapacityView';
 import FuturosImposiblesView from '../components/FuturosImposiblesView';
 import NodusUserAccessReport from '../components/NodusUserAccessReport';
@@ -42,14 +43,15 @@ export const KNOWN_COORDINATORS = {
   'VALENTINA RODRIGUEZ': { formalName: 'Valentina Rodriguez', email: 'valentina.r@crearpsl.net', role: 'coord_c1', sede: 'Medellín' },
   'DAVID GONZALEZ': { formalName: 'David Gonzalez', email: 'david.gonzalez@crearpsl.net', role: 'coord_c1', sede: 'Medellín' },
   'JUAN SEBASTIAN SOTO': { formalName: 'Juan Sebastian Soto', email: 'juansebastian.soto@crearpsl.net', role: 'coord_c1', sede: 'Medellín' },
-  'NAOMI': { formalName: 'Naomi Zamora', email: 'naomi.zamora@crearpsl.net', role: 'coord_c1', sede: 'México' },
+  'NAOMI': { formalName: 'Naomi Zamora', email: 'naomi.zamora@crearpsl.net', role: 'coord_c1', sede: 'CDMX' },
+  'ALONSO SOLARES': { formalName: 'Alonso Solares', email: 'alonso.solares@crearpsl.net', role: 'coord_c1', sede: 'CDMX' },
+  'DANIELA MONROY': { formalName: 'Daniela Monroy Fabbri', email: 'daniela.monroy@crearpsl.net', role: 'coord_c1', sede: 'CDMX' },
   'ADRIANNA': { formalName: 'Adrianna Campuzano', email: 'adrianna@crearpsl.net', role: 'coord_c1', sede: 'Quito' },
   'LILIANA': { formalName: 'Liliana Cubillo', email: 'liliana.cubillo@crearpsl.net', role: 'coord_c1', sede: 'Quito' },
-  'KARLA': { formalName: 'Karla Aguirre', email: 'katherine.aguirre@crearpsl.net', role: 'coord_c1', sede: 'Quito' },
+  'KATHERINE': { formalName: 'Katherine Aguirre', email: 'katherine.aguirre@crearpsl.net', role: 'coord_c1', sede: 'Quito' },
   'ADAMS': { formalName: 'Adams (Coordinación)', email: 'coordinacion.quito@crearpsl.net', role: 'coord_c1', sede: 'Quito' },
   'DANIELA': { formalName: 'Daniela Villa', email: 'dayapamae.villarodriguez14@gmail.com', role: 'coord_c1', sede: 'Quito' },
-  'DANNA': { formalName: 'Dayana Zambrano', email: 'dayizambrano24@gmail.com', role: 'coord_c1', sede: 'Quito' },
-  'MARCELA': { formalName: 'Marcela Robbys', email: 'marobel.studio@gmail.com', role: 'coord_c1', sede: 'Quito' }
+  'DANNA': { formalName: 'Dayana Zambrano', email: 'dayizambrano24@gmail.com', role: 'coord_c1', sede: 'Quito' }
 };
 
 export const GERENTES_POR_SEDE = {
@@ -58,7 +60,8 @@ export const GERENTES_POR_SEDE = {
   'Lima': { name: 'José Sánchez', email: 'jose.sanchez@crearpsl.net' },
   'Medellín': { name: 'Yurany González', email: 'yurany.gonzalez@crearpsl.net' },
   'México': { name: 'Nora Zamora', email: 'nora.zamora@crearpsl.net' },
-  'Quito': { name: 'Emily Campuzano / Freddy Sosa', email: 'emily.campuzano@crearpsl.net' }
+  'CDMX': { name: 'Nora Zamora', email: 'nora.zamora@crearpsl.net' },
+  'Quito': { name: 'Mila Campuzano / David Sosa', email: 'emily.campuzano@crearpsl.net' }
 };
 
 function formatRoleLabel(role) {
@@ -247,16 +250,9 @@ export default function PortfolioBoard() {
           data = docSnap.data();
         }
 
-        if (data && Array.isArray(data.coordinadores) && data.coordinadores.length > 0) {
-          setCoordinadoresRaw(data.coordinadores);
-          setCoordinatorSnapshot({ source: 'nodus', timestamp: data.timestamp || data.updatedAt || null });
-        } else if (nodusFallbackData?.coordinadores) {
-          setCoordinadoresRaw(nodusFallbackData.coordinadores);
-          setCoordinatorSnapshot({ source: 'fallback', timestamp: nodusFallbackData.timestamp || null });
-        } else {
-          setCoordinadoresRaw([]);
-          setCoordinatorSnapshot({ source: 'unavailable', timestamp: null });
-        }
+        const coordinatorSource = selectCoordinatorSnapshot(data, nodusFallbackData);
+        setCoordinadoresRaw(coordinatorSource.coordinadores);
+        setCoordinatorSnapshot({ source: coordinatorSource.source, timestamp: coordinatorSource.timestamp });
 
         let totalEnrolados = 0;
         let totalBajasReales = 0;
@@ -271,14 +267,14 @@ export default function PortfolioBoard() {
             totalEnrolados = data.totales.totalConfirmados || 0;
             totalBajasReales = data.totales.totalNoInteresa || 0;
             totalEnGestion = (data.totales.totalNoContesta || 0) + (data.totales.totalPorConfirmar || 0);
-            totalParticipantes = data.totales.totalAsignados || 1;
+            totalParticipantes = data.totales.totalAsignados || 0;
             totalSinContactar = Math.max(0, totalParticipantes - (data.totales.totalGestiones || 0));
           } else {
-            const list = (data && data.coordinadores) || nodusFallbackData?.coordinadores || [];
+            const list = (data && Array.isArray(data.coordinadores)) ? data.coordinadores : [];
             totalEnrolados = list.reduce((acc, c) => acc + Number(c.estados?.confirmado ?? c.confirmados ?? ((c.confirmadosC1 || 0) + (c.confirmadosC2 || 0)) ?? 0), 0);
             totalBajasReales = list.reduce((acc, c) => acc + Number(c.estados?.noInteresa ?? c.noInteresa ?? 0), 0);
             totalEnGestion = list.reduce((acc, c) => acc + Number((c.estados?.noContesta || 0) + (c.estados?.porConfirmar || 0)), 0);
-            totalParticipantes = list.reduce((acc, c) => acc + Number(c.asignados || 0), 0) || 1;
+            totalParticipantes = list.reduce((acc, c) => acc + Number(c.asignados || 0), 0);
             const gest = list.reduce((acc, c) => acc + Number(c.estados?.llamadas || c.gestiones || 0), 0);
             totalSinContactar = Math.max(0, totalParticipantes - gest);
           }
@@ -289,16 +285,16 @@ export default function PortfolioBoard() {
               totalEnrolados = sedeData.confirmadosTotal || 0;
               totalBajasReales = sedeData.noInteresaTotal || 0;
               totalEnGestion = (sedeData.noContestaTotal || 0) + (sedeData.porConfirmarTotal || 0);
-              totalParticipantes = sedeData.asignadosTotal || 1;
+              totalParticipantes = sedeData.asignadosTotal || 0;
               totalSinContactar = Math.max(0, totalParticipantes - (sedeData.gestionesTotal || 0));
             }
           }
           if (!totalEnrolados && !totalParticipantes) {
-            const list = ((data && data.coordinadores) || nodusFallbackData?.coordinadores || []).filter(c => normalizeSede(c.sede) === normalizeSede(selectedSede));
+            const list = ((data && Array.isArray(data.coordinadores)) ? data.coordinadores : []).filter(c => normalizeSede(c.sede) === normalizeSede(selectedSede));
             totalEnrolados = list.reduce((acc, c) => acc + Number(c.estados?.confirmado ?? c.confirmados ?? ((c.confirmadosC1 || 0) + (c.confirmadosC2 || 0)) ?? 0), 0);
             totalBajasReales = list.reduce((acc, c) => acc + Number(c.estados?.noInteresa ?? c.noInteresa ?? 0), 0);
             totalEnGestion = list.reduce((acc, c) => acc + Number((c.estados?.noContesta || 0) + (c.estados?.porConfirmar || 0)), 0);
-            totalParticipantes = list.reduce((acc, c) => acc + Number(c.asignados || 0), 0) || 1;
+            totalParticipantes = list.reduce((acc, c) => acc + Number(c.asignados || 0), 0);
             const gest = list.reduce((acc, c) => acc + Number(c.estados?.llamadas || c.gestiones || 0), 0);
             totalSinContactar = Math.max(0, totalParticipantes - gest);
           }
@@ -309,7 +305,7 @@ export default function PortfolioBoard() {
         if (totalSinContactar > (totalParticipantes * 0.5)) health = 'warning';
         if (bajaRate > 25) health = 'critical';
 
-        const progress = Math.min(100, Math.round((totalEnrolados / totalParticipantes) * 100));
+        const progress = totalParticipantes > 0 ? Math.min(100, Math.round((totalEnrolados / totalParticipantes) * 100)) : 0;
 
         let ciclosReales = [
           { 
@@ -374,19 +370,10 @@ export default function PortfolioBoard() {
     fetchData();
   }, [selectedSede, events]);
 
-    // Síntesis Cuantitativa de Inteligencia Predictiva Multisede (Empírica y Certificada)
+  // Síntesis Cuantitativa de Inteligencia Predictiva Multisede (Empírica y Certificada — Cero Datos Inventados)
   const predictorMatrixData = useMemo(() => {
-    const list = coordinadoresRaw || [];
+    const list = coordinatorSnapshot.source === 'nodus' ? (coordinadoresRaw || []) : [];
     if (!list.length && !predictorData) return null;
-
-    const defaultProspectosPorSede = {
-      'Quito': 114,
-      'Cuenca': 81,
-      'Guayaquil': 68,
-      'Lima': 60,
-      'Medellín': 51,
-      'México': 43
-    };
 
     const sedesMap = {};
 
@@ -434,11 +421,14 @@ export default function PortfolioBoard() {
         : (totalLlamadas > 0 ? Math.round((totalConfirmados / totalLlamadas) * 1000) / 10 : 0);
 
       const riesgoDesercionFDS = totalConfirmados > 0
-        ? Math.max(5, Math.min(45, Math.round(((totalConfirmados - totalSentados) / totalConfirmados) * 1000) / 10))
-        : (remoteSede?.riesgoDesercionFDS || 20.3);
+        ? Math.max(0, Math.min(100, Math.round(((totalConfirmados - totalSentados) / totalConfirmados) * 1000) / 10))
+        : (Number.isFinite(remoteSede?.riesgoDesercionFDS) ? remoteSede.riesgoDesercionFDS : 0);
 
-      const prospectosSinPago = remoteSede?.prospectosSinPago || defaultProspectosPorSede[sede] || 40;
-      const recuperablesEstimados = Math.round(prospectosSinPago * 0.165);
+      // Solo prospectos verificados en Nodus (cero números hardcodeados)
+      const prospectosSinPago = Number.isFinite(remoteSede?.prospectosSinPago) ? remoteSede.prospectosSinPago : 0;
+      const recuperablesEstimados = Number.isFinite(remoteSede?.recuperablesEstimados)
+        ? remoteSede.recuperablesEstimados
+        : Math.round(prospectosSinPago * (tasaConversion / 100));
       
       // Cálculo REAL con precio de FDS de la sede
       const precioFdsC1 = pricing.precioFdsC1;
@@ -446,18 +436,27 @@ export default function PortfolioBoard() {
       const ingresoRecuperableUSD = Math.round(ingresoRecuperableLocal / pricing.tasaCambioUSD);
       const carteraTotalLocal = prospectosSinPago * precioFdsC1;
 
-      const volFactor = Math.min(100, Math.round((totalConfirmados / Math.max(1, sedeCoords.length * 30)) * 100));
-      const scoreSalud = Math.min(100, Math.max(20, Math.round(
-        (tasaConversion * 0.4) + ((100 - riesgoDesercionFDS) * 0.4) + (volFactor * 0.2)
-      )));
+      const volFactor = sedeCoords.length > 0
+        ? Math.min(100, Math.round((totalConfirmados / Math.max(1, sedeCoords.length * 30)) * 100))
+        : 0;
+      const scoreSalud = (totalConfirmados > 0 || totalLlamadas > 0)
+        ? Math.min(100, Math.max(0, Math.round(
+            (tasaConversion * 0.4) + ((100 - riesgoDesercionFDS) * 0.4) + (volFactor * 0.2)
+          )))
+        : 0;
 
-      let semaforo = 'ESTABLE';
-      if (scoreSalud >= 75) semaforo = 'EXCELENTE';
-      else if (scoreSalud < 50) semaforo = 'ALERTA';
+      let semaforo = 'SIN DATOS';
+      if (totalConfirmados > 0 || totalLlamadas > 0) {
+        if (scoreSalud >= 75) semaforo = 'EXCELENTE';
+        else if (scoreSalud >= 50) semaforo = 'ESTABLE';
+        else semaforo = 'ALERTA';
+      }
 
-      const etaCumplimiento = totalConfirmados >= 50
-        ? 'En Ritmo (Proyección 100% alcanzable)'
-        : 'Requiere aceleración de llamadas';
+      const etaCumplimiento = totalConfirmados === 0 && totalLlamadas === 0
+        ? 'Sin actividad registrada en Nodus'
+        : totalConfirmados >= 50
+          ? 'En Ritmo (Proyección 100% alcanzable)'
+          : 'Requiere aceleración de llamadas';
 
       sedesMap[sede] = {
         sede,
@@ -496,7 +495,7 @@ export default function PortfolioBoard() {
     const totalPorConfirmar = allSedesValues.reduce((a, b) => a + b.totalPorConfirmar, 0);
     const totalNoInteresa = allSedesValues.reduce((a, b) => a + b.totalNoInteresa, 0);
     const totalProspectosSinPago = allSedesValues.reduce((a, b) => a + b.prospectosSinPago, 0);
-    const totalRecuperables = Math.round(totalProspectosSinPago * 0.165);
+    const totalRecuperables = allSedesValues.reduce((a, b) => a + b.recuperablesEstimados, 0);
     const totalIngresoRecuperableUSD = allSedesValues.reduce((a, b) => a + (b.ingresoRecuperableUSD || 0), 0);
 
     const contactadasGlobal = totalConfirmados + totalNoInteresa + totalPorConfirmar;
@@ -505,12 +504,14 @@ export default function PortfolioBoard() {
       : 0;
 
     const riesgoGlobal = totalConfirmados > 0
-      ? Math.max(5, Math.min(45, Math.round(((totalConfirmados - totalSentados) / totalConfirmados) * 1000) / 10))
-      : 23.7;
+      ? Math.max(0, Math.min(100, Math.round(((totalConfirmados - totalSentados) / totalConfirmados) * 1000) / 10))
+      : 0;
 
-    const scoreSaludGlobal = Math.min(100, Math.max(20, Math.round(
-      (tasaConversionGlobal * 0.4) + ((100 - riesgoGlobal) * 0.4) + 20
-    )));
+    const scoreSaludGlobal = (totalConfirmados > 0 || totalLlamadas > 0)
+      ? Math.min(100, Math.max(0, Math.round(
+          (tasaConversionGlobal * 0.4) + ((100 - riesgoGlobal) * 0.4) + 20
+        )))
+      : 0;
 
     const globalPred = {
       sede: 'GLOBAL',
@@ -533,15 +534,15 @@ export default function PortfolioBoard() {
       ingresoRecuperableLocal: totalIngresoRecuperableUSD,
       ingresoRecuperableUSD: totalIngresoRecuperableUSD,
       scoreSalud: scoreSaludGlobal,
-      semaforo: scoreSaludGlobal >= 75 ? 'EXCELENTE' : scoreSaludGlobal >= 50 ? 'ESTABLE' : 'ALERTA',
-      etaCumplimiento: 'En Ritmo (Proyección 100% alcanzable)'
+      semaforo: (totalConfirmados === 0 && totalLlamadas === 0) ? 'SIN DATOS' : scoreSaludGlobal >= 75 ? 'EXCELENTE' : scoreSaludGlobal >= 50 ? 'ESTABLE' : 'ALERTA',
+      etaCumplimiento: (totalConfirmados === 0 && totalLlamadas === 0) ? 'Sin actividad registrada en Nodus' : 'En Ritmo (Proyección 100% alcanzable)'
     };
 
     return {
       sedes: sedesMap,
       global: globalPred
     };
-  }, [coordinadoresRaw, predictorData, customPricing]);
+  }, [coordinadoresRaw, coordinatorSnapshot.source, predictorData, customPricing]);
 
   // Extraer métricas predictivas según la sede seleccionada o Global
   const activePrediction = useMemo(() => {
@@ -759,24 +760,24 @@ export default function PortfolioBoard() {
                     <span style={{ fontSize: '0.75rem', fontWeight: 800, color: textMuted, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                       Salud Predictiva
                     </span>
-                    <h3 style={{ fontSize: '2.2rem', fontWeight: 900, color: (activePrediction?.scoreSalud || 75) >= 70 ? '#10b981' : (activePrediction?.scoreSalud || 75) >= 50 ? '#f59e0b' : '#ef4444', margin: '0.2rem 0' }}>
-                      {activePrediction?.scoreSalud || 75}/100
+                    <h3 style={{ fontSize: '2.2rem', fontWeight: 900, color: (activePrediction?.scoreSalud ?? 0) >= 70 ? '#10b981' : (activePrediction?.scoreSalud ?? 0) >= 50 ? '#f59e0b' : '#ef4444', margin: '0.2rem 0' }}>
+                      {activePrediction?.scoreSalud ?? 0}/100
                     </h3>
                   </div>
                   <div style={{ 
                     padding: '0.75rem', 
                     borderRadius: '12px', 
-                    background: (activePrediction?.scoreSalud || 75) >= 70 ? '#ecfdf5' : '#fffbeb', 
-                    color: (activePrediction?.scoreSalud || 75) >= 70 ? '#10b981' : '#f59e0b' 
+                    background: (activePrediction?.scoreSalud ?? 0) >= 70 ? '#ecfdf5' : '#fffbeb', 
+                    color: (activePrediction?.scoreSalud ?? 0) >= 70 ? '#10b981' : '#f59e0b' 
                   }}>
                     <Target size={28} />
                   </div>
                 </div>
                 <div style={{ width: '100%', height: '8px', background: '#e2e8f0', borderRadius: '10px', overflow: 'hidden', marginBottom: '0.75rem' }}>
-                  <div style={{ width: `${Math.min(100, activePrediction?.scoreSalud || 75)}%`, height: '100%', background: (activePrediction?.scoreSalud || 75) >= 70 ? '#10b981' : (activePrediction?.scoreSalud || 75) >= 50 ? '#f59e0b' : '#ef4444', borderRadius: '10px' }}></div>
+                  <div style={{ width: `${Math.min(100, activePrediction?.scoreSalud ?? 0)}%`, height: '100%', background: (activePrediction?.scoreSalud ?? 0) >= 70 ? '#10b981' : (activePrediction?.scoreSalud ?? 0) >= 50 ? '#f59e0b' : '#ef4444', borderRadius: '10px' }}></div>
                 </div>
                 <p style={{ fontSize: '0.75rem', color: textMuted, margin: 0, lineHeight: '1.4' }}>
-                  Índice multifactorial: 40% Tasa Conversión + 40% Retención FDS + 20% Ritmo Operativo &bull; Estado: <strong style={{ color: (activePrediction?.scoreSalud || 75) >= 70 ? '#10b981' : '#f59e0b' }}>{activePrediction?.semaforo || 'ESTABLE'}</strong>
+                  Índice multifactorial: 40% Tasa Conversión + 40% Retención FDS + 20% Ritmo Operativo &bull; Estado: <strong style={{ color: (activePrediction?.scoreSalud ?? 0) >= 70 ? '#10b981' : '#f59e0b' }}>{activePrediction?.semaforo || 'SIN DATOS'}</strong>
                 </p>
               </div>
 
@@ -787,8 +788,8 @@ export default function PortfolioBoard() {
                     <span style={{ fontSize: '0.75rem', fontWeight: 800, color: textMuted, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                       Riesgo Deserción FDS
                     </span>
-                    <h3 style={{ fontSize: '2.2rem', fontWeight: 900, color: (activePrediction?.riesgoDesercionFDS || 20) > 25 ? '#ef4444' : '#f59e0b', margin: '0.2rem 0' }}>
-                      {activePrediction?.riesgoDesercionFDS ?? 20.3}%
+                    <h3 style={{ fontSize: '2.2rem', fontWeight: 900, color: (activePrediction?.riesgoDesercionFDS ?? 0) > 25 ? '#ef4444' : '#f59e0b', margin: '0.2rem 0' }}>
+                      {activePrediction?.riesgoDesercionFDS ?? 0}%
                     </h3>
                   </div>
                   <div style={{ padding: '0.75rem', borderRadius: '12px', background: '#fef2f2', color: '#ef4444' }}>
@@ -1972,6 +1973,11 @@ ${coord.coachingFeedback}`;
                                   assignedToEmails: [taskForm.assignedToEmail],
                                   assignedSede: selectedCoordForTask?.sede || selectedSede,
                                   role: taskForm.assignedRole || 'gerente',
+                                  isCustom: true,
+                                  createdBy: currentUser?.email || '',
+                                  createdByEmail: currentUser?.email || '',
+                                  assignedByEmail: currentUser?.email || '',
+                                  assignedByName: currentUser?.displayName || currentUser?.name || '',
                                   source: 'Centinela RRHH / Nodus',
                                   createdAt: new Date().toISOString(),
                                   updatedAt: new Date().toISOString(),

@@ -18,13 +18,17 @@ jobs:
       - run: npm install --ignore-scripts --include=optional
       - run: npm install --prefix functions-imo --ignore-scripts
       - name: Validate IMO models
-        run: node --test scripts/tests/imo-auth.test.mjs scripts/tests/imo-identity.test.mjs scripts/tests/imo-control.test.mjs
+        run: node --test scripts/tests/imo-c1-eligibility.test.mjs scripts/tests/imo-auth.test.mjs scripts/tests/imo-identity.test.mjs scripts/tests/imo-control.test.mjs
       - name: Configure private verification and mail secrets
         env:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
           GMAIL_USER: ${{ secrets.GMAIL_USER }}
           GMAIL_PASS: ${{ secrets.GMAIL_PASS }}
         run: node scripts/provisionImoSecrets.mjs
+      - name: Recover incomplete first deployment
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: node scripts/recoverImoFailedDelivery.mjs --repair
       - name: Prepare deployment credential
         env:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
@@ -33,7 +37,7 @@ jobs:
       - name: Deploy only the IMO codebase
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/imo-deploy-credential.json
-        run: npx --yes firebase-tools@latest deploy --config firebase.imo.json --only functions:imo --project centro-operativo-cpsl --non-interactive
+        run: node scripts/deployImoBackend.mjs
       - name: Remove temporary credential
         if: always()
         run: rm -f "$RUNNER_TEMP/imo-deploy-credential.json"

@@ -1,5 +1,5 @@
 import { getWhatsAppUrl } from '../utils/phoneUtils';
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
@@ -11,11 +11,11 @@ import {
   canChangeManagerStatus,
   canViewAllManagers,
   canViewSede,
-  isDireccionRole,
   isGlobalQTCoordinator,
   hasQTPrivileges,
   DUAL_ROLE_TRAINER_EMAILS,
   canViewLiquidacionEntrenadores,
+  canReverseLiquidacionEntrenadores,
   canWriteNotaSeguimiento,
   canViewAllNotasSeguimiento,
   canReplyNotaSeguimiento,
@@ -24,7 +24,6 @@ import {
   canViewInactiveUsers
 } from '../config/permissions';
 import { 
-  INITIAL_MANAGERS, 
   INITIAL_LLAMADOS, 
   ENTRENADORES_LIST, 
   ENTRENADORES_INACTIVOS_LIST,
@@ -36,8 +35,10 @@ import {
 } from '../data/managersData';
 import { OPERATIONAL_SEDES, normalizeRole, normalizeSede } from '../data/usersData';
 import { recordAuditEvent } from '../services/auditService';
+import { recordGroupCall, recordIndividualCall, updateIndividualCallDate } from '../services/callHistoryService';
+import { createCallOperationGate } from '../services/callOperationGate';
 import { db } from '../services/firebase';
-import { collection, getDocs, doc, addDoc, setDoc, updateDoc, deleteDoc, writeBatch, onSnapshot, serverTimestamp, query, where, arrayUnion } from 'firebase/firestore';
+import { collection, getDocs, doc, addDoc, setDoc, updateDoc, deleteDoc, deleteField, writeBatch, onSnapshot, serverTimestamp, query, where, arrayUnion, runTransaction } from 'firebase/firestore';
 import CountryFlag from '../components/CountryFlag';
 import { 
   FolderOpen,
@@ -52,8 +53,15 @@ import {
 } from 'lucide-react';
 import CMJDashboard from '../components/CMJDashboard';
 import KPIsEntrenadoresLlamadas from '../components/KPIsEntrenadoresLlamadas';
+import TrainerCoherencePanel from '../components/TrainerCoherencePanel';
+import { isCoherenceAdmin, assertLegacyTrainerEdit, matchesExplicitTrainer } from '../utils/trainerCoherence';
 import { auditAndDeduplicateManagers } from '../services/dataIntegrityAgent';
+import { buildTeamKeyResolver } from '../utils/teamGrouping';
 import defaultKpisData from '../data/kpisEntrenadoresData.json';
+import { ManagersHelpProvider, ManagersQuickGuide, ManagersHelpMode, HelpButton, HelpInput, HelpSelect, HelpTextarea, HelpLink, HelpSortHeader } from '../components/ManagersHelp';
+import { getManagersGuideRole, managersTabHelpKeys } from '../data/managersHelpContent';
+import { managerDocumentRef, managerNoteMatches } from '../services/managerPersistence';
+import { manualManagerPatch } from '../services/managerSyncPolicy';
 
 
 const SEDE_COLORS = {
@@ -184,8 +192,9 @@ export default function CentroManagers() {
   const canChangeStatus = canChangeManagerStatus(currentUser);
   const userCanAdd = canAddManagers(currentUser);
   const userCanAssign = canAssignTrainer(currentUser);
-  // Pestaña de Liquidación de Entrenadores: solo José Sánchez y Elizabeth Escobar (02/09/2026)
+  // Liquidación y KPIs comparten el permiso reservado a Dirección/SuperAdmin.
   const canViewLiquidacion = canViewLiquidacionEntrenadores(currentUser);
+  const canReversarPago = canReverseLiquidacionEntrenadores(currentUser);
   // Pestaña de KPIs de Llamadas: REGLA ESTRICTA (05/09/2026) solo Directores y José Sánchez / SuperAdmin
   const userCanViewKPIsLlamadas = canViewKPIsLlamadas(currentUser);
   // Notas de Seguimiento post-llamada (02/09/2026): quién puede dejar una nota,
@@ -211,75 +220,41 @@ export default function CentroManagers() {
   const [managers, setManagers] = useState([]);
   const [llamadosData, setLlamadosData] = useState([]);
   const [isLoadingData, setIsLoadingData] = useState(true);
+  const [managersError, setManagersError] = useState('');
+  const [managersReload, setManagersReload] = useState(0);
 
   useEffect(() => {
+    setManagers([]);
+    setIsLoadingData(true);
+    setManagersError('');
     if (!currentUser) return;
     
-    const isGlobal = canViewAllManagers(currentUser) || isDireccionRole(currentUser) || ['jose.sanchez@crearpsl.net', 'armando.pilacuan@gmail.com', 'paul.sosa@crearpsl.net'].includes(currentUser?.email?.toLowerCase());
     const baseCol = collection(db, 'managers_directory');
     // Cargar coleccion completa: CentroManagers aplica filtrado fino y jerarquico en filteredManagers
     // Esto previene que ligeras variantes en el texto de la sede (ej. 'Quito' vs 'Quito Ciclo 1') dejen en blanco la vista.
     const q = baseCol;
 
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    const unsubscribe = onSnapshot(q, { includeMetadataChanges: true }, (querySnapshot) => {
+      // A cached empty/old collection is not confirmation of the current directory.
+      if (querySnapshot.metadata.fromCache) {
+        setIsLoadingData(true);
+        return;
+      }
+      if (querySnapshot.metadata.hasPendingWrites) return;
       const firestoreManagers = [];
       querySnapshot.forEach((doc) => {
         const data = doc.data() || {};
         firestoreManagers.push({
           ...data,
-          id: data.id ?? doc.id,
-          docId: doc.id
+          id: doc.id,
+          docId: doc.id,
+          _legacyDirectoryId: data.id ?? null
         });
       });
 
-      // Merge inteligente y CERO DUPLICADOS:
-      // Si el mismo colaborador existe en el catálogo inicial y en Firestore, o si hay documentos duplicados en Firestore,
-      // se consolida en un único registro canónico priorizando Firestore y el registro más actualizado.
-      const canonicalMap = new Map();
-
-      const getCanonicalKey = (m) => {
-        const cleanName = (m.nombre || '').normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
-        const cleanSede = normalizeSede(m.sede || '').toLowerCase();
-        const cleanTeam = (m.equipo || '').trim().toLowerCase();
-        return `${cleanSede}__${cleanTeam}__${cleanName}`;
-      };
-
-      // 1. Base del catálogo inicial
-      INITIAL_MANAGERS.forEach(initM => {
-        const key = getCanonicalKey(initM);
-        if (key && !canonicalMap.has(key)) {
-          canonicalMap.set(key, initM);
-        }
-      });
-
-      // 2. Fusionar con firestoreManagers (Firestore siempre manda y sobreescribe datos base)
-      firestoreManagers.forEach(fm => {
-        const key = getCanonicalKey(fm);
-        if (!key) return;
-        if (!canonicalMap.has(key)) {
-          canonicalMap.set(key, fm);
-        } else {
-          const prev = canonicalMap.get(key);
-          const merged = {
-            ...prev,
-            ...fm,
-            id: fm.id ?? prev.id,
-            docId: fm.docId || prev.docId,
-            estado: (fm.estado || '').trim() ? fm.estado : prev.estado,
-            llamadaFecha: fm.llamadaFecha || prev.llamadaFecha,
-            llamadaAsistio: fm.llamadaAsistio || prev.llamadaAsistio,
-            telefono: fm.telefono || prev.telefono,
-            entrenador: fm.entrenador || prev.entrenador
-          };
-          canonicalMap.set(key, merged);
-        }
-      });
-
-      const mergedManagers = Array.from(canonicalMap.values());
-
-
-      // Mapear y normalizar
-      const normalized = mergedManagers.map(m => ({
+      // Only persisted documents are editable. Do not resurrect static catalogue
+      // entries or collapse distinct document identities by mutable name/team.
+      const normalized = firestoreManagers.map(m => ({
         ...m,
         estado: normalizeManagerEstado(m.estado),
         entrenador: normalizeTrainer(m.entrenador),
@@ -287,60 +262,41 @@ export default function CentroManagers() {
         sede: normalizeSede(m.sede)
       }));
       setManagers(normalized);
+      setManagersError('');
       setIsLoadingData(false);
     }, (error) => {
       console.error("Error fetching managers from Firestore in real-time:", error);
-      // Fallback a localStorage si falla la conexión
-      const saved = localStorage.getItem('cpsl_managers_data_v3');
-      let loaded = false;
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            setManagers(parsed.map(m => ({
-              ...m,
-              estado: normalizeManagerEstado(m.estado),
-              entrenador: normalizeTrainer(m.entrenador),
-              coordinador: normalizeCoordinator(m.coordinador),
-              sede: normalizeSede(m.sede)
-            })));
-            loaded = true;
-          }
-        } catch (e) {
-          console.error("Error parsing saved managers:", e);
-        }
-      }
-      if (!loaded) {
-        setManagers(INITIAL_MANAGERS.map(m => ({
-          ...m,
-          estado: normalizeManagerEstado(m.estado),
-          entrenador: normalizeTrainer(m.entrenador),
-          coordinador: normalizeCoordinator(m.coordinador),
-          sede: normalizeSede(m.sede)
-        })));
-      }
+      setManagers([]);
+      setManagersError('No se pudo verificar el directorio en Firestore. No mostraremos datos antiguos como si fueran actuales. Reintenta la conexión.');
       setIsLoadingData(false);
     });
 
     return () => unsubscribe();
-  }, [currentUser]);
+  }, [currentUser, managersReload]);
 
   // (02/09/2026) Historial de llamadas grupales — cada llamada registrada queda como
   // un documento nuevo (nunca se sobrescribe), para poder contar cuántas lleva cada
   // equipo. Es la base de la pestaña de Liquidación de Entrenadores.
   const [llamadasHistorial, setLlamadasHistorial] = useState([]);
+  const [llamadasHistorialStatus, setLlamadasHistorialStatus] = useState('loading');
+  const [llamadasHistorialError, setLlamadasHistorialError] = useState('');
   useEffect(() => {
+    setLlamadasHistorial([]);
+    setLlamadasHistorialStatus('loading');
+    setLlamadasHistorialError('');
     if (!currentUser) return;
-    const isGlobal = canViewAllManagers(currentUser) || isDireccionRole(currentUser) || ['jose.sanchez@crearpsl.net', 'armando.pilacuan@gmail.com', 'paul.sosa@crearpsl.net'].includes(currentUser?.email?.toLowerCase());
     const baseCol = collection(db, 'llamadas_grupales_historial');
-    const q = baseCol;
 
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    const unsubscribe = onSnapshot(baseCol, { includeMetadataChanges: true }, (querySnapshot) => {
       const rows = [];
       querySnapshot.forEach((doc) => rows.push({ id: doc.id, ...doc.data() }));
       setLlamadasHistorial(rows);
+      setLlamadasHistorialStatus(querySnapshot.metadata.fromCache ? 'stale' : 'ready');
+      setLlamadasHistorialError('');
     }, (error) => {
       console.error("Error leyendo llamadas_grupales_historial:", error);
+      setLlamadasHistorialStatus('error');
+      setLlamadasHistorialError('No se pudo verificar el historial en Firestore. Los registros visibles pueden estar desactualizados.');
     });
     return () => unsubscribe();
   }, [currentUser]);
@@ -353,9 +309,16 @@ export default function CentroManagers() {
   // permission-denied porque Firestore no puede probar que TODOS los documentos
   // de la colección completa cumplirían la regla para ese usuario.
   const [notasSeguimiento, setNotasSeguimiento] = useState([]);
+  const [notasSeguimientoStatus, setNotasSeguimientoStatus] = useState('loading');
+  const [notasSeguimientoError, setNotasSeguimientoError] = useState('');
   useEffect(() => {
-    if (!currentUser?.email) return;
-    const isGlobal = canViewAllManagers(currentUser) || isDireccionRole(currentUser) || ['jose.sanchez@crearpsl.net', 'armando.pilacuan@gmail.com', 'paul.sosa@crearpsl.net'].includes(currentUser?.email?.toLowerCase());
+    setNotasSeguimiento([]);
+    setNotasSeguimientoStatus('loading');
+    setNotasSeguimientoError('');
+    if (!currentUser?.email) {
+      setNotasSeguimientoStatus('ready');
+      return;
+    }
     
     let notasQuery;
     if (userCanViewAllNotas) {
@@ -365,12 +328,16 @@ export default function CentroManagers() {
       notasQuery = query(collection(db, 'notas_seguimiento'), where('autorEmail', '==', currentUser.email));
     }
 
-    const unsubscribe = onSnapshot(notasQuery, (querySnapshot) => {
+    const unsubscribe = onSnapshot(notasQuery, { includeMetadataChanges: true }, (querySnapshot) => {
       const rows = [];
       querySnapshot.forEach((doc) => rows.push({ id: doc.id, ...doc.data() }));
       setNotasSeguimiento(rows);
+      setNotasSeguimientoStatus(querySnapshot.metadata.fromCache ? 'stale' : 'ready');
+      setNotasSeguimientoError('');
     }, (error) => {
       console.error("Error leyendo notas_seguimiento:", error);
+      setNotasSeguimientoStatus('error');
+      setNotasSeguimientoError('No se pudo verificar el historial de notas. Los comentarios visibles pueden estar desactualizados.');
     });
     return () => unsubscribe();
   }, [currentUser, userCanViewAllNotas]);
@@ -484,6 +451,7 @@ export default function CentroManagers() {
 
   const [filterEntrenador, setFilterEntrenador] = useState(viewAsTrainer ? currentTrainerName : '');
   const [filterEquipo, setFilterEquipo] = useState('');
+  const teamKeyOf = useMemo(() => buildTeamKeyResolver(managers, normalizeSede), [managers]);
   const [directorioViewMode, setDirectorioViewMode] = useState('tabla'); // 'tabla' | 'equipos'
 
   // Catálogo de equipos disponibles ordenados numéricamente para filtrado rápido (#79, #80, #81, #91, #92...)
@@ -510,7 +478,7 @@ export default function CentroManagers() {
       const numStr = m.numEquipo !== undefined && m.numEquipo !== null && String(m.numEquipo).trim() !== ''
         ? String(m.numEquipo).trim()
         : (num !== 999999 ? String(num) : '');
-      const key = `${mSede}_${cleanName}`;
+      const key = teamKeyOf(m);
       if (!map.has(key)) {
         map.set(key, {
           key,
@@ -528,7 +496,7 @@ export default function CentroManagers() {
       if (a.num !== b.num) return a.num - b.num;
       return a.equipo.localeCompare(b.equipo);
     });
-  }, [managers, currentUser, canViewAll, filterSede, filterEntrenador]);
+  }, [managers, currentUser, canViewAll, filterSede, filterEntrenador, teamKeyOf]);
 
 
   // Auto-Graduación de Equipos cuando finaliza "El Viaje"
@@ -657,6 +625,7 @@ export default function CentroManagers() {
 
   // Modal para editar integrante individual (Manager o Capitán)
   const [editIndividualModal, setEditIndividualModal] = useState(null);
+  const [isSavingIndividual, setIsSavingIndividual] = useState(false);
 
   // Modal de confirmación para eliminar
   const [deleteConfirm, setDeleteConfirm] = useState(null);
@@ -680,6 +649,11 @@ export default function CentroManagers() {
   });
 
   const [groupModal, setGroupModal] = useState(null);
+  const [groupCallOperationId, setGroupCallOperationId] = useState('');
+  const [isSavingGroupCall, setIsSavingGroupCall] = useState(false);
+  const groupCallSaveLock = useRef(false);
+  const individualCallGate = useRef(createCallOperationGate());
+  const [savingIndividualCallIds, setSavingIndividualCallIds] = useState({});
 
   const [groupCallDate, setGroupCallDate] = useState(new Date().toISOString().split('T')[0]);
   const [groupCallAttendance, setGroupCallAttendance] = useState({}); // { managerId: boolean }
@@ -743,9 +717,9 @@ export default function CentroManagers() {
 
     return managers.filter(m => {
       const mSede = normalizeSede(m.sede);
-      const isMyTrainerManager = isTrainerMatch(m.entrenador, currentTrainerName) || 
+      const isMyTrainerManager = matchesExplicitTrainer(m, currentUser) ?? (isTrainerMatch(m.entrenador, currentTrainerName) ||
         (m.entrenadorEmail && userEmail && m.entrenadorEmail.toLowerCase() === userEmail) ||
-        (isLili && ((m.entrenador || '').toLowerCase().includes('cubillo') || (m.entrenador || '').toLowerCase().includes('lili')));
+        (isLili && ((m.entrenador || '').toLowerCase().includes('cubillo') || (m.entrenador || '').toLowerCase().includes('lili'))));
 
       // 1. Filtrado de Visibilidad (Seguridad y Jerarquía)
       if (viewAsTrainer) {
@@ -791,7 +765,9 @@ export default function CentroManagers() {
         const cleanFilter = String(filterEquipo).replace(/\s*\(#\d+\)\s*/g, '').trim().toLowerCase();
         const key = `${mSede}_${cleanEqName}`.toLowerCase();
         const num = getTeamNumericValue(m);
-        if (key !== filterEquipo.toLowerCase() && cleanEqName !== cleanFilter && String(m.numEquipo || num) !== filterEquipo) return false;
+        if (filterEquipo.includes('#')) {
+          if (teamKeyOf(m) !== filterEquipo) return false;
+        } else if (key !== filterEquipo.toLowerCase() && cleanEqName !== cleanFilter && String(m.numEquipo || num) !== filterEquipo) return false;
       }
 
       // 5. Filtro Estado (Todos / Activo / Graduado / Desertor)
@@ -806,7 +782,7 @@ export default function CentroManagers() {
 
       return true;
     });
-  }, [managers, search, filterSede, filterEntrenador, filterEquipo, statusFilter, viewAsTrainer, canViewAll, canViewOwnSede, currentTrainerName, currentUser]);
+  }, [managers, search, filterSede, filterEntrenador, filterEquipo, statusFilter, viewAsTrainer, canViewAll, canViewOwnSede, currentTrainerName, currentUser, teamKeyOf]);
 
   // Agrupación de equipos
   const [groupLifecycleFilter, setGroupLifecycleFilter] = useState('Activos'); // 'Activos' | 'Archivo' | 'Todos'
@@ -824,9 +800,9 @@ export default function CentroManagers() {
     const visibleManagers = managers.filter(m => {
       if (!m.equipo) return false;
       const mSede = normalizeSede(m.sede);
-      const isMyTrainerManager = isTrainerMatch(m.entrenador, currentTrainerName) || 
+      const isMyTrainerManager = matchesExplicitTrainer(m, currentUser) ?? (isTrainerMatch(m.entrenador, currentTrainerName) ||
         (m.entrenadorEmail && userEmail && m.entrenadorEmail.toLowerCase() === userEmail) ||
-        (isLili && ((m.entrenador || '').toLowerCase().includes('cubillo') || (m.entrenador || '').toLowerCase().includes('lili')));
+        (isLili && ((m.entrenador || '').toLowerCase().includes('cubillo') || (m.entrenador || '').toLowerCase().includes('lili'))));
 
       // Permisos base de rol
       if (viewAsTrainer) {
@@ -866,7 +842,7 @@ export default function CentroManagers() {
     // 2. Agrupar managers en equipos identificando miembros activos vs archivo
     const teams = {};
     visibleManagers.forEach(m => {
-      const key = `${normalizeSede(m.sede)}_${m.equipo}`;
+      const key = teamKeyOf(m);
       if (!teams[key]) {
         teams[key] = {
           sede: normalizeSede(m.sede),
@@ -1027,7 +1003,7 @@ export default function CentroManagers() {
       if (numA !== numB) return numA - numB;
       return (a.equipo || '').localeCompare(b.equipo || '');
     });
-  }, [managers, search, filterSede, filterEntrenador, groupLifecycleFilter, groupFilterStatus, viewAsTrainer, canViewAll, canViewOwnSede, currentTrainerName, currentUser]);
+  }, [managers, search, filterSede, filterEntrenador, groupLifecycleFilter, groupFilterStatus, viewAsTrainer, canViewAll, canViewOwnSede, currentTrainerName, currentUser, teamKeyOf]);
 
   const groupStats = useMemo(() => {
     let totalEq = groupTeams.length;
@@ -1209,9 +1185,9 @@ export default function CentroManagers() {
       effectiveSede = 'Quito';
     }
 
-    const isMyTrainerManager = (m) => isTrainerMatch(m.entrenador, currentTrainerName) || 
+    const isMyTrainerManager = (m) => matchesExplicitTrainer(m, currentUser) ?? (isTrainerMatch(m.entrenador, currentTrainerName) ||
       (m.entrenadorEmail && userEmail && m.entrenadorEmail.toLowerCase() === userEmail) ||
-      (isLili && ((m.entrenador || '').toLowerCase().includes('cubillo') || (m.entrenador || '').toLowerCase().includes('lili')));
+      (isLili && ((m.entrenador || '').toLowerCase().includes('cubillo') || (m.entrenador || '').toLowerCase().includes('lili'))));
 
     // Si la vista está restringida, calcular stats solo de lo que puede ver
     const baseList = (viewAsTrainer || (!canViewAll && !canViewOwnSede)) 
@@ -1226,41 +1202,6 @@ export default function CentroManagers() {
     const pct = total > 0 ? Math.round((graduados / total) * 100) : 0;
     return { total, graduados, desertores, activos, pct };
   }, [managers, viewAsTrainer, canViewAll, canViewOwnSede, currentTrainerName, currentUser]);
-
-  const handleResetMasterData = async () => {
-    if (window.confirm("¿Deseas restablecer la lista completa de managers originales desde la base maestra a LA NUBE? Esto sobreescribirá la base de datos.")) {
-      try {
-        showToast('Subiendo datos a la nube... por favor espera', 'info');
-        const batchArray = [];
-        batchArray.push(writeBatch(db));
-        let operationCounter = 0;
-        let batchIndex = 0;
-        
-        for (const m of INITIAL_MANAGERS) {
-          const docRef = doc(db, 'managers_directory', m.id.toString());
-          batchArray[batchIndex].set(docRef, m);
-          operationCounter++;
-          
-          if (operationCounter === 490) {
-            batchArray.push(writeBatch(db));
-            batchIndex++;
-            operationCounter = 0;
-          }
-        }
-        
-        for (const batch of batchArray) {
-          await batch.commit();
-        }
-        
-        setManagers(INITIAL_MANAGERS);
-        localStorage.removeItem('cpsl_managers_data_v3');
-        showToast('✅ Datos maestros subidos a Firebase con éxito', 'success');
-      } catch (error) {
-        console.error(error);
-        showToast('Error subiendo a Firebase', 'error');
-      }
-    }
-  };
 
   // Acciones
   const handleUpdateManagerField = async (id, field, value) => {
@@ -1278,23 +1219,16 @@ export default function CentroManagers() {
       : value;
       
     try {
-      const targetManager = managers.find(m => m.id === id) || { id };
-      const docRef = doc(db, 'managers_directory', id.toString());
+      const targetManager = managers.find(m => m.id === id);
+      const docRef = managerDocumentRef(db, targetManager);
       
-      // FIX: Only send fields that exist and are not undefined to prevent Firebase errors
-      // Also ensure we include the core identity fields if upserting a new document
-      const cleanData = {
-        id: targetManager.id || id,
-        nombre: targetManager.nombre || '',
-        equipo: targetManager.equipo || '',
-        sede: targetManager.sede || '',
-        [field]: finalValue
-      };
+      const cleanData = { [field]: finalValue };
+      if (field === 'entrenador') assertLegacyTrainerEdit(targetManager, finalValue);
       
       // Remove any strictly undefined fields (Firestore throws if passed undefined)
       Object.keys(cleanData).forEach(key => cleanData[key] === undefined && delete cleanData[key]);
 
-      await setDoc(docRef, cleanData, { merge: true });
+      await updateDoc(docRef, manualManagerPatch(targetManager, cleanData));
       
       setManagers(prev => prev.map(m => m.id === id ? { ...m, [field]: finalValue } : m));
       
@@ -1317,24 +1251,27 @@ export default function CentroManagers() {
   };
 
   const handleUpdateLlamada = async (id, fecha, asistio) => {
+    const targetManager = managers.find(m => m.id === id);
+    if (!targetManager) {
+      showToast('No se encontró el manager para registrar la llamada.', 'error');
+      return;
+    }
+    setSavingIndividualCallIds(prev => ({ ...prev, [id]: true }));
     try {
-      const targetManager = managers.find(m => m.id === id) || { id };
-      const docRef = doc(db, 'managers_directory', id.toString());
-      // (02/09/2026) FIX: antes se escribía el manager completo con
-      // setDoc({...targetManager, llamadaFecha, llamadaAsistio}, {merge:true}).
-      // "managers" es una MEZCLA de INITIAL_MANAGERS (catálogo estático) +
-      // Firestore + valores normalizados (normalizeTrainer/Coordinator/Sede),
-      // así que casi siempre trae campos que no existen o no coinciden
-      // exactamente con el documento real en Firestore. Eso hacía que
-      // request.resource.data.diff(resource.data).affectedKeys() incluyera
-      // MUCHOS más campos que llamadaFecha/llamadaAsistio, violando el
-      // hasOnly(['llamadaFecha','llamadaAsistio']) de firestore.rules para
-      // cualquiera que no sea SuperAdmin/Gerencia/Coordinación de Maestría —
-      // es decir, fallaba (permission-denied) para entrenadores y
-      // entrenadores de llamadas, que son justo quienes deben poder guardar
-      // esto. Ahora se actualizan SOLO esos dos campos.
+      let recordedEvent;
       try {
-        await updateDoc(docRef, { llamadaFecha: fecha, llamadaAsistio: asistio });
+        recordedEvent = await individualCallGate.current.run(
+          targetManager.docId || targetManager.id,
+          () => doc(collection(db, 'managers_directory')).id,
+          callId => recordIndividualCall(db, {
+            manager: targetManager,
+            callId,
+            fecha,
+            asistio: asistio === 'SI',
+            registradoPorEmail: currentUser?.email || '',
+            registradoPorNombre: currentUser?.name || '',
+          })
+        );
       } catch (updateErr) {
         if (updateErr?.code === 'not-found') {
           showToast('Este manager aún no tiene documento propio en la nube (solo está en el catálogo local). Pide a Gerencia/Coordinación de Maestría que lo sincronice primero.', 'error');
@@ -1344,7 +1281,18 @@ export default function CentroManagers() {
       }
 
       // La actualización de managers en tiempo real ya se maneja por onSnapshot, pero por optimización optimista lo mantenemos aquí
-      setManagers(prev => prev.map(m => m.id === id ? { ...m, llamadaFecha: fecha, llamadaAsistio: asistio } : m));
+      setManagers(prev => prev.map(m => {
+        if (m.id !== id) return m;
+        const history = Array.isArray(m.llamadasHistorial) ? m.llamadasHistorial : [];
+        return {
+          ...m,
+          llamadaFecha: fecha,
+          llamadaAsistio: asistio,
+          llamadasHistorial: history.some(event => event.id === recordedEvent.id)
+            ? history
+            : [...history, recordedEvent],
+        };
+      }));
 
       const managerName = targetManager ? targetManager.nombre : id;
 
@@ -1361,6 +1309,38 @@ export default function CentroManagers() {
     } catch (e) {
       console.error(e);
       showToast('Error al guardar en la nube', 'error');
+    } finally {
+      setSavingIndividualCallIds(prev => {
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      });
+    }
+  };
+
+  const handleEditLlamadaFecha = async (id, fecha) => {
+    const targetManager = managers.find(m => m.id === id);
+    if (!targetManager) {
+      showToast('No se encontró el manager para actualizar la fecha.', 'error');
+      return;
+    }
+    try {
+      const updatedEvent = await updateIndividualCallDate(db, { manager: targetManager, fecha });
+      setManagers(prev => prev.map(m => {
+        if (m.id !== id) return m;
+        const history = Array.isArray(m.llamadasHistorial) ? m.llamadasHistorial : [];
+        return {
+          ...m,
+          llamadaFecha: fecha,
+          llamadasHistorial: updatedEvent
+            ? history.map(event => event.id === updatedEvent.id ? updatedEvent : event)
+            : history,
+        };
+      }));
+      showToast('Fecha de la última llamada actualizada', 'success');
+    } catch (e) {
+      console.error(e);
+      showToast('Error al actualizar la fecha de la llamada', 'error');
     }
   };
 
@@ -1368,62 +1348,37 @@ export default function CentroManagers() {
     const initialAttendance = {};
     team.managers.forEach(m => initialAttendance[m.id] = true); // Todos asisten por defecto
     setGroupCallAttendance(initialAttendance);
+    setGroupCallOperationId(doc(collection(db, 'llamadas_grupales_historial')).id);
     setGroupModal(team);
   };
 
   const handleSaveGroupCall = async () => {
-    if (!groupModal) return;
+    if (!groupModal || groupCallSaveLock.current) return;
+    groupCallSaveLock.current = true;
+    setIsSavingGroupCall(true);
     
     try {
-      const batch = writeBatch(db);
-      groupModal.managers.forEach(m => {
-        if (groupCallAttendance.hasOwnProperty(m.id)) {
-          const docRef = doc(db, 'managers_directory', m.id.toString());
-          // (02/09/2026) FIX: mismo problema que handleUpdateLlamada — escribir
-          // el manager completo ({...m, ...}) con merge:true hace que el diff
-          // contra firestore.rules incluya campos fuera de
-          // hasOnly(['llamadaFecha','llamadaAsistio']) y falla para
-          // entrenadores/entrenadores de llamadas. batch.update() solo toca
-          // esos dos campos.
-          batch.update(docRef, {
-            llamadaFecha: groupCallDate,
-            llamadaAsistio: groupCallAttendance[m.id] ? 'SI' : 'NO'
-          });
-        }
+      const callId = groupCallOperationId || doc(collection(db, 'llamadas_grupales_historial')).id;
+      setGroupCallOperationId(callId);
+      const callResult = await recordGroupCall(db, {
+        callId,
+        managers: groupModal.managers,
+        attendance: groupCallAttendance,
+        fecha: groupCallDate,
+        equipo: groupModal.equipo,
+        numEquipo: groupModal.numEquipo || '',
+        sede: normalizeSede(groupModal.sede),
+        entrenador: groupModal.entrenadorUnico || '',
+        registradoPorEmail: currentUser?.email || '',
+        registradoPorNombre: currentUser?.name || '',
       });
 
-      await batch.commit();
-
-      // (02/09/2026) Historial de llamadas grupales — se AGREGA un registro nuevo por
-      // cada llamada (nunca sobrescribe), para poder contar cuántas lleva cada equipo.
-      // Es la base de la pestaña de Liquidación de Entrenadores ($400 al llegar a 7).
-      // Si esto falla, no bloquea el registro de asistencia (que ya se guardó arriba).
-      try {
-        const equipoKey = `${normalizeSede(groupModal.sede)}_${groupModal.equipo}`;
-        const asistieronCount = Object.values(groupCallAttendance).filter(Boolean).length;
-        await addDoc(collection(db, 'llamadas_grupales_historial'), {
-          equipoKey,
-          equipo: groupModal.equipo,
-          numEquipo: groupModal.numEquipo || '',
-          sede: normalizeSede(groupModal.sede),
-          entrenador: groupModal.entrenadorUnico || '',
-          fecha: groupCallDate,
-          totalIntegrantes: groupModal.managers.length,
-          asistieron: asistieronCount,
-          registradoPorEmail: currentUser?.email || '',
-          registradoPorNombre: currentUser?.name || '',
-          createdAt: serverTimestamp()
-        });
-      } catch (histErr) {
-        console.error('No se pudo guardar el historial de llamada grupal:', histErr);
-      }
-
-      // (02/09/2026) Nota de seguimiento OPCIONAL de esta llamada grupal — pedido
-      // explícito de José. No bloquea el registro de asistencia si falla.
+      let noteSaveFailed = false;
       if (groupCallNota.trim()) {
         try {
           const equipoKey = `${normalizeSede(groupModal.sede)}_${groupModal.equipo}`;
           await guardarNotaSeguimiento({
+            relatedCallId: callId,
             tipo: 'grupal',
             equipoKey,
             equipo: groupModal.equipo,
@@ -1437,7 +1392,7 @@ export default function CentroManagers() {
           });
         } catch (notaErr) {
           console.error('No se pudo guardar la nota de seguimiento grupal:', notaErr);
-          showToast('Asistencia guardada, pero la nota de seguimiento no se pudo guardar', 'error');
+          noteSaveFailed = true;
         }
       }
 
@@ -1452,21 +1407,39 @@ export default function CentroManagers() {
         return m;
       }));
 
-      recordAuditEvent({
+      const auditResult = await recordAuditEvent({
         action: 'ACTUALIZAR_LLAMADA_GRUPAL',
-        user: currentUser?.email || currentUser?.name || 'Usuario',
+        uid: currentUser?.uid,
+        email: currentUser?.email,
+        name: currentUser?.name,
+        role: currentUser?.appRole || currentUser?.role,
+        sede: currentUser?.sede,
         details: `Llamada grupal registrada para el equipo "${groupModal.equipo}" el ${groupCallDate}. Integrantes actualizados: ${groupModal.managers.length}`
       });
 
-      showToast(`Llamada grupal registrada en la nube para el equipo ${groupModal.equipo}`, 'success');
-      setGroupModal(null);
-      setGroupCallNota('');
-      setGroupCallEsQuiebre(false);
-      setGroupCallCategoriaQuiebre('operativo');
-      setGroupCallEstadoQuiebre('riesgo_alto');
+      if (noteSaveFailed) {
+        showToast('Llamada guardada; no se pudo guardar la nota. Reintenta para conservar el comentario.', 'error');
+      } else if (!auditResult.ok) {
+        showToast('Llamada guardada, pero no se pudo registrar el evento de auditoría.', 'error');
+      } else {
+        showToast(callResult.alreadyRecorded
+          ? 'Esta llamada ya estaba guardada; no se creó un duplicado.'
+          : `Llamada grupal registrada en la nube para el equipo ${groupModal.equipo}`, 'success');
+      }
+      if (!noteSaveFailed) {
+        setGroupModal(null);
+        setGroupCallOperationId('');
+        setGroupCallNota('');
+        setGroupCallEsQuiebre(false);
+        setGroupCallCategoriaQuiebre('operativo');
+        setGroupCallEstadoQuiebre('riesgo_alto');
+      }
     } catch (e) {
       console.error(e);
       showToast('Error al registrar llamada grupal en la nube', 'error');
+    } finally {
+      groupCallSaveLock.current = false;
+      setIsSavingGroupCall(false);
     }
   };
 
@@ -1482,10 +1455,12 @@ export default function CentroManagers() {
   // riesgo_alto) — ninguno de los dos se inventó, ambos vienen de esa definición.
   // Nunca se sobrescribe (cada nota es un documento nuevo, igual que
   // llamadas_grupales_historial) y nunca se borra (ver firestore.rules).
-  const guardarNotaSeguimiento = async ({ tipo, managerId, managerNombre, equipoKey, equipo, numEquipo, sede, nota, esQuiebre, categoriaQuiebre, estadoQuiebre, fecha }) => {
-    await addDoc(collection(db, 'notas_seguimiento'), {
+  const guardarNotaSeguimiento = async ({ tipo, managerId, managerNombre, equipoKey, equipo, numEquipo, sede, nota, esQuiebre, categoriaQuiebre, estadoQuiebre, fecha, relatedCallId }) => {
+    const note = {
       tipo, // 'individual' | 'grupal'
       managerId: managerId || null,
+      managerDocId: tipo === 'individual' ? managerId || null : null,
+      relatedCallId: relatedCallId || null,
       managerNombre: managerNombre || null,
       equipoKey: equipoKey || null,
       equipo: equipo || null,
@@ -1500,7 +1475,12 @@ export default function CentroManagers() {
       autorNombre: currentUser?.name || '',
       respuestas: [],
       createdAt: serverTimestamp()
-    });
+    };
+    if (relatedCallId) {
+      await setDoc(doc(db, 'notas_seguimiento', `${relatedCallId}_note`), note);
+    } else {
+      await addDoc(collection(db, 'notas_seguimiento'), note);
+    }
   };
 
   const handleGuardarNotaIndividual = async () => {
@@ -1521,12 +1501,18 @@ export default function CentroManagers() {
         estadoQuiebre: nuevaNotaEsQuiebre ? nuevaNotaEstado : null,
         fecha: new Date().toISOString().split('T')[0]
       });
-      recordAuditEvent({
+      const auditResult = await recordAuditEvent({
         action: 'CREAR_NOTA_SEGUIMIENTO',
-        user: currentUser?.email || currentUser?.name || 'Usuario',
+        uid: currentUser?.uid,
+        email: currentUser?.email,
+        name: currentUser?.name,
+        role: currentUser?.appRole || currentUser?.role,
+        sede: currentUser?.sede,
         details: `Nota de seguimiento individual creada para ${notaModal.nombre}${nuevaNotaEsQuiebre ? ' (marcada como quiebre)' : ''}`
       });
-      showToast('Nota de seguimiento guardada', 'success');
+      showToast(auditResult.ok
+        ? 'Nota de seguimiento guardada'
+        : 'Nota guardada, pero no se pudo registrar el evento de auditoría.', auditResult.ok ? 'success' : 'error');
       setNuevaNotaTexto('');
       setNuevaNotaEsQuiebre(false);
       setNuevaNotaCategoria('operativo');
@@ -1593,7 +1579,9 @@ export default function CentroManagers() {
           teams[k].cierreManual = {
             fecha: m.cierreLiquidacionFecha || '',
             porNombre: m.cierreLiquidacionPorNombre || '',
-            porEmail: m.cierreLiquidacionPorEmail || ''
+            porEmail: m.cierreLiquidacionPorEmail || '',
+            motivo: m.cierreLiquidacionMotivo || '',
+            reabrible: m.cierreLiquidacionMotivo !== 'graduacion_automatica'
           };
         }
       });
@@ -1675,6 +1663,7 @@ export default function CentroManagers() {
 
       const item = {
         equipoKey,
+        pagoDocId: pago?.id || equipoKey,
         equipo,
         numEquipo,
         sede,
@@ -1889,6 +1878,72 @@ export default function CentroManagers() {
     }
   };
 
+  // Revertir en pantalla SOLO quita el estado "pagado" (vuelve a pendientes); no ejecuta ninguna
+  // reversión bancaria. Conserva quién/cuándo pagó y no toca llamadas ni documentos fuente.
+  const handleReversarPago = async (item) => {
+    if (!canReversarPago) return;
+    const confirmado = window.confirm(
+      `¿Reversar el pago de ${item.equipo} (${item.sede}) por $${item.montoUSD} USD?\n\n` +
+      `El equipo volverá a la cola de pendientes. Esto NO realiza ninguna transferencia bancaria inversa: solo quita el estado "pagado" en la plataforma. ` +
+      `Se conservará quién pagó y cuándo, y quedará registrado que tú reversaste.`
+    );
+    if (!confirmado) return;
+    const motivo = (window.prompt('Motivo de la reversión (obligatorio):') || '').trim();
+    if (!motivo) {
+      showToast('Reversión cancelada: el motivo es obligatorio.', 'warning');
+      return;
+    }
+    const ref = doc(db, 'liquidaciones_pagos', item.equipoKey);
+    try {
+      const antes = await runTransaction(db, async (tx) => {
+        const snap = await tx.get(ref);
+        const data = snap.exists() ? snap.data() : null;
+        if (!data || data.estado !== 'pagado') return null;
+        tx.update(ref, {
+          estado: 'pendiente',
+          reversadoDePagadoPorEmail: data.pagadoPorEmail || '',
+          reversadoDePagadoPorNombre: data.pagadoPorNombre || '',
+          reversadoDeFechaPago: data.fechaPago || '',
+          reversadoAt: serverTimestamp(),
+          reversadoFecha: new Date().toISOString(),
+          reversadoPorEmail: currentUser?.email || '',
+          reversadoPorNombre: currentUser?.name || '',
+          reversadoPorRole: currentUser?.appRole || currentUser?.role || '',
+          reversadoMotivo: motivo,
+          updatedAt: serverTimestamp()
+        });
+        return data;
+      });
+      if (!antes) {
+        showToast(`${item.equipo} ya no está en estado pagado; no se realizó ningún cambio.`, 'warning');
+        return;
+      }
+
+      let auditOk = true;
+      try {
+        await recordAuditEvent({
+        action: 'LIQUIDACION_ENTRENADOR_REVERSADA',
+        email: currentUser?.email || '',
+        name: currentUser?.name || '',
+        role: currentUser?.appRole || currentUser?.role || '',
+        sede: item.sede,
+        details: `Pago reversado en plataforma (sin reversión bancaria): ${item.equipo} (${item.sede}) - $${item.montoUSD} USD. Antes: estado=pagado, pagadoPor=${antes.pagadoPorEmail || '-'}, fechaPago=${antes.fechaPago || '-'}. Después: estado=pendiente. Motivo: ${motivo}`,
+        module: 'Liquidacion_Equipos'
+      });
+      } catch (auditErr) {
+        auditOk = false;
+        console.error('Auditoría de reversión falló (la reversión sí se guardó):', auditErr);
+      }
+
+      showToast(auditOk
+        ? `Pago reversado: ${item.equipo} volvió a pendientes.`
+        : `Pago reversado: ${item.equipo} volvió a pendientes, pero el registro de auditoría falló. Avisa a soporte.`, auditOk ? 'success' : 'warning');
+    } catch (e) {
+      console.error(e);
+      showToast('Error al reversar el pago; no se aplicó ningún cambio.', 'error');
+    }
+  };
+
   // (09/09/2026) Acción del COORDINADOR (no de José/Elizabeth): marca un equipo como
   // cerrado — "ya se graduaron o desertaron" — para que entre a la cola de liquidación
   // sin depender de que llegue a 7 llamadas. Usa el mismo permiso que ya gobierna
@@ -1923,6 +1978,13 @@ export default function CentroManagers() {
       return;
     }
 
+    const confirmado = window.confirm(
+      `¿Cerrar el equipo ${team.equipo} (${team.sede}) para enviarlo a Liquidación?\n\n` +
+      `Los integrantes activos pasarán a estado Graduado y el equipo aparecerá en Pendientes de pago. ` +
+      `Si fue un error, un coordinador podrá volver a abrirlo desde Liquidación para que continúe su curso.`
+    );
+    if (!confirmado) return;
+
     try {
       const batch = writeBatch(db);
       const nowISO = new Date().toISOString();
@@ -1938,14 +2000,15 @@ export default function CentroManagers() {
         const currentNormState = normalizeManagerEstado(m.estado);
         const finalEstado = currentNormState === 'Activo' ? 'Graduado' : m.estado;
 
-        // Payload limpio con merge: true para que cree el documento si no existe o actualice si existe
+        // Update only this operation's fields; never upsert a missing member.
         const payload = {
-          ...m,
           estado: finalEstado,
+          estadoAntesCierreLiquidacion: m.estado || 'Activo',
           cierreLiquidacionActivo: true,
           cierreLiquidacionFecha: nowISO,
           cierreLiquidacionPorNombre: userName,
-          cierreLiquidacionPorEmail: userEmail
+          cierreLiquidacionPorEmail: userEmail,
+          cierreLiquidacionMotivo: 'cierre_manual'
         };
 
         // Eliminar valores undefined para evitar rechazo estricto de Firestore
@@ -1953,7 +2016,7 @@ export default function CentroManagers() {
           if (payload[k] === undefined) delete payload[k];
         });
 
-        batch.set(docRef, payload, { merge: true });
+        batch.update(docRef, manualManagerPatch(m, payload));
       });
 
       await batch.commit();
@@ -1968,10 +2031,12 @@ export default function CentroManagers() {
         return { 
           ...m, 
           estado: finalEstado,
+          estadoAntesCierreLiquidacion: m.estado || 'Activo',
           cierreLiquidacionActivo: true, 
           cierreLiquidacionFecha: nowISO, 
           cierreLiquidacionPorNombre: userName, 
-          cierreLiquidacionPorEmail: userEmail 
+          cierreLiquidacionPorEmail: userEmail,
+          cierreLiquidacionMotivo: 'cierre_manual'
         };
       }));
 
@@ -1992,6 +2057,111 @@ export default function CentroManagers() {
     } catch (err) {
       console.error('Error cerrando equipo para liquidación:', err);
       showToast(`No se pudo marcar el equipo como cerrado: ${err.message || 'Error de conexión'}`, 'error');
+    }
+  };
+
+  const handleReabrirEquipoLiquidacion = async (item) => {
+    if (!canChangeStatus || !item.cierreManual?.reabrible) {
+      showToast('No tienes permiso para volver a abrir este equipo.', 'warning');
+      return;
+    }
+    const confirmado = window.confirm(
+      `¿Volver a abrir el equipo ${item.equipo} (${item.sede})?\n\n` +
+      `Se quitará el cierre de Liquidación y el equipo dejará de estar pendiente por cierre. ` +
+      `Los estados previos de sus integrantes se restaurarán para que continúe su curso.`
+    );
+    if (!confirmado) return;
+
+    const targetSede = normalizeSede(item.sede);
+    const targetEquipoNum = getTeamNumericValue(item);
+    const miembros = managers.filter((m) =>
+      m.cierreLiquidacionActivo &&
+      normalizeSede(m.sede) === targetSede &&
+      getTeamNumericValue(m) === targetEquipoNum &&
+      getTeamNumericValue(m) !== 999999
+    );
+    if (miembros.length === 0) {
+      showToast(`No se encontraron integrantes con cierre activo para ${item.equipo}.`, 'warning');
+      return;
+    }
+
+    const userName = currentUser?.name || currentUser?.displayName || 'Coordinador';
+    const userEmail = currentUser?.email || '';
+    const nowISO = new Date().toISOString();
+    try {
+      const batch = writeBatch(db);
+      miembros.forEach((m) => {
+        const docRef = doc(db, 'managers_directory', (m.docId || m.id).toString());
+        const estadoAnterior = m.estadoAntesCierreLiquidacion;
+        const estadoRestaurado = estadoAnterior || (
+          normalizeManagerEstado(m.estado) === 'Graduado' ? 'Activo' : m.estado
+        );
+        batch.update(docRef, manualManagerPatch(m, {
+          estado: estadoRestaurado || 'Activo',
+          cierreLiquidacionActivo: false,
+          cierreLiquidacionReabiertoFecha: nowISO,
+          cierreLiquidacionReabiertoPorNombre: userName,
+          cierreLiquidacionReabiertoPorEmail: userEmail,
+          estadoAntesCierreLiquidacion: deleteField()
+        }));
+      });
+
+      // Un disparador de cierre previo no debe mantener al equipo en la cola;
+      // el umbral normal de siete llamadas seguirá activándolo cuando corresponda.
+      batch.set(doc(db, 'liquidaciones_pagos', item.pagoDocId || item.equipoKey), {
+        equipoKey: item.equipoKey,
+        equipo: item.equipo,
+        numEquipo: item.numEquipo || '',
+        sede: item.sede,
+        estado: 'reabierto',
+        motivo: 'reabierto',
+        reabiertoFecha: nowISO,
+        reabiertoPorNombre: userName,
+        reabiertoPorEmail: userEmail,
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+      await batch.commit();
+
+      setManagers((prev) => prev.map((m) => {
+        const matches = m.cierreLiquidacionActivo &&
+          normalizeSede(m.sede) === targetSede &&
+          getTeamNumericValue(m) === targetEquipoNum &&
+          getTeamNumericValue(m) !== 999999;
+        if (!matches) return m;
+        const estadoRestaurado = m.estadoAntesCierreLiquidacion || (
+          normalizeManagerEstado(m.estado) === 'Graduado' ? 'Activo' : m.estado
+        );
+        const managerSinEstadoPrevio = { ...m };
+        delete managerSinEstadoPrevio.estadoAntesCierreLiquidacion;
+        return {
+          ...managerSinEstadoPrevio,
+          estado: estadoRestaurado || 'Activo',
+          cierreLiquidacionActivo: false,
+          cierreLiquidacionReabiertoFecha: nowISO,
+          cierreLiquidacionReabiertoPorNombre: userName,
+          cierreLiquidacionReabiertoPorEmail: userEmail
+        };
+      }));
+
+      try {
+        await recordAuditEvent({
+          action: 'REAPERTURA_EQUIPO_LIQUIDACION',
+          email: userEmail,
+          name: userName,
+          role: currentUser?.appRole || currentUser?.role || '',
+          sede: item.sede,
+          details: `Equipo ${item.equipo} (${item.sede}) reabierto desde Liquidación por ${userName}; puede continuar su curso.`,
+          module: 'Liquidacion_Equipos'
+        });
+      } catch (auditErr) {
+        console.error('Auditoría de reapertura falló (la reapertura sí se guardó):', auditErr);
+        showToast(`Equipo reabierto, pero falló el registro de auditoría. Avisa a soporte.`, 'warning');
+        return;
+      }
+      showToast(`Equipo ${item.equipo} (${item.sede}) reabierto; puede continuar su curso.`, 'success');
+    } catch (err) {
+      console.error('Error reabriendo equipo desde liquidación:', err);
+      showToast(`No se pudo volver a abrir el equipo: ${err.message || 'Error de conexión'}`, 'error');
     }
   };
 
@@ -2024,8 +2194,7 @@ export default function CentroManagers() {
 
     try {
       const docRef = doc(db, 'managers_directory', created.id.toString());
-      await setDoc(docRef, created);
-      setManagers(prev => [created, ...prev]);
+      await setDoc(docRef, manualManagerPatch(null, created));
 
     } catch(e) {
       console.error('Error guardando manager en Firebase:', e);
@@ -2121,11 +2290,10 @@ export default function CentroManagers() {
       const batch = writeBatch(db);
       newRecords.forEach(record => {
         const docRef = doc(db, 'managers_directory', record.id.toString());
-        batch.set(docRef, record);
+        batch.set(docRef, manualManagerPatch(null, record));
       });
       await batch.commit();
 
-      setManagers(prev => [...newRecords, ...prev]);
     } catch(e) {
       console.error('Error guardando equipo en la nube:', e);
       return showToast(`Error guardando el equipo en la nube: ${e?.message || 'Error de permisos o red'}`, 'error');
@@ -2228,6 +2396,7 @@ export default function CentroManagers() {
       const updatedMembers = validMembers.map(m => {
         const memberId = m.id || m.docId || Date.now() + Math.floor(Math.random() * 10000);
         const trainerToUse = userCanAssign ? finalTrainers : (m.entrenador || finalTrainers);
+        assertLegacyTrainerEdit(managers.find(existing => String(existing.docId || existing.id) === String(m.docId || m.id)), trainerToUse);
         return {
           id: memberId,
           docId: m.docId || memberId.toString(),
@@ -2249,7 +2418,10 @@ export default function CentroManagers() {
       updatedMembers.forEach(member => {
         const docKey = String(member.docId || member.id);
         const docRef = doc(db, 'managers_directory', docKey);
-        batch.set(docRef, member, { merge: true });
+        const existing = managers.find(m => String(m.docId || m.id) === docKey);
+        const payload = manualManagerPatch(existing, member);
+        if (existing) batch.update(docRef, payload);
+        else batch.set(docRef, payload);
       });
 
       await batch.commit();
@@ -2265,7 +2437,7 @@ export default function CentroManagers() {
 
     } catch(e) {
       console.error(e);
-      return showToast('Error actualizando equipo en la nube', 'error');
+      return showToast(e.message || 'Error actualizando equipo en la nube', 'error');
     }
 
     recordAuditEvent({
@@ -2407,11 +2579,12 @@ export default function CentroManagers() {
         };
 
         if (mergeModal.reassignCoach && targetTrainer) {
+          assertLegacyTrainerEdit(m, targetTrainer);
           updatePayload.entrenador = targetTrainer;
           updatePayload.tieneEntrenador = 'Si';
         }
 
-        batch.set(docRef, updatePayload, { merge: true });
+        batch.update(docRef, manualManagerPatch(m, updatePayload));
       });
 
       await batch.commit();
@@ -2482,15 +2655,17 @@ export default function CentroManagers() {
   // Guardar edición individual
   const handleSaveEditIndividual = async (e) => {
     e.preventDefault();
-    if (!editIndividualModal) return;
+    if (!editIndividualModal || isSavingIndividual) return;
     if (!editIndividualModal.nombre.trim()) return showToast('El nombre es obligatorio', 'error');
 
     const finalTrainers = editIndividualModal.selectedTrainers && editIndividualModal.selectedTrainers.length > 0
       ? editIndividualModal.selectedTrainers.map(t => normalizeTrainer(t)).filter(Boolean).join(', ')
       : '';
 
+    setIsSavingIndividual(true);
     try {
       const trainerToUse = userCanAssign ? finalTrainers : editIndividualModal.entrenador;
+      assertLegacyTrainerEdit(managers.find(m => String(m.id) === String(editIndividualModal.id)), trainerToUse);
       const updatedData = {
         nombre: editIndividualModal.nombre.trim(),
         rol: editIndividualModal.rol || 'Manager',
@@ -2504,13 +2679,16 @@ export default function CentroManagers() {
         estado: canChangeStatus ? (editIndividualModal.estado || 'Activo') : editIndividualModal.estado
       };
 
-      const docRef = doc(db, 'managers_directory', editIndividualModal.id.toString());
-      await setDoc(docRef, updatedData, { merge: true });
+      const original = managers.find(m => String(m.id) === String(editIndividualModal.id));
+      const docRef = managerDocumentRef(db, original);
+      await updateDoc(docRef, manualManagerPatch(original, updatedData));
 
       setManagers(prev => prev.map(m => m.id === editIndividualModal.id ? { ...m, ...updatedData } : m));
     } catch(e) {
       console.error(e);
-      return showToast('Error actualizando integrante en la nube', 'error');
+      return showToast('No se guardaron los cambios en la nube. Revisa la conexión y los permisos; el formulario sigue abierto.', 'error');
+    } finally {
+      setIsSavingIndividual(false);
     }
 
     recordAuditEvent({
@@ -2526,7 +2704,8 @@ export default function CentroManagers() {
   // Eliminar manager individual
   const handleDeleteManager = async (id) => {
     try {
-      const docRef = doc(db, 'managers_directory', id.toString());
+      const manager = managers.find(m => m.id === id);
+      const docRef = managerDocumentRef(db, manager);
       await deleteDoc(docRef);
       
       setManagers(prev => prev.filter(m => m.id !== id));
@@ -2553,7 +2732,7 @@ export default function CentroManagers() {
       if (toDelete.length > 0) {
         const batch = writeBatch(db);
         toDelete.forEach(m => {
-          const docRef = doc(db, 'managers_directory', m.id.toString());
+          const docRef = managerDocumentRef(db, m);
           batch.delete(docRef);
         });
         await batch.commit();
@@ -2661,7 +2840,7 @@ export default function CentroManagers() {
       const mSede = normalizeSede(m.sede);
       const cleanEq = String(m.equipo || 'Sin Equipo').replace(/\s*\(#\d+\)\s*/g, '').trim();
       const num = getTeamNumericValue(m);
-      const key = `${mSede}_${cleanEq}`;
+      const key = m.equipo ? teamKeyOf(m) : `${mSede}_${cleanEq}`;
       if (!map.has(key)) {
         map.set(key, {
           key,
@@ -2675,7 +2854,7 @@ export default function CentroManagers() {
       map.get(key).members.push(m);
     });
     return Array.from(map.values());
-  }, [sortedManagers]);
+  }, [sortedManagers, teamKeyOf]);
 
 
   const totalPages = Math.ceil(sortedManagers.length / PAGE_SIZE) || 1;
@@ -2691,7 +2870,23 @@ export default function CentroManagers() {
   const textMuted = "#64748b";
   const borderLight = "#e2e8f0";
 
+  if (isLoadingData || managersError) {
+    return (
+      <ManagersHelpProvider>
+      <main style={{ padding: '2rem', maxWidth: '720px', margin: 'auto' }}>
+        <h1>Centro de Managers</h1>
+        <p role={managersError ? 'alert' : 'status'}>
+          {managersError || 'Verificando datos actuales del directorio en Firestore…'}
+        </p>
+        <HelpButton helpKey="recargarDirectorio" onClick={() => setManagersReload(value => value + 1)}>Reintentar conexión</HelpButton>
+        <HelpButton helpKey="inicio" onClick={() => navigate('/home')}>Volver al inicio</HelpButton>
+      </main>
+      </ManagersHelpProvider>
+    );
+  }
+
   return (
+    <ManagersHelpProvider>
     <div style={{ minHeight: '100vh', background: bgLight, color: textDark, paddingBottom: '4rem', fontFamily: 'Inter, system-ui, sans-serif' }}>
       
       {/* HEADER TEMA CLARO */}
@@ -2699,9 +2894,12 @@ export default function CentroManagers() {
         <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <button onClick={() => navigate('/home')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.4rem 0.8rem', fontSize: '0.85rem', color: textDark, borderColor: borderLight }}>
+            <HelpButton helpKey="inicio" onClick={() => navigate('/home')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.4rem 0.8rem', fontSize: '0.85rem', color: textDark, borderColor: borderLight }}>
               <ArrowLeft size={16} /> Inicio
-            </button>
+            </HelpButton>
+            <HelpButton helpKey="recargarDirectorio" onClick={() => setManagersReload(value => value + 1)} className="btn-secondary" style={{ color: textDark, borderColor: borderLight }}>
+              Actualizar directorio
+            </HelpButton>
             <div>
               <h1 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#d97706', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <Users size={24} /> Centro de Managers
@@ -2714,24 +2912,24 @@ export default function CentroManagers() {
             {isDualRole && (
                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#f1f5f9', padding: '0.5rem 1rem', borderRadius: '8px' }}>
                  <span style={{ fontSize: '0.8rem', fontWeight: 600, color: textMuted }}>Vista:</span>
-                 <button onClick={() => setViewAsTrainer(!viewAsTrainer)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', color: viewAsTrainer ? '#3b82f6' : '#64748b', fontWeight: 'bold' }}>
+                 <HelpButton helpKey="vistaRol" onClick={() => setViewAsTrainer(!viewAsTrainer)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', color: viewAsTrainer ? '#3b82f6' : '#64748b', fontWeight: 'bold' }}>
                    {viewAsTrainer ? <ToggleRight size={24} color="#3b82f6" /> : <ToggleLeft size={24} />}
                    {viewAsTrainer ? 'Entrenador' : 'Corporativo'}
-                 </button>
+                 </HelpButton>
                </div>
             )}
-            <div style={{ textAlign: 'center', cursor: 'pointer' }} onClick={() => { setStatusFilter('Todos'); setCurrentPage(1); }}>
+            <HelpButton helpKey="filtroEstado" style={{ textAlign: 'center', cursor: 'pointer', background: 'transparent', border: 'none', padding: 0 }} onClick={() => { setStatusFilter('Todos'); setCurrentPage(1); }}>
               <div style={{ fontSize: '1.4rem', fontWeight: 800, color: statusFilter === 'Todos' ? '#b45309' : '#d97706' }}>{stats.total}</div>
               <div style={{ fontSize: '0.65rem', color: textMuted, fontWeight: 700 }}>TOTAL</div>
-            </div>
-            <div style={{ textAlign: 'center', cursor: 'pointer' }} onClick={() => { setStatusFilter('Graduado'); setCurrentPage(1); }}>
+            </HelpButton>
+            <HelpButton helpKey="filtroEstado" style={{ textAlign: 'center', cursor: 'pointer', background: 'transparent', border: 'none', padding: 0 }} onClick={() => { setStatusFilter('Graduado'); setCurrentPage(1); }}>
               <div style={{ fontSize: '1.4rem', fontWeight: 800, color: statusFilter === 'Graduado' ? '#059669' : '#10b981' }}>{stats.graduados}</div>
               <div style={{ fontSize: '0.65rem', color: textMuted, fontWeight: 700 }}>GRADUADOS</div>
-            </div>
-            <div style={{ textAlign: 'center', cursor: 'pointer' }} onClick={() => { setStatusFilter('Activo'); setCurrentPage(1); }}>
+            </HelpButton>
+            <HelpButton helpKey="filtroEstado" style={{ textAlign: 'center', cursor: 'pointer', background: 'transparent', border: 'none', padding: 0 }} onClick={() => { setStatusFilter('Activo'); setCurrentPage(1); }}>
               <div style={{ fontSize: '1.4rem', fontWeight: 800, color: statusFilter === 'Activo' ? '#1d4ed8' : '#3b82f6' }}>{stats.activos}</div>
               <div style={{ fontSize: '0.65rem', color: textMuted, fontWeight: 700 }}>ACTIVOS</div>
-            </div>
+            </HelpButton>
           </div>
         </div>
       </header>
@@ -2751,9 +2949,9 @@ export default function CentroManagers() {
               {autoGraduatedAlert.resumen.map((r, i) => <li key={i} style={{ marginBottom: '0.25rem' }}><strong>{r}</strong></li>)}
             </ul>
           </div>
-          <button onClick={() => setAutoGraduatedAlert(null)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#166534', padding: '0.2rem' }}>
+          <HelpButton helpKey="cerrar" onClick={() => setAutoGraduatedAlert(null)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#166534', padding: '0.2rem' }}>
             <X size={24} />
-          </button>
+          </HelpButton>
         </div>
       )}
 
@@ -2770,23 +2968,33 @@ export default function CentroManagers() {
             ...(userCanViewKPIsLlamadas ? [
               { id: 'kpis_llamadas', icon: BarChart3, label: 'KPIs Llamadas' }
             ] : []),
+            ...(isCoherenceAdmin(currentUser) ? [
+              { id: 'coherencia', icon: ShieldCheck, label: 'Coherencia' }
+            ] : []),
             ...(canViewLiquidacion ? [
               { id: 'liquidacion', icon: DollarSign, label: `Liquidación (${liquidacionData.pendientes.length})` }
             ] : [])
           ].map(t => (
-            <button key={t.id} onClick={() => setActiveTab(t.id)} style={{
+            <HelpButton helpKey={managersTabHelpKeys[t.id]} key={t.id} onClick={() => setActiveTab(t.id)} style={{
               padding: '1rem 0.5rem', border: 'none', background: 'transparent',
               color: activeTab === t.id ? '#d97706' : textMuted,
               borderBottom: activeTab === t.id ? '3px solid #d97706' : '3px solid transparent',
               fontWeight: activeTab === t.id ? 700 : 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem'
             }}>
               <t.icon size={18} /> {t.label}
-            </button>
+            </HelpButton>
           ))}
         </div>
       </div>
 
       <main style={{ maxWidth: '1400px', margin: '2rem auto', padding: '0 1.5rem' }}>
+
+        <ManagersQuickGuide
+          key={getManagersGuideRole({ viewAsTrainer, canViewAll, canViewOwnSede })}
+          role={getManagersGuideRole({ viewAsTrainer, canViewAll, canViewOwnSede })}
+        />
+
+        {activeTab === 'coherencia' && isCoherenceAdmin(currentUser) && <TrainerCoherencePanel />}
 
         {/* DIRECTORIO */}
         {activeTab === 'directorio' && (
@@ -2796,7 +3004,7 @@ export default function CentroManagers() {
               <div style={{ display: 'flex', gap: '0.75rem', flex: 1, flexWrap: 'wrap', alignItems: 'center' }}>
                 <div style={{ position: 'relative', minWidth: '240px', flex: '1 1 260px', maxWidth: '360px' }}>
                   <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: textMuted, pointerEvents: 'none' }} />
-                  <input
+                  <HelpInput helpKey="buscar"
                     type="text"
                     placeholder="Buscar manager, equipo, entrenador o sede..."
                     value={search}
@@ -2804,31 +3012,31 @@ export default function CentroManagers() {
                     style={{ width: '100%', boxSizing: 'border-box', padding: '0.6rem 2.2rem 0.6rem 2.4rem', borderRadius: '8px', border: `1px solid ${borderLight}`, fontSize: '0.88rem', outline: 'none', background: bgCard, color: textDark }}
                   />
                   {search && (
-                    <button
+                    <HelpButton helpKey="limpiarBusqueda"
                       onClick={() => { setSearch(''); setCurrentPage(1); }}
                       style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 'none', cursor: 'pointer', color: textMuted, padding: 0 }}
                       title="Limpiar búsqueda"
                     >
                       <X size={16} />
-                    </button>
+                    </HelpButton>
                   )}
                 </div>
                 
                 {canViewAll && (
-                  <select value={filterSede} onChange={e => { setFilterSede(e.target.value); setCurrentPage(1); }} style={{ padding: '0.55rem 0.75rem', borderRadius: '8px', border: `1px solid ${borderLight}`, background: bgCard, color: textDark, fontSize: '0.85rem' }}>
+                  <HelpSelect helpKey="filtroSede" value={filterSede} onChange={e => { setFilterSede(e.target.value); setCurrentPage(1); }} style={{ padding: '0.55rem 0.75rem', borderRadius: '8px', border: `1px solid ${borderLight}`, background: bgCard, color: textDark, fontSize: '0.85rem' }}>
                     <option value="">Todas las Sedes</option>
                     {OPERATIONAL_SEDES.map(s => <option key={s} value={s}>{s}</option>)}
-                  </select>
+                  </HelpSelect>
                 )}
 
                 {(canViewAll || canViewOwnSede) && !viewAsTrainer && (
-                  <select value={filterEntrenador} onChange={e => { setFilterEntrenador(e.target.value); setCurrentPage(1); }} style={{ padding: '0.55rem 0.75rem', borderRadius: '8px', border: `1px solid ${borderLight}`, background: bgCard, color: textDark, fontSize: '0.85rem' }}>
+                  <HelpSelect helpKey="filtroEntrenador" value={filterEntrenador} onChange={e => { setFilterEntrenador(e.target.value); setCurrentPage(1); }} style={{ padding: '0.55rem 0.75rem', borderRadius: '8px', border: `1px solid ${borderLight}`, background: bgCard, color: textDark, fontSize: '0.85rem' }}>
                     <option value="">Todos los Entrenadores</option>
                     {availableTrainers.map(e => <option key={e} value={e}>{e}</option>)}
-                  </select>
+                  </HelpSelect>
                 )}
 
-                <select
+                <HelpSelect helpKey="filtroEquipo"
                   value={filterEquipo}
                   onChange={e => { setFilterEquipo(e.target.value); setCurrentPage(1); }}
                   style={{ padding: '0.55rem 0.75rem', borderRadius: '8px', border: `1px solid ${borderLight}`, background: bgCard, color: textDark, fontSize: '0.85rem' }}
@@ -2839,7 +3047,7 @@ export default function CentroManagers() {
                       {formatTeamDisplay(eq.equipo, eq.numEquipo)} ({eq.sede})
                     </option>
                   ))}
-                </select>
+                </HelpSelect>
 
                 {/* FILTROS DE ESTADO RÁPIDOS */}
                 <div style={{ display: 'flex', gap: '0.25rem', background: '#f1f5f9', padding: '0.25rem', borderRadius: '8px', flexShrink: 0 }}>
@@ -2849,7 +3057,7 @@ export default function CentroManagers() {
                     { id: 'Graduado', label: `🎓 Graduados (${stats.graduados})` },
                     { id: 'Desertor', label: `⚠️ Desertores (${stats.desertores})` },
                   ].map(st => (
-                    <button key={st.id} onClick={() => { setStatusFilter(st.id); setCurrentPage(1); }} style={{
+                    <HelpButton helpKey="filtroEstado" key={st.id} onClick={() => { setStatusFilter(st.id); setCurrentPage(1); }} style={{
                       padding: '0.4rem 0.75rem', borderRadius: '6px', border: 'none',
                       background: statusFilter === st.id ? '#ffffff' : 'transparent',
                       color: statusFilter === st.id ? '#0f172a' : '#64748b',
@@ -2858,7 +3066,7 @@ export default function CentroManagers() {
                       fontSize: '0.78rem', cursor: 'pointer', whiteSpace: 'nowrap'
                     }}>
                       {st.label}
-                    </button>
+                    </HelpButton>
                   ))}
                 </div>
               </div>
@@ -2866,7 +3074,7 @@ export default function CentroManagers() {
               <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
                 {/* SELECTOR DE VISTA DIRECTORIO: TABLA vs TARJETAS DE EQUIPO */}
                 <div style={{ display: 'flex', background: '#f1f5f9', padding: '0.2rem', borderRadius: '8px', border: `1px solid ${borderLight}` }}>
-                  <button
+                  <HelpButton helpKey="tabla"
                     onClick={() => setDirectorioViewMode('tabla')}
                     style={{
                       display: 'flex', alignItems: 'center', gap: '0.35rem', padding: '0.45rem 0.75rem',
@@ -2880,8 +3088,8 @@ export default function CentroManagers() {
                     title="Vista en tabla continua ordenada"
                   >
                     <List size={14} /> Tabla
-                  </button>
-                  <button
+                  </HelpButton>
+                  <HelpButton helpKey="tarjetas"
                     onClick={() => setDirectorioViewMode('equipos')}
                     style={{
                       display: 'flex', alignItems: 'center', gap: '0.35rem', padding: '0.45rem 0.75rem',
@@ -2895,10 +3103,10 @@ export default function CentroManagers() {
                     title="Vista organizada por tarjetas de equipo"
                   >
                     <LayoutGrid size={14} /> Por Equipos ({groupedManagersByTeam.length})
-                  </button>
+                  </HelpButton>
                 </div>
 
-                <button onClick={() => {
+                <HelpButton helpKey="restaurar" onClick={() => {
                     setFilterSede('');
                     setFilterEntrenador('');
                     setFilterEquipo('');
@@ -2909,22 +3117,22 @@ export default function CentroManagers() {
                     setCurrentPage(1);
                   }} title="Limpiar Filtros y Restaurar Orden Natural por Número de Equipo" style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', padding: '0.55rem 0.8rem', borderRadius: '6px', border: `1px solid ${borderLight}`, background: 'transparent', color: textMuted, fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}>
                     <RotateCcw size={14} /> Restaurar Filtros
-                  </button>
+                  </HelpButton>
 
                 {(userCanAdd || userCanAssign || canChangeStatus) && (
-                  <button
+                  <HelpButton helpKey="fusion"
                     onClick={() => handleOpenMergeTeams()}
                     title="Unir varios equipos consolidando capitanes, managers y avances"
                     style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.6rem 1rem', borderRadius: '6px', border: '1px solid #f59e0b', background: 'rgba(245, 158, 11, 0.1)', color: '#d97706', fontWeight: 700, cursor: 'pointer', fontSize: '0.82rem', whiteSpace: 'nowrap' }}
                   >
                     <GitMerge size={16} /> 🔀 Unir Equipos
-                  </button>
+                  </HelpButton>
                 )}
 
                 {userCanAdd && (
-                  <button onClick={() => setShowModal(true)} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.6rem 1.2rem', borderRadius: '6px', border: 'none', background: '#3b82f6', color: '#fff', fontWeight: 600, cursor: 'pointer', boxShadow: '0 2px 4px rgba(59,130,246,0.3)' }}>
+                  <HelpButton helpKey="nuevo" onClick={() => setShowModal(true)} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.6rem 1.2rem', borderRadius: '6px', border: 'none', background: '#3b82f6', color: '#fff', fontWeight: 600, cursor: 'pointer', boxShadow: '0 2px 4px rgba(59,130,246,0.3)' }}>
                     <Plus size={16} /> Nuevo Manager / Equipo
-                  </button>
+                  </HelpButton>
                 )}
               </div>
             </div>
@@ -2935,7 +3143,7 @@ export default function CentroManagers() {
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
                 <thead>
                   <tr style={{ background: '#f1f5f9', color: '#475569', borderBottom: `2px solid ${borderLight}` }}>
-                    <th 
+                    <HelpSortHeader
                       onClick={() => handleSort('nombre')} 
                       style={{ padding: '1rem', cursor: 'pointer', userSelect: 'none', color: sortField === 'nombre' ? '#b45309' : '#475569', background: sortField === 'nombre' ? '#fef3c7' : 'transparent', transition: 'all 0.15s ease' }} 
                       title="Ordenar por Integrante & Rol (A-Z / Z-A)"
@@ -2948,8 +3156,8 @@ export default function CentroManagers() {
                           <ArrowUpDown size={14} style={{ opacity: 0.35 }} />
                         )}
                       </div>
-                    </th>
-                    <th 
+                    </HelpSortHeader>
+                    <HelpSortHeader
                       onClick={() => handleSort('equipo')} 
                       style={{ padding: '1rem', cursor: 'pointer', userSelect: 'none', color: (sortField === 'sede' || sortField === 'equipo') ? '#b45309' : '#475569', background: (sortField === 'sede' || sortField === 'equipo') ? '#fef3c7' : 'transparent', transition: 'all 0.15s ease' }} 
                       title="Ordenar por # Número de Equipo y Sede"
@@ -2962,8 +3170,8 @@ export default function CentroManagers() {
                           <ArrowUpDown size={14} style={{ opacity: 0.35 }} />
                         )}
                       </div>
-                    </th>
-                    <th 
+                    </HelpSortHeader>
+                    <HelpSortHeader
                       onClick={() => handleSort('entrenador')} 
                       style={{ padding: '1rem', cursor: 'pointer', userSelect: 'none', color: sortField === 'entrenador' ? '#b45309' : '#475569', background: sortField === 'entrenador' ? '#fef3c7' : 'transparent', transition: 'all 0.15s ease' }} 
                       title="Ordenar por Entrenador(es) Asignado(s)"
@@ -2976,8 +3184,8 @@ export default function CentroManagers() {
                           <ArrowUpDown size={14} style={{ opacity: 0.35 }} />
                         )}
                       </div>
-                    </th>
-                    <th 
+                    </HelpSortHeader>
+                    <HelpSortHeader
                       onClick={() => handleSort('estado')} 
                       style={{ padding: '1rem', cursor: 'pointer', userSelect: 'none', color: sortField === 'estado' ? '#b45309' : '#475569', background: sortField === 'estado' ? '#fef3c7' : 'transparent', transition: 'all 0.15s ease' }} 
                       title="Ordenar por Estado (Activo / Graduado / Desertor)"
@@ -2990,8 +3198,8 @@ export default function CentroManagers() {
                           <ArrowUpDown size={14} style={{ opacity: 0.35 }} />
                         )}
                       </div>
-                    </th>
-                    <th 
+                    </HelpSortHeader>
+                    <HelpSortHeader
                       onClick={() => handleSort('llamada')} 
                       style={{ padding: '1rem', textAlign: 'center', cursor: 'pointer', userSelect: 'none', color: sortField === 'llamada' ? '#b45309' : '#475569', background: sortField === 'llamada' ? '#fef3c7' : 'transparent', transition: 'all 0.15s ease' }} 
                       title="Ordenar por Confirmación de Llamada"
@@ -3004,7 +3212,7 @@ export default function CentroManagers() {
                           <ArrowUpDown size={14} style={{ opacity: 0.35 }} />
                         )}
                       </div>
-                    </th>
+                    </HelpSortHeader>
                     <th style={{ padding: '1rem', textAlign: 'center' }}>Acciones</th>
                   </tr>
                 </thead>
@@ -3029,9 +3237,9 @@ export default function CentroManagers() {
                           </div>
                           <div style={{ color: textMuted, fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem', marginTop: '0.25rem' }}>
                             {m.telefono ? (
-                              <a href={`${getWhatsAppUrl(m.telefono, m.sede || filterSede)}`} target="_blank" rel="noreferrer" style={{ color: '#10b981', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.2rem', fontWeight: 600 }}>
+                              <HelpLink helpKey="whatsapp" href={`${getWhatsAppUrl(m.telefono, m.sede || filterSede)}`} target="_blank" rel="noreferrer" style={{ color: '#10b981', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.2rem', fontWeight: 600 }}>
                                 📱 {m.telefono}
-                              </a>
+                              </HelpLink>
                             ) : (
                               <span style={{ color: '#94a3b8' }}>Sin teléfono</span>
                             )}
@@ -3055,7 +3263,7 @@ export default function CentroManagers() {
                           {mTrainers.length > 0 && mTrainers[0] !== "" ? (
                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem' }}>
                               {mTrainers.map(t => (
-                                <button
+                                <HelpButton helpKey="tarjetaEntrenador"
                                   key={t}
                                   type="button"
                                   onClick={() => setTrainerCardModal(t)}
@@ -3063,7 +3271,7 @@ export default function CentroManagers() {
                                   style={{ display: 'inline-flex', alignItems: 'center', gap: '0.2rem', background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe', padding: '0.2rem 0.5rem', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
                                 >
                                   🎓 {t}
-                                </button>
+                                </HelpButton>
                               ))}
                             </div>
                           ) : (
@@ -3072,55 +3280,55 @@ export default function CentroManagers() {
                         </td>
                         <td style={{ padding: '1rem' }}>
                           {canChangeStatus ? (
-                            <select value={m.estado} onChange={e => handleUpdateManagerField(m.id, 'estado', e.target.value)} style={{ padding: '0.3rem', borderRadius: '4px', border: 'none', background: m.estado==='Activo'?'#dbeafe':m.estado==='Graduado'?'#dcfce7':'#fee2e2', color: m.estado==='Activo'?'#2563eb':m.estado==='Graduado'?'#16a34a':'#dc2626', fontWeight: 700, fontSize: '0.8rem', cursor: 'pointer' }}>
+                            <HelpSelect helpKey="estado" value={m.estado} onChange={e => handleUpdateManagerField(m.id, 'estado', e.target.value)} style={{ padding: '0.3rem', borderRadius: '4px', border: 'none', background: m.estado==='Activo'?'#dbeafe':m.estado==='Graduado'?'#dcfce7':'#fee2e2', color: m.estado==='Activo'?'#2563eb':m.estado==='Graduado'?'#16a34a':'#dc2626', fontWeight: 700, fontSize: '0.8rem', cursor: 'pointer' }}>
                               <option value="Activo">Activo</option><option value="Graduado">Graduado</option><option value="Desertor">Desertor</option>
-                            </select>
+                            </HelpSelect>
                           ) : (
                              <span style={{ padding: '0.3rem 0.6rem', borderRadius: '4px', background: m.estado==='Activo'?'#dbeafe':m.estado==='Graduado'?'#dcfce7':'#fee2e2', color: m.estado==='Activo'?'#2563eb':m.estado==='Graduado'?'#16a34a':'#dc2626', fontWeight: 700, fontSize: '0.8rem' }}>{m.estado}</span>
                           )}
                         </td>
                         <td style={{ padding: '1rem' }}>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-                            <input type="date" value={m.llamadaFecha || ''} onChange={e => handleUpdateLlamada(m.id, e.target.value, m.llamadaAsistio || 'SI')} style={{ padding: '0.4rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.8rem' }} />
-                            <button onClick={() => handleUpdateLlamada(m.id, m.llamadaFecha || new Date().toISOString().split('T')[0], 'SI')} style={{ padding: '0.4rem 0.6rem', borderRadius: '6px', border: '1px solid #10b981', background: m.llamadaAsistio === 'SI' ? '#10b981' : '#fff', color: m.llamadaAsistio === 'SI' ? '#fff' : '#10b981', fontWeight: 700, cursor: 'pointer' }}>SÍ</button>
-                            <button onClick={() => handleUpdateLlamada(m.id, m.llamadaFecha || new Date().toISOString().split('T')[0], 'NO')} style={{ padding: '0.4rem 0.6rem', borderRadius: '6px', border: '1px solid #ef4444', background: m.llamadaAsistio === 'NO' ? '#ef4444' : '#fff', color: m.llamadaAsistio === 'NO' ? '#fff' : '#ef4444', fontWeight: 700, cursor: 'pointer' }}>NO</button>
+                            <HelpInput helpKey="fechaIndividual" type="date" value={m.llamadaFecha || ''} onChange={e => handleEditLlamadaFecha(m.id, e.target.value)} style={{ padding: '0.4rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.8rem' }} />
+                            <HelpButton helpKey="asistioSi" disabled={Boolean(savingIndividualCallIds[m.id])} onClick={() => handleUpdateLlamada(m.id, m.llamadaFecha || new Date().toISOString().split('T')[0], 'SI')} style={{ padding: '0.4rem 0.6rem', borderRadius: '6px', border: '1px solid #10b981', background: m.llamadaAsistio === 'SI' ? '#10b981' : '#fff', color: m.llamadaAsistio === 'SI' ? '#fff' : '#10b981', fontWeight: 700, cursor: savingIndividualCallIds[m.id] ? 'wait' : 'pointer' }}>SÍ</HelpButton>
+                            <HelpButton helpKey="asistioNo" disabled={Boolean(savingIndividualCallIds[m.id])} onClick={() => handleUpdateLlamada(m.id, m.llamadaFecha || new Date().toISOString().split('T')[0], 'NO')} style={{ padding: '0.4rem 0.6rem', borderRadius: '6px', border: '1px solid #ef4444', background: m.llamadaAsistio === 'NO' ? '#ef4444' : '#fff', color: m.llamadaAsistio === 'NO' ? '#fff' : '#ef4444', fontWeight: 700, cursor: savingIndividualCallIds[m.id] ? 'wait' : 'pointer' }}>NO</HelpButton>
                           </div>
                         </td>
                         <td style={{ padding: '1rem', textAlign: 'center' }}>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}>
-                            <button
+                            <HelpButton helpKey="tarjetaIntegrante"
                               onClick={() => setManagerCardModal(m)}
                               title="Ver Tarjeta del Integrante"
                               style={{ background: '#e0e7ff', border: '1px solid #bfdbfe', color: '#1d4ed8', padding: '0.4rem', borderRadius: '6px', cursor: 'pointer' }}
                             >
                               <UserCheck size={15} />
-                            </button>
+                            </HelpButton>
                             {(userCanWriteNota || userCanViewAllNotas) && (
-                              <button
+                              <HelpButton helpKey="notas"
                                 onClick={() => setNotaModal(m)}
                                 title="Notas de Seguimiento"
                                 style={{ background: '#fefce8', border: '1px solid #fde047', color: '#854d0e', padding: '0.4rem', borderRadius: '6px', cursor: 'pointer' }}
                               >
                                 📝
-                              </button>
+                              </HelpButton>
                             )}
                             {userCanAdd && (
-                              <button
+                              <HelpButton helpKey="editarIntegrante"
                                 onClick={() => handleOpenEditIndividual(m)}
                                 title="Editar Integrante"
                                 style={{ background: '#f1f5f9', border: `1px solid ${borderLight}`, color: '#0f172a', padding: '0.4rem', borderRadius: '6px', cursor: 'pointer' }}
                               >
                                 <Edit3 size={15} />
-                              </button>
+                              </HelpButton>
                             )}
                             {userCanAdd && (
-                              <button
+                              <HelpButton helpKey="eliminar"
                                 onClick={() => setDeleteConfirm({ type: 'manager', id: m.id, name: m.nombre })}
                                 title="Eliminar Integrante"
                                 style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626', padding: '0.4rem', borderRadius: '6px', cursor: 'pointer' }}
                               >
                                 <Trash2 size={15} />
-                              </button>
+                              </HelpButton>
                             )}
                           </div>
                         </td>
@@ -3137,8 +3345,8 @@ export default function CentroManagers() {
                 <div style={{ padding: '1rem', display: 'flex', justifyContent: 'space-between', borderTop: `1px solid ${borderLight}` }}>
                    <span style={{ fontSize: '0.85rem', color: textMuted }}>Página {currentPage} de {totalPages}</span>
                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                     <button disabled={currentPage===1} onClick={() => setCurrentPage(p=>p-1)} style={{ padding: '0.3rem 0.8rem', borderRadius: '4px', border: `1px solid ${borderLight}`, background: '#fff', cursor: 'pointer' }}>Ant</button>
-                     <button disabled={currentPage>=totalPages} onClick={() => setCurrentPage(p=>p+1)} style={{ padding: '0.3rem 0.8rem', borderRadius: '4px', border: `1px solid ${borderLight}`, background: '#fff', cursor: 'pointer' }}>Sig</button>
+                     <HelpButton helpKey="anterior" disabled={currentPage===1} onClick={() => setCurrentPage(p=>p-1)} style={{ padding: '0.3rem 0.8rem', borderRadius: '4px', border: `1px solid ${borderLight}`, background: '#fff', cursor: 'pointer' }}>Ant</HelpButton>
+                     <HelpButton helpKey="siguiente" disabled={currentPage>=totalPages} onClick={() => setCurrentPage(p=>p+1)} style={{ padding: '0.3rem 0.8rem', borderRadius: '4px', border: `1px solid ${borderLight}`, background: '#fff', cursor: 'pointer' }}>Sig</HelpButton>
                    </div>
                 </div>
               </>
@@ -3186,13 +3394,13 @@ export default function CentroManagers() {
                           </div>
 
                           {(userCanAdd || userCanAssign || canChangeStatus) && (
-                            <button
+                            <HelpButton helpKey="fusion"
                               onClick={() => handleOpenMergeTeams({ sede: team.sede, equipo: team.equipo, numEquipo: team.numEquipo, managers: team.members })}
                               title="Unir este equipo"
                               style={{ background: '#fffbeb', border: '1px solid #fde68a', color: '#b45309', padding: '0.2rem 0.5rem', borderRadius: '6px', cursor: 'pointer', fontSize: '0.72rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}
                             >
                               <GitMerge size={12} /> Unir
-                            </button>
+                            </HelpButton>
                           )}
                         </div>
 
@@ -3201,14 +3409,14 @@ export default function CentroManagers() {
                           <span style={{ fontSize: '0.72rem', color: textMuted, fontWeight: 600 }}>Entrenadores:</span>
                           {teamTrainers.length > 0 ? (
                             teamTrainers.map(t => (
-                              <button
+                              <HelpButton helpKey="tarjetaEntrenador"
                                 key={t}
                                 type="button"
                                 onClick={() => setTrainerCardModal(t)}
                                 style={{ background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe', padding: '0.15rem 0.45rem', borderRadius: '4px', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer' }}
                               >
                                 🎓 {t}
-                              </button>
+                              </HelpButton>
                             ))
                           ) : (
                             <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>Sin Asignar</span>
@@ -3246,9 +3454,9 @@ export default function CentroManagers() {
                                   </div>
                                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.2rem', fontSize: '0.72rem' }}>
                                     {m.telefono ? (
-                                      <a href={getWhatsAppUrl(m.telefono, m.sede || filterSede)} target="_blank" rel="noreferrer" style={{ color: '#10b981', textDecoration: 'none', fontWeight: 600 }}>
+                                      <HelpLink helpKey="whatsapp" href={getWhatsAppUrl(m.telefono, m.sede || filterSede)} target="_blank" rel="noreferrer" style={{ color: '#10b981', textDecoration: 'none', fontWeight: 600 }}>
                                         📱 {m.telefono}
-                                      </a>
+                                      </HelpLink>
                                     ) : (
                                       <span style={{ color: '#94a3b8' }}>Sin tel</span>
                                     )}
@@ -3266,7 +3474,7 @@ export default function CentroManagers() {
                                 </div>
 
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                                  <button
+                                  <HelpButton helpKey="alternarAsistencia"
                                     onClick={() => handleToggleLlamada(m.id, m.llamadaAsistio)}
                                     title={`Llamada: ${m.llamadaAsistio || 'NO'}`}
                                     style={{
@@ -3281,40 +3489,40 @@ export default function CentroManagers() {
                                     }}
                                   >
                                     {m.llamadaAsistio === 'SI' ? '✅ Asistió' : '❌ Falta'}
-                                  </button>
-                                  <button
+                                  </HelpButton>
+                                  <HelpButton helpKey="tarjetaIntegrante"
                                     onClick={() => setManagerCardModal(m)}
                                     title="Tarjeta del Integrante"
                                     style={{ background: '#e0e7ff', border: '1px solid #bfdbfe', color: '#1d4ed8', padding: '0.3rem', borderRadius: '5px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                                   >
                                     <UserCheck size={13} />
-                                  </button>
+                                  </HelpButton>
                                   {(userCanWriteNota || userCanViewAllNotas) && (
-                                    <button
+                                    <HelpButton helpKey="notas"
                                       onClick={() => setNotaModal(m)}
                                       title="Notas"
                                       style={{ background: '#fefce8', border: '1px solid #fde047', color: '#854d0e', padding: '0.3rem', borderRadius: '5px', cursor: 'pointer', fontSize: '0.7rem' }}
                                     >
                                       📝
-                                    </button>
+                                    </HelpButton>
                                   )}
                                   {userCanAdd && (
-                                    <button
+                                    <HelpButton helpKey="editarIntegrante"
                                       onClick={() => handleOpenEditIndividual(m)}
                                       title="Editar Integrante"
                                       style={{ background: '#f1f5f9', border: `1px solid ${borderLight}`, color: '#0f172a', padding: '0.3rem', borderRadius: '5px', cursor: 'pointer' }}
                                     >
                                       <Edit3 size={13} />
-                                    </button>
+                                    </HelpButton>
                                   )}
                                   {userCanAdd && (
-                                    <button
+                                    <HelpButton helpKey="eliminar"
                                       onClick={() => setDeleteConfirm({ type: 'manager', id: m.id, name: m.nombre })}
                                       title="Eliminar Integrante"
                                       style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626', padding: '0.3rem', borderRadius: '5px', cursor: 'pointer' }}
                                     >
                                       <Trash2 size={13} />
-                                    </button>
+                                    </HelpButton>
                                   )}
                                 </div>
                               </div>
@@ -3329,7 +3537,7 @@ export default function CentroManagers() {
                           {capitanes.length > 0 ? `👑 ${capitanes.map(c => c.nombre).join(', ')}` : '⚠️ Sin Capitán'}
                         </span>
                         {userCanAdd && (
-                          <button
+                          <HelpButton helpKey="agregarIntegrante"
                             onClick={() => {
                               setNewManager(prev => ({
                                 ...prev,
@@ -3344,7 +3552,7 @@ export default function CentroManagers() {
                             style={{ background: 'transparent', border: 'none', color: '#2563eb', fontWeight: 700, fontSize: '0.75rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}
                           >
                             <Plus size={13} /> Agregar Integrante
-                          </button>
+                          </HelpButton>
                         )}
                       </div>
                     </div>
@@ -3420,7 +3628,7 @@ export default function CentroManagers() {
               <div style={{ display: 'flex', gap: '0.75rem', flex: 1, flexWrap: 'wrap', alignItems: 'center' }}>
                 <div style={{ position: 'relative', minWidth: '240px', flex: '1 1 260px', maxWidth: '360px' }}>
                   <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: textMuted, pointerEvents: 'none' }} />
-                  <input
+                  <HelpInput helpKey="buscar"
                     type="text"
                     placeholder="Buscar equipo, #, manager, coach o sede..."
                     value={search}
@@ -3428,28 +3636,28 @@ export default function CentroManagers() {
                     style={{ width: '100%', boxSizing: 'border-box', padding: '0.6rem 2.2rem 0.6rem 2.4rem', borderRadius: '8px', border: `1px solid ${borderLight}`, fontSize: '0.88rem', outline: 'none', background: bgCard, color: textDark }}
                   />
                   {search && (
-                    <button
+                    <HelpButton helpKey="limpiarBusqueda"
                       onClick={() => setSearch('')}
                       style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 'none', cursor: 'pointer', color: textMuted, padding: 0 }}
                       title="Limpiar búsqueda"
                     >
                       <X size={16} />
-                    </button>
+                    </HelpButton>
                   )}
                 </div>
 
                 {canViewAll && (
-                  <select value={filterSede} onChange={e => setFilterSede(e.target.value)} style={{ padding: '0.55rem 0.75rem', borderRadius: '8px', border: `1px solid ${borderLight}`, background: bgCard, color: textDark, fontSize: '0.85rem' }}>
+                  <HelpSelect helpKey="filtroSede" value={filterSede} onChange={e => setFilterSede(e.target.value)} style={{ padding: '0.55rem 0.75rem', borderRadius: '8px', border: `1px solid ${borderLight}`, background: bgCard, color: textDark, fontSize: '0.85rem' }}>
                     <option value="">Todas las Sedes</option>
                     {OPERATIONAL_SEDES.map(s => <option key={s} value={s}>{s}</option>)}
-                  </select>
+                  </HelpSelect>
                 )}
 
                 {(canViewAll || canViewOwnSede) && !viewAsTrainer && (
-                  <select value={filterEntrenador} onChange={e => setFilterEntrenador(e.target.value)} style={{ padding: '0.55rem 0.75rem', borderRadius: '8px', border: `1px solid ${borderLight}`, background: bgCard, color: textDark, fontSize: '0.85rem' }}>
+                  <HelpSelect helpKey="filtroEntrenador" value={filterEntrenador} onChange={e => setFilterEntrenador(e.target.value)} style={{ padding: '0.55rem 0.75rem', borderRadius: '8px', border: `1px solid ${borderLight}`, background: bgCard, color: textDark, fontSize: '0.85rem' }}>
                     <option value="">Todos los Entrenadores</option>
                     {availableTrainers.map(e => <option key={e} value={e}>{e}</option>)}
-                  </select>
+                  </HelpSelect>
                 )}
 
                 {/* FILTRO ACTIVOS / ARCHIVO / TODOS */}
@@ -3459,7 +3667,7 @@ export default function CentroManagers() {
                     { id: 'Archivo', label: '📦 Archivo' },
                     { id: 'Todos', label: '🌐 Todos' },
                   ].map(lf => (
-                    <button key={lf.id} onClick={() => setGroupLifecycleFilter(lf.id)} style={{
+                    <HelpButton helpKey="filtroCiclo" key={lf.id} onClick={() => setGroupLifecycleFilter(lf.id)} style={{
                       padding: '0.4rem 0.75rem', borderRadius: '6px', border: 'none',
                       background: groupLifecycleFilter === lf.id ? '#ffffff' : 'transparent',
                       color: groupLifecycleFilter === lf.id ? '#0f172a' : '#475569',
@@ -3468,7 +3676,7 @@ export default function CentroManagers() {
                       fontSize: '0.78rem', cursor: 'pointer', whiteSpace: 'nowrap'
                     }}>
                       {lf.label}
-                    </button>
+                    </HelpButton>
                   ))}
                 </div>
 
@@ -3480,7 +3688,7 @@ export default function CentroManagers() {
                     { id: 'Parciales', label: '🟡 Parcial' },
                     { id: 'Pendientes', label: '⏳ Pendiente' }
                   ].map(st => (
-                    <button key={st.id} onClick={() => setGroupFilterStatus(st.id)} style={{
+                    <HelpButton helpKey="filtroLlamadas" key={st.id} onClick={() => setGroupFilterStatus(st.id)} style={{
                       padding: '0.35rem 0.65rem', borderRadius: '6px', border: 'none',
                       background: groupFilterStatus === st.id ? '#ffffff' : 'transparent',
                       color: groupFilterStatus === st.id ? '#0f172a' : '#64748b',
@@ -3489,7 +3697,7 @@ export default function CentroManagers() {
                       fontSize: '0.78rem', cursor: 'pointer'
                     }}>
                       {st.label}
-                    </button>
+                    </HelpButton>
                   ))}
                 </div>
               </div>
@@ -3497,29 +3705,29 @@ export default function CentroManagers() {
               <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center', flexWrap: 'wrap' }}>
                 {(userCanAdd || userCanAssign || canChangeStatus) && (
                   <>
-                    <button
+                    <HelpButton helpKey="fusion"
                       onClick={handleOpenMergeTeams}
                       title="Unir varios equipos consolidando capitanes, managers y avances"
                       style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.6rem 1rem', borderRadius: '8px', border: '1px solid #f59e0b', background: 'rgba(245, 158, 11, 0.1)', color: '#d97706', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
                     >
                       <GitMerge size={16} /> 🔀 Unir Equipos
-                    </button>
-                    <button
+                    </HelpButton>
+                    <HelpButton helpKey="supervisor"
                       onClick={handleRunDataSupervisor}
                       title="Supervisar idoneidad y eliminar managers duplicados o datos espurios"
                       style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.6rem 1rem', borderRadius: '8px', border: '1px solid #0284c7', background: 'rgba(2, 132, 199, 0.1)', color: '#0284c7', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
                     >
                       <ShieldCheck size={16} /> 🛡️ Supervisor de Datos
-                    </button>
+                    </HelpButton>
                   </>
                 )}
                 {userCanAdd && (
-                  <button
+                  <HelpButton helpKey="nuevo"
                     onClick={() => { setShowModal(true); setAddMode('equipo'); }}
                     style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.6rem 1.2rem', borderRadius: '8px', border: 'none', background: '#3b82f6', color: '#fff', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 4px rgba(59,130,246,0.3)', whiteSpace: 'nowrap' }}
                   >
                     <Plus size={16} /> + Nuevo Equipo
-                  </button>
+                  </HelpButton>
                 )}
               </div>
             </div>
@@ -3547,22 +3755,22 @@ export default function CentroManagers() {
                             </h3>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                               {(userCanAdd || userCanAssign || canChangeStatus) && (
-                                <button
+                                <HelpButton helpKey="fusion"
                                   onClick={() => handleOpenMergeTeams(t)}
                                   title={`Unir / Fusionar el equipo ${t.equipo || '#' + t.numEquipo} con otro equipo`}
                                   style={{ background: '#fffbeb', border: '1px solid #fde68a', color: '#b45309', padding: '0.25rem 0.5rem', borderRadius: '6px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}
                                 >
                                   <GitMerge size={12} /> Unir
-                                </button>
+                                </HelpButton>
                               )}
                               {userCanAdd && (
-                                <button
+                                <HelpButton helpKey="editarEquipo"
                                   onClick={() => handleOpenEditTeam(t)}
                                   title="Editar Equipo y Miembros"
                                   style={{ background: '#f1f5f9', border: `1px solid ${borderLight}`, color: '#2563eb', padding: '0.25rem 0.5rem', borderRadius: '6px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}
                                 >
                                   <Edit3 size={12} /> Editar
-                                </button>
+                                </HelpButton>
                               )}
                             </div>
                           </div>
@@ -3572,7 +3780,7 @@ export default function CentroManagers() {
                             <span style={{ fontWeight: 600 }}>Coach(es):</span>
                             {t.entrenadoresArr.length > 0 ? (
                               t.entrenadoresArr.map(e => (
-                                <button
+                                <HelpButton helpKey="tarjetaEntrenador"
                                   key={e}
                                   type="button"
                                   onClick={() => setTrainerCardModal(e)}
@@ -3580,7 +3788,7 @@ export default function CentroManagers() {
                                   style={{ background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe', padding: '0.1rem 0.4rem', borderRadius: '4px', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer' }}
                                 >
                                   🎓 {e}
-                                </button>
+                                </HelpButton>
                               ))
                             ) : (
                               <span style={{ color: '#94a3b8' }}>Sin Asignar</span>
@@ -3696,7 +3904,7 @@ export default function CentroManagers() {
 
                                 {/* Badge de Estado o Selector si tiene permiso */}
                                 {canChangeStatus ? (
-                                  <select
+                                  <HelpSelect helpKey="estado"
                                     value={normEstado}
                                     onChange={e => handleUpdateManagerField(m.id, 'estado', e.target.value)}
                                     title="Cambiar estado del capitán"
@@ -3714,7 +3922,7 @@ export default function CentroManagers() {
                                     <option value="Activo">🟢 Activo</option>
                                     <option value="Graduado">🎓 Graduado</option>
                                     <option value="Desertor">🔴 Desertor</option>
-                                  </select>
+                                  </HelpSelect>
                                 ) : (
                                   <span style={{
                                     fontSize: '0.68rem',
@@ -3730,23 +3938,24 @@ export default function CentroManagers() {
                                 )}
 
                                 {m.telefono && (
-                                  <a href={`${getWhatsAppUrl(m.telefono, m.sede || filterSede)}`} target="_blank" rel="noreferrer" title="Contactar por WhatsApp" style={{ color: '#10b981', textDecoration: 'none' }}>
+                                  <HelpLink helpKey="whatsapp" href={`${getWhatsAppUrl(m.telefono, m.sede || filterSede)}`} target="_blank" rel="noreferrer" title="Contactar por WhatsApp" style={{ color: '#10b981', textDecoration: 'none' }}>
                                     📱
-                                  </a>
+                                  </HelpLink>
                                 )}
                               </div>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                                <button
+                                <HelpButton helpKey="alternarAsistencia"
+                                  disabled={Boolean(savingIndividualCallIds[m.id])}
                                   onClick={() => handleUpdateLlamada(m.id, m.llamadaFecha || new Date().toISOString().split('T')[0], isAsistio ? 'NO' : 'SI')}
                                   title="Clic para cambiar estado de conexión"
                                   style={{
                                     border: 'none', background: isAsistio ? '#10b981' : isNoAsistio ? '#ef4444' : '#e2e8f0',
                                     color: isAsistio || isNoAsistio ? '#fff' : '#64748b',
-                                    padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer'
+                                    padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.72rem', fontWeight: 700, cursor: savingIndividualCallIds[m.id] ? 'wait' : 'pointer'
                                   }}
                                 >
                                   {isAsistio ? '✅ Conectó' : isNoAsistio ? '❌ No Conectó' : '⏳ Pendiente'}
-                                </button>
+                                </HelpButton>
                               </div>
                             </div>
                           );
@@ -3769,7 +3978,7 @@ export default function CentroManagers() {
 
                                 {/* Badge de Estado o Selector si tiene permiso */}
                                 {canChangeStatus ? (
-                                  <select
+                                  <HelpSelect helpKey="estado"
                                     value={normEstado}
                                     onChange={e => handleUpdateManagerField(m.id, 'estado', e.target.value)}
                                     title="Cambiar estado del manager"
@@ -3787,7 +3996,7 @@ export default function CentroManagers() {
                                     <option value="Activo">🟢 Activo</option>
                                     <option value="Graduado">🎓 Graduado</option>
                                     <option value="Desertor">🔴 Desertor</option>
-                                  </select>
+                                  </HelpSelect>
                                 ) : (
                                   <span style={{
                                     fontSize: '0.68rem',
@@ -3803,23 +4012,24 @@ export default function CentroManagers() {
                                 )}
 
                                 {m.telefono && (
-                                  <a href={`${getWhatsAppUrl(m.telefono, m.sede || filterSede)}`} target="_blank" rel="noreferrer" title="Contactar por WhatsApp" style={{ color: '#10b981', textDecoration: 'none' }}>
+                                  <HelpLink helpKey="whatsapp" href={`${getWhatsAppUrl(m.telefono, m.sede || filterSede)}`} target="_blank" rel="noreferrer" title="Contactar por WhatsApp" style={{ color: '#10b981', textDecoration: 'none' }}>
                                     📱
-                                  </a>
+                                  </HelpLink>
                                 )}
                               </div>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                                <button
+                                <HelpButton helpKey="alternarAsistencia"
+                                  disabled={Boolean(savingIndividualCallIds[m.id])}
                                   onClick={() => handleUpdateLlamada(m.id, m.llamadaFecha || new Date().toISOString().split('T')[0], isAsistio ? 'NO' : 'SI')}
                                   title="Clic para cambiar estado de conexión"
                                   style={{
                                     border: 'none', background: isAsistio ? '#10b981' : isNoAsistio ? '#ef4444' : '#e2e8f0',
                                     color: isAsistio || isNoAsistio ? '#fff' : '#64748b',
-                                    padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer'
+                                    padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.72rem', fontWeight: 700, cursor: savingIndividualCallIds[m.id] ? 'wait' : 'pointer'
                                   }}
                                 >
                                   {isAsistio ? '✅ Conectó' : isNoAsistio ? '❌ No Conectó' : '⏳ Pendiente'}
-                                </button>
+                                </HelpButton>
                               </div>
                             </div>
                           );
@@ -3839,7 +4049,7 @@ export default function CentroManagers() {
                             <span>Cerrado para liquidación</span>
                           </div>
                           {canViewLiquidacion && (
-                            <button
+                            <HelpButton helpKey="verLiquidacion"
                               type="button"
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -3863,27 +4073,27 @@ export default function CentroManagers() {
                               title="Ver este equipo en la lista de Liquidación"
                             >
                               Ver en Liquidación ➔
-                            </button>
+                            </HelpButton>
                           )}
                         </div>
                       ) : (
-                        <button
+                        <HelpButton helpKey="cerrarEquipo"
                           onClick={() => handleCerrarEquipoLiquidacion(t)}
                           title="Marca el equipo como graduado/desertor para que entre a Liquidación aunque no llegue a 7 llamadas"
                           style={{ width: '100%', marginBottom: '0.6rem', padding: '0.5rem 0.7rem', borderRadius: '8px', border: '1px solid #bfdbfe', background: '#eff6ff', color: '#1d4ed8', fontWeight: 700, fontSize: '0.78rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
                         >
                           <DollarSign size={14} /> Cerrar equipo para liquidación
-                        </button>
+                        </HelpButton>
                       );
                     })()}
 
                     {/* BOTONES DE ACCION DEL EQUIPO */}
                     <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                      <button onClick={() => openGroupModal(t)} style={{ flex: '1 1 130px', padding: '0.65rem', borderRadius: '8px', border: 'none', background: '#d97706', color: '#fff', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', boxShadow: '0 2px 4px rgba(217,119,6,0.2)' }}>
+                      <HelpButton helpKey="llamadaGrupal" onClick={() => openGroupModal(t)} style={{ flex: '1 1 130px', padding: '0.65rem', borderRadius: '8px', border: 'none', background: '#d97706', color: '#fff', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', boxShadow: '0 2px 4px rgba(217,119,6,0.2)' }}>
                         <PhoneCall size={16} /> Llamada Grupal
-                      </button>
+                      </HelpButton>
                       {(userCanAdd || userCanAssign || canChangeStatus) && (
-                        <button
+                        <HelpButton helpKey="fusion"
                           onClick={() => handleOpenMergeTeams(t)}
                           title={`Unir / Fusionar el equipo ${t.equipo || '#' + t.numEquipo} con otro equipo`}
                           style={{
@@ -3902,16 +4112,16 @@ export default function CentroManagers() {
                           }}
                         >
                           <GitMerge size={16} /> Unir Equipo
-                        </button>
+                        </HelpButton>
                       )}
                       {userCanAdd && (
-                        <button
+                        <HelpButton helpKey="eliminar"
                           onClick={() => setDeleteConfirm({ type: 'team', sede: t.sede, equipo: t.equipo, name: t.equipo })}
                           title="Eliminar Equipo"
                           style={{ padding: '0.65rem', borderRadius: '8px', border: '1px solid #fecaca', background: '#fef2f2', color: '#dc2626', cursor: 'pointer' }}
                         >
                           <Trash2 size={16} />
-                        </button>
+                        </HelpButton>
                       )}
                     </div>
                   </div>
@@ -3959,7 +4169,7 @@ export default function CentroManagers() {
             <div style={{ background: bgCard, borderRadius: '12px', padding: '1rem 1.5rem', border: `1px solid ${borderLight}`, display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
               <div style={{ position: 'relative', minWidth: '280px', flex: '1 1 280px', maxWidth: '450px' }}>
                 <Search size={16} style={{ position: 'absolute', left: '12px', top: '12px', color: textMuted }} />
-                <input
+                <HelpInput helpKey="buscar"
                   type="text"
                   placeholder="Buscar sede o entrenador..."
                   value={search}
@@ -3967,13 +4177,13 @@ export default function CentroManagers() {
                   style={{ width: '100%', padding: '0.6rem 2.2rem 0.6rem 2.4rem', borderRadius: '8px', border: `1px solid ${borderLight}`, fontSize: '0.9rem', outline: 'none', background: bgCard, color: textDark }}
                 />
                 {search && (
-                  <button
+                  <HelpButton helpKey="limpiarBusqueda"
                     onClick={() => setSearch('')}
                     style={{ position: 'absolute', right: '10px', top: '10px', background: 'transparent', border: 'none', cursor: 'pointer', color: textMuted, padding: 0 }}
                     title="Limpiar búsqueda"
                   >
                     <X size={16} />
-                  </button>
+                  </HelpButton>
                 )}
               </div>
               <div style={{ fontSize: '0.82rem', color: textMuted, fontWeight: 600 }}>
@@ -4015,7 +4225,7 @@ export default function CentroManagers() {
                         <span style={{ color: textMuted, fontWeight: 600 }}>Entrenadores:</span>
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem', marginTop: '0.3rem' }}>
                           {s.entrenadores.map(e => (
-                            <button
+                            <HelpButton helpKey="tarjetaEntrenador"
                               key={e}
                               type="button"
                               onClick={() => setTrainerCardModal(e)}
@@ -4023,19 +4233,19 @@ export default function CentroManagers() {
                               style={{ background: '#eff6ff', color: '#1d4ed8', border: 'none', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer' }}
                             >
                               🎓 {e}
-                            </button>
+                            </HelpButton>
                           ))}
                         </div>
                       </div>
                     )}
                   </div>
 
-                  <button
+                  <HelpButton helpKey="directorio"
                     onClick={() => { setFilterSede(s.sede); setActiveTab('directorio'); setCurrentPage(1); }}
                     style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: `1px solid ${borderLight}`, background: '#f8fafc', color: textDark, fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
                   >
                     Ver Directorio de {s.sede} ({s.total})
-                  </button>
+                  </HelpButton>
                 </div>
               ))}
             </div>
@@ -4048,7 +4258,7 @@ export default function CentroManagers() {
             <div style={{ background: bgCard, borderRadius: '12px', padding: '1rem 1.5rem', border: `1px solid ${borderLight}`, display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
               <div style={{ position: 'relative', minWidth: '280px', flex: '1 1 280px', maxWidth: '450px' }}>
                 <Search size={16} style={{ position: 'absolute', left: '12px', top: '12px', color: textMuted }} />
-                <input
+                <HelpInput helpKey="buscar"
                   type="text"
                   placeholder="Buscar entrenador, equipo o sede..."
                   value={search}
@@ -4056,13 +4266,13 @@ export default function CentroManagers() {
                   style={{ width: '100%', padding: '0.6rem 2.2rem 0.6rem 2.4rem', borderRadius: '8px', border: `1px solid ${borderLight}`, fontSize: '0.9rem', outline: 'none', background: bgCard, color: textDark }}
                 />
                 {search && (
-                  <button
+                  <HelpButton helpKey="limpiarBusqueda"
                     onClick={() => setSearch('')}
                     style={{ position: 'absolute', right: '10px', top: '10px', background: 'transparent', border: 'none', cursor: 'pointer', color: textMuted, padding: 0 }}
                     title="Limpiar búsqueda"
                   >
                     <X size={16} />
-                  </button>
+                  </HelpButton>
                 )}
               </div>
               <div style={{ fontSize: '0.82rem', color: textMuted, fontWeight: 600 }}>
@@ -4126,18 +4336,18 @@ export default function CentroManagers() {
                   </div>
 
                   <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem', borderTop: `1px solid ${borderLight}`, paddingTop: '1rem' }}>
-                    <button
+                    <HelpButton helpKey="directorio"
                       onClick={() => { setFilterEntrenador(t.entrenador); setActiveTab('directorio'); setCurrentPage(1); }}
                       style={{ flex: 1, padding: '0.5rem', borderRadius: '6px', border: `1px solid ${borderLight}`, background: '#fff', color: textDark, fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem' }}
                     >
                       <Users size={14} /> Managers ({t.total})
-                    </button>
-                    <button
+                    </HelpButton>
+                    <HelpButton helpKey="equipos"
                       onClick={() => { setFilterEntrenador(t.entrenador); setActiveTab('grupales'); }}
                       style={{ flex: 1, padding: '0.5rem', borderRadius: '6px', border: 'none', background: '#7c3aed', color: '#fff', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem' }}
                     >
                       <Layers size={14} /> Equipos ({t.equipos.length})
-                    </button>
+                    </HelpButton>
                   </div>
                 </div>
               ))}
@@ -4161,8 +4371,7 @@ export default function CentroManagers() {
           )
         )}
 
-        {/* LIQUIDACIÓN DE ENTRENADORES (02/09/2026, rediseño 09/09/2026) — solo José Sánchez y Elizabeth Escobar */}
-        {/* LIQUIDACIÓN DE ENTRENADORES Y PAGOS OFICIALES (Actualizado 12/09/2026 - Solo José Sánchez y Directores) */}
+        {/* Liquidación de entrenadores y pagos oficiales: mismo acceso restringido que los KPIs de llamadas. */}
         {activeTab === 'liquidacion' && canViewLiquidacion && (
           <div>
             {/* ENCABEZADO CON SEGURIDAD Y ACCESO DIRECTO A LA PLANILLA OFICIAL */}
@@ -4181,7 +4390,7 @@ export default function CentroManagers() {
                 </div>
               </div>
 
-              <a
+              <HelpLink helpKey="planillaLlamadas"
                 href="https://docs.google.com/spreadsheets/d/1lWAHh1PSAKu9eU6DOBxZExrHMbCYc3f2Sr8GdghNxD0/edit?usp=drive_link"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -4202,14 +4411,14 @@ export default function CentroManagers() {
                 }}
               >
                 <FileSpreadsheet size={17} /> Abrir Planilla Oficial en Google Sheets <ExternalLink size={15} />
-              </a>
+              </HelpLink>
 
               {canAccessPagosSemanalesDrive(currentUser) && (
-                <a
+                <HelpLink helpKey="drivePagos"
                   href="https://drive.google.com/drive/folders/1c3wkWITxPTdtvZ41o-MTcftRPkQtmpgi?usp=drive_link"
                   target="_blank"
                   rel="noopener noreferrer"
-                  title="Acceso restringido: Solo para el Gerente de Lima y DirecciÃ³n"
+                  title="Acceso restringido: Solo para el Gerente de Lima y Dirección"
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
@@ -4227,13 +4436,13 @@ export default function CentroManagers() {
                   }}
                 >
                   <FolderOpen size={17} /> Carpeta Pagos Semanales (Gerente Lima) <ExternalLink size={15} />
-                </a>
+                </HelpLink>
               )}
             </div>
 
             {/* SUB-NAVEGACIÓN DE PESTAÑAS DENTRO DE LIQUIDACIÓN */}
             <div style={{ display: 'flex', gap: '0.6rem', marginBottom: '1.2rem', borderBottom: `1px solid ${borderLight}`, paddingBottom: '0.7rem', flexWrap: 'wrap' }}>
-              <button
+              <HelpButton helpKey="planilla"
                 type="button"
                 onClick={() => setLiquidacionSubTab('planilla_sheets')}
                 style={{
@@ -4263,9 +4472,9 @@ export default function CentroManagers() {
                 }}>
                   ${planillaTotales.montoPagadoUSD.toLocaleString('en-US')} USD
                 </span>
-              </button>
+              </HelpButton>
 
-              <button
+              <HelpButton helpKey="nodus"
                 type="button"
                 onClick={() => setLiquidacionSubTab('equipos_nodus')}
                 style={{
@@ -4297,9 +4506,9 @@ export default function CentroManagers() {
                     {liquidacionData.pendientes.length} pend.
                   </span>
                 )}
-              </button>
+              </HelpButton>
 
-              <button
+              <HelpButton helpKey="consolidado"
                 type="button"
                 onClick={() => setLiquidacionSubTab('consolidado')}
                 style={{
@@ -4319,7 +4528,7 @@ export default function CentroManagers() {
                 }}
               >
                 <BarChart3 size={16} /> Consolidado Total
-              </button>
+              </HelpButton>
             </div>
 
             {/* VISTA 1: PLANILLA OFICIAL GOOGLE SHEETS */}
@@ -4381,7 +4590,7 @@ export default function CentroManagers() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flex: '1 1 300px' }}>
                     <div style={{ position: 'relative', width: '100%' }}>
                       <Search size={16} style={{ position: 'absolute', left: '0.8rem', top: '50%', transform: 'translateY(-50%)', color: textMuted }} />
-                      <input
+                      <HelpInput helpKey="buscar"
                         type="text"
                         placeholder="Buscar por nombre de entrenador o sede..."
                         value={sheetSearch}
@@ -4402,7 +4611,7 @@ export default function CentroManagers() {
                   <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center', flexWrap: 'wrap' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                       <Filter size={15} color={textMuted} />
-                      <select
+                      <HelpSelect helpKey="filtroSede"
                         value={sheetSedeFilter}
                         onChange={(e) => setSheetSedeFilter(e.target.value)}
                         style={{
@@ -4419,10 +4628,10 @@ export default function CentroManagers() {
                         {OPERATIONAL_SEDES.map(s => (
                           <option key={s} value={s}>{s}</option>
                         ))}
-                      </select>
+                      </HelpSelect>
                     </div>
 
-                    <select
+                    <HelpSelect helpKey="filtroPagos"
                       value={sheetStatusFilter}
                       onChange={(e) => setSheetStatusFilter(e.target.value)}
                       style={{
@@ -4438,10 +4647,10 @@ export default function CentroManagers() {
                       <option value="todos">Todos los Estados ({planillaPagosList.length})</option>
                       <option value="con_saldo">Con saldo pendiente</option>
                       <option value="liquidados">100% Liquidados</option>
-                    </select>
+                    </HelpSelect>
 
                     {(sheetSearch || sheetSedeFilter !== 'Todas' || sheetStatusFilter !== 'todos') && (
-                      <button
+                      <HelpButton helpKey="restaurar"
                         type="button"
                         onClick={() => { setSheetSearch(''); setSheetSedeFilter('Todas'); setSheetStatusFilter('todos'); }}
                         style={{
@@ -4458,7 +4667,7 @@ export default function CentroManagers() {
                         }}
                       >
                         <RotateCcw size={13} /> Limpiar
-                      </button>
+                      </HelpButton>
                     )}
                   </div>
                 </div>
@@ -4559,7 +4768,7 @@ export default function CentroManagers() {
                                   )}
                                 </td>
                                 <td style={{ padding: '0.7rem', textAlign: 'center' }}>
-                                  <a
+                                  <HelpLink helpKey="planillaLlamadas"
                                     href="https://docs.google.com/spreadsheets/d/1lWAHh1PSAKu9eU6DOBxZExrHMbCYc3f2Sr8GdghNxD0/edit?usp=drive_link"
                                     target="_blank"
                                     rel="noopener noreferrer"
@@ -4578,7 +4787,7 @@ export default function CentroManagers() {
                                     }}
                                   >
                                     <FileSpreadsheet size={15} />
-                                  </a>
+                                  </HelpLink>
                                 </td>
                               </tr>
                             );
@@ -4694,19 +4903,28 @@ export default function CentroManagers() {
                               <td style={{ padding: '0.65rem 0.6rem', fontWeight: 700, color: '#059669' }}>${item.montoUSD}</td>
                               <td style={{ padding: '0.65rem 0.6rem' }}>
                                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'nowrap' }}>
-                                  <button
+                                  {item.cierreManual?.reabrible && canChangeStatus && (
+                                    <HelpButton helpKey="reabrirEquipo"
+                                      onClick={() => handleReabrirEquipoLiquidacion(item)}
+                                      title="Quita el cierre y restaura los estados previos para que el equipo continúe su curso"
+                                      style={{ padding: '0.4rem 0.7rem', borderRadius: '6px', border: '1px solid #2563eb', background: '#eff6ff', color: '#1d4ed8', fontWeight: 700, cursor: 'pointer', fontSize: '0.8rem', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
+                                    >
+                                      <RotateCcw size={13} /> Volver a abrir
+                                    </HelpButton>
+                                  )}
+                                  <HelpButton helpKey="marcarPagado"
                                     onClick={() => handleMarcarPagado(item)}
                                     style={{ padding: '0.4rem 0.8rem', borderRadius: '6px', border: 'none', background: '#10b981', color: '#fff', fontWeight: 700, cursor: 'pointer', fontSize: '0.8rem', whiteSpace: 'nowrap' }}
                                   >
                                     Marcar como pagado
-                                  </button>
-                                  <button
+                                  </HelpButton>
+                                  <HelpButton helpKey="ocultarPago"
                                     onClick={() => handleEliminarLiquidacion(item)}
                                     title="Ocultar / Eliminar de esta lista"
                                     style={{ padding: '0.4rem 0.6rem', borderRadius: '6px', border: 'none', background: '#fef2f2', color: '#ef4444', fontWeight: 700, cursor: 'pointer', fontSize: '0.8rem', display: 'flex', alignItems: 'center' }}
                                   >
                                     <Trash2 size={14} />
-                                  </button>
+                                  </HelpButton>
                                 </div>
                               </td>
                             </tr>
@@ -4769,6 +4987,7 @@ export default function CentroManagers() {
                             <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Monto</th>
                             <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Pagado el</th>
                             <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Pagado por</th>
+                            {canReversarPago && <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Acción</th>}
                           </tr>
                         </thead>
                         <tbody>
@@ -4780,13 +4999,24 @@ export default function CentroManagers() {
                               <td style={{ padding: '0.65rem 0.6rem', fontWeight: 700, color: '#059669' }}>${item.montoUSD}</td>
                               <td style={{ padding: '0.65rem 0.6rem' }}>{item.fechaPago || '-'}</td>
                               <td style={{ padding: '0.65rem 0.6rem' }}>{item.pagadoPorNombre || item.pagadoPorEmail || '-'}</td>
+                              {canReversarPago && (
+                                <td style={{ padding: '0.65rem 0.6rem' }}>
+                                  <HelpButton helpKey="reversarPago"
+                                    onClick={() => handleReversarPago(item)}
+                                    title="Devuelve el equipo a pendientes. No revierte la transferencia bancaria."
+                                    style={{ padding: '0.35rem 0.7rem', borderRadius: '6px', border: '1px solid #dc2626', background: 'transparent', color: '#dc2626', fontWeight: 700, fontSize: '0.78rem', cursor: 'pointer' }}
+                                  >
+                                    Reversar pago
+                                  </HelpButton>
+                                </td>
+                              )}
                             </tr>
                           ))}
                         </tbody>
                         <tfoot>
                           <tr style={{ borderTop: `2px solid ${borderLight}` }}>
                             <td colSpan={3} style={{ padding: '0.65rem 0.6rem', textAlign: 'right', fontWeight: 700, color: textMuted }}>Total pagado:</td>
-                            <td colSpan={3} style={{ padding: '0.65rem 0.6rem', fontWeight: 800, color: '#059669' }}>${liquidacionData.totalPagadoUSD.toLocaleString('en-US')}</td>
+                            <td colSpan={canReversarPago ? 4 : 3} style={{ padding: '0.65rem 0.6rem', fontWeight: 800, color: '#059669' }}>${liquidacionData.totalPagadoUSD.toLocaleString('en-US')}</td>
                           </tr>
                         </tfoot>
                       </table>
@@ -4909,14 +5139,15 @@ export default function CentroManagers() {
               <h2 style={{ margin: 0, color: textDark, fontSize: '1.3rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <PlusCircle size={22} color="#3b82f6" /> Crear Nuevo Registro
               </h2>
-              <button onClick={() => setShowModal(false)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: textMuted }}>
+              <HelpButton helpKey="cerrar" onClick={() => setShowModal(false)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: textMuted }}>
                 <X size={20} />
-              </button>
+              </HelpButton>
             </div>
+            <ManagersHelpMode />
 
             {/* SELECTOR DE MODO: INDIVIDUAL VS EQUIPO COMPLETO */}
             <div style={{ display: 'flex', gap: '0.5rem', background: '#f1f5f9', padding: '0.3rem', borderRadius: '10px', marginBottom: '1.5rem' }}>
-              <button
+              <HelpButton helpKey="modoIndividual"
                 type="button"
                 onClick={() => setAddMode('individual')}
                 style={{
@@ -4929,8 +5160,8 @@ export default function CentroManagers() {
                 }}
               >
                 <Users size={16} /> 👤 Integrante Individual (Manager / Capitán)
-              </button>
-              <button
+              </HelpButton>
+              <HelpButton helpKey="modoEquipo"
                 type="button"
                 onClick={() => setAddMode('equipo')}
                 style={{
@@ -4943,7 +5174,7 @@ export default function CentroManagers() {
                 }}
               >
                 <Shield size={16} /> 🛡️ Equipo Completo (Capitán + Managers)
-              </button>
+              </HelpButton>
             </div>
 
             {/* FORMULARIO 1: INDIVIDUAL */}
@@ -4954,7 +5185,7 @@ export default function CentroManagers() {
                     <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.3rem' }}>
                       Nombre Completo *
                     </label>
-                    <input
+                    <HelpInput helpKey="nombre"
                       required
                       placeholder="Ej: Juan Pérez"
                       value={newManager.nombre}
@@ -4966,14 +5197,14 @@ export default function CentroManagers() {
                     <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.3rem' }}>
                       Rol en el Equipo
                     </label>
-                    <select
+                    <HelpSelect helpKey="rol"
                       value={newManager.rol}
                       onChange={e => setNewManager({ ...newManager, rol: e.target.value })}
                       style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: `1px solid ${borderLight}`, fontSize: '0.9rem', fontWeight: 600 }}
                     >
                       <option value="Manager">Manager</option>
                       <option value="Capitan">👑 Capitán</option>
-                    </select>
+                    </HelpSelect>
                   </div>
                 </div>
 
@@ -4982,7 +5213,7 @@ export default function CentroManagers() {
                     <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.3rem' }}>
                       Teléfono WhatsApp
                     </label>
-                    <input
+                    <HelpInput helpKey="telefono"
                       placeholder="Ej: +593 99 123 4567"
                       value={newManager.telefono}
                       onChange={e => setNewManager({ ...newManager, telefono: e.target.value })}
@@ -4993,13 +5224,13 @@ export default function CentroManagers() {
                     <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.3rem' }}>
                       Sede
                     </label>
-                    <select
+                    <HelpSelect helpKey="sede"
                       value={newManager.sede}
                       onChange={e => setNewManager({ ...newManager, sede: e.target.value })}
                       style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: `1px solid ${borderLight}`, fontSize: '0.9rem' }}
                     >
                       {OPERATIONAL_SEDES.map(s => <option key={s} value={s}>{s}</option>)}
-                    </select>
+                    </HelpSelect>
                   </div>
                 </div>
 
@@ -5008,7 +5239,7 @@ export default function CentroManagers() {
                     <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.3rem' }}>
                       Nombre de Equipo
                     </label>
-                    <input
+                    <HelpInput helpKey="equipo"
                       placeholder="Ej: FENIX, ALFA, TITANES..."
                       value={newManager.equipo}
                       onChange={e => setNewManager({ ...newManager, equipo: e.target.value })}
@@ -5019,7 +5250,7 @@ export default function CentroManagers() {
                     <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.3rem' }}>
                       # Número
                     </label>
-                    <input
+                    <HelpInput helpKey="numEquipo"
                       placeholder="Ej: 1, 2, 4..."
                       value={newManager.numEquipo}
                       onChange={e => setNewManager({ ...newManager, numEquipo: e.target.value })}
@@ -5046,7 +5277,7 @@ export default function CentroManagers() {
                         const normE = normalizeTrainer(e);
                         const isSelected = (newManager.selectedTrainers || []).some(t => t === e || normalizeTrainer(t) === normE);
                         return (
-                          <button
+                          <HelpButton helpKey="seleccionarEntrenador"
                             type="button"
                             key={e}
                             onClick={() => {
@@ -5066,7 +5297,7 @@ export default function CentroManagers() {
                           >
                             {isSelected ? <CheckSquare size={14} color="#2563eb" /> : <Square size={14} color="#94a3b8" />}
                             <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{e}</span>
-                          </button>
+                          </HelpButton>
                         );
                       })}
                     </div>
@@ -5078,8 +5309,8 @@ export default function CentroManagers() {
                 </div>
 
                 <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '1rem' }}>
-                  <button type="button" onClick={() => setShowModal(false)} style={{ padding: '0.6rem 1.2rem', borderRadius: '8px', border: `1px solid ${borderLight}`, background: '#fff', color: textDark, fontWeight: 600, cursor: 'pointer' }}>Cancelar</button>
-                  <button type="submit" style={{ padding: '0.6rem 1.5rem', borderRadius: '8px', border: 'none', background: '#3b82f6', color: '#fff', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 4px rgba(59,130,246,0.3)' }}>Guardar Integrante</button>
+                  <HelpButton helpKey="cancelar" type="button" onClick={() => setShowModal(false)} style={{ padding: '0.6rem 1.2rem', borderRadius: '8px', border: `1px solid ${borderLight}`, background: '#fff', color: textDark, fontWeight: 600, cursor: 'pointer' }}>Cancelar</HelpButton>
+                  <HelpButton helpKey="guardarIntegrante" type="submit" style={{ padding: '0.6rem 1.5rem', borderRadius: '8px', border: 'none', background: '#3b82f6', color: '#fff', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 4px rgba(59,130,246,0.3)' }}>Guardar Integrante</HelpButton>
                 </div>
               </form>
             )}
@@ -5092,19 +5323,19 @@ export default function CentroManagers() {
                     <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.3rem' }}>
                       Sede *
                     </label>
-                    <select
+                    <HelpSelect helpKey="sede"
                       value={newTeam.sede}
                       onChange={e => setNewTeam({ ...newTeam, sede: e.target.value })}
                       style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: `1px solid ${borderLight}`, fontSize: '0.9rem' }}
                     >
                       {OPERATIONAL_SEDES.map(s => <option key={s} value={s}>{s}</option>)}
-                    </select>
+                    </HelpSelect>
                   </div>
                   <div>
                     <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.3rem' }}>
                       Nombre del Equipo *
                     </label>
-                    <input
+                    <HelpInput helpKey="equipo"
                       required
                       placeholder="Ej: TITANES, FENIX, IMPARABLES..."
                       value={newTeam.equipo}
@@ -5116,7 +5347,7 @@ export default function CentroManagers() {
                     <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.3rem' }}>
                       # Número
                     </label>
-                    <input
+                    <HelpInput helpKey="numEquipo"
                       placeholder="Ej: 1"
                       value={newTeam.numEquipo}
                       onChange={e => setNewTeam({ ...newTeam, numEquipo: e.target.value })}
@@ -5136,7 +5367,7 @@ export default function CentroManagers() {
                         const normE = normalizeTrainer(e);
                         const isSelected = (newTeam.selectedTrainers || []).some(t => t === e || normalizeTrainer(t) === normE);
                         return (
-                          <button
+                          <HelpButton helpKey="seleccionarEntrenador"
                             type="button"
                             key={e}
                             onClick={() => {
@@ -5156,7 +5387,7 @@ export default function CentroManagers() {
                           >
                             {isSelected ? <CheckSquare size={14} color="#2563eb" /> : <Square size={14} color="#94a3b8" />}
                             <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{e}</span>
-                          </button>
+                          </HelpButton>
                         );
                       })}
                     </div>
@@ -5174,13 +5405,13 @@ export default function CentroManagers() {
                     <span style={{ fontSize: '0.85rem', fontWeight: 800, color: '#854d0e' }}>Capitán del Equipo</span>
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '0.8rem' }}>
-                    <input
+                    <HelpInput helpKey="nombre"
                       placeholder="Nombre del Capitán"
                       value={newTeam.capitan.nombre}
                       onChange={e => setNewTeam({ ...newTeam, capitan: { ...newTeam.capitan, nombre: e.target.value } })}
                       style={{ padding: '0.55rem', borderRadius: '6px', border: '1px solid #fde047', fontSize: '0.85rem', background: '#fff' }}
                     />
-                    <input
+                    <HelpInput helpKey="telefono"
                       placeholder="Teléfono Capitán"
                       value={newTeam.capitan.telefono}
                       onChange={e => setNewTeam({ ...newTeam, capitan: { ...newTeam.capitan, telefono: e.target.value } })}
@@ -5195,7 +5426,7 @@ export default function CentroManagers() {
                     <label style={{ fontSize: '0.85rem', fontWeight: 700, color: textDark }}>
                       Managers del Equipo ({newTeam.managers.length})
                     </label>
-                    <button
+                    <HelpButton helpKey="agregarIntegrante"
                       type="button"
                       onClick={() => setNewTeam({
                         ...newTeam,
@@ -5204,13 +5435,13 @@ export default function CentroManagers() {
                       style={{ background: '#ecfdf5', border: '1px solid #a7f3d0', color: '#059669', fontSize: '0.78rem', fontWeight: 700, padding: '0.3rem 0.6rem', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
                     >
                       <UserPlus size={14} /> + Agregar Manager
-                    </button>
+                    </HelpButton>
                   </div>
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '180px', overflowY: 'auto' }}>
                     {newTeam.managers.map((m, idx) => (
                       <div key={m.id || idx} style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr auto', gap: '0.5rem', alignItems: 'center' }}>
-                        <input
+                        <HelpInput helpKey="nombre"
                           placeholder={`Manager #${idx + 1}`}
                           value={m.nombre}
                           onChange={e => {
@@ -5220,7 +5451,7 @@ export default function CentroManagers() {
                           }}
                           style={{ padding: '0.5rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.85rem' }}
                         />
-                        <input
+                        <HelpInput helpKey="telefono"
                           placeholder="Teléfono"
                           value={m.telefono}
                           onChange={e => {
@@ -5231,7 +5462,7 @@ export default function CentroManagers() {
                           style={{ padding: '0.5rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.85rem' }}
                         />
                         {newTeam.managers.length > 1 && (
-                          <button
+                          <HelpButton helpKey="quitarFila"
                             type="button"
                             onClick={() => {
                               const updated = newTeam.managers.filter((_, i) => i !== idx);
@@ -5240,7 +5471,7 @@ export default function CentroManagers() {
                             style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626', padding: '0.45rem', borderRadius: '6px', cursor: 'pointer' }}
                           >
                             <Trash2 size={14} />
-                          </button>
+                          </HelpButton>
                         )}
                       </div>
                     ))}
@@ -5248,8 +5479,8 @@ export default function CentroManagers() {
                 </div>
 
                 <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '1rem' }}>
-                  <button type="button" onClick={() => setShowModal(false)} style={{ padding: '0.6rem 1.2rem', borderRadius: '8px', border: `1px solid ${borderLight}`, background: '#fff', color: textDark, fontWeight: 600, cursor: 'pointer' }}>Cancelar</button>
-                  <button type="submit" style={{ padding: '0.6rem 1.5rem', borderRadius: '8px', border: 'none', background: '#3b82f6', color: '#fff', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 4px rgba(59,130,246,0.3)' }}>Guardar Equipo Completo</button>
+                  <HelpButton helpKey="cancelar" type="button" onClick={() => setShowModal(false)} style={{ padding: '0.6rem 1.2rem', borderRadius: '8px', border: `1px solid ${borderLight}`, background: '#fff', color: textDark, fontWeight: 600, cursor: 'pointer' }}>Cancelar</HelpButton>
+                  <HelpButton helpKey="guardarEquipo" type="submit" style={{ padding: '0.6rem 1.5rem', borderRadius: '8px', border: 'none', background: '#3b82f6', color: '#fff', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 4px rgba(59,130,246,0.3)' }}>Guardar Equipo Completo</HelpButton>
                 </div>
               </form>
             )}
@@ -5274,10 +5505,11 @@ export default function CentroManagers() {
                   Sede: {editTeamModal.originalSede} • {editTeamModal.members.length} integrantes
                 </p>
               </div>
-              <button onClick={() => setEditTeamModal(null)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: textMuted }}>
+              <HelpButton helpKey="cerrar" onClick={() => setEditTeamModal(null)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: textMuted }}>
                 <X size={20} />
-              </button>
+              </HelpButton>
             </div>
+            <ManagersHelpMode />
 
             <form onSubmit={handleSaveEditTeam} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr 1fr', gap: '0.8rem' }}>
@@ -5285,19 +5517,19 @@ export default function CentroManagers() {
                   <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.3rem' }}>
                     Sede
                   </label>
-                  <select
+                  <HelpSelect helpKey="sede"
                     value={editTeamModal.sede}
                     onChange={e => setEditTeamModal({ ...editTeamModal, sede: e.target.value })}
                     style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: `1px solid ${borderLight}`, fontSize: '0.9rem' }}
                   >
                     {OPERATIONAL_SEDES.map(s => <option key={s} value={s}>{s}</option>)}
-                  </select>
+                  </HelpSelect>
                 </div>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.3rem' }}>
                     Nombre del Equipo *
                   </label>
-                  <input
+                  <HelpInput helpKey="equipo"
                     required
                     value={editTeamModal.equipo}
                     onChange={e => setEditTeamModal({ ...editTeamModal, equipo: e.target.value })}
@@ -5308,7 +5540,7 @@ export default function CentroManagers() {
                   <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.3rem' }}>
                     # Número
                   </label>
-                  <input
+                  <HelpInput helpKey="numEquipo"
                     value={editTeamModal.numEquipo}
                     onChange={e => setEditTeamModal({ ...editTeamModal, numEquipo: e.target.value })}
                     style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: `1px solid ${borderLight}`, fontSize: '0.9rem' }}
@@ -5334,7 +5566,7 @@ export default function CentroManagers() {
                       const normE = normalizeTrainer(e);
                       const isSelected = (editTeamModal.selectedTrainers || []).some(t => t === e || normalizeTrainer(t) === normE);
                       return (
-                        <button
+                        <HelpButton helpKey="seleccionarEntrenador"
                           type="button"
                           key={e}
                           onClick={() => {
@@ -5354,7 +5586,7 @@ export default function CentroManagers() {
                         >
                           {isSelected ? <CheckSquare size={14} color="#2563eb" /> : <Square size={14} color="#94a3b8" />}
                           <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{e}</span>
-                        </button>
+                        </HelpButton>
                       );
                     })}
                   </div>
@@ -5371,7 +5603,7 @@ export default function CentroManagers() {
                   <label style={{ fontSize: '0.85rem', fontWeight: 800, color: textDark }}>
                     Roster de Integrantes ({editTeamModal.members.length})
                   </label>
-                  <button
+                  <HelpButton helpKey="agregarIntegrante"
                     type="button"
                     onClick={() => setEditTeamModal({
                       ...editTeamModal,
@@ -5380,7 +5612,7 @@ export default function CentroManagers() {
                     style={{ background: '#eff6ff', border: '1px solid #bfdbfe', color: '#1d4ed8', fontSize: '0.78rem', fontWeight: 700, padding: '0.3rem 0.6rem', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
                   >
                     <UserPlus size={14} /> + Agregar Integrante
-                  </button>
+                  </HelpButton>
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', maxHeight: '240px', overflowY: 'auto', paddingRight: '4px' }}>
@@ -5388,7 +5620,7 @@ export default function CentroManagers() {
                     const isCap = m.rol === 'Capitan';
                     return (
                       <div key={m.id || idx} style={{ display: 'grid', gridTemplateColumns: '120px 1.5fr 1fr auto', gap: '0.5rem', alignItems: 'center', background: isCap ? '#fefce8' : '#f8fafc', padding: '0.4rem 0.6rem', borderRadius: '8px', border: `1px solid ${isCap ? '#fef08a' : borderLight}` }}>
-                        <select
+                        <HelpSelect helpKey="rol"
                           value={m.rol}
                           onChange={e => {
                             const updated = [...editTeamModal.members];
@@ -5399,8 +5631,8 @@ export default function CentroManagers() {
                         >
                           <option value="Manager">Manager</option>
                           <option value="Capitan">👑 Capitán</option>
-                        </select>
-                        <input
+                        </HelpSelect>
+                        <HelpInput helpKey="nombre"
                           placeholder="Nombre Completo"
                           value={m.nombre}
                           onChange={e => {
@@ -5410,7 +5642,7 @@ export default function CentroManagers() {
                           }}
                           style={{ padding: '0.45rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.85rem', fontWeight: 600 }}
                         />
-                        <input
+                        <HelpInput helpKey="telefono"
                           placeholder="Teléfono"
                           value={m.telefono}
                           onChange={e => {
@@ -5420,7 +5652,7 @@ export default function CentroManagers() {
                           }}
                           style={{ padding: '0.45rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.85rem' }}
                         />
-                        <button
+                        <HelpButton helpKey="quitarFila"
                           type="button"
                           onClick={() => {
                             const updated = editTeamModal.members.filter((_, i) => i !== idx);
@@ -5430,7 +5662,7 @@ export default function CentroManagers() {
                           style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626', padding: '0.45rem', borderRadius: '6px', cursor: 'pointer' }}
                         >
                           <Trash2 size={14} />
-                        </button>
+                        </HelpButton>
                       </div>
                     );
                   })}
@@ -5438,8 +5670,8 @@ export default function CentroManagers() {
               </div>
 
               <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '1rem' }}>
-                <button type="button" onClick={() => setEditTeamModal(null)} style={{ padding: '0.6rem 1.2rem', borderRadius: '8px', border: `1px solid ${borderLight}`, background: '#fff', color: textDark, fontWeight: 600, cursor: 'pointer' }}>Cancelar</button>
-                <button type="submit" style={{ padding: '0.6rem 1.5rem', borderRadius: '8px', border: 'none', background: '#3b82f6', color: '#fff', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 4px rgba(59,130,246,0.3)' }}>Guardar Cambios del Equipo</button>
+                <HelpButton helpKey="cancelar" type="button" onClick={() => setEditTeamModal(null)} style={{ padding: '0.6rem 1.2rem', borderRadius: '8px', border: `1px solid ${borderLight}`, background: '#fff', color: textDark, fontWeight: 600, cursor: 'pointer' }}>Cancelar</HelpButton>
+                <HelpButton helpKey="guardarEquipo" type="submit" style={{ padding: '0.6rem 1.5rem', borderRadius: '8px', border: 'none', background: '#3b82f6', color: '#fff', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 4px rgba(59,130,246,0.3)' }}>Guardar Cambios del Equipo</HelpButton>
               </div>
             </form>
 
@@ -5458,10 +5690,11 @@ export default function CentroManagers() {
               <h2 style={{ margin: 0, color: textDark, fontSize: '1.25rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <Edit3 size={20} color="#3b82f6" /> Editar Integrante: {editIndividualModal.nombre}
               </h2>
-              <button onClick={() => setEditIndividualModal(null)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: textMuted }}>
+              <HelpButton helpKey="cerrar" onClick={() => setEditIndividualModal(null)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: textMuted }}>
                 <X size={20} />
-              </button>
+              </HelpButton>
             </div>
+            <ManagersHelpMode />
 
             <form onSubmit={handleSaveEditIndividual} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1rem' }}>
@@ -5469,7 +5702,7 @@ export default function CentroManagers() {
                   <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.3rem' }}>
                     Nombre Completo *
                   </label>
-                  <input
+                  <HelpInput helpKey="nombre"
                     required
                     value={editIndividualModal.nombre}
                     onChange={e => setEditIndividualModal({ ...editIndividualModal, nombre: e.target.value })}
@@ -5480,14 +5713,14 @@ export default function CentroManagers() {
                   <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.3rem' }}>
                     Rol
                   </label>
-                  <select
+                  <HelpSelect helpKey="rol"
                     value={editIndividualModal.rol}
                     onChange={e => setEditIndividualModal({ ...editIndividualModal, rol: e.target.value })}
                     style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: `1px solid ${borderLight}`, fontSize: '0.9rem', fontWeight: 600 }}
                   >
                     <option value="Manager">Manager</option>
                     <option value="Capitan">👑 Capitán</option>
-                  </select>
+                  </HelpSelect>
                 </div>
               </div>
 
@@ -5496,7 +5729,7 @@ export default function CentroManagers() {
                   <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.3rem' }}>
                     Teléfono WhatsApp
                   </label>
-                  <input
+                  <HelpInput helpKey="telefono"
                     value={editIndividualModal.telefono || ''}
                     onChange={e => setEditIndividualModal({ ...editIndividualModal, telefono: e.target.value })}
                     style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: `1px solid ${borderLight}`, fontSize: '0.9rem' }}
@@ -5506,13 +5739,13 @@ export default function CentroManagers() {
                   <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.3rem' }}>
                     Sede
                   </label>
-                  <select
+                  <HelpSelect helpKey="sede"
                     value={editIndividualModal.sede}
                     onChange={e => setEditIndividualModal({ ...editIndividualModal, sede: e.target.value })}
                     style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: `1px solid ${borderLight}`, fontSize: '0.9rem' }}
                   >
                     {OPERATIONAL_SEDES.map(s => <option key={s} value={s}>{s}</option>)}
-                  </select>
+                  </HelpSelect>
                 </div>
               </div>
 
@@ -5521,7 +5754,7 @@ export default function CentroManagers() {
                   <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.3rem' }}>
                     Equipo
                   </label>
-                  <input
+                  <HelpInput helpKey="equipo"
                     value={editIndividualModal.equipo || ''}
                     onChange={e => setEditIndividualModal({ ...editIndividualModal, equipo: e.target.value })}
                     style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: `1px solid ${borderLight}`, fontSize: '0.9rem' }}
@@ -5531,7 +5764,7 @@ export default function CentroManagers() {
                   <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.3rem' }}>
                     # Número
                   </label>
-                  <input
+                  <HelpInput helpKey="numEquipo"
                     value={editIndividualModal.numEquipo || ''}
                     onChange={e => setEditIndividualModal({ ...editIndividualModal, numEquipo: e.target.value })}
                     style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: `1px solid ${borderLight}`, fontSize: '0.9rem' }}
@@ -5557,7 +5790,7 @@ export default function CentroManagers() {
                       const normE = normalizeTrainer(e);
                       const isSelected = (editIndividualModal.selectedTrainers || []).some(t => t === e || normalizeTrainer(t) === normE);
                       return (
-                        <button
+                        <HelpButton helpKey="seleccionarEntrenador"
                           type="button"
                           key={e}
                           onClick={() => {
@@ -5577,7 +5810,7 @@ export default function CentroManagers() {
                         >
                           {isSelected ? <CheckSquare size={14} color="#2563eb" /> : <Square size={14} color="#94a3b8" />}
                           <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{e}</span>
-                        </button>
+                        </HelpButton>
                       );
                     })}
                   </div>
@@ -5600,7 +5833,7 @@ export default function CentroManagers() {
                   )}
                 </div>
                 {canChangeStatus ? (
-                  <select
+                  <HelpSelect helpKey="estado"
                     value={editIndividualModal.estado || 'Activo'}
                     onChange={e => setEditIndividualModal({ ...editIndividualModal, estado: e.target.value })}
                     style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: `1px solid ${borderLight}`, fontSize: '0.9rem', fontWeight: 600 }}
@@ -5609,7 +5842,7 @@ export default function CentroManagers() {
                     <option value="Graduado">🎓 Graduado</option>
                     <option value="Desertor">⚠️ Desertor</option>
                     <option value="Archivado">📦 Archivado</option>
-                  </select>
+                  </HelpSelect>
                 ) : (
                   <div style={{ padding: '0.6rem 0.8rem', borderRadius: '8px', background: '#f8fafc', border: `1px solid ${borderLight}`, color: '#64748b', fontSize: '0.88rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <Lock size={14} color="#dc2626" />
@@ -5620,8 +5853,8 @@ export default function CentroManagers() {
               </div>
 
               <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '1rem' }}>
-                <button type="button" onClick={() => setEditIndividualModal(null)} style={{ padding: '0.6rem 1.2rem', borderRadius: '8px', border: `1px solid ${borderLight}`, background: '#fff', color: textDark, fontWeight: 600, cursor: 'pointer' }}>Cancelar</button>
-                <button type="submit" style={{ padding: '0.6rem 1.5rem', borderRadius: '8px', border: 'none', background: '#3b82f6', color: '#fff', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 4px rgba(59,130,246,0.3)' }}>Guardar Cambios</button>
+                <HelpButton helpKey="cancelar" type="button" onClick={() => setEditIndividualModal(null)} style={{ padding: '0.6rem 1.2rem', borderRadius: '8px', border: `1px solid ${borderLight}`, background: '#fff', color: textDark, fontWeight: 600, cursor: 'pointer' }}>Cancelar</HelpButton>
+                <HelpButton helpKey="guardarCambios" type="submit" disabled={isSavingIndividual} style={{ padding: '0.6rem 1.5rem', borderRadius: '8px', border: 'none', background: '#3b82f6', color: '#fff', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 4px rgba(59,130,246,0.3)' }}>{isSavingIndividual ? 'Guardando en Firestore…' : 'Guardar Cambios'}</HelpButton>
               </div>
             </form>
 
@@ -5634,26 +5867,27 @@ export default function CentroManagers() {
       {/* ======================================================== */}
       {deleteConfirm && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(3px)', zIndex: 1100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
-          <div style={{ background: bgCard, width: '100%', maxWidth: '440px', borderRadius: '16px', padding: '2rem', boxShadow: '0 25px 30px -5px rgba(0,0,0,0.2)', border: `1px solid ${borderLight}`, textAlign: 'center' }}>
+          <div style={{ background: bgCard, width: '100%', maxWidth: '440px', maxHeight: '90dvh', overflowY: 'auto', boxSizing: 'border-box', borderRadius: '16px', padding: '2rem', boxShadow: '0 25px 30px -5px rgba(0,0,0,0.2)', border: `1px solid ${borderLight}`, textAlign: 'center' }}>
             <div style={{ background: '#fef2f2', width: '56px', height: '56px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem auto' }}>
               <AlertTriangle size={28} color="#dc2626" />
             </div>
             <h3 style={{ margin: '0 0 0.5rem 0', color: textDark, fontSize: '1.2rem', fontWeight: 800 }}>
               ¿Confirmar Eliminación?
             </h3>
+            <ManagersHelpMode />
             <p style={{ color: textMuted, fontSize: '0.88rem', margin: '0 0 1.5rem 0' }}>
               {deleteConfirm.type === 'team'
                 ? `¿Estás seguro de que deseas eliminar el equipo "${deleteConfirm.name}" y a todos sus integrantes de ${deleteConfirm.sede}?`
                 : `¿Estás seguro de que deseas eliminar a "${deleteConfirm.name}"?`}
             </p>
             <div style={{ display: 'flex', gap: '0.8rem', justifyContent: 'center' }}>
-              <button
+              <HelpButton helpKey="cancelar"
                 onClick={() => setDeleteConfirm(null)}
                 style={{ padding: '0.6rem 1.2rem', borderRadius: '8px', border: `1px solid ${borderLight}`, background: '#fff', color: textDark, fontWeight: 600, cursor: 'pointer' }}
               >
                 Cancelar
-              </button>
-              <button
+              </HelpButton>
+              <HelpButton helpKey="confirmarEliminar"
                 onClick={() => {
                   if (deleteConfirm.type === 'team') {
                     handleDeleteTeam(deleteConfirm.sede, deleteConfirm.equipo);
@@ -5664,7 +5898,7 @@ export default function CentroManagers() {
                 style={{ padding: '0.6rem 1.4rem', borderRadius: '8px', border: 'none', background: '#dc2626', color: '#fff', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 4px rgba(220,38,38,0.3)' }}
               >
                 Sí, Eliminar
-              </button>
+              </HelpButton>
             </div>
           </div>
         </div>
@@ -5675,7 +5909,7 @@ export default function CentroManagers() {
       {/* ======================================================== */}
       {groupModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(3px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
-          <div style={{ background: bgCard, width: '100%', maxWidth: '540px', borderRadius: '12px', padding: '2rem', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.15)', border: `1px solid ${borderLight}` }}>
+          <div style={{ background: bgCard, width: '100%', maxWidth: '540px', maxHeight: '90dvh', overflowY: 'auto', boxSizing: 'border-box', borderRadius: '12px', padding: '2rem', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.15)', border: `1px solid ${borderLight}` }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
               <h2 style={{ margin: 0, color: textDark, fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 800 }}>
                 <CountryFlag sede={groupModal.sede} /> {formatTeamDisplay(groupModal.equipo, groupModal.numEquipo)}
@@ -5688,19 +5922,21 @@ export default function CentroManagers() {
             <p style={{ margin: '0 0 1.2rem 0', color: textMuted, fontSize: '0.85rem' }}>
               🎓 Entrenador(es): <strong>{groupModal.entrenadorUnico}</strong> • Sede: <strong>{groupModal.sede}</strong>
             </p>
+            <ManagersHelpMode />
             
             <div style={{ marginBottom: '1.2rem' }}>
               <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.4rem' }}>
                 Fecha de la Llamada:
               </label>
-              <input type="date" value={groupCallDate} onChange={e => setGroupCallDate(e.target.value)} style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.9rem' }} />
+              <HelpInput helpKey="fechaGrupal" type="date" value={groupCallDate} disabled={isSavingGroupCall} onChange={e => setGroupCallDate(e.target.value)} style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.9rem' }} />
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
               <span style={{ fontSize: '0.8rem', fontWeight: 700, color: textDark }}>Asistencia Individual:</span>
               <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <button
+                <HelpButton helpKey="todosSi"
                   type="button"
+                  disabled={isSavingGroupCall}
                   onClick={() => {
                     const allTrue = {};
                     groupModal.managers.forEach(m => allTrue[m.id] = true);
@@ -5709,9 +5945,10 @@ export default function CentroManagers() {
                   style={{ border: 'none', background: '#ecfdf5', color: '#059669', fontSize: '0.75rem', fontWeight: 700, padding: '0.2rem 0.5rem', borderRadius: '4px', cursor: 'pointer' }}
                 >
                   Marcar Todos ✅
-                </button>
-                <button
+                </HelpButton>
+                <HelpButton helpKey="todosNo"
                   type="button"
+                  disabled={isSavingGroupCall}
                   onClick={() => {
                     const allFalse = {};
                     groupModal.managers.forEach(m => allFalse[m.id] = false);
@@ -5720,7 +5957,7 @@ export default function CentroManagers() {
                   style={{ border: 'none', background: '#fef2f2', color: '#dc2626', fontSize: '0.75rem', fontWeight: 700, padding: '0.2rem 0.5rem', borderRadius: '4px', cursor: 'pointer' }}
                 >
                   Marcar Todos ❌
-                </button>
+                </HelpButton>
               </div>
             </div>
             
@@ -5737,13 +5974,13 @@ export default function CentroManagers() {
                         </span>
                       )}
                       <span style={{ fontSize: '0.9rem', fontWeight: 600, color: textDark }}>{m.nombre}</span>
-                      {m.telefono && <a href={getWhatsAppUrl(m.telefono, m.sede || filterSede)} target='_blank' rel='noreferrer' style={{ fontSize: '0.75rem', color: '#10b981', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '2px', marginLeft: '4px' }}>💬 {m.telefono}</a>}
+                      {m.telefono && <HelpLink helpKey="whatsapp" href={getWhatsAppUrl(m.telefono, m.sede || filterSede)} target='_blank' rel='noreferrer' style={{ fontSize: '0.75rem', color: '#10b981', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '2px', marginLeft: '4px' }}>💬 {m.telefono}</HelpLink>}
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                       <span style={{ fontSize: '0.8rem', fontWeight: 700, color: checked ? '#16a34a' : '#dc2626' }}>
                         {checked ? 'Conectó ✅' : 'No Asistió ❌'}
                       </span>
-                      <input type="checkbox" checked={checked} onChange={e => setGroupCallAttendance({...groupCallAttendance, [m.id]: e.target.checked})} style={{ width: '18px', height: '18px', accentColor: '#10b981', cursor: 'pointer' }} />
+                      <HelpInput helpKey="asistencia" type="checkbox" checked={checked} disabled={isSavingGroupCall} onChange={e => setGroupCallAttendance({...groupCallAttendance, [m.id]: e.target.checked})} style={{ width: '18px', height: '18px', accentColor: '#10b981', cursor: 'pointer' }} />
                     </div>
                   </label>
                 );
@@ -5756,37 +5993,38 @@ export default function CentroManagers() {
               <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.4rem' }}>
                 📝 Nota de seguimiento del equipo (opcional):
               </label>
-              <textarea
+              <HelpTextarea helpKey="nota"
                 value={groupCallNota}
+                disabled={isSavingGroupCall}
                 onChange={e => setGroupCallNota(e.target.value)}
                 placeholder="Ej: el equipo llegó atrasado a 3 tareas del gate T-14, capitán sin evidencia..."
                 rows={3}
                 style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.85rem', fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box' }}
               />
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.5rem', fontSize: '0.8rem', fontWeight: 600, color: '#92400e', cursor: 'pointer' }}>
-                <input type="checkbox" checked={groupCallEsQuiebre} onChange={e => setGroupCallEsQuiebre(e.target.checked)} style={{ width: '16px', height: '16px', accentColor: '#dc2626', cursor: 'pointer' }} />
+                <HelpInput helpKey="quiebre" type="checkbox" checked={groupCallEsQuiebre} disabled={isSavingGroupCall} onChange={e => setGroupCallEsQuiebre(e.target.checked)} style={{ width: '16px', height: '16px', accentColor: '#dc2626', cursor: 'pointer' }} />
                 🚨 Marcar como quiebre (incumplimiento de compromiso, meta o estándar)
               </label>
               {groupCallEsQuiebre && (
                 <div style={{ display: 'flex', gap: '0.6rem', marginTop: '0.5rem' }}>
-                  <select value={groupCallCategoriaQuiebre} onChange={e => setGroupCallCategoriaQuiebre(e.target.value)} style={{ flex: 1, padding: '0.4rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.8rem' }}>
+                  <HelpSelect helpKey="categoria" value={groupCallCategoriaQuiebre} disabled={isSavingGroupCall} onChange={e => setGroupCallCategoriaQuiebre(e.target.value)} style={{ flex: 1, padding: '0.4rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.8rem' }}>
                     <option value="operativo">Quiebre operativo</option>
                     <option value="equipo">Quiebre de equipo</option>
                     <option value="participante">Quiebre de participante</option>
-                  </select>
-                  <select value={groupCallEstadoQuiebre} onChange={e => setGroupCallEstadoQuiebre(e.target.value)} style={{ flex: 1, padding: '0.4rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.8rem' }}>
+                  </HelpSelect>
+                  <HelpSelect helpKey="estadoQuiebre" value={groupCallEstadoQuiebre} disabled={isSavingGroupCall} onChange={e => setGroupCallEstadoQuiebre(e.target.value)} style={{ flex: 1, padding: '0.4rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.8rem' }}>
                     <option value="riesgo_alto">Riesgo Alto</option>
                     <option value="vencido">Vencido</option>
                     <option value="bloqueado">Bloqueado</option>
                     <option value="requiere_escalamiento">Requiere Escalamiento</option>
-                  </select>
+                  </HelpSelect>
                 </div>
               )}
             </div>
 
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-              <button onClick={() => { setGroupModal(null); setGroupCallNota(''); setGroupCallEsQuiebre(false); }} style={{ padding: '0.6rem 1.2rem', borderRadius: '6px', border: `1px solid ${borderLight}`, background: '#fff', color: textDark, fontWeight: 600, cursor: 'pointer' }}>Cancelar</button>
-              <button onClick={handleSaveGroupCall} style={{ padding: '0.6rem 1.4rem', borderRadius: '6px', border: 'none', background: '#10b981', color: '#fff', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 4px rgba(16,185,129,0.3)' }}>Guardar Asistencia</button>
+              <HelpButton helpKey="cancelar" disabled={isSavingGroupCall} onClick={() => { setGroupModal(null); setGroupCallOperationId(''); setGroupCallNota(''); setGroupCallEsQuiebre(false); }} style={{ padding: '0.6rem 1.2rem', borderRadius: '6px', border: `1px solid ${borderLight}`, background: '#fff', color: textDark, fontWeight: 600, cursor: isSavingGroupCall ? 'not-allowed' : 'pointer' }}>Cancelar</HelpButton>
+              <HelpButton helpKey="guardarAsistencia" disabled={isSavingGroupCall} onClick={handleSaveGroupCall} style={{ padding: '0.6rem 1.4rem', borderRadius: '6px', border: 'none', background: '#10b981', color: '#fff', fontWeight: 700, cursor: isSavingGroupCall ? 'not-allowed' : 'pointer', boxShadow: '0 2px 4px rgba(16,185,129,0.3)' }}>{isSavingGroupCall ? 'Guardando…' : 'Guardar Asistencia'}</HelpButton>
             </div>
           </div>
         </div>
@@ -5799,7 +6037,7 @@ export default function CentroManagers() {
       {notaModal && (() => {
         const equipoKeyManager = notaModal.equipo ? `${normalizeSede(notaModal.sede)}_${notaModal.equipo}` : null;
         const notasDeEstaPersona = notasSeguimiento
-          .filter(n => (n.tipo === 'individual' && n.managerId === notaModal.id) || (n.tipo === 'grupal' && equipoKeyManager && n.equipoKey === equipoKeyManager))
+          .filter(n => managerNoteMatches(n, notaModal, managers) || (n.tipo === 'grupal' && equipoKeyManager && n.equipoKey === equipoKeyManager))
           .sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
         const CATEGORIA_LABEL = { operativo: 'Quiebre operativo', equipo: 'Quiebre de equipo', participante: 'Quiebre de participante' };
         const ESTADO_LABEL = { riesgo_alto: 'Riesgo Alto', vencido: 'Vencido', bloqueado: 'Bloqueado', requiere_escalamiento: 'Requiere Escalamiento' };
@@ -5810,17 +6048,25 @@ export default function CentroManagers() {
                 <h2 style={{ margin: 0, color: textDark, fontSize: '1.15rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                   📝 Notas de Seguimiento — {notaModal.nombre}
                 </h2>
-                <button onClick={() => setNotaModal(null)} title="Cerrar" style={{ background: '#f1f5f9', border: 'none', borderRadius: '6px', padding: '0.3rem', cursor: 'pointer', color: textMuted }}>
+                <HelpButton helpKey="cerrar" onClick={() => setNotaModal(null)} title="Cerrar" style={{ background: '#f1f5f9', border: 'none', borderRadius: '6px', padding: '0.3rem', cursor: 'pointer', color: textMuted }}>
                   <X size={16} />
-                </button>
+                </HelpButton>
               </div>
               <p style={{ margin: '0 0 1rem 0', fontSize: '0.8rem', color: textMuted }}>
                 {formatTeamDisplay(notaModal.equipo, notaModal.numEquipo)} · {notaModal.sede}
                 {!userCanViewAllNotas && ' · Solo ves las notas que TÚ escribiste'}
               </p>
+              {notasSeguimientoStatus !== 'ready' && (
+                <p role="status" style={{ fontSize: '0.75rem', color: notasSeguimientoStatus === 'error' ? '#b91c1c' : textMuted }}>
+                  {notasSeguimientoStatus === 'loading' && 'Cargando notas de seguimiento…'}
+                  {notasSeguimientoStatus === 'stale' && 'Mostrando notas en caché; esperando confirmación del servidor.'}
+                  {notasSeguimientoStatus === 'error' && notasSeguimientoError}
+                </p>
+              )}
+              <ManagersHelpMode />
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem', marginBottom: '1.2rem' }}>
-                {notasDeEstaPersona.length === 0 && (
+                {notasDeEstaPersona.length === 0 && notasSeguimientoStatus === 'ready' && (
                   <p style={{ fontSize: '0.85rem', color: textMuted, fontStyle: 'italic' }}>Todavía no hay notas registradas.</p>
                 )}
                 {notasDeEstaPersona.map(n => (
@@ -5847,14 +6093,14 @@ export default function CentroManagers() {
 
                     {userCanReplyNota && (
                       <div style={{ display: 'flex', gap: '0.4rem', marginTop: '0.5rem' }}>
-                        <input
+                        <HelpInput helpKey="respuesta"
                           type="text"
                           value={respuestaTexto[n.id] || ''}
                           onChange={e => setRespuestaTexto(prev => ({ ...prev, [n.id]: e.target.value }))}
                           placeholder="Responder como CMJ..."
                           style={{ flex: 1, padding: '0.4rem 0.6rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.8rem' }}
                         />
-                        <button onClick={() => handleResponderNota(n.id)} style={{ padding: '0.4rem 0.7rem', borderRadius: '6px', border: 'none', background: '#2563eb', color: '#fff', fontWeight: 700, fontSize: '0.78rem', cursor: 'pointer' }}>Enviar</button>
+                        <HelpButton helpKey="responder" onClick={() => handleResponderNota(n.id)} style={{ padding: '0.4rem 0.7rem', borderRadius: '6px', border: 'none', background: '#2563eb', color: '#fff', fontWeight: 700, fontSize: '0.78rem', cursor: 'pointer' }}>Enviar</HelpButton>
                       </div>
                     )}
                   </div>
@@ -5866,7 +6112,7 @@ export default function CentroManagers() {
                   <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.4rem' }}>
                     Agregar nota nueva:
                   </label>
-                  <textarea
+                  <HelpTextarea helpKey="nota"
                     value={nuevaNotaTexto}
                     onChange={e => setNuevaNotaTexto(e.target.value)}
                     placeholder="Ej: no confirmó su compromiso de esta semana, sin evidencia..."
@@ -5874,26 +6120,26 @@ export default function CentroManagers() {
                     style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.85rem', fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box' }}
                   />
                   <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.5rem', fontSize: '0.8rem', fontWeight: 600, color: '#92400e', cursor: 'pointer' }}>
-                    <input type="checkbox" checked={nuevaNotaEsQuiebre} onChange={e => setNuevaNotaEsQuiebre(e.target.checked)} style={{ width: '16px', height: '16px', accentColor: '#dc2626', cursor: 'pointer' }} />
+                    <HelpInput helpKey="quiebre" type="checkbox" checked={nuevaNotaEsQuiebre} onChange={e => setNuevaNotaEsQuiebre(e.target.checked)} style={{ width: '16px', height: '16px', accentColor: '#dc2626', cursor: 'pointer' }} />
                     🚨 Marcar como quiebre (incumplimiento de compromiso, meta o estándar)
                   </label>
                   {nuevaNotaEsQuiebre && (
                     <div style={{ display: 'flex', gap: '0.6rem', marginTop: '0.5rem' }}>
-                      <select value={nuevaNotaCategoria} onChange={e => setNuevaNotaCategoria(e.target.value)} style={{ flex: 1, padding: '0.4rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.8rem' }}>
+                      <HelpSelect helpKey="categoria" value={nuevaNotaCategoria} onChange={e => setNuevaNotaCategoria(e.target.value)} style={{ flex: 1, padding: '0.4rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.8rem' }}>
                         <option value="operativo">Quiebre operativo</option>
                         <option value="equipo">Quiebre de equipo</option>
                         <option value="participante">Quiebre de participante</option>
-                      </select>
-                      <select value={nuevaNotaEstado} onChange={e => setNuevaNotaEstado(e.target.value)} style={{ flex: 1, padding: '0.4rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.8rem' }}>
+                      </HelpSelect>
+                      <HelpSelect helpKey="estadoQuiebre" value={nuevaNotaEstado} onChange={e => setNuevaNotaEstado(e.target.value)} style={{ flex: 1, padding: '0.4rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.8rem' }}>
                         <option value="riesgo_alto">Riesgo Alto</option>
                         <option value="vencido">Vencido</option>
                         <option value="bloqueado">Bloqueado</option>
                         <option value="requiere_escalamiento">Requiere Escalamiento</option>
-                      </select>
+                      </HelpSelect>
                     </div>
                   )}
                   <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.6rem' }}>
-                    <button onClick={handleGuardarNotaIndividual} disabled={!nuevaNotaTexto.trim()} style={{ padding: '0.5rem 1rem', borderRadius: '6px', border: 'none', background: nuevaNotaTexto.trim() ? '#10b981' : '#94a3b8', color: '#fff', fontWeight: 700, fontSize: '0.85rem', cursor: nuevaNotaTexto.trim() ? 'pointer' : 'not-allowed' }}>Guardar Nota</button>
+                    <HelpButton helpKey="guardarNota" onClick={handleGuardarNotaIndividual} disabled={!nuevaNotaTexto.trim()} style={{ padding: '0.5rem 1rem', borderRadius: '6px', border: 'none', background: nuevaNotaTexto.trim() ? '#10b981' : '#94a3b8', color: '#fff', fontWeight: 700, fontSize: '0.85rem', cursor: nuevaNotaTexto.trim() ? 'pointer' : 'not-allowed' }}>Guardar Nota</HelpButton>
                   </div>
                 </div>
               )}
@@ -5914,12 +6160,12 @@ export default function CentroManagers() {
         
         // Notas del manager
         const notasManager = notasSeguimiento
-          .filter(n => (n.tipo === 'individual' && n.managerId === m.id) || (n.tipo === 'grupal' && n.equipoKey === equipoKey))
+          .filter(n => managerNoteMatches(n, m, managers) || (n.tipo === 'grupal' && n.equipoKey === equipoKey))
           .sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
 
         return (
           <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(3px)', zIndex: 1250, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }} onClick={() => setManagerCardModal(null)}>
-            <div onClick={e => e.stopPropagation()} style={{ background: bgCard, width: '100%', maxWidth: '420px', borderRadius: '12px', padding: '1.8rem', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.15)', border: `1px solid ${borderLight}`, borderTop: '4px solid #3b82f6' }}>
+            <div onClick={e => e.stopPropagation()} style={{ background: bgCard, width: '100%', maxWidth: '420px', maxHeight: '90dvh', overflowY: 'auto', boxSizing: 'border-box', borderRadius: '12px', padding: '1.8rem', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.15)', border: `1px solid ${borderLight}`, borderTop: '4px solid #3b82f6' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
                 <div>
                   <h2 style={{ margin: 0, color: textDark, fontSize: '1.2rem', fontWeight: 800 }}>
@@ -5929,9 +6175,9 @@ export default function CentroManagers() {
                     {m.rol} · {formatTeamDisplay(m.equipo, m.numEquipo)} · {m.sede}
                   </span>
                 </div>
-                <button onClick={() => setManagerCardModal(null)} style={{ background: '#f1f5f9', border: 'none', borderRadius: '6px', padding: '0.3rem', cursor: 'pointer', color: textMuted }}>
+                <HelpButton helpKey="cerrar" onClick={() => setManagerCardModal(null)} style={{ background: '#f1f5f9', border: 'none', borderRadius: '6px', padding: '0.3rem', cursor: 'pointer', color: textMuted }}>
                   <X size={16} />
-                </button>
+                </HelpButton>
               </div>
 
               <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
@@ -5939,18 +6185,33 @@ export default function CentroManagers() {
                   {m.estado}
                 </span>
                 {m.telefono && (
-                  <a href={getWhatsAppUrl(m.telefono)} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', background: '#ecfccb', color: '#b45309', padding: '0.2rem 0.6rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700 }}>
+                  <HelpLink helpKey="whatsapp" href={getWhatsAppUrl(m.telefono)} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', background: '#ecfccb', color: '#b45309', padding: '0.2rem 0.6rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700 }}>
                     📱 WA
-                  </a>
+                  </HelpLink>
                 )}
-                <button onClick={() => { setManagerCardModal(null); setNotaModal(m); }} style={{ border: 'none', background: '#e0e7ff', color: '#1d4ed8', padding: '0.2rem 0.6rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' }}>
+                <HelpButton helpKey="notas" onClick={() => { setManagerCardModal(null); setNotaModal(m); }} style={{ border: 'none', background: '#e0e7ff', color: '#1d4ed8', padding: '0.2rem 0.6rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' }}>
                   📝 {notasManager.length} Notas
-                </button>
+                </HelpButton>
               </div>
 
+              <ManagersHelpMode />
               <h3 style={{ fontSize: '0.9rem', color: textDark, borderBottom: `1px solid ${borderLight}`, paddingBottom: '0.3rem', marginBottom: '0.8rem' }}>
                 📊 Resumen de Llamadas ({llamadasEquipo.length} registradas al equipo)
               </h3>
+              {llamadasHistorialStatus !== 'ready' && (
+                <p role="status" style={{ fontSize: '0.75rem', color: llamadasHistorialStatus === 'error' ? '#b91c1c' : textMuted }}>
+                  {llamadasHistorialStatus === 'loading' && 'Cargando historial de llamadas…'}
+                  {llamadasHistorialStatus === 'stale' && 'Mostrando datos en caché; esperando confirmación del servidor.'}
+                  {llamadasHistorialStatus === 'error' && llamadasHistorialError}
+                </p>
+              )}
+              {notasSeguimientoStatus !== 'ready' && (
+                <p role="status" style={{ fontSize: '0.72rem', color: notasSeguimientoStatus === 'error' ? '#b91c1c' : textMuted }}>
+                  {notasSeguimientoStatus === 'loading' && 'Cargando comentarios…'}
+                  {notasSeguimientoStatus === 'stale' && 'Los comentarios visibles están en caché y pueden estar desactualizados.'}
+                  {notasSeguimientoStatus === 'error' && notasSeguimientoError}
+                </p>
+              )}
               
               <div style={{ background: '#f8fafc', padding: '0.8rem', borderRadius: '8px', border: `1px solid ${borderLight}`, marginBottom: '1rem' }}>
                 <div style={{ fontSize: '0.8rem', color: textMuted, marginBottom: '0.3rem' }}>
@@ -5963,16 +6224,41 @@ export default function CentroManagers() {
 
               <div style={{ maxHeight: '180px', overflowY: 'auto' }}>
                 {llamadasEquipo.map((l, i) => (
-                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.4rem 0', borderBottom: `1px solid ${borderLight}` }}>
+                  <div key={l.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.4rem 0', borderBottom: `1px solid ${borderLight}` }}>
                     <span style={{ fontSize: '0.8rem', color: textDark, fontWeight: 600 }}>Llamada {llamadasEquipo.length - i}</span>
                     <div style={{ textAlign: 'right' }}>
                       <div style={{ fontSize: '0.75rem', color: textMuted }}>{l.fecha}</div>
                       <div style={{ fontSize: '0.7rem', color: l.asistieron >= l.totalIntegrantes * 0.7 ? '#10b981' : '#f59e0b' }}>
                         Equipo: {l.asistieron}/{l.totalIntegrantes} asist.
                       </div>
+                      {notasManager.find(note => note.relatedCallId === l.id)?.nota && (
+                        <div style={{ fontSize: '0.7rem', color: textMuted, marginTop: '0.2rem' }}>
+                          Nota: {notasManager.find(note => note.relatedCallId === l.id).nota}
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
+                {llamadasEquipo.length === 0 && llamadasHistorialStatus === 'ready' && (
+                  <p style={{ fontSize: '0.75rem', color: textMuted }}>No hay llamadas grupales registradas para este equipo.</p>
+                )}
+              </div>
+              <h4 style={{ fontSize: '0.82rem', color: textDark, margin: '1rem 0 0.4rem' }}>Historial individual de {m.nombre}</h4>
+              <div style={{ maxHeight: '160px', overflowY: 'auto' }}>
+                {(Array.isArray(m.llamadasHistorial) ? m.llamadasHistorial : [])
+                  .slice().sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''))
+                  .map(call => (
+                    <div key={call.id} style={{ padding: '0.35rem 0', borderBottom: `1px solid ${borderLight}`, fontSize: '0.75rem', color: textMuted }}>
+                      {call.fecha || 'Sin fecha'} · {call.tipo === 'grupal' ? 'Grupal' : 'Individual'} · {call.asistio ? 'Asistió' : 'No asistió'}
+                    </div>
+                  ))}
+                {(!Array.isArray(m.llamadasHistorial) || m.llamadasHistorial.length === 0) && (
+                  <p style={{ fontSize: '0.75rem', color: textMuted }}>
+                    {llamadasHistorialStatus === 'ready'
+                      ? 'No hay eventos individuales históricos disponibles para este manager.'
+                      : 'El historial individual no está verificado todavía.'}
+                  </p>
+                )}
               </div>
 
             </div>
@@ -5987,18 +6273,19 @@ export default function CentroManagers() {
         const tc = getTrainerCardStats(trainerCardModal);
         return (
           <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(3px)', zIndex: 1200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }} onClick={() => setTrainerCardModal(null)}>
-            <div onClick={e => e.stopPropagation()} style={{ background: bgCard, width: '100%', maxWidth: '440px', borderRadius: '12px', padding: '1.8rem', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.15)', border: `1px solid ${borderLight}`, borderTop: '4px solid #7c3aed' }}>
+            <div onClick={e => e.stopPropagation()} style={{ background: bgCard, width: '100%', maxWidth: '440px', maxHeight: '90dvh', overflowY: 'auto', boxSizing: 'border-box', borderRadius: '12px', padding: '1.8rem', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.15)', border: `1px solid ${borderLight}`, borderTop: '4px solid #7c3aed' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
                 <h2 style={{ margin: 0, color: textDark, fontSize: '1.2rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                   🎓 {trainerCardModal}
                 </h2>
-                <button onClick={() => setTrainerCardModal(null)} title="Cerrar" style={{ background: '#f1f5f9', border: 'none', borderRadius: '6px', padding: '0.3rem', cursor: 'pointer', color: textMuted }}>
+                <HelpButton helpKey="cerrar" onClick={() => setTrainerCardModal(null)} title="Cerrar" style={{ background: '#f1f5f9', border: 'none', borderRadius: '6px', padding: '0.3rem', cursor: 'pointer', color: textMuted }}>
                   <X size={16} />
-                </button>
+                </HelpButton>
               </div>
 
               {tc && tc.total > 0 ? (
                 <>
+                  <ManagersHelpMode />
                   <div style={{ margin: '0.5rem 0 1rem 0' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', marginBottom: '0.3rem' }}>
                       <span style={{ color: textMuted }}>Efectividad de Llamadas:</span>
@@ -6054,13 +6341,25 @@ export default function CentroManagers() {
                     <span style={{ fontSize: '0.78rem', color: textMuted, fontWeight: 600 }}>📞 Últimas llamadas individuales:</span>
                     <div style={{ maxHeight: '160px', overflowY: 'auto', marginTop: '0.4rem', display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
                       {tc.managersList.map(m => (
-                        <div key={m.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.4rem', padding: '0.4rem 0.5rem', background: '#f8fafc', borderRadius: '6px', border: `1px solid ${borderLight}` }}>
-                          <span style={{ fontSize: '0.78rem', color: textDark, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.nombre}</span>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', flexShrink: 0 }}>
-                            <input type="date" value={m.llamadaFecha || ''} onChange={e => handleUpdateLlamada(m.id, e.target.value, m.llamadaAsistio || 'SI')} style={{ padding: '0.2rem', borderRadius: '4px', border: `1px solid ${borderLight}`, fontSize: '0.7rem', width: '110px' }} />
-                            <button onClick={() => handleUpdateLlamada(m.id, m.llamadaFecha || new Date().toISOString().split('T')[0], 'SI')} style={{ padding: '0.2rem 0.4rem', borderRadius: '4px', border: '1px solid #10b981', background: m.llamadaAsistio === 'SI' ? '#10b981' : '#fff', color: m.llamadaAsistio === 'SI' ? '#fff' : '#10b981', fontWeight: 700, fontSize: '0.68rem', cursor: 'pointer' }}>SÍ</button>
-                            <button onClick={() => handleUpdateLlamada(m.id, m.llamadaFecha || new Date().toISOString().split('T')[0], 'NO')} style={{ padding: '0.2rem 0.4rem', borderRadius: '4px', border: '1px solid #ef4444', background: m.llamadaAsistio === 'NO' ? '#ef4444' : '#fff', color: m.llamadaAsistio === 'NO' ? '#fff' : '#ef4444', fontWeight: 700, fontSize: '0.68rem', cursor: 'pointer' }}>NO</button>
+                        <div key={m.id} style={{ padding: '0.4rem 0.5rem', background: '#f8fafc', borderRadius: '6px', border: `1px solid ${borderLight}` }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.4rem' }}>
+                            <span style={{ fontSize: '0.78rem', color: textDark, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.nombre}</span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', flexShrink: 0 }}>
+                              <HelpInput helpKey="fechaIndividual" type="date" value={m.llamadaFecha || ''} onChange={e => handleEditLlamadaFecha(m.id, e.target.value)} style={{ padding: '0.2rem', borderRadius: '4px', border: `1px solid ${borderLight}`, fontSize: '0.7rem', width: '110px' }} />
+                              <HelpButton helpKey="asistioSi" disabled={Boolean(savingIndividualCallIds[m.id])} onClick={() => handleUpdateLlamada(m.id, m.llamadaFecha || new Date().toISOString().split('T')[0], 'SI')} style={{ padding: '0.2rem 0.4rem', borderRadius: '4px', border: '1px solid #10b981', background: m.llamadaAsistio === 'SI' ? '#10b981' : '#fff', color: m.llamadaAsistio === 'SI' ? '#fff' : '#10b981', fontWeight: 700, fontSize: '0.68rem', cursor: savingIndividualCallIds[m.id] ? 'wait' : 'pointer' }}>SÍ</HelpButton>
+                              <HelpButton helpKey="asistioNo" disabled={Boolean(savingIndividualCallIds[m.id])} onClick={() => handleUpdateLlamada(m.id, m.llamadaFecha || new Date().toISOString().split('T')[0], 'NO')} style={{ padding: '0.2rem 0.4rem', borderRadius: '4px', border: '1px solid #ef4444', background: m.llamadaAsistio === 'NO' ? '#ef4444' : '#fff', color: m.llamadaAsistio === 'NO' ? '#fff' : '#ef4444', fontWeight: 700, fontSize: '0.68rem', cursor: savingIndividualCallIds[m.id] ? 'wait' : 'pointer' }}>NO</HelpButton>
+                            </div>
                           </div>
+                          {(Array.isArray(m.llamadasHistorial) ? m.llamadasHistorial : [])
+                            .slice().sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''))
+                            .map(call => (
+                              <div key={call.id} style={{ marginTop: '0.25rem', fontSize: '0.7rem', color: textMuted }}>
+                                {call.fecha || 'Sin fecha'} · {call.tipo === 'grupal' ? 'Grupal' : 'Individual'} · {call.asistio ? 'Asistió' : 'No asistió'}
+                                {call.id && notasSeguimiento.find(note => note.relatedCallId === call.id)?.nota
+                                  ? ` · Nota: ${notasSeguimiento.find(note => note.relatedCallId === call.id).nota}`
+                                  : ''}
+                              </div>
+                            ))}
                         </div>
                       ))}
                       {tc.managersList.length === 0 && <p style={{ fontSize: '0.75rem', color: textMuted, fontStyle: 'italic' }}>Sin managers registrados.</p>}
@@ -6075,19 +6374,25 @@ export default function CentroManagers() {
                     const llamadasDeEsteEntrenador = llamadasHistorial
                       .filter(l => isTrainerMatch(l.entrenador, trainerCardModal))
                       .sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
-                    if (llamadasDeEsteEntrenador.length === 0) return null;
                     return (
                       <div style={{ marginBottom: '1rem' }}>
                         <span style={{ fontSize: '0.78rem', color: textMuted, fontWeight: 600 }}>👥 Llamadas grupales registradas ({llamadasDeEsteEntrenador.length}):</span>
+                        {llamadasHistorialStatus !== 'ready' && (
+                          <p role="status" style={{ fontSize: '0.72rem', color: llamadasHistorialStatus === 'error' ? '#b91c1c' : textMuted }}>
+                            {llamadasHistorialStatus === 'loading' && 'Cargando historial de llamadas…'}
+                            {llamadasHistorialStatus === 'stale' && 'Mostrando datos en caché; esperando confirmación del servidor.'}
+                            {llamadasHistorialStatus === 'error' && llamadasHistorialError}
+                          </p>
+                        )}
                         <div style={{ maxHeight: '180px', overflowY: 'auto', marginTop: '0.4rem', display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
                           {llamadasDeEsteEntrenador.map(l => (
                             <div key={l.id} style={{ padding: '0.4rem 0.5rem', background: '#fafaf9', borderRadius: '6px', border: `1px solid ${borderLight}` }}>
                               {editingLlamadaGrupal?.id === l.id ? (
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                                  <input type="date" value={editingLlamadaGrupal.fecha} onChange={e => setEditingLlamadaGrupal({ ...editingLlamadaGrupal, fecha: e.target.value })} style={{ padding: '0.2rem', borderRadius: '4px', border: `1px solid ${borderLight}`, fontSize: '0.7rem' }} />
-                                  <input type="number" min="0" value={editingLlamadaGrupal.asistieron} onChange={e => setEditingLlamadaGrupal({ ...editingLlamadaGrupal, asistieron: e.target.value })} style={{ width: '55px', padding: '0.2rem', borderRadius: '4px', border: `1px solid ${borderLight}`, fontSize: '0.7rem' }} />
-                                  <button onClick={handleGuardarEdicionLlamadaGrupal} style={{ padding: '0.2rem 0.4rem', borderRadius: '4px', border: 'none', background: '#10b981', color: '#fff', fontWeight: 700, fontSize: '0.68rem', cursor: 'pointer' }}>Guardar</button>
-                                  <button onClick={() => setEditingLlamadaGrupal(null)} style={{ padding: '0.2rem 0.4rem', borderRadius: '4px', border: `1px solid ${borderLight}`, background: '#fff', fontSize: '0.68rem', cursor: 'pointer' }}>Cancelar</button>
+                                  <HelpInput helpKey="fechaGrupal" type="date" value={editingLlamadaGrupal.fecha} onChange={e => setEditingLlamadaGrupal({ ...editingLlamadaGrupal, fecha: e.target.value })} style={{ padding: '0.2rem', borderRadius: '4px', border: `1px solid ${borderLight}`, fontSize: '0.7rem' }} />
+                                  <HelpInput helpKey="asistieron" type="number" min="0" value={editingLlamadaGrupal.asistieron} onChange={e => setEditingLlamadaGrupal({ ...editingLlamadaGrupal, asistieron: e.target.value })} style={{ width: '55px', padding: '0.2rem', borderRadius: '4px', border: `1px solid ${borderLight}`, fontSize: '0.7rem' }} />
+                                  <HelpButton helpKey="guardarLlamada" onClick={handleGuardarEdicionLlamadaGrupal} style={{ padding: '0.2rem 0.4rem', borderRadius: '4px', border: 'none', background: '#10b981', color: '#fff', fontWeight: 700, fontSize: '0.68rem', cursor: 'pointer' }}>Guardar</HelpButton>
+                                  <HelpButton helpKey="cancelar" onClick={() => setEditingLlamadaGrupal(null)} style={{ padding: '0.2rem 0.4rem', borderRadius: '4px', border: `1px solid ${borderLight}`, background: '#fff', fontSize: '0.68rem', cursor: 'pointer' }}>Cancelar</HelpButton>
                                 </div>
                               ) : (
                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.4rem' }}>
@@ -6095,14 +6400,22 @@ export default function CentroManagers() {
                                     {l.fecha} · {l.equipo} · {l.asistieron}/{l.totalIntegrantes}
                                   </span>
                                   {userCanViewAllNotas && (
-                                    <button onClick={() => setEditingLlamadaGrupal({ id: l.id, fecha: l.fecha || '', asistieron: l.asistieron ?? 0 })} title="Editar esta llamada grupal" style={{ background: 'none', border: 'none', color: '#7c3aed', cursor: 'pointer', padding: '0.1rem' }}>
+                                    <HelpButton helpKey="editarLlamada" onClick={() => setEditingLlamadaGrupal({ id: l.id, fecha: l.fecha || '', asistieron: l.asistieron ?? 0 })} title="Editar esta llamada grupal" style={{ background: 'none', border: 'none', color: '#7c3aed', cursor: 'pointer', padding: '0.1rem' }}>
                                       <Edit3 size={13} />
-                                    </button>
+                                    </HelpButton>
                                   )}
                                 </div>
                               )}
+                              {notasSeguimiento.find(note => note.relatedCallId === l.id)?.nota && (
+                                <p style={{ margin: '0.3rem 0 0', fontSize: '0.7rem', color: textMuted }}>
+                                  Nota: {notasSeguimiento.find(note => note.relatedCallId === l.id).nota}
+                                </p>
+                              )}
                             </div>
                           ))}
+                          {llamadasDeEsteEntrenador.length === 0 && llamadasHistorialStatus === 'ready' && (
+                            <p style={{ fontSize: '0.72rem', color: textMuted }}>No hay llamadas grupales registradas para este entrenador.</p>
+                          )}
                         </div>
                       </div>
                     );
@@ -6114,12 +6427,12 @@ export default function CentroManagers() {
                 </p>
               )}
 
-              <button
+              <HelpButton helpKey="directorio"
                 onClick={() => { setFilterEntrenador(trainerCardModal); setActiveTab('directorio'); setCurrentPage(1); setTrainerCardModal(null); }}
                 style={{ width: '100%', padding: '0.65rem', borderRadius: '8px', border: 'none', background: '#7c3aed', color: '#fff', fontWeight: 700, cursor: 'pointer' }}
               >
                 Ver Directorio de {trainerCardModal}
-              </button>
+              </HelpButton>
             </div>
           </div>
         );
@@ -6147,13 +6460,14 @@ export default function CentroManagers() {
                     <p style={{ margin: 0, fontSize: '0.78rem', color: '#94a3b8' }}>Transfiere integrantes de un equipo origen hacia un equipo destino consolidando avances</p>
                   </div>
                 </div>
-                <button onClick={() => setMergeModal(prev => ({ ...prev, isOpen: false }))} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '0.3rem', borderRadius: '6px' }}>
+                <HelpButton helpKey="cerrar" onClick={() => setMergeModal(prev => ({ ...prev, isOpen: false }))} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '0.3rem', borderRadius: '6px' }}>
                   <X size={20} />
-                </button>
+                </HelpButton>
               </div>
 
               {/* CONTENIDO SCROLLABLE */}
               <div style={{ padding: '1.5rem', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                <ManagersHelpMode />
                 
                 {/* ADVERTENCIA INFORMATIVA */}
                 <div style={{ background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: '10px', padding: '0.9rem 1rem', display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
@@ -6171,14 +6485,14 @@ export default function CentroManagers() {
                   <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
                     Sede Operativa:
                   </label>
-                  <select
+                  <HelpSelect helpKey="sede"
                     value={mergeModal.sede}
                     onChange={e => setMergeModal(prev => ({ ...prev, sede: e.target.value, sourceTeam: '', targetTeam: '' }))}
                     disabled={!canViewAll && !canViewOwnSede}
                     style={{ width: '100%', padding: '0.65rem', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.88rem', background: '#f8fafc', fontWeight: 600, color: '#1e293b' }}
                   >
                     {OPERATIONAL_SEDES.map(s => <option key={s} value={s}>{s}</option>)}
-                  </select>
+                  </HelpSelect>
                 </div>
 
                 {/* SELECTORES DE EQUIPOS EN COLUMNAS */}
@@ -6190,7 +6504,7 @@ export default function CentroManagers() {
                       <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#dc2626', display: 'inline-block' }}></span>
                       1. Equipo Origen (A vaciar):
                     </label>
-                    <select
+                    <HelpSelect helpKey="origen"
                       value={mergeModal.sourceTeam}
                       onChange={e => setMergeModal(prev => ({ ...prev, sourceTeam: e.target.value }))}
                       style={{ width: '100%', padding: '0.65rem', borderRadius: '8px', border: '1px solid #f87171', fontSize: '0.85rem', background: '#fff', fontWeight: 600, color: '#1e293b' }}
@@ -6201,7 +6515,7 @@ export default function CentroManagers() {
                           {t.label}
                         </option>
                       ))}
-                    </select>
+                    </HelpSelect>
 
                     {/* PREVIEW ORIGEN */}
                     {sourceTeamObj && (
@@ -6227,7 +6541,7 @@ export default function CentroManagers() {
                       <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#16a34a', display: 'inline-block' }}></span>
                       2. Equipo Destino (Receptor):
                     </label>
-                    <select
+                    <HelpSelect helpKey="destino"
                       value={mergeModal.targetTeam}
                       onChange={e => setMergeModal(prev => ({ ...prev, targetTeam: e.target.value }))}
                       style={{ width: '100%', padding: '0.65rem', borderRadius: '8px', border: '1px solid #86efac', fontSize: '0.85rem', background: '#fff', fontWeight: 600, color: '#1e293b' }}
@@ -6238,7 +6552,7 @@ export default function CentroManagers() {
                           {t.label}
                         </option>
                       ))}
-                    </select>
+                    </HelpSelect>
 
                     {/* PREVIEW DESTINO */}
                     {targetTeamObj && (
@@ -6260,7 +6574,7 @@ export default function CentroManagers() {
                 {/* OPCIÓN DE ASIGNAR COACH DESTINO */}
                 {targetTeamObj && targetTeamObj.coachList !== 'Sin Coach' && (
                   <label style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', background: '#f8fafc', padding: '0.65rem 0.9rem', borderRadius: '8px', border: '1px solid #e2e8f0', cursor: 'pointer' }}>
-                    <input
+                    <HelpInput helpKey="reasignar"
                       type="checkbox"
                       checked={mergeModal.reassignCoach}
                       onChange={e => setMergeModal(prev => ({ ...prev, reassignCoach: e.target.checked }))}
@@ -6274,7 +6588,7 @@ export default function CentroManagers() {
 
                 {/* CHECKBOX DE CONFIRMACIÓN */}
                 <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.6rem', background: '#fffbeb', padding: '0.8rem 1rem', borderRadius: '8px', cursor: 'pointer', border: '1px solid #fef08a' }}>
-                  <input
+                  <HelpInput helpKey="confirmarFusion"
                     type="checkbox"
                     checked={mergeModal.confirmedWarning}
                     onChange={e => setMergeModal(prev => ({ ...prev, confirmedWarning: e.target.checked }))}
@@ -6289,13 +6603,13 @@ export default function CentroManagers() {
 
               {/* FOOTER ACCIONES */}
               <div style={{ padding: '1rem 1.5rem', background: '#f8fafc', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', flexShrink: 0 }}>
-                <button
+                <HelpButton helpKey="cancelar"
                   onClick={() => setMergeModal(prev => ({ ...prev, isOpen: false }))}
                   style={{ padding: '0.65rem 1.2rem', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#fff', color: '#475569', fontWeight: 700, cursor: 'pointer' }}
                 >
                   Cancelar
-                </button>
-                <button
+                </HelpButton>
+                <HelpButton helpKey="ejecutarFusion"
                   onClick={handleExecuteMergeTeams}
                   disabled={!mergeModal.confirmedWarning || !mergeModal.sourceTeam || !mergeModal.targetTeam || mergeModal.isMerging}
                   style={{
@@ -6315,7 +6629,7 @@ export default function CentroManagers() {
                 >
                   <GitMerge size={18} />
                   {mergeModal.isMerging ? 'Uniendo Equipos en Firestore...' : 'Confirmar y Unir Equipos'}
-                </button>
+                </HelpButton>
               </div>
 
             </div>
@@ -6332,9 +6646,9 @@ export default function CentroManagers() {
                 <ShieldCheck size={22} color="#fff" />
                 <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800 }}>Supervisor de Calidad y Cero Duplicados</h3>
               </div>
-              <button onClick={() => setDataSupervisorModal(prev => ({ ...prev, isOpen: false }))} style={{ background: 'none', border: 'none', color: '#e0f2fe', cursor: 'pointer', padding: '0.2rem' }}>
+              <HelpButton helpKey="cerrar" onClick={() => setDataSupervisorModal(prev => ({ ...prev, isOpen: false }))} style={{ background: 'none', border: 'none', color: '#e0f2fe', cursor: 'pointer', padding: '0.2rem' }}>
                 <X size={20} />
-              </button>
+              </HelpButton>
             </div>
 
             <div style={{ padding: '1.5rem', maxHeight: '80vh', overflowY: 'auto' }}>
@@ -6393,18 +6707,18 @@ export default function CentroManagers() {
 
                   {/* Botones de acción */}
                   <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '0.5rem' }}>
-                    <button
+                    <HelpButton helpKey="supervisor"
                       onClick={handleRunDataSupervisor}
                       style={{ padding: '0.6rem 1.2rem', borderRadius: '8px', border: '1px solid #0284c7', background: 'rgba(2, 132, 199, 0.1)', color: '#0284c7', fontWeight: 700, cursor: 'pointer' }}
                     >
                       Volver a Escanear
-                    </button>
-                    <button
+                    </HelpButton>
+                    <HelpButton helpKey="aceptar"
                       onClick={() => setDataSupervisorModal(prev => ({ ...prev, isOpen: false }))}
                       style={{ padding: '0.6rem 1.4rem', borderRadius: '8px', border: 'none', background: '#0284c7', color: '#fff', fontWeight: 800, cursor: 'pointer' }}
                     >
                       Aceptar
-                    </button>
+                    </HelpButton>
                   </div>
                 </div>
               ) : null}
@@ -6414,5 +6728,6 @@ export default function CentroManagers() {
       )}
 
     </div>
+    </ManagersHelpProvider>
   );
 }

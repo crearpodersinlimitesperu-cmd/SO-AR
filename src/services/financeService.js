@@ -1,4 +1,4 @@
-import { collection, doc, getDocs, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, doc, getDocs, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from './firebase';
 
 export async function getHQOperationalStatus() {
@@ -160,43 +160,5 @@ export async function submitWeeklySLA(sede, payload) {
  * Se puede ejecutar una sola vez desde el panel de SuperAdmin.
  */
 export async function hydrateFinanceTasks() {
-  const financeEmails = [
-    'erica.logacho', 'gabriela.rivadeneyra', 'hector.gonzalez', 
-    'alexis.teran', 'diego.flores', 'sebastian.jacome'
-  ];
-  
-  try {
-    const tasksSnap = await getDocs(collection(db, 'tasks'));
-    let updatedCount = 0;
-    
-    // Batch updates para no saturar Firestore
-    // Nota: Simplificado para el MVP.
-    const promises = [];
-    tasksSnap.forEach(taskDoc => {
-      const data = taskDoc.data();
-      const assigneeEmail = (data.assignedToEmail || '').toLowerCase();
-      
-      if (financeEmails.some(e => assigneeEmail.includes(e)) && !data.financeCategory) {
-        // Auto-tagging heurístico basado en título
-        let cat = 'Operativa General';
-        const title = (data.title || '').toLowerCase();
-        if (title.includes('factura')) cat = 'Facturación';
-        if (title.includes('concilia') || title.includes('banco')) cat = 'Conciliación';
-        if (title.includes('cierre')) cat = 'Cierre';
-        if (title.includes('auditor')) cat = 'Auditoría';
-        
-        promises.push(updateDoc(doc(db, 'tasks', taskDoc.id), {
-          financeCategory: cat,
-          systemTag: 'auto-hydrated-cfo-v1'
-        }));
-        updatedCount++;
-      }
-    });
-    
-    await Promise.all(promises);
-    return updatedCount;
-  } catch (error) {
-    console.error("Error hidratando tareas:", error);
-    return 0;
-  }
+  throw new Error('La hidratación de tareas asignadas a terceros requiere un proceso confiable de backend; no puede ejecutarse desde el cliente.');
 }

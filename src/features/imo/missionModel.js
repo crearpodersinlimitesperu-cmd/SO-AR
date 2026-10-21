@@ -17,12 +17,13 @@ export function validateCampaign({ sede, targetTeam, c1Date, assignments }) {
   if (!Number.isInteger(Number(targetTeam)) || Number(targetTeam) < 1) throw new Error('Indica el equipo que ingresa a Capítulo Uno.');
   if (!/^\d{4}-\d{2}-\d{2}$/.test(c1Date) || (Number.isNaN(Date.parse(c1Date)) || new Date(c1Date).toISOString().slice(0, 10) !== c1Date)) throw new Error('Indica la fecha de inicio de C1.');
   if (!assignments.length) throw new Error('Selecciona al menos un IMO con sus enrolados revisados.');
-  if (assignments.length > 100) throw new Error('Genera campañas de hasta 100 IMOs.');
+  if (assignments.length > 200) throw new Error('Genera campañas de hasta 200 IMOs.');
   const sources = new Set(), people = new Set();
   for (const a of assignments) {
     if (!a.nombre || !a.sourceMissionId || sources.has(a.sourceMissionId)) throw new Error('Hay una misión de origen repetida o incompleta.');
     sources.add(a.sourceMissionId);
-    if (!Number.isInteger(Number(a.originTeam)) || Number(a.originTeam) < 1 || Number(a.originTeam) === Number(targetTeam)) throw new Error(`Revisa el equipo de origen de ${a.nombre}.`);
+    // 0 = equipo de origen por confirmar (el IMO no figura como enrolado en Nodus).
+    if (!Number.isInteger(Number(a.originTeam)) || Number(a.originTeam) < 0 || Number(a.originTeam) === Number(targetTeam)) throw new Error(`Revisa el equipo de origen de ${a.nombre}.`);
     if (!a.enrolados?.length || a.enrolados.length > 100) throw new Error(`Revisa los enrolados de ${a.nombre} (entre 1 y 100).`);
     const ids = new Set();
     for (const e of a.enrolados) {

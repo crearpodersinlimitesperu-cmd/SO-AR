@@ -40,7 +40,7 @@ import {
   ArrowLeft, Calendar, CheckCircle2, AlertTriangle, Plane, Building2,
   ShieldCheck, Search, History, ExternalLink, Users, Save, X, Filter, RefreshCw, CircleAlert, Pencil, Plus
 } from 'lucide-react';
-import { collection, onSnapshot, doc, setDoc, addDoc, serverTimestamp, writeBatch } from 'firebase/firestore';
+import { collection, onSnapshot, doc, setDoc, addDoc, serverTimestamp, writeBatch, runTransaction } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useAuth } from '../context/AuthContext';
 import { formatTeamString } from '../utils/formatTeam';
@@ -52,6 +52,21 @@ import { getFlagForSede } from '../utils/flags';
 import { canUseAsignadorEntrenadores } from '../config/permissions';
 import { listTrainerPolicyFiles, TRAINER_POLICIES_FOLDER_ID } from '../services/googleDriveService';
 import { isInactiveTrainer } from '../data/managersData';
+import {
+  campoAsignacionSlot,
+  extraerPreasignaciones,
+  normalizarIdentidadEntrenador,
+  resolverSugerenciaEntrenador,
+} from '../utils/trainerAssignments';
+import {
+  TRAINER_CALENDAR_SYNC_AGENT_NAME,
+  buildPublicAssignment,
+  buildPublicOperational,
+  computeCalendarProjectionPlan,
+  indexAssignmentsForLookup,
+  matchAssignmentForEvent,
+  syncTrainerCalendarProjections,
+} from '../services/trainerCalendarSyncAgent';
 
 // Los 3 fines de semana de Maestría del Juego. El orden es el oficial del
 // entrenamiento y se usa tal cual para numerar los FDS.
@@ -126,11 +141,6 @@ const fmtFecha = (v) => {
 // El calendario histórico puede traer "FERNANDO ARAGON" y el directorio
 // "Fer Aragon". Para filtrar se compara una identidad normalizada; no altera
 // el nombre original mostrado ni una asignación guardada.
-const normalizarIdentidadEntrenador = (value = '') => String(value)
-  .toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-  .replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter(Boolean)
-  .map(token => ({ fernando: 'fer', fer: 'fer' }[token] || token))
-  .join(' ');
 const NOMBRES_LEGALES_ENTRENADORES = {
   'alejandro diaz': 'Alejandro Díaz',
   'alonso solares': 'Alonso Solares Salazar',
@@ -259,20 +269,6 @@ const resolverNombreDirectorio = (value, directorio) => {
 // no una asignación válida: un FDS debe tener exactamente una persona.
 // Conservamos el texto original y mostramos cada candidato, pero jamás
 // escogemos uno automáticamente ni lo escribimos en Firestore.
-const extraerPreasignaciones = (value = '') => {
-  const seen = new Set();
-  return String(value)
-    .split(/[\/;,\n]+/)
-    .map(name => name.trim())
-    .filter(Boolean)
-    .filter(name => {
-      const key = normalizarIdentidadEntrenador(name);
-      if (!key || seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
-};
-
 const normalizarTexto = (value = '') => String(value).toLowerCase().normalize('NFD')
   .replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
 const tokensNombre = value => normalizarTexto(value).split(' ')
@@ -306,6 +302,7 @@ export default function AsignadorEntrenadores() {
   const navigate = useNavigate();
 
   const [asignaciones, setAsignaciones] = useState({});   // key -> { [fds]: {entrenador, ...} }
+  const [assignmentsReady, setAssignmentsReady] = useState(false);
   const [entrenadores, setEntrenadores] = useState([]);
   const [vuelos, setVuelos] = useState(null);             // null = aún no se sabe
   const [vuelosError, setVuelosError] = useState(false);
@@ -326,6 +323,14 @@ export default function AsignadorEntrenadores() {
   const [policySearch, setPolicySearch] = useState('');
   const [calendarOverrides, setCalendarOverrides] = useState({});
   const [customCalendarEvents, setCustomCalendarEvents] = useState([]);
+  const [publicAssignments, setPublicAssignments] = useState([]);
+  const [publicOperational, setPublicOperational] = useState([]);
+  const [agentSyncState, setAgentSyncState] = useState({
+    status: 'checking',
+    repairedAssignments: 0,
+    repairedOperational: 0,
+    syncedAt: null,
+  });
   const [calendarEditor, setCalendarEditor] = useState(null);
   const [calendarDraft, setCalendarDraft] = useState({});
   const [calendarSaving, setCalendarSaving] = useState(false);
@@ -477,17 +482,104 @@ export default function AsignadorEntrenadores() {
 
   // --- Asignaciones guardadas en Causa OS (en vivo) -------------------------
   useEffect(() => {
+    setAssignmentsReady(false);
     if (!autorizado) return;
-    const unsub = onSnapshot(collection(db, 'asignaciones_entrenadores'), snap => {
+    const unsub = onSnapshot(collection(db, 'asignaciones_entrenadores'), { includeMetadataChanges: true }, snap => {
       const out = {};
       snap.forEach(d => { out[d.id] = d.data(); });
       setAsignaciones(out);
+      setAssignmentsReady(!snap.metadata.fromCache && !snap.metadata.hasPendingWrites);
     }, err => {
+      setAssignmentsReady(false);
       console.error('asignaciones_entrenadores:', err);
       showToast('No se pudieron leer las asignaciones guardadas: ' + err.message, 'error');
     });
     return () => unsub();
   }, [autorizado]);
+
+  // --- Proyecciones públicas del Calendario Global (supervisadas por el Agente) ---
+  useEffect(() => {
+    if (!autorizado) return;
+    const unsubPubAssign = onSnapshot(collection(db, 'calendario_asignaciones_publicas'), snap => {
+      setPublicAssignments(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    }, err => console.warn('calendario_asignaciones_publicas:', err));
+    const unsubPubOp = onSnapshot(collection(db, 'calendario_operativo_publico'), snap => {
+      setPublicOperational(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    }, err => console.warn('calendario_operativo_publico:', err));
+    return () => { unsubPubAssign(); unsubPubOp(); };
+  }, [autorizado]);
+
+  // --- Agente Guardián de Sincronización Asignador ↔ Calendario Global ------
+  useEffect(() => {
+    if (!autorizado || !assignmentsReady) return;
+    const plan = computeCalendarProjectionPlan({
+      assignments: asignaciones,
+      overrides: calendarOverrides,
+      customEvents: customCalendarEvents,
+      publicAssignments,
+      publicOperational,
+    });
+    if (plan.inSync) {
+      setAgentSyncState(prev => ({
+        ...prev,
+        status: 'synced',
+        syncedAt: prev.syncedAt || new Date().toISOString(),
+      }));
+      return;
+    }
+    let cancelled = false;
+    setAgentSyncState(prev => ({ ...prev, status: 'syncing' }));
+    syncTrainerCalendarProjections(db, {
+      assignments: asignaciones,
+      overrides: calendarOverrides,
+      customEvents: customCalendarEvents,
+      publicAssignments,
+      publicOperational,
+    }).then(res => {
+      if (cancelled) return;
+      setAgentSyncState({
+        status: 'synced',
+        repairedAssignments: res.repairedAssignments,
+        repairedOperational: res.repairedOperational,
+        syncedAt: res.syncedAt,
+      });
+    }).catch(err => {
+      console.warn('Agente sincronizador calendario global:', err);
+      if (!cancelled) setAgentSyncState(prev => ({ ...prev, status: 'error' }));
+    });
+    return () => { cancelled = true; };
+  }, [autorizado, assignmentsReady, asignaciones, calendarOverrides, customCalendarEvents, publicAssignments, publicOperational]);
+
+  const forzarSincronizacionAgente = async () => {
+    if (!autorizado) return;
+    if (!assignmentsReady) {
+      showToast('Espera la lectura del servidor antes de publicar asignaciones.', 'error');
+      return;
+    }
+    setAgentSyncState(prev => ({ ...prev, status: 'syncing' }));
+    try {
+      const res = await syncTrainerCalendarProjections(db, {
+        assignments: asignaciones,
+        overrides: calendarOverrides,
+        customEvents: customCalendarEvents,
+        publicAssignments: [],
+        publicOperational: [],
+      });
+      setAgentSyncState({
+        status: 'synced',
+        repairedAssignments: res.repairedAssignments,
+        repairedOperational: res.repairedOperational,
+        syncedAt: res.syncedAt,
+      });
+      showToast(
+        `✓ ${TRAINER_CALENDAR_SYNC_AGENT_NAME}: ${res.repairedAssignments} asignaciones y ${res.repairedOperational} fechas operativas publicadas en Calendario Global.`,
+        'success'
+      );
+    } catch (err) {
+      setAgentSyncState(prev => ({ ...prev, status: 'error' }));
+      showToast('Error al sincronizar con Calendario Global: ' + err.message, 'error');
+    }
+  };
 
   // --- Trazabilidad de esta pantalla ---------------------------------------
   useEffect(() => {
@@ -506,11 +598,11 @@ export default function AsignadorEntrenadores() {
     if (!autorizado) return;
     (async () => {
       try {
-        let res = await fetch('/vuelos_tracker.json?t=' + Date.now());
-        if (!res.ok) res = await fetch('/cartas/vuelos_tracker.json?t=' + Date.now());
+        let res = await fetch('/vuelos_tracker.json?t=' + Date.now(), { cache: 'no-store' });
+        if (!res.ok) res = await fetch('/cartas/vuelos_tracker.json?t=' + Date.now(), { cache: 'no-store' });
         if (!res.ok) { setVuelosError(true); return; }
         const data = await res.json();
-        setVuelos(Array.isArray(data) ? data : (data.vuelos || []));
+        setVuelos(Array.isArray(data) ? data : (data.vuelos || Object.values(data.flights || {})));
       } catch {
         setVuelosError(true);
       }
@@ -577,8 +669,10 @@ export default function AsignadorEntrenadores() {
   const filas = useMemo(() => {
     const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
     const out = [];
+    const assignmentIndex = indexAssignmentsForLookup(asignaciones);
     (events || []).forEach(ev => {
-      const sourceKey = eventoKey(ev);
+      if (ev.esPersonalizado) return;
+      const sourceKey = ev.__sourceEventKey || eventoKey(ev);
       const override = calendarOverrides[sourceKey] || {};
       const inicio = override.fechaInicio || ev.fecha_inicio || ev.start;
       if (!inicio) return;
@@ -586,37 +680,42 @@ export default function AsignadorEntrenadores() {
       if (periodo === 'proximos' && !isNaN(d.getTime()) && d < hoy) return;
       if (periodo === 'pasados' && !isNaN(d.getTime()) && d >= hoy) return;
 
-      const key = sourceKey;
       const nombre = ev.nombre || ev.name || 'Entrenamiento';
       const complementario = tipoComplementario(nombre);
       const capitulo = tipoCapitulo(nombre);
       const programa = tipoPrograma(nombre);
       const sede = normalizeSede(ev.sede || ev.sedeTag || '');
-      const guardado = asignaciones[key] || {};
+      const guardado = matchAssignmentForEvent(ev, assignmentIndex, sede) || {};
+      const key = guardado.id || sourceKey;
       const slots = esMaestria(nombre) ? FDS_MAESTRIA : ['unico'];
 
       slots.forEach((slot, i) => {
         const asign = guardado[slot] || {};
-        const entrenadorHojaRaw = ev.trainer || ev.entrenador || '';
+        const entrenadorHojaRaw = typeof ev.sheetTrainer !== 'undefined'
+          ? ev.sheetTrainer
+          : (ev.trainer || ev.entrenador || '');
         const preasignacionesHoja = extraerPreasignaciones(entrenadorHojaRaw);
+        const sugerencia = resolverSugerenciaEntrenador(preasignacionesHoja, i, slots.length > 1);
         out.push({
-          key, slot,
+          key, sourceKey, slot,
           esMJ: esProgramaMaestria(nombre),
+          tieneSlotsMaestria: slots.length > 1,
           complementario,
           capitulo,
           programa: slots.length > 1 ? `mj_${slot === 'Creación' ? 'creacion' : slot === 'Relación' ? 'relacion' : 'gratitud'}` : programa,
           fdsLabel: slots.length > 1 ? `FDS ${i + 1} · ${slot}` : null,
           nombre, sede,
           fechaInicio: inicio,
-          fechaFin: ajustarFechaFinPorRegla(nombre, inicio, override.fechaFin ?? (ev.fecha_fin || ev.end || '')),
+          fechaFin: override.fechaFin || ev.fecha_fin || ev.end || ajustarFechaFinPorRegla(nombre, inicio, ''),
           equipo: ev.equipo || ev.team || '',
           lugar: ev.lugar || ev.direccion || '',
           // entrenador de la hoja (lo que hay hoy) vs el asignado en Causa OS
           entrenadorHojaRaw,
-          // Solo una persona por slot: FDS 1, 2 y 3 toman su respectivo entrenador preasignado
-          entrenadorHoja: preasignacionesHoja.length === 1 
-            ? preasignacionesHoja[0] 
-            : (slots.length > 1 && preasignacionesHoja[i] ? preasignacionesHoja[i] : (preasignacionesHoja[0] || '')),
+          // La sugerencia candidata se asigna solo a su slot. Un nombre legado
+          // permanece como referencia general, no como entrenador confirmado de los tres FDS.
+          entrenadorHoja: sugerencia.candidato,
+          sugerenciaCronograma: sugerencia.referencia,
+          sugerenciaGeneral: sugerencia.referenciaGeneral,
           preasignacionesHoja,
           entrenadorAsignado: asign.entrenador || '',
           asignadoPor: asign.asignadoPor || '',
@@ -632,8 +731,8 @@ export default function AsignadorEntrenadores() {
       out.push({
         key: ev.id, slot: 'unico', esMJ: esProgramaMaestria(nombre),
         complementario: tipoComplementario(nombre), capitulo: tipoCapitulo(nombre), programa: tipoPrograma(nombre),
-        fdsLabel: null, nombre, sede: normalizeSede(ev.sede || ''), fechaInicio: inicio, fechaFin: ajustarFechaFinPorRegla(nombre, inicio, ev.fechaFin || ''),
-        equipo: ev.equipo || '', lugar: ev.lugar || '', entrenadorHojaRaw: '', entrenadorHoja: '', preasignacionesHoja: [],
+        fdsLabel: null, nombre, sede: normalizeSede(ev.sede || ''), fechaInicio: inicio, fechaFin: ev.fechaFin || ajustarFechaFinPorRegla(nombre, inicio, ''),
+        equipo: ev.equipo || '', lugar: ev.lugar || '', entrenadorHojaRaw: '', entrenadorHoja: '', sugerenciaCronograma: '', sugerenciaGeneral: false, preasignacionesHoja: [], tieneSlotsMaestria: false,
         entrenadorAsignado: (asignaciones[ev.id] || {}).unico?.entrenador || '',
         asignadoPor: (asignaciones[ev.id] || {}).unico?.asignadoPor || '',
         asignadoEn: (asignaciones[ev.id] || {}).unico?.fechaIso || '', esPersonalizado: true,
@@ -654,7 +753,7 @@ export default function AsignadorEntrenadores() {
       if (['mj_creacion', 'mj_relacion', 'mj_gratitud', 'mj_el_viaje', 'vuelos'].includes(filtroTipo) && f.programa !== filtroTipo) return false;
       if (filtroTipo === 'complementarios' && !f.complementario) return false;
       if (['caida_confianza', 'tanque', 'caminata_fuego', 'rompimiento'].includes(filtroTipo) && f.complementario !== filtroTipo) return false;
-      if (filtroEntrenador === 'pendientes' && (f.entrenadorAsignado || f.entrenadorHoja)) return false;
+      if (filtroEntrenador === 'pendientes' && f.entrenadorAsignado) return false;
       if (filtroEntrenador !== 'todos' && filtroEntrenador !== 'pendientes') {
         // Token-based partial matching: any candidate sharing ≥1 significant token (>2 chars) with the
         // selected filter name is accepted. Handles name variants, initials and casing differences.
@@ -698,7 +797,7 @@ export default function AsignadorEntrenadores() {
   // --- KPIs (todos calculados sobre las filas reales) ----------------------
   const kpis = useMemo(() => {
     const total = filas.length;
-    const conEntrenador = filas.filter(f => f.entrenadorAsignado || f.entrenadorHoja).length;
+    const conEntrenador = filas.filter(f => f.entrenadorAsignado).length;
     const sedes = new Set(filas.map(f => f.sede).filter(Boolean));
     return {
       total,
@@ -717,7 +816,7 @@ export default function AsignadorEntrenadores() {
       if (key) m.set(key, { nombre: formatearNombrePersona(nombreLegalEntrenador(e.nombre)), sede: e.sede, total: 0, principales: 0, mj: 0, complementarios: 0, detalle: new Map(), proximos: [], fuenteNombre: 'directorio' });
     });
     filas.forEach(f => {
-      const n = f.entrenadorAsignado || f.entrenadorHoja;
+      const n = f.entrenadorAsignado;
       if (!n) return;
       const canonical = resolverNombreDirectorio(n, entrenadores);
       const nombre = formatearNombrePersona(canonical?.nombre || n);
@@ -886,39 +985,53 @@ export default function AsignadorEntrenadores() {
     const now = new Date().toISOString();
     const actorName = currentUser?.name || currentUser?.email || 'desconocido';
     try {
-      const batch = writeBatch(db);
       const isNew = calendarEditor?.mode === 'nuevo';
+      const isCustom = isNew || calendarEditor?.fila?.esPersonalizado;
+      const sourceKey = calendarEditor?.fila?.sourceKey || calendarEditor?.fila?.key;
       const target = isNew
         ? doc(collection(db, 'calendario_operativo_custom'))
-        : doc(db, 'calendario_operativo_overrides', calendarEditor.fila.key);
+        : doc(db, isCustom ? 'calendario_operativo_custom' : 'calendario_operativo_overrides', sourceKey);
       const payload = {
         nombre: draft.nombre.trim(), sede: normalizeSede(draft.sede), equipo: String(draft.equipo || '').trim(),
         lugar: String(draft.lugar || '').trim(), fechaInicio: `${draft.fechaInicio}T00:00:00`, fechaFin: `${fechaFin}T00:00:00`,
         actualizadoPor: actorName, actualizadoPorEmail: currentUser?.email || '', actualizadoEn: serverTimestamp(), fechaIso: now,
       };
-      if (isNew) {
-        batch.set(target, { ...payload, creadoPor: actorName, creadoPorEmail: currentUser?.email || '', creadoEn: serverTimestamp(), origen: 'causa_os' });
-      } else {
-        batch.set(target, { ...payload, sourceEventKey: calendarEditor.fila.key, origen: 'override_causa_os' }, { merge: true });
+      const assignmentKey = calendarEditor?.fila?.key;
+      const logRef = doc(collection(db, 'calendario_operativo_log'));
+      await runTransaction(db, async batch => {
+        const assignmentRef = !isNew ? doc(db, 'asignaciones_entrenadores', assignmentKey) : null;
+        const storedAssignment = assignmentRef ? await batch.get(assignmentRef) : null;
+        if (isNew) {
+          batch.set(target, { ...payload, creadoPor: actorName, creadoPorEmail: currentUser?.email || '', creadoEn: serverTimestamp(), origen: 'causa_os' });
+        } else {
+          batch.set(target, { ...payload, sourceEventKey: isCustom ? null : sourceKey, origen: isCustom ? 'causa_os' : 'override_causa_os' }, { merge: true });
+        }
+        // Proyección segura para las agendas que todos consultan. Mantiene el
+        // registro privado y su auditoría intactos; publica solamente los
+        // campos operativos que esas agendas ya muestran.
+        batch.set(doc(db, 'calendario_operativo_publico', target.id), {
+          ...buildPublicOperational({ ...payload, sourceEventKey: sourceKey }, isCustom ? 'custom' : 'override', target.id),
+          actualizadoEn: serverTimestamp(),
+      });
+      if (storedAssignment?.exists()) {
+        const metadata = {
+          entrenamiento: payload.nombre, sede: payload.sede, equipo: payload.equipo,
+          fechaInicio: payload.fechaInicio, fechaFin: payload.fechaFin,
+        };
+        batch.set(assignmentRef, metadata, { merge: true });
+        batch.set(doc(db, 'calendario_asignaciones_publicas', assignmentKey), {
+          ...buildPublicAssignment({ ...storedAssignment.data(), ...metadata }),
+          actualizadoEn: serverTimestamp(),
+        });
       }
-      // Proyección segura para las agendas que todos consultan. Mantiene el
-      // registro privado y su auditoría intactos; publica solamente los
-      // campos operativos que esas agendas ya muestran.
-      batch.set(doc(db, 'calendario_operativo_publico', target.id), {
-        kind: isNew ? 'custom' : 'override',
-        sourceEventKey: isNew ? null : calendarEditor.fila.key,
-        ...payload,
-        source: 'causa_os_asignador',
-        actualizadoEn: serverTimestamp(),
-      }, { merge: true });
-      batch.set(doc(collection(db, 'calendario_operativo_log')), {
+      batch.set(logRef, {
         action: isNew ? 'CALENDAR_EVENT_CREATED' : 'CALENDAR_DATES_UPDATED',
-        eventKey: target.id, sourceEventKey: isNew ? null : calendarEditor.fila.key,
+        eventKey: target.id, sourceEventKey: isCustom ? null : sourceKey,
         nombre: payload.nombre, sede: payload.sede, equipo: payload.equipo,
         fechaInicio: payload.fechaInicio, fechaFin: payload.fechaFin,
         actorName, actorEmail: currentUser?.email || '', occurredAt: now, immutable: true,
       });
-      await batch.commit();
+      });
       setCalMes(new Date(`${draft.fechaInicio}T00:00:00`));
       setCalendarEditor(null);
       showToast(isNew ? 'Entrenamiento creado en el calendario operativo de Causa OS.' : 'Fechas actualizadas en Causa OS; la hoja no fue modificada.', 'success');
@@ -931,11 +1044,14 @@ export default function AsignadorEntrenadores() {
   // --- Guardar una asignación (con trazabilidad) ---------------------------
   const asignar = async (fila, nuevoEntrenador) => {
     if (!autorizado) return;
-    const anterior = fila.entrenadorAsignado || fila.entrenadorHoja
-      || (fila.preasignacionesHoja?.length ? `preasignación pendiente: ${fila.preasignacionesHoja.join(' / ')}` : '(sin asignar)');
+    const anterior = fila.entrenadorAsignado || '(sin asignar)';
     if (nuevoEntrenador === fila.entrenadorAsignado) return;
     setGuardando(`${fila.key}__${fila.slot}`);
     try {
+      const selected = entrenadores.filter(person => person.nombre === nuevoEntrenador);
+      if (nuevoEntrenador && (selected.length !== 1 || !selected[0].email)) {
+        throw new Error('Identidad ambigua o sin email explícito: no se guardó la asignación.');
+      }
       const ref = doc(db, 'asignaciones_entrenadores', fila.key);
       const now = new Date().toISOString();
       const payload = {
@@ -945,34 +1061,30 @@ export default function AsignadorEntrenadores() {
         fechaFin: fila.fechaFin || null,
         equipo: fila.equipo || null,
         actualizadoEn: serverTimestamp(),
-        [fila.slot]: nuevoEntrenador
+        ...campoAsignacionSlot(fila.slot, nuevoEntrenador
           ? {
               entrenador: nuevoEntrenador,
+              entrenadorEmail: selected[0].email.toLowerCase(),
               asignadoPor: currentUser?.name || currentUser?.email || 'desconocido',
               asignadoPorEmail: currentUser?.email || '',
               fechaIso: now,
             }
-          : null,
+          : null),
       };
       const projectionRef = doc(db, 'calendario_asignaciones_publicas', fila.key);
       const assignmentLogRef = doc(collection(db, 'asignaciones_entrenadores_log'));
-      const batch = writeBatch(db);
+      await runTransaction(db, async batch => {
+        const storedAssignment = await batch.get(ref);
 
-      // La asignación privada es el registro canónico. La proyección contiene
-      // exclusivamente el nombre confirmado y el momento de publicación: el
-      // calendario público puede leerla de inmediato sin exponer correos,
-      // usuarios ni la bitácora interna.
-      batch.set(ref, payload, { merge: true });
-      batch.set(projectionRef, {
-        entrenamiento: fila.nombre,
-        sede: fila.sede,
-        fechaInicio: fila.fechaInicio,
-        fechaFin: fila.fechaFin || null,
-        equipo: fila.equipo || null,
-        [fila.slot]: nuevoEntrenador ? { entrenador: nuevoEntrenador, fechaIso: now } : null,
-        source: 'causa_os_asignador',
-        actualizadoEn: serverTimestamp(),
-      }, { merge: true });
+        // La asignación privada es el registro canónico. La proyección contiene
+        // exclusivamente el nombre confirmado y el momento de publicación: el
+        // calendario público puede leerla de inmediato sin exponer correos,
+        // usuarios ni la bitácora interna.
+        batch.set(ref, payload, { merge: true });
+        batch.set(projectionRef, {
+          ...buildPublicAssignment({ ...storedAssignment.data(), ...payload }),
+          actualizadoEn: serverTimestamp(),
+      });
 
       // Trazabilidad: queda el quién, qué, cuándo y el valor anterior.
       batch.set(assignmentLogRef, {
@@ -982,11 +1094,13 @@ export default function AsignadorEntrenadores() {
         fechaEntrenamiento: fila.fechaInicio,
         anterior,
         nuevo: nuevoEntrenador || '(sin asignar)',
+        sugeridoCronograma: fila.sugerenciaCronograma || null,
+        sugerenciaGeneral: Boolean(fila.sugerenciaGeneral),
         porNombre: currentUser?.name || '',
         porEmail: currentUser?.email || '',
         fechaIso: now,
       });
-      await batch.commit();
+      });
 
       showToast(
         nuevoEntrenador
@@ -1043,11 +1157,46 @@ export default function AsignadorEntrenadores() {
               Asignador Oficial de Entrenadores &amp; Cronograma Maestro
             </h1>
             <p className="text-muted" style={{ margin: '0.3rem 0 0', fontSize: '0.84rem' }}>
-              Entrenamientos del calendario oficial ({events?.length || 0} eventos) ·{' '}
-              {Object.keys(asignaciones).length} con asignación guardada en Causa OS
+              Fuente autoritativa de todos los calendarios ({events?.length || 0} eventos) ·{' '}
+              {Object.keys(asignaciones).length} con asignación confirmada en Causa OS
             </p>
+            <div style={{ marginTop: '0.45rem', display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', fontSize: '0.76rem' }}>
+              <span style={{
+                display: 'inline-flex', alignItems: 'center', gap: '0.35rem',
+                padding: '0.2rem 0.6rem', borderRadius: '999px', fontWeight: 700,
+                background: agentSyncState.status === 'synced'
+                  ? 'rgba(16, 185, 129, 0.14)'
+                  : agentSyncState.status === 'syncing'
+                    ? 'rgba(59, 130, 246, 0.14)'
+                    : 'rgba(245, 158, 11, 0.16)',
+                color: agentSyncState.status === 'synced'
+                  ? '#10b981'
+                  : agentSyncState.status === 'syncing'
+                    ? '#3b82f6'
+                    : '#f59e0b',
+                border: '1px solid currentColor',
+              }}>
+                <ShieldCheck size={13} />
+                {TRAINER_CALENDAR_SYNC_AGENT_NAME}:{' '}
+                {agentSyncState.status === 'synced'
+                  ? `100% Sincronizado (${publicAssignments.length} asignaciones / ${publicOperational.length} fechas públicas)`
+                  : agentSyncState.status === 'syncing'
+                    ? 'Sincronizando proyecciones públicas...'
+                    : 'Verificando sincronización...'}
+              </span>
+            </div>
           </div>
           <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+            <button onClick={forzarSincronizacionAgente}
+              disabled={!assignmentsReady || agentSyncState.status === 'syncing'}
+              title="Ejecutar Agente Guardián para publicar inmediatamente todas las asignaciones y fechas hacia el Calendario Global"
+              style={{ ...selectStyle, width: 'auto', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', borderColor: 'rgba(16,185,129,0.45)', color: '#10b981', fontWeight: 700 }}>
+              <RefreshCw size={15} /> Sincronizar Calendario Global
+            </button>
+            <button onClick={() => window.open('/calendario_global.html?v=' + Date.now(), '_blank', 'noopener,noreferrer')}
+              style={{ ...selectStyle, width: 'auto', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+              <ExternalLink size={15} /> Abrir Calendario Global
+            </button>
             <button onClick={() => setTab('trazabilidad')}
               style={{ ...selectStyle, width: 'auto', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
               <History size={15} /> Trazabilidad ({trazas.length})
@@ -1245,7 +1394,9 @@ export default function AsignadorEntrenadores() {
                   {filasFiltradas.map(f => {
                     const idFila = `${f.key}__${f.slot}`;
                     const actual = f.entrenadorAsignado || '';
-                    const tienePreasignacionAmbigua = !actual && (f.preasignacionesHoja?.length || 0) > 1;
+                    const tienePreasignacionAmbigua = !actual
+                      && (f.preasignacionesHoja?.length || 0) > 1
+                      && (!f.tieneSlotsMaestria || !f.entrenadorHoja);
                     const sinAsignar = !actual && !f.entrenadorHoja;
                     return (
                       <tr key={idFila} style={{ borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.06))' }}>
@@ -1276,7 +1427,7 @@ export default function AsignadorEntrenadores() {
                             <option value="">
                               {tienePreasignacionAmbigua
                                 ? `— Confirmar entrenador (${f.preasignacionesHoja.length} en nómina) —`
-                                : f.entrenadorHoja ? `📋 ${f.entrenadorHoja} (Sugerido de Cronograma)` : '— Sin asignar —'}
+                                : f.entrenadorHoja ? `📋 ${f.entrenadorHoja} (sugerencia; seleccionar para confirmar)` : '— Sin asignar —'}
                             </option>
                             {entrenadores.map(e => <option key={e.nombre} value={e.nombre}>{e.nombre}</option>)}
                           </select>
@@ -1290,9 +1441,14 @@ export default function AsignadorEntrenadores() {
                               <span>ℹ️</span> Preasignación: {f.preasignacionesHoja.join(' · ')}
                             </div>
                           )}
-                          {!actual && !tienePreasignacionAmbigua && f.entrenadorHoja && (
+                          {f.sugerenciaCronograma && (
                             <div style={{ fontSize: '0.68rem', marginTop: 4, color: '#f59e0b', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                              <span>📋</span> Registrado en cronograma · Seleccionar para confirmar
+                              <span>📋</span>
+                              {f.sugerenciaGeneral
+                                ? <>Sugerencia original del cronograma: {f.sugerenciaCronograma} (referencia general; no confirma este FDS)</>
+                                : actual
+                                  ? <>Sugerencia original del cronograma: {f.sugerenciaCronograma}</>
+                                  : <>Sugerido por cronograma: {f.sugerenciaCronograma} · seleccionar para confirmar</>}
                             </div>
                           )}
                         </td>
@@ -1365,7 +1521,7 @@ export default function AsignadorEntrenadores() {
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.83rem' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid var(--border-color, rgba(255,255,255,0.12))' }}>
-                  {['CUÁNDO', 'QUIÉN', 'ENTRENAMIENTO', 'ANTES', 'DESPUÉS'].map(h => (
+                  {['CUÁNDO', 'QUIÉN', 'ENTRENAMIENTO', 'ANTES', 'SUGERIDO EN CRONOGRAMA', 'DESPUÉS'].map(h => (
                     <th key={h} style={{ textAlign: 'left', padding: '0.7rem 0.9rem', color: 'var(--text-muted)', fontSize: '0.7rem', fontWeight: 800 }}>{h}</th>
                   ))}
                 </tr>
@@ -1382,6 +1538,10 @@ export default function AsignadorEntrenadores() {
                       {t.fds && <span style={{ color: '#a78bfa' }}> · {t.fds}</span>}
                     </td>
                     <td style={{ padding: '0.6rem 0.9rem' }} className="text-muted">{t.anterior}</td>
+                    <td style={{ padding: '0.6rem 0.9rem' }} className="text-muted">
+                      {t.sugeridoCronograma || '—'}
+                      {t.sugerenciaGeneral && t.sugeridoCronograma ? ' (referencia general)' : ''}
+                    </td>
                     <td style={{ padding: '0.6rem 0.9rem', color: '#10b981', fontWeight: 600 }}>{t.nuevo}</td>
                   </tr>
                 ))}
@@ -1543,7 +1703,7 @@ export default function AsignadorEntrenadores() {
         filas.forEach(f => {
           if (!f.fechaInicio) return;
           if (filtroSede !== 'todas' && f.sede !== filtroSede) return;
-          if (filtroEntrenador === 'pendientes' && (f.entrenadorAsignado || f.entrenadorHoja)) return;
+          if (filtroEntrenador === 'pendientes' && f.entrenadorAsignado) return;
           if (filtroEntrenador !== 'todos' && filtroEntrenador !== 'pendientes') {
             const ft = normalizarTexto(filtroEntrenador).split(' ').filter(t => t.length > 2);
             const cands = [f.entrenadorAsignado, f.entrenadorHoja, ...(f.preasignacionesHoja || [])].filter(Boolean);
@@ -1653,7 +1813,7 @@ export default function AsignadorEntrenadores() {
                     return (
                       <div key={si}
                         onClick={() => setCalTooltip(calTooltip?.key === `seg-${semanaIdx}-${si}` ? null : { key: `seg-${semanaIdx}-${si}`, ev: seg.ev })}
-                        title={`${seg.ev.nombre}\n${fmtFecha(seg.ev.fechaInicio)} → ${fmtFecha(seg.ev.fechaFin || seg.ev.fechaInicio)}\n${seg.ev.entrenadorAsignado || seg.ev.entrenadorHoja || 'Sin asignar'}`}
+                        title={`${seg.ev.nombre}\n${fmtFecha(seg.ev.fechaInicio)} → ${fmtFecha(seg.ev.fechaFin || seg.ev.fechaInicio)}\n${seg.ev.entrenadorAsignado || seg.ev.entrenadorHoja || 'Sin asignar'}${seg.ev.sugerenciaGeneral && seg.ev.sugerenciaCronograma ? `\nReferencia general del cronograma: ${seg.ev.sugerenciaCronograma}` : ''}`}
                         style={{
                           position: 'absolute',
                           top: topOffset,
@@ -1707,11 +1867,15 @@ export default function AsignadorEntrenadores() {
                     <strong style={{ color: 'var(--text-heading)' }}>Entrenador:</strong>{' '}
                     {calTooltip.ev.entrenadorAsignado
                       ? <span style={{ color: '#10b981', fontWeight: 700 }}>✓ {calTooltip.ev.entrenadorAsignado} <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>(asignado en Causa OS)</span></span>
-                      : calTooltip.ev.entrenadorHoja
-                        ? <span style={{ color: '#f59e0b', fontWeight: 700 }}>{calTooltip.ev.entrenadorHoja} <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>(de la hoja)</span></span>
-                        : <span style={{ color: '#ef4444' }}>Sin asignar</span>
-                    }
+                      : <span style={{ color: '#ef4444' }}>Sin asignar</span>}
                   </span>
+                  {calTooltip.ev.sugerenciaCronograma && (
+                    <span style={{ gridColumn: '1/-1' }}>
+                      <strong style={{ color: 'var(--text-heading)' }}>Sugerencia original del cronograma:</strong>{' '}
+                      <span style={{ color: '#f59e0b' }}>{calTooltip.ev.sugerenciaCronograma}</span>
+                      {calTooltip.ev.sugerenciaGeneral && ' (referencia general; no confirma este FDS)'}
+                    </span>
+                  )}
                   {(calTooltip.ev.preasignacionesHoja || []).length > 1 && (
                     <span style={{ gridColumn: '1/-1' }}>
                       <strong style={{ color: 'var(--text-heading)' }}>Preasignados en hoja:</strong> {calTooltip.ev.preasignacionesHoja.join(', ')}

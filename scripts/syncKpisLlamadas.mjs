@@ -3,6 +3,8 @@ import { initializeApp, cert, getApps } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import fs from 'fs';
 import path from 'path';
+import { coherenceSede, coherenceTeam } from '../src/utils/trainerCoherence.js';
+import { managerSourceIdentities, persistManagerSheetRow } from '../src/services/managerSyncPolicy.js';
 
 const KEY_FILE = './centro-operativo-cpsl-65ad52160f45.json';
 
@@ -266,7 +268,10 @@ export async function syncKpisLlamadas() {
     }
 
     const mClean = cleanStr(manager);
-    const sheet1Meta = statusByManagerCleanName.get(mClean) || {};
+    const scopedCandidates = managersSheet1.filter(m => cleanStr(m.nombre) === mClean &&
+      coherenceSede(m.sede) === coherenceSede(r[2]) &&
+      coherenceTeam({ equipo: m.nombreEquipo }) === coherenceTeam({ equipo: r[3] }));
+    const sheet1Meta = scopedCandidates.length === 1 ? scopedCandidates[0] : {};
 
     llamadosDetalle.push({
       id: `llam_${i}`,
@@ -451,7 +456,7 @@ export async function syncKpisLlamadas() {
   const existingManagers = [];
   snapManagers.forEach(d => existingManagers.push({ ...d.data(), docId: d.id }));
 
-  const normalizeStr = (str) => String(str || '').toLowerCase().trim().replace(/[^a-z0-9]/g, '');
+  const normalizeStr = (str) => String(str || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim().replace(/[^a-z0-9]/g, '');
   
   let added = 0;
   let updated = 0;
@@ -460,10 +465,16 @@ export async function syncKpisLlamadas() {
     if (!nodusMgr.nombre || nodusMgr.nombre === '') continue;
     
     // Find if it exists in Firebase (match by exact name and sede)
-    const match = existingManagers.find(em => 
-      normalizeStr(em.nombre) === normalizeStr(nodusMgr.nombre) && 
-      normalizeStr(em.sede) === normalizeStr(nodusMgr.sede)
-    );
+    const matches = existingManagers.filter(em => managerSourceIdentities(em).some(identity =>
+      normalizeStr(identity.nombre) === normalizeStr(nodusMgr.nombre) &&
+      coherenceSede(identity.sede) === coherenceSede(nodusMgr.sede) &&
+      coherenceTeam(identity) === coherenceTeam(nodusMgr)
+    ));
+    if (matches.length > 1) {
+      console.warn('Manager ambiguo por sede/equipo: omitido sin escritura.');
+      continue;
+    }
+    const match = matches[0];
 
     const updateData = {
       nombre: nodusMgr.nombre,
@@ -476,19 +487,20 @@ export async function syncKpisLlamadas() {
       tieneEntrenador: nodusMgr.tieneEntrenador || false,
       coordinador: nodusMgr.coordinador || '',
       estado: nodusMgr.estado || 'Activo',
-      fuente: 'nodus'
+      fuente: 'sheet:managers_en_juego'
     };
 
     if (match) {
       // Update existing
       const docRef = db.collection('managers_directory').doc(match.docId);
-      batch.set(docRef, updateData, { merge: true });
+      await persistManagerSheetRow(db, docRef, updateData);
       updated++;
     } else {
       // Insert new
       const docRef = db.collection('managers_directory').doc();
       updateData.id = docRef.id;
-      batch.set(docRef, updateData);
+      await persistManagerSheetRow(db, docRef, updateData);
+      existingManagers.push({ ...updateData, docId: docRef.id });
       added++;
     }
   }

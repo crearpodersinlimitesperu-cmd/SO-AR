@@ -1,0 +1,72 @@
+name: Deploy authenticated Nodus JSON Worker
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-nodus-json-worker
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      NODUS_API_KEY: ${{ secrets.NODUS_API_KEY }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: cloudflare-worker/package-lock.json
+
+      - name: Verify deployment secrets are configured
+        shell: bash
+        run: |
+          missing=()
+          [[ -n "$CLOUDFLARE_API_TOKEN" ]] || missing+=(CLOUDFLARE_API_TOKEN)
+          [[ -n "$CLOUDFLARE_ACCOUNT_ID" ]] || missing+=(CLOUDFLARE_ACCOUNT_ID)
+          [[ -n "$NODUS_API_KEY" ]] || missing+=(NODUS_API_KEY)
+          if (( ${#missing[@]} )); then
+            printf 'Missing required GitHub Actions secrets: %s\n' "${missing[*]}" >&2
+            exit 1
+          fi
+
+      - name: Install Worker dependencies
+        working-directory: cloudflare-worker
+        run: npm ci
+
+      - name: Run Worker scope and aggregation tests
+        working-directory: cloudflare-worker
+        run: npm test
+
+      - name: Configure Nodus API credential
+        working-directory: cloudflare-worker
+        shell: bash
+        run: printf '%s' "$NODUS_API_KEY" | npx wrangler secret put NODUS_API_KEY
+
+      - name: Deploy Worker
+        working-directory: cloudflare-worker
+        run: npx wrangler deploy
+
+      - name: Verify deployed authenticated route
+        shell: bash
+        run: |
+          response="$(curl --silent --show-error \
+            -X POST \
+            -H 'Content-Type: application/json' \
+            -d '{}' \
+            https://so-ar-copiloto.crearpsl-cpsl.workers.dev/nodus-json/catalog)"
+          if [[ "$response" != *'Inicia sesión en Causa OS para consultar Nodus.'* ]]; then
+            printf 'Worker route smoke check failed: expected the Nodus JSON authentication response.\n' >&2
+            exit 1
+          fi
+          printf 'Authenticated Nodus JSON route is deployed and requires Firebase authentication.\n'

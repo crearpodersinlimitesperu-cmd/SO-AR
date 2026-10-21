@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { usersData, normalizeRole } from '../data/usersData';
+import { usersData, normalizeRole, getRoleDisplayName } from '../data/usersData';
 import { Users, CheckCircle2, Shield, UserCheck, Calculator, X, Sparkles } from 'lucide-react';
 
 export default function GoalDivisionModal({ isOpen, onClose, goal, onSaveAssignment, currentUser }) {
@@ -50,8 +50,6 @@ export default function GoalDivisionModal({ isOpen, onClose, goal, onSaveAssignm
   // modal React ejecutaba un número distinto de hooks entre renders y lanzaba
   // "Rendered more hooks than during the previous render", tumbando toda la app (solo hay
   // un ErrorBoundary global en main.jsx).
-  if (!isOpen || !goal) return null;
-
   const applyPreset = (presetType) => {
     let filtered = [];
     const roleNorm = (goal.stage || '').toUpperCase();
@@ -144,6 +142,8 @@ export default function GoalDivisionModal({ isOpen, onClose, goal, onSaveAssignm
     }
   };
 
+  if (!isOpen || !goal) return null;
+
   const totalAssignedQuota = assignedCoordinators.reduce((sum, item) => sum + (Number(item.targetQuota) || 0), 0);
   const targetVal = Number(goal.targetValue || 0);
   const isBalanced = Math.abs(totalAssignedQuota - targetVal) < 0.1;
@@ -191,7 +191,7 @@ export default function GoalDivisionModal({ isOpen, onClose, goal, onSaveAssignm
           <Users size={28} color="var(--crear-blue)" />
           <div>
             <h2 style={{ margin: 0, fontSize: '1.4rem', color: '#ffffff' }}>
-              Dividir y Asignar Meta a Coordinadoras
+              Repartir la meta entre responsables
             </h2>
             <p className="text-muted" style={{ margin: 0, fontSize: '0.85rem' }}>
               {goal.title} — Meta Total: <strong style={{ color: 'var(--crear-gold)' }}>{targetVal} {goal.kpi || 'unidades'}</strong>
@@ -319,7 +319,7 @@ export default function GoalDivisionModal({ isOpen, onClose, goal, onSaveAssignm
         {/* LISTADO DE COORDINADORAS SELECCIONABLES */}
         <div style={{ marginBottom: '1.5rem' }}>
           <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 'bold', color: '#ffffff', marginBottom: '0.6rem' }}>
-            Coordinadoras Asignadas ({assignedCoordinators.length} seleccionadas):
+            Responsables seleccionados ({assignedCoordinators.length}):
           </label>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '250px', overflowY: 'auto', paddingRight: '4px' }}>
@@ -354,7 +354,7 @@ export default function GoalDivisionModal({ isOpen, onClose, goal, onSaveAssignm
                         {coord.name}
                       </div>
                       <div style={{ fontSize: '0.75rem', color: isC1 ? 'var(--crear-blue)' : 'var(--role-mj)' }}>
-                        {isC1 ? 'Coordinadora C1 / C2' : 'Coordinadora Maestría (CMJ)'} • {coord.sede}
+                        {coord.role ? getRoleDisplayName(coord.role) : 'Rol no registrado'} • {coord.sede}
                       </div>
                     </div>
                   </label>

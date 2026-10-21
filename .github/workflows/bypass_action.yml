@@ -1,0 +1,43 @@
+name: Nodus Cloudflare Bypass
+
+on:
+  workflow_dispatch:
+
+jobs:
+  run-bypass:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install Puppeteer Stealth
+        run: npm install puppeteer puppeteer-extra puppeteer-extra-plugin-stealth
+
+      - name: Run Scraper
+        run: |
+          cat << 'JS' > scrape.cjs
+          const puppeteer = require('puppeteer-extra');
+          const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+          puppeteer.use(StealthPlugin());
+          
+          (async () => {
+            const browser = await puppeteer.launch({ headless: "new" });
+            const page = await browser.newPage();
+            await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+            await page.goto('https://imo.crearpslglobal.com/auth/login');
+            const title = await page.title();
+            console.log("Status Title:", title);
+            if (title.includes("Cloudflare") || title.includes("Just a moment")) {
+                console.log("❌ Bloqueado por Cloudflare en MacOS Runner");
+            } else {
+                console.log("✅ ¡Bypass Exitoso!");
+            }
+            await browser.close();
+          })();
+          JS
+          node scrape.cjs

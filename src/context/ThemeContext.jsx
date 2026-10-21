@@ -4,6 +4,7 @@ const ThemeContext = createContext();
 
 export function ThemeProvider({ children }) {
   // 'auto' | 'light' | 'dark' | 'zen'
+  const getSystemTheme = () => window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
   const [themeMode, setThemeModeState] = useState(() => {
     return localStorage.getItem('cpsl_theme_mode') || 'dark';
   });
@@ -19,7 +20,7 @@ export function ThemeProvider({ children }) {
     if (savedMode === 'zen') return 'zen';
     if (savedMode === 'light') return 'light';
     if (savedMode === 'dark') return 'dark';
-    return 'dark';
+    return getSystemTheme();
   });
 
   const setThemeMode = (mode) => {
@@ -52,12 +53,7 @@ export function ThemeProvider({ children }) {
       if (themeMode === 'light') return 'light';
       if (themeMode === 'dark') return 'dark';
       
-      // Modo Auto: Cálculo por horario solar (6:00 a 18:30 Día, resto Noche)
-      const now = new Date();
-      const currentHour = now.getHours() + now.getMinutes() / 60;
-      const isDayTime = currentHour >= 6.0 && currentHour < 18.5;
-
-      return isDayTime ? 'light' : 'dark';
+      return getSystemTheme();
     };
 
     const applyTheme = () => {
@@ -75,11 +71,9 @@ export function ThemeProvider({ children }) {
 
     applyTheme();
 
-    const interval = setInterval(() => {
-      if (themeMode === 'auto') applyTheme();
-    }, 60000);
-
-    return () => clearInterval(interval);
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: light)');
+    if (themeMode === 'auto') mediaQuery.addEventListener('change', applyTheme);
+    return () => mediaQuery.removeEventListener('change', applyTheme);
   }, [themeMode]);
 
   return (

@@ -67,3 +67,42 @@ Run `37511911253`: creación/configuración de los secretos IMO correcta y carga
 Permiso mínimo preparado para aprobación: rol `roles/secretmanager.secretAccessor` de la cuenta de ejecución `122588918051-compute@developer.gserviceaccount.com` exclusivamente en `IMO_VERIFICATION_SECRET`, `IMO_MAIL_USER`, `IMO_MAIL_PASS`. No hace falta conceder administración general de secretos a GitHub. Se solicitó autorización explícita para este acceso; aún pendiente. La consola de Google Cloud solicita reautenticación del usuario antes de abrir Secret Manager.
 
 No se ha activado `imo_system/control`, no se enviaron códigos reales y no se importaron identidades. Reanudar desde la verificación de identidad de Google y los secretos NODUS_USER/NODUS_PASSWORD. No repetir la creación de secretos ni sustituir sus valores al reintentar.
+
+### Avance de permisos y recuperación (6 de octubre, tarde)
+
+- Secret Accessor confirmado en consola: cuenta de ejecución, 3 de 3 secretos IMO.
+- Run `37546616866`: las dos compilaciones fallaron; Google identificó ausencia de `roles/logging.logWriter`.
+- El usuario autorizó continuar y Google confirmó la concesión de Logs Writer.
+- Run `37549241719`: el recurso fallido de `imoDeliverCode` no tenía eventTrigger; Firebase interpretó el stub como HTTPS e impidió actualizarlo a trigger.
+- Se añadió recuperación acotada: solo elimina/recrea `imoDeliverCode` cuando es FAILED, sin eventTrigger, con codebase `imo` y entryPoint exacto. Nunca elimina una función operativa.
+- Run `37549555841`: recuperación correcta; compilación falló leyendo el archivo fuente. Los registros ya funcionan y muestran denegación de `storage.objects.get` en `gcf-v2-sources-122588918051-us-central1`.
+- Se dejó preparado, sin guardar, `roles/storage.objectViewer` para `122588918051-compute@developer.gserviceaccount.com` exclusivamente en ese bucket. Pendiente de autorización del usuario para este nuevo acceso.
+- No hay funciones IMO operativas confirmadas. No se habilitó el control ni se enviaron códigos reales. La autenticación/sincronización Nodus y el portal v3 siguen pendientes.
+
+## Plazo del portal verificado
+
+Al completar la primera verificación OTP, el backend crea una sola ventana en `imo_private_mission_windows/{campaignId}/profiles/{imoHash}` con `openedAt` de hora del servidor. Una verificación posterior no reinicia el plazo. El backend permite reportes hasta el instante exacto de las 8.5 horas y rechaza nuevas solicitudes después; los reportes anteriores siguen visibles. La ventana se entrega con la respuesta privada del roster y el portal muestra el contador de 7 horas, la prórroga automática de 90 minutos y el modo de solo lectura.
+
+El Monitor puede leer las fechas/nombre de esas ventanas para personal autorizado; ningún cliente puede escribirlas y los perfiles privados completos siguen fuera del navegador. Este límite del portal es adicional al estado de operación v3: no habilita el snapshot, no crea campañas, no acredita una integración activa de Nodus ni sustituye la revisión C1/C2.
+
+### Backend desplegado y verificado — 7 de octubre de 2026
+
+- Confirmados permisos de secretos, Logs Writer, Storage Object Viewer (solo bucket de fuentes) y Artifact Registry Writer (solo gcf-artifacts).
+- El usuario autorizó solicitudes públicas solo para `imoAccess`. Se aplicó en Cloud Run; `imoDeliverCode` mantiene su trigger privado.
+- Run `37684978829`: SUCCESS. Ambas funciones ACTIVE; trigger Firestore de entrega comprobado y endpoint público devuelve INVALID_ARGUMENT (400) a una acción inválida.
+- Consulta sin sesión/datos de prueba a `roster`: FAILED_PRECONDITION, verificación de Nodus no disponible; no reveló enrolados, no se enviaron códigos.
+- La advertencia de retención de imágenes se conserva. El wrapper solo acepta ese error específico tras éxito de ambas operaciones y verificación independiente de estado/trigger/endpoint. No se modificaron políticas de borrado.
+- Los metadatos de NODUS_USER y NODUS_PASSWORD siguen fechados 1 de octubre; no se repitieron intentos de login con las mismas credenciales que fallaron.
+- Pendiente funcional: acceso válido a Nodus, importador verificado, campañas/portal v3, revisión de coordinadores y prueba integral. Backend activo no equivale a portal terminado.
+
+## Portal conectado al backend — 8 octubre 2026
+
+- Se añadió `VerifiedMissionPortal` para campañas schemaVersion 3: documento, código, sesión en memoria de 30 minutos, consulta propia, calendario, búsqueda, filtros y solicitudes idempotentes de cambio/contacto/asistencia.
+- No se leen perfiles públicos en campañas v3. Los enlaces v2 existentes mantienen su flujo explícitamente no verificado; no fueron convertidos ni activados con identidades inferidas.
+- Monitor: eliminados los textos fijos 133/291 y la afirmación no calculada de cero duplicados/omisiones. Buscar ya no amplía silenciosamente el filtro de equipo.
+- Validación: 23 pruebas de contratos existentes; recorrido de navegador con respuestas sintéticas locales (documento, código, consulta, ausencia de datos, cambio 30→32 pendiente y cierre de sesión); compilación de producción.
+- Pendientes reales: acceso válido al sincronizador Nodus, importación privada verificada, habilitación de campaña v3, bandeja autenticada de revisión C1/C2 y prueba integral de correo/notificación con datos autorizados. No se habilitó el control ni se enviaron mensajes durante esta comprobación.
+
+## Disponibilidad para C1 — regla del usuario, 8 octubre
+
+Solo se muestran enrolados con inasistencia C1 explícita o deserción C1 registrada. Una deserción C1 tiene precedencia sobre asistencia de apertura. Ya sentados sin deserción se excluyen; estado ausente, intención IMO, pagos, llamadas y estado C2 no acreditan disponibilidad. Misma regla en Monitor, candidatos, generación, portal v2/v3 y servidor (consulta y solicitudes). No se borran fichas ni historial. Las campañas antiguas que no guardaron estado C1 quedan pendientes de verificación, no se reclasifican como disponibles. Las proyecciones nuevas conservan la evidencia C1. Pruebas de modelo/candidatos/identidad/control: 22 aprobadas; compilación aprobada. Prueba adicional de emulador añadida; no ejecutada localmente por ausencia de Java.

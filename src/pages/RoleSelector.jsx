@@ -13,7 +13,11 @@ export default function RoleSelector() {
     if (isSwitching) return;
     setIsSwitching(true);
     try {
-      await switchRole(roleId);
+      const changed = await switchRole(roleId);
+      if (!changed) {
+        setIsSwitching(false);
+        return;
+      }
       if (roleId === 'gerente') {
         navigate('/gerente');
       } else if (roleId === 'global' || roleId === 'consolidado') {
@@ -33,14 +37,11 @@ export default function RoleSelector() {
     userRoles = currentUser.roles;
   } else if (currentUser?.appRole) {
     userRoles = [currentUser.appRole];
-  } else {
-    // If somehow no roles, fallback to these common ones to not block them
-    userRoles = ['gerente', 'coord_c1', 'coord_maestria', 'capitan', 'qt', 'entrenador'];
   }
   // Define strict hierarchy order (lower index = higher priority)
   const roleHierarchy = [
     'direccion', 'cfo', 'gerente', 'director_maestria', 
-    'coord_c1', 'coord_maestria', 'capitan', 'manager',
+    'coord_c1', 'coord_jr', 'coord_maestria', 'capitan', 'manager',
     'entrenador', 'entrenador_llamadas', 'qt',
     'finanzas', 'coordinador', 'talento_humano', 'legal', 'asistente_impuestos_quito', 'tecnico_sst'
   ];

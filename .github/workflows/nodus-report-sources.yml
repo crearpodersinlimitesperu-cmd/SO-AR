@@ -1,0 +1,44 @@
+name: Nodus report sources and read-only evidence
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        type: choice
+        options: [audit, publish, discover-goals]
+        default: audit
+        description: Audit reads snapshots; publish refreshes aggregates; discover-goals reads Nodus schema without personal records
+permissions:
+  contents: read
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts --include=optional
+      - name: Test read-only goals discovery contract
+        if: inputs.mode == 'discover-goals'
+        run: node --test tests/nodus-goal-discovery.test.mjs
+      - name: Install browser for read-only goals discovery
+        if: inputs.mode == 'discover-goals'
+        run: npx puppeteer browsers install chrome
+      - name: Discover Nodus goals source schema without personal records
+        if: inputs.mode == 'discover-goals'
+        env:
+          NODUS_USER: ${{ secrets.NODUS_USER }}
+          NODUS_PASSWORD: ${{ secrets.NODUS_PASSWORD }}
+        run: node scripts/discoverNodusGoalSources.mjs
+      - name: Read-only evidence
+        if: inputs.mode == 'audit'
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: node scripts/publishNodusReportSources.mjs
+      - name: Publish aggregate sources and evidence
+        if: inputs.mode == 'publish'
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: node scripts/publishNodusReportSources.mjs --apply

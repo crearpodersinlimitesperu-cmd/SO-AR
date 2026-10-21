@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
 import { useCycles } from '../context/CyclesContext';
+import { findOfficialMJEvent } from '../services/mjCalendarSource';
+import { visibleMJCalendars } from '../utils/mjCalendarVisibility';
 import { db } from '../services/firebase';
 import {
   collection, query, onSnapshot, doc, setDoc, deleteDoc, serverTimestamp
@@ -10,34 +12,6 @@ import {
 import {
   Calendar, Plus, ArrowLeft, Printer, Trash2, Edit3, Save, X, Copy, Lock, RefreshCw, ChevronUp, ChevronDown
 } from 'lucide-react';
-
-// Busca, en el calendario oficial ya cargado por CyclesContext (misma fuente
-// que usa toda la app para saber en qué etapa está cada equipo), el evento
-// "MAESTRIA DEL JUEGO" de una sede+equipo. Se usa SOLO para precargar la
-// fecha del Primer FDS (Creación) — el resto de fechas de ese bloque no
-// vienen en esta fuente. A partir de esa fecha del Primer FDS, la función
-// applyReliableDates() de más abajo calcula todo lo demás que SÍ tiene un
-// patrón 100% consistente en los 3 calendarios reales de ejemplo.
-function findOfficialMJEvent(events, sede, equipoNumero) {
-  if (!sede?.trim() || !equipoNumero?.trim() || !events?.length) return null;
-  const sedeNorm = sede.trim().toLowerCase();
-  const equipoNorm = String(equipoNumero).trim();
-  const sedeAliases = [
-    ['lima', 'lim'], ['quito', 'uio'], ['guayaquil', 'gye'],
-    ['cuenca', 'cue'], ['medell', 'med'], ['mexico', 'mex'], ['méxico', 'mex'], ['cdmx', 'mex']
-  ];
-  return events.find(e => {
-    const nombre = e.nombre || e.name || '';
-    if (nombre !== 'MAESTRIA DEL JUEGO') return false;
-    const evSede = (e.sede || e.sedeTag || e.place || e.address || '').toLowerCase();
-    if (!evSede) return false;
-    const sedeMatches = evSede.includes(sedeNorm) || sedeNorm.includes(evSede) ||
-      sedeAliases.some(([a, b]) => (sedeNorm.includes(a) && evSede.includes(b)));
-    if (!sedeMatches) return false;
-    const evEquipo = String(e.equipo || '').trim();
-    return evEquipo === equipoNorm || evEquipo.includes(equipoNorm) || (equipoNorm && equipoNorm.includes(evEquipo));
-  }) || null;
-}
 
 function addDaysISO(isoDate, days) {
   const d = new Date(isoDate + 'T00:00:00');
@@ -342,16 +316,18 @@ const FDS_LABELS = { creacion: 'PRIMER FDS: CREACIÓN', relacion: 'SEGUNDO FDS: 
 export default function CalendarioMJ() {
   const { currentUser } = useAuth();
   const { showToast } = useUI();
-  const { events } = useCycles();
+  const { events, loadingEvents } = useCycles();
   const navigate = useNavigate();
 
   const [calendars, setCalendars] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
   const [editing, setEditing] = useState(null); // null = lista; 'new' o docId = editor
   const [form, setForm] = useState(emptyForm());
   const [saving, setSaving] = useState(false);
   const [previewId, setPreviewId] = useState(null);
   const [autoFilledOnce, setAutoFilledOnce] = useState(false);
+  const [sourceNotice, setSourceNotice] = useState(null);
 
   const userCanEdit = canEdit(currentUser);
 
@@ -391,11 +367,17 @@ export default function CalendarioMJ() {
   }, [fds1FechaInicio, editing]);
 
   const buscarEnCalendarioOficial = () => {
-    const match = findOfficialMJEvent(events, form.sede, form.equipoNumero);
-    if (!match) {
-      showToast('No se encontró este equipo en el calendario oficial. Ingresa las fechas manualmente.', 'error');
+    const key = `${form.sede}|${form.equipoNumero}`;
+    if (loadingEvents) {
+      setSourceNotice({ key, message: 'El calendario aún está cargando. Espera antes de buscar las fechas.' });
       return;
     }
+    const match = findOfficialMJEvent(events, form.sede, form.equipoNumero);
+    if (!match) {
+      setSourceNotice({ key, message: `No hay una fecha inequívoca del Primer FDS (Creación) para el equipo ${form.equipoNumero || 'pendiente'} en ${form.sede || 'la sede pendiente'} dentro del calendario cargado. Esto no significa que el equipo no exista en Nodus. Confirma la fecha de Maestría con la sede antes de ingresarla; no uses el período de C1/C2 ni el fin de semana de otro equipo.` });
+      return;
+    }
+    setSourceNotice(null);
     const start = (match.fecha_inicio || match.start || '').replace('Z', '').slice(0, 10);
     if (!start) {
       showToast('El equipo se encontró pero sin fecha de inicio registrada.', 'error');
@@ -421,23 +403,17 @@ export default function CalendarioMJ() {
       const rows = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       rows.sort((a, b) => (a.sede || '').localeCompare(b.sede || '') || (Number(a.equipoNumero) || 0) - (Number(b.equipoNumero) || 0));
       setCalendars(rows);
+      setLoadError(null);
       setLoading(false);
     }, (err) => {
       console.error('Error cargando calendarios MJ:', err);
+      setLoadError('No se pudieron cargar los calendarios. Revisa tu conexión y los permisos de acceso antes de crear otro calendario.');
       setLoading(false);
     });
     return () => unsub();
   }, []);
 
-  const visibleCalendars = useMemo(() => {
-    if (!currentUser) return [];
-    if (currentUser.isSuperAdmin || ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'consolidado', 'director_maestria'].includes(currentUser.appRole)) {
-      return calendars;
-    }
-    // Coordinador de Maestría: solo su sede
-    const userSede = (currentUser.sede || '').trim().toLowerCase();
-    return calendars.filter(c => (c.sede || '').trim().toLowerCase() === userSede);
-  }, [calendars, currentUser]);
+  const visibleCalendars = useMemo(() => visibleMJCalendars(calendars, currentUser), [calendars, currentUser]);
 
   const startNew = () => {
     setForm(emptyForm());
@@ -646,6 +622,11 @@ export default function CalendarioMJ() {
         </div>
       )}
 
+      {editing && sourceNotice?.key === `${form.sede}|${form.equipoNumero}` && (
+        <div role="status" className="no-print" style={{ padding: '1rem', marginBottom: '1rem', border: '1px solid var(--border-subtle)', borderRadius: '10px' }}>
+          {sourceNotice.message}
+        </div>
+      )}
       {editing ? (
         <CalendarioEditor
           form={form}
@@ -668,6 +649,8 @@ export default function CalendarioMJ() {
         <div className="no-print">
           {loading ? (
             <p>Cargando calendarios...</p>
+          ) : loadError ? (
+            <p role="alert" style={{ color: '#ef4444' }}>{loadError}</p>
           ) : visibleCalendars.length === 0 ? (
             <div style={{ padding: '2rem', textAlign: 'center', opacity: 0.7 }}>
               Todavía no hay calendarios guardados{userCanEdit ? ' — crea el primero con "Nuevo calendario".' : '.'}
@@ -1148,4 +1131,3 @@ function CalendarioPreview({ cal, onClose }) {
     </div>
   );
 }
-

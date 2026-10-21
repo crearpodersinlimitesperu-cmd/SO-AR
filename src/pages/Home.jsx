@@ -1,7 +1,18 @@
-import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { MODULE_REGISTRY, isModuleVisible, REPORTES_VISIBLE } from '../config/moduleRegistry';
+import { useModuleUsage } from '../context/ModuleUsageContext';
+import ModuleQuickAccess from '../components/ModuleQuickAccess';
+import ModuleHelpButton from '../components/ModuleHelpButton';
+import HomeModuleWorkspace from '../components/HomeModuleWorkspace';
+import { useState, useEffect, useRef, useMemo } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { resolveTaskLink } from '../services/taskNavigation';
 import { useAuth } from '../context/AuthContext';
 import { useCycles } from '../context/CyclesContext';
+import {
+  applyAsignadorAuthoritativeProjection,
+  indexAssignmentsForLookup,
+  matchAssignmentForEvent,
+} from '../services/trainerCalendarProjection.js';
 import { useChecklist } from '../context/ChecklistContext';
 import { useUI } from '../context/UIContext';
 import { useTheme } from '../context/ThemeContext';
@@ -12,10 +23,12 @@ import {
   FileText, LogOut, Clock, Calendar as CalendarIcon, MapPin, CheckCircle2, 
   AlertCircle, Circle, RefreshCw, CalendarPlus, Bell, Users, AtSign, 
   BookOpen, Lightbulb, Search, X, Filter, ChevronDown, Sparkles,
-  Zap, LayoutGrid, Sliders, CheckSquare, ArrowRight, ArrowUpRight, ShieldCheck,
-  TrendingUp, Compass, HelpCircle, User
+  Zap, Sliders, CheckSquare, ArrowRight, ArrowUpRight, ShieldCheck,
+  TrendingUp, Compass, HelpCircle, User, AlertTriangle
 } from 'lucide-react';
 import { getFlagForSede } from '../utils/flags';
+import { getTaskProgressRoles } from '../utils/taskProgressRoles';
+import { isTaskVisibleForUser } from '../utils/taskPrivacy';
 import { createGoogleEvent } from '../services/googleSync';
 import { calculateAutomaticDeadline } from '../utils/soarDates';
 import TaskAssignmentModal from '../components/TaskAssignmentModal';
@@ -33,14 +46,108 @@ import {
   canAccessAgendaTimeBoxing, canAccessFlyersC1, canAccessCalendarioMJ,
   canAccessMonitorVuelos, canAccessMonitorIMOs, canAccessHotelesSede, canAccessManualQT,
   canAccessDirectorioQT, canAccessManualNodus, canAccessCampusInteractivo,
-  canUseAsignadorEntrenadores, PORTFOLIO_FI_REVIEW_EMAILS, isDataAdmin
+  canUseAsignadorEntrenadores, isDataAdmin, isElizabethEscobar
 } from '../config/permissions';
 import EffectiveCommunicationButton from '../components/EffectiveCommunicationButton';
 import { getAllCompanyUsers } from '../services/userService';
 import UserProfileModal from '../components/UserProfileModal';
+import { getOverdueAssignedTasks, isTaskDoneForUser, getOverdueEscalation } from '../utils/overdueTasks';
 import HorariosEntrenamientoModal from '../components/HorariosEntrenamientoModal';
 import { INITIAL_MANAGERS, normalizeTrainer } from '../data/managersData';
 import { formatTrainerDisplayName, nombreLegalEntrenador, normalizarIdentidadEntrenador } from '../data/trainerAliases';
+
+const getEventTeamLabels = (event = {}) => {
+  const rawValues = [
+    event.equipos,
+    event.numEquipos,
+    event.equipo,
+    event.team,
+    event.numEquipo,
+    event.teamNum,
+    event.data?.equipos,
+    event.data?.equipo,
+    event.data?.team,
+    event.data?.numEquipo
+  ];
+  const labels = new Set();
+
+  const addValue = (value) => {
+    if (Array.isArray(value)) {
+      value.forEach(addValue);
+      return;
+    }
+    if (value && typeof value === 'object') {
+      addValue(value.numEquipo ?? value.teamNum ?? value.equipo ?? value.team);
+      return;
+    }
+    if (value == null) return;
+    const text = String(value).trim();
+    if (!text) return;
+    const teamPattern = /^(?:(?:equipo|equipos|eq\.?|team|teams)\s*:?\s*)?#?\d+(?:(?:\s*[,/&•-]\s*|\s+y\s+)(?:(?:equipo|equipos|eq\.?|team|teams)\s*:?\s*)?#?\d+)*$/i;
+    if (!teamPattern.test(text)) return;
+    const numbers = text.match(/\d+/g) || [];
+    if (numbers.length === 1 && [4, 6].includes(numbers[0].length)) {
+      for (let i = 0; i < numbers[0].length; i += 2) {
+        labels.add(`#${numbers[0].slice(i, i + 2)}`);
+      }
+    } else {
+      numbers.forEach((number) => labels.add(`#${number}`));
+    }
+  };
+  rawValues.forEach(addValue);
+
+  return [...labels];
+};
+
+const eventTrainingStage = (event = {}) => {
+  const name = String(event.nombre || event.name || event.entrenamiento || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toUpperCase();
+  if (name.includes('CAPITULO UNO') || /\bC1\b/.test(name)) return 'C1';
+  if (name.includes('CAPITULO DOS') || /\bC2\b/.test(name)) return 'C2';
+  if (name.includes('MAESTRIA DEL JUEGO') || /\bMJ\b/.test(name)) return 'MJ';
+  return '';
+};
+
+const getRelatedEventTeamLabels = (event, allEvents) => {
+  const directLabels = getEventTeamLabels(event);
+  if (directLabels.length) return directLabels;
+
+  const stage = eventTrainingStage(event);
+  const date = new Date(event.fecha_inicio || event.start || '');
+  const eventSede = event.sede || event.sedeTag || '';
+  if (!eventSede || Number.isNaN(date.getTime())) return [];
+
+  const relatedStages = stage === 'MJ'
+    ? ['C2']
+    : stage === 'C1' || stage === 'C2'
+      ? [stage === 'C1' ? 'C2' : 'C1']
+      : null;
+  const candidates = allEvents.flatMap((candidate) => {
+    const candidateStage = eventTrainingStage(candidate);
+    const candidateSede = candidate.sede || candidate.sedeTag || '';
+    if (candidate === event ||
+        (relatedStages && !relatedStages.includes(candidateStage)) ||
+        (stage === 'MJ' && candidateStage !== 'C2') ||
+        !candidateSede ||
+        normalizeSede(candidateSede) !== normalizeSede(eventSede)) {
+      return [];
+    }
+    const candidateDate = new Date(candidate.fecha_inicio || candidate.start || '');
+    if (Number.isNaN(candidateDate.getTime())) return [];
+    const dayGap = (candidateDate.getTime() - date.getTime()) / 86400000;
+    if (stage === 'MJ' ? dayGap > 0 || dayGap < -60 : Math.abs(dayGap) > 45) return [];
+    return getEventTeamLabels(candidate).map((team) => ({ team, distance: Math.abs(dayGap) }));
+  });
+  if (!candidates.length) return [];
+
+  const nearestDistance = Math.min(...candidates.map((candidate) => candidate.distance));
+  const nearestTeams = new Set(
+    candidates.filter((candidate) => candidate.distance === nearestDistance).map((candidate) => candidate.team)
+  );
+  return [...nearestTeams];
+};
 
 /**
  * Normaliza y verifica si un evento está asignado a un entrenador específico
@@ -68,25 +175,6 @@ const isTrainerMatchingUser = (evTrainer, user) => {
     const normT = normalizeTrainer(t);
     return Boolean(normT && userIdentity && normT === userIdentity);
   });
-};
-
-// El Asignador guarda una proyección mínima y pública de la asignación
-// confirmada. Esta clave es deliberadamente idéntica a la que usa el
-// Asignador: permite que el perfil del entrenador se actualice en vivo sin
-// exponer la asignación privada (correos, quién hizo el cambio o bitácora).
-const publicAssignmentEventKey = (event = {}) => {
-  const date = String(event.fecha_inicio || event.start || event.fechaInicio || '').slice(0, 10);
-  const sede = normalizeSede(event.sede || event.sedeTag || '');
-  const training = String(event.nombre || event.name || event.entrenamiento || '').trim();
-  const team = String(event.equipo || event.team || '').trim();
-  return `${date}__${sede}__${training}${team ? `__${team}` : ''}`.replace(/\//g, '-');
-};
-
-const publicAssignmentEventKeyNoTeam = (event = {}) => {
-  const date = String(event.fecha_inicio || event.start || event.fechaInicio || '').slice(0, 10);
-  const sede = normalizeSede(event.sede || event.sedeTag || '');
-  const training = String(event.nombre || event.name || event.entrenamiento || '').trim();
-  return `${date}__${sede}__${training}`.replace(/\//g, '-');
 };
 
 const trainerIdentityKey = (value) => {
@@ -125,21 +213,6 @@ const confirmedTrainerNames = (assignment) => {
 // hay que actualizar también esta lista para que el buscador no muestre
 // accesos desactualizados o incorrectos.
 // ============================================================================
-const EXEC_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria'];
-const KPI_ROLES = ['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan'];
-const DIRECTORIO_QT_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin', 'director_maestria'];
-// CAMPUS_ROLES: ya no se usa como filtro — Campus Interactivo es abierto a TODOS los
-// roles según la Matriz Oficial (fila "Campus Interactivo" = X en las 9 columnas).
-// Se deja declarada solo por si se necesita revertir a un acceso restringido.
-const CAMPUS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin'];
-const CENTRO_MANAGERS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'director_maestria'];
-const MANUAL_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'superadmin', 'director_maestria'];
-const MANUAL_NODUS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin', 'director_maestria'];
-const REPORTES_VISIBLE = (u) => Boolean(
-  u?.isSuperAdmin || u?.isGerente ||
-  ['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'capitan', 'qt', 'direccion', 'director_maestria', 'aliado', 'manager'].includes(u?.appRole)
-);
-
 // ============================================================================
 // REGISTRO DE OPCIONES Y ACCIONES DE CAUSA OS (02/09/2026)
 // ----------------------------------------------------------------------------
@@ -385,7 +458,7 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Indicadores clave de rendimiento: deserción, confirmados, reentrenados y futuros imposibles',
     keywords: ['kpi', 'kpis', 'mis kpis', 'metricas', 'indicadores', 'desercion', 'confirmados', 'reentrenados', 'enrolamiento'],
     route: '/mis-kpis',
-    roles: ['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan']
+    roles: ['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_jr', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan']
   },
   {
     id: 'opt-reportes',
@@ -708,46 +781,6 @@ const CAUSA_OPTIONS_REGISTRY = [
   }
 ];
 
-const MODULE_REGISTRY = [
-  { id: 'gerencial', label: 'Causa OS Gerencial', emoji: '💼', route: '/gerente', roles: EXEC_ROLES },
-  { id: 'portafolio', label: 'Portafolio PMO (Planview)', emoji: '📈', route: '/portafolio', roles: EXEC_ROLES },
-  { id: 'estrategia', label: 'Estrategia OKRs (Cascade)', emoji: '🎯', route: '/estrategia', roles: EXEC_ROLES },
-  { id: 'auditoria-kpis', label: 'Auditoría de KPIs', emoji: '📉', route: '/auditoria-kpis', roles: EXEC_ROLES },
-  { id: 'acuerdos', label: 'Acuerdos Oficiales (Correo)', emoji: '✉️', route: '/acuerdos', roles: EXEC_ROLES },
-  { id: 'calendario-equipo', label: 'Agenda y Time Boxing', emoji: '🗓️', route: '/calendario-equipo', roles: null },
-  { id: 'learning', label: 'Inteligencia Colectiva (Learning)', emoji: '🧠', route: '/learning', roles: EXEC_ROLES },
-  { id: 'excelencia', label: 'Excelencia Operativa', emoji: '👑', route: '/excelencia', roles: EXEC_ROLES },
-  { id: 'mis-kpis', label: 'Mis KPIs', emoji: '📊', route: '/mis-kpis', roles: KPI_ROLES },
-  { id: 'directorio-qt', label: 'Directorio QT', emoji: '⚡', route: '/directorio-qt', roles: DIRECTORIO_QT_ROLES },
-  { id: 'superadmin', label: 'Centro de Mando', emoji: '🌐', route: '/superadmin', roles: [...EXEC_ROLES, 'talento_humano'] },
-  // Antes era null (abierto a todos). Corregido: Directivos + Gerentes únicamente
-  // según la Matriz Oficial, fila "Calendario Global" (08/09/2026).
-  { id: 'calendario-global', label: 'Calendario Global Maestro', emoji: '📅', external: 'calendario-global', roles: EXEC_ROLES },
-  // Abierto a TODOS los roles según la Matriz Oficial (antes usaba CAMPUS_ROLES, restrictivo).
-  { id: 'campus', label: 'Campus Interactivo', emoji: '🎓', external: 'https://cpsl-campus-interactivo.vercel.app/ruta', roles: null },
-  { id: 'centro-managers', label: 'Centro de Managers', emoji: '🎯', route: '/centro-managers', roles: CENTRO_MANAGERS_ROLES },
-  { id: 'protocolo-emergencias', label: 'Protocolo de Emergencias', emoji: '🚨', route: '/protocolo-emergencias', roles: null },
-  { id: 'manual', label: 'Manual / Guía Causa OS / QT', emoji: '📘', route: '/manual', roles: MANUAL_ROLES },
-  { id: 'manual-nodus', label: 'Manual Práctico Nodus', emoji: '📗', route: '/manual-nodus', roles: MANUAL_NODUS_ROLES },
-  { id: 'checklist', label: 'Mi Checklist Operativo', emoji: '✅', route: (u) => `/checklist/${u?.appRole || 'capitan'}`, roles: null },
-  { id: 'metas', label: 'Mis Metas', emoji: '🏆', route: '/metas', roles: null },
-  { id: 'reportes', label: 'Enviar Reportes', emoji: '📤', route: '/reportes', roles: null, visible: REPORTES_VISIBLE },
-  // Corregido según confirmación explícita de José (08/09/2026): Directivos (y
-  // director_maestria, tratado como Directivos) NO tienen acceso a Flyers C1.
-  // Solo Gerentes, Coordinadores C1Y2 y Coordinadores de MJ, según la Matriz Oficial.
-  { id: 'generador-flyer', label: 'Generador de Flyers Oficiales', emoji: '🎨', route: '/generador-flyer', roles: ['gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj'] },
-  { id: 'cfo-dashboard', label: 'Dirección Financiera Global', emoji: '🏦', route: '/cfo-dashboard', roles: null, visible: (u) => ['cfo', 'ceo', 'superadmin', 'direccion'].includes(u?.appRole) || u?.isSuperAdmin },
-  { id: 'finance-workspace', label: 'Operativa Financiera', emoji: '💸', route: '/finance-workspace', roles: null, visible: (u) => ['finanzas', 'facturacion', 'contador', 'superadmin'].includes(u?.appRole) },
-  { id: 'maestria-global', label: 'Comando Global Maestría', emoji: '🎯', route: '/maestria-global', roles: null, visible: (u) => ['director_maestria', 'direccion', 'superadmin', 'ceo'].includes(u?.appRole) || u?.isSuperAdmin },
-  { id: 'trainer-hub', label: 'Academia y Hub de Entrenamiento', emoji: '🎓', route: '/trainer-hub', roles: null, visible: (u) => ['entrenador', 'direccion', 'superadmin', 'ceo', 'director_maestria'].includes(u?.appRole) || u?.isSuperAdmin },
-  { id: 'call-coach-crm', label: 'CRM Entrenadores de Llamadas', emoji: '📞', route: '/call-coach-crm', roles: null, visible: (u) => ['entrenador_llamadas', 'direccion', 'superadmin', 'ceo'].includes(u?.appRole) || u?.isSuperAdmin },
-  { id: 'qt-hub', label: 'Hub Operativo QT', emoji: '⚡', route: '/qt-hub', roles: null, visible: (u) => ['qt', 'gerente', 'superadmin', 'ceo'].includes(u?.appRole) || u?.isSuperAdmin },
-  { id: 'hr-command-center', label: 'HR Command Center', emoji: '🏢', route: '/hr-command-center', roles: null, visible: (u) => ['talento_humano', 'rrhh', 'superadmin', 'ceo', 'direccion'].includes(u?.appRole) || u?.isSuperAdmin },
-  { id: 'legal-hub', label: 'Torre de Riesgo (Legal)', emoji: '⚖️', route: '/legal-hub', roles: null, visible: (u) => ['legal', 'juridico', 'superadmin', 'ceo'].includes(u?.appRole) || u?.isSuperAdmin },
-  { id: 'andres-command-center', label: 'Comando Maestría (Andrés)', emoji: '🌐', route: '/andres-command-center', roles: null, visible: (u) => ['coord_maestria_global', 'director_maestria', 'superadmin', 'ceo'].includes(u?.appRole) || u?.isSuperAdmin },
-  { id: 'panel-legal', label: 'Auditoría Legal (Firmas)', emoji: '⚖️', route: '/legal-admin', roles: null, visible: (u) => isDataAdmin(u) },
-];
-
 // BUG REAL corregido (08/09/2026, reportado por José: "soy superusuario con
 // acceso a todo lo cual debería aparecer en mi selector"). El selector de rol
 // inline de la barra PRO (más abajo, junto al nombre/avatar) solo listaba
@@ -762,24 +795,11 @@ const MODULE_REGISTRY = [
 // del sistema SO-AR (ver el comentario en ROLE_DISPLAY_NAMES, usersData.js).
 const ALL_SIMULATABLE_ROLES = [
   'consolidado', 'direccion', 'cfo', 'gerente', 'director_maestria',
-  'coord_c1', 'coord_maestria', 'capitan', 'manager',
+  'coord_c1', 'coord_jr', 'coord_maestria', 'capitan', 'manager',
   'entrenador', 'entrenador_llamadas', 'qt',
   'finanzas', 'coordinador', 'talento_humano', 'legal',
   'asistente_impuestos_quito', 'tecnico_sst'
 ];
-
-const isModuleVisible = (mod, currentUser) => {
-  if (typeof mod.visible === 'function') return mod.visible(currentUser);
-  if (mod.roles === null) return true;
-  const allowedRoles = mod.roles || [];
-  // Super Administrador (cuando NO está en simulación explícita de otro usuario) tiene acceso total a todos los módulos
-  if (currentUser?.isSuperAdmin && !currentUser?.isSimulated) return true;
-  // Respaldo nominal únicamente para el acceso de revisión FI de Andrés Gómez.
-  // No convierte su cuenta en superadmin ni altera otros módulos.
-  if (mod.id === 'portafolio' && PORTFOLIO_FI_REVIEW_EMAILS.includes((currentUser?.email || '').trim().toLowerCase())) return true;
-  if (currentUser?.appRole === 'consolidado') return true;
-  return allowedRoles.includes(currentUser?.appRole);
-};
 
 // ============================================================================
 // TAREAS QUE HAS ASIGNADO — cuenta regresiva (28/08/2026)
@@ -810,6 +830,15 @@ const getCountdownInfo = (deadlineIso, now) => {
   return { label: `🟢 ${timeStr} restantes`, color: '#ffffff', bg: '#16a34a', border: '#166534', overdue: false };
 };
 
+function LiveClock() {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+  return now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+
 export default function Home() {
   // (15/09/2026) BUG CRITICO CORREGIDO: la linea de 'consolidado' devolvia true
   // para CUALQUIER lista de roles pedida, sin verificar los roles reales del
@@ -822,10 +851,8 @@ export default function Home() {
   // mostrar ("todo lo que sus roles reales abarcan"), no todo sin excepcion.
   const hasRoleAccess = (allowedRoles) => {
     if (currentUser?.isSuperAdmin && !currentUser?.isSimulated) return true;
-    if (currentUser?.appRole === 'consolidado') {
-      return (currentUser?.roles || []).some(r => allowedRoles.includes(r));
-    }
-    return allowedRoles.includes(currentUser?.appRole);
+    return allowedRoles.includes(currentUser?.appRole) ||
+           (currentUser?.roles || []).some(r => allowedRoles.includes(r));
   };
 
   const { currentUser, logout, switchRole, reauthenticateGoogle, updateCurrentUserFields } = useAuth();
@@ -864,6 +891,11 @@ export default function Home() {
   const { themeMode, setThemeMode, activeTheme } = useTheme();
   const { notifications, unreadCount, markAllAsRead, markAsRead } = useNotifications();
   const navigate = useNavigate();
+  const { frequent, allowedModules } = useModuleUsage();
+  const openFrequentModule = mod => {
+    setShowToolsDropdown(false);
+    navigate(typeof mod.route === 'function' ? mod.route(currentUser) : mod.route);
+  };
 
   // Reloj local
   const [time, setTime] = useState(new Date());
@@ -933,6 +965,7 @@ export default function Home() {
   const [showTaskDetailModal, setShowTaskDetailModal] = useState(false);
   const [tareasAsignadasFilter, setTareasAsignadasFilter] = useState('Activas'); // 'Activas' | 'Vencidas' | 'Cumplidas' | 'Todas'
   const [tareasAsignadasSearch, setTareasAsignadasSearch] = useState('');
+  const [tareasAsignadasDireccion, setTareasAsignadasDireccion] = useState('todas'); // 'todas' | 'a_mi' | 'por_mi'
   const [tareasAsignadasSort, setTareasAsignadasSort] = useState('urgencia'); // 'urgencia' | 'recientes' | 'antiguas' | 'deadline_asc' | 'deadline_desc' | 'avance_desc' | 'avance_asc' | 'titulo'
   const [showVenueModal, setShowVenueModal] = useState(false);
   const [showHorariosModal, setShowHorariosModal] = useState(false);
@@ -1043,6 +1076,33 @@ export default function Home() {
   }, []);
 
   // Manejo de clic sobre una notificación para llevar SI O SI a la tarea
+  const [taskLinkParams, setTaskLinkParams] = useSearchParams();
+  const linkedTaskId = taskLinkParams.get('taskId');
+  useEffect(() => {
+    if (!linkedTaskId || !currentUser || loadingTasks) return;
+    let cancelled = false;
+    resolveTaskLink(linkedTaskId, allTasks || [], currentUser, async id => {
+      const snapshot = await getDoc(doc(db, 'tasks', id));
+      return snapshot.exists() ? { ...snapshot.data(), id: snapshot.id } : null;
+    }).then(task => {
+      if (cancelled) return;
+      setSelectedTaskForDetail(task);
+      setShowTaskDetailModal(true);
+    }).catch(error => {
+      if (cancelled) return;
+      console.error('No se pudo abrir el enlace de tarea:', error);
+      showToast('Esta tarea ya no existe o no tienes acceso a ella.', 'error');
+    }).finally(() => {
+      if (cancelled) return;
+      setTaskLinkParams(previous => {
+        const next = new URLSearchParams(previous);
+        next.delete('taskId');
+        return next;
+      }, { replace: true });
+    });
+    return () => { cancelled = true; };
+  }, [linkedTaskId, currentUser, loadingTasks, allTasks, setTaskLinkParams, showToast]);
+
   const handleNotificationClick = async (notif) => {
     if (!notif) return;
 
@@ -1063,46 +1123,47 @@ export default function Home() {
 
     // 3a. Por taskId exacto en allTasks
     if (notif.taskId && allTasks && allTasks.length > 0) {
-      targetTask = allTasks.find(t => t.id === notif.taskId);
+      targetTask = allTasks.find(t => t.id === notif.taskId && isTaskVisibleForUser(t, currentUser));
     }
 
     // 3b. Por título / nombre de tarea
-    if (!targetTask && notif.title && allTasks && allTasks.length > 0) {
+    if (!targetTask && !notif.taskId && notif.type !== 'schedule_update' && notif.title && allTasks && allTasks.length > 0) {
       const notifTitleNorm = notif.title.toLowerCase().trim();
       targetTask = allTasks.find(t => {
         const taskName = (t.task || t.title || '').toLowerCase().trim();
-        return taskName && (taskName === notifTitleNorm || notifTitleNorm.includes(taskName) || taskName.includes(notifTitleNorm));
+        return isTaskVisibleForUser(t, currentUser) && taskName && (taskName === notifTitleNorm || notifTitleNorm.includes(taskName) || taskName.includes(notifTitleNorm));
       });
     }
 
     // 3c. Si no está en memoria pero tiene taskId, consultar Firestore directamente
     if (!targetTask && notif.taskId) {
       try {
-        const snap = await getDoc(doc(db, 'checklist_tasks', notif.taskId));
+        const snap = await getDoc(doc(db, 'tasks', notif.taskId));
         if (snap.exists()) {
-          targetTask = { id: snap.id, ...snap.data() };
-        } else {
-          const snap2 = await getDoc(doc(db, 'tasks', notif.taskId));
-          if (snap2.exists()) {
-            targetTask = { id: snap2.id, ...snap2.data() };
-          }
+          const candidate = { id: snap.id, ...snap.data() };
+          if (isTaskVisibleForUser(candidate, currentUser)) targetTask = candidate;
         }
       } catch (err) {
         console.warn("Error obteniendo tarea desde Firestore:", err);
       }
     }
 
-    // 4. Si encontramos la tarea o construimos una tarea coherente para abrir
-    const taskToOpen = targetTask || {
-      id: notif.taskId || notif.id,
-      task: notif.title || notif.message,
-      title: notif.title || notif.message,
-      description: notif.message || '',
-      assignedSede: notif.assignedSede || 'Lima',
-      deadline: notif.deadline || notif.created_at || new Date().toISOString(),
-      priority: notif.priority || 'Urgente',
-      createdBy: notif.createdBy || 'Sistema'
-    };
+    // 4. Las notificaciones informativas (p. ej. "Horarios Actualizados") no
+    // son tareas: abrirlas como tarea ficticia mostraba "VENCIDA" y "Guardar
+    // Avances" fallaba porque el documento no existe en checklist_tasks.
+    if (!targetTask) {
+      if (notif.type === 'schedule_update') {
+        setShowHorariosModal(true);
+      } else if (notif.link && typeof notif.link === 'string' && notif.link.startsWith('/')) {
+        navigate(notif.link);
+      } else if (notif.taskId) {
+        showToast?.('Esta tarea ya no existe o no tienes acceso a ella.', 'warning');
+      } else {
+        showToast?.(notif.message || notif.title || 'Notificación leída.', 'info');
+      }
+      return;
+    }
+    const taskToOpen = targetTask;
 
     // Abrir modal de detalles y avances de la tarea SÍ O SÍ
     setSelectedTaskForDetail(taskToOpen);
@@ -1157,7 +1218,8 @@ export default function Home() {
   };
 
   useEffect(() => {
-    const timer = setInterval(() => setTime(new Date()), 1000);
+    // Home completo se recalcula cada minuto; el reloj con segundos vive en LiveClock.
+    const timer = setInterval(() => setTime(new Date()), 60000);
     return () => clearInterval(timer);
   }, []);
 
@@ -1197,6 +1259,7 @@ export default function Home() {
   };
 
   const activeRole = currentUser?.appRole || currentUser?.role || 'gerente';
+  const taskProgressRoles = getTaskProgressRoles(activeRole, currentUser?.roles);
   const isExecutiveUser = ['ceo', 'cco', 'socio', 'super_admin', 'direccion'].includes(activeRole) ||
                           userEmail === 'fer.aragon@crearpsl.net' ||
                           userEmail === 'paul.sosa@crearpsl.net';
@@ -1207,9 +1270,6 @@ export default function Home() {
                        (t.collaborators && t.collaborators.some(c => isEmailMatch(c, userEmail)));
     if (isAssigned) return true;
     if (isExecutiveUser) return false; // Roles ejecutivos / Fer y Paul no tienen tareas operativas por defecto
-    if (activeRole === 'consolidado') {
-      return true;
-    }
 
     // 1. Si la tarea fue asignada nominalmente a alguien más, no computar en mi progreso
     const hasSpecificAssignees = (Array.isArray(t.assignedToEmails) && t.assignedToEmails.length > 0) || Boolean(t.assignedToEmail);
@@ -1245,7 +1305,7 @@ export default function Home() {
       }
     }
 
-    return t.role === activeRole;
+    return taskProgressRoles.includes(t.role);
   });
   const completedForProgress = myTasksForProgress.filter(t => t.completed || t.status === 'Completada').length;
   const progressPercentage = myTasksForProgress.length > 0 ? Math.round((completedForProgress / myTasksForProgress.length) * 100) : 0;
@@ -1331,7 +1391,7 @@ export default function Home() {
     .slice(0, 8);
 
   const globalSearchModuleResults = !globalSearchActive ? [] : MODULE_REGISTRY
-    .filter(mod => isModuleVisible(mod, currentUser))
+    .filter(mod => mod.route ? allowedModules.some(allowed => allowed.id === mod.id) : isModuleVisible(mod, currentUser))
     .filter(mod => mod.label.toLowerCase().includes(globalSearchQ))
     .slice(0, 8);
 
@@ -1364,6 +1424,8 @@ export default function Home() {
     setGlobalSearchTerm('');
     if (opt.action === 'open_horarios_modal') {
       setShowHorariosModal(true);
+    } else if (opt.action === 'open_guia_llamadas') {
+      handleOpenGuiaLlamadas();
     } else if (opt.action === 'new_task') {
       setShowTaskModal(true);
     } else if (opt.action === 'venue_modal') {
@@ -1405,12 +1467,39 @@ export default function Home() {
   // Si por algún motivo el registro no aparece todavía en realUsersData (ej. aún
   // cargando), cae de vuelta a currentUser tal cual — UserProfileModal ya sabe
   // mostrar un aviso si ese objeto no tiene un id real de Firestore para guardar.
+  const myOverdueTasks = useMemo(
+    () => getOverdueAssignedTasks(allTasks, currentUser?.email, Date.now(), {
+      sede: currentUser?.sede,
+      cycleId: currentCycle?.id,
+      cycleIds: (quitoCycles || []).map(qc => qc?.cycle?.id)
+    }),
+    [allTasks, currentUser?.email, currentUser?.sede, currentCycle?.id, quitoCycles, time]
+  );
+  const myOverdueCount = myOverdueTasks.length;
+  const overdueEscalation = useMemo(
+    () => getOverdueEscalation(myOverdueTasks, Date.now()),
+    [myOverdueTasks, time]
+  );
+
+  const [profileInitialTab, setProfileInitialTab] = useState(null);
+
   const handleOpenMyProfile = () => {
     const myEmail = (currentUser?.email || '').toLowerCase().trim();
     const ownRecord = myEmail
       ? realUsersData.find(u => (u.email || '').toLowerCase().trim() === myEmail)
       : null;
     setSelectedSearchUser(ownRecord || currentUser);
+    setProfileInitialTab(null);
+    setShowSearchUserModal(true);
+  };
+
+  const handleOpenGuiaLlamadas = () => {
+    const myEmail = (currentUser?.email || '').toLowerCase().trim();
+    const ownRecord = myEmail
+      ? realUsersData.find(u => (u.email || '').toLowerCase().trim() === myEmail)
+      : null;
+    setSelectedSearchUser(ownRecord || currentUser);
+    setProfileInitialTab('guia_rezagados');
     setShowSearchUserModal(true);
   };
 
@@ -1463,7 +1552,13 @@ export default function Home() {
   const tareasQueHeAsignado = [
     ...(allTasks || [])
       .filter(t => isEmailMatch(t.createdBy, userEmail) && userEmail)
-      .map(t => ({ ...t, __direction: 'asignada_por_mi' })),
+      .map(t => ({
+        ...t,
+        __direction: 'asignada_por_mi',
+        // Autoasignada: también cuenta como "asignada a mí".
+        __assignedToMe: (Array.isArray(t.assignedToEmails) && t.assignedToEmails.some(e => isEmailMatch(e, userEmail))) ||
+          (t.assignedToEmail && isEmailMatch(t.assignedToEmail, userEmail)) || false
+      })),
     ...(allTasks || [])
       .filter(t => {
         const yaEsCreador = isEmailMatch(t.createdBy, userEmail);
@@ -1472,7 +1567,7 @@ export default function Home() {
                (t.assignedToEmail && isEmailMatch(t.assignedToEmail, userEmail)) ||
                (t.collaborators && t.collaborators.some(c => isEmailMatch(c, userEmail)));
       })
-      .map(t => ({ ...t, __direction: 'asignada_a_mi' }))
+      .map(t => ({ ...t, __direction: 'asignada_a_mi', __assignedToMe: true }))
   ]
     .sort((a, b) => {
       const da = a.deadline ? new Date(a.deadline).getTime() : Infinity;
@@ -1482,6 +1577,21 @@ export default function Home() {
 
   return (
     <div style={{ maxWidth: viewMode === 'lite' ? '780px' : '960px', margin: '0 auto', padding: viewMode === 'lite' ? '1.5rem 1rem' : '2rem 1rem' }}>
+      <ModuleQuickAccess />
+      {isElizabethEscobar(currentUser) && (
+        <button
+          type="button"
+          className="btn-primary"
+          onClick={() => navigate('/elizabeth-dashboard')}
+          style={{
+            width: '100%', minHeight: '64px', padding: '1rem', marginBottom: '1.5rem',
+            fontSize: '1.3rem', fontWeight: 800, borderRadius: '16px',
+            background: '#fbbf24', color: '#211407', whiteSpace: 'normal'
+          }}
+        >
+          Mi panel sencillo — tareas y tiempos de mi equipo
+        </button>
+      )}
       
       {/* CABECERA PRINCIPAL */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
@@ -1557,7 +1667,7 @@ export default function Home() {
               )}
               <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
                 <span style={{ fontWeight: 'bold', fontSize: '0.92rem', color: activeTheme === 'light' ? '#0f172a' : '#e2e8f0', letterSpacing: '0.5px' }}>
-                  {time.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                  <LiveClock />
                 </span>
                 <span style={{ fontSize: '0.7rem', color: activeTheme === 'light' ? '#64748b' : '#94a3b8' }}>
                   {time.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' }).replace('.', '')} (TÚ)
@@ -1643,16 +1753,31 @@ export default function Home() {
                 (ej. elegir equipo(s) de Quito). Pedido explícito de José. */}
             <button
               onClick={handleOpenMyProfile}
-              title="Ver y editar mi perfil"
+              className={myOverdueCount > 0 ? 'overdue-profile-btn' : undefined}
+              title={myOverdueCount > 0
+                ? `Tienes ${myOverdueCount} tarea(s) vencida(s) hace más de 72 h${overdueEscalation.hours > 0 ? ` · la alerta crece cada hora (+${overdueEscalation.hours} h)` : ''}`
+                : 'Ver y editar mi perfil'}
+              aria-label={myOverdueCount > 0
+                ? `Mi Perfil: ${myOverdueCount} ${myOverdueCount === 1 ? 'tarea vencida' : 'tareas vencidas'} hace más de 72 horas`
+                : 'Mi Perfil'}
               style={{
-                display: 'flex', alignItems: 'center', gap: '0.35rem',
-                background: 'rgba(255,255,255,0.06)', border: '1px solid var(--border-strong)',
-                borderRadius: '8px', padding: '0.35rem 0.7rem', cursor: 'pointer',
-                color: 'var(--text-main)', fontSize: '0.75rem', fontWeight: 600
+                display: 'flex', alignItems: 'center', gap: '0.4rem',
+                background: myOverdueCount > 0 ? 'linear-gradient(135deg, #dc2626, #ea580c)' : 'rgba(255,255,255,0.06)',
+                border: myOverdueCount > 0 ? '2px solid #fecaca' : '1px solid var(--border-strong)',
+                borderRadius: '8px', padding: myOverdueCount > 0 ? `${0.35 * overdueEscalation.scale}rem ${0.7 * overdueEscalation.scale}rem` : '0.35rem 0.7rem', cursor: 'pointer',
+                color: myOverdueCount > 0 ? '#ffffff' : 'var(--text-main)', fontSize: myOverdueCount > 0 ? `${0.78 * overdueEscalation.scale}rem` : '0.78rem', fontWeight: myOverdueCount > 0 ? 800 : 600,
+                transition: 'font-size 0.6s ease, padding 0.6s ease'
               }}
             >
-              <User size={14} style={{ color: 'var(--crear-gold)' }} />
+              {myOverdueCount > 0
+                ? <AlertTriangle size={Math.round(15 * overdueEscalation.scale)} aria-hidden="true" style={{ color: '#fff' }} />
+                : <User size={14} aria-hidden="true" style={{ color: 'var(--crear-gold)' }} />}
               Mi Perfil
+              {myOverdueCount > 0 && (
+                <span aria-hidden="true" style={{ background: '#fff', color: '#b91c1c', borderRadius: '999px', padding: '0 0.5rem', fontSize: `${0.75 * overdueEscalation.scale}rem`, fontWeight: 900, minWidth: '1.3em', textAlign: 'center' }}>
+                  {myOverdueCount}
+                </span>
+              )}
             </button>
           </div>
 
@@ -2102,6 +2227,16 @@ export default function Home() {
                 boxShadow: '0 20px 50px rgba(0,0,0,0.95), 0 0 25px rgba(41, 171, 226, 0.2)',
                 border: '1px solid rgba(41, 171, 226, 0.4)'
               }}>
+                {frequent.length > 0 && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', paddingBottom: '0.5rem', borderBottom: '1px solid var(--border-strong)' }}>
+                    <strong style={{ fontSize: '0.82rem' }}>Frecuentes en este navegador</strong>
+                    {frequent.map(mod => (
+                      <button key={mod.id} type="button" onClick={() => openFrequentModule(mod)} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem' }}>
+                        {mod.emoji} {mod.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
                 {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) ? (
                   <>
                     <button onClick={() => { setShowToolsDropdown(false); navigate('/gerente'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
@@ -2184,10 +2319,21 @@ export default function Home() {
                   </button>
                 )}
 
-                {hasRoleAccess(['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan']) && (
+                {hasRoleAccess(['coord_c1', 'coord_c2', 'coord_jr', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan']) && (
                   <button onClick={() => { setShowToolsDropdown(false); navigate('/mis-kpis'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
                     📊 Mis KPIs
                   </button>
+                )}
+
+                {(hasRoleAccess(['coord_jr', 'coord_c1', 'coordinador_c1c2', 'gerente', 'direccion', 'superadmin', 'ceo']) || Boolean(currentUser?.email && (currentUser.email.includes('cardenasgina29') || currentUser.email.includes('cardenaslopezgina') || currentUser.email.includes('gina.cardenas')))) && (
+                  <>
+                    <button onClick={() => { setShowToolsDropdown(false); handleOpenGuiaLlamadas(); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#38bdf8', background: 'rgba(2, 132, 199, 0.14)', borderColor: 'rgba(56, 189, 248, 0.35)', fontWeight: 'bold' }}>
+                      📞 Centro de Operaciones Rezagados C1
+                    </button>
+                    <button onClick={() => { setShowToolsDropdown(false); window.open('https://imo.crearpslglobal.com/reporterezagados', '_blank', 'noopener,noreferrer'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#06b6d4', background: 'rgba(6, 182, 212, 0.1)' }}>
+                      🌐 Base Nodus Rezagados C1 ↗
+                    </button>
+                  </>
                 )}
 
                 {canAccessDirectorioQT(currentUser) && (
@@ -2306,55 +2452,66 @@ export default function Home() {
 
       {/* BARRA PRO COMPLETA (SI ESTÁ EN MODO PRO) */}
       {viewMode === 'pro' && customModules.advancedTools !== false && (
-        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap', marginBottom: '1.5rem', padding: '0.75rem', background: 'rgba(255,255,255,0.02)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.06)' }}>
+        <HomeModuleWorkspace>
           {canAccessAgendaTimeBoxing(currentUser) && (
-            <button onClick={() => setShowHorariosModal(true)} className="btn-primary" title="Horarios oficiales de entrenamiento y código de vestimenta" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #06b6d4, #0284c7)', color: 'white', fontWeight: 'bold', border: 'none' }}>
+            <ModuleHelpButton helpKey="horarios" onClick={() => setShowHorariosModal(true)} className="home-module-card" title="Horarios oficiales de entrenamiento y código de vestimenta">
               ⏰ Horarios y Vestimenta
-            </button>
+            </ModuleHelpButton>
           )}
           {currentUser?.appRole === 'cfo' ? (
-            <button onClick={() => navigate('/cfo-dashboard')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #10b981, #047857)', color: 'white', fontWeight: 'bold', border: 'none' }}>
+            <ModuleHelpButton helpKey="cfo" onClick={() => navigate('/cfo-dashboard')} className="home-module-card">
               🏦 Dirección Financiera (CFO)
-            </button>
+            </ModuleHelpButton>
           ) : currentUser?.appRole === 'legal' || currentUser?.appRole === 'juridico' ? (
-            <button onClick={() => navigate('/legal-hub')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: 'white', fontWeight: 'bold', border: 'none' }}>
+            <ModuleHelpButton helpKey="legal" onClick={() => navigate('/legal-hub')} className="home-module-card">
               ⚖️ Torre Legal
-            </button>
+            </ModuleHelpButton>
           ) : currentUser?.appRole === 'talento_humano' || currentUser?.appRole === 'rrhh' ? (
-            <button onClick={() => navigate('/hr-command-center')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #8b5cf6, #6d28d9)', color: 'white', fontWeight: 'bold', border: 'none' }}>
+            <ModuleHelpButton helpKey="talento" onClick={() => navigate('/hr-command-center')} className="home-module-card">
               🏢 Talento Humano
-            </button>
+            </ModuleHelpButton>
           ) : currentUser?.appRole === 'coord_maestria_global' ? (
-            <button onClick={() => navigate('/andres-command-center')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #0284c7, #0369a1)', color: 'white', fontWeight: 'bold', border: 'none' }}>
+            <ModuleHelpButton helpKey="maestria" onClick={() => navigate('/andres-command-center')} className="home-module-card">
               🌐 Comando Maestría
-            </button>
+            </ModuleHelpButton>
           ) : hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) ? (
-            <button onClick={() => navigate('/gerente')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'var(--crear-gold)', color: 'black' }}>
+            <ModuleHelpButton helpKey="gerencial" onClick={() => navigate('/gerente')} className="home-module-card">
               💼 Causa OS Gerencial
-            </button>
+            </ModuleHelpButton>
           ) : (
-            <button onClick={() => navigate(`/checklist/${currentUser?.appRole || 'capitan'}`)} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'var(--crear-gold)', color: 'black' }}>
+            <ModuleHelpButton helpKey="checklist" onClick={() => navigate(`/checklist/${currentUser?.appRole || 'capitan'}`)} className="home-module-card">
               💼 Mi Dashboard
-            </button>
+            </ModuleHelpButton>
           )}
           {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) && (
             <>
-              <button onClick={() => navigate('/portafolio')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #0ea5e9, #0369a1)', color: 'white', border: 'none' }}>
+              <ModuleHelpButton helpKey="portafolio" onClick={() => navigate('/portafolio')} className="home-module-card">
                 📈 Portafolio PMO
-              </button>
-              <button onClick={() => navigate('/estrategia')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #10b981, #047857)', color: 'white', border: 'none' }}>
+              </ModuleHelpButton>
+              <ModuleHelpButton helpKey="estrategia" onClick={() => navigate('/estrategia')} className="home-module-card">
                 🎯 OKRs (Cascade)
-              </button>
-              <button onClick={() => navigate('/auditoria-kpis')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'transparent', border: '1px solid #10b981', color: '#10b981' }}>
+              </ModuleHelpButton>
+              <ModuleHelpButton helpKey="auditoria" onClick={() => navigate('/auditoria-kpis')} className="home-module-card">
                 📉 Auditoría KPIs
-              </button>
+              </ModuleHelpButton>
             </>
           )}
 
-          {hasRoleAccess(['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan']) && (
-            <button onClick={() => navigate('/mis-kpis')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #10b981, #047857)', color: 'white', border: 'none' }}>
+          {hasRoleAccess(['coord_c1', 'coord_c2', 'coord_jr', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan']) && (
+            <ModuleHelpButton helpKey="kpis" onClick={() => navigate('/mis-kpis')} className="home-module-card">
               📊 Mis KPIs
-            </button>
+            </ModuleHelpButton>
+          )}
+
+          {(hasRoleAccess(['coord_jr', 'coord_c1', 'coordinador_c1c2', 'gerente', 'direccion', 'superadmin', 'ceo']) || Boolean(currentUser?.email && (currentUser.email.includes('cardenasgina29') || currentUser.email.includes('cardenaslopezgina') || currentUser.email.includes('gina.cardenas')))) && (
+            <>
+              <ModuleHelpButton helpKey="rezagadosC1" onClick={handleOpenGuiaLlamadas} className="home-module-card" title="Centro de Operaciones Rezagados C1: Guía Oficial de Llamadas C1, scripts de reencuadre, objeciones y protocolo legal Indecopi">
+                📞 Centro Operaciones Rezagados C1
+              </ModuleHelpButton>
+              <ModuleHelpButton helpKey="baseNodusRezagados" onClick={() => window.open('https://imo.crearpslglobal.com/reporterezagados', '_blank', 'noopener,noreferrer')} className="home-module-card" title="Abrir Base Nodus Rezagados C1">
+                🌐 Base Nodus Rezagados C1
+              </ModuleHelpButton>
+            </>
           )}
 
           {canAccessManualQT(currentUser) && (
@@ -2364,128 +2521,128 @@ export default function Home() {
             // Causa OS — la sección exclusiva de QT existe ahí (pestaña "Guía por Rol"), pero
             // no es lo primero que se ve. José eligió la opción de llevar directo al Manual QT
             // externo completo (el mismo enlace que ya existía dentro de esa sección).
-            <button onClick={() => window.open('https://crearpsl.net/manual_quantum_team.html', '_blank', 'noopener,noreferrer')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #0284c7, #2563eb)', color: 'white', border: 'none' }}>
+            <ModuleHelpButton helpKey="manualQT" onClick={() => window.open('https://crearpsl.net/manual_quantum_team.html', '_blank', 'noopener,noreferrer')} className="home-module-card">
               📘 Manual QT
-            </button>
+            </ModuleHelpButton>
           )}
 
           {canAccessManualNodus(currentUser) && (
-            <button onClick={() => navigate('/manual-nodus')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #10b981, #047857)', color: 'white', border: 'none' }}>
+            <ModuleHelpButton helpKey="manualNodus" onClick={() => navigate('/manual-nodus')} className="home-module-card">
               📗 Manual Nodus
-            </button>
+            </ModuleHelpButton>
           )}
 
           {canAccessDirectorioQT(currentUser) && (
-            <button onClick={() => navigate('/directorio-qt')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: 'white', border: 'none' }}>
+            <ModuleHelpButton helpKey="directorioQT" onClick={() => navigate('/directorio-qt')} className="home-module-card">
               ⚡ Directorio QT
-            </button>
+            </ModuleHelpButton>
           )}
 
           {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria', 'talento_humano']) && (
-            <button onClick={() => navigate('/superadmin')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #8b5cf6, #29abe2)', color: 'white', border: 'none' }}>
+            <ModuleHelpButton helpKey="mando" onClick={() => navigate('/superadmin')} className="home-module-card">
               🌐 Centro de Mando
-            </button>
+            </ModuleHelpButton>
           )}
           {hasRoleAccess(['cfo', 'ceo', 'superadmin', 'direccion']) && (
-            <button onClick={() => navigate('/cfo-dashboard')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #1e293b, #064e3b)', color: '#10b981', border: '1px solid #10b981', fontWeight: 'bold' }}>
+            <ModuleHelpButton helpKey="cfo" onClick={() => navigate('/cfo-dashboard')} className="home-module-card">
               🏦 Dir. Financiera
-            </button>
+            </ModuleHelpButton>
           )}
           {hasRoleAccess(['finanzas', 'facturacion', 'contador', 'superadmin']) && (
-            <button onClick={() => navigate('/finance-workspace')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #1e293b, #065f46)', color: '#34d399', border: '1px solid #34d399' }}>
+            <ModuleHelpButton helpKey="finanzas" onClick={() => navigate('/finance-workspace')} className="home-module-card">
               💸 Finanzas
-            </button>
+            </ModuleHelpButton>
           )}
           {hasRoleAccess(['coord_maestria_global', 'director_maestria', 'superadmin', 'ceo', 'direccion']) && (
-            <button onClick={() => navigate('/andres-command-center')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #0c4a6e, #0284c7)', color: '#ffffff', fontWeight: 'bold', border: 'none' }}>
+            <ModuleHelpButton helpKey="maestria" onClick={() => navigate('/andres-command-center')} className="home-module-card">
               🌐 Maestría (Andrés)
-            </button>
+            </ModuleHelpButton>
           )}
           {hasRoleAccess(['talento_humano', 'rrhh', 'superadmin', 'ceo', 'direccion']) && (
-            <button onClick={() => navigate('/hr-command-center')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #4c1d95, #7c3aed)', color: '#ffffff', fontWeight: 'bold', border: 'none' }}>
+            <ModuleHelpButton helpKey="talento" onClick={() => navigate('/hr-command-center')} className="home-module-card">
               🏢 Talento Humano
-            </button>
+            </ModuleHelpButton>
           )}
           {hasRoleAccess(['legal', 'juridico', 'superadmin', 'ceo', 'direccion']) && (
-            <button onClick={() => navigate('/legal-hub')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #78350f, #d97706)', color: '#ffffff', fontWeight: 'bold', border: 'none' }}>
+            <ModuleHelpButton helpKey="legal" onClick={() => navigate('/legal-hub')} className="home-module-card">
               ⚖️ Torre Legal
-            </button>
+            </ModuleHelpButton>
           )}
           {hasRoleAccess(['qt', 'gerente', 'superadmin', 'ceo', 'direccion']) && (
-            <button onClick={() => navigate('/qt-hub')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #7c2d12, #ea580c)', color: '#ffffff', fontWeight: 'bold', border: 'none' }}>
+            <ModuleHelpButton helpKey="hubQT" onClick={() => navigate('/qt-hub')} className="home-module-card">
               ⚡ Hub QT
-            </button>
+            </ModuleHelpButton>
           )}
           {hasRoleAccess(['entrenador_llamadas', 'direccion', 'superadmin', 'ceo', 'coordinador_mj', 'coord_maestria']) && (
-            <button onClick={() => navigate('/call-coach-crm')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #831843, #db2777)', color: '#ffffff', fontWeight: 'bold', border: 'none' }}>
+            <ModuleHelpButton helpKey="llamadas" onClick={() => navigate('/call-coach-crm')} className="home-module-card">
               📞 CRM Llamadas
-            </button>
+            </ModuleHelpButton>
           )}
           {hasRoleAccess(['entrenador', 'direccion', 'superadmin', 'ceo', 'director_maestria']) && (
-            <button onClick={() => navigate('/trainer-hub')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #713f12, #ca8a04)', color: '#ffffff', fontWeight: 'bold', border: 'none' }}>
+            <ModuleHelpButton helpKey="entrenador" onClick={() => navigate('/trainer-hub')} className="home-module-card">
               🎓 Hub Entrenador
-            </button>
+            </ModuleHelpButton>
           )}
           {isDataAdmin(currentUser) && (
-            <button onClick={() => navigate('/legal-admin')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #1e293b, #0f172a)', color: '#fbbf24', border: '1px solid #fbbf24' }}>
+            <ModuleHelpButton helpKey="auditoriaLegal" onClick={() => navigate('/legal-admin')} className="home-module-card">
               ⚖️ Auditoría Legal
-            </button>
+            </ModuleHelpButton>
           )}
 
           {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) && (
-            <button onClick={() => window.open('/calendario_global.html?v=' + Date.now() + '&email=' + encodeURIComponent(currentUser?.email || '') + '&name=' + encodeURIComponent(currentUser?.displayName || currentUser?.name || ''), '_blank')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #ef4444)', color: 'white', border: 'none' }}>
+            <ModuleHelpButton helpKey="calendarioGlobal" onClick={() => window.open('/calendario_global.html?v=' + Date.now() + '&email=' + encodeURIComponent(currentUser?.email || '') + '&name=' + encodeURIComponent(currentUser?.displayName || currentUser?.name || ''), '_blank')} className="home-module-card">
               📅 Calendario Global
-            </button>
+            </ModuleHelpButton>
           )}
 
           {/* Campus Interactivo: abierto a TODOS los 9 roles */}
-          <button onClick={() => window.open('https://cpsl-campus-interactivo.vercel.app/ruta', '_blank')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #10b981, #059669)', color: 'white', border: 'none' }}>
+          <ModuleHelpButton helpKey="campus" onClick={() => window.open('https://cpsl-campus-interactivo.vercel.app/ruta', '_blank')} className="home-module-card">
             🎓 Campus Interactivo
-          </button>
+          </ModuleHelpButton>
 
           {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'director_maestria']) && (
-            <button onClick={() => navigate('/centro-managers')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#000', fontWeight: 'bold', border: 'none' }}>
+            <ModuleHelpButton helpKey="managers" onClick={() => navigate('/centro-managers')} className="home-module-card">
               👑 Centro Managers
-            </button>
+            </ModuleHelpButton>
           )}
 
           {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) && (
-            <button onClick={() => navigate('/crm-maestro')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #10b981, #047857)', color: 'white', fontWeight: 'bold', border: 'none' }}>
+            <ModuleHelpButton helpKey="crm" onClick={() => navigate('/crm-maestro')} className="home-module-card">
               <Users size={14} style={{ display: 'inline', marginRight: '4px' }} /> BASE MAESTRA CRM
-            </button>
+            </ModuleHelpButton>
           )}
 
           {canAccessCalendarioMJ(currentUser) && (
-            <button onClick={() => navigate('/calendario-mj')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #1a75bc, #29abe2)', color: 'white', border: 'none' }}>
+            <ModuleHelpButton helpKey="calendarioMJ" onClick={() => navigate('/calendario-mj')} className="home-module-card">
               📅 Calendario MJ
-            </button>
+            </ModuleHelpButton>
           )}
 
           {canAccessFlyersC1(currentUser) && (
-            <button onClick={() => navigate('/generador-flyer')} className="btn-primary" title="Generador de Flyers Oficiales para Capítulos Uno" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #ec4899)', color: 'white', fontWeight: 'bold', border: 'none', boxShadow: '0 0 15px rgba(245, 158, 11, 0.4)' }}>
+            <ModuleHelpButton helpKey="flyers" onClick={() => navigate('/generador-flyer')} className="home-module-card" title="Generador de Flyers Oficiales para Capítulos Uno">
               🎨 Flyers C1 Globales
-            </button>
+            </ModuleHelpButton>
           )}
 
           {canAccessMonitorVuelos(currentUser) && (
-            <button onClick={() => navigate('/monitor-vuelos')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #38bdf8, #0284c7)', color: 'white', fontWeight: 'bold', border: 'none' }}>
+            <ModuleHelpButton helpKey="vuelos" onClick={() => navigate('/monitor-vuelos')} className="home-module-card">
               ✈️ Monitor de Vuelos
-            </button>
+            </ModuleHelpButton>
           )}
           {canAccessMonitorIMOs(currentUser) && (
-            <button onClick={() => navigate('/monitor-imos')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #a855f7, #7e22ce)', color: 'white', fontWeight: 'bold', border: 'none' }}>
+            <ModuleHelpButton helpKey="imos" onClick={() => navigate('/monitor-imos')} className="home-module-card">
               🦅 Monitor de IMOs
-            </button>
+            </ModuleHelpButton>
           )}
 
           {/* (20/09/2026) Asignador Oficial de Entrenadores — solo Fer, Paul y José
               (canUseAsignadorEntrenadores, lista cerrada de correos). */}
           {canUseAsignadorEntrenadores(currentUser) && (
-            <button onClick={() => navigate('/asignador-entrenadores')} className="btn-primary" title="Asignar qué entrenador va a cada entrenamiento y a cada FDS de Maestría" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #6366f1, #4338ca)', color: 'white', fontWeight: 'bold', border: 'none' }}>
+            <ModuleHelpButton helpKey="asignador" onClick={() => navigate('/asignador-entrenadores')} className="home-module-card" title="Asignar qué entrenador va a cada entrenamiento y a cada FDS de Maestría">
               🎯 Asignador de Entrenadores
-            </button>
+            </ModuleHelpButton>
           )}
-        </div>
+        </HomeModuleWorkspace>
       )}
 
       {/* BANNER INTERACTIVO DE SOLICITUDES DE COLABORACIÓN */}
@@ -2838,112 +2995,12 @@ export default function Home() {
                     const isEntrenador = ['entrenador', 'entrenador_llamadas'].includes(role);
                     const isQT = role === 'qt' || (currentUser?.roles || []).includes('qt');
                     const isEquipoRole = ['capitan', 'aliado', 'manager'].includes(role);
-                    const publishedOverrides = Object.values(publicCalendarChanges)
-                      .filter(change => change.kind === 'override' && change.sourceEventKey)
-                      .reduce((byEvent, change) => ({ ...byEvent, [change.sourceEventKey]: change }), {});
-                    const publishedCustomEvents = Object.values(publicCalendarChanges)
-                      .filter(change => change.kind === 'custom' && change.fechaInicio && change.nombre)
-                      .map(change => ({
-                        ...change,
-                        nombre: change.nombre,
-                        sede: change.sede,
-                        equipo: change.equipo || '',
-                        lugar: change.lugar || '',
-                        fecha_inicio: change.fechaInicio,
-                        fecha_fin: change.fechaFin || change.fechaInicio,
-                        __assignmentKey: change.id,
-                      }));
-                    const rawProfileEvents = (events || []).map(event => {
-                      const keyWithTeam = publicAssignmentEventKey(event);
-                      const keyNoTeam = publicAssignmentEventKeyNoTeam(event);
-                      
-                      const findLooseMatch = (dict) => {
-                        const datePrefixEnd = keyWithTeam.indexOf('__');
-                        if (datePrefixEnd === -1) return null;
-                        const suffixWithTeam = keyWithTeam.slice(datePrefixEnd);
-                        const suffixNoTeam = keyNoTeam.slice(keyNoTeam.indexOf('__'));
-                        
-                        // Exact match
-                        if (dict[event.__assignmentKey]) return dict[event.__assignmentKey];
-                        if (dict[keyWithTeam]) return dict[keyWithTeam];
-                        if (dict[keyNoTeam]) return dict[keyNoTeam];
-                        
-                        // Loose match (ignore date)
-                        for (const k of Object.keys(dict)) {
-                          if (k.endsWith(suffixWithTeam)) return dict[k];
-                        }
-                        for (const k of Object.keys(dict)) {
-                          if (k.endsWith(suffixNoTeam)) return dict[k];
-                        }
-                        return null;
-                      };
-
-                      const change = findLooseMatch(publishedOverrides);
-                      if (!change) return event;
-                      return {
-                        ...event,
-                        fecha_inicio: change.fechaInicio || event.fecha_inicio || event.start,
-                        fecha_fin: change.fechaFin || event.fecha_fin || event.end,
-                        sede: change.sede || event.sede || event.sedeTag,
-                        equipo: change.equipo ?? event.equipo ?? event.team,
-                        lugar: change.lugar || event.lugar || event.place,
-                      };
-                    }).concat(publishedCustomEvents.filter(custom => !(events || []).some(event => event.__assignmentKey === custom.__assignmentKey)));
-
-                    const assignmentForEvent = (event) => {
-                      const keyWithTeam = publicAssignmentEventKey(event);
-                      const keyNoTeam = publicAssignmentEventKeyNoTeam(event);
-                      
-                      const findLooseMatch = (dict) => {
-                        const datePrefixEnd = keyWithTeam.indexOf('__');
-                        if (datePrefixEnd === -1) return null;
-                        const suffixWithTeam = keyWithTeam.slice(datePrefixEnd);
-                        const suffixNoTeam = keyNoTeam.slice(keyNoTeam.indexOf('__'));
-                        
-                        // Exact match
-                        if (dict[event.__assignmentKey]) return dict[event.__assignmentKey];
-                        if (dict[keyWithTeam]) return dict[keyWithTeam];
-                        if (dict[keyNoTeam]) return dict[keyNoTeam];
-                        
-                        // Loose match (ignore date)
-                        for (const k of Object.keys(dict)) {
-                          if (k.endsWith(suffixWithTeam)) return dict[k];
-                        }
-                        for (const k of Object.keys(dict)) {
-                          if (k.endsWith(suffixNoTeam)) return dict[k];
-                        }
-                        return null;
-                      };
-                      
-                      return findLooseMatch(publicTrainerAssignments);
-                    };
+                    const assignmentIndex = indexAssignmentsForLookup(publicTrainerAssignments);
+                    const profileEvents = applyAsignadorAuthoritativeProjection(
+                      events || [], publicTrainerAssignments, Object.values(publicCalendarChanges)
+                    );
+                    const assignmentForEvent = event => matchAssignmentForEvent(event, assignmentIndex);
                     const assignedTrainerNamesForEvent = (event) => confirmedTrainerNames(assignmentForEvent(event));
-
-                    // Deduplicación estricta de eventos mostrados para evitar registros duplicados
-                    // (misma fecha, sede y entrenamiento). Causa OS siempre tiene prioridad.
-                    const profileEvents = [];
-                    const seenProfileMap = new Map();
-                    for (const ev of rawProfileEvents) {
-                      const d = String(ev.fecha_inicio || ev.start || '').slice(0, 10);
-                      const s = normalizeSede(ev.sede || ev.sedeTag || '').toUpperCase();
-                      const n = String(ev.nombre || ev.name || '').trim().toUpperCase();
-                      const dedupKey = `${d}__${s}__${n}`;
-                      if (!seenProfileMap.has(dedupKey)) {
-                        seenProfileMap.set(dedupKey, ev);
-                        profileEvents.push(ev);
-                      } else {
-                        const existing = seenProfileMap.get(dedupKey);
-                        const evAssigned = assignedTrainerNamesForEvent(ev).length > 0;
-                        const existingAssigned = assignedTrainerNamesForEvent(existing).length > 0;
-                        if (evAssigned && !existingAssigned) {
-                          Object.assign(existing, ev);
-                        } else {
-                          existing.equipo = existing.equipo || ev.equipo;
-                          existing.lugar = existing.lugar || ev.lugar;
-                          if (!existing.trainer && ev.trainer) existing.trainer = ev.trainer;
-                        }
-                      }
-                    }
 
                     let displayEvents = profileEvents.filter(ev => {
                       // 1. Entrenadores: la asignación confirmada en Causa OS
@@ -3142,12 +3199,18 @@ export default function Home() {
                           let evEndDate = new Date(ev.fecha_fin || baseDate || new Date());
                           const hotelVenue = getVenueForTraining(ev.sede || ev.sedeTag || currentUser?.sede, ev.nombre || ev.name, ev.lugar, ev.direccion);
                           const confirmedTrainerLabel = assignedTrainerNamesForEvent(ev).join(' / ');
+                          const teamLabels = getRelatedEventTeamLabels(ev, profileEvents);
 
                           return (
                             <li key={i} style={{ padding: '0.6rem 0', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.8rem' }}>
                               <div style={{ minWidth: 0 }}>
                                 <span className="text-white" style={{ fontWeight: 'bold', fontSize: '0.92rem', display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                   {ev.nombre || ev.name || 'Entrenamiento'}
+                                </span>
+                                <span style={{ fontSize: '0.75rem', color: teamLabels.length ? 'var(--crear-cyan)' : '#f59e0b', display: 'block', marginTop: '0.15rem', fontWeight: 700 }}>
+                                  {teamLabels.length
+                                    ? `${teamLabels.length > 1 ? 'Equipos' : 'Equipo'} ${teamLabels.join(' · ')}`
+                                    : 'Equipo: número no especificado en el calendario'}
                                 </span>
                                 <span style={{ fontSize: '0.75rem', color: 'var(--crear-cyan)', display: 'block', marginTop: '0.1rem' }}>
                                   🏨 {hotelVenue}
@@ -3290,13 +3353,31 @@ export default function Home() {
               Coordinadores MJ recién dados de alta). */}
           {(() => {
             // Clasificación para las pestañas de filtro (Activas/Vencidas/Cumplidas/Todas).
-            const clasificadas = tareasQueHeAsignado.map(task => {
+            const overdueOpts = {
+              sede: currentUser?.sede,
+              cycleId: currentCycle?.id,
+              cycleIds: (quitoCycles || []).map(qc => qc?.cycle?.id)
+            };
+            const direccionCounts = {
+              todas: tareasQueHeAsignado.length,
+              a_mi: tareasQueHeAsignado.filter(t => t.__assignedToMe).length,
+              por_mi: tareasQueHeAsignado.filter(t => t.__direction === 'asignada_por_mi').length
+            };
+            const porDireccion = tareasQueHeAsignado.filter(t =>
+              tareasAsignadasDireccion === 'a_mi' ? t.__assignedToMe
+                : tareasAsignadasDireccion === 'por_mi' ? t.__direction === 'asignada_por_mi'
+                  : true);
+            const clasificadas = porDireccion.map(task => {
               // FIX 16/09/2026: José confirmó (captura "Feliz Cumpleaños !!",
               // 100% avance pero seguía en "Vencidas") que una tarea al 100%
               // de avance debe contar como cumplida aunque completed/status
               // no estén sincronizados. Red de seguridad, no reemplaza
               // completed/status (que siguen siendo la fuente principal).
-              const isDone = task.completed || task.status === 'Completada' || task.progressPercentage === 100;
+              // Mismo criterio que la alerta de vencidas (overdueTasks.js): para lo
+              // asignado a mí también cuenta mi avance individual.
+              const isDone = task.__assignedToMe
+                ? isTaskDoneForUser(task, userEmail, overdueOpts)
+                : !!(task.completed || task.status === 'Completada' || task.progressPercentage === 100);
               const isOverdue = !isDone && getCountdownInfo(task.deadline, time).overdue;
               return { task, isDone, isOverdue };
             });
@@ -3498,7 +3579,27 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* TABS DE ESTADO */}
+              {/* FILTRO POR DIRECCIÓN: asignadas a mí / por mí */}
+              <div role="group" aria-label="Filtrar por quién asignó" style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginTop: '0.8rem' }}>
+                {[['todas', 'Todas'], ['a_mi', 'Asignadas a mí'], ['por_mi', 'Asignadas por mí']].map(([key, label]) => (
+                  <button
+                    key={key}
+                    type="button"
+                    aria-pressed={tareasAsignadasDireccion === key}
+                    onClick={() => setTareasAsignadasDireccion(key)}
+                    style={{
+                      padding: '0.3rem 0.75rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700,
+                      border: `1px solid ${tareasAsignadasDireccion === key ? 'var(--crear-gold)' : 'var(--border-subtle)'}`,
+                      background: tareasAsignadasDireccion === key ? 'rgba(245, 158, 11, 0.15)' : 'transparent',
+                      color: tareasAsignadasDireccion === key ? 'var(--crear-gold)' : 'var(--text-muted)',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease'
+                    }}
+                  >
+                    {label} ({direccionCounts[key]})
+                  </button>
+                ))}
+              </div>
               <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', marginTop: '0.8rem' }}>
                 {['Activas', 'Vencidas', 'Cumplidas', 'Todas'].map(f => (
                   <button
@@ -3729,12 +3830,13 @@ export default function Home() {
       {/* MODAL CONFIGURACIÓN DE HOTELES Y SALONES */}
       <VenueConfigModal isOpen={showVenueModal} onClose={() => setShowVenueModal(false)} />
 
-      {/* MODAL DE PERFIL DE PERSONA (abierto desde el Buscador Global) */}
+      {/* MODAL DE PERFIL DE PERSONA (abierto desde el Buscador Global o Guía Oficial) */}
       {showSearchUserModal && selectedSearchUser && (
         <UserProfileModal 
           isOpen={showSearchUserModal} 
-          onClose={() => setShowSearchUserModal(false)} 
+          onClose={() => { setShowSearchUserModal(false); setProfileInitialTab(null); }} 
           user={selectedSearchUser} 
+          initialTab={profileInitialTab}
           allTasks={allTasks} 
           onStatusUpdated={(updated) => setSelectedSearchUser(prev => ({ ...prev, ...updated }))}
         />

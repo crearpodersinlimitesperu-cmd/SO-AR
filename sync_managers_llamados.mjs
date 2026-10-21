@@ -1,8 +1,8 @@
 /**
  * Motor de sincronizacion: Google Sheets -> Firestore
  *
- * Sincroniza EN UN SOLO SENTIDO (la hoja de Google es la fuente de verdad,
- * nunca se escribe de vuelta a la hoja):
+ * Sincroniza EN UN SOLO SENTIDO (nunca se escribe de vuelta a la hoja).
+ * Los campos editados en Causa OS tienen precedencia explícita en Firestore:
  *
  *   1) Hoja "Managers en juego ..." (Hoja1)  -> coleccion Firestore `managers_directory`
  *   2) Hoja "LLAMADOS MANAGERS" (pestañas mensuales tipo AGOSTO2026, JULIO2026, ...)
@@ -30,7 +30,9 @@ import { google } from 'googleapis';
 import { initializeApp, cert, getApps } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import fs from 'fs';
-import { INITIAL_MANAGERS, INITIAL_LLAMADOS } from './src/data/managersData.js';
+import { INITIAL_LLAMADOS } from './src/data/managersData.js';
+import { coherenceSede } from './src/utils/trainerCoherence.js';
+import { managerSourceIdentities, persistManagerSheetRow } from './src/services/managerSyncPolicy.js';
 
 const KEY_FILE = './centro-operativo-cpsl-65ad52160f45.json';
 
@@ -138,20 +140,12 @@ function findHeaderIndexMap(headers) {
 async function syncManagers() {
   console.log('\n=== Sincronizando MANAGERS (Hoja: Managers en juego...) ===');
 
-  // 1. Estado actual "efectivo" (igual que lo calcula la app: catalogo fijo
-  //    + lo que ya haya en Firestore, Firestore gana si el id coincide).
+  // Only persisted records participate in identity reconciliation.
   const existingSnap = await db.collection('managers_directory').get();
   const firestoreById = new Map();
   existingSnap.forEach((doc) => firestoreById.set(String(doc.id), { id: doc.id, ...doc.data() }));
 
-  const effectiveById = new Map();
-  INITIAL_MANAGERS.forEach((m) => {
-    const fromFs = firestoreById.get(String(m.id));
-    effectiveById.set(String(m.id), fromFs ? { ...m, ...fromFs } : m);
-  });
-  firestoreById.forEach((m, id) => {
-    if (!effectiveById.has(String(id))) effectiveById.set(String(id), m);
-  });
+  const effectiveById = firestoreById;
 
   // Llave = nombre+equipo -> id. Un manager en 2 equipos distintos genera 2
   // llaves distintas apuntando a 2 documentos distintos (no se fusionan).
@@ -160,7 +154,11 @@ async function syncManagers() {
   effectiveById.forEach((m, id) => {
     const numId = Number(id);
     if (Number.isFinite(numId) && numId > maxId) maxId = numId;
-    if (m.nombre) keyToId.set(managerMatchKey(m.nombre, m.equipo), id);
+    for (const identity of managerSourceIdentities(m)) {
+      if (!identity.nombre) continue;
+      const scopedKey = `${coherenceSede(identity.sede)}__${managerMatchKey(identity.nombre, identity.equipo)}`;
+      keyToId.set(scopedKey, keyToId.has(scopedKey) && keyToId.get(scopedKey) !== id ? null : id);
+    }
   });
 
   // 2. Leer la hoja.
@@ -195,8 +193,6 @@ async function syncManagers() {
   let creados = 0;
   let actualizados = 0;
   let sinNombre = 0;
-  let batch = db.batch();
-  let batchCount = 0;
 
   const seenKeys = new Map(); // deteccion de filas duplicadas EXACTAS dentro de la misma hoja (mismo nombre+equipo repetido)
   let duplicadosEnHoja = 0;
@@ -208,10 +204,16 @@ async function syncManagers() {
     const nombre = toProperCase(nombreRaw); // nombre normalizado a formato "Nombre Propio"
     const equipoRaw = col.equipo !== undefined ? (row[col.equipo] || '').toString().trim() : '';
 
-    const key = managerMatchKey(nombreRaw, equipoRaw);
+    const sedeRaw = col.sede !== undefined ? (row[col.sede] || '').toString().trim() : '';
+    const key = `${coherenceSede(sedeRaw)}__${managerMatchKey(nombreRaw, equipoRaw)}`;
+    if (keyToId.has(key) && keyToId.get(key) === null) {
+      console.warn('Manager ambiguo por sede/equipo: omitido sin escritura.');
+      continue;
+    }
     if (seenKeys.has(key)) {
       duplicadosEnHoja++;
-      console.log(`  AVISO: fila ${r + 1} repite a "${nombre}" en el mismo equipo "${equipoRaw}" (ya vista en fila ${seenKeys.get(key) + 1}) — se conserva la ultima version.`);
+      console.warn('Fila duplicada por nombre/sede/equipo: omitida sin sobrescribir.');
+      continue;
     }
     seenKeys.set(key, r);
 
@@ -248,17 +250,10 @@ async function syncManagers() {
       _syncUpdatedAt: new Date().toISOString(),
     };
 
-    batch.set(db.collection('managers_directory').doc(String(docId)), data, { merge: true });
-    batchCount++;
+    await persistManagerSheetRow(db, db.collection('managers_directory').doc(String(docId)), data);
     if (isNew) creados++; else actualizados++;
 
-    if (batchCount >= 400) {
-      await batch.commit();
-      batch = db.batch();
-      batchCount = 0;
-    }
   }
-  if (batchCount > 0) await batch.commit();
 
   console.log(`Managers -> creados: ${creados}, actualizados: ${actualizados}, filas sin nombre (omitidas): ${sinNombre}, filas duplicadas exactas (mismo nombre+equipo repetido en la hoja): ${duplicadosEnHoja}`);
   return { creados, actualizados, sinNombre, duplicadosEnHoja };

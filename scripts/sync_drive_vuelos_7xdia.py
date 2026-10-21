@@ -18,7 +18,7 @@ import io
 import re
 import time
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 import fitz  # PyMuPDF
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
@@ -306,7 +306,7 @@ def sync_from_drive():
             all_raw_items.append(item)
             raw_cache[fid] = item
         except Exception as e:
-            print(f"Error leyendo {name}: {e}")
+            print(f"Error leyendo PDF: {type(e).__name__}")
 
     try:
         with open(RAW_FILE, 'w', encoding='utf-8') as f:
@@ -405,15 +405,15 @@ def sync_from_drive():
                                 "departureDate": dep_date,
                                 "scheduledDeparture": f"{dep_date}T{dep_time}:00-05:00",
                                 "scheduledArrival": f"{arr_date}T{arr_time}:00-05:00",
-                                "estimatedDeparture": f"{dep_date}T{dep_time}:00-05:00",
-                                "estimatedArrival": f"{arr_date}T{arr_time}:00-05:00",
+                                "estimatedDeparture": None,
+                                "estimatedArrival": None,
                                 "actualDeparture": None,
                                 "actualArrival": None
                             },
-                            "status": "ON_TIME",
-                            "statusLabel": "Confirmado / A tiempo",
-                            "statusDescription": f"Vuelo con entrenador {norm_pax} confirmado ruta {orig_code} → {dest_code}",
-                            "delayMinutes": 0,
+                            "status": "SCHEDULED",
+                            "statusLabel": "Programado según itinerario",
+                            "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+                            "delayMinutes": None,
                             "terminal": "T1",
                             "gate": "Confirmándose en aeropuerto",
                             "baggageClaim": "Por confirmar en arribo",
@@ -504,15 +504,15 @@ def sync_from_drive():
                                 "departureDate": dep_date,
                                 "scheduledDeparture": f"{dep_date}T{dep_t}:00-05:00",
                                 "scheduledArrival": f"{dep_date}T{arr_t}:00-05:00",
-                                "estimatedDeparture": f"{dep_date}T{dep_t}:00-05:00",
-                                "estimatedArrival": f"{dep_date}T{arr_t}:00-05:00",
+                                "estimatedDeparture": None,
+                                "estimatedArrival": None,
                                 "actualDeparture": None,
                                 "actualArrival": None
                             },
-                            "status": "ON_TIME",
-                            "statusLabel": "Confirmado / A tiempo",
-                            "statusDescription": f"Vuelo con entrenador {norm_pax} confirmado ruta {orig_code} → {dest_code}",
-                            "delayMinutes": 0,
+                            "status": "SCHEDULED",
+                            "statusLabel": "Programado según itinerario",
+                            "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+                            "delayMinutes": None,
                             "terminal": "T1",
                             "gate": "Confirmándose en aeropuerto",
                             "baggageClaim": "Por confirmar en arribo",
@@ -614,15 +614,15 @@ def sync_from_drive():
                                 "departureDate": dep_iso_date,
                                 "scheduledDeparture": f"{dep_iso_date}T{dep_time}:00-05:00",
                                 "scheduledArrival": f"{arr_iso_date}T{arr_time}:00-05:00",
-                                "estimatedDeparture": f"{dep_iso_date}T{dep_time}:00-05:00",
-                                "estimatedArrival": f"{arr_iso_date}T{arr_time}:00-05:00",
+                                "estimatedDeparture": None,
+                                "estimatedArrival": None,
                                 "actualDeparture": None,
                                 "actualArrival": None
                             },
-                            "status": "ON_TIME",
-                            "statusLabel": "Confirmado / A tiempo",
-                            "statusDescription": f"Vuelo con entrenador {norm_pax} confirmado ruta {orig_code} → {dest_code}",
-                            "delayMinutes": 0,
+                            "status": "SCHEDULED",
+                            "statusLabel": "Programado según itinerario",
+                            "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+                            "delayMinutes": None,
                             "terminal": "T1",
                             "gate": "Confirmándose en aeropuerto",
                             "baggageClaim": "Por confirmar en arribo",
@@ -639,12 +639,13 @@ def sync_from_drive():
     # Construcción del payload final
     output_tracker = {
         "version": "3.2.0-ai-engine",
-        "updatedAt": datetime.now().isoformat() + "Z",
+        "updatedAt": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "liveStatusAvailable": False,
         "aiEngineStatus": "ACTIVE",
         "totalPdfAnalyzed": len(all_raw_items),
         "totalFlightsIndexed": len(flights_dict),
         "totalFlights": len(flights_dict),
-        "syncFrequency": "7 veces al día (06:00, 09:00, 12:00, 15:00, 18:00, 21:00, 23:30)",
+        "syncFrequency": "7 veces al día (01:00, 04:00, 10:00, 13:00, 16:00, 19:00, 22:00 UTC)",
         "source": "Google Drive Sync (Carpetas Oficiales Vuelos CPSL)",
         "flights": flights_dict
     }

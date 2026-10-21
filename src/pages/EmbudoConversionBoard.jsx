@@ -1,646 +1,252 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { doc, onSnapshot } from 'firebase/firestore';
-import { db, auth } from '../services/firebase';
-import { 
-  TrendingUp, Users, ArrowLeft, RefreshCw, CheckCircle2, 
-  AlertCircle, ChevronRight, Filter, ShieldCheck, DollarSign, 
-  PhoneCall, Award, Compass, Zap, Layers, BarChart3, Database,
-  Copy, Check
-} from 'lucide-react';
-import { OPERATIONAL_SEDES } from '../data/usersData';
+import { ArrowLeft, RefreshCw, Users, Activity, CircleHelp } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { auth } from '../services/firebase';
+
+const WORKER_URL = import.meta.env.VITE_COPILOTO_WORKER_URL ||
+  'https://so-ar-copiloto.crearpsl-cpsl.workers.dev';
+
+function formatTimestamp(value) {
+  if (!value) return 'No disponible';
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? value : date.toLocaleString('es', { dateStyle: 'medium', timeStyle: 'short' });
+}
+
+function knownRate(counts) {
+  const known = counts.yes + counts.no;
+  return known ? `${((counts.yes / known) * 100).toFixed(1)}%` : 'Sin datos verificables';
+}
+
+function CountCard({ label, counts, description }) {
+  return (
+    <article style={styles.card}>
+      <div style={styles.cardLabel}>{label}</div>
+      <strong style={styles.count}>{counts.yes}</strong>
+      <div style={styles.secondary}>Sí · {counts.no} No · {counts.unknown} Sin dato</div>
+      <div style={styles.rate}>Tasa entre {counts.yes + counts.no} estados conocidos: {knownRate(counts)}</div>
+      <p style={styles.cardDescription}>{description}</p>
+    </article>
+  );
+}
 
 export default function EmbudoConversionBoard() {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
-  
-  const [loading, setLoading] = useState(true);
-  const [snapshotData, setSnapshotData] = useState(null);
-  const [selectedSede, setSelectedSede] = useState('Lima');
-  const [selectedEquipo, setSelectedEquipo] = useState('EQUIPO 30');
-  const [equiposDisponibles, setEquiposDisponibles] = useState(['EQUIPO 30', 'EQUIPO 29', 'EQUIPO 28', 'EQUIPO 27', 'EQUIPO 17', 'TODOS']);
-  const [lastUpdated, setLastUpdated] = useState(null);
-  const [activeTab, setActiveTab] = useState('embudo'); // 'embudo' | 'tabla_sql' | 'coordinacion' | 'integridad' | 'brandscript'
-  const [copiedKey, setCopiedKey] = useState(null);
+  const [catalog, setCatalog] = useState(null);
+  const [catalogError, setCatalogError] = useState('');
+  const [selectedSedeId, setSelectedSedeId] = useState('');
+  const [selectedTeamId, setSelectedTeamId] = useState('');
+  const [metrics, setMetrics] = useState(null);
+  const [metricsError, setMetricsError] = useState('');
+  const [loadingCatalog, setLoadingCatalog] = useState(true);
+  const [loadingMetrics, setLoadingMetrics] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  const copyText = (text, key) => {
-    navigator.clipboard.writeText(text);
-    setCopiedKey(key);
-    setTimeout(() => setCopiedKey(null), 2500);
-  };
-
-  // Colores corporativos CPSL
-  const bgLight = "#0b132b";
-  const bgCard = "#1c2541";
-  const bgSurface = "#1e293b";
-  const gold = "#f59e0b";
-  const textLight = "#f8fafc";
-  const textMuted = "#94a3b8";
-  const borderCard = "#334155";
-
-  // Escuchar snapshot de Nodus en tiempo real desde Firestore
-  useEffect(() => {
-    let cancelled = false;
-    let unsubscribe = () => {};
-
-    function subscribe(alreadyRetried) {
-      const docRef = doc(db, 'nodus_kpis_sincronizados', 'latest_snapshot');
-      unsubscribe = onSnapshot(docRef, (docSnap) => {
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          setSnapshotData(data);
-          setLastUpdated(data.timestamp || new Date().toISOString());
-
-          // Detectar equipos en snapshot
-          if (data.secciones?.reporteAsistenciaPorEquipo) {
-            const keys = Object.keys(data.secciones.reporteAsistenciaPorEquipo).map(k => {
-              const match = k.match(/EQUIPO\s+\d+/i);
-              return match ? match[0].toUpperCase() : k;
-            });
-            const uniqueEquipos = Array.from(new Set(keys)).filter(Boolean);
-            if (uniqueEquipos.length > 0) {
-              setEquiposDisponibles([...uniqueEquipos, 'TODOS']);
-            }
-          }
-        }
-        setLoading(false);
-      }, async (err) => {
-        console.error("Error escuchando snapshot:", err);
-        // Un token de sesión cacheado/desactualizado puede rechazar la suscripción aunque
-        // el usuario esté realmente logueado. Se fuerza un refresco y se reintenta una sola vez.
-        if (err.code === 'permission-denied' && !alreadyRetried && auth.currentUser) {
-          try {
-            await auth.currentUser.getIdToken(true);
-            if (!cancelled) subscribe(true);
-            return;
-          } catch (refreshErr) {
-            console.error("Error refrescando token:", refreshErr);
-          }
-        }
-        setLoading(false);
-      });
+  const callWorker = useCallback(async (path, body) => {
+    const user = auth.currentUser;
+    if (!user) throw new Error('Inicia sesión en Causa OS para consultar Nodus.');
+    const token = await user.getIdToken();
+    const response = await fetch(`${WORKER_URL}${path}`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: body === undefined ? '{}' : JSON.stringify(body)
+    });
+    let result;
+    try {
+      result = await response.json();
+    } catch {
+      throw new Error('El servicio de Nodus respondió con un formato no válido.');
     }
-
-    subscribe(false);
-    return () => { cancelled = true; unsubscribe(); };
+    if (!response.ok) {
+      if (path === '/nodus-json/catalog' && result.error === 'invalid-argument') {
+        throw new Error('El Worker seguro de Nodus aún no está actualizado. No se mostrarán datos de respaldo como si fueran actuales.');
+      }
+      throw new Error(result.message || 'No se pudo consultar Nodus.');
+    }
+    return result;
   }, []);
 
-  // Calcular las métricas del embudo relacional (Emulando la Vista SQL vista_embudo_conversion_c1_c2_mj)
-  const getMetrics = () => {
-    let baseC1 = 0;
-    let sentadosC1 = 0;
-    let confirmados = 0;
-    let desertores = 0;
-    let monetizadosC2 = 0;
-    let noContesta = 0;
-    let siguienteFecha = 0;
+  useEffect(() => {
+    let cancelled = false;
+    setLoadingCatalog(true);
+    setCatalog(null);
+    setMetrics(null);
+    setCatalogError('');
+    setLoadingMetrics(false);
+    callWorker('/nodus-json/catalog')
+      .then((result) => {
+        if (cancelled) return;
+        setCatalog(result);
+        if (result.scope !== 'general') {
+          const firstSede = result.sedes?.[0];
+          setSelectedSedeId((current) => current || String(firstSede?.id || ''));
+        }
+      })
+      .catch((error) => {
+        if (!cancelled) setCatalogError(error.message);
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingCatalog(false);
+      });
+    return () => { cancelled = true; };
+  }, [callWorker, currentUser?.uid, refreshKey]);
 
-    if (snapshotData?.secciones?.reporteAsistenciaPorEquipo) {
-      const porEquipo = snapshotData.secciones.reporteAsistenciaPorEquipo || {};
-      
-      // Intentar buscar cruzando el Equipo y la Sede
-      let eqKey = Object.keys(porEquipo).find(k => 
-        k.toUpperCase().includes(selectedEquipo.toUpperCase()) && 
-        k.toUpperCase().includes(selectedSede.toUpperCase())
-      );
-      
-      // Si no encuentra cruzado, buscar solo por Equipo
-      if (!eqKey) {
-        eqKey = Object.keys(porEquipo).find(k => k.toUpperCase().includes(selectedEquipo.toUpperCase()));
-      }
+  const visibleSedes = catalog?.sedes || [];
+  const selectedSede = visibleSedes.find((sede) => String(sede.id) === selectedSedeId) || visibleSedes[0];
+  const availableTeams = useMemo(() => selectedSede?.equipos || [], [selectedSede]);
 
-      const eqData = eqKey ? porEquipo[eqKey] : null;
-
-      if (eqData?.kpis) {
-        eqData.kpis.forEach(k => {
-          const text = k.content?.join(' ') || '';
-          if (text.includes('Confirmado') && !isNaN(parseInt(k.content[0]))) confirmados = parseInt(k.content[0]);
-          if (text.includes('Asistieron') && !isNaN(parseInt(k.content[0]))) sentadosC1 = parseInt(k.content[0]);
-          if (text.includes('Desertores') && !isNaN(parseInt(k.content[0]))) desertores = parseInt(k.content[0]);
-          if (text.includes('Pagaron C2') && !isNaN(parseInt(k.content[0]))) monetizadosC2 = parseInt(k.content[0]);
-          if (text.includes('No Contesta') && !isNaN(parseInt(k.content[0]))) noContesta = parseInt(k.content[0]);
-          if (text.includes('Siguiente') && !isNaN(parseInt(k.content[0]))) siguienteFecha = parseInt(k.content[0]);
-        });
-      }
+  useEffect(() => {
+    if (!availableTeams.length) {
+      setSelectedTeamId('');
+      setMetrics(null);
+      setMetricsError('');
+      setLoadingMetrics(false);
+      return;
     }
+    if (!availableTeams.some((team) => String(team.id) === selectedTeamId)) {
+      setSelectedTeamId(String(availableTeams[0].id));
+    }
+  }, [availableTeams, selectedTeamId]);
 
-    const pctConfirmadoASentado = confirmados > 0 ? ((sentadosC1 / confirmados) * 100).toFixed(1) : 0;
-    const pctAsignadoASentado = baseC1 > 0 ? ((sentadosC1 / baseC1) * 100).toFixed(1) : 0;
-    const pctPromo = sentadosC1 > 0 ? ((monetizadosC2 / sentadosC1) * 100).toFixed(1) : 0;
-    const pctDesertores = sentadosC1 > 0 ? ((desertores / sentadosC1) * 100).toFixed(1) : 0;
+  useEffect(() => {
+    if (!catalog || !selectedTeamId || catalog.scope === 'general') return undefined;
+    let cancelled = false;
+    setLoadingMetrics(true);
+    setMetrics(null);
+    setMetricsError('');
+    callWorker('/nodus-json/team-metrics', { teamId: Number(selectedTeamId) })
+      .then((result) => {
+        if (!cancelled) setMetrics(result);
+      })
+      .catch((error) => {
+        if (!cancelled) setMetricsError(error.message);
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingMetrics(false);
+      });
+    return () => { cancelled = true; };
+  }, [callWorker, catalog?.scope, selectedTeamId]);
 
-    return {
-      id_equipo: 134,
-      nombre_equipo: selectedEquipo,
-      sede: selectedSede,
-      graduados_c1: sentadosC1,
-      base_c1: confirmados > 0 ? confirmados + noContesta + siguienteFecha : baseC1, // estimación
-      pagos_promo_c1: monetizadosC2,
-      pct_pagos_promo_domingo: pctPromo,
-      sentados_c2: monetizadosC2,
-      pct_tasa_sentados_c2: pctPromo,
-      total_asignados_coord: confirmados + noContesta + siguienteFecha,
-      confirmados_coord: confirmados,
-      no_contesta: noContesta,
-      siguiente_fecha: siguienteFecha,
-      pct_confirmado_a_sentado: pctConfirmadoASentado,
-      pct_total_asignado_a_sentado: pctAsignadoASentado,
-      desertores_c2: desertores,
-      pct_desertores_c2: pctDesertores,
-      graduados_c2: Math.max(0, sentadosC1 - desertores),
-      sentados_creacion_fds1: Math.round(monetizadosC2 * 0.9),
-      sentados_relacion_fds2: Math.round(monetizadosC2 * 0.85),
-      sentados_gratitud_fds3: Math.round(monetizadosC2 * 0.8),
-      graduados_el_viaje: Math.round(monetizadosC2 * 0.75),
-      pct_llegada_el_viaje: monetizadosC2 > 0 ? 83.3 : 0
-    };
-  };
-
-  const m = getMetrics();
+  const teamSummary = metrics?.metrics;
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: bgLight, color: textLight, padding: '1.5rem 2rem' }}>
-      
-      {/* HEADER DE CONTROL */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <button 
-            onClick={() => navigate('/home')} 
-            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: bgCard, border: `1px solid ${borderCard}`, color: textLight, padding: '0.6rem 1rem', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}
-          >
-            <ArrowLeft size={18} /> Volver al Tablero
-          </button>
-          <div>
-            <h1 style={{ margin: 0, fontSize: '1.6rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Layers size={26} color={gold} /> Embudo de Conversión C1 ➔ C2 ➔ MJ ➔ El Viaje
-            </h1>
-            <p style={{ margin: 0, color: textMuted, fontSize: '0.85rem' }}>
-              Vista analítica en tiempo real basada en la especificación <code style={{ color: gold }}>vista_embudo_conversion_c1_c2_mj</code>
-            </p>
-          </div>
+    <main style={styles.page}>
+      <header style={styles.header}>
+        <button type="button" onClick={() => navigate('/home')} style={styles.backButton}>
+          <ArrowLeft size={17} /> Volver al tablero
+        </button>
+        <div style={{ flex: 1 }}>
+          <p style={styles.eyebrow}>NODUS · CONSULTA VERIFICADA</p>
+          <h1 style={styles.title}>Seguimiento de C1 y C2</h1>
+          <p style={styles.subtitle}>Consulta por equipo basada en los estados que Nodus documenta; los datos faltantes se mantienen como desconocidos.</p>
         </div>
+        <button type="button" onClick={() => setRefreshKey((value) => value + 1)} disabled={loadingCatalog || loadingMetrics} style={styles.refreshButton}>
+          <RefreshCw size={16} /> Actualizar
+        </button>
+      </header>
 
-        {/* CONTROLES EN VIVO */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: '#064e3b', color: '#34d399', padding: '0.4rem 0.8rem', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 'bold' }}>
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10b981', display: 'inline-block' }}></span>
-            NODUS LIVE
-          </div>
+      {loadingCatalog && <p role="status" style={styles.notice}>Consultando la fuente oficial de Nodus…</p>}
+      {catalogError && <div role="alert" style={styles.error}>{catalogError}</div>}
 
-          <select 
-            value={selectedEquipo} 
-            onChange={(e) => setSelectedEquipo(e.target.value)}
-            style={{ background: bgCard, border: `1px solid ${borderCard}`, color: textLight, padding: '0.5rem 1rem', borderRadius: '8px', fontWeight: 'bold' }}
-          >
-            {equiposDisponibles.map(eq => (
-              <option key={eq} value={eq}>{eq}</option>
-            ))}
-          </select>
+      {catalog && (
+        <>
+          <section aria-label="Estado de la fuente" style={styles.source}>
+            <Activity size={17} />
+            <span><strong>Fuente:</strong> API JSON de Nodus</span>
+            <span><strong>Generado:</strong> {formatTimestamp(catalog.generatedAt)}</span>
+            <span><strong>Recibido:</strong> {formatTimestamp(catalog.retrievedAt)}</span>
+          </section>
+          <p style={styles.freshnessNote}>La consulta valida la antigüedad de la respuesta. No es un flujo en vivo; vuelve a actualizar para pedir una nueva lectura.</p>
 
-          <select 
-            value={selectedSede} 
-            onChange={(e) => setSelectedSede(e.target.value)}
-            style={{ background: bgCard, border: `1px solid ${borderCard}`, color: textLight, padding: '0.5rem 1rem', borderRadius: '8px', fontWeight: 'bold' }}
-          >
-            {['Lima', 'Quito', 'Cuenca', 'Guayaquil', 'Medellín', 'México'].map(s => (
-              <option key={s} value={s}>{s}</option>
-            ))}
-          </select>
-        </div>
-      </div>
+          {catalog.scope === 'general' ? (
+            <section style={styles.summaryGrid} aria-label="Indicadores generales Nodus">
+              <div style={styles.card}><div style={styles.cardLabel}>Sedes con datos</div><strong style={styles.count}>{catalog.totals.sedes}</strong></div>
+              <div style={styles.card}><div style={styles.cardLabel}>Equipos activos</div><strong style={styles.count}>{catalog.totals.equipos}</strong></div>
+              <div style={styles.card}><div style={styles.cardLabel}>Participantes reportados por equipo</div><strong style={styles.count}>{catalog.totals.participantes}</strong></div>
+              <p style={styles.scopeNote}>Tu vista muestra indicadores generales. El detalle de equipos y participantes está limitado a coordinación de la sede asignada y gerencia.</p>
+            </section>
+          ) : (
+            <>
+              <section style={styles.filters} aria-label="Filtros Nodus">
+                {catalog.scope === 'global' && (
+                  <label style={styles.field}>
+                    <span>Sede</span>
+                    <select value={selectedSede?.id || ''} onChange={(event) => setSelectedSedeId(event.target.value)} style={styles.select}>
+                      {visibleSedes.map((sede) => <option key={sede.id} value={sede.id}>{sede.nombre}</option>)}
+                    </select>
+                  </label>
+                )}
+                <label style={styles.field}>
+                  <span>Equipo</span>
+                  <select value={selectedTeamId} onChange={(event) => setSelectedTeamId(event.target.value)} style={styles.select}>
+                    {availableTeams.map((team) => <option key={team.id} value={team.id}>{team.nombre}</option>)}
+                  </select>
+                </label>
+                <span style={styles.scopePill}>{catalog.scope === 'global' ? 'Alcance de gerencia' : `Sede asignada: ${selectedSede?.nombre || 'No disponible'}`}</span>
+              </section>
 
-      {/* PESTAÑAS DE NAVEGACIÓN */}
-      <div style={{ display: 'flex', gap: '0.5rem', borderBottom: `1px solid ${borderCard}`, marginBottom: '1.5rem', overflowX: 'auto', paddingBottom: '0.2rem' }}>
-        {[
-          { id: 'embudo', label: '⚡ Flujo Visual del Embudo', icon: TrendingUp },
-          { id: 'tabla_sql', label: '🗄️ Vista Relacional SQL (En Vivo)', icon: Database },
-          { id: 'coordinacion', label: '📞 Blitz de Coordinación', icon: PhoneCall },
-          { id: 'integridad', label: '🛡️ Integridad y Caja', icon: ShieldCheck },
-                  ].map(tab => {
-          const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                background: isActive ? bgCard : 'transparent',
-                color: isActive ? gold : textMuted,
-                border: 'none',
-                borderBottom: isActive ? `3px solid ${gold}` : '3px solid transparent',
-                padding: '0.8rem 1.2rem',
-                cursor: 'pointer',
-                fontWeight: isActive ? 'bold' : 'normal',
-                fontSize: '0.9rem'
-              }}
-            >
-              <Icon size={18} /> {tab.label}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* RIBBON DE METAS OFICIALES */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
-        <div style={{ background: bgCard, padding: '1rem', borderRadius: '10px', border: `1px solid ${borderCard}` }}>
-          <p style={{ margin: 0, fontSize: '0.75rem', color: textMuted, textTransform: 'uppercase' }}>KPI-ENT-001 | Graduados C1</p>
-          <h3 style={{ margin: '0.4rem 0', fontSize: '1.6rem', color: textLight }}>{m.graduados_c1} <span style={{ fontSize: '0.8rem', color: textMuted }}>/ {m.base_c1} PX</span></h3>
-          <p style={{ margin: 0, fontSize: '0.75rem', color: '#10b981' }}>Base de Salón Sentada</p>
-        </div>
-
-        <div style={{ background: bgCard, padding: '1rem', borderRadius: '10px', border: `1px solid ${borderCard}` }}>
-          <p style={{ margin: 0, fontSize: '0.75rem', color: textMuted, textTransform: 'uppercase' }}>KPI-ENT-002 | Pagos Promo C1</p>
-          <h3 style={{ margin: '0.4rem 0', fontSize: '1.6rem', color: gold }}>{m.pct_pagos_promo_domingo}% <span style={{ fontSize: '0.8rem', color: textMuted }}>({m.pagos_promo_c1} PX)</span></h3>
-          <p style={{ margin: 0, fontSize: '0.75rem', color: textMuted }}>Meta Oficial: <strong style={{ color: textLight }}>50%</strong></p>
-        </div>
-
-        <div style={{ background: bgCard, padding: '1rem', borderRadius: '10px', border: `1px solid ${borderCard}` }}>
-          <p style={{ margin: 0, fontSize: '0.75rem', color: textMuted, textTransform: 'uppercase' }}>KPI-CC-001 | Confirmado ➔ Sentado</p>
-          <h3 style={{ margin: '0.4rem 0', fontSize: '1.6rem', color: '#38bdf8' }}>{m.pct_confirmado_a_sentado}%</h3>
-          <p style={{ margin: 0, fontSize: '0.75rem', color: textMuted }}>Efectividad de llamadas Blitz</p>
-        </div>
-
-        <div style={{ background: bgCard, padding: '1rem', borderRadius: '10px', border: `1px solid ${borderCard}` }}>
-          <p style={{ margin: 0, fontSize: '0.75rem', color: textMuted, textTransform: 'uppercase' }}>KPI-ENT-007 | Llegada El Viaje</p>
-          <h3 style={{ margin: '0.4rem 0', fontSize: '1.6rem', color: '#a855f7' }}>{m.pct_llegada_el_viaje}% <span style={{ fontSize: '0.8rem', color: textMuted }}>({m.graduados_el_viaje} PX)</span></h3>
-          <p style={{ margin: 0, fontSize: '0.75rem', color: textMuted }}>Meta Oficial: <strong style={{ color: textLight }}>90%</strong></p>
-        </div>
-      </div>
-
-      {/* CONTENIDO SEGÚN PESTAÑA */}
-      {activeTab === 'embudo' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          
-          {/* SECUENCIA DEL EMBUDO VISUAL */}
-          <div style={{ background: bgCard, padding: '1.5rem', borderRadius: '12px', border: `1px solid ${borderCard}` }}>
-            <h3 style={{ marginTop: 0, marginBottom: '1.5rem', fontSize: '1.2rem', color: gold, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <TrendingUp size={20} /> Embudo Extremo a Extremo ({m.nombre_equipo} — {m.sede})
-            </h3>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', position: 'relative' }}>
-              
-              {/* PASO 1 */}
-              <div style={{ background: bgSurface, padding: '1.2rem', borderRadius: '10px', borderLeft: `4px solid ${gold}` }}>
-                <span style={{ fontSize: '0.7rem', color: gold, fontWeight: 'bold' }}>PASO 1 • CAPÍTULO 1</span>
-                <h4 style={{ margin: '0.4rem 0', fontSize: '1.1rem' }}>Graduación C1</h4>
-                <p style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: '0.5rem 0', color: textLight }}>{m.graduados_c1} <span style={{ fontSize: '0.8rem', color: textMuted }}>Sentados</span></p>
-                <div style={{ fontSize: '0.8rem', color: textMuted }}>
-                  <p style={{ margin: '0.2rem 0' }}>• Base Registrada: <strong>{m.base_c1}</strong></p>
-                  <p style={{ margin: '0.2rem 0' }}>• Pagaron Promo Domingo: <strong style={{ color: gold }}>{m.pagos_promo_c1} ({m.pct_pagos_promo_domingo}%)</strong></p>
-                </div>
-              </div>
-
-              {/* PASO 2 */}
-              <div style={{ background: bgSurface, padding: '1.2rem', borderRadius: '10px', borderLeft: '4px solid #38bdf8' }}>
-                <span style={{ fontSize: '0.7rem', color: '#38bdf8', fontWeight: 'bold' }}>PASO 2 • COORDINACIÓN</span>
-                <h4 style={{ margin: '0.4rem 0', fontSize: '1.1rem' }}>Blitz Entre Semana</h4>
-                <p style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: '0.5rem 0', color: '#38bdf8' }}>{m.confirmados_coord} <span style={{ fontSize: '0.8rem', color: textMuted }}>Confirmados</span></p>
-                <div style={{ fontSize: '0.8rem', color: textMuted }}>
-                  <p style={{ margin: '0.2rem 0' }}>• Asignados: <strong>{m.total_asignados_coord}</strong></p>
-                  <p style={{ margin: '0.2rem 0' }}>• Confirmado ➔ Sentado: <strong style={{ color: '#34d399' }}>{m.pct_confirmado_a_sentado}%</strong></p>
-                </div>
-              </div>
-
-              {/* PASO 3 */}
-              <div style={{ background: bgSurface, padding: '1.2rem', borderRadius: '10px', borderLeft: '4px solid #10b981' }}>
-                <span style={{ fontSize: '0.7rem', color: '#10b981', fontWeight: 'bold' }}>PASO 3 • CAPÍTULO 2</span>
-                <h4 style={{ margin: '0.4rem 0', fontSize: '1.1rem' }}>Salón de Avanzado</h4>
-                <p style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: '0.5rem 0', color: '#10b981' }}>{m.sentados_c2} <span style={{ fontSize: '0.8rem', color: textMuted }}>Sentados</span></p>
-                <div style={{ fontSize: '0.8rem', color: textMuted }}>
-                  <p style={{ margin: '0.2rem 0' }}>• Desertores C2: <strong style={{ color: '#f87171' }}>{m.desertores_c2} ({m.pct_desertores_c2}%)</strong></p>
-                  <p style={{ margin: '0.2rem 0' }}>• Graduados C2: <strong style={{ color: '#34d399' }}>{m.graduados_c2}</strong></p>
-                </div>
-              </div>
-
-              {/* PASO 4 */}
-              <div style={{ background: bgSurface, padding: '1.2rem', borderRadius: '10px', borderLeft: '4px solid #a855f7' }}>
-                <span style={{ fontSize: '0.7rem', color: '#a855f7', fontWeight: 'bold' }}>PASO 4 • MAESTRÍA (MJ)</span>
-                <h4 style={{ margin: '0.4rem 0', fontSize: '1.1rem' }}>Ciclo de 90 Días</h4>
-                <p style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: '0.5rem 0', color: '#a855f7' }}>{m.sentados_creacion_fds1} <span style={{ fontSize: '0.8rem', color: textMuted }}>FDS 1 Creación</span></p>
-                <div style={{ fontSize: '0.8rem', color: textMuted }}>
-                  <p style={{ margin: '0.2rem 0' }}>• FDS 2 Relación: <strong>{m.sentados_relacion_fds2}</strong></p>
-                  <p style={{ margin: '0.2rem 0' }}>• FDS 3 Gratitud: <strong>{m.sentados_gratitud_fds3}</strong></p>
-                </div>
-              </div>
-
-              {/* PASO 5 */}
-              <div style={{ background: bgSurface, padding: '1.2rem', borderRadius: '10px', borderLeft: '4px solid #ec4899' }}>
-                <span style={{ fontSize: '0.7rem', color: '#ec4899', fontWeight: 'bold' }}>PASO 5 • EL VIAJE</span>
-                <h4 style={{ margin: '0.4rem 0', fontSize: '1.1rem' }}>Graduación Final</h4>
-                <p style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: '0.5rem 0', color: '#ec4899' }}>{m.graduados_el_viaje} <span style={{ fontSize: '0.8rem', color: textMuted }}>PX Viaje</span></p>
-                <div style={{ fontSize: '0.8rem', color: textMuted }}>
-                  <p style={{ margin: '0.2rem 0' }}>• Tasa Llegada El Viaje: <strong style={{ color: '#34d399' }}>{m.pct_llegada_el_viaje}%</strong></p>
-                  <p style={{ margin: '0.2rem 0' }}>• Meta Oficial: <strong>90%</strong></p>
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-          {/* DIAGNÓSTICO EJECUTIVO */}
-          <div style={{ background: bgCard, padding: '1.5rem', borderRadius: '12px', border: `1px solid ${borderCard}` }}>
-            <h3 style={{ marginTop: 0, fontSize: '1.1rem', color: textLight, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Compass size={20} color={gold} /> Diagnóstico Ejecutivo del Embudo ({m.nombre_equipo})
-            </h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
-              <div style={{ background: bgSurface, padding: '1rem', borderRadius: '8px' }}>
-                <h4 style={{ margin: '0 0 0.5rem 0', color: gold, fontSize: '0.9rem' }}>🎯 Responsabilidad del Entrenador en Sala</h4>
-                <p style={{ margin: 0, fontSize: '0.85rem', color: textMuted, lineHeight: '1.4' }}>
-                  El salón de C1 cerró con <strong>{m.graduados_c1} personas sentadas</strong>. La monetización directa en el domingo de C1 fue de <strong>{m.pagos_promo_c1} inscritos a C2 ({m.pct_pagos_promo_domingo}%)</strong> frente a la meta del 50%.
-                </p>
-              </div>
-              <div style={{ background: bgSurface, padding: '1rem', borderRadius: '8px' }}>
-                <h4 style={{ margin: '0 0 0.5rem 0', color: '#38bdf8', fontSize: '0.9rem' }}>📞 Responsabilidad de la Coordinación (Blitz)</h4>
-                <p style={{ margin: 0, fontSize: '0.85rem', color: textMuted, lineHeight: '1.4' }}>
-                  De los <strong>{m.confirmados_coord} confirmados</strong> por llamadas entre semana, se sentaron <strong>{m.graduados_c1} participantes</strong>, arrojando una efectividad telefónica del <strong style={{ color: '#34d399' }}>{m.pct_confirmado_a_sentado}%</strong> (sólo 8 no-shows).
-                </p>
-              </div>
-              <div style={{ background: bgSurface, padding: '1rem', borderRadius: '8px' }}>
-                <h4 style={{ margin: '0 0 0.5rem 0', color: '#f87171', fontSize: '0.9rem' }}>⚠️ Punto de Atención (Deserción en Sala)</h4>
-                <p style={{ margin: 0, fontSize: '0.85rem', color: textMuted, lineHeight: '1.4' }}>
-                  La tasa de deserción registrada en el fin de semana de C1 fue de <strong>{m.desertores_c2} participantes ({m.pct_desertores_c2}%)</strong>. Se debe reforzar el contenedor y los acuerdos de supervivencia desde el viernes.
-                </p>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      )}
-
-      {/* PESTAÑA VISTA RELACIONAL SQL */}
-      {activeTab === 'tabla_sql' && (
-        <div style={{ background: bgCard, padding: '1.5rem', borderRadius: '12px', border: `1px solid ${borderCard}` }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-            <h3 style={{ margin: 0, fontSize: '1.1rem', color: gold, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Database size={20} /> Salida de la Vista: <code style={{ color: textLight }}>vista_embudo_conversion_c1_c2_mj</code>
-            </h3>
-            <span style={{ fontSize: '0.8rem', color: textMuted }}>Actualizado en tiempo real desde Firestore Snapshot</span>
-          </div>
-
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem', textAlign: 'left' }}>
-              <thead>
-                <tr style={{ background: bgSurface, color: textMuted, borderBottom: `2px solid ${borderCard}` }}>
-                  <th style={{ padding: '0.8rem' }}>EQUIPO</th>
-                  <th style={{ padding: '0.8rem' }}>SEDE</th>
-                  <th style={{ padding: '0.8rem' }}>GRADUADOS C1</th>
-                  <th style={{ padding: '0.8rem' }}>PAGOS PROMO</th>
-                  <th style={{ padding: '0.8rem' }}>% PROMO</th>
-                  <th style={{ padding: '0.8rem' }}>SENTADOS C2</th>
-                  <th style={{ padding: '0.8rem' }}>% TASA SENTADOS</th>
-                  <th style={{ padding: '0.8rem' }}>ASIGNADOS COORD</th>
-                  <th style={{ padding: '0.8rem' }}>CONFIRMADOS</th>
-                  <th style={{ padding: '0.8rem' }}>% CONF ➔ SENT</th>
-                  <th style={{ padding: '0.8rem' }}>DESERTORES C2</th>
-                  <th style={{ padding: '0.8rem' }}>LLEGADA EL VIAJE</th>
-                  <th style={{ padding: '0.8rem' }}>% EL VIAJE</th>
-                </tr>
-              </thead>
-              <tbody>
-                {snapshotData?.secciones?.reporteAsistenciaPorEquipo ? 
-                Object.keys(snapshotData.secciones.reporteAsistenciaPorEquipo).map((k, idx) => {
-                  const eqData = snapshotData.secciones.reporteAsistenciaPorEquipo[k];
-                  let sc1 = 0, mc2 = 0;
-                  if (eqData?.kpis) {
-                    eqData.kpis.forEach(kp => {
-                      const text = kp.content?.join(' ') || '';
-                      if (text.includes('Asistieron') && !isNaN(parseInt(kp.content[0]))) sc1 = parseInt(kp.content[0]);
-                      if (text.includes('Pagaron C2') && !isNaN(parseInt(kp.content[0]))) mc2 = parseInt(kp.content[0]);
-                    });
-                  }
-                  return {
-                    eq: k,
-                    sede: 'NODUS',
-                    c1: sc1,
-                    promo: mc2,
-                    pctPromo: sc1 > 0 ? ((mc2/sc1)*100).toFixed(1) + '%' : '0%',
-                    c2: mc2,
-                    pctC2: sc1 > 0 ? ((mc2/sc1)*100).toFixed(1) + '%' : '0%',
-                    asig: '-',
-                    conf: '-',
-                    pctConfSent: '-',
-                    des: '-',
-                    viaje: Math.round(mc2 * 0.75),
-                    pctViaje: '83.3%'
-                  };
-                }).map((row, idx) => (
-                  <tr key={idx} style={{ borderBottom: `1px solid ${borderCard}`, background: row.eq === selectedEquipo ? '#1e3a8a33' : 'transparent' }}>
-                    <td style={{ padding: '0.8rem', fontWeight: 'bold', color: row.eq === selectedEquipo ? gold : textLight }}>{row.eq}</td>
-                    <td style={{ padding: '0.8rem' }}>{row.sede}</td>
-                    <td style={{ padding: '0.8rem', fontWeight: 'bold' }}>{row.c1}</td>
-                    <td style={{ padding: '0.8rem' }}>{row.promo}</td>
-                    <td style={{ padding: '0.8rem', color: gold }}>{row.pctPromo}</td>
-                    <td style={{ padding: '0.8rem', fontWeight: 'bold' }}>{row.c2}</td>
-                    <td style={{ padding: '0.8rem' }}>{row.pctC2}</td>
-                    <td style={{ padding: '0.8rem' }}>{row.asig}</td>
-                    <td style={{ padding: '0.8rem' }}>{row.conf}</td>
-                    <td style={{ padding: '0.8rem', color: '#34d399', fontWeight: 'bold' }}>{row.pctConfSent}</td>
-                    <td style={{ padding: '0.8rem', color: row.des > 0 ? '#f87171' : textMuted }}>{row.des}</td>
-                    <td style={{ padding: '0.8rem' }}>{row.viaje}</td>
-                    <td style={{ padding: '0.8rem', color: '#a855f7', fontWeight: 'bold' }}>{row.pctViaje}</td>
-                  </tr>
-                )) : <tr><td colSpan="13">No data</td></tr>}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
-      {/* PESTAÑA DE BLITZ DE COORDINACIÓN (ESPECÍFICO POR C1 Y GLOBAL) */}
-      {activeTab === 'coordinacion' && (() => {
-        const coordsPerC1 = {
-          'EQUIPO 30': {
-            joyce: { asignados: 135, confirmados: 92, pctConf: '68.1%', sentados: 85, pctSent: '92.4%', noContesta: 24, siguiente: 6, desertores: 23, monetizados: 26, abonos: 4, c2_nuevos: 14, c2_meta: 18, c2_rezagados: 3, c2_sentados: 17 },
-            diana: { asignados: 77, confirmados: 54, pctConf: '70.1%', sentados: 42, pctSent: '77.8%', noContesta: 10, siguiente: 9, desertores: 8, monetizados: 17, abonos: 1, c2_nuevos: 14, c2_meta: 18, c2_rezagados: 1, c2_sentados: 15 }
-          },
-          'EQUIPO 29': {
-            joyce: { asignados: 156, confirmados: 118, pctConf: '75.6%', sentados: 76, pctSent: '64.4%', noContesta: 23, siguiente: 7, desertores: 0, monetizados: 24, abonos: 0 },
-            diana: { asignados: 103, confirmados: 64, pctConf: '62.1%', sentados: 58, pctSent: '90.6%', noContesta: 27, siguiente: 1, desertores: 0, monetizados: 23, abonos: 1 }
-          },
-          'EQUIPO 28': {
-            joyce: { asignados: 183, confirmados: 140, pctConf: '76.5%', sentados: 129, pctSent: '92.1%', noContesta: 21, siguiente: 3, desertores: 0, monetizados: 30, abonos: 6 },
-            diana: { asignados: 79, confirmados: 38, pctConf: '48.1%', sentados: 45, pctSent: '118.4%', noContesta: 24, siguiente: 1, desertores: 0, monetizados: 21, abonos: 1 }
-          },
-          'EQUIPO 27': {
-            joyce: { asignados: 138, confirmados: 87, pctConf: '63.0%', sentados: 51, pctSent: '58.6%', noContesta: 26, siguiente: 1, desertores: 0, monetizados: 12, abonos: 0 },
-            diana: { asignados: 104, confirmados: 51, pctConf: '49.0%', sentados: 66, pctSent: '129.4%', noContesta: 16, siguiente: 7, desertores: 0, monetizados: 18, abonos: 1 }
-          }
-        };
-
-        const currentEqData = coordsPerC1[selectedEquipo] || coordsPerC1['EQUIPO 30'];
-
-        return (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            <div style={{ background: '#1e3a8a33', border: '1px solid #3b82f6', padding: '0.8rem 1.2rem', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
-              <span style={{ fontSize: '0.9rem', color: '#93c5fd', fontWeight: 'bold' }}>
-                📍 Visualizando métricas individuales de Coordinación para: <strong style={{ color: gold }}>{selectedEquipo} — {selectedSede}</strong>
-              </span>
-              <span style={{ fontSize: '0.75rem', color: textMuted }}>Filtro individual por fin de semana de entrenamiento</span>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '1.5rem' }}>
-              
-              {/* JOYCE POR C1 */}
-              <div style={{ background: bgCard, padding: '1.5rem', borderRadius: '12px', border: `1px solid ${borderCard}` }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: `1px solid ${borderCard}`, paddingBottom: '0.8rem' }}>
-                  <h3 style={{ margin: 0, fontSize: '1.2rem', color: gold }}>👩‍💼 Joyce ({selectedEquipo})</h3>
-                  <span style={{ background: '#064e3b', color: '#34d399', fontSize: '0.75rem', padding: '0.2rem 0.6rem', borderRadius: '4px', fontWeight: 'bold' }}>
-                    Conv: {currentEqData.joyce.pctSent}
-                  </span>
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', marginTop: '1rem', fontSize: '0.85rem' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: `1px solid ${borderCard}`, paddingBottom: '0.4rem' }}>
-                    <span style={{ color: textMuted }}>Participantes Asignados en este C1:</span>
-                    <strong>{currentEqData.joyce.asignados} PX</strong>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: `1px solid ${borderCard}`, paddingBottom: '0.4rem' }}>
-                    <span style={{ color: textMuted }}>Confirmados en 1ra Llamada:</span>
-                    <strong style={{ color: '#38bdf8' }}>{currentEqData.joyce.confirmados} ({currentEqData.joyce.pctConf})</strong>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: `1px solid ${borderCard}`, paddingBottom: '0.4rem' }}>
-                    <span style={{ color: textMuted }}>Se Sentaron en Sala (Asistieron):</span>
-                    <strong style={{ color: '#34d399', fontSize: '1.05rem' }}>{currentEqData.joyce.sentados} PX</strong>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: `1px solid ${borderCard}`, paddingBottom: '0.4rem' }}>
-                    <span style={{ color: textMuted }}>No Contesta / Siguiente Fecha:</span>
-                    <span>{currentEqData.joyce.noContesta} No Contesta | {currentEqData.joyce.siguiente} Sig.</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: `1px solid ${borderCard}`, paddingBottom: '0.4rem' }}>
-                    <span style={{ color: textMuted }}>Desertores en Salón:</span>
-                    <strong style={{ color: currentEqData.joyce.desertores > 0 ? '#f87171' : textMuted }}>{currentEqData.joyce.desertores} PX</strong>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.4rem' }}>
-                    <span style={{ color: textMuted }}>Monetizados hacia C2 (Pagos + Abonos):</span>
-                    <strong style={{ color: gold }}>{currentEqData.joyce.monetizados} Pagados ({currentEqData.joyce.abonos} Abonos)</strong>
-                  </div>
-                  {currentEqData.joyce.c2_sentados !== undefined && (
-                    <div style={{ background: '#3b82f61a', padding: '0.8rem', borderRadius: '8px', border: '1px solid #3b82f64d', marginTop: '0.5rem' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ color: '#60a5fa', fontWeight: 'bold' }}>Sentados en Capítulo 2:</span>
-                        <strong style={{ color: '#93c5fd', fontSize: '1.1rem' }}>{currentEqData.joyce.c2_sentados} PX</strong>
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: textLight, marginTop: '0.4rem' }}>
-                        <span>Nuevos: {currentEqData.joyce.c2_nuevos}/{currentEqData.joyce.c2_meta}</span>
-                        <span>Rezagados: {currentEqData.joyce.c2_rezagados}</span>
-                      </div>
+              {loadingMetrics && <p role="status" style={styles.notice}>Cargando estados del equipo…</p>}
+              {metricsError && <div role="alert" style={styles.error}>{metricsError}</div>}
+              {teamSummary && (
+                <>
+                  <section style={styles.teamHeading}>
+                    <div>
+                      <p style={styles.eyebrow}>EQUIPO SELECCIONADO</p>
+                      <h2 style={styles.teamTitle}>{teamSummary.equipo.nombre}</h2>
+                      <p style={styles.subtitle}>{teamSummary.equipo.sede} · {teamSummary.totalParticipantes} participantes activos devueltos por Nodus</p>
                     </div>
-                  )}
-                </div>
-              </div>
-
-              {/* DIANA POR C1 */}
-              <div style={{ background: bgCard, padding: '1.5rem', borderRadius: '12px', border: `1px solid ${borderCard}` }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: `1px solid ${borderCard}`, paddingBottom: '0.8rem' }}>
-                  <h3 style={{ margin: 0, fontSize: '1.2rem', color: gold }}>👩‍💼 Diana ({selectedEquipo})</h3>
-                  <span style={{ background: '#064e3b', color: '#34d399', fontSize: '0.75rem', padding: '0.2rem 0.6rem', borderRadius: '4px', fontWeight: 'bold' }}>
-                    Conv: {currentEqData.diana.pctSent}
-                  </span>
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', marginTop: '1rem', fontSize: '0.85rem' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: `1px solid ${borderCard}`, paddingBottom: '0.4rem' }}>
-                    <span style={{ color: textMuted }}>Participantes Asignados en este C1:</span>
-                    <strong>{currentEqData.diana.asignados} PX</strong>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: `1px solid ${borderCard}`, paddingBottom: '0.4rem' }}>
-                    <span style={{ color: textMuted }}>Confirmados en 1ra Llamada:</span>
-                    <strong style={{ color: '#38bdf8' }}>{currentEqData.diana.confirmados} ({currentEqData.diana.pctConf})</strong>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: `1px solid ${borderCard}`, paddingBottom: '0.4rem' }}>
-                    <span style={{ color: textMuted }}>Se Sentaron en Sala (Asistieron):</span>
-                    <strong style={{ color: '#34d399', fontSize: '1.05rem' }}>{currentEqData.diana.sentados} PX</strong>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: `1px solid ${borderCard}`, paddingBottom: '0.4rem' }}>
-                    <span style={{ color: textMuted }}>No Contesta / Siguiente Fecha:</span>
-                    <span>{currentEqData.diana.noContesta} No Contesta | {currentEqData.diana.siguiente} Sig.</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: `1px solid ${borderCard}`, paddingBottom: '0.4rem' }}>
-                    <span style={{ color: textMuted }}>Desertores en Salón:</span>
-                    <strong style={{ color: currentEqData.diana.desertores > 0 ? '#f87171' : textMuted }}>{currentEqData.diana.desertores} PX</strong>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.4rem' }}>
-                    <span style={{ color: textMuted }}>Monetizados hacia C2 (Pagos + Abonos):</span>
-                    <strong style={{ color: gold }}>{currentEqData.diana.monetizados} Pagados ({currentEqData.diana.abonos} Abonos)</strong>
-                  </div>
-                  {currentEqData.diana.c2_sentados !== undefined && (
-                    <div style={{ background: '#3b82f61a', padding: '0.8rem', borderRadius: '8px', border: '1px solid #3b82f64d', marginTop: '0.5rem' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ color: '#60a5fa', fontWeight: 'bold' }}>Sentados en Capítulo 2:</span>
-                        <strong style={{ color: '#93c5fd', fontSize: '1.1rem' }}>{currentEqData.diana.c2_sentados} PX</strong>
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: textLight, marginTop: '0.4rem' }}>
-                        <span>Nuevos: {currentEqData.diana.c2_nuevos}/{currentEqData.diana.c2_meta}</span>
-                        <span>Rezagados: {currentEqData.diana.c2_rezagados}</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-            </div>
-
-            {/* TOTALES ACUMULADOS HISTÓRICOS */}
-            <div style={{ background: bgSurface, padding: '1.2rem', borderRadius: '10px', border: `1px solid ${borderCard}` }}>
-              <h4 style={{ margin: '0 0 0.8rem 0', color: textMuted, fontSize: '0.85rem', textTransform: 'uppercase' }}>
-                🌐 Totales Acumulados Históricos en Nodus (Lima Ciclo 1 Global)
-              </h4>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', fontSize: '0.82rem' }}>
-                <div>
-                  <strong>Joyce (Global):</strong> 2,733 gestiones | 922 asignados | 98% cobertura | 1,258 confirmados acumulados.
-                </div>
-                <div>
-                  <strong>Diana (Global):</strong> 2,056 gestiones | 880 asignados | 95% cobertura | 1,082 confirmados acumulados.
-                </div>
-                <div>
-                  <strong>Leyla (Global):</strong> 627 gestiones | 96 asignados | 260 confirmados acumulados.
-                </div>
-              </div>
-            </div>
-
-          </div>
-        );
-      })()}
-
-      {/* PESTAÑA DE INTEGRIDAD Y CAJA */}
-      {activeTab === 'integridad' && (
-        <div style={{ background: bgCard, padding: '1.5rem', borderRadius: '12px', border: `1px solid ${borderCard}` }}>
-          <h3 style={{ marginTop: 0, fontSize: '1.2rem', color: gold, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <ShieldCheck size={22} /> Protocolo de Integridad Financiera y Vías de Pago
-          </h3>
-          <p style={{ color: textMuted, fontSize: '0.85rem' }}>
-            Estándar inalterable para evitar desfases financieros y "arrastres ficticios" en la plataforma Nodus.
-          </p>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem', marginTop: '1.5rem' }}>
-            <div style={{ background: bgSurface, padding: '1rem', borderRadius: '8px' }}>
-              <h4 style={{ margin: '0 0 0.5rem 0', color: '#10b981' }}>💳 Vías de Pago Autorizadas</h4>
-              <ul style={{ margin: 0, paddingLeft: '1.2rem', fontSize: '0.85rem', color: textLight, lineHeight: '1.6' }}>
-                <li><code>TRANSF</code> (Transferencia Bancaria con extracto verificado)</li>
-                <li><code>TC</code> (Tarjeta de Crédito / Débito en POS)</li>
-                <li><code>LINK</code> (Pasarela de Pago Online)</li>
-                <li><code>EFECTIVO</code> (Ingresado a caja física de mesa)</li>
-                <li><code>USDT</code> / <code>PAYPHONE</code> / <code>PAYPAL</code></li>
-              </ul>
-            </div>
-
-            <div style={{ background: bgSurface, padding: '1rem', borderRadius: '8px' }}>
-              <h4 style={{ margin: '0 0 0.5rem 0', color: gold }}>⏰ Cierre Bancario Obligatorio</h4>
-              <p style={{ fontSize: '0.85rem', color: textMuted, lineHeight: '1.5' }}>
-                Todo pago recibido debe estar respaldado y verificado físicamente en la cuenta bancaria antes del <strong>Lunes a las 12:00 PM</strong>.
-              </p>
-              <div style={{ background: '#78350f33', border: '1px solid #f59e0b', padding: '0.6rem', borderRadius: '6px', fontSize: '0.8rem', color: gold }}>
-                ⚠️ Queda terminantemente prohibido inflar confirmados con acuerdos débiles (<code>AC</code>) no respaldados.
-              </div>
-            </div>
-          </div>
-        </div>
+                    <span style={styles.sourceBadge}>Respuesta validada</span>
+                  </section>
+                  <section style={styles.grid} aria-label="Estados de participantes">
+                    <CountCard label="C1 · Pago registrado" counts={teamSummary.capitulo1Pagado} description="Cuenta únicamente cuando Nodus registra pagado como sí o no." />
+                    <CountCard label="C1 · Asistencia registrada" counts={teamSummary.capitulo1Asistio} description="Asistencia declarada en el estado de Capítulo 1." />
+                    <CountCard label="C1 · Deserción registrada" counts={teamSummary.capitulo1Desertor} description="No se interpreta la falta de un valor como ausencia de deserción." />
+                    <CountCard label="C2 · Pago registrado" counts={teamSummary.capitulo2Pagado} description="Pago de Capítulo 2; no equivale por sí solo a asistencia." />
+                    <CountCard label="Maestría · Estado registrado" counts={teamSummary.maestria} description="Estado que Nodus expone dentro de Capítulo 2; no predice etapas futuras." />
+                  </section>
+                  <p style={styles.dataNote}><CircleHelp size={15} /> “Sin dato” significa que el campo no llegó como verdadero o falso. Las tasas usan solo estados conocidos y muestran su denominador; no estiman graduación, llamadas ni llegada a etapas que esta API no documenta.</p>
+                  <p style={styles.freshnessNote}>Estados del equipo generados por Nodus: {formatTimestamp(metrics.generatedAt)} · recibidos: {formatTimestamp(metrics.retrievedAt)}.</p>
+                </>
+              )}
+              {!loadingMetrics && !metricsError && !availableTeams.length && (
+                <p style={styles.notice}><Users size={17} /> No hay equipos activos en la sede disponible.</p>
+              )}
+            </>
+          )}
+        </>
       )}
-
-          </div>
+    </main>
   );
 }
+
+const styles = {
+  page: { minHeight: '100vh', background: '#f4f7fb', color: '#172033', padding: 'clamp(1rem, 3vw, 2.5rem)', fontFamily: 'Inter, system-ui, sans-serif' },
+  header: { display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap', marginBottom: '1.5rem' },
+  backButton: { display: 'inline-flex', alignItems: 'center', gap: '.5rem', border: '1px solid #d4dce8', borderRadius: 9, background: '#fff', padding: '.65rem .85rem', color: '#34445f', cursor: 'pointer' },
+  refreshButton: { display: 'inline-flex', alignItems: 'center', gap: '.5rem', border: 0, borderRadius: 9, background: '#174a78', padding: '.7rem .9rem', color: '#fff', cursor: 'pointer' },
+  eyebrow: { margin: '0 0 .35rem', color: '#52718e', fontSize: '.72rem', fontWeight: 700, letterSpacing: '.08em' },
+  title: { margin: 0, fontSize: 'clamp(1.35rem, 3vw, 2rem)', color: '#183453' },
+  subtitle: { margin: '.35rem 0 0', color: '#617087', lineHeight: 1.5 },
+  source: { display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', background: '#eaf3fa', border: '1px solid #c8ddeb', borderRadius: 10, padding: '.8rem 1rem', color: '#31536e', fontSize: '.85rem' },
+  freshnessNote: { margin: '.6rem 0 1.2rem', color: '#718096', fontSize: '.82rem' },
+  notice: { display: 'flex', alignItems: 'center', gap: '.5rem', background: '#fff', border: '1px solid #dce4ee', borderRadius: 9, padding: '1rem', color: '#4f6077' },
+  error: { border: '1px solid #efc2bd', borderRadius: 9, background: '#fff1ef', padding: '1rem', color: '#8a332c' },
+  filters: { display: 'flex', alignItems: 'end', flexWrap: 'wrap', gap: '1rem', margin: '1rem 0 1.5rem', padding: '1rem', background: '#fff', border: '1px solid #e0e6ef', borderRadius: 12 },
+  field: { display: 'grid', gap: '.35rem', minWidth: 220, color: '#4c5c72', fontSize: '.82rem', fontWeight: 600 },
+  select: { border: '1px solid #cbd5e1', borderRadius: 8, background: '#fff', padding: '.65rem .75rem', color: '#23354f', fontSize: '.92rem' },
+  scopePill: { marginLeft: 'auto', borderRadius: 999, background: '#edf5ef', padding: '.45rem .7rem', color: '#386344', fontSize: '.8rem' },
+  teamHeading: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', margin: '1rem 0' },
+  teamTitle: { margin: 0, color: '#183453', fontSize: '1.35rem' },
+  sourceBadge: { borderRadius: 999, background: '#e7f4ed', padding: '.45rem .75rem', color: '#31704a', fontSize: '.8rem', fontWeight: 600 },
+  grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 250px), 1fr))', gap: '1rem' },
+  summaryGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))', gap: '1rem' },
+  card: { minWidth: 0, border: '1px solid #e0e6ef', borderRadius: 12, background: '#fff', padding: '1.1rem', boxShadow: '0 2px 8px #19324d0a' },
+  cardLabel: { color: '#52657d', fontSize: '.85rem', fontWeight: 650 },
+  count: { display: 'block', marginTop: '.65rem', color: '#174a78', fontSize: '2rem', lineHeight: 1.1 },
+  secondary: { marginTop: '.5rem', color: '#4f6077', fontSize: '.86rem' },
+  rate: { marginTop: '.45rem', color: '#31536e', fontSize: '.82rem', fontWeight: 600 },
+  cardDescription: { margin: '.75rem 0 0', color: '#718096', fontSize: '.8rem', lineHeight: 1.45 },
+  scopeNote: { gridColumn: '1 / -1', margin: 0, color: '#617087', fontSize: '.86rem' },
+  dataNote: { display: 'flex', alignItems: 'flex-start', gap: '.5rem', margin: '1rem 0 0', color: '#53657d', fontSize: '.84rem', lineHeight: 1.5 }
+};

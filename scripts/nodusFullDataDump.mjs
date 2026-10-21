@@ -3,8 +3,8 @@ import * as xlsx from 'xlsx';
 import fs from 'fs';
 
 // Configuración de entorno
-const USERNAME = process.env.NODUS_USER || 'CREARPSL';
-const PASSWORD = process.env.NODUS_PASSWORD || 'CREARPSL26';
+const USERNAME = process.env.NODUS_USER;
+const PASSWORD = process.env.NODUS_PASSWORD;
 
 // Retardo aleatorio humano
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));

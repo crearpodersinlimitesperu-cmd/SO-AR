@@ -5,6 +5,11 @@ on:
     # Runs every 5 minutes for faster mail delivery
     - cron: '*/5 * * * *'
   workflow_dispatch: # Allow manual trigger from GitHub UI
+    inputs:
+      communication_id:
+        description: 'Optional communicationId whose persisted SUCCESS state must be verified'
+        required: false
+        type: string
 
 jobs:
   mail-dispatch:
@@ -60,6 +65,7 @@ jobs:
           GMAIL_SERVER_APP_PASSWORD: ${{ secrets.GMAIL_PASS }}
           LIMA_GMAIL_USER: ${{ secrets.LIMA_GMAIL_USER }}
           LIMA_GMAIL_PASS: ${{ secrets.LIMA_GMAIL_PASS }}
+          VERIFY_COMMUNICATION_ID: ${{ inputs.communication_id }}
         run: |
           node scripts/assignInsuranceTaskAndMail.mjs || echo "Aviso: assignInsuranceTaskAndMail completado con observaciones"
           node scripts/mailerDaemon.js --one-shot

@@ -247,8 +247,8 @@ export default function StrategyBoard() {
         if (docSnap.exists()) {
           data = docSnap.data();
         } else {
-          console.warn("Usando nodusFallbackData para StrategyBoard");
-          data = nodusFallbackData;
+          console.warn("Snapshot Nodus no disponible en StrategyBoard (cero datos inventados)");
+          data = { coordinadores: [], totales: {} };
         }
 
         let totalAsignados = 0;
@@ -258,7 +258,7 @@ export default function StrategyBoard() {
         let totalNoContesta = 0;
         let totalNoInteresa = 0;
 
-        const coords = (data.coordinadores || nodusFallbackData?.coordinadores || []);
+        const coords = Array.isArray(data?.coordinadores) ? data.coordinadores : [];
         const isGlobal = !selectedSede || ['global', 'sede global', 'todas', 'todos'].includes(String(selectedSede).toLowerCase().trim());
         const filteredCoords = isGlobal
           ? coords

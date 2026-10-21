@@ -1,3 +1,4 @@
+import { runCausaNodusCRMSync } from './CausaNodusCRMSyncAgent.mjs';
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import 'dotenv/config';
@@ -14,11 +15,18 @@ import { NodusHrSentinelAgent } from './nodusHrSentinelAgent.mjs';
 import { NodusFIAgent } from './nodusFIAgent.mjs';
 import { NodusGenealogyAgent } from './nodusGenealogyAgent.mjs';
 import { NodusIdentityAgent } from './nodusIdentityAgent.mjs';
-import { resolveUniqueNameMatch } from '../shared/rrhhSentinelRules.mjs';
 import {
-  buildPendingEnrolleeRecords,
-  hasCompleteNodusTeamExtraction
-} from '../shared/nodusPendingEnrollees.mjs';
+  assessFiCompleteness,
+  buildEquipoSedeIndex,
+  canonicalSede,
+  mergeParticipants,
+  parseDataTablesInfo,
+  rowsToFiParticipants,
+  summarizeSedeEquipoDiscrepancies
+} from './nodusFuturosImposiblesParser.mjs';
+import { resolveUniqueNameMatch } from '../shared/rrhhSentinelRules.mjs';
+import { publishNodusReportSources } from './publishNodusReportSources.mjs';
+import { extractNodusC1Report } from './nodusC1Report.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -134,14 +142,6 @@ class NodusExtractorAgent {
     await this.page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36');
     await this.page.setExtraHTTPHeaders({
       'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8',
-      'Sec-Ch-Ua': '"Chromium";v="130", "Google Chrome";v="130", "Not?A_Brand";v="99"',
-      'Sec-Ch-Ua-Mobile': '?0',
-      'Sec-Ch-Ua-Platform': '"Windows"',
-      'Sec-Fetch-Dest': 'document',
-      'Sec-Fetch-Mode': 'navigate',
-      'Sec-Fetch-Site': 'none',
-      'Sec-Fetch-User': '?1',
-      'Upgrade-Insecure-Requests': '1'
     });
     await this.page.setViewport({ width: 1920, height: 1080 });
   }
@@ -151,15 +151,14 @@ class NodusExtractorAgent {
     while (attempts < 3) {
       try {
         attempts++;
-        await this.page.goto(url, { waitUntil: 'domcontentloaded', timeout });
+        const response = await this.page.goto(url, { waitUntil: 'domcontentloaded', timeout });
         await new Promise(r => setTimeout(r, 2000));
-        return;
+        return response;
       } catch (e) {
         console.warn(`[SafeGoto] Intento ${attempts} para ${url} falló (${e.message}). Reintentando...`);
         if (attempts >= 3) {
           try {
-            await this.page.goto(url, { waitUntil: 'load', timeout });
-            return;
+            return await this.page.goto(url, { waitUntil: 'load', timeout });
           } catch (e2) {
             throw e2;
           }
@@ -247,6 +246,14 @@ class NodusExtractorAgent {
           console.log(`✅ [Agente 1 - Extractor] Sesión iniciada con éxito. URL: ${postLoginUrl}`);
           return true;
         }
+
+        // Sigue en /auth/login: registrar el aviso visible de NODUS (sin credenciales)
+        // para distinguir credenciales rechazadas, cuenta bloqueada o límite de intentos.
+        const loginNotice = await this.page.evaluate(() => {
+          const nodes = document.querySelectorAll('.alert, .invalid-feedback, .text-danger, .error, [role="alert"]');
+          return Array.from(nodes).map(n => (n.textContent || '').replace(/\s+/g, ' ').trim()).filter(Boolean).join(' | ').slice(0, 300);
+        }).catch(() => '');
+        throw new Error(`[LOGIN_REJECTED] NODUS mantuvo /auth/login tras enviar el formulario. Aviso: ${loginNotice || '(sin mensaje visible)'}`);
       } catch (err) {
         console.warn(`⚠️ [Agente 1 - Extractor] Intento ${attempts} de inicio de sesión falló: ${err.message}`);
         await new Promise(r => setTimeout(r, 3000));
@@ -375,66 +382,23 @@ class NodusExtractorAgent {
     console.log("👥 [Agente 1 - Extractor] Extrayendo lista de equipos de la sección /reporte...");
     await this.safeGoto('https://imo.crearpslglobal.com/reporte', 35000);
 
-    const teamList = await this.page.evaluate(() => {
+    const activeEquipos = await this.page.evaluate(() => {
       const select = document.querySelector('select[name="id_equipo"]');
-      if (!select) return { available: false, equipos: [] };
-      return {
-        available: true,
-        equipos: Array.from(select.options)
-          .filter(o => o.value && o.text.includes('✓'))
-          .map(o => ({ id: o.value, nombre: o.text.trim() }))
-      };
+      if (!select) throw new Error('Report team selector unavailable');
+      return Array.from(select.options)
+        .filter(o => o.value && o.text.includes('✓'))
+        .map(o => ({ id: o.value, nombre: o.text.trim() }));
     });
-    const activeEquipos = teamList.equipos;
 
     console.log(`🔍 [Agente 1 - Extractor] Encontrados ${activeEquipos.length} equipos activos para C1 y C2.`);
-    let failedTeamCount = 0;
+    if (!activeEquipos.length) throw new Error('Active report teams unavailable');
 
     const equiposData = [];
     // Extraemos de los equipos activos de forma segura
     for (const eq of activeEquipos) {
       try {
-        await this.safeGoto(`https://imo.crearpslglobal.com/reporte?id_equipo=${eq.id}`, 25000);
-        const report = await this.page.evaluate(() => {
-          const normalizeHeader = value => String(value || '').normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
-          const headers = Array.from(document.querySelectorAll('table thead th'))
-            .map(th => th.innerText.trim());
-          const enrollmentDateIndex = headers.findIndex(header =>
-            /fecha.*(enrol|inscrip|registro|alta)/i.test(normalizeHeader(header))
-          );
-          const siteIndex = headers.findIndex(header => /^(sede|ciudad)$/i.test(normalizeHeader(header)));
-          const weekendDateIndex = headers.findIndex(header =>
-            /(fin de semana|fecha fds|fds fecha)/i.test(normalizeHeader(header))
-          );
-          const trs = Array.from(document.querySelectorAll('table tbody tr'));
-          const participantes = trs.map(tr => {
-            const tds = Array.from(tr.querySelectorAll('td')).map(td => td.innerText.trim());
-            const item = {};
-            if (tds[1]) item.apellidos = tds[1];
-            if (tds[2]) item.nombres = tds[2];
-            if (tds[3]) item.nombrePreferido = tds[3];
-            if (tds[4]) item.telefono = tds[4];
-            if (tds[5]) item.coordinador = tds[5];
-            if (tds[6]) item.imo = tds[6];
-            if (tds[7]) item.telefonoImo = tds[7];
-            if (tds[8]) item.llamada1 = tds[8];
-            if (tds[9]) item.llamada2 = tds[9];
-            if (tds[10]) item.finDeSemana = tds[10];
-            if (tds[11]) item.asistencia = tds[11];
-            if (tds[12]) item.desertor = tds[12];
-            if (tds[13]) item.pago = tds[13];
-            if (enrollmentDateIndex >= 0 && tds[enrollmentDateIndex]) {
-              item[headers[enrollmentDateIndex]] = tds[enrollmentDateIndex];
-            }
-            if (siteIndex >= 0 && tds[siteIndex]) item[headers[siteIndex]] = tds[siteIndex];
-            if (weekendDateIndex >= 0 && tds[weekendDateIndex]) item[headers[weekendDateIndex]] = tds[weekendDateIndex];
-            return item;
-          }).filter(p => p.nombres || p.apellidos || p.telefono || p.imo);
-          return { hasHeaders: headers.length > 0, participantes };
-        });
-        if (!report.hasHeaders) throw new Error('NODUS no presentó encabezados de reporte');
-        const participantes = report.participantes;
+        const participantes = await extractNodusC1Report(this.page, eq.id, () =>
+          this.safeGoto(`https://imo.crearpslglobal.com/reporte?id_equipo=${eq.id}`, 25000));
 
         equiposData.push({
           equipoId: eq.id,
@@ -443,212 +407,133 @@ class NodusExtractorAgent {
           participantes: participantes
         });
       } catch (err) {
-        console.warn(`Aviso al extraer equipo ${eq.nombre}: ${err.message}`);
-        failedTeamCount += 1;
+        throw new Error(`C1 source extraction failed for team ${eq.id}; publication stopped`, { cause: err });
       }
     }
     console.log(`✅ [Agente 1 - Extractor] Datos de ${equiposData.length} equipos extraídos con éxito.`);
-    let reason = '';
-    if (!teamList.available) reason = 'NODUS no mostró la lista de equipos activos.';
-    else if (activeEquipos.length === 0) reason = 'NODUS no mostró equipos activos.';
-    else if (failedTeamCount > 0) reason = 'No se pudo extraer el detalle de todos los equipos activos.';
-
-    return {
-      equipos: equiposData,
-      teamListAvailable: teamList.available,
-      expectedTeamCount: activeEquipos.length,
-      extractedTeamCount: equiposData.length,
-      failedTeamCount,
-      complete: teamList.available && hasCompleteNodusTeamExtraction({
-        expectedTeamCount: activeEquipos.length,
-        extractedTeamCount: equiposData.length
-      }),
-      reason
-    };
+    return equiposData;
   }
 
   async extractFuturosImposibles(coordinadores = null) {
     console.log("🎯 [Agente 1 - Extractor] Extrayendo Futuros Imposibles multi-sede desde NODUS...");
+    const FI_URL = 'https://imo.crearpslglobal.com/futurosimposibles';
+    const equipoSedeIndex = buildEquipoSedeIndex(coordinadores);
+    const expectedSedes = [...new Set((coordinadores || []).map((c) => c?.sede).filter((s) => s && canonicalSede(s) !== 'Sin sede'))];
+    const acumulador = new Map();
+    const blocked = [];
+    const pasadas = [];
+    let expectedTotal = null;
 
-    const SEDES_CONOCIDAS = ['Lima', 'Quito', 'Cuenca', 'Guayaquil', 'Medellín', 'México', 'Bogotá'];
+    const isBlocked = () => /sgcaptcha/.test(this.page.url());
+    const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
-    // Mapear equipos a sedes basado en RRHH para inferir sede real de los FIs
-    const equipoSedeMap = new Map();
-    if (coordinadores && Array.isArray(coordinadores)) {
-      coordinadores.forEach(c => {
-        if (c.sede && Array.isArray(c.equipos)) {
-          c.equipos.forEach(eq => equipoSedeMap.set(eq.trim().toLowerCase(), c.sede));
-        }
+    // Lee la página actual de DataTables (cabeceras, filas, info y estado de paginación).
+    const leerPagina = () => this.page.evaluate(() => {
+      const key = (v = '') => v.toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+      const table = Array.from(document.querySelectorAll('table')).find((t) => {
+        const h = key(t.querySelector('thead')?.innerText || '');
+        return h.includes('nombre') || h.includes('participante') || h.includes('asistente');
       });
-    }
+      if (!table) return { found: false, rows: [], info: '', hasNext: false };
+      const headers = Array.from(table.querySelectorAll('thead th')).map((h, i) => key(h.innerText || `col_${i}`));
+      const rows = Array.from(table.querySelectorAll('tbody tr')).map((tr) => {
+        const cells = Array.from(tr.querySelectorAll('td')).map((c) => c.innerText.trim());
+        return headers.reduce((rec, h, i) => ({ ...rec, [h]: cells[i] || '' }), {});
+      }).filter((r) => Object.values(r).some(Boolean) && !/ningun dato|no hay datos|no data/.test(key(Object.values(r)[0])));
+      const info = document.querySelector('.dataTables_info')?.innerText || '';
+      const next = document.querySelector('.paginate_button.next, #DataTables_Table_0_next');
+      return { found: true, rows, info, hasNext: !!next && !/disabled/.test(next.className || '') };
+    });
 
-    const first = (row, candidates) => {
-      const found = Object.entries(row).find(([key]) => candidates.some((candidate) => key.includes(candidate)));
-      return found?.[1] || '';
-    };
-    const yes = (value) => /^(si|s[ií]|true|1|asistio|asistió|confirmad[oa])$/i.test(String(value).trim());
-    const number = (value) => Number.parseInt(String(value).replace(/[^0-9-]/g, ''), 10) || 0;
-
-    // Infiere sede desde la columna o, si vacía, desde el nombre del equipo
-    const inferirSede = (equipo, sedeColumna) => {
-      if (sedeColumna && sedeColumna.trim()) return sedeColumna.trim();
-      const eqStr = (equipo || '').trim();
-      const eqLower = eqStr.toLowerCase();
-      if (equipoSedeMap.has(eqLower)) return equipoSedeMap.get(eqLower);
-
-      const eq = eqStr.toUpperCase();
-      if (eq.includes('CUENCA')) return 'Cuenca';
-      if (eq.includes('QUITO')) return 'Quito';
-      if (eq.includes('GUAYAQUIL') || eq.includes('GYE')) return 'Guayaquil';
-      if (eq.includes('BOGOTA') || eq.includes('BOGOTÁ')) return 'Bogotá';
-      if (eq.includes('MEDELLIN') || eq.includes('MEDELLÍN')) return 'Medellín';
-      if (eq.includes('MEXICO') || eq.includes('MÉXICO') || eq.includes('CDMX')) return 'México';
-      return 'Lima';
-    };
-
-    // Extrae la tabla de la página actual y mapea a participantes
-    const extraerTablaActual = async (sedeForzada) => {
-      const rawRows = await this.page.evaluate(() => {
-        const key = (value = '') => value.toString().toLowerCase()
-          .normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
-        const table = Array.from(document.querySelectorAll('table')).find((candidate) => {
-          const heading = key(candidate.querySelector('thead')?.innerText || '');
-          return heading.includes('nombre') || heading.includes('participante') || heading.includes('asistente');
-        });
-        if (!table) return [];
-        const headers = Array.from(table.querySelectorAll('thead th')).map((header, index) => key(header.innerText || `col_${index}`));
-        return Array.from(table.querySelectorAll('tbody tr')).map((row) => {
-          const cells = Array.from(row.querySelectorAll('td')).map((cell) => cell.innerText.trim());
-          return headers.reduce((record, header, index) => ({ ...record, [header]: cells[index] || '' }), {});
-        }).filter((row) => Object.values(row).some(Boolean));
+    // Muestra el máximo de filas por página y recorre todas las páginas.
+    const leerTodasLasPaginas = async () => {
+      await this.page.evaluate(() => {
+        const sel = document.querySelector('select[name$="_length"]');
+        if (!sel) return;
+        const max = Array.from(sel.options).map((o) => ({ v: o.value, n: parseInt(o.value, 10) }))
+          .sort((a, b) => (b.n === -1 ? Infinity : b.n) - (a.n === -1 ? Infinity : a.n))[0];
+        if (max) { sel.value = max.v; sel.dispatchEvent(new Event('change', { bubbles: true })); }
       });
-      return rawRows.map((row, index) => {
-        const nombrePart = first(row, ['nombre', 'participante', 'asistente']);
-        const apellidoPart = first(row, ['apellido']);
-        const nombre = (apellidoPart && !nombrePart.toLowerCase().includes(apellidoPart.toLowerCase())) 
-          ? `${nombrePart} ${apellidoPart}`.trim() 
-          : nombrePart;
-        const asistencia = first(row, ['asistencia pfd', 'asistio pfd', 'asistencia', 'pfd']);
-        const sedeCol = first(row, ['sede', 'ciudad']);
-        const equipo = first(row, ['equipo', 'team']);
-        return {
-          id: first(row, ['id', 'dni', 'cedula']) || `nodus_fi_${index}`,
-          dni: first(row, ['dni', 'cedula', 'documento']),
-          nombre,
-          sede: sedeForzada || inferirSede(equipo, sedeCol),
-          equipo,
-          fechaPFD: first(row, ['fecha pfd', 'pfd fecha']),
-          asistioPFD: yes(asistencia),
-          totalFi: number(first(row, ['total fi', 'fis cargados', 'futuros cargados'])),
-          pendientes: number(first(row, ['pendiente'])),
-          devueltos: number(first(row, ['devuelto'])),
-          aprobados: number(first(row, ['aprobado'])),
-          fis: []
-        };
-      }).filter((p) => p.nombre && p.asistioPFD);
+      await wait(1500);
+      const rows = [];
+      let total = null;
+      for (let page = 0; page < 300; page++) {
+        const snap = await leerPagina();
+        if (!snap.found) break;
+        rows.push(...snap.rows);
+        total = parseDataTablesInfo(snap.info) ?? total;
+        if (!snap.hasNext) break;
+        await this.page.evaluate(() => document.querySelector('.paginate_button.next, #DataTables_Table_0_next')?.click());
+        await wait(700);
+      }
+      return { rows, total };
     };
 
-    // ── PASO 1: Navegar a la página de FIs ───────────────────────────────────
-    await this.safeGoto('https://imo.crearpslglobal.com/futurosimposibles', 45000);
-    if (this.page.url().includes('sgcaptcha') || this.page.url().includes('.well-known/sgcaptcha')) {
+    const registrarPasada = async (etiqueta) => {
+      if (isBlocked()) { blocked.push(etiqueta); return; }
+      const { rows, total } = await leerTodasLasPaginas();
+      const parsed = rowsToFiParticipants(rows, { equipoSedeIndex });
+      const nuevos = mergeParticipants(acumulador, parsed);
+      pasadas.push({ etiqueta, filasLeidas: rows.length, totalDeclarado: total, nuevos });
+      console.log(`📍 [Agente 6 - FI] ${etiqueta}: ${rows.length} filas (declaradas: ${total ?? 'n/d'}), ${nuevos} nuevos. Total: ${acumulador.size}`);
+      return total;
+    };
+
+    // Cambia un <select> de la página a la opción indicada y espera a que recargue.
+    const elegirOpcion = async (selectIndex, optionValue) => {
+      await this.page.evaluate((i, v) => {
+        const sel = document.querySelectorAll('select:not([name$="_length"])')[i];
+        if (!sel) return;
+        sel.value = v; sel.dispatchEvent(new Event('change', { bubbles: true }));
+      }, selectIndex, optionValue);
+      await wait(2000);
+    };
+
+    await this.safeGoto(FI_URL, 45000);
+    if (isBlocked()) {
       throw new Error('El WAF de NODUS/SiteGround bloqueó la lectura de Futuros Imposibles; no se interpretó como universo vacío.');
     }
 
-    // ── PASO 2: Intentar seleccionar "Todas las sedes" en el filtro de NODUS ─
-    try {
-      const filterActivated = await this.page.evaluate(() => {
-        const selects = Array.from(document.querySelectorAll('select'));
-        for (const sel of selects) {
-          const allOpt = Array.from(sel.options).find(o => /todas|all|global|sin filtro|todos/i.test(o.text));
-          if (allOpt) {
-            sel.value = allOpt.value;
-            sel.dispatchEvent(new Event('change', { bubbles: true }));
-            return true;
-          }
-        }
-        return false;
-      });
-      if (filterActivated) {
-        await new Promise(r => setTimeout(r, 2500));
-        const resultado = await extraerTablaActual(null);
-        const sedesFound = new Set(resultado.map(p => p.sede).filter(Boolean));
-        if (resultado.length > 0) {
-          console.log(`✅ [Agente 6 - FI] Filtro "Todas" activado. Sedes: ${[...sedesFound].join(', ')} (${resultado.length} participantes)`);
-          return resultado;
+    // Pasada base: vista por defecto (equipo "Todos"), todas las páginas. No
+    // se retorna aquí: es solo la primera de varias pasadas.
+    expectedTotal = await registrarPasada('Vista completa');
+
+    // Filtros de la página (sede y/o equipo): se recorre cada opción concreta
+    // para no depender de que "Todos" entregue el universo completo.
+    const filtros = await this.page.evaluate(() => Array.from(document.querySelectorAll('select:not([name$="_length"])')).map((sel, index) => ({
+      index,
+      options: Array.from(sel.options).map((o) => ({ value: o.value, text: o.text.trim() }))
+        .filter((o) => o.value !== '' && !/^(todas?|todos|all|global|sin filtro|seleccione.*)$/i.test(o.text))
+    })));
+    for (const filtro of filtros) {
+      for (const opt of filtro.options) {
+        try {
+          await this.safeGoto(FI_URL, 35000);
+          if (isBlocked()) { blocked.push(`filtro ${opt.text}`); continue; }
+          await elegirOpcion(filtro.index, opt.value);
+          await registrarPasada(`Filtro ${opt.text}`);
+        } catch (err) {
+          blocked.push(`filtro ${opt.text}: ${err.message}`);
         }
       }
-    } catch (filterErr) {
-      console.warn(`⚠️ [Agente 6 - FI] Filtro "Todas" no disponible: ${filterErr.message}`);
     }
 
-    // ── PASO 3: Leer tabla inicial (puede tener todas las sedes si NODUS es global) ─
-    const resultadoInicial = await extraerTablaActual(null);
-    const sedesIniciales = new Set(resultadoInicial.map(p => p.sede).filter(s => s && s !== ''));
-    console.log(`📋 [Agente 6 - FI] Extracción inicial: ${resultadoInicial.length} participantes. Sedes detectadas: ${[...sedesIniciales].join(', ') || 'ninguna'}`);
-
-    // Si ya tenemos 2+ sedes reales en columna sede, no necesitamos iterar
-    if ([...sedesIniciales].filter(s => s !== 'Lima').length >= 2) {
-      console.log(`✅ [Agente 6 - FI] Tabla multi-sede en carga directa. No se requiere iteración.`);
-      return resultadoInicial;
-    }
-
-    // ── PASO 4: Iteración por sede con parámetro URL o selector UI ───────────
-    console.log("🔄 [Agente 6 - FI] Extracción iterativa por sede...");
-    const acumulador = new Map();
-    const clavePart = (p) => {
-      const dni = (p.dni || '').replace(/\D/g, '');
-      const nombre = (p.nombre || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
-      return dni.length >= 6 ? `dni:${dni}` : `nombre:${nombre}`;
+    const participantes = Array.from(acumulador.values());
+    const evaluacion = assessFiCompleteness({ participantes, expectedTotal, blocked, expectedSedes });
+    const discrepancias = summarizeSedeEquipoDiscrepancies(participantes);
+    if (discrepancias.sinSede > 0) evaluacion.reasons.push(`${discrepancias.sinSede} registros sin sede resoluble.`);
+    const completeness = evaluacion.reasons.length ? 'partial' : 'complete';
+    console.log(`${completeness === 'complete' ? '✅' : '⚠️'} [Agente 6 - FI] ${participantes.length} participantes únicos; cobertura: ${evaluacion.coverage.map((c) => `${c.sede}=${c.participantes}`).join(', ')}; estado: ${completeness}. ${evaluacion.reasons.join(' ')}`);
+    return {
+      participantes,
+      completeness,
+      completenessReasons: evaluacion.reasons,
+      coverage: evaluacion.coverage,
+      expectedTotal,
+      passes: pasadas,
+      blocked,
+      sedeEquipoDiscrepancies: discrepancias
     };
-    for (const p of resultadoInicial) acumulador.set(clavePart(p), p);
-
-    for (const sede of SEDES_CONOCIDAS) {
-      try {
-        // Estrategia A: parámetro URL ?sede=
-        const urlSede = `https://imo.crearpslglobal.com/futurosimposibles?sede=${encodeURIComponent(sede)}`;
-        await this.safeGoto(urlSede, 40000);
-        if (this.page.url().includes('sgcaptcha')) {
-          console.warn(`⚠️ WAF bloqueó sede ${sede}, omitiendo.`);
-          continue;
-        }
-        await new Promise(r => setTimeout(r, 1500));
-
-        // Estrategia B: si NODUS ignoró el parámetro, buscar selector en UI
-        if (!this.page.url().includes('sede=') && !this.page.url().includes(encodeURIComponent(sede))) {
-          await this.safeGoto('https://imo.crearpslglobal.com/futurosimposibles', 35000);
-          const sedeSeleccionada = await this.page.evaluate((sedeName) => {
-            const selects = Array.from(document.querySelectorAll('select'));
-            for (const sel of selects) {
-              const opt = Array.from(sel.options).find(o => o.text.trim().toLowerCase() === sedeName.toLowerCase());
-              if (opt) { sel.value = opt.value; sel.dispatchEvent(new Event('change', { bubbles: true })); return true; }
-            }
-            const btn = Array.from(document.querySelectorAll('button, a, [role="tab"]'))
-              .find(b => b.textContent.trim().toLowerCase() === sedeName.toLowerCase());
-            if (btn) { btn.click(); return true; }
-            return false;
-          }, sede);
-          if (!sedeSeleccionada) {
-            console.warn(`⚠️ [Agente 6 - FI] Sin selector UI para "${sede}", omitiendo.`);
-            continue;
-          }
-          await new Promise(r => setTimeout(r, 2000));
-        }
-
-        const parts = await extraerTablaActual(sede);
-        let nuevos = 0;
-        for (const p of parts) {
-          if (!acumulador.has(clavePart(p))) { acumulador.set(clavePart(p), p); nuevos++; }
-        }
-        console.log(`📍 [Agente 6 - FI] ${sede}: ${parts.length} extraídos, ${nuevos} nuevos. Total: ${acumulador.size}`);
-      } catch (sedeErr) {
-        console.warn(`⚠️ [Agente 6 - FI] Error en sede "${sede}": ${sedeErr.message}`);
-      }
-    }
-
-    const resultado = Array.from(acumulador.values());
-    const sedesFinales = new Set(resultado.map(p => p.sede).filter(Boolean));
-    console.log(`✅ [Agente 6 - FI] ${resultado.length} participantes únicos. Sedes: ${[...sedesFinales].join(', ')}`);
-    return resultado;
   }
 
   async extractAvanzadosYContabilidad() {
@@ -755,14 +640,15 @@ class NodusNormalizerAgent {
             dominantSede = s;
           }
         }
+        // Cero inferencia de sede por rango numérico de equipo: solo se acepta sede explícita en el nombre
         if (!dominantSede) {
           const eqStr = (eq.equipoNombre || '').toUpperCase();
-          const matchNum = eqStr.match(/(\d+)/);
-          if (matchNum) {
-            const num = parseInt(matchNum[1], 10);
-            if (num >= 110 && num <= 140) dominantSede = 'Quito/Guayaquil';
-            else if (num >= 10 && num <= 50) dominantSede = 'Lima';
-          }
+          if (eqStr.includes('LIMA')) dominantSede = 'Lima';
+          else if (eqStr.includes('QUITO')) dominantSede = 'Quito';
+          else if (eqStr.includes('GUAYAQUIL') || eqStr.includes('GYE')) dominantSede = 'Guayaquil';
+          else if (eqStr.includes('CUENCA')) dominantSede = 'Cuenca';
+          else if (eqStr.includes('MEDELLIN') || eqStr.includes('MEDELLÍN')) dominantSede = 'Medellín';
+          else if (eqStr.includes('MEXICO') || eqStr.includes('MÉXICO')) dominantSede = 'México';
         }
         if (dominantSede) {
           equipoSedeMap[eq.equipoNombre.trim().toLowerCase()] = dominantSede;
@@ -1106,93 +992,6 @@ class NodusNormalizerAgent {
  * AGENTE 3: DESPACHADOR Y PERSISTENCIA ATÓMICA (NodusDispatcherAgent)
  * =========================================================================
  */
-async function deletePendingEnrolleeRun(adminDb, runId) {
-  if (!runId || runId === 'latest') return;
-  const runRef = adminDb.collection('nodus_pending_enrollee_reports').doc(runId);
-  const pages = await runRef.collection('pages').get();
-  for (let offset = 0; offset < pages.docs.length; offset += 450) {
-    const batch = adminDb.batch();
-    pages.docs.slice(offset, offset + 450).forEach(page => batch.delete(page.ref));
-    await batch.commit();
-  }
-  await runRef.delete();
-}
-
-async function publishPendingEnrolleeReport(adminDb, normalizedData, sourceTimestamp, generatedAt) {
-  const latestRef = adminDb.collection('nodus_pending_enrollee_reports').doc('latest');
-  const previousSnap = await latestRef.get();
-  const previous = previousSnap.exists ? previousSnap.data() : {};
-  const previousReadyRunId = previous.status === 'ready'
-    ? previous.runId
-    : previous.lastReadyRunId || null;
-  const previousReadyGeneratedAt = previous.status === 'ready'
-    ? previous.generatedAt
-    : previous.lastReadyGeneratedAt || null;
-  const teams = Array.isArray(normalizedData.equiposReporte) ? normalizedData.equiposReporte : [];
-  const extraction = normalizedData.pendingEnrolleeExtraction || {};
-  const reportId = `run_${Date.now()}`;
-
-  if (!extraction.complete || !teams.length) {
-    await latestRef.set({
-      schemaVersion: 1,
-      status: 'unavailable',
-      reason: 'La extracción NODUS no verificó todos los equipos activos; no se publica como reporte completo.',
-      runId: null,
-      extractionReason: extraction.reason || '',
-      teamListAvailable: extraction.teamListAvailable ?? false,
-      expectedTeamCount: extraction.expectedTeamCount ?? 0,
-      extractedTeamCount: extraction.extractedTeamCount ?? teams.length,
-      failedTeamCount: extraction.failedTeamCount ?? 0,
-      lastReadyRunId: previousReadyRunId,
-      lastReadyGeneratedAt: previousReadyGeneratedAt,
-      sourceTimestamp: sourceTimestamp || null,
-      generatedAt
-    });
-    return;
-  }
-
-  const coordinadores = Array.isArray(normalizedData.coordinadores) ? normalizedData.coordinadores : [];
-  const { records, withoutNameCount } = buildPendingEnrolleeRecords(teams, coordinadores);
-  const runRef = adminDb.collection('nodus_pending_enrollee_reports').doc(reportId);
-  const PAGE_SIZE = 60;
-  const pages = [];
-  for (let offset = 0; offset < records.length; offset += PAGE_SIZE) {
-    pages.push(records.slice(offset, offset + PAGE_SIZE));
-  }
-
-  await runRef.set({
-    schemaVersion: 1,
-    source: 'NODUS /reporte por equipo',
-    sourceTimestamp: sourceTimestamp || null,
-    generatedAt
-  });
-  for (let index = 0; index < pages.length; index += 1) {
-    await runRef.collection('pages').doc(`page_${String(index + 1).padStart(4, '0')}`).set({
-      pageIndex: index,
-      records: pages[index]
-    });
-  }
-
-  await latestRef.set({
-    schemaVersion: 1,
-    status: 'ready',
-    runId: reportId,
-    source: 'NODUS /reporte por equipo',
-    sourceTimestamp: sourceTimestamp || null,
-    generatedAt,
-    pendingCount: records.length,
-    verifiedTeamCount: teams.length,
-    unidentifiableCount: withoutNameCount,
-    chronologicalCount: records.filter(record => record.fechaEnrolamiento || record.fechaFds).length,
-    enrollmentDateCount: records.filter(record => record.fechaEnrolamiento).length,
-    pages: pages.length
-  });
-
-  if (previousReadyRunId && previousReadyRunId !== reportId) {
-    await deletePendingEnrolleeRun(adminDb, previousReadyRunId);
-  }
-}
-
 class NodusDispatcherAgent {
   async dispatch(normalizedData, rawData) {
     console.log("☁️ [Agente 3 - Despachador] Guardando datos en Firestore y respaldos locales...");
@@ -1201,12 +1000,6 @@ class NodusDispatcherAgent {
     // de servicio se limita al entorno de CI y nunca se expone al cliente.
     const adminDb = getAdminDbForNodusPublish();
     const timestamp = new Date().toISOString();
-    await publishPendingEnrolleeReport(
-      adminDb,
-      normalizedData,
-      rawData?.timestamp || timestamp,
-      timestamp
-    );
 
     const equiposSummary = (normalizedData.equiposReporte || []).map(eq => ({
       equipoId: eq.equipoId,
@@ -1264,6 +1057,7 @@ class NodusDispatcherAgent {
       equiposReporte: safeEquiposReporte
     });
     console.log("✅ [Agente 3 - Despachador] Guardado 'nodus_coordinadores_c1c2/latest'");
+    await publishNodusReportSources(adminDb, { ...normalizedData, timestamp });
 
     // 3. Guardar en historial horario: nodus_kpis_history / snapshot_<timestamp>
     const historyId = `snap_${new Date().getTime()}`;
@@ -1281,46 +1075,42 @@ class NodusDispatcherAgent {
       if (!eq.participantes) continue;
       for (const p of eq.participantes) {
         if (!p.imo) continue;
+        // Filas de estado de pago ("Pagado (S/. ...)", "Sin pago ...") no son personas.
+        if (/^(sin pago|pagado|pago)\b|S\/\.|\d/i.test(`${p.nombres || ''} ${p.apellidos || ''}`.trim())) continue;
+        if (/^sin (invitador|imo|enrolador)\b/i.test(String(p.imo).trim())) continue;
         const imoName = p.imo.trim();
         if (!imoName) continue;
 
-        // Normalizar nombre del equipo para evitar fragmentación (ej. EQUIPO 29 vs EQUIPO 29 - LIMA CICLO 1 V)
+        // Normalizar nombre del equipo sin inventar sede cuando Nodus no la declara explícitamente
         let normalizedEquipo = (eq.equipoNombre || '').trim().replace(/\s+/g, ' ');
-        if (/^EQUIPO\s+28(\b|\s|$)/i.test(normalizedEquipo) && !normalizedEquipo.toUpperCase().includes('QUITO')) {
-          normalizedEquipo = 'EQUIPO 28 - LIMA CICLO 1';
-        } else if (/^EQUIPO\s+29(\b|\s|$)/i.test(normalizedEquipo)) {
-          normalizedEquipo = 'EQUIPO 29 - LIMA CICLO 1';
-        } else if (/^EQUIPO\s+30(\b|\s|$)/i.test(normalizedEquipo)) {
-          normalizedEquipo = 'EQUIPO 30 - LIMA CICLO 1';
-        } else if (/^EQUIPO\s+31(\b|\s|$)/i.test(normalizedEquipo)) {
-          normalizedEquipo = 'EQUIPO 31 - LIMA CICLO 1';
-        } else {
-          normalizedEquipo = normalizedEquipo.replace(/\s+V$/i, '').replace(/[✓✔]/g, '').trim();
-        }
+        normalizedEquipo = normalizedEquipo.replace(/\s+V$/i, '').replace(/[✓✔]/g, '').trim();
 
-        // Inferir sede del nombre del equipo si es posible
-        let sedeDetectada = "Lima";
+        // Extraer sede únicamente cuando consta explícitamente en el nombre del equipo de Nodus
+        let sedeDetectada = "SIN_SEDE_EXPLICITA";
         const eqUpper = (eq.equipoNombre || '').toUpperCase();
-        if (eqUpper.includes("CUENCA")) sedeDetectada = "Cuenca";
+        if (eqUpper.includes("LIMA")) sedeDetectada = "Lima";
+        else if (eqUpper.includes("CUENCA")) sedeDetectada = "Cuenca";
         else if (eqUpper.includes("QUITO")) sedeDetectada = "Quito";
         else if (eqUpper.includes("GUAYAQUIL") || eqUpper.includes("GYE")) sedeDetectada = "Guayaquil";
         else if (eqUpper.includes("BOGOTA") || eqUpper.includes("BOGOTÁ")) sedeDetectada = "Bogotá";
         else if (eqUpper.includes("MEDELLIN") || eqUpper.includes("MEDELLÍN")) sedeDetectada = "Medellín";
         else if (eqUpper.includes("MEXICO") || eqUpper.includes("MÉXICO")) sedeDetectada = "México";
 
-        if (!imoMissionsMap[imoName]) {
-          imoMissionsMap[imoName] = {
+        // Un registro por IMO y equipo de ingreso: el reporte de Nodus lista a los
+        // participantes del equipo que entra a C1, no el equipo propio del IMO.
+        const missionKey = `${imoName}__${eq.equipoId}`;
+        const targetTeamMatch = String(eq.equipoNombre || '').match(/EQUIPO\s+(\d+)/i);
+        if (!imoMissionsMap[missionKey]) {
+          imoMissionsMap[missionKey] = {
             id: `imo_${imoName.toLowerCase().replace(/[^a-z0-9]/g, '_')}_${eq.equipoId}`,
             imoNombre: imoName,
             equipo: normalizedEquipo,
+            ...(targetTeamMatch ? { targetTeam: Number(targetTeamMatch[1]) } : {}),
             sede: sedeDetectada,
             enrolados: [],
             checks: {},
             lastUpdated: timestamp,
           };
-        } else if (imoMissionsMap[imoName].sede === "No especificada" || imoMissionsMap[imoName].sede === "Lima") {
-          imoMissionsMap[imoName].sede = sedeDetectada;
-          imoMissionsMap[imoName].equipo = normalizedEquipo;
         }
 
         const cleanPhone = (p.telefono || '').replace(/\D/g, '');
@@ -1330,7 +1120,7 @@ class NodusDispatcherAgent {
         const hasContacto = (p.llamada1 && p.llamada1.trim() !== '') || (p.llamada2 && p.llamada2.trim() !== '');
 
         // Evitar duplicados dentro de la misión
-        const yaExiste = imoMissionsMap[imoName].enrolados.some(e => {
+        const yaExiste = imoMissionsMap[missionKey].enrolados.some(e => {
           const eCleanPhone = (e.telefono || '').replace(/\D/g, '');
           if (cleanPhone.length >= 7 && eCleanPhone.length >= 7 && (cleanPhone === eCleanPhone || cleanPhone.endsWith(eCleanPhone) || eCleanPhone.endsWith(cleanPhone))) {
             return true;
@@ -1343,7 +1133,7 @@ class NodusDispatcherAgent {
         });
 
         if (!yaExiste) {
-          imoMissionsMap[imoName].enrolados.push({
+          imoMissionsMap[missionKey].enrolados.push({
             id: enroladoId,
             nombre: `${p.nombres || ''} ${p.apellidos || ''}`.trim(),
             telefono: p.telefono || '',
@@ -1353,16 +1143,16 @@ class NodusDispatcherAgent {
         }
 
         // Registrar o actualizar checks
-        imoMissionsMap[imoName].checks[enroladoId] = {
-          contacto: !!hasContacto || (imoMissionsMap[imoName].checks[enroladoId]?.contacto || false),
-          asistencia: !!hasAsistencia || (imoMissionsMap[imoName].checks[enroladoId]?.asistencia || false)
+        imoMissionsMap[missionKey].checks[enroladoId] = {
+          contacto: !!hasContacto || (imoMissionsMap[missionKey].checks[enroladoId]?.contacto || false),
+          asistencia: !!hasAsistencia || (imoMissionsMap[missionKey].checks[enroladoId]?.asistencia || false)
         };
       }
     }
 
     let misionesGuardadas = 0;
-    for (const imoName in imoMissionsMap) {
-      const mission = imoMissionsMap[imoName];
+    for (const missionKey in imoMissionsMap) {
+      const mission = imoMissionsMap[missionKey];
       mission.totalEnrolados = mission.enrolados.length;
       
       // Contar completados solo entre los enrolados vigentes y únicos
@@ -1425,8 +1215,11 @@ export async function runMultiAgentSync() {
 
 
   try {
-    const user = process.env.NODUS_GLOBAL_USER || process.env.NODUS_USER || process.env.IMO_USER || 'CREARPSL';
-    const pwd = process.env.NODUS_GLOBAL_PASS || process.env.NODUS_PASSWORD || process.env.IMO_PASSWORD || 'CREARPSL26*';
+    const user = process.env.NODUS_GLOBAL_USER || process.env.NODUS_USER || process.env.IMO_USER;
+    const pwd = process.env.NODUS_GLOBAL_PASS || process.env.NODUS_PASSWORD || process.env.IMO_PASSWORD;
+    if (!user || !pwd) {
+      throw new Error('[MISSING_CREDENTIALS] Faltan los secrets NODUS_USER/NODUS_PASSWORD.');
+    }
 
     let authenticated = false;
     // 1. Intento inicial de conexión directa con navegador blindado
@@ -1493,20 +1286,12 @@ export async function runMultiAgentSync() {
       secciones: {
         actividadCoordinadores: { kpis: rawCoordinadores },
         dashboardPrincipal: rawDashboard,
-        reporteEquipos: rawEquiposReporte.equipos,
+        reporteEquipos: rawEquiposReporte,
         biDeepExtract: biDeepExtract
       }
     };
 
-    const normalized = normalizer.normalizeData(rawCoordinadores, rawDashboard, rawEquiposReporte.equipos);
-    normalized.pendingEnrolleeExtraction = {
-      complete: rawEquiposReporte.complete,
-      teamListAvailable: rawEquiposReporte.teamListAvailable,
-      expectedTeamCount: rawEquiposReporte.expectedTeamCount,
-      extractedTeamCount: rawEquiposReporte.extractedTeamCount,
-      failedTeamCount: rawEquiposReporte.failedTeamCount,
-      reason: rawEquiposReporte.reason
-    };
+    const normalized = normalizer.normalizeData(rawCoordinadores, rawDashboard, rawEquiposReporte);
 
       // [Agente 8 - Identidad] Validar que NO haya usuarios inventados, y purgar renuncias
       normalized.coordinadores = await identitySentinel.enforceIdentityTruth(normalized.coordinadores, 'C1_C2');
@@ -1554,7 +1339,8 @@ export async function runMultiAgentSync() {
     console.log("\n🎯 [Agente 6 - Futuros Imposibles] Activando auditoría de metas post-PFD...");
     try {
       const fiAgent = new NodusFIAgent();
-      const participantesFI = await extractor.extractFuturosImposibles(normalized.coordinadores);
+      const fiResult = await extractor.extractFuturosImposibles(normalized.coordinadores);
+      const participantesFI = fiResult.participantes;
       if (participantesFI.length === 0) {
         throw new Error('NODUS no devolvió asistentes PFD verificables; se conserva el último snapshot FI.');
       }
@@ -1562,13 +1348,25 @@ export async function runMultiAgentSync() {
       const fiDiag = await fiAgent.runAudit(participantesFI);
       const adminDb = getAdminDbForNodusPublish();
       const syncId = new Date().toISOString();
+      const snapshotMeta = {
+        completeness: fiResult.completeness,
+        completenessReasons: fiResult.completenessReasons,
+        coverage: fiResult.coverage,
+        expectedTotal: fiResult.expectedTotal ?? null,
+        passes: fiResult.passes,
+        blocked: fiResult.blocked,
+        sedeEquipoDiscrepancies: fiResult.sedeEquipoDiscrepancies
+      };
+      const snapshot = {
+        ...buildFiLatestSnapshot(participantesFI, fiDiag, syncId),
+        ...snapshotMeta
+      };
 
-      // Escritura atómica a través de Firebase Admin. El documento latest se
-      // toca únicamente después de completar extracción y validación; así una
-      // respuesta parcial, una pantalla de login o un bloqueo WAF no borran
-      // el universo ya publicado. Los participantes se particionan en chunks
-      // para no exceder el tamaño máximo de Firestore.
-      const latestRef = adminDb.collection('nodus_futuros_imposibles').doc('latest');
+      // Solo una lectura verificada como completa reemplaza `latest`. Una
+      // lectura parcial se guarda aparte (latest_partial) para diagnóstico y
+      // el último snapshot verificado sigue siendo el que consume Causa OS.
+      const publishedDoc = fiResult.completeness === 'complete' ? 'latest' : 'latest_partial';
+      const latestRef = adminDb.collection('nodus_futuros_imposibles').doc(publishedDoc);
       const chunkCollection = latestRef.collection('participantes');
       const chunks = buildFiSnapshotChunks(participantesFI);
       const previousChunks = await chunkCollection.get();
@@ -1589,16 +1387,18 @@ export async function runMultiAgentSync() {
         }, { merge: false });
       });
       await writeBatch.commit();
-      await latestRef.set(buildFiLatestSnapshot(participantesFI, fiDiag, syncId), { merge: false });
+      await latestRef.set(snapshot, { merge: false });
       await adminDb.collection('nodus_fi_sync_history').add({
-        status: 'published',
+        status: fiResult.completeness === 'complete' ? 'published' : 'partial_not_published',
         source: 'nodus_futuros_imposibles',
         extractedAt: syncId,
         universePfd: participantesFI.length,
         summary: fiDiag.resumen,
+        ...snapshotMeta,
+        sedeEquipoDiscrepancies: { total: fiResult.sedeEquipoDiscrepancies.total, sinSede: fiResult.sedeEquipoDiscrepancies.sinSede },
         createdAt: FieldValue.serverTimestamp()
       });
-      console.log(`✅ [Agente 6 - Futuros Imposibles] Snapshot publicado: ${participantesFI.length} asistentes PFD.`);
+      console.log(`✅ [Agente 6 - Futuros Imposibles] ${fiResult.completeness === 'complete' ? 'Snapshot completo publicado' : 'Lectura PARCIAL guardada en latest_partial (latest intacto)'}: ${participantesFI.length} participantes.`);
     } catch (fiErr) {
       console.error("⚠️ [Agente 6 - Futuros Imposibles] No se publicó ningún snapshot FI:", fiErr.message);
       // El registro de fallo es aislado del snapshot: permite diagnóstico sin
@@ -1631,6 +1431,15 @@ export async function runMultiAgentSync() {
       await genealogyAgent.publicarLinajeYCoherencia(linajeReport);
     } catch (genErr) {
       console.error("⚠️ [Agente 7 - Genealogista] Error no bloqueante al construir el linaje:", genErr.message);
+    }
+
+    // 8. AGENTE DE INTELIGENCIA DE DATOS Y DELTA SYNC CRM (CausaNodusCRMSyncAgent)
+    try {
+      console.log("🚀 [Agente 8 - CausaNodusCRMSyncAgent] Ejecutando sincronización delta CRM...");
+      await runCausaNodusCRMSync();
+      console.log("✅ [Agente 8 - CausaNodusCRMSyncAgent] Sincronización CRM y Árbol Genealógico exitosa.");
+    } catch (crmErr) {
+      console.error("⚠️ [Agente 8 - CausaNodusCRMSyncAgent] Error no bloqueante en CRM sync:", crmErr.message);
     }
 
     console.log("✨ PIPELINE MULTI-AGENTE COMPLETADO EXITOSAMENTE");

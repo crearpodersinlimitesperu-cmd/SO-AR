@@ -1,6 +1,15 @@
 name: IMO Firebase backend readiness (read only)
 on:
   workflow_dispatch:
+    inputs:
+      e32_readiness:
+        type: boolean
+        default: false
+        description: Read aggregate Lima E32 campaign readiness; never publish a campaign
+      nodus_reports:
+        type: boolean
+        default: false
+        description: Include aggregate read-only evidence for coordinator reports
 permissions:
   contents: read
 jobs:
@@ -17,3 +26,13 @@ jobs:
         env:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
         run: node scripts/auditImoFirebaseBackend.mjs
+      - name: Read Nodus report evidence without personal data
+        if: inputs.nodus_reports
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: node scripts/publishNodusReportSources.mjs
+      - name: Read Lima E32 campaign readiness without personal data
+        if: inputs.e32_readiness
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: node scripts/auditImoCampaignReadiness.mjs

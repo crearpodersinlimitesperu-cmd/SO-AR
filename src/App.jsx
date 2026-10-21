@@ -1,17 +1,18 @@
-import { startCausaNodusAgent, stopCausaNodusAgent } from "./services/CausaNodusAgent";
-
-import { lazy, Suspense, useState, useEffect } from 'react'
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import { Children, lazy, Suspense, useState, useEffect } from 'react'
+import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import { useUI } from './context/UIContext'
-import { PORTFOLIO_FI_REVIEW_EMAILS, isGlobalObserver } from './config/permissions'
+import { PORTFOLIO_FI_REVIEW_EMAILS, isElizabethEscobar } from './config/permissions'
 import './index.css'
 import PromptModal from './components/PromptModal'
 import BirthdayAlert from './components/BirthdayAlert'
 import ApdaycPaymentAlert from './components/ApdaycPaymentAlert'
 import HelpModal from './components/HelpModal'
 import ThemeToggle from './components/ThemeToggle'
-import { HelpCircle } from 'lucide-react'
+import MagicalLoadingScreen from './components/MagicalLoadingScreen'
+import { HelpCircle, RefreshCw } from 'lucide-react'
+import { ModuleUsageProvider, ModuleVisit } from './context/ModuleUsageContext'
+import { canEnterRoleRoute } from './utils/routeAccess'
 
 const CfoDashboard = lazy(() => import('./pages/CfoDashboard'));
 const AICopilot = lazy(() => import('./components/AICopilot'));
@@ -31,6 +32,7 @@ const OnboardingLegal = lazy(() => import('./pages/OnboardingLegal'));
 const Login = lazy(() => import('./pages/Login'));
 const OptOutPage = lazy(() => import('./pages/OptOutPage'));
 const Home = lazy(() => import('./pages/Home'));
+const ElizabethDashboard = lazy(() => import('./pages/ElizabethDashboard'));
 const CausaOSTask = lazy(() => import('./pages/CausaOSTask'));
 const RoleSelector = lazy(() => import('./pages/RoleSelector'));
 const ChecklistBoard = lazy(() => import('./pages/ChecklistBoard'));
@@ -66,11 +68,16 @@ const AsignadorEntrenadores = lazy(() => import('./pages/AsignadorEntrenadores')
 const ComunicadosOperativos = lazy(() => import('./pages/ComunicadosOperativos'));
 
 function RouteLoadingFallback() {
-  return (
-    <div style={{ minHeight: '50vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <p className="text-gold">Cargando módulo...</p>
-    </div>
-  );
+  return <MagicalLoadingScreen message="Abriendo el módulo…" />;
+}
+
+function HomeEntry() {
+  const { currentUser } = useAuth();
+  const location = useLocation();
+  if (isElizabethEscobar(currentUser) && !new URLSearchParams(location.search).has('taskId')) {
+    return <Navigate to="/elizabeth-dashboard" replace />;
+  }
+  return <Home />;
 }
 
 // Componente para proteger autenticación básica
@@ -78,13 +85,13 @@ function PrivateRoute({ children }) {
   const { currentUser, loading } = useAuth();
   
   if (loading) {
-    return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><p className="text-gold">Cargando...</p></div>;
+    return <MagicalLoadingScreen message="Preparando tu espacio de creación…" />;
   }
   
   if (currentUser?.isParticipantOnly) {
     return <Navigate to="/onboarding-legal" replace />;
   }
-  return currentUser ? children : <Navigate to={`/login?from=${window.location.pathname}`} replace />;
+  return currentUser ? <ModuleVisit>{children}</ModuleVisit> : <Navigate to={`/login?from=${encodeURIComponent(window.location.pathname + window.location.search)}`} replace />;
 }
 
 // Componente para proteger autorización por Roles (S3 / Audit Fix)
@@ -105,7 +112,7 @@ function RoleRoute({ children, allowedRoles = [], allowedEmails = [], requireSup
   const { showToast } = useUI();
 
   if (loading) {
-    return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><p className="text-gold">Verificando permisos...</p></div>;
+    return <MagicalLoadingScreen message="Verificando permisos…" />;
   }
 
   if (!currentUser) {
@@ -120,7 +127,7 @@ function RoleRoute({ children, allowedRoles = [], allowedEmails = [], requireSup
   // Salvo que esté simulando explícitamente a otro colaborador (currentUser.isSimulated),
   // el Super Administrador jamás es bloqueado ni redirigido de ninguna sección.
   if (currentUser.isSuperAdmin && !currentUser.isSimulated) {
-    return children;
+    return <ModuleVisit>{children}</ModuleVisit>;
   }
 
   // (15/09/2026) BUG CRITICO CORREGIDO: este bloque otorgaba "return children"
@@ -148,7 +155,7 @@ function RoleRoute({ children, allowedRoles = [], allowedEmails = [], requireSup
   // Verificación de Super Admin
   if (requireSuperAdmin) {
     if (currentUser.isSuperAdmin) {
-      return children;
+      return <ModuleVisit>{children}</ModuleVisit>;
     }
     showToast("ACCESO DENEGADO: Esta sección requiere privilegios de Super Administrador.", "error");
     return <Navigate to="/home" replace />;
@@ -156,27 +163,38 @@ function RoleRoute({ children, allowedRoles = [], allowedEmails = [], requireSup
 
   // Verificación de Roles permitidos
   if (allowedRoles.length > 0) {
-    const hasAllowedEmail = allowedEmails.includes((currentUser.email || '').trim().toLowerCase());
-    const isObserver = isGlobalObserver(currentUser);
-    const hasRole = (currentUser.appRole !== 'consolidado' && allowedRoles.includes(currentUser.appRole)) ||
-                    currentUser.isSuperAdmin ||
-                    isObserver ||
-                    (!excludeDireccionBypass && currentUser.isDireccion) ||
-                    (currentUser.roles || []).some(r => allowedRoles.includes(r)) || hasAllowedEmail;
+    const hasRole = canEnterRoleRoute(currentUser, { allowedRoles, allowedEmails, requireSuperAdmin, excludeDireccionBypass });
     if (!hasRole) {
       showToast(`ACCESO DENEGADO: Tu rol actual (${currentUser.appRole}) no tiene acceso a esta sección.`, "error");
       return <Navigate to="/home" replace />;
     }
   }
 
-  return children;
+  return <ModuleVisit>{children}</ModuleVisit>;
+}
+
+function PersonalizedRoutes({ children }) {
+  // Derive policy from the actual guarded routes, not a second role matrix.
+  const routePolicies = Children.toArray(children).flatMap(route => {
+    const element = route.props.element;
+    if (element?.type !== RoleRoute && element?.type !== PrivateRoute) return [];
+    return [{ path: route.props.path, access: element.type === RoleRoute ? element.props : {} }];
+  });
+  return (
+    <ModuleUsageProvider routePolicies={routePolicies}>
+      <Suspense fallback={<RouteLoadingFallback />}>
+        <Routes>{children}</Routes>
+      </Suspense>
+    </ModuleUsageProvider>
+  );
 }
 
 function App() {
   const { originalAdminUser, currentUser, stopSimulation } = useAuth();
+  const navigate = useNavigate();
+  // Libera la caché heredada del antiguo agente global (varios MB por navegador).
   useEffect(() => {
-    startCausaNodusAgent();
-    return () => stopCausaNodusAgent();
+    try { localStorage.removeItem('CAUSA_FAST_CACHE'); } catch { /* sin acceso a storage */ }
   }, []);
 
   const [showHelp, setShowHelp] = useState(false);
@@ -189,48 +207,70 @@ function App() {
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       {originalAdminUser && (
         <div style={{
-          background: 'var(--crear-gold)',
-          color: '#000',
-          padding: '0.8rem 2rem',
+          background: 'linear-gradient(90deg, #d97706, #f59e0b)',
+          color: '#000000',
+          padding: '0.65rem 1.8rem',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
           fontWeight: 'bold',
           zIndex: 9999,
-          boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+          boxShadow: '0 4px 14px rgba(0,0,0,0.4)',
           position: 'sticky',
           top: 0
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span>⚠️ MODO SIMULADOR ACTIVO:</span>
-            <span>Estás viendo la plataforma como <strong>{currentUser?.name}</strong></span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap', fontSize: '0.9rem' }}>
+            <span style={{ background: '#000', color: '#fbbf24', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              🎭 MODO SIMULADOR (CAJA NEGRA)
+            </span>
+            <span>
+              Viendo como: <strong>{currentUser?.name || currentUser?.displayName}</strong> ({currentUser?.email})
+            </span>
+            <span style={{ opacity: 0.85, fontSize: '0.82rem' }}>
+              · Rol: <strong>{currentUser?.appRole || currentUser?.role}</strong> · Sede: <strong>{currentUser?.sede}</strong>
+            </span>
+            <span style={{ opacity: 0.78, fontSize: '0.78rem' }}>
+              · Las preferencias viven en el navegador de cada usuario y no aplican al simular.
+            </span>
           </div>
-          <button 
-            onClick={stopSimulation}
-            style={{
-              background: '#000',
-              color: 'var(--crear-gold)',
-              border: 'none',
-              padding: '0.4rem 1rem',
-              borderRadius: '6px',
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              fontSize: '0.85rem'
-            }}
-          >
-            ❌ Terminar Simulación
-          </button>
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+            <button 
+              onClick={() => {
+                stopSimulation();
+                navigate('/home', { replace: true });
+              }}
+              style={{
+                background: '#000000',
+                color: '#f59e0b',
+                border: '1px solid rgba(245, 158, 11, 0.4)',
+                padding: '0.45rem 1.1rem',
+                borderRadius: '8px',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                fontSize: '0.85rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.3)'
+              }}
+            >
+              ❌ Terminar Simulación
+            </button>
+          </div>
         </div>
       )}
       <PromptModal />
       {currentUser && <BirthdayAlert />}
       {currentUser && <ApdaycPaymentAlert />}
       <main style={{ flex: 1 }}>
-        <Suspense fallback={<RouteLoadingFallback />}>
-        <Routes>
+        <PersonalizedRoutes>
           <Route path="/login" element={<Login />} />
           <Route path="/opt-out" element={<OptOutPage />} />
-          <Route path="/causa-os-task" element={<CausaOSTask />} />
+          <Route path="/causa-os-task" element={
+            <RoleRoute allowedRoles={['gerente', 'direccion', 'director_maestria', 'cfo', 'cco', 'ceo', 'socio', 'superadmin']}>
+              <CausaOSTask />
+            </RoleRoute>
+          } />
 
           
           <Route path="/" element={<Navigate to="/home" replace />} />
@@ -293,8 +333,18 @@ function App() {
           } />
           <Route path="/home" element={
             <PrivateRoute>
+              <HomeEntry />
+            </PrivateRoute>
+          } />
+          <Route path="/home-completo" element={
+            <PrivateRoute>
               <Home />
             </PrivateRoute>
+          } />
+          <Route path="/elizabeth-dashboard" element={
+            <RoleRoute allowedRoles={['cfo']} allowedEmails={['contabilidad.global@crearpsl.net']} requireSuperAdmin={false}>
+              <ElizabethDashboard />
+            </RoleRoute>
           } />
 
           <Route path="/manual" element={
@@ -573,8 +623,7 @@ function App() {
           <Route path="/coordinadores-nodus" element={<Navigate to="/auditoria-kpis" replace />} />
 
           <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-        </Suspense>
+        </PersonalizedRoutes>
       </main>
       
       {/* Botón flotante de ayuda */}
@@ -589,6 +638,32 @@ function App() {
               <ThemeToggle />
             </div>
           )}
+          <button
+            type="button"
+            className="no-print floating-refresh-btn"
+            onClick={() => window.location.reload()}
+            title="Actualizar Causa OS sin cerrar la sesión"
+            aria-label="Actualizar Causa OS; la sesión se conserva"
+            style={{
+              position: 'fixed',
+              top: '4.5rem',
+              right: '1.25rem',
+              width: '44px',
+              height: '44px',
+              borderRadius: '50%',
+              background: 'var(--bg-dark-alt)',
+              color: 'var(--text-main)',
+              border: '1px solid var(--border-strong)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: 'var(--card-shadow)',
+              cursor: 'pointer',
+              zIndex: 8500
+            }}
+          >
+            <RefreshCw size={19} />
+          </button>
           {/* Copiloto SO-AR: restringido a Gerentes y Directivos por decisión explícita (26/08/2026) */}
           {(currentUser.isSuperAdmin || currentUser.isGerente || currentUser.isDireccion) && (
             <div className="no-print">

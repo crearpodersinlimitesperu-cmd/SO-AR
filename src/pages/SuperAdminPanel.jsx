@@ -4,7 +4,7 @@ import { useChecklist } from '../context/ChecklistContext';
 import { useAuth } from '../context/AuthContext';
 import { useCycles } from '../context/CyclesContext';
 import { useUI } from '../context/UIContext';
-import { doc, setDoc, updateDoc, deleteDoc, collection, query, orderBy, limit, getDocs, onSnapshot } from 'firebase/firestore';
+import { doc, setDoc, updateDoc, deleteDoc, collection, query, orderBy, limit, getDocs, onSnapshot, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db, auth } from '../services/firebase';
 import { normalizeRole, normalizeSede, OPERATIONAL_SEDES } from '../data/usersData';
 import { canViewInactiveUsers, isElizabethEscobar } from '../config/permissions';
@@ -644,10 +644,10 @@ function AuditLogView() {
                     <td style={{ padding: '0.8rem' }}>
                       <strong>{log.sede || 'Global'}</strong>
                       <br />
-                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{log.location || 'Acceso Seguro'} ({log.ip || '127.0.0.1'})</span>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{log.location || 'No recopilada'} ({log.ip || 'No recopilada'})</span>
                     </td>
                     <td style={{ padding: '0.8rem', fontSize: '0.75rem', color: 'var(--text-muted)', maxWidth: '160px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={log.userAgent}>
-                      {log.userAgent || 'Web Browser'}
+                      {log.userAgent || 'No recopilado'}
                     </td>
                   </tr>
                 );
@@ -670,11 +670,15 @@ function AuditLogView() {
 function SuggestionsView() {
   const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
+  const [retry, setRetry] = useState(0);
   const [filterStatus, setFilterStatus] = useState('TODAS'); // 'TODAS' | 'Pendiente' | 'En Revisión' | 'Resuelto'
   const [selectedImg, setSelectedImg] = useState(null);
   const { showToast } = useUI();
 
   useEffect(() => {
+    setLoading(true);
+    setLoadError('');
     try {
       const q = query(collection(db, 'sugerencias_soporte'), orderBy('createdAt', 'desc'), limit(100));
       const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -683,17 +687,20 @@ function SuggestionsView() {
           ...doc.data()
         }));
         setSuggestions(list);
+        setLoadError('');
         setLoading(false);
       }, (err) => {
         console.error("Error escuchando sugerencias:", err);
+        setLoadError('No se pudo leer el feedback. No se puede afirmar que no existan pendientes.');
         setLoading(false);
       });
       return () => unsubscribe();
     } catch (e) {
       console.error(e);
+      setLoadError('No se pudo consultar el buzón de feedback.');
       setLoading(false);
     }
-  }, []);
+  }, [retry]);
 
   const handleUpdateStatus = async (id, newStatus) => {
     try {
@@ -743,6 +750,10 @@ function SuggestionsView() {
           <p style={{ color: 'var(--text-muted)', margin: '0.3rem 0 0 0', fontSize: '0.9rem' }}>
             Retroalimentación, ideas y reportes enviados por colaboradores desde el Centro de Ayuda Causa OS en tiempo real.
           </p>
+          <p className="text-muted">
+            Fuente: sugerencias_soporte · Hasta 100 envíos más recientes, no el historial completo.
+            Este buzón no incluye chats privados del copiloto. «Resuelto» es el estado declarado, no una certificación técnica.
+          </p>
         </div>
         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
           <select
@@ -765,7 +776,12 @@ function SuggestionsView() {
         </div>
       </div>
 
-      {loading ? (
+      {loadError ? (
+        <div role="alert">
+          <p>{loadError}</p>
+          <button type="button" onClick={() => setRetry(value => value + 1)}>Reintentar lectura</button>
+        </div>
+      ) : loading ? (
         <p style={{ color: 'var(--text-muted)' }}>Cargando sugerencias en tiempo real...</p>
       ) : filtered.length === 0 ? (
         <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>
@@ -1099,6 +1115,150 @@ function RoleView({ tasks, navigate, onSelectUser, onAssignTask, userConnections
           </div>
         );
       })}
+    </div>
+  );
+}
+
+// ============================================================================
+// DIAGNÓSTICOS — reportes automáticos (GitHub Actions) y reporte profundo
+// pegado manualmente desde el agente de Copilot. Solo Super Admin.
+// El contenido se muestra como texto plano (React lo escapa); nunca HTML.
+// ============================================================================
+const DIAGNOSTIC_WORKFLOW_URL = 'https://github.com/crearpodersinlimitesperu-cmd/SO-AR/actions/workflows/platform-audit.yml';
+const DEEP_REPORT_MAX_CHARS = 50000;
+const DEEP_REPORT_MIN_CHARS = 50;
+const DEEP_TITLE_MAX_CHARS = 150;
+
+function DiagnosticsView() {
+  const { currentUser } = useAuth();
+  const { showToast } = useUI();
+  const [reports, setReports] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [expandedId, setExpandedId] = useState(null);
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+  const [publishing, setPublishing] = useState(false);
+
+  useEffect(() => {
+    if (!currentUser?.isSuperAdmin) return undefined;
+    const q = query(collection(db, 'platform_diagnostic_reports'), orderBy('createdAt', 'desc'), limit(20));
+    return onSnapshot(q, (snap) => {
+      setReports(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      setError(null);
+      setLoading(false);
+    }, (e) => {
+      console.error('Diagnósticos:', e);
+      setError('No se pudieron cargar los reportes.');
+      setLoading(false);
+    });
+  }, [currentUser?.isSuperAdmin]);
+
+  if (!currentUser?.isSuperAdmin) return null;
+
+  const trimmedContent = content.trim();
+  const trimmedTitle = title.trim();
+  const canPublish = !publishing
+    && trimmedTitle.length > 0 && trimmedTitle.length <= DEEP_TITLE_MAX_CHARS
+    && trimmedContent.length >= DEEP_REPORT_MIN_CHARS && trimmedContent.length <= DEEP_REPORT_MAX_CHARS;
+
+  const handlePublish = async () => {
+    if (!canPublish) return;
+    setPublishing(true);
+    try {
+      await addDoc(collection(db, 'platform_diagnostic_reports'), {
+        source: 'copilot_deep',
+        title: trimmedTitle,
+        content: trimmedContent,
+        createdBy: (currentUser.email || '').toLowerCase(),
+        createdAt: serverTimestamp(),
+      });
+      setTitle('');
+      setContent('');
+      showToast('Reporte profundo publicado en Centro de Mando.', 'success');
+    } catch (e) {
+      console.error(e);
+      showToast('No se pudo publicar el reporte.', 'error');
+    } finally {
+      setPublishing(false);
+    }
+  };
+
+  const formatDate = (ts) => (ts?.toDate ? ts.toDate().toLocaleString() : '—');
+  const statusLabel = { ok: '🟢 OK', warn: '🟡 Revisar', error: '🔴 Atención', failed: '🔴 Falló' };
+  const box = { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '1rem', marginBottom: '1rem' };
+
+  return (
+    <div>
+      <div style={box}>
+        <h3 style={{ marginTop: 0 }}>Auditoría automática y verificable</h3>
+        <p className="text-muted text-sm">
+          Corre sola aproximadamente cada 5 horas en GitHub Actions y guarda aquí su reporte. Para lanzarla ahora,
+          abre el workflow y pulsa tú mismo <strong>Run workflow</strong>; este panel no la dispara por ti.
+        </p>
+        <a href={DIAGNOSTIC_WORKFLOW_URL} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--gold, #d4af37)' }}>
+          Abrir workflow en GitHub ↗
+        </a>
+      </div>
+
+      <div style={box}>
+        <h3 style={{ marginTop: 0 }}>Reportes recientes</h3>
+        {loading && <p className="text-muted text-sm">Cargando…</p>}
+        {error && <p style={{ color: '#f87171' }}>{error}</p>}
+        {!loading && !error && reports.length === 0 && <p className="text-muted text-sm">Aún no hay reportes.</p>}
+        {reports.map(r => (
+          <div key={r.id} style={{ borderTop: '1px solid rgba(255,255,255,0.08)', padding: '0.75rem 0' }}>
+            <button
+              onClick={() => setExpandedId(expandedId === r.id ? null : r.id)}
+              style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', textAlign: 'left', width: '100%', padding: 0 }}
+            >
+              <strong>{r.source === 'copilot_deep' ? '🧠 Copilot profundo' : '⚙️ Automático'}</strong>
+              {' · '}{formatDate(r.createdAt)}
+              {r.source === 'automatic' && ` · ${statusLabel[r.status] || r.status}`}
+              <div className="text-muted text-sm">{r.title || r.summary}</div>
+            </button>
+            {r.source === 'automatic' && (r.runUrl || r.commit) && (
+              <div className="text-muted text-sm">
+                {r.runUrl && /^https:\/\/github\.com\//.test(r.runUrl) && <a href={r.runUrl} target="_blank" rel="noopener noreferrer">Run ↗</a>}
+                {r.commit && <span> · commit {String(r.commit).slice(0, 7)}</span>}
+              </div>
+            )}
+            {r.source === 'copilot_deep' && r.createdBy && <div className="text-muted text-sm">Publicado por {r.createdBy}</div>}
+            {expandedId === r.id && (
+              <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', maxHeight: '480px', overflow: 'auto', fontSize: '0.8rem', marginTop: '0.5rem' }}>{r.content}</pre>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <div style={box}>
+        <h3 style={{ marginTop: 0 }}>Publicar reporte profundo de Copilot</h3>
+        <p className="text-muted text-sm">
+          Los agentes "Diagnóstico integral de Causa OS" y "CausaAuditorAgent" se ejecutan a demanda en Copilot y no publican por sí mismos.
+          Pega aquí el informe revisado; se guarda en el historial de Diagnósticos de Centro de Mando (Markdown como texto plano).
+          Retira datos personales y secretos antes de publicarlo. Los reportes publicados no se pueden editar ni borrar desde esta pantalla.
+        </p>
+        <input
+          value={title}
+          maxLength={DEEP_TITLE_MAX_CHARS}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Título (p. ej. Diagnóstico integral 07/10/2026)"
+          style={{ width: '100%', marginBottom: '0.5rem', padding: '0.5rem' }}
+        />
+        <textarea
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          rows={12}
+          placeholder="Pega el informe revisado de cualquiera de los agentes aquí…"
+          style={{ width: '100%', padding: '0.5rem', fontFamily: 'monospace' }}
+        />
+        <div className="text-muted text-sm" style={{ margin: '0.25rem 0 0.5rem' }}>
+          {trimmedContent.length.toLocaleString()} / {DEEP_REPORT_MAX_CHARS.toLocaleString()} caracteres (mínimo {DEEP_REPORT_MIN_CHARS})
+        </div>
+        <button className="btn btn-primary" disabled={!canPublish} onClick={handlePublish}>
+          {publishing ? 'Publicando…' : 'Publicar reporte'}
+        </button>
+      </div>
     </div>
   );
 }
@@ -1496,6 +1656,9 @@ export default function SuperAdminPanel() {
             {(currentUser?.isSuperAdmin || currentUser?.appRole === 'talento_humano' || (currentUser?.roles || []).includes('talento_humano')) && (
               <button style={tabStyle('auditoria')} onClick={() => setActiveView('auditoria')}>🛡️ Auditoría</button>
             )}
+            {currentUser?.isSuperAdmin && (
+              <button style={tabStyle('diagnosticos')} onClick={() => setActiveView('diagnosticos')}>🩺 Diagnósticos</button>
+            )}
             {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion') && (
               <button style={tabStyle('sugerencias')} onClick={() => setActiveView('sugerencias')}>💡 Buzón Sugerencias</button>
             )}
@@ -1535,6 +1698,9 @@ export default function SuperAdminPanel() {
           )}
           {activeView === 'auditoria' && (
             <AuditLogView />
+          )}
+          {activeView === 'diagnosticos' && currentUser?.isSuperAdmin && (
+            <DiagnosticsView />
           )}
           {activeView === 'sugerencias' && (
             <SuggestionsView />

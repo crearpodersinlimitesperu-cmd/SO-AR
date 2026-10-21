@@ -3,8 +3,8 @@ import fs from 'fs';
 
 const CREDENTIALS = {
   url: 'https://imo.crearpslglobal.com/',
-  user: 'CREARPSL',
-  pass: 'CREARPSL26*'
+  user: process.env.NODUS_USER,
+  pass: process.env.NODUS_PASSWORD
 };
 
 async function testLogin() {

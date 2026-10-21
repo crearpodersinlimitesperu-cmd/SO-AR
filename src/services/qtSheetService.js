@@ -284,7 +284,8 @@ export function mapRowsToQTMembers(rows) {
     // Validacion contra lista de bajas y renuncias confirmadas
     const isResigned = INACTIVE_QT_MEMBERS_OVERRIDE.includes(docNumero) ||
                        INACTIVE_QT_MEMBERS_OVERRIDE.includes(email.toLowerCase()) ||
-                       nombre.toLowerCase().includes('leyla kelly pasquel');
+                       nombre.toLowerCase().includes('leyla kelly pasquel') ||
+                       nombre.toLowerCase().includes('leyla pasquel');
 
     if (isResigned) {
       estado = 'INACTIVO - RENUNCIA';

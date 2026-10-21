@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { doc, getDoc, setDoc, runTransaction } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useAuth } from '../context/AuthContext';
+import { canEditSedeDatos } from '../utils/sedeDatosPermissions';
 import sedes from '../data/sedesInstitucionales.json';
 
 const fields = {razonSocial:'Razón social',identificacionFiscal:'Identificación fiscal (RUC, RFC o NIT)',direccionFiscal:'Dirección fiscal completa',correoContacto:'Correo institucional de contacto',telefonoContacto:'Teléfono de contacto con código de país'};
@@ -10,10 +11,10 @@ export default function DatosSedesCartas() {
   const { currentUser } = useAuth();
   const email=(currentUser?.email || '').toLowerCase();
   const admin=Boolean(currentUser?.isSuperAdmin);
-  const initial=Object.keys(sedes).find(id=>sedes[id].gerentes.some(g=>g.email===email)) || 'lima';
+  const initial=Object.keys(sedes).find(id=>sedes[id].gerentes.some(g=>g.email===email) || canEditSedeDatos(currentUser,sedes[id].sede)) || 'lima';
   const [id,setId]=useState(new URLSearchParams(location.search).get('sede') in sedes ? new URLSearchParams(location.search).get('sede') : initial);
   const [draft,setDraft]=useState({}); const [busy,setBusy]=useState(false); const [loading,setLoading]=useState(true); const [message,setMessage]=useState('');
-  const sede=sedes[id]; const editable=admin || sede.gerentes.some(g=>g.email===email);
+  const sede=sedes[id]; const editable=canEditSedeDatos(currentUser,sede.sede);
   useEffect(()=>{
     let active=true;setLoading(true);setMessage('');
     getDoc(doc(db,'sedes_institucionales',id)).then(snapshot=>{if(active){setDraft({...sede,...(snapshot.exists()?snapshot.data():{})});setLoading(false);}}).catch(()=>{if(active){setMessage('No se pudieron cargar los datos. Recarga antes de guardar.');setLoading(true);}});
@@ -37,7 +38,7 @@ export default function DatosSedesCartas() {
         entries.forEach(([key,data],index)=>{
           if(existing[index].exists())return;
           const title=`Completar datos institucionales para cartas — ${data.sede}`;
-          const notes=`Responsables: ${data.gerentes.map(g=>g.nombre).join(' y ')}. Completar razón social legal, identificación fiscal (RUC/RFC/NIT), dirección fiscal completa, correo institucional y teléfono con código de país. Confirmar nombres/cargos y autorización de los responsables; adjuntar respaldo y, si corresponde, firma autorizada en la evidencia de esta tarea. No adjuntar documentos personales de invitados. Formulario: https://centro-operativo-cpsl.web.app/datos-sedes-cartas?sede=${key} . Hasta completar los datos, la carta mostrará solo los nombres de gerencia. No se deben reutilizar los datos fiscales de otra sede.`;
+          const notes=`Responsables: ${[...new Set(data.gerentes.map(g=>g.nombre))].join(' y ')}. Completar razón social legal, identificación fiscal (RUC/RFC/NIT), dirección fiscal completa, correo institucional y teléfono con código de país. Confirmar nombres/cargos y autorización de los responsables; adjuntar respaldo y, si corresponde, firma autorizada en la evidencia de esta tarea. No adjuntar documentos personales de invitados. Formulario: https://centro-operativo-cpsl.web.app/datos-sedes-cartas?sede=${key} . Hasta completar los datos, la carta mostrará solo los nombres de gerencia. No se deben reutilizar los datos fiscales de otra sede.`;
           transaction.set(refs[index],{id:refs[index].id,task:title,title,notes,description:notes,role:'gerente',assignedRoles:['gerente'],assignedSede:data.sede,assignedToEmails:data.gerentes.map(g=>g.email),createdBy:email,assignedByEmail:email,assignedByName:currentUser.name||'José Sánchez',created_at:new Date().toISOString(),priority:'🟡 AMARILLO',isCritical:false,completed:false,status:'Pendiente',deadline:null,assigneeProgress:Object.fromEntries(data.gerentes.map(g=>[g.email,{name:g.nombre,role:'gerente',sede:data.sede,completed:false,completedAt:null,progress:0}]))});count++;
         });return count;
       });setMessage(`${created} tareas creadas. Las tareas existentes se conservaron sin duplicarlas.`);
@@ -48,7 +49,7 @@ export default function DatosSedesCartas() {
     <h1>Datos de las sedes para cartas</h1>
     <p>Los datos guardados se mostrarán en las cartas públicas de invitación. Incluye únicamente información institucional autorizada para ese fin.</p>
     <label>Sede <select value={id} onChange={e=>setId(e.target.value)} disabled={busy}>{Object.entries(sedes).map(([key,data])=><option key={key} value={key}>{data.sede}</option>)}</select></label>
-    <p><strong>Responsables:</strong> {sede.gerentes.map(g=>g.nombre).join(' y ')}</p>
+    <p><strong>Responsables:</strong> {[...new Set(sede.gerentes.map(g=>g.nombre))].join(' y ')}</p>
     <p>Si falta algún dato institucional, la carta conservará únicamente los nombres de los responsables. No se colocará una imagen de firma sin autorización.</p>
     <form onSubmit={save}>
       {Object.entries(fields).map(([key,label])=><label key={key} style={{display:'block',margin:'1rem 0'}}>{label}<input style={{display:'block',width:'100%',padding:10}} type={key==='correoContacto'?'email':'text'} maxLength={500} value={draft[key]||''} disabled={busy||loading||!editable} onChange={e=>setDraft({...draft,[key]:e.target.value})}/></label>)}

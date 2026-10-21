@@ -1,4 +1,4 @@
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from './firebase';
 
 // ============================================================================
@@ -38,24 +38,29 @@ export async function getManagersPipeline(sede) {
     return results;
   } catch (error) {
     console.error("Error al obtener pipeline real de managers:", error);
-    return [];
+    throw error;
   }
 }
 
 export async function getDualTasks(sede) {
+  if (!sede) return [];
+
   try {
-    const tasksSnap = await getDocs(collection(db, 'checklist_tasks'));
+    const tasksQuery = query(
+      collection(db, 'checklist_tasks'),
+      where('isDualTask', '==', true),
+      where('sede', 'in', [sede, 'Global', 'Sede Global'])
+    );
+    const tasksSnap = await getDocs(tasksQuery);
     const results = [];
     tasksSnap.forEach(docSnap => {
       const data = docSnap.data();
-      if (data.isDualTask && (!sede || sede === 'Global' || data.sede === sede)) {
-        results.push({ id: docSnap.id, ...data });
-      }
+      results.push({ id: docSnap.id, ...data });
     });
     return results;
   } catch (error) {
     console.error("Error al obtener dual tasks:", error);
-    return [];
+    throw error;
   }
 }
 

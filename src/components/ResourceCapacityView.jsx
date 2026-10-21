@@ -30,7 +30,7 @@ export default function ResourceCapacityView({ selectedSede = 'GLOBAL', hrSentin
     async function loadFlights() {
       try {
         setLoadingFlights(true);
-        const res = await fetch('/vuelos_tracker.json?t=' + Date.now());
+        const res = await fetch('/vuelos_tracker.json?t=' + Date.now(), { cache: 'no-store' });
         if (res.ok) {
           const json = await res.json();
           if (json.flights && isMounted) {

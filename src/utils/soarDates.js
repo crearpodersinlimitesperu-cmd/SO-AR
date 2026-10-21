@@ -62,8 +62,9 @@ const TASK_DEADLINE_RULES = {
 export const calculateAutomaticDeadline = (task, cycle = null) => {
   if (!task) return '';
   
-  // Si la tarea ya tiene una fecha manual personalizada asignada por el Gerente, respetarla
-  if (task.deadline && task.deadline.includes('-') && task.deadline.includes(':')) {
+  // Si la tarea ya tiene una fecha manual personalizada asignada explícitamente por el usuario/gerente, respetarla
+  const isManual = Boolean(task.hasManualDeadline || task.isManualDeadline || task.manualDeadline);
+  if (isManual && task.deadline && task.deadline.includes('-') && task.deadline.includes(':')) {
     return task.deadline;
   }
 

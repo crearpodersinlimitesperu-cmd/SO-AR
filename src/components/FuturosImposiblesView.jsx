@@ -8,6 +8,7 @@ import {
 import { addDoc, collection, doc, getDocFromServer, getDocsFromServer, onSnapshot, serverTimestamp, setDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useAuth } from '../context/AuthContext';
+import { opcionesEquipo, resolveFISource } from '../services/nodusFISnapshot';
 const EQUIPOS_FUTUROS_IMPOSIBLES = ['EQUIPO 27', 'EQUIPO 28', 'EQUIPO 29', 'EQUIPO 30', 'EQUIPO 31'];
 const ESTADOS_FI = [
   { id: 'TODOS', label: 'Todos los estados' },
@@ -40,7 +41,7 @@ export default function FuturosImposiblesView({
         .sort((a, b) => Number(a.index) - Number(b.index))
         .flatMap((chunk) => Array.isArray(chunk.participantes) ? chunk.participantes : []);
     }
-    return { payload, participantes };
+    return payload ? { ...payload, participantes } : null;
   };
 
   const { currentUser } = useAuth();
@@ -75,18 +76,17 @@ export default function FuturosImposiblesView({
     let isMounted = true;
     async function fetchNodusFIData() {
       try {
-        const { payload, participantes } = await readLiveFISnapshot();
-        const universoPfd = participantes.filter((p) => p?.asistioPFD === true);
+        const payload = await readLiveFISnapshot();
         if (!isMounted) return;
-        if (universoPfd.length > 0) {
-          setParticipantesRaw(participantes);
-          setSourceState({ status: 'live', label: 'NODUS CREAR · fuente en vivo', detail: `${universoPfd.length} participantes con PFD confirmado.`, syncedAt: payload?.syncedAt || payload?.timestamp || payload?.updatedAt || null });
-        } else {
-          setParticipantesRaw([]);
-          setSourceState({ status: 'snapshot', label: 'Respaldo verificado activo', detail: `Operando con el catálogo maestro verificado (${NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES.length} participantes PFD).`, syncedAt: payload?.syncedAt || payload?.timestamp || payload?.updatedAt || null });
-        }
+        const resolved = resolveFISource(payload, []);
+        setParticipantesRaw(resolved.participantes);
+        setSourceState(resolved.sourceState);
       } catch (err) {
-        if (isMounted) setSourceState({ status: 'unavailable', label: 'NODUS no disponible ahora', detail: 'No se pudo leer la publicación en vivo; se conserva el respaldo verificable.', syncedAt: null });
+        if (isMounted) {
+          const resolved = resolveFISource(null, []);
+          setParticipantesRaw(resolved.participantes);
+          setSourceState(resolved.sourceState);
+        }
       }
     }
     fetchNodusFIData();
@@ -147,29 +147,15 @@ export default function FuturosImposiblesView({
   };
 
   // Cálculo dinámico de equipos disponibles según la sede seleccionada
-  const equiposDeSede = useMemo(() => {
-    const esFiltroGlobal = !selectedSede || ['global', 'sede global', 'todas', 'todos', 'all'].includes((selectedSede || '').toLowerCase().trim());
-    const deSede = esFiltroGlobal
-      ? participantesConRevision
-      : participantesConRevision.filter(p => (p.sede || '').toLowerCase().includes(selectedSede.toLowerCase().trim()));
-
-    const eqSet = new Set();
-    deSede.forEach(p => {
-      if (p.equipo) eqSet.add(p.equipo.trim());
-    });
-
-    const sorted = Array.from(eqSet).sort((a, b) => {
-      const numA = parseInt(a.replace(/\D/g, ''), 10) || 0;
-      const numB = parseInt(b.replace(/\D/g, ''), 10) || 0;
-      return numA - numB || a.localeCompare(b);
-    });
-
-    return ['Todos', ...sorted];
-  }, [participantesConRevision, selectedSede]);
+  const esGlobalSede = ['', 'global', 'sede global', 'todas', 'todos', 'all'].includes((selectedSede || '').toLowerCase().trim());
+  const equiposDeSede = useMemo(
+    () => opcionesEquipo(participantesConRevision, selectedSede),
+    [participantesConRevision, selectedSede]
+  );
 
   // Si cambia la sede y el equipo seleccionado no pertenece a esa sede, resetear a 'Todos'
   useEffect(() => {
-    if (equipoFilter !== 'Todos' && !equiposDeSede.includes(equipoFilter)) {
+    if (equipoFilter !== 'Todos' && !equiposDeSede.some((o) => o.value === equipoFilter)) {
       setEquipoFilter('Todos');
     }
   }, [selectedSede, equiposDeSede, equipoFilter]);
@@ -188,20 +174,16 @@ export default function FuturosImposiblesView({
   const handleReevaluate = async () => {
     setIsEvaluating(true);
     try {
-      const { payload, participantes } = await readLiveFISnapshot();
-      const universoPfd = participantes.filter((p) => p?.asistioPFD === true);
-      if (universoPfd.length === 0) {
-        setParticipantesRaw([]);
-        setSourceState({ status: 'snapshot', label: 'Respaldo verificado activo', detail: `Operando con el catálogo maestro verificado (${NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES.length} participantes PFD).`, syncedAt: payload?.syncedAt || payload?.timestamp || null });
-        triggerToast('No hay universo PFD verificable en la última publicación de NODUS.', 'warning');
-        return;
-      }
-      setParticipantesRaw(participantes);
-      setSourceState({ status: 'live', label: 'NODUS CREAR · fuente en vivo', detail: `${universoPfd.length} participantes con PFD confirmado.`, syncedAt: payload?.syncedAt || payload?.timestamp || payload?.updatedAt || null });
-      triggerToast('Diagnóstico recalculado con la última publicación verificable de NODUS.');
+      const payload = await readLiveFISnapshot();
+      const resolved = resolveFISource(payload, []);
+      setParticipantesRaw(resolved.participantes);
+      setSourceState(resolved.sourceState);
+      triggerToast(resolved.sourceState.status === 'live' ? 'Diagnóstico recalculado con la última publicación verificable de NODUS.' : resolved.sourceState.label);
     } catch (error) {
-      setSourceState({ status: 'unavailable', label: 'NODUS no disponible ahora', detail: 'No se pudo releer la fuente en vivo. Se mantiene el último respaldo verificable.', syncedAt: null });
-      triggerToast('No se pudo consultar NODUS en este momento.', 'warning');
+      const resolved = resolveFISource(null, []);
+      setParticipantesRaw(resolved.participantes);
+      setSourceState(resolved.sourceState);
+      triggerToast('No se pudo leer NODUS en vivo. Universo bloqueado (cero datos inventados).');
     } finally {
       setIsEvaluating(false);
     }
@@ -318,14 +300,14 @@ export default function FuturosImposiblesView({
             }}>
               <Target size={14} /> AGENTE CENTINELA IA &bull; AUDITORÍA DE FUTUROS IMPOSIBLES
             </span>
-            <span style={{ fontSize: '0.85rem', color: sourceState.status === 'live' ? '#10b981' : sourceState.status === 'snapshot' ? '#38bdf8' : '#ef4444' }}>
+            <span style={{ fontSize: '0.85rem', color: sourceState.status === 'live' ? '#10b981' : '#f59e0b' }}>
               &bull; {sourceState.label}
             </span>
           </div>
           <p style={{ margin: 0, fontSize: '0.85rem', color: textMuted, maxWidth: '900px', lineHeight: 1.4 }}>
             <strong style={{ color: '#f59e0b' }}>Regla Operativa Nodus:</strong> <em>"Solo participantes que ya asistieron a su PFD (primer fin de semana) — ahí es cuando corresponde revisar sus Futuros Imposibles."</em>
           </p>
-          <p style={{ margin: '0.45rem 0 0', fontSize: '0.76rem', color: sourceState.status === 'live' ? '#6ee7b7' : sourceState.status === 'snapshot' ? '#7dd3fc' : '#fca5a5', maxWidth: '900px', lineHeight: 1.4 }}>
+          <p style={{ margin: '0.45rem 0 0', fontSize: '0.76rem', color: sourceState.status === 'live' ? '#6ee7b7' : '#fcd34d', maxWidth: '900px', lineHeight: 1.4 }}>
             {sourceState.detail} Última marca: {sourceDateLabel(sourceState.syncedAt)}.
           </p>
           {sourceCatalog && (
@@ -598,7 +580,7 @@ export default function FuturosImposiblesView({
             <Filter size={15} color="#38bdf8" /> SEMÁFORO DE CUMPLIMIENTO POR EQUIPO (Click para filtrar)
           </h4>
           <span style={{ fontSize: '0.75rem', color: textMuted }}>
-            Filtro actual: <strong style={{ color: '#38bdf8' }}>{equipoFilter}</strong>
+            Filtro actual: <strong style={{ color: '#38bdf8' }}>{equiposDeSede.find((o) => o.value === equipoFilter)?.label || equipoFilter}</strong>
           </span>
         </div>
 
@@ -627,12 +609,12 @@ export default function FuturosImposiblesView({
           </button>
 
           {metricas.equiposList.map((eq, idx) => {
-            const isSelected = equipoFilter === eq.equipo;
+            const isSelected = equipoFilter === eq.key;
             const badgeColor = eq.semaforo === 'VERDE' ? '#10b981' : eq.semaforo === 'AMARILLO' ? '#f59e0b' : '#ef4444';
             return (
               <button
                 key={idx}
-                onClick={() => setEquipoFilter(isSelected ? 'Todos' : eq.equipo)}
+                onClick={() => setEquipoFilter(isSelected ? 'Todos' : eq.key)}
                 style={{
                   padding: '0.4rem 0.8rem',
                   borderRadius: '20px',
@@ -655,7 +637,7 @@ export default function FuturosImposiblesView({
                   background: badgeColor,
                   display: 'inline-block' 
                 }} />
-                <span>{eq.equipo}</span>
+                <span>{esGlobalSede ? `${eq.sede} · ${eq.equipo}` : eq.equipo}</span>
                 <span style={{ color: textMuted, fontSize: '0.7rem' }}>
                   ({eq.pctEntrega}%)
                 </span>
@@ -739,8 +721,8 @@ export default function FuturosImposiblesView({
               }}
             >
               {equiposDeSede.map(eq => (
-                <option key={eq} value={eq} style={{ background: '#0f172a', color: '#f8fafc' }}>
-                  {eq}
+                <option key={eq.value} value={eq.value} style={{ background: '#0f172a', color: '#f8fafc' }}>
+                  {eq.label}
                 </option>
               ))}
             </select>
@@ -876,7 +858,7 @@ export default function FuturosImposiblesView({
                       <td style={{ padding: '0.85rem 1rem' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
                           <span style={{ fontSize: '0.78rem', fontWeight: 600, color: '#38bdf8' }}>{p.sede}</span>
-                          <span style={{ fontSize: '0.72rem', color: textMuted }}>{p.equipo}</span>
+                          <span style={{ fontSize: '0.78rem', fontWeight: 700, color: textDark }}>{p.equipo || 'Sin equipo'}</span>
                         </div>
                       </td>
 

@@ -1,15 +1,18 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { db, auth } from '../services/firebase';
-import { collection, onSnapshot, doc, updateDoc, setDoc, writeBatch, addDoc, query, where, orderBy, limit, getDocs, getDoc } from 'firebase/firestore';
+import { collection, onSnapshot, doc, updateDoc, setDoc, writeBatch, addDoc, query, where, orderBy, limit, getDocs, getDoc, runTransaction } from 'firebase/firestore';
 import { checklistData } from '../data/checklistData';
 import { usersData, normalizeRole } from '../data/usersData';
 import { isSuperAdminEmail, isGerenciaRole } from '../config/permissions';
 import { canSendOperationalCommunications } from '../config/permissions';
 import { calculateAutomaticDeadline } from '../utils/soarDates';
+import { filterTasksForUser, getChecklistRolesForUser, hasSimulatedTaskIdentityMismatch, getTaskReadIdentity, canCreateTaskAsUser } from '../utils/taskPrivacy';
 import { createGoogleTask } from '../services/googleSync';
 import { useUI } from './UIContext';
 import { useAuth } from './AuthContext';
 import { useCycles } from './CyclesContext';
+import { applyCycleCompletion, createCycleCompletion, getEffectiveCompletion, getNextCompletionState, isCompletionTransition, resolveTaskCycleScope } from '../utils/taskLifecycle';
+import { normalizeTaskLocation, taskLocationLabel, taskReminderMessage, taskUrl, escapeTaskHtml } from '../utils/taskLocation';
 
 const ChecklistContext = createContext();
 
@@ -31,6 +34,8 @@ const formatDeadlineEs = (iso) => {
 // con detalles completos de la tarea, botón de acceso directo e indicaciones
 // paso a paso de inicio de sesión en Causa OS (clave para colaboradores nuevos o sin conexión).
 const buildTaskEmailHtml = ({
+  taskId,
+  location,
   taskTitle,
   notes,
   deadline,
@@ -84,6 +89,10 @@ const buildTaskEmailHtml = ({
                 <td style="padding: 6px 0; color: #0f172a;">${assignedSede || 'Global'}</td>
               </tr>
               <tr>
+                <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Ubicación declarada:</td>
+                <td style="padding: 6px 0; color: #0f172a;">${escapeTaskHtml(taskLocationLabel({ location }))}</td>
+              </tr>
+              <tr>
                 <td style="padding: 6px 0; color: #64748b; font-weight: 600;">🚨 Prioridad:</td>
                 <td style="padding: 6px 0; color: #0f172a; font-weight: 600;">${priority || 'Normal'}</td>
               </tr>
@@ -100,7 +109,7 @@ const buildTaskEmailHtml = ({
 
         <!-- Botón de Acción Principal -->
         <div style="text-align: center; margin: 26px 0 28px 0;">
-          <a href="https://centro-operativo-cpsl.web.app" style="background-color: #2563eb; color: #ffffff; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 15px; display: inline-block; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.35);">
+          <a href="${escapeTaskHtml(taskUrl(taskId))}" style="background-color: #2563eb; color: #ffffff; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 15px; display: inline-block; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.35);">
             🚀 Ingresar a Causa OS
           </a>
         </div>
@@ -231,8 +240,12 @@ const buildTaskCompletedEmailHtml = ({
 export function ChecklistProvider({ children }) {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [taskLoadError, setTaskLoadError] = useState('');
+  const pendingTaskToggles = useRef(new Set());
   const { showToast, showPrompt } = useUI();
   const { currentUser, reauthenticateGoogle } = useAuth();
+  const taskReadIdentity = getTaskReadIdentity(currentUser);
+  const [loadedTaskIdentity, setLoadedTaskIdentity] = useState(null);
   // (28/08/2026, restaurado 29/08/2026) CORRECCIÓN: antes calculateAutomaticDeadline()
   // se llamaba SIN el ciclo activo real, así que siempre usaba el único ciclo de
   // ejemplo hardcodeado en src/data/cyclesData.js ("Equipo 30", fechas fijas) para
@@ -281,256 +294,176 @@ export function ChecklistProvider({ children }) {
   // usando currentCycle, igual que siempre.
   // Notifica al asignador/creador de la tarea por correo institucional y notificacion in-app
   // cuando un colaborador marca la tarea como COMPLETADA (pedido explicito de Jose).
-  const notifyTaskCompletedToAssigner = async (prevData, updates, taskId) => {
-    try {
-      const sanitizeEmail = (e) => (typeof e === 'string' ? e.trim().toLowerCase()
-        .replace('@crearpls.com', '@crearpsl.net')
-        .replace('@crearpsl.com', '@crearpsl.net')
-        .replace(/ketherine\.aguirre@/gi, 'katherine.aguirre@')
-        .replace(/coodinacion\.administrativa@/gi, 'coordinacion.administrativa@') : '');
+  const buildCompletionDelivery = (prevData, updates, taskId, completionId) => {
+    const sanitizeEmail = (email) => (typeof email === 'string' ? email.trim().toLowerCase()
+      .replace('@crearpls.com', '@crearpsl.net')
+      .replace('@crearpsl.com', '@crearpsl.net')
+      .replace(/ketherine\.aguirre@/gi, 'katherine.aguirre@')
+      .replace(/coodinacion\.administrativa@/gi, 'coordinacion.administrativa@') : '');
+    const assignerEmail = sanitizeEmail(prevData.assignedByEmail || '');
+    const completedByName = currentUser?.displayName || currentUser?.name || currentUser?.email || 'Un colaborador';
+    const completedByEmail = sanitizeEmail(currentUser?.email || '');
+    const taskTitle = updates.task || prevData.task || updates.title || prevData.title || 'Compromiso Operativo';
+    const assignedSede = updates.assignedSede || prevData.assignedSede || prevData.sede || currentUser?.sede || 'Global';
+    const nowIso = updates.completedAt || new Date().toISOString();
+    if (!assignerEmail.includes('@') || assignerEmail === completedByEmail) return null;
 
-      const assignerEmail = sanitizeEmail(prevData.assignedByEmail || prevData.createdBy || updates.assignedByEmail || '');
-      const taskTitle = updates.task || prevData.task || updates.title || prevData.title || 'Compromiso Operativo';
-      const completedByName = currentUser?.displayName || currentUser?.name || currentUser?.email || 'Un colaborador';
-      const completedByEmail = sanitizeEmail(currentUser?.email || '');
-      const assignerName = prevData.assignedByName || prevData.assignerName || updates.assignedByName || 'Líder / Coordinador';
-      const assignedSede = updates.assignedSede || prevData.assignedSede || prevData.sede || currentUser?.sede || 'Global';
-      const nowIso = new Date().toISOString();
-
-      // Si no hay correo de asignador valido, salir
-      if (!assignerEmail || !assignerEmail.includes('@')) {
-        return;
-      }
-
-      // Si quien completo la tarea es el mismo asignador/creador, no generar auto-notificacion redundante
-      if (assignerEmail === completedByEmail) {
-        return;
-      }
-
-      const noteText = (updates.comments || updates.notes || prevData.comments || prevData.notes || '').trim();
-      const evidenceUrl = updates.evidenceUrl || updates.evidence_url || prevData.evidenceUrl || prevData.evidence_url || '';
-
-      const mailDocRef = doc(collection(db, 'mail'));
-      const notifDocRef = doc(collection(db, 'notifications'));
-
-      const htmlContent = buildTaskCompletedEmailHtml({
-        taskTitle,
-        assignerName,
-        completedByName,
-        completedByEmail,
-        completedAt: nowIso,
-        assignedSede,
-        evidenceUrl,
-        notes: noteText
-      });
-
-      // 1. Encolar en coleccion 'mail' (procesado automaticamente por mailerDaemon.js)
-      await setDoc(mailDocRef, {
+    const noteText = (updates.comments || updates.notes || prevData.comments || prevData.notes || '').trim();
+    const evidenceUrl = updates.evidenceUrl || updates.evidence_url || prevData.evidenceUrl || prevData.evidence_url || '';
+    return {
+      mailRef: doc(db, 'mail', `task_completed_${completionId}`),
+      mailData: {
         to: [assignerEmail],
         type: 'task_completed_alert',
         delivery: { state: 'PENDING' },
         createdAt: nowIso,
         message: {
           subject: `✅ TAREA COMPLETADA: ${taskTitle} — Causa OS`,
-          html: htmlContent
+          html: buildTaskCompletedEmailHtml({
+            taskTitle,
+            assignerName: prevData.assignedByName || prevData.assignerName || 'Líder / Coordinador',
+            completedByName,
+            completedByEmail,
+            completedAt: nowIso,
+            assignedSede,
+            evidenceUrl,
+            notes: noteText
+          })
         }
-      });
-
-      // 2. Notificacion In-App en Firestore 'notifications'
-      await setDoc(notifDocRef, {
+      },
+      notificationRef: doc(db, 'notifications', `task_completed_${completionId}`),
+      notificationData: {
         userId: assignerEmail,
         title: `✅ Tarea completada: ${taskTitle}`,
         message: `${completedByName} ha completado la tarea "${taskTitle}" en ${assignedSede}.`,
-        taskId: taskId,
+        taskId,
         type: 'task_completed',
         read: false,
         created_at: nowIso
-      });
+      }
+    };
+  };
 
-      console.log(`📧 Notificacion de tarea completada despachada para: ${assignerEmail}`);
+  const notifyTaskCompletedToAssigner = async (prevData, updates, taskId, completionId) => {
+    try {
+      const delivery = buildCompletionDelivery(prevData, updates, taskId, completionId);
+      if (!delivery) return;
+      await Promise.all([
+        setDoc(delivery.mailRef, delivery.mailData),
+        setDoc(delivery.notificationRef, delivery.notificationData)
+      ]);
+      console.log(`📧 Notificacion de tarea completada despachada para: ${delivery.mailData.to[0]}`);
     } catch (error) {
       console.error("Error al notificar al asignador por correo de tarea completada:", error);
     }
   };
 
-  const writeTaskDoc = async (taskId, updates, cycleForDeadline = currentCycle) => {
+  const writeTaskDoc = async (taskId, updates, cycleForDeadline = currentCycle, cycleScope = null) => {
     try {
       const taskRef = doc(db, 'tasks', taskId);
-      const snap = await getDoc(taskRef);
-      const prevData = snap.exists() ? snap.data() : (checklistData.find(t => t.id === taskId) || {});
-      const wasCompleted = prevData.completed === true || prevData.status === 'Completada';
-      const isNowCompleted = updates.completed === true || updates.status === 'Completada';
+      const baseTask = checklistData.find(task => task.id === taskId);
+      const completionId = doc(collection(db, 'task_completion_events')).id;
+      let completionDelivery = null;
 
-      if (!snap.exists()) {
-        const baseTask = checklistData.find(t => t.id === taskId);
-        await setDoc(taskRef, {
-          ...(baseTask || {}),
-          id: taskId,
-          completed: false,
-          status: 'Pendiente',
-          priority: baseTask?.isCritical ? '🔴 ROJO' : '🟡 AMARILLO',
-          progressPercentage: 0,
-          deadline: baseTask ? calculateAutomaticDeadline(baseTask, cycleForDeadline) : null,
-          created_at: new Date().toISOString(),
-          ...updates
+      const expandDottedFields = (fields) => Object.entries(fields).reduce((result, [path, value]) => {
+        const keys = path.split('.');
+        let cursor = result;
+        keys.slice(0, -1).forEach(key => {
+          cursor[key] = cursor[key] || {};
+          cursor = cursor[key];
         });
-      } else {
-        await updateDoc(taskRef, updates);
-      }
+        cursor[keys[keys.length - 1]] = value;
+        return result;
+      }, {});
 
-      // Si la tarea paso a estado COMPLETADA, notificar inmediatamente por correo al asignador
-      if (isNowCompleted && !wasCompleted) {
-        notifyTaskCompletedToAssigner(prevData, updates, taskId);
-      }
+      await runTransaction(db, async transaction => {
+        const snapshot = await transaction.get(taskRef);
+        const prevData = snapshot.exists() ? snapshot.data() : (baseTask || {});
+        const nextUpdates = { ...updates };
+        const nextCompleted = getNextCompletionState(updates);
+        const includesProgressUpdate = updates.progress !== undefined || updates.progressPercentage !== undefined;
+        const includesCompletionUpdate = updates.completed !== undefined ||
+          updates.status !== undefined || includesProgressUpdate;
+        let completionTransition = false;
+
+        const resolvedScope = resolveTaskCycleScope(prevData, {
+          catalogTask: Boolean(baseTask),
+          ...(cycleScope ?? { sede: currentUser?.sede?.trim() || 'Global', cycle: cycleForDeadline })
+        });
+        const cycleKey = resolvedScope ? `${resolvedScope.sede}__${resolvedScope.cycle.id}` : null;
+        if (resolvedScope && includesCompletionUpdate) {
+          const previous = getEffectiveCompletion(prevData, {
+            sede: resolvedScope.sede,
+            cycleId: resolvedScope.cycle.id,
+            cycleScoped: true
+          });
+          completionTransition = isCompletionTransition(previous.completed, nextCompleted);
+          const completionEntry = createCycleCompletion(prevData.completions?.[cycleKey], {
+            cycle: resolvedScope.cycle,
+            completed: nextCompleted,
+            updatedAt: new Date().toISOString(),
+            completionId: completionTransition ? completionId : prevData.completions?.[cycleKey]?.completionId,
+            updates
+          });
+          nextUpdates[`completions.${cycleKey}`] = completionEntry;
+        } else if (includesCompletionUpdate) {
+          completionTransition = isCompletionTransition(
+            prevData.completed === true || prevData.status === 'Completada',
+            nextCompleted
+          );
+        }
+
+        if (completionTransition) {
+          completionDelivery = buildCompletionDelivery(
+            prevData,
+            { ...nextUpdates, completedAt: new Date().toISOString() },
+            taskId,
+            completionId
+          );
+        }
+
+        if (snapshot.exists()) {
+          transaction.update(taskRef, nextUpdates);
+        } else {
+          const initialData = {
+            ...(baseTask || {}),
+            id: taskId,
+            ...(baseTask ? { catalogTask: true } : {}),
+            completed: false,
+            status: 'Pendiente',
+            priority: baseTask?.isCritical ? '🔴 ROJO' : '🟡 AMARILLO',
+            progressPercentage: 0,
+            deadline: baseTask ? calculateAutomaticDeadline(baseTask, cycleForDeadline) : null,
+            created_at: new Date().toISOString(),
+            ...expandDottedFields(nextUpdates)
+          };
+          transaction.set(taskRef, initialData);
+        }
+
+        if (completionTransition && completionDelivery) {
+          transaction.set(completionDelivery.mailRef, completionDelivery.mailData);
+          transaction.set(completionDelivery.notificationRef, completionDelivery.notificationData);
+        }
+      });
     } catch (err) {
       console.error("writeTaskDoc error:", err);
-      setTasks(prev => prev.map(t => t.id === taskId ? { ...t, ...updates } : t));
       throw err;
     }
   };
 
   useEffect(() => {
-    // Escuchar cambios en la colección "tasks" en tiempo real
-    const tasksRef = collection(db, 'tasks');
-    const unsubscribe = onSnapshot(tasksRef, (snapshot) => {
-      const userSede = currentUser?.sede?.trim() || 'Global';
-      let loadedTasks = [];
-
-      if (!snapshot.empty) {
-        loadedTasks = snapshot.docs.map(doc => {
-          const data = doc.data();
-          let sedeCompleted = data.completed;
-          let sedeStatus = data.status;
-          
-          if (data.completions && !data.isCustom && !doc.id.startsWith('custom_') && !data.assignedToEmail && !data.assignedToEmails) {
-            const cycleKey = currentCycle?.id ? `${userSede}__${currentCycle.id}` : null;
-            const myCycleData = cycleKey ? data.completions[cycleKey] : null;
-            const mySedeData = data.completions[userSede];
-            if (myCycleData && myCycleData.completed !== undefined) {
-              sedeCompleted = myCycleData.completed;
-              sedeStatus = myCycleData.status;
-            } else if (mySedeData && mySedeData.completed !== undefined) {
-              sedeCompleted = mySedeData.completed;
-              sedeStatus = mySedeData.status;
-            }
-          }
-
-          return {
-            id: doc.id,
-            ...data,
-            completed: sedeCompleted,
-            status: sedeStatus
-          };
-        });
-      }
-
-      // Roles ejecutivos que NO deben recibir tareas del catálogo base automáticamente.
-      // Fer Aragón (ceo), Paul Sosa (cco) y similares no operan el checklist operativo.
-      const EXECUTIVE_ROLES_NO_CHECKLIST = ['ceo', 'cco', 'socio', 'super_admin', 'direccion'];
-      const userRoleForMerge = currentUser?.appRole || currentUser?.role || '';
-      const userEmailLower = (currentUser?.email || '').toLowerCase().trim();
-      const skipCatalogMerge = EXECUTIVE_ROLES_NO_CHECKLIST.includes(userRoleForMerge) || 
-                                userEmailLower === 'fer.aragon@crearpsl.net' || 
-                                userEmailLower === 'paul.sosa@crearpsl.net';
-
-      // Merge de seguridad: Asegurar que todas las tareas del catálogo base (incluidas las nuevas de QT) existan
-      // Solo se aplica a roles operativos — no a roles ejecutivos sin checklist propio.
-      const existingIds = new Set(loadedTasks.map(t => t.id));
-      const missingBaseTasks = skipCatalogMerge ? [] : checklistData.filter(t => !existingIds.has(t.id)).map(task => {
-        const autoDeadline = calculateAutomaticDeadline(task, currentCycle);
-        return {
-          ...task,
-          id: task.id,
-          completed: false,
-          status: 'Pendiente',
-          priority: task.isCritical ? '🔴 ROJO' : '🟡 AMARILLO',
-          progressPercentage: 0,
-          deadline: autoDeadline,
-          created_at: new Date().toISOString()
-        };
-      });
-
-      const allTasks = [...loadedTasks, ...missingBaseTasks];
-
-      // (14/09/2026) MULTI-EQUIPO QUITO: si esta persona eligió 2 equipos en su
-      // perfil (quitoCycles.length > 1 — ver CyclesContext.jsx), cada tarea del
-      // CATÁLOGO (checklistData) se expande en una copia por equipo, cada una con
-      // su propia fecha límite (calculada con el ciclo real de ESE equipo, no el
-      // genérico currentCycle que solo refleja el primero) y su propio estado de
-      // completado (leído de completions["${userSede}__${cycle.id}"], que ya es
-      // único por equipo porque cycle.id incluye el número de equipo — ver
-      // buildCycleForEquipo() en CyclesContext.jsx). Las tareas PERSONALIZADAS
-      // (asignadas puntualmente, id "custom_..."), que no existen en checklistData,
-      // NO se duplican — se muestran una sola vez, igual que siempre.
-      // IMPORTANTE: si la fila ya existe en Firestore y YA trae un "deadline"
-      // guardado, se respeta tal cual para AMBOS equipos (mismo criterio que ya
-      // aplica hoy para cualquier sede: una fecha ya persistida no se recalcula).
-      // Solo se calcula una fecha distinta por equipo cuando la tarea todavía no
-      // tiene documento propio en Firestore (missingBaseTasks).
-      let finalTasks = allTasks;
-      if (isMultiTeamQuito) {
-        // Solo las tareas que YA tienen documento propio en Firestore (loadedTasks)
-        // pueden traer un "deadline" persistido de verdad (manual o congelado desde
-        // que se creó el doc) — ese valor se respeta igual para los dos equipos,
-        // igual que ya ocurre hoy para cualquier sede. Las que vienen de
-        // missingBaseTasks (sin doc todavía) traen un "deadline" que solo se
-        // calculó para el PRIMER equipo elegido (currentCycle) — para esas,
-        // recalculamos siempre por equipo en vez de reusar ese valor.
-        const loadedTaskIds = new Set(loadedTasks.map(t => t.id));
-        const expanded = [];
-        allTasks.forEach(t => {
-          const baseTaskDef = checklistData.find(bt => bt.id === t.id);
-          if (!baseTaskDef) {
-            expanded.push(t);
-            return;
-          }
-          const isPersisted = loadedTaskIds.has(t.id);
-          quitoCycles.forEach(({ equipo, cycle }) => {
-            const cycleKey = cycle?.id ? `${userSede}__${cycle.id}` : null;
-            const myCycleData = cycleKey && t.completions ? t.completions[cycleKey] : null;
-            const mySedeData = t.completions ? t.completions[userSede] : null;
-            const effective = (myCycleData && myCycleData.completed !== undefined)
-              ? myCycleData
-              : (mySedeData || { completed: false, status: 'Pendiente' });
-            const perTeamDeadline = isPersisted
-              ? (t.deadline || calculateAutomaticDeadline(baseTaskDef, cycle))
-              : calculateAutomaticDeadline(baseTaskDef, cycle);
-
-            expanded.push({
-              ...t,
-              uiKey: `${t.id}__EQ${equipo}`,
-              equipoQuito: equipo,
-              quitoCycleId: cycle?.id || null,
-              deadline: perTeamDeadline,
-              completed: effective.completed,
-              status: effective.status
-            });
-          });
-        });
-        finalTasks = expanded;
-      }
-
-      setTasks(finalTasks);
-      setLoading(false);
-    }, (error) => {
-      console.error("Error fetching tasks from Firestore:", error);
-      // Fallback a checklistData local si Firestore falla
-      const EXECUTIVE_ROLES_NO_CHECKLIST = ['ceo', 'cco', 'socio', 'super_admin', 'direccion'];
-      const userRoleForFallback = currentUser?.appRole || currentUser?.role || '';
-      const userEmailLower = (currentUser?.email || '').toLowerCase().trim();
-      let devCustom = [];
-      try {
-        devCustom = JSON.parse(localStorage.getItem('cpsl_dev_tasks') || '[]');
-      } catch(e) {}
-
-      if (EXECUTIVE_ROLES_NO_CHECKLIST.includes(userRoleForFallback) || 
-          userEmailLower === 'fer.aragon@crearpsl.net' || 
-          userEmailLower === 'paul.sosa@crearpsl.net') {
-        setTasks(devCustom);
-        setLoading(false);
-        return;
-      }
-      const localTasks = checklistData.map(task => ({
+    setLoadedTaskIdentity(null);
+    setTaskLoadError('');
+    const executiveRolesWithoutChecklist = ['ceo', 'cco', 'socio', 'super_admin', 'direccion'];
+    const userRole = currentUser?.appRole || currentUser?.role || '';
+    const userEmail = (currentUser?.email || '').toLowerCase().trim();
+    const skipCatalog = executiveRolesWithoutChecklist.includes(userRole) ||
+      userEmail === 'fer.aragon@crearpsl.net' ||
+      userEmail === 'paul.sosa@crearpsl.net';
+    const roleIds = skipCatalog ? [] : getChecklistRolesForUser(currentUser);
+    const fallbackTasks = checklistData
+      .filter(task => roleIds.includes(normalizeRole(task.role)))
+      .map(task => ({
         ...task,
         completed: false,
         status: 'Pendiente',
@@ -538,11 +471,165 @@ export function ChecklistProvider({ children }) {
         progressPercentage: 0,
         deadline: calculateAutomaticDeadline(task, currentCycle)
       }));
-      setTasks([...localTasks, ...devCustom]);
+
+    setTasks(fallbackTasks);
+    if (!currentUser) {
+      setLoadedTaskIdentity(taskReadIdentity);
       setLoading(false);
+      return undefined;
+    }
+
+    const taskCollection = collection(db, 'tasks');
+    const querySpecs = [];
+    roleIds.forEach(roleId => {
+      const roleTaskIds = checklistData
+        .filter(task => normalizeRole(task.role) === roleId)
+        .map(task => task.id);
+      for (let index = 0; index < roleTaskIds.length; index += 30) {
+        querySpecs.push({
+          key: `catalog:${roleId}:${index}`,
+          constraints: [
+            where('role', '==', roleId),
+            where('id', 'in', roleTaskIds.slice(index, index + 30))
+          ]
+        });
+      }
     });
 
-    return () => unsubscribe();
+    const authEmail = userEmail;
+    if (authEmail) {
+      const authEmails = [...new Set([
+        authEmail,
+        authEmail.replace('@crearpsl.com', '@crearpsl.net'),
+        authEmail.replace('@crearpsl.net', '@crearpsl.com')
+      ])];
+      const exactOperator = authEmails.length > 1 ? 'in' : '==';
+      const arrayOperator = authEmails.length > 1 ? 'array-contains-any' : 'array-contains';
+      [
+        ['assignedToEmail', exactOperator, exactOperator === 'in' ? authEmails : authEmails[0]],
+        ['assignedToEmails', arrayOperator, arrayOperator === 'array-contains-any' ? authEmails : authEmails[0]],
+        ['assigned_to', exactOperator, exactOperator === 'in' ? authEmails : authEmails[0]],
+        ['createdBy', exactOperator, exactOperator === 'in' ? authEmails : authEmails[0]],
+        ['assignedByEmail', exactOperator, exactOperator === 'in' ? authEmails : authEmails[0]],
+        ['createdByEmail', exactOperator, exactOperator === 'in' ? authEmails : authEmails[0]],
+        ['created_by', exactOperator, exactOperator === 'in' ? authEmails : authEmails[0]]
+      ].forEach(([field, operator, value]) => querySpecs.push({
+        key: `personal:${field}`,
+        constraints: [where(field, operator, value)]
+      }));
+    }
+    if (currentUser.uid) {
+      querySpecs.push({
+        key: 'personal:ownerId',
+        constraints: [where('ownerId', '==', currentUser.uid)]
+      });
+    }
+
+    if (querySpecs.length === 0) {
+      setLoadedTaskIdentity(taskReadIdentity);
+      setLoading(false);
+      return undefined;
+    }
+
+    const snapshotsByQuery = new Map();
+    const pendingQueries = new Set(querySpecs.map(({ key }) => key));
+    let active = true;
+    const publishTasks = () => {
+      if (!active) return;
+      const docsById = new Map();
+      snapshotsByQuery.forEach(docs => docs.forEach(taskDoc => docsById.set(taskDoc.id, taskDoc)));
+      const userSede = currentUser?.sede?.trim() || 'Global';
+      const loadedTasks = filterTasksForUser(
+        [...docsById.values()].map(taskDoc => ({ id: taskDoc.id, ...taskDoc.data() })),
+        currentUser
+      ).map(data => {
+        let sedeCompleted = data.completed;
+        let sedeStatus = data.status;
+        const taskId = data.id;
+
+        const isBaseCatalogTask = checklistData.some(task => task.id === taskId) &&
+          !data.isCustom && !taskId.startsWith('custom_') &&
+          !data.assignedToEmail &&
+          !(Array.isArray(data.assignedToEmails) && data.assignedToEmails.length > 0);
+        if (isBaseCatalogTask && !isMultiTeamQuito) {
+          return applyCycleCompletion(data, {
+            sede: userSede,
+            cycleId: currentCycle?.id
+          });
+        }
+
+        return { ...data, completed: sedeCompleted, status: sedeStatus };
+      });
+
+      const existingIds = new Set(loadedTasks.map(task => task.id));
+      const missingBaseTasks = fallbackTasks
+        .filter(task => !existingIds.has(task.id))
+        .map(task => ({
+          ...task,
+          progressPercentage: 0,
+          created_at: new Date().toISOString()
+        }));
+      const allTasks = [...loadedTasks, ...missingBaseTasks];
+      let finalTasks = allTasks;
+
+      if (isMultiTeamQuito) {
+        const loadedTaskIds = new Set(loadedTasks.map(task => task.id));
+        const expanded = [];
+        allTasks.forEach(task => {
+          const baseTaskDef = checklistData.find(baseTask => baseTask.id === task.id);
+          if (!baseTaskDef || task.isCustom || task.assignedToEmail || task.assignedToEmails?.length) {
+            expanded.push(task);
+            return;
+          }
+          const isPersisted = loadedTaskIds.has(task.id);
+          quitoCycles.forEach(({ equipo, cycle }) => {
+            const effectiveTask = applyCycleCompletion(task, {
+              sede: userSede,
+              cycleId: cycle?.id
+            });
+            const perTeamDeadline = isPersisted
+              ? (task.deadline || calculateAutomaticDeadline(baseTaskDef, cycle))
+              : calculateAutomaticDeadline(baseTaskDef, cycle);
+
+            expanded.push({
+              ...effectiveTask,
+              uiKey: `${task.id}__EQ${equipo}`,
+              equipoQuito: equipo,
+              quitoCycleId: cycle?.id || null,
+              deadline: perTeamDeadline
+            });
+          });
+        });
+        finalTasks = expanded;
+      }
+
+      setTasks(finalTasks);
+      setLoadedTaskIdentity(taskReadIdentity);
+      setLoading(pendingQueries.size > 0);
+    };
+
+    setLoading(true);
+    const unsubscribers = querySpecs.map(({ key, constraints }) => onSnapshot(
+      query(taskCollection, ...constraints),
+      snapshot => {
+        if (!active) return;
+        snapshotsByQuery.set(key, snapshot.docs);
+        pendingQueries.delete(key);
+        publishTasks();
+      },
+      error => {
+        if (!active) return;
+        console.error(`Error fetching authorized tasks (${key}):`, error);
+        pendingQueries.delete(key);
+        setTaskLoadError('No se pudieron cargar todas las tareas autorizadas; el listado puede estar incompleto.');
+        publishTasks();
+      }
+    ));
+
+    return () => {
+      active = false;
+      unsubscribers.forEach(unsubscribe => unsubscribe());
+    };
     // currentCycle?.id se agrega para que, en cuanto CyclesContext termine de cargar
     // el ciclo real (llega después del primer render, vía la API del calendario),
     // este listener se vuelva a suscribir y recalcule los "deadline" faltantes con
@@ -551,7 +638,7 @@ export function ChecklistProvider({ children }) {
     // elige/cambia su(s) equipo(s) en su perfil, este listener se vuelva a
     // suscribir y reconstruya "tasks" con la expansión multi-equipo correcta —
     // igual que ya hacía currentCycle?.id, pero para quitoCycles.
-  }, [currentUser?.sede, currentUser?.email, currentUser?.appRole, currentCycle?.id, currentCycle?.name, quitoCyclesKey]);
+  }, [currentUser?.sede, currentUser?.email, currentUser?.appRole, currentUser?.role, currentUser?.roles?.join('|'), currentUser?.uid, currentUser?.isSimulated, taskReadIdentity, currentCycle?.id, currentCycle?.name, quitoCyclesKey]);
 
   // (14/09/2026) equipoQuito (opcional): cuando el usuario de Quito tiene 2 equipos
   // elegidos, ChecklistBoard.jsx pasa aquí a cuál de los dos pertenece la fila que
@@ -562,46 +649,94 @@ export function ChecklistProvider({ children }) {
   // misma tarea de catálogo. Para cualquier otro caso (equipoQuito ausente,
   // sedes fuera de Quito, Quito con 0 o 1 equipo) el comportamiento es idéntico
   // al de siempre: se usa currentCycle.
-  const toggleTask = async (taskId, currentStatus, equipoQuito = null) => {
+  const toggleTask = async (taskKey, currentStatus, equipoQuito = null) => {
+    if (pendingTaskToggles.current.has(taskKey)) {
+      const error = new Error('Espera a que termine de guardarse el cambio anterior de esta tarea.');
+      showToast(error.message, 'error');
+      throw error;
+    }
+    pendingTaskToggles.current.add(taskKey);
+    const taskId = taskKey.includes('__EQ') ? taskKey.split('__EQ')[0] : taskKey;
+    const nextStatus = !currentStatus;
+    const userSede = currentUser?.sede?.trim() || 'Global';
+    const cycleForThisToggle = equipoQuito
+      ? quitoCycles.find(qc => qc.equipo === equipoQuito)?.cycle
+      : currentCycle;
+    const cycleKey = cycleForThisToggle?.id ? `${userSede}__${cycleForThisToggle.id}` : null;
+    const isBaseCatalogTask = checklistData.some(task => task.id === taskId);
+    const optimisticTasks = new WeakMap();
+
     try {
-      const userSede = currentUser?.sede?.trim() || 'Global';
-      const cycleForThisToggle = equipoQuito
-        ? (quitoCycles.find(qc => qc.equipo === equipoQuito)?.cycle || currentCycle)
-        : currentCycle;
-      const cycleKey = cycleForThisToggle?.id ? `${userSede}__${cycleForThisToggle.id}` : null;
+      const task = tasks.find(t => t.uiKey === taskKey || (!t.uiKey && t.id === taskId));
+      const cycleScope = resolveTaskCycleScope(task, {
+        catalogTask: isBaseCatalogTask, sede: userSede, cycle: cycleForThisToggle
+      });
+      setTasks(prev => prev.map(t => {
+        if (t.uiKey === taskKey || (!t.uiKey && t.id === taskId)) {
+          const nextCompletions = { ...(t.completions || {}) };
+          if (cycleScope) {
+            nextCompletions[cycleKey] = {
+              ...(nextCompletions[cycleKey] || {}),
+              completed: nextStatus,
+              status: nextStatus ? 'Completada' : 'Pendiente',
+              cycleId: cycleForThisToggle.id,
+              updatedAt: new Date().toISOString()
+            };
+          } else if (userSede) {
+            nextCompletions[userSede] = {
+              ...(nextCompletions[userSede] || {}),
+              completed: nextStatus,
+              status: nextStatus ? 'Completada' : 'Pendiente',
+              updatedAt: new Date().toISOString()
+            };
+          }
+          const optimisticTask = {
+            ...t,
+            completed: nextStatus,
+            status: nextStatus ? 'Completada' : 'Pendiente',
+            completedAt: nextStatus ? new Date().toISOString() : null,
+            completions: nextCompletions
+          };
+          optimisticTasks.set(optimisticTask, t);
+          return optimisticTask;
+        }
+        return t;
+      }));
 
       const updates = {
-        completed: !currentStatus,
-        status: !currentStatus ? 'Completada' : 'Pendiente',
+        completed: nextStatus,
+        status: nextStatus ? 'Completada' : 'Pendiente',
         // FIX 16/09/2026: fecha real de cumplimiento (trazabilidad, pedido
         // explicito de Jose). Se limpia al reabrir para no dejar una fecha
         // vieja "pegada"; se vuelve a fijar (con la fecha real del momento)
         // si se vuelve a completar.
-        completedAt: !currentStatus ? new Date().toISOString() : null,
-        [`completions.${userSede}.completed`]: !currentStatus,
-        [`completions.${userSede}.status`]: !currentStatus ? 'Completada' : 'Pendiente',
+        completedAt: nextStatus ? new Date().toISOString() : null,
+        [`completions.${userSede}.completed`]: nextStatus,
+        [`completions.${userSede}.status`]: nextStatus ? 'Completada' : 'Pendiente',
         [`completions.${userSede}.updatedAt`]: new Date().toISOString()
       };
 
-      if (cycleKey) {
-        updates[`completions.${cycleKey}.completed`] = !currentStatus;
-        updates[`completions.${cycleKey}.status`] = !currentStatus ? 'Completada' : 'Pendiente';
-        updates[`completions.${cycleKey}.cycleId`] = cycleForThisToggle.id;
-        updates[`completions.${cycleKey}.cycleName`] = cycleForThisToggle.name || '';
-        updates[`completions.${cycleKey}.updatedAt`] = new Date().toISOString();
-      }
-
       // Update both legacy and map formats just in case it's a custom task
-      await writeTaskDoc(taskId, updates, cycleForThisToggle);
+      await writeTaskDoc(
+        taskId,
+        updates,
+        cycleForThisToggle,
+        cycleScope
+      );
     } catch (error) {
       console.error("Error updating task:", error);
-      showToast("No se pudo actualizar la tarea. Revisa los permisos de Firestore.", "error");
+      // A newer snapshot is authoritative; only undo our own optimistic objects.
+      setTasks(prev => prev.map(t => optimisticTasks.get(t) || t));
+      showToast(`No se pudo actualizar la tarea. ${error.message}`, "error");
+      throw error;
+    } finally {
+      pendingTaskToggles.current.delete(taskKey);
     }
   };
 
-  const updateTaskDetails = async (taskId, updates) => {
+  const updateTaskDetails = async (taskId, updates, cycleScope = null) => {
     try {
-      await writeTaskDoc(taskId, updates);
+      await writeTaskDoc(taskId, updates, currentCycle, cycleScope);
     } catch (error) {
       console.error("Error updating task details:", error);
       showToast("No se pudo actualizar la tarea.", "error");
@@ -644,7 +779,7 @@ export function ChecklistProvider({ children }) {
       batch.set(doc(collection(db, 'notifications')), {
         userId: email,
         title: `Mensaje sobre: ${title}`,
-        message: `${senderName}: ${body}`,
+        message: taskReminderMessage(task, `${senderName}: ${body}`),
         taskId: task.id,
         taskMessageId: messageRef.id,
         type: 'task_message',
@@ -671,15 +806,19 @@ export function ChecklistProvider({ children }) {
     recipients.forEach(email => {
       batch.set(doc(collection(db, 'mail')), {
         to: [email], type: 'task_reminder', delivery: { state: 'PENDING' }, createdAt: now,
-        message: { subject: `Recordatorio de tarea: ${title} — Causa OS`, html: `<div style="font-family:Arial,sans-serif;max-width:620px;margin:auto;color:#172033"><h2 style="color:#078ac6">Recordatorio de tarea</h2><p><strong>${escapeHtml(senderName)}</strong> te escribió sobre:</p><p style="font-weight:bold">${escapeHtml(title)}</p><div style="white-space:pre-wrap;background:#f3f7fa;border-left:4px solid #078ac6;padding:14px">${escapeHtml(body)}</div><p style="color:#5b6673;font-size:12px">Mensaje enviado desde Causa OS.</p></div>` }
+        message: { subject: `Recordatorio de tarea: ${title} — Causa OS`, html: `<div style="font-family:Arial,sans-serif;max-width:620px;margin:auto;color:#172033"><h2 style="color:#078ac6">Recordatorio de tarea</h2><p><strong>${escapeHtml(senderName)}</strong> te escribió sobre:</p><p style="font-weight:bold">${escapeHtml(title)}</p><div style="white-space:pre-wrap;background:#f3f7fa;border-left:4px solid #078ac6;padding:14px">${escapeHtml(body)}</div><p>Ubicación: ${escapeHtml(taskLocationLabel(task))}</p><a href="${escapeHtml(taskUrl(task.id))}">Abrir tarea en Causa OS</a><p style="color:#5b6673;font-size:12px">Mensaje enviado desde Causa OS.</p></div>` }
       });
-      batch.set(doc(collection(db, 'notifications')), { userId: email, title: `Recordatorio: ${title}`, message: `${senderName}: ${body}`, taskId: task.id, type: 'task_email_reminder', read: false, created_at: now });
+      batch.set(doc(collection(db, 'notifications')), { userId: email, title: `Recordatorio: ${title}`, message: taskReminderMessage(task, `${senderName}: ${body}`), taskId: task.id, type: 'task_email_reminder', read: false, created_at: now });
     });
     await batch.commit();
     return { recipients: recipients.length };
   };
 
   const addCustomTask = async (taskData) => {
+    if (!canCreateTaskAsUser(currentUser, auth.currentUser?.email)) {
+      showToast('No se puede crear una tarea en simulación o sin una sesión real de tu cuenta.', 'error');
+      return false;
+    }
     try {
       const batch = writeBatch(db);
       // Creamos un ID único usando timestamp
@@ -693,6 +832,11 @@ export function ChecklistProvider({ children }) {
         .replace(/ketherine\.aguirre@/gi, 'katherine.aguirre@')
         .replace(/coodinacion\.administrativa@/gi, 'coordinacion.administrativa@') : '');
       const cleanData = { ...taskData };
+      cleanData.location = normalizeTaskLocation(taskData.location);
+      cleanData.isCustom = true;
+      cleanData.createdBy = currentUser.email;
+      cleanData.assignedByEmail = currentUser.email;
+      cleanData.assignedByName = currentUser.name || currentUser.displayName || currentUser.email;
       if (Array.isArray(cleanData.assignedToEmails)) {
         cleanData.assignedToEmails = [...new Set(cleanData.assignedToEmails.map(sanitizeEmail).filter(Boolean))];
       }
@@ -744,7 +888,7 @@ export function ChecklistProvider({ children }) {
           completed: false,
           status: 'Pendiente',
           created_at: new Date().toISOString()
-        });
+        }, { merge: true });
       }
 
       // Si la tarea tiene asignaciones directas a uno o más usuarios y no es una plantilla
@@ -761,7 +905,7 @@ export function ChecklistProvider({ children }) {
           batch.set(notifRef, {
             userId: cleanEmail,
             title: cleanData.task || cleanData.title,
-            message: notifMsg,
+            message: taskReminderMessage({ ...cleanData, id: customId }, notifMsg),
             read: false,
             taskId: customId,
             created_at: new Date().toISOString()
@@ -778,6 +922,8 @@ export function ChecklistProvider({ children }) {
             message: {
               subject: `📋 NUEVA TAREA ASIGNADA: ${cleanData.task || cleanData.title} — Causa OS`,
               html: buildTaskEmailHtml({
+                taskId: customId,
+                location: cleanData.location,
                 taskTitle: cleanData.task || cleanData.title,
                 notes: noteSnippet,
                 deadline: cleanData.deadline,
@@ -795,6 +941,7 @@ export function ChecklistProvider({ children }) {
             // simplemente no adjunta nada, no rompe el envío del correo).
             calendarEvent: {
               taskId: customId,
+              location: cleanData.location,
               title: cleanData.task || cleanData.title,
               deadline: cleanData.deadline || null,
               description: `Tarea Causa OS — Sede: ${cleanData.assignedSede || 'Global'}. Asignado por: ${assignerName}. Prioridad: ${cleanData.priority || 'Normal'}.${noteSnippet ? ' \nNotas: ' + noteSnippet : ''}`
@@ -816,7 +963,7 @@ export function ChecklistProvider({ children }) {
     try {
       const taskRef = doc(db, 'tasks', taskId);
       const taskSnap = await getDoc(taskRef);
-      if (!taskSnap.exists()) return false;
+      if (!taskSnap.exists()) throw new Error('La tarea ya no existe; no se pudo guardar la edición.');
       const currentTask = taskSnap.data();
 
       const sanitizeEmail = (e) => (typeof e === 'string' ? e.trim().toLowerCase()
@@ -825,6 +972,7 @@ export function ChecklistProvider({ children }) {
         .replace(/ketherine\.aguirre@/gi, 'katherine.aguirre@')
         .replace(/coodinacion\.administrativa@/gi, 'coordinacion.administrativa@') : '');
       const cleanUpdatedData = { ...updatedData };
+      if ('location' in updatedData) cleanUpdatedData.location = normalizeTaskLocation(updatedData.location);
       if (Array.isArray(cleanUpdatedData.assignedToEmails)) {
         cleanUpdatedData.assignedToEmails = [...new Set(cleanUpdatedData.assignedToEmails.map(sanitizeEmail).filter(Boolean))];
       }
@@ -837,7 +985,7 @@ export function ChecklistProvider({ children }) {
 
       // Calcular asignados: nuevos (recién agregados) vs los que ya estaban.
       const oldEmails = (currentTask.assignedToEmails || (currentTask.assignedToEmail ? [currentTask.assignedToEmail] : [])).map(sanitizeEmail).filter(Boolean);
-      const newEmails = (cleanUpdatedData.assignedToEmails || (cleanUpdatedData.assignedToEmail ? [cleanUpdatedData.assignedToEmail] : [])).map(sanitizeEmail).filter(Boolean);
+      const newEmails = (cleanUpdatedData.assignedToEmails || (cleanUpdatedData.assignedToEmail ? [cleanUpdatedData.assignedToEmail] : oldEmails)).map(sanitizeEmail).filter(Boolean);
 
       const newlyAddedEmails = newEmails.filter(email => !oldEmails.includes(email));
       const stillAssignedEmails = newEmails.filter(email => oldEmails.includes(email));
@@ -848,7 +996,7 @@ export function ChecklistProvider({ children }) {
       // Ahora, cualquier edición de un campo relevante (fecha límite, título,
       // prioridad, sede) también notifica a quienes ya estaban asignados —
       // no solo a los que se agregan de nuevo.
-      const relevantFieldChanged = ['deadline', 'task', 'title', 'priority', 'assignedSede', 'notes', 'description', 'comments'].some(
+      const relevantFieldChanged = ['deadline', 'task', 'title', 'priority', 'assignedSede', 'location', 'notes', 'description', 'comments'].some(
         field => field in cleanUpdatedData && cleanUpdatedData[field] !== currentTask[field]
       );
 
@@ -865,7 +1013,7 @@ export function ChecklistProvider({ children }) {
         batch.set(notifRef, {
           userId: cleanEmail,
           title: cleanUpdatedData.task || currentTask.task,
-          message: notifMsg,
+          message: taskReminderMessage({ ...currentTask, ...cleanUpdatedData, id: taskId }, notifMsg),
           read: false,
           taskId: taskId,
           created_at: new Date().toISOString()
@@ -882,6 +1030,8 @@ export function ChecklistProvider({ children }) {
           message: {
             subject: `📋 NUEVA TAREA ASIGNADA: ${cleanUpdatedData.task || currentTask.task} — Causa OS`,
             html: buildTaskEmailHtml({
+              taskId,
+              location: cleanUpdatedData.location ?? currentTask.location,
               taskTitle: cleanUpdatedData.task || currentTask.task,
               notes: activeNote,
               deadline: cleanUpdatedData.deadline || currentTask.deadline,
@@ -895,6 +1045,7 @@ export function ChecklistProvider({ children }) {
           },
           calendarEvent: {
             taskId: taskId,
+            location: cleanUpdatedData.location ?? currentTask.location ?? '',
             title: cleanUpdatedData.task || currentTask.task,
             deadline: cleanUpdatedData.deadline || currentTask.deadline || null,
             description: `Tarea Causa OS — Sede: ${cleanUpdatedData.assignedSede || currentTask.assignedSede || 'Global'}. Asignado por: ${assignerName}. Prioridad: ${cleanUpdatedData.priority || currentTask.priority || 'Normal'}.${activeNote ? ' \nNotas: ' + activeNote : ''}`
@@ -914,7 +1065,7 @@ export function ChecklistProvider({ children }) {
           batch.set(notifRef, {
             userId: cleanEmail,
             title: cleanUpdatedData.task || currentTask.task,
-            message: notifMsg,
+            message: taskReminderMessage({ ...currentTask, ...cleanUpdatedData, id: taskId }, notifMsg),
             read: false,
             taskId: taskId,
             created_at: new Date().toISOString()
@@ -931,6 +1082,8 @@ export function ChecklistProvider({ children }) {
             message: {
               subject: `📋 TAREA ACTUALIZADA: ${cleanUpdatedData.task || currentTask.task} — Causa OS`,
               html: buildTaskEmailHtml({
+                taskId,
+                location: cleanUpdatedData.location ?? currentTask.location,
                 taskTitle: cleanUpdatedData.task || currentTask.task,
                 notes: activeNote,
                 deadline: cleanUpdatedData.deadline || currentTask.deadline,
@@ -944,6 +1097,7 @@ export function ChecklistProvider({ children }) {
             },
             calendarEvent: {
               taskId: taskId,
+              location: cleanUpdatedData.location ?? currentTask.location ?? '',
               title: cleanUpdatedData.task || currentTask.task,
               deadline: cleanUpdatedData.deadline || currentTask.deadline || null,
               description: `Tarea Causa OS — Sede: ${cleanUpdatedData.assignedSede || currentTask.assignedSede || 'Global'}. Actualizado por: ${assignerName}. Prioridad: ${cleanUpdatedData.priority || currentTask.priority || 'Normal'}.${activeNote ? ' \nNotas: ' + activeNote : ''}`
@@ -985,16 +1139,16 @@ export function ChecklistProvider({ children }) {
     });
     if (roleTasks.length === 0) return 0;
 
-    const cycleKey = currentCycle?.id ? `${targetSede}__${currentCycle.id}` : null;
-
     const completed = roleTasks.filter(t => {
-      if (t.completions) {
-        if (cycleKey && t.completions[cycleKey] !== undefined) {
-          return t.completions[cycleKey].completed === true;
-        }
-        if (t.completions[targetSede] !== undefined) {
-          return t.completions[targetSede].completed === true;
-        }
+      const catalogScoped = checklistData.some(task => task.id === t.id) &&
+        !t.isCustom && !t.assignedToEmail &&
+        !(Array.isArray(t.assignedToEmails) && t.assignedToEmails.length > 0);
+      if (catalogScoped) {
+        return getEffectiveCompletion(t, {
+          sede: targetSede,
+          cycleId: t.quitoCycleId || currentCycle?.id,
+          cycleScoped: true
+        }).completed;
       }
       return t.completed || t.status === 'Completada';
     }).length;
@@ -1038,6 +1192,7 @@ export function ChecklistProvider({ children }) {
 
         batch.set(taskRef, {
           ...task,
+          catalogTask: true,
           completed: false, // Legacy fallback
           status: 'Pendiente', // Legacy fallback
           completions: initialCompletions,
@@ -1334,26 +1489,56 @@ export function ChecklistProvider({ children }) {
   // 4. Actualización de progreso individual en tarjetas compartidas / multi-área
   const updateIndividualProgress = async (taskId, userEmail, isCompleted, progressPercentage = null) => {
     try {
+      const normalizeEmailKey = (val) => (typeof val === 'string'
+        ? val.trim().toLowerCase()
+            .replace('@crearpls.com', '@crearpsl.net')
+            .replace('@crearpsl.com', '@crearpsl.net')
+        : '');
+      const em = normalizeEmailKey(userEmail || currentUser?.email || '');
+      if (!em) return false;
+
       const taskRef = doc(db, 'tasks', taskId);
       const snap = await getDoc(taskRef);
       if (!snap.exists()) return false;
       const data = snap.data();
       const currentProgress = { ...(data.assigneeProgress || {}) };
-      const em = (userEmail || currentUser?.email || '').toLowerCase().trim();
-      if (!em) return false;
 
-      const userObj = usersData.find(u => u.email?.toLowerCase() === em);
-      const prevEntry = currentProgress[em] || {
-        name: currentUser?.displayName || userObj?.name || em,
+      // Asegurar que todos los asignados formales tengan entrada en currentProgress
+      const formalAssignees = [
+        ...(Array.isArray(data.assignedToEmails) ? data.assignedToEmails : []),
+        ...(data.assignedToEmail ? [data.assignedToEmail] : []),
+        ...(data.assigned_to ? [data.assigned_to] : [])
+      ].map(normalizeEmailKey).filter(Boolean);
+
+      formalAssignees.forEach(assigneeEm => {
+        const existingMatch = Object.keys(currentProgress).find(k => normalizeEmailKey(k) === assigneeEm);
+        if (!existingMatch) {
+          const u = usersData.find(usr => normalizeEmailKey(usr.email) === assigneeEm);
+          currentProgress[assigneeEm] = {
+            name: u?.name || assigneeEm,
+            role: u?.role || data.role || 'colaborador',
+            sede: u?.sede || data.assignedSede || 'Global',
+            completed: data.completed === true,
+            completedAt: data.completed === true ? (data.completedAt || null) : null,
+            progress: data.completed === true ? 100 : 0
+          };
+        }
+      });
+
+      const targetKey = Object.keys(currentProgress).find(k => normalizeEmailKey(k) === em) || em;
+      const userObj = usersData.find(u => normalizeEmailKey(u.email) === em);
+      const prevEntry = currentProgress[targetKey] || {
+        name: currentUser?.displayName || currentUser?.name || userObj?.name || em,
         role: currentUser?.appRole || userObj?.role || 'colaborador',
         sede: currentUser?.sede || userObj?.sede || 'Global'
       };
 
-      currentProgress[em] = {
+      const nextProgVal = progressPercentage !== null ? progressPercentage : (isCompleted ? 100 : 0);
+      currentProgress[targetKey] = {
         ...prevEntry,
         completed: isCompleted,
         completedAt: isCompleted ? new Date().toISOString() : null,
-        progress: progressPercentage !== null ? progressPercentage : (isCompleted ? 100 : 0)
+        progress: nextProgVal
       };
 
       // Si todos los asignados completaron, marcar la tarjeta general como completada
@@ -1368,8 +1553,8 @@ export function ChecklistProvider({ children }) {
         return acc + val;
       }, 0);
       const overallPercent = totalItems > 0 ? Math.round(sumProgress / totalItems) : (isCompleted ? 100 : 0);
-
-      await updateDoc(taskRef, {
+      const nowIso = new Date().toISOString();
+      const nextPayload = {
         assigneeProgress: currentProgress,
         completed: allCompleted,
         status: allCompleted ? 'Completada' : (anyCompleted ? 'En Progreso' : 'Pendiente'),
@@ -1379,15 +1564,25 @@ export function ChecklistProvider({ children }) {
         // por colaborador), trazabilidad pedida por Jose. Conserva la fecha
         // si ya existia (no se pisa en actualizaciones posteriores); nunca se
         // inventa.
-        completedAt: allCompleted ? (data.completedAt || new Date().toISOString()) : null,
-        updatedAt: new Date().toISOString()
-      });
+        completedAt: allCompleted ? (data.completedAt || nowIso) : null,
+        updatedAt: nowIso
+      };
+
+      // Actualización optimista inmediata para reflejar el cambio sin latencia
+      setTasks(prev => prev.map(t => t.id === taskId ? { ...t, ...nextPayload } : t));
+
+      await updateDoc(taskRef, nextPayload);
 
       if (allCompleted && !data.completed) {
-        notifyTaskCompletedToAssigner(data, { completed: true, status: 'Completada', progressPercentage: 100 }, taskId);
+        notifyTaskCompletedToAssigner(
+          data,
+          { completed: true, status: 'Completada', progressPercentage: 100 },
+          taskId,
+          doc(collection(db, 'task_completion_events')).id
+        );
       }
 
-      showToast(isCompleted ? "¡Completaste tu parte de la tarea!" : "Marcaste tu parte como pendiente.", "success");
+      showToast(isCompleted ? "¡Tarea marcada como completada!" : "Marcaste la tarea como pendiente.", "success");
       return true;
     } catch (err) {
       console.error("Error updating individual progress:", err);
@@ -1396,9 +1591,12 @@ export function ChecklistProvider({ children }) {
     }
   };
 
+  const hasCurrentTaskSnapshot = loadedTaskIdentity === taskReadIdentity;
+  const visibleTasks = hasCurrentTaskSnapshot ? filterTasksForUser(tasks, currentUser) : [];
+
   return (
     <ChecklistContext.Provider value={{ 
-      tasks, 
+      tasks: visibleTasks,
       toggleTask, 
       updateTaskDetails,
       sendTaskMessage,
@@ -1406,7 +1604,7 @@ export function ChecklistProvider({ children }) {
       editCustomTask, 
       submitEvidence, 
       getProgressByRole, 
-      loading, 
+      loading: loading || !hasCurrentTaskSnapshot,
       initializeFirestore, 
       addCustomTask, 
       syncTasksToGoogle,
@@ -1414,7 +1612,9 @@ export function ChecklistProvider({ children }) {
       inviteCollaborator,
       acceptCollaboration,
       rejectCollaboration,
-      updateIndividualProgress
+      updateIndividualProgress,
+      taskLoadError,
+      taskReadRestricted: hasSimulatedTaskIdentityMismatch(currentUser, auth.currentUser?.email)
     }}>
       {children}
     </ChecklistContext.Provider>

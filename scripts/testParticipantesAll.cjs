@@ -10,8 +10,8 @@ puppeteer.use(StealthPlugin());
     await page.goto('https://imo.crearpslglobal.com/', { waitUntil: 'networkidle2', timeout: 60000 });
     
     if (await page.$('input[name="usuario"]')) {
-        await page.type('input[name="usuario"]', process.env.NODUS_GLOBAL_USER || 'CREARPSL');
-        await page.type('input[name="password"]', process.env.NODUS_GLOBAL_PASS || 'CREARPSL26*');
+        await page.type('input[name="usuario"]', process.env.NODUS_GLOBAL_USER);
+        await page.type('input[name="password"]', process.env.NODUS_GLOBAL_PASS);
         await Promise.all([
             page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 60000 }),
             page.click('button[type="submit"]')

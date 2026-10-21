@@ -4,11 +4,13 @@ import { useState, useEffect, useMemo } from 'react';
 import { calculateAutomaticDeadline } from '../utils/soarDates';
 import { useCycles } from '../context/CyclesContext';
 import { cyclesData } from '../data/cyclesData';
+import { getOverdueAssignedTasks, getTaskDisplayName } from '../utils/overdueTasks';
 import { 
   X, User, Users, CheckCircle2, Clock, AlertTriangle, 
   FileText, Link2, Plus, Trash2, ExternalLink, Calendar, 
   Building2, Mail, Shield, PlusCircle, CheckSquare, Eye,
-  UserX, UserCheck, ShieldAlert
+  UserX, UserCheck, ShieldAlert, Database, PhoneCall, Copy, Check,
+  BookOpen, HelpCircle, ArrowRight
 } from 'lucide-react';
 import { db } from '../services/firebase';
 import { doc, onSnapshot, setDoc, updateDoc, arrayUnion, arrayRemove, addDoc, collection, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
@@ -26,7 +28,7 @@ import UserStatusModal from './UserStatusModal';
 // canónicos para evitar mostrar sinónimos duplicados (ej. "coordinador_c1c2"
 // y "coord_c1" son el mismo rol, solo se ofrece el segundo).
 const ROLE_EDIT_OPTIONS = [
-  'direccion', 'cfo', 'gerente', 'director_maestria', 'coord_c1', 'coord_maestria',
+  'direccion', 'cfo', 'gerente', 'director_maestria', 'coord_c1', 'coord_jr', 'coord_maestria',
   'capitan', 'manager', 'qt', 'coordinador', 'finanzas', 'asistente_impuestos_quito',
   'talento_humano', 'legal', 'tecnico_sst', 'entrenador', 'entrenador_llamadas', 'observador'
 ];
@@ -87,7 +89,7 @@ function formatBirthdayNoYear(cumpleanos) {
   return `${dia} de ${MESES_ES[mesIdx]}`;
 }
 
-export default function UserProfileModal({ isOpen, onClose, user, allTasks = [], onStatusUpdated }) {
+export default function UserProfileModal({ isOpen, onClose, user, allTasks = [], onStatusUpdated, initialTab = null }) {
   const { currentUser, originalAdminUser, simulateUser, updateCurrentUserFields } = useAuth();
   const navigate = useNavigate();
   const { toggleTask } = useChecklist();
@@ -97,10 +99,12 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
   // provista por CyclesContext.jsx a partir del calendario oficial en vivo -- se usa
   // mas abajo para el selector de "Equipo(s) en Quito" (equiposQuito).
   let quitoTeamOptions = [];
+  let quitoCycles = [];
   try {
     const cyclesCtx = useCycles();
     currentCycle = cyclesCtx?.currentCycle || cyclesData[0];
     quitoTeamOptions = cyclesCtx?.quitoTeamOptions || [];
+    quitoCycles = cyclesCtx?.quitoCycles || [];
   } catch (e) {
     currentCycle = cyclesData[0];
   }
@@ -108,6 +112,7 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
   // Orden y filtro de tareas en la Matriz Operativa
   const [taskSortOrder, setTaskSortOrder] = useState('asc'); // 'asc' (Próximas primero / Cronológico) | 'desc'
   const [taskFilterStatus, setTaskFilterStatus] = useState('all'); // 'all' | 'pending' | 'completed' | 'critical'
+  const [copiedScriptKey, setCopiedScriptKey] = useState(null);
 
   const parseDateToMs = (val) => {
     if (!val) return null;
@@ -162,11 +167,32 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
     return { deadlineStr: null, dateObj: null, timestamp: Infinity, isAutomatic: false };
   };
 
+  // Estado optimista local para que los clicks en el checkbox respondan al instante sin delay
+  const [localTaskOverrides, setLocalTaskOverrides] = useState({});
+
   const isTaskCompleted = (t, userSede) => {
+    if (localTaskOverrides[t.id] !== undefined) {
+      return !!localTaskOverrides[t.id];
+    }
     if (t.completions && userSede && t.completions[userSede]) {
       return !!t.completions[userSede].completed;
     }
     return !!(t.completed || t.status === 'Completada');
+  };
+
+  const handleToggleTaskOptimistic = async (task, currentStatus) => {
+    const nextStatus = !currentStatus;
+    setLocalTaskOverrides(prev => ({ ...prev, [task.id]: nextStatus }));
+    try {
+      await toggleTask(task.id, currentStatus, task.equipoQuito);
+    } catch (e) {
+      // Revertir en caso de falla
+      setLocalTaskOverrides(prev => {
+        const next = { ...prev };
+        delete next[task.id];
+        return next;
+      });
+    }
   };
 
   const [targetUser, setTargetUser] = useState(user);
@@ -179,7 +205,8 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
   const isInactive = u?.isActive === false || u?.status === 'inactive' || u?.active === false;
   const canManageStatus = canManageUserStatus(currentUser);
 
-  const [activeTab, setActiveTab] = useState('tasks'); // 'tasks' | 'notes' | 'documents'
+  const isRezagadosUser = u?.role === 'coord_jr' || u?.appRole === 'coord_jr' || (u?.email && (u.email.includes('cardenasgina29') || u.email.includes('cardenaslopezgina')));
+  const [activeTab, setActiveTab] = useState(initialTab || (isRezagadosUser ? 'guia_rezagados' : 'tasks')); // 'tasks' | 'notes' | 'documents' | 'guia_rezagados'
   const [profileData, setProfileData] = useState({ notes: [], documents: [] });
   const [loadingMeta, setLoadingMeta] = useState(true);
 
@@ -223,6 +250,9 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
 
   useEffect(() => {
     if (user && isOpen) {
+      if (initialTab) {
+        setActiveTab(initialTab);
+      }
       setRoleDraft(normalizeRole(user.role) || '');
       setRolesDraft(Array.from(new Set([
         normalizeRole(user.role), ...(Array.isArray(user.roles) ? user.roles.map(normalizeRole) : [])
@@ -232,7 +262,7 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
       setBirthdayDraft(user.cumpleanos || '');
       setQuitoTeamsDraft(Array.isArray(user.equiposQuito) ? user.equiposQuito : []);
     }
-  }, [user, isOpen]);
+  }, [user, isOpen, initialTab]);
 
   // (14/09/2026) Equipo(s) de Quito (editable por la propia persona, o por Super
   // Admin) -- se guarda en users/{id}.equiposQuito. Ver CyclesContext.jsx para el
@@ -333,8 +363,16 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
   const userTasks = useMemo(() => {
     if (!user) return [];
     const raw = allTasks.filter(t => {
-      const isAssigned = (t.assignedToEmails && t.assignedToEmails.some(e => e.toLowerCase() === user.email?.toLowerCase())) || (t.assignedToEmail && t.assignedToEmail.toLowerCase() === user.email?.toLowerCase());
-      const isCollab = t.collaborators && t.collaborators.includes(user.email);
+      const userEmails = [
+        user.email,
+        user.corporateEmail,
+        user.personalEmail,
+        ...(Array.isArray(user.emails) ? user.emails : [])
+      ].map(e => (e || '').toLowerCase().trim()).filter(Boolean);
+
+      const isAssigned = (t.assignedToEmails && t.assignedToEmails.some(e => userEmails.includes((e || '').toLowerCase().trim()))) ||
+                         (t.assignedToEmail && userEmails.includes((t.assignedToEmail || '').toLowerCase().trim()));
+      const isCollab = t.collaborators && t.collaborators.some(c => userEmails.includes((c || '').toLowerCase().trim()));
       
       if (isAssigned || isCollab) {
         // Regla de Privacidad: Si yo (currentUser) soy gerente/director y estoy viendo el perfil de otro gerente/director
@@ -396,6 +434,33 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
       return (a.task || a.title || '').localeCompare(b.task || b.title || '');
     });
   }, [allTasks, user, currentUser, canonicalRole, currentCycle, taskSortOrder]);
+
+  const overdueAlertTasks = useMemo(() => {
+    const emails = [
+      user?.email,
+      user?.corporateEmail,
+      user?.personalEmail,
+      ...(Array.isArray(user?.emails) ? user?.emails : [])
+    ].map(e => (e || '').toLowerCase().trim()).filter(Boolean);
+    const seen = new Set();
+    const list = [];
+    emails.forEach(em => {
+      getOverdueAssignedTasks(allTasks, em, Date.now(), {
+        sede: user?.sede,
+        cycleId: currentCycle?.id,
+        cycleIds: quitoCycles.map(qc => qc?.cycle?.id)
+      }).forEach(t => {
+        const id = t.id || t.title || t.name;
+        // Nunca alertar una tarea que la matriz ya muestra como completada.
+        if (isTaskCompleted(t, user?.sede)) return;
+        if (!seen.has(id)) {
+          seen.add(id);
+          list.push(t);
+        }
+      });
+    });
+    return list;
+  }, [allTasks, user?.email, user?.corporateEmail, user?.personalEmail, user?.emails, user?.sede, currentCycle?.id, quitoCycles, localTaskOverrides]);
 
   const completedTasks = useMemo(() => {
     if (!user) return [];
@@ -801,27 +866,32 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
       <div style={{
         position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
         backgroundColor: 'rgba(5, 10, 25, 0.85)', backdropFilter: 'blur(8px)',
-        zIndex: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem'
+        zIndex: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem',
+        boxSizing: 'border-box', overflowY: 'auto'
       }}>
-        <div className="glass-panel" style={{
-          width: '100%', maxWidth: '850px', maxHeight: '90vh', display: 'flex', flexDirection: 'column',
+        <div className="glass-panel" role="dialog" aria-label={`Perfil de ${user.name}`} tabIndex={0} style={{
+          width: '100%', maxWidth: '850px', maxHeight: 'calc(100dvh - 2rem)', boxSizing: 'border-box',
           position: 'relative', border: `1px solid ${roleColor}40`, boxShadow: `0 10px 40px rgba(0,0,0,0.8), 0 0 20px ${roleColor}20`,
-          borderRadius: '16px', overflow: 'hidden'
+          borderRadius: '16px', overflowY: 'auto', overscrollBehavior: 'contain'
         }}>
-          {/* Close button */}
-          <button 
-            onClick={onClose}
-            style={{
-              position: 'absolute', top: '1.2rem', right: '1.2rem', background: 'rgba(255,255,255,0.08)',
-              border: 'none', color: '#fff', borderRadius: '50%', width: '36px', height: '36px',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10,
-              transition: 'background 0.2s'
-            }}
-            onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
-            onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
-          >
-            <X size={20} />
-          </button>
+          {/* Keep the close button visible while the entire profile scrolls. */}
+          <div style={{ position: 'sticky', top: 0, height: 0, zIndex: 10 }}>
+            <button
+              type="button"
+              aria-label="Cerrar perfil"
+              onClick={onClose}
+              style={{
+                position: 'absolute', top: '1.2rem', right: '1.2rem', background: 'rgba(255,255,255,0.08)',
+                border: 'none', color: '#fff', borderRadius: '50%', width: '36px', height: '36px',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 10,
+                transition: 'background 0.2s'
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
+            >
+              <X size={20} />
+            </button>
+          </div>
 
           {/* User Header Profile Card */}
           <div style={{
@@ -1449,8 +1519,64 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
               </div>
             )}
 
+            {/* Ficha Nodus DB para Coordinación Junior / Gina Cárdenas */}
+            {(user?.nodusUser || user?.role === 'coord_jr' || user?.appRole === 'coord_jr' || (user?.email && (user.email.includes('cardenasgina29') || user.email.includes('cardenaslopezgina')))) && (
+              <div style={{
+                marginTop: '1rem',
+                padding: '0.9rem 1.1rem',
+                borderRadius: '12px',
+                background: 'linear-gradient(135deg, rgba(2, 132, 199, 0.12), rgba(6, 182, 212, 0.08))',
+                border: '1px solid rgba(6, 182, 212, 0.35)',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 800, fontSize: '0.92rem', color: '#38bdf8' }}>
+                    <Database size={18} color="#06b6d4" /> Credenciales y Ficha Nodus DB · Coordinación Junior Rezagados C1
+                  </div>
+                  <a
+                    href="https://imo.crearpslglobal.com/reporterezagados"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      background: 'linear-gradient(45deg, #0284c7, #06b6d4)',
+                      color: '#ffffff',
+                      padding: '0.35rem 0.85rem',
+                      borderRadius: '6px',
+                      textDecoration: 'none',
+                      fontWeight: 'bold',
+                      fontSize: '0.78rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.4rem',
+                      boxShadow: '0 2px 8px rgba(6, 182, 212, 0.3)'
+                    }}
+                  >
+                    <ExternalLink size={14} /> Abrir Nodus Rezagados
+                  </a>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.6rem', fontSize: '0.82rem' }}>
+                  <div style={{ background: 'rgba(0,0,0,0.25)', padding: '0.4rem 0.7rem', borderRadius: '6px' }}>
+                    <span style={{ color: 'var(--text-muted)' }}>Usuario Nodus:</span>{' '}
+                    <strong style={{ color: '#f59e0b', fontFamily: 'monospace' }}>{user.nodusUser || 'GCARDENAS'}</strong>
+                  </div>
+                  <div style={{ background: 'rgba(0,0,0,0.25)', padding: '0.4rem 0.7rem', borderRadius: '6px' }}>
+                    <span style={{ color: 'var(--text-muted)' }}>Contraseña:</span>{' '}
+                    <strong style={{ color: '#10b981', fontFamily: 'monospace' }}>{user.nodusPassword || 'nolaolvidare'}</strong>
+                  </div>
+                  <div style={{ background: 'rgba(0,0,0,0.25)', padding: '0.4rem 0.7rem', borderRadius: '6px' }}>
+                    <span style={{ color: 'var(--text-muted)' }}>Sede Nodus:</span>{' '}
+                    <strong style={{ color: '#38bdf8' }}>{user.nodusSede || 'LIMA CICLO 1'}</strong>
+                  </div>
+                  <div style={{ background: 'rgba(0,0,0,0.25)', padding: '0.4rem 0.7rem', borderRadius: '6px' }}>
+                    <span style={{ color: 'var(--text-muted)' }}>Módulo Asignado:</span>{' '}
+                    <strong style={{ color: '#a855f7' }}>Rezagados C1 & QT</strong>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Navigation Tabs */}
-            <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1.2rem' }}>
+            <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1.2rem', flexWrap: 'wrap' }}>
               <button 
                 onClick={() => setActiveTab('tasks')}
                 style={{
@@ -1489,11 +1615,40 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
               >
                 <Link2 size={16} /> Documentos y Enlaces ({profileData.documents.length})
               </button>
+
+              {(activeTab === 'guia_rezagados' || isRezagadosUser || user?.nodusUser || currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.appRole === 'direccion' || currentUser?.appRole === 'gerente' || currentUser?.appRole === 'coord_c1' || currentUser?.appRole === 'coordinador_c1c2' || currentUser?.appRole === 'coord_c2' || currentUser?.appRole === 'qt') && (
+                <button 
+                  onClick={() => setActiveTab('guia_rezagados')}
+                  style={{
+                    padding: '0.5rem 1rem', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                    fontSize: '0.85rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.4rem',
+                    background: activeTab === 'guia_rezagados' ? 'linear-gradient(45deg, #0284c7, #06b6d4)' : 'rgba(255,255,255,0.05)',
+                    color: activeTab === 'guia_rezagados' ? '#fff' : 'var(--text-muted)',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  <PhoneCall size={16} /> Guía de Llamadas C1
+                </button>
+              )}
             </div>
           </div>
 
-          {/* Modal Body with scroll */}
-          <div style={{ padding: '1.5rem 2rem', overflowY: 'auto', flex: 1 }}>
+          {/* Modal Body */}
+          <div style={{ padding: '1.5rem 2rem' }}>
+
+            {overdueAlertTasks.length > 0 && (
+              <div role="alert" style={{ marginBottom: '1rem', padding: '1rem 1.1rem', borderRadius: '10px', background: 'linear-gradient(135deg, #b91c1c, #c2410c)', border: '3px solid #fecaca', borderLeft: '10px solid #fde047', boxShadow: '0 0 0 1px #7f1d1d, 0 4px 14px rgba(220,38,38,0.45)', color: '#ffffff' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 800, fontSize: '1.05rem', color: '#ffffff' }}>
+                  <AlertTriangle size={20} aria-hidden="true" />
+                  {overdueAlertTasks.length === 1
+                    ? '1 tarea vencida hace más de 72 horas'
+                    : `${overdueAlertTasks.length} tareas vencidas hace más de 72 horas`}
+                </div>
+                <ul style={{ margin: '0.5rem 0 0', paddingLeft: '1.2rem', fontSize: '0.9rem', fontWeight: 600, color: '#fff' }}>
+                  {overdueAlertTasks.map(t => <li key={t.id || getTaskDisplayName(t)}>{getTaskDisplayName(t)}</li>)}
+                </ul>
+              </div>
+            )}
 
             {/* TAB 1: TASKS */}
             {activeTab === 'tasks' && (
@@ -1727,7 +1882,7 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
                             <input 
                               type="checkbox"
                               checked={isCompleted}
-                              onChange={() => toggleTask(task.id, isCompleted)}
+                              onChange={() => handleToggleTaskOptimistic(task, isCompleted)}
                               style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: 'var(--crear-gold)' }}
                             />
                             <div style={{ flex: 1 }}>
@@ -1967,6 +2122,242 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
                     ))}
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* TAB 4: GUÍA DE LLAMADAS Y RESCATE DE REZAGADOS C1 */}
+            {activeTab === 'guia_rezagados' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+                <div style={{
+                  background: 'linear-gradient(135deg, rgba(2, 132, 199, 0.15), rgba(15, 23, 42, 0.6))',
+                  border: '1px solid rgba(6, 182, 212, 0.4)',
+                  borderRadius: '12px',
+                  padding: '1.2rem',
+                  color: '#f8fafc'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.8rem', marginBottom: '0.8rem' }}>
+                    <div>
+                      <h3 style={{ margin: 0, color: '#38bdf8', fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <BookOpen size={22} color="#06b6d4" /> Guía Oficial de Llamadas de C1: Gestión de Rezagados & Marco de Ética Operativa
+                      </h3>
+                      <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.85rem', color: '#94a3b8' }}>
+                        Protocolo estandarizado de reconfirmación de asistencia, alternativas de reprogramación y cumplimiento legal (Ley 29571 Código del Consumidor, Ley 29733 & D.S. 016-2024-JUS Protección de Datos).
+                      </p>
+                    </div>
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <button
+                        onClick={() => navigate('/vende-sin-vender')}
+                        style={{
+                          background: 'rgba(255,255,255,0.08)',
+                          color: '#38bdf8',
+                          border: '1px solid rgba(56, 189, 248, 0.3)',
+                          padding: '0.4rem 0.8rem',
+                          borderRadius: '6px',
+                          fontSize: '0.8rem',
+                          fontWeight: 'bold',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.3rem'
+                        }}
+                      >
+                        <BookOpen size={14} /> Libro Vende Sin Vender
+                      </button>
+                      <a
+                        href="https://imo.crearpslglobal.com/reporterezagados"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          background: 'linear-gradient(45deg, #0284c7, #06b6d4)',
+                          color: '#fff',
+                          padding: '0.4rem 0.8rem',
+                          borderRadius: '6px',
+                          fontSize: '0.8rem',
+                          fontWeight: 'bold',
+                          textDecoration: 'none',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.3rem'
+                        }}
+                      >
+                        <ExternalLink size={14} /> Panel Rezagados Nodus
+                      </a>
+                    </div>
+                  </div>
+
+                  {/* SECCIÓN DE CUMPLIMIENTO LEGAL Y DERECHOS DEL CONSUMIDOR */}
+                  <div style={{ background: 'rgba(15, 23, 42, 0.7)', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '8px', padding: '0.9rem', marginBottom: '1rem' }}>
+                    <strong style={{ color: '#f59e0b', fontSize: '0.88rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                      ⚖️ Marco de Cumplimiento Legal y Derechos del Consumidor (Perú & Sedes Internacionales)
+                    </strong>
+                    <ul style={{ margin: '0.5rem 0 0 1.2rem', padding: 0, fontSize: '0.78rem', color: '#cbd5e1', lineHeight: '1.5' }}>
+                      <li><strong>Atención de Reclamaciones:</strong> Ningún coordinador autoriza o promete reembolsos por teléfono. Toda solicitud formal de reembolso se deriva de inmediato al área de Atención al Cliente / Legal a través del canal oficial (Libro de Reclamaciones físico o virtual según Ley 29571).</li>
+                      <li><strong>Límites de Reencuadre (Métodos No Coercitivos):</strong> Permite un máximo de dos (2) intentos de reencuadre positivo. Si el participante mantiene su decisión negativa, se registra su estado, se le entregan las alternativas escritas por WhatsApp y se agradece su tiempo sin insistencia ni presión.</li>
+                      <li><strong>Protección de Datos Personales (Ley 29733 & D.S. 016-2024-JUS):</strong> Principio de Minimización. Registrar únicamente datos estrictamente necesarios: Estado, Fecha, Sede, Canal y Próxima Acción. Prohibido registrar o compartir diagnósticos psicológicos, opiniones personales o detalles de salud sensible en chats operativos.</li>
+                      <li><strong>Separación de Procesos:</strong> La gestión de rezagados es un servicio de reconfirmación y acompañamiento para clientes con compra completada; no se mezcla con prospección o telemercadeo sin consentimiento previo expreso.</li>
+                    </ul>
+                  </div>
+
+                  {/* PROTOCOLO EN 4 FASES REAJUSTADO */}
+                  <h4 style={{ color: 'var(--crear-gold)', margin: '0.8rem 0 0.5rem 0', fontSize: '1rem', borderBottom: '1px solid rgba(255,215,0,0.2)', paddingBottom: '0.3rem' }}>
+                    📞 Protocolo Operativo de Reconfirmación en 4 Fases
+                  </h4>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.8rem', marginTop: '0.8rem' }}>
+                    <div style={{ background: 'rgba(0,0,0,0.3)', padding: '0.8rem', borderRadius: '8px', borderLeft: '3px solid #38bdf8' }}>
+                      <strong style={{ color: '#38bdf8', fontSize: '0.85rem' }}>1. Verificación & Estado del Cupo</strong>
+                      <p style={{ margin: '0.3rem 0 0 0', fontSize: '0.78rem', color: '#cbd5e1', lineHeight: '1.4' }}>
+                        Verifica la identidad del participante, reconfirma la validez activa de su cupo y su valor de inversión sin asumir juicios personales.
+                      </p>
+                    </div>
+                    <div style={{ background: 'rgba(0,0,0,0.3)', padding: '0.8rem', borderRadius: '8px', borderLeft: '3px solid #f59e0b' }}>
+                      <strong style={{ color: '#f59e0b', fontSize: '0.85rem' }}>2. Exploración Empática de Disponibilidad</strong>
+                      <p style={{ margin: '0.3rem 0 0 0', fontSize: '0.78rem', color: '#cbd5e1', lineHeight: '1.4' }}>
+                        Escucha la situación actual de agenda, trabajo o entorno con empatía y ofrece las alternativas de fechas y reprogramación vigentes.
+                      </p>
+                    </div>
+                    <div style={{ background: 'rgba(0,0,0,0.3)', padding: '0.8rem', borderRadius: '8px', borderLeft: '3px solid #a855f7' }}>
+                      <strong style={{ color: '#a855f7', fontSize: '0.85rem' }}>3. Ofrecimiento de Alternativas (Máx. 2 intentos)</strong>
+                      <p style={{ margin: '0.3rem 0 0 0', fontSize: '0.78rem', color: '#cbd5e1', lineHeight: '1.4' }}>
+                        Si hay dudas o cruce de horarios, ofrece opciones de convocatoria siguiente o transferencia de cupo. Respeta su autonomía si mantiene su negativa.
+                      </p>
+                    </div>
+                    <div style={{ background: 'rgba(0,0,0,0.3)', padding: '0.8rem', borderRadius: '8px', borderLeft: '3px solid #10b981' }}>
+                      <strong style={{ color: '#10b981', fontSize: '0.85rem' }}>4. Confirmación, Registro & Derivación</strong>
+                      <p style={{ margin: '0.3rem 0 0 0', fontSize: '0.78rem', color: '#cbd5e1', lineHeight: '1.4' }}>
+                        Fija fecha o próximo contacto por escrito, registra en Causa OS / Nodus DB (&lt;3 min) y deriva solicitudes formales al área Legal/Atención.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* GUIONES ÉTICOS Y RUTAS DE MANEJO LEGAL DE SITUACIONES Y OBJECIONES */}
+                <h4 style={{ color: '#ffffff', margin: '0.5rem 0 0 0', fontSize: '1.05rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <HelpCircle size={18} color="#06b6d4" /> Guiones Adaptados: Solución de Objeciones y Canal Formal de Reclamos
+                </h4>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                  {[
+                    {
+                      key: 'ruta_reclamo_reembolso',
+                      title: 'Ruta 1: Solicitud de Reembolso / Devolución Monetaria',
+                      color: '#f59e0b',
+                      badge: 'Protocolo Legal & Derivación a Canal Oficial',
+                      script: `Entiendo tu solicitud, [Nombre]. Tu cupo permanece activo y podemos revisar opciones de reubicación o transferencia de fecha según la política vigente. Si deseas presentar un reclamo formal sobre tu compra, lo registro de inmediato y lo derivo al área de Atención al Cliente/Legal, quienes te responderán por el canal oficial dentro del plazo establecido.`
+                    },
+                    {
+                      key: 'ruta_tiempo_trabajo',
+                      title: 'Ruta 2: Objeción de Tiempo / Trabajo / Horarios',
+                      color: '#38bdf8',
+                      badge: 'Confirmación de Disponibilidad Real & Alternativas',
+                      script: `Te entiendo, [Nombre]. Tu cupo sigue activo y queremos ayudarte a usarlo. Si esta fecha no es viable por tu trabajo o agenda, podemos revisar la siguiente convocatoria disponible o evaluar una transferencia según la política. ¿Cuál de estas opciones te funciona mejor?`
+                    },
+                    {
+                      key: 'ruta_indecision',
+                      title: 'Ruta 3: Incertidumbre ("No sé") / Revisión Personal',
+                      color: '#a855f7',
+                      badge: 'Acompañamiento sin Presión & Autonomía',
+                      script: `No hay problema, [Nombre]. No necesito que decidas bajo presión. Te puedo enviar por WhatsApp las fechas disponibles, la sede y los requisitos. Si prefieres revisarlo con calma, te contacto nuevamente el [Día/Fecha]. ¿Te parece?`
+                    },
+                    {
+                      key: 'ruta_familia_entorno',
+                      title: 'Ruta 4: Situación Familiar / Pareja / Entorno',
+                      color: '#ec4899',
+                      badge: 'Ecología Familiar & Comunicación Transparente',
+                      script: `Comprendo que desees conversarlo con tu familia, [Nombre]. Tu entrenamiento está diseñado para sumar valor positivo a tu entorno. Te envío por escrito la información resumida para que puedan revisarla juntos y te vuelvo a llamar el [Día] para coordinar.`
+                    },
+                    {
+                      key: 'ruta_no_contesta',
+                      title: 'Ruta 5: Protocolo para No Contesta / Secuencia WhatsApp',
+                      color: '#06b6d4',
+                      badge: 'Seguimiento Profesional por WhatsApp / Mensajería',
+                      script: `Hola [Nombre], te saluda Gina Cárdenas de CREAR PSL LIMA. Te escribo para reconfirmar las opciones disponibles para la asistencia a tu entrenamiento C1. Por favor respóndeme este mensaje cuando tengas un momento para enviarte la información completa. ¡Estamos atentos a ti!`
+                    }
+                  ].map((route) => (
+                    <div
+                      key={route.key}
+                      style={{
+                        background: 'rgba(255,255,255,0.03)',
+                        border: `1px solid ${route.color}40`,
+                        borderLeft: `5px solid ${route.color}`,
+                        borderRadius: '10px',
+                        padding: '1rem',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '0.6rem'
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+                        <div>
+                          <strong style={{ color: '#ffffff', fontSize: '0.95rem' }}>{route.title}</strong>
+                          <span style={{ marginLeft: '0.6rem', background: `${route.color}20`, color: route.color, border: `1px solid ${route.color}40`, padding: '0.15rem 0.5rem', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 'bold' }}>
+                            {route.badge}
+                          </span>
+                        </div>
+                        <button
+                          onClick={() => {
+                            navigator.clipboard.writeText(route.script);
+                            setCopiedScriptKey(route.key);
+                            showToast('Guión copiado al portapapeles', 'success');
+                            setTimeout(() => setCopiedScriptKey(null), 2500);
+                          }}
+                          style={{
+                            background: copiedScriptKey === route.key ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255,255,255,0.06)',
+                            color: copiedScriptKey === route.key ? '#10b981' : 'var(--text-muted)',
+                            border: `1px solid ${copiedScriptKey === route.key ? '#10b981' : 'rgba(255,255,255,0.15)'}`,
+                            padding: '0.3rem 0.7rem',
+                            borderRadius: '6px',
+                            fontSize: '0.78rem',
+                            fontWeight: 'bold',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.3rem',
+                            transition: 'all 0.2s'
+                          }}
+                        >
+                          {copiedScriptKey === route.key ? <Check size={14} /> : <Copy size={14} />}
+                          {copiedScriptKey === route.key ? '¡Copiado!' : 'Copiar Guión'}
+                        </button>
+                      </div>
+                      <div style={{ background: 'rgba(0,0,0,0.3)', padding: '0.8rem', borderRadius: '6px', fontSize: '0.84rem', color: '#e2e8f0', lineHeight: '1.5', fontFamily: 'sans-serif', borderLeft: '2px solid rgba(255,255,255,0.1)' }}>
+                        "{route.script}"
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* MATRIZ DE KPIS REAJUSTADOS Y RECOMENDADOS */}
+                <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', padding: '1rem', marginTop: '0.5rem' }}>
+                  <h4 style={{ color: '#38bdf8', margin: '0 0 0.8rem 0', fontSize: '0.98rem' }}>
+                    📊 Matriz de KPIs Reajustados para Coordinación de Rezagados
+                  </h4>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.8rem' }}>
+                    <div style={{ background: 'rgba(0,0,0,0.2)', padding: '0.7rem', borderRadius: '6px' }}>
+                      <span style={{ fontSize: '0.72rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 'bold' }}>Contacto Efectivo</span>
+                      <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.85rem', color: '#f8fafc', fontWeight: 'bold' }}>
+                        % de Base contactada con estado actualizado y próxima acción definida.
+                      </p>
+                    </div>
+                    <div style={{ background: 'rgba(0,0,0,0.2)', padding: '0.7rem', borderRadius: '6px' }}>
+                      <span style={{ fontSize: '0.72rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 'bold' }}>Canal Formal de Reclamación</span>
+                      <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.85rem', color: '#f8fafc', fontWeight: 'bold' }}>
+                        100% de solicitudes de reembolso derivadas y registradas en &lt; 24h ante Legal/Atención.
+                      </p>
+                    </div>
+                    <div style={{ background: 'rgba(0,0,0,0.2)', padding: '0.7rem', borderRadius: '6px' }}>
+                      <span style={{ fontSize: '0.72rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 'bold' }}>Registro Ágil & Minimización</span>
+                      <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.78rem', color: '#f8fafc', fontWeight: 'bold' }}>
+                        Registro en Causa OS &lt; 3 minutos con campos mínimos (sin datos sensibles).
+                      </p>
+                    </div>
+                    <div style={{ background: 'rgba(0,0,0,0.2)', padding: '0.7rem', borderRadius: '6px' }}>
+                      <span style={{ fontSize: '0.72rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 'bold' }}>Consentimiento de Captación</span>
+                      <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.78rem', color: '#f8fafc', fontWeight: 'bold' }}>
+                        Reconfirmaciones de rezagados separadas de captación con consentimiento explícito.
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
 

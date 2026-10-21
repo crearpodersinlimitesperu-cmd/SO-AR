@@ -19,6 +19,15 @@ export const normalizarTexto = (texto = '') => {
     .trim();
 };
 
+// Convierte la clave sede|equipo en "Sede · EQUIPO n" para mostrarla.
+export const etiquetaEquipo = (filtroEquipo, participantes = []) => {
+  if (!filtroEquipo || filtroEquipo === 'Todos' || !String(filtroEquipo).includes('|')) return filtroEquipo;
+  const p = participantes.find((x) => equipoKeyDe(x) === filtroEquipo);
+  return p ? `${p.sede} · ${p.equipo}` : filtroEquipo;
+};
+
+export const equipoKeyDe = (p = {}) => `${normalizarTexto(p.sede || 'sin sede')}|${normalizarTexto(p.equipo || 'sin equipo')}`;
+
 /**
  * Motor principal de diagnóstico del Agente IA
  */
@@ -33,7 +42,13 @@ export function ejecutarDiagnosticoFIs(
   // personas con asistencia PFD explícitamente confirmada. Si la fuente no
   // entrega esa señal, no se inventa una conclusión con datos ambiguos.
   const universoPfd = (Array.isArray(todosParticipantes) ? todosParticipantes : [])
-    .filter((participante) => participante?.asistioPFD === true);
+    .filter((participante) => {
+      if (participante?.asistioPFD !== true) return false;
+      // Directiva de Gobernanza: Segregar y aislar equipos de soporte/aliados (ej. Equipo 1000)
+      const eqNorm = (participante.equipo || '').toLowerCase();
+      if (eqNorm.includes('equipo 1000') || eqNorm.includes('1000')) return false;
+      return true;
+    });
 
   // 1. Filtrado por Sede
   let participantesEnSede = universoPfd;
@@ -51,10 +66,13 @@ export function ejecutarDiagnosticoFIs(
     const dev = p.devueltos || 0;
     const apr = p.aprobados || 0;
 
-    const eqKey = p.equipo || 'Sin Equipo';
+    const eqNombre = p.equipo || 'Sin Equipo';
+    const eqKey = equipoKeyDe(p);
     if (!equiposMap[eqKey]) {
       equiposMap[eqKey] = {
-        equipo: eqKey,
+        key: eqKey,
+        sede: p.sede || 'Sin sede',
+        equipo: eqNombre,
         total: 0,
         sinEntrega: 0,
         conEntrega: 0,
@@ -71,6 +89,17 @@ export function ejecutarDiagnosticoFIs(
     equiposMap[eqKey].aprobados += apr;
   });
 
+  // Orden jerárquico canónico por Sede institucional
+  const SEDE_ORDER = {
+    'lima': 1,
+    'quito': 2,
+    'guayaquil': 3,
+    'cuenca': 4,
+    'medellin': 5,
+    'medellín': 5,
+    'cdmx': 6
+  };
+
   // Calcular semáforo de equipos de la sede
   const equiposList = Object.values(equiposMap).map(eq => {
     const pctEntrega = eq.total > 0 ? Math.round((eq.conEntrega / eq.total) * 100) : 0;
@@ -83,6 +112,12 @@ export function ejecutarDiagnosticoFIs(
       semaforo
     };
   }).sort((a, b) => {
+    // Si estamos en vista GLOBAL, agrupar primero coherentemente por Sede
+    if (esFiltroGlobal) {
+      const orderA = SEDE_ORDER[normalizarTexto(a.sede)] || 99;
+      const orderB = SEDE_ORDER[normalizarTexto(b.sede)] || 99;
+      if (orderA !== orderB) return orderA - orderB;
+    }
     const numA = parseInt((a.equipo || '').replace(/\D/g, ''), 10) || 0;
     const numB = parseInt((b.equipo || '').replace(/\D/g, ''), 10) || 0;
     return numA - numB || b.pctEntrega - a.pctEntrega;
@@ -91,7 +126,10 @@ export function ejecutarDiagnosticoFIs(
   // 3. Aplicar filtro de equipo a los participantes
   let filtrados = participantesEnSede;
   if (filtroEquipo && filtroEquipo !== 'Todos') {
-    filtrados = filtrados.filter(p => (p.equipo || '').toUpperCase().includes(filtroEquipo.toUpperCase()));
+    // Empareja por sede+equipo: el mismo código puede existir en varias sedes.
+    filtrados = filtrados.filter(p => String(filtroEquipo).includes('|')
+      ? equipoKeyDe(p) === filtroEquipo
+      : (p.equipo || '').toUpperCase().includes(filtroEquipo.toUpperCase()));
   }
 
   // 4. Filtrado por estado de FIs
@@ -174,7 +212,7 @@ export function ejecutarDiagnosticoFIs(
   };
 
   // 6. Generar dictamen de inteligencia artificial
-  const dictamenIA = generarDictamenEjecutivoIA(metricas, filtroSede, filtroEquipo);
+  const dictamenIA = generarDictamenEjecutivoIA(metricas, filtroSede, etiquetaEquipo(filtroEquipo, universoPfd));
 
   return {
     participantes: filtrados,
