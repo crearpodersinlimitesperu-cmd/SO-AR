@@ -1,5 +1,32 @@
 # Carga inicial de Causa OS
 
+## Resultados tardios durante cambios de sesion
+
+El observer de Auth invalida ahora cada verificacion anterior al recibir otro
+estado de sesion o desmontarse el provider. Una lectura lenta de perfil o roles
+ya no puede restaurar una sesion cerrada, reemplazar una sesion posterior ni
+borrarla por un error tardio. El gate vuelve a cerrarse mientras se verifica el
+nuevo estado; solo la verificacion vigente puede liberarlo. Tambien se limpia
+el estado de simulacion en memoria al cambiar la sesion autenticada.
+
+`tests/auth-session-race.test.mjs` ejecuta el effect real con Auth, Firestore,
+storage y setters simulados, usando solo fixtures `example.invalid` y promesas
+controladas. Cubre cierre durante busqueda de users/staff, roles, lectura propia
+y persistencia inicial, resultados fuera de orden, error obsoleto mientras la
+sesion nueva espera, desmontaje y fallo vigente con aviso generico.
+
+No se cancelan operaciones del SDK ya enviadas: una escritura de perfil iniciada
+antes del cambio puede finalizar, pero su resultado no publica sesion ni auditoria
+de acceso. No cambian consultas, matriz RBAC, normalizacion de roles, calendarios,
+reintentos del SDK ni plazos de timeout. Este cambio protege el observer de sesion
+persistida; no unifica el flujo paralelo del popup de login. No prueba ni resuelve
+un incidente individual. Las esperas sin respuesta siguen requiriendo evidencia
+de la fase afectada y una politica explicita antes de introducir timeouts.
+
+```sh
+node --test tests/auth-session-race.test.mjs tests/auth-startup-latency.test.mjs tests/auth-startup-critical-path.test.mjs
+```
+
 ## Sesion autenticada: segunda optimizacion posterior a PR #145
 
 La base de comparacion es `d1c07eaa128038df90d6a5db0a1c6b2a39b824f9`.

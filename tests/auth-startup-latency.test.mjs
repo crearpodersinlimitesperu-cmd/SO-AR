@@ -39,8 +39,8 @@ function loadAgent() {
     await delay(RTT);
     inFlight -= 1;
     const rows = name === 'managers_directory'
-      ? [{ nombre: 'Ana Perez', email: 'ana@crearpsl.net', sede: 'Lima', rol: 'manager' }]
-      : [{ nombre: 'Ana Perez', email: 'ana@crearpsl.net', sede: 'Lima' }];
+      ? [{ nombre: 'Synthetic Fixture', email: 'access-fixture@example.invalid', sede: 'Synthetic Site', rol: 'manager' }]
+      : [{ nombre: 'Synthetic Fixture', email: 'access-fixture@example.invalid', sede: 'Synthetic Site' }];
     return { forEach: (cb) => rows.forEach((data) => cb({ data: () => data })) };
   };
   const agent = new Function('db', 'getDocs', 'collection', 'findUserByAnyEmail', 'normalizeRole', 'DUAL_ROLE_TRAINER_EMAILS', 'console',
@@ -53,7 +53,7 @@ function loadAgent() {
 test('role directories are fetched in parallel and still produce the same roles', async () => {
   const { agent, stats } = loadAgent();
   const t0 = performance.now();
-  const roles = await agent({ email: 'ana@crearpsl.net', displayName: 'Ana Perez' }, ['colaborador']);
+  const roles = await agent({ email: 'access-fixture@example.invalid', displayName: 'Synthetic Fixture' }, ['colaborador']);
   const elapsed = performance.now() - t0;
   assert.equal(stats().maxInFlight, 2);
   assert.ok(elapsed < RTT * 1.8, `agent took ${elapsed.toFixed(0)}ms, expected ~1 RTT`);
@@ -63,7 +63,7 @@ test('role directories are fetched in parallel and still produce the same roles'
 test('existing profile: metadata write does not block startup but is still sent', async () => {
   const { saveSelfProfile, writes } = loadSaveSelfProfile({ exists: true, writeMs: RTT * 5 });
   const t0 = performance.now();
-  await saveSelfProfile({ uid: 'u1', displayName: 'Ana' }, { name: 'Ana' }, 'ana@crearpsl.net');
+  await saveSelfProfile({ uid: 'u1', displayName: 'Synthetic Fixture' }, { name: 'Synthetic Fixture' }, 'access-fixture@example.invalid');
   const elapsed = performance.now() - t0;
   assert.ok(elapsed < RTT * 2, `blocked ${elapsed.toFixed(0)}ms`);
   assert.equal(writes.length, 1);
@@ -75,7 +75,7 @@ test('existing profile: metadata write does not block startup but is still sent'
 
 test('first login: users/{uid} creation is still awaited before continuing', async () => {
   const { saveSelfProfile, writes } = loadSaveSelfProfile({ exists: false });
-  await saveSelfProfile({ uid: 'u1', displayName: 'Ana', providerData: [] }, { name: 'Ana' }, 'ana@crearpsl.net');
+  await saveSelfProfile({ uid: 'u1', displayName: 'Synthetic Fixture', providerData: [] }, { name: 'Synthetic Fixture' }, 'access-fixture@example.invalid');
   assert.equal(writes.length, 1);
   assert.equal(writes[0].settled, true);
   assert.equal(writes[0].payload.uid, 'u1');
@@ -83,7 +83,7 @@ test('first login: users/{uid} creation is still awaited before continuing', asy
 
 test('persisted session keeps verification order and does not await the daily audit', () => {
   const start = authSource.indexOf('onAuthStateChanged(auth, async');
-  const effect = authSource.slice(start, authSource.indexOf('return unsubscribe', start));
+  const effect = authSource.slice(start, authSource.indexOf('  }, []);', start));
   const order = [
     "startupTrace.measure('users-lookup'",
     'foundUser.isActive === false',
@@ -91,7 +91,7 @@ test('persisted session keeps verification order and does not await the daily au
     'saveSelfProfile(user, canonicalUser, normalizedEmail, profileResult.snapshot)',
     'setCurrentUser(userObj)',
     'recordAuditEvent({',
-    'setLoading(false);\n      }'
+    'startupTrace.finish()'
   ].map((needle) => {
     const index = effect.indexOf(needle);
     assert.notEqual(index, -1, needle);
