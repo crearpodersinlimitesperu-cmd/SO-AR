@@ -1,6 +1,27 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { applyCycleCompletion, createCycleCompletion, getEffectiveCompletion, getNextCompletionState, getTaskProgress, isCompletionTransition } from './taskLifecycle.js';
+import { applyCycleCompletion, createCycleCompletion, getEffectiveCompletion, getNextCompletionState, getTaskProgress, isCompletionTransition, resolveTaskCycleScope } from './taskLifecycle.js';
+
+test('catalog writes require a non-empty cycle ID and sede, including omitted scope', () => {
+  for (const cycle of [undefined, null, {}, { name: 'Sin Equipo Activo' }, { id: '' }, { id: '  ' }, { id: 7 }]) {
+    assert.throws(() => resolveTaskCycleScope({}, { catalogTask: true, sede: 'Lima', cycle }), /Espera a que cargue el ciclo/);
+  }
+  assert.throws(() => resolveTaskCycleScope({}, { catalogTask: true }), /Espera a que cargue el ciclo/);
+  const cycle = { id: 'synthetic-cycle', name: 'Fixture' };
+  assert.throws(() => resolveTaskCycleScope({}, { catalogTask: true, sede: ' ', cycle }), /Espera a que cargue el ciclo/);
+  assert.deepEqual(resolveTaskCycleScope({}, { catalogTask: true, sede: 'Lima', cycle }), { sede: 'Lima', cycle });
+});
+
+test('personal and directly assigned tasks do not require a cycle even with catalog IDs', () => {
+  assert.equal(resolveTaskCycleScope({}), null);
+  for (const task of [{ isCustom: true }, { assignedToEmail: 'fixture@example.test' }, { assignedToEmails: ['fixture@example.test'] }]) {
+    assert.equal(resolveTaskCycleScope(task, { catalogTask: true }), null);
+    assert.equal(resolveTaskCycleScope(task, {
+      catalogTask: true, sede: 'Lima', cycle: { id: 'unused' }
+    }), null);
+  }
+  assert.throws(() => resolveTaskCycleScope({ assignedToEmails: [] }, { catalogTask: true }), /ciclo/);
+});
 
 test('catalog tasks use the active cycle and never inherit legacy completion', () => {
   const task = {

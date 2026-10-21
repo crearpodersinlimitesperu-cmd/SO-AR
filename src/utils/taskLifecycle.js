@@ -1,3 +1,13 @@
+export function resolveTaskCycleScope(task, { catalogTask = false, sede, cycle } = {}) {
+  const hasDirectAssignees = Boolean(task?.assignedToEmail) ||
+    (Array.isArray(task?.assignedToEmails) && task.assignedToEmails.length > 0);
+  if (!catalogTask || task?.isCustom || hasDirectAssignees) return null;
+  if (!sede?.trim() || typeof cycle?.id !== 'string' || !cycle.id.trim()) {
+    throw new Error('Espera a que cargue el ciclo de la tarea antes de guardar los avances.');
+  }
+  return { sede, cycle };
+}
+
 export function getEffectiveCompletion(task, { sede, cycleId, cycleScoped = false } = {}) {
   if (cycleScoped) {
     const cycleCompletion = cycleId && sede
