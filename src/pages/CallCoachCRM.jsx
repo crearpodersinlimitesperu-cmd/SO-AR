@@ -16,18 +16,38 @@ export default function CallCoachCRM() {
   const [pipeline, setPipeline] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
   const [showLegacy, setShowLegacy] = useState(false);
+  const [reload, setReload] = useState(0);
 
   useEffect(() => {
+    let active = true;
     async function loadData() {
-      const p = await getManagersPipeline(currentUser?.sede);
-      const t = await getDualTasks(currentUser?.sede);
-      setPipeline(p);
-      setTasks(t);
-      setLoading(false);
+      setLoading(true);
+      setLoadError('');
+      try {
+        const [p, t] = await Promise.all([
+          getManagersPipeline(currentUser?.sede),
+          getDualTasks(currentUser?.sede),
+        ]);
+        if (active) {
+          setPipeline(p);
+          setTasks(t);
+        }
+      } catch (error) {
+        if (active) {
+          setPipeline([]);
+          setTasks([]);
+          setLoadError('No se pudieron cargar los datos del CRM. Reintenta la conexión.');
+          console.error('Error cargando CRM de llamadas:', error);
+        }
+      } finally {
+        if (active) setLoading(false);
+      }
     }
     loadData();
-  }, [currentUser]);
+    return () => { active = false; };
+  }, [currentUser, reload]);
 
   const handleSignoff = async (id) => {
     const success = await signoffDualTask(id, 'coach');
@@ -42,6 +62,15 @@ export default function CallCoachCRM() {
       <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-heading)', background: 'var(--bg-dark)', minHeight: '100vh' }}>
         <PhoneCall size={36} color="var(--crear-gold)" style={{ animation: 'bounce 1s infinite', marginBottom: '1rem' }} />
         <div style={{ fontSize: '1.2rem', fontWeight: 700 }}>Cargando Speed CRM de Seguimiento...</div>
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div role="alert" style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-heading)', background: 'var(--bg-dark)', minHeight: '100vh' }}>
+        <p>{loadError}</p>
+        <button type="button" onClick={() => setReload(value => value + 1)}>Reintentar</button>
       </div>
     );
   }
@@ -105,6 +134,9 @@ export default function CallCoachCRM() {
             </h2>
             
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
+              {pipeline.length === 0 && (
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>No hay managers registrados para esta sede.</p>
+              )}
               {otherManagers.map(m => (
                 <div key={m.id} style={{ background: 'var(--bg-dark-alt)', border: '1px solid var(--border-subtle)', padding: '1rem', borderRadius: '8px', position: 'relative', overflow: 'hidden' }}>
                   <div style={{ position: 'absolute', top: 0, left: 0, height: '4px', width: `${(m.sentados/m.meta)*100}%`, background: m.status === 'GREEN' ? '#10b981' : '#f59e0b', transition: 'width 0.5s ease' }} />
@@ -155,6 +187,9 @@ export default function CallCoachCRM() {
             </p>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {tasks.length === 0 && (
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>No hay tareas duales pendientes en esta sede.</p>
+              )}
               {tasks.map(t => (
                 <div key={t.id} style={{ background: 'var(--bg-dark-alt)', borderRadius: '8px', padding: '1rem', border: '1px solid var(--border-subtle)' }}>
                   <h3 style={{ fontSize: '0.95rem', margin: '0 0 4px 0', color: 'var(--text-heading)' }}>{t.title}</h3>

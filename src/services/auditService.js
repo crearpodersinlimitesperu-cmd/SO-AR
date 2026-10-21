@@ -2,15 +2,17 @@
 // Servicio Centralizado de Auditoría de Accesos Reales y Rastreo de Conexión de Usuarios
 
 import { db } from './firebase';
-import { collection, addDoc, getDocs, query, orderBy, limit, doc, setDoc, serverTimestamp, deleteDoc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, orderBy, limit, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 
 const LOCAL_CONNECTIONS_KEY = 'cpsl_user_connections';
 
 /**
  * Registra un evento de auditoría REAL en Cloud Firestore
  */
-export async function recordAuditEvent({ uid, email, name, role, sede, action, details = '', isSimulation = false, simulatedBy = null }) {
-  if (!email) return null;
+export async function recordAuditEvent({ email, name, role, sede, action, details = '', isSimulation = false, simulatedBy = null }) {
+  if (!email) {
+    return { ok: false, error: new Error('An email is required to record an audit event.') };
+  }
 
   const nowIso = new Date().toISOString();
   const activeSimTarget = typeof sessionStorage !== "undefined" ? sessionStorage.getItem("cpsl_simulated_target_email") : null;
@@ -31,15 +33,18 @@ export async function recordAuditEvent({ uid, email, name, role, sede, action, d
   };
 
   try {
-    // 1. Guardar log inmutable en Firestore
     await addDoc(collection(db, 'audit_logs'), {
       ...logEntry,
       timestamp: serverTimestamp(),
       createdAtIso: nowIso
     });
+  } catch (error) {
+    console.error('Firestore audit write error:', error);
+    return { ok: false, error };
+  }
 
-    // 2. Si es un LOGIN REAL (no simulación) y tenemos correo, actualizar perfil de conexión
-    if (action === 'LOGIN' && !effectiveIsSimulation && email) {
+  if (action === 'LOGIN' && !effectiveIsSimulation) {
+    try {
       const userProfileRef = doc(db, 'user_profiles', email.toLowerCase().trim());
       await setDoc(userProfileRef, {
         email: email.toLowerCase().trim(),
@@ -50,12 +55,13 @@ export async function recordAuditEvent({ uid, email, name, role, sede, action, d
         lastLoginAtIso: nowIso,
         lastAction: 'LOGIN_REAL'
       }, { merge: true });
+    } catch (profileSyncError) {
+      console.error('Firestore login profile sync error:', profileSyncError);
+      return { ok: true, logEntry, profileSyncError };
     }
-  } catch (e) {
-    console.warn("Firestore audit sync error:", e.message);
   }
 
-  return logEntry;
+  return { ok: true, logEntry };
 }
 
 /**
