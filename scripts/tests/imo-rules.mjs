@@ -63,7 +63,7 @@ try {
   await assertFails(deleteDoc(doc(staff, `${profilePath}/imo_events/event-1`)));
   await assertFails(updateDoc(doc(anon, `${profilePath}/imo_events/event-1`), { source: 'changed' }));
   await env.withSecurityRulesDisabled(async ctx => {
-    await updateDoc(doc(ctx.firestore(), `${profilePath}/imo_progress/window`), { openedAt: Timestamp.fromMillis(Date.now() - (8 * 60 * 60 + 30 * 60 + 1) * 1000) });
+    await updateDoc(doc(ctx.firestore(), `${profilePath}/imo_progress/window`), { openedAt: Timestamp.fromMillis(Date.now() - 9 * 60 * 60 * 1000) });
   });
   await assertFails(save('contacto', false, 'event-3'));
   await assertSucceeds(updateDoc(doc(staff, 'imo_campaigns', cid), { status: 'closed' }));
