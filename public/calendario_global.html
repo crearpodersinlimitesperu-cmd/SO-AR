@@ -519,7 +519,10 @@
         // CONFIGURACIÓN API BACKEND (MULTI-GERENTE + OCR + TRACKING)
         // ═══════════════════════════════════════════════════════════════
         const API_URL = 'https://script.google.com/macros/s/AKfycbxSZFhddMYyspZpkW-qPHEi8hycLGfnhFeCPSYc4VbckWIeiiZAbxyJY71XRb2-Ya4U/exec';
-        const CURRENT_CALENDAR_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1u0tc4GeooPmSwNxZ0CErKGtRU4oD-mO3l--ZSQM-KPs/gviz/tq?tqx=out:json&gid=1326951636';
+        const calendarSourceReady = import('./officialCalendarSource.js');
+        let calendarRefreshPromise = null;
+        let calendarSourceStatus = {};
+        let calendarSourceEvents = [];
         let syncInterval = null;
         let isSyncing = false;
         let saveQueue = [];
@@ -732,70 +735,6 @@
           return window.causaCalendarProjection.matchAssignmentForEvent(ev, assignmentIndex, sedeKey);
         }
 
-        function googleVizDateToIso(value) {
-          const match = String(value || '').match(/^Date\((\d+),(\d+),(\d+)\)$/);
-          if (!match) return '';
-          return `${match[1]}-${String(Number(match[2]) + 1).padStart(2, '0')}-${String(match[3]).padStart(2, '0')}T00:00:00`;
-        }
-
-        function currentCalendarMergeKey(event, sedeKey) {
-          return [
-            String(event.start || event.fecha_inicio || '').slice(0, 10),
-            normalizeSedeAsignador(event.sede || event.sedeTag || sedeKey || ''),
-            window.causaCalendarProjection.extractTeamDigitsKey(event.equipo ?? event.team),
-            window.causaCalendarProjection.normalizeTrainingNameKey(event.name || event.nombre)
-          ].join('__');
-        }
-
-        // El Apps Script conserva el historial; esta publicación de la misma
-        // hoja aporta las fechas vigentes sin escribir ni alterar el histórico.
-        // IMPORTANTE: el entrenador de la hoja se guarda solo como sheetTrainer
-        // (sugerencia interna); NUNCA pisa ev.trainer porque la fuente única y
-        // autoritativa es /asignador-entrenadores.
-        async function mergeCurrentOfficialSchedule(data) {
-          const response = await fetch(CURRENT_CALENDAR_SHEET_URL);
-          if (!response.ok) throw new Error('No se pudo leer el calendario vigente');
-          const text = await response.text();
-          const first = text.indexOf('{');
-          const last = text.lastIndexOf('}');
-          if (first < 0 || last < first) throw new Error('Formato de calendario vigente inválido');
-          const rows = JSON.parse(text.slice(first, last + 1)).table?.rows || [];
-          const index = new Map();
-          Object.keys(data || {}).forEach(sede => (data[sede] || []).forEach(event => {
-            index.set(currentCalendarMergeKey(event, sede), event);
-          }));
-          rows.forEach(row => {
-            const cells = row.c || [];
-            const value = column => cells[column]?.v ?? '';
-            const start = googleVizDateToIso(value(0));
-            if (!start) return;
-            const sourceSede = String(value(1) || '').trim();
-            const sede = normalizeSedeKey(sourceSede || 'LIM');
-            const name = String(value(3) || '').trim();
-            const incoming = {
-              start, end: ajustarFechaFinPorRegla(name, start, ''), name, equipo: cleanEquipoFormula(value(2)),
-              sheetTrainer: String(value(4) || '').trim(), trainer: '', place: String(value(5) || '').trim(),
-              address: String(value(6) || '').trim(), sedeTag: sede, sede: sourceSede
-            };
-            const key = currentCalendarMergeKey(incoming, sede);
-            const existing = index.get(key);
-            if (existing) {
-              Object.assign(existing, {
-                ...incoming,
-                trainer: existing.assignmentSource === 'causa_os' ? existing.trainer : '',
-                sheetTrainer: incoming.sheetTrainer || existing.sheetTrainer || '',
-                equipo: existing.equipo || incoming.equipo,
-                end: ajustarFechaFinPorRegla(name, start, existing.end || incoming.end),
-                logistics: existing.logistics || {}
-              });
-            } else {
-              if (!data[sede]) data[sede] = [];
-              data[sede].push(incoming);
-              index.set(key, incoming);
-            }
-          });
-        }
-
         function escapeCalendarText(value) {
           return String(value || '').replace(/[&<>'"]/g, character => ({
             '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
@@ -949,65 +888,82 @@
           syncFromServer();
         };
 
-        window.addEventListener('online', () => { isOnline = true; syncQueue(); });
+        window.addEventListener('online', () => { isOnline = true; syncQueue(); syncFromServer(); });
         window.addEventListener('offline', () => { isOnline = false; showToast('⚠️ Modo offline. Cambios guardados localmente.', 'warning'); });
+        window.addEventListener('focus', () => syncFromServer());
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible') syncFromServer();
+        });
 
         // ═══════════════════════════════════════════════════════════════
         // SYNC MULTI-GERENTE (POLLING CADA 30s)
         // ═══════════════════════════════════════════════════════════════
         async function startSync() {
           await syncFromServer();
-          syncInterval = setInterval(syncFromServer, 30000);
+          if (!syncInterval) syncInterval = setInterval(syncFromServer, 30000);
         }
 
-        async function syncFromServer() {
-          if (isSyncing || !API_URL || API_URL.includes('PEGA_AQUI')) return;
-          isSyncing = true;
+        async function setCalendarSourceStatus(update) {
+          calendarSourceStatus = { ...calendarSourceStatus, ...update };
+          const { calendarFreshnessText } = await calendarSourceReady;
+          const label = document.getElementById('calendarFreshness');
+          if (label) label.textContent = calendarFreshnessText(calendarSourceStatus);
+        }
+
+        function syncFromServer() {
+          if (calendarRefreshPromise) return calendarRefreshPromise;
+          calendarRefreshPromise = refreshCalendarSource().finally(() => { calendarRefreshPromise = null; });
+          return calendarRefreshPromise;
+        }
+
+        async function refreshCalendarSource() {
+          await setCalendarSourceStatus({ refreshing: true });
           try {
-            const res = await fetch(`${API_URL}?action=getEventos`);
-            const eventos = await res.json();
-            if (Array.isArray(eventos) && eventos.length > 0) {
-              const newData = {};
-              eventos.forEach(ev => {
-                const sede = normalizeSedeKey(ev.sede || 'LIM');
-                if (!newData[sede]) newData[sede] = [];
-                newData[sede].push({
-                  start: ev.fecha_inicio,
-                  end: ajustarFechaFinPorRegla(ev.nombre, ev.fecha_inicio, ev.fecha_fin),
-                  name: ev.nombre,
-                  equipo: cleanEquipoFormula(ev.equipo),
-                  sheetTrainer: ev.trainer || '',
-                  trainer: '',
-                  assignmentSource: 'unassigned_in_asignador',
-                  place: ev.lugar,
-                  address: ev.direccion,
-                  sedeTag: sede,
-                  logistics: {
-                    ticket: ev.ticket || 'pending',
-                    hotel: ev.hotel || 'pending',
-                    trainer_notified: ev.notified === 'TRUE' || ev.notified === true,
-                    trainer_arrival: ev.arrival || '',
-                    ticket_url: ev.ticket_url || ''
-                  }
-                });
+            const { loadOfficialCalendar } = await calendarSourceReady;
+            const result = await loadOfficialCalendar();
+            const eventos = result.sources.api ? result.events
+              : window.causaCalendarProjection.mergeOfficialCalendar(calendarSourceEvents, result.events);
+            calendarSourceEvents = eventos;
+            const newData = {};
+            eventos.forEach(ev => {
+              const sede = normalizeSedeKey(ev.sede || 'LIM');
+              if (!newData[sede]) newData[sede] = [];
+              newData[sede].push({
+                start: ev.fecha_inicio || ev.start,
+                end: ajustarFechaFinPorRegla(ev.nombre || ev.name, ev.fecha_inicio || ev.start, ev.fecha_fin || ev.end),
+                name: ev.nombre || ev.name,
+                equipo: cleanEquipoFormula(ev.equipo),
+                sheetTrainer: ev.sheetTrainer || ev.trainer || '',
+                trainer: '',
+                assignmentSource: 'unassigned_in_asignador',
+                place: ev.lugar ?? ev.place,
+                address: ev.direccion ?? ev.address,
+                sedeTag: sede,
+                logistics: ev.logistics || {
+                  ticket: ev.ticket || 'pending',
+                  hotel: ev.hotel || 'pending',
+                  trainer_notified: ev.notified === 'TRUE' || ev.notified === true,
+                  trainer_arrival: ev.arrival || '',
+                  ticket_url: ev.ticket_url || ''
+                }
               });
-              window.allEventsData = newData;
-              try {
-                await mergeCurrentOfficialSchedule(window.allEventsData);
-              } catch (scheduleError) {
-                console.warn('No se pudo actualizar el contraste de calendario vigente:', scheduleError);
-              }
-              await syncOfficialAssignments(window.allEventsData);
-              mergeLogistics();
-              if (sessionStorage.auth === "true") {
-                renderSedeTabs();
-                renderEvents(document.getElementById('searchInput')?.value || '');
-              }
+            });
+            window.allEventsData = newData;
+            const assignmentsRead = await syncOfficialAssignments(window.allEventsData);
+            mergeLogistics();
+            if (sessionStorage.auth === "true") {
+              renderSedeTabs();
+              renderEvents(document.getElementById('searchInput')?.value || '');
             }
+            await setCalendarSourceStatus({
+              checkedAt: result.checkedAt, sources: result.sources, error: null, refreshing: false,
+            });
+            if (result.errors.length) console.warn('Lectura parcial del calendario:', result.errors);
+            return result.sources.api && result.sources.sheet && assignmentsRead;
           } catch(err) {
             console.warn('Sync falló, usando datos locales:', err);
-          } finally {
-            isSyncing = false;
+            await setCalendarSourceStatus({ refreshing: false, error: err.message });
+            return false;
           }
         }
 
@@ -1023,8 +979,10 @@
           showToast('🔄 Cruzando agenda con el Asignador oficial de Causa OS…', 'info');
           
           try {
-            await syncFromServer();
-            showToast('✅ Calendario actualizado. Las asignaciones confirmadas vienen de Causa OS.', 'success');
+            const complete = await syncFromServer();
+            showToast(complete
+              ? '✅ Fuentes del calendario consultadas. Revisa la última lectura y los filtros.'
+              : '⚠️ Lectura incompleta. Revisa el estado de las fuentes y del Asignador.', complete ? 'success' : 'warning');
           } catch (err) {
             showToast('❌ Error en la sincronización', 'error');
           } finally {
@@ -2043,74 +2001,19 @@
             passIn.addEventListener('keypress', (e) => { if(e.key === 'Enter') checkLogin(); });
             userIn.addEventListener('keypress', (e) => { if(e.key === 'Enter') passIn.focus(); });
 
-            // Fetch events data dynamically from backend API with local fallback support
-            const getEventosUrl = 'https://script.google.com/macros/s/AKfycbxSZFhddMYyspZpkW-qPHEi8hycLGfnhFeCPSYc4VbckWIeiiZAbxyJY71XRb2-Ya4U/exec?action=getEventos';
-            
-            fetch(getEventosUrl)
-                .then(res => res.json())
-                .then(flatData => {
-                    const data = {};
-                    flatData.forEach(ev => {
-                        let key = normalizeSedeKey(ev.sede);
-                        if (!data[key]) data[key] = [];
-                        data[key].push({
-                            start: ev.fecha_inicio,
-                            end: ajustarFechaFinPorRegla(ev.nombre, ev.fecha_inicio, ev.fecha_fin),
-                            name: ev.nombre,
-                            equipo: cleanEquipoFormula(ev.equipo),
-                            sheetTrainer: ev.trainer || '',
-                            trainer: '',
-                            assignmentSource: 'unassigned_in_asignador',
-                            place: ev.lugar,
-                            address: ev.direccion,
-                            logistics: {
-                                ticket: ev.ticket,
-                                hotel: ev.hotel,
-                                trainer_notified: ev.notified,
-                                trainer_arrival: ev.arrival,
-                                ticket_url: ev.ticket_url
-                            }
-                        });
-                    });
-                    
-                allEventsData = data;
-                markSheetContext(allEventsData);
-                mergeCurrentOfficialSchedule(allEventsData).catch(error => console.warn('Contraste vigente no disponible:', error)).finally(() => syncOfficialAssignments(allEventsData)).finally(() => {
-                    mergeLogistics();
-                    if (sessionStorage.auth === "true") {
-                        renderSedeTabs();
-                        renderEvents();
-                    }
-                });
-                })
-                .catch(err => {
-                    console.error("Error cargando API en vivo:", err);
-                    fetch('events_data.json')
-                        .then(res => res.json())
-                        .then(data => {
-                            markSheetContext(data);
-                            allEventsData = data;
-                            mergeCurrentOfficialSchedule(allEventsData).catch(error => console.warn('Contraste vigente no disponible:', error)).finally(() => syncOfficialAssignments(allEventsData)).finally(() => {
-                                mergeLogistics();
-                                if (sessionStorage.auth === "true") {
-                                    renderSedeTabs();
-                                    renderEvents();
-                                }
-                            });
-                        })
-                        .catch(() => {
-                            // Fallback to embedded events (sanitized via markSheetContext)
-                            markSheetContext(fallbackEventsData);
-                            allEventsData = fallbackEventsData;
-                            mergeCurrentOfficialSchedule(allEventsData).catch(error => console.warn('Contraste vigente no disponible:', error)).finally(() => syncOfficialAssignments(allEventsData)).finally(() => {
-                                mergeLogistics();
-                                if (sessionStorage.auth === "true") {
-                                    renderSedeTabs();
-                                    renderEvents();
-                                }
-                            });
-                        });
-                });
+            // The bundled history is a visibly unverified fallback, never a successful live read.
+            markSheetContext(fallbackEventsData);
+            if (!Object.keys(allEventsData).length) allEventsData = fallbackEventsData;
+            if (!calendarSourceEvents.length) {
+                calendarSourceEvents = Object.entries(fallbackEventsData).flatMap(([sede, events]) =>
+                    events.map(event => ({ ...event, sede })));
+            }
+            mergeLogistics();
+            if (sessionStorage.auth === "true") {
+                renderSedeTabs();
+                renderEvents();
+            }
+            startSync();
         });
 
         // ==========================================
@@ -2459,6 +2362,9 @@
     </div>
 
     <div id="mainContent" class="max-w-7xl mx-auto pt-52 md:pt-40 pb-12 px-6 transition-all duration-300">
+        <p id="calendarFreshness" role="status" aria-live="polite" class="text-sm text-gray-300 mb-4">
+            Consultando fuentes del calendario. Copia local sin actualidad verificada.
+        </p>
         
         <!-- Global Sede Tabs -->
         <div class="flex overflow-x-auto gap-4 mb-6 pb-2 scrollbar-hide border-b border-gray-800" id="sedeTabs">

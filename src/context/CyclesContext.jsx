@@ -2,8 +2,8 @@ import { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { useAuth } from './AuthContext';
 import { db } from '../services/firebase';
-import { OFFICIAL_CALENDAR_SHEET_URL, parseOfficialCalendarSheet } from '../services/officialCalendarSheet';
-import { applyAsignadorAuthoritativeProjection, mergeOfficialCalendar } from '../services/trainerCalendarProjection.js';
+import { useOfficialCalendar } from '../hooks/useOfficialCalendar';
+import { applyAsignadorAuthoritativeProjection } from '../services/trainerCalendarProjection.js';
 
 // Genera un id estable para un evento del calendario oficial (viene de una hoja
 // de Google, sin "id" propio de Firestore), para poder recordar cuáles ya se
@@ -152,87 +152,15 @@ export function CyclesProvider({ children }) {
   const [currentCycle, setCurrentCycle] = useState(null);
   const [currentStage, setCurrentStage] = useState('CARGANDO...');
   const [events, setEvents] = useState([]);
-  const [sourceEvents, setSourceEvents] = useState([]);
+  const { sourceEvents, loadingEvents, calendarStatus, refreshCalendar } = useOfficialCalendar();
   const [assignmentProjection, setAssignmentProjection] = useState([]);
   const [operationalProjection, setOperationalProjection] = useState([]);
-  const [loadingEvents, setLoadingEvents] = useState(true);
   // (14/09/2026) quitoCycles: ciclo(s) construido(s) para el/los equipo(s) que el
   // usuario de Quito eligió en su perfil (0, 1 o 2 — ver equiposQuito). Queda en
   // [] para cualquier usuario que no sea de Quito, y también para un usuario de
   // Quito que todavía no eligió equipo (modo automático, sin cambios). Lo consume
   // principalmente ChecklistBoard.jsx para las pestañas "Todos/Equipo X/Equipo Y".
   const [quitoCycles, setQuitoCycles] = useState([]);
-
-  useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        // 1. Cargar cache inmediata para no mostrar 0 eventos mientras conecta
-        try {
-          const cached = localStorage.getItem('causa_official_calendar_cache');
-          if (cached) {
-            const parsedCache = JSON.parse(cached);
-            if (Array.isArray(parsedCache) && parsedCache.length > 0) {
-              setSourceEvents(parsedCache);
-            }
-          }
-        } catch (_) {}
-
-        const API_URL = 'https://script.google.com/macros/s/AKfycbxSZFhddMYyspZpkW-qPHEi8hycLGfnhFeCPSYc4VbckWIeiiZAbxyJY71XRb2-Ya4U/exec?action=getEventos';
-        
-        // Timeout defensivo de 4s para Apps Script (evita que la pantalla se quede en "Cargando..." si Google bloquea/demora)
-        const scriptController = new AbortController();
-        const scriptTimeout = setTimeout(() => scriptController.abort(), 4000);
-
-        const [apiResult, sheetResult] = await Promise.allSettled([
-          fetch(API_URL, { signal: scriptController.signal }).then(res => {
-            clearTimeout(scriptTimeout);
-            if (!res.ok) throw new Error();
-            return res.json();
-          }).catch(err => {
-            clearTimeout(scriptTimeout);
-            throw err;
-          }),
-          fetch(OFFICIAL_CALENDAR_SHEET_URL).then(res => {
-            if (!res.ok) throw new Error();
-            return res.text();
-          })
-        ]);
-        const apiJson = apiResult.status === 'fulfilled' ? apiResult.value : null;
-        const apiData = apiJson ? (apiJson.data || apiJson) : null;
-        const validApiEvents = Array.isArray(apiData) && apiData.length > 0
-          ? apiData.filter(ev => ev.fecha_inicio || ev.start)
-          : [];
-
-        const sheetEvents = sheetResult.status === 'fulfilled'
-          ? parseOfficialCalendarSheet(sheetResult.value)
-          : [];
-        if (sheetResult.status === 'rejected') {
-          console.warn('No se pudo contrastar la agenda actual de Sheets:', sheetResult.reason);
-        }
-
-        let allEvents = [];
-        if (validApiEvents.length > 0) {
-           allEvents = mergeOfficialCalendar(validApiEvents, sheetEvents)
-             .sort((a, b) => new Date(a.fecha_inicio || a.start) - new Date(b.fecha_inicio || b.start));
-        } else if (sheetEvents.length > 0) {
-          allEvents = sheetEvents.sort((a, b) => new Date(a.fecha_inicio) - new Date(b.fecha_inicio));
-        }
-
-        if (allEvents.length > 0) {
-          setSourceEvents(allEvents);
-          try {
-            localStorage.setItem('causa_official_calendar_cache', JSON.stringify(allEvents));
-          } catch (_) {}
-        }
-      } catch (e) {
-        console.error("Error fetching calendar for cycles", e);
-      } finally {
-        setLoadingEvents(false);
-      }
-    };
-
-    fetchEvents();
-  }, [currentUser]); // Re-fetch or recalculate when currentUser changes
 
   // Ambas proyecciones se actualizan en vivo al confirmar una asignación o
   // editar/crear una fecha desde el Asignador. El calendario fuente no se toca.
@@ -532,7 +460,7 @@ export function CyclesProvider({ children }) {
   }, [events]);
 
   return (
-    <CyclesContext.Provider value={{ currentCycle, currentStage, events, loadingEvents, syncEventsToGoogle, quitoCycles, quitoTeamOptions }}>
+    <CyclesContext.Provider value={{ currentCycle, currentStage, events, loadingEvents, calendarStatus, refreshCalendar, syncEventsToGoogle, quitoCycles, quitoTeamOptions }}>
       {children}
     </CyclesContext.Provider>
   );

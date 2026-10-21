@@ -8,6 +8,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { resolveTaskLink } from '../services/taskNavigation';
 import { useAuth } from '../context/AuthContext';
 import { useCycles } from '../context/CyclesContext';
+import CalendarFreshness from '../components/CalendarFreshness';
 import {
   applyAsignadorAuthoritativeProjection,
   indexAssignmentsForLookup,
@@ -885,7 +886,7 @@ export default function Home() {
     return () => { isMounted = false; };
   }, [currentUser]);
 
-  const { currentCycle, currentStage, events, loadingEvents, quitoCycles, quitoTeamOptions } = useCycles();
+  const { currentCycle, currentStage, events, loadingEvents, calendarStatus, refreshCalendar, quitoCycles, quitoTeamOptions } = useCycles();
   const { tasks: allTasks, loading: loadingTasks, syncTasksToGoogle, acceptCollaboration, rejectCollaboration } = useChecklist();
   const { showToast, viewMode, setViewMode, customModules } = useUI();
   const { themeMode, setThemeMode, activeTheme } = useTheme();
@@ -2898,6 +2899,8 @@ export default function Home() {
                   </div>
                 </div>
               </div>
+
+              <CalendarFreshness status={calendarStatus} onRefresh={refreshCalendar} />
 
               {/* Filtros */}
               <div style={{ 

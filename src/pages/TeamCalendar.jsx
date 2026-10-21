@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCycles } from '../context/CyclesContext';
+import CalendarFreshness from '../components/CalendarFreshness';
 import { calendarEventsForLocalDay } from '../services/trainerCalendarProjection.js';
 import { useUI } from '../context/UIContext';
 import { useNavigate } from 'react-router-dom';
@@ -582,7 +583,7 @@ const MASTER_TEAM_SCHEDULES = [
 
 export default function TeamCalendar() {
   const { currentUser } = useAuth();
-  const { events } = useCycles();
+  const { events, calendarStatus, refreshCalendar } = useCycles();
   const { showToast } = useUI();
   const navigate = useNavigate();
 
@@ -785,6 +786,7 @@ export default function TeamCalendar() {
           <p style={{ margin: '0.4rem 0 0', fontSize: '0.92rem', color: 'var(--text-muted)' }}>
             <strong>CREAR PODER SIN LÍMITES</strong> • Jornadas, turnos y deadlines para <strong>Equipo de Oficina, Gerentes de Sede y Coordinadores</strong>.
           </p>
+          <CalendarFreshness status={calendarStatus} onRefresh={refreshCalendar} />
         </div>
 
         {/* ACCIONES SUPERIORES */}
