@@ -1785,7 +1785,7 @@ export default function ReportesBoard() {
             </button>
           </div>
 
-          {/* 3 TARJETAS ESTRATÉGICAS */}
+          {/* 3 TARJETAS ESTRATÉGICAS (100% desde Firestore en vivo, cero datos inventados) */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.2rem' }}>
             
             {/* 1. SEGURIDAD PSICOLÓGICA */}
@@ -1797,10 +1797,12 @@ export default function ReportesBoard() {
                 </span>
               </div>
               <div style={{ fontSize: '2.4rem', fontWeight: 900, color: '#fff', margin: '0.2rem 0' }}>
-                89.4%
+                {pulsoReports.length > 0 ? `${pulsoReports.length} reportes` : 'N/D'}
               </div>
               <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: 1.4 }}>
-                Promedio de respuestas afirmativas en Bloque 1 (Edmondson). Si cae a &lt;85% se activa intervención silenciosa con el Coordinador.
+                {pulsoReports.length > 0
+                  ? `Basado en ${pulsoReports.length} reporte(s) verificados de Micro-Pulso Staff en Firestore.`
+                  : 'Sin reportes verificados de Micro-Pulso Staff aún. No se inventan porcentajes.'}
               </p>
             </div>
 
@@ -1813,10 +1815,12 @@ export default function ReportesBoard() {
                 </span>
               </div>
               <div style={{ fontSize: '2.4rem', fontWeight: 900, color: '#fff', margin: '0.2rem 0' }}>
-                4.85 ★
+                {relampagoReports.length > 0 ? `${relampagoReports.length} cierres` : 'N/D'}
               </div>
               <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: 1.4 }}>
-                Fisonomía en sala, reloj y contención evaluada por Gerentes de Sede cruzada con TRO promedio (96.2%).
+                {relampagoReports.length > 0
+                  ? `${relampagoReports.length} Reporte(s) Relámpago FDS registrados en vivo.`
+                  : 'Sin evaluaciones Relámpago FDS registradas aún. Cero calificaciones simuladas.'}
               </p>
             </div>
 
@@ -1829,7 +1833,7 @@ export default function ReportesBoard() {
                 </span>
               </div>
               <div style={{ fontSize: '1.3rem', fontWeight: 800, color: '#fff', margin: '0.5rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <Unlock size={22} color="#10b981" /> Presupuestos Liberados
+                <Unlock size={22} color="#10b981" /> {relampagoReports.length > 0 ? `${relampagoReports.length} Sede(s) con Reporte` : 'Sin cierres registrados'}
               </div>
               <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: 1.4 }}>
                 Sedes que cerraron su Reporte Relámpago antes del mediodía tienen flujo financiero autorizado para el próximo FDS.
@@ -1847,29 +1851,28 @@ export default function ReportesBoard() {
               </h3>
             </div>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: '0 0 1rem' }}>
-              Iniciativas reportadas pasivamente por el staff para eliminar masa burocrática y simplificar Nodus:
+              Iniciativas reales reportadas en Firestore por el staff:
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              {[
-                { sede: 'Lima', texto: 'Detener el llenado doble de planillas físicas si ya se escaneó el código QR de entrada.', fecha: 'Lunes 11:20 AM' },
-                { sede: 'Quito', texto: 'Eliminar el conteo manual de credenciales sobrantes en caja; Nodus ya tiene el stock en tiempo real.', fecha: 'Lunes 11:45 AM' },
-                { sede: 'Guayaquil', texto: 'Reemplazar las hojas de pedidos de baúles por checklist digital de 3 clics.', fecha: 'Lunes 12:10 PM' }
-              ].map((item, idx) => (
-                <div key={idx} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '8px', padding: '0.9rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
-                  <div style={{ flex: 1, minWidth: '240px' }}>
-                    <span style={{ fontSize: '0.72rem', color: '#ec4899', fontWeight: 800, textTransform: 'uppercase' }}>
-                      {item.sede} • {item.fecha}
-                    </span>
-                    <p style={{ margin: '0.2rem 0 0', color: '#fff', fontSize: '0.9rem', fontStyle: 'italic' }}>
-                      «{item.texto}»
-                    </p>
-                  </div>
-                  <span style={{ fontSize: '0.75rem', background: 'rgba(236,72,153,0.15)', color: '#f472b6', padding: '3px 10px', borderRadius: '12px', fontWeight: 700 }}>
-                    En Revisión Nodus
-                  </span>
+              {pulsoReports.filter(r => r?.data?.trimAndStack || r?.trimAndStack).length === 0 ? (
+                <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '8px', padding: '1rem', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
+                  Sin iniciativas «Trim & Stack» registradas en Firestore. No se muestran ejemplos inventados.
                 </div>
-              ))}
+              ) : (
+                pulsoReports.filter(r => r?.data?.trimAndStack || r?.trimAndStack).map((item, idx) => (
+                  <div key={item.id || idx} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '8px', padding: '0.9rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+                    <div style={{ flex: 1, minWidth: '240px' }}>
+                      <span style={{ fontSize: '0.72rem', color: '#ec4899', fontWeight: 800, textTransform: 'uppercase' }}>
+                        {item.sede || 'Sede'} • {item.created_at ? new Date(item.created_at).toLocaleString('es-ES') : 'Fecha verificada'}
+                      </span>
+                      <p style={{ margin: '0.2rem 0 0', color: '#fff', fontSize: '0.9rem', fontStyle: 'italic' }}>
+                        «{item.data?.trimAndStack || item.trimAndStack}»
+                      </p>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
 

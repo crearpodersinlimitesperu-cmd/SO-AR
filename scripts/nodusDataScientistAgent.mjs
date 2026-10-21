@@ -350,15 +350,15 @@ export class NodusDataScientistAgent {
         ? (totalConfirmados / llamadasContactadas) * 100 
         : (totalLlamadas > 0 ? (totalConfirmados / totalLlamadas) * 100 : 0);
 
-      // Riesgo de deserciÃ³n FDS: PonderaciÃ³n de desinterÃ©s y retenciÃ³n
+      // Riesgo de deserción FDS empírico (cero valores inventados)
       const riesgoFDS = totalConfirmados > 0
-        ? Math.max(5, Math.min(45, Math.round(((totalConfirmados - totalSentados) / totalConfirmados) * 1000) / 10))
-        : (fdsData?.tasaDesercionFDS || 20.3);
+        ? Math.max(0, Math.min(100, Math.round(((totalConfirmados - totalSentados) / totalConfirmados) * 1000) / 10))
+        : (Number.isFinite(fdsData?.tasaDesercionFDS) ? fdsData.tasaDesercionFDS : 0);
 
-      // Potencial de recaudaciÃ³n REAL con precio oficial FDS C1 de la sede
+      // Potencial de recaudación REAL con precio oficial FDS C1 de la sede y tasa empírica de la sede
       const pricing = SEDES_FDS_PRICING[sede] || { moneda: 'USD', simbolo: '$', precioFdsC1: 250, tasaUSD: 1.0 };
       const prospectosCount = prosps.length;
-      const recuperablesEstimados = Math.round(prospectosCount * CONVERSION_PROSPECTO_BASE);
+      const recuperablesEstimados = Math.round(prospectosCount * (tasaConversion / 100));
       const ingresoRecuperableLocal = recuperablesEstimados * pricing.precioFdsC1;
       const ingresoRecuperableUSD = Math.round(ingresoRecuperableLocal / pricing.tasaUSD);
       const carteraTotalLocal = prospectosCount * pricing.precioFdsC1;
@@ -366,8 +366,10 @@ export class NodusDataScientistAgent {
       // Score de Salud Predictiva (0 a 100)
       const convScore = Math.min(100, tasaConversion);
       const retScore = Math.max(0, 100 - riesgoFDS);
-      const volScore = Math.min(100, (totalConfirmados / Math.max(1, coords.length * 30)) * 100);
-      const scoreSalud = Math.min(100, Math.max(20, Math.round((convScore * 0.4) + (retScore * 0.4) + (volScore * 0.2))));
+      const volScore = coords.length > 0 ? Math.min(100, (totalConfirmados / Math.max(1, coords.length * 30)) * 100) : 0;
+      const scoreSalud = (totalConfirmados > 0 || totalLlamadas > 0)
+        ? Math.min(100, Math.max(0, Math.round((convScore * 0.4) + (retScore * 0.4) + (volScore * 0.2))))
+        : 0;
 
       let semaforo = 'ESTABLE';
       if (scoreSalud >= 75) semaforo = 'EXCELENTE';
@@ -413,18 +415,20 @@ export class NodusDataScientistAgent {
     const contactadasGlobal = totalConfirmadosGlobal + totalNoInteresaGlobal + totalPorConfirmarGlobal;
     const tasaConversionGlobal = contactadasGlobal > 0 ? (totalConfirmadosGlobal / contactadasGlobal) * 100 : 0;
     const riesgoFDSGlobal = totalConfirmadosGlobal > 0
-      ? Math.max(5, Math.min(45, Math.round(((totalConfirmadosGlobal - totalSentadosGlobal) / totalConfirmadosGlobal) * 1000) / 10))
-      : (fdsData.tasaDesercionFDS || 23.7);
+      ? Math.max(0, Math.min(100, Math.round(((totalConfirmadosGlobal - totalSentadosGlobal) / totalConfirmadosGlobal) * 1000) / 10))
+      : (Number.isFinite(fdsData?.tasaDesercionFDS) ? fdsData.tasaDesercionFDS : 0);
 
     const totalProspectosSinPago = prospectos.length;
-    const totalRecuperablesGlobal = Math.round(totalProspectosSinPago * CONVERSION_PROSPECTO_BASE);
+    const totalRecuperablesGlobal = Math.round(totalProspectosSinPago * (tasaConversionGlobal / 100));
     const totalIngresoRecuperableUSD = Object.values(sedesPredictions).reduce((acc, s) => acc + (s.ingresoRecuperableUSD || 0), 0);
 
-    const scoreSaludGlobal = Math.min(100, Math.max(20, Math.round(
-      (Math.min(100, tasaConversionGlobal) * 0.4) +
-      ((100 - riesgoFDSGlobal) * 0.4) +
-      (Math.min(100, (totalConfirmadosGlobal / Math.max(1, coordinadores.length * 30)) * 100) * 0.2)
-    )));
+    const scoreSaludGlobal = (totalConfirmadosGlobal > 0 || totalLlamadasGlobal > 0)
+      ? Math.min(100, Math.max(0, Math.round(
+          (Math.min(100, tasaConversionGlobal) * 0.4) +
+          ((100 - riesgoFDSGlobal) * 0.4) +
+          (Math.min(100, (totalConfirmadosGlobal / Math.max(1, coordinadores.length * 30)) * 100) * 0.2)
+        )))
+      : 0;
 
     const globalPrediction = {
       totalCoordinadores: coordinadores.length,

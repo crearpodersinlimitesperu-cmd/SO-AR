@@ -134,10 +134,10 @@ class CRMGenealogyAgent {
         }
       }
     } catch (e) {
-      console.warn("Aviso: usando fallback local para Nodus C1/C2", e);
+      console.warn("Aviso: no se pudo leer Nodus C1/C2 en vivo (cero datos inventados)", e);
     }
 
-    this.nodusData = nodusFallback;
+    this.nodusData = { coordinadores: [], equiposReporte: [] };
     return this.nodusData;
   }
 
