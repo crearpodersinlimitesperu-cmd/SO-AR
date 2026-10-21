@@ -38,6 +38,8 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
   const hasAccess = canViewKPIsLlamadas(currentUser);
 
   const [data, setData] = useState(null);
+  const [dataStatus, setDataStatus] = useState('loading');
+  const [dataError, setDataError] = useState('');
   const [activeSubView, setActiveSubView] = useState('entrenadores'); // 'entrenadores' | 'graficas_retencion' | 'directorio_estados'
   const [search, setSearch] = useState('');
   const [filterSede, setFilterSede] = useState('Todas');
@@ -53,8 +55,10 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
   // Escuchar datos en tiempo real solo si el usuario tiene acceso
   useEffect(() => {
     if (!hasAccess) return;
-    const unsub = subscribeToKpisSummary((kpiPayload) => {
+    const unsub = subscribeToKpisSummary((kpiPayload, syncState = {}) => {
       setData(kpiPayload);
+      setDataStatus(syncState.status || 'ready');
+      setDataError(syncState.error?.message || '');
     });
     return () => unsub();
   }, [hasAccess]);
@@ -332,8 +336,10 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
               gap: '0.4rem',
               border: '1px solid rgba(139, 92, 246, 0.4)'
             }}>
-              <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981', display: 'inline-block' }} />
-              Google Sheets API v4 • En Vivo
+              <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: dataStatus === 'ready' ? '#10b981' : '#f59e0b', display: 'inline-block' }} />
+              {dataStatus === 'ready' ? 'Firestore • En Vivo'
+                : dataStatus === 'partial' ? 'Resumen en vivo • Detalle local'
+                  : 'Datos locales • Sin confirmar'}
             </span>
             <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
               699 Managers • 34 Entrenadores • 5,402 Llamadas
@@ -415,6 +421,23 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
           </HelpButton>
         </div>
       </div>
+
+      {dataStatus !== 'ready' && (
+        <div role={dataStatus === 'error' ? 'alert' : 'status'} style={{
+          padding: '0.75rem 1rem',
+          borderRadius: '8px',
+          background: dataStatus === 'error' ? '#fef2f2' : '#fffbeb',
+          border: `1px solid ${dataStatus === 'error' ? '#fecaca' : '#fde68a'}`,
+          color: dataStatus === 'error' ? '#991b1b' : '#92400e',
+          fontSize: '0.85rem'
+        }}>
+          {dataStatus === 'loading' && 'Cargando y verificando los datos de llamadas…'}
+          {dataStatus === 'stale' && 'Se muestran datos en caché; todavía no se han confirmado con el servidor.'}
+          {dataStatus === 'partial' && 'El resumen está confirmado en Firestore, pero el detalle de managers sigue usando los datos locales de referencia.'}
+          {dataStatus === 'empty' && 'No hay un resumen vigente en Firestore; se muestran datos locales de referencia.'}
+          {dataStatus === 'error' && `No se pudo verificar el resumen en Firestore. Se muestran datos locales de referencia.${dataError ? ` ${dataError}` : ''}`}
+        </div>
+      )}
 
       {/* 2. TABLERO DE SCORECARDS GLOBALES (Llamadas, Graduados, Desertores, Asignados) */}
       <div style={{

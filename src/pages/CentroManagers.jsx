@@ -1,5 +1,5 @@
 import { getWhatsAppUrl } from '../utils/phoneUtils';
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
@@ -11,7 +11,6 @@ import {
   canChangeManagerStatus,
   canViewAllManagers,
   canViewSede,
-  isDireccionRole,
   isGlobalQTCoordinator,
   hasQTPrivileges,
   DUAL_ROLE_TRAINER_EMAILS,
@@ -36,6 +35,7 @@ import {
 } from '../data/managersData';
 import { OPERATIONAL_SEDES, normalizeRole, normalizeSede } from '../data/usersData';
 import { recordAuditEvent } from '../services/auditService';
+import { recordGroupCall, recordIndividualCall } from '../services/callHistoryService';
 import { db } from '../services/firebase';
 import { collection, getDocs, doc, addDoc, setDoc, updateDoc, deleteDoc, deleteField, writeBatch, onSnapshot, serverTimestamp, query, where, arrayUnion, runTransaction } from 'firebase/firestore';
 import CountryFlag from '../components/CountryFlag';
@@ -277,18 +277,25 @@ export default function CentroManagers() {
   // un documento nuevo (nunca se sobrescribe), para poder contar cuántas lleva cada
   // equipo. Es la base de la pestaña de Liquidación de Entrenadores.
   const [llamadasHistorial, setLlamadasHistorial] = useState([]);
+  const [llamadasHistorialStatus, setLlamadasHistorialStatus] = useState('loading');
+  const [llamadasHistorialError, setLlamadasHistorialError] = useState('');
   useEffect(() => {
+    setLlamadasHistorial([]);
+    setLlamadasHistorialStatus('loading');
+    setLlamadasHistorialError('');
     if (!currentUser) return;
-    const isGlobal = canViewAllManagers(currentUser) || isDireccionRole(currentUser) || ['jose.sanchez@crearpsl.net', 'armando.pilacuan@gmail.com', 'paul.sosa@crearpsl.net'].includes(currentUser?.email?.toLowerCase());
     const baseCol = collection(db, 'llamadas_grupales_historial');
-    const q = baseCol;
 
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    const unsubscribe = onSnapshot(baseCol, { includeMetadataChanges: true }, (querySnapshot) => {
       const rows = [];
       querySnapshot.forEach((doc) => rows.push({ id: doc.id, ...doc.data() }));
       setLlamadasHistorial(rows);
+      setLlamadasHistorialStatus(querySnapshot.metadata.fromCache ? 'stale' : 'ready');
+      setLlamadasHistorialError('');
     }, (error) => {
       console.error("Error leyendo llamadas_grupales_historial:", error);
+      setLlamadasHistorialStatus('error');
+      setLlamadasHistorialError('No se pudo verificar el historial en Firestore. Los registros visibles pueden estar desactualizados.');
     });
     return () => unsubscribe();
   }, [currentUser]);
@@ -301,9 +308,16 @@ export default function CentroManagers() {
   // permission-denied porque Firestore no puede probar que TODOS los documentos
   // de la colección completa cumplirían la regla para ese usuario.
   const [notasSeguimiento, setNotasSeguimiento] = useState([]);
+  const [notasSeguimientoStatus, setNotasSeguimientoStatus] = useState('loading');
+  const [notasSeguimientoError, setNotasSeguimientoError] = useState('');
   useEffect(() => {
-    if (!currentUser?.email) return;
-    const isGlobal = canViewAllManagers(currentUser) || isDireccionRole(currentUser) || ['jose.sanchez@crearpsl.net', 'armando.pilacuan@gmail.com', 'paul.sosa@crearpsl.net'].includes(currentUser?.email?.toLowerCase());
+    setNotasSeguimiento([]);
+    setNotasSeguimientoStatus('loading');
+    setNotasSeguimientoError('');
+    if (!currentUser?.email) {
+      setNotasSeguimientoStatus('ready');
+      return;
+    }
     
     let notasQuery;
     if (userCanViewAllNotas) {
@@ -313,12 +327,16 @@ export default function CentroManagers() {
       notasQuery = query(collection(db, 'notas_seguimiento'), where('autorEmail', '==', currentUser.email));
     }
 
-    const unsubscribe = onSnapshot(notasQuery, (querySnapshot) => {
+    const unsubscribe = onSnapshot(notasQuery, { includeMetadataChanges: true }, (querySnapshot) => {
       const rows = [];
       querySnapshot.forEach((doc) => rows.push({ id: doc.id, ...doc.data() }));
       setNotasSeguimiento(rows);
+      setNotasSeguimientoStatus(querySnapshot.metadata.fromCache ? 'stale' : 'ready');
+      setNotasSeguimientoError('');
     }, (error) => {
       console.error("Error leyendo notas_seguimiento:", error);
+      setNotasSeguimientoStatus('error');
+      setNotasSeguimientoError('No se pudo verificar el historial de notas. Los comentarios visibles pueden estar desactualizados.');
     });
     return () => unsubscribe();
   }, [currentUser, userCanViewAllNotas]);
@@ -630,6 +648,9 @@ export default function CentroManagers() {
   });
 
   const [groupModal, setGroupModal] = useState(null);
+  const [groupCallOperationId, setGroupCallOperationId] = useState('');
+  const [isSavingGroupCall, setIsSavingGroupCall] = useState(false);
+  const groupCallSaveLock = useRef(false);
 
   const [groupCallDate, setGroupCallDate] = useState(new Date().toISOString().split('T')[0]);
   const [groupCallAttendance, setGroupCallAttendance] = useState({}); // { managerId: boolean }
@@ -1229,10 +1250,16 @@ export default function CentroManagers() {
   const handleUpdateLlamada = async (id, fecha, asistio) => {
     try {
       const targetManager = managers.find(m => m.id === id);
-      const docRef = managerDocumentRef(db, targetManager);
-      // Attendance edits must not rewrite normalized identity or assignment fields.
+      let recordedEvent;
       try {
-        await updateDoc(docRef, { llamadaFecha: fecha, llamadaAsistio: asistio });
+        recordedEvent = await recordIndividualCall(db, {
+          manager: targetManager,
+          callId: doc(collection(db, 'managers_directory')).id,
+          fecha,
+          asistio: asistio === 'SI',
+          registradoPorEmail: currentUser?.email || '',
+          registradoPorNombre: currentUser?.name || '',
+        });
       } catch (updateErr) {
         if (updateErr?.code === 'not-found') {
           showToast('Este manager aún no tiene documento propio en la nube (solo está en el catálogo local). Pide a Gerencia/Coordinación de Maestría que lo sincronice primero.', 'error');
@@ -1242,7 +1269,18 @@ export default function CentroManagers() {
       }
 
       // La actualización de managers en tiempo real ya se maneja por onSnapshot, pero por optimización optimista lo mantenemos aquí
-      setManagers(prev => prev.map(m => m.id === id ? { ...m, llamadaFecha: fecha, llamadaAsistio: asistio } : m));
+      setManagers(prev => prev.map(m => {
+        if (m.id !== id) return m;
+        const history = Array.isArray(m.llamadasHistorial) ? m.llamadasHistorial : [];
+        return {
+          ...m,
+          llamadaFecha: fecha,
+          llamadaAsistio: asistio,
+          llamadasHistorial: history.some(event => event.id === recordedEvent.id)
+            ? history
+            : [...history, recordedEvent],
+        };
+      }));
 
       const managerName = targetManager ? targetManager.nombre : id;
 
@@ -1266,62 +1304,37 @@ export default function CentroManagers() {
     const initialAttendance = {};
     team.managers.forEach(m => initialAttendance[m.id] = true); // Todos asisten por defecto
     setGroupCallAttendance(initialAttendance);
+    setGroupCallOperationId(doc(collection(db, 'llamadas_grupales_historial')).id);
     setGroupModal(team);
   };
 
   const handleSaveGroupCall = async () => {
-    if (!groupModal) return;
+    if (!groupModal || groupCallSaveLock.current) return;
+    groupCallSaveLock.current = true;
+    setIsSavingGroupCall(true);
     
     try {
-      const batch = writeBatch(db);
-      groupModal.managers.forEach(m => {
-        if (groupCallAttendance.hasOwnProperty(m.id)) {
-          const docRef = managerDocumentRef(db, m);
-          // (02/09/2026) FIX: mismo problema que handleUpdateLlamada — escribir
-          // el manager completo ({...m, ...}) con merge:true hace que el diff
-          // contra firestore.rules incluya campos fuera de
-          // hasOnly(['llamadaFecha','llamadaAsistio']) y falla para
-          // entrenadores/entrenadores de llamadas. batch.update() solo toca
-          // esos dos campos.
-          batch.update(docRef, {
-            llamadaFecha: groupCallDate,
-            llamadaAsistio: groupCallAttendance[m.id] ? 'SI' : 'NO'
-          });
-        }
+      const callId = groupCallOperationId || doc(collection(db, 'llamadas_grupales_historial')).id;
+      setGroupCallOperationId(callId);
+      const callResult = await recordGroupCall(db, {
+        callId,
+        managers: groupModal.managers,
+        attendance: groupCallAttendance,
+        fecha: groupCallDate,
+        equipo: groupModal.equipo,
+        numEquipo: groupModal.numEquipo || '',
+        sede: normalizeSede(groupModal.sede),
+        entrenador: groupModal.entrenadorUnico || '',
+        registradoPorEmail: currentUser?.email || '',
+        registradoPorNombre: currentUser?.name || '',
       });
 
-      await batch.commit();
-
-      // (02/09/2026) Historial de llamadas grupales — se AGREGA un registro nuevo por
-      // cada llamada (nunca sobrescribe), para poder contar cuántas lleva cada equipo.
-      // Es la base de la pestaña de Liquidación de Entrenadores ($400 al llegar a 7).
-      // Si esto falla, no bloquea el registro de asistencia (que ya se guardó arriba).
-      try {
-        const equipoKey = `${normalizeSede(groupModal.sede)}_${groupModal.equipo}`;
-        const asistieronCount = Object.values(groupCallAttendance).filter(Boolean).length;
-        await addDoc(collection(db, 'llamadas_grupales_historial'), {
-          equipoKey,
-          equipo: groupModal.equipo,
-          numEquipo: groupModal.numEquipo || '',
-          sede: normalizeSede(groupModal.sede),
-          entrenador: groupModal.entrenadorUnico || '',
-          fecha: groupCallDate,
-          totalIntegrantes: groupModal.managers.length,
-          asistieron: asistieronCount,
-          registradoPorEmail: currentUser?.email || '',
-          registradoPorNombre: currentUser?.name || '',
-          createdAt: serverTimestamp()
-        });
-      } catch (histErr) {
-        console.error('No se pudo guardar el historial de llamada grupal:', histErr);
-      }
-
-      // (02/09/2026) Nota de seguimiento OPCIONAL de esta llamada grupal — pedido
-      // explícito de José. No bloquea el registro de asistencia si falla.
+      let noteSaveFailed = false;
       if (groupCallNota.trim()) {
         try {
           const equipoKey = `${normalizeSede(groupModal.sede)}_${groupModal.equipo}`;
           await guardarNotaSeguimiento({
+            relatedCallId: callId,
             tipo: 'grupal',
             equipoKey,
             equipo: groupModal.equipo,
@@ -1335,7 +1348,7 @@ export default function CentroManagers() {
           });
         } catch (notaErr) {
           console.error('No se pudo guardar la nota de seguimiento grupal:', notaErr);
-          showToast('Asistencia guardada, pero la nota de seguimiento no se pudo guardar', 'error');
+          noteSaveFailed = true;
         }
       }
 
@@ -1350,21 +1363,39 @@ export default function CentroManagers() {
         return m;
       }));
 
-      recordAuditEvent({
+      const auditResult = await recordAuditEvent({
         action: 'ACTUALIZAR_LLAMADA_GRUPAL',
-        user: currentUser?.email || currentUser?.name || 'Usuario',
+        uid: currentUser?.uid,
+        email: currentUser?.email,
+        name: currentUser?.name,
+        role: currentUser?.appRole || currentUser?.role,
+        sede: currentUser?.sede,
         details: `Llamada grupal registrada para el equipo "${groupModal.equipo}" el ${groupCallDate}. Integrantes actualizados: ${groupModal.managers.length}`
       });
 
-      showToast(`Llamada grupal registrada en la nube para el equipo ${groupModal.equipo}`, 'success');
-      setGroupModal(null);
-      setGroupCallNota('');
-      setGroupCallEsQuiebre(false);
-      setGroupCallCategoriaQuiebre('operativo');
-      setGroupCallEstadoQuiebre('riesgo_alto');
+      if (noteSaveFailed) {
+        showToast('Llamada guardada; no se pudo guardar la nota. Reintenta para conservar el comentario.', 'error');
+      } else if (!auditResult.ok) {
+        showToast('Llamada guardada, pero no se pudo registrar el evento de auditoría.', 'error');
+      } else {
+        showToast(callResult.alreadyRecorded
+          ? 'Esta llamada ya estaba guardada; no se creó un duplicado.'
+          : `Llamada grupal registrada en la nube para el equipo ${groupModal.equipo}`, 'success');
+      }
+      if (!noteSaveFailed) {
+        setGroupModal(null);
+        setGroupCallOperationId('');
+        setGroupCallNota('');
+        setGroupCallEsQuiebre(false);
+        setGroupCallCategoriaQuiebre('operativo');
+        setGroupCallEstadoQuiebre('riesgo_alto');
+      }
     } catch (e) {
       console.error(e);
       showToast('Error al registrar llamada grupal en la nube', 'error');
+    } finally {
+      groupCallSaveLock.current = false;
+      setIsSavingGroupCall(false);
     }
   };
 
@@ -1380,11 +1411,12 @@ export default function CentroManagers() {
   // riesgo_alto) — ninguno de los dos se inventó, ambos vienen de esa definición.
   // Nunca se sobrescribe (cada nota es un documento nuevo, igual que
   // llamadas_grupales_historial) y nunca se borra (ver firestore.rules).
-  const guardarNotaSeguimiento = async ({ tipo, managerId, managerNombre, equipoKey, equipo, numEquipo, sede, nota, esQuiebre, categoriaQuiebre, estadoQuiebre, fecha }) => {
-    await addDoc(collection(db, 'notas_seguimiento'), {
+  const guardarNotaSeguimiento = async ({ tipo, managerId, managerNombre, equipoKey, equipo, numEquipo, sede, nota, esQuiebre, categoriaQuiebre, estadoQuiebre, fecha, relatedCallId }) => {
+    const note = {
       tipo, // 'individual' | 'grupal'
       managerId: managerId || null,
       managerDocId: tipo === 'individual' ? managerId || null : null,
+      relatedCallId: relatedCallId || null,
       managerNombre: managerNombre || null,
       equipoKey: equipoKey || null,
       equipo: equipo || null,
@@ -1399,7 +1431,12 @@ export default function CentroManagers() {
       autorNombre: currentUser?.name || '',
       respuestas: [],
       createdAt: serverTimestamp()
-    });
+    };
+    if (relatedCallId) {
+      await setDoc(doc(db, 'notas_seguimiento', `${relatedCallId}_note`), note);
+    } else {
+      await addDoc(collection(db, 'notas_seguimiento'), note);
+    }
   };
 
   const handleGuardarNotaIndividual = async () => {
@@ -1420,12 +1457,18 @@ export default function CentroManagers() {
         estadoQuiebre: nuevaNotaEsQuiebre ? nuevaNotaEstado : null,
         fecha: new Date().toISOString().split('T')[0]
       });
-      recordAuditEvent({
+      const auditResult = await recordAuditEvent({
         action: 'CREAR_NOTA_SEGUIMIENTO',
-        user: currentUser?.email || currentUser?.name || 'Usuario',
+        uid: currentUser?.uid,
+        email: currentUser?.email,
+        name: currentUser?.name,
+        role: currentUser?.appRole || currentUser?.role,
+        sede: currentUser?.sede,
         details: `Nota de seguimiento individual creada para ${notaModal.nombre}${nuevaNotaEsQuiebre ? ' (marcada como quiebre)' : ''}`
       });
-      showToast('Nota de seguimiento guardada', 'success');
+      showToast(auditResult.ok
+        ? 'Nota de seguimiento guardada'
+        : 'Nota guardada, pero no se pudo registrar el evento de auditoría.', auditResult.ok ? 'success' : 'error');
       setNuevaNotaTexto('');
       setNuevaNotaEsQuiebre(false);
       setNuevaNotaCategoria('operativo');
@@ -5839,7 +5882,7 @@ export default function CentroManagers() {
               <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.4rem' }}>
                 Fecha de la Llamada:
               </label>
-              <HelpInput helpKey="fechaGrupal" type="date" value={groupCallDate} onChange={e => setGroupCallDate(e.target.value)} style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.9rem' }} />
+              <HelpInput helpKey="fechaGrupal" type="date" value={groupCallDate} disabled={isSavingGroupCall} onChange={e => setGroupCallDate(e.target.value)} style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.9rem' }} />
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
@@ -5847,6 +5890,7 @@ export default function CentroManagers() {
               <div style={{ display: 'flex', gap: '0.5rem' }}>
                 <HelpButton helpKey="todosSi"
                   type="button"
+                  disabled={isSavingGroupCall}
                   onClick={() => {
                     const allTrue = {};
                     groupModal.managers.forEach(m => allTrue[m.id] = true);
@@ -5858,6 +5902,7 @@ export default function CentroManagers() {
                 </HelpButton>
                 <HelpButton helpKey="todosNo"
                   type="button"
+                  disabled={isSavingGroupCall}
                   onClick={() => {
                     const allFalse = {};
                     groupModal.managers.forEach(m => allFalse[m.id] = false);
@@ -5889,7 +5934,7 @@ export default function CentroManagers() {
                       <span style={{ fontSize: '0.8rem', fontWeight: 700, color: checked ? '#16a34a' : '#dc2626' }}>
                         {checked ? 'Conectó ✅' : 'No Asistió ❌'}
                       </span>
-                      <HelpInput helpKey="asistencia" type="checkbox" checked={checked} onChange={e => setGroupCallAttendance({...groupCallAttendance, [m.id]: e.target.checked})} style={{ width: '18px', height: '18px', accentColor: '#10b981', cursor: 'pointer' }} />
+                      <HelpInput helpKey="asistencia" type="checkbox" checked={checked} disabled={isSavingGroupCall} onChange={e => setGroupCallAttendance({...groupCallAttendance, [m.id]: e.target.checked})} style={{ width: '18px', height: '18px', accentColor: '#10b981', cursor: 'pointer' }} />
                     </div>
                   </label>
                 );
@@ -5904,23 +5949,24 @@ export default function CentroManagers() {
               </label>
               <HelpTextarea helpKey="nota"
                 value={groupCallNota}
+                disabled={isSavingGroupCall}
                 onChange={e => setGroupCallNota(e.target.value)}
                 placeholder="Ej: el equipo llegó atrasado a 3 tareas del gate T-14, capitán sin evidencia..."
                 rows={3}
                 style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.85rem', fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box' }}
               />
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.5rem', fontSize: '0.8rem', fontWeight: 600, color: '#92400e', cursor: 'pointer' }}>
-                <HelpInput helpKey="quiebre" type="checkbox" checked={groupCallEsQuiebre} onChange={e => setGroupCallEsQuiebre(e.target.checked)} style={{ width: '16px', height: '16px', accentColor: '#dc2626', cursor: 'pointer' }} />
+                <HelpInput helpKey="quiebre" type="checkbox" checked={groupCallEsQuiebre} disabled={isSavingGroupCall} onChange={e => setGroupCallEsQuiebre(e.target.checked)} style={{ width: '16px', height: '16px', accentColor: '#dc2626', cursor: 'pointer' }} />
                 🚨 Marcar como quiebre (incumplimiento de compromiso, meta o estándar)
               </label>
               {groupCallEsQuiebre && (
                 <div style={{ display: 'flex', gap: '0.6rem', marginTop: '0.5rem' }}>
-                  <HelpSelect helpKey="categoria" value={groupCallCategoriaQuiebre} onChange={e => setGroupCallCategoriaQuiebre(e.target.value)} style={{ flex: 1, padding: '0.4rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.8rem' }}>
+                  <HelpSelect helpKey="categoria" value={groupCallCategoriaQuiebre} disabled={isSavingGroupCall} onChange={e => setGroupCallCategoriaQuiebre(e.target.value)} style={{ flex: 1, padding: '0.4rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.8rem' }}>
                     <option value="operativo">Quiebre operativo</option>
                     <option value="equipo">Quiebre de equipo</option>
                     <option value="participante">Quiebre de participante</option>
                   </HelpSelect>
-                  <HelpSelect helpKey="estadoQuiebre" value={groupCallEstadoQuiebre} onChange={e => setGroupCallEstadoQuiebre(e.target.value)} style={{ flex: 1, padding: '0.4rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.8rem' }}>
+                  <HelpSelect helpKey="estadoQuiebre" value={groupCallEstadoQuiebre} disabled={isSavingGroupCall} onChange={e => setGroupCallEstadoQuiebre(e.target.value)} style={{ flex: 1, padding: '0.4rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.8rem' }}>
                     <option value="riesgo_alto">Riesgo Alto</option>
                     <option value="vencido">Vencido</option>
                     <option value="bloqueado">Bloqueado</option>
@@ -5931,8 +5977,8 @@ export default function CentroManagers() {
             </div>
 
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-              <HelpButton helpKey="cancelar" onClick={() => { setGroupModal(null); setGroupCallNota(''); setGroupCallEsQuiebre(false); }} style={{ padding: '0.6rem 1.2rem', borderRadius: '6px', border: `1px solid ${borderLight}`, background: '#fff', color: textDark, fontWeight: 600, cursor: 'pointer' }}>Cancelar</HelpButton>
-              <HelpButton helpKey="guardarAsistencia" onClick={handleSaveGroupCall} style={{ padding: '0.6rem 1.4rem', borderRadius: '6px', border: 'none', background: '#10b981', color: '#fff', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 4px rgba(16,185,129,0.3)' }}>Guardar Asistencia</HelpButton>
+              <HelpButton helpKey="cancelar" disabled={isSavingGroupCall} onClick={() => { setGroupModal(null); setGroupCallOperationId(''); setGroupCallNota(''); setGroupCallEsQuiebre(false); }} style={{ padding: '0.6rem 1.2rem', borderRadius: '6px', border: `1px solid ${borderLight}`, background: '#fff', color: textDark, fontWeight: 600, cursor: isSavingGroupCall ? 'not-allowed' : 'pointer' }}>Cancelar</HelpButton>
+              <HelpButton helpKey="guardarAsistencia" disabled={isSavingGroupCall} onClick={handleSaveGroupCall} style={{ padding: '0.6rem 1.4rem', borderRadius: '6px', border: 'none', background: '#10b981', color: '#fff', fontWeight: 700, cursor: isSavingGroupCall ? 'not-allowed' : 'pointer', boxShadow: '0 2px 4px rgba(16,185,129,0.3)' }}>{isSavingGroupCall ? 'Guardando…' : 'Guardar Asistencia'}</HelpButton>
             </div>
           </div>
         </div>
@@ -5964,10 +6010,17 @@ export default function CentroManagers() {
                 {formatTeamDisplay(notaModal.equipo, notaModal.numEquipo)} · {notaModal.sede}
                 {!userCanViewAllNotas && ' · Solo ves las notas que TÚ escribiste'}
               </p>
+              {notasSeguimientoStatus !== 'ready' && (
+                <p role="status" style={{ fontSize: '0.75rem', color: notasSeguimientoStatus === 'error' ? '#b91c1c' : textMuted }}>
+                  {notasSeguimientoStatus === 'loading' && 'Cargando notas de seguimiento…'}
+                  {notasSeguimientoStatus === 'stale' && 'Mostrando notas en caché; esperando confirmación del servidor.'}
+                  {notasSeguimientoStatus === 'error' && notasSeguimientoError}
+                </p>
+              )}
               <ManagersHelpMode />
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem', marginBottom: '1.2rem' }}>
-                {notasDeEstaPersona.length === 0 && (
+                {notasDeEstaPersona.length === 0 && notasSeguimientoStatus === 'ready' && (
                   <p style={{ fontSize: '0.85rem', color: textMuted, fontStyle: 'italic' }}>Todavía no hay notas registradas.</p>
                 )}
                 {notasDeEstaPersona.map(n => (
@@ -6099,6 +6152,20 @@ export default function CentroManagers() {
               <h3 style={{ fontSize: '0.9rem', color: textDark, borderBottom: `1px solid ${borderLight}`, paddingBottom: '0.3rem', marginBottom: '0.8rem' }}>
                 📊 Resumen de Llamadas ({llamadasEquipo.length} registradas al equipo)
               </h3>
+              {llamadasHistorialStatus !== 'ready' && (
+                <p role="status" style={{ fontSize: '0.75rem', color: llamadasHistorialStatus === 'error' ? '#b91c1c' : textMuted }}>
+                  {llamadasHistorialStatus === 'loading' && 'Cargando historial de llamadas…'}
+                  {llamadasHistorialStatus === 'stale' && 'Mostrando datos en caché; esperando confirmación del servidor.'}
+                  {llamadasHistorialStatus === 'error' && llamadasHistorialError}
+                </p>
+              )}
+              {notasSeguimientoStatus !== 'ready' && (
+                <p role="status" style={{ fontSize: '0.72rem', color: notasSeguimientoStatus === 'error' ? '#b91c1c' : textMuted }}>
+                  {notasSeguimientoStatus === 'loading' && 'Cargando comentarios…'}
+                  {notasSeguimientoStatus === 'stale' && 'Los comentarios visibles están en caché y pueden estar desactualizados.'}
+                  {notasSeguimientoStatus === 'error' && notasSeguimientoError}
+                </p>
+              )}
               
               <div style={{ background: '#f8fafc', padding: '0.8rem', borderRadius: '8px', border: `1px solid ${borderLight}`, marginBottom: '1rem' }}>
                 <div style={{ fontSize: '0.8rem', color: textMuted, marginBottom: '0.3rem' }}>
@@ -6111,16 +6178,41 @@ export default function CentroManagers() {
 
               <div style={{ maxHeight: '180px', overflowY: 'auto' }}>
                 {llamadasEquipo.map((l, i) => (
-                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.4rem 0', borderBottom: `1px solid ${borderLight}` }}>
+                  <div key={l.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.4rem 0', borderBottom: `1px solid ${borderLight}` }}>
                     <span style={{ fontSize: '0.8rem', color: textDark, fontWeight: 600 }}>Llamada {llamadasEquipo.length - i}</span>
                     <div style={{ textAlign: 'right' }}>
                       <div style={{ fontSize: '0.75rem', color: textMuted }}>{l.fecha}</div>
                       <div style={{ fontSize: '0.7rem', color: l.asistieron >= l.totalIntegrantes * 0.7 ? '#10b981' : '#f59e0b' }}>
                         Equipo: {l.asistieron}/{l.totalIntegrantes} asist.
                       </div>
+                      {notasManager.find(note => note.relatedCallId === l.id)?.nota && (
+                        <div style={{ fontSize: '0.7rem', color: textMuted, marginTop: '0.2rem' }}>
+                          Nota: {notasManager.find(note => note.relatedCallId === l.id).nota}
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
+                {llamadasEquipo.length === 0 && llamadasHistorialStatus === 'ready' && (
+                  <p style={{ fontSize: '0.75rem', color: textMuted }}>No hay llamadas grupales registradas para este equipo.</p>
+                )}
+              </div>
+              <h4 style={{ fontSize: '0.82rem', color: textDark, margin: '1rem 0 0.4rem' }}>Historial individual de {m.nombre}</h4>
+              <div style={{ maxHeight: '160px', overflowY: 'auto' }}>
+                {(Array.isArray(m.llamadasHistorial) ? m.llamadasHistorial : [])
+                  .slice().sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''))
+                  .map(call => (
+                    <div key={call.id} style={{ padding: '0.35rem 0', borderBottom: `1px solid ${borderLight}`, fontSize: '0.75rem', color: textMuted }}>
+                      {call.fecha || 'Sin fecha'} · {call.tipo === 'grupal' ? 'Grupal' : 'Individual'} · {call.asistio ? 'Asistió' : 'No asistió'}
+                    </div>
+                  ))}
+                {(!Array.isArray(m.llamadasHistorial) || m.llamadasHistorial.length === 0) && (
+                  <p style={{ fontSize: '0.75rem', color: textMuted }}>
+                    {llamadasHistorialStatus === 'ready'
+                      ? 'No hay eventos individuales históricos disponibles para este manager.'
+                      : 'El historial individual no está verificado todavía.'}
+                  </p>
+                )}
               </div>
 
             </div>
@@ -6203,13 +6295,25 @@ export default function CentroManagers() {
                     <span style={{ fontSize: '0.78rem', color: textMuted, fontWeight: 600 }}>📞 Últimas llamadas individuales:</span>
                     <div style={{ maxHeight: '160px', overflowY: 'auto', marginTop: '0.4rem', display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
                       {tc.managersList.map(m => (
-                        <div key={m.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.4rem', padding: '0.4rem 0.5rem', background: '#f8fafc', borderRadius: '6px', border: `1px solid ${borderLight}` }}>
-                          <span style={{ fontSize: '0.78rem', color: textDark, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.nombre}</span>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', flexShrink: 0 }}>
-                            <HelpInput helpKey="fechaIndividual" type="date" value={m.llamadaFecha || ''} onChange={e => handleUpdateLlamada(m.id, e.target.value, m.llamadaAsistio || 'SI')} style={{ padding: '0.2rem', borderRadius: '4px', border: `1px solid ${borderLight}`, fontSize: '0.7rem', width: '110px' }} />
-                            <HelpButton helpKey="asistioSi" onClick={() => handleUpdateLlamada(m.id, m.llamadaFecha || new Date().toISOString().split('T')[0], 'SI')} style={{ padding: '0.2rem 0.4rem', borderRadius: '4px', border: '1px solid #10b981', background: m.llamadaAsistio === 'SI' ? '#10b981' : '#fff', color: m.llamadaAsistio === 'SI' ? '#fff' : '#10b981', fontWeight: 700, fontSize: '0.68rem', cursor: 'pointer' }}>SÍ</HelpButton>
-                            <HelpButton helpKey="asistioNo" onClick={() => handleUpdateLlamada(m.id, m.llamadaFecha || new Date().toISOString().split('T')[0], 'NO')} style={{ padding: '0.2rem 0.4rem', borderRadius: '4px', border: '1px solid #ef4444', background: m.llamadaAsistio === 'NO' ? '#ef4444' : '#fff', color: m.llamadaAsistio === 'NO' ? '#fff' : '#ef4444', fontWeight: 700, fontSize: '0.68rem', cursor: 'pointer' }}>NO</HelpButton>
+                        <div key={m.id} style={{ padding: '0.4rem 0.5rem', background: '#f8fafc', borderRadius: '6px', border: `1px solid ${borderLight}` }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.4rem' }}>
+                            <span style={{ fontSize: '0.78rem', color: textDark, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.nombre}</span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', flexShrink: 0 }}>
+                              <HelpInput helpKey="fechaIndividual" type="date" value={m.llamadaFecha || ''} onChange={e => handleUpdateLlamada(m.id, e.target.value, m.llamadaAsistio || 'SI')} style={{ padding: '0.2rem', borderRadius: '4px', border: `1px solid ${borderLight}`, fontSize: '0.7rem', width: '110px' }} />
+                              <HelpButton helpKey="asistioSi" onClick={() => handleUpdateLlamada(m.id, m.llamadaFecha || new Date().toISOString().split('T')[0], 'SI')} style={{ padding: '0.2rem 0.4rem', borderRadius: '4px', border: '1px solid #10b981', background: m.llamadaAsistio === 'SI' ? '#10b981' : '#fff', color: m.llamadaAsistio === 'SI' ? '#fff' : '#10b981', fontWeight: 700, fontSize: '0.68rem', cursor: 'pointer' }}>SÍ</HelpButton>
+                              <HelpButton helpKey="asistioNo" onClick={() => handleUpdateLlamada(m.id, m.llamadaFecha || new Date().toISOString().split('T')[0], 'NO')} style={{ padding: '0.2rem 0.4rem', borderRadius: '4px', border: '1px solid #ef4444', background: m.llamadaAsistio === 'NO' ? '#ef4444' : '#fff', color: m.llamadaAsistio === 'NO' ? '#fff' : '#ef4444', fontWeight: 700, fontSize: '0.68rem', cursor: 'pointer' }}>NO</HelpButton>
+                            </div>
                           </div>
+                          {(Array.isArray(m.llamadasHistorial) ? m.llamadasHistorial : [])
+                            .slice().sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''))
+                            .map(call => (
+                              <div key={call.id} style={{ marginTop: '0.25rem', fontSize: '0.7rem', color: textMuted }}>
+                                {call.fecha || 'Sin fecha'} · {call.tipo === 'grupal' ? 'Grupal' : 'Individual'} · {call.asistio ? 'Asistió' : 'No asistió'}
+                                {call.id && notasSeguimiento.find(note => note.relatedCallId === call.id)?.nota
+                                  ? ` · Nota: ${notasSeguimiento.find(note => note.relatedCallId === call.id).nota}`
+                                  : ''}
+                              </div>
+                            ))}
                         </div>
                       ))}
                       {tc.managersList.length === 0 && <p style={{ fontSize: '0.75rem', color: textMuted, fontStyle: 'italic' }}>Sin managers registrados.</p>}
@@ -6224,10 +6328,16 @@ export default function CentroManagers() {
                     const llamadasDeEsteEntrenador = llamadasHistorial
                       .filter(l => isTrainerMatch(l.entrenador, trainerCardModal))
                       .sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
-                    if (llamadasDeEsteEntrenador.length === 0) return null;
                     return (
                       <div style={{ marginBottom: '1rem' }}>
                         <span style={{ fontSize: '0.78rem', color: textMuted, fontWeight: 600 }}>👥 Llamadas grupales registradas ({llamadasDeEsteEntrenador.length}):</span>
+                        {llamadasHistorialStatus !== 'ready' && (
+                          <p role="status" style={{ fontSize: '0.72rem', color: llamadasHistorialStatus === 'error' ? '#b91c1c' : textMuted }}>
+                            {llamadasHistorialStatus === 'loading' && 'Cargando historial de llamadas…'}
+                            {llamadasHistorialStatus === 'stale' && 'Mostrando datos en caché; esperando confirmación del servidor.'}
+                            {llamadasHistorialStatus === 'error' && llamadasHistorialError}
+                          </p>
+                        )}
                         <div style={{ maxHeight: '180px', overflowY: 'auto', marginTop: '0.4rem', display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
                           {llamadasDeEsteEntrenador.map(l => (
                             <div key={l.id} style={{ padding: '0.4rem 0.5rem', background: '#fafaf9', borderRadius: '6px', border: `1px solid ${borderLight}` }}>
@@ -6250,8 +6360,16 @@ export default function CentroManagers() {
                                   )}
                                 </div>
                               )}
+                              {notasSeguimiento.find(note => note.relatedCallId === l.id)?.nota && (
+                                <p style={{ margin: '0.3rem 0 0', fontSize: '0.7rem', color: textMuted }}>
+                                  Nota: {notasSeguimiento.find(note => note.relatedCallId === l.id).nota}
+                                </p>
+                              )}
                             </div>
                           ))}
+                          {llamadasDeEsteEntrenador.length === 0 && llamadasHistorialStatus === 'ready' && (
+                            <p style={{ fontSize: '0.72rem', color: textMuted }}>No hay llamadas grupales registradas para este entrenador.</p>
+                          )}
                         </div>
                       </div>
                     );

@@ -38,7 +38,7 @@ export async function getManagersPipeline(sede) {
     return results;
   } catch (error) {
     console.error("Error al obtener pipeline real de managers:", error);
-    return [];
+    throw error;
   }
 }
 
@@ -60,7 +60,7 @@ export async function getDualTasks(sede) {
     return results;
   } catch (error) {
     console.error("Error al obtener dual tasks:", error);
-    return [];
+    throw error;
   }
 }
 

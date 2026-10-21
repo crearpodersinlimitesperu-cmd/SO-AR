@@ -1,4 +1,4 @@
-import { collection, doc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from './firebase';
 import defaultKpisData from '../data/kpisEntrenadoresData.json';
 
@@ -8,30 +8,39 @@ import defaultKpisData from '../data/kpisEntrenadoresData.json';
  * @returns {Function} Unsubscribe function
  */
 export function subscribeToKpisSummary(callback) {
-  // Inicialmente proveer datos precargados para visualización instantánea (0 ms)
-  callback(defaultKpisData);
+  callback(defaultKpisData, { status: 'loading', source: 'bundled' });
 
   try {
     const docRef = doc(db, 'kpis_entrenadores_llamadas', '_resumen');
-    const unsubscribe = onSnapshot(docRef, (docSnap) => {
+    const unsubscribe = onSnapshot(docRef, { includeMetadataChanges: true }, (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
         callback({
           metadata: data.metadata || defaultKpisData.metadata,
           totales: data.totales || defaultKpisData.totales,
           kpis: data.kpis || defaultKpisData.kpis,
-          llamadosDetalle: defaultKpisData.llamadosDetalle,
-          managersSheet1: defaultKpisData.managersSheet1 || [],
+          llamadosDetalle: data.llamadosDetalle || defaultKpisData.llamadosDetalle,
+          managersSheet1: data.managersSheet1 || defaultKpisData.managersSheet1 || [],
+        }, {
+          status: docSnap.metadata.fromCache ? 'stale'
+            : Array.isArray(data.llamadosDetalle) && Array.isArray(data.managersSheet1) ? 'ready'
+              : 'partial',
+        });
+      } else {
+        callback(defaultKpisData, {
+          status: docSnap.metadata.fromCache ? 'stale' : 'empty',
+          source: 'bundled',
         });
       }
     }, (error) => {
-      console.warn('Nota: Usando datos locales de KPIs (Firestore offline o reglas restringidas):', error);
-      callback(defaultKpisData);
+      console.error('Error leyendo resumen de KPIs de llamadas:', error);
+      callback(defaultKpisData, { status: 'error', source: 'bundled', error });
     });
 
     return unsubscribe;
   } catch (err) {
     console.warn('Error inicializando suscripción a KPIs:', err);
+    callback(defaultKpisData, { status: 'error', source: 'bundled', error: err });
     return () => {};
   }
 }
@@ -42,13 +51,16 @@ export function subscribeToKpisSummary(callback) {
  * @param {Function} callback 
  */
 export function subscribeToTrainerDetail(trainerSlug, callback) {
-  if (!trainerSlug) return () => {};
+  if (!trainerSlug) {
+    callback({ managersList: [], managersCount: 0 }, { status: 'empty' });
+    return () => {};
+  }
 
   try {
     const docRef = doc(db, 'kpis_entrenadores_llamadas', trainerSlug);
-    const unsubscribe = onSnapshot(docRef, (docSnap) => {
+    const unsubscribe = onSnapshot(docRef, { includeMetadataChanges: true }, (docSnap) => {
       if (docSnap.exists()) {
-        callback(docSnap.data());
+        callback(docSnap.data(), { status: docSnap.metadata.fromCache ? 'stale' : 'ready' });
       } else {
         // Fallback a los datos locales
         const fallbackList = (defaultKpisData.llamadosDetalle || []).filter(
@@ -61,10 +73,10 @@ export function subscribeToTrainerDetail(trainerSlug, callback) {
           ...(kpiItem || {}),
           managersList: fallbackList,
           managersCount: fallbackList.length,
-        });
+        }, { status: docSnap.metadata.fromCache ? 'stale' : 'empty', source: 'bundled' });
       }
     }, (err) => {
-      console.warn('Fallback local para entrenador:', trainerSlug, err);
+      console.error('Error leyendo el detalle de entrenador:', trainerSlug, err);
       const fallbackList = (defaultKpisData.llamadosDetalle || []).filter(
         m => slugify(m.entrenador) === trainerSlug
       );
@@ -75,12 +87,13 @@ export function subscribeToTrainerDetail(trainerSlug, callback) {
         ...(kpiItem || {}),
         managersList: fallbackList,
         managersCount: fallbackList.length,
-      });
+      }, { status: 'error', source: 'bundled', error: err });
     });
 
     return unsubscribe;
   } catch (e) {
     console.error('Error suscribiendo a detalle de entrenador:', e);
+    callback({ managersList: [], managersCount: 0 }, { status: 'error', error: e });
     return () => {};
   }
 }
