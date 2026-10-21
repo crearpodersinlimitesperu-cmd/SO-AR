@@ -36,10 +36,17 @@ export default function FuturosImposiblesView({
     let participantes = Array.isArray(payload?.participantes) ? payload.participantes : [];
     if (!participantes.length && Number(payload?.participantChunks || 0) > 0) {
       const chunksSnap = await getDocsFromServer(collection(db, 'nodus_futuros_imposibles', 'latest', 'participantes'));
-      participantes = chunksSnap.docs
-        .map((chunk) => chunk.data())
-        .sort((a, b) => Number(a.index) - Number(b.index))
+      const chunks = chunksSnap.docs.map(chunk => chunk.data()).sort((a, b) => Number(a.index) - Number(b.index));
+      if (chunks.length !== Number(payload.participantChunks) ||
+          chunks.some((chunk, index) => chunk.index !== index || chunk.extractedAt !== payload.extractedAt ||
+            !Array.isArray(chunk.participantes))) {
+        throw new Error('La publicación FI cambió o está incompleta. Vuelve a actualizar.');
+      }
+      participantes = chunks
         .flatMap((chunk) => Array.isArray(chunk.participantes) ? chunk.participantes : []);
+      if (participantes.length !== Number(payload.universePfd)) {
+        throw new Error('El total de participantes FI no coincide con la publicación.');
+      }
     }
     return payload ? { ...payload, participantes } : null;
   };

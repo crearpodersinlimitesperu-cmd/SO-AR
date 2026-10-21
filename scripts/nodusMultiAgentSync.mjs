@@ -1370,10 +1370,13 @@ export async function runMultiAgentSync() {
       const chunkCollection = latestRef.collection('participantes');
       const chunks = buildFiSnapshotChunks(participantesFI);
       const previousChunks = await chunkCollection.get();
-      const cleanupBatch = adminDb.batch();
-      previousChunks.forEach(doc => cleanupBatch.delete(doc.ref));
-      await cleanupBatch.commit();
+      const nextChunkIds = new Set(chunks.map(({ index }) => `chunk_${String(index).padStart(4, '0')}`));
+      const obsoleteChunks = previousChunks.docs.filter(chunk => !nextChunkIds.has(chunk.id));
+      if (obsoleteChunks.length + chunks.length + 1 > 500) {
+        throw new Error('FI snapshot exceeds atomic publication write limit; previous snapshot preserved.');
+      }
       const writeBatch = adminDb.batch();
+      obsoleteChunks.forEach(chunk => writeBatch.delete(chunk.ref));
       chunks.forEach(({ index, participantes }) => {
         const chunkRef = chunkCollection.doc(`chunk_${String(index).padStart(4, '0')}`);
         writeBatch.set(chunkRef, {
@@ -1386,8 +1389,8 @@ export async function runMultiAgentSync() {
           universePfd: participantesFI.length
         }, { merge: false });
       });
+      writeBatch.set(latestRef, snapshot, { merge: false });
       await writeBatch.commit();
-      await latestRef.set(snapshot, { merge: false });
       await adminDb.collection('nodus_fi_sync_history').add({
         status: fiResult.completeness === 'complete' ? 'published' : 'partial_not_published',
         source: 'nodus_futuros_imposibles',

@@ -46,17 +46,17 @@ for (const completeness of ['complete', 'partial']) {
       collection: name => ({
         doc: id => ({
           collection: child => ({
-            get: async () => [{ ref: `${name}/${id}/${child}/old` }],
+            get: async () => ({ docs: [{ id: 'old', ref: `${name}/${id}/${child}/old` }] }),
             doc: chunk => `${name}/${id}/${child}/${chunk}`
           }),
-          set: async payload => writes.push({ path: `${name}/${id}`, payload })
+          path: `${name}/${id}`
         })
       }),
       batch: () => {
         const pending = [];
         return {
           delete: ref => pending.push(() => deleted.push(ref)),
-          set: (ref, payload) => pending.push(() => writes.push({ path: ref, payload })),
+          set: (ref, payload) => pending.push(() => writes.push({ path: ref.path || ref, payload })),
           commit: async () => pending.forEach(write => write())
         };
       }
@@ -103,8 +103,8 @@ test('FI view reconstructs chunks without losing freshness or completeness metad
     getDocsFromServer: async () => {
       chunkReads += 1;
       return { docs: [
-        { data: () => ({ index: 1, participantes: [second] }) },
-        { data: () => ({ index: 0, participantes: [first] }) }
+        { data: () => ({ index: 1, extractedAt: payload.extractedAt, participantes: [second] }) },
+        { data: () => ({ index: 0, extractedAt: payload.extractedAt, participantes: [first] }) }
       ] };
     }
   });
@@ -117,5 +117,9 @@ test('FI view reconstructs chunks without losing freshness or completeness metad
   const legacy = await read({ ...payload, participantes: [first] });
   assert.equal(legacy.participantes[0], first);
   assert.equal(chunkReads, 1);
+  await assert.rejects(read({ ...payload, extractedAt: 'different-generation' }),
+    /publicación FI cambió o está incompleta/);
+  await assert.rejects(read({ ...payload, participantChunks: 3 }), /publicación FI cambió o está incompleta/);
+  await assert.rejects(read({ ...payload, universePfd: 3 }), /total de participantes FI/);
   assert.equal((viewSource.match(/await readLiveFISnapshot\(\)/g) || []).length, 2);
 });
