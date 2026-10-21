@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCycles } from '../context/CyclesContext';
+import { calendarEventsForLocalDay } from '../services/trainerCalendarProjection.js';
 import { useUI } from '../context/UIContext';
 import { useNavigate } from 'react-router-dom';
 import { OPERATIONAL_SEDES, normalizeSede } from '../data/usersData';
@@ -714,12 +715,7 @@ export default function TeamCalendar() {
   // Eventos de Cycles en el día seleccionado
   const selectedDayEvents = useMemo(() => {
     if (!events || events.length === 0) return [];
-    const dateStr = selectedDate.toISOString().slice(0, 10);
-    return events.filter(e => {
-      const evStart = (e.fechaInicio || e.startDate || e.date || '').slice(0, 10);
-      const evEnd = (e.fechaFin || e.endDate || evStart).slice(0, 10);
-      return dateStr >= evStart && dateStr <= evEnd;
-    });
+    return calendarEventsForLocalDay(events, selectedDate);
   }, [events, selectedDate]);
 
   // Bloques del día seleccionado filtrados por ROL, SEDE y TIPO
@@ -1764,4 +1760,3 @@ export default function TeamCalendar() {
     </div>
   );
 }
-

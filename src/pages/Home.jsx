@@ -8,6 +8,11 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { resolveTaskLink } from '../services/taskNavigation';
 import { useAuth } from '../context/AuthContext';
 import { useCycles } from '../context/CyclesContext';
+import {
+  applyAsignadorAuthoritativeProjection,
+  indexAssignmentsForLookup,
+  matchAssignmentForEvent,
+} from '../services/trainerCalendarProjection.js';
 import { useChecklist } from '../context/ChecklistContext';
 import { useUI } from '../context/UIContext';
 import { useTheme } from '../context/ThemeContext';
@@ -170,25 +175,6 @@ const isTrainerMatchingUser = (evTrainer, user) => {
     const normT = normalizeTrainer(t);
     return Boolean(normT && userIdentity && normT === userIdentity);
   });
-};
-
-// El Asignador guarda una proyección mínima y pública de la asignación
-// confirmada. Esta clave es deliberadamente idéntica a la que usa el
-// Asignador: permite que el perfil del entrenador se actualice en vivo sin
-// exponer la asignación privada (correos, quién hizo el cambio o bitácora).
-const publicAssignmentEventKey = (event = {}) => {
-  const date = String(event.fecha_inicio || event.start || event.fechaInicio || '').slice(0, 10);
-  const sede = normalizeSede(event.sede || event.sedeTag || '');
-  const training = String(event.nombre || event.name || event.entrenamiento || '').trim();
-  const team = String(event.equipo || event.team || '').trim();
-  return `${date}__${sede}__${training}${team ? `__${team}` : ''}`.replace(/\//g, '-');
-};
-
-const publicAssignmentEventKeyNoTeam = (event = {}) => {
-  const date = String(event.fecha_inicio || event.start || event.fechaInicio || '').slice(0, 10);
-  const sede = normalizeSede(event.sede || event.sedeTag || '');
-  const training = String(event.nombre || event.name || event.entrenamiento || '').trim();
-  return `${date}__${sede}__${training}`.replace(/\//g, '-');
 };
 
 const trainerIdentityKey = (value) => {
@@ -3009,112 +2995,12 @@ export default function Home() {
                     const isEntrenador = ['entrenador', 'entrenador_llamadas'].includes(role);
                     const isQT = role === 'qt' || (currentUser?.roles || []).includes('qt');
                     const isEquipoRole = ['capitan', 'aliado', 'manager'].includes(role);
-                    const publishedOverrides = Object.values(publicCalendarChanges)
-                      .filter(change => change.kind === 'override' && change.sourceEventKey)
-                      .reduce((byEvent, change) => ({ ...byEvent, [change.sourceEventKey]: change }), {});
-                    const publishedCustomEvents = Object.values(publicCalendarChanges)
-                      .filter(change => change.kind === 'custom' && change.fechaInicio && change.nombre)
-                      .map(change => ({
-                        ...change,
-                        nombre: change.nombre,
-                        sede: change.sede,
-                        equipo: change.equipo || '',
-                        lugar: change.lugar || '',
-                        fecha_inicio: change.fechaInicio,
-                        fecha_fin: change.fechaFin || change.fechaInicio,
-                        __assignmentKey: change.id,
-                      }));
-                    const rawProfileEvents = (events || []).map(event => {
-                      const keyWithTeam = publicAssignmentEventKey(event);
-                      const keyNoTeam = publicAssignmentEventKeyNoTeam(event);
-                      
-                      const findLooseMatch = (dict) => {
-                        const datePrefixEnd = keyWithTeam.indexOf('__');
-                        if (datePrefixEnd === -1) return null;
-                        const suffixWithTeam = keyWithTeam.slice(datePrefixEnd);
-                        const suffixNoTeam = keyNoTeam.slice(keyNoTeam.indexOf('__'));
-                        
-                        // Exact match
-                        if (dict[event.__assignmentKey]) return dict[event.__assignmentKey];
-                        if (dict[keyWithTeam]) return dict[keyWithTeam];
-                        if (dict[keyNoTeam]) return dict[keyNoTeam];
-                        
-                        // Loose match (ignore date)
-                        for (const k of Object.keys(dict)) {
-                          if (k.endsWith(suffixWithTeam)) return dict[k];
-                        }
-                        for (const k of Object.keys(dict)) {
-                          if (k.endsWith(suffixNoTeam)) return dict[k];
-                        }
-                        return null;
-                      };
-
-                      const change = findLooseMatch(publishedOverrides);
-                      if (!change) return event;
-                      return {
-                        ...event,
-                        fecha_inicio: change.fechaInicio || event.fecha_inicio || event.start,
-                        fecha_fin: change.fechaFin || event.fecha_fin || event.end,
-                        sede: change.sede || event.sede || event.sedeTag,
-                        equipo: change.equipo ?? event.equipo ?? event.team,
-                        lugar: change.lugar || event.lugar || event.place,
-                      };
-                    }).concat(publishedCustomEvents.filter(custom => !(events || []).some(event => event.__assignmentKey === custom.__assignmentKey)));
-
-                    const assignmentForEvent = (event) => {
-                      const keyWithTeam = publicAssignmentEventKey(event);
-                      const keyNoTeam = publicAssignmentEventKeyNoTeam(event);
-                      
-                      const findLooseMatch = (dict) => {
-                        const datePrefixEnd = keyWithTeam.indexOf('__');
-                        if (datePrefixEnd === -1) return null;
-                        const suffixWithTeam = keyWithTeam.slice(datePrefixEnd);
-                        const suffixNoTeam = keyNoTeam.slice(keyNoTeam.indexOf('__'));
-                        
-                        // Exact match
-                        if (dict[event.__assignmentKey]) return dict[event.__assignmentKey];
-                        if (dict[keyWithTeam]) return dict[keyWithTeam];
-                        if (dict[keyNoTeam]) return dict[keyNoTeam];
-                        
-                        // Loose match (ignore date)
-                        for (const k of Object.keys(dict)) {
-                          if (k.endsWith(suffixWithTeam)) return dict[k];
-                        }
-                        for (const k of Object.keys(dict)) {
-                          if (k.endsWith(suffixNoTeam)) return dict[k];
-                        }
-                        return null;
-                      };
-                      
-                      return findLooseMatch(publicTrainerAssignments);
-                    };
+                    const assignmentIndex = indexAssignmentsForLookup(publicTrainerAssignments);
+                    const profileEvents = applyAsignadorAuthoritativeProjection(
+                      events || [], publicTrainerAssignments, Object.values(publicCalendarChanges)
+                    );
+                    const assignmentForEvent = event => matchAssignmentForEvent(event, assignmentIndex);
                     const assignedTrainerNamesForEvent = (event) => confirmedTrainerNames(assignmentForEvent(event));
-
-                    // Deduplicación estricta de eventos mostrados para evitar registros duplicados
-                    // (misma fecha, sede y entrenamiento). Causa OS siempre tiene prioridad.
-                    const profileEvents = [];
-                    const seenProfileMap = new Map();
-                    for (const ev of rawProfileEvents) {
-                      const d = String(ev.fecha_inicio || ev.start || '').slice(0, 10);
-                      const s = normalizeSede(ev.sede || ev.sedeTag || '').toUpperCase();
-                      const n = String(ev.nombre || ev.name || '').trim().toUpperCase();
-                      const dedupKey = `${d}__${s}__${n}`;
-                      if (!seenProfileMap.has(dedupKey)) {
-                        seenProfileMap.set(dedupKey, ev);
-                        profileEvents.push(ev);
-                      } else {
-                        const existing = seenProfileMap.get(dedupKey);
-                        const evAssigned = assignedTrainerNamesForEvent(ev).length > 0;
-                        const existingAssigned = assignedTrainerNamesForEvent(existing).length > 0;
-                        if (evAssigned && !existingAssigned) {
-                          Object.assign(existing, ev);
-                        } else {
-                          existing.equipo = existing.equipo || ev.equipo;
-                          existing.lugar = existing.lugar || ev.lugar;
-                          if (!existing.trainer && ev.trainer) existing.trainer = ev.trainer;
-                        }
-                      }
-                    }
 
                     let displayEvents = profileEvents.filter(ev => {
                       // 1. Entrenadores: la asignación confirmada en Causa OS
