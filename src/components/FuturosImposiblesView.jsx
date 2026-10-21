@@ -5,7 +5,7 @@ import {
   Filter, ShieldAlert, Award, FileText, UserCheck, AlertTriangle,
   Loader2, ThumbsUp, Send, Check
 } from 'lucide-react';
-import { addDoc, collection, doc, getDocFromServer, onSnapshot, serverTimestamp, setDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, getDocFromServer, getDocsFromServer, onSnapshot, serverTimestamp, setDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useAuth } from '../context/AuthContext';
 import { opcionesEquipo, resolveFISource } from '../services/nodusFISnapshot';
@@ -30,6 +30,27 @@ export default function FuturosImposiblesView({
   textDark = 'var(--text-main, #f8fafc)',
   textMuted = 'var(--text-muted, #94a3b8)'
 }) {
+  const readLiveFISnapshot = async () => {
+    const snap = await getDocFromServer(doc(db, 'nodus_futuros_imposibles', 'latest'));
+    const payload = snap.exists() ? snap.data() : null;
+    let participantes = Array.isArray(payload?.participantes) ? payload.participantes : [];
+    if (!participantes.length && Number(payload?.participantChunks || 0) > 0) {
+      const chunksSnap = await getDocsFromServer(collection(db, 'nodus_futuros_imposibles', 'latest', 'participantes'));
+      const chunks = chunksSnap.docs.map(chunk => chunk.data()).sort((a, b) => Number(a.index) - Number(b.index));
+      if (chunks.length !== Number(payload.participantChunks) ||
+          chunks.some((chunk, index) => chunk.index !== index || chunk.extractedAt !== payload.extractedAt ||
+            !Array.isArray(chunk.participantes))) {
+        throw new Error('La publicación FI cambió o está incompleta. Vuelve a actualizar.');
+      }
+      participantes = chunks
+        .flatMap((chunk) => Array.isArray(chunk.participantes) ? chunk.participantes : []);
+      if (participantes.length !== Number(payload.universePfd)) {
+        throw new Error('El total de participantes FI no coincide con la publicación.');
+      }
+    }
+    return payload ? { ...payload, participantes } : null;
+  };
+
   const { currentUser } = useAuth();
   // Estados de filtrado y búsqueda
   const [equipoFilter, setEquipoFilter] = useState('Todos');
@@ -62,8 +83,7 @@ export default function FuturosImposiblesView({
     let isMounted = true;
     async function fetchNodusFIData() {
       try {
-        const snap = await getDocFromServer(doc(db, 'nodus_futuros_imposibles', 'latest'));
-        const payload = snap.exists() ? snap.data() : null;
+        const payload = await readLiveFISnapshot();
         if (!isMounted) return;
         const resolved = resolveFISource(payload, []);
         setParticipantesRaw(resolved.participantes);
@@ -161,8 +181,7 @@ export default function FuturosImposiblesView({
   const handleReevaluate = async () => {
     setIsEvaluating(true);
     try {
-      const snap = await getDocFromServer(doc(db, 'nodus_futuros_imposibles', 'latest'));
-      const payload = snap.exists() ? snap.data() : null;
+      const payload = await readLiveFISnapshot();
       const resolved = resolveFISource(payload, []);
       setParticipantesRaw(resolved.participantes);
       setSourceState(resolved.sourceState);
