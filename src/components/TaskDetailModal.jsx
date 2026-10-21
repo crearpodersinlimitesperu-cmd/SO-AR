@@ -723,6 +723,15 @@ export default function TaskDetailModal({
 
       const finalCompleted = allDone || finalOverall === 100;
 
+      if (!isMultiAssignee && targetKey && mapToSave[targetKey]) {
+        mapToSave[targetKey] = {
+          ...mapToSave[targetKey],
+          progress: finalOverall,
+          completed: finalCompleted,
+          completedAt: finalCompleted ? (mapToSave[targetKey]?.completedAt || new Date().toISOString()) : null
+        };
+      }
+
       // Registrar avance en la bitácora de notas si el usuario actual avanzó
       let updatedNotesList = [...notesList];
       if (isMultiAssignee && targetKey) {
@@ -751,7 +760,7 @@ export default function TaskDetailModal({
         // (finalCompleted=false), se limpia -- se resetea al volver a
         // completarse, nunca se inventa una fecha.
         completedAt: finalCompleted ? (task.completedAt || new Date().toISOString()) : null,
-        assigneeProgress: isMultiAssignee ? mapToSave : (task.assigneeProgress || {}),
+        assigneeProgress: Object.keys(mapToSave).length > 0 ? mapToSave : (task.assigneeProgress || {}),
         evidenceUrl: mainEvidenceUrl,
         evidence_url: mainEvidenceUrl,
         evidences: evidencesList,

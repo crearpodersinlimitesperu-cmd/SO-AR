@@ -1475,26 +1475,56 @@ export function ChecklistProvider({ children }) {
   // 4. Actualización de progreso individual en tarjetas compartidas / multi-área
   const updateIndividualProgress = async (taskId, userEmail, isCompleted, progressPercentage = null) => {
     try {
+      const normalizeEmailKey = (val) => (typeof val === 'string'
+        ? val.trim().toLowerCase()
+            .replace('@crearpls.com', '@crearpsl.net')
+            .replace('@crearpsl.com', '@crearpsl.net')
+        : '');
+      const em = normalizeEmailKey(userEmail || currentUser?.email || '');
+      if (!em) return false;
+
       const taskRef = doc(db, 'tasks', taskId);
       const snap = await getDoc(taskRef);
       if (!snap.exists()) return false;
       const data = snap.data();
       const currentProgress = { ...(data.assigneeProgress || {}) };
-      const em = (userEmail || currentUser?.email || '').toLowerCase().trim();
-      if (!em) return false;
 
-      const userObj = usersData.find(u => u.email?.toLowerCase() === em);
-      const prevEntry = currentProgress[em] || {
-        name: currentUser?.displayName || userObj?.name || em,
+      // Asegurar que todos los asignados formales tengan entrada en currentProgress
+      const formalAssignees = [
+        ...(Array.isArray(data.assignedToEmails) ? data.assignedToEmails : []),
+        ...(data.assignedToEmail ? [data.assignedToEmail] : []),
+        ...(data.assigned_to ? [data.assigned_to] : [])
+      ].map(normalizeEmailKey).filter(Boolean);
+
+      formalAssignees.forEach(assigneeEm => {
+        const existingMatch = Object.keys(currentProgress).find(k => normalizeEmailKey(k) === assigneeEm);
+        if (!existingMatch) {
+          const u = usersData.find(usr => normalizeEmailKey(usr.email) === assigneeEm);
+          currentProgress[assigneeEm] = {
+            name: u?.name || assigneeEm,
+            role: u?.role || data.role || 'colaborador',
+            sede: u?.sede || data.assignedSede || 'Global',
+            completed: data.completed === true,
+            completedAt: data.completed === true ? (data.completedAt || null) : null,
+            progress: data.completed === true ? 100 : 0
+          };
+        }
+      });
+
+      const targetKey = Object.keys(currentProgress).find(k => normalizeEmailKey(k) === em) || em;
+      const userObj = usersData.find(u => normalizeEmailKey(u.email) === em);
+      const prevEntry = currentProgress[targetKey] || {
+        name: currentUser?.displayName || currentUser?.name || userObj?.name || em,
         role: currentUser?.appRole || userObj?.role || 'colaborador',
         sede: currentUser?.sede || userObj?.sede || 'Global'
       };
 
-      currentProgress[em] = {
+      const nextProgVal = progressPercentage !== null ? progressPercentage : (isCompleted ? 100 : 0);
+      currentProgress[targetKey] = {
         ...prevEntry,
         completed: isCompleted,
         completedAt: isCompleted ? new Date().toISOString() : null,
-        progress: progressPercentage !== null ? progressPercentage : (isCompleted ? 100 : 0)
+        progress: nextProgVal
       };
 
       // Si todos los asignados completaron, marcar la tarjeta general como completada
@@ -1509,8 +1539,8 @@ export function ChecklistProvider({ children }) {
         return acc + val;
       }, 0);
       const overallPercent = totalItems > 0 ? Math.round(sumProgress / totalItems) : (isCompleted ? 100 : 0);
-
-      await updateDoc(taskRef, {
+      const nowIso = new Date().toISOString();
+      const nextPayload = {
         assigneeProgress: currentProgress,
         completed: allCompleted,
         status: allCompleted ? 'Completada' : (anyCompleted ? 'En Progreso' : 'Pendiente'),
@@ -1520,9 +1550,14 @@ export function ChecklistProvider({ children }) {
         // por colaborador), trazabilidad pedida por Jose. Conserva la fecha
         // si ya existia (no se pisa en actualizaciones posteriores); nunca se
         // inventa.
-        completedAt: allCompleted ? (data.completedAt || new Date().toISOString()) : null,
-        updatedAt: new Date().toISOString()
-      });
+        completedAt: allCompleted ? (data.completedAt || nowIso) : null,
+        updatedAt: nowIso
+      };
+
+      // Actualización optimista inmediata para reflejar el cambio sin latencia
+      setTasks(prev => prev.map(t => t.id === taskId ? { ...t, ...nextPayload } : t));
+
+      await updateDoc(taskRef, nextPayload);
 
       if (allCompleted && !data.completed) {
         notifyTaskCompletedToAssigner(
@@ -1533,7 +1568,7 @@ export function ChecklistProvider({ children }) {
         );
       }
 
-      showToast(isCompleted ? "¡Completaste tu parte de la tarea!" : "Marcaste tu parte como pendiente.", "success");
+      showToast(isCompleted ? "¡Tarea marcada como completada!" : "Marcaste la tarea como pendiente.", "success");
       return true;
     } catch (err) {
       console.error("Error updating individual progress:", err);

@@ -213,7 +213,7 @@ export function AuthProvider({ children }) {
       showToast('Acceso Denegado: solo José Sánchez puede simular usuarios.', 'error');
       return;
     }
-    setOriginalAdminUser(realAdmin);
+    setOriginalAdminUser(originalAdminUser || currentUser);
     sessionStorage.removeItem('cpsl_active_role');
     
     const targetEmail = (targetUser?.emails?.[0] || targetUser?.email || '').toLowerCase().trim();
@@ -265,7 +265,7 @@ export function AuthProvider({ children }) {
         isSimulation: true,
         simulatedBy: realAdmin.email
       });
-      setCurrentUser(realAdmin);
+      setCurrentUser(originalAdminUser);
       setOriginalAdminUser(null);
       showToast('Simulación terminada. Bienvenido de vuelta, José.', 'success');
     }
