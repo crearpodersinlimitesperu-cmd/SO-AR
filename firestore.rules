@@ -1011,7 +1011,7 @@ service cloud.firestore {
       }
     }
     match /imo_missions/{missionId} {
-      allow read: if true;
+      allow read: if isImoStaff();
       allow create: if isImoStaff() && request.resource.data.schemaVersion == 2 &&
         request.resource.data.createdBy == request.auth.uid && request.resource.data.createdAt == request.time &&
         request.resource.data.originTeam is int && request.resource.data.originTeam >= 0 &&
