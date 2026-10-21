@@ -3,7 +3,7 @@ import { collection, onSnapshot } from 'firebase/firestore';
 import { useAuth } from './AuthContext';
 import { db } from '../services/firebase';
 import { OFFICIAL_CALENDAR_SHEET_URL, parseOfficialCalendarSheet } from '../services/officialCalendarSheet';
-import { applyAsignadorAuthoritativeProjection } from '../services/trainerCalendarSyncAgent';
+import { applyAsignadorAuthoritativeProjection, mergeOfficialCalendar } from '../services/trainerCalendarProjection.js';
 
 // Genera un id estable para un evento del calendario oficial (viene de una hoja
 // de Google, sin "id" propio de Firestore), para poder recordar cuáles ya se
@@ -15,64 +15,6 @@ const getEventSyncId = (ev) =>
 // republicar cambios de la agenda. Esta vista pública de la MISMA hoja es el
 // contraste de actualidad: solamente complementa/actualiza eventos, nunca
 // escribe en Sheets y nunca toca las asignaciones de Causa OS.
-const calendarMergeKey = (event = {}) => [
-  String(event.fecha_inicio || event.start || '').slice(0, 10),
-  String(event.sede || event.sedeTag || '').trim().toUpperCase(),
-  String(event.equipo || event.team || '').trim(),
-  String(event.nombre || event.name || '').trim().toUpperCase()
-].join('__');
-
-const calendarMergeKeyNoTeam = (event = {}) => [
-  String(event.fecha_inicio || event.start || '').slice(0, 10),
-  String(event.sede || event.sedeTag || '').trim().toUpperCase(),
-  String(event.nombre || event.name || '').trim().toUpperCase()
-].join('__');
-
-const mergeOfficialCalendar = (apiEvents, sheetEvents) => {
-  const byKey = new Map();
-  const byKeyNoTeam = new Map();
-
-  for (const event of apiEvents || []) {
-    const fullKey = calendarMergeKey(event);
-    const noTeamKey = calendarMergeKeyNoTeam(event);
-    byKey.set(fullKey, event);
-    if (!byKeyNoTeam.has(noTeamKey)) {
-      byKeyNoTeam.set(noTeamKey, event);
-    }
-  }
-
-  for (const sheetEvent of sheetEvents || []) {
-    const fullKey = calendarMergeKey(sheetEvent);
-    const noTeamKey = calendarMergeKeyNoTeam(sheetEvent);
-    // Búsqueda inteligente: match exacto por equipo o match por fecha+sede+nombre
-    // para evitar duplicar eventos cuando la hoja viene sin número de equipo.
-    const previous = byKey.get(fullKey) || byKeyNoTeam.get(noTeamKey);
-
-    const merged = {
-      ...(previous || {}),
-      ...sheetEvent,
-      // Preservar equipo existente si la hoja lo trae en blanco
-      equipo: sheetEvent.equipo || previous?.equipo || previous?.team || '',
-      fecha_fin: previous?.fecha_fin || previous?.end || sheetEvent.fecha_fin || '',
-      ticket: previous?.ticket || 'pending',
-      hotel: previous?.hotel || 'pending',
-      notified: previous?.notified || false,
-      arrival: previous?.arrival || '',
-      ticket_url: previous?.ticket_url || ''
-    };
-
-    if (previous) {
-      const prevFullKey = calendarMergeKey(previous);
-      byKey.delete(prevFullKey);
-    }
-    const mergedFullKey = calendarMergeKey(merged);
-    byKey.set(mergedFullKey, merged);
-    byKeyNoTeam.set(noTeamKey, merged);
-  }
-
-  return [...byKey.values()];
-};
-
 const applyAsignadorProjection = (sourceEvents, assignments, operationalChanges) =>
   applyAsignadorAuthoritativeProjection(sourceEvents, assignments, operationalChanges);
 

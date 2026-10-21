@@ -42,6 +42,10 @@
     <!-- Puente de sesión: reutiliza únicamente la sesión ya iniciada de Causa OS.
          No crea sesiones paralelas ni guarda credenciales en esta página. -->
     <script type="module">
+        import * as projection from './trainerCalendarProjection.js';
+        window.causaCalendarProjection = projection;
+    </script>
+    <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js';
         import { getFirestore, collection, onSnapshot } from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js';
 
@@ -687,11 +691,6 @@
           return raw || 'Sede Global';
         }
 
-        function extractTeamDigitsKey(equipo) {
-          const digits = String(equipo || '').match(/\d+/g);
-          return digits && digits.length ? digits.join('') : String(equipo || '').trim();
-        }
-
         function ajustarFechaFinPorRegla(nombre, inicioRaw, finRaw) {
           if (!inicioRaw) return finRaw;
           const n = String(nombre || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -722,63 +721,15 @@
         }
 
         function assignmentEventKey(ev, sedeKey) {
-          const date = String(ev.start || ev.fecha_inicio || '').slice(0, 10);
-          const sede = normalizeSedeAsignador(ev.sede || ev.sedeTag || sedeKey || '');
-          const name = String(ev.name || ev.nombre || '').trim();
-          const eq = String(ev.team || ev.equipo || '').trim();
-          return `${date}__${sede}__${name}${eq ? '__' + eq : ''}`.replace(/\//g, '-');
-        }
-
-        function assignmentEventKeyNoTeam(ev, sedeKey) {
-          const date = String(ev.start || ev.fecha_inicio || '').slice(0, 10);
-          const sede = normalizeSedeAsignador(ev.sede || ev.sedeTag || sedeKey || '');
-          const name = String(ev.name || ev.nombre || '').trim();
-          return `${date}__${sede}__${name}`.replace(/\//g, '-');
-        }
-
-        function assignmentEventKeyDigitsTeam(ev, sedeKey) {
-          const base = assignmentEventKeyNoTeam(ev, sedeKey);
-          const digits = extractTeamDigitsKey(ev.team || ev.equipo || '');
-          return digits ? `${base}__${digits}`.replace(/\//g, '-') : base;
+          return window.causaCalendarProjection.buildAsignadorEventKey(ev, sedeKey);
         }
 
         function indexAssignmentsForLookup(assignments) {
-          const byKey = new Map();
-          (assignments || []).forEach(docData => {
-            if (!docData || typeof docData !== 'object') return;
-            const id = String(docData.id || '').trim();
-            if (id) byKey.set(id, docData);
-            const date = String(docData.fechaInicio || '').slice(0, 10);
-            const sede = normalizeSedeAsignador(docData.sede || '');
-            const name = String(docData.entrenamiento || docData.nombre || '').trim();
-            const eq = String(docData.equipo || '').trim();
-            if (date && sede && name) {
-              const noTeamKey = `${date}__${sede}__${name}`.replace(/\//g, '-');
-              const withTeamKey = `${noTeamKey}${eq ? '__' + eq : ''}`.replace(/\//g, '-');
-              const digits = extractTeamDigitsKey(eq);
-              const digitsKey = digits ? `${noTeamKey}__${digits}`.replace(/\//g, '-') : noTeamKey;
-              if (!byKey.has(withTeamKey)) byKey.set(withTeamKey, docData);
-              if (!byKey.has(digitsKey)) byKey.set(digitsKey, docData);
-              if (!byKey.has(noTeamKey)) byKey.set(noTeamKey, docData);
-            }
-          });
-          return byKey;
+          return window.causaCalendarProjection.indexAssignmentsForLookup(assignments);
         }
 
         function matchAssignmentForEvent(ev, assignmentIndex, sedeKey) {
-          if (!ev || !assignmentIndex) return null;
-          const candidates = [
-            ev.sourceEventKey,
-            ev.__sourceEventKey,
-            ev.id,
-            assignmentEventKey(ev, sedeKey),
-            assignmentEventKeyDigitsTeam(ev, sedeKey),
-            assignmentEventKeyNoTeam(ev, sedeKey),
-          ].filter(Boolean);
-          for (const key of candidates) {
-            if (assignmentIndex.has(key)) return assignmentIndex.get(key);
-          }
-          return null;
+          return window.causaCalendarProjection.matchAssignmentForEvent(ev, assignmentIndex, sedeKey);
         }
 
         function googleVizDateToIso(value) {
@@ -791,16 +742,8 @@
           return [
             String(event.start || event.fecha_inicio || '').slice(0, 10),
             normalizeSedeAsignador(event.sede || event.sedeTag || sedeKey || ''),
-            String(event.equipo || '').trim(),
-            String(event.name || event.nombre || '').trim().toUpperCase()
-          ].join('__');
-        }
-
-        function currentCalendarMergeKeyNoTeam(event, sedeKey) {
-          return [
-            String(event.start || event.fecha_inicio || '').slice(0, 10),
-            normalizeSedeAsignador(event.sede || event.sedeTag || sedeKey || ''),
-            String(event.name || event.nombre || '').trim().toUpperCase()
+            window.causaCalendarProjection.extractTeamDigitsKey(event.equipo ?? event.team),
+            window.causaCalendarProjection.normalizeTrainingNameKey(event.name || event.nombre)
           ].join('__');
         }
 
@@ -818,11 +761,8 @@
           if (first < 0 || last < first) throw new Error('Formato de calendario vigente inválido');
           const rows = JSON.parse(text.slice(first, last + 1)).table?.rows || [];
           const index = new Map();
-          const indexNoTeam = new Map();
           Object.keys(data || {}).forEach(sede => (data[sede] || []).forEach(event => {
             index.set(currentCalendarMergeKey(event, sede), event);
-            const noTeam = currentCalendarMergeKeyNoTeam(event, sede);
-            if (!indexNoTeam.has(noTeam)) indexNoTeam.set(noTeam, event);
           }));
           rows.forEach(row => {
             const cells = row.c || [];
@@ -838,8 +778,7 @@
               address: String(value(6) || '').trim(), sedeTag: sede, sede: sourceSede
             };
             const key = currentCalendarMergeKey(incoming, sede);
-            const keyNoTeam = currentCalendarMergeKeyNoTeam(incoming, sede);
-            const existing = index.get(key) || indexNoTeam.get(keyNoTeam);
+            const existing = index.get(key);
             if (existing) {
               Object.assign(existing, {
                 ...incoming,
@@ -853,7 +792,6 @@
               if (!data[sede]) data[sede] = [];
               data[sede].push(incoming);
               index.set(key, incoming);
-              indexNoTeam.set(keyNoTeam, incoming);
             }
           });
         }
@@ -910,15 +848,19 @@
         function mergeOfficialAssignments(data, assignments) {
           const assignmentIndex = indexAssignmentsForLookup(assignments);
           let confirmed = 0;
-          Object.keys(data || {}).forEach(sede => {
-            (data[sede] || []).forEach(ev => {
-              if (!ev.sourceEventKey) {
-                ev.sourceEventKey = assignmentEventKey(ev, sede);
-              }
-              if (typeof ev.sheetTrainer === 'undefined') {
-                ev.sheetTrainer = formatTrainerDisplayName(ev.trainer || '');
-              }
-              ev.end = ajustarFechaFinPorRegla(ev.name || ev.nombre, ev.start, ev.end);
+          const rawEvents = Object.entries(data || {}).flatMap(([sede, events]) =>
+            events.map(event => ({ ...event, sede: event.sede || sede, sedeTag: event.sedeTag || sede }))
+          );
+          const events = window.causaCalendarProjection.applyAsignadorAuthoritativeProjection(
+            rawEvents, assignments, operationalChangesByData.get(data) || []
+          );
+          Object.keys(data).forEach(sede => { data[sede] = []; });
+          events.forEach(ev => {
+              const sede = normalizeSedeKey(ev.sede || ev.sedeTag);
+              if (!data[sede]) data[sede] = [];
+              ev.sourceEventKey = ev.__sourceEventKey;
+              ev.place = ev.lugar ?? ev.place ?? '';
+              data[sede].push(ev);
               const assignment = matchAssignmentForEvent(ev, assignmentIndex, sede);
               const slots = assignment || {};
               const orderedSlots = ['unico', 'Creación', 'Relación', 'Gratitud'];
@@ -939,77 +881,32 @@
               ev.trainer = formattedConfirmed;
               ev.assignmentSource = 'causa_os';
               confirmed++;
-            });
-
-            // Deduplicación de eventos en la misma sede (misma fecha, nombre y equipo normalizado)
-            const seen = new Map();
-            const unique = [];
-            (data[sede] || []).forEach(ev => {
-              const d = String(ev.start || ev.fecha_inicio || '').slice(0, 10);
-              const n = String(ev.name || ev.nombre || '').trim().toUpperCase();
-              const eqDigits = extractTeamDigitsKey(ev.equipo);
-              const baseKey = `${d}__${n}`;
-              const fullKey = eqDigits ? `${baseKey}__${eqDigits}` : baseKey;
-              const matchKey = seen.has(fullKey)
-                ? fullKey
-                : (!eqDigits && seen.has(baseKey) ? baseKey : null);
-              if (!matchKey) {
-                seen.set(fullKey, ev);
-                if (!seen.has(baseKey)) seen.set(baseKey, ev);
-                unique.push(ev);
-              } else {
-                const existing = seen.get(matchKey);
-                if (ev.assignmentSource === 'causa_os' && existing.assignmentSource !== 'causa_os') {
-                  Object.assign(existing, ev);
-                } else {
-                  existing.equipo = existing.equipo || ev.equipo;
-                  existing.place = existing.place || ev.place;
-                }
-              }
-            });
-            data[sede] = unique;
           });
           return confirmed;
         }
 
+        const operationalSourceSnapshots = new WeakMap();
+        const operationalChangesByData = new WeakMap();
         function applyOperationalChanges(data, changes) {
-          const overrides = new Map((changes || []).filter(item => item.kind === 'override' && item.sourceEventKey).map(item => [item.sourceEventKey, item]));
-          Object.keys(data || {}).forEach(sede => {
-            (data[sede] || []).forEach(ev => {
-              const sourceEventKey = ev.sourceEventKey || assignmentEventKey(ev, sede);
-              const sourceEventKeyDigits = assignmentEventKeyDigitsTeam(ev, sede);
-              const sourceEventKeyNoTeam = assignmentEventKeyNoTeam(ev, sede);
-              const change = overrides.get(sourceEventKey) || overrides.get(sourceEventKeyDigits) || overrides.get(sourceEventKeyNoTeam);
-              if (!change) return;
-              ev.sourceEventKey = sourceEventKey;
-              ev.start = change.fechaInicio || ev.start;
-              ev.name = change.nombre || ev.name;
-              ev.end = change.fechaFin || ajustarFechaFinPorRegla(ev.name, ev.start, ev.end || ev.start);
-              ev.equipo = change.equipo ?? ev.equipo;
-              ev.place = change.lugar ?? ev.place;
-              ev.sede = change.sede || ev.sede;
-              ev.sedeTag = normalizeSedeKey(change.sede || ev.sedeTag || sede);
-            });
-          });
-          (changes || []).filter(item => item.kind === 'custom' && item.fechaInicio && item.nombre).forEach(item => {
-            const sede = normalizeSedeKey(item.sede || 'LIM');
+          operationalChangesByData.set(data, changes);
+          if (!operationalSourceSnapshots.has(data)) {
+            operationalSourceSnapshots.set(data, Object.entries(data).flatMap(([sede, events]) =>
+              events.map(event => ({ ...event, sede: event.sede || sede, sedeTag: event.sedeTag || sede }))
+            ));
+          }
+          const projected = window.causaCalendarProjection.applyAsignadorAuthoritativeProjection(
+            operationalSourceSnapshots.get(data), [], changes
+          );
+          Object.keys(data).forEach(sede => { data[sede] = []; });
+          projected.forEach(event => {
+            const sede = normalizeSedeKey(event.sede || event.sedeTag);
             if (!data[sede]) data[sede] = [];
-            if (data[sede].some(ev => ev.sourceEventKey === `custom__${item.id}` || ev.sourceEventKey === item.id)) return;
             data[sede].push({
-              id: item.id,
-              sourceEventKey: item.id,
-              start: item.fechaInicio,
-              end: ajustarFechaFinPorRegla(item.nombre, item.fechaInicio, item.fechaFin || item.fechaInicio),
-              name: item.nombre,
-              equipo: item.equipo || '',
-              place: item.lugar || '',
-              address: '',
-              sede: item.sede || sede,
-              sedeTag: sede,
-              sheetTrainer: '',
-              trainer: '',
-              assignmentSource: 'unassigned_in_asignador',
-              logistics: { ticket: 'pending', hotel: 'pending', trainer_notified: false }
+              ...event,
+              sourceEventKey: event.__sourceEventKey,
+              place: event.lugar ?? event.place ?? '',
+              address: event.direccion ?? event.address ?? '',
+              logistics: event.logistics || { ticket: 'pending', hotel: 'pending', trainer_notified: false }
             });
           });
         }
