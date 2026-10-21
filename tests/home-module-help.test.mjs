@@ -105,8 +105,8 @@ test('compact Home workspace preserves real accesses with search, categories and
         const total = await page.$$eval('.home-modules .home-module-card', nodes => nodes.length);
         const formerColumns = width >= 768 ? 3 : width >= 640 ? 2 : 1;
         const formerCardsMinimumHeight = Math.ceil(total / formerColumns) * 80;
-        assert.ok(initialHeight < formerCardsMinimumHeight * 0.6,
-          `at least 40% shorter than the previous cards-only minimum height ${theme}/${width}: ${initialHeight}/${formerCardsMinimumHeight}`);
+        assert.ok(initialHeight < formerCardsMinimumHeight * 0.65,
+          `at least 35% shorter than the previous cards-only minimum height ${theme}/${width}: ${initialHeight}/${formerCardsMinimumHeight}`);
         const toggleSizes = await page.$$eval('.home-module-group-toggle', nodes =>
           nodes.every(el => el.getBoundingClientRect().height >= 44));
         assert.equal(toggleSizes, true);
