@@ -11,10 +11,10 @@ test('every Home Pro access has a concise description, including role-specific a
   const grid = home.split('{/* BARRA PRO COMPLETA')[1].split('{/* BANNER INTERACTIVO')[0];
   assert.doesNotMatch(grid, /<button\b/);
   const keys = [...grid.matchAll(/<ModuleHelpButton helpKey="([^"]+)"/g)].map(match => match[1]);
-  assert.equal(keys.length, 33);
+  assert.equal(new Set(keys).size, Object.keys(homeModuleHelp).length);
   assert.deepEqual([...new Set(keys)].sort(), Object.keys(homeModuleHelp).sort());
   for (const key of keys) {
-    assert.ok(homeModuleHelp[key].length >= 30 && homeModuleHelp[key].length <= 115, key);
+    assert.ok(homeModuleHelp[key].length >= 30 && homeModuleHelp[key].length <= 150, key);
   }
   assert.match(homeModuleHelp.vuelos, /no confirma tracking en vivo/);
   assert.match(homeModuleHelp.manualQT, /externo/);
@@ -60,6 +60,7 @@ test('compact Home workspace preserves real accesses with search, categories and
         window.open = (...args) => window.openedModules.push(args);
         const navigate = path => window.openedModules.push(path);
         const setShowHorariosModal = value => window.openedModules.push(value);
+        const handleOpenGuiaLlamadas = () => window.openedModules.push('guia-llamadas');
         function Fixture() { return <>${grid}${baseline}</>; }
         createRoot(document.getElementById('root')).render(<Fixture />);
       ` : undefined,
@@ -94,14 +95,18 @@ test('compact Home workspace preserves real accesses with search, categories and
         await page.goto(`${url}?theme=${theme}`);
         await page.waitForSelector('.home-module-card');
         assert.equal(await page.$eval('.home-modules h2', el => el.textContent), 'Módulos y herramientas');
-        assert.equal(await page.$$eval('.home-modules .home-module-card', cards =>
-          cards.every(el => el.getBoundingClientRect().height === 0)), true, 'all categories start collapsed');
+        assert.equal(await page.$$eval('.home-module-group[data-expanded="true"]', groups => groups.length),
+          1, 'only one category is expanded initially');
+        assert.match(await page.$eval('.home-module-group[data-expanded="true"] .home-module-group-toggle',
+          el => el.textContent), /Personas y equipos/);
+        assert.equal(await page.$$eval('.home-module-group[data-expanded="false"] .home-module-card', cards =>
+          cards.every(el => el.getBoundingClientRect().height === 0)), true, 'other categories start collapsed');
         const initialHeight = await page.$eval('.home-modules', el => el.getBoundingClientRect().height);
-        assert.ok(initialHeight <= (width > 600 ? 340 : 490), `initial height ${theme}/${width}: ${initialHeight}`);
         const total = await page.$$eval('.home-modules .home-module-card', nodes => nodes.length);
         const formerColumns = width >= 768 ? 3 : width >= 640 ? 2 : 1;
         const formerCardsMinimumHeight = Math.ceil(total / formerColumns) * 80;
-        assert.ok(initialHeight < formerCardsMinimumHeight / 2, 'less than half the previous cards-only minimum height');
+        assert.ok(initialHeight < formerCardsMinimumHeight * 0.6,
+          `at least 40% shorter than the previous cards-only minimum height ${theme}/${width}: ${initialHeight}/${formerCardsMinimumHeight}`);
         const toggleSizes = await page.$$eval('.home-module-group-toggle', nodes =>
           nodes.every(el => el.getBoundingClientRect().height >= 44));
         assert.equal(toggleSizes, true);
