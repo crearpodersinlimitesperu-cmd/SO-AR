@@ -735,7 +735,15 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const startupTrace = createAuthStartupTrace();
+    let sessionVersion = 0;
+    let disposed = false;
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      const version = ++sessionVersion;
+      const isCurrentSession = () => !disposed && version === sessionVersion;
+      if (!isCurrentSession()) return;
+      setLoading(true);
+      setCurrentUser(null);
+      setOriginalAdminUser(null);
       startupTrace.authReady();
       try {
         if (user) {
@@ -743,9 +751,11 @@ export function AuthProvider({ children }) {
           const normalizedEmail = rawEmail.replace('@crearpsl.com', '@crearpsl.net');
           
           let foundUser = await startupTrace.measure('users-lookup', () => findUserInFirestore(normalizedEmail));
+          if (!isCurrentSession()) return;
           
           if (!foundUser) {
             foundUser = await startupTrace.measure('staff-lookup', () => findStaffInFirestore(normalizedEmail));
+            if (!isCurrentSession()) return;
           }
           
           // 🆕 (02/09/2026) Mismo respaldo que en loginWithGoogle: catálogo estático
@@ -776,6 +786,7 @@ export function AuthProvider({ children }) {
             if (foundUser.isActive === false || foundUser.status === 'inactive' || foundUser.active === false || esInactivoDesvinculado) {
               console.warn("Usuario desactivado intentando acceder a la sesión:", normalizedEmail);
               await signOut(auth);
+              if (!isCurrentSession()) return;
               setCurrentUser(null);
               setLoading(false);
               return;
@@ -791,6 +802,7 @@ export function AuthProvider({ children }) {
                 error => ({ error })
               )
             ]);
+            if (!isCurrentSession()) return;
             canonicalUser = mergeAuthenticatedRoleProfile(
               canonicalUser,
               profileResult.snapshot?.exists() ? profileResult.snapshot.data() : null,
@@ -801,6 +813,7 @@ export function AuthProvider({ children }) {
             if (profileResult.error) throw profileResult.error;
             await startupTrace.measure('profile-metadata', () =>
               saveSelfProfile(user, canonicalUser, normalizedEmail, profileResult.snapshot));
+            if (!isCurrentSession()) return;
 
             const userObj = buildUserObject(user, canonicalUser, normalizedEmail);
             
@@ -857,7 +870,8 @@ export function AuthProvider({ children }) {
           } else {
             sessionStorage.removeItem('googleAccessToken');
             sessionStorage.removeItem('cpsl_active_role');
-            auth.signOut();
+            await auth.signOut();
+            if (!isCurrentSession()) return;
             setCurrentUser(null);
           }
         } else {
@@ -874,16 +888,24 @@ export function AuthProvider({ children }) {
           setCurrentUser(null);
         }
       } catch (authErr) {
+        if (!isCurrentSession()) return;
         console.error("Error crítico durante autenticación en Causa OS:", authErr);
         setCurrentUser(null);
         showToast('No se pudo verificar tu acceso. Vuelve a iniciar sesión.', 'error');
       } finally {
-        startupTrace.finish();
-        setLoading(false);
+        if (isCurrentSession()) {
+          startupTrace.finish();
+          setLoading(false);
+        }
       }
     });
     
-    return unsubscribe;
+    return () => {
+      // Unsubscribe no cancela las lecturas async que ya estaban en curso.
+      disposed = true;
+      sessionVersion += 1;
+      unsubscribe();
+    };
   }, []);
 
   return (

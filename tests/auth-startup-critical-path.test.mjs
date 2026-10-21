@@ -11,7 +11,7 @@ const current = readFileSync(new URL('../src/context/AuthContext.jsx', import.me
 const baseline = execFileSync('git', ['show', `${baselineRef}:src/context/AuthContext.jsx`], { encoding: 'utf8' });
 const agentSource = readFileSync(new URL('../src/services/roleAgentDaemon.js', import.meta.url), 'utf8');
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
-const email = 'ana@crearpsl.net';
+const email = 'access-fixture@example.invalid';
 const uid = 'A'.repeat(28);
 const row = (id, data) => ({ id, data: () => data });
 
@@ -64,19 +64,20 @@ function harness(source, { rows = [], staff = [], exists = true, fail = '', inac
   const agentBody = agentSource.replace(/^import .*$/gm, '').replace('export async function', 'async function');
   const agent = new Function('db', 'getDocs', 'collection', 'findUserByAnyEmail', 'normalizeRole', 'DUAL_ROLE_TRAINER_EMAILS', 'console',
     `${agentBody}; return enforceUserRolesAgent;`)({}, getDocs, collection, () => null, r => r, [], logger);
-  const start = source.indexOf('const unsubscribe = onAuthStateChanged');
-  const effectBody = source.slice(start, source.indexOf('return unsubscribe;', start));
+  const declarations = source.indexOf('let sessionVersion = 0;');
+  const start = declarations === -1 ? source.indexOf('const unsubscribe = onAuthStateChanged') : declarations;
+  const effectBody = source.slice(start, source.indexOf('  }, []);', start));
   const storage = { getItem: () => null, setItem() {}, removeItem() {} };
   new Function('onAuthStateChanged', 'auth', 'findUserInFirestore', 'findStaffInFirestore', 'db', 'collection',
     'query', 'where', 'getDocs', 'getDoc', 'doc', 'findUserByAnyEmail', 'isSuperAdminEmail', 'isInactiveTrainer',
-    'signOut', 'setCurrentUser', 'setLoading', 'normalizeUserRecord', 'enforceUserRolesAgent', 'saveSelfProfile',
+    'signOut', 'setCurrentUser', 'setOriginalAdminUser', 'setLoading', 'normalizeUserRecord', 'enforceUserRolesAgent', 'saveSelfProfile',
     'buildUserObject', 'recordAuditEvent', 'sessionStorage', 'localStorage', 'PARTICIPANT_FLAG',
     'buildParticipantUser', 'mergeAuthenticatedRoleProfile', 'console', 'showToast', 'startupTrace', effectBody)(
     (_, cb) => { callback = cb; return () => {}; }, { signOut: async () => event('signout') },
     helpers.findUserInFirestore, helpers.findStaffInFirestore, {}, collection, query, where, getDocs, getDoc, doc,
     () => null, () => false, () => inactive, async () => event('signout'),
-    user => { currentUser = user; event(user ? 'access' : 'no-access'); },
-    () => event('gate-finished'), user => ({ ...user, roles: ['colaborador'] }),
+    user => { currentUser = user; event(user ? 'access' : 'no-access'); }, () => {},
+    value => event(value ? 'gate-started' : 'gate-finished'), user => ({ ...user, roles: ['colaborador'] }),
     agent, saveSelfProfile, (_, user) => user, async () => event('audit'),
     storage, storage, 'participant', () => ({ participant: true }), mergeAuthenticatedRoleProfile, logger,
     () => event('toast'), createAuthStartupTrace());
@@ -86,7 +87,7 @@ function harness(source, { rows = [], staff = [], exists = true, fail = '', inac
       const startAt = performance.now();
       await pause(RTT); // simulated Firebase auth-state restoration, not a real auth measurement
       event('auth-ready');
-      await callback({ uid, email, displayName: 'Ana', providerData: [] });
+      await callback({ uid, email, displayName: 'Synthetic Fixture', providerData: [] });
       return performance.now() - startAt;
     }
   };
@@ -103,7 +104,7 @@ test('OR lookup preserves field priority before UID preference, aliases and dupl
   for (const field of ['email', 'corporateEmail', 'personalEmail']) {
     const h = harness(current, { rows: [row('legacy', { [field]: email })] });
     assert.equal((await h.helpers.findUserInFirestore(email))._docId, 'legacy');
-    assert.equal(await h.helpers.findUserInFirestore('missing@crearpsl.net'), null);
+    assert.equal(await h.helpers.findUserInFirestore('missing@example.invalid'), null);
   }
   const hStaff = harness(current, { staff: [
     row('a', { email, name: 'Secondary' }), row('z', { emails: [email], name: 'Preferred' })
@@ -117,8 +118,8 @@ test('actual callback: comparable PR145 vs current at 60ms RTT, including auth-s
     ['corporateEmail', 'corporateEmail', 5, 2], ['personalEmail', 'personalEmail', 6, 2],
     ['staff-email', 'staff', 8, 3]
   ]) {
-    const data = { name: 'Ana', [field]: field === 'emails' ? [email] : email };
-    const opts = field === 'staff' ? { staff: [row('staff', { email, name: 'Ana' })] } : { rows: [row(uid, data)] };
+    const data = { name: 'Synthetic Fixture', [field]: field === 'emails' ? [email] : email };
+    const opts = field === 'staff' ? { staff: [row('staff', { email, name: 'Synthetic Fixture' })] } : { rows: [row(uid, data)] };
     const old = harness(baseline, opts);
     const updated = harness(current, opts);
     const oldMs = await old.run();
@@ -138,7 +139,7 @@ test('actual callback: comparable PR145 vs current at 60ms RTT, including auth-s
 });
 
 test('self-profile read overlaps roles, but first creation and roles finish before access', async () => {
-  const h = harness(current, { rows: [row(uid, { emails: [email], name: 'Ana' })], exists: false });
+  const h = harness(current, { rows: [row(uid, { emails: [email], name: 'Synthetic Fixture' })], exists: false });
   await h.run();
   assert.ok(h.user());
   const read = name => h.events.find(e => e.name === name).at;
