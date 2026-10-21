@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { db, auth } from '../services/firebase';
 import { collection, onSnapshot, doc, updateDoc, setDoc, writeBatch, addDoc, query, where, orderBy, limit, getDocs, getDoc, runTransaction } from 'firebase/firestore';
 import { checklistData } from '../data/checklistData';
@@ -11,7 +11,7 @@ import { createGoogleTask } from '../services/googleSync';
 import { useUI } from './UIContext';
 import { useAuth } from './AuthContext';
 import { useCycles } from './CyclesContext';
-import { applyCycleCompletion, createCycleCompletion, getEffectiveCompletion, getNextCompletionState, isCompletionTransition } from '../utils/taskLifecycle';
+import { applyCycleCompletion, createCycleCompletion, getEffectiveCompletion, getNextCompletionState, isCompletionTransition, resolveTaskCycleScope } from '../utils/taskLifecycle';
 import { normalizeTaskLocation, taskLocationLabel, taskReminderMessage, taskUrl, escapeTaskHtml } from '../utils/taskLocation';
 
 const ChecklistContext = createContext();
@@ -241,6 +241,7 @@ export function ChecklistProvider({ children }) {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [taskLoadError, setTaskLoadError] = useState('');
+  const pendingTaskToggles = useRef(new Set());
   const { showToast, showPrompt } = useUI();
   const { currentUser, reauthenticateGoogle } = useAuth();
   const taskReadIdentity = getTaskReadIdentity(currentUser);
@@ -361,8 +362,6 @@ export function ChecklistProvider({ children }) {
     try {
       const taskRef = doc(db, 'tasks', taskId);
       const baseTask = checklistData.find(task => task.id === taskId);
-      const isCycleScoped = Boolean(baseTask && cycleScope?.sede && cycleScope?.cycle?.id);
-      const cycleKey = isCycleScoped ? `${cycleScope.sede}__${cycleScope.cycle.id}` : null;
       const completionId = doc(collection(db, 'task_completion_events')).id;
       let completionDelivery = null;
 
@@ -387,21 +386,20 @@ export function ChecklistProvider({ children }) {
           updates.status !== undefined || includesProgressUpdate;
         let completionTransition = false;
 
-        const hasDirectAssignees = Boolean(prevData.assignedToEmail) ||
-          (Array.isArray(prevData.assignedToEmails) && prevData.assignedToEmails.length > 0);
-        if (baseTask && cycleScope && !prevData.isCustom && !hasDirectAssignees && !isCycleScoped) {
-          throw new Error('Espera a que cargue el ciclo de la tarea antes de guardar los avances.');
-        }
-        const scopeThisCompletion = isCycleScoped && !prevData.isCustom && !hasDirectAssignees;
-        if (scopeThisCompletion && includesCompletionUpdate) {
+        const resolvedScope = resolveTaskCycleScope(prevData, {
+          catalogTask: Boolean(baseTask),
+          ...(cycleScope ?? { sede: currentUser?.sede?.trim() || 'Global', cycle: cycleForDeadline })
+        });
+        const cycleKey = resolvedScope ? `${resolvedScope.sede}__${resolvedScope.cycle.id}` : null;
+        if (resolvedScope && includesCompletionUpdate) {
           const previous = getEffectiveCompletion(prevData, {
-            sede: cycleScope.sede,
-            cycleId: cycleScope.cycle.id,
+            sede: resolvedScope.sede,
+            cycleId: resolvedScope.cycle.id,
             cycleScoped: true
           });
           completionTransition = isCompletionTransition(previous.completed, nextCompleted);
           const completionEntry = createCycleCompletion(prevData.completions?.[cycleKey], {
-            cycle: cycleScope.cycle,
+            cycle: resolvedScope.cycle,
             completed: nextCompleted,
             updatedAt: new Date().toISOString(),
             completionId: completionTransition ? completionId : prevData.completions?.[cycleKey]?.completionId,
@@ -449,7 +447,6 @@ export function ChecklistProvider({ children }) {
       });
     } catch (err) {
       console.error("writeTaskDoc error:", err);
-      setTasks(prev => prev.map(t => t.id === taskId ? { ...t, ...updates } : t));
       throw err;
     }
   };
@@ -653,47 +650,59 @@ export function ChecklistProvider({ children }) {
   // sedes fuera de Quito, Quito con 0 o 1 equipo) el comportamiento es idéntico
   // al de siempre: se usa currentCycle.
   const toggleTask = async (taskKey, currentStatus, equipoQuito = null) => {
+    if (pendingTaskToggles.current.has(taskKey)) {
+      const error = new Error('Espera a que termine de guardarse el cambio anterior de esta tarea.');
+      showToast(error.message, 'error');
+      throw error;
+    }
+    pendingTaskToggles.current.add(taskKey);
     const taskId = taskKey.includes('__EQ') ? taskKey.split('__EQ')[0] : taskKey;
     const nextStatus = !currentStatus;
     const userSede = currentUser?.sede?.trim() || 'Global';
     const cycleForThisToggle = equipoQuito
-      ? (quitoCycles.find(qc => qc.equipo === equipoQuito)?.cycle || currentCycle)
+      ? quitoCycles.find(qc => qc.equipo === equipoQuito)?.cycle
       : currentCycle;
     const cycleKey = cycleForThisToggle?.id ? `${userSede}__${cycleForThisToggle.id}` : null;
     const isBaseCatalogTask = checklistData.some(task => task.id === taskId);
-
-    // ACTUALIZACIÓN OPTIMISTA INMEDIATA (Cero latencia visual en UI)
-    setTasks(prev => prev.map(t => {
-      if (t.uiKey === taskKey || (!t.uiKey && t.id === taskId)) {
-        const nextCompletions = { ...(t.completions || {}) };
-        if (cycleKey && isBaseCatalogTask) {
-          nextCompletions[cycleKey] = {
-            ...(nextCompletions[cycleKey] || {}),
-            completed: nextStatus,
-            status: nextStatus ? 'Completada' : 'Pendiente',
-            cycleId: cycleForThisToggle.id,
-            updatedAt: new Date().toISOString()
-          };
-        } else if (userSede) {
-          nextCompletions[userSede] = {
-            ...(nextCompletions[userSede] || {}),
-            completed: nextStatus,
-            status: nextStatus ? 'Completada' : 'Pendiente',
-            updatedAt: new Date().toISOString()
-          };
-        }
-        return {
-          ...t,
-          completed: nextStatus,
-          status: nextStatus ? 'Completada' : 'Pendiente',
-          completedAt: nextStatus ? new Date().toISOString() : null,
-          completions: nextCompletions
-        };
-      }
-      return t;
-    }));
+    const optimisticTasks = new WeakMap();
 
     try {
+      const task = tasks.find(t => t.uiKey === taskKey || (!t.uiKey && t.id === taskId));
+      const cycleScope = resolveTaskCycleScope(task, {
+        catalogTask: isBaseCatalogTask, sede: userSede, cycle: cycleForThisToggle
+      });
+      setTasks(prev => prev.map(t => {
+        if (t.uiKey === taskKey || (!t.uiKey && t.id === taskId)) {
+          const nextCompletions = { ...(t.completions || {}) };
+          if (cycleScope) {
+            nextCompletions[cycleKey] = {
+              ...(nextCompletions[cycleKey] || {}),
+              completed: nextStatus,
+              status: nextStatus ? 'Completada' : 'Pendiente',
+              cycleId: cycleForThisToggle.id,
+              updatedAt: new Date().toISOString()
+            };
+          } else if (userSede) {
+            nextCompletions[userSede] = {
+              ...(nextCompletions[userSede] || {}),
+              completed: nextStatus,
+              status: nextStatus ? 'Completada' : 'Pendiente',
+              updatedAt: new Date().toISOString()
+            };
+          }
+          const optimisticTask = {
+            ...t,
+            completed: nextStatus,
+            status: nextStatus ? 'Completada' : 'Pendiente',
+            completedAt: nextStatus ? new Date().toISOString() : null,
+            completions: nextCompletions
+          };
+          optimisticTasks.set(optimisticTask, t);
+          return optimisticTask;
+        }
+        return t;
+      }));
+
       const updates = {
         completed: nextStatus,
         status: nextStatus ? 'Completada' : 'Pendiente',
@@ -712,11 +721,16 @@ export function ChecklistProvider({ children }) {
         taskId,
         updates,
         cycleForThisToggle,
-        isBaseCatalogTask && cycleKey ? { sede: userSede, cycle: cycleForThisToggle } : null
+        cycleScope
       );
     } catch (error) {
       console.error("Error updating task:", error);
-      showToast("No se pudo actualizar la tarea. Revisa los permisos de Firestore.", "error");
+      // A newer snapshot is authoritative; only undo our own optimistic objects.
+      setTasks(prev => prev.map(t => optimisticTasks.get(t) || t));
+      showToast(`No se pudo actualizar la tarea. ${error.message}`, "error");
+      throw error;
+    } finally {
+      pendingTaskToggles.current.delete(taskKey);
     }
   };
 

@@ -21,5 +21,5 @@ test('task modal and snapshots share scoped progress persistence', () => {
   assert.match(context, /return applyCycleCompletion\(data,/);
   assert.match(context, /const effectiveTask = applyCycleCompletion\(task,/);
   assert.match(context, /completionId: completionTransition[\s\S]*?,\s*updates\s*\}\)/);
-  assert.match(context, /throw new Error\('Espera a que cargue el ciclo/);
+  assert.match(context, /const resolvedScope = resolveTaskCycleScope\(prevData,/);
 });
