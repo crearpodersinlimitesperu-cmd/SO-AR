@@ -9,10 +9,14 @@ const LOCAL_CONNECTIONS_KEY = 'cpsl_user_connections';
 /**
  * Registra un evento de auditoría REAL en Cloud Firestore
  */
-export async function recordAuditEvent({ uid, email, name, role, sede, action, details = '', isSimulation = false }) {
+export async function recordAuditEvent({ uid, email, name, role, sede, action, details = '', isSimulation = false, simulatedBy = null }) {
   if (!email) return null;
 
   const nowIso = new Date().toISOString();
+  const activeSimTarget = typeof sessionStorage !== "undefined" ? sessionStorage.getItem("cpsl_simulated_target_email") : null;
+  const activeSimAdmin = typeof sessionStorage !== "undefined" ? sessionStorage.getItem("cpsl_original_admin_email") : null;
+  const effectiveIsSimulation = Boolean(isSimulation || activeSimTarget);
+  const effectiveSimulatedBy = simulatedBy || (effectiveIsSimulation ? (activeSimAdmin || "jose.sanchez@crearpsl.net") : null);
 
   const logEntry = {
     email: email.toLowerCase().trim(),
@@ -21,6 +25,8 @@ export async function recordAuditEvent({ uid, email, name, role, sede, action, d
     sede: sede || 'Sede Global',
     action: action || 'ACCESO',
     details: details || '',
+    isSimulation: effectiveIsSimulation,
+    simulatedBy: effectiveSimulatedBy,
     timestamp: nowIso
   };
 
@@ -33,7 +39,7 @@ export async function recordAuditEvent({ uid, email, name, role, sede, action, d
     });
 
     // 2. Si es un LOGIN REAL (no simulación) y tenemos correo, actualizar perfil de conexión
-    if (action === 'LOGIN' && !isSimulation && email) {
+    if (action === 'LOGIN' && !effectiveIsSimulation && email) {
       const userProfileRef = doc(db, 'user_profiles', email.toLowerCase().trim());
       await setDoc(userProfileRef, {
         email: email.toLowerCase().trim(),

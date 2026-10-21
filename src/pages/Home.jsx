@@ -472,7 +472,7 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Indicadores clave de rendimiento: deserción, confirmados, reentrenados y futuros imposibles',
     keywords: ['kpi', 'kpis', 'mis kpis', 'metricas', 'indicadores', 'desercion', 'confirmados', 'reentrenados', 'enrolamiento'],
     route: '/mis-kpis',
-    roles: ['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan']
+    roles: ['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_jr', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan']
   },
   {
     id: 'opt-reportes',
@@ -809,7 +809,7 @@ const CAUSA_OPTIONS_REGISTRY = [
 // del sistema SO-AR (ver el comentario en ROLE_DISPLAY_NAMES, usersData.js).
 const ALL_SIMULATABLE_ROLES = [
   'consolidado', 'direccion', 'cfo', 'gerente', 'director_maestria',
-  'coord_c1', 'coord_maestria', 'capitan', 'manager',
+  'coord_c1', 'coord_jr', 'coord_maestria', 'capitan', 'manager',
   'entrenador', 'entrenador_llamadas', 'qt',
   'finanzas', 'coordinador', 'talento_humano', 'legal',
   'asistente_impuestos_quito', 'tecnico_sst'
@@ -865,10 +865,8 @@ export default function Home() {
   // mostrar ("todo lo que sus roles reales abarcan"), no todo sin excepcion.
   const hasRoleAccess = (allowedRoles) => {
     if (currentUser?.isSuperAdmin && !currentUser?.isSimulated) return true;
-    if (currentUser?.appRole === 'consolidado') {
-      return (currentUser?.roles || []).some(r => allowedRoles.includes(r));
-    }
-    return allowedRoles.includes(currentUser?.appRole);
+    return allowedRoles.includes(currentUser?.appRole) ||
+           (currentUser?.roles || []).some(r => allowedRoles.includes(r));
   };
 
   const { currentUser, logout, switchRole, reauthenticateGoogle, updateCurrentUserFields } = useAuth();
@@ -1440,6 +1438,8 @@ export default function Home() {
     setGlobalSearchTerm('');
     if (opt.action === 'open_horarios_modal') {
       setShowHorariosModal(true);
+    } else if (opt.action === 'open_guia_llamadas') {
+      handleOpenGuiaLlamadas();
     } else if (opt.action === 'new_task') {
       setShowTaskModal(true);
     } else if (opt.action === 'venue_modal') {
@@ -1495,12 +1495,25 @@ export default function Home() {
     [myOverdueTasks, time]
   );
 
+  const [profileInitialTab, setProfileInitialTab] = useState(null);
+
   const handleOpenMyProfile = () => {
     const myEmail = (currentUser?.email || '').toLowerCase().trim();
     const ownRecord = myEmail
       ? realUsersData.find(u => (u.email || '').toLowerCase().trim() === myEmail)
       : null;
     setSelectedSearchUser(ownRecord || currentUser);
+    setProfileInitialTab(null);
+    setShowSearchUserModal(true);
+  };
+
+  const handleOpenGuiaLlamadas = () => {
+    const myEmail = (currentUser?.email || '').toLowerCase().trim();
+    const ownRecord = myEmail
+      ? realUsersData.find(u => (u.email || '').toLowerCase().trim() === myEmail)
+      : null;
+    setSelectedSearchUser(ownRecord || currentUser);
+    setProfileInitialTab('guia_rezagados');
     setShowSearchUserModal(true);
   };
 
@@ -2320,10 +2333,21 @@ export default function Home() {
                   </button>
                 )}
 
-                {hasRoleAccess(['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan']) && (
+                {hasRoleAccess(['coord_c1', 'coord_c2', 'coord_jr', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan']) && (
                   <button onClick={() => { setShowToolsDropdown(false); navigate('/mis-kpis'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
                     📊 Mis KPIs
                   </button>
+                )}
+
+                {(hasRoleAccess(['coord_jr', 'coord_c1', 'coordinador_c1c2', 'gerente', 'direccion', 'superadmin', 'ceo']) || Boolean(currentUser?.email && (currentUser.email.includes('cardenasgina29') || currentUser.email.includes('cardenaslopezgina') || currentUser.email.includes('gina.cardenas')))) && (
+                  <>
+                    <button onClick={() => { setShowToolsDropdown(false); handleOpenGuiaLlamadas(); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#38bdf8', background: 'rgba(2, 132, 199, 0.14)', borderColor: 'rgba(56, 189, 248, 0.35)', fontWeight: 'bold' }}>
+                      📞 Centro de Operaciones Rezagados C1
+                    </button>
+                    <button onClick={() => { setShowToolsDropdown(false); window.open('https://imo.crearpslglobal.com/reporterezagados', '_blank', 'noopener,noreferrer'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#06b6d4', background: 'rgba(6, 182, 212, 0.1)' }}>
+                      🌐 Base Nodus Rezagados C1 ↗
+                    </button>
+                  </>
                 )}
 
                 {canAccessDirectorioQT(currentUser) && (
@@ -2487,10 +2511,21 @@ export default function Home() {
             </>
           )}
 
-          {hasRoleAccess(['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan']) && (
+          {hasRoleAccess(['coord_c1', 'coord_c2', 'coord_jr', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan']) && (
             <ModuleHelpButton helpKey="kpis" onClick={() => navigate('/mis-kpis')} className="home-module-card">
               📊 Mis KPIs
             </ModuleHelpButton>
+          )}
+
+          {(hasRoleAccess(['coord_jr', 'coord_c1', 'coordinador_c1c2', 'gerente', 'direccion', 'superadmin', 'ceo']) || Boolean(currentUser?.email && (currentUser.email.includes('cardenasgina29') || currentUser.email.includes('cardenaslopezgina') || currentUser.email.includes('gina.cardenas')))) && (
+            <>
+              <ModuleHelpButton helpKey="rezagadosC1" onClick={handleOpenGuiaLlamadas} className="home-module-card" title="Centro de Operaciones Rezagados C1: Guía Oficial de Llamadas C1, scripts de reencuadre, objeciones y protocolo legal Indecopi">
+                📞 Centro Operaciones Rezagados C1
+              </ModuleHelpButton>
+              <ModuleHelpButton helpKey="baseNodusRezagados" onClick={() => window.open('https://imo.crearpslglobal.com/reporterezagados', '_blank', 'noopener,noreferrer')} className="home-module-card" title="Abrir Base Nodus Rezagados C1">
+                🌐 Base Nodus Rezagados C1
+              </ModuleHelpButton>
+            </>
           )}
 
           {canAccessManualQT(currentUser) && (
@@ -3909,12 +3944,13 @@ export default function Home() {
       {/* MODAL CONFIGURACIÓN DE HOTELES Y SALONES */}
       <VenueConfigModal isOpen={showVenueModal} onClose={() => setShowVenueModal(false)} />
 
-      {/* MODAL DE PERFIL DE PERSONA (abierto desde el Buscador Global) */}
+      {/* MODAL DE PERFIL DE PERSONA (abierto desde el Buscador Global o Guía Oficial) */}
       {showSearchUserModal && selectedSearchUser && (
         <UserProfileModal 
           isOpen={showSearchUserModal} 
-          onClose={() => setShowSearchUserModal(false)} 
+          onClose={() => { setShowSearchUserModal(false); setProfileInitialTab(null); }} 
           user={selectedSearchUser} 
+          initialTab={profileInitialTab}
           allTasks={allTasks} 
           onStatusUpdated={(updated) => setSelectedSearchUser(prev => ({ ...prev, ...updated }))}
         />

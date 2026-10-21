@@ -28,9 +28,13 @@ export function resolveFISource(payload, fallback = [], now = Date.now()) {
   return {
     participantes: fallback,
     sourceState: {
-      status: 'fallback',
-      label: 'RESPALDO ESTÁTICO PARCIAL · no es NODUS en vivo',
-      detail: `No hay participantes PFD confirmados en una publicación verificable de NODUS; se muestra un respaldo estático de ${fallback.length} participantes que NO incluye todas las sedes ni los FI reales.${syncedAt ? ` Última marca disponible: ${freshness.label}.` : ' Fecha de sincronización desconocida.'}`,
+      status: fallback.length > 0 ? 'fallback' : 'unavailable',
+      label: fallback.length > 0
+        ? 'RESPALDO ESTÁTICO PARCIAL · no es NODUS en vivo'
+        : 'SIN PUBLICACIÓN VERIFICABLE DE NODUS · cero datos inventados',
+      detail: fallback.length > 0
+        ? `No hay participantes PFD confirmados en una publicación verificable de NODUS; se muestra un respaldo estático de ${fallback.length} participantes que NO incluye todas las sedes ni los FI reales.${syncedAt ? ` Última marca disponible: ${freshness.label}.` : ' Fecha de sincronización desconocida.'}`
+        : `No hay participantes con PFD confirmado en una publicación verificable de NODUS.${syncedAt ? ` Última marca disponible: ${freshness.label}.` : ' Fecha de sincronización desconocida.'} No se inventan ni sustituyen registros.`,
       syncedAt
     }
   };

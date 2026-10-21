@@ -9,7 +9,6 @@ import { addDoc, collection, doc, getDocFromServer, onSnapshot, serverTimestamp,
 import { db } from '../services/firebase';
 import { useAuth } from '../context/AuthContext';
 import { opcionesEquipo, resolveFISource } from '../services/nodusFISnapshot';
-import { NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES } from '../data/nodusFuturosImposiblesData';
 const EQUIPOS_FUTUROS_IMPOSIBLES = ['EQUIPO 27', 'EQUIPO 28', 'EQUIPO 29', 'EQUIPO 30', 'EQUIPO 31'];
 const ESTADOS_FI = [
   { id: 'TODOS', label: 'Todos los estados' },
@@ -66,12 +65,12 @@ export default function FuturosImposiblesView({
         const snap = await getDocFromServer(doc(db, 'nodus_futuros_imposibles', 'latest'));
         const payload = snap.exists() ? snap.data() : null;
         if (!isMounted) return;
-        const resolved = resolveFISource(payload, NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES);
+        const resolved = resolveFISource(payload, []);
         setParticipantesRaw(resolved.participantes);
         setSourceState(resolved.sourceState);
       } catch (err) {
         if (isMounted) {
-          const resolved = resolveFISource(null, NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES);
+          const resolved = resolveFISource(null, []);
           setParticipantesRaw(resolved.participantes);
           setSourceState(resolved.sourceState);
         }
@@ -164,15 +163,15 @@ export default function FuturosImposiblesView({
     try {
       const snap = await getDocFromServer(doc(db, 'nodus_futuros_imposibles', 'latest'));
       const payload = snap.exists() ? snap.data() : null;
-      const resolved = resolveFISource(payload, NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES);
+      const resolved = resolveFISource(payload, []);
       setParticipantesRaw(resolved.participantes);
       setSourceState(resolved.sourceState);
       triggerToast(resolved.sourceState.status === 'live' ? 'Diagnóstico recalculado con la última publicación verificable de NODUS.' : resolved.sourceState.label);
     } catch (error) {
-      const resolved = resolveFISource(null, NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES);
+      const resolved = resolveFISource(null, []);
       setParticipantesRaw(resolved.participantes);
       setSourceState(resolved.sourceState);
-      triggerToast('No se pudo leer NODUS. Se muestra respaldo estático PARCIAL.');
+      triggerToast('No se pudo leer NODUS en vivo. Universo bloqueado (cero datos inventados).');
     } finally {
       setIsEvaluating(false);
     }

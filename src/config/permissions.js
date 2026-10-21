@@ -558,6 +558,7 @@ export const getAssignableRoles = (currentUser) => {
     { id: 'director_maestria', name: 'Director de Maestría' },
     { id: 'coord_maestria', name: 'Coordinador Maestría' },
     { id: 'coord_c1', name: 'Coordinador C1/C2' },
+    { id: 'coord_jr', name: 'Coordinadora Junior (Rezagados C1 & QT)' },
     { id: 'capitan', name: 'Capitán' },
     { id: 'manager', name: 'Manager' },
     { id: 'qt', name: 'Quantum Team (QT)' },
@@ -661,11 +662,13 @@ export const OFFICIAL_PERMISSION_MATRIX = {
     directivos: 'GLOBAL',
     gerente: 'SEDE',
     coord_c1: 'ASIGNADOS',
+    coord_jr: 'ASIGNADOS',
     coord_maestria: 'ASIGNADOS'
   },
   'manual_qt': {
     gerente: 'GLOBAL',
     coord_c1: 'GLOBAL',
+    coord_jr: 'GLOBAL',
     coord_maestria: 'GLOBAL',
     qt: 'GLOBAL'
   },
@@ -674,7 +677,9 @@ export const OFFICIAL_PERMISSION_MATRIX = {
     directivos: 'GLOBAL',
     gerente: 'GLOBAL',
     coord_c1: 'GLOBAL',
-    coord_maestria: 'GLOBAL'
+    coord_jr: 'GLOBAL',
+    coord_maestria: 'GLOBAL',
+    qt: 'GLOBAL'
   },
   'directorio_qt': {
     directivos: 'GLOBAL',

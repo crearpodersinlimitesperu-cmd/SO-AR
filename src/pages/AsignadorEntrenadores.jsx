@@ -58,6 +58,13 @@ import {
   normalizarIdentidadEntrenador,
   resolverSugerenciaEntrenador,
 } from '../utils/trainerAssignments';
+import {
+  TRAINER_CALENDAR_SYNC_AGENT_NAME,
+  computeCalendarProjectionPlan,
+  indexAssignmentsForLookup,
+  matchAssignmentForEvent,
+  syncTrainerCalendarProjections,
+} from '../services/trainerCalendarSyncAgent';
 
 // Los 3 fines de semana de Maestría del Juego. El orden es el oficial del
 // entrenamiento y se usa tal cual para numerar los FDS.
@@ -313,6 +320,14 @@ export default function AsignadorEntrenadores() {
   const [policySearch, setPolicySearch] = useState('');
   const [calendarOverrides, setCalendarOverrides] = useState({});
   const [customCalendarEvents, setCustomCalendarEvents] = useState([]);
+  const [publicAssignments, setPublicAssignments] = useState([]);
+  const [publicOperational, setPublicOperational] = useState([]);
+  const [agentSyncState, setAgentSyncState] = useState({
+    status: 'checking',
+    repairedAssignments: 0,
+    repairedOperational: 0,
+    syncedAt: null,
+  });
   const [calendarEditor, setCalendarEditor] = useState(null);
   const [calendarDraft, setCalendarDraft] = useState({});
   const [calendarSaving, setCalendarSaving] = useState(false);
@@ -476,6 +491,86 @@ export default function AsignadorEntrenadores() {
     return () => unsub();
   }, [autorizado]);
 
+  // --- Proyecciones públicas del Calendario Global (supervisadas por el Agente) ---
+  useEffect(() => {
+    if (!autorizado) return;
+    const unsubPubAssign = onSnapshot(collection(db, 'calendario_asignaciones_publicas'), snap => {
+      setPublicAssignments(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    }, err => console.warn('calendario_asignaciones_publicas:', err));
+    const unsubPubOp = onSnapshot(collection(db, 'calendario_operativo_publico'), snap => {
+      setPublicOperational(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    }, err => console.warn('calendario_operativo_publico:', err));
+    return () => { unsubPubAssign(); unsubPubOp(); };
+  }, [autorizado]);
+
+  // --- Agente Guardián de Sincronización Asignador ↔ Calendario Global ------
+  useEffect(() => {
+    if (!autorizado) return;
+    const plan = computeCalendarProjectionPlan({
+      assignments: asignaciones,
+      overrides: calendarOverrides,
+      customEvents: customCalendarEvents,
+      publicAssignments,
+      publicOperational,
+    });
+    if (plan.inSync) {
+      setAgentSyncState(prev => ({
+        ...prev,
+        status: 'synced',
+        syncedAt: prev.syncedAt || new Date().toISOString(),
+      }));
+      return;
+    }
+    let cancelled = false;
+    setAgentSyncState(prev => ({ ...prev, status: 'syncing' }));
+    syncTrainerCalendarProjections(db, {
+      assignments: asignaciones,
+      overrides: calendarOverrides,
+      customEvents: customCalendarEvents,
+      publicAssignments,
+      publicOperational,
+    }).then(res => {
+      if (cancelled) return;
+      setAgentSyncState({
+        status: 'synced',
+        repairedAssignments: res.repairedAssignments,
+        repairedOperational: res.repairedOperational,
+        syncedAt: res.syncedAt,
+      });
+    }).catch(err => {
+      console.warn('Agente sincronizador calendario global:', err);
+      if (!cancelled) setAgentSyncState(prev => ({ ...prev, status: 'error' }));
+    });
+    return () => { cancelled = true; };
+  }, [autorizado, asignaciones, calendarOverrides, customCalendarEvents, publicAssignments, publicOperational]);
+
+  const forzarSincronizacionAgente = async () => {
+    if (!autorizado) return;
+    setAgentSyncState(prev => ({ ...prev, status: 'syncing' }));
+    try {
+      const res = await syncTrainerCalendarProjections(db, {
+        assignments: asignaciones,
+        overrides: calendarOverrides,
+        customEvents: customCalendarEvents,
+        publicAssignments: [],
+        publicOperational: [],
+      });
+      setAgentSyncState({
+        status: 'synced',
+        repairedAssignments: res.repairedAssignments,
+        repairedOperational: res.repairedOperational,
+        syncedAt: res.syncedAt,
+      });
+      showToast(
+        `✓ ${TRAINER_CALENDAR_SYNC_AGENT_NAME}: ${res.repairedAssignments} asignaciones y ${res.repairedOperational} fechas operativas publicadas en Calendario Global.`,
+        'success'
+      );
+    } catch (err) {
+      setAgentSyncState(prev => ({ ...prev, status: 'error' }));
+      showToast('Error al sincronizar con Calendario Global: ' + err.message, 'error');
+    }
+  };
+
   // --- Trazabilidad de esta pantalla ---------------------------------------
   useEffect(() => {
     if (!autorizado) return;
@@ -564,8 +659,10 @@ export default function AsignadorEntrenadores() {
   const filas = useMemo(() => {
     const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
     const out = [];
+    const assignmentIndex = indexAssignmentsForLookup(asignaciones);
     (events || []).forEach(ev => {
-      const sourceKey = eventoKey(ev);
+      if (ev.esPersonalizado) return;
+      const sourceKey = ev.__sourceEventKey || eventoKey(ev);
       const override = calendarOverrides[sourceKey] || {};
       const inicio = override.fechaInicio || ev.fecha_inicio || ev.start;
       if (!inicio) return;
@@ -579,12 +676,14 @@ export default function AsignadorEntrenadores() {
       const capitulo = tipoCapitulo(nombre);
       const programa = tipoPrograma(nombre);
       const sede = normalizeSede(ev.sede || ev.sedeTag || '');
-      const guardado = asignaciones[key] || {};
+      const guardado = asignaciones[key] || matchAssignmentForEvent(ev, assignmentIndex, sede) || {};
       const slots = esMaestria(nombre) ? FDS_MAESTRIA : ['unico'];
 
       slots.forEach((slot, i) => {
         const asign = guardado[slot] || {};
-        const entrenadorHojaRaw = ev.trainer || ev.entrenador || '';
+        const entrenadorHojaRaw = typeof ev.sheetTrainer !== 'undefined'
+          ? ev.sheetTrainer
+          : (ev.trainer || ev.entrenador || '');
         const preasignacionesHoja = extraerPreasignaciones(entrenadorHojaRaw);
         const sugerencia = resolverSugerenciaEntrenador(preasignacionesHoja, i, slots.length > 1);
         out.push({
@@ -1039,11 +1138,45 @@ export default function AsignadorEntrenadores() {
               Asignador Oficial de Entrenadores &amp; Cronograma Maestro
             </h1>
             <p className="text-muted" style={{ margin: '0.3rem 0 0', fontSize: '0.84rem' }}>
-              Entrenamientos del calendario oficial ({events?.length || 0} eventos) ·{' '}
-              {Object.keys(asignaciones).length} con asignación guardada en Causa OS
+              Fuente autoritativa de todos los calendarios ({events?.length || 0} eventos) ·{' '}
+              {Object.keys(asignaciones).length} con asignación confirmada en Causa OS
             </p>
+            <div style={{ marginTop: '0.45rem', display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', fontSize: '0.76rem' }}>
+              <span style={{
+                display: 'inline-flex', alignItems: 'center', gap: '0.35rem',
+                padding: '0.2rem 0.6rem', borderRadius: '999px', fontWeight: 700,
+                background: agentSyncState.status === 'synced'
+                  ? 'rgba(16, 185, 129, 0.14)'
+                  : agentSyncState.status === 'syncing'
+                    ? 'rgba(59, 130, 246, 0.14)'
+                    : 'rgba(245, 158, 11, 0.16)',
+                color: agentSyncState.status === 'synced'
+                  ? '#10b981'
+                  : agentSyncState.status === 'syncing'
+                    ? '#3b82f6'
+                    : '#f59e0b',
+                border: '1px solid currentColor',
+              }}>
+                <ShieldCheck size={13} />
+                {TRAINER_CALENDAR_SYNC_AGENT_NAME}:{' '}
+                {agentSyncState.status === 'synced'
+                  ? `100% Sincronizado (${publicAssignments.length} asignaciones / ${publicOperational.length} fechas públicas)`
+                  : agentSyncState.status === 'syncing'
+                    ? 'Sincronizando proyecciones públicas...'
+                    : 'Verificando sincronización...'}
+              </span>
+            </div>
           </div>
           <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+            <button onClick={forzarSincronizacionAgente}
+              title="Ejecutar Agente Guardián para publicar inmediatamente todas las asignaciones y fechas hacia el Calendario Global"
+              style={{ ...selectStyle, width: 'auto', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', borderColor: 'rgba(16,185,129,0.45)', color: '#10b981', fontWeight: 700 }}>
+              <RefreshCw size={15} /> Sincronizar Calendario Global
+            </button>
+            <button onClick={() => window.open('/calendario_global.html?v=' + Date.now(), '_blank', 'noopener,noreferrer')}
+              style={{ ...selectStyle, width: 'auto', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+              <ExternalLink size={15} /> Abrir Calendario Global
+            </button>
             <button onClick={() => setTab('trazabilidad')}
               style={{ ...selectStyle, width: 'auto', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
               <History size={15} /> Trazabilidad ({trazas.length})

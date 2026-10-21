@@ -265,7 +265,9 @@ export function auditAllGoals(goals = [], parentGoalsMap = {}, options = {}) {
     if (audit.requiresUpdate) {
       pendingSyncCount++;
     }
-    totalConfirmadosAuditados += audit.detectedRealValue;
+    if (Number.isFinite(audit.detectedRealValue)) {
+      totalConfirmadosAuditados += audit.detectedRealValue;
+    }
   });
 
   return {

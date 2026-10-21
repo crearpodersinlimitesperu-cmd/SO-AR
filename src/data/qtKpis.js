@@ -20,9 +20,28 @@ export const qtKpis = {
   },
   "cardenaslopezgina@gmail.com": {
     name: "GINA CARDENAS",
-    role: "Líder Quantum Team",
+    role: "Coordinadora Junior (Rezagados C1 & QT)",
     evento: "C1E31 LIMA",
     email: "cardenaslopezgina@gmail.com",
+    metrics: {
+      PX: 62, 
+      DESERTOR: 15, 
+      PX_FIN: 47, 
+      DECLARACION: 22,
+      C2: 12, 
+      C2_MJ: 6, 
+      ABONO: 1, 
+      ACUERDO: 0, 
+      FICHA: 3, 
+      PAGOS: 18, 
+      PP: "38%"
+    }
+  },
+  "cardenasgina29@gmail.com": {
+    name: "GINA CARDENAS",
+    role: "Coordinadora Junior (Rezagados C1 & QT)",
+    evento: "C1E31 LIMA",
+    email: "cardenasgina29@gmail.com",
     metrics: {
       PX: 62, 
       DESERTOR: 15, 

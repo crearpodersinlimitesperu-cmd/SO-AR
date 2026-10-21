@@ -61,6 +61,7 @@ export default function DirectorioQT() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSede, setSelectedSede] = useState('Todas');
   const [selectedEdicion, setSelectedEdicion] = useState('Todas');
+  const [showInactive, setShowInactive] = useState(false);
   const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'table'
 
   useEffect(() => {
@@ -124,6 +125,13 @@ export default function DirectorioQT() {
                               userRoles.includes('coord_c1') || userRoles.includes('coord_maestria');
     
     return members.filter(m => {
+      // -1. Ocultar integrantes inactivos, desvinculados o renunciados por defecto (salvo activar "Mostrar Inactivos")
+      if (!showInactive) {
+        if (!m.esActivo || m.role === 'inactivo' || (m.estado && (m.estado.toUpperCase().includes('INACTIVO') || m.estado.toUpperCase().includes('RENUNCIA')))) {
+          return false;
+        }
+      }
+
       // 0. Reglas de Jerarquía Corporativa
       const userSede = normalizeQTSede(currentUser?.sede || '');
       const isGlobalUser = userSede.toLowerCase().includes('global');
@@ -172,7 +180,7 @@ export default function DirectorioQT() {
 
       return true;
     });
-  }, [members, selectedSede, selectedEdicion, searchQuery]);
+  }, [members, selectedSede, selectedEdicion, searchQuery, showInactive]);
 
   // Estadísticas rápidas
   // BUG REAL encontrado y corregido (08/09/2026, reportado por José viendo la
@@ -347,6 +355,17 @@ export default function DirectorioQT() {
             <option value="intermedio" style={{ background: '#0d152d', color: '#ffffff' }}>✨ 1 a 8 Ediciones</option>
             <option value="reciente" style={{ background: '#0d152d', color: '#ffffff' }}>🌱 Graduados Recientes</option>
           </select>
+
+          {/* Toggle Mostrar Inactivos */}
+          <label style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer', fontSize: '0.82rem', color: showInactive ? '#ef4444' : 'var(--text-muted, #94a3b8)', fontWeight: 700, userSelect: 'none' }}>
+            <input 
+              type="checkbox" 
+              checked={showInactive} 
+              onChange={(e) => setShowInactive(e.target.checked)} 
+              style={{ cursor: 'pointer', accentColor: '#ef4444' }}
+            />
+            Mostrar Inactivos / Bajas
+          </label>
         </div>
 
         {/* Vista Toggle & Contador */}

@@ -687,6 +687,40 @@
           return raw || 'Sede Global';
         }
 
+        function extractTeamDigitsKey(equipo) {
+          const digits = String(equipo || '').match(/\d+/g);
+          return digits && digits.length ? digits.join('') : String(equipo || '').trim();
+        }
+
+        function ajustarFechaFinPorRegla(nombre, inicioRaw, finRaw) {
+          if (!inicioRaw) return finRaw;
+          const n = String(nombre || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+          const unSoloDia = [
+            'tanque', 'rompimiento', 'caida', 'confianza', 'caminata', 'fuego',
+            'impacto', 'revision', 'revisacion'
+          ];
+          if (unSoloDia.some(kw => n.includes(kw))) return inicioRaw;
+
+          const terminaDomingo = [
+            'capitulo uno', 'capitulo 1', 'c1', 'capitulo dos', 'capitulo 2', 'c2',
+            'maestria del juego', 'maestria', 'creacion', 'relacion', 'gratitud',
+            'el viaje', 'viaje'
+          ];
+          if (!terminaDomingo.some(kw => n.includes(kw))) return finRaw || inicioRaw;
+
+          const start = new Date(String(inicioRaw).length === 10 ? `${inicioRaw}T12:00:00` : inicioRaw);
+          if (isNaN(start.getTime())) return finRaw;
+          const dow = start.getDay();
+          const diasADomingo = dow === 0 ? 0 : 7 - dow;
+          const sunday = new Date(start);
+          sunday.setDate(start.getDate() + diasADomingo);
+          const y = sunday.getFullYear();
+          const m = String(sunday.getMonth() + 1).padStart(2, '0');
+          const d = String(sunday.getDate()).padStart(2, '0');
+          const hasTime = String(finRaw || inicioRaw).includes('T');
+          return hasTime ? `${y}-${m}-${d}T00:00:00` : `${y}-${m}-${d}`;
+        }
+
         function assignmentEventKey(ev, sedeKey) {
           const date = String(ev.start || ev.fecha_inicio || '').slice(0, 10);
           const sede = normalizeSedeAsignador(ev.sede || ev.sedeTag || sedeKey || '');
@@ -700,6 +734,51 @@
           const sede = normalizeSedeAsignador(ev.sede || ev.sedeTag || sedeKey || '');
           const name = String(ev.name || ev.nombre || '').trim();
           return `${date}__${sede}__${name}`.replace(/\//g, '-');
+        }
+
+        function assignmentEventKeyDigitsTeam(ev, sedeKey) {
+          const base = assignmentEventKeyNoTeam(ev, sedeKey);
+          const digits = extractTeamDigitsKey(ev.team || ev.equipo || '');
+          return digits ? `${base}__${digits}`.replace(/\//g, '-') : base;
+        }
+
+        function indexAssignmentsForLookup(assignments) {
+          const byKey = new Map();
+          (assignments || []).forEach(docData => {
+            if (!docData || typeof docData !== 'object') return;
+            const id = String(docData.id || '').trim();
+            if (id) byKey.set(id, docData);
+            const date = String(docData.fechaInicio || '').slice(0, 10);
+            const sede = normalizeSedeAsignador(docData.sede || '');
+            const name = String(docData.entrenamiento || docData.nombre || '').trim();
+            const eq = String(docData.equipo || '').trim();
+            if (date && sede && name) {
+              const noTeamKey = `${date}__${sede}__${name}`.replace(/\//g, '-');
+              const withTeamKey = `${noTeamKey}${eq ? '__' + eq : ''}`.replace(/\//g, '-');
+              const digits = extractTeamDigitsKey(eq);
+              const digitsKey = digits ? `${noTeamKey}__${digits}`.replace(/\//g, '-') : noTeamKey;
+              if (!byKey.has(withTeamKey)) byKey.set(withTeamKey, docData);
+              if (!byKey.has(digitsKey)) byKey.set(digitsKey, docData);
+              if (!byKey.has(noTeamKey)) byKey.set(noTeamKey, docData);
+            }
+          });
+          return byKey;
+        }
+
+        function matchAssignmentForEvent(ev, assignmentIndex, sedeKey) {
+          if (!ev || !assignmentIndex) return null;
+          const candidates = [
+            ev.sourceEventKey,
+            ev.__sourceEventKey,
+            ev.id,
+            assignmentEventKey(ev, sedeKey),
+            assignmentEventKeyDigitsTeam(ev, sedeKey),
+            assignmentEventKeyNoTeam(ev, sedeKey),
+          ].filter(Boolean);
+          for (const key of candidates) {
+            if (assignmentIndex.has(key)) return assignmentIndex.get(key);
+          }
+          return null;
         }
 
         function googleVizDateToIso(value) {
@@ -727,6 +806,9 @@
 
         // El Apps Script conserva el historial; esta publicación de la misma
         // hoja aporta las fechas vigentes sin escribir ni alterar el histórico.
+        // IMPORTANTE: el entrenador de la hoja se guarda solo como sheetTrainer
+        // (sugerencia interna); NUNCA pisa ev.trainer porque la fuente única y
+        // autoritativa es /asignador-entrenadores.
         async function mergeCurrentOfficialSchedule(data) {
           const response = await fetch(CURRENT_CALENDAR_SHEET_URL);
           if (!response.ok) throw new Error('No se pudo leer el calendario vigente');
@@ -749,9 +831,10 @@
             if (!start) return;
             const sourceSede = String(value(1) || '').trim();
             const sede = normalizeSedeKey(sourceSede || 'LIM');
+            const name = String(value(3) || '').trim();
             const incoming = {
-              start, end: '', name: String(value(3) || '').trim(), equipo: cleanEquipoFormula(value(2)),
-              trainer: String(value(4) || '').trim(), place: String(value(5) || '').trim(),
+              start, end: ajustarFechaFinPorRegla(name, start, ''), name, equipo: cleanEquipoFormula(value(2)),
+              sheetTrainer: String(value(4) || '').trim(), trainer: '', place: String(value(5) || '').trim(),
               address: String(value(6) || '').trim(), sedeTag: sede, sede: sourceSede
             };
             const key = currentCalendarMergeKey(incoming, sede);
@@ -760,8 +843,10 @@
             if (existing) {
               Object.assign(existing, {
                 ...incoming,
+                trainer: existing.assignmentSource === 'causa_os' ? existing.trainer : '',
+                sheetTrainer: incoming.sheetTrainer || existing.sheetTrainer || '',
                 equipo: existing.equipo || incoming.equipo,
-                end: existing.end || incoming.end,
+                end: ajustarFechaFinPorRegla(name, start, existing.end || incoming.end),
                 logistics: existing.logistics || {}
               });
             } else {
@@ -784,9 +869,9 @@
           const badge = document.getElementById('asignadorSourceBadge');
           if (!badge) return;
           const states = {
-            oficial: ['Fuente oficial: Asignador Causa OS', 'text-emerald-400', 'checkmark-circle-outline'],
-            contraste: ['Asignador no disponible · Sheets solo como contraste', 'text-amber-400', 'alert-circle-outline'],
-            pendiente: ['Verificando Asignador Causa OS…', 'text-gray-400', 'sync-outline']
+            oficial: ['Sincronizado con Asignador de Entrenadores (Fuente Única)', 'text-emerald-400', 'checkmark-circle-outline'],
+            contraste: ['Esperando conexión con Asignador Causa OS…', 'text-amber-400', 'alert-circle-outline'],
+            pendiente: ['Sincronizando con Asignador Causa OS…', 'text-gray-400', 'sync-outline']
           };
           const [label, color, icon] = states[status] || states.pendiente;
           badge.className = `bg-crearCard border border-crearBorder ${color} text-xs font-semibold px-4 py-2 rounded-full flex items-center gap-2 shadow-sm`;
@@ -796,17 +881,17 @@
         function markSheetContext(data) {
           Object.keys(data || {}).forEach(sede => {
             (data[sede] || []).forEach(ev => {
-              if (typeof ev.sheetTrainer === 'undefined') ev.sheetTrainer = ev.trainer || '';
-              // Sincronizar con nombre legal canónico del cronograma oficial
-              const formattedSheetTrainer = formatTrainerDisplayName(ev.trainer || ev.sheetTrainer || '');
-              if (formattedSheetTrainer) {
-                ev.sheetTrainer = formattedSheetTrainer;
-                ev.trainer = formattedSheetTrainer;
-                ev.assignmentSource = 'sheet_synced';
-              } else {
-                ev.trainer = '';
-                ev.assignmentSource = 'none';
+              if (!ev.sourceEventKey) {
+                ev.sourceEventKey = assignmentEventKey(ev, sede);
               }
+              if (typeof ev.sheetTrainer === 'undefined') {
+                ev.sheetTrainer = formatTrainerDisplayName(ev.trainer || '');
+              }
+              ev.end = ajustarFechaFinPorRegla(ev.name || ev.nombre, ev.start, ev.end);
+              // REGLA DE ORO: nunca mostrar entrenadores de la hoja de Google
+              // si no están confirmados en /asignador-entrenadores.
+              ev.trainer = '';
+              ev.assignmentSource = 'unassigned_in_asignador';
               ev.causaAssignments = [];
             });
           });
@@ -815,26 +900,26 @@
         function restoreSheetReference(data) {
           Object.keys(data || {}).forEach(sede => {
             (data[sede] || []).forEach(ev => {
-              const formatted = formatTrainerDisplayName(ev.sheetTrainer || '');
-              ev.trainer = formatted || '';
-              ev.assignmentSource = formatted ? 'sheet_synced' : 'none';
+              ev.trainer = '';
+              ev.assignmentSource = 'unassigned_in_asignador';
               ev.causaAssignments = [];
             });
           });
         }
 
         function mergeOfficialAssignments(data, assignments) {
-          const byEvent = new Map((assignments || []).map(item => [item.id, item]));
+          const assignmentIndex = indexAssignmentsForLookup(assignments);
           let confirmed = 0;
           Object.keys(data || {}).forEach(sede => {
             (data[sede] || []).forEach(ev => {
-              if (typeof ev.sheetTrainer === 'undefined') ev.sheetTrainer = ev.trainer || '';
-              const keyWithTeam = assignmentEventKey(ev, sede);
-              const keyNoTeam = assignmentEventKeyNoTeam(ev, sede);
-              const assignment =
-                byEvent.get(ev.sourceEventKey) ||
-                byEvent.get(keyWithTeam) ||
-                byEvent.get(keyNoTeam);
+              if (!ev.sourceEventKey) {
+                ev.sourceEventKey = assignmentEventKey(ev, sede);
+              }
+              if (typeof ev.sheetTrainer === 'undefined') {
+                ev.sheetTrainer = formatTrainerDisplayName(ev.trainer || '');
+              }
+              ev.end = ajustarFechaFinPorRegla(ev.name || ev.nombre, ev.start, ev.end);
+              const assignment = matchAssignmentForEvent(ev, assignmentIndex, sede);
               const slots = assignment || {};
               const orderedSlots = ['unico', 'Creación', 'Relación', 'Gratitud'];
               const confirmedSlots = orderedSlots
@@ -842,15 +927,10 @@
                 .map(slot => ({ slot, ...slots[slot] }));
               ev.causaAssignments = confirmedSlots;
               if (!confirmedSlots.length) {
-                // Si no hay confirmación directa en Causa OS, sincronizar el entrenador oficial de Sheets normalizado
-                const formattedSheet = formatTrainerDisplayName(ev.sheetTrainer || '');
-                if (formattedSheet) {
-                  ev.trainer = formattedSheet;
-                  ev.assignmentSource = 'sheet_synced';
-                } else {
-                  ev.trainer = '';
-                  ev.assignmentSource = 'none';
-                }
+                // Fuente única: /asignador-entrenadores. Si allí está sin asignar,
+                // aquí también permanece sin asignar (nunca se inventa ni se toma de Sheets).
+                ev.trainer = '';
+                ev.assignmentSource = 'unassigned_in_asignador';
                 return;
               }
               const formattedConfirmed = confirmedSlots.length === 1 && confirmedSlots[0].slot === 'unico'
@@ -861,18 +941,24 @@
               confirmed++;
             });
 
-            // Deduplicación de eventos en la misma sede (misma fecha y nombre)
+            // Deduplicación de eventos en la misma sede (misma fecha, nombre y equipo normalizado)
             const seen = new Map();
             const unique = [];
             (data[sede] || []).forEach(ev => {
               const d = String(ev.start || ev.fecha_inicio || '').slice(0, 10);
               const n = String(ev.name || ev.nombre || '').trim().toUpperCase();
-              const k = `${d}__${n}`;
-              if (!seen.has(k)) {
-                seen.set(k, ev);
+              const eqDigits = extractTeamDigitsKey(ev.equipo);
+              const baseKey = `${d}__${n}`;
+              const fullKey = eqDigits ? `${baseKey}__${eqDigits}` : baseKey;
+              const matchKey = seen.has(fullKey)
+                ? fullKey
+                : (!eqDigits && seen.has(baseKey) ? baseKey : null);
+              if (!matchKey) {
+                seen.set(fullKey, ev);
+                if (!seen.has(baseKey)) seen.set(baseKey, ev);
                 unique.push(ev);
               } else {
-                const existing = seen.get(k);
+                const existing = seen.get(matchKey);
                 if (ev.assignmentSource === 'causa_os' && existing.assignmentSource !== 'causa_os') {
                   Object.assign(existing, ev);
                 } else {
@@ -891,13 +977,14 @@
           Object.keys(data || {}).forEach(sede => {
             (data[sede] || []).forEach(ev => {
               const sourceEventKey = ev.sourceEventKey || assignmentEventKey(ev, sede);
+              const sourceEventKeyDigits = assignmentEventKeyDigitsTeam(ev, sede);
               const sourceEventKeyNoTeam = assignmentEventKeyNoTeam(ev, sede);
-              const change = overrides.get(sourceEventKey) || overrides.get(sourceEventKeyNoTeam);
+              const change = overrides.get(sourceEventKey) || overrides.get(sourceEventKeyDigits) || overrides.get(sourceEventKeyNoTeam);
               if (!change) return;
               ev.sourceEventKey = sourceEventKey;
               ev.start = change.fechaInicio || ev.start;
-              ev.end = change.fechaFin || ev.end || ev.start;
               ev.name = change.nombre || ev.name;
+              ev.end = change.fechaFin || ajustarFechaFinPorRegla(ev.name, ev.start, ev.end || ev.start);
               ev.equipo = change.equipo ?? ev.equipo;
               ev.place = change.lugar ?? ev.place;
               ev.sede = change.sede || ev.sede;
@@ -907,11 +994,22 @@
           (changes || []).filter(item => item.kind === 'custom' && item.fechaInicio && item.nombre).forEach(item => {
             const sede = normalizeSedeKey(item.sede || 'LIM');
             if (!data[sede]) data[sede] = [];
-            if (data[sede].some(ev => ev.sourceEventKey === `custom__${item.id}`)) return;
+            if (data[sede].some(ev => ev.sourceEventKey === `custom__${item.id}` || ev.sourceEventKey === item.id)) return;
             data[sede].push({
-              sourceEventKey: `custom__${item.id}`, start: item.fechaInicio, end: item.fechaFin || item.fechaInicio,
-              name: item.nombre, equipo: item.equipo || '', place: item.lugar || '', address: '', sede: item.sede || sede,
-              sedeTag: sede, trainer: '', logistics: { ticket: 'pending', hotel: 'pending', trainer_notified: false }
+              id: item.id,
+              sourceEventKey: item.id,
+              start: item.fechaInicio,
+              end: ajustarFechaFinPorRegla(item.nombre, item.fechaInicio, item.fechaFin || item.fechaInicio),
+              name: item.nombre,
+              equipo: item.equipo || '',
+              place: item.lugar || '',
+              address: '',
+              sede: item.sede || sede,
+              sedeTag: sede,
+              sheetTrainer: '',
+              trainer: '',
+              assignmentSource: 'unassigned_in_asignador',
+              logistics: { ticket: 'pending', hotel: 'pending', trainer_notified: false }
             });
           });
         }
@@ -932,9 +1030,6 @@
             setAsignadorStatus('oficial');
             return true;
           } catch (error) {
-            // La agenda queda navegable con la referencia de Sheets, marcada
-            // como provisional. Así una indisponibilidad no borra información
-            // operativa ni convierte ese dato en una confirmación de Causa OS.
             console.warn('No se pudo consultar el Asignador oficial:', error);
             restoreSheetReference(data);
             setAsignadorStatus('contraste');
@@ -954,8 +1049,6 @@
         };
 
         window.causaCalendarOperationalChanged = () => {
-          // Se reconstruye desde la agenda fuente antes de aplicar el cambio;
-          // evita acumular transformaciones y conserva el histórico intacto.
           syncFromServer();
         };
 
@@ -983,10 +1076,12 @@
                 if (!newData[sede]) newData[sede] = [];
                 newData[sede].push({
                   start: ev.fecha_inicio,
-                  end: ev.fecha_fin,
+                  end: ajustarFechaFinPorRegla(ev.nombre, ev.fecha_inicio, ev.fecha_fin),
                   name: ev.nombre,
                   equipo: cleanEquipoFormula(ev.equipo),
-                  trainer: ev.trainer,
+                  sheetTrainer: ev.trainer || '',
+                  trainer: '',
+                  assignmentSource: 'unassigned_in_asignador',
                   place: ev.lugar,
                   address: ev.direccion,
                   sedeTag: sede,
@@ -2063,10 +2158,12 @@
                         if (!data[key]) data[key] = [];
                         data[key].push({
                             start: ev.fecha_inicio,
-                            end: ev.fecha_fin,
+                            end: ajustarFechaFinPorRegla(ev.nombre, ev.fecha_inicio, ev.fecha_fin),
                             name: ev.nombre,
                             equipo: cleanEquipoFormula(ev.equipo),
-                            trainer: ev.trainer,
+                            sheetTrainer: ev.trainer || '',
+                            trainer: '',
+                            assignmentSource: 'unassigned_in_asignador',
                             place: ev.lugar,
                             address: ev.direccion,
                             logistics: {
@@ -2080,6 +2177,7 @@
                     });
                     
                 allEventsData = data;
+                markSheetContext(allEventsData);
                 mergeCurrentOfficialSchedule(allEventsData).catch(error => console.warn('Contraste vigente no disponible:', error)).finally(() => syncOfficialAssignments(allEventsData)).finally(() => {
                     mergeLogistics();
                     if (sessionStorage.auth === "true") {
@@ -2093,6 +2191,7 @@
                     fetch('events_data.json')
                         .then(res => res.json())
                         .then(data => {
+                            markSheetContext(data);
                             allEventsData = data;
                             mergeCurrentOfficialSchedule(allEventsData).catch(error => console.warn('Contraste vigente no disponible:', error)).finally(() => syncOfficialAssignments(allEventsData)).finally(() => {
                                 mergeLogistics();
@@ -2103,7 +2202,8 @@
                             });
                         })
                         .catch(() => {
-                            // Fallback to embedded events
+                            // Fallback to embedded events (sanitized via markSheetContext)
+                            markSheetContext(fallbackEventsData);
                             allEventsData = fallbackEventsData;
                             mergeCurrentOfficialSchedule(allEventsData).catch(error => console.warn('Contraste vigente no disponible:', error)).finally(() => syncOfficialAssignments(allEventsData)).finally(() => {
                                 mergeLogistics();
@@ -3068,13 +3168,11 @@
                 startDateObj.setMinutes(startDateObj.getMinutes() + startDateObj.getTimezoneOffset());
                 const monthName = monthNames[startDateObj.getMonth()];
                 const yearName = startDateObj.getFullYear().toString();
-                const trainerName = ev.trainer || "Por confirmar";
+                const trainerName = (ev.assignmentSource === 'causa_os' && ev.trainer) ? ev.trainer : "Sin asignar";
                 const placeName = ev.place || "Por confirmar";
-                const trainerSource = ev.assignmentSource === 'causa_os'
+                const trainerSource = (ev.assignmentSource === 'causa_os' && ev.trainer)
                   ? '<span class="mt-1 inline-flex items-center gap-1 text-[9px] font-bold text-emerald-400"><ion-icon name="checkmark-circle-outline"></ion-icon> Confirmado en Asignador Causa OS</span>'
-                  : (ev.trainer || ev.sheetTrainer)
-                    ? '<span class="mt-1 inline-flex items-center gap-1 text-[9px] font-semibold text-sky-400"><ion-icon name="sync-outline"></ion-icon> Sincronizado Cronograma Oficial</span>'
-                    : '<p class="mt-1 text-[10px] text-gray-500">Sin entrenador asignado</p>';
+                  : '<p class="mt-1 text-[10px] text-amber-400/80 font-semibold flex items-center gap-1"><ion-icon name="time-outline"></ion-icon> Pendiente en Asignador de Entrenadores</p>';
                 
                 const log = ev.logistics || { ticket: "pending", hotel: "pending", trainer_notified: false, trainer_arrival: "" };
                 
@@ -3166,7 +3264,7 @@
                                 </div>
                                 <div>
                                     <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Entrenador</p>
-                                    ${trainerName !== 'Por confirmar' ? `
+                                    ${trainerName !== 'Por confirmar' && trainerName !== 'Sin asignar' ? `
                                     <button onclick="openTrainerDrawer('${trainerName.replace(/'/g, "\'")}')" class="text-sm text-gray-200 font-medium text-left cursor-pointer border-b border-dashed border-gray-500 hover:text-crearCyan hover:border-crearCyan transition-colors flex items-center gap-1">
                                         <span>${trainerName}</span>
                                         <ion-icon name="card-outline" class="text-xs text-crearCyan/70"></ion-icon>

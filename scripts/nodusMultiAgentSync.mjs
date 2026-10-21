@@ -611,14 +611,15 @@ class NodusNormalizerAgent {
             dominantSede = s;
           }
         }
+        // Cero inferencia de sede por rango numérico de equipo: solo se acepta sede explícita en el nombre
         if (!dominantSede) {
           const eqStr = (eq.equipoNombre || '').toUpperCase();
-          const matchNum = eqStr.match(/(\d+)/);
-          if (matchNum) {
-            const num = parseInt(matchNum[1], 10);
-            if (num >= 110 && num <= 140) dominantSede = 'Quito/Guayaquil';
-            else if (num >= 10 && num <= 50) dominantSede = 'Lima';
-          }
+          if (eqStr.includes('LIMA')) dominantSede = 'Lima';
+          else if (eqStr.includes('QUITO')) dominantSede = 'Quito';
+          else if (eqStr.includes('GUAYAQUIL') || eqStr.includes('GYE')) dominantSede = 'Guayaquil';
+          else if (eqStr.includes('CUENCA')) dominantSede = 'Cuenca';
+          else if (eqStr.includes('MEDELLIN') || eqStr.includes('MEDELLÍN')) dominantSede = 'Medellín';
+          else if (eqStr.includes('MEXICO') || eqStr.includes('MÉXICO')) dominantSede = 'México';
         }
         if (dominantSede) {
           equipoSedeMap[eq.equipoNombre.trim().toLowerCase()] = dominantSede;
@@ -1051,24 +1052,15 @@ class NodusDispatcherAgent {
         const imoName = p.imo.trim();
         if (!imoName) continue;
 
-        // Normalizar nombre del equipo para evitar fragmentación (ej. EQUIPO 29 vs EQUIPO 29 - LIMA CICLO 1 V)
+        // Normalizar nombre del equipo sin inventar sede cuando Nodus no la declara explícitamente
         let normalizedEquipo = (eq.equipoNombre || '').trim().replace(/\s+/g, ' ');
-        if (/^EQUIPO\s+28(\b|\s|$)/i.test(normalizedEquipo) && !normalizedEquipo.toUpperCase().includes('QUITO')) {
-          normalizedEquipo = 'EQUIPO 28 - LIMA CICLO 1';
-        } else if (/^EQUIPO\s+29(\b|\s|$)/i.test(normalizedEquipo)) {
-          normalizedEquipo = 'EQUIPO 29 - LIMA CICLO 1';
-        } else if (/^EQUIPO\s+30(\b|\s|$)/i.test(normalizedEquipo)) {
-          normalizedEquipo = 'EQUIPO 30 - LIMA CICLO 1';
-        } else if (/^EQUIPO\s+31(\b|\s|$)/i.test(normalizedEquipo)) {
-          normalizedEquipo = 'EQUIPO 31 - LIMA CICLO 1';
-        } else {
-          normalizedEquipo = normalizedEquipo.replace(/\s+V$/i, '').replace(/[✓✔]/g, '').trim();
-        }
+        normalizedEquipo = normalizedEquipo.replace(/\s+V$/i, '').replace(/[✓✔]/g, '').trim();
 
-        // Inferir sede del nombre del equipo si es posible
-        let sedeDetectada = "Lima";
+        // Extraer sede únicamente cuando consta explícitamente en el nombre del equipo de Nodus
+        let sedeDetectada = "SIN_SEDE_EXPLICITA";
         const eqUpper = (eq.equipoNombre || '').toUpperCase();
-        if (eqUpper.includes("CUENCA")) sedeDetectada = "Cuenca";
+        if (eqUpper.includes("LIMA")) sedeDetectada = "Lima";
+        else if (eqUpper.includes("CUENCA")) sedeDetectada = "Cuenca";
         else if (eqUpper.includes("QUITO")) sedeDetectada = "Quito";
         else if (eqUpper.includes("GUAYAQUIL") || eqUpper.includes("GYE")) sedeDetectada = "Guayaquil";
         else if (eqUpper.includes("BOGOTA") || eqUpper.includes("BOGOTÁ")) sedeDetectada = "Bogotá";

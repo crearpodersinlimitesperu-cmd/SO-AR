@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
@@ -170,7 +170,7 @@ export default function AuditoriaKPIs({ defaultTab }) {
             }
           }
 
-          const totalOkParsed = parseInt(confirmados) || 0;
+          const totalOkParsed = confirmadosStr ? (parseInt(confirmados, 10) || 0) : null;
           allData.push({
             id: `nodus_${index}`,
             userName: name,
@@ -179,15 +179,15 @@ export default function AuditoriaKPIs({ defaultTab }) {
             sede: sede,
             role: roleStr,
             stage: roleStr === 'coord_maestria' ? 'MJ' : 'C1',
-            gestionesTotal: parseInt(gestiones) || 0,
-            asignados: parseInt(asignados) || 0,
+            gestionesTotal: content.includes('Gestiones') ? (parseInt(gestiones, 10) || 0) : null,
+            asignados: content.includes('Asignados') ? (parseInt(asignados, 10) || 0) : null,
             dynamicMetrics: dynamicMetrics,
             statusPills: statusPills,
             totalOk: totalOkParsed,
-            nuevosOk: totalOkParsed,
-            rezagadosOk: 0,
+            nuevosOk: null,
+            rezagadosOk: null,
             status: 'pending',
-            createdAt: data.timestamp || new Date().toISOString(),
+            createdAt: data.timestamp || null,
             rawContent: content
           });
         }

@@ -1,11 +1,12 @@
 import { Children, useEffect, useMemo, useState } from 'react';
-import { ArrowRight, CalendarClock, CheckCircle2, Clock3, ListChecks, Users, Plus } from 'lucide-react';
+import { ArrowRight, CalendarClock, CheckCircle2, Clock3, ListChecks, Users, Plus, RotateCcw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useChecklist } from '../context/ChecklistContext';
 import { isElizabethEscobar } from '../config/permissions';
 import { findUserByAnyEmail } from '../data/usersData';
 import TaskAssignmentModal from '../components/TaskAssignmentModal';
+import TaskDetailModal from '../components/TaskDetailModal';
 import {
   getTaskAssigneeEmails,
   getTasksAssignedBy,
@@ -15,6 +16,7 @@ import {
   getTeamMembers,
   getTeamTimingSummary,
   isTaskCompleteForAssignee,
+  isTaskCompleteForTeam,
   normalizeTaskEmail
 } from '../utils/elizabethDashboard';
 import './ElizabethDashboard.css';
@@ -36,23 +38,71 @@ function TaskTiming({ task, now }) {
   return <span className={`elizabeth-badge elizabeth-badge--${timing.key}`}>{timing.label}</span>;
 }
 
-function TaskList({ tasks, now, emptyLabel, assigneeEmail }) {
+function TaskList({ tasks, now, emptyLabel, assigneeEmail, onToggleTask, onOpenTask, busyTaskId }) {
   if (tasks.length === 0) return <p className="elizabeth-dashboard__empty" role="status">{emptyLabel}</p>;
   return (
     <div className="elizabeth-dashboard__task-list">
       {tasks.map(task => {
         const assignees = getTaskAssigneeEmails(task);
+        const completed = assigneeEmail
+          ? isTaskCompleteForAssignee(task, assigneeEmail)
+          : isTaskCompleteForTeam(task);
+        const isBusy = busyTaskId === task.id;
         return (
           <article className="elizabeth-task-card" key={task.id}>
             <div className="elizabeth-task-card__main">
-              <h3>{task.title || task.task || task.name || 'Tarea sin título'}</h3>
+              <h3>
+                <button
+                  type="button"
+                  className="elizabeth-task-card__title-btn"
+                  onClick={() => onOpenTask?.(task)}
+                >
+                  {task.title || task.task || task.name || 'Tarea sin título'}
+                </button>
+              </h3>
               <p>{assignees.length
                 ? `Para: ${assignees.map(email => assigneeName(task, email)).join(', ')}`
                 : 'Sin una persona asignada registrada'}</p>
             </div>
-            <TaskTiming task={assigneeEmail
-              ? { ...task, completed: isTaskCompleteForAssignee(task, assigneeEmail) }
-              : task} now={now} />
+            <div className="elizabeth-task-card__controls">
+              <TaskTiming task={assigneeEmail
+                ? {
+                    ...task,
+                    completed,
+                    status: completed ? 'Completada' : 'Pendiente',
+                    progressPercentage: completed ? 100 : 0
+                  }
+                : task} now={now} />
+              {onToggleTask && (
+                <button
+                  type="button"
+                  className={`elizabeth-task-card__complete-btn ${completed ? 'elizabeth-task-card__complete-btn--done' : ''}`}
+                  disabled={isBusy}
+                  onClick={() => onToggleTask(task, completed)}
+                >
+                  {completed ? (
+                    <>
+                      <RotateCcw size={16} aria-hidden="true" />
+                      {isBusy ? 'Guardando…' : 'Reabrir'}
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle2 size={17} aria-hidden="true" />
+                      {isBusy ? 'Guardando…' : (assigneeEmail ? 'Ya completé' : 'Marcar completada')}
+                    </>
+                  )}
+                </button>
+              )}
+              {onOpenTask && (
+                <button
+                  type="button"
+                  className="elizabeth-task-card__detail-btn"
+                  onClick={() => onOpenTask(task)}
+                >
+                  Ver detalle
+                </button>
+              )}
+            </div>
           </article>
         );
       })}
@@ -69,7 +119,7 @@ function OrderedSections({ order, children }) {
 
 export default function ElizabethDashboard() {
   const { currentUser } = useAuth();
-  const { tasks = [], loading, taskLoadError, taskReadRestricted } = useChecklist();
+  const { tasks = [], loading, taskLoadError, taskReadRestricted, updateIndividualProgress, toggleTask } = useChecklist();
   const navigate = useNavigate();
   const [now, setNow] = useState(() => new Date());
   const [preferences, setPreferences] = useState(defaultPreferences);
@@ -77,13 +127,47 @@ export default function ElizabethDashboard() {
   const [preferenceOwner, setPreferenceOwner] = useState(null);
   const [creationOpen, setCreationOpen] = useState(false);
   const [creationNotice, setCreationNotice] = useState('');
+  const [selectedTaskId, setSelectedTaskId] = useState(null);
+  const [busyTaskId, setBusyTaskId] = useState(null);
   const userKey = currentUser?.isSimulated ? null : currentUser?.uid;
   const activePreferences = preferenceOwner === userKey ? preferences : defaultPreferences();
   const canLearn = canLearnPreferences(currentUser) && preferenceOwner === userKey;
+  const selectedTask = useMemo(
+    () => (selectedTaskId ? tasks.find(t => t.id === selectedTaskId) || null : null),
+    [tasks, selectedTaskId]
+  );
+
+  const handleToggleOwnTask = async (task, currentlyCompleted) => {
+    if (!task?.id || busyTaskId === task.id) return;
+    setBusyTaskId(task.id);
+    try {
+      const myEmail = normalizeTaskEmail(currentUser?.email);
+      if (myEmail && typeof updateIndividualProgress === 'function') {
+        await updateIndividualProgress(task.id, myEmail, !currentlyCompleted, !currentlyCompleted ? 100 : 0);
+      } else if (typeof toggleTask === 'function') {
+        await toggleTask(task.id, currentlyCompleted);
+      }
+    } finally {
+      setBusyTaskId(null);
+    }
+  };
+
+  const handleToggleAssignedTask = async (task, currentlyCompleted) => {
+    if (!task?.id || busyTaskId === task.id) return;
+    setBusyTaskId(task.id);
+    try {
+      if (typeof toggleTask === 'function') {
+        await toggleTask(task.id, currentlyCompleted);
+      }
+    } finally {
+      setBusyTaskId(null);
+    }
+  };
 
   useEffect(() => {
     setCreationOpen(false);
     setCreationNotice('');
+    setSelectedTaskId(null);
   }, [currentUser?.uid, currentUser?.email, currentUser?.isSimulated]);
 
   useEffect(() => {
@@ -273,7 +357,14 @@ export default function ElizabethDashboard() {
             </div>
             <ListChecks size={26} aria-hidden="true" />
           </div>
-          <TaskList tasks={visibleAssignedTasks} now={now} emptyLabel={readState.emptyLabel || (assignedTasks.length ? 'No hay tareas con este filtro.' : 'No hay tareas que hayas asignado.')} />
+          <TaskList
+            tasks={visibleAssignedTasks}
+            now={now}
+            onToggleTask={handleToggleAssignedTask}
+            onOpenTask={(task) => setSelectedTaskId(task.id)}
+            busyTaskId={busyTaskId}
+            emptyLabel={readState.emptyLabel || (assignedTasks.length ? 'No hay tareas con este filtro.' : 'No hay tareas que hayas asignado.')}
+          />
         </section>
 
         <section className="elizabeth-dashboard__section" data-section="own" aria-labelledby="elizabeth-own-title">
@@ -284,7 +375,15 @@ export default function ElizabethDashboard() {
             </div>
             <ListChecks size={26} aria-hidden="true" />
           </div>
-          <TaskList tasks={visibleOwnTasks} now={now} assigneeEmail={currentUser?.email} emptyLabel={readState.emptyLabel || (ownTasks.length ? 'No hay tareas con este filtro.' : 'No hay tareas asignadas a ti.')} />
+          <TaskList
+            tasks={visibleOwnTasks}
+            now={now}
+            assigneeEmail={currentUser?.email}
+            onToggleTask={handleToggleOwnTask}
+            onOpenTask={(task) => setSelectedTaskId(task.id)}
+            busyTaskId={busyTaskId}
+            emptyLabel={readState.emptyLabel || (ownTasks.length ? 'No hay tareas con este filtro.' : 'No hay tareas asignadas a ti.')}
+          />
         </section>
 
         <section className="elizabeth-dashboard__section" data-section="team" aria-labelledby="elizabeth-team-title">
@@ -325,7 +424,13 @@ export default function ElizabethDashboard() {
                   <ul>
                     {filterDashboardTasks(person.tasks, filter, now, person.email).map((task, index) => (
                       <li key={`${task.id || task.task || 'task'}-${index}`}>
-                        <span>{task.title || task.task || task.name || 'Tarea sin título'}</span>
+                        <button
+                          type="button"
+                          className="elizabeth-task-card__title-btn"
+                          onClick={() => setSelectedTaskId(task.id)}
+                        >
+                          {task.title || task.task || task.name || 'Tarea sin título'}
+                        </button>
                         <TaskTiming task={{ ...task, assignedToEmail: null, assigned_to: null, assignedToEmails: [person.email] }} now={now} />
                       </li>
                     ))}
@@ -339,6 +444,13 @@ export default function ElizabethDashboard() {
           )}
         </section>
         </OrderedSections>
+
+        <TaskDetailModal
+          isOpen={Boolean(selectedTask)}
+          task={selectedTask}
+          onClose={() => setSelectedTaskId(null)}
+          resolveAssigneeName={(email) => assigneeName(selectedTask || {}, normalizeTaskEmail(email))}
+        />
 
         <footer className="elizabeth-dashboard__footer">
           <Clock3 size={17} aria-hidden="true" />

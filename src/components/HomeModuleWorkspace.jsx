@@ -4,7 +4,7 @@ import { homeModuleHelp } from '../data/homeModuleHelp';
 import '../pages/HomeModules.css';
 
 const categories = [
-  { id: 'operacion', label: 'Operación y seguimiento', keys: ['horarios', 'gerencial', 'checklist', 'kpis', 'hubQT', 'vuelos', 'imos', 'asignador'] },
+  { id: 'operacion', label: 'Operación y seguimiento', keys: ['horarios', 'gerencial', 'checklist', 'kpis', 'hubQT', 'vuelos', 'imos', 'asignador', 'rezagadosC1', 'baseNodusRezagados'] },
   { id: 'direccion', label: 'Dirección y gestión', keys: ['portafolio', 'estrategia', 'auditoria', 'mando', 'cfo', 'finanzas', 'talento', 'legal', 'auditoriaLegal'] },
   { id: 'personas', label: 'Personas y equipos', keys: ['directorioQT', 'llamadas', 'managers', 'crm'] },
   { id: 'formacion', label: 'Formación y recursos', keys: ['manualQT', 'manualNodus', 'maestria', 'entrenador', 'campus', 'flyers'] },
@@ -32,7 +32,7 @@ const normalize = text => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').
 export default function HomeModuleWorkspace({ children }) {
   const id = useId();
   const [query, setQuery] = useState('');
-  const [expanded, setExpanded] = useState(null);
+  const [expanded, setExpanded] = useState('personas');
   const [collapsedResults, setCollapsedResults] = useState([]);
   const terms = normalize(query).trim().split(/\s+/).filter(Boolean);
   const searching = terms.length > 0;
@@ -52,6 +52,9 @@ export default function HomeModuleWorkspace({ children }) {
     return { ...category, accesses, matches };
   }).filter(group => group.matches.length > 0);
   const count = groups.reduce((total, group) => total + group.matches.length, 0);
+  const activeExpanded = expanded === null
+    ? null
+    : (groups.some(g => g.id === expanded) ? expanded : (groups[0]?.id ?? null));
 
   return (
     <section className="home-modules" aria-labelledby={`${id}-title`}>
@@ -78,7 +81,7 @@ export default function HomeModuleWorkspace({ children }) {
       </p>
       <div id={`${id}-groups`} className="home-module-groups">
         {groups.map(group => {
-          const open = searching ? !collapsedResults.includes(group.id) : expanded === group.id;
+          const open = searching ? !collapsedResults.includes(group.id) : activeExpanded === group.id;
           return (
             <div key={group.id} className="home-module-group" data-expanded={open}>
               <h3>

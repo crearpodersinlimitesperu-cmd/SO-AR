@@ -207,41 +207,56 @@ function App() {
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       {originalAdminUser && (
         <div style={{
-          background: 'var(--crear-gold)',
-          color: '#000',
-          padding: '0.8rem 2rem',
+          background: 'linear-gradient(90deg, #d97706, #f59e0b)',
+          color: '#000000',
+          padding: '0.65rem 1.8rem',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
           fontWeight: 'bold',
           zIndex: 9999,
-          boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+          boxShadow: '0 4px 14px rgba(0,0,0,0.4)',
           position: 'sticky',
           top: 0
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span>⚠️ MODO SIMULADOR ACTIVO:</span>
-            <span>Estás viendo la plataforma como <strong>{currentUser?.name}</strong></span>
-            <span>Las preferencias viven en el navegador de cada usuario y no aplican al simular.</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap', fontSize: '0.9rem' }}>
+            <span style={{ background: '#000', color: '#fbbf24', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              🎭 MODO SIMULADOR (CAJA NEGRA)
+            </span>
+            <span>
+              Viendo como: <strong>{currentUser?.name || currentUser?.displayName}</strong> ({currentUser?.email})
+            </span>
+            <span style={{ opacity: 0.85, fontSize: '0.82rem' }}>
+              · Rol: <strong>{currentUser?.appRole || currentUser?.role}</strong> · Sede: <strong>{currentUser?.sede}</strong>
+            </span>
+            <span style={{ opacity: 0.78, fontSize: '0.78rem' }}>
+              · Las preferencias viven en el navegador de cada usuario y no aplican al simular.
+            </span>
           </div>
-          <button 
-            onClick={() => {
-              stopSimulation();
-              navigate('/home', { replace: true });
-            }}
-            style={{
-              background: '#000',
-              color: 'var(--crear-gold)',
-              border: 'none',
-              padding: '0.4rem 1rem',
-              borderRadius: '6px',
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              fontSize: '0.85rem'
-            }}
-          >
-            ❌ Terminar Simulación
-          </button>
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+            <button 
+              onClick={() => {
+                stopSimulation();
+                navigate('/home', { replace: true });
+              }}
+              style={{
+                background: '#000000',
+                color: '#f59e0b',
+                border: '1px solid rgba(245, 158, 11, 0.4)',
+                padding: '0.45rem 1.1rem',
+                borderRadius: '8px',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                fontSize: '0.85rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.3)'
+              }}
+            >
+              ❌ Terminar Simulación
+            </button>
+          </div>
         </div>
       )}
       <PromptModal />

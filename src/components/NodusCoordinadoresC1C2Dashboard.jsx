@@ -13,7 +13,6 @@ import {
   Legend, CartesianGrid, Cell, PieChart, Pie, ComposedChart, Line
 } from 'recharts';
 import { useTheme } from '../context/ThemeContext';
-import nodusFallbackData from '../data/nodusFallbackData.json';
 import { usersData, OPERATIONAL_SEDES } from '../data/usersData';
 import './NodusCoordinadoresC1C2Dashboard.css';
 
@@ -79,27 +78,14 @@ function resolveCoordinatorEmail(coord) {
     if (Array.isArray(match?.emails) && match.emails.length > 0) return match.emails[0];
   }
 
-  // 3. Fallback: generación de correo institucional
-  const parts = rawName.split(/\s+/).filter(Boolean);
-  if (parts.length >= 2) {
-    const first = clean(parts[0]);
-    const last = clean(parts[1]);
-    return `${first}.${last}@crearpsl.net`;
-  } else if (parts.length === 1 && parts[0]) {
-    return `${clean(parts[0])}@crearpsl.net`;
-  }
-
-  return 'coordinacion@crearpsl.net';
+  // 3. Cero invención de correos institucionales: si no figura en Nodus ni en el directorio verificado, se reporta vacío
+  return '';
 }
 
-// Combinación robusta y resiliente con el catálogo multi-sede de nodusFallbackData
-// Garantiza que JAMÁS se pierdan las 6 sedes (Cuenca, Guayaquil, Lima, Medellín, México, Quito) ni los 22 coordinadores
 function mergeWithFallbackData(remoteData) {
-  if (!remoteData || !remoteData.coordinadores || remoteData.coordinadores.length === 0) {
-    return nodusFallbackData;
+  if (!remoteData || !Array.isArray(remoteData.coordinadores)) {
+    return null;
   }
-  // Si tenemos datos remotos, NUNCA combinamos con el fallback.
-  // La base de datos y el Identity Sentinel son la ÚNICA fuente de verdad.
   return remoteData;
 }
 
@@ -192,8 +178,8 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
     return null;
   };
 
-  const [data, setData] = useState(nodusFallbackData || null);
-  const [loading, setLoading] = useState(!nodusFallbackData);
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
 
@@ -278,8 +264,8 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
           });
         }
       }, (err) => {
-        console.warn("Realtime listener usando snapshot de respaldo:", err.message);
-        setData(prev => prev || nodusFallbackData);
+        console.warn("Error leyendo snapshot Nodus en tiempo real:", err.message);
+        setError('No se pudo verificar la fuente en vivo de Nodus.');
         setLoading(false);
       });
     } catch (e) {

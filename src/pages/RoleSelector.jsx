@@ -41,7 +41,7 @@ export default function RoleSelector() {
   // Define strict hierarchy order (lower index = higher priority)
   const roleHierarchy = [
     'direccion', 'cfo', 'gerente', 'director_maestria', 
-    'coord_c1', 'coord_maestria', 'capitan', 'manager',
+    'coord_c1', 'coord_jr', 'coord_maestria', 'capitan', 'manager',
     'entrenador', 'entrenador_llamadas', 'qt',
     'finanzas', 'coordinador', 'talento_humano', 'legal', 'asistente_impuestos_quito', 'tecnico_sst'
   ];

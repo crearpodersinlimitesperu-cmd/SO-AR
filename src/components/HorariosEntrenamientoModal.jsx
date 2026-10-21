@@ -36,20 +36,6 @@ function getLeadershipForSede(sedeName) {
     return isThisSede && isLeader;
   });
 
-  // Especial Quito: asegurar inclusión de Marcela Robbys (coord_c1 oficial de Quito)
-  if (cleanTarget.includes('quito')) {
-    const hasMarcela = leaders.some(u => (u.email || '').toLowerCase().includes('marobel'));
-    if (!hasMarcela) {
-      leaders.push({
-        id: 'coord_marcela_quito',
-        name: 'Marcela Robbys',
-        role: 'coord_c1',
-        sede: 'Quito',
-        email: 'marobel.studio@gmail.com'
-      });
-    }
-  }
-
   const mapped = leaders.map(u => {
     let cleanName = u.name;
     let cleanRole = 'Coordinador';
@@ -58,7 +44,7 @@ function getLeadershipForSede(sedeName) {
 
     // Mapeo riguroso de coordinadores y gerentes de Quito y sedes
     if (email.includes('katherine.aguirre')) {
-      cleanName = 'Karla Aguirre';
+      cleanName = 'Katherine Aguirre';
       cleanRole = 'Coord. C1/C2';
     } else if (email.includes('karla.pastrano')) {
       cleanName = 'Karla Pastrano';
@@ -75,9 +61,6 @@ function getLeadershipForSede(sedeName) {
     } else if (email.includes('danna.guaman')) {
       cleanName = 'Danna Guaman';
       cleanRole = 'Coord. C2';
-    } else if (email.includes('marobel')) {
-      cleanName = 'Marcela Robbys';
-      cleanRole = 'Coord. C1/C2';
     } else if (email.includes('erika.gavilanez')) {
       cleanName = 'Erika Gavilanez';
       cleanRole = 'Coord. Maestría';
