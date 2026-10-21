@@ -1,7 +1,18 @@
-name: Publicar proyección de asignaciones para calendario
+name: Agente Guardián de Sincronización Asignador ↔ Calendario Global
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '*/30 * * * *'
+  push:
+    branches:
+      - master
+    paths:
+      - 'src/pages/AsignadorEntrenadores.jsx'
+      - 'src/services/trainerCalendarSyncAgent.js'
+      - 'public/calendario_global.html'
+      - 'scripts/publishCalendarAssignmentProjection.mjs'
+      - '.github/workflows/publish-calendar-assignment-projection.yml'
 
 concurrency:
   group: calendar-assignment-projection
@@ -18,7 +29,7 @@ jobs:
           node-version: '20'
           cache: npm
       - run: npm ci
-      - name: Publicar asignaciones existentes sin tocar la fuente canónica
+      - name: Ejecutar Agente Guardián de Sincronización Asignador ↔ Calendario Global
         env:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
         run: node scripts/publishCalendarAssignmentProjection.mjs

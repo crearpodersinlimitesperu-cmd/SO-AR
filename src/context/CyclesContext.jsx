@@ -3,6 +3,7 @@ import { collection, onSnapshot } from 'firebase/firestore';
 import { useAuth } from './AuthContext';
 import { db } from '../services/firebase';
 import { OFFICIAL_CALENDAR_SHEET_URL, parseOfficialCalendarSheet } from '../services/officialCalendarSheet';
+import { applyAsignadorAuthoritativeProjection } from '../services/trainerCalendarSyncAgent';
 
 // Genera un id estable para un evento del calendario oficial (viene de una hoja
 // de Google, sin "id" propio de Firestore), para poder recordar cuáles ya se
@@ -72,141 +73,8 @@ const mergeOfficialCalendar = (apiEvents, sheetEvents) => {
   return [...byKey.values()];
 };
 
-// Debe coincidir con la clave que usa el Asignador, pero nunca modifica el
-// calendario fuente. Así un cambio de fecha puede localizar su evento previo.
-const normalizeAssignmentSede = (sede = '') => {
-  const raw = String(sede).trim();
-  const value = raw.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-  if (raw === 'MED' || value.includes('medell')) return 'Medellín';
-  if (raw === 'LIM' || value.includes('lima')) return 'Lima';
-  if (raw === 'CUE' || value.includes('cuenca')) return 'Cuenca';
-  if (raw === 'GYE' || value.includes('guayaquil')) return 'Guayaquil';
-  if (raw === 'MEX' || value.includes('mex') || value.includes('cdmx')) return 'México';
-  if (raw.startsWith('UIO') || value.includes('quito')) return 'Quito';
-  return raw || 'Sede Global';
-};
-
-const asignadorEventKey = (event = {}) => {
-  const f = String(event.fecha_inicio || event.start || '').slice(0, 10);
-  const s = normalizeAssignmentSede(event.sede || event.sedeTag || '');
-  const n = String(event.nombre || event.name || '').trim();
-  const eq = String(event.equipo || event.team || '').trim();
-  return `${f}__${s}__${n}${eq ? '__' + eq : ''}`.replace(/\//g, '-');
-};
-
-const asignadorEventKeyNoTeam = (event = {}) => {
-  const f = String(event.fecha_inicio || event.start || '').slice(0, 10);
-  const s = normalizeAssignmentSede(event.sede || event.sedeTag || '');
-  const n = String(event.nombre || event.name || '').trim();
-  return `${f}__${s}__${n}`.replace(/\//g, '-');
-};
-
-const trainerFromAssignment = assignment => {
-  if (!assignment) return '';
-  const slots = assignment || {};
-  const ordered = ['unico', 'Creación', 'Relación', 'Gratitud']
-    .filter(slot => slots[slot]?.entrenador)
-    .map(slot => slots[slot].entrenador);
-  if (ordered.length) return ordered.join(' / ');
-  return assignment.entrenador || assignment.trainer || '';
-};
-
-const applyAsignadorProjection = (sourceEvents, assignments, operationalChanges) => {
-  const assignmentByKey = new Map((assignments || []).map(item => [item.id, item]));
-  const overridesBySourceKey = new Map((operationalChanges || [])
-    .filter(item => item.kind === 'override' && item.sourceEventKey)
-    .map(item => [item.sourceEventKey, item]));
-
-  const result = (sourceEvents || []).map(event => {
-    const sourceKey = asignadorEventKey(event);
-    const sourceKeyNoTeam = asignadorEventKeyNoTeam(event);
-
-    const override = overridesBySourceKey.get(sourceKey) || overridesBySourceKey.get(sourceKeyNoTeam);
-
-    const updatedEvent = {
-      ...event,
-      __assignmentKey: sourceKey,
-      ...(override ? {
-        nombre: override.nombre || event.nombre, name: override.nombre || event.name,
-        sede: override.sede || event.sede, sedeTag: override.sede || event.sedeTag,
-        equipo: override.equipo ?? event.equipo, lugar: override.lugar ?? event.lugar,
-        fecha_inicio: override.fechaInicio || event.fecha_inicio || event.start,
-        fecha_fin: override.fechaFin || event.fecha_fin || event.end || '',
-        start: override.fechaInicio || event.start || event.fecha_inicio,
-        end: override.fechaFin || event.end || event.fecha_fin || '',
-      } : {})
-    };
-
-    // Búsqueda cruzada de la asignación confirmada en Causa OS:
-    // 1. Clave actual (con fecha actualizada tras override si aplica)
-    const currentKey = asignadorEventKey(updatedEvent);
-    const currentKeyNoTeam = asignadorEventKeyNoTeam(updatedEvent);
-    // 2. Clave original fuente
-    const assignmentDoc =
-      assignmentByKey.get(currentKey) ||
-      assignmentByKey.get(currentKeyNoTeam) ||
-      assignmentByKey.get(sourceKey) ||
-      assignmentByKey.get(sourceKeyNoTeam);
-
-    const confirmedTrainer = trainerFromAssignment(assignmentDoc);
-
-    if (confirmedTrainer) {
-      updatedEvent.trainer = confirmedTrainer;
-      updatedEvent.entrenador = confirmedTrainer;
-      updatedEvent.assignmentSource = 'causa_os';
-      updatedEvent.__assignmentKey = assignmentDoc.id || currentKey;
-    } else {
-      updatedEvent.__assignmentKey = currentKey;
-    }
-
-    return updatedEvent;
-  });
-
-  (operationalChanges || []).filter(item => item.kind === 'custom').forEach(item => {
-    const customKey = item.id;
-    const assignmentDoc = assignmentByKey.get(customKey);
-    const confirmedTrainer = trainerFromAssignment(assignmentDoc);
-    result.push({
-      __assignmentKey: item.id,
-      fecha_inicio: item.fechaInicio, fecha_fin: item.fechaFin || '', start: item.fechaInicio, end: item.fechaFin || '',
-      nombre: item.nombre, name: item.nombre, sede: item.sede, sedeTag: item.sede,
-      equipo: item.equipo || '', lugar: item.lugar || '', direccion: '',
-      trainer: confirmedTrainer || '', entrenador: confirmedTrainer || '',
-      assignmentSource: confirmedTrainer ? 'causa_os' : 'custom', origen: 'causa_os'
-    });
-  });
-
-  // Deduplicación estricta: un mismo entrenamiento (fecha + sede + nombre) nunca debe
-  // aparecer dos veces. Si hay conflicto, la proyección de Causa OS prevalece sobre
-  // referencias provisionales de Sheets.
-  const deduplicated = [];
-  const seenMap = new Map();
-
-  for (const ev of result) {
-    const d = String(ev.fecha_inicio || ev.start || '').slice(0, 10);
-    const s = normalizeAssignmentSede(ev.sede || ev.sedeTag || '').toUpperCase();
-    const n = String(ev.nombre || ev.name || '').trim().toUpperCase();
-    const dedupKey = `${d}__${s}__${n}`;
-
-    if (!seenMap.has(dedupKey)) {
-      seenMap.set(dedupKey, ev);
-      deduplicated.push(ev);
-    } else {
-      const existing = seenMap.get(dedupKey);
-      if (ev.assignmentSource === 'causa_os' && existing.assignmentSource !== 'causa_os') {
-        Object.assign(existing, ev);
-      } else {
-        existing.equipo = existing.equipo || ev.equipo;
-        existing.lugar = existing.lugar || ev.lugar;
-        existing.direccion = existing.direccion || ev.direccion;
-        if (!existing.trainer && ev.trainer) existing.trainer = ev.trainer;
-        if (!existing.entrenador && ev.entrenador) existing.entrenador = ev.entrenador;
-      }
-    }
-  }
-
-  return deduplicated.sort((a, b) => new Date(a.fecha_inicio || a.start) - new Date(b.fecha_inicio || b.start));
-};
+const applyAsignadorProjection = (sourceEvents, assignments, operationalChanges) =>
+  applyAsignadorAuthoritativeProjection(sourceEvents, assignments, operationalChanges);
 
 // (14/09/2026) EXTRAÍDO de calculateCycleAndStage() sin cambiar su lógica, para
 // poder reutilizarlo tanto en la detección AUTOMÁTICA de equipo (el comportamiento

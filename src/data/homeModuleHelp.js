@@ -27,5 +27,7 @@ export const homeModuleHelp = {
   flyers: 'Genera y descarga flyers de entrenamientos por programa, sede y equipo.',
   vuelos: 'Consulta vuelos programados y cartas de entrenadores; no confirma tracking en vivo.',
   imos: 'Consulta el seguimiento de IMOs y sus enrolados por sede.',
-  asignador: 'Asigna entrenadores a entrenamientos y fines de semana de Maestría.'
+  asignador: 'Asigna entrenadores a entrenamientos y fines de semana de Maestría.',
+  rezagadosC1: 'Centro de Operaciones Rezagados C1: Guía Oficial de Llamadas C1, scripts de reencuadre, objeciones, protocolo legal Indecopi y reporte Nodus.',
+  baseNodusRezagados: 'Abre la Base Nodus de Rezagados C1 en vivo (imo.crearpslglobal.com/reporterezagados).'
 };
