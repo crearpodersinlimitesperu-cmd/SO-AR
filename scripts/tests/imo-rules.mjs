@@ -59,7 +59,9 @@ try {
   await assertSucceeds(getDocs(query(collectionGroup(staff, 'imo_confirmations'))));
   await assertSucceeds(getDocs(query(collectionGroup(staff, 'imo_progress'))));
   await assertFails(getDocs(query(collectionGroup(anon, 'imo_confirmations'))));
+  await assertFails(getDocs(query(collectionGroup(other, 'imo_confirmations'))));
   await assertFails(getDocs(query(collectionGroup(anon, 'imo_progress'))));
+  await assertFails(getDocs(query(collectionGroup(other, 'imo_progress'))));
   await assertFails(deleteDoc(doc(staff, `${profilePath}/imo_events/event-1`)));
   await assertFails(updateDoc(doc(anon, `${profilePath}/imo_events/event-1`), { source: 'changed' }));
   await env.withSecurityRulesDisabled(async ctx => {
