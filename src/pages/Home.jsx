@@ -472,7 +472,7 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Indicadores clave de rendimiento: deserción, confirmados, reentrenados y futuros imposibles',
     keywords: ['kpi', 'kpis', 'mis kpis', 'metricas', 'indicadores', 'desercion', 'confirmados', 'reentrenados', 'enrolamiento'],
     route: '/mis-kpis',
-    roles: ['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan']
+    roles: ['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_jr', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan']
   },
   {
     id: 'opt-reportes',
@@ -809,7 +809,7 @@ const CAUSA_OPTIONS_REGISTRY = [
 // del sistema SO-AR (ver el comentario en ROLE_DISPLAY_NAMES, usersData.js).
 const ALL_SIMULATABLE_ROLES = [
   'consolidado', 'direccion', 'cfo', 'gerente', 'director_maestria',
-  'coord_c1', 'coord_maestria', 'capitan', 'manager',
+  'coord_c1', 'coord_jr', 'coord_maestria', 'capitan', 'manager',
   'entrenador', 'entrenador_llamadas', 'qt',
   'finanzas', 'coordinador', 'talento_humano', 'legal',
   'asistente_impuestos_quito', 'tecnico_sst'

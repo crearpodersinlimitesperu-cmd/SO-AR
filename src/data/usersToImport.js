@@ -1425,6 +1425,7 @@ export const USERS_TO_IMPORT = [
     ],
     "sede": "Lima",
     "emails": [
+      "gina.cardenas@crearpsl.net",
       "cardenasgina29@gmail.com",
       "cardenaslopezgina@gmail.com"
     ],

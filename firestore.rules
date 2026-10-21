@@ -588,7 +588,8 @@ service cloud.firestore {
           ))
         ) &&
         !request.resource.data.diff(resource.data).affectedKeys().hasAny([
-          'isSuperAdmin', 'isActive', 'status', 'active', 'rolesUpdatedBy', 'rolesUpdatedAt'
+          'isSuperAdmin', 'isActive', 'status', 'active', 'rolesUpdatedBy', 'rolesUpdatedAt',
+          'role', 'rol', 'appRole', 'roles', 'sede', 'roleSedes'
         ])
       );
       allow delete: if isSuperAdmin();
