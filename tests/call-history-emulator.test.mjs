@@ -5,7 +5,7 @@ import { initializeTestEnvironment, assertFails, assertSucceeds } from '@firebas
 import { initializeApp, deleteApp } from 'firebase-admin/app';
 import { getFirestore as adminFirestore } from 'firebase-admin/firestore';
 import { doc, getDocFromServer, setDoc } from 'firebase/firestore';
-import { recordGroupCall, recordIndividualCall } from '../src/services/callHistoryService.js';
+import { recordGroupCall, recordIndividualCall, updateIndividualCallDate } from '../src/services/callHistoryService.js';
 
 const projectId = 'demo-call-history';
 const isLocalEmulator = /^127\.0\.0\.1:\d+$/.test(process.env.FIRESTORE_EMULATOR_HOST || '');
@@ -49,18 +49,46 @@ test('group calls are atomic, retain each member event and are idempotent', { sk
     assert.equal(secondManager.llamadaAsistio, 'NO');
     assert.equal(firstManager.llamadasHistorial.length, 1);
     assert.equal(secondManager.llamadasHistorial.length, 1);
-    await assertSucceeds(recordIndividualCall(db, {
+    const individualCall = {
       manager: managers[0],
       callId: 'synthetic-individual-call-001',
       fecha: '2026-10-22',
       asistio: false,
       registradoPorEmail: 'trainer@example.test',
+    };
+    await assertSucceeds(recordIndividualCall(db, individualCall));
+    await assertSucceeds(recordIndividualCall(db, {
+      ...individualCall,
+      fecha: '2026-10-24',
+      asistio: true,
     }));
     const afterIndividualCall = (await assertSucceeds(getDocFromServer(doc(db, 'managers_directory', 'manager-one')))).data();
     assert.equal(afterIndividualCall.llamadasHistorial.length, 2);
     assert.equal(afterIndividualCall.llamadasHistorial[0].id, call.callId);
     assert.equal(afterIndividualCall.llamadasHistorial[1].id, 'synthetic-individual-call-001');
     assert.equal(afterIndividualCall.llamadaAsistio, 'NO');
+    assert.equal(afterIndividualCall.llamadaFecha, '2026-10-22');
+
+    await assertSucceeds(updateIndividualCallDate(db, {
+      manager: managers[0],
+      fecha: '2026-10-23',
+    }));
+    const afterDateEdit = (await assertSucceeds(getDocFromServer(doc(db, 'managers_directory', 'manager-one')))).data();
+    assert.equal(afterDateEdit.llamadasHistorial.length, 2, 'date edits do not append call events');
+    assert.equal(afterDateEdit.llamadasHistorial[1].fecha, '2026-10-23');
+    assert.equal(afterDateEdit.llamadaFecha, '2026-10-23');
+    assert.equal(afterDateEdit.llamadaAsistio, 'NO');
+
+    await assertSucceeds(recordIndividualCall(db, {
+      ...individualCall,
+      callId: 'synthetic-individual-call-002',
+      fecha: '2026-10-25',
+      asistio: true,
+    }));
+    const afterNextCall = (await assertSucceeds(getDocFromServer(doc(db, 'managers_directory', 'manager-one')))).data();
+    assert.equal(afterNextCall.llamadasHistorial.length, 3, 'a later deliberate call creates a new event');
+    assert.equal(afterNextCall.llamadasHistorial[2].id, 'synthetic-individual-call-002');
+    assert.equal(afterNextCall.llamadaAsistio, 'SI');
 
     await assertFails(setDoc(doc(env.unauthenticatedContext().firestore(), 'llamadas_grupales_historial', 'anonymous'), {
       equipo: 'SYNTHETIC-TEAM',

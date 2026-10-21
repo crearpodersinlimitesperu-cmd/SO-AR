@@ -1,4 +1,4 @@
-import { arrayUnion, doc, runTransaction, updateDoc } from 'firebase/firestore';
+import { arrayUnion, doc, runTransaction } from 'firebase/firestore';
 import { managerDocumentRef } from './managerPersistence.js';
 
 const requiredText = (value, field) => {
@@ -23,12 +23,46 @@ export async function recordIndividualCall(db, {
     registradoPorNombre,
     createdAtIso: new Date().toISOString(),
   };
-  await updateDoc(managerDocumentRef(db, manager), {
-    llamadaFecha: date,
-    llamadaAsistio: asistio ? 'SI' : 'NO',
-    llamadasHistorial: arrayUnion(event),
+  const managerRef = managerDocumentRef(db, manager);
+  return runTransaction(db, async transaction => {
+    const snapshot = await transaction.get(managerRef);
+    if (!snapshot.exists()) throw new Error('Manager document does not exist.');
+
+    const currentHistory = Array.isArray(snapshot.data().llamadasHistorial)
+      ? snapshot.data().llamadasHistorial
+      : [];
+    const existingEvent = currentHistory.find(item => item.id === id);
+    if (existingEvent) return existingEvent;
+
+    transaction.update(managerRef, {
+      llamadaFecha: date,
+      llamadaAsistio: asistio ? 'SI' : 'NO',
+      llamadasHistorial: [...currentHistory, event],
+    });
+    return event;
   });
-  return event;
+}
+
+export async function updateIndividualCallDate(db, { manager, fecha }) {
+  const date = requiredText(fecha, 'fecha');
+  const managerRef = managerDocumentRef(db, manager);
+
+  return runTransaction(db, async transaction => {
+    const snapshot = await transaction.get(managerRef);
+    if (!snapshot.exists()) throw new Error('Manager document does not exist.');
+
+    const data = snapshot.data();
+    const history = Array.isArray(data.llamadasHistorial) ? data.llamadasHistorial : [];
+    const latestEvent = history.length - 1;
+    const updatedHistory = history.map((event, index) => (
+      index === latestEvent ? { ...event, fecha: date } : event
+    ));
+    transaction.update(managerRef, {
+      llamadaFecha: date,
+      ...(history.length > 0 ? { llamadasHistorial: updatedHistory } : {}),
+    });
+    return history.length > 0 ? updatedHistory[latestEvent] : null;
+  });
 }
 
 export async function recordGroupCall(db, {

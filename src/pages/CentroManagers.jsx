@@ -35,7 +35,8 @@ import {
 } from '../data/managersData';
 import { OPERATIONAL_SEDES, normalizeRole, normalizeSede } from '../data/usersData';
 import { recordAuditEvent } from '../services/auditService';
-import { recordGroupCall, recordIndividualCall } from '../services/callHistoryService';
+import { recordGroupCall, recordIndividualCall, updateIndividualCallDate } from '../services/callHistoryService';
+import { createCallOperationGate } from '../services/callOperationGate';
 import { db } from '../services/firebase';
 import { collection, getDocs, doc, addDoc, setDoc, updateDoc, deleteDoc, deleteField, writeBatch, onSnapshot, serverTimestamp, query, where, arrayUnion, runTransaction } from 'firebase/firestore';
 import CountryFlag from '../components/CountryFlag';
@@ -651,6 +652,8 @@ export default function CentroManagers() {
   const [groupCallOperationId, setGroupCallOperationId] = useState('');
   const [isSavingGroupCall, setIsSavingGroupCall] = useState(false);
   const groupCallSaveLock = useRef(false);
+  const individualCallGate = useRef(createCallOperationGate());
+  const [savingIndividualCallIds, setSavingIndividualCallIds] = useState({});
 
   const [groupCallDate, setGroupCallDate] = useState(new Date().toISOString().split('T')[0]);
   const [groupCallAttendance, setGroupCallAttendance] = useState({}); // { managerId: boolean }
@@ -1248,18 +1251,27 @@ export default function CentroManagers() {
   };
 
   const handleUpdateLlamada = async (id, fecha, asistio) => {
+    const targetManager = managers.find(m => m.id === id);
+    if (!targetManager) {
+      showToast('No se encontró el manager para registrar la llamada.', 'error');
+      return;
+    }
+    setSavingIndividualCallIds(prev => ({ ...prev, [id]: true }));
     try {
-      const targetManager = managers.find(m => m.id === id);
       let recordedEvent;
       try {
-        recordedEvent = await recordIndividualCall(db, {
-          manager: targetManager,
-          callId: doc(collection(db, 'managers_directory')).id,
-          fecha,
-          asistio: asistio === 'SI',
-          registradoPorEmail: currentUser?.email || '',
-          registradoPorNombre: currentUser?.name || '',
-        });
+        recordedEvent = await individualCallGate.current.run(
+          targetManager.docId || targetManager.id,
+          () => doc(collection(db, 'managers_directory')).id,
+          callId => recordIndividualCall(db, {
+            manager: targetManager,
+            callId,
+            fecha,
+            asistio: asistio === 'SI',
+            registradoPorEmail: currentUser?.email || '',
+            registradoPorNombre: currentUser?.name || '',
+          })
+        );
       } catch (updateErr) {
         if (updateErr?.code === 'not-found') {
           showToast('Este manager aún no tiene documento propio en la nube (solo está en el catálogo local). Pide a Gerencia/Coordinación de Maestría que lo sincronice primero.', 'error');
@@ -1297,6 +1309,38 @@ export default function CentroManagers() {
     } catch (e) {
       console.error(e);
       showToast('Error al guardar en la nube', 'error');
+    } finally {
+      setSavingIndividualCallIds(prev => {
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      });
+    }
+  };
+
+  const handleEditLlamadaFecha = async (id, fecha) => {
+    const targetManager = managers.find(m => m.id === id);
+    if (!targetManager) {
+      showToast('No se encontró el manager para actualizar la fecha.', 'error');
+      return;
+    }
+    try {
+      const updatedEvent = await updateIndividualCallDate(db, { manager: targetManager, fecha });
+      setManagers(prev => prev.map(m => {
+        if (m.id !== id) return m;
+        const history = Array.isArray(m.llamadasHistorial) ? m.llamadasHistorial : [];
+        return {
+          ...m,
+          llamadaFecha: fecha,
+          llamadasHistorial: updatedEvent
+            ? history.map(event => event.id === updatedEvent.id ? updatedEvent : event)
+            : history,
+        };
+      }));
+      showToast('Fecha de la última llamada actualizada', 'success');
+    } catch (e) {
+      console.error(e);
+      showToast('Error al actualizar la fecha de la llamada', 'error');
     }
   };
 
@@ -3245,9 +3289,9 @@ export default function CentroManagers() {
                         </td>
                         <td style={{ padding: '1rem' }}>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-                            <HelpInput helpKey="fechaIndividual" type="date" value={m.llamadaFecha || ''} onChange={e => handleUpdateLlamada(m.id, e.target.value, m.llamadaAsistio || 'SI')} style={{ padding: '0.4rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.8rem' }} />
-                            <HelpButton helpKey="asistioSi" onClick={() => handleUpdateLlamada(m.id, m.llamadaFecha || new Date().toISOString().split('T')[0], 'SI')} style={{ padding: '0.4rem 0.6rem', borderRadius: '6px', border: '1px solid #10b981', background: m.llamadaAsistio === 'SI' ? '#10b981' : '#fff', color: m.llamadaAsistio === 'SI' ? '#fff' : '#10b981', fontWeight: 700, cursor: 'pointer' }}>SÍ</HelpButton>
-                            <HelpButton helpKey="asistioNo" onClick={() => handleUpdateLlamada(m.id, m.llamadaFecha || new Date().toISOString().split('T')[0], 'NO')} style={{ padding: '0.4rem 0.6rem', borderRadius: '6px', border: '1px solid #ef4444', background: m.llamadaAsistio === 'NO' ? '#ef4444' : '#fff', color: m.llamadaAsistio === 'NO' ? '#fff' : '#ef4444', fontWeight: 700, cursor: 'pointer' }}>NO</HelpButton>
+                            <HelpInput helpKey="fechaIndividual" type="date" value={m.llamadaFecha || ''} onChange={e => handleEditLlamadaFecha(m.id, e.target.value)} style={{ padding: '0.4rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.8rem' }} />
+                            <HelpButton helpKey="asistioSi" disabled={Boolean(savingIndividualCallIds[m.id])} onClick={() => handleUpdateLlamada(m.id, m.llamadaFecha || new Date().toISOString().split('T')[0], 'SI')} style={{ padding: '0.4rem 0.6rem', borderRadius: '6px', border: '1px solid #10b981', background: m.llamadaAsistio === 'SI' ? '#10b981' : '#fff', color: m.llamadaAsistio === 'SI' ? '#fff' : '#10b981', fontWeight: 700, cursor: savingIndividualCallIds[m.id] ? 'wait' : 'pointer' }}>SÍ</HelpButton>
+                            <HelpButton helpKey="asistioNo" disabled={Boolean(savingIndividualCallIds[m.id])} onClick={() => handleUpdateLlamada(m.id, m.llamadaFecha || new Date().toISOString().split('T')[0], 'NO')} style={{ padding: '0.4rem 0.6rem', borderRadius: '6px', border: '1px solid #ef4444', background: m.llamadaAsistio === 'NO' ? '#ef4444' : '#fff', color: m.llamadaAsistio === 'NO' ? '#fff' : '#ef4444', fontWeight: 700, cursor: savingIndividualCallIds[m.id] ? 'wait' : 'pointer' }}>NO</HelpButton>
                           </div>
                         </td>
                         <td style={{ padding: '1rem', textAlign: 'center' }}>
@@ -3901,12 +3945,13 @@ export default function CentroManagers() {
                               </div>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                                 <HelpButton helpKey="alternarAsistencia"
+                                  disabled={Boolean(savingIndividualCallIds[m.id])}
                                   onClick={() => handleUpdateLlamada(m.id, m.llamadaFecha || new Date().toISOString().split('T')[0], isAsistio ? 'NO' : 'SI')}
                                   title="Clic para cambiar estado de conexión"
                                   style={{
                                     border: 'none', background: isAsistio ? '#10b981' : isNoAsistio ? '#ef4444' : '#e2e8f0',
                                     color: isAsistio || isNoAsistio ? '#fff' : '#64748b',
-                                    padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer'
+                                    padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.72rem', fontWeight: 700, cursor: savingIndividualCallIds[m.id] ? 'wait' : 'pointer'
                                   }}
                                 >
                                   {isAsistio ? '✅ Conectó' : isNoAsistio ? '❌ No Conectó' : '⏳ Pendiente'}
@@ -3974,12 +4019,13 @@ export default function CentroManagers() {
                               </div>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                                 <HelpButton helpKey="alternarAsistencia"
+                                  disabled={Boolean(savingIndividualCallIds[m.id])}
                                   onClick={() => handleUpdateLlamada(m.id, m.llamadaFecha || new Date().toISOString().split('T')[0], isAsistio ? 'NO' : 'SI')}
                                   title="Clic para cambiar estado de conexión"
                                   style={{
                                     border: 'none', background: isAsistio ? '#10b981' : isNoAsistio ? '#ef4444' : '#e2e8f0',
                                     color: isAsistio || isNoAsistio ? '#fff' : '#64748b',
-                                    padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer'
+                                    padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.72rem', fontWeight: 700, cursor: savingIndividualCallIds[m.id] ? 'wait' : 'pointer'
                                   }}
                                 >
                                   {isAsistio ? '✅ Conectó' : isNoAsistio ? '❌ No Conectó' : '⏳ Pendiente'}
@@ -6299,9 +6345,9 @@ export default function CentroManagers() {
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.4rem' }}>
                             <span style={{ fontSize: '0.78rem', color: textDark, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.nombre}</span>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', flexShrink: 0 }}>
-                              <HelpInput helpKey="fechaIndividual" type="date" value={m.llamadaFecha || ''} onChange={e => handleUpdateLlamada(m.id, e.target.value, m.llamadaAsistio || 'SI')} style={{ padding: '0.2rem', borderRadius: '4px', border: `1px solid ${borderLight}`, fontSize: '0.7rem', width: '110px' }} />
-                              <HelpButton helpKey="asistioSi" onClick={() => handleUpdateLlamada(m.id, m.llamadaFecha || new Date().toISOString().split('T')[0], 'SI')} style={{ padding: '0.2rem 0.4rem', borderRadius: '4px', border: '1px solid #10b981', background: m.llamadaAsistio === 'SI' ? '#10b981' : '#fff', color: m.llamadaAsistio === 'SI' ? '#fff' : '#10b981', fontWeight: 700, fontSize: '0.68rem', cursor: 'pointer' }}>SÍ</HelpButton>
-                              <HelpButton helpKey="asistioNo" onClick={() => handleUpdateLlamada(m.id, m.llamadaFecha || new Date().toISOString().split('T')[0], 'NO')} style={{ padding: '0.2rem 0.4rem', borderRadius: '4px', border: '1px solid #ef4444', background: m.llamadaAsistio === 'NO' ? '#ef4444' : '#fff', color: m.llamadaAsistio === 'NO' ? '#fff' : '#ef4444', fontWeight: 700, fontSize: '0.68rem', cursor: 'pointer' }}>NO</HelpButton>
+                              <HelpInput helpKey="fechaIndividual" type="date" value={m.llamadaFecha || ''} onChange={e => handleEditLlamadaFecha(m.id, e.target.value)} style={{ padding: '0.2rem', borderRadius: '4px', border: `1px solid ${borderLight}`, fontSize: '0.7rem', width: '110px' }} />
+                              <HelpButton helpKey="asistioSi" disabled={Boolean(savingIndividualCallIds[m.id])} onClick={() => handleUpdateLlamada(m.id, m.llamadaFecha || new Date().toISOString().split('T')[0], 'SI')} style={{ padding: '0.2rem 0.4rem', borderRadius: '4px', border: '1px solid #10b981', background: m.llamadaAsistio === 'SI' ? '#10b981' : '#fff', color: m.llamadaAsistio === 'SI' ? '#fff' : '#10b981', fontWeight: 700, fontSize: '0.68rem', cursor: savingIndividualCallIds[m.id] ? 'wait' : 'pointer' }}>SÍ</HelpButton>
+                              <HelpButton helpKey="asistioNo" disabled={Boolean(savingIndividualCallIds[m.id])} onClick={() => handleUpdateLlamada(m.id, m.llamadaFecha || new Date().toISOString().split('T')[0], 'NO')} style={{ padding: '0.2rem 0.4rem', borderRadius: '4px', border: '1px solid #ef4444', background: m.llamadaAsistio === 'NO' ? '#ef4444' : '#fff', color: m.llamadaAsistio === 'NO' ? '#fff' : '#ef4444', fontWeight: 700, fontSize: '0.68rem', cursor: savingIndividualCallIds[m.id] ? 'wait' : 'pointer' }}>NO</HelpButton>
                             </div>
                           </div>
                           {(Array.isArray(m.llamadasHistorial) ? m.llamadasHistorial : [])
