@@ -1,0 +1,85 @@
+name: 📞 Reporte Diario de Llamadas Coordinadores (12:30 PM)
+
+on:
+  schedule:
+    # 17:30 UTC = 12:30 PM (UTC-5: Lima, Quito, Guayaquil, Cuenca, Medellín)
+    - cron: '30 17 * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Modo simulación (Dry Run: no envía mensajes reales a chat)'
+        required: false
+        type: boolean
+        default: false
+      sede:
+        description: 'Sede específica (Lima, Quito, Cuenca, Guayaquil, Medellín, o all)'
+        required: false
+        type: string
+        default: 'all'
+
+permissions:
+  contents: read
+
+jobs:
+  daily-calls-report:
+    name: 📞 Enviar Reporte de Llamadas a Chat de Sede
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: ⬇️ Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm install --include=optional
+
+      - name: 🔑 Escribir Service Account temporal
+        run: echo "$GOOGLE_SERVICE_ACCOUNT_JSON" > centro-operativo-cpsl-65ad52160f45.json
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+
+      - name: 🩺 Verificar validez de credenciales
+        run: |
+          node -e "
+            try {
+              const raw = require('fs').readFileSync('centro-operativo-cpsl-65ad52160f45.json', 'utf8');
+              if (raw && raw.trim().startsWith('{')) {
+                JSON.parse(raw);
+                console.log('✅ Service account JSON válida');
+              } else {
+                console.log('⚠️ Secret GOOGLE_SERVICE_ACCOUNT_JSON no configurado o vacío; el agente usará fallback seguro.');
+              }
+            } catch(e) {
+              console.log('⚠️ Error parseando credencial:', e.message);
+            }
+          "
+
+      - name: 🚀 Ejecutar Agente de Reporte Diario de Llamadas
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          GOOGLE_CHAT_WEBHOOK_URL: ${{ secrets.GOOGLE_CHAT_WEBHOOK_URL }}
+          GOOGLE_CHAT_WEBHOOK_LIMA: ${{ secrets.GOOGLE_CHAT_WEBHOOK_LIMA }}
+          GOOGLE_CHAT_WEBHOOK_QUITO: ${{ secrets.GOOGLE_CHAT_WEBHOOK_QUITO }}
+          GOOGLE_CHAT_WEBHOOK_CUENCA: ${{ secrets.GOOGLE_CHAT_WEBHOOK_CUENCA }}
+          GOOGLE_CHAT_WEBHOOK_GUAYAQUIL: ${{ secrets.GOOGLE_CHAT_WEBHOOK_GUAYAQUIL }}
+          GOOGLE_CHAT_WEBHOOK_MEDELLIN: ${{ secrets.GOOGLE_CHAT_WEBHOOK_MEDELLIN }}
+        run: |
+          CMD="node scripts/sendDailyCallsReportChat.mjs"
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            CMD="$CMD --dry-run"
+          fi
+          if [ -n "${{ github.event.inputs.sede }}" ] && [ "${{ github.event.inputs.sede }}" != "all" ]; then
+            CMD="$CMD --sede=${{ github.event.inputs.sede }}"
+          fi
+          echo "Ejecutando: $CMD"
+          eval $CMD
+
+      - name: 🗑️ Borrar Service Account temporal del runner
+        if: always()
+        run: rm -f centro-operativo-cpsl-65ad52160f45.json

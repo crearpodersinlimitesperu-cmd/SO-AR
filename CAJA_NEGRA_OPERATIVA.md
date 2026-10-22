@@ -734,6 +734,30 @@ Tras el reporte de incidencias donde firmas completadas figuraban en el panel ad
   - **Regla Fundamental:** Jamás se debe contar el número de llamadas como el número de PX. A una misma persona (PX) se le puede llamar múltiples veces hasta lograr el contacto o confirmación; por tanto, las llamadas miden volumen de esfuerzo operativo, mientras que los PX miden personas únicas reales en sala.
   - **Reflejo en Copiloto Analítico (`AICopilot.jsx`):** Las respuestas diferencian explícitamente entre `PX Confirmados`, `PX Por Confirmar` y `Total Intentos / Gestiones de Llamada realizada`. Si la consulta especifica sede (ej. Lima), se filtra estrictamente a las coordinaciones de dicha sede.
 
+### 18.4. Agente de Reporte Diario de Llamadas de Coordinadores (12:30 PM Automático a Chat de Sede)
+* **Objetivo y Automatización:**
+  - Transmisión autónoma y programada todos los días a las **12:30 PM** (hora local UTC-5: Lima, Quito, Guayaquil, Cuenca, Medellín; cron: `30 17 * * *` en GitHub Actions).
+  - Componentes:
+    - **Workflow de GitHub Actions:** [`.github/workflows/daily-calls-report-1230.yml`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/.github/workflows/daily-calls-report-1230.yml).
+    - **Script Ejecutor:** [`scripts/sendDailyCallsReportChat.mjs`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/scripts/sendDailyCallsReportChat.mjs).
+    - **Suite de Pruebas Automatizadas:** [`tests/daily-calls-report.test.mjs`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/tests/daily-calls-report.test.mjs).
+* **Estructura Canónica del Reporte:**
+  1. **Separación Taxativa de PX vs Llamadas:**
+     - 👥 **PX ASIGNADOS EN SALA (Personas Únicas):** Conteo exacto de participantes únicos asignados al ciclo.
+     - 🟢 **Confirmados a Sala (OK):** Personas que confirmaron asistencia presencial.
+     - 🟡 **Por Confirmar (XC):** Personas en seguimiento pendiente.
+     - 🔴 **No Contesta (NC):** Personas sin respuesta telefónica.
+     - 📞 **GESTIONES REALIZADAS (Total Llamadas / Esfuerzos):** Volumen acumulado de intentos y llamadas completadas (desglosado en C1 y C2). Se explicita en el mensaje: *"A un PX se le contacta cuantas veces sea necesario; los PX son participantes únicos en sala."*
+  2. **Detalle por Coordinador(a):**
+     - Nombre y rol Nodus, equipos a cargo, PX Asignados, PX Confirmados, Gestiones de llamada realizadas y porcentaje de cobertura efectiva.
+  3. **Diagnóstico Asertivo Directivo:**
+     - Identifica el cuello de botella inmediato (ej. remarcar contactos Por Confirmar o recontactar por WhatsApp los No Contesta).
+  4. **Enrutamiento Estricto por Sede:**
+     - Lee la configuración en Firestore `settings/google_chat` (`sedesWebhooks` y fallback) y variables de entorno de GitHub Secrets (`GOOGLE_CHAT_WEBHOOK_LIMA`, `GOOGLE_CHAT_WEBHOOK_QUITO`, etc.).
+     - Si una sede no tiene webhook configurado aún, se omite limpiamente su envío para no contaminar el espacio de otras sedes (regla de no mezclar espacios).
+  5. **Política Anti-Alucinación (Fail-Closed):**
+     - Si Nodus no tiene datos para esa sede o ciclo en el corte de 12:30 PM, se notifica claramente como `Estado Nodus: Sin sincronización disponible para esta sede en el corte actual`, sin precargar números inventados.
+
 ---
 
 > 📜 **Mandato de la Caja Negra:**
