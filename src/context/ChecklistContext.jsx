@@ -11,7 +11,7 @@ import { createGoogleTask } from '../services/googleSync';
 import { useUI } from './UIContext';
 import { useAuth } from './AuthContext';
 import { useCycles } from './CyclesContext';
-import { applyCycleCompletion, createCycleCompletion, getEffectiveCompletion, getNextCompletionState, hasAmbiguousCycleCompletionScope, isCompletionTransition, isTaskClosedForDelivery, preserveClosedAssigneeProgress, resolveTaskCycleScope } from '../utils/taskLifecycle';
+import { applyCycleCompletion, createCycleCompletion, getEffectiveCompletion, getNextCompletionState, hasAmbiguousCycleCompletionScope, isCompletionTransition, isTaskClosedForDelivery, preserveClosedAssigneeProgress, resolveTaskCycleScope, taskClosureContext } from '../utils/taskLifecycle';
 import { normalizeTaskLocation, taskLocationLabel, taskReminderMessage, taskUrl, escapeTaskHtml } from '../utils/taskLocation';
 
 const ChecklistContext = createContext();
@@ -303,29 +303,35 @@ export function ChecklistProvider({ children }) {
         const completionTransition = includesCompletionUpdate &&
           isCompletionTransition(previous.completed, effectiveNextCompleted);
         const reopenTransition = reopeningRequested && explicitReopen;
-        let eventScope = resolvedScope
+        const eventScope = resolvedScope
           ? { sede: resolvedScope.sede, cycleId: resolvedScope.cycle.id }
           : {};
-        let individualTransition = null;
+        const individualTransitions = [];
+        let changedKeys = [];
         if (nextUpdates.assigneeProgress) {
           const previousMap = prevData.assigneeProgress || {};
           const nextMap = nextUpdates.assigneeProgress;
-          const changedKeys = [...new Set([...Object.keys(previousMap), ...Object.keys(nextMap)])]
+          changedKeys = [...new Set([...Object.keys(previousMap), ...Object.keys(nextMap)])]
             .filter(key => JSON.stringify(previousMap[key]) !== JSON.stringify(nextMap[key]));
-          if (changedKeys.length > 1) {
-            throw new Error('Guarda el avance de un colaborador a la vez para proteger los cierres individuales.');
+          if (changedKeys.length > 10) {
+            throw new Error('El guardado atómico admite hasta diez cambios de participantes.');
           }
-          if (changedKeys.length === 1) {
-            const key = changedKeys[0];
-            eventScope = { assigneeEmail: key };
+          changedKeys.forEach((key, index) => {
             const wasClosed = isTaskClosedForDelivery({ ...previousMap[key] });
             const nowClosed = isTaskClosedForDelivery({ ...nextMap[key] });
-            if (wasClosed !== nowClosed) individualTransition = nowClosed ? 'completed' : 'reopened';
-          }
+            if (wasClosed !== nowClosed) individualTransitions.push({
+              key, id: `${completionId}_participant_${index}`, action: nowClosed ? 'completed' : 'reopened'
+            });
+          });
         }
         nextUpdates.lifecycleMutation = {
           eventId: completionId,
-          scope: eventScope
+          scope: eventScope,
+          assigneeKeys: changedKeys,
+          assigneeEventIds: Object.fromEntries(individualTransitions.map(event => [event.key, event.id])),
+          ...(!reopenTransition
+            ? { closureContext: taskClosureContext({ ...prevData, ...nextUpdates }) }
+            : {})
         };
         if (resolvedScope && includesCompletionUpdate) {
           const priorEntry = prevData.completions?.[cycleKey] || {};
@@ -361,16 +367,25 @@ export function ChecklistProvider({ children }) {
           transaction.set(taskRef, initialData);
         }
 
-        if (completionTransition || reopenTransition || individualTransition) {
-          const actorEmail = String(currentUser?.email || auth.currentUser?.email || '').trim().toLowerCase();
+        const actorEmail = String(currentUser?.email || auth.currentUser?.email || '').trim().toLowerCase();
+        for (const event of individualTransitions) {
+          transaction.set(doc(db, 'task_completion_events', event.id), {
+            taskId, action: event.action, actorEmail, occurredAt: serverTimestamp(),
+            source: 'manual', scope: { assigneeEmail: event.key },
+            ...(event.action === 'completed'
+              ? { closureContext: taskClosureContext({ ...prevData, ...nextUpdates }) } : {})
+          });
+        }
+        if (completionTransition || reopenTransition) {
           const eventRef = doc(db, 'task_completion_events', completionId);
           transaction.set(eventRef, {
             taskId,
-            action: individualTransition || (reopenTransition ? 'reopened' : 'completed'),
+            action: reopenTransition ? 'reopened' : 'completed',
             actorEmail,
             occurredAt: serverTimestamp(),
             source: 'manual',
-            scope: eventScope
+            scope: eventScope,
+            ...(isCompleted ? { closureContext: taskClosureContext(data) } : {})
           });
         }
       });

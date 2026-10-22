@@ -43,6 +43,18 @@ export function isCompletionTransition(previousCompleted, nextCompleted) {
   return previousCompleted !== true && nextCompleted === true;
 }
 
+export function taskClosureContext(task) {
+  const comments = task?.comments ?? '';
+  const evidenceUrl = task?.evidenceUrl ?? task?.evidence_url ?? '';
+  const evidences = task?.evidences ?? [];
+  if (typeof comments !== 'string' || comments.length > 500000 ||
+      typeof evidenceUrl !== 'string' || evidenceUrl.length > 8192 ||
+      !Array.isArray(evidences) || evidences.length > 100) {
+    throw new Error('El comentario o las referencias de evidencia exceden el esquema de auditoría del cierre.');
+  }
+  return { comments, evidenceUrl, evidences };
+}
+
 export function isTaskClosedForDelivery(task, { completionScope, recipientEmail } = {}) {
   const isClosed = entry => Boolean(entry) && (
     entry.completed === true ||

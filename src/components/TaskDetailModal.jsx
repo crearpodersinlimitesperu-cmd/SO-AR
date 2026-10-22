@@ -498,16 +498,8 @@ export default function TaskDetailModal({
   // Selector de avance individual del usuario actual
   const assigneeChanged = (entry, baseline) =>
     entry?.progress !== baseline?.progress || entry?.completed !== baseline?.completed;
-  const canEditAssignee = (email) => {
-    const otherPending = Object.entries(assigneeProgressMap).some(([key, entry]) =>
-      !isSameUserEmail(key, email) && assigneeChanged(entry, assigneeProgressBaseline.current[key]));
-    if (otherPending) showToast('Guarda el avance pendiente antes de editar otro colaborador.', 'warning');
-    return !otherPending;
-  };
-
   const handleSetMyProgress = (val) => {
     const targetKey = myEmailKey || normalizeTaskEmail(userEmail);
-    if (targetKey && !canEditAssignee(targetKey)) return;
     setMyProgress(val);
     const isDone = val === 100;
     setMyCompleted(isDone);
@@ -536,7 +528,7 @@ export default function TaskDetailModal({
 
   // Alternar avance de un colaborador (para creadores o coordinadores)
   const handleToggleCollaboratorStatus = (collabEmail) => {
-    if (!isCreator || !canEditAssignee(collabEmail)) return;
+    if (!isCreator) return;
     setCompletionIntent(true);
     setAssigneeProgressMap(prev => {
       const entry = prev[collabEmail] || {};

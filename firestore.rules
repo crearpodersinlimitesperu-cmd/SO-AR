@@ -347,12 +347,6 @@ service cloud.firestore {
         ]);
     }
 
-    function canWriteTaskCompletionEvent(taskData) {
-      return isSuperAdmin() || isGerenteODireccion() ||
-        isOwner(taskData) || isCollaborator(taskData) ||
-        isChecklistCatalogTask(taskData, isPersonalTask(taskData));
-    }
-
     function lifecycleClosed(data) {
       return data.get('completed', false) == true || data.get('status', '') == 'Completada' ||
         data.get('progress', 0) == 100 || data.get('progressPercentage', 0) == 100;
@@ -387,19 +381,61 @@ service cloud.firestore {
          (before.get('progressPercentage', 0) != 100 || after.get('progressPercentage', 0) == 100));
     }
 
-    function safeLifecycleMap(before, after, scope, field, taskId, mutation) {
+    function safeChangedLifecycleMap(before, after, scope, field, taskId, mutation) {
       let key = field == 'completions'
         ? scope.get('sede', '') + '__' + scope.get('cycleId', '')
         : scope.get('assigneeEmail', '');
       let validScope = field == 'completions'
         ? scope.keys().hasAll(['sede', 'cycleId']) && scope.sede != '' && scope.cycleId != ''
         : scope.keys().hasAll(['assigneeEmail']) && scope.assigneeEmail != '';
-      return before == after ||
-        (after.diff(before).changedKeys().size() == 0 && after.diff(before).removedKeys().size() == 0) ||
-        (validScope && after.diff(before).affectedKeys().hasOnly([key]) &&
+      return validScope && after.diff(before).affectedKeys().hasOnly([key]) &&
           (preservesClosedEntry(before.get(key, {}), after.get(key, {})) ||
            (!lifecycleClosed(after.get(key, {})) && scope == mutation.get('scope', {}) &&
-            hasNewReopenEvent(taskId, mutation))));
+            hasNewReopenEvent(taskId, mutation)));
+    }
+
+    function safeLifecycleMap(before, after, scope, field, taskId, mutation) {
+      return before == after ||
+        (after.diff(before).changedKeys().size() == 0 && after.diff(before).removedKeys().size() == 0) ||
+        safeChangedLifecycleMap(before, after, scope, field, taskId, mutation);
+    }
+
+    function safeAssigneeEntry(before, after, key, taskId, mutation) {
+      return key is string &&
+        (preservesClosedEntry(before.get(key, {}), after.get(key, {})) ||
+          (!lifecycleClosed(after.get(key, {})) &&
+            hasNewReopenEvent(taskId, {
+              'eventId': mutation.get('assigneeEventIds', {}).get(key, ''),
+              'scope': { 'assigneeEmail': key }
+            })));
+    }
+
+    function safeAssigneeIndex(before, after, keys, index, taskId, mutation) {
+      return index >= keys.size() || safeAssigneeEntry(before, after, keys[index], taskId, mutation);
+    }
+
+    function safeAssigneeChanges(before, after, taskId, mutation) {
+      let keys = mutation.get('assigneeKeys', []);
+      return keys is list && keys.size() <= 10 &&
+        after.diff(before).affectedKeys().hasOnly(keys) &&
+        safeAssigneeIndex(before, after, keys, 0, taskId, mutation) &&
+        safeAssigneeIndex(before, after, keys, 1, taskId, mutation) &&
+        safeAssigneeIndex(before, after, keys, 2, taskId, mutation) &&
+        safeAssigneeIndex(before, after, keys, 3, taskId, mutation) &&
+        safeAssigneeIndex(before, after, keys, 4, taskId, mutation) &&
+        safeAssigneeIndex(before, after, keys, 5, taskId, mutation) &&
+        safeAssigneeIndex(before, after, keys, 6, taskId, mutation) &&
+        safeAssigneeIndex(before, after, keys, 7, taskId, mutation) &&
+        safeAssigneeIndex(before, after, keys, 8, taskId, mutation) &&
+        safeAssigneeIndex(before, after, keys, 9, taskId, mutation);
+    }
+
+    function safeAssigneeMap(before, after, scope, taskId, mutation) {
+      return before == after ||
+        (after.diff(before).changedKeys().size() == 0 && after.diff(before).removedKeys().size() == 0) ||
+        (mutation.keys().hasAny(['assigneeKeys'])
+          ? safeAssigneeChanges(before, after, taskId, mutation)
+          : safeChangedLifecycleMap(before, after, scope, 'assigneeProgress', taskId, mutation));
     }
 
     function safeTaskLifecycleUpdate(taskId) {
@@ -411,8 +447,20 @@ service cloud.firestore {
           (!lifecycleClosed(after) && hasNewReopenEvent(taskId, mutation))) &&
         safeLifecycleMap(before.get('completions', {}), after.get('completions', {}),
           scope, 'completions', taskId, mutation) &&
-        safeLifecycleMap(before.get('assigneeProgress', {}), after.get('assigneeProgress', {}),
-          scope, 'assigneeProgress', taskId, mutation);
+        safeAssigneeMap(before.get('assigneeProgress', {}), after.get('assigneeProgress', {}),
+          scope, taskId, mutation);
+    }
+
+    function validClosureContext(event, taskData) {
+      let context = event.get('closureContext', {});
+      return context.keys().hasAll(['comments', 'evidenceUrl', 'evidences']) &&
+        context.keys().hasOnly(['comments', 'evidenceUrl', 'evidences']) &&
+        context.comments is string && context.comments.size() <= 500000 &&
+        context.comments == taskData.get('comments', '') &&
+        context.evidenceUrl is string && context.evidenceUrl.size() <= 8192 &&
+        context.evidenceUrl == taskData.get('evidenceUrl', taskData.get('evidence_url', '')) &&
+        context.evidences is list && context.evidences.size() <= 100 &&
+        context.evidences == taskData.get('evidences', []);
     }
 
     function validTaskCompletionEvent() {
@@ -424,7 +472,7 @@ service cloud.firestore {
       let beforeState = lifecycleEventState(beforeTask, scope);
       let afterState = lifecycleEventState(afterTask, scope);
       return event.keys().hasAll(['taskId', 'action', 'actorEmail', 'occurredAt', 'source', 'scope']) &&
-        event.keys().hasOnly(['taskId', 'action', 'actorEmail', 'occurredAt', 'source', 'scope']) &&
+        event.keys().hasOnly(['taskId', 'action', 'actorEmail', 'occurredAt', 'source', 'scope', 'closureContext']) &&
         event.taskId is string && event.taskId.size() > 0 &&
         event.actorEmail == email() &&
         event.occurredAt == request.time &&
@@ -438,7 +486,8 @@ service cloud.firestore {
             (scope.assigneeEmail == email() || isSuperAdmin() || isGerenteODireccion() ||
              beforeTask.get('createdBy', '') == email() || beforeTask.get('assignedByEmail', '') == email()))) &&
         existsAfter(taskPath) &&
-        (canWriteTaskCompletionEvent(beforeTask) || canWriteTaskCompletionEvent(afterTask)) &&
+        (event.action == 'completed' ? validClosureContext(event, afterTask) :
+          !event.keys().hasAny(['closureContext'])) &&
         ((event.action == 'completed' && !lifecycleClosed(beforeState) && lifecycleClosed(afterState)) ||
          (event.action == 'reopened' && lifecycleClosed(beforeState) && !lifecycleClosed(afterState)));
     }
@@ -530,14 +579,15 @@ service cloud.firestore {
                          (isOwner(request.resource.data) &&
                           !isReservedChecklistTaskId(request.resource.data.get('id', ''))) ||
                          isCollaborator(request.resource.data)));
-      allow update: if safeTaskLifecycleUpdate(taskId) && (isSuperAdmin() || isGerenteODireccion() ||
+      allow update: if safeTaskLifecycleUpdate(taskId) && (
+                    (resource.data.get('isCustom', false) == false &&
+                     isChecklistCatalogTask(resource.data, isPersonalTask(resource.data)) &&
+                     isOperationalProgressUpdate()) ||
+                    isSuperAdmin() || isGerenteODireccion() ||
                     isOwner(resource.data) ||
                     (isCollaborator(resource.data) &&
                      request.resource.data.diff(resource.data).affectedKeys().hasAny(['status', 'progress', 'evidence_url', 'evidenceUrl', 'completions']) &&
-                     !request.resource.data.diff(resource.data).affectedKeys().hasAny(['assignedToEmail', 'role', 'sede', 'ownerId'])) ||
-                    (resource.data.get('isCustom', false) == false &&
-                     isChecklistCatalogTask(resource.data, isPersonalTask(resource.data)) &&
-                     isOperationalProgressUpdate()));
+                     !request.resource.data.diff(resource.data).affectedKeys().hasAny(['assignedToEmail', 'role', 'sede', 'ownerId'])));
       allow delete: if isGerenteODireccion() || isSuperAdmin();
     }
 

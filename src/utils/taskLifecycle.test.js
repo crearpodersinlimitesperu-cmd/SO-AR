@@ -1,6 +1,22 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { applyCycleCompletion, createCycleCompletion, getEffectiveCompletion, getNextCompletionState, getTaskProgress, hasAmbiguousCycleCompletionScope, isCompletionTransition, isTaskClosedForDelivery, preserveClosedAssigneeProgress, resolveTaskCycleScope } from './taskLifecycle.js';
+import { applyCycleCompletion, createCycleCompletion, getEffectiveCompletion, getNextCompletionState, getTaskProgress, hasAmbiguousCycleCompletionScope, isCompletionTransition, isTaskClosedForDelivery, preserveClosedAssigneeProgress, resolveTaskCycleScope, taskClosureContext } from './taskLifecycle.js';
+
+test('closure context captures existing comments and evidence references without inventing closure-specific data', () => {
+  const task = { comments: 'Comment present at close', evidence_url: 'https://example.test/evidence',
+    evidences: [{ id: 'ev-1', url: 'https://example.test/evidence' }] };
+  const storedEvent = JSON.parse(JSON.stringify({ closureContext: taskClosureContext(task) }));
+  task.comments = 'Edited after reopen';
+  task.evidences = [];
+  assert.equal(storedEvent.closureContext.comments, 'Comment present at close');
+  assert.equal(storedEvent.closureContext.evidenceUrl, 'https://example.test/evidence');
+  assert.equal(storedEvent.closureContext.evidences[0].id, 'ev-1');
+  assert.deepEqual(taskClosureContext({}), { comments: '', evidenceUrl: '', evidences: [] });
+  for (const oversized of [{ comments: 'x'.repeat(500001) }, { evidenceUrl: 'x'.repeat(8193) },
+    { evidences: Array.from({ length: 101 }, () => ({})) }]) {
+    assert.throws(() => taskClosureContext(oversized), /esquema de auditoría/);
+  }
+});
 
 test('catalog writes require a non-empty cycle ID and sede, including omitted scope', () => {
   for (const cycle of [undefined, null, {}, { name: 'Sin Equipo Activo' }, { id: '' }, { id: '  ' }, { id: 7 }]) {

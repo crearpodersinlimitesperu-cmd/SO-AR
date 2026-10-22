@@ -31,7 +31,11 @@ La causa residual estaba en `src/components/TaskDetailModal.jsx` (`handleSaveAll
 
 SMTP y Firestore no comparten una transacción. Sin soporte de idempotencia del proveedor, no es posible garantizar exactamente una entrega. `DELIVERY_UNKNOWN` requiere conciliación manual y evita un reintento automático ciego; no demuestra si el proveedor entregó el correo.
 
-No se añadió una alerta de patrón anómalo: no hay en este flujo un canal de alerta verificado ni un umbral aprobado. Los estados `ERROR`, `DELIVERY_UNKNOWN`, `SKIPPED_CLOSED`, `SKIPPED_STALE` y `SKIPPED_UNLINKED_TASK` quedan registrados para observación, pero esto no equivale a una alerta. Los logs de este cambio no registran direcciones de destinatarios ni contenido de tarea.
+Control de volumen y alerta interna: antes de reclamar un correo vinculado a tarea, el mailer consume transaccionalmente presupuestos diarios UTC (`mail_delivery_budgets`): 30 intentos por tarea, 20 por destinatario y 6 por par tarea+destinatario. Al agotarse, el documento pasa a `SKIPPED_RATE_LIMIT` (terminal, sin SMTP) y se crea una sola notificación interna `MAIL_DELIVERY_ANOMALY` por administrador (`SUPER_ADMIN_EMAILS`, id determinista), sin contenido de tarea ni correos en el texto. Los umbrales son decisiones de ingeniería de este cambio, no valores aprobados por negocio; no hay canal externo (correo/Slack). Los reintentos por documento siguen limitados a 3.
+
+Auditoría de cierre: cada evento `completed` guarda `closureContext` (comentarios, `evidenceUrl` y lista `evidences` vigentes al cerrar, con límites de tamaño); las reglas exigen que coincida con la tarea resultante, y el evento es inmutable. La aplicación no tiene campos de comentario/evidencia específicos del cierre: se registra el estado vigente en ese momento, no se distingue cuál se añadió "para cerrar". Los cierres anteriores a este cambio no tienen ese snapshot.
+
+Reapertura (backend): las reglas de `tasks` rechazan cualquier update que cambie un cierre raíz, de ciclo/sede o de participante a abierto salvo que `lifecycleMutation` referencie un `task_completion_events` nuevo, `reopened`, del mismo actor y alcance, con `occurredAt == request.time`. Ediciones ordinarias (notas, evidencia, progreso de abiertos) siguen permitidas. Limitación: el evento valida actor y alcance, no la autorización adicional más allá de las reglas existentes de `tasks`.
 
 Los correos de tarea antiguos sin `taskId` ni `calendarEvent.taskId` no permiten identificar su tarea; si conservan un tipo conocido de correo de tarea, se descartan. Un correo legado sin tipo y sin vínculo de tarea no puede clasificarse con seguridad por el daemon actual. La consulta o modificación de datos reales no se realizó.
 
@@ -61,7 +65,7 @@ El workflow existente `.github/workflows/validate-task-privacy.yml` ya se activa
 
 **Plan por nivel:** funcional/regresión: `npm run test:persistence` + `npm test`; integración aislada: Firestore Emulator con `npm run test:rules` y mocks de outbox/SMTP; compatibilidad/build: `npm run build`; concurrencia/carga: aumentar la contención de varios workers sobre el mismo doc y bucket de recordatorio únicamente con Firestore Emulator/mocks, esperando un solo claim/registro, sin SMTP. No se definió un SLA cuantitativo de carga, por lo que no se inventa un umbral.
 
-No fue posible ejecutar estas comprobaciones en este entorno: `node` y `npm` no están instalados. Se requiere el resultado CI antes de aceptar como validadas las pruebas de navegador, concurrencia/reintentos, build y reglas Firestore. La prueba de cambio de identidad es un fixture de navegador; no equivale a un login real/multidispositivo ni demuestra sincronización en producción. No se hizo prueba de carga SMTP ni se envió correo.
+Localmente (Node 22 y Firestore Emulator con Temurin 21) pasaron `taskLifecycle`, `mail-queue` y `tests/firestore-task-privacy.test.mjs`; las pruebas de navegador (Puppeteer) no produjeron resultado local y dependen de CI, igual que el build. La prueba de cambio de identidad es un fixture de navegador; no equivale a un login real/multidispositivo ni demuestra sincronización en producción. No se hizo prueba de carga SMTP ni se envió correo.
 
 ## Registro de cambios
 

@@ -51,7 +51,7 @@ test('actual task context persists location, updates reminders and reads links; 
       };
       export const getDoc = async ref => ({
         id: ref.id, exists: () => store.has(ref.path + '/' + ref.id),
-        data: () => store.get(ref.path + '/' + ref.id)
+        data: () => structuredClone(store.get(ref.path + '/' + ref.id))
       });
       export const getDocs = async ref => snapshot(ref);
       export const writeBatch = () => {
@@ -72,7 +72,12 @@ test('actual task context persists location, updates reminders and reads links; 
       export const setDoc = async () => { throw new Error('Unexpected direct write'); };
       export const updateDoc = setDoc;
       export const addDoc = setDoc;
-      export const runTransaction = setDoc;
+      export const runTransaction = async (_db, callback) => {
+        const batch = writeBatch();
+        await callback({ get: getDoc, set: batch.set, update: batch.update });
+        await batch.commit();
+      };
+      window.fixturePublish = () => listeners.forEach(listener => listener());
     `
   };
   const server = await createServer({
@@ -103,6 +108,7 @@ test('actual task context persists location, updates reminders and reads links; 
             const [open, setOpen] = useState(true);
             const [editing, setEditing] = useState(null);
             const [detail, setDetail] = useState(null);
+            window.fixtureOpenDetail = setDetail;
             const task = api.tasks.find(task => task.isCustom);
             window.fixtureResolveLink = async user => resolveTaskLink(task.id, [], user, async id => window.fixtureStore.get('tasks/' + id));
             return <>
@@ -203,6 +209,49 @@ test('actual task context persists location, updates reminders and reads links; 
     assert.match(cleared.mail.message.html, /Ubicación no declarada/);
     assert.doesNotMatch(cleared.mail.message.html, /Sala B/);
     assert.match(cleared.notification.message, /Ubicación no declarada/);
+
+    await page.evaluate(() => {
+      const task = {
+        id: 'custom_legacy_multi', isCustom: true, task: 'Legacy shared task',
+        createdBy: 'owner@example.test', assignedByEmail: 'owner@example.test',
+        assignedToEmails: ['owner@example.test', 'recipient@example.test'],
+        completed: false, status: 'Pendiente', progressPercentage: 0,
+        comments: 'Existing note',
+        assigneeProgress: {
+          'owner@example.test': { completed: false },
+          'recipient@example.test': { completed: false }
+        }
+      };
+      window.fixtureStore.set('tasks/' + task.id, task);
+      window.fixturePublish();
+      window.fixtureOpenDetail(task);
+    });
+    await page.waitForFunction(() => document.body.innerText.includes('Legacy shared task'));
+    const saveModal = () => page.evaluate(() => {
+      const button = [...document.querySelectorAll('button')].find(node => node.textContent.includes('Guardar Avances'));
+      if (!button) throw new Error('Missing real task modal save button');
+      button.click();
+    });
+    await saveModal();
+    await page.waitForFunction(() => window.fixtureStore.get('tasks/custom_legacy_multi')?.lastUpdated);
+    let legacy = await page.evaluate(() => window.fixtureStore.get('tasks/custom_legacy_multi'));
+    assert.deepEqual(legacy.assigneeProgress, {
+      'owner@example.test': { completed: false },
+      'recipient@example.test': { completed: false }
+    }, 'saving the real modal does not persist synthesized metadata for either legacy participant');
+    assert.equal(legacy.completed, false);
+    await page.evaluate(() => {
+      window.fixtureOpenDetail({ ...window.fixtureStore.get('tasks/custom_legacy_multi') });
+    });
+    await page.waitForFunction(() => [...document.querySelectorAll('button')].some(button => button.textContent.trim() === '50%'));
+    await page.evaluate(() => [...document.querySelectorAll('button')].find(button => button.textContent.trim() === '50%').click());
+    await saveModal();
+    await page.waitForFunction(() => window.fixtureStore.get('tasks/custom_legacy_multi')?.assigneeProgress['owner@example.test']?.progress === 50);
+    legacy = await page.evaluate(() => window.fixtureStore.get('tasks/custom_legacy_multi'));
+    assert.equal(legacy.completed, false);
+    assert.deepEqual(legacy.assigneeProgress['recipient@example.test'], { completed: false },
+      'legitimate progress preserves the other participant exactly');
+    assert.notEqual((await page.evaluate(() => window.fixtureToast)).type, 'error');
 
     const failed = await page.evaluate(async () => {
       window.fixtureRejectWrite = true;

@@ -8,6 +8,7 @@ import {
 } from '@firebase/rules-unit-testing';
 import {
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -254,15 +255,16 @@ test('role-and-ID scoped catalog queries succeed without exposing other roles', 
 });
 
 test('catalog completion transaction records an immutable lifecycle event', async () => {
-  await seedTasks([{ id: 'soar_12', role: 'coord_c1', isCustom: false, completed: false, status: 'Pendiente' }]);
+  const closureContext = {
+    comments: 'Comment present at close', evidenceUrl: 'https://example.test/evidence',
+    evidences: [{ id: 'ev-one', url: 'https://example.test/evidence' }]
+  };
+  await seedTasks([{ id: 'soar_12', role: 'coord_c1', isCustom: false, completed: false, status: 'Pendiente', ...closureContext }]);
   const db = coordinatorDb();
   const completedAt = new Date().toISOString();
 
   await assertSucceeds(runTransaction(db, async transaction => {
     transaction.update(doc(db, 'tasks', 'soar_12'), {
-      completed: true,
-      status: 'Completada',
-      progressPercentage: 100,
       lifecycleMutation: { eventId: 'close-event', scope: { sede: 'Lima', cycleId: 'cycle-1' } },
       completions: {
         'Lima__cycle-1': {
@@ -273,8 +275,7 @@ test('catalog completion transaction records an immutable lifecycle event', asyn
           completedAt,
           completionId: 'close-event'
         }
-      },
-      completedAt
+      }
     });
     transaction.set(doc(db, 'task_completion_events', 'close-event'), {
       taskId: 'soar_12',
@@ -282,10 +283,27 @@ test('catalog completion transaction records an immutable lifecycle event', asyn
       actorEmail: 'coord@example.com',
       occurredAt: serverTimestamp(),
       source: 'manual',
-      scope: { sede: 'Lima', cycleId: 'cycle-1' }
+      scope: { sede: 'Lima', cycleId: 'cycle-1' },
+      closureContext
     });
   }));
   await assertFails(updateDoc(doc(db, 'task_completion_events', 'close-event'), { action: 'reopened' }));
+  await assertFails(deleteDoc(doc(db, 'task_completion_events', 'close-event')));
+  await assertSucceeds(updateDoc(doc(db, 'tasks', 'soar_12'), {
+    comments: 'Later edited note', evidenceUrl: '', evidences: []
+  }));
+  await assertSucceeds(runTransaction(db, async transaction => {
+    transaction.update(doc(db, 'tasks', 'soar_12'), {
+      'completions.Lima__cycle-1': { completed: false, status: 'Pendiente' },
+      lifecycleMutation: { eventId: 'reopen-after-evidence-edit', scope: { sede: 'Lima', cycleId: 'cycle-1' } }
+    });
+    transaction.set(doc(db, 'task_completion_events', 'reopen-after-evidence-edit'), {
+      taskId: 'soar_12', action: 'reopened', actorEmail: 'coord@example.com',
+      occurredAt: serverTimestamp(), source: 'manual', scope: { sede: 'Lima', cycleId: 'cycle-1' }
+    });
+  }));
+  assert.deepEqual((await getDoc(doc(db, 'task_completion_events', 'close-event'))).data().closureContext, closureContext,
+    'the original close context survives later evidence/comment edits and manual reopening');
   await assertFails(setDoc(doc(userDb('other', 'other@example.com'), 'task_completion_events', 'forged'), {
     taskId: 'soar_12',
     action: 'completed',
@@ -372,8 +390,23 @@ test('a personal task owner can explicitly reopen it with an immutable audit eve
       completedAt: null,
       lifecycleMutation: { eventId: 'owner-reopen', scope: {} }
     });
+    transaction.set(doc(ownerDb, 'task_completion_events', 'owner-reopen'), {
+      taskId: 'custom_closed',
+      action: 'reopened',
+      actorEmail: 'owner@example.com',
+      occurredAt: serverTimestamp(),
+      source: 'manual',
+      scope: {}
+    });
+  }));
+  await assertFails(updateDoc(doc(userDb('unrelated', 'unrelated@example.com'), 'tasks', 'custom_closed'), {
+    completed: false,
+    status: 'Pendiente',
+    completedAt: null
+  }));
+});
 
-    test('direct catalog/cycle and assignee reopen writes fail without a fresh matching event', async () => {
+test('direct catalog/cycle and assignee reopen writes fail without a fresh matching event', async () => {
       await seedTasks([{
         id: 'soar_12', role: 'coord_c1', isCustom: false,
         completed: false,
@@ -429,21 +462,6 @@ test('a personal task owner can explicitly reopen it with an immutable audit eve
           source: 'manual', scope: { assigneeEmail: 'owner@example.com' }, occurredAt: serverTimestamp()
         });
       }));
-    });
-    transaction.set(doc(ownerDb, 'task_completion_events', 'owner-reopen'), {
-      taskId: 'custom_closed',
-      action: 'reopened',
-      actorEmail: 'owner@example.com',
-      occurredAt: serverTimestamp(),
-      source: 'manual',
-      scope: {}
-    });
-  }));
-  await assertFails(updateDoc(doc(userDb('unrelated', 'unrelated@example.com'), 'tasks', 'custom_closed'), {
-    completed: false,
-    status: 'Pendiente',
-    completedAt: null
-  }));
 });
 
 test('checklist_tasks keeps role catalog access without exposing other roles', async () => {
