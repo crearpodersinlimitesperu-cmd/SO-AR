@@ -35,26 +35,76 @@ function generateAssertiveResponse(queryText, nodusData, currentUser, messageHis
     }
   }
 
-  // 1. Preguntas sobre un equipo/ciclo específico (ej. "C1 E31", "equipo 30")
-  // (14/09/2026) CORREGIDO: antes esta rama devolvía SIEMPRE un "Reporte Oficial"
-  // con cifras y nombres de coordinadoras totalmente inventados (fijos en el
-  // código, sin leer nodusData) y lo presentaba como "verificado en las fuentes
-  // autorizadas" — una alucinación literal, detectada junto con el fix del
-  // selector de sedes de Home.jsx (mismo reporte de José: "no alucinar"). Ahora
-  // se busca el equipo en los datos reales de coords/sedes (si existen) y, si no
-  // hay coincidencia con datos en vivo, se dice explícitamente que no hay datos
-  // verificados disponibles — nunca se inventa una cifra para rellenar.
+  // 1. Preguntas sobre un equipo/ciclo específico (ej. "C1 E32", "equipo 32", "lima e32")
   const equipoMatch = q.match(/\b(?:e|equipo\s*)(\d{1,3})\b/);
   if (equipoMatch) {
     const equipoNum = equipoMatch[1];
-    const coordsDelEquipo = coords.filter(c => String(c.equipo || '').includes(equipoNum));
+    const isTargetEq = (eqStr) => {
+      if (!eqStr) return false;
+      const digits = String(eqStr).match(/\d+/g);
+      return digits ? digits.includes(equipoNum) : false;
+    };
+
+    // Colectar datos reales tanto de c.equipos (array oficial en Nodus) como de c.equipo
+    const matchingCoords = [];
+    coords.forEach(c => {
+      const matchedEqs = Array.isArray(c.equipos)
+        ? c.equipos.filter(eq => isTargetEq(eq.equipo || eq.name || eq.id))
+        : [];
+      const matchLegacy = isTargetEq(c.equipo);
+
+      if (matchedEqs.length > 0) {
+        matchingCoords.push({
+          nombre: c.nombre,
+          sede: c.sede || 'sede no especificada',
+          equipos: matchedEqs,
+        });
+      } else if (matchLegacy) {
+        matchingCoords.push({
+          nombre: c.nombre,
+          sede: c.sede || 'sede no especificada',
+          legacyEstado: c.estados || {},
+        });
+      }
+    });
+
     let resp = `📊 **Consulta Equipo ${equipoNum}:**\n\n`;
-    if (coordsDelEquipo.length > 0) {
-      resp += `Datos en vivo (Nodus) para las coordinaciones asociadas a este equipo:\n\n`;
-      coordsDelEquipo.forEach(c => {
-        const est = c.estados || {};
-        resp += `* **${c.nombre} (${c.sede || 'sede no especificada'}):** ${est.confirmado || 0} confirmados, ${est.porConfirmar || 0} por confirmar, de ${est.asignados || 0} asignados.\n`;
+    if (matchingCoords.length > 0) {
+      let totalConf = 0;
+      let totalAsig = 0;
+      let totalLlam = 0;
+      let totalPorConf = 0;
+
+      resp += `Datos en vivo (Nodus) para el Equipo ${equipoNum}:\n\n`;
+      matchingCoords.forEach(c => {
+        if (c.equipos && c.equipos.length > 0) {
+          c.equipos.forEach(eq => {
+            const conf = Number(eq.confirmado || 0);
+            const porConf = Number(eq.porConfirmar || 0);
+            const asig = Number(eq.asistieron || eq.asignados || (conf + porConf) || 0);
+            const llam = Number(eq.llamadas || 0);
+            totalConf += conf;
+            totalPorConf += porConf;
+            totalAsig += asig;
+            totalLlam += llam;
+            resp += `* **${c.nombre} (${c.sede}):** **${conf}** confirmados, **${porConf}** por confirmar (Llamadas: ${llam}).\n`;
+          });
+        } else if (c.legacyEstado) {
+          const est = c.legacyEstado;
+          const conf = Number(est.confirmado || 0);
+          const porConf = Number(est.porConfirmar || 0);
+          const asig = Number(est.asignados || 0);
+          totalConf += conf;
+          totalPorConf += porConf;
+          totalAsig += asig;
+          resp += `* **${c.nombre} (${c.sede}):** **${conf}** confirmados, **${porConf}** por confirmar, de **${asig}** asignados.\n`;
+        }
       });
+
+      resp += `\n📈 **Total Verificado en Nodus (Equipo ${equipoNum}):**\n`;
+      resp += `* **Confirmados:** **${totalConf}**\n`;
+      if (totalPorConf > 0) resp += `* **Por Confirmar:** **${totalPorConf}**\n`;
+      if (totalLlam > 0) resp += `* **Gestiones / Llamadas:** **${totalLlam}**\n`;
     } else {
       resp += `⚠️ No encuentro datos en vivo verificados (Nodus/Firestore) para el Equipo ${equipoNum} en este momento. No voy a inventar cifras — puedes pedirme el reporte general de sedes ("¿cómo van los confirmados?") mientras se sincroniza, o consultar directamente en Nodus/el padrón oficial.`;
     }
