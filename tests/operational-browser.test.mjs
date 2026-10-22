@@ -299,6 +299,38 @@ test('actual task context persists location, updates reminders and reads links; 
       if (email !== 'owner@example.test') assert.deepEqual(advancedLarge.assigneeProgress[email], entry);
     }
 
+    await page.evaluate(() => {
+      const task = {
+        id: 'custom_legacy_status', isCustom: true, task: 'Legacy status participant',
+        createdBy: 'owner@example.test', assignedToEmails: ['owner@example.test', 'recipient@example.test'],
+        completed: false, progressPercentage: 55,
+        assigneeProgress: {
+          'owner@example.test': { status: 'Completada', progressPercentage: 100 },
+          'recipient@example.test': { progress: 10 }
+        }
+      };
+      window.fixtureStore.set('tasks/' + task.id, task);
+      window.fixturePublish();
+      window.fixtureOpenDetail(task);
+    });
+    await page.waitForFunction(() => document.body.innerText.includes('Legacy status participant'));
+    await saveModal();
+    assert.deepEqual(await page.evaluate(() =>
+      window.fixtureTask('custom_legacy_status').assigneeProgress['owner@example.test']),
+    { status: 'Completada', progressPercentage: 100 }, 'ordinary modal saves preserve status-only closure without invented dates');
+    await page.evaluate(() => window.fixtureOpenDetail(window.fixtureTask('custom_legacy_status')));
+    await page.waitForFunction(() => [...document.querySelectorAll('button')].some(button => button.textContent.includes('Reabrir Mi Parte')));
+    await page.evaluate(() => [...document.querySelectorAll('button')].find(button => button.textContent.includes('Reabrir Mi Parte')).click());
+    await saveModal();
+    await page.waitForFunction(() =>
+      window.fixtureTask('custom_legacy_status').assigneeProgress['owner@example.test'].status === 'Pendiente');
+    const manuallyReopened = await page.evaluate(() => window.fixtureTask('custom_legacy_status'));
+    assert.equal(manuallyReopened.assigneeProgress['owner@example.test'].progressPercentage, 0);
+    assert.deepEqual(manuallyReopened.assigneeProgress['recipient@example.test'], { progress: 10 });
+    assert.equal(await page.evaluate(() => [...window.fixtureStore.entries()].some(([path, event]) =>
+      path.startsWith('task_completion_events/') && event.taskId === 'custom_legacy_status' &&
+      event.action === 'reopened' && event.scope.assigneeEmail === 'owner@example.test')), true);
+
     const failed = await page.evaluate(async () => {
       window.fixtureRejectWrite = true;
       const task = window.fixtureApi.tasks.find(task => task.isCustom);

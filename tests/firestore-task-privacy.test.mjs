@@ -839,7 +839,7 @@ test('canonical state preserves a legacy alias key while authorizing only the ma
   const email = 'owner@crearpsl.net';
   await seedTasks([{
     id: 'custom_legacy_alias', isCustom: true, createdBy: 'creator@example.com',
-    assignedToEmail: email, assigneeProgress: { [key]: { completed: true, progress: 100 } }
+    assignedToEmail: email, assigneeProgress: { [key]: { status: 'Completada', progressPercentage: 100 } }
   }]);
   const db = userDb('owner', email);
   await assertSucceeds(runTransaction(db, async transaction => {

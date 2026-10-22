@@ -20,7 +20,7 @@ import { db } from '../services/firebase';
 import { canSendOperationalCommunications } from '../config/permissions';
 import { deadlineTimeReference, timeZoneForSede, zonedDateInputParts, zonedDateTimeToIso } from '../utils/timezones';
 import { taskLocationLabel, taskPath } from '../utils/taskLocation';
-import { getTaskProgress } from '../utils/taskLifecycle';
+import { getTaskProgress, isTaskClosedForDelivery } from '../utils/taskLifecycle';
 import { checklistData } from '../data/checklistData';
 
 export const normalizeTaskEmail = (e) => {
@@ -203,7 +203,7 @@ export default function TaskDetailModal({
         const u = findUserByAnyEmail(clean);
         const entry = existingKey ? existingMap[existingKey] : null;
 
-        const entryProg = typeof entry?.progress === 'number'
+        const entryProg = isTaskClosedForDelivery(entry) ? 100 : typeof entry?.progress === 'number'
           ? entry.progress
           : (typeof entry?.progressPercentage === 'number'
               ? entry.progressPercentage
@@ -728,7 +728,7 @@ export default function TaskDetailModal({
         }
       }
 
-      const previouslyCompleted = task.completed === true || task.status === 'Completada';
+      const previouslyCompleted = isTaskClosedForDelivery(task);
       const individualReopen = Object.entries(mapToSave).some(([key, entry]) =>
         assigneeProgressBaseline.current[key]?.completed === true && entry.completed !== true && entry.progress < 100);
       const explicitReopen = completionIntent &&

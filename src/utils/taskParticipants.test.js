@@ -49,3 +49,11 @@ test('partial participant updates retain other states and resolve aliases to the
     'Owner@crearpls.com': { progress: 40 }, 'other@example.test': { completed: true, progress: 100 }
   });
 });
+
+test('manual progress changes update every legacy terminal signal instead of leaving a closed status behind', () => {
+  assert.deepEqual(applyParticipantChanges({ assigneeProgress: { 'a@example.test': {
+    status: 'Completada', progressPercentage: 100
+  } } }, { 'a@example.test': { completed: false, progress: 0 } }), {
+    'a@example.test': { completed: false, progress: 0, progressPercentage: 0, status: 'Pendiente' }
+  });
+});

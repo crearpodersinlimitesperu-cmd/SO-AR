@@ -1541,13 +1541,13 @@ export function ChecklistProvider({ children }) {
         const nowIso = new Date().toISOString();
         const individualWasCompleted = isTaskClosedForDelivery(prevEntry);
         const nextProgVal = progressPercentage !== null ? progressPercentage : (isCompleted ? 100 : 0);
-        currentProgress[targetKey] = {
+        currentProgress[targetKey] = applyParticipantChanges(data, { [targetKey]: {
           ...prevEntry,
           completed: isCompleted,
           ...(!isCompleted ? { completedAt: null }
             : !individualWasCompleted ? { completedAt: nowIso } : {}),
           progress: nextProgVal
-        };
+        } })[targetKey];
 
         const progressEntries = [...new Set([...formalAssignees, ...Object.keys(currentProgress).map(normalizeEmailKey)])]
           .map(key => currentProgress[Object.keys(currentProgress).find(k => normalizeEmailKey(k) === key)] ||

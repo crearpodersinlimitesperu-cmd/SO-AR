@@ -533,7 +533,9 @@ test('task transactions roll back rejected optimism, gate celebrations and prese
       window.fixtureStore['closed-without-date'] = {
         id: 'closed-without-date', isCustom: true, createdBy: 'owner@example.test',
         assignedToEmails: ['owner@example.test'], progress: 100,
-        assigneeProgress: { 'owner@example.test': { completed: true, progress: 100 } }
+        assigneeProgress: { 'owner@example.test': {
+          completed: true, progress: 100, progressPercentage: 100, status: 'Completada'
+        } }
       };
       window.publishFixture();
     });
@@ -544,6 +546,13 @@ test('task transactions roll back rejected optimism, gate celebrations and prese
     assert.equal('completedAt' in undated.assigneeProgress['owner@example.test'], false);
     assert.equal(await page.evaluate(() => Object.values(window.fixtureEvents)
       .some(event => event.taskId === 'closed-without-date')), false, 'no synthetic historical closure event');
+    assert.equal(await page.evaluate(() => window.fixtureApi.updateIndividualProgress(
+      'closed-without-date', 'owner@example.test', false)), true);
+    const reopenedLegacy = await page.evaluate(() => window.fixtureTask('closed-without-date'));
+    assert.equal(reopenedLegacy.assigneeProgress['owner@example.test'].progressPercentage, 0);
+    assert.equal(reopenedLegacy.assigneeProgress['owner@example.test'].status, 'Pendiente');
+    assert.equal(await page.evaluate(() => Object.values(window.fixtureEvents)
+      .filter(event => event.taskId === 'closed-without-date' && event.action === 'reopened').length), 2);
 
     await page.evaluate(() => { window.fixtureWriteError = true; });
     assert.equal((await call('updateTaskDetails', 'catalog', { progressPercentage: 50 })).ok, false);

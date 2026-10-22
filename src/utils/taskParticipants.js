@@ -26,10 +26,18 @@ export function mergeParticipantStates(task, states) {
 
 export function applyParticipantChanges(task, changes) {
   const previous = task?.assigneeProgress || {};
-  const normalized = Object.fromEntries(Object.entries(changes).map(([key, state]) => [
-    Object.keys(previous).find(existing => normalizeParticipantEmail(existing) === normalizeParticipantEmail(key)) || key,
-    state
-  ]));
+  const normalized = Object.fromEntries(Object.entries(changes).map(([key, state]) => {
+    const storedKey = Object.keys(previous).find(existing => normalizeParticipantEmail(existing) === normalizeParticipantEmail(key)) || key;
+    const before = previous[storedKey] || {};
+    const progressChanged = state?.completed !== before.completed || state?.progress !== before.progress;
+    const progressState = progressChanged && typeof state?.completed === 'boolean' && typeof state?.progress === 'number'
+      ? {
+        ...state,
+        ...('progressPercentage' in before ? { progressPercentage: state.progress } : {}),
+        ...('status' in before ? { status: state.completed ? 'Completada' : (state.progress > 0 ? 'En Progreso' : 'Pendiente') } : {})
+      } : state;
+    return [storedKey, progressState];
+  }));
   return mergeParticipantStates(task, normalized).assigneeProgress;
 }
 
