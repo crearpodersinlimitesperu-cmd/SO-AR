@@ -45,9 +45,28 @@ function generateAssertiveResponse(queryText, nodusData, currentUser, messageHis
       return digits ? digits.includes(equipoNum) : false;
     };
 
-    // Colectar datos reales tanto de c.equipos (array oficial en Nodus) como de c.equipo
+    // Detectar si la pregunta especifica una sede (ej. "en lima para c1 e32")
+    const sedesConocidas = ['lima', 'quito', 'guayaquil', 'cuenca', 'medellin', 'mexico'];
+    const sedeEnQuery = sedesConocidas.find(s => q.includes(s));
+
+    // 1A. Prioridad: Revisar si existe el padrón oficial del equipo en equiposReporte / nodus_report_sources
+    const equiposReporte = nodusData?.equiposReporte || nodusData?.reportSources || [];
+    const directTeamReport = Array.isArray(equiposReporte)
+      ? equiposReporte.find(t => {
+          const name = String(t.equipoNombre || t.nombre || t.equipo || '').toLowerCase();
+          const matchNum = isTargetEq(name) || String(t.team || t.equipoId) === equipoNum;
+          if (!matchNum) return false;
+          if (sedeEnQuery) return name.includes(sedeEnQuery) || String(t.sede || '').toLowerCase().includes(sedeEnQuery);
+          return true;
+        })
+      : null;
+
+    // Colectar datos de las tarjetas de coordinadores (c.equipos)
     const matchingCoords = [];
     coords.forEach(c => {
+      const cSedeNorm = String(c.sede || '').toLowerCase();
+      if (sedeEnQuery && !cSedeNorm.includes(sedeEnQuery)) return;
+
       const matchedEqs = Array.isArray(c.equipos)
         ? c.equipos.filter(eq => isTargetEq(eq.equipo || eq.name || eq.id))
         : [];
@@ -68,14 +87,33 @@ function generateAssertiveResponse(queryText, nodusData, currentUser, messageHis
       }
     });
 
-    let resp = `📊 **Consulta Equipo ${equipoNum}:**\n\n`;
+    let resp = `📊 **Consulta Equipo ${equipoNum}${sedeEnQuery ? ` (${sedeEnQuery.toUpperCase()})` : ''}:**\n\n`;
+
+    // Si tenemos el padrón completo de participantes del reporte oficial (121 asignados):
+    if (directTeamReport && Array.isArray(directTeamReport.participantes)) {
+      const parts = directTeamReport.participantes;
+      const confCount = parts.filter(p => {
+        const est = String(p.asistencia || p.estado || p.llamada1 || p.llamada2 || '').toUpperCase();
+        return est.includes('CONFIRMADO') || est.includes('ASISTIO') || est.includes('SENTADO');
+      }).length;
+      const porConfCount = parts.filter(p => {
+        const est = String(p.asistencia || p.estado || p.llamada1 || p.llamada2 || '').toUpperCase();
+        return est.includes('POR CONFIRMAR') || est.includes('PENDIENTE');
+      }).length;
+
+      resp += `📋 **Padrón Oficial Nodus (/reporte):**\n`;
+      resp += `* **Total Asignados en Nodus:** **${parts.length}** contactos\n`;
+      resp += `* **Confirmados a Sala:** **${confCount}**\n`;
+      resp += `* **Por Confirmar / Pendientes:** **${porConfCount}**\n\n`;
+    }
+
     if (matchingCoords.length > 0) {
       let totalConf = 0;
       let totalAsig = 0;
       let totalLlam = 0;
       let totalPorConf = 0;
 
-      resp += `Datos en vivo (Nodus) para el Equipo ${equipoNum}:\n\n`;
+      resp += `📞 **Gestión de Llamadas por Coordinador (Nodus en vivo):**\n\n`;
       matchingCoords.forEach(c => {
         if (c.equipos && c.equipos.length > 0) {
           c.equipos.forEach(eq => {
@@ -101,11 +139,12 @@ function generateAssertiveResponse(queryText, nodusData, currentUser, messageHis
         }
       });
 
-      resp += `\n📈 **Total Verificado en Nodus (Equipo ${equipoNum}):**\n`;
-      resp += `* **Confirmados:** **${totalConf}**\n`;
+      resp += `\n📈 **Resumen de Llamadas Nodus (Equipo ${equipoNum}):**\n`;
+      resp += `* **Confirmados por llamada:** **${totalConf}**\n`;
       if (totalPorConf > 0) resp += `* **Por Confirmar:** **${totalPorConf}**\n`;
-      if (totalLlam > 0) resp += `* **Gestiones / Llamadas:** **${totalLlam}**\n`;
-    } else {
+      if (totalLlam > 0) resp += `* **Gestiones / Llamadas realizadas:** **${totalLlam}**\n`;
+      resp += `\n💡 _Nota: Si el padrón total en Nodus registra 121 contactos, los ${totalConf} confirmados corresponden a las gestiones telefónicas activas cargadas por las coordinadoras hasta el último corte._\n`;
+    } else if (!directTeamReport) {
       resp += `⚠️ No encuentro datos en vivo verificados (Nodus/Firestore) para el Equipo ${equipoNum} en este momento. No voy a inventar cifras — puedes pedirme el reporte general de sedes ("¿cómo van los confirmados?") mientras se sincroniza, o consultar directamente en Nodus/el padrón oficial.`;
     }
     return resp;
