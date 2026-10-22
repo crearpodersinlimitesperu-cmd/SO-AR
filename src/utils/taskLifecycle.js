@@ -93,15 +93,11 @@ export function preserveClosedAssigneeProgress(previous = {}, requested = {}) {
     );
     if (!requestedKey) return;
 
-    const entry = { ...merged[requestedKey], completed: true, status: 'Completada' };
-    if ('progress' in previousEntry) entry.progress = previousEntry.progress;
-    if ('progressPercentage' in previousEntry) entry.progressPercentage = previousEntry.progressPercentage;
-    if ('completedAt' in previousEntry) {
-      if (previousEntry.completedAt === null) delete entry.completedAt;
-      else entry.completedAt = previousEntry.completedAt;
-    } else {
-      delete entry.completedAt;
-    }
+    const entry = { ...merged[requestedKey] };
+    ['completed', 'status', 'progress', 'progressPercentage', 'completedAt'].forEach(field => {
+      if (field in previousEntry) entry[field] = previousEntry[field];
+      else delete entry[field];
+    });
     if ('completionId' in previousEntry) entry.completionId = previousEntry.completionId;
     merged[requestedKey] = entry;
   });

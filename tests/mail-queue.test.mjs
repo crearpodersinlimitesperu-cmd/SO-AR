@@ -6,6 +6,9 @@ import {
   enqueueOverdueTaskMails,
   MAIL_CLAIM_LEASE_MS,
   MAX_MAIL_ATTEMPTS,
+  DAILY_TASK_MAIL_ATTEMPTS,
+  DAILY_USER_MAIL_ATTEMPTS,
+  DAILY_TASK_USER_MAIL_ATTEMPTS,
   recordMailFailure,
   recordMailSuccess,
   recordMailUnknown,
@@ -13,6 +16,7 @@ import {
   skipTaskMailIfClosed,
   STALE_REASON
 } from '../scripts/mailQueue.js';
+import { SUPER_ADMIN_EMAILS } from '../src/config/permissions.js';
 
 const now = Date.parse('2026-10-09T15:00:00Z');
 const cutoff = now - 48 * 60 * 60 * 1000;
@@ -129,6 +133,54 @@ test('overlapping claims increment the attempt count once and use one lease', as
     Date.parse(docs.get('mail/a').delivery.leaseExpiresAt),
     now + MAIL_CLAIM_LEASE_MS
   );
+});
+
+test('distinct outbox documents share atomic task/user budgets and one private admin alert', async () => {
+  const mails = Object.fromEntries(Array.from({ length: 12 }, (_, i) => [`mail/budget-${i}`, {
+    taskId: 'task-private', type: 'task_reminder', to: ['recipient@example.test'],
+    message: { subject: 'Private title', html: 'Private evidence' },
+    delivery: { state: 'PENDING' }
+  }]));
+  const { db, ref, docs } = fakeFirestore({ ...mails, 'tasks/task-private': { completed: false } });
+  const results = await Promise.all(Object.keys(mails).map(path => claimPendingMail(db, ref(path), now)));
+  assert.equal(results.filter(result => result.state === 'SENDING').length, DAILY_TASK_USER_MAIL_ATTEMPTS);
+  assert.equal(results.filter(result => result.state === 'SKIPPED_RATE_LIMIT').length, 12 - DAILY_TASK_USER_MAIL_ATTEMPTS);
+  const notifications = [...docs].filter(([path]) => path.startsWith('notifications/'));
+  assert.equal(notifications.length, SUPER_ADMIN_EMAILS.length);
+  for (const [, notification] of notifications) {
+    assert.ok(SUPER_ADMIN_EMAILS.includes(notification.userId));
+    assert.equal(notification.type, 'MAIL_DELIVERY_ANOMALY');
+    assert.equal(notification.read, false);
+    assert.doesNotMatch(notification.message, /task-private|recipient@|Private title|Private evidence/);
+  }
+  for (const [path, mail] of docs) {
+    if (path.startsWith('mail/') && mail.delivery.state === 'SKIPPED_RATE_LIMIT') {
+      assert.equal(mail.delivery.attemptCount, undefined);
+      assert.equal(selectMailAction(mail, now + 86400000), null);
+    }
+  }
+});
+
+test('task-wide and user-wide limits apply across recipients/tasks and reset only on the next UTC day', async () => {
+  for (const kind of ['task', 'user']) {
+    const limit = kind === 'task' ? DAILY_TASK_MAIL_ATTEMPTS : DAILY_USER_MAIL_ATTEMPTS;
+    const initial = {};
+    for (let i = 0; i <= limit; i++) {
+      const taskId = kind === 'task' ? 'same-task' : `task-${i}`;
+      initial[`tasks/${taskId}`] = { completed: false };
+      initial[`mail/${i}`] = {
+        taskId, type: 'task_update',
+        to: [kind === 'user' ? 'same@example.test' : `recipient-${i}@example.test`],
+        delivery: { state: 'PENDING' }
+      };
+    }
+    const { db, ref, docs } = fakeFirestore(initial);
+    const results = await Promise.all(Array.from({ length: limit + 1 }, (_, i) => claimPendingMail(db, ref(`mail/${i}`), now)));
+    assert.equal(results.filter(result => result.state === 'SENDING').length, limit, kind);
+    assert.equal(results.at(-1).state, 'SKIPPED_RATE_LIMIT', kind);
+    docs.set('mail/new-day', structuredClone(initial[`mail/${limit}`]));
+    assert.equal((await claimPendingMail(db, ref('mail/new-day'), now + 86400000)).state, 'SENDING', kind);
+  }
 });
 
 test('a closed cycle suppresses only mail for that cycle and records the observed closure', async () => {

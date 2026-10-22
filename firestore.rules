@@ -343,7 +343,7 @@ service cloud.firestore {
           'evidence_url', 'evidenceUrl', 'date', 'googleSynced',
           'assigneeProgress', 'evidences', 'comments', 'notes', 'description',
           'progressNotes', 'completedAt', 'lastUpdated', 'lastUpdatedBy',
-          'updatedAt', 'updated_at', 'deadline'
+          'updatedAt', 'updated_at', 'deadline', 'lifecycleMutation'
         ]);
     }
 
@@ -353,39 +353,93 @@ service cloud.firestore {
         isChecklistCatalogTask(taskData, isPersonalTask(taskData));
     }
 
+    function lifecycleClosed(data) {
+      return data.get('completed', false) == true || data.get('status', '') == 'Completada' ||
+        data.get('progress', 0) == 100 || data.get('progressPercentage', 0) == 100;
+    }
+
+    function lifecycleEventState(taskData, scope) {
+      return scope.keys().hasAll(['sede', 'cycleId'])
+        ? taskData.get('completions', {}).get(scope.sede + '__' + scope.cycleId, {})
+        : scope.keys().hasAll(['assigneeEmail'])
+          ? taskData.get('assigneeProgress', {}).get(scope.assigneeEmail, {})
+          : taskData;
+    }
+
+    function hasNewReopenEvent(taskId, mutation) {
+      let eventId = mutation.get('eventId', '');
+      let eventPath = /databases/$(database)/documents/task_completion_events/$(eventId);
+      let event = eventId != '' && existsAfter(eventPath) ? getAfter(eventPath).data : {};
+      return eventId is string && eventId != '' && !exists(eventPath) &&
+        event.get('taskId', '') == taskId && event.get('action', '') == 'reopened' &&
+        event.get('actorEmail', '') == email() && event.get('source', '') == 'manual' &&
+        event.get('occurredAt', null) == request.time &&
+        event.get('scope', {}) == mutation.get('scope', {});
+    }
+
+    function preservesClosedEntry(before, after) {
+      return !lifecycleClosed(before) ||
+        (lifecycleClosed(after) &&
+         (before.get('completed', false) != true || after.get('completed', false) == true) &&
+         (before.get('status', '') != 'Completada' || after.get('status', '') == 'Completada') &&
+         after.get('completedAt', null) == before.get('completedAt', null) &&
+         (before.get('progress', 0) != 100 || after.get('progress', 0) == 100) &&
+         (before.get('progressPercentage', 0) != 100 || after.get('progressPercentage', 0) == 100));
+    }
+
+    function safeLifecycleMap(before, after, scope, field, taskId, mutation) {
+      let key = field == 'completions'
+        ? scope.get('sede', '') + '__' + scope.get('cycleId', '')
+        : scope.get('assigneeEmail', '');
+      let validScope = field == 'completions'
+        ? scope.keys().hasAll(['sede', 'cycleId']) && scope.sede != '' && scope.cycleId != ''
+        : scope.keys().hasAll(['assigneeEmail']) && scope.assigneeEmail != '';
+      return before == after ||
+        (after.diff(before).changedKeys().size() == 0 && after.diff(before).removedKeys().size() == 0) ||
+        (validScope && after.diff(before).affectedKeys().hasOnly([key]) &&
+          (preservesClosedEntry(before.get(key, {}), after.get(key, {})) ||
+           (!lifecycleClosed(after.get(key, {})) && scope == mutation.get('scope', {}) &&
+            hasNewReopenEvent(taskId, mutation))));
+    }
+
+    function safeTaskLifecycleUpdate(taskId) {
+      let before = resource.data;
+      let after = request.resource.data;
+      let mutation = after.get('lifecycleMutation', {});
+      let scope = mutation.get('mapScope', mutation.get('scope', {}));
+      return (preservesClosedEntry(before, after) ||
+          (!lifecycleClosed(after) && hasNewReopenEvent(taskId, mutation))) &&
+        safeLifecycleMap(before.get('completions', {}), after.get('completions', {}),
+          scope, 'completions', taskId, mutation) &&
+        safeLifecycleMap(before.get('assigneeProgress', {}), after.get('assigneeProgress', {}),
+          scope, 'assigneeProgress', taskId, mutation);
+    }
+
     function validTaskCompletionEvent() {
       let event = request.resource.data;
       let taskPath = /databases/$(database)/documents/tasks/$(event.taskId);
-      let taskExisted = exists(taskPath);
-      let taskExistsAfter = existsAfter(taskPath);
-      let beforeTask = taskExisted ? get(taskPath).data : {};
-      let afterTask = taskExistsAfter ? getAfter(taskPath).data : {};
+      let beforeTask = exists(taskPath) ? get(taskPath).data : {};
+      let afterTask = existsAfter(taskPath) ? getAfter(taskPath).data : {};
       let scope = event.get('scope', {});
-      let cycleScoped = scope is map && scope.keys().hasAll(['sede', 'cycleId']);
-      let cycleKey = cycleScoped ? scope.sede + '__' + scope.cycleId : '';
-      let beforeState = cycleScoped
-        ? beforeTask.get('completions', {}).get(cycleKey, {})
-        : beforeTask;
-      let afterState = cycleScoped
-        ? afterTask.get('completions', {}).get(cycleKey, {})
-        : afterTask;
-      let wasCompleted = beforeState.get('completed', false) == true ||
-        beforeState.get('status', '') == 'Completada';
-      let isCompleted = afterState.get('completed', false) == true ||
-        afterState.get('status', '') == 'Completada';
+      let beforeState = lifecycleEventState(beforeTask, scope);
+      let afterState = lifecycleEventState(afterTask, scope);
       return event.keys().hasAll(['taskId', 'action', 'actorEmail', 'occurredAt', 'source', 'scope']) &&
         event.keys().hasOnly(['taskId', 'action', 'actorEmail', 'occurredAt', 'source', 'scope']) &&
         event.taskId is string && event.taskId.size() > 0 &&
         event.actorEmail == email() &&
-        event.occurredAt is string && event.occurredAt.size() > 0 &&
+        event.occurredAt == request.time &&
         event.source == 'manual' &&
         event.scope is map &&
-        (!cycleScoped || (scope.sede is string && scope.sede.size() > 0 &&
-          scope.cycleId is string && scope.cycleId.size() > 0)) &&
-        taskExistsAfter &&
+        (scope.size() == 0 ||
+          (scope.keys().hasOnly(['sede', 'cycleId']) &&
+           scope.sede is string && scope.sede.size() > 0 &&
+           scope.cycleId is string && scope.cycleId.size() > 0) ||
+          (scope.keys().hasOnly(['assigneeEmail']) && scope.assigneeEmail is string &&
+            (scope.assigneeEmail == email() || isSuperAdmin() || isGerenteODireccion()))) &&
+        existsAfter(taskPath) &&
         (canWriteTaskCompletionEvent(beforeTask) || canWriteTaskCompletionEvent(afterTask)) &&
-        ((event.action == 'completed' && !wasCompleted && isCompleted) ||
-         (event.action == 'reopened' && wasCompleted && !isCompleted));
+        ((event.action == 'completed' && !lifecycleClosed(beforeState) && lifecycleClosed(afterState)) ||
+         (event.action == 'reopened' && lifecycleClosed(beforeState) && !lifecycleClosed(afterState)));
     }
 
     // (29/08/2026) MJ_CALENDARS: el rol operativo del usuario (coord_maestria,
@@ -475,14 +529,14 @@ service cloud.firestore {
                          (isOwner(request.resource.data) &&
                           !isReservedChecklistTaskId(request.resource.data.get('id', ''))) ||
                          isCollaborator(request.resource.data)));
-      allow update: if isSuperAdmin() || isGerenteODireccion() ||
+      allow update: if safeTaskLifecycleUpdate(taskId) && (isSuperAdmin() || isGerenteODireccion() ||
                     isOwner(resource.data) ||
                     (isCollaborator(resource.data) &&
                      request.resource.data.diff(resource.data).affectedKeys().hasAny(['status', 'progress', 'evidence_url', 'evidenceUrl', 'completions']) &&
                      !request.resource.data.diff(resource.data).affectedKeys().hasAny(['assignedToEmail', 'role', 'sede', 'ownerId'])) ||
                     (resource.data.get('isCustom', false) == false &&
                      isChecklistCatalogTask(resource.data, isPersonalTask(resource.data)) &&
-                     isOperationalProgressUpdate());
+                     isOperationalProgressUpdate()));
       allow delete: if isGerenteODireccion() || isSuperAdmin();
     }
 

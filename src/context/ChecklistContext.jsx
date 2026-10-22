@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { db, auth } from '../services/firebase';
-import { collection, onSnapshot, doc, updateDoc, setDoc, writeBatch, addDoc, query, where, orderBy, limit, getDocs, getDoc, runTransaction } from 'firebase/firestore';
+import { collection, onSnapshot, doc, updateDoc, writeBatch, addDoc, query, where, orderBy, limit, getDocs, runTransaction, serverTimestamp } from 'firebase/firestore';
 import { checklistData } from '../data/checklistData';
 import { usersData, normalizeRole } from '../data/usersData';
 import { isSuperAdminEmail, isGerenciaRole } from '../config/permissions';
@@ -263,6 +263,7 @@ export function ChecklistProvider({ children }) {
           }
         }
         if (resolvedScope) {
+          delete nextUpdates.assigneeProgress;
           ['completed', 'status', 'completedAt', 'progress', 'progressPercentage'].forEach(field => {
               delete nextUpdates[field];
           });
@@ -302,6 +303,30 @@ export function ChecklistProvider({ children }) {
         const completionTransition = includesCompletionUpdate &&
           isCompletionTransition(previous.completed, effectiveNextCompleted);
         const reopenTransition = reopeningRequested && explicitReopen;
+        let eventScope = resolvedScope
+          ? { sede: resolvedScope.sede, cycleId: resolvedScope.cycle.id }
+          : {};
+        let individualTransition = null;
+        if (nextUpdates.assigneeProgress) {
+          const previousMap = prevData.assigneeProgress || {};
+          const nextMap = nextUpdates.assigneeProgress;
+          const changedKeys = [...new Set([...Object.keys(previousMap), ...Object.keys(nextMap)])]
+            .filter(key => JSON.stringify(previousMap[key]) !== JSON.stringify(nextMap[key]));
+          if (changedKeys.length > 1) {
+            throw new Error('Guarda el avance de un colaborador a la vez para proteger los cierres individuales.');
+          }
+          if (changedKeys.length === 1) {
+            const key = changedKeys[0];
+            eventScope = { assigneeEmail: key };
+            const wasClosed = isTaskClosedForDelivery({ ...previousMap[key] });
+            const nowClosed = isTaskClosedForDelivery({ ...nextMap[key] });
+            if (wasClosed !== nowClosed) individualTransition = nowClosed ? 'completed' : 'reopened';
+          }
+        }
+        nextUpdates.lifecycleMutation = {
+          eventId: completionId,
+          scope: eventScope
+        };
         if (resolvedScope && includesCompletionUpdate) {
           const priorEntry = prevData.completions?.[cycleKey] || {};
           const preservedProgress = priorEntry.progressPercentage ?? priorEntry.progress ?? 100;
@@ -336,18 +361,16 @@ export function ChecklistProvider({ children }) {
           transaction.set(taskRef, initialData);
         }
 
-        if (completionTransition || reopenTransition) {
+        if (completionTransition || reopenTransition || individualTransition) {
           const actorEmail = String(currentUser?.email || auth.currentUser?.email || '').trim().toLowerCase();
           const eventRef = doc(db, 'task_completion_events', completionId);
           transaction.set(eventRef, {
             taskId,
-            action: reopenTransition ? 'reopened' : 'completed',
+            action: individualTransition || (reopenTransition ? 'reopened' : 'completed'),
             actorEmail,
-            occurredAt: new Date().toISOString(),
+            occurredAt: serverTimestamp(),
             source: 'manual',
-            scope: resolvedScope
-              ? { sede: resolvedScope.sede, cycleId: resolvedScope.cycle.id }
-              : {}
+            scope: eventScope
           });
         }
       });
@@ -589,13 +612,6 @@ export function ChecklistProvider({ children }) {
               cycleId: cycleForThisToggle.id,
               updatedAt: new Date().toISOString()
             };
-          } else if (userSede) {
-            nextCompletions[userSede] = {
-              ...(nextCompletions[userSede] || {}),
-              completed: nextStatus,
-              status: nextStatus ? 'Completada' : 'Pendiente',
-              updatedAt: new Date().toISOString()
-            };
           }
           const optimisticTask = {
             ...t,
@@ -613,16 +629,13 @@ export function ChecklistProvider({ children }) {
       const updates = {
         completed: nextStatus,
         status: nextStatus ? 'Completada' : 'Pendiente',
+        progress: nextStatus ? 100 : 0,
+        progressPercentage: nextStatus ? 100 : 0,
         // FIX 16/09/2026: fecha real de cumplimiento (trazabilidad, pedido
         // explicito de Jose). Se limpia al reabrir para no dejar una fecha
         // vieja "pegada"; se vuelve a fijar (con la fecha real del momento)
         // si se vuelve a completar.
-        completedAt: nextStatus ? new Date().toISOString() : null,
-        ...(!cycleScope ? {
-          [`completions.${userSede}.completed`]: nextStatus,
-          [`completions.${userSede}.status`]: nextStatus ? 'Completada' : 'Pendiente',
-          [`completions.${userSede}.updatedAt`]: new Date().toISOString()
-        } : {})
+        completedAt: nextStatus ? new Date().toISOString() : null
       };
 
       // Update both legacy and map formats just in case it's a custom task
@@ -923,14 +936,8 @@ export function ChecklistProvider({ children }) {
         ['completed', 'status', 'completedAt', 'progress', 'progressPercentage', 'completions'].forEach(field => {
           delete safeUpdatedData[field];
         });
-        if (isTaskClosedForDelivery(currentTask)) {
-          delete safeUpdatedData.assigneeProgress;
-        } else if (safeUpdatedData.assigneeProgress) {
-          safeUpdatedData.assigneeProgress = preserveClosedAssigneeProgress(
-            currentTask.assigneeProgress,
-            safeUpdatedData.assigneeProgress
-          );
-        }
+        // Assignment editing must never reset existing participants' progress.
+        delete safeUpdatedData.assigneeProgress;
         const nextTask = { ...currentTask, ...safeUpdatedData };
         transaction.update(taskRef, safeUpdatedData);
 
@@ -1211,9 +1218,20 @@ export function ChecklistProvider({ children }) {
   // 1. Enviar invitación de colaboración / mención
   const inviteCollaborator = async (task, targetUser, message) => {
     try {
-      const batch = writeBatch(db);
       const taskRef = doc(db, 'tasks', task.id);
-      
+      await runTransaction(db, async batch => {
+      const snapshot = await batch.get(taskRef);
+      if (!snapshot.exists()) throw new Error('La tarea ya no existe.');
+      const persisted = snapshot.data();
+      const scope = resolveTaskCycleScope(persisted, {
+        catalogTask: checklistData.some(item => item.id === task.id),
+        sede: currentUser?.sede?.trim() || 'Global',
+        cycle: currentCycle
+      });
+      const completionScope = scope ? { sede: scope.sede, cycleId: scope.cycle.id } : undefined;
+      if (isTaskClosedForDelivery(persisted, { completionScope, recipientEmail: targetUser.email })) {
+        throw new Error('No se pueden enviar invitaciones de una tarea cerrada.');
+      }
       const newPending = {
         email: targetUser.email,
         name: targetUser.name,
@@ -1226,7 +1244,7 @@ export function ChecklistProvider({ children }) {
         createdAt: new Date().toISOString()
       };
 
-      const currentPending = task.pendingCollaborations || [];
+      const currentPending = persisted.pendingCollaborations || [];
       batch.update(taskRef, {
         pendingCollaborations: [...currentPending.filter(p => p.email !== targetUser.email), newPending]
       });
@@ -1256,6 +1274,7 @@ export function ChecklistProvider({ children }) {
         type: 'task_collaboration_invite',
         taskId: task.id,
         recipientEmail: targetUser.email,
+        ...(completionScope ? { completionScope } : {}),
         delivery: { state: 'PENDING', attemptCount: 0 },
         message: {
           subject: `🤝 Causa OS | Invitación de Colaboración — ${inviteTaskTitle}`,
@@ -1317,7 +1336,7 @@ export function ChecklistProvider({ children }) {
         }
       });
 
-      await batch.commit();
+      });
       showToast(`¡Invitación enviada con éxito a @${targetUser.name}!`, 'success');
       return true;
     } catch (err) {
@@ -1330,10 +1349,20 @@ export function ChecklistProvider({ children }) {
   // 2. Aceptar invitación de colaboración
   const acceptCollaboration = async (notification) => {
     try {
-      const batch = writeBatch(db);
       const taskRef = doc(db, 'tasks', notification.taskId);
-
-      const task = tasks.find(t => t.id === notification.taskId);
+      await runTransaction(db, async batch => {
+      const snapshot = await batch.get(taskRef);
+      if (!snapshot.exists()) throw new Error('La tarea ya no existe.');
+      const task = snapshot.data();
+      const scope = resolveTaskCycleScope(task, {
+        catalogTask: checklistData.some(item => item.id === notification.taskId),
+        sede: currentUser?.sede?.trim() || 'Global',
+        cycle: currentCycle
+      });
+      if (isTaskClosedForDelivery(task, {
+        completionScope: scope ? { sede: scope.sede, cycleId: scope.cycle.id } : undefined,
+        recipientEmail: currentUser.email
+      })) throw new Error('No se pueden aceptar invitaciones de una tarea cerrada.');
       const currentCollabs = task?.collaborators ? [...task.collaborators] : [];
       const currentCollabDetails = task?.collaboratorDetails ? [...task.collaboratorDetails] : [];
 
@@ -1370,7 +1399,7 @@ export function ChecklistProvider({ children }) {
         });
       }
 
-      await batch.commit();
+      });
       showToast(`¡Colaboración aceptada! La tarea ahora está en tu panel compartido.`, 'success');
       return true;
     } catch (err) {
@@ -1424,27 +1453,14 @@ export function ChecklistProvider({ children }) {
           ...(data.assigned_to ? [data.assigned_to] : [])
         ].map(normalizeEmailKey).filter(Boolean);
 
-        formalAssignees.forEach(assigneeEm => {
-          const existingMatch = Object.keys(currentProgress).find(k => normalizeEmailKey(k) === assigneeEm);
-          if (!existingMatch) {
-            const u = usersData.find(usr => normalizeEmailKey(usr.email) === assigneeEm);
-            currentProgress[assigneeEm] = {
-              name: u?.name || assigneeEm,
-              role: u?.role || data.role || 'colaborador',
-              sede: u?.sede || data.assignedSede || 'Global',
-              completed: data.completed === true,
-              completedAt: data.completed === true ? (data.completedAt || null) : null,
-              progress: data.completed === true ? 100 : 0
-            };
-          }
-        });
-
         const targetKey = Object.keys(currentProgress).find(k => normalizeEmailKey(k) === em) || em;
         const userObj = usersData.find(u => normalizeEmailKey(u.email) === em);
         const prevEntry = currentProgress[targetKey] || {
           name: currentUser?.displayName || currentUser?.name || userObj?.name || em,
           role: currentUser?.appRole || userObj?.role || 'colaborador',
-          sede: currentUser?.sede || userObj?.sede || 'Global'
+          sede: currentUser?.sede || userObj?.sede || 'Global',
+          completed: data.completed === true,
+          progress: data.completed === true ? 100 : 0
         };
 
         const nowIso = new Date().toISOString();
@@ -1456,12 +1472,13 @@ export function ChecklistProvider({ children }) {
           progress: nextProgVal
         };
 
-        const allKeys = Object.keys(currentProgress);
-        const allCompleted = allKeys.length > 0 && allKeys.every(k => currentProgress[k].completed === true || currentProgress[k].progress === 100);
-        const anyCompleted = allKeys.some(k => currentProgress[k].completed === true || currentProgress[k].progress > 0);
-        const totalItems = allKeys.length;
-        const sumProgress = allKeys.reduce((acc, k) => {
-          const item = currentProgress[k];
+        const progressEntries = [...new Set([...formalAssignees, ...Object.keys(currentProgress).map(normalizeEmailKey)])]
+          .map(key => currentProgress[Object.keys(currentProgress).find(k => normalizeEmailKey(k) === key)] ||
+            { completed: data.completed === true, progress: data.completed === true ? 100 : 0 });
+        const allCompleted = progressEntries.length > 0 && progressEntries.every(item => item.completed === true || item.progress === 100);
+        const anyCompleted = progressEntries.some(item => item.completed === true || item.progress > 0);
+        const totalItems = progressEntries.length;
+        const sumProgress = progressEntries.reduce((acc, item) => {
           const val = typeof item.progress === 'number' ? item.progress : (item.completed ? 100 : 0);
           return acc + val;
         }, 0);
@@ -1469,6 +1486,9 @@ export function ChecklistProvider({ children }) {
         const previousCompleted = data.completed === true || data.status === 'Completada';
         const completionTransition = !previousCompleted && allCompleted;
         const reopenTransition = previousCompleted && !allCompleted;
+        const individualWasCompleted = isTaskClosedForDelivery(prevEntry);
+        const individualTransition = individualWasCompleted !== isCompleted;
+        const eventScope = individualTransition ? { assigneeEmail: targetKey } : {};
         const nextPayload = {
           assigneeProgress: currentProgress,
           completed: allCompleted,
@@ -1476,18 +1496,25 @@ export function ChecklistProvider({ children }) {
           progressPercentage: overallPercent,
           progress: overallPercent,
           completedAt: allCompleted ? (data.completedAt || nowIso) : null,
-          updatedAt: nowIso
+          updatedAt: nowIso,
+          lifecycleMutation: {
+            eventId,
+            scope: eventScope,
+            mapScope: { assigneeEmail: targetKey }
+          }
         };
 
         transaction.update(taskRef, nextPayload);
-        if (completionTransition || reopenTransition) {
+        if (individualTransition || completionTransition || reopenTransition) {
           transaction.set(doc(db, 'task_completion_events', eventId), {
             taskId,
-            action: reopenTransition ? 'reopened' : 'completed',
+            action: individualTransition
+              ? (isCompleted ? 'completed' : 'reopened')
+              : (reopenTransition ? 'reopened' : 'completed'),
             actorEmail: String(currentUser?.email || auth.currentUser?.email || '').trim().toLowerCase(),
-            occurredAt: nowIso,
+            occurredAt: serverTimestamp(),
             source: 'manual',
-            scope: {}
+            scope: eventScope
           });
         }
         return nextPayload;

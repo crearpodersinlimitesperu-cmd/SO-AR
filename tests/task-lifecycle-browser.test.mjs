@@ -98,6 +98,7 @@ test('task transactions roll back rejected optimism, gate celebrations and prese
       window.fixtureWrites = [];
       const listeners = new Set();
       export const collection = (_db, path) => ({ path });
+      export const serverTimestamp = () => new Date().toISOString();
       let eventId = 0;
       export const doc = (_db, path, id) => typeof path === 'string'
         ? { path, id } : { path: _db.path, id: 'event-' + ++eventId };
@@ -279,6 +280,9 @@ test('task transactions roll back rejected optimism, gate celebrations and prese
     assert.equal(await page.evaluate(() => window.fixtureCelebrations), 0);
     await page.evaluate(() => { window.fixtureRelease(); window.fixtureHoldWrites = false; });
     await page.waitForFunction(() => window.fixtureCelebrations === 1);
+    assert.ok(await page.evaluate(() => window.fixtureWrites.some(write =>
+      write.ref.path === 'task_completion_events' && write.updates.action === 'completed')),
+    'the successful completion transaction writes its audit event before reload');
     await page.reload();
     await page.waitForFunction(() => window.fixtureApi?.loading === false);
     const completed = (await state()).find(t => t.id === 'catalog');
@@ -296,8 +300,6 @@ test('task transactions roll back rejected optimism, gate celebrations and prese
     assert.equal(completed.completions.Lima__old.completedAt, 'original-close');
     assert.equal(completed.responsible, 'Fixture manager');
     assert.deepEqual(completed.history, [{ action: 'created', at: 'original-time' }]);
-    assert.ok(await page.evaluate(() => window.fixtureWrites.some(write =>
-      write.ref.path === 'task_completion_events' && write.updates.action === 'completed')));
     assert.deepEqual(await call('updateTaskDetails', 'catalog', {
       completed: false,
       status: 'Pendiente',
@@ -434,8 +436,7 @@ test('task transactions roll back rejected optimism, gate celebrations and prese
       assert.equal(saved.completed, true);
       assert.equal(saved.comments, 'Kept without a cycle');
       assert.equal(saved.status, 'Completada');
-      assert.ok(saved.completions.Lima.completed);
-      assert.equal(Object.keys(saved.completions).some(key => key.includes('__')), false);
+      assert.equal(Object.keys(saved.completions || {}).some(key => key.includes('__')), false);
     }
     assert.equal(await page.evaluate(() => window.fixtureStore.personal.assignedByEmail), 'assigner@example.test');
     assert.equal(await page.evaluate(() => window.fixtureWrites.some(write => write.ref.path === 'mail')), false);

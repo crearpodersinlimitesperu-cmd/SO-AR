@@ -13,6 +13,7 @@ import {
   getDocs,
   query,
   runTransaction,
+  serverTimestamp,
   setDoc,
   updateDoc,
   where
@@ -262,6 +263,7 @@ test('catalog completion transaction records an immutable lifecycle event', asyn
       completed: true,
       status: 'Completada',
       progressPercentage: 100,
+      lifecycleMutation: { eventId: 'close-event', scope: { sede: 'Lima', cycleId: 'cycle-1' } },
       completions: {
         'Lima__cycle-1': {
           completed: true,
@@ -278,7 +280,7 @@ test('catalog completion transaction records an immutable lifecycle event', asyn
       taskId: 'soar_12',
       action: 'completed',
       actorEmail: 'coord@example.com',
-      occurredAt: completedAt,
+      occurredAt: serverTimestamp(),
       source: 'manual',
       scope: { sede: 'Lima', cycleId: 'cycle-1' }
     });
@@ -288,7 +290,7 @@ test('catalog completion transaction records an immutable lifecycle event', asyn
     taskId: 'soar_12',
     action: 'completed',
     actorEmail: 'other@example.com',
-    occurredAt: completedAt,
+    occurredAt: serverTimestamp(),
     source: 'manual',
     scope: { sede: 'Lima', cycleId: 'cycle-1' }
   }));
@@ -309,13 +311,14 @@ test('cycle-scoped manual reopening is auditable without closing another cycle',
   const db = coordinatorDb();
   await assertSucceeds(runTransaction(db, async transaction => {
     transaction.update(doc(db, 'tasks', 'soar_12'), {
-      'completions.Lima__cycle-1': { completed: false, status: 'Pendiente', cycleId: 'cycle-1' }
+      'completions.Lima__cycle-1': { completed: false, status: 'Pendiente', cycleId: 'cycle-1' },
+      lifecycleMutation: { eventId: 'reopen-cycle-1', scope: { sede: 'Lima', cycleId: 'cycle-1' } }
     });
     transaction.set(doc(db, 'task_completion_events', 'reopen-cycle-1'), {
       taskId: 'soar_12',
       action: 'reopened',
       actorEmail: 'coord@example.com',
-      occurredAt: new Date().toISOString(),
+      occurredAt: serverTimestamp(),
       source: 'manual',
       scope: { sede: 'Lima', cycleId: 'cycle-1' }
     });
@@ -337,7 +340,7 @@ test('cycle-scoped manual reopening is auditable without closing another cycle',
       taskId: 'soar_12',
       action: 'reopened',
       actorEmail: 'other-coordinator@example.com',
-      occurredAt: new Date().toISOString(),
+      occurredAt: serverTimestamp(),
       source: 'manual',
       scope: { sede: 'Lima', cycleId: 'cycle-1' }
     });
@@ -355,19 +358,83 @@ test('a personal task owner can explicitly reopen it with an immutable audit eve
     completedAt: 'recorded-close'
   }]);
   const ownerDb = userDb('owner', 'owner@example.com');
-  const occurredAt = new Date().toISOString();
-
+  await assertFails(updateDoc(doc(ownerDb, 'tasks', 'custom_closed'), {
+    completed: false, status: 'Pendiente', completedAt: null
+  }));
+  await assertFails(updateDoc(doc(ownerDb, 'tasks', 'custom_closed'), {
+    completedAt: 'forged-close-time'
+  }));
+  await assertSucceeds(updateDoc(doc(ownerDb, 'tasks', 'custom_closed'), { notes: 'Additional evidence' }));
   await assertSucceeds(runTransaction(ownerDb, async transaction => {
     transaction.update(doc(ownerDb, 'tasks', 'custom_closed'), {
       completed: false,
       status: 'Pendiente',
-      completedAt: null
+      completedAt: null,
+      lifecycleMutation: { eventId: 'owner-reopen', scope: {} }
+    });
+
+    test('direct catalog/cycle and assignee reopen writes fail without a fresh matching event', async () => {
+      await seedTasks([{
+        id: 'soar_12', role: 'coord_c1', isCustom: false,
+        completed: false,
+        completions: {
+          'Lima__one': { completed: true, completedAt: 'recorded-one' },
+          'Lima__two': { completed: false }
+        }
+      }, {
+        id: 'custom_individual', isCustom: true,
+        assignedToEmails: ['owner@example.com', 'other@example.com'],
+        createdBy: 'owner@example.com', completed: false,
+        assigneeProgress: {
+          'owner@example.com': { completed: true, progress: 100, completedAt: 'recorded-owner' },
+          'other@example.com': { completed: false, progress: 0 }
+        }
+      }]);
+      const db = coordinatorDb();
+      await assertFails(updateDoc(doc(db, 'tasks', 'soar_12'), {
+        'completions.Lima__one': { completed: false }
+      }));
+      await assertFails(updateDoc(doc(db, 'tasks', 'soar_12'), { completions: {} }));
+      await assertSucceeds(updateDoc(doc(db, 'tasks', 'soar_12'), {
+        'completions.Lima__two': { completed: true },
+        lifecycleMutation: { eventId: 'not-a-reopen', scope: { sede: 'Lima', cycleId: 'two' } }
+      }));
+      const owner = userDb('owner', 'owner@example.com');
+      await assertFails(updateDoc(doc(owner, 'tasks', 'custom_individual'), {
+        assigneeProgress: { 'owner@example.com': { completed: false }, 'other@example.com': { completed: false } }
+      }));
+      await assertFails(runTransaction(owner, async transaction => {
+        transaction.update(doc(owner, 'tasks', 'custom_individual'), {
+          assigneeProgress: {
+            'owner@example.com': { completed: false, progress: 0 },
+            'other@example.com': { completed: false, progress: 0 }
+          },
+          lifecycleMutation: { eventId: 'forged-time', scope: { assigneeEmail: 'owner@example.com' } }
+        });
+        transaction.set(doc(owner, 'task_completion_events', 'forged-time'), {
+          taskId: 'custom_individual', action: 'reopened', actorEmail: 'owner@example.com',
+          source: 'manual', scope: { assigneeEmail: 'owner@example.com' }, occurredAt: 'arbitrary-string'
+        });
+      }));
+      await assertSucceeds(runTransaction(owner, async transaction => {
+        transaction.update(doc(owner, 'tasks', 'custom_individual'), {
+          assigneeProgress: {
+            'owner@example.com': { completed: false, progress: 0 },
+            'other@example.com': { completed: false, progress: 0 }
+          },
+          lifecycleMutation: { eventId: 'individual-reopen', scope: { assigneeEmail: 'owner@example.com' } }
+        });
+        transaction.set(doc(owner, 'task_completion_events', 'individual-reopen'), {
+          taskId: 'custom_individual', action: 'reopened', actorEmail: 'owner@example.com',
+          source: 'manual', scope: { assigneeEmail: 'owner@example.com' }, occurredAt: serverTimestamp()
+        });
+      }));
     });
     transaction.set(doc(ownerDb, 'task_completion_events', 'owner-reopen'), {
       taskId: 'custom_closed',
       action: 'reopened',
       actorEmail: 'owner@example.com',
-      occurredAt,
+      occurredAt: serverTimestamp(),
       source: 'manual',
       scope: {}
     });

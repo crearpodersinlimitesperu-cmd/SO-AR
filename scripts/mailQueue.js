@@ -1,10 +1,14 @@
 import { createHash } from 'node:crypto';
+import { SUPER_ADMIN_EMAILS } from '../src/config/permissions.js';
 import {
   hasAmbiguousCycleCompletionScope,
   isTaskClosedForDelivery
 } from '../src/utils/taskLifecycle.js';
 
 export const MAX_MAIL_ATTEMPTS = 3;
+export const DAILY_TASK_MAIL_ATTEMPTS = 30;
+export const DAILY_USER_MAIL_ATTEMPTS = 20;
+export const DAILY_TASK_USER_MAIL_ATTEMPTS = 6;
 export const MAIL_CLAIM_LEASE_MS = 10 * 60 * 1000;
 export const MAIL_RETRY_DELAY_MS = 5 * 60 * 1000;
 const STALE_ALERT_TYPES = new Set(['task_overdue_assigner_alert', 'task_completed_alert']);
@@ -148,6 +152,61 @@ export async function claimPendingMail(db, ref, now = Date.now()) {
         'delivery.reason': STALE_REASON
       });
       return { data, state: action };
+    }
+
+    if (taskBound) {
+      const recipients = [...new Set([
+        ...(Array.isArray(data.to) ? data.to : typeof data.to === 'string' ? [data.to] : []),
+        ...(Array.isArray(data.cc) ? data.cc : typeof data.cc === 'string' ? [data.cc] : []),
+        ...(Array.isArray(data.bcc) ? data.bcc : typeof data.bcc === 'string' ? [data.bcc] : []),
+        ...(data.recipientEmail ? [data.recipientEmail] : [])
+      ].map(value => String(value).trim().toLowerCase()).filter(Boolean))];
+      const day = new Date(now).toISOString().slice(0, 10);
+      const budgets = [
+        { kind: 'task', subject: taskId, limit: DAILY_TASK_MAIL_ATTEMPTS },
+        ...recipients.flatMap(recipient => [
+          { kind: 'user', subject: recipient, limit: DAILY_USER_MAIL_ATTEMPTS },
+          { kind: 'task_user', subject: `${taskId}|${recipient}`, limit: DAILY_TASK_USER_MAIL_ATTEMPTS }
+        ])
+      ].map(budget => {
+        const id = createTaskMailId(budget.subject, budget.kind, '', day);
+        return { ...budget, id, ref: db.collection('mail_delivery_budgets').doc(id) };
+      });
+      const snapshots = await Promise.all(budgets.map(budget => transaction.get(budget.ref)));
+      const counts = snapshots.map(snapshot => snapshot.exists ? snapshot.data().attemptCount || 0 : 0);
+      const exceeded = budgets.findIndex((budget, index) => counts[index] >= budget.limit);
+      if (exceeded !== -1) {
+        const budget = budgets[exceeded];
+        const alreadyAlerted = snapshots[exceeded].data()?.alerted === true;
+        if (!alreadyAlerted) {
+          for (const adminEmail of SUPER_ADMIN_EMAILS) {
+            const alertId = createTaskMailId(budget.id, 'mail_anomaly', adminEmail, day);
+            transaction.set(db.collection('notifications').doc(alertId), {
+              userId: adminEmail,
+              type: 'MAIL_DELIVERY_ANOMALY',
+              title: 'Control de correo: limite diario alcanzado',
+              message: `Se detuvieron intentos por presupuesto ${budget.kind}. Referencia: ${budget.id}. Revision manual requerida.`,
+              read: false,
+              created_at: new Date(now).toISOString()
+            });
+          }
+          transaction.set(budget.ref, {
+            attemptCount: counts[exceeded], kind: budget.kind, day,
+            alerted: true, alertedAt: new Date(now).toISOString()
+          });
+        }
+        transaction.update(ref, {
+          'delivery.state': 'SKIPPED_RATE_LIMIT',
+          'delivery.endTime': new Date(now).toISOString(),
+          'delivery.budgetId': budget.id,
+          'delivery.reason': 'Limite diario de intentos alcanzado; alerta interna registrada para administradores.'
+        });
+        return { data, state: 'SKIPPED_RATE_LIMIT' };
+      }
+      budgets.forEach((budget, index) => transaction.set(budget.ref, {
+        attemptCount: counts[index] + 1, kind: budget.kind, day,
+        updatedAt: new Date(now).toISOString()
+      }));
     }
 
     const attempts = Number.isInteger(data.delivery?.attemptCount) ? data.delivery.attemptCount : 0;

@@ -67,7 +67,7 @@ jobs:
           LIMA_GMAIL_PASS: ${{ secrets.LIMA_GMAIL_PASS }}
           VERIFY_COMMUNICATION_ID: ${{ inputs.communication_id }}
         run: |
-          node scripts/assignInsuranceTaskAndMail.mjs || echo "Aviso: assignInsuranceTaskAndMail completado con observaciones"
+          node scripts/assignInsuranceTaskAndMail.mjs
           node scripts/mailerDaemon.js --one-shot
 
       - name: 🗑️ Borrar la llave del runner
