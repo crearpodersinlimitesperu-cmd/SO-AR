@@ -29,7 +29,13 @@ test('actual task context persists location, updates reminders and reads links; 
       const listeners = new Set();
       let nextId = 0;
       window.fixtureStore = store;
+      window.fixtureTask = id => ({ ...store.get('tasks/' + id), assigneeProgress: {
+        ...(store.get('tasks/' + id)?.assigneeProgress || {}),
+        ...Object.fromEntries([...store].filter(([key]) => key.startsWith('tasks/' + id + '/participant_states/'))
+          .map(([key, record]) => [key.split('/').at(-1), record.state]))
+      } });
       export const collection = (_db, path) => ({ path });
+      export const serverTimestamp = () => new Date().toISOString();
       export const doc = (_db, path, id) => {
         if (_db?.path) return { path: _db.path, id: path || 'fixture_' + ++nextId };
         return { path, id: id || 'fixture_' + ++nextId };
@@ -39,7 +45,7 @@ test('actual task context persists location, updates reminders and reads links; 
       export const orderBy = () => ({});
       export const limit = () => ({});
       const snapshot = ref => {
-        const docs = [...store].filter(([key]) => key.startsWith(ref.path + '/'))
+        const docs = [...store].filter(([key]) => key.startsWith(ref.path + '/') && !key.slice(ref.path.length + 1).includes('/'))
           .map(([key, data]) => ({ id: key.split('/').at(-1), data: () => data }));
         return { docs, empty: !docs.length, forEach: fn => docs.forEach(fn) };
       };
@@ -50,7 +56,7 @@ test('actual task context persists location, updates reminders and reads links; 
       };
       export const getDoc = async ref => ({
         id: ref.id, exists: () => store.has(ref.path + '/' + ref.id),
-        data: () => store.get(ref.path + '/' + ref.id)
+        data: () => structuredClone(store.get(ref.path + '/' + ref.id))
       });
       export const getDocs = async ref => snapshot(ref);
       export const writeBatch = () => {
@@ -71,7 +77,13 @@ test('actual task context persists location, updates reminders and reads links; 
       export const setDoc = async () => { throw new Error('Unexpected direct write'); };
       export const updateDoc = setDoc;
       export const addDoc = setDoc;
-      export const runTransaction = setDoc;
+      export const runTransaction = async (_db, callback) => {
+        const batch = writeBatch();
+        const result = await callback({ get: getDoc, set: batch.set, update: batch.update });
+        await batch.commit();
+        return result;
+      };
+      window.fixturePublish = () => listeners.forEach(listener => listener());
     `
   };
   const server = await createServer({
@@ -102,6 +114,7 @@ test('actual task context persists location, updates reminders and reads links; 
             const [open, setOpen] = useState(true);
             const [editing, setEditing] = useState(null);
             const [detail, setDetail] = useState(null);
+            window.fixtureOpenDetail = setDetail;
             const task = api.tasks.find(task => task.isCustom);
             window.fixtureResolveLink = async user => resolveTaskLink(task.id, [], user, async id => window.fixtureStore.get('tasks/' + id));
             return <>
@@ -202,6 +215,121 @@ test('actual task context persists location, updates reminders and reads links; 
     assert.match(cleared.mail.message.html, /Ubicación no declarada/);
     assert.doesNotMatch(cleared.mail.message.html, /Sala B/);
     assert.match(cleared.notification.message, /Ubicación no declarada/);
+
+    await page.evaluate(() => {
+      const task = {
+        id: 'custom_legacy_multi', isCustom: true, task: 'Legacy shared task',
+        createdBy: 'owner@example.test', assignedByEmail: 'owner@example.test',
+        assignedToEmails: ['owner@example.test', 'recipient@example.test'],
+        completed: false, status: 'Pendiente', progressPercentage: 0,
+        comments: 'Existing note',
+        assigneeProgress: {
+          'owner@example.test': { completed: false },
+          'recipient@example.test': { completed: false }
+        }
+      };
+      window.fixtureStore.set('tasks/' + task.id, task);
+      window.fixturePublish();
+      window.fixtureOpenDetail(task);
+    });
+    await page.waitForFunction(() => document.body.innerText.includes('Legacy shared task'));
+    const saveModal = () => page.evaluate(() => {
+      const button = [...document.querySelectorAll('button')].find(node => node.textContent.includes('Guardar Avances'));
+      if (!button) throw new Error('Missing real task modal save button');
+      button.click();
+    });
+    await saveModal();
+    await page.waitForFunction(() => window.fixtureStore.get('tasks/custom_legacy_multi')?.lastUpdated);
+    let legacy = await page.evaluate(() => window.fixtureStore.get('tasks/custom_legacy_multi'));
+    assert.deepEqual(legacy.assigneeProgress, {
+      'owner@example.test': { completed: false },
+      'recipient@example.test': { completed: false }
+    }, 'saving the real modal does not persist synthesized metadata for either legacy participant');
+    assert.equal(legacy.completed, false);
+    await page.evaluate(() => {
+      window.fixtureOpenDetail({ ...window.fixtureStore.get('tasks/custom_legacy_multi') });
+    });
+    await page.waitForFunction(() => [...document.querySelectorAll('button')].some(button => button.textContent.trim() === '50%'));
+    await page.evaluate(() => [...document.querySelectorAll('button')].find(button => button.textContent.trim() === '50%').click());
+    await saveModal();
+    await page.waitForFunction(() => window.fixtureTask('custom_legacy_multi')?.assigneeProgress['owner@example.test']?.progress === 50);
+    legacy = await page.evaluate(() => window.fixtureTask('custom_legacy_multi'));
+    assert.equal(legacy.completed, false);
+    assert.deepEqual(legacy.assigneeProgress['recipient@example.test'], { completed: false },
+      'legitimate progress preserves the other participant exactly');
+    assert.notEqual((await page.evaluate(() => window.fixtureToast)).type, 'error');
+
+    await page.evaluate(() => {
+      const emails = Array.from({ length: 14 }, (_, i) => i === 0 ? 'owner@example.test' : `member${i}@example.test`);
+      const task = {
+        id: 'custom_large_multi', isCustom: true, task: 'Large shared task',
+        createdBy: 'owner@example.test', assignedByEmail: 'owner@example.test',
+        assignedToEmails: emails, completed: false, status: 'Pendiente', progressPercentage: 0,
+        comments: 'Existing note',
+        assigneeProgress: Object.fromEntries(emails.map((email, i) => [email, i === 3
+          ? { completed: true, progress: 100, completedAt: 'recorded-close' }
+          : { completed: false }])),
+        closedAssigneeKeys: ['member3@example.test']
+      };
+      window.fixtureStore.set('tasks/' + task.id, task);
+      window.fixturePublish();
+      window.fixtureOpenDetail(task);
+    });
+    await page.waitForFunction(() => document.body.innerText.includes('Large shared task'));
+    await page.type('textarea[placeholder^="Escribe un avance"]', 'A note for the 14-participant task');
+    await page.evaluate(() => [...document.querySelectorAll('button')]
+      .find(button => button.textContent.includes('Registrar Avance')).click());
+    await saveModal();
+    await page.waitForFunction(() => window.fixtureStore.get('tasks/custom_large_multi')?.lastUpdated);
+    const large = await page.evaluate(() => window.fixtureStore.get('tasks/custom_large_multi'));
+    assert.deepEqual(large.assigneeProgress['member3@example.test'],
+      { completed: true, progress: 100, completedAt: 'recorded-close' },
+      'a note save on a 14-participant task preserves the closed participant exactly');
+    assert.deepEqual(large.closedAssigneeKeys, ['member3@example.test']);
+    assert.equal(large.comments, 'A note for the 14-participant task');
+    assert.notEqual((await page.evaluate(() => window.fixtureToast)).type, 'error');
+    await page.evaluate(() => window.fixtureOpenDetail({ ...window.fixtureStore.get('tasks/custom_large_multi') }));
+    await page.waitForFunction(() => [...document.querySelectorAll('button')].some(button => button.textContent.trim() === '50%'));
+    await page.evaluate(() => [...document.querySelectorAll('button')].find(button => button.textContent.trim() === '50%').click());
+    await saveModal();
+    await page.waitForFunction(() => window.fixtureTask('custom_large_multi')?.assigneeProgress['owner@example.test']?.progress === 50);
+    const advancedLarge = await page.evaluate(() => window.fixtureTask('custom_large_multi'));
+    assert.deepEqual(advancedLarge.assigneeProgress['member3@example.test'], large.assigneeProgress['member3@example.test']);
+    for (const [email, entry] of Object.entries(large.assigneeProgress)) {
+      if (email !== 'owner@example.test') assert.deepEqual(advancedLarge.assigneeProgress[email], entry);
+    }
+
+    await page.evaluate(() => {
+      const task = {
+        id: 'custom_legacy_status', isCustom: true, task: 'Legacy status participant',
+        createdBy: 'owner@example.test', assignedToEmails: ['owner@example.test', 'recipient@example.test'],
+        completed: false, progressPercentage: 55,
+        assigneeProgress: {
+          'owner@example.test': { status: 'Completada', progressPercentage: 100 },
+          'recipient@example.test': { progress: 10 }
+        }
+      };
+      window.fixtureStore.set('tasks/' + task.id, task);
+      window.fixturePublish();
+      window.fixtureOpenDetail(task);
+    });
+    await page.waitForFunction(() => document.body.innerText.includes('Legacy status participant'));
+    await saveModal();
+    assert.deepEqual(await page.evaluate(() =>
+      window.fixtureTask('custom_legacy_status').assigneeProgress['owner@example.test']),
+    { status: 'Completada', progressPercentage: 100 }, 'ordinary modal saves preserve status-only closure without invented dates');
+    await page.evaluate(() => window.fixtureOpenDetail(window.fixtureTask('custom_legacy_status')));
+    await page.waitForFunction(() => [...document.querySelectorAll('button')].some(button => button.textContent.includes('Reabrir Mi Parte')));
+    await page.evaluate(() => [...document.querySelectorAll('button')].find(button => button.textContent.includes('Reabrir Mi Parte')).click());
+    await saveModal();
+    await page.waitForFunction(() =>
+      window.fixtureTask('custom_legacy_status').assigneeProgress['owner@example.test'].status === 'Pendiente');
+    const manuallyReopened = await page.evaluate(() => window.fixtureTask('custom_legacy_status'));
+    assert.equal(manuallyReopened.assigneeProgress['owner@example.test'].progressPercentage, 0);
+    assert.deepEqual(manuallyReopened.assigneeProgress['recipient@example.test'], { progress: 10 });
+    assert.equal(await page.evaluate(() => [...window.fixtureStore.entries()].some(([path, event]) =>
+      path.startsWith('task_completion_events/') && event.taskId === 'custom_legacy_status' &&
+      event.action === 'reopened' && event.scope.assigneeEmail === 'owner@example.test')), true);
 
     const failed = await page.evaluate(async () => {
       window.fixtureRejectWrite = true;

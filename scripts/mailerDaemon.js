@@ -4,7 +4,21 @@ import sanitizeHtml from 'sanitize-html';
 import { initializeApp, cert } from 'firebase-admin/app';
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 import { readFileSync, existsSync } from 'fs';
-import { claimPendingMail, selectMailAction, STALE_REASON } from './mailQueue.js';
+import {
+  claimPendingMail,
+  createTaskMailId,
+  enqueueOverdueTaskMails,
+  recordMailFailure,
+  recordMailSuccess,
+  recordMailUnknown,
+  selectMailAction,
+  skipTaskMailIfClosed,
+  STALE_REASON
+} from './mailQueue.js';
+import {
+  hasAmbiguousCycleCompletionScope,
+  isTaskClosedForDelivery
+} from '../src/utils/taskLifecycle.js';
 
 dotenv.config();
 
@@ -48,6 +62,10 @@ if (process.env.LIMA_GMAIL_USER && process.env.LIMA_GMAIL_PASS) {
 }
 
 const isOneShot = process.argv.includes('--one-shot');
+
+const isDefinitiveMailFailure = error =>
+  (Number.isInteger(error?.responseCode) && error.responseCode >= 400 && error.responseCode <= 599) ||
+  ['ECONNECTION', 'ECONNREFUSED', 'ENOTFOUND'].includes(error?.code);
 
 // --- 2.1 GENERACIÓN DE INVITACIÓN DE CALENDARIO (.ics) ---
 const DEFAULT_EVENT_DURATION_MIN = 30;
@@ -103,20 +121,21 @@ function buildIcsAttachment(calendarEvent) {
 async function processMailDoc(docSnap) {
   const claim = await claimPendingMail(db, docSnap.ref);
   if (!claim) return null;
-  if (claim.state === 'SKIPPED_STALE') {
-    console.log(`⏭️ SKIPPED_STALE doc=${docSnap.id}: ${STALE_REASON}`);
+  if (claim.state !== 'SENDING') {
+    const detail = claim.state === 'SKIPPED_STALE' ? `: ${STALE_REASON}` : '';
+    console.log(`⏭️ ${claim.state} doc=${docSnap.id}${detail}`);
     return claim.state;
   }
   console.log(`📬 SENDING doc=${docSnap.id} previousState=${claim.data.delivery?.state || 'UNSET'}`);
   try {
     return await sendClaimedMail(docSnap, claim.data);
   } catch (error) {
-    console.error(`❌ Error procesando correo doc=${docSnap.id}:`, error.message);
-    await docSnap.ref.update({
-      'delivery.state': 'ERROR',
-      'delivery.error': error.message,
-      'delivery.endTime': new Date().toISOString()
-    });
+    if (error.smtpAttempted) {
+      console.error(`⚠️ DELIVERY_UNKNOWN doc=${docSnap.id}: no se pudo persistir el resultado SMTP.`);
+      return 'DELIVERY_UNKNOWN';
+    }
+    console.error(`❌ Error procesando correo doc=${docSnap.id}:`, error.code || 'MAIL_PROCESSING_ERROR');
+    await recordMailFailure(db, docSnap.ref, error);
     return 'ERROR';
   }
 }
@@ -127,8 +146,9 @@ async function sendClaimedMail(docSnap, data) {
 
   if (rawRecipients.length === 0) {
     console.warn(`⚠️ Documento de correo sin destinatario válido (doc ${docSnap.id})`);
-    await db.collection('mail').doc(docSnap.id).update({
+    await docSnap.ref.update({
       'delivery.state': 'REJECTED',
+      'delivery.endTime': new Date().toISOString(),
       reason: 'Documento de correo sin campo "to" válido'
     });
     return 'REJECTED';
@@ -180,8 +200,9 @@ async function sendClaimedMail(docSnap, data) {
   }
 
   if (validRecipients.length === 0) {
-    await db.collection('mail').doc(docSnap.id).update({
+    await docSnap.ref.update({
       'delivery.state': 'REJECTED',
+      'delivery.endTime': new Date().toISOString(),
       reason: 'Ningún destinatario pertenece a un usuario registrado'
     });
     return 'REJECTED';
@@ -235,11 +256,31 @@ async function sendClaimedMail(docSnap, data) {
     mailOptions.icalEvent = { method: 'PUBLISH', filename: icsAttachment.filename, content: icsAttachment.content };
   }
 
-  await currentTransporter.sendMail(mailOptions);
-  await docSnap.ref.update({
-    'delivery.state': 'SUCCESS',
-    'delivery.endTime': new Date().toISOString()
-  });
+  const skippedState = await skipTaskMailIfClosed(db, docSnap.ref, data, validRecipients);
+  if (skippedState) return skippedState;
+
+  try {
+    await currentTransporter.sendMail(mailOptions);
+  } catch (error) {
+    try {
+      if (isDefinitiveMailFailure(error)) {
+        await recordMailFailure(db, docSnap.ref, error);
+        return 'ERROR';
+      }
+      await recordMailUnknown(db, docSnap.ref, error);
+      return 'DELIVERY_UNKNOWN';
+    } catch (persistenceError) {
+      persistenceError.smtpAttempted = true;
+      throw persistenceError;
+    }
+  }
+  try {
+    const persisted = await recordMailSuccess(db, docSnap.ref);
+    if (!persisted) return 'DELIVERY_UNKNOWN';
+  } catch (error) {
+    console.error(`⚠️ DELIVERY_UNKNOWN doc=${docSnap.id}: SMTP aceptó el correo pero Firestore no confirmó el estado.`);
+    return 'DELIVERY_UNKNOWN';
+  }
   console.log(`✅ SUCCESS doc=${docSnap.id} communicationId=${data.communicationId || 'UNSET'}`);
   return 'SUCCESS';
 }
@@ -285,8 +326,8 @@ async function processPendingMails() {
         throw new Error('El comunicado solicitado no tiene todos sus correos en SUCCESS');
       }
     }
-    if (isOneShot && outcomes.ERROR) {
-      throw new Error(`${outcomes.ERROR} correos terminaron en ERROR`);
+    if (isOneShot && (outcomes.ERROR || outcomes.DELIVERY_UNKNOWN)) {
+      throw new Error(`${outcomes.ERROR || 0} correos terminaron en ERROR; ${outcomes.DELIVERY_UNKNOWN || 0} requieren conciliacion manual`);
     }
   } catch (e) {
     console.error("Error al procesar lote de correos:", e.message);
@@ -421,17 +462,26 @@ async function checkOverdueTaskReminders() {
 
     for (const docSnap of tasksSnap.docs) {
       const data = docSnap.data();
-      const isDone = data.completed === true || data.status === 'Completada';
-      if (isDone) continue;
+      const cycleId = data.quitoCycleId || data.cycleId;
+      const completionScope = cycleId && (data.sede || data.assignedSede)
+        ? { sede: data.sede || data.assignedSede, cycleId }
+        : undefined;
+      if (isTaskClosedForDelivery(data, { completionScope })) continue;
       if (!data.deadline) continue;
 
-      const deadlineDate = new Date(data.deadline);
+      const deadlineDate = data.deadline?.toDate
+        ? data.deadline.toDate()
+        : new Date(data.deadline);
       if (isNaN(deadlineDate.getTime())) continue;
       if (deadlineDate >= now) continue; // aún no vence
 
-      const emails = Array.isArray(data.assignedToEmails) && data.assignedToEmails.length > 0
+      const rawEmails = Array.isArray(data.assignedToEmails) && data.assignedToEmails.length > 0
         ? data.assignedToEmails
         : (data.assignedToEmail ? [data.assignedToEmail] : []);
+      const emails = [...new Map(rawEmails
+        .map(email => String(email || '').trim())
+        .filter(Boolean)
+        .map(email => [email.toLowerCase(), email])).values()];
       if (emails.length === 0) continue; // tarea sin asignación directa
 
       const lastReminderDate = data.lastReminderAt?.toDate
@@ -450,8 +500,8 @@ async function checkOverdueTaskReminders() {
       const priority = data.priority || 'Normal';
       const notes = data.notes || '';
       const deadlineFormatted = formatDeadlineEsLocal(data.deadline);
-
-      console.log(`⚡ Llamado a la Causa por compromiso fuera de tiempo: "${taskTitle}" (${docSnap.id}). Notificando a: ${emails.join(', ')}`);
+      const reminderBucket = Math.floor((now.getTime() - deadlineDate.getTime()) / (REMINDER_DEBOUNCE_HOURS * 60 * 60 * 1000));
+      const mailEntries = [];
 
       for (const email of emails) {
         // Intentar obtener el nombre del líder desde user_profiles si no viene en la tarea
@@ -467,9 +517,17 @@ async function checkOverdueTaskReminders() {
         }
         const cleanName = recipientName ? recipientName.trim() : 'Líder';
 
-        await db.collection('mail').add({
-          to: [email],
-          message: {
+        const normalizedEmail = email.toLowerCase().trim();
+        mailEntries.push({
+          id: createTaskMailId(docSnap.id, 'task_reminder', normalizedEmail, reminderBucket),
+          data: {
+            to: [email],
+            type: 'task_reminder',
+            taskId: docSnap.id,
+            recipientEmail: normalizedEmail,
+            ...(completionScope ? { completionScope } : {}),
+            delivery: { state: 'PENDING', attemptCount: 0 },
+            message: {
             subject: `⚡ LLAMADO A LA CAUSA: Compromiso pendiente por honrar — ${taskTitle}`,
             html: `
               <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1e293b; max-width: 620px; margin: 0 auto; border: 1px solid #cbd5e1; border-radius: 12px; overflow: hidden; background-color: #ffffff; box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);">
@@ -590,20 +648,25 @@ async function checkOverdueTaskReminders() {
 
               </div>
             `
-          },
-          createdAt: FieldValue.serverTimestamp()
+            },
+            createdAt: FieldValue.serverTimestamp()
+          }
         });
       }
 
       // Notificar también al asignador/creador de que la tarea asignada está fuera de plazo (vencida)
       const assignerEmail = (data.assignedByEmail || data.createdBy || '').toLowerCase().trim();
       if (assignerEmail && assignerEmail.includes('@') && !emails.map(e => e.toLowerCase().trim()).includes(assignerEmail)) {
-        console.log(`⚠️ Notificando al asignador (${assignerEmail}) sobre vencimiento de tarea: "${taskTitle}"`);
-        await db.collection('mail').add({
-          to: [assignerEmail],
-          type: 'task_overdue_assigner_alert',
-          delivery: { state: 'PENDING' },
-          message: {
+        mailEntries.push({
+          id: createTaskMailId(docSnap.id, 'task_overdue_assigner_alert', assignerEmail, reminderBucket),
+          data: {
+            to: [assignerEmail],
+            type: 'task_overdue_assigner_alert',
+            taskId: docSnap.id,
+            recipientEmail: assignerEmail,
+            ...(completionScope ? { completionScope } : {}),
+            delivery: { state: 'PENDING', attemptCount: 0 },
+            message: {
             subject: `⚠️ TAREA FUERA DE PLAZO: ${taskTitle} — Asignada a ${emails.join(', ')}`,
             html: `
               <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1e293b; max-width: 620px; margin: 0 auto; border: 1px solid #cbd5e1; border-radius: 12px; overflow: hidden; background-color: #ffffff; box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);">
@@ -676,17 +739,24 @@ async function checkOverdueTaskReminders() {
                 </div>
               </div>
             `
-          },
-          createdAt: FieldValue.serverTimestamp()
+            },
+            createdAt: FieldValue.serverTimestamp()
+          }
         });
       }
 
-      await db.collection('tasks').doc(docSnap.id).update({
-        lastReminderAt: FieldValue.serverTimestamp()
-      });
+      const queued = await enqueueOverdueTaskMails(
+        db,
+        docSnap.ref,
+        mailEntries,
+        now.getTime(),
+        FieldValue.serverTimestamp()
+      );
+      if (queued.queued) console.log(`📨 Recordatorios de tarea en cola: ${queued.queued}`);
     }
   } catch (error) {
-    console.error("❌ Error verificando tareas vencidas:", error.message);
+    console.error("❌ Error verificando tareas vencidas:", error.code || 'OVERDUE_TASK_QUEUE_ERROR');
+    if (isOneShot) throw error;
   }
 }
 

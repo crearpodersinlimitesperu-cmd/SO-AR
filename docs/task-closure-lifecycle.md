@@ -1,0 +1,119 @@
+# Cierre y entrega de tareas
+
+**Fecha de registro:** 2026-10-22
+**Responsable del cambio:** equipo de ingeniería/Copilot
+**Estado:** modelo canónico implementado y validado localmente; la aprobación requiere checks verdes del head exacto de la PR #178. Sin merge, despliegue, migración productiva ni SMTP real.
+
+## Diagnóstico y evidencia
+
+La investigación comenzó sobre `85fe653`, que ya contiene la PR #174; el último `origin/master` consultado por git fue `18fc645` (2026-10-22). #174 corrige el rollback de actualizaciones rechazadas y exige ciclo válido para escribir tareas de catálogo. No cubre el guardado ordinario del modal ni la entrega de correo. No se duplicaron las PR #166, #176 ni #177.
+
+Para resolver la actualización concurrente, `origin/master` se volvió a consultar y estaba en `024b8ad32dbc3f8b4ea6d96becf140c6c397481b`, con el arreglo de calendario global #180 además de #166/#177. Se integró sin reescribir commits en `3f39921b3ccef842be596ed43cb611a2e565c06a`. El único conflicto de contenido fue `package.json`: `test:persistence` conserva la regresión canónica nueva y `test:calendars` incorpora además freshness/global-render; Home combina calendario y lectura canónica, y Trainer conserva el nuevo paso calendar. La PR resultó `MERGEABLE`.
+
+La causa residual estaba en `src/components/TaskDetailModal.jsx` (`handleSaveAll`): el guardado de evidencia, notas o avance podía enviar `completed:false`, `status:'Pendiente'` y `completedAt:null` calculados a partir del progreso. Además, `ChecklistContext.editCustomTask` podía sustituir `assigneeProgress` por una plantilla con asignaciones en cero al editar y notificar por correo/in-app aunque la tarea estuviera cerrada. La ruta del botón explícito de alternancia es distinta; ahora su intención de reapertura se pasa por separado.
+
+`mailerDaemon.js` procesaba los mensajes pendientes con un claim de estado, pero sin contador persistente ni lease; el escaneo vencido solo miraba `completed/status` globales, creaba documentos de correo con IDs aleatorios y actualizaba `lastReminderAt` fuera de una transacción. Tampoco se releía la tarea antes de llamar SMTP. `task_completed_alert` se generaba en el contexto de tareas al completar una tarea.
+
+El intento intermedio con `closedAssigneeKeys` no resolvía la integridad: en `f409ee8`, una tarea raíz abierta con participante legacy cerrado, sin ledger, aceptaba una escritura que abría su mapa con `lifecycleMutation.assigneeKeys: []`, sin evento. Se reprodujo en Emulator; no es una hipótesis ni un comportamiento aceptado. El modelo siguiente elimina esa autoridad del cliente, en vez de añadir otro marker mutable.
+
+## Modelo canónico y transición legacy
+
+El estado operativo se guarda en `tasks/{taskId}/participant_states/{assigneeEmail}`. La subcolección reutiliza la autorización de su tarea; conserva la clave legacy exacta y sus alias conocidos, sin introducir una colección global con otro esquema de acceso. Cada documento contiene `taskId`, `assigneeEmail`, `state` y `lifecycleMutation.eventId`.
+
+`tasks.assigneeProgress` queda como **baseline inmutable después de crear la tarea**, no como otra ruta de escritura. Las reglas rechazan cualquier cambio del mapa, antes y después de materializar participantes, con o sin ledger/marker y aunque el cliente sea obsoleto. Guardar notas con el mapa intacto sigue permitido. `closedAssigneeKeys` puede permanecer en datos históricos, pero quitarlo o falsificarlo no concede ningún permiso.
+
+Al guardar progreso, la transacción del cliente relee la tarea y los documentos de participantes, materializa todos los asignados aún ausentes y aplica las modificaciones en el mismo commit que la raíz y los eventos necesarios. Las notas sin cambios de avance no necesitan backfill. La creación de un documento se valida contra la entrada legacy exacta; una entrada ya cerrada solo se copia intacta o se reabre con evento autorizado. Copiar un cierre histórico no inventa actor, fecha ni evento. Desde ese momento se valida contra el estado canónico previo; eliminar el documento está denegado, por lo que no puede reaparecer una versión legacy anterior.
+
+Los clientes nuevos siguen exponiendo un mapa **derivado en memoria** al modal/tablero: baseline más estados canónicos. Suscripciones por tarea, lectura de enlaces y notificaciones en Home, operaciones del contexto y comprobaciones de correo consultan esos estados. Una lectura pendiente, fallida o con `state` inválido no devuelve una tarea supuestamente abierta: se oculta esa tarea y se muestra error explícito. Las suscripciones se limpian al cambiar identidad/tarea.
+
+Reafirmar un avance ya cerrado conserva la fecha existente o su ausencia, también si la única señal legacy era progreso 100. No genera una fecha/evento histórico sintético. Una nueva transición real tras reapertura obtiene su nueva fecha y auditoría. El modal reconoce también `status`/`progressPercentage` legacy; una reapertura manual actualiza todas las señales terminales existentes, sin dejar un estado cerrado residual que haga fallar el evento.
+
+No hay máximo artificial de 8/10 cambios ni fragmentación parcial. Emulator prueba 40 participantes con avances abiertos juntos, una mezcla con cierre y rechazo atómico de un cliente obsoleto; el contexto real prueba 40 avances en una sola transacción y recarga. El modal real prueba 14 participantes, nota y progreso propio, sin normalizar los cierres ajenos. Se mantienen los límites intrínsecos de Firestore (tamaño y número de escrituras/documentos consultados por reglas); muchos cierres simultáneos con eventos consumen más accesos que avances abiertos. No se promete carga ilimitada ni se divide un commit silenciosamente.
+
+Compatibilidad deliberada: un cliente viejo que intente cambiar el mapa recibirá `permission-denied` y debe cargar la versión nueva; sus notas con mapa idéntico no se bloquean. Esto evita la carrera de inicialización: no existe una ventana anterior a una migración de producción en la que pueda cambiar el baseline. No se ha ejecutado backfill ni ninguna escritura productiva. El comando histórico `scripts/recoverErikaTask.mjs`, que atribuía cierres sin actor verificado y escribía el mapa, falla antes de leer credenciales/inicializar Admin; no se ejecutó su código productivo.
+
+## Cambios implementados
+
+- El guardado normal ya no interpreta progreso parcial como intención de reabrir. La transacción relee el estado persistido, conserva el cierre y su fecha, y solo cambia el estado terminal si recibe intención explícita.
+- Los guardados obsoletos y la edición de asignaciones releen la tarea dentro de una transacción; los campos de cierre no se aceptan desde el editor de asignaciones, y el progreso de una persona ya cerrada se conserva mientras siga asignada. La edición de tarea cerrada no crea correo ni notificación.
+- Las actualizaciones de catálogo con ciclo escriben el mapa de completitud del ciclo/sede objetivo sin sobrescribir `completed`, `status`, `completedAt` o progreso globales. La reapertura de un ciclo no altera otros ciclos ni el cierre global.
+- Las transiciones manuales de cierre y reapertura producen registros inmutables en `task_completion_events`. Las reglas permiten el registro únicamente junto con una transición coincidente y actor autorizado; no se amplió la regla general de actualización de tareas.
+- Si un avance individual cruza también el estado raíz, se escriben eventos distintos para cada alcance en la misma transacción: `lifecycleMutation.eventId` enlaza la raíz y `assigneeEventIds` el participante. La regla de reapertura raíz exige un evento con `scope: {}`, no basta un evento individual.
+- Se retiró la generación automática de la alerta de tarea completada. Los correos históricos de tipo `task_completed_alert` se descartan como `SKIPPED_CLOSED`, `SKIPPED_UNLINKED_TASK`, `SKIPPED_STALE` o `SKIPPED_POLICY`; no se entrega una alerta automática aunque la tarea se haya reabierto.
+- Mensajes y recordatorios manuales consultan la tarea dentro de la transacción que encola el correo/notificación. Los correos de tarea nuevos llevan `taskId`; mensajes antiguos que no puedan vincularse de forma segura a una tarea se descartan cuando su tipo identifica que pertenecen a una tarea.
+- El flujo programado `assignInsuranceTaskAndMail.mjs` ya no envía SMTP directamente: preserva los campos de ciclo de vida existentes, comprueba el cierre en la transacción que crea notificación/outbox y usa IDs deterministas. El mailer común vuelve a comprobar el cierre antes de SMTP.
+- El mailer reclama y relee la tarea asociada en una transacción antes del envío. Una tarea cerrada se marca terminalmente `SKIPPED_CLOSED` con hora, alcance observado y motivo. La comparación usa ciclo/sede o destinatario cuando el documento registra ese ámbito; no se toma la finalización de otro ciclo como cierre de este.
+- Si una tarea tiene completitudes por ciclo pero el correo no identifica ciclo/sede, no se infiere un cierre global ni se envía a ciegas: se conserva en estado terminal `SKIPPED_SCOPE_UNKNOWN` para revisión.
+- Los recordatorios vencidos usan IDs deterministas derivados de tarea, tipo, destinatario normalizado y bucket de debounce. La revisión de cierre, creación de documentos de correo y actualización de `lastReminderAt` ocurren en una sola transacción; no se avanza el debounce si no se encola ningún documento nuevo.
+- La cola persiste `attemptCount`, horas de inicio/final, lease y próximo intento. El límite es tres intentos por documento, con espera exponencial de 5/10 minutos. Una concesión vencida pasa a `DELIVERY_UNKNOWN`, no se reenvía automáticamente.
+- Un rechazo SMTP explícito o un error de conexión/resolución considerado previo a aceptación queda como `ERROR` y puede reintentarse dentro del límite. Si SMTP acepta el mensaje pero Firestore no confirma `SUCCESS`, el documento permanece `SENDING` y, al vencer el lease de 10 minutos, pasa a `DELIVERY_UNKNOWN`. Los errores SMTP cuya aceptación no se puede determinar también quedan en `DELIVERY_UNKNOWN`.
+
+## Límite de entrega y observabilidad
+
+SMTP y Firestore no comparten una transacción. Sin soporte de idempotencia del proveedor, no es posible garantizar exactamente una entrega. `DELIVERY_UNKNOWN` requiere conciliación manual y evita un reintento automático ciego; no demuestra si el proveedor entregó el correo.
+
+La última relectura tampoco es una cancelación atómica del proveedor: un cierre posterior a esa lectura y anterior a aceptación SMTP conserva una ventana residual. Las pruebas verifican cierre antes de claim y después de claim/antes de esa última lectura; no afirman eliminar una carrera distribuida mediante mocks.
+
+Correo con varios destinatarios sin `recipientEmail`: la relectura pre-SMTP evalúa cada destinatario; se omiten los participantes cerrados (se registra solo `delivery.suppressedClosedRecipients`, un contador) y se envía a los abiertos; si todos están cerrados queda `SKIPPED_CLOSED`.
+
+Vínculo de tareas en correo: el productor de seguros guarda `linkedTaskIds` (tarea individual) además de `taskId` (maestra); `claimPendingMail` y `skipTaskMailIfClosed` releen las vinculadas. Antes de SMTP se filtran los destinatarios cerrados en cualquiera de ellas; si todos están cerrados se omite el envío. Una tarea vinculada ausente o de ciclo ambiguo bloquea el documento completo. El esquema admite como máximo cinco vínculos adicionales: datos inválidos o más de cinco terminan en `SKIPPED_UNLINKED_TASK`; no se truncan ni se omiten verificaciones silenciosamente.
+
+Control de volumen y alerta interna: antes de reclamar un correo vinculado a tarea, el mailer consume transaccionalmente presupuestos diarios UTC (`mail_delivery_budgets`): 30 intentos por tarea, 20 por destinatario y 6 por par tarea+destinatario. Al agotarse, el documento pasa a `SKIPPED_RATE_LIMIT` (terminal, sin SMTP) y se crea una sola notificación interna `MAIL_DELIVERY_ANOMALY` por administrador (`SUPER_ADMIN_EMAILS`, id determinista), sin contenido de tarea ni correos en el texto. Los umbrales son decisiones de ingeniería de este cambio, no valores aprobados por negocio; no hay canal externo (correo/Slack). Los reintentos por documento siguen limitados a 3.
+
+Auditoría de cierre: cada evento `completed` guarda `closureContext` (comentarios, `evidenceUrl` y lista `evidences` vigentes al cerrar, con límites de tamaño); las reglas exigen que coincida con la tarea resultante, y el evento es inmutable. La aplicación no tiene campos de comentario/evidencia específicos del cierre: se registra el estado vigente en ese momento, no se distingue cuál se añadió "para cerrar". Los cierres anteriores a este cambio no tienen ese snapshot.
+
+Reapertura (backend): las reglas de `tasks` protegen raíz y ciclo/sede; las de `participant_states` protegen cada participante, partiendo de su baseline legacy si aún no está materializado. La transición requiere un `task_completion_events` nuevo, `reopened`, del mismo actor y alcance, con `occurredAt == request.time`. Una coasignación no autoriza reabrir a otra persona: se prueba DENIED incluso con evento de forma válida. Ediciones abiertas conservan la autoridad previa sobre la tarea compartida; no se cambian roles.
+
+Rutas explícitas: `ChecklistContext.toggleTask` marca la intención manual para raíz/ciclo; `updateIndividualProgress` emite eventos individuales y, cuando corresponde, raíz; `TaskDetailModal.handleSaveAll` pasa intención separada al detectar el cambio manual desde su baseline. El editor de asignaciones no reabre. Raíz y participante usan IDs distintos, actor y hora de commit iguales y `closureContext` independiente para cada cierre.
+
+| Productor/superficie | Vinculación y control |
+|---|---|
+| `ChecklistContext.addCustomTask` | Asignación al crear una tarea nueva; outbox y notificación en el batch de creación |
+| `editCustomTask` | Asignación/actualización; relectura canónica transaccional antes de correo/in-app |
+| `sendTaskReminderEmail` / `sendTaskMessage` | Recordatorio manual / mensajería interna; filtran destinatarios cerrados con relectura canónica |
+| `inviteCollaborator` / `acceptCollaboration` | Invitación/aceptación; relectura canónica del destinatario, sin reabrir implícitamente |
+| `mailerDaemon.checkOverdueTaskReminders` → `enqueueOverdueTaskMails` | Vencidos; relectura canónica al encolar, IDs y debounce atómicos |
+| `assignInsuranceTaskAndMail.mjs` | Seguros; enlaza maestra e individual y consulta ambas al encolar, claim y pre-SMTP |
+| `task_completed_alert` | Productor retirado; documentos históricos conocidos se descartan terminalmente |
+
+No se eliminan notificaciones históricas ya persistidas. Los correos de acceso/inactividad y campañas que no pertenecen al ciclo de una tarea no reciben esta política globalmente. `.github/workflows/mail-dispatch.yml` conserva su schedule de cinco minutos, `npm install` y ambos comandos productivos; no se modificó en esta iteración canónica ni se ejecutó.
+
+Los correos de tarea antiguos sin `taskId` ni `calendarEvent.taskId` no permiten identificar su tarea; si conservan un tipo conocido de correo de tarea, se descartan. Un correo legado sin tipo y sin vínculo de tarea no puede clasificarse con seguridad por el daemon actual. La consulta o modificación de datos reales no se realizó.
+
+## Criterios de aceptación
+
+| # | Criterio | Estado | Evidencia |
+|---|---|---|---|
+| 1 | Guardar evidencia/notas/progreso o editar asignaciones no reabre una tarea cerrada; conserva fechas tras recarga. | Cubierto en pruebas aisladas | Contexto/modal reales; baseline inmutable y estado canónico bajo reglas |
+| 2 | Cierre/reapertura por sede y ciclo no cambia el estado global ni otro ciclo. | Cubierto en pruebas aisladas | `taskLifecycle.test.js` y navegador con dos ciclos |
+| 3 | Reapertura solo explícita, autorizada y protegida en backend. | Cubierto en Emulator | Legacy/canónico: sin evento DENIED; manual propio ALLOWED; coasignado ajeno con evento DENIED |
+| 4 | Actor/hora/alcance y comentarios/evidencia append-only. | Cubierto en flujos nuevos; parcial histórico | Eventos separados raíz/participante; snapshot sobrevive edición, reapertura y recarga; no se reconstruyen cierres anteriores |
+| 5 | No generar ni entregar `task_completed_alert`. | Cubierto con mocks | Productor retirado y política terminal de cola |
+| 6 | Suprimir nueva notificación al encolar y correo task-bound al encolar/claim/pre-SMTP. | Cubierto con mocks/navegador; ventana SMTP indicada | Estados canónicos, seguros maestra+individual, multi-destinatario y sender real con `sendMail` simulado |
+| 7 | Vencidos idempotentes y debounce atómico. | Cubierto con mocks | IDs deterministas y concurrencia de enqueue |
+| 8 | Cap, registro de intentos y alerta de patrón repetido. | Cubierto con mocks; umbrales por aprobar | Tres intentos/documento; presupuestos 30/20/6 y notificación interna deduplicada |
+| 9 | Lease y ambigüedad sin reenvío ciego. | Cubierto con mocks; limitación SMTP | Lease vencido/aceptación ambigua → `DELIVERY_UNKNOWN`, conciliación manual |
+| 10 | Aislamiento de usuario/ciclo y compatibilidad multiasignada. | Cubierto en Emulator/fixtures; sin login real productivo | 40 avances abiertos atómicos, modal real de 14 y carreras contra escrituras legacy denegadas |
+
+## Plan de validación
+
+El workflow existente `.github/workflows/validate-task-privacy.yml` ya se activa por estos archivos y ejecuta:
+
+1. `node --check scripts/mailQueue.js && node --check scripts/mailerDaemon.js && node --check scripts/assignInsuranceTaskAndMail.mjs && node --check scripts/taskParticipantStore.js && node --check scripts/recoverErikaTask.mjs`.
+2. `npx oxlint -c .oxlintrc.lifecycle.json src/context/ChecklistContext.jsx src/components/TaskDetailModal.jsx src/utils/taskLifecycle.js src/utils/taskParticipants.js src/services/taskParticipantStore.js scripts/taskParticipantStore.js scripts/mailQueue.js scripts/mailerDaemon.js`; `npm run test:persistence`, `npm run test:operational` y `npm test` (incluye `tests/mail-queue.test.mjs`).
+3. `npm run build`.
+4. `npx --yes firebase-tools@latest emulators:exec --only firestore --project demo-task-privacy "npm run test:rules && node --test tests/firestore-manager-persistence.test.mjs scripts/tests/nodus-report-rules.test.mjs"`.
+
+**Plan por nivel:** funcional/regresión: `npm run test:persistence` + `npm test`; integración aislada: Firestore Emulator con `npm run test:rules` y mocks de outbox/SMTP; compatibilidad/build: `npm run build`; concurrencia/carga: aumentar la contención de varios workers sobre el mismo doc y bucket de recordatorio únicamente con Firestore Emulator/mocks, esperando un solo claim/registro, sin SMTP. No se definió un SLA cuantitativo de carga, por lo que no se inventa un umbral.
+
+Localmente están disponibles Node 22 y Firestore Emulator con Java 21. En el árbol integrado pasaron `npm run test:persistence` (26), `npm run test:operational` (15, Puppeteer con modal real), `npm run test:calendars` (34, incluye freshness/calendario global), `npm test` (242), build y lint selectivo `no-undef` (advertencias preexistentes). Bajo Emulator pasaron privacidad/A01 (39), acceso IMO (9), el script de reglas IMO y manager/Nodus (6), mediante el comando completo de CI indicado arriba. Las nuevas regresiones prueban carreras de migración/cierre, rechazo de mapa legacy incluso con guard vacío/ledger falso, cierre y reapertura canónicos autorizados y eventos distintos raíz/participante.
+
+El head integrado `3f39921b3ccef842be596ed43cb611a2e565c06a` pasó [Validate 39839074556](https://github.com/crearpodersinlimitesperu-cmd/SO-AR/actions/runs/39839074556) y [Trainer 39839074548](https://github.com/crearpodersinlimitesperu-cmd/SO-AR/actions/runs/39839074548), ambos SUCCESS exact-head; Trainer añadió y ejecutó también las pruebas aisladas de calendario. Los checks verdes anteriores de `f409ee8`, `b89e613` u otros heads no sustituyen esos resultados. La prueba de cambio de identidad es un fixture; no equivale a login real/multidispositivo ni demuestra sincronización productiva. No se hizo prueba de carga SMTP ni se envió correo. `deploy.yml` incluye Hosting, reglas e índices; `deploy-rules` también se activa por reglas. No se ejecutaron esos despliegues ni `mail-dispatch` productivo. Un despliegue futuro autorizado deberá coordinar reglas, cliente y daemon canónicos; no debe revertir las reglas al ledger inseguro.
+
+## Registro de cambios
+
+- 2026-10-22 — equipo de ingeniería/Copilot: protección de cierre frente a guardados ordinarios/obsoletos; aislamiento del estado por ciclo; registro append-only de transiciones; supresión de alertas automáticas de cierre; control de cierre para correo task-bound; outbox determinista para vencidos; contador de intentos, lease, límite y estado ambiguo; regresiones de navegador, reglas y cola.
+- 2026-10-22 — equipo de ingeniería/Copilot: el productor programado de seguros deja SMTP directo y reusa outbox idempotente; preserva estado terminal y comprueba cierre antes de crear notificación/correo; añade prueba de relectura pre-SMTP y chequeo de sintaxis CI para los scripts.
+- 2026-10-22 — equipo de ingeniería/Copilot: eventos separados raíz/participante; rechazo de vínculos de correo inválidos o excesivos sin truncar; filtrado por destinatario en todas las tareas vinculadas; pruebas del sender real con SMTP simulado y modal real de 14 participantes.
+- 2026-10-22 — equipo de ingeniería/Copilot: reemplazo del ledger inseguro por documentos canónicos con baseline legacy inmutable, migración perezosa transaccional sin atribuir cierres históricos, lecturas canónicas en contexto/Home/correo, 40 avances abiertos atómicos, carreras y autorización negativa en Emulator; retiro preventivo del comando histórico no auditado. Sin escrituras productivas.
+- 2026-10-22 — equipo de ingeniería/Copilot: integración de `master` `024b8ad` en `3f39921`; resolución del conflicto package scripts preservando tests de participantes y calendario, convivencia de Home/calendario canónico, pruebas combinadas 26/242/15/34, build y ambos workflows CI SUCCESS en el head integrado. Sin merge/deploy.

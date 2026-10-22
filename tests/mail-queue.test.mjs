@@ -1,111 +1,600 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { claimPendingMail, selectMailAction, STALE_REASON } from '../scripts/mailQueue.js';
+import { readFileSync } from 'node:fs';
+import { runInNewContext } from 'node:vm';
+import {
+  claimPendingMail,
+  createTaskMailId,
+  enqueueOverdueTaskMails,
+  MAIL_CLAIM_LEASE_MS,
+  MAX_MAIL_ATTEMPTS,
+  DAILY_TASK_MAIL_ATTEMPTS,
+  DAILY_USER_MAIL_ATTEMPTS,
+  DAILY_TASK_USER_MAIL_ATTEMPTS,
+  recordMailFailure,
+  recordMailSuccess,
+  recordMailUnknown,
+  selectMailAction,
+  skipTaskMailIfClosed,
+  STALE_REASON
+} from '../scripts/mailQueue.js';
+import { SUPER_ADMIN_EMAILS } from '../src/config/permissions.js';
 
 const now = Date.parse('2026-10-09T15:00:00Z');
 const cutoff = now - 48 * 60 * 60 * 1000;
 
-test('selects PENDING and legacy documents without a state', () => {
+function fakeFirestore(initial = {}) {
+  const docs = new Map(Object.entries(initial));
+  let tail = Promise.resolve();
+  const updates = [];
+  const applyUpdate = (path, fields) => {
+    const current = structuredClone(docs.get(path) || {});
+    for (const [fieldPath, value] of Object.entries(fields)) {
+      const parts = fieldPath.split('.');
+      let cursor = current;
+      for (const part of parts.slice(0, -1)) cursor = cursor[part] ??= {};
+      cursor[parts.at(-1)] = value;
+    }
+    docs.set(path, current);
+  };
+  const ref = path => ({
+    path,
+    async get() {
+      const data = docs.get(path);
+      return { exists: data !== undefined, data: () => structuredClone(data) };
+    },
+    async update(fields) {
+      updates.push({ path, fields });
+      applyUpdate(path, fields);
+    }
+  });
+  const db = {
+    collection(name) {
+      return { doc: id => ref(`${name}/${id}`) };
+    },
+    runTransaction(callback) {
+      const result = tail.then(() => callback({
+        async get(actualRef) {
+          const data = docs.get(actualRef.path);
+          return { exists: data !== undefined, data: () => structuredClone(data) };
+        },
+        update(actualRef, fields) {
+          updates.push({ path: actualRef.path, fields });
+          applyUpdate(actualRef.path, fields);
+        },
+        set(actualRef, data) {
+          docs.set(actualRef.path, structuredClone(data));
+        }
+      }));
+      tail = result;
+      return result;
+    }
+  };
+  return { db, docs, updates, ref };
+}
+
+test('selects pending and legacy documents, but never terminal or active leases', () => {
   for (const delivery of [undefined, {}, { state: '' }, { state: null }, { state: 'PENDING' }]) {
     assert.equal(selectMailAction({ delivery }, now), 'SENDING');
   }
-  for (const state of ['SENDING', 'SUCCESS', 'ERROR', 'REJECTED', 'SKIPPED_STALE']) {
+  for (const state of ['SUCCESS', 'REJECTED', 'SKIPPED_STALE', 'SKIPPED_CLOSED', 'DELIVERY_UNKNOWN']) {
     assert.equal(selectMailAction({ delivery: { state } }, now), null);
   }
+  assert.equal(selectMailAction({
+    delivery: { state: 'SENDING', leaseExpiresAt: new Date(now + 1).toISOString() }
+  }, now), null);
+  assert.equal(selectMailAction({
+    delivery: { state: 'SENDING', leaseExpiresAt: new Date(now - 1).toISOString() }
+  }, now), 'LEASE_EXPIRED');
 });
 
-test('skips only the two stale task alert types, for ISO and Timestamp dates', () => {
+test('skips stale alerts without applying the stale policy to unrelated mail', () => {
   for (const type of ['task_overdue_assigner_alert', 'task_completed_alert']) {
-    for (const delivery of [undefined, { state: 'PENDING' }]) {
-      for (const createdAt of [
-        new Date(cutoff - 1).toISOString(),
-        { toDate: () => new Date(cutoff - 1) }
-      ]) {
-        assert.equal(selectMailAction({ type, delivery, createdAt }, now), 'SKIPPED_STALE');
-      }
-      for (const timestamp of [cutoff, cutoff + 1, now + 1]) {
-        assert.equal(selectMailAction({
-          type, delivery, createdAt: new Date(timestamp).toISOString()
-        }, now), 'SENDING');
-      }
+    for (const createdAt of [
+      new Date(cutoff - 1).toISOString(),
+      { toDate: () => new Date(cutoff - 1) }
+    ]) {
+      assert.equal(selectMailAction({ type, createdAt, delivery: { state: 'PENDING' } }, now), 'SKIPPED_STALE');
+    }
+    for (const timestamp of [cutoff, cutoff + 1, now + 1]) {
+      assert.equal(selectMailAction({
+        type, createdAt: new Date(timestamp).toISOString(), delivery: { state: 'PENDING' }
+      }, now), 'SENDING');
     }
   }
-  for (const type of ['operational_broadcast', 'task_reminder', 'imo_welcome', undefined]) {
-    assert.equal(selectMailAction({
-      type, delivery: { state: 'PENDING' }, createdAt: new Date(cutoff - 1).toISOString()
-    }, now), 'SENDING');
-  }
+  assert.equal(selectMailAction({
+    type: 'operational_broadcast',
+    createdAt: new Date(cutoff - 1).toISOString(),
+    delivery: { state: 'PENDING' }
+  }, now), 'SENDING');
 });
 
-test('does not infer staleness from missing or invalid dates or reselect terminal states', () => {
+test('does not infer staleness from invalid dates or reselect terminal states', () => {
   for (const createdAt of [undefined, null, '', 'invalid']) {
     assert.equal(selectMailAction({
       type: 'task_completed_alert', createdAt, delivery: { state: 'PENDING' }
     }, now), 'SENDING');
   }
   assert.equal(selectMailAction({
-    type: 'task_completed_alert', createdAt: new Date(cutoff - 1).toISOString(),
+    type: 'task_completed_alert',
+    createdAt: new Date(cutoff - 1).toISOString(),
     delivery: { state: 'SUCCESS' }
   }, now), null);
 });
 
-function fakeFirestore(initialData) {
-  let data = initialData;
-  let tail = Promise.resolve();
-  const updates = [];
-  const ref = {};
-  return {
-    ref, updates,
-    db: {
-      runTransaction(callback) {
-        const result = tail.then(() => callback({
-          async get(actualRef) {
-            assert.equal(actualRef, ref);
-            return { exists: data !== null, data: () => data };
-          },
-          update(actualRef, update) {
-            assert.equal(actualRef, ref);
-            updates.push(update);
-            data = { ...data, delivery: { ...data.delivery, state: update['delivery.state'] } };
-          }
-        }));
-        tail = result;
-        return result;
-      }
-    }
-  };
-}
-
-test('overlapping claims reserve a pending mail exactly once before sending', async () => {
-  const { db, ref, updates } = fakeFirestore({ delivery: { state: 'PENDING' } });
+test('overlapping claims increment the attempt count once and use one lease', async () => {
+  const { db, ref, docs } = fakeFirestore({ 'mail/a': { delivery: { state: 'PENDING' } } });
+  const mailRef = ref('mail/a');
   const results = await Promise.all([
-    claimPendingMail(db, ref, now), claimPendingMail(db, ref, now)
+    claimPendingMail(db, mailRef, now), claimPendingMail(db, mailRef, now)
   ]);
   assert.equal(results.filter(Boolean).length, 1);
-  assert.equal(results[0].state, 'SENDING');
-  assert.deepEqual(updates, [{
-    'delivery.state': 'SENDING', 'delivery.startTime': new Date(now).toISOString()
-  }]);
+  assert.equal(results.find(Boolean).state, 'SENDING');
+  assert.equal(docs.get('mail/a').delivery.attemptCount, 1);
+  assert.equal(
+    Date.parse(docs.get('mail/a').delivery.leaseExpiresAt),
+    now + MAIL_CLAIM_LEASE_MS
+  );
 });
 
-test('stale claims persist the reason without entering SENDING', async () => {
-  const { db, ref, updates } = fakeFirestore({
-    delivery: { state: 'PENDING' }, type: 'task_completed_alert',
-    createdAt: new Date(cutoff - 1).toISOString()
+test('distinct outbox documents share atomic task/user budgets and one private admin alert', async () => {
+  const mails = Object.fromEntries(Array.from({ length: 12 }, (_, i) => [`mail/budget-${i}`, {
+    taskId: 'task-private', type: 'task_reminder', to: ['recipient@example.test'],
+    message: { subject: 'Private title', html: 'Private evidence' },
+    delivery: { state: 'PENDING' }
+  }]));
+  const { db, ref, docs } = fakeFirestore({ ...mails, 'tasks/task-private': { completed: false } });
+  const results = await Promise.all(Object.keys(mails).map(path => claimPendingMail(db, ref(path), now)));
+  assert.equal(results.filter(result => result.state === 'SENDING').length, DAILY_TASK_USER_MAIL_ATTEMPTS);
+  assert.equal(results.filter(result => result.state === 'SKIPPED_RATE_LIMIT').length, 12 - DAILY_TASK_USER_MAIL_ATTEMPTS);
+  const notifications = [...docs].filter(([path]) => path.startsWith('notifications/'));
+  assert.equal(notifications.length, SUPER_ADMIN_EMAILS.length);
+  for (const [, notification] of notifications) {
+    assert.ok(SUPER_ADMIN_EMAILS.includes(notification.userId));
+    assert.equal(notification.type, 'MAIL_DELIVERY_ANOMALY');
+    assert.equal(notification.read, false);
+    assert.doesNotMatch(notification.message, /task-private|recipient@|Private title|Private evidence/);
+  }
+  for (const [path, mail] of docs) {
+    if (path.startsWith('mail/') && mail.delivery.state === 'SKIPPED_RATE_LIMIT') {
+      assert.equal(mail.delivery.attemptCount, undefined);
+      assert.equal(selectMailAction(mail, now + 86400000), null);
+    }
+  }
+});
+
+test('task-wide and user-wide limits apply across recipients/tasks and reset only on the next UTC day', async () => {
+  for (const kind of ['task', 'user']) {
+    const limit = kind === 'task' ? DAILY_TASK_MAIL_ATTEMPTS : DAILY_USER_MAIL_ATTEMPTS;
+    const initial = {};
+    for (let i = 0; i <= limit; i++) {
+      const taskId = kind === 'task' ? 'same-task' : `task-${i}`;
+      initial[`tasks/${taskId}`] = { completed: false };
+      initial[`mail/${i}`] = {
+        taskId, type: 'task_update',
+        to: [kind === 'user' ? 'same@example.test' : `recipient-${i}@example.test`],
+        delivery: { state: 'PENDING' }
+      };
+    }
+    const { db, ref, docs } = fakeFirestore(initial);
+    const results = await Promise.all(Array.from({ length: limit + 1 }, (_, i) => claimPendingMail(db, ref(`mail/${i}`), now)));
+    assert.equal(results.filter(result => result.state === 'SENDING').length, limit, kind);
+    assert.equal(results.at(-1).state, 'SKIPPED_RATE_LIMIT', kind);
+    docs.set('mail/new-day', structuredClone(initial[`mail/${limit}`]));
+    assert.equal((await claimPendingMail(db, ref('mail/new-day'), now + 86400000)).state, 'SENDING', kind);
+  }
+});
+
+test('a closed cycle suppresses only mail for that cycle and records the observed closure', async () => {
+  const { db, ref, docs } = fakeFirestore({
+    'mail/cycle-one': {
+      type: 'task_reminder', taskId: 'catalog', completionScope: { sede: 'Lima', cycleId: 'one' },
+      delivery: { state: 'PENDING' }
+    },
+    'mail/cycle-two': {
+      type: 'task_reminder', taskId: 'catalog', completionScope: { sede: 'Lima', cycleId: 'two' },
+      delivery: { state: 'PENDING' }
+    },
+    'tasks/catalog': {
+      completed: false, status: 'Pendiente',
+      completions: {
+        'Lima__one': { completed: true, completedAt: 'recorded' },
+        'Lima__two': { completed: false }
+      }
+    }
   });
-  assert.equal((await claimPendingMail(db, ref, now)).state, 'SKIPPED_STALE');
-  assert.equal(await claimPendingMail(db, ref, now), null);
-  assert.deepEqual(updates, [{
-    'delivery.state': 'SKIPPED_STALE',
-    'delivery.endTime': new Date(now).toISOString(),
-    'delivery.reason': STALE_REASON
-  }]);
+  const closed = await claimPendingMail(db, ref('mail/cycle-one'), now);
+  const open = await claimPendingMail(db, ref('mail/cycle-two'), now);
+  assert.equal(closed.state, 'SKIPPED_CLOSED');
+  assert.equal(docs.get('mail/cycle-one').delivery.taskStateObserved, 'closed');
+  assert.equal(docs.get('mail/cycle-one').delivery.skippedAt, new Date(now).toISOString());
+  assert.equal(open.state, 'SENDING');
 });
 
-test('deleted documents and transaction failures never produce a send claim', async () => {
-  const { db, ref } = fakeFirestore(null);
-  assert.equal(await claimPendingMail(db, ref, now), null);
+test('the pre-SMTP recheck suppresses a task closed after claim and leaves unrelated mail alone', async () => {
+  const { db, ref, docs } = fakeFirestore({
+    'mail/race': {
+      type: 'task_reminder',
+      taskId: 'task',
+      recipientEmail: 'owner@example.test',
+      delivery: { state: 'PENDING' }
+    },
+    'mail/broadcast': {
+      type: 'operational_broadcast',
+      delivery: { state: 'SENDING', attemptCount: 1 }
+    },
+    'tasks/task': { completed: false, status: 'Pendiente' }
+  });
+  const claim = await claimPendingMail(db, ref('mail/race'), now);
+  assert.equal(claim.state, 'SENDING');
+
+  docs.set('tasks/task', { completed: true, status: 'Completada' });
+  assert.equal(
+    await skipTaskMailIfClosed(db, ref('mail/race'), claim.data, ['owner@example.test'], now + 1),
+    'SKIPPED_CLOSED'
+  );
+  assert.equal(docs.get('mail/race').delivery.state, 'SKIPPED_CLOSED');
+  assert.equal(docs.get('mail/race').delivery.taskStateObserved, 'closed');
+  assert.equal(
+    await skipTaskMailIfClosed(db, ref('mail/broadcast'), docs.get('mail/broadcast'), ['ops@example.test'], now + 2),
+    false,
+    'non-task-bound mail bypasses task lifecycle suppression'
+  );
+  assert.equal(docs.get('mail/broadcast').delivery.state, 'SENDING');
+});
+
+test('global closure suppresses task-bound mail, and completion alerts never send', async () => {
+  const { db, ref, docs } = fakeFirestore({
+    'mail/closed': { type: 'task_assignment', taskId: 'task', delivery: { state: 'PENDING' } },
+    'mail/completion': { type: 'task_completed_alert', taskId: 'open', delivery: { state: 'PENDING' } },
+    'tasks/task': { completed: true, status: 'Completada' },
+    'tasks/open': { completed: false, status: 'Pendiente' }
+  });
+  assert.equal((await claimPendingMail(db, ref('mail/closed'), now)).state, 'SKIPPED_CLOSED');
+  assert.equal((await claimPendingMail(db, ref('mail/completion'), now)).state, 'SKIPPED_POLICY');
+  assert.equal(docs.get('mail/completion').delivery.state, 'SKIPPED_POLICY');
+});
+
+test('unlinked task mail is terminally skipped instead of bypassing lifecycle checks', async () => {
+  const { db, ref, docs } = fakeFirestore({
+    'mail/legacy': { type: 'task_reminder', delivery: { state: 'PENDING' } }
+  });
+  assert.equal((await claimPendingMail(db, ref('mail/legacy'), now)).state, 'SKIPPED_UNLINKED_TASK');
+  assert.equal(docs.get('mail/legacy').delivery.state, 'SKIPPED_UNLINKED_TASK');
+});
+
+test('cycle-bound task mail without a cycle scope is skipped instead of assuming global closure', async () => {
+  const { db, ref, docs } = fakeFirestore({
+    'mail/unscoped-cycle': {
+      type: 'task_reminder', taskId: 'catalog', delivery: { state: 'PENDING' }
+    },
+    'tasks/catalog': {
+      completed: false, status: 'Pendiente',
+      completions: { 'Lima__cycle-1': { completed: true } }
+    }
+  });
+  assert.equal((await claimPendingMail(db, ref('mail/unscoped-cycle'), now)).state, 'SKIPPED_SCOPE_UNKNOWN');
+  assert.equal(docs.get('mail/unscoped-cycle').delivery.state, 'SKIPPED_SCOPE_UNKNOWN');
+});
+
+test('stale claims persist reason and terminal state', async () => {
+  const { db, ref, docs } = fakeFirestore({
+    'mail/stale': {
+      delivery: { state: 'PENDING' },
+      type: 'task_overdue_assigner_alert',
+      createdAt: new Date(cutoff - 1).toISOString()
+    }
+  });
+  assert.equal((await claimPendingMail(db, ref('mail/stale'), now)).state, 'SKIPPED_STALE');
+  assert.equal(await claimPendingMail(db, ref('mail/stale'), now), null);
+  assert.equal(docs.get('mail/stale').delivery.reason, STALE_REASON);
+});
+
+test('transport failures retry with a persistent cap and terminal exhaustion state', async () => {
+  const { db, ref, docs } = fakeFirestore({ 'mail/retry': { delivery: { state: 'PENDING' } } });
+  for (let attempt = 1; attempt <= MAX_MAIL_ATTEMPTS; attempt += 1) {
+    const claim = await claimPendingMail(db, ref('mail/retry'), now + attempt * 10 * 60 * 1000);
+    assert.equal(claim.attemptCount, attempt);
+    const result = await recordMailFailure(db, ref('mail/retry'), { code: 'ECONNRESET' }, now + attempt * 10 * 60 * 1000);
+    assert.equal(result.attempts, attempt);
+    assert.equal(result.exhausted, attempt === MAX_MAIL_ATTEMPTS);
+  }
+  assert.equal(docs.get('mail/retry').delivery.attemptCount, MAX_MAIL_ATTEMPTS);
+  assert.ok(docs.get('mail/retry').delivery.exhaustedAt);
+  assert.equal(selectMailAction(docs.get('mail/retry'), now + 10 * 60 * 60 * 1000), null);
+});
+
+test('an expired claim becomes DELIVERY_UNKNOWN and cannot be blindly resent', async () => {
+  const { db, ref, docs } = fakeFirestore({
+    'mail/ambiguous': {
+      delivery: { state: 'SENDING', attemptCount: 1, leaseExpiresAt: new Date(now - 1).toISOString() }
+    }
+  });
+  assert.equal((await claimPendingMail(db, ref('mail/ambiguous'), now)).state, 'DELIVERY_UNKNOWN');
+  assert.equal(await claimPendingMail(db, ref('mail/ambiguous'), now + MAIL_CLAIM_LEASE_MS), null);
+});
+
+test('ambiguous SMTP acceptance is terminal even when the provider error lacks a response', async () => {
+  const { db, ref, docs } = fakeFirestore({
+    'mail/unknown': { delivery: { state: 'SENDING', attemptCount: 1 } }
+  });
+  assert.equal(await recordMailUnknown(db, ref('mail/unknown'), { code: 'ETIMEDOUT' }, now), true);
+  assert.equal(docs.get('mail/unknown').delivery.state, 'DELIVERY_UNKNOWN');
+  assert.equal(selectMailAction(docs.get('mail/unknown'), now + 100 * MAIL_CLAIM_LEASE_MS), null);
+});
+
+test('confirmed SMTP delivery persists SUCCESS transactionally; failed confirmation stays leased', async () => {
+  const { db, ref, docs } = fakeFirestore({
+    'mail/success': { delivery: { state: 'SENDING', attemptCount: 1 } }
+  });
+  assert.equal(await recordMailSuccess(db, ref('mail/success'), now), true);
+  assert.equal(docs.get('mail/success').delivery.state, 'SUCCESS');
+
+  const { db: failingDb, ref: failingRef } = fakeFirestore({
+    'mail/ambiguous-success': {
+      delivery: { state: 'SENDING', attemptCount: 1, leaseExpiresAt: new Date(now + MAIL_CLAIM_LEASE_MS).toISOString() }
+    }
+  });
+  await assert.rejects(recordMailSuccess({
+    runTransaction: async () => { throw new Error('confirmation write failed'); }
+  }, failingRef('mail/ambiguous-success'), now), /confirmation write failed/);
+  assert.equal(await claimPendingMail(failingDb, failingRef('mail/ambiguous-success'), now), null);
+  assert.equal((await claimPendingMail(
+    failingDb, failingRef('mail/ambiguous-success'), now + MAIL_CLAIM_LEASE_MS
+  )).state, 'DELIVERY_UNKNOWN');
+});
+
+test('deterministic task mail IDs include normalized recipient and debounce bucket', () => {
+  assert.equal(createTaskMailId('task-1', 'task_reminder', 'USER@example.test', 4),
+    createTaskMailId('task-1', 'task_reminder', 'user@example.test', 4));
+  assert.notEqual(createTaskMailId('task-1', 'task_reminder', 'user@example.test', 4),
+    createTaskMailId('task-1', 'task_reminder', 'user@example.test', 5));
+});
+
+test('overdue enqueue is transactionally deduplicated and updates debounce only when queued', async () => {
+  const { db, ref, docs } = fakeFirestore({
+    'tasks/overdue': {
+      deadline: new Date(now - 25 * 60 * 60 * 1000).toISOString(),
+      completed: false,
+      lastReminderAt: null
+    }
+  });
+  const taskRef = ref('tasks/overdue');
+  const entry = {
+    id: createTaskMailId('overdue', 'task_reminder', 'owner@example.test', 1),
+    data: { taskId: 'overdue', recipientEmail: 'owner@example.test', type: 'task_reminder' }
+  };
+  const results = await Promise.all([
+    enqueueOverdueTaskMails(db, taskRef, [entry], now, new Date(now).toISOString()),
+    enqueueOverdueTaskMails(db, taskRef, [entry], now, new Date(now).toISOString())
+  ]);
+  assert.equal(results.reduce((sum, item) => sum + item.queued, 0), 1);
+  assert.ok(docs.get('tasks/overdue').lastReminderAt);
+  assert.ok(docs.has(`mail/${entry.id}`));
+});
+
+test('overdue enqueue respects cycle completion without globally suppressing another cycle', async () => {
+  const { db, ref, docs } = fakeFirestore({
+    'tasks/catalog': {
+      deadline: new Date(now - 25 * 60 * 60 * 1000).toISOString(),
+      completed: true,
+      completions: {
+        'Lima__one': { completed: true },
+        'Lima__two': { completed: false }
+      }
+    }
+  });
+  const taskRef = ref('tasks/catalog');
+  const entries = [
+    {
+      id: 'cycle-one',
+      data: { taskId: 'catalog', type: 'task_reminder', recipientEmail: 'one@example.test',
+        completionScope: { sede: 'Lima', cycleId: 'one' } }
+    },
+    {
+      id: 'cycle-two',
+      data: { taskId: 'catalog', type: 'task_reminder', recipientEmail: 'two@example.test',
+        completionScope: { sede: 'Lima', cycleId: 'two' } }
+    }
+  ];
+  const result = await enqueueOverdueTaskMails(db, taskRef, entries, now, new Date(now).toISOString());
+  assert.deepEqual(result, { queued: 1, reason: 'queued' });
+  assert.equal(docs.has('mail/cycle-one'), false);
+  assert.equal(docs.has('mail/cycle-two'), true);
+});
+
+test('overdue enqueue leaves debounce untouched when the cycle scope is ambiguous', async () => {
+  const { db, ref, docs } = fakeFirestore({
+    'tasks/catalog-unknown': {
+      deadline: new Date(now - 25 * 60 * 60 * 1000).toISOString(),
+      completed: false,
+      completions: { 'Lima__cycle-1': { completed: true } }
+    }
+  });
+  const result = await enqueueOverdueTaskMails(
+    db,
+    ref('tasks/catalog-unknown'),
+    [{ id: 'unscoped', data: { taskId: 'catalog-unknown', type: 'task_reminder' } }],
+    now,
+    new Date(now).toISOString()
+  );
+  assert.deepEqual(result, { queued: 0, reason: 'scope_unknown' });
+  assert.equal(docs.get('tasks/catalog-unknown').lastReminderAt, undefined);
+});
+
+test('missing documents and transaction failures never produce a send claim', async () => {
+  const { db, ref } = fakeFirestore();
+  assert.equal(await claimPendingMail(db, ref('mail/missing'), now), null);
   await assert.rejects(claimPendingMail({
     runTransaction: async () => { throw new Error('transaction failed'); }
-  }, ref, now), /transaction failed/);
+  }, ref('mail/failure'), now), /transaction failed/);
+});
+
+test('multi-recipient task mail without recipientEmail drops closed participants and keeps open ones', async () => {
+  const { db, ref, docs } = fakeFirestore({
+    'mail/multi': { type: 'task_reminder', taskId: 'task', to: ['a@example.test', 'b@example.test'], delivery: { state: 'SENDING', attemptCount: 1 } },
+    'tasks/task': {
+      completed: false,
+      status: 'Pendiente',
+      assigneeProgress: { 'a@example.test': { completed: true, status: 'Completada' }, 'b@example.test': { completed: false } }
+    }
+  });
+  const recipients = ['a@example.test', 'b@example.test'];
+  assert.equal(await skipTaskMailIfClosed(db, ref('mail/multi'), docs.get('mail/multi'), recipients, now), false);
+  assert.deepEqual(recipients, ['b@example.test']);
+  assert.equal(docs.get('mail/multi').delivery.suppressedClosedRecipients, 1);
+
+  docs.set('tasks/task', { completed: false, assigneeProgress: {
+    'a@example.test': { completed: true }, 'b@example.test': { completed: true }
+  } });
+  const both = ['a@example.test', 'b@example.test'];
+  assert.equal(await skipTaskMailIfClosed(db, ref('mail/multi'), docs.get('mail/multi'), both, now + 1), 'SKIPPED_CLOSED');
+  assert.equal(docs.get('mail/multi').delivery.state, 'SKIPPED_CLOSED');
+});
+
+test('mail linked to a master and an individual task is suppressed when only the individual task closes after enqueue', async () => {
+  const mail = type => ({
+    type: 'seguro_salud_entrenadores', taskId: 'master', linkedTaskIds: ['individual'],
+    to: ['coach@example.test'], recipientEmail: 'coach@example.test', delivery: { state: type }
+  });
+  const { db, ref, docs } = fakeFirestore({
+    'mail/claim': mail('PENDING'),
+    'mail/presmtp': mail('PENDING'),
+    'tasks/master': { completed: false, status: 'Pendiente' },
+    'tasks/individual': { completed: false, status: 'Pendiente' }
+  });
+  const sendable = await claimPendingMail(db, ref('mail/presmtp'), now);
+  assert.equal(sendable.state, 'SENDING');
+  docs.set('tasks/individual', { completed: true, status: 'Completada' });
+  const recipients = ['coach@example.test'];
+  assert.equal(await skipTaskMailIfClosed(db, ref('mail/presmtp'), sendable.data, recipients, now + 1), 'SKIPPED_CLOSED');
+  assert.equal(docs.get('mail/presmtp').delivery.state, 'SKIPPED_CLOSED');
+
+  assert.equal((await claimPendingMail(db, ref('mail/claim'), now + 2)).state, 'SKIPPED_CLOSED');
+  assert.equal(docs.get('mail/claim').delivery.taskStateObserved, 'closed');
+});
+
+test('canonical participant closure after claim is re-read at pre-SMTP and on the next claim', async () => {
+  const data = {
+    type: 'seguro_salud_entrenadores', taskId: 'master', linkedTaskIds: ['individual'],
+    to: ['coach@example.test'], recipientEmail: 'coach@example.test', delivery: { state: 'PENDING' }
+  };
+  const { db, ref, docs } = fakeFirestore({
+    'mail/pre': data, 'mail/next': data,
+    'tasks/master': { completed: false }, 'tasks/individual': {
+      completed: false, assignedToEmails: ['coach@example.test'],
+      assigneeProgress: { 'coach@example.test': { completed: false, progress: 0 } }
+    }
+  });
+  const claimed = await claimPendingMail(db, ref('mail/pre'), now);
+  assert.equal(claimed.state, 'SENDING');
+  docs.set('tasks/individual/participant_states/coach@example.test', {
+    taskId: 'individual', assigneeEmail: 'coach@example.test',
+    state: { completed: true, progress: 100, completedAt: 'canonical-close' }
+  });
+  assert.equal(await skipTaskMailIfClosed(db, ref('mail/pre'), claimed.data, [...data.to], now + 1), 'SKIPPED_CLOSED');
+  assert.equal((await claimPendingMail(db, ref('mail/next'), now + 2)).state, 'SKIPPED_CLOSED');
+  assert.equal(docs.get('tasks/individual').assigneeProgress['coach@example.test'].completed, false,
+    'suppression uses canonical state, not the intentionally unchanged legacy map');
+});
+
+test('the insurance producer links the individual task so claim and pre-SMTP re-read it', async () => {
+  const source = readFileSync(new URL('../scripts/assignInsuranceTaskAndMail.mjs', import.meta.url), 'utf8');
+  assert.match(source, /linkedTaskIds:\s*\[individualTaskId\]/);
+});
+
+test('pre-SMTP filters each recipient across linked tasks using the actual SMTP recipient array', async () => {
+  const data = {
+    taskId: 'master', linkedTaskIds: ['individual'], to: ['a@example.test', 'b@example.test'],
+    delivery: { state: 'PENDING' }
+  };
+  const { db, ref, docs } = fakeFirestore({
+    'mail/linked-multi': data, 'tasks/master': { completed: false },
+    'tasks/individual': { assigneeProgress: {
+      'a@example.test': { completed: true, progress: 100 }, 'b@example.test': { completed: false, progress: 50 }
+    } }
+  });
+  const claimed = await claimPendingMail(db, ref('mail/linked-multi'), now);
+  assert.equal(claimed.state, 'SENDING');
+  const recipients = [...data.to];
+  const mailOptions = { to: recipients };
+  assert.equal(await skipTaskMailIfClosed(db, ref('mail/linked-multi'), claimed.data, recipients, now + 1), false);
+  assert.deepEqual(mailOptions.to, ['b@example.test']);
+  assert.equal(docs.get('mail/linked-multi').delivery.suppressedClosedRecipients, 1);
+});
+
+test('invalid or excessive task links fail closed instead of silently truncating closure checks', async () => {
+  for (const linkedTaskIds of ['individual', [''], ['tasks/individual'], Array.from({ length: 6 }, (_, i) => `individual-${i}`)]) {
+    const data = { taskId: 'master', linkedTaskIds, delivery: { state: 'PENDING' }, to: ['a@example.test'] };
+    const { db, ref, docs } = fakeFirestore({
+      'mail/invalid-links': data, 'tasks/master': { completed: false },
+      'tasks/individual-5': { completed: true }
+    });
+    assert.equal((await claimPendingMail(db, ref('mail/invalid-links'), now)).state, 'SKIPPED_UNLINKED_TASK');
+    assert.equal(await skipTaskMailIfClosed(db, ref('mail/invalid-links'), data, data.to, now), 'SKIPPED_UNLINKED_TASK');
+    assert.equal(docs.get('mail/invalid-links').delivery.attemptCount, undefined);
+  }
+});
+
+test('the actual daemon sender passes only open recipients to mocked sendMail and never sends if the individual closes', async () => {
+  const source = readFileSync(new URL('../scripts/mailerDaemon.js', import.meta.url), 'utf8');
+  const start = source.indexOf('async function sendClaimedMail(');
+  const end = source.indexOf('\nasync function processPendingMails(', start);
+  assert.ok(start >= 0 && end > start);
+  // Evaluate only the real sender, never the daemon bootstrap or its production credentials.
+  for (const allClosed of [false, true]) {
+    const data = {
+      taskId: 'master', linkedTaskIds: ['individual'], type: 'task_reminder',
+      to: ['closed@crearpsl.net', 'open@crearpsl.net'], delivery: { state: 'SENDING', attemptCount: 1 }
+    };
+    const { db, ref, docs } = fakeFirestore({
+      'mail/sender': data, 'tasks/master': { completed: false },
+      'tasks/individual': { completed: false, assigneeProgress: {
+        'closed@crearpsl.net': { completed: false }, 'open@crearpsl.net': { completed: false }
+      } },
+      'tasks/individual/participant_states/closed@crearpsl.net': { state: { completed: true } },
+      'tasks/individual/participant_states/open@crearpsl.net': { state: { completed: allClosed } }
+    });
+    const deliveries = [];
+    const sendClaimedMail = runInNewContext(`(${source.slice(start, end)})`, {
+      db, skipTaskMailIfClosed, recordMailSuccess, recordMailFailure, recordMailUnknown,
+      sanitizeHtml: html => html, buildIcsAttachment: () => null,
+      transporter: { sendMail: async options => { deliveries.push(structuredClone(options)); } },
+      limaTransporter: null, process: { env: { GMAIL_SERVER_EMAIL: 'sender@example.test' } },
+      isDefinitiveMailFailure: () => false, console: { log() {}, warn() {}, error() {} }
+    });
+    assert.equal(await sendClaimedMail({ id: 'sender', ref: ref('mail/sender') }, data),
+      allClosed ? 'SKIPPED_CLOSED' : 'SUCCESS');
+    if (allClosed) {
+      assert.equal(deliveries.length, 0);
+      assert.equal(docs.get('mail/sender').delivery.state, 'SKIPPED_CLOSED');
+    } else {
+      assert.equal(deliveries.length, 1);
+      assert.deepEqual(Array.from(deliveries[0].to), ['open@crearpsl.net']);
+      assert.equal(docs.get('mail/sender').delivery.suppressedClosedRecipients, 1);
+    }
+  }
+});
+
+test('canonical closure prevents overdue enqueue without advancing the debounce', async () => {
+  const { db, docs, ref } = fakeFirestore({
+    'tasks/overdue-canonical': {
+      completed: false, deadline: new Date(now - 72 * 60 * 60 * 1000).toISOString(),
+      assignedToEmails: ['coach@example.test'], assigneeProgress: { 'coach@example.test': { completed: false } }
+    },
+    'tasks/overdue-canonical/participant_states/coach@example.test': { state: { completed: true, progress: 100 } }
+  });
+  const result = await enqueueOverdueTaskMails(db, ref('tasks/overdue-canonical'), [{
+    id: 'not-enqueued', data: { taskId: 'overdue-canonical', type: 'task_reminder', recipientEmail: 'coach@example.test' }
+  }], now, new Date(now).toISOString());
+  assert.deepEqual(result, { queued: 0, reason: 'closed' });
+  assert.equal(docs.has('mail/not-enqueued'), false);
+  assert.equal(docs.get('tasks/overdue-canonical').lastReminderAt, undefined);
+});
+
+test('the retired unaudited legacy recovery command fails before reading credentials or initializing Admin', () => {
+  const source = readFileSync(new URL('../scripts/recoverErikaTask.mjs', import.meta.url), 'utf8');
+  const gate = source.slice(0, source.indexOf('\nimport '));
+  assert.throws(() => runInNewContext(gate), /Recuperación histórica retirada/);
+  assert.ok(!/readFileSync|initializeApp|process\.env/.test(gate));
 });

@@ -6,6 +6,7 @@ import HomeModuleWorkspace from '../components/HomeModuleWorkspace';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { resolveTaskLink } from '../services/taskNavigation';
+import { loadTaskParticipants } from '../services/taskParticipantStore';
 import { useAuth } from '../context/AuthContext';
 import { useCycles } from '../context/CyclesContext';
 import CalendarFreshness from '../components/CalendarFreshness';
@@ -1084,7 +1085,7 @@ export default function Home() {
     let cancelled = false;
     resolveTaskLink(linkedTaskId, allTasks || [], currentUser, async id => {
       const snapshot = await getDoc(doc(db, 'tasks', id));
-      return snapshot.exists() ? { ...snapshot.data(), id: snapshot.id } : null;
+      return snapshot.exists() ? loadTaskParticipants(db, id, { ...snapshot.data(), id: snapshot.id }) : null;
     }).then(task => {
       if (cancelled) return;
       setSelectedTaskForDetail(task);
@@ -1142,7 +1143,7 @@ export default function Home() {
         const snap = await getDoc(doc(db, 'tasks', notif.taskId));
         if (snap.exists()) {
           const candidate = { id: snap.id, ...snap.data() };
-          if (isTaskVisibleForUser(candidate, currentUser)) targetTask = candidate;
+          if (isTaskVisibleForUser(candidate, currentUser)) targetTask = await loadTaskParticipants(db, snap.id, candidate);
         }
       } catch (err) {
         console.warn("Error obteniendo tarea desde Firestore:", err);

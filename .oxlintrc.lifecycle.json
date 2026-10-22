@@ -1,0 +1,5 @@
+{
+  "env": { "browser": true, "node": true, "es2022": true },
+  "plugins": ["react"],
+  "rules": { "no-undef": "error" }
+}

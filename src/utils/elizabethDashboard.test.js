@@ -136,7 +136,7 @@ test('loading, failed and restricted views never claim zero totals or confirmed 
   assert.match(context, /\['createdBy', exactOperator/);
   assert.match(context, /\['assignedByEmail', exactOperator/);
   assert.match(context, /\['assignedToEmails', arrayOperator/);
-  assert.match(context, /setLoading\(pendingQueries\.size > 0\)/);
+  assert.match(context, /setLoading\(pendingQueries\.size > 0 \|\| pendingParticipants\.size > 0\)/);
   assert.match(context, /pendingQueries\.delete\(key\)/);
   const page = readFileSync(new URL('../pages/ElizabethDashboard.jsx', import.meta.url), 'utf8');
   assert.match(page, /Tus propias tareas/);

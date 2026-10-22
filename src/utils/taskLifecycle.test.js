@@ -1,6 +1,22 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { applyCycleCompletion, createCycleCompletion, getEffectiveCompletion, getNextCompletionState, getTaskProgress, isCompletionTransition, resolveTaskCycleScope } from './taskLifecycle.js';
+import { applyCycleCompletion, createCycleCompletion, getEffectiveCompletion, getNextCompletionState, getTaskProgress, hasAmbiguousCycleCompletionScope, isCompletionTransition, isTaskClosedForDelivery, preserveClosedAssigneeProgress, resolveTaskCycleScope, taskClosureContext } from './taskLifecycle.js';
+
+test('closure context captures existing comments and evidence references without inventing closure-specific data', () => {
+  const task = { comments: 'Comment present at close', evidence_url: 'https://example.test/evidence',
+    evidences: [{ id: 'ev-1', url: 'https://example.test/evidence' }] };
+  const storedEvent = JSON.parse(JSON.stringify({ closureContext: taskClosureContext(task) }));
+  task.comments = 'Edited after reopen';
+  task.evidences = [];
+  assert.equal(storedEvent.closureContext.comments, 'Comment present at close');
+  assert.equal(storedEvent.closureContext.evidenceUrl, 'https://example.test/evidence');
+  assert.equal(storedEvent.closureContext.evidences[0].id, 'ev-1');
+  assert.deepEqual(taskClosureContext({}), { comments: '', evidenceUrl: '', evidences: [] });
+  for (const oversized of [{ comments: 'x'.repeat(500001) }, { evidenceUrl: 'x'.repeat(8193) },
+    { evidences: Array.from({ length: 101 }, () => ({})) }]) {
+    assert.throws(() => taskClosureContext(oversized), /esquema de auditoría/);
+  }
+});
 
 test('catalog writes require a non-empty cycle ID and sede, including omitted scope', () => {
   for (const cycle of [undefined, null, {}, { name: 'Sin Equipo Activo' }, { id: '' }, { id: '  ' }, { id: 7 }]) {
@@ -61,12 +77,77 @@ test('completion notifications are reserved for pending-to-complete transitions'
   assert.equal(isCompletionTransition(true, false), false);
 });
 
+test('delivery suppression respects cycle, assignee, and global completion scopes', () => {
+  const task = {
+    completed: false,
+    completions: {
+      'Lima__cycle-1': { completed: true },
+      'Lima__cycle-2': { completed: false }
+    },
+    assigneeProgress: {
+      'one@crearpsl.net': { completed: true },
+      'two@crearpsl.net': { completed: false }
+    }
+  };
+  assert.equal(isTaskClosedForDelivery(task, { completionScope: { sede: 'Lima', cycleId: 'cycle-1' } }), true);
+  assert.equal(isTaskClosedForDelivery(task, { completionScope: { sede: 'Lima', cycleId: 'cycle-2' } }), false);
+  assert.equal(isTaskClosedForDelivery(task, {
+    completionScope: { sede: 'Lima', cycleId: 'cycle-2' }, recipientEmail: 'one@crearpsl.net'
+  }), true, 'a recipient completion also suppresses mail for that recipient');
+  assert.equal(isTaskClosedForDelivery(task, {
+    completionScope: { sede: 'Lima', cycleId: 'cycle-2' }, recipientEmail: 'two@crearpsl.net'
+  }), false);
+  assert.equal(isTaskClosedForDelivery(task, { recipientEmail: 'one@crearpls.com' }), true);
+  assert.equal(isTaskClosedForDelivery(task, { recipientEmail: 'two@crearpsl.net' }), false);
+  assert.equal(isTaskClosedForDelivery(task), false, 'another cycle completion does not close the global task');
+  assert.equal(isTaskClosedForDelivery({ completed: true }, { completionScope: { sede: 'Lima', cycleId: 'cycle-2' } }), false);
+});
+
+test('delivery requires explicit scope when a task has cycle completions', () => {
+  const task = { completed: true, completions: { 'Lima__cycle-1': { completed: true } } };
+  assert.equal(hasAmbiguousCycleCompletionScope(task), true);
+  assert.equal(hasAmbiguousCycleCompletionScope(task, {
+    completionScope: { sede: 'Lima', cycleId: 'cycle-2' }
+  }), false);
+  assert.equal(hasAmbiguousCycleCompletionScope({ completions: { Lima: { completed: true } } }), false);
+});
+
+test('stale assignee updates preserve only still-assigned closed entries and their recorded closure', () => {
+  const merged = preserveClosedAssigneeProgress({
+    'owner@crearpsl.net': {
+      completed: true, status: 'Completada', progress: 100,
+      completedAt: 'recorded-close', completionId: 'event-1'
+    },
+    'open@crearpsl.net': { completed: false, progress: 20 },
+    'former@crearpsl.net': { completed: true, status: 'Completada', progress: 100 },
+    'legacy-closed@crearpsl.net': { completed: true, status: 'Completada', progress: 100 }
+  }, {
+    'owner@crearpsl.com': { completed: false, status: 'Pendiente', progress: 25, completedAt: null },
+    'open@crearpsl.net': { completed: false, progress: 50 },
+    'removed@crearpsl.net': { completed: false, progress: 0 },
+    'legacy-closed@crearpsl.net': { completed: false, status: 'Pendiente', progress: 0, completedAt: 'unverified-new-date' }
+  });
+
+  assert.deepEqual(merged['owner@crearpsl.com'], {
+    completed: true, status: 'Completada', progress: 100,
+    completedAt: 'recorded-close', completionId: 'event-1'
+  });
+  assert.deepEqual(merged['open@crearpsl.net'], { completed: false, progress: 50 });
+  assert.equal('removed@crearpsl.net' in merged, true);
+  assert.equal('former@crearpsl.net' in merged, false);
+  assert.equal(merged['legacy-closed@crearpsl.net'].completed, true);
+  assert.equal('completedAt' in merged['legacy-closed@crearpsl.net'], false,
+    'missing historical close time is not inferred from a later save');
+});
+
 test('progress-only updates to 100% complete the task', () => {
   assert.equal(getNextCompletionState({ progressPercentage: 100 }), true);
   assert.equal(getNextCompletionState({ progress: 100 }), true);
   assert.equal(getNextCompletionState({ completed: true, progress: 30 }), true);
   assert.equal(getNextCompletionState({ completed: false, progressPercentage: 100 }), false);
   assert.equal(getNextCompletionState({ progressPercentage: 99 }), false);
+  assert.equal(getNextCompletionState({ status: 'Pendiente de validación' }), null);
+  assert.equal(getNextCompletionState({ comments: 'Evidence saved' }), null);
 });
 
 test('cycle completion entries retain cycle identity and audit metadata', () => {

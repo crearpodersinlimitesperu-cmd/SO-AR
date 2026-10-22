@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { db, auth } from '../services/firebase';
-import { collection, onSnapshot, doc, updateDoc, setDoc, writeBatch, addDoc, query, where, orderBy, limit, getDocs, getDoc, runTransaction } from 'firebase/firestore';
+import { collection, onSnapshot, doc, updateDoc, writeBatch, addDoc, query, where, orderBy, limit, getDocs, runTransaction, serverTimestamp } from 'firebase/firestore';
 import { checklistData } from '../data/checklistData';
 import { usersData, normalizeRole } from '../data/usersData';
 import { isSuperAdminEmail, isGerenciaRole } from '../config/permissions';
@@ -11,8 +11,10 @@ import { createGoogleTask } from '../services/googleSync';
 import { useUI } from './UIContext';
 import { useAuth } from './AuthContext';
 import { useCycles } from './CyclesContext';
-import { applyCycleCompletion, createCycleCompletion, getEffectiveCompletion, getNextCompletionState, isCompletionTransition, resolveTaskCycleScope } from '../utils/taskLifecycle';
+import { applyCycleCompletion, createCycleCompletion, getEffectiveCompletion, getNextCompletionState, hasAmbiguousCycleCompletionScope, isCompletionTransition, isTaskClosedForDelivery, preserveClosedAssigneeProgress, resolveTaskCycleScope, taskClosureContext } from '../utils/taskLifecycle';
 import { normalizeTaskLocation, taskLocationLabel, taskReminderMessage, taskUrl, escapeTaskHtml } from '../utils/taskLocation';
+import { applyParticipantChanges, mergeParticipantStates, participantCollectionPath, participantKeys } from '../utils/taskParticipants';
+import { readTaskParticipants, stageTaskParticipants } from '../services/taskParticipantStore';
 
 const ChecklistContext = createContext();
 
@@ -154,89 +156,6 @@ const buildTaskEmailHtml = ({
   `;
 };
 
-// Genera una plantilla de correo HTML institucional cuando una tarea es COMPLETADA,
-// notificando al lider que la asigno (pedido explicito de Jose: enviar correo al asignador al completarse).
-const buildTaskCompletedEmailHtml = ({
-  taskTitle,
-  assignerName,
-  completedByName,
-  completedByEmail,
-  completedAt,
-  assignedSede,
-  evidenceUrl,
-  notes
-}) => {
-  const greeting = assignerName || 'Líder';
-  const cleanTitle = taskTitle || 'Compromiso Operativo';
-  const completedDateFormatted = formatDeadlineEs(completedAt);
-
-  return `
-    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1e293b; max-width: 620px; margin: 0 auto; border: 1px solid #cbd5e1; border-radius: 12px; overflow: hidden; background-color: #ffffff; box-shadow: 0 4px 12px rgba(0,0,0,0.06);">
-      <!-- Cabecera Institucional Verde Exito -->
-      <div style="background: linear-gradient(135deg, #064e3b 0%, #0f172a 100%); color: #ffffff; padding: 24px; text-align: center; border-bottom: 3px solid #10b981;">
-        <span style="display: inline-block; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #34d399; font-weight: 700; margin-bottom: 6px;">CREAR PODER SIN LÍMITES</span>
-        <h1 style="margin: 0; font-size: 22px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px;">✅ TAREA COMPLETADA</h1>
-        <p style="margin: 6px 0 0 0; font-size: 13px; color: #a7f3d0;">Sistema Operativo Causa OS · Cumplimiento de Acuerdos</p>
-      </div>
-
-      <div style="padding: 26px 28px; background-color: #ffffff;">
-        <p style="font-size: 15px; margin-top: 0; line-height: 1.5;">Hola <strong>${greeting}</strong>,</p>
-        <p style="font-size: 14.5px; color: #475569; line-height: 1.5; margin-bottom: 20px;">
-          Te informamos que la tarea que asignaste en <strong>Causa OS</strong> ha sido marcada como <strong>COMPLETADA</strong> con éxito.
-        </p>
-
-        <!-- Tarjeta de Detalle de Cumplimiento -->
-        <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 18px 20px; margin-bottom: 22px;">
-          <div style="margin-bottom: 12px;">
-            <span style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: #166534; letter-spacing: 0.5px;">Tarea completada:</span>
-            <div style="font-size: 17px; font-weight: 700; color: #064e3b; margin-top: 4px; line-height: 1.35;">${cleanTitle}</div>
-          </div>
-
-          <table style="width: 100%; border-collapse: collapse; font-size: 13.5px; margin-top: 10px;">
-            <tbody>
-              <tr>
-                <td style="padding: 6px 0; color: #166534; width: 140px; font-weight: 600;">👤 Completada por:</td>
-                <td style="padding: 6px 0; color: #0f172a; font-weight: 700;">${completedByName} (${completedByEmail || 'Colaborador'})</td>
-              </tr>
-              <tr>
-                <td style="padding: 6px 0; color: #166534; font-weight: 600;">📅 Fecha y hora:</td>
-                <td style="padding: 6px 0; color: #0f172a; font-weight: 600;">${completedDateFormatted}</td>
-              </tr>
-              <tr>
-                <td style="padding: 6px 0; color: #166534; font-weight: 600;">📍 Sede / Área:</td>
-                <td style="padding: 6px 0; color: #0f172a;">${assignedSede || 'Global'}</td>
-              </tr>
-              ${evidenceUrl ? `
-              <tr>
-                <td style="padding: 6px 0; color: #166534; font-weight: 600;">🔗 Evidencia:</td>
-                <td style="padding: 6px 0;"><a href="${evidenceUrl}" target="_blank" rel="noopener noreferrer" style="color: #059669; font-weight: 700; text-decoration: underline;">Ver Evidencia Adjunta</a></td>
-              </tr>
-              ` : ''}
-            </tbody>
-          </table>
-
-          ${notes ? `
-          <div style="background-color: #ffffff; color: #1e293b; border-left: 4px solid #10b981; padding: 12px 14px; margin-top: 14px; border-radius: 6px; border: 1px solid #e2e8f0; border-left-width: 4px;">
-            <strong style="color: #047857; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px;">💬 Comentarios o Notas de Cierre:</strong>
-            <span style="white-space: pre-wrap; font-size: 13.5px; line-height: 1.5; color: #334155;">${notes}</span>
-          </div>
-          ` : ''}
-        </div>
-
-        <div style="text-align: center; margin: 24px 0 10px 0;">
-          <a href="https://centro-operativo-cpsl.web.app/home" style="background-color: #059669; color: #ffffff; padding: 12px 28px; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 14px; display: inline-block; box-shadow: 0 4px 10px rgba(5, 150, 105, 0.25);">
-            🚀 Ingresar a Causa OS
-          </a>
-        </div>
-      </div>
-
-      <div style="background-color: #f8fafc; border-top: 1px solid #e2e8f0; padding: 12px 20px; text-align: center; font-size: 11px; color: #64748b;">
-        CREAR Poder Sin Límites · Causa OS · Sistema de Gestión Impecable
-      </div>
-    </div>
-  `;
-};
-
 export function ChecklistProvider({ children }) {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -292,78 +211,12 @@ export function ChecklistProvider({ children }) {
   // toque, para no congelar en el doc compartido la fecha del primer equipo que
   // por azar lo haya tocado primero — para cualquier otro caso (default) se sigue
   // usando currentCycle, igual que siempre.
-  // Notifica al asignador/creador de la tarea por correo institucional y notificacion in-app
-  // cuando un colaborador marca la tarea como COMPLETADA (pedido explicito de Jose).
-  const buildCompletionDelivery = (prevData, updates, taskId, completionId) => {
-    const sanitizeEmail = (email) => (typeof email === 'string' ? email.trim().toLowerCase()
-      .replace('@crearpls.com', '@crearpsl.net')
-      .replace('@crearpsl.com', '@crearpsl.net')
-      .replace(/ketherine\.aguirre@/gi, 'katherine.aguirre@')
-      .replace(/coodinacion\.administrativa@/gi, 'coordinacion.administrativa@') : '');
-    const assignerEmail = sanitizeEmail(prevData.assignedByEmail || '');
-    const completedByName = currentUser?.displayName || currentUser?.name || currentUser?.email || 'Un colaborador';
-    const completedByEmail = sanitizeEmail(currentUser?.email || '');
-    const taskTitle = updates.task || prevData.task || updates.title || prevData.title || 'Compromiso Operativo';
-    const assignedSede = updates.assignedSede || prevData.assignedSede || prevData.sede || currentUser?.sede || 'Global';
-    const nowIso = updates.completedAt || new Date().toISOString();
-    if (!assignerEmail.includes('@') || assignerEmail === completedByEmail) return null;
-
-    const noteText = (updates.comments || updates.notes || prevData.comments || prevData.notes || '').trim();
-    const evidenceUrl = updates.evidenceUrl || updates.evidence_url || prevData.evidenceUrl || prevData.evidence_url || '';
-    return {
-      mailRef: doc(db, 'mail', `task_completed_${completionId}`),
-      mailData: {
-        to: [assignerEmail],
-        type: 'task_completed_alert',
-        delivery: { state: 'PENDING' },
-        createdAt: nowIso,
-        message: {
-          subject: `✅ TAREA COMPLETADA: ${taskTitle} — Causa OS`,
-          html: buildTaskCompletedEmailHtml({
-            taskTitle,
-            assignerName: prevData.assignedByName || prevData.assignerName || 'Líder / Coordinador',
-            completedByName,
-            completedByEmail,
-            completedAt: nowIso,
-            assignedSede,
-            evidenceUrl,
-            notes: noteText
-          })
-        }
-      },
-      notificationRef: doc(db, 'notifications', `task_completed_${completionId}`),
-      notificationData: {
-        userId: assignerEmail,
-        title: `✅ Tarea completada: ${taskTitle}`,
-        message: `${completedByName} ha completado la tarea "${taskTitle}" en ${assignedSede}.`,
-        taskId,
-        type: 'task_completed',
-        read: false,
-        created_at: nowIso
-      }
-    };
-  };
-
-  const notifyTaskCompletedToAssigner = async (prevData, updates, taskId, completionId) => {
-    try {
-      const delivery = buildCompletionDelivery(prevData, updates, taskId, completionId);
-      if (!delivery) return;
-      await Promise.all([
-        setDoc(delivery.mailRef, delivery.mailData),
-        setDoc(delivery.notificationRef, delivery.notificationData)
-      ]);
-      console.log(`📧 Notificacion de tarea completada despachada para: ${delivery.mailData.to[0]}`);
-    } catch (error) {
-      console.error("Error al notificar al asignador por correo de tarea completada:", error);
-    }
-  };
-
-  const writeTaskDoc = async (taskId, updates, cycleForDeadline = currentCycle, cycleScope = null) => {
+  const writeTaskDoc = async (taskId, updates, cycleForDeadline = currentCycle, cycleScope = null, explicitReopen = false) => {
     try {
       const taskRef = doc(db, 'tasks', taskId);
       const baseTask = checklistData.find(task => task.id === taskId);
       const completionId = doc(collection(db, 'task_completion_events')).id;
-      let completionDelivery = null;
+      let preservedClosure = false;
 
       const expandDottedFields = (fields) => Object.entries(fields).reduce((result, [path, value]) => {
         const keys = path.split('.');
@@ -378,51 +231,135 @@ export function ChecklistProvider({ children }) {
 
       await runTransaction(db, async transaction => {
         const snapshot = await transaction.get(taskRef);
-        const prevData = snapshot.exists() ? snapshot.data() : (baseTask || {});
+        const persisted = snapshot.exists() ? snapshot.data() : (baseTask || {});
+        const participants = snapshot.exists()
+          ? await readTaskParticipants(transaction, db, taskId, persisted, Object.keys(updates.assigneeProgress || {}))
+          : { task: persisted, records: new Map() };
+        const prevData = participants.task;
         const nextUpdates = { ...updates };
+        if (updates.assigneeProgress) {
+          nextUpdates.assigneeProgress = applyParticipantChanges(prevData, updates.assigneeProgress);
+        }
         const nextCompleted = getNextCompletionState(updates);
         const includesProgressUpdate = updates.progress !== undefined || updates.progressPercentage !== undefined;
-        const includesCompletionUpdate = updates.completed !== undefined ||
-          updates.status !== undefined || includesProgressUpdate;
-        let completionTransition = false;
+        const includesCompletionUpdate = nextCompleted !== null;
 
         const resolvedScope = resolveTaskCycleScope(prevData, {
           catalogTask: Boolean(baseTask),
           ...(cycleScope ?? { sede: currentUser?.sede?.trim() || 'Global', cycle: cycleForDeadline })
         });
         const cycleKey = resolvedScope ? `${resolvedScope.sede}__${resolvedScope.cycle.id}` : null;
-        if (resolvedScope && includesCompletionUpdate) {
-          const previous = getEffectiveCompletion(prevData, {
-            sede: resolvedScope.sede,
-            cycleId: resolvedScope.cycle.id,
-            cycleScoped: true
+        const previous = resolvedScope
+          ? getEffectiveCompletion(prevData, {
+              sede: resolvedScope.sede,
+              cycleId: resolvedScope.cycle.id,
+              cycleScoped: true
+            })
+          : {
+              completed: isTaskClosedForDelivery(prevData),
+              completion: null
+            };
+        const reopeningRequested = previous.completed && nextCompleted === false;
+        const preserveTerminalState = previous.completed && !(reopeningRequested && explicitReopen);
+        if (!explicitReopen && updates.assigneeProgress) {
+          if (preserveTerminalState && !resolvedScope) {
+            delete nextUpdates.assigneeProgress;
+          } else {
+            nextUpdates.assigneeProgress = preserveClosedAssigneeProgress(
+              prevData.assigneeProgress,
+              nextUpdates.assigneeProgress
+            );
+          }
+        }
+        if (resolvedScope) {
+          delete nextUpdates.assigneeProgress;
+          ['completed', 'status', 'completedAt', 'progress', 'progressPercentage'].forEach(field => {
+              delete nextUpdates[field];
           });
-          completionTransition = isCompletionTransition(previous.completed, nextCompleted);
-          const completionEntry = createCycleCompletion(prevData.completions?.[cycleKey], {
-            cycle: resolvedScope.cycle,
-            completed: nextCompleted,
-            updatedAt: new Date().toISOString(),
-            completionId: completionTransition ? completionId : prevData.completions?.[cycleKey]?.completionId,
-            updates
+          Object.keys(nextUpdates).forEach(field => {
+              if (field.startsWith(`completions.${resolvedScope.sede}.`)) delete nextUpdates[field];
           });
-          nextUpdates[`completions.${cycleKey}`] = completionEntry;
-        } else if (includesCompletionUpdate) {
-          completionTransition = isCompletionTransition(
-            prevData.completed === true || prevData.status === 'Completada',
-            nextCompleted
-          );
+        }
+        preservedClosure = preserveTerminalState && (
+          nextCompleted === false ||
+          updates.completed === false ||
+          (typeof updates.status === 'string' && updates.status !== 'Completada') ||
+          (includesProgressUpdate && (updates.progress ?? updates.progressPercentage) < 100) ||
+          updates.completedAt === null
+        );
+        const effectiveNextCompleted = preserveTerminalState ? true : nextCompleted;
+
+        if (preserveTerminalState && !resolvedScope) {
+          nextUpdates.completed = true;
+          nextUpdates.status = 'Completada';
+          const priorCompletedAt = previous.completion?.completedAt ?? prevData.completedAt;
+          if (priorCompletedAt !== undefined && priorCompletedAt !== null) {
+            nextUpdates.completedAt = priorCompletedAt;
+          } else {
+            delete nextUpdates.completedAt;
+          }
+          if (includesProgressUpdate) {
+            const priorProgress = previous.completion?.progressPercentage ??
+              previous.completion?.progress ??
+              prevData.progressPercentage ??
+              prevData.progress ??
+              100;
+            if ('progressPercentage' in updates) nextUpdates.progressPercentage = priorProgress;
+            if ('progress' in updates) nextUpdates.progress = priorProgress;
+          }
         }
 
-        if (completionTransition) {
-          completionDelivery = buildCompletionDelivery(
-            prevData,
-            { ...nextUpdates, completedAt: new Date().toISOString() },
-            taskId,
-            completionId
-          );
+        const completionTransition = includesCompletionUpdate &&
+          isCompletionTransition(previous.completed, effectiveNextCompleted);
+        const reopenTransition = reopeningRequested && explicitReopen;
+        const eventScope = resolvedScope
+          ? { sede: resolvedScope.sede, cycleId: resolvedScope.cycle.id }
+          : {};
+        const individualTransitions = [];
+        let changedKeys = [];
+        if (nextUpdates.assigneeProgress) {
+          const previousMap = prevData.assigneeProgress || {};
+          const nextMap = nextUpdates.assigneeProgress;
+          changedKeys = [...new Set([...Object.keys(previousMap), ...Object.keys(nextMap)])]
+            .filter(key => JSON.stringify(previousMap[key]) !== JSON.stringify(nextMap[key]));
+          changedKeys.forEach((key, index) => {
+            const wasClosed = isTaskClosedForDelivery({ ...previousMap[key] });
+            const nowClosed = isTaskClosedForDelivery({ ...nextMap[key] });
+            if (wasClosed !== nowClosed) individualTransitions.push({
+              key, id: `${completionId}_participant_${index}`, action: nowClosed ? 'completed' : 'reopened'
+            });
+          });
+        }
+        nextUpdates.lifecycleMutation = {
+          eventId: completionId,
+          scope: eventScope,
+          assigneeEventIds: Object.fromEntries(individualTransitions.map(event => [event.key, event.id])),
+          ...(!reopenTransition
+            ? { closureContext: taskClosureContext({ ...prevData, ...nextUpdates }) }
+            : {})
+        };
+        if (resolvedScope && includesCompletionUpdate) {
+          const priorEntry = prevData.completions?.[cycleKey] || {};
+          const preservedProgress = priorEntry.progressPercentage ?? priorEntry.progress ?? 100;
+          const completionUpdates = preserveTerminalState
+            ? { ...updates, progressPercentage: preservedProgress, progress: preservedProgress }
+            : updates;
+          const completionEntry = createCycleCompletion(prevData.completions?.[cycleKey], {
+            cycle: resolvedScope.cycle,
+            completed: effectiveNextCompleted,
+            updatedAt: new Date().toISOString(),
+            completionId: completionTransition ? completionId : priorEntry.completionId,
+            updates: completionUpdates
+          });
+          nextUpdates[`completions.${cycleKey}`] = completionEntry;
         }
 
         if (snapshot.exists()) {
+          if (nextUpdates.assigneeProgress) {
+            stageTaskParticipants(transaction, db, taskId, participants, nextUpdates.assigneeProgress,
+              nextUpdates.lifecycleMutation.assigneeEventIds);
+            delete nextUpdates.assigneeProgress;
+          }
           transaction.update(taskRef, nextUpdates);
         } else {
           const initialData = {
@@ -440,11 +377,29 @@ export function ChecklistProvider({ children }) {
           transaction.set(taskRef, initialData);
         }
 
-        if (completionTransition && completionDelivery) {
-          transaction.set(completionDelivery.mailRef, completionDelivery.mailData);
-          transaction.set(completionDelivery.notificationRef, completionDelivery.notificationData);
+        const actorEmail = String(currentUser?.email || auth.currentUser?.email || '').trim().toLowerCase();
+        for (const event of individualTransitions) {
+          transaction.set(doc(db, 'task_completion_events', event.id), {
+            taskId, action: event.action, actorEmail, occurredAt: serverTimestamp(),
+            source: 'manual', scope: { assigneeEmail: event.key },
+            ...(event.action === 'completed'
+              ? { closureContext: taskClosureContext({ ...prevData, ...nextUpdates }) } : {})
+          });
+        }
+        if (completionTransition || reopenTransition) {
+          const eventRef = doc(db, 'task_completion_events', completionId);
+          transaction.set(eventRef, {
+            taskId,
+            action: reopenTransition ? 'reopened' : 'completed',
+            actorEmail,
+            occurredAt: serverTimestamp(),
+            source: 'manual',
+            scope: eventScope,
+            ...(!reopenTransition ? { closureContext: nextUpdates.lifecycleMutation.closureContext } : {})
+          });
         }
       });
+      return { preservedClosure };
     } catch (err) {
       console.error("writeTaskDoc error:", err);
       throw err;
@@ -533,16 +488,63 @@ export function ChecklistProvider({ children }) {
 
     const snapshotsByQuery = new Map();
     const pendingQueries = new Set(querySpecs.map(({ key }) => key));
+    const participantSubscriptions = new Map();
+    const participantSnapshots = new Map();
+    const pendingParticipants = new Set();
+    const failedParticipants = new Set();
     let active = true;
     const publishTasks = () => {
       if (!active) return;
       const docsById = new Map();
       snapshotsByQuery.forEach(docs => docs.forEach(taskDoc => docsById.set(taskDoc.id, taskDoc)));
       const userSede = currentUser?.sede?.trim() || 'Global';
-      const loadedTasks = filterTasksForUser(
+      const authorizedTasks = filterTasksForUser(
         [...docsById.values()].map(taskDoc => ({ id: taskDoc.id, ...taskDoc.data() })),
         currentUser
-      ).map(data => {
+      );
+      const participantTaskIds = new Set(authorizedTasks.filter(task => participantKeys(task).length > 0).map(task => task.id));
+      for (const [id, unsubscribe] of participantSubscriptions) {
+        if (participantTaskIds.has(id)) continue;
+        unsubscribe();
+        participantSubscriptions.delete(id);
+        participantSnapshots.delete(id);
+        pendingParticipants.delete(id);
+        failedParticipants.delete(id);
+      }
+      for (const id of participantTaskIds) {
+        if (participantSubscriptions.has(id)) continue;
+        pendingParticipants.add(id);
+        participantSubscriptions.set(id, () => {});
+        const unsubscribe = onSnapshot(collection(db, participantCollectionPath(id)), snapshot => {
+          if (!active) return;
+          const states = Object.fromEntries(snapshot.docs.map(stateDoc => [stateDoc.id, stateDoc.data().state]));
+          try {
+            mergeParticipantStates({}, states);
+          } catch (error) {
+            pendingParticipants.delete(id);
+            failedParticipants.add(id);
+            console.error('Invalid canonical task progress:', error.message);
+            setTaskLoadError('No se pudo verificar el avance individual; esas tareas no se muestran como activas.');
+            publishTasks();
+            return;
+          }
+          participantSnapshots.set(id, states);
+          pendingParticipants.delete(id);
+          failedParticipants.delete(id);
+          publishTasks();
+        }, error => {
+          if (!active) return;
+          pendingParticipants.delete(id);
+          failedParticipants.add(id);
+          console.error('Error fetching canonical task progress:', error.code || 'PARTICIPANT_READ_ERROR');
+          setTaskLoadError('No se pudo verificar el avance individual; esas tareas no se muestran como activas.');
+          publishTasks();
+        });
+        participantSubscriptions.set(id, unsubscribe);
+      }
+      const loadedTasks = authorizedTasks
+        .filter(task => !pendingParticipants.has(task.id) && !failedParticipants.has(task.id))
+        .map(task => mergeParticipantStates(task, participantSnapshots.get(task.id) || {})).map(data => {
         let sedeCompleted = data.completed;
         let sedeStatus = data.status;
         const taskId = data.id;
@@ -561,7 +563,7 @@ export function ChecklistProvider({ children }) {
         return { ...data, completed: sedeCompleted, status: sedeStatus };
       });
 
-      const existingIds = new Set(loadedTasks.map(task => task.id));
+      const existingIds = new Set(authorizedTasks.map(task => task.id));
       const missingBaseTasks = fallbackTasks
         .filter(task => !existingIds.has(task.id))
         .map(task => ({
@@ -605,7 +607,7 @@ export function ChecklistProvider({ children }) {
 
       setTasks(finalTasks);
       setLoadedTaskIdentity(taskReadIdentity);
-      setLoading(pendingQueries.size > 0);
+      setLoading(pendingQueries.size > 0 || pendingParticipants.size > 0);
     };
 
     setLoading(true);
@@ -629,6 +631,7 @@ export function ChecklistProvider({ children }) {
     return () => {
       active = false;
       unsubscribers.forEach(unsubscribe => unsubscribe());
+      participantSubscriptions.forEach(unsubscribe => unsubscribe());
     };
     // currentCycle?.id se agrega para que, en cuanto CyclesContext termine de cargar
     // el ciclo real (llega después del primer render, vía la API del calendario),
@@ -682,13 +685,6 @@ export function ChecklistProvider({ children }) {
               cycleId: cycleForThisToggle.id,
               updatedAt: new Date().toISOString()
             };
-          } else if (userSede) {
-            nextCompletions[userSede] = {
-              ...(nextCompletions[userSede] || {}),
-              completed: nextStatus,
-              status: nextStatus ? 'Completada' : 'Pendiente',
-              updatedAt: new Date().toISOString()
-            };
           }
           const optimisticTask = {
             ...t,
@@ -706,14 +702,13 @@ export function ChecklistProvider({ children }) {
       const updates = {
         completed: nextStatus,
         status: nextStatus ? 'Completada' : 'Pendiente',
+        progress: nextStatus ? 100 : 0,
+        progressPercentage: nextStatus ? 100 : 0,
         // FIX 16/09/2026: fecha real de cumplimiento (trazabilidad, pedido
         // explicito de Jose). Se limpia al reabrir para no dejar una fecha
         // vieja "pegada"; se vuelve a fijar (con la fecha real del momento)
         // si se vuelve a completar.
-        completedAt: nextStatus ? new Date().toISOString() : null,
-        [`completions.${userSede}.completed`]: nextStatus,
-        [`completions.${userSede}.status`]: nextStatus ? 'Completada' : 'Pendiente',
-        [`completions.${userSede}.updatedAt`]: new Date().toISOString()
+        completedAt: nextStatus ? new Date().toISOString() : null
       };
 
       // Update both legacy and map formats just in case it's a custom task
@@ -721,7 +716,8 @@ export function ChecklistProvider({ children }) {
         taskId,
         updates,
         cycleForThisToggle,
-        cycleScope
+        cycleScope,
+        !nextStatus
       );
     } catch (error) {
       console.error("Error updating task:", error);
@@ -734,9 +730,9 @@ export function ChecklistProvider({ children }) {
     }
   };
 
-  const updateTaskDetails = async (taskId, updates, cycleScope = null) => {
+  const updateTaskDetails = async (taskId, updates, cycleScope = null, explicitReopen = false) => {
     try {
-      await writeTaskDoc(taskId, updates, currentCycle, cycleScope);
+      return await writeTaskDoc(taskId, updates, currentCycle, cycleScope, explicitReopen);
     } catch (error) {
       console.error("Error updating task details:", error);
       showToast("No se pudo actualizar la tarea.", "error");
@@ -762,33 +758,42 @@ export function ChecklistProvider({ children }) {
     const now = new Date().toISOString();
     const senderName = currentUser?.displayName || currentUser?.name || senderEmail;
     const title = task.task || task.title || 'Tarea sin título';
-    const batch = writeBatch(db);
     const messageRef = doc(collection(db, 'task_messages'));
-    batch.set(messageRef, {
-      taskId: task.id,
-      taskTitle: title,
-      senderEmail,
-      senderName,
-      recipientEmails: recipients,
-      body,
-      createdAt: now,
-      channel: recipients.length > 1 ? 'grupo' : 'individual',
-      immutable: true
-    });
-    recipients.forEach(email => {
-      batch.set(doc(collection(db, 'notifications')), {
-        userId: email,
-        title: `Mensaje sobre: ${title}`,
-        message: taskReminderMessage(task, `${senderName}: ${body}`),
+    const taskRef = doc(db, 'tasks', task.id);
+    let notifiedRecipients = [];
+    await runTransaction(db, async transaction => {
+      const taskSnapshot = await transaction.get(taskRef);
+      if (!taskSnapshot.exists()) throw new Error('La tarea ya no existe.');
+      const { task: currentTask } = await readTaskParticipants(transaction, db, task.id, taskSnapshot.data(), recipients);
+      notifiedRecipients = recipients.filter(email =>
+        !isTaskClosedForDelivery(currentTask, { recipientEmail: email })
+      );
+      if (!notifiedRecipients.length) throw new Error('La tarea está cerrada para los destinatarios seleccionados.');
+      transaction.set(messageRef, {
         taskId: task.id,
-        taskMessageId: messageRef.id,
-        type: 'task_message',
-        read: false,
-        created_at: now
+        taskTitle: title,
+        senderEmail,
+        senderName,
+        recipientEmails: notifiedRecipients,
+        body,
+        createdAt: now,
+        channel: notifiedRecipients.length > 1 ? 'grupo' : 'individual',
+        immutable: true
+      });
+      notifiedRecipients.forEach(email => {
+        transaction.set(doc(collection(db, 'notifications')), {
+          userId: email,
+          title: `Mensaje sobre: ${title}`,
+          message: taskReminderMessage(task, `${senderName}: ${body}`),
+          taskId: task.id,
+          taskMessageId: messageRef.id,
+          type: 'task_message',
+          read: false,
+          created_at: now
+        });
       });
     });
-    await batch.commit();
-    return { recipients: recipients.length };
+    return { recipients: notifiedRecipients.length };
   };
 
   const sendTaskReminderEmail = async (task, recipientEmails, text) => {
@@ -800,18 +805,34 @@ export function ChecklistProvider({ children }) {
     const senderName = currentUser?.displayName || currentUser?.name || currentUser?.email || 'Dirección Causa OS';
     const now = new Date().toISOString();
     const escapeHtml = value => String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
-    const batch = writeBatch(db);
     const auditRef = doc(collection(db, 'operational_communications'));
-    batch.set(auditRef, { type: 'task_reminder', taskId: task.id, taskTitle: title, senderEmail: currentUser.email, senderName, recipients, body, createdAt: now, immutable: true });
-    recipients.forEach(email => {
-      batch.set(doc(collection(db, 'mail')), {
-        to: [email], type: 'task_reminder', delivery: { state: 'PENDING' }, createdAt: now,
-        message: { subject: `Recordatorio de tarea: ${title} — Causa OS`, html: `<div style="font-family:Arial,sans-serif;max-width:620px;margin:auto;color:#172033"><h2 style="color:#078ac6">Recordatorio de tarea</h2><p><strong>${escapeHtml(senderName)}</strong> te escribió sobre:</p><p style="font-weight:bold">${escapeHtml(title)}</p><div style="white-space:pre-wrap;background:#f3f7fa;border-left:4px solid #078ac6;padding:14px">${escapeHtml(body)}</div><p>Ubicación: ${escapeHtml(taskLocationLabel(task))}</p><a href="${escapeHtml(taskUrl(task.id))}">Abrir tarea en Causa OS</a><p style="color:#5b6673;font-size:12px">Mensaje enviado desde Causa OS.</p></div>` }
+    const taskRef = doc(db, 'tasks', task.id);
+    const completionScope = task.quitoCycleId && currentUser?.sede
+      ? { sede: currentUser.sede, cycleId: task.quitoCycleId }
+      : task.cycleId && (task.sede || task.assignedSede)
+        ? { sede: task.sede || task.assignedSede, cycleId: task.cycleId }
+        : undefined;
+    let queuedRecipients = [];
+    await runTransaction(db, async transaction => {
+      const taskSnapshot = await transaction.get(taskRef);
+      if (!taskSnapshot.exists()) throw new Error('La tarea ya no existe.');
+      const { task: currentTask } = await readTaskParticipants(transaction, db, task.id, taskSnapshot.data(), recipients);
+      queuedRecipients = recipients.filter(email =>
+        !isTaskClosedForDelivery(currentTask, { completionScope, recipientEmail: email })
+      );
+      if (!queuedRecipients.length) throw new Error('La tarea está cerrada para los destinatarios seleccionados.');
+      transaction.set(auditRef, { type: 'task_reminder', taskId: task.id, taskTitle: title, senderEmail: currentUser.email, senderName, recipients: queuedRecipients, body, createdAt: now, immutable: true });
+      queuedRecipients.forEach(email => {
+        transaction.set(doc(collection(db, 'mail')), {
+          to: [email], type: 'task_reminder', taskId: task.id, recipientEmail: email,
+          ...(completionScope ? { completionScope } : {}),
+          delivery: { state: 'PENDING', attemptCount: 0 }, createdAt: now,
+          message: { subject: `Recordatorio de tarea: ${title} — Causa OS`, html: `<div style="font-family:Arial,sans-serif;max-width:620px;margin:auto;color:#172033"><h2 style="color:#078ac6">Recordatorio de tarea</h2><p><strong>${escapeHtml(senderName)}</strong> te escribió sobre:</p><p style="font-weight:bold">${escapeHtml(title)}</p><div style="white-space:pre-wrap;background:#f3f7fa;border-left:4px solid #078ac6;padding:14px">${escapeHtml(body)}</div><p>Ubicación: ${escapeHtml(taskLocationLabel(task))}</p><a href="${escapeHtml(taskUrl(task.id))}">Abrir tarea en Causa OS</a><p style="color:#5b6673;font-size:12px">Mensaje enviado desde Causa OS.</p></div>` }
+        });
+        transaction.set(doc(collection(db, 'notifications')), { userId: email, title: `Recordatorio: ${title}`, message: taskReminderMessage(task, `${senderName}: ${body}`), taskId: task.id, type: 'task_email_reminder', read: false, created_at: now });
       });
-      batch.set(doc(collection(db, 'notifications')), { userId: email, title: `Recordatorio: ${title}`, message: taskReminderMessage(task, `${senderName}: ${body}`), taskId: task.id, type: 'task_email_reminder', read: false, created_at: now });
     });
-    await batch.commit();
-    return { recipients: recipients.length };
+    return { recipients: queuedRecipients.length };
   };
 
   const addCustomTask = async (taskData) => {
@@ -919,6 +940,10 @@ export function ChecklistProvider({ children }) {
           const mailRef = doc(collection(db, 'mail'));
           batch.set(mailRef, {
             to: [cleanEmail],
+            type: 'task_assignment',
+            taskId: customId,
+            recipientEmail: cleanEmail,
+            delivery: { state: 'PENDING', attemptCount: 0 },
             message: {
               subject: `📋 NUEVA TAREA ASIGNADA: ${cleanData.task || cleanData.title} — Causa OS`,
               html: buildTaskEmailHtml({
@@ -962,10 +987,6 @@ export function ChecklistProvider({ children }) {
   const editCustomTask = async (taskId, updatedData) => {
     try {
       const taskRef = doc(db, 'tasks', taskId);
-      const taskSnap = await getDoc(taskRef);
-      if (!taskSnap.exists()) throw new Error('La tarea ya no existe; no se pudo guardar la edición.');
-      const currentTask = taskSnap.data();
-
       const sanitizeEmail = (e) => (typeof e === 'string' ? e.trim().toLowerCase()
         .replace('@crearpls.com', '@crearpsl.net')
         .replace('@crearpsl.com', '@crearpsl.net')
@@ -980,133 +1001,96 @@ export function ChecklistProvider({ children }) {
         cleanUpdatedData.assignedToEmail = sanitizeEmail(cleanUpdatedData.assignedToEmail);
       }
 
-      const batch = writeBatch(db);
-      batch.update(taskRef, cleanUpdatedData);
-
-      // Calcular asignados: nuevos (recién agregados) vs los que ya estaban.
-      const oldEmails = (currentTask.assignedToEmails || (currentTask.assignedToEmail ? [currentTask.assignedToEmail] : [])).map(sanitizeEmail).filter(Boolean);
-      const newEmails = (cleanUpdatedData.assignedToEmails || (cleanUpdatedData.assignedToEmail ? [cleanUpdatedData.assignedToEmail] : oldEmails)).map(sanitizeEmail).filter(Boolean);
-
-      const newlyAddedEmails = newEmails.filter(email => !oldEmails.includes(email));
-      const stillAssignedEmails = newEmails.filter(email => oldEmails.includes(email));
-
-      // "si o si notifique" (28/08/2026): antes, si editabas una tarea que
-      // YA tenía asignados (ej. le cambiabas la fecha límite o el título) sin
-      // agregar a nadie nuevo, esos asignados no se enteraban del cambio.
-      // Ahora, cualquier edición de un campo relevante (fecha límite, título,
-      // prioridad, sede) también notifica a quienes ya estaban asignados —
-      // no solo a los que se agregan de nuevo.
-      const relevantFieldChanged = ['deadline', 'task', 'title', 'priority', 'assignedSede', 'location', 'notes', 'description', 'comments'].some(
-        field => field in cleanUpdatedData && cleanUpdatedData[field] !== currentTask[field]
-      );
-
-      const activeNote = (cleanUpdatedData.notes || currentTask.notes || '').trim();
-
-      newlyAddedEmails.forEach(email => {
-        const cleanEmail = sanitizeEmail(email);
-        const notifMsg = activeNote
-          ? `Se te asignó en ${cleanUpdatedData.assignedSede || currentTask.assignedSede || 'Global'}: "${cleanUpdatedData.task || currentTask.task}". Nota: ${activeNote.substring(0, 80)}${activeNote.length > 80 ? '...' : ''}`
-          : `Se te ha asignado una tarea en la sede ${cleanUpdatedData.assignedSede || currentTask.assignedSede || 'Global'}.`;
-
-        // 1. Notificación In-App
-        const notifRef = doc(collection(db, 'notifications'));
-        batch.set(notifRef, {
-          userId: cleanEmail,
-          title: cleanUpdatedData.task || currentTask.task,
-          message: taskReminderMessage({ ...currentTask, ...cleanUpdatedData, id: taskId }, notifMsg),
-          read: false,
-          taskId: taskId,
-          created_at: new Date().toISOString()
+      await runTransaction(db, async transaction => {
+        const taskSnap = await transaction.get(taskRef);
+        if (!taskSnap.exists()) throw new Error('La tarea ya no existe; no se pudo guardar la edición.');
+        const { task: currentTask } = await readTaskParticipants(transaction, db, taskId, taskSnap.data(),
+          [...(cleanUpdatedData.assignedToEmails || []), cleanUpdatedData.assignedToEmail].filter(Boolean));
+        const safeUpdatedData = { ...cleanUpdatedData };
+        ['completed', 'status', 'completedAt', 'progress', 'progressPercentage', 'completions'].forEach(field => {
+          delete safeUpdatedData[field];
         });
+        // Assignment editing must never reset existing participants' progress.
+        delete safeUpdatedData.assigneeProgress;
+        const nextTask = { ...currentTask, ...safeUpdatedData };
+        transaction.update(taskRef, safeUpdatedData);
 
-        // 2. Notificación por Correo
-        const u = usersData.find(usr => usr.email?.toLowerCase() === cleanEmail);
-        const recipientName = u?.name || cleanEmail;
-        const assignerName = cleanUpdatedData.assignedByName || currentUser?.displayName || currentUser?.name || currentUser?.email || 'Dirección CREAR';
+        const oldEmails = (currentTask.assignedToEmails ||
+          (currentTask.assignedToEmail ? [currentTask.assignedToEmail] : []))
+          .map(sanitizeEmail).filter(Boolean);
+        const newEmails = (safeUpdatedData.assignedToEmails ||
+          (safeUpdatedData.assignedToEmail ? [safeUpdatedData.assignedToEmail] : oldEmails))
+          .map(sanitizeEmail).filter(Boolean);
+        const newlyAddedEmails = newEmails.filter(email => !oldEmails.includes(email));
+        const stillAssignedEmails = newEmails.filter(email => oldEmails.includes(email));
+        const relevantFieldChanged = ['deadline', 'task', 'title', 'priority', 'assignedSede', 'location', 'notes', 'description', 'comments'].some(
+          field => field in safeUpdatedData && safeUpdatedData[field] !== currentTask[field]
+        );
+        const activeNote = (safeUpdatedData.notes || currentTask.notes || '').trim();
+        const recipientsToNotify = [
+          ...newlyAddedEmails.map(email => ({ email, isUpdate: false })),
+          ...(relevantFieldChanged ? stillAssignedEmails.map(email => ({ email, isUpdate: true })) : [])
+        ];
+        const scopeUnknown = hasAmbiguousCycleCompletionScope(nextTask);
 
-        const mailRef = doc(collection(db, 'mail'));
-        batch.set(mailRef, {
-          to: [cleanEmail],
-          message: {
-            subject: `📋 NUEVA TAREA ASIGNADA: ${cleanUpdatedData.task || currentTask.task} — Causa OS`,
-            html: buildTaskEmailHtml({
-              taskId,
-              location: cleanUpdatedData.location ?? currentTask.location,
-              taskTitle: cleanUpdatedData.task || currentTask.task,
-              notes: activeNote,
-              deadline: cleanUpdatedData.deadline || currentTask.deadline,
-              assignedSede: cleanUpdatedData.assignedSede || currentTask.assignedSede || 'Global',
-              priority: cleanUpdatedData.priority || currentTask.priority || 'Normal',
-              assignedByName: assignerName,
-              recipientName,
-              recipientEmail: cleanEmail,
-              isUpdate: false
-            })
-          },
-          calendarEvent: {
-            taskId: taskId,
-            location: cleanUpdatedData.location ?? currentTask.location ?? '',
-            title: cleanUpdatedData.task || currentTask.task,
-            deadline: cleanUpdatedData.deadline || currentTask.deadline || null,
-            description: `Tarea Causa OS — Sede: ${cleanUpdatedData.assignedSede || currentTask.assignedSede || 'Global'}. Asignado por: ${assignerName}. Prioridad: ${cleanUpdatedData.priority || currentTask.priority || 'Normal'}.${activeNote ? ' \nNotas: ' + activeNote : ''}`
-          }
-        });
-      });
-
-      if (relevantFieldChanged) {
-        stillAssignedEmails.forEach(email => {
+        recipientsToNotify.forEach(({ email, isUpdate }) => {
           const cleanEmail = sanitizeEmail(email);
-          const notifMsg = activeNote
-            ? `Se actualizó la tarea "${cleanUpdatedData.task || currentTask.task}". Nota: ${activeNote.substring(0, 80)}${activeNote.length > 80 ? '...' : ''}`
-            : `Se actualizó una tarea que tenías asignada en la sede ${cleanUpdatedData.assignedSede || currentTask.assignedSede || 'Global'}.`;
-
-          // 1. Notificación In-App
-          const notifRef = doc(collection(db, 'notifications'));
-          batch.set(notifRef, {
+          if (scopeUnknown || isTaskClosedForDelivery(nextTask, { recipientEmail: cleanEmail })) return;
+          const notificationMessage = isUpdate
+            ? (activeNote
+              ? `Se actualizó la tarea "${safeUpdatedData.task || currentTask.task}". Nota: ${activeNote.substring(0, 80)}${activeNote.length > 80 ? '...' : ''}`
+              : `Se actualizó una tarea que tenías asignada en la sede ${safeUpdatedData.assignedSede || currentTask.assignedSede || 'Global'}.`)
+            : (activeNote
+              ? `Se te asignó en ${safeUpdatedData.assignedSede || currentTask.assignedSede || 'Global'}: "${safeUpdatedData.task || currentTask.task}". Nota: ${activeNote.substring(0, 80)}${activeNote.length > 80 ? '...' : ''}`
+              : `Se te ha asignado una tarea en la sede ${safeUpdatedData.assignedSede || currentTask.assignedSede || 'Global'}.`);
+          const taskMessage = taskReminderMessage(nextTask, notificationMessage);
+          const notificationRef = doc(collection(db, 'notifications'));
+          transaction.set(notificationRef, {
             userId: cleanEmail,
-            title: cleanUpdatedData.task || currentTask.task,
-            message: taskReminderMessage({ ...currentTask, ...cleanUpdatedData, id: taskId }, notifMsg),
+            title: safeUpdatedData.task || currentTask.task,
+            message: taskMessage,
             read: false,
-            taskId: taskId,
+            taskId,
             created_at: new Date().toISOString()
           });
 
-          // 2. Notificación por Correo
-          const u = usersData.find(usr => usr.email?.toLowerCase() === cleanEmail);
-          const recipientName = u?.name || cleanEmail;
-          const assignerName = cleanUpdatedData.assignedByName || currentUser?.displayName || currentUser?.name || currentUser?.email || 'Dirección CREAR';
-
+          const user = usersData.find(usr => usr.email?.toLowerCase() === cleanEmail);
+          const recipientName = user?.name || cleanEmail;
+          const assignerName = safeUpdatedData.assignedByName ||
+            currentUser?.displayName || currentUser?.name || currentUser?.email || 'Dirección CREAR';
           const mailRef = doc(collection(db, 'mail'));
-          batch.set(mailRef, {
+          transaction.set(mailRef, {
             to: [cleanEmail],
+            type: isUpdate ? 'task_update' : 'task_assignment',
+            taskId,
+            recipientEmail: cleanEmail,
+            delivery: { state: 'PENDING', attemptCount: 0 },
             message: {
-              subject: `📋 TAREA ACTUALIZADA: ${cleanUpdatedData.task || currentTask.task} — Causa OS`,
+              subject: `${isUpdate ? '📋 TAREA ACTUALIZADA' : '📋 NUEVA TAREA ASIGNADA'}: ${safeUpdatedData.task || currentTask.task} — Causa OS`,
               html: buildTaskEmailHtml({
                 taskId,
-                location: cleanUpdatedData.location ?? currentTask.location,
-                taskTitle: cleanUpdatedData.task || currentTask.task,
+                location: safeUpdatedData.location ?? currentTask.location,
+                taskTitle: safeUpdatedData.task || currentTask.task,
                 notes: activeNote,
-                deadline: cleanUpdatedData.deadline || currentTask.deadline,
-                assignedSede: cleanUpdatedData.assignedSede || currentTask.assignedSede || 'Global',
-                priority: cleanUpdatedData.priority || currentTask.priority || 'Normal',
+                deadline: safeUpdatedData.deadline || currentTask.deadline,
+                assignedSede: safeUpdatedData.assignedSede || currentTask.assignedSede || 'Global',
+                priority: safeUpdatedData.priority || currentTask.priority || 'Normal',
                 assignedByName: assignerName,
                 recipientName,
                 recipientEmail: cleanEmail,
-                isUpdate: true
+                isUpdate
               })
             },
             calendarEvent: {
-              taskId: taskId,
-              location: cleanUpdatedData.location ?? currentTask.location ?? '',
-              title: cleanUpdatedData.task || currentTask.task,
-              deadline: cleanUpdatedData.deadline || currentTask.deadline || null,
-              description: `Tarea Causa OS — Sede: ${cleanUpdatedData.assignedSede || currentTask.assignedSede || 'Global'}. Actualizado por: ${assignerName}. Prioridad: ${cleanUpdatedData.priority || currentTask.priority || 'Normal'}.${activeNote ? ' \nNotas: ' + activeNote : ''}`
+              taskId,
+              location: safeUpdatedData.location ?? currentTask.location ?? '',
+              title: safeUpdatedData.task || currentTask.task,
+              deadline: safeUpdatedData.deadline || currentTask.deadline || null,
+              description: `Tarea Causa OS — Sede: ${safeUpdatedData.assignedSede || currentTask.assignedSede || 'Global'}. ${isUpdate ? 'Actualizado' : 'Asignado'} por: ${assignerName}. Prioridad: ${safeUpdatedData.priority || currentTask.priority || 'Normal'}.${activeNote ? ' \nNotas: ' + activeNote : ''}`
             }
           });
         });
-      }
-
-      await batch.commit();
+      });
       return true;
     } catch (error) {
       console.error("Error editing custom task:", error);
@@ -1308,9 +1292,20 @@ export function ChecklistProvider({ children }) {
   // 1. Enviar invitación de colaboración / mención
   const inviteCollaborator = async (task, targetUser, message) => {
     try {
-      const batch = writeBatch(db);
       const taskRef = doc(db, 'tasks', task.id);
-      
+      await runTransaction(db, async batch => {
+      const snapshot = await batch.get(taskRef);
+      if (!snapshot.exists()) throw new Error('La tarea ya no existe.');
+      const { task: persisted } = await readTaskParticipants(batch, db, task.id, snapshot.data(), [targetUser.email]);
+      const scope = resolveTaskCycleScope(persisted, {
+        catalogTask: checklistData.some(item => item.id === task.id),
+        sede: currentUser?.sede?.trim() || 'Global',
+        cycle: currentCycle
+      });
+      const completionScope = scope ? { sede: scope.sede, cycleId: scope.cycle.id } : undefined;
+      if (isTaskClosedForDelivery(persisted, { completionScope, recipientEmail: targetUser.email })) {
+        throw new Error('No se pueden enviar invitaciones de una tarea cerrada.');
+      }
       const newPending = {
         email: targetUser.email,
         name: targetUser.name,
@@ -1323,7 +1318,7 @@ export function ChecklistProvider({ children }) {
         createdAt: new Date().toISOString()
       };
 
-      const currentPending = task.pendingCollaborations || [];
+      const currentPending = persisted.pendingCollaborations || [];
       batch.update(taskRef, {
         pendingCollaborations: [...currentPending.filter(p => p.email !== targetUser.email), newPending]
       });
@@ -1350,6 +1345,11 @@ export function ChecklistProvider({ children }) {
       const inviteTaskTitle = task.task || task.title || 'Compromiso sin título';
       batch.set(mailRef, {
         to: [targetUser.email],
+        type: 'task_collaboration_invite',
+        taskId: task.id,
+        recipientEmail: targetUser.email,
+        ...(completionScope ? { completionScope } : {}),
+        delivery: { state: 'PENDING', attemptCount: 0 },
         message: {
           subject: `🤝 Causa OS | Invitación de Colaboración — ${inviteTaskTitle}`,
           html: `
@@ -1410,7 +1410,7 @@ export function ChecklistProvider({ children }) {
         }
       });
 
-      await batch.commit();
+      });
       showToast(`¡Invitación enviada con éxito a @${targetUser.name}!`, 'success');
       return true;
     } catch (err) {
@@ -1423,10 +1423,20 @@ export function ChecklistProvider({ children }) {
   // 2. Aceptar invitación de colaboración
   const acceptCollaboration = async (notification) => {
     try {
-      const batch = writeBatch(db);
       const taskRef = doc(db, 'tasks', notification.taskId);
-
-      const task = tasks.find(t => t.id === notification.taskId);
+      await runTransaction(db, async batch => {
+      const snapshot = await batch.get(taskRef);
+      if (!snapshot.exists()) throw new Error('La tarea ya no existe.');
+      const { task } = await readTaskParticipants(batch, db, notification.taskId, snapshot.data(), [currentUser.email]);
+      const scope = resolveTaskCycleScope(task, {
+        catalogTask: checklistData.some(item => item.id === notification.taskId),
+        sede: currentUser?.sede?.trim() || 'Global',
+        cycle: currentCycle
+      });
+      if (isTaskClosedForDelivery(task, {
+        completionScope: scope ? { sede: scope.sede, cycleId: scope.cycle.id } : undefined,
+        recipientEmail: currentUser.email
+      })) throw new Error('No se pueden aceptar invitaciones de una tarea cerrada.');
       const currentCollabs = task?.collaborators ? [...task.collaborators] : [];
       const currentCollabDetails = task?.collaboratorDetails ? [...task.collaboratorDetails] : [];
 
@@ -1463,7 +1473,7 @@ export function ChecklistProvider({ children }) {
         });
       }
 
-      await batch.commit();
+      });
       showToast(`¡Colaboración aceptada! La tarea ahora está en tu panel compartido.`, 'success');
       return true;
     } catch (err) {
@@ -1496,91 +1506,115 @@ export function ChecklistProvider({ children }) {
         : '');
       const em = normalizeEmailKey(userEmail || currentUser?.email || '');
       if (!em) return false;
+      const actorEmail = normalizeEmailKey(auth.currentUser?.email || currentUser?.email || '');
+      const canManageOtherProgress = isSuperAdminEmail(actorEmail) ||
+        isGerenciaRole(normalizeRole(currentUser?.appRole || currentUser?.role || ''));
+      if (em !== actorEmail && !canManageOtherProgress) {
+        throw new Error('Solo puedes cambiar tu propio avance individual.');
+      }
 
       const taskRef = doc(db, 'tasks', taskId);
-      const snap = await getDoc(taskRef);
-      if (!snap.exists()) return false;
-      const data = snap.data();
-      const currentProgress = { ...(data.assigneeProgress || {}) };
+      const eventId = doc(collection(db, 'task_completion_events')).id;
+      const result = await runTransaction(db, async transaction => {
+        const snap = await transaction.get(taskRef);
+        if (!snap.exists()) return null;
+        const participants = await readTaskParticipants(transaction, db, taskId, snap.data(), [em]);
+        const data = participants.task;
+        const currentProgress = { ...(data.assigneeProgress || {}) };
 
-      // Asegurar que todos los asignados formales tengan entrada en currentProgress
-      const formalAssignees = [
-        ...(Array.isArray(data.assignedToEmails) ? data.assignedToEmails : []),
-        ...(data.assignedToEmail ? [data.assignedToEmail] : []),
-        ...(data.assigned_to ? [data.assigned_to] : [])
-      ].map(normalizeEmailKey).filter(Boolean);
+        const formalAssignees = [
+          ...(Array.isArray(data.assignedToEmails) ? data.assignedToEmails : []),
+          ...(data.assignedToEmail ? [data.assignedToEmail] : []),
+          ...(data.assigned_to ? [data.assigned_to] : [])
+        ].map(normalizeEmailKey).filter(Boolean);
 
-      formalAssignees.forEach(assigneeEm => {
-        const existingMatch = Object.keys(currentProgress).find(k => normalizeEmailKey(k) === assigneeEm);
-        if (!existingMatch) {
-          const u = usersData.find(usr => normalizeEmailKey(usr.email) === assigneeEm);
-          currentProgress[assigneeEm] = {
-            name: u?.name || assigneeEm,
-            role: u?.role || data.role || 'colaborador',
-            sede: u?.sede || data.assignedSede || 'Global',
-            completed: data.completed === true,
-            completedAt: data.completed === true ? (data.completedAt || null) : null,
-            progress: data.completed === true ? 100 : 0
-          };
+        const targetKey = Object.keys(currentProgress).find(k => normalizeEmailKey(k) === em) || em;
+        const userObj = usersData.find(u => normalizeEmailKey(u.email) === em);
+        const prevEntry = currentProgress[targetKey] || {
+          name: currentUser?.displayName || currentUser?.name || userObj?.name || em,
+          role: currentUser?.appRole || userObj?.role || 'colaborador',
+          sede: currentUser?.sede || userObj?.sede || 'Global',
+          completed: false,
+          progress: 0
+        };
+
+        const nowIso = new Date().toISOString();
+        const individualWasCompleted = isTaskClosedForDelivery(prevEntry);
+        const nextProgVal = progressPercentage !== null ? progressPercentage : (isCompleted ? 100 : 0);
+        currentProgress[targetKey] = applyParticipantChanges(data, { [targetKey]: {
+          ...prevEntry,
+          completed: isCompleted,
+          ...(!isCompleted ? { completedAt: null }
+            : !individualWasCompleted ? { completedAt: nowIso } : {}),
+          progress: nextProgVal
+        } })[targetKey];
+
+        const progressEntries = [...new Set([...formalAssignees, ...Object.keys(currentProgress).map(normalizeEmailKey)])]
+          .map(key => currentProgress[Object.keys(currentProgress).find(k => normalizeEmailKey(k) === key)] ||
+            { completed: false, progress: 0 });
+        const allCompleted = progressEntries.length > 0 && progressEntries.every(item => item.completed === true || item.progress === 100);
+        const anyCompleted = progressEntries.some(item => item.completed === true || item.progress > 0);
+        const totalItems = progressEntries.length;
+        const sumProgress = progressEntries.reduce((acc, item) => {
+          const val = typeof item.progress === 'number' ? item.progress : (item.completed ? 100 : 0);
+          return acc + val;
+        }, 0);
+        const overallPercent = totalItems > 0 ? Math.round(sumProgress / totalItems) : (isCompleted ? 100 : 0);
+        const previousCompleted = isTaskClosedForDelivery(data);
+        const completionTransition = !previousCompleted && allCompleted;
+        const reopenTransition = previousCompleted && !allCompleted;
+        const individualTransition = individualWasCompleted !== isCompleted;
+        const rootTransition = completionTransition || reopenTransition;
+        const rootEventId = `${eventId}_root`;
+        const nextPayload = {
+          assigneeProgress: currentProgress,
+          completed: allCompleted,
+          status: allCompleted ? 'Completada' : (anyCompleted ? 'En Progreso' : 'Pendiente'),
+          progressPercentage: overallPercent,
+          progress: overallPercent,
+          ...(allCompleted
+            ? (previousCompleted
+              ? ('completedAt' in data ? { completedAt: data.completedAt } : {})
+              : { completedAt: nowIso })
+            : { completedAt: null }),
+          updatedAt: nowIso,
+          lifecycleMutation: {
+            eventId: rootTransition ? rootEventId : eventId,
+            scope: rootTransition ? {} : { assigneeEmail: targetKey },
+            mapScope: { assigneeEmail: targetKey },
+            assigneeEventIds: individualTransition ? { [targetKey]: eventId } : {}
+          }
+        };
+
+        stageTaskParticipants(transaction, db, taskId, participants, currentProgress,
+          nextPayload.lifecycleMutation.assigneeEventIds);
+        const rootPayload = { ...nextPayload };
+        delete rootPayload.assigneeProgress;
+        transaction.update(taskRef, rootPayload);
+        const transitionEvents = [
+          ...(individualTransition ? [{
+            id: eventId, action: isCompleted ? 'completed' : 'reopened', scope: { assigneeEmail: targetKey }
+          }] : []),
+          ...(rootTransition ? [{
+            id: rootEventId, action: reopenTransition ? 'reopened' : 'completed', scope: {}
+          }] : [])
+        ];
+        for (const event of transitionEvents) {
+          transaction.set(doc(db, 'task_completion_events', event.id), {
+            taskId,
+            action: event.action,
+            actorEmail: String(currentUser?.email || auth.currentUser?.email || '').trim().toLowerCase(),
+            occurredAt: serverTimestamp(),
+            source: 'manual',
+            scope: event.scope,
+            ...(event.action === 'completed'
+              ? { closureContext: taskClosureContext({ ...data, ...nextPayload }) } : {})
+          });
         }
+        return nextPayload;
       });
-
-      const targetKey = Object.keys(currentProgress).find(k => normalizeEmailKey(k) === em) || em;
-      const userObj = usersData.find(u => normalizeEmailKey(u.email) === em);
-      const prevEntry = currentProgress[targetKey] || {
-        name: currentUser?.displayName || currentUser?.name || userObj?.name || em,
-        role: currentUser?.appRole || userObj?.role || 'colaborador',
-        sede: currentUser?.sede || userObj?.sede || 'Global'
-      };
-
-      const nextProgVal = progressPercentage !== null ? progressPercentage : (isCompleted ? 100 : 0);
-      currentProgress[targetKey] = {
-        ...prevEntry,
-        completed: isCompleted,
-        completedAt: isCompleted ? new Date().toISOString() : null,
-        progress: nextProgVal
-      };
-
-      // Si todos los asignados completaron, marcar la tarjeta general como completada
-      const allKeys = Object.keys(currentProgress);
-      const allCompleted = allKeys.length > 0 && allKeys.every(k => currentProgress[k].completed === true || currentProgress[k].progress === 100);
-      const anyCompleted = allKeys.some(k => currentProgress[k].completed === true || currentProgress[k].progress > 0);
-
-      const totalItems = allKeys.length;
-      const sumProgress = allKeys.reduce((acc, k) => {
-        const item = currentProgress[k];
-        const val = typeof item.progress === 'number' ? item.progress : (item.completed ? 100 : 0);
-        return acc + val;
-      }, 0);
-      const overallPercent = totalItems > 0 ? Math.round(sumProgress / totalItems) : (isCompleted ? 100 : 0);
-      const nowIso = new Date().toISOString();
-      const nextPayload = {
-        assigneeProgress: currentProgress,
-        completed: allCompleted,
-        status: allCompleted ? 'Completada' : (anyCompleted ? 'En Progreso' : 'Pendiente'),
-        progressPercentage: overallPercent,
-        progress: overallPercent,
-        // FIX 16/09/2026: fecha real de cumplimiento a nivel de tarea (no solo
-        // por colaborador), trazabilidad pedida por Jose. Conserva la fecha
-        // si ya existia (no se pisa en actualizaciones posteriores); nunca se
-        // inventa.
-        completedAt: allCompleted ? (data.completedAt || nowIso) : null,
-        updatedAt: nowIso
-      };
-
-      // Actualización optimista inmediata para reflejar el cambio sin latencia
-      setTasks(prev => prev.map(t => t.id === taskId ? { ...t, ...nextPayload } : t));
-
-      await updateDoc(taskRef, nextPayload);
-
-      if (allCompleted && !data.completed) {
-        notifyTaskCompletedToAssigner(
-          data,
-          { completed: true, status: 'Completada', progressPercentage: 100 },
-          taskId,
-          doc(collection(db, 'task_completion_events')).id
-        );
-      }
+      if (!result) return false;
+      setTasks(prev => prev.map(t => t.id === taskId ? { ...t, ...result } : t));
 
       showToast(isCompleted ? "¡Tarea marcada como completada!" : "Marcaste la tarea como pendiente.", "success");
       return true;

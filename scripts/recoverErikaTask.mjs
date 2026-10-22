@@ -2,6 +2,8 @@
 // Recuperación de datos de progreso para Erika Gavilánez
 // Tareas afectadas: custom_1790898436987 y custom_1790665257137
 
+throw new Error('Recuperación histórica retirada: escribe el mapa legacy y atribuye un cierre sin actor verificado. Usa el flujo canónico autorizado con auditoría; este comando no modifica datos.');
+
 import { initializeApp, cert, getApps } from 'firebase-admin/app';
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 import fs from 'fs';

@@ -20,7 +20,7 @@ import { db } from '../services/firebase';
 import { canSendOperationalCommunications } from '../config/permissions';
 import { deadlineTimeReference, timeZoneForSede, zonedDateInputParts, zonedDateTimeToIso } from '../utils/timezones';
 import { taskLocationLabel, taskPath } from '../utils/taskLocation';
-import { getTaskProgress } from '../utils/taskLifecycle';
+import { getTaskProgress, isTaskClosedForDelivery } from '../utils/taskLifecycle';
 import { checklistData } from '../data/checklistData';
 
 export const normalizeTaskEmail = (e) => {
@@ -112,9 +112,11 @@ export default function TaskDetailModal({
   // Estados locales editables para avances y evidencias
   const [progress, setProgress] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [completionIntent, setCompletionIntent] = useState(false);
 
   // Estados de seguimiento colaborativo (avance general vs individual)
   const [assigneeProgressMap, setAssigneeProgressMap] = useState({});
+  const assigneeProgressBaseline = useRef({});
   const [myProgress, setMyProgress] = useState(0);
   const [myCompleted, setMyCompleted] = useState(false);
   const [evidencesList, setEvidencesList] = useState([]);
@@ -161,6 +163,7 @@ export default function TaskDetailModal({
       
       setProgress(initialProgress);
       setIsCompleted(task.completed === true || task.status === 'Completada' || initialProgress === 100);
+      setCompletionIntent(false);
       const deadlineZone = timeZoneForSede(task.assignedSede || task.sede)?.zone || 'America/Guayaquil';
       const existingDeadline = task.deadline ? zonedDateInputParts(task.deadline, deadlineZone) : { date: '', time: '' };
       setDeadlineDate(existingDeadline.date);
@@ -200,7 +203,7 @@ export default function TaskDetailModal({
         const u = findUserByAnyEmail(clean);
         const entry = existingKey ? existingMap[existingKey] : null;
 
-        const entryProg = typeof entry?.progress === 'number'
+        const entryProg = isTaskClosedForDelivery(entry) ? 100 : typeof entry?.progress === 'number'
           ? entry.progress
           : (typeof entry?.progressPercentage === 'number'
               ? entry.progressPercentage
@@ -223,6 +226,7 @@ export default function TaskDetailModal({
       });
 
       setAssigneeProgressMap(newMap);
+      assigneeProgressBaseline.current = newMap;
       setMyProgress(foundMyProgress);
       setMyCompleted(foundMyCompleted);
 
@@ -488,18 +492,18 @@ export default function TaskDetailModal({
     setProgress(val);
     if (val === 100) {
       setIsCompleted(true);
-    } else if (val < 100 && isCompleted) {
-      setIsCompleted(false);
     }
   };
 
   // Selector de avance individual del usuario actual
+  const assigneeChanged = (entry, baseline) =>
+    entry?.progress !== baseline?.progress || entry?.completed !== baseline?.completed;
   const handleSetMyProgress = (val) => {
+    const targetKey = myEmailKey || normalizeTaskEmail(userEmail);
     setMyProgress(val);
     const isDone = val === 100;
     setMyCompleted(isDone);
 
-    const targetKey = myEmailKey || normalizeTaskEmail(userEmail);
     if (targetKey) {
       setAssigneeProgressMap(prev => ({
         ...prev,
@@ -518,12 +522,14 @@ export default function TaskDetailModal({
 
   const handleToggleMyPart = () => {
     const nextVal = myCompleted ? 0 : 100;
+    setCompletionIntent(true);
     handleSetMyProgress(nextVal);
   };
 
   // Alternar avance de un colaborador (para creadores o coordinadores)
   const handleToggleCollaboratorStatus = (collabEmail) => {
     if (!isCreator) return;
+    setCompletionIntent(true);
     setAssigneeProgressMap(prev => {
       const entry = prev[collabEmail] || {};
       const nextDone = !entry.completed;
@@ -650,6 +656,7 @@ export default function TaskDetailModal({
     }
     const nextCompleted = !isCompleted;
     setIsCompleted(nextCompleted);
+    setCompletionIntent(true);
     if (nextCompleted && progress < 100) {
       setProgress(100);
     } else if (!nextCompleted && progress === 100) {
@@ -721,7 +728,18 @@ export default function TaskDetailModal({
         }
       }
 
-      const finalCompleted = allDone || finalOverall === 100;
+      const previouslyCompleted = isTaskClosedForDelivery(task);
+      const individualReopen = Object.entries(mapToSave).some(([key, entry]) =>
+        assigneeProgressBaseline.current[key]?.completed === true && entry.completed !== true && entry.progress < 100);
+      const explicitReopen = completionIntent &&
+        ((previouslyCompleted && (!isCompleted || (isMultiAssignee && !allDone))) || individualReopen);
+      const finalCompleted = previouslyCompleted && !explicitReopen
+        ? true
+        : allDone || finalOverall === 100;
+      if (previouslyCompleted && !explicitReopen) {
+        finalOverall = typeof task.progressPercentage === 'number' ? task.progressPercentage : 100;
+        mapToSave = task.assigneeProgress || mapToSave;
+      }
 
       if (!isMultiAssignee && targetKey && mapToSave[targetKey]) {
         mapToSave[targetKey] = {
@@ -731,6 +749,12 @@ export default function TaskDetailModal({
           completedAt: finalCompleted ? (mapToSave[targetKey]?.completedAt || new Date().toISOString()) : null
         };
       }
+      const persistedMap = { ...(task.assigneeProgress || {}) };
+      Object.entries(mapToSave).forEach(([key, entry]) => {
+        if (!assigneeChanged(entry, assigneeProgressBaseline.current[key])) return;
+        const persistedKey = Object.keys(persistedMap).find(existing => isSameUserEmail(existing, key)) || key;
+        persistedMap[persistedKey] = { ...(persistedMap[persistedKey] || {}), ...entry };
+      });
 
       // Registrar avance en la bitácora de notas si el usuario actual avanzó
       let updatedNotesList = [...notesList];
@@ -760,7 +784,7 @@ export default function TaskDetailModal({
         // (finalCompleted=false), se limpia -- se resetea al volver a
         // completarse, nunca se inventa una fecha.
         completedAt: finalCompleted ? (task.completedAt || new Date().toISOString()) : null,
-        assigneeProgress: Object.keys(mapToSave).length > 0 ? mapToSave : (task.assigneeProgress || {}),
+        assigneeProgress: persistedMap,
         evidenceUrl: mainEvidenceUrl,
         evidence_url: mainEvidenceUrl,
         evidences: evidencesList,
@@ -784,11 +808,13 @@ export default function TaskDetailModal({
               : currentCycle
           }
         : null;
-      await updateTaskDetails(task.id, updates, cycleScope);
+      const saveResult = await updateTaskDetails(task.id, updates, cycleScope, explicitReopen);
       if (finalCompleted || (myAssigneeEntry && myProgress === 100) || (!isMultiAssignee && progress === 100)) {
         celebrateVictory();
       }
-      showToast('🎉 ¡Tarea actualizada y avances guardados exitosamente!', 'success');
+      showToast(saveResult?.preservedClosure
+        ? 'Avances guardados; se conservó el cierre. Usa la acción Reabrir para cambiar el estado.'
+        : '🎉 ¡Tarea actualizada y avances guardados exitosamente!', saveResult?.preservedClosure ? 'info' : 'success');
       setHasUnsavedChanges(false);
       onClose();
     } catch (err) {

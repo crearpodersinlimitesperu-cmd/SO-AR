@@ -43,6 +43,80 @@ export function isCompletionTransition(previousCompleted, nextCompleted) {
   return previousCompleted !== true && nextCompleted === true;
 }
 
+export function taskClosureContext(task) {
+  const comments = task?.comments ?? '';
+  const evidenceUrl = task?.evidenceUrl ?? task?.evidence_url ?? '';
+  const evidences = task?.evidences ?? [];
+  if (typeof comments !== 'string' || comments.length > 500000 ||
+      typeof evidenceUrl !== 'string' || evidenceUrl.length > 8192 ||
+      !Array.isArray(evidences) || evidences.length > 100) {
+    throw new Error('El comentario o las referencias de evidencia exceden el esquema de auditoría del cierre.');
+  }
+  return { comments, evidenceUrl, evidences };
+}
+
+export function isTaskClosedForDelivery(task, { completionScope, recipientEmail } = {}) {
+  const isClosed = entry => Boolean(entry) && (
+    entry.completed === true ||
+    entry.status === 'Completada' ||
+    entry.progress === 100 ||
+    entry.progressPercentage === 100
+  );
+
+  const cycleScoped = Boolean(completionScope?.sede && completionScope?.cycleId);
+  if (cycleScoped && isClosed(task?.completions?.[`${completionScope.sede}__${completionScope.cycleId}`])) return true;
+  if (!cycleScoped && completionScope?.sede && isClosed(task?.completions?.[completionScope.sede])) return true;
+
+  if (recipientEmail && task?.assigneeProgress && typeof task.assigneeProgress === 'object') {
+    const email = String(recipientEmail).trim().toLowerCase()
+      .replace('@crearpls.com', '@crearpsl.net')
+      .replace('@crearpsl.com', '@crearpsl.net');
+    const key = Object.keys(task.assigneeProgress).find(candidate => String(candidate).trim().toLowerCase()
+      .replace('@crearpls.com', '@crearpsl.net')
+      .replace('@crearpsl.com', '@crearpsl.net') === email);
+    if (key && isClosed(task.assigneeProgress[key])) return true;
+  }
+
+  if (cycleScoped) return false;
+  return isClosed(task);
+}
+
+export function hasAmbiguousCycleCompletionScope(task, { completionScope } = {}) {
+  if (completionScope?.sede && completionScope?.cycleId) return false;
+  return Object.keys(task?.completions || {}).some(key => key.includes('__'));
+}
+
+export function preserveClosedAssigneeProgress(previous = {}, requested = {}) {
+  if (!previous || typeof previous !== 'object' || Array.isArray(previous) ||
+      !requested || typeof requested !== 'object' || Array.isArray(requested)) return requested;
+  const normalizeEmail = value => String(value || '').trim().toLowerCase()
+    .replace('@crearpls.com', '@crearpsl.net')
+    .replace('@crearpsl.com', '@crearpsl.net');
+  const merged = { ...requested };
+
+  Object.entries(previous).forEach(([previousKey, previousEntry]) => {
+    const isClosed = previousEntry?.completed === true ||
+      previousEntry?.status === 'Completada' ||
+      previousEntry?.progress === 100 ||
+      previousEntry?.progressPercentage === 100;
+    if (!isClosed) return;
+    const requestedKey = Object.keys(merged).find(key =>
+      normalizeEmail(key) === normalizeEmail(previousKey)
+    );
+    if (!requestedKey) return;
+
+    const entry = { ...merged[requestedKey] };
+    ['completed', 'status', 'progress', 'progressPercentage', 'completedAt'].forEach(field => {
+      if (field in previousEntry) entry[field] = previousEntry[field];
+      else delete entry[field];
+    });
+    if ('completionId' in previousEntry) entry.completionId = previousEntry.completionId;
+    merged[requestedKey] = entry;
+  });
+
+  return merged;
+}
+
 export function getTaskProgress(task) {
   if (typeof task?.progressPercentage === 'number') return task.progressPercentage;
   if (typeof task?.progress === 'number') return task.progress;
@@ -75,7 +149,10 @@ export function applyCycleCompletion(task, { sede, cycleId } = {}) {
 export function getNextCompletionState(updates) {
   if (typeof updates?.completed === 'boolean') return updates.completed;
   if (updates?.status === 'Completada') return true;
-  return updates?.progressPercentage === 100 || updates?.progress === 100;
+  if (['Pendiente', 'En progreso', 'En Progreso'].includes(updates?.status)) return false;
+  if (typeof updates?.progressPercentage === 'number') return updates.progressPercentage >= 100;
+  if (typeof updates?.progress === 'number') return updates.progress >= 100;
+  return null;
 }
 
 export function createCycleCompletion(current = {}, { cycle, completed, updatedAt, completionId, updates = {} } = {}) {
