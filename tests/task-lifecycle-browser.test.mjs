@@ -130,7 +130,7 @@ test('task transactions roll back rejected optimism, gate celebrations and prese
       };
       export const runTransaction = async (_db, callback) => {
         const writes = [];
-        await callback({
+        const result = await callback({
           get: async ref => ({ exists: () => Boolean(store[ref.id]), data: () => structuredClone(store[ref.id]) }),
           update: (ref, updates) => writes.push({ ref, updates }),
           set: (ref, updates) => writes.push({ ref, updates })
@@ -147,6 +147,7 @@ test('task transactions roll back rejected optimism, gate celebrations and prese
         }
         localStorage.setItem('task-lifecycle-events', JSON.stringify(window.fixtureEvents));
         window.publishFixture();
+        return result;
       };
       const unexpected = () => { throw new Error('Unexpected non-transaction write'); };
       export const updateDoc = unexpected;
@@ -206,6 +207,10 @@ test('task transactions roll back rejected optimism, gate celebrations and prese
     browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
     const page = await browser.newPage();
     const errors = [];
+    const consoleErrors = [];
+    page.on('console', message => {
+      if (message.type() === 'error') consoleErrors.push(message.text());
+    });
     page.on('pageerror', error => errors.push(error.message));
     await page.setRequestInterception(true);
     const url = `${server.resolvedUrls.local[0]}task-test`;
@@ -405,6 +410,66 @@ test('task transactions roll back rejected optimism, gate celebrations and prese
       write.ref.path === 'mail' || write.ref.path === 'notifications'
     )), false, 'assignment edits of a closed task do not create email or in-app notifications');
 
+    await page.evaluate(() => {
+      window.fixtureStore['individual-roundtrip'] = {
+        id: 'individual-roundtrip', isCustom: true, createdBy: 'owner@example.test',
+        assignedToEmails: ['owner@example.test', 'other@example.test'],
+        completed: false, progress: 50, progressPercentage: 50,
+        comments: 'Closure note', evidence_url: 'https://example.test/evidence',
+        evidences: [{ id: 'evidence-1', url: 'https://example.test/evidence' }],
+        assigneeProgress: {
+          'owner@example.test': { completed: false, progress: 0 },
+          'other@example.test': { completed: true, progress: 100, completedAt: 'other-close' }
+        },
+        closedAssigneeKeys: ['other@example.test']
+      };
+      window.publishFixture();
+    });
+    const individualResult = await page.evaluate(() =>
+      window.fixtureApi.updateIndividualProgress('individual-roundtrip', 'owner@example.test', true));
+    assert.equal(individualResult, true, consoleErrors.join('\n'));
+    const individualClosure = await page.evaluate(() => ({
+      task: window.fixtureStore['individual-roundtrip'],
+      events: Object.entries(window.fixtureEvents).filter(([, event]) =>
+        event.taskId === 'individual-roundtrip' && event.action === 'completed')
+    }));
+    assert.equal(individualClosure.task.completed, true);
+    assert.equal(individualClosure.events.length, 2, 'root and participant each have their own completion event');
+    for (const [, event] of individualClosure.events) {
+      assert.deepEqual(event.closureContext, {
+        comments: 'Closure note', evidenceUrl: 'https://example.test/evidence',
+        evidences: [{ id: 'evidence-1', url: 'https://example.test/evidence' }]
+      });
+    }
+    const rootClosure = individualClosure.events.find(([, event]) => Object.keys(event.scope).length === 0);
+    const participantClosure = individualClosure.events.find(([, event]) => event.scope.assigneeEmail === 'owner@example.test');
+    assert.equal(individualClosure.task.lifecycleMutation.eventId, rootClosure[0]);
+    assert.equal(individualClosure.task.lifecycleMutation.assigneeEventIds['owner@example.test'], participantClosure[0]);
+
+    assert.equal(await page.evaluate(() =>
+      window.fixtureApi.updateIndividualProgress('individual-roundtrip', 'owner@example.test', false)), true);
+    const individualReopen = await page.evaluate(() => ({
+      task: window.fixtureStore['individual-roundtrip'],
+      events: Object.entries(window.fixtureEvents).filter(([, event]) =>
+        event.taskId === 'individual-roundtrip' && event.action === 'reopened')
+    }));
+    assert.equal(individualReopen.task.completed, false);
+    assert.deepEqual(individualReopen.task.closedAssigneeKeys, ['other@example.test']);
+    assert.equal(individualReopen.task.assigneeProgress['other@example.test'].completedAt, 'other-close');
+    assert.equal(individualReopen.events.length, 2);
+    assert.deepEqual(individualReopen.task.lifecycleMutation.scope, {});
+    assert.deepEqual(individualReopen.task.lifecycleMutation.mapScope, { assigneeEmail: 'owner@example.test' });
+    for (const [, event] of individualReopen.events) assert.equal('closureContext' in event, false);
+    assert.deepEqual(await call('updateTaskDetails', 'individual-roundtrip', {
+      comments: 'Edited later', evidence_url: '', evidences: []
+    }), { ok: true });
+    await page.reload();
+    await page.waitForFunction(() => window.fixtureApi?.loading === false);
+    for (const [id, event] of individualClosure.events) {
+      assert.deepEqual(await page.evaluate(id => window.fixtureEvents[id], id), event,
+        'original closure evidence and comments survive editing, reopening and reload');
+    }
+
     await page.evaluate(() => { window.fixtureWriteError = true; });
     assert.equal((await call('updateTaskDetails', 'catalog', { progressPercentage: 50 })).ok, false);
     assert.deepEqual((await state()).find(t => t.id === 'catalog'), reopened);
@@ -452,6 +517,16 @@ test('task transactions roll back rejected optimism, gate celebrations and prese
     }
     assert.equal(await page.evaluate(() => window.fixtureStore.personal.assignedByEmail), 'assigner@example.test');
     assert.equal(await page.evaluate(() => window.fixtureWrites.some(write => write.ref.path === 'mail')), false);
+    const rootEvent = await page.evaluate(() => Object.values(window.fixtureEvents).find(event =>
+      event.taskId === 'personal' && event.action === 'completed'));
+    assert.deepEqual(rootEvent.scope, {});
+    assert.equal(rootEvent.closureContext.comments, 'Other confirmed comment');
+    assert.deepEqual(await call('toggleTask', 'personal', true), { ok: true });
+    assert.equal(await page.evaluate(() => window.fixtureStore.personal.completed), false);
+    const rootReopen = await page.evaluate(() => Object.values(window.fixtureEvents).find(event =>
+      event.taskId === 'personal' && event.action === 'reopened'));
+    assert.deepEqual(rootReopen.scope, {});
+    assert.equal('closureContext' in rootReopen, false);
 
     await load('?teams');
     const beforeTeams = await state();

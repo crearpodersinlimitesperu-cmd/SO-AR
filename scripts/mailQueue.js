@@ -62,9 +62,16 @@ export function selectMailAction(data, now = Date.now()) {
 
 const MAX_LINKED_TASK_IDS = 5;
 
-export function linkedTaskIdsOf(data) {
+function linkedTaskIdsOf(data) {
   const ids = Array.isArray(data?.linkedTaskIds) ? data.linkedTaskIds : [];
-  return [...new Set(ids.filter(id => typeof id === 'string' && id.trim()))].slice(0, MAX_LINKED_TASK_IDS);
+  return [...new Set(ids)];
+}
+
+function hasInvalidTaskLinks(data) {
+  return data.linkedTaskIds !== undefined &&
+    (!Array.isArray(data.linkedTaskIds) ||
+      data.linkedTaskIds.length > MAX_LINKED_TASK_IDS ||
+      data.linkedTaskIds.some(id => typeof id !== 'string' || !id.trim() || id.includes('/')));
 }
 
 function linkedClosureState(taskSnapshot, data, recipients) {
@@ -93,7 +100,7 @@ export async function claimPendingMail(db, ref, now = Date.now()) {
     if (!snapshot.exists) return null;
     const data = snapshot.data();
     const taskId = data.taskId || data.calendarEvent?.taskId;
-    const taskBound = TASK_BOUND_MAIL_TYPES.has(data.type) || Boolean(taskId);
+    const taskBound = TASK_BOUND_MAIL_TYPES.has(data.type) || Boolean(taskId) || data.linkedTaskIds !== undefined;
     const action = selectMailAction(data, now);
     if (!action) return null;
 
@@ -113,11 +120,11 @@ export async function claimPendingMail(db, ref, now = Date.now()) {
       });
       return { data, state: action };
     }
-    if (taskBound && !taskId) {
+    if (taskBound && (!taskId || hasInvalidTaskLinks(data))) {
       transaction.update(ref, {
         'delivery.state': 'SKIPPED_UNLINKED_TASK',
         'delivery.endTime': new Date(now).toISOString(),
-        'delivery.reason': 'El correo de tarea no tiene taskId para verificar su ciclo de vida.'
+        'delivery.reason': 'El correo de tarea no tiene taskId o sus vinculos de tarea no son validos.'
       });
       return { data, state: 'SKIPPED_UNLINKED_TASK' };
     }
@@ -265,6 +272,14 @@ export async function claimPendingMail(db, ref, now = Date.now()) {
 }
 
 export async function skipTaskMailIfClosed(db, ref, data, recipients, now = Date.now()) {
+  if (hasInvalidTaskLinks(data)) {
+    await ref.update({
+      'delivery.state': 'SKIPPED_UNLINKED_TASK',
+      'delivery.endTime': new Date(now).toISOString(),
+      'delivery.reason': 'Los vinculos de tarea no son validos; no se omitio ninguna comprobacion de cierre.'
+    });
+    return 'SKIPPED_UNLINKED_TASK';
+  }
   const taskId = data.taskId || data.calendarEvent?.taskId;
   if (typeof taskId !== 'string' || !taskId.trim()) return false;
 
@@ -274,10 +289,11 @@ export async function skipTaskMailIfClosed(db, ref, data, recipients, now = Date
   const linkedState = linkedSnapshots.map(snapshotOfLinked => linkedClosureState(snapshotOfLinked, data, recipients))
     .find(Boolean);
   const taskData = taskSnapshot.exists ? taskSnapshot.data() : null;
-  const closedFor = recipientEmail => isTaskClosedForDelivery(taskData, {
+  const tasks = [taskData, ...linkedSnapshots.filter(snapshot => snapshot.exists).map(snapshot => snapshot.data())];
+  const closedFor = recipientEmail => tasks.some(task => isTaskClosedForDelivery(task, {
     completionScope: data.completionScope,
     recipientEmail
-  });
+  }));
   let suppressed = 0;
   let state = linkedState || (!taskSnapshot.exists
     ? 'SKIPPED_TASK_MISSING'

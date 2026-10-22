@@ -1,5 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { runInNewContext } from 'node:vm';
 import {
   claimPendingMail,
   createTaskMailId,
@@ -473,7 +475,77 @@ test('mail linked to a master and an individual task is suppressed when only the
 });
 
 test('the insurance producer links the individual task so claim and pre-SMTP re-read it', async () => {
-  const { readFileSync } = await import('node:fs');
   const source = readFileSync(new URL('../scripts/assignInsuranceTaskAndMail.mjs', import.meta.url), 'utf8');
   assert.match(source, /linkedTaskIds:\s*\[individualTaskId\]/);
+});
+
+test('pre-SMTP filters each recipient across linked tasks using the actual SMTP recipient array', async () => {
+  const data = {
+    taskId: 'master', linkedTaskIds: ['individual'], to: ['a@example.test', 'b@example.test'],
+    delivery: { state: 'PENDING' }
+  };
+  const { db, ref, docs } = fakeFirestore({
+    'mail/linked-multi': data, 'tasks/master': { completed: false },
+    'tasks/individual': { assigneeProgress: {
+      'a@example.test': { completed: true, progress: 100 }, 'b@example.test': { completed: false, progress: 50 }
+    } }
+  });
+  const claimed = await claimPendingMail(db, ref('mail/linked-multi'), now);
+  assert.equal(claimed.state, 'SENDING');
+  const recipients = [...data.to];
+  const mailOptions = { to: recipients };
+  assert.equal(await skipTaskMailIfClosed(db, ref('mail/linked-multi'), claimed.data, recipients, now + 1), false);
+  assert.deepEqual(mailOptions.to, ['b@example.test']);
+  assert.equal(docs.get('mail/linked-multi').delivery.suppressedClosedRecipients, 1);
+});
+
+test('invalid or excessive task links fail closed instead of silently truncating closure checks', async () => {
+  for (const linkedTaskIds of ['individual', [''], ['tasks/individual'], Array.from({ length: 6 }, (_, i) => `individual-${i}`)]) {
+    const data = { taskId: 'master', linkedTaskIds, delivery: { state: 'PENDING' }, to: ['a@example.test'] };
+    const { db, ref, docs } = fakeFirestore({
+      'mail/invalid-links': data, 'tasks/master': { completed: false },
+      'tasks/individual-5': { completed: true }
+    });
+    assert.equal((await claimPendingMail(db, ref('mail/invalid-links'), now)).state, 'SKIPPED_UNLINKED_TASK');
+    assert.equal(await skipTaskMailIfClosed(db, ref('mail/invalid-links'), data, data.to, now), 'SKIPPED_UNLINKED_TASK');
+    assert.equal(docs.get('mail/invalid-links').delivery.attemptCount, undefined);
+  }
+});
+
+test('the actual daemon sender passes only open recipients to mocked sendMail and never sends if the individual closes', async () => {
+  const source = readFileSync(new URL('../scripts/mailerDaemon.js', import.meta.url), 'utf8');
+  const start = source.indexOf('async function sendClaimedMail(');
+  const end = source.indexOf('\nasync function processPendingMails(', start);
+  assert.ok(start >= 0 && end > start);
+  // Evaluate only the real sender, never the daemon bootstrap or its production credentials.
+  for (const allClosed of [false, true]) {
+    const data = {
+      taskId: 'master', linkedTaskIds: ['individual'], type: 'task_reminder',
+      to: ['closed@crearpsl.net', 'open@crearpsl.net'], delivery: { state: 'SENDING', attemptCount: 1 }
+    };
+    const { db, ref, docs } = fakeFirestore({
+      'mail/sender': data, 'tasks/master': { completed: false },
+      'tasks/individual': { completed: allClosed, assigneeProgress: {
+        'closed@crearpsl.net': { completed: true }, 'open@crearpsl.net': { completed: false }
+      } }
+    });
+    const deliveries = [];
+    const sendClaimedMail = runInNewContext(`(${source.slice(start, end)})`, {
+      db, skipTaskMailIfClosed, recordMailSuccess, recordMailFailure, recordMailUnknown,
+      sanitizeHtml: html => html, buildIcsAttachment: () => null,
+      transporter: { sendMail: async options => { deliveries.push(structuredClone(options)); } },
+      limaTransporter: null, process: { env: { GMAIL_SERVER_EMAIL: 'sender@example.test' } },
+      isDefinitiveMailFailure: () => false, console: { log() {}, warn() {}, error() {} }
+    });
+    assert.equal(await sendClaimedMail({ id: 'sender', ref: ref('mail/sender') }, data),
+      allClosed ? 'SKIPPED_CLOSED' : 'SUCCESS');
+    if (allClosed) {
+      assert.equal(deliveries.length, 0);
+      assert.equal(docs.get('mail/sender').delivery.state, 'SKIPPED_CLOSED');
+    } else {
+      assert.equal(deliveries.length, 1);
+      assert.deepEqual(Array.from(deliveries[0].to), ['open@crearpsl.net']);
+      assert.equal(docs.get('mail/sender').delivery.suppressedClosedRecipients, 1);
+    }
+  }
 });

@@ -1510,7 +1510,8 @@ export function ChecklistProvider({ children }) {
         const reopenTransition = previousCompleted && !allCompleted;
         const individualWasCompleted = isTaskClosedForDelivery(prevEntry);
         const individualTransition = individualWasCompleted !== isCompleted;
-        const eventScope = individualTransition ? { assigneeEmail: targetKey } : {};
+        const rootTransition = completionTransition || reopenTransition;
+        const rootEventId = `${eventId}_root`;
         const nextPayload = {
           assigneeProgress: currentProgress,
           closedAssigneeKeys: Object.keys(currentProgress).filter(key => isTaskClosedForDelivery({ ...currentProgress[key] })),
@@ -1521,25 +1522,32 @@ export function ChecklistProvider({ children }) {
           completedAt: allCompleted ? (data.completedAt || nowIso) : null,
           updatedAt: nowIso,
           lifecycleMutation: {
-            eventId,
-            scope: eventScope,
-            mapScope: { assigneeEmail: targetKey }
+            eventId: rootTransition ? rootEventId : eventId,
+            scope: rootTransition ? {} : { assigneeEmail: targetKey },
+            mapScope: { assigneeEmail: targetKey },
+            assigneeKeys: individualWasCompleted ? [targetKey] : [],
+            assigneeEventIds: individualTransition ? { [targetKey]: eventId } : {}
           }
         };
 
         transaction.update(taskRef, nextPayload);
-        if (individualTransition || completionTransition || reopenTransition) {
-          const eventAction = individualTransition
-            ? (isCompleted ? 'completed' : 'reopened')
-            : (reopenTransition ? 'reopened' : 'completed');
-          transaction.set(doc(db, 'task_completion_events', eventId), {
+        const transitionEvents = [
+          ...(individualTransition ? [{
+            id: eventId, action: isCompleted ? 'completed' : 'reopened', scope: { assigneeEmail: targetKey }
+          }] : []),
+          ...(rootTransition ? [{
+            id: rootEventId, action: reopenTransition ? 'reopened' : 'completed', scope: {}
+          }] : [])
+        ];
+        for (const event of transitionEvents) {
+          transaction.set(doc(db, 'task_completion_events', event.id), {
             taskId,
-            action: eventAction,
+            action: event.action,
             actorEmail: String(currentUser?.email || auth.currentUser?.email || '').trim().toLowerCase(),
             occurredAt: serverTimestamp(),
             source: 'manual',
-            scope: eventScope,
-            ...(eventAction === 'completed'
+            scope: event.scope,
+            ...(event.action === 'completed'
               ? { closureContext: taskClosureContext({ ...data, ...nextPayload }) } : {})
           });
         }

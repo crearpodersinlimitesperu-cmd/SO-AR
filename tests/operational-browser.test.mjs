@@ -270,6 +270,9 @@ test('actual task context persists location, updates reminders and reads links; 
       window.fixtureOpenDetail(task);
     });
     await page.waitForFunction(() => document.body.innerText.includes('Large shared task'));
+    await page.type('textarea[placeholder^="Escribe un avance"]', 'A note for the 14-participant task');
+    await page.evaluate(() => [...document.querySelectorAll('button')]
+      .find(button => button.textContent.includes('Registrar Avance')).click());
     await saveModal();
     await page.waitForFunction(() => window.fixtureStore.get('tasks/custom_large_multi')?.lastUpdated);
     const large = await page.evaluate(() => window.fixtureStore.get('tasks/custom_large_multi'));
@@ -277,7 +280,18 @@ test('actual task context persists location, updates reminders and reads links; 
       { completed: true, progress: 100, completedAt: 'recorded-close' },
       'a note save on a 14-participant task preserves the closed participant exactly');
     assert.deepEqual(large.closedAssigneeKeys, ['member3@example.test']);
+    assert.equal(large.comments, 'A note for the 14-participant task');
     assert.notEqual((await page.evaluate(() => window.fixtureToast)).type, 'error');
+    await page.evaluate(() => window.fixtureOpenDetail({ ...window.fixtureStore.get('tasks/custom_large_multi') }));
+    await page.waitForFunction(() => [...document.querySelectorAll('button')].some(button => button.textContent.trim() === '50%'));
+    await page.evaluate(() => [...document.querySelectorAll('button')].find(button => button.textContent.trim() === '50%').click());
+    await saveModal();
+    await page.waitForFunction(() => window.fixtureStore.get('tasks/custom_large_multi')?.assigneeProgress['owner@example.test']?.progress === 50);
+    const advancedLarge = await page.evaluate(() => window.fixtureStore.get('tasks/custom_large_multi'));
+    assert.deepEqual(advancedLarge.assigneeProgress['member3@example.test'], large.assigneeProgress['member3@example.test']);
+    for (const [email, entry] of Object.entries(large.assigneeProgress)) {
+      if (email !== 'owner@example.test') assert.deepEqual(advancedLarge.assigneeProgress[email], entry);
+    }
 
     const failed = await page.evaluate(async () => {
       window.fixtureRejectWrite = true;

@@ -596,6 +596,11 @@ test('large assignee lists save notes, open progress and mixed closures atomical
   const mixed = { ...advanced, [emails[1]]: { ...advanced[emails[1]], completed: true, progress: 100, completedAt: 'closed-now' } };
   await assertSucceeds(updateDoc(ref, save(mixed, [emails[0], emails[1]])));
 
+  await assertFails(updateDoc(ref, { closedAssigneeKeys: [] }));
+  await assertFails(updateDoc(ref, save(mixed, [], [emails[0], emails[1]])));
+  await assertFails(updateDoc(ref, save({
+    ...mixed, [emails[0]]: { ...mixed[emails[0]], name: 'Changed metadata only' }
+  }, [emails[1]], [emails[0]])));
   const stale = Object.fromEntries(emails.map(email => [email, { ...mixed[email], completed: false, progress: 50 }]));
   await assertFails(updateDoc(ref, { assigneeProgress: stale }));
   await assertFails(updateDoc(ref, save(stale, [], [emails[0], emails[1]])));
@@ -631,4 +636,68 @@ test('individual completion is accepted only with its closure snapshot', async (
   });
   await assertFails(complete('no-context', false));
   await assertSucceeds(complete('with-context', true));
+});
+
+test('a client cannot remove an unchanged closed participant from the ledger then reopen it without an event', async () => {
+  const email = 'owner@example.com';
+  const original = { completed: true, progress: 100, completedAt: 'first-close' };
+  await seedTasks([{
+    id: 'custom_ledger_two_steps', isCustom: true, createdBy: email, completed: false,
+    assignedToEmails: [email, 'other@example.com'], closedAssigneeKeys: [email],
+    assigneeProgress: { [email]: original, 'other@example.com': { completed: false, progress: 0 } }
+  }]);
+  const db = userDb('owner', email);
+  const ref = doc(db, 'tasks', 'custom_ledger_two_steps');
+  await assertFails(updateDoc(ref, {
+    closedAssigneeKeys: [],
+    lifecycleMutation: { scope: {}, assigneeKeys: [email] }
+  }));
+  assert.deepEqual((await getDoc(ref)).data().closedAssigneeKeys, [email]);
+  await assertFails(updateDoc(ref, {
+    assigneeProgress: { [email]: { completed: false, progress: 0 }, 'other@example.com': { completed: false, progress: 0 } },
+    lifecycleMutation: { scope: {}, assigneeKeys: [], eventId: 'no-event-created' }
+  }));
+  assert.deepEqual((await getDoc(ref)).data().assigneeProgress[email], original);
+});
+
+test('root and participant reopen events are linked separately without releasing other closed participants', async () => {
+  const email = 'owner@example.com';
+  const other = 'other@example.com';
+  const closed = { completed: true, progress: 100, completedAt: 'original-close' };
+  await seedTasks([{
+    id: 'custom_root_and_person', isCustom: true, createdBy: email,
+    assignedToEmails: [email, other], ...closed, status: 'Completada', progressPercentage: 100,
+    assigneeProgress: { [email]: closed, [other]: closed }, closedAssigneeKeys: [email, other]
+  }]);
+  const owner = userDb('owner', email);
+  const ref = doc(owner, 'tasks', 'custom_root_and_person');
+  const eventRef = doc(owner, 'task_completion_events', 'root-person-reopened');
+  const rootEventRef = doc(owner, 'task_completion_events', 'root-person-reopened_root');
+  const reopen = includeRootEvent => runTransaction(owner, async transaction => {
+    transaction.update(ref, {
+      completed: false, status: 'En Progreso', progress: 50, progressPercentage: 50, completedAt: null,
+      assigneeProgress: { [email]: { completed: false, progress: 0, completedAt: null }, [other]: closed },
+      closedAssigneeKeys: [other],
+      lifecycleMutation: {
+        eventId: includeRootEvent ? rootEventRef.id : eventRef.id,
+        scope: includeRootEvent ? {} : { assigneeEmail: email }, mapScope: { assigneeEmail: email },
+        assigneeKeys: [email], assigneeEventIds: { [email]: eventRef.id }
+      }
+    });
+    transaction.set(eventRef, {
+      taskId: ref.id, action: 'reopened', actorEmail: email, occurredAt: serverTimestamp(),
+      source: 'manual', scope: { assigneeEmail: email }
+    });
+    if (includeRootEvent) transaction.set(rootEventRef, {
+      taskId: ref.id, action: 'reopened', actorEmail: email, occurredAt: serverTimestamp(),
+      source: 'manual', scope: {}
+    });
+  });
+  await assertFails(reopen(false));
+  await assertSucceeds(reopen(true));
+  assert.equal((await getDoc(ref)).data().assigneeProgress[other].completed, true);
+  await assertFails(updateDoc(ref, {
+    closedAssigneeKeys: [],
+    lifecycleMutation: { eventId: 'not-created', scope: {}, assigneeKeys: [other] }
+  }));
 });
