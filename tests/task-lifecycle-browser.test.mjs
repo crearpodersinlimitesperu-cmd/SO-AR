@@ -296,6 +296,8 @@ test('task transactions roll back rejected optimism, gate celebrations and prese
     assert.equal(completed.completions.Lima__old.completedAt, 'original-close');
     assert.equal(completed.responsible, 'Fixture manager');
     assert.deepEqual(completed.history, [{ action: 'created', at: 'original-time' }]);
+    assert.ok(await page.evaluate(() => window.fixtureWrites.some(write =>
+      write.ref.path === 'task_completion_events' && write.updates.action === 'completed')));
     assert.deepEqual(await call('updateTaskDetails', 'catalog', {
       completed: false,
       status: 'Pendiente',
@@ -322,8 +324,6 @@ test('task transactions roll back rejected optimism, gate celebrations and prese
     assert.equal(await page.evaluate(() =>
       window.fixtureStore.catalog.completions['Lima__cycle-1'].status
     ), 'Completada');
-    assert.ok(await page.evaluate(() => window.fixtureWrites.some(write =>
-      write.ref.path === 'task_completion_events' && write.updates.action === 'completed')));
 
     await start('catalog', true);
     await page.waitForFunction(() => window.fixtureApi.tasks.find(t => t.id === 'catalog')?.completed === false);

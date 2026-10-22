@@ -311,8 +311,8 @@ test('overdue enqueue is transactionally deduplicated and updates debounce only 
     data: { taskId: 'overdue', recipientEmail: 'owner@example.test', type: 'task_reminder' }
   };
   const results = await Promise.all([
-    enqueueOverdueTaskMails(db, taskRef, [entry], now, () => new Date(now).toISOString()),
-    enqueueOverdueTaskMails(db, taskRef, [entry], now, () => new Date(now).toISOString())
+    enqueueOverdueTaskMails(db, taskRef, [entry], now, new Date(now).toISOString()),
+    enqueueOverdueTaskMails(db, taskRef, [entry], now, new Date(now).toISOString())
   ]);
   assert.equal(results.reduce((sum, item) => sum + item.queued, 0), 1);
   assert.ok(docs.get('tasks/overdue').lastReminderAt);
@@ -343,7 +343,7 @@ test('overdue enqueue respects cycle completion without globally suppressing ano
         completionScope: { sede: 'Lima', cycleId: 'two' } }
     }
   ];
-  const result = await enqueueOverdueTaskMails(db, taskRef, entries, now, () => new Date(now).toISOString());
+  const result = await enqueueOverdueTaskMails(db, taskRef, entries, now, new Date(now).toISOString());
   assert.deepEqual(result, { queued: 1, reason: 'queued' });
   assert.equal(docs.has('mail/cycle-one'), false);
   assert.equal(docs.has('mail/cycle-two'), true);
@@ -362,7 +362,7 @@ test('overdue enqueue leaves debounce untouched when the cycle scope is ambiguou
     ref('tasks/catalog-unknown'),
     [{ id: 'unscoped', data: { taskId: 'catalog-unknown', type: 'task_reminder' } }],
     now,
-    () => new Date(now).toISOString()
+    new Date(now).toISOString()
   );
   assert.deepEqual(result, { queued: 0, reason: 'scope_unknown' });
   assert.equal(docs.get('tasks/catalog-unknown').lastReminderAt, undefined);
