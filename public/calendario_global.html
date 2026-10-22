@@ -784,6 +784,56 @@
           });
         }
 
+        // --- Espejo exacto de las sugerencias del Asignador -----------------
+        // Réplica 1:1 de src/utils/trainerAssignments.js (extraerPreasignaciones /
+        // resolverSugerenciaEntrenador) y de la regla de slots de Maestría de
+        // AsignadorEntrenadores.jsx. Así el Calendario Global muestra exactamente
+        // el mismo entrenador sugerido que ve el Asignador, sin inventar nada:
+        // solo se usa la columna Entrenador del cronograma oficial y siempre se
+        // rotula como "Sugerido", nunca como confirmado.
+        function normalizarIdentidadEntrenadorCal(value) {
+          return String(value || '')
+            .toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter(Boolean)
+            .map(token => ({ fernando: 'fer', fer: 'fer' }[token] || token))
+            .join(' ');
+        }
+
+        function extraerPreasignacionesCal(value) {
+          const seen = new Set();
+          return String(value || '')
+            .split(/[\/;,\n]+/)
+            .map(name => name.trim())
+            .filter(Boolean)
+            .filter(name => {
+              const key = normalizarIdentidadEntrenadorCal(name);
+              if (!key || seen.has(key)) return false;
+              seen.add(key);
+              return true;
+            });
+        }
+
+        function esMaestriaConSlotsCal(nombre) {
+          const n = String(nombre || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+          if (n.includes('el viaje')) return false;
+          return n.includes('maestria') || n.includes('mj');
+        }
+
+        function resolveAsignadorSuggestion(ev) {
+          if (!ev) return '';
+          const pre = extraerPreasignacionesCal(ev.sheetTrainer || '');
+          if (!pre.length) return '';
+          if (esMaestriaConSlotsCal(ev.name || ev.nombre)) {
+            const slots = ['Creación', 'Relación', 'Gratitud'];
+            // Con un solo nombre el Asignador lo sugiere únicamente para el FDS 1.
+            const parts = pre.length === 1
+              ? [`${slots[0]}: ${formatTrainerDisplayName(pre[0])}`]
+              : slots.map((slot, i) => pre[i] ? `${slot}: ${formatTrainerDisplayName(pre[i])}` : '').filter(Boolean);
+            return parts.join(' · ');
+          }
+          return pre.length === 1 ? formatTrainerDisplayName(pre[0]) : '';
+        }
+
         function mergeOfficialAssignments(data, assignments) {
           const assignmentIndex = indexAssignmentsForLookup(assignments);
           let confirmed = 0;
@@ -3035,10 +3085,16 @@
                 startDateObj.setMinutes(startDateObj.getMinutes() + startDateObj.getTimezoneOffset());
                 const monthName = monthNames[startDateObj.getMonth()];
                 const yearName = startDateObj.getFullYear().toString();
-                const trainerName = (ev.assignmentSource === 'causa_os' && ev.trainer) ? ev.trainer : "Sin asignar";
+                const isConfirmedTrainer = ev.assignmentSource === 'causa_os' && ev.trainer;
+                // Si no hay confirmación, se refleja la MISMA sugerencia que muestra el
+                // Asignador (columna Entrenador del cronograma oficial), rotulada como tal.
+                const suggestedTrainer = isConfirmedTrainer ? '' : resolveAsignadorSuggestion(ev);
+                const trainerName = isConfirmedTrainer ? ev.trainer : (suggestedTrainer || "Sin asignar");
                 const placeName = ev.place || "Por confirmar";
-                const trainerSource = (ev.assignmentSource === 'causa_os' && ev.trainer)
+                const trainerSource = isConfirmedTrainer
                   ? '<span class="mt-1 inline-flex items-center gap-1 text-[9px] font-bold text-emerald-400"><ion-icon name="checkmark-circle-outline"></ion-icon> Confirmado en Asignador Causa OS</span>'
+                  : suggestedTrainer
+                  ? '<p class="mt-1 text-[10px] text-amber-400/90 font-semibold flex items-center gap-1"><ion-icon name="clipboard-outline"></ion-icon> Sugerido por cronograma · pendiente de confirmar en Asignador</p>'
                   : '<p class="mt-1 text-[10px] text-amber-400/80 font-semibold flex items-center gap-1"><ion-icon name="time-outline"></ion-icon> Pendiente en Asignador de Entrenadores</p>';
                 
                 const log = ev.logistics || { ticket: "pending", hotel: "pending", trainer_notified: false, trainer_arrival: "" };
@@ -3132,11 +3188,13 @@
                                 </div>
                                 <div>
                                     <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Entrenador</p>
-                                    ${trainerName !== 'Por confirmar' && trainerName !== 'Sin asignar' ? `
+                                    ${isConfirmedTrainer ? `
                                     <button onclick="openTrainerDrawer('${trainerName.replace(/'/g, "\'")}')" class="text-sm text-gray-200 font-medium text-left cursor-pointer border-b border-dashed border-gray-500 hover:text-crearCyan hover:border-crearCyan transition-colors flex items-center gap-1">
                                         <span>${trainerName}</span>
                                         <ion-icon name="card-outline" class="text-xs text-crearCyan/70"></ion-icon>
                                     </button>
+                                    ` : suggestedTrainer ? `
+                                    <p class="text-sm text-amber-200/90 font-medium italic">${escapeCalendarText(trainerName)}</p>
                                     ` : `
                                     <p class="text-sm text-gray-500 font-medium">${trainerName}</p>
                                     `}
