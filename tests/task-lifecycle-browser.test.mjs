@@ -96,10 +96,11 @@ test('task transactions roll back rejected optimism, gate celebrations and prese
       const store = JSON.parse(localStorage.getItem('task-lifecycle-fixture') || JSON.stringify(initial));
       window.fixtureStore = store;
       window.fixtureWrites = [];
+      window.fixtureEvents = JSON.parse(localStorage.getItem('task-lifecycle-events') || '{}');
       const listeners = new Set();
       export const collection = (_db, path) => ({ path });
       export const serverTimestamp = () => new Date().toISOString();
-      let eventId = 0;
+      let eventId = Object.keys(window.fixtureEvents).length;
       export const doc = (_db, path, id) => typeof path === 'string'
         ? { path, id } : { path: _db.path, id: 'event-' + ++eventId };
       export const query = ref => ref;
@@ -142,7 +143,9 @@ test('task transactions roll back rejected optimism, gate celebrations and prese
         for (const { ref, updates } of writes) {
           window.fixtureWrites.push({ ref, updates });
           if (ref.path === 'tasks') patch(store[ref.id] ??= {}, updates);
+          if (ref.path === 'task_completion_events') window.fixtureEvents[ref.id] = structuredClone(updates);
         }
+        localStorage.setItem('task-lifecycle-events', JSON.stringify(window.fixtureEvents));
         window.publishFixture();
       };
       const unexpected = () => { throw new Error('Unexpected non-transaction write'); };
@@ -286,6 +289,13 @@ test('task transactions roll back rejected optimism, gate celebrations and prese
     await page.reload();
     await page.waitForFunction(() => window.fixtureApi?.loading === false);
     const completed = (await state()).find(t => t.id === 'catalog');
+    const completionEvent = await page.evaluate(() => Object.values(window.fixtureEvents).find(event =>
+      event.taskId === 'catalog' && event.action === 'completed'));
+    assert.equal(completionEvent.actorEmail, 'owner@example.test');
+    assert.equal(completionEvent.source, 'manual');
+    assert.deepEqual(completionEvent.scope, { sede: 'Lima', cycleId: 'cycle-1' });
+    assert.ok(Number.isFinite(Date.parse(completionEvent.occurredAt)),
+      'the committed transition event survives the reload alongside the task');
     assert.equal(completed.completed, true);
     assert.equal(completed.progressPercentage, 100);
     assert.ok(completed.completedAt);

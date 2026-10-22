@@ -30,6 +30,7 @@ test('actual task context persists location, updates reminders and reads links; 
       let nextId = 0;
       window.fixtureStore = store;
       export const collection = (_db, path) => ({ path });
+      export const serverTimestamp = () => new Date().toISOString();
       export const doc = (_db, path, id) => {
         if (_db?.path) return { path: _db.path, id: path || 'fixture_' + ++nextId };
         return { path, id: id || 'fixture_' + ++nextId };

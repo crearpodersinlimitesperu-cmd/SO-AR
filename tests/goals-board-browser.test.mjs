@@ -34,6 +34,7 @@ test('GoalsBoard renders synthetic roles, overachievement, source absence and sc
     'firebase/firestore': `
       const goals = ${JSON.stringify(goals)};
       export const collection = (_db, path) => ({ path });
+      export const serverTimestamp = () => new Date().toISOString();
       export const doc = (_db, path, id) => ({ path, id });
       export const query = ref => ref;
       export const where = () => ({});

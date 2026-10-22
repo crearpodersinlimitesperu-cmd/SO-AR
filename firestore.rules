@@ -435,7 +435,8 @@ service cloud.firestore {
            scope.sede is string && scope.sede.size() > 0 &&
            scope.cycleId is string && scope.cycleId.size() > 0) ||
           (scope.keys().hasOnly(['assigneeEmail']) && scope.assigneeEmail is string &&
-            (scope.assigneeEmail == email() || isSuperAdmin() || isGerenteODireccion()))) &&
+            (scope.assigneeEmail == email() || isSuperAdmin() || isGerenteODireccion() ||
+             beforeTask.get('createdBy', '') == email() || beforeTask.get('assignedByEmail', '') == email()))) &&
         existsAfter(taskPath) &&
         (canWriteTaskCompletionEvent(beforeTask) || canWriteTaskCompletionEvent(afterTask)) &&
         ((event.action == 'completed' && !lifecycleClosed(beforeState) && lifecycleClosed(afterState)) ||

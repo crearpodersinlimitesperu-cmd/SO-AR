@@ -116,6 +116,7 @@ export default function TaskDetailModal({
 
   // Estados de seguimiento colaborativo (avance general vs individual)
   const [assigneeProgressMap, setAssigneeProgressMap] = useState({});
+  const assigneeProgressBaseline = useRef({});
   const [myProgress, setMyProgress] = useState(0);
   const [myCompleted, setMyCompleted] = useState(false);
   const [evidencesList, setEvidencesList] = useState([]);
@@ -225,6 +226,7 @@ export default function TaskDetailModal({
       });
 
       setAssigneeProgressMap(newMap);
+      assigneeProgressBaseline.current = newMap;
       setMyProgress(foundMyProgress);
       setMyCompleted(foundMyCompleted);
 
@@ -494,12 +496,22 @@ export default function TaskDetailModal({
   };
 
   // Selector de avance individual del usuario actual
+  const assigneeChanged = (entry, baseline) =>
+    entry?.progress !== baseline?.progress || entry?.completed !== baseline?.completed;
+  const canEditAssignee = (email) => {
+    const otherPending = Object.entries(assigneeProgressMap).some(([key, entry]) =>
+      !isSameUserEmail(key, email) && assigneeChanged(entry, assigneeProgressBaseline.current[key]));
+    if (otherPending) showToast('Guarda el avance pendiente antes de editar otro colaborador.', 'warning');
+    return !otherPending;
+  };
+
   const handleSetMyProgress = (val) => {
+    const targetKey = myEmailKey || normalizeTaskEmail(userEmail);
+    if (targetKey && !canEditAssignee(targetKey)) return;
     setMyProgress(val);
     const isDone = val === 100;
     setMyCompleted(isDone);
 
-    const targetKey = myEmailKey || normalizeTaskEmail(userEmail);
     if (targetKey) {
       setAssigneeProgressMap(prev => ({
         ...prev,
@@ -524,7 +536,7 @@ export default function TaskDetailModal({
 
   // Alternar avance de un colaborador (para creadores o coordinadores)
   const handleToggleCollaboratorStatus = (collabEmail) => {
-    if (!isCreator) return;
+    if (!isCreator || !canEditAssignee(collabEmail)) return;
     setCompletionIntent(true);
     setAssigneeProgressMap(prev => {
       const entry = prev[collabEmail] || {};
@@ -725,8 +737,10 @@ export default function TaskDetailModal({
       }
 
       const previouslyCompleted = task.completed === true || task.status === 'Completada';
-      const explicitReopen = completionIntent && previouslyCompleted &&
-        (!isCompleted || (isMultiAssignee && !allDone));
+      const individualReopen = Object.entries(mapToSave).some(([key, entry]) =>
+        assigneeProgressBaseline.current[key]?.completed === true && entry.completed !== true && entry.progress < 100);
+      const explicitReopen = completionIntent &&
+        ((previouslyCompleted && (!isCompleted || (isMultiAssignee && !allDone))) || individualReopen);
       const finalCompleted = previouslyCompleted && !explicitReopen
         ? true
         : allDone || finalOverall === 100;
@@ -743,6 +757,12 @@ export default function TaskDetailModal({
           completedAt: finalCompleted ? (mapToSave[targetKey]?.completedAt || new Date().toISOString()) : null
         };
       }
+      const persistedMap = { ...(task.assigneeProgress || {}) };
+      Object.entries(mapToSave).forEach(([key, entry]) => {
+        if (!assigneeChanged(entry, assigneeProgressBaseline.current[key])) return;
+        const persistedKey = Object.keys(persistedMap).find(existing => isSameUserEmail(existing, key)) || key;
+        persistedMap[persistedKey] = { ...(persistedMap[persistedKey] || {}), ...entry };
+      });
 
       // Registrar avance en la bitácora de notas si el usuario actual avanzó
       let updatedNotesList = [...notesList];
@@ -772,7 +792,7 @@ export default function TaskDetailModal({
         // (finalCompleted=false), se limpia -- se resetea al volver a
         // completarse, nunca se inventa una fecha.
         completedAt: finalCompleted ? (task.completedAt || new Date().toISOString()) : null,
-        assigneeProgress: Object.keys(mapToSave).length > 0 ? mapToSave : (task.assigneeProgress || {}),
+        assigneeProgress: persistedMap,
         evidenceUrl: mainEvidenceUrl,
         evidence_url: mainEvidenceUrl,
         evidences: evidencesList,
