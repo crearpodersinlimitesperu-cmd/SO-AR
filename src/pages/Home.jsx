@@ -57,6 +57,7 @@ import { getOverdueAssignedTasks, isTaskDoneForUser, getOverdueEscalation } from
 import HorariosEntrenamientoModal from '../components/HorariosEntrenamientoModal';
 import { INITIAL_MANAGERS, normalizeTrainer } from '../data/managersData';
 import { formatTrainerDisplayName, nombreLegalEntrenador, normalizarIdentidadEntrenador } from '../data/trainerAliases';
+import { resumenSugerenciaCronograma } from '../utils/trainerAssignments';
 
 const getEventTeamLabels = (event = {}) => {
   const rawValues = [
@@ -3250,18 +3251,57 @@ export default function Home() {
                                     cambiar su comportamiento general es más riesgo del que pide este bug
                                     puntual). */}
                                 {/* Visibilidad de Trainer:
-                                    Directiva oficial de José Sánchez: Las coordinadoras de cada sede (como Lili Cubillo y Judith Romero),
-                                    así como gerentes, directores y entrenadores deben ver siempre a los entrenadores asignados
-                                    en los eventos y entrenamientos de sus perfiles y sedes.
-                                    Solo se oculta a participantes de equipo rasos (capitán/aliado que no coordinan). */}
-                                {(!hasRoleAccess(['capitan', 'aliado']) || 
-                                  isCoordC1C2 || isCoordMJ || isEntrenador || isGerente || isSuperOrDir || 
-                                  (currentUser?.roles || []).some(r => ['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'director_maestria', 'entrenador', 'entrenador_llamadas', 'gerente'].includes(r)) ||
-                                  (currentUser?.isSuperAdmin && !currentUser?.isSimulated)) && (
-                                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginTop: '0.1rem' }}>
-                                    🎙️ Trainer: {formatTrainerDisplayName(confirmedTrainerLabel || ev.trainer || ev.entrenador) || 'Por confirmar'}
-                                  </span>
-                                )}
+                                    Directiva oficial de José Sánchez: 
+                                    - Los gerentes (y directores / superadmin) deben ver los entrenadores siempre (en todas las fechas y eventos).
+                                    - Los coordinadores ven los entrenadores del ciclo activo de su sede/equipo.
+                                    - Si no hay asignación confirmada pero hay sugerencia del cronograma, se muestra con etiqueta de sugerencia.
+                                */}
+                                {(() => {
+                                  // Determinar si el evento pertenece al ciclo activo
+                                  const isEventInActiveCycle = (() => {
+                                    if (!ev.fecha_inicio && !ev.start) return false;
+                                    const evDateStr = String(ev.fecha_inicio || ev.start).slice(0, 10);
+                                    const cyclesToCheck = (quitoCycles && quitoCycles.length > 0)
+                                      ? quitoCycles.map(qc => qc.cycle)
+                                      : (currentCycle ? [currentCycle] : []);
+                                    if (!cyclesToCheck.length) return true; // Si no hay ciclo cargado, permitir visibilidad
+                                    return cyclesToCheck.some(c => {
+                                      if (!c) return false;
+                                      const starts = [c.c1_start, c.c2_start, c.maestria_start].filter(Boolean).map(s => String(s).slice(0, 10));
+                                      const ends = [c.c1_end, c.c2_end, c.maestria_end].filter(Boolean).map(s => String(s).slice(0, 10));
+                                      if (starts.includes(evDateStr)) return true;
+                                      // Comparar rango de ciclo
+                                      const cycleMin = starts.length ? [...starts].sort()[0] : null;
+                                      const cycleMax = ends.length ? [...ends].sort().reverse()[0] : (starts.length ? [...starts].sort().reverse()[0] : null);
+                                      if (cycleMin && cycleMax && evDateStr >= cycleMin && evDateStr <= cycleMax) return true;
+                                      // Comparar número de equipo si coincide con el ciclo
+                                      const cycleTeamDigits = c.id ? c.id.replace(/[^0-9]/g, '') : '';
+                                      const evEqDigits = String(ev.equipo || ev.team || '').replace(/[^0-9]/g, '');
+                                      if (cycleTeamDigits && evEqDigits && (cycleTeamDigits.includes(evEqDigits) || evEqDigits.includes(cycleTeamDigits))) return true;
+                                      return false;
+                                    });
+                                  })();
+
+                                  const canAlwaysSeeTrainer = isGerente || isSuperOrDir || isEntrenador;
+                                  const isCoordinator = isCoordC1C2 || isCoordMJ || (currentUser?.roles || []).some(r => ['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'director_maestria', 'coord_jr'].includes(r));
+                                  const canSeeTrainer = canAlwaysSeeTrainer || (isCoordinator && isEventInActiveCycle);
+
+                                  if (!canSeeTrainer) return null;
+
+                                  const rawTrainer = confirmedTrainerLabel || ev.trainer || ev.entrenador;
+                                  const confirmedDisplay = formatTrainerDisplayName(rawTrainer);
+                                  const suggestedDisplay = !confirmedDisplay ? resumenSugerenciaCronograma(ev.nombre || ev.name, ev.sheetTrainer) : '';
+
+                                  return (
+                                    <span style={{ fontSize: '0.75rem', color: confirmedDisplay ? 'var(--text-muted)' : '#f59e0b', display: 'block', marginTop: '0.1rem' }}>
+                                      🎙️ Trainer: {confirmedDisplay 
+                                        ? confirmedDisplay 
+                                        : (suggestedDisplay 
+                                          ? `${formatTrainerDisplayName(suggestedDisplay)} (sugerido cronograma)` 
+                                          : 'Por confirmar')}
+                                    </span>
+                                  );
+                                })()}
                               </div>
                               <div style={{ textAlign: 'right', flexShrink: 0 }}>
                                 <span className="text-gold" style={{ fontWeight: 'bold', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.2rem', justifyContent: 'flex-end' }}>

@@ -38,3 +38,23 @@ export const resolverSugerenciaEntrenador = (preasignaciones, slotIndex, tieneSl
 };
 
 export const campoAsignacionSlot = (slot, asignacion) => ({ [slot]: asignacion });
+
+// Resumen legible de la sugerencia del cronograma oficial para un evento, con
+// la MISMA regla que usa el Asignador (por slot en Maestría; con un solo nombre
+// solo se sugiere el FDS 1; varios nombres en un programa de slot único no se
+// sugieren). Nunca representa un entrenador confirmado.
+const FDS_MAESTRIA_SUGERENCIA = ['Creación', 'Relación', 'Gratitud'];
+export const resumenSugerenciaCronograma = (nombre = '', sheetTrainer = '') => {
+  const pre = extraerPreasignaciones(sheetTrainer);
+  if (!pre.length) return '';
+  const n = String(nombre || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const conSlots = !n.includes('el viaje') && (n.includes('maestria') || n.includes('mj'));
+  if (!conSlots) return resolverSugerenciaEntrenador(pre, 0, false).candidato;
+  return FDS_MAESTRIA_SUGERENCIA
+    .map((slot, i) => {
+      const { candidato } = resolverSugerenciaEntrenador(pre, i, true);
+      return candidato ? `${slot}: ${candidato}` : '';
+    })
+    .filter(Boolean)
+    .join(' · ');
+};
