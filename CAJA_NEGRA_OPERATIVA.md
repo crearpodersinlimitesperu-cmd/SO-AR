@@ -730,6 +730,8 @@ Tras el reporte de incidencias donde firmas completadas figuraban en el panel ad
 * Todos los agentes de sincronización (`scripts/nodusApiClient.mjs`, `scripts/nodusMultiAgentSync.mjs`, `publishNodusReportSources.mjs`) y servicios de visualización frontend (`NodusDataMap.jsx`, `AuditoriaKPIs.jsx`, `ReportesBoard.jsx`) operan bajo arquitectura *fail-closed*:
   - Si un dato no existe o no pudo ser extraído de Nodus, se reporta como "No disponible / Pendiente de sync".
   - Prohibido cualquier valor simulado, sintético o inventado en Causa OS.
+* **Corrección en Copiloto Analítico (`AICopilot.jsx`):**
+  - Se optimizó la resolución de consultas por equipo (ej. *"cuantos confirmados hay en lima para c1 e32"*): anteriormente el buscador interno inspeccionaba la propiedad `c.equipo` como string simple en lugar del array de desglose real `c.equipos` (donde Nodus consolida cada equipo: `confirmado`, `porConfirmar`, `asistieron`, `llamadas`), lo que provocaba falsos negativos de "no encuentro datos". Ahora agrega de inmediato todos los confirmados y llamadas del equipo desde la fuente viva de Nodus/Firestore.
 
 ---
 
