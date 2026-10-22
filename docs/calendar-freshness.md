@@ -57,6 +57,39 @@ proximidad. Cuando falta Apps Script, se conserva el historial de la lectura
 anterior disponible durante esa sesión (y la caché React). Una discrepancia de
 fechas entre fuentes requiere confirmación operativa, no una fecha inventada.
 
+## Incidente: tarjetas vacías en «Próximos C1»
+
+Producción mostraba la pestaña «Próximos C1» sin tarjetas, el contador previo
+(«Viendo 7»), el contador lateral de C1 en 0, el estado vacío oculto y la
+frescura detenida en «Consultando». Lectura pública sin autenticación: Apps
+Script devolvió 1856 eventos y el CSV 2508 filas; cada fuente tenía una fila con
+`nombre` vacío. Ninguna fuente estaba vacía.
+
+Causa: `refreshCalendarSource` convertía el nombre vacío en `undefined` y
+`renderEvents`, tras vaciar el contenedor, ejecutaba `ev.name.toUpperCase()` en el
+filtro C1. El `TypeError` impedía actualizar contador, estado vacío y frescura.
+Además, el contador lateral de C1 usaba una regla (`equipo` con «C1») distinta de
+la de las tarjetas y nunca coincidía.
+
+Protecciones en `public/calendario_global.html`:
+
+- Un nombre ausente se muestra como «Sin nombre en la fuente oficial»; no se
+  inventa ni se descarta el evento.
+- Tarjetas y contador lateral comparten `getNextC1Events()`.
+- Cada tarjeta se renderiza aislada: un registro que falla se omite, se cuenta y
+  se anuncia en `#renderIssues`; el resto de la vista se muestra. El estado vacío
+  solo aparece cuando no hay eventos legítimos y nada se omitió.
+- Los datos nuevos sustituyen a los visibles solo tras proyectar asignaciones;
+  la proyección operativa y la de asignaciones tienen límite de cinco segundos.
+- La frescura siempre termina: éxito, error visible (incluido fallo del módulo o
+  de la vista: «Datos leídos, pero no se pudieron mostrar») o
+  «Lectura completada; vista parcial: N registro(s) … omitido(s)», que antecede
+  al texto de fuentes y persiste al cambiar de pestaña.
+
+La **frescura de fuentes** (qué se consultó y cuándo) y la **completitud de la
+vista** (si todo lo leído se pudo mostrar) son indicadores distintos: una lectura
+fresca con vista parcial no se presenta como actualización completa.
+
 ## Reproducción y regresiones
 
 Ejecutar `npm run test:calendars`. Las pruebas no acceden a datos productivos:
@@ -74,6 +107,10 @@ sintéticos.
 - Página Global real: carga desde CSV aunque Apps Script falle; equipos mixtos,
   filtro Guayaquil/búsqueda/historial, conservación de filtros tras refrescar y
   ausencia de notificación de éxito en fallo total.
+- `tests/calendar-global-render-browser.test.mjs`: página Global real con reloj
+  fijo (22/10/2026), Próximos C1 vacío legítimo y siete actuales, fila sin nombre,
+  registros omitidos con vista parcial, proyección operativa colgada, módulo de
+  frescura y contenedor ausentes.
 - Regresiones existentes de identidad, equipos paralelos, fechas operativas,
   desasignación, calendario diario y proyección pública en build.
 

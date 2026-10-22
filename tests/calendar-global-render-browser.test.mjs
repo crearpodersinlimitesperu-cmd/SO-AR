@@ -192,11 +192,13 @@ test('partial source, hung operational projection, render failure and missing mo
     assert.equal(state.count, '0');
     assert.equal(state.empty, false, 'skipped records are not presented as a legitimate absence of C1');
     assert.match(state.issue, /^2 registro\(s\) de la fuente no se pudieron mostrar/);
-    assert.match(state.status, /Hoja oficial y Apps Script consultados/);
+    assert.match(state.status, /^Lectura completada; vista parcial: 2 registro\(s\) de la fuente omitido\(s\)/);
+    assert.match(state.status, /Hoja oficial y Apps Script consultados/, 'source freshness semantics are kept');
     state = await view(page, 'CURRENT');
     assert.equal(state.cards, 7);
     assert.equal(state.count, '7');
     assert.equal(state.issue, '');
+    assert.match(state.status, /^Lectura completada; vista parcial/, 'switching tabs does not hide that the last read was partially rendered');
     assert.equal(errors.length, 0, errors.join('\n'));
   } finally {
     await close();

@@ -916,6 +916,10 @@
               ? 'Consultando fuentes del calendario…'
               : `No se pudo actualizar el calendario. ${calendarSourceStatus.error || error.message}`;
           }
+          // La frescura describe las fuentes; la completitud de la vista se informa aparte.
+          if (!calendarSourceStatus.refreshing && calendarSourceStatus.renderIssues > 0) {
+            text = `Lectura completada; vista parcial: ${calendarSourceStatus.renderIssues} registro(s) de la fuente omitido(s) por datos inválidos. ${text}`;
+          }
           const label = document.getElementById('calendarFreshness');
           if (label) label.textContent = text;
         }
@@ -970,18 +974,20 @@
             if (!rendered.ok) {
               await setCalendarSourceStatus({
                 checkedAt: result.checkedAt, sources: result.sources, refreshing: false,
+                renderIssues: 0,
                 error: `Datos leídos, pero no se pudieron mostrar: ${rendered.error.message}`,
               });
               return false;
             }
             await setCalendarSourceStatus({
               checkedAt: result.checkedAt, sources: result.sources, error: null, refreshing: false,
+              renderIssues: rendered.issues,
             });
             if (result.errors.length) console.warn('Lectura parcial del calendario:', result.errors);
             return result.sources.api && result.sources.sheet && assignmentsRead && !rendered.issues;
           } catch(err) {
             console.warn('Sync falló, usando datos locales:', err);
-            await setCalendarSourceStatus({ refreshing: false, error: err.message });
+            await setCalendarSourceStatus({ refreshing: false, renderIssues: 0, error: err.message });
             return false;
           }
         }
