@@ -23,6 +23,8 @@ jobs:
           cache: npm
       - run: npm ci --include=optional
       - run: npm test && node --test src/utils/trainerCoherence.test.js
+      - name: Calendar freshness and isolated browser regressions
+        run: npm run test:calendars
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
