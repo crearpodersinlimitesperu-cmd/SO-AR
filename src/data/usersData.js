@@ -1,5 +1,5 @@
 import { canonicalSede } from '../utils/sede.js';
-import { USERS_TO_IMPORT } from './usersToImport';
+import { USERS_TO_IMPORT } from './usersToImport.js';
 
 export const usersData = USERS_TO_IMPORT;
 
@@ -96,7 +96,7 @@ export const normalizeUserRecord = (data) => {
   };
 };
 
-export { OFFICIAL_SEDES, OFFICIAL_SEDES_TEAMS, parseTeamNumber, normalizeEquipoLabel, isTeamConsistentWithSede, inferSedeFromTeamNumber } from './officialSedesTeams';
+export { OFFICIAL_SEDES, OFFICIAL_SEDES_TEAMS, parseTeamNumber, normalizeEquipoLabel, isTeamConsistentWithSede, inferSedeFromTeamNumber } from './officialSedesTeams.js';
 
 export const OPERATIONAL_SEDES = [
   'Quito',

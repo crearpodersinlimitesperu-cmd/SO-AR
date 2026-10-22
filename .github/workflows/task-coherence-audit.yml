@@ -1,0 +1,74 @@
+name: 🛡️ Auditoría de Coherencia de Tareas y Roles
+
+on:
+  schedule:
+    # Ejecuta a las 05:00 UTC (00:00 hora Lima/Quito)
+    - cron: '0 5 * * *'
+  workflow_dispatch:
+    inputs:
+      auto_fix:
+        description: 'Aplicar auto-reparaciones seguras en Firestore (--fix)'
+        required: false
+        type: boolean
+        default: false
+      user_email:
+        description: 'Auditar solo un usuario específico (opcional)'
+        required: false
+        type: string
+        default: ''
+      role:
+        description: 'Auditar solo un rol específico (opcional)'
+        required: false
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  audit-task-role-coherence:
+    name: 🛡️ Auditar Tareas vs Perfiles y Roles
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: ⬇️ Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm install --include=optional
+
+      - name: 🔑 Escribir Service Account temporal
+        run: echo "$GOOGLE_SERVICE_ACCOUNT_JSON" > centro-operativo-cpsl-65ad52160f45.json
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+
+      - name: 🩺 Ejecutar Pruebas de Coherencia
+        run: node --test tests/task-role-coherence.test.mjs
+
+      - name: 🚀 Ejecutar Agente Auditor de Tareas y Roles
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          CMD="node scripts/auditTaskRoleCoherenceAgent.mjs"
+          if [ "${{ github.event.inputs.auto_fix }}" = "true" ]; then
+            CMD="$CMD --fix"
+          fi
+          if [ -n "${{ github.event.inputs.user_email }}" ]; then
+            CMD="$CMD --user=${{ github.event.inputs.user_email }}"
+          fi
+          if [ -n "${{ github.event.inputs.role }}" ]; then
+            CMD="$CMD --role=${{ github.event.inputs.role }}"
+          fi
+          echo "Ejecutando: $CMD"
+          eval $CMD
+
+      - name: 🗑️ Borrar Service Account temporal del runner
+        if: always()
+        run: rm -f centro-operativo-cpsl-65ad52160f45.json

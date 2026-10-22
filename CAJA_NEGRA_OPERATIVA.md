@@ -758,6 +758,29 @@ Tras el reporte de incidencias donde firmas completadas figuraban en el panel ad
   5. **Política Anti-Alucinación (Fail-Closed):**
      - Si Nodus no tiene datos para esa sede o ciclo en el corte de 12:30 PM, se notifica claramente como `Estado Nodus: Sin sincronización disponible para esta sede en el corte actual`, sin precargar números inventados.
 
+### 18.5. Agente Auditor de Coherencia de Tareas y Roles de Usuarios
+* **Objetivo:**
+  - Auditar de forma exhaustiva y continua que las tareas operativas (catálogo oficial y colecciones en vivo en Firestore `/tasks`) estén funcionando sin fallas y sean estrictamente coherentes con el perfil, identidad y roles de los usuarios asignados.
+  - Componentes:
+    - **Módulo de Reglas y Lógica Pura:** [`src/utils/taskRoleCoherence.js`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/src/utils/taskRoleCoherence.js).
+    - **Script Ejecutor de Auditoría:** [`scripts/auditTaskRoleCoherenceAgent.mjs`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/scripts/auditTaskRoleCoherenceAgent.mjs).
+    - **Workflow de GitHub Actions:** [`.github/workflows/task-coherence-audit.yml`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/.github/workflows/task-coherence-audit.yml).
+    - **Suite de Pruebas Automatizadas:** [`tests/task-role-coherence.test.mjs`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/tests/task-role-coherence.test.mjs).
+* **Dimensiones Auditadas:**
+  1. **Coherencia de Rol & Perfil (`ROLE_MISMATCH`):**
+     - Compara los roles declarados de la tarea contra el conjunto canónico de roles del usuario (`user.role`, `user.roles`, `user.appRole`).
+     - Alerta si una tarea gerencial (`role: 'gerente'`) o de coordinación (`role: 'coord_c1'`) es asignada a un colaborador sin las credenciales o permisos correspondientes.
+  2. **Funcionamiento Operativo y Estado (`CONTRADICTORY_STATUS`, `STATUS_PROGRESS_MISMATCH`):**
+     - Detecta incoherencias como `completed: true` con `status: 'Pendiente'`, o `status: 'Completada'` con avance 0% sin evidencia.
+     - Provee payload de auto-reparación (`--fix`) para sincronizar estados de forma segura y no destructiva.
+  3. **Cero Tareas Huérfanas (`ORPHANED_ASSIGNEE`, `EMAIL_DOMAIN_TYPO`):**
+     - Valida que cada correo asignatario exista en el directorio de colaboradores de Causa OS.
+     - Detecta y corrige errores tipográficos históricos (ej. `@crearpls.com` ➔ `@crearpsl.net`).
+  4. **Multi-Asignación y Avance Individual (`MULTI_ASSIGNEE_DESYNC`):**
+     - Garantiza que si una tarea lista a varios asignatarios en `assignedToEmails`, cada uno posea su correspondiente entrada en `assigneeProgress`.
+  5. **Privacidad y Aislamiento de Tareas Personales (`UNOWNED_CUSTOM_TASK`):**
+     - Impide que tareas personalizadas queden sin propietario o asignatario (`ownerId`/`createdBy`), evitando cualquier riesgo de fuga hacia vistas públicas o catálogo.
+
 ---
 
 > 📜 **Mandato de la Caja Negra:**
