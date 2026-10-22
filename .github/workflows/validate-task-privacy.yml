@@ -24,6 +24,8 @@ on:
       - 'scripts/tests/nodus-c1-report.test.mjs'
       - '.github/workflows/imo-lima-e32.yml'
       - 'scripts/mailQueue.js'
+      - 'scripts/taskParticipantStore.js'
+      - 'scripts/recoverErikaTask.mjs'
       - 'scripts/assignInsuranceTaskAndMail.mjs'
       - 'scripts/sync_drive_vuelos_7xdia.py'
       - 'public/flight-tracker.js'
@@ -66,10 +68,10 @@ jobs:
         run: npm ci --include=optional
 
       - name: Check mail lifecycle scripts
-        run: node --check scripts/mailQueue.js && node --check scripts/mailerDaemon.js && node --check scripts/assignInsuranceTaskAndMail.mjs
+        run: node --check scripts/mailQueue.js && node --check scripts/mailerDaemon.js && node --check scripts/assignInsuranceTaskAndMail.mjs && node --check scripts/taskParticipantStore.js && node --check scripts/recoverErikaTask.mjs
 
       - name: Check undefined identifiers in lifecycle code
-        run: npx oxlint -c .oxlintrc.lifecycle.json src/context/ChecklistContext.jsx src/components/TaskDetailModal.jsx src/utils/taskLifecycle.js scripts/mailQueue.js scripts/mailerDaemon.js
+        run: npx oxlint -c .oxlintrc.lifecycle.json src/context/ChecklistContext.jsx src/components/TaskDetailModal.jsx src/utils/taskLifecycle.js src/utils/taskParticipants.js src/services/taskParticipantStore.js scripts/taskParticipantStore.js scripts/mailQueue.js scripts/mailerDaemon.js
 
       - name: Run tests
         run: npm run test:persistence && npm test && npm run test:nodus-json && npm run test:flyer-teams && npm run test:nodus-reports && npm run test:flight-monitor && npm run test:loading && node --test tests/logistics-help-deploy.test.mjs tests/logistics-help-browser.test.mjs tests/home-module-help.test.mjs

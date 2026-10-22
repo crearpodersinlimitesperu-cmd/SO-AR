@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 import { SUPER_ADMIN_EMAILS } from '../src/config/permissions.js';
+import { canonicalTaskSnapshot } from './taskParticipantStore.js';
 import {
   hasAmbiguousCycleCompletionScope,
   isTaskClosedForDelivery
@@ -131,9 +132,9 @@ export async function claimPendingMail(db, ref, now = Date.now()) {
 
     if (typeof taskId === 'string' && taskId.trim()) {
       const taskRef = db.collection('tasks').doc(taskId);
-      const taskSnapshot = await transaction.get(taskRef);
+      const taskSnapshot = await canonicalTaskSnapshot(db, taskId, await transaction.get(taskRef), transaction, recipientsOf(data));
       const linkedSnapshots = await Promise.all(linkedTaskIdsOf(data)
-        .map(id => transaction.get(db.collection('tasks').doc(id))));
+        .map(async id => canonicalTaskSnapshot(db, id, await transaction.get(db.collection('tasks').doc(id)), transaction, recipientsOf(data))));
       const linkedState = linkedSnapshots.map(snapshotOfLinked => linkedClosureState(snapshotOfLinked, data, recipientsOf(data)))
         .find(Boolean);
       if (taskSnapshot.exists && linkedState) {
@@ -283,9 +284,9 @@ export async function skipTaskMailIfClosed(db, ref, data, recipients, now = Date
   const taskId = data.taskId || data.calendarEvent?.taskId;
   if (typeof taskId !== 'string' || !taskId.trim()) return false;
 
-  const taskSnapshot = await db.collection('tasks').doc(taskId).get();
+  const taskSnapshot = await canonicalTaskSnapshot(db, taskId, await db.collection('tasks').doc(taskId).get(), null, recipients);
   const linkedSnapshots = await Promise.all(linkedTaskIdsOf(data)
-    .map(id => db.collection('tasks').doc(id).get()));
+    .map(async id => canonicalTaskSnapshot(db, id, await db.collection('tasks').doc(id).get(), null, recipients)));
   const linkedState = linkedSnapshots.map(snapshotOfLinked => linkedClosureState(snapshotOfLinked, data, recipients))
     .find(Boolean);
   const taskData = taskSnapshot.exists ? taskSnapshot.data() : null;
@@ -393,7 +394,8 @@ export async function recordMailSuccess(db, ref, now = Date.now()) {
 export async function enqueueOverdueTaskMails(db, taskRef, entries, now, serverTimestamp) {
   if (!entries.length) return { queued: 0, reason: 'no_recipients' };
   return db.runTransaction(async transaction => {
-    const taskSnapshot = await transaction.get(taskRef);
+    const taskSnapshot = await canonicalTaskSnapshot(db, taskRef.id || taskRef.path.split('/').at(-1),
+      await transaction.get(taskRef), transaction, entries.map(entry => entry.data.recipientEmail).filter(Boolean));
     if (!taskSnapshot.exists) return { queued: 0, reason: 'task_missing' };
     const task = taskSnapshot.data();
     const scopedEntries = entries.filter(entry => !hasAmbiguousCycleCompletionScope(task, entry.data));

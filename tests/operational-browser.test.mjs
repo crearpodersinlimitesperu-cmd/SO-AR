@@ -29,6 +29,11 @@ test('actual task context persists location, updates reminders and reads links; 
       const listeners = new Set();
       let nextId = 0;
       window.fixtureStore = store;
+      window.fixtureTask = id => ({ ...store.get('tasks/' + id), assigneeProgress: {
+        ...(store.get('tasks/' + id)?.assigneeProgress || {}),
+        ...Object.fromEntries([...store].filter(([key]) => key.startsWith('tasks/' + id + '/participant_states/'))
+          .map(([key, record]) => [key.split('/').at(-1), record.state]))
+      } });
       export const collection = (_db, path) => ({ path });
       export const serverTimestamp = () => new Date().toISOString();
       export const doc = (_db, path, id) => {
@@ -40,7 +45,7 @@ test('actual task context persists location, updates reminders and reads links; 
       export const orderBy = () => ({});
       export const limit = () => ({});
       const snapshot = ref => {
-        const docs = [...store].filter(([key]) => key.startsWith(ref.path + '/'))
+        const docs = [...store].filter(([key]) => key.startsWith(ref.path + '/') && !key.slice(ref.path.length + 1).includes('/'))
           .map(([key, data]) => ({ id: key.split('/').at(-1), data: () => data }));
         return { docs, empty: !docs.length, forEach: fn => docs.forEach(fn) };
       };
@@ -74,8 +79,9 @@ test('actual task context persists location, updates reminders and reads links; 
       export const addDoc = setDoc;
       export const runTransaction = async (_db, callback) => {
         const batch = writeBatch();
-        await callback({ get: getDoc, set: batch.set, update: batch.update });
+        const result = await callback({ get: getDoc, set: batch.set, update: batch.update });
         await batch.commit();
+        return result;
       };
       window.fixturePublish = () => listeners.forEach(listener => listener());
     `
@@ -246,8 +252,8 @@ test('actual task context persists location, updates reminders and reads links; 
     await page.waitForFunction(() => [...document.querySelectorAll('button')].some(button => button.textContent.trim() === '50%'));
     await page.evaluate(() => [...document.querySelectorAll('button')].find(button => button.textContent.trim() === '50%').click());
     await saveModal();
-    await page.waitForFunction(() => window.fixtureStore.get('tasks/custom_legacy_multi')?.assigneeProgress['owner@example.test']?.progress === 50);
-    legacy = await page.evaluate(() => window.fixtureStore.get('tasks/custom_legacy_multi'));
+    await page.waitForFunction(() => window.fixtureTask('custom_legacy_multi')?.assigneeProgress['owner@example.test']?.progress === 50);
+    legacy = await page.evaluate(() => window.fixtureTask('custom_legacy_multi'));
     assert.equal(legacy.completed, false);
     assert.deepEqual(legacy.assigneeProgress['recipient@example.test'], { completed: false },
       'legitimate progress preserves the other participant exactly');
@@ -286,8 +292,8 @@ test('actual task context persists location, updates reminders and reads links; 
     await page.waitForFunction(() => [...document.querySelectorAll('button')].some(button => button.textContent.trim() === '50%'));
     await page.evaluate(() => [...document.querySelectorAll('button')].find(button => button.textContent.trim() === '50%').click());
     await saveModal();
-    await page.waitForFunction(() => window.fixtureStore.get('tasks/custom_large_multi')?.assigneeProgress['owner@example.test']?.progress === 50);
-    const advancedLarge = await page.evaluate(() => window.fixtureStore.get('tasks/custom_large_multi'));
+    await page.waitForFunction(() => window.fixtureTask('custom_large_multi')?.assigneeProgress['owner@example.test']?.progress === 50);
+    const advancedLarge = await page.evaluate(() => window.fixtureTask('custom_large_multi'));
     assert.deepEqual(advancedLarge.assigneeProgress['member3@example.test'], large.assigneeProgress['member3@example.test']);
     for (const [email, entry] of Object.entries(large.assigneeProgress)) {
       if (email !== 'owner@example.test') assert.deepEqual(advancedLarge.assigneeProgress[email], entry);

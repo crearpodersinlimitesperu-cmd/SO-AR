@@ -16,6 +16,7 @@ import { initializeApp, cert, getApps } from 'firebase-admin/app';
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 import { readFileSync, existsSync } from 'fs';
 import { createTaskMailId } from './mailQueue.js';
+import { canonicalTaskSnapshot } from './taskParticipantStore.js';
 import {
   hasAmbiguousCycleCompletionScope,
   isTaskClosedForDelivery
@@ -339,10 +340,7 @@ CÓMO ENVIAR LA CONSTANCIA:
       ['completed', 'status', 'completedAt', 'progress', 'progressPercentage', 'created_at'].forEach(field => {
         delete payload[field];
       });
-      payload.assigneeProgress = {
-        ...payload.assigneeProgress,
-        ...(latestData.assigneeProgress || {})
-      };
+      delete payload.assigneeProgress;
       if (Array.isArray(latestData.progressNotes)) payload.progressNotes = latestData.progressNotes;
     }
     transaction.set(masterTaskRef, payload, { merge: true });
@@ -434,9 +432,11 @@ CÓMO ENVIAR LA CONSTANCIA:
     };
 
     const enqueued = await db.runTransaction(async transaction => {
-      const taskSnapshot = await transaction.get(masterTaskRef);
+      const taskSnapshot = await canonicalTaskSnapshot(db, masterTaskId,
+        await transaction.get(masterTaskRef), transaction, [emailClean]);
       const individualTaskRef = db.collection('tasks').doc(individualTaskId);
-      const individualSnapshot = await transaction.get(individualTaskRef);
+      const individualSnapshot = await canonicalTaskSnapshot(db, individualTaskId,
+        await transaction.get(individualTaskRef), transaction, [emailClean]);
       const notificationSnapshot = await transaction.get(notificationRef);
       const mailSnapshot = await transaction.get(mailDocRef);
       if (!taskSnapshot.exists || !individualSnapshot.exists) {

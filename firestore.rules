@@ -352,23 +352,38 @@ service cloud.firestore {
         data.get('progress', 0) == 100 || data.get('progressPercentage', 0) == 100;
     }
 
-    function lifecycleEventState(taskData, scope) {
+    function participantBeforeState(taskId, key, taskData) {
+      let path = /databases/$(database)/documents/tasks/$(taskId)/participant_states/$(key);
+      return exists(path) ? get(path).data.state : taskData.get('assigneeProgress', {}).get(key, {});
+    }
+
+    function participantAfterState(taskId, key, taskData) {
+      let path = /databases/$(database)/documents/tasks/$(taskId)/participant_states/$(key);
+      return existsAfter(path) ? getAfter(path).data.state : taskData.get('assigneeProgress', {}).get(key, {});
+    }
+
+    function lifecycleEventState(taskId, taskData, scope, after) {
       return scope.keys().hasAll(['sede', 'cycleId'])
         ? taskData.get('completions', {}).get(scope.sede + '__' + scope.cycleId, {})
         : scope.keys().hasAll(['assigneeEmail'])
-          ? taskData.get('assigneeProgress', {}).get(scope.assigneeEmail, {})
+          ? (after ? participantAfterState(taskId, scope.assigneeEmail, taskData)
+             : participantBeforeState(taskId, scope.assigneeEmail, taskData))
           : taskData;
     }
 
-    function hasNewReopenEvent(taskId, mutation) {
+    function hasNewLifecycleEvent(taskId, mutation, action) {
       let eventId = mutation.get('eventId', '');
       let eventPath = /databases/$(database)/documents/task_completion_events/$(eventId);
       let event = eventId != '' && existsAfter(eventPath) ? getAfter(eventPath).data : {};
       return eventId is string && eventId != '' && !exists(eventPath) &&
-        event.get('taskId', '') == taskId && event.get('action', '') == 'reopened' &&
+        event.get('taskId', '') == taskId && event.get('action', '') == action &&
         event.get('actorEmail', '') == email() && event.get('source', '') == 'manual' &&
         event.get('occurredAt', null) == request.time &&
         event.get('scope', {}) == mutation.get('scope', {});
+    }
+
+    function hasNewReopenEvent(taskId, mutation) {
+      return hasNewLifecycleEvent(taskId, mutation, 'reopened');
     }
 
     function preservesClosedEntry(before, after) {
@@ -400,58 +415,38 @@ service cloud.firestore {
         safeChangedLifecycleMap(before, after, scope, field, taskId, mutation);
     }
 
-    function safeAssigneeIndex(before, after, keys, index, taskId, mutation, ledger) {
-      return index >= keys.size() ||
-        safeAssigneeEntry(before, after, keys[index], taskId, mutation, ledger);
+    function participantEmail(key) {
+      return key.lower().replace('@crearpls[.]com$', '@crearpsl.net')
+        .replace('@crearpsl[.]com$', '@crearpsl.net');
     }
 
-    function safeAssigneeEntry(before, after, key, taskId, mutation, ledger) {
-      return key is string &&
-        ((preservesClosedEntry(before.get(key, {}), after.get(key, {})) &&
-            (!(key in ledger.before) || key in ledger.after)) ||
-          (!lifecycleClosed(after.get(key, {})) &&
-            hasNewReopenEvent(taskId, {
-              'eventId': mutation.get('assigneeEventIds', {}).get(key, ''),
-              'scope': { 'assigneeEmail': key }
-            })));
+    function canChangeParticipant(taskData, key) {
+      return participantEmail(key) == participantEmail(email()) ||
+        isGerenteODireccion() || isOwner(taskData) || isCollaborator(taskData);
     }
 
-    // Escalable en participantes: los terminales se registran en closedAssigneeKeys y se
-    // comparan con conjuntos (sin recorrer cada asignado). Solo las claves cerradas que el
-    // guardado toca (guard) se verifican una por una, con tope de 8 por limite de expresiones.
-    function safeAssigneeChanges(before, after, taskId, mutation, ledger) {
-      let keys = mutation.get('assigneeKeys', []);
-      return keys is list && keys.size() <= 8 &&
-        after.diff(before).affectedKeys().intersection(ledger.before.toSet()).hasOnly(keys) &&
-        (keys.size() == 0 || (keys.size() == 1
-        ? safeAssigneeEntry(before, after, keys[0], taskId, mutation, ledger)
-        : (safeAssigneeIndex(before, after, keys, 0, taskId, mutation, ledger) &&
-        safeAssigneeIndex(before, after, keys, 1, taskId, mutation, ledger) &&
-        safeAssigneeIndex(before, after, keys, 2, taskId, mutation, ledger) &&
-        safeAssigneeIndex(before, after, keys, 3, taskId, mutation, ledger) &&
-        safeAssigneeIndex(before, after, keys, 4, taskId, mutation, ledger) &&
-        safeAssigneeIndex(before, after, keys, 5, taskId, mutation, ledger) &&
-        safeAssigneeIndex(before, after, keys, 6, taskId, mutation, ledger) &&
-        safeAssigneeIndex(before, after, keys, 7, taskId, mutation, ledger))));
+    function isTaskParticipant(taskData, key) {
+      return key in taskData.get('assigneeProgress', {}) ||
+        key in taskData.get('assignedToEmails', []) ||
+        key == taskData.get('assignedToEmail', '') ||
+        key == taskData.get('assigned_to', '') ||
+        key in taskData.get('collaborators', []) ||
+        (participantEmail(key) == participantEmail(email()) && isOwner(taskData));
     }
 
-    function safeAssigneeMap(before, after, scope, taskId, mutation, ledger) {
-      return before == after ||
-        (after.diff(before).changedKeys().size() == 0 && after.diff(before).removedKeys().size() == 0) ||
-        (mutation.keys().hasAny(['assigneeKeys'])
-          ? safeAssigneeChanges(before, after, taskId, mutation, ledger)
-          : safeChangedLifecycleMap(before, after, scope, 'assigneeProgress', taskId, mutation));
-    }
-
-    function safeClosedAssigneeLedger(beforeTask, afterTask, mutation) {
-      let ledgerBefore = beforeTask.get('closedAssigneeKeys', []);
-      let ledgerAfter = afterTask.get('closedAssigneeKeys', []);
-      let released = mutation.get('assigneeKeys', []);
-      let changed = afterTask.get('assigneeProgress', {}).diff(beforeTask.get('assigneeProgress', {})).affectedKeys();
-      return ledgerBefore is list && ledgerAfter is list && ledgerAfter.size() <= 500 &&
-        released is list &&
-        ledgerBefore.toSet().difference(ledgerAfter.toSet()).hasOnly(released) &&
-        ledgerBefore.toSet().difference(ledgerAfter.toSet()).difference(changed).size() == 0;
+    function validParticipantState(taskId, key, taskData, before) {
+      let data = request.resource.data;
+      let mutation = { 'eventId': data.get('lifecycleMutation', {}).get('eventId', ''),
+        'scope': { 'assigneeEmail': key } };
+      return canReadTask(taskData) && isTaskParticipant(taskData, key) &&
+        data.keys().hasAll(['taskId', 'assigneeEmail', 'state', 'lifecycleMutation']) &&
+        data.keys().hasOnly(['taskId', 'assigneeEmail', 'state', 'lifecycleMutation']) &&
+        data.taskId == taskId && data.assigneeEmail == key && data.state is map &&
+        (data.state == before || canChangeParticipant(taskData, key)) &&
+        (preservesClosedEntry(before, data.state) ||
+          (!lifecycleClosed(data.state) && hasNewReopenEvent(taskId, mutation))) &&
+        (lifecycleClosed(before) || !lifecycleClosed(data.state) ||
+          hasNewLifecycleEvent(taskId, mutation, 'completed'));
     }
 
     function safeTaskLifecycleUpdate(taskId) {
@@ -465,11 +460,7 @@ service cloud.firestore {
           }))) &&
         safeLifecycleMap(before.get('completions', {}), after.get('completions', {}),
           scope, 'completions', taskId, mutation) &&
-        safeClosedAssigneeLedger(before, after, mutation) &&
-        safeAssigneeMap(before.get('assigneeProgress', {}), after.get('assigneeProgress', {}),
-          scope, taskId, mutation, {
-            'before': before.get('closedAssigneeKeys', []), 'after': after.get('closedAssigneeKeys', [])
-          });
+        after.get('assigneeProgress', {}) == before.get('assigneeProgress', {});
     }
 
     function validClosureContext(event, taskData) {
@@ -490,8 +481,8 @@ service cloud.firestore {
       let beforeTask = exists(taskPath) ? get(taskPath).data : {};
       let afterTask = existsAfter(taskPath) ? getAfter(taskPath).data : {};
       let scope = event.get('scope', {});
-      let beforeState = lifecycleEventState(beforeTask, scope);
-      let afterState = lifecycleEventState(afterTask, scope);
+      let beforeState = lifecycleEventState(event.taskId, beforeTask, scope, false);
+      let afterState = lifecycleEventState(event.taskId, afterTask, scope, true);
       return event.keys().hasAll(['taskId', 'action', 'actorEmail', 'occurredAt', 'source', 'scope']) &&
         event.keys().hasOnly(['taskId', 'action', 'actorEmail', 'occurredAt', 'source', 'scope', 'closureContext']) &&
         event.taskId is string && event.taskId.size() > 0 &&
@@ -504,7 +495,7 @@ service cloud.firestore {
            scope.sede is string && scope.sede.size() > 0 &&
            scope.cycleId is string && scope.cycleId.size() > 0) ||
           (scope.keys().hasOnly(['assigneeEmail']) && scope.assigneeEmail is string &&
-            (scope.assigneeEmail == email() || isSuperAdmin() || isGerenteODireccion() ||
+            (participantEmail(scope.assigneeEmail) == participantEmail(email()) || isSuperAdmin() || isGerenteODireccion() ||
              beforeTask.get('createdBy', '') == email() || beforeTask.get('assignedByEmail', '') == email()))) &&
         existsAfter(taskPath) &&
         (event.action == 'completed' ? validClosureContext(event, afterTask) :
@@ -610,6 +601,16 @@ service cloud.firestore {
                      request.resource.data.diff(resource.data).affectedKeys().hasAny(['status', 'progress', 'evidence_url', 'evidenceUrl', 'completions']) &&
                      !request.resource.data.diff(resource.data).affectedKeys().hasAny(['assignedToEmail', 'role', 'sede', 'ownerId'])));
       allow delete: if isGerenteODireccion() || isSuperAdmin();
+
+      match /participant_states/{assigneeEmail} {
+        allow read: if canReadTask(get(/databases/$(database)/documents/tasks/$(taskId)).data);
+        allow create: if validParticipantState(taskId, assigneeEmail,
+          get(/databases/$(database)/documents/tasks/$(taskId)).data,
+          get(/databases/$(database)/documents/tasks/$(taskId)).data.get('assigneeProgress', {}).get(assigneeEmail, {}));
+        allow update: if validParticipantState(taskId, assigneeEmail,
+          get(/databases/$(database)/documents/tasks/$(taskId)).data, resource.data.state);
+        allow delete: if false;
+      }
     }
 
     match /task_completion_events/{eventId} {

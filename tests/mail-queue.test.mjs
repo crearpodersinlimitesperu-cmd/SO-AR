@@ -474,6 +474,30 @@ test('mail linked to a master and an individual task is suppressed when only the
   assert.equal(docs.get('mail/claim').delivery.taskStateObserved, 'closed');
 });
 
+test('canonical participant closure after claim is re-read at pre-SMTP and on the next claim', async () => {
+  const data = {
+    type: 'seguro_salud_entrenadores', taskId: 'master', linkedTaskIds: ['individual'],
+    to: ['coach@example.test'], recipientEmail: 'coach@example.test', delivery: { state: 'PENDING' }
+  };
+  const { db, ref, docs } = fakeFirestore({
+    'mail/pre': data, 'mail/next': data,
+    'tasks/master': { completed: false }, 'tasks/individual': {
+      completed: false, assignedToEmails: ['coach@example.test'],
+      assigneeProgress: { 'coach@example.test': { completed: false, progress: 0 } }
+    }
+  });
+  const claimed = await claimPendingMail(db, ref('mail/pre'), now);
+  assert.equal(claimed.state, 'SENDING');
+  docs.set('tasks/individual/participant_states/coach@example.test', {
+    taskId: 'individual', assigneeEmail: 'coach@example.test',
+    state: { completed: true, progress: 100, completedAt: 'canonical-close' }
+  });
+  assert.equal(await skipTaskMailIfClosed(db, ref('mail/pre'), claimed.data, [...data.to], now + 1), 'SKIPPED_CLOSED');
+  assert.equal((await claimPendingMail(db, ref('mail/next'), now + 2)).state, 'SKIPPED_CLOSED');
+  assert.equal(docs.get('tasks/individual').assigneeProgress['coach@example.test'].completed, false,
+    'suppression uses canonical state, not the intentionally unchanged legacy map');
+});
+
 test('the insurance producer links the individual task so claim and pre-SMTP re-read it', async () => {
   const source = readFileSync(new URL('../scripts/assignInsuranceTaskAndMail.mjs', import.meta.url), 'utf8');
   assert.match(source, /linkedTaskIds:\s*\[individualTaskId\]/);
@@ -525,9 +549,11 @@ test('the actual daemon sender passes only open recipients to mocked sendMail an
     };
     const { db, ref, docs } = fakeFirestore({
       'mail/sender': data, 'tasks/master': { completed: false },
-      'tasks/individual': { completed: allClosed, assigneeProgress: {
-        'closed@crearpsl.net': { completed: true }, 'open@crearpsl.net': { completed: false }
-      } }
+      'tasks/individual': { completed: false, assigneeProgress: {
+        'closed@crearpsl.net': { completed: false }, 'open@crearpsl.net': { completed: false }
+      } },
+      'tasks/individual/participant_states/closed@crearpsl.net': { state: { completed: true } },
+      'tasks/individual/participant_states/open@crearpsl.net': { state: { completed: allClosed } }
     });
     const deliveries = [];
     const sendClaimedMail = runInNewContext(`(${source.slice(start, end)})`, {
@@ -548,4 +574,27 @@ test('the actual daemon sender passes only open recipients to mocked sendMail an
       assert.equal(docs.get('mail/sender').delivery.suppressedClosedRecipients, 1);
     }
   }
+});
+
+test('canonical closure prevents overdue enqueue without advancing the debounce', async () => {
+  const { db, docs, ref } = fakeFirestore({
+    'tasks/overdue-canonical': {
+      completed: false, deadline: new Date(now - 72 * 60 * 60 * 1000).toISOString(),
+      assignedToEmails: ['coach@example.test'], assigneeProgress: { 'coach@example.test': { completed: false } }
+    },
+    'tasks/overdue-canonical/participant_states/coach@example.test': { state: { completed: true, progress: 100 } }
+  });
+  const result = await enqueueOverdueTaskMails(db, ref('tasks/overdue-canonical'), [{
+    id: 'not-enqueued', data: { taskId: 'overdue-canonical', type: 'task_reminder', recipientEmail: 'coach@example.test' }
+  }], now, new Date(now).toISOString());
+  assert.deepEqual(result, { queued: 0, reason: 'closed' });
+  assert.equal(docs.has('mail/not-enqueued'), false);
+  assert.equal(docs.get('tasks/overdue-canonical').lastReminderAt, undefined);
+});
+
+test('the retired unaudited legacy recovery command fails before reading credentials or initializing Admin', () => {
+  const source = readFileSync(new URL('../scripts/recoverErikaTask.mjs', import.meta.url), 'utf8');
+  const gate = source.slice(0, source.indexOf('\nimport '));
+  assert.throws(() => runInNewContext(gate), /Recuperación histórica retirada/);
+  assert.ok(!/readFileSync|initializeApp|process\.env/.test(gate));
 });

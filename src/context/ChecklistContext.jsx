@@ -13,9 +13,10 @@ import { useAuth } from './AuthContext';
 import { useCycles } from './CyclesContext';
 import { applyCycleCompletion, createCycleCompletion, getEffectiveCompletion, getNextCompletionState, hasAmbiguousCycleCompletionScope, isCompletionTransition, isTaskClosedForDelivery, preserveClosedAssigneeProgress, resolveTaskCycleScope, taskClosureContext } from '../utils/taskLifecycle';
 import { normalizeTaskLocation, taskLocationLabel, taskReminderMessage, taskUrl, escapeTaskHtml } from '../utils/taskLocation';
+import { applyParticipantChanges, mergeParticipantStates, participantCollectionPath, participantKeys } from '../utils/taskParticipants';
+import { readTaskParticipants, stageTaskParticipants } from '../services/taskParticipantStore';
 
 const ChecklistContext = createContext();
-const MAX_GUARDED_PARTICIPANT_CHANGES = 8; // debe coincidir con safeAssigneeChanges en firestore.rules
 
 // Formatea una fecha límite ISO a texto legible en español, para los correos
 // de asignación de tarea (agregado 28/08/2026 a pedido de José, para que el
@@ -230,8 +231,15 @@ export function ChecklistProvider({ children }) {
 
       await runTransaction(db, async transaction => {
         const snapshot = await transaction.get(taskRef);
-        const prevData = snapshot.exists() ? snapshot.data() : (baseTask || {});
+        const persisted = snapshot.exists() ? snapshot.data() : (baseTask || {});
+        const participants = snapshot.exists()
+          ? await readTaskParticipants(transaction, db, taskId, persisted, Object.keys(updates.assigneeProgress || {}))
+          : { task: persisted, records: new Map() };
+        const prevData = participants.task;
         const nextUpdates = { ...updates };
+        if (updates.assigneeProgress) {
+          nextUpdates.assigneeProgress = applyParticipantChanges(prevData, updates.assigneeProgress);
+        }
         const nextCompleted = getNextCompletionState(updates);
         const includesProgressUpdate = updates.progress !== undefined || updates.progressPercentage !== undefined;
         const includesCompletionUpdate = nextCompleted !== null;
@@ -259,7 +267,7 @@ export function ChecklistProvider({ children }) {
           } else {
             nextUpdates.assigneeProgress = preserveClosedAssigneeProgress(
               prevData.assigneeProgress,
-              updates.assigneeProgress
+              nextUpdates.assigneeProgress
             );
           }
         }
@@ -309,20 +317,11 @@ export function ChecklistProvider({ children }) {
           : {};
         const individualTransitions = [];
         let changedKeys = [];
-        let guardKeys = [];
         if (nextUpdates.assigneeProgress) {
           const previousMap = prevData.assigneeProgress || {};
           const nextMap = nextUpdates.assigneeProgress;
           changedKeys = [...new Set([...Object.keys(previousMap), ...Object.keys(nextMap)])]
             .filter(key => JSON.stringify(previousMap[key]) !== JSON.stringify(nextMap[key]));
-          const previousLedger = new Set(Array.isArray(prevData.closedAssigneeKeys) ? prevData.closedAssigneeKeys : []);
-          guardKeys = changedKeys.filter(key =>
-            previousLedger.has(key) || isTaskClosedForDelivery({ ...previousMap[key] }));
-          if (guardKeys.length > MAX_GUARDED_PARTICIPANT_CHANGES) {
-            throw new Error(`El guardado atómico admite hasta ${MAX_GUARDED_PARTICIPANT_CHANGES} cambios sobre participantes ya cerrados.`);
-          }
-          nextUpdates.closedAssigneeKeys = Object.keys(nextMap)
-            .filter(key => isTaskClosedForDelivery({ ...nextMap[key] }));
           changedKeys.forEach((key, index) => {
             const wasClosed = isTaskClosedForDelivery({ ...previousMap[key] });
             const nowClosed = isTaskClosedForDelivery({ ...nextMap[key] });
@@ -334,7 +333,6 @@ export function ChecklistProvider({ children }) {
         nextUpdates.lifecycleMutation = {
           eventId: completionId,
           scope: eventScope,
-          assigneeKeys: guardKeys,
           assigneeEventIds: Object.fromEntries(individualTransitions.map(event => [event.key, event.id])),
           ...(!reopenTransition
             ? { closureContext: taskClosureContext({ ...prevData, ...nextUpdates }) }
@@ -357,6 +355,11 @@ export function ChecklistProvider({ children }) {
         }
 
         if (snapshot.exists()) {
+          if (nextUpdates.assigneeProgress) {
+            stageTaskParticipants(transaction, db, taskId, participants, nextUpdates.assigneeProgress,
+              nextUpdates.lifecycleMutation.assigneeEventIds);
+            delete nextUpdates.assigneeProgress;
+          }
           transaction.update(taskRef, nextUpdates);
         } else {
           const initialData = {
@@ -485,16 +488,63 @@ export function ChecklistProvider({ children }) {
 
     const snapshotsByQuery = new Map();
     const pendingQueries = new Set(querySpecs.map(({ key }) => key));
+    const participantSubscriptions = new Map();
+    const participantSnapshots = new Map();
+    const pendingParticipants = new Set();
+    const failedParticipants = new Set();
     let active = true;
     const publishTasks = () => {
       if (!active) return;
       const docsById = new Map();
       snapshotsByQuery.forEach(docs => docs.forEach(taskDoc => docsById.set(taskDoc.id, taskDoc)));
       const userSede = currentUser?.sede?.trim() || 'Global';
-      const loadedTasks = filterTasksForUser(
+      const authorizedTasks = filterTasksForUser(
         [...docsById.values()].map(taskDoc => ({ id: taskDoc.id, ...taskDoc.data() })),
         currentUser
-      ).map(data => {
+      );
+      const participantTaskIds = new Set(authorizedTasks.filter(task => participantKeys(task).length > 0).map(task => task.id));
+      for (const [id, unsubscribe] of participantSubscriptions) {
+        if (participantTaskIds.has(id)) continue;
+        unsubscribe();
+        participantSubscriptions.delete(id);
+        participantSnapshots.delete(id);
+        pendingParticipants.delete(id);
+        failedParticipants.delete(id);
+      }
+      for (const id of participantTaskIds) {
+        if (participantSubscriptions.has(id)) continue;
+        pendingParticipants.add(id);
+        participantSubscriptions.set(id, () => {});
+        const unsubscribe = onSnapshot(collection(db, participantCollectionPath(id)), snapshot => {
+          if (!active) return;
+          const states = Object.fromEntries(snapshot.docs.map(stateDoc => [stateDoc.id, stateDoc.data().state]));
+          try {
+            mergeParticipantStates({}, states);
+          } catch (error) {
+            pendingParticipants.delete(id);
+            failedParticipants.add(id);
+            console.error('Invalid canonical task progress:', error.message);
+            setTaskLoadError('No se pudo verificar el avance individual; esas tareas no se muestran como activas.');
+            publishTasks();
+            return;
+          }
+          participantSnapshots.set(id, states);
+          pendingParticipants.delete(id);
+          failedParticipants.delete(id);
+          publishTasks();
+        }, error => {
+          if (!active) return;
+          pendingParticipants.delete(id);
+          failedParticipants.add(id);
+          console.error('Error fetching canonical task progress:', error.code || 'PARTICIPANT_READ_ERROR');
+          setTaskLoadError('No se pudo verificar el avance individual; esas tareas no se muestran como activas.');
+          publishTasks();
+        });
+        participantSubscriptions.set(id, unsubscribe);
+      }
+      const loadedTasks = authorizedTasks
+        .filter(task => !pendingParticipants.has(task.id) && !failedParticipants.has(task.id))
+        .map(task => mergeParticipantStates(task, participantSnapshots.get(task.id) || {})).map(data => {
         let sedeCompleted = data.completed;
         let sedeStatus = data.status;
         const taskId = data.id;
@@ -513,7 +563,7 @@ export function ChecklistProvider({ children }) {
         return { ...data, completed: sedeCompleted, status: sedeStatus };
       });
 
-      const existingIds = new Set(loadedTasks.map(task => task.id));
+      const existingIds = new Set(authorizedTasks.map(task => task.id));
       const missingBaseTasks = fallbackTasks
         .filter(task => !existingIds.has(task.id))
         .map(task => ({
@@ -557,7 +607,7 @@ export function ChecklistProvider({ children }) {
 
       setTasks(finalTasks);
       setLoadedTaskIdentity(taskReadIdentity);
-      setLoading(pendingQueries.size > 0);
+      setLoading(pendingQueries.size > 0 || pendingParticipants.size > 0);
     };
 
     setLoading(true);
@@ -581,6 +631,7 @@ export function ChecklistProvider({ children }) {
     return () => {
       active = false;
       unsubscribers.forEach(unsubscribe => unsubscribe());
+      participantSubscriptions.forEach(unsubscribe => unsubscribe());
     };
     // currentCycle?.id se agrega para que, en cuanto CyclesContext termine de cargar
     // el ciclo real (llega después del primer render, vía la API del calendario),
@@ -713,7 +764,7 @@ export function ChecklistProvider({ children }) {
     await runTransaction(db, async transaction => {
       const taskSnapshot = await transaction.get(taskRef);
       if (!taskSnapshot.exists()) throw new Error('La tarea ya no existe.');
-      const currentTask = taskSnapshot.data();
+      const { task: currentTask } = await readTaskParticipants(transaction, db, task.id, taskSnapshot.data(), recipients);
       notifiedRecipients = recipients.filter(email =>
         !isTaskClosedForDelivery(currentTask, { recipientEmail: email })
       );
@@ -765,7 +816,7 @@ export function ChecklistProvider({ children }) {
     await runTransaction(db, async transaction => {
       const taskSnapshot = await transaction.get(taskRef);
       if (!taskSnapshot.exists()) throw new Error('La tarea ya no existe.');
-      const currentTask = taskSnapshot.data();
+      const { task: currentTask } = await readTaskParticipants(transaction, db, task.id, taskSnapshot.data(), recipients);
       queuedRecipients = recipients.filter(email =>
         !isTaskClosedForDelivery(currentTask, { completionScope, recipientEmail: email })
       );
@@ -953,7 +1004,8 @@ export function ChecklistProvider({ children }) {
       await runTransaction(db, async transaction => {
         const taskSnap = await transaction.get(taskRef);
         if (!taskSnap.exists()) throw new Error('La tarea ya no existe; no se pudo guardar la edición.');
-        const currentTask = taskSnap.data();
+        const { task: currentTask } = await readTaskParticipants(transaction, db, taskId, taskSnap.data(),
+          [...(cleanUpdatedData.assignedToEmails || []), cleanUpdatedData.assignedToEmail].filter(Boolean));
         const safeUpdatedData = { ...cleanUpdatedData };
         ['completed', 'status', 'completedAt', 'progress', 'progressPercentage', 'completions'].forEach(field => {
           delete safeUpdatedData[field];
@@ -1244,7 +1296,7 @@ export function ChecklistProvider({ children }) {
       await runTransaction(db, async batch => {
       const snapshot = await batch.get(taskRef);
       if (!snapshot.exists()) throw new Error('La tarea ya no existe.');
-      const persisted = snapshot.data();
+      const { task: persisted } = await readTaskParticipants(batch, db, task.id, snapshot.data(), [targetUser.email]);
       const scope = resolveTaskCycleScope(persisted, {
         catalogTask: checklistData.some(item => item.id === task.id),
         sede: currentUser?.sede?.trim() || 'Global',
@@ -1375,7 +1427,7 @@ export function ChecklistProvider({ children }) {
       await runTransaction(db, async batch => {
       const snapshot = await batch.get(taskRef);
       if (!snapshot.exists()) throw new Error('La tarea ya no existe.');
-      const task = snapshot.data();
+      const { task } = await readTaskParticipants(batch, db, notification.taskId, snapshot.data(), [currentUser.email]);
       const scope = resolveTaskCycleScope(task, {
         catalogTask: checklistData.some(item => item.id === notification.taskId),
         sede: currentUser?.sede?.trim() || 'Global',
@@ -1466,7 +1518,8 @@ export function ChecklistProvider({ children }) {
       const result = await runTransaction(db, async transaction => {
         const snap = await transaction.get(taskRef);
         if (!snap.exists()) return null;
-        const data = snap.data();
+        const participants = await readTaskParticipants(transaction, db, taskId, snap.data(), [em]);
+        const data = participants.task;
         const currentProgress = { ...(data.assigneeProgress || {}) };
 
         const formalAssignees = [
@@ -1481,8 +1534,8 @@ export function ChecklistProvider({ children }) {
           name: currentUser?.displayName || currentUser?.name || userObj?.name || em,
           role: currentUser?.appRole || userObj?.role || 'colaborador',
           sede: currentUser?.sede || userObj?.sede || 'Global',
-          completed: data.completed === true,
-          progress: data.completed === true ? 100 : 0
+          completed: false,
+          progress: 0
         };
 
         const nowIso = new Date().toISOString();
@@ -1496,7 +1549,7 @@ export function ChecklistProvider({ children }) {
 
         const progressEntries = [...new Set([...formalAssignees, ...Object.keys(currentProgress).map(normalizeEmailKey)])]
           .map(key => currentProgress[Object.keys(currentProgress).find(k => normalizeEmailKey(k) === key)] ||
-            { completed: data.completed === true, progress: data.completed === true ? 100 : 0 });
+            { completed: false, progress: 0 });
         const allCompleted = progressEntries.length > 0 && progressEntries.every(item => item.completed === true || item.progress === 100);
         const anyCompleted = progressEntries.some(item => item.completed === true || item.progress > 0);
         const totalItems = progressEntries.length;
@@ -1514,7 +1567,6 @@ export function ChecklistProvider({ children }) {
         const rootEventId = `${eventId}_root`;
         const nextPayload = {
           assigneeProgress: currentProgress,
-          closedAssigneeKeys: Object.keys(currentProgress).filter(key => isTaskClosedForDelivery({ ...currentProgress[key] })),
           completed: allCompleted,
           status: allCompleted ? 'Completada' : (anyCompleted ? 'En Progreso' : 'Pendiente'),
           progressPercentage: overallPercent,
@@ -1525,12 +1577,15 @@ export function ChecklistProvider({ children }) {
             eventId: rootTransition ? rootEventId : eventId,
             scope: rootTransition ? {} : { assigneeEmail: targetKey },
             mapScope: { assigneeEmail: targetKey },
-            assigneeKeys: individualWasCompleted ? [targetKey] : [],
             assigneeEventIds: individualTransition ? { [targetKey]: eventId } : {}
           }
         };
 
-        transaction.update(taskRef, nextPayload);
+        stageTaskParticipants(transaction, db, taskId, participants, currentProgress,
+          nextPayload.lifecycleMutation.assigneeEventIds);
+        const rootPayload = { ...nextPayload };
+        delete rootPayload.assigneeProgress;
+        transaction.update(taskRef, rootPayload);
         const transitionEvents = [
           ...(individualTransition ? [{
             id: eventId, action: isCompleted ? 'completed' : 'reopened', scope: { assigneeEmail: targetKey }

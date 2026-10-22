@@ -94,8 +94,15 @@ test('task transactions roll back rejected optimism, gate celebrations and prese
           } }
       };
       const store = JSON.parse(localStorage.getItem('task-lifecycle-fixture') || JSON.stringify(initial));
+      const participants = JSON.parse(localStorage.getItem('task-lifecycle-participants') || '{}');
       window.fixtureStore = store;
+      window.fixtureParticipants = participants;
+      window.fixtureTask = id => ({ ...store[id], assigneeProgress: {
+        ...(store[id]?.assigneeProgress || {}),
+        ...Object.fromEntries(Object.entries(participants[id] || {}).map(([key, record]) => [key, record.state]))
+      } });
       window.fixtureWrites = [];
+      window.fixtureTransactions = [];
       window.fixtureEvents = JSON.parse(localStorage.getItem('task-lifecycle-events') || '{}');
       const listeners = new Set();
       export const collection = (_db, path) => ({ path });
@@ -107,17 +114,25 @@ test('task transactions roll back rejected optimism, gate celebrations and prese
       export const where = () => ({});
       export const orderBy = where;
       export const limit = where;
-      export const onSnapshot = (ref, callback) => {
-        const notify = () => callback({ docs: Object.entries(store).map(([id, value]) => {
+      export const onSnapshot = (ref, callback, onError) => {
+        const notify = () => {
+          if (ref.path.endsWith('/participant_states') && window.fixtureParticipantError === ref.path.split('/')[1]) {
+            onError({ code: 'permission-denied' });
+            return;
+          }
+          callback({ docs: Object.entries(ref.path.endsWith('/participant_states')
+          ? participants[ref.path.split('/')[1]] || {} : store).map(([id, value]) => {
           const data = structuredClone(value);
           return { id, data: () => data };
         }) });
+        };
         listeners.add(notify);
         queueMicrotask(notify);
         return () => listeners.delete(notify);
       };
       window.publishFixture = () => {
         localStorage.setItem('task-lifecycle-fixture', JSON.stringify(store));
+        localStorage.setItem('task-lifecycle-participants', JSON.stringify(participants));
         listeners.forEach(notify => notify());
       };
       const patch = (target, updates) => {
@@ -131,7 +146,11 @@ test('task transactions roll back rejected optimism, gate celebrations and prese
       export const runTransaction = async (_db, callback) => {
         const writes = [];
         const result = await callback({
-          get: async ref => ({ exists: () => Boolean(store[ref.id]), data: () => structuredClone(store[ref.id]) }),
+          get: async ref => {
+            const value = ref.path.endsWith('/participant_states')
+              ? participants[ref.path.split('/')[1]]?.[ref.id] : store[ref.id];
+            return { exists: () => value !== undefined, data: () => structuredClone(value) };
+          },
           update: (ref, updates) => writes.push({ ref, updates }),
           set: (ref, updates) => writes.push({ ref, updates })
         });
@@ -140,9 +159,13 @@ test('task transactions roll back rejected optimism, gate celebrations and prese
           window.fixtureReject = () => reject(new Error('Synthetic denied write'));
         });
         if (window.fixtureWriteError) throw new Error('Synthetic denied write');
+        window.fixtureTransactions.push(writes);
         for (const { ref, updates } of writes) {
           window.fixtureWrites.push({ ref, updates });
           if (ref.path === 'tasks') patch(store[ref.id] ??= {}, updates);
+          if (ref.path.endsWith('/participant_states')) {
+            (participants[ref.path.split('/')[1]] ??= {})[ref.id] = structuredClone(updates);
+          }
           if (ref.path === 'task_completion_events') window.fixtureEvents[ref.id] = structuredClone(updates);
         }
         localStorage.setItem('task-lifecycle-events', JSON.stringify(window.fixtureEvents));
@@ -387,7 +410,7 @@ test('task transactions roll back rejected optimism, gate celebrations and prese
         'other@example.test': { completed: false, progress: 45 }
       }
     }), { ok: true });
-    const openMulti = await page.evaluate(() => window.fixtureStore['multi-assignee-open']);
+    const openMulti = await page.evaluate(() => window.fixtureTask('multi-assignee-open'));
     assert.equal(openMulti.assigneeProgress['owner@example.test'].completed, true);
     assert.equal(openMulti.assigneeProgress['owner@example.test'].completedAt, 'owner-close');
     assert.equal(openMulti.assigneeProgress['other@example.test'].progress, 45,
@@ -429,7 +452,7 @@ test('task transactions roll back rejected optimism, gate celebrations and prese
       window.fixtureApi.updateIndividualProgress('individual-roundtrip', 'owner@example.test', true));
     assert.equal(individualResult, true, consoleErrors.join('\n'));
     const individualClosure = await page.evaluate(() => ({
-      task: window.fixtureStore['individual-roundtrip'],
+      task: window.fixtureTask('individual-roundtrip'),
       events: Object.entries(window.fixtureEvents).filter(([, event]) =>
         event.taskId === 'individual-roundtrip' && event.action === 'completed')
     }));
@@ -449,7 +472,7 @@ test('task transactions roll back rejected optimism, gate celebrations and prese
     assert.equal(await page.evaluate(() =>
       window.fixtureApi.updateIndividualProgress('individual-roundtrip', 'owner@example.test', false)), true);
     const individualReopen = await page.evaluate(() => ({
-      task: window.fixtureStore['individual-roundtrip'],
+      task: window.fixtureTask('individual-roundtrip'),
       events: Object.entries(window.fixtureEvents).filter(([, event]) =>
         event.taskId === 'individual-roundtrip' && event.action === 'reopened')
     }));
@@ -469,6 +492,42 @@ test('task transactions roll back rejected optimism, gate celebrations and prese
       assert.deepEqual(await page.evaluate(id => window.fixtureEvents[id], id), event,
         'original closure evidence and comments survive editing, reopening and reload');
     }
+
+    await page.evaluate(() => {
+      const keys = Array.from({ length: 40 }, (_, index) => 'participant-' + index + '@example.test');
+      window.fixtureStore['bulk-open'] = {
+        id: 'bulk-open', isCustom: true, createdBy: 'owner@example.test', completed: false,
+        assignedToEmails: keys, assigneeProgress: Object.fromEntries(keys.map(key => [key, { progress: 0 }]))
+      };
+      window.publishFixture();
+    });
+    const transactionsBeforeBulk = await page.evaluate(() => window.fixtureTransactions.length);
+    const bulkChanges = await page.evaluate(() => Object.fromEntries(
+      window.fixtureStore['bulk-open'].assignedToEmails.map(key => [key, { progress: 35 }])));
+    assert.deepEqual(await call('updateTaskDetails', 'bulk-open', {
+      assigneeProgress: bulkChanges, progressPercentage: 35
+    }), { ok: true });
+    assert.equal(await page.evaluate(() => window.fixtureTransactions.length), transactionsBeforeBulk + 1,
+      'all forty advances and migration commit in one transaction, never partial chunks');
+    assert.equal(await page.evaluate(() => Object.keys(window.fixtureParticipants['bulk-open']).length), 40);
+    assert.equal(await page.evaluate(() => Object.values(window.fixtureTask('bulk-open').assigneeProgress)
+      .every(state => state.progress === 35)), true);
+    assert.equal(await page.evaluate(() => Object.values(window.fixtureStore['bulk-open'].assigneeProgress)
+      .every(state => state.progress === 0)), true, 'the legacy baseline remains read-only');
+    await page.reload();
+    await page.waitForFunction(() => window.fixtureApi?.loading === false);
+    assert.equal((await state()).find(task => task.id === 'bulk-open').assigneeProgress['participant-39@example.test'].progress, 35);
+    await page.evaluate(() => {
+      window.fixtureParticipantError = 'bulk-open';
+      window.publishFixture();
+    });
+    await page.waitForFunction(() => !window.fixtureApi.tasks.some(task => task.id === 'bulk-open'));
+    assert.match(await page.evaluate(() => window.fixtureApi.taskLoadError), /No se pudo verificar/);
+    await page.evaluate(() => {
+      window.fixtureParticipantError = null;
+      window.publishFixture();
+    });
+    await page.waitForFunction(() => window.fixtureApi.tasks.some(task => task.id === 'bulk-open'));
 
     await page.evaluate(() => { window.fixtureWriteError = true; });
     assert.equal((await call('updateTaskDetails', 'catalog', { progressPercentage: 50 })).ok, false);
