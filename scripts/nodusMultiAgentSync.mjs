@@ -33,6 +33,16 @@ const __dirname = path.dirname(__filename);
 
 puppeteer.use(StealthPlugin());
 
+const FI_PARTICIPANT_CHUNK_SIZE = 100;
+
+function chunkArray(items, size) {
+  const chunks = [];
+  for (let index = 0; index < items.length; index += size) {
+    chunks.push(items.slice(index, index + size));
+  }
+  return chunks;
+}
+
 // Configuración Resiliente de Firebase
 // Diccionario dinámico cargado desde workspace
 let workspaceDirectory = [];
@@ -69,6 +79,26 @@ function getAdminDbForNodusPublish() {
   }
   const adminApp = getAdminApps().length ? getAdminApps()[0] : initializeAdminApp({ credential: cert(serviceAccount) });
   return getAdminFirestore(adminApp);
+}
+
+export function buildFiSnapshotChunks(participantesFI = []) {
+  return chunkArray(participantesFI, FI_PARTICIPANT_CHUNK_SIZE).map((participantes, index) => ({
+    index,
+    participantes
+  }));
+}
+
+export function buildFiLatestSnapshot(participantesFI = [], fiDiag = {}, syncId = '') {
+  return {
+    source: 'nodus_futuros_imposibles',
+    sourceVersion: 'fi-sync-v3',
+    sourceUrl: 'https://imo.crearpslglobal.com/futurosimposibles',
+    extractedAt: syncId,
+    syncedAt: FieldValue.serverTimestamp(),
+    universePfd: participantesFI.length,
+    participantChunks: buildFiSnapshotChunks(participantesFI).length,
+    summary: fiDiag.resumen
+  };
 }
 
 
@@ -362,7 +392,7 @@ class NodusExtractorAgent {
 
     console.log(`🔍 [Agente 1 - Extractor] Encontrados ${activeEquipos.length} equipos activos para C1 y C2.`);
     if (!activeEquipos.length) throw new Error('Active report teams unavailable');
-    
+
     const equiposData = [];
     // Extraemos de los equipos activos de forma segura
     for (const eq of activeEquipos) {
@@ -380,7 +410,6 @@ class NodusExtractorAgent {
         throw new Error(`C1 source extraction failed for team ${eq.id}; publication stopped`, { cause: err });
       }
     }
-
     console.log(`✅ [Agente 1 - Extractor] Datos de ${equiposData.length} equipos extraídos con éxito.`);
     return equiposData;
   }
@@ -1329,14 +1358,7 @@ export async function runMultiAgentSync() {
         sedeEquipoDiscrepancies: fiResult.sedeEquipoDiscrepancies
       };
       const snapshot = {
-        participantes: participantesFI,
-        source: 'nodus_futuros_imposibles',
-        sourceVersion: 'fi-sync-v3',
-        sourceUrl: 'https://imo.crearpslglobal.com/futurosimposibles',
-        extractedAt: syncId,
-        syncedAt: FieldValue.serverTimestamp(),
-        universePfd: participantesFI.length,
-        summary: fiDiag.resumen,
+        ...buildFiLatestSnapshot(participantesFI, fiDiag, syncId),
         ...snapshotMeta
       };
 
@@ -1344,7 +1366,31 @@ export async function runMultiAgentSync() {
       // lectura parcial se guarda aparte (latest_partial) para diagnóstico y
       // el último snapshot verificado sigue siendo el que consume Causa OS.
       const publishedDoc = fiResult.completeness === 'complete' ? 'latest' : 'latest_partial';
-      await adminDb.collection('nodus_futuros_imposibles').doc(publishedDoc).set(snapshot, { merge: false });
+      const latestRef = adminDb.collection('nodus_futuros_imposibles').doc(publishedDoc);
+      const chunkCollection = latestRef.collection('participantes');
+      const chunks = buildFiSnapshotChunks(participantesFI);
+      const previousChunks = await chunkCollection.get();
+      const nextChunkIds = new Set(chunks.map(({ index }) => `chunk_${String(index).padStart(4, '0')}`));
+      const obsoleteChunks = previousChunks.docs.filter(chunk => !nextChunkIds.has(chunk.id));
+      if (obsoleteChunks.length + chunks.length + 1 > 500) {
+        throw new Error('FI snapshot exceeds atomic publication write limit; previous snapshot preserved.');
+      }
+      const writeBatch = adminDb.batch();
+      obsoleteChunks.forEach(chunk => writeBatch.delete(chunk.ref));
+      chunks.forEach(({ index, participantes }) => {
+        const chunkRef = chunkCollection.doc(`chunk_${String(index).padStart(4, '0')}`);
+        writeBatch.set(chunkRef, {
+          index,
+          participantes,
+          source: 'nodus_futuros_imposibles',
+          sourceVersion: 'fi-sync-v3',
+          extractedAt: syncId,
+          syncedAt: FieldValue.serverTimestamp(),
+          universePfd: participantesFI.length
+        }, { merge: false });
+      });
+      writeBatch.set(latestRef, snapshot, { merge: false });
+      await writeBatch.commit();
       await adminDb.collection('nodus_fi_sync_history').add({
         status: fiResult.completeness === 'complete' ? 'published' : 'partial_not_published',
         source: 'nodus_futuros_imposibles',

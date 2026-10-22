@@ -11,6 +11,7 @@ import {
   canChangeManagerStatus,
   canViewAllManagers,
   canViewSede,
+  isMaestriaCoordinator,
   isGlobalQTCoordinator,
   hasQTPrivileges,
   DUAL_ROLE_TRAINER_EMAILS,
