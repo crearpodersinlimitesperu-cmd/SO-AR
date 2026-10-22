@@ -505,12 +505,12 @@
         // Revisar si ya está autenticado
         window.addEventListener('DOMContentLoaded', () => {
             if (sessionStorage.getItem('auth') === 'true' || sessionStorage.getItem('crearAuthIndex') === 'true') {
-                document.getElementById('login-overlay').classList.add('hidden');
+                document.getElementById('login-overlay')?.classList.add('hidden');
                 renderSedeTabs();
                 renderEvents('');
                 startSync();
             } else {
-                document.getElementById('login-overlay').classList.remove('hidden');
+                document.getElementById('login-overlay')?.classList.remove('hidden');
             }
         });
 
@@ -854,14 +854,15 @@
           markSheetContext(data);
           setAsignadorStatus('pendiente');
           try {
+            const withTimeout = (promise, label) => Promise.race([
+              promise,
+              new Promise((_, reject) => setTimeout(() => reject(new Error(`Tiempo de espera ${label}`)), 5000))
+            ]);
             const operationalChanges = typeof window.causaCalendarLoadOperational === 'function'
-              ? await window.causaCalendarLoadOperational() : [];
+              ? await withTimeout(window.causaCalendarLoadOperational(), 'de cambios operativos') : [];
             applyOperationalChanges(data, operationalChanges);
             if (typeof window.causaCalendarLoadAssignments !== 'function') throw new Error('La proyección del Asignador no está disponible');
-            const assignments = await Promise.race([
-              window.causaCalendarLoadAssignments(),
-              new Promise((_, reject) => setTimeout(() => reject(new Error('Tiempo de espera del Asignador')), 5000))
-            ]);
+            const assignments = await withTimeout(window.causaCalendarLoadAssignments(), 'del Asignador');
             mergeOfficialAssignments(data, assignments);
             setAsignadorStatus('oficial');
             return true;
@@ -905,9 +906,22 @@
 
         async function setCalendarSourceStatus(update) {
           calendarSourceStatus = { ...calendarSourceStatus, ...update };
-          const { calendarFreshnessText } = await calendarSourceReady;
+          let text;
+          try {
+            const { calendarFreshnessText } = await calendarSourceReady;
+            text = calendarFreshnessText(calendarSourceStatus);
+          } catch (error) {
+            // Sin el módulo de frescura el estado debe terminar igualmente visible.
+            text = calendarSourceStatus.refreshing
+              ? 'Consultando fuentes del calendario…'
+              : `No se pudo actualizar el calendario. ${calendarSourceStatus.error || error.message}`;
+          }
+          // La frescura describe las fuentes; la completitud de la vista se informa aparte.
+          if (!calendarSourceStatus.refreshing && calendarSourceStatus.renderIssues > 0) {
+            text = `Lectura completada; vista parcial: ${calendarSourceStatus.renderIssues} registro(s) de la fuente omitido(s) por datos inválidos. ${text}`;
+          }
           const label = document.getElementById('calendarFreshness');
-          if (label) label.textContent = calendarFreshnessText(calendarSourceStatus);
+          if (label) label.textContent = text;
         }
 
         function syncFromServer() {
@@ -931,7 +945,7 @@
               newData[sede].push({
                 start: ev.fecha_inicio || ev.start,
                 end: ajustarFechaFinPorRegla(ev.nombre || ev.name, ev.fecha_inicio || ev.start, ev.fecha_fin || ev.end),
-                name: ev.nombre || ev.name,
+                name: ev.nombre || ev.name || '',
                 equipo: cleanEquipoFormula(ev.equipo),
                 sheetTrainer: ev.sheetTrainer || ev.trainer || '',
                 trainer: '',
@@ -948,21 +962,32 @@
                 }
               });
             });
+            // La vista solo cambia cuando la nueva lectura ya está proyectada.
+            const assignmentsRead = await syncOfficialAssignments(newData);
             window.allEventsData = newData;
-            const assignmentsRead = await syncOfficialAssignments(window.allEventsData);
             mergeLogistics();
+            let rendered = { ok: true, issues: 0 };
             if (sessionStorage.auth === "true") {
               renderSedeTabs();
-              renderEvents(document.getElementById('searchInput')?.value || '');
+              rendered = renderEvents(document.getElementById('searchInput')?.value || '');
+            }
+            if (!rendered.ok) {
+              await setCalendarSourceStatus({
+                checkedAt: result.checkedAt, sources: result.sources, refreshing: false,
+                renderIssues: 0,
+                error: `Datos leídos, pero no se pudieron mostrar: ${rendered.error.message}`,
+              });
+              return false;
             }
             await setCalendarSourceStatus({
               checkedAt: result.checkedAt, sources: result.sources, error: null, refreshing: false,
+              renderIssues: rendered.issues,
             });
             if (result.errors.length) console.warn('Lectura parcial del calendario:', result.errors);
-            return result.sources.api && result.sources.sheet && assignmentsRead;
+            return result.sources.api && result.sources.sheet && assignmentsRead && !rendered.issues;
           } catch(err) {
             console.warn('Sync falló, usando datos locales:', err);
-            await setCalendarSourceStatus({ refreshing: false, error: err.message });
+            await setCalendarSourceStatus({ refreshing: false, renderIssues: 0, error: err.message });
             return false;
           }
         }
@@ -2246,7 +2271,7 @@
                 if (key !== 'VUELOS') {
                     let evList = [];
                     if (key === 'ALL_C1') {
-                        evList = getEventsForTab('upcoming').filter(ev => cleanEquipoFormula(ev.equipo).toUpperCase().includes('C1'));
+                        evList = getNextC1Events();
                     } else if (key === 'CURRENT') {
                         evList = getEventsForTab('current');
                     } else if (key === 'UPCOMING') {
@@ -2441,6 +2466,8 @@
           </div>
         </div>
 
+        <div id="renderIssues" role="alert" class="hidden mb-4 rounded-xl border border-amber-500/40 bg-amber-900/20 px-4 py-3 text-sm font-semibold text-amber-300"></div>
+
         <div id="eventsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <!-- Eventos renderizados por JS -->
         </div>
@@ -2450,8 +2477,8 @@
             <div class="w-20 h-20 bg-gray-800/50 rounded-full flex items-center justify-center mb-6">
                 <ion-icon name="search-outline" class="text-4xl text-crearCyan"></ion-icon>
             </div>
-            <h3 class="text-2xl font-bold text-white mb-2">Sin resultados</h3>
-            <p class="text-gray-400 max-w-md">El motor de búsqueda no encontró coincidencias en esta pestaña. Intenta buscar en otra pestaña o con otra palabra clave.</p>
+            <h3 id="noResultsTitle" class="text-2xl font-bold text-white mb-2">Sin resultados</h3>
+            <p id="noResultsText" class="text-gray-400 max-w-md">El motor de búsqueda no encontró coincidencias en esta pestaña. Intenta buscar en otra pestaña o con otra palabra clave.</p>
         </div>
     </div>
 
@@ -2837,7 +2864,63 @@
         const tabUpcoming = document.getElementById('tabUpcoming');
         const tabPast = document.getElementById('tabPast');
 
+        function calendarEventName(ev) {
+            return String(ev?.name || ev?.nombre || '').trim();
+        }
+
+        // Una sola definición de "Próximos C1" para el contador lateral y las tarjetas:
+        // el siguiente Capítulo Uno vigente o próximo de cada sede.
+        function getNextC1Events() {
+            const compiled = [];
+            Object.keys(allEventsData).forEach(sKey => {
+                const c1Events = (allEventsData[sKey] || []).filter(ev => {
+                    if (!normalizeStr(calendarEventName(ev)).includes('capitulo uno')) return false;
+                    const status = getEventStatus(ev.start, ev.end);
+                    return status === 'upcoming' || status === 'current';
+                });
+                if (c1Events.length > 0) {
+                    c1Events.sort((a, b) => new Date(a.start) - new Date(b.start));
+                    compiled.push({ ...c1Events[0], sedeTag: sKey });
+                }
+            });
+            return compiled;
+        }
+
+        function showRenderIssue(message) {
+            const el = document.getElementById('renderIssues');
+            if (!el) return;
+            el.textContent = message || '';
+            el.classList.toggle('hidden', !message);
+        }
+
+        function setEmptyStateCopy(title, text) {
+            const titleEl = document.getElementById('noResultsTitle');
+            const textEl = document.getElementById('noResultsText');
+            if (titleEl) titleEl.textContent = title;
+            if (textEl) textEl.textContent = text;
+        }
+
+        // Nunca deja la vista a medias: contador, vacío y avisos quedan coherentes
+        // con lo que realmente se dibujó, aunque falle un registro o el DOM.
         function renderEvents(filterText = '') {
+            const issues = [];
+            try {
+                renderEventsUnsafe(filterText, issues);
+            } catch (error) {
+                console.error('No se pudo dibujar el calendario:', error);
+                if (container) container.innerHTML = '';
+                if (countVisible) countVisible.textContent = '0';
+                if (noResults) noResults.classList.add('hidden');
+                showRenderIssue(`No se pudieron mostrar los eventos de esta vista: ${error.message}`);
+                return { ok: false, error };
+            }
+            showRenderIssue(issues.length
+                ? `${issues.length} registro(s) de la fuente no se pudieron mostrar y se omitieron; el resto de la vista está completo.`
+                : '');
+            return { ok: true, issues: issues.length };
+        }
+
+        function renderEventsUnsafe(filterText, issues) {
             container.innerHTML = '';
             let renderCount = 0;
 
@@ -2871,26 +2954,7 @@
             if (activeSede === 'ALL_C1') {
                 if (tabSelector) tabSelector.classList.add('hidden');
                 activeTab = 'upcoming'; // Force upcoming mode
-                
-                const compiled = [];
-                Object.keys(allEventsData).forEach(sKey => {
-                    const sEvents = allEventsData[sKey] || [];
-                    const c1Events = sEvents.filter(ev => {
-                        const nameUpper = ev.name.toUpperCase();
-                        const isC1 = nameUpper.includes("CAPITULO UNO") || nameUpper.includes("CAPÍTULO UNO");
-                        const status = getEventStatus(ev.start, ev.end);
-                        return isC1 && (status === 'upcoming' || status === 'current');
-                    });
-                    
-                    if (c1Events.length > 0) {
-                        c1Events.sort((a, b) => new Date(a.start) - new Date(b.start));
-                        compiled.push({
-                            ...c1Events[0],
-                            sedeTag: sKey
-                        });
-                    }
-                });
-                currentSedeEvents = compiled;
+                currentSedeEvents = getNextC1Events();
             } else if (activeSede === 'CURRENT') {
                 if (tabSelector) tabSelector.classList.add('hidden');
                 activeTab = 'upcoming';
@@ -2959,7 +3023,7 @@
                 eventsToRender.sort((a, b) => new Date(a.start) - new Date(b.start));
             }
 
-            eventsToRender.forEach((ev, index) => {
+            const renderEventCard = (ev, index) => {
                 const status = getEventStatus(ev.start, ev.end);
                 
                 if (activeSede !== 'ALL_C1' && activeSede !== 'CURRENT' && activeSede !== 'UPCOMING') {
@@ -2995,7 +3059,8 @@
                   ? `<span class="px-2 py-0.5 rounded text-[9px] font-bold bg-purple-900/40 text-purple-300 border border-purple-800/30 flex items-center gap-1"><ion-icon name="mail-open-outline"></ion-icon> Avisado</span>`
                   : `<span class="px-2 py-0.5 rounded text-[9px] font-bold bg-orange-900/40 text-orange-400 border border-orange-800/30 flex items-center gap-1"><ion-icon name="mail-outline"></ion-icon> Sin Avisar</span>`;
                 
-                const searchString = normalizeStr(`${ev.name} equipo ${ev.equipo} ${monthName} ${yearName} ${trainerName} ${placeName} ${ev.sedeTag || ''}`);
+                const eventName = calendarEventName(ev);
+                const searchString = normalizeStr(`${eventName} equipo ${ev.equipo} ${monthName} ${yearName} ${trainerName} ${placeName} ${ev.sedeTag || ''}`);
                 const searchTerms = lowerFilter.split(' ').filter(t => t.trim() !== '');
                 const matches = searchTerms.every(term => searchString.includes(term));
 
@@ -3056,7 +3121,7 @@
                                 ${sedeLabel}
                                 <span class="bg-crearBlue/20 text-crearCyan text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-md mb-1.5 inline-block">Equipo ${ev.equipo || 'N/A'}</span>
                                 ${countdownLabel}
-                                <h4 class="text-white font-extrabold text-lg leading-tight group-hover:text-crearCyan transition-colors">${ev.name}</h4>
+                                <h4 class="text-white font-extrabold text-lg leading-tight group-hover:text-crearCyan transition-colors">${eventName ? escapeCalendarText(eventName) : '<span class="text-amber-400">Sin nombre en la fuente oficial</span>'}</h4>
                             </div>
                         </div>
 
@@ -3165,12 +3230,28 @@
                     if(wgt) wgt.innerHTML = `<ion-icon name="checkmark-done-circle" class="text-gray-500"></ion-icon> Realizado`;
                 }
                 
-                renderCount++;
+                return true;
+            };
+
+            eventsToRender.forEach((ev, index) => {
+                try {
+                    if (renderEventCard(ev, index)) renderCount++;
+                } catch (error) {
+                    issues.push(error);
+                    console.error('Registro del calendario omitido al dibujar:', error, ev);
+                }
             });
 
             countVisible.textContent = renderCount;
 
-            if (renderCount === 0) {
+            if (renderCount === 0 && !issues.length) {
+                if (lowerFilter.trim()) {
+                    setEmptyStateCopy('Sin resultados', 'El motor de búsqueda no encontró coincidencias en esta pestaña. Intenta buscar en otra pestaña o con otra palabra clave.');
+                } else if (activeSede === 'ALL_C1') {
+                    setEmptyStateCopy('Sin Capítulo Uno próximos', 'Las fuentes leídas no tienen un Capítulo Uno en curso o próximo en ninguna sede.');
+                } else {
+                    setEmptyStateCopy('Sin eventos', 'No hay eventos para esta pestaña en las fuentes leídas.');
+                }
                 noResults.classList.remove('hidden');
             } else {
                 noResults.classList.add('hidden');
