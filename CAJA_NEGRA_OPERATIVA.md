@@ -703,6 +703,36 @@ Tras el reporte de incidencias donde firmas completadas figuraban en el panel ad
   2. **Inclusión en Plan Maestro 2026:** Se inyectó formalmente en el array `ENTRENADORES_OFICIALES_CPSL` etiquetada para "El Viaje" y habilitada para recibir llamadas.
   3. **Corrección de Directorio Activo:** Se normalizó a los usuarios en Firestore (`users` y `staff_directory`) inyectándoles el `displayName` correcto si venían de cuentas importadas con campos en blanco. 
 
+---
+
+## 18. Actualización Operativa & Técnica Mayor: Sincronización Automática e Íntegra Asignador ↔ Calendario Global, Visibilidad Jerárquica y Blindaje Anti-Invención (22 de Octubre de 2026)
+
+### 18.1. Sincronización Automática e Íntegra Asignador ↔ Calendario Global
+* **Directiva:** Todo lo que se asigne, sugiera o modifique en `/asignador-entrenadores` (fuente única y autoritativa) debe reflejarse fielmente, de forma automática e íntegra en el Calendario Global (`public/calendario_global.html`) y en los paneles de Causa OS.
+* **Mapeo de Estados Sin Invenciones:**
+  1. **Entrenador Confirmado:** Se publica en tiempo real en la colección `calendario_asignaciones_publicas` vía Firestore (`onSnapshot`). En el Calendario Global se rotula en color verde esmeralda: `✓ Confirmado en Asignador Causa OS`.
+  2. **Entrenador Sugerido por Cronograma Oficial:** Se incorporó el motor espejo de sugerencias ([`resumenSugerenciaCronograma`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/src/utils/trainerAssignments.js)) replicando exactamente la lógica del Asignador:
+     - En **Maestría del Juego**, se desglosa por fines de semana (`Creación`, `Relación`, `Gratitud`). Si la celda contiene un único nombre, se sugiere exclusivamente para el FDS 1.
+     - En programas de slot único con múltiples candidatos no consensuados, se mantiene como pendiente de resolución para evitar ambigüedades.
+     - Se rotula explícitamente en color ámbar: `Sugerido por cronograma · pendiente de confirmar en Asignador`.
+  3. **Sin Asignar:** Permanece visible como `Sin asignar · Pendiente en Asignador de Entrenadores`. Jamás se fabrica o inventa un entrenador sintético.
+
+### 18.2. Reglas de Filtrado y Visibilidad Jerárquica en "Eventos y Entrenamientos" (`Home.jsx`)
+* **Gerentes de Sede (Filtro por Defecto de Primera Vista):**
+  - **Requisito:** Al ingresar a Mi Inicio (`/home`), el Gerente debe ver de primera vista únicamente las fechas de su propia sede, pero manteniendo la libertad de ver las demás sedes si lo desea.
+  - **Implementación:** Se inicializa `selectedSedeFilter` mediante `gerenteDefaultSede`, asociando la sede canónica del gerente (`Lima`, `Quito`, `Guayaquil`, `Cuenca`, `Medellín`, `México`).
+  - **Flexibilidad Operativa:** El selector 📍 permanece 100% activo, permitiendo al gerente cambiar en cualquier momento a "Todas las sedes" o a otra sede sin bloqueos de permisos.
+* **Visibilidad de Entrenadores (Gerentes vs Coordinadores):**
+  - **Gerentes, Dirección y SuperAdmin:** Pueden ver **siempre** los entrenadores (confirmados o sugeridos) en **todas** las fechas y eventos visibles.
+  - **Coordinadores (`coord_c1`, `coord_c2`, `coord_maestria`, `coordinador_c1c2`, `coordinador_mj`, `coord_jr`):** Únicamente pueden ver los entrenadores asignados/sugeridos en las fechas que pertenezcan al **ciclo activo de su sede/equipo** (`currentCycle` o `quitoCycles`). Para fechas ajenas al ciclo activo, se reserva la visibilidad del entrenador.
+
+### 18.3. Mandato Estricto Anti-Invención de Datos de Nodus
+* Todos los agentes de sincronización (`scripts/nodusApiClient.mjs`, `scripts/nodusMultiAgentSync.mjs`, `publishNodusReportSources.mjs`) y servicios de visualización frontend (`NodusDataMap.jsx`, `AuditoriaKPIs.jsx`, `ReportesBoard.jsx`) operan bajo arquitectura *fail-closed*:
+  - Si un dato no existe o no pudo ser extraído de Nodus, se reporta como "No disponible / Pendiente de sync".
+  - Prohibido cualquier valor simulado, sintético o inventado en Causa OS.
+
+---
+
 > 📜 **Mandato de la Caja Negra:**
 > Esta Caja Negra es la fuente viva de verdad de CPSL y Causa OS. Debe consultarse antes de cualquier cambio de arquitectura y actualizarse de inmediato tras cada nueva funcionalidad, regla o descubrimiento operativo.
 
