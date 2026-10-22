@@ -15,6 +15,7 @@ import { applyCycleCompletion, createCycleCompletion, getEffectiveCompletion, ge
 import { normalizeTaskLocation, taskLocationLabel, taskReminderMessage, taskUrl, escapeTaskHtml } from '../utils/taskLocation';
 
 const ChecklistContext = createContext();
+const MAX_GUARDED_PARTICIPANT_CHANGES = 8; // debe coincidir con safeAssigneeChanges en firestore.rules
 
 // Formatea una fecha límite ISO a texto legible en español, para los correos
 // de asignación de tarea (agregado 28/08/2026 a pedido de José, para que el
@@ -308,14 +309,20 @@ export function ChecklistProvider({ children }) {
           : {};
         const individualTransitions = [];
         let changedKeys = [];
+        let guardKeys = [];
         if (nextUpdates.assigneeProgress) {
           const previousMap = prevData.assigneeProgress || {};
           const nextMap = nextUpdates.assigneeProgress;
           changedKeys = [...new Set([...Object.keys(previousMap), ...Object.keys(nextMap)])]
             .filter(key => JSON.stringify(previousMap[key]) !== JSON.stringify(nextMap[key]));
-          if (changedKeys.length > 10) {
-            throw new Error('El guardado atómico admite hasta diez cambios de participantes.');
+          const previousLedger = new Set(Array.isArray(prevData.closedAssigneeKeys) ? prevData.closedAssigneeKeys : []);
+          guardKeys = changedKeys.filter(key =>
+            previousLedger.has(key) || isTaskClosedForDelivery({ ...previousMap[key] }));
+          if (guardKeys.length > MAX_GUARDED_PARTICIPANT_CHANGES) {
+            throw new Error(`El guardado atómico admite hasta ${MAX_GUARDED_PARTICIPANT_CHANGES} cambios sobre participantes ya cerrados.`);
           }
+          nextUpdates.closedAssigneeKeys = Object.keys(nextMap)
+            .filter(key => isTaskClosedForDelivery({ ...nextMap[key] }));
           changedKeys.forEach((key, index) => {
             const wasClosed = isTaskClosedForDelivery({ ...previousMap[key] });
             const nowClosed = isTaskClosedForDelivery({ ...nextMap[key] });
@@ -327,7 +334,7 @@ export function ChecklistProvider({ children }) {
         nextUpdates.lifecycleMutation = {
           eventId: completionId,
           scope: eventScope,
-          assigneeKeys: changedKeys,
+          assigneeKeys: guardKeys,
           assigneeEventIds: Object.fromEntries(individualTransitions.map(event => [event.key, event.id])),
           ...(!reopenTransition
             ? { closureContext: taskClosureContext({ ...prevData, ...nextUpdates }) }
@@ -1506,6 +1513,7 @@ export function ChecklistProvider({ children }) {
         const eventScope = individualTransition ? { assigneeEmail: targetKey } : {};
         const nextPayload = {
           assigneeProgress: currentProgress,
+          closedAssigneeKeys: Object.keys(currentProgress).filter(key => isTaskClosedForDelivery({ ...currentProgress[key] })),
           completed: allCompleted,
           status: allCompleted ? 'Completada' : (anyCompleted ? 'En Progreso' : 'Pendiente'),
           progressPercentage: overallPercent,
@@ -1521,15 +1529,18 @@ export function ChecklistProvider({ children }) {
 
         transaction.update(taskRef, nextPayload);
         if (individualTransition || completionTransition || reopenTransition) {
+          const eventAction = individualTransition
+            ? (isCompleted ? 'completed' : 'reopened')
+            : (reopenTransition ? 'reopened' : 'completed');
           transaction.set(doc(db, 'task_completion_events', eventId), {
             taskId,
-            action: individualTransition
-              ? (isCompleted ? 'completed' : 'reopened')
-              : (reopenTransition ? 'reopened' : 'completed'),
+            action: eventAction,
             actorEmail: String(currentUser?.email || auth.currentUser?.email || '').trim().toLowerCase(),
             occurredAt: serverTimestamp(),
             source: 'manual',
-            scope: eventScope
+            scope: eventScope,
+            ...(eventAction === 'completed'
+              ? { closureContext: taskClosureContext({ ...data, ...nextPayload }) } : {})
           });
         }
         return nextPayload;

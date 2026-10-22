@@ -567,3 +567,68 @@ test('C-01: whitelisted manager without users/{uid} profile can create a critica
     assignedToEmails: ['a@example.com', 'b@example.com']
   }));
 });
+
+test('large assignee lists save notes, open progress and mixed closures atomically while closed entries stay protected', async () => {
+  const emails = Array.from({ length: 40 }, (_, i) => `member${i}@example.com`);
+  const legacy = Object.fromEntries(emails.map((email, i) => [email, i === 0
+    ? { completed: true, progress: 100, completedAt: 'recorded-first' }
+    : { progress: 10 }]));
+  await seedTasks([{
+    id: 'custom_large', isCustom: true, assignedToEmails: emails,
+    createdBy: 'member0@example.com', completed: false, assigneeProgress: legacy,
+    closedAssigneeKeys: [emails[0]]
+  }]);
+  const owner = userDb('member0', 'member0@example.com');
+  const ref = doc(owner, 'tasks', 'custom_large');
+  const save = (progress, ledger, guard = [], extra = {}) => ({
+    assigneeProgress: progress, closedAssigneeKeys: ledger, ...extra,
+    lifecycleMutation: { eventId: 'bulk-save', scope: {}, assigneeKeys: guard, assigneeEventIds: {} }
+  });
+
+  const metadata = Object.fromEntries(emails.map((email, i) => [email, i === 0 ? legacy[email]
+    : { ...legacy[email], name: email, role: 'colaborador', sede: 'Lima', completed: false }]));
+  await assertSucceeds(updateDoc(ref, save(metadata, [emails[0]], [], { notes: 'kept' })));
+
+  const advanced = Object.fromEntries(emails.map((email, i) => [email, i === 0 ? metadata[email]
+    : { ...metadata[email], progress: 40 }]));
+  await assertSucceeds(updateDoc(ref, save(advanced, [emails[0]])));
+
+  const mixed = { ...advanced, [emails[1]]: { ...advanced[emails[1]], completed: true, progress: 100, completedAt: 'closed-now' } };
+  await assertSucceeds(updateDoc(ref, save(mixed, [emails[0], emails[1]])));
+
+  const stale = Object.fromEntries(emails.map(email => [email, { ...mixed[email], completed: false, progress: 50 }]));
+  await assertFails(updateDoc(ref, { assigneeProgress: stale }));
+  await assertFails(updateDoc(ref, save(stale, [], [emails[0], emails[1]])));
+  await assertFails(updateDoc(ref, save(stale, [emails[0], emails[1]], [emails[0], emails[1]])));
+  const reopenTwo = { ...mixed, [emails[0]]: { ...mixed[emails[0]], completed: false, progress: 0 } };
+  await assertFails(updateDoc(ref, { assigneeProgress: reopenTwo }));
+  await assertFails(updateDoc(ref, save(reopenTwo, [], [emails[0]])));
+  await assertSucceeds(updateDoc(ref, save({ ...mixed, [emails[5]]: { ...mixed[emails[5]], progress: 70 } }, [emails[0], emails[1]])));
+  const data = (await getDoc(ref)).data();
+  assert.equal(data.assigneeProgress[emails[0]].completedAt, 'recorded-first');
+  assert.equal(data.assigneeProgress[emails[1]].progress, 100);
+});
+
+test('individual completion is accepted only with its closure snapshot', async () => {
+  await seedTasks([{
+    id: 'custom_two', isCustom: true, assignedToEmails: ['owner@example.com', 'other@example.com'],
+    createdBy: 'owner@example.com', completed: false, comments: 'done', evidences: [],
+    assigneeProgress: { 'owner@example.com': { progress: 0 }, 'other@example.com': { progress: 0 } }
+  }]);
+  const owner = userDb('owner', 'owner@example.com');
+  const ref = doc(owner, 'tasks', 'custom_two');
+  const complete = (id, withContext) => runTransaction(owner, async transaction => {
+    transaction.update(ref, {
+      assigneeProgress: { 'owner@example.com': { completed: true, progress: 100 }, 'other@example.com': { progress: 0 } },
+      closedAssigneeKeys: ['owner@example.com'],
+      lifecycleMutation: { eventId: id, scope: { assigneeEmail: 'owner@example.com' }, mapScope: { assigneeEmail: 'owner@example.com' } }
+    });
+    transaction.set(doc(owner, 'task_completion_events', id), {
+      taskId: 'custom_two', action: 'completed', actorEmail: 'owner@example.com', occurredAt: serverTimestamp(),
+      source: 'manual', scope: { assigneeEmail: 'owner@example.com' },
+      ...(withContext ? { closureContext: { comments: 'done', evidenceUrl: '', evidences: [] } } : {})
+    });
+  });
+  await assertFails(complete('no-context', false));
+  await assertSucceeds(complete('with-context', true));
+});

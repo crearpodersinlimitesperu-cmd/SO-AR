@@ -253,6 +253,32 @@ test('actual task context persists location, updates reminders and reads links; 
       'legitimate progress preserves the other participant exactly');
     assert.notEqual((await page.evaluate(() => window.fixtureToast)).type, 'error');
 
+    await page.evaluate(() => {
+      const emails = Array.from({ length: 14 }, (_, i) => i === 0 ? 'owner@example.test' : `member${i}@example.test`);
+      const task = {
+        id: 'custom_large_multi', isCustom: true, task: 'Large shared task',
+        createdBy: 'owner@example.test', assignedByEmail: 'owner@example.test',
+        assignedToEmails: emails, completed: false, status: 'Pendiente', progressPercentage: 0,
+        comments: 'Existing note',
+        assigneeProgress: Object.fromEntries(emails.map((email, i) => [email, i === 3
+          ? { completed: true, progress: 100, completedAt: 'recorded-close' }
+          : { completed: false }])),
+        closedAssigneeKeys: ['member3@example.test']
+      };
+      window.fixtureStore.set('tasks/' + task.id, task);
+      window.fixturePublish();
+      window.fixtureOpenDetail(task);
+    });
+    await page.waitForFunction(() => document.body.innerText.includes('Large shared task'));
+    await saveModal();
+    await page.waitForFunction(() => window.fixtureStore.get('tasks/custom_large_multi')?.lastUpdated);
+    const large = await page.evaluate(() => window.fixtureStore.get('tasks/custom_large_multi'));
+    assert.deepEqual(large.assigneeProgress['member3@example.test'],
+      { completed: true, progress: 100, completedAt: 'recorded-close' },
+      'a note save on a 14-participant task preserves the closed participant exactly');
+    assert.deepEqual(large.closedAssigneeKeys, ['member3@example.test']);
+    assert.notEqual((await page.evaluate(() => window.fixtureToast)).type, 'error');
+
     const failed = await page.evaluate(async () => {
       window.fixtureRejectWrite = true;
       const task = window.fixtureApi.tasks.find(task => task.isCustom);

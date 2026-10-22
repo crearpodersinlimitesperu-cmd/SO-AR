@@ -416,6 +416,7 @@ CÓMO ENVIAR LA CONSTANCIA:
     const mailDocData = {
       to: [emailClean],
       taskId: masterTaskId,
+      linkedTaskIds: [individualTaskId],
       recipientEmail: emailClean,
       delivery: { state: 'PENDING', attemptCount: 0 },
       message: {

@@ -343,7 +343,7 @@ service cloud.firestore {
           'evidence_url', 'evidenceUrl', 'date', 'googleSynced',
           'assigneeProgress', 'evidences', 'comments', 'notes', 'description',
           'progressNotes', 'completedAt', 'lastUpdated', 'lastUpdatedBy',
-          'updatedAt', 'updated_at', 'deadline', 'lifecycleMutation'
+          'updatedAt', 'updated_at', 'deadline', 'lifecycleMutation', 'closedAssigneeKeys'
         ]);
     }
 
@@ -400,6 +400,11 @@ service cloud.firestore {
         safeChangedLifecycleMap(before, after, scope, field, taskId, mutation);
     }
 
+    function safeAssigneeIndex(before, after, keys, index, taskId, mutation) {
+      return index >= keys.size() ||
+        safeAssigneeEntry(before, after, keys[index], taskId, mutation);
+    }
+
     function safeAssigneeEntry(before, after, key, taskId, mutation) {
       return key is string &&
         (preservesClosedEntry(before.get(key, {}), after.get(key, {})) ||
@@ -410,14 +415,13 @@ service cloud.firestore {
             })));
     }
 
-    function safeAssigneeIndex(before, after, keys, index, taskId, mutation) {
-      return index >= keys.size() || safeAssigneeEntry(before, after, keys[index], taskId, mutation);
-    }
-
-    function safeAssigneeChanges(before, after, taskId, mutation) {
+    // Escalable en participantes: los terminales se registran en closedAssigneeKeys y se
+    // comparan con conjuntos (sin recorrer cada asignado). Solo las claves cerradas que el
+    // guardado toca (guard) se verifican una por una, con tope de 8 por limite de expresiones.
+    function safeAssigneeChanges(before, after, taskId, mutation, ledgerBefore) {
       let keys = mutation.get('assigneeKeys', []);
-      return keys is list && keys.size() <= 10 &&
-        after.diff(before).affectedKeys().hasOnly(keys) &&
+      return keys is list && keys.size() <= 8 &&
+        after.diff(before).affectedKeys().intersection(ledgerBefore.toSet()).hasOnly(keys) &&
         safeAssigneeIndex(before, after, keys, 0, taskId, mutation) &&
         safeAssigneeIndex(before, after, keys, 1, taskId, mutation) &&
         safeAssigneeIndex(before, after, keys, 2, taskId, mutation) &&
@@ -425,17 +429,24 @@ service cloud.firestore {
         safeAssigneeIndex(before, after, keys, 4, taskId, mutation) &&
         safeAssigneeIndex(before, after, keys, 5, taskId, mutation) &&
         safeAssigneeIndex(before, after, keys, 6, taskId, mutation) &&
-        safeAssigneeIndex(before, after, keys, 7, taskId, mutation) &&
-        safeAssigneeIndex(before, after, keys, 8, taskId, mutation) &&
-        safeAssigneeIndex(before, after, keys, 9, taskId, mutation);
+        safeAssigneeIndex(before, after, keys, 7, taskId, mutation);
     }
 
-    function safeAssigneeMap(before, after, scope, taskId, mutation) {
+    function safeAssigneeMap(before, after, scope, taskId, mutation, ledgerBefore) {
       return before == after ||
         (after.diff(before).changedKeys().size() == 0 && after.diff(before).removedKeys().size() == 0) ||
         (mutation.keys().hasAny(['assigneeKeys'])
-          ? safeAssigneeChanges(before, after, taskId, mutation)
+          ? safeAssigneeChanges(before, after, taskId, mutation, ledgerBefore)
           : safeChangedLifecycleMap(before, after, scope, 'assigneeProgress', taskId, mutation));
+    }
+
+    function safeClosedAssigneeLedger(beforeTask, afterTask, mutation, scope) {
+      let ledgerBefore = beforeTask.get('closedAssigneeKeys', []);
+      let ledgerAfter = afterTask.get('closedAssigneeKeys', []);
+      let released = mutation.get('assigneeKeys', [scope.get('assigneeEmail', '')]);
+      return ledgerBefore is list && ledgerAfter is list && ledgerAfter.size() <= 500 &&
+        released is list &&
+        ledgerBefore.toSet().difference(released.toSet()).difference(ledgerAfter.toSet()).size() == 0;
     }
 
     function safeTaskLifecycleUpdate(taskId) {
@@ -447,8 +458,9 @@ service cloud.firestore {
           (!lifecycleClosed(after) && hasNewReopenEvent(taskId, mutation))) &&
         safeLifecycleMap(before.get('completions', {}), after.get('completions', {}),
           scope, 'completions', taskId, mutation) &&
+        safeClosedAssigneeLedger(before, after, mutation, scope) &&
         safeAssigneeMap(before.get('assigneeProgress', {}), after.get('assigneeProgress', {}),
-          scope, taskId, mutation);
+          scope, taskId, mutation, before.get('closedAssigneeKeys', []));
     }
 
     function validClosureContext(event, taskData) {

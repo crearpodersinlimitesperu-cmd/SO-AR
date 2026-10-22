@@ -449,3 +449,31 @@ test('multi-recipient task mail without recipientEmail drops closed participants
   assert.equal(await skipTaskMailIfClosed(db, ref('mail/multi'), docs.get('mail/multi'), both, now + 1), 'SKIPPED_CLOSED');
   assert.equal(docs.get('mail/multi').delivery.state, 'SKIPPED_CLOSED');
 });
+
+test('mail linked to a master and an individual task is suppressed when only the individual task closes after enqueue', async () => {
+  const mail = type => ({
+    type: 'seguro_salud_entrenadores', taskId: 'master', linkedTaskIds: ['individual'],
+    to: ['coach@example.test'], recipientEmail: 'coach@example.test', delivery: { state: type }
+  });
+  const { db, ref, docs } = fakeFirestore({
+    'mail/claim': mail('PENDING'),
+    'mail/presmtp': mail('PENDING'),
+    'tasks/master': { completed: false, status: 'Pendiente' },
+    'tasks/individual': { completed: false, status: 'Pendiente' }
+  });
+  const sendable = await claimPendingMail(db, ref('mail/presmtp'), now);
+  assert.equal(sendable.state, 'SENDING');
+  docs.set('tasks/individual', { completed: true, status: 'Completada' });
+  const recipients = ['coach@example.test'];
+  assert.equal(await skipTaskMailIfClosed(db, ref('mail/presmtp'), sendable.data, recipients, now + 1), 'SKIPPED_CLOSED');
+  assert.equal(docs.get('mail/presmtp').delivery.state, 'SKIPPED_CLOSED');
+
+  assert.equal((await claimPendingMail(db, ref('mail/claim'), now + 2)).state, 'SKIPPED_CLOSED');
+  assert.equal(docs.get('mail/claim').delivery.taskStateObserved, 'closed');
+});
+
+test('the insurance producer links the individual task so claim and pre-SMTP re-read it', async () => {
+  const { readFileSync } = await import('node:fs');
+  const source = readFileSync(new URL('../scripts/assignInsuranceTaskAndMail.mjs', import.meta.url), 'utf8');
+  assert.match(source, /linkedTaskIds:\s*\[individualTaskId\]/);
+});

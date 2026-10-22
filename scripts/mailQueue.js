@@ -60,6 +60,33 @@ export function selectMailAction(data, now = Date.now()) {
   return 'SENDING';
 }
 
+const MAX_LINKED_TASK_IDS = 5;
+
+export function linkedTaskIdsOf(data) {
+  const ids = Array.isArray(data?.linkedTaskIds) ? data.linkedTaskIds : [];
+  return [...new Set(ids.filter(id => typeof id === 'string' && id.trim()))].slice(0, MAX_LINKED_TASK_IDS);
+}
+
+function linkedClosureState(taskSnapshot, data, recipients) {
+  if (!taskSnapshot.exists) return 'SKIPPED_TASK_MISSING';
+  const taskData = taskSnapshot.data();
+  if (hasAmbiguousCycleCompletionScope(taskData, data)) return 'SKIPPED_SCOPE_UNKNOWN';
+  const closed = recipientEmail => isTaskClosedForDelivery(taskData, {
+    completionScope: data.completionScope,
+    recipientEmail
+  });
+  const explicit = data.recipientEmail ? String(data.recipientEmail) : undefined;
+  if (recipients.length) return recipients.every(closed) || (explicit && closed(explicit)) ? 'SKIPPED_CLOSED' : null;
+  return closed(explicit) ? 'SKIPPED_CLOSED' : null;
+}
+
+function recipientsOf(data) {
+  return [...new Set([
+    ...(Array.isArray(data.to) ? data.to : typeof data.to === 'string' ? [data.to] : []),
+    ...(data.recipientEmail ? [data.recipientEmail] : [])
+  ].map(value => String(value).trim().toLowerCase()).filter(Boolean))];
+}
+
 export async function claimPendingMail(db, ref, now = Date.now()) {
   return db.runTransaction(async transaction => {
     const snapshot = await transaction.get(ref);
@@ -98,6 +125,21 @@ export async function claimPendingMail(db, ref, now = Date.now()) {
     if (typeof taskId === 'string' && taskId.trim()) {
       const taskRef = db.collection('tasks').doc(taskId);
       const taskSnapshot = await transaction.get(taskRef);
+      const linkedSnapshots = await Promise.all(linkedTaskIdsOf(data)
+        .map(id => transaction.get(db.collection('tasks').doc(id))));
+      const linkedState = linkedSnapshots.map(snapshotOfLinked => linkedClosureState(snapshotOfLinked, data, recipientsOf(data)))
+        .find(Boolean);
+      if (taskSnapshot.exists && linkedState) {
+        transaction.update(ref, {
+          'delivery.state': linkedState,
+          'delivery.endTime': new Date(now).toISOString(),
+          ...(linkedState === 'SKIPPED_CLOSED'
+            ? { 'delivery.skippedAt': new Date(now).toISOString(), 'delivery.taskStateObserved': 'closed' }
+            : {}),
+          'delivery.reason': 'Una tarea vinculada esta cerrada, ausente o sin ciclo identificable.'
+        });
+        return { data, state: linkedState };
+      }
       if (!taskSnapshot.exists) {
         transaction.update(ref, {
           'delivery.state': 'SKIPPED_TASK_MISSING',
@@ -227,17 +269,21 @@ export async function skipTaskMailIfClosed(db, ref, data, recipients, now = Date
   if (typeof taskId !== 'string' || !taskId.trim()) return false;
 
   const taskSnapshot = await db.collection('tasks').doc(taskId).get();
+  const linkedSnapshots = await Promise.all(linkedTaskIdsOf(data)
+    .map(id => db.collection('tasks').doc(id).get()));
+  const linkedState = linkedSnapshots.map(snapshotOfLinked => linkedClosureState(snapshotOfLinked, data, recipients))
+    .find(Boolean);
   const taskData = taskSnapshot.exists ? taskSnapshot.data() : null;
   const closedFor = recipientEmail => isTaskClosedForDelivery(taskData, {
     completionScope: data.completionScope,
     recipientEmail
   });
   let suppressed = 0;
-  let state = !taskSnapshot.exists
+  let state = linkedState || (!taskSnapshot.exists
     ? 'SKIPPED_TASK_MISSING'
     : hasAmbiguousCycleCompletionScope(taskData, data)
       ? 'SKIPPED_SCOPE_UNKNOWN'
-      : null;
+      : null);
   if (!state) {
     const explicit = data.recipientEmail ? String(data.recipientEmail) : undefined;
     if (!recipients.length || (explicit && closedFor(explicit))) {
