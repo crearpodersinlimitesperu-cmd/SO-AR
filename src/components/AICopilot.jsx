@@ -113,7 +113,7 @@ function generateAssertiveResponse(queryText, nodusData, currentUser, messageHis
       let totalLlam = 0;
       let totalPorConf = 0;
 
-      resp += `📞 **Gestión de Llamadas por Coordinador (Nodus en vivo):**\n\n`;
+      resp += `👥 **Personas Únicas (PX) Gestionadas:**\n\n`;
       matchingCoords.forEach(c => {
         if (c.equipos && c.equipos.length > 0) {
           c.equipos.forEach(eq => {
@@ -125,7 +125,7 @@ function generateAssertiveResponse(queryText, nodusData, currentUser, messageHis
             totalPorConf += porConf;
             totalAsig += asig;
             totalLlam += llam;
-            resp += `* **${c.nombre} (${c.sede}):** **${conf}** confirmados, **${porConf}** por confirmar (Llamadas: ${llam}).\n`;
+            resp += `* **${c.nombre} (${c.sede}):** **${conf} PX** confirmados, **${porConf} PX** por confirmar (Gestiones: ${llam} intentos/llamadas).\n`;
           });
         } else if (c.legacyEstado) {
           const est = c.legacyEstado;
@@ -135,15 +135,15 @@ function generateAssertiveResponse(queryText, nodusData, currentUser, messageHis
           totalConf += conf;
           totalPorConf += porConf;
           totalAsig += asig;
-          resp += `* **${c.nombre} (${c.sede}):** **${conf}** confirmados, **${porConf}** por confirmar, de **${asig}** asignados.\n`;
+          resp += `* **${c.nombre} (${c.sede}):** **${conf} PX** confirmados, **${porConf} PX** por confirmar, de **${asig} PX** asignados.\n`;
         }
       });
 
-      resp += `\n📈 **Resumen de Llamadas Nodus (Equipo ${equipoNum}):**\n`;
-      resp += `* **Confirmados por llamada:** **${totalConf}**\n`;
-      if (totalPorConf > 0) resp += `* **Por Confirmar:** **${totalPorConf}**\n`;
-      if (totalLlam > 0) resp += `* **Gestiones / Llamadas realizadas:** **${totalLlam}**\n`;
-      resp += `\n💡 _Nota: Si el padrón total en Nodus registra 121 contactos, los ${totalConf} confirmados corresponden a las gestiones telefónicas activas cargadas por las coordinadoras hasta el último corte._\n`;
+      resp += `\n📈 **Balance de Personas (PX) vs Gestiones (Equipo ${equipoNum}):**\n`;
+      resp += `* **PX Confirmados:** **${totalConf} personas**\n`;
+      if (totalPorConf > 0) resp += `* **PX Por Confirmar:** **${totalPorConf} personas**\n`;
+      resp += `* **Total Intentos / Gestiones de Llamada:** **${totalLlam} llamadas** (un PX recibe múltiples llamadas hasta lograr el contacto efectivo)\n`;
+      resp += `\n💡 _Regla Operativa CPSL: El número de llamadas mide esfuerzo y frecuencia de seguimiento; el número de PX (participantes) mide cabezas reales en sala._\n`;
     } else if (!directTeamReport) {
       resp += `⚠️ No encuentro datos en vivo verificados (Nodus/Firestore) para el Equipo ${equipoNum} en este momento. No voy a inventar cifras — puedes pedirme el reporte general de sedes ("¿cómo van los confirmados?") mientras se sincroniza, o consultar directamente en Nodus/el padrón oficial.`;
     }
@@ -163,9 +163,9 @@ function generateAssertiveResponse(queryText, nodusData, currentUser, messageHis
         `No tengo un snapshot reciente de Nodus/Firestore para darte cifras verificadas de enrolamiento. No voy a inventar totales — intenta de nuevo en unos minutos o revisa directamente el dashboard de Nodus.`;
     }
     let resp = `📊 **Reporte de Enrolamiento y Confirmados (Nodus Live Audit):**\n\n`;
-    resp += `* **Total Asignados:** **${totales.totalAsignados ?? 'sin dato'}** contactos\n`;
-    resp += `* **Confirmados a Sala:** **${totales.totalConfirmados ?? 'sin dato'}** participantes confirmados\n`;
-    resp += `* **Gestiones Realizadas:** **${totales.totalGestiones ?? 'sin dato'}** llamadas efectivas\n`;
+    resp += `* **Total Contactos Asignados (PX):** **${totales.totalAsignados ?? 'sin dato'}** personas\n`;
+    resp += `* **Confirmados a Sala (PX):** **${totales.totalConfirmados ?? 'sin dato'}** personas confirmadas\n`;
+    resp += `* **Total Intentos / Gestiones:** **${totales.totalGestiones ?? 'sin dato'}** llamadas realizadas (múltiples llamadas por cada PX)\n`;
     if (totales.totalAsignados > 0) {
       const conv = Math.round(((totales.totalConfirmados || 0) / totales.totalAsignados) * 100);
       resp += `* **Tasa de Conversión Real:** **${conv}%**\n\n`;
