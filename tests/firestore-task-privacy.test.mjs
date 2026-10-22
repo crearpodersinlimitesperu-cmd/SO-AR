@@ -730,7 +730,7 @@ test('root and participant reopen events are linked separately without releasing
 
 test('legacy migration races reject old-map writes and preserve the original closed state without inventing an event', async () => {
   const email = 'owner@example.com';
-  const closed = { completed: true, progress: 100, completedAt: 'legacy-close' };
+  const closed = { completed: true, progress: 100 };
   await seedTasks([{
     id: 'custom_migration_race', isCustom: true, createdBy: email, completed: false,
     assignedToEmails: [email], assigneeProgress: { [email]: closed }

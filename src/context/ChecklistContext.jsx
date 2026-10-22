@@ -256,7 +256,7 @@ export function ChecklistProvider({ children }) {
               cycleScoped: true
             })
           : {
-              completed: prevData.completed === true || prevData.status === 'Completada',
+              completed: isTaskClosedForDelivery(prevData),
               completion: null
             };
         const reopeningRequested = previous.completed && nextCompleted === false;
@@ -1539,11 +1539,13 @@ export function ChecklistProvider({ children }) {
         };
 
         const nowIso = new Date().toISOString();
+        const individualWasCompleted = isTaskClosedForDelivery(prevEntry);
         const nextProgVal = progressPercentage !== null ? progressPercentage : (isCompleted ? 100 : 0);
         currentProgress[targetKey] = {
           ...prevEntry,
           completed: isCompleted,
-          completedAt: isCompleted ? (prevEntry.completedAt || nowIso) : null,
+          ...(!isCompleted ? { completedAt: null }
+            : !individualWasCompleted ? { completedAt: nowIso } : {}),
           progress: nextProgVal
         };
 
@@ -1558,10 +1560,9 @@ export function ChecklistProvider({ children }) {
           return acc + val;
         }, 0);
         const overallPercent = totalItems > 0 ? Math.round(sumProgress / totalItems) : (isCompleted ? 100 : 0);
-        const previousCompleted = data.completed === true || data.status === 'Completada';
+        const previousCompleted = isTaskClosedForDelivery(data);
         const completionTransition = !previousCompleted && allCompleted;
         const reopenTransition = previousCompleted && !allCompleted;
-        const individualWasCompleted = isTaskClosedForDelivery(prevEntry);
         const individualTransition = individualWasCompleted !== isCompleted;
         const rootTransition = completionTransition || reopenTransition;
         const rootEventId = `${eventId}_root`;
@@ -1571,7 +1572,11 @@ export function ChecklistProvider({ children }) {
           status: allCompleted ? 'Completada' : (anyCompleted ? 'En Progreso' : 'Pendiente'),
           progressPercentage: overallPercent,
           progress: overallPercent,
-          completedAt: allCompleted ? (data.completedAt || nowIso) : null,
+          ...(allCompleted
+            ? (previousCompleted
+              ? ('completedAt' in data ? { completedAt: data.completedAt } : {})
+              : { completedAt: nowIso })
+            : { completedAt: null }),
           updatedAt: nowIso,
           lifecycleMutation: {
             eventId: rootTransition ? rootEventId : eventId,

@@ -529,6 +529,22 @@ test('task transactions roll back rejected optimism, gate celebrations and prese
     });
     await page.waitForFunction(() => window.fixtureApi.tasks.some(task => task.id === 'bulk-open'));
 
+    await page.evaluate(() => {
+      window.fixtureStore['closed-without-date'] = {
+        id: 'closed-without-date', isCustom: true, createdBy: 'owner@example.test',
+        assignedToEmails: ['owner@example.test'], progress: 100,
+        assigneeProgress: { 'owner@example.test': { completed: true, progress: 100 } }
+      };
+      window.publishFixture();
+    });
+    assert.equal(await page.evaluate(() => window.fixtureApi.updateIndividualProgress(
+      'closed-without-date', 'owner@example.test', true)), true);
+    const undated = await page.evaluate(() => window.fixtureTask('closed-without-date'));
+    assert.equal('completedAt' in undated, false, 'reasserting a closed root never invents a historical date');
+    assert.equal('completedAt' in undated.assigneeProgress['owner@example.test'], false);
+    assert.equal(await page.evaluate(() => Object.values(window.fixtureEvents)
+      .some(event => event.taskId === 'closed-without-date')), false, 'no synthetic historical closure event');
+
     await page.evaluate(() => { window.fixtureWriteError = true; });
     assert.equal((await call('updateTaskDetails', 'catalog', { progressPercentage: 50 })).ok, false);
     assert.deepEqual((await state()).find(t => t.id === 'catalog'), reopened);
