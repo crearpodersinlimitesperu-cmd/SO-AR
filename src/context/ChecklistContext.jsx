@@ -385,7 +385,7 @@ export function ChecklistProvider({ children }) {
             occurredAt: serverTimestamp(),
             source: 'manual',
             scope: eventScope,
-            ...(isCompleted ? { closureContext: taskClosureContext(data) } : {})
+            ...(!reopenTransition ? { closureContext: nextUpdates.lifecycleMutation.closureContext } : {})
           });
         }
       });

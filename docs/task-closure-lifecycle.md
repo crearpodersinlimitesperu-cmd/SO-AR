@@ -31,6 +31,10 @@ La causa residual estaba en `src/components/TaskDetailModal.jsx` (`handleSaveAll
 
 SMTP y Firestore no comparten una transacción. Sin soporte de idempotencia del proveedor, no es posible garantizar exactamente una entrega. `DELIVERY_UNKNOWN` requiere conciliación manual y evita un reintento automático ciego; no demuestra si el proveedor entregó el correo.
 
+Correo con varios destinatarios sin `recipientEmail`: la relectura pre-SMTP evalúa cada destinatario; se omiten los participantes cerrados (se registra solo `delivery.suppressedClosedRecipients`, un contador) y se envía a los abiertos; si todos están cerrados queda `SKIPPED_CLOSED`.
+
+Límite de participantes: la regla de Firestore verifica como máximo diez participantes modificados por escritura (`lifecycleMutation.assigneeKeys`, 1000 expresiones por evaluación). El modal solo envía las entradas que el usuario cambió respecto de la línea base normalizada, por lo que la normalización legacy no cuenta; una única edición de más de diez participantes distintos se rechaza (no hay fragmentación automática) sin relajar la protección terminal.
+
 Control de volumen y alerta interna: antes de reclamar un correo vinculado a tarea, el mailer consume transaccionalmente presupuestos diarios UTC (`mail_delivery_budgets`): 30 intentos por tarea, 20 por destinatario y 6 por par tarea+destinatario. Al agotarse, el documento pasa a `SKIPPED_RATE_LIMIT` (terminal, sin SMTP) y se crea una sola notificación interna `MAIL_DELIVERY_ANOMALY` por administrador (`SUPER_ADMIN_EMAILS`, id determinista), sin contenido de tarea ni correos en el texto. Los umbrales son decisiones de ingeniería de este cambio, no valores aprobados por negocio; no hay canal externo (correo/Slack). Los reintentos por documento siguen limitados a 3.
 
 Auditoría de cierre: cada evento `completed` guarda `closureContext` (comentarios, `evidenceUrl` y lista `evidences` vigentes al cerrar, con límites de tamaño); las reglas exigen que coincida con la tarea resultante, y el evento es inmutable. La aplicación no tiene campos de comentario/evidencia específicos del cierre: se registra el estado vigente en ese momento, no se distingue cuál se añadió "para cerrar". Los cierres anteriores a este cambio no tienen ese snapshot.
@@ -52,7 +56,7 @@ Los correos de tarea antiguos sin `taskId` ni `calendarEvent.taskId` no permiten
 | 7 | Recordatorios vencidos son idempotentes y actualizan debounce atómicamente solo al encolar. | Implementado; pruebas locales pendientes | `enqueueOverdueTaskMails`, IDs deterministas y test concurrente |
 | 8 | Intentos quedan contados por documento y nunca exceden tres. | Implementado; pruebas locales pendientes | Claim transaccional, `recordMailFailure`, pruebas de retry cap |
 | 9 | El lease evita claims simultáneos; SMTP/confirmación ambiguos no se reenvían automáticamente. | Implementado; pruebas SMTP integradas pendientes | `DELIVERY_UNKNOWN`, prueba de lease vencido y respuesta ambigua |
-| 10 | Un ciclo cerrado no bloquea otro ciclo, correo no task-bound queda fuera del filtro de cierre, y una identidad ajena no modifica/ve tareas privadas. | Implementado en fixtures/emulador; CI pendiente | Pruebas de ciclos, `operational_broadcast`, cambio de identidad simulado y reglas; sin acceso a producción |
+| 10 | Un ciclo cerrado no bloquea otro ciclo, correo no task-bound queda fuera del filtro de cierre, y una identidad ajena no modifica/ve tareas privadas. | Implementado en fixtures/emulador; CI del head final pendiente | Pruebas de ciclos, `operational_broadcast`, cambio de identidad simulado y reglas; sin acceso a producción |
 
 ## Plan de validación
 

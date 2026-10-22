@@ -228,14 +228,33 @@ export async function skipTaskMailIfClosed(db, ref, data, recipients, now = Date
 
   const taskSnapshot = await db.collection('tasks').doc(taskId).get();
   const taskData = taskSnapshot.exists ? taskSnapshot.data() : null;
-  const state = !taskSnapshot.exists
+  const closedFor = recipientEmail => isTaskClosedForDelivery(taskData, {
+    completionScope: data.completionScope,
+    recipientEmail
+  });
+  let suppressed = 0;
+  let state = !taskSnapshot.exists
     ? 'SKIPPED_TASK_MISSING'
     : hasAmbiguousCycleCompletionScope(taskData, data)
       ? 'SKIPPED_SCOPE_UNKNOWN'
-      : isTaskClosedForDelivery(taskData, {
-        completionScope: data.completionScope,
-        recipientEmail: data.recipientEmail || (recipients.length === 1 ? recipients[0] : undefined)
-      }) ? 'SKIPPED_CLOSED' : null;
+      : null;
+  if (!state) {
+    const explicit = data.recipientEmail ? String(data.recipientEmail) : undefined;
+    if (!recipients.length || (explicit && closedFor(explicit))) {
+      state = closedFor(explicit) ? 'SKIPPED_CLOSED' : null;
+    } else {
+      const open = recipients.filter(recipient => !closedFor(recipient));
+      if (!open.length) state = 'SKIPPED_CLOSED';
+      else if (open.length < recipients.length) {
+        suppressed = recipients.length - open.length;
+        // Se filtra en el mismo arreglo que usa el remitente SMTP: los destinatarios cerrados no reciben el envio.
+        recipients.splice(0, recipients.length, ...open);
+      }
+    }
+  }
+  if (!state && suppressed) {
+    await ref.update({ 'delivery.suppressedClosedRecipients': suppressed });
+  }
   if (!state) return false;
 
   await ref.update({

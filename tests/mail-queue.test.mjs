@@ -427,3 +427,25 @@ test('missing documents and transaction failures never produce a send claim', as
     runTransaction: async () => { throw new Error('transaction failed'); }
   }, ref('mail/failure'), now), /transaction failed/);
 });
+
+test('multi-recipient task mail without recipientEmail drops closed participants and keeps open ones', async () => {
+  const { db, ref, docs } = fakeFirestore({
+    'mail/multi': { type: 'task_reminder', taskId: 'task', to: ['a@example.test', 'b@example.test'], delivery: { state: 'SENDING', attemptCount: 1 } },
+    'tasks/task': {
+      completed: false,
+      status: 'Pendiente',
+      assigneeProgress: { 'a@example.test': { completed: true, status: 'Completada' }, 'b@example.test': { completed: false } }
+    }
+  });
+  const recipients = ['a@example.test', 'b@example.test'];
+  assert.equal(await skipTaskMailIfClosed(db, ref('mail/multi'), docs.get('mail/multi'), recipients, now), false);
+  assert.deepEqual(recipients, ['b@example.test']);
+  assert.equal(docs.get('mail/multi').delivery.suppressedClosedRecipients, 1);
+
+  docs.set('tasks/task', { completed: false, assigneeProgress: {
+    'a@example.test': { completed: true }, 'b@example.test': { completed: true }
+  } });
+  const both = ['a@example.test', 'b@example.test'];
+  assert.equal(await skipTaskMailIfClosed(db, ref('mail/multi'), docs.get('mail/multi'), both, now + 1), 'SKIPPED_CLOSED');
+  assert.equal(docs.get('mail/multi').delivery.state, 'SKIPPED_CLOSED');
+});

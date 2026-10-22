@@ -294,6 +294,8 @@ test('task transactions roll back rejected optimism, gate celebrations and prese
     assert.equal(completionEvent.actorEmail, 'owner@example.test');
     assert.equal(completionEvent.source, 'manual');
     assert.deepEqual(completionEvent.scope, { sede: 'Lima', cycleId: 'cycle-1' });
+    assert.ok(completionEvent.closureContext && Array.isArray(completionEvent.closureContext.evidences),
+      'the completion event carries the closure snapshot written by the real writeTaskDoc');
     assert.ok(Number.isFinite(Date.parse(completionEvent.occurredAt)),
       'the committed transition event survives the reload alongside the task');
     assert.equal(completed.completed, true);
