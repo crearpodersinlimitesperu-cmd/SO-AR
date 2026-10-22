@@ -43,6 +43,13 @@ beforeEach(async () => {
       roles: ['coord_c1'],
       sede: 'Lima'
     });
+    await setDoc(doc(context.firestore(), 'users', 'coord-2'), {
+      uid: 'coord-2',
+      email: 'other-coordinator@example.com',
+      role: 'coord_c2',
+      roles: ['coord_c2'],
+      sede: 'Lima'
+    });
   });
 });
 
@@ -245,7 +252,7 @@ test('role-and-ID scoped catalog queries succeed without exposing other roles', 
   await assertFails(getDocs(otherRoleQuery));
 });
 
-test('catalog completion transaction can update task and enqueue mail and notification', async () => {
+test('catalog completion transaction records an immutable lifecycle event', async () => {
   await seedTasks([{ id: 'soar_12', role: 'coord_c1', isCustom: false, completed: false, status: 'Pendiente' }]);
   const db = coordinatorDb();
   const completedAt = new Date().toISOString();
@@ -261,27 +268,114 @@ test('catalog completion transaction can update task and enqueue mail and notifi
           status: 'Completada',
           cycleId: 'cycle-1',
           cycleName: 'Cycle 1',
-          completedAt
+          completedAt,
+          completionId: 'close-event'
         }
       },
       completedAt
     });
-    transaction.set(doc(db, 'mail', 'task_completed_event-1'), {
-      to: ['assigner@example.com'],
-      type: 'task_completed_alert',
-      delivery: { state: 'PENDING' },
-      createdAt: completedAt,
-      message: { subject: 'Task completed', html: '<p>Completed</p>' }
-    });
-    transaction.set(doc(db, 'notifications', 'task_completed_event-1'), {
-      userId: 'assigner@example.com',
-      title: 'Task completed',
-      message: 'A task was completed.',
+    transaction.set(doc(db, 'task_completion_events', 'close-event'), {
       taskId: 'soar_12',
-      type: 'task_completed',
-      read: false,
-      created_at: completedAt
+      action: 'completed',
+      actorEmail: 'coord@example.com',
+      occurredAt: completedAt,
+      source: 'manual',
+      scope: { sede: 'Lima', cycleId: 'cycle-1' }
     });
+  }));
+  await assertFails(updateDoc(doc(db, 'task_completion_events', 'close-event'), { action: 'reopened' }));
+  await assertFails(setDoc(doc(userDb('other', 'other@example.com'), 'task_completion_events', 'forged'), {
+    taskId: 'soar_12',
+    action: 'completed',
+    actorEmail: 'other@example.com',
+    occurredAt: completedAt,
+    source: 'manual',
+    scope: { sede: 'Lima', cycleId: 'cycle-1' }
+  }));
+});
+
+test('cycle-scoped manual reopening is auditable without closing another cycle', async () => {
+  await seedTasks([{
+    id: 'soar_12',
+    role: 'coord_c1',
+    isCustom: false,
+    completed: false,
+    status: 'Pendiente',
+    completions: {
+      'Lima__cycle-1': { completed: true, status: 'Completada', cycleId: 'cycle-1' },
+      'Lima__cycle-2': { completed: false, status: 'Pendiente', cycleId: 'cycle-2' }
+    }
+  }]);
+  const db = coordinatorDb();
+  await assertSucceeds(runTransaction(db, async transaction => {
+    transaction.update(doc(db, 'tasks', 'soar_12'), {
+      'completions.Lima__cycle-1': { completed: false, status: 'Pendiente', cycleId: 'cycle-1' }
+    });
+    transaction.set(doc(db, 'task_completion_events', 'reopen-cycle-1'), {
+      taskId: 'soar_12',
+      action: 'reopened',
+      actorEmail: 'coord@example.com',
+      occurredAt: new Date().toISOString(),
+      source: 'manual',
+      scope: { sede: 'Lima', cycleId: 'cycle-1' }
+    });
+  }));
+  const task = (await assertSucceeds(getDoc(doc(db, 'tasks', 'soar_12')))).data();
+  assert.equal(task.completions['Lima__cycle-1'].completed, false);
+  assert.equal(task.completions['Lima__cycle-2'].completed, false);
+  await assertFails(updateDoc(
+    doc(userDb('coord-2', 'other-coordinator@example.com'), 'tasks', 'soar_12'),
+    { completed: false, status: 'Pendiente' }
+  ));
+  const otherCoordinator = userDb('coord-2', 'other-coordinator@example.com');
+  await assertFails(runTransaction(otherCoordinator, async transaction => {
+    const taskRef = doc(otherCoordinator, 'tasks', 'soar_12');
+    transaction.update(taskRef, {
+      'completions.Lima__cycle-1': { completed: false, status: 'Pendiente', cycleId: 'cycle-1' }
+    });
+    transaction.set(doc(otherCoordinator, 'task_completion_events', 'unauthorized-reopen'), {
+      taskId: 'soar_12',
+      action: 'reopened',
+      actorEmail: 'other-coordinator@example.com',
+      occurredAt: new Date().toISOString(),
+      source: 'manual',
+      scope: { sede: 'Lima', cycleId: 'cycle-1' }
+    });
+  }));
+});
+
+test('a personal task owner can explicitly reopen it with an immutable audit event', async () => {
+  await seedTasks([{
+    id: 'custom_closed',
+    isCustom: true,
+    assignedToEmail: 'owner@example.com',
+    createdBy: 'owner@example.com',
+    completed: true,
+    status: 'Completada',
+    completedAt: 'recorded-close'
+  }]);
+  const ownerDb = userDb('owner', 'owner@example.com');
+  const occurredAt = new Date().toISOString();
+
+  await assertSucceeds(runTransaction(ownerDb, async transaction => {
+    transaction.update(doc(ownerDb, 'tasks', 'custom_closed'), {
+      completed: false,
+      status: 'Pendiente',
+      completedAt: null
+    });
+    transaction.set(doc(ownerDb, 'task_completion_events', 'owner-reopen'), {
+      taskId: 'custom_closed',
+      action: 'reopened',
+      actorEmail: 'owner@example.com',
+      occurredAt,
+      source: 'manual',
+      scope: {}
+    });
+  }));
+  await assertFails(updateDoc(doc(userDb('unrelated', 'unrelated@example.com'), 'tasks', 'custom_closed'), {
+    completed: false,
+    status: 'Pendiente',
+    completedAt: null
   }));
 });
 

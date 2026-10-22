@@ -13,8 +13,13 @@ test('task transactions roll back rejected optimism, gate celebrations and prese
   `;
   const mocks = {
     '../context/AuthContext': `
-      const currentUser = { uid: 'fixture-owner', email: 'owner@example.test', appRole: 'gerente',
-        roles: ['gerente'], sede: new URLSearchParams(location.search).has('teams') ? 'Quito' : 'Lima' };
+      const params = new URLSearchParams(location.search);
+      const otherUser = params.has('otherUser');
+      const currentUser = {
+        uid: otherUser ? 'fixture-other' : 'fixture-owner',
+        email: otherUser ? 'other@example.test' : 'owner@example.test',
+        appRole: 'gerente', roles: ['gerente'], sede: params.has('teams') ? 'Quito' : 'Lima'
+      };
       export const useAuth = () => ({ currentUser });
     `,
     '../context/UIContext': `
@@ -40,7 +45,11 @@ test('task transactions roll back rejected optimism, gate celebrations and prese
     './CyclesContext': `export { useCycles } from '../context/CyclesContext';`,
     '../data/checklistData': catalog,
     '../data/checklistData.js': catalog,
-    '../services/firebase': `export const db = {}; export const auth = { currentUser: { email: 'owner@example.test' } };`,
+    '../services/firebase': `
+      const otherUser = new URLSearchParams(location.search).has('otherUser');
+      export const db = {};
+      export const auth = { currentUser: { email: otherUser ? 'other@example.test' : 'owner@example.test' } };
+    `,
     '../services/googleSync': `export const createGoogleTask = () => { throw new Error('No external sync allowed'); };`,
     '../utils/neuroFeedback': `export const celebrateVictory = () => { window.fixtureCelebrations++; };`,
     '../components/TaskCompletionChoiceModal': `
@@ -54,7 +63,7 @@ test('task transactions roll back rejected optimism, gate celebrations and prese
       const sede = params.has('teams') ? 'Quito' : 'Lima';
       const initial = {
         catalog: { id: 'catalog', role: 'gerente', task: 'Fixture catalog', cyclePhase: 'PRE-C1',
-          completed: false, status: 'En progreso', progressPercentage: 25,
+          completed: false, status: 'En progreso', completedAt: null, progressPercentage: 25,
           comments: 'Original comment', responsible: 'Fixture manager',
           history: [{ action: 'created', at: 'original-time' }], created_at: 'original-time',
           completions: {
@@ -68,7 +77,21 @@ test('task transactions roll back rejected optimism, gate celebrations and prese
         'catalog-direct': { id: 'catalog-direct', role: 'gerente', task: 'Fixture direct',
           cyclePhase: 'PRE-C1', assignedToEmails: ['owner@example.test'], completed: false },
         'catalog-custom': { id: 'catalog-custom', role: 'gerente', task: 'Fixture custom',
-          cyclePhase: 'PRE-C1', isCustom: true, createdBy: 'owner@example.test', completed: false }
+          cyclePhase: 'PRE-C1', isCustom: true, createdBy: 'owner@example.test', completed: false },
+        'closed-multi': { id: 'closed-multi', task: 'Fixture closed multi-assignee', isCustom: true,
+          assignedToEmails: ['owner@example.test', 'other@example.test'], completed: true,
+          status: 'Completada', completedAt: 'root-close', progressPercentage: 100,
+          assigneeProgress: {
+            'owner@example.test': { completed: true, completedAt: 'owner-close', progress: 100 },
+            'other@example.test': { completed: false, progress: 10 }
+          } },
+        'multi-assignee-open': { id: 'multi-assignee-open', task: 'Fixture open multi-assignee', isCustom: true,
+          assignedToEmails: ['owner@example.test', 'other@example.test'], completed: false,
+          status: 'En Progreso', progressPercentage: 55,
+          assigneeProgress: {
+            'owner@example.test': { completed: true, completedAt: 'owner-close', progress: 100 },
+            'other@example.test': { completed: false, progress: 10 }
+          } }
       };
       const store = JSON.parse(localStorage.getItem('task-lifecycle-fixture') || JSON.stringify(initial));
       window.fixtureStore = store;
@@ -262,17 +285,115 @@ test('task transactions roll back rejected optimism, gate celebrations and prese
     assert.equal(completed.completed, true);
     assert.equal(completed.progressPercentage, 100);
     assert.ok(completed.completedAt);
+    assert.equal(await page.evaluate(() => window.fixtureStore.catalog.completed), false);
+    assert.equal(await page.evaluate(() => window.fixtureStore.catalog.status), 'En progreso');
+    assert.equal(await page.evaluate(() => window.fixtureStore.catalog.completedAt), null,
+      'cycle completion does not set global closure fields');
+    assert.equal(await page.evaluate(() => window.fixtureStore.catalog.progressPercentage), 25);
+    assert.equal(await page.evaluate(() =>
+      window.fixtureStore.catalog.completions['Lima__cycle-1'].completed
+    ), true);
     assert.equal(completed.completions.Lima__old.completedAt, 'original-close');
     assert.equal(completed.responsible, 'Fixture manager');
     assert.deepEqual(completed.history, [{ action: 'created', at: 'original-time' }]);
+    assert.deepEqual(await call('updateTaskDetails', 'catalog', {
+      completed: false,
+      status: 'Pendiente',
+      progressPercentage: 25,
+      progress: 25,
+      completedAt: null,
+      comments: 'Saved evidence while closed'
+    }), { ok: true });
+    const preserved = (await state()).find(t => t.id === 'catalog');
+    assert.equal(preserved.completed, true, 'ordinary saves cannot reopen a closed cycle');
+    assert.equal(preserved.progressPercentage, 100);
+    assert.equal(preserved.completedAt, completed.completedAt);
+    assert.equal(preserved.comments, 'Saved evidence while closed');
+    assert.equal(await page.evaluate(() => window.fixtureStore.catalog.completed), false);
+    assert.deepEqual(await call('updateTaskDetails', 'catalog', {
+      status: 'Pendiente de validación',
+      completedAt: null,
+      comments: 'Saved an auxiliary status while closed'
+    }), { ok: true });
+    const preservedAuxiliaryStatus = (await state()).find(t => t.id === 'catalog');
+    assert.equal(preservedAuxiliaryStatus.completed, true);
+    assert.equal(preservedAuxiliaryStatus.status, 'Completada');
+    assert.equal(preservedAuxiliaryStatus.completedAt, preserved.completedAt);
+    assert.equal(await page.evaluate(() =>
+      window.fixtureStore.catalog.completions['Lima__cycle-1'].status
+    ), 'Completada');
+    assert.ok(await page.evaluate(() => window.fixtureWrites.some(write =>
+      write.ref.path === 'task_completion_events' && write.updates.action === 'completed')));
+
     await start('catalog', true);
     await page.waitForFunction(() => window.fixtureApi.tasks.find(t => t.id === 'catalog')?.completed === false);
     await reject();
-    assert.deepEqual((await state()).find(t => t.id === 'catalog'), completed, 'failed reopen preserves closure time and history');
+    assert.deepEqual((await state()).find(t => t.id === 'catalog'), preservedAuxiliaryStatus, 'failed reopen preserves closure time and history');
+    assert.deepEqual(await call('updateTaskDetails', 'catalog', {
+      completed: false, status: 'Pendiente', progressPercentage: 75, progress: 75, completedAt: null
+    }, null, true), { ok: true });
+    const reopened = (await state()).find(t => t.id === 'catalog');
+    assert.equal(reopened.completed, false);
+    assert.equal(reopened.completedAt, null);
+    assert.equal(await page.evaluate(() => window.fixtureStore.catalog.completed), false,
+      'reopening a cycle does not rewrite root/global completion');
+    assert.equal(await page.evaluate(() => window.fixtureStore.catalog.completedAt), null);
+    assert.ok(await page.evaluate(() => window.fixtureWrites.some(write =>
+      write.ref.path === 'task_completion_events' && write.updates.action === 'reopened')));
+
+    assert.deepEqual(await call('updateTaskDetails', 'closed-multi', {
+      completed: false,
+      status: 'Pendiente',
+      completedAt: null,
+      progressPercentage: 45,
+      assigneeProgress: {
+        'owner@example.test': { completed: false, completedAt: null, progress: 25 },
+        'other@example.test': { completed: false, progress: 45 }
+      },
+      comments: 'Stale multi-assignee form save'
+    }), { ok: true });
+    const closedMulti = await page.evaluate(() => window.fixtureStore['closed-multi']);
+    assert.equal(closedMulti.completed, true);
+    assert.equal(closedMulti.status, 'Completada');
+    assert.equal(closedMulti.completedAt, 'root-close');
+    assert.deepEqual(closedMulti.assigneeProgress['owner@example.test'], {
+      completed: true, completedAt: 'owner-close', progress: 100
+    });
+    assert.deepEqual(closedMulti.assigneeProgress['other@example.test'], {
+      completed: false, progress: 10
+    }, 'ordinary saves of a globally closed task preserve the entire assignee map');
+    assert.deepEqual(await call('updateTaskDetails', 'multi-assignee-open', {
+      assigneeProgress: {
+        'owner@example.test': { completed: false, completedAt: null, progress: 25 },
+        'other@example.test': { completed: false, progress: 45 }
+      }
+    }), { ok: true });
+    const openMulti = await page.evaluate(() => window.fixtureStore['multi-assignee-open']);
+    assert.equal(openMulti.assigneeProgress['owner@example.test'].completed, true);
+    assert.equal(openMulti.assigneeProgress['owner@example.test'].completedAt, 'owner-close');
+    assert.equal(openMulti.assigneeProgress['other@example.test'].progress, 45,
+      'an open assignee can advance while another assignee remains closed');
+    await page.evaluate(() => { window.fixtureWrites = []; });
+    assert.deepEqual(await call('editCustomTask', 'closed-multi', {
+      task: 'Updated closed task',
+      assignedToEmails: ['owner@example.test', 'other@example.test'],
+      assigneeProgress: {
+        'owner@example.test': { completed: false, progress: 0 },
+        'other@example.test': { completed: false, progress: 0 }
+      }
+    }), { ok: true });
+    const editedClosedMulti = await page.evaluate(() => window.fixtureStore['closed-multi']);
+    assert.equal(editedClosedMulti.completed, true);
+    assert.equal(editedClosedMulti.completedAt, 'root-close');
+    assert.equal(editedClosedMulti.assigneeProgress['owner@example.test'].completed, true);
+    assert.equal(editedClosedMulti.assigneeProgress['other@example.test'].progress, 10);
+    assert.equal(await page.evaluate(() => window.fixtureWrites.some(write =>
+      write.ref.path === 'mail' || write.ref.path === 'notifications'
+    )), false, 'assignment edits of a closed task do not create email or in-app notifications');
 
     await page.evaluate(() => { window.fixtureWriteError = true; });
     assert.equal((await call('updateTaskDetails', 'catalog', { progressPercentage: 50 })).ok, false);
-    assert.deepEqual((await state()).find(t => t.id === 'catalog'), completed);
+    assert.deepEqual((await state()).find(t => t.id === 'catalog'), reopened);
     await page.evaluate(() => { window.fixtureWriteError = false; });
     assert.deepEqual(await call('updateTaskDetails', 'catalog-new', {
       progressPercentage: 50, comments: 'First catalog write', responsible: 'Fixture manager'
@@ -287,6 +408,9 @@ test('task transactions roll back rejected optimism, gate celebrations and prese
     assert.equal(created.responsible, 'Fixture manager');
     await load('?cycle=cycle-2');
     assert.equal((await state()).find(t => t.id === 'catalog').completed, false, 'a new cycle does not inherit completion');
+    assert.equal(await page.evaluate(() =>
+      window.fixtureStore.catalog.completions['Lima__cycle-1'].completed
+    ), false, 'reopening only changes the explicitly targeted cycle');
 
     await load('?noCycle');
     for (const [method, args] of [
@@ -309,11 +433,12 @@ test('task transactions roll back rejected optimism, gate celebrations and prese
       const saved = await page.evaluate(id => window.fixtureStore[id], id);
       assert.equal(saved.completed, true);
       assert.equal(saved.comments, 'Kept without a cycle');
+      assert.equal(saved.status, 'Completada');
       assert.ok(saved.completions.Lima.completed);
       assert.equal(Object.keys(saved.completions).some(key => key.includes('__')), false);
     }
     assert.equal(await page.evaluate(() => window.fixtureStore.personal.assignedByEmail), 'assigner@example.test');
-    assert.ok(await page.evaluate(() => window.fixtureWrites.some(write => write.ref.path === 'mail')));
+    assert.equal(await page.evaluate(() => window.fixtureWrites.some(write => write.ref.path === 'mail')), false);
 
     await load('?teams');
     const beforeTeams = await state();
@@ -331,6 +456,19 @@ test('task transactions roll back rejected optimism, gate celebrations and prese
     assert.equal((await call('toggleTask', 'catalog__EQ202', false, '202')).ok, false);
     assert.deepEqual(await state(), noTeamCycle);
     assert.equal(await page.evaluate(() => window.fixtureWrites.length), 0, 'never fall back to the other Quito team cycle');
+    await load('?otherUser');
+    const otherUserTasks = await state();
+    assert.equal(otherUserTasks.some(task => task.id === 'personal'), false,
+      "switching session identity does not expose another user's personal task");
+    assert.equal(otherUserTasks.some(task => task.id === 'closed-multi'), true,
+      'the separately assigned collaborator retains access to their shared task');
+    await page.reload();
+    await page.waitForFunction(() => window.fixtureApi?.loading === false);
+    assert.equal((await state()).some(task => task.id === 'personal'), false,
+      'reload keeps the other identity isolated');
+    await load();
+    assert.equal((await state()).some(task => task.id === 'personal'), true,
+      'the original owner retains their task after switching back');
     assert.deepEqual(errors, []);
   } finally {
     await browser?.close();

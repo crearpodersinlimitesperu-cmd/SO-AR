@@ -347,6 +347,47 @@ service cloud.firestore {
         ]);
     }
 
+    function canWriteTaskCompletionEvent(taskData) {
+      return isSuperAdmin() || isGerenteODireccion() ||
+        isOwner(taskData) || isCollaborator(taskData) ||
+        isChecklistCatalogTask(taskData, isPersonalTask(taskData));
+    }
+
+    function validTaskCompletionEvent() {
+      let event = request.resource.data;
+      let taskPath = /databases/$(database)/documents/tasks/$(event.taskId);
+      let taskExisted = exists(taskPath);
+      let taskExistsAfter = existsAfter(taskPath);
+      let beforeTask = taskExisted ? get(taskPath).data : {};
+      let afterTask = taskExistsAfter ? getAfter(taskPath).data : {};
+      let scope = event.get('scope', {});
+      let cycleScoped = scope is map && scope.keys().hasAll(['sede', 'cycleId']);
+      let cycleKey = cycleScoped ? scope.sede + '__' + scope.cycleId : '';
+      let beforeState = cycleScoped
+        ? beforeTask.get('completions', {}).get(cycleKey, {})
+        : beforeTask;
+      let afterState = cycleScoped
+        ? afterTask.get('completions', {}).get(cycleKey, {})
+        : afterTask;
+      let wasCompleted = beforeState.get('completed', false) == true ||
+        beforeState.get('status', '') == 'Completada';
+      let isCompleted = afterState.get('completed', false) == true ||
+        afterState.get('status', '') == 'Completada';
+      return event.keys().hasAll(['taskId', 'action', 'actorEmail', 'occurredAt', 'source', 'scope']) &&
+        event.keys().hasOnly(['taskId', 'action', 'actorEmail', 'occurredAt', 'source', 'scope']) &&
+        event.taskId is string && event.taskId.size() > 0 &&
+        event.actorEmail == email() &&
+        event.occurredAt is string && event.occurredAt.size() > 0 &&
+        event.source == 'manual' &&
+        event.scope is map &&
+        (!cycleScoped || (scope.sede is string && scope.sede.size() > 0 &&
+          scope.cycleId is string && scope.cycleId.size() > 0)) &&
+        taskExistsAfter &&
+        (canWriteTaskCompletionEvent(beforeTask) || canWriteTaskCompletionEvent(afterTask)) &&
+        ((event.action == 'completed' && !wasCompleted && isCompleted) ||
+         (event.action == 'reopened' && wasCompleted && !isCompleted));
+    }
+
     // (29/08/2026) MJ_CALENDARS: el rol operativo del usuario (coord_maestria,
     // director_maestria, etc.) no viaja en el token de autenticación ni se
     // puede inferir de una lista fija de correos como isGerenteODireccion().
@@ -443,6 +484,13 @@ service cloud.firestore {
                      isChecklistCatalogTask(resource.data, isPersonalTask(resource.data)) &&
                      isOperationalProgressUpdate());
       allow delete: if isGerenteODireccion() || isSuperAdmin();
+    }
+
+    match /task_completion_events/{eventId} {
+      allow read: if isAuthenticated() &&
+        (resource.data.actorEmail == email() || isSuperAdmin() || isGerenteODireccion());
+      allow create: if isAuthenticated() && validTaskCompletionEvent();
+      allow update, delete: if false;
     }
 
     // GOALS

@@ -14,8 +14,12 @@
 
 import { initializeApp, cert, getApps } from 'firebase-admin/app';
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
-import nodemailer from 'nodemailer';
 import { readFileSync, existsSync } from 'fs';
+import { createTaskMailId } from './mailQueue.js';
+import {
+  hasAmbiguousCycleCompletionScope,
+  isTaskClosedForDelivery
+} from '../src/utils/taskLifecycle.js';
 
 // 1. INICIALIZAR FIREBASE ADMIN
 const CREDENTIALS_PATH = './centro-operativo-cpsl-65ad52160f45.json';
@@ -31,56 +35,7 @@ if (getApps().length === 0) {
 }
 const db = getFirestore();
 
-// 2. CONFIGURAR TRANSPORTE DE CORREO (NODEMAILER)
-const mailSender = process.env.GMAIL_SERVER_EMAIL || process.env.LIMA_GMAIL_USER || 'direccion@crearpsl.net';
-const mailPass = process.env.GMAIL_SERVER_APP_PASSWORD || process.env.LIMA_GMAIL_PASS;
-
-let transporter = null;
-if (mailPass) {
-  transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: mailSender,
-      pass: mailPass
-    }
-  });
-  console.log(`✅ Nodemailer configurado con el remitente: ${mailSender}`);
-} else {
-  console.warn(`⚠️ No se configuraron contraseñas de Gmail. Los correos se registrarán en la colección 'mail' para el daemon.`);
-}
-
-// 3. GENERADOR DE ADJUNTO .ICS (CALENDARIO)
-function buildIcsAttachment(taskId, deadlineIso) {
-  const dtStart = '20260915T170000Z'; // Martes 15 Sept 12:00 m (UTC -5 = 17:00 UTC)
-  const dtEnd = '20260915T173000Z';
-  const dtStamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-  const uid = `${taskId}-${Date.now()}@crearpsl.net`;
-
-  const lines = [
-    'BEGIN:VCALENDAR',
-    'VERSION:2.0',
-    'PRODID:-//Causa OS//ES',
-    'CALSCALE:GREGORIAN',
-    'METHOD:PUBLISH',
-    'BEGIN:VEVENT',
-    `UID:${uid}`,
-    `DTSTAMP:${dtStamp}`,
-    `DTSTART:${dtStart}`,
-    `DTEND:${dtEnd}`,
-    'SUMMARY:🚨 PLAZO MÁXIMO: Entrega de Seguros de Salud Vigentes (Entrenadores CPSL)',
-    'DESCRIPTION:Plazo límite improrrogable (12:00 m) para remitir la póliza o constancia de Seguro de Salud Vigente para entrenadores de C1, C2, MJ y dinámicas físicas (Caída de confianza, Tanque, Rompimiento, Caminata sobre fuego). Causa OS — CREAR PODER SIN LÍMITES.',
-    'STATUS:CONFIRMED',
-    'END:VEVENT',
-    'END:VCALENDAR'
-  ];
-  return {
-    filename: 'compromiso-seguro-salud-entrenador.ics',
-    content: lines.join('\r\n'),
-    contentType: 'text/calendar; charset=utf-8; method=PUBLISH'
-  };
-}
-
-// 4. PLANTILLA HTML DE CORREO INSTITUCIONAL
+// 2. PLANTILLA HTML DE CORREO INSTITUCIONAL
 function buildCoachInsuranceEmailHtml({ coachName, coachEmail, deadlineFormatted }) {
   return `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1e293b; max-width: 650px; margin: 0 auto; border: 1px solid #cbd5e1; border-radius: 12px; overflow: hidden; background-color: #ffffff; box-shadow: 0 4px 16px rgba(0,0,0,0.08);">
@@ -212,6 +167,10 @@ async function main() {
     console.log('✅ La tarea y los correos para la solicitud de seguros de salud ya fueron emitidos exitosamente. Omitiendo reenvío para evitar spam.');
     return;
   }
+  if (existingMasterDoc.exists && isTaskClosedForDelivery(existingMasterDoc.data())) {
+    console.log('⏭️ La tarea maestra ya está cerrada; no se reasigna ni se generan comunicaciones.');
+    return;
+  }
 
   // A. Obtener entrenadores adicionales de Firestore si existen
   const coachesMap = new Map();
@@ -311,15 +270,27 @@ CÓMO ENVIAR LA CONSTANCIA:
 
   // Mapa de progreso individual por entrenador
   const assigneeProgress = {};
+  const existingProgress = existingMasterDoc.data()?.assigneeProgress || {};
   allCoaches.forEach(c => {
-    assigneeProgress[c.email.toLowerCase().trim()] = {
+    const email = c.email.toLowerCase().trim();
+    const previousKey = Object.keys(existingProgress).find(key =>
+      String(key).trim().toLowerCase().replace('@crearpls.com', '@crearpsl.net') ===
+      email.replace('@crearpls.com', '@crearpsl.net')
+    );
+    assigneeProgress[previousKey || email] = {
+      ...(previousKey ? existingProgress[previousKey] : {}),
       name: c.name,
       role: 'entrenador',
-      sede: c.sede || 'Global',
-      completed: false,
-      completedAt: null,
-      progress: 0
+      sede: c.sede || 'Global'
     };
+    if (!previousKey) {
+      assigneeProgress[email] = {
+        ...assigneeProgress[email],
+        completed: false,
+        completedAt: null,
+        progress: 0
+      };
+    }
   });
 
   // C. Guardar o actualizar la Tarea Maestra en Firestore
@@ -358,60 +329,77 @@ CÓMO ENVIAR LA CONSTANCIA:
     assigneeProgress: assigneeProgress
   };
 
-  await db.collection('tasks').doc(masterTaskId).set(taskData, { merge: true });
+  const masterTaskRef = db.collection('tasks').doc(masterTaskId);
+  const masterSaved = await db.runTransaction(async transaction => {
+    const latest = await transaction.get(masterTaskRef);
+    const latestData = latest.exists ? latest.data() : {};
+    if (latest.exists && isTaskClosedForDelivery(latestData)) return false;
+    const payload = { ...taskData };
+    if (latest.exists) {
+      ['completed', 'status', 'completedAt', 'progress', 'progressPercentage', 'created_at'].forEach(field => {
+        delete payload[field];
+      });
+      payload.assigneeProgress = {
+        ...payload.assigneeProgress,
+        ...(latestData.assigneeProgress || {})
+      };
+      if (Array.isArray(latestData.progressNotes)) payload.progressNotes = latestData.progressNotes;
+    }
+    transaction.set(masterTaskRef, payload, { merge: true });
+    return true;
+  });
+  if (!masterSaved) {
+    console.log('⏭️ La tarea maestra se cerró durante la asignación; se omitieron sus comunicaciones.');
+    return;
+  }
   console.log(`✅ Tarea Maestra asignada en Firestore [tasks/${masterTaskId}] con ${coachEmails.length} entrenadores.`);
 
   // D. Guardar también tareas individuales directas por entrenador para garantizar visibilidad al 100% en todas las vistas de Causa OS
   for (const coach of allCoaches) {
     const emailClean = coach.email.toLowerCase().trim().replace(/[^a-z0-9]/g, '_');
     const individualTaskId = `task_seguro_salud_${emailClean}`;
-    await db.collection('tasks').doc(individualTaskId).set({
-      id: individualTaskId,
-      parentTaskId: masterTaskId,
-      task: TASK_TITLE,
-      title: TASK_TITLE,
-      notes: TASK_NOTES,
-      description: TASK_NOTES,
-      comments: TASK_NOTES,
-      deadline: DEADLINE_ISO,
-      priority: '🔴 ROJO',
-      isCritical: true,
-      isOptional: false,
-      periodicity: 'UNICA',
-      role: 'entrenador',
-      assignedSede: coach.sede || 'Global',
-      createdBy: 'jose.sanchez@crearpsl.net',
-      assignedByName: 'José Sánchez — Dirección y Gerencia de Sede',
-      assignedByEmail: 'jose.sanchez@crearpsl.net',
-      assignedToEmail: coach.email.toLowerCase().trim(),
-      assignedToEmails: [coach.email.toLowerCase().trim()],
-      status: 'Pendiente',
-      completed: false,
-      created_at: new Date().toISOString()
-    }, { merge: true });
+    const individualTaskRef = db.collection('tasks').doc(individualTaskId);
+    await db.runTransaction(async transaction => {
+      const existing = await transaction.get(individualTaskRef);
+      const payload = {
+        id: individualTaskId,
+        parentTaskId: masterTaskId,
+        task: TASK_TITLE,
+        title: TASK_TITLE,
+        notes: TASK_NOTES,
+        description: TASK_NOTES,
+        comments: TASK_NOTES,
+        deadline: DEADLINE_ISO,
+        priority: '🔴 ROJO',
+        isCritical: true,
+        isOptional: false,
+        periodicity: 'UNICA',
+        role: 'entrenador',
+        assignedSede: coach.sede || 'Global',
+        createdBy: 'jose.sanchez@crearpsl.net',
+        assignedByName: 'José Sánchez — Dirección y Gerencia de Sede',
+        assignedByEmail: 'jose.sanchez@crearpsl.net',
+        assignedToEmail: coach.email.toLowerCase().trim(),
+        assignedToEmails: [coach.email.toLowerCase().trim()]
+      };
+      if (!existing.exists) {
+        Object.assign(payload, {
+          status: 'Pendiente',
+          completed: false,
+          created_at: new Date().toISOString()
+        });
+      }
+      transaction.set(individualTaskRef, payload, { merge: true });
+    });
   }
   console.log(`✅ Tareas individuales directas registradas para cada uno de los ${allCoaches.length} entrenadores.`);
 
-  // E. Crear Notificaciones In-App para cada entrenador
-  const notifBatch = db.batch();
-  for (const coach of allCoaches) {
-    const notifRef = db.collection('notifications').doc();
-    notifBatch.set(notifRef, {
-      userId: coach.email.toLowerCase().trim(),
-      title: `🚨 ${TASK_TITLE}`,
-      message: `Requerimiento obligatorio: Presentar Seguro de Salud Vigente para entrenadores de C1, C2, MJ y dinámicas físicas. Plazo máximo: ${DEADLINE_FORMATTED}.`,
-      read: false,
-      taskId: masterTaskId,
-      created_at: new Date().toISOString()
-    });
-  }
-  await notifBatch.commit();
-  console.log(`✅ ${allCoaches.length} Notificaciones In-App creadas en Firestore.`);
-
-  // F. Enviar Correos Institucionales y registrar en cola de correo
-  console.log('\n📧 Iniciando envío y registro de correos electrónicos...');
-  let sentCount = 0;
+  // E. Encolar comunicaciones con IDs deterministas y revalidar el cierre en la transacción.
+  console.log('\n📧 Registrando comunicaciones en el outbox de correo...');
   let queuedCount = 0;
+  let skippedClosedCount = 0;
+  let notificationCount = 0;
+  let existingMailCount = 0;
 
   for (const coach of allCoaches) {
     const emailClean = coach.email.toLowerCase().trim();
@@ -420,11 +408,16 @@ CÓMO ENVIAR LA CONSTANCIA:
       coachEmail: emailClean,
       deadlineFormatted: DEADLINE_FORMATTED
     });
-    const icsAttachment = buildIcsAttachment(masterTaskId, DEADLINE_ISO);
-
-    const mailDocRef = db.collection('mail').doc();
+    const individualTaskId = `task_seguro_salud_${emailClean.replace(/[^a-z0-9]/g, '_')}`;
+    const notificationId = createTaskMailId(masterTaskId, 'task_assignment_notification', emailClean, 'initial');
+    const mailId = createTaskMailId(masterTaskId, 'seguro_salud_entrenadores', emailClean, 'initial');
+    const notificationRef = db.collection('notifications').doc(notificationId);
+    const mailDocRef = db.collection('mail').doc(mailId);
     const mailDocData = {
       to: [emailClean],
+      taskId: masterTaskId,
+      recipientEmail: emailClean,
+      delivery: { state: 'PENDING', attemptCount: 0 },
       message: {
         subject: `🚨 SOLICITUD DE SEGUROS DE SALUD VIGENTES DE LOS ENTRENADORES — Causa OS`,
         html: emailHtml
@@ -439,53 +432,60 @@ CÓMO ENVIAR LA CONSTANCIA:
       type: 'seguro_salud_entrenadores'
     };
 
-    // Si transporter está activo, enviar directamente
-    if (transporter) {
-      try {
-        await transporter.sendMail({
-          from: `"CREAR PODER SIN LÍMITES" <${mailSender}>`,
-          to: emailClean,
-          replyTo: 'jose.sanchez@crearpsl.net',
-          subject: `🚨 SOLICITUD DE SEGUROS DE SALUD VIGENTES DE LOS ENTRENADORES — Causa OS`,
-          html: emailHtml,
-          attachments: [icsAttachment]
-        });
-        mailDocData.delivery = {
-          state: 'SUCCESS',
-          deliveredAt: new Date().toISOString(),
-          sentVia: 'direct_nodemailer'
-        };
-        sentCount++;
-        console.log(`   ✉️ Correo enviado exitosamente a: ${coach.name} <${emailClean}>`);
-      } catch (mailErr) {
-        console.error(`   ⚠️ Fallo envío directo a ${emailClean}: ${mailErr.message}. Queda en cola.`);
-        mailDocData.delivery = {
-          state: 'PENDING_RETRY',
-          error: mailErr.message
-        };
-        queuedCount++;
+    const enqueued = await db.runTransaction(async transaction => {
+      const taskSnapshot = await transaction.get(masterTaskRef);
+      const individualTaskRef = db.collection('tasks').doc(individualTaskId);
+      const individualSnapshot = await transaction.get(individualTaskRef);
+      const notificationSnapshot = await transaction.get(notificationRef);
+      const mailSnapshot = await transaction.get(mailDocRef);
+      if (!taskSnapshot.exists || !individualSnapshot.exists) {
+        throw new Error('No se pudo releer la tarea al encolar sus comunicaciones.');
       }
-    } else {
-      queuedCount++;
-    }
-
-    await mailDocRef.set(mailDocData);
+      const taskData = taskSnapshot.data();
+      const individualData = individualSnapshot.data();
+      if (
+        hasAmbiguousCycleCompletionScope(taskData) ||
+        hasAmbiguousCycleCompletionScope(individualData) ||
+        isTaskClosedForDelivery(taskData, { recipientEmail: emailClean }) ||
+        isTaskClosedForDelivery(individualData, { recipientEmail: emailClean })
+      ) return { state: 'closed', notificationCreated: false };
+      if (!notificationSnapshot.exists) {
+        transaction.set(notificationRef, {
+          userId: emailClean,
+          title: `🚨 ${TASK_TITLE}`,
+          message: `Requerimiento obligatorio: Presentar Seguro de Salud Vigente para entrenadores de C1, C2, MJ y dinámicas físicas. Plazo máximo: ${DEADLINE_FORMATTED}.`,
+          read: false,
+          taskId: masterTaskId,
+          created_at: new Date().toISOString()
+        });
+      }
+      if (!mailSnapshot.exists) transaction.set(mailDocRef, mailDocData);
+      return {
+        state: mailSnapshot.exists ? 'existing' : 'queued',
+        notificationCreated: !notificationSnapshot.exists
+      };
+    });
+    if (enqueued.notificationCreated) notificationCount++;
+    if (enqueued.state === 'queued') queuedCount++;
+    else if (enqueued.state === 'existing') existingMailCount++;
+    else skippedClosedCount++;
   }
 
   // Marcar en la tarea maestra que los correos ya fueron emitidos
   await db.collection('tasks').doc(masterTaskId).set({
     emailsSent: true,
     emailsSentAt: new Date().toISOString(),
-    emailsSentCount: sentCount,
+    emailsSentCount: 0,
     emailsQueuedCount: queuedCount
   }, { merge: true });
 
   console.log(`\n======================================================`);
   console.log(`🎉 PROCESO COMPLETADO EXITOSAMENTE`);
   console.log(`   - Tareas Asignadas en Causa OS: 1 Maestra + ${allCoaches.length} Individuales`);
-  console.log(`   - Notificaciones In-App Creadas: ${allCoaches.length}`);
-  console.log(`   - Correos Enviados Directamente: ${sentCount}`);
-  console.log(`   - Correos en Cola / Auditados: ${allCoaches.length}`);
+  console.log(`   - Notificaciones in-app nuevas: ${notificationCount}`);
+  console.log(`   - Correos nuevos en outbox: ${queuedCount}`);
+  console.log(`   - Documentos de correo ya existentes: ${existingMailCount}`);
+  console.log(`   - Destinatarios omitidos por cierre/ámbito ambiguo: ${skippedClosedCount}`);
   console.log(`   - Fecha Límite: ${DEADLINE_FORMATTED}`);
   console.log(`======================================================\n`);
 }

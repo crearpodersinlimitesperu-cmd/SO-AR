@@ -24,6 +24,7 @@ on:
       - 'scripts/tests/nodus-c1-report.test.mjs'
       - '.github/workflows/imo-lima-e32.yml'
       - 'scripts/mailQueue.js'
+      - 'scripts/assignInsuranceTaskAndMail.mjs'
       - 'scripts/sync_drive_vuelos_7xdia.py'
       - 'public/flight-tracker.js'
       - 'public/cartas/flight-tracker.js'
@@ -63,6 +64,9 @@ jobs:
 
       - name: Install dependencies
         run: npm ci --include=optional
+
+      - name: Check mail lifecycle scripts
+        run: node --check scripts/mailQueue.js && node --check scripts/mailerDaemon.js && node --check scripts/assignInsuranceTaskAndMail.mjs
 
       - name: Run tests
         run: npm run test:persistence && npm test && npm run test:nodus-json && npm run test:flyer-teams && npm run test:nodus-reports && npm run test:flight-monitor && npm run test:loading && node --test tests/logistics-help-deploy.test.mjs tests/logistics-help-browser.test.mjs tests/home-module-help.test.mjs

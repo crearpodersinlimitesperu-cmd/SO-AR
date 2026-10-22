@@ -43,6 +43,72 @@ export function isCompletionTransition(previousCompleted, nextCompleted) {
   return previousCompleted !== true && nextCompleted === true;
 }
 
+export function isTaskClosedForDelivery(task, { completionScope, recipientEmail } = {}) {
+  const isClosed = entry => Boolean(entry) && (
+    entry.completed === true ||
+    entry.status === 'Completada' ||
+    entry.progress === 100 ||
+    entry.progressPercentage === 100
+  );
+
+  const cycleScoped = Boolean(completionScope?.sede && completionScope?.cycleId);
+  if (cycleScoped && isClosed(task?.completions?.[`${completionScope.sede}__${completionScope.cycleId}`])) return true;
+  if (!cycleScoped && completionScope?.sede && isClosed(task?.completions?.[completionScope.sede])) return true;
+
+  if (recipientEmail && task?.assigneeProgress && typeof task.assigneeProgress === 'object') {
+    const email = String(recipientEmail).trim().toLowerCase()
+      .replace('@crearpls.com', '@crearpsl.net')
+      .replace('@crearpsl.com', '@crearpsl.net');
+    const key = Object.keys(task.assigneeProgress).find(candidate => String(candidate).trim().toLowerCase()
+      .replace('@crearpls.com', '@crearpsl.net')
+      .replace('@crearpsl.com', '@crearpsl.net') === email);
+    if (key && isClosed(task.assigneeProgress[key])) return true;
+  }
+
+  if (cycleScoped) return false;
+  return isClosed(task);
+}
+
+export function hasAmbiguousCycleCompletionScope(task, { completionScope } = {}) {
+  if (completionScope?.sede && completionScope?.cycleId) return false;
+  return Object.keys(task?.completions || {}).some(key => key.includes('__'));
+}
+
+export function preserveClosedAssigneeProgress(previous = {}, requested = {}) {
+  if (!previous || typeof previous !== 'object' || Array.isArray(previous) ||
+      !requested || typeof requested !== 'object' || Array.isArray(requested)) return requested;
+  const normalizeEmail = value => String(value || '').trim().toLowerCase()
+    .replace('@crearpls.com', '@crearpsl.net')
+    .replace('@crearpsl.com', '@crearpsl.net');
+  const merged = { ...requested };
+
+  Object.entries(previous).forEach(([previousKey, previousEntry]) => {
+    const isClosed = previousEntry?.completed === true ||
+      previousEntry?.status === 'Completada' ||
+      previousEntry?.progress === 100 ||
+      previousEntry?.progressPercentage === 100;
+    if (!isClosed) return;
+    const requestedKey = Object.keys(merged).find(key =>
+      normalizeEmail(key) === normalizeEmail(previousKey)
+    );
+    if (!requestedKey) return;
+
+    const entry = { ...merged[requestedKey], completed: true, status: 'Completada' };
+    if ('progress' in previousEntry) entry.progress = previousEntry.progress;
+    if ('progressPercentage' in previousEntry) entry.progressPercentage = previousEntry.progressPercentage;
+    if ('completedAt' in previousEntry) {
+      if (previousEntry.completedAt === null) delete entry.completedAt;
+      else entry.completedAt = previousEntry.completedAt;
+    } else {
+      delete entry.completedAt;
+    }
+    if ('completionId' in previousEntry) entry.completionId = previousEntry.completionId;
+    merged[requestedKey] = entry;
+  });
+
+  return merged;
+}
+
 export function getTaskProgress(task) {
   if (typeof task?.progressPercentage === 'number') return task.progressPercentage;
   if (typeof task?.progress === 'number') return task.progress;
@@ -75,7 +141,10 @@ export function applyCycleCompletion(task, { sede, cycleId } = {}) {
 export function getNextCompletionState(updates) {
   if (typeof updates?.completed === 'boolean') return updates.completed;
   if (updates?.status === 'Completada') return true;
-  return updates?.progressPercentage === 100 || updates?.progress === 100;
+  if (['Pendiente', 'En progreso', 'En Progreso'].includes(updates?.status)) return false;
+  if (typeof updates?.progressPercentage === 'number') return updates.progressPercentage >= 100;
+  if (typeof updates?.progress === 'number') return updates.progress >= 100;
+  return null;
 }
 
 export function createCycleCompletion(current = {}, { cycle, completed, updatedAt, completionId, updates = {} } = {}) {
