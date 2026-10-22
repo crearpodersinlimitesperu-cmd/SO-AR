@@ -69,7 +69,7 @@ jobs:
         run: node --check scripts/mailQueue.js && node --check scripts/mailerDaemon.js && node --check scripts/assignInsuranceTaskAndMail.mjs
 
       - name: Check undefined identifiers in lifecycle code
-        run: npx oxlint -D no-undef --env browser,node src/context/ChecklistContext.jsx src/components/TaskDetailModal.jsx src/utils/taskLifecycle.js scripts/mailQueue.js scripts/mailerDaemon.js
+        run: npx oxlint -c .oxlintrc.lifecycle.json src/context/ChecklistContext.jsx src/components/TaskDetailModal.jsx src/utils/taskLifecycle.js scripts/mailQueue.js scripts/mailerDaemon.js
 
       - name: Run tests
         run: npm run test:persistence && npm test && npm run test:nodus-json && npm run test:flyer-teams && npm run test:nodus-reports && npm run test:flight-monitor && npm run test:loading && node --test tests/logistics-help-deploy.test.mjs tests/logistics-help-browser.test.mjs tests/home-module-help.test.mjs
