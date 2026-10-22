@@ -35,8 +35,8 @@ function generateAssertiveResponse(queryText, nodusData, currentUser, messageHis
     }
   }
 
-  // 1. Preguntas sobre un equipo/ciclo específico (ej. "C1 E32", "equipo 32", "lima e32")
-  const equipoMatch = q.match(/\b(?:e|equipo\s*)(\d{1,3})\b/);
+  // 1. Preguntas sobre un equipo/ciclo específico (ej. "C1 E32", "c1e32", "equipo 32", "e32", "lima e32")
+  const equipoMatch = q.match(/(?:equipo\s*|eq\.?\s*|c[12]\s*e|c[12]e|\be)\s*(\d{1,3})\b/);
   if (equipoMatch) {
     const equipoNum = equipoMatch[1];
     const isTargetEq = (eqStr) => {
