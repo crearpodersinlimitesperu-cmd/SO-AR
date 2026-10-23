@@ -661,6 +661,9 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
       let dispGestionesC1 = c.gestionesC1;
       let dispGestionesC2 = c.gestionesC2;
 
+      let coberturaDetalle = c.coberturaDetalle || `${c.coberturaPct}%`;
+      let productividadDetalle = c.productividadDetalle || `${c.productividadPct}%`;
+
       if (isEquipoFiltered) {
         dispGestiones = matchingEquipos.reduce((s, e) => s + (e.llamadas || 0), 0);
         dispConfirmados = matchingEquipos.reduce((s, e) => s + (e.confirmado || 0), 0);
@@ -669,7 +672,24 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
         dispSiguiente = matchingEquipos.reduce((s, e) => s + (e.siguiente || 0), 0);
         dispNoInteresa = matchingEquipos.reduce((s, e) => s + (e.noInteresa || 0), 0);
         dispAsistieron = matchingEquipos.reduce((s, e) => s + (e.asistieron || 0), 0);
-        dispAsignados = dispGestiones;
+
+        // Cero invención: obtener la sala real del equipo desde equiposReporte / equiposSummary
+        const officialEquipos = data?.equiposReporte || data?.equiposSummary || [];
+        let teamRoomPx = 0;
+        if (selectedEquipo !== 'TODOS') {
+          const normTarget = selectedEquipo.toUpperCase().replace(/\s+/g, ' ');
+          const offMatch = officialEquipos.find(o => {
+            const raw = (o.equipoNombre || o.equipo || '').toUpperCase().replace(/\s+/g, ' ');
+            return raw.startsWith(normTarget) || raw.includes(normTarget);
+          });
+          if (offMatch) {
+            teamRoomPx = Number(offMatch.totalParticipantes ?? offMatch.total ?? offMatch.participantes ?? offMatch.inscritos ?? 0);
+          }
+        }
+
+        const contactosGestionados = dispConfirmados + dispNoContesta + dispPorConfirmar + dispSiguiente + dispNoInteresa;
+        dispAsignados = teamRoomPx > 0 ? teamRoomPx : (c.asignados || dispGestiones);
+
         dispSentadosC1 = matchingEquipos.filter(e => recordedPhase(e, c) === 'C1').reduce((s, e) => s + (e.asistieron || 0), 0);
         dispSentadosC2 = matchingEquipos.filter(e => recordedPhase(e, c) === 'C2').reduce((s, e) => s + (e.asistieron || 0), 0);
         dispGestionesC1 = matchingEquipos.filter(e => recordedPhase(e, c) === 'C1').reduce((s, e) => s + (e.llamadas || 0), 0);
@@ -695,13 +715,29 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
         dispGestionesC1 = 0;
       }
 
-      const coberturaPct = dispAsignados > 0 && isEquipoFiltered
-        ? Math.min(100, Math.round((dispGestiones / dispAsignados) * 100))
-        : c.coberturaPct;
+      // Cobertura: % de contactos gestionados sobre la sala del equipo o la base asignada (Cero invención de 100%)
+      let coberturaPct = c.coberturaPct;
+      if (isEquipoFiltered) {
+        const contactosGestionados = dispConfirmados + dispNoContesta + dispPorConfirmar + dispSiguiente + dispNoInteresa;
+        if (dispAsignados > 0) {
+          coberturaPct = Math.min(100, Math.round((contactosGestionados / dispAsignados) * 100));
+          coberturaDetalle = `${contactosGestionados}/${dispAsignados} PX (${coberturaPct}%)`;
+        }
+      }
 
+      // Productividad Nodus: % de personas sentadas en sala respecto a las gestiones realizadas
       const productividadPct = dispGestiones > 0 && isEquipoFiltered
         ? Math.round((dispAsistieron / dispGestiones) * 100)
         : c.productividadPct;
+
+      if (isEquipoFiltered && dispGestiones > 0) {
+        productividadDetalle = `${dispAsistieron}/${dispGestiones} (${productividadPct}%)`;
+      }
+
+      // Tasa de asistencia sobre confirmados (cuántos confirmados llegaron a la sala)
+      const tasaAsistenciaPct = dispConfirmados > 0
+        ? Math.round((dispAsistieron / dispConfirmados) * 100)
+        : 0;
 
       result.push({
         ...c,
@@ -721,7 +757,10 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
           sentadosC2: dispSentadosC2,
           asignados: dispAsignados,
           coberturaPct,
-          productividadPct
+          coberturaDetalle,
+          productividadPct,
+          productividadDetalle,
+          tasaAsistenciaPct
         }
       });
     }
@@ -1507,13 +1546,12 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
               <tr>
                 <th className="nodus-th">Colaborador / Coordinador</th>
                 <th className="nodus-th">Sede & Ciclo</th>
-                <th className="nodus-th" style={{ textAlign: 'right', color: '#f59e0b' }}>Sentados C1</th>
-                <th className="nodus-th" style={{ textAlign: 'right', color: '#8b5cf6' }}>Sentados C2</th>
-                <th className="nodus-th" style={{ textAlign: 'right', color: '#10b981' }}>Total Sentados</th>
                 <th className="nodus-th" style={{ textAlign: 'right' }}>Gestiones (C1 / C2)</th>
-                <th className="nodus-th" style={{ textAlign: 'right' }}>Confirmados</th>
+                <th className="nodus-th" style={{ textAlign: 'right', color: '#10b981' }}>Confirmados</th>
+                <th className="nodus-th" style={{ textAlign: 'right', color: '#f59e0b' }}>Sentados en Sala</th>
+                <th className="nodus-th" style={{ textAlign: 'center', color: '#10b981' }}>Asistencia / Conf.</th>
                 <th className="nodus-th" style={{ textAlign: 'center' }}>Cobertura</th>
-                <th className="nodus-th" style={{ textAlign: 'center' }}>Productividad</th>
+                <th className="nodus-th" style={{ textAlign: 'center' }}>Productividad Nodus</th>
                 <th className="nodus-th" style={{ textAlign: 'center' }}>Última Gestión</th>
                 <th className="nodus-th" style={{ textAlign: 'center' }}>Equipos</th>
               </tr>
@@ -1521,7 +1559,7 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
             <tbody>
               {filteredCoordinadores.length === 0 ? (
                 <tr>
-                  <td colSpan={11} style={{ padding: '3rem 1rem', textAlign: 'center', color: 'var(--nodus-text-muted)' }}>
+                  <td colSpan={10} style={{ padding: '3rem 1rem', textAlign: 'center', color: 'var(--nodus-text-muted)' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.6rem' }}>
                       <AlertCircle size={24} color="#f59e0b" />
                       <span>No se encontraron coordinadores con los filtros seleccionados.</span>
@@ -1580,27 +1618,6 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
                           </div>
                         </td>
 
-                        {/* Sentados C1 */}
-                        <td className="nodus-td" style={{ textAlign: 'right' }}>
-                          <span className="nodus-badge-sentados-c1">
-                            {coord.displayStats.sentadosC1}
-                          </span>
-                        </td>
-
-                        {/* Sentados C2 */}
-                        <td className="nodus-td" style={{ textAlign: 'right' }}>
-                          <span className="nodus-badge-sentados-c2">
-                            {coord.displayStats.sentadosC2}
-                          </span>
-                        </td>
-
-                        {/* Total Sentados */}
-                        <td className="nodus-td" style={{ textAlign: 'right' }}>
-                          <span className="nodus-badge-asistieron">
-                            {coord.displayStats.asistieron}
-                          </span>
-                        </td>
-
                         {/* Gestiones (C1 / C2) */}
                         <td className="nodus-td" style={{ textAlign: 'right' }}>
                           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.1rem' }}>
@@ -1615,28 +1632,66 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
 
                         {/* Confirmados */}
                         <td className="nodus-td" style={{ textAlign: 'right' }}>
-                          <span className="nodus-badge-confirmados">
-                            {coord.displayStats.confirmados}
-                          </span>
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.1rem' }}>
+                            <span className="nodus-badge-confirmados">
+                              {coord.displayStats.confirmados}
+                            </span>
+                            <span style={{ fontSize: '0.68rem', color: 'var(--nodus-text-muted)' }}>
+                              {coord.displayStats.gestiones > 0 ? `${Math.round((coord.displayStats.confirmados / coord.displayStats.gestiones) * 100)}% de llamadas` : '0%'}
+                            </span>
+                          </div>
+                        </td>
+
+                        {/* Sentados en Sala */}
+                        <td className="nodus-td" style={{ textAlign: 'right' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.1rem' }}>
+                            <span className="nodus-badge-asistieron">
+                              {coord.displayStats.asistieron}
+                            </span>
+                            {(coord.displayStats.sentadosC1 > 0 || coord.displayStats.sentadosC2 > 0) && (
+                              <span style={{ fontSize: '0.68rem', color: 'var(--nodus-text-muted)' }}>
+                                C1: <strong style={{ color: '#f59e0b' }}>{coord.displayStats.sentadosC1 || 0}</strong> • C2: <strong style={{ color: '#8b5cf6' }}>{coord.displayStats.sentadosC2 || 0}</strong>
+                              </span>
+                            )}
+                          </div>
+                        </td>
+
+                        {/* Asistencia sobre Confirmados */}
+                        <td className="nodus-td" style={{ textAlign: 'center' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }} title={`${coord.displayStats.asistieron} sentados de ${coord.displayStats.confirmados} confirmados`}>
+                            <span style={{ fontWeight: 800, color: '#10b981' }}>{coord.displayStats.tasaAsistenciaPct}%</span>
+                            <div style={{ width: '55px', height: '4px', background: 'var(--nodus-progress-bg)', borderRadius: '2px', overflow: 'hidden' }}>
+                              <div style={{ width: `${Math.min(100, coord.displayStats.tasaAsistenciaPct)}%`, height: '100%', background: '#10b981', borderRadius: '2px' }} />
+                            </div>
+                            <span style={{ fontSize: '0.66rem', color: 'var(--nodus-text-muted)' }}>
+                              {coord.displayStats.asistieron}/{coord.displayStats.confirmados} PX
+                            </span>
+                          </div>
                         </td>
 
                         {/* Cobertura */}
                         <td className="nodus-td" style={{ textAlign: 'center' }}>
-                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }} title={coord.displayStats.coberturaDetalle || `${coord.displayStats.coberturaPct}%`}>
                             <span style={{ fontWeight: 800, color: '#ffc107' }}>{coord.displayStats.coberturaPct}%</span>
                             <div style={{ width: '55px', height: '4px', background: 'var(--nodus-progress-bg)', borderRadius: '2px', overflow: 'hidden' }}>
                               <div style={{ width: `${coord.displayStats.coberturaPct}%`, height: '100%', background: '#ffc107', borderRadius: '2px' }} />
                             </div>
+                            <span style={{ fontSize: '0.66rem', color: 'var(--nodus-text-muted)' }}>
+                              {coord.displayStats.coberturaDetalle || `${coord.displayStats.coberturaPct}%`}
+                            </span>
                           </div>
                         </td>
 
-                        {/* Productividad */}
+                        {/* Productividad Nodus */}
                         <td className="nodus-td" style={{ textAlign: 'center' }}>
-                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }} title="Métrica Nodus: (Sentados en Sala / Gestiones Realizadas) %">
                             <span style={{ fontWeight: 800, color: '#14b8a6' }}>{coord.displayStats.productividadPct}%</span>
                             <div style={{ width: '55px', height: '4px', background: 'var(--nodus-progress-bg)', borderRadius: '2px', overflow: 'hidden' }}>
                               <div style={{ width: `${coord.displayStats.productividadPct}%`, height: '100%', background: '#14b8a6', borderRadius: '2px' }} />
                             </div>
+                            <span style={{ fontSize: '0.66rem', color: 'var(--nodus-text-muted)' }}>
+                              {coord.displayStats.productividadDetalle || `${coord.displayStats.asistieron}/${coord.displayStats.gestiones}`}
+                            </span>
                           </div>
                         </td>
 
@@ -1667,7 +1722,7 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
                       {/* SUBTABLA ANIDADA (SOLO MUESTRA LOS EQUIPOS FILTRADOS) */}
                       {isExpanded && hasEquipos && (
                         <tr>
-                          <td colSpan={11} className="nodus-nested-wrapper">
+                          <td colSpan={10} className="nodus-nested-wrapper">
                             <div className="nodus-nested-panel">
                               <div className="nodus-nested-header">
                                 <h4 className="nodus-nested-title">
