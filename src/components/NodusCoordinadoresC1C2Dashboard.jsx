@@ -336,11 +336,11 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
       let confirmadosC1 = c.confirmadosC1;
       let confirmadosC2 = c.confirmadosC2;
 
-      // Cálculo resiliente en caliente si faltasen campos precalculados
-      if (sentadosC1 === undefined || sentadosC2 === undefined) {
+      // Cálculo resiliente en caliente si faltasen campos precalculados o si la suma da 0 con asistentes reales
+      if (sentadosC1 === undefined || sentadosC2 === undefined || (sentadosC1 === 0 && sentadosC2 === 0 && (c.asistieron || 0) > 0)) {
         let sc1 = 0, sc2 = 0, gc1 = 0, gc2 = 0, cc1 = 0, cc2 = 0;
         (c.equipos || []).forEach(eq => {
-          const phase = recordedPhase(eq);
+          const phase = recordedPhase(eq, c);
           if (!phase || phase === 'MJ') return;
           const isC2 = phase === 'C2';
           if (isC2) {
@@ -353,6 +353,17 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
             cc1 += (eq.confirmado || 0);
           }
         });
+
+        // Si no se clasificó ningún sentado por equipo individual pero el coordinador tiene total asistieron en sala:
+        if (sc1 + sc2 === 0 && (c.asistieron || 0) > 0) {
+          const coordPhase = recordedPhase(null, c);
+          if (coordPhase === 'C2') {
+            sc2 = c.asistieron;
+          } else {
+            sc1 = c.asistieron;
+          }
+        }
+
         sentadosC1 = sc1;
         sentadosC2 = sc2;
         gestionesC1 = (gc1 + gc2 > 0) ? gc1 : (c.c1 || 0);
@@ -361,7 +372,15 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
         confirmadosC2 = cc2;
       }
 
-      const totalSentados = c.asistieron || (sentadosC1 + sentadosC2);
+      const totalSentados = Math.max(c.asistieron || 0, (sentadosC1 || 0) + (sentadosC2 || 0));
+      if ((sentadosC1 || 0) + (sentadosC2 || 0) < totalSentados) {
+        const coordPhase = recordedPhase(null, c);
+        if (coordPhase === 'C2') {
+          sentadosC2 = totalSentados - (sentadosC1 || 0);
+        } else {
+          sentadosC1 = totalSentados - (sentadosC2 || 0);
+        }
+      }
       const totalGestiones = c.gestiones || (gestionesC1 + gestionesC2);
       const totalConfirmados = c.estados?.confirmado || (confirmadosC1 + confirmadosC2);
 
@@ -489,14 +508,64 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
     }
 
     const set = new Set();
+    const officialEquipos = data?.equiposReporte || data?.equiposSummary || [];
+
+    // 1. Agregar equipos oficiales desde data.equiposReporte / data.equiposSummary según la sede seleccionada
+    officialEquipos.forEach(item => {
+      const rawName = item.equipoNombre || item.equipo || '';
+      const normName = rawName.toUpperCase();
+      const matchTeam = normName.match(/^(EQUIPO\s+\d+)/i);
+      const teamClean = matchTeam ? matchTeam[1] : (rawName.split('—')[0] || '').trim();
+      if (!teamClean) return;
+
+      let teamSede = 'Desconocida';
+      if (normName.includes('LIMA')) teamSede = 'Lima';
+      else if (normName.includes('QUITO')) teamSede = 'Quito';
+      else if (normName.includes('GUAYAQUIL') || normName.includes('GYE')) teamSede = 'Guayaquil';
+      else if (normName.includes('CUENCA')) teamSede = 'Cuenca';
+      else if (normName.includes('MEDELLIN') || normName.includes('MEDELLÍN')) teamSede = 'Medellín';
+      else if (normName.includes('MEXICO') || normName.includes('MÉXICO')) teamSede = 'México';
+
+      // Filtrar por sede si aplica
+      if (selectedSede !== 'TODAS' && teamSede !== selectedSede) return;
+
+      // Filtrar por ciclo / fase si aplica
+      let phase = 'C1';
+      if (normName.includes('CICLO 2') || normName.includes('C2') || normName.includes('CAPITULO 2')) phase = 'C2';
+      if (selectedEntrenamiento === 'C1' && phase !== 'C1') return;
+      if (selectedEntrenamiento === 'C2' && phase !== 'C2') return;
+
+      // Si hay un coordinador específico seleccionado, solo incluir los equipos oficiales que ese coordinador gestionó
+      if (selectedCoordinador !== 'TODOS') {
+        const coordHasTeam = coords.some(c => (c.equipos || []).some(eq => (eq.equipo || '').toUpperCase() === teamClean));
+        if (!coordHasTeam) return;
+      }
+
+      set.add(teamClean);
+    });
+
+    // 2. Agregar equipos desde la actividad de coordinadores filtrados (asegurando coherencia con la sede seleccionada)
     coords.forEach(c => {
       (c.equipos || []).forEach(eq => {
         if (!eq.equipo) return;
-        const phase = recordedPhase(eq);
+        const phase = recordedPhase(eq, c);
         
         // Usar la fase registrada, nunca el número del equipo.
         if (selectedEntrenamiento === 'C1' && phase !== 'C1') return;
         if (selectedEntrenamiento === 'C2' && phase !== 'C2') return;
+
+        // Evitar contaminación cruzada de equipos de otras sedes (p.ej. EQUIPO 117 de Quito en un coordinador de Lima)
+        if (selectedSede !== 'TODAS') {
+          const eqSede = eq.sedeInferida || 'Desconocida';
+          if (eqSede !== 'Desconocida' && eqSede !== selectedSede && !eqSede.includes(selectedSede)) {
+            return;
+          }
+          const offMatch = officialEquipos.find(o => (o.equipoNombre || '').toUpperCase().startsWith(eq.equipo.toUpperCase()));
+          if (offMatch) {
+            const offNorm = (offMatch.equipoNombre || '').toUpperCase();
+            if (!offNorm.includes(selectedSede.toUpperCase())) return;
+          }
+        }
 
         set.add(eq.equipo);
       });
@@ -507,7 +576,7 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
       const numB = parseInt(b.replace(/\D/g, '')) || 0;
       return numA - numB;
     });
-  }, [c1c2Coordinadores, selectedCoordinador, searchTerm, selectedSede, selectedCiclo, selectedEntrenamiento]);
+  }, [c1c2Coordinadores, data, selectedCoordinador, searchTerm, selectedSede, selectedCiclo, selectedEntrenamiento]);
 
   // Sincronización automática de selectores para evitar combinaciones incoherentes
   useEffect(() => {
@@ -553,7 +622,7 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
       if (selectedEntrenamiento === 'C2' && (c.sentadosC2 === 0 && c.gestionesC2 === 0)) continue;
 
       // 4. Filtro por Equipo
-      let matchingEquipos = (c.equipos || []).filter(eq => selectedEntrenamiento === 'TODOS' || recordedPhase(eq) === selectedEntrenamiento);
+      let matchingEquipos = (c.equipos || []).filter(eq => selectedEntrenamiento === 'TODOS' || recordedPhase(eq, c) === selectedEntrenamiento);
       if (selectedEquipo !== 'TODOS') {
         matchingEquipos = matchingEquipos.filter(eq => eq.equipo === selectedEquipo);
         if (matchingEquipos.length === 0) continue;
@@ -601,10 +670,17 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
         dispNoInteresa = matchingEquipos.reduce((s, e) => s + (e.noInteresa || 0), 0);
         dispAsistieron = matchingEquipos.reduce((s, e) => s + (e.asistieron || 0), 0);
         dispAsignados = dispGestiones;
-        dispSentadosC1 = matchingEquipos.filter(e => recordedPhase(e) === 'C1').reduce((s, e) => s + (e.asistieron || 0), 0);
-        dispSentadosC2 = matchingEquipos.filter(e => recordedPhase(e) === 'C2').reduce((s, e) => s + (e.asistieron || 0), 0);
-        dispGestionesC1 = matchingEquipos.filter(e => recordedPhase(e) === 'C1').reduce((s, e) => s + (e.llamadas || 0), 0);
-        dispGestionesC2 = matchingEquipos.filter(e => recordedPhase(e) === 'C2').reduce((s, e) => s + (e.llamadas || 0), 0);
+        dispSentadosC1 = matchingEquipos.filter(e => recordedPhase(e, c) === 'C1').reduce((s, e) => s + (e.asistieron || 0), 0);
+        dispSentadosC2 = matchingEquipos.filter(e => recordedPhase(e, c) === 'C2').reduce((s, e) => s + (e.asistieron || 0), 0);
+        dispGestionesC1 = matchingEquipos.filter(e => recordedPhase(e, c) === 'C1').reduce((s, e) => s + (e.llamadas || 0), 0);
+        dispGestionesC2 = matchingEquipos.filter(e => recordedPhase(e, c) === 'C2').reduce((s, e) => s + (e.llamadas || 0), 0);
+        if (dispSentadosC1 + dispSentadosC2 === 0 && dispAsistieron > 0) {
+          if (recordedPhase(null, c) === 'C2') {
+            dispSentadosC2 = dispAsistieron;
+          } else {
+            dispSentadosC1 = dispAsistieron;
+          }
+        }
       } else if (selectedEntrenamiento === 'C1') {
         dispGestiones = c.gestionesC1;
         dispConfirmados = c.confirmadosC1;
@@ -730,7 +806,7 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
       const name = eq.equipo;
       if (!name) return;
       const num = parseInt(name.replace(/\D/g, '')) || 0;
-      const phase = recordedPhase(eq);
+      const phase = recordedPhase(eq, coord);
       const isC1 = phase === 'C1';
 
       // Filtros por capítulo si aplica
@@ -769,6 +845,13 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
       } else {
         teamAggMap[name].sentadosC2 += phase === 'C2' ? asist : 0;
         teamAggMap[name].gestionesC2 += phase === 'C2' ? llam : 0;
+      }
+      if (teamAggMap[name].sentadosC1 + teamAggMap[name].sentadosC2 === 0 && asist > 0) {
+        if (recordedPhase(null, coord) === 'C2') {
+          teamAggMap[name].sentadosC2 += asist;
+        } else {
+          teamAggMap[name].sentadosC1 += asist;
+        }
       }
       teamAggMap[name].totalSentados += asist;
       teamAggMap[name].gestiones += llam;
@@ -838,7 +921,7 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
   }, []);
   const freshness = snapshotFreshness(data?.timestamp, auditNow);
   const timeSinceSync = freshness.label;
-  const unclassifiedTeams = (data?.coordinadores || []).flatMap(c => c.equipos || []).filter(eq => !recordedPhase(eq)).length;
+  const unclassifiedTeams = (data?.coordinadores || []).flatMap(c => (c.equipos || []).map(eq => ({ eq, c }))).filter(({ eq, c }) => !recordedPhase(eq, c)).length;
 
   if (loading) {
     return (
@@ -1618,7 +1701,7 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
                                   <tbody>
                                     {coord.visibleEquipos.map((eq, eqIdx) => {
                                       const teamNum = parseInt(eq.equipo.replace(/[^0-9]/g, '')) || 0;
-                                      const phase = recordedPhase(eq);
+                                      const phase = recordedPhase(eq, coord);
                                       const isC2 = phase === 'C2';
                                       const tasaAsist = eq.confirmado > 0 ? Math.round((eq.asistieron / eq.confirmado) * 100) : 0;
                                       return (

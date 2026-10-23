@@ -8,12 +8,33 @@ export function fallbackAttendance(row) {
   if ([row.llamada1, row.llamada2].some(value => norm(value) === 'CONFIRMADO')) return 'CONFIRMADO';
   return MISSING_NODUS;
 }
-export function recordedPhase(row) {
-  for (const value of [row?.capitulo, row?.fase, row?.entrenamiento, row?.phase]) {
+export function recordedPhase(row, parentContext = null) {
+  for (const value of [row?.capitulo, row?.fase, row?.entrenamiento, row?.phase, row?.ciclo, row?.equipo, row?.equipoNombre]) {
     const text = norm(value);
-    if (/^(C1|CAPITULO (1|UNO))$/.test(text)) return 'C1';
-    if (/^(C2|CAPITULO (2|DOS))$/.test(text)) return 'C2';
-    if (/^(MJ|MAESTRIA DEL JUEGO)$/.test(text)) return 'MJ';
+    if (/^(C1|CAPITULO (1|UNO)|CICLO (1|UNO))$/.test(text) || /\b(C1|CAPITULO 1|CICLO 1)\b/.test(text)) return 'C1';
+    if (/^(C2|CAPITULO (2|DOS)|CICLO (2|DOS))$/.test(text) || /\b(C2|CAPITULO 2|CICLO 2)\b/.test(text)) return 'C2';
+    if (/^(MJ|MAESTRIA DEL JUEGO)$/.test(text) || /\b(MJ|MAESTRIA DEL JUEGO)\b/.test(text)) return 'MJ';
+  }
+  if (parentContext) {
+    for (const value of [parentContext?.ciclo, parentContext?.rol, parentContext?.entrenamiento, parentContext?.fase, parentContext?.capitulo]) {
+      const text = norm(value);
+      if (/\b(C1|CICLO 1|CAPITULO 1|COORDINADOR C1)\b/.test(text) && !/\b(C2|CICLO 2|CAPITULO 2)\b/.test(text)) return 'C1';
+      if (/\b(C2|CICLO 2|CAPITULO 2|COORDINADOR C2)\b/.test(text) && !/\b(C1|CICLO 1|CAPITULO 1)\b/.test(text)) return 'C2';
+      if (/\b(MJ|MAESTRIA)\b/.test(text)) return 'MJ';
+    }
+    if ((Number(parentContext?.c1) > 0 || Number(parentContext?.gestionesC1) > 0) &&
+        Number(parentContext?.c2 || 0) === 0 && Number(parentContext?.gestionesC2 || 0) === 0) {
+      return 'C1';
+    }
+    if ((Number(parentContext?.c2) > 0 || Number(parentContext?.gestionesC2) > 0) &&
+        Number(parentContext?.c1 || 0) === 0 && Number(parentContext?.gestionesC1 || 0) === 0) {
+      return 'C2';
+    }
+    if (norm(parentContext?.ciclo) === 'CICLO 2' || norm(parentContext?.ciclo) === 'C2') return 'C2';
+    if (norm(parentContext?.ciclo) === 'CICLO 1' || norm(parentContext?.ciclo) === 'C1') return 'C1';
+  }
+  if (row?.equipo || row?.llamadas || row?.confirmado || row?.asistieron) {
+    return 'C1';
   }
   return null;
 }

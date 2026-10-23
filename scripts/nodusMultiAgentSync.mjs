@@ -671,9 +671,41 @@ class NodusNormalizerAgent {
           else if (eqStr.includes('MEXICO') || eqStr.includes('MÉXICO')) dominantSede = 'México';
         }
         if (dominantSede) {
-          equipoSedeMap[eq.equipoNombre.trim().toLowerCase()] = dominantSede;
+          const rawKey = eq.equipoNombre.trim().toLowerCase();
+          equipoSedeMap[rawKey] = dominantSede;
+          const matchClean = (eq.equipoNombre || '').toUpperCase().match(/^(EQUIPO\s+\d+)/i);
+          if (matchClean) {
+            equipoSedeMap[matchClean[1].toLowerCase()] = dominantSede;
+          }
         }
       });
+    }
+
+    // Tally complementario desde la actividad de coordinadores para equipos que no están en el reporte del ciclo actual
+    if (rawCoordinadores && Array.isArray(rawCoordinadores)) {
+      const coordSedesTally = {};
+      rawCoordinadores.forEach(c => {
+        const full = c.fullText || '';
+        const lines = full.split('\n').map(l => l.trim()).filter(Boolean);
+        const sedeLine = lines.find(l => l.toLowerCase().startsWith('sede:'));
+        const coordSede = sedeLine ? sedeLine.replace(/sede:\s*/i, '').trim() : '';
+        if (!coordSede || coordSede === 'Sin Sede') return;
+        (c.equipos || []).forEach(eq => {
+          const k = (eq.equipo || '').trim().toLowerCase();
+          if (!k || k === 'sin equipo') return;
+          if (!coordSedesTally[k]) coordSedesTally[k] = {};
+          coordSedesTally[k][coordSede] = (coordSedesTally[k][coordSede] || 0) + (eq.llamadas || 1);
+        });
+      });
+      for (const [k, tally] of Object.entries(coordSedesTally)) {
+        if (!equipoSedeMap[k]) {
+          let bestSede = null, maxCalls = 0;
+          for (const [s, calls] of Object.entries(tally)) {
+            if (calls > maxCalls) { maxCalls = calls; bestSede = s; }
+          }
+          if (bestSede) equipoSedeMap[k] = bestSede;
+        }
+      }
     }
 
     const rawCoordinadoresList = rawCoordinadores.map(item => {
@@ -814,6 +846,45 @@ class NodusNormalizerAgent {
             ? 'Coordinador C1'
             : 'Coordinador';
 
+      const isC2Coord = ciclo === 'Ciclo 2' || coordinatorRole === 'Coordinador C2' || (c2Value > 0 && (c1Value === 0 || c1Value === null));
+      const sentadosC1 = isC2Coord ? 0 : totalAsistieron;
+      const sentadosC2 = isC2Coord ? totalAsistieron : 0;
+      const gestionesC1 = c1Value ?? (isC2Coord ? 0 : (gestionesValue ?? 0));
+      const gestionesC2 = c2Value ?? (isC2Coord ? (gestionesValue ?? 0) : 0);
+      const confirmadosC1 = isC2Coord ? 0 : confirmado;
+      const confirmadosC2 = isC2Coord ? confirmado : 0;
+
+      const enrichedEquipos = (item.equipos || []).map(eq => {
+        const eqKey = (eq.equipo || '').trim().toLowerCase();
+        const sedeInferida = equipoSedeMap[eqKey];
+        let incoherencia = false;
+        if (sedeInferida && sede !== 'Sin Sede') {
+          if (sedeInferida === 'Quito/Guayaquil' && !['Quito', 'Guayaquil'].includes(sede)) {
+            incoherencia = true;
+          } else if (sedeInferida !== 'Quito/Guayaquil' && sedeInferida !== sede) {
+            incoherencia = true;
+          }
+        }
+        if (incoherencia) console.warn(`🚨 [INCOHERENCIA] ${nombre} (${sede}) tiene asignado ${eq.equipo} (${sedeInferida}).`);
+
+        let eqFase = isC2Coord ? 'C2' : 'C1';
+        const officialMatch = (rawEquiposReporte || []).find(o => (o.equipoNombre || '').toUpperCase().startsWith((eq.equipo || '').toUpperCase()));
+        if (officialMatch) {
+          const offUpper = (officialMatch.equipoNombre || '').toUpperCase();
+          if (offUpper.includes('CICLO 2') || offUpper.includes('C2')) eqFase = 'C2';
+          else if (offUpper.includes('CICLO 1') || offUpper.includes('C1')) eqFase = 'C1';
+        }
+
+        return {
+          ...eq,
+          fase: eqFase,
+          capitulo: eqFase,
+          ciclo: eqFase === 'C2' ? 'Ciclo 2' : 'Ciclo 1',
+          sedeInferida: sedeInferida || 'Desconocida',
+          incoherenciaSedes: incoherencia
+        };
+      });
+
       return {
         id: `coord_${nombre.toLowerCase().replace(/[^a-z0-9]/g, '_')}_${sede.toLowerCase()}`,
         nombre,
@@ -832,6 +903,15 @@ class NodusNormalizerAgent {
         productividadPct,
         productividadDetalle,
         asistieron: totalAsistieron,
+        sentadosC1,
+        sentadosC2,
+        sentadosTotal: totalAsistieron,
+        gestionesC1,
+        gestionesC2,
+        gestionesTotal: gestiones,
+        confirmadosC1,
+        confirmadosC2,
+        confirmadosTotal: confirmado,
         tasaEfectividad: gestionesValue !== null && confirmadoValue !== null && gestionesValue > 0
           ? Math.round((confirmadoValue / gestionesValue) * 100)
           : null,
@@ -862,20 +942,7 @@ class NodusNormalizerAgent {
           yaAsistio,
           devolucion
         },
-                equipos: (item.equipos || []).map(eq => {
-          const eqKey = (eq.equipo || '').trim().toLowerCase();
-          const sedeInferida = equipoSedeMap[eqKey];
-          let incoherencia = false;
-          if (sedeInferida && sede !== 'Sin Sede') {
-            if (sedeInferida === 'Quito/Guayaquil' && !['Quito', 'Guayaquil'].includes(sede)) {
-              incoherencia = true;
-            } else if (sedeInferida !== 'Quito/Guayaquil' && sedeInferida !== sede) {
-              incoherencia = true;
-            }
-          }
-          if (incoherencia) console.warn(`🚨 [INCOHERENCIA] ${nombre} (${sede}) tiene asignado ${eq.equipo} (${sedeInferida}).`);
-          return { ...eq, sedeInferida: sedeInferida || 'Desconocida', incoherenciaSedes: incoherencia };
-        })
+        equipos: enrichedEquipos
       };
     });
 
