@@ -850,6 +850,51 @@ Tras el reporte de incidencias donde firmas completadas figuraban en el panel ad
 
 ---
 
+### 18.8. Integración API Oficial Nodus — El Puente de Verdad Absoluta Anti-Invención
+* **Directiva Suprema del Usuario:** *"Los agentes conectados a Nodus deben de asegurarse que ningún dato sea inventado en Causa, que todos sean fieles a Nodus. Este JSON es el puente entre Nodus y Causa para que no alucine ni invente datos; todo debe salir de Nodus."*
+* **Especificación de la API de Consulta Nodus:**
+  - **Naturaleza:** API de **solo lectura** que entrega datos oficiales del sistema en **JSON**.
+  - **URL Base:** `https://imo.crearpslglobal.com/api`
+  - **Método HTTP:** Estrictamente `GET`. Cualquier otro método responde `405 Method Not Allowed`.
+  - **Codificación:** UTF-8. Formato de fechas: `YYYY-MM-DD`. Fechas con hora: `YYYY-MM-DD HH:MM:SS` (hora oficial de Ecuador / GMT-5).
+  - **Autenticación Obligatoria:** Header `X-Api-Key: <token>` (también admite `Authorization: Bearer <token>`). Ausencia o error de token responde `401 Unauthorized`.
+  - **Sobre de Respuesta Canónico:**
+    - Éxito (HTTP 200): `{ "ok": true, "data": { ... }, "meta": { "generado": "ISO-8601" } }`
+    - Error (HTTP 4xx / 5xx): `{ "ok": false, "error": { "codigo": "...", "mensaje": "..." } }`
+* **Endpoints Oficiales Documentados e Integrados:**
+  1. `GET /api/sedes`: Sedes activas, cada una con su arreglo de equipos activos (`id`, `nombre`, `ciudad`, `ciclo`, `pais`, `equipos` con `etapa_vigente` y número de `participantes`).
+  2. `GET /api/equipos`: Filtro de equipos activos por `id_sede` y estado `en_actividad=1`.
+  3. `GET /api/participantes/{id_equipo}`: Nómina completa y activa de participantes de un equipo ordenados por apellidos, identificador, teléfono, email, coordinador y estado de Capítulo 1 y Capítulo 2.
+  4. `GET /api/pagos`: Pagos registrados con filtros obligatorios de ventana temporal (`desde`, `hasta` máx 93 días), `id_sede` o `id_equipo`.
+  5. `GET /api/enrolados`: Registros de personas enroladas en el periodo por sede o equipo con detalle del enrolador/aliado y estado de asistencia.
+  6. `GET /api/persona/{identificacion}`: Ficha consolidada e historial de un participante en la plataforma Nodus.
+* **Política de Cero Invención / Fail-Closed:**
+  - Ningún módulo de Causa OS (Embudo C1/C2, Monitor IMOs, Auditoría KPIs, Copiloto IA) puede generar multiplicadores sintéticos, proyecciones inventadas ni rellenar con ceros silenciosos cuando la fuente Nodus no esté disponible.
+  - Distinción técnica obligatoria en toda la plataforma: **"Sentados en Sala"** (asistencia presencial física confirmada en puerta) vs. **"Confirmados Telefónicos"** (gestión previa de llamadas de coordinación).
+  - Componentes del puente: [`scripts/nodusApiClient.mjs`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/scripts/nodusApiClient.mjs), [`scripts/nodusMultiAgentSync.mjs`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/scripts/nodusMultiAgentSync.mjs), [`src/services/nodusApiService.js`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/src/services/nodusApiService.js).
+
+---
+
+### 18.9. Resolución de Casos Críticos de Coordinación: Daniela Monroy y Evelyn Cedillo
+* **Caso 1: Daniela Monroy Fabbri (`daniela.monroy@crearpsl.net`)**
+  - **Incidencia A — Centro de Mánagers con graduados como "Activos":**
+    - En Firestore `managers_directory` y en [`src/data/managersData.js`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/src/data/managersData.js), los equipos 1, 2, 3 y 4 de México (*MARDUK AETT*, *ALOHI MAU*, *TORA BUSHIDO* y *QUIRON 33*) tenían registros como `estado: "Activo"` (docs `23`, `31`, `1791924882958`, `694`).
+    - *Solución:* Se actualizaron todos los documentos en Firestore a `estado: "Graduado"`, se corrigió el catálogo histórico [`src/data/managersData.js`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/src/data/managersData.js), y en [`src/pages/CentroManagers.jsx`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/src/pages/CentroManagers.jsx) se fijó el filtro por defecto en `Activo` para evitar contaminación visual de cohortes anteriores.
+  - **Incidencia B — Desaparición de Calendarios de Maestría del Juego (MJ):**
+    - En [`src/utils/mjCalendarVisibility.js`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/src/utils/mjCalendarVisibility.js), los roles con visión global estaban restringidos a directores (`director_maestria`, `direccion`, etc.). Siendo `coord_maestria` con sede `México` (donde aún no hay calendarios MJ registrados en `mj_calendars`), el filtro devolvía un array vacío `[]`.
+    - *Solución:* Se amplió [`src/utils/mjCalendarVisibility.js`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/src/utils/mjCalendarVisibility.js) para otorgar visibilidad global completa a los roles `coord_maestria`, `coordinador_mj` y a Daniela Monroy de forma explícita.
+* **Caso 2: Evelyn Paulina Cedillo (`evelyn.cedillo@crearpsl.net` - Cuenca C1/C2)**
+  - **Incidencia — Tareas del checklist que se registraban y luego se reseteaban a 0%:**
+    - Discrepancia de casing: El perfil `users/evelyn_cedillo` contenía `sede: "cuenca"` (minúscula), mientras que las llaves de completitud en `tasks` se graban como `"Cuenca__CUE-EQ-24"` (con mayúscula).
+    - En [`src/utils/taskLifecycle.js`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/src/utils/taskLifecycle.js), `getEffectiveCompletion` exigía coincidencia estricta; al haber diferencia de mayúscula, `applyCycleCompletion` sobreescribía los valores visuales a `0%` al recargar la página.
+    - Las tareas de POST-C1 de Cuenca Equipo 24 (`cc1y2_post1`, `cc1y2_post2`, `cc1y2_post3`) habían sido completadas por Evelyn a las 17:45 UTC pero la clave de ciclo no se había consolidado.
+    - *Solución:*
+      1. Se restauró en Firestore el objeto `Cuenca__CUE-EQ-24` al 100% en `cc1y2_post1`, `cc1y2_post2` y `cc1y2_post3`.
+      2. Se unificó la sede de `evelyn_cedillo` a `"Cuenca"` y se integró [`canonicalSede`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/src/utils/sede.js) en [`src/context/ChecklistContext.jsx`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/src/context/ChecklistContext.jsx).
+      3. Se adaptó [`src/utils/taskLifecycle.js`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/src/utils/taskLifecycle.js) para que la búsqueda de ciclo sea insensible a mayúsculas/minúsculas y vincule por `cycleId`, blindando el avance contra pérdidas de estado.
+
+---
+
 > 📜 **Mandato de la Caja Negra:**
 > Esta Caja Negra es la fuente viva de verdad de CPSL y Causa OS. Debe consultarse antes de cualquier cambio de arquitectura y actualizarse de inmediato tras cada nueva funcionalidad, regla o descubrimiento operativo.
 
