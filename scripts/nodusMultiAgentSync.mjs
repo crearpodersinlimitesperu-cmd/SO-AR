@@ -400,10 +400,30 @@ class NodusExtractorAgent {
         const participantes = await extractNodusC1Report(this.page, eq.id, () =>
           this.safeGoto(`https://imo.crearpslglobal.com/reporte?id_equipo=${eq.id}`, 25000));
 
+        const asistieron = participantes.filter(p => p.reportAttendanceC1 === true || String(p.asistencia || '').toUpperCase().includes('SI')).length;
+        const desertores = participantes.filter(p => p.reportDropoutC1 === true || String(p.desertor || '').toUpperCase().includes('SI')).length;
+        const confirmadosLlamada = participantes.filter(p => {
+          const l1 = String(p.llamada1 || '').toUpperCase();
+          const l2 = String(p.llamada2 || '').toUpperCase();
+          return l1.includes('CONFIRMADO') || l2.includes('CONFIRMADO');
+        }).length;
+        const rezagados = participantes.filter(p => {
+          const fn = String(p.finDeSemana || '').toUpperCase();
+          const nom = String(p.nombrePreferido || p.nombres || '').toUpperCase();
+          const c = String(p.coordinador || '').toUpperCase();
+          return fn.includes('REZAGAD') || nom.includes('REZAGAD') || c.includes('REZAGAD');
+        }).length;
+        const sinMarcar = Math.max(0, participantes.length - asistieron - desertores);
+
         equiposData.push({
           equipoId: eq.id,
           equipoNombre: eq.nombre,
           totalParticipantes: participantes.length,
+          asistieron,
+          desertores,
+          sinMarcar,
+          rezagados,
+          confirmadosLlamada,
           participantes: participantes
         });
       } catch (err) {
@@ -1004,7 +1024,12 @@ class NodusDispatcherAgent {
     const equiposSummary = (normalizedData.equiposReporte || []).map(eq => ({
       equipoId: eq.equipoId,
       equipoNombre: eq.equipoNombre,
-      totalParticipantes: eq.totalParticipantes || (eq.participantes ? eq.participantes.length : 0)
+      totalParticipantes: eq.totalParticipantes || (eq.participantes ? eq.participantes.length : 0),
+      asistieron: eq.asistieron ?? 0,
+      desertores: eq.desertores ?? 0,
+      sinMarcar: eq.sinMarcar ?? 0,
+      rezagados: eq.rezagados ?? 0,
+      confirmadosLlamada: eq.confirmadosLlamada ?? 0
     }));
 
     const masterSnapshot = {
@@ -1014,6 +1039,7 @@ class NodusDispatcherAgent {
       totales: normalizedData.totales,
       sedes: normalizedData.sedesSummary,
       coordinadores: normalizedData.coordinadores,
+      equipos: equiposSummary,
       equiposSummary
     };
 
@@ -1054,6 +1080,7 @@ class NodusDispatcherAgent {
       totales: normalizedData.totales,
       sedes: normalizedData.sedesSummary,
       coordinadores: normalizedData.coordinadores,
+      equiposSummary,
       equiposReporte: safeEquiposReporte
     });
     console.log("✅ [Agente 3 - Despachador] Guardado 'nodus_coordinadores_c1c2/latest'");

@@ -49,10 +49,10 @@ function generateAssertiveResponse(queryText, nodusData, currentUser, messageHis
     const sedesConocidas = ['lima', 'quito', 'guayaquil', 'cuenca', 'medellin', 'mexico'];
     const sedeEnQuery = sedesConocidas.find(s => q.includes(s));
 
-    // 1A. Prioridad: Revisar si existe el padrón oficial del equipo en equiposReporte / nodus_report_sources
-    const equiposReporte = nodusData?.equiposReporte || nodusData?.reportSources || [];
-    const directTeamReport = Array.isArray(equiposReporte)
-      ? equiposReporte.find(t => {
+    // 1A. Prioridad: Revisar si existe el padrón oficial del equipo en equiposReporte / equiposSummary / nodus_report_sources
+    const allEquiposReporte = nodusData?.equiposReporte || nodusData?.equiposSummary || nodusData?.kpisEquipos || nodusData?.equipos || nodusData?.reportSources || [];
+    const directTeamReport = Array.isArray(allEquiposReporte)
+      ? allEquiposReporte.find(t => {
           const name = String(t.equipoNombre || t.nombre || t.equipo || '').toLowerCase();
           const matchNum = isTargetEq(name) || String(t.team || t.equipoId) === equipoNum;
           if (!matchNum) return false;
@@ -91,27 +91,41 @@ function generateAssertiveResponse(queryText, nodusData, currentUser, messageHis
 
     const asksAboutSeated = /(?:senta(?:do|da|ron|r)?|asist(?:i[oó]|ieron|en|encia)?|en\s+sala|en\s+el\s+sal[oó]n|puerta|check-?in)/i.test(q);
 
-    // Si tenemos el padrón completo de participantes del reporte oficial (121 asignados):
-    if (directTeamReport && Array.isArray(directTeamReport.participantes)) {
-      const parts = directTeamReport.participantes;
-      const asistieronCount = parts.filter(p => {
-        const est = String(p.asistencia || '').toUpperCase();
-        return est.includes('ASIST') || est.includes('PRESENTE') || est.includes('SENTADO') || est.includes('SI');
-      }).length;
-      const confCount = parts.filter(p => {
-        const est = String(p.llamada1 || p.llamada2 || p.estado || '').toUpperCase();
-        return est.includes('CONFIRMADO');
-      }).length;
-      const porConfCount = parts.filter(p => {
-        const est = String(p.llamada1 || p.llamada2 || p.estado || '').toUpperCase();
-        return est.includes('POR CONFIRMAR') || est.includes('PENDIENTE') || est.includes('NO CONTESTA');
-      }).length;
+    // Si tenemos el padrón del equipo (completo o consolidado en Nodus):
+    if (directTeamReport) {
+      const parts = Array.isArray(directTeamReport.participantes) ? directTeamReport.participantes : null;
+      const totalInscritos = directTeamReport.totalParticipantes || (parts ? parts.length : 0);
+      let asistieronCount = directTeamReport.asistieron;
+      let sinMarcarCount = directTeamReport.sinMarcar;
+      let rezagadosCount = directTeamReport.rezagados;
+      let confCount = directTeamReport.confirmadosLlamada;
 
-      resp += `📋 **Padrón Oficial Nodus (/reporte):**\n`;
-      resp += `* **Total Asignados en Nodus:** **${parts.length}** contactos\n`;
-      resp += `* **Sentados en Sala (Check-in Nodus):** **${asistieronCount} personas**\n`;
-      resp += `* **Confirmados por Teléfono:** **${confCount} personas**\n`;
-      resp += `* **Por Confirmar / Pendientes:** **${porConfCount} personas**\n\n`;
+      if (parts) {
+        asistieronCount = parts.filter(p => p.reportAttendanceC1 === true || String(p.asistencia || '').toUpperCase().includes('SI') || String(p.asistencia || '').toUpperCase().includes('ASIST')).length;
+        confCount = parts.filter(p => {
+          const est = String(p.llamada1 || p.llamada2 || p.estado || '').toUpperCase();
+          return est.includes('CONFIRMADO');
+        }).length;
+        rezagadosCount = parts.filter(p => {
+          const fn = String(p.finDeSemana || '').toUpperCase();
+          const nom = String(p.nombrePreferido || p.nombres || '').toUpperCase();
+          return fn.includes('REZAGAD') || nom.includes('REZAGAD');
+        }).length;
+        sinMarcarCount = Math.max(0, totalInscritos - asistieronCount);
+      }
+
+      resp += `🏛️ **Padrón Oficial de Sala Nodus (Aforo Total del Equipo):**\n`;
+      resp += `* **Total Participantes Inscritos en el Evento:** **${totalInscritos} personas**\n`;
+      if (asistieronCount !== undefined && asistieronCount !== null) {
+        resp += `* **Asistieron en Sala (Acreditados en Puerta):** **${asistieronCount} personas**\n`;
+      }
+      if (sinMarcarCount !== undefined && sinMarcarCount !== null) {
+        resp += `* **Sin Marcar Asistencia:** **${sinMarcarCount} personas**\n`;
+      }
+      if (rezagadosCount > 0) {
+        resp += `* **Rezagados de Equipos Anteriores:** **${rezagadosCount} personas**\n`;
+      }
+      resp += `\n`;
     }
 
     if (matchingCoords.length > 0) {
@@ -654,7 +668,8 @@ export default function AICopilot() {
           const kData = (kpisDoc && kpisDoc.exists()) ? kpisDoc.data() : {};
           nodusData = {
             ...cData,
-            kpisEquipos: kData.equipos || [],
+            equiposSummary: cData.equiposSummary || kData.equiposSummary || kData.equipos || [],
+            kpisEquipos: kData.equipos || kData.equiposSummary || cData.equiposSummary || [],
             kpisTotales: kData.totales || {},
             kpisSedes: kData.sedes || [],
             kpisTimestamp: kData.timestamp || cData.timestamp || null
