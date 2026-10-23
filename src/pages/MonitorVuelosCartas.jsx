@@ -47,6 +47,12 @@ const SEDES_CONFIG = [
 // Carpetas Oficiales de Google Drive
 const DRIVE_REPOSITORIES = [
   {
+    name: '01_PASAPORTES: Pasaportes Oficiales Entrenadores',
+    desc: 'Repositorio oficial con los 20 escaneos originales de pasaportes y cédulas de identidad de todos los entrenadores internacionales de Crear Poder Sin Límites (Carlos Brunis, Leandro Brunis, Andrés Idrovo, Alejandro Díaz, etc.).',
+    url: 'https://drive.google.com/drive/folders/1Q2NSa-2w2b7L0MGPrIcy-HZX_fUsnmzc?usp=sharing',
+    badge: '20 Pasaportes Verificados'
+  },
+  {
     name: 'Vuelos y Documentación Entrenadores Multi-Sede',
     desc: 'Carpetas organizadas por sede (Cuenca, Quito, Guayaquil, Medellín, México, Lima) con itinerarios, pases de abordar y documentos oficiales.',
     url: 'https://drive.google.com/drive/folders/1oi7mUG619dQ2ZVzHzUyO5Xkwti-jgDFl?usp=drive_link',

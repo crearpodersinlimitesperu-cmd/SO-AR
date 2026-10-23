@@ -9,7 +9,7 @@ def dump_codebase():
     # Extensions to include
     valid_extensions = ['.jsx', '.js', '.css', '.json', '.html']
     # Directories to exclude
-    exclude_dirs = ['node_modules', '.git', 'dist', 'build', '.firebase', 'backup', 'backups', 'docs']
+    exclude_dirs = ['node_modules', '.git', 'dist', 'build', '.firebase', 'backup', 'backups', 'docs', 'data', 'scratch']
     
     print(f"Generando {output_file_1}...")
     
