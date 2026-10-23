@@ -173,23 +173,31 @@ function generateAssertiveResponse(queryText, nodusData, currentUser, messageHis
       if (asksAboutSeated) {
         resp += `\n🪑 **Asistencia Presencial (Sentados en Sala):**\n`;
         if (totalAsistieron > 0) {
-          resp += `* **Sentados en Sala Registrados:** **${totalAsistieron} personas** con check-in en puerta en Nodus.\n\n`;
+          resp += `* **Asistentes de la Cartera Telefónica (Gestión Coordinadoras):** **${totalAsistieron} personas** llegaron a sala provenientes de los contactos llamados por las coordinadoras.\n`;
+          resp += `  _(Desglose: ${matchingCoords.map(c => {
+            const eq = (c.equipos || []).find(e => isTargetEq(e.equipo || e.name || e.id));
+            const asist = eq ? (eq.asistieron || eq.asistio || eq.sentados || 0) : 0;
+            return `${c.nombre}: ${asist} asistentes`;
+          }).join(', ')})._\n\n`;
+          resp += `⚠️ **IMPORTANTE (Aforo Total de Sala en Nodus vs Cartera de Llamadas):**\n`;
+          resp += `Los **${totalAsistieron} asistentes** aquí reflejados corresponden **únicamente a los ${totalAsig} contactos asignados a las coordinadoras** para seguimiento telefónico. El padrón general de Nodus en sala incluye además **rezagados de equipos anteriores, participantes de otros enroladores/IMOs y registros directos en puerta** (en el caso de Equipo 32 Lima, el aforo total en Nodus registra **95 asistentes de 149 participantes totales** con 13 rezagados).\n\n`;
         } else {
-          resp += `* **Sentados en Sala Registrados:** **0 personas** registradas en sala hasta este corte.\n`;
+          resp += `* **Sentados en Sala Registrados (Cartera Coordinación):** **0 personas** registradas en sala hasta este corte.\n`;
           resp += `  _(Nota de sala: En Nodus, los 'sentados' corresponden al check-in presencial en puerta. Si el evento aún no ha iniciado o la mesa de acreditación está en proceso, el registro oficial en sala figurará en 0 hasta la carga del acta)._\n\n`;
         }
         resp += `📞 **Compromiso Previo (Gestión Telefónica de Coordinación):**\n`;
         resp += `* **Confirmados por Teléfono:** **${totalConf} personas** confirmaron su compromiso de asistir.\n`;
         if (totalPorConf > 0) resp += `* **Por Confirmar / Pendientes:** **${totalPorConf} personas**\n`;
-        if (totalAsig > 0) resp += `* **Total Contactos Asignados en Nodus:** **${totalAsig} personas**\n`;
+        if (totalAsig > 0) resp += `* **Contactos Asignados a Coordinación (Llamadas):** **${totalAsig} personas**\n`;
         resp += `* **Gestiones / Intentos de Llamada:** **${totalLlam} llamadas**\n`;
-        resp += `\n💡 _Diferencia Operativa Nodus: Una confirmación por llamada es un compromiso telefónico previo; un sentado en sala es una persona acreditada físicamente en puerta._\n`;
+        resp += `\n💡 _Diferencia Operativa Nodus: Una confirmación por llamada es un compromiso telefónico previo; los 67 asistentes son las personas que asistieron de la lista llamada; y los 95 de Nodus es la sala completa incluyendo rezagados e IMOs independientes._\n`;
       } else {
         resp += `\n📈 **Balance Oficial Nodus (Equipo ${equipoNum}):**\n`;
         resp += `* **Confirmados por Teléfono:** **${totalConf} personas**\n`;
-        resp += `* **Sentados en Sala (Check-in Nodus):** **${totalAsistieron > 0 ? `${totalAsistieron} personas` : '0 (sin check-in cargado aún)'}**\n`;
+        resp += `* **Asistentes de Cartera Coordinación:** **${totalAsistieron > 0 ? `${totalAsistieron} personas` : '0 (sin check-in cargado aún)'}**\n`;
+        resp += `  _(Nota: La sala general de Nodus incluye rezagados e ingresos directos que elevan el total presencial en sala)._\n`;
         if (totalPorConf > 0) resp += `* **Por Confirmar / Pendientes:** **${totalPorConf} personas**\n`;
-        if (totalAsig > 0) resp += `* **Total Contactos Asignados:** **${totalAsig} personas**\n`;
+        if (totalAsig > 0) resp += `* **Total Contactos Asignados a Coordinación:** **${totalAsig} personas**\n`;
         resp += `* **Total Intentos de Llamada:** **${totalLlam} llamadas** (un PX recibe múltiples llamadas de seguimiento)\n`;
         resp += `\n💡 _Regla Operativa CPSL: El número de llamadas mide esfuerzo y frecuencia de seguimiento; las confirmaciones telefónicas miden compromiso previo; y los sentados en sala miden las personas que efectivamente cruzaron la puerta del evento._\n`;
       }
