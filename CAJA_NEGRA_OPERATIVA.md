@@ -781,6 +781,42 @@ Tras el reporte de incidencias donde firmas completadas figuraban en el panel ad
   5. **Privacidad y Aislamiento de Tareas Personales (`UNOWNED_CUSTOM_TASK`):**
      - Impide que tareas personalizadas queden sin propietario o asignatario (`ownerId`/`createdBy`), evitando cualquier riesgo de fuga hacia vistas públicas o catálogo.
 
+### 18.6. Auditoría Exhaustiva e Integración de Datos Reales de Documentos en Cartas de Entrenadores
+* **Mandato Operativo y Legal:**
+  - *"Todas las cartas emitidas deben de tener los datos reales de los entrenadores, esto es muy serio."*
+  - Queda terminantemente prohibido emitir cartas de bienvenida o invitaciones migratorias con leyendas provisionales (`[DOCUMENTO PENDIENTE]`), abreviaturas genéricas (`PASAPORTE ECUATORIANO` sin numeración) o enlaces a carpetas crudas de Google Drive.
+* **Fuente Canónica de Verificación:**
+  - Se realizó la extracción y verificación mediante OCR de alta precisión sobre la totalidad de los 20 escaneos oficiales de pasaporte y documentos de identidad gubernamentales almacenados en el expediente de entrenadores (`work/crm/trainers/`):
+    1. **Jesús Adrián Acosta Rodríguez:** Pasaporte MEX `N12516404` · CURP `AORJ880422HZSCDS03`.
+    2. **Cirilo Agustín Martínez:** Pasaporte MEX `N07847087` · CURP `AUMC010611HOCGRRA4`.
+    3. **Fernando Aragón:** DNI Mercosur ARG `17.856.159`.
+    4. **Juan Ángel Arreola Morales:** Pasaporte MEX `N11363440` · CURP `AEMJ880713HNLRRN01`.
+    5. **Michael Andrés Boada Rubiano:** Pasaporte COL `PE226260` · C.C. `1026263360`.
+    6. **Diego David Bravo Figueroa:** Pasaporte ECU `A9025643` · C.I. `1713803847`.
+    7. **Leandro Emilio Brunis Avilés:** Pasaporte ECU `A8243780` · C.I. `1718426560` (Vigencia: 14/09/2022 al 14/09/2032).
+    8. **Carlos Emilio Brunis Villacís:** Pasaporte ECU `A8885265` · C.I. `1201916986` (Vigencia: 19/09/2023 al 19/09/2033).
+    9. **Ernesto Alejandro Díaz Pabón:** Pasaporte ECU `A4152916` · C.I. `1727274928`.
+    10. **Carlos Andrés Gómez Gómez:** Pasaporte COL `BG726399` · C.C. `3482169`.
+    11. **Elmer Andrés Idrovo Andrade:** Pasaporte ECU `A9919241` · C.I. `1712332350` (Vigencia: 24/07/2023 al 24/07/2033).
+    12. **Haydin Fernando Mendoza Clavijo:** Pasaporte ECU `A9900720` · C.I. `1717587529`.
+    13. **Ana Elena Monroy Thompson:** Pasaporte MEX `N04328038` · CURP `MOTA960805MMCNHN08`.
+    14. **Mildred Muñoz Vásquez:** Pasaporte COL `BE596036` · C.C. `1036598062`.
+    15. **Julio César Narváez Mora:** Pasaporte ECU `A8266033` · C.I. `1714134804` (Vigencia: 24/09/2022 al 24/09/2032).
+    16. **María de Lourdes Patiño Galárraga:** Pasaporte ECU `B0857192` · C.I. `1712863404`.
+    17. **Mauricio Pérez Robles:** Pasaporte MEX `N13904212` · CURP `PERM910531HPLRBR01`.
+    18. **Alonso Solares Salazar:** Pasaporte MEX `N11971541` · CURP `SOSA851221HDFLLL00`.
+    19. **Edison Paúl Sosa Carrera:** Pasaporte ECU `A9305688` · C.I. `1717138596`.
+    20. **José Antonio Torrón Ramírez:** Pasaporte DOM `RD6804526` · C.I. `00115213092`.
+* **Componentes Impactados:**
+  1. [`public/cartas/entrenadores-documentos.json`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/public/cartas/entrenadores-documentos.json): Actualizado con los 20 registros oficiales estructurados con números de pasaporte, cédula/CURP/DNI, fechas de nacimiento, vigencias y enlaces de respaldo.
+  2. [`public/cartas/carta_invitacion_migraciones.html`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/public/cartas/carta_invitacion_migraciones.html): Eliminado el truncamiento que eliminaba números de documento; ahora imprime la cadena oficial íntegra de pasaporte y cédula.
+  3. **Cartas HTML Oficiales Actualizadas y Nuevas:**
+     - [`carta_carlos_brunis_cue.html`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/public/cartas/carta_carlos_brunis_cue.html) (Nueva carta interactiva para Carlos Brunis, CUE 4FDS).
+     - [`carta_leandro_brunis_cue.html`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/public/cartas/carta_leandro_brunis_cue.html) (Nueva carta interactiva para Leandro Brunis, CUE CAP 1 E24).
+     - [`carta_ana_monroy_lim.html`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/public/cartas/carta_ana_monroy_lim.html) (Nueva carta interactiva para Ana Elena Monroy, Sede Lima).
+     - Se integró la tarjeta de identidad y documentos oficiales verificados en [`carta_andres_idrobo_creacion_e31.html`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/public/cartas/carta_andres_idrobo_creacion_e31.html), [`carta_andres_idrobo_e30.html`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/public/cartas/carta_andres_idrobo_e30.html), [`carta_lourdes_relacion_e30.html`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/public/cartas/carta_lourdes_relacion_e30.html), [`carta_lourdes_patino_e29.html`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/public/cartas/carta_lourdes_patino_e29.html), [`carta_mike_boada_gratitud_e29.html`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/public/cartas/carta_mike_boada_gratitud_e29.html), [`carta_alejandro_diaz_e28.html`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/public/cartas/carta_alejandro_diaz_e28.html), [`julio-narvaez-elviaje-e28.html`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/public/cartas/julio-narvaez-elviaje-e28.html) y [`fernando-aragon-c1.html`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/public/cartas/fernando-aragon-c1.html).
+  4. [`src/pages/MonitorVuelosCartas.jsx`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/src/pages/MonitorVuelosCartas.jsx): Actualizados todos los badges del catálogo `OFICIAL_LETTERS` con números reales de pasaporte/cédula; y el visor de previsualización (modal) incrusta automáticamente la carta oficial con datos verificados en lugar de enlaces rotos o carpetas crudas de Google Drive.
+
 ---
 
 > 📜 **Mandato de la Caja Negra:**
