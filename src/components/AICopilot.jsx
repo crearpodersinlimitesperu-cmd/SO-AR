@@ -89,22 +89,29 @@ function generateAssertiveResponse(queryText, nodusData, currentUser, messageHis
 
     let resp = `📊 **Consulta Equipo ${equipoNum}${sedeEnQuery ? ` (${sedeEnQuery.toUpperCase()})` : ''}:**\n\n`;
 
+    const asksAboutSeated = /(?:senta(?:do|da|ron|r)?|asist(?:i[oó]|ieron|en|encia)?|en\s+sala|en\s+el\s+sal[oó]n|puerta|check-?in)/i.test(q);
+
     // Si tenemos el padrón completo de participantes del reporte oficial (121 asignados):
     if (directTeamReport && Array.isArray(directTeamReport.participantes)) {
       const parts = directTeamReport.participantes;
+      const asistieronCount = parts.filter(p => {
+        const est = String(p.asistencia || '').toUpperCase();
+        return est.includes('ASIST') || est.includes('PRESENTE') || est.includes('SENTADO') || est.includes('SI');
+      }).length;
       const confCount = parts.filter(p => {
-        const est = String(p.asistencia || p.estado || p.llamada1 || p.llamada2 || '').toUpperCase();
-        return est.includes('CONFIRMADO') || est.includes('ASISTIO') || est.includes('SENTADO');
+        const est = String(p.llamada1 || p.llamada2 || p.estado || '').toUpperCase();
+        return est.includes('CONFIRMADO');
       }).length;
       const porConfCount = parts.filter(p => {
-        const est = String(p.asistencia || p.estado || p.llamada1 || p.llamada2 || '').toUpperCase();
-        return est.includes('POR CONFIRMAR') || est.includes('PENDIENTE');
+        const est = String(p.llamada1 || p.llamada2 || p.estado || '').toUpperCase();
+        return est.includes('POR CONFIRMAR') || est.includes('PENDIENTE') || est.includes('NO CONTESTA');
       }).length;
 
       resp += `📋 **Padrón Oficial Nodus (/reporte):**\n`;
       resp += `* **Total Asignados en Nodus:** **${parts.length}** contactos\n`;
-      resp += `* **Confirmados a Sala:** **${confCount}**\n`;
-      resp += `* **Por Confirmar / Pendientes:** **${porConfCount}**\n\n`;
+      resp += `* **Sentados en Sala (Check-in Nodus):** **${asistieronCount} personas**\n`;
+      resp += `* **Confirmados por Teléfono:** **${confCount} personas**\n`;
+      resp += `* **Por Confirmar / Pendientes:** **${porConfCount} personas**\n\n`;
     }
 
     if (matchingCoords.length > 0) {
@@ -112,6 +119,7 @@ function generateAssertiveResponse(queryText, nodusData, currentUser, messageHis
       let totalAsig = 0;
       let totalLlam = 0;
       let totalPorConf = 0;
+      let totalAsistieron = 0;
 
       resp += `👥 **Personas Únicas (PX) Gestionadas:**\n\n`;
       matchingCoords.forEach(c => {
@@ -119,31 +127,72 @@ function generateAssertiveResponse(queryText, nodusData, currentUser, messageHis
           c.equipos.forEach(eq => {
             const conf = Number(eq.confirmado || 0);
             const porConf = Number(eq.porConfirmar || 0);
-            const asig = Number(eq.asistieron || eq.asignados || (conf + porConf) || 0);
+            const asist = Number(eq.asistieron || eq.asistio || eq.sentados || 0);
+            const asig = Number(eq.asignados || (conf + porConf + (Number(eq.noContesta) || 0) + (Number(eq.siguiente) || 0)) || 0);
             const llam = Number(eq.llamadas || 0);
             totalConf += conf;
             totalPorConf += porConf;
             totalAsig += asig;
             totalLlam += llam;
-            resp += `* **${c.nombre} (${c.sede}):** **${conf} PX** confirmados, **${porConf} PX** por confirmar (Gestiones: ${llam} intentos/llamadas).\n`;
+            totalAsistieron += asist;
+            resp += `* **${c.nombre} (${c.sede}):** **${conf} PX** confirmados por llamada, **${porConf} PX** por confirmar (Gestiones: ${llam} intentos/llamadas).\n`;
           });
         } else if (c.legacyEstado) {
           const est = c.legacyEstado;
           const conf = Number(est.confirmado || 0);
           const porConf = Number(est.porConfirmar || 0);
           const asig = Number(est.asignados || 0);
+          const asist = Number(est.asistieron || 0);
           totalConf += conf;
           totalPorConf += porConf;
           totalAsig += asig;
-          resp += `* **${c.nombre} (${c.sede}):** **${conf} PX** confirmados, **${porConf} PX** por confirmar, de **${asig} PX** asignados.\n`;
+          totalAsistieron += asist;
+          resp += `* **${c.nombre} (${c.sede}):** **${conf} PX** confirmados por llamada, **${porConf} PX** por confirmar, de **${asig} PX** asignados.\n`;
         }
       });
 
-      resp += `\n📈 **Balance de Personas (PX) vs Gestiones (Equipo ${equipoNum}):**\n`;
-      resp += `* **PX Confirmados:** **${totalConf} personas**\n`;
-      if (totalPorConf > 0) resp += `* **PX Por Confirmar:** **${totalPorConf} personas**\n`;
-      resp += `* **Total Intentos / Gestiones de Llamada:** **${totalLlam} llamadas** (un PX recibe múltiples llamadas hasta lograr el contacto efectivo)\n`;
-      resp += `\n💡 _Regla Operativa CPSL: El número de llamadas mide esfuerzo y frecuencia de seguimiento; el número de PX (participantes) mide cabezas reales en sala._\n`;
+      // Cruzar con kpisEquipos si está disponible
+      if (Array.isArray(nodusData?.kpisEquipos)) {
+        const kpiMatch = nodusData.kpisEquipos.find(e => {
+          const name = String(e.nombre || e.equipo || '').toLowerCase();
+          return isTargetEq(name) && (!sedeEnQuery || name.includes(sedeEnQuery));
+        });
+        if (kpiMatch) {
+          if (kpiMatch.asistieron !== undefined && totalAsistieron === 0) {
+            totalAsistieron = Number(kpiMatch.asistieron || 0);
+          }
+          if (kpiMatch.confirmados !== undefined && totalConf === 0) {
+            totalConf = Number(kpiMatch.confirmados || 0);
+          }
+          if (kpiMatch.asignados !== undefined && totalAsig === 0) {
+            totalAsig = Number(kpiMatch.asignados || 0);
+          }
+        }
+      }
+
+      if (asksAboutSeated) {
+        resp += `\n🪑 **Asistencia Presencial (Sentados en Sala):**\n`;
+        if (totalAsistieron > 0) {
+          resp += `* **Sentados en Sala Registrados:** **${totalAsistieron} personas** con check-in en puerta en Nodus.\n\n`;
+        } else {
+          resp += `* **Sentados en Sala Registrados:** **0 personas** registradas en sala hasta este corte.\n`;
+          resp += `  _(Nota de sala: En Nodus, los 'sentados' corresponden al check-in presencial en puerta. Si el evento aún no ha iniciado o la mesa de acreditación está en proceso, el registro oficial en sala figurará en 0 hasta la carga del acta)._\n\n`;
+        }
+        resp += `📞 **Compromiso Previo (Gestión Telefónica de Coordinación):**\n`;
+        resp += `* **Confirmados por Teléfono:** **${totalConf} personas** confirmaron su compromiso de asistir.\n`;
+        if (totalPorConf > 0) resp += `* **Por Confirmar / Pendientes:** **${totalPorConf} personas**\n`;
+        if (totalAsig > 0) resp += `* **Total Contactos Asignados en Nodus:** **${totalAsig} personas**\n`;
+        resp += `* **Gestiones / Intentos de Llamada:** **${totalLlam} llamadas**\n`;
+        resp += `\n💡 _Diferencia Operativa Nodus: Una confirmación por llamada es un compromiso telefónico previo; un sentado en sala es una persona acreditada físicamente en puerta._\n`;
+      } else {
+        resp += `\n📈 **Balance Oficial Nodus (Equipo ${equipoNum}):**\n`;
+        resp += `* **Confirmados por Teléfono:** **${totalConf} personas**\n`;
+        resp += `* **Sentados en Sala (Check-in Nodus):** **${totalAsistieron > 0 ? `${totalAsistieron} personas` : '0 (sin check-in cargado aún)'}**\n`;
+        if (totalPorConf > 0) resp += `* **Por Confirmar / Pendientes:** **${totalPorConf} personas**\n`;
+        if (totalAsig > 0) resp += `* **Total Contactos Asignados:** **${totalAsig} personas**\n`;
+        resp += `* **Total Intentos de Llamada:** **${totalLlam} llamadas** (un PX recibe múltiples llamadas de seguimiento)\n`;
+        resp += `\n💡 _Regla Operativa CPSL: El número de llamadas mide esfuerzo y frecuencia de seguimiento; las confirmaciones telefónicas miden compromiso previo; y los sentados en sala miden las personas que efectivamente cruzaron la puerta del evento._\n`;
+      }
     } else if (!directTeamReport) {
       resp += `⚠️ No encuentro datos en vivo verificados (Nodus/Firestore) para el Equipo ${equipoNum} en este momento. No voy a inventar cifras — puedes pedirme el reporte general de sedes ("¿cómo van los confirmados?") mientras se sincroniza, o consultar directamente en Nodus/el padrón oficial.`;
     }
@@ -589,10 +638,19 @@ export default function AICopilot() {
       if (!aiText) {
         let nodusData = null;
         try {
-          const nodusDoc = await getDocResilient(doc(db, 'nodus_coordinadores_c1c2', 'latest'));
-          if (nodusDoc && nodusDoc.exists()) {
-            nodusData = nodusDoc.data();
-          }
+          const [nodusDoc, kpisDoc] = await Promise.all([
+            getDocResilient(doc(db, 'nodus_coordinadores_c1c2', 'latest')),
+            getDocResilient(doc(db, 'nodus_kpis_sincronizados', 'latest_snapshot'))
+          ]);
+          const cData = (nodusDoc && nodusDoc.exists()) ? nodusDoc.data() : {};
+          const kData = (kpisDoc && kpisDoc.exists()) ? kpisDoc.data() : {};
+          nodusData = {
+            ...cData,
+            kpisEquipos: kData.equipos || [],
+            kpisTotales: kData.totales || {},
+            kpisSedes: kData.sedes || [],
+            kpisTimestamp: kData.timestamp || cData.timestamp || null
+          };
         } catch (nodusErr) {
           console.warn("Error leyendo snapshot Nodus para copilot:", nodusErr);
         }
