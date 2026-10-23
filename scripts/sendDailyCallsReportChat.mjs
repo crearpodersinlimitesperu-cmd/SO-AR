@@ -22,8 +22,9 @@ import fs from 'fs';
 import path from 'path';
 import { initializeApp, cert, getApps, applicationDefault } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
+import { OFFICIAL_SEDES_TEAMS } from '../src/data/officialSedesTeams.js';
 
-const REPORT_SEDES = ['Lima', 'Quito', 'Cuenca', 'Guayaquil', 'Medellín'];
+const REPORT_SEDES = ['Lima', 'Quito', 'Cuenca', 'Guayaquil', 'Medellín', 'México'];
 const KEY_FILE = './centro-operativo-cpsl-65ad52160f45.json';
 
 // --- INICIALIZACIÓN DE FIRESTORE ---
@@ -134,10 +135,137 @@ export async function loadGoogleChatConfig() {
   };
 }
 
+// --- CALENDARIO Y VENTANA OPERATIVA DE LLAMADAS ---
+/**
+ * Determina si una sede está en ventana de llamadas activas para su entrenamiento próximo.
+ * 
+ * Regla de Oro Operativa CPSL:
+ * 1. Durante el entrenamiento (Viernes a Domingo) y post-entrenamiento inmediato (Lunes a Martes):
+ *    - El entrenamiento está en curso en sala o recién culminado.
+ *    - Las llamadas están CERRADAS.
+ *    - NO se envía reporte de llamadas de Nodus hasta el miércoles con los nuevos pagos.
+ * 2. Ventana activa de llamadas: Miércoles y Jueves.
+ *    - Nodus reporta los nuevos pagos y enrolados del siguiente ciclo.
+ *    - Las coordinadoras llaman y confirman participantes para la sala.
+ *    - Se envía el reporte oficial a las 12:30 PM.
+ */
+export function getSedeCallingSchedule(sedeName, now = new Date()) {
+  const normSede = (sedeName || '').trim();
+  const config = OFFICIAL_SEDES_TEAMS[normSede];
+  if (!config) return { isCallingOpen: false, shouldSendReport: false, reason: `Sede "${normSede}" no configurada en calendario maestro.` };
+
+  const localStr = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Lima',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).format(now);
+
+  const localDayOfWeek = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Lima',
+    weekday: 'short'
+  }).format(now); // 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'
+
+  const allEvents = config.upcomingC1 || [];
+  const sorted = [...allEvents].sort((a, b) => a.date.localeCompare(b.date));
+
+  // 1. Verificar si hay un entrenamiento en curso en sala o recién culminado (Viernes a Martes = inicio + 4 días)
+  const ongoing = sorted.find(e => {
+    const start = e.date;
+    const end = new Date(new Date(start).getTime() + 4 * 24 * 3600 * 1000).toISOString().slice(0, 10);
+    return localStr >= start && localStr <= end;
+  });
+
+  if (ongoing) {
+    return {
+      sede: normSede,
+      isCallingOpen: false,
+      status: 'IN_TRAINING_OR_POST',
+      currentTeam: ongoing.team,
+      eventDate: ongoing.date,
+      shouldSendReport: false,
+      reason: `El entrenamiento C1 E${ongoing.team} de ${normSede} está en curso en sala o en cierre (${ongoing.date}). Las llamadas están cerradas. No se envía reporte de Nodus hasta el miércoles con el registro de nuevos pagos.`
+    };
+  }
+
+  // 2. Buscar próximo evento en calendario
+  const nextEvent = sorted.find(e => e.date > localStr);
+  if (!nextEvent) {
+    return {
+      sede: normSede,
+      isCallingOpen: false,
+      status: 'NO_UPCOMING_EVENT',
+      shouldSendReport: false,
+      reason: `Sin entrenamientos próximos programados en calendario para ${normSede}.`
+    };
+  }
+
+  // 3. Regla directiva de días de llamada: Miércoles (Wed) y Jueves (Thu)
+  const isWednesdayOrThursday = (localDayOfWeek === 'Wed' || localDayOfWeek === 'Thu');
+  const diffDays = Math.round((new Date(nextEvent.date).getTime() - new Date(localStr).getTime()) / (24 * 3600 * 1000));
+
+  // Ventana activa: semana del evento (hasta 9 días antes pero estrictamente en Miércoles o Jueves)
+  if (isWednesdayOrThursday && diffDays <= 9 && diffDays >= 1) {
+    return {
+      sede: normSede,
+      isCallingOpen: true,
+      status: 'CALLING_ACTIVE',
+      targetTeam: nextEvent.team,
+      eventDate: nextEvent.date,
+      daysToEvent: diffDays,
+      shouldSendReport: true,
+      reason: `Ventana activa de llamadas para C1 E${nextEvent.team} (${nextEvent.date}). Reporte de nuevos pagos disponible.`
+    };
+  }
+
+  return {
+    sede: normSede,
+    isCallingOpen: false,
+    status: 'CALLING_INACTIVE',
+    targetTeam: nextEvent.team,
+    eventDate: nextEvent.date,
+    daysToEvent: diffDays,
+    shouldSendReport: false,
+    reason: `Fuera de ventana de llamadas activas para ${normSede} (próximo C1 E${nextEvent.team} el ${nextEvent.date}). Las llamadas y reportes se reanudan el miércoles con los nuevos pagos registrados en Nodus.`
+  };
+}
+
 // --- CONSTRUCCIÓN DEL REPORTE POR SEDE ---
-export function buildSedeDailyReport(sedeName, snapshotData) {
+export function buildSedeDailyReport(sedeName, snapshotData, options = {}) {
+  const { force = false, referenceDate = new Date(), checkSchedule = false } = options;
+  const scheduleInfo = getSedeCallingSchedule(sedeName, referenceDate);
+
+  // Fecha y corte
+  const timestamp = snapshotData?.timestamp || new Date().toISOString();
+  const fechaCorte = new Date(timestamp).toLocaleString('es-PE', {
+    timeZone: 'America/Lima',
+    dateStyle: 'medium',
+    timeStyle: 'short'
+  });
+
+  // Si se solicitó chequeo de calendario y las llamadas están cerradas / fuera de ventana
+  if (checkSchedule && !scheduleInfo.shouldSendReport && !force) {
+    return {
+      sede: sedeName,
+      available: false,
+      suppressed: true,
+      scheduleInfo,
+      timestamp,
+      fechaCorte,
+      reason: scheduleInfo.reason
+    };
+  }
+
+  const targetTeamNum = scheduleInfo.targetTeam || scheduleInfo.currentTeam;
+  const targetTeamStr = targetTeamNum ? `EQUIPO ${targetTeamNum}` : null;
+
+  const allEquiposReporte = snapshotData?.equiposReporte || snapshotData?.equiposSummary || [];
+  const officialTeam = targetTeamStr
+    ? allEquiposReporte.find(e => (e.equipoNombre || '').toUpperCase().startsWith(targetTeamStr))
+    : null;
+
   const normSede = (sedeName || '').toLowerCase().trim();
-  const rawSedes = snapshotData.sedes || [];
+  const rawSedes = snapshotData?.sedes || [];
   const sedesList = Array.isArray(rawSedes) ? rawSedes : Object.values(rawSedes);
   
   const sedeSummary = sedesList.find(s => 
@@ -145,68 +273,103 @@ export function buildSedeDailyReport(sedeName, snapshotData) {
     normSede.includes((s.sede || '').toLowerCase().trim())
   ) || null;
 
-  const coordinadores = (snapshotData.coordinadores || []).filter(c => 
+  const coordinadores = (snapshotData?.coordinadores || []).filter(c => 
     (c.sede || '').toLowerCase().trim() === normSede ||
     normSede.includes((c.sede || '').toLowerCase().trim())
   );
 
-  // Fecha y corte
-  const timestamp = snapshotData.timestamp || new Date().toISOString();
-  const fechaCorte = new Date(timestamp).toLocaleString('es-PE', {
-    timeZone: 'America/Lima',
-    dateStyle: 'medium',
-    timeStyle: 'short'
-  });
-
-  // Si no hay información de la sede en Nodus
-  if (!sedeSummary && coordinadores.length === 0) {
+  // Si no hay información de la sede en Nodus ni equipo oficial
+  if (!sedeSummary && coordinadores.length === 0 && !officialTeam) {
     return {
       sede: sedeName,
       available: false,
+      suppressed: false,
+      scheduleInfo,
       timestamp,
       fechaCorte,
       reason: 'Sin datos registrados en Nodus para esta sede en el corte actual.'
     };
   }
 
-  // PX (Participantes únicos) vs Gestiones (Llamadas realizadas)
-  const pxAsignados = Number(sedeSummary?.asignadosTotal ?? coordinadores.reduce((acc, c) => acc + (c.asignados || 0), 0));
-  const pxConfirmados = Number(sedeSummary?.confirmadosTotal ?? coordinadores.reduce((acc, c) => acc + (c.estados?.confirmado || 0), 0));
-  const pxPorConfirmar = Number(sedeSummary?.porConfirmarTotal ?? coordinadores.reduce((acc, c) => acc + (c.estados?.porConfirmar || 0), 0));
-  const pxNoContesta = Number(sedeSummary?.noContestaTotal ?? coordinadores.reduce((acc, c) => acc + (c.estados?.noContesta || 0), 0));
-  
-  // Gestiones de llamadas (esfuerzos acumulados)
-  const gestionesTotales = Number(sedeSummary?.gestionesTotal ?? coordinadores.reduce((acc, c) => acc + (c.gestiones || 0), 0));
-  const llamadasC1 = Number(sedeSummary?.c1Total ?? coordinadores.reduce((acc, c) => acc + (c.c1 || 0), 0));
-  const llamadasC2 = Number(sedeSummary?.c2Total ?? coordinadores.reduce((acc, c) => acc + (c.c2 || 0), 0));
+  // Cómputo de participantes reales y llamadas para el entrenamiento próximo
+  let pxAsignados = officialTeam?.totalParticipantes || 0;
+  let pxConfirmados = officialTeam?.confirmadosLlamada || 0;
+  let pxPorConfirmar = 0;
+  let pxNoContesta = 0;
+  let gestionesTotales = 0;
+  let llamadasC1 = 0;
+  let llamadasC2 = 0;
 
-  const tasaConversion = pxAsignados > 0 ? Math.round((pxConfirmados / pxAsignados) * 100) : 0;
-
-  // Desglose de coordinadores
+  // Desglose por coordinadores específico para el equipo objetivo
   const detalleCoordinadores = coordinadores.map(c => {
-    const equiposList = Array.isArray(c.equipos)
-      ? c.equipos.map(e => (typeof e === 'string' ? e : e.nombre || e.equipo || 'Equipo')).filter(Boolean)
-      : [];
-    const equiposDisplay = equiposList.slice(0, 3).join(', ') + (equiposList.length > 3 ? ` (+${equiposList.length - 3})` : '');
+    let coordLlamadas = 0;
+    let coordConfirmados = 0;
+    let coordPorConfirmar = 0;
+    let coordNoContesta = 0;
+
+    if (targetTeamStr) {
+      const matchEq = (c.equipos || []).find(e => (e.equipo || '').toUpperCase().startsWith(targetTeamStr));
+      if (matchEq) {
+        coordLlamadas = matchEq.llamadas || 0;
+        coordConfirmados = matchEq.confirmado || 0;
+        coordPorConfirmar = matchEq.porConfirmar || 0;
+        coordNoContesta = matchEq.noContesta || 0;
+      }
+    } else {
+      coordLlamadas = c.gestiones || 0;
+      coordConfirmados = c.estados?.confirmado || 0;
+      coordPorConfirmar = c.estados?.porConfirmar || 0;
+      coordNoContesta = c.estados?.noContesta || 0;
+    }
+
+    gestionesTotales += coordLlamadas;
+    if (!officialTeam || !officialTeam.confirmadosLlamada) {
+      pxConfirmados += coordConfirmados;
+    }
+    pxPorConfirmar += coordPorConfirmar;
+    pxNoContesta += coordNoContesta;
+    llamadasC1 += coordLlamadas;
 
     return {
       nombre: c.nombre || c.nombreCompleto || 'Coordinador',
       rol: c.rol || 'Coordinación',
-      pxAsignados: c.asignados || 0,
-      pxConfirmados: c.estados?.confirmado || 0,
-      pxPorConfirmar: c.estados?.porConfirmar || 0,
-      pxNoContesta: c.estados?.noContesta || 0,
-      gestionesTotales: c.gestiones || 0,
-      c1: c.c1 || 0,
-      c2: c.c2 || 0,
-      coberturaPct: c.coberturaPct || 0,
-      equipos: equiposDisplay || 'Ciclo Activo'
+      pxConfirmados: coordConfirmados,
+      pxPorConfirmar: coordPorConfirmar,
+      pxNoContesta: coordNoContesta,
+      gestionesTotales: coordLlamadas,
+      pxAsignados: officialTeam?.totalParticipantes || c.asignados || 0,
+      targetTeam: targetTeamStr || 'Ciclo Activo'
     };
   });
+
+  // Fallback si no había equipo en equiposReporte ni en c.equipos con llamadas (ej. snapshots históricos sin equiposReporte):
+  if (pxAsignados === 0) {
+    pxAsignados = Number(sedeSummary?.asignadosTotal ?? coordinadores.reduce((acc, c) => acc + (c.asignados || 0), 0));
+  }
+  if (pxConfirmados === 0 && sedeSummary?.confirmadosTotal) {
+    pxConfirmados = Number(sedeSummary.confirmadosTotal);
+  }
+  if (gestionesTotales === 0 && sedeSummary?.gestionesTotal) {
+    gestionesTotales = Number(sedeSummary.gestionesTotal);
+    llamadasC1 = Number(sedeSummary.c1Total || gestionesTotales);
+    llamadasC2 = Number(sedeSummary.c2Total || 0);
+  }
+  if (pxPorConfirmar === 0 && sedeSummary?.porConfirmarTotal) {
+    pxPorConfirmar = Number(sedeSummary.porConfirmarTotal);
+  }
+  if (pxNoContesta === 0 && sedeSummary?.noContestaTotal) {
+    pxNoContesta = Number(sedeSummary.noContestaTotal);
+  }
+
+  const tasaConversion = pxAsignados > 0 ? Math.round((pxConfirmados / pxAsignados) * 100) : 0;
 
   return {
     sede: sedeName,
     available: true,
+    suppressed: false,
+    scheduleInfo,
+    targetTeamLabel: targetTeamStr ? `C1 — ${targetTeamStr}` : 'Ciclo Activo',
+    eventDate: scheduleInfo.eventDate || null,
     timestamp,
     fechaCorte,
     pxAsignados,
@@ -227,6 +390,7 @@ export function formatGoogleChatCard(report) {
   const {
     sede,
     available,
+    suppressed,
     fechaCorte,
     pxAsignados,
     pxConfirmados,
@@ -237,8 +401,19 @@ export function formatGoogleChatCard(report) {
     llamadasC2,
     tasaConversion,
     coordinadores,
-    reason
+    reason,
+    targetTeamLabel,
+    eventDate
   } = report;
+
+  if (suppressed) {
+    return {
+      text: `⏸️ *CREAR PODER SIN LÍMITES — Sede ${sede}*\n` +
+        `📅 *Corte:* ${fechaCorte}\n\n` +
+        `Estado: ${reason}\n` +
+        `_Regla Operativa: Las llamadas de confirmación están cerradas durante el entrenamiento en sala. Los reportes se reanudan el miércoles con los nuevos pagos registrados en Nodus._`
+    };
+  }
 
   if (!available) {
     const textFallback = `⚠️ *CREAR PODER SIN LÍMITES — Reporte 12:30 PM: Sede ${sede}*\n` +
@@ -278,19 +453,22 @@ export function formatGoogleChatCard(report) {
     };
   }
 
+  const targetLabel = targetTeamLabel || (report.scheduleInfo?.targetTeam ? `C1 — EQUIPO ${report.scheduleInfo.targetTeam}` : null);
+  const eventDateText = eventDate ? `(${eventDate})` : '';
+
   // Texto fallback para clientes de chat simples o terminal
   let textFallback = `📢 *CREAR PODER SIN LÍMITES — Reporte Diario de Llamadas (12:30 PM)*\n` +
-    `📍 *Sede:* ${sede} | ⏰ *Corte:* ${fechaCorte}\n\n` +
+    `📍 *Sede:* ${sede}` + (targetLabel ? ` | 🎯 *Objetivo:* ${targetLabel} ${eventDateText}` : '') + ` | ⏰ *Corte:* ${fechaCorte}\n\n` +
     `👥 *PX ASIGNADOS EN SALA (Personas únicas):* ${pxAsignados}\n` +
     `🟢 *Confirmados a Sala:* ${pxConfirmados} (${tasaConversion}% de la sala)\n` +
     `🟡 *Por Confirmar (XC):* ${pxPorConfirmar}\n` +
     `🔴 *No Contesta (NC):* ${pxNoContesta}\n\n` +
     `📞 *GESTIONES REALIZADAS (Total llamadas/intentos):* ${gestionesTotales} (C1: ${llamadasC1} · C2: ${llamadasC2})\n` +
     `_Nota directiva: Un PX puede recibir múltiples llamadas; los PX son participantes únicos en sala._\n\n` +
-    `👤 *Detalle por Coordinación:*\n`;
+    `👤 *Detalle por Coordinación${targetLabel ? ` (${targetLabel})` : ''}:*\n`;
 
   for (const c of coordinadores) {
-    textFallback += `• *${c.nombre}*: ${c.pxConfirmados} confirmados de ${c.pxAsignados} PX (${c.gestionesTotales} llamadas realizadas) [${c.equipos}]\n`;
+    textFallback += `• *${c.nombre}*: ${c.pxConfirmados} confirmados` + (c.targetTeam ? ` para ${c.targetTeam}` : ` de ${c.pxAsignados} PX`) + ` (${c.gestionesTotales} llamadas realizadas)\n`;
   }
 
   // Widgets para Google Chat CardsV2
@@ -300,7 +478,19 @@ export function formatGoogleChatCard(report) {
         topLabel: '📍 Sede & Fecha de Corte',
         text: `<b>${sede}</b> • Corte oficial 12:30 PM • <i>${fechaCorte}</i>`
       }
-    },
+    }
+  ];
+
+  if (targetLabel) {
+    widgets.push({
+      decoratedText: {
+        topLabel: '🎯 ENTRENAMIENTO OBJETIVO',
+        text: `<b>${targetLabel}</b> ${eventDateText ? `• Inicio: <i>${eventDateText}</i>` : ''}`
+      }
+    });
+  }
+
+  widgets.push(
     {
       decoratedText: {
         topLabel: '👥 PARTICIPANTES ASIGNADOS (PX ÚNICOS EN SALA)',
@@ -343,13 +533,13 @@ export function formatGoogleChatCard(report) {
         text: `<b>${gestionesTotales} llamadas</b> (C1: ${llamadasC1} · C2: ${llamadasC2})<br><i>*A un PX se le contacta cuantas veces sea necesario para asegurar sala.</i>`
       }
     }
-  ];
+  );
 
   // Sección de Coordinadores
   const coordWidgets = coordinadores.map(c => ({
     decoratedText: {
-      topLabel: `👤 ${c.nombre} (${c.rol}) • ${c.equipos}`,
-      text: `🟢 <b>${c.pxConfirmados}</b> conf. de <b>${c.pxAsignados}</b> PX | 📞 <b>${c.gestionesTotales}</b> llamadas | 📈 Cobertura: <b>${c.coberturaPct}%</b>`
+      topLabel: `👤 ${c.nombre} (${c.rol}) • ${c.targetTeam || 'Ciclo'}`,
+      text: `🟢 <b>${c.pxConfirmados}</b> conf. | 📞 <b>${c.gestionesTotales}</b> llamadas para ${c.targetTeam || 'Ciclo'}`
     }
   }));
 
@@ -363,7 +553,7 @@ export function formatGoogleChatCard(report) {
 
   const sections = [
     {
-      header: '📊 Resumen Directivo de Sala (Nodus Live)',
+      header: `📊 Resumen Directivo de Sala — ${targetLabel || 'Nodus Live'}`,
       widgets
     },
     {
@@ -406,7 +596,7 @@ export function formatGoogleChatCard(report) {
       card: {
         header: {
           title: `CREAR PODER SIN LÍMITES — Sede ${sede}`,
-          subtitle: `📞 Reporte Diario de Llamadas (Corte 12:30 PM)`,
+          subtitle: `📞 Reporte Diario de Llamadas (Corte 12:30 PM)` + (targetLabel ? ` • ${targetLabel}` : ''),
           imageUrl: 'https://crearglobal.com/favicon.ico',
           imageType: 'CIRCLE'
         },
@@ -444,13 +634,16 @@ export async function sendPayloadToGoogleChat(webhookUrl, payload) {
 export async function runDailyCallsReportAgent(options = {}) {
   const {
     dryRun = false,
+    force = false,
     targetSede = null,
-    snapshotFile = null
+    snapshotFile = null,
+    referenceDate = new Date()
   } = options;
 
   console.log(`================================================================`);
   console.log(`🤖 AGENTE DE REPORTE DIARIO DE LLAMADAS (CORTE 12:30 PM)`);
   console.log(`Modo: ${dryRun ? '🔍 DRY RUN (Simulación sin envío real)' : '🚀 LIVE (Envío activo a Google Chat)'}`);
+  console.log(`Fuerza de envío (--force): ${force ? 'Activado (ignora ventana)' : 'Desactivado (respeta calendario de sala)'}`);
   console.log(`================================================================`);
 
   // 1. Cargar Snapshot de Nodus
@@ -476,7 +669,21 @@ export async function runDailyCallsReportAgent(options = {}) {
     console.log(`\n------------------------------------------------------------`);
     console.log(`📍 Procesando Sede: ${sede}`);
 
-    const report = buildSedeDailyReport(sede, snapshotData);
+    const report = buildSedeDailyReport(sede, snapshotData, { checkSchedule: !force, force, referenceDate });
+
+    // Si el reporte está suprimido (entrenamiento en curso o fuera de ventana miércoles/jueves)
+    if (report.suppressed) {
+      console.log(`⏸️ [SUPRIMIDO] Sede "${sede}": ${report.reason}`);
+      results.push({ sede, success: true, suppressed: true, reason: report.reason, report });
+      continue;
+    }
+
+    if (!report.available) {
+      console.log(`⚠️ [NO DISPONIBLE] Sede "${sede}": ${report.reason}`);
+      results.push({ sede, success: false, suppressed: false, reason: report.reason, report });
+      continue;
+    }
+
     const cardPayload = formatGoogleChatCard(report);
 
     // Obtener webhook específico de la sede
@@ -496,7 +703,7 @@ export async function runDailyCallsReportAgent(options = {}) {
       continue;
     }
 
-    console.log(`[ENVIANDO] Transmitiendo reporte de ${sede} a Google Chat...`);
+    console.log(`[ENVIANDO] Transmitiendo reporte de ${sede} (${report.targetTeamLabel || 'Ciclo'}) a Google Chat...`);
     const sendResult = await sendPayloadToGoogleChat(webhookUrl, cardPayload);
 
     if (sendResult.success) {
@@ -515,7 +722,7 @@ export async function runDailyCallsReportAgent(options = {}) {
       await firestore.collection('audit_logs').add({
         action: 'DAILY_CALLS_REPORT_1230_DISPATCH',
         timestamp: new Date().toISOString(),
-        results: results.map(r => ({ sede: r.sede, success: r.success, reason: r.reason || null })),
+        results: results.map(r => ({ sede: r.sede, success: r.success, suppressed: r.suppressed || false, reason: r.reason || null })),
         agent: 'sendDailyCallsReportChat.mjs'
       });
       console.log(`\n[4/4] Bitácora guardada en Firestore audit_logs.`);
@@ -533,12 +740,13 @@ export async function runDailyCallsReportAgent(options = {}) {
 if (import.meta.url === `file://${process.argv[1]}`) {
   const args = process.argv.slice(2);
   const dryRun = args.includes('--dry-run');
+  const force = args.includes('--force');
   const sedeArg = args.find(a => a.startsWith('--sede='));
   const targetSede = sedeArg ? sedeArg.split('=')[1] : null;
   const snapshotArg = args.find(a => a.startsWith('--snapshot-file='));
   const snapshotFile = snapshotArg ? snapshotArg.split('=')[1] : null;
 
-  runDailyCallsReportAgent({ dryRun, targetSede, snapshotFile })
+  runDailyCallsReportAgent({ dryRun, force, targetSede, snapshotFile })
     .then(() => process.exit(0))
     .catch(err => {
       console.error('Fatal error running agent:', err);

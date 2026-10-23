@@ -11,8 +11,13 @@ on:
         required: false
         type: boolean
         default: false
+      force:
+        description: 'Forzar envío (ignora ventana miércoles/jueves y supresión de sala)'
+        required: false
+        type: boolean
+        default: false
       sede:
-        description: 'Sede específica (Lima, Quito, Cuenca, Guayaquil, Medellín, o all)'
+        description: 'Sede específica (Lima, Quito, Cuenca, Guayaquil, Medellín, México, o all)'
         required: false
         type: string
         default: 'all'
@@ -73,6 +78,9 @@ jobs:
           CMD="node scripts/sendDailyCallsReportChat.mjs"
           if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
             CMD="$CMD --dry-run"
+          fi
+          if [ "${{ github.event.inputs.force }}" = "true" ]; then
+            CMD="$CMD --force"
           fi
           if [ -n "${{ github.event.inputs.sede }}" ] && [ "${{ github.event.inputs.sede }}" != "all" ]; then
             CMD="$CMD --sede=${{ github.event.inputs.sede }}"
