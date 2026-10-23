@@ -384,7 +384,7 @@ export default function CentroManagers() {
   const [sheetStatusFilter, setSheetStatusFilter] = useState('todos');
   const [search, setSearch] = useState(initialSearchQuery);
   const [filterSede, setFilterSede] = useState(initialSedeQuery ? normalizeSede(initialSedeQuery) : '');
-  const [statusFilter, setStatusFilter] = useState('Todos'); // 'Todos' | 'Activo' | 'Graduado' | 'Desertor'
+  const [statusFilter, setStatusFilter] = useState('Activo'); // 'Activo' por defecto | 'Todos' | 'Graduado' | 'Desertor'
 
   const canSeeInactives = canViewInactiveUsers(currentUser);
 

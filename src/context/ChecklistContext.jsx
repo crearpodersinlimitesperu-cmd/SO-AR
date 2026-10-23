@@ -15,6 +15,7 @@ import { applyCycleCompletion, createCycleCompletion, getEffectiveCompletion, ge
 import { normalizeTaskLocation, taskLocationLabel, taskReminderMessage, taskUrl, escapeTaskHtml } from '../utils/taskLocation';
 import { applyParticipantChanges, mergeParticipantStates, participantCollectionPath, participantKeys } from '../utils/taskParticipants';
 import { readTaskParticipants, stageTaskParticipants } from '../services/taskParticipantStore';
+import { canonicalSede } from '../utils/sede';
 
 const ChecklistContext = createContext();
 
@@ -497,7 +498,7 @@ export function ChecklistProvider({ children }) {
       if (!active) return;
       const docsById = new Map();
       snapshotsByQuery.forEach(docs => docs.forEach(taskDoc => docsById.set(taskDoc.id, taskDoc)));
-      const userSede = currentUser?.sede?.trim() || 'Global';
+      const userSede = canonicalSede(currentUser?.sede?.trim() || 'Global');
       const authorizedTasks = filterTasksForUser(
         [...docsById.values()].map(taskDoc => ({ id: taskDoc.id, ...taskDoc.data() })),
         currentUser
@@ -661,7 +662,7 @@ export function ChecklistProvider({ children }) {
     pendingTaskToggles.current.add(taskKey);
     const taskId = taskKey.includes('__EQ') ? taskKey.split('__EQ')[0] : taskKey;
     const nextStatus = !currentStatus;
-    const userSede = currentUser?.sede?.trim() || 'Global';
+    const userSede = canonicalSede(currentUser?.sede?.trim() || 'Global');
     const cycleForThisToggle = equipoQuito
       ? quitoCycles.find(qc => qc.equipo === equipoQuito)?.cycle
       : currentCycle;

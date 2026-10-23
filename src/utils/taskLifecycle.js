@@ -9,14 +9,38 @@ export function resolveTaskCycleScope(task, { catalogTask = false, sede, cycle }
 }
 
 export function getEffectiveCompletion(task, { sede, cycleId, cycleScoped = false } = {}) {
+  const normSede = sede ? String(sede).trim().toLowerCase() : '';
+  const normCycleId = cycleId ? String(cycleId).trim().toLowerCase() : '';
+
   if (cycleScoped) {
-    const cycleCompletion = cycleId && sede
-      ? task?.completions?.[`${sede}__${cycleId}`]
-      : null;
+    let cycleCompletion = null;
+    if (task?.completions && typeof task.completions === 'object') {
+      if (sede && cycleId && task.completions[`${sede}__${cycleId}`]) {
+        cycleCompletion = task.completions[`${sede}__${cycleId}`];
+      }
+      if (!cycleCompletion && normSede && normCycleId) {
+        const targetKey = `${normSede}__${normCycleId}`;
+        const foundKey = Object.keys(task.completions).find(k => k.toLowerCase() === targetKey);
+        if (foundKey) cycleCompletion = task.completions[foundKey];
+      }
+      if (!cycleCompletion && normCycleId) {
+        const foundKey = Object.keys(task.completions).find(k => {
+          const entry = task.completions[k];
+          const entryCycleId = entry?.cycleId ? String(entry.cycleId).trim().toLowerCase() : '';
+          const keyMatchesSede = normSede ? k.toLowerCase().startsWith(normSede) : true;
+          return keyMatchesSede && entryCycleId === normCycleId;
+        });
+        if (foundKey) cycleCompletion = task.completions[foundKey];
+      }
+      if (!cycleCompletion && !normCycleId && normSede) {
+        const foundKey = Object.keys(task.completions).find(k => k.toLowerCase() === normSede);
+        if (foundKey) cycleCompletion = task.completions[foundKey];
+      }
+    }
     const completed = cycleCompletion?.completed === true;
     return {
       completed,
-      status: completed ? 'Completada' : 'Pendiente',
+      status: completed ? 'Completada' : (cycleCompletion?.status || 'Pendiente'),
       completion: cycleCompletion || null
     };
   }

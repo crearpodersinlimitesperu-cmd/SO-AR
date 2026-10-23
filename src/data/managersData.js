@@ -141,7 +141,7 @@ export const INITIAL_MANAGERS = [
     "entrenador": "Jose Luis Sanchez Moreno",
     "coordinador": "ALONSO SOLARES",
     "sede": "CDMX",
-    "estado": "Activo"
+    "estado": "Graduado"
   },
   {
     "id": 12,
@@ -154,7 +154,7 @@ export const INITIAL_MANAGERS = [
     "entrenador": "Jose Luis Sanchez Moreno",
     "coordinador": "ALONSO SOLARES",
     "sede": "CDMX",
-    "estado": "Activo"
+    "estado": "Graduado"
   },
   {
     "id": 13,
@@ -167,7 +167,7 @@ export const INITIAL_MANAGERS = [
     "entrenador": "Jose Luis Sanchez Moreno",
     "coordinador": "ALONSO SOLARES",
     "sede": "CDMX",
-    "estado": "Activo"
+    "estado": "Graduado"
   },
   {
     "id": 14,
@@ -180,7 +180,7 @@ export const INITIAL_MANAGERS = [
     "entrenador": "Jose Luis Sanchez Moreno",
     "coordinador": "ALONSO SOLARES",
     "sede": "CDMX",
-    "estado": "Activo"
+    "estado": "Graduado"
   },
   {
     "id": 15,
@@ -284,7 +284,7 @@ export const INITIAL_MANAGERS = [
     "entrenador": "Julio Narvaez",
     "coordinador": "ALONSO SOLARES",
     "sede": "CDMX",
-    "estado": "Activo"
+    "estado": "Graduado"
   },
   {
     "id": 23,
@@ -297,7 +297,7 @@ export const INITIAL_MANAGERS = [
     "entrenador": "Julio Narvaez",
     "coordinador": "ALONSO SOLARES",
     "sede": "CDMX",
-    "estado": "Activo"
+    "estado": "Graduado"
   },
   {
     "id": 24,
@@ -349,7 +349,7 @@ export const INITIAL_MANAGERS = [
     "entrenador": "Erika Gissell Gavilanez Gallardo",
     "coordinador": "DANIELA MONROY FABBRI",
     "sede": "CDMX",
-    "estado": "Activo"
+    "estado": "Graduado"
   },
   {
     "id": 28,
@@ -401,7 +401,7 @@ export const INITIAL_MANAGERS = [
     "entrenador": "Linid Valencia",
     "coordinador": "DANIELA MONROY FABBRI",
     "sede": "CDMX",
-    "estado": "Activo"
+    "estado": "Graduado"
   },
   {
     "id": 32,
