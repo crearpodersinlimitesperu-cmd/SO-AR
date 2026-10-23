@@ -1,46 +1,89 @@
 {
-  "fuente": "Google Drive · Pasaportes de entrenadores (carpeta 1Q2NSa-2w2b7L0MGPrIcy-HZX_fUsnmzc)",
+  "fuente": "Expediente Oficial de Entrenadores · Documentos y Pasaportes Verificados (Escaneos Originales)",
   "verificado": "2026-10-23",
-  "nota": "Datos de identidad y documentos oficiales verificados para emisión de cartas oficiales e invitaciones migratorias.",
+  "nota": "Base legal y consular verificada con números reales de pasaporte, cédula/DNI/CURP, nacionalidad y fechas de vigencia para todas las cartas de bienvenida e invitaciones migratorias emitidas.",
   "entrenadores": [
     {
       "nombre": "JESUS ADRIAN ACOSTA RODRIGUEZ",
       "nacionalidad": "MEXICANA",
-      "documento": "PASAPORTE MEXICANO",
-      "archivo": "PASAPORTE_ACOSTA_RODRIGUEZ_JESUS_ADRIAN.jpg"
+      "documento": "PASAPORTE MEXICANO N° N12516404 / CURP AORJ880422HZSCDS03",
+      "pasaporte": "N12516404",
+      "curp": "AORJ880422HZSCDS03",
+      "fechaNacimiento": "22/04/1988",
+      "lugarNacimiento": "Zacatecas, Zacatecas, México",
+      "vigenciaPasaporte": "07/02/2024 al 07/02/2027",
+      "archivo": "PASAPORTE_ACOSTA_RODRIGUEZ_JESUS_ADRIAN.jpg",
+      "alias": [
+        "CHUY ACOSTA",
+        "JESUS ACOSTA"
+      ]
     },
     {
       "nombre": "CIRILO AGUSTIN MARTINEZ",
       "nacionalidad": "MEXICANA",
-      "documento": "PASAPORTE MEXICANO",
-      "archivo": "PASAPORTE_AGUSTIN_MARTINEZ_CIRILO.jpeg"
+      "documento": "PASAPORTE MEXICANO N° N07847087 / CURP AUMC010611HOCGRRA4",
+      "pasaporte": "N07847087",
+      "curp": "AUMC010611HOCGRRA4",
+      "fechaNacimiento": "11/06/2001",
+      "lugarNacimiento": "Tijuana, Baja California, México",
+      "vigenciaPasaporte": "Vigente",
+      "archivo": "PASAPORTE_AGUSTIN_MARTINEZ_CIRILO.jpeg",
+      "alias": [
+        "CIRILO AGUSTIN"
+      ]
     },
     {
       "nombre": "FERNANDO ARAGON",
       "nacionalidad": "ARGENTINA",
-      "documento": "DNI MERCOSUR",
-      "archivo": "PASAPORTE_ARAGON_FERNANDO.jpeg"
+      "documento": "DNI MERCOSUR ARGENTINO N° 17.856.159",
+      "dni": "17.856.159",
+      "fechaNacimiento": "03/09/1965",
+      "lugarNacimiento": "Argentina",
+      "archivo": "PASAPORTE_ARAGON_FERNANDO.jpeg",
+      "alias": [
+        "FER ARAGON"
+      ]
     },
     {
       "nombre": "JUAN ANGEL ARREOLA MORALES",
       "nacionalidad": "MEXICANA",
-      "documento": "PASAPORTE MEXICANO",
-      "archivo": "PASAPORTE_ARREOLA_MORALES_JUAN_ANGEL.jpg"
+      "documento": "PASAPORTE MEXICANO N° N11363440 / CURP AEMJ880713HNLRRN01",
+      "pasaporte": "N11363440",
+      "curp": "AEMJ880713HNLRRN01",
+      "fechaNacimiento": "13/07/1988",
+      "lugarNacimiento": "México",
+      "archivo": "PASAPORTE_ARREOLA_MORALES_JUAN_ANGEL.jpg",
+      "alias": [
+        "JUAN ANGEL ARREOLA",
+        "JUAN ARREOLA"
+      ]
     },
     {
       "nombre": "MICHAEL ANDRES BOADA RUBIANO",
       "nacionalidad": "COLOMBIANA",
-      "documento": "PASAPORTE COLOMBIANO",
+      "documento": "PASAPORTE COLOMBIANO N° PE226260 / C.C. 1026263360",
+      "pasaporte": "PE226260",
+      "cedula": "1026263360",
+      "fechaNacimiento": "24/12/1988",
+      "lugarNacimiento": "Bogotá, Colombia",
       "archivo": "PASAPORTE_BOADA_RUBIANO_MICHAEL_ANDRES.jpg",
       "alias": [
-        "MIKE BOADA"
+        "MIKE BOADA",
+        "MICHAEL BOADA"
       ]
     },
     {
       "nombre": "DIEGO DAVID BRAVO FIGUEROA",
       "nacionalidad": "ECUATORIANA",
-      "documento": "PASAPORTE ECUATORIANO",
-      "archivo": "PASAPORTE_BRAVO_FIGUEROA_DIEGO_DAVID.jpeg"
+      "documento": "PASAPORTE ECUATORIANO N° A9025643 / C.I. 1713803847",
+      "pasaporte": "A9025643",
+      "cedula": "1713803847",
+      "fechaNacimiento": "07/02/1977",
+      "lugarNacimiento": "Riobamba, Ecuador",
+      "archivo": "PASAPORTE_BRAVO_FIGUEROA_DIEGO_DAVID.jpeg",
+      "alias": [
+        "DIEGO BRAVO"
+      ]
     },
     {
       "nombre": "LEANDRO EMILIO BRUNIS AVILES",
@@ -50,6 +93,7 @@
       "cedula": "1718426560",
       "fechaNacimiento": "24/11/1989",
       "lugarNacimiento": "Quito, Ecuador",
+      "vigenciaPasaporte": "14/09/2022 al 14/09/2032",
       "archivo": "PASAPORTE_BRUNIS_AVILES_LEANDRO_EMILIO.jpg",
       "alias": [
         "LEANDRO BRUNIS"
@@ -63,6 +107,7 @@
       "cedula": "1201916986",
       "fechaNacimiento": "24/07/1966",
       "lugarNacimiento": "Ventanas, Ecuador",
+      "vigenciaPasaporte": "19/09/2023 al 19/09/2033",
       "archivo": "PASAPORTE_BRUNIS_VILLACIS_CARLOS_EMILIO.jpg",
       "alias": [
         "CARLOS BRUNIS"
@@ -71,77 +116,169 @@
     {
       "nombre": "ERNESTO ALEJANDRO DIAZ PABON",
       "nacionalidad": "ECUATORIANA",
-      "documento": "PASAPORTE ECUATORIANO",
-      "archivo": "PASAPORTE_DIAZ_PABON_ERNESTO_ALEJANDRO.jpg"
+      "documento": "PASAPORTE ECUATORIANO N° A4152916 / C.I. 1727274928",
+      "pasaporte": "A4152916",
+      "cedula": "1727274928",
+      "fechaNacimiento": "24/04/1993",
+      "lugarNacimiento": "Quito, Ecuador",
+      "archivo": "PASAPORTE_DIAZ_PABON_ERNESTO_ALEJANDRO.jpg",
+      "alias": [
+        "ALEJANDRO DIAZ",
+        "ALEJO DIAZ"
+      ]
     },
     {
       "nombre": "CARLOS ANDRES GOMEZ GOMEZ",
       "nacionalidad": "COLOMBIANA",
-      "documento": "PASAPORTE COLOMBIANO",
-      "archivo": "PASAPORTE_GOMEZ_GOMEZ_CARLOS_ANDRES.jpeg"
+      "documento": "PASAPORTE COLOMBIANO N° BG726399 / C.C. 3482169",
+      "pasaporte": "BG726399",
+      "cedula": "3482169",
+      "fechaNacimiento": "23/04/1982",
+      "lugarNacimiento": "Medellín, Colombia",
+      "archivo": "PASAPORTE_GOMEZ_GOMEZ_CARLOS_ANDRES.jpeg",
+      "alias": [
+        "ANDRES GOMEZ",
+        "CARLOS GOMEZ"
+      ]
     },
     {
       "nombre": "ELMER ANDRES IDROBO ANDRADE",
       "nacionalidad": "ECUATORIANA",
-      "documento": "PASAPORTE ECUATORIANO",
+      "documento": "PASAPORTE ECUATORIANO N° A9919241 / C.I. 1712332350",
+      "pasaporte": "A9919241",
+      "cedula": "1712332350",
+      "fechaNacimiento": "01/12/1989",
+      "lugarNacimiento": "Quito, Ecuador",
+      "vigenciaPasaporte": "24/07/2023 al 24/07/2033",
       "archivo": "PASAPORTE_IDROBO_ANDRADE_ELMER_ANDRES.jpg",
       "alias": [
-        "ANDRES IDROVO"
+        "ANDRES IDROVO",
+        "ANDRES IDROBO",
+        "ELMER IDROBO"
       ]
     },
     {
       "nombre": "HAYDIN FERNANDO MENDOZA CLAVIJO",
       "nacionalidad": "ECUATORIANA",
-      "documento": "PASAPORTE ECUATORIANO",
-      "archivo": "PASAPORTE_MENDOZA_CLAVIJO_HAYDIN_FERNANDO.jpeg"
+      "documento": "PASAPORTE ECUATORIANO N° A9900720 / C.I. 1717587529",
+      "pasaporte": "A9900720",
+      "cedula": "1717587529",
+      "fechaNacimiento": "19/05/1984",
+      "lugarNacimiento": "Cayambe, Ecuador",
+      "archivo": "PASAPORTE_MENDOZA_CLAVIJO_HAYDIN_FERNANDO.jpeg",
+      "alias": [
+        "HAYDIN MENDOZA",
+        "FERNANDO MENDOZA"
+      ]
     },
     {
       "nombre": "ANA ELENA MONROY THOMPSON",
       "nacionalidad": "MEXICANA",
-      "documento": "PASAPORTE MEXICANO",
-      "archivo": "PASAPORTE_MONROY_THOMPSON_ANA_ELENA.jpg"
+      "documento": "PASAPORTE MEXICANO N° N04328038 / CURP MOTA960805MMCNHN08",
+      "pasaporte": "N04328038",
+      "curp": "MOTA960805MMCNHN08",
+      "fechaNacimiento": "05/08/1996",
+      "lugarNacimiento": "Coyoacán, Ciudad de México, México",
+      "archivo": "PASAPORTE_MONROY_THOMPSON_ANA_ELENA.jpg",
+      "alias": [
+        "ANA ELENA MONROY",
+        "ANA MONROY"
+      ]
     },
     {
       "nombre": "MILDRED MUÑOZ VASQUEZ",
       "nacionalidad": "COLOMBIANA",
-      "documento": "PASAPORTE COLOMBIANO",
-      "archivo": "PASAPORTE_MUNOZ_VASQUEZ_MILDRED.jpg"
+      "documento": "PASAPORTE COLOMBIANO N° BE596036 / C.C. 1036598062",
+      "pasaporte": "BE596036",
+      "cedula": "1036598062",
+      "fechaNacimiento": "25/02/1986",
+      "lugarNacimiento": "Itagüí, Colombia",
+      "archivo": "PASAPORTE_MUNOZ_VASQUEZ_MILDRED.jpg",
+      "alias": [
+        "MILDRED MUNOZ"
+      ]
     },
     {
       "nombre": "JULIO CESAR NARVAEZ MORA",
       "nacionalidad": "ECUATORIANA",
-      "documento": "PASAPORTE ECUATORIANO",
-      "archivo": "PASAPORTE_NARVAEZ_MORA_JULIO_CESAR.jpg"
+      "documento": "PASAPORTE ECUATORIANO N° A8266033 / C.I. 1714134804",
+      "pasaporte": "A8266033",
+      "cedula": "1714134804",
+      "fechaNacimiento": "29/06/1979",
+      "lugarNacimiento": "Quito, Ecuador",
+      "vigenciaPasaporte": "24/09/2022 al 24/09/2032",
+      "archivo": "PASAPORTE_NARVAEZ_MORA_JULIO_CESAR.jpg",
+      "alias": [
+        "JULIO NARVAEZ"
+      ]
     },
     {
       "nombre": "MARIA DE LOURDES PATIÑO GALARRAGA",
       "nacionalidad": "ECUATORIANA",
-      "documento": "PASAPORTE ECUATORIANO",
-      "archivo": "PASAPORTE_PATINO_GALARRAGA_MARIA_DE_LOURDES.jpeg"
+      "documento": "PASAPORTE ECUATORIANO N° B0857192 / C.I. 1712863404",
+      "pasaporte": "B0857192",
+      "cedula": "1712863404",
+      "fechaNacimiento": "17/12/1976",
+      "lugarNacimiento": "Quito, Ecuador",
+      "archivo": "PASAPORTE_PATINO_GALARRAGA_MARIA_DE_LOURDES.jpeg",
+      "alias": [
+        "LOURDES PATINO",
+        "MARIA DE LOURDES PATINO"
+      ]
     },
     {
       "nombre": "EDISON PAUL SOSA CARRERA",
       "nacionalidad": "ECUATORIANA",
-      "documento": "PASAPORTE ECUATORIANO",
-      "archivo": "PASAPORTE PAUL SOSA.jpeg"
+      "documento": "PASAPORTE ECUATORIANO N° A9305688 / C.I. 1717138596",
+      "pasaporte": "A9305688",
+      "cedula": "1717138596",
+      "fechaNacimiento": "24/06/1985",
+      "lugarNacimiento": "Quito, Ecuador",
+      "archivo": "PASAPORTE PAUL SOSA.jpeg",
+      "alias": [
+        "PAUL SOSA",
+        "EDISON PAUL SOSA"
+      ]
     },
     {
       "nombre": "MAURICIO PEREZ ROBLES",
       "nacionalidad": "MEXICANA",
-      "documento": "PASAPORTE MEXICANO",
-      "archivo": "PASAPORTE_PEREZ_ROBLES_MAURICIO.jpeg"
+      "documento": "PASAPORTE MEXICANO N° N13904212 / CURP PERM910531HPLRBR01",
+      "pasaporte": "N13904212",
+      "curp": "PERM910531HPLRBR01",
+      "fechaNacimiento": "31/05/1991",
+      "lugarNacimiento": "Puebla, México",
+      "archivo": "PASAPORTE_PEREZ_ROBLES_MAURICIO.jpeg",
+      "alias": [
+        "MAURICIO PEREZ"
+      ]
     },
     {
       "nombre": "ALONSO SOLARES SALAZAR",
       "nacionalidad": "MEXICANA",
-      "documento": "PASAPORTE MEXICANO",
-      "archivo": "PASAPORTE_SOLARES_SALAZAR_ALONSO.jpg"
+      "documento": "PASAPORTE MEXICANO N° N11971541 / CURP SOSA851221HDFLLL00",
+      "pasaporte": "N11971541",
+      "curp": "SOSA851221HDFLLL00",
+      "fechaNacimiento": "21/12/1985",
+      "lugarNacimiento": "Ciudad de México, México",
+      "archivo": "PASAPORTE_SOLARES_SALAZAR_ALONSO.jpg",
+      "alias": [
+        "ALONSO SOLARES"
+      ]
     },
     {
       "nombre": "JOSE ANTONIO TORRON RAMIREZ",
       "nacionalidad": "DOMINICANA",
-      "documento": "PASAPORTE DOMINICANO",
-      "archivo": "PASAPORTE_TORRON_RAMIREZ_JOSE_ANTONIO.jpg"
+      "documento": "PASAPORTE DOMINICANO N° RD6804526 / C.I. 00115213092",
+      "pasaporte": "RD6804526",
+      "cedula": "00115213092",
+      "fechaNacimiento": "02/11/1969",
+      "lugarNacimiento": "Santo Domingo, República Dominicana",
+      "archivo": "PASAPORTE_TORRON_RAMIREZ_JOSE_ANTONIO.jpg",
+      "alias": [
+        "JOSE TORRON",
+        "JOSE ANTONIO TORRON"
+      ]
     }
   ]
 }

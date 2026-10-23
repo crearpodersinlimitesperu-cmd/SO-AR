@@ -183,39 +183,39 @@ const OFICIAL_LETTERS = [
 
     {
       id: 'carta-andres-creacion-e31',
-      entrenador: 'Andrés Idrovo',
+      entrenador: 'Elmer Andrés Idrovo Andrade',
       rol: 'Líder Creación',
       equipo: 'Equipo 31 - Creación',
       sede: 'Lima',
       url: '/cartas/carta_andres_idrobo_creacion_e31.html',
-      badge: 'N/A',
-      fecha: '2026',
-      descripcion: 'Carta oficial de bienvenida.',
-      vuelos: []
+      badge: 'Pasaporte A9919241 · CI 1712332350',
+      fecha: '09 - 11 Octubre 2026',
+      descripcion: 'Carta oficial de bienvenida, itinerario LATAM NMLGFJ, documento verificado y hospedaje en Faraona Grand Hotel.',
+      vuelos: ['LA 1351', 'LA 1430', 'LA 1449', 'LA 1407']
     },
     {
       id: 'carta-lourdes-relacion-e30',
-      entrenador: 'Lourdes Patiño',
+      entrenador: 'María de Lourdes Patiño Galárraga',
       rol: 'Líder Relación',
       equipo: 'Equipo 30 - Relación',
       sede: 'Lima',
       url: '/cartas/carta_lourdes_relacion_e30.html',
-      badge: 'N/A',
-      fecha: '2026',
-      descripcion: 'Carta oficial de bienvenida.',
-      vuelos: []
+      badge: 'Pasaporte B0857192 · CI 1712863404',
+      fecha: '08 - 12 Octubre 2026',
+      descripcion: 'Carta oficial de bienvenida, itinerario LATAM MRVXID (LA 1425 / LA 1449), documento verificado y hospedaje en Faraona Grand Hotel.',
+      vuelos: ['LA 1425', 'LA 1449', 'LA 1407']
     },
     {
       id: 'carta-mike-gratitud-e29',
-      entrenador: 'Mike Boada',
+      entrenador: 'Michael Andrés Boada Rubiano',
       rol: 'Líder Gratitud',
       equipo: 'Equipo 29 - Gratitud',
       sede: 'Lima',
       url: '/cartas/carta_mike_boada_gratitud_e29.html',
-      badge: 'SEGURO PENDIENTE',
-      fecha: '2026',
-      descripcion: 'Carta oficial de bienvenida con condición (Falta Seguro Médico).',
-      vuelos: []
+      badge: 'Pasaporte PE226260 · CC 1026263360',
+      fecha: '08 - 12 Octubre 2026',
+      descripcion: 'Carta oficial de bienvenida, itinerario Avianca BWAFFU / DGNZLJ (AV 108 / AV 51), documento verificado y hospedaje en Faraona Grand Hotel.',
+      vuelos: ['AV 108', 'AV 51', 'AV 74', 'AV 8378']
     },
 
   // SEDE LIMA
@@ -226,57 +226,57 @@ const OFICIAL_LETTERS = [
     equipo: 'Equipo 30 - Creación',
     sede: 'Lima',
     url: '/cartas/carta_andres_idrobo_e30.html',
-    badge: 'Volaris DD7FPP',
-    fecha: 'Enero - Febrero 2027',
-    descripcion: 'Carta oficial de invitación, itinerario de vuelos TIJ ➔ LIM (Y4 181) y LIM ➔ TIJ (Y4 3919), hotel y logística de chofer.',
-    vuelos: ['Y4 181', 'Y4 3919']
+    badge: 'Pasaporte A9919241 · CI 1712332350',
+    fecha: '04 - 06 Septiembre 2026',
+    descripcion: 'Carta oficial de bienvenida, itinerario LATAM LA 1437 / LA 1449, documento verificado y hospedaje en Hotel Jose Antonio Deluxe.',
+    vuelos: ['LA 1437', 'LA 1449', 'LA 1369']
   },
   {
     id: 'carta-ana-monroy-lim',
     entrenador: 'Ana Elena Monroy Thompson',
-    rol: 'Entrenadora',
+    rol: 'Entrenadora / Directora',
     equipo: 'Lima 2027',
     sede: 'Lima',
     url: '/cartas/carta_ana_monroy_lim.html',
-    badge: 'Volaris DD7FPP',
+    badge: 'Pasaporte N04328038 · CURP MOTA960805',
     fecha: 'Ene - Feb 2027',
-    descripcion: 'Carta oficial de invitación, itinerario de vuelos TIJ ? LIM (Y4 181) y LIM ? TIJ (Y4 3919), hotel y logística de chofer.',
+    descripcion: 'Carta oficial de invitación, itinerario Volaris DD7FPP (Y4 181 / Y4 3919), documento legal verificado y hospedaje en Hotel Jose Antonio Deluxe.',
     vuelos: ['Y4 181', 'Y4 3919']
   },
   {
     id: 'carta-lourdes-patino',
-    entrenador: 'María de Lourdes Patiño',
+    entrenador: 'María de Lourdes Patiño Galárraga',
     rol: 'Entrenadora de Sala',
     equipo: 'Equipo 29 - Relación',
     sede: 'Lima',
     url: '/cartas/carta_lourdes_patino_e29.html',
-    badge: 'LATAM DJBJJD',
-    fecha: 'Septiembre 2026',
-    descripcion: 'Carta oficial de invitación, itinerario de vuelo internacional UIO ➔ LIM (LA 1437), hospedaje y viáticos de coordinación.',
-    vuelos: ['LA 1437']
+    badge: 'Pasaporte B0857192 · CI 1712863404',
+    fecha: '04 - 06 Septiembre 2026',
+    descripcion: 'Carta oficial de invitación, itinerario de vuelo internacional UIO ➔ LIM (LA 1437), hospedaje en Hotel Jose Antonio Deluxe y viáticos.',
+    vuelos: ['LA 1437', 'LA 1449']
   },
   {
     id: 'carta-alejandro-diaz',
-    entrenador: 'Alejandro Díaz Pabón',
+    entrenador: 'Ernesto Alejandro Díaz Pabón',
     rol: 'Entrenador Senior',
     equipo: 'Equipo 28 - Gratitud',
     sede: 'Lima',
     url: '/cartas/carta_alejandro_diaz_e28.html',
-    badge: 'Avianca AVCONF',
-    fecha: 'Enero - Febrero 2027',
-    descripcion: 'Carta de facilitación e itinerario de vuelo BOG ➔ LIM (AV 108), transporte en Lima y agenda del fin de semana.',
-    vuelos: ['AV 108']
+    badge: 'Pasaporte A4152916 · CI 1727274928',
+    fecha: '03 - 07 Septiembre 2026',
+    descripcion: 'Carta oficial de facilitación, itinerario Avianca AV 108 / AV 51, documento legal verificado y hospedaje en Hotel Jose Antonio Deluxe.',
+    vuelos: ['AV 108', 'AV 51']
   },
   {
     id: 'carta-julio-narvaez',
-    entrenador: 'Julio Narváez',
+    entrenador: 'Julio César Narváez Mora',
     rol: 'Entrenador / Facilitador',
     equipo: 'Equipo 28 - El Viaje',
     sede: 'Lima',
     url: '/cartas/julio-narvaez-elviaje-e28.html',
-    badge: 'Maestría del Juego',
+    badge: 'Pasaporte A8266033 · CI 1714134804',
     fecha: 'Enero - Febrero 2027',
-    descripcion: 'Carta de confirmación logística y requerimientos de sala para Maestría del Juego El Viaje en Cieneguilla.',
+    descripcion: 'Carta de confirmación logística, documento legal verificado y requerimientos de sala para Maestría del Juego El Viaje en Cieneguilla.',
     vuelos: []
   },
   {
@@ -286,9 +286,9 @@ const OFICIAL_LETTERS = [
     equipo: 'CC1 - Transformación',
     sede: 'Lima',
     url: '/cartas/fernando-aragon-c1.html',
-    badge: 'CC1 Oficial',
+    badge: 'DNI Mercosur 17.856.159 (ARG)',
     fecha: 'Agosto - Enero - Febrero 2027',
-    descripcion: 'Carta oficial de asignación y cronograma de intervención ontológica para CC1.',
+    descripcion: 'Carta oficial de asignación, documento nacional de identidad verificado y cronograma de intervención ontológica para CC1.',
     vuelos: []
   },
   {
@@ -320,72 +320,72 @@ const OFICIAL_LETTERS = [
   // SEDE QUITO
   {
     id: 'carta-mike-boada-uio',
-    entrenador: 'Mike Boada',
+    entrenador: 'Michael Andrés Boada Rubiano',
     rol: 'Entrenador Senior',
     equipo: 'UIO FDS E128 & E129',
     sede: 'Quito',
     url: 'https://drive.google.com/drive/folders/1N64i0WfN_x-WOQ1ULeOIQSADnMw2mSw4',
-    badge: 'UIO E128-E129',
+    badge: 'Pasaporte PE226260 · CC 1026263360',
     fecha: 'Septiembre - Octubre 2026',
     descripcion: 'Itinerario de vuelos, asignación de salas en Fortaleza Cuántica Quito (De los Naranjos) y agenda logística de entrenadores.',
     vuelos: ['LA 1437', 'LA 1414']
   },
   {
     id: 'carta-mauricio-perez-uio',
-    entrenador: 'Mauricio Pérez',
+    entrenador: 'Mauricio Pérez Robles',
     rol: 'Entrenador de Sala',
     equipo: 'UIO CAP 1 E128',
     sede: 'Quito',
     url: 'https://drive.google.com/drive/folders/1tjYp0VIugfs7hQ3PLTZKqp1oQkWIvRak',
-    badge: 'UIO E128',
+    badge: 'Pasaporte N13904212 · CURP PERM910531',
     fecha: 'Enero - Febrero 2027',
     descripcion: 'Carta de confirmación logística y vuelo hacia Quito (UIO) para entrenamiento CAP 1 en Fortaleza Cuántica.',
     vuelos: ['LA 1429']
   },
   {
     id: 'carta-andres-gomez-uio',
-    entrenador: 'Andrés Gómez',
+    entrenador: 'Carlos Andrés Gómez Gómez',
     rol: 'Entrenador de Impacto',
     equipo: 'UIO CAP 2 E128 & Academia',
     sede: 'Quito',
     url: 'https://drive.google.com/drive/folders/1YCq9xVMWZXgD_T7HDrnVn9NnVVz_8W41',
-    badge: 'UIO Academia',
+    badge: 'Pasaporte BG726399 · CC 3482169',
     fecha: 'Enero - Febrero 2027',
     descripcion: 'Itinerario de vuelo, agenda de formación en Fortaleza Cuántica y traslado desde aeropuerto Mariscal Sucre (UIO).',
     vuelos: ['LA 1437']
   },
   {
     id: 'carta-cirilo-martinez-uio',
-    entrenador: 'Cirilo Martínez',
+    entrenador: 'Cirilo Agustín Martínez',
     rol: 'Facilitador Internacional',
     equipo: 'UIO FDS E124 - E126',
     sede: 'Quito',
     url: 'https://drive.google.com/drive/folders/1Oo7gTTY2F0ciag7oCboaFIpgB08Z61N1',
-    badge: 'UIO FDS E126',
+    badge: 'Pasaporte N07847087 · CURP AUMC010611',
     fecha: 'Septiembre - Octubre 2026',
     descripcion: 'Itinerario de vuelos internacionales, agenda en Quito y coordinación logística de hospedaje en Swissôtel Quito.',
     vuelos: ['LA 1414']
   },
   {
     id: 'carta-alonso-solares-uio',
-    entrenador: 'Alonso Solares',
+    entrenador: 'Alonso Solares Salazar',
     rol: 'Entrenador de Caminata y Fuego',
     equipo: 'UIO Caminata Fuego E125',
     sede: 'Quito',
     url: 'https://drive.google.com/drive/folders/1TzY9oDXpkA485OOuS7TiAYmJWA1qPKOX',
-    badge: 'UIO Caminata E125',
+    badge: 'Pasaporte N11971541 · CURP SOSA851221',
     fecha: 'Enero - Febrero 2027',
     descripcion: 'Plan de vuelo Quito, traslado al sitio de Caminata y requerimientos operativos de seguridad para evento de alto impacto.',
     vuelos: ['LA 1429']
   },
   {
     id: 'carta-chuy-acosta-uio',
-    entrenador: 'Chuy Acosta',
+    entrenador: 'Jesús Adrián Acosta Rodríguez',
     rol: 'Entrenador Ontológico',
     equipo: 'UIO Academia & FDS 127',
     sede: 'Quito',
     url: 'https://drive.google.com/drive/folders/1Q9kiTKVKbHDKm4jsi7WboYDk-yj-vQQr',
-    badge: 'UIO E127',
+    badge: 'Pasaporte N12516404 · CURP AORJ880422',
     fecha: 'Octubre 2026',
     descripcion: 'Itinerario de vuelos y asignación de sala para FDS 127 en sede Quito Fortaleza Cuántica.',
     vuelos: ['LA 1437']
@@ -397,7 +397,7 @@ const OFICIAL_LETTERS = [
     equipo: 'Academia UIO & Formación Kids',
     sede: 'Quito',
     url: 'https://drive.google.com/drive/folders/1cONlxQGyWNmqcYoF2oD4Mmi_pPyH--Jo',
-    badge: 'Academia UIO',
+    badge: 'Pasaporte N04328038 · CURP MOTA960805',
     fecha: 'Enero - Febrero 2027',
     descripcion: 'Itinerario oficial de vuelos, traslados y agenda de formación académica en sede Quito.',
     vuelos: ['LA 1414']
@@ -406,12 +406,12 @@ const OFICIAL_LETTERS = [
   // SEDE CUENCA
   {
     id: 'carta-diego-bravo-cue',
-    entrenador: 'Diego Bravo Figueroa',
+    entrenador: 'Diego David Bravo Figueroa',
     rol: 'Entrenador Senior',
     equipo: '4FDS Cuenca Oficial',
     sede: 'Cuenca',
     url: 'https://drive.google.com/drive/folders/1AI57KdM7u572KULm5aE20TpmaaWVj10F',
-    badge: 'CUE 4FDS',
+    badge: 'Pasaporte A9025643 · CI 1713803847',
     fecha: 'Septiembre - Octubre 2026',
     descripcion: 'Boleto aéreo e itinerario de traslados a Cuenca (CUE), hospedaje en Hotel Oro Verde Cuenca y coordinación de sala.',
     vuelos: ['LA 1414']
@@ -430,12 +430,12 @@ const OFICIAL_LETTERS = [
   },
   {
     id: 'carta-mildred-munoz-cue',
-    entrenador: 'Mildred Muñoz',
+    entrenador: 'Mildred Muñoz Vásquez',
     rol: 'Entrenadora de Alto Impacto',
     equipo: 'CAP 2 CUE E23',
     sede: 'Cuenca',
     url: 'https://drive.google.com/drive/folders/1crElNGKJGrtLG-_BBgqUPjHDn9WsfcyV',
-    badge: 'CUE E23',
+    badge: 'Pasaporte BE596036 · CC 1036598062',
     fecha: 'Enero - Febrero 2027',
     descripcion: 'Carta de vuelo y agenda logística para entrenamiento CAP 2 en sede Cuenca.',
     vuelos: ['LA 1437']
@@ -454,12 +454,12 @@ const OFICIAL_LETTERS = [
   },
   {
     id: 'carta-juan-angel-arreola-cue',
-    entrenador: 'Juan Ángel Arreola',
+    entrenador: 'Juan Ángel Arreola Morales',
     rol: 'Facilitador Internacional',
     equipo: 'CUE CAP 2 E24',
     sede: 'Cuenca',
     url: 'https://drive.google.com/drive/folders/1X9MROEm3agkqEEbYOFsKD7eAhw3VAjB1',
-    badge: 'CUE CAP 2',
+    badge: 'Pasaporte N11363440 · CURP AEMJ880713',
     fecha: 'Septiembre - Octubre 2026',
     descripcion: 'Documento oficial de vuelo internacional hacia Cuenca y agenda de intervención transformacional.',
     vuelos: ['LA 1429']
@@ -471,7 +471,7 @@ const OFICIAL_LETTERS = [
     equipo: 'CUE FDS E21',
     sede: 'Cuenca',
     url: 'https://drive.google.com/drive/folders/1-82Q9FS9s1YOHliXFm4vwiMvxDGoD_7r',
-    badge: 'CUE FDS E21',
+    badge: 'Pasaporte A9919241 · CI 1712332350',
     fecha: 'Enero - Febrero 2027',
     descripcion: 'Itinerario de vuelo, logística de chofer en aeropuerto Mariscal La Mar y hospedaje en Cuenca.',
     vuelos: ['LA 1437']
@@ -480,36 +480,36 @@ const OFICIAL_LETTERS = [
   // SEDE GUAYAQUIL
   {
     id: 'carta-mike-boada-gye',
-    entrenador: 'Mike Boada',
+    entrenador: 'Michael Andrés Boada Rubiano',
     rol: 'Entrenador Senior',
     equipo: 'GYE FDS E37',
     sede: 'Guayaquil',
     url: 'https://drive.google.com/drive/folders/1N64i0WfN_x-WOQ1ULeOIQSADnMw2mSw4',
-    badge: 'GYE FDS E37',
+    badge: 'Pasaporte PE226260 · CC 1026263360',
     fecha: 'Enero - Febrero 2027',
     descripcion: 'Carta de confirmación aérea UIO ➔ GYE, hospedaje en Hotel Wyndham Guayaquil y chofer asignado.',
     vuelos: ['LA 1429']
   },
   {
     id: 'carta-mauricio-perez-gye',
-    entrenador: 'Mauricio Pérez',
+    entrenador: 'Mauricio Pérez Robles',
     rol: 'Entrenador de Sala',
     equipo: 'GYE CAP 1 E38',
     sede: 'Guayaquil',
     url: 'https://drive.google.com/drive/folders/1tjYp0VIugfs7hQ3PLTZKqp1oQkWIvRak',
-    badge: 'GYE E38',
+    badge: 'Pasaporte N13904212 · CURP PERM910531',
     fecha: 'Octubre 2026',
     descripcion: 'Vuelo hacia Guayaquil (GYE), traslado en aeropuerto José Joaquín de Olmedo y agenda operativa.',
     vuelos: ['LA 1414']
   },
   {
     id: 'carta-lourdes-patino-gye',
-    entrenador: 'María de Lourdes Patiño',
+    entrenador: 'María de Lourdes Patiño Galárraga',
     rol: 'Entrenadora de Sala',
     equipo: 'GYE FDS E37',
     sede: 'Guayaquil',
     url: 'https://drive.google.com/drive/folders/1LsipQSaorbQSMOdijVFWzu1K-Vs72ZkJ',
-    badge: 'GYE FDS E37',
+    badge: 'Pasaporte B0857192 · CI 1712863404',
     fecha: 'Enero - Febrero 2027',
     descripcion: 'Itinerario de vuelo Guayaquil, hotel oficial Wyndham en Puerto Santa Ana y protocolo de chofer.',
     vuelos: ['LA 1437']
@@ -521,19 +521,19 @@ const OFICIAL_LETTERS = [
     equipo: 'GYE FDS E35 & E38',
     sede: 'Guayaquil',
     url: 'https://drive.google.com/drive/folders/1cONlxQGyWNmqcYoF2oD4Mmi_pPyH--Jo',
-    badge: 'GYE FDS E38',
+    badge: 'Pasaporte N04328038 · CURP MOTA960805',
     fecha: 'Enero - Febrero 2027',
     descripcion: 'Itinerario de pasaje aéreo Guayaquil, traslados y agenda del fin de semana.',
     vuelos: ['LA 1429']
   },
   {
     id: 'carta-juan-angel-arreola-gye',
-    entrenador: 'Juan Ángel Arreola',
+    entrenador: 'Juan Ángel Arreola Morales',
     rol: 'Facilitador Internacional',
     equipo: 'GYE CAP 2 E37 / E38',
     sede: 'Guayaquil',
     url: 'https://drive.google.com/drive/folders/1X9MROEm3agkqEEbYOFsKD7eAhw3VAjB1',
-    badge: 'GYE CAP 2',
+    badge: 'Pasaporte N11363440 · CURP AEMJ880713',
     fecha: 'Enero - Febrero 2027',
     descripcion: 'Boleto aéreo, logística de transporte aeropuerto José Joaquín de Olmedo y hotel oficial.',
     vuelos: ['LA 1414']
@@ -545,7 +545,7 @@ const OFICIAL_LETTERS = [
     equipo: 'GYE FDS E36',
     sede: 'Guayaquil',
     url: 'https://drive.google.com/drive/folders/1-82Q9FS9s1YOHliXFm4vwiMvxDGoD_7r',
-    badge: 'GYE FDS E36',
+    badge: 'Pasaporte A9919241 · CI 1712332350',
     fecha: 'Enero - Febrero 2027',
     descripcion: 'Vuelo directo Guayaquil, traslado hacia hotel y salón de entrenamiento oficial.',
     vuelos: ['LA 1437']
@@ -559,19 +559,19 @@ const OFICIAL_LETTERS = [
     equipo: 'Medellín Kids & Liderazgo Juvenil',
     sede: 'Medellín',
     url: 'https://drive.google.com/drive/folders/1cONlxQGyWNmqcYoF2oD4Mmi_pPyH--Jo',
-    badge: 'MDE Kids Oficial',
+    badge: 'Pasaporte N04328038 · CURP MOTA960805',
     fecha: 'Septiembre - Octubre 2026',
     descripcion: 'Itinerario aéreo hacia Medellín José María Córdova (MDE), hospedaje en Hotel Dann Carlton Belfort y logística de sala.',
     vuelos: ['AV 108']
   },
   {
     id: 'carta-alejandro-diaz-mde',
-    entrenador: 'Alejandro Díaz Pabón',
+    entrenador: 'Ernesto Alejandro Díaz Pabón',
     rol: 'Entrenador Senior',
     equipo: 'Coordinación Colombia',
     sede: 'Medellín',
     url: 'https://drive.google.com/drive/folders/1i60YXyxRrFP1LxmXUVuHK5eRyeUBzR0r',
-    badge: 'MDE Conexión',
+    badge: 'Pasaporte A4152916 · CI 1727274928',
     fecha: 'Enero - Febrero 2027',
     descripcion: 'Carta oficial de coordinación, vuelos de enlace BOG-MDE-LIM y protocolo de chofer en Rionegro.',
     vuelos: ['AV 108']
@@ -580,12 +580,12 @@ const OFICIAL_LETTERS = [
   // SEDE MÉXICO
   {
     id: 'carta-lourdes-patino-mex',
-    entrenador: 'María de Lourdes Patiño',
+    entrenador: 'María de Lourdes Patiño Galárraga',
     rol: 'Entrenadora Internacional',
     equipo: 'Enlace México - Perú',
     sede: 'México',
     url: 'https://drive.google.com/file/d/1GGakOnjKwxr-tOK7bBijlWpy5Mym2T_9/view?usp=drivesdk',
-    badge: 'MEX ➔ LIM',
+    badge: 'Pasaporte B0857192 · CI 1712863404',
     fecha: 'Julio - Enero - Febrero 2027',
     descripcion: 'Pasaje aéreo internacional México ➔ Lima, confirmación de vuelo y respaldo institucional de facilitación.',
     vuelos: ['LA 1437']
@@ -597,7 +597,7 @@ const OFICIAL_LETTERS = [
     equipo: 'Red Internacional México',
     sede: 'México',
     url: 'https://drive.google.com/drive/folders/1oi7mUG619dQ2ZVzHzUyO5Xkwti-jgDFl',
-    badge: 'MEX Internacional',
+    badge: 'Pasaportes N11363440 / N07847087',
     fecha: 'Oficial 2026',
     descripcion: 'Carta oficial de acreditación para vuelos internacionales desde Aeropuerto Benito Juárez (MEX).',
     vuelos: ['LA 1437']
@@ -2030,6 +2030,17 @@ export default function MonitorVuelosCartas() {
               </div>
 
               <div style={{ display: 'flex', gap: '8px' }}>
+                {previewLetter.url && previewLetter.url.includes('drive.google.com') && (
+                  <a
+                    href={`/cartas/carta_invitacion_migraciones.html?nombre=${encodeURIComponent(previewLetter.entrenador || previewLetter.name)}&sede=${encodeURIComponent((previewLetter.sede || 'lima').toLowerCase())}&rol=${encodeURIComponent(previewLetter.rol || 'Entrenador')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-secondary"
+                    style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', textDecoration: 'none' }}
+                  >
+                    <FileText size={14} /> Carta Oficial
+                  </a>
+                )}
                 <a
                   href={previewLetter.url}
                   target="_blank"
@@ -2037,7 +2048,7 @@ export default function MonitorVuelosCartas() {
                   className="btn-secondary"
                   style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', textDecoration: 'none' }}
                 >
-                  <ExternalLink size={14} /> Abrir Completo
+                  <ExternalLink size={14} /> {previewLetter.url?.includes('drive.google.com') ? 'Ver Carpeta Drive' : 'Abrir Completo'}
                 </a>
                 <button
                   onClick={() => setPreviewLetter(null)}
@@ -2051,7 +2062,9 @@ export default function MonitorVuelosCartas() {
 
             <div style={{ flex: 1, position: 'relative', background: '#000' }}>
               <iframe
-                src={previewLetter.url}
+                src={previewLetter.url && !previewLetter.url.includes('drive.google.com')
+                  ? previewLetter.url
+                  : `/cartas/carta_invitacion_migraciones.html?nombre=${encodeURIComponent(previewLetter.entrenador || previewLetter.name)}&sede=${encodeURIComponent((previewLetter.sede || 'lima').toLowerCase())}&rol=${encodeURIComponent(previewLetter.rol || 'Entrenador')}`}
                 title={previewLetter.entrenador || previewLetter.name}
                 style={{ width: '100%', height: '100%', border: 'none' }}
               />
