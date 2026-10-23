@@ -819,6 +819,37 @@ Tras el reporte de incidencias donde firmas completadas figuraban en el panel ad
 
 ---
 
+### 18.7. Auditoría de Cambios de Cupo vs Nodus y Bases de Datos de Sentados Históricos (Lima C1 E32)
+* **Mandato y Reglas de Negocio Directivas:**
+  1. *"Que las personas que salen no se hayan sentado y que estén inscritas."*
+  2. *"No apto si ya se le hizo cambio de cupo previo."* (Límite estricto de 1 cambio de cupo por participante).
+  3. *"Aquí se buscan sentados antiguos para ver si son aptos para cambio de nombre."*
+* **Bases de Datos de Sentados Históricos Integradas:**
+  - Se descargaron e indexaron localmente en `data/sentados_historicos/` las 6 fuentes maestras de asistencia histórica de la organización:
+    1. [`CAPITULO UNO E19 LIMA.xlsx`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/data/sentados_historicos/CAPITULO%20UNO%20E19%20LIMA.xlsx) (`1K3BHZ9UpW77kWc9bXHG_a0Zx9ibRGPvh`).
+    2. [`ASISTENCIA CAPÍTULO UNO LIMA.xlsx`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/data/sentados_historicos/ASISTENCIA%20CAP%C3%8DTULO%20UNO%20LIMA.xlsx) (`1pf6ytbSE988UvAv3AVvWUqjgQaTwDfYO`) — 21 hojas (Básico 1, 2, 3, CC 2024, N1, Rezagados, C1 #4 al #19).
+    3. [`REZAGADOS C1 E18 LIMA.xlsx`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/data/sentados_historicos/REZAGADOS%20C1%20E18%20LIMA.xlsx) (`1enzfn6eqH5anXQOaBNNPiLcsLsFCOwtU`).
+    4. [`ASISTENCIA CAPITULO DOS LIMA.xlsx`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/data/sentados_historicos/ASISTENCIA%20CAPITULO%20DOS%20LIMA.xlsx) (`17TsTmvuPmeal9vipZgosYhXRYD24XTGz`) — 19 hojas (Avanzado 1, 2, 3, C2 #4 al #18; quienes cursaron C2 ya consumieron C1).
+    5. [`clientes_asistencia (28).xlsx`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/data/sentados_historicos/clientes_asistencia%20%2828%29.xlsx) (`1zmE0gYzSNrJbTfsgZjMy7F2rITTaYbXT`).
+    6. [`LISTA DE ASISTENCIA EQUIPO 105.xlsx`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/data/sentados_historicos/LISTA%20DE%20ASISTENCIA%20EQUIPO%20105.xlsx) (`1uk_C5Ns79As2o_l08fAIONA2T_ChtWBy`).
+  - **Volumen Total Indexado:** 5,552 registros históricos consolidados, con 2,001 participantes con asistencia a sala confirmada.
+* **Cruce de las 23 Solicitudes de Cambio de Cupo (C1 E32 Lima):**
+  - **Total Solicitudes:** 23.
+  - **🟢 APTOS CONFIRMADOS:** 23 (100% de elegibilidad).
+  - **🔴 NO APTOS:** 0.
+  - **Detalle de Caso Singular (#8):** Beatriz Violeta Yanac Rodriguez (DNI `09641366`, registrada por Aliado Luis Alberto Hernández Mendoza en Equipo 11) figuraba en el historial de C1 #13, C1 #14 y N1. En N1 su estatus quedó registrado como `NI` (No Interesada), `DESABILITADA`, con asistencia vacía en las tres hojas, comprobando fehacientemente que **nunca se sentó en sala**.
+  - **Verificación de Cambios Previos:** 0 duplicados en formulario y 0 registros previos consumidos.
+* **Canales de Notificación y Trazabilidad Ejecutados:**
+  1. **Google Chat (Espacio Sede Lima `AAQAOaOPrZU`):** Tarjeta y reporte completo entregados exitosamente (`spaces/AAQAOaOPrZU/messages/5rnsCGr5c_I.5rnsCGr5c_I`).
+  2. **Causa OS (`/notifications`):**
+     - Joyce Marín (`joyce.marin@crearpsl.net`): Documento ID `Et2NUSi047QkAHromZir`.
+     - Diana Moscoso (`diana.moscoso@crearpsl.net`): Documento ID `D58O5XUk6UXYLuStQoUQ`.
+     - José Sánchez (`jose.sanchez@crearpsl.net`): Documento ID `ILsX8dogu0zoXqrYh8t1`.
+  3. **Script Automatizado:** [`scripts/validateCambiosCupoNodus.mjs`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/scripts/validateCambiosCupoNodus.mjs).
+  4. **Expediente de Resultados:** [`data/sentados_historicos/auditoria_cambios_cupo_e32.json`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/data/sentados_historicos/auditoria_cambios_cupo_e32.json).
+
+---
+
 > 📜 **Mandato de la Caja Negra:**
 > Esta Caja Negra es la fuente viva de verdad de CPSL y Causa OS. Debe consultarse antes de cualquier cambio de arquitectura y actualizarse de inmediato tras cada nueva funcionalidad, regla o descubrimiento operativo.
 

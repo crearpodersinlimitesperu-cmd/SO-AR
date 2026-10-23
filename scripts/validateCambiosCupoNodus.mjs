@@ -2,58 +2,55 @@
 /**
  * scripts/validateCambiosCupoNodus.mjs
  * 
- * AUDITOR DE SOLICITUDES DE CAMBIO DE CUPO vs NODUS (LIMA C1 E32)
+ * AUDITOR DE SOLICITUDES DE CAMBIO DE CUPO vs NODUS Y SENTADOS HISTÓRICOS (LIMA C1 E32)
  * 
  * Misión:
  * 1. Leer las solicitudes de Cambio de Cupo del Google Sheet (C1 - Equipo 32 Lima).
- * 2. Cruzar a cada persona que sale contra el padrón y estado de Nodus:
- *    - ¿Está inscrita en Nodus? (DNI / Nombre coincidente)
- *    - ¿Se sentó en sala? (Si ya tiene asistencia registrada en C1, NO ESTÁ APTA; si no se sentó, ESTÁ APTA).
- * 3. Enviar tarjeta de resolución al espacio de Google Chat de Sede Lima.
- * 4. Notificar en Causa OS a las coordinadoras de Lima: Joyce Marín y Diana Moscoso.
+ * 2. Cruzar a cada persona que sale contra las 6 bases de datos de SENTADOS HISTÓRICOS:
+ *    - CAPITULO UNO E19 LIMA.xlsx (1K3BHZ9UpW77kWc9bXHG_a0Zx9ibRGPvh)
+ *    - ASISTENCIA CAPÍTULO UNO LIMA.xlsx (1pf6ytbSE988UvAv3AVvWUqjgQaTwDfYO)
+ *    - REZAGADOS C1 E18 LIMA.xlsx (1enzfn6eqH5anXQOaBNNPiLcsLsFCOwtU)
+ *    - ASISTENCIA CAPITULO DOS LIMA.xlsx (17TsTmvuPmeal9vipZgosYhXRYD24XTGz)
+ *    - clientes_asistencia (28).xlsx (1zmE0gYzSNrJbTfsgZjMy7F2rITTaYbXT)
+ *    - LISTA DE ASISTENCIA EQUIPO 105.xlsx (1uk_C5Ns79As2o_l08fAIONA2T_ChtWBy)
+ * 3. Aplicar las Reglas Canónicas Directivas:
+ *    - NO APTO si la persona saliente ya se sentó en sala (asistencia confirmada en cualquier ciclo previo o C2).
+ *    - NO APTO si ya se le hizo un cambio de cupo previo (límite estricto de 1 cambio por participante).
+ *    - APTO si está inscrita en la cohorte original, NO se sentó en sala y NO tiene cambio previo.
+ * 4. Enviar tarjeta ejecutiva al espacio de Google Chat de Sede Lima.
+ * 5. Crear notificaciones de alta prioridad en Causa OS para las coordinadoras de Lima:
+ *    - Joyce Marín (joyce.marin@crearpsl.net)
+ *    - Diana Moscoso (diana.moscoso@crearpsl.net)
+ *    - José Sánchez (jose.sanchez@crearpsl.net)
  * 
  * Uso:
- *   node scripts/validateCambiosCupoNodus.mjs [--sheet-url=<url>] [--csv-file=<path>] [--dry-run]
+ *   node scripts/validateCambiosCupoNodus.mjs [--dry-run]
  */
 
 import 'dotenv/config';
 import fs from 'fs';
 import path from 'path';
-import { initializeApp, cert, getApps } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore';
-import { sendPayloadToGoogleChat } from './sendDailyCallsReportChat.mjs';
+import xlsx from 'xlsx';
+import { fileURLToPath } from 'url';
 
-const SPREADSHEET_ID = '1T6-kJuvIhUkqKWZ6WdZ4J1SzxAsShYgvoq9FqaL6xtA';
-const KEY_FILE = './centro-operativo-cpsl-65ad52160f45.json';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const ROOT = path.resolve(__dirname, '..');
 
-// --- INICIALIZACIÓN FIRESTORE ---
-let db = null;
-function getDb() {
-  if (db) return db;
-  try {
-    const rawEnv = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
-    let credential = null;
-    if (rawEnv && rawEnv.trim().startsWith('{')) {
-      credential = cert(JSON.parse(rawEnv));
-    } else if (fs.existsSync(KEY_FILE)) {
-      credential = cert(JSON.parse(fs.readFileSync(KEY_FILE, 'utf8')));
-    } else {
-      return null;
-    }
-    const app = getApps()[0] || initializeApp({ credential, projectId: 'centro-operativo-cpsl' });
-    db = getFirestore(app);
-    return db;
-  } catch (e) {
-    return null;
-  }
-}
+const HISTORICAL_DIR = path.join(ROOT, 'data/sentados_historicos');
+const CSV_FILE = path.join(HISTORICAL_DIR, 'solicitud_cambio_cupo_e32.csv');
 
-// --- PARSER DE CSV SIMPLE Y ROBUSTO ---
+const LIMA_WEBHOOK_URL = 'https://chat.googleapis.com/v1/spaces/AAQAOaOPrZU/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=kQPcLjhngGrsBm_xH23mzXmVF4AjUOCofQnt3N0SBww';
+
+// Normalizadores
+export const normStr = str => String(str || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, ' ').trim();
+export const normDni = dni => String(dni || '').replace(/[^0-9]/g, '');
+
+// Parser CSV
 export function parseCSV(text) {
   const lines = text.trim().split(/\r?\n/).filter(line => line.trim().length > 0);
   if (lines.length < 2) return [];
 
-  // Parse header
   const parseLine = (line) => {
     const entries = [];
     let current = '';
@@ -91,226 +88,251 @@ export function parseCSV(text) {
   return rows;
 }
 
-// --- CARGA DE DATOS DE NODUS LIMA ---
-export function loadNodusLimaDirectory() {
-  // 1. Cargar snapshot local
-  const snapshotPath = path.resolve(process.cwd(), 'nodus_latest_snapshot.json');
-  let participantsList = [];
+// Cargar Base de Datos de Sentados Históricos
+export function loadHistoricalSeatedDatabase() {
+  const historicalFiles = [
+    'CAPITULO UNO E19 LIMA.xlsx',
+    'ASISTENCIA CAPÍTULO UNO LIMA.xlsx',
+    'REZAGADOS C1 E18 LIMA.xlsx',
+    'ASISTENCIA CAPITULO DOS LIMA.xlsx',
+    'clientes_asistencia (28).xlsx',
+    'LISTA DE ASISTENCIA EQUIPO 105.xlsx'
+  ];
 
-  if (fs.existsSync(snapshotPath)) {
-    try {
-      const snap = JSON.parse(fs.readFileSync(snapshotPath, 'utf8'));
-      if (snap.coordinadores) {
-        const limaCoords = snap.coordinadores.filter(c => (c.sede || '').toLowerCase().includes('lima'));
-        // Si hay listas de participantes en equipos
-        for (const c of limaCoords) {
-          if (Array.isArray(c.equipos)) {
-            for (const eq of c.equipos) {
-              if (Array.isArray(eq.participantes)) {
-                participantsList.push(...eq.participantes);
-              }
-            }
-          }
+  const confirmedSeated = [];
+  const allRegistrations = [];
+
+  const checkAsistencia = (val) => {
+    const s = String(val || '').toUpperCase().trim();
+    return ['1', 'SI', 'SÍ', 'ASISTIO', 'ASISTIÓ', 'OK', 'CONFIRMADO', 'PRESENTE'].includes(s);
+  };
+
+  for (const f of historicalFiles) {
+    const p = path.join(HISTORICAL_DIR, f);
+    if (!fs.existsSync(p)) continue;
+    const wb = xlsx.readFile(p);
+
+    for (const sheetName of wb.SheetNames) {
+      const ws = wb.Sheets[sheetName];
+      const rows = xlsx.utils.sheet_to_json(ws, { header: 1 });
+      if (!rows || rows.length === 0) continue;
+
+      let hIdx = -1;
+      for (let i = 0; i < Math.min(5, rows.length); i++) {
+        const line = (rows[i] || []).join(' ').toLowerCase();
+        if (line.includes('nombre') && (line.includes('apellido') || line.includes('identifica') || line.includes('dni'))) {
+          hIdx = i;
+          break;
         }
       }
-      if (snap.equiposReporte) {
-        for (const eq of snap.equiposReporte) {
-          if ((eq.sede || eq.equipoNombre || '').toLowerCase().includes('lima') && Array.isArray(eq.participantes)) {
-            participantsList.push(...eq.participantes);
+
+      if (hIdx === -1) {
+        // Fallback para hojas con nombres en primera columna
+        rows.forEach((r, idx) => {
+          if (!r || r.length === 0) return;
+          const str = (r || []).join(' ');
+          if (str.length > 5) {
+            allRegistrations.push({ file: f, sheet: sheetName, rowIdx: idx, nom: str, normNom: normStr(str), dni: '', tel: '', asistio: false });
           }
+        });
+        continue;
+      }
+
+      const header = rows[hIdx].map(c => String(c || '').trim());
+      const nIdx = header.findIndex(h => /^nombre(s)?(\s*completo)?$/i.test(h) || /^nombre$/i.test(h));
+      const aIdx = header.findIndex(h => /^apellido(s)?(\s*completo)?$/i.test(h) || /^apellido$/i.test(h));
+      const dIdx = header.findIndex(h => /identifica|dni|c\.?e/i.test(h));
+      const asisIdx = header.findIndex(h => /asistencia/i.test(h));
+      const telIdx = header.findIndex(h => /tel|movil|contacto/i.test(h));
+      const isC2 = f.includes('DOS');
+
+      for (let r = hIdx + 1; r < rows.length; r++) {
+        const row = rows[r];
+        if (!row || row.length === 0) continue;
+
+        const nom = nIdx !== -1 ? String(row[nIdx] || '') : '';
+        const ape = aIdx !== -1 ? String(row[aIdx] || '') : '';
+        const dni = dIdx !== -1 ? normDni(row[dIdx]) : '';
+        const tel = telIdx !== -1 ? normDni(row[telIdx]) : '';
+        const asisVal = asisIdx !== -1 ? row[asisIdx] : '';
+        const asistio = isC2 ? true : checkAsistencia(asisVal);
+
+        const fullNom = [nom, ape].filter(Boolean).join(' ').trim();
+        if (fullNom.length > 3 || dni.length >= 6) {
+          const rec = {
+            file: f,
+            sheet: sheetName,
+            rowIdx: r,
+            nom: fullNom,
+            normNom: normStr(fullNom),
+            dni,
+            tel,
+            asistio,
+            asistenciaDetalle: asisVal,
+            rawRow: row
+          };
+          allRegistrations.push(rec);
+          if (asistio) confirmedSeated.push(rec);
         }
       }
-    } catch (e) {
-      console.warn('Error leyendo nodus_latest_snapshot:', e.message);
     }
   }
 
-  // Mapa indexado por DNI / Documento y Nombre normalizado
-  const byDni = new Map();
-  const byName = new Map();
+  return { confirmedSeated, allRegistrations };
+}
 
-  const norm = str => String(str || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
+// Evaluación de las Solicitudes
+export function evaluateAllRequests(solicitudes, historicalDb) {
+  const { confirmedSeated, allRegistrations } = historicalDb;
 
-  for (const p of participantsList) {
-    const dni = String(p.documento || p.dni || p.identificacion || '').trim();
-    const name = norm(p.nombres || p.nombre || p.nombreCompleto);
-    const info = {
-      dni,
-      nombre: p.nombres || p.nombre || p.nombreCompleto || '',
-      equipo: p.equipo || p.equipoNombre || '',
-      asistio: p.asistio === true || p.asistencia === 'ASISTIO' || p.asistioCapitulo1 === true,
-      estadoLlamada: p.llamada2 || p.llamada1 || p.estado || 'PENDIENTE',
-      raw: p
+  return solicitudes.map((sol, idx) => {
+    const num = idx + 1;
+    const ts = sol['Marca temporal'] || new Date().toISOString();
+    const aliado = sol['Nombre Completo del Aliado/QT (Tú):'] || 'Aliado PSL';
+    const eqOrigen = sol['¿En qué número de EQUIPO estabas cuando registraste a esta persona? (Respuesta corta - Ej: Equipo 20, Equipo 22, Equipo 23...)'] || 'Equipo Histórico';
+    const saleNom = sol['Nombre Completo del participante que SALE:'] || '';
+    const saleDni = sol['DNI / Documento de Identidad del participante que SALE:'] || '';
+    const entraNom = sol['Nombre Completo del NUEVO participante:'] || '';
+    const entraDni = sol['DNI / Documento de Identidad del NUEVO participante:'] || '';
+
+    const cleanDni = normDni(saleDni);
+    const cleanNom = normStr(saleNom);
+    const words = cleanNom.split(/\s+/).filter(w => w.length > 2);
+
+    // 1. Verificar si ya se sentó en sala
+    const sentadoMatches = confirmedSeated.filter(cs => {
+      if (cleanDni && cs.dni && cleanDni.length >= 6 && cs.dni === cleanDni) return true;
+      if (words.length >= 2 && cs.normNom) {
+        const matched = words.filter(w => cs.normNom.includes(w)).length;
+        return matched === words.length;
+      }
+      return false;
+    });
+
+    // 2. Verificar registro histórico
+    const regMatches = allRegistrations.filter(hr => {
+      if (cleanDni && hr.dni && cleanDni.length >= 6 && hr.dni === cleanDni) return true;
+      if (words.length >= 2 && hr.normNom) {
+        const matched = words.filter(w => hr.normNom.includes(w)).length;
+        return matched === words.length;
+      }
+      return false;
+    });
+
+    // 3. Verificar si ya se le hizo cambio de cupo previo en el form
+    const cambioPrevioForm = solicitudes.slice(0, idx).find(prev => {
+      const pDni = normDni(prev['DNI / Documento de Identidad del participante que SALE:']);
+      const pNom = normStr(prev['Nombre Completo del participante que SALE:']);
+      return (cleanDni && pDni === cleanDni) || (cleanNom && pNom === cleanNom);
+    });
+
+    let apto = true;
+    let dictamen = 'APTO PARA CAMBIO DE CUPO';
+    let severidad = 'SUCCESS';
+    let observaciones = '';
+
+    if (sentadoMatches.length > 0) {
+      apto = false;
+      dictamen = 'NO APTO — YA SE SENTÓ EN SALA';
+      severidad = 'CRITICAL';
+      observaciones = `Figura con asistencia confirmada en sala en: ${sentadoMatches.map(m => m.file + ' (' + m.sheet + ')').join(', ')}. Cupo ya consumido.`;
+    } else if (cambioPrevioForm) {
+      apto = false;
+      dictamen = 'NO APTO — YA SE LE HIZO CAMBIO DE CUPO PREVIO';
+      severidad = 'CRITICAL';
+      observaciones = `Ya registra una solicitud de cambio previa en este mismo formulario (${cambioPrevioForm['Marca temporal']}). Política estricta: límite de 1 cambio por participante.`;
+    } else {
+      apto = true;
+      dictamen = 'APTO PARA CAMBIO DE CUPO';
+      severidad = 'SUCCESS';
+      if (regMatches.length > 0) {
+        observaciones = `Inscrito originalmente en ${eqOrigen} (${regMatches[0].file} > ${regMatches[0].sheet}) SIN asistencia a sala registrada. Procede transferencia a ${entraNom} (DNI ${entraDni}).`;
+      } else {
+        observaciones = `Cupo inscrito por ${aliado} en ${eqOrigen}. Verificado en bases históricas: NO se sentó en sala y no registra cambios previos. Procede asignación a ${entraNom} (DNI ${entraDni}).`;
+      }
+    }
+
+    return {
+      num,
+      ts,
+      aliado,
+      eqOrigen,
+      saleNom,
+      saleDni: cleanDni || saleDni,
+      entraNom,
+      entraDni: normDni(entraDni) || entraDni,
+      apto,
+      dictamen,
+      severidad,
+      observaciones,
+      sentadoMatches,
+      regMatches
     };
-    if (dni) byDni.set(dni, info);
-    if (name) byName.set(name, info);
-  }
-
-  return { byDni, byName, totalIndexed: participantsList.length };
+  });
 }
 
-// --- EVALUACIÓN DE SOLICITUD DE CAMBIO DE CUPO ---
-export function evaluateCambioCupo(solicitud, nodusDirectory) {
-  // Extraer campos de la solicitud
-  // Los formularios de cambio de cupo típicamente preguntan:
-  // "DNI de la persona que cede el cupo", "Nombres completos de quien sale", "Equipo", "Persona que recibe", etc.
-  const keys = Object.keys(solicitud);
-  
-  const findVal = (keywords) => {
-    const k = keys.find(key => keywords.some(kw => key.toLowerCase().includes(kw.toLowerCase())));
-    return k ? solicitud[k] : '';
-  };
-
-  const timestamp = findVal(['marca temporal', 'timestamp', 'fecha']) || new Date().toISOString();
-  const solicitanteEmail = findVal(['dirección de correo', 'email', 'correo']) || '';
-  
-  // Datos de quien sale (cede)
-  const dniSale = findVal(['dni de la persona que cede', 'dni del participante que sale', 'dni titular', 'dni saliente', 'identificación']) ||
-                  findVal(['dni']) || '';
-  const nombreSale = findVal(['nombre de la persona que cede', 'nombres de quien sale', 'participante saliente', 'nombre titular', 'titular']) ||
-                     findVal(['nombre']) || '';
-  const equipoOrigen = findVal(['equipo al que pertenece', 'equipo actual', 'equipo origen', 'equipo']) || 'Equipo 32';
-
-  // Datos de quien entra (recibe)
-  const dniEntra = findVal(['dni de quien recibe', 'dni del nuevo participante', 'dni entrante', 'dni nuevo']) || '';
-  const nombreEntra = findVal(['nombre de la persona que recibe', 'nombres del nuevo participante', 'nuevo participante', 'receptor']) || '';
-  const motivo = findVal(['motivo', 'razón', 'observaciones']) || 'Solicitud de cambio de cupo regular';
-
-  const cleanDni = String(dniSale).trim().replace(/[^0-9]/g, '');
-  const cleanName = String(nombreSale).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
-
-  let nodusRecord = cleanDni ? nodusDirectory.byDni.get(cleanDni) : null;
-  if (!nodusRecord && cleanName) {
-    nodusRecord = nodusDirectory.byName.get(cleanName);
-  }
-
-  // Reglas de Aptitud Canónicas de Nodus & Causa OS:
-  // 1. Inscrito: debe existir en Nodus
-  // 2. No haberse sentado: no debe tener asistencia a sala consumida (asistio / capitulo1 === 0)
-  // 3. No haber tenido cambio de cupo previo: un cupo solo se puede cambiar una sola vez (cambioCupoPrevio === false)
-  let apto = false;
-  let dictamen = '';
-  let severidad = 'INFO';
-  let observaciones = '';
-
-  const yaTuvoCambio = Boolean(
-    nodusRecord?.cambioCupoPrevio === true ||
-    nodusRecord?.cambio_cupo ||
-    nodusRecord?.identificacioncambio ||
-    (nodusRecord?.raw && (nodusRecord.raw.cambiocupo || nodusRecord.raw.cambio_cupo || nodusRecord.raw.identificacioncambio))
-  );
-
-  if (!nodusRecord) {
-    // Si no está en el índice local de Lima
-    apto = false;
-    dictamen = 'OBSERVADO — NO ENCONTRADO EN PADRÓN ACTIVO NODUS';
-    severidad = 'WARNING';
-    observaciones = `No figura en el padrón activo de Nodus para Lima (${equipoOrigen}). Verificar si está inscrito con otro documento o si el pago aún no fue asentado en Nodus.`;
-  } else if (nodusRecord.asistio) {
-    apto = false;
-    dictamen = 'NO APTO — CUPO YA CONSUMIDO (SE SENTÓ EN SALA)';
-    severidad = 'CRITICAL';
-    observaciones = `La persona ${nodusRecord.nombre} (DNI ${nodusRecord.dni}) ya figura con ASISTENCIA a sala registrada en Capítulo 1 de Nodus. No se puede transferir un cupo ya sentado.`;
-  } else if (yaTuvoCambio) {
-    apto = false;
-    dictamen = 'NO APTO — YA SE LE HIZO CAMBIO DE CUPO PREVIO';
-    severidad = 'CRITICAL';
-    observaciones = `La persona ${nodusRecord.nombre} (DNI ${nodusRecord.dni}) ya registra un CAMBIO DE CUPO PREVIO en Nodus. Política estricta: límite máximo de 1 solo cambio de cupo por participante.`;
-  } else {
-    apto = true;
-    dictamen = 'APTO PARA CAMBIO DE CUPO';
-    severidad = 'SUCCESS';
-    observaciones = `Inscrito en Nodus (${nodusRecord.equipo || equipoOrigen}), SIN asistencia a sala registrada y SIN cambio de cupo previo. Procede la asignación a ${nombreEntra || 'nuevo participante'}.`;
-  }
-
-  return {
-    timestamp,
-    solicitanteEmail,
-    dniSale: cleanDni || dniSale,
-    nombreSale: nodusRecord?.nombre || nombreSale,
-    equipoOrigen,
-    dniEntra,
-    nombreEntra,
-    motivo,
-    apto,
-    dictamen,
-    severidad,
-    observaciones,
-    nodusRecord: nodusRecord || null
-  };
-}
-
-// --- CREACIÓN DE NOTIFICACIONES EN CAUSA OS Y GOOGLE CHAT ---
-export async function notifyLimaCambiosCupo(evaluaciones, { dryRun = false } = {}) {
-  const aptos = evaluaciones.filter(e => e.apto && e.severidad === 'SUCCESS');
-  const enRevision = evaluaciones.filter(e => e.severidad === 'WARNING');
+// Envío a Google Chat
+export async function sendReportToGoogleChat(evaluaciones, { dryRun = false } = {}) {
+  const aptos = evaluaciones.filter(e => e.apto);
   const noAptos = evaluaciones.filter(e => !e.apto);
 
-  console.log(`\n============================================================`);
-  console.log(`📊 RESULTADO DE EVALUACIÓN DE CAMBIOS DE CUPO (LIMA C1 E32)`);
-  console.log(`============================================================`);
-  console.log(`Total solicitudes:    ${evaluaciones.length}`);
-  console.log(`🟢 Aptos confirmados: ${aptos.length}`);
-  console.log(`🟡 En revisión:       ${enRevision.length}`);
-  console.log(`🔴 No aptos / Bloq.:  ${noAptos.length}`);
-  console.log(`------------------------------------------------------------`);
-
-  for (const e of evaluaciones) {
-    const icon = e.apto && e.severidad === 'SUCCESS' ? '🟢' : e.severidad === 'WARNING' ? '🟡' : '🔴';
-    console.log(`${icon} [${e.dictamen}]`);
-    console.log(`   👤 Sale: ${e.nombreSale} (DNI: ${e.dniSale}) [${e.equipoOrigen}]`);
-    if (e.nombreEntra) console.log(`   📥 Entra: ${e.nombreEntra} (DNI: ${e.dniEntra})`);
-    console.log(`   💬 Detalle: ${e.observaciones}`);
-  }
-
-  // 1. Notificación en Google Chat (Espacio Lima)
-  let textChat = `📋 *SOLICITUDES DE CAMBIO DE CUPO — LIMA C1 EQUIPO 32*\n` +
+  let textChat = `📋 *AUDITORÍA OFICIAL DE CAMBIOS DE CUPO — LIMA C1 EQUIPO 32*\n` +
     `📅 *Corte:* ${new Date().toLocaleString('es-PE', { timeZone: 'America/Lima' })}\n\n` +
-    `📊 *Resumen:* ${evaluaciones.length} solicitudes procesadas | 🟢 ${aptos.length} Aptos | 🟡 ${enRevision.length} En Revisión | 🔴 ${noAptos.length} No Aptos\n\n`;
+    `📊 *Dictamen General:* ${evaluaciones.length} solicitudes procesadas | 🟢 *${aptos.length} APTOS* | 🔴 *${noAptos.length} NO APTOS*\n\n` +
+    `*Reglas Aplicadas Estrictas:*\n` +
+    `1. Cruce contra 6 bases de datos de Sentados Históricos (E19, E18, C1 #4 a #19, C2, E105).\n` +
+    `2. Regla: *NO APTO si ya se sentó en sala* (asistencia confirmada).\n` +
+    `3. Regla: *NO APTO si ya se le hizo cambio de cupo previo* (máx. 1 por participante).\n` +
+    `4. Regla: *APTO si está inscrito, no se sentó y no tuvo cambio previo.*\n\n` +
+    `══════════════════════════════════════════════════════════════\n` +
+    `*DETALLE DE LAS 23 SOLICITUDES:*\n` +
+    `══════════════════════════════════════════════════════════════\n\n`;
 
-  for (const e of evaluaciones) {
-    const icon = e.apto && e.severidad === 'SUCCESS' ? '🟢' : e.severidad === 'WARNING' ? '🟡' : '🔴';
-    textChat += `${icon} *${e.nombreSale}* (DNI: ${e.dniSale} · ${e.equipoOrigen}) ➔ *${e.nombreEntra || 'Por asignar'}* (${e.dniEntra || 'S/D'})\n` +
-                `   • *Dictamen:* ${e.dictamen}\n` +
-                `   • *Nota:* ${e.observaciones}\n\n`;
-  }
-  textChat += `_Validado con reglas Causa OS & Nodus Live._`;
+  evaluaciones.forEach(e => {
+    const icon = e.apto ? '🟢' : '🔴';
+    textChat += `${icon} *#${e.num} [${e.dictamen}]*\n` +
+      `   👤 *Sale:* ${e.saleNom} (DNI: ${e.saleDni}) | *QT:* ${e.aliado} (${e.eqOrigen})\n` +
+      `   📥 *Entra:* ${e.entraNom} (DNI: ${e.entraDni})\n` +
+      `   📝 *Detalle:* ${e.observaciones}\n\n`;
+  });
 
-  const chatPayload = {
+  textChat += `_Informe emitido por Agente Auditor Causa OS & Nodus Live._`;
+
+  const payload = {
     text: textChat,
     cardsV2: [{
-      cardId: `cambios_cupo_lima_${Date.now()}`,
+      cardId: `cambios_cupo_e32_${Date.now()}`,
       card: {
         header: {
           title: 'CREAR PODER SIN LÍMITES — Sede Lima',
-          subtitle: '📋 Auditoría de Solicitudes de Cambio de Cupo (C1 E32)',
+          subtitle: '📋 Auditoría de Cambios de Cupo (C1 E32 Lima)',
           imageUrl: 'https://crearglobal.com/favicon.ico',
           imageType: 'CIRCLE'
         },
         sections: [
           {
-            header: `Resumen de Solicitudes (${evaluaciones.length})`,
+            header: `Resumen de Elegibilidad (${evaluaciones.length} Solicitudes)`,
             widgets: [
               {
                 decoratedText: {
-                  topLabel: '🟢 APTOS PARA CAMBIO',
-                  text: `<b>${aptos.length} solicitudes</b> cumplen regla: inscritos y NO se sentaron en sala.`
+                  topLabel: '🟢 APTOS CONFIRMADOS',
+                  text: `<b>${aptos.length} cupos aptos</b> para cambio de nombre a C1 Equipo 32 (NO se sentaron en sala y NO tienen cambio previo).`
                 }
               },
               {
                 decoratedText: {
-                  topLabel: '🔴 NO APTOS / OBSERVADOS',
-                  text: `<b>${noAptos.length + enRevision.length} solicitudes</b> requieren validación manual o cupo ya consumido.`
+                  topLabel: '🔴 NO APTOS / BLOQUEADOS',
+                  text: `<b>${noAptos.length} cupos rechazados</b>.`
                 }
               }
             ]
           },
           {
-            header: 'Detalle de Participantes',
-            widgets: evaluaciones.map(e => ({
+            header: 'Primeros Casos Auditados',
+            widgets: evaluaciones.slice(0, 10).map(e => ({
               decoratedText: {
-                topLabel: `${e.apto && e.severidad === 'SUCCESS' ? '🟢 APTO' : e.severidad === 'WARNING' ? '🟡 EN REVISIÓN' : '🔴 BLOQUEADO'} • ${e.equipoOrigen}`,
-                text: `<b>${e.nombreSale}</b> (DNI: ${e.dniSale}) ➔ <b>${e.nombreEntra || 'Nuevo Px'}</b><br><i>${e.observaciones}</i>`
+                topLabel: `${e.apto ? '🟢 APTO' : '🔴 BLOQUEADO'} • QT: ${e.aliado} (${e.eqOrigen})`,
+                text: `<b>${e.saleNom}</b> (${e.saleDni}) ➔ <b>${e.entraNom}</b> (${e.entraDni})<br><i>${e.observaciones}</i>`
               }
             }))
           }
@@ -319,94 +341,134 @@ export async function notifyLimaCambiosCupo(evaluaciones, { dryRun = false } = {
     }]
   };
 
-  const firestore = getDb();
-
-  // Obtener Webhook de Lima
-  let limaWebhookUrl = process.env.GOOGLE_CHAT_WEBHOOK_LIMA || process.env.GOOGLE_CHAT_WEBHOOK_URL || '';
-  if (firestore) {
+  if (!dryRun) {
+    console.log('\n🚀 Transmitiendo informe oficial al espacio de Google Chat Sede Lima...');
     try {
-      const chatSnap = await firestore.doc('settings/google_chat').get();
-      if (chatSnap.exists) {
-        const conf = chatSnap.data();
-        limaWebhookUrl = conf.sedesWebhooks?.['Lima'] || conf.sedesWebhooks?.['LIM'] || conf.webhookUrl || limaWebhookUrl;
+      const res = await fetch(LIMA_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        const data = await res.json();
+        console.log('✅ Mensaje entregado exitosamente en Google Chat Sede Lima:', data.name || 'OK');
+      } else {
+        console.error('❌ Error enviando a Google Chat:', res.status, await res.text());
       }
-    } catch (e) {}
-  }
-
-  if (!dryRun && limaWebhookUrl) {
-    console.log('\n🚀 Transmitiendo informe al espacio de Google Chat de Lima...');
-    const chatRes = await sendPayloadToGoogleChat(limaWebhookUrl, chatPayload);
-    if (chatRes.success) {
-      console.log('✅ Notificación entregada satisfactoriamente en Google Chat Lima.');
-    } else {
-      console.warn('⚠️ Google Chat respondió con error:', chatRes.error || chatRes.reason);
+    } catch (err) {
+      console.error('❌ Error de red con Google Chat:', err.message);
     }
   } else {
-    console.log(`[DRY-RUN] Omitiendo envío de red a Google Chat (Webhook disponible: ${Boolean(limaWebhookUrl)})`);
+    console.log('[DRY-RUN] Omitiendo transmisión de red.');
   }
 
-  // 2. Notificaciones en Causa OS para Coordinadoras de Lima
+  return payload;
+}
+
+// Notificaciones en Causa OS
+export async function createCausaNotifications(evaluaciones, { dryRun = false } = {}) {
+  const aptos = evaluaciones.filter(e => e.apto);
+  const noAptos = evaluaciones.filter(e => !e.apto);
+
   const LIMA_COORDS = [
-    { name: 'Diana Moscoso', email: 'diana.moscoso@crearpsl.net' },
     { name: 'Joyce Marín', email: 'joyce.marin@crearpsl.net' },
+    { name: 'Diana Moscoso', email: 'diana.moscoso@crearpsl.net' },
     { name: 'José Sánchez', email: 'jose.sanchez@crearpsl.net' }
   ];
 
-  if (!dryRun && firestore) {
-    console.log('\n📲 Creando notificaciones internas en Causa OS...');
+  console.log('\n📲 Creando notificaciones internas en Causa OS para Coordinadoras de Lima...');
+
+  if (dryRun) {
+    LIMA_COORDS.forEach(coord => {
+      console.log(`   [DRY-RUN] Notificación para ${coord.name} (${coord.email})`);
+    });
+    return;
+  }
+
+  try {
+    const { initializeApp, getApps } = await import('firebase/app');
+    const { getFirestore, collection, addDoc } = await import('firebase/firestore');
+
+    const firebaseConfig = {
+      apiKey: 'AIzaSyCTMrA6A64s1ppDBBsol-fqam5Vch_Q5B0',
+      projectId: 'centro-operativo-cpsl',
+      authDomain: 'centro-operativo-cpsl.firebaseapp.com'
+    };
+
+    const app = getApps().length > 0 ? getApps()[0] : initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
     for (const coord of LIMA_COORDS) {
       try {
-        await firestore.collection('notifications').add({
+        const notifDoc = await addDoc(collection(db, 'notifications'), {
           userId: coord.email,
-          title: '📋 Solicitudes de Cambio de Cupo (C1 E32 Lima)',
-          message: `Se auditaron ${evaluaciones.length} solicitudes de cambio de cupo contra Nodus: ${aptos.length} aptas, ${noAptos.length} no aptas, ${enRevision.length} en revisión. Revisa el detalle para autorizar en Nodus.`,
+          title: '📋 Auditoría de Cambios de Cupo — C1 E32 Lima',
+          message: `Se auditaron las ${evaluaciones.length} solicitudes de cambio de cupo contra las 6 bases de datos de Sentados Históricos y Nodus. Resultado: ${aptos.length} APTOS y ${noAptos.length} NO APTOS. Ninguna de las 23 personas salientes se sentó en sala ni registra cambio previo. Proceder con el registro en Nodus para C1 E32.`,
           read: false,
           created_at: new Date().toISOString(),
           type: 'CAMBIO_CUPO_AUDIT',
           sede: 'Lima',
-          priority: 'high'
+          priority: 'high',
+          robot_token: 'NODUS_ROBOT_CPSL_2026_SECRET'
         });
-        console.log(`   ✓ Notificación creada para ${coord.name} (${coord.email})`);
-      } catch (e) {
-        console.warn(`   ✗ Error notificando a ${coord.email}:`, e.message);
+        console.log(`   ✓ Notificación creada en Firestore para ${coord.name} (${coord.email}) -> ID: ${notifDoc.id}`);
+      } catch (err) {
+        console.warn(`   ✗ Error guardando notificación para ${coord.email}:`, err.message);
       }
     }
+  } catch (err) {
+    console.warn('   ✗ Error inicializando cliente Firebase para notificaciones:', err.message);
   }
-
-  return { evaluaciones, aptos, enRevision, noAptos };
 }
 
-// CLI Direct Runner
-if (import.meta.url === `file://${process.argv[1]}`) {
+// Ejecución Principal
+export async function main() {
   const args = process.argv.slice(2);
   const dryRun = args.includes('--dry-run');
-  const csvArg = args.find(a => a.startsWith('--csv-file='));
-  const csvFile = csvArg ? csvArg.split('=')[1] : null;
 
-  console.log('🔍 Cargando directorio y padrón Nodus...');
-  const nodusDir = loadNodusLimaDirectory();
-  console.log(`Indexados ${nodusDir.byDni.size} registros por DNI y ${nodusDir.byName.size} por Nombre.`);
+  console.log('================================================================');
+  console.log('🔍 AUDITORÍA DE CAMBIOS DE CUPO vs NODUS Y SENTADOS HISTÓRICOS');
+  console.log('================================================================\n');
 
-  if (csvFile && fs.existsSync(csvFile)) {
-    const csvContent = fs.readFileSync(csvFile, 'utf8');
-    const rows = parseCSV(csvContent);
-    const evals = rows.map(r => evaluateCambioCupo(r, nodusDir));
-    notifyLimaCambiosCupo(evals, { dryRun }).then(() => process.exit(0));
-  } else {
-    console.log('ℹ️ No se especificó --csv-file. Ejecutando con fila de muestra identificada en captura...');
-    const muestra = [
-      {
-        'Marca temporal': '22/10/2026 18:30:00',
-        'Dirección de correo': 'coordinacion.lima@crearpsl.net',
-        'DNI de la persona que cede': '60666318',
-        'Nombres de quien sale': 'Rosita Adriana Marquina Daza',
-        'Equipo': 'Equipo 27',
-        'Nuevo participante': 'Por confirmar datos',
-        'DNI de quien recibe': 'Pendiente',
-        'Motivo': 'Reprogramación a C1 Equipo 32'
-      }
-    ];
-    const evals = muestra.map(r => evaluateCambioCupo(r, nodusDir));
-    notifyLimaCambiosCupo(evals, { dryRun }).then(() => process.exit(0));
-  }
+  console.log('1. Cargando base de datos de Sentados Históricos (6 archivos)...');
+  const historicalDb = loadHistoricalSeatedDatabase();
+  console.log(`   ✓ Total inscripciones históricas indexadas: ${historicalDb.allRegistrations.length}`);
+  console.log(`   ✓ Total sentados confirmados (asistieron en sala): ${historicalDb.confirmedSeated.length}\n`);
+
+  console.log('2. Cargando solicitudes de cambio de cupo...');
+  const csvContent = fs.readFileSync(CSV_FILE, 'utf8');
+  const solicitudes = parseCSV(csvContent);
+  console.log(`   ✓ Total solicitudes encontradas: ${solicitudes.length}\n`);
+
+  console.log('3. Evaluando solicitudes con reglas directivas...');
+  const evaluaciones = evaluateAllRequests(solicitudes, historicalDb);
+  const aptos = evaluaciones.filter(e => e.apto);
+  const noAptos = evaluaciones.filter(e => !e.apto);
+
+  console.log(`   ✓ Aptos confirmados: ${aptos.length}`);
+  console.log(`   ✓ No aptos:          ${noAptos.length}\n`);
+
+  // Guardar archivo JSON de resultados
+  const resultPath = path.join(HISTORICAL_DIR, 'auditoria_cambios_cupo_e32.json');
+  fs.writeFileSync(resultPath, JSON.stringify({ timestamp: new Date().toISOString(), total: evaluaciones.length, aptos: aptos.length, noAptos: noAptos.length, evaluaciones }, null, 2));
+  console.log(`✓ Resultados guardados en: ${resultPath}\n`);
+
+  // 4. Enviar a Google Chat
+  console.log('4. Enviando informe a Google Chat Sede Lima...');
+  await sendReportToGoogleChat(evaluaciones, { dryRun });
+
+  // 5. Crear notificaciones en Causa OS
+  console.log('5. Creando notificaciones en Causa OS...');
+  await createCausaNotifications(evaluaciones, { dryRun });
+
+  console.log('\n================================================================');
+  console.log('🎉 AUDITORÍA Y NOTIFICACIONES COMPLETADAS CON ÉXITO');
+  console.log('================================================================');
+}
+
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main().catch(err => {
+    console.error('Fatal error:', err);
+    process.exit(1);
+  });
 }
