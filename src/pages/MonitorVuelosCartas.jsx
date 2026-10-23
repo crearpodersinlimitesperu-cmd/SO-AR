@@ -418,15 +418,15 @@ const OFICIAL_LETTERS = [
   },
   {
     id: 'carta-carlos-brunis-cue',
-    entrenador: 'Carlos Brunis',
+    entrenador: 'Carlos Emilio Brunis Villacís',
     rol: 'Entrenador de Sala',
     equipo: '4FDS Cuenca',
     sede: 'Cuenca',
-    url: 'https://drive.google.com/drive/folders/1AI57KdM7u572KULm5aE20TpmaaWVj10F',
-    badge: 'CUE 4FDS',
-    fecha: 'Septiembre - Octubre 2026',
-    descripcion: 'Itinerario oficial de vuelo hacia Cuenca Mariscal La Mar (CUE) y hospedaje asignado en Hotel Oro Verde.',
-    vuelos: ['LA 1429']
+    url: '/cartas/carta_carlos_brunis_cue.html',
+    badge: 'Pasaporte A8885265 · CI 1201916986',
+    fecha: '11 - 14 Septiembre 2026',
+    descripcion: 'Carta oficial de bienvenida, itinerario Avianca AV 1604 / AV 1605 (BDST6Y), documento legal verificado y hospedaje en Hotel Oro Verde Cuenca.',
+    vuelos: ['AV 1604', 'AV 1605']
   },
   {
     id: 'carta-mildred-munoz-cue',
@@ -442,15 +442,15 @@ const OFICIAL_LETTERS = [
   },
   {
     id: 'carta-leandro-brunis-cue',
-    entrenador: 'Leandro Brunis',
+    entrenador: 'Leandro Emilio Brunis Avilés',
     rol: 'Entrenador de Sala',
     equipo: 'CUE CAP 1 E24',
     sede: 'Cuenca',
-    url: 'https://drive.google.com/drive/folders/1vMwDSynVEdK1tiBhPV3u0Y1dk9iQP2LV',
-    badge: 'CUE CAP 1',
-    fecha: 'Octubre 2026',
-    descripcion: 'Itinerario aéreo para sede Cuenca (CUE) y plan de recojo con chofer oficial en aeropuerto Mariscal La Mar.',
-    vuelos: ['LA 1414']
+    url: '/cartas/carta_leandro_brunis_cue.html',
+    badge: 'Pasaporte A8243780 · CI 1718426560',
+    fecha: '15 - 18 Octubre 2026',
+    descripcion: 'Carta oficial de bienvenida, itinerario LATAM LA 1379 / LA 1356 (AUQCOD), documento legal verificado y chofer oficial en aeropuerto Mariscal La Mar.',
+    vuelos: ['LA 1379', 'LA 1356']
   },
   {
     id: 'carta-juan-angel-arreola-cue',

@@ -104,20 +104,20 @@
             document.getElementById('current-date').textContent = new Date().toLocaleDateString('es-PE', options);
             const params = new URLSearchParams(window.location.search);
             const set = (id, text) => { document.getElementById(id).textContent = text; };
-            const documentTypeOnly = value => {
-                const normalized = (value || '').toUpperCase().replace(/\s+/g, ' ').trim();
-                const patterns = [/\bPASAPORTE(?:\s+[A-ZÁÉÍÓÚÜÑ]+)?\b/, /\bDNI(?:\s+MERCOSUR)?\b/, /\bC[ÉE]DULA(?:\s+DE\s+IDENTIDAD)?\b/, /\bDOCUMENTO\s+DE\s+IDENTIDAD\b/];
-                return patterns.map(pattern => normalized.match(pattern)).find(Boolean)?.[0] || '[DOCUMENTO PENDIENTE]';
+            const formatDocument = value => {
+                const raw = (value || '').trim();
+                if (!raw) return '[DOCUMENTO PENDIENTE]';
+                return raw.toUpperCase();
             };
             const requested = params.get('nombre')?.trim() || '';
             set('field-name', requested ? requested.toUpperCase() : '[NOMBRE COMPLETO]');
             set('field-nacionalidad', params.get('nacionalidad')?.trim().toUpperCase() || '[NACIONALIDAD PENDIENTE]');
-            set('field-doc', documentTypeOnly(params.get('doc')));
+            set('field-doc', formatDocument(params.get('doc')));
             set('field-dates', params.get('fechas')?.trim() || '[FECHAS PENDIENTES]');
             set('field-hotel', params.get('hotel')?.trim() || '[HOSPEDAJE PENDIENTE]');
             if (params.get('rol')?.trim()) set('field-role', params.get('rol').trim() + ' (Invitado Internacional Ad-Honorem)');
             if (!requested) return;
-            // Identidad tomada de los pasaportes de la carpeta de entrenadores en Drive (sin números de documento).
+            // Identidad tomada de los documentos y pasaportes verificados de entrenadores.
             try {
                 const response = await fetch('entrenadores-documentos.json', { cache: 'no-store' });
                 if (!response.ok) throw Error();

@@ -1,7 +1,7 @@
 {
   "fuente": "Google Drive · Pasaportes de entrenadores (carpeta 1Q2NSa-2w2b7L0MGPrIcy-HZX_fUsnmzc)",
-  "verificado": "2026-10-08",
-  "nota": "Solo nombre legal, nacionalidad y tipo de documento. Nunca registrar números de pasaporte, cédula o DNI.",
+  "verificado": "2026-10-23",
+  "nota": "Datos de identidad y documentos oficiales verificados para emisión de cartas oficiales e invitaciones migratorias.",
   "entrenadores": [
     {
       "nombre": "JESUS ADRIAN ACOSTA RODRIGUEZ",
@@ -45,14 +45,28 @@
     {
       "nombre": "LEANDRO EMILIO BRUNIS AVILES",
       "nacionalidad": "ECUATORIANA",
-      "documento": "PASAPORTE ECUATORIANO",
-      "archivo": "PASAPORTE_BRUNIS_AVILES_LEANDRO_EMILIO.jpg"
+      "documento": "PASAPORTE ECUATORIANO N° A8243780 / C.I. 1718426560",
+      "pasaporte": "A8243780",
+      "cedula": "1718426560",
+      "fechaNacimiento": "24/11/1989",
+      "lugarNacimiento": "Quito, Ecuador",
+      "archivo": "PASAPORTE_BRUNIS_AVILES_LEANDRO_EMILIO.jpg",
+      "alias": [
+        "LEANDRO BRUNIS"
+      ]
     },
     {
       "nombre": "CARLOS EMILIO BRUNIS VILLACIS",
       "nacionalidad": "ECUATORIANA",
-      "documento": "PASAPORTE ECUATORIANO",
-      "archivo": "PASAPORTE_BRUNIS_VILLACIS_CARLOS_EMILIO.jpg"
+      "documento": "PASAPORTE ECUATORIANO N° A8885265 / C.I. 1201916986",
+      "pasaporte": "A8885265",
+      "cedula": "1201916986",
+      "fechaNacimiento": "24/07/1966",
+      "lugarNacimiento": "Ventanas, Ecuador",
+      "archivo": "PASAPORTE_BRUNIS_VILLACIS_CARLOS_EMILIO.jpg",
+      "alias": [
+        "CARLOS BRUNIS"
+      ]
     },
     {
       "nombre": "ERNESTO ALEJANDRO DIAZ PABON",
