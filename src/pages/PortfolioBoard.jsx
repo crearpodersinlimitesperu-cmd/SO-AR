@@ -666,7 +666,7 @@ export default function PortfolioBoard() {
                 gap: '0.4rem' 
               }}
             >
-              <Target size={16} /> Futuros Imposibles (IA)
+              <Target size={16} /> Resultados Imposibles (IA)
             </button>
             {canViewNodusUserAccess && (
               <button

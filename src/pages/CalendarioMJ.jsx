@@ -245,12 +245,12 @@ const DEFAULT_ACTIVITIES = [
   { seccion: 'creacion', actividad: 'Entrega de directorio: físico y digital.', fecha: '', hora: 'Hasta las 2:00 pm, lo entrega un representante del equipo.' },
   { seccion: 'creacion', actividad: 'Entrenamiento de confianza', fecha: '', hora: '11:00 am a 2:00 pm.' },
   { seccion: 'creacion', actividad: 'Impacto Creación', fecha: '', hora: '3:00 pm a 5:00 pm' },
-  { seccion: 'creacion', actividad: 'Revisión de Futuros Imposibles', fecha: '', hora: '6:00 pm a 7:00 pm' },
+  { seccion: 'creacion', actividad: 'Revisión de Resultados Imposibles', fecha: '', hora: '6:00 pm a 7:00 pm' },
   { seccion: 'creacion', actividad: 'Línea de Elección y\nEntrega de souvenirs a\nparticipantes del Capítulo 1', fecha: '', hora: '8:00 pm a 10:30 pm aprox.' },
   { seccion: 'creacion', actividad: 'Pase de Antorcha y\nCaminata de Equipos', fecha: '', hora: '6:00 PM' },
   { seccion: 'creacion', actividad: 'Barco', fecha: '', hora: '6:00 PM' },
   { seccion: 'creacion', actividad: 'Entrenamiento\nTanque', fecha: '', hora: '1:00 pm a 4:00 pm.' },
-  { seccion: 'creacion', actividad: 'Revisión de Futuros Imposibles', fecha: '', hora: '5:00 pm a 6:00 pm' },
+  { seccion: 'creacion', actividad: 'Revisión de Resultados Imposibles', fecha: '', hora: '5:00 pm a 6:00 pm' },
   { seccion: 'creacion', actividad: 'Vuelos', fecha: '', hora: '6:00 pm a 11:00 pm aprox.' },
   // fechaVariable: true — a pedido de José ("esta fecha se puede desplazar"):
   // el offset Y el bloque (creación o relación) de esta actividad cambian de
@@ -264,7 +264,7 @@ const DEFAULT_ACTIVITIES = [
   { seccion: 'relacion', actividad: 'Barco', fecha: '', hora: '6:00 PM' },
   { seccion: 'relacion', actividad: 'Entrenamiento\nRompimiento de Barreras', fecha: '', hora: '9:00 am a 12:00 pm' },
   { seccion: 'relacion', actividad: 'Impacto Relación', fecha: '', hora: '' },
-  { seccion: 'relacion', actividad: 'Revisión de Futuros Imposibles', fecha: '', hora: '5:00 pm a 6:00 pm' },
+  { seccion: 'relacion', actividad: 'Revisión de Resultados Imposibles', fecha: '', hora: '5:00 pm a 6:00 pm' },
   { seccion: 'relacion', actividad: 'Vuelos', fecha: '', hora: '6:30 pm a 11:00 pm aprox.' },
 
   // esCierre: true — a pedido de José ("aquí va fin del entrenamiento"):

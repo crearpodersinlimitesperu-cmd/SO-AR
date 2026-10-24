@@ -690,7 +690,7 @@ const CAUSA_OPTIONS_REGISTRY = [
     category: 'Maestría',
     badge: 'Dirección Académica',
     emoji: '🌐',
-    desc: 'Supervisión de coordinadores C1/C2/MJ, auditoría de Futuros Imposibles y misiones de expansión',
+    desc: 'Supervisión de coordinadores C1/C2/MJ, auditoría de Resultados Imposibles y misiones de expansión',
     keywords: ['andres gomez', 'maestria global', 'futuros imposibles', 'coordinadores', 'misiones', 'expansion'],
     route: '/andres-command-center',
     roles: ['coord_maestria_global', 'director_maestria', 'superadmin', 'ceo', 'direccion']

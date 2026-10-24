@@ -123,22 +123,38 @@ export default function FuturosImposiblesView({
   }, []);
 
   const participantesConRevision = useMemo(() => participantesRaw.map((participant) => {
-    const fis = (participant.fis || []).map((fi, areaIndex) => {
+    const rawFis = participant.fis || [];
+    // Directiva de Alta Dirección (Tecnología NEC): Evaluación de exactamente 3 Resultados Imposibles de estándar superior
+    const activeFis = rawFis.slice(0, 3);
+    const fis = activeFis.map((fi, areaIndex) => {
       const review = reviewOverrides[`${participant.id}__${areaIndex}`];
       return review ? { ...fi, estado: review.estado, feedback: review.feedback || fi.feedback } : fi;
     });
-    // Algunas publicaciones de NODUS entregan resumen por participante antes
-    // de exponer el detalle de las cinco áreas. Se conserva ese resumen y no
-    // se lo convierte artificialmente en cero; cuando hay detalle, este es la
-    // fuente de verdad para las métricas y revisiones.
+    
+    // Inmutabilidad: Preservamos el universo histórico pero auditamos estrictamente sobre el estándar de 3 Resultados
     const hasFiDetail = fis.length > 0;
+    const total3 = hasFiDetail 
+      ? fis.filter((fi) => fi.estado !== 'no_presentado' && (fi.meta || '').trim()).length 
+      : Math.min(Number(participant.totalFi) || 0, 3);
+    const aprobados3 = hasFiDetail 
+      ? fis.filter((fi) => fi.estado === 'aprobado').length 
+      : Math.min(Number(participant.aprobados) || 0, 3);
+    const pendientes3 = hasFiDetail 
+      ? fis.filter((fi) => fi.estado === 'pendiente').length 
+      : Math.min(Number(participant.pendientes) || 0, 3);
+    const devueltos3 = hasFiDetail 
+      ? fis.filter((fi) => fi.estado === 'devuelto').length 
+      : Math.min(Number(participant.devueltos) || 0, 3);
+
     return {
       ...participant,
+      rawFis, // Histórico completo preservado sin alteración de DB
       fis,
-      totalFi: hasFiDetail ? fis.filter((fi) => fi.estado !== 'no_presentado').length : Number(participant.totalFi) || 0,
-      aprobados: hasFiDetail ? fis.filter((fi) => fi.estado === 'aprobado').length : Number(participant.aprobados) || 0,
-      pendientes: hasFiDetail ? fis.filter((fi) => fi.estado === 'pendiente').length : Number(participant.pendientes) || 0,
-      devueltos: hasFiDetail ? fis.filter((fi) => fi.estado === 'devuelto').length : Number(participant.devueltos) || 0
+      totalFi: total3,
+      aprobados: aprobados3,
+      pendientes: pendientes3,
+      devueltos: devueltos3,
+      cumpleEstandar3: aprobados3 === 3
     };
   }), [participantesRaw, reviewOverrides]);
 
@@ -305,21 +321,21 @@ export default function FuturosImposiblesView({
               alignItems: 'center',
               gap: '0.35rem'
             }}>
-              <Target size={14} /> AGENTE CENTINELA IA &bull; AUDITORÍA DE FUTUROS IMPOSIBLES
+              <Target size={14} /> AGENTE CENTINELA IA &bull; AUDITORÍA DE RESULTADOS IMPOSIBLES
             </span>
             <span style={{ fontSize: '0.85rem', color: sourceState.status === 'live' ? '#10b981' : '#f59e0b' }}>
               &bull; {sourceState.label}
             </span>
           </div>
           <p style={{ margin: 0, fontSize: '0.85rem', color: textMuted, maxWidth: '900px', lineHeight: 1.4 }}>
-            <strong style={{ color: '#f59e0b' }}>Regla Operativa Nodus:</strong> <em>"Solo participantes que ya asistieron a su PFD (primer fin de semana) — ahí es cuando corresponde revisar sus Futuros Imposibles."</em>
+            <strong style={{ color: '#f59e0b' }}>Estándar de Alta Dirección:</strong> <em>"Auditoría continua de los exactamente 3 Resultados Imposibles declarados por cada participante activo en juego."</em>
           </p>
           <p style={{ margin: '0.45rem 0 0', fontSize: '0.76rem', color: sourceState.status === 'live' ? '#6ee7b7' : '#fcd34d', maxWidth: '900px', lineHeight: 1.4 }}>
             {sourceState.detail} Última marca: {sourceDateLabel(sourceState.syncedAt)}.
           </p>
           {sourceCatalog && (
             <p style={{ margin: '0.35rem 0 0', fontSize: '0.73rem', color: textMuted, maxWidth: '900px', lineHeight: 1.4 }}>
-              Contrato NODUS detectado: <strong>{sourceCatalog.extractionReadiness === 'detail_ready' ? 'detalle FI disponible' : sourceCatalog.extractionReadiness === 'summary_ready' ? 'resumen FI disponible' : sourceCatalog.extractionReadiness === 'blocked_by_waf' ? 'lectura bloqueada por WAF de NODUS' : 'requiere ajuste de campos'}</strong> · ruta {sourceCatalog.resolvedPath || sourceCatalog.route} · inspeccionado {sourceDateLabel(sourceCatalog.updatedAt || sourceCatalog.discoveredAt)}.
+              Contrato NODUS detectado: <strong>{sourceCatalog.extractionReadiness === 'detail_ready' ? 'detalle disponible' : sourceCatalog.extractionReadiness === 'summary_ready' ? 'resumen disponible' : sourceCatalog.extractionReadiness === 'blocked_by_waf' ? 'lectura bloqueada por WAF de NODUS' : 'requiere ajuste de campos'}</strong> · ruta {sourceCatalog.resolvedPath || sourceCatalog.route} · inspeccionado {sourceDateLabel(sourceCatalog.updatedAt || sourceCatalog.discoveredAt)}.
             </p>
           )}
         </div>
@@ -394,7 +410,7 @@ export default function FuturosImposiblesView({
           padding: '1rem' 
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#ef4444', textTransform: 'uppercase' }}>Sin Entrega (0 FIs)</span>
+            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#ef4444', textTransform: 'uppercase' }}>Sin Entrega (0 RIs)</span>
             <AlertCircle size={16} color="#ef4444" />
           </div>
           <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#ef4444' }}>{metricas.conCeroFIs}</div>
@@ -403,10 +419,10 @@ export default function FuturosImposiblesView({
           </div>
         </div>
 
-        {/* KPI 3: Con FIs Cargados */}
+        {/* KPI 3: Con RIs Cargados */}
         <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '10px', padding: '1rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: textMuted, textTransform: 'uppercase' }}>Con FIs Cargados</span>
+            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: textMuted, textTransform: 'uppercase' }}>Con Resultados (1 a 3)</span>
             <Target size={16} color="#10b981" />
           </div>
           <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#10b981' }}>{metricas.conFIs}</div>
@@ -415,30 +431,30 @@ export default function FuturosImposiblesView({
           </div>
         </div>
 
-        {/* KPI 4: FIs Pendientes */}
+        {/* KPI 4: RIs Pendientes */}
         <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '10px', padding: '1rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: textMuted, textTransform: 'uppercase' }}>Pendientes</span>
+            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: textMuted, textTransform: 'uppercase' }}>Resultados Pendientes</span>
             <Clock size={16} color="#f59e0b" />
           </div>
           <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f59e0b' }}>{metricas.totalPendientes}</div>
           <div style={{ fontSize: '0.75rem', color: textMuted, marginTop: '0.2rem' }}>Por revisar por mentores</div>
         </div>
 
-        {/* KPI 5: FIs Devueltos */}
+        {/* KPI 5: RIs Devueltos */}
         <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '10px', padding: '1rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: textMuted, textTransform: 'uppercase' }}>Devueltos</span>
+            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: textMuted, textTransform: 'uppercase' }}>Resultados Devueltos</span>
             <RefreshCw size={16} color="#ea580c" />
           </div>
           <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#ea580c' }}>{metricas.totalDevueltos}</div>
-          <div style={{ fontSize: '0.75rem', color: textMuted, marginTop: '0.2rem' }}>Requieren corrección</div>
+          <div style={{ fontSize: '0.75rem', color: textMuted, marginTop: '0.2rem' }}>Requieren corrección SMART</div>
         </div>
 
-        {/* KPI 6: FIs Aprobados */}
+        {/* KPI 6: RIs Aprobados */}
         <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '10px', padding: '1rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: textMuted, textTransform: 'uppercase' }}>Aprobados</span>
+            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: textMuted, textTransform: 'uppercase' }}>Resultados Aprobados</span>
             <CheckCircle2 size={16} color="#059669" />
           </div>
           <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#059669' }}>{metricas.totalAprobados}</div>
@@ -823,7 +839,7 @@ export default function FuturosImposiblesView({
               ) : (
                 participantes.map((p, idx) => {
                   const isZero = (p.totalFi || 0) === 0;
-                  const isAllApproved = (p.aprobados || 0) === 5;
+                  const isAllApproved = (p.aprobados || 0) === 3;
                   const hasPendientes = (p.pendientes || 0) > 0;
                   const hasDevueltos = (p.devueltos || 0) > 0;
 
@@ -1012,7 +1028,7 @@ export default function FuturosImposiblesView({
         </div>
       </div>
 
-      {/* 7. MODAL DE REVISIÓN Y AUDITORÍA DE 5 FUTUROS IMPOSIBLES */}
+      {/* 7. MODAL DE REVISIÓN Y AUDITORÍA DE 3 RESULTADOS IMPOSIBLES */}
       {modalOpen && selectedParticipant && (
         <div style={{
           position: 'fixed',
@@ -1058,7 +1074,7 @@ export default function FuturosImposiblesView({
                     fontSize: '0.7rem', 
                     fontWeight: 800 
                   }}>
-                    AUDITORÍA FI
+                    AUDITORÍA RESULTADOS IMPOSIBLES
                   </span>
                   <span style={{ fontSize: '0.8rem', color: textMuted }}>
                     DNI: {selectedParticipant.dni || 'Sin DNI'} &bull; Sede: {selectedParticipant.sede} &bull; {selectedParticipant.equipo}
@@ -1094,8 +1110,8 @@ export default function FuturosImposiblesView({
                 marginBottom: '1.5rem' 
               }}>
                 <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '0.6rem', borderRadius: '8px', textAlign: 'center' }}>
-                  <div style={{ fontSize: '0.7rem', color: textMuted }}>TOTAL FIs</div>
-                  <div style={{ fontSize: '1.2rem', fontWeight: 800, color: textDark }}>{selectedParticipant.totalFi}/5</div>
+                  <div style={{ fontSize: '0.7rem', color: textMuted }}>TOTAL RESULTADOS</div>
+                  <div style={{ fontSize: '1.2rem', fontWeight: 800, color: textDark }}>{selectedParticipant.totalFi}/3</div>
                 </div>
                 <div style={{ background: 'rgba(245, 158, 11, 0.1)', padding: '0.6rem', borderRadius: '8px', textAlign: 'center' }}>
                   <div style={{ fontSize: '0.7rem', color: '#f59e0b' }}>PENDIENTES</div>
@@ -1111,7 +1127,7 @@ export default function FuturosImposiblesView({
                 </div>
               </div>
 
-              {/* Selector de Áreas (5 FIs) */}
+              {/* Selector de Resultados (Exactamente 3 Resultados Imposibles) */}
               <div style={{ 
                 display: 'flex', 
                 gap: '0.5rem', 
@@ -1120,7 +1136,7 @@ export default function FuturosImposiblesView({
                 overflowX: 'auto',
                 paddingBottom: '0.5rem'
               }}>
-                {(selectedParticipant.fis || []).map((fi, idx) => {
+                {(selectedParticipant.fis || []).slice(0, 3).map((fi, idx) => {
                   const isActive = activeAreaTab === idx;
                   const isApr = fi.estado === 'aprobado';
                   const isPen = fi.estado === 'pendiente';
@@ -1153,13 +1169,13 @@ export default function FuturosImposiblesView({
                         borderRadius: '50%',
                         background: isApr ? '#10b981' : isPen ? '#f59e0b' : isDev ? '#ea580c' : '#64748b'
                       }} />
-                      {idx + 1}. {fi.area}
+                      {idx + 1}. {fi.area || `Resultado ${idx + 1}`}
                     </button>
                   );
                 })}
               </div>
 
-              {/* Detalle del FI Activo */}
+              {/* Detalle del Resultado Activo */}
               {(() => {
                 const fi = selectedParticipant.fis?.[activeAreaTab] || {};
                 const evaluacion = evaluarCalidadOntologicaFI(fi.area, fi.titulo, fi.meta);
@@ -1167,7 +1183,7 @@ export default function FuturosImposiblesView({
 
                 return (
                   <div>
-                    {/* Header del FI */}
+                    {/* Header del Resultado */}
                     <div style={{ 
                       display: 'flex', 
                       justifyContent: 'space-between', 
@@ -1178,10 +1194,10 @@ export default function FuturosImposiblesView({
                     }}>
                       <div>
                         <span style={{ fontSize: '0.75rem', color: textMuted, textTransform: 'uppercase' }}>
-                          Área {activeAreaTab + 1} de 5
+                          Resultado {activeAreaTab + 1} de 3
                         </span>
                         <h4 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: textDark }}>
-                          {fi.area}
+                          {fi.area || `Resultado Imposible ${activeAreaTab + 1}`}
                         </h4>
                       </div>
 
@@ -1210,7 +1226,7 @@ export default function FuturosImposiblesView({
                       </div>
                       {isNoPresentado ? (
                         <div style={{ color: '#ef4444', fontStyle: 'italic', fontSize: '0.88rem' }}>
-                          🚨 El participante aún no ha redactado ni cargado su Futuro Imposible para esta área en la plataforma oficial.
+                          🚨 El participante aún no ha redactado ni cargado su Resultado Imposible para esta meta en la plataforma oficial.
                         </div>
                       ) : (
                         <div>

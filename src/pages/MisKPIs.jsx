@@ -1240,7 +1240,7 @@ export default function MisKPIs() {
 
             <div className="form-group">
               <label>
-                Futuros Imposibles C2 Declarados (%) 
+                Resultados Imposibles C2 Declarados (%) 
                 <span className="text-gold" style={{ fontSize: '0.8rem' }}> (Meta de {personName}: {customMetas?.futurosImposibles ?? 80}%)</span>
                 {renderMetaComparisonBadge(qtData.futurosImposibles, customMetas?.futurosImposibles ?? 80)}
               </label>
@@ -1607,7 +1607,7 @@ export default function MisKPIs() {
                     />
                   </div>
                   <div className="form-group">
-                    <label style={{ fontSize: '0.8rem' }}>Futuros Imposibles C2 (%)</label>
+                    <label style={{ fontSize: '0.8rem' }}>Resultados Imposibles C2 (%)</label>
                     <input 
                       type="number" 
                       value={metasDraft.futurosImposibles ?? 80} 

@@ -127,7 +127,7 @@ export default function AndresCommandCenter() {
 
         <div style={{ gridColumn: 'span 4', background: 'var(--bg-card)', borderRadius: '12px', border: '1px solid var(--border-strong)', padding: '1.5rem', boxShadow: 'var(--shadow-sm)' }}>
           <h2 style={{ fontSize: '1.1rem', color: 'var(--text-heading)', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 0 1rem 0' }}>
-            <AlertTriangle size={20} color="#f59e0b" /> Auditor: Futuros Imposibles
+            <AlertTriangle size={20} color="#f59e0b" /> Auditor: Resultados Imposibles
           </h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
             {audit.map(a => (

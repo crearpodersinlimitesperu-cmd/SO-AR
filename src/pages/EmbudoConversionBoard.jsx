@@ -2,6 +2,8 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../services/firebase';
+import nodusFallbackData from '../data/nodusFallbackData.json';
+import { canonicalSede } from '../utils/sede';
 import { 
   ArrowLeft, RefreshCw, Users, Activity, CheckCircle2, 
   PhoneCall, ShieldCheck, Database, Layers, TrendingUp,
@@ -51,28 +53,67 @@ export default function EmbudoConversionBoard() {
     };
   }, [refreshKey]);
 
-  // Lista de coordinadores oficiales
+  // Lista de coordinadores oficiales con fusión resiliente (cero dependencia frágil de Firestore trunco)
   const allCoordinadores = useMemo(() => {
-    return coordsData?.coordinadores || snapshotData?.coordinadores || [];
+    const liveCoords = coordsData?.coordinadores || snapshotData?.coordinadores || [];
+    const fallbackCoords = nodusFallbackData?.coordinadores || [];
+    
+    // Si la fuente en vivo no tiene coordinadores, usamos la base verificada
+    if (!liveCoords.length) return fallbackCoords;
+
+    const map = new Map();
+    // 1. Poblamos con la base histórica completa de Nodus
+    fallbackCoords.forEach(c => {
+      const sede = canonicalSede(c.sede);
+      const key = `${(c.nombre || c.nombreCompleto || '').trim().toLowerCase()}_${sede.toLowerCase()}`;
+      map.set(key, { ...c, sede });
+    });
+
+    // 2. Superponemos la fuente en vivo, fusionando los equipos
+    liveCoords.forEach(c => {
+      const sede = canonicalSede(c.sede);
+      const key = `${(c.nombre || c.nombreCompleto || '').trim().toLowerCase()}_${sede.toLowerCase()}`;
+      const existing = map.get(key);
+      if (existing) {
+        const eqMap = new Map();
+        (existing.equipos || []).forEach(e => {
+          if (e.equipo) eqMap.set(e.equipo, e);
+        });
+        (c.equipos || []).forEach(e => {
+          if (e.equipo) eqMap.set(e.equipo, e);
+        });
+        map.set(key, { ...existing, ...c, sede, equipos: Array.from(eqMap.values()) });
+      } else {
+        map.set(key, { ...c, sede });
+      }
+    });
+
+    return Array.from(map.values());
   }, [coordsData, snapshotData]);
 
   // Lista de sedes disponibles
   const availableSedes = useMemo(() => {
     const set = new Set();
-    (snapshotData?.sedes || []).forEach(s => s.sede && set.add(s.sede));
-    allCoordinadores.forEach(c => c.sede && set.add(c.sede));
+    allCoordinadores.forEach(c => {
+      const s = canonicalSede(c.sede);
+      if (s && s !== 'Global' && s !== 'Sin sede') set.add(s);
+    });
     return ['TODAS', ...Array.from(set).sort()];
-  }, [snapshotData, allCoordinadores]);
+  }, [allCoordinadores]);
 
   // Lista de equipos disponibles según la sede seleccionada
   const availableEquipos = useMemo(() => {
     const set = new Set();
+    const target = canonicalSede(selectedSede);
+
     allCoordinadores.forEach(c => {
-      if (selectedSede !== 'TODAS' && c.sede !== selectedSede) return;
+      const cSede = canonicalSede(c.sede);
+      if (selectedSede !== 'TODAS' && cSede.toLowerCase() !== target.toLowerCase()) return;
       (c.equipos || []).forEach(e => {
         if (e.equipo && e.equipo !== 'Sin equipo') set.add(e.equipo);
       });
     });
+
     return ['TODOS', ...Array.from(set).sort((a, b) => {
       const numA = parseInt(a.replace(/\D/g, '') || '0', 10);
       const numB = parseInt(b.replace(/\D/g, '') || '0', 10);
@@ -131,14 +172,14 @@ export default function EmbudoConversionBoard() {
         c2Total = sedeSnap.c2Total || 0;
       }
       // Sumar estados desde coordinadores de esa sede
-      allCoordinadores.filter(c => c.sede?.toLowerCase() === selectedSede.toLowerCase()).forEach(c => {
+      allCoordinadores.filter(c => canonicalSede(c.sede).toLowerCase() === canonicalSede(selectedSede).toLowerCase()).forEach(c => {
         siguiente += c.estados?.siguiente || 0;
         noInteresa += c.estados?.noInteresa || 0;
       });
     } else {
       // Filtrado por Equipo específico
       allCoordinadores.forEach(c => {
-        if (selectedSede !== 'TODAS' && c.sede?.toLowerCase() !== selectedSede.toLowerCase()) return;
+        if (selectedSede !== 'TODAS' && canonicalSede(c.sede).toLowerCase() !== canonicalSede(selectedSede).toLowerCase()) return;
         (c.equipos || []).forEach(e => {
           if (e.equipo === selectedEquipo) {
             gestiones += e.llamadas || 0;
@@ -179,7 +220,7 @@ export default function EmbudoConversionBoard() {
   const equiposTable = useMemo(() => {
     const map = {};
     allCoordinadores.forEach(c => {
-      if (selectedSede !== 'TODAS' && c.sede?.toLowerCase() !== selectedSede.toLowerCase()) return;
+      if (selectedSede !== 'TODAS' && canonicalSede(c.sede).toLowerCase() !== canonicalSede(selectedSede).toLowerCase()) return;
       (c.equipos || []).forEach(e => {
         if (!e.equipo || e.equipo === 'Sin equipo') return;
         if (selectedEquipo !== 'TODOS' && e.equipo !== selectedEquipo) return;
@@ -217,7 +258,7 @@ export default function EmbudoConversionBoard() {
   // Desglose de coordinadores filtrados
   const coordinadoresTable = useMemo(() => {
     return allCoordinadores.filter(c => {
-      if (selectedSede !== 'TODAS' && c.sede?.toLowerCase() !== selectedSede.toLowerCase()) return false;
+      if (selectedSede !== 'TODAS' && canonicalSede(c.sede).toLowerCase() !== canonicalSede(selectedSede).toLowerCase()) return false;
       if (selectedEquipo !== 'TODOS') {
         return (c.equipos || []).some(e => e.equipo === selectedEquipo);
       }

@@ -179,7 +179,7 @@ const MASTER_TEAM_SCHEDULES = [
     id: 'sch-x2',
     dayOfWeek: 3,
     roleCategory: 'coordinador',
-    title: 'Auditoría & Carga en Nodus de Futuros Imposibles (FI)',
+    title: 'Auditoría & Carga en Nodus de Resultados Imposibles (RI)',
     time: '14:00 - 19:00',
     type: 'Deadline',
     owner: 'Coordinador de Maestría (CMJ)',

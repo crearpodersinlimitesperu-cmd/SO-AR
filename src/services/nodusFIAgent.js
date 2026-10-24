@@ -1,12 +1,16 @@
 /**
- * AGENTE CENTINELA DE INTELIGENCIA ARTIFICIAL &bull; AUDITOR DE FUTUROS IMPOSIBLES (FIs)
+ * AGENTE CENTINELA DE INTELIGENCIA ARTIFICIAL &bull; AUDITOR DE RESULTADOS IMPOSIBLES
  * Módulo de Inteligencia Operativa y Diagnóstico Predictivo - Causa OS / NODUS CREAR
+ * 
+ * Directiva Cultural de Alta Dirección (Tecnología NEC):
+ * Transición oficial y estricta: "Futuros Imposibles" -> "Resultados Imposibles".
+ * Nueva Regla de Negocio: 3 Resultados Imposibles de estándar superior por participante en juego.
  * 
  * Misión del Agente:
  * 1. Auditar la cohorte completa de participantes post-PFD en NODUS (https://imo.crearpslglobal.com/futurosimposibles).
- * 2. Calcular índices de entrega, rezago crítico (0 FIs), cuellos de botella de revisión (pendientes) y devueltos.
+ * 2. Calcular índices de entrega, rezago crítico (0 Resultados), cuellos de botella de revisión (pendientes) y devueltos.
  * 3. Emitir dictámenes diagnósticos ejecutivos en tiempo real con recomendaciones tácticas para Dirección y Coordinadores.
- * 4. Proveer validación de calidad ontológica sobre las 5 áreas de Futuros Imposibles.
+ * 4. Proveer validación de calidad ontológica y SMART sobre los 3 Resultados Imposibles requeridos.
  */
 
 // Helper para remover tildes y diacríticos
@@ -237,7 +241,7 @@ export function generarDictamenEjecutivoIA(metricas, filtroSede, filtroEquipo) {
       severidad: 'SIN_DATOS',
       badgeTexto: '⛔ SIN UNIVERSO PFD VERIFICABLE',
       colorBadge: '#ef4444',
-      resumen: `No se puede emitir un diagnóstico de Futuros Imposibles para ${sedeLabel}${equipoLabel}: la fuente actual no aporta participantes con asistencia PFD confirmada. No se interpreta este resultado como cobertura, cumplimiento ni estabilidad.`,
+      resumen: `No se puede emitir un diagnóstico de Resultados Imposibles para ${sedeLabel}${equipoLabel}: la fuente actual no aporta participantes con asistencia PFD confirmada. No se interpreta este resultado como cobertura, cumplimiento ni estabilidad.`,
       pilarCobertura: {
         titulo: '1. Universo no verificable',
         detalle: 'La auditoría requiere participantes con asistencia PFD explícita. Hasta que NODUS entregue ese universo, cualquier porcentaje sería engañoso.',
@@ -252,7 +256,7 @@ export function generarDictamenEjecutivoIA(metricas, filtroSede, filtroEquipo) {
         titulo: '3. Acción requerida para recuperar evidencia',
         pasos: [{
           plazo: 'Inmediato',
-          accion: 'Revisar la última sincronización NODUS y publicar participantes con id, sede, equipo, asistencia PFD y sus cinco FIs.',
+          accion: 'Revisar la última sincronización NODUS y publicar participantes con id, sede, equipo, asistencia PFD y sus 3 Resultados Imposibles de alto estándar.',
           responsable: 'Integración NODUS / Dirección de Operaciones'
         }]
       },
@@ -277,18 +281,18 @@ export function generarDictamenEjecutivoIA(metricas, filtroSede, filtroEquipo) {
     colorBadge = '#f59e0b';
   }
 
-  const resumen = `El Agente Centinela IA ha auditado el universo de ${totalParticipantes} participantes que asistieron a su Primer Fin de Semana (PFD) en ${sedeLabel}${equipoLabel}. Se detecta que ${conCeroFIs} participantes (${tasaSinEntrega}%) no registran ningún Futuro Imposible en la plataforma oficial de NODUS. Esto representa un punto ciego crítico para el acompañamiento y consolidación de metas transformacionales del Ciclo 1.`;
+  const resumen = `El Agente Centinela IA ha auditado el universo de ${totalParticipantes} participantes que asistieron a su Primer Fin de Semana (PFD) en ${sedeLabel}${equipoLabel}. Se detecta que ${conCeroFIs} participantes (${tasaSinEntrega}%) no registran ningún Resultado Imposible en la plataforma oficial de NODUS. El nuevo estándar de Alta Dirección exige declarar exactamente 3 Resultados Imposibles cuantificables y retadores por participante en juego.`;
 
   const pilarCobertura = {
     titulo: '1. Diagnóstico de Cobertura y Rezago de Entrega',
-    detalle: `De ${totalParticipantes} participantes con asistencia confirmada a PFD, únicamente ${metricas.conFIs} participantes han iniciado la carga de sus metas. Existe un rezago sistemático donde los participantes no están accediendo a imo.crearpslglobal.com/futurosimposibles o los coordinadores no están exigiendo el comprobante de carga antes de la siguiente sesión.`,
+    detalle: `De ${totalParticipantes} participantes con asistencia confirmada a PFD, únicamente ${metricas.conFIs} participantes han iniciado la carga de sus 3 Resultados Imposibles. Existe un rezago sistemático donde los participantes no están accediendo a imo.crearpslglobal.com/futurosimposibles o los coordinadores no están exigiendo el comprobante de carga antes de la siguiente sesión.`,
     alerta: `${conCeroFIs} participantes en riesgo inminente de perder foco en sus metas.`
   };
 
   const pilarCuelloBotella = {
     titulo: '2. Cuello de Botella en el Pipeline de Revisión',
-    detalle: `Actualmente se registran ${totalPendientes} FIs en estado "Pendiente" y ${totalDevueltos} en estado "Devuelto". ${totalAprobados} han sido completamente certificados. El tiempo de respuesta de los mentores en las revisiones pendientes es clave para que los participantes ajusten metas devueltas antes del próximo fin de semana.`,
-    alerta: totalPendientes > 15 ? 'Atención: Acumulación de FIs pendientes requiere sesión extraordinaria de revisión de mentores.' : 'Flujo de revisión en rango manejable.'
+    detalle: `Actualmente se registran ${totalPendientes} Resultados Imposibles en estado "Pendiente" y ${totalDevueltos} en estado "Devuelto". ${totalAprobados} han sido completamente certificados bajo el estándar superior de 3 metas.`,
+    alerta: totalPendientes > 15 ? 'Atención: Acumulación de Resultados Imposibles pendientes requiere sesión extraordinaria de revisión de mentores.' : 'Flujo de revisión en rango manejable.'
   };
 
   const pilarPlanAccion = {
@@ -296,26 +300,26 @@ export function generarDictamenEjecutivoIA(metricas, filtroSede, filtroEquipo) {
     pasos: [
       {
         plazo: 'Primeras 24 Horas',
-        accion: 'Disparar recordatorio masivo de alta prioridad vía WhatsApp desde la coordinación de IMO a los participantes con 0 FIs registrados.',
+        accion: 'Disparar recordatorio masivo de alta prioridad vía WhatsApp desde la coordinación de IMO a los participantes con 0 Resultados Imposibles registrados.',
         responsable: 'Coordinadores C1/C2 y Gerentes de Sede'
       },
       {
         plazo: 'Próximas 48 Horas',
-        accion: 'Habilitar "Clínica Virtual de Futuros Imposibles" (sesión de 45 min por Zoom) para redacción y subida en tiempo real de los 5 FIs guiados por mentores.',
+        accion: 'Habilitar "Clínica Virtual de Resultados Imposibles" (sesión de 45 min por Zoom) para redacción y subida en tiempo real de los 3 Resultados Imposibles de estándar superior guiados por mentores.',
         responsable: 'Equipo de Mentores y Facilitadores'
       },
       {
         plazo: 'Fin de Semana',
-        accion: 'Bloque obligatorio de 2 horas para revisión de 100% de FIs pendientes y certificación en plataforma NODUS.',
-        responsable: 'Mentores y Supervisión de Dirección (José Sánchez)'
+        accion: 'Bloque obligatorio de 2 horas para revisión de 100% de Resultados Imposibles pendientes y certificación en plataforma NODUS.',
+        responsable: 'Mentores y Supervisión de Dirección'
       }
     ]
   };
 
   const directivasParaDireccion = [
     `Intervenir de forma prioritaria en los equipos con 0% de entrega reportados en el semáforo inferior.`,
-    `Supervisar que cada coordinador exija la captura de aprobación del FI en NODUS como requisito de habilitación operativa.`,
-    `Monitorear el KPI de FIs devueltos (${totalDevueltos}) para garantizar que los participantes no queden bloqueados sin orientación.`
+    `Supervisar que cada coordinador exija la captura de aprobación de los 3 Resultados Imposibles en NODUS como requisito de habilitación operativa.`,
+    `Monitorear el KPI de Resultados Imposibles devueltos (${totalDevueltos}) para garantizar que los participantes no queden bloqueados sin orientación.`
   ];
 
   return {
@@ -331,7 +335,7 @@ export function generarDictamenEjecutivoIA(metricas, filtroSede, filtroEquipo) {
 }
 
 /**
- * Validador ontológico y de calidad de un Futuro Imposible (FI)
+ * Validador ontológico y de calidad de un Resultado Imposible (RI)
  */
 export function evaluarCalidadOntologicaFI(area, titulo, meta) {
   if (!meta || meta.trim().length === 0) {
@@ -340,7 +344,7 @@ export function evaluarCalidadOntologicaFI(area, titulo, meta) {
       nivel: 'NO_PRESENTADO',
       etiqueta: 'Sin Redactar',
       color: '#94a3b8',
-      observaciones: 'El participante aún no ha registrado esta meta.'
+      observaciones: 'El participante aún no ha registrado este Resultado Imposible.'
     };
   }
 
@@ -359,11 +363,11 @@ export function evaluarCalidadOntologicaFI(area, titulo, meta) {
 
   if (puntaje >= 85) {
     nivel = 'ALTA';
-    etiqueta = 'Meta Extraordinaria (Audaz & SMART)';
+    etiqueta = 'Resultado Extraordinario (Audaz & SMART)';
     color = '#10b981';
   } else if (puntaje < 60) {
     nivel = 'BAJA';
-    etiqueta = 'Requiere Mayor Especificidad';
+    etiqueta = 'Requiere Mayor Especificidad y Cuantificación';
     color = '#ef4444';
   }
 
@@ -378,7 +382,7 @@ export function evaluarCalidadOntologicaFI(area, titulo, meta) {
     observaciones += 'La redacción es demasiado breve; amplíe el contexto y el compromiso personal.';
   }
   if (!observaciones) {
-    observaciones = 'La meta cumple con los estándares de Futuro Imposible: retadora, medible y con marco temporal explícito.';
+    observaciones = 'La meta cumple con los estándares de Resultado Imposible: retadora, medible y con marco temporal explícito.';
   }
 
   return {
@@ -387,5 +391,103 @@ export function evaluarCalidadOntologicaFI(area, titulo, meta) {
     etiqueta,
     color,
     observaciones: observaciones.trim()
+  };
+}
+
+// Alias cultural para mantener compatibilidad total
+export const evaluarCalidadOntologicaRI = evaluarCalidadOntologicaFI;
+
+/**
+ * Motor de Auditoría IA para Participantes "En Juego" (Regla de 3 Resultados Imposibles)
+ * Cruce inmutable con Nodus sin alteración de base de datos
+ */
+export function auditarParticipantesEnJuego3Resultados(participantes = [], evidenciasNodus = {}) {
+  const enJuego = (Array.isArray(participantes) ? participantes : []).filter(p => {
+    if (!p) return false;
+    const asistio = p.asistioPFD === true;
+    const esActivo = p.estadoParticipante === 'ACTIVO' || p.enJuego === true || asistio;
+    const eqNorm = (p.equipo || '').toLowerCase();
+    const noSoporte = !eqNorm.includes('equipo 1000') && !eqNorm.includes('1000');
+    return esActivo && noSoporte;
+  });
+
+  const auditados = enJuego.map(p => {
+    const rawFis = Array.isArray(p.fis) ? p.fis : [];
+    // Estándar de Alto Rendimiento: Exactamente los 3 primeros Resultados Imposibles
+    const activeRIs = rawFis.slice(0, 3).map((ri, idx) => {
+      const evaluacion = evaluarCalidadOntologicaFI(ri.area || `Resultado ${idx + 1}`, ri.titulo, ri.meta);
+      const tieneEvidenciaNodus = Boolean(evidenciasNodus[`${p.id}__${idx}`] || ri.evidenciaUrl || ri.estado === 'aprobado');
+      
+      let estadoAuditado = ri.estado || 'pendiente';
+      if (!ri.meta || !ri.meta.trim()) {
+        estadoAuditado = 'no_presentado';
+      } else if (tieneEvidenciaNodus && evaluacion.puntaje >= 70) {
+        estadoAuditado = 'aprobado';
+      } else if (evaluacion.puntaje < 60) {
+        estadoAuditado = 'devuelto';
+      }
+
+      return {
+        ...ri,
+        index: idx,
+        orden: idx + 1,
+        evaluacion,
+        tieneEvidenciaNodus,
+        estado: estadoAuditado
+      };
+    });
+
+    // Rellenar hasta 3 si faltan declarar
+    while (activeRIs.length < 3) {
+      const idx = activeRIs.length;
+      activeRIs.push({
+        index: idx,
+        orden: idx + 1,
+        area: `Resultado ${idx + 1}`,
+        titulo: '',
+        meta: '',
+        estado: 'no_presentado',
+        evaluacion: evaluarCalidadOntologicaFI('', '', ''),
+        tieneEvidenciaNodus: false
+      });
+    }
+
+    const aprobados3 = activeRIs.filter(r => r.estado === 'aprobado').length;
+    const pendientes3 = activeRIs.filter(r => r.estado === 'pendiente').length;
+    const devueltos3 = activeRIs.filter(r => r.estado === 'devuelto').length;
+    const cargados3 = activeRIs.filter(r => r.estado !== 'no_presentado').length;
+    const cumpleEstandarSuperior = aprobados3 === 3;
+
+    return {
+      ...p,
+      rawFis, // Inmutabilidad histórica total
+      resultadosImposibles: activeRIs,
+      totalResultados3: cargados3,
+      aprobados3,
+      pendientes3,
+      devueltos3,
+      cumpleEstandarSuperior,
+      porcentajeCumplimiento: Math.round((aprobados3 / 3) * 100),
+      dictamenIA: cumpleEstandarSuperior
+        ? 'CERTIFICADO_3_DE_3'
+        : cargados3 === 0
+        ? 'REZAGO_CRITICO_0_DE_3'
+        : 'EN_PROCESO_AUDITORIA'
+    };
+  });
+
+  const totalEnJuego = auditados.length;
+  const certificadosCompletos = auditados.filter(p => p.cumpleEstandarSuperior).length;
+  const sinEntrega = auditados.filter(p => p.totalResultados3 === 0).length;
+  const enProceso = totalEnJuego - certificadosCompletos - sinEntrega;
+  const efectividadGlobal = totalEnJuego > 0 ? Math.round((certificadosCompletos / totalEnJuego) * 100) : 0;
+
+  return {
+    totalEnJuego,
+    certificadosCompletos,
+    sinEntrega,
+    enProceso,
+    efectividadGlobal,
+    participantesAuditados: auditados
   };
 }
