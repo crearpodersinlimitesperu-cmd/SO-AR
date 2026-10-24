@@ -53,6 +53,7 @@ import {
 import EffectiveCommunicationButton from '../components/EffectiveCommunicationButton';
 import { getAllCompanyUsers } from '../services/userService';
 import UserProfileModal from '../components/UserProfileModal';
+import RitualCierreModal from '../components/RitualCierreModal';
 import { getOverdueAssignedTasks, isTaskDoneForUser, getOverdueEscalation } from '../utils/overdueTasks';
 import HorariosEntrenamientoModal from '../components/HorariosEntrenamientoModal';
 import { INITIAL_MANAGERS, normalizeTrainer } from '../data/managersData';
@@ -1243,10 +1244,13 @@ export default function Home() {
     return () => clearInterval(timer);
   }, []);
 
+  const [showRitualCierre, setShowRitualCierre] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const handleLogout = async () => {
+
+  const performLogout = async () => {
     if (isLoggingOut) return;
     setIsLoggingOut(true);
+    setShowRitualCierre(false);
     try {
       await logout();
       navigate('/login');
@@ -1254,6 +1258,10 @@ export default function Home() {
       console.error("Error al cerrar sesión", error);
       setIsLoggingOut(false);
     }
+  };
+
+  const handleLogout = () => {
+    setShowRitualCierre(true);
   };
 
   // Cálculo de tareas del usuario
@@ -3905,6 +3913,14 @@ export default function Home() {
 
       {/* MODAL HORARIOS DE ENTRENAMIENTOS Y CÓDIGO DE VESTIMENTA */}
       <HorariosEntrenamientoModal isOpen={showHorariosModal} onClose={() => setShowHorariosModal(false)} currentUser={currentUser} />
+
+      {/* RITUAL DE CIERRE DE JORNADA — PLAN DE ENFOQUE DEL DÍA SIGUIENTE */}
+      <RitualCierreModal
+        isOpen={showRitualCierre}
+        onClose={() => setShowRitualCierre(false)}
+        onConfirmLogout={performLogout}
+        currentUser={currentUser}
+      />
     </div>
   );
 }

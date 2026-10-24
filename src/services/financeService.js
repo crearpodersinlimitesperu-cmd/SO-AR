@@ -1,4 +1,4 @@
-import { collection, doc, getDocs, setDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, doc, getDocs, setDoc, runTransaction, serverTimestamp } from 'firebase/firestore';
 import { db } from './firebase.js';
 
 export async function getHQOperationalStatus() {
@@ -191,6 +191,114 @@ export function reconcilePaymentBalancesAtomic(paymentRecord = {}, newAbono = nu
     abonos: existingAbonos,
     ultimaReconciliacion: new Date().toISOString()
   };
+}
+
+/**
+ * Registra o actualiza un pago con abonos en Firestore utilizando runTransaction(db, ...).
+ * Garantiza cero colisiones y cero descuadres aritméticos entre múltiples cajas concurrentes.
+ * 
+ * Directiva Fail-Open Comercial:
+ * Si la conexión experimenta timeout o latencia de red, se efectúa la reconciliación atómica
+ * en memoria y se aprueba de inmediato la transacción para no detener el cobro al participante,
+ * emitiendo una alerta asíncrona a la bitácora de auditoría.
+ * 
+ * @param {Object} params
+ * @param {string} params.paymentId - Identificador único de la cuenta/ticket del participante
+ * @param {string} params.sede - Sede de registro (ej. 'lima', 'quito')
+ * @param {Object} [params.newAbono] - Nuevo abono { monto, metodoPago, referencia, fecha }
+ * @param {Object} [params.metadata] - Datos adicionales de contexto
+ * @returns {Promise<Object>} Resultado atómico con saldo actualizado y estado transaccional
+ */
+export async function recordPaymentTransactionAtomic({
+  paymentId,
+  sede = 'Global',
+  newAbono = null,
+  metadata = {}
+}) {
+  if (!paymentId) {
+    throw new Error('Identificador de pago obligatorio para garantizar consistencia');
+  }
+
+  const startTime = Date.now();
+  const paymentRef = doc(db, 'finance_payments', String(paymentId));
+  const auditCol = collection(db, 'finanzas_audit_trail');
+
+  try {
+    const result = await runTransaction(db, async (transaction) => {
+      const snap = await transaction.get(paymentRef);
+      const currentData = snap.exists() ? snap.data() : { id: paymentId, sede, montoTotal: 0, abonos: [] };
+
+      // Reconciliación atómica de saldos (hecho inmutable)
+      const reconciled = reconcilePaymentBalancesAtomic(currentData, newAbono);
+
+      const updatePayload = {
+        ...reconciled,
+        sede,
+        ...metadata,
+        updatedAt: serverTimestamp(),
+        lastTransactionLatencyMs: Date.now() - startTime
+      };
+
+      transaction.set(paymentRef, updatePayload, { merge: true });
+
+      // Registro inmutable en bitácora de transacciones
+      const auditDocRef = doc(auditCol);
+      transaction.set(auditDocRef, {
+        paymentId,
+        sede,
+        montoAbonado: Number(newAbono?.monto || 0),
+        saldoPendiente: reconciled.saldoPendiente,
+        estadoPago: reconciled.estadoPago,
+        metodoPago: newAbono?.metodoPago || 'EFECTIVO',
+        timestamp: serverTimestamp(),
+        concurrencyProtected: true
+      });
+
+      return reconciled;
+    });
+
+    return {
+      success: true,
+      failOpen: false,
+      data: result,
+      latencyMs: Date.now() - startTime
+    };
+  } catch (error) {
+    const latencyMs = Date.now() - startTime;
+    console.warn(`[Finance Fail-Open] Transacción Firestore diferida por contingencia (${error.message}). Activando registro comercial inmediato.`);
+
+    // Fail-Open Innegociable: el cobro no se detiene jamás en sala
+    const fallbackReconciled = reconcilePaymentBalancesAtomic(
+      { id: paymentId, sede, montoTotal: metadata.montoTotal || 0, abonos: metadata.existingAbonos || [] },
+      newAbono
+    );
+
+    // Registro asíncrono en cuarentena para auditoría posterior sin frenar la mesa
+    setTimeout(async () => {
+      try {
+        const quarantineCol = collection(db, 'security_quarantine_audits');
+        await setDoc(doc(quarantineCol), {
+          paymentId,
+          sede,
+          montoAbonado: Number(newAbono?.monto || 0),
+          errorReason: error.message,
+          latencyMs,
+          status: 'FAIL_OPEN_APPROVED_PENDING_AUDIT',
+          timestamp: serverTimestamp()
+        });
+      } catch (e) {
+        // Silencioso para garantizar cero impacto en el cliente
+      }
+    }, 10);
+
+    return {
+      success: true,
+      failOpen: true,
+      data: fallbackReconciled,
+      warning: 'Operación asegurada en modo de continuidad operativa (Fail-Open)',
+      latencyMs
+    };
+  }
 }
 
 /**

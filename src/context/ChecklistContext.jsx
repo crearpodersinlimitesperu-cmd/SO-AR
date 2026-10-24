@@ -1629,9 +1629,50 @@ export function ChecklistProvider({ children }) {
   const hasCurrentTaskSnapshot = loadedTaskIdentity === taskReadIdentity;
   const visibleTasks = hasCurrentTaskSnapshot ? filterTasksForUser(tasks, currentUser) : [];
 
+  const [showAllHistoricalTasks, setShowAllHistoricalTasks] = useState(false);
+
+  // Filtro visual de Fase Activa (Cero eliminación en base de datos; preservación histórica absoluta)
+  const isTaskInActiveWindow = (task) => {
+    if (!task.isClosed && !task.completed) return true;
+    if (task.deadline) {
+      const deadlineDate = new Date(task.deadline);
+      const diffDays = (Date.now() - deadlineDate.getTime()) / (1000 * 60 * 60 * 24);
+      if (diffDays > 7 && (task.isClosed || task.completed)) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  const activePhaseTasks = visibleTasks.filter(isTaskInActiveWindow);
+  const displayedTasks = showAllHistoricalTasks ? visibleTasks : activePhaseTasks;
+
+  // Selección de las 2 prioridades clave para el bloque de tiempo protegido del día
+  const priorityFocusTasks = useMemo(() => {
+    const sorted = [...activePhaseTasks].sort((a, b) => {
+      const isComercialA = /(asistencia|confirmar|abono|pago|check-in|caja|llamada)/i.test(a.taskTitle || a.title || '');
+      const isComercialB = /(asistencia|confirmar|abono|pago|check-in|caja|llamada)/i.test(b.taskTitle || b.title || '');
+      if (isComercialA && !isComercialB) return -1;
+      if (!isComercialA && isComercialB) return 1;
+      if (a.priority === 'high' && b.priority !== 'high') return -1;
+      if (a.priority !== 'high' && b.priority === 'high') return 1;
+      return 0;
+    });
+
+    return {
+      highImpactTasks: sorted.slice(0, 2),
+      secondaryTasks: sorted.slice(2)
+    };
+  }, [activePhaseTasks]);
+
   return (
     <ChecklistContext.Provider value={{ 
-      tasks: visibleTasks,
+      tasks: displayedTasks,
+      allHistoricalTasks: visibleTasks,
+      showAllHistoricalTasks,
+      setShowAllHistoricalTasks,
+      highImpactTasks: priorityFocusTasks.highImpactTasks,
+      secondaryTasks: priorityFocusTasks.secondaryTasks,
       toggleTask, 
       updateTaskDetails,
       sendTaskMessage,

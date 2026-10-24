@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
+import { useChecklist } from '../context/ChecklistContext';
 import { collection, addDoc, serverTimestamp, getDocs, doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { 
@@ -70,6 +71,12 @@ export default function MisKPIs() {
   const [selectedPerson, setSelectedPerson] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [historyFilter, setHistoryFilter] = useState('person'); // 'person' | 'my' | 'all'
+
+  // Bloque protegido y prioridades del día (Cero jerga técnica; Cero pérdida de registros)
+  const checklistCtx = useChecklist();
+  const highImpactTasks = checklistCtx?.highImpactTasks || [];
+  const secondaryTasks = checklistCtx?.secondaryTasks || [];
+  const [showSecondaryList, setShowSecondaryList] = useState(false);
   
   // Metas personalizadas de la persona seleccionada
   const [customMetas, setCustomMetas] = useState(null);
@@ -825,6 +832,151 @@ export default function MisKPIs() {
           ) : (
             <div style={{ padding: '0.75rem 1rem', borderRadius: '8px', background: 'rgba(0,0,0,0.2)', borderLeft: '4px solid #3b82f6', fontSize: '0.8rem', color: '#cbd5e1' }}>
               ℹ️ Mostrando perfil operativo para <strong>{personName}</strong> ({selectedPerson?.roleName || selectedPerson?.role}). Los reportes se evaluarán contra sus metas personalizadas.
+            </div>
+          )}
+        </div>
+
+        {/* ENFOQUE OPERATIVO DEL DÍA — BLOQUE PROTEGIDO */}
+        <div style={{
+          marginBottom: '1.5rem',
+          padding: '1.25rem',
+          borderRadius: '12px',
+          background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(15, 23, 42, 0.6) 100%)',
+          border: '1px solid rgba(212, 175, 55, 0.25)',
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.9rem', flexWrap: 'wrap', gap: '0.6rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <div style={{ background: 'rgba(212, 175, 55, 0.15)', padding: '0.45rem', borderRadius: '8px', color: '#d4af37' }}>
+                <Target size={18} />
+              </div>
+              <div>
+                <h4 style={{ margin: 0, fontSize: '0.98rem', fontWeight: 700, color: '#f8fafc' }}>
+                  Enfoque Operativo del Día — Bloque Protegido
+                </h4>
+                <p style={{ margin: '0.15rem 0 0', fontSize: '0.78rem', color: '#94a3b8' }}>
+                  Tus 2 compromisos prioritarios para la jornada actual (Horario sugerido: 09:00 am - 11:00 am).
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setShowSecondaryList(!showSecondaryList)}
+              style={{
+                background: 'rgba(255,255,255,0.06)',
+                border: '1px solid rgba(255,255,255,0.15)',
+                color: '#cbd5e1',
+                padding: '0.4rem 0.8rem',
+                borderRadius: '6px',
+                fontSize: '0.78rem',
+                cursor: 'pointer',
+                fontWeight: 600
+              }}
+            >
+              {showSecondaryList ? 'Ocultar Actividades Complementarias' : `Ver Actividades Complementarias (${secondaryTasks.length})`}
+            </button>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '0.85rem' }}>
+            {highImpactTasks.length > 0 ? (
+              highImpactTasks.map((task, idx) => (
+                <div key={task.id || idx} style={{
+                  background: '#0b1120',
+                  border: idx === 0 ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid rgba(59, 130, 246, 0.4)',
+                  borderRadius: '10px',
+                  padding: '0.9rem 1rem',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '0.75rem'
+                }}>
+                  <div style={{
+                    background: idx === 0 ? 'rgba(16, 185, 129, 0.15)' : 'rgba(59, 130, 246, 0.15)',
+                    color: idx === 0 ? '#10b981' : '#3b82f6',
+                    padding: '0.4rem',
+                    borderRadius: '8px',
+                    fontWeight: 700,
+                    fontSize: '0.85rem'
+                  }}>
+                    #{idx + 1}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: '0.86rem', fontWeight: 600, color: '#f8fafc', marginBottom: '0.25rem' }}>
+                      {task.taskTitle || task.title || (idx === 0 ? 'Llamadas de confirmación y asistencia' : 'Revisión y reconciliación de abonos')}
+                    </div>
+                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', fontSize: '0.74rem', color: '#94a3b8' }}>
+                      <span style={{ 
+                        padding: '0.1rem 0.4rem', 
+                        borderRadius: '4px', 
+                        background: idx === 0 ? 'rgba(16, 185, 129, 0.12)' : 'rgba(59, 130, 246, 0.12)',
+                        color: idx === 0 ? '#10b981' : '#60a5fa',
+                        fontWeight: 600
+                      }}>
+                        {idx === 0 ? 'Impacto en Sala' : 'Gestión de Registro'}
+                      </span>
+                      <span>{task.deadline ? `Límite: ${task.deadline.slice(0, 10)}` : 'Hoy'}</span>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <>
+                <div style={{
+                  background: '#0b1120',
+                  border: '1px solid rgba(16, 185, 129, 0.4)',
+                  borderRadius: '10px',
+                  padding: '0.9rem 1rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem'
+                }}>
+                  <div style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', padding: '0.4rem', borderRadius: '8px', fontWeight: 700, fontSize: '0.85rem' }}>#1</div>
+                  <div>
+                    <div style={{ fontSize: '0.86rem', fontWeight: 600, color: '#f8fafc' }}>Confirmación de Asistentes en Sala</div>
+                    <div style={{ fontSize: '0.74rem', color: '#94a3b8' }}>Prioridad crítica para asegurar sentados de la fase activa</div>
+                  </div>
+                </div>
+                <div style={{
+                  background: '#0b1120',
+                  border: '1px solid rgba(59, 130, 246, 0.4)',
+                  borderRadius: '10px',
+                  padding: '0.9rem 1rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem'
+                }}>
+                  <div style={{ background: 'rgba(59, 130, 246, 0.15)', color: '#3b82f6', padding: '0.4rem', borderRadius: '8px', fontWeight: 700, fontSize: '0.85rem' }}>#2</div>
+                  <div>
+                    <div style={{ fontSize: '0.86rem', fontWeight: 600, color: '#f8fafc' }}>Reconciliación y Cobro de Abonos</div>
+                    <div style={{ fontSize: '0.74rem', color: '#94a3b8' }}>Seguimiento y registro de abonos sin descuadres de caja</div>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* LISTA COMPLEMENTARIA (PRESERVACIÓN HISTÓRICA TOTAL) */}
+          {showSecondaryList && (
+            <div style={{ marginTop: '1rem', paddingTop: '0.85rem', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+              <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#94a3b8', marginBottom: '0.6rem' }}>
+                Actividades Complementarias en Base ({secondaryTasks.length} registradas)
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', maxHeight: '180px', overflowY: 'auto' }}>
+                {secondaryTasks.map((t, i) => (
+                  <div key={t.id || i} style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '0.45rem 0.75rem',
+                    borderRadius: '6px',
+                    background: 'rgba(255,255,255,0.03)',
+                    fontSize: '0.78rem',
+                    color: '#cbd5e1'
+                  }}>
+                    <span>{t.taskTitle || t.title}</span>
+                    <span style={{ fontSize: '0.7rem', color: '#64748b' }}>{t.deadline ? t.deadline.slice(0, 10) : 'Registrada'}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>
