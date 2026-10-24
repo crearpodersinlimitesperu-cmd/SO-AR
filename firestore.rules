@@ -1369,5 +1369,31 @@ service cloud.firestore {
         && request.resource.data.telefonoContacto is string && request.resource.data.telefonoContacto.size() <= 500;
       allow delete: if isSuperAdmin();
     }
+
+    // ============================================================================
+    // GOBERNANZA Y SUPERVISIÓN: Omni-Auditor y Super-Agente Orquestador
+    // ============================================================================
+    match /sentinel_agent_heartbeats/{agentId} {
+      allow read: if isAuthenticated();
+      allow write: if isSuperAdmin() || isGerenteODireccion();
+    }
+
+    match /agent_deterministic_ledger/{actionHash} {
+      allow read: if isAuthenticated();
+      allow write: if isSuperAdmin() || isGerenteODireccion();
+    }
+
+    match /alerts_red_sentinel/{alertId} {
+      allow read: if isSuperAdmin() || isGerenteODireccion();
+      allow create: if isAuthenticated() && request.resource.data.keys().hasAll(['alertId', 'tipo', 'nivel', 'timestamp', 'destinatarios']);
+      allow update, delete: if isSuperAdmin();
+    }
+
+    match /ai_pending_approvals/{approvalId} {
+      allow read: if isSuperAdmin() || isGerenteODireccion();
+      allow create: if isAuthenticated();
+      allow update, delete: if isSuperAdmin() || isGerenteODireccion();
+    }
   }
 }
+

@@ -17,8 +17,9 @@
  * 4. Trazabilidad por sede estricta (Linid gobierna Lima, Alonso México, etc.).
  */
 
-import { db } from './firebase';
-import { collection, query, where, getDocs, doc, setDoc, updateDoc, getDoc } from 'firebase/firestore';
+import { db } from './firebase.js';
+import { collection, query, where, getDocs, doc, setDoc, updateDoc, getDoc, serverTimestamp } from 'firebase/firestore';
+import { omniAuditor } from './omniAuditorOrquestador.js';
 
 export const CMJ_DIRECTORY = [
   {
@@ -140,6 +141,52 @@ export class CMJSentinelAgent {
       console.warn(`[CMJ Sentinel] Error al auditar perfil CMJ:`, err);
       return { status: 'ERROR', error: err.message };
     }
+  }
+
+  /**
+   * Emite un latido (heartbeat) de salud operativo para supervisión del OmniAuditor
+   */
+  async recordHeartbeat(status = 'HEALTHY', details = {}) {
+    const timestamp = new Date().toISOString();
+    const heartbeatPayload = {
+      agentId: 'cmjSentinelAgent',
+      agentName: this.name,
+      status,
+      lastHeartbeat: timestamp,
+      details,
+      consecutiveErrors: status === 'HEALTHY' ? 0 : 1
+    };
+
+    if (db) {
+      try {
+        const hbRef = doc(db, 'sentinel_agent_heartbeats', 'cmjSentinelAgent');
+        await setDoc(hbRef, {
+          ...heartbeatPayload,
+          updatedAt: serverTimestamp()
+        }, { merge: true });
+      } catch (err) {
+        console.warn('[CMJ Sentinel] Error guardando heartbeat en Firestore:', err.message);
+      }
+    }
+
+    return heartbeatPayload;
+  }
+
+  /**
+   * Auditoría de llamadas reales de Maestría del Juego gobernada por el OmniAuditor
+   * - Cero alucinación: si no está en Nodus, se catalogará como [DATO NO REGISTRADO EN NODUS]
+   * - Trazabilidad determinista SHA-256 para evitar duplicación de llamadas
+   * - Conteo estricto de Personas Únicas (PX) vs Gestiones Totales
+   */
+  async auditMaestriaCalls(callsData = [], nodusMaestriaData = {}, phaseConfig = {}) {
+    const auditResult = await omniAuditor.auditCmjMaestriaCalls(callsData, nodusMaestriaData, phaseConfig);
+    await this.recordHeartbeat('HEALTHY', {
+      pxUnicos: auditResult.metricasRealesNodus.pxUnicosConfirmados,
+      gestionesTotales: auditResult.metricasRealesNodus.gestionesLlamadasTotales,
+      descartadasPorInflacion: auditResult.anomaliasInflacionDescartadas.length,
+      noEnNodus: auditResult.datosNoRegistradosEnNodus.length
+    });
+    return auditResult;
   }
 
   /**
