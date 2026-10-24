@@ -920,34 +920,88 @@ export default function Home() {
   // URL de bandera real vía flagcdn.com (no emojis)
   const flagUrl = (countryCode) =>
     `https://flagcdn.com/w40/${countryCode.toLowerCase()}.png`;
-  // Mapeo IANA timezone → código de país (2 letras ISO)
+
+  // Mapeo exhaustivo IANA timezone → código de país (2 letras ISO)
   const TZ_TO_COUNTRY = {
+    // América Latina y Caribe
     'America/Lima': 'pe', 'America/Guayaquil': 'ec', 'America/Bogota': 'co',
     'America/Mexico_City': 'mx', 'America/Monterrey': 'mx', 'America/Mazatlan': 'mx',
-    'America/Cancun': 'mx', 'America/Merida': 'mx', 'America/Chihuahua': 'mx',
-    'America/New_York': 'us', 'America/Chicago': 'us', 'America/Los_Angeles': 'us',
-    'America/Denver': 'us', 'America/Phoenix': 'us', 'America/Anchorage': 'us',
-    'America/Buenos_Aires': 'ar', 'America/Argentina/Buenos_Aires': 'ar',
+    'America/Cancun': 'mx', 'America/Merida': 'mx', 'America/Chihuahua': 'mx', 'America/Hermosillo': 'mx',
+    'America/Buenos_Aires': 'ar', 'America/Argentina/Buenos_Aires': 'ar', 'America/Argentina/Cordoba': 'ar',
     'America/Santiago': 'cl', 'America/Caracas': 've', 'America/La_Paz': 'bo',
     'America/Asuncion': 'py', 'America/Montevideo': 'uy',
     'America/Sao_Paulo': 'br', 'America/Manaus': 'br', 'America/Belem': 'br',
-    'America/Toronto': 'ca', 'America/Vancouver': 'ca',
-    'Europe/Madrid': 'es', 'Europe/London': 'gb', 'Europe/Paris': 'fr',
-    'Europe/Berlin': 'de', 'Europe/Rome': 'it', 'Europe/Amsterdam': 'nl',
-    'Europe/Lisbon': 'pt', 'Europe/Moscow': 'ru', 'Europe/Warsaw': 'pl',
-    'Europe/Bucharest': 'ro', 'Europe/Athens': 'gr', 'Europe/Istanbul': 'tr',
+    'America/Panama': 'pa', 'America/Costa_Rica': 'cr', 'America/Guatemala': 'gt',
+    'America/El_Salvador': 'sv', 'America/Tegucigalpa': 'hn', 'America/Managua': 'ni',
+    'America/Santo_Domingo': 'do', 'America/Puerto_Rico': 'pr', 'America/Havana': 'cu',
+
+    // Norteamérica
+    'America/New_York': 'us', 'America/Chicago': 'us', 'America/Los_Angeles': 'us',
+    'America/Denver': 'us', 'America/Phoenix': 'us', 'America/Anchorage': 'us', 'America/Detroit': 'us',
+    'America/Toronto': 'ca', 'America/Vancouver': 'ca', 'America/Montreal': 'ca',
+
+    // Europa
+    'Europe/Madrid': 'es', 'Atlantic/Canary': 'es', 'Europe/Ceuta': 'es',
+    'Europe/Lisbon': 'pt', 'Atlantic/Madeira': 'pt', 'Atlantic/Azores': 'pt',
+    'Europe/London': 'gb', 'Europe/Paris': 'fr', 'Europe/Berlin': 'de',
+    'Europe/Rome': 'it', 'Europe/Amsterdam': 'nl', 'Europe/Brussels': 'be',
+    'Europe/Vienna': 'at', 'Europe/Zurich': 'ch', 'Europe/Prague': 'es',
+    'Europe/Bratislava': 'sk', 'Europe/Warsaw': 'pl', 'Europe/Budapest': 'hu',
+    'Europe/Bucharest': 'ro', 'Europe/Athens': 'gr', 'Europe/Dublin': 'ie',
+    'Europe/Stockholm': 'se', 'Europe/Oslo': 'no', 'Europe/Copenhagen': 'dk',
+    'Europe/Helsinki': 'fi', 'Europe/Moscow': 'ru', 'Europe/Istanbul': 'tr',
+    'Europe/Andorra': 'ad', 'Europe/Gibraltar': 'gi',
+
+    // Asia & Oceanía
     'Asia/Tokyo': 'jp', 'Asia/Shanghai': 'cn', 'Asia/Seoul': 'kr',
     'Asia/Kolkata': 'in', 'Asia/Dubai': 'ae', 'Asia/Singapore': 'sg',
-    'Australia/Sydney': 'au', 'Pacific/Auckland': 'nz',
+    'Asia/Bangkok': 'th', 'Asia/Hong_Kong': 'hk',
+    'Australia/Sydney': 'au', 'Australia/Melbourne': 'au', 'Pacific/Auckland': 'nz',
   };
-  // Detecta si el usuario está en una zona diferente a Lima/CDMX
-  const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+  // Detecta la zona horaria del usuario y resuelve el país de la bandera de forma resiliente
+  const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Europe/Madrid';
   const LATAM_CORE_TZ = [
     'America/Lima', 'America/Guayaquil', 'America/Bogota',
     'America/Mexico_City', 'America/Monterrey', 'America/Mazatlan',
   ];
   const isOutsideLatam = !LATAM_CORE_TZ.includes(userTz);
-  const localCountryCode = TZ_TO_COUNTRY[userTz] || null;
+
+  const localCountryCode = (() => {
+    // 1. Mapeo directo por zona horaria IANA
+    if (TZ_TO_COUNTRY[userTz]) {
+      if (userTz === 'Europe/Prague' && typeof navigator !== 'undefined' && navigator.language?.toLowerCase().startsWith('cs')) {
+        return 'cz';
+      }
+      return TZ_TO_COUNTRY[userTz];
+    }
+
+    // 2. Si la zona horaria pertenece a Europa
+    if (userTz.startsWith('Europe/') || userTz.startsWith('Atlantic/')) {
+      return 'es'; // España como sede canónica europea
+    }
+
+    // 3. Fallback inteligente por sede asignada del usuario
+    const sede = (currentUser?.sede || '').toLowerCase();
+    if (sede.includes('lima') || sede.includes('peru') || sede.includes('perú')) return 'pe';
+    if (sede.includes('quito') || sede.includes('guayaquil') || sede.includes('cuenca') || sede.includes('ecuador')) return 'ec';
+    if (sede.includes('medellin') || sede.includes('colombia')) return 'co';
+    if (sede.includes('mexico') || sede.includes('cdmx')) return 'mx';
+    if (sede.includes('madrid') || sede.includes('españa')) return 'es';
+
+    // 4. Fallback por idioma del navegador
+    if (typeof navigator !== 'undefined') {
+      const lang = (navigator.language || '').toLowerCase();
+      if (lang.includes('es-es')) return 'es';
+      if (lang.includes('es-pe')) return 'pe';
+      if (lang.includes('es-ec')) return 'ec';
+      if (lang.includes('es-co')) return 'co';
+      if (lang.includes('es-mx')) return 'mx';
+      if (lang.startsWith('es')) return 'es';
+    }
+
+    return 'es';
+  })();
   // Label UTC offset para zonas no mapeadas
   const localZoneLabel = (() => {
     const offset = -new Date().getTimezoneOffset() / 60;
@@ -1688,11 +1742,15 @@ export default function Home() {
               background: activeTheme === 'light' ? '#f8fafc' : 'rgba(255,255,255,0.05)', borderRadius: '8px',
               padding: '3px 8px', border: activeTheme === 'light' ? '1px solid #cbd5e1' : '1px solid rgba(255,255,255,0.1)'
             }}>
-              {localCountryCode ? (
-                <img src={flagUrl(localCountryCode)} alt="Tu Ubicación" style={{ width: '20px', height: '14px', objectFit: 'cover', borderRadius: '2px', flexShrink: 0 }} />
-              ) : (
-                <span style={{ fontSize: '14px' }}>📍</span>
-              )}
+              <img 
+                src={flagUrl(localCountryCode || 'es')} 
+                alt="Tu Ubicación" 
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = 'https://flagcdn.com/w40/es.png';
+                }}
+                style={{ width: '20px', height: '14px', objectFit: 'cover', borderRadius: '2px', flexShrink: 0 }} 
+              />
               <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
                 <span style={{ fontWeight: 'bold', fontSize: '0.92rem', color: activeTheme === 'light' ? '#0f172a' : '#e2e8f0', letterSpacing: '0.5px' }}>
                   <LiveClock />
