@@ -42,17 +42,19 @@ export function ejecutarDiagnosticoFIs(
   filtroSede = 'GLOBAL',
   filtroEquipo = 'Todos',
   filtroEstado = 'TODOS',
-  queryBusqueda = ''
+  queryBusqueda = '',
+  filtroRol = 'TODOS'
 ) {
   // 0. El universo de una auditoría FI nunca es "todos los registros": solo
-  // personas con asistencia PFD explícitamente confirmada. Si la fuente no
-  // entrega esa señal, no se inventa una conclusión con datos ambiguos.
+  // personas con asistencia PFD explícitamente confirmada y en estado activo.
   const universoPfd = (Array.isArray(todosParticipantes) ? todosParticipantes : [])
     .filter((participante) => {
       if (participante?.asistioPFD !== true) return false;
       // Directiva de Gobernanza: Segregar y aislar equipos de soporte/aliados (ej. Equipo 1000)
       const eqNorm = (participante.equipo || '').toLowerCase();
       if (eqNorm.includes('equipo 1000') || eqNorm.includes('1000')) return false;
+      // Excluir desertores e inactivos (solo participantes y managers en juego activos)
+      if (participante?.isDesertor === true || participante?.isActivo === false || participante?.estado === 'DESERTOR') return false;
       return true;
     });
 
@@ -161,14 +163,21 @@ export function ejecutarDiagnosticoFIs(
     }
   }
 
-  // 5. Filtrado por búsqueda en tiempo real
+  // 5. Filtrado por Rol institucional (PX vs MANAGER)
+  if (filtroRol && filtroRol !== 'TODOS') {
+    const rolTarget = String(filtroRol).toUpperCase();
+    filtrados = filtrados.filter(p => (p.rol || 'PX').toUpperCase() === rolTarget);
+  }
+
+  // 6. Filtrado por búsqueda en tiempo real
   if (queryBusqueda && queryBusqueda.trim() !== '') {
     const qNorm = normalizarTexto(queryBusqueda);
     filtrados = filtrados.filter(p => {
       const nombreNorm = normalizarTexto(p.nombre || '');
       const dniNorm = normalizarTexto(p.dni || '');
       const equipoNorm = normalizarTexto(p.equipo || '');
-      return nombreNorm.includes(qNorm) || dniNorm.includes(qNorm) || equipoNorm.includes(qNorm);
+      const rolNorm = normalizarTexto(p.rol || 'PX');
+      return nombreNorm.includes(qNorm) || dniNorm.includes(qNorm) || equipoNorm.includes(qNorm) || rolNorm.includes(qNorm);
     });
   }
 

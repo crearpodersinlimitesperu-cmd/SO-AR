@@ -122,3 +122,24 @@ test('4. Multi-Sede Operativo y Resolución Canónica de Equipos y Sedes (Quito,
   const diagMedellinTilde = ejecutarDiagnosticoFIs(NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES, 'Medellín');
   assert.equal(diagMedellin.metricas.totalParticipantes, diagMedellinTilde.metricas.totalParticipantes);
 });
+
+test('5. Cohorte Activa: Cobertura de PX y Managers en Nodus, Exclusión de Desertores y Filtrado por Rol', () => {
+  // 1. Verificar que el dataset contenga tanto PX como Managers
+  const tienePX = NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES.some(p => p.rol === 'PX');
+  const tieneManagers = NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES.some(p => p.rol === 'MANAGER');
+  assert.ok(tienePX, 'El dataset debe contener participantes activos (PX)');
+  assert.ok(tieneManagers, 'El dataset debe contener managers activos');
+
+  // 2. Verificar que 100% de la cohorte esté activa y con 0 desertores
+  const hayDesertores = NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES.some(p => p.isDesertor === true || p.estado === 'DESERTOR' || p.isActivo === false);
+  assert.equal(hayDesertores, false, 'La cohorte activa de auditoría no debe contener desertores ni inactivos');
+
+  // 3. Probar el filtro por Rol en el motor de diagnóstico
+  const diagPX = ejecutarDiagnosticoFIs(NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES, 'GLOBAL', 'Todos', 'TODOS', '', 'PX');
+  const diagManagers = ejecutarDiagnosticoFIs(NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES, 'GLOBAL', 'Todos', 'TODOS', '', 'MANAGER');
+  const diagTodos = ejecutarDiagnosticoFIs(NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES, 'GLOBAL', 'Todos', 'TODOS', '', 'TODOS');
+
+  assert.ok(diagPX.metricas.totalParticipantes > 0, 'Debe haber participantes PX diagnosticados');
+  assert.ok(diagManagers.metricas.totalParticipantes > 0, 'Debe haber managers diagnosticados');
+  assert.equal(diagPX.metricas.totalParticipantes + diagManagers.metricas.totalParticipantes, diagTodos.metricas.totalParticipantes, 'La suma de PX y Managers debe coincidir exactamente con el total global de activos');
+});

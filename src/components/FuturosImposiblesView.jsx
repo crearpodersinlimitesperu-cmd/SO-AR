@@ -10,7 +10,7 @@ import { db } from '../services/firebase';
 import { useAuth } from '../context/AuthContext';
 import { opcionesEquipo, resolveFISource } from '../services/nodusFISnapshot';
 import { canonicalSede } from '../utils/sede.js';
-import { NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES } from '../data/nodusFuturosImposiblesData.js';
+import { NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES, ROLES_FI } from '../data/nodusFuturosImposiblesData.js';
 import nodusEnroladosFallback from '../data/nodusEnroladosRecords.json';
 
 const normSearch = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '');
@@ -96,6 +96,7 @@ export default function FuturosImposiblesView({
   // Estados de filtrado y búsqueda
   const [equipoFilter, setEquipoFilter] = useState('Todos');
   const [estadoFilter, setEstadoFilter] = useState('TODOS');
+  const [rolFilter, setRolFilter] = useState('TODOS');
   const [searchQuery, setSearchQuery] = useState('');
   
   // Datos de NODUS: un payload vacío no puede sustituir el último universo
@@ -206,6 +207,7 @@ export default function FuturosImposiblesView({
 
     return {
       ...participant,
+      rol: participant.rol || 'PX',
       equipo: resolvedEquipo,
       rawFis, // Histórico completo preservado sin alteración de DB
       fis,
@@ -261,9 +263,10 @@ export default function FuturosImposiblesView({
       selectedSede,
       equipoFilter,
       estadoFilter,
-      searchQuery
+      searchQuery,
+      rolFilter
     );
-  }, [participantesConRevision, selectedSede, equipoFilter, estadoFilter, searchQuery]);
+  }, [participantesConRevision, selectedSede, equipoFilter, estadoFilter, searchQuery, rolFilter]);
 
   const handleReevaluate = async () => {
     setIsEvaluating(true);
@@ -848,6 +851,32 @@ export default function FuturosImposiblesView({
             </select>
           </div>
 
+          {/* Selector de Rol Institucional (PX / MANAGER) */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <span style={{ fontSize: '0.78rem', color: textMuted }}>Rol:</span>
+            <select
+              value={rolFilter}
+              onChange={(e) => setRolFilter(e.target.value)}
+              style={{
+                padding: '0.55rem 0.85rem',
+                borderRadius: '8px',
+                border: `1px solid ${borderLight}`,
+                background: 'rgba(0, 0, 0, 0.25)',
+                color: textDark,
+                fontSize: '0.82rem',
+                fontWeight: 600,
+                outline: 'none',
+                cursor: 'pointer'
+              }}
+            >
+              {ROLES_FI.map(r => (
+                <option key={r.id} value={r.id} style={{ background: '#0f172a', color: '#f8fafc' }}>
+                  {r.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <div style={{ fontSize: '0.8rem', color: textMuted, marginLeft: '0.5rem' }}>
             Mostrando <strong>{participantes.length}</strong> de {totalPfdEnSede} asistentes PFD verificables {esGlobalSede ? '(Global)' : `en ${selectedSede}`}
           </div>
@@ -868,7 +897,7 @@ export default function FuturosImposiblesView({
             <thead>
               <tr style={{ background: 'rgba(0, 0, 0, 0.3)', borderBottom: `1px solid ${borderLight}` }}>
                 <th style={{ padding: '0.85rem 1rem', fontWeight: 700, color: textMuted, textTransform: 'uppercase', fontSize: '0.72rem' }}>
-                  Participante
+                  Participante / Rol
                 </th>
                 <th style={{ padding: '0.85rem 1rem', fontWeight: 700, color: textMuted, textTransform: 'uppercase', fontSize: '0.72rem' }}>
                   Identificación
@@ -925,7 +954,7 @@ export default function FuturosImposiblesView({
                       onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(56, 189, 248, 0.04)'}
                       onMouseLeave={(e) => e.currentTarget.style.background = idx % 2 === 0 ? 'transparent' : 'rgba(255, 255, 255, 0.01)'}
                     >
-                      {/* Participante */}
+                      {/* Participante y Rol */}
                       <td style={{ padding: '0.85rem 1rem' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                           <span style={{ 
@@ -937,8 +966,33 @@ export default function FuturosImposiblesView({
                             flexShrink: 0
                           }} />
                           <div>
-                            <div style={{ fontWeight: 700, color: textDark }}>{p.nombre}</div>
-                            <div style={{ fontSize: '0.72rem', color: textMuted }}>PFD: {p.fechaPFD || '16/08/2026'} ({p.diasDesdePFD || 27}d)</div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
+                              <span style={{ fontWeight: 700, color: textDark }}>{p.nombre}</span>
+                              <span style={{ 
+                                padding: '0.1rem 0.45rem', 
+                                borderRadius: '4px', 
+                                fontSize: '0.64rem', 
+                                fontWeight: 800, 
+                                letterSpacing: '0.04em',
+                                background: p.rol === 'MANAGER' ? 'rgba(245, 158, 11, 0.18)' : 'rgba(56, 189, 248, 0.18)', 
+                                color: p.rol === 'MANAGER' ? '#f59e0b' : '#38bdf8',
+                                border: p.rol === 'MANAGER' ? '1px solid rgba(245, 158, 11, 0.35)' : '1px solid rgba(56, 189, 248, 0.35)'
+                              }}>
+                                {p.rol === 'MANAGER' ? 'MANAGER' : 'PX'}
+                              </span>
+                              <span style={{
+                                padding: '0.1rem 0.35rem',
+                                borderRadius: '4px',
+                                fontSize: '0.6rem',
+                                fontWeight: 700,
+                                background: 'rgba(16, 185, 129, 0.15)',
+                                color: '#10b981',
+                                border: '1px solid rgba(16, 185, 129, 0.3)'
+                              }}>
+                                ACTIVO
+                              </span>
+                            </div>
+                            <div style={{ fontSize: '0.72rem', color: textMuted }}>PFD: {p.fechaPFD || '16/08/2026'} ({p.diasDesdePFD || 27}d) &bull; {p.rol === 'MANAGER' ? 'Mesa / Liderazgo' : 'Participante en Juego'}</div>
                           </div>
                         </div>
                       </td>

@@ -1,7 +1,8 @@
-﻿/**
- * DATASET CONSOLIDADO DE PARTICIPANTES Y SEGUIMIENTO DE FUTUROS IMPOSIBLES (FIs)
- * Extraído y sincronizado con NODUS CREAR v1.0.0 (https://imo.crearpslglobal.com/futurosimposibles)
- * Universo: Cohorte de 440 participantes que asistieron al Primer Fin de Semana (PFD).
+/**
+ * DATASET CONSOLIDADO DE PARTICIPANTES Y MANAGERS CON RESULTADOS IMPOSIBLES (RI)
+ * Sincronizado con NODUS CREAR v1.0.0 (https://imo.crearpslglobal.com/futurosimposibles)
+ * Universo Oficial: Participantes (PX) y Managers ACTIVOS post-PFD en todas las sedes institucionales.
+ * Cero Alucinación: Excluye desertores e inactivos.
  */
 
 export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
@@ -54,7 +55,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -105,7 +110,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -156,7 +165,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -207,7 +220,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -258,7 +275,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -309,7 +330,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "Completar la formación avanzada e impactar la vida de 50 personas a través del servicio.",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -360,7 +385,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -411,7 +440,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -462,7 +495,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -513,7 +550,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -564,7 +605,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -615,7 +660,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -666,7 +715,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "Completar la formación avanzada e impactar la vida de 50 personas a través del servicio.",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -717,7 +770,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -768,7 +825,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -819,7 +880,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -870,7 +935,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -921,7 +990,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -972,7 +1045,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -1023,7 +1100,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -1074,7 +1155,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -1125,7 +1210,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -1176,7 +1265,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -1227,7 +1320,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -1278,7 +1375,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "Completar la formación avanzada e impactar la vida de 50 personas a través del servicio.",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -1329,7 +1430,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -1380,7 +1485,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -1431,7 +1540,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -1482,7 +1595,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -1533,7 +1650,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -1584,7 +1705,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -1635,7 +1760,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -1686,7 +1815,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -1737,7 +1870,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -1788,7 +1925,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -1839,7 +1980,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -1890,7 +2035,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -1941,7 +2090,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -1992,7 +2145,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -2043,7 +2200,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -2094,7 +2255,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -2145,7 +2310,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -2196,7 +2365,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "Completar la formación avanzada e impactar la vida de 50 personas a través del servicio.",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -2247,7 +2420,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -2298,7 +2475,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -2349,7 +2530,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -2400,7 +2585,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "MANAGER",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -2451,7 +2640,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -2502,7 +2695,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -2553,7 +2750,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -2604,7 +2805,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -2655,7 +2860,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -2706,7 +2915,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -2757,7 +2970,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -2808,7 +3025,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -2859,7 +3080,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "Completar la formación avanzada e impactar la vida de 50 personas a través del servicio.",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -2910,7 +3135,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -2961,7 +3190,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -3012,7 +3245,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -3063,7 +3300,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -3114,7 +3355,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -3165,7 +3410,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -3216,7 +3465,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -3267,7 +3520,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -3318,7 +3575,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -3369,7 +3630,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -3420,7 +3685,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -3471,7 +3740,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -3522,7 +3795,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -3573,7 +3850,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -3624,7 +3905,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -3675,7 +3960,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -3726,7 +4015,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -3777,7 +4070,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -3828,7 +4125,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -3879,7 +4180,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -3930,7 +4235,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -3981,7 +4290,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -4032,7 +4345,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "Completar la formación avanzada e impactar la vida de 50 personas a través del servicio.",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -4083,7 +4400,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -4134,7 +4455,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -4185,7 +4510,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -4236,7 +4565,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -4287,7 +4620,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -4338,7 +4675,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "MANAGER",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -4389,7 +4730,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -4440,7 +4785,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -4491,7 +4840,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -4542,7 +4895,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "Completar la formación avanzada e impactar la vida de 50 personas a través del servicio.",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -4593,7 +4950,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -4644,7 +5005,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -4695,7 +5060,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -4746,7 +5115,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -4797,7 +5170,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -4848,7 +5225,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -4899,7 +5280,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -4950,7 +5335,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -5001,7 +5390,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -5052,7 +5445,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -5103,7 +5500,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "Completar la formación avanzada e impactar la vida de 50 personas a través del servicio.",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -5154,7 +5555,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -5205,7 +5610,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -5256,7 +5665,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -5307,7 +5720,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -5358,7 +5775,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -5409,7 +5830,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -5460,7 +5885,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -5511,7 +5940,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -5562,7 +5995,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -5613,7 +6050,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -5664,7 +6105,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -5715,7 +6160,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -5766,7 +6215,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -5817,7 +6270,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -5868,7 +6325,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -5919,7 +6380,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -5970,7 +6435,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -6021,7 +6490,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -6072,7 +6545,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -6123,7 +6600,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -6174,7 +6655,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "Completar la formación avanzada e impactar la vida de 50 personas a través del servicio.",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -6225,7 +6710,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "MANAGER",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -6276,7 +6765,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -6327,7 +6820,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -6378,7 +6875,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -6429,7 +6930,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "MANAGER",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -6480,7 +6985,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -6531,7 +7040,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -6582,7 +7095,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -6633,7 +7150,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -6684,7 +7205,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -6735,7 +7260,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -6786,7 +7315,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -6837,7 +7370,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -6888,7 +7425,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -6939,7 +7480,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -6990,7 +7535,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -7041,7 +7590,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -7092,7 +7645,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -7143,7 +7700,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "Completar la formación avanzada e impactar la vida de 50 personas a través del servicio.",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -7194,7 +7755,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -7245,7 +7810,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -7296,7 +7865,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -7347,7 +7920,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -7398,7 +7975,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -7449,7 +8030,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -7500,7 +8085,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -7551,7 +8140,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -7602,7 +8195,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -7653,7 +8250,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -7704,7 +8305,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -7755,7 +8360,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -7806,7 +8415,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -7857,7 +8470,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -7908,7 +8525,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -7959,7 +8580,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -8010,7 +8635,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -8061,7 +8690,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -8112,7 +8745,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -8163,7 +8800,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -8214,7 +8855,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "MANAGER",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -8265,7 +8910,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -8316,7 +8965,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -8367,7 +9020,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -8418,7 +9075,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "Completar la formación avanzada e impactar la vida de 50 personas a través del servicio.",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -8469,7 +9130,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -8520,7 +9185,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -8571,7 +9240,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -8622,7 +9295,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -8673,7 +9350,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -8724,7 +9405,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "MANAGER",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -8775,7 +9460,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -8826,7 +9515,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "MANAGER",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -8877,7 +9570,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -8928,7 +9625,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "Completar la formación avanzada e impactar la vida de 50 personas a través del servicio.",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -8979,7 +9680,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "MANAGER",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -9030,7 +9735,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -9081,7 +9790,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -9132,7 +9845,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -9183,7 +9900,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -9234,7 +9955,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -9285,7 +10010,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -9336,7 +10065,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -9387,7 +10120,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -9438,7 +10175,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -9489,7 +10230,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -9540,7 +10285,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -9591,7 +10340,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -9642,7 +10395,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -9693,7 +10450,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -9744,7 +10505,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -9795,7 +10560,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -9846,7 +10615,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -9897,7 +10670,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -9948,7 +10725,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "Completar la formación avanzada e impactar la vida de 50 personas a través del servicio.",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -9999,7 +10780,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -10050,7 +10835,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -10101,7 +10890,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -10152,7 +10945,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -10203,7 +11000,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -10254,7 +11055,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -10305,7 +11110,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -10356,7 +11165,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -10407,7 +11220,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -10458,7 +11275,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -10509,7 +11330,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -10560,7 +11385,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -10611,7 +11440,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -10662,7 +11495,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -10713,7 +11550,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "Completar la formación avanzada e impactar la vida de 50 personas a través del servicio.",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -10764,7 +11605,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -10815,7 +11660,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -10866,7 +11715,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -10917,7 +11770,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -10968,7 +11825,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -11019,7 +11880,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -11070,7 +11935,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -11121,7 +11990,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -11172,7 +12045,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -11223,7 +12100,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -11274,7 +12155,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -11325,7 +12210,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -11376,7 +12265,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -11427,7 +12320,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -11478,7 +12375,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -11529,7 +12430,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -11580,7 +12485,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -11631,7 +12540,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -11682,7 +12595,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -11733,7 +12650,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "Completar la formación avanzada e impactar la vida de 50 personas a través del servicio.",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -11784,7 +12705,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "PX",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -11835,7 +12760,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "meta": "",
         "area": "Desarrollo Personal & Espiritual"
       }
-    ]
+    ],
+    "rol": "MANAGER",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO"
   },
   {
     "fechaPFD": "16/08/2026",
@@ -11844,7 +12773,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
     "totalFi": 0,
     "equipo": "EQUIPO 1",
     "nombre": "EDITH CASTILLO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "México",
     "diasDesdePFD": 27,
@@ -11883,7 +12816,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
     "totalFi": 0,
     "equipo": "EQUIPO 1",
     "nombre": "DANIELA MONROY",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "México",
     "diasDesdePFD": 27,
@@ -11922,7 +12859,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
     "totalFi": 0,
     "equipo": "EQUIPO 1",
     "nombre": "NORA ZAMORA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "México",
     "diasDesdePFD": 27,
@@ -11961,7 +12902,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
     "totalFi": 0,
     "equipo": "EQUIPO 1",
     "nombre": "ULISES ORDAZ",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "México",
     "diasDesdePFD": 27,
@@ -12000,7 +12945,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
     "totalFi": 3,
     "equipo": "EQUIPO 1",
     "nombre": "SANTIAGO YUNGA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Cuenca",
     "diasDesdePFD": 27,
@@ -12035,54 +12984,19 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   {
     "fechaPFD": "16/08/2026",
     "id": "fi_part_1006",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 1",
-    "nombre": "MARITZA ROMERO",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Cuenca",
-    "diasDesdePFD": 27,
-    "dni": "5930980184471",
-    "aprobados": 1,
-    "coordinador": "MIGUEL TORRES",
-    "entrenador": "Jesus Acosta",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1007",
     "pendientes": 1,
     "totalFi": 3,
     "equipo": "EQUIPO 1",
     "nombre": "AMADA ALMENDARIS",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Cuenca",
     "diasDesdePFD": 27,
-    "dni": "DNI_1007",
+    "dni": "DNI_1006",
     "aprobados": 2,
     "coordinador": "",
     "entrenador": "Erika Gavilánez",
@@ -12112,12 +13026,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1008",
+    "id": "fi_part_1007",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 1",
     "nombre": "ANDREA MEDINA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Cuenca",
     "diasDesdePFD": 27,
@@ -12151,39 +13069,86 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1009",
-    "pendientes": 2,
-    "totalFi": 3,
+    "id": "fi_part_1008",
+    "pendientes": 0,
+    "totalFi": 0,
     "equipo": "EQUIPO 1",
-    "nombre": "FELIPE RHENALS",
+    "nombre": "ÁNGEL VARGAS",
+    "rol": "PX",
     "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Medellín",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 0,
+    "sede": "Lima",
     "diasDesdePFD": 27,
-    "dni": "3104429169",
+    "dni": "DNI_1008",
     "aprobados": 0,
     "coordinador": "",
-    "entrenador": "Ana Cristina Sánchez",
+    "entrenador": "José Torron",
     "fis": [
       {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "estado": "no_presentado",
+        "titulo": "",
         "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "meta": "",
         "area": "Salud & Vitalidad"
       },
       {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "estado": "no_presentado",
+        "titulo": "",
         "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
+        "meta": "",
         "area": "Finanzas & Riqueza"
       },
       {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "estado": "no_presentado",
+        "titulo": "",
+        "feedback": "",
+        "meta": "",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1009",
+    "pendientes": 0,
+    "totalFi": 0,
+    "equipo": "EQUIPO 1",
+    "nombre": "SARA GARAY",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1009",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "José Torron",
+    "fis": [
+      {
+        "estado": "no_presentado",
+        "titulo": "",
+        "feedback": "",
+        "meta": "",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "no_presentado",
+        "titulo": "",
+        "feedback": "",
+        "meta": "",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "no_presentado",
+        "titulo": "",
+        "feedback": "",
+        "meta": "",
         "area": "Relaciones & Familia"
       }
     ]
@@ -12195,7 +13160,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
     "totalFi": 3,
     "equipo": "EQUIPO 1",
     "nombre": "DIEGO CAMARGO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Medellín",
     "diasDesdePFD": 27,
@@ -12234,7 +13203,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
     "totalFi": 3,
     "equipo": "EQUIPO 1",
     "nombre": "JUAN MAYA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Medellín",
     "diasDesdePFD": 27,
@@ -12273,7 +13246,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
     "totalFi": 3,
     "equipo": "EQUIPO 1",
     "nombre": "JAVIER TORRES",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -12312,7 +13289,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
     "totalFi": 3,
     "equipo": "EQUIPO 2",
     "nombre": "ERNESTO SEPÚLVEDA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "México",
     "diasDesdePFD": 27,
@@ -12351,7 +13332,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
     "totalFi": 3,
     "equipo": "EQUIPO 2",
     "nombre": "MARTHA GUERRERO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "México",
     "diasDesdePFD": 27,
@@ -12390,7 +13375,11 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
     "totalFi": 3,
     "equipo": "EQUIPO 2",
     "nombre": "JENNIFER IÑIGUEZ",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Cuenca",
     "diasDesdePFD": 27,
@@ -12425,50 +13414,15 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   {
     "fechaPFD": "16/08/2026",
     "id": "fi_part_1016",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 2",
-    "nombre": "JOSÉ GALINDO",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Cuenca",
-    "diasDesdePFD": 27,
-    "dni": "0992848576",
-    "aprobados": 1,
-    "coordinador": "MIGUEL TORRES",
-    "entrenador": "Julio Narváez",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1017",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 2",
     "nombre": "VANESA QUEZADA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Cuenca",
     "diasDesdePFD": 27,
@@ -12502,16 +13456,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1018",
+    "id": "fi_part_1017",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "EQUIPO 2",
     "nombre": "MÓNICA COELLO",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
-    "dni": "DNI_1018",
+    "dni": "DNI_1017",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Andrés Gómez",
@@ -12541,51 +13499,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1019",
-    "pendientes": 1,
-    "totalFi": 3,
-    "equipo": "EQUIPO 2",
-    "nombre": "ALEJANDRO CALLE",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Medellín",
-    "diasDesdePFD": 27,
-    "dni": "3234282671",
-    "aprobados": 2,
-    "coordinador": "",
-    "entrenador": "Alejandro Diaz",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1020",
+    "id": "fi_part_1018",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 2",
     "nombre": "MIGUEL PATIÑO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Medellín",
     "diasDesdePFD": 27,
@@ -12619,12 +13542,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1021",
+    "id": "fi_part_1019",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 2",
     "nombre": "JAIME ARENAS",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Medellín",
     "diasDesdePFD": 27,
@@ -12658,12 +13585,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1022",
+    "id": "fi_part_1020",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 2",
     "nombre": "DANIELA PEREZ",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Medellín",
     "diasDesdePFD": 27,
@@ -12697,51 +13628,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1023",
-    "pendientes": 0,
-    "totalFi": 0,
-    "equipo": "EQUIPO 2",
-    "nombre": "BRIAN MORALES",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Medellín",
-    "diasDesdePFD": 27,
-    "dni": "573233644192",
-    "aprobados": 0,
-    "coordinador": "MAURICIO RAMIREZ",
-    "entrenador": "Mike Boada",
-    "fis": [
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1024",
+    "id": "fi_part_1021",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 2",
     "nombre": "MAURICIO RAMÍREZ",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Medellín",
     "diasDesdePFD": 27,
@@ -12775,16 +13671,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1025",
+    "id": "fi_part_1022",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "EQUIPO 2",
     "nombre": "MISHELL TORRES",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1025",
+    "dni": "DNI_1022",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Mildred Muñoz",
@@ -12814,12 +13714,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1026",
+    "id": "fi_part_1023",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 3",
     "nombre": "GABRIEL ORDÁZ",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "México",
     "diasDesdePFD": 27,
@@ -12853,51 +13757,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1027",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 3",
-    "nombre": "MATEO PACHACAMA",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Cuenca",
-    "diasDesdePFD": 27,
-    "dni": "984123196",
-    "aprobados": 0,
-    "coordinador": "ISAAC BETANCOURTH",
-    "entrenador": "Ana Cristina Sánchez",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1028",
+    "id": "fi_part_1024",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 3",
     "nombre": "MABE CATOTA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Cuenca",
     "diasDesdePFD": 27,
@@ -12931,12 +13800,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1029",
+    "id": "fi_part_1025",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 3",
     "nombre": "PAMELA TIXI",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Cuenca",
     "diasDesdePFD": 27,
@@ -12970,55 +13843,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1030",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 3",
-    "nombre": "IGNACIO JIMÉNEZ",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Cuenca",
-    "diasDesdePFD": 27,
-    "dni": "593962298765",
-    "aprobados": 1,
-    "coordinador": "MIGUEL TORRES",
-    "entrenador": "Julio Narváez",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1031",
+    "id": "fi_part_1026",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "EQUIPO 3",
     "nombre": "RENE PINARGOTE (G)",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
-    "dni": "DNI_1031",
+    "dni": "DNI_1026",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Alejandro Diaz",
@@ -13048,16 +13886,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1032",
+    "id": "fi_part_1027",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "EQUIPO 3",
     "nombre": "FER MENDOZA (G)",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
-    "dni": "DNI_1032",
+    "dni": "DNI_1027",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Mike Boada",
@@ -13087,12 +13929,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1033",
+    "id": "fi_part_1028",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 3",
     "nombre": "VALENTINA RODRÍGUEZ",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Medellín",
     "diasDesdePFD": 27,
@@ -13126,12 +13972,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1034",
+    "id": "fi_part_1029",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 3",
     "nombre": "LEDIS DAZA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Medellín",
     "diasDesdePFD": 27,
@@ -13165,12 +14015,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1035",
+    "id": "fi_part_1030",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 4",
     "nombre": "NELSON JIMENEZ",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "México",
     "diasDesdePFD": 27,
@@ -13204,51 +14058,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1036",
-    "pendientes": 1,
-    "totalFi": 3,
-    "equipo": "EQUIPO 4",
-    "nombre": "DAYANNA LÓPEZ",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Cuenca",
-    "diasDesdePFD": 27,
-    "dni": "0980177146",
-    "aprobados": 2,
-    "coordinador": "JOSUE VERA",
-    "entrenador": "José Torron",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1037",
+    "id": "fi_part_1031",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 4",
     "nombre": "KERLIE CARRILLO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Cuenca",
     "diasDesdePFD": 27,
@@ -13282,12 +14101,59 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1038",
+    "id": "fi_part_1032",
+    "pendientes": 0,
+    "totalFi": 0,
+    "equipo": "EQUIPO 4",
+    "nombre": "IRMA TRIVEÑO",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1032",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "José Torron",
+    "fis": [
+      {
+        "estado": "no_presentado",
+        "titulo": "",
+        "feedback": "",
+        "meta": "",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "no_presentado",
+        "titulo": "",
+        "feedback": "",
+        "meta": "",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "no_presentado",
+        "titulo": "",
+        "feedback": "",
+        "meta": "",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1033",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 4",
     "nombre": "DAVID GONZÁLEZ FRANCO",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Medellín",
     "diasDesdePFD": 27,
@@ -13321,12 +14187,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1039",
+    "id": "fi_part_1034",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 4",
     "nombre": "MANUEL VIVANCO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -13360,16 +14230,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1040",
+    "id": "fi_part_1035",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "EQUIPO 4",
     "nombre": "ROCÍO DE LA CRUZ",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1040",
+    "dni": "DNI_1035",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Mildred Muñoz",
@@ -13399,12 +14273,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1041",
+    "id": "fi_part_1036",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 5",
     "nombre": "ISMAEL MÁRQUEZ",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Cuenca",
     "diasDesdePFD": 27,
@@ -13438,12 +14316,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1042",
+    "id": "fi_part_1037",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 5",
     "nombre": "JUAN FERNANDO REINOSO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Cuenca",
     "diasDesdePFD": 27,
@@ -13477,12 +14359,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1043",
+    "id": "fi_part_1038",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 5",
     "nombre": "COLOMBIA OCHOA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Cuenca",
     "diasDesdePFD": 27,
@@ -13516,19 +14402,23 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1044",
-    "pendientes": 2,
+    "id": "fi_part_1039",
+    "pendientes": 0,
     "totalFi": 3,
-    "equipo": "EQUIPO 6",
-    "nombre": "FRANKLIM ZEAS",
+    "equipo": "EQUIPO 5",
+    "nombre": "PAMELA CARRILLO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
-    "sede": "Cuenca",
+    "sede": "Lima",
     "diasDesdePFD": 27,
-    "dni": "0984077123",
-    "aprobados": 1,
-    "coordinador": "JOSUE VERA",
-    "entrenador": "Ana Monroy",
+    "dni": "593992492027",
+    "aprobados": 3,
+    "coordinador": "",
+    "entrenador": "Christian Tito",
     "fis": [
       {
         "estado": "aprobado",
@@ -13538,14 +14428,14 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "area": "Salud & Vitalidad"
       },
       {
-        "estado": "pendiente",
+        "estado": "aprobado",
         "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
         "feedback": "",
         "meta": "Cumplimiento del estándar superior financiero",
         "area": "Finanzas & Riqueza"
       },
       {
-        "estado": "no_presentado",
+        "estado": "aprobado",
         "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
         "feedback": "",
         "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
@@ -13555,12 +14445,59 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1045",
+    "id": "fi_part_1040",
+    "pendientes": 0,
+    "totalFi": 0,
+    "equipo": "EQUIPO 5",
+    "nombre": "JOSÉ COELLO",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1040",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "José Torron",
+    "fis": [
+      {
+        "estado": "no_presentado",
+        "titulo": "",
+        "feedback": "",
+        "meta": "",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "no_presentado",
+        "titulo": "",
+        "feedback": "",
+        "meta": "",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "no_presentado",
+        "titulo": "",
+        "feedback": "",
+        "meta": "",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1041",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 6",
     "nombre": "DIANA MACAS",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -13594,19 +14531,23 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1046",
-    "pendientes": 2,
+    "id": "fi_part_1042",
+    "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 6",
-    "nombre": "EDGAR KEVIN GARCES",
+    "nombre": "LEYLA PASQUEL",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
-    "sede": "Medellín",
+    "sede": "Lima",
     "diasDesdePFD": 27,
-    "dni": "573194169780",
-    "aprobados": 1,
+    "dni": "51996820944",
+    "aprobados": 3,
     "coordinador": "",
-    "entrenador": "Ana Monroy",
+    "entrenador": "Julio Narváez",
     "fis": [
       {
         "estado": "aprobado",
@@ -13616,14 +14557,14 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "area": "Salud & Vitalidad"
       },
       {
-        "estado": "pendiente",
+        "estado": "aprobado",
         "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
         "feedback": "",
         "meta": "Cumplimiento del estándar superior financiero",
         "area": "Finanzas & Riqueza"
       },
       {
-        "estado": "no_presentado",
+        "estado": "aprobado",
         "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
         "feedback": "",
         "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
@@ -13633,12 +14574,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1047",
+    "id": "fi_part_1043",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 6",
     "nombre": "MARIA FERNANDA ALVAREZ",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Medellín",
     "diasDesdePFD": 27,
@@ -13672,16 +14617,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1048",
+    "id": "fi_part_1044",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "EQUIPO 6",
     "nombre": "ALAN CARRASCO",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1048",
+    "dni": "DNI_1044",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Mildred Muñoz",
@@ -13711,12 +14660,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1049",
+    "id": "fi_part_1045",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 6",
     "nombre": "AMENDAÑO ROSA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -13750,12 +14703,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1050",
+    "id": "fi_part_1046",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 6",
     "nombre": "ANEL ORIHUELA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -13789,12 +14746,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1051",
+    "id": "fi_part_1047",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 7",
     "nombre": "JOSÉ LUIS PRADO",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Cuenca",
     "diasDesdePFD": 27,
@@ -13828,12 +14789,102 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1052",
+    "id": "fi_part_1048",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 7",
+    "nombre": "JUAN MANUEL GRANDA",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51947469418",
+    "aprobados": 3,
+    "coordinador": "LINID VALENCIA",
+    "entrenador": "Lourdes Patiño",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1049",
+    "pendientes": 0,
+    "totalFi": 0,
+    "equipo": "EQUIPO 7",
+    "nombre": "DIOMAR VELA",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1049",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Mildred Muñoz",
+    "fis": [
+      {
+        "estado": "no_presentado",
+        "titulo": "",
+        "feedback": "",
+        "meta": "",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "no_presentado",
+        "titulo": "",
+        "feedback": "",
+        "meta": "",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "no_presentado",
+        "titulo": "",
+        "feedback": "",
+        "meta": "",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1050",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 7",
     "nombre": "MARTHA LONDOÑO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Medellín",
     "diasDesdePFD": 27,
@@ -13867,12 +14918,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1053",
+    "id": "fi_part_1051",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 8",
     "nombre": "ALBA ABAD",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Cuenca",
     "diasDesdePFD": 27,
@@ -13906,55 +14961,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1054",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 8",
-    "nombre": "MARCO MÉNDEZ",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Cuenca",
-    "diasDesdePFD": 27,
-    "dni": "0983168859",
-    "aprobados": 1,
-    "coordinador": "KERLY CARRILLO",
-    "entrenador": "Mauricio Ramírez",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1055",
+    "id": "fi_part_1052",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 8",
     "nombre": "CARLOS PUGLLIA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Cuenca",
     "diasDesdePFD": 27,
-    "dni": "DNI_1055",
+    "dni": "DNI_1052",
     "aprobados": 1,
     "coordinador": "",
     "entrenador": "Mila Campuzano",
@@ -13984,19 +15004,152 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
+    "id": "fi_part_1053",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 8",
+    "nombre": "VIVIANA ALCÁNTARA",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51987020591",
+    "aprobados": 3,
+    "coordinador": "",
+    "entrenador": "Ana Cristina Sánchez",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1054",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 8",
+    "nombre": "ROBERTO CONDEZO",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51999105525",
+    "aprobados": 3,
+    "coordinador": "",
+    "entrenador": "Ana Cristina Sánchez",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1055",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 8",
+    "nombre": "TONNY GUTIÉRREZ",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51958058579",
+    "aprobados": 3,
+    "coordinador": "",
+    "entrenador": "Ana Cristina Sánchez",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
     "id": "fi_part_1056",
     "pendientes": 1,
     "totalFi": 3,
     "equipo": "EQUIPO 8",
-    "nombre": "LAURA VANESSA DURANGO ARAQUE",
+    "nombre": "LUCY GIOVANNA OSTOA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
-    "sede": "Medellín",
+    "sede": "Lima",
     "diasDesdePFD": 27,
-    "dni": "3113691829",
+    "dni": "DNI_1056",
     "aprobados": 2,
-    "coordinador": "MAURICIO RAMIREZ",
-    "entrenador": "Andrés Gómez",
+    "coordinador": "",
+    "entrenador": "Julio Narváez",
     "fis": [
       {
         "estado": "aprobado",
@@ -14024,18 +15177,22 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   {
     "fechaPFD": "16/08/2026",
     "id": "fi_part_1057",
-    "pendientes": 2,
+    "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 8",
-    "nombre": "EVELYN FLORES",
+    "nombre": "MANUEL VIVANCO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
-    "sede": "Quito",
+    "sede": "Lima",
     "diasDesdePFD": 27,
-    "dni": "51994704928",
-    "aprobados": 1,
+    "dni": "51985610048",
+    "aprobados": 3,
     "coordinador": "",
-    "entrenador": "Mildred Muñoz",
+    "entrenador": "Julio Narváez",
     "fis": [
       {
         "estado": "aprobado",
@@ -14045,14 +15202,14 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "area": "Salud & Vitalidad"
       },
       {
-        "estado": "pendiente",
+        "estado": "aprobado",
         "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
         "feedback": "",
         "meta": "Cumplimiento del estándar superior financiero",
         "area": "Finanzas & Riqueza"
       },
       {
-        "estado": "no_presentado",
+        "estado": "aprobado",
         "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
         "feedback": "",
         "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
@@ -14063,50 +15220,15 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   {
     "fechaPFD": "16/08/2026",
     "id": "fi_part_1058",
-    "pendientes": 1,
-    "totalFi": 3,
-    "equipo": "EQUIPO 8",
-    "nombre": "LUSY DIAZ",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "51961892790",
-    "aprobados": 2,
-    "coordinador": "",
-    "entrenador": "Mildred Muñoz",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1059",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 9",
     "nombre": "VERÓNICA PRADO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Cuenca",
     "diasDesdePFD": 27,
@@ -14140,12 +15262,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1060",
+    "id": "fi_part_1059",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 9",
     "nombre": "GEOVANNI DOMÍNGUEZ",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Cuenca",
     "diasDesdePFD": 27,
@@ -14179,19 +15305,23 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1061",
-    "pendientes": 1,
+    "id": "fi_part_1060",
+    "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 9",
-    "nombre": "JOHN BENITEZ",
+    "nombre": "NANCY HUALLIPE",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
-    "sede": "Medellín",
+    "sede": "Lima",
     "diasDesdePFD": 27,
-    "dni": "573246110466",
-    "aprobados": 2,
-    "coordinador": "MAURICIO RAMIREZ",
-    "entrenador": "Andrés Idrobo",
+    "dni": "51944243222",
+    "aprobados": 3,
+    "coordinador": "",
+    "entrenador": "Lourdes Patiño",
     "fis": [
       {
         "estado": "aprobado",
@@ -14208,7 +15338,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "area": "Finanzas & Riqueza"
       },
       {
-        "estado": "no_presentado",
+        "estado": "aprobado",
         "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
         "feedback": "",
         "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
@@ -14218,12 +15348,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1062",
+    "id": "fi_part_1061",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 9",
     "nombre": "ROSEMARY DE PAZ",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -14257,12 +15391,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1063",
+    "id": "fi_part_1062",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 10",
     "nombre": "ROSY BAYAS",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Cuenca",
     "diasDesdePFD": 27,
@@ -14296,12 +15434,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1064",
+    "id": "fi_part_1063",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 10",
     "nombre": "CARLOS MEJIA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Cuenca",
     "diasDesdePFD": 27,
@@ -14335,19 +15477,23 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1065",
-    "pendientes": 2,
+    "id": "fi_part_1064",
+    "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 10",
-    "nombre": "BRYAN CAICEDO",
+    "nombre": "JULY LEÓN",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
-    "sede": "Medellín",
+    "sede": "Lima",
     "diasDesdePFD": 27,
-    "dni": "961164574",
-    "aprobados": 1,
-    "coordinador": "ERIKA GAVILANEZ",
-    "entrenador": "José Torron",
+    "dni": "51907503084",
+    "aprobados": 3,
+    "coordinador": "",
+    "entrenador": "Mildred Muñoz",
     "fis": [
       {
         "estado": "aprobado",
@@ -14357,14 +15503,14 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "area": "Salud & Vitalidad"
       },
       {
-        "estado": "pendiente",
+        "estado": "aprobado",
         "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
         "feedback": "",
         "meta": "Cumplimiento del estándar superior financiero",
         "area": "Finanzas & Riqueza"
       },
       {
-        "estado": "no_presentado",
+        "estado": "aprobado",
         "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
         "feedback": "",
         "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
@@ -14374,12 +15520,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1066",
+    "id": "fi_part_1065",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 10",
     "nombre": "PAMELA CARRILLO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Medellín",
     "diasDesdePFD": 27,
@@ -14413,12 +15563,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1067",
+    "id": "fi_part_1066",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 10",
     "nombre": "VERONICA GALLEGO TABORDA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Medellín",
     "diasDesdePFD": 27,
@@ -14452,12 +15606,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1068",
+    "id": "fi_part_1067",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 10",
     "nombre": "JUAN PABLO LEMA BERMUDEZ",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Medellín",
     "diasDesdePFD": 27,
@@ -14491,12 +15649,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1069",
+    "id": "fi_part_1068",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 11",
     "nombre": "EDWIN JIMBO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Cuenca",
     "diasDesdePFD": 27,
@@ -14530,12 +15692,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1070",
+    "id": "fi_part_1069",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 11",
     "nombre": "JUANJO CARRANZA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Cuenca",
     "diasDesdePFD": 27,
@@ -14569,12 +15735,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1071",
+    "id": "fi_part_1070",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 11",
     "nombre": "PAULY CEDILLO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Cuenca",
     "diasDesdePFD": 27,
@@ -14608,12 +15778,145 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
+    "id": "fi_part_1071",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 11",
+    "nombre": "ELIZABETH MORALES CARCELÉN",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51998450224",
+    "aprobados": 3,
+    "coordinador": "",
+    "entrenador": "Ana Cristina Sánchez",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
     "id": "fi_part_1072",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 11",
+    "nombre": "MARCO ANTONIO VILLARREAL VALDIVIEZO",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51962511575",
+    "aprobados": 3,
+    "coordinador": "",
+    "entrenador": "Isaac Betancourt",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1073",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 11",
+    "nombre": "LEYLA KELLY PASQUEL ALFARO",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51996820944",
+    "aprobados": 3,
+    "coordinador": "",
+    "entrenador": "Mildred Muñoz",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1074",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 12",
     "nombre": "CHRISTIAN ROBALINO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Cuenca",
     "diasDesdePFD": 27,
@@ -14647,12 +15950,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1073",
+    "id": "fi_part_1075",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 12",
     "nombre": "BELEN MUQUINCHO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Cuenca",
     "diasDesdePFD": 27,
@@ -14686,90 +15993,188 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1074",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 12",
-    "nombre": "MARTHA REA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Cuenca",
-    "diasDesdePFD": 27,
-    "dni": "0987656778",
-    "aprobados": 1,
-    "coordinador": "JUAN FER REINOSO",
-    "entrenador": "Kriscia Rodas",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1075",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 12",
-    "nombre": "JHON BENITEZ",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Medellín",
-    "diasDesdePFD": 27,
-    "dni": "573246110466",
-    "aprobados": 1,
-    "coordinador": "MAURICIO RAMIREZ",
-    "entrenador": "Andrés Gómez",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
     "id": "fi_part_1076",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 12",
-    "nombre": "ELIZABETH DOMINGUEZ",
+    "nombre": "MANUEL YAKIMA RIVERA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "996612880",
+    "aprobados": 3,
+    "coordinador": "LINID VALENCIA",
+    "entrenador": "Alejandro Diaz",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1077",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 12",
+    "nombre": "VIVIANA ELIZABETH ALCÁNTARA MAURTUA",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51987020591",
+    "aprobados": 3,
+    "coordinador": "",
+    "entrenador": "Alejandro Diaz",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1078",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 12",
+    "nombre": "KRISCIA LISZET RODAS QUISPE",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51964140549",
+    "aprobados": 3,
+    "coordinador": "",
+    "entrenador": "Josué Vera",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1079",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 12",
+    "nombre": "MARÍA CELLI HUAYANCA DIAZ",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51989947797",
+    "aprobados": 3,
+    "coordinador": "",
+    "entrenador": "Lourdes Patiño",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1080",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 12",
+    "nombre": "ELIZABETH DOMINGUEZ",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Medellín",
     "diasDesdePFD": 27,
@@ -14803,12 +16208,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1077",
+    "id": "fi_part_1081",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 12",
     "nombre": "KATHERINE OSPINA DUQUE",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Medellín",
     "diasDesdePFD": 27,
@@ -14842,12 +16251,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1078",
+    "id": "fi_part_1082",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 12",
     "nombre": "MARTHA LUCIA LONDOÑO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Medellín",
     "diasDesdePFD": 27,
@@ -14881,12 +16294,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1079",
+    "id": "fi_part_1083",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 13",
     "nombre": "PAUL OCHOA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Cuenca",
     "diasDesdePFD": 27,
@@ -14920,12 +16337,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1080",
+    "id": "fi_part_1084",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 13",
     "nombre": "MIRIAM ORDOÑEZ",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Cuenca",
     "diasDesdePFD": 27,
@@ -14959,38 +16380,42 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1081",
-    "pendientes": 2,
+    "id": "fi_part_1085",
+    "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 13",
-    "nombre": "DIEGO MORA",
+    "nombre": "JORGE LUIS LEÓN DE LOS RÍOS",
+    "rol": "MANAGER",
     "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Cuenca",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
     "diasDesdePFD": 27,
-    "dni": "0987583826",
-    "aprobados": 0,
-    "coordinador": "KERLY CARRILLO - JUANFER REINOSO",
-    "entrenador": "Mila Campuzano",
+    "dni": "51998044097",
+    "aprobados": 3,
+    "coordinador": "",
+    "entrenador": "Lourdes Patiño",
     "fis": [
       {
-        "estado": "pendiente",
+        "estado": "aprobado",
         "titulo": "Resultado Imposible 1: Salud & Vitalidad",
         "feedback": "",
         "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
         "area": "Salud & Vitalidad"
       },
       {
-        "estado": "pendiente",
+        "estado": "aprobado",
         "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
         "feedback": "",
         "meta": "Cumplimiento del estándar superior financiero",
         "area": "Finanzas & Riqueza"
       },
       {
-        "estado": "devuelto",
+        "estado": "aprobado",
         "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "feedback": "",
         "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
         "area": "Relaciones & Familia"
       }
@@ -14998,12 +16423,59 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1082",
+    "id": "fi_part_1086",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 13",
+    "nombre": "SARITA RAMOS",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51953656959",
+    "aprobados": 3,
+    "coordinador": "",
+    "entrenador": "María José Román",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1087",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 13",
     "nombre": "ESTEFANIA CHAVARRIA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Medellín",
     "diasDesdePFD": 27,
@@ -15037,12 +16509,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1083",
+    "id": "fi_part_1088",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 13",
     "nombre": "VANESSA GIRALDO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Medellín",
     "diasDesdePFD": 27,
@@ -15076,90 +16552,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1084",
-    "pendientes": 1,
-    "totalFi": 3,
-    "equipo": "EQUIPO 13",
-    "nombre": "YESID SANTANDER",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Medellín",
-    "diasDesdePFD": 27,
-    "dni": "573042071111",
-    "aprobados": 2,
-    "coordinador": "MAURICIO RAMIREZ",
-    "entrenador": "Ana Monroy",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1085",
-    "pendientes": 1,
-    "totalFi": 3,
-    "equipo": "EQUIPO 14",
-    "nombre": "MICHELLE ZUNIGA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Cuenca",
-    "diasDesdePFD": 27,
-    "dni": "0958758565",
-    "aprobados": 2,
-    "coordinador": "KERLY CARRILLO / JUAN FERNANDO REINOSO",
-    "entrenador": "David Sosa",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1086",
+    "id": "fi_part_1089",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 14",
     "nombre": "PAUL PINOS",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Cuenca",
     "diasDesdePFD": 27,
@@ -15193,12 +16595,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1087",
+    "id": "fi_part_1090",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 14",
     "nombre": "FABIAN NAULA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Cuenca",
     "diasDesdePFD": 27,
@@ -15232,51 +16638,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1088",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 14",
-    "nombre": "DAVID VALDIVIEZO",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Cuenca",
-    "diasDesdePFD": 27,
-    "dni": "0984833315",
-    "aprobados": 1,
-    "coordinador": "KERLY CARRILLO / JUAN FERNANDO REINOSO",
-    "entrenador": "Pamela Carrillo",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1089",
+    "id": "fi_part_1091",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 14",
     "nombre": "JONATHAN VARGAS",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -15310,12 +16681,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1090",
+    "id": "fi_part_1092",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 14",
     "nombre": "ANDREINA TENELEMA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -15349,12 +16724,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1091",
+    "id": "fi_part_1093",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 14",
     "nombre": "GABY ROMÁN",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -15388,12 +16767,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1092",
+    "id": "fi_part_1094",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 14",
     "nombre": "KEVIN TIBAN",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -15427,19 +16810,23 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1093",
-    "pendientes": 1,
+    "id": "fi_part_1095",
+    "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 14",
-    "nombre": "SORAYA LARA",
+    "nombre": "RONY LANDEO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
-    "sede": "Guayaquil",
+    "sede": "Lima",
     "diasDesdePFD": 27,
-    "dni": "593991631172",
-    "aprobados": 2,
+    "dni": "971248667",
+    "aprobados": 3,
     "coordinador": "",
-    "entrenador": "Mike Boada",
+    "entrenador": "Erika Gavilánez",
     "fis": [
       {
         "estado": "aprobado",
@@ -15456,7 +16843,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "area": "Finanzas & Riqueza"
       },
       {
-        "estado": "no_presentado",
+        "estado": "aprobado",
         "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
         "feedback": "",
         "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
@@ -15466,12 +16853,188 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1094",
+    "id": "fi_part_1096",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 14",
+    "nombre": "REYNA JARAMILLO",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "954821488",
+    "aprobados": 3,
+    "coordinador": "",
+    "entrenador": "José Torron",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1097",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 14",
+    "nombre": "GARETH SAID RAMOS PÉREZ",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "946011882",
+    "aprobados": 3,
+    "coordinador": "",
+    "entrenador": "María José Román",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1098",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 14",
+    "nombre": "SANDRA MARLENE LÓPEZ CHAHUA",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "970870801",
+    "aprobados": 3,
+    "coordinador": "",
+    "entrenador": "María José Román",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1099",
+    "pendientes": 0,
+    "totalFi": 0,
+    "equipo": "EQUIPO 30",
+    "nombre": "FERNANDO LOPEZ LOPEZ",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51981237577",
+    "aprobados": 0,
+    "coordinador": "LINID VALENCIA",
+    "entrenador": "Alejandro Diaz",
+    "fis": [
+      {
+        "estado": "no_presentado",
+        "titulo": "",
+        "feedback": "",
+        "meta": "",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "no_presentado",
+        "titulo": "",
+        "feedback": "",
+        "meta": "",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "no_presentado",
+        "titulo": "",
+        "feedback": "",
+        "meta": "",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1100",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "EQUIPO 124",
     "nombre": "DANIELA MONROY",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -15505,12 +17068,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1095",
+    "id": "fi_part_1101",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 14",
     "nombre": "CAMILA LEÓN MOORE",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -15544,12 +17111,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1096",
+    "id": "fi_part_1102",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 14",
     "nombre": "CARMEN PÉREZ PÉREZ",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -15583,90 +17154,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1097",
-    "pendientes": 1,
-    "totalFi": 3,
-    "equipo": "EQUIPO 15",
-    "nombre": "DIEGO LEON",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Cuenca",
-    "diasDesdePFD": 27,
-    "dni": "0992101126",
-    "aprobados": 2,
-    "coordinador": "JUAN FERNANDO REINOSO",
-    "entrenador": "Fernando Mendoza",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1098",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 15",
-    "nombre": "RENATO MARQUEZ",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Cuenca",
-    "diasDesdePFD": 27,
-    "dni": "0961628015",
-    "aprobados": 1,
-    "coordinador": "JUAN FERNANDO REINOSO",
-    "entrenador": "Isaac Betancourt",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1099",
+    "id": "fi_part_1103",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 15",
     "nombre": "MYRIAM CRESPIN",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -15700,12 +17197,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1100",
+    "id": "fi_part_1104",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 15",
     "nombre": "JHOMAIRA ESPARZA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -15739,12 +17240,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1101",
+    "id": "fi_part_1105",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 15",
     "nombre": "ANITA GUEVARA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -15778,12 +17283,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1102",
+    "id": "fi_part_1106",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 15",
     "nombre": "RUTC VERA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -15817,12 +17326,231 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1103",
+    "id": "fi_part_1107",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 15",
+    "nombre": "ELIZABETH MORALES",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51998450224",
+    "aprobados": 3,
+    "coordinador": "",
+    "entrenador": "Ana Monroy",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1108",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 15",
+    "nombre": "DAYSI REQUEJO",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51945111938",
+    "aprobados": 3,
+    "coordinador": "",
+    "entrenador": "Erika Gavilánez",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1109",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 15",
+    "nombre": "ALEXANDRA TAPULLIMA",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "941842840",
+    "aprobados": 3,
+    "coordinador": "LINID VALENCIA",
+    "entrenador": "Josué Vera",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1110",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 15",
+    "nombre": "DIEGO BARBIERI",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "951815674",
+    "aprobados": 3,
+    "coordinador": "LINID VALENCIA",
+    "entrenador": "Mauricio Ramírez",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1111",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 15",
+    "nombre": "LIZ TRUJILLO",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51980496819",
+    "aprobados": 3,
+    "coordinador": "",
+    "entrenador": "Mauricio Ramírez",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1112",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 16",
     "nombre": "CRISTINA VINTIMILLA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Cuenca",
     "diasDesdePFD": 27,
@@ -15856,12 +17584,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1104",
+    "id": "fi_part_1113",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 16",
     "nombre": "GERARD AVILA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Cuenca",
     "diasDesdePFD": 27,
@@ -15895,51 +17627,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1105",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 16",
-    "nombre": "ANGGIE ESPINOZA",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Guayaquil",
-    "diasDesdePFD": 27,
-    "dni": "593982449947",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Ana Cristina Sánchez",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1106",
+    "id": "fi_part_1114",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "EQUIPO 16",
     "nombre": "LUIS PRUNA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -15973,12 +17670,102 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1107",
+    "id": "fi_part_1115",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 16",
+    "nombre": "DIANA MOSCOSSO",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51924105061",
+    "aprobados": 3,
+    "coordinador": "",
+    "entrenador": "Ana Monroy",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1116",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 16",
+    "nombre": "ALLYZON LEÓN SUAREZ",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51991215652",
+    "aprobados": 3,
+    "coordinador": "",
+    "entrenador": "María José Román",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1117",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 16",
     "nombre": "JORGE RAMÍREZ",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -16012,12 +17799,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1108",
+    "id": "fi_part_1118",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 17",
     "nombre": "JOSUE AVILES",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Cuenca",
     "diasDesdePFD": 27,
@@ -16051,12 +17842,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1109",
+    "id": "fi_part_1119",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 17",
     "nombre": "ESTEFANIA CASTILLO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Cuenca",
     "diasDesdePFD": 27,
@@ -16090,12 +17885,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1110",
+    "id": "fi_part_1120",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 17",
     "nombre": "JUAN DIEGO JARA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Cuenca",
     "diasDesdePFD": 27,
@@ -16129,51 +17928,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1111",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 17",
-    "nombre": "JOSÉ GUALCHI",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Guayaquil",
-    "diasDesdePFD": 27,
-    "dni": "593984294753",
-    "aprobados": 1,
-    "coordinador": "",
-    "entrenador": "Ana Cristina Sánchez",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1112",
+    "id": "fi_part_1121",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 17",
     "nombre": "JAMMEL ARVELAEZ",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -16207,12 +17971,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1113",
+    "id": "fi_part_1122",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 17",
     "nombre": "XAVIER CALERO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -16246,12 +18014,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1114",
+    "id": "fi_part_1123",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 17",
     "nombre": "VALERIA TIBAN",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -16285,12 +18057,446 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1115",
+    "id": "fi_part_1124",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 17",
+    "nombre": "ANAMELVA QUIÑONEZ",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51920122990",
+    "aprobados": 3,
+    "coordinador": "",
+    "entrenador": "Alejandro Diaz",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1125",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 17",
+    "nombre": "RAUL CHAVEZ INCHE",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51930702843",
+    "aprobados": 3,
+    "coordinador": "",
+    "entrenador": "Alejandro Diaz",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1126",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 17",
+    "nombre": "ROCIO DE LA PAZ HUAYTALLA",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51924255051",
+    "aprobados": 3,
+    "coordinador": "",
+    "entrenador": "Ana Monroy",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1127",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 17",
+    "nombre": "ROSMERY OCHOA FERRER",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "989665820",
+    "aprobados": 3,
+    "coordinador": "LINID VALENCIA",
+    "entrenador": "Andrés Idrobo",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1128",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 17",
+    "nombre": "PAMELA MORALES",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51952372756",
+    "aprobados": 3,
+    "coordinador": "",
+    "entrenador": "Andrés Idrobo",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1129",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 17",
+    "nombre": "JEAN CARLOS RIOS",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51991512467",
+    "aprobados": 3,
+    "coordinador": "",
+    "entrenador": "Diego Bravo",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1130",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 17",
+    "nombre": "YUSMELY GARCÍA",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51921979246",
+    "aprobados": 3,
+    "coordinador": "",
+    "entrenador": "Erika Gavilánez",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1131",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 17",
+    "nombre": "ISABEL CORREA",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51996592870",
+    "aprobados": 3,
+    "coordinador": "LINID VALENCIA",
+    "entrenador": "Fernando Mendoza",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1132",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 17",
+    "nombre": "BRITNEY SAFIRO OLENKA",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51981087758",
+    "aprobados": 3,
+    "coordinador": "",
+    "entrenador": "Josué Vera",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1133",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 17",
+    "nombre": "JUANA MARIA FALCON",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51973827510",
+    "aprobados": 3,
+    "coordinador": "",
+    "entrenador": "Mila Campuzano",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1134",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 14",
     "nombre": "MARIANA CATRILLON",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Medellín",
     "diasDesdePFD": 27,
@@ -16324,51 +18530,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1116",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 14",
-    "nombre": "ANDRES MAURICIO VARGAS",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Medellín",
-    "diasDesdePFD": 27,
-    "dni": "573116042782",
-    "aprobados": 1,
-    "coordinador": "MAURICIO RAMIREZ",
-    "entrenador": "José Sánchez",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1117",
+    "id": "fi_part_1135",
     "pendientes": 1,
     "totalFi": 3,
     "equipo": "EQUIPO 15",
     "nombre": "DAVID GONZALEZ",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Medellín",
     "diasDesdePFD": 27,
@@ -16402,12 +18573,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1118",
+    "id": "fi_part_1136",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "EQUIPO 30",
     "nombre": "MABEL ROBBYS",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -16441,16 +18616,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1119",
+    "id": "fi_part_1137",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "EQUIPO 125",
     "nombre": "JULIO NARVÁEZ",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1119",
+    "dni": "DNI_1137",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Camila Torres",
@@ -16480,90 +18659,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1120",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 18",
-    "nombre": "KARINA VALDIVIEZO",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Cuenca",
-    "diasDesdePFD": 27,
-    "dni": "0967241443",
-    "aprobados": 1,
-    "coordinador": "KERLY CARRILLO",
-    "entrenador": "Ana Monroy",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1121",
-    "pendientes": 1,
-    "totalFi": 3,
-    "equipo": "EQUIPO 18",
-    "nombre": "PAUL RECALDE",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Guayaquil",
-    "diasDesdePFD": 27,
-    "dni": "593999766343",
-    "aprobados": 2,
-    "coordinador": "",
-    "entrenador": "Andrés Idrobo",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1122",
+    "id": "fi_part_1138",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 18",
     "nombre": "JAIME IBARRA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -16597,12 +18702,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1123",
+    "id": "fi_part_1139",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 18",
     "nombre": "SOLEDAD RAMÍREZ",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -16636,12 +18745,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1124",
+    "id": "fi_part_1140",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 18",
     "nombre": "EVELYN MUÑOZ",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -16675,12 +18788,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1125",
+    "id": "fi_part_1141",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 18",
     "nombre": "JONATHAN LA ROSA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -16714,12 +18831,231 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1126",
+    "id": "fi_part_1142",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 18",
+    "nombre": "JOYCE MARIN",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "593993027018",
+    "aprobados": 3,
+    "coordinador": "",
+    "entrenador": "Diego Bravo",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1143",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 18",
+    "nombre": "ELVIS CUELLAR",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51943064793",
+    "aprobados": 3,
+    "coordinador": "",
+    "entrenador": "Erika Gavilánez",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1144",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 18",
+    "nombre": "RAQUEL RIVEROS RAMOS",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51931059726",
+    "aprobados": 3,
+    "coordinador": "",
+    "entrenador": "Julio Narváez",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1145",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 18",
+    "nombre": "ROCIO AYVAR VEGA",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51967197761",
+    "aprobados": 3,
+    "coordinador": "",
+    "entrenador": "Lourdes Patiño",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1146",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 18",
+    "nombre": "LIDIA CRSITINA MARTINEZ PUENTE",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51940243206",
+    "aprobados": 3,
+    "coordinador": "",
+    "entrenador": "Mauricio Ramírez",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1147",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 19",
     "nombre": "BATIOJA ARTURO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -16753,12 +19089,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1127",
+    "id": "fi_part_1148",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 19",
     "nombre": "BUSTOS ALEXANDER",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -16792,12 +19132,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1128",
+    "id": "fi_part_1149",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 19",
     "nombre": "ROBBYS MABEL",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -16831,12 +19175,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1129",
+    "id": "fi_part_1150",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 19",
     "nombre": "VALLEJO XAVIER",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -16870,16 +19218,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1130",
+    "id": "fi_part_1151",
     "pendientes": 1,
     "totalFi": 3,
     "equipo": "EQUIPO 19",
     "nombre": "CASTILLO ANA LAURA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
-    "dni": "DNI_1130",
+    "dni": "DNI_1151",
     "aprobados": 2,
     "coordinador": "",
     "entrenador": "Andrés Idrobo",
@@ -16909,12 +19261,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1131",
+    "id": "fi_part_1152",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 19",
     "nombre": "BATIOJA ALEXYS",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -16948,12 +19304,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1132",
+    "id": "fi_part_1153",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 19",
     "nombre": "CHÁVEZ ALEXANDRA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -16987,12 +19347,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1133",
+    "id": "fi_part_1154",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 19",
     "nombre": "MENDOZA MAURICIO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -17026,12 +19390,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1134",
+    "id": "fi_part_1155",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 19",
     "nombre": "VALDEZ HEIDY",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -17065,19 +19433,23 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1135",
-    "pendientes": 2,
+    "id": "fi_part_1156",
+    "pendientes": 0,
     "totalFi": 3,
-    "equipo": "EQUIPO 20",
-    "nombre": "ARGOTTI EMILIANO",
+    "equipo": "EQUIPO 19",
+    "nombre": "LEISI MEDINA IDROGO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
-    "sede": "Guayaquil",
+    "sede": "Lima",
     "diasDesdePFD": 27,
-    "dni": "0962784962",
-    "aprobados": 1,
-    "coordinador": "",
-    "entrenador": "Alejandro Diaz",
+    "dni": "51989063639",
+    "aprobados": 3,
+    "coordinador": "LINID VALENCIA",
+    "entrenador": "Fernando Mendoza",
     "fis": [
       {
         "estado": "aprobado",
@@ -17087,14 +19459,14 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "area": "Salud & Vitalidad"
       },
       {
-        "estado": "pendiente",
+        "estado": "aprobado",
         "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
         "feedback": "",
         "meta": "Cumplimiento del estándar superior financiero",
         "area": "Finanzas & Riqueza"
       },
       {
-        "estado": "no_presentado",
+        "estado": "aprobado",
         "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
         "feedback": "",
         "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
@@ -17104,12 +19476,102 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1136",
+    "id": "fi_part_1157",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 19",
+    "nombre": "ANGELLA MARIA BOLLET GOMEZ",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51989455869",
+    "aprobados": 3,
+    "coordinador": "LINID VALENCIA",
+    "entrenador": "Julio Narváez",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1158",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 19",
+    "nombre": "LUCAS ALBERTO SANCHEZ SILVA",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51999927725",
+    "aprobados": 3,
+    "coordinador": "LINID VALENCIA",
+    "entrenador": "Mila Campuzano",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1159",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 20",
     "nombre": "TENELEMA ANDREINA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -17143,51 +19605,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1137",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 20",
-    "nombre": "CORREA MABEL",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Guayaquil",
-    "diasDesdePFD": 27,
-    "dni": "0978667245",
-    "aprobados": 1,
-    "coordinador": "",
-    "entrenador": "José Sánchez",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1138",
+    "id": "fi_part_1160",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 20",
     "nombre": "CORREA CRISTIAN",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -17221,22 +19648,26 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1139",
+    "id": "fi_part_1161",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 20",
-    "nombre": "ORDOÑEZ DIEGO",
+    "nombre": "RHANIA INTIVEROS REQUEJO",
+    "rol": "PX",
     "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 0,
+    "sede": "Lima",
     "diasDesdePFD": 27,
-    "dni": "0963058531",
-    "aprobados": 0,
+    "dni": "DNI_1161",
+    "aprobados": 1,
     "coordinador": "",
-    "entrenador": "Mildred Muñoz",
+    "entrenador": "Erika Gavilánez",
     "fis": [
       {
-        "estado": "pendiente",
+        "estado": "aprobado",
         "titulo": "Resultado Imposible 1: Salud & Vitalidad",
         "feedback": "",
         "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
@@ -17250,9 +19681,9 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "area": "Finanzas & Riqueza"
       },
       {
-        "estado": "devuelto",
+        "estado": "no_presentado",
         "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "feedback": "",
         "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
         "area": "Relaciones & Familia"
       }
@@ -17260,12 +19691,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1140",
+    "id": "fi_part_1162",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 21",
     "nombre": "RAMÍREZ JORGE",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -17299,12 +19734,145 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1141",
+    "id": "fi_part_1163",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 21",
+    "nombre": "JOSE ALONSO GALVEZ LOPEZ",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "962338667",
+    "aprobados": 3,
+    "coordinador": "LINID VALENCIA",
+    "entrenador": "Alejandro Diaz",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1164",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 21",
+    "nombre": "MILAGROS CASTAÑEDA ORBE",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "934593496",
+    "aprobados": 3,
+    "coordinador": "LINID VALENCIA",
+    "entrenador": "Mauricio Ramírez",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1165",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 21",
+    "nombre": "ARISKERLA MONTANO MIRANDA",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "979375441",
+    "aprobados": 3,
+    "coordinador": "LINID VALENCIA",
+    "entrenador": "Mila Campuzano",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1166",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 21",
     "nombre": "GUAROCHICO ADRIANNA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -17338,51 +19906,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1142",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 22",
-    "nombre": "KARLA VERA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Guayaquil",
-    "diasDesdePFD": 27,
-    "dni": "0987427733",
-    "aprobados": 1,
-    "coordinador": "",
-    "entrenador": "Erika Gavilánez",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1143",
+    "id": "fi_part_1167",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 22",
     "nombre": "AXEL ANGULO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -17416,51 +19949,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1144",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 22",
-    "nombre": "GABRIELA CARBO",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Guayaquil",
-    "diasDesdePFD": 27,
-    "dni": "0959283977",
-    "aprobados": 1,
-    "coordinador": "",
-    "entrenador": "Lourdes Patiño",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1145",
+    "id": "fi_part_1168",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "EQUIPO 22",
     "nombre": "SHARON ANDRADE",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -17494,12 +19992,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1146",
+    "id": "fi_part_1169",
     "pendientes": 1,
     "totalFi": 3,
     "equipo": "EQUIPO 22",
     "nombre": "FRANCISCO MONTOYA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -17533,12 +20035,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1147",
+    "id": "fi_part_1170",
     "pendientes": 1,
     "totalFi": 3,
     "equipo": "EQUIPO 22",
     "nombre": "PEDRO SOLÍS",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -17572,19 +20078,23 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1148",
-    "pendientes": 2,
+    "id": "fi_part_1171",
+    "pendientes": 0,
     "totalFi": 3,
-    "equipo": "EQUIPO 23",
-    "nombre": "KARLA JIMENEZ",
+    "equipo": "EQUIPO 22",
+    "nombre": "CHARO YANETH APONTE PÉREZ",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
-    "sede": "Guayaquil",
+    "sede": "Lima",
     "diasDesdePFD": 27,
-    "dni": "0994709294",
-    "aprobados": 1,
-    "coordinador": "",
-    "entrenador": "Andrés Gómez",
+    "dni": "980648582",
+    "aprobados": 3,
+    "coordinador": "LINID VALENCIA",
+    "entrenador": "Ana Monroy",
     "fis": [
       {
         "estado": "aprobado",
@@ -17594,7 +20104,93 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "area": "Salud & Vitalidad"
       },
       {
-        "estado": "pendiente",
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1172",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 22",
+    "nombre": "GREZIA MAIA JOLLY VERA",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "920738765",
+    "aprobados": 3,
+    "coordinador": "LINID VALENCIA",
+    "entrenador": "Mauricio Ramírez",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1173",
+    "pendientes": 1,
+    "totalFi": 3,
+    "equipo": "EQUIPO 23",
+    "nombre": "GIOVANNA PALOMINO MARCOS",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51922042189",
+    "aprobados": 2,
+    "coordinador": "LINID VALENCIA",
+    "entrenador": "Alejandro Diaz",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
         "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
         "feedback": "",
         "meta": "Cumplimiento del estándar superior financiero",
@@ -17611,12 +20207,274 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1149",
+    "id": "fi_part_1174",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 23",
+    "nombre": "JESSICA LÓPEZ LÓPEZ",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "951381389",
+    "aprobados": 3,
+    "coordinador": "LINID VALENCIA",
+    "entrenador": "Alejandro Diaz",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1175",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 23",
+    "nombre": "FERNANDO ABEL LÓPEZ LÓPEZ",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "981237577",
+    "aprobados": 3,
+    "coordinador": "LINID VALENCIA",
+    "entrenador": "David Sosa",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1176",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 23",
+    "nombre": "GISSELLA HUAMAN CELESTINO",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "969587076",
+    "aprobados": 3,
+    "coordinador": "LINID VALENCIA",
+    "entrenador": "Diego Bravo",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1177",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 23",
+    "nombre": "GARETH RAMOS PÉREZ",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "946011882",
+    "aprobados": 3,
+    "coordinador": "LINID VALENCIA",
+    "entrenador": "Erika Gavilánez",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1178",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 23",
+    "nombre": "VANEZA RAMÍREZ",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "913863730",
+    "aprobados": 3,
+    "coordinador": "LINID VALENCIA",
+    "entrenador": "Fernando Mendoza",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1179",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 23",
+    "nombre": "DAVID EMERSON CONTRERAS LUCHINE",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "941433268",
+    "aprobados": 3,
+    "coordinador": "LINID VALENCIA",
+    "entrenador": "Isaac Betancourt",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1180",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 24",
     "nombre": "EDUARDO HARO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -17650,18 +20508,22 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1150",
-    "pendientes": 2,
+    "id": "fi_part_1181",
+    "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 24",
-    "nombre": "ENRIQUE FRANCO",
+    "nombre": "ANA CARINA CARDENAS",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
-    "sede": "Guayaquil",
+    "sede": "Lima",
     "diasDesdePFD": 27,
-    "dni": "0980805649",
-    "aprobados": 1,
-    "coordinador": "",
+    "dni": "51996468297",
+    "aprobados": 3,
+    "coordinador": "LINID VALENCIA",
     "entrenador": "Erika Gavilánez",
     "fis": [
       {
@@ -17672,14 +20534,14 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "area": "Salud & Vitalidad"
       },
       {
-        "estado": "pendiente",
+        "estado": "aprobado",
         "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
         "feedback": "",
         "meta": "Cumplimiento del estándar superior financiero",
         "area": "Finanzas & Riqueza"
       },
       {
-        "estado": "no_presentado",
+        "estado": "aprobado",
         "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
         "feedback": "",
         "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
@@ -17689,12 +20551,317 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1151",
+    "id": "fi_part_1182",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 24",
+    "nombre": "ELIZABETH HUAMANI",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51947676664",
+    "aprobados": 3,
+    "coordinador": "LINID VALENCIA",
+    "entrenador": "Erika Gavilánez",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1183",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 24",
+    "nombre": "FERNANDO JUAN LOPEZ MELO",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51978581515",
+    "aprobados": 3,
+    "coordinador": "LINID VALENCIA",
+    "entrenador": "Erika Gavilánez",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1184",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 24",
+    "nombre": "GERALDINE STEPHANIE OTRERA",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51944521634",
+    "aprobados": 3,
+    "coordinador": "LINID VALENCIA",
+    "entrenador": "Erika Gavilánez",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1185",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 24",
+    "nombre": "LELY ALTAMIRANO LLANTOY",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51969721562",
+    "aprobados": 3,
+    "coordinador": "LINID VALENCIA",
+    "entrenador": "Erika Gavilánez",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1186",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 24",
+    "nombre": "MARINA PATRICIA CRUZADO MAMANI",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51987724882",
+    "aprobados": 3,
+    "coordinador": "LINID VALENCIA",
+    "entrenador": "Erika Gavilánez",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1187",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 24",
+    "nombre": "OTTY ZULEY URTEAGA SILVA",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51976232368",
+    "aprobados": 3,
+    "coordinador": "LINID VALENCIA",
+    "entrenador": "Erika Gavilánez",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1188",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 24",
+    "nombre": "YENNY PAOLA FLORES TIPISMANA",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51963421178",
+    "aprobados": 3,
+    "coordinador": "LINID VALENCIA",
+    "entrenador": "Erika Gavilánez",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1189",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 25",
     "nombre": "ERIK VACA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -17728,12 +20895,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1152",
+    "id": "fi_part_1190",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 25",
     "nombre": "MARIELA LOPEZ",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -17767,12 +20938,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1153",
+    "id": "fi_part_1191",
     "pendientes": 1,
     "totalFi": 3,
     "equipo": "EQUIPO 25",
     "nombre": "DIEGO SILVA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -17806,12 +20981,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1154",
+    "id": "fi_part_1192",
     "pendientes": 1,
     "totalFi": 3,
     "equipo": "EQUIPO 25",
     "nombre": "PAOLA VERA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -17845,12 +21024,59 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1155",
+    "id": "fi_part_1193",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 25",
+    "nombre": "MARCO ANTONIO VILLARREAL",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "962511575",
+    "aprobados": 3,
+    "coordinador": "LINID VALENCIA",
+    "entrenador": "Lourdes Patiño",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1194",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 26",
     "nombre": "JAHAIRA MUÑOZ",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -17884,51 +21110,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1156",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 18",
-    "nombre": "HUGO CASTILLO",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Cuenca",
-    "diasDesdePFD": 27,
-    "dni": "0986389625",
-    "aprobados": 1,
-    "coordinador": "KERLY CARRILLO",
-    "entrenador": "Ana Monroy",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1157",
+    "id": "fi_part_1195",
     "pendientes": 1,
     "totalFi": 3,
     "equipo": "EQUIPO 26",
     "nombre": "DANNA OCHOA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -17962,51 +21153,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1158",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 18",
-    "nombre": "FRANCISCO ROMERO",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Cuenca",
-    "diasDesdePFD": 27,
-    "dni": "0984051438",
-    "aprobados": 1,
-    "coordinador": "KERLY CARRILLO",
-    "entrenador": "Ana Monroy",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1159",
+    "id": "fi_part_1196",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 18",
     "nombre": "CYNTHIA TIXI",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Cuenca",
     "diasDesdePFD": 27,
@@ -18040,12 +21196,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1160",
+    "id": "fi_part_1197",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 18",
     "nombre": "ALEXANDER YUNGA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Cuenca",
     "diasDesdePFD": 27,
@@ -18079,12 +21239,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1161",
+    "id": "fi_part_1198",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 18",
     "nombre": "BLANCA ORELLANA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Cuenca",
     "diasDesdePFD": 27,
@@ -18118,12 +21282,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1162",
+    "id": "fi_part_1199",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 19",
     "nombre": "MARCELO RIERA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Cuenca",
     "diasDesdePFD": 27,
@@ -18157,16 +21325,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1163",
+    "id": "fi_part_1200",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "EQUIPO 122",
     "nombre": "MARIA ELENA ANDRADE",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1163",
+    "dni": "DNI_1200",
     "aprobados": 0,
     "coordinador": "LILI CUBILLO",
     "entrenador": "Daniela Monroy",
@@ -18196,12 +21368,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1164",
+    "id": "fi_part_1201",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 27",
     "nombre": "KARINA ZAMORA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -18235,16 +21411,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1165",
+    "id": "fi_part_1202",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "EQUIPO 122",
     "nombre": "VIVIANA RUIZ",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1165",
+    "dni": "DNI_1202",
     "aprobados": 0,
     "coordinador": "LILI CUBILLO",
     "entrenador": "Daniela Monroy",
@@ -18274,16 +21454,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1166",
+    "id": "fi_part_1203",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "EQUIPO 123",
     "nombre": "DAYANA TAMAYO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1166",
+    "dni": "DNI_1203",
     "aprobados": 0,
     "coordinador": "REGINA ROMERO",
     "entrenador": "Daniela Monroy",
@@ -18313,51 +21497,59 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1167",
-    "pendientes": 0,
-    "totalFi": 0,
-    "equipo": "EQUIPO 123",
-    "nombre": "WILSON CONZA",
+    "id": "fi_part_1204",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 26",
+    "nombre": "FABIO ALESSANDRO CANQUI LLOYD",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
-    "sede": "Quito",
+    "sede": "Lima",
     "diasDesdePFD": 27,
-    "dni": "0961944443",
-    "aprobados": 0,
-    "coordinador": "REGINA ROMERO",
-    "entrenador": "Daniela Monroy",
+    "dni": "DNI_1204",
+    "aprobados": 1,
+    "coordinador": "",
+    "entrenador": "Josué Vera",
     "fis": [
       {
-        "estado": "no_presentado",
-        "titulo": "",
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
         "feedback": "",
-        "meta": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
         "area": "Salud & Vitalidad"
       },
       {
-        "estado": "no_presentado",
-        "titulo": "",
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
         "feedback": "",
-        "meta": "",
+        "meta": "Cumplimiento del estándar superior financiero",
         "area": "Finanzas & Riqueza"
       },
       {
         "estado": "no_presentado",
-        "titulo": "",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
         "feedback": "",
-        "meta": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
         "area": "Relaciones & Familia"
       }
     ]
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1168",
+    "id": "fi_part_1205",
     "pendientes": 1,
     "totalFi": 3,
     "equipo": "EQUIPO 28",
     "nombre": "LAURA TOAPANTA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -18391,12 +21583,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1169",
+    "id": "fi_part_1206",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 30",
     "nombre": "ALVARO ANGARITA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -18430,12 +21626,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1170",
+    "id": "fi_part_1207",
     "pendientes": 1,
     "totalFi": 3,
     "equipo": "EQUIPO 30",
     "nombre": "WILSON VALLEJO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -18469,12 +21669,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1171",
+    "id": "fi_part_1208",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 30",
     "nombre": "KARINA GARCIA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -18508,16 +21712,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1172",
+    "id": "fi_part_1209",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 31",
     "nombre": "MARIEL GUERRERO",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
-    "dni": "DNI_1172",
+    "dni": "DNI_1209",
     "aprobados": 1,
     "coordinador": "",
     "entrenador": "Linid Valencia",
@@ -18547,12 +21755,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1173",
+    "id": "fi_part_1210",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 31",
     "nombre": "LEO ANGARITA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -18586,12 +21798,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1174",
+    "id": "fi_part_1211",
     "pendientes": 1,
     "totalFi": 3,
     "equipo": "EQUIPO 31",
     "nombre": "BELEN GARCIA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -18625,12 +21841,102 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1175",
+    "id": "fi_part_1212",
+    "pendientes": 1,
+    "totalFi": 3,
+    "equipo": "EQUIPO 26",
+    "nombre": "ANITA ESPERANZA FLORES TIPISMANA",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51998795068",
+    "aprobados": 2,
+    "coordinador": "LINID VALENCIA",
+    "entrenador": "Josué Vera",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "no_presentado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1213",
+    "pendientes": 1,
+    "totalFi": 3,
+    "equipo": "EQUIPO 26",
+    "nombre": "BRIAN STEVE SANGAY SALVATIERRA",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51902807431",
+    "aprobados": 2,
+    "coordinador": "LINID VALENCIA",
+    "entrenador": "Josué Vera",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "no_presentado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1214",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 44",
     "nombre": "BELÉN GARCÍA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -18664,16 +21970,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1176",
+    "id": "fi_part_1215",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 49",
     "nombre": "DANIELA VELARDE",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1176",
+    "dni": "DNI_1215",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Diego Bravo",
@@ -18703,16 +22013,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1177",
+    "id": "fi_part_1216",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 50",
     "nombre": "ESTEBAN CAJIAO",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1177",
+    "dni": "DNI_1216",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Diego Bravo",
@@ -18742,16 +22056,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1178",
+    "id": "fi_part_1217",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 50",
     "nombre": "YOXI GARCÍA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1178",
+    "dni": "DNI_1217",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Diego Bravo",
@@ -18781,16 +22099,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1179",
+    "id": "fi_part_1218",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 51",
     "nombre": "JOHANA HERRERA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1179",
+    "dni": "DNI_1218",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Alejandro Diaz",
@@ -18820,16 +22142,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1180",
+    "id": "fi_part_1219",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 51",
     "nombre": "JUAN MACAS",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1180",
+    "dni": "DNI_1219",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Diego Bravo",
@@ -18859,16 +22185,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1181",
+    "id": "fi_part_1220",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 51",
     "nombre": "GABRIEL GARCÍA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1181",
+    "dni": "DNI_1220",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Mildred Muñoz",
@@ -18898,16 +22228,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1182",
+    "id": "fi_part_1221",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 52",
     "nombre": "TANIA CUMBAL",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1182",
+    "dni": "DNI_1221",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Leandro",
@@ -18937,16 +22271,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1183",
+    "id": "fi_part_1222",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 53",
     "nombre": "JOSUÉ VERA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1183",
+    "dni": "DNI_1222",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Andrés Gómez",
@@ -18976,16 +22314,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1184",
+    "id": "fi_part_1223",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 54",
     "nombre": "ALEJANDRO LÓPEZ",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1184",
+    "dni": "DNI_1223",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Andrés Gómez",
@@ -19015,16 +22357,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1185",
+    "id": "fi_part_1224",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 54",
     "nombre": "JOAO TRUJILLO",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1185",
+    "dni": "DNI_1224",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Andrés Gómez",
@@ -19054,12 +22400,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1186",
+    "id": "fi_part_1225",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 54",
     "nombre": "KERLIE CARRILLO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -19093,16 +22443,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1187",
+    "id": "fi_part_1226",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 54",
     "nombre": "MIGUEL ROBALINO",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1187",
+    "dni": "DNI_1226",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Diego Bravo",
@@ -19132,16 +22486,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1188",
+    "id": "fi_part_1227",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 54",
     "nombre": "VÍCTOR ALVEAR",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1188",
+    "dni": "DNI_1227",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Diego Bravo",
@@ -19171,16 +22529,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1189",
+    "id": "fi_part_1228",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 54",
     "nombre": "MILA CAMPUZANO",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1189",
+    "dni": "DNI_1228",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Mildred Muñoz",
@@ -19210,16 +22572,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1190",
+    "id": "fi_part_1229",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 55",
     "nombre": "CRISTIAN TITO",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1190",
+    "dni": "DNI_1229",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Andrés Gómez",
@@ -19249,16 +22615,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1191",
+    "id": "fi_part_1230",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 55",
     "nombre": "DAVID CAJIAO",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1191",
+    "dni": "DNI_1230",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Diego Bravo",
@@ -19288,16 +22658,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1192",
+    "id": "fi_part_1231",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 55",
     "nombre": "ESTEFY ESPINOSA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1192",
+    "dni": "DNI_1231",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Lourdes Patiño",
@@ -19327,16 +22701,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1193",
+    "id": "fi_part_1232",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 55",
     "nombre": "HÉCTOR CASTELLANOS",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1193",
+    "dni": "DNI_1232",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Mildred Muñoz",
@@ -19366,16 +22744,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1194",
+    "id": "fi_part_1233",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 56",
     "nombre": "MINDY ORTEGA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1194",
+    "dni": "DNI_1233",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Andrés Gómez",
@@ -19405,12 +22787,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1195",
+    "id": "fi_part_1234",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 56",
     "nombre": "ERIKA PAZMIÑO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -19444,1540 +22830,23 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1196",
+    "id": "fi_part_1235",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 57",
     "nombre": "ADRIANA GUARICHICO",
+    "rol": "PX",
     "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1196",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Andrés Gómez",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1197",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 57",
-    "nombre": "DIEGO MIRANDA",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1197",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Leandro",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1198",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 57",
-    "nombre": "JULIO CESAR NARVÁEZ",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1198",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Lourdes Patiño",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1199",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 57",
-    "nombre": "EDUARDO GARCÍA",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1199",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Mike Boada",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1200",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 58",
-    "nombre": "MICHELLE ESTRADA",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1200",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Andrés Gómez",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1201",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 58",
-    "nombre": "DIANA MARTÍNEZ",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "0995986195",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Diego Bravo",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1202",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 58",
-    "nombre": "JACQUELINE LÓPEZ",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1202",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Mildred Muñoz",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1203",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 59",
-    "nombre": "CAMILA ZAVALA",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1203",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Alejandro Diaz",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1204",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 59",
-    "nombre": "ARIEL CAJIAO",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1204",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Andrés Gómez",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1205",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 59",
-    "nombre": "ORIANA LLOVERA",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1205",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Jesus Acosta",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1206",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 59",
-    "nombre": "REGINA ROMERO",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1206",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Leandro",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1207",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 60",
-    "nombre": "TATI CELI",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1207",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Andrés Gómez",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1208",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 60",
-    "nombre": "EDUARDO REINOSO",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1208",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Diego Bravo",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1209",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 60",
-    "nombre": "CYNTHIA GUALAVISI",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1209",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Lourdes Patiño",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1210",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 60",
-    "nombre": "JEANNETH VELAZCO",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1210",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Lourdes Patiño",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1211",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 61",
-    "nombre": "KATHY FELIX",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1211",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Andrés Gómez",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1212",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 61",
-    "nombre": "GEOVANA TAMAYO",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1212",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Leandro",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1213",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 61",
-    "nombre": "KEVIN ROMERO",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1213",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Lourdes Patiño",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1214",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 61",
-    "nombre": "FELIPE VALENCIA",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1214",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Mike Boada",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1215",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 61",
-    "nombre": "LIZ ZAMBRANO",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1215",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Mike Boada",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1216",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 61",
-    "nombre": "ANDREA VIÑAMAGUA",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1216",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Mildred Muñoz",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1217",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 61",
-    "nombre": "JOSÉ LUIS SANTOLIVA",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1217",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Mildred Muñoz",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1218",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 62",
-    "nombre": "HENNY XIMENA BARRAGAN",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1218",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Andrés Gómez",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1219",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 62",
-    "nombre": "DAYANA VILLA",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1219",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Christian Tito",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1220",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 62",
-    "nombre": "ALEXANDRA GALARZA",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1220",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Diego Bravo",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1221",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 62",
-    "nombre": "LUIS LUNA",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1221",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Diego Bravo",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1222",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 62",
-    "nombre": "IDROBO ANDRÉS",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1222",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Mildred Muñoz",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1223",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 63",
-    "nombre": "MIGUEL TORRES",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "0991680131",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Alejandro Diaz",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1224",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 63",
-    "nombre": "MARTIN QUINAPALLO",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1224",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Jesus Acosta",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1225",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 63",
-    "nombre": "SUSANA LINCANGO",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1225",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Jesus Acosta",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1226",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 63",
-    "nombre": "RENATA CHALA",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1226",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Leandro",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1227",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 63",
-    "nombre": "TABATA QUINAPALLO",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1227",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Lourdes Patiño",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1228",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 63",
-    "nombre": "JORGE LUIS ZAPATA",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1228",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Mike Boada",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1229",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 64",
-    "nombre": "PABLO ZAPATA",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1229",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Alejandro Diaz",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1230",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 64",
-    "nombre": "KARELYS MÉNDEZ",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1230",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Andrés Gómez",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1231",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 64",
-    "nombre": "NATHALI LÓPEZ",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1231",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Andrés Gómez",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1232",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 64",
-    "nombre": "FRANCISCO TACO",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1232",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Christian Tito",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1233",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 64",
-    "nombre": "JOHANNA ATARIHUANA",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1233",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Christian Tito",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1234",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 64",
-    "nombre": "ELVIS TERÁN",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1234",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Diego Bravo",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1235",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 64",
-    "nombre": "KATHY GUDIÑO",
-    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
     "dni": "DNI_1235",
     "aprobados": 0,
     "coordinador": "",
-    "entrenador": "Diego Bravo",
+    "entrenador": "Andrés Gómez",
     "fis": [
       {
         "estado": "pendiente",
@@ -21007,16 +22876,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
     "id": "fi_part_1236",
     "pendientes": 2,
     "totalFi": 3,
-    "equipo": "EQUIPO 64",
-    "nombre": "ANABELA FIGUEROA",
+    "equipo": "EQUIPO 57",
+    "nombre": "DIEGO MIRANDA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
     "dni": "DNI_1236",
     "aprobados": 0,
     "coordinador": "",
-    "entrenador": "Lourdes Patiño",
+    "entrenador": "Leandro",
     "fis": [
       {
         "estado": "pendiente",
@@ -21046,9 +22919,13 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
     "id": "fi_part_1237",
     "pendientes": 2,
     "totalFi": 3,
-    "equipo": "EQUIPO 64",
-    "nombre": "ELIZABETH LÓPEZ",
+    "equipo": "EQUIPO 57",
+    "nombre": "JULIO CESAR NARVÁEZ",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -21085,16 +22962,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
     "id": "fi_part_1238",
     "pendientes": 2,
     "totalFi": 3,
-    "equipo": "EQUIPO 64",
-    "nombre": "BRYAN CAICEDO",
+    "equipo": "EQUIPO 57",
+    "nombre": "EDUARDO GARCÍA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "961164574",
+    "dni": "DNI_1238",
     "aprobados": 0,
-    "coordinador": "ERIKA GAVILANEZ",
-    "entrenador": "Mildred Muñoz",
+    "coordinador": "",
+    "entrenador": "Mike Boada",
     "fis": [
       {
         "estado": "pendiente",
@@ -21124,16 +23005,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
     "id": "fi_part_1239",
     "pendientes": 2,
     "totalFi": 3,
-    "equipo": "EQUIPO 65",
-    "nombre": "LIS HARO",
+    "equipo": "EQUIPO 58",
+    "nombre": "MICHELLE ESTRADA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
     "dni": "DNI_1239",
     "aprobados": 0,
     "coordinador": "",
-    "entrenador": "Mike Boada",
+    "entrenador": "Andrés Gómez",
     "fis": [
       {
         "estado": "pendiente",
@@ -21161,37 +23046,41 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   {
     "fechaPFD": "16/08/2026",
     "id": "fi_part_1240",
-    "pendientes": 2,
+    "pendientes": 0,
     "totalFi": 3,
-    "equipo": "EQUIPO 65",
-    "nombre": "MEL MACHADO",
+    "equipo": "EQUIPO 58",
+    "nombre": "DIANA MARTÍNEZ",
+    "rol": "PX",
     "asistioPFD": true,
-    "devueltos": 1,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1240",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Mike Boada",
+    "dni": "0995986195",
+    "aprobados": 3,
+    "coordinador": "JOSUÉ VERA",
+    "entrenador": "Diego Bravo",
     "fis": [
       {
-        "estado": "pendiente",
+        "estado": "aprobado",
         "titulo": "Resultado Imposible 1: Salud & Vitalidad",
         "feedback": "",
         "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
         "area": "Salud & Vitalidad"
       },
       {
-        "estado": "pendiente",
+        "estado": "aprobado",
         "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
         "feedback": "",
         "meta": "Cumplimiento del estándar superior financiero",
         "area": "Finanzas & Riqueza"
       },
       {
-        "estado": "devuelto",
+        "estado": "aprobado",
         "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "feedback": "",
         "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
         "area": "Relaciones & Familia"
       }
@@ -21202,9 +23091,13 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
     "id": "fi_part_1241",
     "pendientes": 2,
     "totalFi": 3,
-    "equipo": "EQUIPO 65",
-    "nombre": "CHRIS BRUNIS",
+    "equipo": "EQUIPO 58",
+    "nombre": "JACQUELINE LÓPEZ",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -21241,9 +23134,13 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
     "id": "fi_part_1242",
     "pendientes": 2,
     "totalFi": 3,
-    "equipo": "EQUIPO 66",
-    "nombre": "XIMENA FONSECA",
+    "equipo": "EQUIPO 59",
+    "nombre": "CAMILA ZAVALA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -21280,9 +23177,13 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
     "id": "fi_part_1243",
     "pendientes": 2,
     "totalFi": 3,
-    "equipo": "EQUIPO 66",
-    "nombre": "JOSUÉ LÓPEZ",
+    "equipo": "EQUIPO 59",
+    "nombre": "ARIEL CAJIAO",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -21319,9 +23220,13 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
     "id": "fi_part_1244",
     "pendientes": 2,
     "totalFi": 3,
-    "equipo": "EQUIPO 66",
-    "nombre": "ORLANDO SOLÍS",
+    "equipo": "EQUIPO 59",
+    "nombre": "ORIANA LLOVERA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -21358,16 +23263,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
     "id": "fi_part_1245",
     "pendientes": 2,
     "totalFi": 3,
-    "equipo": "EQUIPO 66",
-    "nombre": "PATRICIA FLORES",
+    "equipo": "EQUIPO 59",
+    "nombre": "REGINA ROMERO",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
     "dni": "DNI_1245",
     "aprobados": 0,
     "coordinador": "",
-    "entrenador": "Jesus Acosta",
+    "entrenador": "Leandro",
     "fis": [
       {
         "estado": "pendiente",
@@ -21397,16 +23306,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
     "id": "fi_part_1246",
     "pendientes": 2,
     "totalFi": 3,
-    "equipo": "EQUIPO 66",
-    "nombre": "JIMMY ANDRANGO",
+    "equipo": "EQUIPO 60",
+    "nombre": "TATI CELI",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
     "dni": "DNI_1246",
     "aprobados": 0,
     "coordinador": "",
-    "entrenador": "Diego Bravo",
+    "entrenador": "Andrés Gómez",
     "fis": [
       {
         "estado": "pendiente",
@@ -21436,871 +23349,17 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
     "id": "fi_part_1247",
     "pendientes": 2,
     "totalFi": 3,
-    "equipo": "EQUIPO 66",
-    "nombre": "HELEN SIMBANA",
+    "equipo": "EQUIPO 60",
+    "nombre": "EDUARDO REINOSO",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
     "dni": "DNI_1247",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Lourdes Patiño",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1248",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 66",
-    "nombre": "GABY VIZUENA",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1248",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Mildred Muñoz",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1249",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 66",
-    "nombre": "ROMMEL QUILANPALLO",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1249",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Mildred Muñoz",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1250",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 67",
-    "nombre": "NELLY SALINAS",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1250",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Alejandro Diaz",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1251",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 67",
-    "nombre": "ERIKA TRUJILLO",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1251",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Christian Tito",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1252",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 67",
-    "nombre": "KEVIN MORENO",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1252",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Christian Tito",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1253",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 67",
-    "nombre": "CINTHYA MONTANO",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1253",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Julio Narváez",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1254",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 67",
-    "nombre": "ARACELLY SOLANO",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1254",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Leandro",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1255",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 67",
-    "nombre": "EDISSON ABAD",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1255",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Leandro",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1256",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 67",
-    "nombre": "FELIPE LÓPEZ",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1256",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Leandro",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1257",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 68",
-    "nombre": "ESTEBAN ALMEIDA",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1257",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Lourdes Patiño",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1258",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 69",
-    "nombre": "ALEXANDRA VÁSQUEZ",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1258",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Andrés Gómez",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1259",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 69",
-    "nombre": "ESTEBAN JIMÉNEZ",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1259",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "José Torron",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1260",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 69",
-    "nombre": "GABRIELA BARAJA",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1260",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Leandro",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1261",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 69",
-    "nombre": "CRIS RAMOS",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1261",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Lourdes Patiño",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1262",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 69",
-    "nombre": "ELI QUILLUPANGUI",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1262",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Lourdes Patiño",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1263",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 69",
-    "nombre": "ANDREA GUERRERO",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1263",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Mildred Muñoz",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1264",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 70",
-    "nombre": "ALBA GORDILLO",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1264",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Alejandro Diaz",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1265",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 70",
-    "nombre": "ALEX MALDONADO",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1265",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Alejandro Diaz",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1266",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 70",
-    "nombre": "ANDRÉS PILATUNA",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1266",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Alejandro Diaz",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1267",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 70",
-    "nombre": "JESSI VISCAINO",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1267",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Andrés Gómez",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1268",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 70",
-    "nombre": "ALEJANDRO GÓMEZ",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "0999761820",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Jesus Acosta",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1269",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 70",
-    "nombre": "ENRIQUE TIPAN",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1269",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Diego Bravo",
@@ -22330,38 +23389,171 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1270",
-    "pendientes": 0,
+    "id": "fi_part_1248",
+    "pendientes": 2,
     "totalFi": 3,
-    "equipo": "EQUIPO 70",
-    "nombre": "SANDRA MORENO",
+    "equipo": "EQUIPO 60",
+    "nombre": "CYNTHIA GUALAVISI",
+    "rol": "PX",
     "asistioPFD": true,
-    "devueltos": 0,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "593994837809",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
+    "dni": "DNI_1248",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Lourdes Patiño",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1249",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 60",
+    "nombre": "JEANNETH VELAZCO",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1249",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Lourdes Patiño",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1250",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 61",
+    "nombre": "KATHY FELIX",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1250",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Andrés Gómez",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1251",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 61",
+    "nombre": "GEOVANA TAMAYO",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1251",
+    "aprobados": 0,
+    "coordinador": "",
     "entrenador": "Leandro",
     "fis": [
       {
-        "estado": "aprobado",
+        "estado": "pendiente",
         "titulo": "Resultado Imposible 1: Salud & Vitalidad",
         "feedback": "",
         "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
         "area": "Salud & Vitalidad"
       },
       {
-        "estado": "aprobado",
+        "estado": "pendiente",
         "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
         "feedback": "",
         "meta": "Cumplimiento del estándar superior financiero",
         "area": "Finanzas & Riqueza"
       },
       {
-        "estado": "aprobado",
+        "estado": "devuelto",
         "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
         "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
         "area": "Relaciones & Familia"
       }
@@ -22369,16 +23561,149 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1271",
+    "id": "fi_part_1252",
     "pendientes": 2,
     "totalFi": 3,
-    "equipo": "EQUIPO 70",
-    "nombre": "SANTIAGO ARGUELLO",
+    "equipo": "EQUIPO 61",
+    "nombre": "KEVIN ROMERO",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1271",
+    "dni": "DNI_1252",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Lourdes Patiño",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1253",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 61",
+    "nombre": "FELIPE VALENCIA",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1253",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Mike Boada",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1254",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 61",
+    "nombre": "LIZ ZAMBRANO",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1254",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Mike Boada",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1255",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 61",
+    "nombre": "ANDREA VIÑAMAGUA",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1255",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Mildred Muñoz",
@@ -22408,16 +23733,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1272",
+    "id": "fi_part_1256",
     "pendientes": 2,
     "totalFi": 3,
-    "equipo": "EQUIPO 70",
-    "nombre": "DANIEL CHORA",
+    "equipo": "EQUIPO 61",
+    "nombre": "JOSÉ LUIS SANTOLIVA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1272",
+    "dni": "DNI_1256",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Mildred Muñoz",
@@ -22447,16 +23776,493 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1273",
+    "id": "fi_part_1257",
     "pendientes": 2,
     "totalFi": 3,
-    "equipo": "EQUIPO 71",
-    "nombre": "JAIME MARTÍNEZ",
+    "equipo": "EQUIPO 62",
+    "nombre": "HENNY XIMENA BARRAGAN",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1273",
+    "dni": "DNI_1257",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Andrés Gómez",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1258",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 62",
+    "nombre": "DAYANA VILLA",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1258",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Christian Tito",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1259",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 62",
+    "nombre": "ALEXANDRA GALARZA",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1259",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Diego Bravo",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1260",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 62",
+    "nombre": "LUIS LUNA",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1260",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Diego Bravo",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1261",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 62",
+    "nombre": "IDROBO ANDRÉS",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1261",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Mildred Muñoz",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1262",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 63",
+    "nombre": "MIGUEL TORRES",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "0991680131",
+    "aprobados": 3,
+    "coordinador": "JOSUÉ VERA",
+    "entrenador": "Alejandro Diaz",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1263",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 63",
+    "nombre": "MARTIN QUINAPALLO",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1263",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Jesus Acosta",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1264",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 63",
+    "nombre": "SUSANA LINCANGO",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1264",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Jesus Acosta",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1265",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 63",
+    "nombre": "RENATA CHALA",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1265",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Leandro",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1266",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 63",
+    "nombre": "TABATA QUINAPALLO",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1266",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Lourdes Patiño",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1267",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 63",
+    "nombre": "JORGE LUIS ZAPATA",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1267",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Mike Boada",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1268",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 64",
+    "nombre": "PABLO ZAPATA",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1268",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Alejandro Diaz",
@@ -22486,12 +24292,231 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
+    "id": "fi_part_1269",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 64",
+    "nombre": "KARELYS MÉNDEZ",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1269",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Andrés Gómez",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1270",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 64",
+    "nombre": "NATHALI LÓPEZ",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1270",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Andrés Gómez",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1271",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 64",
+    "nombre": "FRANCISCO TACO",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1271",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Christian Tito",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1272",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 64",
+    "nombre": "JOHANNA ATARIHUANA",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1272",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Christian Tito",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1273",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 64",
+    "nombre": "ELVIS TERÁN",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1273",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Diego Bravo",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
     "id": "fi_part_1274",
     "pendientes": 2,
     "totalFi": 3,
-    "equipo": "EQUIPO 71",
-    "nombre": "XIMENA GUERRERO",
+    "equipo": "EQUIPO 64",
+    "nombre": "KATHY GUDIÑO",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -22528,16 +24553,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
     "id": "fi_part_1275",
     "pendientes": 2,
     "totalFi": 3,
-    "equipo": "EQUIPO 71",
-    "nombre": "WENDY PINTO",
+    "equipo": "EQUIPO 64",
+    "nombre": "ANABELA FIGUEROA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
     "dni": "DNI_1275",
     "aprobados": 0,
     "coordinador": "",
-    "entrenador": "Julio Narváez",
+    "entrenador": "Lourdes Patiño",
     "fis": [
       {
         "estado": "pendiente",
@@ -22567,16 +24596,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
     "id": "fi_part_1276",
     "pendientes": 2,
     "totalFi": 3,
-    "equipo": "EQUIPO 71",
-    "nombre": "MARJORIE MARTÍNEZ",
+    "equipo": "EQUIPO 64",
+    "nombre": "ELIZABETH LÓPEZ",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
     "dni": "DNI_1276",
     "aprobados": 0,
     "coordinador": "",
-    "entrenador": "Leandro",
+    "entrenador": "Lourdes Patiño",
     "fis": [
       {
         "estado": "pendiente",
@@ -22606,16 +24639,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
     "id": "fi_part_1277",
     "pendientes": 2,
     "totalFi": 3,
-    "equipo": "EQUIPO 71",
-    "nombre": "BRYAN IZA",
+    "equipo": "EQUIPO 65",
+    "nombre": "LIS HARO",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "962992736",
+    "dni": "DNI_1277",
     "aprobados": 0,
-    "coordinador": "ISAAC BETANCOURTH",
-    "entrenador": "Lourdes Patiño",
+    "coordinador": "",
+    "entrenador": "Mike Boada",
     "fis": [
       {
         "estado": "pendiente",
@@ -22645,16 +24682,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
     "id": "fi_part_1278",
     "pendientes": 2,
     "totalFi": 3,
-    "equipo": "EQUIPO 71",
-    "nombre": "XAVIER LUTUALA",
+    "equipo": "EQUIPO 65",
+    "nombre": "MEL MACHADO",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
     "dni": "DNI_1278",
     "aprobados": 0,
     "coordinador": "",
-    "entrenador": "Mildred Muñoz",
+    "entrenador": "Mike Boada",
     "fis": [
       {
         "estado": "pendiente",
@@ -22684,169 +24725,17 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
     "id": "fi_part_1279",
     "pendientes": 2,
     "totalFi": 3,
-    "equipo": "EQUIPO 72",
-    "nombre": "ANGELA LEÓN",
+    "equipo": "EQUIPO 65",
+    "nombre": "CHRIS BRUNIS",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
     "dni": "DNI_1279",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Andrés Gómez",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1280",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 72",
-    "nombre": "NATHY TATES",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1280",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Andrés Gómez",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1281",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 72",
-    "nombre": "JAIDELYS HERNÁNDEZ",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1281",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Lourdes Patiño",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1282",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 72",
-    "nombre": "NATHY CEPEDA",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1282",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Lourdes Patiño",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1283",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 72",
-    "nombre": "CARMEN SÁNCHEZ",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1283",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Mildred Muñoz",
@@ -22876,19 +24765,195 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
+    "id": "fi_part_1280",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 66",
+    "nombre": "XIMENA FONSECA",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1280",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Alejandro Diaz",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1281",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 66",
+    "nombre": "JOSUÉ LÓPEZ",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1281",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Andrés Gómez",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1282",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 66",
+    "nombre": "ORLANDO SOLÍS",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1282",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Jesus Acosta",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1283",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 66",
+    "nombre": "PATRICIA FLORES",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1283",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Jesus Acosta",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
     "id": "fi_part_1284",
     "pendientes": 2,
     "totalFi": 3,
-    "equipo": "EQUIPO 73",
-    "nombre": "IRMA ZUMARRAGA",
+    "equipo": "EQUIPO 66",
+    "nombre": "JIMMY ANDRANGO",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
     "dni": "DNI_1284",
     "aprobados": 0,
     "coordinador": "",
-    "entrenador": "Andrés Gómez",
+    "entrenador": "Diego Bravo",
     "fis": [
       {
         "estado": "pendiente",
@@ -22918,16 +24983,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
     "id": "fi_part_1285",
     "pendientes": 2,
     "totalFi": 3,
-    "equipo": "EQUIPO 73",
-    "nombre": "MYRIAM GARCÍA",
+    "equipo": "EQUIPO 66",
+    "nombre": "HELEN SIMBANA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
     "dni": "DNI_1285",
     "aprobados": 0,
     "coordinador": "",
-    "entrenador": "Andrés Gómez",
+    "entrenador": "Lourdes Patiño",
     "fis": [
       {
         "estado": "pendiente",
@@ -22957,13 +25026,490 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
     "id": "fi_part_1286",
     "pendientes": 2,
     "totalFi": 3,
-    "equipo": "EQUIPO 73",
-    "nombre": "JAVIER MEDINA",
+    "equipo": "EQUIPO 66",
+    "nombre": "GABY VIZUENA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
     "dni": "DNI_1286",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Mildred Muñoz",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1287",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 66",
+    "nombre": "ROMMEL QUILANPALLO",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1287",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Mildred Muñoz",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1288",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 67",
+    "nombre": "NELLY SALINAS",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1288",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Alejandro Diaz",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1289",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 67",
+    "nombre": "ERIKA TRUJILLO",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1289",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Christian Tito",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1290",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 67",
+    "nombre": "KEVIN MORENO",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1290",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Christian Tito",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1291",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 67",
+    "nombre": "CINTHYA MONTANO",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1291",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Julio Narváez",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1292",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 67",
+    "nombre": "ARACELLY SOLANO",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1292",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Leandro",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1293",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 67",
+    "nombre": "EDISSON ABAD",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1293",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Leandro",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1294",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 67",
+    "nombre": "FELIPE LÓPEZ",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1294",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Leandro",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1295",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 68",
+    "nombre": "ESTEBAN ALMEIDA",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1295",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Lourdes Patiño",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1296",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 69",
+    "nombre": "ALEXANDRA VÁSQUEZ",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1296",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Andrés Gómez",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1297",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 69",
+    "nombre": "ESTEBAN JIMÉNEZ",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1297",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "José Torron",
@@ -22993,12 +25539,1134 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1287",
+    "id": "fi_part_1298",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 69",
+    "nombre": "GABRIELA BARAJA",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1298",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Leandro",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1299",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 69",
+    "nombre": "CRIS RAMOS",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1299",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Lourdes Patiño",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1300",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 69",
+    "nombre": "ELI QUILLUPANGUI",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1300",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Lourdes Patiño",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1301",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 69",
+    "nombre": "ANDREA GUERRERO",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1301",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Mildred Muñoz",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1302",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 70",
+    "nombre": "ALBA GORDILLO",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1302",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Alejandro Diaz",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1303",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 70",
+    "nombre": "ALEX MALDONADO",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1303",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Alejandro Diaz",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1304",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 70",
+    "nombre": "ANDRÉS PILATUNA",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1304",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Alejandro Diaz",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1305",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 70",
+    "nombre": "JESSI VISCAINO",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1305",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Andrés Gómez",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1306",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 70",
+    "nombre": "ALEJANDRO GÓMEZ",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "0999761820",
+    "aprobados": 3,
+    "coordinador": "JOSUÉ VERA",
+    "entrenador": "Jesus Acosta",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1307",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 70",
+    "nombre": "ENRIQUE TIPAN",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1307",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Diego Bravo",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1308",
+    "pendientes": 0,
+    "totalFi": 3,
+    "equipo": "EQUIPO 70",
+    "nombre": "SANDRA MORENO",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
+    "devueltos": 0,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "593994837809",
+    "aprobados": 3,
+    "coordinador": "JOSUÉ VERA",
+    "entrenador": "Leandro",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1309",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 70",
+    "nombre": "SANTIAGO ARGUELLO",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1309",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Mildred Muñoz",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1310",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 70",
+    "nombre": "DANIEL CHORA",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1310",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Mildred Muñoz",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1311",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 71",
+    "nombre": "JAIME MARTÍNEZ",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1311",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Alejandro Diaz",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1312",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 71",
+    "nombre": "XIMENA GUERRERO",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1312",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Diego Bravo",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1313",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 71",
+    "nombre": "WENDY PINTO",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1313",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Julio Narváez",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1314",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 71",
+    "nombre": "MARJORIE MARTÍNEZ",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1314",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Leandro",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1315",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 71",
+    "nombre": "XAVIER LUTUALA",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1315",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Mildred Muñoz",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1316",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 72",
+    "nombre": "ANGELA LEÓN",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1316",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Andrés Gómez",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1317",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 72",
+    "nombre": "NATHY TATES",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1317",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Andrés Gómez",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1318",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 72",
+    "nombre": "JAIDELYS HERNÁNDEZ",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1318",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Lourdes Patiño",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1319",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 72",
+    "nombre": "NATHY CEPEDA",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1319",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Lourdes Patiño",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1320",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 72",
+    "nombre": "CARMEN SÁNCHEZ",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1320",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Mildred Muñoz",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1321",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 73",
+    "nombre": "IRMA ZUMARRAGA",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1321",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Andrés Gómez",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1322",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 73",
+    "nombre": "MYRIAM GARCÍA",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1322",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "Andrés Gómez",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1323",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 73",
+    "nombre": "JAVIER MEDINA",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 1,
+    "sede": "Quito",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1323",
+    "aprobados": 0,
+    "coordinador": "",
+    "entrenador": "José Torron",
+    "fis": [
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "devuelto",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "Ajustar indicador medible según directiva de estándar superior",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1324",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 73",
     "nombre": "ANDRÉS ARMAS",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -23032,16 +26700,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1288",
+    "id": "fi_part_1325",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 73",
     "nombre": "MELANIE MARTÍNEZ",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1288",
+    "dni": "DNI_1325",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Leandro",
@@ -23071,16 +26743,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1289",
+    "id": "fi_part_1326",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 73",
     "nombre": "MARÍA JOSÉ FONSECA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1289",
+    "dni": "DNI_1326",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Lourdes Patiño",
@@ -23110,16 +26786,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1290",
+    "id": "fi_part_1327",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 73",
     "nombre": "ROSARIO GAIBOR",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1290",
+    "dni": "DNI_1327",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Lourdes Patiño",
@@ -23149,16 +26829,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1291",
+    "id": "fi_part_1328",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 73",
     "nombre": "KEVIN VÁZQUEZ",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1291",
+    "dni": "DNI_1328",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Mildred Muñoz",
@@ -23188,16 +26872,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1292",
+    "id": "fi_part_1329",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 74",
     "nombre": "ALBERT MEDINA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1292",
+    "dni": "DNI_1329",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Alejandro Diaz",
@@ -23227,16 +26915,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1293",
+    "id": "fi_part_1330",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 74",
     "nombre": "PEDRO SILVA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1293",
+    "dni": "DNI_1330",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Alejandro Diaz",
@@ -23266,16 +26958,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1294",
+    "id": "fi_part_1331",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 74",
     "nombre": "ANDRÉS PAREDES",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1294",
+    "dni": "DNI_1331",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Jesus Acosta",
@@ -23305,16 +27001,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1295",
+    "id": "fi_part_1332",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 74",
     "nombre": "ARIANA MÉNDEZ",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1295",
+    "dni": "DNI_1332",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Leandro",
@@ -23344,16 +27044,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1296",
+    "id": "fi_part_1333",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 74",
     "nombre": "FERNANDA PEREIRA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1296",
+    "dni": "DNI_1333",
     "aprobados": 0,
     "coordinador": "ERIKA GAVILANEZ",
     "entrenador": "Leandro",
@@ -23383,16 +27087,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1297",
+    "id": "fi_part_1334",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 75",
     "nombre": "MICHAEL LANDETA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1297",
+    "dni": "DNI_1334",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Alejandro Diaz",
@@ -23422,16 +27130,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1298",
+    "id": "fi_part_1335",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 75",
     "nombre": "GUSTAVO RUIZ",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1298",
+    "dni": "DNI_1335",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Andrés Gómez",
@@ -23461,16 +27173,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1299",
+    "id": "fi_part_1336",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 75",
     "nombre": "JOHANNA HERRERA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1299",
+    "dni": "DNI_1336",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Andrés Gómez",
@@ -23500,16 +27216,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1300",
+    "id": "fi_part_1337",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 75",
     "nombre": "DANNY SILVA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1300",
+    "dni": "DNI_1337",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Jesus Acosta",
@@ -23539,16 +27259,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1301",
+    "id": "fi_part_1338",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 75",
     "nombre": "SOLANGGI SILVA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1301",
+    "dni": "DNI_1338",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Jesus Acosta",
@@ -23578,16 +27302,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1302",
+    "id": "fi_part_1339",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 75",
     "nombre": "MARTEO PACHACAMA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1302",
+    "dni": "DNI_1339",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Diego Bravo",
@@ -23617,16 +27345,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1303",
+    "id": "fi_part_1340",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 75",
     "nombre": "SEBASTIÁN MORENO",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1303",
+    "dni": "DNI_1340",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Leandro",
@@ -23656,16 +27388,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1304",
+    "id": "fi_part_1341",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 75",
     "nombre": "CRISTINA ROMÁN",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1304",
+    "dni": "DNI_1341",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Mike Boada",
@@ -23695,16 +27431,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1305",
+    "id": "fi_part_1342",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 75",
     "nombre": "ALEJANDRO ENRÍQUEZ",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1305",
+    "dni": "DNI_1342",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Mildred Muñoz",
@@ -23734,16 +27474,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1306",
+    "id": "fi_part_1343",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 76",
     "nombre": "ROSSY BAYAS",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1306",
+    "dni": "DNI_1343",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Andrés Gómez",
@@ -23773,16 +27517,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1307",
+    "id": "fi_part_1344",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 76",
     "nombre": "GRACE PUMISACHO",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1307",
+    "dni": "DNI_1344",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Lourdes Patiño",
@@ -23812,12 +27560,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1308",
+    "id": "fi_part_1345",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 77",
     "nombre": "VICTORIA ANDRADE",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -23851,16 +27603,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1309",
+    "id": "fi_part_1346",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 77",
     "nombre": "LILI CUBILLO",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1309",
+    "dni": "DNI_1346",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Lourdes Patiño",
@@ -23890,16 +27646,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1310",
+    "id": "fi_part_1347",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 77",
     "nombre": "OSCAR LAMIÑA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1310",
+    "dni": "DNI_1347",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Lourdes Patiño",
@@ -23929,16 +27689,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1311",
+    "id": "fi_part_1348",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 77",
     "nombre": "JOSÉ ÁNGEL ROMERO",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1311",
+    "dni": "DNI_1348",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Mike Boada",
@@ -23968,16 +27732,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1312",
+    "id": "fi_part_1349",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 77",
     "nombre": "ALEXANDRA VIVAS",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1312",
+    "dni": "DNI_1349",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Mildred Muñoz",
@@ -24007,16 +27775,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1313",
+    "id": "fi_part_1350",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 78",
     "nombre": "ISRAEL BALAREZO",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1313",
+    "dni": "DNI_1350",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Andrés Gómez",
@@ -24046,16 +27818,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1314",
+    "id": "fi_part_1351",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 78",
     "nombre": "JENNY CADENA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1314",
+    "dni": "DNI_1351",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Andrés Gómez",
@@ -24085,16 +27861,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1315",
+    "id": "fi_part_1352",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 78",
     "nombre": "MELI VALENZUELA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1315",
+    "dni": "DNI_1352",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Andrés Gómez",
@@ -24124,16 +27904,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1316",
+    "id": "fi_part_1353",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 78",
     "nombre": "ANITA GUANOLUISA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1316",
+    "dni": "DNI_1353",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Jesus Acosta",
@@ -24163,16 +27947,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1317",
+    "id": "fi_part_1354",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 78",
     "nombre": "GEOVY AMORES",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1317",
+    "dni": "DNI_1354",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Jesus Acosta",
@@ -24202,16 +27990,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1318",
+    "id": "fi_part_1355",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 78",
     "nombre": "MAYTE TASINTUNA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1318",
+    "dni": "DNI_1355",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Jesus Acosta",
@@ -24241,16 +28033,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1319",
+    "id": "fi_part_1356",
     "pendientes": 1,
     "totalFi": 3,
     "equipo": "EQUIPO 78",
     "nombre": "CORINA MORA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1319",
+    "dni": "DNI_1356",
     "aprobados": 2,
     "coordinador": "",
     "entrenador": "Julio Narváez",
@@ -24280,16 +28076,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1320",
+    "id": "fi_part_1357",
     "pendientes": 1,
     "totalFi": 3,
     "equipo": "EQUIPO 78",
     "nombre": "ROBERTO RODRÍGUEZ",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1320",
+    "dni": "DNI_1357",
     "aprobados": 2,
     "coordinador": "",
     "entrenador": "Mike Boada",
@@ -24319,16 +28119,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1321",
+    "id": "fi_part_1358",
     "pendientes": 1,
     "totalFi": 3,
     "equipo": "EQUIPO 78",
     "nombre": "RICARDO GAVILÁNEZ",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1321",
+    "dni": "DNI_1358",
     "aprobados": 2,
     "coordinador": "",
     "entrenador": "Mildred Muñoz",
@@ -24358,12 +28162,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1322",
+    "id": "fi_part_1359",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 79",
     "nombre": "ABIGAIL ORDOÑEZ",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -24397,12 +28205,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1323",
+    "id": "fi_part_1360",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 79",
     "nombre": "RUTH PARRENO",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -24436,12 +28248,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1324",
+    "id": "fi_part_1361",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 79",
     "nombre": "MARGARITA LEMA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -24475,51 +28291,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1325",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 79",
-    "nombre": "ELENA LLANOS",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "593968525606",
-    "aprobados": 1,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Mildred Muñoz",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1326",
+    "id": "fi_part_1362",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 80",
     "nombre": "ANGIE LEÓN",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -24553,51 +28334,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1327",
-    "pendientes": 1,
-    "totalFi": 3,
-    "equipo": "EQUIPO 80",
-    "nombre": "FLOR MENDOZA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "979151395",
-    "aprobados": 2,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Christian Tito",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1328",
+    "id": "fi_part_1363",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 80",
     "nombre": "JENNIFER VILLAVICENCIO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -24631,12 +28377,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1329",
+    "id": "fi_part_1364",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 80",
     "nombre": "CHRISTIAN BUSTAMANTE",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -24670,12 +28420,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1330",
+    "id": "fi_part_1365",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 80",
     "nombre": "ALEJANDRO ARTEAGA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -24709,16 +28463,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1331",
+    "id": "fi_part_1366",
     "pendientes": 1,
     "totalFi": 3,
     "equipo": "EQUIPO 81",
     "nombre": "JOSSELYN USHINA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1331",
+    "dni": "DNI_1366",
     "aprobados": 2,
     "coordinador": "",
     "entrenador": "Alejandro Diaz",
@@ -24748,12 +28506,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1332",
+    "id": "fi_part_1367",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 81",
     "nombre": "EVELYN ROMÁN",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -24787,12 +28549,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1333",
+    "id": "fi_part_1368",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 81",
     "nombre": "MAFER CALDERÓN",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -24826,12 +28592,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1334",
+    "id": "fi_part_1369",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 81",
     "nombre": "CARLOS INTRIAGO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -24865,16 +28635,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1335",
+    "id": "fi_part_1370",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 81",
     "nombre": "CRISTINA GARCÍA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1335",
+    "dni": "DNI_1370",
     "aprobados": 1,
     "coordinador": "",
     "entrenador": "José Torron",
@@ -24904,16 +28678,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1336",
+    "id": "fi_part_1371",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 81",
     "nombre": "MYRIAM FLORES",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1336",
+    "dni": "DNI_1371",
     "aprobados": 1,
     "coordinador": "",
     "entrenador": "José Torron",
@@ -24943,16 +28721,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1337",
+    "id": "fi_part_1372",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 81",
     "nombre": "STALIN GAVIDIA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1337",
+    "dni": "DNI_1372",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Lourdes Patiño",
@@ -24982,51 +28764,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1338",
-    "pendientes": 1,
-    "totalFi": 3,
-    "equipo": "EQUIPO 81",
-    "nombre": "FERNANDO MEDIAVILLA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "5930984435866",
-    "aprobados": 2,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Mildred Muñoz",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1339",
+    "id": "fi_part_1373",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 81",
     "nombre": "MIROSLAVA ROMÁN",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -25060,12 +28807,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1340",
+    "id": "fi_part_1374",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 82",
     "nombre": "MERY LARGO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -25099,12 +28850,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1341",
+    "id": "fi_part_1375",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 82",
     "nombre": "DAVID RUIZ",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -25138,12 +28893,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1342",
+    "id": "fi_part_1376",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 82",
     "nombre": "SAVIE BARRIGA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -25177,16 +28936,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1343",
+    "id": "fi_part_1377",
     "pendientes": 1,
     "totalFi": 3,
     "equipo": "EQUIPO 82",
     "nombre": "GENESIS MENÉNDEZ",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1343",
+    "dni": "DNI_1377",
     "aprobados": 2,
     "coordinador": "",
     "entrenador": "Jesus Acosta",
@@ -25216,12 +28979,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1344",
+    "id": "fi_part_1378",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 82",
     "nombre": "RONALD CARGUA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -25255,12 +29022,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1345",
+    "id": "fi_part_1379",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 82",
     "nombre": "SARA FERNÁNDEZ",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -25294,12 +29065,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1346",
+    "id": "fi_part_1380",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 82",
     "nombre": "SEBASTIÁN ULLOA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -25333,12 +29108,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1347",
+    "id": "fi_part_1381",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 82",
     "nombre": "SANDY MONSERRATE",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -25372,12 +29151,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1348",
+    "id": "fi_part_1382",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 82",
     "nombre": "STEFANY HERRERA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -25411,12 +29194,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1349",
+    "id": "fi_part_1383",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 83",
     "nombre": "XAVIER CALLE",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -25450,12 +29237,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1350",
+    "id": "fi_part_1384",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 83",
     "nombre": "ERICK TAMAYO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -25489,12 +29280,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1351",
+    "id": "fi_part_1385",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 83",
     "nombre": "ALBA BÁEZ",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -25528,12 +29323,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1352",
+    "id": "fi_part_1386",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 83",
     "nombre": "EVELYN HERNÁNDEZ",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -25567,12 +29366,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1353",
+    "id": "fi_part_1387",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 83",
     "nombre": "JONATHAN GUARACA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -25606,12 +29409,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1354",
+    "id": "fi_part_1388",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 83",
     "nombre": "ANDRÉS BANDA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -25645,12 +29452,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1355",
+    "id": "fi_part_1389",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 83",
     "nombre": "DIANA RAMÍREZ",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -25684,12 +29495,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1356",
+    "id": "fi_part_1390",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 83",
     "nombre": "FRANKLIN HERRERA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -25723,16 +29538,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1357",
+    "id": "fi_part_1391",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 83",
     "nombre": "ANTHONY VELASTAGUI",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1357",
+    "dni": "DNI_1391",
     "aprobados": 1,
     "coordinador": "",
     "entrenador": "Mike Boada",
@@ -25762,12 +29581,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1358",
+    "id": "fi_part_1392",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 83",
     "nombre": "CARLOS NAVEDA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -25801,55 +29624,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1359",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 83",
-    "nombre": "BLADIMIR PARRA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "5930995902993",
-    "aprobados": 1,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Mike Boada",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1360",
+    "id": "fi_part_1393",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 83",
     "nombre": "ABI CALDERÓN",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1360",
+    "dni": "DNI_1393",
     "aprobados": 1,
     "coordinador": "",
     "entrenador": "Mike Boada",
@@ -25879,12 +29667,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1361",
+    "id": "fi_part_1394",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 83",
     "nombre": "HUGO CÓRDOVA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -25918,12 +29710,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1362",
+    "id": "fi_part_1395",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 84",
     "nombre": "MAU RIVADENEIRA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -25957,12 +29753,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1363",
+    "id": "fi_part_1396",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 84",
     "nombre": "MIKAELLA CORREA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -25996,51 +29796,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1364",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 84",
-    "nombre": "NICOLE MURGEYTIO",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "593987634771",
-    "aprobados": 1,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Alejandro Diaz",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1365",
+    "id": "fi_part_1397",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 84",
     "nombre": "ANDRÉS WONG",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -26074,12 +29839,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1366",
+    "id": "fi_part_1398",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 84",
     "nombre": "BELEN TRUJILLO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -26113,12 +29882,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1367",
+    "id": "fi_part_1399",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 84",
     "nombre": "DIANA VILLAMAR",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -26152,12 +29925,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1368",
+    "id": "fi_part_1400",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 84",
     "nombre": "LISS ACOSTA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -26191,12 +29968,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1369",
+    "id": "fi_part_1401",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 84",
     "nombre": "MAGY MENDOZA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -26230,12 +30011,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1370",
+    "id": "fi_part_1402",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 84",
     "nombre": "MAISHEL FREIRE",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -26269,12 +30054,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1371",
+    "id": "fi_part_1403",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 84",
     "nombre": "MARTIN QUIROZ",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -26308,12 +30097,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1372",
+    "id": "fi_part_1404",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 84",
     "nombre": "FRANK CALDERÓN",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -26347,12 +30140,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1373",
+    "id": "fi_part_1405",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 84",
     "nombre": "GABRIELA ESPÍN",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -26386,16 +30183,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1374",
+    "id": "fi_part_1406",
     "pendientes": 1,
     "totalFi": 3,
     "equipo": "EQUIPO 84",
     "nombre": "RUBÉN MANAGER",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1374",
+    "dni": "DNI_1406",
     "aprobados": 2,
     "coordinador": "",
     "entrenador": "Erika Gavilánez",
@@ -26425,12 +30226,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1375",
+    "id": "fi_part_1407",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 84",
     "nombre": "POLETH MONTALVO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -26464,12 +30269,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1376",
+    "id": "fi_part_1408",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 84",
     "nombre": "PAMELA TIXI",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -26503,12 +30312,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1377",
+    "id": "fi_part_1409",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 84",
     "nombre": "ALEJANDRA MUÑOZ",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -26542,12 +30355,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1378",
+    "id": "fi_part_1410",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 84",
     "nombre": "GRACE ZAMBRANO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -26581,12 +30398,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1379",
+    "id": "fi_part_1411",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 84",
     "nombre": "JEAN PIERRE QUIROZ",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -26620,12 +30441,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1380",
+    "id": "fi_part_1412",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 84",
     "nombre": "JAHEL SALAZAR",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -26659,16 +30484,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1381",
+    "id": "fi_part_1413",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 84",
     "nombre": "ANDERSON BÁSICO",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1381",
+    "dni": "DNI_1413",
     "aprobados": 1,
     "coordinador": "",
     "entrenador": "Mike Boada",
@@ -26698,12 +30527,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1382",
+    "id": "fi_part_1414",
     "pendientes": 1,
     "totalFi": 3,
     "equipo": "EQUIPO 84",
     "nombre": "NELSON JIMENEZ",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -26737,51 +30570,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1383",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 85",
-    "nombre": "DAYANNA LÓPEZ",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "0980177146",
-    "aprobados": 1,
-    "coordinador": "JOSUE VERA",
-    "entrenador": "José Torron",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1384",
+    "id": "fi_part_1415",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 85",
     "nombre": "LILIBETH CUBILLO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -26815,90 +30613,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1385",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 85",
-    "nombre": "FERNANDO GONZÁLEZ",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "593991488105",
-    "aprobados": 1,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "José Torron",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1386",
-    "pendientes": 1,
-    "totalFi": 3,
-    "equipo": "EQUIPO 85",
-    "nombre": "CARLOS RAMÍREZ",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "51990184115",
-    "aprobados": 2,
-    "coordinador": "",
-    "entrenador": "Julio Narváez",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1387",
+    "id": "fi_part_1416",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 85",
     "nombre": "DAVID GONZÁLEZ FRANCO",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -26932,12 +30656,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1388",
+    "id": "fi_part_1417",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 85",
     "nombre": "VALENTINA RODRÍGUEZ",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -26971,12 +30699,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1389",
+    "id": "fi_part_1418",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 85",
     "nombre": "MARGARITA PILLAJO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -27010,12 +30742,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1390",
+    "id": "fi_part_1419",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 86",
     "nombre": "DANIEL TAPIA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -27049,12 +30785,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1391",
+    "id": "fi_part_1420",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 86",
     "nombre": "JONATHAN HERRERA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -27088,12 +30828,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1392",
+    "id": "fi_part_1421",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 86",
     "nombre": "MILTON CHICAIZA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -27127,12 +30871,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1393",
+    "id": "fi_part_1422",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 86",
     "nombre": "JOSÉ MARÍA JIMÉNEZ",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -27166,12 +30914,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1394",
+    "id": "fi_part_1423",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 86",
     "nombre": "ALEJANDRA TENEMAZA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -27205,12 +30957,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1395",
+    "id": "fi_part_1424",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 86",
     "nombre": "DARWIN CISNEROS",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -27244,12 +31000,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1396",
+    "id": "fi_part_1425",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 86",
     "nombre": "FABIOLA LARA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -27283,12 +31043,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1397",
+    "id": "fi_part_1426",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 86",
     "nombre": "ANDRÉS VALLE",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -27322,12 +31086,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1398",
+    "id": "fi_part_1427",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 87",
     "nombre": "MICHELLE VARGAS",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -27361,12 +31129,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1399",
+    "id": "fi_part_1428",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 87",
     "nombre": "XIMENA CALISPA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -27400,12 +31172,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1400",
+    "id": "fi_part_1429",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 87",
     "nombre": "SANTIAGO BENÍTEZ",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -27439,12 +31215,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1401",
+    "id": "fi_part_1430",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 87",
     "nombre": "DARÍO BETANCOURT",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -27478,12 +31258,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1402",
+    "id": "fi_part_1431",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 87",
     "nombre": "ADAMS GONZÁLEZ",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -27517,16 +31301,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1403",
+    "id": "fi_part_1432",
     "pendientes": 1,
     "totalFi": 3,
     "equipo": "EQUIPO 87",
     "nombre": "IVANA ESPINOZA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1403",
+    "dni": "DNI_1432",
     "aprobados": 2,
     "coordinador": "",
     "entrenador": "Jesus Acosta",
@@ -27556,12 +31344,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1404",
+    "id": "fi_part_1433",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 87",
     "nombre": "ROMINA MARCONI",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -27595,12 +31387,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1405",
+    "id": "fi_part_1434",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 87",
     "nombre": "EMANUEL LLUMIQUINGA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -27634,12 +31430,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1406",
+    "id": "fi_part_1435",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 87",
     "nombre": "FRANCISCO ABAD",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -27673,12 +31473,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1407",
+    "id": "fi_part_1436",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 87",
     "nombre": "YAHAIRA FIERRO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -27712,12 +31516,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1408",
+    "id": "fi_part_1437",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 87",
     "nombre": "FABRICIO MEDINA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -27751,12 +31559,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1409",
+    "id": "fi_part_1438",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 87",
     "nombre": "VANESSA ROMERO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -27790,12 +31602,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1410",
+    "id": "fi_part_1439",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 88",
     "nombre": "ANDRÉS MENA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -27829,51 +31645,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1411",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 88",
-    "nombre": "KATHY MENA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "593996029957",
-    "aprobados": 1,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Alejandro Diaz",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1412",
+    "id": "fi_part_1440",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 88",
     "nombre": "DANIEL ESCOBAR",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -27907,12 +31688,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1413",
+    "id": "fi_part_1441",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 88",
     "nombre": "YOLANDA TORRES",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -27946,12 +31731,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1414",
+    "id": "fi_part_1442",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 88",
     "nombre": "JUAN CASTILLO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -27985,12 +31774,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1415",
+    "id": "fi_part_1443",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 88",
     "nombre": "MÓNICA MENA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -28024,12 +31817,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1416",
+    "id": "fi_part_1444",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 88",
     "nombre": "CARLOS ORTIZ",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -28063,12 +31860,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1417",
+    "id": "fi_part_1445",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 88",
     "nombre": "LEONILA CASTILLO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -28102,51 +31903,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1418",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 88",
-    "nombre": "FABRICIO MONTERO",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "593992789103",
-    "aprobados": 1,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Josué Vera",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1419",
+    "id": "fi_part_1446",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 88",
     "nombre": "JULIANA QUIROZ",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -28180,12 +31946,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1420",
+    "id": "fi_part_1447",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 88",
     "nombre": "LORENA CARRIÓN",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -28219,12 +31989,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1421",
+    "id": "fi_part_1448",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 89",
     "nombre": "PABLO ORTIZ",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -28258,90 +32032,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1422",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 89",
-    "nombre": "SOFIA DUEÑAS",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "0998071513",
-    "aprobados": 1,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Diego Bravo",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1423",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 89",
-    "nombre": "WILLIAM PALADINES",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "0980810907",
-    "aprobados": 1,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Diego Bravo",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1424",
+    "id": "fi_part_1449",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 89",
     "nombre": "CESAR RODRÍGUEZ",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -28375,12 +32075,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1425",
+    "id": "fi_part_1450",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 89",
     "nombre": "MIREYA ADRIANO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -28414,51 +32118,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1426",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 89",
-    "nombre": "CESAR MONTENEGRO",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "0998366343",
-    "aprobados": 1,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Julio Narváez",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1427",
+    "id": "fi_part_1451",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 89",
     "nombre": "EVELYN CUENCA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -28492,12 +32161,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1428",
+    "id": "fi_part_1452",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 89",
     "nombre": "FRANCISCO PACHECO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -28531,16 +32204,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1429",
+    "id": "fi_part_1453",
     "pendientes": 1,
     "totalFi": 3,
     "equipo": "EQUIPO 90",
     "nombre": "CAROLINA SANTAMARIA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1429",
+    "dni": "DNI_1453",
     "aprobados": 2,
     "coordinador": "ERIKA GAVILANEZ",
     "entrenador": "Diego Bravo",
@@ -28570,12 +32247,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1430",
+    "id": "fi_part_1454",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 90",
     "nombre": "GABY VALAREZO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -28609,51 +32290,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1431",
-    "pendientes": 1,
-    "totalFi": 3,
-    "equipo": "EQUIPO 90",
-    "nombre": "VÍCTOR GÓMEZ",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "0991089099",
-    "aprobados": 2,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Erika Gavilánez",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1432",
+    "id": "fi_part_1455",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 90",
     "nombre": "LEONARDO ESPÍN",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -28687,12 +32333,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1433",
+    "id": "fi_part_1456",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 90",
     "nombre": "JAVIER PAZMIÑO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -28726,12 +32376,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1434",
+    "id": "fi_part_1457",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 90",
     "nombre": "JESSY SALAZAR",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -28765,12 +32419,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1435",
+    "id": "fi_part_1458",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 90",
     "nombre": "ABIGAIL AILLON",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -28804,12 +32462,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1436",
+    "id": "fi_part_1459",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 90",
     "nombre": "JHONATAN RUALEZ",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -28843,16 +32505,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1437",
+    "id": "fi_part_1460",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 90",
     "nombre": "RUBÉN CADENA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1437",
+    "dni": "DNI_1460",
     "aprobados": 1,
     "coordinador": "ERIKA GAVILANEZ",
     "entrenador": "Isaac Betancourt",
@@ -28882,12 +32548,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1438",
+    "id": "fi_part_1461",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 90",
     "nombre": "FELIPE CATILLO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -28921,51 +32591,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1439",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 90",
-    "nombre": "PLUTARCO ALMEIDA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "0984458759",
-    "aprobados": 1,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "José Torron",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1440",
+    "id": "fi_part_1462",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 90",
     "nombre": "LEÓN ARMAS",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -28999,51 +32634,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1441",
-    "pendientes": 1,
-    "totalFi": 3,
-    "equipo": "EQUIPO 90",
-    "nombre": "MÓNICA CHÁVEZ",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "0986937742",
-    "aprobados": 2,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Josué Vera",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1442",
+    "id": "fi_part_1463",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 90",
     "nombre": "GABY SÁNCHEZ",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -29077,12 +32677,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1443",
+    "id": "fi_part_1464",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 90",
     "nombre": "DEISY CHACON",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -29116,51 +32720,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1444",
-    "pendientes": 1,
-    "totalFi": 3,
-    "equipo": "EQUIPO 91",
-    "nombre": "VERÓNICA MORALES",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1444",
-    "aprobados": 2,
-    "coordinador": "ISAAC BETANCOURTH",
-    "entrenador": "Ana Cristina Sánchez",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1445",
+    "id": "fi_part_1465",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 91",
     "nombre": "JORGE RODRÍGUEZ",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -29194,51 +32763,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1446",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 91",
-    "nombre": "PAUL MORALES",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "0963085663",
-    "aprobados": 1,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "José Torron",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1447",
+    "id": "fi_part_1466",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 91",
     "nombre": "HORACIO MAFLA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -29272,12 +32806,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1448",
+    "id": "fi_part_1467",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 91",
     "nombre": "PABLO SORIA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -29311,16 +32849,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1449",
+    "id": "fi_part_1468",
     "pendientes": 1,
     "totalFi": 3,
     "equipo": "EQUIPO 91",
     "nombre": "FERNANDO DE LA CRUZ",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1449",
+    "dni": "DNI_1468",
     "aprobados": 2,
     "coordinador": "",
     "entrenador": "Julio Narváez",
@@ -29350,12 +32892,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1450",
+    "id": "fi_part_1469",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 91",
     "nombre": "FABIAN ABAD",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -29389,12 +32935,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1451",
+    "id": "fi_part_1470",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 92",
     "nombre": "SARA CASTILLO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -29428,12 +32978,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1452",
+    "id": "fi_part_1471",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 92",
     "nombre": "MARIO SALAZAR",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -29467,12 +33021,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1453",
+    "id": "fi_part_1472",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 92",
     "nombre": "KARLA PAREDES",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -29506,12 +33064,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1454",
+    "id": "fi_part_1473",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 92",
     "nombre": "MARGARITA BUENAÑO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -29545,12 +33107,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1455",
+    "id": "fi_part_1474",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 92",
     "nombre": "OSCAR ROSERO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -29584,12 +33150,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1456",
+    "id": "fi_part_1475",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 93",
     "nombre": "RUBIO ROSERO ANDREA LIZBETH",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -29623,12 +33193,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1457",
+    "id": "fi_part_1476",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 93",
     "nombre": "SORIA PAREDES MARGARITA DE LAS MERCEDES",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -29662,12 +33236,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1458",
+    "id": "fi_part_1477",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 93",
     "nombre": "MARTÍNEZ GUERRERO MARJORIE XIMENA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -29701,12 +33279,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1459",
+    "id": "fi_part_1478",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 93",
     "nombre": "GUERRERO VITERI MARCIA XIMENA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -29740,12 +33322,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1460",
+    "id": "fi_part_1479",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 93",
     "nombre": "ALTUNA ÁLVAREZ GABRIELA LUCIA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -29779,12 +33365,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1461",
+    "id": "fi_part_1480",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 93",
     "nombre": "ABAD GONZA MISAEL SEBASTIÁN",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -29818,12 +33408,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1462",
+    "id": "fi_part_1481",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 93",
     "nombre": "ESPINOZA ORTIZ IVANA PATRICIA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -29857,12 +33451,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1463",
+    "id": "fi_part_1482",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 93",
     "nombre": "ITAS MAZÓN KAREN SULAY",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -29896,12 +33494,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1464",
+    "id": "fi_part_1483",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 93",
     "nombre": "VARELA CANO SUSANA NOEMI",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -29935,51 +33537,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1465",
-    "pendientes": 1,
-    "totalFi": 3,
-    "equipo": "EQUIPO 93",
-    "nombre": "CADENA MARTÍNEZ KEVIN JOEL",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "987397514",
-    "aprobados": 2,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "María José Román",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1466",
+    "id": "fi_part_1484",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 93",
     "nombre": "GONZA GONZÁLEZ JAIR ISRAEL",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -30013,12 +33580,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1467",
+    "id": "fi_part_1485",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 94",
     "nombre": "LIZZIE ZAMBRANO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -30052,12 +33623,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1468",
+    "id": "fi_part_1486",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 94",
     "nombre": "SANDRA ERAZO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -30091,12 +33666,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1469",
+    "id": "fi_part_1487",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 94",
     "nombre": "ISMAEL GUZMÁN",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -30130,12 +33709,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1470",
+    "id": "fi_part_1488",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 94",
     "nombre": "SANDRA NAULA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -30169,12 +33752,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1471",
+    "id": "fi_part_1489",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 94",
     "nombre": "KARINA MAZON",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -30208,12 +33795,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1472",
+    "id": "fi_part_1490",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 95",
     "nombre": "VÁSQUEZ KEVIN",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -30247,12 +33838,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1473",
+    "id": "fi_part_1491",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 95",
     "nombre": "VILLAMAR PAZ",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -30286,12 +33881,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1474",
+    "id": "fi_part_1492",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 95",
     "nombre": "TAMAYO DAYANA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -30325,12 +33924,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1475",
+    "id": "fi_part_1493",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 95",
     "nombre": "ASANZA NADIA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -30364,12 +33967,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1476",
+    "id": "fi_part_1494",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 95",
     "nombre": "TITO MATEO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -30403,12 +34010,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1477",
+    "id": "fi_part_1495",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 95",
     "nombre": "POZO CAMILA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -30442,12 +34053,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1478",
+    "id": "fi_part_1496",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 95",
     "nombre": "SUAREZ MARLENE",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -30481,51 +34096,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1479",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 95",
-    "nombre": "VERA GEOVANNA",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "0967239396",
-    "aprobados": 0,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Mike Boada",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1480",
+    "id": "fi_part_1497",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 95",
     "nombre": "TAMAYO JANDERY",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -30559,12 +34139,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1481",
+    "id": "fi_part_1498",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 96",
     "nombre": "NANCY MENDOZA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -30598,90 +34182,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1482",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 96",
-    "nombre": "DAVID VALAREZO",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "0959944151",
-    "aprobados": 1,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Josué Vera",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1483",
-    "pendientes": 1,
-    "totalFi": 3,
-    "equipo": "EQUIPO 96",
-    "nombre": "EDMUNDO CARVAJAL",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "0978668372",
-    "aprobados": 2,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "María José Román",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1484",
+    "id": "fi_part_1499",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 96",
     "nombre": "GERARDO MEDIAVILLA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -30715,12 +34225,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1485",
+    "id": "fi_part_1500",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 97",
     "nombre": "JONATHAN HERNÁNDEZ",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -30754,51 +34268,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1486",
-    "pendientes": 1,
-    "totalFi": 3,
-    "equipo": "EQUIPO 97",
-    "nombre": "SANTIAGO ALARCÓN",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "998367570",
-    "aprobados": 2,
-    "coordinador": "ISAAC BETANCOURTH",
-    "entrenador": "Alejandro Diaz",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1487",
+    "id": "fi_part_1501",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 97",
     "nombre": "ADRIANA RAMÍREZ",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -30832,12 +34311,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1488",
+    "id": "fi_part_1502",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 97",
     "nombre": "BRIGGETTE PICOITA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -30871,12 +34354,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1489",
+    "id": "fi_part_1503",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 97",
     "nombre": "MISHELL MOSCOSO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -30910,12 +34397,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1490",
+    "id": "fi_part_1504",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 97",
     "nombre": "VIELKA ALTUNA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -30949,12 +34440,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1491",
+    "id": "fi_part_1505",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 97",
     "nombre": "KARINA SEGURA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -30988,12 +34483,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1492",
+    "id": "fi_part_1506",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 97",
     "nombre": "WILLOW PALADINES",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -31027,12 +34526,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1493",
+    "id": "fi_part_1507",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 97",
     "nombre": "LIZARDO ZARATE",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -31066,51 +34569,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1494",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 98",
-    "nombre": "TANNIA JACQUELINE VALVERDE PANDO",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "0987278887",
-    "aprobados": 0,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "José Sánchez",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1495",
+    "id": "fi_part_1508",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 98",
     "nombre": "GEOVANA ELIZABETH TAMAYO GUACHAMIN",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -31144,90 +34612,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1496",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 98",
-    "nombre": "EDISON JAVIER LUTUALA VALIENTE",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "0962985900",
-    "aprobados": 1,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Julio Narváez",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1497",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 98",
-    "nombre": "DARWIN ALEJANDRO ENRÍQUEZ PUPIALES",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "0981333528",
-    "aprobados": 1,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "María José Román",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1498",
+    "id": "fi_part_1509",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 98",
     "nombre": "MARÍA TERESA MAEJÍA VILLALBA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -31261,51 +34655,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1499",
-    "pendientes": 1,
-    "totalFi": 3,
-    "equipo": "EQUIPO 99",
-    "nombre": "ANDRÉS MACIAS",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "0963482451",
-    "aprobados": 2,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Diego Bravo",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1500",
+    "id": "fi_part_1510",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 99",
     "nombre": "KEVIN CÓRDOVA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -31339,12 +34698,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1501",
+    "id": "fi_part_1511",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 99",
     "nombre": "EVELYN MORENO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -31378,16 +34741,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1502",
+    "id": "fi_part_1512",
     "pendientes": 1,
     "totalFi": 3,
     "equipo": "EQUIPO 99",
     "nombre": "FERNANDO GOZALES",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1502",
+    "dni": "DNI_1512",
     "aprobados": 2,
     "coordinador": "",
     "entrenador": "Josué Vera",
@@ -31417,12 +34784,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1503",
+    "id": "fi_part_1513",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 99",
     "nombre": "NATHALY VELEZ",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -31456,12 +34827,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1504",
+    "id": "fi_part_1514",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 99",
     "nombre": "ISAAC BETANCOURT",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -31495,12 +34870,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1505",
+    "id": "fi_part_1515",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 100",
     "nombre": "ALEX ORBE",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -31534,12 +34913,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1506",
+    "id": "fi_part_1516",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 100",
     "nombre": "SANDRA HURTADO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -31573,12 +34956,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1507",
+    "id": "fi_part_1517",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 100",
     "nombre": "DANIEL VALDEZ",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -31612,12 +34999,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1508",
+    "id": "fi_part_1518",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 100",
     "nombre": "ANDREA CONTRERAS",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -31651,12 +35042,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1509",
+    "id": "fi_part_1519",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 100",
     "nombre": "DARWIN DELGADO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -31690,12 +35085,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1510",
+    "id": "fi_part_1520",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 100",
     "nombre": "ISABEL CARDENAS",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -31729,12 +35128,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1511",
+    "id": "fi_part_1521",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 100",
     "nombre": "RICARDO ESTEVES",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -31768,12 +35171,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1512",
+    "id": "fi_part_1522",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 100",
     "nombre": "ESTEFANIA ROMERO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -31807,12 +35214,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1513",
+    "id": "fi_part_1523",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 100",
     "nombre": "MONICA CASANOVA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -31846,12 +35257,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1514",
+    "id": "fi_part_1524",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 100",
     "nombre": "ELIZABETH JARRIN",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -31885,16 +35300,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1515",
+    "id": "fi_part_1525",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 100",
     "nombre": "SOFIA VASCO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1515",
+    "dni": "DNI_1525",
     "aprobados": 3,
     "coordinador": "ERIKA GAVILANEZ",
     "entrenador": "María José Román",
@@ -31924,12 +35343,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1516",
+    "id": "fi_part_1526",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 100",
     "nombre": "YOXIBETH GARCIA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -31963,12 +35386,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1517",
+    "id": "fi_part_1527",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 100",
     "nombre": "MARCELA TITUAÑA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -32002,12 +35429,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1518",
+    "id": "fi_part_1528",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 100",
     "nombre": "DIEGO BRAVO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -32041,12 +35472,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1519",
+    "id": "fi_part_1529",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 101",
     "nombre": "MARGARITA SORIA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -32080,12 +35515,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1520",
+    "id": "fi_part_1530",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 101",
     "nombre": "ENA CARRERA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -32119,90 +35558,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1521",
-    "pendientes": 1,
-    "totalFi": 3,
-    "equipo": "EQUIPO 101",
-    "nombre": "EVELYN QUINALOA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "984104374",
-    "aprobados": 2,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Lourdes Patiño",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1522",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 102",
-    "nombre": "JUAN CARLOS CARGUACUNDO",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "998789582",
-    "aprobados": 0,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "David Sosa",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1523",
+    "id": "fi_part_1531",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 102",
     "nombre": "EDISON HATTY",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -32236,12 +35601,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1524",
+    "id": "fi_part_1532",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 102",
     "nombre": "DAYANA ZAMBRANO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -32275,12 +35644,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1525",
+    "id": "fi_part_1533",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 102",
     "nombre": "DORIS PAZMIÑO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -32314,12 +35687,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1526",
+    "id": "fi_part_1534",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 102",
     "nombre": "ANAHI REYES",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -32353,51 +35730,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1527",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 102",
-    "nombre": "PABLO COBOS",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "998032222",
-    "aprobados": 0,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Mike Boada",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1528",
+    "id": "fi_part_1535",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 103",
     "nombre": "NATALIA CEPEDA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -32431,12 +35773,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1529",
+    "id": "fi_part_1536",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 103",
     "nombre": "ALEXIS BAZURTO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -32470,51 +35816,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1530",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 103",
-    "nombre": "DIEGO JACOME",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "987621305",
-    "aprobados": 1,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Diego Bravo",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1531",
+    "id": "fi_part_1537",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 103",
     "nombre": "DANIEL VINUEZA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -32548,90 +35859,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1532",
-    "pendientes": 1,
-    "totalFi": 3,
-    "equipo": "EQUIPO 103",
-    "nombre": "KARINA GUARACA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "998294954",
-    "aprobados": 2,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "José Sánchez",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1533",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 103",
-    "nombre": "ARIANA ESTRADA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "983598854",
-    "aprobados": 1,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Julio Narváez",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1534",
+    "id": "fi_part_1538",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 103",
     "nombre": "NICOLE MURGUEYTIO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -32665,12 +35902,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1535",
+    "id": "fi_part_1539",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 103",
     "nombre": "MAURICIO RIVADENEIRA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -32704,12 +35945,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1536",
+    "id": "fi_part_1540",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 103",
     "nombre": "NATT ARTEAGA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -32743,51 +35988,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1537",
-    "pendientes": 1,
-    "totalFi": 3,
-    "equipo": "EQUIPO 104",
-    "nombre": "CASTILLO REYES LEONILA GABRIELA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "593999849832",
-    "aprobados": 2,
-    "coordinador": "ROBERTO RODRIGUEZ",
-    "entrenador": "Ana Monroy",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1538",
+    "id": "fi_part_1541",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 104",
     "nombre": "VASCO BASANTES JOHANNA PAOLA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -32821,16 +36031,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1539",
+    "id": "fi_part_1542",
     "pendientes": 1,
     "totalFi": 3,
     "equipo": "EQUIPO 104",
     "nombre": "JEAN PIERRE SALAZAR",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1539",
+    "dni": "DNI_1542",
     "aprobados": 2,
     "coordinador": "",
     "entrenador": "David Sosa",
@@ -32860,90 +36074,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1540",
-    "pendientes": 1,
-    "totalFi": 3,
-    "equipo": "EQUIPO 104",
-    "nombre": "JAQUI REYES GIOVANNY JAVIER",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "593958834058",
-    "aprobados": 2,
-    "coordinador": "ROBERTO RODRIGUEZ",
-    "entrenador": "Diego Bravo",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1541",
-    "pendientes": 1,
-    "totalFi": 3,
-    "equipo": "EQUIPO 104",
-    "nombre": "BENITEZ NIETO TATIANA MISHELL",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "593999752777",
-    "aprobados": 2,
-    "coordinador": "ROBERTO RODRIGUEZ",
-    "entrenador": "José Sánchez",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1542",
+    "id": "fi_part_1543",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 104",
     "nombre": "TITUANA SUQUILLO MARIA PAULINA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -32977,12 +36117,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1543",
+    "id": "fi_part_1544",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 104",
     "nombre": "CASTILLO REYES JUAN FERNANDO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -33016,12 +36160,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1544",
+    "id": "fi_part_1545",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 104",
     "nombre": "MERINO TARQUI MARGARITA NOEMI",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -33055,12 +36203,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1545",
+    "id": "fi_part_1546",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 104",
     "nombre": "LITA AYALA MARIA AUGUSTA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -33094,129 +36246,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1546",
-    "pendientes": 1,
-    "totalFi": 3,
-    "equipo": "EQUIPO 105",
-    "nombre": "PAZ CRISTINA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "984443805",
-    "aprobados": 2,
-    "coordinador": "ERIKA GAVILANEZ",
-    "entrenador": "Andrés Idrobo",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
     "id": "fi_part_1547",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 105",
-    "nombre": "VILLAMAR VERONICA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "993467965",
-    "aprobados": 1,
-    "coordinador": "",
-    "entrenador": "Diego Bravo",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1548",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 105",
-    "nombre": "CARIUS JONATHAN",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "981744833",
-    "aprobados": 1,
-    "coordinador": "",
-    "entrenador": "Diego Bravo",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1549",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 105",
     "nombre": "MICOLTA BRIANNA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -33250,51 +36289,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1550",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 105",
-    "nombre": "ENRIQUEZ ALEJANDRO",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "981333528",
-    "aprobados": 1,
-    "coordinador": "",
-    "entrenador": "Fernando Mendoza",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1551",
+    "id": "fi_part_1548",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 105",
     "nombre": "PEREIRA JENNIFER",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -33328,12 +36332,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1552",
+    "id": "fi_part_1549",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 105",
     "nombre": "PIARPUEZAN CAMILA MARCELA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -33367,129 +36375,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1553",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 105",
-    "nombre": "MOREJON CRISTINA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "995321338",
-    "aprobados": 1,
-    "coordinador": "",
-    "entrenador": "José Sánchez",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1554",
-    "pendientes": 1,
-    "totalFi": 3,
-    "equipo": "EQUIPO 105",
-    "nombre": "BENITEZ SANTIAGO",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "994347819",
-    "aprobados": 2,
-    "coordinador": "ERIKA GAVILANEZ",
-    "entrenador": "Josué Vera",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1555",
-    "pendientes": 1,
-    "totalFi": 3,
-    "equipo": "EQUIPO 105",
-    "nombre": "GUERRERO MORAIMA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "992935885",
-    "aprobados": 2,
-    "coordinador": "ERIKA GAVILANEZ",
-    "entrenador": "Josué Vera",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1556",
+    "id": "fi_part_1550",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 105",
     "nombre": "HATTY CHRISTIAN",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -33523,12 +36418,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1557",
+    "id": "fi_part_1551",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 105",
     "nombre": "NAVAS YAMILEX",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -33562,12 +36461,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1558",
+    "id": "fi_part_1552",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 105",
     "nombre": "ROMERO JOSE ANGEL",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -33601,90 +36504,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1559",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 105",
-    "nombre": "CHALUISA NATHALIA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "998110306",
-    "aprobados": 1,
-    "coordinador": "",
-    "entrenador": "Pamela Carrillo",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1560",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 105",
-    "nombre": "CARCELEN CARLA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "981370601",
-    "aprobados": 1,
-    "coordinador": "",
-    "entrenador": "Pamela Carrillo",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1561",
+    "id": "fi_part_1553",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 106",
     "nombre": "LAURA VILLAGOMEZ",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -33718,12 +36547,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1562",
+    "id": "fi_part_1554",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 106",
     "nombre": "STEFANY QUILUMBA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -33757,12 +36590,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1563",
+    "id": "fi_part_1555",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 106",
     "nombre": "JUAN GARZON",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -33796,129 +36633,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1564",
-    "pendientes": 1,
-    "totalFi": 3,
-    "equipo": "EQUIPO 106",
-    "nombre": "MARCO CLAVIJO",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "0990342527",
-    "aprobados": 2,
-    "coordinador": "ALEJANDRO DIAZ",
-    "entrenador": "Mauricio Ramírez",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1565",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 106",
-    "nombre": "ANDRES LEON ARMAS",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "984939196",
-    "aprobados": 0,
-    "coordinador": "ALEJANDRO DIAZ",
-    "entrenador": "Mike Boada",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1566",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 107",
-    "nombre": "ANDREA POZO",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "984564752",
-    "aprobados": 1,
-    "coordinador": "ISAAC BETANCOURTH",
-    "entrenador": "Diego Bravo",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1567",
+    "id": "fi_part_1556",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 107",
     "nombre": "KARINA GARCIA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -33952,129 +36676,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1568",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 107",
-    "nombre": "ALISSON BARREROS",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "963136490",
-    "aprobados": 1,
-    "coordinador": "ISAAC BETANCOURTH",
-    "entrenador": "José Sánchez",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1569",
-    "pendientes": 1,
-    "totalFi": 3,
-    "equipo": "EQUIPO 107",
-    "nombre": "MATEO PACHACAMA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "984123196",
-    "aprobados": 2,
-    "coordinador": "ISAAC BETANCOURTH",
-    "entrenador": "Josué Vera",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1570",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 107",
-    "nombre": "MARTIN GARCIA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "999681812",
-    "aprobados": 1,
-    "coordinador": "ISAAC BETANCOURTH",
-    "entrenador": "Julio Narváez",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1571",
+    "id": "fi_part_1557",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 107",
     "nombre": "PAOLA ALMEIDA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -34108,90 +36719,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1572",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 107",
-    "nombre": "JUAN CUZCO",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "990394123",
-    "aprobados": 1,
-    "coordinador": "ISAAC BETANCOURTH",
-    "entrenador": "Kriscia Rodas",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1573",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 107",
-    "nombre": "JORGE GAUNULEMA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "984092584",
-    "aprobados": 1,
-    "coordinador": "ISAAC BETANCOURTH",
-    "entrenador": "Lourdes Patiño",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1574",
+    "id": "fi_part_1558",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 107",
     "nombre": "SEBASTIAN JACOME",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -34225,12 +36762,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1575",
+    "id": "fi_part_1559",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 108",
     "nombre": "JENNIFER VILLAVICINCIO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -34264,12 +36805,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1576",
+    "id": "fi_part_1560",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 108",
     "nombre": "ALEX PICO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -34303,90 +36848,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1577",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 108",
-    "nombre": "GÉNESIS MÉNDEZ",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "0998307134",
-    "aprobados": 1,
-    "coordinador": "ROBERTO RODRIGUEZ",
-    "entrenador": "José Sánchez",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1578",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 108",
-    "nombre": "XIMENA BRIONES",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "0987245276",
-    "aprobados": 1,
-    "coordinador": "ROBERTO RODRIGUEZ",
-    "entrenador": "Julio Narváez",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1579",
+    "id": "fi_part_1561",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 108",
     "nombre": "KARLA PASTRANO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -34420,90 +36891,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1580",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 109",
-    "nombre": "MARIA FERNANDA BASSANTES",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "0958720323",
-    "aprobados": 1,
-    "coordinador": "ISAAC BETANCOURTH",
-    "entrenador": "Diego Bravo",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1581",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 109",
-    "nombre": "OCTAVIO MURGUEYTIO",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "0987458601",
-    "aprobados": 1,
-    "coordinador": "ISAAC BETANCOURTH",
-    "entrenador": "Diego Bravo",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1582",
+    "id": "fi_part_1562",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 109",
     "nombre": "LUIS SABAY",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -34537,51 +36934,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1583",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 109",
-    "nombre": "ALEX ANRRANGO",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "0988626954",
-    "aprobados": 1,
-    "coordinador": "ISAAC BETANCOURTH",
-    "entrenador": "Kriscia Rodas",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1584",
+    "id": "fi_part_1563",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 109",
     "nombre": "CARLOS LARA BURGOS",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -34615,12 +36977,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1585",
+    "id": "fi_part_1564",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 110",
     "nombre": "CAROLINA VINTIMILLA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -34654,90 +37020,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1586",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 110",
-    "nombre": "NATALIA CAJAS",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "593999243226",
-    "aprobados": 1,
-    "coordinador": "ALEJANDRO DIAZ",
-    "entrenador": "José Sánchez",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1587",
-    "pendientes": 1,
-    "totalFi": 3,
-    "equipo": "EQUIPO 110",
-    "nombre": "RUTH CALVACHE",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "593998486533",
-    "aprobados": 2,
-    "coordinador": "ALEJANDRO DIAZ",
-    "entrenador": "Josué Vera",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1588",
+    "id": "fi_part_1565",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 110",
     "nombre": "WILLIAMS SANCHEZ",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -34771,12 +37063,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1589",
+    "id": "fi_part_1566",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 111",
     "nombre": "JUAN MORENO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -34810,12 +37106,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1590",
+    "id": "fi_part_1567",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 111",
     "nombre": "KAROL VILLARUEL",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -34849,12 +37149,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1591",
+    "id": "fi_part_1568",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 111",
     "nombre": "JONATHAN CARIUS",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -34888,16 +37192,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1592",
+    "id": "fi_part_1569",
     "pendientes": 1,
     "totalFi": 3,
     "equipo": "EQUIPO 111",
     "nombre": "EDWIN CALERO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1592",
+    "dni": "DNI_1569",
     "aprobados": 2,
     "coordinador": "LILI CUBILLO",
     "entrenador": "Julio Narváez",
@@ -34927,19 +37235,23 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1593",
+    "id": "fi_part_1570",
     "pendientes": 1,
     "totalFi": 3,
-    "equipo": "EQUIPO 111",
-    "nombre": "VALERIA CEVALLOS",
+    "equipo": "EQUIPO 26",
+    "nombre": "BRYAN RODNY LOPEZ HANCO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
-    "sede": "Quito",
+    "sede": "Lima",
     "diasDesdePFD": 27,
-    "dni": "999661970",
+    "dni": "51970764599",
     "aprobados": 2,
-    "coordinador": "ISAAC BETANCOURTH",
-    "entrenador": "Mauricio Ramírez",
+    "coordinador": "LINID VALENCIA",
+    "entrenador": "Josué Vera",
     "fis": [
       {
         "estado": "aprobado",
@@ -34966,12 +37278,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1594",
+    "id": "fi_part_1571",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 112",
     "nombre": "EDUARDO ALFARO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -35005,55 +37321,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1595",
-    "pendientes": 1,
-    "totalFi": 3,
-    "equipo": "EQUIPO 112",
-    "nombre": "GRECIA MENDEZ",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "0963214210",
-    "aprobados": 2,
-    "coordinador": "ROBERTO RODRIGUEZ",
-    "entrenador": "José Sánchez",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1596",
+    "id": "fi_part_1572",
     "pendientes": 1,
     "totalFi": 3,
     "equipo": "EQUIPO 112",
     "nombre": "IVAN TINILLO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1596",
+    "dni": "DNI_1572",
     "aprobados": 2,
     "coordinador": "ISAAC BETANCOURTH",
     "entrenador": "Kriscia Rodas",
@@ -35083,12 +37364,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1597",
+    "id": "fi_part_1573",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 112",
     "nombre": "ARIANNA MENDEZ",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -35122,51 +37407,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1598",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 113",
-    "nombre": "GISS TRUJILLO",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "991850773",
-    "aprobados": 1,
-    "coordinador": "ERIKA GAVILANEZ",
-    "entrenador": "Andrés Idrobo",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1599",
+    "id": "fi_part_1574",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 113",
     "nombre": "JOSHUA ALBUJA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -35200,12 +37450,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1600",
+    "id": "fi_part_1575",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 113",
     "nombre": "KENNETH ALBUJA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -35239,12 +37493,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1601",
+    "id": "fi_part_1576",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 113",
     "nombre": "LUIS CAICEDO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -35278,12 +37536,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1602",
+    "id": "fi_part_1577",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 113",
     "nombre": "SARA VASCO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -35317,12 +37579,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1603",
+    "id": "fi_part_1578",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 113",
     "nombre": "SOLANGE ESCOBAR",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -35356,12 +37622,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1604",
+    "id": "fi_part_1579",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 113",
     "nombre": "XIMENA GALLARDO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -35395,16 +37665,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1605",
+    "id": "fi_part_1580",
     "pendientes": 1,
     "totalFi": 3,
     "equipo": "EQUIPO 113",
     "nombre": "ZIACNE SILVA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1605",
+    "dni": "DNI_1580",
     "aprobados": 2,
     "coordinador": "",
     "entrenador": "Andrés Idrobo",
@@ -35434,90 +37708,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1606",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 114",
-    "nombre": "BRYAN PESANTEZ",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "593984956356",
-    "aprobados": 0,
-    "coordinador": "ALEJANDRO DIAZ",
-    "entrenador": "Linid Valencia",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1607",
-    "pendientes": 1,
-    "totalFi": 3,
-    "equipo": "EQUIPO 114",
-    "nombre": "GUIDO GAMBOA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "593981181398",
-    "aprobados": 2,
-    "coordinador": "ALEJANDRO DIAZ",
-    "entrenador": "Mauricio Ramírez",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1608",
+    "id": "fi_part_1581",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 114",
     "nombre": "ERICK BRAVO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -35551,12 +37751,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1609",
+    "id": "fi_part_1582",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 114",
     "nombre": "WILSON ALBUJA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -35590,168 +37794,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1610",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 115",
-    "nombre": "DAYANA MARTINEZ",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "593985328992",
-    "aprobados": 1,
-    "coordinador": "ALEJANDRO DIAZ",
-    "entrenador": "Linid Valencia",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1611",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 115",
-    "nombre": "DIEGO ALBUJA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "990462746",
-    "aprobados": 1,
-    "coordinador": "ISAAC BETANCOURTH",
-    "entrenador": "Linid Valencia",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1612",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 115",
-    "nombre": "JONATHAN ZAMORA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "999450690",
-    "aprobados": 1,
-    "coordinador": "ISAAC BETANCOURTH",
-    "entrenador": "Linid Valencia",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1613",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 115",
-    "nombre": "SANDRA MENDIETA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "983508986",
-    "aprobados": 1,
-    "coordinador": "ISAAC BETANCOURTH",
-    "entrenador": "Linid Valencia",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1614",
+    "id": "fi_part_1583",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 115",
     "nombre": "KRISTEL DEFAS",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -35785,51 +37837,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1615",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 115",
-    "nombre": "EMERITA SALAS",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "982376593",
-    "aprobados": 1,
-    "coordinador": "ISAAC BETANCOURTH",
-    "entrenador": "Linid Valencia",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1616",
+    "id": "fi_part_1584",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 115",
     "nombre": "NAHYA BERMEO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -35863,12 +37880,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1617",
+    "id": "fi_part_1585",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 115",
     "nombre": "VICTOR SANCHEZ",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -35902,51 +37923,274 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1618",
-    "pendientes": 0,
-    "totalFi": 0,
-    "equipo": "EQUIPO 123",
-    "nombre": "EDUARDO LEON",
+    "id": "fi_part_1586",
+    "pendientes": 1,
+    "totalFi": 3,
+    "equipo": "EQUIPO 26",
+    "nombre": "CAMILA ALEGRIA VERASTEGUI DURAN",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
-    "sede": "Quito",
+    "sede": "Lima",
     "diasDesdePFD": 27,
-    "dni": "0960652421",
-    "aprobados": 0,
-    "coordinador": "REGINA ROMERO",
-    "entrenador": "Daniela Monroy",
+    "dni": "51930526967",
+    "aprobados": 2,
+    "coordinador": "LINID VALENCIA",
+    "entrenador": "Josué Vera",
     "fis": [
       {
-        "estado": "no_presentado",
-        "titulo": "",
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
         "feedback": "",
-        "meta": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
         "area": "Salud & Vitalidad"
       },
       {
-        "estado": "no_presentado",
-        "titulo": "",
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
         "feedback": "",
-        "meta": "",
+        "meta": "Cumplimiento del estándar superior financiero",
         "area": "Finanzas & Riqueza"
       },
       {
         "estado": "no_presentado",
-        "titulo": "",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
         "feedback": "",
-        "meta": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
         "area": "Relaciones & Familia"
       }
     ]
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1619",
+    "id": "fi_part_1587",
+    "pendientes": 1,
+    "totalFi": 3,
+    "equipo": "EQUIPO 26",
+    "nombre": "MARIA OLARTE BARRIENTOS",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51948162114",
+    "aprobados": 2,
+    "coordinador": "LINID VALENCIA",
+    "entrenador": "Josué Vera",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "no_presentado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1588",
+    "pendientes": 1,
+    "totalFi": 3,
+    "equipo": "EQUIPO 27",
+    "nombre": "GINA CARDENAS LOPEZ",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51999699649",
+    "aprobados": 2,
+    "coordinador": "LEYLA PASQUEL",
+    "entrenador": "Ana Monroy",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "no_presentado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1589",
+    "pendientes": 1,
+    "totalFi": 3,
+    "equipo": "EQUIPO 27",
+    "nombre": "GREZIA MARIA JOLLY VERA",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51920738765",
+    "aprobados": 2,
+    "coordinador": "LEYLA PASQUEL",
+    "entrenador": "Ana Monroy",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "no_presentado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1590",
+    "pendientes": 1,
+    "totalFi": 3,
+    "equipo": "EQUIPO 27",
+    "nombre": "GUSTAVO ADOLFO FERNANDEZ ESPINOZA",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51930326809",
+    "aprobados": 2,
+    "coordinador": "LEYLA PASQUEL",
+    "entrenador": "Ana Monroy",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "no_presentado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1591",
+    "pendientes": 1,
+    "totalFi": 3,
+    "equipo": "EQUIPO 27",
+    "nombre": "JOSE ISRAEL MAQUERA MONTOYA",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51904408130",
+    "aprobados": 2,
+    "coordinador": "LEYLA PASQUEL",
+    "entrenador": "Ana Monroy",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "no_presentado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1592",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 20",
     "nombre": "PAULINA CEDILLO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Cuenca",
     "diasDesdePFD": 27,
@@ -35980,12 +38224,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1620",
+    "id": "fi_part_1593",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 20",
     "nombre": "EDISON YUNGA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Cuenca",
     "diasDesdePFD": 27,
@@ -36019,12 +38267,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1621",
+    "id": "fi_part_1594",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 20",
     "nombre": "CARLOS MONCAYO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Cuenca",
     "diasDesdePFD": 27,
@@ -36058,16 +38310,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1622",
+    "id": "fi_part_1595",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 21",
     "nombre": "VERONICA CLAVIJO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Cuenca",
     "diasDesdePFD": 27,
-    "dni": "DNI_1622",
+    "dni": "DNI_1595",
     "aprobados": 0,
     "coordinador": "FERNANDO MENDOZA",
     "entrenador": "Fernando Mendoza",
@@ -36097,16 +38353,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1623",
+    "id": "fi_part_1596",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 21",
     "nombre": "SEBASTIAN RIVAS",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Cuenca",
     "diasDesdePFD": 27,
-    "dni": "DNI_1623",
+    "dni": "DNI_1596",
     "aprobados": 0,
     "coordinador": "FERNANDO MENDOZA",
     "entrenador": "Fernando Mendoza",
@@ -36136,16 +38396,63 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1624",
+    "id": "fi_part_1597",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "EQUIPO 28",
+    "nombre": "LIZ CAROL TRUJILLO MALLQUI",
+    "rol": "MANAGER",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "51980496819",
+    "aprobados": 1,
+    "coordinador": "LINID VALENCIA",
+    "entrenador": "Fernando Mendoza",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "no_presentado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1598",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "EQUIPO 124",
     "nombre": "IVAN MEJÍA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1624",
+    "dni": "DNI_1598",
     "aprobados": 0,
     "coordinador": "ISAAC BETANCOURTH",
     "entrenador": "Daniela Monroy",
@@ -36175,16 +38482,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1625",
+    "id": "fi_part_1599",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "EQUIPO 124",
     "nombre": "IVAN TINILO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1625",
+    "dni": "DNI_1599",
     "aprobados": 0,
     "coordinador": "ISAAC BETANCOURTH",
     "entrenador": "Daniela Monroy",
@@ -36214,12 +38525,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1626",
+    "id": "fi_part_1600",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 16",
     "nombre": "JUAN ESTEBAN OSSA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Medellín",
     "diasDesdePFD": 27,
@@ -36253,12 +38568,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1627",
+    "id": "fi_part_1601",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 32",
     "nombre": "ISABELLA TORRES",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -36292,12 +38611,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1628",
+    "id": "fi_part_1602",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 32",
     "nombre": "IVONNE RECAURTE",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -36331,16 +38654,63 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1629",
+    "id": "fi_part_1603",
+    "pendientes": 2,
+    "totalFi": 3,
+    "equipo": "APOYO MESAS",
+    "nombre": "CARMEN PÉREZ",
+    "rol": "PX",
+    "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
+    "devueltos": 0,
+    "sede": "Lima",
+    "diasDesdePFD": 27,
+    "dni": "DNI_1603",
+    "aprobados": 1,
+    "coordinador": "",
+    "entrenador": "David Sosa",
+    "fis": [
+      {
+        "estado": "aprobado",
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "feedback": "",
+        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
+        "area": "Salud & Vitalidad"
+      },
+      {
+        "estado": "pendiente",
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "feedback": "",
+        "meta": "Cumplimiento del estándar superior financiero",
+        "area": "Finanzas & Riqueza"
+      },
+      {
+        "estado": "no_presentado",
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "feedback": "",
+        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
+        "area": "Relaciones & Familia"
+      }
+    ]
+  },
+  {
+    "fechaPFD": "16/08/2026",
+    "id": "fi_part_1604",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "Sin Equipo",
     "nombre": "MÓNICA COELLO GYE",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
-    "dni": "DNI_1629",
+    "dni": "DNI_1604",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Andrés Gómez",
@@ -36370,16 +38740,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1630",
+    "id": "fi_part_1605",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "Sin Equipo",
     "nombre": "YOU AMBULUDI GYE",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
-    "dni": "DNI_1630",
+    "dni": "DNI_1605",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Christian Tito",
@@ -36409,16 +38783,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1631",
+    "id": "fi_part_1606",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "Sin Equipo",
     "nombre": "YENICE ARIZAGA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 1,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
-    "dni": "DNI_1631",
+    "dni": "DNI_1606",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "José Torron",
@@ -36448,16 +38826,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1632",
+    "id": "fi_part_1607",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "Sin Equipo",
     "nombre": "GABRIEL CARBO",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
-    "dni": "DNI_1632",
+    "dni": "DNI_1607",
     "aprobados": 1,
     "coordinador": "",
     "entrenador": "José Torron",
@@ -36487,16 +38869,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1633",
+    "id": "fi_part_1608",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "Sin Equipo",
     "nombre": "LUIS PIBAQUE",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
-    "dni": "DNI_1633",
+    "dni": "DNI_1608",
     "aprobados": 1,
     "coordinador": "",
     "entrenador": "José Torron",
@@ -36526,16 +38912,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1634",
+    "id": "fi_part_1609",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "Sin Equipo",
     "nombre": "FAUSTO MENDOZA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
-    "dni": "DNI_1634",
+    "dni": "DNI_1609",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Julio Narváez",
@@ -36565,16 +38955,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1635",
+    "id": "fi_part_1610",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "Sin Equipo",
     "nombre": "MANUEL LÓPEZ",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
-    "dni": "DNI_1635",
+    "dni": "DNI_1610",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Julio Narváez",
@@ -36604,16 +38998,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1636",
+    "id": "fi_part_1611",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "Sin Equipo",
     "nombre": "DANIEL TREJO",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
-    "dni": "DNI_1636",
+    "dni": "DNI_1611",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Mike Boada",
@@ -36643,16 +39041,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1637",
+    "id": "fi_part_1612",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "Sin Equipo",
     "nombre": "GRACE PUMISACHO",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
-    "dni": "DNI_1637",
+    "dni": "DNI_1612",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Mike Boada",
@@ -36682,16 +39084,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1638",
+    "id": "fi_part_1613",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "Sin Equipo",
     "nombre": "ANA VERDUGA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1638",
+    "dni": "DNI_1613",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Mildred Muñoz",
@@ -36721,16 +39127,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1639",
+    "id": "fi_part_1614",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "Sin Equipo",
     "nombre": "ANGELA MONTANO GYE",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1639",
+    "dni": "DNI_1614",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Mildred Muñoz",
@@ -36760,16 +39170,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1640",
+    "id": "fi_part_1615",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "Sin Equipo",
     "nombre": "ARMANDO SOLÍS",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1640",
+    "dni": "DNI_1615",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Mildred Muñoz",
@@ -36799,16 +39213,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1641",
+    "id": "fi_part_1616",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "Sin Equipo",
     "nombre": "CAROLINA MEJÍA",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1641",
+    "dni": "DNI_1616",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Mildred Muñoz",
@@ -36838,16 +39256,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1642",
+    "id": "fi_part_1617",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "Sin Equipo",
     "nombre": "CHRISTIAN LÓPEZ",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1642",
+    "dni": "DNI_1617",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Mildred Muñoz",
@@ -36877,16 +39299,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1643",
+    "id": "fi_part_1618",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "Sin Equipo",
     "nombre": "DIEGO ACURI GYE",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1643",
+    "dni": "DNI_1618",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Mildred Muñoz",
@@ -36916,16 +39342,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1644",
+    "id": "fi_part_1619",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "Sin Equipo",
     "nombre": "IRENE QUILACHAMIN",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1644",
+    "dni": "DNI_1619",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Mildred Muñoz",
@@ -36955,16 +39385,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1645",
+    "id": "fi_part_1620",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "Sin Equipo",
     "nombre": "MAFER FLORES GYE",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1645",
+    "dni": "DNI_1620",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Mildred Muñoz",
@@ -36994,16 +39428,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1646",
+    "id": "fi_part_1621",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "Sin Equipo",
     "nombre": "MARJORIE ARIAS",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1646",
+    "dni": "DNI_1621",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Mildred Muñoz",
@@ -37033,16 +39471,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1647",
+    "id": "fi_part_1622",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "Sin Equipo",
     "nombre": "NELLY CELI",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1647",
+    "dni": "DNI_1622",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Mildred Muñoz",
@@ -37072,16 +39514,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1648",
+    "id": "fi_part_1623",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "Sin Equipo",
     "nombre": "VICKY VILLAVICENCIO G",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1648",
+    "dni": "DNI_1623",
     "aprobados": 0,
     "coordinador": "",
     "entrenador": "Mildred Muñoz",
@@ -37111,12 +39557,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1649",
+    "id": "fi_part_1624",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "METAMORFOSIS",
     "nombre": "WILSON VALLEJO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -37150,12 +39600,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1650",
+    "id": "fi_part_1625",
     "pendientes": 1,
     "totalFi": 3,
     "equipo": "EQUIPO 33",
     "nombre": "ENRRIQUE FRANCO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -37189,12 +39643,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1651",
+    "id": "fi_part_1626",
     "pendientes": 1,
     "totalFi": 3,
     "equipo": "EQUIPO 33",
     "nombre": "EVELYN ORELLANA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -37228,12 +39686,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1652",
+    "id": "fi_part_1627",
     "pendientes": 1,
     "totalFi": 3,
     "equipo": "EQUIPO 33",
     "nombre": "FERNANDA IBAÑEZ",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -37267,12 +39729,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1653",
+    "id": "fi_part_1628",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "EQUIPO 34",
     "nombre": "ILIANA DELGADO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -37306,12 +39772,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1654",
+    "id": "fi_part_1629",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "EQUIPO 34",
     "nombre": "OSCAR MORAN",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -37345,12 +39815,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1655",
+    "id": "fi_part_1630",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "EQUIPO 34",
     "nombre": "BYRON FIGUERO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -37384,12 +39858,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1656",
+    "id": "fi_part_1631",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "EQUIPO 34",
     "nombre": "MATEO RECALDE",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -37423,12 +39901,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1657",
+    "id": "fi_part_1632",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "EQUIPO 34",
     "nombre": "PILAR RODRIGUEZ",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -37462,12 +39944,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1658",
+    "id": "fi_part_1633",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "EQUIPO 34",
     "nombre": "SANDRA FREIRE",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -37501,12 +39987,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1659",
+    "id": "fi_part_1634",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "EQUIPO 34",
     "nombre": "ANDRES JURADO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -37540,12 +40030,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1660",
+    "id": "fi_part_1635",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 116",
     "nombre": "MARTÍN QUIROZ",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -37579,12 +40073,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1661",
+    "id": "fi_part_1636",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 116",
     "nombre": "PAOLA CAMACHO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -37618,12 +40116,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1662",
+    "id": "fi_part_1637",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "EQUIPO 32",
     "nombre": "MARIELA GUERRERO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -37657,90 +40159,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1663",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 118",
-    "nombre": "ROBERT PASTRANA",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "984898787",
-    "aprobados": 0,
-    "coordinador": "ALEJANDRO DIAZ",
-    "entrenador": "Linid Valencia",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1664",
-    "pendientes": 1,
-    "totalFi": 3,
-    "equipo": "EQUIPO 118",
-    "nombre": "CAROLINA QUISHPE",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "986151899",
-    "aprobados": 2,
-    "coordinador": "ALEJANDRO DIAZ",
-    "entrenador": "Linid Valencia",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1665",
+    "id": "fi_part_1638",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 118",
     "nombre": "DANIELA ESPOSITO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -37774,12 +40202,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1666",
+    "id": "fi_part_1639",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 118",
     "nombre": "DAVID SALVADOR",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -37813,12 +40245,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1667",
+    "id": "fi_part_1640",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 118",
     "nombre": "GABRIELA TAPIA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -37852,12 +40288,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1668",
+    "id": "fi_part_1641",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 118",
     "nombre": "JAVIER SALAS",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -37891,12 +40331,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1669",
+    "id": "fi_part_1642",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 119",
     "nombre": "VERITO MUZO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -37930,90 +40374,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1670",
-    "pendientes": 1,
-    "totalFi": 3,
-    "equipo": "EQUIPO 119",
-    "nombre": "GABRIELA ALTUNA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "979351211",
-    "aprobados": 2,
-    "coordinador": "ALEJANDRO DIAZ",
-    "entrenador": "Mauricio Ramírez",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1671",
-    "pendientes": 1,
-    "totalFi": 3,
-    "equipo": "EQUIPO 119",
-    "nombre": "CAROLINA HERRERA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "988618235",
-    "aprobados": 2,
-    "coordinador": "ISAAC BETANCOURTH",
-    "entrenador": "Mauricio Ramírez",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1672",
+    "id": "fi_part_1643",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 119",
     "nombre": "CHRISTIAN SOSA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -38047,12 +40417,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1673",
+    "id": "fi_part_1644",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 119",
     "nombre": "ROBERT ESPINOZA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -38086,12 +40460,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1674",
+    "id": "fi_part_1645",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 119",
     "nombre": "SANTIAGO PROAÑO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -38125,90 +40503,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1675",
-    "pendientes": 1,
-    "totalFi": 3,
-    "equipo": "EQUIPO 119",
-    "nombre": "JHONNY CUASCOTA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "996574352",
-    "aprobados": 2,
-    "coordinador": "ISAAC BETANCOURTH",
-    "entrenador": "Mauricio Ramírez",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1676",
-    "pendientes": 1,
-    "totalFi": 3,
-    "equipo": "EQUIPO 119",
-    "nombre": "JENNIFER MARMOL",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1676",
-    "aprobados": 2,
-    "coordinador": "LEYLA PASQUEL",
-    "entrenador": "Mauricio Ramírez",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1677",
+    "id": "fi_part_1646",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 119",
     "nombre": "LLULI MINIGUANO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -38242,16 +40546,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1678",
+    "id": "fi_part_1647",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 120",
     "nombre": "XIMENA MEJÍA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1678",
+    "dni": "DNI_1647",
     "aprobados": 3,
     "coordinador": "ISAAC BETANCOURTH",
     "entrenador": "Lourdes Patiño",
@@ -38281,16 +40589,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1679",
+    "id": "fi_part_1648",
     "pendientes": 1,
     "totalFi": 3,
     "equipo": "EQUIPO 120",
     "nombre": "JESSIKA PINANGO",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1679",
+    "dni": "DNI_1648",
     "aprobados": 2,
     "coordinador": "",
     "entrenador": "Lourdes Patiño",
@@ -38320,16 +40632,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1680",
+    "id": "fi_part_1649",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 120",
     "nombre": "JESSICA MALDONADO",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1680",
+    "dni": "DNI_1649",
     "aprobados": 1,
     "coordinador": "",
     "entrenador": "Lourdes Patiño",
@@ -38359,133 +40675,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1681",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 120",
-    "nombre": "SANTIAGO LARREA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1681",
-    "aprobados": 1,
-    "coordinador": "ISAAC BETANCOURTH",
-    "entrenador": "Lourdes Patiño",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1682",
-    "pendientes": 2,
-    "totalFi": 3,
-    "equipo": "EQUIPO 120",
-    "nombre": "JORGE GUANULEMA",
-    "asistioPFD": true,
-    "devueltos": 1,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1682",
-    "aprobados": 0,
-    "coordinador": "ISAAC BETANCOURTH",
-    "entrenador": "Lourdes Patiño",
-    "fis": [
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "pendiente",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "devuelto",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "Ajustar indicador medible según directiva de estándar superior",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1683",
-    "pendientes": 0,
-    "totalFi": 0,
-    "equipo": "EQUIPO 120",
-    "nombre": "ANNY ALARCÓN",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1683",
-    "aprobados": 0,
-    "coordinador": "ISAAC BETANCOURTH",
-    "entrenador": "Lourdes Patiño",
-    "fis": [
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1684",
+    "id": "fi_part_1650",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 120",
     "nombre": "FREDDY ANGAMARCA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1684",
+    "dni": "DNI_1650",
     "aprobados": 3,
     "coordinador": "ISAAC BETANCOURTH",
     "entrenador": "Lourdes Patiño",
@@ -38515,16 +40718,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1685",
+    "id": "fi_part_1651",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 121",
     "nombre": "BRYAN ANRRANGO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1685",
+    "dni": "DNI_1651",
     "aprobados": 3,
     "coordinador": "ERIKA GAVILANEZ",
     "entrenador": "José Sánchez",
@@ -38554,16 +40761,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1686",
+    "id": "fi_part_1652",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 121",
     "nombre": "EDUARDO CARAPAZ",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1686",
+    "dni": "DNI_1652",
     "aprobados": 3,
     "coordinador": "ERIKA GAVILANEZ",
     "entrenador": "José Sánchez",
@@ -38593,16 +40804,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1687",
+    "id": "fi_part_1653",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 121",
     "nombre": "OMAR GUANOQUIZA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1687",
+    "dni": "DNI_1653",
     "aprobados": 3,
     "coordinador": "ERIKA GAVILANEZ",
     "entrenador": "José Sánchez",
@@ -38632,12 +40847,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1688",
+    "id": "fi_part_1654",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 111",
     "nombre": "MARIA BELEN LLUMIQUINGA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -38671,16 +40890,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1689",
+    "id": "fi_part_1655",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 5",
     "nombre": "JORGE MARÍN",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "México",
     "diasDesdePFD": 27,
-    "dni": "DNI_1689",
+    "dni": "DNI_1655",
     "aprobados": 1,
     "coordinador": "",
     "entrenador": "Mauricio Ramírez",
@@ -38710,16 +40933,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1690",
+    "id": "fi_part_1656",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 5",
     "nombre": "NAOMI CAMPOS",
+    "rol": "PX",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "México",
     "diasDesdePFD": 27,
-    "dni": "DNI_1690",
+    "dni": "DNI_1656",
     "aprobados": 1,
     "coordinador": "",
     "entrenador": "Mauricio Ramírez",
@@ -38749,12 +40976,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1691",
+    "id": "fi_part_1657",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "EQUIPO 26",
     "nombre": "JOSE MARIA VELATEGUI",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -38788,12 +41019,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1692",
+    "id": "fi_part_1658",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "EQUIPO 27",
     "nombre": "VICENTE BENITEZ",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -38827,12 +41062,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1693",
+    "id": "fi_part_1659",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 117",
     "nombre": "ADAMS GONZALEZ",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -38866,55 +41105,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1694",
-    "pendientes": 0,
-    "totalFi": 0,
-    "equipo": "EQUIPO 117",
-    "nombre": "ANDRES MOSQUERA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "958936593",
-    "aprobados": 0,
-    "coordinador": "ERIKA GAVILANEZ",
-    "entrenador": "Mike Boada",
-    "fis": [
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1695",
+    "id": "fi_part_1660",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 117",
     "nombre": "CRISTINA MOREJON",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1695",
+    "dni": "DNI_1660",
     "aprobados": 3,
     "coordinador": "ERIKA GAVILANEZ",
     "entrenador": "Mike Boada",
@@ -38944,12 +41148,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1696",
+    "id": "fi_part_1661",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 117",
     "nombre": "MARCELA AGUIRRE",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -38983,12 +41191,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1697",
+    "id": "fi_part_1662",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 117",
     "nombre": "SANTIAGO BENITEZ",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -39022,12 +41234,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1698",
+    "id": "fi_part_1663",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 117",
     "nombre": "DANNA GUAMAN",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -39061,12 +41277,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1699",
+    "id": "fi_part_1664",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 117",
     "nombre": "JONATHAN PILLAJO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -39100,51 +41320,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1700",
-    "pendientes": 0,
-    "totalFi": 0,
-    "equipo": "EQUIPO 117",
-    "nombre": "LISBETH CONGO",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "998758461",
-    "aprobados": 0,
-    "coordinador": "ERIKA GAVILANEZ",
-    "entrenador": "Mike Boada",
-    "fis": [
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1701",
+    "id": "fi_part_1665",
     "pendientes": 0,
     "totalFi": 3,
     "equipo": "EQUIPO 117",
     "nombre": "THOMAS GARCIA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "GRADUADO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
@@ -39178,16 +41363,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1702",
+    "id": "fi_part_1666",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "EQUIPO 125",
     "nombre": "MONICA ROMAN",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1702",
+    "dni": "DNI_1666",
     "aprobados": 0,
     "coordinador": "ERIKA GAVILANEZ",
     "entrenador": "Julio Narváez",
@@ -39217,16 +41406,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1703",
+    "id": "fi_part_1667",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "EQUIPO 125",
     "nombre": "RUBEN CADENA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1703",
+    "dni": "DNI_1667",
     "aprobados": 0,
     "coordinador": "ERIKA GAVILANEZ",
     "entrenador": "Julio Narváez",
@@ -39256,16 +41449,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1704",
+    "id": "fi_part_1668",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "EQUIPO 125",
     "nombre": "SOFY CASTELO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1704",
+    "dni": "DNI_1668",
     "aprobados": 0,
     "coordinador": "ERIKA GAVILANEZ",
     "entrenador": "Julio Narváez",
@@ -39295,16 +41492,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1705",
+    "id": "fi_part_1669",
     "pendientes": 0,
     "totalFi": 0,
     "equipo": "EQUIPO 125",
     "nombre": "SOLANGE ORTIZ",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1705",
+    "dni": "DNI_1669",
     "aprobados": 0,
     "coordinador": "ERIKA GAVILANEZ",
     "entrenador": "Julio Narváez",
@@ -39334,19 +41535,23 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1706",
-    "pendientes": 0,
+    "id": "fi_part_1670",
+    "pendientes": 2,
     "totalFi": 3,
-    "equipo": "EQUIPO 1",
-    "nombre": "JAVIER TORRES",
+    "equipo": "EQUIPO 16",
+    "nombre": "BRIAN MORALES",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
-    "sede": "Cuenca",
+    "sede": "Medellín",
     "diasDesdePFD": 27,
-    "dni": "5930998024307",
-    "aprobados": 3,
-    "coordinador": "MIGUEL TORRES",
-    "entrenador": "Mildred Muñoz",
+    "dni": "573233644192",
+    "aprobados": 1,
+    "coordinador": "MAURICIO RAMIREZ",
+    "entrenador": "JESUS ACOSTA",
     "fis": [
       {
         "estado": "aprobado",
@@ -39356,14 +41561,14 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "area": "Salud & Vitalidad"
       },
       {
-        "estado": "aprobado",
+        "estado": "pendiente",
         "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
         "feedback": "",
         "meta": "Cumplimiento del estándar superior financiero",
         "area": "Finanzas & Riqueza"
       },
       {
-        "estado": "aprobado",
+        "estado": "pendiente",
         "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
         "feedback": "",
         "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
@@ -39373,18 +41578,22 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1707",
-    "pendientes": 0,
+    "id": "fi_part_1671",
+    "pendientes": 2,
     "totalFi": 3,
-    "equipo": "EQUIPO 1",
-    "nombre": "AMADA AMENDAÑO",
+    "equipo": "EQUIPO 19",
+    "nombre": "KARINA VALDIVIEZO",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Cuenca",
     "diasDesdePFD": 27,
-    "dni": "5930999084200",
-    "aprobados": 3,
-    "coordinador": "MIGUEL TORRES",
+    "dni": "0967241443",
+    "aprobados": 1,
+    "coordinador": "JUAN FER REINOSO",
     "entrenador": "Erika Gavilánez",
     "fis": [
       {
@@ -39395,14 +41604,14 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "area": "Salud & Vitalidad"
       },
       {
-        "estado": "aprobado",
+        "estado": "pendiente",
         "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
         "feedback": "",
         "meta": "Cumplimiento del estándar superior financiero",
         "area": "Finanzas & Riqueza"
       },
       {
-        "estado": "aprobado",
+        "estado": "pendiente",
         "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
         "feedback": "",
         "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
@@ -39412,402 +41621,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1708",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 2",
-    "nombre": "MAURICIO RAMIREZ",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Medellín",
-    "diasDesdePFD": 27,
-    "dni": "3052476502",
-    "aprobados": 3,
-    "coordinador": "",
-    "entrenador": "Mildred Muñoz",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1709",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 4",
-    "nombre": "VALENTINA RODRIGUEZ",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Medellín",
-    "diasDesdePFD": 27,
-    "dni": "573044072665",
-    "aprobados": 3,
-    "coordinador": "",
-    "entrenador": "Ana Monroy",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1710",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 4",
-    "nombre": "DAVID GONZALEZ FRANCO",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Medellín",
-    "diasDesdePFD": 27,
-    "dni": "573013053610",
-    "aprobados": 3,
-    "coordinador": "",
-    "entrenador": "Ana Monroy",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1711",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 5",
-    "nombre": "ISMAEL MARQUEZ",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Cuenca",
-    "diasDesdePFD": 27,
-    "dni": "0988903378",
-    "aprobados": 3,
-    "coordinador": "JOSUE VERA",
-    "entrenador": "Alejandro Diaz",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1712",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 6",
-    "nombre": "AMENDAÑO ROSA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Cuenca",
-    "diasDesdePFD": 27,
-    "dni": "0999084200",
-    "aprobados": 3,
-    "coordinador": "JOSUE VERA",
-    "entrenador": "Mildred Muñoz",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1713",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 7",
-    "nombre": "JOSE GALINDO",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Cuenca",
-    "diasDesdePFD": 27,
-    "dni": "0992848576",
-    "aprobados": 3,
-    "coordinador": "JOSUE VERA",
-    "entrenador": "Ana Monroy",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1714",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 7",
-    "nombre": "JOSE LUIS PRADO",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Cuenca",
-    "diasDesdePFD": 27,
-    "dni": "0997244234",
-    "aprobados": 3,
-    "coordinador": "JOSUE VERA",
-    "entrenador": "Diego Bravo",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1715",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 8",
-    "nombre": "CARLOS PUGLLA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Cuenca",
-    "diasDesdePFD": 27,
-    "dni": "0963451858",
-    "aprobados": 3,
-    "coordinador": "KERLY CARRILLO",
-    "entrenador": "Mila Campuzano",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1716",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 9",
-    "nombre": "GEOVANNI DOMINGUEZ",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Cuenca",
-    "diasDesdePFD": 27,
-    "dni": "0993893819",
-    "aprobados": 3,
-    "coordinador": "KERLY CARRILLO",
-    "entrenador": "Fernando Mendoza",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1717",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 21",
-    "nombre": "GUAROCHICO ADRIANNA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Guayaquil",
-    "diasDesdePFD": 27,
-    "dni": "0984613232",
-    "aprobados": 3,
-    "coordinador": "",
-    "entrenador": "Mildred Muñoz",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1718",
+    "id": "fi_part_1672",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 22",
     "nombre": "PEDRO SOLIS",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -39831,7 +41654,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "area": "Finanzas & Riqueza"
       },
       {
-        "estado": "no_presentado",
+        "estado": "pendiente",
         "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
         "feedback": "",
         "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
@@ -39841,12 +41664,16 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1719",
+    "id": "fi_part_1673",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 25",
     "nombre": "SHIRLEY VELASQUEZ",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Guayaquil",
     "diasDesdePFD": 27,
@@ -39870,7 +41697,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "area": "Finanzas & Riqueza"
       },
       {
-        "estado": "no_presentado",
+        "estado": "pendiente",
         "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
         "feedback": "",
         "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
@@ -39880,2941 +41707,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1720",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 79",
-    "nombre": "RUTH PARREÑO",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "5930992310545",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Andrés Gómez",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1721",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 80",
-    "nombre": "DANIEL VERA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "5930998731046",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Christian Tito",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1722",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 81",
-    "nombre": "MIRIAM FLORES",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "5930988035696",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "José Torron",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1723",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 83",
-    "nombre": "ABIGAIL CALDERÓN",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "5930958918232",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Mike Boada",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1724",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 83",
-    "nombre": "ALBA BAEZ",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "5930963146246",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Andrés Gómez",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1725",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 83",
-    "nombre": "ANTHONY VELASTEGUI",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "5930985519571",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Mike Boada",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1726",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 83",
-    "nombre": "DIANA RAMIREZ",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "5930998045560",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Fernando Mendoza",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1727",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 83",
-    "nombre": "EVELYN HERNANDEZ",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "5930992450002",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Andrés Gómez",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1728",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 83",
-    "nombre": "HUGO CORDOVA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "5930994825120",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Mildred Muñoz",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1729",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 84",
-    "nombre": "CHRISTIAN QUIROZ M.",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "593987333702",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Mildred Muñoz",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1730",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 84",
-    "nombre": "GABRIELA ESPIN",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "593984573440",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Fernando Mendoza",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1731",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 84",
-    "nombre": "MARTIN  QUIROZ",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "593995606621",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Christian Tito",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1732",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 84",
-    "nombre": "WILLIAM SANCHEZ",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "593986813400",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Josué Vera",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1733",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 85",
-    "nombre": "FERNANDA SALAZAR",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "593995189260",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Julio Narváez",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1734",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 85",
-    "nombre": "GUILLERMO TAMAYO",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "593969054276",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "José Torron",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1735",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 85",
-    "nombre": "VICTORIA CAZORLA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "593996802001",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Andrés Idrobo",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1736",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 86",
-    "nombre": "ANDRES VALLE",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "593963284609",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "María José Román",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1737",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 86",
-    "nombre": "JOSE MARIA JIMENEZ",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "593983449967",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Lourdes Patiño",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1738",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 87",
-    "nombre": "DARIO BETANCOURT",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "597996240797",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Andrés Gómez",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1739",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 87",
-    "nombre": "VALERIA ESPINOZA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "593962180647",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Chuy Acosta",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1740",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 88",
-    "nombre": "CARLOS ORTÍZ",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "593999701679",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Isaac Betancourt",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1741",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 89",
-    "nombre": "CESAR RODRIGUEZ",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "0978990144",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Fernando Mendoza",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1742",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 89",
-    "nombre": "DIANA MARTINEZ",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "0995986195",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Mildred Muñoz",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1743",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 90",
-    "nombre": "ALEJANDRO GOMEZ",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "0999761820",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Lourdes Patiño",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1744",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 90",
-    "nombre": "GABY SANCHEZ",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "0959013902",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Julio Narváez",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1745",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 90",
-    "nombre": "LEON ARMAS",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "0984939196",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Josué Vera",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1746",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 90",
-    "nombre": "LEONARDO ESPIN",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "0993664644",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Erika Gavilánez",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1747",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 91",
-    "nombre": "FERNANDO APUANGO DE LA CRUZ",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "0986985620",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Julio Narváez",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1748",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 91",
-    "nombre": "JORGE RODRIGUEZ",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "0999101568",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Lourdes Patiño",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1749",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 91",
-    "nombre": "VERONICA MORALES",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "0985113033",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Julio Narváez",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1750",
-    "pendientes": 0,
-    "totalFi": 0,
-    "equipo": "EQUIPO 4",
-    "nombre": "DAYANNA LOPEZ",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Cuenca",
-    "diasDesdePFD": 27,
-    "dni": "0980177146",
-    "aprobados": 0,
-    "coordinador": "JOSUE VERA",
-    "entrenador": "José Torron",
-    "fis": [
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1751",
-    "pendientes": 0,
-    "totalFi": 0,
-    "equipo": "EQUIPO 8",
-    "nombre": "MARCO MENDEZ",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Cuenca",
-    "diasDesdePFD": 27,
-    "dni": "0983168859",
-    "aprobados": 0,
-    "coordinador": "KERLY CARRILLO",
-    "entrenador": "Mauricio Ramírez",
-    "fis": [
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1752",
-    "pendientes": 0,
-    "totalFi": 0,
-    "equipo": "EQUIPO 14",
-    "nombre": "SORAYA LARA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Cuenca",
-    "diasDesdePFD": 27,
-    "dni": "593991631172",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Mike Boada",
-    "fis": [
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1753",
-    "pendientes": 0,
-    "totalFi": 0,
-    "equipo": "EQUIPO 14",
-    "nombre": "LUCY OSTOA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Cuenca",
-    "diasDesdePFD": 27,
-    "dni": "949191577",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "María José Román",
-    "fis": [
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1754",
-    "pendientes": 0,
-    "totalFi": 0,
-    "equipo": "EQUIPO 15",
-    "nombre": "LUIS ALBERTO HERNÁNDEZ MENDOZA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Cuenca",
-    "diasDesdePFD": 27,
-    "dni": "51956268830",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Julio Narváez",
-    "fis": [
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1755",
-    "pendientes": 0,
-    "totalFi": 0,
-    "equipo": "EQUIPO 15",
-    "nombre": "PAUL GAMARRA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Cuenca",
-    "diasDesdePFD": 27,
-    "dni": "51934690932",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Lourdes Patiño",
-    "fis": [
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1756",
-    "pendientes": 0,
-    "totalFi": 0,
-    "equipo": "EQUIPO 16",
-    "nombre": "ANGGIE ESPINOZA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Cuenca",
-    "diasDesdePFD": 27,
-    "dni": "593982449947",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Ana Cristina Sánchez",
-    "fis": [
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1757",
-    "pendientes": 0,
-    "totalFi": 0,
-    "equipo": "EQUIPO 17",
-    "nombre": "JOSE GUALCHI",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Cuenca",
-    "diasDesdePFD": 27,
-    "dni": "593984294753",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Ana Cristina Sánchez",
-    "fis": [
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1758",
-    "pendientes": 0,
-    "totalFi": 0,
-    "equipo": "EQUIPO 17",
-    "nombre": "GERALDINE VANESSA SOTOMAYOR",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Cuenca",
-    "diasDesdePFD": 27,
-    "dni": "51983701400",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Mauricio Ramírez",
-    "fis": [
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1759",
-    "pendientes": 0,
-    "totalFi": 0,
-    "equipo": "EQUIPO 17",
-    "nombre": "PILAR DE LA CRUZ HUAYTALLA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Cuenca",
-    "diasDesdePFD": 27,
-    "dni": "51985461746",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Fernando Mendoza",
-    "fis": [
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1760",
-    "pendientes": 0,
-    "totalFi": 0,
-    "equipo": "EQUIPO 18",
-    "nombre": "ZARA CASTILLO HERRERA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Cuenca",
-    "diasDesdePFD": 27,
-    "dni": "51961491513",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Alejandro Diaz",
-    "fis": [
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1761",
-    "pendientes": 0,
-    "totalFi": 0,
-    "equipo": "EQUIPO 18",
-    "nombre": "PAUL RECALDE",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Cuenca",
-    "diasDesdePFD": 27,
-    "dni": "593999766343",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Andrés Idrobo",
-    "fis": [
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1762",
-    "pendientes": 0,
-    "totalFi": 0,
-    "equipo": "EQUIPO 19",
-    "nombre": "CARLOS ALBERTO CASTILLO TIPISMANA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Cuenca",
-    "diasDesdePFD": 27,
-    "dni": "51982791484",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "David Sosa",
-    "fis": [
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1763",
-    "pendientes": 0,
-    "totalFi": 0,
-    "equipo": "EQUIPO 19",
-    "nombre": "CRISTIAN JONATHAN ARONE CHACHAYMA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Cuenca",
-    "diasDesdePFD": 27,
-    "dni": "51961496514",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Julio Narváez",
-    "fis": [
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1764",
-    "pendientes": 0,
-    "totalFi": 0,
-    "equipo": "EQUIPO 20",
-    "nombre": "ORDOÑEZ DIEGO",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Guayaquil",
-    "diasDesdePFD": 27,
-    "dni": "0963058531",
-    "aprobados": 0,
-    "coordinador": "",
-    "entrenador": "Mildred Muñoz",
-    "fis": [
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1765",
-    "pendientes": 0,
-    "totalFi": 0,
-    "equipo": "EQUIPO 81",
-    "nombre": "JOSELYN USHIÑA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "5930958648685",
-    "aprobados": 0,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Alejandro Diaz",
-    "fis": [
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1766",
-    "pendientes": 0,
-    "totalFi": 0,
-    "equipo": "EQUIPO 84",
-    "nombre": "ELENA LLANOS",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Cuenca",
-    "diasDesdePFD": 27,
-    "dni": "593968525606",
-    "aprobados": 0,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Fernando Mendoza",
-    "fis": [
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1767",
-    "pendientes": 0,
-    "totalFi": 0,
-    "equipo": "EQUIPO 84",
-    "nombre": "NICOLE MURGEYTIO",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Cuenca",
-    "diasDesdePFD": 27,
-    "dni": "593987634771",
-    "aprobados": 0,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Alejandro Diaz",
-    "fis": [
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1768",
-    "pendientes": 0,
-    "totalFi": 0,
-    "equipo": "EQUIPO 84",
-    "nombre": "RUBEN CADENA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Cuenca",
-    "diasDesdePFD": 27,
-    "dni": "593987512450",
-    "aprobados": 0,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Erika Gavilánez",
-    "fis": [
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1769",
-    "pendientes": 0,
-    "totalFi": 0,
-    "equipo": "EQUIPO 84",
-    "nombre": "ANDERSON ORTEGA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "593997446147",
-    "aprobados": 0,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Mike Boada",
-    "fis": [
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1770",
-    "pendientes": 0,
-    "totalFi": 0,
-    "equipo": "EQUIPO 85",
-    "nombre": "FERNANDO GONZÁLEZ",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Cuenca",
-    "diasDesdePFD": 27,
-    "dni": "593991488105",
-    "aprobados": 0,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "José Torron",
-    "fis": [
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1771",
-    "pendientes": 0,
-    "totalFi": 0,
-    "equipo": "EQUIPO 85",
-    "nombre": "MICHELLE CARDENAS",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Cuenca",
-    "diasDesdePFD": 27,
-    "dni": "593999357124",
-    "aprobados": 0,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "José Torron",
-    "fis": [
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1772",
-    "pendientes": 0,
-    "totalFi": 0,
-    "equipo": "EQUIPO 90",
-    "nombre": "MONICA CHAVEZ",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "0986937742",
-    "aprobados": 0,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Josué Vera",
-    "fis": [
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1773",
-    "pendientes": 0,
-    "totalFi": 0,
-    "equipo": "EQUIPO 90",
-    "nombre": "VICTOR GOMEZ",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "0991089099",
-    "aprobados": 0,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Erika Gavilánez",
-    "fis": [
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1774",
-    "pendientes": 0,
-    "totalFi": 0,
-    "equipo": "EQUIPO 93",
-    "nombre": "CADENA MARTINEZ KEVIN JOEL",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "987397514",
-    "aprobados": 0,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "María José Román",
-    "fis": [
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1775",
-    "pendientes": 0,
-    "totalFi": 0,
-    "equipo": "EQUIPO 98",
-    "nombre": "DARWIN ALEJANDRO ENRIQUEZ PUPIALES",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "0981333528",
-    "aprobados": 0,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "María José Román",
-    "fis": [
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1776",
-    "pendientes": 0,
-    "totalFi": 0,
-    "equipo": "EQUIPO 99",
-    "nombre": "FERNANDO GOZALEZ",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "0991488105",
-    "aprobados": 0,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Josué Vera",
-    "fis": [
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1777",
-    "pendientes": 0,
-    "totalFi": 0,
-    "equipo": "EQUIPO 104",
-    "nombre": "\\NSALAZAR BENITEZ \\TJEAN PIERRE",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "593998195158",
-    "aprobados": 0,
-    "coordinador": "ROBERTO RODRIGUEZ",
-    "entrenador": "David Sosa",
-    "fis": [
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1778",
-    "pendientes": 0,
-    "totalFi": 0,
-    "equipo": "EQUIPO 30",
-    "nombre": "ISABELA TORRES",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Guayaquil",
-    "diasDesdePFD": 27,
-    "dni": "0961901809",
-    "aprobados": 0,
-    "coordinador": "JONATHAN LA ROSA",
-    "entrenador": "Lourdes Patiño",
-    "fis": [
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1779",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 93",
-    "nombre": "ABAD GONZA MISAEL SEBASTIAN",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "958722184",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Diego Bravo",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1780",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 93",
-    "nombre": "ALTUNA ALVAREZ GABRIELA LUCIA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "990138300",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Fernando Mendoza",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1781",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 93",
-    "nombre": "GONZA GONZALEZ JAIR ISRAEL",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "959454765",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Mildred Muñoz",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1782",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 93",
-    "nombre": "ITAS MAZÓN  KAREN SULAY",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "992449643",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "José Sánchez",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1783",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 93",
-    "nombre": "MARTINEZ GUERRERO MARJORIE XIMENA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "999717749",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Ana Monroy",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1784",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 94",
-    "nombre": "ISMAEL GUZMAN",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "0987942544",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Andrés Idrobo",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1785",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 95",
-    "nombre": "VASQUEZ KEVIN",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "0998479299",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Ana Monroy",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1786",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 97",
-    "nombre": "ADRIANA RAMIREZ",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "593987609978",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Diego Bravo",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1787",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 99",
-    "nombre": "NATHALY  VELEZ",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "0991233384",
-    "aprobados": 3,
-    "coordinador": "JOSUÉ VERA",
-    "entrenador": "Julio Narváez",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1788",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 119",
-    "nombre": "NILDA NICOL NOLASCO CHIPANA",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "992796887",
-    "aprobados": 3,
-    "coordinador": "ISAAC BETANCOURTH",
-    "entrenador": "Mauricio Ramírez",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1789",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 120",
-    "nombre": "JESSIKA MALDONADO",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1789",
-    "aprobados": 3,
-    "coordinador": "ISAAC BETANCOURTH",
-    "entrenador": "Lourdes Patiño",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1790",
-    "pendientes": 0,
-    "totalFi": 3,
-    "equipo": "EQUIPO 120",
-    "nombre": "JESSICA PINANGO",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1790",
-    "aprobados": 3,
-    "coordinador": "ISAAC BETANCOURTH",
-    "entrenador": "Lourdes Patiño",
-    "fis": [
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
-        "feedback": "",
-        "meta": "Estándar superior alcanzado en vitalidad y disciplina física",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
-        "feedback": "",
-        "meta": "Cumplimiento del estándar superior financiero",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "aprobado",
-        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
-        "feedback": "",
-        "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1791",
-    "pendientes": 0,
-    "totalFi": 0,
-    "equipo": "EQUIPO 121",
-    "nombre": "LISSETH LUCERO",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1791",
-    "aprobados": 0,
-    "coordinador": "ERIKA GAVILANEZ",
-    "entrenador": "JOSE SANCHEZ",
-    "fis": [
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1792",
-    "pendientes": 0,
-    "totalFi": 0,
-    "equipo": "EQUIPO 121",
-    "nombre": "BRENDA FARFAN",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1792",
-    "aprobados": 0,
-    "coordinador": "ERIKA GAVILANEZ",
-    "entrenador": "JOSE SANCHEZ",
-    "fis": [
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1793",
-    "pendientes": 0,
-    "totalFi": 0,
-    "equipo": "EQUIPO 121",
-    "nombre": "ANGEL MALACATUS",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1793",
-    "aprobados": 0,
-    "coordinador": "ERIKA GAVILANEZ",
-    "entrenador": "JOSE SANCHEZ",
-    "fis": [
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1794",
-    "pendientes": 0,
-    "totalFi": 0,
-    "equipo": "EQUIPO 121",
-    "nombre": "GABRIELA OSIO",
-    "asistioPFD": true,
-    "devueltos": 0,
-    "sede": "Quito",
-    "diasDesdePFD": 27,
-    "dni": "DNI_1794",
-    "aprobados": 0,
-    "coordinador": "ERIKA GAVILANEZ",
-    "entrenador": "José Sánchez",
-    "fis": [
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Salud & Vitalidad"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Finanzas & Riqueza"
-      },
-      {
-        "estado": "no_presentado",
-        "titulo": "",
-        "feedback": "",
-        "meta": "",
-        "area": "Relaciones & Familia"
-      }
-    ]
-  },
-  {
-    "fechaPFD": "16/08/2026",
-    "id": "fi_part_1795",
+    "id": "fi_part_1674",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 124",
     "nombre": "DORIS BALSECA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1795",
+    "dni": "DNI_1674",
     "aprobados": 1,
     "coordinador": "ISAAC BETANCOURTH",
     "entrenador": "FERNANDO MENDOZA",
@@ -42834,7 +41740,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "area": "Finanzas & Riqueza"
       },
       {
-        "estado": "no_presentado",
+        "estado": "pendiente",
         "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
         "feedback": "",
         "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
@@ -42844,16 +41750,20 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
   },
   {
     "fechaPFD": "16/08/2026",
-    "id": "fi_part_1796",
+    "id": "fi_part_1675",
     "pendientes": 2,
     "totalFi": 3,
     "equipo": "EQUIPO 124",
     "nombre": "ANDREA MEJÍA",
+    "rol": "MANAGER",
     "asistioPFD": true,
+    "isActivo": true,
+    "isDesertor": false,
+    "estado": "EN_JUEGO",
     "devueltos": 0,
     "sede": "Quito",
     "diasDesdePFD": 27,
-    "dni": "DNI_1796",
+    "dni": "DNI_1675",
     "aprobados": 1,
     "coordinador": "ISAAC BETANCOURTH",
     "entrenador": "FERNANDO MENDOZA",
@@ -42873,7 +41783,7 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "area": "Finanzas & Riqueza"
       },
       {
-        "estado": "no_presentado",
+        "estado": "pendiente",
         "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
         "feedback": "",
         "meta": "Liderazgo inspirador y resultados de alto impacto relacional",
@@ -42905,10 +41815,16 @@ export const EQUIPOS_FUTUROS_IMPOSIBLES = [
 
 export const ESTADOS_FI = [
   { id: "TODOS", label: "Todos los Estados" },
-  { id: "SIN_ENTREGA", label: "🚨 0 FIs (Sin Entrega - Alerta)" },
+  { id: "SIN_ENTREGA", label: "🚨 0 Resultados (Sin Entrega - Alerta)" },
   { id: "PENDIENTES", label: "⏳ Con Pendientes de Revisión" },
-  { id: "DEVUELTOS", label: "🔄 Con FIs Devueltos" },
-  { id: "APROBADOS", label: "✅ Con FIs Aprobados" }
+  { id: "DEVUELTOS", label: "🔄 Con Resultados Devueltos" },
+  { id: "APROBADOS", label: "✅ Con Resultados Aprobados" }
+];
+
+export const ROLES_FI = [
+  { id: "TODOS", label: "Todos los Roles (PX + Managers)" },
+  { id: "PX", label: "Participantes (PX)" },
+  { id: "MANAGER", label: "Managers / Capitanes" }
 ];
 
 export default NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES;
