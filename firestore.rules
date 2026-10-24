@@ -687,6 +687,20 @@ service cloud.firestore {
       allow write: if isAuthenticated() && email() == userDocId;
     }
 
+    function isValidNotificationData() {
+      let data = request.resource.data;
+      return data.keys().hasAll(['userId', 'title', 'message', 'read', 'created_at'])
+        && data.keys().hasOnly(['userId', 'title', 'message', 'read', 'created_at',
+             'createdAt', 'timestamp', 'type', 'taskId', 'taskMessageId', 'taskTitle', 'inviterEmail',
+             'inviterName', 'sede', 'standardId', 'priority', 'requiresAction', 'communicationId', 'robot_token'])
+        && data.userId is string
+        && data.userId.matches('.+@.+')
+        && data.title is string && data.title.size() <= 1000
+        && data.message is string && data.message.size() <= 20000
+        && data.read == false
+        && data.created_at is string;
+    }
+
     // NOTIFICATIONS (userId siempre es el correo, nunca el uid)
     match /notifications/{notifId} {
       allow read: if isAuthenticated() && resource.data.userId == email();
@@ -695,19 +709,11 @@ service cloud.firestore {
       // destinatarios y no registran remitente verificable, así que Rules no puede validar
       // remitente->destinatario. Se limita al máximo: solo esquema conocido, sin leídas,
       // textos acotados. El destinatario es el único que puede leer/actualizar/borrar.
-      // Pendiente recomendado: mover la publicación a backend (Cloud Function).
-      allow create: if (isAuthenticated()
-        && request.resource.data.keys().hasAll(['userId', 'title', 'message', 'read', 'created_at'])
-        && request.resource.data.keys().hasOnly(['userId', 'title', 'message', 'read', 'created_at',
-             'createdAt', 'timestamp', 'type', 'taskId', 'taskMessageId', 'taskTitle', 'inviterEmail',
-             'inviterName', 'sede', 'standardId', 'priority', 'requiresAction', 'communicationId', 'robot_token'])
-        && request.resource.data.userId is string
-        && request.resource.data.userId.matches('.+@.+')
-        && request.resource.data.title is string && request.resource.data.title.size() <= 1000
-        && request.resource.data.message is string && request.resource.data.message.size() <= 20000
-        && request.resource.data.read == false
-        && request.resource.data.created_at is string)
-        || (request.resource.data != null && request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET");
+      // Automatizaciones con robot_token DEBEN cumplir estrictamente el esquema para evitar abusos.
+      allow create: if isValidNotificationData() && (
+        isAuthenticated() ||
+        (request.resource.data != null && request.resource.data.get('robot_token', '') == "NODUS_ROBOT_CPSL_2026_SECRET")
+      );
       allow update: if isAuthenticated() && resource.data.userId == email();
       allow delete: if isAuthenticated() && resource.data.userId == email();
     }
@@ -727,7 +733,8 @@ service cloud.firestore {
     // MAIL (cola de la extensión Trigger Email)
     match /mail/{mailId} {
       allow read: if isAuthenticated();
-      allow create: if isAuthenticated() || (request.resource.data != null && request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET");
+      allow create: if (isAuthenticated() || (request.resource.data != null && request.resource.data.get('robot_token', '') == "NODUS_ROBOT_CPSL_2026_SECRET"))
+        && request.resource.data.keys().hasAny(['to', 'message', 'template']);
       allow update, delete: if isSuperAdmin();
     }
 
@@ -894,9 +901,10 @@ service cloud.firestore {
     }
 
     // NODUS: acceso gerencial/autenticado y sincronización de robots autorizados.
+    // Lectura restringida a usuarios autenticados (blindaje contra scraping web anónimo).
     match /nodus_kpis_sincronizados/{document=**} {
-      allow read: if isAuthenticated() || true;
-      allow write: if isSuperAdmin() || isGerenteODireccion() || (request.resource.data != null && request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET");
+      allow read: if isAuthenticated();
+      allow write: if isSuperAdmin() || isGerenteODireccion() || (request.resource.data != null && request.resource.data.get('robot_token', '') == "NODUS_ROBOT_CPSL_2026_SECRET");
     }
 
     // FUTUROS IMPOSIBLES: NODUS conserva la fuente; Causa OS solo consume
@@ -964,6 +972,7 @@ service cloud.firestore {
         exists(profilePath) &&
         (
           get(profilePath).data.get('role', '') in roleNames ||
+          get(profilePath).data.get('rol', '') in roleNames ||
           get(profilePath).data.get('appRole', '') in roleNames ||
           (get(profilePath).data.get('roles', []) is list &&
            get(profilePath).data.get('roles', []).hasAny(roleNames))
@@ -980,6 +989,17 @@ service cloud.firestore {
         'coord_c1', 'coord_c2', 'coordinador_c1c2',
         'coord_maestria', 'coordinador_mj'
       ]);
+    }
+    function isStaffOrCoordinatorOrManagement() {
+      return isAuthenticated() && (
+        isGerenteODireccion() ||
+        isSuperAdmin() ||
+        callerHasAnyRole([
+          'gerente', 'direccion', 'cfo', 'cco', 'ceo', 'director_maestria', 'consolidado', 'superadmin',
+          'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'coord_jr', 'coordinador',
+          'staff', 'manager', 'capitan', 'qt', 'entrenador', 'entrenador_llamadas', 'talento_humano', 'aliado'
+        ])
+      );
     }
     function emailIsCaller(value) {
       return value is string && value.lower() in callerEmailAliases();
@@ -1029,8 +1049,14 @@ service cloud.firestore {
     // ------------------------------------------------------------------------
     // COLECCIONES ADICIONALES (FALTANTES REVELADAS EN AUDITORÍA FORENSE)
     // ------------------------------------------------------------------------
+    // PROTECCIÓN DE DATOS SENSIBLES (PII): Solo staff/coordinador/management autenticado puede leer.
+    // Escritura restringida estrictamente a gerencia o superadmin.
     match /participants/{document=**} {
-      allow read: if isAuthenticated();
+      allow read: if isStaffOrCoordinatorOrManagement();
+      allow write: if isGerenteODireccion() || isSuperAdmin();
+    }
+    match /crm_participants/{document=**} {
+      allow read: if isStaffOrCoordinatorOrManagement();
       allow write: if isGerenteODireccion() || isSuperAdmin();
     }
     match /sugerencias_soporte/{document=**} {
@@ -1052,15 +1078,39 @@ service cloud.firestore {
     match /notas_seguimiento/{document=**} {
       allow read, write: if isAuthenticated();
     }
+
+    // GOBERNANZA Y CONTENCIÓN DE IA SOBRE COLECCIONES FINANCIERAS:
+    // Bloqueo total de escrituras autónomas de bots o IAs.
+    // Toda escritura requiere usuario humano autenticado con rol gerencial o superadmin.
     match /liquidaciones_pagos/{document=**} {
-      allow read, write: if isGerenteODireccion() || isSuperAdmin();
+      allow read: if isGerenteODireccion() || isSuperAdmin();
+      allow write: if isGerenteODireccion() || isSuperAdmin();
     }
     match /finanzas_audit_trail/{document=**} {
-      allow read, write: if isGerenteODireccion() || isSuperAdmin();
+      allow read: if isGerenteODireccion() || isSuperAdmin();
+      allow write: if isGerenteODireccion() || isSuperAdmin();
     }
+    match /cfo-dashboard/{document=**} {
+      allow read: if isGerenteODireccion() || isSuperAdmin();
+      allow write: if isGerenteODireccion() || isSuperAdmin();
+    }
+    match /cfo_dashboard/{document=**} {
+      allow read: if isGerenteODireccion() || isSuperAdmin();
+      allow write: if isGerenteODireccion() || isSuperAdmin();
+    }
+
+    // AUDITORÍA Y CERTIFICACIÓN DE SENTADOS CONFIRMADOS:
+    // Lectura permitida a usuarios autenticados.
+    // Escritura restringida a SuperAdmin o Gerencia.
+    match /nodus_auditoria_sentados_confirmados/{document=**} {
+      allow read: if isAuthenticated();
+      allow write: if isSuperAdmin() || isGerenteODireccion();
+    }
+
+    // NODUS: sincronización de coordinadores. Lectura autenticada (sin fuga pública).
     match /nodus_coordinadores_c1c2/{document=**} {
-      allow read: if isAuthenticated() || true;
-      allow write: if isSuperAdmin() || isGerenteODireccion() || (request.resource.data != null && request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET");
+      allow read: if isAuthenticated();
+      allow write: if isSuperAdmin() || isGerenteODireccion() || (request.resource.data != null && request.resource.data.get('robot_token', '') == "NODUS_ROBOT_CPSL_2026_SECRET");
     }
     match /graduados_lineage_master/{document=**} {
       allow read: if isAuthenticated();
@@ -1233,7 +1283,10 @@ service cloud.firestore {
     match /kpis_entrenadores_llamadas/{document=**} {
       allow read, write: if isAuthenticated();
     }
-    // Cada participante puede crear y consultar únicamente sus propias firmas.
+    // INMUTABILIDAD LEGAL ABSOLUTA - Onboarding Legal y Firmas Digitales
+    // Borrado bloqueado para todos (incluso superadmin) para preservar validez probatoria contractual.
+    // Updates restringidos únicamente a metadatos de sincronización PDF, prohibiendo cualquier
+    // alteración de firma, DNI, identificación, timestamp o identidad del firmante.
     match /px_legal_signatures/{signatureId} {
       allow read: if isSuperAdmin() || isGerenteODireccion() || (isAuthenticated() && resource.data.participant_id == email());
       allow create: if isAuthenticated()
@@ -1247,15 +1300,21 @@ service cloud.firestore {
         && request.resource.data.signature_data_url.size() < 700000
         && request.resource.data.docs_accepted is list
         && request.resource.data.docs_accepted.size() > 0;
-      // Los datos de aceptación y la firma son inmutables desde el cliente.
-      allow update: if isSuperAdmin() || (isAuthenticated()
-        && resource.data.owner_uid == request.auth.uid
-        && resource.data.participant_id == email()
+      allow update: if (isSuperAdmin() || isGerenteODireccion() || (isAuthenticated()
+          && resource.data.owner_uid == request.auth.uid
+          && resource.data.participant_id == email()))
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
           'pdf_storage_path', 'pdf_download_url', 'pdfStoragePath', 'pdfDownloadUrl',
           'nodus_synced', 'nodus_synced_at', 'nodusSynced', 'nodusSyncedAt'
-        ]));
-      allow delete: if isSuperAdmin();
+        ])
+        && request.resource.data.signature_data_url == resource.data.signature_data_url
+        && request.resource.data.signed_at == resource.data.signed_at
+        && request.resource.data.get('participant_id', '') == resource.data.get('participant_id', '')
+        && request.resource.data.get('dni', '') == resource.data.get('dni', '')
+        && request.resource.data.get('identification', '') == resource.data.get('identification', '')
+        && request.resource.data.get('owner_uid', '') == resource.data.get('owner_uid', '')
+        && request.resource.data.get('id', '') == resource.data.get('id', '');
+      allow delete: if false;
     }
     // Reportes de diagnóstico (Centro de Mando). Solo Super Admin lee.
     // "automatic" lo escribe únicamente el Admin SDK (bypass de reglas).

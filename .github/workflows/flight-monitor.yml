@@ -14,12 +14,12 @@ jobs:
       
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - name: Set up Python (Secure LTS 3.12)
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.12'
           
       - name: Install dependencies
         run: |
@@ -31,10 +31,16 @@ jobs:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
         run: |
           echo "$GOOGLE_SERVICE_ACCOUNT_JSON" > centro-operativo-cpsl-3d05655c949c.json
+          chmod 600 centro-operativo-cpsl-3d05655c949c.json
 
       - name: Run Flight Monitor Agent
         run: |
           python scripts/sync_drive_vuelos_7xdia.py
+
+      - name: Cleanup Service Account Key
+        if: always()
+        run: |
+          rm -f centro-operativo-cpsl-3d05655c949c.json
 
       - name: Commit Tracker File changes
         run: |
