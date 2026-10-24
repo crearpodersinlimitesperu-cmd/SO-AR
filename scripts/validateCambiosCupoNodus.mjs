@@ -409,7 +409,7 @@ export async function createCausaNotifications(evaluaciones, { dryRun = false } 
           type: 'CAMBIO_CUPO_AUDIT',
           sede: 'Lima',
           priority: 'high',
-          robot_token: 'NODUS_ROBOT_CPSL_2026_SECRET'
+          robot_token: process.env.NODUS_ROBOT_SECRET ? 'AUTHENTICATED_AUDIT_ROBOT' : 'UNAUTHENTICATED_ROBOT'
         });
         console.log(`   ✓ Notificación creada en Firestore para ${coord.name} (${coord.email}) -> ID: ${notifDoc.id}`);
       } catch (err) {

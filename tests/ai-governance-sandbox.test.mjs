@@ -5,6 +5,8 @@ import {
   PROTECTED_SENSITIVE_COLLECTIONS,
   HUMAN_MANAGEMENT_ROLES,
   validateAIOperation,
+  enforceAICopilotFinancialLock,
+  executeFailOpenRevenueTransaction,
   executeZeroLatencySafeFallback
 } from '../src/services/aiGovernanceSecuritySandbox.js';
 
@@ -12,6 +14,7 @@ describe('AIGovernanceSecuritySandbox', () => {
   it('identifies protected collections and management roles', () => {
     assert.ok(PROTECTED_FINANCIAL_COLLECTIONS.includes('liquidaciones_pagos'));
     assert.ok(PROTECTED_FINANCIAL_COLLECTIONS.includes('cfo-dashboard'));
+    assert.ok(PROTECTED_FINANCIAL_COLLECTIONS.includes('banking_reconciliations'));
     assert.ok(PROTECTED_SENSITIVE_COLLECTIONS.includes('px_legal_signatures'));
     assert.ok(HUMAN_MANAGEMENT_ROLES.includes('gerente'));
     assert.ok(HUMAN_MANAGEMENT_ROLES.includes('cfo'));
@@ -25,6 +28,15 @@ describe('AIGovernanceSecuritySandbox', () => {
     });
     assert.equal(res.allowed, true);
     assert.equal(res.requiresHITL, false);
+  });
+
+  it('strictly locks Copilot IA from modifying financial collections', () => {
+    const lockCheck = enforceAICopilotFinancialLock('Causa-Copilot-IA', 'create', 'liquidaciones_pagos');
+    assert.equal(lockCheck.locked, true);
+    assert.match(lockCheck.reason, /confinada a solo-lectura/);
+
+    const readCheck = enforceAICopilotFinancialLock('Causa-Copilot-IA', 'read', 'liquidaciones_pagos');
+    assert.equal(readCheck.locked, false);
   });
 
   it('strictly contains autonomous AI writes on financial collections without human manager', async () => {
@@ -50,6 +62,32 @@ describe('AIGovernanceSecuritySandbox', () => {
     });
     assert.equal(res.allowed, true);
     assert.equal(res.requiresHITL, false);
+  });
+
+  it('executes Fail-Open revenue transactions allowing payments even when security check fails', async () => {
+    const initialPayment = {
+      id: 'PAY-C1-001',
+      montoTotal: 500,
+      abonos: [{ monto: 200, metodoPago: 'TRANSF' }]
+    };
+
+    const newAbono = { monto: 300, metodoPago: 'EFECTIVO' };
+
+    // Simula una caída o timeout del escudo WAF / IP security check
+    const failingSecurityGate = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('WAF_IP_REPUTATION_GATEWAY_DOWN')), 50);
+    });
+
+    const result = await executeFailOpenRevenueTransaction(initialPayment, newAbono, failingSecurityGate);
+
+    assert.equal(result.success, true);
+    assert.equal(result.failOpenTriggered, true);
+    assert.equal(result.reconciledPayment.estadoPago, 'PAGADO_TOTAL');
+    assert.equal(result.reconciledPayment.saldoPendiente, 0);
+    assert.equal(result.reconciledPayment.montoAbonado, 500);
+    assert.equal(result.reconciledPayment.securityStatus, 'FAIL_OPEN_APPROVED_PENDING_AUDIT');
+    assert.ok(result.durationMs < 500, 'Debe cumplir SLA sub-500ms');
+    assert.equal(result.slaStatus, 'SLA_MET_SUB_2S');
   });
 
   it('guarantees business continuity SLA <2s with safe fallback when primary operation fails', async () => {

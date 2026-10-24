@@ -37,7 +37,11 @@ import crypto from 'crypto';
 import { initializeApp, cert, getApps } from 'firebase-admin/app';
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 
-const ROBOT_SECRET = process.env.NODUS_ROBOT_SECRET || 'NODUS_ROBOT_CPSL_2026_SECRET';
+// ZERO-TRUST DE SECRETOS: Prohibido usar llaves en texto plano en el repositorio
+const ROBOT_SECRET = process.env.NODUS_ROBOT_SECRET;
+if (!ROBOT_SECRET) {
+  console.warn("⚠️ [Zero-Trust Security]: NODUS_ROBOT_SECRET no provisto en variables de entorno. Operando en modo restringido sin credenciales fijas.");
+}
 const SYNC_TIMESTAMP = new Date().toISOString();
 const SYNC_LOG_ID = `sync_delta_${Date.now()}`;
 const FORCE_FULL_SYNC = process.argv.includes('--full') || process.env.FORCE_FULL_SYNC === 'true';
@@ -235,7 +239,7 @@ export function buildCrmParticipantDoc(rawP, fiLookup = {}) {
 
   return {
     sync_log_id: SYNC_LOG_ID,
-    robot_token_valid: (ROBOT_SECRET === 'NODUS_ROBOT_CPSL_2026_SECRET'),
+    robot_token_valid: Boolean(ROBOT_SECRET && ROBOT_SECRET.length >= 16),
     actualizado_el: SYNC_TIMESTAMP,
     identificacion: {
       nombre_completo: safeField(rawP.nombre),
