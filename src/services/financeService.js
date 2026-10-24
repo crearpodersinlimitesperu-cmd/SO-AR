@@ -1,5 +1,5 @@
 import { collection, doc, getDocs, setDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from './firebase';
+import { db } from './firebase.js';
 
 export async function getHQOperationalStatus() {
   const hqStatuses = [];
@@ -152,6 +152,45 @@ export async function submitWeeklySLA(sede, payload) {
     console.error("Error al enviar SLA semanal:", error);
     return false;
   }
+}
+
+/**
+ * Reconciliación Matemática y Transaccional de Pagos / Abonos (Zero-Descuadre).
+ * Garantiza que la sumatoria de abonos, el saldo pendiente y el monto total
+ * mantengan consistencia atómica inmutable sin descuadres aritméticos.
+ */
+export function reconcilePaymentBalancesAtomic(paymentRecord = {}, newAbono = null) {
+  const montoTotal = Number(paymentRecord.montoTotal || paymentRecord.totalAmount || paymentRecord.price || 0);
+  const existingAbonos = Array.isArray(paymentRecord.abonos) ? [...paymentRecord.abonos] : [];
+
+  if (newAbono && Number(newAbono.monto) > 0) {
+    existingAbonos.push({
+      ...newAbono,
+      monto: Number(newAbono.monto),
+      fecha: newAbono.fecha || new Date().toISOString(),
+      metodoPago: newAbono.metodoPago || 'EFECTIVO'
+    });
+  }
+
+  const montoAbonado = existingAbonos.reduce((acc, curr) => acc + (Number(curr.monto) || 0), 0);
+  const saldoPendiente = Math.max(0, Math.round((montoTotal - montoAbonado) * 100) / 100);
+
+  let estadoPago = 'PENDIENTE';
+  if (saldoPendiente <= 0 && montoTotal > 0) {
+    estadoPago = 'PAGADO_TOTAL';
+  } else if (montoAbonado > 0) {
+    estadoPago = 'ABONO_PARCIAL';
+  }
+
+  return {
+    ...paymentRecord,
+    montoTotal,
+    montoAbonado: Math.round(montoAbonado * 100) / 100,
+    saldoPendiente,
+    estadoPago,
+    abonos: existingAbonos,
+    ultimaReconciliacion: new Date().toISOString()
+  };
 }
 
 /**

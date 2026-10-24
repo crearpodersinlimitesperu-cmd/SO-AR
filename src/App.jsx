@@ -365,11 +365,7 @@ function App() {
             </RoleRoute>
           } />
 
-          <Route path="/masterclass-distinciones" element={
-            <PrivateRoute>
-              <MasterclassDistinciones />
-            </PrivateRoute>
-          } />
+          <Route path="/masterclass-distinciones" element={<Navigate to="/learning" replace />} />
 
           <Route path="/roles" element={
             <PrivateRoute>
@@ -499,11 +495,7 @@ function App() {
             </RoleRoute>
           } />
 
-          <Route path="/brandscript" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'entrenador', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coordinador_mj', 'qt', 'capitan']} requireSuperAdmin={false}>
-              <BrandScriptBoard />
-            </RoleRoute>
-          } />
+          <Route path="/brandscript" element={<Navigate to="/estrategia" replace />} />
 
           <Route path="/acuerdos" element={
             <PrivateRoute>
@@ -550,11 +542,7 @@ function App() {
               y se agregaron coord_maestria/coordinador_mj (presentes en la Matriz
               Oficial pero ausentes antes). excludeDireccionBypass=true agregado
               08/09/2026 (confirmado por José), misma razón que en /calendario-mj. */}
-          <Route path="/generador-flyer" element={
-            <RoleRoute allowedRoles={['gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj']} requireSuperAdmin={false} excludeDireccionBypass={true}>
-              <GeneradorFlyer />
-            </RoleRoute>
-          } />
+          <Route path="/generador-flyer" element={<Navigate to="/home" replace />} />
 
           {/* Monitor de Vuelos y Cartas Oficiales */}
           {/* Contiene AMBAS: "Monitor de Vuelos" (Directivos+Gerentes) y "Sistema de
@@ -612,13 +600,9 @@ function App() {
             </PrivateRoute>
           } />
 
-          {/* Best-Seller Causa OS: Vende Sin Vender */}
-          <Route path="/vende-sin-vender" element={
-            <PrivateRoute>
-              <VendeSinVender />
-            </PrivateRoute>
-          } />
-          <Route path="/causa-vende" element={<Navigate to="/vende-sin-vender" replace />} />
+          {/* Rutas de Prospección Comercial Redirigidas a Home / CRM */}
+          <Route path="/vende-sin-vender" element={<Navigate to="/home" replace />} />
+          <Route path="/causa-vende" element={<Navigate to="/home" replace />} />
           <Route path="/actividadcoordinadores" element={<Navigate to="/auditoria-kpis" replace />} />
           <Route path="/coordinadores-nodus" element={<Navigate to="/auditoria-kpis" replace />} />
 

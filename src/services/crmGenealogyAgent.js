@@ -4,9 +4,9 @@
  * y catálogo histórico de graduados de Poder Sin Límites.
  */
 
-import nodusFallback from '../data/nodusFallbackData.json';
-import limaGraduadosFallback from '../data/limaGraduadosLineage.json';
-import { db } from './firebase';
+import nodusFallback from '../data/nodusFallbackData.json' with { type: 'json' };
+import limaGraduadosFallback from '../data/limaGraduadosLineage.json' with { type: 'json' };
+import { db } from './firebase.js';
 import { doc, getDoc } from 'firebase/firestore';
 
 export const SEDES_CATALOG = [
@@ -80,6 +80,45 @@ export function detectItemSede(item) {
   if (phone.startsWith('593')) return 'Quito';
 
   return 'Lima';
+}
+
+/**
+ * Preserva la sede de origen inmutable para proteger el linaje de enrolamiento
+ * al transferir o mudar participantes entre sedes operativas.
+ */
+export function getParticipantOriginSede(item) {
+  if (!item) return 'Lima';
+  if (item.sedeOrigen) return normalizeSedeName(item.sedeOrigen);
+  return detectItemSede(item);
+}
+
+/**
+ * Transfiere un participante a una nueva sede preservando la cadena de custodia
+ * y el linaje de atribución al líder enrolador original.
+ */
+export function transferParticipantSede(participant, targetSede) {
+  if (!participant || !targetSede) return participant;
+  const canonicalOrigin = getParticipantOriginSede(participant);
+  const canonicalTarget = normalizeSedeName(targetSede);
+
+  const traslados = Array.isArray(participant.historialTraslados) 
+    ? [...participant.historialTraslados] 
+    : [];
+
+  traslados.push({
+    from: participant.sede || canonicalOrigin,
+    to: canonicalTarget,
+    timestamp: new Date().toISOString()
+  });
+
+  return {
+    ...participant,
+    sedeOrigen: canonicalOrigin,
+    sedeActual: canonicalTarget,
+    sede: canonicalTarget,
+    historialTraslados: traslados,
+    updatedAt: new Date().toISOString()
+  };
 }
 
 /**
