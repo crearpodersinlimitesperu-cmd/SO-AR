@@ -14,6 +14,7 @@ import {
 } from 'recharts';
 import { useTheme } from '../context/ThemeContext';
 import { usersData, OPERATIONAL_SEDES } from '../data/usersData';
+import AuditoriaSentadosConfirmadosModal from './AuditoriaSentadosConfirmadosModal';
 import './NodusCoordinadoresC1C2Dashboard.css';
 
 const KNOWN_COORDINATOR_EMAILS = {
@@ -201,6 +202,7 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
   const [activeChartTab, setActiveChartTab] = useState('coordinadores'); // coordinadores, sedes, estados
   const [chartMetric, setChartMetric] = useState('sentados'); // 'sentados' (C1 vs C2), 'gestiones' (Llamadas), 'integral' (Doble eje)
   const [singleCoordView, setSingleCoordView] = useState('equipos'); // 'equipos' | 'resumen'
+  const [isAuditoriaModalOpen, setIsAuditoriaModalOpen] = useState(false);
 
   // Filas expandidas (para ver desglose de equipos)
   const [expandedRows, setExpandedRows] = useState({});
@@ -996,6 +998,23 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
             <span className="nodus-pulse-dot" />
             <span>Sincronizado: <strong style={{ color: freshness.stale ? '#f59e0b' : '#10b981' }}>{timeSinceSync}</strong></span>
           </div>
+
+          <button
+            onClick={() => setIsAuditoriaModalOpen(true)}
+            className="nodus-btn-refresh"
+            style={{
+              background: 'rgba(255, 193, 7, 0.15)',
+              color: '#ffc107',
+              border: '1px solid rgba(255, 193, 7, 0.35)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.45rem'
+            }}
+            title="Abrir auditoría de Sentados vs Confirmados (Nuevos y Rezagados - C1 y C2)"
+          >
+            <UserCheck size={14} color="#ffc107" />
+            <span>Auditoría Sentados vs Confirmados</span>
+          </button>
 
           <button
             onClick={handleManualRefresh}
@@ -1820,6 +1839,12 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
           </table>
         </div>
       </div>
+
+      {/* MODAL DE AUDITORÍA: SENTADOS VS CONFIRMADOS (C1 & C2, NUEVOS & REZAGADOS) */}
+      <AuditoriaSentadosConfirmadosModal
+        isOpen={isAuditoriaModalOpen}
+        onClose={() => setIsAuditoriaModalOpen(false)}
+      />
     </div>
   );
 }
