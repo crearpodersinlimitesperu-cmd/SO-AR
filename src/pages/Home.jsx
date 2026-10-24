@@ -945,7 +945,7 @@ export default function Home() {
     'Europe/Lisbon': 'pt', 'Atlantic/Madeira': 'pt', 'Atlantic/Azores': 'pt',
     'Europe/London': 'gb', 'Europe/Paris': 'fr', 'Europe/Berlin': 'de',
     'Europe/Rome': 'it', 'Europe/Amsterdam': 'nl', 'Europe/Brussels': 'be',
-    'Europe/Vienna': 'at', 'Europe/Zurich': 'ch', 'Europe/Prague': 'es',
+    'Europe/Vienna': 'at', 'Europe/Zurich': 'ch', 'Europe/Prague': 'cz',
     'Europe/Bratislava': 'sk', 'Europe/Warsaw': 'pl', 'Europe/Budapest': 'hu',
     'Europe/Bucharest': 'ro', 'Europe/Athens': 'gr', 'Europe/Dublin': 'ie',
     'Europe/Stockholm': 'se', 'Europe/Oslo': 'no', 'Europe/Copenhagen': 'dk',
@@ -959,8 +959,8 @@ export default function Home() {
     'Australia/Sydney': 'au', 'Australia/Melbourne': 'au', 'Pacific/Auckland': 'nz',
   };
 
-  // Detecta la zona horaria del usuario y resuelve el país de la bandera de forma resiliente
-  const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Europe/Madrid';
+  // Detecta la zona horaria del usuario y resuelve el país de la bandera de forma física/resiliente
+  const userTz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Lima';
   const LATAM_CORE_TZ = [
     'America/Lima', 'America/Guayaquil', 'America/Bogota',
     'America/Mexico_City', 'America/Monterrey', 'America/Mazatlan',
@@ -968,39 +968,35 @@ export default function Home() {
   const isOutsideLatam = !LATAM_CORE_TZ.includes(userTz);
 
   const localCountryCode = (() => {
-    // 1. Mapeo directo por zona horaria IANA
+    // 1. Mapeo directo por zona horaria IANA real del dispositivo (física)
     if (TZ_TO_COUNTRY[userTz]) {
-      if (userTz === 'Europe/Prague' && typeof navigator !== 'undefined' && navigator.language?.toLowerCase().startsWith('cs')) {
-        return 'cz';
-      }
       return TZ_TO_COUNTRY[userTz];
     }
 
-    // 2. Si la zona horaria pertenece a Europa
-    if (userTz.startsWith('Europe/') || userTz.startsWith('Atlantic/')) {
-      return 'es'; // España como sede canónica europea
+    // 2. Si la zona horaria contiene ciudad o país conocido
+    if (userTz.includes('Prague')) return 'cz';
+    if (userTz.includes('Madrid')) return 'es';
+    if (userTz.includes('Lima')) return 'pe';
+    if (userTz.includes('Bogota')) return 'co';
+    if (userTz.includes('Guayaquil')) return 'ec';
+    if (userTz.includes('Mexico')) return 'mx';
+
+    // 3. Detección por código de país del navegador (ej: es-ES -> es, cs-CZ -> cz, en-US -> us)
+    if (typeof navigator !== 'undefined' && navigator.language) {
+      const parts = navigator.language.split('-');
+      if (parts.length > 1 && parts[1].length === 2) {
+        return parts[1].toLowerCase();
+      }
     }
 
-    // 3. Fallback inteligente por sede asignada del usuario
+    // 4. Fallback por sede asignada del usuario si está en una de las sedes oficiales
     const sede = (currentUser?.sede || '').toLowerCase();
     if (sede.includes('lima') || sede.includes('peru') || sede.includes('perú')) return 'pe';
     if (sede.includes('quito') || sede.includes('guayaquil') || sede.includes('cuenca') || sede.includes('ecuador')) return 'ec';
     if (sede.includes('medellin') || sede.includes('colombia')) return 'co';
     if (sede.includes('mexico') || sede.includes('cdmx')) return 'mx';
-    if (sede.includes('madrid') || sede.includes('españa')) return 'es';
 
-    // 4. Fallback por idioma del navegador
-    if (typeof navigator !== 'undefined') {
-      const lang = (navigator.language || '').toLowerCase();
-      if (lang.includes('es-es')) return 'es';
-      if (lang.includes('es-pe')) return 'pe';
-      if (lang.includes('es-ec')) return 'ec';
-      if (lang.includes('es-co')) return 'co';
-      if (lang.includes('es-mx')) return 'mx';
-      if (lang.startsWith('es')) return 'es';
-    }
-
-    return 'es';
+    return 'pe';
   })();
   // Label UTC offset para zonas no mapeadas
   const localZoneLabel = (() => {
@@ -1743,11 +1739,11 @@ export default function Home() {
               padding: '3px 8px', border: activeTheme === 'light' ? '1px solid #cbd5e1' : '1px solid rgba(255,255,255,0.1)'
             }}>
               <img 
-                src={flagUrl(localCountryCode || 'es')} 
+                src={flagUrl(localCountryCode || 'pe')} 
                 alt="Tu Ubicación" 
                 onError={(e) => {
                   e.currentTarget.onerror = null;
-                  e.currentTarget.src = 'https://flagcdn.com/w40/es.png';
+                  e.currentTarget.src = 'https://flagcdn.com/w40/pe.png';
                 }}
                 style={{ width: '20px', height: '14px', objectFit: 'cover', borderRadius: '2px', flexShrink: 0 }} 
               />
