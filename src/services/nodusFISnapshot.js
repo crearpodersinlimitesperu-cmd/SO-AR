@@ -69,6 +69,10 @@ export function opcionesEquipo(participantes = [], sede = 'GLOBAL') {
   const num = (t) => parseInt(t.replace(/\D/g, ''), 10) || 0;
   const list = [...map.values()]
     .sort((a, b) => {
+      const aIsSinEquipo = (a.equipo || '').toLowerCase().includes('sin equipo');
+      const bIsSinEquipo = (b.equipo || '').toLowerCase().includes('sin equipo');
+      if (aIsSinEquipo && !bIsSinEquipo) return 1;
+      if (!aIsSinEquipo && bIsSinEquipo) return -1;
       const orderA = SEDE_ORDER[normalizarTexto(a.sede)] || 99;
       const orderB = SEDE_ORDER[normalizarTexto(b.sede)] || 99;
       if (orderA !== orderB) return orderA - orderB;

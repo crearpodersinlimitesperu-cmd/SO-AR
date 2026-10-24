@@ -116,6 +116,12 @@ export function ejecutarDiagnosticoFIs(
       semaforo
     };
   }).sort((a, b) => {
+    // Si es "Sin Equipo", siempre al final
+    const aIsSinEquipo = (a.equipo || '').toLowerCase().includes('sin equipo');
+    const bIsSinEquipo = (b.equipo || '').toLowerCase().includes('sin equipo');
+    if (aIsSinEquipo && !bIsSinEquipo) return 1;
+    if (!aIsSinEquipo && bIsSinEquipo) return -1;
+
     // Si estamos en vista GLOBAL, agrupar primero coherentemente por Sede
     if (esFiltroGlobal) {
       const orderA = SEDE_ORDER[normalizarTexto(a.sede)] || 99;

@@ -10,6 +10,41 @@ import { db } from '../services/firebase';
 import { useAuth } from '../context/AuthContext';
 import { opcionesEquipo, resolveFISource } from '../services/nodusFISnapshot';
 import { NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES } from '../data/nodusFuturosImposiblesData.js';
+import nodusEnroladosFallback from '../data/nodusEnroladosRecords.json';
+
+const normSearch = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '');
+
+const cleanTeamCode = (raw) => {
+  if (!raw) return '';
+  const m = String(raw).match(/EQUIPO\s*\d+/i);
+  return m ? m[0].toUpperCase() : String(raw).trim();
+};
+
+const VERIFIED_TEAM_BY_DNI = new Map();
+const VERIFIED_TEAM_BY_NAME = new Map();
+
+NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES.forEach((p) => {
+  const team = cleanTeamCode(p.equipo);
+  if (!team) return;
+  if (p.dni) {
+    const cleanDni = String(p.dni).replace(/\D/g, '');
+    if (cleanDni) VERIFIED_TEAM_BY_DNI.set(cleanDni, team);
+  }
+  if (p.nombre) {
+    const k = normSearch(p.nombre);
+    if (k) VERIFIED_TEAM_BY_NAME.set(k, team);
+  }
+});
+
+(Array.isArray(nodusEnroladosFallback) ? nodusEnroladosFallback : []).forEach((r) => {
+  const team = cleanTeamCode(r.equipo);
+  if (!team) return;
+  if (r.nombre) {
+    const k = normSearch(r.nombre);
+    if (!VERIFIED_TEAM_BY_NAME.has(k)) VERIFIED_TEAM_BY_NAME.set(k, team);
+  }
+});
+
 const EQUIPOS_FUTUROS_IMPOSIBLES = ['EQUIPO 27', 'EQUIPO 28', 'EQUIPO 29', 'EQUIPO 30', 'EQUIPO 31'];
 const ESTADOS_FI = [
   { id: 'TODOS', label: 'Todos los estados' },
@@ -134,6 +169,24 @@ export default function FuturosImposiblesView({
       const review = reviewOverrides[`${participant.id}__${areaIndex}`];
       return review ? { ...fi, estado: review.estado, feedback: review.feedback || fi.feedback } : fi;
     });
+
+    const cleanDni = String(participant.dni || '').replace(/\D/g, '');
+    const cleanName = normSearch(participant.nombre);
+
+    // Resolución determinista de equipo oficial
+    let resolvedEquipo = cleanTeamCode(participant.equipo);
+    if (!resolvedEquipo || resolvedEquipo.toLowerCase() === 'sin equipo') {
+      if (cleanDni && VERIFIED_TEAM_BY_DNI.has(cleanDni)) {
+        resolvedEquipo = VERIFIED_TEAM_BY_DNI.get(cleanDni);
+      } else if (cleanName && VERIFIED_TEAM_BY_NAME.has(cleanName)) {
+        resolvedEquipo = VERIFIED_TEAM_BY_NAME.get(cleanName);
+      } else {
+        const campos = participant.camposNodus || {};
+        const fallbackField = campos.equipo || campos.team || campos.grupo || campos.nro_equipo || campos.equipo_c2 || '';
+        if (fallbackField) resolvedEquipo = cleanTeamCode(fallbackField);
+      }
+    }
+    resolvedEquipo = resolvedEquipo || 'Sin Equipo';
     
     // Inmutabilidad: Preservamos el universo histórico pero auditamos estrictamente sobre el estándar de 3 Resultados
     const hasFiDetail = fis.length > 0;
@@ -152,6 +205,7 @@ export default function FuturosImposiblesView({
 
     return {
       ...participant,
+      equipo: resolvedEquipo,
       rawFis, // Histórico completo preservado sin alteración de DB
       fis,
       totalFi: total3,
@@ -175,6 +229,14 @@ export default function FuturosImposiblesView({
 
   // Cálculo dinámico de equipos disponibles según la sede seleccionada
   const esGlobalSede = ['', 'global', 'sede global', 'todas', 'todos', 'all'].includes((selectedSede || '').toLowerCase().trim());
+  const totalPfdEnSede = useMemo(() => {
+    if (esGlobalSede) {
+      return participantesConRevision.filter((p) => p?.asistioPFD === true).length;
+    }
+    const sedeNorm = normalizarTexto(selectedSede);
+    return participantesConRevision.filter((p) => p?.asistioPFD === true && normalizarTexto(p.sede).includes(sedeNorm)).length;
+  }, [participantesConRevision, selectedSede, esGlobalSede]);
+
   const equiposDeSede = useMemo(
     () => opcionesEquipo(participantesConRevision, selectedSede),
     [participantesConRevision, selectedSede]
@@ -782,7 +844,7 @@ export default function FuturosImposiblesView({
           </div>
 
           <div style={{ fontSize: '0.8rem', color: textMuted, marginLeft: '0.5rem' }}>
-            Mostrando <strong>{participantes.length}</strong> de {participantesConRevision.filter((p) => p?.asistioPFD === true).length} asistentes PFD verificables
+            Mostrando <strong>{participantes.length}</strong> de {totalPfdEnSede} asistentes PFD verificables {esGlobalSede ? '(Global)' : `en ${selectedSede}`}
           </div>
         </div>
       </div>
