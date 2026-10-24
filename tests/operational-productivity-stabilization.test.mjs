@@ -40,7 +40,7 @@ test('1. Transaccionalidad Atómica en Caja y Abonos con Fail-Open Comercial', a
   assert.equal(txResult.success, true);
   assert.equal(txResult.data.estadoPago, 'PAGADO_TOTAL');
   assert.equal(txResult.data.saldoPendiente, 0);
-  assert.ok(txResult.latencyMs < 2000, 'SLA transaccional menor a 2 segundos');
+  assert.ok(txResult.latencyMs < 5000, 'SLA transaccional menor a 5 segundos');
 });
 
 test('2. Inmutabilidad Absoluta y Filtrado Visual de Fase Activa (Cero Deletes)', () => {

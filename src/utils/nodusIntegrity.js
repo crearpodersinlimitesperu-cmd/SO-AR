@@ -33,7 +33,7 @@ export function recordedPhase(row, parentContext = null) {
     if (norm(parentContext?.ciclo) === 'CICLO 2' || norm(parentContext?.ciclo) === 'C2') return 'C2';
     if (norm(parentContext?.ciclo) === 'CICLO 1' || norm(parentContext?.ciclo) === 'C1') return 'C1';
   }
-  if (row?.equipo || row?.llamadas || row?.confirmado || row?.asistieron) {
+  if (row?.llamadas || row?.confirmado || row?.asistieron) {
     return 'C1';
   }
   return null;

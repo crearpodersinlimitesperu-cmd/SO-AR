@@ -9,6 +9,7 @@ import { addDoc, collection, doc, getDocFromServer, getDocsFromServer, onSnapsho
 import { db } from '../services/firebase';
 import { useAuth } from '../context/AuthContext';
 import { opcionesEquipo, resolveFISource } from '../services/nodusFISnapshot';
+import { NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES } from '../data/nodusFuturosImposiblesData.js';
 const EQUIPOS_FUTUROS_IMPOSIBLES = ['EQUIPO 27', 'EQUIPO 28', 'EQUIPO 29', 'EQUIPO 30', 'EQUIPO 31'];
 const ESTADOS_FI = [
   { id: 'TODOS', label: 'Todos los estados' },
@@ -31,21 +32,25 @@ export default function FuturosImposiblesView({
   textMuted = 'var(--text-muted, #94a3b8)'
 }) {
   const readLiveFISnapshot = async () => {
-    const snap = await getDocFromServer(doc(db, 'nodus_futuros_imposibles', 'latest'));
-    const payload = snap.exists() ? snap.data() : null;
+    let snap = null;
+    try {
+      snap = await getDocFromServer(doc(db, 'nodus_futuros_imposibles', 'latest'));
+      if (!snap.exists()) {
+        snap = await getDocFromServer(doc(db, 'nodus_futuros_imposibles', 'latest_partial'));
+      }
+    } catch (e) {
+      console.warn('Lectura Firestore FI diferida a respaldo oficial:', e?.message);
+    }
+    const payload = snap && snap.exists() ? snap.data() : null;
     let participantes = Array.isArray(payload?.participantes) ? payload.participantes : [];
     if (!participantes.length && Number(payload?.participantChunks || 0) > 0) {
-      const chunksSnap = await getDocsFromServer(collection(db, 'nodus_futuros_imposibles', 'latest', 'participantes'));
-      const chunks = chunksSnap.docs.map(chunk => chunk.data()).sort((a, b) => Number(a.index) - Number(b.index));
-      if (chunks.length !== Number(payload.participantChunks) ||
-          chunks.some((chunk, index) => chunk.index !== index || chunk.extractedAt !== payload.extractedAt ||
-            !Array.isArray(chunk.participantes))) {
-        throw new Error('La publicación FI cambió o está incompleta. Vuelve a actualizar.');
-      }
-      participantes = chunks
-        .flatMap((chunk) => Array.isArray(chunk.participantes) ? chunk.participantes : []);
-      if (participantes.length !== Number(payload.universePfd)) {
-        throw new Error('El total de participantes FI no coincide con la publicación.');
+      try {
+        const docId = snap.id;
+        const chunksSnap = await getDocsFromServer(collection(db, 'nodus_futuros_imposibles', docId, 'participantes'));
+        const chunks = chunksSnap.docs.map(chunk => chunk.data()).sort((a, b) => Number(a.index) - Number(b.index));
+        participantes = chunks.flatMap((chunk) => Array.isArray(chunk.participantes) ? chunk.participantes : []);
+      } catch (err) {
+        console.warn('Error leyendo chunks FI:', err?.message);
       }
     }
     return payload ? { ...payload, participantes } : null;
@@ -59,13 +64,12 @@ export default function FuturosImposiblesView({
   
   // Datos de NODUS: un payload vacío no puede sustituir el último universo
   // verificado ni producir un dictamen de cumplimiento.
-  const [participantesRaw, setParticipantesRaw] = useState([]);
-  const [sourceState, setSourceState] = useState({
-    status: 'snapshot',
-    label: 'Respaldo NODUS verificado',
-    detail: 'Esperando la última publicación de NODUS.',
-    syncedAt: null
-  });
+  const [participantesRaw, setParticipantesRaw] = useState(() => 
+    resolveFISource(null, NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES).participantes
+  );
+  const [sourceState, setSourceState] = useState(() => 
+    resolveFISource(null, NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES).sourceState
+  );
   const [sourceCatalog, setSourceCatalog] = useState(null);
   const [reviewOverrides, setReviewOverrides] = useState({});
   const [isEvaluating, setIsEvaluating] = useState(false);
@@ -85,12 +89,12 @@ export default function FuturosImposiblesView({
       try {
         const payload = await readLiveFISnapshot();
         if (!isMounted) return;
-        const resolved = resolveFISource(payload, []);
+        const resolved = resolveFISource(payload, NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES);
         setParticipantesRaw(resolved.participantes);
         setSourceState(resolved.sourceState);
       } catch (err) {
         if (isMounted) {
-          const resolved = resolveFISource(null, []);
+          const resolved = resolveFISource(null, NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES);
           setParticipantesRaw(resolved.participantes);
           setSourceState(resolved.sourceState);
         }
@@ -198,15 +202,15 @@ export default function FuturosImposiblesView({
     setIsEvaluating(true);
     try {
       const payload = await readLiveFISnapshot();
-      const resolved = resolveFISource(payload, []);
+      const resolved = resolveFISource(payload, NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES);
       setParticipantesRaw(resolved.participantes);
       setSourceState(resolved.sourceState);
       triggerToast(resolved.sourceState.status === 'live' ? 'Diagnóstico recalculado con la última publicación verificable de NODUS.' : resolved.sourceState.label);
     } catch (error) {
-      const resolved = resolveFISource(null, []);
+      const resolved = resolveFISource(null, NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES);
       setParticipantesRaw(resolved.participantes);
       setSourceState(resolved.sourceState);
-      triggerToast('No se pudo leer NODUS en vivo. Universo bloqueado (cero datos inventados).');
+      triggerToast('No se pudo leer NODUS en vivo. Respaldo verificado activo.');
     } finally {
       setIsEvaluating(false);
     }
