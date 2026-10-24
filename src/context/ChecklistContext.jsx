@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useRef } from 'react';
+import { createContext, useContext, useState, useEffect, useRef, useMemo } from 'react';
 import { db, auth } from '../services/firebase';
 import { collection, onSnapshot, doc, updateDoc, writeBatch, addDoc, query, where, orderBy, limit, getDocs, runTransaction, serverTimestamp } from 'firebase/firestore';
 import { checklistData } from '../data/checklistData';
