@@ -1123,7 +1123,7 @@ export default function TeamCalendar() {
             {selectedDayEvents.length > 0 && (
               <div style={{ marginBottom: '1.5rem' }}>
                 <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--crear-gold)', textTransform: 'uppercase', marginBottom: '0.6rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                  <Sparkles size={14} /> Eventos Oficiales de Ciclo (Firestore)
+                  <Sparkles size={14} /> Eventos Oficiales de Ciclo (En Vivo)
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
                   {selectedDayEvents.map((ev, i) => (

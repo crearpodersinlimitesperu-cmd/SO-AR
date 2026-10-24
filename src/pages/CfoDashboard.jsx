@@ -124,7 +124,7 @@ export default function CfoDashboard() {
     if (success) {
       toast.success(newStatus ? `🚨 Sede ${hq.sede} BLOQUEADA financieramente.` : `✅ Bloqueo levantado para ${hq.sede}.`);
     } else {
-      toast.error('Error al actualizar Firestore. Revirtiendo.');
+      toast.error('Error al actualizar en Causa OS. Revirtiendo.');
       setSedesData(officialFinancialData);
     }
   };
@@ -409,7 +409,7 @@ export default function CfoDashboard() {
                 </div>
 
                 <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                  {loadingHqs ? 'Sincronizando estado...' : 'Conectado a Firestore'}
+                  {loadingHqs ? 'Sincronizando estado...' : 'Conectado al Servidor Central'}
                 </div>
               </div>
 
@@ -767,12 +767,12 @@ export default function CfoDashboard() {
               {loadingCloses ? (
                 <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>
                   <RefreshCw size={24} className="spin" style={{ marginBottom: '0.5rem' }} />
-                  <div>Cargando cierres contables desde Firestore...</div>
+                  <div>Cargando cierres contables en tiempo real...</div>
                 </div>
               ) : dailyCloses.length === 0 ? (
                 <div style={{ padding: '3.5rem 1.5rem', textAlign: 'center', color: 'var(--text-muted)' }}>
                   <FileText size={36} style={{ opacity: 0.3, marginBottom: '0.8rem' }} />
-                  <p style={{ margin: 0, fontWeight: 600 }}>No hay cierres diarios registrados recientemente en Firestore.</p>
+                  <p style={{ margin: 0, fontWeight: 600 }}>No hay cierres diarios registrados recientemente.</p>
                   <p style={{ margin: '0.4rem 0 0 0', fontSize: '0.8rem' }}>
                     Los analistas contables (Gabriela, Hector, Diego, Alexis, Erica) pueden registrar cierres desde la Operativa Financiera.
                   </p>

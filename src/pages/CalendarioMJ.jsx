@@ -564,7 +564,7 @@ export default function CalendarioMJ() {
       setForm(emptyForm());
     } catch (err) {
       console.error('Error guardando calendario MJ:', err);
-      showToast('No se pudo guardar el calendario. Revisa los permisos de Firestore.', 'error');
+      showToast('No se pudo guardar el calendario. Revisa tus permisos en Causa OS.', 'error');
     } finally {
       setSaving(false);
     }
@@ -577,7 +577,7 @@ export default function CalendarioMJ() {
       showToast('Calendario eliminado.', 'success');
     } catch (err) {
       console.error('Error eliminando calendario MJ:', err);
-      showToast('No se pudo eliminar. Revisa los permisos de Firestore.', 'error');
+      showToast('No se pudo eliminar. Revisa tus permisos en Causa OS.', 'error');
     }
   };
 

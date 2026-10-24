@@ -586,7 +586,7 @@ export default function EmbudoConversionBoard() {
               <div style={styles.integrityItem}>
                 <CheckCircle2 size={18} color="#10b981" />
                 <div>
-                  <strong>Fuente en Base de Datos:</strong> Documento Firestore <code>nodus_coordinadores_c1c2/latest</code> y <code>nodus_kpis_sincronizados/latest_snapshot</code>.
+                  <strong>Fuente en Base de Datos:</strong> Registro Central Nodus <code>nodus_coordinadores_c1c2/latest</code> y <code>nodus_kpis_sincronizados/latest_snapshot</code>.
                 </div>
               </div>
               <div style={styles.integrityItem}>

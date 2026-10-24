@@ -1801,7 +1801,7 @@ export default function ReportesBoard() {
               </div>
               <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: 1.4 }}>
                 {pulsoReports.length > 0
-                  ? `Basado en ${pulsoReports.length} reporte(s) verificados de Micro-Pulso Staff en Firestore.`
+                  ? `Basado en ${pulsoReports.length} reporte(s) verificados de Micro-Pulso Staff en Causa OS.`
                   : 'Sin reportes verificados de Micro-Pulso Staff aún. No se inventan porcentajes.'}
               </p>
             </div>
@@ -1851,13 +1851,13 @@ export default function ReportesBoard() {
               </h3>
             </div>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: '0 0 1rem' }}>
-              Iniciativas reales reportadas en Firestore por el staff:
+              Iniciativas reales reportadas en Causa OS por el staff:
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               {pulsoReports.filter(r => r?.data?.trimAndStack || r?.trimAndStack).length === 0 ? (
                 <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '8px', padding: '1rem', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-                  Sin iniciativas «Trim & Stack» registradas en Firestore. No se muestran ejemplos inventados.
+                  Sin iniciativas «Trim & Stack» registradas en Causa OS. No se muestran ejemplos inventados.
                 </div>
               ) : (
                 pulsoReports.filter(r => r?.data?.trimAndStack || r?.trimAndStack).map((item, idx) => (
