@@ -5,8 +5,11 @@ import {
 } from '../scripts/agentAuditoriaResultadosImposibles.mjs';
 import { 
   evaluarCalidadOntologicaFI, 
-  auditarParticipantesEnJuego3Resultados 
+  auditarParticipantesEnJuego3Resultados,
+  ejecutarDiagnosticoFIs 
 } from '../src/services/nodusFIAgent.js';
+import { opcionesEquipo } from '../src/services/nodusFISnapshot.js';
+import { NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES } from '../src/data/nodusFuturosImposiblesData.js';
 
 test('1. Migración Lingüística y Cultural a Resultados Imposibles', () => {
   const evaluacion = evaluarCalidadOntologicaFI(
@@ -91,4 +94,31 @@ test('3. Agente Evaluador IA: Cero Inflación de Métricas y Cruce de Evidencias
   assert.equal(auditoria.efectividadGlobal, 0);
   assert.equal(auditoria.informeEjecutivo.reglaNegocio, '3 Resultados Imposibles de estándar superior por participante en juego');
   assert.ok(auditoria.informeEjecutivo.hallazgosCriticos.length > 0);
+});
+
+test('4. Multi-Sede Operativo y Resolución Canónica de Equipos y Sedes (Quito, Guayaquil, Cuenca, Medellín, México)', () => {
+  // Verificamos que el dataset oficial incluya todas las sedes operativas sin exclusión de Lima
+  const sedesRequeridas = ['Lima', 'Quito', 'Guayaquil', 'Cuenca', 'Medellín', 'México'];
+  
+  for (const sede of sedesRequeridas) {
+    const diag = ejecutarDiagnosticoFIs(NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES, sede);
+    const equipos = opcionesEquipo(NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES, sede);
+
+    assert.ok(diag.metricas.totalParticipantes > 0, `Sede ${sede} debe contener participantes verificables`);
+    assert.ok(equipos.length > 1, `Sede ${sede} debe contener equipos operativos desplegables`);
+    assert.ok(diag.dictamenIA.resumen, `Sede ${sede} debe generar dictamen ejecutivo del Agente IA`);
+  }
+
+  // Verificamos resolución de alias canónicos (CDMX -> México, UIO -> Quito, GYE -> Guayaquil, Medellin -> Medellín)
+  const diagCDMX = ejecutarDiagnosticoFIs(NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES, 'CDMX');
+  const diagMex = ejecutarDiagnosticoFIs(NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES, 'México');
+  assert.equal(diagCDMX.metricas.totalParticipantes, diagMex.metricas.totalParticipantes);
+
+  const diagUIO = ejecutarDiagnosticoFIs(NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES, 'UIO');
+  const diagQuito = ejecutarDiagnosticoFIs(NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES, 'Quito');
+  assert.equal(diagUIO.metricas.totalParticipantes, diagQuito.metricas.totalParticipantes);
+
+  const diagMedellin = ejecutarDiagnosticoFIs(NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES, 'Medellin');
+  const diagMedellinTilde = ejecutarDiagnosticoFIs(NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES, 'Medellín');
+  assert.equal(diagMedellin.metricas.totalParticipantes, diagMedellinTilde.metricas.totalParticipantes);
 });

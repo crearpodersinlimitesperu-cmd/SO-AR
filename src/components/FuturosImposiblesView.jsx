@@ -9,6 +9,7 @@ import { addDoc, collection, doc, getDocFromServer, getDocsFromServer, onSnapsho
 import { db } from '../services/firebase';
 import { useAuth } from '../context/AuthContext';
 import { opcionesEquipo, resolveFISource } from '../services/nodusFISnapshot';
+import { canonicalSede } from '../utils/sede.js';
 import { NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES } from '../data/nodusFuturosImposiblesData.js';
 import nodusEnroladosFallback from '../data/nodusEnroladosRecords.json';
 
@@ -233,8 +234,12 @@ export default function FuturosImposiblesView({
     if (esGlobalSede) {
       return participantesConRevision.filter((p) => p?.asistioPFD === true).length;
     }
+    const targetCanon = canonicalSede(selectedSede);
     const sedeNorm = normalizarTexto(selectedSede);
-    return participantesConRevision.filter((p) => p?.asistioPFD === true && normalizarTexto(p.sede).includes(sedeNorm)).length;
+    return participantesConRevision.filter((p) => {
+      if (p?.asistioPFD !== true) return false;
+      return canonicalSede(p.sede) === targetCanon || normalizarTexto(p.sede).includes(sedeNorm);
+    }).length;
   }, [participantesConRevision, selectedSede, esGlobalSede]);
 
   const equiposDeSede = useMemo(

@@ -1,4 +1,5 @@
 import { equipoKeyDe, normalizarTexto } from './nodusFIAgent.js';
+import { canonicalSede } from '../utils/sede.js';
 
 import { snapshotFreshness } from '../utils/nodusIntegrity.js';
 
@@ -46,6 +47,7 @@ const GLOBAL_KEYS = ['', 'global', 'sede global', 'todas', 'todos', 'all'];
 // en GLOBAL se etiquetan con su sede y se identifican por sede+equipo.
 export function opcionesEquipo(participantes = [], sede = 'GLOBAL') {
   const global = GLOBAL_KEYS.includes(normalizarTexto(sede));
+  const targetCanon = canonicalSede(sede);
   const sedeNorm = normalizarTexto(sede);
   const map = new Map();
   for (const p of participantes) {
@@ -53,7 +55,7 @@ export function opcionesEquipo(participantes = [], sede = 'GLOBAL') {
     // Directiva de Gobernanza: Aislar Equipo 1000 de los selectores operativos
     const eqNorm = (p.equipo || '').toLowerCase();
     if (eqNorm.includes('equipo 1000') || eqNorm.includes('1000')) continue;
-    if (!global && !normalizarTexto(p.sede).includes(sedeNorm)) continue;
+    if (!global && canonicalSede(p.sede) !== targetCanon && !normalizarTexto(p.sede).includes(sedeNorm)) continue;
     const value = equipoKeyDe(p);
     if (!map.has(value)) map.set(value, { value, equipo: p.equipo.trim(), sede: p.sede || 'Sin sede' });
   }

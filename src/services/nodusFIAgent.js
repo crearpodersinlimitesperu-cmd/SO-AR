@@ -13,6 +13,8 @@
  * 4. Proveer validación de calidad ontológica y SMART sobre los 3 Resultados Imposibles requeridos.
  */
 
+import { canonicalSede } from '../utils/sede.js';
+
 // Helper para remover tildes y diacríticos
 export const normalizarTexto = (texto = '') => {
   return texto
@@ -54,12 +56,16 @@ export function ejecutarDiagnosticoFIs(
       return true;
     });
 
-  // 1. Filtrado por Sede
+  // 1. Filtrado por Sede (Soporte canónico multi-sede y prevención de descalce)
   let participantesEnSede = universoPfd;
   const esFiltroGlobal = !filtroSede || ['global', 'sede global', 'todas', 'todos', 'all'].includes(normalizarTexto(filtroSede));
   if (!esFiltroGlobal) {
+    const targetCanon = canonicalSede(filtroSede);
     const sedeNorm = normalizarTexto(filtroSede);
-    participantesEnSede = participantesEnSede.filter(p => normalizarTexto(p.sede).includes(sedeNorm));
+    participantesEnSede = participantesEnSede.filter(p => {
+      const pCanon = canonicalSede(p.sede);
+      return pCanon === targetCanon || normalizarTexto(p.sede).includes(sedeNorm);
+    });
   }
 
   // 2. Mapa de desempeño por equipo (calculado sobre la sede completa para alimentar filtros y semáforos)
