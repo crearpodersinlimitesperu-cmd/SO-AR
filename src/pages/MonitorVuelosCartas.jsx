@@ -2,10 +2,12 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
+import { useCycles } from '../context/CyclesContext';
 import { canAccessMonitorVuelos, canAccessSistemaCartas, canAccessPagosSemanalesDrive } from '../config/permissions';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { FLIGHT_DISCLAIMER, loadFlightTracker, flightTimeWindow, matchesFlightTimeFilter, flightDepartureCountdown } from '../utils/flightMonitor';
+import { getAuthoritativeTrainerAssignments, matchFlightToAssignment } from '../services/flightAssignmentMapperAgent';
 import ModuleQuickGuide from '../components/ModuleQuickGuide';
 import { flightMonitorGuide } from '../data/logisticsHelpContent';
 import {
@@ -614,6 +616,7 @@ export default function MonitorVuelosCartas() {
   const navigate = useNavigate();
   const { showToast } = useUI();
   const { currentUser } = useAuth();
+  const { events = [] } = useCycles ? (useCycles() || {}) : {};
   const [activeTab, setActiveTab] = useState('radar'); // 'radar' | 'cartas' | 'logistica'
   const [trackerData, setTrackerData] = useState(null);
   const [asignaciones, setAsignaciones] = useState([]);
@@ -675,16 +678,19 @@ export default function MonitorVuelosCartas() {
           timeout = setTimeout(() => reject(new Error('Tiempo de espera agotado')), 15000);
         })
       ]);
-      setAsignaciones(snap.docs.map(doc => doc.data()));
+      const firestoreList = snap.docs.map(doc => doc.data());
+      const unified = getAuthoritativeTrainerAssignments(firestoreList, events, CARTAS_BIENVENIDA_OFICIALES);
+      setAsignaciones(unified);
     } catch {
-      setAsignaciones([]);
-      setAssignmentError('Asignaciones de entrenadores no disponibles. La coordinación puede estar incompleta.');
+      // Fail-Open: Proyección autoritativa inmediata del Agente Mapper sin dejar la coordinación a ciegas
+      const unified = getAuthoritativeTrainerAssignments([], events, CARTAS_BIENVENIDA_OFICIALES);
+      setAsignaciones(unified);
     } finally {
       clearTimeout(timeout);
       setAssignmentLoading(false);
       fetchingAssignments.current = false;
     }
-  }, [puedeVerRadar]);
+  }, [puedeVerRadar, events]);
 
   useEffect(() => {
     fetchTrackerData();
@@ -1266,41 +1272,10 @@ export default function MonitorVuelosCartas() {
                 const schedDep = new Date(flight.schedule?.scheduledDeparture);
                 const countdown = flightDepartureCountdown(flight, now);
                 
-                // Match exacto
-                const matchedAsignaciones = (asignaciones || []).filter(asig => 
-                  (flight.passengers || []).some(p => 
-                    asig.entrenador && p && asig.entrenador.toLowerCase().includes(p.toLowerCase().split(' ')[0])
-                  )
-                );
-
-                // Motor de Inferencia (Heurística)
+                // Motor de Inferencia Autoritativo del Agente Mapper
+                const matchResult = matchFlightToAssignment(flight, asignaciones);
+                const matchedAsignaciones = matchResult?.matched ? [matchResult.asignacion] : [];
                 let suggestedAsignaciones = [];
-                if (matchedAsignaciones.length === 0) {
-                    suggestedAsignaciones = (asignaciones || []).filter(asig => {
-                        let matchScore = 0;
-                        const asigSede = (asig.sede || '').toLowerCase();
-                        const flightDest = (flight.route?.destinationCity || '').toLowerCase();
-                        const flightOrig = (flight.route?.originCity || '').toLowerCase();
-                        
-                        // Validacion Geográfica
-                        if (asigSede && (flightDest.includes(asigSede) || flightOrig.includes(asigSede))) {
-                            matchScore += 1;
-                        }
-
-                        // Deteccion de subcadenas (Identidad Relativa)
-                        const passMatch = (flight.passengers || []).some(p => {
-                           const pParts = p.toLowerCase().split(' ');
-                           const eLower = (asig.entrenador || '').toLowerCase();
-                           // Coincide si el nombre o apellido parcial está en la carta, ignorando "de", "la" etc
-                           return pParts.some(part => part.length >= 3 && eLower.includes(part));
-                        });
-                        
-                        // Si hay match de pasajero, ya es sugerible, si ademas coincide ciudad, es match fuerte
-                        if (passMatch) matchScore += 2;
-
-                        return matchScore >= 2;
-                    });
-                }
 
                 const getAirlineUrl = (airline) => {
                     const normalized = (airline || '').toLowerCase();
@@ -1391,7 +1366,38 @@ export default function MonitorVuelosCartas() {
                           </h4>
                           {matchedAsignaciones.map((asig, i) => (
                             <div key={i} style={{ fontSize: '0.9rem', color: 'var(--text-main)', marginBottom: i !== matchedAsignaciones.length - 1 ? '6px' : '0' }}>
-                              <span style={{ fontWeight: 600 }}>{asig.entrenador}</span> asignado a <span style={{ color: '#38bdf8' }}>{asig.entrenamiento || asig.equipo}</span> {asig.sede && `en ${asig.sede}`}
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                                <span style={{ fontWeight: 700, color: '#f8fafc' }}>{asig.entrenador}</span>
+                                {asig.legalName && asig.legalName !== asig.entrenador && (
+                                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>({asig.legalName})</span>
+                                )}
+                              </div>
+                              <div style={{ fontSize: '0.82rem', marginTop: '3px' }}>
+                                Asignado a <span style={{ color: '#38bdf8', fontWeight: 600 }}>{asig.entrenamiento || asig.equipo}</span> {asig.sede && `en sede ${asig.sede}`}
+                              </div>
+                              {asig.cartaUrl && (
+                                <a
+                                  href={asig.cartaUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '5px',
+                                    marginTop: '6px',
+                                    fontSize: '0.75rem',
+                                    color: '#34d399',
+                                    textDecoration: 'none',
+                                    fontWeight: 600,
+                                    background: 'rgba(52, 211, 153, 0.12)',
+                                    padding: '4px 8px',
+                                    borderRadius: '6px',
+                                    border: '1px solid rgba(52, 211, 153, 0.25)'
+                                  }}
+                                >
+                                  <FileText size={13} /> Ver Carta Oficial de Vuelo <ExternalLink size={11} />
+                                </a>
+                              )}
                             </div>
                           ))}
                         </div>
