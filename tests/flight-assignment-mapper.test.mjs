@@ -25,8 +25,9 @@ test('1. Resolución Automática de Pasajeros Críticos (Casos de Imágenes)', (
   assert.equal(resLeandro.matched, true);
   assert.equal(resLeandro.asignacion.canonicalName, 'Leandro Brunis');
   assert.equal(resLeandro.asignacion.legalName, 'Leandro Emilio Brunis Avilés');
-  assert.equal(resLeandro.asignacion.sede, 'Cuenca');
-  assert.ok(resLeandro.asignacion.cartaUrl.includes('leandro_brunis'));
+  assert.equal(resLeandro.asignacion.sede, 'Lima');
+  assert.equal(resLeandro.asignacion.equipo, 'LIM CAP 1 E32');
+  assert.ok(resLeandro.asignacion.cartaUrl.includes('carta_leandro_brunis_lim'));
 
   // Caso 2: Juan Angel Arreola (Avianca AV 1604, PNR: ADAHS5)
   const flightArreola = {
@@ -57,8 +58,9 @@ test('1. Resolución Automática de Pasajeros Críticos (Casos de Imágenes)', (
   assert.equal(resCarlos.matched, true);
   assert.equal(resCarlos.asignacion.canonicalName, 'Carlos Brunis');
   assert.equal(resCarlos.asignacion.legalName, 'Carlos Emilio Brunis Villacís');
-  assert.equal(resCarlos.asignacion.sede, 'Cuenca');
-  assert.ok(resCarlos.asignacion.cartaUrl.includes('carlos_brunis'));
+  assert.equal(resCarlos.asignacion.sede, 'Lima');
+  assert.equal(resCarlos.asignacion.equipo, 'LIM FDS / Coordinación QT');
+  assert.ok(resCarlos.asignacion.cartaUrl.includes('carta_carlos_brunis_lim'));
 });
 
 test('2. Directiva Fail-Open: Disponibilidad Autoritativa sin Firestore', () => {

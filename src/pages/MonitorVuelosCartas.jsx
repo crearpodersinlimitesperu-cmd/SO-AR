@@ -228,6 +228,30 @@ const OFICIAL_LETTERS = [
 
   // SEDE LIMA
   {
+    id: 'carta-leandro-brunis-lim',
+    entrenador: 'Leandro Emilio Brunis Avilés',
+    rol: 'Entrenador C1 / Dirección Operativa',
+    equipo: 'LIM CAP 1 · E32',
+    sede: 'Lima',
+    url: '/cartas/carta_leandro_brunis_lim.html',
+    badge: 'Pasaporte A8243780 · CI 1718426560',
+    fecha: '22 - 25 Octubre 2026',
+    descripcion: 'Carta oficial de bienvenida y vuelos LATAM LA 1425 / LA 1444 (PNR: YVCUJD), facilitación ontológica y dirección de sala en Lima C1 Equipo 32.',
+    vuelos: ['LA 1425', 'LA 1444', 'LA 2383', 'LA 2382']
+  },
+  {
+    id: 'carta-carlos-brunis-lim',
+    entrenador: 'Carlos Emilio Brunis Villacís',
+    rol: 'Entrenador de Sala / Coordinación QT Global',
+    equipo: 'LIM FDS · QT GLOBAL',
+    sede: 'Lima',
+    url: '/cartas/carta_carlos_brunis_lim.html',
+    badge: 'Pasaporte A8885265 · CI 1201916986',
+    fecha: 'Octubre 2026 (En Operación Activa)',
+    descripcion: 'Carta oficial de bienvenida e itinerario confirmado de vuelos (PNRs: MXVURS / JGIWQZ / EEWPTQ) para coordinación QT Global y liderazgo de sala en Lima.',
+    vuelos: ['LA 2383', 'LA 1436', 'LA 1414', 'LA 2382']
+  },
+  {
     id: 'carta-andres-idrovo',
     entrenador: 'Elmer Andrés Idrovo Andrade',
     rol: 'Entrenador Principal',
@@ -611,6 +635,8 @@ const OFICIAL_LETTERS = [
     vuelos: ['LA 1437']
   }
 ];
+
+const CARTAS_BIENVENIDA_OFICIALES = OFICIAL_LETTERS;
 
 export default function MonitorVuelosCartas() {
   const navigate = useNavigate();

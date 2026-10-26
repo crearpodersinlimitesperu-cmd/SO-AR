@@ -36,28 +36,28 @@ export const TRAINER_FLIGHT_MAPPINGS = [
     canonicalName: 'Leandro Brunis',
     legalName: 'Leandro Emilio Brunis Avilés',
     tokens: ['leandro', 'brunis', 'aviles', 'emilio'],
-    sede: 'Cuenca',
-    equipo: 'CUE CAP 1 E24',
-    entrenamiento: 'CUE CAP 1 E24 (Capítulo Uno)',
+    sede: 'Lima',
+    equipo: 'LIM CAP 1 E32',
+    entrenamiento: 'Capítulo Uno Lima E32 / Dirección Operativa',
     rol: 'Entrenador C1 / Dirección Operativa',
-    cartaUrl: '/cartas/carta_leandro_brunis_cue.html',
+    cartaUrl: '/cartas/carta_leandro_brunis_lim.html',
     badge: 'Pasaporte A8243780 · CI 1718426560',
-    pnrs: ['YVCUJD', 'AUQCOD'],
-    vuelos: ['LA 1379', 'LA 1356', 'LA 1444', 'LA 1425']
+    pnrs: ['YVCUJD', 'AUQCOD', 'UGZXMI', 'QAIKHC', 'UYVXHK', 'NFZOPN', 'OINDBB'],
+    vuelos: ['LA 1425', 'LA 1444', 'LA 1379', 'LA 1356', 'LA 2382', 'LA 2383', 'LA 1436', 'LA 1426', 'LA 1377', 'LA 1378']
   },
   {
     id: 'asig-carlos-brunis',
     canonicalName: 'Carlos Brunis',
     legalName: 'Carlos Emilio Brunis Villacís',
     tokens: ['carlos', 'brunis', 'villacis', 'emilio'],
-    sede: 'Cuenca',
-    equipo: '4FDS Cuenca',
-    entrenamiento: '4FDS Cuenca / El Viaje',
-    rol: 'Entrenador de Sala',
-    cartaUrl: '/cartas/carta_carlos_brunis_cue.html',
+    sede: 'Lima',
+    equipo: 'LIM FDS / Coordinación QT',
+    entrenamiento: 'Entrenamiento de Sala Lima / QT Global',
+    rol: 'Entrenador de Sala / Coordinador QT Global',
+    cartaUrl: '/cartas/carta_carlos_brunis_lim.html',
     badge: 'Pasaporte A8885265 · CI 1201916986',
-    pnrs: ['JGIWQZ', 'BDST6Y'],
-    vuelos: ['AV 1604', 'AV 1605', 'LA 1414']
+    pnrs: ['JGIWQZ', 'BDST6Y', 'MXVURS', 'EEWPTQ'],
+    vuelos: ['LA 1414', 'AV 1604', 'AV 1605', 'LA 2383', 'LA 2382', 'LA 1436']
   },
   {
     id: 'asig-juan-angel-arreola',
@@ -533,19 +533,72 @@ export function matchFlightToAssignment(flight, allAssignments = []) {
     ? allAssignments
     : TRAINER_FLIGHT_MAPPINGS;
 
+  // Contextualizador dinámico de sede operativa según ruta aérea y directiva oficial
+  const resolveFlightContext = (candidate, method, confidence, label) => {
+    const route = flight.route || {};
+    const destCity = String(route.destinationCity || '').toLowerCase();
+    const origCity = String(route.originCity || '').toLowerCase();
+    const destAirport = String(route.destination || '').toUpperCase();
+    const origAirport = String(route.origin || '').toUpperCase();
+
+    let resolvedSede = candidate.sede || 'Lima';
+    let resolvedEquipo = candidate.equipo;
+    let resolvedEntrenamiento = candidate.entrenamiento;
+    let resolvedCartaUrl = candidate.cartaUrl;
+
+    const isBrunis = candidate.tokens?.includes('brunis') || 
+      String(candidate.canonicalName || '').toLowerCase().includes('brunis') ||
+      String(candidate.legalName || '').toLowerCase().includes('brunis');
+
+    if (destCity.includes('lima') || origCity.includes('lima') || destAirport === 'LIM' || origAirport === 'LIM' || isBrunis) {
+      resolvedSede = 'Lima';
+      if (isBrunis) {
+        const isLeandro = candidate.tokens?.includes('leandro') || String(candidate.canonicalName || '').toLowerCase().includes('leandro');
+        if (isLeandro) {
+          resolvedEquipo = 'LIM CAP 1 E32';
+          resolvedEntrenamiento = 'Capítulo Uno Lima E32 / Dirección Operativa';
+          resolvedCartaUrl = '/cartas/carta_leandro_brunis_lim.html';
+        } else {
+          resolvedEquipo = 'LIM FDS / Coordinación QT';
+          resolvedEntrenamiento = 'Entrenamiento de Sala Lima / QT Global';
+          resolvedCartaUrl = '/cartas/carta_carlos_brunis_lim.html';
+        }
+      }
+    } else if (destCity.includes('cuenca') || origCity.includes('cuenca') || destAirport === 'CUE' || origAirport === 'CUE') {
+      resolvedSede = 'Cuenca';
+    } else if (destCity.includes('guayaquil') || origCity.includes('guayaquil') || destAirport === 'GYE' || origAirport === 'GYE') {
+      resolvedSede = 'Guayaquil';
+    } else if (destCity.includes('quito') || destAirport === 'UIO') {
+      resolvedSede = origCity.includes('lima') ? 'Lima' : (candidate.sede || 'Quito');
+    }
+
+    return {
+      matched: true,
+      asignacion: {
+        ...candidate,
+        sede: resolvedSede,
+        equipo: resolvedEquipo,
+        entrenamiento: resolvedEntrenamiento,
+        cartaUrl: resolvedCartaUrl
+      },
+      confidence,
+      method,
+      label
+    };
+  };
+
   // PASO 1: Coincidencia por Código de Reserva (PNR) - Certeza Absoluta
   if (pnr) {
     const pnrMatch = assignments.find(asig => 
       Array.isArray(asig.pnrs) && asig.pnrs.some(p => String(p).trim().toUpperCase() === pnr)
     );
     if (pnrMatch) {
-      return {
-        matched: true,
-        asignacion: pnrMatch,
-        confidence: 1.0,
-        method: 'PNR_EXACT_MATCH',
-        label: 'Asignación verificada por Código de Reserva (PNR)'
-      };
+      return resolveFlightContext(
+        pnrMatch, 
+        'PNR_EXACT_MATCH', 
+        1.0, 
+        'Asignación verificada por Código de Reserva (PNR)'
+      );
     }
   }
 
@@ -576,13 +629,12 @@ export function matchFlightToAssignment(flight, allAssignments = []) {
     }
 
     if (bestCandidate) {
-      return {
-        matched: true,
-        asignacion: bestCandidate,
-        confidence: 0.98,
-        method: 'PASSENGER_IDENTITY_MATCH',
-        label: 'Asignación verificada por Nombre de Entrenador'
-      };
+      return resolveFlightContext(
+        bestCandidate, 
+        'PASSENGER_IDENTITY_MATCH', 
+        0.98, 
+        'Asignación verificada por Nombre de Entrenador'
+      );
     }
   }
 
@@ -595,13 +647,12 @@ export function matchFlightToAssignment(flight, allAssignments = []) {
       })
     );
     if (flightNumMatch) {
-      return {
-        matched: true,
-        asignacion: flightNumMatch,
-        confidence: 0.90,
-        method: 'FLIGHT_NUMBER_MATCH',
-        label: 'Asignación verificada por Número de Vuelo Oficial'
-      };
+      return resolveFlightContext(
+        flightNumMatch, 
+        'FLIGHT_NUMBER_MATCH', 
+        0.90, 
+        'Asignación verificada por Número de Vuelo Oficial'
+      );
     }
   }
 
