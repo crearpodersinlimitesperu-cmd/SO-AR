@@ -6,7 +6,7 @@ import {
   Clock, ShieldCheck, Box, ArrowLeft, Loader2, Sparkles, DollarSign,
   Users, PhoneCall, AlertTriangle, Target, RefreshCw, BarChart2, ShieldAlert,
   Award, CheckSquare, Plus, ExternalLink, Send, X, Trophy, Filter, ArrowUpDown,
-  Search, UserCheck
+  Search, UserCheck, Zap
 } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { doc, collection, writeBatch } from 'firebase/firestore';
@@ -18,6 +18,7 @@ import { selectCoordinatorSnapshot } from '../services/nodusMetricsModel.js';
 import ResourceCapacityView from '../components/ResourceCapacityView';
 import FuturosImposiblesView from '../components/FuturosImposiblesView';
 import NodusUserAccessReport from '../components/NodusUserAccessReport';
+import NodusLiveModulesDashboard from '../components/NodusLiveModulesDashboard';
 import { NODUS_REPORT_ADMIN_EMAILS, PORTFOLIO_FI_REVIEW_EMAILS } from '../config/permissions';
 import {
   classifyCoordinatorPerformance,
@@ -166,7 +167,7 @@ export default function PortfolioBoard() {
   const [toastMessage, setToastMessage] = useState(null);
 
   useEffect(() => {
-    if (tabParam && ['predictor', 'active', 'resources', 'rrhh_sentinel', 'futuros_imposibles', 'nodus_users'].includes(tabParam)) {
+    if (tabParam && ['predictor', 'active', 'resources', 'rrhh_sentinel', 'futuros_imposibles', 'nodus_users', 'nodus_live_modules'].includes(tabParam)) {
       setViewMode(resolveTab(tabParam));
     }
   }, [tabParam, isAuthorizedForPredictor, canViewNodusUserAccess]);
@@ -678,6 +679,23 @@ export default function PortfolioBoard() {
             >
               <Target size={16} /> Resultados Imposibles (IA)
             </button>
+            <button 
+              onClick={() => handleTabChange('nodus_live_modules')} 
+              style={{ 
+                padding: '0.5rem 1rem', 
+                borderRadius: '8px', 
+                border: viewMode === 'nodus_live_modules' ? '1px solid #10b981' : `1px solid ${borderLight}`, 
+                background: viewMode === 'nodus_live_modules' ? 'rgba(16, 185, 129, 0.18)' : 'transparent', 
+                color: viewMode === 'nodus_live_modules' ? '#10b981' : textMuted, 
+                fontWeight: 700, 
+                cursor: 'pointer', 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '0.4rem' 
+              }}
+            >
+              <Zap size={16} /> Módulos Nodus (En Vivo)
+            </button>
             {canViewNodusUserAccess && (
               <button
                 onClick={() => handleTabChange('nodus_users')}
@@ -711,6 +729,8 @@ export default function PortfolioBoard() {
             <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem' }}>Error de Sincronización</h2>
             <p>{errorObj}</p>
           </div>
+        ) : viewMode === 'nodus_live_modules' ? (
+          <NodusLiveModulesDashboard />
         ) : viewMode === 'nodus_users' ? (
           <NodusUserAccessReport />
         ) : viewMode === 'predictor' && !predictorMatrixData ? (

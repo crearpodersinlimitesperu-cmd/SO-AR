@@ -124,6 +124,84 @@ export async function getNodusPagos({ desde, hasta, id_sede, id_equipo } = {}, a
   }
 }
 
+/**
+ * 6. GET /api/aliados
+ * Obtiene métricas y asignaciones de aliados por equipo.
+ */
+export async function getNodusAliados({ equipoId } = {}, apiKey) {
+  try {
+    const result = await buildClient(apiKey).getAliados({ equipoId });
+    return { ok: true, ...result };
+  } catch (error) {
+    return wrapError(error);
+  }
+}
+
+/**
+ * 7. GET /api/contabilidad
+ * Obtiene totales recaudados, pagos cerrados y pendientes.
+ */
+export async function getNodusContabilidad({ sedeId, equipoId } = {}, apiKey) {
+  try {
+    const result = await buildClient(apiKey).getContabilidad({ sedeId, equipoId });
+    return { ok: true, ...result };
+  } catch (error) {
+    return wrapError(error);
+  }
+}
+
+/**
+ * 8. GET /api/mesaregistro
+ * Obtiene el padrón de mesa de registro y check-in en vivo.
+ */
+export async function getNodusMesaRegistro({ equipoId } = {}, apiKey) {
+  try {
+    const result = await buildClient(apiKey).getMesaRegistro({ equipoId });
+    return { ok: true, ...result };
+  } catch (error) {
+    return wrapError(error);
+  }
+}
+
+/**
+ * 9. GET /api/juniors
+ * Obtiene los registros de cohorts y liderazgo Juniors.
+ */
+export async function getNodusJuniors({ sedeId } = {}, apiKey) {
+  try {
+    const result = await buildClient(apiKey).getJuniors({ sedeId });
+    return { ok: true, ...result };
+  } catch (error) {
+    return wrapError(error);
+  }
+}
+
+/**
+ * 10. GET /api/modulos
+ * Obtiene el catálogo dinámico de módulos disponibles en Nodus.
+ */
+export async function getNodusModulosCatalogo(apiKey) {
+  try {
+    const result = await buildClient(apiKey).getModulosCatalogo();
+    return { ok: true, ...result };
+  } catch (error) {
+    return wrapError(error);
+  }
+}
+
+/**
+ * 11. GET /api/{moduloPath}
+ * Consulta genérica para cualquier módulo nuevo auto-descubierto.
+ */
+export async function getNodusModuloGenerico(moduloPath, params = {}, apiKey) {
+  try {
+    const result = await buildClient(apiKey).getModuloGenerico(moduloPath, params);
+    return { ok: true, ...result };
+  } catch (error) {
+    return wrapError(error);
+  }
+}
+
 export { createNodusApiClient, NodusApiError };
 
 export default {
@@ -131,5 +209,11 @@ export default {
   getEquipos: getNodusEquipos,
   getParticipantesEquipo: getNodusParticipantesEquipo,
   getParticipantePorCedula: getNodusParticipantePorCedula,
-  getPagos: getNodusPagos
+  getPagos: getNodusPagos,
+  getAliados: getNodusAliados,
+  getContabilidad: getNodusContabilidad,
+  getMesaRegistro: getNodusMesaRegistro,
+  getJuniors: getNodusJuniors,
+  getModulosCatalogo: getNodusModulosCatalogo,
+  getModuloGenerico: getNodusModuloGenerico
 };

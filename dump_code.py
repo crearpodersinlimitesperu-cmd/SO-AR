@@ -25,7 +25,9 @@ def dump_codebase():
                 ext = os.path.splitext(file)[1]
                 
                 # Omitir archivos que puedan contener secretos o que no aporten al código fuente útil
-                if file == "package-lock.json" or file.endswith(".json") and "centro-operativo" in file:
+                file_full = os.path.join(root, file)
+                if (file == "package-lock.json" or 
+                    (file.endswith(".json") and (root == "." or "backup" in file or "raw" in file or "vuelos" in file or "centro-operativo" in file or os.path.getsize(file_full) > 200000))):
                     continue
 
                 if ext in valid_extensions:

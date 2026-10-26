@@ -2,6 +2,7 @@ import puppeteer from 'puppeteer';
 import 'dotenv/config';
 import { initializeApp as initializeAdminApp, cert, getApps as getAdminApps } from 'firebase-admin/app';
 import { getFirestore as getAdminFirestore } from 'firebase-admin/firestore';
+import { runDynamicModulesSync } from './nodusDynamicModulesAgent.mjs';
 
 function getAdminDb() {
   const rawServiceAccount = process.env.GOOGLE_SERVICE_ACCOUNT_JSON || process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
@@ -147,6 +148,20 @@ export async function runScraperWithDates(startDate = null, endDate = null, sede
     // resultante (secciones.dashboardPrincipal) para saber cómo se llaman de verdad las
     // columnas de confirmaciones antes de conectar esa tarjeta a datos reales.
     extractedData.secciones.dashboardPrincipal = await extractDataFromPage(page, 'https://imo.crearpslglobal.com/dashboard', 'Dashboard Principal (Confirmaciones)', startDate, endDate);
+
+    // 6. Auto-descubrimiento y extracción de módulos dinámicos y especializados (/aliados, /contabilidad, /mesaregistro, /juniors, etc.)
+    console.log("\n🌐 Ejecutando Auto-descubrimiento de nuevos módulos y extracción profunda...");
+    try {
+      const dynamicModulesResult = await runDynamicModulesSync(page, adminDb);
+      extractedData.secciones.catalogoModulos = dynamicModulesResult.catalog;
+      extractedData.secciones.aliados = dynamicModulesResult.modulos['/aliados'];
+      extractedData.secciones.contabilidad = dynamicModulesResult.modulos['/contabilidad'];
+      extractedData.secciones.mesaRegistro = dynamicModulesResult.modulos['/mesaregistro'];
+      extractedData.secciones.juniors = dynamicModulesResult.modulos['/juniors'];
+      extractedData.secciones.modulosDinamicos = dynamicModulesResult.modulos;
+    } catch (dynErr) {
+      console.warn("⚠️ Aviso no bloqueante en auto-descubrimiento de módulos dinámicos:", dynErr.message);
+    }
 
     console.log("\n📊 Extracción finalizada.");
 

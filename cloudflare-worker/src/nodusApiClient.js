@@ -160,5 +160,31 @@ export function createNodusApiClient({
       }
       return result;
     },
+    async getAliados({ equipoId } = {}) {
+      const params = equipoId != null ? { id_equipo: boundedInteger(equipoId, 'equipo_id') } : {};
+      return await request('/aliados', params);
+    },
+    async getContabilidad({ sedeId, equipoId } = {}) {
+      const params = {};
+      if (equipoId != null) params.id_equipo = boundedInteger(equipoId, 'equipo_id');
+      if (sedeId != null) params.id_sede = boundedInteger(sedeId, 'sede_id');
+      return await request('/contabilidad', params);
+    },
+    async getMesaRegistro({ equipoId } = {}) {
+      const params = equipoId != null ? { id_equipo: boundedInteger(equipoId, 'equipo_id') } : {};
+      return await request('/mesaregistro', params);
+    },
+    async getJuniors({ sedeId } = {}) {
+      const params = sedeId != null ? { id_sede: boundedInteger(sedeId, 'sede_id') } : {};
+      return await request('/juniors', params);
+    },
+    async getModulosCatalogo() {
+      return await request('/modulos');
+    },
+    async getModuloGenerico(moduloPath, params = {}) {
+      const cleanPath = String(moduloPath || '').replace(/^\/+/, '');
+      if (!cleanPath || /[^a-zA-Z0-9_\-\/]/.test(cleanPath)) throw new NodusApiError('invalid_modulo_path');
+      return await request(`/${cleanPath}`, params);
+    },
   });
 }

@@ -27,6 +27,7 @@ import {
 import { resolveUniqueNameMatch } from '../shared/rrhhSentinelRules.mjs';
 import { publishNodusReportSources } from './publishNodusReportSources.mjs';
 import { extractNodusC1Report } from './nodusC1Report.mjs';
+import { runDynamicModulesSync } from './nodusDynamicModulesAgent.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -1107,7 +1108,12 @@ class NodusDispatcherAgent {
       sedes: normalizedData.sedesSummary,
       coordinadores: normalizedData.coordinadores,
       equipos: equiposSummary,
-      equiposSummary
+      equiposSummary,
+      catalogoModulos: rawData?.secciones?.catalogoModulos || [],
+      aliados: rawData?.secciones?.aliados || null,
+      contabilidad: rawData?.secciones?.contabilidad || null,
+      mesaRegistro: rawData?.secciones?.mesaRegistro || null,
+      juniors: rawData?.secciones?.juniors || null
     };
 
     // 1. Guardar en nodus_kpis_sincronizados / latest_snapshot
@@ -1376,12 +1382,27 @@ export async function runMultiAgentSync() {
     const rawEquiposReporte = await extractor.extractActiveEquiposReporte();
     const biDeepExtract = await extractor.extractAvanzadosYContabilidad();
 
+    // Auto-descubrimiento dinámico de todos los módulos del sidebar (/aliados, /contabilidad, /mesaregistro, /juniors, etc.)
+    console.log("🌐 Ejecutando Auto-descubrimiento y extracción de módulos Nodus...");
+    let dynamicModulesResult = { catalog: mapResult, modulos: {} };
+    try {
+      dynamicModulesResult = await runDynamicModulesSync(extractor.page, getAdminDbForNodusPublish());
+    } catch (dynErr) {
+      console.warn("⚠️ Aviso no bloqueante en auto-descubrimiento dinámico:", dynErr.message);
+    }
+
     const rawData = {
       secciones: {
         actividadCoordinadores: { kpis: rawCoordinadores },
         dashboardPrincipal: rawDashboard,
         reporteEquipos: rawEquiposReporte,
-        biDeepExtract: biDeepExtract
+        biDeepExtract: biDeepExtract,
+        catalogoModulos: dynamicModulesResult.catalog,
+        aliados: dynamicModulesResult.modulos['/aliados'],
+        contabilidad: dynamicModulesResult.modulos['/contabilidad'],
+        mesaRegistro: dynamicModulesResult.modulos['/mesaregistro'],
+        juniors: dynamicModulesResult.modulos['/juniors'],
+        modulosDinamicos: dynamicModulesResult.modulos
       }
     };
 
