@@ -10,7 +10,7 @@ import {
   collection, query, onSnapshot, doc, setDoc, deleteDoc, serverTimestamp
 } from 'firebase/firestore';
 import {
-  Calendar, Plus, ArrowLeft, Printer, Trash2, Edit3, Save, X, Copy, Lock, RefreshCw, ChevronUp, ChevronDown
+  Calendar, Plus, ArrowLeft, Printer, Trash2, Edit3, Save, X, Copy, Lock, RefreshCw, ChevronUp, ChevronDown, ShieldAlert
 } from 'lucide-react';
 
 function addDaysISO(isoDate, days) {
@@ -613,6 +613,47 @@ export default function CalendarioMJ() {
           <button onClick={() => navigate('/home')} className="btn-secondary" style={{ padding: '0.6rem 1rem', borderRadius: '10px' }}>
             <ArrowLeft size={16} style={{ display: 'inline', marginRight: '0.3rem' }} /> Volver
           </button>
+        </div>
+      </div>
+
+      {/* AVISO DE CONFIDENCIALIDAD ESTRICTA */}
+      <div 
+        className="no-print"
+        style={{
+          background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.14) 0%, rgba(217, 119, 6, 0.10) 100%)',
+          border: '1px solid rgba(239, 68, 68, 0.45)',
+          borderRadius: '10px',
+          padding: '0.85rem 1.1rem',
+          marginBottom: '1.2rem',
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: '0.85rem'
+        }}
+      >
+        <div style={{
+          background: 'rgba(239, 68, 68, 0.22)',
+          borderRadius: '8px',
+          padding: '6px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexShrink: 0,
+          border: '1px solid rgba(239, 68, 68, 0.45)'
+        }}>
+          <ShieldAlert size={20} style={{ color: '#ef4444' }} />
+        </div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '4px' }}>
+            <span style={{ fontWeight: 800, color: '#fee2e2', fontSize: '0.82rem', letterSpacing: '0.5px', textTransform: 'uppercase' }}>
+              Aviso Oficial de Confidencialidad y Uso Reservado
+            </span>
+            <span style={{ fontSize: '0.62rem', background: '#dc2626', color: '#ffffff', padding: '2px 7px', borderRadius: '4px', fontWeight: 900, letterSpacing: '0.8px' }}>
+              ESTRICTAMENTE CONFIDENCIAL
+            </span>
+          </div>
+          <p style={{ margin: 0, fontSize: '0.78rem', lineHeight: '1.45', color: '#fca5a5' }}>
+            Toda la información expuesta en estos calendarios (fechas, entrenadores, dinámicas y sedes) es de carácter reservado y confidencial de <strong>CREAR Poder Sin Límites</strong>. Prohibida terminantemente su difusión o revelación sin autorización previa y por escrito.
+          </p>
         </div>
       </div>
 

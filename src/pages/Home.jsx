@@ -26,7 +26,7 @@ import {
   AlertCircle, Circle, RefreshCw, CalendarPlus, Bell, Users, AtSign, 
   BookOpen, Lightbulb, Search, X, Filter, ChevronDown, Sparkles,
   Zap, Sliders, CheckSquare, ArrowRight, ArrowUpRight, ShieldCheck,
-  TrendingUp, Compass, HelpCircle, User, AlertTriangle
+  TrendingUp, Compass, HelpCircle, User, AlertTriangle, ShieldAlert, Lock
 } from 'lucide-react';
 import { getFlagForSede } from '../utils/flags';
 import { getTaskProgressRoles } from '../utils/taskProgressRoles';
@@ -2981,6 +2981,62 @@ export default function Home() {
                 </div>
               </div>
 
+              {/* AVISO INSTITUCIONAL DE CONFIDENCIALIDAD Y NO DIVULGACIÓN (ESTRICTAMENTE CONFIDENCIAL) */}
+              <div 
+                className="confidentiality-notice-banner"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.14) 0%, rgba(217, 119, 6, 0.10) 100%)',
+                  border: '1px solid rgba(239, 68, 68, 0.45)',
+                  borderRadius: '10px',
+                  padding: '0.85rem 1.1rem',
+                  marginBottom: '1rem',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '0.85rem',
+                  boxShadow: '0 4px 14px rgba(0, 0, 0, 0.25)'
+                }}
+              >
+                <div style={{
+                  background: 'rgba(239, 68, 68, 0.22)',
+                  borderRadius: '8px',
+                  padding: '6px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  border: '1px solid rgba(239, 68, 68, 0.45)'
+                }}>
+                  <ShieldAlert size={20} style={{ color: '#ef4444' }} />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '4px' }}>
+                    <span style={{ 
+                      fontWeight: 800, 
+                      color: '#fee2e2', 
+                      fontSize: '0.82rem', 
+                      letterSpacing: '0.5px',
+                      textTransform: 'uppercase'
+                    }}>
+                      Aviso Oficial de Confidencialidad y Uso Reservado
+                    </span>
+                    <span style={{ 
+                      fontSize: '0.62rem', 
+                      background: '#dc2626', 
+                      color: '#ffffff', 
+                      padding: '2px 7px', 
+                      borderRadius: '4px', 
+                      fontWeight: 900, 
+                      letterSpacing: '0.8px' 
+                    }}>
+                      ESTRICTAMENTE CONFIDENCIAL
+                    </span>
+                  </div>
+                  <p style={{ margin: 0, fontSize: '0.78rem', lineHeight: '1.45', color: '#fca5a5' }}>
+                    Toda la información expuesta en este módulo (entrenadores asignados, fechas oficiales, lugares de sala, sedes y logística operativa) es propiedad exclusiva de <strong>CREAR Poder Sin Límites</strong>. Su contenido es de carácter reservado y confidencial para la coordinación interna autorizada. Queda <strong>estrictamente prohibida</strong> su divulgación, compartición, captura o revelación a terceros sin autorización oficial expresa por escrito de la Dirección General.
+                  </p>
+                </div>
+              </div>
+
               <CalendarFreshness status={calendarStatus} onRefresh={refreshCalendar} />
 
               {/* Filtros */}
@@ -3076,6 +3132,7 @@ export default function Home() {
                     const isGerente = role === 'gerente' || currentUser?.isGerente;
                     const isCoordC1C2 = ['coord_c1', 'coord_c2', 'coordinador_c1c2'].includes(role);
                     const isCoordMJ = ['coord_maestria', 'coordinador_mj', 'director_maestria'].includes(role);
+                    const isCoordinator = isCoordC1C2 || isCoordMJ || ['coordinador', 'coordinador_general', 'coordinacion', 'coordinadora', 'coord_jr', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'director_maestria'].includes(role) || (currentUser?.roles || []).some(r => ['coordinador', 'coordinador_general', 'coordinacion', 'coordinadora', 'coord_jr', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'director_maestria'].includes(r));
                     const isEntrenador = ['entrenador', 'entrenador_llamadas'].includes(role);
                     const isQT = role === 'qt' || (currentUser?.roles || []).includes('qt');
                     const isEquipoRole = ['capitan', 'aliado', 'manager'].includes(role);
@@ -3101,20 +3158,10 @@ export default function Home() {
                         return isTrainerMatchingUser(ev.trainer || ev.entrenador, currentUser);
                       }
 
-                      // 2. Coordinadores (C1/C2 y Maestría): Confirmado por José (08/09/2026):
-                      // "las coordinadoras de cada sede pueden ver todas las fechas de sus sedes tanto de mj como de c1y c2 todas las fechas y entrenadores"
-                      if (isCoordC1C2 || isCoordMJ) {
-                        // (14/09/2026) CORREGIDO: mismo bug ya arreglado hoy en el selector
-                        // manual de sede (más abajo) — currentUser.sede puede llegar
-                        // normalizado como "Quito Ciclo 1"/"Quito Ciclo 2" (ver
-                        // normalizeUserRecord() en userNormalizer.js, usado por
-                        // AuthContext.jsx) mientras que los eventos reales guardan la sede
-                        // como código ("UIO", "GYE", etc.), por lo que el includes() de texto
-                        // crudo nunca coincidía para Quito. normalizeSede() (import de
-                        // '../data/usersData', mismo que usa el resto de este archivo)
-                        // resuelve ambos lados a la misma forma canónica ("Quito",
-                        // "Guayaquil", etc.) antes de comparar. Reportado por José: a Erika
-                        // (Coordinadora MJ, Quito) no le cargaban las fechas de su sede.
+                      // 2. Coordinadores (C1/C2, Maestría y Coordinación de Sede):
+                      // Confirmado: las coordinadoras y coordinadores de cada sede pueden ver
+                      // todas las fechas, lugares y entrenadores de sus sedes.
+                      if (isCoordinator) {
                         const userSedeNorm = normalizeSede(currentUser?.sede);
                         if (userSedeNorm !== 'Sede Global') {
                           const evSedeRaw = ev.sede || ev.sedeTag || '';
@@ -3122,7 +3169,7 @@ export default function Home() {
                             return false;
                           }
                         }
-                        // Ven todos los eventos y entrenadores de su sede (C1, C2 y MJ)
+                        // Ven todos los eventos y entrenadores de su sede (C1, C2, MJ y Especiales)
                         return true;
                       }
 
@@ -3276,7 +3323,8 @@ export default function Home() {
                     }
 
                     return (
-                      <div style={{ maxHeight: '320px', overflowY: 'auto', paddingRight: '0.4rem' }}>
+                      <>
+                        <div style={{ maxHeight: '320px', overflowY: 'auto', paddingRight: '0.4rem' }}>
                         {displayEvents.map((ev, i) => {
                           const baseDate = ev.fecha_inicio || ev.start;
                           const evStartDate = new Date(baseDate || new Date());
@@ -3345,8 +3393,7 @@ export default function Home() {
                                   })();
 
                                   const canAlwaysSeeTrainer = isGerente || isSuperOrDir || isEntrenador;
-                                  const isCoordinator = isCoordC1C2 || isCoordMJ || (currentUser?.roles || []).some(r => ['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'director_maestria', 'coord_jr'].includes(r));
-                                  const canSeeTrainer = canAlwaysSeeTrainer || (isCoordinator && isEventInActiveCycle);
+                                  const canSeeTrainer = canAlwaysSeeTrainer || isCoordinator;
 
                                   if (!canSeeTrainer) return null;
 
@@ -3370,7 +3417,11 @@ export default function Home() {
                                   <MapPin size={11} /> {getFlagForSede(ev.sede || ev.sedeTag)} {ev.sede || ev.sedeTag || 'GLOBAL'}
                                 </span>
                                 <span className="text-muted" style={{ fontSize: '0.75rem', display: 'block' }}>
-                                  {ev.fecha_inicio ? ev.fecha_inicio.substring(0, 10) : ''}
+                                  {ev.fecha_inicio ? (
+                                    ev.fecha_fin && ev.fecha_fin !== ev.fecha_inicio
+                                      ? `${ev.fecha_inicio.substring(0, 10)} al ${ev.fecha_fin.substring(0, 10)}`
+                                      : ev.fecha_inicio.substring(0, 10)
+                                  ) : ''}
                                 </span>
                                 <button 
                                   onClick={() => handleAddEventToGoogle(ev, evStartDate, evEndDate)}
@@ -3384,7 +3435,29 @@ export default function Home() {
                           );
                         })}
                       </div>
-                    );
+
+                      {/* RECORDATORIO OFICIAL DE CONFIDENCIALIDAD & NDA */}
+                      <div style={{
+                        marginTop: '0.8rem',
+                        paddingTop: '0.6rem',
+                        borderTop: '1px solid rgba(255,255,255,0.06)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        fontSize: '0.72rem',
+                        color: 'var(--text-muted)',
+                        flexWrap: 'wrap',
+                        gap: '6px'
+                      }}>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#94a3b8' }}>
+                          <Lock size={12} style={{ color: 'var(--crear-gold)' }} /> Información interna confidencial de CREAR Poder Sin Límites bajo política Zero-Trust.
+                        </span>
+                        <span style={{ color: '#ef4444', fontWeight: 700, fontSize: '0.68rem', letterSpacing: '0.5px' }}>
+                          PROHIBIDA SU DIVULGACIÓN SIN AUTORIZACIÓN
+                        </span>
+                      </div>
+                    </>
+                  );
                   })()}
                 </ul>
               )}

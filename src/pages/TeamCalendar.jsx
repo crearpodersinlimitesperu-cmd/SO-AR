@@ -3,7 +3,7 @@ import {
   Calendar as CalendarIcon, Clock, Users, ChevronLeft, ChevronRight, 
   Plus, ArrowLeft, Filter, CheckCircle2, Sparkles, Shirt, X, 
   Layers, MapPin, Tag, AlertCircle, Info, Briefcase, Building, 
-  UserCheck, Shield, FileText, CheckSquare, Award
+  UserCheck, Shield, FileText, CheckSquare, Award, ShieldAlert, Lock
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCycles } from '../context/CyclesContext';
@@ -825,6 +825,47 @@ export default function TeamCalendar() {
           >
             <Sparkles size={16} /> Calendario Maestría (MJ)
           </button>
+        </div>
+      </div>
+
+      {/* AVISO INSTITUCIONAL DE CONFIDENCIALIDAD Y NO DIVULGACIÓN */}
+      <div 
+        style={{
+          background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.14) 0%, rgba(217, 119, 6, 0.10) 100%)',
+          border: '1px solid rgba(239, 68, 68, 0.45)',
+          borderRadius: '10px',
+          padding: '0.85rem 1.1rem',
+          marginBottom: '1.5rem',
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: '0.85rem',
+          boxShadow: '0 4px 14px rgba(0, 0, 0, 0.25)'
+        }}
+      >
+        <div style={{
+          background: 'rgba(239, 68, 68, 0.22)',
+          borderRadius: '8px',
+          padding: '6px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexShrink: 0,
+          border: '1px solid rgba(239, 68, 68, 0.45)'
+        }}>
+          <ShieldAlert size={20} style={{ color: '#ef4444' }} />
+        </div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '4px' }}>
+            <span style={{ fontWeight: 800, color: '#fee2e2', fontSize: '0.82rem', letterSpacing: '0.5px', textTransform: 'uppercase' }}>
+              Aviso Oficial de Confidencialidad y Uso Reservado
+            </span>
+            <span style={{ fontSize: '0.62rem', background: '#dc2626', color: '#ffffff', padding: '2px 7px', borderRadius: '4px', fontWeight: 900, letterSpacing: '0.8px' }}>
+              ESTRICTAMENTE CONFIDENCIAL
+            </span>
+          </div>
+          <p style={{ margin: 0, fontSize: '0.78rem', lineHeight: '1.45', color: '#fca5a5' }}>
+            Toda la información contenida en este cronograma (asignaciones de entrenadores, fechas oficiales, lugares de sala, sedes y dinámicas de equipo) es confidencial y de uso exclusivo para la coordinación autorizada de <strong>CREAR Poder Sin Límites</strong>. Prohibida terminantemente su difusión, reproducción o captura sin autorización previa y por escrito.
+          </p>
         </div>
       </div>
 
