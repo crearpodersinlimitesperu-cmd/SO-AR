@@ -974578,6 +974578,210 @@ test('invalid storage and unavailable browser storage surface errors rather than
 
 ---
 
+## Archivo: src/utils/callScheduleAutomation.js
+
+```js
+/**
+ * AUTOMATIZACIÓN DE CRONOGRAMA Y DIRECTIVAS DE ENTRENADORES DE LLAMADAS (CAUSA OS)
+ *
+ * Directivas Implementadas:
+ * 1. Seguimiento estándar: Videollamada de Google Meet (20 a 30 minutos).
+ * 2. Límite de carga: Máximo 5 mánagers activos por entrenador.
+ * 3. Liquidación financiera: Liberación fija por llamada efectiva ($25 USD), independiente de graduación/deserción.
+ * 4. Metas de alto rendimiento: Exactamente 3 Resultados Imposibles para avanzar (sin eliminar histórico).
+ * 5. Cronograma automatizado:
+ *    - Llamada 1: Obligatoria con el capitán antes de iniciar Capítulo 1.
+ *    - Pausa operativa: Durante C1 y C2 (dinámicas de sala).
+ *    - Llamadas 2..N: Semanales consecutivas tras el primer fin de semana de Maestría.
+ *    - Cero bloqueos de fin de año: Continuidad operativa garantizada en dic/ene.
+ */
+
+export const STANDARD_CALL_CONTACT_TYPE = 'Videollamada de Google Meet';
+export const STANDARD_CALL_DURATION = '20-30 min';
+export const MAX_TRAINER_LOAD = 5;
+export const FEE_PER_EFFECTIVE_CALL_USD = 25;
+export const REQUIRED_FUTUROS_IMPOSIBLES = 3;
+
+/**
+ * Valida la capacidad de carga del entrenador.
+ * Un entrenador no puede tener más de 5 mánagers asignados.
+ */
+export function validateTrainerCapacity(currentActiveCount = 0, incomingCount = 1) {
+  const current = Number(currentActiveCount) || 0;
+  const incoming = Number(incomingCount) || 0;
+  const projected = current + incoming;
+  const allowed = projected <= MAX_TRAINER_LOAD;
+  const remaining = Math.max(0, MAX_TRAINER_LOAD - current);
+
+  return {
+    allowed,
+    current,
+    projected,
+    remaining,
+    max: MAX_TRAINER_LOAD,
+    error: allowed
+      ? null
+      : `Límite de carga excedido: El entrenador tiene ${current} asignados y alcanzaría ${projected} (máximo permitido: ${MAX_TRAINER_LOAD}).`
+  };
+}
+
+/**
+ * Garantía de Continuidad de Fin de Año.
+ * Las directivas prohíben bloqueos o suspensiones durante temporada de fin de año.
+ * Siempre retorna false para indicar que NO hay suspensión.
+ */
+export function isYearEndBlocked(_date) {
+  return false;
+}
+
+/**
+ * Formatea una fecha YYYY-MM-DD agregando N días.
+ */
+function addDays(isoDateStr, days) {
+  if (!isoDateStr) return '';
+  const [y, m, d] = String(isoDateStr).slice(0, 10).split('-').map(Number);
+  if (!y || !m || !d) return isoDateStr;
+  const date = new Date(Date.UTC(y, m - 1, d));
+  date.setUTCDate(date.getUTCDate() + days);
+  return date.toISOString().slice(0, 10);
+}
+
+/**
+ * Genera el cronograma automatizado de llamadas según directivas.
+ *
+ * @param {Object} options
+ * @param {string} options.c1StartDate Fecha de inicio de Capítulo 1 (YYYY-MM-DD)
+ * @param {string} options.mjStartDate Fecha de inicio del 1er fin de semana de Maestría (YYYY-MM-DD)
+ * @param {number} [options.totalCalls=7] Total de llamadas planificadas en el ciclo
+ * @param {string} [options.equipo=''] Nombre o número del equipo
+ * @param {string} [options.capitanName=''] Nombre del capitán
+ */
+export function generateAutomatedCallSchedule({
+  c1StartDate = '',
+  mjStartDate = '',
+  totalCalls = 7,
+  equipo = '',
+  capitanName = ''
+} = {}) {
+  const schedule = [];
+
+  // 1. Llamada Obligatoria con el Capitán Pre-Capítulo 1
+  const preC1Date = c1StartDate ? addDays(c1StartDate, -3) : addDays(new Date().toISOString().slice(0, 10), 1);
+  schedule.push({
+    numeroLlamada: 1,
+    tipo: 'pre_c1_capitan',
+    titulo: 'Llamada 1: Obligatoria con el Capitán (Pre-C1)',
+    destinatario: capitanName ? `Capitán: ${capitanName}` : 'Capitán del Equipo',
+    tipoContacto: STANDARD_CALL_CONTACT_TYPE,
+    duracionMinutos: STANDARD_CALL_DURATION,
+    fechaProgramada: preC1Date,
+    obligatoria: true,
+    fase: 'Pre-Capítulo 1',
+    descripcion: 'Alineación de visión, acuerdos operativos y metas antes de iniciar Capítulo 1.',
+    requiereNotaVoz: true,
+    estado: 'programada'
+  });
+
+  // 2. Pausa Operativa (Durante C1 y C2)
+  const pausaFin = mjStartDate || (c1StartDate ? addDays(c1StartDate, 21) : addDays(preC1Date, 21));
+  schedule.push({
+    tipo: 'pausa_operativa',
+    titulo: 'Pausa Operativa de Inmersión (C1 & C2)',
+    fechaInicio: c1StartDate || addDays(preC1Date, 3),
+    fechaFin: pausaFin,
+    descripcion: 'Espacio de sala y dinámicas vivenciales para los participantes. Pausa en llamadas de seguimiento.',
+    activa: true
+  });
+
+  // 3. Retoma Formal de Llamadas Semanales Post-1er Fin de Semana de Maestría
+  const baseMjDate = mjStartDate || addDays(preC1Date, 28);
+  const regularCallsCount = Math.max(1, totalCalls - 1);
+
+  for (let i = 1; i <= regularCallsCount; i++) {
+    const callNumber = i + 1;
+    // Llamadas semanales: se programan cada 7 días tras culminar el primer FDS de Maestría
+    const callDate = addDays(baseMjDate, i * 7);
+    const isYearEnd = /-(12-(2[0-9]|3[01])|01-0[1-7])/.test(callDate);
+
+    schedule.push({
+      numeroLlamada: callNumber,
+      tipo: 'semanal_maestria',
+      titulo: `Llamada ${callNumber}: Seguimiento Semanal Maestría`,
+      destinatario: equipo ? `Equipo ${equipo}` : 'Equipo de Mánagers',
+      tipoContacto: STANDARD_CALL_CONTACT_TYPE,
+      duracionMinutos: STANDARD_CALL_DURATION,
+      fechaProgramada: callDate,
+      obligatoria: true,
+      fase: 'Maestría del Juego',
+      descripcion: `Sesión de coaching semanal ${i}/${regularCallsCount}. Evaluación de avances y sentados.`,
+      requiereNotaVoz: true,
+      temporadaFinDeAno: isYearEnd,
+      suspendida: false,
+      bloqueada: false,
+      continuidadOperativaGarantizada: true,
+      estado: 'programada'
+    });
+  }
+
+  return {
+    equipo,
+    capitanName,
+    c1StartDate,
+    mjStartDate,
+    totalLlamadas: totalCalls,
+    llamadaCapitanPreC1: schedule[0],
+    pausaOperativa: schedule[1],
+    llamadasSemanales: schedule.filter(item => item.tipo === 'semanal_maestria'),
+    cronogramaCompleto: schedule
+  };
+}
+
+/**
+ * Calcula la liquidación fija del entrenador basada exclusivamente en llamadas efectivas registradas.
+ * No depende de la graduación ni deserción del mánager.
+ */
+export function calculateTrainerLiquidation({
+  effectiveCallsCount = 0,
+  feePerCall = FEE_PER_EFFECTIVE_CALL_USD
+} = {}) {
+  const count = Math.max(0, Number(effectiveCallsCount) || 0);
+  const fee = Number(feePerCall) || FEE_PER_EFFECTIVE_CALL_USD;
+  const totalUSD = count * fee;
+
+  return {
+    llamadasEfectivas: count,
+    tarifaPorLlamada: fee,
+    totalUSD,
+    moneda: 'USD',
+    motivo: 'llamadas_efectivas',
+    criterio: 'Liquidación fija por llamada efectiva registrada honestamente en Causa OS'
+  };
+}
+
+/**
+ * Valida si un participante cumple con exactamente 3 Resultados Imposibles para avanzar.
+ * Garantiza inmutabilidad histórica.
+ */
+export function validateParticipantAdvance(approvedFIsCount = 0, required = REQUIRED_FUTUROS_IMPOSIBLES) {
+  const approved = Number(approvedFIsCount) || 0;
+  const req = Number(required) || REQUIRED_FUTUROS_IMPOSIBLES;
+  const canAdvance = approved === req;
+
+  return {
+    canAdvance,
+    approvedCount: approved,
+    requiredCount: req,
+    faltan: Math.max(0, req - approved),
+    statusText: canAdvance
+      ? 'Habilitado para avanzar: 3 Resultados Imposibles aprobados'
+      : `Bloqueado para avanzar: Requiere exactamente ${req} Resultados Imposibles aprobados (actualmente: ${approved})`
+  };
+}
+
+```
+
+---
+
 ## Archivo: src/utils/elizabethPreferences.js
 
 ```js
@@ -985435,11 +985639,18 @@ export default function FuturosImposiblesView({
                             borderRadius: '4px',
                             fontWeight: 700
                           }}>
-                            ✅ Certificado 100%
+                            🚀 Habilitado para Avanzar (3/3)
                           </span>
                         ) : (
-                          <span style={{ fontSize: '0.72rem', color: textMuted }}>
-                            En Progreso ({p.totalFi}/5)
+                          <span style={{ 
+                            fontSize: '0.72rem', 
+                            color: '#f59e0b', 
+                            background: 'rgba(245, 158, 11, 0.1)', 
+                            padding: '0.2rem 0.5rem', 
+                            borderRadius: '4px',
+                            fontWeight: 700
+                          }}>
+                            🔒 Bloqueado ({p.aprobados || 0}/3 Aprobados)
                           </span>
                         )}
                       </td>
@@ -985548,6 +985759,29 @@ export default function FuturosImposiblesView({
 
             {/* Modal Body */}
             <div style={{ padding: '1.5rem', overflowY: 'auto', flex: 1 }}>
+              {/* BANNER DE REGLA DE AVANCE: EXACTAMENTE 3 RESULTADOS IMPOSIBLES */}
+              <div style={{
+                background: selectedParticipant.aprobados === 3 ? 'rgba(16, 185, 129, 0.12)' : 'rgba(245, 158, 11, 0.12)',
+                border: `1px solid ${selectedParticipant.aprobados === 3 ? '#10b981' : '#f59e0b'}`,
+                borderRadius: '8px',
+                padding: '0.75rem 1rem',
+                marginBottom: '1.25rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '0.5rem'
+              }}>
+                <div style={{ fontSize: '0.82rem', fontWeight: 700, color: selectedParticipant.aprobados === 3 ? '#10b981' : '#f59e0b' }}>
+                  {selectedParticipant.aprobados === 3
+                    ? '🚀 HABILITADO PARA AVANZAR: Cumple con exactamente 3 Resultados Imposibles aprobados.'
+                    : `🔒 AVANCE BLOQUEADO: Requiere exactamente 3 Resultados Imposibles aprobados para avanzar (actualmente ${selectedParticipant.aprobados}/3).`}
+                </div>
+                <div style={{ fontSize: '0.72rem', color: textMuted }}>
+                  Inmutabilidad: Registros históricos de ciclos previos preservados en base de datos.
+                </div>
+              </div>
+
               {/* Badges de estado general */}
               <div style={{ 
                 display: 'grid', 
@@ -1045668,7 +1045902,7 @@ export default function ComunicadosOperativos() {
 ## Archivo: src/pages/CallCoachCRM.jsx
 
 ```javascript
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getManagersPipeline, getDualTasks, signoffDualTask } from '../services/callCoachService';
@@ -1045676,8 +1045910,16 @@ import ChecklistBoard from './ChecklistBoard';
 import { toast } from 'react-hot-toast';
 import { 
   PhoneCall, Users, AlertOctagon, CheckCircle, Clock, 
-  ChevronRight, ChevronDown, Activity, ChevronLeft, Lock
+  ChevronRight, ChevronDown, Activity, ChevronLeft, Lock,
+  Video, Mic, Calendar, ShieldCheck, CheckSquare, Square, X,
+  ExternalLink, Sparkles
 } from 'lucide-react';
+import { 
+  MAX_TRAINER_LOAD, 
+  STANDARD_CALL_CONTACT_TYPE, 
+  STANDARD_CALL_DURATION,
+  generateAutomatedCallSchedule 
+} from '../utils/callScheduleAutomation';
 
 export default function CallCoachCRM() {
   const { currentUser } = useAuth();
@@ -1045688,7 +1045930,17 @@ export default function CallCoachCRM() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
   const [showLegacy, setShowLegacy] = useState(false);
+  const [showSchedule, setShowSchedule] = useState(false);
   const [reload, setReload] = useState(0);
+
+  // Modal para ver historial de llamadas del manager
+  const [selectedManagerForHistory, setSelectedManagerForHistory] = useState(null);
+
+  // Checklist semanal obligatorio del entrenador
+  const [weeklyChecklist, setWeeklyChecklist] = useState({
+    meetCallDone: false,
+    voiceNoteReportSent: false
+  });
 
   useEffect(() => {
     let active = true;
@@ -1045725,6 +1045977,45 @@ export default function CallCoachCRM() {
       setTasks(prev => prev.map(t => t.id === id ? { ...t, coachSigned: true } : t));
       toast.success('Tu parte de la tarea ha sido firmada. Esperando al Coordinador.', { icon: '✅' });
     }
+  };
+
+  // Cálculo de carga actual del entrenador (Límite Directiva: Máximo 5)
+  const myAssignedManagers = useMemo(() => {
+    const currentName = String(currentUser?.name || '').toLowerCase().trim();
+    if (!currentName) return [];
+    return pipeline.filter(m => {
+      const ent = String(m.entrenador || '').toLowerCase().trim();
+      return ent && (ent.includes(currentName) || currentName.includes(ent));
+    });
+  }, [pipeline, currentUser]);
+
+  const coachLoadCount = myAssignedManagers.length > 0 ? myAssignedManagers.length : pipeline.length;
+  const isLoadMaxed = coachLoadCount >= MAX_TRAINER_LOAD;
+
+  // Cronograma automatizado de referencia
+  const sampleSchedule = useMemo(() => {
+    return generateAutomatedCallSchedule({
+      c1StartDate: new Date().toISOString().slice(0, 10),
+      mjStartDate: '',
+      totalCalls: 7,
+      equipo: myAssignedManagers[0]?.equipo || 'Equipo Maestría',
+      capitanName: myAssignedManagers[0]?.name || 'Capitán Asignado'
+    });
+  }, [myAssignedManagers]);
+
+  const toggleChecklistItem = (key) => {
+    setWeeklyChecklist(prev => {
+      const next = { ...prev, [key]: !prev[key] };
+      if (!prev[key]) {
+        toast.success(
+          key === 'meetCallDone'
+            ? 'Videollamada de Google Meet (20-30 min) confirmada.'
+            : 'Envío de Nota de Voz al Coordinador de Maestría confirmado.',
+          { icon: '🎙️' }
+        );
+      }
+      return next;
+    });
   };
 
   if (loading) {
@@ -1045766,29 +1046057,203 @@ export default function CallCoachCRM() {
               <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.9rem' }}>Entrenador: {currentUser?.name || 'Coach'}</p>
             </div>
           </div>
-          <div style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '0.5rem 1rem', borderRadius: '8px', color: '#10b981', fontSize: '0.85rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <Activity size={16} /> Nodus Sync: Activo (Equipo 1000 Excluido)
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+            {/* BADGE DE CAPACIDAD DE CARGA (LÍMITE 5) */}
+            <div style={{ 
+              background: isLoadMaxed ? 'rgba(239, 68, 68, 0.15)' : 'rgba(59, 130, 246, 0.12)', 
+              border: `1px solid ${isLoadMaxed ? '#ef4444' : '#3b82f6'}`, 
+              padding: '0.45rem 0.9rem', 
+              borderRadius: '8px', 
+              fontSize: '0.82rem', 
+              fontWeight: 700,
+              color: isLoadMaxed ? '#ef4444' : '#38bdf8',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}>
+              <Users size={16} /> Carga Asignada: {coachLoadCount}/{MAX_TRAINER_LOAD} {isLoadMaxed ? '⚠️ Máximo Alcanzado' : '✅ Capacidad Óptima'}
+            </div>
+
+            {/* BADGE FORMATO DE LLAMADA OBLIGATORIO */}
+            <div style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '0.45rem 0.9rem', borderRadius: '8px', color: '#10b981', fontSize: '0.82rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Video size={16} /> {STANDARD_CALL_CONTACT_TYPE} ({STANDARD_CALL_DURATION})
+            </div>
+
+            <div style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '0.45rem 0.9rem', borderRadius: '8px', color: '#10b981', fontSize: '0.82rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Activity size={16} /> Nodus Sync: Activo
+            </div>
           </div>
         </div>
       </div>
 
-      <div style={{ maxWidth: '1400px', margin: '2rem auto', padding: '0 2rem', display: 'grid', gridTemplateColumns: '1fr 2.5fr 1.5fr', gap: '1.5rem' }}>
+      {/* BANNER INFORMATIVO: DIRECTIVAS DE OPERACIÓN APROBADAS */}
+      <div style={{ maxWidth: '1400px', margin: '1rem auto 0 auto', padding: '0 2rem' }}>
+        <div style={{ 
+          background: 'linear-gradient(90deg, rgba(30, 58, 138, 0.35) 0%, rgba(15, 23, 42, 0.8) 100%)', 
+          border: '1px solid rgba(59, 130, 246, 0.3)', 
+          borderRadius: '10px', 
+          padding: '0.85rem 1.25rem',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '0.8rem'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <ShieldCheck size={20} color="#38bdf8" />
+            <div style={{ fontSize: '0.82rem', color: 'var(--text-main)' }}>
+              <strong>Directivas de Dirección General:</strong> Formato obligatorio en <strong>Videollamada de Google Meet (20-30 min)</strong> &bull; Límite estricto de <strong>5 mánagers por entrenador</strong> &bull; Liquidación <strong>fija por llamada efectiva ($25 USD)</strong> &bull; Requisito de <strong>3 Resultados Imposibles</strong>.
+            </div>
+          </div>
+
+          <button 
+            onClick={() => setShowSchedule(!showSchedule)}
+            style={{ 
+              background: 'rgba(56, 189, 248, 0.15)', 
+              border: '1px solid #38bdf8', 
+              color: '#38bdf8', 
+              padding: '0.35rem 0.75rem', 
+              borderRadius: '6px', 
+              fontSize: '0.75rem', 
+              fontWeight: 700, 
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px'
+            }}
+          >
+            <Calendar size={14} /> {showSchedule ? 'Ocultar Cronograma Oficial' : 'Ver Cronograma Oficial de Llamadas'}
+          </button>
+        </div>
+
+        {/* VISUALIZADOR DEL CRONOGRAMA AUTOMATIZADO */}
+        {showSchedule && (
+          <div style={{ marginTop: '0.8rem', background: 'var(--bg-card)', borderRadius: '10px', padding: '1.2rem', border: '1px solid var(--border-strong)', boxShadow: 'var(--shadow-sm)' }}>
+            <h3 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-heading)', margin: '0 0 0.8rem 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Calendar size={18} color="#38bdf8" /> Cronograma Automatizado Oficial (Orden de Ejecución)
+            </h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '0.8rem' }}>
+              <div style={{ background: 'rgba(59, 130, 246, 0.08)', border: '1px solid rgba(59, 130, 246, 0.25)', borderRadius: '8px', padding: '0.8rem' }}>
+                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#38bdf8', textTransform: 'uppercase' }}>Fase 1: Pre-Capítulo 1</div>
+                <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-heading)', marginTop: '2px' }}>1 Llamada Obligatoria con el Capitán</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>Antes de iniciar C1. Duración: 20-30 min vía Google Meet.</div>
+              </div>
+              <div style={{ background: 'rgba(245, 158, 11, 0.08)', border: '1px solid rgba(245, 158, 11, 0.25)', borderRadius: '8px', padding: '0.8rem' }}>
+                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#f59e0b', textTransform: 'uppercase' }}>Fase 2: Pausa Operativa</div>
+                <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-heading)', marginTop: '2px' }}>Inmersión de Sala (C1 & C2)</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>Pausa en llamadas de seguimiento durante el desarrollo vivencial de los fines de semana.</div>
+              </div>
+              <div style={{ background: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.25)', borderRadius: '8px', padding: '0.8rem' }}>
+                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#10b981', textTransform: 'uppercase' }}>Fase 3: Maestría del Juego</div>
+                <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-heading)', marginTop: '2px' }}>Retoma Semanal Post-1er FDS</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>Llamadas semanales cada 7 días. Continuidad garantizada en fin de año (sin bloqueos).</div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div style={{ maxWidth: '1400px', margin: '1.5rem auto', padding: '0 2rem', display: 'grid', gridTemplateColumns: '1fr 2.3fr 1.4fr', gap: '1.5rem' }}>
         
-        {/* COLUMNA 1: URGENCIAS Y SEMÁFORO ROJO */}
+        {/* COLUMNA 1: URGENCIAS Y CHECKLIST SEMANAL OBLIGATORIO */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          <div style={{ background: 'var(--bg-card)', borderRadius: '12px', border: '1px solid var(--border-strong)', padding: '1.5rem', boxShadow: 'var(--shadow-sm)' }}>
-            <h2 style={{ fontSize: '1.1rem', color: '#ef4444', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 0 1rem 0' }}>
-              <AlertOctagon size={20} /> Urgencias de Hoy (En Rojo)
+          
+          {/* TAREA SEMANAL OBLIGATORIA DEL ENTRENADOR */}
+          <div style={{ background: 'var(--bg-card)', borderRadius: '12px', border: '1px solid var(--border-strong)', padding: '1.3rem', boxShadow: 'var(--shadow-sm)' }}>
+            <h2 style={{ fontSize: '1rem', color: '#38bdf8', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 0 0.4rem 0', fontWeight: 800 }}>
+              <Mic size={18} /> Checklist Semanal del Coach
+            </h2>
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: '0 0 1rem 0' }}>
+              Confirmación obligatoria por cada ciclo semanal antes de liberar la liquidación:
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+              <button 
+                type="button"
+                onClick={() => toggleChecklistItem('meetCallDone')}
+                style={{ 
+                  background: weeklyChecklist.meetCallDone ? 'rgba(16, 185, 129, 0.12)' : 'var(--bg-dark-alt)', 
+                  border: `1px solid ${weeklyChecklist.meetCallDone ? '#10b981' : 'var(--border-subtle)'}`,
+                  borderRadius: '8px',
+                  padding: '0.7rem',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '0.6rem',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  color: 'var(--text-main)'
+                }}
+              >
+                {weeklyChecklist.meetCallDone ? <CheckSquare size={18} color="#10b981" /> : <Square size={18} color="var(--text-muted)" />}
+                <div>
+                  <div style={{ fontSize: '0.82rem', fontWeight: 700, color: weeklyChecklist.meetCallDone ? '#10b981' : 'var(--text-heading)' }}>
+                    Videollamada Google Meet (20-30 min)
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                    Realizada con cámara y agenda de 3 metas.
+                  </div>
+                </div>
+              </button>
+
+              <button 
+                type="button"
+                onClick={() => toggleChecklistItem('voiceNoteReportSent')}
+                style={{ 
+                  background: weeklyChecklist.voiceNoteReportSent ? 'rgba(16, 185, 129, 0.12)' : 'var(--bg-dark-alt)', 
+                  border: `1px solid ${weeklyChecklist.voiceNoteReportSent ? '#10b981' : 'var(--border-subtle)'}`,
+                  borderRadius: '8px',
+                  padding: '0.7rem',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '0.6rem',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  color: 'var(--text-main)'
+                }}
+              >
+                {weeklyChecklist.voiceNoteReportSent ? <CheckSquare size={18} color="#10b981" /> : <Square size={18} color="var(--text-muted)" />}
+                <div>
+                  <div style={{ fontSize: '0.82rem', fontWeight: 700, color: weeklyChecklist.voiceNoteReportSent ? '#10b981' : 'var(--text-heading)' }}>
+                    Envío de Nota de Voz al Coordinador
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                    Reporte semanal enviado al Coordinador de Maestría.
+                  </div>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          {/* URGENCIAS DE HOY */}
+          <div style={{ background: 'var(--bg-card)', borderRadius: '12px', border: '1px solid var(--border-strong)', padding: '1.3rem', boxShadow: 'var(--shadow-sm)' }}>
+            <h2 style={{ fontSize: '1rem', color: '#ef4444', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 0 1rem 0', fontWeight: 800 }}>
+              <AlertOctagon size={18} /> Urgencias de Hoy (En Rojo)
             </h2>
             {redManagers.length === 0 ? (
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>No hay Managers en rojo.</p>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>No hay Managers en rojo.</p>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 {redManagers.map(m => (
-                  <div key={m.id} style={{ background: 'rgba(239, 68, 68, 0.08)', borderLeft: '4px solid #ef4444', padding: '1rem', borderRadius: '6px', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
-                    <div style={{ fontWeight: 800, color: 'var(--text-heading)', fontSize: '0.95rem' }}>{m.name}</div>
-                    <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginTop: '4px' }}>Sentados: {m.sentados}/{m.meta}</div>
-                    <div style={{ color: '#ef4444', fontSize: '0.75rem', fontWeight: 700, marginTop: '4px' }}>Nodus: {m.nodusLastCall}</div>
+                  <div 
+                    key={m.id} 
+                    onClick={() => setSelectedManagerForHistory(m)}
+                    style={{ 
+                      background: 'rgba(239, 68, 68, 0.08)', 
+                      borderLeft: '4px solid #ef4444', 
+                      padding: '0.9rem', 
+                      borderRadius: '6px', 
+                      border: '1px solid rgba(239, 68, 68, 0.2)',
+                      cursor: 'pointer',
+                      transition: 'transform 0.15s ease'
+                    }}
+                    title="Haz clic para ver el historial completo de llamadas"
+                  >
+                    <div style={{ fontWeight: 800, color: 'var(--text-heading)', fontSize: '0.92rem' }}>{m.name}</div>
+                    <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginTop: '3px' }}>Sentados: {m.sentados}/{m.meta} &bull; {m.equipo}</div>
+                    <div style={{ color: '#ef4444', fontSize: '0.75rem', fontWeight: 700, marginTop: '3px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <PhoneCall size={12} /> Último contacto: {m.nodusLastCall}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -1045796,31 +1046261,56 @@ export default function CallCoachCRM() {
           </div>
         </div>
 
-        {/* COLUMNA 2: PIPELINE "3 SENTADOS" */}
+        {/* COLUMNA 2: PIPELINE DE MANAGERS CON VISTA DE HISTORIAL */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           <div style={{ background: 'var(--bg-card)', borderRadius: '12px', border: '1px solid var(--border-strong)', padding: '1.5rem', flex: 1, boxShadow: 'var(--shadow-sm)' }}>
-            <h2 style={{ fontSize: '1.1rem', color: 'var(--text-heading)', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 0 1rem 0' }}>
-              <Users size={20} color="var(--color-primary, #3b82f6)" /> Pipeline de Managers (En Seguimiento / Verde)
-            </h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+              <h2 style={{ fontSize: '1.1rem', color: 'var(--text-heading)', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0, fontWeight: 800 }}>
+                <Users size={20} color="var(--color-primary, #3b82f6)" /> Pipeline de Managers ({pipeline.length})
+              </h2>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                Haz clic en cualquier tarjeta para auditar su <strong>Historial de Llamadas</strong>
+              </span>
+            </div>
             
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '1rem' }}>
               {pipeline.length === 0 && (
                 <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>No hay managers registrados para esta sede.</p>
               )}
               {otherManagers.map(m => (
-                <div key={m.id} style={{ background: 'var(--bg-dark-alt)', border: '1px solid var(--border-subtle)', padding: '1rem', borderRadius: '8px', position: 'relative', overflow: 'hidden' }}>
+                <div 
+                  key={m.id} 
+                  onClick={() => setSelectedManagerForHistory(m)}
+                  style={{ 
+                    background: 'var(--bg-dark-alt)', 
+                    border: '1px solid var(--border-subtle)', 
+                    padding: '1rem', 
+                    borderRadius: '8px', 
+                    position: 'relative', 
+                    overflow: 'hidden',
+                    cursor: 'pointer',
+                    transition: 'border-color 0.2s ease, transform 0.15s ease'
+                  }}
+                  title="Haz clic para ver el historial completo de llamadas"
+                >
                   <div style={{ position: 'absolute', top: 0, left: 0, height: '4px', width: `${(m.sentados/m.meta)*100}%`, background: m.status === 'GREEN' ? '#10b981' : '#f59e0b', transition: 'width 0.5s ease' }} />
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
-                      <div style={{ fontWeight: 700, color: 'var(--text-heading)', fontSize: '1rem' }}>{m.name}</div>
-                      <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>{m.equipo}</div>
+                      <div style={{ fontWeight: 700, color: 'var(--text-heading)', fontSize: '0.95rem' }}>{m.name}</div>
+                      <div style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}>{m.equipo} · {m.rol || 'Manager'}</div>
                     </div>
-                    <div style={{ background: 'var(--bg-card)', padding: '4px 10px', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 800, color: m.status === 'GREEN' ? '#10b981' : '#f59e0b', border: '1px solid var(--border-subtle)' }}>
+                    <div style={{ background: 'var(--bg-card)', padding: '3px 8px', borderRadius: '16px', fontSize: '0.8rem', fontWeight: 800, color: m.status === 'GREEN' ? '#10b981' : '#f59e0b', border: '1px solid var(--border-subtle)' }}>
                       {m.sentados}/{m.meta}
                     </div>
                   </div>
-                  <div style={{ marginTop: '1rem', paddingTop: '0.75rem', borderTop: '1px dashed var(--border-subtle)', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                    <PhoneCall size={14} color="var(--color-primary, #3b82f6)" /> Último estado: <strong style={{ color: 'var(--text-main)' }}>{m.nodusLastCall}</strong>
+                  
+                  <div style={{ marginTop: '0.8rem', paddingTop: '0.6rem', borderTop: '1px dashed var(--border-subtle)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <Video size={13} color="#10b981" /> Meet: 20-30m
+                    </div>
+                    <div style={{ color: '#38bdf8', fontWeight: 600 }}>
+                      Ver Historial ➔
+                    </div>
                   </div>
                 </div>
               ))}
@@ -1045887,6 +1046377,111 @@ export default function CallCoachCRM() {
         </div>
 
       </div>
+
+      {/* MODAL DE HISTORIAL COMPLETO DE LLAMADAS DEL MANAGER */}
+      {selectedManagerForHistory && (
+        <div 
+          style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.7)', backdropFilter: 'blur(4px)', zIndex: 1200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}
+          onClick={() => setSelectedManagerForHistory(null)}
+        >
+          <div 
+            onClick={e => e.stopPropagation()} 
+            style={{ background: 'var(--bg-card)', width: '100%', maxWidth: '520px', maxHeight: '85vh', overflowY: 'auto', borderRadius: '12px', padding: '1.8rem', border: '1px solid var(--border-strong)', borderTop: '4px solid #3b82f6', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.3)' }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.2rem' }}>
+              <div>
+                <h2 style={{ margin: 0, color: 'var(--text-heading)', fontSize: '1.2rem', fontWeight: 800 }}>
+                  {selectedManagerForHistory.name}
+                </h2>
+                <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                  {selectedManagerForHistory.rol || 'Manager'} &bull; {selectedManagerForHistory.equipo} &bull; Sede: {selectedManagerForHistory.sede}
+                </div>
+              </div>
+              <button 
+                onClick={() => setSelectedManagerForHistory(null)}
+                style={{ background: 'rgba(255,255,255,0.05)', border: 'none', borderRadius: '6px', padding: '0.4rem', cursor: 'pointer', color: 'var(--text-muted)' }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* BADGES DE FORMATO Y ESTADO */}
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1.2rem' }}>
+              <span style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', padding: '0.25rem 0.65rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                <Video size={13} /> {STANDARD_CALL_CONTACT_TYPE}
+              </span>
+              <span style={{ background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', padding: '0.25rem 0.65rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700 }}>
+                ⏱️ {STANDARD_CALL_DURATION}
+              </span>
+              <span style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#f59e0b', padding: '0.25rem 0.65rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700 }}>
+                🎯 Sentados: {selectedManagerForHistory.sentados}/{selectedManagerForHistory.meta}
+              </span>
+            </div>
+
+            {/* LISTA DE HISTORIAL */}
+            <h3 style={{ fontSize: '0.9rem', color: 'var(--text-heading)', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.4rem', marginBottom: '0.8rem', fontWeight: 700 }}>
+              📞 Historial de Llamadas Registradas
+            </h3>
+
+            {(!selectedManagerForHistory.llamadasHistorial || selectedManagerForHistory.llamadasHistorial.length === 0) ? (
+              <div style={{ background: 'rgba(255,255,255,0.02)', padding: '1rem', borderRadius: '8px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.82rem' }}>
+                No hay historial de llamadas previas registradas para este manager en la base de datos de Causa OS.
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                {selectedManagerForHistory.llamadasHistorial
+                  .slice()
+                  .sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''))
+                  .map((call, idx) => (
+                    <div 
+                      key={call.id || idx} 
+                      style={{ 
+                        background: 'var(--bg-dark-alt)', 
+                        padding: '0.8rem', 
+                        borderRadius: '8px', 
+                        border: '1px solid var(--border-subtle)' 
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
+                        <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-heading)' }}>
+                          {call.fecha || 'Sin fecha'} &bull; {call.tipo === 'grupal' ? 'Llamada Grupal' : 'Llamada Individual'}
+                        </span>
+                        <span style={{ 
+                          fontSize: '0.72rem', 
+                          fontWeight: 700, 
+                          padding: '0.2rem 0.5rem', 
+                          borderRadius: '4px',
+                          background: call.asistio ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                          color: call.asistio ? '#10b981' : '#ef4444'
+                        }}>
+                          {call.asistio ? '✅ Asistió (Efectiva)' : '❌ Ausente'}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                        Formato: {call.tipoContacto || STANDARD_CALL_CONTACT_TYPE} ({call.duracionMinutos || STANDARD_CALL_DURATION})
+                      </div>
+                      {call.registradoPorNombre && (
+                        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                          Registrado por: {call.registradoPorNombre} {call.registradoPorEmail ? `(${call.registradoPorEmail})` : ''}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+              </div>
+            )}
+
+            <div style={{ marginTop: '1.4rem', display: 'flex', justifyContent: 'flex-end' }}>
+              <button 
+                onClick={() => setSelectedManagerForHistory(null)}
+                style={{ background: 'var(--crear-navy, #1e3a8a)', color: '#fff', border: 'none', padding: '0.6rem 1.2rem', borderRadius: '6px', fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer' }}
+              >
+                Cerrar Historial
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
@@ -1055871,6 +1056466,12 @@ import {
   BarChart3, GitMerge, ArrowRight, FileSpreadsheet, ExternalLink,
   List, LayoutGrid
 } from 'lucide-react';
+import { 
+  MAX_TRAINER_LOAD, 
+  STANDARD_CALL_CONTACT_TYPE, 
+  STANDARD_CALL_DURATION,
+  FEE_PER_EFFECTIVE_CALL_USD 
+} from '../utils/callScheduleAutomation';
 import CMJDashboard from '../components/CMJDashboard';
 import KPIsEntrenadoresLlamadas from '../components/KPIsEntrenadoresLlamadas';
 import TrainerCoherencePanel from '../components/TrainerCoherencePanel';
@@ -1056483,6 +1057084,8 @@ export default function CentroManagers() {
   const [groupCallEsQuiebre, setGroupCallEsQuiebre] = useState(false);
   const [groupCallCategoriaQuiebre, setGroupCallCategoriaQuiebre] = useState('operativo');
   const [groupCallEstadoQuiebre, setGroupCallEstadoQuiebre] = useState('riesgo_alto');
+  const [groupCallMeetUrl, setGroupCallMeetUrl] = useState('');
+  const [groupCallNotaVozEnviada, setGroupCallNotaVozEnviada] = useState(true);
 
   // (02/09/2026) Modal de Notas de Seguimiento por persona — se abre desde el botón
   // 📝 de cada manager en el Directorio. Muestra el historial (notas individuales de
@@ -1057037,6 +1057640,18 @@ export default function CentroManagers() {
       : field === 'coordinador' ? normalizeCoordinator(value)
       : field === 'sede' ? normalizeSede(value)
       : value;
+
+    if (field === 'entrenador' && finalValue) {
+      const activeCount = managers.filter(m => 
+        String(m.id) !== String(id) &&
+        (m.estado || 'Activo') === 'Activo' &&
+        parseTrainersList(m.entrenador).map(t => normalizeTrainer(t)).includes(finalValue)
+      ).length;
+      if (activeCount >= MAX_TRAINER_LOAD) {
+        showToast(`Límite de Carga Excedido: El entrenador ${finalValue} ya cuenta con ${activeCount}/${MAX_TRAINER_LOAD} mánagers activos asignados (máximo permitido).`, "error");
+        return;
+      }
+    }
       
     try {
       const targetManager = managers.find(m => m.id === id);
@@ -1057168,6 +1057783,8 @@ export default function CentroManagers() {
     const initialAttendance = {};
     team.managers.forEach(m => initialAttendance[m.id] = true); // Todos asisten por defecto
     setGroupCallAttendance(initialAttendance);
+    setGroupCallMeetUrl('');
+    setGroupCallNotaVozEnviada(true);
     setGroupCallOperationId(doc(collection(db, 'llamadas_grupales_historial')).id);
     setGroupModal(team);
   };
@@ -1057189,6 +1057806,10 @@ export default function CentroManagers() {
         numEquipo: groupModal.numEquipo || '',
         sede: normalizeSede(groupModal.sede),
         entrenador: groupModal.entrenadorUnico || '',
+        tipoContacto: STANDARD_CALL_CONTACT_TYPE,
+        duracionMinutos: STANDARD_CALL_DURATION,
+        meetUrl: groupCallMeetUrl,
+        notaVozEnviada: groupCallNotaVozEnviada,
         registradoPorEmail: currentUser?.email || '',
         registradoPorNombre: currentUser?.name || '',
       });
@@ -1057450,27 +1058071,28 @@ export default function CentroManagers() {
                    Object.values(liquidacionesPagos).find(p => p.equipoKey?.toUpperCase() === equipoKey?.toUpperCase()) || null;
 
       const infoEquipoFull = infoEquipo || { estados: new Set() };
-      const sinActivos = !infoEquipoFull.estados.has('Activo');
-      const tieneDesertorOGraduado = infoEquipoFull.estados.has('Desertor') || infoEquipoFull.estados.has('Graduado');
-      const esEquipoInactivo = sinActivos && tieneDesertorOGraduado;
+      
+      // Contar llamadas efectivas (asistencia confirmada o registrada exitosamente)
+      const llamadasEfectivas = registros.filter(r => (r.asistieron ?? 1) > 0 || r.llamadaEfectiva === true || r.asistio === true).length;
 
-      const cumpleLlamadas = count >= 7;
-      const tieneCierreManual = !!cierreManual || (pago && (pago.motivo === 'cierre_manual' || pago.estado === 'pendiente_pago'));
-      const cumpleCierre = tieneCierreManual || (esEquipoInactivo && count >= 5);
+      // Según directiva de Dirección General: la liquidación ya no está condicionada a graduación ni deserción.
+      // El pago se libera de forma fija por cada llamada efectiva registrada honestamente ($25 USD c/u).
+      const esElegible = llamadasEfectivas > 0 || !!cierreManual || !!pago;
 
-      if (!cumpleLlamadas && !cumpleCierre) {
-        if ((count === 5 || count === 6) && ultimoLlamada) {
+      if (!esElegible) {
+        if (ultimoLlamada || count > 0) {
           enCamino.push({
             equipoKey,
-            equipo: ultimoLlamada.equipo,
-            numEquipo: ultimoLlamada.numEquipo,
-            sede: ultimoLlamada.sede,
-            entrenador: ultimoLlamada.entrenador || 'Sin Asignar',
+            equipo: ultimoLlamada?.equipo || equipoKey,
+            numEquipo: ultimoLlamada?.numEquipo || '',
+            sede: ultimoLlamada?.sede || '',
+            entrenador: ultimoLlamada?.entrenador || 'Sin Asignar',
             totalLlamadas: count,
-            faltan: 7 - count
+            llamadasEfectivas: 0,
+            faltan: 1
           });
         }
-        return; // Todavía no llega a la meta de 7 llamadas ni fue cerrado manualmente
+        return;
       }
 
       // Datos del equipo: preferir el historial de llamadas (más completo); si el equipo
@@ -1057479,7 +1058101,9 @@ export default function CentroManagers() {
       const numEquipo = ultimoLlamada?.numEquipo || infoEquipo?.numEquipo || pago?.numEquipo || '';
       const sede = ultimoLlamada?.sede || infoEquipo?.sede || pago?.sede || '';
       const entrenador = ultimoLlamada?.entrenador || Array.from(infoEquipo?.entrenadores || []).join(', ') || pago?.entrenador || 'Sin Asignar';
-      const septimo = sorted[6]; // La llamada #7 (índice 6) es la que dispara el pago, si aplica
+
+      // Monto liquidable: tarifa fija por llamada efectiva registrada
+      const montoCalculado = pago?.montoUSD ? Number(pago.montoUSD) : Math.max(FEE_PER_EFFECTIVE_CALL_USD, llamadasEfectivas * FEE_PER_EFFECTIVE_CALL_USD);
 
       const item = {
         equipoKey,
@@ -1057489,9 +1058113,11 @@ export default function CentroManagers() {
         sede,
         entrenador,
         totalLlamadas: count,
-        fechaAlcanzo7: septimo?.fecha || '',
-        montoUSD: Number(pago?.montoUSD || 400),
-        motivo: cumpleLlamadas ? 'llamadas' : (tieneCierreManual ? 'cierre_manual' : 'desertor_automatico'),
+        llamadasEfectivas,
+        fechaAlcanzo7: sorted[sorted.length - 1]?.fecha || '',
+        montoUSD: montoCalculado,
+        tarifaPorLlamada: FEE_PER_EFFECTIVE_CALL_USD,
+        motivo: 'llamadas_efectivas',
         cierreManual
       };
 
@@ -1057510,8 +1058136,8 @@ export default function CentroManagers() {
     pagados.sort((a, b) => (b.fechaPago || '').localeCompare(a.fechaPago || ''));
     enCamino.sort((a, b) => b.totalLlamadas - a.totalLlamadas);
 
-    const totalPendienteUSD = pendientes.length * 400;
-    const totalPagadoUSD = pagados.length * 400;
+    const totalPendienteUSD = pendientes.reduce((sum, p) => sum + (Number(p.montoUSD) || 0), 0);
+    const totalPagadoUSD = pagados.reduce((sum, p) => sum + (Number(p.montoUSD) || 0), 0);
 
     return { pendientes, pagados, enCamino, totalPendienteUSD, totalPagadoUSD };
   }, [llamadasHistorial, liquidacionesPagos, equiposParaLiquidacion, canViewLiquidacion]);
@@ -1057661,26 +1058287,39 @@ export default function CentroManagers() {
   const handleMarcarPagado = async (item) => {
     if (!canViewLiquidacion) return;
     try {
-      await setDoc(doc(db, 'liquidaciones_pagos', item.equipoKey), {
-        equipoKey: item.equipoKey,
-        equipo: item.equipo,
-        numEquipo: item.numEquipo || '',
-        sede: item.sede,
-        entrenador: item.entrenador,
-        montoUSD: Number(item.montoUSD || 100),
-        monto: Number(item.montoUSD || 100),
-        moneda: 'USD',
-        metodo_pago: 'transferencia',
-        cajero_user_id: currentUser?.uid || '',
-        llamadasAlPagar: item.totalLlamadas,
-        motivo: item.motivo || 'llamadas',
-        fechaAlcanzo7: item.fechaAlcanzo7,
-        estado: 'pagado',
-        pagadoPorEmail: currentUser?.email || '',
-        pagadoPorNombre: currentUser?.name || '',
-        fechaPago: new Date().toISOString().split('T')[0],
-        updatedAt: serverTimestamp()
-      }, { merge: true });
+      const pagoRef = doc(db, 'liquidaciones_pagos', item.equipoKey);
+      await runTransaction(db, async (tx) => {
+        const snap = await tx.get(pagoRef);
+        const prev = snap.exists() ? snap.data() : null;
+        if (prev?.estado === 'pagado') {
+          throw new Error('Esta liquidación ya fue procesada y pagada previamente.');
+        }
+
+        const monto = Number(item.montoUSD || (item.llamadasEfectivas || item.totalLlamadas || 1) * FEE_PER_EFFECTIVE_CALL_USD);
+        tx.set(pagoRef, {
+          equipoKey: item.equipoKey,
+          equipo: item.equipo,
+          numEquipo: item.numEquipo || '',
+          sede: item.sede,
+          entrenador: item.entrenador,
+          montoUSD: monto,
+          monto: monto,
+          moneda: 'USD',
+          metodo_pago: 'transferencia',
+          cajero_user_id: currentUser?.uid || '',
+          llamadasAlPagar: item.totalLlamadas,
+          llamadasEfectivas: item.llamadasEfectivas || item.totalLlamadas,
+          tarifaPorLlamada: FEE_PER_EFFECTIVE_CALL_USD,
+          motivo: item.motivo || 'llamadas_efectivas',
+          criterio: 'Liquidación fija por llamada efectiva registrada honestamente en Causa OS',
+          fechaAlcanzo7: item.fechaAlcanzo7 || '',
+          estado: 'pagado',
+          pagadoPorEmail: currentUser?.email || '',
+          pagadoPorNombre: currentUser?.name || '',
+          fechaPago: new Date().toISOString().split('T')[0],
+          updatedAt: serverTimestamp()
+        }, { merge: true });
+      });
 
       recordAuditEvent({
         action: 'LIQUIDACION_ENTRENADOR_PAGADA',
@@ -1057688,13 +1058327,13 @@ export default function CentroManagers() {
         name: currentUser?.name || '',
         role: currentUser?.appRole || '',
         sede: item.sede,
-        details: `Liquidación marcada como pagada: ${item.equipo} (${item.sede}) - Entrenador: ${item.entrenador} - $${item.montoUSD} USD - Motivo: ${item.motivo === 'cierre_manual' ? 'equipo cerrado por coordinador' : '7 llamadas alcanzadas'}`
+        details: `Liquidación atómica registrada: ${item.equipo} (${item.sede}) - Entrenador: ${item.entrenador} - $${item.montoUSD} USD - Tarifa: $${FEE_PER_EFFECTIVE_CALL_USD}/llamada efectiva`
       });
 
       showToast(`Marcado como pagado: ${item.equipo}`, 'success');
     } catch (e) {
       console.error(e);
-      showToast('Error al marcar como pagado', 'error');
+      showToast(e.message || 'Error al marcar como pagado', 'error');
     }
   };
 
@@ -1058197,6 +1058836,22 @@ export default function CentroManagers() {
       return showToast('El equipo debe tener al menos un integrante', 'error');
     }
 
+    if (userCanAssign && finalTrainers) {
+      const trainersToCheck = parseTrainersList(finalTrainers).map(t => normalizeTrainer(t)).filter(Boolean);
+      const teamMemberIds = new Set(validMembers.map(m => String(m.id || m.docId || '')));
+      for (const tName of trainersToCheck) {
+        const outsideActive = managers.filter(m => 
+          !teamMemberIds.has(String(m.id || m.docId || '')) &&
+          (m.estado || 'Activo') === 'Activo' &&
+          parseTrainersList(m.entrenador).map(t => normalizeTrainer(t)).includes(tName)
+        ).length;
+        const insideActive = validMembers.filter(m => (m.estado || 'Activo') === 'Activo').length;
+        if (outsideActive + insideActive > MAX_TRAINER_LOAD) {
+          return showToast(`Límite de Carga Excedido: Asignar este equipo a ${tName} superaría el límite de ${MAX_TRAINER_LOAD} mánagers activos (tendría ${outsideActive + insideActive}).`, 'error');
+        }
+      }
+    }
+
     try {
       const batch = writeBatch(db);
       
@@ -1058481,6 +1059136,20 @@ export default function CentroManagers() {
     const finalTrainers = editIndividualModal.selectedTrainers && editIndividualModal.selectedTrainers.length > 0
       ? editIndividualModal.selectedTrainers.map(t => normalizeTrainer(t)).filter(Boolean).join(', ')
       : '';
+
+    if (userCanAssign && finalTrainers && (editIndividualModal.estado || 'Activo') === 'Activo') {
+      const trainersToCheck = parseTrainersList(finalTrainers).map(t => normalizeTrainer(t)).filter(Boolean);
+      for (const tName of trainersToCheck) {
+        const activeCount = managers.filter(m => 
+          String(m.id) !== String(editIndividualModal.id) &&
+          (m.estado || 'Activo') === 'Activo' &&
+          parseTrainersList(m.entrenador).map(t => normalizeTrainer(t)).includes(tName)
+        ).length;
+        if (activeCount >= MAX_TRAINER_LOAD) {
+          return showToast(`Límite de Carga Excedido: El entrenador ${tName} ya cuenta con ${activeCount}/${MAX_TRAINER_LOAD} mánagers activos asignados (máximo permitido).`, 'error');
+        }
+      }
+    }
 
     setIsSavingIndividual(true);
     try {
@@ -1060111,8 +1060780,16 @@ export default function CentroManagers() {
                           🎓 {t.entrenador}
                         </h3>
                       </div>
-                      <span style={{ background: '#f3e8ff', color: '#7c3aed', padding: '0.25rem 0.6rem', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 800 }}>
-                        {t.total} Managers
+                      <span style={{ 
+                        background: t.total >= MAX_TRAINER_LOAD ? '#fef2f2' : '#f3e8ff', 
+                        color: t.total >= MAX_TRAINER_LOAD ? '#dc2626' : '#7c3aed', 
+                        border: `1px solid ${t.total >= MAX_TRAINER_LOAD ? '#fca5a5' : '#ddd6fe'}`,
+                        padding: '0.25rem 0.6rem', 
+                        borderRadius: '12px', 
+                        fontSize: '0.75rem', 
+                        fontWeight: 800 
+                      }}>
+                        {t.total}/{MAX_TRAINER_LOAD} Managers {t.total >= MAX_TRAINER_LOAD ? '⚠️ (Carga Máxima)' : `(${Math.max(0, MAX_TRAINER_LOAD - t.total)} libres)`}
                       </span>
                     </div>
 
@@ -1061751,6 +1062428,28 @@ export default function CentroManagers() {
               <HelpInput helpKey="fechaGrupal" type="date" value={groupCallDate} disabled={isSavingGroupCall} onChange={e => setGroupCallDate(e.target.value)} style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.9rem' }} />
             </div>
 
+            {/* FORMATO OBLIGATORIO DE CONTACTO (DIRECTIVA 1) */}
+            <div style={{ marginBottom: '1.2rem', padding: '0.8rem', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: '0.82rem', fontWeight: 800, color: '#16a34a', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <PhoneCall size={15} /> {STANDARD_CALL_CONTACT_TYPE}
+                </span>
+                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#15803d', background: '#dcfce7', padding: '2px 8px', borderRadius: '12px' }}>
+                  ⏱️ {STANDARD_CALL_DURATION}
+                </span>
+              </div>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', fontWeight: 700, color: '#166534', cursor: 'pointer', marginTop: '2px' }}>
+                <input 
+                  type="checkbox" 
+                  checked={groupCallNotaVozEnviada} 
+                  disabled={isSavingGroupCall}
+                  onChange={e => setGroupCallNotaVozEnviada(e.target.checked)}
+                  style={{ width: '16px', height: '16px', accentColor: '#16a34a', cursor: 'pointer' }}
+                />
+                🎙️ Reporte semanal enviado en formato de Nota de Voz al Coordinador de Maestría
+              </label>
+            </div>
+
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
               <span style={{ fontSize: '0.8rem', fontWeight: 700, color: textDark }}>Asistencia Individual:</span>
               <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -1062044,15 +1062743,25 @@ export default function CentroManagers() {
 
               <div style={{ maxHeight: '180px', overflowY: 'auto' }}>
                 {llamadasEquipo.map((l, i) => (
-                  <div key={l.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.4rem 0', borderBottom: `1px solid ${borderLight}` }}>
-                    <span style={{ fontSize: '0.8rem', color: textDark, fontWeight: 600 }}>Llamada {llamadasEquipo.length - i}</span>
+                  <div key={l.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.5rem 0', borderBottom: `1px solid ${borderLight}` }}>
+                    <div>
+                      <span style={{ fontSize: '0.8rem', color: textDark, fontWeight: 700 }}>Llamada {llamadasEquipo.length - i}</span>
+                      <div style={{ fontSize: '0.72rem', color: '#16a34a', display: 'flex', alignItems: 'center', gap: '3px', marginTop: '2px' }}>
+                        📹 {l.tipoContacto || STANDARD_CALL_CONTACT_TYPE} ({l.duracionMinutos || STANDARD_CALL_DURATION})
+                      </div>
+                      {l.notaVozEnviada && (
+                        <div style={{ fontSize: '0.7rem', color: '#0284c7', display: 'flex', alignItems: 'center', gap: '3px', marginTop: '1px' }}>
+                          🎙️ Nota de voz confirmada al Coordinador
+                        </div>
+                      )}
+                    </div>
                     <div style={{ textAlign: 'right' }}>
                       <div style={{ fontSize: '0.75rem', color: textMuted }}>{l.fecha}</div>
-                      <div style={{ fontSize: '0.7rem', color: l.asistieron >= l.totalIntegrantes * 0.7 ? '#10b981' : '#f59e0b' }}>
-                        Equipo: {l.asistieron}/{l.totalIntegrantes} asist.
+                      <div style={{ fontSize: '0.7rem', color: l.asistieron >= l.totalIntegrantes * 0.7 ? '#10b981' : '#f59e0b', fontWeight: 700 }}>
+                        {l.asistieron}/{l.totalIntegrantes} asistieron
                       </div>
                       {notasManager.find(note => note.relatedCallId === l.id)?.nota && (
-                        <div style={{ fontSize: '0.7rem', color: textMuted, marginTop: '0.2rem' }}>
+                        <div style={{ fontSize: '0.7rem', color: textMuted, marginTop: '0.2rem', maxWidth: '180px', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
                           Nota: {notasManager.find(note => note.relatedCallId === l.id).nota}
                         </div>
                       )}
@@ -1062068,8 +1062777,25 @@ export default function CentroManagers() {
                 {(Array.isArray(m.llamadasHistorial) ? m.llamadasHistorial : [])
                   .slice().sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''))
                   .map(call => (
-                    <div key={call.id} style={{ padding: '0.35rem 0', borderBottom: `1px solid ${borderLight}`, fontSize: '0.75rem', color: textMuted }}>
-                      {call.fecha || 'Sin fecha'} · {call.tipo === 'grupal' ? 'Grupal' : 'Individual'} · {call.asistio ? 'Asistió' : 'No asistió'}
+                    <div key={call.id} style={{ padding: '0.45rem 0', borderBottom: `1px solid ${borderLight}`, fontSize: '0.75rem', color: textMuted, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div>
+                        <div style={{ fontWeight: 600, color: textDark }}>
+                          {call.fecha || 'Sin fecha'} &bull; {call.tipo === 'grupal' ? 'Grupal' : 'Individual'}
+                        </div>
+                        <div style={{ fontSize: '0.7rem', color: '#16a34a' }}>
+                          📹 {call.tipoContacto || STANDARD_CALL_CONTACT_TYPE} ({call.duracionMinutos || STANDARD_CALL_DURATION})
+                        </div>
+                      </div>
+                      <span style={{ 
+                        fontSize: '0.7rem', 
+                        fontWeight: 700, 
+                        padding: '0.15rem 0.4rem', 
+                        borderRadius: '4px',
+                        background: call.asistio ? '#dcfce7' : '#fee2e2',
+                        color: call.asistio ? '#16a34a' : '#dc2626'
+                      }}>
+                        {call.asistio ? '✅ Efectiva' : '❌ Ausente'}
+                      </span>
                     </div>
                   ))}
                 {(!Array.isArray(m.llamadasHistorial) || m.llamadasHistorial.length === 0) && (
@@ -1065203,16 +1065929,25 @@ const requiredText = (value, field) => {
 
 export async function recordIndividualCall(db, {
   manager, callId, fecha, asistio, registradoPorEmail = '', registradoPorNombre = '',
+  tipoContacto = 'Videollamada de Google Meet', duracionMinutos = '20-30 min',
+  meetUrl = '', notaVozEnviada = false, llamadaEfectiva = null
 }) {
   const id = requiredText(callId, 'callId');
   const date = requiredText(fecha, 'fecha');
   if (typeof asistio !== 'boolean') throw new Error('asistio must be a boolean.');
 
+  const effective = llamadaEfectiva !== null ? Boolean(llamadaEfectiva) : asistio;
+
   const event = {
     id,
     tipo: 'individual',
+    tipoContacto: String(tipoContacto || 'Videollamada de Google Meet').trim(),
+    duracionMinutos: String(duracionMinutos || '20-30 min').trim(),
     fecha: date,
     asistio,
+    llamadaEfectiva: effective,
+    meetUrl: String(meetUrl || '').trim(),
+    notaVozEnviada: Boolean(notaVozEnviada),
     registradoPorEmail,
     registradoPorNombre,
     createdAtIso: new Date().toISOString(),
@@ -1065262,6 +1065997,8 @@ export async function updateIndividualCallDate(db, { manager, fecha }) {
 export async function recordGroupCall(db, {
   callId, managers, attendance, fecha, equipo, numEquipo = '', sede,
   entrenador = '', registradoPorEmail = '', registradoPorNombre = '',
+  tipoContacto = 'Videollamada de Google Meet', duracionMinutos = '20-30 min',
+  meetUrl = '', notaVozEnviada = false,
 }) {
   const id = requiredText(callId, 'callId');
   const date = requiredText(fecha, 'fecha');
@@ -1065284,6 +1066021,10 @@ export async function recordGroupCall(db, {
   const team = requiredText(equipo, 'equipo');
   const normalizedSede = requiredText(sede, 'sede');
   const callRef = doc(db, 'llamadas_grupales_historial', id);
+  const contactType = String(tipoContacto || 'Videollamada de Google Meet').trim();
+  const duration = String(duracionMinutos || '20-30 min').trim();
+  const asistieronCount = members.filter(member => member.asistio).length;
+
   const call = {
     callId: id,
     equipoKey: `${normalizedSede}_${team}`,
@@ -1065291,9 +1066032,14 @@ export async function recordGroupCall(db, {
     numEquipo,
     sede: normalizedSede,
     entrenador,
+    tipoContacto: contactType,
+    duracionMinutos: duration,
+    meetUrl: String(meetUrl || '').trim(),
+    notaVozEnviada: Boolean(notaVozEnviada),
+    llamadaEfectiva: asistieronCount > 0,
     fecha: date,
     totalIntegrantes: members.length,
-    asistieron: members.filter(member => member.asistio).length,
+    asistieron: asistieronCount,
     registradoPorEmail,
     registradoPorNombre,
     createdAtIso: new Date().toISOString(),
@@ -1065310,6 +1066056,11 @@ export async function recordGroupCall(db, {
         llamadasHistorial: arrayUnion({
           id,
           tipo: 'grupal',
+          tipoContacto: contactType,
+          duracionMinutos: duration,
+          meetUrl: call.meetUrl,
+          notaVozEnviada: call.notaVozEnviada,
+          llamadaEfectiva: member.asistio,
           fecha: date,
           asistio: member.asistio,
           equipo: team,
@@ -1065858,15 +1066609,24 @@ export async function getManagersPipeline(sede) {
       
       results.push({
         id: docSnap.id,
+        docId: docSnap.id,
         name: data.nombre || data.name || 'Sin Nombre',
         equipo: data.equipo || 'Sin Equipo',
+        numEquipo: data.numEquipo || '',
         sede: data.sede || 'Sin Sede',
+        rol: data.rol || 'Manager',
+        telefono: data.telefono || '',
         status,
         sentados,
         meta,
-        nodusLastCall: data.ultimo_contacto || data.ultimoContacto || 'Sin registro',
+        nodusLastCall: data.ultimo_contacto || data.ultimoContacto || data.llamadaFecha || 'Sin registro',
         isCritical: status === 'RED',
-        entrenador: data.entrenador_llamadas || data.entrenador || ''
+        entrenador: data.entrenador_llamadas || data.entrenador || '',
+        llamadasHistorial: Array.isArray(data.llamadasHistorial) ? data.llamadasHistorial : [],
+        llamadaFecha: data.llamadaFecha || '',
+        llamadaAsistio: data.llamadaAsistio || 'Sin registro',
+        tipoContacto: 'Videollamada de Google Meet',
+        duracionMinutos: '20-30 min'
       });
     });
     return results;

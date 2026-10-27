@@ -9,16 +9,25 @@ const requiredText = (value, field) => {
 
 export async function recordIndividualCall(db, {
   manager, callId, fecha, asistio, registradoPorEmail = '', registradoPorNombre = '',
+  tipoContacto = 'Videollamada de Google Meet', duracionMinutos = '20-30 min',
+  meetUrl = '', notaVozEnviada = false, llamadaEfectiva = null
 }) {
   const id = requiredText(callId, 'callId');
   const date = requiredText(fecha, 'fecha');
   if (typeof asistio !== 'boolean') throw new Error('asistio must be a boolean.');
 
+  const effective = llamadaEfectiva !== null ? Boolean(llamadaEfectiva) : asistio;
+
   const event = {
     id,
     tipo: 'individual',
+    tipoContacto: String(tipoContacto || 'Videollamada de Google Meet').trim(),
+    duracionMinutos: String(duracionMinutos || '20-30 min').trim(),
     fecha: date,
     asistio,
+    llamadaEfectiva: effective,
+    meetUrl: String(meetUrl || '').trim(),
+    notaVozEnviada: Boolean(notaVozEnviada),
     registradoPorEmail,
     registradoPorNombre,
     createdAtIso: new Date().toISOString(),
@@ -68,6 +77,8 @@ export async function updateIndividualCallDate(db, { manager, fecha }) {
 export async function recordGroupCall(db, {
   callId, managers, attendance, fecha, equipo, numEquipo = '', sede,
   entrenador = '', registradoPorEmail = '', registradoPorNombre = '',
+  tipoContacto = 'Videollamada de Google Meet', duracionMinutos = '20-30 min',
+  meetUrl = '', notaVozEnviada = false,
 }) {
   const id = requiredText(callId, 'callId');
   const date = requiredText(fecha, 'fecha');
@@ -90,6 +101,10 @@ export async function recordGroupCall(db, {
   const team = requiredText(equipo, 'equipo');
   const normalizedSede = requiredText(sede, 'sede');
   const callRef = doc(db, 'llamadas_grupales_historial', id);
+  const contactType = String(tipoContacto || 'Videollamada de Google Meet').trim();
+  const duration = String(duracionMinutos || '20-30 min').trim();
+  const asistieronCount = members.filter(member => member.asistio).length;
+
   const call = {
     callId: id,
     equipoKey: `${normalizedSede}_${team}`,
@@ -97,9 +112,14 @@ export async function recordGroupCall(db, {
     numEquipo,
     sede: normalizedSede,
     entrenador,
+    tipoContacto: contactType,
+    duracionMinutos: duration,
+    meetUrl: String(meetUrl || '').trim(),
+    notaVozEnviada: Boolean(notaVozEnviada),
+    llamadaEfectiva: asistieronCount > 0,
     fecha: date,
     totalIntegrantes: members.length,
-    asistieron: members.filter(member => member.asistio).length,
+    asistieron: asistieronCount,
     registradoPorEmail,
     registradoPorNombre,
     createdAtIso: new Date().toISOString(),
@@ -116,6 +136,11 @@ export async function recordGroupCall(db, {
         llamadasHistorial: arrayUnion({
           id,
           tipo: 'grupal',
+          tipoContacto: contactType,
+          duracionMinutos: duration,
+          meetUrl: call.meetUrl,
+          notaVozEnviada: call.notaVozEnviada,
+          llamadaEfectiva: member.asistio,
           fecha: date,
           asistio: member.asistio,
           equipo: team,

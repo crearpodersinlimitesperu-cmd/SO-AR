@@ -24,15 +24,24 @@ export async function getManagersPipeline(sede) {
       
       results.push({
         id: docSnap.id,
+        docId: docSnap.id,
         name: data.nombre || data.name || 'Sin Nombre',
         equipo: data.equipo || 'Sin Equipo',
+        numEquipo: data.numEquipo || '',
         sede: data.sede || 'Sin Sede',
+        rol: data.rol || 'Manager',
+        telefono: data.telefono || '',
         status,
         sentados,
         meta,
-        nodusLastCall: data.ultimo_contacto || data.ultimoContacto || 'Sin registro',
+        nodusLastCall: data.ultimo_contacto || data.ultimoContacto || data.llamadaFecha || 'Sin registro',
         isCritical: status === 'RED',
-        entrenador: data.entrenador_llamadas || data.entrenador || ''
+        entrenador: data.entrenador_llamadas || data.entrenador || '',
+        llamadasHistorial: Array.isArray(data.llamadasHistorial) ? data.llamadasHistorial : [],
+        llamadaFecha: data.llamadaFecha || '',
+        llamadaAsistio: data.llamadaAsistio || 'Sin registro',
+        tipoContacto: 'Videollamada de Google Meet',
+        duracionMinutos: '20-30 min'
       });
     });
     return results;
