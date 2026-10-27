@@ -966050,13 +966050,28 @@ function buildCycleForEquipo(sedeEvents, equipoStr, sedeCode, anchorDate) {
     return eEq === equipoStr || eEq.includes(equipoStr) || equipoStr.includes(eEq);
   });
 
-  // Ordenar cronológicamente (ascendente) para tomar el C1, C2 y MJ correspondientes a este ciclo,
-  // y no eventos de varios meses después.
+  // Ordenar cronológicamente (ascendente)
   equipoEvents.sort((a, b) => new Date(a.fecha_inicio || a.start) - new Date(b.fecha_inicio || b.start));
 
-  const c1 = equipoEvents.find(e => (e.nombre || e.name) === 'CAPITULO UNO');
-  const c2 = equipoEvents.find(e => (e.nombre || e.name) === 'CAPITULO DOS');
-  let mj = equipoEvents.find(e => (e.nombre || e.name) === 'MAESTRIA DEL JUEGO');
+  const c1Events = equipoEvents.filter(e => (e.nombre || e.name) === 'CAPITULO UNO');
+  const c2Events = equipoEvents.filter(e => (e.nombre || e.name) === 'CAPITULO DOS');
+  const mjEvents = equipoEvents.filter(e => (e.nombre || e.name) === 'MAESTRIA DEL JUEGO');
+
+  // En equipos combinados o con múltiples eventos, seleccionamos el más cercano a anchorDate
+  // en lugar del más antiguo de hace meses.
+  const pickClosest = (eventsList) => {
+    if (!eventsList.length) return null;
+    if (eventsList.length === 1) return eventsList[0];
+    return eventsList.reduce((best, curr) => {
+      const dtCurr = new Date((curr.fecha_inicio || curr.start).replace('Z', ''));
+      const dtBest = new Date((best.fecha_inicio || best.start).replace('Z', ''));
+      return Math.abs(dtCurr - anchorDate) < Math.abs(dtBest - anchorDate) ? curr : best;
+    });
+  };
+
+  const c1 = pickClosest(c1Events);
+  const c2 = pickClosest(c2Events);
+  let mj = pickClosest(mjEvents);
 
   // Si no tiene MJ explícito con el número de equipo (en el Sheet el MJ suele tener equipo en blanco),
   // buscamos la Maestría del Juego de la sede que corresponde a este ciclo:
@@ -966315,15 +966330,53 @@ export function CyclesProvider({ children }) {
     // ya se activa de inmediato la preparación del siguiente ciclo/equipo).
     const lookbackDate = new Date(today.getTime() - 4 * 24 * 60 * 60 * 1000);
     
+    // Determinamos los tipos de eventos relevantes según el rol del usuario:
+    // - coord_c1 se enfoca en CAPITULO UNO
+    // - coord_c2 se enfoca en CAPITULO DOS
+    // - director_maestria / coord_maestria se enfoca en MAESTRIA DEL JUEGO
+    // - coord_c1_c2 se enfoca en CAPITULO UNO y DOS
+    // - Roles generales abarcan todos los hitos del ciclo
+    const normRole = (userRole || '').toLowerCase().trim();
+    let allowedEventNames = ['CAPITULO UNO', 'CAPITULO DOS', 'MAESTRIA DEL JUEGO'];
+    if (normRole === 'coord_c1') {
+      allowedEventNames = ['CAPITULO UNO'];
+    } else if (normRole === 'coord_c2') {
+      allowedEventNames = ['CAPITULO DOS'];
+    } else if (normRole === 'coord_c1_c2') {
+      allowedEventNames = ['CAPITULO UNO', 'CAPITULO DOS'];
+    } else if (normRole === 'director_maestria' || normRole === 'coord_maestria') {
+      allowedEventNames = ['MAESTRIA DEL JUEGO'];
+    }
+
     let nextEvent = null;
     for (const e of sedeEvents) {
         const d = new Date((e.fecha_inicio || e.start).replace('Z', ''));
-        if (d >= lookbackDate && ['CAPITULO UNO', 'CAPITULO DOS', 'MAESTRIA DEL JUEGO'].includes(e.nombre || e.name)) {
+        if (d >= lookbackDate && allowedEventNames.includes(e.nombre || e.name)) {
             nextEvent = e;
             break;
         }
     }
     
+    if (!nextEvent) {
+        for (let i = sedeEvents.length - 1; i >= 0; i--) {
+            const e = sedeEvents[i];
+            if (allowedEventNames.includes(e.nombre || e.name)) {
+                nextEvent = e;
+                break;
+            }
+        }
+    }
+
+    // Fallback tolerante si no se encontró evento en allowedEventNames
+    if (!nextEvent) {
+        for (const e of sedeEvents) {
+            const d = new Date((e.fecha_inicio || e.start).replace('Z', ''));
+            if (d >= lookbackDate && ['CAPITULO UNO', 'CAPITULO DOS', 'MAESTRIA DEL JUEGO'].includes(e.nombre || e.name)) {
+                nextEvent = e;
+                break;
+            }
+        }
+    }
     if (!nextEvent) {
         for (let i = sedeEvents.length - 1; i >= 0; i--) {
             const e = sedeEvents[i];
@@ -967083,9 +967136,12 @@ export function ChecklistProvider({ children }) {
         const includesProgressUpdate = updates.progress !== undefined || updates.progressPercentage !== undefined;
         const includesCompletionUpdate = nextCompleted !== null;
 
+        const effectiveCycleScope = cycleScope
+          ? { ...cycleScope, sede: canonicalSede(cycleScope.sede) }
+          : { sede: canonicalSede(currentUser?.sede?.trim() || 'Global'), cycle: cycleForDeadline };
         const resolvedScope = resolveTaskCycleScope(prevData, {
           catalogTask: Boolean(baseTask),
-          ...(cycleScope ?? { sede: currentUser?.sede?.trim() || 'Global', cycle: cycleForDeadline })
+          ...effectiveCycleScope
         });
         const cycleKey = resolvedScope ? `${resolvedScope.sede}__${resolvedScope.cycle.id}` : null;
         const previous = resolvedScope
@@ -968356,9 +968412,27 @@ export function ChecklistProvider({ children }) {
       const eventId = doc(collection(db, 'task_completion_events')).id;
       const result = await runTransaction(db, async transaction => {
         const snap = await transaction.get(taskRef);
-        if (!snap.exists()) return null;
-        const participants = await readTaskParticipants(transaction, db, taskId, snap.data(), [em]);
-        const data = participants.task;
+        let data = {};
+        let participants = { task: {}, records: new Map() };
+        if (snap.exists()) {
+          participants = await readTaskParticipants(transaction, db, taskId, snap.data(), [em]);
+          data = participants.task;
+        } else {
+          const baseTask = checklistData.find(b => b.id === taskId);
+          data = {
+            ...(baseTask || {}),
+            id: taskId,
+            ...(baseTask ? { catalogTask: true } : {}),
+            completed: false,
+            status: 'Pendiente',
+            priority: baseTask?.isCritical ? '🔴 ROJO' : '🟡 AMARILLO',
+            progressPercentage: 0,
+            deadline: baseTask ? calculateAutomaticDeadline(baseTask, currentCycle) : null,
+            created_at: new Date().toISOString(),
+            assigneeProgress: {}
+          };
+          participants = { task: data, records: new Map() };
+        }
         const currentProgress = { ...(data.assigneeProgress || {}) };
 
         const formalAssignees = [
@@ -968429,7 +968503,11 @@ export function ChecklistProvider({ children }) {
           nextPayload.lifecycleMutation.assigneeEventIds);
         const rootPayload = { ...nextPayload };
         delete rootPayload.assigneeProgress;
-        transaction.update(taskRef, rootPayload);
+        if (snap.exists()) {
+          transaction.update(taskRef, rootPayload);
+        } else {
+          transaction.set(taskRef, { ...data, ...rootPayload });
+        }
         const transitionEvents = [
           ...(individualTransition ? [{
             id: eventId, action: isCompleted ? 'completed' : 'reopened', scope: { assigneeEmail: targetKey }
@@ -974684,13 +974762,25 @@ export function getEffectiveCompletion(task, { sede, cycleId, cycleScoped = fals
           const entry = task.completions[k];
           const entryCycleId = entry?.cycleId ? String(entry.cycleId).trim().toLowerCase() : '';
           const keyMatchesSede = normSede ? k.toLowerCase().startsWith(normSede) : true;
-          return keyMatchesSede && entryCycleId === normCycleId;
+          return keyMatchesSede && (entryCycleId === normCycleId || k.toLowerCase().endsWith(`__${normCycleId}`));
         });
         if (foundKey) cycleCompletion = task.completions[foundKey];
       }
       if (!cycleCompletion && !normCycleId && normSede) {
-        const foundKey = Object.keys(task.completions).find(k => k.toLowerCase() === normSede);
-        if (foundKey) cycleCompletion = task.completions[foundKey];
+        const candidateKeys = Object.keys(task.completions).filter(k => {
+          const lower = k.toLowerCase();
+          return lower === normSede || lower.startsWith(`${normSede}__`);
+        });
+        if (candidateKeys.length > 0) {
+          candidateKeys.sort((a, b) => {
+            const itemA = task.completions[a] || {};
+            const itemB = task.completions[b] || {};
+            const timeA = new Date(itemA.updatedAt || itemA.completedAt || 0).getTime();
+            const timeB = new Date(itemB.updatedAt || itemB.completedAt || 0).getTime();
+            return timeB - timeA;
+          });
+          cycleCompletion = task.completions[candidateKeys[0]];
+        }
       }
     }
     const completed = cycleCompletion?.completed === true;
@@ -975393,7 +975483,7 @@ export function formatFlyerC1Dates(startValue, endValue) {
 // Sistema de Cálculo Automático de Fechas y Horas Límite SO-AR
 // Conecta la información de los manuales operativos con las fechas del ciclo activo
 
-import { cyclesData } from '../data/cyclesData';
+import { cyclesData } from '../data/cyclesData.js';
 
 const addDays = (dateStr, days) => {
   const d = new Date(dateStr);
@@ -997028,6 +997118,7 @@ import { deadlineTimeReference, timeZoneForSede, zonedDateInputParts, zonedDateT
 import { taskLocationLabel, taskPath } from '../utils/taskLocation';
 import { getTaskProgress, isTaskClosedForDelivery } from '../utils/taskLifecycle';
 import { checklistData } from '../data/checklistData';
+import { canonicalSede } from '../utils/sede';
 
 export const normalizeTaskEmail = (e) => {
   if (!e) return '';
@@ -997808,7 +997899,7 @@ export default function TaskDetailModal({
         !task.assignedToEmail &&
         !(Array.isArray(task.assignedToEmails) && task.assignedToEmails.length > 0)
         ? {
-            sede: currentUser?.sede?.trim() || 'Global',
+            sede: canonicalSede(currentUser?.sede?.trim() || 'Global'),
             cycle: task.quitoCycleId
               ? { id: task.quitoCycleId, name: task.cycleName || '' }
               : currentCycle

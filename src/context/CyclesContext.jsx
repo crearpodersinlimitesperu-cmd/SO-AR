@@ -42,13 +42,28 @@ function buildCycleForEquipo(sedeEvents, equipoStr, sedeCode, anchorDate) {
     return eEq === equipoStr || eEq.includes(equipoStr) || equipoStr.includes(eEq);
   });
 
-  // Ordenar cronológicamente (ascendente) para tomar el C1, C2 y MJ correspondientes a este ciclo,
-  // y no eventos de varios meses después.
+  // Ordenar cronológicamente (ascendente)
   equipoEvents.sort((a, b) => new Date(a.fecha_inicio || a.start) - new Date(b.fecha_inicio || b.start));
 
-  const c1 = equipoEvents.find(e => (e.nombre || e.name) === 'CAPITULO UNO');
-  const c2 = equipoEvents.find(e => (e.nombre || e.name) === 'CAPITULO DOS');
-  let mj = equipoEvents.find(e => (e.nombre || e.name) === 'MAESTRIA DEL JUEGO');
+  const c1Events = equipoEvents.filter(e => (e.nombre || e.name) === 'CAPITULO UNO');
+  const c2Events = equipoEvents.filter(e => (e.nombre || e.name) === 'CAPITULO DOS');
+  const mjEvents = equipoEvents.filter(e => (e.nombre || e.name) === 'MAESTRIA DEL JUEGO');
+
+  // En equipos combinados o con múltiples eventos, seleccionamos el más cercano a anchorDate
+  // en lugar del más antiguo de hace meses.
+  const pickClosest = (eventsList) => {
+    if (!eventsList.length) return null;
+    if (eventsList.length === 1) return eventsList[0];
+    return eventsList.reduce((best, curr) => {
+      const dtCurr = new Date((curr.fecha_inicio || curr.start).replace('Z', ''));
+      const dtBest = new Date((best.fecha_inicio || best.start).replace('Z', ''));
+      return Math.abs(dtCurr - anchorDate) < Math.abs(dtBest - anchorDate) ? curr : best;
+    });
+  };
+
+  const c1 = pickClosest(c1Events);
+  const c2 = pickClosest(c2Events);
+  let mj = pickClosest(mjEvents);
 
   // Si no tiene MJ explícito con el número de equipo (en el Sheet el MJ suele tener equipo en blanco),
   // buscamos la Maestría del Juego de la sede que corresponde a este ciclo:
@@ -307,15 +322,53 @@ export function CyclesProvider({ children }) {
     // ya se activa de inmediato la preparación del siguiente ciclo/equipo).
     const lookbackDate = new Date(today.getTime() - 4 * 24 * 60 * 60 * 1000);
     
+    // Determinamos los tipos de eventos relevantes según el rol del usuario:
+    // - coord_c1 se enfoca en CAPITULO UNO
+    // - coord_c2 se enfoca en CAPITULO DOS
+    // - director_maestria / coord_maestria se enfoca en MAESTRIA DEL JUEGO
+    // - coord_c1_c2 se enfoca en CAPITULO UNO y DOS
+    // - Roles generales abarcan todos los hitos del ciclo
+    const normRole = (userRole || '').toLowerCase().trim();
+    let allowedEventNames = ['CAPITULO UNO', 'CAPITULO DOS', 'MAESTRIA DEL JUEGO'];
+    if (normRole === 'coord_c1') {
+      allowedEventNames = ['CAPITULO UNO'];
+    } else if (normRole === 'coord_c2') {
+      allowedEventNames = ['CAPITULO DOS'];
+    } else if (normRole === 'coord_c1_c2') {
+      allowedEventNames = ['CAPITULO UNO', 'CAPITULO DOS'];
+    } else if (normRole === 'director_maestria' || normRole === 'coord_maestria') {
+      allowedEventNames = ['MAESTRIA DEL JUEGO'];
+    }
+
     let nextEvent = null;
     for (const e of sedeEvents) {
         const d = new Date((e.fecha_inicio || e.start).replace('Z', ''));
-        if (d >= lookbackDate && ['CAPITULO UNO', 'CAPITULO DOS', 'MAESTRIA DEL JUEGO'].includes(e.nombre || e.name)) {
+        if (d >= lookbackDate && allowedEventNames.includes(e.nombre || e.name)) {
             nextEvent = e;
             break;
         }
     }
     
+    if (!nextEvent) {
+        for (let i = sedeEvents.length - 1; i >= 0; i--) {
+            const e = sedeEvents[i];
+            if (allowedEventNames.includes(e.nombre || e.name)) {
+                nextEvent = e;
+                break;
+            }
+        }
+    }
+
+    // Fallback tolerante si no se encontró evento en allowedEventNames
+    if (!nextEvent) {
+        for (const e of sedeEvents) {
+            const d = new Date((e.fecha_inicio || e.start).replace('Z', ''));
+            if (d >= lookbackDate && ['CAPITULO UNO', 'CAPITULO DOS', 'MAESTRIA DEL JUEGO'].includes(e.nombre || e.name)) {
+                nextEvent = e;
+                break;
+            }
+        }
+    }
     if (!nextEvent) {
         for (let i = sedeEvents.length - 1; i >= 0; i--) {
             const e = sedeEvents[i];

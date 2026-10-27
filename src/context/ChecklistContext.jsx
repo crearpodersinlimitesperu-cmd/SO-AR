@@ -245,9 +245,12 @@ export function ChecklistProvider({ children }) {
         const includesProgressUpdate = updates.progress !== undefined || updates.progressPercentage !== undefined;
         const includesCompletionUpdate = nextCompleted !== null;
 
+        const effectiveCycleScope = cycleScope
+          ? { ...cycleScope, sede: canonicalSede(cycleScope.sede) }
+          : { sede: canonicalSede(currentUser?.sede?.trim() || 'Global'), cycle: cycleForDeadline };
         const resolvedScope = resolveTaskCycleScope(prevData, {
           catalogTask: Boolean(baseTask),
-          ...(cycleScope ?? { sede: currentUser?.sede?.trim() || 'Global', cycle: cycleForDeadline })
+          ...effectiveCycleScope
         });
         const cycleKey = resolvedScope ? `${resolvedScope.sede}__${resolvedScope.cycle.id}` : null;
         const previous = resolvedScope
@@ -1518,9 +1521,27 @@ export function ChecklistProvider({ children }) {
       const eventId = doc(collection(db, 'task_completion_events')).id;
       const result = await runTransaction(db, async transaction => {
         const snap = await transaction.get(taskRef);
-        if (!snap.exists()) return null;
-        const participants = await readTaskParticipants(transaction, db, taskId, snap.data(), [em]);
-        const data = participants.task;
+        let data = {};
+        let participants = { task: {}, records: new Map() };
+        if (snap.exists()) {
+          participants = await readTaskParticipants(transaction, db, taskId, snap.data(), [em]);
+          data = participants.task;
+        } else {
+          const baseTask = checklistData.find(b => b.id === taskId);
+          data = {
+            ...(baseTask || {}),
+            id: taskId,
+            ...(baseTask ? { catalogTask: true } : {}),
+            completed: false,
+            status: 'Pendiente',
+            priority: baseTask?.isCritical ? '🔴 ROJO' : '🟡 AMARILLO',
+            progressPercentage: 0,
+            deadline: baseTask ? calculateAutomaticDeadline(baseTask, currentCycle) : null,
+            created_at: new Date().toISOString(),
+            assigneeProgress: {}
+          };
+          participants = { task: data, records: new Map() };
+        }
         const currentProgress = { ...(data.assigneeProgress || {}) };
 
         const formalAssignees = [
@@ -1591,7 +1612,11 @@ export function ChecklistProvider({ children }) {
           nextPayload.lifecycleMutation.assigneeEventIds);
         const rootPayload = { ...nextPayload };
         delete rootPayload.assigneeProgress;
-        transaction.update(taskRef, rootPayload);
+        if (snap.exists()) {
+          transaction.update(taskRef, rootPayload);
+        } else {
+          transaction.set(taskRef, { ...data, ...rootPayload });
+        }
         const transitionEvents = [
           ...(individualTransition ? [{
             id: eventId, action: isCompleted ? 'completed' : 'reopened', scope: { assigneeEmail: targetKey }

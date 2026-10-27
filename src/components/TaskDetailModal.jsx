@@ -22,6 +22,7 @@ import { deadlineTimeReference, timeZoneForSede, zonedDateInputParts, zonedDateT
 import { taskLocationLabel, taskPath } from '../utils/taskLocation';
 import { getTaskProgress, isTaskClosedForDelivery } from '../utils/taskLifecycle';
 import { checklistData } from '../data/checklistData';
+import { canonicalSede } from '../utils/sede';
 
 export const normalizeTaskEmail = (e) => {
   if (!e) return '';
@@ -802,7 +803,7 @@ export default function TaskDetailModal({
         !task.assignedToEmail &&
         !(Array.isArray(task.assignedToEmails) && task.assignedToEmails.length > 0)
         ? {
-            sede: currentUser?.sede?.trim() || 'Global',
+            sede: canonicalSede(currentUser?.sede?.trim() || 'Global'),
             cycle: task.quitoCycleId
               ? { id: task.quitoCycleId, name: task.cycleName || '' }
               : currentCycle

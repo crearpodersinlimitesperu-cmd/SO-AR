@@ -28,13 +28,25 @@ export function getEffectiveCompletion(task, { sede, cycleId, cycleScoped = fals
           const entry = task.completions[k];
           const entryCycleId = entry?.cycleId ? String(entry.cycleId).trim().toLowerCase() : '';
           const keyMatchesSede = normSede ? k.toLowerCase().startsWith(normSede) : true;
-          return keyMatchesSede && entryCycleId === normCycleId;
+          return keyMatchesSede && (entryCycleId === normCycleId || k.toLowerCase().endsWith(`__${normCycleId}`));
         });
         if (foundKey) cycleCompletion = task.completions[foundKey];
       }
       if (!cycleCompletion && !normCycleId && normSede) {
-        const foundKey = Object.keys(task.completions).find(k => k.toLowerCase() === normSede);
-        if (foundKey) cycleCompletion = task.completions[foundKey];
+        const candidateKeys = Object.keys(task.completions).filter(k => {
+          const lower = k.toLowerCase();
+          return lower === normSede || lower.startsWith(`${normSede}__`);
+        });
+        if (candidateKeys.length > 0) {
+          candidateKeys.sort((a, b) => {
+            const itemA = task.completions[a] || {};
+            const itemB = task.completions[b] || {};
+            const timeA = new Date(itemA.updatedAt || itemA.completedAt || 0).getTime();
+            const timeB = new Date(itemB.updatedAt || itemB.completedAt || 0).getTime();
+            return timeB - timeA;
+          });
+          cycleCompletion = task.completions[candidateKeys[0]];
+        }
       }
     }
     const completed = cycleCompletion?.completed === true;

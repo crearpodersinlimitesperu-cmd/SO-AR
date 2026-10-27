@@ -1,7 +1,7 @@
 // Sistema de Cálculo Automático de Fechas y Horas Límite SO-AR
 // Conecta la información de los manuales operativos con las fechas del ciclo activo
 
-import { cyclesData } from '../data/cyclesData';
+import { cyclesData } from '../data/cyclesData.js';
 
 const addDays = (dateStr, days) => {
   const d = new Date(dateStr);
