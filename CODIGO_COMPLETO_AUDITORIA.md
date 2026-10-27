@@ -1046495,16 +1046495,33 @@ export default function CallCoachCRM() {
               📞 Historial de Llamadas Registradas
             </h3>
 
-            {(!selectedManagerForHistory.llamadasHistorial || selectedManagerForHistory.llamadasHistorial.length === 0) ? (
-              <div style={{ background: 'rgba(255,255,255,0.02)', padding: '1rem', borderRadius: '8px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.82rem' }}>
-                No hay historial de llamadas previas registradas para este manager en la base de datos de Causa OS.
-              </div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-                {selectedManagerForHistory.llamadasHistorial
-                  .slice()
-                  .sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''))
-                  .map((call, idx) => (
+            {(() => {
+              const rawCalls = Array.isArray(selectedManagerForHistory.llamadasHistorial)
+                ? [...selectedManagerForHistory.llamadasHistorial]
+                : [];
+              if (rawCalls.length === 0 && selectedManagerForHistory.llamadaFecha && selectedManagerForHistory.llamadaFecha !== 'Sin registro') {
+                rawCalls.push({
+                  id: `legacy_${selectedManagerForHistory.id}`,
+                  tipo: 'individual',
+                  fecha: selectedManagerForHistory.llamadaFecha,
+                  asistio: selectedManagerForHistory.llamadaAsistio === 'SI',
+                  tipoContacto: STANDARD_CALL_CONTACT_TYPE,
+                  duracionMinutos: STANDARD_CALL_DURATION
+                });
+              }
+              const displayCalls = rawCalls.sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
+
+              if (displayCalls.length === 0) {
+                return (
+                  <div style={{ background: 'rgba(255,255,255,0.02)', padding: '1rem', borderRadius: '8px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.82rem' }}>
+                    No hay historial de llamadas previas registradas para este manager en la base de datos de Causa OS.
+                  </div>
+                );
+              }
+
+              return (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                  {displayCalls.map((call, idx) => (
                     <div 
                       key={call.id || idx} 
                       style={{ 
@@ -1046532,6 +1046549,11 @@ export default function CallCoachCRM() {
                       <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                         Formato: {call.tipoContacto || STANDARD_CALL_CONTACT_TYPE} ({call.duracionMinutos || STANDARD_CALL_DURATION})
                       </div>
+                      {call.notaVozEnviada && (
+                        <div style={{ fontSize: '0.7rem', color: '#38bdf8', marginTop: '2px' }}>
+                          🎙️ Nota de voz al Coordinador confirmada
+                        </div>
+                      )}
                       {call.registradoPorNombre && (
                         <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '2px' }}>
                           Registrado por: {call.registradoPorNombre} {call.registradoPorEmail ? `(${call.registradoPorEmail})` : ''}
@@ -1046539,8 +1046561,9 @@ export default function CallCoachCRM() {
                       )}
                     </div>
                   ))}
-              </div>
-            )}
+                </div>
+              );
+            })()}
 
             <div style={{ marginTop: '1.4rem', display: 'flex', justifyContent: 'flex-end' }}>
               <button 
@@ -1057793,6 +1057816,8 @@ export default function CentroManagers() {
             callId,
             fecha,
             asistio: asistio === 'SI',
+            tipoContacto: STANDARD_CALL_CONTACT_TYPE,
+            duracionMinutos: STANDARD_CALL_DURATION,
             registradoPorEmail: currentUser?.email || '',
             registradoPorNombre: currentUser?.name || '',
           })
@@ -1057929,10 +1057954,28 @@ export default function CentroManagers() {
 
       setManagers(prev => prev.map(m => {
         if (groupCallAttendance.hasOwnProperty(m.id)) {
+          const prevHistory = Array.isArray(m.llamadasHistorial) ? m.llamadasHistorial : [];
+          const newEvent = {
+            id: callId,
+            tipo: 'grupal',
+            tipoContacto: STANDARD_CALL_CONTACT_TYPE,
+            duracionMinutos: STANDARD_CALL_DURATION,
+            meetUrl: groupCallMeetUrl,
+            notaVozEnviada: groupCallNotaVozEnviada,
+            llamadaEfectiva: !!groupCallAttendance[m.id],
+            fecha: groupCallDate,
+            asistio: !!groupCallAttendance[m.id],
+            equipo: groupModal.equipo,
+            sede: normalizeSede(groupModal.sede),
+            registradoPorEmail: currentUser?.email || '',
+            registradoPorNombre: currentUser?.name || '',
+            createdAtIso: new Date().toISOString()
+          };
           return {
             ...m,
             llamadaFecha: groupCallDate,
-            llamadaAsistio: groupCallAttendance[m.id] ? 'SI' : 'NO'
+            llamadaAsistio: groupCallAttendance[m.id] ? 'SI' : 'NO',
+            llamadasHistorial: prevHistory.some(e => e.id === callId) ? prevHistory : [...prevHistory, newEvent]
           };
         }
         return m;
@@ -1062815,6 +1062858,41 @@ export default function CentroManagers() {
           .filter(n => managerNoteMatches(n, m, managers) || (n.tipo === 'grupal' && n.equipoKey === equipoKey))
           .sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
 
+        // Historial Unificado Impecable y Lossless (cero pérdida de datos grupales o individuales)
+        const memberCalls = Array.isArray(m.llamadasHistorial) ? [...m.llamadasHistorial] : [];
+        if (memberCalls.length === 0 && m.llamadaFecha && m.llamadaFecha !== 'Sin registro') {
+          memberCalls.push({
+            id: `legacy_${m.id}`,
+            tipo: 'individual',
+            tipoContacto: STANDARD_CALL_CONTACT_TYPE,
+            duracionMinutos: STANDARD_CALL_DURATION,
+            fecha: m.llamadaFecha,
+            asistio: m.llamadaAsistio === 'SI',
+            llamadaEfectiva: m.llamadaAsistio === 'SI'
+          });
+        }
+
+        const seenCallIds = new Set(memberCalls.map(c => c.id || `${c.fecha}_${c.tipo}`));
+        
+        const unifiedHistory = [
+          ...memberCalls,
+          ...llamadasEquipo
+            .filter(l => !seenCallIds.has(l.id || l.callId || `${l.fecha}_grupal`))
+            .map(l => ({
+              id: l.id || l.callId,
+              tipo: 'grupal',
+              tipoContacto: l.tipoContacto || STANDARD_CALL_CONTACT_TYPE,
+              duracionMinutos: l.duracionMinutos || STANDARD_CALL_DURATION,
+              meetUrl: l.meetUrl || '',
+              notaVozEnviada: l.notaVozEnviada || false,
+              fecha: l.fecha,
+              asistio: true,
+              llamadaEfectiva: true,
+              registradoPorNombre: l.registradoPorNombre || '',
+              registradoPorEmail: l.registradoPorEmail || ''
+            }))
+        ].sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
+
         return (
           <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(3px)', zIndex: 1250, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }} onClick={() => setManagerCardModal(null)}>
             <div onClick={e => e.stopPropagation()} style={{ background: bgCard, width: '100%', maxWidth: '420px', maxHeight: '90dvh', overflowY: 'auto', boxSizing: 'border-box', borderRadius: '12px', padding: '1.8rem', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.15)', border: `1px solid ${borderLight}`, borderTop: '4px solid #3b82f6' }}>
@@ -1062905,36 +1062983,44 @@ export default function CentroManagers() {
                   <p style={{ fontSize: '0.75rem', color: textMuted }}>No hay llamadas grupales registradas para este equipo.</p>
                 )}
               </div>
-              <h4 style={{ fontSize: '0.82rem', color: textDark, margin: '1rem 0 0.4rem' }}>Historial individual de {m.nombre}</h4>
-              <div style={{ maxHeight: '160px', overflowY: 'auto' }}>
-                {(Array.isArray(m.llamadasHistorial) ? m.llamadasHistorial : [])
-                  .slice().sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''))
-                  .map(call => (
-                    <div key={call.id} style={{ padding: '0.45rem 0', borderBottom: `1px solid ${borderLight}`, fontSize: '0.75rem', color: textMuted, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <div>
-                        <div style={{ fontWeight: 600, color: textDark }}>
-                          {call.fecha || 'Sin fecha'} &bull; {call.tipo === 'grupal' ? 'Grupal' : 'Individual'}
-                        </div>
-                        <div style={{ fontSize: '0.7rem', color: '#16a34a' }}>
-                          📹 {call.tipoContacto || STANDARD_CALL_CONTACT_TYPE} ({call.duracionMinutos || STANDARD_CALL_DURATION})
-                        </div>
+              <h4 style={{ fontSize: '0.82rem', color: textDark, margin: '1rem 0 0.4rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span>Historial de Sesiones de {m.nombre}</span>
+                <span style={{ fontSize: '0.72rem', color: '#16a34a', fontWeight: 700 }}>
+                  {unifiedHistory.length} sesiones verificadas
+                </span>
+              </h4>
+              <div style={{ maxHeight: '180px', overflowY: 'auto' }}>
+                {unifiedHistory.map((call, idx) => (
+                  <div key={call.id || idx} style={{ padding: '0.45rem 0', borderBottom: `1px solid ${borderLight}`, fontSize: '0.75rem', color: textMuted, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <div style={{ fontWeight: 600, color: textDark }}>
+                        {call.fecha || 'Sin fecha'} &bull; {call.tipo === 'grupal' ? 'Llamada Grupal' : 'Llamada Individual'}
                       </div>
-                      <span style={{ 
-                        fontSize: '0.7rem', 
-                        fontWeight: 700, 
-                        padding: '0.15rem 0.4rem', 
-                        borderRadius: '4px',
-                        background: call.asistio ? '#dcfce7' : '#fee2e2',
-                        color: call.asistio ? '#16a34a' : '#dc2626'
-                      }}>
-                        {call.asistio ? '✅ Efectiva' : '❌ Ausente'}
-                      </span>
+                      <div style={{ fontSize: '0.7rem', color: '#16a34a', marginTop: '1px' }}>
+                        📹 {call.tipoContacto || STANDARD_CALL_CONTACT_TYPE} ({call.duracionMinutos || STANDARD_CALL_DURATION})
+                      </div>
+                      {call.notaVozEnviada && (
+                        <div style={{ fontSize: '0.68rem', color: '#0284c7', marginTop: '1px' }}>
+                          🎙️ Nota de voz confirmada al Coordinador
+                        </div>
+                      )}
                     </div>
-                  ))}
-                {(!Array.isArray(m.llamadasHistorial) || m.llamadasHistorial.length === 0) && (
+                    <span style={{ 
+                      fontSize: '0.7rem', 
+                      fontWeight: 700, 
+                      padding: '0.15rem 0.4rem', 
+                      borderRadius: '4px',
+                      background: call.asistio ? '#dcfce7' : '#fee2e2',
+                      color: call.asistio ? '#16a34a' : '#dc2626'
+                    }}>
+                      {call.asistio ? '✅ Efectiva' : '❌ Ausente'}
+                    </span>
+                  </div>
+                ))}
+                {unifiedHistory.length === 0 && (
                   <p style={{ fontSize: '0.75rem', color: textMuted }}>
                     {llamadasHistorialStatus === 'ready'
-                      ? 'No hay eventos individuales históricos disponibles para este manager.'
+                      ? 'No hay eventos históricos registrados para este manager.'
                       : 'El historial individual no está verificado todavía.'}
                   </p>
                 )}

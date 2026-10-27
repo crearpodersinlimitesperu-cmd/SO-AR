@@ -524,16 +524,33 @@ export default function CallCoachCRM() {
               📞 Historial de Llamadas Registradas
             </h3>
 
-            {(!selectedManagerForHistory.llamadasHistorial || selectedManagerForHistory.llamadasHistorial.length === 0) ? (
-              <div style={{ background: 'rgba(255,255,255,0.02)', padding: '1rem', borderRadius: '8px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.82rem' }}>
-                No hay historial de llamadas previas registradas para este manager en la base de datos de Causa OS.
-              </div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-                {selectedManagerForHistory.llamadasHistorial
-                  .slice()
-                  .sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''))
-                  .map((call, idx) => (
+            {(() => {
+              const rawCalls = Array.isArray(selectedManagerForHistory.llamadasHistorial)
+                ? [...selectedManagerForHistory.llamadasHistorial]
+                : [];
+              if (rawCalls.length === 0 && selectedManagerForHistory.llamadaFecha && selectedManagerForHistory.llamadaFecha !== 'Sin registro') {
+                rawCalls.push({
+                  id: `legacy_${selectedManagerForHistory.id}`,
+                  tipo: 'individual',
+                  fecha: selectedManagerForHistory.llamadaFecha,
+                  asistio: selectedManagerForHistory.llamadaAsistio === 'SI',
+                  tipoContacto: STANDARD_CALL_CONTACT_TYPE,
+                  duracionMinutos: STANDARD_CALL_DURATION
+                });
+              }
+              const displayCalls = rawCalls.sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
+
+              if (displayCalls.length === 0) {
+                return (
+                  <div style={{ background: 'rgba(255,255,255,0.02)', padding: '1rem', borderRadius: '8px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.82rem' }}>
+                    No hay historial de llamadas previas registradas para este manager en la base de datos de Causa OS.
+                  </div>
+                );
+              }
+
+              return (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                  {displayCalls.map((call, idx) => (
                     <div 
                       key={call.id || idx} 
                       style={{ 
@@ -561,6 +578,11 @@ export default function CallCoachCRM() {
                       <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                         Formato: {call.tipoContacto || STANDARD_CALL_CONTACT_TYPE} ({call.duracionMinutos || STANDARD_CALL_DURATION})
                       </div>
+                      {call.notaVozEnviada && (
+                        <div style={{ fontSize: '0.7rem', color: '#38bdf8', marginTop: '2px' }}>
+                          🎙️ Nota de voz al Coordinador confirmada
+                        </div>
+                      )}
                       {call.registradoPorNombre && (
                         <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '2px' }}>
                           Registrado por: {call.registradoPorNombre} {call.registradoPorEmail ? `(${call.registradoPorEmail})` : ''}
@@ -568,8 +590,9 @@ export default function CallCoachCRM() {
                       )}
                     </div>
                   ))}
-              </div>
-            )}
+                </div>
+              );
+            })()}
 
             <div style={{ marginTop: '1.4rem', display: 'flex', justifyContent: 'flex-end' }}>
               <button 

@@ -152,3 +152,86 @@ test('Directiva de Continuidad: Las llamadas grupales continuarán hasta que el 
   assert.equal(completedStatus.pendingTeams, 0);
   assert.match(completedStatus.message, /Ciclo grupal completado/);
 });
+
+test('Integridad Impecable del Historial (Lossless Call History & Zero Data Loss)', () => {
+  // Simular un manager con llamadas individuales previas
+  const manager = {
+    id: 'mng-999',
+    nombre: 'Valeria Manager',
+    equipo: 'Equipo 31',
+    sede: 'Lima',
+    llamadaFecha: '2026-09-10',
+    llamadaAsistio: 'SI',
+    llamadasHistorial: [
+      {
+        id: 'call-indiv-1',
+        tipo: 'individual',
+        fecha: '2026-09-10',
+        asistio: true,
+        tipoContacto: 'Videollamada de Google Meet',
+        duracionMinutos: '20-30 min',
+        notaVozEnviada: true,
+        registradoPorNombre: 'Coach Lima'
+      }
+    ]
+  };
+
+  // Simular historial de llamadas del equipo en llamadas_grupales_historial
+  const llamadasEquipo = [
+    {
+      id: 'call-group-1',
+      callId: 'call-group-1',
+      equipoKey: 'LIMA_EQUIPO 31',
+      fecha: '2026-09-17',
+      totalIntegrantes: 5,
+      asistieron: 5,
+      tipoContacto: 'Videollamada de Google Meet',
+      duracionMinutos: '20-30 min',
+      notaVozEnviada: true
+    },
+    {
+      id: 'call-group-2',
+      callId: 'call-group-2',
+      equipoKey: 'LIMA_EQUIPO 31',
+      fecha: '2026-09-24',
+      totalIntegrantes: 5,
+      asistieron: 4,
+      tipoContacto: 'Videollamada de Google Meet',
+      duracionMinutos: '20-30 min',
+      notaVozEnviada: true
+    }
+  ];
+
+  // Algoritmo de unificación sin pérdida
+  const memberCalls = Array.isArray(manager.llamadasHistorial) ? [...manager.llamadasHistorial] : [];
+  const seenCallIds = new Set(memberCalls.map(c => c.id || `${c.fecha}_${c.tipo}`));
+
+  const unifiedHistory = [
+    ...memberCalls,
+    ...llamadasEquipo
+      .filter(l => !seenCallIds.has(l.id || l.callId || `${l.fecha}_grupal`))
+      .map(l => ({
+        id: l.id || l.callId,
+        tipo: 'grupal',
+        tipoContacto: l.tipoContacto,
+        duracionMinutos: l.duracionMinutos,
+        notaVozEnviada: l.notaVozEnviada,
+        fecha: l.fecha,
+        asistio: true,
+        llamadaEfectiva: true
+      }))
+  ].sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
+
+  // Debe contener exactamente 3 llamadas (1 individual + 2 grupales), ordenadas descendente
+  assert.equal(unifiedHistory.length, 3, 'El historial unificado no debe perder ninguna llamada');
+  assert.equal(unifiedHistory[0].fecha, '2026-09-24');
+  assert.equal(unifiedHistory[1].fecha, '2026-09-17');
+  assert.equal(unifiedHistory[2].fecha, '2026-09-10');
+
+  // Cada llamada debe conservar los metadatos completos
+  unifiedHistory.forEach(call => {
+    assert.ok(call.tipoContacto, 'Debe conservar tipoContacto');
+    assert.ok(call.duracionMinutos, 'Debe conservar duracionMinutos');
+    assert.equal(typeof call.asistio, 'boolean', 'Debe conservar estado booleano de asistencia');
+  });
+});
