@@ -194,3 +194,70 @@ export function validateParticipantAdvance(approvedFIsCount = 0, required = REQU
       : `Bloqueado para avanzar: Requiere exactamente ${req} Resultados Imposibles aprobados (actualmente: ${approved})`
   };
 }
+
+/**
+ * Evalúa la continuidad de las llamadas grupales para un conjunto de equipos asignados.
+ * Directiva: "Las llamadas grupales continuarán hasta que el último grupo asignado las tenga".
+ *
+ * @param {Array<Object>} assignedTeams Lista de equipos asignados
+ * @param {number} [targetCalls=7] Meta estándar de llamadas grupales
+ * @returns {Object} Estado de continuidad del ciclo de llamadas grupales
+ */
+export function getGroupCallsCycleStatus(assignedTeams = [], targetCalls = 7) {
+  if (!Array.isArray(assignedTeams) || assignedTeams.length === 0) {
+    return {
+      active: false,
+      shouldContinue: false,
+      totalTeams: 0,
+      completedTeams: 0,
+      pendingTeams: 0,
+      pendingTeamList: [],
+      message: 'No hay equipos asignados en el ciclo actual.'
+    };
+  }
+
+  const pendingTeamList = [];
+  let completedTeams = 0;
+
+  for (const team of assignedTeams) {
+    const callsCount = Number(team.callsCount ?? team.totalLlamadas ?? team.llamadasCount ?? 0);
+    const isCompleted = callsCount >= targetCalls;
+    if (isCompleted) {
+      completedTeams++;
+    } else {
+      pendingTeamList.push({
+        equipo: team.equipo || team.name || team.id || 'Equipo sin nombre',
+        sede: team.sede || '',
+        entrenador: team.entrenador || '',
+        callsCount,
+        faltan: Math.max(0, targetCalls - callsCount)
+      });
+    }
+  }
+
+  const totalTeams = assignedTeams.length;
+  const pendingTeams = pendingTeamList.length;
+  // Las llamadas continúan mientras exista al menos un grupo asignado que aún no las haya completado todas
+  const shouldContinue = pendingTeams > 0;
+
+  return {
+    active: shouldContinue,
+    shouldContinue,
+    totalTeams,
+    completedTeams,
+    pendingTeams,
+    targetCalls,
+    pendingTeamList,
+    lastGroupPending: pendingTeamList.length > 0 ? pendingTeamList[pendingTeamList.length - 1] : null,
+    message: shouldContinue
+      ? `Las llamadas grupales continuarán activas hasta que el último grupo asignado las tenga (${completedTeams}/${totalTeams} completados, faltan ${pendingTeams}).`
+      : `Ciclo grupal completado: El 100% de los grupos asignados (${totalTeams}/${totalTeams}) completó sus ${targetCalls} llamadas.`
+  };
+}
+
+/**
+ * Función booleana directa para verificar si las llamadas grupales deben continuar.
+ */
+export function shouldGroupCallsContinue(assignedTeams = [], targetCalls = 7) {
+  return getGroupCallsCycleStatus(assignedTeams, targetCalls).shouldContinue;
+}

@@ -974778,6 +974778,73 @@ export function validateParticipantAdvance(approvedFIsCount = 0, required = REQU
   };
 }
 
+/**
+ * Evalúa la continuidad de las llamadas grupales para un conjunto de equipos asignados.
+ * Directiva: "Las llamadas grupales continuarán hasta que el último grupo asignado las tenga".
+ *
+ * @param {Array<Object>} assignedTeams Lista de equipos asignados
+ * @param {number} [targetCalls=7] Meta estándar de llamadas grupales
+ * @returns {Object} Estado de continuidad del ciclo de llamadas grupales
+ */
+export function getGroupCallsCycleStatus(assignedTeams = [], targetCalls = 7) {
+  if (!Array.isArray(assignedTeams) || assignedTeams.length === 0) {
+    return {
+      active: false,
+      shouldContinue: false,
+      totalTeams: 0,
+      completedTeams: 0,
+      pendingTeams: 0,
+      pendingTeamList: [],
+      message: 'No hay equipos asignados en el ciclo actual.'
+    };
+  }
+
+  const pendingTeamList = [];
+  let completedTeams = 0;
+
+  for (const team of assignedTeams) {
+    const callsCount = Number(team.callsCount ?? team.totalLlamadas ?? team.llamadasCount ?? 0);
+    const isCompleted = callsCount >= targetCalls;
+    if (isCompleted) {
+      completedTeams++;
+    } else {
+      pendingTeamList.push({
+        equipo: team.equipo || team.name || team.id || 'Equipo sin nombre',
+        sede: team.sede || '',
+        entrenador: team.entrenador || '',
+        callsCount,
+        faltan: Math.max(0, targetCalls - callsCount)
+      });
+    }
+  }
+
+  const totalTeams = assignedTeams.length;
+  const pendingTeams = pendingTeamList.length;
+  // Las llamadas continúan mientras exista al menos un grupo asignado que aún no las haya completado todas
+  const shouldContinue = pendingTeams > 0;
+
+  return {
+    active: shouldContinue,
+    shouldContinue,
+    totalTeams,
+    completedTeams,
+    pendingTeams,
+    targetCalls,
+    pendingTeamList,
+    lastGroupPending: pendingTeamList.length > 0 ? pendingTeamList[pendingTeamList.length - 1] : null,
+    message: shouldContinue
+      ? `Las llamadas grupales continuarán activas hasta que el último grupo asignado las tenga (${completedTeams}/${totalTeams} completados, faltan ${pendingTeams}).`
+      : `Ciclo grupal completado: El 100% de los grupos asignados (${totalTeams}/${totalTeams}) completó sus ${targetCalls} llamadas.`
+  };
+}
+
+/**
+ * Función booleana directa para verificar si las llamadas grupales deben continuar.
+ */
+export function shouldGroupCallsContinue(assignedTeams = [], targetCalls = 7) {
+  return getGroupCallsCycleStatus(assignedTeams, targetCalls).shouldContinue;
+}
+
 ```
 
 ---
@@ -1046149,6 +1046216,11 @@ export default function CallCoachCRM() {
                 <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-heading)', marginTop: '2px' }}>Retoma Semanal Post-1er FDS</div>
                 <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>Llamadas semanales cada 7 días. Continuidad garantizada en fin de año (sin bloqueos).</div>
               </div>
+              <div style={{ background: 'rgba(168, 85, 247, 0.08)', border: '1px solid rgba(168, 85, 247, 0.25)', borderRadius: '8px', padding: '0.8rem' }}>
+                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#c084fc', textTransform: 'uppercase' }}>Regla de Continuidad Grupal</div>
+                <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-heading)', marginTop: '2px' }}>Hasta el Último Grupo Asignado</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>Las llamadas grupales continuarán activas hasta que el último grupo asignado las tenga.</div>
+              </div>
             </div>
           </div>
         )}
@@ -1056470,7 +1056542,8 @@ import {
   MAX_TRAINER_LOAD, 
   STANDARD_CALL_CONTACT_TYPE, 
   STANDARD_CALL_DURATION,
-  FEE_PER_EFFECTIVE_CALL_USD 
+  FEE_PER_EFFECTIVE_CALL_USD,
+  getGroupCallsCycleStatus 
 } from '../utils/callScheduleAutomation';
 import CMJDashboard from '../components/CMJDashboard';
 import KPIsEntrenadoresLlamadas from '../components/KPIsEntrenadoresLlamadas';
@@ -1057452,6 +1057525,23 @@ export default function CentroManagers() {
       totalMngNoActivos
     };
   }, [groupTeams]);
+
+  // Continuidad de llamadas grupales hasta que el último grupo asignado las tenga
+  const groupCycleStatus = useMemo(() => {
+    return getGroupCallsCycleStatus(
+      groupTeams.map(t => {
+        const teamKey = `${normalizeSede(t.sede)}_${String(t.equipo).trim().toUpperCase()}`;
+        const callsCount = llamadasHistorial.filter(l => (l.equipoKey || '').toUpperCase() === teamKey).length;
+        return {
+          equipo: t.equipo,
+          sede: t.sede,
+          entrenador: t.entrenadorUnico,
+          callsCount
+        };
+      }),
+      7
+    );
+  }, [groupTeams, llamadasHistorial]);
 
   // Estadísticas por Sede (Tab: Sedes)
   const sedesStats = useMemo(() => {
@@ -1060061,6 +1060151,46 @@ export default function CentroManagers() {
         {activeTab === 'grupales' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             
+            {/* DIRECTIVA DE CONTINUIDAD: LLAMADAS CONTINÚAN HASTA QUE EL ÚLTIMO GRUPO ASIGNADO LAS TENGA */}
+            <div style={{
+              background: groupCycleStatus.shouldContinue ? 'linear-gradient(90deg, rgba(30, 58, 138, 0.18) 0%, rgba(16, 185, 129, 0.1) 100%)' : 'rgba(16, 185, 129, 0.12)',
+              border: `1px solid ${groupCycleStatus.shouldContinue ? '#3b82f6' : '#10b981'}`,
+              borderRadius: '10px',
+              padding: '0.9rem 1.25rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '0.75rem',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <Activity size={22} color={groupCycleStatus.shouldContinue ? '#3b82f6' : '#10b981'} />
+                <div>
+                  <div style={{ fontSize: '0.9rem', fontWeight: 800, color: textDark }}>
+                    {groupCycleStatus.shouldContinue
+                      ? '🔄 Ciclo Operativo Activo: Las llamadas grupales continuarán hasta que el último grupo asignado las tenga.'
+                      : '✅ Ciclo Grupal Cumplido: El 100% de los grupos asignados ha completado sus llamadas.'}
+                  </div>
+                  <div style={{ fontSize: '0.78rem', color: textMuted, marginTop: '2px' }}>
+                    {groupCycleStatus.completedTeams} de {groupCycleStatus.totalTeams} equipos asignados completaron sus llamadas meta (7).
+                    {groupCycleStatus.pendingTeams > 0 && ` Faltan ${groupCycleStatus.pendingTeams} equipos por culminar su ciclo.`}
+                  </div>
+                </div>
+              </div>
+              <span style={{ 
+                background: groupCycleStatus.shouldContinue ? '#eff6ff' : '#ecfdf5', 
+                color: groupCycleStatus.shouldContinue ? '#1d4ed8' : '#047857',
+                border: `1px solid ${groupCycleStatus.shouldContinue ? '#bfdbfe' : '#a7f3d0'}`,
+                padding: '0.35rem 0.8rem', 
+                borderRadius: '16px', 
+                fontSize: '0.78rem', 
+                fontWeight: 700 
+              }}>
+                {groupCycleStatus.shouldContinue ? 'Continuidad Garantizada' : 'Meta 100%'}
+              </span>
+            </div>
+
             {/* KPI BAR GRUPAL */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
               <div style={{ background: bgCard, borderRadius: '12px', padding: '1.2rem', border: `1px solid ${borderLight}`, display: 'flex', alignItems: 'center', gap: '1rem', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
@@ -1062448,6 +1062578,9 @@ export default function CentroManagers() {
                 />
                 🎙️ Reporte semanal enviado en formato de Nota de Voz al Coordinador de Maestría
               </label>
+              <div style={{ fontSize: '0.74rem', color: '#166534', background: '#dcfce7', padding: '0.4rem 0.6rem', borderRadius: '6px', border: '1px dashed #86efac' }}>
+                ℹ️ <strong>Continuidad Grupal:</strong> Las llamadas grupales continuarán formalmente semana a semana hasta que el último grupo asignado las complete.
+              </div>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>

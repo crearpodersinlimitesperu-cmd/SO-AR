@@ -10,7 +10,9 @@ import {
   isYearEndBlocked,
   generateAutomatedCallSchedule,
   calculateTrainerLiquidation,
-  validateParticipantAdvance
+  validateParticipantAdvance,
+  getGroupCallsCycleStatus,
+  shouldGroupCallsContinue
 } from '../src/utils/callScheduleAutomation.js';
 
 test('Directiva 1: Estándares de Videollamada Google Meet y Duración', () => {
@@ -116,4 +118,37 @@ test('Directiva 4: Cronograma automatizado (Llamada 1 Pre-C1 con Capitán -> Pau
   assert.equal(decCall.bloqueada, false);
   assert.equal(decCall.continuidadOperativaGarantizada, true);
   assert.equal(isYearEndBlocked(decCall.fechaProgramada), false);
+});
+
+test('Directiva de Continuidad: Las llamadas grupales continuarán hasta que el último grupo asignado las tenga', () => {
+  const assignedGroups = [
+    { equipo: 'Equipo 30', callsCount: 7 }, // Ya completó sus 7 llamadas
+    { equipo: 'Equipo 31', callsCount: 7 }, // Ya completó sus 7 llamadas
+    { equipo: 'Equipo 32', callsCount: 4 }, // Faltan 3 llamadas
+  ];
+
+  // Aunque el Equipo 30 y 31 hayan terminado, las llamadas grupales DEBEN continuar por el Equipo 32
+  const status = getGroupCallsCycleStatus(assignedGroups, 7);
+  assert.equal(status.shouldContinue, true, 'Las llamadas deben continuar mientras el último grupo tenga llamadas pendientes');
+  assert.equal(status.active, true);
+  assert.equal(status.completedTeams, 2);
+  assert.equal(status.pendingTeams, 1);
+  assert.equal(status.lastGroupPending.equipo, 'Equipo 32');
+  assert.equal(status.lastGroupPending.faltan, 3);
+  assert.match(status.message, /Las llamadas grupales continuarán activas hasta que el último grupo asignado las tenga/);
+
+  assert.equal(shouldGroupCallsContinue(assignedGroups, 7), true);
+
+  // Cuando el último grupo asignado finalmente completa sus llamadas:
+  const allCompletedGroups = [
+    { equipo: 'Equipo 30', callsCount: 7 },
+    { equipo: 'Equipo 31', callsCount: 7 },
+    { equipo: 'Equipo 32', callsCount: 7 },
+  ];
+  const completedStatus = getGroupCallsCycleStatus(allCompletedGroups, 7);
+  assert.equal(completedStatus.shouldContinue, false);
+  assert.equal(completedStatus.active, false);
+  assert.equal(completedStatus.completedTeams, 3);
+  assert.equal(completedStatus.pendingTeams, 0);
+  assert.match(completedStatus.message, /Ciclo grupal completado/);
 });

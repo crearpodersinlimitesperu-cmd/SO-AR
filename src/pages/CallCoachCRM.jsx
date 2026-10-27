@@ -245,6 +245,11 @@ export default function CallCoachCRM() {
                 <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-heading)', marginTop: '2px' }}>Retoma Semanal Post-1er FDS</div>
                 <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>Llamadas semanales cada 7 días. Continuidad garantizada en fin de año (sin bloqueos).</div>
               </div>
+              <div style={{ background: 'rgba(168, 85, 247, 0.08)', border: '1px solid rgba(168, 85, 247, 0.25)', borderRadius: '8px', padding: '0.8rem' }}>
+                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#c084fc', textTransform: 'uppercase' }}>Regla de Continuidad Grupal</div>
+                <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-heading)', marginTop: '2px' }}>Hasta el Último Grupo Asignado</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>Las llamadas grupales continuarán activas hasta que el último grupo asignado las tenga.</div>
+              </div>
             </div>
           </div>
         )}
