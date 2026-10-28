@@ -1056559,7 +1056559,7 @@ import {
   Edit3, Trash2, UserPlus, Shield, Crown, Check, CheckSquare, Square,
   ShieldCheck, Lock, AlertTriangle, Target, ArrowUpDown, ArrowUp, ArrowDown,
   BarChart3, GitMerge, ArrowRight, FileSpreadsheet, ExternalLink,
-  List, LayoutGrid
+  List, LayoutGrid, CreditCard
 } from 'lucide-react';
 import { 
   MAX_TRAINER_LOAD, 
@@ -1056901,6 +1056901,13 @@ export default function CentroManagers() {
   const [search, setSearch] = useState(initialSearchQuery);
   const [filterSede, setFilterSede] = useState(initialSedeQuery ? normalizeSede(initialSedeQuery) : '');
   const [statusFilter, setStatusFilter] = useState('Activo'); // 'Activo' por defecto | 'Todos' | 'Graduado' | 'Desertor'
+
+  // Filtros y selección interactiva en el Liquidador (Llamadas Grupales vs Individuales)
+  const [filtroTipoLlamada, setFiltroTipoLlamada] = useState('todas'); // 'todas' | 'grupales' | 'individuales'
+  const [filtroSedeLiquidacion, setFiltroSedeLiquidacion] = useState('todas');
+  const [filtroEntrenadorLiquidacion, setFiltroEntrenadorLiquidacion] = useState('todos');
+  const [selectedLiquidacionKeys, setSelectedLiquidacionKeys] = useState(new Set());
+  const [procesandoLiquidacionMasiva, setProcesandoLiquidacionMasiva] = useState(false);
 
   const canSeeInactives = canViewInactiveUsers(currentUser);
 
@@ -1058175,18 +1058182,13 @@ export default function CentroManagers() {
 
     const pendientes = [];
     const pagados = [];
-    // (09/09/2026) "En camino a la meta" (5 o 6 de 7 llamadas, a 1-2 de activar el pago por
-    // ese disparador) para que la pantalla se lea como un pipeline financiero real. No
-    // incluye el disparador de cierre manual porque ese es binario (cerrado o no) — no hay
-    // un "casi cerrado" que mostrar ahí.
     const enCamino = [];
 
-    // Unión de equipos candidatos: los que tienen llamadas registradas + los que el
-    // coordinador cerró manualmente aunque no lleguen a 7 llamadas + los registrados en liquidacionesPagos
+    // 1. LLAMADAS GRUPALES (EQUIPOS)
     const todosLosEquipoKeys = new Set([
       ...Object.keys(porEquipo), 
       ...Object.keys(equiposParaLiquidacion),
-      ...Object.keys(liquidacionesPagos)
+      ...Object.keys(liquidacionesPagos).filter(k => !k.startsWith('indiv__') && !k.startsWith('sheet_pago__'))
     ]);
 
     todosLosEquipoKeys.forEach((equipoKey) => {
@@ -1058200,11 +1058202,10 @@ export default function CentroManagers() {
                          Object.values(equiposParaLiquidacion).find(e => e.equipoKey?.toUpperCase() === equipoKey?.toUpperCase()) || null;
       const cierreManual = infoEquipo?.cierreManual || null;
       const pago = liquidacionesPagos[equipoKey] || 
+                   liquidacionesPagos[`grupal__${equipoKey}`] ||
                    liquidacionesPagos[equipoKey.toUpperCase()] ||
-                   Object.values(liquidacionesPagos).find(p => p.equipoKey?.toUpperCase() === equipoKey?.toUpperCase()) || null;
+                   Object.values(liquidacionesPagos).find(p => (p.equipoKey?.toUpperCase() === equipoKey?.toUpperCase() || p.liquidacionKey === `grupal__${equipoKey}`)) || null;
 
-      const infoEquipoFull = infoEquipo || { estados: new Set() };
-      
       // Contar llamadas efectivas (asistencia confirmada o registrada exitosamente)
       const llamadasEfectivas = registros.filter(r => (r.asistieron ?? 1) > 0 || r.llamadaEfectiva === true || r.asistio === true).length;
 
@@ -1058215,6 +1058216,9 @@ export default function CentroManagers() {
       if (!esElegible) {
         if (ultimoLlamada || count > 0) {
           enCamino.push({
+            tipo: 'grupal',
+            tipoLabel: 'Grupal (Equipo)',
+            liquidacionKey: `grupal__${equipoKey}`,
             equipoKey,
             equipo: ultimoLlamada?.equipo || equipoKey,
             numEquipo: ultimoLlamada?.numEquipo || '',
@@ -1058222,27 +1058226,28 @@ export default function CentroManagers() {
             entrenador: ultimoLlamada?.entrenador || 'Sin Asignar',
             totalLlamadas: count,
             llamadasEfectivas: 0,
-            faltan: 1
+            faltan: Math.max(0, 7 - count)
           });
         }
         return;
       }
 
-      // Datos del equipo: preferir el historial de llamadas (más completo); si el equipo
-      // se cerró manualmente sin ninguna llamada registrada, usar equiposParaLiquidacion o pago.
       const equipo = ultimoLlamada?.equipo || infoEquipo?.equipo || pago?.equipo || equipoKey;
       const numEquipo = ultimoLlamada?.numEquipo || infoEquipo?.numEquipo || pago?.numEquipo || '';
       const sede = ultimoLlamada?.sede || infoEquipo?.sede || pago?.sede || '';
       const entrenador = ultimoLlamada?.entrenador || Array.from(infoEquipo?.entrenadores || []).join(', ') || pago?.entrenador || 'Sin Asignar';
 
-      // Monto liquidable: tarifa fija por llamada efectiva registrada
       const montoCalculado = pago?.montoUSD ? Number(pago.montoUSD) : Math.max(FEE_PER_EFFECTIVE_CALL_USD, llamadasEfectivas * FEE_PER_EFFECTIVE_CALL_USD);
 
       const item = {
+        tipo: 'grupal',
+        tipoLabel: 'Grupal (Equipo)',
+        liquidacionKey: `grupal__${equipoKey}`,
         equipoKey,
         pagoDocId: pago?.id || equipoKey,
         equipo,
         numEquipo,
+        participanteNombre: '',
         sede,
         entrenador,
         totalLlamadas: count,
@@ -1058250,18 +1058255,90 @@ export default function CentroManagers() {
         fechaAlcanzo7: sorted[sorted.length - 1]?.fecha || '',
         montoUSD: montoCalculado,
         tarifaPorLlamada: FEE_PER_EFFECTIVE_CALL_USD,
-        motivo: 'llamadas_efectivas',
+        motivo: 'llamadas_grupales_efectivas',
         cierreManual
       };
 
       if (pago && pago.estado === 'eliminado') {
-        return; // Ignorar el equipo completamente
+        return;
       }
       
       if (pago && pago.estado === 'pagado') {
         pagados.push({ ...item, pagadoPorNombre: pago.pagadoPorNombre, pagadoPorEmail: pago.pagadoPorEmail, fechaPago: pago.fechaPago });
       } else {
         pendientes.push(item);
+      }
+    });
+
+    // 2. LLAMADAS INDIVIDUALES (1 A 1 CON PARTICIPANTES/MANAGERS)
+    (managers || []).forEach(m => {
+      if (!m) return;
+      const mId = m.id || m.documentId || m.cedula || m.email;
+      if (!mId) return;
+
+      const rawCalls = Array.isArray(m.llamadasHistorial) ? m.llamadasHistorial : [];
+      const individualCalls = rawCalls.filter(c => c && (c.tipo === 'individual' || (!c.tipo && !c.equipoKey)));
+
+      if (individualCalls.length === 0 && m.llamadaFecha) {
+        individualCalls.push({
+          id: `legacy_${mId}_${m.llamadaFecha}`,
+          tipo: 'individual',
+          fecha: m.llamadaFecha,
+          asistio: m.llamadaAsistio === 'SI' || m.llamadaAsistio === true,
+          llamadaEfectiva: m.llamadaAsistio === 'SI' || m.llamadaAsistio === true,
+          registradoPorNombre: m.entrenador || 'Coach'
+        });
+      }
+
+      const llamadasEfectivasInd = individualCalls.filter(c => 
+        c.llamadaEfectiva === true || c.asistio === true || c.asistio === 'SI'
+      ).length;
+
+      const indKey = `indiv__${mId}`;
+      const pago = liquidacionesPagos[indKey] || liquidacionesPagos[mId] || null;
+
+      if (llamadasEfectivasInd > 0 || !!pago) {
+        const sortedInd = [...individualCalls].sort((a, b) => (a.fecha || '').localeCompare(b.fecha || ''));
+        const ultimoInd = sortedInd[sortedInd.length - 1];
+        const entrenador = m.entrenador || m.entrenadorLlamadas || pago?.entrenador || 'Sin Asignar';
+        const montoCalculado = pago?.montoUSD 
+          ? Number(pago.montoUSD) 
+          : Math.max(FEE_PER_EFFECTIVE_CALL_USD, llamadasEfectivasInd * FEE_PER_EFFECTIVE_CALL_USD);
+
+        const indItem = {
+          tipo: 'individual',
+          tipoLabel: 'Individual (1 a 1)',
+          liquidacionKey: indKey,
+          managerId: mId,
+          equipoKey: indKey,
+          pagoDocId: pago?.id || indKey,
+          equipo: m.equipo || 'Sin Equipo',
+          numEquipo: m.numEquipo || '',
+          participanteNombre: m.nombre || 'Mánager',
+          sede: m.sede || '',
+          entrenador,
+          totalLlamadas: individualCalls.length,
+          llamadasEfectivas: llamadasEfectivasInd,
+          fechaAlcanzo7: ultimoInd?.fecha || '',
+          montoUSD: montoCalculado,
+          tarifaPorLlamada: FEE_PER_EFFECTIVE_CALL_USD,
+          motivo: 'llamadas_individuales_efectivas'
+        };
+
+        if (pago && pago.estado === 'eliminado') {
+          return;
+        }
+
+        if (pago && pago.estado === 'pagado') {
+          pagados.push({
+            ...indItem,
+            pagadoPorNombre: pago.pagadoPorNombre,
+            pagadoPorEmail: pago.pagadoPorEmail,
+            fechaPago: pago.fechaPago
+          });
+        } else {
+          pendientes.push(indItem);
+        }
       }
     });
 
@@ -1058273,7 +1058350,78 @@ export default function CentroManagers() {
     const totalPagadoUSD = pagados.reduce((sum, p) => sum + (Number(p.montoUSD) || 0), 0);
 
     return { pendientes, pagados, enCamino, totalPendienteUSD, totalPagadoUSD };
-  }, [llamadasHistorial, liquidacionesPagos, equiposParaLiquidacion, canViewLiquidacion]);
+  }, [llamadasHistorial, liquidacionesPagos, equiposParaLiquidacion, canViewLiquidacion, managers]);
+
+  // Filtrado reactivo de pendientes y pagados según tipo de llamada, sede y entrenador
+  const filteredPendientes = useMemo(() => {
+    return liquidacionData.pendientes.filter(item => {
+      if (filtroTipoLlamada === 'grupales' && item.tipo !== 'grupal') return false;
+      if (filtroTipoLlamada === 'individuales' && item.tipo !== 'individual') return false;
+      if (filtroSedeLiquidacion !== 'todas' && item.sede?.toLowerCase() !== filtroSedeLiquidacion.toLowerCase()) return false;
+      if (filtroEntrenadorLiquidacion !== 'todos' && !isTrainerMatch(item.entrenador, filtroEntrenadorLiquidacion)) return false;
+      return true;
+    });
+  }, [liquidacionData.pendientes, filtroTipoLlamada, filtroSedeLiquidacion, filtroEntrenadorLiquidacion]);
+
+  const filteredPagados = useMemo(() => {
+    return liquidacionData.pagados.filter(item => {
+      if (filtroTipoLlamada === 'grupales' && item.tipo !== 'grupal') return false;
+      if (filtroTipoLlamada === 'individuales' && item.tipo !== 'individual') return false;
+      if (filtroSedeLiquidacion !== 'todas' && item.sede?.toLowerCase() !== filtroSedeLiquidacion.toLowerCase()) return false;
+      if (filtroEntrenadorLiquidacion !== 'todos' && !isTrainerMatch(item.entrenador, filtroEntrenadorLiquidacion)) return false;
+      return true;
+    });
+  }, [liquidacionData.pagados, filtroTipoLlamada, filtroSedeLiquidacion, filtroEntrenadorLiquidacion]);
+
+  const conteoGrupalesPendientes = useMemo(() => {
+    return liquidacionData.pendientes.filter(i => i.tipo === 'grupal').length;
+  }, [liquidacionData.pendientes]);
+
+  const conteoIndividualesPendientes = useMemo(() => {
+    return liquidacionData.pendientes.filter(i => i.tipo === 'individual').length;
+  }, [liquidacionData.pendientes]);
+
+  const totalPendienteFiltradoUSD = useMemo(() => {
+    return filteredPendientes.reduce((sum, p) => sum + (Number(p.montoUSD) || 0), 0);
+  }, [filteredPendientes]);
+
+  const totalPagadoFiltradoUSD = useMemo(() => {
+    return filteredPagados.reduce((sum, p) => sum + (Number(p.montoUSD) || 0), 0);
+  }, [filteredPagados]);
+
+  // Selección múltiple para liquidación masiva
+  const allVisibleSelected = filteredPendientes.length > 0 && filteredPendientes.every(it => selectedLiquidacionKeys.has(it.liquidacionKey));
+
+  const toggleSelectAllVisible = () => {
+    if (allVisibleSelected) {
+      setSelectedLiquidacionKeys(prev => {
+        const next = new Set(prev);
+        filteredPendientes.forEach(it => next.delete(it.liquidacionKey));
+        return next;
+      });
+    } else {
+      setSelectedLiquidacionKeys(prev => {
+        const next = new Set(prev);
+        filteredPendientes.forEach(it => next.add(it.liquidacionKey));
+        return next;
+      });
+    }
+  };
+
+  const toggleSelectItem = (key) => {
+    setSelectedLiquidacionKeys(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
+
+  const totalSeleccionadosUSD = useMemo(() => {
+    return filteredPendientes
+      .filter(it => selectedLiquidacionKeys.has(it.liquidacionKey))
+      .reduce((sum, it) => sum + (Number(it.montoUSD) || 0), 0);
+  }, [filteredPendientes, selectedLiquidacionKeys]);
   // Planilla Oficial de Llamados (Google Sheets: 1lWAHh1PSAKu9eU6DOBxZExrHMbCYc3f2Sr8GdghNxD0)
   // Extracción e integración idempotente de pagos realizados a entrenadores sin duplicados
   const planillaPagosList = useMemo(() => {
@@ -1058389,12 +1058537,18 @@ export default function CentroManagers() {
   
   const handleEliminarLiquidacion = async (item) => {
     if (!canViewLiquidacion) return;
-    if (!window.confirm(`¿Estás seguro de que deseas ocultar/eliminar el equipo ${item.equipo} de esta lista? Esto no borra el equipo del sistema Nodus, solo lo elimina del reporte financiero de pagos pendientes.`)) return;
+    const itemLabel = item.tipo === 'individual' ? `al participante ${item.participanteNombre}` : `al equipo ${item.equipo}`;
+    if (!window.confirm(`¿Estás seguro de que deseas ocultar/eliminar ${itemLabel} de esta lista? Esto no borra datos del sistema Nodus, solo lo retira del reporte de pagos pendientes.`)) return;
 
     try {
-      await setDoc(doc(db, 'liquidaciones_pagos', item.equipoKey), {
-        equipoKey: item.equipoKey,
-        equipo: item.equipo,
+      const docKey = item.tipo === 'individual' ? (item.liquidacionKey || `indiv__${item.managerId}`) : (item.equipoKey || item.liquidacionKey);
+      await setDoc(doc(db, 'liquidaciones_pagos', docKey), {
+        liquidacionKey: docKey,
+        tipoLlamada: item.tipo || 'grupal',
+        equipoKey: item.equipoKey || '',
+        managerId: item.managerId || '',
+        participanteNombre: item.participanteNombre || '',
+        equipo: item.equipo || '',
         numEquipo: item.numEquipo || '',
         sede: item.sede,
         estado: 'eliminado',
@@ -1058406,13 +1058560,13 @@ export default function CentroManagers() {
 
       recordAuditEvent({
         action: 'ELIMINAR_CANDIDATO_PAGO',
-        details: `Candidato a pago de equipo ${item.equipo} marcado como eliminado/ignorado.`,
-        module: 'Liquidacion_Equipos'
+        details: `Candidato a pago (${item.tipo || 'grupal'}) ${item.equipo || item.participanteNombre} marcado como eliminado/ignorado.`,
+        module: 'Liquidacion_Llamadas'
       });
-      showToast(`El equipo ${item.equipo} fue retirado de la lista de pendientes.`, 'success');
+      showToast(`El registro fue retirado de la lista de pendientes.`, 'success');
     } catch (e) {
       console.error(e);
-      showToast("Error al ocultar el equipo.", "error");
+      showToast("Error al ocultar el registro.", "error");
     }
   };
 
@@ -1058420,7 +1058574,10 @@ export default function CentroManagers() {
   const handleMarcarPagado = async (item) => {
     if (!canViewLiquidacion) return;
     try {
-      const pagoRef = doc(db, 'liquidaciones_pagos', item.equipoKey);
+      const docKey = item.tipo === 'individual' 
+        ? (item.liquidacionKey || `indiv__${item.managerId}`) 
+        : (item.equipoKey || item.liquidacionKey);
+      const pagoRef = doc(db, 'liquidaciones_pagos', docKey);
       await runTransaction(db, async (tx) => {
         const snap = await tx.get(pagoRef);
         const prev = snap.exists() ? snap.data() : null;
@@ -1058430,8 +1058587,12 @@ export default function CentroManagers() {
 
         const monto = Number(item.montoUSD || (item.llamadasEfectivas || item.totalLlamadas || 1) * FEE_PER_EFFECTIVE_CALL_USD);
         tx.set(pagoRef, {
-          equipoKey: item.equipoKey,
-          equipo: item.equipo,
+          liquidacionKey: docKey,
+          tipoLlamada: item.tipo || 'grupal',
+          equipoKey: item.equipoKey || '',
+          managerId: item.managerId || '',
+          participanteNombre: item.participanteNombre || '',
+          equipo: item.equipo || '',
           numEquipo: item.numEquipo || '',
           sede: item.sede,
           entrenador: item.entrenador,
@@ -1058443,8 +1058604,8 @@ export default function CentroManagers() {
           llamadasAlPagar: item.totalLlamadas,
           llamadasEfectivas: item.llamadasEfectivas || item.totalLlamadas,
           tarifaPorLlamada: FEE_PER_EFFECTIVE_CALL_USD,
-          motivo: item.motivo || 'llamadas_efectivas',
-          criterio: 'Liquidación fija por llamada efectiva registrada honestamente en Causa OS',
+          motivo: item.motivo || (item.tipo === 'individual' ? 'llamadas_individuales_efectivas' : 'llamadas_grupales_efectivas'),
+          criterio: `Liquidación fija por llamada efectiva (${item.tipo === 'individual' ? '1 a 1' : 'Grupal'}) registrada honestamente en Causa OS`,
           fechaAlcanzo7: item.fechaAlcanzo7 || '',
           estado: 'pagado',
           pagadoPorEmail: currentUser?.email || '',
@@ -1058460,13 +1058621,95 @@ export default function CentroManagers() {
         name: currentUser?.name || '',
         role: currentUser?.appRole || '',
         sede: item.sede,
-        details: `Liquidación atómica registrada: ${item.equipo} (${item.sede}) - Entrenador: ${item.entrenador} - $${item.montoUSD} USD - Tarifa: $${FEE_PER_EFFECTIVE_CALL_USD}/llamada efectiva`
+        details: `Liquidación atómica registrada: ${item.tipo === 'individual' ? item.participanteNombre : item.equipo} (${item.sede}) - Entrenador: ${item.entrenador} - $${item.montoUSD} USD - Tarifa: $${FEE_PER_EFFECTIVE_CALL_USD}/llamada efectiva (${item.tipo === 'individual' ? 'Individual 1-a-1' : 'Grupal'})`
       });
 
-      showToast(`Marcado como pagado: ${item.equipo}`, 'success');
+      showToast(`Marcado como pagado: ${item.tipo === 'individual' ? item.participanteNombre : item.equipo}`, 'success');
     } catch (e) {
       console.error(e);
       showToast(e.message || 'Error al marcar como pagado', 'error');
+    }
+  };
+
+  // Liquidación Masiva para ítems seleccionados
+  const handleMarcarSeleccionadosPagados = async () => {
+    if (!canViewLiquidacion) return;
+    const itemsToPay = filteredPendientes.filter(it => selectedLiquidacionKeys.has(it.liquidacionKey));
+    if (itemsToPay.length === 0) {
+      showToast('No has seleccionado ningún ítem para liquidar.', 'warning');
+      return;
+    }
+
+    const totalMonto = itemsToPay.reduce((acc, it) => acc + (Number(it.montoUSD) || 0), 0);
+    const confirmMsg = `¿Confirmar liquidación masiva de ${itemsToPay.length} registros seleccionados por un total de $${totalMonto.toLocaleString('en-US')} USD?\n\n` +
+      `Se procesará cada llamada efectiva a $${FEE_PER_EFFECTIVE_CALL_USD} USD mediante transacciones atómicas individuales.`;
+
+    if (!window.confirm(confirmMsg)) return;
+
+    setProcesandoLiquidacionMasiva(true);
+    let successCount = 0;
+    let errorCount = 0;
+
+    for (const item of itemsToPay) {
+      try {
+        const docKey = item.tipo === 'individual' ? (item.liquidacionKey || `indiv__${item.managerId}`) : (item.equipoKey || item.liquidacionKey);
+        const pagoRef = doc(db, 'liquidaciones_pagos', docKey);
+        await runTransaction(db, async (tx) => {
+          const snap = await tx.get(pagoRef);
+          const prev = snap.exists() ? snap.data() : null;
+          if (prev?.estado === 'pagado') return;
+
+          const monto = Number(item.montoUSD || (item.llamadasEfectivas || item.totalLlamadas || 1) * FEE_PER_EFFECTIVE_CALL_USD);
+          tx.set(pagoRef, {
+            liquidacionKey: docKey,
+            tipoLlamada: item.tipo || 'grupal',
+            equipoKey: item.equipoKey || '',
+            managerId: item.managerId || '',
+            participanteNombre: item.participanteNombre || '',
+            equipo: item.equipo || '',
+            numEquipo: item.numEquipo || '',
+            sede: item.sede,
+            entrenador: item.entrenador,
+            montoUSD: monto,
+            monto: monto,
+            moneda: 'USD',
+            metodo_pago: 'transferencia',
+            cajero_user_id: currentUser?.uid || '',
+            llamadasAlPagar: item.totalLlamadas,
+            llamadasEfectivas: item.llamadasEfectivas || item.totalLlamadas,
+            tarifaPorLlamada: FEE_PER_EFFECTIVE_CALL_USD,
+            motivo: item.motivo,
+            criterio: `Liquidación masiva fija por llamada efectiva (${item.tipo === 'individual' ? '1 a 1' : 'Grupal'})`,
+            fechaAlcanzo7: item.fechaAlcanzo7 || '',
+            estado: 'pagado',
+            pagadoPorEmail: currentUser?.email || '',
+            pagadoPorNombre: currentUser?.name || '',
+            fechaPago: new Date().toISOString().split('T')[0],
+            updatedAt: serverTimestamp()
+          }, { merge: true });
+        });
+        successCount++;
+      } catch (err) {
+        console.error(`Error liquidando ${item.equipo || item.participanteNombre}:`, err);
+        errorCount++;
+      }
+    }
+
+    recordAuditEvent({
+      action: 'LIQUIDACION_MASIVA_ENTRENADORES',
+      email: currentUser?.email || '',
+      name: currentUser?.name || '',
+      role: currentUser?.appRole || '',
+      details: `Liquidación masiva completada: ${successCount} registros pagados por $${totalMonto} USD (${errorCount} errores)`
+    });
+
+    setSelectedLiquidacionKeys(new Set());
+    setProcesandoLiquidacionMasiva(false);
+
+    if (errorCount === 0) {
+      showToast(`¡Liquidación completada! ${successCount} registros marcados como pagados ($${totalMonto} USD).`, 'success');
+    } else {
+      showToast(`Procesados ${successCount} pagos con éxito. ${errorCount} fallaron.`, 'warning');
     }
   };
 
@@ -1058474,9 +1058717,10 @@ export default function CentroManagers() {
   // reversión bancaria. Conserva quién/cuándo pagó y no toca llamadas ni documentos fuente.
   const handleReversarPago = async (item) => {
     if (!canReversarPago) return;
+    const itemLabel = item.tipo === 'individual' ? item.participanteNombre : item.equipo;
     const confirmado = window.confirm(
-      `¿Reversar el pago de ${item.equipo} (${item.sede}) por $${item.montoUSD} USD?\n\n` +
-      `El equipo volverá a la cola de pendientes. Esto NO realiza ninguna transferencia bancaria inversa: solo quita el estado "pagado" en la plataforma. ` +
+      `¿Reversar el pago de ${itemLabel} (${item.sede}) por $${item.montoUSD} USD?\n\n` +
+      `El registro volverá a la cola de pendientes. Esto NO realiza ninguna transferencia bancaria inversa: solo quita el estado "pagado" en la plataforma. ` +
       `Se conservará quién pagó y cuándo, y quedará registrado que tú reversaste.`
     );
     if (!confirmado) return;
@@ -1058485,7 +1058729,8 @@ export default function CentroManagers() {
       showToast('Reversión cancelada: el motivo es obligatorio.', 'warning');
       return;
     }
-    const ref = doc(db, 'liquidaciones_pagos', item.equipoKey);
+    const docKey = item.tipo === 'individual' ? (item.liquidacionKey || `indiv__${item.managerId}`) : (item.equipoKey || item.liquidacionKey);
+    const ref = doc(db, 'liquidaciones_pagos', docKey);
     try {
       const antes = await runTransaction(db, async (tx) => {
         const snap = await tx.get(ref);
@@ -1058507,7 +1058752,7 @@ export default function CentroManagers() {
         return data;
       });
       if (!antes) {
-        showToast(`${item.equipo} ya no está en estado pagado; no se realizó ningún cambio.`, 'warning');
+        showToast(`${itemLabel} ya no está en estado pagado; no se realizó ningún cambio.`, 'warning');
         return;
       }
 
@@ -1058519,8 +1058764,8 @@ export default function CentroManagers() {
         name: currentUser?.name || '',
         role: currentUser?.appRole || currentUser?.role || '',
         sede: item.sede,
-        details: `Pago reversado en plataforma (sin reversión bancaria): ${item.equipo} (${item.sede}) - $${item.montoUSD} USD. Antes: estado=pagado, pagadoPor=${antes.pagadoPorEmail || '-'}, fechaPago=${antes.fechaPago || '-'}. Después: estado=pendiente. Motivo: ${motivo}`,
-        module: 'Liquidacion_Equipos'
+        details: `Pago reversado en plataforma (sin reversión bancaria): ${itemLabel} (${item.sede}) - $${item.montoUSD} USD. Antes: estado=pagado, pagadoPor=${antes.pagadoPorEmail || '-'}, fechaPago=${antes.fechaPago || '-'}. Después: estado=pendiente. Motivo: ${motivo}`,
+        module: 'Liquidacion_Llamadas'
       });
       } catch (auditErr) {
         auditOk = false;
@@ -1058528,8 +1058773,8 @@ export default function CentroManagers() {
       }
 
       showToast(auditOk
-        ? `Pago reversado: ${item.equipo} volvió a pendientes.`
-        : `Pago reversado: ${item.equipo} volvió a pendientes, pero el registro de auditoría falló. Avisa a soporte.`, auditOk ? 'success' : 'warning');
+        ? `Pago reversado: ${itemLabel} volvió a pendientes.`
+        : `Pago reversado: ${itemLabel} volvió a pendientes, pero el registro de auditoría falló. Avisa a soporte.`, auditOk ? 'success' : 'warning');
     } catch (e) {
       console.error(e);
       showToast('Error al reversar el pago; no se aplicó ningún cambio.', 'error');
@@ -1061163,7 +1061408,7 @@ export default function CentroManagers() {
                   boxShadow: liquidacionSubTab === 'equipos_nodus' ? '0 2px 6px rgba(16,185,129,0.3)' : 'none'
                 }}
               >
-                <Users size={16} /> Liquidación por Equipos (Nodus)
+                <Layers size={16} /> Liquidación Operativa (Grupales e Individuales)
                 {liquidacionData.pendientes.length > 0 && (
                   <span style={{
                     background: liquidacionSubTab === 'equipos_nodus' ? 'rgba(255,255,255,0.25)' : 'rgba(239,68,68,0.15)',
@@ -1061492,7 +1061737,7 @@ export default function CentroManagers() {
               </div>
             )}
 
-            {/* VISTA 2: LIQUIDACIÓN POR EQUIPOS (NODUS) */}
+            {/* VISTA 2: LIQUIDACIÓN OPERATIVA (GRUPALES E INDIVIDUALES) */}
             {liquidacionSubTab === 'equipos_nodus' && (
               <div>
                 {/* RESUMEN FINANCIERO — panel de 4 cifras clave */}
@@ -1061501,109 +1061746,367 @@ export default function CentroManagers() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: 800, color: '#b45309', marginBottom: '0.4rem' }}>
                       <Clock size={14} /> Por Pagar Ahora (Nodus)
                     </div>
-                    <div style={{ fontSize: '1.8rem', fontWeight: 800, color: textDark }}>${liquidacionData.totalPendienteUSD.toLocaleString('en-US')}</div>
-                    <div style={{ fontSize: '0.78rem', color: textMuted, marginTop: '0.2rem' }}>{liquidacionData.pendientes.length} equipo{liquidacionData.pendientes.length !== 1 ? 's' : ''} ya cumplió la meta</div>
+                    <div style={{ fontSize: '1.8rem', fontWeight: 800, color: textDark }}>${totalPendienteFiltradoUSD.toLocaleString('en-US')}</div>
+                    <div style={{ fontSize: '0.78rem', color: textMuted, marginTop: '0.2rem' }}>
+                      {filteredPendientes.length} pendientes ({conteoGrupalesPendientes} grupales • {conteoIndividualesPendientes} individuales)
+                    </div>
                   </div>
                   <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.2rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: 800, color: '#059669', marginBottom: '0.4rem' }}>
                       <CheckCircle size={14} /> Pagado Histórico (Nodus)
                     </div>
-                    <div style={{ fontSize: '1.8rem', fontWeight: 800, color: textDark }}>${liquidacionData.totalPagadoUSD.toLocaleString('en-US')}</div>
-                    <div style={{ fontSize: '0.78rem', color: textMuted, marginTop: '0.2rem' }}>{liquidacionData.pagados.length} pago{liquidacionData.pagados.length !== 1 ? 's' : ''} registrado{liquidacionData.pagados.length !== 1 ? 's' : ''}</div>
+                    <div style={{ fontSize: '1.8rem', fontWeight: 800, color: textDark }}>${totalPagadoFiltradoUSD.toLocaleString('en-US')}</div>
+                    <div style={{ fontSize: '0.78rem', color: textMuted, marginTop: '0.2rem' }}>{filteredPagados.length} pago{filteredPagados.length !== 1 ? 's' : ''} registrado{filteredPagados.length !== 1 ? 's' : ''}</div>
                   </div>
                   <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.2rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: 800, color: '#3b82f6', marginBottom: '0.4rem' }}>
                       <Target size={14} /> En Camino a la Meta
                     </div>
                     <div style={{ fontSize: '1.8rem', fontWeight: 800, color: textDark }}>{liquidacionData.enCamino.length}</div>
-                    <div style={{ fontSize: '0.78rem', color: textMuted, marginTop: '0.2rem' }}>a 1 o 2 llamadas de activar el pago</div>
+                    <div style={{ fontSize: '0.78rem', color: textMuted, marginTop: '0.2rem' }}>equipos en avance hacia 7 llamadas</div>
                   </div>
                   <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.2rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: 800, color: '#6366f1', marginBottom: '0.4rem' }}>
                       <BarChart3 size={14} /> Comprometido Nodus
                     </div>
-                    <div style={{ fontSize: '1.8rem', fontWeight: 800, color: textDark }}>${(liquidacionData.totalPendienteUSD + liquidacionData.totalPagadoUSD).toLocaleString('en-US')}</div>
-                    <div style={{ fontSize: '0.78rem', color: textMuted, marginTop: '0.2rem' }}>pendiente + pagado, ciclo actual</div>
+                    <div style={{ fontSize: '1.8rem', fontWeight: 800, color: textDark }}>${(totalPendienteFiltradoUSD + totalPagadoFiltradoUSD).toLocaleString('en-US')}</div>
+                    <div style={{ fontSize: '0.78rem', color: textMuted, marginTop: '0.2rem' }}>pendiente + pagado filtrado</div>
                   </div>
                 </div>
 
+                {/* BARRA DE SELECCIÓN Y FILTRO DE LLAMADAS (GRUPALES VS INDIVIDUALES) */}
+                <div style={{ 
+                  background: bgCard, 
+                  border: `1px solid ${borderLight}`, 
+                  borderRadius: '12px', 
+                  padding: '1rem 1.25rem', 
+                  marginBottom: '1.2rem', 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center', 
+                  flexWrap: 'wrap', 
+                  gap: '1rem' 
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: '0.82rem', fontWeight: 800, color: textDark, marginRight: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                      <Filter size={15} color="#059669" /> Seleccionar Tipo de Llamada:
+                    </span>
+                    
+                    <button
+                      type="button"
+                      onClick={() => setFiltroTipoLlamada('todas')}
+                      style={{
+                        padding: '0.45rem 0.9rem',
+                        borderRadius: '8px',
+                        border: filtroTipoLlamada === 'todas' ? '2px solid #10b981' : `1px solid ${borderLight}`,
+                        background: filtroTipoLlamada === 'todas' ? 'rgba(16,185,129,0.12)' : 'transparent',
+                        color: filtroTipoLlamada === 'todas' ? '#059669' : textMuted,
+                        fontWeight: filtroTipoLlamada === 'todas' ? 800 : 600,
+                        fontSize: '0.82rem',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                        transition: 'all 0.2s'
+                      }}
+                    >
+                      <Layers size={14} /> Todas las Llamadas ({liquidacionData.pendientes.length})
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setFiltroTipoLlamada('grupales')}
+                      style={{
+                        padding: '0.45rem 0.9rem',
+                        borderRadius: '8px',
+                        border: filtroTipoLlamada === 'grupales' ? '2px solid #8b5cf6' : `1px solid ${borderLight}`,
+                        background: filtroTipoLlamada === 'grupales' ? 'rgba(139,92,246,0.12)' : 'transparent',
+                        color: filtroTipoLlamada === 'grupales' ? '#7c3aed' : textMuted,
+                        fontWeight: filtroTipoLlamada === 'grupales' ? 800 : 600,
+                        fontSize: '0.82rem',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                        transition: 'all 0.2s'
+                      }}
+                    >
+                      <Users size={14} /> 👥 Llamadas Grupales ({conteoGrupalesPendientes})
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setFiltroTipoLlamada('individuales')}
+                      style={{
+                        padding: '0.45rem 0.9rem',
+                        borderRadius: '8px',
+                        border: filtroTipoLlamada === 'individuales' ? '2px solid #3b82f6' : `1px solid ${borderLight}`,
+                        background: filtroTipoLlamada === 'individuales' ? 'rgba(59,130,246,0.12)' : 'transparent',
+                        color: filtroTipoLlamada === 'individuales' ? '#2563eb' : textMuted,
+                        fontWeight: filtroTipoLlamada === 'individuales' ? 800 : 600,
+                        fontSize: '0.82rem',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                        transition: 'all 0.2s'
+                      }}
+                    >
+                      <UserCheck size={14} /> 👤 Llamadas Individuales (1 a 1) ({conteoIndividualesPendientes})
+                    </button>
+                  </div>
+
+                  {/* FILTROS SECUNDARIOS: SEDE Y ENTRENADOR */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+                    <select
+                      value={filtroSedeLiquidacion}
+                      onChange={(e) => setFiltroSedeLiquidacion(e.target.value)}
+                      style={{
+                        padding: '0.45rem 0.75rem',
+                        borderRadius: '8px',
+                        border: `1px solid ${borderLight}`,
+                        background: bgCard,
+                        color: textDark,
+                        fontSize: '0.82rem',
+                        fontWeight: 600
+                      }}
+                    >
+                      <option value="todas">Todas las Sedes</option>
+                      {['Lima', 'Quito', 'Guayaquil', 'Medellín', 'México', 'Cuenca', 'Sede Global'].map(s => (
+                        <option key={s} value={s}>{s}</option>
+                      ))}
+                    </select>
+
+                    <select
+                      value={filtroEntrenadorLiquidacion}
+                      onChange={(e) => setFiltroEntrenadorLiquidacion(e.target.value)}
+                      style={{
+                        padding: '0.45rem 0.75rem',
+                        borderRadius: '8px',
+                        border: `1px solid ${borderLight}`,
+                        background: bgCard,
+                        color: textDark,
+                        fontSize: '0.82rem',
+                        fontWeight: 600,
+                        maxWidth: '200px'
+                      }}
+                    >
+                      <option value="todos">Todos los Entrenadores</option>
+                      {availableTrainers.map(ent => (
+                        <option key={ent} value={ent}>{ent}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* TOOLBAR DE ACCIÓN MASIVA (CUANDO HAY ÍTEMS SELECCIONADOS) */}
+                {selectedLiquidacionKeys.size > 0 && (
+                  <div style={{
+                    background: 'linear-gradient(90deg, rgba(16,185,129,0.15) 0%, rgba(59,130,246,0.15) 100%)',
+                    border: '1px solid #10b981',
+                    borderRadius: '10px',
+                    padding: '0.85rem 1.25rem',
+                    marginBottom: '1.2rem',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    flexWrap: 'wrap',
+                    gap: '0.8rem',
+                    boxShadow: '0 2px 8px rgba(16,185,129,0.15)'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                      <CheckSquare size={18} color="#059669" />
+                      <span style={{ fontWeight: 800, color: textDark, fontSize: '0.88rem' }}>
+                        {selectedLiquidacionKeys.size} llamada{selectedLiquidacionKeys.size !== 1 ? 's' : ''} seleccionada{selectedLiquidacionKeys.size !== 1 ? 's' : ''}
+                      </span>
+                      <span style={{ fontSize: '0.85rem', color: textMuted }}>•</span>
+                      <span style={{ fontWeight: 800, color: '#059669', fontSize: '0.95rem' }}>
+                        Total a liquidar: ${totalSeleccionadosUSD.toLocaleString('en-US')} USD
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', gap: '0.6rem' }}>
+                      <button
+                        type="button"
+                        disabled={procesandoLiquidacionMasiva}
+                        onClick={handleMarcarSeleccionadosPagados}
+                        style={{
+                          background: '#10b981',
+                          color: '#ffffff',
+                          border: 'none',
+                          borderRadius: '7px',
+                          padding: '0.45rem 1.1rem',
+                          fontWeight: 800,
+                          fontSize: '0.82rem',
+                          cursor: procesandoLiquidacionMasiva ? 'not-allowed' : 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.4rem',
+                          boxShadow: '0 2px 6px rgba(16,185,129,0.3)'
+                        }}
+                      >
+                        <CreditCard size={15} />
+                        {procesandoLiquidacionMasiva ? 'Procesando pagos...' : `Liquidar Seleccionados ($${totalSeleccionadosUSD} USD)`}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedLiquidacionKeys(new Set())}
+                        style={{
+                          background: 'transparent',
+                          border: `1px solid ${borderLight}`,
+                          borderRadius: '7px',
+                          padding: '0.45rem 0.8rem',
+                          color: textMuted,
+                          fontWeight: 600,
+                          fontSize: '0.82rem',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Limpiar selección
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 {/* PENDIENTES DE PAGO */}
                 <div style={{ background: bgCard, borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', border: `1px solid ${borderLight}`, padding: '1.5rem', marginBottom: '1.2rem' }}>
-                  <h3 style={{ fontSize: '1rem', color: textDark, marginBottom: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                    <Clock size={16} color="#b45309" /> Pendientes de pago ({liquidacionData.pendientes.length})
-                  </h3>
-                  {liquidacionData.pendientes.length === 0 ? (
-                    <p style={{ color: textMuted, fontSize: '0.9rem' }}>No hay equipos pendientes de liquidar por ahora - ningún equipo ha alcanzado todavía las 7 llamadas grupales registradas ni fue cerrado manualmente por un coordinador.</p>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.9rem', flexWrap: 'wrap', gap: '0.6rem' }}>
+                    <h3 style={{ fontSize: '1rem', color: textDark, margin: 0, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                      <Clock size={16} color="#b45309" /> Pendientes de pago ({filteredPendientes.length})
+                    </h3>
+                    <div style={{ fontSize: '0.78rem', color: textMuted }}>
+                      Tarifa fija: <strong>${FEE_PER_EFFECTIVE_CALL_USD} USD</strong> por llamada efectiva registrada
+                    </div>
+                  </div>
+
+                  {filteredPendientes.length === 0 ? (
+                    <p style={{ color: textMuted, fontSize: '0.9rem' }}>
+                      No hay registros pendientes para los filtros seleccionados ({filtroTipoLlamada === 'todas' ? 'Todas las llamadas' : filtroTipoLlamada === 'grupales' ? 'Llamadas grupales' : 'Llamadas individuales'}).
+                    </p>
                   ) : (
                     <div style={{ overflowX: 'auto' }}>
                       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
                         <thead>
                           <tr style={{ background: 'rgba(180,83,9,0.08)', textAlign: 'left' }}>
-                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Equipo</th>
+                            <th style={{ padding: '0.7rem 0.6rem', width: '36px', textAlign: 'center' }}>
+                              <input
+                                type="checkbox"
+                                checked={allVisibleSelected}
+                                onChange={toggleSelectAllVisible}
+                                title={allVisibleSelected ? "Deseleccionar todos" : "Seleccionar todos los visibles"}
+                                style={{ cursor: 'pointer', width: '15px', height: '15px' }}
+                              />
+                            </th>
+                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Modalidad</th>
+                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Destinatario</th>
                             <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Sede</th>
                             <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Entrenador</th>
-                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Motivo</th>
-                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Llamadas</th>
+                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Llamadas Efectivas</th>
                             <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Monto</th>
-                            <th style={{ padding: '0.7rem 0.6rem' }}></th>
+                            <th style={{ padding: '0.7rem 0.6rem', textAlign: 'right' }}>Acciones</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {liquidacionData.pendientes.map((item, idx) => (
-                            <tr key={item.equipoKey} style={{ borderBottom: `1px solid ${borderLight}`, background: idx % 2 === 1 ? 'rgba(0,0,0,0.015)' : 'transparent' }}>
-                              <td style={{ padding: '0.65rem 0.6rem', fontWeight: 600 }}>{item.equipo} {item.numEquipo ? `(#${item.numEquipo})` : ''}</td>
-                              <td style={{ padding: '0.65rem 0.6rem' }}><CountryFlag sede={item.sede} /> {item.sede}</td>
-                              <td style={{ padding: '0.65rem 0.6rem' }}>{item.entrenador}</td>
-                              <td style={{ padding: '0.65rem 0.6rem' }}>
-                                {item.motivo === 'cierre_manual' ? (
-                                  <span title={item.cierreManual?.porNombre ? `Cerrado por ${item.cierreManual.porNombre}` : ''} style={{ background: '#eff6ff', color: '#1d4ed8', padding: '0.2rem 0.5rem', borderRadius: '5px', fontSize: '0.72rem', fontWeight: 700, whiteSpace: 'nowrap' }}>
-                                    🔒 Equipo cerrado
-                                  </span>
-                                ) : item.motivo === 'desertor_automatico' ? (
-                                  <span style={{ background: '#fef2f2', color: '#ef4444', padding: '0.2rem 0.5rem', borderRadius: '5px', fontSize: '0.72rem', fontWeight: 700, whiteSpace: 'nowrap' }}>
-                                    ⚠️ Inactivo / Desertor
-                                  </span>
-                                ) : (
-                                  <span style={{ background: '#fefce8', color: '#a16207', padding: '0.2rem 0.5rem', borderRadius: '5px', fontSize: '0.72rem', fontWeight: 700, whiteSpace: 'nowrap' }} title={item.fechaAlcanzo7 ? `Llegó a 7 el ${item.fechaAlcanzo7}` : ''}>
-                                    ⭐ 7 llamadas
-                                  </span>
-                                )}
-                              </td>
-                              <td style={{ padding: '0.65rem 0.6rem' }}>{item.totalLlamadas}</td>
-                              <td style={{ padding: '0.65rem 0.6rem', fontWeight: 700, color: '#059669' }}>${item.montoUSD}</td>
-                              <td style={{ padding: '0.65rem 0.6rem' }}>
-                                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'nowrap' }}>
-                                  {item.cierreManual?.reabrible && canChangeStatus && (
-                                    <HelpButton helpKey="reabrirEquipo"
-                                      onClick={() => handleReabrirEquipoLiquidacion(item)}
-                                      title="Quita el cierre y restaura los estados previos para que el equipo continúe su curso"
-                                      style={{ padding: '0.4rem 0.7rem', borderRadius: '6px', border: '1px solid #2563eb', background: '#eff6ff', color: '#1d4ed8', fontWeight: 700, cursor: 'pointer', fontSize: '0.8rem', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
-                                    >
-                                      <RotateCcw size={13} /> Volver a abrir
-                                    </HelpButton>
+                          {filteredPendientes.map((item, idx) => {
+                            const isSelected = selectedLiquidacionKeys.has(item.liquidacionKey);
+                            return (
+                              <tr key={item.liquidacionKey || item.equipoKey} style={{ borderBottom: `1px solid ${borderLight}`, background: isSelected ? 'rgba(16,185,129,0.08)' : idx % 2 === 1 ? 'rgba(0,0,0,0.015)' : 'transparent' }}>
+                                <td style={{ padding: '0.65rem 0.6rem', textAlign: 'center' }}>
+                                  <input
+                                    type="checkbox"
+                                    checked={isSelected}
+                                    onChange={() => toggleSelectItem(item.liquidacionKey)}
+                                    style={{ cursor: 'pointer', width: '15px', height: '15px' }}
+                                  />
+                                </td>
+                                <td style={{ padding: '0.65rem 0.6rem' }}>
+                                  {item.tipo === 'individual' ? (
+                                    <span style={{ background: '#dbeafe', color: '#1e40af', padding: '0.2rem 0.55rem', borderRadius: '5px', fontSize: '0.72rem', fontWeight: 800, whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                                      <UserCheck size={12} /> Individual (1 a 1)
+                                    </span>
+                                  ) : (
+                                    <span style={{ background: '#f3e8ff', color: '#6b21a8', padding: '0.2rem 0.55rem', borderRadius: '5px', fontSize: '0.72rem', fontWeight: 800, whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                                      <Users size={12} /> Grupal (Equipo)
+                                    </span>
                                   )}
-                                  <HelpButton helpKey="marcarPagado"
-                                    onClick={() => handleMarcarPagado(item)}
-                                    style={{ padding: '0.4rem 0.8rem', borderRadius: '6px', border: 'none', background: '#10b981', color: '#fff', fontWeight: 700, cursor: 'pointer', fontSize: '0.8rem', whiteSpace: 'nowrap' }}
-                                  >
-                                    Marcar como pagado
-                                  </HelpButton>
-                                  <HelpButton helpKey="ocultarPago"
-                                    onClick={() => handleEliminarLiquidacion(item)}
-                                    title="Ocultar / Eliminar de esta lista"
-                                    style={{ padding: '0.4rem 0.6rem', borderRadius: '6px', border: 'none', background: '#fef2f2', color: '#ef4444', fontWeight: 700, cursor: 'pointer', fontSize: '0.8rem', display: 'flex', alignItems: 'center' }}
-                                  >
-                                    <Trash2 size={14} />
-                                  </HelpButton>
-                                </div>
-                              </td>
-                            </tr>
-                          ))}
+                                </td>
+                                <td style={{ padding: '0.65rem 0.6rem' }}>
+                                  {item.tipo === 'individual' ? (
+                                    <div>
+                                      <div style={{ fontWeight: 700, color: textDark }}>{item.participanteNombre}</div>
+                                      <div style={{ fontSize: '0.72rem', color: textMuted }}>Equipo: {item.equipo} {item.numEquipo ? `(#${item.numEquipo})` : ''}</div>
+                                    </div>
+                                  ) : (
+                                    <div style={{ fontWeight: 700, color: textDark }}>
+                                      {item.equipo} {item.numEquipo ? `(#${item.numEquipo})` : ''}
+                                    </div>
+                                  )}
+                                </td>
+                                <td style={{ padding: '0.65rem 0.6rem' }}><CountryFlag sede={item.sede} /> {item.sede}</td>
+                                <td style={{ padding: '0.65rem 0.6rem', fontWeight: 600 }}>{item.entrenador}</td>
+                                <td style={{ padding: '0.65rem 0.6rem' }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                                    {item.tipo === 'grupal' ? (
+                                      item.motivo === 'cierre_manual' ? (
+                                        <span title={item.cierreManual?.porNombre ? `Cerrado por ${item.cierreManual.porNombre}` : ''} style={{ background: '#eff6ff', color: '#1d4ed8', padding: '0.2rem 0.5rem', borderRadius: '5px', fontSize: '0.72rem', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                                          🔒 Cerrado ({item.totalLlamadas} ll.)
+                                        </span>
+                                      ) : item.motivo === 'desertor_automatico' ? (
+                                        <span style={{ background: '#fef2f2', color: '#ef4444', padding: '0.2rem 0.5rem', borderRadius: '5px', fontSize: '0.72rem', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                                          ⚠️ Inactivo ({item.totalLlamadas} ll.)
+                                        </span>
+                                      ) : (
+                                        <span style={{ background: '#fefce8', color: '#a16207', padding: '0.2rem 0.5rem', borderRadius: '5px', fontSize: '0.72rem', fontWeight: 700, whiteSpace: 'nowrap' }} title={item.fechaAlcanzo7 ? `Llegó a 7 el ${item.fechaAlcanzo7}` : ''}>
+                                          ⭐ {item.totalLlamadas} de 7 llamadas
+                                        </span>
+                                      )
+                                    ) : (
+                                      <span style={{ background: '#ecfdf5', color: '#047857', padding: '0.2rem 0.5rem', borderRadius: '5px', fontSize: '0.72rem', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                                        📞 {item.llamadasEfectivas} llamada{item.llamadasEfectivas !== 1 ? 's' : ''} 1-a-1
+                                      </span>
+                                    )}
+                                  </div>
+                                </td>
+                                <td style={{ padding: '0.65rem 0.6rem', fontWeight: 800, color: '#059669', fontSize: '0.92rem' }}>
+                                  ${item.montoUSD} USD
+                                </td>
+                                <td style={{ padding: '0.65rem 0.6rem', textAlign: 'right' }}>
+                                  <div style={{ display: 'flex', gap: '0.4rem', justifyContent: 'flex-end', flexWrap: 'nowrap' }}>
+                                    {item.cierreManual?.reabrible && canChangeStatus && item.tipo === 'grupal' && (
+                                      <HelpButton helpKey="reabrirEquipo"
+                                        onClick={() => handleReabrirEquipoLiquidacion(item)}
+                                        title="Quita el cierre y restaura los estados previos para que el equipo continúe su curso"
+                                        style={{ padding: '0.35rem 0.6rem', borderRadius: '6px', border: '1px solid #2563eb', background: '#eff6ff', color: '#1d4ed8', fontWeight: 700, cursor: 'pointer', fontSize: '0.78rem', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
+                                      >
+                                        <RotateCcw size={12} /> Volver a abrir
+                                      </HelpButton>
+                                    )}
+                                    <HelpButton helpKey="marcarPagado"
+                                      onClick={() => handleMarcarPagado(item)}
+                                      style={{ padding: '0.35rem 0.75rem', borderRadius: '6px', border: 'none', background: '#10b981', color: '#fff', fontWeight: 700, cursor: 'pointer', fontSize: '0.78rem', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
+                                    >
+                                      <Check size={12} /> Marcar como pagado
+                                    </HelpButton>
+                                    <HelpButton helpKey="ocultarPago"
+                                      onClick={() => handleEliminarLiquidacion(item)}
+                                      title="Ocultar / Eliminar de esta lista"
+                                      style={{ padding: '0.35rem 0.5rem', borderRadius: '6px', border: 'none', background: '#fef2f2', color: '#ef4444', fontWeight: 700, cursor: 'pointer', fontSize: '0.78rem', display: 'flex', alignItems: 'center' }}
+                                    >
+                                      <Trash2 size={13} />
+                                    </HelpButton>
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })}
                         </tbody>
                         <tfoot>
                           <tr style={{ borderTop: `2px solid ${borderLight}` }}>
-                            <td colSpan={5} style={{ padding: '0.65rem 0.6rem', textAlign: 'right', fontWeight: 700, color: textMuted }}>Total pendiente:</td>
-                            <td colSpan={2} style={{ padding: '0.65rem 0.6rem', fontWeight: 800, color: '#059669' }}>${liquidacionData.totalPendienteUSD.toLocaleString('en-US')}</td>
+                            <td colSpan={6} style={{ padding: '0.65rem 0.6rem', textAlign: 'right', fontWeight: 700, color: textMuted }}>
+                              Total pendiente ({filtroTipoLlamada === 'todas' ? 'Todas' : filtroTipoLlamada === 'grupales' ? 'Grupales' : 'Individuales'}):
+                            </td>
+                            <td colSpan={2} style={{ padding: '0.65rem 0.6rem', fontWeight: 800, color: '#059669', fontSize: '0.95rem' }}>
+                              ${totalPendienteFiltradoUSD.toLocaleString('en-US')} USD
+                            </td>
                           </tr>
                         </tfoot>
                       </table>
@@ -1061631,7 +1062134,7 @@ export default function CentroManagers() {
                             <span style={{ fontWeight: 700, color: '#3b82f6' }}>Falta{item.faltan !== 1 ? 'n' : ''} {item.faltan}</span>
                           </div>
                           <div style={{ height: '6px', background: 'rgba(0,0,0,0.08)', borderRadius: '4px', overflow: 'hidden' }}>
-                            <div style={{ height: '100%', width: `${(item.totalLlamadas / 7) * 100}%`, background: '#3b82f6', borderRadius: '4px' }} />
+                            <div style={{ height: '100%', width: `${Math.min(100, (item.totalLlamadas / 7) * 100)}%`, background: '#3b82f6', borderRadius: '4px' }} />
                           </div>
                         </div>
                       ))}
@@ -1061642,38 +1062145,61 @@ export default function CentroManagers() {
                 {/* HISTORIAL DE PAGOS */}
                 <div style={{ background: bgCard, borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', border: `1px solid ${borderLight}`, padding: '1.5rem' }}>
                   <h3 style={{ fontSize: '1rem', color: textDark, marginBottom: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                    <CheckCircle size={16} color="#059669" /> Historial de pagos ({liquidacionData.pagados.length})
+                    <CheckCircle size={16} color="#059669" /> Historial de pagos ({filteredPagados.length})
                   </h3>
-                  {liquidacionData.pagados.length === 0 ? (
-                    <p style={{ color: textMuted, fontSize: '0.9rem' }}>Todavía no se ha marcado ningún pago.</p>
+                  {filteredPagados.length === 0 ? (
+                    <p style={{ color: textMuted, fontSize: '0.9rem' }}>Todavía no se ha marcado ningún pago para los filtros seleccionados.</p>
                   ) : (
                     <div style={{ overflowX: 'auto' }}>
                       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
                         <thead>
                           <tr style={{ background: 'rgba(5,150,105,0.08)', textAlign: 'left' }}>
-                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Equipo</th>
+                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Modalidad</th>
+                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Destinatario</th>
                             <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Sede</th>
                             <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Entrenador</th>
                             <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Monto</th>
                             <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Pagado el</th>
                             <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Pagado por</th>
-                            {canReversarPago && <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Acción</th>}
+                            {canReversarPago && <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark, textAlign: 'right' }}>Acción</th>}
                           </tr>
                         </thead>
                         <tbody>
-                          {liquidacionData.pagados.map((item, idx) => (
-                            <tr key={item.equipoKey} style={{ borderBottom: `1px solid ${borderLight}`, background: idx % 2 === 1 ? 'rgba(0,0,0,0.015)' : 'transparent' }}>
-                              <td style={{ padding: '0.65rem 0.6rem', fontWeight: 600 }}>{item.equipo} {item.numEquipo ? `(#${item.numEquipo})` : ''}</td>
+                          {filteredPagados.map((item, idx) => (
+                            <tr key={item.liquidacionKey || item.equipoKey} style={{ borderBottom: `1px solid ${borderLight}`, background: idx % 2 === 1 ? 'rgba(0,0,0,0.015)' : 'transparent' }}>
+                              <td style={{ padding: '0.65rem 0.6rem' }}>
+                                {item.tipo === 'individual' ? (
+                                  <span style={{ background: '#dbeafe', color: '#1e40af', padding: '0.2rem 0.55rem', borderRadius: '5px', fontSize: '0.72rem', fontWeight: 800, whiteSpace: 'nowrap' }}>
+                                    👤 Individual
+                                  </span>
+                                ) : (
+                                  <span style={{ background: '#f3e8ff', color: '#6b21a8', padding: '0.2rem 0.55rem', borderRadius: '5px', fontSize: '0.72rem', fontWeight: 800, whiteSpace: 'nowrap' }}>
+                                    👥 Grupal
+                                  </span>
+                                )}
+                              </td>
+                              <td style={{ padding: '0.65rem 0.6rem', fontWeight: 600 }}>
+                                {item.tipo === 'individual' ? (
+                                  <div>
+                                    <div style={{ fontWeight: 700, color: textDark }}>{item.participanteNombre}</div>
+                                    <div style={{ fontSize: '0.72rem', color: textMuted }}>Equipo: {item.equipo} {item.numEquipo ? `(#${item.numEquipo})` : ''}</div>
+                                  </div>
+                                ) : (
+                                  <div style={{ fontWeight: 700, color: textDark }}>
+                                    {item.equipo} {item.numEquipo ? `(#${item.numEquipo})` : ''}
+                                  </div>
+                                )}
+                              </td>
                               <td style={{ padding: '0.65rem 0.6rem' }}><CountryFlag sede={item.sede} /> {item.sede}</td>
                               <td style={{ padding: '0.65rem 0.6rem' }}>{item.entrenador}</td>
-                              <td style={{ padding: '0.65rem 0.6rem', fontWeight: 700, color: '#059669' }}>${item.montoUSD}</td>
+                              <td style={{ padding: '0.65rem 0.6rem', fontWeight: 700, color: '#059669' }}>${item.montoUSD} USD</td>
                               <td style={{ padding: '0.65rem 0.6rem' }}>{item.fechaPago || '-'}</td>
                               <td style={{ padding: '0.65rem 0.6rem' }}>{item.pagadoPorNombre || item.pagadoPorEmail || '-'}</td>
                               {canReversarPago && (
-                                <td style={{ padding: '0.65rem 0.6rem' }}>
+                                <td style={{ padding: '0.65rem 0.6rem', textAlign: 'right' }}>
                                   <HelpButton helpKey="reversarPago"
                                     onClick={() => handleReversarPago(item)}
-                                    title="Devuelve el equipo a pendientes. No revierte la transferencia bancaria."
+                                    title="Devuelve el registro a pendientes. No revierte la transferencia bancaria."
                                     style={{ padding: '0.35rem 0.7rem', borderRadius: '6px', border: '1px solid #dc2626', background: 'transparent', color: '#dc2626', fontWeight: 700, fontSize: '0.78rem', cursor: 'pointer' }}
                                   >
                                     Reversar pago
@@ -1061685,8 +1062211,8 @@ export default function CentroManagers() {
                         </tbody>
                         <tfoot>
                           <tr style={{ borderTop: `2px solid ${borderLight}` }}>
-                            <td colSpan={3} style={{ padding: '0.65rem 0.6rem', textAlign: 'right', fontWeight: 700, color: textMuted }}>Total pagado:</td>
-                            <td colSpan={canReversarPago ? 4 : 3} style={{ padding: '0.65rem 0.6rem', fontWeight: 800, color: '#059669' }}>${liquidacionData.totalPagadoUSD.toLocaleString('en-US')}</td>
+                            <td colSpan={4} style={{ padding: '0.65rem 0.6rem', textAlign: 'right', fontWeight: 700, color: textMuted }}>Total pagado:</td>
+                            <td colSpan={canReversarPago ? 4 : 3} style={{ padding: '0.65rem 0.6rem', fontWeight: 800, color: '#059669' }}>${totalPagadoFiltradoUSD.toLocaleString('en-US')} USD</td>
                           </tr>
                         </tfoot>
                       </table>

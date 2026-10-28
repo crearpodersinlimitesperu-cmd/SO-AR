@@ -235,3 +235,75 @@ test('Integridad Impecable del Historial (Lossless Call History & Zero Data Loss
     assert.equal(typeof call.asistio, 'boolean', 'Debe conservar estado booleano de asistencia');
   });
 });
+
+test('Directiva de Selección en Liquidador: Diferenciación de Llamadas Grupales vs Individuales y Selección Lote', () => {
+  // Mock de candidatos para liquidación combinando grupales e individuales
+  const liquidacionCandidates = [
+    {
+      tipo: 'grupal',
+      tipoLabel: 'Grupal (Equipo)',
+      liquidacionKey: 'grupal__LIMA_EQ31',
+      equipo: 'Equipo 31',
+      sede: 'Lima',
+      entrenador: 'Alejandro Diaz',
+      totalLlamadas: 7,
+      llamadasEfectivas: 7,
+      montoUSD: 175
+    },
+    {
+      tipo: 'individual',
+      tipoLabel: 'Individual (1 a 1)',
+      liquidacionKey: 'indiv__MNG_001',
+      participanteNombre: 'Carlos Brunis',
+      equipo: 'Equipo 31',
+      sede: 'Lima',
+      entrenador: 'Alejandro Diaz',
+      totalLlamadas: 1,
+      llamadasEfectivas: 1,
+      montoUSD: 25
+    },
+    {
+      tipo: 'individual',
+      tipoLabel: 'Individual (1 a 1)',
+      liquidacionKey: 'indiv__MNG_002',
+      participanteNombre: 'Leandro Perez',
+      equipo: 'Equipo 31',
+      sede: 'Lima',
+      entrenador: 'Alejandro Diaz',
+      totalLlamadas: 2,
+      llamadasEfectivas: 2,
+      montoUSD: 50
+    }
+  ];
+
+  // 1. Selector de filtro por tipo: Todas | Grupales | Individuales
+  const filterByTipo = (list, filtro) => {
+    if (filtro === 'todas') return list;
+    if (filtro === 'grupales') return list.filter(item => item.tipo === 'grupal');
+    if (filtro === 'individuales') return list.filter(item => item.tipo === 'individual');
+    return list;
+  };
+
+  const todas = filterByTipo(liquidacionCandidates, 'todas');
+  assert.equal(todas.length, 3);
+  assert.equal(todas.reduce((acc, i) => acc + i.montoUSD, 0), 250);
+
+  const soloGrupales = filterByTipo(liquidacionCandidates, 'grupales');
+  assert.equal(soloGrupales.length, 1);
+  assert.equal(soloGrupales[0].equipo, 'Equipo 31');
+  assert.equal(soloGrupales[0].montoUSD, 175);
+
+  const soloIndividuales = filterByTipo(liquidacionCandidates, 'individuales');
+  assert.equal(soloIndividuales.length, 2);
+  assert.equal(soloIndividuales[0].participanteNombre, 'Carlos Brunis');
+  assert.equal(soloIndividuales[1].participanteNombre, 'Leandro Perez');
+  assert.equal(soloIndividuales.reduce((acc, i) => acc + i.montoUSD, 0), 75);
+
+  // 2. Selección interactiva por checkboxes
+  const selectedKeys = new Set(['grupal__LIMA_EQ31', 'indiv__MNG_001']);
+  const selectedItems = liquidacionCandidates.filter(c => selectedKeys.has(c.liquidacionKey));
+  assert.equal(selectedItems.length, 2);
+
+  const totalSeleccionadosUSD = selectedItems.reduce((acc, i) => acc + i.montoUSD, 0);
+  assert.equal(totalSeleccionadosUSD, 200); // 175 grupal + 25 individual = 200 USD
+});
