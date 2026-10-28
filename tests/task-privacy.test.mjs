@@ -110,6 +110,9 @@ test('every static catalog task is included in the Firestore role allowlist', ()
     .filter(task => {
       const roleBlock = roleBlocks.get(task.role) || '';
       if (roleBlock.includes(`'${task.id}'`)) return false;
+      // Las reglas listan los ids como una sola alternación: taskId.matches('a|b|c')
+      const escapedId = task.id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      if (new RegExp(`matches\\('(?:[^']*\\|)?${escapedId}(?:\\|[^']*)?'\\)`).test(roleBlock)) return false;
       return !rangedCatalogAllowlist.some(({ role, pattern, idPattern }) =>
         role === task.role &&
         idPattern.test(task.id) &&
