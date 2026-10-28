@@ -41,7 +41,17 @@ jobs:
           APPLY_C1: ${{ github.event_name == 'workflow_run' || inputs.apply }}
         run: |
           if [ "$APPLY_C1" = "true" ]; then
-            node scripts/syncImoC1Eligibility.mjs --apply
+            CMD="node scripts/syncImoC1Eligibility.mjs --apply"
           else
-            node scripts/syncImoC1Eligibility.mjs
+            CMD="node scripts/syncImoC1Eligibility.mjs"
+          fi
+          STATUS=0
+          OUTPUT=$($CMD 2>&1) || STATUS=$?
+          echo "$OUTPUT"
+          if [ $STATUS -ne 0 ]; then
+            if echo "$OUTPUT" | grep -q "Human verification required"; then
+              echo "::warning title=Nodus Cloudflare Challenge::El servidor Nodus solicitó verificación humana (Cloudflare WAF / Captcha) para la IP del runner de GitHub. Se omite la sincronización automatizada hasta el próximo ciclo."
+              exit 0
+            fi
+            exit $STATUS
           fi
