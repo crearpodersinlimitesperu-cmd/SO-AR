@@ -1186,9 +1186,11 @@ export const USERS_TO_IMPORT = [
     ],
     "sede": "UIO",
     "emails": [
+      "gabriela.altuna@crearpsl.net",
       "1976-09-26"
     ],
-    "email": "1976-09-26"
+    "email": "gabriela.altuna@crearpsl.net",
+    "birthDate": "1976-09-26"
   },
   {
     "id": "qt_fernandamichellepereiraarmijos",
