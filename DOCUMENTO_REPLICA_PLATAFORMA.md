@@ -1010175,6 +1010175,16 @@ export default function GeneradorFlyer() {
     goldSubtle: isLight ? 'rgba(217, 119, 6, 0.12)' : 'rgba(255, 193, 7, 0.15)'
   };
 
+  const userSedeCode = (() => {
+    const s = (user?.sede || '').toLowerCase();
+    if (s.includes('cuenca') || s.includes('cue')) return 'cue';
+    if (s.includes('quito') || s.includes('uio')) return 'uio';
+    if (s.includes('guayaquil') || s.includes('gye')) return 'gye';
+    if (s.includes('medell') || s.includes('med')) return 'med';
+    if (s.includes('mex') || s.includes('méx')) return 'mex';
+    return 'lim';
+  })();
+
   // Estados del flyer
   const [tipoPrograma, setTipoPrograma] = useState('C1');
   const [programa, setPrograma] = useState('CAPÍTULO UNO');
@@ -1010184,14 +1010194,22 @@ export default function GeneradorFlyer() {
   const [sedes, setSedes] = useState(() => synchronizeFlyerRows([], 'C1'));
   const [descargando, setDescargando] = useState(false);
   const [modoFlyer, setModoFlyer] = useState(FLYER_MODE_ALL);
-  const [sedeIndividualId, setSedeIndividualId] = useState('');
+  const [sedeIndividualId, setSedeIndividualId] = useState(userSedeCode);
   const [presetActivo, setPresetActivo] = useState('calendario');
   const [showCliModal, setShowCliModal] = useState(false);
-  const [porEquipo, setPorEquipo] = useState(true);
-  const [equipoSedeId, setEquipoSedeId] = useState('lim');
+  const [porEquipo, setPorEquipo] = useState(false);
+  const [equipoSedeId, setEquipoSedeId] = useState(userSedeCode);
   const [equipoId, setEquipoId] = useState('');
   const [previewPage, setPreviewPage] = useState(0);
   const equiposDisponibles = flyerTeamsForVenue(events, equipoSedeId);
+
+  // Auto-seleccionar el primer equipo disponible cuando se activa vista por equipo
+  useEffect(() => {
+    if (porEquipo && !equipoId && equiposDisponibles.length > 0) {
+      setEquipoId(equiposDisponibles[0]);
+    }
+  }, [porEquipo, equipoSedeId, equiposDisponibles, equipoId]);
+
   const seleccionEquipo = selectTeamFlyer(events, equipoSedeId, equipoId);
   const paginasEquipo = teamFlyerPages(seleccionEquipo.sedes);
   const tituloFlyer = porEquipo ? (seleccionEquipo.error ? 'ENTRENAMIENTOS' : flyerTeamLabel(equipoId).toUpperCase()) : programa;
@@ -1011356,7 +1011374,8 @@ export default function GeneradorFlyer() {
                       onClick={() => {
                         setModoFlyer(value);
                         if (value === FLYER_MODE_SINGLE && !sedesSeleccionables.some(s => s.id === sedeIndividualId)) {
-                          setSedeIndividualId(sedesSeleccionables[0]?.id || '');
+                          const preferred = sedesSeleccionables.find(s => s.id === userSedeCode)?.id || sedesSeleccionables[0]?.id || '';
+                          setSedeIndividualId(preferred);
                         }
                       }}
                       aria-pressed={modoFlyer === value}
@@ -1054033,6 +1054052,18 @@ export default function Home() {
                     </button>
                   )}
 
+                  {canAccessFlyersC1(currentUser) && (
+                    <button 
+                      type="button"
+                      onClick={() => navigate('/generador-flyer')}
+                      className="btn-secondary"
+                      style={{ padding: '0.25rem 0.6rem', fontSize: '0.78rem', color: '#f59e0b', borderColor: 'rgba(245, 158, 11, 0.45)', background: 'rgba(245, 158, 11, 0.12)', fontWeight: 'bold' }}
+                      title="Generar Flyers Oficiales autorizados para difusión de fechas y enrolamiento"
+                    >
+                      🎨 Generar Flyer Oficial
+                    </button>
+                  )}
+
                   <div style={{ display: 'flex', gap: '0.4rem', borderLeft: '1px solid rgba(255,255,255,0.1)', paddingLeft: '0.6rem' }}>
                     {['entrenador', 'entrenador_llamadas'].includes(currentUser?.appRole) && (
                       <span style={{ color: 'var(--crear-gold)', fontWeight: 'bold', fontSize: '0.85rem' }}>
@@ -1054094,7 +1054125,7 @@ export default function Home() {
                     </span>
                   </div>
                   <p style={{ margin: 0, fontSize: '0.78rem', lineHeight: '1.45', color: '#fca5a5' }}>
-                    Toda la información expuesta en este módulo (entrenadores asignados, fechas oficiales, lugares de sala, sedes y logística operativa) es propiedad exclusiva de <strong>CREAR Poder Sin Límites</strong>. Su contenido es de carácter reservado y confidencial para la coordinación interna autorizada. Queda <strong>estrictamente prohibida</strong> su divulgación, compartición, captura o revelación a terceros sin autorización oficial expresa por escrito de la Dirección General.
+                    Toda la información operativa expuesta en este módulo (entrenadores asignados, acuerdos de sala y logística interna) es propiedad exclusiva de <strong>CREAR Poder Sin Límites</strong> y de carácter reservado para la coordinación interna autorizada. Queda <strong>estrictamente prohibida</strong> su divulgación interna o externa no autorizada o captura a terceros. Para la difusión pública de fechas y enrolamiento de participantes, genere y comparta exclusivamente los <strong>Flyers Oficiales</strong> autorizados desde el módulo de Flyers.
                   </p>
                 </div>
               </div>

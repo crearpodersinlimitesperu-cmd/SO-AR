@@ -80,6 +80,16 @@ export default function GeneradorFlyer() {
     goldSubtle: isLight ? 'rgba(217, 119, 6, 0.12)' : 'rgba(255, 193, 7, 0.15)'
   };
 
+  const userSedeCode = (() => {
+    const s = (user?.sede || '').toLowerCase();
+    if (s.includes('cuenca') || s.includes('cue')) return 'cue';
+    if (s.includes('quito') || s.includes('uio')) return 'uio';
+    if (s.includes('guayaquil') || s.includes('gye')) return 'gye';
+    if (s.includes('medell') || s.includes('med')) return 'med';
+    if (s.includes('mex') || s.includes('méx')) return 'mex';
+    return 'lim';
+  })();
+
   // Estados del flyer
   const [tipoPrograma, setTipoPrograma] = useState('C1');
   const [programa, setPrograma] = useState('CAPÍTULO UNO');
@@ -89,14 +99,22 @@ export default function GeneradorFlyer() {
   const [sedes, setSedes] = useState(() => synchronizeFlyerRows([], 'C1'));
   const [descargando, setDescargando] = useState(false);
   const [modoFlyer, setModoFlyer] = useState(FLYER_MODE_ALL);
-  const [sedeIndividualId, setSedeIndividualId] = useState('');
+  const [sedeIndividualId, setSedeIndividualId] = useState(userSedeCode);
   const [presetActivo, setPresetActivo] = useState('calendario');
   const [showCliModal, setShowCliModal] = useState(false);
-  const [porEquipo, setPorEquipo] = useState(true);
-  const [equipoSedeId, setEquipoSedeId] = useState('lim');
+  const [porEquipo, setPorEquipo] = useState(false);
+  const [equipoSedeId, setEquipoSedeId] = useState(userSedeCode);
   const [equipoId, setEquipoId] = useState('');
   const [previewPage, setPreviewPage] = useState(0);
   const equiposDisponibles = flyerTeamsForVenue(events, equipoSedeId);
+
+  // Auto-seleccionar el primer equipo disponible cuando se activa vista por equipo
+  useEffect(() => {
+    if (porEquipo && !equipoId && equiposDisponibles.length > 0) {
+      setEquipoId(equiposDisponibles[0]);
+    }
+  }, [porEquipo, equipoSedeId, equiposDisponibles, equipoId]);
+
   const seleccionEquipo = selectTeamFlyer(events, equipoSedeId, equipoId);
   const paginasEquipo = teamFlyerPages(seleccionEquipo.sedes);
   const tituloFlyer = porEquipo ? (seleccionEquipo.error ? 'ENTRENAMIENTOS' : flyerTeamLabel(equipoId).toUpperCase()) : programa;
@@ -1261,7 +1279,8 @@ export default function GeneradorFlyer() {
                       onClick={() => {
                         setModoFlyer(value);
                         if (value === FLYER_MODE_SINGLE && !sedesSeleccionables.some(s => s.id === sedeIndividualId)) {
-                          setSedeIndividualId(sedesSeleccionables[0]?.id || '');
+                          const preferred = sedesSeleccionables.find(s => s.id === userSedeCode)?.id || sedesSeleccionables[0]?.id || '';
+                          setSedeIndividualId(preferred);
                         }
                       }}
                       aria-pressed={modoFlyer === value}

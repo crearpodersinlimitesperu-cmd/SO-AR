@@ -2974,6 +2974,18 @@ export default function Home() {
                     </button>
                   )}
 
+                  {canAccessFlyersC1(currentUser) && (
+                    <button 
+                      type="button"
+                      onClick={() => navigate('/generador-flyer')}
+                      className="btn-secondary"
+                      style={{ padding: '0.25rem 0.6rem', fontSize: '0.78rem', color: '#f59e0b', borderColor: 'rgba(245, 158, 11, 0.45)', background: 'rgba(245, 158, 11, 0.12)', fontWeight: 'bold' }}
+                      title="Generar Flyers Oficiales autorizados para difusión de fechas y enrolamiento"
+                    >
+                      🎨 Generar Flyer Oficial
+                    </button>
+                  )}
+
                   <div style={{ display: 'flex', gap: '0.4rem', borderLeft: '1px solid rgba(255,255,255,0.1)', paddingLeft: '0.6rem' }}>
                     {['entrenador', 'entrenador_llamadas'].includes(currentUser?.appRole) && (
                       <span style={{ color: 'var(--crear-gold)', fontWeight: 'bold', fontSize: '0.85rem' }}>
@@ -3035,7 +3047,7 @@ export default function Home() {
                     </span>
                   </div>
                   <p style={{ margin: 0, fontSize: '0.78rem', lineHeight: '1.45', color: '#fca5a5' }}>
-                    Toda la información expuesta en este módulo (entrenadores asignados, fechas oficiales, lugares de sala, sedes y logística operativa) es propiedad exclusiva de <strong>CREAR Poder Sin Límites</strong>. Su contenido es de carácter reservado y confidencial para la coordinación interna autorizada. Queda <strong>estrictamente prohibida</strong> su divulgación, compartición, captura o revelación a terceros sin autorización oficial expresa por escrito de la Dirección General.
+                    Toda la información operativa expuesta en este módulo (entrenadores asignados, acuerdos de sala y logística interna) es propiedad exclusiva de <strong>CREAR Poder Sin Límites</strong> y de carácter reservado para la coordinación interna autorizada. Queda <strong>estrictamente prohibida</strong> su divulgación interna o externa no autorizada o captura a terceros. Para la difusión pública de fechas y enrolamiento de participantes, genere y comparta exclusivamente los <strong>Flyers Oficiales</strong> autorizados desde el módulo de Flyers.
                   </p>
                 </div>
               </div>
