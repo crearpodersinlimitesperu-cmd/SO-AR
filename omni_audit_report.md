@@ -23,7 +23,7 @@ Los siguientes módulos críticos existen en Nodus con data viva, pero NO tienen
 
 ## 2. Hallazgos Cuantitativos
 - **Usuarios en Nodus**: ~15
-- **Usuarios en Causa OS**: 108
+- **Usuarios en Causa OS**: 208
 
 ## 3. Recomendación Arquitectónica
 No podemos migrar módulo por módulo manualmente (son 35). Sugiero desplegar un **Pipeline de Migración Masiva** usando Cloud Functions que lea el inventario completo y lo vierta en colecciones espejo de Firestore automáticamente.
