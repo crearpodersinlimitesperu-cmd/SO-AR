@@ -16,7 +16,7 @@ export const SUPER_ADMIN_EMAILS = [
 // Mantener sincronizada con isGerenteODireccion() en firestore.rules.
 export const NODUS_REPORT_ADMIN_EMAILS = [
   ...SUPER_ADMIN_EMAILS,
-  'emely.leon@crearpsl.net',
+  'ricardo.gavilanez@crearpsl.net',
   'fer.aragon@crearpsl.net',
   'andres.gomez@crearpsl.net',
   'gomeznueve@gmail.com',
@@ -283,17 +283,37 @@ export const isGlobalObserver = (currentUser) => {
 };
 
 /**
- * REGLA ESTRICTA DE PRIVACIDAD (Pedido explícito de José Sánchez):
- * "ojo los inactivos en cualquier rol solo pueden ser vistos por mi y talento humano nadie mas"
+ * REGLA ESTRICTA DE PRIVACIDAD:
+ * "perfiles desactivados y esta info solo la pueden ver directivos"
+ * (Exclusivo para Directivos: Dirección General, Dirección, SuperAdmins, José Sánchez y Talento Humano activo).
  */
 export const canViewInactiveUsers = (currentUser) => {
   if (!currentUser) return false;
+  // Un usuario inactivo o desvinculado no tiene privilegios de auditar ni ver inactivos
+  if (currentUser.active === false || currentUser.estado === 'inactivo' || currentUser.role === 'inactivo' || currentUser.status === 'inactive') return false;
+
   const email = (currentUser.email || '').toLowerCase().trim();
   if (email === 'jose.sanchez@crearpsl.net' || isSuperAdminEmail(email)) return true;
+
   const r = (currentUser.appRole || currentUser.role || '').toLowerCase();
   const roles = Array.isArray(currentUser.roles) ? currentUser.roles.map(x => String(x).toLowerCase()) : [];
+
+  // Directivos autorizados: Dirección General, Directores (DIRECCION_ROLES) e isDireccion
+  if (
+    currentUser.isDireccion ||
+    currentUser.isSuperAdmin ||
+    r === 'director_general' ||
+    roles.includes('director_general') ||
+    isDireccionRole(r) ||
+    roles.some(x => isDireccionRole(x))
+  ) {
+    return true;
+  }
+
+  // Talento Humano activo
   if (r === 'talento_humano' || roles.includes('talento_humano')) return true;
   if (email === 'talento.humano@crearpsl.net' || email === 'karen.moran@crearpsl.net') return true;
+
   return false;
 };
 

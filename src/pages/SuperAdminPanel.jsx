@@ -1430,9 +1430,11 @@ export default function SuperAdminPanel() {
     transition: 'all 0.2s',
   });
 
+  const isUserInactive = (u) => u.isActive === false || u.status === 'inactive' || u.active === false || u.estado === 'inactivo' || u.role === 'inactivo' || isInactiveTrainer(u.name || u.displayName);
+
   const displayedUsersData = (realUsersData || []).filter(u => {
-    const isInactive = u.isActive === false || u.status === 'inactive' || u.active === false || isInactiveTrainer(u.name || u.displayName);
-    // REGLA ESTRICTA DE PRIVACIDAD: Usuarios inactivos SOLO visibles para José Sánchez y Talento Humano
+    const isInactive = isUserInactive(u);
+    // REGLA ESTRICTA DE PRIVACIDAD: Usuarios inactivos SOLO visibles para Directivos y Talento Humano
     if (isInactive && !canViewInactiveUsers(currentUser)) return false;
     if (statusFilter === 'ACTIVE') return !isInactive;
     if (statusFilter === 'INACTIVE') return isInactive;
@@ -1515,7 +1517,7 @@ export default function SuperAdminPanel() {
             🌐 Maestría Global (Andrés)
           </button>
           <button onClick={() => navigate('/hr-command-center')} className="btn-secondary" style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', borderRadius: '8px', border: '1px solid rgba(167, 139, 250, 0.4)', background: 'rgba(167, 139, 250, 0.1)', color: '#a78bfa', fontWeight: 600 }}>
-            🏢 Talento Humano (Lennin)
+            🏢 Talento Humano
           </button>
           <button onClick={() => navigate('/legal-hub')} className="btn-secondary" style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', borderRadius: '8px', border: '1px solid rgba(245, 158, 11, 0.4)', background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', fontWeight: 600 }}>
             ⚖️ Torre Legal (Pablo Mendieta)
@@ -1596,11 +1598,11 @@ export default function SuperAdminPanel() {
             {canViewInactiveUsers(currentUser) ? (
               <>
                 <option value="ALL" style={{ color: 'black' }}>👥 Todos ({realUsersData.length})</option>
-                <option value="ACTIVE" style={{ color: 'black' }}>🟢 Solo Activos ({realUsersData.filter(u => !(u.isActive === false || u.status === 'inactive' || u.active === false)).length})</option>
-                <option value="INACTIVE" style={{ color: 'black' }}>🔴 Solo Inactivos / Bajas ({realUsersData.filter(u => u.isActive === false || u.status === 'inactive' || u.active === false).length})</option>
+                <option value="ACTIVE" style={{ color: 'black' }}>🟢 Solo Activos ({realUsersData.filter(u => !isUserInactive(u)).length})</option>
+                <option value="INACTIVE" style={{ color: 'black' }}>🔴 Solo Inactivos / Bajas ({realUsersData.filter(u => isUserInactive(u)).length})</option>
               </>
             ) : (
-              <option value="ACTIVE" style={{ color: 'black' }}>🟢 Colaboradores Activos ({realUsersData.filter(u => !(u.isActive === false || u.status === 'inactive' || u.active === false)).length})</option>
+              <option value="ACTIVE" style={{ color: 'black' }}>🟢 Colaboradores Activos ({realUsersData.filter(u => !isUserInactive(u)).length})</option>
             )}
           </select>
         </div>

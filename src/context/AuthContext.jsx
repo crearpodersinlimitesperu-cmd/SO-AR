@@ -650,10 +650,17 @@ export function AuthProvider({ children }) {
 
       // 🚫 VALIDACIÓN DE ESTADO ACTIVO / INACTIVO (Trazabilidad y Control de Acceso)
       const esInactivoDesvinculado = isInactiveTrainer(foundUser.name || foundUser.displayName);
-      if (foundUser.isActive === false || foundUser.status === 'inactive' || foundUser.active === false || esInactivoDesvinculado) {
+      if (
+        foundUser.isActive === false || 
+        foundUser.status === 'inactive' || 
+        foundUser.active === false || 
+        foundUser.estado === 'inactivo' || 
+        foundUser.role === 'inactivo' || 
+        esInactivoDesvinculado
+      ) {
         await auth.signOut();
-        const reason = esInactivoDesvinculado ? ' (Personal desvinculado de Crear)' : (foundUser.deactivationReason ? ` (Motivo: ${foundUser.deactivationReason})` : '');
-        throw new Error(`ACCESO DENEGADO: Tu cuenta de colaborador se encuentra desactivada${reason}. Comunícate con Talento Humano o SuperAdmin.`);
+        const reason = esInactivoDesvinculado ? ' (Personal desvinculado de Crear)' : (foundUser.deactivationReason || foundUser.motivo ? ` (Motivo: ${foundUser.deactivationReason || foundUser.motivo})` : '');
+        throw new Error(`ACCESO DENEGADO: Tu cuenta de colaborador se encuentra desactivada${reason}. Comunícate con Dirección General.`);
       }
 
       // Normalizar el registro usando el esquema canónico (Hito 1)

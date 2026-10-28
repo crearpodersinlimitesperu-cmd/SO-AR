@@ -11,7 +11,8 @@ import {
   isGlobalQTCoordinator, 
   hasQTPrivileges, 
   isDireccionRole, 
-  isNonOperationalDirector 
+  isNonOperationalDirector,
+  canViewInactiveUsers
 } from '../config/permissions';
 import { normalizeRole } from '../data/usersData';
 import CountryFlag from '../components/CountryFlag';
@@ -51,6 +52,8 @@ export default function DirectorioQT() {
   
   const userSede = normalizeQTSede(currentUser?.sede || '');
   const isQTGlobalCoordinator = isGlobalQTCoordinator(currentUser);
+
+  const canSeeInactives = canViewInactiveUsers(currentUser);
 
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -125,8 +128,8 @@ export default function DirectorioQT() {
                               userRoles.includes('coord_c1') || userRoles.includes('coord_maestria');
     
     return members.filter(m => {
-      // -1. Ocultar integrantes inactivos, desvinculados o renunciados por defecto (salvo activar "Mostrar Inactivos")
-      if (!showInactive) {
+      // -1. Ocultar integrantes inactivos, desvinculados o renunciados por defecto (solo Directivos y Talento Humano pueden verlos si activan "Mostrar Inactivos")
+      if (!canSeeInactives || !showInactive) {
         if (!m.esActivo || m.role === 'inactivo' || (m.estado && (m.estado.toUpperCase().includes('INACTIVO') || m.estado.toUpperCase().includes('RENUNCIA')))) {
           return false;
         }
@@ -356,16 +359,18 @@ export default function DirectorioQT() {
             <option value="reciente" style={{ background: '#0d152d', color: '#ffffff' }}>🌱 Graduados Recientes</option>
           </select>
 
-          {/* Toggle Mostrar Inactivos */}
-          <label style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer', fontSize: '0.82rem', color: showInactive ? '#ef4444' : 'var(--text-muted, #94a3b8)', fontWeight: 700, userSelect: 'none' }}>
-            <input 
-              type="checkbox" 
-              checked={showInactive} 
-              onChange={(e) => setShowInactive(e.target.checked)} 
-              style={{ cursor: 'pointer', accentColor: '#ef4444' }}
-            />
-            Mostrar Inactivos / Bajas
-          </label>
+          {/* Toggle Mostrar Inactivos (Exclusivo Directivos y Talento Humano) */}
+          {canSeeInactives && (
+            <label style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer', fontSize: '0.82rem', color: showInactive ? '#ef4444' : 'var(--text-muted, #94a3b8)', fontWeight: 700, userSelect: 'none' }}>
+              <input 
+                type="checkbox" 
+                checked={showInactive} 
+                onChange={(e) => setShowInactive(e.target.checked)} 
+                style={{ cursor: 'pointer', accentColor: '#ef4444' }}
+              />
+              Mostrar Inactivos / Bajas
+            </label>
+          )}
         </div>
 
         {/* Vista Toggle & Contador */}

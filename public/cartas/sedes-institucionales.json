@@ -41,16 +41,20 @@
     "pais": "Ecuador",
     "gerentes": [
       {
-        "nombre": "July Leon",
-        "email": "emely.leon@crearpsl.net"
-      },
-      {
         "nombre": "Edison Ricardo Gavilánez Gallardo",
         "email": "ricardo.gavilanez@crearpsl.net"
       },
       {
         "nombre": "Edison Ricardo Gavilánez Gallardo",
         "email": "ricardogavilanez1021@gmail.com"
+      }
+    ],
+    "gerentesHistoricos": [
+      {
+        "nombre": "July Leon",
+        "email": "emely.leon@crearpsl.net",
+        "estado": "inactivo",
+        "motivo": "Renuncia voluntaria (28/10/2026)"
       }
     ],
     "razonSocial": "",

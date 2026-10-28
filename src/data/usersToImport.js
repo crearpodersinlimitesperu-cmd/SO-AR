@@ -70,8 +70,15 @@ export const USERS_TO_IMPORT = [
   {
     "id": "staff_emelyjuliettlenchavez",
     "name": "July Leon",
-    "role": "gerente",
-    "roles": [
+    "role": "inactivo",
+    "roles": [],
+    "active": false,
+    "estado": "inactivo",
+    "motivo": "Renuncia (28/10/2026)",
+    "deactivationReason": "Renuncia voluntaria a Gerencia Cuenca",
+    "deactivatedAt": "2026-10-28",
+    "previousRole": "gerente",
+    "previousRoles": [
       "gerente"
     ],
     "sede": "Cuenca",
@@ -254,8 +261,15 @@ export const USERS_TO_IMPORT = [
   {
     "id": "staff_lenninfernandochasilima",
     "name": "Lennin Chasi",
-    "role": "talento_humano",
-    "roles": [
+    "role": "inactivo",
+    "roles": [],
+    "active": false,
+    "estado": "inactivo",
+    "motivo": "Renuncia (28/10/2026)",
+    "deactivationReason": "Renuncia voluntaria a Talento Humano",
+    "deactivatedAt": "2026-10-28",
+    "previousRole": "talento_humano",
+    "previousRoles": [
       "talento_humano"
     ],
     "sede": "Global",

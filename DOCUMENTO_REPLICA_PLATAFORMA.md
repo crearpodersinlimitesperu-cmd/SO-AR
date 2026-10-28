@@ -53908,16 +53908,20 @@ export function calendarFreshnessText({ refreshing, checkedAt, sources, error, c
     "pais": "Ecuador",
     "gerentes": [
       {
-        "nombre": "July Leon",
-        "email": "emely.leon@crearpsl.net"
-      },
-      {
         "nombre": "Edison Ricardo Gavilánez Gallardo",
         "email": "ricardo.gavilanez@crearpsl.net"
       },
       {
         "nombre": "Edison Ricardo Gavilánez Gallardo",
         "email": "ricardogavilanez1021@gmail.com"
+      }
+    ],
+    "gerentesHistoricos": [
+      {
+        "nombre": "July Leon",
+        "email": "emely.leon@crearpsl.net",
+        "estado": "inactivo",
+        "motivo": "Renuncia voluntaria (28/10/2026)"
       }
     ],
     "razonSocial": "",
@@ -965596,10 +965600,17 @@ export function AuthProvider({ children }) {
 
       // 🚫 VALIDACIÓN DE ESTADO ACTIVO / INACTIVO (Trazabilidad y Control de Acceso)
       const esInactivoDesvinculado = isInactiveTrainer(foundUser.name || foundUser.displayName);
-      if (foundUser.isActive === false || foundUser.status === 'inactive' || foundUser.active === false || esInactivoDesvinculado) {
+      if (
+        foundUser.isActive === false || 
+        foundUser.status === 'inactive' || 
+        foundUser.active === false || 
+        foundUser.estado === 'inactivo' || 
+        foundUser.role === 'inactivo' || 
+        esInactivoDesvinculado
+      ) {
         await auth.signOut();
-        const reason = esInactivoDesvinculado ? ' (Personal desvinculado de Crear)' : (foundUser.deactivationReason ? ` (Motivo: ${foundUser.deactivationReason})` : '');
-        throw new Error(`ACCESO DENEGADO: Tu cuenta de colaborador se encuentra desactivada${reason}. Comunícate con Talento Humano o SuperAdmin.`);
+        const reason = esInactivoDesvinculado ? ' (Personal desvinculado de Crear)' : (foundUser.deactivationReason || foundUser.motivo ? ` (Motivo: ${foundUser.deactivationReason || foundUser.motivo})` : '');
+        throw new Error(`ACCESO DENEGADO: Tu cuenta de colaborador se encuentra desactivada${reason}. Comunícate con Dirección General.`);
       }
 
       // Normalizar el registro usando el esquema canónico (Hito 1)
@@ -968642,7 +968653,7 @@ export const SUPER_ADMIN_EMAILS = [
 // Mantener sincronizada con isGerenteODireccion() en firestore.rules.
 export const NODUS_REPORT_ADMIN_EMAILS = [
   ...SUPER_ADMIN_EMAILS,
-  'emely.leon@crearpsl.net',
+  'ricardo.gavilanez@crearpsl.net',
   'fer.aragon@crearpsl.net',
   'andres.gomez@crearpsl.net',
   'gomeznueve@gmail.com',
@@ -968909,17 +968920,37 @@ export const isGlobalObserver = (currentUser) => {
 };
 
 /**
- * REGLA ESTRICTA DE PRIVACIDAD (Pedido explícito de José Sánchez):
- * "ojo los inactivos en cualquier rol solo pueden ser vistos por mi y talento humano nadie mas"
+ * REGLA ESTRICTA DE PRIVACIDAD:
+ * "perfiles desactivados y esta info solo la pueden ver directivos"
+ * (Exclusivo para Directivos: Dirección General, Dirección, SuperAdmins, José Sánchez y Talento Humano activo).
  */
 export const canViewInactiveUsers = (currentUser) => {
   if (!currentUser) return false;
+  // Un usuario inactivo o desvinculado no tiene privilegios de auditar ni ver inactivos
+  if (currentUser.active === false || currentUser.estado === 'inactivo' || currentUser.role === 'inactivo' || currentUser.status === 'inactive') return false;
+
   const email = (currentUser.email || '').toLowerCase().trim();
   if (email === 'jose.sanchez@crearpsl.net' || isSuperAdminEmail(email)) return true;
+
   const r = (currentUser.appRole || currentUser.role || '').toLowerCase();
   const roles = Array.isArray(currentUser.roles) ? currentUser.roles.map(x => String(x).toLowerCase()) : [];
+
+  // Directivos autorizados: Dirección General, Directores (DIRECCION_ROLES) e isDireccion
+  if (
+    currentUser.isDireccion ||
+    currentUser.isSuperAdmin ||
+    r === 'director_general' ||
+    roles.includes('director_general') ||
+    isDireccionRole(r) ||
+    roles.some(x => isDireccionRole(x))
+  ) {
+    return true;
+  }
+
+  // Talento Humano activo
   if (r === 'talento_humano' || roles.includes('talento_humano')) return true;
   if (email === 'talento.humano@crearpsl.net' || email === 'karen.moran@crearpsl.net') return true;
+
   return false;
 };
 
@@ -1013829,7 +1013860,7 @@ export const KNOWN_COORDINATORS = {
 };
 
 export const GERENTES_POR_SEDE = {
-  'Cuenca': { name: 'July León / Ricardo Gavilánez', email: 'emely.leon@crearpsl.net' },
+  'Cuenca': { name: 'Ricardo Gavilánez', email: 'ricardo.gavilanez@crearpsl.net' },
   'Guayaquil': { name: 'Josué Vera', email: 'josue.vera@crearpsl.net' },
   'Lima': { name: 'José Sánchez', email: 'jose.sanchez@crearpsl.net' },
   'Medellín': { name: 'Yurany González', email: 'yurany.gonzalez@crearpsl.net' },
@@ -1040666,9 +1040697,11 @@ export default function SuperAdminPanel() {
     transition: 'all 0.2s',
   });
 
+  const isUserInactive = (u) => u.isActive === false || u.status === 'inactive' || u.active === false || u.estado === 'inactivo' || u.role === 'inactivo' || isInactiveTrainer(u.name || u.displayName);
+
   const displayedUsersData = (realUsersData || []).filter(u => {
-    const isInactive = u.isActive === false || u.status === 'inactive' || u.active === false || isInactiveTrainer(u.name || u.displayName);
-    // REGLA ESTRICTA DE PRIVACIDAD: Usuarios inactivos SOLO visibles para José Sánchez y Talento Humano
+    const isInactive = isUserInactive(u);
+    // REGLA ESTRICTA DE PRIVACIDAD: Usuarios inactivos SOLO visibles para Directivos y Talento Humano
     if (isInactive && !canViewInactiveUsers(currentUser)) return false;
     if (statusFilter === 'ACTIVE') return !isInactive;
     if (statusFilter === 'INACTIVE') return isInactive;
@@ -1040751,7 +1040784,7 @@ export default function SuperAdminPanel() {
             🌐 Maestría Global (Andrés)
           </button>
           <button onClick={() => navigate('/hr-command-center')} className="btn-secondary" style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', borderRadius: '8px', border: '1px solid rgba(167, 139, 250, 0.4)', background: 'rgba(167, 139, 250, 0.1)', color: '#a78bfa', fontWeight: 600 }}>
-            🏢 Talento Humano (Lennin)
+            🏢 Talento Humano
           </button>
           <button onClick={() => navigate('/legal-hub')} className="btn-secondary" style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', borderRadius: '8px', border: '1px solid rgba(245, 158, 11, 0.4)', background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', fontWeight: 600 }}>
             ⚖️ Torre Legal (Pablo Mendieta)
@@ -1040832,11 +1040865,11 @@ export default function SuperAdminPanel() {
             {canViewInactiveUsers(currentUser) ? (
               <>
                 <option value="ALL" style={{ color: 'black' }}>👥 Todos ({realUsersData.length})</option>
-                <option value="ACTIVE" style={{ color: 'black' }}>🟢 Solo Activos ({realUsersData.filter(u => !(u.isActive === false || u.status === 'inactive' || u.active === false)).length})</option>
-                <option value="INACTIVE" style={{ color: 'black' }}>🔴 Solo Inactivos / Bajas ({realUsersData.filter(u => u.isActive === false || u.status === 'inactive' || u.active === false).length})</option>
+                <option value="ACTIVE" style={{ color: 'black' }}>🟢 Solo Activos ({realUsersData.filter(u => !isUserInactive(u)).length})</option>
+                <option value="INACTIVE" style={{ color: 'black' }}>🔴 Solo Inactivos / Bajas ({realUsersData.filter(u => isUserInactive(u)).length})</option>
               </>
             ) : (
-              <option value="ACTIVE" style={{ color: 'black' }}>🟢 Colaboradores Activos ({realUsersData.filter(u => !(u.isActive === false || u.status === 'inactive' || u.active === false)).length})</option>
+              <option value="ACTIVE" style={{ color: 'black' }}>🟢 Colaboradores Activos ({realUsersData.filter(u => !isUserInactive(u)).length})</option>
             )}
           </select>
         </div>
@@ -1041731,7 +1041764,8 @@ import {
   isGlobalQTCoordinator, 
   hasQTPrivileges, 
   isDireccionRole, 
-  isNonOperationalDirector 
+  isNonOperationalDirector,
+  canViewInactiveUsers
 } from '../config/permissions';
 import { normalizeRole } from '../data/usersData';
 import CountryFlag from '../components/CountryFlag';
@@ -1041771,6 +1041805,8 @@ export default function DirectorioQT() {
   
   const userSede = normalizeQTSede(currentUser?.sede || '');
   const isQTGlobalCoordinator = isGlobalQTCoordinator(currentUser);
+
+  const canSeeInactives = canViewInactiveUsers(currentUser);
 
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -1041845,8 +1041881,8 @@ export default function DirectorioQT() {
                               userRoles.includes('coord_c1') || userRoles.includes('coord_maestria');
     
     return members.filter(m => {
-      // -1. Ocultar integrantes inactivos, desvinculados o renunciados por defecto (salvo activar "Mostrar Inactivos")
-      if (!showInactive) {
+      // -1. Ocultar integrantes inactivos, desvinculados o renunciados por defecto (solo Directivos y Talento Humano pueden verlos si activan "Mostrar Inactivos")
+      if (!canSeeInactives || !showInactive) {
         if (!m.esActivo || m.role === 'inactivo' || (m.estado && (m.estado.toUpperCase().includes('INACTIVO') || m.estado.toUpperCase().includes('RENUNCIA')))) {
           return false;
         }
@@ -1042076,16 +1042112,18 @@ export default function DirectorioQT() {
             <option value="reciente" style={{ background: '#0d152d', color: '#ffffff' }}>🌱 Graduados Recientes</option>
           </select>
 
-          {/* Toggle Mostrar Inactivos */}
-          <label style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer', fontSize: '0.82rem', color: showInactive ? '#ef4444' : 'var(--text-muted, #94a3b8)', fontWeight: 700, userSelect: 'none' }}>
-            <input 
-              type="checkbox" 
-              checked={showInactive} 
-              onChange={(e) => setShowInactive(e.target.checked)} 
-              style={{ cursor: 'pointer', accentColor: '#ef4444' }}
-            />
-            Mostrar Inactivos / Bajas
-          </label>
+          {/* Toggle Mostrar Inactivos (Exclusivo Directivos y Talento Humano) */}
+          {canSeeInactives && (
+            <label style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer', fontSize: '0.82rem', color: showInactive ? '#ef4444' : 'var(--text-muted, #94a3b8)', fontWeight: 700, userSelect: 'none' }}>
+              <input 
+                type="checkbox" 
+                checked={showInactive} 
+                onChange={(e) => setShowInactive(e.target.checked)} 
+                style={{ cursor: 'pointer', accentColor: '#ef4444' }}
+              />
+              Mostrar Inactivos / Bajas
+            </label>
+          )}
         </div>
 
         {/* Vista Toggle & Contador */}
@@ -1069322,7 +1069360,7 @@ export const SCHEDULE_SEDE_MANAGERS = {
   'lima': ['jose.sanchez@crearpsl.net', 'contabilidad.lima@crearpsl.net'],
   'quito': ['emily.campuzano@crearpsl.net', 'freddy.sosa@crearpsl.net', 'david.sosa@crearpsl.net'],
   'guayaquil': ['josue.vera@crearpsl.net'],
-  'cuenca': ['emely.leon@crearpsl.net', 'emely.leon@crearpls.com', 'ricardo.gavilanez@crearpsl.net', 'ricardogavilanez1021@gmail.com'],
+  'cuenca': ['ricardo.gavilanez@crearpsl.net', 'ricardogavilanez1021@gmail.com'],
   'medellin': ['yurany.gonzalez@crearpsl.net'],
   'mexico': ['nora.zamora@crearpsl.net']
 };
@@ -1071611,7 +1071649,8 @@ export const officialFinancialData = [
     sede: 'Cuenca (Ecuador)', 
     sedeKey: 'cuenca',
     pais: 'Ecuador',
-    gerentes: ['July Leon', 'Edison Ricardo Gavilánez'],
+    gerentes: ['Edison Ricardo Gavilánez'],
+    gerentesHistoricos: ['July Leon (inactiva por renuncia 28/10/2026)'],
     contadores: ['Erica Logacho'], 
     emailContable: 'asistente.contable@crearpsl.net',
     nodusIncome: 41500, 

@@ -56,7 +56,7 @@ export const KNOWN_COORDINATORS = {
 };
 
 export const GERENTES_POR_SEDE = {
-  'Cuenca': { name: 'July León / Ricardo Gavilánez', email: 'emely.leon@crearpsl.net' },
+  'Cuenca': { name: 'Ricardo Gavilánez', email: 'ricardo.gavilanez@crearpsl.net' },
   'Guayaquil': { name: 'Josué Vera', email: 'josue.vera@crearpsl.net' },
   'Lima': { name: 'José Sánchez', email: 'jose.sanchez@crearpsl.net' },
   'Medellín': { name: 'Yurany González', email: 'yurany.gonzalez@crearpsl.net' },
