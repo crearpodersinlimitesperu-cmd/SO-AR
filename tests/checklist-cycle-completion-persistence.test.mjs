@@ -76,9 +76,9 @@ test('coord_c1 operational cycle targets CAPITULO UNO and calculates future dead
   const today = new Date('2026-10-27T12:00:00');
   const lookbackDate = new Date(today.getTime() - 4 * 24 * 60 * 60 * 1000);
 
-  // When role is coord_c1, allowedEventNames is strictly CAPITULO UNO
+  // When role is coord_c1, allowedEventNames includes C1 and C2 (excludes MAESTRIA DEL JUEGO)
   const userRole = 'coord_c1';
-  const allowedEventNames = ['CAPITULO UNO'];
+  const allowedEventNames = ['CAPITULO UNO', 'CAPITULO DOS'];
 
   let nextEvent = null;
   for (const e of sedeEvents) {
@@ -196,5 +196,70 @@ test('first-time progress update creates catalog doc with participant states ins
   assert.equal(savedDoc.completed, true);
   assert.equal(savedDoc.assigneeProgress[em].completed, true);
   assert.equal(savedDoc.assigneeProgress[em].progress, 100);
+});
+
+test('coord_c1 in Cuenca for Equipo 24 transitions to C2 stage during prep week and finds CAPITULO DOS as nextEvent', () => {
+  // Cuenca Equipo 24 events
+  const cuencaEvents = [
+    { nombre: 'CAPITULO UNO', equipo: '24', fecha_inicio: '2026-10-16T00:00:00', fecha_fin: '2026-10-18T23:59:59' },
+    { nombre: 'CAPITULO DOS', equipo: '24', fecha_inicio: '2026-10-29T00:00:00', fecha_fin: '2026-10-31T23:59:59' },
+    { nombre: 'MAESTRIA DEL JUEGO', equipo: '23 y 24', fecha_inicio: '2026-11-20T00:00:00', fecha_fin: '2026-11-22T23:59:59' }
+  ];
+
+  const userRole = 'coord_c1';
+  const normRole = (userRole || '').toLowerCase().trim();
+  let allowedEventNames = ['CAPITULO UNO', 'CAPITULO DOS', 'MAESTRIA DEL JUEGO'];
+  if (normRole === 'coord_c1' || normRole === 'coord_c2' || normRole === 'coord_c1_c2' || normRole === 'coordinador_c1' || normRole === 'coordinador_c2') {
+    allowedEventNames = ['CAPITULO UNO', 'CAPITULO DOS'];
+  }
+
+  // Wednesday Oct 28, 2026 (day before C2 starts on Oct 29)
+  const todayWed28 = new Date('2026-10-28T15:19:00');
+  const lookbackDate = new Date(todayWed28.getTime() - 4 * 24 * 60 * 60 * 1000);
+
+  let nextEvent = null;
+  for (const e of cuencaEvents) {
+    const d = new Date(e.fecha_inicio.replace('Z', ''));
+    if (d >= lookbackDate && allowedEventNames.includes(e.nombre)) {
+      nextEvent = e;
+      break;
+    }
+  }
+
+  assert.ok(nextEvent, 'Must find next event for Cuenca coordinator');
+  assert.equal(nextEvent.nombre, 'CAPITULO DOS', 'Must target CAPITULO DOS, not stick to past C1 or skip to Maestria');
+  assert.equal(nextEvent.equipo, '24');
+
+  // Stage computation logic simulation matching computeStageForCycle
+  function computeStage(active, today) {
+    const c1Start = new Date(active.c1_start.replace('Z', ''));
+    const c1End = new Date(active.c1_end.replace('Z', ''));
+    const c2Start = new Date(active.c2_start.replace('Z', ''));
+    const c2End = new Date(active.c2_end.replace('Z', ''));
+    const gate1Date = new Date(c1Start);
+    gate1Date.setDate(gate1Date.getDate() - 21);
+    const c2PrepStart = active.c2_start ? new Date(c2Start.getTime() - 4 * 24 * 60 * 60 * 1000) : c2Start;
+
+    if (today < gate1Date) return 'GATE 1';
+    if (today < c1Start) return 'PRE-C1';
+    if (today >= c1Start && today <= c1End) return 'C1';
+    if (today > c1End && today < c2PrepStart) return 'POST-C1';
+    if (today >= c2PrepStart && today <= c2End) return 'C2';
+    return 'PRE-MJ';
+  }
+
+  const activeCycle = {
+    c1_start: '2026-10-16T00:00:00',
+    c1_end: '2026-10-18T23:59:59',
+    c2_start: '2026-10-29T00:00:00',
+    c2_end: '2026-10-31T23:59:59'
+  };
+
+  // Oct 20 (immediately after C1): POST-C1
+  assert.equal(computeStage(activeCycle, new Date('2026-10-20T12:00:00')), 'POST-C1');
+  // Oct 28 (Wednesday before C2): enters C2 phase for Wednesday list closing & Thursday grounding
+  assert.equal(computeStage(activeCycle, todayWed28), 'C2');
+  // Oct 29 (day of C2): C2
+  assert.equal(computeStage(activeCycle, new Date('2026-10-29T08:00:00')), 'C2');
 });
 

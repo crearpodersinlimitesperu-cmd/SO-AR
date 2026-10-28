@@ -966161,15 +966161,19 @@ function computeStageForCycle(active, today) {
   const gate1Date = new Date(c1Start);
   gate1Date.setDate(gate1Date.getDate() - 21);
 
+  // Preparativos de C2: desde 4 días antes de C2 (arranque de semana operativa: Miércoles cierre de listas, Jueves grounding)
+  // la sede entra formalmente en fase C2 para dar continuidad a las tareas críticas de coordinación
+  const c2PrepStart = active.c2_start ? new Date(c2Start.getTime() - 4 * 24 * 60 * 60 * 1000) : c2Start;
+
   if (today < gate1Date) {
     return 'GATE 1';
   } else if (today < c1Start) {
     return 'PRE-C1';
   } else if (today >= c1Start && today <= c1End) {
     return 'C1';
-  } else if (today > c1End && today < c2Start) {
+  } else if (today > c1End && today < c2PrepStart) {
     return 'POST-C1';
-  } else if (today >= c2Start && today <= c2End) {
+  } else if (today >= c2PrepStart && today <= c2End) {
     return 'C2';
   } else if (today > c2End && today < maestriaStart) {
     return 'PRE-MJ';
@@ -966342,20 +966346,14 @@ export function CyclesProvider({ children }) {
     const lookbackDate = new Date(today.getTime() - 4 * 24 * 60 * 60 * 1000);
     
     // Determinamos los tipos de eventos relevantes según el rol del usuario:
-    // - coord_c1 se enfoca en CAPITULO UNO
-    // - coord_c2 se enfoca en CAPITULO DOS
-    // - director_maestria / coord_maestria se enfoca en MAESTRIA DEL JUEGO
-    // - coord_c1_c2 se enfoca en CAPITULO UNO y DOS
+    // - Coordinadores de Capítulo 1 y 2 coordinan ambos hitos operativos (C1 y C2)
+    // - Coordinadores y directores de Maestría se enfocan en MAESTRIA DEL JUEGO
     // - Roles generales abarcan todos los hitos del ciclo
     const normRole = (userRole || '').toLowerCase().trim();
     let allowedEventNames = ['CAPITULO UNO', 'CAPITULO DOS', 'MAESTRIA DEL JUEGO'];
-    if (normRole === 'coord_c1') {
-      allowedEventNames = ['CAPITULO UNO'];
-    } else if (normRole === 'coord_c2') {
-      allowedEventNames = ['CAPITULO DOS'];
-    } else if (normRole === 'coord_c1_c2') {
+    if (normRole === 'coord_c1' || normRole === 'coord_c2' || normRole === 'coord_c1_c2' || normRole === 'coordinador_c1' || normRole === 'coordinador_c2') {
       allowedEventNames = ['CAPITULO UNO', 'CAPITULO DOS'];
-    } else if (normRole === 'director_maestria' || normRole === 'coord_maestria') {
+    } else if (normRole === 'director_maestria' || normRole === 'coord_maestria' || normRole === 'coordinador_mj') {
       allowedEventNames = ['MAESTRIA DEL JUEGO'];
     }
 
@@ -1052070,23 +1052068,26 @@ export default function Home() {
   const [activeEventTab, setActiveEventTab] = useState('locales');
   const [timeFilter, setTimeFilter] = useState('futuros');
   const [selectedSedeFilter, setSelectedSedeFilter] = useState('todas');
-  // (22/10/2026) Pedido por José: "los gerentes aquí solo deben de ver las fechas
-  // de su sede de primera vista, con la opción de ver las de las otras sedes".
-  // Al entrar (o al cambiar de usuario/simulación) el Gerente arranca filtrado
-  // en su propia sede; el selector "📍" sigue permitiendo "Todas las sedes" u
-  // otra sede. No restringe permisos: solo fija el filtro inicial.
-  const gerenteDefaultSede = (() => {
-    const role = currentUser?.appRole || currentUser?.role || '';
-    const isGerenteRole = role === 'gerente' || Boolean(currentUser?.isGerente);
+  // (22/10/2026 y 28/10/2026) Pedido por José: Gerentes y Coordinadores aquí deben de ver
+  // las fechas de su sede de primera vista, con la opción de ver las de las otras sedes.
+  // Al entrar (o al cambiar de usuario/simulación) arrancan filtrados en su propia sede;
+  // el selector "📍" sigue permitiendo "Todas las sedes" u otra sede sin restricciones.
+  const userDefaultSede = (() => {
+    const role = (currentUser?.appRole || currentUser?.role || '').toLowerCase().trim();
     const isSuperOrDir = Boolean(currentUser?.isDireccion) ||
       ['direccion', 'cfo', 'ceo', 'cco', 'superadmin', 'super_admin', 'consolidado'].includes(role);
-    if (!isGerenteRole || isSuperOrDir) return '';
+    if (isSuperOrDir) return '';
+
+    const isGerenteRole = role === 'gerente' || Boolean(currentUser?.isGerente);
+    const isCoordRole = role.startsWith('coord') || role.startsWith('coordinador');
+    if (!isGerenteRole && !isCoordRole) return '';
+
     const sedeNorm = normalizeSede(currentUser?.sede);
     return ['Lima', 'Quito', 'Guayaquil', 'Cuenca', 'Medellín', 'México'].includes(sedeNorm) ? sedeNorm : '';
   })();
   useEffect(() => {
-    setSelectedSedeFilter(gerenteDefaultSede || 'todas');
-  }, [currentUser?.email, gerenteDefaultSede]);
+    setSelectedSedeFilter(userDefaultSede || 'todas');
+  }, [currentUser?.email, userDefaultSede]);
   const [selectedTrainingFilter, setSelectedTrainingFilter] = useState('todos');
   const [searchQuery, setSearchQuery] = useState('');
   const [publicTrainerAssignments, setPublicTrainerAssignments] = useState({});

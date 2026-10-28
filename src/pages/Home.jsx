@@ -1009,23 +1009,26 @@ export default function Home() {
   const [activeEventTab, setActiveEventTab] = useState('locales');
   const [timeFilter, setTimeFilter] = useState('futuros');
   const [selectedSedeFilter, setSelectedSedeFilter] = useState('todas');
-  // (22/10/2026) Pedido por José: "los gerentes aquí solo deben de ver las fechas
-  // de su sede de primera vista, con la opción de ver las de las otras sedes".
-  // Al entrar (o al cambiar de usuario/simulación) el Gerente arranca filtrado
-  // en su propia sede; el selector "📍" sigue permitiendo "Todas las sedes" u
-  // otra sede. No restringe permisos: solo fija el filtro inicial.
-  const gerenteDefaultSede = (() => {
-    const role = currentUser?.appRole || currentUser?.role || '';
-    const isGerenteRole = role === 'gerente' || Boolean(currentUser?.isGerente);
+  // (22/10/2026 y 28/10/2026) Pedido por José: Gerentes y Coordinadores aquí deben de ver
+  // las fechas de su sede de primera vista, con la opción de ver las de las otras sedes.
+  // Al entrar (o al cambiar de usuario/simulación) arrancan filtrados en su propia sede;
+  // el selector "📍" sigue permitiendo "Todas las sedes" u otra sede sin restricciones.
+  const userDefaultSede = (() => {
+    const role = (currentUser?.appRole || currentUser?.role || '').toLowerCase().trim();
     const isSuperOrDir = Boolean(currentUser?.isDireccion) ||
       ['direccion', 'cfo', 'ceo', 'cco', 'superadmin', 'super_admin', 'consolidado'].includes(role);
-    if (!isGerenteRole || isSuperOrDir) return '';
+    if (isSuperOrDir) return '';
+
+    const isGerenteRole = role === 'gerente' || Boolean(currentUser?.isGerente);
+    const isCoordRole = role.startsWith('coord') || role.startsWith('coordinador');
+    if (!isGerenteRole && !isCoordRole) return '';
+
     const sedeNorm = normalizeSede(currentUser?.sede);
     return ['Lima', 'Quito', 'Guayaquil', 'Cuenca', 'Medellín', 'México'].includes(sedeNorm) ? sedeNorm : '';
   })();
   useEffect(() => {
-    setSelectedSedeFilter(gerenteDefaultSede || 'todas');
-  }, [currentUser?.email, gerenteDefaultSede]);
+    setSelectedSedeFilter(userDefaultSede || 'todas');
+  }, [currentUser?.email, userDefaultSede]);
   const [selectedTrainingFilter, setSelectedTrainingFilter] = useState('todos');
   const [searchQuery, setSearchQuery] = useState('');
   const [publicTrainerAssignments, setPublicTrainerAssignments] = useState({});
