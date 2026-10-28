@@ -35,7 +35,20 @@ export async function recordIndividualCall(db, {
   const managerRef = managerDocumentRef(db, manager);
   return runTransaction(db, async transaction => {
     const snapshot = await transaction.get(managerRef);
-    if (!snapshot.exists()) throw new Error('Manager document does not exist.');
+    if (!snapshot.exists()) {
+      // Auto-crear el documento en Firestore si sólo existía en el catálogo local
+      const initialDoc = {
+        ...(manager || {}),
+        docId: managerRef.id,
+        id: manager?.id || managerRef.id,
+        llamadaFecha: date,
+        llamadaAsistio: asistio ? 'SI' : 'NO',
+        llamadasHistorial: [event],
+        createdAtIso: new Date().toISOString(),
+      };
+      transaction.set(managerRef, initialDoc);
+      return event;
+    }
 
     const currentHistory = Array.isArray(snapshot.data().llamadasHistorial)
       ? snapshot.data().llamadasHistorial
@@ -129,27 +142,50 @@ export async function recordGroupCall(db, {
     const existing = await transaction.get(callRef);
     if (existing.exists()) return { alreadyRecorded: true, callId: id };
 
-    for (const member of members) {
-      transaction.update(member.ref, {
-        llamadaFecha: date,
-        llamadaAsistio: member.asistio ? 'SI' : 'NO',
-        llamadasHistorial: arrayUnion({
-          id,
-          tipo: 'grupal',
-          tipoContacto: contactType,
-          duracionMinutos: duration,
-          meetUrl: call.meetUrl,
-          notaVozEnviada: call.notaVozEnviada,
-          llamadaEfectiva: member.asistio,
-          fecha: date,
-          asistio: member.asistio,
+    // Todas las lecturas antes de escrituras (regla de transacciones Firestore)
+    const memberSnapshots = await Promise.all(
+      members.map(member => transaction.get(member.ref))
+    );
+
+    for (let i = 0; i < members.length; i++) {
+      const member = members[i];
+      const memberSnap = memberSnapshots[i];
+      const groupCallEvent = {
+        id,
+        tipo: 'grupal',
+        tipoContacto: contactType,
+        duracionMinutos: duration,
+        meetUrl: call.meetUrl,
+        notaVozEnviada: call.notaVozEnviada,
+        llamadaEfectiva: member.asistio,
+        fecha: date,
+        asistio: member.asistio,
+        equipo: team,
+        sede: normalizedSede,
+        registradoPorEmail,
+        registradoPorNombre,
+        createdAtIso: call.createdAtIso,
+      };
+
+      if (!memberSnap.exists()) {
+        transaction.set(member.ref, {
+          id: member.id,
+          docId: member.ref.id,
           equipo: team,
+          numEquipo,
           sede: normalizedSede,
-          registradoPorEmail,
-          registradoPorNombre,
-          createdAtIso: call.createdAtIso,
-        }),
-      });
+          llamadaFecha: date,
+          llamadaAsistio: member.asistio ? 'SI' : 'NO',
+          llamadasHistorial: [groupCallEvent],
+          createdAtIso: new Date().toISOString()
+        });
+      } else {
+        transaction.update(member.ref, {
+          llamadaFecha: date,
+          llamadaAsistio: member.asistio ? 'SI' : 'NO',
+          llamadasHistorial: arrayUnion(groupCallEvent),
+        });
+      }
     }
     transaction.set(callRef, call);
     return { alreadyRecorded: false, callId: id };

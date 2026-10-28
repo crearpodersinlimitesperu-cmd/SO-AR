@@ -966346,15 +966346,14 @@ export function CyclesProvider({ children }) {
     const lookbackDate = new Date(today.getTime() - 4 * 24 * 60 * 60 * 1000);
     
     // Determinamos los tipos de eventos relevantes según el rol del usuario:
-    // - Coordinadores de Capítulo 1 y 2 coordinan ambos hitos operativos (C1 y C2)
-    // - Coordinadores y directores de Maestría se enfocan en MAESTRIA DEL JUEGO
+    // - Coordinadores C1/C2 se enfocan en los hitos de sala C1 y C2 (excluyen Maestría)
+    // - Coordinadores y directores de Maestría abarcan el ciclo completo (C1, C2 y MJ)
+    //   para dar seguimiento integral a sus tareas de POST-C1, C2 y Maestría del Juego
     // - Roles generales abarcan todos los hitos del ciclo
     const normRole = (userRole || '').toLowerCase().trim();
     let allowedEventNames = ['CAPITULO UNO', 'CAPITULO DOS', 'MAESTRIA DEL JUEGO'];
     if (normRole === 'coord_c1' || normRole === 'coord_c2' || normRole === 'coord_c1_c2' || normRole === 'coordinador_c1' || normRole === 'coordinador_c2') {
       allowedEventNames = ['CAPITULO UNO', 'CAPITULO DOS'];
-    } else if (normRole === 'director_maestria' || normRole === 'coord_maestria' || normRole === 'coordinador_mj') {
-      allowedEventNames = ['MAESTRIA DEL JUEGO'];
     }
 
     let nextEvent = null;
@@ -1054252,14 +1054251,21 @@ export default function Home() {
                       }
 
                       // 2. Coordinadores (C1/C2, Maestría y Coordinación de Sede):
-                      // Confirmado: las coordinadoras y coordinadores de cada sede pueden ver
-                      // todas las fechas, lugares y entrenadores de sus sedes.
+                      // Confirmado: coordinadoras y coordinadores arrancan viendo las fechas de su sede,
+                      // pero pueden consultar libremente cualquier otra sede seleccionándola en el filtro (ej. Medellín).
                       if (isCoordinator) {
-                        const userSedeNorm = normalizeSede(currentUser?.sede);
-                        if (userSedeNorm !== 'Sede Global') {
+                        if (selectedSedeFilter !== 'todas') {
+                          const sfNorm = normalizeSede(selectedSedeFilter);
                           const evSedeRaw = ev.sede || ev.sedeTag || '';
-                          if (!evSedeRaw || normalizeSede(evSedeRaw) !== userSedeNorm) {
-                            return false;
+                          return normalizeSede(evSedeRaw) === sfNorm;
+                        }
+                        if (activeEventTab === 'locales') {
+                          const userSedeNorm = normalizeSede(currentUser?.sede);
+                          if (userSedeNorm !== 'Sede Global') {
+                            const evSedeRaw = ev.sede || ev.sedeTag || '';
+                            if (!evSedeRaw || normalizeSede(evSedeRaw) !== userSedeNorm) {
+                              return false;
+                            }
                           }
                         }
                         // Ven todos los eventos y entrenadores de su sede (C1, C2, MJ y Especiales)
@@ -1066770,7 +1066776,20 @@ export async function recordIndividualCall(db, {
   const managerRef = managerDocumentRef(db, manager);
   return runTransaction(db, async transaction => {
     const snapshot = await transaction.get(managerRef);
-    if (!snapshot.exists()) throw new Error('Manager document does not exist.');
+    if (!snapshot.exists()) {
+      // Auto-crear el documento en Firestore si sólo existía en el catálogo local
+      const initialDoc = {
+        ...(manager || {}),
+        docId: managerRef.id,
+        id: manager?.id || managerRef.id,
+        llamadaFecha: date,
+        llamadaAsistio: asistio ? 'SI' : 'NO',
+        llamadasHistorial: [event],
+        createdAtIso: new Date().toISOString(),
+      };
+      transaction.set(managerRef, initialDoc);
+      return event;
+    }
 
     const currentHistory = Array.isArray(snapshot.data().llamadasHistorial)
       ? snapshot.data().llamadasHistorial
@@ -1066864,27 +1066883,50 @@ export async function recordGroupCall(db, {
     const existing = await transaction.get(callRef);
     if (existing.exists()) return { alreadyRecorded: true, callId: id };
 
-    for (const member of members) {
-      transaction.update(member.ref, {
-        llamadaFecha: date,
-        llamadaAsistio: member.asistio ? 'SI' : 'NO',
-        llamadasHistorial: arrayUnion({
-          id,
-          tipo: 'grupal',
-          tipoContacto: contactType,
-          duracionMinutos: duration,
-          meetUrl: call.meetUrl,
-          notaVozEnviada: call.notaVozEnviada,
-          llamadaEfectiva: member.asistio,
-          fecha: date,
-          asistio: member.asistio,
+    // Todas las lecturas antes de escrituras (regla de transacciones Firestore)
+    const memberSnapshots = await Promise.all(
+      members.map(member => transaction.get(member.ref))
+    );
+
+    for (let i = 0; i < members.length; i++) {
+      const member = members[i];
+      const memberSnap = memberSnapshots[i];
+      const groupCallEvent = {
+        id,
+        tipo: 'grupal',
+        tipoContacto: contactType,
+        duracionMinutos: duration,
+        meetUrl: call.meetUrl,
+        notaVozEnviada: call.notaVozEnviada,
+        llamadaEfectiva: member.asistio,
+        fecha: date,
+        asistio: member.asistio,
+        equipo: team,
+        sede: normalizedSede,
+        registradoPorEmail,
+        registradoPorNombre,
+        createdAtIso: call.createdAtIso,
+      };
+
+      if (!memberSnap.exists()) {
+        transaction.set(member.ref, {
+          id: member.id,
+          docId: member.ref.id,
           equipo: team,
+          numEquipo,
           sede: normalizedSede,
-          registradoPorEmail,
-          registradoPorNombre,
-          createdAtIso: call.createdAtIso,
-        }),
-      });
+          llamadaFecha: date,
+          llamadaAsistio: member.asistio ? 'SI' : 'NO',
+          llamadasHistorial: [groupCallEvent],
+          createdAtIso: new Date().toISOString()
+        });
+      } else {
+        transaction.update(member.ref, {
+          llamadaFecha: date,
+          llamadaAsistio: member.asistio ? 'SI' : 'NO',
+          llamadasHistorial: arrayUnion(groupCallEvent),
+        });
+      }
     }
     transaction.set(callRef, call);
     return { alreadyRecorded: false, callId: id };
@@ -1074489,7 +1074531,7 @@ export const createGoogleEvent = async (eventDetails, token) => {
 import { doc } from 'firebase/firestore';
 
 export function managerDocumentRef(db, manager) {
-  const id = manager?.docId;
+  const id = manager?.docId || manager?.id;
   if (id === undefined || id === null || String(id).trim() === '') {
     throw new Error('Cannot persist a manager without a Firestore document id.');
   }

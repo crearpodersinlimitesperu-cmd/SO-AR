@@ -327,15 +327,14 @@ export function CyclesProvider({ children }) {
     const lookbackDate = new Date(today.getTime() - 4 * 24 * 60 * 60 * 1000);
     
     // Determinamos los tipos de eventos relevantes según el rol del usuario:
-    // - Coordinadores de Capítulo 1 y 2 coordinan ambos hitos operativos (C1 y C2)
-    // - Coordinadores y directores de Maestría se enfocan en MAESTRIA DEL JUEGO
+    // - Coordinadores C1/C2 se enfocan en los hitos de sala C1 y C2 (excluyen Maestría)
+    // - Coordinadores y directores de Maestría abarcan el ciclo completo (C1, C2 y MJ)
+    //   para dar seguimiento integral a sus tareas de POST-C1, C2 y Maestría del Juego
     // - Roles generales abarcan todos los hitos del ciclo
     const normRole = (userRole || '').toLowerCase().trim();
     let allowedEventNames = ['CAPITULO UNO', 'CAPITULO DOS', 'MAESTRIA DEL JUEGO'];
     if (normRole === 'coord_c1' || normRole === 'coord_c2' || normRole === 'coord_c1_c2' || normRole === 'coordinador_c1' || normRole === 'coordinador_c2') {
       allowedEventNames = ['CAPITULO UNO', 'CAPITULO DOS'];
-    } else if (normRole === 'director_maestria' || normRole === 'coord_maestria' || normRole === 'coordinador_mj') {
-      allowedEventNames = ['MAESTRIA DEL JUEGO'];
     }
 
     let nextEvent = null;

@@ -263,3 +263,58 @@ test('coord_c1 in Cuenca for Equipo 24 transitions to C2 stage during prep week 
   assert.equal(computeStage(activeCycle, new Date('2026-10-29T08:00:00')), 'C2');
 });
 
+test('coord_maestria in Lima tracks active cycle (Equipo 32) and calculates current October/November deadlines without August 2026 regression', () => {
+  const limaEvents = [
+    { nombre: 'CAPITULO UNO', equipo: '32', fecha_inicio: '2026-10-23T00:00:00', fecha_fin: '2026-10-25T23:59:59' },
+    { nombre: 'CAPITULO DOS', equipo: '32', fecha_inicio: '2026-11-06T00:00:00', fecha_fin: '2026-11-08T23:59:59' },
+    { nombre: 'MAESTRIA DEL JUEGO', equipo: '30, 31 y 32', fecha_inicio: '2026-11-27T00:00:00', fecha_fin: '2026-11-29T23:59:59' }
+  ];
+
+  const userRole = 'coord_maestria';
+  const normRole = (userRole || '').toLowerCase().trim();
+  // Maestría coordinators cover C1, C2, and Maestría
+  let allowedEventNames = ['CAPITULO UNO', 'CAPITULO DOS', 'MAESTRIA DEL JUEGO'];
+  if (normRole === 'coord_c1' || normRole === 'coord_c2' || normRole === 'coord_c1_c2' || normRole === 'coordinador_c1' || normRole === 'coordinador_c2') {
+    allowedEventNames = ['CAPITULO UNO', 'CAPITULO DOS'];
+  }
+
+  const today = new Date('2026-10-28T12:00:00');
+  const lookbackDate = new Date(today.getTime() - 4 * 24 * 60 * 60 * 1000);
+
+  let nextEvent = null;
+  for (const e of limaEvents) {
+    const d = new Date(e.fecha_inicio.replace('Z', ''));
+    if (d >= lookbackDate && allowedEventNames.includes(e.nombre)) {
+      nextEvent = e;
+      break;
+    }
+  }
+
+  assert.ok(nextEvent, 'Must find active event for Lima Maestria coordinator');
+  // C1 was Oct 23-25; lookbackDate is Oct 24, so C1 is in active window or C2 is next
+  assert.ok(['32', '30, 31 y 32'].includes(nextEvent.equipo));
+
+  const activeCycle = {
+    id: 'LIM-EQ-32',
+    name: 'Equipo 32',
+    c1_start: '2026-10-23T00:00:00',
+    c1_end: '2026-10-25T23:59:59',
+    c2_start: '2026-11-06T00:00:00',
+    c2_end: '2026-11-08T23:59:59',
+    maestria_start: '2026-11-27T00:00:00',
+    maestria_end: '2026-11-29T23:59:59'
+  };
+
+  // Test the task in Linid's screenshot: cmj_postc1_12 ("Confirmar salones y audio")
+  const task = {
+    id: 'cmj_postc1_12',
+    task: 'Confirmar salones y audio.',
+    cyclePhase: 'POST-C1',
+    isCritical: true
+  };
+
+  const deadline = calculateAutomaticDeadline(task, activeCycle);
+  assert.ok(deadline.startsWith('2026-10-'), `Deadline must be in October 2026, got ${deadline}`);
+  assert.ok(!deadline.startsWith('2026-08-'), 'Must NOT fall back to August 2026 (71d overdue bug eliminated)');
+});
+

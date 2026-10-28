@@ -3174,14 +3174,21 @@ export default function Home() {
                       }
 
                       // 2. Coordinadores (C1/C2, Maestría y Coordinación de Sede):
-                      // Confirmado: las coordinadoras y coordinadores de cada sede pueden ver
-                      // todas las fechas, lugares y entrenadores de sus sedes.
+                      // Confirmado: coordinadoras y coordinadores arrancan viendo las fechas de su sede,
+                      // pero pueden consultar libremente cualquier otra sede seleccionándola en el filtro (ej. Medellín).
                       if (isCoordinator) {
-                        const userSedeNorm = normalizeSede(currentUser?.sede);
-                        if (userSedeNorm !== 'Sede Global') {
+                        if (selectedSedeFilter !== 'todas') {
+                          const sfNorm = normalizeSede(selectedSedeFilter);
                           const evSedeRaw = ev.sede || ev.sedeTag || '';
-                          if (!evSedeRaw || normalizeSede(evSedeRaw) !== userSedeNorm) {
-                            return false;
+                          return normalizeSede(evSedeRaw) === sfNorm;
+                        }
+                        if (activeEventTab === 'locales') {
+                          const userSedeNorm = normalizeSede(currentUser?.sede);
+                          if (userSedeNorm !== 'Sede Global') {
+                            const evSedeRaw = ev.sede || ev.sedeTag || '';
+                            if (!evSedeRaw || normalizeSede(evSedeRaw) !== userSedeNorm) {
+                              return false;
+                            }
                           }
                         }
                         // Ven todos los eventos y entrenadores de su sede (C1, C2, MJ y Especiales)
