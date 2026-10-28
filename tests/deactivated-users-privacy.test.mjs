@@ -48,3 +48,13 @@ test('July Leon no tiene privilegios de Nodus Report Admin ni en firestore.rules
   const rules = readFileSync(new URL('../firestore.rules', import.meta.url), 'utf8');
   assert.equal(rules.includes('emely.leon@crearpsl.net'), false);
 });
+
+test('Andrés Gómez está configurado formalmente como Directivo', () => {
+  const andres = USERS_TO_IMPORT.find(u => u.id === 'staff_andresgomez');
+  assert.ok(andres, 'Andrés Gómez debe existir en el catálogo');
+  assert.equal(andres.role, 'direccion');
+  assert.equal(andres.isDireccion, true);
+  assert.ok(andres.roles.includes('direccion'));
+  assert.ok(andres.roles.includes('director_maestria'));
+  assert.equal(canViewInactiveUsers(andres), true);
+});

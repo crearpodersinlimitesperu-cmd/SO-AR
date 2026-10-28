@@ -37,8 +37,8 @@ export const normalizeRole = (role) => {
   // Manager
   if (r === 'manager' || r === 'managers') return 'manager';
   
-  // Direccion (CEO, CCO, Socio)
-  if (r.includes('ceo') || r.includes('cco') || r.includes('socio') || r.includes('direccion') || r.includes('dirección')) return 'direccion';
+  // Direccion (CEO, CCO, Socio, Directivo)
+  if (r.includes('ceo') || r.includes('cco') || r.includes('socio') || r.includes('direccion') || r.includes('dirección') || r.includes('directivo')) return 'direccion';
   
   // CFO / Finanzas
   if (r === 'cfo' || r.includes('jefa financiera') || r.includes('jefe financiero')) return 'cfo';
