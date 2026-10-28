@@ -1056559,7 +1056559,7 @@ import {
   Edit3, Trash2, UserPlus, Shield, Crown, Check, CheckSquare, Square,
   ShieldCheck, Lock, AlertTriangle, Target, ArrowUpDown, ArrowUp, ArrowDown,
   BarChart3, GitMerge, ArrowRight, FileSpreadsheet, ExternalLink,
-  List, LayoutGrid, CreditCard
+  List, LayoutGrid, CreditCard, Activity
 } from 'lucide-react';
 import { 
   MAX_TRAINER_LOAD, 
