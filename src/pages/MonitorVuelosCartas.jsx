@@ -21,6 +21,7 @@ import {
   Building,
   Phone,
   ArrowLeft,
+  ArrowRight,
   RefreshCw,
   CheckCircle,
   AlertTriangle,
@@ -784,7 +785,7 @@ export default function MonitorVuelosCartas() {
   const flightsList = Object.values(trackerData?.flights || {});
 
   // Filtro de vuelos según Sede seleccionada, estado y rutas
-  const filteredFlights = flightsList.filter(f => {
+  const rawFilteredFlights = flightsList.filter(f => {
     if (!matchesFlightTimeFilter(f, flightStatusFilter, now)) return false;
 
     // Filtro por Sede seleccionada
@@ -828,6 +829,21 @@ export default function MonitorVuelosCartas() {
     }
     return true;
   });
+
+  // Deduplicación canónica estricta para garantizar que no aparezcan vuelos repetidos sin contexto
+  const seenFlightKeys = new Set();
+  const filteredFlights = rawFilteredFlights.filter(f => {
+    const flightId = (f.flightNumber || f.flightCode || '').trim().toUpperCase();
+    const pnr = (f.reservationCode || '').trim().toUpperCase();
+    const sched = f.schedule?.scheduledDeparture || '';
+    const orig = (f.route?.origin || '').trim().toUpperCase();
+    const dest = (f.route?.destination || '').trim().toUpperCase();
+    const key = `${flightId}_${pnr}_${sched}_${orig}_${dest}`;
+    if (seenFlightKeys.has(key)) return false;
+    seenFlightKeys.add(key);
+    return true;
+  });
+
   filteredFlights.sort((a, b) => new Date(a.schedule?.scheduledDeparture || new Date()).getTime() - new Date(b.schedule?.scheduledDeparture || new Date()).getTime());
 
   // Filtro de cartas según Sede seleccionada y búsqueda
@@ -1329,12 +1345,28 @@ export default function MonitorVuelosCartas() {
                     }}
                   >
                     <div>
-                      <div className="flight-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                        <div className="flight-card-date">
-                          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Fecha y Hora</div>
-                          <div className="flight-card-date-value" style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-main)' }}>
-                            {Number.isFinite(schedDep.getTime()) ? `${schedDep.toLocaleDateString([], { timeZone: 'America/Guayaquil' })} ${schedDep.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'America/Guayaquil' })}` : 'Fecha no disponible'}
-                          </div>
+                      {/* Cabecera: Número de Vuelo, Aerolínea y Estado Operativo */}
+                      <div className="flight-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            background: 'rgba(56, 189, 248, 0.2)',
+                            color: '#38bdf8',
+                            padding: '4px 10px',
+                            borderRadius: '8px',
+                            fontSize: '0.92rem',
+                            fontWeight: 800,
+                            letterSpacing: '0.02em',
+                            border: '1px solid rgba(56, 189, 248, 0.35)'
+                          }}>
+                            <Plane size={15} />
+                            {flight.flightNumber || flight.flightCode || 'Vuelo'}
+                          </span>
+                          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+                            {flight.airline || 'Aerolínea'}
+                          </span>
                         </div>
                         <div className="flight-status-wrap">
                           <span className="flight-status-badge" style={{
@@ -1342,7 +1374,7 @@ export default function MonitorVuelosCartas() {
                             color: '#38bdf8',
                             padding: '4px 12px',
                             borderRadius: '12px',
-                            fontSize: '0.8rem',
+                            fontSize: '0.78rem',
                             fontWeight: 700
                           }}>
                             {flightTimeWindow(flight, now) === 'estimated' ? 'En horario estimado' : flight.statusLabel}
@@ -1350,12 +1382,74 @@ export default function MonitorVuelosCartas() {
                         </div>
                       </div>
 
+                      {/* CONTEXTO DE RUTA CLARO: Origen ➔ Destino (IATA, Ciudades, Aeropuertos) */}
+                      <div style={{
+                        background: 'rgba(255, 255, 255, 0.03)',
+                        border: '1px solid rgba(255, 255, 255, 0.08)',
+                        borderRadius: '12px',
+                        padding: '0.85rem 1rem',
+                        marginBottom: '0.85rem'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem' }}>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontSize: '1.3rem', fontWeight: 900, color: '#f8fafc', letterSpacing: '0.03em' }}>
+                              {flight.route?.origin || 'ORIG'}
+                            </div>
+                            <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#38bdf8', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                              {flight.route?.originCity || 'Origen'}
+                            </div>
+                            {flight.route?.originAirport && (
+                              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                {flight.route.originAirport}
+                              </div>
+                            )}
+                          </div>
+
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '0 0.5rem', flexShrink: 0 }}>
+                            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: '2px' }}>
+                              {flight.route?.flightDuration || 'Directo'}
+                            </span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#38bdf8' }}>
+                              <div style={{ width: '18px', height: '1px', background: 'rgba(56, 189, 248, 0.5)' }} />
+                              <ArrowRight size={16} />
+                              <div style={{ width: '18px', height: '1px', background: 'rgba(56, 189, 248, 0.5)' }} />
+                            </div>
+                            <span style={{ fontSize: '0.65rem', color: 'rgba(56, 189, 248, 0.8)', marginTop: '2px', textTransform: 'uppercase', fontWeight: 700 }}>
+                              Tramo {flight.route?.isDirect ? 'Directo' : 'Conexión'}
+                            </span>
+                          </div>
+
+                          <div style={{ flex: 1, minWidth: 0, textAlign: 'right' }}>
+                            <div style={{ fontSize: '1.3rem', fontWeight: 900, color: '#f8fafc', letterSpacing: '0.03em' }}>
+                              {flight.route?.destination || 'DEST'}
+                            </div>
+                            <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#38bdf8', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                              {flight.route?.destinationCity || 'Destino'}
+                            </div>
+                            {flight.route?.destinationAirport && (
+                              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                {flight.route.destinationAirport}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Fecha y Hora de Salida Programada */}
+                      <div className="flight-card-date" style={{ marginBottom: '0.75rem' }}>
+                        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Fecha y Hora Programada</div>
+                        <div className="flight-card-date-value" style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-main)' }}>
+                          {Number.isFinite(schedDep.getTime()) ? `${schedDep.toLocaleDateString([], { timeZone: 'America/Guayaquil' })} ${schedDep.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'America/Guayaquil' })}` : 'Fecha no disponible'}
+                        </div>
+                      </div>
+
+                      {/* Contador de Tiempo Restante */}
                       <div className="flight-departure-countdown" style={{
                         background: 'rgba(56,189,248,0.08)',
                         border: '1px solid rgba(56,189,248,0.25)',
                         padding: '0.85rem 1rem',
                         borderRadius: '12px',
-                        marginBottom: '1rem'
+                        marginBottom: '0.85rem'
                       }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: 'var(--text-main)', marginBottom: '6px' }}>
                           <Clock size={16} aria-hidden="true" />
@@ -1372,35 +1466,105 @@ export default function MonitorVuelosCartas() {
                         </div>
                       </div>
 
-                      <div style={{ background: 'rgba(255,255,255,0.02)', padding: '1rem', borderRadius: '12px', marginBottom: '1rem' }}>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                      {/* Código de Reserva (PNR) con Botón de Copiado */}
+                      <div style={{ background: 'rgba(255,255,255,0.02)', padding: '0.75rem 1rem', borderRadius: '12px', marginBottom: '0.85rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <div>
-                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Aerolínea</div>
-                            <div style={{ fontSize: '0.95rem', color: '#38bdf8', fontWeight: 600 }}>{flight.airline || 'N/A'}</div>
+                            <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Código de reserva (PNR)</div>
+                            <div style={{ fontSize: '1.25rem', color: 'var(--crear-gold)', fontWeight: 800, letterSpacing: '0.05em' }}>
+                              {flight.reservationCode || 'N/A'}
+                            </div>
                           </div>
-                          <div>
-                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Código de reserva (PNR)</div>
-                            <div style={{ fontSize: '1.1rem', color: 'var(--crear-gold)', fontWeight: 800 }}>{flight.reservationCode || 'N/A'}</div>
-                          </div>
+                          {flight.reservationCode && (
+                            <button
+                              onClick={() => copyToClipboard(flight.reservationCode, 'Código PNR')}
+                              style={{
+                                background: 'rgba(255, 183, 3, 0.12)',
+                                border: '1px solid rgba(255, 183, 3, 0.3)',
+                                color: 'var(--crear-gold)',
+                                padding: '6px 10px',
+                                borderRadius: '8px',
+                                fontSize: '0.75rem',
+                                fontWeight: 700,
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '5px'
+                              }}
+                            >
+                              <Copy size={13} /> Copiar PNR
+                            </button>
+                          )}
                         </div>
                       </div>
 
+                      {/* HERO BLOCK: ENTRENADOR DESTACADO (Tamaño prominente, alto contraste y rol) */}
                       {matchedAsignaciones.length > 0 ? (
-                        <div style={{ padding: '12px', background: 'rgba(16, 185, 129, 0.1)', borderRadius: '8px', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
-                          <h4 style={{ margin: '0 0 8px 0', color: '#059669', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <CheckCircle size={16} /> Asignación verificada
-                          </h4>
+                        <div style={{
+                          padding: '1rem',
+                          background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.18) 0%, rgba(5, 150, 105, 0.12) 100%)',
+                          borderRadius: '12px',
+                          border: '1.5px solid rgba(16, 185, 129, 0.5)',
+                          boxShadow: '0 4px 14px rgba(16, 185, 129, 0.12)',
+                          marginBottom: '0.5rem'
+                        }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                            <span style={{ color: '#10b981', fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                              <CheckCircle size={15} /> Asignación verificada
+                            </span>
+                            {matchedAsignaciones[0].sede && (
+                              <span style={{ background: 'rgba(16, 185, 129, 0.25)', color: '#34d399', padding: '2px 8px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 800 }}>
+                                SEDE {matchedAsignaciones[0].sede.toUpperCase()}
+                              </span>
+                            )}
+                          </div>
+                          
                           {matchedAsignaciones.map((asig, i) => (
-                            <div key={i} style={{ fontSize: '0.9rem', color: 'var(--text-main)', marginBottom: i !== matchedAsignaciones.length - 1 ? '6px' : '0' }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-                                <span style={{ fontWeight: 700, color: '#f8fafc' }}>{asig.entrenador}</span>
-                                {asig.legalName && asig.legalName !== asig.entrenador && (
-                                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>({asig.legalName})</span>
+                            <div key={i} style={{ marginBottom: i !== matchedAsignaciones.length - 1 ? '10px' : '0' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+                                <div style={{
+                                  width: '44px',
+                                  height: '44px',
+                                  borderRadius: '50%',
+                                  background: 'linear-gradient(135deg, #10b981 0%, #047857 100%)',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  color: '#ffffff',
+                                  flexShrink: 0,
+                                  boxShadow: '0 2px 8px rgba(16, 185, 129, 0.35)'
+                                }}>
+                                  <User size={24} />
+                                </div>
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                  {/* NOMBRE DEL ENTRENADOR: VISIBILIDAD MÁXIMA, GRANDE Y CLARA */}
+                                  <div style={{ fontSize: '1.3rem', fontWeight: 900, color: '#ffffff', lineHeight: 1.25 }}>
+                                    {asig.entrenador}
+                                  </div>
+                                  {asig.legalName && asig.legalName !== asig.entrenador && (
+                                    <div style={{ fontSize: '0.8rem', color: '#cbd5e1', marginTop: '2px' }}>
+                                      Doc. Legal: <strong style={{ color: '#f1f5f9' }}>{asig.legalName}</strong>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+
+                              <div style={{
+                                background: 'rgba(0, 0, 0, 0.25)',
+                                borderRadius: '8px',
+                                padding: '8px 12px',
+                                fontSize: '0.88rem',
+                                color: '#e2e8f0',
+                                marginTop: '6px'
+                              }}>
+                                Asignado a: <span style={{ color: '#38bdf8', fontWeight: 700 }}>{asig.entrenamiento || asig.equipo}</span>
+                                {asig.rol && (
+                                  <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginTop: '3px' }}>
+                                    Rol: <span style={{ color: '#a7f3d0', fontWeight: 600 }}>{asig.rol}</span>
+                                  </div>
                                 )}
                               </div>
-                              <div style={{ fontSize: '0.82rem', marginTop: '3px' }}>
-                                Asignado a <span style={{ color: '#38bdf8', fontWeight: 600 }}>{asig.entrenamiento || asig.equipo}</span> {asig.sede && `en sede ${asig.sede}`}
-                              </div>
+
                               {asig.cartaUrl && (
                                 <a
                                   href={asig.cartaUrl}
@@ -1409,35 +1573,43 @@ export default function MonitorVuelosCartas() {
                                   style={{
                                     display: 'inline-flex',
                                     alignItems: 'center',
-                                    gap: '5px',
-                                    marginTop: '6px',
-                                    fontSize: '0.75rem',
+                                    gap: '6px',
+                                    marginTop: '8px',
+                                    fontSize: '0.8rem',
                                     color: '#34d399',
                                     textDecoration: 'none',
-                                    fontWeight: 600,
-                                    background: 'rgba(52, 211, 153, 0.12)',
-                                    padding: '4px 8px',
+                                    fontWeight: 700,
+                                    background: 'rgba(52, 211, 153, 0.15)',
+                                    padding: '5px 10px',
                                     borderRadius: '6px',
-                                    border: '1px solid rgba(52, 211, 153, 0.25)'
+                                    border: '1px solid rgba(52, 211, 153, 0.3)'
                                   }}
                                 >
-                                  <FileText size={13} /> Ver Carta Oficial de Vuelo <ExternalLink size={11} />
+                                  <FileText size={14} /> Ver Carta Oficial de Vuelo <ExternalLink size={12} />
                                 </a>
                               )}
                             </div>
                           ))}
                         </div>
                       ) : suggestedAsignaciones.length > 0 ? (
-                        <div style={{ padding: '12px', background: 'rgba(56, 189, 248, 0.1)', borderRadius: '8px', border: '1px solid rgba(56, 189, 248, 0.3)' }}>
+                        <div style={{
+                          padding: '1rem',
+                          background: 'rgba(56, 189, 248, 0.12)',
+                          borderRadius: '12px',
+                          border: '1px solid rgba(56, 189, 248, 0.35)',
+                          marginBottom: '0.5rem'
+                        }}>
                           <h4 style={{ margin: '0 0 8px 0', color: '#0284c7', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
                             <Compass size={16} /> Sugerencia del sistema
                           </h4>
-                          <div className="flight-alert-copy" style={{ fontSize: '0.82rem', marginBottom: '8px' }}>
-                            Este vuelo podría pertenecer a:
-                          </div>
                           {suggestedAsignaciones.map((asig, i) => (
-                            <div key={i} style={{ fontSize: '0.9rem', color: 'var(--text-main)', marginBottom: i !== suggestedAsignaciones.length - 1 ? '6px' : '0' }}>
-                              <span style={{ fontWeight: 600 }}>{asig.entrenador}</span> para <span style={{ color: '#34d399' }}>{asig.entrenamiento || asig.equipo}</span> {asig.sede && `(${asig.sede})`}
+                            <div key={i} style={{ marginBottom: '8px' }}>
+                              <div style={{ fontSize: '1.2rem', fontWeight: 900, color: '#f8fafc' }}>
+                                {asig.entrenador}
+                              </div>
+                              <div style={{ fontSize: '0.85rem', color: '#94a3b8' }}>
+                                Para <span style={{ color: '#34d399', fontWeight: 700 }}>{asig.entrenamiento || asig.equipo}</span> {asig.sede && `(${asig.sede})`}
+                              </div>
                             </div>
                           ))}
                           <button 
@@ -1445,63 +1617,100 @@ export default function MonitorVuelosCartas() {
                                 e.preventDefault();
                                 alert('Enlace confirmado por heurística (integración en desarrollo)');
                             }}
-                            style={{ marginTop: '10px', background: 'rgba(56, 189, 248, 0.15)', border: '1px solid rgba(56,189,248,0.4)', color: '#38bdf8', padding: '6px 12px', borderRadius: '6px', fontSize: '0.75rem', cursor: 'pointer', width: '100%', fontWeight: '600' }}
+                            style={{ marginTop: '6px', background: 'rgba(56, 189, 248, 0.15)', border: '1px solid rgba(56,189,248,0.4)', color: '#38bdf8', padding: '6px 12px', borderRadius: '6px', fontSize: '0.75rem', cursor: 'pointer', width: '100%', fontWeight: '600' }}
                           >
                             Vincular Vuelo y Carta
                           </button>
                         </div>
                       ) : (
-                        <div style={{ padding: '12px', background: 'rgba(245, 158, 11, 0.1)', borderRadius: '8px', border: '1px solid rgba(245, 158, 11, 0.3)' }}>
-                          <h4 style={{ margin: '0 0 8px 0', color: '#b45309', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <AlertTriangle size={16} /> Requiere revisión manual
-                          </h4>
-                          <div className="flight-alert-copy" style={{ fontSize: '0.85rem' }}>
-                            No se encontraron similitudes para: <strong>{(flight.passengers || []).join(', ')}</strong>.
+                        <div style={{
+                          padding: '1rem',
+                          background: 'rgba(245, 158, 11, 0.1)',
+                          borderRadius: '12px',
+                          border: '1px solid rgba(245, 158, 11, 0.3)',
+                          marginBottom: '0.5rem'
+                        }}>
+                          <div style={{ color: '#d97706', fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <AlertTriangle size={15} /> Pasajero en Itinerario
+                          </div>
+                          <div style={{ fontSize: '1.2rem', fontWeight: 900, color: '#f8fafc' }}>
+                            {(flight.passengers || []).join(', ') || 'Nombre no disponible'}
+                          </div>
+                          <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '4px' }}>
+                            Requiere vinculación con asignación de sala
                           </div>
                         </div>
                       )}
                     </div>
 
-                    <div style={{ display: 'flex', gap: '10px', marginTop: '0.5rem' }}>
-                      <a
-                        href={getAirlineUrl(flight.airline)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="btn-primary"
-                        style={{
-                          flex: 1,
-                          fontSize: '0.85rem',
-                          padding: '10px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: '6px',
-                          textDecoration: 'none'
-                        }}
-                      >
-                        Hacer Check-In
-                      </a>
-                      
-                      {flight.radarUrl && (
+                    {/* Botones de Acción del Vuelo y Logística de Sede */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '0.5rem' }}>
+                      <div style={{ display: 'flex', gap: '8px' }}>
                         <a
-                          href={flight.radarUrl}
+                          href={getAirlineUrl(flight.airline)}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="btn-secondary"
+                          className="btn-primary"
                           style={{
                             flex: 1,
-                            fontSize: '0.85rem',
-                            padding: '10px',
+                            fontSize: '0.82rem',
+                            padding: '9px',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             gap: '6px',
-                            textDecoration: 'none'
+                            textDecoration: 'none',
+                            fontWeight: 700
                           }}
                         >
-                          Consultar radar externo
+                          Hacer Check-In
                         </a>
-                      )}
+                        
+                        {flight.radarUrl && (
+                          <a
+                            href={flight.radarUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn-secondary"
+                            style={{
+                              flex: 1,
+                              fontSize: '0.82rem',
+                              padding: '9px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '6px',
+                              textDecoration: 'none',
+                              fontWeight: 700
+                            }}
+                          >
+                            Consultar radar externo
+                          </a>
+                        )}
+                      </div>
+
+                      <button
+                        onClick={() => copyDriverBriefing(flight)}
+                        className="btn-secondary"
+                        style={{
+                          width: '100%',
+                          fontSize: '0.78rem',
+                          padding: '7px 10px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px',
+                          background: 'rgba(255, 255, 255, 0.04)',
+                          border: '1px solid rgba(255, 255, 255, 0.1)',
+                          color: '#e2e8f0',
+                          cursor: 'pointer',
+                          borderRadius: '8px',
+                          fontWeight: 600
+                        }}
+                      >
+                        <Car size={14} style={{ color: '#38bdf8' }} />
+                        Copiar Briefing para Chofer (WhatsApp)
+                      </button>
                     </div>
                   </div>
                 );

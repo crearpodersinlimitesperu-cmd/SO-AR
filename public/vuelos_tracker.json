@@ -1,11 +1,11 @@
 {
   "version": "3.2.0-ai-engine",
-  "updatedAt": "2026-10-31T06:37:33.524763Z",
+  "updatedAt": "2026-10-31T09:40:09.913993Z",
   "liveStatusAvailable": false,
   "aiEngineStatus": "ACTIVE",
   "totalPdfAnalyzed": 482,
-  "totalFlightsIndexed": 337,
-  "totalFlights": 337,
+  "totalFlightsIndexed": 332,
+  "totalFlights": 332,
   "syncFrequency": "7 veces al día (01:00, 04:00, 10:00, 13:00, 16:00, 19:00, 22:00 UTC)",
   "source": "Google Drive Sync (Carpetas Oficiales Vuelos CPSL)",
   "flights": {
@@ -11195,11 +11195,58 @@
       "radarUrl": "https://www.flightradar24.com/data/flights/la1426",
       "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
     },
-    "AV045_2026-09-23_BOG_SAN": {
+    "AV045_2026-09-23_MEX_BOG": {
       "flightNumber": "AV 045",
-      "flightCode": "AV045_2026-09-23_BOG_SAN",
+      "flightCode": "AV045_2026-09-23_MEX_BOG",
       "airline": "Avianca",
-      "callsign": "AV045_2026-09-23_BOG_SAN",
+      "callsign": "AV045_2026-09-23_MEX_BOG",
+      "reservationCode": "C6VQ3P",
+      "passengers": [
+        "Mauricio Perez Robles"
+      ],
+      "sourcePdf": "MAURICIO PEREZ UIO CAP 1 128 Y 129.pdf",
+      "sourcePath": " / MAURICIO PEREZ UIO CAP 1 128 Y 129.pdf",
+      "route": {
+        "origin": "MEX",
+        "originCity": "Ciudad de México",
+        "originAirport": "Aeropuerto Internacional Benito Juárez",
+        "destination": "BOG",
+        "destinationCity": "Bogotá",
+        "destinationAirport": "Aeropuerto Internacional El Dorado",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 00m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-23",
+        "scheduledDeparture": "2026-09-23T04:55:00-05:00",
+        "scheduledArrival": "2026-09-23T10:30:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Salida de Vuelos Llegadas T1 / T2 (Aeropuerto Benito Juárez MEX)",
+        "destination": "Sede Ciudad de México (Hospedaje por coordinar con Dirección de Sede) (Ciudad de México, México)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Coordinación de bienvenida y traslado con Sede México."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/av045",
+      "checkInUrl": "https://www.google.com/search?q=check+in+Avianca+AV045"
+    },
+    "AV5200_2026-09-23_BOG_SAN": {
+      "flightNumber": "AV 5200",
+      "flightCode": "AV5200_2026-09-23_BOG_SAN",
+      "airline": "Avianca",
+      "callsign": "AV5200_2026-09-23_BOG_SAN",
       "reservationCode": "C6VQ3P",
       "passengers": [
         "Mauricio Perez Robles"
@@ -11239,14 +11286,14 @@
         "driverPickupEstimated": "30 min posteriores al aterrizaje",
         "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
       },
-      "radarUrl": "https://www.flightradar24.com/data/flights/av045",
-      "checkInUrl": "https://www.google.com/search?q=check+in+Avianca+AV045"
+      "radarUrl": "https://www.flightradar24.com/data/flights/av5200",
+      "checkInUrl": "https://www.google.com/search?q=check+in+Avianca+AV5200"
     },
-    "AV5200_2026-10-05_SAN_BOG": {
-      "flightNumber": "AV 5200",
-      "flightCode": "AV5200_2026-10-05_SAN_BOG",
+    "AV5201_2026-10-05_SAN_BOG": {
+      "flightNumber": "AV 5201",
+      "flightCode": "AV5201_2026-10-05_SAN_BOG",
       "airline": "Avianca",
-      "callsign": "AV5200_2026-10-05_SAN_BOG",
+      "callsign": "AV5201_2026-10-05_SAN_BOG",
       "reservationCode": "C6VQ3P",
       "passengers": [
         "Mauricio Perez Robles"
@@ -11285,53 +11332,6 @@
         "destination": "Hotel Jose Antonio Deluxe Miraflores (Calle Bellavista 133, Miraflores, Lima 15074, Perú)",
         "driverPickupEstimated": "30 min posteriores al aterrizaje",
         "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
-      },
-      "radarUrl": "https://www.flightradar24.com/data/flights/av5200",
-      "checkInUrl": "https://www.google.com/search?q=check+in+Avianca+AV5200"
-    },
-    "AV5201_2026-10-05_BOG_MEX": {
-      "flightNumber": "AV 5201",
-      "flightCode": "AV5201_2026-10-05_BOG_MEX",
-      "airline": "Avianca",
-      "callsign": "AV5201_2026-10-05_BOG_MEX",
-      "reservationCode": "C6VQ3P",
-      "passengers": [
-        "Mauricio Perez Robles"
-      ],
-      "sourcePdf": "MAURICIO PEREZ UIO CAP 1 128 Y 129.pdf",
-      "sourcePath": " / MAURICIO PEREZ UIO CAP 1 128 Y 129.pdf",
-      "route": {
-        "origin": "BOG",
-        "originCity": "Bogotá",
-        "originAirport": "Aeropuerto Internacional El Dorado",
-        "destination": "MEX",
-        "destinationCity": "Ciudad de México",
-        "destinationAirport": "Aeropuerto Internacional Benito Juárez",
-        "isDirect": true,
-        "stops": 0,
-        "flightDuration": "2h 00m"
-      },
-      "schedule": {
-        "departureDate": "2026-10-05",
-        "scheduledDeparture": "2026-10-05T19:15:00-05:00",
-        "scheduledArrival": "2026-10-05T23:00:00-05:00",
-        "estimatedDeparture": null,
-        "estimatedArrival": null,
-        "actualDeparture": null,
-        "actualArrival": null
-      },
-      "status": "SCHEDULED",
-      "statusLabel": "Programado según itinerario",
-      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
-      "delayMinutes": null,
-      "terminal": "T1",
-      "gate": "Confirmándose en aeropuerto",
-      "baggageClaim": "Por confirmar en arribo",
-      "logistics": {
-        "pickupLocation": "Puerta de Salida de Vuelos Llegadas T1 / T2 (Aeropuerto Benito Juárez MEX)",
-        "destination": "Sede Ciudad de México (Hospedaje por coordinar con Dirección de Sede) (Ciudad de México, México)",
-        "driverPickupEstimated": "30 min posteriores al aterrizaje",
-        "driverNote": "Coordinación de bienvenida y traslado con Sede México."
       },
       "radarUrl": "https://www.flightradar24.com/data/flights/av5201",
       "checkInUrl": "https://www.google.com/search?q=check+in+Avianca+AV5201"
@@ -11477,11 +11477,11 @@
       "radarUrl": "https://www.flightradar24.com/data/flights/la1386",
       "checkInUrl": "https://www.google.com/search?q=check+in+LATAM+Airlines+LA1386"
     },
-    "AV1604_2026-09-14_CUE_UIO": {
+    "AV1604_2026-09-11_UIO_CUE": {
       "flightNumber": "AV 1604",
-      "flightCode": "AV1604_2026-09-14_CUE_UIO",
+      "flightCode": "AV1604_2026-09-11_UIO_CUE",
       "airline": "Avianca",
-      "callsign": "AV1604_2026-09-14_CUE_UIO",
+      "callsign": "AV1604_2026-09-11_UIO_CUE",
       "reservationCode": "BDST6Y",
       "passengers": [
         "Carlos Brunis"
@@ -11489,20 +11489,20 @@
       "sourcePdf": "CARLOS BRUNIS 4FDS CUE.pdf",
       "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR",
       "route": {
-        "origin": "CUE",
-        "originCity": "Cuenca",
-        "originAirport": "Aeropuerto Mariscal La Mar",
-        "destination": "UIO",
-        "destinationCity": "Quito",
-        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "origin": "UIO",
+        "originCity": "Quito",
+        "originAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "destination": "CUE",
+        "destinationCity": "Cuenca",
+        "destinationAirport": "Aeropuerto Mariscal La Mar",
         "isDirect": true,
         "stops": 0,
         "flightDuration": "2h 00m"
       },
       "schedule": {
-        "departureDate": "2026-09-14",
-        "scheduledDeparture": "2026-09-14T07:40:00-05:00",
-        "scheduledArrival": "2026-09-14T08:35:00-05:00",
+        "departureDate": "2026-09-11",
+        "scheduledDeparture": "2026-09-11T05:55:00-05:00",
+        "scheduledArrival": "2026-09-11T06:55:00-05:00",
         "estimatedDeparture": null,
         "estimatedArrival": null,
         "actualDeparture": null,
@@ -11516,10 +11516,10 @@
       "gate": "Confirmándose en aeropuerto",
       "baggageClaim": "Por confirmar en arribo",
       "logistics": {
-        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
-        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
-        "driverPickupEstimated": "30 min posteriores al aterrizaje",
-        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
+        "pickupLocation": "Hall Principal de Salida de Pasajeros (Aeropuerto CUE)",
+        "destination": "Sede Cuenca (Hospedaje por coordinar con Dirección de Sede) (Cuenca, Ecuador)",
+        "driverPickupEstimated": "20 min posteriores al aterrizaje",
+        "driverNote": "Traslado coordinado con equipo local de Sede Cuenca."
       },
       "radarUrl": "https://www.flightradar24.com/data/flights/av1604",
       "checkInUrl": "https://www.google.com/search?q=check+in+Avianca+AV1604"
@@ -11665,11 +11665,11 @@
       "radarUrl": "https://www.flightradar24.com/data/flights/la1442",
       "checkInUrl": "https://www.google.com/search?q=check+in+LATAM+Airlines+LA1442"
     },
-    "AV8385_2026-09-28_GYE_BOG": {
+    "AV8385_2026-09-24_BOG_GYE": {
       "flightNumber": "AV 8385",
-      "flightCode": "AV8385_2026-09-28_GYE_BOG",
+      "flightCode": "AV8385_2026-09-24_BOG_GYE",
       "airline": "Avianca",
-      "callsign": "AV8385_2026-09-28_GYE_BOG",
+      "callsign": "AV8385_2026-09-24_BOG_GYE",
       "reservationCode": "ARQ5S4",
       "passengers": [
         "Michael Andres Boada Rubiano"
@@ -11677,20 +11677,20 @@
       "sourcePdf": "MIKE BOADA GYE FDS E37.pdf",
       "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / MIKE BOADA",
       "route": {
-        "origin": "GYE",
-        "originCity": "Guayaquil",
-        "originAirport": "Aeropuerto Internacional José Joaquín de Olmedo",
-        "destination": "BOG",
-        "destinationCity": "Bogotá",
-        "destinationAirport": "Aeropuerto Internacional El Dorado",
+        "origin": "BOG",
+        "originCity": "Bogotá",
+        "originAirport": "Aeropuerto Internacional El Dorado",
+        "destination": "GYE",
+        "destinationCity": "Guayaquil",
+        "destinationAirport": "Aeropuerto Internacional José Joaquín de Olmedo",
         "isDirect": true,
         "stops": 0,
         "flightDuration": "2h 00m"
       },
       "schedule": {
-        "departureDate": "2026-09-28",
-        "scheduledDeparture": "2026-09-28T10:05:00-05:00",
-        "scheduledArrival": "2026-09-28T12:00:00-05:00",
+        "departureDate": "2026-09-24",
+        "scheduledDeparture": "2026-09-24T06:55:00-05:00",
+        "scheduledArrival": "2026-09-24T08:55:00-05:00",
         "estimatedDeparture": null,
         "estimatedArrival": null,
         "actualDeparture": null,
@@ -11704,10 +11704,10 @@
       "gate": "Confirmándose en aeropuerto",
       "baggageClaim": "Por confirmar en arribo",
       "logistics": {
-        "pickupLocation": "Terminal de Arribos",
-        "destination": "Retorno a Domicilio (Base Bogotá) (Bogotá, Colombia)",
-        "driverPickupEstimated": "N/A",
-        "driverNote": "El entrenador retorna a su ciudad de residencia."
+        "pickupLocation": "Puerta de Salida de Arribos (Aeropuerto Olmedo GYE)",
+        "destination": "Sede Guayaquil (Hospedaje por coordinar con Dirección de Sede) (Guayaquil, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Coordinación de bienvenida y traslado con Dirección de Sede Guayaquil."
       },
       "radarUrl": "https://www.flightradar24.com/data/flights/av8385",
       "checkInUrl": "https://www.google.com/search?q=check+in+Avianca+AV8385"
@@ -11900,11 +11900,58 @@
       "radarUrl": "https://www.flightradar24.com/data/flights/la1373",
       "checkInUrl": "https://www.google.com/search?q=check+in+LATAM+Airlines+LA1373"
     },
-    "AV9243_2026-09-23_BOG_UIO": {
+    "AV9243_2026-09-23_MDE_BOG": {
       "flightNumber": "AV 9243",
-      "flightCode": "AV9243_2026-09-23_BOG_UIO",
+      "flightCode": "AV9243_2026-09-23_MDE_BOG",
       "airline": "Avianca",
-      "callsign": "AV9243_2026-09-23_BOG_UIO",
+      "callsign": "AV9243_2026-09-23_MDE_BOG",
+      "reservationCode": "CTIHPR",
+      "passengers": [
+        "Mildred Munoz"
+      ],
+      "sourcePdf": "MILDRED MUÑOZ CAP 2 CUE E23.pdf",
+      "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / MILDRED MUÑOZ",
+      "route": {
+        "origin": "MDE",
+        "originCity": "Medellín",
+        "originAirport": "Aeropuerto Internacional José María Córdova",
+        "destination": "BOG",
+        "destinationCity": "Bogotá",
+        "destinationAirport": "Aeropuerto Internacional El Dorado",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 00m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-23",
+        "scheduledDeparture": "2026-09-23T08:35:00-05:00",
+        "scheduledArrival": "2026-09-23T09:35:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Salida Puerta 1 Llegadas Internacionales / Nacionales MDE",
+        "destination": "Sede Medellín (Hospedaje por coordinar con Dirección de Sede) (Medellín, Colombia)",
+        "driverPickupEstimated": "35 min posteriores al aterrizaje",
+        "driverNote": "Coordinación de bienvenida y traslado con Sede Medellín."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/av9243",
+      "checkInUrl": "https://www.google.com/search?q=check+in+Avianca+AV9243"
+    },
+    "AV117_2026-09-23_BOG_UIO": {
+      "flightNumber": "AV 117",
+      "flightCode": "AV117_2026-09-23_BOG_UIO",
+      "airline": "Avianca",
+      "callsign": "AV117_2026-09-23_BOG_UIO",
       "reservationCode": "CTIHPR",
       "passengers": [
         "Mildred Munoz"
@@ -11944,14 +11991,14 @@
         "driverPickupEstimated": "30 min posteriores al aterrizaje",
         "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
       },
-      "radarUrl": "https://www.flightradar24.com/data/flights/av9243",
-      "checkInUrl": "https://www.google.com/search?q=check+in+Avianca+AV9243"
+      "radarUrl": "https://www.flightradar24.com/data/flights/av117",
+      "checkInUrl": "https://www.google.com/search?q=check+in+Avianca+AV117"
     },
-    "AV117_2026-09-28_CUE_UIO": {
-      "flightNumber": "AV 117",
-      "flightCode": "AV117_2026-09-28_CUE_UIO",
+    "AV1609_2026-09-28_CUE_UIO": {
+      "flightNumber": "AV 1609",
+      "flightCode": "AV1609_2026-09-28_CUE_UIO",
       "airline": "Avianca",
-      "callsign": "AV117_2026-09-28_CUE_UIO",
+      "callsign": "AV1609_2026-09-28_CUE_UIO",
       "reservationCode": "CTIHPR",
       "passengers": [
         "Mildred Munoz"
@@ -11990,53 +12037,6 @@
         "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
         "driverPickupEstimated": "30 min posteriores al aterrizaje",
         "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
-      },
-      "radarUrl": "https://www.flightradar24.com/data/flights/av117",
-      "checkInUrl": "https://www.google.com/search?q=check+in+Avianca+AV117"
-    },
-    "AV1609_2026-09-28_UIO_MDE": {
-      "flightNumber": "AV 1609",
-      "flightCode": "AV1609_2026-09-28_UIO_MDE",
-      "airline": "Avianca",
-      "callsign": "AV1609_2026-09-28_UIO_MDE",
-      "reservationCode": "CTIHPR",
-      "passengers": [
-        "Mildred Munoz"
-      ],
-      "sourcePdf": "MILDRED MUÑOZ CAP 2 CUE E23.pdf",
-      "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / MILDRED MUÑOZ",
-      "route": {
-        "origin": "UIO",
-        "originCity": "Quito",
-        "originAirport": "Aeropuerto Internacional Mariscal Sucre",
-        "destination": "MDE",
-        "destinationCity": "Medellín",
-        "destinationAirport": "Aeropuerto Internacional José María Córdova",
-        "isDirect": true,
-        "stops": 0,
-        "flightDuration": "2h 00m"
-      },
-      "schedule": {
-        "departureDate": "2026-09-28",
-        "scheduledDeparture": "2026-09-28T17:20:00-05:00",
-        "scheduledArrival": "2026-09-28T18:50:00-05:00",
-        "estimatedDeparture": null,
-        "estimatedArrival": null,
-        "actualDeparture": null,
-        "actualArrival": null
-      },
-      "status": "SCHEDULED",
-      "statusLabel": "Programado según itinerario",
-      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
-      "delayMinutes": null,
-      "terminal": "T1",
-      "gate": "Confirmándose en aeropuerto",
-      "baggageClaim": "Por confirmar en arribo",
-      "logistics": {
-        "pickupLocation": "Salida Puerta 1 Llegadas Internacionales / Nacionales MDE",
-        "destination": "Sede Medellín (Hospedaje por coordinar con Dirección de Sede) (Medellín, Colombia)",
-        "driverPickupEstimated": "35 min posteriores al aterrizaje",
-        "driverNote": "Coordinación de bienvenida y traslado con Sede Medellín."
       },
       "radarUrl": "https://www.flightradar24.com/data/flights/av1609",
       "checkInUrl": "https://www.google.com/search?q=check+in+Avianca+AV1609"
@@ -12370,11 +12370,58 @@
       "radarUrl": "https://www.flightradar24.com/data/flights/la1356",
       "checkInUrl": "https://www.google.com/search?q=check+in+LATAM+Airlines+LA1356"
     },
-    "CM121_2026-10-08_PTY_GYE": {
+    "CM121_2026-10-08_MEX_PTY": {
       "flightNumber": "CM 121",
-      "flightCode": "CM121_2026-10-08_PTY_GYE",
+      "flightCode": "CM121_2026-10-08_MEX_PTY",
       "airline": "Copa Airlines",
-      "callsign": "CM121_2026-10-08_PTY_GYE",
+      "callsign": "CM121_2026-10-08_MEX_PTY",
+      "reservationCode": "BBQTLG",
+      "passengers": [
+        "Mauricio Perez Robles"
+      ],
+      "sourcePdf": "MAURICIO PEREZ CAP 1 GYE E38.pdf",
+      "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / MAURICIO PEREZ",
+      "route": {
+        "origin": "MEX",
+        "originCity": "Ciudad de México",
+        "originAirport": "Aeropuerto Internacional Benito Juárez",
+        "destination": "PTY",
+        "destinationCity": "Panamá",
+        "destinationAirport": "Aeropuerto Internacional de Tocumen",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 00m"
+      },
+      "schedule": {
+        "departureDate": "2026-10-08",
+        "scheduledDeparture": "2026-10-08T13:10:00-05:00",
+        "scheduledArrival": "2026-10-08T17:54:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Salida de Vuelos Llegadas T1 / T2 (Aeropuerto Benito Juárez MEX)",
+        "destination": "Sede Ciudad de México (Hospedaje por coordinar con Dirección de Sede) (Ciudad de México, México)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Coordinación de bienvenida y traslado con Sede México."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/cm121",
+      "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM121"
+    },
+    "CM213_2026-10-08_PTY_GYE": {
+      "flightNumber": "CM 213",
+      "flightCode": "CM213_2026-10-08_PTY_GYE",
+      "airline": "Copa Airlines",
+      "callsign": "CM213_2026-10-08_PTY_GYE",
       "reservationCode": "BBQTLG",
       "passengers": [
         "Mauricio Perez Robles"
@@ -12414,14 +12461,14 @@
         "driverPickupEstimated": "30 min posteriores al aterrizaje",
         "driverNote": "Coordinación de bienvenida y traslado con Dirección de Sede Guayaquil."
       },
-      "radarUrl": "https://www.flightradar24.com/data/flights/cm121",
-      "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM121"
+      "radarUrl": "https://www.flightradar24.com/data/flights/cm213",
+      "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM213"
     },
-    "CM213_2026-10-12_GYE_PTY": {
-      "flightNumber": "CM 213",
-      "flightCode": "CM213_2026-10-12_GYE_PTY",
+    "CM313_2026-10-12_GYE_PTY": {
+      "flightNumber": "CM 313",
+      "flightCode": "CM313_2026-10-12_GYE_PTY",
       "airline": "Copa Airlines",
-      "callsign": "CM213_2026-10-12_GYE_PTY",
+      "callsign": "CM313_2026-10-12_GYE_PTY",
       "reservationCode": "BBQTLG",
       "passengers": [
         "Mauricio Perez Robles"
@@ -12460,53 +12507,6 @@
         "destination": "Sede Guayaquil (Hospedaje por coordinar con Dirección de Sede) (Guayaquil, Ecuador)",
         "driverPickupEstimated": "30 min posteriores al aterrizaje",
         "driverNote": "Coordinación de bienvenida y traslado con Dirección de Sede Guayaquil."
-      },
-      "radarUrl": "https://www.flightradar24.com/data/flights/cm213",
-      "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM213"
-    },
-    "CM313_2026-10-12_PTY_MEX": {
-      "flightNumber": "CM 313",
-      "flightCode": "CM313_2026-10-12_PTY_MEX",
-      "airline": "Copa Airlines",
-      "callsign": "CM313_2026-10-12_PTY_MEX",
-      "reservationCode": "BBQTLG",
-      "passengers": [
-        "Mauricio Perez Robles"
-      ],
-      "sourcePdf": "MAURICIO PEREZ CAP 1 GYE E38.pdf",
-      "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / MAURICIO PEREZ",
-      "route": {
-        "origin": "PTY",
-        "originCity": "Panamá",
-        "originAirport": "Aeropuerto Internacional de Tocumen",
-        "destination": "MEX",
-        "destinationCity": "Ciudad de México",
-        "destinationAirport": "Aeropuerto Internacional Benito Juárez",
-        "isDirect": true,
-        "stops": 0,
-        "flightDuration": "2h 00m"
-      },
-      "schedule": {
-        "departureDate": "2026-10-12",
-        "scheduledDeparture": "2026-10-12T09:29:00-05:00",
-        "scheduledArrival": "2026-10-12T12:10:00-05:00",
-        "estimatedDeparture": null,
-        "estimatedArrival": null,
-        "actualDeparture": null,
-        "actualArrival": null
-      },
-      "status": "SCHEDULED",
-      "statusLabel": "Programado según itinerario",
-      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
-      "delayMinutes": null,
-      "terminal": "T1",
-      "gate": "Confirmándose en aeropuerto",
-      "baggageClaim": "Por confirmar en arribo",
-      "logistics": {
-        "pickupLocation": "Puerta de Salida de Vuelos Llegadas T1 / T2 (Aeropuerto Benito Juárez MEX)",
-        "destination": "Sede Ciudad de México (Hospedaje por coordinar con Dirección de Sede) (Ciudad de México, México)",
-        "driverPickupEstimated": "30 min posteriores al aterrizaje",
-        "driverNote": "Coordinación de bienvenida y traslado con Sede México."
       },
       "radarUrl": "https://www.flightradar24.com/data/flights/cm313",
       "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM313"
@@ -12558,11 +12558,58 @@
       "radarUrl": "https://www.flightradar24.com/data/flights/cm120",
       "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM120"
     },
-    "CM137_2026-09-24_PTY_UIO": {
+    "CM137_2026-09-24_MEX_PTY": {
       "flightNumber": "CM 137",
-      "flightCode": "CM137_2026-09-24_PTY_UIO",
+      "flightCode": "CM137_2026-09-24_MEX_PTY",
       "airline": "Copa Airlines",
-      "callsign": "CM137_2026-09-24_PTY_UIO",
+      "callsign": "CM137_2026-09-24_MEX_PTY",
+      "reservationCode": "AR4QO4",
+      "passengers": [
+        "Alonso Solares Salazar"
+      ],
+      "sourcePdf": "ALONSO SOLARES GYE FDS E36.pdf",
+      "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / ALONSO SOLARES",
+      "route": {
+        "origin": "MEX",
+        "originCity": "Ciudad de México",
+        "originAirport": "Aeropuerto Internacional Benito Juárez",
+        "destination": "PTY",
+        "destinationCity": "Panamá",
+        "destinationAirport": "Aeropuerto Internacional de Tocumen",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 00m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-24",
+        "scheduledDeparture": "2026-09-24T09:50:00-05:00",
+        "scheduledArrival": "2026-09-24T14:38:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Salida de Vuelos Llegadas T1 / T2 (Aeropuerto Benito Juárez MEX)",
+        "destination": "Sede Ciudad de México (Hospedaje por coordinar con Dirección de Sede) (Ciudad de México, México)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Coordinación de bienvenida y traslado con Sede México."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/cm137",
+      "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM137"
+    },
+    "CM159_2026-09-24_PTY_UIO": {
+      "flightNumber": "CM 159",
+      "flightCode": "CM159_2026-09-24_PTY_UIO",
+      "airline": "Copa Airlines",
+      "callsign": "CM159_2026-09-24_PTY_UIO",
       "reservationCode": "CUW2KL",
       "passengers": [
         "Mauricio Perez Robles"
@@ -12602,14 +12649,14 @@
         "driverPickupEstimated": "30 min posteriores al aterrizaje",
         "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
       },
-      "radarUrl": "https://www.flightradar24.com/data/flights/cm137",
-      "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM137"
+      "radarUrl": "https://www.flightradar24.com/data/flights/cm159",
+      "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM159"
     },
-    "CM159_2026-09-28_UIO_PTY": {
-      "flightNumber": "CM 159",
-      "flightCode": "CM159_2026-09-28_UIO_PTY",
+    "CM718_2026-09-28_UIO_PTY": {
+      "flightNumber": "CM 718",
+      "flightCode": "CM718_2026-09-28_UIO_PTY",
       "airline": "Copa Airlines",
-      "callsign": "CM159_2026-09-28_UIO_PTY",
+      "callsign": "CM718_2026-09-28_UIO_PTY",
       "reservationCode": "CUW2KL",
       "passengers": [
         "Mauricio Perez Robles"
@@ -12648,53 +12695,6 @@
         "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
         "driverPickupEstimated": "30 min posteriores al aterrizaje",
         "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
-      },
-      "radarUrl": "https://www.flightradar24.com/data/flights/cm159",
-      "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM159"
-    },
-    "CM718_2026-09-28_PTY_MEX": {
-      "flightNumber": "CM 718",
-      "flightCode": "CM718_2026-09-28_PTY_MEX",
-      "airline": "Copa Airlines",
-      "callsign": "CM718_2026-09-28_PTY_MEX",
-      "reservationCode": "CUW2KL",
-      "passengers": [
-        "Mauricio Perez Robles"
-      ],
-      "sourcePdf": "MAURICIO PEREZ CAP 1 UIO E128.pdf",
-      "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / MAURICIO PEREZ",
-      "route": {
-        "origin": "PTY",
-        "originCity": "Panamá",
-        "originAirport": "Aeropuerto Internacional de Tocumen",
-        "destination": "MEX",
-        "destinationCity": "Ciudad de México",
-        "destinationAirport": "Aeropuerto Internacional Benito Juárez",
-        "isDirect": true,
-        "stops": 0,
-        "flightDuration": "2h 00m"
-      },
-      "schedule": {
-        "departureDate": "2026-09-28",
-        "scheduledDeparture": "2026-09-28T19:12:00-05:00",
-        "scheduledArrival": "2026-09-28T22:05:00-05:00",
-        "estimatedDeparture": null,
-        "estimatedArrival": null,
-        "actualDeparture": null,
-        "actualArrival": null
-      },
-      "status": "SCHEDULED",
-      "statusLabel": "Programado según itinerario",
-      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
-      "delayMinutes": null,
-      "terminal": "T1",
-      "gate": "Confirmándose en aeropuerto",
-      "baggageClaim": "Por confirmar en arribo",
-      "logistics": {
-        "pickupLocation": "Puerta de Salida de Vuelos Llegadas T1 / T2 (Aeropuerto Benito Juárez MEX)",
-        "destination": "Sede Ciudad de México (Hospedaje por coordinar con Dirección de Sede) (Ciudad de México, México)",
-        "driverPickupEstimated": "30 min posteriores al aterrizaje",
-        "driverNote": "Coordinación de bienvenida y traslado con Sede México."
       },
       "radarUrl": "https://www.flightradar24.com/data/flights/cm718",
       "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM718"
@@ -12892,12 +12892,12 @@
       "flightCode": "LA1386_2026-10-05_CUE_UIO",
       "airline": "LATAM Airlines",
       "callsign": "LA1386_2026-10-05_CUE_UIO",
-      "reservationCode": "HXFFUJ",
+      "reservationCode": "BBAGXG",
       "passengers": [
-        "ELMER ANDRES IDROBO ANDRADE"
+        "Alonso Solares Salazar"
       ],
-      "sourcePdf": "ANDRES IDROBO CUE FDS E21.pdf",
-      "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / ANDRES IDROBO",
+      "sourcePdf": "ALONSO SOLARES CUE FDS E22. IDA.pdf",
+      "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / ALONSO SOLARES",
       "route": {
         "origin": "CUE",
         "originCity": "Cuenca",
@@ -12907,12 +12907,12 @@
         "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
         "isDirect": true,
         "stops": 0,
-        "flightDuration": "1h 15m"
+        "flightDuration": "2h 00m"
       },
       "schedule": {
         "departureDate": "2026-10-05",
-        "scheduledDeparture": "2026-10-05T07:00:00-05:00",
-        "scheduledArrival": "2026-10-05T08:15:00-05:00",
+        "scheduledDeparture": "2026-10-05T06:56:00-05:00",
+        "scheduledArrival": "2026-10-05T07:45:00-05:00",
         "estimatedDeparture": null,
         "estimatedArrival": null,
         "actualDeparture": null,
@@ -12934,11 +12934,11 @@
       "radarUrl": "https://www.flightradar24.com/data/flights/la1386",
       "checkInUrl": "https://www.google.com/search?q=check+in+LATAM+Airlines+LA1386"
     },
-    "AV1638_2026-11-02_GYE_UIO": {
+    "AV1638_2026-10-29_UIO_GYE": {
       "flightNumber": "AV 1638",
-      "flightCode": "AV1638_2026-11-02_GYE_UIO",
+      "flightCode": "AV1638_2026-10-29_UIO_GYE",
       "airline": "Avianca",
-      "callsign": "AV1638_2026-11-02_GYE_UIO",
+      "callsign": "AV1638_2026-10-29_UIO_GYE",
       "reservationCode": "CSV7X3",
       "passengers": [
         "Maria De Lourdes Patino"
@@ -12946,20 +12946,20 @@
       "sourcePdf": "LOURDES PATIÑO GYE FDS E37.pdf",
       "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / LOURDES PATIÑO",
       "route": {
-        "origin": "GYE",
-        "originCity": "Guayaquil",
-        "originAirport": "Aeropuerto Internacional José Joaquín de Olmedo",
-        "destination": "UIO",
-        "destinationCity": "Quito",
-        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "origin": "UIO",
+        "originCity": "Quito",
+        "originAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "destination": "GYE",
+        "destinationCity": "Guayaquil",
+        "destinationAirport": "Aeropuerto Internacional José Joaquín de Olmedo",
         "isDirect": true,
         "stops": 0,
         "flightDuration": "2h 00m"
       },
       "schedule": {
-        "departureDate": "2026-11-02",
-        "scheduledDeparture": "2026-11-02T08:20:00-05:00",
-        "scheduledArrival": "2026-11-02T09:15:00-05:00",
+        "departureDate": "2026-10-29",
+        "scheduledDeparture": "2026-10-29T10:25:00-05:00",
+        "scheduledArrival": "2026-10-29T11:25:00-05:00",
         "estimatedDeparture": null,
         "estimatedArrival": null,
         "actualDeparture": null,
@@ -12973,10 +12973,10 @@
       "gate": "Confirmándose en aeropuerto",
       "baggageClaim": "Por confirmar en arribo",
       "logistics": {
-        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
-        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
+        "pickupLocation": "Puerta de Salida de Arribos (Aeropuerto Olmedo GYE)",
+        "destination": "Sede Guayaquil (Hospedaje por coordinar con Dirección de Sede) (Guayaquil, Ecuador)",
         "driverPickupEstimated": "30 min posteriores al aterrizaje",
-        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
+        "driverNote": "Coordinación de bienvenida y traslado con Dirección de Sede Guayaquil."
       },
       "radarUrl": "https://www.flightradar24.com/data/flights/av1638",
       "checkInUrl": "https://www.google.com/search?q=check+in+Avianca+AV1638"
@@ -13216,11 +13216,58 @@
       "radarUrl": "https://www.flightradar24.com/data/flights/la4024",
       "checkInUrl": "https://www.google.com/search?q=check+in+LATAM+Airlines+LA4024"
     },
-    "AV9337_2026-10-15_BOG_UIO": {
+    "AV9337_2026-10-15_MDE_BOG": {
       "flightNumber": "AV 9337",
-      "flightCode": "AV9337_2026-10-15_BOG_UIO",
+      "flightCode": "AV9337_2026-10-15_MDE_BOG",
       "airline": "Avianca",
-      "callsign": "AV9337_2026-10-15_BOG_UIO",
+      "callsign": "AV9337_2026-10-15_MDE_BOG",
+      "reservationCode": "CR55P4",
+      "passengers": [
+        "Carlos Andres Gomez"
+      ],
+      "sourcePdf": "ANDRES GOMEZ UIO 2FDS E126.pdf",
+      "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / ANDRES GOMEZ",
+      "route": {
+        "origin": "MDE",
+        "originCity": "Medellín",
+        "originAirport": "Aeropuerto Internacional José María Córdova",
+        "destination": "BOG",
+        "destinationCity": "Bogotá",
+        "destinationAirport": "Aeropuerto Internacional El Dorado",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 00m"
+      },
+      "schedule": {
+        "departureDate": "2026-10-15",
+        "scheduledDeparture": "2026-10-15T19:40:00-05:00",
+        "scheduledArrival": "2026-10-15T20:40:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Salida Puerta 1 Llegadas Internacionales / Nacionales MDE",
+        "destination": "Sede Medellín (Hospedaje por coordinar con Dirección de Sede) (Medellín, Colombia)",
+        "driverPickupEstimated": "35 min posteriores al aterrizaje",
+        "driverNote": "Coordinación de bienvenida y traslado con Sede Medellín."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/av9337",
+      "checkInUrl": "https://www.google.com/search?q=check+in+Avianca+AV9337"
+    },
+    "AV125_2026-10-15_BOG_UIO": {
+      "flightNumber": "AV 125",
+      "flightCode": "AV125_2026-10-15_BOG_UIO",
+      "airline": "Avianca",
+      "callsign": "AV125_2026-10-15_BOG_UIO",
       "reservationCode": "CR55P4",
       "passengers": [
         "Carlos Andres Gomez"
@@ -13260,14 +13307,14 @@
         "driverPickupEstimated": "30 min posteriores al aterrizaje",
         "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
       },
-      "radarUrl": "https://www.flightradar24.com/data/flights/av9337",
-      "checkInUrl": "https://www.google.com/search?q=check+in+Avianca+AV9337"
+      "radarUrl": "https://www.flightradar24.com/data/flights/av125",
+      "checkInUrl": "https://www.google.com/search?q=check+in+Avianca+AV125"
     },
-    "AV125_2026-10-19_UIO_BOG": {
-      "flightNumber": "AV 125",
-      "flightCode": "AV125_2026-10-19_UIO_BOG",
+    "AV124_2026-10-19_UIO_BOG": {
+      "flightNumber": "AV 124",
+      "flightCode": "AV124_2026-10-19_UIO_BOG",
       "airline": "Avianca",
-      "callsign": "AV125_2026-10-19_UIO_BOG",
+      "callsign": "AV124_2026-10-19_UIO_BOG",
       "reservationCode": "CR55P4",
       "passengers": [
         "Carlos Andres Gomez"
@@ -13306,53 +13353,6 @@
         "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
         "driverPickupEstimated": "30 min posteriores al aterrizaje",
         "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
-      },
-      "radarUrl": "https://www.flightradar24.com/data/flights/av125",
-      "checkInUrl": "https://www.google.com/search?q=check+in+Avianca+AV125"
-    },
-    "AV124_2026-10-19_BOG_MDE": {
-      "flightNumber": "AV 124",
-      "flightCode": "AV124_2026-10-19_BOG_MDE",
-      "airline": "Avianca",
-      "callsign": "AV124_2026-10-19_BOG_MDE",
-      "reservationCode": "CR55P4",
-      "passengers": [
-        "Carlos Andres Gomez"
-      ],
-      "sourcePdf": "ANDRES GOMEZ UIO 2FDS E126.pdf",
-      "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / ANDRES GOMEZ",
-      "route": {
-        "origin": "BOG",
-        "originCity": "Bogotá",
-        "originAirport": "Aeropuerto Internacional El Dorado",
-        "destination": "MDE",
-        "destinationCity": "Medellín",
-        "destinationAirport": "Aeropuerto Internacional José María Córdova",
-        "isDirect": true,
-        "stops": 0,
-        "flightDuration": "2h 00m"
-      },
-      "schedule": {
-        "departureDate": "2026-10-19",
-        "scheduledDeparture": "2026-10-19T07:40:00-05:00",
-        "scheduledArrival": "2026-10-19T08:45:00-05:00",
-        "estimatedDeparture": null,
-        "estimatedArrival": null,
-        "actualDeparture": null,
-        "actualArrival": null
-      },
-      "status": "SCHEDULED",
-      "statusLabel": "Programado según itinerario",
-      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
-      "delayMinutes": null,
-      "terminal": "T1",
-      "gate": "Confirmándose en aeropuerto",
-      "baggageClaim": "Por confirmar en arribo",
-      "logistics": {
-        "pickupLocation": "Salida Puerta 1 Llegadas Internacionales / Nacionales MDE",
-        "destination": "Sede Medellín (Hospedaje por coordinar con Dirección de Sede) (Medellín, Colombia)",
-        "driverPickupEstimated": "35 min posteriores al aterrizaje",
-        "driverNote": "Coordinación de bienvenida y traslado con Sede Medellín."
       },
       "radarUrl": "https://www.flightradar24.com/data/flights/av124",
       "checkInUrl": "https://www.google.com/search?q=check+in+Avianca+AV124"
@@ -13404,11 +13404,58 @@
       "radarUrl": "https://www.flightradar24.com/data/flights/av9354",
       "checkInUrl": "https://www.google.com/search?q=check+in+Avianca+AV9354"
     },
-    "AV9311_2026-09-02_BOG_UIO": {
+    "AV9311_2026-09-02_MDE_BOG": {
       "flightNumber": "AV 9311",
-      "flightCode": "AV9311_2026-09-02_BOG_UIO",
+      "flightCode": "AV9311_2026-09-02_MDE_BOG",
       "airline": "Avianca",
-      "callsign": "AV9311_2026-09-02_BOG_UIO",
+      "callsign": "AV9311_2026-09-02_MDE_BOG",
+      "reservationCode": "CR3TMM",
+      "passengers": [
+        "Carlos Andres Gomez"
+      ],
+      "sourcePdf": "ANDRES GOMEZ UIO CAP 2 E126 E127 Y ACADEMIA.pdf",
+      "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / ANDRES GOMEZ",
+      "route": {
+        "origin": "MDE",
+        "originCity": "Medellín",
+        "originAirport": "Aeropuerto Internacional José María Córdova",
+        "destination": "BOG",
+        "destinationCity": "Bogotá",
+        "destinationAirport": "Aeropuerto Internacional El Dorado",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 00m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-02",
+        "scheduledDeparture": "2026-09-02T13:15:00-05:00",
+        "scheduledArrival": "2026-09-02T14:15:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Salida Puerta 1 Llegadas Internacionales / Nacionales MDE",
+        "destination": "Sede Medellín (Hospedaje por coordinar con Dirección de Sede) (Medellín, Colombia)",
+        "driverPickupEstimated": "35 min posteriores al aterrizaje",
+        "driverNote": "Coordinación de bienvenida y traslado con Sede Medellín."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/av9311",
+      "checkInUrl": "https://www.google.com/search?q=check+in+Avianca+AV9311"
+    },
+    "AV8373_2026-09-02_BOG_UIO": {
+      "flightNumber": "AV 8373",
+      "flightCode": "AV8373_2026-09-02_BOG_UIO",
+      "airline": "Avianca",
+      "callsign": "AV8373_2026-09-02_BOG_UIO",
       "reservationCode": "CR3TMM",
       "passengers": [
         "Carlos Andres Gomez"
@@ -13447,53 +13494,6 @@
         "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
         "driverPickupEstimated": "30 min posteriores al aterrizaje",
         "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
-      },
-      "radarUrl": "https://www.flightradar24.com/data/flights/av9311",
-      "checkInUrl": "https://www.google.com/search?q=check+in+Avianca+AV9311"
-    },
-    "AV8373_2026-09-17_UIO_MDE": {
-      "flightNumber": "AV 8373",
-      "flightCode": "AV8373_2026-09-17_UIO_MDE",
-      "airline": "Avianca",
-      "callsign": "AV8373_2026-09-17_UIO_MDE",
-      "reservationCode": "CR3TMM",
-      "passengers": [
-        "Carlos Andres Gomez"
-      ],
-      "sourcePdf": "ANDRES GOMEZ UIO CAP 2 E126 E127 Y ACADEMIA.pdf",
-      "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / ANDRES GOMEZ",
-      "route": {
-        "origin": "UIO",
-        "originCity": "Quito",
-        "originAirport": "Aeropuerto Internacional Mariscal Sucre",
-        "destination": "MDE",
-        "destinationCity": "Medellín",
-        "destinationAirport": "Aeropuerto Internacional José María Córdova",
-        "isDirect": true,
-        "stops": 0,
-        "flightDuration": "2h 00m"
-      },
-      "schedule": {
-        "departureDate": "2026-09-17",
-        "scheduledDeparture": "2026-09-17T17:20:00-05:00",
-        "scheduledArrival": "2026-09-17T18:50:00-05:00",
-        "estimatedDeparture": null,
-        "estimatedArrival": null,
-        "actualDeparture": null,
-        "actualArrival": null
-      },
-      "status": "SCHEDULED",
-      "statusLabel": "Programado según itinerario",
-      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
-      "delayMinutes": null,
-      "terminal": "T1",
-      "gate": "Confirmándose en aeropuerto",
-      "baggageClaim": "Por confirmar en arribo",
-      "logistics": {
-        "pickupLocation": "Salida Puerta 1 Llegadas Internacionales / Nacionales MDE",
-        "destination": "Sede Medellín (Hospedaje por coordinar con Dirección de Sede) (Medellín, Colombia)",
-        "driverPickupEstimated": "35 min posteriores al aterrizaje",
-        "driverNote": "Coordinación de bienvenida y traslado con Sede Medellín."
       },
       "radarUrl": "https://www.flightradar24.com/data/flights/av8373",
       "checkInUrl": "https://www.google.com/search?q=check+in+Avianca+AV8373"
@@ -13545,11 +13545,58 @@
       "radarUrl": "https://www.flightradar24.com/data/flights/av158",
       "checkInUrl": "https://www.google.com/search?q=check+in+Avianca+AV158"
     },
-    "UA2760_2026-09-24_IAH_PTY": {
+    "UA2760_2026-09-24_SAN_IAH": {
       "flightNumber": "UA 2760",
-      "flightCode": "UA2760_2026-09-24_IAH_PTY",
+      "flightCode": "UA2760_2026-09-24_SAN_IAH",
       "airline": "United Airlines",
-      "callsign": "UA2760_2026-09-24_IAH_PTY",
+      "callsign": "UA2760_2026-09-24_SAN_IAH",
+      "reservationCode": "CTGG5Y",
+      "passengers": [
+        "Ana Elena Monroy Thompson"
+      ],
+      "sourcePdf": "ANA MONROY GYE FDS E 35.pdf",
+      "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / ANA MONRROY",
+      "route": {
+        "origin": "SAN",
+        "originCity": "San Diego",
+        "originAirport": "San Diego International Airport",
+        "destination": "IAH",
+        "destinationCity": "Houston",
+        "destinationAirport": "George Bush Intercontinental Airport",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 00m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-24",
+        "scheduledDeparture": "2026-09-24T08:00:00-05:00",
+        "scheduledArrival": "2026-09-24T13:21:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe Miraflores (Calle Bellavista 133, Miraflores, Lima 15074, Perú)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/ua2760",
+      "checkInUrl": "https://www.google.com/search?q=check+in+United+Airlines+UA2760"
+    },
+    "UA1034_2026-09-24_IAH_PTY": {
+      "flightNumber": "UA 1034",
+      "flightCode": "UA1034_2026-09-24_IAH_PTY",
+      "airline": "United Airlines",
+      "callsign": "UA1034_2026-09-24_IAH_PTY",
       "reservationCode": "CTGG5Y",
       "passengers": [
         "Ana Elena Monroy Thompson"
@@ -13589,14 +13636,14 @@
         "driverPickupEstimated": "30 min posteriores al aterrizaje",
         "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
       },
-      "radarUrl": "https://www.flightradar24.com/data/flights/ua2760",
-      "checkInUrl": "https://www.google.com/search?q=check+in+United+Airlines+UA2760"
+      "radarUrl": "https://www.flightradar24.com/data/flights/ua1034",
+      "checkInUrl": "https://www.google.com/search?q=check+in+United+Airlines+UA1034"
     },
-    "UA1034_2026-09-24_PTY_GYE": {
-      "flightNumber": "UA 1034",
-      "flightCode": "UA1034_2026-09-24_PTY_GYE",
-      "airline": "United Airlines",
-      "callsign": "UA1034_2026-09-24_PTY_GYE",
+    "CM301_2026-09-24_PTY_GYE": {
+      "flightNumber": "CM 301",
+      "flightCode": "CM301_2026-09-24_PTY_GYE",
+      "airline": "Copa Airlines",
+      "callsign": "CM301_2026-09-24_PTY_GYE",
       "reservationCode": "CTGG5Y",
       "passengers": [
         "Ana Elena Monroy Thompson"
@@ -13636,176 +13683,35 @@
         "driverPickupEstimated": "30 min posteriores al aterrizaje",
         "driverNote": "Coordinación de bienvenida y traslado con Dirección de Sede Guayaquil."
       },
-      "radarUrl": "https://www.flightradar24.com/data/flights/ua1034",
-      "checkInUrl": "https://www.google.com/search?q=check+in+United+Airlines+UA1034"
-    },
-    "UA7165_2026-09-28_GYE_PTY": {
-      "flightNumber": "UA 7165",
-      "flightCode": "UA7165_2026-09-28_GYE_PTY",
-      "airline": "United Airlines",
-      "callsign": "UA7165_2026-09-28_GYE_PTY",
-      "reservationCode": "CTGG5Y",
-      "passengers": [
-        "Ana Elena Monroy Thompson"
-      ],
-      "sourcePdf": "ANA MONROY GYE FDS E 35.pdf",
-      "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / ANA MONRROY",
-      "route": {
-        "origin": "GYE",
-        "originCity": "Guayaquil",
-        "originAirport": "Aeropuerto Internacional José Joaquín de Olmedo",
-        "destination": "PTY",
-        "destinationCity": "Panamá",
-        "destinationAirport": "Aeropuerto Internacional de Tocumen",
-        "isDirect": true,
-        "stops": 0,
-        "flightDuration": "2h 00m"
-      },
-      "schedule": {
-        "departureDate": "2026-09-28",
-        "scheduledDeparture": "2026-09-28T08:28:00-05:00",
-        "scheduledArrival": "2026-09-28T10:40:00-05:00",
-        "estimatedDeparture": null,
-        "estimatedArrival": null,
-        "actualDeparture": null,
-        "actualArrival": null
-      },
-      "status": "SCHEDULED",
-      "statusLabel": "Programado según itinerario",
-      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
-      "delayMinutes": null,
-      "terminal": "T1",
-      "gate": "Confirmándose en aeropuerto",
-      "baggageClaim": "Por confirmar en arribo",
-      "logistics": {
-        "pickupLocation": "Puerta de Salida de Arribos (Aeropuerto Olmedo GYE)",
-        "destination": "Sede Guayaquil (Hospedaje por coordinar con Dirección de Sede) (Guayaquil, Ecuador)",
-        "driverPickupEstimated": "30 min posteriores al aterrizaje",
-        "driverNote": "Coordinación de bienvenida y traslado con Dirección de Sede Guayaquil."
-      },
-      "radarUrl": "https://www.flightradar24.com/data/flights/ua7165",
-      "checkInUrl": "https://www.google.com/search?q=check+in+United+Airlines+UA7165"
-    },
-    "CM301_2026-09-28_GYE_PTY": {
-      "flightNumber": "CM 301",
-      "flightCode": "CM301_2026-09-28_GYE_PTY",
-      "airline": "Copa Airlines",
-      "callsign": "CM301_2026-09-28_GYE_PTY",
-      "reservationCode": "CTGG5Y",
-      "passengers": [
-        "Ana Elena Monroy Thompson"
-      ],
-      "sourcePdf": "ANA MONROY GYE FDS E 35.pdf",
-      "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / ANA MONRROY",
-      "route": {
-        "origin": "GYE",
-        "originCity": "Guayaquil",
-        "originAirport": "Aeropuerto Internacional José Joaquín de Olmedo",
-        "destination": "PTY",
-        "destinationCity": "Panamá",
-        "destinationAirport": "Aeropuerto Internacional de Tocumen",
-        "isDirect": true,
-        "stops": 0,
-        "flightDuration": "2h 00m"
-      },
-      "schedule": {
-        "departureDate": "2026-09-28",
-        "scheduledDeparture": "2026-09-28T08:28:00-05:00",
-        "scheduledArrival": "2026-09-28T10:40:00-05:00",
-        "estimatedDeparture": null,
-        "estimatedArrival": null,
-        "actualDeparture": null,
-        "actualArrival": null
-      },
-      "status": "SCHEDULED",
-      "statusLabel": "Programado según itinerario",
-      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
-      "delayMinutes": null,
-      "terminal": "T1",
-      "gate": "Confirmándose en aeropuerto",
-      "baggageClaim": "Por confirmar en arribo",
-      "logistics": {
-        "pickupLocation": "Puerta de Salida de Arribos (Aeropuerto Olmedo GYE)",
-        "destination": "Sede Guayaquil (Hospedaje por coordinar con Dirección de Sede) (Guayaquil, Ecuador)",
-        "driverPickupEstimated": "30 min posteriores al aterrizaje",
-        "driverNote": "Coordinación de bienvenida y traslado con Dirección de Sede Guayaquil."
-      },
       "radarUrl": "https://www.flightradar24.com/data/flights/cm301",
       "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM301"
     },
-    "UA7166_2026-09-28_PTY_SAN": {
-      "flightNumber": "UA 7166",
-      "flightCode": "UA7166_2026-09-28_PTY_SAN",
-      "airline": "United Airlines",
-      "callsign": "UA7166_2026-09-28_PTY_SAN",
-      "reservationCode": "CTGG5Y",
-      "passengers": [
-        "Ana Elena Monroy Thompson"
-      ],
-      "sourcePdf": "ANA MONROY GYE FDS E 35.pdf",
-      "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / ANA MONRROY",
-      "route": {
-        "origin": "PTY",
-        "originCity": "Panamá",
-        "originAirport": "Aeropuerto Internacional de Tocumen",
-        "destination": "SAN",
-        "destinationCity": "San Diego",
-        "destinationAirport": "San Diego International Airport",
-        "isDirect": true,
-        "stops": 0,
-        "flightDuration": "2h 00m"
-      },
-      "schedule": {
-        "departureDate": "2026-09-28",
-        "scheduledDeparture": "2026-09-28T13:54:00-05:00",
-        "scheduledArrival": "2026-09-28T18:29:00-05:00",
-        "estimatedDeparture": null,
-        "estimatedArrival": null,
-        "actualDeparture": null,
-        "actualArrival": null
-      },
-      "status": "SCHEDULED",
-      "statusLabel": "Programado según itinerario",
-      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
-      "delayMinutes": null,
-      "terminal": "T1",
-      "gate": "Confirmándose en aeropuerto",
-      "baggageClaim": "Por confirmar en arribo",
-      "logistics": {
-        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
-        "destination": "Hotel Jose Antonio Deluxe Miraflores (Calle Bellavista 133, Miraflores, Lima 15074, Perú)",
-        "driverPickupEstimated": "30 min posteriores al aterrizaje",
-        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
-      },
-      "radarUrl": "https://www.flightradar24.com/data/flights/ua7166",
-      "checkInUrl": "https://www.google.com/search?q=check+in+United+Airlines+UA7166"
-    },
-    "CM300_2026-09-28_PTY_SAN": {
+    "CM300_2026-09-28_GYE_PTY": {
       "flightNumber": "CM 300",
-      "flightCode": "CM300_2026-09-28_PTY_SAN",
+      "flightCode": "CM300_2026-09-28_GYE_PTY",
       "airline": "Copa Airlines",
-      "callsign": "CM300_2026-09-28_PTY_SAN",
-      "reservationCode": "CTGG5Y",
+      "callsign": "CM300_2026-09-28_GYE_PTY",
+      "reservationCode": "AR4QO4",
       "passengers": [
-        "Ana Elena Monroy Thompson"
+        "Alonso Solares Salazar"
       ],
-      "sourcePdf": "ANA MONROY GYE FDS E 35.pdf",
-      "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / ANA MONRROY",
+      "sourcePdf": "ALONSO SOLARES GYE FDS E36.pdf",
+      "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / ALONSO SOLARES",
       "route": {
-        "origin": "PTY",
-        "originCity": "Panamá",
-        "originAirport": "Aeropuerto Internacional de Tocumen",
-        "destination": "SAN",
-        "destinationCity": "San Diego",
-        "destinationAirport": "San Diego International Airport",
+        "origin": "GYE",
+        "originCity": "Guayaquil",
+        "originAirport": "Aeropuerto Internacional José Joaquín de Olmedo",
+        "destination": "PTY",
+        "destinationCity": "Panamá",
+        "destinationAirport": "Aeropuerto Internacional de Tocumen",
         "isDirect": true,
         "stops": 0,
         "flightDuration": "2h 00m"
       },
       "schedule": {
         "departureDate": "2026-09-28",
-        "scheduledDeparture": "2026-09-28T13:54:00-05:00",
-        "scheduledArrival": "2026-09-28T18:29:00-05:00",
+        "scheduledDeparture": "2026-09-28T08:28:00-05:00",
+        "scheduledArrival": "2026-09-28T10:40:00-05:00",
         "estimatedDeparture": null,
         "estimatedArrival": null,
         "actualDeparture": null,
@@ -13819,60 +13725,13 @@
       "gate": "Confirmándose en aeropuerto",
       "baggageClaim": "Por confirmar en arribo",
       "logistics": {
-        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
-        "destination": "Hotel Jose Antonio Deluxe Miraflores (Calle Bellavista 133, Miraflores, Lima 15074, Perú)",
+        "pickupLocation": "Puerta de Salida de Arribos (Aeropuerto Olmedo GYE)",
+        "destination": "Sede Guayaquil (Hospedaje por coordinar con Dirección de Sede) (Guayaquil, Ecuador)",
         "driverPickupEstimated": "30 min posteriores al aterrizaje",
-        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+        "driverNote": "Coordinación de bienvenida y traslado con Dirección de Sede Guayaquil."
       },
       "radarUrl": "https://www.flightradar24.com/data/flights/cm300",
       "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM300"
-    },
-    "UA7057_2026-09-28_PTY_SAN": {
-      "flightNumber": "UA 7057",
-      "flightCode": "UA7057_2026-09-28_PTY_SAN",
-      "airline": "United Airlines",
-      "callsign": "UA7057_2026-09-28_PTY_SAN",
-      "reservationCode": "CTGG5Y",
-      "passengers": [
-        "Ana Elena Monroy Thompson"
-      ],
-      "sourcePdf": "ANA MONROY GYE FDS E 35.pdf",
-      "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / ANA MONRROY",
-      "route": {
-        "origin": "PTY",
-        "originCity": "Panamá",
-        "originAirport": "Aeropuerto Internacional de Tocumen",
-        "destination": "SAN",
-        "destinationCity": "San Diego",
-        "destinationAirport": "San Diego International Airport",
-        "isDirect": true,
-        "stops": 0,
-        "flightDuration": "2h 00m"
-      },
-      "schedule": {
-        "departureDate": "2026-09-28",
-        "scheduledDeparture": "2026-09-28T13:54:00-05:00",
-        "scheduledArrival": "2026-09-28T18:29:00-05:00",
-        "estimatedDeparture": null,
-        "estimatedArrival": null,
-        "actualDeparture": null,
-        "actualArrival": null
-      },
-      "status": "SCHEDULED",
-      "statusLabel": "Programado según itinerario",
-      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
-      "delayMinutes": null,
-      "terminal": "T1",
-      "gate": "Confirmándose en aeropuerto",
-      "baggageClaim": "Por confirmar en arribo",
-      "logistics": {
-        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
-        "destination": "Hotel Jose Antonio Deluxe Miraflores (Calle Bellavista 133, Miraflores, Lima 15074, Perú)",
-        "driverPickupEstimated": "30 min posteriores al aterrizaje",
-        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
-      },
-      "radarUrl": "https://www.flightradar24.com/data/flights/ua7057",
-      "checkInUrl": "https://www.google.com/search?q=check+in+United+Airlines+UA7057"
     },
     "CM847_2026-09-28_PTY_SAN": {
       "flightNumber": "CM 847",
@@ -13921,11 +13780,11 @@
       "radarUrl": "https://www.flightradar24.com/data/flights/cm847",
       "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM847"
     },
-    "CM850_2026-09-15_PTY_UIO": {
+    "CM850_2026-09-14_SAN_PTY": {
       "flightNumber": "CM 850",
-      "flightCode": "CM850_2026-09-15_PTY_UIO",
+      "flightCode": "CM850_2026-09-14_SAN_PTY",
       "airline": "Copa Airlines",
-      "callsign": "CM850_2026-09-15_PTY_UIO",
+      "callsign": "CM850_2026-09-14_SAN_PTY",
       "reservationCode": "AA9RNI",
       "passengers": [
         "Ana Elena Monroy Thompson"
@@ -13933,20 +13792,20 @@
       "sourcePdf": "ANA MONROY ACADEMIA UIO.pdf",
       "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / ANA MONRROY",
       "route": {
-        "origin": "PTY",
-        "originCity": "Panamá",
-        "originAirport": "Aeropuerto Internacional de Tocumen",
-        "destination": "UIO",
-        "destinationCity": "Quito",
-        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "origin": "SAN",
+        "originCity": "San Diego",
+        "originAirport": "San Diego International Airport",
+        "destination": "PTY",
+        "destinationCity": "Panamá",
+        "destinationAirport": "Aeropuerto Internacional de Tocumen",
         "isDirect": true,
         "stops": 0,
         "flightDuration": "2h 00m"
       },
       "schedule": {
-        "departureDate": "2026-09-15",
-        "scheduledDeparture": "2026-09-15T10:29:00-05:00",
-        "scheduledArrival": "2026-09-15T12:30:00-05:00",
+        "departureDate": "2026-09-14",
+        "scheduledDeparture": "2026-09-14T22:30:00-05:00",
+        "scheduledArrival": "2026-09-15T06:47:00-05:00",
         "estimatedDeparture": null,
         "estimatedArrival": null,
         "actualDeparture": null,
@@ -13960,10 +13819,10 @@
       "gate": "Confirmándose en aeropuerto",
       "baggageClaim": "Por confirmar en arribo",
       "logistics": {
-        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
-        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe Miraflores (Calle Bellavista 133, Miraflores, Lima 15074, Perú)",
         "driverPickupEstimated": "30 min posteriores al aterrizaje",
-        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
       },
       "radarUrl": "https://www.flightradar24.com/data/flights/cm850",
       "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM850"
@@ -14015,11 +13874,58 @@
       "radarUrl": "https://www.flightradar24.com/data/flights/cm829",
       "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM829"
     },
-    "UA2760_2026-10-29_IAH_PTY": {
+    "UA2760_2026-10-29_SAN_IAH": {
       "flightNumber": "UA 2760",
-      "flightCode": "UA2760_2026-10-29_IAH_PTY",
+      "flightCode": "UA2760_2026-10-29_SAN_IAH",
       "airline": "United Airlines",
-      "callsign": "UA2760_2026-10-29_IAH_PTY",
+      "callsign": "UA2760_2026-10-29_SAN_IAH",
+      "reservationCode": "CUSJT9",
+      "passengers": [
+        "Ana Elena Monroy Thompson"
+      ],
+      "sourcePdf": "ANA MONRROY GYE FDS E38.pdf",
+      "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / ANA MONRROY",
+      "route": {
+        "origin": "SAN",
+        "originCity": "San Diego",
+        "originAirport": "San Diego International Airport",
+        "destination": "IAH",
+        "destinationCity": "Houston",
+        "destinationAirport": "George Bush Intercontinental Airport",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 00m"
+      },
+      "schedule": {
+        "departureDate": "2026-10-29",
+        "scheduledDeparture": "2026-10-29T08:05:00-05:00",
+        "scheduledArrival": "2026-10-29T13:22:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe Miraflores (Calle Bellavista 133, Miraflores, Lima 15074, Perú)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/ua2760",
+      "checkInUrl": "https://www.google.com/search?q=check+in+United+Airlines+UA2760"
+    },
+    "UA1034_2026-10-29_IAH_PTY": {
+      "flightNumber": "UA 1034",
+      "flightCode": "UA1034_2026-10-29_IAH_PTY",
+      "airline": "United Airlines",
+      "callsign": "UA1034_2026-10-29_IAH_PTY",
       "reservationCode": "CUSJT9",
       "passengers": [
         "Ana Elena Monroy Thompson"
@@ -14059,14 +13965,14 @@
         "driverPickupEstimated": "30 min posteriores al aterrizaje",
         "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
       },
-      "radarUrl": "https://www.flightradar24.com/data/flights/ua2760",
-      "checkInUrl": "https://www.google.com/search?q=check+in+United+Airlines+UA2760"
+      "radarUrl": "https://www.flightradar24.com/data/flights/ua1034",
+      "checkInUrl": "https://www.google.com/search?q=check+in+United+Airlines+UA1034"
     },
-    "UA1034_2026-10-29_PTY_GYE": {
-      "flightNumber": "UA 1034",
-      "flightCode": "UA1034_2026-10-29_PTY_GYE",
-      "airline": "United Airlines",
-      "callsign": "UA1034_2026-10-29_PTY_GYE",
+    "CM301_2026-10-29_PTY_GYE": {
+      "flightNumber": "CM 301",
+      "flightCode": "CM301_2026-10-29_PTY_GYE",
+      "airline": "Copa Airlines",
+      "callsign": "CM301_2026-10-29_PTY_GYE",
       "reservationCode": "CUSJT9",
       "passengers": [
         "Ana Elena Monroy Thompson"
@@ -14106,155 +14012,14 @@
         "driverPickupEstimated": "30 min posteriores al aterrizaje",
         "driverNote": "Coordinación de bienvenida y traslado con Dirección de Sede Guayaquil."
       },
-      "radarUrl": "https://www.flightradar24.com/data/flights/ua1034",
-      "checkInUrl": "https://www.google.com/search?q=check+in+United+Airlines+UA1034"
-    },
-    "UA7165_2026-11-02_GYE_PTY": {
-      "flightNumber": "UA 7165",
-      "flightCode": "UA7165_2026-11-02_GYE_PTY",
-      "airline": "United Airlines",
-      "callsign": "UA7165_2026-11-02_GYE_PTY",
-      "reservationCode": "CUSJT9",
-      "passengers": [
-        "Ana Elena Monroy Thompson"
-      ],
-      "sourcePdf": "ANA MONRROY GYE FDS E38.pdf",
-      "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / ANA MONRROY",
-      "route": {
-        "origin": "GYE",
-        "originCity": "Guayaquil",
-        "originAirport": "Aeropuerto Internacional José Joaquín de Olmedo",
-        "destination": "PTY",
-        "destinationCity": "Panamá",
-        "destinationAirport": "Aeropuerto Internacional de Tocumen",
-        "isDirect": true,
-        "stops": 0,
-        "flightDuration": "2h 00m"
-      },
-      "schedule": {
-        "departureDate": "2026-11-02",
-        "scheduledDeparture": "2026-11-02T08:27:00-05:00",
-        "scheduledArrival": "2026-11-02T10:41:00-05:00",
-        "estimatedDeparture": null,
-        "estimatedArrival": null,
-        "actualDeparture": null,
-        "actualArrival": null
-      },
-      "status": "SCHEDULED",
-      "statusLabel": "Programado según itinerario",
-      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
-      "delayMinutes": null,
-      "terminal": "T1",
-      "gate": "Confirmándose en aeropuerto",
-      "baggageClaim": "Por confirmar en arribo",
-      "logistics": {
-        "pickupLocation": "Puerta de Salida de Arribos (Aeropuerto Olmedo GYE)",
-        "destination": "Sede Guayaquil (Hospedaje por coordinar con Dirección de Sede) (Guayaquil, Ecuador)",
-        "driverPickupEstimated": "30 min posteriores al aterrizaje",
-        "driverNote": "Coordinación de bienvenida y traslado con Dirección de Sede Guayaquil."
-      },
-      "radarUrl": "https://www.flightradar24.com/data/flights/ua7165",
-      "checkInUrl": "https://www.google.com/search?q=check+in+United+Airlines+UA7165"
-    },
-    "CM301_2026-11-02_GYE_PTY": {
-      "flightNumber": "CM 301",
-      "flightCode": "CM301_2026-11-02_GYE_PTY",
-      "airline": "Copa Airlines",
-      "callsign": "CM301_2026-11-02_GYE_PTY",
-      "reservationCode": "CUSJT9",
-      "passengers": [
-        "Ana Elena Monroy Thompson"
-      ],
-      "sourcePdf": "ANA MONRROY GYE FDS E38.pdf",
-      "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / ANA MONRROY",
-      "route": {
-        "origin": "GYE",
-        "originCity": "Guayaquil",
-        "originAirport": "Aeropuerto Internacional José Joaquín de Olmedo",
-        "destination": "PTY",
-        "destinationCity": "Panamá",
-        "destinationAirport": "Aeropuerto Internacional de Tocumen",
-        "isDirect": true,
-        "stops": 0,
-        "flightDuration": "2h 00m"
-      },
-      "schedule": {
-        "departureDate": "2026-11-02",
-        "scheduledDeparture": "2026-11-02T08:27:00-05:00",
-        "scheduledArrival": "2026-11-02T10:41:00-05:00",
-        "estimatedDeparture": null,
-        "estimatedArrival": null,
-        "actualDeparture": null,
-        "actualArrival": null
-      },
-      "status": "SCHEDULED",
-      "statusLabel": "Programado según itinerario",
-      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
-      "delayMinutes": null,
-      "terminal": "T1",
-      "gate": "Confirmándose en aeropuerto",
-      "baggageClaim": "Por confirmar en arribo",
-      "logistics": {
-        "pickupLocation": "Puerta de Salida de Arribos (Aeropuerto Olmedo GYE)",
-        "destination": "Sede Guayaquil (Hospedaje por coordinar con Dirección de Sede) (Guayaquil, Ecuador)",
-        "driverPickupEstimated": "30 min posteriores al aterrizaje",
-        "driverNote": "Coordinación de bienvenida y traslado con Dirección de Sede Guayaquil."
-      },
       "radarUrl": "https://www.flightradar24.com/data/flights/cm301",
       "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM301"
     },
-    "UA7166_2026-11-02_PTY_SAN": {
-      "flightNumber": "UA 7166",
-      "flightCode": "UA7166_2026-11-02_PTY_SAN",
-      "airline": "United Airlines",
-      "callsign": "UA7166_2026-11-02_PTY_SAN",
-      "reservationCode": "CUSJT9",
-      "passengers": [
-        "Ana Elena Monroy Thompson"
-      ],
-      "sourcePdf": "ANA MONRROY GYE FDS E38.pdf",
-      "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / ANA MONRROY",
-      "route": {
-        "origin": "PTY",
-        "originCity": "Panamá",
-        "originAirport": "Aeropuerto Internacional de Tocumen",
-        "destination": "SAN",
-        "destinationCity": "San Diego",
-        "destinationAirport": "San Diego International Airport",
-        "isDirect": true,
-        "stops": 0,
-        "flightDuration": "2h 00m"
-      },
-      "schedule": {
-        "departureDate": "2026-11-02",
-        "scheduledDeparture": "2026-11-02T13:45:00-05:00",
-        "scheduledArrival": "2026-11-02T17:15:00-05:00",
-        "estimatedDeparture": null,
-        "estimatedArrival": null,
-        "actualDeparture": null,
-        "actualArrival": null
-      },
-      "status": "SCHEDULED",
-      "statusLabel": "Programado según itinerario",
-      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
-      "delayMinutes": null,
-      "terminal": "T1",
-      "gate": "Confirmándose en aeropuerto",
-      "baggageClaim": "Por confirmar en arribo",
-      "logistics": {
-        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
-        "destination": "Hotel Jose Antonio Deluxe Miraflores (Calle Bellavista 133, Miraflores, Lima 15074, Perú)",
-        "driverPickupEstimated": "30 min posteriores al aterrizaje",
-        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
-      },
-      "radarUrl": "https://www.flightradar24.com/data/flights/ua7166",
-      "checkInUrl": "https://www.google.com/search?q=check+in+United+Airlines+UA7166"
-    },
-    "CM300_2026-11-02_PTY_SAN": {
+    "CM300_2026-11-02_GYE_PTY": {
       "flightNumber": "CM 300",
-      "flightCode": "CM300_2026-11-02_PTY_SAN",
+      "flightCode": "CM300_2026-11-02_GYE_PTY",
       "airline": "Copa Airlines",
-      "callsign": "CM300_2026-11-02_PTY_SAN",
+      "callsign": "CM300_2026-11-02_GYE_PTY",
       "reservationCode": "CUSJT9",
       "passengers": [
         "Ana Elena Monroy Thompson"
@@ -14262,20 +14027,20 @@
       "sourcePdf": "ANA MONRROY GYE FDS E38.pdf",
       "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / ANA MONRROY",
       "route": {
-        "origin": "PTY",
-        "originCity": "Panamá",
-        "originAirport": "Aeropuerto Internacional de Tocumen",
-        "destination": "SAN",
-        "destinationCity": "San Diego",
-        "destinationAirport": "San Diego International Airport",
+        "origin": "GYE",
+        "originCity": "Guayaquil",
+        "originAirport": "Aeropuerto Internacional José Joaquín de Olmedo",
+        "destination": "PTY",
+        "destinationCity": "Panamá",
+        "destinationAirport": "Aeropuerto Internacional de Tocumen",
         "isDirect": true,
         "stops": 0,
         "flightDuration": "2h 00m"
       },
       "schedule": {
         "departureDate": "2026-11-02",
-        "scheduledDeparture": "2026-11-02T13:45:00-05:00",
-        "scheduledArrival": "2026-11-02T17:15:00-05:00",
+        "scheduledDeparture": "2026-11-02T08:27:00-05:00",
+        "scheduledArrival": "2026-11-02T10:41:00-05:00",
         "estimatedDeparture": null,
         "estimatedArrival": null,
         "actualDeparture": null,
@@ -14289,60 +14054,13 @@
       "gate": "Confirmándose en aeropuerto",
       "baggageClaim": "Por confirmar en arribo",
       "logistics": {
-        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
-        "destination": "Hotel Jose Antonio Deluxe Miraflores (Calle Bellavista 133, Miraflores, Lima 15074, Perú)",
+        "pickupLocation": "Puerta de Salida de Arribos (Aeropuerto Olmedo GYE)",
+        "destination": "Sede Guayaquil (Hospedaje por coordinar con Dirección de Sede) (Guayaquil, Ecuador)",
         "driverPickupEstimated": "30 min posteriores al aterrizaje",
-        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+        "driverNote": "Coordinación de bienvenida y traslado con Dirección de Sede Guayaquil."
       },
       "radarUrl": "https://www.flightradar24.com/data/flights/cm300",
       "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM300"
-    },
-    "UA7057_2026-11-02_PTY_SAN": {
-      "flightNumber": "UA 7057",
-      "flightCode": "UA7057_2026-11-02_PTY_SAN",
-      "airline": "United Airlines",
-      "callsign": "UA7057_2026-11-02_PTY_SAN",
-      "reservationCode": "CUSJT9",
-      "passengers": [
-        "Ana Elena Monroy Thompson"
-      ],
-      "sourcePdf": "ANA MONRROY GYE FDS E38.pdf",
-      "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / ANA MONRROY",
-      "route": {
-        "origin": "PTY",
-        "originCity": "Panamá",
-        "originAirport": "Aeropuerto Internacional de Tocumen",
-        "destination": "SAN",
-        "destinationCity": "San Diego",
-        "destinationAirport": "San Diego International Airport",
-        "isDirect": true,
-        "stops": 0,
-        "flightDuration": "2h 00m"
-      },
-      "schedule": {
-        "departureDate": "2026-11-02",
-        "scheduledDeparture": "2026-11-02T13:45:00-05:00",
-        "scheduledArrival": "2026-11-02T17:15:00-05:00",
-        "estimatedDeparture": null,
-        "estimatedArrival": null,
-        "actualDeparture": null,
-        "actualArrival": null
-      },
-      "status": "SCHEDULED",
-      "statusLabel": "Programado según itinerario",
-      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
-      "delayMinutes": null,
-      "terminal": "T1",
-      "gate": "Confirmándose en aeropuerto",
-      "baggageClaim": "Por confirmar en arribo",
-      "logistics": {
-        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
-        "destination": "Hotel Jose Antonio Deluxe Miraflores (Calle Bellavista 133, Miraflores, Lima 15074, Perú)",
-        "driverPickupEstimated": "30 min posteriores al aterrizaje",
-        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
-      },
-      "radarUrl": "https://www.flightradar24.com/data/flights/ua7057",
-      "checkInUrl": "https://www.google.com/search?q=check+in+United+Airlines+UA7057"
     },
     "CM847_2026-11-02_PTY_SAN": {
       "flightNumber": "CM 847",
@@ -14391,11 +14109,11 @@
       "radarUrl": "https://www.flightradar24.com/data/flights/cm847",
       "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM847"
     },
-    "AV1604_2026-11-01_CUE_UIO": {
+    "AV1604_2026-10-29_UIO_CUE": {
       "flightNumber": "AV 1604",
-      "flightCode": "AV1604_2026-11-01_CUE_UIO",
+      "flightCode": "AV1604_2026-10-29_UIO_CUE",
       "airline": "Avianca",
-      "callsign": "AV1604_2026-11-01_CUE_UIO",
+      "callsign": "AV1604_2026-10-29_UIO_CUE",
       "reservationCode": "ADAHS5",
       "passengers": [
         "Juan Angel Arreola"
@@ -14403,20 +14121,20 @@
       "sourcePdf": "JUAN ANGEL CUE CAP 2 E24.pdf",
       "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / JUAN ANGEL AREOLA",
       "route": {
-        "origin": "CUE",
-        "originCity": "Cuenca",
-        "originAirport": "Aeropuerto Mariscal La Mar",
-        "destination": "UIO",
-        "destinationCity": "Quito",
-        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "origin": "UIO",
+        "originCity": "Quito",
+        "originAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "destination": "CUE",
+        "destinationCity": "Cuenca",
+        "destinationAirport": "Aeropuerto Mariscal La Mar",
         "isDirect": true,
         "stops": 0,
         "flightDuration": "2h 00m"
       },
       "schedule": {
-        "departureDate": "2026-11-01",
-        "scheduledDeparture": "2026-11-01T21:20:00-05:00",
-        "scheduledArrival": "2026-11-01T22:15:00-05:00",
+        "departureDate": "2026-10-29",
+        "scheduledDeparture": "2026-10-29T06:00:00-05:00",
+        "scheduledArrival": "2026-10-29T07:00:00-05:00",
         "estimatedDeparture": null,
         "estimatedArrival": null,
         "actualDeparture": null,
@@ -14430,10 +14148,10 @@
       "gate": "Confirmándose en aeropuerto",
       "baggageClaim": "Por confirmar en arribo",
       "logistics": {
-        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
-        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
-        "driverPickupEstimated": "30 min posteriores al aterrizaje",
-        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
+        "pickupLocation": "Hall Principal de Salida de Pasajeros (Aeropuerto CUE)",
+        "destination": "Sede Cuenca (Hospedaje por coordinar con Dirección de Sede) (Cuenca, Ecuador)",
+        "driverPickupEstimated": "20 min posteriores al aterrizaje",
+        "driverNote": "Traslado coordinado con equipo local de Sede Cuenca."
       },
       "radarUrl": "https://www.flightradar24.com/data/flights/av1604",
       "checkInUrl": "https://www.google.com/search?q=check+in+Avianca+AV1604"
@@ -14485,11 +14203,11 @@
       "radarUrl": "https://www.flightradar24.com/data/flights/av1607",
       "checkInUrl": "https://www.google.com/search?q=check+in+Avianca+AV1607"
     },
-    "AM684_2026-11-02_UIO_MEX": {
+    "AM684_2026-10-28_MEX_UIO": {
       "flightNumber": "AM 684",
-      "flightCode": "AM684_2026-11-02_UIO_MEX",
+      "flightCode": "AM684_2026-10-28_MEX_UIO",
       "airline": "Aeroméxico",
-      "callsign": "AM684_2026-11-02_UIO_MEX",
+      "callsign": "AM684_2026-10-28_MEX_UIO",
       "reservationCode": "AD8JYS",
       "passengers": [
         "Juan Angel Arreola"
@@ -14497,20 +14215,20 @@
       "sourcePdf": "JUAN ANGEL CUE CAP 2 E24..pdf",
       "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / JUAN ANGEL AREOLA",
       "route": {
-        "origin": "UIO",
-        "originCity": "Quito",
-        "originAirport": "Aeropuerto Internacional Mariscal Sucre",
-        "destination": "MEX",
-        "destinationCity": "Ciudad de México",
-        "destinationAirport": "Aeropuerto Internacional Benito Juárez",
+        "origin": "MEX",
+        "originCity": "Ciudad de México",
+        "originAirport": "Aeropuerto Internacional Benito Juárez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
         "isDirect": true,
         "stops": 0,
         "flightDuration": "2h 00m"
       },
       "schedule": {
-        "departureDate": "2026-11-02",
-        "scheduledDeparture": "2026-11-02T09:05:00-05:00",
-        "scheduledArrival": "2026-11-02T12:45:00-05:00",
+        "departureDate": "2026-10-28",
+        "scheduledDeparture": "2026-10-28T13:50:00-05:00",
+        "scheduledArrival": "2026-10-28T19:35:00-05:00",
         "estimatedDeparture": null,
         "estimatedArrival": null,
         "actualDeparture": null,
@@ -14524,10 +14242,10 @@
       "gate": "Confirmándose en aeropuerto",
       "baggageClaim": "Por confirmar en arribo",
       "logistics": {
-        "pickupLocation": "Puerta de Salida de Vuelos Llegadas T1 / T2 (Aeropuerto Benito Juárez MEX)",
-        "destination": "Sede Ciudad de México (Hospedaje por coordinar con Dirección de Sede) (Ciudad de México, México)",
+        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
+        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
         "driverPickupEstimated": "30 min posteriores al aterrizaje",
-        "driverNote": "Coordinación de bienvenida y traslado con Sede México."
+        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
       },
       "radarUrl": "https://www.flightradar24.com/data/flights/am684",
       "checkInUrl": "https://www.google.com/search?q=check+in+Aeroméxico+AM684"
@@ -14579,11 +14297,58 @@
       "radarUrl": "https://www.flightradar24.com/data/flights/am685",
       "checkInUrl": "https://www.google.com/search?q=check+in+Aeroméxico+AM685"
     },
-    "CM137_2026-09-16_PTY_GYE": {
+    "CM137_2026-09-16_MEX_PTY": {
       "flightNumber": "CM 137",
-      "flightCode": "CM137_2026-09-16_PTY_GYE",
+      "flightCode": "CM137_2026-09-16_MEX_PTY",
       "airline": "Copa Airlines",
-      "callsign": "CM137_2026-09-16_PTY_GYE",
+      "callsign": "CM137_2026-09-16_MEX_PTY",
+      "reservationCode": "CTBM5V",
+      "passengers": [
+        "Juan Angel Arreola"
+      ],
+      "sourcePdf": "JUAN ANGEL A GYE CAP 2 E 37.pdf",
+      "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / JUAN ANGEL AREOLA",
+      "route": {
+        "origin": "MEX",
+        "originCity": "Ciudad de México",
+        "originAirport": "Aeropuerto Internacional Benito Juárez",
+        "destination": "PTY",
+        "destinationCity": "Panamá",
+        "destinationAirport": "Aeropuerto Internacional de Tocumen",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 00m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-16",
+        "scheduledDeparture": "2026-09-16T07:00:00-05:00",
+        "scheduledArrival": "2026-09-16T11:48:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Salida de Vuelos Llegadas T1 / T2 (Aeropuerto Benito Juárez MEX)",
+        "destination": "Sede Ciudad de México (Hospedaje por coordinar con Dirección de Sede) (Ciudad de México, México)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Coordinación de bienvenida y traslado con Sede México."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/cm137",
+      "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM137"
+    },
+    "CM378_2026-09-16_PTY_GYE": {
+      "flightNumber": "CM 378",
+      "flightCode": "CM378_2026-09-16_PTY_GYE",
+      "airline": "Copa Airlines",
+      "callsign": "CM378_2026-09-16_PTY_GYE",
       "reservationCode": "CTBM5V",
       "passengers": [
         "Juan Angel Arreola"
@@ -14623,14 +14388,14 @@
         "driverPickupEstimated": "30 min posteriores al aterrizaje",
         "driverNote": "Coordinación de bienvenida y traslado con Dirección de Sede Guayaquil."
       },
-      "radarUrl": "https://www.flightradar24.com/data/flights/cm137",
-      "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM137"
+      "radarUrl": "https://www.flightradar24.com/data/flights/cm378",
+      "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM378"
     },
-    "CM378_2026-09-21_GYE_PTY": {
-      "flightNumber": "CM 378",
-      "flightCode": "CM378_2026-09-21_GYE_PTY",
+    "CM300_2026-09-21_GYE_PTY": {
+      "flightNumber": "CM 300",
+      "flightCode": "CM300_2026-09-21_GYE_PTY",
       "airline": "Copa Airlines",
-      "callsign": "CM378_2026-09-21_GYE_PTY",
+      "callsign": "CM300_2026-09-21_GYE_PTY",
       "reservationCode": "CTBM5V",
       "passengers": [
         "Juan Angel Arreola"
@@ -14669,53 +14434,6 @@
         "destination": "Sede Guayaquil (Hospedaje por coordinar con Dirección de Sede) (Guayaquil, Ecuador)",
         "driverPickupEstimated": "30 min posteriores al aterrizaje",
         "driverNote": "Coordinación de bienvenida y traslado con Dirección de Sede Guayaquil."
-      },
-      "radarUrl": "https://www.flightradar24.com/data/flights/cm378",
-      "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM378"
-    },
-    "CM300_2026-09-21_PTY_MEX": {
-      "flightNumber": "CM 300",
-      "flightCode": "CM300_2026-09-21_PTY_MEX",
-      "airline": "Copa Airlines",
-      "callsign": "CM300_2026-09-21_PTY_MEX",
-      "reservationCode": "CTBM5V",
-      "passengers": [
-        "Juan Angel Arreola"
-      ],
-      "sourcePdf": "JUAN ANGEL A GYE CAP 2 E 37.pdf",
-      "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / JUAN ANGEL AREOLA",
-      "route": {
-        "origin": "PTY",
-        "originCity": "Panamá",
-        "originAirport": "Aeropuerto Internacional de Tocumen",
-        "destination": "MEX",
-        "destinationCity": "Ciudad de México",
-        "destinationAirport": "Aeropuerto Internacional Benito Juárez",
-        "isDirect": true,
-        "stops": 0,
-        "flightDuration": "2h 00m"
-      },
-      "schedule": {
-        "departureDate": "2026-09-21",
-        "scheduledDeparture": "2026-09-21T11:47:00-05:00",
-        "scheduledArrival": "2026-09-21T14:30:00-05:00",
-        "estimatedDeparture": null,
-        "estimatedArrival": null,
-        "actualDeparture": null,
-        "actualArrival": null
-      },
-      "status": "SCHEDULED",
-      "statusLabel": "Programado según itinerario",
-      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
-      "delayMinutes": null,
-      "terminal": "T1",
-      "gate": "Confirmándose en aeropuerto",
-      "baggageClaim": "Por confirmar en arribo",
-      "logistics": {
-        "pickupLocation": "Puerta de Salida de Vuelos Llegadas T1 / T2 (Aeropuerto Benito Juárez MEX)",
-        "destination": "Sede Ciudad de México (Hospedaje por coordinar con Dirección de Sede) (Ciudad de México, México)",
-        "driverPickupEstimated": "30 min posteriores al aterrizaje",
-        "driverNote": "Coordinación de bienvenida y traslado con Sede México."
       },
       "radarUrl": "https://www.flightradar24.com/data/flights/cm300",
       "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM300"
@@ -14767,11 +14485,58 @@
       "radarUrl": "https://www.flightradar24.com/data/flights/cm136",
       "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM136"
     },
-    "CM137_2026-10-21_PTY_GYE": {
+    "CM137_2026-10-21_MEX_PTY": {
       "flightNumber": "CM 137",
-      "flightCode": "CM137_2026-10-21_PTY_GYE",
+      "flightCode": "CM137_2026-10-21_MEX_PTY",
       "airline": "Copa Airlines",
-      "callsign": "CM137_2026-10-21_PTY_GYE",
+      "callsign": "CM137_2026-10-21_MEX_PTY",
+      "reservationCode": "BBWFJT",
+      "passengers": [
+        "Juan Angel Arreola"
+      ],
+      "sourcePdf": "JUAN ANGEL GYE CAP 2 E 38.pdf",
+      "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / JUAN ANGEL AREOLA",
+      "route": {
+        "origin": "MEX",
+        "originCity": "Ciudad de México",
+        "originAirport": "Aeropuerto Internacional Benito Juárez",
+        "destination": "PTY",
+        "destinationCity": "Panamá",
+        "destinationAirport": "Aeropuerto Internacional de Tocumen",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 00m"
+      },
+      "schedule": {
+        "departureDate": "2026-10-21",
+        "scheduledDeparture": "2026-10-21T09:50:00-05:00",
+        "scheduledArrival": "2026-10-21T14:38:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Salida de Vuelos Llegadas T1 / T2 (Aeropuerto Benito Juárez MEX)",
+        "destination": "Sede Ciudad de México (Hospedaje por coordinar con Dirección de Sede) (Ciudad de México, México)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Coordinación de bienvenida y traslado con Sede México."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/cm137",
+      "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM137"
+    },
+    "CM378_2026-10-21_PTY_GYE": {
+      "flightNumber": "CM 378",
+      "flightCode": "CM378_2026-10-21_PTY_GYE",
+      "airline": "Copa Airlines",
+      "callsign": "CM378_2026-10-21_PTY_GYE",
       "reservationCode": "BBWFJT",
       "passengers": [
         "Juan Angel Arreola"
@@ -14811,14 +14576,14 @@
         "driverPickupEstimated": "30 min posteriores al aterrizaje",
         "driverNote": "Coordinación de bienvenida y traslado con Dirección de Sede Guayaquil."
       },
-      "radarUrl": "https://www.flightradar24.com/data/flights/cm137",
-      "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM137"
+      "radarUrl": "https://www.flightradar24.com/data/flights/cm378",
+      "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM378"
     },
-    "CM378_2026-10-26_GYE_PTY": {
-      "flightNumber": "CM 378",
-      "flightCode": "CM378_2026-10-26_GYE_PTY",
+    "CM300_2026-10-26_GYE_PTY": {
+      "flightNumber": "CM 300",
+      "flightCode": "CM300_2026-10-26_GYE_PTY",
       "airline": "Copa Airlines",
-      "callsign": "CM378_2026-10-26_GYE_PTY",
+      "callsign": "CM300_2026-10-26_GYE_PTY",
       "reservationCode": "BBWFJT",
       "passengers": [
         "Juan Angel Arreola"
@@ -14857,53 +14622,6 @@
         "destination": "Sede Guayaquil (Hospedaje por coordinar con Dirección de Sede) (Guayaquil, Ecuador)",
         "driverPickupEstimated": "30 min posteriores al aterrizaje",
         "driverNote": "Coordinación de bienvenida y traslado con Dirección de Sede Guayaquil."
-      },
-      "radarUrl": "https://www.flightradar24.com/data/flights/cm378",
-      "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM378"
-    },
-    "CM300_2026-10-26_PTY_MEX": {
-      "flightNumber": "CM 300",
-      "flightCode": "CM300_2026-10-26_PTY_MEX",
-      "airline": "Copa Airlines",
-      "callsign": "CM300_2026-10-26_PTY_MEX",
-      "reservationCode": "BBWFJT",
-      "passengers": [
-        "Juan Angel Arreola"
-      ],
-      "sourcePdf": "JUAN ANGEL GYE CAP 2 E 38.pdf",
-      "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / JUAN ANGEL AREOLA",
-      "route": {
-        "origin": "PTY",
-        "originCity": "Panamá",
-        "originAirport": "Aeropuerto Internacional de Tocumen",
-        "destination": "MEX",
-        "destinationCity": "Ciudad de México",
-        "destinationAirport": "Aeropuerto Internacional Benito Juárez",
-        "isDirect": true,
-        "stops": 0,
-        "flightDuration": "2h 00m"
-      },
-      "schedule": {
-        "departureDate": "2026-10-26",
-        "scheduledDeparture": "2026-10-26T11:53:00-05:00",
-        "scheduledArrival": "2026-10-26T14:30:00-05:00",
-        "estimatedDeparture": null,
-        "estimatedArrival": null,
-        "actualDeparture": null,
-        "actualArrival": null
-      },
-      "status": "SCHEDULED",
-      "statusLabel": "Programado según itinerario",
-      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
-      "delayMinutes": null,
-      "terminal": "T1",
-      "gate": "Confirmándose en aeropuerto",
-      "baggageClaim": "Por confirmar en arribo",
-      "logistics": {
-        "pickupLocation": "Puerta de Salida de Vuelos Llegadas T1 / T2 (Aeropuerto Benito Juárez MEX)",
-        "destination": "Sede Ciudad de México (Hospedaje por coordinar con Dirección de Sede) (Ciudad de México, México)",
-        "driverPickupEstimated": "30 min posteriores al aterrizaje",
-        "driverNote": "Coordinación de bienvenida y traslado con Sede México."
       },
       "radarUrl": "https://www.flightradar24.com/data/flights/cm300",
       "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM300"
@@ -14955,32 +14673,32 @@
       "radarUrl": "https://www.flightradar24.com/data/flights/cm136",
       "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM136"
     },
-    "CM137_2026-10-15_PTY_UIO": {
-      "flightNumber": "CM 137",
-      "flightCode": "CM137_2026-10-15_PTY_UIO",
-      "airline": "Copa Airlines",
-      "callsign": "CM137_2026-10-15_PTY_UIO",
-      "reservationCode": "CROTT9",
+    "AM685_2026-10-19_UIO_MEX": {
+      "flightNumber": "AM 685",
+      "flightCode": "AM685_2026-10-19_UIO_MEX",
+      "airline": "Aeroméxico",
+      "callsign": "AM685_2026-10-19_UIO_MEX",
+      "reservationCode": "CRULO5",
       "passengers": [
         "Cirilo Agustin Martinez"
       ],
-      "sourcePdf": "CIRILO MARTINEZ UIO FDS E124..pdf",
+      "sourcePdf": "CIRILO MARTINEZ UIO FDS E124.pdf",
       "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / CIRILO MARTINEZ",
       "route": {
-        "origin": "PTY",
-        "originCity": "Panamá",
-        "originAirport": "Aeropuerto Internacional de Tocumen",
-        "destination": "UIO",
-        "destinationCity": "Quito",
-        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "origin": "UIO",
+        "originCity": "Quito",
+        "originAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "destination": "MEX",
+        "destinationCity": "Ciudad de México",
+        "destinationAirport": "Aeropuerto Internacional Benito Juárez",
         "isDirect": true,
         "stops": 0,
         "flightDuration": "2h 00m"
       },
       "schedule": {
-        "departureDate": "2026-10-15",
-        "scheduledDeparture": "2026-10-15T15:29:00-05:00",
-        "scheduledArrival": "2026-10-15T17:30:00-05:00",
+        "departureDate": "2026-10-19",
+        "scheduledDeparture": "2026-10-19T10:43:00-05:00",
+        "scheduledArrival": "2026-10-19T14:25:00-05:00",
         "estimatedDeparture": null,
         "estimatedArrival": null,
         "actualDeparture": null,
@@ -14994,10 +14712,57 @@
       "gate": "Confirmándose en aeropuerto",
       "baggageClaim": "Por confirmar en arribo",
       "logistics": {
-        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
-        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
+        "pickupLocation": "Puerta de Salida de Vuelos Llegadas T1 / T2 (Aeropuerto Benito Juárez MEX)",
+        "destination": "Sede Ciudad de México (Hospedaje por coordinar con Dirección de Sede) (Ciudad de México, México)",
         "driverPickupEstimated": "30 min posteriores al aterrizaje",
-        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
+        "driverNote": "Coordinación de bienvenida y traslado con Sede México."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/am685",
+      "checkInUrl": "https://www.google.com/search?q=check+in+Aeroméxico+AM685"
+    },
+    "CM137_2026-10-15_MEX_PTY": {
+      "flightNumber": "CM 137",
+      "flightCode": "CM137_2026-10-15_MEX_PTY",
+      "airline": "Copa Airlines",
+      "callsign": "CM137_2026-10-15_MEX_PTY",
+      "reservationCode": "CROTT9",
+      "passengers": [
+        "Cirilo Agustin Martinez"
+      ],
+      "sourcePdf": "CIRILO MARTINEZ UIO FDS E124..pdf",
+      "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / CIRILO MARTINEZ",
+      "route": {
+        "origin": "MEX",
+        "originCity": "Ciudad de México",
+        "originAirport": "Aeropuerto Internacional Benito Juárez",
+        "destination": "PTY",
+        "destinationCity": "Panamá",
+        "destinationAirport": "Aeropuerto Internacional de Tocumen",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 00m"
+      },
+      "schedule": {
+        "departureDate": "2026-10-15",
+        "scheduledDeparture": "2026-10-15T09:50:00-05:00",
+        "scheduledArrival": "2026-10-15T14:38:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Salida de Vuelos Llegadas T1 / T2 (Aeropuerto Benito Juárez MEX)",
+        "destination": "Sede Ciudad de México (Hospedaje por coordinar con Dirección de Sede) (Ciudad de México, México)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Coordinación de bienvenida y traslado con Sede México."
       },
       "radarUrl": "https://www.flightradar24.com/data/flights/cm137",
       "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM137"
@@ -15049,11 +14814,58 @@
       "radarUrl": "https://www.flightradar24.com/data/flights/cm159",
       "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM159"
     },
-    "CM137_2026-09-10_PTY_UIO": {
+    "CM137_2026-09-10_MEX_PTY": {
       "flightNumber": "CM 137",
-      "flightCode": "CM137_2026-09-10_PTY_UIO",
+      "flightCode": "CM137_2026-09-10_MEX_PTY",
       "airline": "Copa Airlines",
-      "callsign": "CM137_2026-09-10_PTY_UIO",
+      "callsign": "CM137_2026-09-10_MEX_PTY",
+      "reservationCode": "ACK8F7",
+      "passengers": [
+        "Cirilo Agustin Martinez"
+      ],
+      "sourcePdf": "CIRILO MARTINEZ UIO FDS E126 E123.pdf",
+      "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / CIRILO MARTINEZ",
+      "route": {
+        "origin": "MEX",
+        "originCity": "Ciudad de México",
+        "originAirport": "Aeropuerto Internacional Benito Juárez",
+        "destination": "PTY",
+        "destinationCity": "Panamá",
+        "destinationAirport": "Aeropuerto Internacional de Tocumen",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 00m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-10",
+        "scheduledDeparture": "2026-09-10T09:50:00-05:00",
+        "scheduledArrival": "2026-09-10T14:38:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Salida de Vuelos Llegadas T1 / T2 (Aeropuerto Benito Juárez MEX)",
+        "destination": "Sede Ciudad de México (Hospedaje por coordinar con Dirección de Sede) (Ciudad de México, México)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Coordinación de bienvenida y traslado con Sede México."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/cm137",
+      "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM137"
+    },
+    "CM159_2026-09-10_PTY_UIO": {
+      "flightNumber": "CM 159",
+      "flightCode": "CM159_2026-09-10_PTY_UIO",
+      "airline": "Copa Airlines",
+      "callsign": "CM159_2026-09-10_PTY_UIO",
       "reservationCode": "ACK8F7",
       "passengers": [
         "Cirilo Agustin Martinez"
@@ -15093,14 +14905,14 @@
         "driverPickupEstimated": "30 min posteriores al aterrizaje",
         "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
       },
-      "radarUrl": "https://www.flightradar24.com/data/flights/cm137",
-      "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM137"
+      "radarUrl": "https://www.flightradar24.com/data/flights/cm159",
+      "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM159"
     },
-    "CM159_2026-09-21_UIO_PTY": {
-      "flightNumber": "CM 159",
-      "flightCode": "CM159_2026-09-21_UIO_PTY",
+    "CM210_2026-09-21_UIO_PTY": {
+      "flightNumber": "CM 210",
+      "flightCode": "CM210_2026-09-21_UIO_PTY",
       "airline": "Copa Airlines",
-      "callsign": "CM159_2026-09-21_UIO_PTY",
+      "callsign": "CM210_2026-09-21_UIO_PTY",
       "reservationCode": "ACK8F7",
       "passengers": [
         "Cirilo Agustin Martinez"
@@ -15139,53 +14951,6 @@
         "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
         "driverPickupEstimated": "30 min posteriores al aterrizaje",
         "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
-      },
-      "radarUrl": "https://www.flightradar24.com/data/flights/cm159",
-      "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM159"
-    },
-    "CM210_2026-09-21_PTY_MEX": {
-      "flightNumber": "CM 210",
-      "flightCode": "CM210_2026-09-21_PTY_MEX",
-      "airline": "Copa Airlines",
-      "callsign": "CM210_2026-09-21_PTY_MEX",
-      "reservationCode": "ACK8F7",
-      "passengers": [
-        "Cirilo Agustin Martinez"
-      ],
-      "sourcePdf": "CIRILO MARTINEZ UIO FDS E126 E123.pdf",
-      "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / CIRILO MARTINEZ",
-      "route": {
-        "origin": "PTY",
-        "originCity": "Panamá",
-        "originAirport": "Aeropuerto Internacional de Tocumen",
-        "destination": "MEX",
-        "destinationCity": "Ciudad de México",
-        "destinationAirport": "Aeropuerto Internacional Benito Juárez",
-        "isDirect": true,
-        "stops": 0,
-        "flightDuration": "2h 00m"
-      },
-      "schedule": {
-        "departureDate": "2026-09-21",
-        "scheduledDeparture": "2026-09-21T09:26:00-05:00",
-        "scheduledArrival": "2026-09-21T12:10:00-05:00",
-        "estimatedDeparture": null,
-        "estimatedArrival": null,
-        "actualDeparture": null,
-        "actualArrival": null
-      },
-      "status": "SCHEDULED",
-      "statusLabel": "Programado según itinerario",
-      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
-      "delayMinutes": null,
-      "terminal": "T1",
-      "gate": "Confirmándose en aeropuerto",
-      "baggageClaim": "Por confirmar en arribo",
-      "logistics": {
-        "pickupLocation": "Puerta de Salida de Vuelos Llegadas T1 / T2 (Aeropuerto Benito Juárez MEX)",
-        "destination": "Sede Ciudad de México (Hospedaje por coordinar con Dirección de Sede) (Ciudad de México, México)",
-        "driverPickupEstimated": "30 min posteriores al aterrizaje",
-        "driverNote": "Coordinación de bienvenida y traslado con Sede México."
       },
       "radarUrl": "https://www.flightradar24.com/data/flights/cm210",
       "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM210"
@@ -15284,11 +15049,11 @@
       "radarUrl": "https://www.flightradar24.com/data/flights/av1608",
       "checkInUrl": "https://www.google.com/search?q=check+in+Avianca+AV1608"
     },
-    "AM684_2026-10-05_CUE_UIO": {
+    "AM684_2026-09-30_MEX_UIO": {
       "flightNumber": "AM 684",
-      "flightCode": "AM684_2026-10-05_CUE_UIO",
+      "flightCode": "AM684_2026-09-30_MEX_UIO",
       "airline": "Aeroméxico",
-      "callsign": "AM684_2026-10-05_CUE_UIO",
+      "callsign": "AM684_2026-09-30_MEX_UIO",
       "reservationCode": "BBAGXG",
       "passengers": [
         "Alonso Solares Salazar"
@@ -15296,9 +15061,9 @@
       "sourcePdf": "ALONSO SOLARES CUE FDS E22. IDA.pdf",
       "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / ALONSO SOLARES",
       "route": {
-        "origin": "CUE",
-        "originCity": "Cuenca",
-        "originAirport": "Aeropuerto Mariscal La Mar",
+        "origin": "MEX",
+        "originCity": "Ciudad de México",
+        "originAirport": "Aeropuerto Internacional Benito Juárez",
         "destination": "UIO",
         "destinationCity": "Quito",
         "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
@@ -15307,9 +15072,9 @@
         "flightDuration": "2h 00m"
       },
       "schedule": {
-        "departureDate": "2026-10-05",
-        "scheduledDeparture": "2026-10-05T06:56:00-05:00",
-        "scheduledArrival": "2026-10-05T07:45:00-05:00",
+        "departureDate": "2026-09-30",
+        "scheduledDeparture": "2026-09-30T11:10:00-05:00",
+        "scheduledArrival": "2026-09-30T16:57:00-05:00",
         "estimatedDeparture": null,
         "estimatedArrival": null,
         "actualDeparture": null,
@@ -15330,100 +15095,6 @@
       },
       "radarUrl": "https://www.flightradar24.com/data/flights/am684",
       "checkInUrl": "https://www.google.com/search?q=check+in+Aeroméxico+AM684"
-    },
-    "AM8842_2026-10-05_UIO_MEX": {
-      "flightNumber": "AM 8842",
-      "flightCode": "AM8842_2026-10-05_UIO_MEX",
-      "airline": "Aeroméxico",
-      "callsign": "AM8842_2026-10-05_UIO_MEX",
-      "reservationCode": "BBAGXG",
-      "passengers": [
-        "Alonso Solares Salazar"
-      ],
-      "sourcePdf": "ALONSO SOLARES CUE FDS E22. IDA.pdf",
-      "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / ALONSO SOLARES",
-      "route": {
-        "origin": "UIO",
-        "originCity": "Quito",
-        "originAirport": "Aeropuerto Internacional Mariscal Sucre",
-        "destination": "MEX",
-        "destinationCity": "Ciudad de México",
-        "destinationAirport": "Aeropuerto Internacional Benito Juárez",
-        "isDirect": true,
-        "stops": 0,
-        "flightDuration": "2h 00m"
-      },
-      "schedule": {
-        "departureDate": "2026-10-05",
-        "scheduledDeparture": "2026-10-05T10:43:00-05:00",
-        "scheduledArrival": "2026-10-05T14:25:00-05:00",
-        "estimatedDeparture": null,
-        "estimatedArrival": null,
-        "actualDeparture": null,
-        "actualArrival": null
-      },
-      "status": "SCHEDULED",
-      "statusLabel": "Programado según itinerario",
-      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
-      "delayMinutes": null,
-      "terminal": "T1",
-      "gate": "Confirmándose en aeropuerto",
-      "baggageClaim": "Por confirmar en arribo",
-      "logistics": {
-        "pickupLocation": "Puerta de Salida de Vuelos Llegadas T1 / T2 (Aeropuerto Benito Juárez MEX)",
-        "destination": "Sede Ciudad de México (Hospedaje por coordinar con Dirección de Sede) (Ciudad de México, México)",
-        "driverPickupEstimated": "30 min posteriores al aterrizaje",
-        "driverNote": "Coordinación de bienvenida y traslado con Sede México."
-      },
-      "radarUrl": "https://www.flightradar24.com/data/flights/am8842",
-      "checkInUrl": "https://www.google.com/search?q=check+in+Aeroméxico+AM8842"
-    },
-    "LA1386_2026-10-05_UIO_MEX": {
-      "flightNumber": "LA 1386",
-      "flightCode": "LA1386_2026-10-05_UIO_MEX",
-      "airline": "LATAM Airlines",
-      "callsign": "LA1386_2026-10-05_UIO_MEX",
-      "reservationCode": "BBAGXG",
-      "passengers": [
-        "Alonso Solares Salazar"
-      ],
-      "sourcePdf": "ALONSO SOLARES CUE FDS E22. IDA.pdf",
-      "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / ALONSO SOLARES",
-      "route": {
-        "origin": "UIO",
-        "originCity": "Quito",
-        "originAirport": "Aeropuerto Internacional Mariscal Sucre",
-        "destination": "MEX",
-        "destinationCity": "Ciudad de México",
-        "destinationAirport": "Aeropuerto Internacional Benito Juárez",
-        "isDirect": true,
-        "stops": 0,
-        "flightDuration": "2h 00m"
-      },
-      "schedule": {
-        "departureDate": "2026-10-05",
-        "scheduledDeparture": "2026-10-05T10:43:00-05:00",
-        "scheduledArrival": "2026-10-05T14:25:00-05:00",
-        "estimatedDeparture": null,
-        "estimatedArrival": null,
-        "actualDeparture": null,
-        "actualArrival": null
-      },
-      "status": "SCHEDULED",
-      "statusLabel": "Programado según itinerario",
-      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
-      "delayMinutes": null,
-      "terminal": "T1",
-      "gate": "Confirmándose en aeropuerto",
-      "baggageClaim": "Por confirmar en arribo",
-      "logistics": {
-        "pickupLocation": "Puerta de Salida de Vuelos Llegadas T1 / T2 (Aeropuerto Benito Juárez MEX)",
-        "destination": "Sede Ciudad de México (Hospedaje por coordinar con Dirección de Sede) (Ciudad de México, México)",
-        "driverPickupEstimated": "30 min posteriores al aterrizaje",
-        "driverNote": "Coordinación de bienvenida y traslado con Sede México."
-      },
-      "radarUrl": "https://www.flightradar24.com/data/flights/la1386",
-      "checkInUrl": "https://www.google.com/search?q=check+in+LATAM+Airlines+LA1386"
     },
     "AM685_2026-10-05_UIO_MEX": {
       "flightNumber": "AM 685",
@@ -15472,32 +15143,32 @@
       "radarUrl": "https://www.flightradar24.com/data/flights/am685",
       "checkInUrl": "https://www.google.com/search?q=check+in+Aeroméxico+AM685"
     },
-    "AM684_2026-09-21_UIO_MEX": {
+    "AM684_2026-09-16_MEX_UIO": {
       "flightNumber": "AM 684",
-      "flightCode": "AM684_2026-09-21_UIO_MEX",
+      "flightCode": "AM684_2026-09-16_MEX_UIO",
       "airline": "Aeroméxico",
-      "callsign": "AM684_2026-09-21_UIO_MEX",
-      "reservationCode": "CRYW3P",
+      "callsign": "AM684_2026-09-16_MEX_UIO",
+      "reservationCode": "BAPB7B",
       "passengers": [
-        "Jesus Adrian Acosta Rodriguez"
+        "Alonso Solares Salazar"
       ],
-      "sourcePdf": "CHUY ACOSTA UIO ACADEMIA Y FDS 127.pdf",
-      "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / CHUY ACOSTA",
+      "sourcePdf": "ALONSO SOLARES UIO CAMINATA Y FDS E125.pdf",
+      "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / ALONSO SOLARES",
       "route": {
-        "origin": "UIO",
-        "originCity": "Quito",
-        "originAirport": "Aeropuerto Internacional Mariscal Sucre",
-        "destination": "MEX",
-        "destinationCity": "Ciudad de México",
-        "destinationAirport": "Aeropuerto Internacional Benito Juárez",
+        "origin": "MEX",
+        "originCity": "Ciudad de México",
+        "originAirport": "Aeropuerto Internacional Benito Juárez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
         "isDirect": true,
         "stops": 0,
         "flightDuration": "2h 00m"
       },
       "schedule": {
-        "departureDate": "2026-09-21",
-        "scheduledDeparture": "2026-09-21T10:45:00-05:00",
-        "scheduledArrival": "2026-09-21T14:25:00-05:00",
+        "departureDate": "2026-09-16",
+        "scheduledDeparture": "2026-09-16T15:25:00-05:00",
+        "scheduledArrival": "2026-09-16T21:11:00-05:00",
         "estimatedDeparture": null,
         "estimatedArrival": null,
         "actualDeparture": null,
@@ -15511,10 +15182,10 @@
       "gate": "Confirmándose en aeropuerto",
       "baggageClaim": "Por confirmar en arribo",
       "logistics": {
-        "pickupLocation": "Puerta de Salida de Vuelos Llegadas T1 / T2 (Aeropuerto Benito Juárez MEX)",
-        "destination": "Sede Ciudad de México (Hospedaje por coordinar con Dirección de Sede) (Ciudad de México, México)",
+        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
+        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
         "driverPickupEstimated": "30 min posteriores al aterrizaje",
-        "driverNote": "Coordinación de bienvenida y traslado con Sede México."
+        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
       },
       "radarUrl": "https://www.flightradar24.com/data/flights/am684",
       "checkInUrl": "https://www.google.com/search?q=check+in+Aeroméxico+AM684"
@@ -15524,12 +15195,12 @@
       "flightCode": "AM685_2026-09-21_UIO_MEX",
       "airline": "Aeroméxico",
       "callsign": "AM685_2026-09-21_UIO_MEX",
-      "reservationCode": "BAPB7B",
+      "reservationCode": "CRYW3P",
       "passengers": [
-        "Alonso Solares Salazar"
+        "Jesus Adrian Acosta Rodriguez"
       ],
-      "sourcePdf": "ALONSO SOLARES UIO CAMINATA Y FDS E125.pdf",
-      "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / ALONSO SOLARES",
+      "sourcePdf": "CHUY ACOSTA UIO ACADEMIA Y FDS 127.pdf",
+      "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / CHUY ACOSTA",
       "route": {
         "origin": "UIO",
         "originCity": "Quito",
@@ -15571,12 +15242,12 @@
       "flightCode": "AM685_2026-10-26_UIO_MEX",
       "airline": "Aeroméxico",
       "callsign": "AM685_2026-10-26_UIO_MEX",
-      "reservationCode": "AX2FS9",
+      "reservationCode": "CSU7VM",
       "passengers": [
-        "Alonso Solares Salazar"
+        "Jesus Adrian Acosta Rodriguez"
       ],
-      "sourcePdf": "ALONSO SOLARES UIO FDS E127.pdf",
-      "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / ALONSO SOLARES",
+      "sourcePdf": "CHUY ACOSTA UIO FDS E125.pdf",
+      "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / CHUY ACOSTA",
       "route": {
         "origin": "UIO",
         "originCity": "Quito",
@@ -15612,6 +15283,53 @@
       },
       "radarUrl": "https://www.flightradar24.com/data/flights/am685",
       "checkInUrl": "https://www.google.com/search?q=check+in+Aeroméxico+AM685"
+    },
+    "CM137_2026-10-22_MEX_PTY": {
+      "flightNumber": "CM 137",
+      "flightCode": "CM137_2026-10-22_MEX_PTY",
+      "airline": "Copa Airlines",
+      "callsign": "CM137_2026-10-22_MEX_PTY",
+      "reservationCode": "AWY6RB",
+      "passengers": [
+        "Alonso Solares Salazar"
+      ],
+      "sourcePdf": "ALONSO SOLARES UIO FDS E127..pdf",
+      "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / ALONSO SOLARES",
+      "route": {
+        "origin": "MEX",
+        "originCity": "Ciudad de México",
+        "originAirport": "Aeropuerto Internacional Benito Juárez",
+        "destination": "PTY",
+        "destinationCity": "Panamá",
+        "destinationAirport": "Aeropuerto Internacional de Tocumen",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 00m"
+      },
+      "schedule": {
+        "departureDate": "2026-10-22",
+        "scheduledDeparture": "2026-10-22T09:50:00-05:00",
+        "scheduledArrival": "2026-10-22T14:38:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Salida de Vuelos Llegadas T1 / T2 (Aeropuerto Benito Juárez MEX)",
+        "destination": "Sede Ciudad de México (Hospedaje por coordinar con Dirección de Sede) (Ciudad de México, México)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Coordinación de bienvenida y traslado con Sede México."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/cm137",
+      "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM137"
     },
     "CM159_2026-10-22_PTY_UIO": {
       "flightNumber": "CM 159",
@@ -15660,6 +15378,53 @@
       "radarUrl": "https://www.flightradar24.com/data/flights/cm159",
       "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM159"
     },
+    "CM378_2026-09-24_PTY_GYE": {
+      "flightNumber": "CM 378",
+      "flightCode": "CM378_2026-09-24_PTY_GYE",
+      "airline": "Copa Airlines",
+      "callsign": "CM378_2026-09-24_PTY_GYE",
+      "reservationCode": "AR4QO4",
+      "passengers": [
+        "Alonso Solares Salazar"
+      ],
+      "sourcePdf": "ALONSO SOLARES GYE FDS E36.pdf",
+      "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / ALONSO SOLARES",
+      "route": {
+        "origin": "PTY",
+        "originCity": "Panamá",
+        "originAirport": "Aeropuerto Internacional de Tocumen",
+        "destination": "GYE",
+        "destinationCity": "Guayaquil",
+        "destinationAirport": "Aeropuerto Internacional José Joaquín de Olmedo",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 00m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-24",
+        "scheduledDeparture": "2026-09-24T15:17:00-05:00",
+        "scheduledArrival": "2026-09-24T17:30:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Salida de Arribos (Aeropuerto Olmedo GYE)",
+        "destination": "Sede Guayaquil (Hospedaje por coordinar con Dirección de Sede) (Guayaquil, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Coordinación de bienvenida y traslado con Dirección de Sede Guayaquil."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/cm378",
+      "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM378"
+    },
     "CM136_2026-09-28_PTY_MEX": {
       "flightNumber": "CM 136",
       "flightCode": "CM136_2026-09-28_PTY_MEX",
@@ -15707,11 +15472,11 @@
       "radarUrl": "https://www.flightradar24.com/data/flights/cm136",
       "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM136"
     },
-    "CM121_2026-10-22_PTY_UIO": {
+    "CM121_2026-10-22_MEX_PTY": {
       "flightNumber": "CM 121",
-      "flightCode": "CM121_2026-10-22_PTY_UIO",
+      "flightCode": "CM121_2026-10-22_MEX_PTY",
       "airline": "Copa Airlines",
-      "callsign": "CM121_2026-10-22_PTY_UIO",
+      "callsign": "CM121_2026-10-22_MEX_PTY",
       "reservationCode": "CRZSXI",
       "passengers": [
         "Jesus Adrian Acosta Rodriguez"
@@ -15719,20 +15484,20 @@
       "sourcePdf": "CHUY ACOSTA UIO FDS E125...pdf",
       "sourcePath": " / VUELOS SEPTIEMBRE Y OCTUBRE ECUADOR / CHUY ACOSTA",
       "route": {
-        "origin": "PTY",
-        "originCity": "Panamá",
-        "originAirport": "Aeropuerto Internacional de Tocumen",
-        "destination": "UIO",
-        "destinationCity": "Quito",
-        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "origin": "MEX",
+        "originCity": "Ciudad de México",
+        "originAirport": "Aeropuerto Internacional Benito Juárez",
+        "destination": "PTY",
+        "destinationCity": "Panamá",
+        "destinationAirport": "Aeropuerto Internacional de Tocumen",
         "isDirect": true,
         "stops": 0,
         "flightDuration": "2h 00m"
       },
       "schedule": {
         "departureDate": "2026-10-22",
-        "scheduledDeparture": "2026-10-22T18:40:00-05:00",
-        "scheduledArrival": "2026-10-22T20:41:00-05:00",
+        "scheduledDeparture": "2026-10-22T13:10:00-05:00",
+        "scheduledArrival": "2026-10-22T17:54:00-05:00",
         "estimatedDeparture": null,
         "estimatedArrival": null,
         "actualDeparture": null,
@@ -15746,10 +15511,10 @@
       "gate": "Confirmándose en aeropuerto",
       "baggageClaim": "Por confirmar en arribo",
       "logistics": {
-        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
-        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
+        "pickupLocation": "Puerta de Salida de Vuelos Llegadas T1 / T2 (Aeropuerto Benito Juárez MEX)",
+        "destination": "Sede Ciudad de México (Hospedaje por coordinar con Dirección de Sede) (Ciudad de México, México)",
         "driverPickupEstimated": "30 min posteriores al aterrizaje",
-        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
+        "driverNote": "Coordinación de bienvenida y traslado con Sede México."
       },
       "radarUrl": "https://www.flightradar24.com/data/flights/cm121",
       "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM121"
@@ -15801,11 +15566,11 @@
       "radarUrl": "https://www.flightradar24.com/data/flights/cm152",
       "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM152"
     },
-    "AM701_2026-09-14_MEX_UIO": {
-      "flightNumber": "AM 701",
-      "flightCode": "AM701_2026-09-14_MEX_UIO",
+    "AM684_2026-09-14_MEX_UIO": {
+      "flightNumber": "AM 684",
+      "flightCode": "AM684_2026-09-14_MEX_UIO",
       "airline": "Aeroméxico",
-      "callsign": "AM701_2026-09-14_MEX_UIO",
+      "callsign": "AM684_2026-09-14_MEX_UIO",
       "reservationCode": "CRYW3P",
       "passengers": [
         "Jesus Adrian Acosta Rodriguez"
@@ -15845,8 +15610,8 @@
         "driverPickupEstimated": "30 min posteriores al aterrizaje",
         "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
       },
-      "radarUrl": "https://www.flightradar24.com/data/flights/am701",
-      "checkInUrl": "https://www.google.com/search?q=check+in+Aeroméxico+AM701"
+      "radarUrl": "https://www.flightradar24.com/data/flights/am684",
+      "checkInUrl": "https://www.google.com/search?q=check+in+Aeroméxico+AM684"
     }
   }
 }

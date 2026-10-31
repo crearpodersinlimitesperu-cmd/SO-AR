@@ -353,24 +353,27 @@ def sync_from_drive():
 
                     window = lines[i:i+35]
                     for w, w_l in enumerate(window):
-                        if w_l == 'Salida' and w + 1 < len(window):
+                        # Evitar filtrar tramos posteriores en la misma ventana de búsqueda
+                        if w > 0 and re.search(r'\b(LA|AV|CM|JA|UA|DL|AA|IB|UX|AM|2K)\s*(\d{2,4})\b', w_l):
+                            break
+                        if w_l == 'Salida' and w + 1 < len(window) and not dep_date:
                             m_d = re.search(r'(\d{1,2})\s+([A-Za-z]{3,10})\s+(\d{1,2}:\d{2})', window[w+1])
                             if m_d:
                                 m_num = MONTH_MAP.get(m_d.group(2).lower())
                                 if m_num:
                                     dep_date = f"2026-{m_num}-{m_d.group(1).zfill(2)}"
                                     dep_time = m_d.group(3)
-                            if w + 2 < len(window):
+                            if w + 2 < len(window) and not orig_code:
                                 orig_code = detect_city_code(window[w+2])
 
-                        if w_l == 'Llegada' and w + 1 < len(window):
+                        if w_l == 'Llegada' and w + 1 < len(window) and not arr_date:
                             m_a = re.search(r'(\d{1,2})\s+([A-Za-z]{3,10})\s+(\d{1,2}:\d{2})', window[w+1])
                             if m_a:
                                 m_num = MONTH_MAP.get(m_a.group(2).lower())
                                 if m_num:
                                     arr_date = f"2026-{m_num}-{m_a.group(1).zfill(2)}"
                                     arr_time = m_a.group(3)
-                            if w + 2 < len(window):
+                            if w + 2 < len(window) and not dest_code:
                                 dest_code = detect_city_code(window[w+2])
 
                     if dep_date and orig_code and dest_code and orig_code != dest_code:
@@ -453,6 +456,8 @@ def sync_from_drive():
                     dep_time, arr_time = None, None
 
                     for w, w_l in enumerate(window):
+                        if w > 0 and 'DEPARTURE:' in w_l:
+                            break
                         m_f = re.search(r'\b(LA|AV|CM|JA|UA|DL|AA|IB|UX|AM|2K)\s*(\d{2,4})\b', w_l)
                         if m_f and not fl_num:
                             fl_num = f"{m_f.group(1)} {m_f.group(2)}"
