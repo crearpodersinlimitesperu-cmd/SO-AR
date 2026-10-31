@@ -1023921,7 +1023921,7 @@ const SEDES_LOGISTICA = {
   Lima: {
     nombre: 'Lima',
     pais: 'Perú',
-    bandera: 'ðŸ‡µðŸ‡ª',
+    bandera: '🇵🇪',
     hotel: 'Hotel Jose Antonio Deluxe Miraflores',
     direccion: 'Calle Bellavista 133, Miraflores, Lima 15074, Perú',
     mapsUrl: 'https://maps.google.com/?q=Hotel+Jose+Antonio+Deluxe+Miraflores+Lima',
@@ -1023939,7 +1023939,7 @@ const SEDES_LOGISTICA = {
   Quito: {
     nombre: 'Quito',
     pais: 'Ecuador',
-    bandera: 'ðŸ‡ªðŸ‡¨',
+    bandera: '🇪🇨',
     hotel: 'Fortaleza Cuántica / Swissôtel Quito',
     direccion: 'De los Naranjos, 170124 Quito, Ecuador',
     mapsUrl: 'https://maps.google.com/?q=De+los+Naranjos+170124+Quito+Ecuador',
@@ -1023957,7 +1023957,7 @@ const SEDES_LOGISTICA = {
   Cuenca: {
     nombre: 'Cuenca',
     pais: 'Ecuador',
-    bandera: 'ðŸ‡ªðŸ‡¨',
+    bandera: '🇪🇨',
     hotel: 'Hotel Oro Verde Cuenca',
     direccion: 'Av. Ordóñez Lasso s/n, Cuenca 010150, Ecuador',
     mapsUrl: 'https://maps.google.com/?q=Hotel+Oro+Verde+Cuenca+Ecuador',
@@ -1023975,7 +1023975,7 @@ const SEDES_LOGISTICA = {
   Guayaquil: {
     nombre: 'Guayaquil',
     pais: 'Ecuador',
-    bandera: 'ðŸ‡ªðŸ‡¨',
+    bandera: '🇪🇨',
     hotel: 'Hotel Wyndham Guayaquil (Puerto Santa Ana)',
     direccion: 'Calle Numa Pompilio Llona, Ciudad del Río, Puerto Santa Ana, Guayaquil',
     mapsUrl: 'https://maps.google.com/?q=Hotel+Wyndham+Guayaquil+Puerto+Santa+Ana',
@@ -1024610,16 +1024610,16 @@ export default function MonitorVuelosCartas() {
 
     const text = `✈️ *CREAR PODER SIN LÍMITES - BRIEFING DE RECOJO DE ENTRENADOR*\n` +
       `📍 *Sede de Llegada:* ${info.nombre} ${info.bandera}\n\n` +
-      `📍Œ *Vuelo:* ${flight.flightNumber} (${flight.airline})\n` +
-      `ðŸ‘¤ *Pasajero(s):* ${flight.passengers.join(', ')}\n` +
-      `ðŸ›« *Ruta:* ${flight.route.originCity} (${flight.route.origin}) ➔ ${flight.route.destinationCity} (${flight.route.destination})\n` +
+      `🛫 *Vuelo:* ${flight.flightNumber} (${flight.airline})\n` +
+      `👤 *Pasajero(s):* ${flight.passengers.join(', ')}\n` +
+      `🛬 *Ruta:* ${flight.route.originCity} (${flight.route.origin}) ➔ ${flight.route.destinationCity} (${flight.route.destination})\n` +
       `⏰ *Llegada según itinerario:* ${arrivalTime}\n` +
       `📍 *Punto de Recojo:* ${flight.logistics?.pickupLocation || info.puntoEspera}\n` +
-      `ðŸ¨ *Destino:* ${info.hotel} (${info.direccion})\n` +
-      `ðŸš— *Hora Chofer:* ${flight.logistics?.driverPickupEstimated || '30 min posteriores al aterrizaje'}\n` +
+      `🏨 *Destino:* ${info.hotel} (${info.direccion})\n` +
+      `🚗 *Hora Chofer:* ${flight.logistics?.driverPickupEstimated || '30 min posteriores al aterrizaje'}\n` +
       `ℹ️ *Nota de Protocolo:* ${flight.logistics?.driverNote || 'Conductor esperará en llegadas con cartel oficial CREAR PODER SIN LÍMITES.'}\n` +
       `ℹ️ *Estado:* ${FLIGHT_DISCLAIMER}\n` +
-      `🔍— *Radar externo:* ${flight.radarUrl || 'Consultar aerolínea'}`;
+      `🔍 *Radar externo:* ${flight.radarUrl || 'Consultar aerolínea'}`;
     copyToClipboard(text, `Briefing de WhatsApp para chofer (${info.nombre})`);
   };
 
@@ -1025689,7 +1025689,7 @@ export default function MonitorVuelosCartas() {
           {/* Grid de Cartas Multi-Sede */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '1.2rem' }}>
             {filteredLetters.map(letter => {
-              const sedeInfo = SEDES_LOGISTICA[letter.sede] || { bandera: 'ðŸŒ' };
+              const sedeInfo = SEDES_LOGISTICA[letter.sede] || { bandera: '🌐' };
               const isDriveLink = letter.url.includes('drive.google.com');
 
               return (
@@ -1025982,12 +1025982,12 @@ export default function MonitorVuelosCartas() {
                   </div>
                   <button
                     onClick={() => {
-                      const text = `ðŸš— *CPSL PROTOCOLO CHOFER - SEDE ${currentLogistica.nombre.toUpperCase()}*\n` +
-                        `ðŸ¨ *Hotel:* ${currentLogistica.hotel}\n` +
+                      const text = `🚗 *CPSL PROTOCOLO CHOFER - SEDE ${currentLogistica.nombre.toUpperCase()}*\n` +
+                        `🏨 *Hotel:* ${currentLogistica.hotel}\n` +
                         `📍 *Dirección:* ${currentLogistica.direccion}\n` +
                         `✈️ *Aeropuerto:* ${currentLogistica.aeropuerto}\n` +
-                        `📍Œ *Punto de Espera:* ${currentLogistica.puntoEspera}\n` +
-                        `📍ž *Teléfono Hotel:* ${currentLogistica.telefono}`;
+                        `🛫 *Punto de Espera:* ${currentLogistica.puntoEspera}\n` +
+                        `📞 *Teléfono Hotel:* ${currentLogistica.telefono}`;
                       copyToClipboard(text, `Protocolo de sede ${currentLogistica.nombre}`);
                     }}
                     className="btn-secondary"
