@@ -1,11 +1,11 @@
 {
   "version": "3.2.0-ai-engine",
-  "updatedAt": "2026-11-02T07:13:19.964027Z",
+  "updatedAt": "2026-11-02T19:58:27.167785Z",
   "liveStatusAvailable": false,
   "aiEngineStatus": "ACTIVE",
-  "totalPdfAnalyzed": 482,
-  "totalFlightsIndexed": 332,
-  "totalFlights": 332,
+  "totalPdfAnalyzed": 491,
+  "totalFlightsIndexed": 359,
+  "totalFlights": 359,
   "syncFrequency": "7 veces al día (01:00, 04:00, 10:00, 13:00, 16:00, 19:00, 22:00 UTC)",
   "source": "Google Drive Sync (Carpetas Oficiales Vuelos CPSL)",
   "flights": {
@@ -249,12 +249,12 @@
       "flightCode": "LA1430_2026-09-04_LIM_UIO",
       "airline": "LATAM Airlines",
       "callsign": "LA1430_2026-09-04_LIM_UIO",
-      "reservationCode": "AKVVMJ",
+      "reservationCode": "KABTZP",
       "passengers": [
-        "HAYDIN MENDOZA CLAVIJO"
+        "FERNANDO ARAGON"
       ],
-      "sourcePdf": "LA5441064TFUW-b207f75d-272f-424c-bab0-5a60e05d2e80-cuv-bill.pdf",
-      "sourcePath": "",
+      "sourcePdf": "FER ARAGON - CAP UNO EQ 39 - GUAYAQUIL.pdf",
+      "sourcePath": " / FER ARAGON - CAP UNO EQ 39 - GUAYAQUIL.pdf",
       "route": {
         "origin": "LIM",
         "originCity": "Lima",
@@ -6124,12 +6124,12 @@
       "flightCode": "LA1401_2026-09-04_LIM_UIO",
       "airline": "LATAM Airlines",
       "callsign": "LA1401_2026-09-04_LIM_UIO",
-      "reservationCode": "LIDPQA",
+      "reservationCode": "OEDIMH",
       "passengers": [
-        "FERNANDO ARAGON"
+        "MARIA PATINO"
       ],
-      "sourcePdf": "LA5448199YVDW-f8981234-94c0-495a-b1c7-0f06e07fb472-cuv-bill.pdf",
-      "sourcePath": "",
+      "sourcePdf": "LOURDES PATIÑO - 2DO FDS EQ 23 - CUENCA.pdf",
+      "sourcePath": " / LOURDES PATIÑO - 2DO FDS EQ 23 - CUENCA.pdf",
       "route": {
         "origin": "LIM",
         "originCity": "Lima",
@@ -6594,12 +6594,12 @@
       "flightCode": "LA2464_2026-09-04_LIM_UIO",
       "airline": "LATAM Airlines",
       "callsign": "LA2464_2026-09-04_LIM_UIO",
-      "reservationCode": "EQNQHQ",
+      "reservationCode": "KABTZP",
       "passengers": [
         "FERNANDO ARAGON"
       ],
-      "sourcePdf": "LA5449455TMZA-bf6d0016-6bd1-4c07-918c-196de17270ef-cuv-bill.pdf",
-      "sourcePath": "",
+      "sourcePdf": "FER ARAGON - CAP UNO EQ 39 - GUAYAQUIL.pdf",
+      "sourcePath": " / FER ARAGON - CAP UNO EQ 39 - GUAYAQUIL.pdf",
       "route": {
         "origin": "LIM",
         "originCity": "Lima",
@@ -10636,12 +10636,12 @@
       "flightCode": "LA2369_2026-09-04_LIM_UIO",
       "airline": "LATAM Airlines",
       "callsign": "LA2369_2026-09-04_LIM_UIO",
-      "reservationCode": "KZNOJE",
+      "reservationCode": "KABTZP",
       "passengers": [
         "FERNANDO ARAGON"
       ],
-      "sourcePdf": "Comprobante-LATAM-LA5441175IOEY.pdf",
-      "sourcePath": "",
+      "sourcePdf": "FER ARAGON - CAP UNO EQ 39 - GUAYAQUIL.pdf",
+      "sourcePath": " / FER ARAGON - CAP UNO EQ 39 - GUAYAQUIL.pdf",
       "route": {
         "origin": "LIM",
         "originCity": "Lima",
@@ -11194,6 +11194,1275 @@
       },
       "radarUrl": "https://www.flightradar24.com/data/flights/la1426",
       "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "CM121_2026-11-26_MEX_PTY": {
+      "flightNumber": "CM 121",
+      "flightCode": "CM121_2026-11-26_MEX_PTY",
+      "airline": "Copa Airlines",
+      "callsign": "CM121_2026-11-26_MEX_PTY",
+      "reservationCode": "BV6EW4",
+      "passengers": [
+        "Cirilo Agustin Martinez"
+      ],
+      "sourcePdf": "CIRILO MARTINEZ - 1ER FDS EQ 131 - QUITO.pdf",
+      "sourcePath": " / CIRILO MARTINEZ - 1ER FDS EQ 131 - QUITO.pdf",
+      "route": {
+        "origin": "MEX",
+        "originCity": "Ciudad de México",
+        "originAirport": "Aeropuerto Internacional Benito Juárez",
+        "destination": "PTY",
+        "destinationCity": "Panamá",
+        "destinationAirport": "Aeropuerto Internacional de Tocumen",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 00m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-26",
+        "scheduledDeparture": "2026-11-26T13:10:00-05:00",
+        "scheduledArrival": "2026-11-26T17:59:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Salida de Vuelos Llegadas T1 / T2 (Aeropuerto Benito Juárez MEX)",
+        "destination": "Sede Ciudad de México (Hospedaje por coordinar con Dirección de Sede) (Ciudad de México, México)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Coordinación de bienvenida y traslado con Sede México."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/cm121",
+      "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM121"
+    },
+    "CM152_2026-11-26_PTY_UIO": {
+      "flightNumber": "CM 152",
+      "flightCode": "CM152_2026-11-26_PTY_UIO",
+      "airline": "Copa Airlines",
+      "callsign": "CM152_2026-11-26_PTY_UIO",
+      "reservationCode": "BV6EW4",
+      "passengers": [
+        "Cirilo Agustin Martinez"
+      ],
+      "sourcePdf": "CIRILO MARTINEZ - 1ER FDS EQ 131 - QUITO.pdf",
+      "sourcePath": " / CIRILO MARTINEZ - 1ER FDS EQ 131 - QUITO.pdf",
+      "route": {
+        "origin": "PTY",
+        "originCity": "Panamá",
+        "originAirport": "Aeropuerto Internacional de Tocumen",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 00m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-26",
+        "scheduledDeparture": "2026-11-26T18:45:00-05:00",
+        "scheduledArrival": "2026-11-26T20:47:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
+        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/cm152",
+      "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM152"
+    },
+    "CM438_2026-11-30_UIO_PTY": {
+      "flightNumber": "CM 438",
+      "flightCode": "CM438_2026-11-30_UIO_PTY",
+      "airline": "Copa Airlines",
+      "callsign": "CM438_2026-11-30_UIO_PTY",
+      "reservationCode": "BV6EW4",
+      "passengers": [
+        "Cirilo Agustin Martinez"
+      ],
+      "sourcePdf": "CIRILO MARTINEZ - 1ER FDS EQ 131 - QUITO.pdf",
+      "sourcePath": " / CIRILO MARTINEZ - 1ER FDS EQ 131 - QUITO.pdf",
+      "route": {
+        "origin": "UIO",
+        "originCity": "Quito",
+        "originAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "destination": "PTY",
+        "destinationCity": "Panamá",
+        "destinationAirport": "Aeropuerto Internacional de Tocumen",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 00m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-30",
+        "scheduledDeparture": "2026-11-30T08:26:00-05:00",
+        "scheduledArrival": "2026-11-30T10:24:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
+        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/cm438",
+      "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM438"
+    },
+    "CM136_2026-11-30_PTY_MEX": {
+      "flightNumber": "CM 136",
+      "flightCode": "CM136_2026-11-30_PTY_MEX",
+      "airline": "Copa Airlines",
+      "callsign": "CM136_2026-11-30_PTY_MEX",
+      "reservationCode": "BV6EW4",
+      "passengers": [
+        "Cirilo Agustin Martinez"
+      ],
+      "sourcePdf": "CIRILO MARTINEZ - 1ER FDS EQ 131 - QUITO.pdf",
+      "sourcePath": " / CIRILO MARTINEZ - 1ER FDS EQ 131 - QUITO.pdf",
+      "route": {
+        "origin": "PTY",
+        "originCity": "Panamá",
+        "originAirport": "Aeropuerto Internacional de Tocumen",
+        "destination": "MEX",
+        "destinationCity": "Ciudad de México",
+        "destinationAirport": "Aeropuerto Internacional Benito Juárez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 00m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-30",
+        "scheduledDeparture": "2026-11-30T11:45:00-05:00",
+        "scheduledArrival": "2026-11-30T14:30:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Salida de Vuelos Llegadas T1 / T2 (Aeropuerto Benito Juárez MEX)",
+        "destination": "Sede Ciudad de México (Hospedaje por coordinar con Dirección de Sede) (Ciudad de México, México)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Coordinación de bienvenida y traslado con Sede México."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/cm136",
+      "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM136"
+    },
+    "AV8399_2026-11-25_MDE_GYE": {
+      "flightNumber": "AV 8399",
+      "flightCode": "AV8399_2026-11-25_MDE_GYE",
+      "airline": "Avianca",
+      "callsign": "AV8399_2026-11-25_MDE_GYE",
+      "reservationCode": "2MAWFA",
+      "passengers": [
+        "Carlos Andres Gomez"
+      ],
+      "sourcePdf": "ANDRES GOMEZ - CAP DOS EQ 39 - GUAYAQUIL.pdf",
+      "sourcePath": " / ANDRES GOMEZ - CAP DOS EQ 39 - GUAYAQUIL.pdf",
+      "route": {
+        "origin": "MDE",
+        "originCity": "Medellín",
+        "originAirport": "Aeropuerto Internacional José María Córdova",
+        "destination": "GYE",
+        "destinationCity": "Guayaquil",
+        "destinationAirport": "Aeropuerto Internacional José Joaquín de Olmedo",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 00m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-25",
+        "scheduledDeparture": "2026-11-25T16:50:00-05:00",
+        "scheduledArrival": "2026-11-25T18:45:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Salida de Arribos (Aeropuerto Olmedo GYE)",
+        "destination": "Sede Guayaquil (Hospedaje por coordinar con Dirección de Sede) (Guayaquil, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Coordinación de bienvenida y traslado con Dirección de Sede Guayaquil."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/av8399",
+      "checkInUrl": "https://www.google.com/search?q=check+in+Avianca+AV8399"
+    },
+    "AV8398_2026-11-30_GYE_MDE": {
+      "flightNumber": "AV 8398",
+      "flightCode": "AV8398_2026-11-30_GYE_MDE",
+      "airline": "Avianca",
+      "callsign": "AV8398_2026-11-30_GYE_MDE",
+      "reservationCode": "2MAWFA",
+      "passengers": [
+        "Carlos Andres Gomez"
+      ],
+      "sourcePdf": "ANDRES GOMEZ - CAP DOS EQ 39 - GUAYAQUIL.pdf",
+      "sourcePath": " / ANDRES GOMEZ - CAP DOS EQ 39 - GUAYAQUIL.pdf",
+      "route": {
+        "origin": "GYE",
+        "originCity": "Guayaquil",
+        "originAirport": "Aeropuerto Internacional José Joaquín de Olmedo",
+        "destination": "MDE",
+        "destinationCity": "Medellín",
+        "destinationAirport": "Aeropuerto Internacional José María Córdova",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 00m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-30",
+        "scheduledDeparture": "2026-11-30T13:35:00-05:00",
+        "scheduledArrival": "2026-11-30T15:20:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Salida Puerta 1 Llegadas Internacionales / Nacionales MDE",
+        "destination": "Sede Medellín (Hospedaje por coordinar con Dirección de Sede) (Medellín, Colombia)",
+        "driverPickupEstimated": "35 min posteriores al aterrizaje",
+        "driverNote": "Coordinación de bienvenida y traslado con Sede Medellín."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/av8398",
+      "checkInUrl": "https://www.google.com/search?q=check+in+Avianca+AV8398"
+    },
+    "CM137_2026-11-19_MEX_PTY": {
+      "flightNumber": "CM 137",
+      "flightCode": "CM137_2026-11-19_MEX_PTY",
+      "airline": "Copa Airlines",
+      "callsign": "CM137_2026-11-19_MEX_PTY",
+      "reservationCode": "BU6AEJ",
+      "passengers": [
+        "Cirilo Agustin Martinez"
+      ],
+      "sourcePdf": "CIRILO MARTINEZ - 3ER FDS EQ 126 - QUITO.pdf",
+      "sourcePath": " / CIRILO MARTINEZ - 3ER FDS EQ 126 - QUITO.pdf",
+      "route": {
+        "origin": "MEX",
+        "originCity": "Ciudad de México",
+        "originAirport": "Aeropuerto Internacional Benito Juárez",
+        "destination": "PTY",
+        "destinationCity": "Panamá",
+        "destinationAirport": "Aeropuerto Internacional de Tocumen",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 00m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-19",
+        "scheduledDeparture": "2026-11-19T09:10:00-05:00",
+        "scheduledArrival": "2026-11-19T14:03:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Salida de Vuelos Llegadas T1 / T2 (Aeropuerto Benito Juárez MEX)",
+        "destination": "Sede Ciudad de México (Hospedaje por coordinar con Dirección de Sede) (Ciudad de México, México)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Coordinación de bienvenida y traslado con Sede México."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/cm137",
+      "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM137"
+    },
+    "CM159_2026-11-19_PTY_UIO": {
+      "flightNumber": "CM 159",
+      "flightCode": "CM159_2026-11-19_PTY_UIO",
+      "airline": "Copa Airlines",
+      "callsign": "CM159_2026-11-19_PTY_UIO",
+      "reservationCode": "BU6AEJ",
+      "passengers": [
+        "Cirilo Agustin Martinez"
+      ],
+      "sourcePdf": "CIRILO MARTINEZ - 3ER FDS EQ 126 - QUITO.pdf",
+      "sourcePath": " / CIRILO MARTINEZ - 3ER FDS EQ 126 - QUITO.pdf",
+      "route": {
+        "origin": "PTY",
+        "originCity": "Panamá",
+        "originAirport": "Aeropuerto Internacional de Tocumen",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 00m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-19",
+        "scheduledDeparture": "2026-11-19T15:31:00-05:00",
+        "scheduledArrival": "2026-11-19T17:33:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
+        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/cm159",
+      "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM159"
+    },
+    "CM438_2026-11-23_UIO_PTY": {
+      "flightNumber": "CM 438",
+      "flightCode": "CM438_2026-11-23_UIO_PTY",
+      "airline": "Copa Airlines",
+      "callsign": "CM438_2026-11-23_UIO_PTY",
+      "reservationCode": "BU6AEJ",
+      "passengers": [
+        "Cirilo Agustin Martinez"
+      ],
+      "sourcePdf": "CIRILO MARTINEZ - 3ER FDS EQ 126 - QUITO.pdf",
+      "sourcePath": " / CIRILO MARTINEZ - 3ER FDS EQ 126 - QUITO.pdf",
+      "route": {
+        "origin": "UIO",
+        "originCity": "Quito",
+        "originAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "destination": "PTY",
+        "destinationCity": "Panamá",
+        "destinationAirport": "Aeropuerto Internacional de Tocumen",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 00m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-23",
+        "scheduledDeparture": "2026-11-23T08:26:00-05:00",
+        "scheduledArrival": "2026-11-23T10:24:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
+        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/cm438",
+      "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM438"
+    },
+    "CM136_2026-11-23_PTY_MEX": {
+      "flightNumber": "CM 136",
+      "flightCode": "CM136_2026-11-23_PTY_MEX",
+      "airline": "Copa Airlines",
+      "callsign": "CM136_2026-11-23_PTY_MEX",
+      "reservationCode": "BU6AEJ",
+      "passengers": [
+        "Cirilo Agustin Martinez"
+      ],
+      "sourcePdf": "CIRILO MARTINEZ - 3ER FDS EQ 126 - QUITO.pdf",
+      "sourcePath": " / CIRILO MARTINEZ - 3ER FDS EQ 126 - QUITO.pdf",
+      "route": {
+        "origin": "PTY",
+        "originCity": "Panamá",
+        "originAirport": "Aeropuerto Internacional de Tocumen",
+        "destination": "MEX",
+        "destinationCity": "Ciudad de México",
+        "destinationAirport": "Aeropuerto Internacional Benito Juárez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 00m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-23",
+        "scheduledDeparture": "2026-11-23T11:45:00-05:00",
+        "scheduledArrival": "2026-11-23T14:30:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Salida de Vuelos Llegadas T1 / T2 (Aeropuerto Benito Juárez MEX)",
+        "destination": "Sede Ciudad de México (Hospedaje por coordinar con Dirección de Sede) (Ciudad de México, México)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Coordinación de bienvenida y traslado con Sede México."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/cm136",
+      "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM136"
+    },
+    "AM684_2026-11-18_MEX_UIO": {
+      "flightNumber": "AM 684",
+      "flightCode": "AM684_2026-11-18_MEX_UIO",
+      "airline": "Aeroméxico",
+      "callsign": "AM684_2026-11-18_MEX_UIO",
+      "reservationCode": "2MABP9",
+      "passengers": [
+        "Juan Angel Arreola"
+      ],
+      "sourcePdf": "JUAN ANGEL ARREOLA - CAP DOS EQ 131 - QUITO.pdf",
+      "sourcePath": " / JUAN ANGEL ARREOLA - CAP DOS EQ 131 - QUITO.pdf",
+      "route": {
+        "origin": "MEX",
+        "originCity": "Ciudad de México",
+        "originAirport": "Aeropuerto Internacional Benito Juárez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 00m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-18",
+        "scheduledDeparture": "2026-11-18T13:45:00-05:00",
+        "scheduledArrival": "2026-11-18T19:31:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
+        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/am684",
+      "checkInUrl": "https://www.google.com/search?q=check+in+Aeroméxico+AM684"
+    },
+    "AM685_2026-11-23_UIO_MEX": {
+      "flightNumber": "AM 685",
+      "flightCode": "AM685_2026-11-23_UIO_MEX",
+      "airline": "Aeroméxico",
+      "callsign": "AM685_2026-11-23_UIO_MEX",
+      "reservationCode": "2MABP9",
+      "passengers": [
+        "Juan Angel Arreola"
+      ],
+      "sourcePdf": "JUAN ANGEL ARREOLA - CAP DOS EQ 131 - QUITO.pdf",
+      "sourcePath": " / JUAN ANGEL ARREOLA - CAP DOS EQ 131 - QUITO.pdf",
+      "route": {
+        "origin": "UIO",
+        "originCity": "Quito",
+        "originAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "destination": "MEX",
+        "destinationCity": "Ciudad de México",
+        "destinationAirport": "Aeropuerto Internacional Benito Juárez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 00m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-23",
+        "scheduledDeparture": "2026-11-23T09:05:00-05:00",
+        "scheduledArrival": "2026-11-23T12:45:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Salida de Vuelos Llegadas T1 / T2 (Aeropuerto Benito Juárez MEX)",
+        "destination": "Sede Ciudad de México (Hospedaje por coordinar con Dirección de Sede) (Ciudad de México, México)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Coordinación de bienvenida y traslado con Sede México."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/am685",
+      "checkInUrl": "https://www.google.com/search?q=check+in+Aeroméxico+AM685"
+    },
+    "LA2464_2026-11-12_LIM_UIO": {
+      "flightNumber": "LA 2464",
+      "flightCode": "LA2464_2026-11-12_LIM_UIO",
+      "airline": "LATAM Airlines",
+      "callsign": "LA2464_2026-11-12_LIM_UIO",
+      "reservationCode": "KABTZP",
+      "passengers": [
+        "FERNANDO ARAGON"
+      ],
+      "sourcePdf": "FER ARAGON - CAP UNO EQ 39 - GUAYAQUIL.pdf",
+      "sourcePath": " / FER ARAGON - CAP UNO EQ 39 - GUAYAQUIL.pdf",
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-12",
+        "scheduledDeparture": "2026-11-12T08:40:00-05:00",
+        "scheduledArrival": "2026-11-12T11:30:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
+        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la2464",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1429_2026-11-12_LIM_GYE": {
+      "flightNumber": "LA 1429",
+      "flightCode": "LA1429_2026-11-12_LIM_GYE",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1429_2026-11-12_LIM_GYE",
+      "reservationCode": "KABTZP",
+      "passengers": [
+        "FERNANDO ARAGON"
+      ],
+      "sourcePdf": "FER ARAGON - CAP UNO EQ 39 - GUAYAQUIL.pdf",
+      "sourcePath": " / FER ARAGON - CAP UNO EQ 39 - GUAYAQUIL.pdf",
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "GYE",
+        "destinationCity": "Guayaquil",
+        "destinationAirport": "Aeropuerto Internacional José Joaquín de Olmedo",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-12",
+        "scheduledDeparture": "2026-11-12T12:35:00-05:00",
+        "scheduledArrival": "2026-11-12T14:50:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Salida de Arribos (Aeropuerto Olmedo GYE)",
+        "destination": "Sede Guayaquil (Hospedaje por coordinar con Dirección de Sede) (Guayaquil, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Coordinación de bienvenida y traslado con Dirección de Sede Guayaquil."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1429",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1430_2026-11-16_GYE_LIM": {
+      "flightNumber": "LA 1430",
+      "flightCode": "LA1430_2026-11-16_GYE_LIM",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1430_2026-11-16_GYE_LIM",
+      "reservationCode": "KABTZP",
+      "passengers": [
+        "FERNANDO ARAGON"
+      ],
+      "sourcePdf": "FER ARAGON - CAP UNO EQ 39 - GUAYAQUIL.pdf",
+      "sourcePath": " / FER ARAGON - CAP UNO EQ 39 - GUAYAQUIL.pdf",
+      "route": {
+        "origin": "GYE",
+        "originCity": "Guayaquil",
+        "originAirport": "Aeropuerto Internacional José Joaquín de Olmedo",
+        "destination": "LIM",
+        "destinationCity": "Lima",
+        "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-16",
+        "scheduledDeparture": "2026-11-16T09:10:00-05:00",
+        "scheduledArrival": "2026-11-16T11:00:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe Miraflores (Calle Bellavista 133, Miraflores, Lima 15074, Perú)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1430",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA2369_2026-11-16_LIM_UIO": {
+      "flightNumber": "LA 2369",
+      "flightCode": "LA2369_2026-11-16_LIM_UIO",
+      "airline": "LATAM Airlines",
+      "callsign": "LA2369_2026-11-16_LIM_UIO",
+      "reservationCode": "KABTZP",
+      "passengers": [
+        "FERNANDO ARAGON"
+      ],
+      "sourcePdf": "FER ARAGON - CAP UNO EQ 39 - GUAYAQUIL.pdf",
+      "sourcePath": " / FER ARAGON - CAP UNO EQ 39 - GUAYAQUIL.pdf",
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-16",
+        "scheduledDeparture": "2026-11-16T12:10:00-05:00",
+        "scheduledArrival": "2026-11-16T18:30:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
+        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la2369",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "AM684_2026-11-11_MEX_UIO": {
+      "flightNumber": "AM 684",
+      "flightCode": "AM684_2026-11-11_MEX_UIO",
+      "airline": "Aeroméxico",
+      "callsign": "AM684_2026-11-11_MEX_UIO",
+      "reservationCode": "2OULHW",
+      "passengers": [
+        "Juan Angel Arreola"
+      ],
+      "sourcePdf": "JUAN ANGEL ARREOLA - CAP DOS EQ 130 - QUITO.pdf",
+      "sourcePath": " / JUAN ANGEL ARREOLA - CAP DOS EQ 130 - QUITO.pdf",
+      "route": {
+        "origin": "MEX",
+        "originCity": "Ciudad de México",
+        "originAirport": "Aeropuerto Internacional Benito Juárez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 00m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-11",
+        "scheduledDeparture": "2026-11-11T13:45:00-05:00",
+        "scheduledArrival": "2026-11-11T19:31:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
+        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/am684",
+      "checkInUrl": "https://www.google.com/search?q=check+in+Aeroméxico+AM684"
+    },
+    "AM685_2026-11-16_UIO_MEX": {
+      "flightNumber": "AM 685",
+      "flightCode": "AM685_2026-11-16_UIO_MEX",
+      "airline": "Aeroméxico",
+      "callsign": "AM685_2026-11-16_UIO_MEX",
+      "reservationCode": "2OULHW",
+      "passengers": [
+        "Juan Angel Arreola"
+      ],
+      "sourcePdf": "JUAN ANGEL ARREOLA - CAP DOS EQ 130 - QUITO.pdf",
+      "sourcePath": " / JUAN ANGEL ARREOLA - CAP DOS EQ 130 - QUITO.pdf",
+      "route": {
+        "origin": "UIO",
+        "originCity": "Quito",
+        "originAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "destination": "MEX",
+        "destinationCity": "Ciudad de México",
+        "destinationAirport": "Aeropuerto Internacional Benito Juárez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 00m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-16",
+        "scheduledDeparture": "2026-11-16T09:05:00-05:00",
+        "scheduledArrival": "2026-11-16T12:45:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Salida de Vuelos Llegadas T1 / T2 (Aeropuerto Benito Juárez MEX)",
+        "destination": "Sede Ciudad de México (Hospedaje por coordinar con Dirección de Sede) (Ciudad de México, México)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Coordinación de bienvenida y traslado con Sede México."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/am685",
+      "checkInUrl": "https://www.google.com/search?q=check+in+Aeroméxico+AM685"
+    },
+    "LA1401_2026-11-05_UIO_CUE": {
+      "flightNumber": "LA 1401",
+      "flightCode": "LA1401_2026-11-05_UIO_CUE",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1401_2026-11-05_UIO_CUE",
+      "reservationCode": "OEDIMH",
+      "passengers": [
+        "MARIA PATINO"
+      ],
+      "sourcePdf": "LOURDES PATIÑO - 2DO FDS EQ 23 - CUENCA.pdf",
+      "sourcePath": " / LOURDES PATIÑO - 2DO FDS EQ 23 - CUENCA.pdf",
+      "route": {
+        "origin": "UIO",
+        "originCity": "Quito",
+        "originAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "destination": "CUE",
+        "destinationCity": "Cuenca",
+        "destinationAirport": "Aeropuerto Mariscal La Mar",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-05",
+        "scheduledDeparture": "2026-11-05T12:08:00-05:00",
+        "scheduledArrival": "2026-11-05T13:03:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Hall Principal de Salida de Pasajeros (Aeropuerto CUE)",
+        "destination": "Sede Cuenca (Hospedaje por coordinar con Dirección de Sede) (Cuenca, Ecuador)",
+        "driverPickupEstimated": "20 min posteriores al aterrizaje",
+        "driverNote": "Traslado coordinado con equipo local de Sede Cuenca."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1401",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1386_2026-11-09_CUE_UIO": {
+      "flightNumber": "LA 1386",
+      "flightCode": "LA1386_2026-11-09_CUE_UIO",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1386_2026-11-09_CUE_UIO",
+      "reservationCode": "ARPUXR",
+      "passengers": [
+        "ERNESTO DIAZ PABON"
+      ],
+      "sourcePdf": "ALEJANDRO DIAZ - 3ER FDS EQ 22 - CUENCA.pdf",
+      "sourcePath": " / ALEJANDRO DIAZ - 3ER FDS EQ 22 - CUENCA.pdf",
+      "route": {
+        "origin": "CUE",
+        "originCity": "Cuenca",
+        "originAirport": "Aeropuerto Mariscal La Mar",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-09",
+        "scheduledDeparture": "2026-11-09T06:53:00-05:00",
+        "scheduledArrival": "2026-11-09T07:43:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
+        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1386",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1386_2026-09-04_LIM_UIO": {
+      "flightNumber": "LA 1386",
+      "flightCode": "LA1386_2026-09-04_LIM_UIO",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1386_2026-09-04_LIM_UIO",
+      "reservationCode": "ARPUXR",
+      "passengers": [
+        "ERNESTO DIAZ PABON"
+      ],
+      "sourcePdf": "ALEJANDRO DIAZ - 3ER FDS EQ 22 - CUENCA.pdf",
+      "sourcePath": " / ALEJANDRO DIAZ - 3ER FDS EQ 22 - CUENCA.pdf",
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-04",
+        "scheduledDeparture": "2026-09-04T08:00:00-05:00",
+        "scheduledArrival": "2026-09-04T10:30:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
+        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1386",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1380_2026-11-08_CUE_UIO": {
+      "flightNumber": "LA 1380",
+      "flightCode": "LA1380_2026-11-08_CUE_UIO",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1380_2026-11-08_CUE_UIO",
+      "reservationCode": "OEDIMH",
+      "passengers": [
+        "MARIA PATINO"
+      ],
+      "sourcePdf": "LOURDES PATIÑO - 2DO FDS EQ 23 - CUENCA.pdf",
+      "sourcePath": " / LOURDES PATIÑO - 2DO FDS EQ 23 - CUENCA.pdf",
+      "route": {
+        "origin": "CUE",
+        "originCity": "Cuenca",
+        "originAirport": "Aeropuerto Mariscal La Mar",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-08",
+        "scheduledDeparture": "2026-11-08T22:06:00-05:00",
+        "scheduledArrival": "2026-11-08T22:56:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
+        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1380",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1380_2026-09-04_LIM_UIO": {
+      "flightNumber": "LA 1380",
+      "flightCode": "LA1380_2026-09-04_LIM_UIO",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1380_2026-09-04_LIM_UIO",
+      "reservationCode": "OEDIMH",
+      "passengers": [
+        "MARIA PATINO"
+      ],
+      "sourcePdf": "LOURDES PATIÑO - 2DO FDS EQ 23 - CUENCA.pdf",
+      "sourcePath": " / LOURDES PATIÑO - 2DO FDS EQ 23 - CUENCA.pdf",
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-04",
+        "scheduledDeparture": "2026-09-04T08:00:00-05:00",
+        "scheduledArrival": "2026-09-04T10:30:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
+        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1380",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1441_2026-11-05_BOG_UIO": {
+      "flightNumber": "LA 1441",
+      "flightCode": "LA1441_2026-11-05_BOG_UIO",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1441_2026-11-05_BOG_UIO",
+      "reservationCode": "BWWBBT",
+      "passengers": [
+        "Michael Andres Boada Rubiano"
+      ],
+      "sourcePdf": "MIKE BOADA - 1FDS EQ 24 - CUENCA.pdf",
+      "sourcePath": " / MIKE BOADA - 1FDS EQ 24 - CUENCA.pdf",
+      "route": {
+        "origin": "BOG",
+        "originCity": "Bogotá",
+        "originAirport": "Aeropuerto Internacional El Dorado",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 00m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-05",
+        "scheduledDeparture": "2026-11-05T10:00:00-05:00",
+        "scheduledArrival": "2026-11-05T11:45:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
+        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1441",
+      "checkInUrl": "https://www.google.com/search?q=check+in+LATAM+Airlines+LA1441"
+    },
+    "LA1379_2026-11-05_UIO_CUE": {
+      "flightNumber": "LA 1379",
+      "flightCode": "LA1379_2026-11-05_UIO_CUE",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1379_2026-11-05_UIO_CUE",
+      "reservationCode": "BWWBBT",
+      "passengers": [
+        "Michael Andres Boada Rubiano"
+      ],
+      "sourcePdf": "MIKE BOADA - 1FDS EQ 24 - CUENCA.pdf",
+      "sourcePath": " / MIKE BOADA - 1FDS EQ 24 - CUENCA.pdf",
+      "route": {
+        "origin": "UIO",
+        "originCity": "Quito",
+        "originAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "destination": "CUE",
+        "destinationCity": "Cuenca",
+        "destinationAirport": "Aeropuerto Mariscal La Mar",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 00m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-05",
+        "scheduledDeparture": "2026-11-05T17:52:00-05:00",
+        "scheduledArrival": "2026-11-05T18:47:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Hall Principal de Salida de Pasajeros (Aeropuerto CUE)",
+        "destination": "Sede Cuenca (Hospedaje por coordinar con Dirección de Sede) (Cuenca, Ecuador)",
+        "driverPickupEstimated": "20 min posteriores al aterrizaje",
+        "driverNote": "Traslado coordinado con equipo local de Sede Cuenca."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1379",
+      "checkInUrl": "https://www.google.com/search?q=check+in+LATAM+Airlines+LA1379"
+    },
+    "LA1402_2026-11-09_CUE_UIO": {
+      "flightNumber": "LA 1402",
+      "flightCode": "LA1402_2026-11-09_CUE_UIO",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1402_2026-11-09_CUE_UIO",
+      "reservationCode": "BWWBBT",
+      "passengers": [
+        "Michael Andres Boada Rubiano"
+      ],
+      "sourcePdf": "MIKE BOADA - 1FDS EQ 24 - CUENCA.pdf",
+      "sourcePath": " / MIKE BOADA - 1FDS EQ 24 - CUENCA.pdf",
+      "route": {
+        "origin": "CUE",
+        "originCity": "Cuenca",
+        "originAirport": "Aeropuerto Mariscal La Mar",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 00m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-09",
+        "scheduledDeparture": "2026-11-09T16:36:00-05:00",
+        "scheduledArrival": "2026-11-09T17:27:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
+        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1402",
+      "checkInUrl": "https://www.google.com/search?q=check+in+LATAM+Airlines+LA1402"
+    },
+    "LA1442_2026-11-11_UIO_BOG": {
+      "flightNumber": "LA 1442",
+      "flightCode": "LA1442_2026-11-11_UIO_BOG",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1442_2026-11-11_UIO_BOG",
+      "reservationCode": "BWWBBT",
+      "passengers": [
+        "Michael Andres Boada Rubiano"
+      ],
+      "sourcePdf": "MIKE BOADA - 1FDS EQ 24 - CUENCA.pdf",
+      "sourcePath": " / MIKE BOADA - 1FDS EQ 24 - CUENCA.pdf",
+      "route": {
+        "origin": "UIO",
+        "originCity": "Quito",
+        "originAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "destination": "BOG",
+        "destinationCity": "Bogotá",
+        "destinationAirport": "Aeropuerto Internacional El Dorado",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 00m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-11",
+        "scheduledDeparture": "2026-11-11T18:40:00-05:00",
+        "scheduledArrival": "2026-11-11T20:20:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Terminal de Arribos",
+        "destination": "Retorno a Domicilio (Base Bogotá) (Bogotá, Colombia)",
+        "driverPickupEstimated": "N/A",
+        "driverNote": "El entrenador retorna a su ciudad de residencia."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1442",
+      "checkInUrl": "https://www.google.com/search?q=check+in+LATAM+Airlines+LA1442"
     },
     "AV045_2026-09-23_MEX_BOG": {
       "flightNumber": "AV 045",
