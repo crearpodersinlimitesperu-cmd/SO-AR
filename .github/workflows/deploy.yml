@@ -55,6 +55,9 @@ jobs:
       - name: 📦 Instalar dependencias
         run: npm install --include=optional
 
+      - name: 🛡️ Guardián de Integridad de Botones, Rutas y Permisos UI
+        run: node --test tests/ui-routes-buttons-integrity.test.mjs tests/generador-flyer-accessibility.test.mjs
+
       - name: 🔨 Build de producción
         env:
           NODE_OPTIONS: "--max-old-space-size=4096"

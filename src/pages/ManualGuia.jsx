@@ -635,7 +635,7 @@ export default function ManualGuia() {
                 onClick={() => navigate('/reportes')} />
               <ModuleCard icon={<TrendingUp />} color="#06b6d4" title="Embudo de Conversion"
                 desc="Trazabilidad del funnel de enrolamiento: prospectos, citados, sentados y financiados. Vista en tiempo real por sede y etapa del ciclo."
-                onClick={() => navigate('/embudo')} />
+                onClick={() => navigate('/embudo-conversion')} />
               <ModuleCard icon={<Shield />} color="#ec4899" title="Panel Super Admin"
                 desc="Vista global de todas las sedes, roles y personas. Auditoria de accesos, cambios de rol e historial de conexiones. Solo para Direccion Global."
                 onClick={() => navigate('/superadmin')} />
@@ -650,7 +650,7 @@ export default function ManualGuia() {
                 onClick={() => navigate('/excelencia')} />
               <ModuleCard icon={<Calendar />} color="#10b981" title="Calendario de Equipo"
                 desc="Vista mensual de eventos, entrenamientos, Fines de Semana de Calibracion y fechas clave del ciclo por sede."
-                onClick={() => navigate('/calendario')} />
+                onClick={() => navigate('/calendario-equipo')} />
               <ModuleCard icon={<AlertOctagon />} color="#ef4444" title="Protocolo de Emergencias"
                 desc="Modulo interactivo con los 7 pasos de oro, cadena de mando en crisis, matriz de gravedad y checklist de seguridad por sede."
                 onClick={() => navigate('/protocolo-emergencias')} />

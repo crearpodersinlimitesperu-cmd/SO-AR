@@ -22,6 +22,7 @@ import dotenv from 'dotenv';
 import { initializeApp, cert, getApps } from 'firebase-admin/app';
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 import { readFileSync, existsSync } from 'fs';
+import { spawnSync } from 'child_process';
 
 dotenv.config();
 
@@ -623,6 +624,37 @@ async function main() {
     } else {
       info.push('✅ Consistencia: cuando una persona tiene varios documentos en "users", todos coinciden en sede y rol.');
     }
+  }
+
+  // --- 4e. Integridad de Botones, Rutas y Permisos UI (HECHO) ----------------
+  // Verifica estáticamente en cada corrida que:
+  // 1) Todas las páginas en src/pages/*.jsx estén montadas en src/App.jsx.
+  // 2) Ningún botón o navigate('/...') apunte a rutas inexistentes o redirecciones muertas a /home.
+  // 3) Todo botón visible según permissions.js / MODULE_REGISTRY esté autorizado en RoleRoute de App.jsx.
+  try {
+    const uiCheck = spawnSync(
+      process.execPath,
+      ['--test', 'tests/ui-routes-buttons-integrity.test.mjs', 'tests/generador-flyer-accessibility.test.mjs'],
+      { encoding: 'utf8', timeout: 30000 }
+    );
+    if (uiCheck.status !== 0) {
+      const errOut = ((uiCheck.stderr || '') + '\n' + (uiCheck.stdout || '')).trim().slice(-600);
+      findings.push({
+        severity: 'ERROR',
+        tipo: 'HECHO',
+        titulo: 'Botones o rutas UI desincronizadas',
+        detalle: `La suite supervisora de botones/rutas detectó un fallo de integridad: ${errOut.replace(/\s+/g, ' ')}`
+      });
+    } else {
+      info.push('✅ Integridad UI: 100% de páginas montadas, botones navigate() válidos y permisos RoleRoute sincronizados.');
+    }
+  } catch (e) {
+    findings.push({
+      severity: 'WARN',
+      tipo: 'HECHO',
+      titulo: 'Verificación de botones UI no ejecutada',
+      detalle: `No se pudo correr tests/ui-routes-buttons-integrity.test.mjs: ${e.message}`
+    });
   }
 
   // --- 3f. Hallazgos de auditoría de permisos — recordatorio estático ---------

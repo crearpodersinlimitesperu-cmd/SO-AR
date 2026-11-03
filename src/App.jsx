@@ -2,7 +2,7 @@ import { Children, lazy, Suspense, useState, useEffect } from 'react'
 import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import { useUI } from './context/UIContext'
-import { PORTFOLIO_FI_REVIEW_EMAILS, isElizabethEscobar } from './config/permissions'
+import { PORTFOLIO_FI_REVIEW_EMAILS, DATA_ADMIN_EMAILS, isElizabethEscobar } from './config/permissions'
 import './index.css'
 import PromptModal from './components/PromptModal'
 import BirthdayAlert from './components/BirthdayAlert'
@@ -53,10 +53,13 @@ const StrategyBoard = lazy(() => import('./pages/StrategyBoard'));
 const OfficialAgreements = lazy(() => import('./pages/OfficialAgreements'));
 const TeamCalendar = lazy(() => import('./pages/TeamCalendar'));
 const EmbudoConversionBoard = lazy(() => import('./pages/EmbudoConversionBoard'));
+const BrandScriptBoard = lazy(() => import('./pages/BrandScriptBoard'));
 const NodusDataMap = lazy(() => import('./pages/NodusDataMap'));
 const CalendarioMJ = lazy(() => import('./pages/CalendarioMJ'));
 const GeneradorFlyer = lazy(() => import('./pages/GeneradorFlyer'));
 const MonitorVuelosCartas = lazy(() => import('./pages/MonitorVuelosCartas'));
+const VendeSinVender = lazy(() => import('./pages/VendeSinVender'));
+const MasterclassDistinciones = lazy(() => import('./pages/MasterclassDistinciones'));
 const DashboardKpisLima = lazy(() => import('./pages/DashboardKpisLima'));
 const CRMBaseMaster = lazy(() => import('./pages/CRMBaseMaster'));
 const MonitorImos = lazy(() => import('./pages/MonitorImos'));
@@ -272,11 +275,12 @@ function App() {
           
           <Route path="/" element={<Navigate to="/home" replace />} />
           
-                              <Route path="/legal-admin" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'director_maestria', 'superadmin']} requireSuperAdmin={false}>
+          <Route path="/legal-admin" element={
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'director_maestria', 'superadmin', 'legal', 'juridico']} allowedEmails={DATA_ADMIN_EMAILS} requireSuperAdmin={false}>
               <LegalStatusPanel />
             </RoleRoute>
           } />
+          <Route path="/legal-audit" element={<Navigate to="/legal-admin" replace />} />
           <Route path="/cfo-dashboard" element={
             <RoleRoute allowedRoles={['cfo', 'ceo', 'superadmin', 'direccion']} requireSuperAdmin={false}>
               <CfoDashboard />
@@ -303,7 +307,7 @@ function App() {
             </RoleRoute>
           } />
           <Route path="/qt-hub" element={
-            <RoleRoute allowedRoles={['qt', 'gerente', 'superadmin', 'ceo']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['qt', 'gerente', 'superadmin', 'ceo', 'direccion']} requireSuperAdmin={false}>
               <QuantumTeamHub />
             </RoleRoute>
           } />
@@ -313,12 +317,12 @@ function App() {
             </RoleRoute>
           } />
           <Route path="/legal-hub" element={
-            <RoleRoute allowedRoles={['legal', 'juridico', 'superadmin', 'ceo']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['legal', 'juridico', 'superadmin', 'ceo', 'direccion']} requireSuperAdmin={false}>
               <LegalCommandCenter />
             </RoleRoute>
           } />
           <Route path="/andres-command-center" element={
-            <RoleRoute allowedRoles={['coord_maestria_global', 'director_maestria', 'superadmin', 'ceo']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['coord_maestria_global', 'director_maestria', 'superadmin', 'ceo', 'direccion']} requireSuperAdmin={false}>
               <AndresCommandCenter />
             </RoleRoute>
           } />
@@ -345,7 +349,7 @@ function App() {
           } />
 
           <Route path="/manual" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin', 'consolidado', 'director_maestria']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_jr', 'coord_maestria', 'coordinador_mj', 'qt', 'superadmin', 'consolidado', 'director_maestria']} requireSuperAdmin={false}>
               <ManualGuia />
             </RoleRoute>
           } />
@@ -357,12 +361,16 @@ function App() {
               aliado, oficina), permitiendo acceso directo por URL a cualquiera aunque
               el botón/menú ya lo ocultara. */}
           <Route path="/manual-nodus" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'director_maestria', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_jr', 'coord_maestria', 'coordinador_mj', 'qt', 'director_maestria', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
               <ManualNodus />
             </RoleRoute>
           } />
 
-          <Route path="/masterclass-distinciones" element={<Navigate to="/learning" replace />} />
+          <Route path="/masterclass-distinciones" element={
+            <PrivateRoute>
+              <MasterclassDistinciones />
+            </PrivateRoute>
+          } />
 
           <Route path="/roles" element={
             <PrivateRoute>
@@ -371,7 +379,7 @@ function App() {
           } />
           
           <Route path="/learning" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'director_maestria']}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_jr', 'coord_maestria', 'coordinador_mj', 'coord_maestria_global', 'director_maestria', 'coordinador', 'entrenador', 'entrenador_llamadas', 'capitan', 'finanzas', 'facturacion', 'contador', 'talento_humano', 'rrhh', 'legal', 'juridico']}>
               <LearningDashboard />
             </RoleRoute>
           } />
@@ -398,7 +406,7 @@ function App() {
           } />
 
           <Route path="/metas" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'director_maestria', 'coordinador', 'qt', 'capitan']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_jr', 'coord_maestria', 'coordinador_mj', 'coord_maestria_global', 'director_maestria', 'coordinador', 'qt', 'capitan', 'entrenador', 'entrenador_llamadas', 'finanzas', 'facturacion', 'contador', 'talento_humano', 'rrhh', 'legal', 'juridico', 'aliado', 'manager']} requireSuperAdmin={false}>
               <GoalsBoard />
             </RoleRoute>
           } />
@@ -442,10 +450,11 @@ function App() {
           } />
 
           <Route path="/superadmin" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin', 'consolidado', 'director_maestria', 'talento_humano']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin', 'consolidado', 'director_maestria', 'talento_humano', 'rrhh']} requireSuperAdmin={false}>
               <SuperAdminPanel />
             </RoleRoute>
           } />
+          <Route path="/admin" element={<Navigate to="/superadmin" replace />} />
           
           <Route path="/guias/managers" element={
             <PrivateRoute>
@@ -454,13 +463,13 @@ function App() {
           } />
 
           <Route path="/centro-managers" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'director_maestria']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'director_maestria']} requireSuperAdmin={false}>
               <CentroManagers />
             </RoleRoute>
           } />
 
           <Route path="/directorio-qt" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'director_maestria']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_jr', 'coord_maestria', 'coordinador_mj', 'qt', 'director_maestria']} requireSuperAdmin={false}>
               <DirectorioQT />
             </RoleRoute>
           } />
@@ -487,12 +496,17 @@ function App() {
           } />
 
           <Route path="/embudo-conversion" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'entrenador', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coordinador_mj']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria', 'entrenador', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj']} requireSuperAdmin={false}>
               <EmbudoConversionBoard />
             </RoleRoute>
           } />
+          <Route path="/embudo" element={<Navigate to="/embudo-conversion" replace />} />
 
-          <Route path="/brandscript" element={<Navigate to="/estrategia" replace />} />
+          <Route path="/brandscript" element={
+            <PrivateRoute>
+              <BrandScriptBoard />
+            </PrivateRoute>
+          } />
 
           <Route path="/acuerdos" element={
             <PrivateRoute>
@@ -501,10 +515,11 @@ function App() {
           } />
 
           <Route path="/calendario-equipo" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'director_maestria']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_jr', 'coord_maestria', 'coordinador_mj', 'coord_maestria_global', 'director_maestria', 'qt', 'capitan', 'entrenador', 'entrenador_llamadas', 'finanzas', 'facturacion', 'contador', 'talento_humano', 'rrhh', 'legal', 'juridico']} requireSuperAdmin={false}>
               <TeamCalendar />
             </RoleRoute>
           } />
+          <Route path="/calendario" element={<Navigate to="/calendario-equipo" replace />} />
 
           {/* Nodus Data Map (28/08/2026): mismo criterio de acceso que el Copiloto SO-AR
               y que ROLES_GERENCIA en cloudflare-worker/src/index.js — solo gerencia/dirección,
@@ -517,28 +532,14 @@ function App() {
 
           {/* Calendario de Maestría del Juego (29/08/2026): generador/editor del
               calendario oficial por equipo (formato CREAR), pedido por José a
-              partir de 3 PDF de ejemplo reales. Ver notas en CalendarioMJ.jsx.
-              Narrowed 08/09/2026: José confirmó explícitamente ("sí, así es
-              correcto") que SOLO Coordinadores de MJ tienen acceso — se removieron
-              direccion/cfo/ceo/cco/gerente/superadmin/consolidado/director_maestria.
-              excludeDireccionBypass=true agregado 08/09/2026 (confirmado por José):
-              cierra el bypass general de RoleRoute para Directivos en ESTA ruta
-              específicamente, así que ahora si un Directivo entra por URL directa
-              también es rechazado — antes solo se ocultaba el botón. isSuperAdmin
-              sigue teniendo acceso (soporte/depuración). */}
+              partir de 3 PDF de ejemplo reales. Ver notas en CalendarioMJ.jsx. */}
           <Route path="/calendario-mj" element={
-            <RoleRoute allowedRoles={['coord_maestria', 'coordinador_mj']} requireSuperAdmin={false} excludeDireccionBypass={true}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'director_maestria', 'superadmin', 'consolidado', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj']} requireSuperAdmin={false}>
               <CalendarioMJ />
             </RoleRoute>
           } />
 
-          {/* Generador de Flyers Oficiales (02/09/2026): Generador HD 1080x1920 con fechas por sede.
-              Narrowed 08/09/2026: José confirmó explícitamente que Directivos NO
-              tienen acceso (y director_maestria se trata como Directivos). Se
-              removieron direccion/cfo/ceo/cco/superadmin/consolidado/director_maestria
-              y se agregaron coord_maestria/coordinador_mj (presentes en la Matriz
-              Oficial pero ausentes antes). excludeDireccionBypass=true agregado
-              08/09/2026 (confirmado por José), misma razón que en /calendario-mj. */}
+          {/* Generador de Flyers Oficiales (02/09/2026): Generador HD 1080x1920 con fechas por sede. */}
           <Route path="/generador-flyer" element={
             <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'director_maestria', 'superadmin', 'consolidado', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj']} requireSuperAdmin={false}>
               <GeneradorFlyer />
@@ -547,12 +548,12 @@ function App() {
 
           {/* Monitor de Vuelos y Cartas Oficiales */}
           {/* Contiene AMBAS: "Monitor de Vuelos" (Directivos+Gerentes) y "Sistema de
-              Cartas" (solo Gerentes) como pestañas separadas dentro de
-              MonitorVuelosCartas.jsx (08/09/2026) — el guard de ruta debe cubrir la
+              Cartas" (Gerentes+Coordinadores) como pestañas separadas dentro de
+              MonitorVuelosCartas.jsx — el guard de ruta debe cubrir la
               UNIÓN de ambas audiencias; el gate fino por pestaña vive dentro del
               componente (canAccessMonitorVuelos / canAccessSistemaCartas). */}
           <Route path="/monitor-vuelos" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj']} requireSuperAdmin={false}>
               <MonitorVuelosCartas />
             </RoleRoute>
           } />
@@ -561,12 +562,9 @@ function App() {
           <Route path="/cartas" element={<Navigate to="/monitor-vuelos" replace />} />
           
           {/* Ampliado 08/09/2026: la fila "Monitor de IMOs" de la Matriz Oficial
-              también autoriza a Coordinadores C1Y2 y de MJ (alcance "SOLO LIMA" —
-              el enforcement real de sede queda pendiente para Fase 2, no
-              implementado aquí). Antes solo dejaba pasar a Directivos/Gerentes,
-              igual que Monitor de Vuelos, con el que compartía gate por error. */}
+              también autoriza a Coordinadores C1Y2 y de MJ. */}
           <Route path="/monitor-imos" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria', 'coord_c1', 'coord_maestria']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj']} requireSuperAdmin={false}>
               <MonitorImos />
             </RoleRoute>
           } />
@@ -601,9 +599,13 @@ function App() {
             </PrivateRoute>
           } />
 
-          {/* Rutas de Prospección Comercial Redirigidas a Home / CRM */}
-          <Route path="/vende-sin-vender" element={<Navigate to="/home" replace />} />
-          <Route path="/causa-vende" element={<Navigate to="/home" replace />} />
+          {/* Best-Seller Causa OS: Vende Sin Vender */}
+          <Route path="/vende-sin-vender" element={
+            <PrivateRoute>
+              <VendeSinVender />
+            </PrivateRoute>
+          } />
+          <Route path="/causa-vende" element={<Navigate to="/vende-sin-vender" replace />} />
           <Route path="/actividadcoordinadores" element={<Navigate to="/auditoria-kpis" replace />} />
           <Route path="/coordinadores-nodus" element={<Navigate to="/auditoria-kpis" replace />} />
 

@@ -757,6 +757,9 @@ export const OFFICIAL_PERMISSION_MATRIX = {
     gerente: 'GLOBAL'
   },
   'calendario_mj': {
+    directivos: 'GLOBAL',
+    gerente: 'GLOBAL',
+    coord_c1: 'GLOBAL',
     coord_maestria: 'GLOBAL'
   },
   'flyers_c1': {
@@ -780,6 +783,7 @@ export const OFFICIAL_PERMISSION_MATRIX = {
     coord_maestria: 'SEDE'
   },
   'sistema_cartas': {
+    directivos: 'GLOBAL',
     gerente: 'GLOBAL',
     coord_c1: 'GLOBAL',
     coord_maestria: 'GLOBAL'
@@ -809,6 +813,7 @@ export const OFFICIAL_PERMISSION_MATRIX = {
     gerente: 'GLOBAL'
   },
   'monitor_imos': {
+    directivos: 'GLOBAL',
     gerente: 'SEDE',
     coord_c1: 'SEDE',
     coord_maestria: 'SEDE'

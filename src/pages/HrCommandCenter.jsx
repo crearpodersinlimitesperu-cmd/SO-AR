@@ -42,7 +42,7 @@ export default function HrCommandCenter() {
           {/* ACCESOS DIRECTOS */}
           <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
             <button
-              onClick={() => navigate('/admin')}
+              onClick={() => navigate('/superadmin')}
               style={{
                 background: 'rgba(59, 130, 246, 0.12)', border: '1px solid rgba(59, 130, 246, 0.3)',
                 color: '#60a5fa', padding: '0.6rem 1rem', borderRadius: '8px',
@@ -52,7 +52,7 @@ export default function HrCommandCenter() {
               <Users size={16} /> Directorio y Colaboradores
             </button>
             <button
-              onClick={() => navigate('/legal-audit')}
+              onClick={() => navigate('/legal-admin')}
               style={{
                 background: 'rgba(16, 185, 129, 0.12)', border: '1px solid rgba(16, 185, 129, 0.3)',
                 color: '#34d399', padding: '0.6rem 1rem', borderRadius: '8px',
@@ -124,7 +124,7 @@ export default function HrCommandCenter() {
               </p>
               <div style={{ marginTop: '1.2rem' }}>
                 <button
-                  onClick={() => navigate('/admin')}
+                  onClick={() => navigate('/superadmin')}
                   style={{
                     width: '100%', padding: '0.75rem', background: '#1e293b', border: '1px solid rgba(255,255,255,0.15)',
                     color: '#fff', borderRadius: '8px', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer'
@@ -144,7 +144,7 @@ export default function HrCommandCenter() {
               </p>
               <div style={{ marginTop: '1.2rem' }}>
                 <button
-                  onClick={() => navigate('/legal-audit')}
+                  onClick={() => navigate('/legal-admin')}
                   style={{
                     width: '100%', padding: '0.75rem', background: '#1e293b', border: '1px solid rgba(255,255,255,0.15)',
                     color: '#fff', borderRadius: '8px', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer'
