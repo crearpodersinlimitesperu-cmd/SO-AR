@@ -55,6 +55,7 @@ const TeamCalendar = lazy(() => import('./pages/TeamCalendar'));
 const EmbudoConversionBoard = lazy(() => import('./pages/EmbudoConversionBoard'));
 const NodusDataMap = lazy(() => import('./pages/NodusDataMap'));
 const CalendarioMJ = lazy(() => import('./pages/CalendarioMJ'));
+const GeneradorFlyer = lazy(() => import('./pages/GeneradorFlyer'));
 const MonitorVuelosCartas = lazy(() => import('./pages/MonitorVuelosCartas'));
 const DashboardKpisLima = lazy(() => import('./pages/DashboardKpisLima'));
 const CRMBaseMaster = lazy(() => import('./pages/CRMBaseMaster'));
@@ -538,7 +539,11 @@ function App() {
               y se agregaron coord_maestria/coordinador_mj (presentes en la Matriz
               Oficial pero ausentes antes). excludeDireccionBypass=true agregado
               08/09/2026 (confirmado por José), misma razón que en /calendario-mj. */}
-          <Route path="/generador-flyer" element={<Navigate to="/home" replace />} />
+          <Route path="/generador-flyer" element={
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'director_maestria', 'superadmin', 'consolidado', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj']} requireSuperAdmin={false}>
+              <GeneradorFlyer />
+            </RoleRoute>
+          } />
 
           {/* Monitor de Vuelos y Cartas Oficiales */}
           {/* Contiene AMBAS: "Monitor de Vuelos" (Directivos+Gerentes) y "Sistema de

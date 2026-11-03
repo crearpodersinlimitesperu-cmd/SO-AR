@@ -46,7 +46,8 @@ function getCountryFlag(ciudad = '') {
 
 export default function GeneradorFlyer() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { currentUser, user: legacyUser } = useAuth();
+  const user = currentUser || legacyUser;
   const { events } = useCycles();
   const { showToast } = useUI();
   const canvasRef = useRef(null);

@@ -57,3 +57,25 @@ test('Home.jsx provides direct access to Generador Flyer in Eventos y Entrenamie
     'Confidentiality banner must clarify that public promotion is done via official flyers'
   );
 });
+
+test('App.jsx mounts GeneradorFlyer on /generador-flyer without redirecting back to /home', () => {
+  const appCode = fs.readFileSync('src/App.jsx', 'utf8');
+
+  assert.match(
+    appCode,
+    /const\s+GeneradorFlyer\s*=\s*lazy\(\(\)\s*=>\s*import\(['"]\.\/pages\/GeneradorFlyer['"]\)\)/,
+    'App.jsx must lazy-load GeneradorFlyer'
+  );
+
+  assert.match(
+    appCode,
+    /<Route\s+path="\/generador-flyer"\s+element=\{[\s\S]*?<GeneradorFlyer\s*\/>[\s\S]*?\}\s*\/>/,
+    '/generador-flyer route must mount <GeneradorFlyer />'
+  );
+
+  assert.doesNotMatch(
+    appCode,
+    /<Route\s+path="\/generador-flyer"\s+element=\{<Navigate\s+to="\/home"/,
+    '/generador-flyer must never redirect back to /home'
+  );
+});

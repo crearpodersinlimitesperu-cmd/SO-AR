@@ -760,6 +760,7 @@ export const OFFICIAL_PERMISSION_MATRIX = {
     coord_maestria: 'GLOBAL'
   },
   'flyers_c1': {
+    directivos: 'GLOBAL',
     gerente: 'GLOBAL',
     coord_c1: 'GLOBAL',
     coord_maestria: 'GLOBAL'
