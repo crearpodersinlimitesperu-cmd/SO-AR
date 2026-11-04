@@ -478,7 +478,8 @@ Con el fin de profesionalizar y escalar la operación sin fricción ni pérdida 
 13. **Auditoría Forense y Ejecución de Tareas Pre-Colapso del Modelo:**
     * **Restricción Estricta de Personal Inactivo (Mandato Dirección):**
       - En `src/config/permissions.js`, se removió la permisividad a `isDireccionRole` en `canManageUserStatus`.
-      - Ahora la visibilidad y gestión de colaboradores dados de baja/inactivos está restringida **ÚNICA Y EXCLUSIVAMENTE** a Super Administradores (`jose.sanchez@crearpsl.net` / `isSuperAdmin`) y Talento Humano (`lennin.chasi@crearpsl.net` / `talento_humano` / `director_th`). Ningún otro rol de gerencia o dirección tiene visibilidad de personal inactivo.
+      - La corrección conserva el perfil histórico de Lennin con marcadores explícitos de inactividad y retira su identidad de autorizaciones, catálogos Workspace y destinatarios operativos revisados. Los permisos de baja/consulta se evalúan después de negar perfiles inactivos; Talento Humano conserva la capacidad cuando el rol pertenece a un perfil activo. Pruebas locales verifican estas reglas y el filtrado por `active`, `isActive`, `status`, `estado`, `role` y `roles`.
+      - Evidencia limitada al código y pruebas del repositorio: no se consultó ni modificó Google Workspace o Firebase en producción, no se verificó la revocación de cuentas/sesiones anteriores ni se comprobó el despliegue. Esta documentación no certifica el estado de producción.
     * **Blindaje de Identidad de Cirilo Agustín Martínez (México):**
       - En `public/cartas/carta_invitacion_migraciones.html`, se fijó en la tabla inmutable `verifiedNationalities` a `CIRILO AGUSTIN MARTINEZ` y `CIRILO MARTINEZ` con Nacionalidad `MEXICANA` y Documento `PASAPORTE MEXICANO`.
       - Se blindó contra sobreescritura de parámetros en la URL, asegurando la verdad histórica oficial.

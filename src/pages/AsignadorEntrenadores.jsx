@@ -52,6 +52,7 @@ import { getFlagForSede } from '../utils/flags';
 import { canUseAsignadorEntrenadores } from '../config/permissions';
 import { listTrainerPolicyFiles, TRAINER_POLICIES_FOLDER_ID } from '../services/googleDriveService';
 import { isInactiveTrainer } from '../data/managersData';
+import { isUserInactive } from '../utils/userNormalizer.js';
 import {
   campoAsignacionSlot,
   extraerPreasignaciones,
@@ -361,7 +362,7 @@ export default function AsignadorEntrenadores() {
         const soloEntrenadores = todos.filter(u => {
           const roles = [u.role, u.appRole, ...(Array.isArray(u.roles) ? u.roles : [])]
             .filter(Boolean).map(r => normalizeRole(r));
-          const activo = u.isActive !== false && u.status !== 'inactive';
+          const activo = !isUserInactive(u);
           const inactivoExcluido = isInactiveTrainer(u.name || u.displayName);
           return activo && !inactivoExcluido && roles.some(r => r === 'entrenador' || r === 'entrenador_llamadas' || r === 'director_maestria');
         });

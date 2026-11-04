@@ -265,6 +265,8 @@ export const USERS_TO_IMPORT = [
     "role": "inactivo",
     "roles": [],
     "active": false,
+    "isActive": false,
+    "status": "inactive",
     "estado": "inactivo",
     "motivo": "Renuncia (28/10/2026)",
     "deactivationReason": "Renuncia voluntaria a Talento Humano",

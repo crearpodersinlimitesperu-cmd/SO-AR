@@ -1,6 +1,7 @@
 // Configuración centralizada de permisos y roles administrativos
 // Este archivo es la ÚNICA fuente de verdad para emails con privilegios elevados.
 // Cualquier cambio de SuperAdmin se hace AQUÍ, no disperso en el código.
+import { isUserInactive } from '../utils/userNormalizer.js';
 
 /**
  * Emails con privilegios de Super Administrador.
@@ -77,7 +78,7 @@ const UNICO_EMAIL_AUTORIZADO_A_SIMULAR = 'jose.sanchez@crearpsl.net';
  */
 export const canSimulate = (currentUser, originalAdminUser = null) => {
   const persona = originalAdminUser || currentUser;
-  if (!persona) return false;
+  if (!currentUser || isUserInactive(currentUser) || !persona || isUserInactive(persona)) return false;
   return (persona.email || '').trim().toLowerCase() === UNICO_EMAIL_AUTORIZADO_A_SIMULAR;
 };
 
@@ -103,7 +104,7 @@ export const isGerenciaRole = (role) => {
  * Verifica si el usuario es Coordinador Global QT (Carlos Brunis)
  */
 export const isGlobalQTCoordinator = (currentUser) => {
-  if (!currentUser) return false;
+  if (!currentUser || isUserInactive(currentUser)) return false;
   const email = (currentUser.email || '').toLowerCase();
   return email.includes('carlos.brunis') || email.includes('brunische66');
 };
@@ -113,13 +114,12 @@ export const isGlobalQTCoordinator = (currentUser) => {
  * Incluye a Leyla (que tiene rol dual de coord_maestria y qt).
  */
 export const hasQTPrivileges = (currentUser) => {
-  if (!currentUser) return false;
+  if (!currentUser || isUserInactive(currentUser)) return false;
   const email = (currentUser.email || '').toLowerCase();
   const name = (currentUser.name || currentUser.displayName || '').toLowerCase();
   const r = currentUser.appRole;
   
   // Usuario inactivo o desvinculado no tiene privilegios
-  if (currentUser.active === false || currentUser.estado === 'inactivo' || currentUser.role === 'inactivo') return false;
   // Leyla renunció a QT y a Oficina (12/09/2026)
   if (email.includes('leylakellypasquel') || email.includes('leyla.pasquel') || name.includes('leyla pasquel')) return false;
   
@@ -133,7 +133,7 @@ export const hasQTPrivileges = (currentUser) => {
  * pero NO deben ver botones operativos (como actualizar sheets).
  */
 export const isNonOperationalDirector = (currentUser) => {
-  if (!currentUser) return false;
+  if (!currentUser || isUserInactive(currentUser)) return false;
   const email = (currentUser.email || '').toLowerCase();
   const name = (currentUser.name || currentUser.displayName || '').toLowerCase();
   
@@ -155,7 +155,7 @@ export const MAESTRIA_COORDINATOR_EMAILS = [
 ];
 
 export const isMaestriaCoordinator = (currentUser) => {
-  if (!currentUser) return false;
+  if (!currentUser || isUserInactive(currentUser)) return false;
   const email = (currentUser.email || '').toLowerCase().trim();
   if (MAESTRIA_COORDINATOR_EMAILS.includes(email) || email.includes('linid') || email.includes('maestria') || email.includes('judith.romero') || email.includes('cubillo')) return true;
   const r = (currentUser.appRole || currentUser.role || '').toLowerCase();
@@ -168,7 +168,7 @@ export const isMaestriaCoordinator = (currentUser) => {
  * Verifica si un usuario puede agregar nuevos managers (Coordinador Maestría, Director Maestría o SuperAdmin)
  */
 export const canAddManagers = (currentUser) => {
-  if (!currentUser) return false;
+  if (!currentUser || isUserInactive(currentUser)) return false;
   if (currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email)) return true;
   if (isMaestriaCoordinator(currentUser)) return true;
   const r = currentUser.appRole || currentUser.role;
@@ -197,7 +197,7 @@ export const canAddManagers = (currentUser) => {
  * Todos ellos tienen PLENO PODER para asignar, cambiar y reasignar entrenadores.
  */
 export const canAssignTrainer = (currentUser) => {
-  if (!currentUser) return false;
+  if (!currentUser || isUserInactive(currentUser)) return false;
   if (currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email)) return true;
   if (isMaestriaCoordinator(currentUser)) return true;
 
@@ -248,7 +248,7 @@ export const canAssignTrainer = (currentUser) => {
  * Entrenadores, capitanes, coordinadores C1/C2, gerentes de sede y demás roles NO pueden cambiar estados.
  */
 export const canChangeManagerStatus = (currentUser) => {
-  if (!currentUser) return false;
+  if (!currentUser || isUserInactive(currentUser)) return false;
   if (currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email)) return true;
   if (isMaestriaCoordinator(currentUser)) return true;
   const r = currentUser.appRole || currentUser.role;
@@ -274,7 +274,7 @@ export const OBSERVER_EMAILS = [
 ];
 
 export const isGlobalObserver = (currentUser) => {
-  if (!currentUser) return false;
+  if (!currentUser || isUserInactive(currentUser)) return false;
   const email = (currentUser.email || '').toLowerCase().trim();
   if (OBSERVER_EMAILS.includes(email)) return true;
   const r = (currentUser.appRole || currentUser.role || '').toLowerCase();
@@ -288,9 +288,8 @@ export const isGlobalObserver = (currentUser) => {
  * (Exclusivo para Directivos: Dirección General, Dirección, SuperAdmins, José Sánchez y Talento Humano activo).
  */
 export const canViewInactiveUsers = (currentUser) => {
-  if (!currentUser) return false;
+  if (!currentUser || isUserInactive(currentUser)) return false;
   // Un usuario inactivo o desvinculado no tiene privilegios de auditar ni ver inactivos
-  if (currentUser.active === false || currentUser.estado === 'inactivo' || currentUser.role === 'inactivo' || currentUser.status === 'inactive') return false;
 
   const email = (currentUser.email || '').toLowerCase().trim();
   if (email === 'jose.sanchez@crearpsl.net' || isSuperAdminEmail(email)) return true;
@@ -312,13 +311,13 @@ export const canViewInactiveUsers = (currentUser) => {
 
   // Talento Humano activo
   if (r === 'talento_humano' || roles.includes('talento_humano')) return true;
-  if (email === 'talento.humano@crearpsl.net' || email === 'karen.moran@crearpsl.net') return true;
+  if (email === 'karen.moran@crearpsl.net') return true;
 
   return false;
 };
 
 export const canViewAllManagers = (currentUser) => {
-  if (!currentUser) return false;
+  if (!currentUser || isUserInactive(currentUser)) return false;
   if (currentUser.isSuperAdmin || currentUser.isDireccion || isSuperAdminEmail(currentUser.email) || isGlobalObserver(currentUser)) return true;
   // ELIMINADO: if (isMaestriaCoordinator(currentUser)) return true; -> Esto daba acceso global a todos los coordinadores locales como Lili.
   const r = String(currentUser.appRole || currentUser.role || '').toLowerCase();
@@ -330,7 +329,7 @@ export const canViewAllManagers = (currentUser) => {
  * Verifica si el usuario puede ver managers de su sede (Coordinadores de Maestría y Gerentes de Sede).
  */
 export const canViewSede = (currentUser) => {
-  if (!currentUser) return false;
+  if (!currentUser || isUserInactive(currentUser)) return false;
   if (currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email) || isGlobalObserver(currentUser)) return true;
   if (isMaestriaCoordinator(currentUser)) return true;
   const r = currentUser.appRole || currentUser.role;
@@ -398,6 +397,7 @@ const LIQUIDACION_REVERSAR_EMAILS = [
  */
 export const canReverseLiquidacionEntrenadores = (currentUser) =>
   !!currentUser &&
+  !isUserInactive(currentUser) &&
   LIQUIDACION_REVERSAR_EMAILS.includes((currentUser.email || '').trim().toLowerCase()) &&
   canViewLiquidacionEntrenadores(currentUser) &&
   canViewAllManagers(currentUser);
@@ -420,7 +420,7 @@ export const CRM_MAESTRO_ACCESS_EMAILS = [
 ];
 
 export const canViewCRMMaestro = (currentUser) => {
-  if (!currentUser) return false;
+  if (!currentUser || isUserInactive(currentUser)) return false;
   const email = (currentUser.email || '').trim().toLowerCase();
   return CRM_MAESTRO_ACCESS_EMAILS.includes(email);
 };
@@ -435,7 +435,7 @@ export const canViewCRMMaestro = (currentUser) => {
  * NO pueden verlo entrenadores, coordinadores, gerentes de sede, capitanes ni colaboradores operativos.
  */
 export const canViewKPIsLlamadas = (currentUser) => {
-  if (!currentUser) return false;
+  if (!currentUser || isUserInactive(currentUser)) return false;
   const email = (currentUser.email || '').trim().toLowerCase();
 
   // "yo" / SuperAdmin
@@ -466,7 +466,7 @@ export const canViewKPIsLlamadas = (currentUser) => {
  * (request.resource.data.autorEmail == su propio correo).
  */
 export const canWriteNotaSeguimiento = (currentUser) => {
-  if (!currentUser) return false;
+  if (!currentUser || isUserInactive(currentUser)) return false;
   const role = currentUser.appRole || currentUser.role;
   const roles = currentUser.roles || (role ? [role] : []);
   return role === 'entrenador' || role === 'entrenador_llamadas' ||
@@ -482,7 +482,7 @@ export const canWriteNotaSeguimiento = (currentUser) => {
  * cambia, actualizar AMBOS lugares.
  */
 export const canViewAllNotasSeguimiento = (currentUser) => {
-  if (!currentUser) return false;
+  if (!currentUser || isUserInactive(currentUser)) return false;
   const role = currentUser.appRole || currentUser.role;
   const roles = currentUser.roles || (role ? [role] : []);
   return role === 'coord_maestria' || role === 'director_maestria' ||
@@ -525,7 +525,7 @@ export const PORTFOLIO_FI_REVIEW_EMAILS = [
 ];
 
 export const canUseAsignadorEntrenadores = (currentUser) => {
-  if (!currentUser) return false;
+  if (!currentUser || isUserInactive(currentUser)) return false;
   const email = (currentUser.email || '').trim().toLowerCase();
   if (!email) return false;
   return ASIGNADOR_ENTRENADORES_EMAILS.includes(email);
@@ -539,7 +539,7 @@ export const OPERATIONAL_COMMUNICATION_EMAILS = [
   'andres.gomez@crearpsl.net', 'gomeznueve@gmail.com'
 ];
 export const canSendOperationalCommunications = (currentUser) =>
-  Boolean(currentUser?.email && OPERATIONAL_COMMUNICATION_EMAILS.includes(currentUser.email.trim().toLowerCase()));
+  Boolean(currentUser?.email && !isUserInactive(currentUser) && OPERATIONAL_COMMUNICATION_EMAILS.includes(currentUser.email.trim().toLowerCase()));
 
 /**
  * ¿Puede el usuario actual RESPONDER a una nota de seguimiento? Pedido explícito
@@ -547,7 +547,7 @@ export const canSendOperationalCommunications = (currentUser) =>
  * toda la gerencia. Debe coincidir con callerRole() en firestore.rules.
  */
 export const canReplyNotaSeguimiento = (currentUser) => {
-  if (!currentUser) return false;
+  if (!currentUser || isUserInactive(currentUser)) return false;
   const role = currentUser.appRole || currentUser.role;
   const roles = currentUser.roles || (role ? [role] : []);
   return role === 'coord_maestria' || role === 'director_maestria' ||
@@ -561,6 +561,7 @@ export const canReplyNotaSeguimiento = (currentUser) => {
  * @returns {Array<{id: string, name: string}>}
  */
 export const getAssignableRoles = (currentUser) => {
+  if (isUserInactive(currentUser)) return [];
   const normRole = currentUser?.appRole;
   
   if (!normRole) return [];
@@ -641,7 +642,7 @@ export const getAssignableRoles = (currentUser) => {
  * quien cuenta con columna de visibilidad y acceso dedicada en la Matriz Oficial de Google Sheets.
  */
 export const isElizabethEscobar = (currentUser) => {
-  if (!currentUser) return false;
+  if (!currentUser || isUserInactive(currentUser)) return false;
   const email = (currentUser.email || '').trim().toLowerCase();
   const name = (currentUser.name || currentUser.displayName || '').toLowerCase();
   return email === 'contabilidad.global@crearpsl.net' ||
@@ -827,7 +828,7 @@ export const OFFICIAL_PERMISSION_MATRIX = {
  * @returns {{ hasAccess: boolean, scope: 'GLOBAL' | 'SEDE' | 'DASHBOARD' | 'ASIGNADOS' | 'SEDE_C1' | 'NONE' | string }}
  */
 export const checkModuleAccess = (currentUser, moduleKey) => {
-  if (!currentUser) return { hasAccess: false, scope: 'NONE' };
+  if (!currentUser || isUserInactive(currentUser)) return { hasAccess: false, scope: 'NONE' };
 
   // Super Admin tiene acceso GLOBAL incondicional (salvo simulación explícita de otro usuario)
   if ((currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email)) && !currentUser.isSimulated) {
@@ -966,7 +967,7 @@ export const canAccessCopilot = (currentUser) => {
  * Solicitud directa: "https://drive.google.com/drive/folders/1c3wkWITxPTdtvZ41o-MTcftRPkQtmpgi?usp=drive_link esto es solo para el gerente de lima"
  */
 export const isGerenteLima = (currentUser) => {
-  if (!currentUser) return false;
+  if (!currentUser || isUserInactive(currentUser)) return false;
   const email = (currentUser.email || '').trim().toLowerCase();
   if (email === 'jose.sanchez@crearpsl.net') return true;
   if (currentUser.isSuperAdmin || isSuperAdminEmail(email)) return true;
@@ -990,10 +991,10 @@ export const canAccessPagosSemanalesDrive = (currentUser) => {
  * Permitido exclusivamente para:
  * 1. Super Administradores (isSuperAdmin === true o en SUPER_ADMIN_EMAILS como José Sánchez).
  * 2. Dirección Global (roles: direccion, cfo, cco, ceo).
- * 3. Talento Humano (rol: talento_humano, email: talento.humano@crearpsl.net o rol de RRHH).
+ * 3. Talento Humano activo (rol: talento_humano o director_th).
  */
 export const canManageUserStatus = (currentUser) => {
-  if (!currentUser) return false;
+  if (!currentUser || isUserInactive(currentUser)) return false;
   if (currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email)) return true;
 
   const role = (currentUser.appRole || currentUser.role || '').toLowerCase();
@@ -1004,7 +1005,7 @@ export const canManageUserStatus = (currentUser) => {
   }
 
   const email = (currentUser.email || '').trim().toLowerCase();
-  if (email === 'talento.humano@crearpsl.net' || email.includes('talento.humano') || email.includes('rrhh') || email.includes('lennin')) {
+  if (email === 'karen.moran@crearpsl.net') {
     return true;
   }
 
@@ -1023,7 +1024,7 @@ export const DATA_ADMIN_EMAILS = [
 ];
 
 export const isDataAdmin = (currentUser) => {
-  if (!currentUser) return false;
+  if (!currentUser || isUserInactive(currentUser)) return false;
   if (currentUser.isSuperAdmin || isSuperAdminEmail(currentUser?.email)) return true;
   const email = (currentUser.email || '').trim().toLowerCase();
   return DATA_ADMIN_EMAILS.includes(email);
@@ -1039,7 +1040,7 @@ export const canDownloadLegalPDF = (currentUser) => {
 };
 
 export const canSignLegalDocs = (currentUser) => {
-  return !!currentUser?.email;
+  return Boolean(currentUser?.email && !isUserInactive(currentUser));
 };
 
 export const isLegalDocsPending = (currentUser, legalSignatures) => {

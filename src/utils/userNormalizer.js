@@ -11,6 +11,24 @@ export const normalizeEmail = (email) => {
   return email.toLowerCase().trim();
 };
 
+export const isUserInactive = (user) => {
+  if (!user) return false;
+  const normalizeStatus = value => String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+    .toLowerCase();
+  const inactiveRoles = [user.role, user.appRole, user.rol, ...(Array.isArray(user.roles) ? user.roles : [])]
+    .some(role => normalizeStatus(role) === 'inactivo');
+  const estado = normalizeStatus(user.estado);
+  return user.active === false ||
+    user.isActive === false ||
+    ['inactive', 'inactivo', 'baja', 'renuncia', 'desvinculado'].some(marker => normalizeStatus(user.status).includes(marker)) ||
+    ['inactivo', 'baja', 'renuncia', 'desvinculado'].some(marker => estado.includes(marker)) ||
+    inactiveRoles ||
+    user.esActivo === false;
+};
+
 // 2. Normalización de Rol Individual (Basado en usersData.js pero más estricto)
 export const normalizeRole = (role) => {
   if (!role) return 'miembro';
@@ -154,9 +172,9 @@ export const normalizeUserRecord = (data, source = 'unknown') => {
     equiposQuito: Array.isArray(data.equiposQuito)
       ? [...new Set(data.equiposQuito.map(v => String(v).trim()).filter(Boolean))].slice(0, 2)
       : [],
-    status: data.status || (data.active === false || data.isActive === false ? 'inactive' : 'active'),
-    active: data.active !== false && data.isActive !== false && data.status !== 'inactive',
-    isActive: data.active !== false && data.isActive !== false && data.status !== 'inactive',
+    status: isUserInactive(data) ? 'inactive' : (data.status || 'active'),
+    active: !isUserInactive(data),
+    isActive: !isUserInactive(data),
     deactivatedAt: data.deactivatedAt || null,
     deactivatedBy: data.deactivatedBy || null,
     deactivationReason: data.deactivationReason || null,
@@ -229,7 +247,7 @@ export const mergeUserRecords = (existing, incoming) => {
 
   const mergedEmails = [...new Set([...e.emails, ...i.emails])];
   const mergedRoles = [...new Set([...e.roles, ...i.roles])];
-  const isInactive = e.status === 'inactive' || i.status === 'inactive' || e.isActive === false || i.isActive === false || e.active === false || i.active === false;
+  const isInactive = isUserInactive(e) || isUserInactive(i);
 
   return {
     ...e,

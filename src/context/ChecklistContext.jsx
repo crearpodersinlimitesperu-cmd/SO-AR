@@ -4,6 +4,7 @@ import { collection, onSnapshot, doc, updateDoc, writeBatch, addDoc, query, wher
 import { checklistData } from '../data/checklistData';
 import { usersData, normalizeRole } from '../data/usersData';
 import { isSuperAdminEmail, isGerenciaRole } from '../config/permissions';
+import { isUserInactive } from '../utils/userNormalizer.js';
 import { canSendOperationalCommunications } from '../config/permissions';
 import { calculateAutomaticDeadline } from '../utils/soarDates';
 import { filterTasksForUser, getChecklistRolesForUser, hasSimulatedTaskIdentityMismatch, getTaskReadIdentity, canCreateTaskAsUser } from '../utils/taskPrivacy';
@@ -1151,8 +1152,10 @@ export function ChecklistProvider({ children }) {
       return false;
     }
 
-    const norm = normalizeRole(user?.appRole || user?.role);
-    const isAuthorized = user?.isSuperAdmin || isGerenciaRole(norm) || isSuperAdminEmail(activeAuthUser.email);
+    const permissionUser = currentUser || user;
+    const norm = normalizeRole(permissionUser?.appRole || permissionUser?.role);
+    const isAuthorized = !isUserInactive(permissionUser) &&
+      (permissionUser?.isSuperAdmin || isGerenciaRole(norm) || isSuperAdminEmail(activeAuthUser.email));
     
     if (!isAuthorized) {
       showToast("ACCESO DENEGADO: Solo la Gerencia o Dirección pueden reiniciar el ciclo operativo.", "error");
@@ -1510,6 +1513,7 @@ export function ChecklistProvider({ children }) {
         : '');
       const em = normalizeEmailKey(userEmail || currentUser?.email || '');
       if (!em) return false;
+      if (isUserInactive(currentUser)) throw new Error('Un perfil inactivo no puede modificar avances.');
       const actorEmail = normalizeEmailKey(auth.currentUser?.email || currentUser?.email || '');
       const canManageOtherProgress = isSuperAdminEmail(actorEmail) ||
         isGerenciaRole(normalizeRole(currentUser?.appRole || currentUser?.role || ''));

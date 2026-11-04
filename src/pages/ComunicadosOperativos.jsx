@@ -5,6 +5,8 @@ import { collection, doc, writeBatch } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { getAllCompanyUsers } from '../services/userService';
 import { canSendOperationalCommunications } from '../config/permissions';
+import { isUserInactive } from '../utils/userNormalizer.js';
+import { isInactiveTrainer } from '../data/trainerIdentity.js';
 import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
 
@@ -27,7 +29,7 @@ export default function ComunicadosOperativos() {
       const seen = new Set();
       setPeople((users || []).filter(user => {
         const email = normal(user.email || user.corporateEmail);
-        if (!email || seen.has(email) || user.isActive === false || user.status === 'inactive') return false;
+        if (!email || seen.has(email) || isUserInactive(user) || isInactiveTrainer(user.name || user.displayName)) return false;
         seen.add(email); return true;
       }).map(user => ({ ...user, email: normal(user.email || user.corporateEmail) })));
     }).catch(error => showToast(`No se pudo cargar el directorio: ${error.message}`, 'error'));

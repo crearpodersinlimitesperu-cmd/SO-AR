@@ -6,6 +6,7 @@
 
 import { getContractsByCountry, getSedePais } from '../data/legalContracts';
 import { findUserByAnyEmail } from '../data/usersData';
+import { isUserInactive } from '../utils/userNormalizer.js';
 import googleWorkspaceUsers from '../data/googleWorkspaceUsers.json';
 import nodusEnroladosFallback from '../data/nodusEnroladosRecords.json';
 import { INITIAL_MANAGERS } from '../data/managersData.js';
@@ -111,6 +112,7 @@ export const resolveParticipantKYC = (emailOrId) => {
     if (typeof findUserByAnyEmail === 'function') {
       const u = findUserByAnyEmail(search);
       if (u) {
+        if (isUserInactive(u)) return null;
         const sede = u.sede && u.sede !== 'Global' && u.sede !== 'ALL' ? u.sede : '';
         return {
           source: 'usersData',

@@ -1,4 +1,5 @@
 import { PORTFOLIO_FI_REVIEW_EMAILS, isDataAdmin } from './permissions.js';
+import { isUserInactive } from '../utils/userNormalizer.js';
 
 export const EXEC_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria'];
 export const KPI_ROLES = ['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_jr', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan'];
@@ -56,6 +57,7 @@ export const MODULE_REGISTRY = [
 ];
 
 export const isModuleVisible = (mod, currentUser) => {
+  if (currentUser && isUserInactive(currentUser)) return false;
   if (typeof mod.visible === 'function') return mod.visible(currentUser);
   if (mod.roles === null) return true;
   const allowedRoles = mod.roles || [];
@@ -69,4 +71,3 @@ export const isModuleVisible = (mod, currentUser) => {
   }
   return allowedRoles.includes(currentUser?.appRole) || (currentUser?.roles || []).some(r => allowedRoles.includes(r));
 };
-
