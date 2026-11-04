@@ -1,5 +1,6 @@
 import React from 'react';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
+import { isAssetLoadError } from '../utils/assetLoadErrors';
 
 export class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -15,7 +16,7 @@ export class ErrorBoundary extends React.Component {
     console.error("ErrorBoundary caught an error:", error, errorInfo);
     this.setState({ errorInfo });
 
-    if (/failed to fetch dynamically imported module|importing a module script failed|loading chunk .+ failed/i.test(String(error))) {
+    if (isAssetLoadError(error)) {
       const reloadKey = `causa:chunk-reload:${window.location.pathname}`;
       try {
         const previousReload = Number(sessionStorage.getItem(reloadKey));
