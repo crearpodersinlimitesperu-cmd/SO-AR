@@ -33,7 +33,7 @@ const COLORS_SEDES = {
   'Sin Sede': '#94a3b8'
 };
 
-export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
+export default function KPIsEntrenadoresLlamadas({ allManagersList = [], operationalCalls = null }) {
   const { currentUser } = useAuth();
   const hasAccess = canViewKPIsLlamadas(currentUser);
 
@@ -306,6 +306,14 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
+      <section aria-label="KPIs del historial operativo" style={{ padding: '1rem', border: '1px solid #cbd5e1', borderRadius: '8px', color: '#0f172a', background: '#fff' }}>
+        <h3 style={{ margin: '0 0 0.5rem', fontSize: '1rem' }}>Historial operativo de Causa OS</h3>
+        {operationalCalls ? <p style={{ margin: 0 }}>
+          {operationalCalls.individual} individuales · {operationalCalls.grupal} grupales · {operationalCalls.efectivas} efectivas.
+          {' '}{operationalCalls.anuladas} anuladas conservadas, excluidas de estos conteos y pendientes.
+        </p> : <p role="status">Esperando confirmación del historial operativo.</p>}
+        <p style={{ margin: '0.5rem 0 0', fontSize: '0.875rem' }}>La auditoría de Sheets que aparece debajo es una fuente histórica independiente; no se mezcla ni se reescribe con las correcciones operativas.</p>
+      </section>
       
       {/* 1. HERO HEADER DE CONTROL Y CONEXIÓN EN TIEMPO REAL */}
       <div style={{

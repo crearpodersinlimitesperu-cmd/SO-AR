@@ -22,7 +22,8 @@ import {
   canReplyNotaSeguimiento,
   canViewKPIsLlamadas,
   canAccessPagosSemanalesDrive,
-  canViewInactiveUsers
+  canViewInactiveUsers,
+  canCorrectManagerCall
 } from '../config/permissions';
 import { 
   INITIAL_LLAMADOS, 
@@ -37,7 +38,10 @@ import {
 import { OPERATIONAL_SEDES, normalizeRole, normalizeSede } from '../data/usersData';
 import { recordAuditEvent } from '../services/auditService';
 import { parsePaymentAmount, sumPaymentAmounts, updatePaidAmountInTransaction } from '../utils/liquidacionPayment';
-import { recordGroupCall, recordIndividualCall, updateIndividualCallDate } from '../services/callHistoryService';
+import { recordGroupCall, recordIndividualCall } from '../services/callHistoryService';
+import { isActiveCall, callHistorySignature, operationalCallMetrics, callSettlement } from '../utils/callHistory';
+import CallCorrectionDialog from '../components/CallCorrectionDialog';
+import { assertPaymentCallsUnchanged } from '../services/callPaymentGuard';
 import { createCallOperationGate } from '../services/callOperationGate';
 import { db } from '../services/firebase';
 import { collection, getDocs, doc, addDoc, setDoc, updateDoc, deleteDoc, deleteField, writeBatch, onSnapshot, serverTimestamp, query, where, arrayUnion, runTransaction } from 'firebase/firestore';
@@ -286,7 +290,8 @@ export default function CentroManagers() {
   // (02/09/2026) Historial de llamadas grupales — cada llamada registrada queda como
   // un documento nuevo (nunca se sobrescribe), para poder contar cuántas lleva cada
   // equipo. Es la base de la pestaña de Liquidación de Entrenadores.
-  const [llamadasHistorial, setLlamadasHistorial] = useState([]);
+  const [allLlamadasHistorial, setLlamadasHistorial] = useState([]);
+  const llamadasHistorial = useMemo(() => allLlamadasHistorial.filter(isActiveCall), [allLlamadasHistorial]);
   const [llamadasHistorialStatus, setLlamadasHistorialStatus] = useState('loading');
   const [llamadasHistorialError, setLlamadasHistorialError] = useState('');
   useEffect(() => {
@@ -1183,33 +1188,16 @@ export default function CentroManagers() {
     return { entrenador: trainerName, total, activos, graduados, desertores, equipos, sedes, asistieron, noAsistieron, conLlamada, pctAsist, managersList: trainerManagers };
   };
 
-  // (02/09/2026) Editar una llamada GRUPAL ya registrada (fecha o cuántos
-  // asistieron) desde la tarjeta 🎓 del entrenador — pedido explícito de José:
-  // "que cuando ponen una nueva llamada individual o grupal se vea en la ficha
-  // y se pueda editar también". Restringido a quien ya puede administrar
-  // managers_directory/llamadas_grupales_historial (ver firestore.rules:
-  // canManageManagers() / isGerenteODireccion()) — un entrenador puede
-  // REGISTRAR una llamada grupal nueva, pero no reescribir una ya existente
-  // (esa cuenta alimenta el pago de $400 de Liquidación).
-  const [editingLlamadaGrupal, setEditingLlamadaGrupal] = useState(null); // { id, fecha, asistieron }
-  const handleGuardarEdicionLlamadaGrupal = async () => {
-    if (!editingLlamadaGrupal) return;
-    try {
-      await updateDoc(doc(db, 'llamadas_grupales_historial', editingLlamadaGrupal.id), {
-        fecha: editingLlamadaGrupal.fecha,
-        asistieron: Number(editingLlamadaGrupal.asistieron) || 0
-      });
-      recordAuditEvent({
-        action: 'EDITAR_LLAMADA_GRUPAL_HISTORIAL',
-        user: currentUser?.email || currentUser?.name || 'Usuario',
-        details: `Llamada grupal ${editingLlamadaGrupal.id} editada: fecha=${editingLlamadaGrupal.fecha}, asistieron=${editingLlamadaGrupal.asistieron}`
-      });
-      showToast('Llamada grupal actualizada', 'success');
-      setEditingLlamadaGrupal(null);
-    } catch (e) {
-      console.error(e);
-      showToast('Error al editar (revisa que tengas permiso de gerencia/CMJ)', 'error');
+  const [callCorrection, setCallCorrection] = useState(null);
+  const [individualCallDates, setIndividualCallDates] = useState({});
+  const openCallCorrection = (manager, call, initialFecha) => {
+    const canonical = call.tipo === 'grupal'
+      ? allLlamadasHistorial.find(row => row.id === call.id) : call;
+    if (!canonical) {
+      showToast('No se encontró el original grupal. Solicita conciliación a Dirección.', 'warning');
+      return;
     }
+    setCallCorrection({ manager, call: { ...canonical, tipo: call.tipo || 'individual' }, initialFecha });
   };
 
   const stats = useMemo(() => {
@@ -1298,6 +1286,7 @@ export default function CentroManagers() {
   };
 
   const handleUpdateLlamada = async (id, fecha, asistio) => {
+    fecha = individualCallDates[id] || fecha;
     const targetManager = managers.find(m => m.id === id);
     if (!targetManager) {
       showToast('No se encontró el manager para registrar la llamada.', 'error');
@@ -1355,6 +1344,7 @@ export default function CentroManagers() {
       });
 
       showToast(`Registro guardado: ${asistio === 'SI' ? 'Asistió' : 'No asistió'}`, 'success');
+      setIndividualCallDates(prev => { const next = { ...prev }; delete next[id]; return next; });
     } catch (e) {
       console.error(e);
       showToast('Error al guardar en la nube', 'error');
@@ -1373,23 +1363,12 @@ export default function CentroManagers() {
       showToast('No se encontró el manager para actualizar la fecha.', 'error');
       return;
     }
-    try {
-      const updatedEvent = await updateIndividualCallDate(db, { manager: targetManager, fecha });
-      setManagers(prev => prev.map(m => {
-        if (m.id !== id) return m;
-        const history = Array.isArray(m.llamadasHistorial) ? m.llamadasHistorial : [];
-        return {
-          ...m,
-          llamadaFecha: fecha,
-          llamadasHistorial: updatedEvent
-            ? history.map(event => event.id === updatedEvent.id ? updatedEvent : event)
-            : history,
-        };
-      }));
-      showToast('Fecha de la última llamada actualizada', 'success');
-    } catch (e) {
-      console.error(e);
-      showToast('Error al actualizar la fecha de la llamada', 'error');
+    const latest = (targetManager.llamadasHistorial || []).filter(call => call.tipo !== 'grupal' && isActiveCall(call))
+      .slice().sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''))[0];
+    if (latest) openCallCorrection(targetManager, latest, fecha);
+    else {
+      setIndividualCallDates(prev => ({ ...prev, [id]: fecha }));
+      showToast('Fecha preparada. Registra SÍ o NO para guardar una nueva llamada.', 'info');
     }
   };
 
@@ -1703,7 +1682,13 @@ export default function CentroManagers() {
 
       // Según directiva de Dirección General: la liquidación ya no está condicionada a graduación ni deserción.
       // El pago se libera de forma fija por cada llamada efectiva registrada honestamente ($25 USD c/u).
-      const esElegible = llamadasEfectivas > 0 || !!cierreManual || !!pago;
+      const allRegistros = allLlamadasHistorial.filter(call => call.equipoKey === equipoKey);
+      const settlement = callSettlement({
+        effectiveCount: llamadasEfectivas, payment: pago, closed: Boolean(cierreManual),
+        hasCorrections: allRegistros.some(call => call.afectaLiquidacion || !isActiveCall(call)),
+        fee: FEE_PER_EFFECTIVE_CALL_USD,
+      });
+      const esElegible = settlement.eligible;
 
       if (!esElegible) {
         if (ultimoLlamada || count > 0) {
@@ -1729,7 +1714,7 @@ export default function CentroManagers() {
       const sede = ultimoLlamada?.sede || infoEquipo?.sede || pago?.sede || '';
       const entrenador = ultimoLlamada?.entrenador || Array.from(infoEquipo?.entrenadores || []).join(', ') || pago?.entrenador || 'Sin Asignar';
 
-      const montoCalculado = pago?.montoUSD ? Number(pago.montoUSD) : Math.max(FEE_PER_EFFECTIVE_CALL_USD, llamadasEfectivas * FEE_PER_EFFECTIVE_CALL_USD);
+      const montoCalculado = settlement.amount;
 
       const item = {
         tipo: 'grupal',
@@ -1748,7 +1733,9 @@ export default function CentroManagers() {
         montoUSD: montoCalculado,
         tarifaPorLlamada: FEE_PER_EFFECTIVE_CALL_USD,
         motivo: 'llamadas_grupales_efectivas',
-        cierreManual
+        cierreManual,
+        callSnapshot: allRegistros
+          .map(call => ({ id: call.id, signature: callHistorySignature([call]) }))
       };
 
       if (pago && pago.estado === 'eliminado') {
@@ -1769,9 +1756,9 @@ export default function CentroManagers() {
       if (!mId) return;
 
       const rawCalls = Array.isArray(m.llamadasHistorial) ? m.llamadasHistorial : [];
-      const individualCalls = rawCalls.filter(c => c && (c.tipo === 'individual' || (!c.tipo && !c.equipoKey)));
+      const individualCalls = rawCalls.filter(c => c && isActiveCall(c) && (c.tipo === 'individual' || (!c.tipo && !c.equipoKey)));
 
-      if (individualCalls.length === 0 && m.llamadaFecha) {
+      if (rawCalls.length === 0 && m.llamadaFecha) {
         individualCalls.push({
           id: `legacy_${mId}_${m.llamadaFecha}`,
           tipo: 'individual',
@@ -1789,13 +1776,16 @@ export default function CentroManagers() {
       const indKey = `indiv__${mId}`;
       const pago = liquidacionesPagos[indKey] || liquidacionesPagos[mId] || null;
 
-      if (llamadasEfectivasInd > 0 || !!pago) {
+      const settlement = callSettlement({
+        effectiveCount: llamadasEfectivasInd, payment: pago,
+        hasCorrections: rawCalls.some(call => call.afectaLiquidacion || !isActiveCall(call)),
+        fee: FEE_PER_EFFECTIVE_CALL_USD,
+      });
+      if (settlement.eligible) {
         const sortedInd = [...individualCalls].sort((a, b) => (a.fecha || '').localeCompare(b.fecha || ''));
         const ultimoInd = sortedInd[sortedInd.length - 1];
         const entrenador = m.entrenador || m.entrenadorLlamadas || pago?.entrenador || 'Sin Asignar';
-        const montoCalculado = pago?.montoUSD 
-          ? Number(pago.montoUSD) 
-          : Math.max(FEE_PER_EFFECTIVE_CALL_USD, llamadasEfectivasInd * FEE_PER_EFFECTIVE_CALL_USD);
+        const montoCalculado = settlement.amount;
 
         const indItem = {
           tipo: 'individual',
@@ -1814,7 +1804,8 @@ export default function CentroManagers() {
           fechaAlcanzo7: ultimoInd?.fecha || '',
           montoUSD: montoCalculado,
           tarifaPorLlamada: FEE_PER_EFFECTIVE_CALL_USD,
-          motivo: 'llamadas_individuales_efectivas'
+          motivo: 'llamadas_individuales_efectivas',
+          callSignature: callHistorySignature(rawCalls)
         };
 
         if (pago && pago.estado === 'eliminado') {
@@ -1842,7 +1833,7 @@ export default function CentroManagers() {
     const totalPagadoUSD = sumPaymentAmounts(pagados);
 
     return { pendientes, pagados, enCamino, totalPendienteUSD, totalPagadoUSD };
-  }, [llamadasHistorial, liquidacionesPagos, equiposParaLiquidacion, canViewLiquidacion, managers]);
+  }, [llamadasHistorial, allLlamadasHistorial, liquidacionesPagos, equiposParaLiquidacion, canViewLiquidacion, managers]);
 
   // Filtrado reactivo de pendientes y pagados según tipo de llamada, sede y entrenador
   const filteredPendientes = useMemo(() => {
@@ -2076,6 +2067,7 @@ export default function CentroManagers() {
         if (prev?.estado === 'pagado') {
           throw new Error('Esta liquidación ya fue procesada y pagada previamente.');
         }
+        await assertPaymentCallsUnchanged(db, tx, item);
 
         const monto = Number(item.montoUSD || (item.llamadasEfectivas || item.totalLlamadas || 1) * FEE_PER_EFFECTIVE_CALL_USD);
         tx.set(pagoRef, {
@@ -2150,6 +2142,7 @@ export default function CentroManagers() {
           const snap = await tx.get(pagoRef);
           const prev = snap.exists() ? snap.data() : null;
           if (prev?.estado === 'pagado') return;
+          await assertPaymentCallsUnchanged(db, tx, item);
 
           const monto = Number(item.montoUSD || (item.llamadasEfectivas || item.totalLlamadas || 1) * FEE_PER_EFFECTIVE_CALL_USD);
           tx.set(pagoRef, {
@@ -3694,7 +3687,7 @@ export default function CentroManagers() {
                         </td>
                         <td style={{ padding: '1rem' }}>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-                            <HelpInput helpKey="fechaIndividual" type="date" value={m.llamadaFecha || ''} onChange={e => handleEditLlamadaFecha(m.id, e.target.value)} style={{ padding: '0.4rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.8rem' }} />
+                            <HelpInput helpKey="fechaIndividual" type="date" value={individualCallDates[m.id] ?? m.llamadaFecha ?? ''} onChange={e => handleEditLlamadaFecha(m.id, e.target.value)} style={{ padding: '0.4rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.8rem' }} />
                             <HelpButton helpKey="asistioSi" disabled={Boolean(savingIndividualCallIds[m.id])} onClick={() => handleUpdateLlamada(m.id, m.llamadaFecha || new Date().toISOString().split('T')[0], 'SI')} style={{ padding: '0.4rem 0.6rem', borderRadius: '6px', border: '1px solid #10b981', background: m.llamadaAsistio === 'SI' ? '#10b981' : '#fff', color: m.llamadaAsistio === 'SI' ? '#fff' : '#10b981', fontWeight: 700, cursor: savingIndividualCallIds[m.id] ? 'wait' : 'pointer' }}>SÍ</HelpButton>
                             <HelpButton helpKey="asistioNo" disabled={Boolean(savingIndividualCallIds[m.id])} onClick={() => handleUpdateLlamada(m.id, m.llamadaFecha || new Date().toISOString().split('T')[0], 'NO')} style={{ padding: '0.4rem 0.6rem', borderRadius: '6px', border: '1px solid #ef4444', background: m.llamadaAsistio === 'NO' ? '#ef4444' : '#fff', color: m.llamadaAsistio === 'NO' ? '#fff' : '#ef4444', fontWeight: 700, cursor: savingIndividualCallIds[m.id] ? 'wait' : 'pointer' }}>NO</HelpButton>
                           </div>
@@ -4811,7 +4804,8 @@ export default function CentroManagers() {
         {/* KPIS DE ENTRENADORES DE LLAMADAS — REGLA ESTRICTA (05/09/2026): Solo Directores y José Sánchez / SuperAdmin */}
         {activeTab === 'kpis_llamadas' && (
           userCanViewKPIsLlamadas ? (
-            <KPIsEntrenadoresLlamadas allManagersList={managers} />
+            <KPIsEntrenadoresLlamadas allManagersList={managers}
+              operationalCalls={llamadasHistorialStatus === 'ready' ? operationalCallMetrics(managers, allLlamadasHistorial) : null} />
           ) : (
             <div style={{ background: bgCard, borderRadius: '12px', padding: '3rem', textAlign: 'center', border: `1px solid ${borderLight}` }}>
               <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#ef4444', marginBottom: '0.5rem' }}>
@@ -6918,7 +6912,7 @@ export default function CentroManagers() {
       
       {/* TARJETA DEL MANAGER/CAPITÁN */}
       {managerCardModal && (() => {
-        const m = managerCardModal;
+        const m = managers.find(row => row.id === managerCardModal.id) || managerCardModal;
         const equipoKey = m.equipo ? `${normalizeSede(m.sede)}_${String(m.equipo).trim().toUpperCase()}` : null;
         // Llamadas de este equipo
         const llamadasEquipo = llamadasHistorial
@@ -6948,9 +6942,10 @@ export default function CentroManagers() {
         
         const unifiedHistory = [
           ...memberCalls,
-          ...llamadasEquipo
+          ...allLlamadasHistorial.filter(l => (l.equipoKey || '').toUpperCase() === equipoKey)
             .filter(l => !seenCallIds.has(l.id || l.callId || `${l.fecha}_grupal`))
             .map(l => ({
+              ...l,
               id: l.id || l.callId,
               tipo: 'grupal',
               tipoContacto: l.tipoContacto || STANDARD_CALL_CONTACT_TYPE,
@@ -7058,12 +7053,12 @@ export default function CentroManagers() {
               <h4 style={{ fontSize: '0.82rem', color: textDark, margin: '1rem 0 0.4rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <span>Historial de Sesiones de {m.nombre}</span>
                 <span style={{ fontSize: '0.72rem', color: '#16a34a', fontWeight: 700 }}>
-                  {unifiedHistory.length} sesiones verificadas
+                  {unifiedHistory.filter(isActiveCall).length} sesiones vigentes · {unifiedHistory.length} conservadas
                 </span>
               </h4>
               <div style={{ maxHeight: '180px', overflowY: 'auto' }}>
                 {unifiedHistory.map((call, idx) => (
-                  <div key={call.id || idx} style={{ padding: '0.45rem 0', borderBottom: `1px solid ${borderLight}`, fontSize: '0.75rem', color: textMuted, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div key={call.id || idx} style={{ padding: '0.65rem 0', borderBottom: `1px solid ${borderLight}`, fontSize: '0.875rem', color: textMuted, display: 'flex', flexWrap: 'wrap', gap: '0.5rem', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
                       <div style={{ fontWeight: 600, color: textDark }}>
                         {call.fecha || 'Sin fecha'} &bull; {call.tipo === 'grupal' ? 'Llamada Grupal' : 'Llamada Individual'}
@@ -7076,6 +7071,15 @@ export default function CentroManagers() {
                           🎙️ Nota de voz confirmada al Coordinador
                         </div>
                       )}
+                      {call.ultimaCorreccion && <p style={{ margin: '0.35rem 0', overflowWrap: 'anywhere' }}>
+                        {call.ultimaCorreccion.motivo} · {call.ultimaCorreccion.actorEmail} · {call.ultimaCorreccion.occurredAtIso}
+                      </p>}
+                      {(canCorrectManagerCall(currentUser, m, call) || call.ultimaCorreccion) && (
+                        <HelpButton helpKey="corregirLlamada" onClick={() => openCallCorrection(m, call)}
+                          style={{ minHeight: '44px', padding: '0.4rem 0.65rem', cursor: 'pointer' }}>
+                          {isActiveCall(call) && canCorrectManagerCall(currentUser, m, call) ? 'Corregir / anular' : 'Ver auditoría / restaurar'}
+                        </HelpButton>
+                      )}
                     </div>
                     <span style={{ 
                       fontSize: '0.7rem', 
@@ -7085,7 +7089,7 @@ export default function CentroManagers() {
                       background: call.asistio ? '#dcfce7' : '#fee2e2',
                       color: call.asistio ? '#16a34a' : '#dc2626'
                     }}>
-                      {call.asistio ? '✅ Efectiva' : '❌ Ausente'}
+                      {!isActiveCall(call) ? 'Anulada · no cuenta' : call.asistio ? '✅ Efectiva' : '❌ Ausente'}
                     </span>
                   </div>
                 ))}
@@ -7182,7 +7186,7 @@ export default function CentroManagers() {
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.4rem' }}>
                             <span style={{ fontSize: '0.78rem', color: textDark, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.nombre}</span>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', flexShrink: 0 }}>
-                              <HelpInput helpKey="fechaIndividual" type="date" value={m.llamadaFecha || ''} onChange={e => handleEditLlamadaFecha(m.id, e.target.value)} style={{ padding: '0.2rem', borderRadius: '4px', border: `1px solid ${borderLight}`, fontSize: '0.7rem', width: '110px' }} />
+                              <HelpInput helpKey="fechaIndividual" type="date" value={individualCallDates[m.id] ?? m.llamadaFecha ?? ''} onChange={e => handleEditLlamadaFecha(m.id, e.target.value)} style={{ padding: '0.2rem', borderRadius: '4px', border: `1px solid ${borderLight}`, fontSize: '0.7rem', width: '110px' }} />
                               <HelpButton helpKey="asistioSi" disabled={Boolean(savingIndividualCallIds[m.id])} onClick={() => handleUpdateLlamada(m.id, m.llamadaFecha || new Date().toISOString().split('T')[0], 'SI')} style={{ padding: '0.2rem 0.4rem', borderRadius: '4px', border: '1px solid #10b981', background: m.llamadaAsistio === 'SI' ? '#10b981' : '#fff', color: m.llamadaAsistio === 'SI' ? '#fff' : '#10b981', fontWeight: 700, fontSize: '0.68rem', cursor: savingIndividualCallIds[m.id] ? 'wait' : 'pointer' }}>SÍ</HelpButton>
                               <HelpButton helpKey="asistioNo" disabled={Boolean(savingIndividualCallIds[m.id])} onClick={() => handleUpdateLlamada(m.id, m.llamadaFecha || new Date().toISOString().split('T')[0], 'NO')} style={{ padding: '0.2rem 0.4rem', borderRadius: '4px', border: '1px solid #ef4444', background: m.llamadaAsistio === 'NO' ? '#ef4444' : '#fff', color: m.llamadaAsistio === 'NO' ? '#fff' : '#ef4444', fontWeight: 700, fontSize: '0.68rem', cursor: savingIndividualCallIds[m.id] ? 'wait' : 'pointer' }}>NO</HelpButton>
                             </div>
@@ -7191,7 +7195,8 @@ export default function CentroManagers() {
                             .slice().sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''))
                             .map(call => (
                               <div key={call.id} style={{ marginTop: '0.25rem', fontSize: '0.7rem', color: textMuted }}>
-                                {call.fecha || 'Sin fecha'} · {call.tipo === 'grupal' ? 'Grupal' : 'Individual'} · {call.asistio ? 'Asistió' : 'No asistió'}
+                                {call.fecha || 'Sin fecha'} · {call.tipo === 'grupal' ? 'Grupal' : 'Individual'} · {!isActiveCall(call) ? 'Anulada · no cuenta' : call.asistio ? 'Asistió' : 'No asistió'}
+                                {canCorrectManagerCall(currentUser, m, call) && <HelpButton helpKey="corregirLlamada" onClick={() => openCallCorrection(m, call)} style={{ minHeight: '44px' }}>Corregir / auditar</HelpButton>}
                                 {call.id && notasSeguimiento.find(note => note.relatedCallId === call.id)?.nota
                                   ? ` · Nota: ${notasSeguimiento.find(note => note.relatedCallId === call.id).nota}`
                                   : ''}
@@ -7203,12 +7208,10 @@ export default function CentroManagers() {
                     </div>
                   </div>
 
-                  {/* (02/09/2026) Llamadas GRUPALES registradas por este entrenador — solo
-                      lectura para todos; editable (fecha / cuántos asistieron) solo para
-                      quien ya administra managers_directory (CMJ/gerencia/dirección),
-                      igual que exige firestore.rules — esta cuenta alimenta Liquidación. */}
+                  {/* Las correcciones grupales usan el original y todas sus copias.
+                      No se reescribe un conteo de asistentes sin verificar integrantes. */}
                   {(() => {
-                    const llamadasDeEsteEntrenador = llamadasHistorial
+                    const llamadasDeEsteEntrenador = allLlamadasHistorial
                       .filter(l => isTrainerMatch(l.entrenador, trainerCardModal))
                       .sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
                     return (
@@ -7224,25 +7227,16 @@ export default function CentroManagers() {
                         <div style={{ maxHeight: '180px', overflowY: 'auto', marginTop: '0.4rem', display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
                           {llamadasDeEsteEntrenador.map(l => (
                             <div key={l.id} style={{ padding: '0.4rem 0.5rem', background: '#fafaf9', borderRadius: '6px', border: `1px solid ${borderLight}` }}>
-                              {editingLlamadaGrupal?.id === l.id ? (
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                                  <HelpInput helpKey="fechaGrupal" type="date" value={editingLlamadaGrupal.fecha} onChange={e => setEditingLlamadaGrupal({ ...editingLlamadaGrupal, fecha: e.target.value })} style={{ padding: '0.2rem', borderRadius: '4px', border: `1px solid ${borderLight}`, fontSize: '0.7rem' }} />
-                                  <HelpInput helpKey="asistieron" type="number" min="0" value={editingLlamadaGrupal.asistieron} onChange={e => setEditingLlamadaGrupal({ ...editingLlamadaGrupal, asistieron: e.target.value })} style={{ width: '55px', padding: '0.2rem', borderRadius: '4px', border: `1px solid ${borderLight}`, fontSize: '0.7rem' }} />
-                                  <HelpButton helpKey="guardarLlamada" onClick={handleGuardarEdicionLlamadaGrupal} style={{ padding: '0.2rem 0.4rem', borderRadius: '4px', border: 'none', background: '#10b981', color: '#fff', fontWeight: 700, fontSize: '0.68rem', cursor: 'pointer' }}>Guardar</HelpButton>
-                                  <HelpButton helpKey="cancelar" onClick={() => setEditingLlamadaGrupal(null)} style={{ padding: '0.2rem 0.4rem', borderRadius: '4px', border: `1px solid ${borderLight}`, background: '#fff', fontSize: '0.68rem', cursor: 'pointer' }}>Cancelar</HelpButton>
-                                </div>
-                              ) : (
                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.4rem' }}>
                                   <span style={{ fontSize: '0.75rem', color: textDark }}>
-                                    {l.fecha} · {l.equipo} · {l.asistieron}/{l.totalIntegrantes}
+                                    {l.fecha} · {l.equipo} · {l.asistieron}/{l.totalIntegrantes} {!isActiveCall(l) && '· Anulada'}
                                   </span>
-                                  {userCanViewAllNotas && (
-                                    <HelpButton helpKey="editarLlamada" onClick={() => setEditingLlamadaGrupal({ id: l.id, fecha: l.fecha || '', asistieron: l.asistieron ?? 0 })} title="Editar esta llamada grupal" style={{ background: 'none', border: 'none', color: '#7c3aed', cursor: 'pointer', padding: '0.1rem' }}>
+                                  {canCorrectManagerCall(currentUser, null, l) && (
+                                    <HelpButton helpKey="corregirLlamada" onClick={() => openCallCorrection(null, { ...l, tipo: 'grupal' })} title="Corregir esta llamada grupal" style={{ background: 'none', border: 'none', color: '#7c3aed', cursor: 'pointer', padding: '0.5rem', minHeight: '44px' }}>
                                       <Edit3 size={13} />
                                     </HelpButton>
                                   )}
                                 </div>
-                              )}
                               {notasSeguimiento.find(note => note.relatedCallId === l.id)?.nota && (
                                 <p style={{ margin: '0.3rem 0 0', fontSize: '0.7rem', color: textMuted }}>
                                   Nota: {notasSeguimiento.find(note => note.relatedCallId === l.id).nota}
@@ -7473,6 +7467,10 @@ export default function CentroManagers() {
           </div>
         );
       })()}
+
+      {callCorrection && <CallCorrectionDialog db={db} user={currentUser} {...callCorrection}
+        onClose={() => setCallCorrection(null)}
+        onSaved={() => { setCallCorrection(null); showToast('Corrección guardada con auditoría. El original se conserva.', 'success'); }} />}
 
       {/* MODAL: SUPERVISOR DE IDONEIDAD Y CALIDAD DE DATOS */}
       {dataSupervisorModal.isOpen && (

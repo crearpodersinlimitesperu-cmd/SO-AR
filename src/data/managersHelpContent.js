@@ -11,7 +11,9 @@ export const managersFieldHelp = {
   numEquipo: help('Número de equipo', 'Escribe el número oficial del equipo. Distingue equipos con el mismo nombre; verifica la sede.', '122 para el equipo #122', '124 si la persona pertenece al #122'),
   entrenador: help('Entrenadores asignados', 'Selecciona solo los entrenadores confirmados para este equipo. Puedes elegir varios si corresponde; la asignación requiere el permiso existente.', 'Los nombres acordados con coordinación', 'Asignar por parecido de nombres'),
   estado: help('Estado del integrante', 'Confirma la situación antes de cambiarla. En una celda del directorio el cambio se guarda al seleccionar; en un formulario se guarda con Guardar.', 'Graduado cuando su cierre está confirmado', 'Usar Desertor para indicar una sola ausencia'),
-  fechaIndividual: help('Fecha de llamada individual', 'Elige la fecha real de la llamada. Esta celda se guarda al cambiarla; si no había asistencia registrada, el sistema usa SÍ.', 'La fecha del encuentro confirmado', 'Cambiar la fecha como recordatorio de una llamada futura'),
+  fechaIndividual: help('Fecha de llamada individual', 'Si existe una llamada, abre su corrección con motivo obligatorio. Para una llamada nueva, elige la fecha y luego registra SÍ o NO.', 'La fecha del encuentro confirmado', 'Cambiar la fecha como recordatorio de una llamada futura'),
+  motivoCorreccion: help('Motivo de corrección', 'Explica qué ocurrió (5 a 500 caracteres). Se conserva junto al original, tu identidad y la fecha; no incluyas datos privados innecesarios.', 'Registro duplicado de la llamada del 28 de octubre'),
+  accionCorreccion: help('Tipo de corrección', 'Corrige datos o anula un duplicado sin borrarlo. Solo Dirección puede restaurar una llamada anulada. Una llamada pagada requiere revisión de Finanzas.'),
   fechaGrupal: help('Fecha de llamada grupal', 'Selecciona la fecha real del encuentro que estás registrando o corrigiendo.', 'La fecha en que se realizó la llamada', 'La fecha prevista si aún no ocurrió'),
   asistencia: help('Asistencia individual', 'Marca la casilla solo si esta persona conectó. Revisa integrante por integrante antes de guardar.', 'Marcado para quien sí asistió', 'Marcar todo sin comprobar asistencia'),
   asistieron: help('Cantidad de asistentes', 'Introduce cuántos integrantes realmente asistieron a esa llamada, sin superar el total del equipo.', '4 si conectaron cuatro integrantes', 'Contar invitados como integrantes del equipo'),
@@ -34,6 +36,8 @@ export const managersFieldHelp = {
 };
 
 export const managersActionHelp = {
+  corregirLlamada: help('Corregir llamada', 'Abre la corrección del registro seleccionado. Solo llamadas propias o de tus integrantes asignados. Las anuladas no cuentan ni generan pendientes de pago.'),
+  confirmarCorreccion: help('Guardar corrección trazable', 'Guarda el motivo, valores previos, autor y fecha en una transacción. No borra el original. Si está pagada o cambió mientras la revisabas, no se modifica nada.'),
   recargarDirectorio: help('Reintentar conexión', 'Vuelve a consultar Firestore. No restaura catálogos antiguos ni modifica registros del directorio.'),
   inicio: help('Volver a Inicio', 'Regresa al inicio de Causa OS. Guarda primero los cambios pendientes del formulario.'),
   vistaRol: help('Cambiar vista', 'Alterna entre tu vista de entrenador y corporativa si tienes doble rol. No cambia tu identidad ni tus permisos.'),
@@ -56,7 +60,7 @@ export const managersActionHelp = {
   notas: help('Ver notas de seguimiento', 'Abre el historial permitido para este integrante y su equipo. Escribir o responder depende de tu perfil.'),
   editarIntegrante: help('Editar integrante', 'Abre sus datos para corregir identidad, contacto y equipo. Verifica la identidad oficial antes de guardar.'),
   editarEquipo: help('Editar equipo', 'Abre la sede, identidad, entrenadores y roster del equipo. Confirma número y nombre para no mezclar homónimos.'),
-  eliminar: help('Eliminar registro', 'Abre la confirmación de eliminación de la persona o del equipo completo. Revisa el alcance; no lo uses para indicar una ausencia.'),
+  eliminar: help('Eliminar registro', 'Abre la confirmación de eliminación. Un integrante con historial de llamadas no puede borrarse: corrige o anula la llamada desde su ficha. No lo uses para indicar una ausencia.'),
   confirmarEliminar: help('Confirmar eliminación', 'Elimina el registro indicado; si es un equipo, elimina sus integrantes. Confirma solo después de revisar la advertencia.'),
   anterior: help('Página anterior', 'Muestra la página anterior de resultados sin cambiar datos.'),
   siguiente: help('Página siguiente', 'Muestra la siguiente página de resultados sin cambiar datos.'),

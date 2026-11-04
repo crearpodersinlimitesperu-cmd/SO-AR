@@ -27,9 +27,11 @@ export function manualManagerPatch(manager, changes) {
 
 export function managerSheetPatch(existing, incoming) {
   const trainerSafe = preserveExplicitTrainerAssignment(existing, incoming);
+  const protectedCallFields = existing?.llamadasHistorial?.length
+    ? ['llamadasHistorial', 'llamadaFecha', 'llamadaAsistio'] : ['llamadasHistorial'];
   return Object.fromEntries(Object.entries(trainerSafe).filter(([field]) =>
     existing?.[`_manual_${field}`] !== true && !field.startsWith('_manual') &&
-    field !== '_sheetIdentity'
+    field !== '_sheetIdentity' && !protectedCallFields.includes(field)
   ));
 }
 

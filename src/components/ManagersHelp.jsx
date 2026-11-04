@@ -22,10 +22,10 @@ export function ManagersHelpProvider({ children }) {
     setActive(null);
     setPosition(null);
   };
-  const show = (help, id, anchor) => {
+  const show = (help, id, anchor, passive = false) => {
     clearTimer();
     setPosition(null);
-    setActive({ help, id, anchor });
+    setActive({ help, id, anchor, passive });
   };
   const hideSoon = () => {
     clearTimer();
@@ -90,7 +90,7 @@ export function ManagersHelpProvider({ children }) {
           role="tooltip"
           id={active.id}
           className="managers-help-popover"
-          style={{ ...position, visibility: position ? 'visible' : 'hidden' }}
+          style={{ ...position, visibility: position ? 'visible' : 'hidden', ...(active.passive ? { pointerEvents: 'none' } : {}) }}
           onPointerEnter={clearTimer}
           onPointerLeave={hideSoon}
         >
@@ -111,12 +111,12 @@ function hasText(children) {
   );
 }
 
-export function ManagerHelpControl({ as: Tag, helpKey, children, ...props }) {
+export function ManagerHelpControl({ as: Tag, helpKey, passiveHelp = false, children, ...props }) {
   const context = useContext(HelpContext);
   const id = useId();
   const isAction = Tag === 'button' || Tag === 'a' || Tag === 'th';
   const help = isAction ? managersActionHelp[helpKey] : managersFieldHelp[helpKey];
-  const explain = event => context.show(help, id, event.currentTarget);
+  const explain = event => context.show(help, id, event.currentTarget, passiveHelp);
   const click = event => {
     if (isAction && shouldExplainAction(context.learning, helpKey)) {
       event.preventDefault();
@@ -133,7 +133,7 @@ export function ManagerHelpControl({ as: Tag, helpKey, children, ...props }) {
       aria-label={props['aria-label'] || ((!isAction || !hasText(children)) ? (props.title || help.label) : undefined)}
       aria-describedby={[props['aria-describedby'], `${context.descriptionPrefix}-${isAction ? 'action' : 'field'}-${helpKey}`].filter(Boolean).join(' ')}
       data-manager-help={helpKey}
-      onFocus={event => { explain(event); props.onFocus?.(event); }}
+      onFocus={event => { if (passiveHelp) context.hide(); else explain(event); props.onFocus?.(event); }}
       onBlur={event => { context.hideSoon(); props.onBlur?.(event); }}
       onPointerEnter={event => {
         if (event.pointerType === 'mouse') explain(event);

@@ -2,6 +2,7 @@
 // Este archivo es la ÚNICA fuente de verdad para emails con privilegios elevados.
 // Cualquier cambio de SuperAdmin se hace AQUÍ, no disperso en el código.
 import { isUserInactive } from '../utils/userNormalizer.js';
+import callCorrectionAccess from '../../functions/callCorrectionAccess.json' with { type: 'json' };
 
 /**
  * Emails con privilegios de Super Administrador.
@@ -347,32 +348,8 @@ export const canViewSede = (currentUser) => {
  * Emails de entrenadores que TAMBIÉN tienen un rol corporativo (dual-role).
  * Estos usuarios pueden alternar entre su vista de entrenador y su rol de oficina.
  */
-export const DUAL_ROLE_TRAINER_EMAILS = [
-  'jose.sanchez@crearpsl.net',      // SuperAdmin + Gerente Lima + Entrenador
-  'andres.gomez@crearpsl.net',     // Director Maestría del Juego + Entrenador C2 + Entrenador Relación MJ + Entrenador de Llamadas (confirmado por José, 02/09/2026)
-  'fer.aragon@crearpsl.net',        // Corporativo + Entrenador C1
-  'paul.sosa@crearpsl.net',         // Corporativo + Entrenador C2+MJ
-  'leandro.brunis@crearpsl.net',    // Dirección / Corporativo + Entrenador C1 (Leandro Brunis)
-  'carlos.brunis@crearpsl.net',     // Coordinador QT Global + Entrenador (Carlos Brunis)
-  'linid.valencia@crearpsl.net',    // Coordinadora MJ + Entrenadora
-  'brunische66@gmail.com',
-  'jesus.acosta@crearpsl.net',      // Entrenador + Observador Global
-  'chuyacostar88@gmail.com',        // Entrenador + Observador Global (Gmail oficial)
-  'jesusadrianacosta@gmail.com',    // Entrenador + Observador Global (Gmail alterno)
-  'daniela.monroy@crearpsl.net',      // Entrenadora de llamadas
-  'erika.gavilanez@crearpsl.net',     // Coordinadora MJ + Entrenadora de llamadas
-  'mauricio.ramirez@crearpsl.net',    // Entrenador de llamadas
-  'emalejodiaz@gmail.com',            // Entrenador de llamadas
-  'anamonroyt@gmail.com',             // Entrenadora de llamadas
-  'dibrafi@gmail.com',                // Entrenador de llamadas
-  'fernandomendozaclavijo22@gmail.com', // Entrenador de llamadas
-  'marylourdespat@gmail.com',         // Entrenadora de llamadas
-  'direccion@bmbgbrokers.com',        // Entrenador de llamadas
-  'milacampuzano21@gmail.com',        // Entrenadora de llamadas
-  'kerly.carrillo@crearpsl.net',      // Coordinadora MJ Cuenca + Entrenadora de llamadas (Kerlie Carrillo)
-  'liliana.cubillo@crearpsl.net',     // Coordinadora MJ Quito + Entrenadora de llamadas (Lili Cubillo)
-  'judith.romero@crearpsl.net',       // Coordinadora MJ Quito + Entrenadora de llamadas (Regina Romero)
-];
+// Shared with the authenticated correction backend; the existing allowlist is unchanged.
+export const DUAL_ROLE_TRAINER_EMAILS = callCorrectionAccess.dualRoleTrainerEmails;
 
 /**
  * La pestaña de liquidación comparte el acceso de dirección de los KPIs del
@@ -472,6 +449,25 @@ export const canWriteNotaSeguimiento = (currentUser) => {
   return role === 'entrenador' || role === 'entrenador_llamadas' ||
     roles.includes('entrenador') || roles.includes('entrenador_llamadas') ||
     DUAL_ROLE_TRAINER_EMAILS.includes((currentUser.email || '').toLowerCase());
+};
+
+export const canCorrectManagerCall = (user, manager, call) => {
+  if (!user || isUserInactive(user) || user.isSimulated || !call?.id ||
+      String(call.id).startsWith('legacy_')) return false;
+  if (canViewKPIsLlamadas(user)) return true;
+  if (!canWriteNotaSeguimiento(user)) return false;
+  const normalize = value => String(value || '').trim().normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  const emailKey = value => normalize(value).replace(/@crearpsl\.com$/, '@crearpsl.net');
+  if (emailKey(call.registradoPorEmail) === emailKey(user.email) && user.email) return true;
+  if (!manager) return false;
+  if (manager.entrenadorId) {
+    return manager.entrenadorId === user.uid &&
+      (!manager.entrenadorEmail || emailKey(manager.entrenadorEmail) === emailKey(user.email));
+  }
+  if (manager.entrenadorEmail) return emailKey(manager.entrenadorEmail) === emailKey(user.email);
+  return Boolean(user.name && String(manager.entrenador || '').split(/[,/&•]+/)
+    .some(name => normalize(name) === normalize(user.name)));
 };
 
 /**
