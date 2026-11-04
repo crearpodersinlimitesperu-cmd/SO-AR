@@ -543,6 +543,45 @@ Permanecen los bloqueadores anteriores: otros reportes, lectores globales Nodus,
 catálogos estáticos, aprovisionamiento/auditoría administrativa y evidencia de
 la cuenta/ruta afectada. **No se declara terminado el incidente.**
 
+## Continuación: StrategyBoard sin snapshot global ni directorio estático
+
+`src/pages/StrategyBoard.jsx:181-195` usa la proyección privada de métricas,
+no `nodus_coordinadores_c1c2/latest`, Firebase SDK de lectura ni JSON histórico.
+El servidor incluye `snapshot.authorization` con tipo y sedes, calculados desde
+la autoridad verificada (`index.js:534-538`,
+`privateNodusReportModel.js:4-8`). El selector no deriva autoridad de un rol
+normalizado en el navegador ni concede GLOBAL por faltar una sede.
+
+Se conservan Dirección global y sedes administrativas múltiples. La vista se
+reinicia al cambiar cuenta, alcance servidor o sede seleccionada. Regeneración
+de IA verifica la cuenta antes/después del token, fetch y JSON; no reaplica una
+respuesta de la sede anterior. Ante fallo de IA se identifica explícitamente el
+cálculo determinista, sin atribuirlo a una respuesta de IA exitosa. Ausencia de
+proyección/métricas no produce una estrategia de cero datos supuestamente vivos.
+
+Se retiró la búsqueda del nombre del gerente en `usersData` global: la propiedad
+descriptiva usa «Gerencia de [sede]», sin atribuir un responsable nominal desde
+un catálogo no verificado. No cambia el plan que se copia/exporta ni elimina
+datos administrativos. Esto no resuelve los catálogos estáticos de otros módulos.
+
+Chromium ejecuta StrategyBoard y su hook reales: opciones de una sede y sedes
+duales sin GLOBAL, cambio de sede con IA pendiente, prompt sin coordinadores
+de otra sede, errores de autorización, cambio de cuenta y simulación. Handlers
+reales verifican autoridad personal/local/dual/global sin confiar en el body.
+**74 privacidad correctas**, build Vite y Worker ESM correctos.
+La primera regresión dio 244/248 por un fallo adicional de tolerancia temporal
+Auth; aislado pasó **10/10** y la repetición sin modificar código/umbrales dio
+**245/248**, exclusivamente los tres fallos del baseline. No se clasifica la
+fluctuación temporal como un cuarto fallo permanente del baseline.
+
+Este bloque sustituye solo el pendiente de StrategyBoard en listas históricas.
+Siguen abiertos Portfolio (snapshot, predictor, HR e identidad nominal),
+GoalsBoard, participantes/auditoría, otros reportes, datos estáticos y gates
+administrativos. El Worker debe publicar el nuevo contrato de autoridad antes
+del frontend, en una publicación futura autorizada. No se desplegó ni fusionó
+nada. Los cinco avisos de bordes existentes en StrategyBoard son ajenos al
+aislamiento: se conserva el diseño y no se suprimen reglas.
+
 ## Auditoría y reparación de datos: procedimiento, no ejecutado
 
 No se conocen documentos corruptos confirmados. No sería correcto inventar IDs,

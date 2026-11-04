@@ -1,6 +1,12 @@
 import { CALL_METRICS, REPORT_SEDES, validCallCounts } from '../../src/services/nodusReportModel.js';
 import { filterNodusSedes } from './nodusJsonModel.js';
 
+export function privateMetricAuthority(scope) {
+  const sedes = scope.type === 'global' ? REPORT_SEDES : scope.type === 'sede'
+    ? filterNodusSedes(REPORT_SEDES.map(nombre => ({ nombre })), scope).map(sede => sede.nombre) : [];
+  return { type: scope.type, sedes };
+}
+
 export function privateReportAccess(profile, scope) {
   if (scope.type === 'global') return { sedes: REPORT_SEDES, stages: ['C1', 'C2'] };
   if (scope.type !== 'sede') return null;

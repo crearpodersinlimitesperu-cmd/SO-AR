@@ -277,19 +277,27 @@ test('private snapshot endpoint returns only the authenticated personal/site pro
   assert.equal(response.headers.get('Cache-Control'), 'no-store');
   const body = await response.json();
   assert.equal(body.scope, 'personal');
+  assert.deepEqual(body.snapshot.authorization, { type: 'personal', sedes: [] });
   assert.equal(body.snapshot.coordinadores.length, 1);
   assert.equal(body.snapshot.coordinadores[0].email, 'local@example.invalid');
   assert.doesNotMatch(JSON.stringify(body), /FOREIGN|999/);
 
   const manager = fixture({ profile: { role: 'gerente', sede: 'Lima' }, snapshot });
   const siteResponse = await manager.handlePrivateNodusSnapshot(request(), {}, 'https://example.invalid');
-  assert.doesNotMatch(JSON.stringify(await siteResponse.json()), /FOREIGN|999/);
+  const site = await siteResponse.json();
+  assert.doesNotMatch(JSON.stringify(site), /FOREIGN|999/);
+  assert.deepEqual(site.snapshot.authorization, { type: 'sede', sedes: ['Lima'] });
+  const dual = fixture({ profile: { role: 'gerente', sede: 'Lima', roles: ['gerente'], roleSedes: { gerente: 'Quito' } }, snapshot });
+  const dualBody = await (await dual.handlePrivateNodusSnapshot(request({ sede: 'México', scope: 'global' }), {}, '')).json();
+  assert.deepEqual(dualBody.snapshot.authorization, { type: 'sede', sedes: ['Lima', 'Quito'] });
 
   const director = fixture({ profile: { role: 'direccion' }, snapshot });
   const global = await (await director.handlePrivateNodusSnapshot(request(), {}, 'https://example.invalid')).json();
   assert.equal(global.snapshot.coordinadores.length, 2);
   assert.equal(global.snapshot.totales.asignados, 999);
   assert.equal(global.snapshot.secciones, undefined, 'even global metric consumers do not download raw source sections');
+  assert.equal(global.snapshot.authorization.type, 'global');
+  assert.equal(global.snapshot.authorization.sedes.length, 6);
   const inactive = fixture({ profile: { role: 'gerente', sede: 'Lima', active: false }, snapshot });
   assert.equal((await inactive.handlePrivateNodusSnapshot(request(), {}, 'https://example.invalid')).status, 403);
   const importedBridge = fixture({ profile: { role: 'entrenador', email: 'local@example.invalid',

@@ -40,7 +40,7 @@ test('private metrics client sends only Firebase identity, never role/sede and n
   assert.equal(requests[0][1].cache, 'no-store');
   for (const path of ['../src/pages/MisKPIs.jsx', '../src/components/AICopilot.jsx',
     '../src/pages/EmbudoConversionBoard.jsx', '../src/pages/AsignadorEntrenadores.jsx',
-    '../src/components/NodusCoordinadoresC1C2Dashboard.jsx']) {
+    '../src/components/NodusCoordinadoresC1C2Dashboard.jsx', '../src/pages/StrategyBoard.jsx']) {
     const source = readFileSync(new URL(path, import.meta.url), 'utf8');
     assert.match(source, /(?:read|use)PrivateNodusSnapshot\(/);
     assert.doesNotMatch(source, /doc\(db, 'nodus_(?:coordinadores_c1c2|kpis_sincronizados)'/);

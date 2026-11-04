@@ -51,7 +51,7 @@ test('local team summaries follow the published team label, but contradictory or
   assert.deepEqual(scopedNodusContext({ equiposSummary }, { type: 'personal', emails: [] }).equiposSummary, []);
 });
 
-test('real metric hook and Embudo never reintroduce global fallback and reject stale callbacks without remounting', async () => {
+test('real metric hook, Embudo and Strategy enforce scope changes, authorized dual sedes and stale callbacks', async () => {
   const fixtureId = `${process.cwd()}/nodus-metrics-fixture.jsx`;
   const server = await createServer({
     configFile: false, server: { host: '127.0.0.1', port: 0, hmr: false },
@@ -76,15 +76,23 @@ test('real metric hook and Embudo never reintroduce global fallback and reject s
           import {MemoryRouter} from 'react-router-dom';
           import Embudo from '/src/pages/EmbudoConversionBoard.jsx';
           import OperationalReview from '/src/components/OperationalReview.jsx';
+          import Strategy from '/src/pages/StrategyBoard.jsx';
           import useMetrics from '/src/hooks/usePrivateNodusSnapshot.js';
           window.metricRequests=[];
           window.pendingMetrics=[];
+          window.pendingStrategy=[];
+          window.strategyRequests=[];
           const local={timestamp:'2026-11-04T20:00:00Z',sedes:[],equiposSummary:[],coordinadores:[{
             nombre:'SYNTHETIC_LIMA_COORD',email:'synthetic@example.invalid',sede:'Lima',
             asignados:4,gestiones:3,sentadosTotal:1,confirmadosTotal:2,estados:{confirmado:2},
             equipos:[{equipo:'C1 E31',fase:'C1',llamadas:3,confirmado:2}]
           }]};
           window.fetch=async (url,options)=>{
+            if(new URL(url).pathname==='/'){
+              window.strategyRequests.push(JSON.parse(options.body));
+              await new Promise(resolve=>window.pendingStrategy.push(resolve));
+              return Response.json({text:'OLD_SITE_AI_RESPONSE'});
+            }
             const isReports=String(url).endsWith('/nodus-private-report-sources');
             if(!isReports && !String(url).endsWith('/nodus-private-snapshot')) throw new Error('Forbidden network path');
             window.metricRequests.push({url,body:options.body,token:options.headers.Authorization});
@@ -100,7 +108,10 @@ test('real metric hook and Embudo never reintroduce global fallback and reject s
                   {sede:'Lima',stage:'C1',team:'31',status:'ready',rows:1,unknown:0,counts}
                 ]}]}});
             }
-            return Response.json({snapshot:local});
+            const authorization=window.strategyAuthority||{type:'sede',sedes:['Lima']};
+            const other={...local.coordinadores[0],nombre:'SYNTHETIC_QUITO_COORD',email:'quito@example.invalid',sede:'Quito',asignados:9};
+            return Response.json({snapshot:{...local,authorization,
+              coordinadores:authorization.sedes.includes('Quito')?[...local.coordinadores,other]:local.coordinadores}});
           };
           function Fixture(){
             const [viewer,setViewer]=useState({uid:'alpha',email:'alpha@example.invalid',role:'gerente',roles:['gerente'],sede:'Lima'});
@@ -108,7 +119,7 @@ test('real metric hook and Embudo never reintroduce global fallback and reject s
             window.viewer=viewer; window.swapViewer=setViewer; window.reloadMetrics=()=>setRevision(v=>v+1);
             window.fixtureAuth.currentUser={uid:viewer.uid,getIdToken:async ()=>'synthetic-'+viewer.uid};
             const state=useMetrics({revision});
-            return <><output id="metrics-probe">{JSON.stringify(state)}</output><MemoryRouter><Embudo/><OperationalReview/></MemoryRouter></>;
+            return <><output id="metrics-probe">{JSON.stringify(state)}</output><MemoryRouter><Embudo/><OperationalReview/><Strategy/></MemoryRouter></>;
           }
           createRoot(document.getElementById('root')).render(<Fixture/>);
         `;
@@ -145,13 +156,43 @@ test('real metric hook and Embudo never reintroduce global fallback and reject s
     const calls = await page.evaluate(() => window.metricRequests);
     assert.ok(calls.length >= 2);
     assert.ok(calls.every(call => call.body === '{}' && call.token === 'Bearer synthetic-alpha'));
-    await page.evaluate(() => { window.failMetrics=true; window.reloadMetrics(); });
+    await page.waitForSelector('[data-strategy-sede="Lima"] select');
+    assert.deepEqual(await page.$$eval('[data-strategy-sede] select option', options => options.map(option => option.value)), ['Lima']);
+    await page.evaluate(() => {
+      window.strategyAuthority={type:'sede',sedes:['Lima','Quito']};
+      window.swapViewer({...window.viewer,roleSedes:{gerente:'Quito'}});
+    });
+    await page.waitForFunction(() => document.querySelectorAll('[data-strategy-sede] select option').length === 2);
+    assert.deepEqual(await page.$$eval('[data-strategy-sede] select option', options => options.map(option => option.value)), ['Lima', 'Quito']);
+    await page.waitForFunction(() => [...document.querySelectorAll('[data-strategy-sede] button')].some(button =>
+      button.textContent.includes('Actualizar Análisis IA') && !button.disabled));
+    await page.evaluate(() => [...document.querySelectorAll('[data-strategy-sede] button')]
+      .find(button => button.textContent.includes('Actualizar Análisis IA')).click());
+    await page.waitForFunction(() => window.pendingStrategy.length === 1);
+    assert.doesNotMatch(await page.evaluate(() => JSON.stringify(window.strategyRequests)), /SYNTHETIC_QUITO_COORD/);
+    await page.select('[data-strategy-sede] select', 'Quito');
+    await page.waitForSelector('[data-strategy-sede="Quito"]');
+    await page.waitForFunction(() => [...document.querySelectorAll('[data-strategy-sede] button')].some(button =>
+      button.textContent.includes('Misiones por Coordinador')));
+    await page.evaluate(() => {
+      [...document.querySelectorAll('[data-strategy-sede] button')].find(button =>
+        button.textContent.includes('Misiones por Coordinador')).click();
+      window.pendingStrategy.splice(0).forEach(resolve=>resolve());
+    });
+    await page.waitForFunction(() => document.querySelector('[data-strategy-sede="Quito"]')?.textContent.includes('SYNTHETIC_QUITO_COORD'));
+    assert.doesNotMatch(await page.$eval('[data-strategy-sede]', element => element.textContent), /SYNTHETIC_LIMA_COORD|OLD_SITE_AI_RESPONSE/);
+    await page.evaluate(() => {
+      window.failMetrics=true;
+      window.swapViewer({...window.viewer,status:'active'});
+      window.reloadMetrics();
+    });
     await page.waitForFunction(() => document.querySelector('#metrics-probe')?.textContent.includes('SYNTHETIC_AUTHORIZATION_ERROR'));
     assert.doesNotMatch(await page.$eval('#metrics-probe', element => element.textContent), /SYNTHETIC_LIMA_COORD/);
     await page.evaluate(() => [...document.querySelectorAll('button')].find(button => button.textContent.includes('Actualizar')).click());
     await page.waitForFunction(() => document.querySelector('[role="alert"]')?.textContent.includes('SYNTHETIC_AUTHORIZATION_ERROR'));
     assert.equal(await page.$$eval('article strong', elements => elements.length), 0);
     assert.doesNotMatch(await page.$eval('body', element => element.textContent), /SYNTHETIC_LIMA_COORD/);
+    assert.doesNotMatch(await page.$eval('[data-strategy-sede]', element => element.textContent), /SYNTHETIC_LIMA_COORD|SYNTHETIC_QUITO_COORD/);
     await page.evaluate(() => { window.failMetrics=false; window.holdMetrics=true; window.reloadMetrics(); });
     await page.waitForFunction(() => window.pendingMetrics.length > 0);
     await page.evaluate(() => window.swapViewer({...window.viewer,sede:'Quito'}));

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { 
   Target, TrendingUp, AlertCircle, CheckCircle2, ChevronRight, 
@@ -7,11 +7,11 @@ import {
   BrainCircuit, RefreshCw, Copy, Check, DollarSign, Calendar, Users, PhoneCall, Award
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { doc } from 'firebase/firestore';
-import { auth, db, getDocResilient } from '../services/firebase';
-import { OPERATIONAL_SEDES, normalizeSede, normalizeRole, usersData } from '../data/usersData';
+import { auth } from '../services/firebase';
+import { canonicalSede as normalizeSede } from '../utils/sede.js';
 import { getSedePricing, formatCurrencyAmount } from '../data/sedesPricingData';
-import nodusFallbackData from '../data/nodusFallbackData.json';
+import usePrivateNodusSnapshot from '../hooks/usePrivateNodusSnapshot.js';
+import { privateViewKey } from '../utils/sessionPrivacy.js';
 
 // =========================================================================
 // MOTOR AUTÓNOMO DE ESTRATEGIA OPERATIVA CAUSA OS (ZERO-HALLUCINATION & MATH-GROUNDED)
@@ -27,8 +27,7 @@ function buildDeterministicStrategy({
   totalPorConfirmar,
   totalNoContesta,
   pricing,
-  coords,
-  staffList
+  coords
 }) {
   const sedeName = selectedSede === 'GLOBAL' ? 'Global' : selectedSede;
   const precioUnitario = pricing?.precioFds || 900;
@@ -41,9 +40,6 @@ function buildDeterministicStrategy({
   // Potencial oculto en la bolsa "Por Confirmar"
   const recaudacionPorConfirmar = Math.round(totalPorConfirmar * 0.25) * precioUnitario;
 
-  // Gerente de Sede detectado
-  const gerente = staffList.find(s => s.role === 'gerente') || { name: `Gerente de ${sedeName}` };
-  
   // Tasa de conversión necesaria sobre los "Por Confirmar" para cerrar el déficit
   const conversionPorConfReq = totalPorConfirmar > 0 
     ? Math.min(100, Math.round((deficit / totalPorConfirmar) * 100))
@@ -150,7 +146,7 @@ function buildDeterministicStrategy({
 
   return {
     sede: sedeName,
-    gerente: gerente.name,
+    gerente: `Gerencia de ${sedeName}`,
     diagnostico: {
       salud: deficit === 0 ? 'Excelente' : deficit <= 10 ? 'Manejable' : 'Atención Inmediata',
       resumen: deficit === 0
@@ -184,25 +180,30 @@ function buildDeterministicStrategy({
 
 export default function StrategyBoard() {
   const { currentUser } = useAuth();
+  const projection = usePrivateNodusSnapshot();
+  const [pickedSede, setPickedSede] = useState('');
+  const authority = projection.snapshot?.authorization;
+  const global = authority?.type === 'global';
+  const sedesDisponibles = ['sede', 'global'].includes(authority?.type) && Array.isArray(authority.sedes)
+    ? [...(global ? ['GLOBAL'] : []), ...authority.sedes] : [];
+  const selectedSede = sedesDisponibles.includes(pickedSede) ? pickedSede : sedesDisponibles[0] || '';
+  return <StrategyScreen key={`${privateViewKey(currentUser)}:${JSON.stringify(authority)}:${selectedSede}`}
+    projection={projection} selectedSede={selectedSede} setSelectedSede={setPickedSede}
+    sedesDisponibles={sedesDisponibles} />;
+}
+
+function StrategyScreen({ projection, selectedSede, setSelectedSede, sedesDisponibles }) {
+  const { currentUser } = useAuth();
+  const mounted = useRef(true);
+  useEffect(() => {
+    mounted.current = true;
+    return () => { mounted.current = false; };
+  }, []);
   const navigate = useNavigate();
   const [showGoalModal, setShowGoalModal] = useState(false);
   const [selectedGoal, setSelectedGoal] = useState(null);
 
-  const isGlobalStrategyRole = (() => {
-    if (currentUser?.isSuperAdmin) return true;
-    const exec = ['direccion', 'cfo', 'ceo', 'cco', 'director_maestria', 'superadmin'];
-    if (currentUser?.appRole === 'consolidado') {
-      return (currentUser?.roles || []).some(r => exec.includes(r));
-    }
-    const currentRoles = [currentUser?.appRole, currentUser?.role, ...(Array.isArray(currentUser?.roles) ? currentUser.roles : [])]
-      .filter(Boolean).map(r => normalizeRole ? normalizeRole(r) : r);
-    return currentRoles.some(r => exec.includes(r));
-  })();
-
-  const rawUserSede = currentUser?.sede ? normalizeSede(currentUser.sede) : 'GLOBAL';
-  const initialSede = isGlobalStrategyRole || ['global', 'sede global', 'todas'].includes(String(rawUserSede).toLowerCase()) ? 'GLOBAL' : rawUserSede;
-  const [selectedSede, setSelectedSede] = useState(initialSede);
-  const sedesDisponibles = isGlobalStrategyRole ? ['GLOBAL', ...OPERATIONAL_SEDES] : [initialSede];
+  const canChooseSede = sedesDisponibles.length > 1;
 
   const [loading, setLoading] = useState(true);
   const [globalHealth, setGlobalHealth] = useState(0);
@@ -217,6 +218,7 @@ export default function StrategyBoard() {
   const [isGeneratingAi, setIsGeneratingAi] = useState(false);
   const [activeStrategyTab, setActiveStrategyTab] = useState('diagnostico'); // 'diagnostico' | 'plan' | 'coordinadores' | 'financiero' | 'speech'
   const [copiedStrategy, setCopiedStrategy] = useState(false);
+  const [aiWarning, setAiWarning] = useState('');
 
   const bgLight = "#f8fafc";
   const bgCard = "#ffffff";
@@ -227,29 +229,21 @@ export default function StrategyBoard() {
   // Tarifas de la sede
   const pricing = useMemo(() => getSedePricing(selectedSede), [selectedSede]);
 
-  // Staff de la sede en usersData
-  const staffSede = useMemo(() => {
-    return usersData.filter(u => {
-      if (selectedSede === 'GLOBAL') return true;
-      return normalizeSede(u.sede) === normalizeSede(selectedSede);
-    });
-  }, [selectedSede]);
-
   // Carga y Sincronización de Datos en Tiempo Real
   useEffect(() => {
-    async function fetchData() {
+    function fetchData() {
       setLoading(true);
+      setAiWarning('');
+      setAiStrategy(null);
+      setPredictionData(null);
+      setOkrs([]);
+      setManagerAlerts([]);
+      setCoordinadoresList([]);
       try {
-        const docRef = doc(db, 'nodus_coordinadores_c1c2', 'latest');
-        const docSnap = await getDocResilient(docRef);
-        
-        let data = null;
-        if (docSnap.exists()) {
-          data = docSnap.data();
-        } else {
-          console.warn("Snapshot Nodus no disponible en StrategyBoard (cero datos inventados)");
-          data = { coordinadores: [], totales: {} };
-        }
+        if (projection.loading) return;
+        if (projection.error) throw new Error(projection.error);
+        if (!selectedSede || !projection.snapshot) throw new Error('No hay una sede estratégica autorizada por el servidor.');
+        const data = projection.snapshot;
 
         let totalAsignados = 0;
         let totalGestiones = 0;
@@ -263,6 +257,10 @@ export default function StrategyBoard() {
         const filteredCoords = isGlobal
           ? coords
           : coords.filter(c => normalizeSede(c.sede) === normalizeSede(selectedSede));
+        if (!filteredCoords.length && !(isGlobal && Object.keys(data.totales || {}).length) &&
+            !data.sedes.some(sede => normalizeSede(sede.sede) === normalizeSede(selectedSede))) {
+          throw new Error('No hay métricas verificadas para la sede seleccionada.');
+        }
 
         setCoordinadoresList(filteredCoords);
 
@@ -441,8 +439,7 @@ export default function StrategyBoard() {
           totalPorConfirmar,
           totalNoContesta,
           pricing,
-          coords: filteredCoords,
-          staffList: staffSede
+          coords: filteredCoords
         });
         setAiStrategy(estrategiaGenerada);
 
@@ -455,12 +452,16 @@ export default function StrategyBoard() {
     }
 
     fetchData();
-  }, [selectedSede, pricing, staffSede]);
+  }, [selectedSede, pricing, projection.snapshot, projection.loading, projection.error]);
 
   // Manejador para regenerar la estrategia con IA (con llamada opcional al worker de Gemini)
   const handleRegenerateStrategy = async () => {
     if (!predictionData) return;
+    const owner = auth.currentUser;
+    const isCurrent = () => Boolean(owner?.uid) && mounted.current && owner.uid === currentUser?.uid && auth.currentUser?.uid === owner.uid;
+    if (!isCurrent()) return;
     setIsGeneratingAi(true);
+    setAiWarning('');
 
     try {
       // Intentar llamada al worker de Gemini
@@ -471,6 +472,7 @@ export default function StrategyBoard() {
       if (firebaseUser && workerUrl) {
         try {
           const idToken = await firebaseUser.getIdToken(false);
+          if (!isCurrent()) return;
           const prompt = `Actúa como el Agente Estratégico Senior de Causa OS (Crear Poder Sin Límites).
 Analiza los datos de la sede ${selectedSede}:
 - Meta de sala: ${predictionData.meta}
@@ -484,25 +486,31 @@ Genera una estrategia de cierre para los próximos 4 días con metas nominales e
 
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 4000);
-          const res = await fetch(workerUrl, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${idToken}`
-            },
-            body: JSON.stringify({ messages: [{ role: 'user', content: prompt }] }),
-            signal: controller.signal
-          });
-          clearTimeout(timeoutId);
-
-          if (res.ok) {
+          try {
+            const res = await fetch(workerUrl, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${idToken}`
+              },
+              body: JSON.stringify({ messages: [{ role: 'user', content: prompt }] }),
+              signal: controller.signal
+            });
+            if (!isCurrent()) return;
+            if (!res.ok) throw new Error(`IA no disponible (${res.status}).`);
             const json = await res.json();
-            if (json.text) aiText = json.text;
+            if (!isCurrent()) return;
+            if (typeof json.text !== 'string' || !json.text.trim()) throw new Error('La IA no devolvió una estrategia verificable.');
+            aiText = json.text;
+          } finally {
+            clearTimeout(timeoutId);
           }
         } catch (wErr) {
           console.warn("Worker timeout/skip, fallback al motor analítico Causa OS:", wErr);
+          if (isCurrent()) setAiWarning('IA no disponible. Se conserva el cálculo determinista con métricas autorizadas.');
         }
       }
+      if (!isCurrent()) return;
 
       // Motor analítico determinístico con data en vivo
       const updatedStrategy = buildDeterministicStrategy({
@@ -516,8 +524,7 @@ Genera una estrategia de cierre para los próximos 4 días con metas nominales e
         totalPorConfirmar: predictionData.porConfirmar,
         totalNoContesta: predictionData.noContesta,
         pricing,
-        coords: coordinadoresList,
-        staffList: staffSede
+        coords: coordinadoresList
       });
 
       if (aiText) {
@@ -527,8 +534,9 @@ Genera una estrategia de cierre para los próximos 4 días con metas nominales e
       setAiStrategy(updatedStrategy);
     } catch (err) {
       console.error("Error al regenerar estrategia:", err);
+      if (isCurrent()) setAiWarning('No se pudo regenerar la estrategia.');
     } finally {
-      setIsGeneratingAi(false);
+      if (isCurrent()) setIsGeneratingAi(false);
     }
   };
 
@@ -549,7 +557,7 @@ Genera una estrategia de cierre para los próximos 4 días con metas nominales e
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: bgLight, color: textDark, paddingBottom: '4rem', fontFamily: 'Inter, system-ui, sans-serif' }}>
+    <div data-strategy-sede={selectedSede} style={{ minHeight: '100vh', background: bgLight, color: textDark, paddingBottom: '4rem', fontFamily: 'Inter, system-ui, sans-serif' }}>
       
       {/* HEADER COHERENTE */}
       <header style={{ background: bgCard, borderBottom: `1px solid ${borderLight}`, padding: '1.2rem 2rem', position: 'sticky', top: 0, zIndex: 100, boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }}>
@@ -572,8 +580,8 @@ Genera una estrategia de cierre para los próximos 4 días con metas nominales e
               <select
                 value={selectedSede}
                 onChange={(e) => setSelectedSede(e.target.value)}
-                disabled={!isGlobalStrategyRole}
-                style={{ padding: '0.4rem 2rem 0.4rem 0.8rem', borderRadius: '6px', border: `1px solid ${borderLight}`, background: bgCard, color: textDark, fontWeight: 700, fontSize: '0.85rem', cursor: isGlobalStrategyRole ? 'pointer' : 'not-allowed', opacity: isGlobalStrategyRole ? 1 : 0.7, appearance: 'none', backgroundImage: 'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23131313%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.7rem top 50%', backgroundSize: '0.65rem auto' }}
+                disabled={!canChooseSede}
+                style={{ padding: '0.4rem 2rem 0.4rem 0.8rem', borderRadius: '6px', border: `1px solid ${borderLight}`, background: bgCard, color: textDark, fontWeight: 700, fontSize: '0.85rem', cursor: canChooseSede ? 'pointer' : 'not-allowed', opacity: canChooseSede ? 1 : 0.7, appearance: 'none', backgroundImage: 'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23131313%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.7rem top 50%', backgroundSize: '0.65rem auto' }}
               >
                 {sedesDisponibles.map(s => <option key={s} value={s}>{s}</option>)}
               </select>
@@ -586,19 +594,20 @@ Genera una estrategia de cierre para los próximos 4 días con metas nominales e
 
       <main style={{ maxWidth: '1000px', margin: '2rem auto', padding: '0 1.5rem' }}>
         
-        {loading ? (
+        {loading || projection.loading ? (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem', color: textMuted }}>
             <Loader2 size={40} className="animate-spin text-green-500 mb-4" />
             <p>Calculando Estrategia e Inteligencia Nodus en Vivo...</p>
           </div>
-        ) : errorObj ? (
-          <div style={{ background: '#fef2f2', border: '1px solid #f87171', color: '#b91c1c', padding: '2rem', borderRadius: '12px', textAlign: 'center' }}>
+        ) : projection.error || errorObj ? (
+          <div role="alert" style={{ background: '#fef2f2', border: '1px solid #f87171', color: '#b91c1c', padding: '2rem', borderRadius: '12px', textAlign: 'center' }}>
             <AlertCircle size={40} style={{ margin: '0 auto 1rem auto' }} />
             <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem' }}>Error de Sincronización</h2>
-            <p>{errorObj}</p>
+            <p>{projection.error || errorObj}</p>
           </div>
         ) : (
           <>
+            {aiWarning && <p role="status">{aiWarning}</p>}
             {/* RESUMEN GLOBAL */}
             <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.5rem', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
               <div>

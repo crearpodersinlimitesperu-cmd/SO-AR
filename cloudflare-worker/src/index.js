@@ -41,7 +41,7 @@ import { filterNodusSedes, hasNodusTeamAccess, nodusAccessScope, personalNodusEm
 import { findUserByAnyEmail } from '../../src/data/usersData.js';
 import { createPrivateChatHandler } from './privateChatHandler.js';
 import { createPrivateChatStore } from './privateChatStore.js';
-import { privateReportAccess, projectPrivateReportSource } from './privateNodusReportModel.js';
+import { privateMetricAuthority, privateReportAccess, projectPrivateReportSource } from './privateNodusReportModel.js';
 import { privatePulseAccess, pulseCountQuery, decodePulseCount } from './privatePulseModel.js';
 
 const FIREBASE_PROJECT_ID = 'centro-operativo-cpsl';
@@ -532,7 +532,10 @@ async function handlePrivateNodusSnapshot(request, env, origin) {
     const snapshot = await firestoreGet('nodus_kpis_sincronizados/latest_snapshot', token, { strict: true });
     if (!snapshot) return json({ error: 'not-found', message: 'No hay métricas Nodus publicadas.' }, 404, origin);
     // This endpoint never returns raw sections or participant rosters, including to directors.
-    const safe = scopedNodusContext(snapshot, scope.type === 'global' ? { type: 'metrics-global' } : scope);
+    const safe = {
+      ...scopedNodusContext(snapshot, scope.type === 'global' ? { type: 'metrics-global' } : scope),
+      authorization: privateMetricAuthority(scope)
+    };
     const freshProfile = await firestoreGet(`users/${identity.sub}`, token, { strict: true });
     let freshScope = freshProfile ? callerNodusScope(freshProfile, identity.email) : { type: 'denied' };
     if (freshScope.type === 'general') {
