@@ -245,7 +245,7 @@ como defectos del aislamiento; no se hizo un rediseño ni se silenciaron reglas.
 Dirección conserva acceso global». Se aplica al Worker activo, no se interpreta
 el rol de vista `consolidado` como una autoridad global.
 
-- `cloudflare-worker/src/nodusJsonModel.js:1-138`: los gerentes pasan a alcance
+- `cloudflare-worker/src/nodusJsonModel.js:1-168`: los gerentes pasan a alcance
   local; se admiten las sedes de `sede` y `roleSedes` de roles realmente otorgados,
   con nombres canónicos reconocidos. Inactividad prevalece incluso sobre
   privilegios globales. La proyección permite identidades y métricas del alcance,
@@ -273,7 +273,7 @@ el rol de vista `consolidado` como una autoridad global.
   rechazado y errores explícitos. El Copiloto no presenta ausencia de acceso
   como un reporte exitoso de cero discrepancias.
 
-Validación de esta iteración: **50/50** pruebas de privacidad y **18/18** de
+Validación de esta iteración: **51/51** pruebas de privacidad y **18/18** de
 Nodus JSON; build directo Vite correcto. Se ejecutan los handlers reales con
 JWT/Firestore/red sintéticos, incluyendo gerente A frente a B, dirección,
 inactivos, suplantación por correo importado, respuesta de equipo de sede
@@ -282,6 +282,14 @@ las métricas de una fila con la forma publicada por el sincronizador. Las
 pruebas del cliente cubren cambios de cuenta en cada espera y ausencia de
 fallback Firestore. El CI `profile-privacy` de `7bf370c` terminó **SUCCESS**;
 los dos jobs generales siguen en **FAILURE**, separados de esta suite.
+
+El endpoint personal reutiliza además `assertAuthenticatedIdentity` contra el
+catálogo oficial: deniega UID contradictorio y alias que enlacen a otra persona
+oficial **antes de leer el snapshot**. Se conservan alias oficiales y la
+equivalencia corporativa `.net`/`.com`; un parámetro de la pantalla no aprueba un
+alias. Esto evita que el nuevo servicio vuelva a introducir el puente de
+identidad ya corregido en AuthContext. No sustituye la auditoría de alias
+históricos desconocidos para el catálogo.
 
 **Gate adicional de publicación, no ejecutado:** publicar primero el Worker
 actualizado, comprobar con cuentas autorizadas las asignaciones/alias del
@@ -296,6 +304,16 @@ en recursos públicos. Esta iteración elimina dos descargas y endurece los
 endpoints activos; no convierte las reglas abiertas de los snapshots restantes
 en una protección efectiva. No es seguro cerrar esas reglas sin migrar los
 contratos de reportes/equipos y aprovisionar las autoridades legítimas.
+
+Se detectó también un bloqueo concreto de **historial de chat tras revocación**:
+`AICopilot.jsx:508-548` recarga conversaciones por UID, sin registrar el alcance
+con el que fueron generadas; `firestore.rules:751-753` permite leerlas a su dueño.
+Remontar la vista y vaciar el estado no evita que se vuelva a descargar una
+respuesta antigua producida bajo una autoridad global ya retirada. Los
+documentos históricos no tienen un manifiesto de fuentes/alcances que permita
+clasificarlos automáticamente. No se modificaron ni borraron conversaciones:
+se necesita definir la cuarentena/migración de los historiales sin alcance
+antes de endurecer su lectura sin perder información legítima.
 
 ## Auditoría y reparación de datos: procedimiento, no ejecutado
 

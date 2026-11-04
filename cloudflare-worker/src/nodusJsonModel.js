@@ -72,6 +72,16 @@ export function nodusAccessScope(userData, globalEmailAllowed) {
   return { type: 'general' };
 }
 
+export function personalNodusEmails(profile, authenticatedEmail, uid, findOfficial) {
+  const canonicalEmail = value => String(value || '').trim().toLowerCase().replace(/@crearpsl\.com$/, '@crearpsl.net');
+  const lookup = value => findOfficial(canonicalEmail(value));
+  assertAuthenticatedIdentity(profile, canonicalEmail(authenticatedEmail), lookup, uid);
+  const emails = [...new Set([authenticatedEmail, ...identityEmails(profile), ...identityEmails(lookup(authenticatedEmail))]
+    .filter(value => typeof value === 'string' && value.trim()).map(value => value.trim().toLowerCase()))];
+  return [...new Set(emails.flatMap(email => email.endsWith('@crearpsl.net') || email.endsWith('@crearpsl.com')
+    ? [email, canonicalEmail(email), canonicalEmail(email).replace(/@crearpsl\.net$/, '@crearpsl.com')] : [email]))];
+}
+
 export function filterNodusSedes(sedes, scope) {
   if (scope.type === 'global') return sedes;
   if (scope.type !== 'sede') return [];
@@ -193,3 +203,4 @@ export function summarizeNodusCatalog(sedes) {
     return total;
   }, { sedes: 0, equipos: 0, participantes: 0 });
 }
+import { assertAuthenticatedIdentity, identityEmails } from '../../src/utils/authIdentity.js';

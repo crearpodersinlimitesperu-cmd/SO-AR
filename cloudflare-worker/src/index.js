@@ -37,7 +37,8 @@
 import { jwtVerify, createRemoteJWKSet, SignJWT, importPKCS8 } from 'jose';
 import { notebookKnowledge } from './notebookKnowledge.js';
 import { createNodusApiClient, NodusApiError } from './nodusApiClient.js';
-import { filterNodusSedes, hasNodusTeamAccess, nodusAccessScope, scopedNodusContext, summarizeNodusCatalog, summarizeNodusTeam } from './nodusJsonModel.js';
+import { filterNodusSedes, hasNodusTeamAccess, nodusAccessScope, personalNodusEmails, scopedNodusContext, summarizeNodusCatalog, summarizeNodusTeam } from './nodusJsonModel.js';
+import { findUserByAnyEmail } from '../../src/data/usersData.js';
 
 const FIREBASE_PROJECT_ID = 'centro-operativo-cpsl';
 const FIREBASE_JWKS = createRemoteJWKSet(
@@ -514,9 +515,12 @@ async function handlePrivateNodusSnapshot(request, env, origin) {
     let scope = callerNodusScope(profile, identity.email);
     if (scope.type === 'denied') return json({ error: 'permission-denied', message: 'No tienes un alcance Nodus autorizado.' }, 403, origin);
     if (scope.type === 'general') {
-      scope = { type: 'personal', emails: [...new Set([identity.email, profile.email,
-        ...(Array.isArray(profile.emails) ? profile.emails : [])]
-        .filter(value => typeof value === 'string' && value.trim()).map(value => value.trim().toLowerCase()))] };
+      try {
+        scope = { type: 'personal', emails: personalNodusEmails(profile, identity.email, identity.sub, findUserByAnyEmail) };
+      } catch (error) {
+        console.error('[nodus-private-snapshot] Identidad contradictoria:', error.message);
+        return json({ error: 'permission-denied', message: 'Tu perfil contiene una identidad contradictoria; requiere revisión administrativa.' }, 403, origin);
+      }
     }
     const snapshot = await firestoreGet('nodus_kpis_sincronizados/latest_snapshot', token);
     if (!snapshot) return json({ error: 'not-found', message: 'No hay métricas Nodus publicadas.' }, 404, origin);

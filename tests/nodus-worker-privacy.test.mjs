@@ -19,7 +19,7 @@ function fixture({ profile, tokenEmail = 'manager@example.invalid', snapshot, re
       meta: { generado: 'synthetic-time' }
     })
   });
-  const names = ['createRemoteJWKSet', 'notebookKnowledge', 'createNodusApiClient', 'NodusApiError',
+  const names = ['createRemoteJWKSet', 'notebookKnowledge', 'createNodusApiClient', 'NodusApiError', 'findUserByAnyEmail',
     'fetch', ...Object.keys(model), 'fixtureProfile', 'fixtureSnapshot', 'fixtureEmail', 'fixturePaths'];
   return {
     prompts, paths,
@@ -33,6 +33,7 @@ function fixture({ profile, tokenEmail = 'manager@example.invalid', snapshot, re
       firestoreAdd = async () => {};
       return { handleNodusJson, handleNodusDataMap, handlePrivateNodusSnapshot, construirContextoNodus, callerNodusScope };
     `)(() => ({}), '', createClient, class extends Error {},
+      email => email === 'local@example.invalid' ? localIdentity : email === 'foreign@example.invalid' ? foreignIdentity : null,
       async (_url, options) => {
         prompts.push(JSON.parse(options.body));
         return { json: async () => ({ choices: [{ message: { content: 'Synthetic response' } }] }) };
@@ -50,6 +51,8 @@ const snapshot = {
     { sede: 'Quito', email: 'FOREIGN_PERSON', asignados: 9 }
   ]
 };
+const localIdentity = { email: 'local@example.invalid', emails: ['local@example.invalid', 'approved@example.invalid'] };
+const foreignIdentity = { email: 'foreign@example.invalid' };
 
 test('actual Worker API handlers restrict managers by server profile, not request scope or historical email allowlists', async () => {
   const worker = fixture({ profile: { role: 'gerente', sede: 'Lima' }, tokenEmail: 'leandro.brunis@crearpsl.net', snapshot });
@@ -112,6 +115,22 @@ test('private snapshot endpoint returns only the authenticated personal/site pro
   assert.equal(global.snapshot.secciones, undefined, 'even global metric consumers do not download raw source sections');
   const inactive = fixture({ profile: { role: 'gerente', sede: 'Lima', active: false }, snapshot });
   assert.equal((await inactive.handlePrivateNodusSnapshot(request(), {}, 'https://example.invalid')).status, 403);
+  const importedBridge = fixture({ profile: { role: 'entrenador', email: 'local@example.invalid',
+    emails: ['local@example.invalid', 'foreign@example.invalid'] }, tokenEmail: 'local@example.invalid', snapshot });
+  assert.equal((await importedBridge.handlePrivateNodusSnapshot(request(), {}, 'https://example.invalid')).status, 403);
+  assert.equal(importedBridge.paths.some(path => path.startsWith('nodus_')), false, 'deny identity bridge before downloading source data');
+});
+
+test('personal projection identity preserves approved aliases but rejects contradictory UID and known foreign aliases', () => {
+  const find = email => email === 'local@example.invalid' ? localIdentity
+    : email === 'foreign@example.invalid' ? foreignIdentity : null;
+  assert.ok(model.personalNodusEmails({ uid: 'own', email: 'local@example.invalid' },
+    'local@example.invalid', 'own', find).includes('approved@example.invalid'));
+  assert.throws(() => model.personalNodusEmails({ uid: 'foreign' }, 'local@example.invalid', 'own', find), /UID/);
+  assert.throws(() => model.personalNodusEmails({ email: 'foreign@example.invalid' },
+    'local@example.invalid', 'own', find), /otra identidad/);
+  assert.ok(model.personalNodusEmails({ email: 'synthetic@crearpsl.net' },
+    'synthetic@crearpsl.com', 'own', () => null).includes('synthetic@crearpsl.net'));
 });
 
 test('projection preserves the published coordinator KPI contract and cycle while stripping nested personal data', () => {
