@@ -31,7 +31,7 @@ function fixture(data) {
 
 test('transaction updates only amount and editor metadata, preserving the original payment', async () => {
   const before = {
-    estado: 'pagado', montoUSD: 400, fechaPago: '2026-10-01',
+    estado: 'pagado', montoUSD: 400, monto: 400, fechaPago: '2026-10-01',
     pagadoPorEmail: 'original@example.test', pagadoPorNombre: 'Original',
     equipoKey: 'team', sede: 'Lima', extra: { retained: true }
   };
@@ -42,7 +42,7 @@ test('transaction updates only amount and editor metadata, preserving the origin
   assert.equal(result.before, before);
   assert.equal(result.montoUSD, 125.5);
   assert.deepEqual(updates, [{
-    montoUSD: 125.5, montoEditadoAt: timestamp, montoEditadoPorEmail: user.email,
+    montoUSD: 125.5, monto: 125.5, montoEditadoAt: timestamp, montoEditadoPorEmail: user.email,
     montoEditadoPorNombre: user.name, montoEditadoPorRole: user.appRole
   }]);
   assert.deepEqual(before, original);

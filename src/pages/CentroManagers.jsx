@@ -2238,7 +2238,7 @@ export default function CentroManagers() {
         name: currentUser?.name || '',
         role: currentUser?.appRole || currentUser?.role || '',
         sede: before.sede || item.sede,
-        details: `Monto pagado editado: ${item.pagoDocId}. Antes: montoUSD=${before.montoUSD ?? '(sin monto registrado)'}. Después: montoUSD=${montoUSD}. Se conserva estado=${before.estado}, fechaPago=${before.fechaPago || '-'}, pagadoPor=${before.pagadoPorEmail || before.pagadoPorNombre || '-'}. Sin transferencia bancaria.`
+        details: `Monto pagado editado: ${item.pagoDocId}. Antes: montoUSD=${before.montoUSD ?? '(sin monto registrado)'}, monto=${before.monto ?? '(sin monto registrado)'}. Después: montoUSD=${montoUSD}, monto=${montoUSD}. Se conserva estado=${before.estado}, fechaPago=${before.fechaPago || '-'}, pagadoPor=${before.pagadoPorEmail || before.pagadoPorNombre || '-'}. Sin transferencia bancaria.`
       });
       auditOk = auditResult.ok;
       if (!auditOk) console.error('Auditoría de edición falló (el monto sí se guardó):', auditResult.error);

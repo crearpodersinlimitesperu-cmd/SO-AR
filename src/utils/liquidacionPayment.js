@@ -28,6 +28,7 @@ export async function updatePaidAmountInTransaction(tx, ref, input, user, edited
   }
   tx.update(ref, {
     montoUSD,
+    monto: montoUSD,
     montoEditadoAt: editedAt,
     montoEditadoPorEmail: user.email || '',
     montoEditadoPorNombre: user.name || '',

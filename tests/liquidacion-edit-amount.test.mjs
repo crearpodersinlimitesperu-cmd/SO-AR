@@ -15,7 +15,7 @@ function fixture({ input = '125,50', allowed = true, state = 'pagado', audit = '
   const audits = [];
   const writes = [];
   const errors = [];
-  const before = { estado: state, montoUSD: 450, fechaPago: '2026-10-01', pagadoPorEmail: 'original@example.test', sede: 'Lima' };
+  const before = { estado: state, montoUSD: 450, monto: 450, fechaPago: '2026-10-01', pagadoPorEmail: 'original@example.test', sede: 'Lima' };
   const handle = runInNewContext(`(() => { ${handlerSource}; return handleEditarMontoPago; })()`, {
     canReversarPago: allowed,
     currentUser: { email: 'andres.gomez@crearpsl.net', name: 'Director', appRole: 'director_maestria' },
@@ -55,10 +55,11 @@ test('editor uses the actual document ID and audits committed before/after, not 
   await f.run();
   assert.equal(f.writes.length, 1);
   assert.equal(f.writes[0].patch.montoUSD, 125.5);
+  assert.equal(f.writes[0].patch.monto, 125.5);
   assert.equal(f.audits.length, 1);
   assert.equal(f.audits[0].action, 'LIQUIDACION_ENTRENADOR_MONTO_EDITADO');
   assert.equal(f.audits[0].email, 'andres.gomez@crearpsl.net');
-  assert.match(f.audits[0].details, /Antes: montoUSD=450\. Después: montoUSD=125.5/);
+  assert.match(f.audits[0].details, /Antes: montoUSD=450, monto=450\. Después: montoUSD=125.5, monto=125.5/);
   assert.match(f.audits[0].details, /estado=pagado, fechaPago=2026-10-01, pagadoPor=original@example.test/);
   assert.equal(f.toasts.at(-1)[1], 'success');
 });
