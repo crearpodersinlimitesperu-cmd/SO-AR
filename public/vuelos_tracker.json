@@ -1,14 +1,390 @@
 {
   "version": "3.2.0-ai-engine",
-  "updatedAt": "2026-11-04T11:51:59.361713Z",
+  "updatedAt": "2026-11-04T20:17:24.857542Z",
   "liveStatusAvailable": false,
   "aiEngineStatus": "ACTIVE",
-  "totalPdfAnalyzed": 494,
-  "totalFlightsIndexed": 359,
-  "totalFlights": 359,
+  "totalPdfAnalyzed": 498,
+  "totalFlightsIndexed": 363,
+  "totalFlights": 363,
   "syncFrequency": "7 veces al día (01:00, 04:00, 10:00, 13:00, 16:00, 19:00, 22:00 UTC)",
   "source": "Google Drive Sync (Carpetas Oficiales Vuelos CPSL)",
   "flights": {
+    "LA1445_2026-11-26_UIO_LIM": {
+      "flightNumber": "LA 1445",
+      "flightCode": "LA1445_2026-11-26_UIO_LIM",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1445_2026-11-26_UIO_LIM",
+      "reservationCode": "CNMLWE",
+      "passengers": [
+        "DIEGO BRAVO FIGUEROA"
+      ],
+      "sourcePdf": "Latam Airlines - CUV.pdf",
+      "sourcePath": " / Latam Airlines - CUV.pdf",
+      "route": {
+        "origin": "UIO",
+        "originCity": "Quito",
+        "originAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "destination": "LIM",
+        "destinationCity": "Lima",
+        "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-26",
+        "scheduledDeparture": "2026-11-26T19:50:00-05:00",
+        "scheduledArrival": "2026-11-26T22:05:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe Miraflores (Calle Bellavista 133, Miraflores, Lima 15074, Perú)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1445",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1444_2026-11-29_LIM_UIO": {
+      "flightNumber": "LA 1444",
+      "flightCode": "LA1444_2026-11-29_LIM_UIO",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1444_2026-11-29_LIM_UIO",
+      "reservationCode": "CNMLWE",
+      "passengers": [
+        "DIEGO BRAVO FIGUEROA"
+      ],
+      "sourcePdf": "Latam Airlines - CUV.pdf",
+      "sourcePath": " / Latam Airlines - CUV.pdf",
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-29",
+        "scheduledDeparture": "2026-11-29T23:30:00-05:00",
+        "scheduledArrival": "2026-11-30T01:55:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Terminal de Arribos",
+        "destination": "Retorno a Domicilio (Base Quito) (Quito, Ecuador)",
+        "driverPickupEstimated": "N/A",
+        "driverNote": "El entrenador retorna a su ciudad de residencia."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1444",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1445_2026-09-04_LIM_UIO": {
+      "flightNumber": "LA 1445",
+      "flightCode": "LA1445_2026-09-04_LIM_UIO",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1445_2026-09-04_LIM_UIO",
+      "reservationCode": "DXWUSX",
+      "passengers": [
+        "ELMER IDROBO ANDRADE"
+      ],
+      "sourcePdf": "Latam Airlines - CUV.pdf",
+      "sourcePath": " / Latam Airlines - CUV.pdf",
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-04",
+        "scheduledDeparture": "2026-09-04T08:00:00-05:00",
+        "scheduledArrival": "2026-09-04T10:30:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
+        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1445",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1444_2026-09-04_LIM_UIO": {
+      "flightNumber": "LA 1444",
+      "flightCode": "LA1444_2026-09-04_LIM_UIO",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1444_2026-09-04_LIM_UIO",
+      "reservationCode": "YVCUJD",
+      "passengers": [
+        "LEANDRO BRUNIS AVILES"
+      ],
+      "sourcePdf": "Latam Airlines - CUV.pdf",
+      "sourcePath": " / Latam Airlines - CUV.pdf",
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-04",
+        "scheduledDeparture": "2026-09-04T08:00:00-05:00",
+        "scheduledArrival": "2026-09-04T10:30:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
+        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1444",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA2393_2026-11-24_MDE_LIM": {
+      "flightNumber": "LA 2393",
+      "flightCode": "LA2393_2026-11-24_MDE_LIM",
+      "airline": "LATAM Airlines",
+      "callsign": "LA2393_2026-11-24_MDE_LIM",
+      "reservationCode": "FKALQX",
+      "passengers": [
+        "FERNANDO ARAGON"
+      ],
+      "sourcePdf": "Latam Airlines - CUV.pdf",
+      "sourcePath": " / Latam Airlines - CUV.pdf",
+      "route": {
+        "origin": "MDE",
+        "originCity": "Medellín",
+        "originAirport": "Aeropuerto Internacional José María Córdova",
+        "destination": "LIM",
+        "destinationCity": "Lima",
+        "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-24",
+        "scheduledDeparture": "2026-11-24T18:10:00-05:00",
+        "scheduledArrival": "2026-11-24T21:25:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe Miraflores (Calle Bellavista 133, Miraflores, Lima 15074, Perú)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la2393",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA2393_2026-09-04_LIM_UIO": {
+      "flightNumber": "LA 2393",
+      "flightCode": "LA2393_2026-09-04_LIM_UIO",
+      "airline": "LATAM Airlines",
+      "callsign": "LA2393_2026-09-04_LIM_UIO",
+      "reservationCode": "IRKDAM",
+      "passengers": [
+        "MILDRED MUNOZ VASQUEZ"
+      ],
+      "sourcePdf": "LA5449083OZNK-0499025c-1f89-4513-8926-030f0d0dc5d7-cuv-bill.pdf",
+      "sourcePath": "",
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-04",
+        "scheduledDeparture": "2026-09-04T08:00:00-05:00",
+        "scheduledArrival": "2026-09-04T10:30:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
+        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la2393",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA2465_2026-11-30_LIM_UIO": {
+      "flightNumber": "LA 2465",
+      "flightCode": "LA2465_2026-11-30_LIM_UIO",
+      "airline": "LATAM Airlines",
+      "callsign": "LA2465_2026-11-30_LIM_UIO",
+      "reservationCode": "SLKEAJ",
+      "passengers": [
+        "FERNANDO ARAGON"
+      ],
+      "sourcePdf": "Latam Airlines - CUV.pdf",
+      "sourcePath": " / Latam Airlines - CUV.pdf",
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-30",
+        "scheduledDeparture": "2026-11-30T01:20:00-05:00",
+        "scheduledArrival": "2026-11-30T07:40:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
+        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la2465",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA2465_2026-09-04_LIM_UIO": {
+      "flightNumber": "LA 2465",
+      "flightCode": "LA2465_2026-09-04_LIM_UIO",
+      "airline": "LATAM Airlines",
+      "callsign": "LA2465_2026-09-04_LIM_UIO",
+      "reservationCode": "USWLVZ",
+      "passengers": [
+        "FERNANDO ARAGON"
+      ],
+      "sourcePdf": "LA5445144RJWK-7b9a99b6-7583-45a4-ba9b-75953150dfd6-cuv-bill.pdf",
+      "sourcePath": "",
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-04",
+        "scheduledDeparture": "2026-09-04T08:00:00-05:00",
+        "scheduledArrival": "2026-09-04T10:30:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
+        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la2465",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
     "LA1354_2026-12-17_UIO_GYE": {
       "flightNumber": "LA 1354",
       "flightCode": "LA1354_2026-12-17_UIO_GYE",
@@ -526,53 +902,6 @@
       "radarUrl": "https://www.flightradar24.com/data/flights/la4018",
       "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
     },
-    "LA2393_2026-09-04_LIM_UIO": {
-      "flightNumber": "LA 2393",
-      "flightCode": "LA2393_2026-09-04_LIM_UIO",
-      "airline": "LATAM Airlines",
-      "callsign": "LA2393_2026-09-04_LIM_UIO",
-      "reservationCode": "IRKDAM",
-      "passengers": [
-        "MILDRED MUNOZ VASQUEZ"
-      ],
-      "sourcePdf": "LA5449083OZNK-0499025c-1f89-4513-8926-030f0d0dc5d7-cuv-bill.pdf",
-      "sourcePath": "",
-      "route": {
-        "origin": "LIM",
-        "originCity": "Lima",
-        "originAirport": "Aeropuerto Internacional Jorge Chávez",
-        "destination": "UIO",
-        "destinationCity": "Quito",
-        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
-        "isDirect": true,
-        "stops": 0,
-        "flightDuration": "2h 15m"
-      },
-      "schedule": {
-        "departureDate": "2026-09-04",
-        "scheduledDeparture": "2026-09-04T08:00:00-05:00",
-        "scheduledArrival": "2026-09-04T10:30:00-05:00",
-        "estimatedDeparture": null,
-        "estimatedArrival": null,
-        "actualDeparture": null,
-        "actualArrival": null
-      },
-      "status": "SCHEDULED",
-      "statusLabel": "Programado según itinerario",
-      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
-      "delayMinutes": null,
-      "terminal": "T1",
-      "gate": "Confirmándose en aeropuerto",
-      "baggageClaim": "Por confirmar en arribo",
-      "logistics": {
-        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
-        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
-        "driverPickupEstimated": "30 min posteriores al aterrizaje",
-        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
-      },
-      "radarUrl": "https://www.flightradar24.com/data/flights/la2393",
-      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
-    },
     "LA4972_2026-09-04_LIM_UIO": {
       "flightNumber": "LA 4972",
       "flightCode": "LA4972_2026-09-04_LIM_UIO",
@@ -881,100 +1210,6 @@
         "departureDate": "2026-11-15",
         "scheduledDeparture": "2026-11-15T23:30:00-05:00",
         "scheduledArrival": "2026-11-16T01:55:00-05:00",
-        "estimatedDeparture": null,
-        "estimatedArrival": null,
-        "actualDeparture": null,
-        "actualArrival": null
-      },
-      "status": "SCHEDULED",
-      "statusLabel": "Programado según itinerario",
-      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
-      "delayMinutes": null,
-      "terminal": "T1",
-      "gate": "Confirmándose en aeropuerto",
-      "baggageClaim": "Por confirmar en arribo",
-      "logistics": {
-        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
-        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
-        "driverPickupEstimated": "30 min posteriores al aterrizaje",
-        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
-      },
-      "radarUrl": "https://www.flightradar24.com/data/flights/la1444",
-      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
-    },
-    "LA1445_2026-09-04_LIM_UIO": {
-      "flightNumber": "LA 1445",
-      "flightCode": "LA1445_2026-09-04_LIM_UIO",
-      "airline": "LATAM Airlines",
-      "callsign": "LA1445_2026-09-04_LIM_UIO",
-      "reservationCode": "DXWUSX",
-      "passengers": [
-        "ELMER IDROBO ANDRADE"
-      ],
-      "sourcePdf": "Latam Airlines - CUV.pdf",
-      "sourcePath": " / Latam Airlines - CUV.pdf",
-      "route": {
-        "origin": "LIM",
-        "originCity": "Lima",
-        "originAirport": "Aeropuerto Internacional Jorge Chávez",
-        "destination": "UIO",
-        "destinationCity": "Quito",
-        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
-        "isDirect": true,
-        "stops": 0,
-        "flightDuration": "2h 15m"
-      },
-      "schedule": {
-        "departureDate": "2026-09-04",
-        "scheduledDeparture": "2026-09-04T08:00:00-05:00",
-        "scheduledArrival": "2026-09-04T10:30:00-05:00",
-        "estimatedDeparture": null,
-        "estimatedArrival": null,
-        "actualDeparture": null,
-        "actualArrival": null
-      },
-      "status": "SCHEDULED",
-      "statusLabel": "Programado según itinerario",
-      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
-      "delayMinutes": null,
-      "terminal": "T1",
-      "gate": "Confirmándose en aeropuerto",
-      "baggageClaim": "Por confirmar en arribo",
-      "logistics": {
-        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
-        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
-        "driverPickupEstimated": "30 min posteriores al aterrizaje",
-        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
-      },
-      "radarUrl": "https://www.flightradar24.com/data/flights/la1445",
-      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
-    },
-    "LA1444_2026-09-04_LIM_UIO": {
-      "flightNumber": "LA 1444",
-      "flightCode": "LA1444_2026-09-04_LIM_UIO",
-      "airline": "LATAM Airlines",
-      "callsign": "LA1444_2026-09-04_LIM_UIO",
-      "reservationCode": "YVCUJD",
-      "passengers": [
-        "LEANDRO BRUNIS AVILES"
-      ],
-      "sourcePdf": "Latam Airlines - CUV.pdf",
-      "sourcePath": " / Latam Airlines - CUV.pdf",
-      "route": {
-        "origin": "LIM",
-        "originCity": "Lima",
-        "originAirport": "Aeropuerto Internacional Jorge Chávez",
-        "destination": "UIO",
-        "destinationCity": "Quito",
-        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
-        "isDirect": true,
-        "stops": 0,
-        "flightDuration": "2h 15m"
-      },
-      "schedule": {
-        "departureDate": "2026-09-04",
-        "scheduledDeparture": "2026-09-04T08:00:00-05:00",
-        "scheduledArrival": "2026-09-04T10:30:00-05:00",
         "estimatedDeparture": null,
         "estimatedArrival": null,
         "actualDeparture": null,
@@ -2902,53 +3137,6 @@
         "departureDate": "2026-08-17",
         "scheduledDeparture": "2026-08-17T01:15:00-05:00",
         "scheduledArrival": "2026-08-17T07:40:00-05:00",
-        "estimatedDeparture": null,
-        "estimatedArrival": null,
-        "actualDeparture": null,
-        "actualArrival": null
-      },
-      "status": "SCHEDULED",
-      "statusLabel": "Programado según itinerario",
-      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
-      "delayMinutes": null,
-      "terminal": "T1",
-      "gate": "Confirmándose en aeropuerto",
-      "baggageClaim": "Por confirmar en arribo",
-      "logistics": {
-        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
-        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
-        "driverPickupEstimated": "30 min posteriores al aterrizaje",
-        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
-      },
-      "radarUrl": "https://www.flightradar24.com/data/flights/la2465",
-      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
-    },
-    "LA2465_2026-09-04_LIM_UIO": {
-      "flightNumber": "LA 2465",
-      "flightCode": "LA2465_2026-09-04_LIM_UIO",
-      "airline": "LATAM Airlines",
-      "callsign": "LA2465_2026-09-04_LIM_UIO",
-      "reservationCode": "USWLVZ",
-      "passengers": [
-        "FERNANDO ARAGON"
-      ],
-      "sourcePdf": "LA5445144RJWK-7b9a99b6-7583-45a4-ba9b-75953150dfd6-cuv-bill.pdf",
-      "sourcePath": "",
-      "route": {
-        "origin": "LIM",
-        "originCity": "Lima",
-        "originAirport": "Aeropuerto Internacional Jorge Chávez",
-        "destination": "UIO",
-        "destinationCity": "Quito",
-        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
-        "isDirect": true,
-        "stops": 0,
-        "flightDuration": "2h 15m"
-      },
-      "schedule": {
-        "departureDate": "2026-09-04",
-        "scheduledDeparture": "2026-09-04T08:00:00-05:00",
-        "scheduledArrival": "2026-09-04T10:30:00-05:00",
         "estimatedDeparture": null,
         "estimatedArrival": null,
         "actualDeparture": null,
@@ -11195,6 +11383,100 @@
       "radarUrl": "https://www.flightradar24.com/data/flights/la1426",
       "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
     },
+    "AM684_2026-11-18_MEX_UIO": {
+      "flightNumber": "AM 684",
+      "flightCode": "AM684_2026-11-18_MEX_UIO",
+      "airline": "Aeroméxico",
+      "callsign": "AM684_2026-11-18_MEX_UIO",
+      "reservationCode": "2MABP9",
+      "passengers": [
+        "Juan Angel Arreola"
+      ],
+      "sourcePdf": "JUAN ANGEL ARREOLA - 2DO FDS EQ-128 - QUITO.pdf",
+      "sourcePath": " / JUAN ANGEL ARREOLA - 2DO FDS EQ-128 - QUITO.pdf",
+      "route": {
+        "origin": "MEX",
+        "originCity": "Ciudad de México",
+        "originAirport": "Aeropuerto Internacional Benito Juárez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 00m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-18",
+        "scheduledDeparture": "2026-11-18T13:45:00-05:00",
+        "scheduledArrival": "2026-11-18T19:31:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
+        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/am684",
+      "checkInUrl": "https://www.google.com/search?q=check+in+Aeroméxico+AM684"
+    },
+    "AM685_2026-11-23_UIO_MEX": {
+      "flightNumber": "AM 685",
+      "flightCode": "AM685_2026-11-23_UIO_MEX",
+      "airline": "Aeroméxico",
+      "callsign": "AM685_2026-11-23_UIO_MEX",
+      "reservationCode": "2MABP9",
+      "passengers": [
+        "Juan Angel Arreola"
+      ],
+      "sourcePdf": "JUAN ANGEL ARREOLA - 2DO FDS EQ-128 - QUITO.pdf",
+      "sourcePath": " / JUAN ANGEL ARREOLA - 2DO FDS EQ-128 - QUITO.pdf",
+      "route": {
+        "origin": "UIO",
+        "originCity": "Quito",
+        "originAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "destination": "MEX",
+        "destinationCity": "Ciudad de México",
+        "destinationAirport": "Aeropuerto Internacional Benito Juárez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 00m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-23",
+        "scheduledDeparture": "2026-11-23T09:05:00-05:00",
+        "scheduledArrival": "2026-11-23T12:45:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Salida de Vuelos Llegadas T1 / T2 (Aeropuerto Benito Juárez MEX)",
+        "destination": "Sede Ciudad de México (Hospedaje por coordinar con Dirección de Sede) (Ciudad de México, México)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Coordinación de bienvenida y traslado con Sede México."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/am685",
+      "checkInUrl": "https://www.google.com/search?q=check+in+Aeroméxico+AM685"
+    },
     "CM121_2026-11-26_MEX_PTY": {
       "flightNumber": "CM 121",
       "flightCode": "CM121_2026-11-26_MEX_PTY",
@@ -11664,100 +11946,6 @@
       },
       "radarUrl": "https://www.flightradar24.com/data/flights/cm136",
       "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM136"
-    },
-    "AM684_2026-11-18_MEX_UIO": {
-      "flightNumber": "AM 684",
-      "flightCode": "AM684_2026-11-18_MEX_UIO",
-      "airline": "Aeroméxico",
-      "callsign": "AM684_2026-11-18_MEX_UIO",
-      "reservationCode": "2MABP9",
-      "passengers": [
-        "Juan Angel Arreola"
-      ],
-      "sourcePdf": "JUAN ANGEL ARREOLA - CAP DOS EQ 131 - QUITO.pdf",
-      "sourcePath": " / JUAN ANGEL ARREOLA - CAP DOS EQ 131 - QUITO.pdf",
-      "route": {
-        "origin": "MEX",
-        "originCity": "Ciudad de México",
-        "originAirport": "Aeropuerto Internacional Benito Juárez",
-        "destination": "UIO",
-        "destinationCity": "Quito",
-        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
-        "isDirect": true,
-        "stops": 0,
-        "flightDuration": "2h 00m"
-      },
-      "schedule": {
-        "departureDate": "2026-11-18",
-        "scheduledDeparture": "2026-11-18T13:45:00-05:00",
-        "scheduledArrival": "2026-11-18T19:31:00-05:00",
-        "estimatedDeparture": null,
-        "estimatedArrival": null,
-        "actualDeparture": null,
-        "actualArrival": null
-      },
-      "status": "SCHEDULED",
-      "statusLabel": "Programado según itinerario",
-      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
-      "delayMinutes": null,
-      "terminal": "T1",
-      "gate": "Confirmándose en aeropuerto",
-      "baggageClaim": "Por confirmar en arribo",
-      "logistics": {
-        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
-        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
-        "driverPickupEstimated": "30 min posteriores al aterrizaje",
-        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
-      },
-      "radarUrl": "https://www.flightradar24.com/data/flights/am684",
-      "checkInUrl": "https://www.google.com/search?q=check+in+Aeroméxico+AM684"
-    },
-    "AM685_2026-11-23_UIO_MEX": {
-      "flightNumber": "AM 685",
-      "flightCode": "AM685_2026-11-23_UIO_MEX",
-      "airline": "Aeroméxico",
-      "callsign": "AM685_2026-11-23_UIO_MEX",
-      "reservationCode": "2MABP9",
-      "passengers": [
-        "Juan Angel Arreola"
-      ],
-      "sourcePdf": "JUAN ANGEL ARREOLA - CAP DOS EQ 131 - QUITO.pdf",
-      "sourcePath": " / JUAN ANGEL ARREOLA - CAP DOS EQ 131 - QUITO.pdf",
-      "route": {
-        "origin": "UIO",
-        "originCity": "Quito",
-        "originAirport": "Aeropuerto Internacional Mariscal Sucre",
-        "destination": "MEX",
-        "destinationCity": "Ciudad de México",
-        "destinationAirport": "Aeropuerto Internacional Benito Juárez",
-        "isDirect": true,
-        "stops": 0,
-        "flightDuration": "2h 00m"
-      },
-      "schedule": {
-        "departureDate": "2026-11-23",
-        "scheduledDeparture": "2026-11-23T09:05:00-05:00",
-        "scheduledArrival": "2026-11-23T12:45:00-05:00",
-        "estimatedDeparture": null,
-        "estimatedArrival": null,
-        "actualDeparture": null,
-        "actualArrival": null
-      },
-      "status": "SCHEDULED",
-      "statusLabel": "Programado según itinerario",
-      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
-      "delayMinutes": null,
-      "terminal": "T1",
-      "gate": "Confirmándose en aeropuerto",
-      "baggageClaim": "Por confirmar en arribo",
-      "logistics": {
-        "pickupLocation": "Puerta de Salida de Vuelos Llegadas T1 / T2 (Aeropuerto Benito Juárez MEX)",
-        "destination": "Sede Ciudad de México (Hospedaje por coordinar con Dirección de Sede) (Ciudad de México, México)",
-        "driverPickupEstimated": "30 min posteriores al aterrizaje",
-        "driverNote": "Coordinación de bienvenida y traslado con Sede México."
-      },
-      "radarUrl": "https://www.flightradar24.com/data/flights/am685",
-      "checkInUrl": "https://www.google.com/search?q=check+in+Aeroméxico+AM685"
     },
     "LA2464_2026-11-12_LIM_UIO": {
       "flightNumber": "LA 2464",
