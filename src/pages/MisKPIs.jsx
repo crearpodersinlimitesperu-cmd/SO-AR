@@ -18,6 +18,7 @@ import { snapshotFreshness } from '../utils/nodusIntegrity.js';
 import OperationalReview from '../components/OperationalReview';
 import { canReadKpiReport } from '../utils/privacyScope.js';
 import { privateKpiQuery } from '../services/privacyQueries.js';
+import { readPrivateNodusSnapshot } from '../services/privateNodusSnapshot.js';
 export { extractNodusMetrics };
 
 // Metas base por defecto por rol (cuando la persona aún no tiene metas personalizadas)
@@ -68,6 +69,7 @@ export default function MisKPIs() {
   const [history, setHistory] = useState([]);
   const [nodusData, setNodusData] = useState(null);
   const [loadingNodus, setLoadingNodus] = useState(false);
+  const [nodusError, setNodusError] = useState(null);
   
   // Catálogo completo de personas por rol
   const [selectedPerson, setSelectedPerson] = useState(null);
@@ -180,12 +182,12 @@ export default function MisKPIs() {
 
   const fetchNodusData = async () => {
     setLoadingNodus(true);
+    setNodusError(null);
     try {
-      const docRef = doc(db, 'nodus_coordinadores_c1c2', 'latest');
-      const snap = await getDoc(docRef);
-      setNodusData(snap.exists() ? snap.data() : null);
+      setNodusData(await readPrivateNodusSnapshot());
     } catch (e) {
       console.warn("No se pudo verificar Nodus en MisKPIs:", e);
+      setNodusError(e.message || 'No se pudo verificar el acceso a las métricas privadas.');
       setNodusData(null);
     } finally {
       setLoadingNodus(false);
@@ -310,7 +312,7 @@ export default function MisKPIs() {
         ? `Nodus · snapshot antiguo o sin fecha verificable (${nodusSnapshotAge.label})`
         : nodusData
           ? 'Nodus · snapshot reciente; sin coincidencia única para esta persona'
-          : 'Nodus · snapshot no disponible';
+          : `Nodus · ${nodusError || 'snapshot no disponible'}`;
 
   // Función para auto-llenar el formulario con las métricas reales
   const handleAutoFillFromNodus = () => {

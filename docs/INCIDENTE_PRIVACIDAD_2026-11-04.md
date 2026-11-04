@@ -239,6 +239,64 @@ activaría su despliegue automático existente**; no fusionar antes del gate.
 Las alertas visuales sobre bordes/animaciones preexistentes no se interpretaron
 como defectos del aislamiento; no se hizo un rediseño ni se silenciaron reglas.
 
+## Alcance Nodus y eliminación del fallback global del Copiloto
+
+**Decisión expresa del usuario:** «Solo sus sedes administrativamente asignadas;
+Dirección conserva acceso global». Se aplica al Worker activo, no se interpreta
+el rol de vista `consolidado` como una autoridad global.
+
+- `cloudflare-worker/src/nodusJsonModel.js:1-138`: los gerentes pasan a alcance
+  local; se admiten las sedes de `sede` y `roleSedes` de roles realmente otorgados,
+  con nombres canónicos reconocidos. Inactividad prevalece incluso sobre
+  privilegios globales. La proyección permite identidades y métricas del alcance,
+  no secciones crudas, campos desconocidos ni padrones anidados de participantes.
+- `cloudflare-worker/src/index.js`: `/nodus-json/*`, contexto del chat y
+  `/nodus-data-map` usan esa autoridad leída del perfil administrativo
+  `users/{uid}`. El correo para la excepción global es el del **token Firebase
+  verificado**, nunca el correo importado del perfil ni parámetros del cliente.
+  También se comprueba la sede del equipo devuelto por la fuente, no solo el ID.
+- La base anterior de `AICopilot.jsx:660-682` descargaba los dos snapshots
+  globales si el Worker no respondía o rechazaba la consulta. Este fallback
+  eludía cualquier autorización implementada exclusivamente en el backend.
+  `AICopilot` y `MisKPIs` ya no hacen esas lecturas: usan
+  `src/services/privateNodusSnapshot.js` y `/nodus-private-snapshot`.
+  La autorización ocurre **antes** de enviar los datos al navegador. No se
+  aceptan rol, sede o identidad enviados por la pantalla.
+- Para cuentas personales se devuelven únicamente coordinadores asociados a los
+  correos del token/perfil administrativo; para gerentes, sus sedes; para
+  Dirección, agregados e identidades autorizadas, sin tablas crudas en este
+  endpoint. Se conservan ciclo, rol y los conteos consumidos por el extractor
+  real de KPIs; los equipos se minimizan y se excluyen contradicciones de sede
+  señaladas por el publicador. Los alias del perfil requieren la auditoría
+  administrativa ya descrita: este cambio no certifica registros históricos.
+- Respuestas privadas `no-store`, cambio de cuenta durante token/fetch/JSON
+  rechazado y errores explícitos. El Copiloto no presenta ausencia de acceso
+  como un reporte exitoso de cero discrepancias.
+
+Validación de esta iteración: **50/50** pruebas de privacidad y **18/18** de
+Nodus JSON; build directo Vite correcto. Se ejecutan los handlers reales con
+JWT/Firestore/red sintéticos, incluyendo gerente A frente a B, dirección,
+inactivos, suplantación por correo importado, respuesta de equipo de sede
+contradictoria y proyección previa al prompt. El extractor real de KPIs conserva
+las métricas de una fila con la forma publicada por el sincronizador. Las
+pruebas del cliente cubren cambios de cuenta en cada espera y ausencia de
+fallback Firestore. El CI `profile-privacy` de `7bf370c` terminó **SUCCESS**;
+los dos jobs generales siguen en **FAILURE**, separados de esta suite.
+
+**Gate adicional de publicación, no ejecutado:** publicar primero el Worker
+actualizado, comprobar con cuentas autorizadas las asignaciones/alias del
+perfil administrativo y después el frontend. Si falta el endpoint, las vistas
+muestran indisponibilidad explícita; no vuelven al snapshot global. No se
+desplegó ningún componente. Los bordes preexistentes señalados en MisKPIs son
+ajenos al contrato de privacidad; no se rediseñaron ni se suprimió el hook.
+
+**El incidente sigue abierto:** otros consumidores conservan lecturas directas
+de los agregados globales y siguen existiendo catálogos personales estáticos
+en recursos públicos. Esta iteración elimina dos descargas y endurece los
+endpoints activos; no convierte las reglas abiertas de los snapshots restantes
+en una protección efectiva. No es seguro cerrar esas reglas sin migrar los
+contratos de reportes/equipos y aprovisionar las autoridades legítimas.
+
 ## Auditoría y reparación de datos: procedimiento, no ejecutado
 
 No se conocen documentos corruptos confirmados. No sería correcto inventar IDs,

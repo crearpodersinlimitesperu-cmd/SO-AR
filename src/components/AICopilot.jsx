@@ -1,11 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Bot, Send, X, Sparkles, BrainCircuit, Loader2, Database, MessageSquarePlus, History, ChevronLeft, MessageCircle } from 'lucide-react';
 import { doc, getDocs, getFirestore, collection, addDoc, updateDoc, query, orderBy } from 'firebase/firestore';
-import { auth, db, getDocResilient } from '../services/firebase';
+import { auth } from '../services/firebase';
+import { readPrivateNodusSnapshot } from '../services/privateNodusSnapshot.js';
 import { useAuth } from '../context/AuthContext';
 
 // MOTOR ANALÍTICO AUTÓNOMO CAUSA OS (ZERO-HALLUCINATION & DEEP DATA ENGINE)
 function generateAssertiveResponse(queryText, nodusData, currentUser, messageHistory = []) {
+  if (!nodusData) return 'No se pudieron verificar métricas dentro de tu alcance autorizado. No se consultaron snapshots globales ni se sustituyeron los datos por ceros. Inténtalo nuevamente cuando el servicio privado esté disponible.';
   let q = (queryText || '').toLowerCase().trim();
   const coords = nodusData?.coordinadores || [];
   const totales = nodusData?.totales || nodusData?.nodusTotales || {};
@@ -14,6 +16,7 @@ function generateAssertiveResponse(queryText, nodusData, currentUser, messageHis
   const fastCacheMissions = nodusData?.imoMissions || [];
   
   if (q.includes('discrepancias') || q.includes('verificado') || q.includes('pendientes')) {
+     if (!Array.isArray(nodusData.enroladosConStatus)) return 'El snapshot autorizado no contiene el reporte de verificación Nodus + IMO. No hay datos disponibles para calcular discrepancias.';
      const verificados = fastCacheEnrolados.filter(e => e.statusIA === 'VERIFICADO_OK').length;
      const discrepancias = fastCacheEnrolados.filter(e => e.statusIA === 'DISCREPANCIA').length;
      return `📊 **Reporte Rápido de Status (Nodus + IMO):**\n\n* Enrolados analizados: **${fastCacheEnrolados.length}**\n* Verificados Ok por Coordinación: **${verificados}**\n* Con Discrepancias (IMO dice sí, Nodus dice no): **${discrepancias}**\n\n_(Datos pre-calculados por el Agente Centinela en background)_.`;
@@ -660,20 +663,7 @@ export default function AICopilot() {
       if (!aiText) {
         let nodusData = null;
         try {
-          const [nodusDoc, kpisDoc] = await Promise.all([
-            getDocResilient(doc(db, 'nodus_coordinadores_c1c2', 'latest')),
-            getDocResilient(doc(db, 'nodus_kpis_sincronizados', 'latest_snapshot'))
-          ]);
-          const cData = (nodusDoc && nodusDoc.exists()) ? nodusDoc.data() : {};
-          const kData = (kpisDoc && kpisDoc.exists()) ? kpisDoc.data() : {};
-          nodusData = {
-            ...cData,
-            equiposSummary: cData.equiposSummary || kData.equiposSummary || kData.equipos || [],
-            kpisEquipos: kData.equipos || kData.equiposSummary || cData.equiposSummary || [],
-            kpisTotales: kData.totales || {},
-            kpisSedes: kData.sedes || [],
-            kpisTimestamp: kData.timestamp || cData.timestamp || null
-          };
+          nodusData = await readPrivateNodusSnapshot();
         } catch (nodusErr) {
           console.warn("Error leyendo snapshot Nodus para copilot:", nodusErr);
         }
