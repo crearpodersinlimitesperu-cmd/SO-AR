@@ -305,15 +305,74 @@ endpoints activos; no convierte las reglas abiertas de los snapshots restantes
 en una protección efectiva. No es seguro cerrar esas reglas sin migrar los
 contratos de reportes/equipos y aprovisionar las autoridades legítimas.
 
-Se detectó también un bloqueo concreto de **historial de chat tras revocación**:
-`AICopilot.jsx:508-548` recarga conversaciones por UID, sin registrar el alcance
-con el que fueron generadas; `firestore.rules:751-753` permite leerlas a su dueño.
-Remontar la vista y vaciar el estado no evita que se vuelva a descargar una
-respuesta antigua producida bajo una autoridad global ya retirada. Los
-documentos históricos no tienen un manifiesto de fuentes/alcances que permita
-clasificarlos automáticamente. No se modificaron ni borraron conversaciones:
-se necesita definir la cuarentena/migración de los historiales sin alcance
-antes de endurecer su lectura sin perder información legítima.
+### Historial del Copiloto tras revocar permisos
+
+Se reprodujo otra vía: en `e280600`, `AICopilot.jsx:508-548` recargaba
+conversaciones por UID, sin registrar el alcance con el que fueron generadas;
+`firestore.rules:750-752` permitía leerlas a su dueño. Remontar la vista no
+evitaba volver a descargar respuestas obtenidas con permisos globales ya
+retirados. Los documentos históricos no contienen un manifiesto suficiente
+para clasificarlos automáticamente.
+
+**Decisión expresa del usuario:** «Sí: conservarlos y bloquear su lectura hasta
+verificar el alcance». Se implementa esa cuarentena **en código, no mediante
+alteración de datos de producción**:
+
+- Se deniega la lectura/escritura directa de `users/{uid}/copilot_chats` y del
+  nuevo espacio `users/{uid}/copilot_scopes/{partición}/chats`. Se preservan
+  íntegros todos los documentos históricos.
+- `/copilot-private-history` autentica Firebase y vuelve a leer el perfil
+  administrativo. El servidor calcula una huella de UID/correos, roles,
+  sedes, asignaciones, privilegios, actividad, política y alias validados.
+  La partición combina esa autoridad con la vista, que **no** otorga permisos.
+  No se aceptan UID, rol ni alcance impuestos por el navegador. Se vuelve a
+  comprobar la autoridad antes de devolver/guardar datos y después de guardar.
+  La vista fija la huella inicialmente autorizada; no adopta otra huella
+  automáticamente tras una revocación ni reetiqueta respuestas sin guardar
+  como si se hubiesen generado con los nuevos permisos. La primera pregunta
+  debe quedar vinculada a esa autoridad antes de consultar al Copiloto; ante
+  fallo se muestra el error y no se generan respuestas privadas sin procedencia.
+- `privateChatHandler.js`, `privateChatStore.js` y `privateChatModel.js`
+  mantienen únicamente conversaciones con procedencia verificable. Listar
+  devuelve metadatos, no cuerpos; abrir vuelve a autorizar. Los cambios de
+  autoridad separan las conversaciones anteriores, sin borrarlas. Reordenar
+  permisos o cambiar la foto no las invalida. Las actualizaciones usan
+  `currentDocument.updateTime`, no sobrescriben escrituras concurrentes.
+- `src/services/privateCopilotHistory.js` y el componente real no vuelven a
+  cargar ni escribir los antiguos `copilot_sessions_{uid}`. Esas claves quedan
+  conservadas, pero fuera del nuevo contrato. No hay fallback a Firestore
+  directo/localStorage tras un error. Cambios de cuenta/alcance y callbacks
+  tardíos se rechazan; no se mezcla historial ni respuestas durante simulación.
+  La pantalla explica tanto los errores como la conservación pendiente de
+  revisión de los historiales previos.
+- Al cubrir el transporte REST real se corrigió además el decodificador del
+  Worker: los elementos `mapValue` dentro de `arrayValue` ahora se convierten
+  recursivamente. Antes quedaban como envoltorios Firestore, lo que impedía
+  aplicar correctamente las proyecciones a coordinadores reales. Los tests no
+  se limitan a sustituir Firestore por objetos planos.
+
+**Migración segura pendiente, no ejecutada:** un administrador debe revisar en
+un entorno restringido cada conversación histórica y acreditar su propietario
+y las fuentes/alcances de todas sus respuestas. Si no puede acreditarlos,
+mantenerla en cuarentena, no asignarle automáticamente el alcance actual ni
+copiarla en bloque al espacio nuevo. Solo tras aprobación y respaldo/versiones
+se podría reconstruir una conversación verificada con trazabilidad de origen.
+El historial local de un navegador compartido sigue siendo inspeccionable
+manualmente por quien controla ese perfil del navegador; no se presenta
+localStorage como una barrera criptográfica ni se eliminan sus datos.
+
+Validación adicional: **59 pruebas de privacidad**, incluida la pantalla real
+en Chromium (historial local intacto/no leído, revocación en plena apertura y
+respuesta tardía tras cambiar de cuenta); **27 pruebas de reglas en emulador**
+incluyen propietario, otro usuario, Dirección y SuperAdmin sin bypass de
+cuarentena. El almacenamiento prueba mensajes con envoltorios Firestore REST,
+separación por autoridad/cuenta, rechazo de alcance/propietario falsificados,
+inactividad y cambio de permisos durante la lectura. El Worker real carga con
+sus imports ESM sin acceso a red. Build directo Vite correcto.
+
+Esta ruta también exige **Worker antes de frontend/reglas** en una eventual
+publicación autorizada; si el endpoint no existe, el historial falla de forma
+explícita. No se desplegó, clasificó, copió ni borró ninguna conversación real.
 
 ## Auditoría y reparación de datos: procedimiento, no ejecutado
 

@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import * as model from '../cloudflare-worker/src/nodusJsonModel.js';
 import { extractNodusMetrics } from '../src/services/nodusMetricsModel.js';
+import { createPrivateChatHandler } from '../cloudflare-worker/src/privateChatHandler.js';
+import { createPrivateChatStore } from '../cloudflare-worker/src/privateChatStore.js';
 
 function fixture({ profile, tokenEmail = 'manager@example.invalid', snapshot, responseSede = 'Lima' }) {
   const prompts = [];
@@ -20,6 +22,7 @@ function fixture({ profile, tokenEmail = 'manager@example.invalid', snapshot, re
     })
   });
   const names = ['createRemoteJWKSet', 'notebookKnowledge', 'createNodusApiClient', 'NodusApiError', 'findUserByAnyEmail',
+    'createPrivateChatHandler', 'createPrivateChatStore',
     'fetch', ...Object.keys(model), 'fixtureProfile', 'fixtureSnapshot', 'fixtureEmail', 'fixturePaths'];
   return {
     prompts, paths,
@@ -34,6 +37,7 @@ function fixture({ profile, tokenEmail = 'manager@example.invalid', snapshot, re
       return { handleNodusJson, handleNodusDataMap, handlePrivateNodusSnapshot, construirContextoNodus, callerNodusScope };
     `)(() => ({}), '', createClient, class extends Error {},
       email => email === 'local@example.invalid' ? localIdentity : email === 'foreign@example.invalid' ? foreignIdentity : null,
+      createPrivateChatHandler, createPrivateChatStore,
       async (_url, options) => {
         prompts.push(JSON.parse(options.body));
         return { json: async () => ({ choices: [{ message: { content: 'Synthetic response' } }] }) };

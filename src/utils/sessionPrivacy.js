@@ -35,7 +35,7 @@ export const privateViewKey = user => JSON.stringify([
   user?.sede, Object.entries(user?.roleSedes || {}).sort(([left], [right]) => left.localeCompare(right)),
   sortedValues(user?.trainerDirectoryIds), sortedValues(user?.trainerNames),
   user?.isSuperAdmin === true, user?.isDireccion === true, user?.isGerente === true,
-  user?.isSimulated === true, user?.isParticipantOnly === true,
+  user?.isSimulated === true, user?.isRoleSimulationActive === true, user?.isParticipantOnly === true,
   user?.active, user?.isActive, user?.esActivo, user?.status, user?.estado,
   user?.deactivatedAt
 ]);

@@ -117,7 +117,7 @@ test('effective identity, role, sede and simulation each invalidate the mounted 
   const viewer = user('me');
   for (const delta of [
     { uid: 'other' }, { email: 'other@example.invalid' }, { appRole: 'gerente' },
-    { sede: 'Quito' }, { isSimulated: true }, { roles: ['coord_c1', 'direccion'] },
+    { sede: 'Quito' }, { isSimulated: true }, { isRoleSimulationActive: true }, { roles: ['coord_c1', 'direccion'] },
     { roleSedes: { qt: 'Quito' } }, { emails: ['approved@example.invalid'] },
     { trainerDirectoryIds: ['assigned-id'] }, { trainerNames: ['Assigned Trainer'] },
     { isSuperAdmin: true }, { isDireccion: true }, { isGerente: true },

@@ -747,8 +747,12 @@ service cloud.firestore {
       );
       allow delete: if isSuperAdmin();
 
+      // Historial sin alcance verificable en cuarentena; el nuevo contrato es solo servidor.
       match /copilot_chats/{chatId} {
-        allow read, write: if isAuthenticated() && request.auth.uid == userId;
+        allow read, write: if false;
+      }
+      match /copilot_scopes/{scopeId}/{document=**} {
+        allow read, write: if false;
       }
     }
 

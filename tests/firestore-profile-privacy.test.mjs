@@ -127,6 +127,27 @@ test('private profiles, directories, notes, calls and KPIs enforce identity/sede
       await assertFails(updateDoc(doc(dbFor('remote'), path), { password: 'forged' }));
       await assertFails(setDoc(doc(dbFor('local'), 'user_private_credentials', profiles.local.email), { username: 'forged' }));
     });
+    await t.test('legacy chat history is quarantined intact and server-scoped history cannot bypass the backend', async () => {
+      const old = 'users/local/copilot_chats/legacy';
+      const fresh = 'users/local/copilot_scopes/synthetic-scope/chats/synthetic-chat';
+      const payload = { messages: [{ role: 'assistant', content: 'Synthetic formerly-global answer' }] };
+      await seed(old, payload);
+      await seed(fresh, payload);
+      for (const id of ['local', 'remote', 'director']) {
+        const db = dbFor(id);
+        for (const path of [old, fresh]) {
+          await assertFails(getDoc(doc(db, path)));
+          await assertFails(setDoc(doc(db, path), payload));
+        }
+        await assertFails(getDocs(collection(db, 'users/local/copilot_chats')));
+        await assertFails(getDocs(collection(db, 'users/local/copilot_scopes/synthetic-scope/chats')));
+      }
+      await env.withSecurityRulesDisabled(async ctx => {
+        assert.deepEqual((await getDoc(doc(ctx.firestore(), old))).data(), payload, 'quarantine does not delete or rewrite historical content');
+      });
+      const root = env.authenticatedContext('synthetic-root', { email: 'jose.sanchez@crearpsl.net' }).firestore();
+      for (const path of [old, fresh]) await assertFails(getDoc(doc(root, path)));
+    });
 
     await t.test('travelling trainer retains assigned managers and can record calls but cannot change identities', async () => {
       const db = dbFor('coach');

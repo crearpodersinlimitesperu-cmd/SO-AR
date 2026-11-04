@@ -39,6 +39,8 @@ import { notebookKnowledge } from './notebookKnowledge.js';
 import { createNodusApiClient, NodusApiError } from './nodusApiClient.js';
 import { filterNodusSedes, hasNodusTeamAccess, nodusAccessScope, personalNodusEmails, scopedNodusContext, summarizeNodusCatalog, summarizeNodusTeam } from './nodusJsonModel.js';
 import { findUserByAnyEmail } from '../../src/data/usersData.js';
+import { createPrivateChatHandler } from './privateChatHandler.js';
+import { createPrivateChatStore } from './privateChatStore.js';
 
 const FIREBASE_PROJECT_ID = 'centro-operativo-cpsl';
 const FIREBASE_JWKS = createRemoteJWKSet(
@@ -131,25 +133,27 @@ async function getServiceAccountAccessToken(env) {
 // Convierte el formato de campos de Firestore REST (fields: {campo: {stringValue: "x"}})
 // a un objeto plano de JS. Solo soporta los tipos que realmente usa esta app.
 function firestoreFieldsToPlain(fields) {
-  const out = {};
-  if (!fields) return out;
-  for (const [key, val] of Object.entries(fields)) {
-    if (val.stringValue !== undefined) out[key] = val.stringValue;
-    else if (val.booleanValue !== undefined) out[key] = val.booleanValue;
-    else if (val.integerValue !== undefined) out[key] = Number(val.integerValue);
-    else if (val.doubleValue !== undefined) out[key] = val.doubleValue;
-    else if (val.arrayValue !== undefined) {
-      out[key] = (val.arrayValue.values || []).map((v) =>
-        v.stringValue !== undefined ? v.stringValue : v
-      );
-    } else if (val.mapValue !== undefined) {
-      out[key] = firestoreFieldsToPlain(val.mapValue.fields);
-    } else {
-      out[key] = null;
-    }
-  }
-  return out;
+  const value = val => {
+    if (val.stringValue !== undefined) return val.stringValue;
+    if (val.booleanValue !== undefined) return val.booleanValue;
+    if (val.integerValue !== undefined) return Number(val.integerValue);
+    if (val.doubleValue !== undefined) return val.doubleValue;
+    if (val.timestampValue !== undefined) return val.timestampValue;
+    if (val.arrayValue !== undefined) return (val.arrayValue.values || []).map(value);
+    if (val.mapValue !== undefined) return firestoreFieldsToPlain(val.mapValue.fields);
+    return null;
+  };
+  return Object.fromEntries(Object.entries(fields || {}).map(([key, val]) => [key, value(val)]));
 }
+
+const handlePrivateChat = createPrivateChatHandler({
+  verifyToken: token => verifyFirebaseToken(token),
+  accessToken: env => getServiceAccountAccessToken(env),
+  store: createPrivateChatStore(FIREBASE_PROJECT_ID, firestoreFieldsToPlain),
+  scopeFor: callerNodusScope,
+  aliasesFor: (profile, email, uid) => personalNodusEmails(profile, email, uid, findUserByAnyEmail),
+  json
+});
 
 async function firestoreGet(path, accessToken) {
   const url = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/${path}`;
@@ -898,6 +902,9 @@ export default {
     }
     if (url.pathname === '/nodus-private-snapshot') {
       return handlePrivateNodusSnapshot(request, env, origin);
+    }
+    if (url.pathname === '/copilot-private-history') {
+      return handlePrivateChat(request, env, origin);
     }
 
     const authHeader = request.headers.get('Authorization') || '';
