@@ -41,7 +41,26 @@ export function latestTeamsBySede(events = [], now = Date.now()) {
   });
 }
 
-function stageEvidence(snapshot, sede, team, stage, stale) {
+function stageEvidence(snapshot, sede, team, stage, stale, now) {
+  if (Array.isArray(snapshot?.reportSources)) {
+    const sources = snapshot.reportSources.filter(source => source.sede === sede && source.stage === stage);
+    if (sources.length > 1) return { status: 'duplicate', label: 'Fuente duplicada; no se sumó', rows: null, confirmed: null };
+    const source = sources[0];
+    if (!source) return { status: 'missing', label: 'Sin reporte publicado', rows: null, confirmed: null };
+    if (snapshotFreshness(source.sourceUpdatedAt, now).stale) {
+      return { status: 'stale', label: 'Reporte antiguo o sin fecha verificable', rows: null, confirmed: null };
+    }
+    const rows = source.teams.filter(row => row.sede === sede && row.stage === stage && row.team === team);
+    if (rows.length > 1) return { status: 'duplicate', label: 'Fuente duplicada; no se sumó', rows: null, confirmed: null };
+    const record = rows[0];
+    if (!record || record.status === 'missing') return {
+      status: 'missing', label: 'Solo resumen o extracción incompleta', rows: null, confirmed: null
+    };
+    if (record.status !== 'ready') return { status: 'unclassified',
+      label: `${record.unknown} registros sin cohorte/estado verificable`, rows: null, confirmed: null };
+    return { status: 'ready', label: 'Conteos del reporte publicado; no certifica asistencia',
+      rows: record.rows, confirmed: record.counts.nuevos_OK + record.counts.rezagados_OK };
+  }
   const matches = (Array.isArray(snapshot?.equiposReporte) ? snapshot.equiposReporte : []).filter(row => {
     const name = String(row.equipoNombre || row.equipo || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
     const namedSedes = REPORT_SEDES.filter(candidate =>
@@ -71,11 +90,13 @@ function stageEvidence(snapshot, sede, team, stage, stale) {
 export function buildOperationalReview(events, snapshot, now = Date.now()) {
   const timestamp = snapshot?.timestamp || null;
   const freshness = snapshotFreshness(timestamp, now);
-  const sedes = latestTeamsBySede(events, now).map(group => ({
+  const sedes = latestTeamsBySede(events, now)
+    .filter(group => !Array.isArray(snapshot?.authorizedSedes) || snapshot.authorizedSedes.includes(group.sede)).map(group => ({
     ...group,
     teams: group.teams.map(team => ({
       ...team,
-      stages: ['C1', 'C2'].map(stage => ({ stage, ...stageEvidence(snapshot, group.sede, team.team, stage, freshness.stale) }))
+      stages: ['C1', 'C2'].filter(stage => !Array.isArray(snapshot?.authorizedStages) || snapshot.authorizedStages.includes(stage))
+        .map(stage => ({ stage, ...stageEvidence(snapshot, group.sede, team.team, stage, freshness.stale, now) }))
     }))
   }));
   return { source: REVIEW_SOURCE, timestamp, freshness, sedes };

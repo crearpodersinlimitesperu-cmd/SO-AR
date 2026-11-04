@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { privateViewKey } from '../utils/sessionPrivacy.js';
-import { readPrivateNodusSnapshot } from '../services/privateNodusSnapshot.js';
+import { readPrivateNodusSnapshot, readPrivateNodusReportSources } from '../services/privateNodusSnapshot.js';
 
-export default function usePrivateNodusSnapshot({ enabled = true, revision = 0 } = {}) {
+function usePrivateNodusProjection(read, { enabled = true, revision = 0 } = {}) {
   const { currentUser } = useAuth();
   const key = privateViewKey(currentUser);
   const scope = useRef(key);
@@ -22,7 +22,7 @@ export default function usePrivateNodusSnapshot({ enabled = true, revision = 0 }
     setState({ ownerKey: key, snapshot: null, loading: true, error: '' });
     const refresh = async () => {
       try {
-        const snapshot = await readPrivateNodusSnapshot({ expectedUid: currentUser.uid, isCurrent });
+        const snapshot = await read({ expectedUid: currentUser.uid, isCurrent });
         if (isCurrent()) setState({ ownerKey: key, snapshot, loading: false, error: '' });
       } catch (error) {
         console.error('No se pudo verificar la proyección privada Nodus:', error);
@@ -34,8 +34,16 @@ export default function usePrivateNodusSnapshot({ enabled = true, revision = 0 }
     };
     refresh();
     return () => { active = false; clearTimeout(timer); };
-  }, [enabled, unavailable, key, revision, currentUser?.uid]);
+  }, [enabled, unavailable, key, revision, currentUser?.uid, read]);
   return state.ownerKey === key && enabled && !unavailable ? state
     : { snapshot: null, loading: enabled && !unavailable,
       error: enabled && unavailable ? 'Las métricas privadas requieren tu cuenta real, sin simulación.' : '' };
+}
+
+export default function usePrivateNodusSnapshot(options) {
+  return usePrivateNodusProjection(readPrivateNodusSnapshot, options);
+}
+
+export function usePrivateNodusReportSources(options) {
+  return usePrivateNodusProjection(readPrivateNodusReportSources, options);
 }

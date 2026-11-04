@@ -60,16 +60,22 @@ test('real metric hook and Embudo never reintroduce global fallback and reject s
       resolveId(id) {
         if (id === '../services/firebase' || id === './firebase') return '\0nodus-metrics:firebase';
         if (id === '../context/AuthContext') return '\0nodus-metrics:auth';
+        if (id === '../context/CyclesContext') return '\0nodus-metrics:cycles';
         if (id === '/nodus-metrics-fixture.jsx') return fixtureId;
       },
       load(id) {
         if (id === '\0nodus-metrics:firebase') return 'export const auth={currentUser:null}; window.fixtureAuth=auth;';
         if (id === '\0nodus-metrics:auth') return 'export const useAuth=()=>({currentUser:window.viewer});';
+        if (id === '\0nodus-metrics:cycles') return `export const useCycles=()=>({loadingEvents:false,events:[
+          {sede:'Lima',equipo:31,nombre:'C1',fecha_inicio:'2026-01-01'},
+          {sede:'Quito',equipo:31,nombre:'C1',fecha_inicio:'2026-01-01'}
+        ]});`;
         if (id === fixtureId) return `
           import React,{useState} from 'react';
           import {createRoot} from 'react-dom/client';
           import {MemoryRouter} from 'react-router-dom';
           import Embudo from '/src/pages/EmbudoConversionBoard.jsx';
+          import OperationalReview from '/src/components/OperationalReview.jsx';
           import useMetrics from '/src/hooks/usePrivateNodusSnapshot.js';
           window.metricRequests=[];
           window.pendingMetrics=[];
@@ -79,10 +85,21 @@ test('real metric hook and Embudo never reintroduce global fallback and reject s
             equipos:[{equipo:'C1 E31',fase:'C1',llamadas:3,confirmado:2}]
           }]};
           window.fetch=async (url,options)=>{
-            if(!String(url).endsWith('/nodus-private-snapshot')) throw new Error('Forbidden network path');
+            const isReports=String(url).endsWith('/nodus-private-report-sources');
+            if(!isReports && !String(url).endsWith('/nodus-private-snapshot')) throw new Error('Forbidden network path');
             window.metricRequests.push({url,body:options.body,token:options.headers.Authorization});
             if(window.holdMetrics) await new Promise(resolve=>window.pendingMetrics.push(resolve));
             if(window.failMetrics) return Response.json({message:'SYNTHETIC_AUTHORIZATION_ERROR'},{status:403});
+            if(isReports){
+              const counts=Object.fromEntries(['nuevos','rezagados'].flatMap(group=>
+                ['OK','XC','NC','NI','SIG','OS','PENDIENTES'].map(metric=>[group+'_'+metric,0])));
+              counts.nuevos_OK=1;
+              const timestamp=new Date().toISOString();
+              return Response.json({snapshot:{timestamp,authorizedSedes:['Lima'],authorizedStages:['C1'],missingSources:[],
+                reportSources:[{sede:'Lima',stage:'C1',sourceUpdatedAt:timestamp,teams:[
+                  {sede:'Lima',stage:'C1',team:'31',status:'ready',rows:1,unknown:0,counts}
+                ]}]}});
+            }
             return Response.json({snapshot:local});
           };
           function Fixture(){
@@ -91,7 +108,7 @@ test('real metric hook and Embudo never reintroduce global fallback and reject s
             window.viewer=viewer; window.swapViewer=setViewer; window.reloadMetrics=()=>setRevision(v=>v+1);
             window.fixtureAuth.currentUser={uid:viewer.uid,getIdToken:async ()=>'synthetic-'+viewer.uid};
             const state=useMetrics({revision});
-            return <><output id="metrics-probe">{JSON.stringify(state)}</output><MemoryRouter><Embudo/></MemoryRouter></>;
+            return <><output id="metrics-probe">{JSON.stringify(state)}</output><MemoryRouter><Embudo/><OperationalReview/></MemoryRouter></>;
           }
           createRoot(document.getElementById('root')).render(<Fixture/>);
         `;
@@ -122,6 +139,9 @@ test('real metric hook and Embudo never reintroduce global fallback and reject s
     await page.waitForFunction(() => [...document.querySelectorAll('button')].some(button =>
       button.textContent.includes('Actualizar') && !button.disabled));
     assert.equal(await page.$eval('article strong', element => element.textContent), '4');
+    await page.waitForSelector('[data-review-sede="Lima"]');
+    assert.deepEqual(await page.$$eval('[data-review-sede]', elements => elements.map(element => element.dataset.reviewSede)), ['Lima']);
+    assert.match(await page.$eval('[data-review-sede="Lima"]', element => element.textContent), /1\/6 con reporte C1 legible/);
     const calls = await page.evaluate(() => window.metricRequests);
     assert.ok(calls.length >= 2);
     assert.ok(calls.every(call => call.body === '{}' && call.token === 'Bearer synthetic-alpha'));

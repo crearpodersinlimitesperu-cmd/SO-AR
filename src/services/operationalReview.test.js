@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { latestTeamsBySede, buildOperationalReview } from './operationalReview.js';
-import { REPORT_SEDES } from './nodusReportModel.js';
+import { REPORT_SEDES, buildReportSources } from './nodusReportModel.js';
+import { projectPrivateReportSource } from '../../cloudflare-worker/src/privateNodusReportModel.js';
 import { operationalRole } from './nodusKpiDirectory.js';
 import { USERS_TO_IMPORT } from '../data/usersToImport.js';
 
@@ -79,4 +80,45 @@ test('official Fer/Paul identities retain CEO/CCO labels instead of gerencia def
     assert.equal(role.tabCategory, 'ejecutivo');
     assert.match(role.roleName, /CEO|CCO/);
   }
+});
+
+test('authorized aggregate sources preserve real rows and counts without exposing foreign calendars, stages or participants', () => {
+  const raw = { timestamp: new Date(now).toISOString(), equiposReporte: [
+    source('Lima', 1, 'C1', [{ grupoReporte: 'Nuevo', llamada1: 'Confirmado', nombre: 'RAW_PRIVATE' }]),
+    source('Quito', 1, 'C1', [{ grupoReporte: 'Nuevo', llamada1: 'Confirmado', nombre: 'FOREIGN_PERSON' }])
+  ] };
+  const sources = buildReportSources(raw);
+  const lima = sources.find(item => item.sede === 'Lima' && item.stage === 'C1');
+  const snapshot = { timestamp: raw.timestamp, authorizedSedes: ['Lima'], authorizedStages: ['C1'],
+    reportSources: [projectPrivateReportSource(lima, 'Lima', 'C1')] };
+  const events = [event('Lima', 1, '2026-10-01'), event('Quito', 1, '2026-10-01')];
+  const projected = buildOperationalReview(events, snapshot, now);
+  assert.deepEqual(projected.sedes.map(group => group.sede), ['Lima']);
+  assert.deepEqual(projected.sedes[0].teams[0].stages.map(stage => stage.stage), ['C1']);
+  assert.deepEqual(projected.sedes[0].teams[0].stages[0], buildOperationalReview(events, raw, now).sedes[0].teams[0].stages[0]);
+  assert.doesNotMatch(JSON.stringify(projected), /RAW_PRIVATE|FOREIGN|Quito/);
+});
+
+test('aggregate source evidence uses its own date and rejects duplicates or unknown cohorts instead of certifying zero', () => {
+  const events = [event('Lima', 1, '2026-10-01')];
+  const sources = buildReportSources({ timestamp: new Date(now).toISOString(), equiposReporte: [
+    source('Lima', 1, 'C1', [{ grupoReporte: 'Nuevo', llamada1: 'Confirmado' }]),
+    source('Lima', 1, 'C2', [{}])
+  ] }).filter(item => item.sede === 'Lima');
+  const review = reportSources => buildOperationalReview(events, {
+    timestamp: new Date(now).toISOString(), authorizedSedes: ['Lima'], reportSources
+  }, now).sedes[0].teams[0].stages;
+  assert.equal(review(sources)[0].confirmed, 1);
+  assert.equal(review(sources)[1].status, 'unclassified');
+  assert.equal(review(sources)[1].confirmed, null);
+  assert.equal(review([{ ...sources[0], sourceUpdatedAt: '2026-09-01' }])[0].status, 'stale');
+  assert.equal(review([sources[0], sources[0]])[0].status, 'duplicate');
+  assert.equal(review([{ ...sources[0], teams: [sources[0].teams[0], sources[0].teams[0]] }])[0].status, 'duplicate');
+  assert.equal(review([])[0].rows, null);
+  assert.throws(() => projectPrivateReportSource({
+    ...sources[0], teams: [{ ...sources[0].teams[0], rows: 5 }]
+  }, 'Lima', 'C1'), /total de filas/);
+  assert.throws(() => projectPrivateReportSource({
+    ...sources[0], teams: [{ ...sources[0].teams[0], sede: 'Quito' }]
+  }, 'Lima', 'C1'), /no verificable/);
 });

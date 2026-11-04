@@ -91,6 +91,7 @@ test('actual task context persists location, updates reminders and reads links; 
     plugins: [react(), {
       name: 'operational-fixture', enforce: 'pre',
       resolveId(id) {
+        if (id === './firebase') return '\0operational:../services/firebase';
         if (['./AuthContext', './UIContext', './CyclesContext'].includes(id)) {
           return `\0operational:../context/${id.slice(2)}`;
         }

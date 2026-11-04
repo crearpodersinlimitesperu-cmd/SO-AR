@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { db } from '../services/firebase';
-import { collection, addDoc, getDocs, getDoc, updateDoc, doc, query, where, orderBy, limit, onSnapshot } from 'firebase/firestore';
+import { collection, addDoc, getDocs, updateDoc, doc, query, where, orderBy, limit, onSnapshot } from 'firebase/firestore';
 import { useAuth } from '../context/AuthContext';
 import { useCycles } from '../context/CyclesContext';
 import { useUI } from '../context/UIContext';
@@ -15,6 +15,8 @@ import { OPERATIONAL_SEDES, normalizeSede } from '../data/usersData';
 import { calendarSede } from '../../functions-imo/calendarModel.mjs';
 import { callTotal, currentReportTeams, reportStages, reportSourceStatus, validCallCounts } from '../services/nodusReportModel.js';
 import { sendReportToGoogleChat, getGoogleChatWebhookConfig, saveGoogleChatWebhookConfig } from '../services/googleChatService';
+import { readPrivateNodusReportSources } from '../services/privateNodusSnapshot.js';
+import { privateViewKey } from '../utils/sessionPrivacy.js';
 
 // POOL MAESTRO DE 12 PREGUNTAS ROTATIVAS (NODUS & CAUSA OS V1.0)
 const POOL_PREGUNTAS = {
@@ -40,6 +42,9 @@ const POOL_PREGUNTAS = {
 
 export default function ReportesBoard() {
   const { currentUser } = useAuth();
+  const viewKey = privateViewKey(currentUser);
+  const viewScope = useRef(viewKey);
+  viewScope.current = viewKey;
   const { currentCycle, currentStage, events, loadingEvents } = useCycles();
   const { showToast } = useUI();
   const navigate = useNavigate();
@@ -114,10 +119,12 @@ export default function ReportesBoard() {
   const [reviewedCounts, setReviewedCounts] = useState(false);
   const nodusRequest = useRef(0);
   const allowedStages = reportStages(currentUser);
+  const preferredSede = calendarSede(currentUser?.sede);
+  const preferredStage = allowedStages[0] || '';
   const reportTargets = useMemo(() => currentReportTeams(events || [], reportSede, reportStage), [events, reportSede, reportStage]);
   const reportTarget = reportTargets.find(t => t.team === selectedNodusTeam) || (reportTargets.length === 1 ? reportTargets[0] : null);
   const sourceStatus = reportSourceStatus(nodusSource, reportTarget);
-  const isSimulation = Boolean(currentUser?.isSimulated || currentUser?.isSimulation);
+  const isSimulation = Boolean(currentUser?.isSimulated || currentUser?.isSimulation || currentUser?.isRoleSimulationActive);
 
   // Configuración de Webhook Google Chat
   const [showChatWebhookModal, setShowChatWebhookModal] = useState(false);
@@ -194,18 +201,20 @@ export default function ReportesBoard() {
 
   const handleExtraerDeNodus = async (teamOverride = null, unused = null, isSilent = false) => {
     const requestId = ++nodusRequest.current;
+    const isCurrent = () => requestId === nodusRequest.current && viewScope.current === viewKey;
     setLoadingNodus(true);
     setNodusStatusMsg('');
     setNodusSource(null);
     setFormData({});
     setReviewedCounts(false);
     try {
+      if (isSimulation) throw new Error('Las fuentes privadas requieren tu cuenta real, sin simulación.');
       if (!allowedStages.includes(reportStage) || (!canSwitchAnyCoord && calendarSede(currentUser?.sede) !== reportSede)) throw new Error('Sede o etapa no autorizada.');
       const targets = currentReportTeams(events || [], reportSede, reportStage);
       const target = targets.find(t => t.team === teamOverride) || (targets.length === 1 ? targets[0] : null);
-      const docSnap = await getDoc(doc(db, 'nodus_report_sources', `${reportSede}_${reportStage}`));
-      if (requestId !== nodusRequest.current) return;
-      const source = docSnap.exists() ? docSnap.data() : null;
+      const projection = await readPrivateNodusReportSources({ expectedUid: currentUser.uid, isCurrent });
+      if (!isCurrent()) return;
+      const source = projection.reportSources.find(source => source.sede === reportSede && source.stage === reportStage) || null;
       const result = reportSourceStatus(source, target);
       setNodusSource(source);
       setNodusEquiposDisponibles(targets);
@@ -214,12 +223,12 @@ export default function ReportesBoard() {
       if (!isSilent) showToast(result.message, result.ready ? 'success' : 'warning');
     } catch (e) {
       console.error("Error al extraer datos de Nodus:", e);
-      if (requestId === nodusRequest.current) {
-        setNodusStatusMsg('No se pudo leer Nodus. No se usará ningún respaldo histórico.');
-        showToast('Error al extraer datos de Nodus.', 'error');
+      if (isCurrent()) {
+        setNodusStatusMsg(`${e.message || 'No se pudo leer Nodus.'} No se usará ningún respaldo histórico.`);
+        showToast(e.message || 'Error al extraer datos de Nodus.', 'error');
       }
     } finally {
-      if (requestId === nodusRequest.current) setLoadingNodus(false);
+      if (isCurrent()) setLoadingNodus(false);
     }
   };
 
@@ -304,13 +313,13 @@ export default function ReportesBoard() {
 
   // Al cambiar de usuario, simulación o tipo de reporte, sincronizar datos de su sede
   useEffect(() => {
-    setReportSede(calendarSede(currentUser?.sede));
-    setReportStage(reportStages(currentUser)[0] || '');
+    setReportSede(preferredSede);
+    setReportStage(preferredStage);
     setFormData({});
     setNodusSource(null);
     setReviewedCounts(false);
     nodusRequest.current++;
-  }, [currentUser?.uid, currentUser?.sede, currentUser?.activeRole, currentUser?.appRole, currentUser?.role, currentUser?.isSimulated]);
+  }, [viewKey, preferredSede, preferredStage]);
 
   useEffect(() => {
     setSelectedNodusTeam('auto');

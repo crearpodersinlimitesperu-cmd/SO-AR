@@ -8,11 +8,11 @@ function fixture(fetchResult = async () => ({ ok: true, json: async () => ({ sna
   const auth = { currentUser: { uid: 'first', getIdToken: async () => 'synthetic-only' } };
   const source = readFileSync(new URL('../src/services/privateNodusSnapshot.js', import.meta.url), 'utf8')
     .replace(/^import .*;\r?$/gm, '').replace(/^export /gm, '').replace('import.meta.env', '{}');
-  const read = new Function('auth', 'fetch', `${source}\nreturn readPrivateNodusSnapshot;`)(auth, async (...args) => {
+  const readers = new Function('auth', 'fetch', `${source}\nreturn {read:readPrivateNodusSnapshot,readReports:readPrivateNodusReportSources};`)(auth, async (...args) => {
     requests.push(args);
     return fetchResult(...args);
   });
-  return { auth, requests, read };
+  return { auth, requests, ...readers };
 }
 test('private metrics client sends only Firebase identity, never role/sede and never queries aggregate Firestore', async () => {
   const { read, requests } = fixture();
@@ -66,6 +66,22 @@ test('effective viewer must match Auth and remain current even when the Auth UID
   stale.auth.currentUser.getIdToken = async () => { active = false; return 'synthetic-only'; };
   await assert.rejects(stale.read({ expectedUid: 'first', isCurrent: () => active }), /cuenta cambió/);
   assert.equal(stale.requests.length, 0);
+});
+test('private report client keeps the same account boundary and never requests arbitrary documents, roles or sites', async () => {
+  const snapshot = { reportSources: [], authorizedSedes: ['Lima'], authorizedStages: ['C1'], missingSources: ['Lima_C1'] };
+  const client = fixture(async () => ({ ok: true, json: async () => ({ snapshot }) }));
+  assert.deepEqual(await client.readReports({ expectedUid: 'first' }), snapshot);
+  assert.match(client.requests[0][0], /\/nodus-private-report-sources$/);
+  assert.equal(client.requests[0][1].body, '{}');
+  assert.equal(client.requests[0][1].cache, 'no-store');
+  await assert.rejects(client.readReports({ expectedUid: 'other' }), /cuenta cambió/);
+  const malformed = fixture();
+  await assert.rejects(malformed.readReports(), /reportes sin una proyección/);
+  for (const path of ['../src/components/OperationalReview.jsx', '../src/pages/ReportesBoard.jsx']) {
+    const source = readFileSync(new URL(path, import.meta.url), 'utf8');
+    assert.match(source, /(?:use|read)PrivateNodusReportSources\(/);
+    assert.doesNotMatch(source, /doc\(db, 'nodus_(?:coordinadores_c1c2|report_sources)'/);
+  }
 });
 test('Copilot explicitly reports unavailable private metrics instead of inventing zero discrepancies', () => {
   const source = readFileSync(new URL('../src/components/AICopilot.jsx', import.meta.url), 'utf8');

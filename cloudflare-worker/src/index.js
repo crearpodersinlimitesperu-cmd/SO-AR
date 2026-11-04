@@ -41,6 +41,7 @@ import { filterNodusSedes, hasNodusTeamAccess, nodusAccessScope, personalNodusEm
 import { findUserByAnyEmail } from '../../src/data/usersData.js';
 import { createPrivateChatHandler } from './privateChatHandler.js';
 import { createPrivateChatStore } from './privateChatStore.js';
+import { privateReportAccess, projectPrivateReportSource } from './privateNodusReportModel.js';
 
 const FIREBASE_PROJECT_ID = 'centro-operativo-cpsl';
 const FIREBASE_JWKS = createRemoteJWKSet(
@@ -155,12 +156,13 @@ const handlePrivateChat = createPrivateChatHandler({
   json
 });
 
-async function firestoreGet(path, accessToken) {
+async function firestoreGet(path, accessToken, { strict = false } = {}) {
   const url = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/${path}`;
   const resp = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
   if (resp.status === 404) return null;
   if (!resp.ok) {
     console.error('[askCopiloto] Error leyendo Firestore:', path, resp.status, await resp.text());
+    if (strict) throw new Error(`Firestore no disponible (${resp.status}).`);
     return null;
   }
   const data = await resp.json();
@@ -514,7 +516,7 @@ async function handlePrivateNodusSnapshot(request, env, origin) {
   }
   try {
     const token = await getServiceAccountAccessToken(env);
-    const profile = await firestoreGet(`users/${identity.sub}`, token);
+    const profile = await firestoreGet(`users/${identity.sub}`, token, { strict: true });
     if (!profile) return json({ error: 'permission-denied', message: 'No existe un perfil administrativo verificado.' }, 403, origin);
     let scope = callerNodusScope(profile, identity.email);
     if (scope.type === 'denied') return json({ error: 'permission-denied', message: 'No tienes un alcance Nodus autorizado.' }, 403, origin);
@@ -526,11 +528,11 @@ async function handlePrivateNodusSnapshot(request, env, origin) {
         return json({ error: 'permission-denied', message: 'Tu perfil contiene una identidad contradictoria; requiere revisión administrativa.' }, 403, origin);
       }
     }
-    const snapshot = await firestoreGet('nodus_kpis_sincronizados/latest_snapshot', token);
+    const snapshot = await firestoreGet('nodus_kpis_sincronizados/latest_snapshot', token, { strict: true });
     if (!snapshot) return json({ error: 'not-found', message: 'No hay métricas Nodus publicadas.' }, 404, origin);
     // This endpoint never returns raw sections or participant rosters, including to directors.
     const safe = scopedNodusContext(snapshot, scope.type === 'global' ? { type: 'metrics-global' } : scope);
-    const freshProfile = await firestoreGet(`users/${identity.sub}`, token);
+    const freshProfile = await firestoreGet(`users/${identity.sub}`, token, { strict: true });
     let freshScope = freshProfile ? callerNodusScope(freshProfile, identity.email) : { type: 'denied' };
     if (freshScope.type === 'general') {
       try {
@@ -547,6 +549,56 @@ async function handlePrivateNodusSnapshot(request, env, origin) {
   } catch (error) {
     console.error('[nodus-private-snapshot] Error de lectura:', error.message);
     return json({ error: 'unavailable', message: 'No se pudieron verificar las métricas privadas.' }, 503, origin);
+  }
+}
+
+async function handlePrivateNodusReportSources(request, env, origin) {
+  const header = request.headers.get('Authorization') || '';
+  if (!header.startsWith('Bearer ')) return json({ message: 'Inicia sesión para consultar reportes.' }, 401, origin);
+  let identity;
+  try {
+    identity = await verifyFirebaseToken(header.slice(7));
+  } catch {
+    return json({ message: 'La sesión expiró.' }, 401, origin);
+  }
+  try {
+    const body = await request.json();
+    if (!body || Array.isArray(body) || typeof body !== 'object' || Object.keys(body).length) {
+      return json({ message: 'El alcance de los reportes solo lo determina el servidor.' }, 400, origin);
+    }
+  } catch {
+    return json({ message: 'La solicitud de reportes no es válida.' }, 400, origin);
+  }
+  try {
+    const token = await getServiceAccountAccessToken(env);
+    const profile = await firestoreGet(`users/${identity.sub}`, token, { strict: true });
+    const access = profile && privateReportAccess(profile, callerNodusScope(profile, identity.email));
+    if (!access) return json({ message: 'No tienes sedes y etapas autorizadas para estos reportes.' }, 403, origin);
+    const missingSources = [];
+    const reports = await Promise.all(access.sedes.flatMap(sede => access.stages.map(async stage => {
+      const path = `nodus_report_sources/${sede}_${stage}`;
+      const source = await firestoreGet(path, token, { strict: true });
+      if (!source) {
+        missingSources.push(`${sede}_${stage}`);
+        return null;
+      }
+      return projectPrivateReportSource(source, sede, stage);
+    })));
+    const freshProfile = await firestoreGet(`users/${identity.sub}`, token, { strict: true });
+    const freshAccess = freshProfile && privateReportAccess(freshProfile, callerNodusScope(freshProfile, identity.email));
+    if (JSON.stringify(freshAccess) !== JSON.stringify(access)) {
+      return json({ message: 'Tu autorización cambió durante la consulta de reportes.' }, 403, origin);
+    }
+    const reportSources = reports.filter(Boolean);
+    if (!reportSources.length) return json({ message: 'No hay fuentes agregadas publicadas para tus sedes y etapas.' }, 404, origin);
+    const dates = reportSources.map(source => source.sourceUpdatedAt).filter(date => Number.isFinite(Date.parse(date))).sort();
+    return json({ snapshot: {
+      timestamp: dates[0] || null, authorizedSedes: access.sedes, authorizedStages: access.stages,
+      reportSources, missingSources: missingSources.sort()
+    } }, 200, origin);
+  } catch (error) {
+    console.error('[nodus-private-report-sources] Error de lectura:', error.message);
+    return json({ message: 'No se pudieron verificar los reportes autorizados; no se usarán padrones globales.' }, 503, origin);
   }
 }
 
@@ -909,6 +961,9 @@ export default {
     }
     if (url.pathname === '/nodus-private-snapshot') {
       return handlePrivateNodusSnapshot(request, env, origin);
+    }
+    if (url.pathname === '/nodus-private-report-sources') {
+      return handlePrivateNodusReportSources(request, env, origin);
     }
     if (url.pathname === '/copilot-private-history') {
       return handlePrivateChat(request, env, origin);

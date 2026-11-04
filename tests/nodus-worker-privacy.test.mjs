@@ -2,11 +2,13 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import * as model from '../cloudflare-worker/src/nodusJsonModel.js';
+import * as reportModel from '../cloudflare-worker/src/privateNodusReportModel.js';
+import { buildReportSources } from '../src/services/nodusReportModel.js';
 import { extractNodusMetrics } from '../src/services/nodusMetricsModel.js';
 import { createPrivateChatHandler } from '../cloudflare-worker/src/privateChatHandler.js';
 import { createPrivateChatStore } from '../cloudflare-worker/src/privateChatStore.js';
 
-function fixture({ profile, nextProfile = profile, tokenEmail = 'manager@example.invalid', snapshot, responseSede = 'Lima' }) {
+function fixture({ profile, nextProfile = profile, sources = {}, restFetcher, tokenEmail = 'manager@example.invalid', snapshot, responseSede = 'Lima' }) {
   const prompts = [];
   const paths = [];
   const source = readFileSync(new URL('../cloudflare-worker/src/index.js', import.meta.url), 'utf8')
@@ -23,26 +25,29 @@ function fixture({ profile, nextProfile = profile, tokenEmail = 'manager@example
   });
   const names = ['createRemoteJWKSet', 'notebookKnowledge', 'createNodusApiClient', 'NodusApiError', 'findUserByAnyEmail',
     'createPrivateChatHandler', 'createPrivateChatStore',
-    'fetch', ...Object.keys(model), 'fixtureProfile', 'fixtureNextProfile', 'fixtureSnapshot', 'fixtureEmail', 'fixturePaths'];
+    'fetch', ...Object.keys(model), ...Object.keys(reportModel),
+    'fixtureProfile', 'fixtureNextProfile', 'fixtureSnapshot', 'fixtureSources', 'fixtureRestReads', 'fixtureEmail', 'fixturePaths'];
   return {
     prompts, paths,
     ...new Function(...names, `${source}
       verifyFirebaseToken = async () => ({sub: 'synthetic-uid', email: fixtureEmail});
       getServiceAccountAccessToken = async () => 'synthetic-token';
       let profileReads = 0;
-      firestoreGet = async path => {
+      if (!fixtureRestReads) firestoreGet = async path => {
         fixturePaths.push(path);
-        return path.startsWith('users/') ? (profileReads++ ? fixtureNextProfile : fixtureProfile) : fixtureSnapshot;
+        return path.startsWith('users/') ? (profileReads++ ? fixtureNextProfile : fixtureProfile)
+          : path.startsWith('nodus_report_sources/') ? fixtureSources[path.split('/')[1]] || null : fixtureSnapshot;
       };
       firestoreAdd = async () => {};
-      return { handleNodusJson, handleNodusDataMap, handlePrivateNodusSnapshot, construirContextoNodus, callerNodusScope };
+      return { handleNodusJson, handleNodusDataMap, handlePrivateNodusSnapshot, handlePrivateNodusReportSources, construirContextoNodus, callerNodusScope };
     `)(() => ({}), '', createClient, class extends Error {},
       email => email === 'local@example.invalid' ? localIdentity : email === 'foreign@example.invalid' ? foreignIdentity : null,
       createPrivateChatHandler, createPrivateChatStore,
       async (_url, options) => {
+        if (restFetcher) return restFetcher(_url, options);
         prompts.push(JSON.parse(options.body));
         return { json: async () => ({ choices: [{ message: { content: 'Synthetic response' } }] }) };
-      }, ...Object.values(model), profile, nextProfile, snapshot, tokenEmail, paths)
+      }, ...Object.values(model), ...Object.values(reportModel), profile, nextProfile, snapshot, sources, Boolean(restFetcher), tokenEmail, paths)
   };
 }
 const request = body => new Request('https://example.invalid/nodus', {
@@ -58,6 +63,89 @@ const snapshot = {
 };
 const localIdentity = { email: 'local@example.invalid', emails: ['local@example.invalid', 'approved@example.invalid'] };
 const foreignIdentity = { email: 'foreign@example.invalid' };
+
+const reportSources = Object.fromEntries(buildReportSources({
+  timestamp: '2026-11-04T20:00:00Z',
+  equiposReporte: [
+    { equipoNombre: 'EQUIPO 31 LIMA C1', extractionComplete: true, participantes: [
+      { grupoReporte: 'Nuevo', llamada1: 'Confirmado', nombre: 'RAW_SECRET_PERSON' }
+    ] },
+    { equipoNombre: 'EQUIPO 31 QUITO C1', extractionComplete: true, participantes: [
+      { grupoReporte: 'Rezagado', llamada1: 'Confirmado', nombre: 'FOREIGN_PERSON' }
+    ] }
+  ]
+}).map(source => [`${source.sede}_${source.stage}`, { ...source, private: 'RAW_SECRET', participantes: ['RAW_SECRET_PERSON'] }]));
+
+test('report endpoint reads only authorized source documents and sends aggregate counts without rosters or extra fields', async () => {
+  const worker = fixture({ profile: { role: 'coord_c1', sede: 'Lima' }, sources: reportSources });
+  const response = await worker.handlePrivateNodusReportSources(request(), {}, 'https://example.invalid');
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get('Cache-Control'), 'no-store');
+  const result = await response.json();
+  assert.deepEqual(result.snapshot.authorizedSedes, ['Lima']);
+  assert.deepEqual(result.snapshot.authorizedStages, ['C1']);
+  assert.equal(result.snapshot.reportSources[0].teams[0].counts.nuevos_OK, 1);
+  assert.deepEqual(worker.paths.filter(path => !path.startsWith('users/')), ['nodus_report_sources/Lima_C1']);
+  assert.doesNotMatch(JSON.stringify(result), /RAW_SECRET|FOREIGN|Quito|participantes/);
+  const manager = fixture({ profile: { role: 'gerente', sede: 'Lima', roles: ['gerente'], roleSedes: { gerente: 'Quito' } }, sources: reportSources });
+  const dual = await (await manager.handlePrivateNodusReportSources(request(), {}, 'https://example.invalid')).json();
+  assert.deepEqual(dual.snapshot.authorizedSedes, ['Lima', 'Quito']);
+  assert.equal(dual.snapshot.reportSources.length, 4);
+  const director = fixture({ profile: { role: 'direccion' }, sources: reportSources });
+  const global = await (await director.handlePrivateNodusReportSources(request(), {}, 'https://example.invalid')).json();
+  assert.equal(global.snapshot.reportSources.length, 12);
+  assert.doesNotMatch(JSON.stringify(global), /RAW_SECRET|FOREIGN_PERSON|participantes/);
+});
+
+test('report endpoint denies client permissions, personal/inactive roles, scope revocation, absent and contradictory sources explicitly', async () => {
+  const worker = fixture({ profile: { role: 'gerente', sede: 'Lima' }, sources: reportSources });
+  assert.equal((await worker.handlePrivateNodusReportSources(request({ sede: 'Quito', role: 'direccion' }), {}, '')).status, 400);
+  assert.equal(worker.paths.length, 0);
+  for (const profile of [{ role: 'entrenador', sede: 'Lima' }, { role: 'gerente', sede: 'Lima', active: false }]) {
+    const denied = fixture({ profile, sources: reportSources });
+    assert.equal((await denied.handlePrivateNodusReportSources(request(), {}, '')).status, 403);
+    assert.equal(denied.paths.some(path => path.startsWith('nodus_')), false);
+  }
+  const revoked = fixture({ profile: { role: 'direccion' }, nextProfile: { role: 'gerente', sede: 'Lima' }, sources: reportSources });
+  assert.equal((await revoked.handlePrivateNodusReportSources(request(), {}, '')).status, 403);
+  const missing = fixture({ profile: { role: 'gerente', sede: 'Lima' } });
+  assert.equal((await missing.handlePrivateNodusReportSources(request(), {}, '')).status, 404);
+  const contradictory = fixture({ profile: { role: 'coord_c1', sede: 'Lima' },
+    sources: { Lima_C1: { ...reportSources.Lima_C1, sede: 'Quito' } } });
+  assert.equal((await contradictory.handlePrivateNodusReportSources(request(), {}, '')).status, 503);
+});
+
+test('real REST transport decodes report counters and fails explicitly instead of treating a Firestore outage as missing data', async () => {
+  const encode = value => value === null ? { nullValue: null }
+    : Array.isArray(value) ? { arrayValue: { values: value.map(encode) } }
+    : typeof value === 'object' ? { mapValue: { fields: Object.fromEntries(Object.entries(value).map(([key, item]) => [key, encode(item)])) } }
+    : typeof value === 'number' ? { integerValue: String(value) }
+    : typeof value === 'boolean' ? { booleanValue: value } : { stringValue: value };
+  const documents = {
+    'users/synthetic-uid': { role: 'coord_c1', sede: 'Lima' },
+    'nodus_report_sources/Lima_C1': reportSources.Lima_C1
+  };
+  const paths = [];
+  let unavailable = false;
+  const worker = fixture({ restFetcher: async (url, options) => {
+    assert.equal(options.method, undefined, 'this endpoint must never write operational documents');
+    const path = decodeURIComponent(new URL(url).pathname.split('/documents/')[1]);
+    paths.push(path);
+    if (unavailable) return Response.json({ error: 'synthetic unavailable' }, { status: 503 });
+    const document = documents[path];
+    return document ? Response.json({ fields: encode(document).mapValue.fields })
+      : Response.json({}, { status: 404 });
+  } });
+  const response = await worker.handlePrivateNodusReportSources(request(), {}, '');
+  assert.equal(response.status, 200);
+  const result = await response.json();
+  assert.equal(result.snapshot.reportSources[0].teams[0].counts.nuevos_OK, 1);
+  assert.doesNotMatch(JSON.stringify(result), /RAW_SECRET|FOREIGN|participantes/);
+  assert.deepEqual(paths, ['users/synthetic-uid', 'nodus_report_sources/Lima_C1', 'users/synthetic-uid']);
+  unavailable = true;
+  assert.equal((await worker.handlePrivateNodusReportSources(request(), {}, '')).status, 503);
+  assert.equal((await worker.handlePrivateNodusSnapshot(request(), {}, '')).status, 503);
+});
 
 test('private snapshot reauthorizes before response when a profile is revoked or moved during a source read', async () => {
   for (const nextProfile of [null, { role: 'gerente', sede: 'Quito' }, { role: 'gerente', sede: 'Lima', active: false }]) {

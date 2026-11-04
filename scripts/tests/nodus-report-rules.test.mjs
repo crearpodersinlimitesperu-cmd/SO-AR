@@ -21,13 +21,16 @@ beforeEach(async () => {
   });
 });
 const client = id => env.authenticatedContext(id, { email: `${id}@example.test` }).firestore();
-test('coordinators can read only their sede and stage, including filtered queries', async () => {
+test('raw Nodus sources are server-only even with a matching sede/stage query', async () => {
   const db = client('c1');
-  await assertSucceeds(getDoc(doc(db, 'nodus_report_sources', 'Lima_C1')));
+  await assertFails(getDoc(doc(db, 'nodus_report_sources', 'Lima_C1')));
   await assertFails(getDoc(doc(db, 'nodus_report_sources', 'Lima_C2')));
   await assertFails(getDoc(doc(db, 'nodus_report_sources', 'Quito_C1')));
   await assertFails(getDocs(collection(db, 'nodus_report_sources')));
-  await assertSucceeds(getDocs(query(collection(db, 'nodus_report_sources'), where('sede', '==', 'Lima'), where('stage', '==', 'C1'))));
+  await assertFails(getDocs(query(collection(db, 'nodus_report_sources'), where('sede', '==', 'Lima'), where('stage', '==', 'C1'))));
+});
+test('submitted call reports retain authorized sede/stage queries without cross-sede reads', async () => {
+  const db = client('c1');
   await assertSucceeds(getDocs(query(collection(db, 'reports'), where('type', '==', 'Llamadas'), where('sede', '==', 'Lima'), where('stage', '==', 'C1'))));
   await assertFails(getDocs(collection(db, 'reports')));
   await assertFails(getDoc(doc(db, 'reports', 'Lima_C2')));
@@ -40,10 +43,11 @@ test('writes cannot spoof sede, stage, sender or source; clients cannot overwrit
   for (const change of [{ sede: 'Quito' }, { stage: 'C2' }, { submitted_by_email: 'other@example.test' }, { team_number: '' }, { source: 'fake' }]) await assertFails(setDoc(doc(db, 'reports', 'spoof'), { ...report, ...change }));
   await assertFails(setDoc(doc(db, 'nodus_report_sources', 'Lima_C1'), { sede: 'Lima', stage: 'C1', teams: [] }));
 });
-test('C2 is not blocked, admin reads all, anonymous and unassigned users are denied', async () => {
-  await assertSucceeds(getDoc(doc(client('c2'), 'nodus_report_sources', 'Lima_C2')));
+test('C2 and admin retain submitted reports, but no browser or anonymous account reads raw sources', async () => {
+  await assertSucceeds(getDoc(doc(client('c2'), 'reports', 'Lima_C2')));
+  await assertFails(getDoc(doc(client('c2'), 'nodus_report_sources', 'Lima_C2')));
   const admin = env.authenticatedContext('admin', { email: 'jose.sanchez@crearpsl.net' }).firestore();
-  await assertSucceeds(getDocs(collection(admin, 'nodus_report_sources')));
+  await assertFails(getDocs(collection(admin, 'nodus_report_sources')));
   await assertSucceeds(getDocs(collection(admin, 'reports')));
   await assertFails(getDoc(doc(client('unknown'), 'nodus_report_sources', 'Lima_C1')));
   await assertFails(getDoc(doc(env.unauthenticatedContext().firestore(), 'nodus_report_sources', 'Lima_C1')));
@@ -52,5 +56,6 @@ test('manager views remain scoped to their own sede and source writes stay forbi
   const db = client('manager');
   await assertSucceeds(getDocs(query(collection(db, 'reports'), where('sede', '==', 'Lima'))));
   await assertFails(getDoc(doc(db, 'reports', 'Quito_C1')));
+  await assertFails(getDoc(doc(db, 'nodus_report_sources', 'Lima_C1')));
   await assertFails(setDoc(doc(db, 'nodus_report_sources', 'Lima_C2'), { sede: 'Lima', stage: 'C2' }));
 });

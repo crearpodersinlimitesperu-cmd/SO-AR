@@ -1,6 +1,6 @@
 import { auth } from './firebase';
 
-export async function readPrivateNodusSnapshot({ expectedUid, isCurrent = () => true } = {}) {
+async function readPrivateNodusProjection(path, { expectedUid, isCurrent = () => true } = {}) {
   const owner = auth.currentUser;
   if (!owner?.uid) throw new Error('Debes iniciar sesión para verificar tus métricas.');
   const assertCurrent = () => {
@@ -12,7 +12,7 @@ export async function readPrivateNodusSnapshot({ expectedUid, isCurrent = () => 
   const token = await owner.getIdToken();
   assertCurrent();
   const base = import.meta.env.VITE_COPILOTO_WORKER_URL || 'https://so-ar-copiloto.crearpsl-cpsl.workers.dev';
-  const response = await fetch(`${base.replace(/\/$/, '')}/nodus-private-snapshot`, {
+  const response = await fetch(`${base.replace(/\/$/, '')}/${path}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
     body: '{}', cache: 'no-store', signal: AbortSignal.timeout(15000)
@@ -21,9 +21,23 @@ export async function readPrivateNodusSnapshot({ expectedUid, isCurrent = () => 
   const result = await response.json();
   assertCurrent();
   if (!response.ok) throw new Error(result.message || `No se pudieron verificar las métricas (${response.status}).`);
-  if (!result.snapshot || !Array.isArray(result.snapshot.coordinadores) ||
-      !Array.isArray(result.snapshot.sedes) || !Array.isArray(result.snapshot.equiposSummary)) {
+  return result.snapshot;
+}
+
+export async function readPrivateNodusSnapshot(options) {
+  const snapshot = await readPrivateNodusProjection('nodus-private-snapshot', options);
+  if (!snapshot || !Array.isArray(snapshot.coordinadores) ||
+      !Array.isArray(snapshot.sedes) || !Array.isArray(snapshot.equiposSummary)) {
     throw new Error('El servidor devolvió métricas sin una proyección privada válida.');
   }
-  return result.snapshot;
+  return snapshot;
+}
+
+export async function readPrivateNodusReportSources(options) {
+  const snapshot = await readPrivateNodusProjection('nodus-private-report-sources', options);
+  if (!snapshot || !Array.isArray(snapshot.reportSources) || !Array.isArray(snapshot.authorizedSedes) ||
+      !Array.isArray(snapshot.authorizedStages) || !Array.isArray(snapshot.missingSources)) {
+    throw new Error('El servidor devolvió reportes sin una proyección privada válida.');
+  }
+  return snapshot;
 }

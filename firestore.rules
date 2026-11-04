@@ -616,8 +616,7 @@ service cloud.firestore {
     }
 
     match /nodus_report_sources/{sourceId} {
-      allow read: if isAuthenticated() && reportScopeAllowed(resource.data);
-      allow write: if false;
+      allow read, write: if false;
     }
 
     // REPORTS

@@ -431,6 +431,52 @@ afirmar aislamiento completo. Las alertas estéticas de bordes y transición CSS
 preexistentes se dejaron fuera de este cambio de privacidad; no se añadieron
 supresiones de reglas de diseño.
 
+## Continuación: revisión operativa y fuentes de llamadas solo servidor
+
+OperationalReview ya no descarga `nodus_coordinadores_c1c2/latest`.
+Consume conteos de `nodus_report_sources` mediante un nuevo endpoint:
+`cloudflare-worker/src/index.js:555`, `/nodus-private-report-sources`.
+El formulario de llamadas en Reportes usa el mismo servicio
+(`src/pages/ReportesBoard.jsx:215`); no accede directamente al documento.
+Después de migrar ambos consumidores se niega **toda** lectura/escritura desde
+el navegador a `nodus_report_sources` (`firestore.rules:618`), incluyendo
+SuperAdmin. Los publicadores administrativos no cambian.
+
+El servidor deriva sede y etapas de los permisos administrativos, no del
+formulario. `privateNodusReportModel.js:4` conserva sedes duales y Dirección
+global, limita coordinaciones C1/C2 a sus etapas y deniega perfiles personales
+o inactivos. Solo lee las rutas autorizadas, nunca el padrón raíz. Relee el
+perfil antes de responder, cancela revocaciones y elimina campos adicionales
+aunque estén presentes en la fuente. `privateNodusReportModel.js:16` comprueba
+sede + etapa + equipo, conteos enteros, filas y suma de estados; no transforma
+fuentes inconsistentes en cero.
+
+La revisión limita sus grupos del calendario a las sedes/etapas autorizadas,
+conserva los conteos de su fuente sin participantes y evalúa cada fecha por
+separado. Fuentes duplicadas, antiguas, incompletas, ausentes o sin cohorte no
+certifican cobertura. Una etapa C1 autorizada no se etiqueta como cobertura
+de C1 **y** C2. Los errores de transporte REST son 503 explícitos, no ausencia
+de documentos; una fuente inexistente no activa respaldo crudo o histórico.
+Las vistas siguen descartando respuestas de otro alcance/cuenta y la
+simulación no consulta estos datos reales.
+
+Verificación: **69 privacidad, 17 operativas, 19 de reportes Nodus y 18 de
+Nodus JSON correctas**; **32 pruebas de reglas correctas en emuladores
+`demo-*`**, con lecturas legítimas de reportes enviados y denegación de todas
+las fuentes crudas, incluso consultas por sede/etapa y SuperAdmin. Chromium
+real muestra únicamente Lima/C1 aun con un calendario sintético de Quito
+presente; el transporte real REST decodifica sus conteos, hace solo GET
+y falla explícitamente ante una caída. Build directo Vite y Worker ESM
+correctos. La regresión general vuelve a **245/248**, solo los tres fallos
+preexistentes de ayuda Managers y cartas-sedes. No se desplegó ninguna regla
+ni endpoint.
+
+Este cierre parcial reemplaza el pendiente de OperationalReview y del acceso
+directo a fuentes de llamadas citado en la continuación anterior. **No cierra
+los otros tipos de `reports`, los snapshots globales ni sus demás lectores,
+GoalsBoard, participantes o los catálogos estáticos.** No se certifica el
+incidente completo.
+
 ## Auditoría y reparación de datos: procedimiento, no ejecutado
 
 No se conocen documentos corruptos confirmados. No sería correcto inventar IDs,
