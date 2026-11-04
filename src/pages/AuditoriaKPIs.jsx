@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
 import { useTheme } from '../context/ThemeContext';
-import { collection, getDocs, getDoc, updateDoc, doc, query, orderBy, limit } from 'firebase/firestore';
+import { collection, getDocs, getDoc, updateDoc, doc, query, where, orderBy, limit } from 'firebase/firestore';
 import { db, auth, getDocResilient } from '../services/firebase';
 import { CheckCircle2, AlertCircle, ArrowLeft, Users, Target, PhoneCall } from 'lucide-react';
 import CountryFlag from '../components/CountryFlag';
@@ -17,6 +17,7 @@ import ZenModeSelector from '../components/ZenModeSelector';
 import OperationalReview from '../components/OperationalReview';
 import { canReadKpiReport } from '../utils/privacyScope.js';
 import { privateKpiQuery } from '../services/privacyQueries.js';
+import { NON_PULSE_REPORT_TYPES } from '../services/pulsePrivacy.js';
 
 export default function AuditoriaKPIs({ defaultTab }) {
   const { currentUser } = useAuth();
@@ -373,7 +374,7 @@ export default function AuditoriaKPIs({ defaultTab }) {
 
       // 1. Cargar reportes operativos reales enviados desde el Centro de Reportes (Firestore 'reports')
       try {
-        const reportsSnap = await getDocs(query(collection(db, 'reports'), orderBy('created_at', 'desc'), limit(500)));
+        const reportsSnap = await getDocs(query(collection(db, 'reports'), where('type', 'in', NON_PULSE_REPORT_TYPES), orderBy('created_at', 'desc'), limit(500)));
         reportsSnap.docs.forEach(docSnap => {
           const r = docSnap.data();
           const data = r.data || {};

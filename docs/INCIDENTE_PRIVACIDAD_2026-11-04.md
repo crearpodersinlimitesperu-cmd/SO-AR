@@ -477,6 +477,72 @@ los otros tipos de `reports`, los snapshots globales ni sus demás lectores,
 GoalsBoard, participantes o los catálogos estáticos.** No se certifica el
 incidente completo.
 
+## Continuación: Micro-Pulso, política provisional pendiente de confirmar
+
+**No es una decisión confirmada del usuario.** Ante la falta de respuesta, el
+coordinador eligió provisionalmente: gerentes solo reciben agregados de sus
+sedes; las respuestas individuales quedan para autor y Dirección/SuperAdmin.
+La confirmación del usuario sigue pendiente, antes de publicar esta política.
+No se ejecutó despliegue, migración ni eliminación.
+
+La regla anterior de `reports` permitía a cualquier autenticado leer todos los
+tipos distintos de Llamadas. `ReportesBoard` consultaba globalmente
+`MicroPulsoStaff` y mostraba texto libre en el buzón Trim & Stack; GoalsBoard y
+AuditoriaKPIs también solicitaban la colección completa. Son vías reproducibles
+de exposición, **no una atribución del caso reportado**.
+
+Cambios:
+
+- `firestore.rules:622-685` separa la política de Micro-Pulso: autor por UID,
+  email administrativo solo para legacy sin UID, Dirección y actividad vigente.
+  Un email coincidente no vence un UID contradictorio. Nuevos envíos acreditan
+  autor UID/email y sede, también en `data.staff_id`/`data.sede_id`; no se puede
+  reetiquetar un reporte para eludir su protección. Gerencia no lee, modifica
+  ni elimina respuestas individuales, tampoco de su propia sede.
+- `cloudflare-worker/src/index.js:556` y `privatePulseModel.js` incorporan
+  `/private-pulse-summary`, con Firebase verificado, perfil fresco y alcance
+  gerencial administrativo. Ejecuta `runAggregationQuery` con **count**, tipo
+  Micro-Pulso y sedes exactas; ni siquiera descarga respuestas individuales.
+  No hereda para este agregado una sede otorgada solo a otro rol coordinador.
+  Admite aliases históricos exactos de las seis sedes; devuelve solo conteo
+  total y sedes autorizadas. Reautoriza antes de responder, con errores
+  explícitos y sin convertir fallos o formatos desconocidos en cero.
+- `src/pages/ReportesBoard.jsx:100-120` vincula borradores, respuestas y agregado
+  a la identidad/alcance vigente. La pantalla real de Chromium prueba retirada
+  de Dirección en el mismo UID, cambio de cuenta, respuesta tardía y borrador
+  no enviado. La descarga individual de Dirección requiere servidor, no caché.
+  `googleChatService.js:168` bloquea Micro-Pulso antes de consultar el webhook;
+  no se comunica la identidad del autor al canal compartido.
+- Los tres lectores de reportes usan los tipos operativos explícitos de
+  `src/services/pulsePrivacy.js`, sin Micro-Pulso en feeds/metas/auditoría.
+  Se mantienen los siete tipos escritos por los productores actuales. Tipos
+  legacy desconocidos requieren inventario, no se borran ni reclasifican.
+  Esto **no cierra la autorización amplia de los otros tipos de `reports`**.
+
+**Reversibilidad acotada:** la política está separada en
+`isPulseDirection`/`canReadIndividualPulse`, el lector individual del dashboard y
+la consulta de agregado. Si el usuario confirma que gerentes deben leer respuestas
+individuales de sus sedes, un cambio específico puede conceder ese alcance en
+reglas y consultas y actualizar sus pruebas negativas, sin migrar ni reescribir
+respuestas. No basta habilitar un botón ni restaurar lectura global para cualquier
+autenticado. Identidad, inactividad y límites entre sedes se deben conservar.
+
+Validación de esta continuación: **74 privacidad, 35 emulador, 17 operativas y
+18 JSON correctas**; build directo Vite y Worker ESM correctos.
+`npm test`: **245/248**, exclusivamente ayuda Managers y dos cartas-sedes del
+baseline. `test:managers`: 33 correctas, un fallo conocido de managerSyncPolicy y
+dos omitidas sin emulador; los casos de reglas sí se ejecutaron con el emulador.
+Se añadieron índices de reportes en `firestore.indexes.json`: el emulador prueba
+autorización, no acredita que esos índices estén disponibles en producción.
+Los índices y endpoint deben estar operativos antes del frontend/reglas, dentro
+de una futura publicación explícitamente autorizada.
+
+Los avisos de diseño sobre bordes/animaciones preexistentes no son defectos de
+aislamiento y se dejan fuera del incidente, sin suprimir sus reglas.
+Permanecen los bloqueadores anteriores: otros reportes, lectores globales Nodus,
+catálogos estáticos, aprovisionamiento/auditoría administrativa y evidencia de
+la cuenta/ruta afectada. **No se declara terminado el incidente.**
+
 ## Auditoría y reparación de datos: procedimiento, no ejecutado
 
 No se conocen documentos corruptos confirmados. No sería correcto inventar IDs,

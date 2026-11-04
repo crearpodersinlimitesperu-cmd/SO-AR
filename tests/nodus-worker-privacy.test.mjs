@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import * as model from '../cloudflare-worker/src/nodusJsonModel.js';
 import * as reportModel from '../cloudflare-worker/src/privateNodusReportModel.js';
+import * as pulseModel from '../cloudflare-worker/src/privatePulseModel.js';
 import { buildReportSources } from '../src/services/nodusReportModel.js';
 import { extractNodusMetrics } from '../src/services/nodusMetricsModel.js';
 import { createPrivateChatHandler } from '../cloudflare-worker/src/privateChatHandler.js';
@@ -25,7 +26,7 @@ function fixture({ profile, nextProfile = profile, sources = {}, restFetcher, to
   });
   const names = ['createRemoteJWKSet', 'notebookKnowledge', 'createNodusApiClient', 'NodusApiError', 'findUserByAnyEmail',
     'createPrivateChatHandler', 'createPrivateChatStore',
-    'fetch', ...Object.keys(model), ...Object.keys(reportModel),
+    'fetch', ...Object.keys(model), ...Object.keys(reportModel), ...Object.keys(pulseModel),
     'fixtureProfile', 'fixtureNextProfile', 'fixtureSnapshot', 'fixtureSources', 'fixtureRestReads', 'fixtureEmail', 'fixturePaths'];
   return {
     prompts, paths,
@@ -39,7 +40,7 @@ function fixture({ profile, nextProfile = profile, sources = {}, restFetcher, to
           : path.startsWith('nodus_report_sources/') ? fixtureSources[path.split('/')[1]] || null : fixtureSnapshot;
       };
       firestoreAdd = async () => {};
-      return { handleNodusJson, handleNodusDataMap, handlePrivateNodusSnapshot, handlePrivateNodusReportSources, construirContextoNodus, callerNodusScope };
+      return { handleNodusJson, handleNodusDataMap, handlePrivateNodusSnapshot, handlePrivateNodusReportSources, handlePrivatePulseSummary, construirContextoNodus, callerNodusScope };
     `)(() => ({}), '', createClient, class extends Error {},
       email => email === 'local@example.invalid' ? localIdentity : email === 'foreign@example.invalid' ? foreignIdentity : null,
       createPrivateChatHandler, createPrivateChatStore,
@@ -47,7 +48,7 @@ function fixture({ profile, nextProfile = profile, sources = {}, restFetcher, to
         if (restFetcher) return restFetcher(_url, options);
         prompts.push(JSON.parse(options.body));
         return { json: async () => ({ choices: [{ message: { content: 'Synthetic response' } }] }) };
-      }, ...Object.values(model), ...Object.values(reportModel), profile, nextProfile, snapshot, sources, Boolean(restFetcher), tokenEmail, paths)
+      }, ...Object.values(model), ...Object.values(reportModel), ...Object.values(pulseModel), profile, nextProfile, snapshot, sources, Boolean(restFetcher), tokenEmail, paths)
   };
 }
 const request = body => new Request('https://example.invalid/nodus', {
@@ -75,6 +76,80 @@ const reportSources = Object.fromEntries(buildReportSources({
     ] }
   ]
 }).map(source => [`${source.sede}_${source.stage}`, { ...source, private: 'RAW_SECRET', participantes: ['RAW_SECRET_PERSON'] }]));
+
+test('pulse aggregation validates the real REST result and never converts malformed/missing results into zero', () => {
+  const result = raw => [{ result: { aggregateFields: { reportCount: { integerValue: raw } } } }];
+  assert.equal(pulseModel.decodePulseCount(result('0')), 0);
+  for (const raw of [null, 0, '1.2', '-1', 'Infinity', '9007199254740992']) {
+    assert.throws(() => pulseModel.decodePulseCount(result(raw)), /no verificable/);
+  }
+  assert.throws(() => pulseModel.decodePulseCount([]), /no verificable/);
+  assert.throws(() => pulseModel.pulseCountQuery('Foreign'), /no autorizada/);
+  assert.deepEqual(pulseModel.privatePulseAccess({ role: 'socio' }, { type: 'global' }).sedes.length, 6);
+});
+
+test('Micro-Pulso endpoint requests counts only, restricts assigned managerial sedes and rechecks authorization', async () => {
+  const calls = [];
+  let profile = { role: 'gerente', sede: 'Lima', roles: ['gerente', 'coord_c1'], roleSedes: { coord_c1: 'Quito' } };
+  let reads = 0;
+  let revoked = false;
+  let malformed = false;
+  let outage = false;
+  const worker = fixture({ restFetcher: async (url, options) => {
+    calls.push({ url, options });
+    if (url.includes('/users/')) {
+      reads++;
+      const current = revoked && reads > 1 ? { ...profile, active: false } : profile;
+      return Response.json({ fields: Object.fromEntries(Object.entries(current).map(([key, value]) => [key,
+        typeof value === 'string' ? { stringValue: value } : typeof value === 'boolean' ? { booleanValue: value }
+          : Array.isArray(value) ? { arrayValue: { values: value.map(stringValue => ({ stringValue })) } }
+            : { mapValue: { fields: Object.fromEntries(Object.entries(value).map(([name, stringValue]) => [name, { stringValue }])) } }
+      ])) });
+    }
+    assert.match(url, /documents:runAggregationQuery$/);
+    if (outage) return new Response('synthetic unavailable', { status: 503 });
+    return Response.json(malformed ? [] : [{ result: { aggregateFields: { reportCount: { integerValue: '7' } } } }]);
+  } });
+  let response = await worker.handlePrivatePulseSummary(request(), {}, '');
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), { snapshot: { authorizedSedes: ['Lima'], reportCount: 7 } });
+  let aggregations = calls.filter(call => call.options.method === 'POST');
+  assert.equal(aggregations.length, 1);
+  assert.equal(aggregations[0].options.body, JSON.stringify(pulseModel.pulseCountQuery('Lima')));
+  assert.doesNotMatch(aggregations[0].options.body, /Quito|submitted_by|trimAndStack|respuestas/);
+  assert.equal(response.headers.get('Cache-Control'), 'no-store');
+  const before = calls.length;
+  assert.equal((await worker.handlePrivatePulseSummary(request({ sede: 'Quito' }), {}, '')).status, 400);
+  assert.equal((await worker.handlePrivatePulseSummary(new Request('https://example.invalid', { method: 'POST', body: '{}' }), {}, '')).status, 401);
+  assert.equal(calls.length, before);
+  profile = { role: 'gerente', sede: 'Lima', roleSedes: { gerente: 'Quito' } };
+  calls.length = 0;
+  response = await worker.handlePrivatePulseSummary(request(), {}, '');
+  assert.deepEqual((await response.json()).snapshot, { authorizedSedes: ['Lima', 'Quito'], reportCount: 14 });
+  for (const denied of [{ role: 'staff', sede: 'Lima' }, { role: 'gerente', sede: 'Lima', active: false },
+    { role: 'gerente', sede: 'Lima', uid: 'foreign-uid' }]) {
+    profile = denied;
+    calls.length = 0;
+    assert.equal((await worker.handlePrivatePulseSummary(request(), {}, '')).status, 403);
+    assert.equal(calls.some(call => call.options.method === 'POST'), false);
+  }
+  profile = { role: 'gerente', sede: 'Lima' };
+  revoked = true; reads = 0;
+  assert.equal((await worker.handlePrivatePulseSummary(request(), {}, '')).status, 403);
+  revoked = false; malformed = true;
+  assert.equal((await worker.handlePrivatePulseSummary(request(), {}, '')).status, 503);
+  malformed = false;
+  outage = true;
+  response = await worker.handlePrivatePulseSummary(request(), {}, '');
+  assert.equal(response.status, 503);
+  assert.equal((await response.json()).snapshot, undefined);
+  outage = false;
+  profile = { role: 'direccion' };
+  calls.length = 0;
+  assert.equal((await worker.handlePrivatePulseSummary(request(), {}, '')).status, 200);
+  aggregations = calls.filter(call => call.options.method === 'POST');
+  assert.equal(aggregations.length, 6);
+});
 
 test('report endpoint reads only authorized source documents and sends aggregate counts without rosters or extra fields', async () => {
   const worker = fixture({ profile: { role: 'coord_c1', sede: 'Lima' }, sources: reportSources });

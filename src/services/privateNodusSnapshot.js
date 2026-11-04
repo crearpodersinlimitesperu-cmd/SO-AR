@@ -41,3 +41,12 @@ export async function readPrivateNodusReportSources(options) {
   }
   return snapshot;
 }
+
+export async function readPrivatePulseSummary(options) {
+  const snapshot = await readPrivateNodusProjection('private-pulse-summary', options);
+  if (!snapshot || !Array.isArray(snapshot.authorizedSedes) ||
+      !Number.isSafeInteger(snapshot.reportCount) || snapshot.reportCount < 0) {
+    throw new Error('El servidor devolvió un agregado de Micro-Pulso no verificable.');
+  }
+  return snapshot;
+}

@@ -42,6 +42,7 @@ import { findUserByAnyEmail } from '../../src/data/usersData.js';
 import { createPrivateChatHandler } from './privateChatHandler.js';
 import { createPrivateChatStore } from './privateChatStore.js';
 import { privateReportAccess, projectPrivateReportSource } from './privateNodusReportModel.js';
+import { privatePulseAccess, pulseCountQuery, decodePulseCount } from './privatePulseModel.js';
 
 const FIREBASE_PROJECT_ID = 'centro-operativo-cpsl';
 const FIREBASE_JWKS = createRemoteJWKSet(
@@ -552,6 +553,51 @@ async function handlePrivateNodusSnapshot(request, env, origin) {
   }
 }
 
+async function handlePrivatePulseSummary(request, env, origin) {
+  const header = request.headers.get('Authorization') || '';
+  let identity;
+  try {
+    if (!header.startsWith('Bearer ')) throw new Error('Missing token');
+    identity = await verifyFirebaseToken(header.slice(7));
+  } catch {
+    return json({ message: 'Inicia sesión para consultar Micro-Pulso.' }, 401, origin);
+  }
+  try {
+    const body = await request.json();
+    if (!body || Array.isArray(body) || typeof body !== 'object' || Object.keys(body).length) {
+      return json({ message: 'El servidor determina las sedes de Micro-Pulso.' }, 400, origin);
+    }
+  } catch {
+    return json({ message: 'La solicitud de Micro-Pulso no es válida.' }, 400, origin);
+  }
+  try {
+    const token = await getServiceAccountAccessToken(env);
+    const accessFor = profile => profile && (profile.uid === undefined || profile.uid === identity.sub)
+      ? privatePulseAccess(profile, callerNodusScope(profile, identity.email),
+        SUPER_ADMIN_EMAILS_WORKER.includes(String(identity.email || '').trim().toLowerCase())) : null;
+    const access = accessFor(await firestoreGet(`users/${identity.sub}`, token, { strict: true }));
+    if (!access) return json({ message: 'No tienes sedes gerenciales autorizadas para Micro-Pulso.' }, 403, origin);
+    const counts = await Promise.all(access.sedes.map(async sede => {
+      const response = await fetch(`https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents:runAggregationQuery`, {
+        method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(pulseCountQuery(sede))
+      });
+      if (!response.ok) throw new Error(`Firestore no pudo contar Micro-Pulso (${response.status}).`);
+      return decodePulseCount(await response.json());
+    }));
+    const freshAccess = accessFor(await firestoreGet(`users/${identity.sub}`, token, { strict: true }));
+    if (JSON.stringify(freshAccess) !== JSON.stringify(access)) {
+      return json({ message: 'Tu autorización cambió durante la consulta de Micro-Pulso.' }, 403, origin);
+    }
+    const reportCount = counts.reduce((total, count) => total + count, 0);
+    if (!Number.isSafeInteger(reportCount)) throw new Error('Conteo agregado fuera de rango.');
+    return json({ snapshot: { authorizedSedes: access.sedes, reportCount } }, 200, origin);
+  } catch (error) {
+    console.error('[private-pulse-summary] Error de lectura:', error.message);
+    return json({ message: 'No se pudo verificar el agregado de Micro-Pulso.' }, 503, origin);
+  }
+}
+
 async function handlePrivateNodusReportSources(request, env, origin) {
   const header = request.headers.get('Authorization') || '';
   if (!header.startsWith('Bearer ')) return json({ message: 'Inicia sesión para consultar reportes.' }, 401, origin);
@@ -961,6 +1007,9 @@ export default {
     }
     if (url.pathname === '/nodus-private-snapshot') {
       return handlePrivateNodusSnapshot(request, env, origin);
+    }
+    if (url.pathname === '/private-pulse-summary') {
+      return handlePrivatePulseSummary(request, env, origin);
     }
     if (url.pathname === '/nodus-private-report-sources') {
       return handlePrivateNodusReportSources(request, env, origin);

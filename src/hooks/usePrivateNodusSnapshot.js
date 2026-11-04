@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { privateViewKey } from '../utils/sessionPrivacy.js';
-import { readPrivateNodusSnapshot, readPrivateNodusReportSources } from '../services/privateNodusSnapshot.js';
+import { readPrivateNodusSnapshot, readPrivateNodusReportSources, readPrivatePulseSummary } from '../services/privateNodusSnapshot.js';
 
 function usePrivateNodusProjection(read, { enabled = true, revision = 0 } = {}) {
   const { currentUser } = useAuth();
@@ -46,4 +46,8 @@ export default function usePrivateNodusSnapshot(options) {
 
 export function usePrivateNodusReportSources(options) {
   return usePrivateNodusProjection(readPrivateNodusReportSources, options);
+}
+
+export function usePrivatePulseSummary(options) {
+  return usePrivateNodusProjection(readPrivatePulseSummary, options);
 }

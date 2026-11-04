@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { db } from '../services/firebase';
-import { collection, addDoc, getDocs, updateDoc, doc, query, where, orderBy, limit, onSnapshot } from 'firebase/firestore';
+import { collection, addDoc, getDocs, getDocsFromServer, updateDoc, doc, query, where, orderBy, limit, onSnapshot } from 'firebase/firestore';
 import { useAuth } from '../context/AuthContext';
 import { useCycles } from '../context/CyclesContext';
 import { useUI } from '../context/UIContext';
@@ -17,6 +17,8 @@ import { callTotal, currentReportTeams, reportStages, reportSourceStatus, validC
 import { sendReportToGoogleChat, getGoogleChatWebhookConfig, saveGoogleChatWebhookConfig } from '../services/googleChatService';
 import { readPrivateNodusReportSources } from '../services/privateNodusSnapshot.js';
 import { privateViewKey } from '../utils/sessionPrivacy.js';
+import { NON_PULSE_REPORT_TYPES, canReadIndividualPulse } from '../services/pulsePrivacy.js';
+import { usePrivatePulseSummary } from '../hooks/usePrivateNodusSnapshot.js';
 
 // POOL MAESTRO DE 12 PREGUNTAS ROTATIVAS (NODUS & CAUSA OS V1.0)
 const POOL_PREGUNTAS = {
@@ -95,11 +97,26 @@ export default function ReportesBoard() {
 
   // Micro-pulso state (selección aleatoria de 3 preguntas)
   const [pulsoQuestions, setPulsoQuestions] = useState([]);
-  const [pulsoRespuestas, setPulsoRespuestas] = useState({});
+  const [pulseDraft, setPulseDraft] = useState({ owner: viewKey, answers: {} });
+  const pulsoRespuestas = pulseDraft.owner === viewKey ? pulseDraft.answers : {};
+  const setPulsoRespuestas = next => setPulseDraft(previous => ({
+    owner: viewKey,
+    answers: typeof next === 'function' ? next(previous.owner === viewKey ? previous.answers : {}) : next
+  }));
 
   // Dashboard de evolución state
-  const [relampagoReports, setRelampagoReports] = useState([]);
-  const [pulsoReports, setPulsoReports] = useState([]);
+  const [storedRelampagoReports, setRelampagoReports] = useState([]);
+  const [storedPulsoReports, setPulsoReports] = useState([]);
+  const [dashboardOwner, setDashboardOwner] = useState('');
+  const [dashboardError, setDashboardError] = useState('');
+  const dashboardGeneration = useRef(0);
+  const relampagoReports = dashboardOwner === viewKey ? storedRelampagoReports : [];
+  const pulsoReports = dashboardOwner === viewKey ? storedPulsoReports : [];
+  const [pulseRevision, setPulseRevision] = useState(0);
+  const pulseSummary = usePrivatePulseSummary({
+    enabled: activeTab === 'dashboard_evolucion' && canViewEvolucionDashboard, revision: pulseRevision
+  });
+  const pulseCount = pulseSummary.snapshot?.reportCount;
   const [loadingDashboard, setLoadingDashboard] = useState(false);
 
   // Feed en tiempo real de Reportes Diarios para Gerentes y Directivos
@@ -318,6 +335,7 @@ export default function ReportesBoard() {
     setFormData({});
     setNodusSource(null);
     setReviewedCounts(false);
+    setLoading(false);
     nodusRequest.current++;
   }, [viewKey, preferredSede, preferredStage]);
 
@@ -360,22 +378,47 @@ export default function ReportesBoard() {
     if (activeTab === 'dashboard_evolucion' && canViewEvolucionDashboard) {
       fetchEvolucionData();
     }
-  }, [activeTab, canViewEvolucionDashboard]);
+    return () => { dashboardGeneration.current++; };
+  }, [activeTab, canViewEvolucionDashboard, viewKey]);
 
   const fetchEvolucionData = async () => {
+    const generation = ++dashboardGeneration.current;
+    const isCurrent = () => generation === dashboardGeneration.current && viewScope.current === viewKey;
+    setRelampagoReports([]);
+    setPulsoReports([]);
+    setDashboardOwner(viewKey);
+    setDashboardError('');
+    if (isSimulation) {
+      setLoadingDashboard(false);
+      setDashboardError('Los reportes privados requieren tu cuenta real, sin simulación.');
+      return;
+    }
     setLoadingDashboard(true);
     try {
       const qRel = query(collection(db, 'reports'), where('type', '==', 'ReporteRelampagoFDS'), limit(50));
       const snapRel = await getDocs(qRel);
-      setRelampagoReports(snapRel.docs.map(d => ({ id: d.id, ...d.data() })));
-
-      const qPul = query(collection(db, 'reports'), where('type', '==', 'MicroPulsoStaff'), limit(100));
-      const snapPul = await getDocs(qPul);
-      setPulsoReports(snapPul.docs.map(d => ({ id: d.id, ...d.data() })));
+      if (!isCurrent()) return;
+      const relampago = snapRel.metadata.fromCache ? [] : snapRel.docs.map(d => ({ id: d.id, ...d.data() }));
+      let pulse = [];
+      if (canReadIndividualPulse(currentUser)) {
+        const qPul = query(collection(db, 'reports'), where('type', '==', 'MicroPulsoStaff'), orderBy('created_at', 'desc'), limit(100));
+        const snapPul = await getDocsFromServer(qPul);
+        if (!isCurrent()) return;
+        pulse = snapPul.metadata.fromCache ? [] : snapPul.docs.map(d => ({ id: d.id, ...d.data() }));
+      }
+      if (isCurrent()) {
+        setRelampagoReports(relampago);
+        setPulsoReports(pulse);
+      }
     } catch (e) {
       console.error("Error fetching dashboard evolucion data:", e);
+      if (isCurrent()) {
+        setRelampagoReports([]);
+        setPulsoReports([]);
+        setDashboardError('No se pudieron verificar los reportes del dashboard.');
+      }
     } finally {
-      setLoadingDashboard(false);
+      if (isCurrent()) setLoadingDashboard(false);
     }
   };
 
@@ -392,8 +435,8 @@ export default function ReportesBoard() {
     if (!canSwitchAnyCoord && !isGerente) return;
     try {
       const qReports = canSwitchAnyCoord
-        ? query(collection(db, 'reports'), orderBy('created_at', 'desc'), limit(50))
-        : query(collection(db, 'reports'), where('sede', '==', calendarSede(currentUser?.sede)), limit(50));
+        ? query(collection(db, 'reports'), where('type', 'in', NON_PULSE_REPORT_TYPES), orderBy('created_at', 'desc'), limit(50))
+        : query(collection(db, 'reports'), where('type', 'in', NON_PULSE_REPORT_TYPES), where('sede', '==', calendarSede(currentUser?.sede)), orderBy('created_at', 'desc'), limit(50));
       const unsub = onSnapshot(qReports, (snapshot) => {
         const reps = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
         setDailyReports(reps.sort((a, b) => String(b.created_at).localeCompare(String(a.created_at))));
@@ -479,7 +522,7 @@ export default function ReportesBoard() {
         }));
         finalData.staff_id = currentUser?.uid || 'anon-staff';
         finalData.email = currentUser?.email || 'anon@crearpsl.net';
-        finalData.sede_id = currentUser?.sede || 'SEDE-LIMA-01';
+        finalData.sede_id = calendarSede(currentUser?.sede);
       }
 
       const report = {
@@ -488,7 +531,9 @@ export default function ReportesBoard() {
         stage: reportType === 'Llamadas' ? reportStage : currentStage || 'C1',
         submitted_by: currentUser?.displayName || currentUser?.email || 'Staff Autorizado',
         submitted_by_email: currentUser?.email || '',
-        sede: reportType === 'Llamadas' ? reportSede : currentUser?.sede || formData.sede_id || 'Global',
+        submitted_by_uid: currentUser?.uid || '',
+        sede: reportType === 'Llamadas' ? reportSede : reportType === 'MicroPulsoStaff'
+          ? calendarSede(currentUser?.sede) : currentUser?.sede || formData.sede_id || 'Global',
         created_at: new Date().toISOString(),
         data: finalData,
         ...(reportType === 'Llamadas' ? {
@@ -501,9 +546,10 @@ export default function ReportesBoard() {
         } : {})
       };
       const newReportRef = await addDoc(collection(db, 'reports'), report);
+      if (viewScope.current !== viewKey) return;
 
       // 1.1 Enviar automáticamente al espacio de Google Chat configurado
-      sendReportToGoogleChat({ id: newReportRef.id, ...report }).then(result => {
+      if (reportType !== 'MicroPulsoStaff') sendReportToGoogleChat({ id: newReportRef.id, ...report }).then(result => {
         if (!result.success && result.reason !== 'disabled' && result.reason !== 'not_configured') showToast('Reporte guardado; Google Chat no confirmó la entrega.', 'warning');
       }).catch(chatErr => {
         console.warn('Google Chat notification failed:', chatErr);
@@ -523,9 +569,9 @@ export default function ReportesBoard() {
       setPulsoRespuestas({});
     } catch (err) {
       console.error(err);
-      showToast('Hubo un error al enviar el reporte.', 'error');
+      if (viewScope.current === viewKey) showToast('Hubo un error al enviar el reporte.', 'error');
     } finally {
-      setLoading(false);
+      if (viewScope.current === viewKey) setLoading(false);
     }
   };
 
@@ -1789,11 +1835,14 @@ export default function ReportesBoard() {
                 Métricas de baja fricción humana: Seguridad Psicológica, Rider del Entrenador y Eliminación de Fricción (Trim & Stack).
               </p>
             </div>
-            <button onClick={fetchEvolucionData} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 1rem' }}>
+            <button onClick={() => { setPulseRevision(value => value + 1); fetchEvolucionData(); }} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 1rem' }}>
               <RefreshCw size={15} /> Actualizar Datos
             </button>
           </div>
 
+          {(pulseSummary.error || dashboardError) && (
+            <div role="alert">{pulseSummary.error || dashboardError}</div>
+          )}
           {/* 3 TARJETAS ESTRATÉGICAS (100% desde Firestore en vivo, cero datos inventados) */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.2rem' }}>
             
@@ -1806,12 +1855,12 @@ export default function ReportesBoard() {
                 </span>
               </div>
               <div style={{ fontSize: '2.4rem', fontWeight: 900, color: '#fff', margin: '0.2rem 0' }}>
-                {pulsoReports.length > 0 ? `${pulsoReports.length} reportes` : 'N/D'}
+                {pulseSummary.loading ? 'Verificando…' : Number.isSafeInteger(pulseCount) ? `${pulseCount} reportes` : 'N/D'}
               </div>
               <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: 1.4 }}>
-                {pulsoReports.length > 0
-                  ? `Basado en ${pulsoReports.length} reporte(s) verificados de Micro-Pulso Staff en Causa OS.`
-                  : 'Sin reportes verificados de Micro-Pulso Staff aún. No se inventan porcentajes.'}
+                {Number.isSafeInteger(pulseCount)
+                  ? `Conteo agregado verificado: ${pulseCount} reporte(s) en las sedes autorizadas. No incluye respuestas individuales.`
+                  : 'Agregado de Micro-Pulso no verificado. No se inventan porcentajes ni ceros.'}
               </p>
             </div>
 
@@ -1864,9 +1913,13 @@ export default function ReportesBoard() {
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              {pulsoReports.filter(r => r?.data?.trimAndStack || r?.trimAndStack).length === 0 ? (
+              {!canReadIndividualPulse(currentUser) ? (
+                <p>Las respuestas individuales están reservadas al autor y Dirección. Gerencia solo recibe el agregado de sus sedes.</p>
+              ) : pulsoReports.filter(r => r?.data?.trimAndStack || r?.trimAndStack).length === 0 ? (
                 <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '8px', padding: '1rem', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-                  Sin iniciativas «Trim & Stack» registradas en Causa OS. No se muestran ejemplos inventados.
+                  {loadingDashboard ? 'Verificando respuestas…' : dashboardError
+                    ? 'Las respuestas no pudieron verificarse.'
+                    : 'Sin iniciativas «Trim & Stack» en los últimos 100 reportes consultados.'}
                 </div>
               ) : (
                 pulsoReports.filter(r => r?.data?.trimAndStack || r?.trimAndStack).map((item, idx) => (

@@ -8,12 +8,29 @@ function fixture(fetchResult = async () => ({ ok: true, json: async () => ({ sna
   const auth = { currentUser: { uid: 'first', getIdToken: async () => 'synthetic-only' } };
   const source = readFileSync(new URL('../src/services/privateNodusSnapshot.js', import.meta.url), 'utf8')
     .replace(/^import .*;\r?$/gm, '').replace(/^export /gm, '').replace('import.meta.env', '{}');
-  const readers = new Function('auth', 'fetch', `${source}\nreturn {read:readPrivateNodusSnapshot,readReports:readPrivateNodusReportSources};`)(auth, async (...args) => {
+  const readers = new Function('auth', 'fetch', `${source}\nreturn {read:readPrivateNodusSnapshot,readReports:readPrivateNodusReportSources,readPulse:readPrivatePulseSummary};`)(auth, async (...args) => {
     requests.push(args);
     return fetchResult(...args);
   });
   return { auth, requests, ...readers };
 }
+test('pulse client validates aggregates and rejects account/scope changes without raw-report fallback', async () => {
+  const snapshot = { authorizedSedes: ['Lima'], reportCount: 7 };
+  const client = fixture(async () => ({ ok: true, json: async () => ({ snapshot }) }));
+  assert.deepEqual(await client.readPulse({ expectedUid: 'first' }), snapshot);
+  assert.match(client.requests[0][0], /\/private-pulse-summary$/);
+  assert.equal(client.requests[0][1].body, '{}');
+  await assert.rejects(client.readPulse({ expectedUid: 'second' }), /cuenta cambió/);
+  const changed = fixture(async () => ({ ok: true, json: async () => {
+    changed.auth.currentUser = { uid: 'second' };
+    return { snapshot };
+  } }));
+  await assert.rejects(changed.readPulse(), /cuenta cambió/);
+  for (const reportCount of [null, -1, 0.1, '7', Number.MAX_SAFE_INTEGER + 1]) {
+    const invalid = fixture(async () => ({ ok: true, json: async () => ({ snapshot: { authorizedSedes: [], reportCount } }) }));
+    await assert.rejects(invalid.readPulse(), /no verificable/);
+  }
+});
 test('private metrics client sends only Firebase identity, never role/sede and never queries aggregate Firestore', async () => {
   const { read, requests } = fixture();
   assert.deepEqual(await read(), data);

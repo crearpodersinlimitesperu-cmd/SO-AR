@@ -619,23 +619,65 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    function isActivePulseCaller() {
+      let profile = /databases/$(database)/documents/users/$(request.auth.uid);
+      let data = exists(profile) ? get(profile).data : {};
+      return exists(profile) && data.get('active', true) != false &&
+        data.get('uid', request.auth.uid) == request.auth.uid &&
+        data.get('isActive', true) != false && data.get('esActivo', true) != false &&
+        !callerHasAnyRole(['inactivo']) &&
+        !data.get('status', '').lower().matches('.*(inactiv|baja|renuncia|desvinculado).*') &&
+        !data.get('estado', '').lower().matches('.*(inactiv|baja|renuncia|desvinculado).*');
+    }
+
+    // Provisional coordinator policy, pending owner confirmation.
+    function isPulseDirection() {
+      return isSuperAdmin() || callerHasAnyRole([
+        'superadmin', 'direccion', 'cfo', 'cco', 'ceo', 'director_maestria', 'socio'
+      ]);
+    }
+
+    function canReadIndividualPulse(data) {
+      return isActivePulseCaller() && (isPulseDirection() ||
+        data.get('submitted_by_uid', '') == request.auth.uid ||
+        (data.get('submitted_by_uid', '') == '' && emailIsCaller(data.get('submitted_by_email', ''))));
+    }
+
     // REPORTS
     match /reports/{reportId} {
       allow read: if isAuthenticated() &&
-        (resource.data.type != 'Llamadas' || reportScopeAllowed(resource.data));
+        (resource.data.get('type', '') == 'MicroPulsoStaff'
+          ? canReadIndividualPulse(resource.data)
+          : (resource.data.type != 'Llamadas' || reportScopeAllowed(resource.data)));
       allow create: if isAuthenticated() &&
-        (request.resource.data.get('type', '') != 'Llamadas' ||
+        (request.resource.data.get('type', '') == 'MicroPulsoStaff'
+          ? (isActivePulseCaller() &&
+             request.resource.data.get('submitted_by_uid', '') == request.auth.uid &&
+             emailIsCaller(request.resource.data.get('submitted_by_email', '')) &&
+             request.resource.data.get('data', {}) is map &&
+             request.resource.data.get('data', {}).get('staff_id', '') == request.resource.data.get('submitted_by_email', '') &&
+             request.resource.data.get('data', {}).get('sede_id', '') == request.resource.data.get('sede', '') &&
+             request.resource.data.get('sede', '') in ['Lima', 'Quito', 'Cuenca', 'Guayaquil', 'Medellín', 'México'] &&
+             samePrivateSede(request.resource.data))
+          : (request.resource.data.get('type', '') != 'Llamadas' ||
          (reportScopeAllowed(request.resource.data) &&
           request.resource.data.get('stage', '') in ['C1', 'C2'] &&
           request.resource.data.get('submitted_by_email', '').lower() == email() &&
           request.resource.data.get('team_number', '') is string &&
           request.resource.data.get('team_number', '').matches('[1-9][0-9]*') &&
-          request.resource.data.get('source', '') in ['nodus-reviewed', 'manual-reviewed']));
+          request.resource.data.get('source', '') in ['nodus-reviewed', 'manual-reviewed'])));
       allow update: if (isGerenteODireccion() || isSuperAdmin()) &&
+        request.resource.data.get('type', '') == resource.data.get('type', '') &&
+        (resource.data.get('type', '') != 'MicroPulsoStaff' ||
+         (isActivePulseCaller() && isPulseDirection() &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'status', 'reviewedBy', 'reviewed_by', 'reviewedAt', 'reviewed_at'
+          ]))) &&
         (resource.data.get('type', '') != 'Llamadas' ||
          (reportScopeAllowed(resource.data) &&
           !request.resource.data.diff(resource.data).affectedKeys().hasAny(['sede', 'stage', 'type', 'submitted_by_email', 'team_number'])));
       allow delete: if (isGerenteODireccion() || isSuperAdmin()) &&
+        (resource.data.get('type', '') != 'MicroPulsoStaff' || (isActivePulseCaller() && isPulseDirection())) &&
         (resource.data.get('type', '') != 'Llamadas' || reportScopeAllowed(resource.data));
     }
 
