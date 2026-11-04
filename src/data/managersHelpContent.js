@@ -89,6 +89,7 @@ export const managersActionHelp = {
   marcarPagado: help('Marcar como pagado', 'Registra el pago como realizado. Verifica antes el comprobante, monto, entrenador y equipo; este botón NO transfiere dinero.'),
   ocultarPago: help('Retirar de pendientes', 'Oculta este equipo del reporte financiero de pendientes. No borra el equipo en Nodus ni registra un pago.'),
   reversarPago: help('Reversar registro de pago', 'Devuelve el equipo a pendientes. NO revierte la transferencia bancaria. Disponible solo para las identidades autorizadas.'),
+  editarMontoPago: help('Editar monto pagado', 'Corrige el importe realmente pagado en USD, positivo y con hasta dos decimales (coma o punto). Solo para las identidades autorizadas a reversar. Conserva estado, fecha y responsable originales; registra quién editó y auditoría antes/después. NO transfiere dinero. Si falla la auditoría, el aviso confirma que el monto sí se guardó y debes avisar a soporte.'),
   editarLlamada: help('Editar llamada grupal', 'Abre la corrección de fecha y cantidad de asistentes de esta llamada existente, sin registrar otra.'),
   guardarLlamada: help('Guardar corrección de llamada', 'Actualiza la fecha y asistentes de esta llamada. Revisa la cantidad frente al total de integrantes.'),
   aceptar: help('Aceptar reporte', 'Cierra el reporte mostrado. No deshace la depuración que ya ejecutó el supervisor.'),

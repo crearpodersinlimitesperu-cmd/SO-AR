@@ -36,6 +36,7 @@ import {
 } from '../data/managersData';
 import { OPERATIONAL_SEDES, normalizeRole, normalizeSede } from '../data/usersData';
 import { recordAuditEvent } from '../services/auditService';
+import { parsePaymentAmount, sumPaymentAmounts, updatePaidAmountInTransaction } from '../utils/liquidacionPayment';
 import { recordGroupCall, recordIndividualCall, updateIndividualCallDate } from '../services/callHistoryService';
 import { createCallOperationGate } from '../services/callOperationGate';
 import { db } from '../services/firebase';
@@ -357,7 +358,7 @@ export default function CentroManagers() {
     if (!canViewLiquidacion) return;
     const unsubscribe = onSnapshot(collection(db, 'liquidaciones_pagos'), (querySnapshot) => {
       const map = {};
-      querySnapshot.forEach((doc) => { map[doc.id] = { id: doc.id, ...doc.data() }; });
+      querySnapshot.forEach((doc) => { map[doc.id] = { ...doc.data(), id: doc.id }; });
       setLiquidacionesPagos(map);
     }, (error) => {
       console.error("Error leyendo liquidaciones_pagos:", error);
@@ -1838,7 +1839,7 @@ export default function CentroManagers() {
     enCamino.sort((a, b) => b.totalLlamadas - a.totalLlamadas);
 
     const totalPendienteUSD = pendientes.reduce((sum, p) => sum + (Number(p.montoUSD) || 0), 0);
-    const totalPagadoUSD = pagados.reduce((sum, p) => sum + (Number(p.montoUSD) || 0), 0);
+    const totalPagadoUSD = sumPaymentAmounts(pagados);
 
     return { pendientes, pagados, enCamino, totalPendienteUSD, totalPagadoUSD };
   }, [llamadasHistorial, liquidacionesPagos, equiposParaLiquidacion, canViewLiquidacion, managers]);
@@ -1877,7 +1878,7 @@ export default function CentroManagers() {
   }, [filteredPendientes]);
 
   const totalPagadoFiltradoUSD = useMemo(() => {
-    return filteredPagados.reduce((sum, p) => sum + (Number(p.montoUSD) || 0), 0);
+    return sumPaymentAmounts(filteredPagados);
   }, [filteredPagados]);
 
   // Selección múltiple para liquidación masiva
@@ -2202,6 +2203,52 @@ export default function CentroManagers() {
     } else {
       showToast(`Procesados ${successCount} pagos con éxito. ${errorCount} fallaron.`, 'warning');
     }
+  };
+
+  const handleEditarMontoPago = async (item) => {
+    if (!canReversarPago) {
+      showToast('No tienes permiso para editar el monto pagado.', 'warning');
+      return;
+    }
+    const input = window.prompt(
+      'Monto realmente pagado en USD (positivo, hasta dos decimales). Solo corrige el registro; no realiza transferencias.',
+      String(item.montoUSD)
+    );
+    if (input === null) return;
+
+    let result;
+    try {
+      const amount = parsePaymentAmount(input);
+      const ref = doc(db, 'liquidaciones_pagos', item.pagoDocId);
+      result = await runTransaction(db, tx =>
+        updatePaidAmountInTransaction(tx, ref, amount, currentUser, serverTimestamp())
+      );
+    } catch (error) {
+      console.error('Error editando el monto pagado:', error);
+      showToast(error.message || 'No se pudo guardar el monto pagado.', 'error');
+      return;
+    }
+
+    const { before, montoUSD } = result;
+    let auditOk = false;
+    try {
+      const auditResult = await recordAuditEvent({
+        action: 'LIQUIDACION_ENTRENADOR_MONTO_EDITADO',
+        email: currentUser?.email || '',
+        name: currentUser?.name || '',
+        role: currentUser?.appRole || currentUser?.role || '',
+        sede: before.sede || item.sede,
+        details: `Monto pagado editado: ${item.pagoDocId}. Antes: montoUSD=${before.montoUSD ?? '(sin monto registrado)'}. Después: montoUSD=${montoUSD}. Se conserva estado=${before.estado}, fechaPago=${before.fechaPago || '-'}, pagadoPor=${before.pagadoPorEmail || before.pagadoPorNombre || '-'}. Sin transferencia bancaria.`
+      });
+      auditOk = auditResult.ok;
+      if (!auditOk) console.error('Auditoría de edición falló (el monto sí se guardó):', auditResult.error);
+    } catch (auditError) {
+      console.error('Auditoría de edición falló (el monto sí se guardó):', auditError);
+    }
+    showToast(auditOk
+      ? `Monto pagado actualizado a $${montoUSD} USD.`
+      : `El monto pagado sí se guardó ($${montoUSD} USD), pero falló la auditoría. Avisa a soporte.`,
+    auditOk ? 'success' : 'warning');
   };
 
   // Revertir en pantalla SOLO quita el estado "pagado" (vuelve a pendientes); no ejecuta ninguna
@@ -5688,6 +5735,14 @@ export default function CentroManagers() {
                               <td style={{ padding: '0.65rem 0.6rem' }}>{item.pagadoPorNombre || item.pagadoPorEmail || '-'}</td>
                               {canReversarPago && (
                                 <td style={{ padding: '0.65rem 0.6rem', textAlign: 'right' }}>
+                                  <HelpButton helpKey="editarMontoPago"
+                                    type="button"
+                                    onClick={() => handleEditarMontoPago(item)}
+                                    title="Corrige solo el monto registrado; conserva fecha y responsable del pago."
+                                    style={{ padding: '0.35rem 0.7rem', marginRight: '0.5rem', borderRadius: '6px', border: '1px solid #059669', background: 'transparent', color: '#059669', fontWeight: 700, fontSize: '0.78rem', cursor: 'pointer' }}
+                                  >
+                                    Editar monto
+                                  </HelpButton>
                                   <HelpButton helpKey="reversarPago"
                                     onClick={() => handleReversarPago(item)}
                                     title="Devuelve el registro a pendientes. No revierte la transferencia bancaria."
