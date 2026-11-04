@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../services/firebase';
-import { collection, doc, setDoc, getDocs } from 'firebase/firestore';
+import { doc, setDoc, getDocs } from 'firebase/firestore';
+import { privateDirectoryQuery } from '../services/privacyQueries.js';
 
 const CausaOSTask = () => {
   const { currentUser } = useAuth();
@@ -17,7 +18,7 @@ const CausaOSTask = () => {
     
     try {
       // Obtener usuarios
-      const usersSnap = await getDocs(collection(db, 'users'));
+      const usersSnap = await getDocs(privateDirectoryQuery(db, 'users', currentUser));
       const targetRoles = ["coord_maestria", "coordinador_mj", "director_maestria", "gerente", "direccion", "entrenador"];
       const targetEmails = [];
       

@@ -105,6 +105,13 @@ test('real AuthProvider clears private state on account, role and simulation cha
       sessionStorage.setItem('googleAccessToken', 'ALPHA_TOKEN');
     });
     await page.waitForFunction(() => document.querySelector('#private-view')?.textContent === 'ALPHA_PRIVATE');
+    await page.evaluate(() => window.fixtureSession.updateCurrentUserFields({ photoURL: 'https://example.invalid/photo' }));
+    assert.equal(await page.$eval('#private-view', el => el.textContent), 'ALPHA_PRIVATE');
+    await page.evaluate(() => window.fixtureSession.updateCurrentUserFields({ roles: ['coord_c1'] }));
+    await page.waitForFunction(() => document.querySelector('#private-view')?.textContent === '');
+    assert.equal(await page.$eval('#private-view', el => el.dataset.role), 'coord_c1',
+      'permission revocation must reset private state even without changing the active role');
+    await page.evaluate(() => window.fixtureSession.updateCurrentUserFields({ roles: ['coord_c1', 'qt'] }));
     await page.evaluate(() => window.fixtureSession.switchRole('qt'));
     await page.waitForFunction(() => document.querySelector('#private-view')?.dataset.role === 'qt');
     assert.equal(await page.$eval('#private-view', el => el.textContent), '');

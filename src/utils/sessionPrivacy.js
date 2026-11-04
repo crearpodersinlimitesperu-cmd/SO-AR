@@ -1,3 +1,5 @@
+import { identityEmails } from './authIdentity.js';
+
 const LOCAL_KEYS = [
   'CAUSA_FAST_CACHE', 'cpsl_user_connections', 'cpsl_llamados_data_v3',
   'cpsl_kpi_reports_v1', 'cpsl_mock_user',
@@ -24,6 +26,16 @@ export function bindPrivateSession(uid, local, session) {
   else session.removeItem('cpsl_session_owner');
 }
 
+const sortedValues = values => [...new Set(Array.isArray(values) ? values : [])].sort();
+
 export const privateViewKey = user => JSON.stringify([
-  user?.uid, user?.email, user?.appRole, user?.sede, user?.isSimulated === true
+  user?.uid, user?.dbId, identityEmails(user).sort(),
+  user?.name, user?.displayName,
+  user?.role, user?.rol, user?.rawRole, user?.appRole, sortedValues(user?.roles),
+  user?.sede, Object.entries(user?.roleSedes || {}).sort(([left], [right]) => left.localeCompare(right)),
+  sortedValues(user?.trainerDirectoryIds), sortedValues(user?.trainerNames),
+  user?.isSuperAdmin === true, user?.isDireccion === true, user?.isGerente === true,
+  user?.isSimulated === true, user?.isParticipantOnly === true,
+  user?.active, user?.isActive, user?.esActivo, user?.status, user?.estado,
+  user?.deactivatedAt
 ]);

@@ -166,6 +166,30 @@ resuelve tardíamente una escritura de rol de A y entra/sale de una simulación.
 El estado anterior, token y cachés legacy no aparecen en B. No inicia sesión en
 Google real ni consulta Firebase de producción.
 
+La continuación de la revisión añade dos cierres reproducidos:
+
+- `src/utils/sessionPrivacy.js:29-41` invalida también las vistas cuando cambian
+  roles concedidos, privilegios, alias, asignaciones, sedes por rol o estado de
+  actividad, aunque el rol activo no cambie. La prueba con AuthProvider real
+  revoca un rol sin cambiar `appRole` y verifica la limpieza del estado privado.
+  Reordenar listas o actualizar la foto no destruye borradores.
+- `src/services/nodusVerificationService.js:55-150` vacía el índice singleton
+  de participantes al salir el último suscriptor y descarta callbacks de
+  generaciones anteriores. Un error de lectura retira los registros de esa
+  fuente y notifica el cambio, en lugar de conservarlos indefinidamente.
+  `tests/nodus-session-privacy.test.mjs` reproduce desmontaje/cambio de sesión,
+  callbacks tardíos y pérdida de permisos de lectura con datos sintéticos.
+  Esto corrige la retención del índice; **no** resuelve el acceso global a los
+  documentos Nodus indicado en los bloqueadores.
+
+Asimismo, `CausaOSTask.jsx` usa la consulta de directorio autorizada en lugar de
+enumerar `users` globalmente, manteniendo compatibilidad con las reglas nuevas.
+La validación posterior a estos cambios da **38/38** en `test:privacy`,
+**10/10** en las pruebas de arranque crítico/latencia de autenticación y build
+directo Vite/lint/diff sin errores. Los resultados de la tabla anterior
+corresponden a la primera entrega; no se reinterpreta una suite parcial como
+cierre de los bloqueadores.
+
 La nueva tarea CI de privacidad se ejecuta independientemente de las suites con
 fallos de baseline y solo usa emuladores. Los workflows de despliegue siguen
 limitados a `master`/ejecución manual. **Fusionar cambios de reglas en master

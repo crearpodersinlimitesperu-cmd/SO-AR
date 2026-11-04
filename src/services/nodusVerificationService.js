@@ -54,14 +54,27 @@ function indexRecord(rec) {
 let subscribers = new Set();
 let stopListeners = [];
 let liveRoot = [], liveTeams = [];
+let listenerGeneration = 0;
 function notifySubscribers() { subscribers.forEach(callback => callback(masterMap.size)); }
 export function initNodusRealtimeListener(onUpdateCallback) {
   subscribers.add(onUpdateCallback);
+  let subscribed = true;
   const unsubscribe = () => {
+    if (!subscribed) return;
+    subscribed = false;
     subscribers.delete(onUpdateCallback);
-    if (!subscribers.size) { stopListeners.forEach(stop => stop()); stopListeners = []; liveRoot = []; liveTeams = []; }
+    if (!subscribers.size) {
+      listenerGeneration += 1;
+      stopListeners.forEach(stop => stop());
+      stopListeners = [];
+      liveRoot = [];
+      liveTeams = [];
+      masterMap.clear();
+    }
   };
   if (stopListeners.length) return unsubscribe;
+  const generation = ++listenerGeneration;
+  const isCurrent = () => generation === listenerGeneration && subscribers.size > 0;
 
   const processParticipante = (p, equipoNombre) => {
     const fullName = (p.n || `${p.nombres || ''} ${p.apellidos || ''}`).trim();
@@ -93,18 +106,37 @@ export function initNodusRealtimeListener(onUpdateCallback) {
     // 1. Escuchar documento raíz 'latest'
     const docRef = doc(db, 'nodus_coordinadores_c1c2', 'latest');
     stopListeners.push(onSnapshot(docRef, snapshot => {
+      if (!isCurrent()) return;
       liveRoot = snapshot.exists() ? snapshot.data().equiposReporte || [] : [];
       rebuild();
-    }, err => console.warn('No se pudo consultar Nodus:', err.message)));
+    }, err => {
+      if (!isCurrent()) return;
+      liveRoot = [];
+      rebuild();
+      console.warn('No se pudo consultar Nodus:', err.message);
+    }));
 
     // 2. Escuchar subcolección 'equipos' (persistencia desacoplada para evitar límite de 1MB)
     const colRef = collection(db, 'nodus_coordinadores_c1c2', 'latest', 'equipos');
     stopListeners.push(onSnapshot(colRef, snapshot => {
+      if (!isCurrent()) return;
       liveTeams = snapshot.docs.map(d => d.data());
       rebuild();
-    }, err => console.warn('No se pudo consultar equipos Nodus:', err.message)));
+    }, err => {
+      if (!isCurrent()) return;
+      liveTeams = [];
+      rebuild();
+      console.warn('No se pudo consultar equipos Nodus:', err.message);
+    }));
 
   } catch (e) {
+    listenerGeneration += 1;
+    stopListeners.forEach(stop => stop());
+    stopListeners = [];
+    liveRoot = [];
+    liveTeams = [];
+    masterMap.clear();
+    notifySubscribers();
     console.warn('Error inicializando listener de Nodus:', e);
   }
   return unsubscribe;
@@ -446,4 +478,3 @@ export function getGlobalNodusStats(missions, getEnroladosList) {
     totalRegistrosNodus: masterMap.size
   };
 }
-

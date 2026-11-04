@@ -115,12 +115,35 @@ test('switching accounts clears tokens, simulation and legacy shared data but pr
 
 test('effective identity, role, sede and simulation each invalidate the mounted private view', () => {
   const viewer = user('me');
-  for (const delta of [{ uid: 'other' }, { email: 'other@example.invalid' }, { appRole: 'gerente' }, { sede: 'Quito' }, { isSimulated: true }]) {
+  for (const delta of [
+    { uid: 'other' }, { email: 'other@example.invalid' }, { appRole: 'gerente' },
+    { sede: 'Quito' }, { isSimulated: true }, { roles: ['coord_c1', 'direccion'] },
+    { roleSedes: { qt: 'Quito' } }, { emails: ['approved@example.invalid'] },
+    { trainerDirectoryIds: ['assigned-id'] }, { trainerNames: ['Assigned Trainer'] },
+    { isSuperAdmin: true }, { isDireccion: true }, { isGerente: true },
+    { active: false }, { isActive: false }, { esActivo: false }, { rol: 'inactivo' }, { estado: 'inactivo' }
+  ]) {
     assert.notEqual(privateViewKey(viewer), privateViewKey({ ...viewer, ...delta }));
   }
   const auth = readFileSync(new URL('../src/context/AuthContext.jsx', import.meta.url), 'utf8');
   assert.match(auth, /<Fragment key=\{privateViewKey\(currentUser\)\}>/);
   assert.doesNotMatch(auth, /setCurrentUser\(parsed\)/);
+});
+
+test('permission list ordering and cosmetic profile updates do not reset private drafts', () => {
+  const viewer = {
+    ...user('me'), roles: ['coord_c1', 'qt'],
+    emails: ['one@example.invalid', 'two@example.invalid'],
+    roleSedes: { coord_c1: 'Lima', qt: 'Quito' },
+    trainerDirectoryIds: ['first-id', 'second-id']
+  };
+  assert.equal(privateViewKey(viewer), privateViewKey({
+    ...viewer, roles: ['qt', 'coord_c1', 'qt'],
+    emails: [...viewer.emails].reverse(),
+    roleSedes: { qt: 'Quito', coord_c1: 'Lima' },
+    trainerDirectoryIds: [...viewer.trainerDirectoryIds].reverse(),
+    photoURL: 'https://example.invalid/new-photo', lastLoginAt: 'updated'
+  }));
 });
 
 test('explicit participant signing survives session binding, but logout removes the flow', () => {
