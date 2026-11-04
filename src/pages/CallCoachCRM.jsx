@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getManagersPipeline, getDualTasks, signoffDualTask } from '../services/callCoachService';
+import { isActiveCall } from '../utils/callHistory';
 import ChecklistBoard from './ChecklistBoard';
 import { toast } from 'react-hot-toast';
 import { 
@@ -572,7 +573,7 @@ export default function CallCoachCRM() {
                           background: call.asistio ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
                           color: call.asistio ? '#10b981' : '#ef4444'
                         }}>
-                          {call.asistio ? '✅ Asistió (Efectiva)' : '❌ Ausente'}
+                          {!isActiveCall(call) ? 'Anulada · no cuenta' : call.asistio ? '✅ Asistió (Efectiva)' : '❌ Ausente'}
                         </span>
                       </div>
                       <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
@@ -588,6 +589,9 @@ export default function CallCoachCRM() {
                           Registrado por: {call.registradoPorNombre} {call.registradoPorEmail ? `(${call.registradoPorEmail})` : ''}
                         </div>
                       )}
+                      {call.ultimaCorreccion && <p style={{ fontSize: '0.875rem', overflowWrap: 'anywhere' }}>
+                        Corrección: {call.ultimaCorreccion.motivo} · {call.ultimaCorreccion.actorEmail} · {call.ultimaCorreccion.occurredAtIso}
+                      </p>}
                     </div>
                   ))}
                 </div>

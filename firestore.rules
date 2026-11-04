@@ -21,13 +21,16 @@ rules_version = '2';
 //     ciclos y reportes fallando en silencio para roles no-superadmin).
 //
 // Qu├® NO cambia (a prop├│sito, para no romper nada que no revis├® a fondo):
-//  Las colecciones staff_directory, managers_directory, excellence_standards, kpi_reports,
+//  Las colecciones staff_directory, excellence_standards, kpi_reports,
 //  learning_logs y success_patterns se dejan EXACTAMENTE como est├ín hoy (cualquier autenticado lee y
 //  escribe) porque no alcanc├® a auditar el detalle de cada una y prefiero no
 //  inventar una restricci├│n que bloquee algo que no vi. Quedan marcadas abajo
 //  con un TODO para una siguiente pasada.
 //  A-01 (parcial): qt_directory (solo escritura), sync_history y
 //  user_stats ya tienen reglas específicas más abajo.
+//  Propuesta 04/11/2026 (sin desplegar): los historiales de llamadas solo admiten
+//  nuevos registros desde cliente. Corregir/anular/restaurar requiere la función
+//  autenticada correctManagerCall y conserva auditoría transaccional.
 //
 // Lista de gerencia/direcci├│n (funci├│n isGerenteODireccion): se extrajo del
 // ├║ltimo snapshot de src/data/usersToImport.js en GitHub (anterior a la
@@ -957,8 +960,38 @@ service cloud.firestore {
     match /staff_directory/{document=**} {
       allow read, write: if isAuthenticated();
     }
-    match /managers_directory/{document=**} {
-      allow read, write: if isAuthenticated();
+    function validNewCall(call) {
+      return call is map && call.get('id', '') is string && call.get('id', '').size() > 0 &&
+        call.get('registradoPorEmail', '').lower() in callerEmailAliases() &&
+        call.get('tipo', '') in ['individual', 'grupal'] &&
+        call.get('asistio', null) is bool &&
+        !call.keys().hasAny(['ultimaCorreccion', 'revision', 'estadoRegistro']);
+    }
+    function preservesCallHistory() {
+      let old = resource.data.get('llamadasHistorial', []);
+      let next = request.resource.data.get('llamadasHistorial', []);
+      let added = next.removeAll(old);
+      return (next == old &&
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['llamadaFecha', 'llamadaAsistio'])) ||
+        (next.size() == old.size() + 1 && next.removeAll(added) == old &&
+          added.size() == 1 && validNewCall(added[0]));
+    }
+    match /managers_directory/{document} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() &&
+        (request.resource.data.get('llamadasHistorial', []).size() == 0 ||
+          (request.resource.data.llamadasHistorial.size() == 1 &&
+            validNewCall(request.resource.data.llamadasHistorial[0])));
+      // Corrections are server-only. Other directory edits retain their existing permissions.
+      allow update: if isAuthenticated() && preservesCallHistory() &&
+        (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['entrenador', 'entrenadorId', 'entrenadorEmail']) ||
+          isManagementRole() || callerHasAnyRole(['coord_maestria', 'coordinador_mj']));
+      allow delete: if isAuthenticated() && resource.data.get('llamadasHistorial', []).size() == 0 &&
+        resource.data.get('llamadaFecha', '') == '';
+    }
+    match /call_corrections/{correctionId} {
+      allow read: if isAuthenticated();
+      allow write: if false;
     }
     match /excellence_standards/{document=**} {
       allow read, write: if isAuthenticated();
@@ -1019,7 +1052,10 @@ service cloud.firestore {
       allow write: if isGerenteODireccion() || isSuperAdmin();
     }
     match /llamadas_grupales_historial/{document=**} {
-      allow read, write: if isAuthenticated();
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() &&
+        request.resource.data.get('registradoPorEmail', '').lower() in callerEmailAliases();
+      allow update, delete: if false;
     }
     match /notas_seguimiento/{document=**} {
       allow read, write: if isAuthenticated();
@@ -1342,4 +1378,3 @@ service cloud.firestore {
     }
   }
 }
-

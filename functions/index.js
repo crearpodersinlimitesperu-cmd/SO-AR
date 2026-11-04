@@ -47,8 +47,11 @@ const { notebookKnowledge } = require("./notebookKnowledge");
 
 initializeApp();
 const db = getFirestore();
+const { createCorrectCall } = require("./callCorrections");
 
 setGlobalOptions({ region: "us-central1", maxInstances: 10 });
+
+exports.correctManagerCall = onCall(createCorrectCall({ db, FieldValue, HttpsError }));
 
 const GROQ_API_KEY = defineSecret("GROQ_API_KEY");
 

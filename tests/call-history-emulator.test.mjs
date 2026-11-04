@@ -4,8 +4,8 @@ import { readFileSync } from 'node:fs';
 import { initializeTestEnvironment, assertFails, assertSucceeds } from '@firebase/rules-unit-testing';
 import { initializeApp, deleteApp } from 'firebase-admin/app';
 import { getFirestore as adminFirestore } from 'firebase-admin/firestore';
-import { doc, getDocFromServer, setDoc } from 'firebase/firestore';
-import { recordGroupCall, recordIndividualCall, updateIndividualCallDate } from '../src/services/callHistoryService.js';
+import { doc, getDocFromServer, setDoc, updateDoc } from 'firebase/firestore';
+import { recordGroupCall, recordIndividualCall } from '../src/services/callHistoryService.js';
 
 const projectId = 'demo-call-history';
 const isLocalEmulator = /^127\.0\.0\.1:\d+$/.test(process.env.FIRESTORE_EMULATOR_HOST || '');
@@ -69,14 +69,13 @@ test('group calls are atomic, retain each member event and are idempotent', { sk
     assert.equal(afterIndividualCall.llamadaAsistio, 'NO');
     assert.equal(afterIndividualCall.llamadaFecha, '2026-10-22');
 
-    await assertSucceeds(updateIndividualCallDate(db, {
-      manager: managers[0],
-      fecha: '2026-10-23',
+    await assertFails(updateDoc(doc(db, 'managers_directory', 'manager-one'), {
+      llamadaFecha: '2026-10-23',
     }));
     const afterDateEdit = (await assertSucceeds(getDocFromServer(doc(db, 'managers_directory', 'manager-one')))).data();
     assert.equal(afterDateEdit.llamadasHistorial.length, 2, 'date edits do not append call events');
-    assert.equal(afterDateEdit.llamadasHistorial[1].fecha, '2026-10-23');
-    assert.equal(afterDateEdit.llamadaFecha, '2026-10-23');
+    assert.equal(afterDateEdit.llamadasHistorial[1].fecha, '2026-10-22');
+    assert.equal(afterDateEdit.llamadaFecha, '2026-10-22');
     assert.equal(afterDateEdit.llamadaAsistio, 'NO');
 
     await assertSucceeds(recordIndividualCall(db, {

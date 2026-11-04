@@ -65,25 +65,18 @@ export async function recordIndividualCall(db, {
   });
 }
 
-export async function updateIndividualCallDate(db, { manager, fecha }) {
-  const date = requiredText(fecha, 'fecha');
-  const managerRef = managerDocumentRef(db, manager);
+export async function correctManagerCall(db, input) {
+  const { getFunctions, httpsCallable } = await import('firebase/functions');
+  const result = await httpsCallable(getFunctions(db.app, 'us-central1'), 'correctManagerCall')(input);
+  if (result.data?.ok !== true) throw new Error('La corrección no fue confirmada por el servidor.');
+  return result.data;
+}
 
-  return runTransaction(db, async transaction => {
-    const snapshot = await transaction.get(managerRef);
-    if (!snapshot.exists()) throw new Error('Manager document does not exist.');
-
-    const data = snapshot.data();
-    const history = Array.isArray(data.llamadasHistorial) ? data.llamadasHistorial : [];
-    const latestEvent = history.length - 1;
-    const updatedHistory = history.map((event, index) => (
-      index === latestEvent ? { ...event, fecha: date } : event
-    ));
-    transaction.update(managerRef, {
-      llamadaFecha: date,
-      ...(history.length > 0 ? { llamadasHistorial: updatedHistory } : {}),
-    });
-    return history.length > 0 ? updatedHistory[latestEvent] : null;
+export async function updateIndividualCallDate(db, { manager, callId, fecha, motivo, operationId, expectedRevision }) {
+  return correctManagerCall(db, {
+    tipo: 'individual', managerDocId: managerDocumentRef(db, manager).id,
+    callId: requiredText(callId, 'callId'), action: 'editar',
+    changes: { fecha: requiredText(fecha, 'fecha') }, motivo, operationId, expectedRevision,
   });
 }
 
@@ -132,6 +125,7 @@ export async function recordGroupCall(db, {
     llamadaEfectiva: asistieronCount > 0,
     fecha: date,
     totalIntegrantes: members.length,
+    managerDocIds: members.map(member => member.ref.id),
     asistieron: asistieronCount,
     registradoPorEmail,
     registradoPorNombre,
