@@ -119,7 +119,7 @@ export function assertLegacyTrainerEdit(existing, trainerLabel) {
 export function matchesExplicitTrainer(row, user) {
   if (!hasTrainerIdentity(row)) return null;
   if (row.entrenadorId) {
-    if (text(row.entrenadorId) !== text(user?.uid)) return false;
+    if (![user?.uid, user?.dbId].filter(Boolean).map(text).includes(text(row.entrenadorId))) return false;
     return !row.entrenadorEmail || key(row.entrenadorEmail) === key(user?.email);
   }
   return Boolean(key(user?.email) && key(row.entrenadorEmail) === key(user.email));

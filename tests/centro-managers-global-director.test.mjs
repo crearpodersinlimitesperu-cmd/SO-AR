@@ -94,7 +94,7 @@ for (const filter of ['filteredManagers', 'groupTeams']) {
   test(`${filter}: existing hierarchy and trainer visibility stay unchanged`, () => {
     assert.deepEqual(execute(profile('gerente')).ids, ['local', 'global-qt']);
     for (const role of ['coord_maestria', 'coordinador_mj', 'coord_c1', 'capitan']) {
-      assert.deepEqual(execute(profile(role)).ids, ['local', 'remote-manager'], role);
+      assert.deepEqual(execute(profile(role)).ids, ['local'], role);
     }
     for (const role of ['direccion', 'director_maestria']) {
       assert.deepEqual(execute(profile(role)).ids, managers.map(row => row.id), role);
@@ -103,7 +103,8 @@ for (const filter of ['filteredManagers', 'groupTeams']) {
     assert.deepEqual(execute(trainer, true).ids, ['assigned']);
     assert.deepEqual(execute(trainer).ids, ['assigned']);
     assert.deepEqual(execute(profile('miembro')).ids, ['local']);
-    assert.deepEqual(execute({ ...profile('qt'), email: 'carlos.brunis@example.test' }).ids,
+    assert.deepEqual(execute({ ...profile('qt'), email: 'carlos.brunis@example.test' }).ids, ['local', 'global-qt']);
+    assert.deepEqual(execute({ ...profile('qt'), email: 'carlos.brunis@crearpsl.net' }).ids,
       managers.map(row => row.id));
   });
 }

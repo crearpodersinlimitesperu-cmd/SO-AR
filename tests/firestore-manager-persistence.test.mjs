@@ -28,6 +28,11 @@ after(async () => {
 test('actual Firestore commit, stale sync and fresh client read preserve the manual Mexico edit', async () => {
   const source = { id: 'old-catalogue-id', nombre: 'Persona Prueba', sede: 'MEX', equipo: 'TEST', numEquipo: 901, telefono: 'Anterior' };
   await adminDb.doc('managers_directory/actual-doc-id').set(source);
+  for (const uid of ['gerente-mexico', 'gerente-mexico-reload']) {
+    await adminDb.doc(`users/${uid}`).set({
+      uid, email: 'manager@example.test', role: 'gerente', roles: ['gerente'], sede: 'México'
+    });
+  }
   const db = env.authenticatedContext('gerente-mexico', { email: 'manager@example.test' }).firestore();
   const ref = managerDocumentRef(db, { ...source, docId: 'actual-doc-id' });
   await assertSucceeds(updateDoc(ref, manualManagerPatch(source, { nombre: 'Corregido', telefono: '', equipo: 'ACTUAL' })));
@@ -38,7 +43,7 @@ test('actual Firestore commit, stale sync and fresh client read preserve the man
   assert.equal(saved.equipo, 'ACTUAL');
   assert.equal(saved.rol, 'Capitan');
   assert.equal(saved._sheetIdentity.nombre, source.nombre);
-  assert.equal((await getDocFromServer(doc(db, 'managers_directory', source.id))).exists(), false);
+  assert.equal((await adminDb.doc(`managers_directory/${source.id}`).get()).exists, false);
   const anotherSession = env.authenticatedContext('gerente-mexico-reload', { email: 'manager@example.test' }).firestore();
   assert.equal((await getDocFromServer(doc(anotherSession, ref.path))).data().nombre, 'Corregido');
 });
@@ -48,6 +53,6 @@ test('anonymous write is denied and updating a missing row never creates a catal
   await assertFails(setDoc(doc(unauthenticated, 'managers_directory', 'denied'), { nombre: 'No permitido' }));
   const db = env.authenticatedContext('operator', { email: 'operator@example.test' }).firestore();
   await assert.rejects(updateDoc(doc(db, 'managers_directory', 'missing'), { telefono: 'No upsert' }),
-    error => error.code === 'not-found');
-  assert.equal((await getDocFromServer(doc(db, 'managers_directory', 'missing'))).exists(), false);
+    error => ['not-found', 'permission-denied'].includes(error.code));
+  assert.equal((await adminDb.doc('managers_directory/missing').get()).exists, false);
 });

@@ -25,7 +25,6 @@ import {
   canViewInactiveUsers
 } from '../config/permissions';
 import { 
-  INITIAL_LLAMADOS, 
   ENTRENADORES_LIST, 
   ENTRENADORES_INACTIVOS_LIST,
   isInactiveTrainer,
@@ -71,6 +70,8 @@ import { ManagersHelpProvider, ManagersQuickGuide, ManagersHelpMode, HelpButton,
 import { getManagersGuideRole, managersTabHelpKeys } from '../data/managersHelpContent';
 import { managerDocumentRef, managerNoteMatches } from '../services/managerPersistence';
 import { manualManagerPatch } from '../services/managerSyncPolicy';
+import { privateDirectoryQuery } from '../services/privacyQueries.js';
+import { canReadManager, sedeQueryValues, sameOperationalSede } from '../utils/privacyScope.js';
 
 
 const SEDE_COLORS = {
@@ -238,10 +239,7 @@ export default function CentroManagers() {
     setManagersError('');
     if (!currentUser) return;
     
-    const baseCol = collection(db, 'managers_directory');
-    // Cargar coleccion completa: CentroManagers aplica filtrado fino y jerarquico en filteredManagers
-    // Esto previene que ligeras variantes en el texto de la sede (ej. 'Quito' vs 'Quito Ciclo 1') dejen en blanco la vista.
-    const q = baseCol;
+    const q = privateDirectoryQuery(db, 'managers_directory', currentUser, { manager: true });
 
     const unsubscribe = onSnapshot(q, { includeMetadataChanges: true }, (querySnapshot) => {
       // A cached empty/old collection is not confirmation of the current directory.
@@ -270,7 +268,7 @@ export default function CentroManagers() {
         coordinador: normalizeCoordinator(m.coordinador),
         sede: normalizeSede(m.sede)
       }));
-      setManagers(normalized);
+      setManagers(normalized.filter(manager => canReadManager(currentUser, manager)));
       setManagersError('');
       setIsLoadingData(false);
     }, (error) => {
@@ -296,10 +294,11 @@ export default function CentroManagers() {
     if (!currentUser) return;
     const baseCol = collection(db, 'llamadas_grupales_historial');
 
-    const unsubscribe = onSnapshot(baseCol, { includeMetadataChanges: true }, (querySnapshot) => {
+    const historyQuery = canViewAll ? baseCol : query(baseCol, where('registradoPorEmail', '==', currentUser.email));
+    const unsubscribe = onSnapshot(historyQuery, { includeMetadataChanges: true }, (querySnapshot) => {
       const rows = [];
       querySnapshot.forEach((doc) => rows.push({ id: doc.id, ...doc.data() }));
-      setLlamadasHistorial(rows);
+      setLlamadasHistorial(rows.filter(row => canViewAll || row.registradoPorEmail === currentUser.email));
       setLlamadasHistorialStatus(querySnapshot.metadata.fromCache ? 'stale' : 'ready');
       setLlamadasHistorialError('');
     }, (error) => {
@@ -308,7 +307,7 @@ export default function CentroManagers() {
       setLlamadasHistorialError('No se pudo verificar el historial en Firestore. Los registros visibles pueden estar desactualizados.');
     });
     return () => unsubscribe();
-  }, [currentUser]);
+  }, [currentUser, canViewAll]);
 
   // (02/09/2026) Notas de Seguimiento post-llamada — feedback del entrenador de
   // llamadas (individual o grupal), usado para detectar y anticiparse a quiebres.
@@ -330,9 +329,11 @@ export default function CentroManagers() {
     }
     
     let notasQuery;
-    if (userCanViewAllNotas) {
+    if (canViewAll) {
       const baseCol = collection(db, 'notas_seguimiento');
       notasQuery = baseCol;
+    } else if (userCanViewAllNotas && sedeQueryValues(currentUser).length) {
+      notasQuery = query(collection(db, 'notas_seguimiento'), where('sede', 'in', sedeQueryValues(currentUser)));
     } else {
       notasQuery = query(collection(db, 'notas_seguimiento'), where('autorEmail', '==', currentUser.email));
     }
@@ -340,7 +341,8 @@ export default function CentroManagers() {
     const unsubscribe = onSnapshot(notasQuery, { includeMetadataChanges: true }, (querySnapshot) => {
       const rows = [];
       querySnapshot.forEach((doc) => rows.push({ id: doc.id, ...doc.data() }));
-      setNotasSeguimiento(rows);
+      setNotasSeguimiento(rows.filter(row => canViewAll ||
+        row.autorEmail === currentUser.email || (userCanViewAllNotas && sameOperationalSede(currentUser, row))));
       setNotasSeguimientoStatus(querySnapshot.metadata.fromCache ? 'stale' : 'ready');
       setNotasSeguimientoError('');
     }, (error) => {
@@ -349,12 +351,13 @@ export default function CentroManagers() {
       setNotasSeguimientoError('No se pudo verificar el historial de notas. Los comentarios visibles pueden estar desactualizados.');
     });
     return () => unsubscribe();
-  }, [currentUser, userCanViewAllNotas]);
+  }, [currentUser, userCanViewAllNotas, canViewAll]);
 
   // Registro de pagos ya liquidados a entrenadores (solo se carga si el usuario
   // tiene permiso de ver la pestaña, para no pedir datos que no va a poder leer).
   const [liquidacionesPagos, setLiquidacionesPagos] = useState({});
   useEffect(() => {
+    setLiquidacionesPagos({});
     if (!canViewLiquidacion) return;
     const unsubscribe = onSnapshot(collection(db, 'liquidaciones_pagos'), (querySnapshot) => {
       const map = {};
@@ -366,14 +369,15 @@ export default function CentroManagers() {
     return () => unsubscribe();
   }, [canViewLiquidacion]);
 
+  const llamadosStorageKey = `cpsl_llamados_data_v4:${currentUser?.uid}:${currentUser?.email}`;
   const [llamadosDataState, setLlamadosDataState] = useState(() => {
     try {
-      const saved = localStorage.getItem('cpsl_llamados_data_v3');
+      const saved = localStorage.getItem(llamadosStorageKey);
       if (saved) return JSON.parse(saved);
     } catch (e) {
       console.error(e);
     }
-    return INITIAL_LLAMADOS;
+    return [];
   });
 
   useEffect(() => {
@@ -381,8 +385,10 @@ export default function CentroManagers() {
   }, [llamadosDataState]);
 
   useEffect(() => {
-    try { localStorage.setItem('cpsl_llamados_data_v3', JSON.stringify(llamadosData)); } catch (e) {}
-  }, [llamadosData]);
+    try { localStorage.setItem(llamadosStorageKey, JSON.stringify(llamadosData)); } catch (e) {
+      console.error('No se pudo guardar la caché personal de llamados:', e);
+    }
+  }, [llamadosData, llamadosStorageKey]);
 
   // UI State
   const [activeTab, setActiveTab] = useState(initialTab);
@@ -446,21 +452,14 @@ export default function CentroManagers() {
     if (email === 'andres.gomez@crearpsl.net') return 'Andres Gomez';
     if (email === 'leandro.brunis@crearpsl.net') return 'Leandro Brunis';
     if (email === 'carlos.brunis@crearpsl.net' || email === 'brunische66@gmail.com') return 'Carlos Brunis';
-    if (email === 'liliana.cubillo@crearpsl.net' || email === 'lili.cubillo@crearpsl.net' || email.includes('cubillo')) return 'Lili Cubillo';
+    if (email === 'liliana.cubillo@crearpsl.net' || email === 'lili.cubillo@crearpsl.net') return 'Lili Cubillo';
     if (email === 'judith.romero@crearpsl.net' || email === 'regina.romero@crearpsl.net') return 'Regina Romero';
 
     const userName = currentUser.name || currentUser.displayName || '';
     const cleanUser = userName.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
     const match = allTrainerNames.find(e => {
       const cleanE = e.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
-      if (cleanUser.includes(cleanE) || cleanE.includes(cleanUser)) return true;
-      
-      const w1 = cleanUser.split(/\s+/);
-      const w2 = cleanE.split(/\s+/);
-      if (w1.length >= 2 && w2.length >= 2) {
-        if (w1[0] === w2[0] && (w1[1] === w2[1] || w1[w1.length - 1] === w2[w2.length - 1])) return true;
-      }
-      return false;
+      return cleanUser && normalizeTrainer(cleanUser) === normalizeTrainer(cleanE);
     });
     return match || userName;
   }, [currentUser, allTrainerNames]);
@@ -473,7 +472,7 @@ export default function CentroManagers() {
   // Catálogo de equipos disponibles ordenados numéricamente para filtrado rápido (#79, #80, #81, #91, #92...)
   const availableEquipos = useMemo(() => {
     const userEmail = (currentUser?.email || '').toLowerCase().trim();
-    const isLili = userEmail === 'liliana.cubillo@crearpsl.net' || userEmail === 'lili.cubillo@crearpsl.net' || userEmail.includes('cubillo');
+    const isLili = userEmail === 'liliana.cubillo@crearpsl.net' || userEmail === 'lili.cubillo@crearpsl.net';
     let effectiveSede = normalizeSede(currentUser?.sede);
     if (isLili && (!effectiveSede || effectiveSede === 'Sede Global' || effectiveSede === 'Global')) {
       effectiveSede = 'Quito';
@@ -754,9 +753,7 @@ export default function CentroManagers() {
         if (isGerente) {
           if (mSede !== effectiveSede && mSede !== 'GLOBAL' && mSede !== 'Sede Global') return false;
         } else if (isCoord || canViewOwnSede) {
-          // Coordinadores ven su sede Y a los gerentes (como referencia directiva)
-          const mRol = (m.rol || '').toLowerCase();
-          if (mSede !== effectiveSede && !mRol.includes('gerente')) return false;
+          if (mSede !== effectiveSede) return false;
         } else if (hasQTPrivileges(currentUser)) {
           // QT: ven su sede y al Coordinador Global de QT
           const mRol = (m.rol || '').toLowerCase();
@@ -808,7 +805,7 @@ export default function CentroManagers() {
 
   const groupTeams = useMemo(() => {
     const userEmail = (currentUser?.email || '').toLowerCase().trim();
-    const isLili = userEmail === 'liliana.cubillo@crearpsl.net' || userEmail === 'lili.cubillo@crearpsl.net' || userEmail.includes('cubillo');
+    const isLili = userEmail === 'liliana.cubillo@crearpsl.net' || userEmail === 'lili.cubillo@crearpsl.net';
     let effectiveSede = normalizeSede(currentUser?.sede);
     if (isLili && (!effectiveSede || effectiveSede === 'Sede Global' || effectiveSede === 'Global')) {
       effectiveSede = 'Quito';
@@ -836,8 +833,7 @@ export default function CentroManagers() {
         if (isGerente) {
           if (mSede !== effectiveSede && mSede !== 'GLOBAL' && mSede !== 'Sede Global') return false;
         } else if (isCoord || canViewOwnSede) {
-          const mRol = (m.rol || '').toLowerCase();
-          if (mSede !== effectiveSede && !mRol.includes('gerente')) return false;
+          if (mSede !== effectiveSede) return false;
         } else if (hasQTPrivileges(currentUser)) {
           // QT: ven su sede y al Coordinador Global de QT
           const mRol = (m.rol || '').toLowerCase();

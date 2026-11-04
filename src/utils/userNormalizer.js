@@ -143,7 +143,7 @@ export const normalizeUserRecord = (data, source = 'unknown') => {
   const nSede = normalizeSede(data.sede);
 
   return {
-    id: data.id || data.uid || email || `generated_${Date.now()}`,
+    id: data._docId || data.id || data.uid || email || `generated_${Date.now()}`,
     uid: data.uid || null,
     name: data.name || data.displayName || email?.split('@')[0] || 'Usuario Desconocido',
     displayName: data.displayName || data.name || email?.split('@')[0] || 'Usuario Desconocido',

@@ -106,7 +106,7 @@ export const isGerenciaRole = (role) => {
 export const isGlobalQTCoordinator = (currentUser) => {
   if (!currentUser || isUserInactive(currentUser)) return false;
   const email = (currentUser.email || '').toLowerCase();
-  return email.includes('carlos.brunis') || email.includes('brunische66');
+  return ['carlos.brunis@crearpsl.net', 'brunische66@gmail.com'].includes(email.trim());
 };
 
 /**
@@ -157,7 +157,7 @@ export const MAESTRIA_COORDINATOR_EMAILS = [
 export const isMaestriaCoordinator = (currentUser) => {
   if (!currentUser || isUserInactive(currentUser)) return false;
   const email = (currentUser.email || '').toLowerCase().trim();
-  if (MAESTRIA_COORDINATOR_EMAILS.includes(email) || email.includes('linid') || email.includes('maestria') || email.includes('judith.romero') || email.includes('cubillo')) return true;
+  if (MAESTRIA_COORDINATOR_EMAILS.includes(email)) return true;
   const r = (currentUser.appRole || currentUser.role || '').toLowerCase();
   const roles = Array.isArray(currentUser.roles) ? currentUser.roles.map(x => String(x).toLowerCase()) : [];
   return r === 'coord_maestria' || r === 'coordinador_mj' || r === 'director_maestria' ||
@@ -220,18 +220,6 @@ export const canAssignTrainer = (currentUser) => {
     'paul.sosa@crearpsl.net'
   ];
   if (allowedEmails.includes(email)) return true;
-
-  const name = (currentUser.name || currentUser.displayName || '').toLowerCase();
-  if (
-    name.includes('fer aragon') || 
-    name.includes('fernando aragon') || 
-    name.includes('paul sosa') ||
-    name.includes('linid') ||
-    name.includes('judith') ||
-    name.includes('regina romero')
-  ) {
-    return true;
-  }
 
   return false;
 };

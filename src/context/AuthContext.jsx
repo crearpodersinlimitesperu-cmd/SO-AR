@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { Fragment, createContext, useContext, useEffect, useState } from 'react';
 import { auth } from '../services/firebase';
 import { signInWithPopup, reauthenticateWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'firebase/auth';
 import { collection, query, where, or, getDocs, doc, getDoc, setDoc, serverTimestamp, addDoc } from 'firebase/firestore';
@@ -13,6 +13,8 @@ import { canonicalSede } from '../utils/sede';
 import { isInactiveTrainer } from '../data/trainerIdentity';
 import { createAuthStartupTrace } from '../utils/authStartupTiming';
 import { addConsolidatedRole, resolveActiveRole } from '../utils/activeRole';
+import { assertAuthenticatedIdentity, selectAuthenticatedProfile } from '../utils/authIdentity.js';
+import { bindPrivateSession, clearPrivateSession, privateViewKey } from '../utils/sessionPrivacy.js';
 
 const AuthContext = createContext();
 
@@ -50,38 +52,7 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const { showToast } = useUI();
 
-  // (07/09/2026) DIAGNÓSTICO CONFIRMADO CON DATOS REALES: 60 de 144 correos en
-  // la colección "users" tienen MÁS DE UN documento — típicamente uno creado
-  // por bootstrapSync.js/qtSyncDaemon.js con un ID tipo slug (ej.
-  // "jose_sanchez_crearpsl", con "roles" casi siempre en null) y otro creado
-  // por el propio login con ID = UID real de Firebase Auth (con "roles" bien
-  // poblado como arreglo). Antes de este fix, cuando una consulta encontraba
-  // ambos documentos, `snap.docs[0]` devolvía el que Firestore ordenara
-  // primero (orden no controlado por nosotros, prácticamente una moneda al
-  // aire) — así que en cada login la persona podía "perder" sus roles
-  // múltiples si por azar se devolvía el documento slug en vez del UID.
-  // Esto es justamente por qué el selector de "cambiar rol" no aparecía de
-  // forma consistente para gente con más de un cargo real.
-  // Las reglas de Firestore (firestore.rules) SIEMPRE validan permisos
-  // leyendo users/{request.auth.uid} — por eso, cuando hay varios documentos
-  // para el mismo correo, preferimos deliberadamente el que tiene forma de
-  // UID de Firebase Auth: es el mismo que las reglas van a usar de todos
-  // modos, así que usarlo también para leer el perfil hace que el
-  // comportamiento sea consistente en vez de aleatorio.
-  const pareceUidFirebase = (docId) => /^[A-Za-z0-9]{20,36}$/.test(docId) && !docId.includes('_');
-
-  const elegirDocumentoCanonico = (snap) => {
-    if (snap.empty) return null;
-    if (snap.size === 1) return snap.docs[0];
-    // Si hay varios documentos para el mismo correo, preferir el que tiene
-    // forma de UID de Firebase Auth (el mismo que usan las reglas de
-    // seguridad y las escrituras de login). Si ninguno tiene esa forma,
-    // se mantiene el comportamiento anterior (el primero que devuelva Firestore).
-    const conFormaDeUid = snap.docs.find((d) => pareceUidFirebase(d.id));
-    return conFormaDeUid || snap.docs[0];
-  };
-
-  // Búsqueda progresiva de usuarios en Firestore
+  // Preferir el UID autenticado exacto; un ID que parece UID no prueba identidad.
   const findUserInFirestore = async (normalizedEmail) => {
     try {
       const usersRef = collection(db, "users");
@@ -92,20 +63,8 @@ export function AuthProvider({ children }) {
         where("corporateEmail", "==", normalizedEmail),
         where("personalEmail", "==", normalizedEmail)
       )));
-      // Un solo viaje de red, pero la misma prioridad entre campos y el mismo
-      // desempate UID/slug dentro del campo ganador que la búsqueda progresiva.
-      for (const field of ['emails', 'email', 'corporateEmail', 'personalEmail']) {
-        const docs = snap.docs.filter((d) => {
-          const value = d.data()[field];
-          return field === 'emails'
-            ? Array.isArray(value) && value.includes(normalizedEmail)
-            : value === normalizedEmail;
-        });
-        if (docs.length) {
-          const elegido = elegirDocumentoCanonico({ empty: false, size: docs.length, docs });
-          return { ...elegido.data(), _docId: elegido.id };
-        }
-      }
+      const elegido = selectAuthenticatedProfile(snap.docs, auth.currentUser, normalizedEmail);
+      if (elegido) return { ...elegido.data(), _docId: elegido.id };
 
     } catch (err) {
       console.error("Error consultando Firestore:", err);
@@ -120,11 +79,8 @@ export function AuthProvider({ children }) {
         where('emails', 'array-contains', email),
         where('email', '==', email)
       )));
-      const preferred = snap.docs.find((d) => {
-        const emails = d.data().emails;
-        return Array.isArray(emails) && emails.includes(email);
-      });
-      return (preferred || snap.docs[0])?.data() || null;
+      const selected = selectAuthenticatedProfile(snap.docs, auth.currentUser, email);
+      return selected?.data() || null;
     } catch (err) {
       console.error("Error consultando staff_directory:", err);
       throw err;
@@ -134,6 +90,7 @@ export function AuthProvider({ children }) {
   const switchRole = async (newRole) => {
     const canonicalNewRole = normalizeRole(newRole);
     const userBeforeSwitch = currentUser;
+    const ownerUid = auth.currentUser?.uid;
     if (!userBeforeSwitch) return;
 
     const canSelectRole = userBeforeSwitch.isSuperAdmin ||
@@ -158,9 +115,13 @@ export function AuthProvider({ children }) {
       }
     }
 
-    sessionStorage.setItem('cpsl_active_role', canonicalNewRole);
+    if (auth.currentUser?.uid !== ownerUid) {
+      showToast('La cuenta cambió durante el cambio de rol. No se aplicó a la nueva sesión.', 'error');
+      return false;
+    }
     setCurrentUser(prev => {
-      if (!prev) return null;
+      if (!prev || privateViewKey(prev) !== privateViewKey(userBeforeSwitch)) return prev;
+      sessionStorage.setItem('cpsl_active_role', canonicalNewRole);
       const isConsolidated = canonicalNewRole === 'consolidado';
       const userRoles = prev.roles || [prev.appRole || ''];
       const hasDireccion = userRoles.some(r => isDireccionRole(r)) || isDireccionRole(prev.role) || isDireccionRole(prev.rawRole);
@@ -277,16 +238,8 @@ export function AuthProvider({ children }) {
     // colapsos de cargos. Un documento histórico puede tener el correo de login
     // en un campo y el corporativo/alterno en otro; se consultan todos antes de
     // aceptar que no existe un perfil canónico. Así un alias no rebaja cargos.
-    const identityEmails = Array.from(new Set([
-      normalizedEmail,
-      user?.email,
-      foundUser?.email,
-      foundUser?.correo,
-      foundUser?.corporateEmail,
-      foundUser?.personalEmail,
-      ...(Array.isArray(foundUser?.emails) ? foundUser.emails : [])
-    ].filter(Boolean).map((email) => email.toString().trim().toLowerCase())));
-    const officialProfile = identityEmails.map(findUserByAnyEmail).find(Boolean) || null;
+    assertAuthenticatedIdentity(foundUser, normalizedEmail, findUserByAnyEmail);
+    const officialProfile = findUserByAnyEmail(normalizedEmail) || findUserByAnyEmail(rawEmail);
     
     // Prioridad: Base de Datos Firestore (cuando ha sido configurada o actualizada) > Catálogo oficial
     const hasAdminUpdatedRoles = Boolean(foundUser.rolesUpdatedAt || foundUser.rolesUpdatedBy);
@@ -302,7 +255,7 @@ export function AuthProvider({ children }) {
     let canonicalRole = normalizeRole(
       isRoleConfiguredInDb ? dbRole : (officialProfile?.role || dbRole || 'colaborador')
     );
-    const isSuperAdmin = isSuperAdminEmail(normalizedEmail) || isSuperAdminEmail(foundUser.email);
+    const isSuperAdmin = isSuperAdminEmail(normalizedEmail);
     const isDualTrainer = DUAL_ROLE_TRAINER_EMAILS.includes(normalizedEmail);
     const isOfficialCoord = Boolean(
       officialProfile && ['coord_c1', 'coord_maestria', 'director_maestria'].includes(canonicalRole)
@@ -392,7 +345,7 @@ export function AuthProvider({ children }) {
     }
 
     // Liliana Cubillo: Coordinadora de Maestría del Juego y Entrenadora de Llamadas (Quito)
-    const isLiliCubillo = ['liliana.cubillo@crearpsl.net', 'lili.cubillo@crearpsl.net'].includes(normalizedEmail) || ['liliana.cubillo@crearpsl.net', 'lili.cubillo@crearpsl.net'].includes(rawEmail) || normalizedEmail.includes('cubillo');
+    const isLiliCubillo = ['liliana.cubillo@crearpsl.net', 'lili.cubillo@crearpsl.net'].includes(normalizedEmail) || ['liliana.cubillo@crearpsl.net', 'lili.cubillo@crearpsl.net'].includes(rawEmail);
     if (isLiliCubillo) {
       if (!assignedRoles.includes('coord_maestria')) assignedRoles.push('coord_maestria');
       if (!assignedRoles.includes('entrenador_llamadas')) assignedRoles.push('entrenador_llamadas');
@@ -457,7 +410,10 @@ export function AuthProvider({ children }) {
 
     return {
       ...user,
-      email: foundUser.email || user.email, // 🚨 Unifica TODO sobre el correo primario para que coincida con DB y Checklist
+      email: officialProfile?.email || normalizedEmail,
+      authEmail: rawEmail,
+      emails: [...new Set([rawEmail, normalizedEmail, officialProfile?.email,
+        ...(officialProfile?.emails || [])].filter(Boolean))],
       name: foundUser.name || user.displayName || 'Colaborador CREAR',
       appRole: activeRole,
       activeRole: activeRole,
@@ -511,7 +467,11 @@ export function AuthProvider({ children }) {
     provider.addScope('https://www.googleapis.com/auth/drive.file');
     provider.addScope('https://www.googleapis.com/auth/drive.metadata.readonly');
     try {
+      const ownerUid = auth.currentUser.uid;
       const result = await reauthenticateWithPopup(auth.currentUser, provider);
+      if (auth.currentUser?.uid !== ownerUid || result.user.uid !== ownerUid) {
+        throw new Error('La cuenta cambió durante la reautenticación de Google.');
+      }
       const credential = GoogleAuthProvider.credentialFromResult(result);
       if (credential && credential.accessToken) {
         sessionStorage.setItem('googleAccessToken', credential.accessToken);
@@ -558,6 +518,9 @@ export function AuthProvider({ children }) {
     try {
       if (participantFlow) sessionStorage.setItem(PARTICIPANT_FLAG, '1');
       const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      if (auth.currentUser?.uid !== user.uid) throw new Error('La cuenta cambió durante el inicio de sesión.');
+      bindPrivateSession(user.uid, localStorage, sessionStorage);
 
       // Extract Google Access Token for API calls
       const credential = GoogleAuthProvider.credentialFromResult(result);
@@ -565,7 +528,6 @@ export function AuthProvider({ children }) {
         sessionStorage.setItem('googleAccessToken', credential.accessToken);
       }
       
-      const user = result.user;
       const rawEmail = user.email.trim().toLowerCase();
       
       // FORZAR USO DE .NET (Excepto para los correos autorizados explicitamente de gmail y miembros registrados)
@@ -605,7 +567,8 @@ export function AuthProvider({ children }) {
         try {
           const qtRef = collection(db, "qt_directory");
           let qSnap = await getDocs(query(qtRef, where("email", "==", rawEmail)));
-          if (!qSnap.empty) foundUser = qSnap.docs[0].data();
+          const selected = selectAuthenticatedProfile(qSnap.docs, user, rawEmail);
+          if (selected) foundUser = { ...selected.data(), _docId: selected.id };
         } catch (err) {
           console.error("Error consultando qt_directory:", err);
         }
@@ -618,6 +581,7 @@ export function AuthProvider({ children }) {
           foundUser = { ...staticUser };
         }
       }
+      if (auth.currentUser?.uid !== user.uid) throw new Error('La cuenta cambió durante el inicio de sesión.');
 
       // Participante externo (cliente/miembro de cualquier sede) que solo viene a
       // firmar sus contratos: se admite cualquier cuenta Google, con perfil limitado
@@ -657,6 +621,7 @@ export function AuthProvider({ children }) {
       }
 
       // Normalizar el registro usando el esquema canónico (Hito 1)
+      assertAuthenticatedIdentity(foundUser, normalizedEmail, findUserByAnyEmail);
       let canonicalUser = normalizeUserRecord(foundUser, 'login');
 
       // 🕵️‍♂️ AGENTE ONLINE: Validar y sanar multiroles 
@@ -667,6 +632,10 @@ export function AuthProvider({ children }) {
           error => ({ error })
         )
       ]);
+      if (auth.currentUser?.uid !== user.uid) throw new Error('La cuenta cambió durante el inicio de sesión.');
+      if (profileResult.snapshot?.exists()) {
+        assertAuthenticatedIdentity(profileResult.snapshot.data(), normalizedEmail, findUserByAnyEmail, user.uid);
+      }
       canonicalUser = mergeAuthenticatedRoleProfile(
         canonicalUser,
         profileResult.snapshot?.exists() ? profileResult.snapshot.data() : null,
@@ -684,6 +653,7 @@ export function AuthProvider({ children }) {
       }
 
       const userObj = buildUserObject(user, canonicalUser, normalizedEmail);
+      if (auth.currentUser?.uid !== user.uid) throw new Error('La cuenta cambió durante el inicio de sesión.');
       setCurrentUser(userObj);
 
       recordAuditEvent({
@@ -715,17 +685,22 @@ export function AuthProvider({ children }) {
   };
 
   const logout = async () => {
+    clearPrivateSession(localStorage, sessionStorage);
+    setCurrentUser(null);
+    setOriginalAdminUser(null);
     if (currentUser && !currentUser.isSimulated) {
       try {
-        await recordAuditEvent({
+        recordAuditEvent({
           email: currentUser.email || currentUser.emails?.[0] || 'Desconocido',
           name: currentUser.name || 'Desconocido',
           role: currentUser.appRole || 'Desconocido',
           sede: currentUser.sede || 'Desconocida',
           action: 'LOGOUT',
           details: 'Cierre de sesión manual'
-        });
-      } catch (e) {}
+        }).catch(error => console.error('Error registrando cierre de sesión:', error));
+      } catch (error) {
+        console.error('Error registrando cierre de sesión:', error);
+      }
     }
     sessionStorage.removeItem('googleAccessToken');
     sessionStorage.removeItem('cpsl_active_role');
@@ -746,6 +721,7 @@ export function AuthProvider({ children }) {
       setOriginalAdminUser(null);
       startupTrace.authReady();
       try {
+        bindPrivateSession(user?.uid || null, localStorage, sessionStorage);
         if (user) {
           const rawEmail = user.email.trim().toLowerCase();
           const normalizedEmail = rawEmail.replace('@crearpsl.com', '@crearpsl.net');
@@ -792,6 +768,7 @@ export function AuthProvider({ children }) {
               return;
             }
 
+            assertAuthenticatedIdentity(foundUser, normalizedEmail, findUserByAnyEmail);
             let canonicalUser = normalizeUserRecord(foundUser, 'onAuthStateChanged');
             
             // 🕵️‍♂️ AGENTE ONLINE: Validar y sanar multiroles 
@@ -803,6 +780,9 @@ export function AuthProvider({ children }) {
               )
             ]);
             if (!isCurrentSession()) return;
+            if (profileResult.snapshot?.exists()) {
+              assertAuthenticatedIdentity(profileResult.snapshot.data(), normalizedEmail, findUserByAnyEmail, user.uid);
+            }
             canonicalUser = mergeAuthenticatedRoleProfile(
               canonicalUser,
               profileResult.snapshot?.exists() ? profileResult.snapshot.data() : null,
@@ -875,14 +855,6 @@ export function AuthProvider({ children }) {
             setCurrentUser(null);
           }
         } else {
-          const mockDevUser = localStorage.getItem('cpsl_mock_user');
-          if (mockDevUser) {
-            try {
-              const parsed = JSON.parse(mockDevUser);
-              setCurrentUser(parsed);
-              return;
-            } catch(e) {}
-          }
           sessionStorage.removeItem('googleAccessToken');
           sessionStorage.removeItem('cpsl_active_role');
           setCurrentUser(null);
@@ -938,7 +910,7 @@ export function AuthProvider({ children }) {
           </div>
           <style>{`@keyframes causaSpin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
         </div>
-      ) : children}
+      ) : <Fragment key={privateViewKey(currentUser)}>{children}</Fragment>}
     </AuthContext.Provider>
   );
 }

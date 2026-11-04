@@ -23,6 +23,7 @@ import { isSuperAdminEmail, canSimulate, canManageUserStatus } from '../config/p
 import { getFlagForSede } from '../utils/flags';
 import TaskAssignmentModal from './TaskAssignmentModal';
 import UserStatusModal from './UserStatusModal';
+import { canReadPrivateProfile } from '../utils/privacyScope.js';
 
 // Roles editables desde este modal (Super Admin) — lista curada de roles
 // canónicos para evitar mostrar sinónimos duplicados (ej. "coordinador_c1c2"
@@ -89,7 +90,12 @@ function formatBirthdayNoYear(cumpleanos) {
   return `${dia} de ${MESES_ES[mesIdx]}`;
 }
 
-export default function UserProfileModal({ isOpen, onClose, user, allTasks = [], onStatusUpdated, initialTab = null }) {
+export default function UserProfileModal(props) {
+  const targetKey = JSON.stringify([props.user?.id, props.user?.uid, props.user?.email, props.isOpen]);
+  return <UserProfileContent key={targetKey} {...props} />;
+}
+
+function UserProfileContent({ isOpen, onClose, user, allTasks = [], onStatusUpdated, initialTab = null }) {
   const { currentUser, originalAdminUser, simulateUser, updateCurrentUserFields } = useAuth();
   const navigate = useNavigate();
   const { toggleTask } = useChecklist();
@@ -209,6 +215,7 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
   const [activeTab, setActiveTab] = useState(initialTab || (isRezagadosUser ? 'guia_rezagados' : 'tasks')); // 'tasks' | 'notes' | 'documents' | 'guia_rezagados'
   const [profileData, setProfileData] = useState({ notes: [], documents: [] });
   const [loadingMeta, setLoadingMeta] = useState(true);
+  const mayReadPrivateProfile = canReadPrivateProfile(currentUser, user);
 
   // Form states for Notes & Documents
   const [newNoteText, setNewNoteText] = useState('');
@@ -274,12 +281,19 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
 
   // Firestore sync for user meta
   useEffect(() => {
-    if (!isOpen || !user?.email) return;
+    setProfileData({ notes: [], documents: [] });
+    setLoadingMeta(true);
+    if (!isOpen || !user?.email || !mayReadPrivateProfile) {
+      setLoadingMeta(false);
+      return;
+    }
 
     const userDocId = user.email.toLowerCase().trim();
     const userDocRef = doc(db, 'user_profiles', userDocId);
+    let active = true;
 
     const unsubscribe = onSnapshot(userDocRef, (docSnap) => {
+      if (!active) return;
       let localConns = {};
       try {
         localConns = JSON.parse(localStorage.getItem('cpsl_user_connections') || '{}');
@@ -320,12 +334,14 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
       }
       setLoadingMeta(false);
     }, (err) => {
+      if (!active) return;
       console.error("Error fetching user profile meta:", err);
+      setProfileData({ notes: [], documents: [] });
       setLoadingMeta(false);
     });
 
-    return () => unsubscribe();
-  }, [isOpen, user]);
+    return () => { active = false; unsubscribe(); };
+  }, [isOpen, user, mayReadPrivateProfile]);
 
   // (15/09/2026) BUG CRITICO CORREGIDO: este "return null" vivia AQUI, antes de
   // los 4 useMemo de mas abajo (userTasks/completedTasks/criticalPending/
@@ -752,6 +768,7 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
   // Handler: Add Note
   const handleAddNote = async (e) => {
     e.preventDefault();
+    if (!mayReadPrivateProfile) { showToast('No tienes acceso a este perfil privado.', 'error'); return; }
     if (!newNoteText.trim()) return;
 
     setIsSavingNote(true);
@@ -789,6 +806,7 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
 
   // Handler: Delete Note
   const handleDeleteNote = async (noteItem) => {
+    if (!mayReadPrivateProfile) { showToast('No tienes acceso a este perfil privado.', 'error'); return; }
     try {
       const userDocId = user.email.toLowerCase().trim();
       const userDocRef = doc(db, 'user_profiles', userDocId);
@@ -805,6 +823,7 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
   // Handler: Add Document Link
   const handleAddDocument = async (e) => {
     e.preventDefault();
+    if (!mayReadPrivateProfile) { showToast('No tienes acceso a este perfil privado.', 'error'); return; }
     if (!newDocTitle.trim() || !newDocUrl.trim()) return;
 
     let formattedUrl = newDocUrl.trim();
@@ -848,6 +867,7 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
 
   // Handler: Delete Document
   const handleDeleteDocument = async (docItem) => {
+    if (!mayReadPrivateProfile) { showToast('No tienes acceso a este perfil privado.', 'error'); return; }
     try {
       const userDocId = user.email.toLowerCase().trim();
       const userDocRef = doc(db, 'user_profiles', userDocId);
@@ -1958,7 +1978,7 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
               </div>
             )}
             {/* TAB 2: NOTES & BITÁCORA */}
-            {activeTab === 'notes' && (
+            {activeTab === 'notes' && mayReadPrivateProfile && (
               <div>
                 <form onSubmit={handleAddNote} style={{ marginBottom: '1.5rem', background: 'rgba(255,255,255,0.02)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)' }}>
                   <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--crear-gold)', fontWeight: 'bold', marginBottom: '0.4rem' }}>
@@ -2027,7 +2047,7 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
             )}
 
             {/* TAB 3: DOCUMENTS & LINKS */}
-            {activeTab === 'documents' && (
+            {activeTab === 'documents' && mayReadPrivateProfile && (
               <div>
                 <form onSubmit={handleAddDocument} style={{ marginBottom: '1.5rem', background: 'rgba(255,255,255,0.02)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)' }}>
                   <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--crear-cyan)', fontWeight: 'bold', marginBottom: '0.6rem' }}>

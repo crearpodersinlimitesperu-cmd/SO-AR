@@ -55,7 +55,7 @@ beforeEach(async () => {
   await testEnv.withSecurityRulesDisabled(async context => {
     const db = context.firestore();
     await Promise.all(Object.entries(USERS).map(([uid, data]) =>
-      setDoc(doc(db, 'users', uid), { uid, ...data })
+      setDoc(doc(db, 'users', uid), { uid, sede: 'Quito', ...data })
     ));
   });
 });
@@ -71,8 +71,8 @@ const superAdminDb = () =>
   testEnv.authenticatedContext(SUPERADMIN.uid, { email: SUPERADMIN.email }).firestore();
 const anonDb = () => testEnv.unauthenticatedContext().firestore();
 
-test('auth startup: OR identity query supports all aliases with unchanged authenticated rules', async () => {
-  const target = 'alias@example.com';
+test('auth startup: OR queries read only the authenticated identity across all alias fields', async () => {
+  const target = USERS['ent-1'].email;
   await Promise.all([
     seed(['users', 'alias-array'], { emails: [target] }),
     seed(['users', 'alias-email'], { email: target }),
@@ -88,8 +88,9 @@ test('auth startup: OR identity query supports all aliases with unchanged authen
     where('personalEmail', '==', target)
   ));
   const snap = await assertSucceeds(getDocs(lookup(dbOf('ent-1'))));
-  assert.deepEqual(snap.docs.map(d => d.id), ['alias-array', 'alias-corporate', 'alias-email', 'alias-personal']);
+  assert.deepEqual(snap.docs.map(d => d.id), ['alias-array', 'alias-corporate', 'alias-email', 'alias-personal', 'ent-1']);
   await assertFails(getDocs(lookup(anonDb())));
+  await assertFails(getDocs(lookup(dbOf('coord-1'))));
   const staffQuery = db => query(collection(db, 'staff_directory'), or(
     where('emails', 'array-contains', target), where('email', '==', target)
   ));
@@ -141,8 +142,9 @@ test('metadata-only UID profiles preserve own learning, sync and directory acces
     userEmail: 'nuevo@crearpsl.net', timestamp: '2026-10-09T00:00:00.000Z'
   }));
   await assertSucceeds(getDocs(query(collection(db, 'sync_history'), where('userEmail', '==', 'nuevo@crearpsl.net'))));
-  await assertSucceeds(getDocs(collection(db, 'users')));
-  await assertSucceeds(getDocs(collection(db, 'qt_directory')));
+  await assertFails(getDocs(collection(db, 'users')));
+  await assertFails(getDocs(collection(db, 'qt_directory')));
+  await assertSucceeds(getDocs(query(collection(db, 'users'), where('email', '==', USERS['metadata-1'].email))));
   await assertFails(setDoc(doc(db, 'qt_directory', 'forged'), { email: 'foreign@example.com' }));
   await assertFails(setDoc(doc(db, 'user_stats', 'foreign-uid'), { totalTasks: 1 }));
 });
@@ -179,15 +181,16 @@ test('sync_history: update y delete por el dueño o la gerencia', async () => {
   await assertSucceeds(deleteDoc(doc(dbOf('ent-1'), 'sync_history', 'h1')));
 });
 
-test('qt_directory: la lectura sigue abierta a autenticados y la escritura es gerencial', async () => {
+test('qt_directory: identity/local-sede reads and management-only scoped writes', async () => {
   await seed(['qt_directory', 'q1'], { email: 'qt@crearpsl.net', sede: 'Quito' });
 
   for (const uid of ['ent-1', 'coord-1', 'qt-1']) {
     const db = dbOf(uid);
-    await assertSucceeds(getDocs(collection(db, 'qt_directory')));
-    await assertSucceeds(getDoc(doc(db, 'qt_directory', 'q1')));
+    await assertFails(getDocs(collection(db, 'qt_directory')));
+    if (uid === 'ent-1') await assertFails(getDoc(doc(db, 'qt_directory', 'q1')));
+    else await assertSucceeds(getDoc(doc(db, 'qt_directory', 'q1')));
     await assertSucceeds(getDocs(query(collection(db, 'qt_directory'), where('email', '==', USERS[uid].email))));
-    await assertSucceeds(getDocs(query(collection(db, 'qt_directory'), orderBy('index', 'asc'))));
+    await assertFails(getDocs(query(collection(db, 'qt_directory'), orderBy('index', 'asc'))));
     await assertFails(setDoc(doc(db, 'qt_directory', 'q2'), { email: 'n@example.com' }));
     await assertFails(updateDoc(doc(db, 'qt_directory', 'q1'), { sede: 'Lima' }));
     await assertFails(deleteDoc(doc(db, 'qt_directory', 'q1')));
@@ -195,25 +198,30 @@ test('qt_directory: la lectura sigue abierta a autenticados y la escritura es ge
   await assertFails(getDocs(collection(anonDb(), 'qt_directory')));
   await assertFails(setDoc(doc(anonDb(), 'qt_directory', 'q2'), { email: 'n@example.com' }));
 
-  for (const db of [dbOf('ger-1'), dbOf('ger-multi'), dbOf('dir-1'), superAdminDb()]) {
-    await assertSucceeds(setDoc(doc(db, 'qt_directory', 'q2'), { email: 'n@example.com' }));
+  for (const db of [dbOf('ger-1'), dbOf('ger-multi')]) {
+    await assertSucceeds(setDoc(doc(db, 'qt_directory', 'q2'), { email: 'n@example.com', sede: 'Quito' }));
+    await assertFails(updateDoc(doc(db, 'qt_directory', 'q1'), { sede: 'Lima' }));
+    await assertFails(deleteDoc(doc(db, 'qt_directory', 'q1')));
+  }
+  for (const db of [dbOf('dir-1'), superAdminDb()]) {
+    await assertSucceeds(setDoc(doc(db, 'qt_directory', 'q2'), { email: 'n@example.com', sede: 'Quito' }));
     await assertSucceeds(updateDoc(doc(db, 'qt_directory', 'q1'), { sede: 'Lima' }));
   }
-  await assertSucceeds(deleteDoc(doc(dbOf('ger-1'), 'qt_directory', 'q1')));
+  await assertSucceeds(deleteDoc(doc(superAdminDb(), 'qt_directory', 'q1')));
 });
 
-test('regresión: kpi_reports y managers_directory no cambian (sigue abierto a autenticados)', async () => {
+test('kpi_reports/managers reject unrelated authenticated users and retain own reporting', async () => {
   await seed(['kpi_reports', 'k1'], { submittedByEmail: 'coord@example.com' });
   await seed(['managers_directory', 'm1'], { nombre: 'M', sede: 'Quito' });
   const ent = dbOf('ent-1');
 
-  await assertSucceeds(getDocs(collection(ent, 'kpi_reports')));
+  await assertFails(getDocs(collection(ent, 'kpi_reports')));
   await assertSucceeds(addDoc(collection(ent, 'kpi_reports'), { submittedByEmail: 'ent@example.com' }));
-  await assertSucceeds(updateDoc(doc(ent, 'kpi_reports', 'k1'), { status: 'reviewed' }));
-  await assertSucceeds(getDocs(collection(ent, 'managers_directory')));
-  await assertSucceeds(setDoc(doc(ent, 'managers_directory', 'm2'), { nombre: 'N' }));
-  await assertSucceeds(updateDoc(doc(ent, 'managers_directory', 'm1'), { estado: 'Activo' }));
-  await assertSucceeds(deleteDoc(doc(ent, 'managers_directory', 'm1')));
+  await assertFails(updateDoc(doc(ent, 'kpi_reports', 'k1'), { status: 'reviewed' }));
+  await assertFails(getDocs(collection(ent, 'managers_directory')));
+  await assertFails(setDoc(doc(ent, 'managers_directory', 'm2'), { nombre: 'N' }));
+  await assertFails(updateDoc(doc(ent, 'managers_directory', 'm1'), { estado: 'Activo' }));
+  await assertFails(deleteDoc(doc(ent, 'managers_directory', 'm1')));
 });
 
 test('graduar manager actualiza y lee el documento real cuando id de catálogo difiere del docId', async () => {
@@ -231,7 +239,7 @@ test('graduar manager actualiza y lee el documento real cuando id de catálogo d
 
   const saved = await assertSucceeds(getDoc(ref));
   assert.equal(saved.data().estado, 'Graduado');
-  const stalePath = await assertSucceeds(getDoc(doc(db, 'managers_directory', manager.id)));
+  const stalePath = await assertSucceeds(getDoc(doc(superAdminDb(), 'managers_directory', manager.id)));
   assert.equal(stalePath.exists(), false);
 });
 
@@ -253,5 +261,6 @@ test('anonymous callers cannot access stats/history and whitelist management nee
   await assertFails(addDoc(collection(db, 'sync_history'), { userEmail: 'ent@example.com' }));
   const management = testEnv.authenticatedContext('without-profile', { email: 'fer.aragon@crearpsl.net' }).firestore();
   await assertSucceeds(getDocs(collection(management, 'user_stats')));
-  await assertSucceeds(setDoc(doc(management, 'qt_directory', 'managed'), { email: 'qt@example.com' }));
+  await assertSucceeds(getDocs(collection(management, 'qt_directory')));
+  await assertFails(setDoc(doc(management, 'qt_directory', 'managed'), { email: 'qt@example.com' }));
 });

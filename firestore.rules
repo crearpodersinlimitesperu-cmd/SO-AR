@@ -60,6 +60,19 @@ service cloud.firestore {
         : [email()];
     }
 
+    function privateCallerAliases() {
+      let profile = /databases/$(database)/documents/users/$(request.auth.uid);
+      let data = exists(profile) ? get(profile).data : {};
+      let verified = data.get('emails', []);
+      let primary = data.get('email', '');
+      let work = data.get('corporateEmail', '');
+      let personal = data.get('personalEmail', '');
+      return callerEmailAliases().concat(verified is list && !('' in verified) ? verified : [])
+        .concat(primary is string && primary != '' ? [primary] : [])
+        .concat(work is string && work != '' ? [work] : [])
+        .concat(personal is string && personal != '' ? [personal] : []);
+    }
+
     // Debe coincidir con SUPER_ADMIN_EMAILS en src/config/permissions.js
     function isSuperAdmin() {
       return isAuthenticated() && (
@@ -629,8 +642,10 @@ service cloud.firestore {
 
     // USER PROFILES (registro de ├║ltimo login / conexi├│n, doc ID = correo)
     match /user_profiles/{userDocId} {
-      allow read: if isAuthenticated();
-      allow write: if isAuthenticated() && email() == userDocId;
+      allow read: if isAuthenticated() && (
+        emailIsCaller(userDocId) || isPrivateProfileAdministrator()
+      );
+      allow write: if isAuthenticated() && (emailIsCaller(userDocId) || isPrivateProfileAdministrator());
     }
 
     function isValidNotificationData() {
@@ -695,30 +710,32 @@ service cloud.firestore {
     // Los usuarios pueden mantener sus datos de perfil y elegir una vista entre
     // los roles que ya tienen asignados, sin poder ampliar esos roles.
     match /users/{userId} {
-      allow read: if isAuthenticated();
+      allow get: if isAuthenticated() && userId == request.auth.uid;
+      allow read: if canReadDirectoryRecord(resource.data);
       allow create: if isSuperAdmin() || (
-        isAuthenticated() && (
-          request.auth.uid == userId ||
-          (request.resource.data != null && (
-            request.resource.data.get('email', '') == email() ||
-            (request.resource.data.get('emails', []) is list && email() in request.resource.data.get('emails', [])) ||
-            request.resource.data.get('uid', '') == request.auth.uid
-          ))
-        )
+        isAuthenticated() &&
+        request.auth.uid == userId &&
+        request.resource.data.keys().hasOnly([
+          'uid', 'email', 'name', 'displayName', 'photoURL',
+          'lastLoginAt', 'createdAt', 'provider'
+        ]) &&
+        request.resource.data.get('uid', '') == request.auth.uid &&
+        emailIsCaller(request.resource.data.get('email', ''))
       );
       allow update: if isSuperAdmin() || (
         isAuthenticated() && (
           request.auth.uid == userId ||
           (resource != null && (
-            resource.data.get('email', '') == email() ||
-            (resource.data.get('emails', []) is list && email() in request.resource.data.get('emails', [])) ||
+            isDirectoryIdentity(resource.data) ||
             resource.data.get('uid', '') == request.auth.uid
           ))
         ) &&
-        !request.resource.data.diff(resource.data).affectedKeys().hasAny([
-          'isSuperAdmin', 'isActive', 'status', 'active', 'rolesUpdatedBy', 'rolesUpdatedAt',
-          'role', 'rol', 'appRole', 'roles', 'sede', 'roleSedes'
-        ])
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'name', 'displayName', 'photoURL', 'lastLoginAt', 'equiposQuito',
+          'document', 'docType', 'activeRoleOverride'
+        ]) &&
+        (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['activeRoleOverride']) ||
+         request.resource.data.activeRoleOverride in resource.data.get('roles', []))
       );
       allow delete: if isSuperAdmin();
 
@@ -948,30 +965,158 @@ service cloud.firestore {
       );
     }
     function emailIsCaller(value) {
-      return value is string && value.lower() in callerEmailAliases();
+      return value is string && value != '' && value.lower() in privateCallerAliases();
+    }
+
+    function isGlobalPrivacyReader() {
+      return isSuperAdmin() || callerHasAnyRole([
+        'direccion', 'cfo', 'cco', 'ceo', 'director_maestria', 'observador'
+      ]) || (isAuthenticated() && email() in [
+        'fer.aragon@crearpsl.net', 'andres.gomez@crearpsl.net', 'gomeznueve@gmail.com',
+        'jesus.acosta@crearpsl.net', 'chuyacostar88@gmail.com', 'jesusadrianacosta@gmail.com'
+      ]);
+    }
+
+    function isPrivateProfileAdministrator() {
+      return isSuperAdmin() || callerHasAnyRole([
+        'direccion', 'cfo', 'cco', 'ceo', 'talento_humano'
+      ]) || (isAuthenticated() && email() == 'karen.moran@crearpsl.net');
+    }
+
+    function privacySede(value) {
+      return !(value is string) ? '' :
+        value.lower().matches('.*quito.*|uio') ? 'quito' :
+        value.lower().matches('.*lima.*|lim') ? 'lima' :
+        value.lower().matches('.*cuenca.*|cue') ? 'cuenca' :
+        value.lower().matches('.*guayaquil.*|gye') ? 'guayaquil' :
+        value.lower().matches('medell[ií]n|med') ? 'medellin' :
+        value.lower().matches('m[eé]xico|mex|cdmx') ? 'mexico' : '';
+    }
+
+    function samePrivateSedeValue(sedeValue) {
+      let profile = /databases/$(database)/documents/users/$(request.auth.uid);
+      let ownSede = exists(profile) ? privacySede(get(profile).data.get('sede', '')) : '';
+      let target = privacySede(sedeValue);
+      let targetLabel = target == 'quito' ? 'Quito' : target == 'lima' ? 'Lima' :
+        target == 'cuenca' ? 'Cuenca' : target == 'guayaquil' ? 'Guayaquil' :
+        target == 'medellin' ? 'Medellín' : target == 'mexico' ? 'México' : '';
+      return exists(profile) && target != '' && (
+        (ownSede != '' && ownSede == target) ||
+        targetLabel in get(profile).data.get('roleSedes', {}).values()
+      );
+    }
+
+    function samePrivateSede(data) {
+      return samePrivateSedeValue(data.get('sede', ''));
+    }
+
+    function hasLocalDirectoryAccess() {
+      return callerHasAnyRole([
+        'gerente', 'coord_c1', 'coordinador_c1', 'coordinador_c1c2',
+        'coord_maestria', 'coordinador_mj', 'capitan', 'qt'
+      ]) || (isAuthenticated() && email() in [
+        'linid.valencia@crearpsl.net', 'judith.romero@crearpsl.net',
+        'erika.gavilanez@crearpsl.net', 'liliana.cubillo@crearpsl.net', 'lili.cubillo@crearpsl.net'
+      ]);
+    }
+
+    function isGlobalQTReader() {
+      return isAuthenticated() && email() in [
+        'carlos.brunis@crearpsl.net', 'brunische66@gmail.com'
+      ];
+    }
+
+    function isDirectoryIdentity(data) {
+      let aliases = privateCallerAliases();
+      return data.get('email', '') in aliases ||
+        data.get('corporateEmail', '') in aliases ||
+        data.get('personalEmail', '') in aliases ||
+        (
+          email() in data.get('emails', []) ||
+          data.get('emails', []).hasAny(aliases)
+        );
+    }
+
+    function canReadDirectoryRecord(data) {
+      return isAuthenticated() && (
+        isGlobalPrivacyReader() || isPrivateProfileAdministrator() || isGlobalQTReader() ||
+        isDirectoryIdentity(data) || (hasLocalDirectoryAccess() && samePrivateSede(data))
+      );
+    }
+
+    function isAssignedPrivateTrainer(data) {
+      let profile = /databases/$(database)/documents/users/$(request.auth.uid);
+      return emailIsCaller(data.get('entrenadorEmail', '')) ||
+        data.get('entrenadorId', '') == request.auth.uid ||
+        (exists(profile) && (
+          data.get('entrenadorId', '') in get(profile).data.get('trainerDirectoryIds', []) ||
+          (data.get('entrenadorId', '') == '' && data.get('entrenadorEmail', '') == '' &&
+           data.get('entrenador', '') in get(profile).data.get('trainerNames', []))
+        ));
+    }
+
+    function canReadPrivateManager(data) {
+      return canReadDirectoryRecord(data) || (isAuthenticated() && isAssignedPrivateTrainer(data));
+    }
+
+    function canEditLocalManagers(data) {
+      return isSuperAdmin() || callerHasAnyRole([
+        'direccion', 'cfo', 'cco', 'ceo', 'director_maestria'
+      ]) || (
+        hasLocalDirectoryAccess() && samePrivateSede(data)
+      );
+    }
+
+    function canReadPrivateKpi(data) {
+      return isGlobalPrivacyReader() ||
+        emailIsCaller(data.get('targetUserEmail', '')) ||
+        emailIsCaller(data.get('userEmail', '')) ||
+        emailIsCaller(data.get('submittedByEmail', '')) ||
+        (callerHasAnyRole(['gerente']) && samePrivateSedeValue(data.get('userSede', '')));
     }
 
     // ------------------------------------------------------------------------
     // COLECCIONES AUDITADAS CON PERMISOS AMPLIOS DE COLABORACIÓN OPERATIVA
     // ------------------------------------------------------------------------
     match /staff_directory/{document=**} {
-      allow read, write: if isAuthenticated();
+      allow read: if canReadDirectoryRecord(resource.data);
+      allow write: if isSuperAdmin();
     }
     match /managers_directory/{document=**} {
-      allow read, write: if isAuthenticated();
+      allow read: if canReadPrivateManager(resource.data);
+      allow create: if isAuthenticated() && canEditLocalManagers(request.resource.data);
+      allow update: if isAuthenticated() && (
+        (canEditLocalManagers(resource.data) && canEditLocalManagers(request.resource.data)) ||
+        (isAssignedPrivateTrainer(resource.data) &&
+         request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+           'llamadaFecha', 'llamadaAsistio', 'llamadasHistorial'
+         ]))
+      );
+      allow delete: if isSuperAdmin();
     }
     match /excellence_standards/{document=**} {
       allow read, write: if isAuthenticated();
     }
     match /kpi_reports/{document=**} {
-      allow read, write: if isAuthenticated();
+      allow read: if isAuthenticated() && canReadPrivateKpi(resource.data);
+      allow create: if isAuthenticated() &&
+        emailIsCaller(request.resource.data.get('submittedByEmail', '')) &&
+        canReadPrivateKpi(request.resource.data);
+      allow update: if isAuthenticated() && canReadPrivateKpi(resource.data) &&
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+          'targetUserId', 'targetUserEmail', 'targetUserSede', 'userEmail', 'userSede', 'submittedByEmail'
+        ]);
+      allow delete: if isSuperAdmin();
     }
     match /learning_logs/{document=**} {
       allow read, write: if isAuthenticated();
     }
     match /qt_directory/{document=**} {
-      allow read: if isAuthenticated();
-      allow write: if isManagementRole();
+      allow read: if canReadDirectoryRecord(resource.data);
+      allow create: if isManagementRole() && canEditLocalManagers(request.resource.data);
+      allow update: if isManagementRole() && canEditLocalManagers(resource.data) &&
+        canEditLocalManagers(request.resource.data);
+      allow delete: if isSuperAdmin();
     }
     match /success_patterns/{document=**} {
       allow read, write: if isAuthenticated();
@@ -1018,11 +1163,27 @@ service cloud.firestore {
       allow read: if isAuthenticated();
       allow write: if isGerenteODireccion() || isSuperAdmin();
     }
-    match /llamadas_grupales_historial/{document=**} {
-      allow read, write: if isAuthenticated();
+    match /llamadas_grupales_historial/{callId} {
+      allow get: if isAuthenticated() &&
+        !exists(/databases/$(database)/documents/llamadas_grupales_historial/$(callId));
+      allow read: if isAuthenticated() && (
+        isGlobalPrivacyReader() || emailIsCaller(resource.data.get('registradoPorEmail', ''))
+      );
+      allow create: if isAuthenticated() &&
+        emailIsCaller(request.resource.data.get('registradoPorEmail', ''));
+      allow update, delete: if isSuperAdmin();
     }
     match /notas_seguimiento/{document=**} {
-      allow read, write: if isAuthenticated();
+      allow read: if isAuthenticated() && (
+        isGlobalPrivacyReader() || emailIsCaller(resource.data.get('autorEmail', '')) ||
+        (callerHasAnyRole(['gerente', 'coord_maestria', 'coordinador_mj']) && samePrivateSede(resource.data))
+      );
+      allow create: if isAuthenticated() && emailIsCaller(request.resource.data.get('autorEmail', ''));
+      allow update: if isAuthenticated() && (
+        isGlobalPrivacyReader() ||
+        (callerHasAnyRole(['coord_maestria', 'coordinador_mj']) && samePrivateSede(resource.data))
+      ) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['autorEmail', 'sede', 'managerId', 'managerDocId']);
+      allow delete: if isSuperAdmin();
     }
 
     // GOBERNANZA Y CONTENCIÓN DE IA SOBRE COLECCIONES FINANCIERAS:
@@ -1205,8 +1366,14 @@ service cloud.firestore {
       allow read: if isImoStaff();
       allow write: if false;
     }
-    match /user_kpi_targets/{document=**} {
-      allow read, write: if isAuthenticated();
+    match /user_kpi_targets/{targetId} {
+      allow read: if isAuthenticated() && canReadPrivateKpi(resource.data);
+      allow create: if isAuthenticated() && canReadPrivateKpi(request.resource.data);
+      allow update: if isAuthenticated() && canReadPrivateKpi(resource.data) &&
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+          'userId', 'userEmail', 'userSede'
+        ]);
+      allow delete: if isSuperAdmin();
     }
     match /nodus_predictor_portfolio/{document=**} {
       allow read: if isAuthenticated();
@@ -1227,7 +1394,8 @@ service cloud.firestore {
       allow write: if isGerenteODireccion() || isSuperAdmin();
     }
     match /kpis_entrenadores_llamadas/{document=**} {
-      allow read, write: if isAuthenticated();
+      allow read: if isGlobalPrivacyReader();
+      allow write: if isSuperAdmin();
     }
     // INMUTABILIDAD LEGAL ABSOLUTA - Onboarding Legal y Firmas Digitales
     // Borrado bloqueado para todos (incluso superadmin) para preservar validez probatoria contractual.
@@ -1342,4 +1510,3 @@ service cloud.firestore {
     }
   }
 }
-

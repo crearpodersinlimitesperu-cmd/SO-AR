@@ -1,7 +1,4 @@
-export const normalizeTrainer = (name) => {
-  if (!name) return '';
-  const clean = name.trim();
-  const map = {
+export const TRAINER_NAME_ALIASES = {
   "Carlos Brunis": "Carlos Brunis",
   "Leandro Brunis": "Leandro Brunis",
   "Andrs Gmez": "Andres Gomez",
@@ -112,6 +109,11 @@ export const normalizeTrainer = (name) => {
   "Maria Jose Román": "Maria Jose Roman",
   "Pamela Carrillo": "Pamela Carrillo"
 };
+
+export const normalizeTrainer = (name) => {
+  if (!name) return '';
+  const clean = name.trim();
+  const map = TRAINER_NAME_ALIASES;
   if (map[clean]) return map[clean];
 
   // (02/09/2026) Fallback insensible a mayúsculas/acentos/espacios — antes de esto,
@@ -149,4 +151,3 @@ export const isInactiveTrainer = (name) => {
   const folded = foldKey(normalizeTrainer(name) || name);
   return ENTRENADORES_INACTIVOS_LIST.some(inactive => foldKey(inactive) === folded);
 };
-

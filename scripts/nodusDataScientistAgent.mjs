@@ -11,6 +11,7 @@
  */
 
 import 'dotenv/config';
+import { canonicalSede } from '../src/utils/sede.js';
 
 // Normalizador canónico de sedes
 const SEDES_FDS_PRICING = {
@@ -220,28 +221,37 @@ export class NodusDataScientistAgent {
     
     // 1. Obtener managers actuales de Firestore o fallback
     let currentManagers = [];
+    const readVersions = new Map();
     try {
       const snapshot = await this.db.collection('managers').get();
       snapshot.forEach(docSnap => {
-        currentManagers.push({ id: docSnap.id, ...docSnap.data() });
+        currentManagers.push({ ...docSnap.data(), id: docSnap.id });
+        readVersions.set(docSnap.id, docSnap.updateTime);
       });
     } catch (e) {
-      console.warn("Aviso al leer colección 'managers':", e.message);
+      console.error("No se pudo verificar la colección 'managers':", e.message);
+      throw e;
     }
 
-    // 2. Mapeo de coordinadores de Nodus por equipo
+    // Los números de equipo se repiten entre sedes; nunca son una identidad global.
+    const identityKey = (sede, equipo) => {
+      const site = canonicalSede(sede);
+      const team = String(equipo || '').trim().match(/^(?:[^\d]*\s)?([1-9]\d*)$/)?.[1];
+      return Object.hasOwn(SEDES_FDS_PRICING, site) && team ? `${site}:${Number(team)}` : null;
+    };
     const coordByTeam = new Map();
     for (const c of nodusCoordinadores) {
-      const teamNumMatch = String(c.equipo).match(/\d+/);
-      const teamNum = teamNumMatch ? parseInt(teamNumMatch[0], 10) : null;
-      if (teamNum) {
-        coordByTeam.set(teamNum, {
+      const key = identityKey(c.sede, c.equipo);
+      if (key) {
+        const candidates = coordByTeam.get(key) || [];
+        candidates.push({
           nombreCoordinador: c.nombreCoordinador || c.coordinador,
-          sede: normalizeSedeName(c.sede),
+          sede: canonicalSede(c.sede),
           confirmados: c.confirmados || 0,
           noContesta: c.noContesta || 0,
           porConfirmar: c.porConfirmar || 0
         });
+        coordByTeam.set(key, candidates);
       }
     }
 
@@ -251,16 +261,18 @@ export class NodusDataScientistAgent {
     let updatesCount = 0;
 
     for (const m of currentManagers) {
-      const teamNum = m.numEquipo || (String(m.equipo).match(/\d+/) ? parseInt(String(m.equipo).match(/\d+/)[0], 10) : null);
+      const key = identityKey(m.sede, m.numEquipo || m.equipo);
       let updatedCoord = m.coordinador;
       let activeNodusData = null;
+      const candidates = key ? coordByTeam.get(key) || [] : [];
 
-      if (teamNum && coordByTeam.has(teamNum)) {
-        activeNodusData = coordByTeam.get(teamNum);
+      if (candidates.length === 1) {
+        activeNodusData = candidates[0];
         if (activeNodusData.nombreCoordinador && activeNodusData.nombreCoordinador !== m.coordinador) {
           updatedCoord = activeNodusData.nombreCoordinador;
-          updatesCount++;
         }
+      } else if (candidates.length > 1) {
+        console.warn(`[Data Scientist] Equipo ambiguo por sede: ${key}; sin escritura.`);
       }
 
       const reconciledEntry = {
@@ -274,15 +286,14 @@ export class NodusDataScientistAgent {
       reconciledList.push(reconciledEntry);
 
       // Si tiene id de Firestore, programar actualización
-      if (m.id && updatesCount > 0 && updatesCount <= 200) {
-        try {
-          const docRef = this.db.collection('managers').doc(String(m.id));
-          batch.update(docRef, {
-            coordinador: updatedCoord,
-            nodusSyncAt: new Date().toISOString(),
-            nodusVerified: !!activeNodusData
-          });
-        } catch (bErr) {}
+      if (m.id && updatedCoord !== m.coordinador && updatesCount < 200) {
+        const docRef = this.db.collection('managers').doc(String(m.id));
+        batch.update(docRef, {
+          coordinador: updatedCoord,
+          nodusSyncAt: new Date().toISOString(),
+          nodusVerified: true
+        }, { lastUpdateTime: readVersions.get(m.id) });
+        updatesCount++;
       }
     }
 

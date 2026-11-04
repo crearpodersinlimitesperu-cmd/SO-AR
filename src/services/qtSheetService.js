@@ -1,15 +1,16 @@
 // src/services/qtSheetService.js
 // Conexión y saneamiento de los miembros de Quantum Team (QT).
 // MIGRADOS A FIRESTORE DESDE GOOGLE SHEETS EN EL HITO 3 (Fase de Seguridad)
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { getDocsFromServer } from 'firebase/firestore';
 import { db } from './firebase';
+import { privateDirectoryQuery } from './privacyQueries.js';
+import { canReadDirectoryPerson } from '../utils/privacyScope.js';
 
 export const QT_SHEET_CSV_URL = import.meta.env.VITE_QT_SHEET_CSV_URL || 'https://docs.google.com/spreadsheets/d/10sz7KNvZ31GOgGDhzH0P3gbISGLW8HPBsSAZwOw5L8U/export?format=csv&gid=0';
 export const QT_SHEET_EDIT_URL = import.meta.env.VITE_QT_SHEET_EDIT_URL || 'https://docs.google.com/spreadsheets/d/10sz7KNvZ31GOgGDhzH0P3gbISGLW8HPBsSAZwOw5L8U/edit?gid=0#gid=0';
 
 const CACHE_KEY = 'cpsl_qt_members_cache_v4';
 const CACHE_TIME_KEY = 'cpsl_qt_members_cache_time_v4';
-const CACHE_TTL_MS = 1000 * 60 * 15; // 15 minutos de caché automático
 
 export function clearQTCache() {
   try {
@@ -325,109 +326,22 @@ export function mapRowsToQTMembers(rows) {
 }
 
 /**
- * Obtiene los miembros de QT en tiempo real desde Google Sheets oficial (con fallback a Firestore)
+ * Consulta solo el directorio autorizado por Firestore, sin CSV ni caché compartida.
  */
-export async function getQTMembers({ forceRefresh = false } = {}) {
-  // 1. Revisar caché local si no es forzado
-  if (!forceRefresh) {
-    try {
-      const cached = localStorage.getItem(CACHE_KEY);
-      const cacheTime = localStorage.getItem(CACHE_TIME_KEY);
-      if (cached && cacheTime) {
-        const age = Date.now() - parseInt(cacheTime, 10);
-        if (age < CACHE_TTL_MS) {
-          const parsed = JSON.parse(cached);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            return {
-              data: parsed,
-              fromCache: true,
-              lastUpdated: new Date(parseInt(cacheTime, 10)).toISOString(),
-              total: parsed.length
-            };
-          }
-        }
-      }
-    } catch (e) {
-      console.warn("Error leyendo caché local de QT:", e);
-    }
-  }
-
-  // 2. Fetch en vivo desde Google Sheets (fuente en tiempo real de nuevas altas)
+export async function getQTMembers({ currentUser } = {}) {
   try {
-    const response = await fetch(QT_SHEET_CSV_URL, {
-      method: 'GET',
-      cache: 'no-cache'
-    });
-
-    if (response.ok) {
-      const csvText = await response.text();
-      const rows = parseCSV(csvText);
-      const members = mapRowsToQTMembers(rows);
-
-      if (members && members.length > 0) {
-        try {
-          localStorage.setItem(CACHE_KEY, JSON.stringify(members));
-          localStorage.setItem(CACHE_TIME_KEY, Date.now().toString());
-        } catch (e) {}
-
-        return {
-          data: members,
-          fromCache: false,
-          lastUpdated: new Date().toISOString(),
-          total: members.length
-        };
-      }
-    }
-  } catch (sheetError) {
-    console.warn("Error al sincronizar con Google Sheets, intentando Firestore:", sheetError);
-  }
-
-  // 3. Fallback en vivo desde Firestore
-  try {
-    const qtRef = collection(db, 'qt_directory');
-    const q = query(qtRef, orderBy('index', 'asc'));
-    const snapshot = await getDocs(q);
-    
-    if (!snapshot.empty) {
-      const members = snapshot.docs.map(doc => doc.data());
-      
-      try {
-        localStorage.setItem(CACHE_KEY, JSON.stringify(members));
-        localStorage.setItem(CACHE_TIME_KEY, Date.now().toString());
-      } catch (e) {}
-
-      return {
-        data: members,
-        fromCache: false,
-        lastUpdated: new Date().toISOString(),
-        total: members.length
-      };
-    }
+    const q = privateDirectoryQuery(db, 'qt_directory', currentUser);
+    const snapshot = await getDocsFromServer(q);
+    const members = snapshot.docs.map(doc => doc.data())
+      .filter(member => canReadDirectoryPerson(currentUser, member));
+    return {
+      data: members,
+      fromCache: false,
+      lastUpdated: new Date().toISOString(),
+      total: members.length
+    };
   } catch (error) {
     console.error("Error al conectar con Firestore (qt_directory):", error);
+    throw error;
   }
-
-  // 4. Fallback de caché antiguo si falló la red
-  try {
-    const cached = localStorage.getItem(CACHE_KEY);
-    const cacheTime = localStorage.getItem(CACHE_TIME_KEY);
-    if (cached) {
-      const parsed = JSON.parse(cached);
-      return {
-        data: parsed,
-        fromCache: true,
-        lastUpdated: cacheTime ? new Date(parseInt(cacheTime, 10)).toISOString() : null,
-        total: parsed.length,
-        isFallback: true
-      };
-    }
-  } catch (e) {}
-
-  return {
-    data: [],
-    fromCache: false,
-    lastUpdated: null,
-    total: 0,
-    error: "No se pudo sincronizar el directorio de QT."
-  };
 }
