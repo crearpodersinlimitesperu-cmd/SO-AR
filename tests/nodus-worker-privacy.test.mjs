@@ -6,7 +6,7 @@ import { extractNodusMetrics } from '../src/services/nodusMetricsModel.js';
 import { createPrivateChatHandler } from '../cloudflare-worker/src/privateChatHandler.js';
 import { createPrivateChatStore } from '../cloudflare-worker/src/privateChatStore.js';
 
-function fixture({ profile, tokenEmail = 'manager@example.invalid', snapshot, responseSede = 'Lima' }) {
+function fixture({ profile, nextProfile = profile, tokenEmail = 'manager@example.invalid', snapshot, responseSede = 'Lima' }) {
   const prompts = [];
   const paths = [];
   const source = readFileSync(new URL('../cloudflare-worker/src/index.js', import.meta.url), 'utf8')
@@ -23,15 +23,16 @@ function fixture({ profile, tokenEmail = 'manager@example.invalid', snapshot, re
   });
   const names = ['createRemoteJWKSet', 'notebookKnowledge', 'createNodusApiClient', 'NodusApiError', 'findUserByAnyEmail',
     'createPrivateChatHandler', 'createPrivateChatStore',
-    'fetch', ...Object.keys(model), 'fixtureProfile', 'fixtureSnapshot', 'fixtureEmail', 'fixturePaths'];
+    'fetch', ...Object.keys(model), 'fixtureProfile', 'fixtureNextProfile', 'fixtureSnapshot', 'fixtureEmail', 'fixturePaths'];
   return {
     prompts, paths,
     ...new Function(...names, `${source}
       verifyFirebaseToken = async () => ({sub: 'synthetic-uid', email: fixtureEmail});
       getServiceAccountAccessToken = async () => 'synthetic-token';
+      let profileReads = 0;
       firestoreGet = async path => {
         fixturePaths.push(path);
-        return path.startsWith('users/') ? fixtureProfile : fixtureSnapshot;
+        return path.startsWith('users/') ? (profileReads++ ? fixtureNextProfile : fixtureProfile) : fixtureSnapshot;
       };
       firestoreAdd = async () => {};
       return { handleNodusJson, handleNodusDataMap, handlePrivateNodusSnapshot, construirContextoNodus, callerNodusScope };
@@ -41,7 +42,7 @@ function fixture({ profile, tokenEmail = 'manager@example.invalid', snapshot, re
       async (_url, options) => {
         prompts.push(JSON.parse(options.body));
         return { json: async () => ({ choices: [{ message: { content: 'Synthetic response' } }] }) };
-      }, ...Object.values(model), profile, snapshot, tokenEmail, paths)
+      }, ...Object.values(model), profile, nextProfile, snapshot, tokenEmail, paths)
   };
 }
 const request = body => new Request('https://example.invalid/nodus', {
@@ -57,6 +58,15 @@ const snapshot = {
 };
 const localIdentity = { email: 'local@example.invalid', emails: ['local@example.invalid', 'approved@example.invalid'] };
 const foreignIdentity = { email: 'foreign@example.invalid' };
+
+test('private snapshot reauthorizes before response when a profile is revoked or moved during a source read', async () => {
+  for (const nextProfile of [null, { role: 'gerente', sede: 'Quito' }, { role: 'gerente', sede: 'Lima', active: false }]) {
+    const worker = fixture({ profile: { role: 'gerente', sede: 'Lima' }, nextProfile, snapshot });
+    const response = await worker.handlePrivateNodusSnapshot(request(), {}, 'https://example.invalid');
+    assert.equal(response.status, 403);
+    assert.doesNotMatch(JSON.stringify(await response.json()), /local@example.invalid|FOREIGN_PERSON/);
+  }
+});
 
 test('actual Worker API handlers restrict managers by server profile, not request scope or historical email allowlists', async () => {
   const worker = fixture({ profile: { role: 'gerente', sede: 'Lima' }, tokenEmail: 'leandro.brunis@crearpsl.net', snapshot });

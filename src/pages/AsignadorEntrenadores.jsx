@@ -48,6 +48,7 @@ import { useCycles } from '../context/CyclesContext';
 import { useUI } from '../context/UIContext';
 import { getAllCompanyUsers } from '../services/userService';
 import { normalizeSede, normalizeRole, OPERATIONAL_SEDES } from '../data/usersData';
+import usePrivateNodusSnapshot from '../hooks/usePrivateNodusSnapshot.js';
 import { getFlagForSede } from '../utils/flags';
 import { canUseAsignadorEntrenadores } from '../config/permissions';
 import { listTrainerPolicyFiles, TRAINER_POLICIES_FOLDER_ID } from '../services/googleDriveService';
@@ -308,7 +309,6 @@ export default function AsignadorEntrenadores() {
   const [vuelos, setVuelos] = useState(null);             // null = aún no se sabe
   const [vuelosError, setVuelosError] = useState(false);
   const [trazas, setTrazas] = useState([]);
-  const [nodusData, setNodusData] = useState([]);
   const [tab, setTab] = useState('matriz');
   const [guardando, setGuardando] = useState('');
   const [policyFiles, setPolicyFiles] = useState([]);
@@ -351,6 +351,8 @@ export default function AsignadorEntrenadores() {
   const [cargaConAsignacion, setCargaConAsignacion] = useState(true);
 
   const autorizado = canUseAsignadorEntrenadores(currentUser);
+  const { snapshot: nodusSnapshot, error: nodusError } = usePrivateNodusSnapshot({ enabled: autorizado });
+  const nodusData = useMemo(() => nodusSnapshot?.coordinadores || [], [nodusSnapshot]);
 
   // --- Entrenadores reales del directorio ----------------------------------
   useEffect(() => {
@@ -610,16 +612,9 @@ export default function AsignadorEntrenadores() {
     })();
   }, [autorizado]);
 
-  // --- Nodus Data (para ver confirmados por equipo) -----------------------
   useEffect(() => {
-    if (!autorizado) return;
-    const unsub = onSnapshot(doc(db, 'nodus_coordinadores_c1c2', 'latest'), snap => {
-      if (snap.exists()) {
-        setNodusData(snap.data().coordinadores || []);
-      }
-    }, () => {});
-    return () => unsub();
-  }, [autorizado]);
+    if (nodusError) showToast(`No se pudieron verificar los confirmados de Nodus: ${nodusError}`, 'error');
+  }, [nodusError, showToast]);
 
   // Los programas principales son fines de semana. Los complementarios
   // operativos indicados abajo duran únicamente el día de su inicio.
@@ -656,7 +651,7 @@ export default function AsignadorEntrenadores() {
       if (Array.isArray(c.equipos)) {
         c.equipos.forEach(eq => {
           if (eq.equipo) {
-            const key = String(eq.equipo).trim().toUpperCase();
+            const key = `${normalizeSede(c.sede)}|${String(eq.equipo).trim().toUpperCase()}`;
             if (!map[key]) map[key] = 0;
             map[key] += Number(eq.confirmado || 0);
           }
@@ -1411,7 +1406,7 @@ export default function AsignadorEntrenadores() {
                         </td>
                         <td style={{ padding: '0.65rem 0.8rem' }}>
                           {f.nombre}
-                          {f.equipo && <span className="text-muted" style={{ fontSize: '0.75rem' }}> - {formatTeamString(f.equipo)} <span style={{ color: '#10b981', fontWeight: 700, marginLeft: 4 }}>({nodusEquiposMap[String(f.equipo).trim().toUpperCase()] || 0} confirmados)</span></span>}
+                          {f.equipo && <span className="text-muted" style={{ fontSize: '0.75rem' }}> - {formatTeamString(f.equipo)} <span style={{ color: '#10b981', fontWeight: 700, marginLeft: 4 }}>({nodusEquiposMap[`${normalizeSede(f.sede)}|${String(f.equipo).trim().toUpperCase()}`] ?? 'Sin dato'} confirmados)</span></span>}
                         </td>
                         <td style={{ padding: '0.65rem 0.8rem', whiteSpace: 'nowrap' }}>
                           {f.fdsLabel

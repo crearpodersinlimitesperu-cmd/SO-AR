@@ -111,38 +111,53 @@ const pickCounts = data => Object.fromEntries(COUNT_FIELDS.filter(field =>
   Number(data[field]) >= 0
 ).map(field => [field, data[field]]));
 
+function summarySede(row) {
+  const name = normalize(row?.equipoNombre || row?.equipo);
+  const named = ['LIMA', 'QUITO', 'CUENCA', 'GUAYAQUIL', 'MEDELLIN', 'MEXICO']
+    .filter(city => new RegExp(`(?:^|[^A-Z])${city}(?:$|[^A-Z])`).test(name));
+  const explicit = canonicalSede(row?.sede);
+  if (named.length > 1 || (explicit && named.length === 1 && named[0] !== explicit)) return '';
+  if (row?.sede && !explicit) return '';
+  return explicit || named[0] || '';
+}
+
 export function scopedNodusContext(snapshot, scope) {
   if (scope.type === 'denied') throw new Error('Nodus scope denied');
   if (scope.type === 'global') return snapshot;
   const timestamp = snapshot?.timestamp || null;
-  if (!['sede', 'personal'].includes(scope.type)) return { timestamp, totales: pickCounts(snapshot?.totales) };
+  if (!['sede', 'personal', 'metrics-global'].includes(scope.type)) return { timestamp, totales: pickCounts(snapshot?.totales) };
   const visible = rows => (Array.isArray(rows) ? rows : []).filter(row =>
-    filterNodusSedes([{ nombre: row?.sede }], scope).length > 0);
+    scope.type === 'metrics-global' || filterNodusSedes([{ nombre: row?.sede }], scope).length > 0);
   const coordinadores = scope.type === 'personal'
     ? (Array.isArray(snapshot?.coordinadores) ? snapshot.coordinadores : []).filter(row =>
       typeof row?.email === 'string' && scope.emails.includes(row.email.trim().toLowerCase()))
     : visible(snapshot?.coordinadores);
   return {
     timestamp,
+    ...(scope.type === 'metrics-global' ? { totales: pickCounts(snapshot?.totales) } : {}),
     sedes: visible(snapshot?.sedes).map(row => ({ sede: row.sede, ...pickCounts(row) })),
     coordinadores: coordinadores.map(row => ({
       sede: row.sede,
-      ...Object.fromEntries(['id', 'nombre', 'nombreCompleto', 'name', 'email', 'rol', 'role', 'ciclo'].filter(field =>
+      ...Object.fromEntries(['id', 'nombre', 'nombreCompleto', 'name', 'email', 'rol', 'role', 'ciclo',
+        'ultGestion', 'ultConexion', 'coberturaDetalle', 'productividadDetalle'].filter(field =>
         typeof row[field] === 'string').map(field => [field, row[field]])),
       ...pickCounts(row),
+      ...(row.metricasDisponibles ? { metricasDisponibles: Object.fromEntries(COUNT_FIELDS
+        .filter(field => typeof row.metricasDisponibles[field] === 'boolean')
+        .map(field => [field, row.metricasDisponibles[field]])) } : {}),
       ...(row.estados ? { estados: pickCounts(row.estados) } : {}),
       ...(Array.isArray(row.equipos) ? { equipos: row.equipos
         .filter(team => !team.incoherenciaSedes && (!canonicalSede(team.sedeInferida) ||
           canonicalSede(team.sedeInferida) === canonicalSede(row.sede)))
         .map(team => ({
-          ...Object.fromEntries(['equipo', 'equipoNombre', 'fase', 'capitulo', 'ciclo'].filter(field =>
+          ...Object.fromEntries(['equipo', 'equipoNombre', 'fase', 'capitulo', 'ciclo', 'sedeInferida'].filter(field =>
             typeof team[field] === 'string').map(field => [field, team[field]])),
           ...pickCounts(team)
         })) } : {})
     })),
-    equiposSummary: visible(snapshot?.equiposSummary).map(row => ({
+    equiposSummary: visible((snapshot?.equiposSummary || []).map(row => ({ ...row, sede: summarySede(row) }))).map(row => ({
       sede: row.sede,
-      ...Object.fromEntries(['equipo', 'equipoNombre', 'numEquipo'].filter(field =>
+      ...Object.fromEntries(['equipo', 'equipoNombre', 'equipoId', 'numEquipo', 'stage', 'fase', 'capitulo', 'ciclo'].filter(field =>
         ['number', 'string'].includes(typeof row[field])).map(field => [field, row[field]])),
       ...pickCounts(row)
     }))

@@ -528,14 +528,21 @@ async function handlePrivateNodusSnapshot(request, env, origin) {
     }
     const snapshot = await firestoreGet('nodus_kpis_sincronizados/latest_snapshot', token);
     if (!snapshot) return json({ error: 'not-found', message: 'No hay métricas Nodus publicadas.' }, 404, origin);
-    const projected = scopedNodusContext(snapshot, scope);
     // This endpoint never returns raw sections or participant rosters, including to directors.
-    const safe = scope.type === 'global'
-      ? {
-        ...scopedNodusContext(snapshot, { type: 'sede', sedes: ['Lima', 'Quito', 'Guayaquil', 'Cuenca', 'Medellín', 'México'] }),
-        totales: scopedNodusContext(snapshot, { type: 'general' }).totales
+    const safe = scopedNodusContext(snapshot, scope.type === 'global' ? { type: 'metrics-global' } : scope);
+    const freshProfile = await firestoreGet(`users/${identity.sub}`, token);
+    let freshScope = freshProfile ? callerNodusScope(freshProfile, identity.email) : { type: 'denied' };
+    if (freshScope.type === 'general') {
+      try {
+        freshScope = { type: 'personal', emails: personalNodusEmails(freshProfile, identity.email, identity.sub, findUserByAnyEmail) };
+      } catch (error) {
+        console.error('[nodus-private-snapshot] Identidad revocada durante la lectura:', error.message);
+        freshScope = { type: 'denied' };
       }
-      : projected;
+    }
+    if (JSON.stringify(freshScope) !== JSON.stringify(scope)) {
+      return json({ error: 'permission-denied', message: 'Tu autorización cambió durante la consulta; vuelve a verificar tus métricas.' }, 403, origin);
+    }
     return json({ scope: scope.type, snapshot: safe }, 200, origin);
   } catch (error) {
     console.error('[nodus-private-snapshot] Error de lectura:', error.message);

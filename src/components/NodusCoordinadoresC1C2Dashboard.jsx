@@ -1,7 +1,6 @@
 import { recordedPhase, snapshotFreshness } from '../utils/nodusIntegrity.js';
 import React, { useState, useEffect, useMemo } from 'react';
-import { db } from '../services/firebase';
-import { doc, getDoc, onSnapshot } from 'firebase/firestore';
+import usePrivateNodusSnapshot from '../hooks/usePrivateNodusSnapshot.js';
 import {
   Users, PhoneCall, CheckCircle2, AlertCircle, Clock, Search, Filter,
   RefreshCw, BarChart2, PieChart as PieChartIcon, TrendingUp, ChevronDown,
@@ -13,81 +12,13 @@ import {
   Legend, CartesianGrid, Cell, PieChart, Pie, ComposedChart, Line
 } from 'recharts';
 import { useTheme } from '../context/ThemeContext';
-import { usersData, OPERATIONAL_SEDES } from '../data/usersData';
+import { OPERATIONAL_SEDES } from '../data/usersData';
 import AuditoriaSentadosConfirmadosModal from './AuditoriaSentadosConfirmadosModal';
 import './NodusCoordinadoresC1C2Dashboard.css';
 
-const KNOWN_COORDINATOR_EMAILS = {
-  'DIANA MACAS': 'diana.macas@crearpsl.net',
-  'BRENDA RODRIGUEZ': 'brenda.rodriguez@crearpsl.net',
-  'VALENTINA RODRIGUEZ': 'valentina.r@crearpsl.net',
-  'JOYCE': 'joyce.marin@crearpsl.net',
-  'JOYCE MARIN': 'joyce.marin@crearpsl.net',
-  'LILIANA': 'liliana.cubillo@crearpsl.net',
-  'LILIANA CUBILLO': 'liliana.cubillo@crearpsl.net',
-  'ADAMS': 'coordinacion.quito@crearpsl.net',
-  'DIANA': 'diana.moscoso@crearpsl.net',
-  'DIANA MOSCOSO': 'diana.moscoso@crearpsl.net',
-  'JOSUE VERA': 'josue.vera@crearpsl.net',
-  'MARCOS VERA': 'josue.vera@crearpsl.net',
-  'JONATHAN LAROSA': 'jonathan.larosa@crearpsl.net',
-  'ERIKA GAVILANEZ': 'erika.gavilanez@crearpsl.net',
-  'LINID VALENCIA': 'linid.valencia@crearpsl.net',
-  'MAURICIO RAMIREZ': 'mauricio.ramirez@crearpsl.net',
-  'ALONSO SOLARES': 'alonso.solares@crearpsl.net',
-  'KERLIE CARRILLO': 'kerlie.carrillo@crearpsl.net'
-};
-
 function resolveCoordinatorEmail(coord) {
-  const sedeClean = (coord?.sede || '').toLowerCase();
-  const rawN = (coord?.nombre || coord?.nombreCompleto || '').toLowerCase();
-
-  // Desambiguación estricta de homónimos entre Sedes
-  if (rawN.includes('diana')) {
-    if (sedeClean.includes('guayaquil') || sedeClean.includes('gye')) {
-      return 'diana.macas@crearpsl.net';
-    }
-    if (sedeClean.includes('lima')) {
-      return 'diana.moscoso@crearpsl.net';
-    }
-  }
-
-  if (coord?.email && coord.email.includes('@') && !coord.email.toLowerCase().includes('solicitar') && !coord.email.toLowerCase().includes('coordinacion.')) {
-    return coord.email.trim();
-  }
-
-  const clean = (s) => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
-  const rawName = coord?.nombre || coord?.nombreCompleto || '';
-  const nameClean = clean(rawName);
-
-  // 1. Catálogo conocido de coordinadores C1 / C2
-  for (const [key, email] of Object.entries(KNOWN_COORDINATOR_EMAILS)) {
-    const keyClean = clean(key);
-    if (nameClean === keyClean || nameClean.includes(keyClean) || keyClean.includes(nameClean)) {
-      return email;
-    }
-  }
-
-  // 2. Consulta en usersData
-  if (Array.isArray(usersData)) {
-    const match = usersData.find(u => {
-      const uName = clean(u.name || u.displayName);
-      return uName && (uName.includes(nameClean) || nameClean.includes(uName));
-    });
-    if (match?.email) return match.email;
-    if (match?.corporateEmail) return match.corporateEmail;
-    if (Array.isArray(match?.emails) && match.emails.length > 0) return match.emails[0];
-  }
-
-  // 3. Cero invención de correos institucionales: si no figura en Nodus ni en el directorio verificado, se reporta vacío
-  return '';
-}
-
-function mergeWithFallbackData(remoteData) {
-  if (!remoteData || !Array.isArray(remoteData.coordinadores)) {
-    return null;
-  }
-  return remoteData;
+  return typeof coord?.email === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(coord.email.trim())
+    ? coord.email.trim() : '';
 }
 
 const COLORS = {
@@ -179,10 +110,9 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
     return null;
   };
 
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [error, setError] = useState(null);
+  const [revision, setRevision] = useState(0);
+  const { snapshot: data, loading, error } = usePrivateNodusSnapshot({ revision });
+  const refreshing = loading;
 
   // Filtros
   const [searchTerm, setSearchTerm] = useState('');
@@ -233,81 +163,7 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
     setSingleCoordView('equipos');
   };
 
-  // Carga y suscripción en tiempo real desde Firestore
-  useEffect(() => {
-    let unsubscribe = null;
-    try {
-      const docRef = doc(db, 'nodus_coordinadores_c1c2', 'latest');
-      unsubscribe = onSnapshot(docRef, (docSnap) => {
-        if (docSnap.exists()) {
-          const merged = mergeWithFallbackData(docSnap.data());
-          setData(merged);
-          setLoading(false);
-          setError(null);
-        } else {
-          // Intentar fallback a nodus_kpis_sincronizados/latest_snapshot
-          const fallbackRef = doc(db, 'nodus_kpis_sincronizados', 'latest_snapshot');
-          getDoc(fallbackRef).then((fSnap) => {
-            if (fSnap.exists()) {
-              const fData = fSnap.data();
-              const merged = mergeWithFallbackData({
-                timestamp: fData.timestamp,
-                totales: fData.totales,
-                sedes: fData.sedes,
-                coordinadores: fData.coordinadores || [],
-                equiposReporte: fData.equiposReporte || []
-              });
-              setData(merged);
-            }
-            setLoading(false);
-          }).catch(err => {
-            console.error("Error en fallback:", err);
-            setLoading(false);
-          });
-        }
-      }, (err) => {
-        console.warn("Error leyendo snapshot Nodus en tiempo real:", err.message);
-        setError('No se pudo verificar la fuente en vivo de Nodus.');
-        setLoading(false);
-      });
-    } catch (e) {
-      console.error(e);
-      setLoading(false);
-    }
-
-    return () => {
-      if (unsubscribe) unsubscribe();
-    };
-  }, []);
-
-  const handleManualRefresh = async () => {
-    setRefreshing(true);
-    try {
-      const docRef = doc(db, 'nodus_coordinadores_c1c2', 'latest');
-      const snap = await getDoc(docRef);
-      if (snap.exists()) {
-        const freshData = snap.data();
-        setData(mergeWithFallbackData(freshData));
-        setError(null);
-      } else {
-        // Fallback a nodus_kpis_sincronizados
-        const fRef = doc(db, 'nodus_kpis_sincronizados', 'latest_snapshot');
-        const fSnap = await getDoc(fRef);
-        if (fSnap.exists()) {
-          setData(mergeWithFallbackData(fSnap.data()));
-          setError(null);
-        } else {
-          setError('No hay una sincronización remota disponible. Se conserva el último registro y su fecha original.');
-        }
-      }
-    } catch (e) {
-      console.warn('No se pudo consultar la sincronización de Nodus:', e);
-      setError('No se pudo consultar Nodus. Los datos mostrados conservan su fecha original.');
-
-    } finally {
-      setTimeout(() => setRefreshing(false), 600);
-    }
-  };
+  const handleManualRefresh = () => setRevision(value => value + 1);
 
   // 1. Filtrado de seguridad estricto: Única y exclusivamente coordinadores operativos de C1 y C2
   // Se excluyen departamentos (contabilidad, facturación, entrenadores, soporte, admin) y usuarios sin llamadas/equipos en C1 o C2
@@ -973,6 +829,15 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
       </div>
     );
   }
+
+  if (!data) return (
+    <div className="nodus-dashboard-container">
+      <h2 className="nodus-header-title">Panel de Coordinadores C1 &amp; C2</h2>
+      <p role="alert">{error || 'No hay una proyección autorizada disponible.'}
+        {' '}No se certifica actividad cero ni se cargan respaldos globales.</p>
+      <button type="button" onClick={handleManualRefresh}>Actualizar</button>
+    </div>
+  );
 
   return (
     <div className="nodus-dashboard-container">
@@ -1848,5 +1713,3 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
     </div>
   );
 }
-
-

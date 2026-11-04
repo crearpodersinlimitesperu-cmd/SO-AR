@@ -671,7 +671,7 @@ export default function AICopilot() {
       if (!aiText) {
         let nodusData = null;
         try {
-          nodusData = await readPrivateNodusSnapshot();
+          nodusData = await readPrivateNodusSnapshot({ expectedUid: currentUser.uid, isCurrent });
         } catch (nodusErr) {
           console.warn("Error leyendo snapshot Nodus para copilot:", nodusErr);
         }

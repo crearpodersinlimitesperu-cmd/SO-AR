@@ -374,6 +374,63 @@ Esta ruta también exige **Worker antes de frontend/reglas** en una eventual
 publicación autorizada; si el endpoint no existe, el historial falla de forma
 explícita. No se desplegó, clasificó, copió ni borró ninguna conversación real.
 
+## Continuación: tableros de métricas sin respaldos globales
+
+Se migraron Embudo (`src/pages/EmbudoConversionBoard.jsx:18`), Coordinadores
+C1/C2 (`src/components/NodusCoordinadoresC1C2Dashboard.jsx:114`) y los confirmados
+del Asignador (`src/pages/AsignadorEntrenadores.jsx:354`) al endpoint privado. Ya
+no suscriben los snapshots globales desde el navegador. Embudo tampoco fusiona
+el catálogo histórico empaquetado con una respuesta autorizada vacía o fallida.
+Sus totales sin filtro se calculan sobre la proyección autorizada cuando no hay
+totales globales; las filas por equipo se separan por sede. El Asignador cruza
+confirmados por sede y equipo, y distingue «Sin dato» de cero.
+
+El correo de Coordinadores ahora es solo el explícito del registro:
+`src/components/NodusCoordinadoresC1C2Dashboard.jsx:19`. Antes, un nombre parcial,
+incluso vacío, podía seleccionar un correo del catálogo; «Diana» podía
+sobrescribir un correo válido por una heurística de sede. No se asigna un correo
+alternativo cuando el origen no lo acredita.
+
+`src/hooks/usePrivateNodusSnapshot.js:6` comparte consulta, actualización manual
+y refresco de 60 segundos, sin persistencia local. También sustituye la carga
+propia de Mis KPIs. Vincula cada respuesta al UID y al alcance efectivo; limpia
+datos al cambiar permisos/cuenta o fallar y no consulta en simulación. El
+servicio exige que el UID de la vista coincida con Auth y vuelve a comprobarlo
+tras cada espera. El Worker relee el perfil antes de responder: una revocación,
+traslado, baja o contradicción de alias durante la consulta cancela la respuesta.
+
+La proyección métrica global conserva resúmenes de equipos aunque el publicador
+no incluya `sede`, pero sigue excluyendo padrones y secciones crudas. Para una
+sede local solo acepta resúmenes con sede explícita o una única ciudad
+inequívoca en el nombre publicado; los nombres contradictorios no autorizan.
+Se preservan banderas de disponibilidad, detalles de cobertura/productividad,
+fechas de gestión y etiquetas de fase necesarias para los consumidores.
+
+Verificación de esta continuación: **65 pruebas de privacidad y 18 de Nodus
+JSON correctas**, incluidas Chromium real, cambio de alcance con el mismo UID,
+cambio de cuenta sin remontar, respuesta tardía, simulación, rechazo sin respaldo
+ni ceros certificados, correo no inferido y contrato de resumen sin participantes.
+Worker ESM y `npm exec vite build` correctos. Regresión general: **245/248**,
+solo ayuda Managers y las dos cartas-sedes preexistentes. En la primera ejecución
+simultánea hubo además un fallo de tolerancia temporal de Auth; pasó aislado
+(6/6) y la repetición general sin carga volvió a los tres fallos base, sin
+modificar pruebas ni umbrales. Managers: **33 correctas, 1 fallo preexistente**
+(`managerSyncPolicy`), 2 omitidas por requerir emulador. No hay cambios nuevos
+de reglas en esta continuación; las 27 pruebas de reglas anteriores se mantienen
+como evidencia de ese commit, no de un nuevo despliegue. CI del commit `3702433`
+confirmó privacidad correcta y falló únicamente en ayuda Managers/cartas-sedes y
+las dos pruebas conocidas de `mjCalendarVisibility`.
+
+**Esto no cierra el incidente.** Siguen los consumidores globales enumerados
+en los bloqueadores, entre ellos OperationalReview, verificación de
+participantes, GoalsBoard, Strategy/Portfolio, informes de auditoría y módulos
+con contratos diferentes. No se les aplicó una proyección incompleta que elimine
+campos legítimos ni se cerraron aún sus reglas globales. La migración de esos
+contratos y los datos personales estáticos sigue siendo necesaria antes de
+afirmar aislamiento completo. Las alertas estéticas de bordes y transición CSS
+preexistentes se dejaron fuera de este cambio de privacidad; no se añadieron
+supresiones de reglas de diseño.
+
 ## Auditoría y reparación de datos: procedimiento, no ejecutado
 
 No se conocen documentos corruptos confirmados. No sería correcto inventar IDs,

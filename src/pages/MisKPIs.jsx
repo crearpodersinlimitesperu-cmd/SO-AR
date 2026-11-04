@@ -18,7 +18,7 @@ import { snapshotFreshness } from '../utils/nodusIntegrity.js';
 import OperationalReview from '../components/OperationalReview';
 import { canReadKpiReport } from '../utils/privacyScope.js';
 import { privateKpiQuery } from '../services/privacyQueries.js';
-import { readPrivateNodusSnapshot } from '../services/privateNodusSnapshot.js';
+import usePrivateNodusSnapshot from '../hooks/usePrivateNodusSnapshot.js';
 export { extractNodusMetrics };
 
 // Metas base por defecto por rol (cuando la persona aún no tiene metas personalizadas)
@@ -67,9 +67,9 @@ export default function MisKPIs() {
   
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState([]);
-  const [nodusData, setNodusData] = useState(null);
-  const [loadingNodus, setLoadingNodus] = useState(false);
-  const [nodusError, setNodusError] = useState(null);
+  const [nodusRevision, setNodusRevision] = useState(0);
+  const { snapshot: nodusData, loading: loadingNodus, error: nodusError } = usePrivateNodusSnapshot({ revision: nodusRevision });
+  const fetchNodusData = () => setNodusRevision(value => value + 1);
   
   // Catálogo completo de personas por rol
   const [selectedPerson, setSelectedPerson] = useState(null);
@@ -174,25 +174,6 @@ export default function MisKPIs() {
     }
     return base.filter(p => p.tabCategory === activeTab);
   }, [allStaffDirectory, activeTab, searchTerm]);
-
-  // Inicializar o buscar persona al cargar o cambiar currentUser
-  useEffect(() => {
-    fetchNodusData();
-  }, [currentUser]);
-
-  const fetchNodusData = async () => {
-    setLoadingNodus(true);
-    setNodusError(null);
-    try {
-      setNodusData(await readPrivateNodusSnapshot());
-    } catch (e) {
-      console.warn("No se pudo verificar Nodus en MisKPIs:", e);
-      setNodusError(e.message || 'No se pudo verificar el acceso a las métricas privadas.');
-      setNodusData(null);
-    } finally {
-      setLoadingNodus(false);
-    }
-  };
 
   // Seleccionar persona por defecto según el usuario logueado o primera disponible
   useEffect(() => {

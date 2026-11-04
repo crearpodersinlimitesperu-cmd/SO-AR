@@ -21,10 +21,13 @@ test('private metrics client sends only Firebase identity, never role/sede and n
   assert.equal(requests[0][1].headers.Authorization, 'Bearer synthetic-only');
   assert.equal(requests[0][1].body, '{}');
   assert.equal(requests[0][1].cache, 'no-store');
-  for (const path of ['../src/pages/MisKPIs.jsx', '../src/components/AICopilot.jsx']) {
+  for (const path of ['../src/pages/MisKPIs.jsx', '../src/components/AICopilot.jsx',
+    '../src/pages/EmbudoConversionBoard.jsx', '../src/pages/AsignadorEntrenadores.jsx',
+    '../src/components/NodusCoordinadoresC1C2Dashboard.jsx']) {
     const source = readFileSync(new URL(path, import.meta.url), 'utf8');
-    assert.match(source, /readPrivateNodusSnapshot\(\)/);
+    assert.match(source, /(?:read|use)PrivateNodusSnapshot\(/);
     assert.doesNotMatch(source, /doc\(db, 'nodus_(?:coordinadores_c1c2|kpis_sincronizados)'/);
+    assert.doesNotMatch(source, /nodusFallbackData/);
   }
 });
 test('private metrics rejects missing sessions, authorization failures and malformed projection without raw fallback', async () => {
@@ -53,6 +56,16 @@ test('account changes during token, fetch or JSON resolution reject old-account 
     return { snapshot: data };
   } }));
   await assert.rejects(third.read(), /cuenta cambió/);
+});
+test('effective viewer must match Auth and remain current even when the Auth UID does not change', async () => {
+  const different = fixture();
+  await assert.rejects(different.read({ expectedUid: 'other' }), /cuenta cambió/);
+  assert.equal(different.requests.length, 0);
+  const stale = fixture();
+  let active = true;
+  stale.auth.currentUser.getIdToken = async () => { active = false; return 'synthetic-only'; };
+  await assert.rejects(stale.read({ expectedUid: 'first', isCurrent: () => active }), /cuenta cambió/);
+  assert.equal(stale.requests.length, 0);
 });
 test('Copilot explicitly reports unavailable private metrics instead of inventing zero discrepancies', () => {
   const source = readFileSync(new URL('../src/components/AICopilot.jsx', import.meta.url), 'utf8');
