@@ -86,7 +86,7 @@ test('persisted session keeps verification order and does not await the daily au
   const effect = authSource.slice(start, authSource.indexOf('  }, []);', start));
   const order = [
     "startupTrace.measure('users-lookup'",
-    'foundUser.isActive === false',
+    'isUserInactive(foundUser)',
     "startupTrace.measure('roles'",
     'saveSelfProfile(user, canonicalUser, normalizedEmail, profileResult.snapshot)',
     'setCurrentUser(userObj)',

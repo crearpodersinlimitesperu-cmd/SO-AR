@@ -13,6 +13,8 @@ import { recordAuditEvent } from '../services/auditService';
 import { getAllCompanyUsers } from '../services/userService';
 import { normalizeTaskEmail } from '../utils/elizabethDashboard';
 import { normalizeTaskLocation, TASK_LOCATION_MAX_LENGTH } from '../utils/taskLocation';
+import { isUserInactive } from '../utils/userNormalizer.js';
+import { isInactiveTrainer } from '../data/managersData';
 
 export const OPERATIONAL_AREAS = [
   {
@@ -155,7 +157,9 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
   const [showAdvancedLite, setShowAdvancedLite] = useState(false);
   const liteDropdownRef = useRef(null);
 
-  const [activeUsersList, setActiveUsersList] = useState(usersData);
+  const [activeUsersList, setActiveUsersList] = useState(() => usersData.filter(user =>
+    !isUserInactive(user) && !isInactiveTrainer(user.name || user.displayName)
+  ));
 
   useEffect(() => {
     let isMounted = true;
@@ -279,7 +283,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
   const canAssignSpecific = true; // Habilitado para todos por solicitud institucional
   const eligibleTeamMembers = teamMembers.filter(person => {
     const user = activeUsersList.find(entry => normalizeTaskEmail(entry.email) === normalizeTaskEmail(person.email));
-    return user?.isActive !== false && user?.active !== false && user?.status !== 'inactive';
+    return user && !isUserInactive(user) && !isInactiveTrainer(user.name || user.displayName);
   });
 
   const stripAccents = (str) => {
@@ -294,13 +298,13 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
   const matchesArea = (user, area) => [user.role, ...(user.roles || [])]
     .filter(Boolean).some(role => area.filter({ ...user, role }));
   const eligibleAreaUsers = (area) => activeUsersList.filter(user =>
-    user.isActive !== false && user.active !== false && user.status !== 'inactive' &&
+    !isUserInactive(user) && !isInactiveTrainer(user.name || user.displayName) &&
     (!selectedSedeFilter || normalizeSede(user.sede) === selectedSedeFilter) &&
     matchesArea(user, area));
 
   const visibleUsers = activeUsersList.filter(u => {
     // Excluir colaboradores dados de baja / inactivos
-    if (u.isActive === false || u.status === 'inactive' || u.active === false) return false;
+    if (isUserInactive(u) || isInactiveTrainer(u.name || u.displayName)) return false;
 
     // 1. Si hay texto en el buscador: Búsqueda global en toda la organización
     if (isSearching) {
@@ -334,7 +338,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
 
   const filteredLiteUsers = activeUsersList.filter(u => {
     // Excluir colaboradores dados de baja / inactivos
-    if (u.isActive === false || u.status === 'inactive' || u.active === false) return false;
+    if (isUserInactive(u) || isInactiveTrainer(u.name || u.displayName)) return false;
 
     if (!liteSearch.trim()) return true;
     const q = stripAccents(liteSearch);

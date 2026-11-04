@@ -15,6 +15,8 @@
 
 import { db } from './firebase';
 import { collection, addDoc, doc, setDoc } from 'firebase/firestore';
+import { findUserByAnyEmail } from '../data/usersData';
+import { isUserInactive } from '../utils/userNormalizer.js';
 
 /**
  * Directorio Oficial de Gerencia por Sede y Dirección Global
@@ -34,8 +36,7 @@ export const GLOBAL_SUPER_ADMINS = [
   'paul.sosa@crearpsl.net',
   'armando.pilacuan@gmail.com',
   'andres.gomez@crearpsl.net',
-  'contabilidad.global@crearpsl.net',
-  'talento.humano@crearpsl.net'
+  'contabilidad.global@crearpsl.net'
 ];
 
 /**
@@ -52,6 +53,15 @@ export function checkScheduleAuthority(currentUser, sede = '') {
       isSuperAdmin: false,
       isSedeManager: false,
       roleTitle: 'Invitado / No autenticado'
+    };
+  }
+
+  if (isUserInactive(currentUser)) {
+    return {
+      canEdit: false,
+      isSuperAdmin: false,
+      isSedeManager: false,
+      roleTitle: 'Perfil inactivo'
     };
   }
 
@@ -119,7 +129,8 @@ export async function notifyTeamScheduleUpdated({ sede, updatedBy, staffList }) 
   const now = new Date().toISOString();
 
   for (const staff of staffList) {
-    if (!staff.email) continue;
+    const officialProfile = staff.email ? findUserByAnyEmail(staff.email) : null;
+    if (!staff.email || isUserInactive(staff) || isUserInactive(officialProfile)) continue;
     try {
       await addDoc(collection(db, 'notifications'), {
         userId: staff.email.toLowerCase().trim(),

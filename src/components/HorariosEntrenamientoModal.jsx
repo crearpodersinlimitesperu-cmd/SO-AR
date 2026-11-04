@@ -8,6 +8,7 @@ import {
 import { doc, getDoc, setDoc, onSnapshot, collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { USERS_TO_IMPORT } from '../data/usersToImport';
+import { isUserInactive } from '../utils/userNormalizer.js';
 import { normalizeRole, normalizeSede, OPERATIONAL_SEDES } from '../data/usersData';
 import { useCycles } from '../context/CyclesContext';
 import { useAuth } from '../context/AuthContext';
@@ -23,8 +24,8 @@ function getLeadershipForSede(sedeName) {
   const normSede = normalizeSede(sedeName);
   const cleanTarget = normSede.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
-  let leaders = USERS_TO_IMPORT.filter(u => {
-    // Excluir personal desvinculado
+  const leaders = USERS_TO_IMPORT.filter(u => {
+    if (isUserInactive(u)) return false;
     const email = (u.email || '').toLowerCase();
     const name = (u.name || '').toLowerCase();
     if (email.includes('leyla') || name.includes('leyla')) return false;
@@ -105,6 +106,15 @@ function getLeadershipForSede(sedeName) {
 
   return mapped.sort((a, b) => rolePriority(a.role) - rolePriority(b.role));
 }
+
+const isInactiveStaffMember = (staff) => {
+  const email = (staff?.email || '').trim().toLowerCase();
+  const officialProfile = USERS_TO_IMPORT.find(user =>
+    user.email?.trim().toLowerCase() === email ||
+    (Array.isArray(user.emails) && user.emails.some(candidate => candidate.trim().toLowerCase() === email))
+  );
+  return isUserInactive(staff) || isUserInactive(officialProfile);
+};
 
 // Plantilla de filas iniciales por entrenamiento
 const DEFAULT_SCHEDULE_TEMPLATE = [
@@ -358,11 +368,10 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
         if (docSnap.exists()) {
           const data = docSnap.data();
           if (data.staff && Array.isArray(data.staff) && data.staff.length > 0) {
-            // Filtrar y sanear desvinculados
             const clean = data.staff.filter(s => {
               const name = (s.name || '').toLowerCase();
               const email = (s.email || '').toLowerCase();
-              return !name.includes('leyla') && !email.includes('leyla');
+              return !isInactiveStaffMember(s) && !name.includes('leyla') && !email.includes('leyla');
             });
             setStaffList(clean);
           } else {
@@ -407,7 +416,7 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
     }
   }, [isOpen, selectedSede, nodusDocId]);
 
-  // Guardar en Causa OS y notificar por correo con copia a Eli Escobar y Lennin (y Gabriela Rivadeneyra en Lima)
+  // Guardar en Causa OS y notificar por correo con copia a Finanzas (y Gabriela Rivadeneyra en Lima)
   const handleSaveToCausa = async () => {
     setIsSaving(true);
     setSaveMessage('');
@@ -416,7 +425,7 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
       const payload = {
         sede: selectedSede,
         rows: scheduleRows,
-        staff: staffList,
+        staff: staffList.filter(staff => !isInactiveStaffMember(staff)),
         acknowledgements: acknowledgements || {},
         updatedAt: new Date().toISOString(),
         updatedBy: activeUser?.name || activeUser?.displayName || activeUser?.email || 'Gerente Causa OS',
@@ -431,18 +440,18 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
         await notifyTeamScheduleUpdated({
           sede: selectedSede,
           updatedBy: activeUser?.name || activeUser?.displayName || 'Gerencia de Sede',
-          staffList: staffList
+          staffList: staffList.filter(staff => !isInactiveStaffMember(staff))
         });
       } catch (notifErr) {
         console.warn('Error enviando notificaciones in-app:', notifErr);
       }
 
-      // Enviar correo a los colaboradores asignados con copia a Eli Escobar y Lennin Chasi
+      // Enviar correo a los colaboradores asignados con copia a Finanzas
       // Y si la sede es LIMA (SOLO EN LIMA), incluir con copia a Gabriela Rivadeneyra (Contadora Lima)
       const isLima = selectedSede.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes('lima');
       try {
-        const staffEmails = staffList.map(s => s.email).filter(Boolean);
-        const ccEmails = ['contabilidad.global@crearpsl.net', 'talento.humano@crearpsl.net'];
+        const staffEmails = staffList.filter(s => !isInactiveStaffMember(s)).map(s => s.email).filter(Boolean);
+        const ccEmails = ['contabilidad.global@crearpsl.net'];
         if (isLima) {
           ccEmails.push('contabilidad.lima@crearpsl.net');
           ccEmails.push('grivadeneira@crearpsl.com');
@@ -500,7 +509,6 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
             <div style="background: #f8fafc; border-left: 4px solid #f59e0b; padding: 12px 16px; margin: 20px 0; border-radius: 4px; font-size: 13px;">
               <strong>📌 Copia oficial enviada a:</strong><br/>
               • <strong>Eli Escobar</strong> (Jefa Financiera): <code>contabilidad.global@crearpsl.net</code><br/>
-              • <strong>Lennin Chasi</strong> (Talento Humano): <code>talento.humano@crearpsl.net</code><br/>
               ${isLima ? '• <strong>Gabriela Rivadeneyra</strong> (Contadora Lima): <code>contabilidad.lima@crearpsl.net</code><br/>' : ''}
             </div>
 
@@ -529,9 +537,9 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
 
       setLastSaved(new Date().toLocaleTimeString());
       setHasUnsavedChanges(false);
-      const notifMsg = isLima 
-        ? 'Guardado en Causa OS y notificado por correo a Eli Escobar, Lennin y Gabriela Rivadeneyra (Lima)' 
-        : 'Guardado en Causa OS y notificado por correo a Eli Escobar y Lennin';
+      const notifMsg = isLima
+        ? 'Guardado en Causa OS y notificado por correo a Eli Escobar y Gabriela Rivadeneyra (Lima)'
+        : 'Guardado en Causa OS y notificado por correo a Eli Escobar';
       setSaveMessage(notifMsg);
       setTimeout(() => setSaveMessage(''), 5000);
     } catch (err) {
@@ -798,8 +806,8 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose, currentUse
   // Enviar Correo masivo
   const handleSendBatchEmail = () => {
     const isLima = selectedSede.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes('lima');
-    const staffEmails = staffList.map(s => s.email).filter(Boolean);
-    const ccList = ['contabilidad.global@crearpsl.net', 'talento.humano@crearpsl.net'];
+    const staffEmails = staffList.filter(s => !isInactiveStaffMember(s)).map(s => s.email).filter(Boolean);
+    const ccList = ['contabilidad.global@crearpsl.net'];
     if (isLima) {
       ccList.push('contabilidad.lima@crearpsl.net');
     }

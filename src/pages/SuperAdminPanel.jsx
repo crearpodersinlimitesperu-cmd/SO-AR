@@ -9,6 +9,7 @@ import { db, auth } from '../services/firebase';
 import { normalizeRole, normalizeSede, OPERATIONAL_SEDES } from '../data/usersData';
 import { canViewInactiveUsers, isElizabethEscobar } from '../config/permissions';
 import { isInactiveTrainer } from '../data/managersData';
+import { isUserInactive as isInactiveUserRecord } from '../utils/userNormalizer.js';
 import { getAllCompanyUsers } from '../services/userService';
 import { openOrCreateDirectMessage } from '../services/googleChatService';
 import { getWhatsAppUrl } from '../utils/phoneUtils';
@@ -1430,7 +1431,7 @@ export default function SuperAdminPanel() {
     transition: 'all 0.2s',
   });
 
-  const isUserInactive = (u) => u.isActive === false || u.status === 'inactive' || u.active === false || u.estado === 'inactivo' || u.role === 'inactivo' || isInactiveTrainer(u.name || u.displayName);
+  const isUserInactive = (u) => isInactiveUserRecord(u) || isInactiveTrainer(u.name || u.displayName);
 
   const displayedUsersData = (realUsersData || []).filter(u => {
     const isInactive = isUserInactive(u);

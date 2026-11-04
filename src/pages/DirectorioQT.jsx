@@ -14,6 +14,7 @@ import {
   isNonOperationalDirector,
   canViewInactiveUsers
 } from '../config/permissions';
+import { isUserInactive } from '../utils/userNormalizer.js';
 import { normalizeRole } from '../data/usersData';
 import CountryFlag from '../components/CountryFlag';
 import { 
@@ -130,7 +131,7 @@ export default function DirectorioQT() {
     return members.filter(m => {
       // -1. Ocultar integrantes inactivos, desvinculados o renunciados por defecto (solo Directivos y Talento Humano pueden verlos si activan "Mostrar Inactivos")
       if (!canSeeInactives || !showInactive) {
-        if (!m.esActivo || m.role === 'inactivo' || (m.estado && (m.estado.toUpperCase().includes('INACTIVO') || m.estado.toUpperCase().includes('RENUNCIA')))) {
+        if (!m.esActivo || isUserInactive(m)) {
           return false;
         }
       }

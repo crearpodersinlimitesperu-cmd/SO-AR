@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { createAuthStartupTrace } from '../src/utils/authStartupTiming.js';
-import { mergeAuthenticatedRoleProfile } from '../src/utils/userNormalizer.js';
+import { isUserInactive, mergeAuthenticatedRoleProfile } from '../src/utils/userNormalizer.js';
 
 const RTT = 60;
 const baselineRef = 'd1c07eaa128038df90d6a5db0a1c6b2a39b824f9';
@@ -70,14 +70,14 @@ function harness(source, { rows = [], staff = [], exists = true, fail = '', inac
   const storage = { getItem: () => null, setItem() {}, removeItem() {} };
   new Function('onAuthStateChanged', 'auth', 'findUserInFirestore', 'findStaffInFirestore', 'db', 'collection',
     'query', 'where', 'getDocs', 'getDoc', 'doc', 'findUserByAnyEmail', 'isSuperAdminEmail', 'isInactiveTrainer',
-    'signOut', 'setCurrentUser', 'setOriginalAdminUser', 'setLoading', 'normalizeUserRecord', 'enforceUserRolesAgent', 'saveSelfProfile',
+    'signOut', 'setCurrentUser', 'setOriginalAdminUser', 'setLoading', 'normalizeUserRecord', 'isUserInactive', 'enforceUserRolesAgent', 'saveSelfProfile',
     'buildUserObject', 'recordAuditEvent', 'sessionStorage', 'localStorage', 'PARTICIPANT_FLAG',
     'buildParticipantUser', 'mergeAuthenticatedRoleProfile', 'console', 'showToast', 'startupTrace', effectBody)(
     (_, cb) => { callback = cb; return () => {}; }, { signOut: async () => event('signout') },
     helpers.findUserInFirestore, helpers.findStaffInFirestore, {}, collection, query, where, getDocs, getDoc, doc,
     () => null, () => false, () => inactive, async () => event('signout'),
     user => { currentUser = user; event(user ? 'access' : 'no-access'); }, () => {},
-    value => event(value ? 'gate-started' : 'gate-finished'), user => ({ ...user, roles: ['colaborador'] }),
+    value => event(value ? 'gate-started' : 'gate-finished'), user => ({ ...user, roles: ['colaborador'] }), isUserInactive,
     agent, saveSelfProfile, (_, user) => user, async () => event('audit'),
     storage, storage, 'participant', () => ({ participant: true }), mergeAuthenticatedRoleProfile, logger,
     () => event('toast'), createAuthStartupTrace());

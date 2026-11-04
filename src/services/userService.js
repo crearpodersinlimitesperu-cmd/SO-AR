@@ -2,6 +2,8 @@ import { db } from './firebase';
 import { doc, getDoc, setDoc, updateDoc, arrayUnion, collection, getDocs, query, where } from 'firebase/firestore';
 import { usersData, normalizeRole, findUserByAnyEmail } from '../data/usersData';
 import { DUAL_ROLE_TRAINER_EMAILS, canManageUserStatus } from '../config/permissions';
+import { isInactiveTrainer } from '../data/trainerIdentity.js';
+import { isUserInactive } from '../utils/userNormalizer.js';
 import { recordAuditEvent } from './auditService';
 
 
@@ -210,7 +212,8 @@ export async function getAllCompanyUsers(currentUser = null) {
       // Deduplicar y limpiar roles
       finalRoles = Array.from(new Set(finalRoles.map(normalizeRole).filter(r => r && r !== 'undefined' && r !== 'null' && r !== 'student')));
 
-      const isUserActive = uData.isActive !== false && uData.status !== 'inactive' && uData.active !== false;
+      const isUserActive = !isUserInactive(uData) &&
+        !isUserInactive({ ...officialProfile, role: finalRole, roles: finalRoles });
 
       const enrichedUser = {
         ...uData,
@@ -230,6 +233,7 @@ export async function getAllCompanyUsers(currentUser = null) {
       };
 
       if (existingIdx !== -1) {
+        const mergedIsUserActive = isUserActive && !isUserInactive(allUsers[existingIdx]);
         allUsers[existingIdx] = withCanonicalEmail({
           ...allUsers[existingIdx],
           ...enrichedUser,
@@ -238,9 +242,9 @@ export async function getAllCompanyUsers(currentUser = null) {
           role: finalRole,
           roles: finalRoles,
           sede: finalSede,
-          status: isUserActive ? 'active' : 'inactive',
-          active: isUserActive,
-          isActive: isUserActive,
+          status: mergedIsUserActive ? 'active' : 'inactive',
+          active: mergedIsUserActive,
+          isActive: mergedIsUserActive,
           deactivatedAt: uData.deactivatedAt || allUsers[existingIdx].deactivatedAt || null,
           deactivatedBy: uData.deactivatedBy || allUsers[existingIdx].deactivatedBy || null,
           deactivationReason: uData.deactivationReason || allUsers[existingIdx].deactivationReason || null,
@@ -329,7 +333,9 @@ export async function getAllCompanyUsers(currentUser = null) {
     console.warn("Error evaluando permisos de estado en getAllCompanyUsers:", err);
     includeInactive = false;
   }
-  return includeInactive ? allUsers : allUsers.filter(u => u.status !== 'inactive');
+  return includeInactive ? allUsers : allUsers.filter(u =>
+    !isUserInactive(u) && !isInactiveTrainer(u.name || u.displayName)
+  );
 }
 
 /**

@@ -54,6 +54,7 @@ function harness({ stage = 'lookup', holdNew = false } = {}) {
     findUserByAnyEmail: () => null,
     isSuperAdminEmail: () => false,
     isInactiveTrainer: () => false,
+    isUserInactive: () => false,
     normalizeUserRecord: user => user,
     enforceUserRolesAgent: user => wait('roles', user, user.roles),
     getDoc: ref => wait('self-profile', fixture(ref.uid.replace('synthetic-', '')), snapshot),

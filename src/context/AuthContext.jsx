@@ -7,7 +7,7 @@ import { normalizeRole, ROLE_DISPLAY_NAMES, findUserByAnyEmail, usersData as all
 import { isSuperAdminEmail, isDireccionRole, isGerenciaRole, canSimulate, DUAL_ROLE_TRAINER_EMAILS } from '../config/permissions';
 import { useUI } from './UIContext';
 import { recordAuditEvent } from '../services/auditService';
-import { mergeAuthenticatedRoleProfile, normalizeUserRecord } from '../utils/userNormalizer';
+import { isUserInactive, mergeAuthenticatedRoleProfile, normalizeUserRecord } from '../utils/userNormalizer';
 import { enforceUserRolesAgent } from '../services/roleAgentDaemon';
 import { canonicalSede } from '../utils/sede';
 import { isInactiveTrainer } from '../data/trainerIdentity';
@@ -650,14 +650,7 @@ export function AuthProvider({ children }) {
 
       // 🚫 VALIDACIÓN DE ESTADO ACTIVO / INACTIVO (Trazabilidad y Control de Acceso)
       const esInactivoDesvinculado = isInactiveTrainer(foundUser.name || foundUser.displayName);
-      if (
-        foundUser.isActive === false || 
-        foundUser.status === 'inactive' || 
-        foundUser.active === false || 
-        foundUser.estado === 'inactivo' || 
-        foundUser.role === 'inactivo' || 
-        esInactivoDesvinculado
-      ) {
+      if (isUserInactive(foundUser) || esInactivoDesvinculado) {
         await auth.signOut();
         const reason = esInactivoDesvinculado ? ' (Personal desvinculado de Crear)' : (foundUser.deactivationReason || foundUser.motivo ? ` (Motivo: ${foundUser.deactivationReason || foundUser.motivo})` : '');
         throw new Error(`ACCESO DENEGADO: Tu cuenta de colaborador se encuentra desactivada${reason}. Comunícate con Dirección General.`);
@@ -790,7 +783,7 @@ export function AuthProvider({ children }) {
           if (foundUser) {
             // 🚫 VALIDACIÓN DE ESTADO ACTIVO / INACTIVO (Trazabilidad y Control de Acceso)
             const esInactivoDesvinculado = isInactiveTrainer(foundUser.name || foundUser.displayName);
-            if (foundUser.isActive === false || foundUser.status === 'inactive' || foundUser.active === false || esInactivoDesvinculado) {
+            if (isUserInactive(foundUser) || esInactivoDesvinculado) {
               console.warn("Usuario desactivado intentando acceder a la sesión:", normalizedEmail);
               await signOut(auth);
               if (!isCurrentSession()) return;
