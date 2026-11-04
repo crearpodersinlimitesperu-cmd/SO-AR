@@ -365,7 +365,6 @@ export function AuthProvider({ children }) {
         foundUser.sede = 'Lima';
       }
       foundUser.nodusUser = 'GCARDENAS';
-      foundUser.nodusPassword = 'nolaolvidare';
       foundUser.nodusSede = 'LIMA CICLO 1';
       foundUser.nodusStatus = 'Activo';
     }

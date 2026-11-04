@@ -18,8 +18,10 @@ usan datos sintéticos, Chromium local y proyectos Firestore `demo-*`.
 ## Vías verificadas y cambios
 
 La confianza de la tabla corresponde a la reproducción del defecto, **no** a su
-atribución al incidente reportado. Las líneas corresponden a este PR; para
-consultar el comportamiento anterior debe usarse `914fbe5`.
+atribución al incidente reportado. Las líneas de esta tabla corresponden al
+commit `770e62f`; para consultar el comportamiento anterior debe usarse
+`914fbe5`. Las continuaciones posteriores se documentan al final de la sección
+de verificación.
 
 | # | Severidad | Evidencia | Defecto y corrección | Confianza |
 |---|---|---|---|---|
@@ -189,6 +191,46 @@ La validación posterior a estos cambios da **38/38** en `test:privacy`,
 directo Vite/lint/diff sin errores. Los resultados de la tabla anterior
 corresponden a la primera entrega; no se reinterpreta una suite parcial como
 cierre de los bloqueadores.
+
+### Contraseña Nodus incluida en el cliente
+
+Se confirmó otra exposición **HIGH (10/10)**: la base `914fbe5` incluía una
+contraseña Nodus en `src/data/usersToImport.js:1454`, la asignaba en
+`AuthContext.jsx` y la mostraba mediante un fallback literal en el modal de
+perfil. No era necesario abrir la ficha para obtenerla: formaba parte de
+recursos JavaScript públicos. No se reproduce su valor en este informe.
+
+Se retiró del catálogo, de AuthContext y del fallback del modal. El acceso
+legítimo se mantiene mediante
+`src/services/privateNodusAccessService.js:5-40` y el documento restringido
+`user_private_credentials/{correoCanónico}`. El contrato contiene `username`,
+`password` y `sede`; no se publica ninguna credencial como ejemplo. Las reglas
+de `firestore.rules:651-657` permiten leer al propietario y administradores de
+perfil, deniegan enumeración a usuarios ordinarios y reservan la escritura a
+SuperAdmin. El modal consulta solo para el propietario/administrador autorizado,
+no muestra cachés locales, descarta callbacks tras cerrar/cambiar de ficha y
+explica explícitamente la ausencia/error de aprovisionamiento.
+
+**Requisito previo al despliegue, no ejecutado:** el administrador debe rotar la
+contraseña expuesta en el sistema de origen y aprovisionar la nueva en ese
+documento privado mediante acceso autorizado. Debe auditar también si los
+migradores antiguos copiaron credenciales a `users`/`staff_directory` u otras
+colecciones de directorio. Un documento Firestore se descarga completo: no basta
+con dejar de pintar el campo. Tras respaldo restringido y validación del nuevo
+acceso, retirar solamente esos campos secretos de los documentos de directorio
+confirmados mediante precondición de versión. No se modificó ningún documento de
+producción ni se ejecutó esa rotación/migración. Las copias históricas del bundle
+y el historial Git no se revocan retirando el literal; de ahí la rotación.
+
+Validación final adicional: **41/41** pruebas de privacidad y **26/26** de reglas
+en emulador, con positivos de propietario/administrador/alias aprobado y negativos
+de otros usuarios y autoaprovisionamiento. La regresión completa vuelve a dar
+**245/248**, exclusivamente los tres fallos de baseline ya documentados. Build
+directo Vite, lint y diff pasan. Se compararon en memoria los bytes de la
+contraseña original contra **todos** los archivos de `src` y `dist`: no hay
+coincidencias y no se imprimió su valor. El CI de privacidad del commit anterior
+`091139d` pasó; los otros dos jobs fallaron por `managersHelpContent`,
+`cartas-sedes` y `mjCalendarVisibility`, no por las pruebas nuevas.
 
 La nueva tarea CI de privacidad se ejecuta independientemente de las suites con
 fallos de baseline y solo usa emuladores. Los workflows de despliegue siguen

@@ -17,7 +17,12 @@ test('private profiles, directories, notes, calls and KPIs enforce identity/sede
     coach: { uid: 'coach', email: 'coach@example.invalid', sede: 'Lima', role: 'entrenador', roles: ['entrenador'], appRole: 'entrenador' },
     director: { uid: 'director', email: 'director@example.invalid', role: 'direccion', roles: ['direccion'] }
   };
-  const dbFor = id => env.authenticatedContext(id, { email: profiles[id]?.email || `${id}@example.invalid` }).firestore();
+  const clients = new Map();
+  const dbFor = id => {
+    if (!clients.has(id)) clients.set(id,
+      env.authenticatedContext(id, { email: profiles[id]?.email || `${id}@example.invalid` }).firestore());
+    return clients.get(id);
+  };
   const seed = async (path, data) => env.withSecurityRulesDisabled(ctx => setDoc(doc(ctx.firestore(), path), data));
   try {
     for (const [id, profile] of Object.entries(profiles)) await seed(`users/${id}`, profile);
@@ -28,6 +33,7 @@ test('private profiles, directories, notes, calls and KPIs enforce identity/sede
     }
     await seed('managers_directory/assigned', { sede: 'Quito', entrenadorId: 'coach', entrenadorEmail: profiles.coach.email });
     await seed('user_profiles/remote@example.invalid', { notes: [{ text: 'Private note' }], documents: [{ url: 'https://example.invalid/private' }] });
+    await seed('user_private_credentials/remote@example.invalid', { username: 'synthetic', password: 'synthetic-fixture-only', sede: 'Quito' });
     await seed('notas_seguimiento/foreign', { autorEmail: profiles.remote.email, sede: 'Quito' });
     await seed('llamadas_grupales_historial/foreign', { registradoPorEmail: profiles.remote.email, sede: 'Quito' });
     await seed('kpi_reports/foreign', { userEmail: profiles.remote.email, userSede: 'Quito', submittedByEmail: profiles.remote.email });
@@ -96,9 +102,14 @@ test('private profiles, directories, notes, calls and KPIs enforce identity/sede
       });
       await seed('staff_directory/alias-person', { email: 'alias@crearpsl.net' });
       await seed('staff_directory/no-identity', { sede: 'Quito' });
+      await seed('user_private_credentials/alias@crearpsl.net', {
+        username: 'synthetic-alias', password: 'synthetic-fixture-only', sede: 'Lima'
+      });
       for (const tokenEmail of ['alias@crearpsl.com', 'approved@example.invalid']) {
         const db = env.authenticatedContext('alias-owner', { email: tokenEmail }).firestore();
         await assertSucceeds(getDoc(doc(db, 'staff_directory', 'alias-person')));
+        await assertSucceeds(getDoc(doc(db, 'user_private_credentials', 'alias@crearpsl.net')));
+        await assertFails(getDoc(doc(db, 'user_private_credentials', profiles.remote.email)));
         await assertSucceeds(getDocs(privateDirectoryQuery(db, 'staff_directory', {
           uid: 'alias-owner', email: 'alias@crearpsl.net', authEmail: tokenEmail, sede: 'Lima', roles: ['entrenador']
         })));
@@ -106,6 +117,17 @@ test('private profiles, directories, notes, calls and KPIs enforce identity/sede
         await assertFails(updateDoc(doc(db, 'users', 'alias-owner'), { emails: [profiles.director.email] }));
       }
     });
+    await t.test('private Nodus credentials are owner/admin-only and cannot be self-provisioned', async () => {
+      const path = 'user_private_credentials/remote@example.invalid';
+      await assertSucceeds(getDoc(doc(dbFor('remote'), path)));
+      await assertSucceeds(getDoc(doc(dbFor('director'), path)));
+      for (const id of ['local', 'coach']) await assertFails(getDoc(doc(dbFor(id), path)));
+      await assertFails(getDocs(collection(dbFor('remote'), 'user_private_credentials')));
+      await assertSucceeds(getDocs(collection(dbFor('director'), 'user_private_credentials')));
+      await assertFails(updateDoc(doc(dbFor('remote'), path), { password: 'forged' }));
+      await assertFails(setDoc(doc(dbFor('local'), 'user_private_credentials', profiles.local.email), { username: 'forged' }));
+    });
+
     await t.test('travelling trainer retains assigned managers and can record calls but cannot change identities', async () => {
       const db = dbFor('coach');
       await assertSucceeds(getDoc(doc(db, 'managers_directory', 'assigned')));

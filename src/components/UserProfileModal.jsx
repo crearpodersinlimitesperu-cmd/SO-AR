@@ -24,6 +24,7 @@ import { getFlagForSede } from '../utils/flags';
 import TaskAssignmentModal from './TaskAssignmentModal';
 import UserStatusModal from './UserStatusModal';
 import { canReadPrivateProfile } from '../utils/privacyScope.js';
+import { subscribeToPrivateNodusCredentials } from '../services/privateNodusAccessService.js';
 
 // Roles editables desde este modal (Super Admin) — lista curada de roles
 // canónicos para evitar mostrar sinónimos duplicados (ej. "coordinador_c1c2"
@@ -119,6 +120,19 @@ function UserProfileContent({ isOpen, onClose, user, allTasks = [], onStatusUpda
   const [taskSortOrder, setTaskSortOrder] = useState('asc'); // 'asc' (Próximas primero / Cronológico) | 'desc'
   const [taskFilterStatus, setTaskFilterStatus] = useState('all'); // 'all' | 'pending' | 'completed' | 'critical'
   const [copiedScriptKey, setCopiedScriptKey] = useState(null);
+  const [nodusCredentials, setNodusCredentials] = useState(null);
+  const [nodusCredentialStatus, setNodusCredentialStatus] = useState('loading');
+  const hasNodusAssignment = Boolean(user?.nodusUser || user?.role === 'coord_jr' || user?.appRole === 'coord_jr');
+
+  useEffect(() => {
+    setNodusCredentials(null);
+    setNodusCredentialStatus('loading');
+    if (!isOpen || !hasNodusAssignment || !canReadPrivateProfile(currentUser, user)) return;
+    return subscribeToPrivateNodusCredentials(currentUser, user, (credentials, state) => {
+      setNodusCredentials(credentials);
+      setNodusCredentialStatus(state.status);
+    });
+  }, [isOpen, hasNodusAssignment, currentUser, user]);
 
   const parseDateToMs = (val) => {
     if (!val) return null;
@@ -1540,7 +1554,7 @@ function UserProfileContent({ isOpen, onClose, user, allTasks = [], onStatusUpda
             )}
 
             {/* Ficha Nodus DB para Coordinación Junior / Gina Cárdenas */}
-            {(user?.nodusUser || user?.role === 'coord_jr' || user?.appRole === 'coord_jr' || (user?.email && (user.email.includes('cardenasgina29') || user.email.includes('cardenaslopezgina')))) && (
+            {hasNodusAssignment && mayReadPrivateProfile && (
               <div style={{
                 marginTop: '1rem',
                 padding: '0.9rem 1.1rem',
@@ -1574,24 +1588,28 @@ function UserProfileContent({ isOpen, onClose, user, allTasks = [], onStatusUpda
                     <ExternalLink size={14} /> Abrir Nodus Rezagados
                   </a>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.6rem', fontSize: '0.82rem' }}>
+                {nodusCredentials && nodusCredentialStatus === 'ready' ? <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.6rem', fontSize: '0.82rem' }}>
                   <div style={{ background: 'rgba(0,0,0,0.25)', padding: '0.4rem 0.7rem', borderRadius: '6px' }}>
                     <span style={{ color: 'var(--text-muted)' }}>Usuario Nodus:</span>{' '}
-                    <strong style={{ color: '#f59e0b', fontFamily: 'monospace' }}>{user.nodusUser || 'GCARDENAS'}</strong>
+                    <strong style={{ color: '#f59e0b', fontFamily: 'monospace' }}>{nodusCredentials.username}</strong>
                   </div>
                   <div style={{ background: 'rgba(0,0,0,0.25)', padding: '0.4rem 0.7rem', borderRadius: '6px' }}>
                     <span style={{ color: 'var(--text-muted)' }}>Contraseña:</span>{' '}
-                    <strong style={{ color: '#10b981', fontFamily: 'monospace' }}>{user.nodusPassword || 'nolaolvidare'}</strong>
+                    <strong style={{ color: '#10b981', fontFamily: 'monospace' }}>{nodusCredentials.password}</strong>
                   </div>
                   <div style={{ background: 'rgba(0,0,0,0.25)', padding: '0.4rem 0.7rem', borderRadius: '6px' }}>
                     <span style={{ color: 'var(--text-muted)' }}>Sede Nodus:</span>{' '}
-                    <strong style={{ color: '#38bdf8' }}>{user.nodusSede || 'LIMA CICLO 1'}</strong>
+                    <strong style={{ color: '#38bdf8' }}>{nodusCredentials.sede}</strong>
                   </div>
                   <div style={{ background: 'rgba(0,0,0,0.25)', padding: '0.4rem 0.7rem', borderRadius: '6px' }}>
                     <span style={{ color: 'var(--text-muted)' }}>Módulo Asignado:</span>{' '}
                     <strong style={{ color: '#a855f7' }}>Rezagados C1 & QT</strong>
                   </div>
-                </div>
+                </div> : <p role="status">
+                  {nodusCredentialStatus === 'loading' ? 'Verificando acceso privado a Nodus...'
+                    : nodusCredentialStatus === 'error' ? 'No se pudieron verificar las credenciales privadas. Contacta a un administrador.'
+                      : 'Las credenciales deben ser aprovisionadas por un administrador en el registro privado. No se usan contraseñas del catálogo público.'}
+                </p>}
               </div>
             )}
 

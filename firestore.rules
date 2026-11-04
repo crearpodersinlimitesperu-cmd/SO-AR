@@ -648,6 +648,14 @@ service cloud.firestore {
       allow write: if isAuthenticated() && (emailIsCaller(userDocId) || isPrivateProfileAdministrator());
     }
 
+    match /user_private_credentials/{userEmail} {
+      allow get: if isAuthenticated() && (
+        emailIsCaller(userEmail) || isPrivateProfileAdministrator()
+      );
+      allow list: if isAuthenticated() && isPrivateProfileAdministrator();
+      allow write: if isSuperAdmin();
+    }
+
     function isValidNotificationData() {
       let data = request.resource.data;
       return data.keys().hasAll(['userId', 'title', 'message', 'read', 'created_at'])
