@@ -1,4 +1,5 @@
 const COORDINATOR_ROLES = new Set([
+  'gerente',
   'coordinador',
   'coordinador_c1',
   'coordinador_c1c2',
@@ -10,14 +11,12 @@ const COORDINATOR_ROLES = new Set([
   'coord_maestria'
 ]);
 const MANAGEMENT_ROLES = new Set([
-  'gerente',
   'direccion',
   'cfo',
   'cco',
   'ceo',
   'director_maestria',
-  'socio',
-  'consolidado'
+  'socio'
 ]);
 
 function normalize(value) {
@@ -44,35 +43,125 @@ function canonicalSede(value) {
     MEX: 'MEXICO',
     CDMX: 'MEXICO'
   };
-  return aliases[normalized] || normalized;
+  const city = aliases[normalized] || normalized.replace(/\s+(?:CICLO|CAPITULO|C)\s*[12]$/, '').trim();
+  return ['LIMA', 'QUITO', 'CUENCA', 'GUAYAQUIL', 'MEDELLIN', 'MEXICO'].includes(city)
+    ? city : city === 'CIUDAD DE MEXICO' ? 'MEXICO' : '';
 }
 
 function userRoles(userData) {
   const roles = Array.isArray(userData?.roles) ? userData.roles : [];
-  return [...roles, userData?.role, userData?.appRole]
+  return [...roles, userData?.role, userData?.appRole, userData?.rol]
     .filter((role) => typeof role === 'string')
     .map((role) => role.trim().toLowerCase());
 }
 
-export function nodusAccessScope(userData, managerEmailAllowed) {
+export function nodusAccessScope(userData, globalEmailAllowed) {
   const roles = userRoles(userData);
-  if (managerEmailAllowed || roles.some((role) => MANAGEMENT_ROLES.has(role))) return { type: 'global' };
+  if (userData?.active === false || userData?.isActive === false || userData?.esActivo === false ||
+      roles.includes('inactivo') || /inactiv|baja|renuncia|desvinculado/i.test(`${userData?.status || ''} ${userData?.estado || ''}`)) {
+    return { type: 'denied' };
+  }
+  if (globalEmailAllowed || roles.some((role) => MANAGEMENT_ROLES.has(role))) return { type: 'global' };
   if (roles.some((role) => COORDINATOR_ROLES.has(role))) {
-    const sede = typeof userData?.sede === 'string' ? userData.sede.trim() : '';
-    return sede ? { type: 'sede', sede } : { type: 'denied' };
+    const assigned = [userData?.sede, ...Object.entries(userData?.roleSedes || {})
+      .filter(([role]) => roles.includes(role.toLowerCase()) && COORDINATOR_ROLES.has(role.toLowerCase()))
+      .map(([, sede]) => sede)].filter(value => typeof value === 'string' && canonicalSede(value));
+    const sedes = [...new Map(assigned.map(value => [canonicalSede(value), value.trim()])).values()];
+    return sedes.length ? { type: 'sede', sede: sedes[0], ...(sedes.length > 1 ? { sedes } : {}) } : { type: 'denied' };
   }
   return { type: 'general' };
+}
+
+export function personalNodusEmails(profile, authenticatedEmail, uid, findOfficial) {
+  const canonicalEmail = value => String(value || '').trim().toLowerCase().replace(/@crearpsl\.com$/, '@crearpsl.net');
+  const lookup = value => findOfficial(canonicalEmail(value));
+  assertAuthenticatedIdentity(profile, canonicalEmail(authenticatedEmail), lookup, uid);
+  const emails = [...new Set([authenticatedEmail, ...identityEmails(profile), ...identityEmails(lookup(authenticatedEmail))]
+    .filter(value => typeof value === 'string' && value.trim()).map(value => value.trim().toLowerCase()))];
+  return [...new Set(emails.flatMap(email => email.endsWith('@crearpsl.net') || email.endsWith('@crearpsl.com')
+    ? [email, canonicalEmail(email), canonicalEmail(email).replace(/@crearpsl\.net$/, '@crearpsl.com')] : [email]))];
 }
 
 export function filterNodusSedes(sedes, scope) {
   if (scope.type === 'global') return sedes;
   if (scope.type !== 'sede') return [];
-  const requested = canonicalSede(scope.sede);
-  if (!requested) return [];
+  const requested = (scope.sedes || [scope.sede]).map(canonicalSede).filter(Boolean);
+  if (!requested.length) return [];
   return sedes.filter((sede) => {
     const names = [sede.ciudad, sede.nombre].map(canonicalSede).filter(Boolean);
-    return names.some((name) => name === requested || name.startsWith(`${requested} `));
+    return names.length > 0 && new Set(names).size === 1 && requested.includes(names[0]);
   });
+}
+
+const COUNT_FIELDS = [
+  'asignados', 'confirmados', 'porConfirmar', 'noContesta', 'noInteresa', 'llamadas', 'asistieron',
+  'asignadosTotal', 'confirmadosTotal', 'gestionesTotal', 'sentadosTotal', 'sentadosC1',
+  'coberturaPct', 'tasaEfectividad', 'totalParticipantes', 'totalCoordinadores', 'totalEquipos',
+  'totalAsignados', 'totalConfirmados', 'totalGestiones', 'totalSentados', 'confirmado',
+  'gestiones', 'c1', 'c2', 'mj', 'sentadosC2', 'gestionesC1', 'gestionesC2', 'confirmadosC1',
+  'confirmadosC2', 'siguiente', 'yaAsistio', 'devolucion', 'productividadPct',
+  'coordinadoresCount', 'noContestaTotal', 'porConfirmarTotal', 'asistieronTotal',
+  'c1Total', 'c2Total', 'mjTotal', 'totalNoContesta', 'totalPorConfirmar', 'totalSiguiente',
+  'totalNoInteresa', 'totalAsistieron', 'coberturaPromedio', 'productividadPromedio',
+  'desertores', 'sinMarcar', 'rezagados', 'confirmadosLlamada'
+];
+const pickCounts = data => Object.fromEntries(COUNT_FIELDS.filter(field =>
+  data?.[field] !== undefined && data[field] !== null && data[field] !== '' &&
+  ['number', 'string'].includes(typeof data[field]) && Number.isFinite(Number(data[field])) &&
+  Number(data[field]) >= 0
+).map(field => [field, data[field]]));
+
+function summarySede(row) {
+  const name = normalize(row?.equipoNombre || row?.equipo);
+  const named = ['LIMA', 'QUITO', 'CUENCA', 'GUAYAQUIL', 'MEDELLIN', 'MEXICO']
+    .filter(city => new RegExp(`(?:^|[^A-Z])${city}(?:$|[^A-Z])`).test(name));
+  const explicit = canonicalSede(row?.sede);
+  if (named.length > 1 || (explicit && named.length === 1 && named[0] !== explicit)) return '';
+  if (row?.sede && !explicit) return '';
+  return explicit || named[0] || '';
+}
+
+export function scopedNodusContext(snapshot, scope) {
+  if (scope.type === 'denied') throw new Error('Nodus scope denied');
+  if (scope.type === 'global') return snapshot;
+  const timestamp = snapshot?.timestamp || null;
+  if (!['sede', 'personal', 'metrics-global'].includes(scope.type)) return { timestamp, totales: pickCounts(snapshot?.totales) };
+  const visible = rows => (Array.isArray(rows) ? rows : []).filter(row =>
+    scope.type === 'metrics-global' || filterNodusSedes([{ nombre: row?.sede }], scope).length > 0);
+  const coordinadores = scope.type === 'personal'
+    ? (Array.isArray(snapshot?.coordinadores) ? snapshot.coordinadores : []).filter(row =>
+      typeof row?.email === 'string' && scope.emails.includes(row.email.trim().toLowerCase()))
+    : visible(snapshot?.coordinadores);
+  return {
+    timestamp,
+    ...(scope.type === 'metrics-global' ? { totales: pickCounts(snapshot?.totales) } : {}),
+    sedes: visible(snapshot?.sedes).map(row => ({ sede: row.sede, ...pickCounts(row) })),
+    coordinadores: coordinadores.map(row => ({
+      sede: row.sede,
+      ...Object.fromEntries(['id', 'nombre', 'nombreCompleto', 'name', 'email', 'rol', 'role', 'ciclo',
+        'ultGestion', 'ultConexion', 'coberturaDetalle', 'productividadDetalle'].filter(field =>
+        typeof row[field] === 'string').map(field => [field, row[field]])),
+      ...pickCounts(row),
+      ...(row.metricasDisponibles ? { metricasDisponibles: Object.fromEntries(COUNT_FIELDS
+        .filter(field => typeof row.metricasDisponibles[field] === 'boolean')
+        .map(field => [field, row.metricasDisponibles[field]])) } : {}),
+      ...(row.estados ? { estados: pickCounts(row.estados) } : {}),
+      ...(Array.isArray(row.equipos) ? { equipos: row.equipos
+        .filter(team => !team.incoherenciaSedes && (!canonicalSede(team.sedeInferida) ||
+          canonicalSede(team.sedeInferida) === canonicalSede(row.sede)))
+        .map(team => ({
+          ...Object.fromEntries(['equipo', 'equipoNombre', 'fase', 'capitulo', 'ciclo', 'sedeInferida'].filter(field =>
+            typeof team[field] === 'string').map(field => [field, team[field]])),
+          ...pickCounts(team)
+        })) } : {})
+    })),
+    equiposSummary: visible((snapshot?.equiposSummary || []).map(row => ({ ...row, sede: summarySede(row) }))).map(row => ({
+      sede: row.sede,
+      ...Object.fromEntries(['equipo', 'equipoNombre', 'equipoId', 'numEquipo', 'stage', 'fase', 'capitulo', 'ciclo'].filter(field =>
+        ['number', 'string'].includes(typeof row[field])).map(field => [field, row[field]])),
+      ...pickCounts(row)
+    }))
+  };
 }
 
 export function hasNodusTeamAccess(sedes, teamId) {
@@ -129,3 +218,4 @@ export function summarizeNodusCatalog(sedes) {
     return total;
   }, { sedes: 0, equipos: 0, participantes: 0 });
 }
+import { assertAuthenticatedIdentity, identityEmails } from '../../src/utils/authIdentity.js';

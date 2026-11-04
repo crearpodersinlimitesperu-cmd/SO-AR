@@ -1,4 +1,5 @@
 import { snapshotFreshness } from '../utils/nodusIntegrity.js';
+import { canonicalSede } from '../utils/sede.js';
 
 export function selectCoordinatorSnapshot(remote, fallback) {
   if (Array.isArray(remote?.coordinadores)) {
@@ -66,12 +67,12 @@ export function findFreshNodusMetrics(snapshot, person, now = Date.now()) {
   const freshness = snapshotFreshness(timestamp, now);
   if (freshness.stale) return null;
   const email = normalize(person.email);
-  const name = normalize(person.name || person.nombre);
+  if (!email) return null;
   const matches = snapshot.coordinadores.filter(coord => {
     if (!coord || typeof coord !== 'object') return false;
-    if (email) return normalize(coord.email) === email;
-    if (!name) return false;
-    return normalize(coord.nombreCompleto || coord.nombre || coord.name) === name;
+    if (normalize(coord.email) !== email) return false;
+    return !person.sede || (canonicalSede(person.sede) !== 'Global' &&
+      canonicalSede(coord.sede) === canonicalSede(person.sede));
   });
   if (matches.length !== 1) return null;
   const metrics = extractNodusMetrics(matches[0]);

@@ -1,12 +1,12 @@
-import { useEffect, useState } from 'react';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../services/firebase';
+import { useState } from 'react';
+import { usePrivateNodusReportSources } from '../hooks/usePrivateNodusSnapshot.js';
 import { useCycles } from '../context/CyclesContext';
 import { buildOperationalReview, REVIEW_SOURCE } from '../services/operationalReview';
 
 export function OperationalReviewView({ events, snapshot, loading, error, onReload, globalFilterSede = 'Todas', now = Date.now() }) {
   const review = buildOperationalReview(events, snapshot, now);
-  const groups = review.sedes.filter(group => globalFilterSede === 'Todas' || group.sede === globalFilterSede);
+  const stages = snapshot?.authorizedStages || ['C1', 'C2'];
+  const groups = error ? [] : review.sedes.filter(group => globalFilterSede === 'Todas' || group.sede === globalFilterSede);
   return (
     <section className="glass-panel" style={{ padding: '1rem', marginBottom: '1rem' }} aria-label="Revisión de seis equipos por sede">
       <h2>Últimos seis equipos por sede · evidencia operativa</h2>
@@ -21,9 +21,9 @@ export function OperationalReviewView({ events, snapshot, loading, error, onRelo
       {error && <p role="alert">{error} No se certifica cobertura completa.</p>}
       {!loading && !snapshot && !error && <p role="status">No existe snapshot publicado. No equivale a cero actividad.</p>}
       {loading ? <p role="status">Esperando calendario y snapshot; no se muestran conclusiones parciales.</p> : groups.map(group => {
-        const evidenced = group.teams.filter(team => team.stages.every(stage => stage.status === 'ready')).length;
+        const evidenced = group.teams.filter(team => team.stages.length > 0 && team.stages.every(stage => stage.status === 'ready')).length;
         return <section key={group.sede} data-review-sede={group.sede} style={{ marginTop: '1rem' }}>
-          <h3>{group.sede}: {group.teams.length}/6 equipos fechados · {evidenced}/6 con reporte C1 y C2 legible</h3>
+          <h3>{group.sede}: {group.teams.length}/6 equipos fechados · {evidenced}/6 con reporte {stages.join(' y ')} legible</h3>
           <p>Período C1: {group.teams.at(-1)?.start || 'Sin fecha'} — {group.teams[0]?.start || 'Sin fecha'}.
             {' '}{group.missingCalendarTeams > 0 && `Faltan ${group.missingCalendarTeams} equipos en el calendario accesible. `}
             {group.invalidEvents > 0 && `${group.invalidEvents} eventos excluidos por identidad/fecha no verificables. `}
@@ -48,19 +48,8 @@ export function OperationalReviewView({ events, snapshot, loading, error, onRelo
 
 export default function OperationalReview({ globalFilterSede }) {
   const { events, loadingEvents } = useCycles();
-  const [state, setState] = useState({ snapshot: null, loading: true, error: '' });
   const [revision, setRevision] = useState(0);
-  useEffect(() => {
-    let cancelled = false;
-    setState({ snapshot: null, loading: true, error: '' });
-    getDoc(doc(db, 'nodus_coordinadores_c1c2', 'latest')).then(snapshot => {
-      if (!cancelled) setState({ snapshot: snapshot.exists() ? snapshot.data() : null, loading: false, error: '' });
-    }).catch(error => {
-      console.error('No se pudo leer la revisión operativa:', error);
-      if (!cancelled) setState({ snapshot: null, loading: false, error: 'No se pudo leer Nodus; comprueba sesión, permisos o conectividad.' });
-    });
-    return () => { cancelled = true; };
-  }, [revision]);
+  const state = usePrivateNodusReportSources({ revision });
   return <OperationalReviewView events={events || []} {...state} loading={state.loading || loadingEvents}
     globalFilterSede={globalFilterSede} onReload={() => setRevision(value => value + 1)} />;
 }

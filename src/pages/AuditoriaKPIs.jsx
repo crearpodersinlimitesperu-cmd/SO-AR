@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
 import { useTheme } from '../context/ThemeContext';
-import { collection, getDocs, getDoc, updateDoc, doc, query, orderBy, limit } from 'firebase/firestore';
+import { collection, getDocs, getDoc, updateDoc, doc, query, where, orderBy, limit } from 'firebase/firestore';
 import { db, auth, getDocResilient } from '../services/firebase';
 import { CheckCircle2, AlertCircle, ArrowLeft, Users, Target, PhoneCall } from 'lucide-react';
 import CountryFlag from '../components/CountryFlag';
@@ -15,6 +15,9 @@ import NodusCoordinadoresC1C2Dashboard from '../components/NodusCoordinadoresC1C
 import ThemeSelector from '../components/ThemeSelector';
 import ZenModeSelector from '../components/ZenModeSelector';
 import OperationalReview from '../components/OperationalReview';
+import { canReadKpiReport } from '../utils/privacyScope.js';
+import { privateKpiQuery } from '../services/privacyQueries.js';
+import { NON_PULSE_REPORT_TYPES } from '../services/pulsePrivacy.js';
 
 export default function AuditoriaKPIs({ defaultTab }) {
   const { currentUser } = useAuth();
@@ -338,12 +341,12 @@ export default function AuditoriaKPIs({ defaultTab }) {
 
   const getLocalReports = () => {
     try {
-      const saved = localStorage.getItem('cpsl_kpi_reports_v1');
+      const saved = localStorage.getItem(`cpsl_kpi_reports_v2:${currentUser?.uid}:${currentUser?.email}`);
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed)) {
           // Filtrar y purgar cualquier dato falso o de prueba antiguo
-          const clean = parsed.filter(r => r && !r.id?.startsWith('kpi_seed_'));
+          const clean = parsed.filter(r => r && !r.id?.startsWith('kpi_seed_') && canReadKpiReport(currentUser, r));
           if (clean.length !== parsed.length) {
             saveLocalReports(clean);
           }
@@ -359,7 +362,7 @@ export default function AuditoriaKPIs({ defaultTab }) {
   const saveLocalReports = (list) => {
     try {
       const cleanList = (list || []).filter(r => r && !r.id?.startsWith('kpi_seed_'));
-      localStorage.setItem('cpsl_kpi_reports_v1', JSON.stringify(cleanList));
+      localStorage.setItem(`cpsl_kpi_reports_v2:${currentUser?.uid}:${currentUser?.email}`, JSON.stringify(cleanList));
     } catch (e) {}
   };
 
@@ -371,7 +374,7 @@ export default function AuditoriaKPIs({ defaultTab }) {
 
       // 1. Cargar reportes operativos reales enviados desde el Centro de Reportes (Firestore 'reports')
       try {
-        const reportsSnap = await getDocs(query(collection(db, 'reports'), orderBy('created_at', 'desc'), limit(500)));
+        const reportsSnap = await getDocs(query(collection(db, 'reports'), where('type', 'in', NON_PULSE_REPORT_TYPES), orderBy('created_at', 'desc'), limit(500)));
         reportsSnap.docs.forEach(docSnap => {
           const r = docSnap.data();
           const data = r.data || {};
@@ -436,7 +439,7 @@ export default function AuditoriaKPIs({ defaultTab }) {
       try {
         let kpiReportsSnap = null;
         try {
-          kpiReportsSnap = await getDocs(query(collection(db, 'kpi_reports'), orderBy('createdAt', 'desc'), limit(500)));
+          kpiReportsSnap = await getDocs(privateKpiQuery(db, currentUser));
         } catch (_) {}
 
         let kpiList = [];

@@ -1451,7 +1451,6 @@ export const USERS_TO_IMPORT = [
     "email": "cardenasgina29@gmail.com",
     "telefono": "+51999699649",
     "nodusUser": "GCARDENAS",
-    "nodusPassword": "nolaolvidare",
     "nodusSede": "LIMA CICLO 1",
     "nodusStatus": "Activo"
   }

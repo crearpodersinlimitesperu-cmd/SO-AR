@@ -23,7 +23,7 @@ test('group calls are atomic, retain each member event and are idempotent', { sk
       { id: 'manager-two', docId: 'manager-two' },
     ];
     for (const manager of managers) {
-      await adminDb.doc(`managers_directory/${manager.docId}`).set({ nombre: manager.id });
+      await adminDb.doc(`managers_directory/${manager.docId}`).set({ nombre: manager.id, entrenadorId: 'trainer-one' });
     }
 
     const db = env.authenticatedContext('trainer-one', { email: 'trainer@example.test' }).firestore();
@@ -107,7 +107,7 @@ test('a failed member update leaves no group event or partial attendance write',
   const adminApp = initializeApp({ projectId }, 'call-history-failure-test-admin');
   const adminDb = adminFirestore(adminApp);
   try {
-    await adminDb.doc('managers_directory/existing-manager').set({ nombre: 'Original' });
+    await adminDb.doc('managers_directory/existing-manager').set({ nombre: 'Original', entrenadorId: 'trainer-two' });
     const db = env.authenticatedContext('trainer-two', { email: 'other-trainer@example.test' }).firestore();
     await assert.rejects(recordGroupCall(db, {
       callId: 'synthetic-failed-call',
@@ -120,9 +120,9 @@ test('a failed member update leaves no group event or partial attendance write',
       equipo: 'SYNTHETIC-TEAM',
       sede: 'SYNTHETIC-SEDE',
     }));
-    const manager = (await assertSucceeds(getDocFromServer(doc(db, 'managers_directory', 'existing-manager')))).data();
+    const manager = (await adminDb.doc('managers_directory/existing-manager').get()).data();
     assert.equal(manager.llamadaFecha, undefined);
-    assert.equal((await assertSucceeds(getDocFromServer(doc(db, 'llamadas_grupales_historial', 'synthetic-failed-call')))).exists(), false);
+    assert.equal((await adminDb.doc('llamadas_grupales_historial/synthetic-failed-call').get()).exists, false);
   } finally {
     await env.cleanup();
     await deleteApp(adminApp);

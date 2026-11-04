@@ -1,5 +1,5 @@
 import { db } from './firebase';
-import { getDocs, collection } from 'firebase/firestore';
+import { getDocs, collection, query, where } from 'firebase/firestore';
 import { findUserByAnyEmail, normalizeRole } from '../data/usersData';
 import { DUAL_ROLE_TRAINER_EMAILS } from '../config/permissions';
 
@@ -62,50 +62,37 @@ export async function enforceUserRolesAgent(firebaseUser, currentRoles) {
     // Ambos directorios son lecturas independientes: se piden en paralelo para
     // no sumar dos viajes de red al arranque de sesión.
     const [managersSnap, qtSnap] = await Promise.all([
-      getDocs(collection(db, 'managers_directory')),
-      getDocs(collection(db, 'qt_directory'))
+      getDocs(query(collection(db, 'managers_directory'), where('email', '==', rawEmail))),
+      getDocs(query(collection(db, 'qt_directory'), where('email', '==', rawEmail)))
     ]);
 
     // 1. Escanear Directorio de Managers y Equipos con Idoneidad Estricta y Aislamiento Territorial
     let isManagerInDB = false;
-    let isTrainerInDB = false;
     let isCoordInDB = false;
 
     managersSnap.forEach(docSnap => {
       const data = docSnap.data();
-      const mName = normalizeString(data.nombre);
       const mEmail = normalizeString(data.email);
       const mEntrenador = normalizeString(data.entrenador);
       const mCoord = normalizeString(data.coordinador);
       const mSede = normalizeString(data.sede);
 
-      // Coincidencia segura: debe coincidir correo corporativo exacto O (nombre exacto Y sede territorial exacta)
       const emailMatches = Boolean(userEmail && mEmail && userEmail === mEmail);
-      const nameAndSedeMatches = Boolean(
-        userName && mName && userName === mName &&
-        userSede && mSede && userSede === mSede
-      );
-      const isLegitimatePerson = emailMatches || nameAndSedeMatches;
+      const isLegitimatePerson = emailMatches;
 
       if (isLegitimatePerson) {
         // Un coordinador oficial cerrado de sede NO puede recibir rol de manager por base externa
         if (!isOfficialCoordinator || (staticProfile?.roles && staticProfile.roles.includes('manager'))) {
           isManagerInDB = true;
-          if (data.rol) {
-            discoveredRoles.add(data.rol.toLowerCase().trim());
-          } else {
-            discoveredRoles.add('manager');
-          }
+          discoveredRoles.add('manager');
         }
       }
 
-      // Entrenador del equipo: solo si coincide correo exacto O (nombre exacto Y misma sede)
       const trainerMatches = Boolean(
         userName && mEntrenador && userName === mEntrenador &&
         (!userSede || !mSede || userSede === mSede)
       );
-      if (trainerMatches && (isDualTrainer || !isOfficialCoordinator)) {
-        isTrainerInDB = true;
+      if (trainerMatches && emailMatches && isDualTrainer) {
         discoveredRoles.add('entrenador');
       }
 
@@ -114,7 +101,7 @@ export async function enforceUserRolesAgent(firebaseUser, currentRoles) {
         userName && mCoord && userName === mCoord &&
         (!userSede || !mSede || userSede === mSede)
       );
-      if (coordMatches) {
+      if (coordMatches && emailMatches && isOfficialCoordinator) {
         isCoordInDB = true;
       }
     });
@@ -131,21 +118,14 @@ export async function enforceUserRolesAgent(firebaseUser, currentRoles) {
     // 2. Escanear Directorio QT con Validación Estricta
     qtSnap.forEach(docSnap => {
       const data = docSnap.data();
-      const qName = normalizeString(data.nombre);
       const qEmail = normalizeString(data.email);
-      const qSede = normalizeString(data.sede);
 
       const qtEmailMatches = Boolean(userEmail && qEmail && userEmail === qEmail);
-      const qtNameAndSedeMatches = Boolean(
-        userName && qName && userName === qName &&
-        userSede && qSede && userSede === qSede
-      );
 
-      if (qtEmailMatches || qtNameAndSedeMatches) {
+      if (qtEmailMatches) {
         // Solo agregar 'qt' si el usuario no es un coordinador exclusivo de sede o si ya lo tiene en DB
         if (!isOfficialCoordinator || (staticProfile?.roles && staticProfile.roles.includes('qt')) || (currentRoles && currentRoles.includes('qt'))) {
           discoveredRoles.add('qt');
-          if (data.rol) discoveredRoles.add(normalizeRole(data.rol));
         }
       }
     });

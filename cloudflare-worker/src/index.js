@@ -15,7 +15,8 @@
  *      leer Firestore por REST — así se sabe el rol/sede real del usuario
  *      (colección `users`, igual que hace el resto de la app).
  *   3. Filtra el contexto de Nodus según la Matriz de Permisos (Operativo /
- *      Coordinador / Gerencia) — mismo criterio que functions/index.js.
+ *      Persona / sedes asignadas administrativamente / Dirección global).
+ *      El respaldo inactivo functions/index.js no define esta autorización.
  *   4. Llama a Groq con la key guardada como Secret de Cloudflare (nunca en
  *      el navegador).
  *   5. Guarda un registro de auditoría en Firestore (`audit_logs`).
@@ -36,7 +37,12 @@
 import { jwtVerify, createRemoteJWKSet, SignJWT, importPKCS8 } from 'jose';
 import { notebookKnowledge } from './notebookKnowledge.js';
 import { createNodusApiClient, NodusApiError } from './nodusApiClient.js';
-import { filterNodusSedes, hasNodusTeamAccess, nodusAccessScope, summarizeNodusCatalog, summarizeNodusTeam } from './nodusJsonModel.js';
+import { filterNodusSedes, hasNodusTeamAccess, nodusAccessScope, personalNodusEmails, scopedNodusContext, summarizeNodusCatalog, summarizeNodusTeam } from './nodusJsonModel.js';
+import { findUserByAnyEmail } from '../../src/data/usersData.js';
+import { createPrivateChatHandler } from './privateChatHandler.js';
+import { createPrivateChatStore } from './privateChatStore.js';
+import { privateMetricAuthority, privateReportAccess, projectPrivateReportSource } from './privateNodusReportModel.js';
+import { privatePulseAccess, pulseCountQuery, decodePulseCount } from './privatePulseModel.js';
 
 const FIREBASE_PROJECT_ID = 'centro-operativo-cpsl';
 const FIREBASE_JWKS = createRemoteJWKSet(
@@ -46,11 +52,6 @@ const FIREBASE_JWKS = createRemoteJWKSet(
 // Modelo vigente en Groq (verificado contra console.groq.com/docs/deprecations
 // el 23/08/2026). Si Groq lo retira en el futuro, este es el único lugar a tocar.
 const GROQ_MODEL = 'openai/gpt-oss-120b';
-
-const ROLES_GERENCIA = [
-  'gerente', 'direccion', 'cfo', 'cco', 'ceo',
-  'director_maestria', 'socio', 'consolidado'
-];
 
 // (02/09/2026) Debe mantenerse IGUAL que SUPER_ADMIN_EMAILS en
 // src/config/permissions.js — no se sincronizan solas, así que si cambia la
@@ -70,20 +71,14 @@ const SUPER_ADMIN_EMAILS_WORKER = [
   'paul.sosa@crearpsl.net'
 ];
 
-const GERENCIA_EMAILS_WORKER = [
-  'emely.leon@crearpsl.net',
-  'fer.aragon@crearpsl.net',
-  'andres.gomez@crearpsl.net',
-  'gomeznueve@gmail.com',
-  'contabilidad.global@crearpsl.net',
-  'leandro.brunis@crearpsl.net',
-  'josue.vera@crearpsl.net',
-  'yurany.gonzalez@crearpsl.net',
-  'nora.zamora@crearpsl.net',
-  'emily.campuzano@crearpsl.net',
-  'freddy.sosa@crearpsl.net',
-  'diana.moscoso@crearpsl.net'
+const GLOBAL_NODUS_EMAILS_WORKER = [
+  ...SUPER_ADMIN_EMAILS_WORKER,
+  'fer.aragon@crearpsl.net', 'andres.gomez@crearpsl.net', 'gomeznueve@gmail.com'
 ];
+
+const callerNodusScope = (userData, tokenEmail) => nodusAccessScope(
+  userData, GLOBAL_NODUS_EMAILS_WORKER.includes(String(tokenEmail || '').trim().toLowerCase())
+);
 
 function corsHeaders(origin) {
   return {
@@ -97,7 +92,7 @@ function corsHeaders(origin) {
 function json(body, status, origin) {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { 'Content-Type': 'application/json', ...corsHeaders(origin) }
+    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store', ...corsHeaders(origin) }
   });
 }
 
@@ -140,32 +135,35 @@ async function getServiceAccountAccessToken(env) {
 // Convierte el formato de campos de Firestore REST (fields: {campo: {stringValue: "x"}})
 // a un objeto plano de JS. Solo soporta los tipos que realmente usa esta app.
 function firestoreFieldsToPlain(fields) {
-  const out = {};
-  if (!fields) return out;
-  for (const [key, val] of Object.entries(fields)) {
-    if (val.stringValue !== undefined) out[key] = val.stringValue;
-    else if (val.booleanValue !== undefined) out[key] = val.booleanValue;
-    else if (val.integerValue !== undefined) out[key] = Number(val.integerValue);
-    else if (val.doubleValue !== undefined) out[key] = val.doubleValue;
-    else if (val.arrayValue !== undefined) {
-      out[key] = (val.arrayValue.values || []).map((v) =>
-        v.stringValue !== undefined ? v.stringValue : v
-      );
-    } else if (val.mapValue !== undefined) {
-      out[key] = firestoreFieldsToPlain(val.mapValue.fields);
-    } else {
-      out[key] = null;
-    }
-  }
-  return out;
+  const value = val => {
+    if (val.stringValue !== undefined) return val.stringValue;
+    if (val.booleanValue !== undefined) return val.booleanValue;
+    if (val.integerValue !== undefined) return Number(val.integerValue);
+    if (val.doubleValue !== undefined) return val.doubleValue;
+    if (val.timestampValue !== undefined) return val.timestampValue;
+    if (val.arrayValue !== undefined) return (val.arrayValue.values || []).map(value);
+    if (val.mapValue !== undefined) return firestoreFieldsToPlain(val.mapValue.fields);
+    return null;
+  };
+  return Object.fromEntries(Object.entries(fields || {}).map(([key, val]) => [key, value(val)]));
 }
 
-async function firestoreGet(path, accessToken) {
+const handlePrivateChat = createPrivateChatHandler({
+  verifyToken: token => verifyFirebaseToken(token),
+  accessToken: env => getServiceAccountAccessToken(env),
+  store: createPrivateChatStore(FIREBASE_PROJECT_ID, firestoreFieldsToPlain),
+  scopeFor: callerNodusScope,
+  aliasesFor: (profile, email, uid) => personalNodusEmails(profile, email, uid, findUserByAnyEmail),
+  json
+});
+
+async function firestoreGet(path, accessToken, { strict = false } = {}) {
   const url = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/${path}`;
   const resp = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
   if (resp.status === 404) return null;
   if (!resp.ok) {
     console.error('[askCopiloto] Error leyendo Firestore:', path, resp.status, await resp.text());
+    if (strict) throw new Error(`Firestore no disponible (${resp.status}).`);
     return null;
   }
   const data = await resp.json();
@@ -288,11 +286,6 @@ async function firestoreAdd(collectionPath, obj, accessToken) {
   });
 }
 
-function esGerencia(userData) {
-  const email = String(userData?.email || '').toLowerCase().trim();
-  return SUPER_ADMIN_EMAILS_WORKER.includes(email) || GERENCIA_EMAILS_WORKER.includes(email);
-}
-
 // Nunca se acepta un campo mutable del perfil del usuario como fuente de verdad
 // para privilegios de administración. El criterio real del backend es el correo
 // corporativo y el rol administrativo que ya está definido en la lista de
@@ -300,11 +293,6 @@ function esGerencia(userData) {
 function esSuperAdmin(userData, email) {
   const normalizedEmail = String(email || userData?.email || '').toLowerCase().trim();
   return SUPER_ADMIN_EMAILS_WORKER.includes(normalizedEmail);
-}
-
-function esCoordinador(userData) {
-  const roles = userData.roles || [userData.role || userData.appRole || ''];
-  return roles.some((r) => String(r).toLowerCase().includes('coordinador'));
 }
 
 // Límite de filas crudas que se mandan por tabla. Con esto una tabla de 500+
@@ -416,10 +404,11 @@ async function handleNodusDataMap(request, env, origin) {
     return json({ error: 'unauthenticated', message: 'Falta el token de sesión.' }, 401, origin);
   }
 
-  let uid;
+  let uid, tokenEmail;
   try {
     const payload = await verifyFirebaseToken(idToken);
     uid = payload.sub;
+    tokenEmail = payload.email;
   } catch (err) {
     console.error('[nodusDataMap] Token inválido:', err);
     return json({ error: 'unauthenticated', message: 'Sesión inválida o expirada.' }, 401, origin);
@@ -438,9 +427,11 @@ async function handleNodusDataMap(request, env, origin) {
     return json({ error: 'permission-denied', message: 'Tu usuario no está registrado en el sistema.' }, 403, origin);
   }
 
-  // Acceso restringido a gerencia/dirección (decidido con José, 28/08/2026) —
-  // mismo criterio que ya usa esGerencia() para el copiloto de chat.
-  if (!esGerencia(userData)) {
+  const scope = callerNodusScope(userData, tokenEmail);
+  const isLocalManager = [userData.role, userData.appRole, userData.rol,
+    ...(Array.isArray(userData.roles) ? userData.roles : [])]
+    .some(role => typeof role === 'string' && role.trim().toLowerCase() === 'gerente');
+  if (scope.type !== 'global' && !(isLocalManager && scope.type === 'sede')) {
     return json({ error: 'permission-denied', message: 'Nodus Data Map está disponible solo para gerencia y dirección.' }, 403, origin);
   }
 
@@ -448,8 +439,10 @@ async function handleNodusDataMap(request, env, origin) {
   if (!snapshot) {
     return json({ error: 'not-found', message: 'No hay datos de Nodus sincronizados todavía.' }, 404, origin);
   }
-  const timestamp = snapshot.timestamp || 'desconocida';
-  const seccionesResumidas = resumirSecciones(snapshot.secciones || {});
+  const authorizedSnapshot = scopedNodusContext(snapshot, scope);
+  const timestamp = authorizedSnapshot.timestamp || 'desconocida';
+  const seccionesResumidas = scope.type === 'global'
+    ? resumirSecciones(authorizedSnapshot.secciones || {}) : authorizedSnapshot;
   const contextoJson = JSON.stringify(seccionesResumidas);
   // Mismo recorte defensivo que usa el chat (MAX_CHARS_CONTEXTO_NODUS) — un
   // bloque individual no debe cargar con el snapshot completo si es enorme.
@@ -511,6 +504,153 @@ async function handleNodusDataMap(request, env, origin) {
   }, 200, origin);
 }
 
+async function handlePrivateNodusSnapshot(request, env, origin) {
+  const header = request.headers.get('Authorization') || '';
+  if (!header.startsWith('Bearer ')) {
+    return json({ error: 'unauthenticated', message: 'Inicia sesión para consultar tus métricas.' }, 401, origin);
+  }
+  let identity;
+  try {
+    identity = await verifyFirebaseToken(header.slice(7));
+  } catch {
+    return json({ error: 'unauthenticated', message: 'La sesión expiró.' }, 401, origin);
+  }
+  try {
+    const token = await getServiceAccountAccessToken(env);
+    const profile = await firestoreGet(`users/${identity.sub}`, token, { strict: true });
+    if (!profile) return json({ error: 'permission-denied', message: 'No existe un perfil administrativo verificado.' }, 403, origin);
+    let scope = callerNodusScope(profile, identity.email);
+    if (scope.type === 'denied') return json({ error: 'permission-denied', message: 'No tienes un alcance Nodus autorizado.' }, 403, origin);
+    if (scope.type === 'general') {
+      try {
+        scope = { type: 'personal', emails: personalNodusEmails(profile, identity.email, identity.sub, findUserByAnyEmail) };
+      } catch (error) {
+        console.error('[nodus-private-snapshot] Identidad contradictoria:', error.message);
+        return json({ error: 'permission-denied', message: 'Tu perfil contiene una identidad contradictoria; requiere revisión administrativa.' }, 403, origin);
+      }
+    }
+    const snapshot = await firestoreGet('nodus_kpis_sincronizados/latest_snapshot', token, { strict: true });
+    if (!snapshot) return json({ error: 'not-found', message: 'No hay métricas Nodus publicadas.' }, 404, origin);
+    // This endpoint never returns raw sections or participant rosters, including to directors.
+    const safe = {
+      ...scopedNodusContext(snapshot, scope.type === 'global' ? { type: 'metrics-global' } : scope),
+      authorization: privateMetricAuthority(scope)
+    };
+    const freshProfile = await firestoreGet(`users/${identity.sub}`, token, { strict: true });
+    let freshScope = freshProfile ? callerNodusScope(freshProfile, identity.email) : { type: 'denied' };
+    if (freshScope.type === 'general') {
+      try {
+        freshScope = { type: 'personal', emails: personalNodusEmails(freshProfile, identity.email, identity.sub, findUserByAnyEmail) };
+      } catch (error) {
+        console.error('[nodus-private-snapshot] Identidad revocada durante la lectura:', error.message);
+        freshScope = { type: 'denied' };
+      }
+    }
+    if (JSON.stringify(freshScope) !== JSON.stringify(scope)) {
+      return json({ error: 'permission-denied', message: 'Tu autorización cambió durante la consulta; vuelve a verificar tus métricas.' }, 403, origin);
+    }
+    return json({ scope: scope.type, snapshot: safe }, 200, origin);
+  } catch (error) {
+    console.error('[nodus-private-snapshot] Error de lectura:', error.message);
+    return json({ error: 'unavailable', message: 'No se pudieron verificar las métricas privadas.' }, 503, origin);
+  }
+}
+
+async function handlePrivatePulseSummary(request, env, origin) {
+  const header = request.headers.get('Authorization') || '';
+  let identity;
+  try {
+    if (!header.startsWith('Bearer ')) throw new Error('Missing token');
+    identity = await verifyFirebaseToken(header.slice(7));
+  } catch {
+    return json({ message: 'Inicia sesión para consultar Micro-Pulso.' }, 401, origin);
+  }
+  try {
+    const body = await request.json();
+    if (!body || Array.isArray(body) || typeof body !== 'object' || Object.keys(body).length) {
+      return json({ message: 'El servidor determina las sedes de Micro-Pulso.' }, 400, origin);
+    }
+  } catch {
+    return json({ message: 'La solicitud de Micro-Pulso no es válida.' }, 400, origin);
+  }
+  try {
+    const token = await getServiceAccountAccessToken(env);
+    const accessFor = profile => profile && (profile.uid === undefined || profile.uid === identity.sub)
+      ? privatePulseAccess(profile, callerNodusScope(profile, identity.email),
+        SUPER_ADMIN_EMAILS_WORKER.includes(String(identity.email || '').trim().toLowerCase())) : null;
+    const access = accessFor(await firestoreGet(`users/${identity.sub}`, token, { strict: true }));
+    if (!access) return json({ message: 'No tienes sedes gerenciales autorizadas para Micro-Pulso.' }, 403, origin);
+    const counts = await Promise.all(access.sedes.map(async sede => {
+      const response = await fetch(`https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents:runAggregationQuery`, {
+        method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(pulseCountQuery(sede))
+      });
+      if (!response.ok) throw new Error(`Firestore no pudo contar Micro-Pulso (${response.status}).`);
+      return decodePulseCount(await response.json());
+    }));
+    const freshAccess = accessFor(await firestoreGet(`users/${identity.sub}`, token, { strict: true }));
+    if (JSON.stringify(freshAccess) !== JSON.stringify(access)) {
+      return json({ message: 'Tu autorización cambió durante la consulta de Micro-Pulso.' }, 403, origin);
+    }
+    const reportCount = counts.reduce((total, count) => total + count, 0);
+    if (!Number.isSafeInteger(reportCount)) throw new Error('Conteo agregado fuera de rango.');
+    return json({ snapshot: { authorizedSedes: access.sedes, reportCount } }, 200, origin);
+  } catch (error) {
+    console.error('[private-pulse-summary] Error de lectura:', error.message);
+    return json({ message: 'No se pudo verificar el agregado de Micro-Pulso.' }, 503, origin);
+  }
+}
+
+async function handlePrivateNodusReportSources(request, env, origin) {
+  const header = request.headers.get('Authorization') || '';
+  if (!header.startsWith('Bearer ')) return json({ message: 'Inicia sesión para consultar reportes.' }, 401, origin);
+  let identity;
+  try {
+    identity = await verifyFirebaseToken(header.slice(7));
+  } catch {
+    return json({ message: 'La sesión expiró.' }, 401, origin);
+  }
+  try {
+    const body = await request.json();
+    if (!body || Array.isArray(body) || typeof body !== 'object' || Object.keys(body).length) {
+      return json({ message: 'El alcance de los reportes solo lo determina el servidor.' }, 400, origin);
+    }
+  } catch {
+    return json({ message: 'La solicitud de reportes no es válida.' }, 400, origin);
+  }
+  try {
+    const token = await getServiceAccountAccessToken(env);
+    const profile = await firestoreGet(`users/${identity.sub}`, token, { strict: true });
+    const access = profile && privateReportAccess(profile, callerNodusScope(profile, identity.email));
+    if (!access) return json({ message: 'No tienes sedes y etapas autorizadas para estos reportes.' }, 403, origin);
+    const missingSources = [];
+    const reports = await Promise.all(access.sedes.flatMap(sede => access.stages.map(async stage => {
+      const path = `nodus_report_sources/${sede}_${stage}`;
+      const source = await firestoreGet(path, token, { strict: true });
+      if (!source) {
+        missingSources.push(`${sede}_${stage}`);
+        return null;
+      }
+      return projectPrivateReportSource(source, sede, stage);
+    })));
+    const freshProfile = await firestoreGet(`users/${identity.sub}`, token, { strict: true });
+    const freshAccess = freshProfile && privateReportAccess(freshProfile, callerNodusScope(freshProfile, identity.email));
+    if (JSON.stringify(freshAccess) !== JSON.stringify(access)) {
+      return json({ message: 'Tu autorización cambió durante la consulta de reportes.' }, 403, origin);
+    }
+    const reportSources = reports.filter(Boolean);
+    if (!reportSources.length) return json({ message: 'No hay fuentes agregadas publicadas para tus sedes y etapas.' }, 404, origin);
+    const dates = reportSources.map(source => source.sourceUpdatedAt).filter(date => Number.isFinite(Date.parse(date))).sort();
+    return json({ snapshot: {
+      timestamp: dates[0] || null, authorizedSedes: access.sedes, authorizedStages: access.stages,
+      reportSources, missingSources: missingSources.sort()
+    } }, 200, origin);
+  } catch (error) {
+    console.error('[nodus-private-report-sources] Error de lectura:', error.message);
+    return json({ message: 'No se pudieron verificar los reportes autorizados; no se usarán padrones globales.' }, 503, origin);
+  }
+}
+
 async function handleNodusJson(request, env, origin, path) {
   const authHeader = request.headers.get('Authorization') || '';
   const idToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
@@ -541,9 +681,7 @@ async function handleNodusJson(request, env, origin, path) {
     return json({ error: 'permission-denied', message: 'Tu usuario no está registrado en Causa OS.' }, 403, origin);
   }
 
-  const email = String(tokenEmail || '').toLowerCase().trim();
-  const managerEmailAllowed = SUPER_ADMIN_EMAILS_WORKER.includes(email) || GERENCIA_EMAILS_WORKER.includes(email);
-  const scope = nodusAccessScope(userData, managerEmailAllowed);
+  const scope = callerNodusScope(userData, tokenEmail);
   if (scope.type === 'denied') {
     return json({ error: 'permission-denied', message: 'Tu cuenta coordinadora no tiene una sede asignada en Causa OS.' }, 403, origin);
   }
@@ -598,6 +736,10 @@ async function handleNodusJson(request, env, origin, path) {
     const participantResult = await client.getParticipantes(teamId);
     if (Number(participantResult.data.equipo.id) !== teamId) {
       return json({ error: 'nodus_invalid_response', message: 'Nodus devolvió un equipo distinto al solicitado.' }, 502, origin);
+    }
+    if (scope.type === 'sede' &&
+        !filterNodusSedes([{ nombre: participantResult.data.equipo.sede }], scope).length) {
+      return json({ error: 'nodus_invalid_response', message: 'Nodus devolvió una sede fuera de tu alcance.' }, 502, origin);
     }
     return json({
       source: participantResult.source,
@@ -738,11 +880,18 @@ async function handleTriggerNodusScraper(request, env, origin) {
   }, 200, origin);
 }
 
-async function construirContextoNodus(userData, accessToken) {
+async function construirContextoNodus(userData, accessToken, tokenEmail) {
   try {
     const data = await firestoreGet('nodus_kpis_sincronizados/latest_snapshot', accessToken);
     if (!data) return 'No hay datos de Nodus disponibles en este momento.';
-    const secciones = data.secciones || {};
+    const scope = callerNodusScope(userData, tokenEmail);
+    if (scope.type === 'denied') return 'Tu cuenta no tiene acceso autorizado a datos de Nodus.';
+    const authorized = scopedNodusContext(data, scope);
+    if (scope.type !== 'global') {
+      return `Fecha: ${authorized.timestamp || 'desconocida'}. Alcance autorizado: ${scope.type === 'sede'
+        ? (scope.sedes || [scope.sede]).join(', ') : 'solo conteos generales'}:\n${JSON.stringify(authorized)}`;
+    }
+    const secciones = authorized.secciones || {};
     const timestamp = data.timestamp || 'desconocida';
     const totales = data.totales || {};
     const sedes = data.sedes || [];
@@ -758,16 +907,7 @@ async function construirContextoNodus(userData, accessToken) {
       secciones: Object.keys(secciones).length > 0 ? resumirSecciones(secciones) : undefined
     };
 
-    if (esGerencia(userData)) {
-      return `Fecha: ${timestamp}. Datos de TODAS las sedes (totales, sedes, coordinadores y equipos):\n${JSON.stringify(resumenSnapshot)}`;
-    }
-    if (esCoordinador(userData)) {
-      const sede = userData.sede || 'Global';
-      const filtradasCoords = coordinadores.filter(c => (c.sede || '').toLowerCase() === sede.toLowerCase());
-      const filtradasSedes = sedes.filter(s => (s.sede || '').toLowerCase() === sede.toLowerCase());
-      return `Fecha: ${timestamp}. Datos de la sede ${sede} (rol coordinador):\n${JSON.stringify({ totales, sedes: filtradasSedes, coordinadores: filtradasCoords })}`;
-    }
-    return `Fecha: ${timestamp}. KPIs generales:\n${JSON.stringify({ totales, sedes })}`;
+    return `Fecha: ${timestamp}. Datos de TODAS las sedes (totales, sedes, coordinadores y equipos):\n${JSON.stringify(resumenSnapshot)}`;
   } catch (err) {
     console.error('[askCopiloto] Error leyendo Nodus:', err);
     return 'No se pudo cargar el contexto de Nodus en este momento.';
@@ -868,6 +1008,18 @@ export default {
     if (url.pathname === '/nodus-json/catalog' || url.pathname === '/nodus-json/team-metrics') {
       return handleNodusJson(request, env, origin, url.pathname);
     }
+    if (url.pathname === '/nodus-private-snapshot') {
+      return handlePrivateNodusSnapshot(request, env, origin);
+    }
+    if (url.pathname === '/private-pulse-summary') {
+      return handlePrivatePulseSummary(request, env, origin);
+    }
+    if (url.pathname === '/nodus-private-report-sources') {
+      return handlePrivateNodusReportSources(request, env, origin);
+    }
+    if (url.pathname === '/copilot-private-history') {
+      return handlePrivateChat(request, env, origin);
+    }
 
     const authHeader = request.headers.get('Authorization') || '';
     const idToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
@@ -928,7 +1080,7 @@ export default {
 
     const ultimaPregunta = [...recientes].reverse().find((m) => m.role !== 'system')?.content || '';
 
-    let nodusContext = await construirContextoNodus(userData, accessToken);
+    let nodusContext = await construirContextoNodus(userData, accessToken, tokenEmail);
     if (nodusContext.length > MAX_CHARS_CONTEXTO_NODUS) {
       nodusContext = `${nodusContext.slice(0, MAX_CHARS_CONTEXTO_NODUS)}\n[...contexto de Nodus recortado por límite de tamaño...]`;
     }

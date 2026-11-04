@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { bindPrivateSession } from '../src/utils/sessionPrivacy.js';
+import { assertAuthenticatedIdentity } from '../src/utils/authIdentity.js';
 
 const source = readFileSync(new URL('../src/context/AuthContext.jsx', import.meta.url), 'utf8');
 const start = source.indexOf('const startupTrace = createAuthStartupTrace();');
@@ -79,6 +81,8 @@ function harness({ stage = 'lookup', holdNew = false } = {}) {
     showToast: message => { reports.push('toast'); notifications.push(message); },
     console: { error: () => reports.push('error'), warn: () => reports.push('warning') }
   };
+  dependencies.bindPrivateSession = bindPrivateSession;
+  dependencies.assertAuthenticatedIdentity = assertAuthenticatedIdentity;
   const cleanup = new Function(...Object.keys(dependencies), effect)(...Object.values(dependencies));
   return {
     pending, entered, newPending, newEntered, states, writes, reports, notifications, cleanup,

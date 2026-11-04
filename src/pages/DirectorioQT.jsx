@@ -96,7 +96,7 @@ export default function DirectorioQT() {
     }
 
     try {
-      const result = await getQTMembers({ forceRefresh });
+      const result = await getQTMembers({ forceRefresh, currentUser });
       setMembers(result.data || []);
       setLastUpdated(result.lastUpdated);
       
@@ -105,6 +105,7 @@ export default function DirectorioQT() {
       }
     } catch (err) {
       console.error("Error cargando directorio QT:", err);
+      setMembers([]);
       showToast("Error al cargar los datos desde Google Sheets.", "error");
     } finally {
       setLoading(false);

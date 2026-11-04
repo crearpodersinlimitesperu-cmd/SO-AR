@@ -5,6 +5,8 @@ import { DUAL_ROLE_TRAINER_EMAILS, canManageUserStatus } from '../config/permiss
 import { isInactiveTrainer } from '../data/trainerIdentity.js';
 import { isUserInactive } from '../utils/userNormalizer.js';
 import { recordAuditEvent } from './auditService';
+import { privateDirectoryQuery } from './privacyQueries.js';
+import { canReadDirectoryPerson } from '../utils/privacyScope.js';
 
 
 /**
@@ -148,7 +150,7 @@ export async function getAllCompanyUsers(currentUser = null) {
     // Admin. Se fusionan por correo igual que ya se hace con qt_directory abajo,
     // sin perder ningún campo: el primer doc encontrado manda, y el duplicado
     // solo rellena los campos que al primero le falten.
-    const usersSnap = await getDocs(collection(db, 'users'));
+    const usersSnap = await getDocs(privateDirectoryQuery(db, 'users', currentUser));
     usersSnap.forEach(docSnap => {
       const uData = docSnap.data();
       const candidateKeys = emailKeysOf(uData);
@@ -269,7 +271,7 @@ export async function getAllCompanyUsers(currentUser = null) {
     // si "users" tampoco lo tenía) a QT que sí tienen esos datos en qt_directory.
     // Ahora se rellenan esos campos en el registro existente, sin pisar ningún dato
     // que "users" ya tuviera.
-    const qtSnap = await getDocs(collection(db, 'qt_directory'));
+    const qtSnap = await getDocs(privateDirectoryQuery(db, 'qt_directory', currentUser));
     // (29/08/2026) Se agrega "cumpleanos" para la alerta de cumpleaños: el dato existe
     // hoy en el directorio de QT (además del Directorio Global importado a "users"),
     // así que se rellena igual que whatsapp/phone: solo si el registro existente
@@ -333,7 +335,8 @@ export async function getAllCompanyUsers(currentUser = null) {
     console.warn("Error evaluando permisos de estado en getAllCompanyUsers:", err);
     includeInactive = false;
   }
-  return includeInactive ? allUsers : allUsers.filter(u =>
+  const visibleUsers = allUsers.filter(user => canReadDirectoryPerson(currentUser, user));
+  return includeInactive ? visibleUsers : visibleUsers.filter(u =>
     !isUserInactive(u) && !isInactiveTrainer(u.name || u.displayName)
   );
 }

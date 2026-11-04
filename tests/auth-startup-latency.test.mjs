@@ -43,9 +43,10 @@ function loadAgent() {
       : [{ nombre: 'Synthetic Fixture', email: 'access-fixture@example.invalid', sede: 'Synthetic Site' }];
     return { forEach: (cb) => rows.forEach((data) => cb({ data: () => data })) };
   };
-  const agent = new Function('db', 'getDocs', 'collection', 'findUserByAnyEmail', 'normalizeRole', 'DUAL_ROLE_TRAINER_EMAILS', 'console',
+  const agent = new Function('db', 'getDocs', 'collection', 'findUserByAnyEmail', 'normalizeRole', 'DUAL_ROLE_TRAINER_EMAILS', 'console', 'query', 'where',
     `${body}; return enforceUserRolesAgent;`)(
-    {}, getDocs, (_, name) => ({ name }), () => null, (r) => r, [], { log() {}, error() {} }
+    {}, getDocs, (_, name) => ({ name }), () => null, (r) => r, [], { log() {}, error() {} },
+    ref => ref, () => ({})
   );
   return { agent, stats: () => ({ maxInFlight }) };
 }
@@ -100,5 +101,5 @@ test('persisted session keeps verification order and does not await the daily au
   assert.deepEqual([...order].sort((a, b) => a - b), order);
   assert.doesNotMatch(effect, /await recordAuditEvent/);
   assert.match(effect, /recordAuditEvent\(\{[\s\S]*?\}\)\.catch\(/);
-  assert.match(authSource, /\{loading \? \([\s\S]*Cargando Causa OS[\s\S]*\) : children\}/);
+  assert.match(authSource, /\{loading \? \([\s\S]*Cargando Causa OS[\s\S]*\) : <Fragment key=\{privateViewKey\(currentUser\)\}>/);
 });

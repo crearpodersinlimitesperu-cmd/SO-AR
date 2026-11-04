@@ -162,7 +162,7 @@ test('Directorios, asignaciones y onboarding filtran perfiles institucionales in
   const legalService = readFileSync(new URL('../src/services/legalSignatureService.js', import.meta.url), 'utf8');
   const scheduleService = readFileSync(new URL('../src/services/scheduleGovernanceAgent.js', import.meta.url), 'utf8');
 
-  assert.match(service, /allUsers\.filter\(u =>[\s\S]*isUserInactive\(u\)[\s\S]*isInactiveTrainer\(u\.name \|\| u\.displayName\)/);
+  assert.match(service, /visibleUsers\.filter\(u =>[\s\S]*isUserInactive\(u\)[\s\S]*isInactiveTrainer\(u\.name \|\| u\.displayName\)/);
   assert.match(assignment, /isUserInactive\(user\)/);
   assert.match(trainerAssignment, /const activo = !isUserInactive\(u\)/);
   assert.match(qtDirectory, /isUserInactive\(m\)/);

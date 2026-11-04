@@ -1,11 +1,14 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { Bot, Send, X, Sparkles, BrainCircuit, Loader2, Database, MessageSquarePlus, History, ChevronLeft, MessageCircle } from 'lucide-react';
-import { doc, getDocs, getFirestore, collection, addDoc, updateDoc, query, orderBy } from 'firebase/firestore';
-import { auth, db, getDocResilient } from '../services/firebase';
+import { auth } from '../services/firebase';
+import { readPrivateNodusSnapshot } from '../services/privateNodusSnapshot.js';
+import { createPrivateCopilotHistory } from '../services/privateCopilotHistory.js';
+import { privateViewKey } from '../utils/sessionPrivacy.js';
 import { useAuth } from '../context/AuthContext';
 
 // MOTOR ANALÍTICO AUTÓNOMO CAUSA OS (ZERO-HALLUCINATION & DEEP DATA ENGINE)
 function generateAssertiveResponse(queryText, nodusData, currentUser, messageHistory = []) {
+  if (!nodusData) return 'No se pudieron verificar métricas dentro de tu alcance autorizado. No se consultaron snapshots globales ni se sustituyeron los datos por ceros. Inténtalo nuevamente cuando el servicio privado esté disponible.';
   let q = (queryText || '').toLowerCase().trim();
   const coords = nodusData?.coordinadores || [];
   const totales = nodusData?.totales || nodusData?.nodusTotales || {};
@@ -14,6 +17,7 @@ function generateAssertiveResponse(queryText, nodusData, currentUser, messageHis
   const fastCacheMissions = nodusData?.imoMissions || [];
   
   if (q.includes('discrepancias') || q.includes('verificado') || q.includes('pendientes')) {
+     if (!Array.isArray(nodusData.enroladosConStatus)) return 'El snapshot autorizado no contiene el reporte de verificación Nodus + IMO. No hay datos disponibles para calcular discrepancias.';
      const verificados = fastCacheEnrolados.filter(e => e.statusIA === 'VERIFICADO_OK').length;
      const discrepancias = fastCacheEnrolados.filter(e => e.statusIA === 'DISCREPANCIA').length;
      return `📊 **Reporte Rápido de Status (Nodus + IMO):**\n\n* Enrolados analizados: **${fastCacheEnrolados.length}**\n* Verificados Ok por Coordinación: **${verificados}**\n* Con Discrepancias (IMO dice sí, Nodus dice no): **${discrepancias}**\n\n_(Datos pre-calculados por el Agente Centinela en background)_.`;
@@ -477,7 +481,24 @@ export default function AICopilot() {
   const [sessions, setSessions] = useState([]);
   const [currentSessionId, setCurrentSessionId] = useState(null);
   const [showHistory, setShowHistory] = useState(false);
+  const [historyError, setHistoryError] = useState('');
   const messagesEndRef = useRef(null);
+  const scopeKey = privateViewKey(currentUser);
+  const currentScope = useRef(scopeKey);
+  const mounted = useRef(true);
+  const conversationGeneration = useRef(0);
+  const historyViewer = useRef(currentUser);
+  historyViewer.current = currentUser;
+  currentScope.current = scopeKey;
+  const isCurrentScope = useCallback(() => mounted.current && currentScope.current === scopeKey &&
+    auth.currentUser?.uid === currentUser?.uid, [scopeKey, currentUser?.uid]);
+  const history = useMemo(() => createPrivateCopilotHistory(historyViewer.current, { isCurrent: isCurrentScope }),
+    [isCurrentScope]);
+
+  useEffect(() => {
+    mounted.current = true;
+    return () => { mounted.current = false; conversationGeneration.current += 1; };
+  }, []);
 
   // Paleta Premium "Caja Negra" (Dark Mode con toques Crear Gold)
   const colors = {
@@ -501,46 +522,32 @@ export default function AICopilot() {
     }
   }, [messages, isOpen]);
 
-  // Load chat sessions from Firestore with LocalStorage resilient fallback
   useEffect(() => {
-    if (!currentUser) return;
-    loadSessions();
-  }, [currentUser]);
+    setSessions([]);
+    setCurrentSessionId(null);
+    setHistoryError('');
+  }, [scopeKey]);
 
-  const loadSessions = async () => {
+  const loadSessions = useCallback(async () => {
     if (!currentUser) return;
-    
-    // Intento 1: LocalStorage inmediato para UX ultra rápida
-    const localKey = `copilot_sessions_${currentUser.uid}`;
     try {
-      const cached = localStorage.getItem(localKey);
-      if (cached) {
-        setSessions(JSON.parse(cached));
-      }
-    } catch (e) {
-      console.warn("Error leyendo historial local:", e);
-    }
-
-    // Intento 2: Sincronización con Firestore
-    try {
-      const db = getFirestore();
-      const chatsRef = collection(db, 'users', currentUser.uid, 'copilot_chats');
-      const q = query(chatsRef, orderBy('updatedAt', 'desc'));
-      const snapshot = await getDocs(q);
-      const loadedSessions = [];
-      snapshot.forEach(docSnap => {
-        loadedSessions.push({ id: docSnap.id, ...docSnap.data() });
-      });
-      if (loadedSessions.length > 0) {
-        setSessions(loadedSessions);
-        localStorage.setItem(localKey, JSON.stringify(loadedSessions));
-      }
+      const loaded = await history.list();
+      if (!isCurrentScope()) return;
+      setSessions(loaded);
+      setHistoryError('');
     } catch (err) {
-      console.warn("Modo offline o sin permisos en Firestore copilot_chats, usando LocalStorage:", err);
+      console.warn('No se pudo verificar el historial privado:', err);
+      if (!isCurrentScope()) return;
+      setSessions([]);
+      setHistoryError(err.message);
     }
-  };
+  }, [currentUser, history, isCurrentScope]);
+
+  useEffect(() => { loadSessions(); }, [loadSessions]);
 
   const startNewChat = () => {
+    conversationGeneration.current += 1;
+    setIsLoading(false);
     setCurrentSessionId(null);
     setMessages([
       {
@@ -551,17 +558,30 @@ export default function AICopilot() {
     setShowHistory(false);
   };
 
-  const loadSession = (session) => {
-    setCurrentSessionId(session.id);
-    if (session.messages && Array.isArray(session.messages)) {
-      setMessages(session.messages);
+  const loadSession = async (session) => {
+    const generation = ++conversationGeneration.current;
+    try {
+      const verified = await history.get(session.id);
+      if (!isCurrentScope() || generation !== conversationGeneration.current) return;
+      setCurrentSessionId(verified.id);
+      setMessages(verified.messages);
+      setHistoryError('');
+      setShowHistory(false);
+    } catch (error) {
+      console.warn('Conversación fuera de alcance o no verificable:', error);
+      if (isCurrentScope()) setHistoryError(error.message);
     }
-    setShowHistory(false);
   };
 
   const handleSend = async (e) => {
     e.preventDefault();
     if (!queryText.trim()) return;
+    if (currentUser?.isSimulated || currentUser?.isRoleSimulationActive) {
+      setHistoryError('Vuelve a tu cuenta real para usar el Copiloto y su historial; la simulación no mezcla conversaciones ni permisos.');
+      return;
+    }
+    const generation = ++conversationGeneration.current;
+    const isCurrent = () => isCurrentScope() && generation === conversationGeneration.current;
 
     const userMessage = { role: 'user', content: queryText };
     const updatedMessages = [...messages, userMessage];
@@ -581,33 +601,20 @@ export default function AICopilot() {
     }
 
     try {
-      // Create or update session in Firestore BEFORE sending to AI to save user's question
-      const db = getFirestore();
       let activeSessionId = currentSessionId;
-      
       try {
-        if (!activeSessionId && currentUser) {
-          // Create new session
-          const newSessionRef = await addDoc(collection(db, 'users', currentUser.uid, 'copilot_chats'), {
-            title: currentQuery.length > 30 ? currentQuery.substring(0, 30) + '...' : currentQuery,
-            messages: updatedMessages,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-          });
-          activeSessionId = newSessionRef.id;
-          setCurrentSessionId(activeSessionId);
-          // Reload sessions list to show it in history
-          loadSessions();
-        } else if (currentUser) {
-          // Update existing session
-          await updateDoc(doc(db, 'users', currentUser.uid, 'copilot_chats', activeSessionId), {
-            messages: updatedMessages,
-            updatedAt: new Date().toISOString()
-          });
-        }
+        const saved = await history.save(activeSessionId, updatedMessages);
+        if (!isCurrent()) return;
+        activeSessionId = saved.id;
+        setCurrentSessionId(saved.id);
+        setHistoryError('');
       } catch (historyErr) {
-        console.warn("No se pudo guardar el historial de chat (posible error de permisos):", historyErr);
+        console.warn('No se pudo guardar la pregunta en el historial privado:', historyErr);
+        if (!isCurrent()) return;
+        setHistoryError(historyErr.message);
+        return;
       }
+      if (!isCurrent()) return;
 
       // Intento 1: Llamar al backend Cloudflare Worker si está disponible
       let aiText = '';
@@ -616,6 +623,7 @@ export default function AICopilot() {
         const firebaseUser = auth.currentUser;
         if (firebaseUser && workerUrl) {
           const idToken = await firebaseUser.getIdToken(false);
+          if (!isCurrent()) return;
           const mensajesParaBot = updatedMessages
             .filter(m => m.role !== 'system' && !m.content.includes('⚠️'))
             .map(m => ({ role: m.role, content: m.content }));
@@ -633,9 +641,11 @@ export default function AICopilot() {
             signal: controller.signal
           });
           clearTimeout(timeoutId);
+          if (!isCurrent()) return;
 
           if (workerResponse.ok) {
             const workerData = await workerResponse.json();
+            if (!isCurrent()) return;
             const refusalPhrases = [
               'no puedo confirmar ese dato',
               'fuentes autorizadas',
@@ -655,66 +665,37 @@ export default function AICopilot() {
       } catch (workerErr) {
         console.warn("Cloudflare Worker no disponible o con latencia, activando Motor Analítico Autónomo Causa OS:", workerErr);
       }
+      if (!isCurrent()) return;
 
       // Intento 2: Si el backend no respondió, dio error o rechazo defensivo, activar el Motor Autónomo Directo de Nodus (Cero Errores y Cero Alucinación)
       if (!aiText) {
         let nodusData = null;
         try {
-          const [nodusDoc, kpisDoc] = await Promise.all([
-            getDocResilient(doc(db, 'nodus_coordinadores_c1c2', 'latest')),
-            getDocResilient(doc(db, 'nodus_kpis_sincronizados', 'latest_snapshot'))
-          ]);
-          const cData = (nodusDoc && nodusDoc.exists()) ? nodusDoc.data() : {};
-          const kData = (kpisDoc && kpisDoc.exists()) ? kpisDoc.data() : {};
-          nodusData = {
-            ...cData,
-            equiposSummary: cData.equiposSummary || kData.equiposSummary || kData.equipos || [],
-            kpisEquipos: kData.equipos || kData.equiposSummary || cData.equiposSummary || [],
-            kpisTotales: kData.totales || {},
-            kpisSedes: kData.sedes || [],
-            kpisTimestamp: kData.timestamp || cData.timestamp || null
-          };
+          nodusData = await readPrivateNodusSnapshot({ expectedUid: currentUser.uid, isCurrent });
         } catch (nodusErr) {
           console.warn("Error leyendo snapshot Nodus para copilot:", nodusErr);
         }
+        if (!isCurrent()) return;
         aiText = generateAssertiveResponse(currentQuery, nodusData, currentUser, updatedMessages);
       }
 
       const finalMessages = [...updatedMessages, { role: 'assistant', content: aiText }];
       setMessages(finalMessages);
 
-      // Persistencia Resiliente 1: Firestore copilot_chats
       try {
-        if (currentUser && activeSessionId) {
-          await updateDoc(doc(db, 'users', currentUser.uid, 'copilot_chats', activeSessionId), {
-            messages: finalMessages,
-            updatedAt: new Date().toISOString()
-          });
-        }
+        const saved = await history.save(activeSessionId, finalMessages);
+        if (!isCurrent()) return;
+        setCurrentSessionId(saved.id);
+        setHistoryError('');
+        await loadSessions();
       } catch (saveErr) {
-        console.warn("Error al actualizar respuesta en Firestore:", saveErr);
-      }
-
-      // Persistencia Resiliente 2: LocalStorage
-      try {
-        const localKey = `copilot_sessions_${currentUser.uid}`;
-        const localSessions = JSON.parse(localStorage.getItem(localKey) || '[]');
-        const updatedLocal = [
-          {
-            id: activeSessionId || 'local_' + Date.now(),
-            title: currentQuery.length > 30 ? currentQuery.substring(0, 30) + '...' : currentQuery,
-            messages: finalMessages,
-            updatedAt: new Date().toISOString()
-          },
-          ...localSessions.filter(s => s.id !== activeSessionId)
-        ];
-        localStorage.setItem(localKey, JSON.stringify(updatedLocal.slice(0, 30)));
-      } catch (localErr) {
-        console.warn("Aviso LocalStorage:", localErr);
+        console.warn('Respuesta no guardada en el historial privado:', saveErr);
+        if (isCurrent()) setHistoryError(saveErr.message);
       }
 
     } catch (error) {
       console.error("Error en Copiloto:", error);
+      if (!isCurrent()) return;
       // Fallback de emergencia final
       const fallbackText = generateAssertiveResponse(currentQuery, null, currentUser, updatedMessages);
       setMessages(prev => [...prev, {
@@ -722,7 +703,7 @@ export default function AICopilot() {
         content: fallbackText
       }]);
     } finally {
-      setIsLoading(false);
+      if (isCurrent()) setIsLoading(false);
     }
   };
 
@@ -800,10 +781,12 @@ export default function AICopilot() {
         </div>
       </div>
 
+      {historyError && <p role="alert" style={{ margin: '0.5rem 1rem', color: colors.text, fontSize: '0.8rem' }}>{historyError}</p>}
       {showHistory ? (
         /* Vista de Historial */
         <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem', background: colors.bgAlt, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
           <h4 style={{ margin: '0 0 1rem 0', color: colors.text, fontSize: '0.9rem', fontWeight: 700 }}>Conversaciones Anteriores</h4>
+          <p style={{ margin: '0 0 0.5rem', color: colors.text, fontSize: '0.8rem' }}>Solo se muestran conversaciones verificadas para tus permisos actuales. Los historiales antiguos se conservan sin cambios y requieren revisión administrativa antes de su lectura.</p>
           {sessions.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '2rem', color: '#94a3b8', fontSize: '0.9rem' }}>
               No hay conversaciones guardadas aún.

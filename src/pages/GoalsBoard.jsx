@@ -14,6 +14,7 @@ import { nodusGoalSourceStatus, findNodusTeam, findNodusAllyEvidence, findNodusA
 import { buildTeamGoalPlan, buildGoalEdit } from '../services/goalsSetup';
 import { auditSingleGoal, auditAllGoals, extractTeamNumber } from '../services/goalsSentinelAgent';
 import { organizeGoalsByTeam, mjStageForTeam, explicitGoalTeam, goalStageKey, localDateKey } from '../services/goalsTimeline';
+import { NON_PULSE_REPORT_TYPES } from '../services/pulsePrivacy.js';
 
 export default function GoalsBoard() {
   const { currentUser } = useAuth();
@@ -212,7 +213,7 @@ export default function GoalsBoard() {
         sourceReady('calendario');
       }, (err) => sourceError('calendario', err));
 
-      const qRep = query(collection(db, 'reports'), orderBy('created_at', 'desc'), limit(50));
+      const qRep = query(collection(db, 'reports'), where('type', 'in', NON_PULSE_REPORT_TYPES), orderBy('created_at', 'desc'), limit(50));
       unsubRep = onSnapshot(qRep, (snap) => {
         setCoordinatorReports(snap.metadata.fromCache ? [] : snap.docs.map(d => ({ id: d.id, ...d.data() })));
         sourceReady('reportes');

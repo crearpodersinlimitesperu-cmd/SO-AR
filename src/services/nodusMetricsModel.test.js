@@ -79,13 +79,14 @@ test('boolean and non-numeric metric values are not converted to numeric zero', 
   assert.equal(metrics.confirmados, null);
 });
 
-test('a source must be fresh and match exactly one coordinator by email or full name', () => {
+test('a source must be fresh and match exactly one coordinator by email, never only by name', () => {
   const now = Date.parse('2026-10-12T17:00:00Z');
   const snapshot = { timestamp: new Date(now - 30_000).toISOString(), coordinadores: [
     { email: 'coord@example.test', nombreCompleto: 'Synthetic Coordinator', asignados: 4, coberturaPct: 25 },
   ] };
   assert.equal(findFreshNodusMetrics(snapshot, { email: 'coord@example.test' }, now).asignados, 4);
-  assert.equal(findFreshNodusMetrics(snapshot, { nombre: 'synthetic   coordinator' }, now).asignados, 4);
+  assert.equal(findFreshNodusMetrics(snapshot, { nombre: 'synthetic   coordinator' }, now), null);
+  assert.equal(findFreshNodusMetrics(snapshot, { email: 'coord@example.test', sede: 'Quito' }, now), null);
   assert.equal(findFreshNodusMetrics(snapshot, { nombre: 'Synthetic' }, now), null);
   assert.equal(findFreshNodusMetrics({ ...snapshot, coordinadores: [...snapshot.coordinadores, ...snapshot.coordinadores] },
     { email: 'coord@example.test' }, now), null);

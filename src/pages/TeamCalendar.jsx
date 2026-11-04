@@ -600,7 +600,7 @@ export default function TeamCalendar() {
   // Bloques personalizados guardados localmente combinados con la matriz maestra
   const [customBlocks, setCustomBlocks] = useState(() => {
     try {
-      const saved = localStorage.getItem('cpsl_timeboxing_blocks_v2');
+      const saved = localStorage.getItem(`cpsl_timeboxing_blocks_v3:${currentUser?.uid}:${currentUser?.email}`);
       return saved ? JSON.parse(saved) : MASTER_TEAM_SCHEDULES;
     } catch (e) {
       return MASTER_TEAM_SCHEDULES;
@@ -633,7 +633,7 @@ export default function TeamCalendar() {
     const updated = [block, ...customBlocks];
     setCustomBlocks(updated);
     try {
-      localStorage.setItem('cpsl_timeboxing_blocks_v2', JSON.stringify(updated));
+      localStorage.setItem(`cpsl_timeboxing_blocks_v3:${currentUser?.uid}:${currentUser?.email}`, JSON.stringify(updated));
     } catch (err) {}
     setShowAddModal(false);
     setNewBlock({

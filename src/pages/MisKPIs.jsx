@@ -16,6 +16,9 @@ import { findFreshNodusMetrics, extractNodusMetrics } from '../services/nodusMet
 import { operationalRole, resolveCoordinatorKpiAssignment } from '../services/nodusKpiDirectory.js';
 import { snapshotFreshness } from '../utils/nodusIntegrity.js';
 import OperationalReview from '../components/OperationalReview';
+import { canReadKpiReport } from '../utils/privacyScope.js';
+import { privateKpiQuery } from '../services/privacyQueries.js';
+import usePrivateNodusSnapshot from '../hooks/usePrivateNodusSnapshot.js';
 export { extractNodusMetrics };
 
 // Metas base por defecto por rol (cuando la persona aún no tiene metas personalizadas)
@@ -64,8 +67,9 @@ export default function MisKPIs() {
   
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState([]);
-  const [nodusData, setNodusData] = useState(null);
-  const [loadingNodus, setLoadingNodus] = useState(false);
+  const [nodusRevision, setNodusRevision] = useState(0);
+  const { snapshot: nodusData, loading: loadingNodus, error: nodusError } = usePrivateNodusSnapshot({ revision: nodusRevision });
+  const fetchNodusData = () => setNodusRevision(value => value + 1);
   
   // Catálogo completo de personas por rol
   const [selectedPerson, setSelectedPerson] = useState(null);
@@ -117,7 +121,7 @@ export default function MisKPIs() {
         name: staffMatch?.name || normName,
         nombre: normName,
         email,
-        sede: c.sede || staffMatch?.sede || 'Sede no informada',
+        sede: staffMatch?.sede || c.sede || 'Sede no informada',
         role: staffMatch?.role || 'nodus_coordinacion_c1c2',
         tabCategory: canonicalRole?.tabCategory || 'c1',
         roleName: canonicalRole?.roleName || 'Coordinación C1/C2 según el origen Nodus',
@@ -152,8 +156,10 @@ export default function MisKPIs() {
       });
     });
 
-    return list;
-  }, [nodusData]);
+    return list.filter(person => canReadKpiReport(currentUser, {
+      userEmail: person.email, userSede: person.sede
+    }));
+  }, [nodusData, currentUser]);
 
   // Personas disponibles filtradas según la pestaña activa o búsqueda global
   const filteredPersonsForTab = useMemo(() => {
@@ -169,44 +175,14 @@ export default function MisKPIs() {
     return base.filter(p => p.tabCategory === activeTab);
   }, [allStaffDirectory, activeTab, searchTerm]);
 
-  // Inicializar o buscar persona al cargar o cambiar currentUser
-  useEffect(() => {
-    fetchNodusData();
-  }, [currentUser]);
-
-  const fetchNodusData = async () => {
-    setLoadingNodus(true);
-    try {
-      const docRef = doc(db, 'nodus_coordinadores_c1c2', 'latest');
-      const snap = await getDoc(docRef);
-      setNodusData(snap.exists() ? snap.data() : null);
-    } catch (e) {
-      console.warn("No se pudo verificar Nodus en MisKPIs:", e);
-      setNodusData(null);
-    } finally {
-      setLoadingNodus(false);
-    }
-  };
-
   // Seleccionar persona por defecto según el usuario logueado o primera disponible
   useEffect(() => {
     if (allStaffDirectory.length === 0) return;
 
     const uEmail = (currentUser?.email || '').toLowerCase().trim();
-    const uName = (currentUser?.displayName || currentUser?.name || '').normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
-
     let matched = uEmail
       ? allStaffDirectory.find(p => (p.email || '').toLowerCase() === uEmail)
       : null;
-    if (!matched && uName) {
-      const exactNameMatches = allStaffDirectory.filter(p => {
-        const name = (p.name || p.nombre || '').normalize('NFD')
-          .replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
-        return name === uName;
-      });
-      if (exactNameMatches.length === 1) matched = exactNameMatches[0];
-    }
 
     if (selectedPerson) return;
     setSelectedPerson(matched || null);
@@ -215,7 +191,7 @@ export default function MisKPIs() {
     }
   }, [allStaffDirectory, currentUser, selectedPerson]);
 
-  const loadPersonMetas = useCallback(async (person) => {
+  const loadPersonMetas = useCallback(async (person, isCurrent) => {
     const roleCat = person.tabCategory || activeTab;
     if (roleCat === 'ejecutivo') {
       setCustomMetas(null);
@@ -227,7 +203,7 @@ export default function MisKPIs() {
     // 1. Intentar desde localStorage
     let stored = null;
     try {
-      const localKey = `cpsl_kpi_targets_${person.id}`;
+      const localKey = `cpsl_kpi_targets_v2:${currentUser?.uid}:${currentUser?.email}:${person.id}`;
       const saved = localStorage.getItem(localKey);
       if (saved) stored = JSON.parse(saved);
     } catch (error) {
@@ -250,15 +226,21 @@ export default function MisKPIs() {
       console.warn("Aviso Firestore al leer metas personalizadas:", e);
     }
 
+    if (!isCurrent()) return;
     const effective = { ...defaultMetasForRole, ...(stored || {}) };
     setCustomMetas(effective);
     setMetasDraft(effective);
-  }, [activeTab]);
+  }, [activeTab, currentUser?.uid, currentUser?.email]);
 
   // Cargar metas personalizadas cuando cambia la persona seleccionada
   useEffect(() => {
+    setCustomMetas(null);
+    setMetasDraft({});
+    setIsEditingMetas(false);
     if (!selectedPerson) return;
-    loadPersonMetas(selectedPerson);
+    let active = true;
+    loadPersonMetas(selectedPerson, () => active);
+    return () => { active = false; };
   }, [selectedPerson, loadPersonMetas]);
 
   const handleSaveCustomMetas = async () => {
@@ -271,14 +253,8 @@ export default function MisKPIs() {
     const roleCat = selectedPerson.tabCategory || activeTab;
 
     try {
-      // Guardar localmente
-      const localKey = `cpsl_kpi_targets_${selectedPerson.id}`;
-      localStorage.setItem(localKey, JSON.stringify(metasDraft));
-
-      // Guardar en Firestore
-      try {
-        const tRef = doc(db, 'user_kpi_targets', selectedPerson.id);
-        await setDoc(tRef, {
+      const tRef = doc(db, 'user_kpi_targets', selectedPerson.id);
+      await setDoc(tRef, {
           userId: selectedPerson.id,
           userName: selectedPerson.name || selectedPerson.nombre,
           userEmail: selectedPerson.email,
@@ -287,15 +263,15 @@ export default function MisKPIs() {
           [roleCat]: metasDraft,
           updatedAt: serverTimestamp(),
           updatedBy: currentUser?.displayName || currentUser?.name || 'Liderazgo'
-        }, { merge: true });
-      } catch (err) {
-        console.warn("Firestore error guardando metas personalizadas:", err);
-      }
+      }, { merge: true });
+      const localKey = `cpsl_kpi_targets_v2:${currentUser?.uid}:${currentUser?.email}:${selectedPerson.id}`;
+      localStorage.setItem(localKey, JSON.stringify(metasDraft));
 
       setCustomMetas(metasDraft);
       setIsEditingMetas(false);
       showToast(`¡Metas personalizadas guardadas con éxito para ${selectedPerson.name}!`, 'success');
     } catch (e) {
+      console.error('Error guardando metas personalizadas:', e);
       showToast('Error al guardar metas personalizadas.', 'error');
     } finally {
       setSavingMetas(false);
@@ -317,7 +293,7 @@ export default function MisKPIs() {
         ? `Nodus · snapshot antiguo o sin fecha verificable (${nodusSnapshotAge.label})`
         : nodusData
           ? 'Nodus · snapshot reciente; sin coincidencia única para esta persona'
-          : 'Nodus · snapshot no disponible';
+          : `Nodus · ${nodusError || 'snapshot no disponible'}`;
 
   // Función para auto-llenar el formulario con las métricas reales
   const handleAutoFillFromNodus = () => {
@@ -378,11 +354,11 @@ export default function MisKPIs() {
 
   const getLocalReports = () => {
     try {
-      const saved = localStorage.getItem('cpsl_kpi_reports_v1');
+      const saved = localStorage.getItem(`cpsl_kpi_reports_v2:${currentUser?.uid}:${currentUser?.email}`);
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed)) {
-          return parsed.filter(r => r && !r.id?.startsWith('kpi_seed_'));
+          return parsed.filter(r => r && !r.id?.startsWith('kpi_seed_') && canReadKpiReport(currentUser, r));
         }
       }
     } catch (e) {}
@@ -392,7 +368,7 @@ export default function MisKPIs() {
   const saveLocalReports = (list) => {
     try {
       const cleanList = (list || []).filter(r => r && !r.id?.startsWith('kpi_seed_'));
-      localStorage.setItem('cpsl_kpi_reports_v1', JSON.stringify(cleanList));
+      localStorage.setItem(`cpsl_kpi_reports_v2:${currentUser?.uid}:${currentUser?.email}`, JSON.stringify(cleanList));
     } catch (e) {}
   };
 
@@ -400,7 +376,7 @@ export default function MisKPIs() {
     let local = getLocalReports();
 
     try {
-      const baseQuery = collection(db, 'kpi_reports');
+      const baseQuery = privateKpiQuery(db, currentUser);
       const snapshot = await getDocs(baseQuery);
       if (snapshot && !snapshot.empty) {
         const remoteData = snapshot.docs.map(d => ({
@@ -417,7 +393,7 @@ export default function MisKPIs() {
     }
 
     local.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
-    setHistory(local);
+    setHistory(local.filter(report => canReadKpiReport(currentUser, report)));
   };
 
   // Guardar reporte con atribución exacta a la persona seleccionada
@@ -524,8 +500,7 @@ export default function MisKPIs() {
       return history.filter(r => 
         r.targetUserId === selectedPerson.id || 
         r.targetUserEmail === selectedPerson.email ||
-        (r.targetUserName && r.targetUserName.toLowerCase() === (selectedPerson.name || selectedPerson.nombre || '').toLowerCase()) ||
-        (r.userName && r.userName.toLowerCase() === (selectedPerson.name || selectedPerson.nombre || '').toLowerCase())
+        r.userEmail === selectedPerson.email
       );
     }
     if (historyFilter === 'my') {

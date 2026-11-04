@@ -4,6 +4,8 @@ import { readFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { createAuthStartupTrace } from '../src/utils/authStartupTiming.js';
 import { isUserInactive, mergeAuthenticatedRoleProfile } from '../src/utils/userNormalizer.js';
+import { assertAuthenticatedIdentity, selectAuthenticatedProfile } from '../src/utils/authIdentity.js';
+import { bindPrivateSession } from '../src/utils/sessionPrivacy.js';
 
 const RTT = 60;
 const baselineRef = 'd1c07eaa128038df90d6a5db0a1c6b2a39b824f9';
@@ -57,13 +59,14 @@ function harness(source, { rows = [], staff = [], exists = true, fail = '', inac
   const saveBody = source.slice(source.indexOf('async function saveSelfProfile'), source.indexOf('export function AuthProvider'));
   const saveSelfProfile = new Function('db', 'doc', 'getDoc', 'setDoc', 'serverTimestamp', 'console',
     `${saveBody}; return saveSelfProfile;`)({}, doc, getDoc, setDoc, () => 'ts', logger);
-  const helpersBody = source.slice(source.indexOf('const pareceUidFirebase'), source.indexOf('const switchRole'));
-  const helpers = new Function('db', 'collection', 'query', 'where', 'or', 'getDocs', 'console',
+  const helperStart = source.includes('const pareceUidFirebase') ? 'const pareceUidFirebase' : 'const findUserInFirestore';
+  const helpersBody = source.slice(source.indexOf(helperStart), source.indexOf('const switchRole'));
+  const helpers = new Function('db', 'collection', 'query', 'where', 'or', 'getDocs', 'console', 'auth', 'selectAuthenticatedProfile',
     `${helpersBody}; return { findUserInFirestore, ${source.includes('const findStaffInFirestore') ? 'findStaffInFirestore,' : ''} };`)(
-    {}, collection, query, where, or, getDocs, logger);
+    {}, collection, query, where, or, getDocs, logger, { currentUser: { uid, email } }, selectAuthenticatedProfile);
   const agentBody = agentSource.replace(/^import .*$/gm, '').replace('export async function', 'async function');
-  const agent = new Function('db', 'getDocs', 'collection', 'findUserByAnyEmail', 'normalizeRole', 'DUAL_ROLE_TRAINER_EMAILS', 'console',
-    `${agentBody}; return enforceUserRolesAgent;`)({}, getDocs, collection, () => null, r => r, [], logger);
+  const agent = new Function('db', 'getDocs', 'collection', 'findUserByAnyEmail', 'normalizeRole', 'DUAL_ROLE_TRAINER_EMAILS', 'console', 'query', 'where',
+    `${agentBody}; return enforceUserRolesAgent;`)({}, getDocs, collection, () => null, r => r, [], logger, query, where);
   const declarations = source.indexOf('let sessionVersion = 0;');
   const start = declarations === -1 ? source.indexOf('const unsubscribe = onAuthStateChanged') : declarations;
   const effectBody = source.slice(start, source.indexOf('  }, []);', start));
@@ -72,7 +75,7 @@ function harness(source, { rows = [], staff = [], exists = true, fail = '', inac
     'query', 'where', 'getDocs', 'getDoc', 'doc', 'findUserByAnyEmail', 'isSuperAdminEmail', 'isInactiveTrainer',
     'signOut', 'setCurrentUser', 'setOriginalAdminUser', 'setLoading', 'normalizeUserRecord', 'isUserInactive', 'enforceUserRolesAgent', 'saveSelfProfile',
     'buildUserObject', 'recordAuditEvent', 'sessionStorage', 'localStorage', 'PARTICIPANT_FLAG',
-    'buildParticipantUser', 'mergeAuthenticatedRoleProfile', 'console', 'showToast', 'startupTrace', effectBody)(
+    'buildParticipantUser', 'mergeAuthenticatedRoleProfile', 'console', 'showToast', 'startupTrace', 'bindPrivateSession', 'assertAuthenticatedIdentity', effectBody)(
     (_, cb) => { callback = cb; return () => {}; }, { signOut: async () => event('signout') },
     helpers.findUserInFirestore, helpers.findStaffInFirestore, {}, collection, query, where, getDocs, getDoc, doc,
     () => null, () => false, () => inactive, async () => event('signout'),
@@ -80,7 +83,7 @@ function harness(source, { rows = [], staff = [], exists = true, fail = '', inac
     value => event(value ? 'gate-started' : 'gate-finished'), user => ({ ...user, roles: ['colaborador'] }), isUserInactive,
     agent, saveSelfProfile, (_, user) => user, async () => event('audit'),
     storage, storage, 'participant', () => ({ participant: true }), mergeAuthenticatedRoleProfile, logger,
-    () => event('toast'), createAuthStartupTrace());
+    () => event('toast'), createAuthStartupTrace(), bindPrivateSession, assertAuthenticatedIdentity);
   return {
     helpers, events, writes, user: () => currentUser,
     async run() {
@@ -93,11 +96,11 @@ function harness(source, { rows = [], staff = [], exists = true, fail = '', inac
   };
 }
 
-test('OR lookup preserves field priority before UID preference, aliases and duplicate semantics', async () => {
+test('OR lookup prefers the authenticated UID across all email fields and rejects ambiguous legacy profiles', async () => {
   const preferred = row('slug', { emails: [email], role: 'coord_c1' });
   const other = row(uid, { email, role: 'manager' });
   const h = harness(current, { rows: [other, preferred] });
-  assert.equal((await h.helpers.findUserInFirestore(email))._docId, 'slug');
+  assert.equal((await h.helpers.findUserInFirestore(email))._docId, uid);
   const sameFieldUid = row(uid, { emails: [email], role: 'coord_maestria' });
   const sameField = harness(current, { rows: [preferred, sameFieldUid] });
   assert.equal((await sameField.helpers.findUserInFirestore(email))._docId, uid);
@@ -109,7 +112,7 @@ test('OR lookup preserves field priority before UID preference, aliases and dupl
   const hStaff = harness(current, { staff: [
     row('a', { email, name: 'Secondary' }), row('z', { emails: [email], name: 'Preferred' })
   ] });
-  assert.equal((await hStaff.helpers.findStaffInFirestore(email)).name, 'Preferred');
+  await assert.rejects(hStaff.helpers.findStaffInFirestore(email), /Identidad ambigua/);
 });
 
 test('actual callback: comparable PR145 vs current at 60ms RTT, including auth-state wait', async t => {

@@ -4,6 +4,7 @@ import {
   filterNodusSedes,
   hasNodusTeamAccess,
   nodusAccessScope,
+  scopedNodusContext,
   summarizeNodusCatalog,
   summarizeNodusTeam
 } from './nodusJsonModel.js';
@@ -55,4 +56,52 @@ test('catalog totals reject invalid participant counts instead of treating them 
     { equipos: [{ participantes: 0 }] }
   ]), { sedes: 2, equipos: 3, participantes: 5 });
   assert.throws(() => summarizeNodusCatalog([{ equipos: [{ participantes: 'unknown' }] }]), /invalid_equipos_schema/);
+});
+
+test('gerentes retain assigned sites, never global access from gerente or consolidated views', () => {
+  const user = { roles: ['gerente', 'coord_c1'], appRole: 'consolidado', sede: 'Lima',
+    roleSedes: { gerente: 'Quito', coord_c1: 'Cuenca', direccion: 'Guayaquil' } };
+  const scope = nodusAccessScope(user, false);
+  assert.equal(scope.type, 'sede');
+  assert.deepEqual(scope.sedes, ['Lima', 'Quito', 'Cuenca']);
+  const sedes = ['Lima', 'Quito', 'Cuenca', 'Guayaquil'].map(nombre => ({ nombre }));
+  assert.deepEqual(filterNodusSedes(sedes, scope), sedes.slice(0, 3));
+  assert.deepEqual(nodusAccessScope({ role: 'gerente', sede: 'Global' }, false), { type: 'denied' });
+  assert.deepEqual(nodusAccessScope({ role: 'gerente', sede: 'unverified' }, false), { type: 'denied' });
+  assert.deepEqual(nodusAccessScope({ role: 'direccion', sede: 'Lima' }, false), { type: 'global' });
+  assert.deepEqual(nodusAccessScope({ role: 'gerente', active: false, sede: 'Lima' }, true), { type: 'denied' });
+  assert.deepEqual(nodusAccessScope({ role: 'consolidado', sede: 'Lima' }, false), { type: 'general' });
+});
+
+test('local Nodus context excludes foreign totals, raw sections and nested personal rows', () => {
+  const snapshot = {
+    timestamp: 'synthetic-time', totales: { asignados: 999 },
+    secciones: { private: 'FOREIGN_RAW' },
+    sedes: [{ sede: 'Lima', asignados: 3, private: 'NESTED_PRIVATE' }, { sede: 'Quito', asignados: 9 }],
+    coordinadores: [
+      { sede: 'Lima', email: 'local@example.invalid', asignados: 3, equipos: [{ private: 'NESTED_PRIVATE' }],
+        estados: { llamadas: 2, private: 'NESTED_PRIVATE' } },
+      { sede: 'Quito', email: 'FOREIGN_EMAIL', asignados: 9 },
+      { email: 'UNSCOPED_EMAIL', asignados: 12 }
+    ],
+    equiposSummary: [{ sede: 'Lima', equipo: '42', asignados: 3, participantes: ['NESTED_PRIVATE'] }]
+  };
+  const scoped = scopedNodusContext(snapshot, { type: 'sede', sede: 'Lima' });
+  assert.equal(scoped.totales, undefined);
+  assert.equal(scoped.secciones, undefined);
+  assert.equal(scoped.coordinadores.length, 1);
+  assert.equal(scoped.coordinadores[0].email, 'local@example.invalid');
+  assert.doesNotMatch(JSON.stringify(scoped), /FOREIGN|NESTED_PRIVATE|UNSCOPED/);
+  assert.deepEqual(scopedNodusContext(snapshot, { type: 'general' }), {
+    timestamp: 'synthetic-time', totales: { asignados: 999 }
+  });
+  assert.equal(scopedNodusContext(snapshot, { type: 'global' }), snapshot);
+  assert.throws(() => scopedNodusContext(snapshot, { type: 'denied' }), /denied/);
+});
+
+test('unknown or contradictory site labels cannot widen local scope', () => {
+  const scope = { type: 'sede', sede: 'Lima' };
+  assert.deepEqual(filterNodusSedes([
+    { nombre: 'Lima foreign' }, { nombre: 'Quito', ciudad: 'Lima' }, { ciudad: 'Lima', nombre: 'LIMA CICLO 1' }
+  ], scope), [{ ciudad: 'Lima', nombre: 'LIMA CICLO 1' }]);
 });

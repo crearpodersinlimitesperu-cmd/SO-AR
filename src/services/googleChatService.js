@@ -165,6 +165,7 @@ export async function saveGoogleChatWebhookConfig(config) {
  */
 export async function sendReportToGoogleChat(report) {
   if (!report) return { success: false, reason: 'no_report' };
+  if (report.type === 'MicroPulsoStaff') return { success: false, reason: 'private_report' };
 
   try {
     const config = await getGoogleChatWebhookConfig();

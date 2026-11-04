@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { doc, onSnapshot } from 'firebase/firestore';
-import { db } from '../services/firebase';
-import nodusFallbackData from '../data/nodusFallbackData.json';
+import usePrivateNodusSnapshot from '../hooks/usePrivateNodusSnapshot.js';
 import { canonicalSede } from '../utils/sede';
 import { 
   ArrowLeft, RefreshCw, Users, Activity, CheckCircle2, 
@@ -13,83 +11,14 @@ import {
 export default function EmbudoConversionBoard() {
   const navigate = useNavigate();
 
-  const [loading, setLoading] = useState(true);
-  const [snapshotData, setSnapshotData] = useState(null);
-  const [coordsData, setCoordsData] = useState(null);
   const [selectedSede, setSelectedSede] = useState('TODAS');
   const [selectedEquipo, setSelectedEquipo] = useState('TODOS');
   const [activeTab, setActiveTab] = useState('equipos'); // 'equipos' | 'coordinadores' | 'integridad'
   const [refreshKey, setRefreshKey] = useState(0);
-
-  // Escuchar en tiempo real los documentos oficiales de Nodus sincronizados en Firestore
-  useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-
-    const unsubSnapshot = onSnapshot(doc(db, 'nodus_kpis_sincronizados', 'latest_snapshot'), (snap) => {
-      if (cancelled) return;
-      if (snap.exists()) {
-        setSnapshotData(snap.data());
-      }
-      setLoading(false);
-    }, (err) => {
-      console.warn('Advertencia leyendo latest_snapshot:', err);
-      setLoading(false);
-    });
-
-    const unsubCoords = onSnapshot(doc(db, 'nodus_coordinadores_c1c2', 'latest'), (snap) => {
-      if (cancelled) return;
-      if (snap.exists()) {
-        setCoordsData(snap.data());
-      }
-    }, (err) => {
-      console.warn('Advertencia leyendo nodus_coordinadores_c1c2:', err);
-    });
-
-    return () => {
-      cancelled = true;
-      unsubSnapshot();
-      unsubCoords();
-    };
-  }, [refreshKey]);
-
-  // Lista de coordinadores oficiales con fusión resiliente (cero dependencia frágil de Firestore trunco)
-  const allCoordinadores = useMemo(() => {
-    const liveCoords = coordsData?.coordinadores || snapshotData?.coordinadores || [];
-    const fallbackCoords = nodusFallbackData?.coordinadores || [];
-    
-    // Si la fuente en vivo no tiene coordinadores, usamos la base verificada
-    if (!liveCoords.length) return fallbackCoords;
-
-    const map = new Map();
-    // 1. Poblamos con la base histórica completa de Nodus
-    fallbackCoords.forEach(c => {
-      const sede = canonicalSede(c.sede);
-      const key = `${(c.nombre || c.nombreCompleto || '').trim().toLowerCase()}_${sede.toLowerCase()}`;
-      map.set(key, { ...c, sede });
-    });
-
-    // 2. Superponemos la fuente en vivo, fusionando los equipos
-    liveCoords.forEach(c => {
-      const sede = canonicalSede(c.sede);
-      const key = `${(c.nombre || c.nombreCompleto || '').trim().toLowerCase()}_${sede.toLowerCase()}`;
-      const existing = map.get(key);
-      if (existing) {
-        const eqMap = new Map();
-        (existing.equipos || []).forEach(e => {
-          if (e.equipo) eqMap.set(e.equipo, e);
-        });
-        (c.equipos || []).forEach(e => {
-          if (e.equipo) eqMap.set(e.equipo, e);
-        });
-        map.set(key, { ...existing, ...c, sede, equipos: Array.from(eqMap.values()) });
-      } else {
-        map.set(key, { ...c, sede });
-      }
-    });
-
-    return Array.from(map.values());
-  }, [coordsData, snapshotData]);
+  const { snapshot: snapshotData, loading, error } = usePrivateNodusSnapshot({ revision: refreshKey });
+  const coordsData = snapshotData;
+  const allCoordinadores = useMemo(() => (snapshotData?.coordinadores || [])
+    .map(row => ({ ...row, sede: canonicalSede(row.sede) })), [snapshotData]);
 
   // Lista de sedes disponibles
   const availableSedes = useMemo(() => {
@@ -156,6 +85,19 @@ export default function EmbudoConversionBoard() {
         (snapshotData?.sedes || []).forEach(s => {
           c1Total += s.c1Total || 0;
           c2Total += s.c2Total || 0;
+        });
+      } else {
+        allCoordinadores.forEach(c => {
+          asignados += Number(c.asignadosTotal ?? c.asignados ?? 0);
+          confirmados += Number(c.confirmadosTotal ?? c.estados?.confirmado ?? 0);
+          noContesta += Number(c.estados?.noContesta ?? 0);
+          porConfirmar += Number(c.estados?.porConfirmar ?? 0);
+          siguiente += Number(c.estados?.siguiente ?? 0);
+          noInteresa += Number(c.estados?.noInteresa ?? 0);
+          asistieron += Number(c.sentadosTotal ?? c.asistieron ?? 0);
+          gestiones += Number(c.gestionesTotal ?? c.gestiones ?? 0);
+          c1Total += Number(c.c1 ?? 0);
+          c2Total += Number(c.c2 ?? 0);
         });
       }
     } else if (selectedEquipo === 'TODOS') {
@@ -225,8 +167,10 @@ export default function EmbudoConversionBoard() {
         if (!e.equipo || e.equipo === 'Sin equipo') return;
         if (selectedEquipo !== 'TODOS' && e.equipo !== selectedEquipo) return;
 
-        if (!map[e.equipo]) {
-          map[e.equipo] = {
+        const key = `${canonicalSede(c.sede)}|${e.equipo}`;
+        if (!map[key]) {
+          map[key] = {
+            key,
             equipo: e.equipo,
             sede: c.sede,
             llamadas: 0,
@@ -238,13 +182,13 @@ export default function EmbudoConversionBoard() {
             noInteresa: 0
           };
         }
-        map[e.equipo].llamadas += e.llamadas || 0;
-        map[e.equipo].confirmados += e.confirmado || 0;
-        map[e.equipo].asistieron += e.asistieron || 0;
-        map[e.equipo].noContesta += e.noContesta || 0;
-        map[e.equipo].siguiente += e.siguiente || 0;
-        map[e.equipo].porConfirmar += e.porConfirmar || 0;
-        map[e.equipo].noInteresa += e.noInteresa || 0;
+        map[key].llamadas += e.llamadas || 0;
+        map[key].confirmados += e.confirmado || 0;
+        map[key].asistieron += e.asistieron || 0;
+        map[key].noContesta += e.noContesta || 0;
+        map[key].siguiente += e.siguiente || 0;
+        map[key].porConfirmar += e.porConfirmar || 0;
+        map[key].noInteresa += e.noInteresa || 0;
       });
     });
 
@@ -269,7 +213,18 @@ export default function EmbudoConversionBoard() {
   const timestamp = snapshotData?.timestamp || coordsData?.timestamp;
   const formattedDate = timestamp 
     ? new Date(timestamp).toLocaleString('es-PE', { dateStyle: 'medium', timeStyle: 'short' })
-    : 'Hoy';
+    : 'Fecha no verificable';
+
+  if (!snapshotData) return (
+    <div style={styles.container}>
+      <button type="button" onClick={() => navigate('/home')} style={styles.backButton}>Volver al Tablero</button>
+      <h1 style={styles.title}>Seguimiento de C1 y C2</h1>
+      <p role={error ? 'alert' : 'status'}>{error || 'Consultando métricas autorizadas…'}
+        {' '}No se muestran respaldos globales ni se certifica actividad cero.</p>
+      <button type="button" disabled={loading} onClick={() => setRefreshKey(value => value + 1)}
+        style={styles.refreshButton}>{loading ? 'Actualizando...' : 'Actualizar'}</button>
+    </div>
+  );
 
   return (
     <div style={styles.container}>
@@ -326,7 +281,7 @@ export default function EmbudoConversionBoard() {
             style={styles.select}
           >
             {availableSedes.map(s => (
-              <option key={s} value={s}>{s === 'TODAS' ? 'Todas las Sedes (Global)' : s}</option>
+              <option key={s} value={s}>{s === 'TODAS' ? 'Todas las sedes autorizadas' : s}</option>
             ))}
           </select>
         </div>
@@ -488,7 +443,7 @@ export default function EmbudoConversionBoard() {
                     const totalLlamadas = eq.llamadas || 0;
                     const tasa = totalLlamadas > 0 ? ((eq.confirmados / totalLlamadas) * 100).toFixed(1) + '%' : '—';
                     return (
-                      <tr key={eq.equipo} style={styles.tr}>
+                      <tr key={eq.key} style={styles.tr}>
                         <td style={styles.tdBold}>{eq.equipo}</td>
                         <td style={styles.td}>{eq.sede || 'Global'}</td>
                         <td style={styles.tdRight}>{eq.llamadas.toLocaleString()}</td>

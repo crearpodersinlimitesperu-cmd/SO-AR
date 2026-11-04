@@ -41,6 +41,7 @@ test('real Managers screen uses server data, saves to real doc ID and reloads af
       export const doc = (_db, path, id) => ({ path, id });
       export const query = ref => ref;
       export const where = () => ({});
+      export const or = (...constraints) => ({ constraints });
       export const serverTimestamp = () => 'fixture-server-time';
       export const deleteField = () => null;
       export const arrayUnion = (...values) => values;
