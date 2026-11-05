@@ -18,6 +18,7 @@ import { getFlagForSede } from '../utils/flags';
 import UserProfileModal from '../components/UserProfileModal';
 import IAAuditor from '../components/IAAuditor';
 import TaskAssignmentModal from '../components/TaskAssignmentModal';
+import AliadosC2AdminPanel from '../components/AliadosC2AdminPanel';
 import { getAllAuditLogs, recordAuditEvent, getAllUserConnections } from '../services/auditService';
 import { runRoleIntegrityAuditAndHeal, applyReviewedRoleChanges } from '../services/roleIntegritySentinelAgent';
 
@@ -1538,6 +1539,26 @@ export default function SuperAdminPanel() {
           <button onClick={() => navigate('/trainer-hub')} className="btn-secondary" style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', borderRadius: '8px', border: '1px solid rgba(234, 179, 8, 0.4)', background: 'rgba(234, 179, 8, 0.1)', color: '#eab308', fontWeight: 600 }}>
             🎓 Hub Entrenadores (Zen)
           </button>
+          {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion') && (
+            <button
+              onClick={() => {
+                setSearchTerm('');
+                setActiveView('aliados_c2');
+              }}
+              className="btn-secondary"
+              style={{
+                fontSize: '0.8rem',
+                padding: '0.4rem 0.85rem',
+                borderRadius: '8px',
+                border: '1px solid rgba(239, 68, 68, 0.6)',
+                background: activeView === 'aliados_c2' ? '#ef4444' : 'rgba(239, 68, 68, 0.16)',
+                color: activeView === 'aliados_c2' ? '#fff' : '#fca5a5',
+                fontWeight: 800,
+              }}
+            >
+              🛡️ Control Guía Aliados C2 (Conexiones & Accesos)
+            </button>
+          )}
         </div>
       </div>
 
@@ -1665,6 +1686,9 @@ export default function SuperAdminPanel() {
             {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion') && (
               <button style={tabStyle('sugerencias')} onClick={() => setActiveView('sugerencias')}>💡 Buzón Sugerencias</button>
             )}
+            {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion') && (
+              <button style={tabStyle('aliados_c2')} onClick={() => setActiveView('aliados_c2')}>🛡️ Aliados C2 (Guía & Accesos)</button>
+            )}
           </div>
           {activeView === 'global' && <GlobalView tasks={tasks} navigate={navigate} realUsersData={displayedUsersData} />}
           {activeView === 'sede' && (
@@ -1707,6 +1731,9 @@ export default function SuperAdminPanel() {
           )}
           {activeView === 'sugerencias' && (
             <SuggestionsView />
+          )}
+          {activeView === 'aliados_c2' && (
+            <AliadosC2AdminPanel currentUser={currentUser} />
           )}
         </>
       )}

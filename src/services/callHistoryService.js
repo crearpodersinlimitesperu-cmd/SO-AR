@@ -50,9 +50,26 @@ export async function recordIndividualCall(db, {
       return event;
     }
 
-    const currentHistory = Array.isArray(snapshot.data().llamadasHistorial)
+    
+    let currentHistory = Array.isArray(snapshot.data().llamadasHistorial)
       ? snapshot.data().llamadasHistorial
       : [];
+      
+    // Si no hay historial pero hay un registro previo, migrarlo
+    if (currentHistory.length === 0 && snapshot.data().llamadaFecha && snapshot.data().llamadaFecha !== 'Sin registro') {
+      currentHistory.push({
+        id: `legacy_${managerRef.id}`,
+        tipo: 'individual',
+        tipoContacto: 'Videollamada de Google Meet',
+        duracionMinutos: '20-30 min',
+        fecha: snapshot.data().llamadaFecha,
+        asistio: snapshot.data().llamadaAsistio === 'SI',
+        llamadaEfectiva: snapshot.data().llamadaAsistio === 'SI',
+        notaVozEnviada: false,
+        createdAtIso: new Date().toISOString()
+      });
+    }
+
     const existingEvent = currentHistory.find(item => item.id === id);
     if (existingEvent) return existingEvent;
 
@@ -189,5 +206,64 @@ export async function recordGroupCall(db, {
     }
     transaction.set(callRef, call);
     return { alreadyRecorded: false, callId: id };
+  });
+}
+
+export async function editIndividualCallInHistory(db, manager, callId, newFecha, newAsistio) {
+  const managerRef = managerDocumentRef(db, manager);
+  return runTransaction(db, async transaction => {
+    const snap = await transaction.get(managerRef);
+    if (!snap.exists()) throw new Error('Manager document does not exist.');
+    
+    const data = snap.data();
+    const history = Array.isArray(data.llamadasHistorial) ? data.llamadasHistorial : [];
+    
+    const updatedHistory = history.map(c => {
+      if (c.id === callId || (typeof callId === 'number' && history.indexOf(c) === callId) || (typeof callId === 'string' && callId.startsWith('legacy_') && c.fecha === (manager.llamadaFecha || ''))) {
+        return {
+          ...c,
+          id: c.id || callId.replace('legacy_', ''),
+          fecha: newFecha,
+          asistio: newAsistio,
+          llamadaEfectiva: newAsistio
+        };
+      }
+      return c;
+    });
+
+    const sorted = [...updatedHistory].sort((a, b) => new Date(a.fecha || 0) - new Date(b.fecha || 0));
+    const latest = sorted[sorted.length - 1];
+
+    transaction.update(managerRef, {
+      llamadasHistorial: updatedHistory,
+      llamadaFecha: latest ? latest.fecha : '',
+      llamadaAsistio: latest ? (latest.asistio ? 'SI' : 'NO') : ''
+    });
+    return updatedHistory;
+  });
+}
+
+export async function deleteIndividualCallFromHistory(db, manager, callId) {
+  const managerRef = managerDocumentRef(db, manager);
+  return runTransaction(db, async transaction => {
+    const snap = await transaction.get(managerRef);
+    if (!snap.exists()) throw new Error('Manager document does not exist.');
+    
+    const data = snap.data();
+    const history = Array.isArray(data.llamadasHistorial) ? data.llamadasHistorial : [];
+    
+    const updatedHistory = history.filter(c => {
+      return !(c.id === callId || (typeof callId === 'number' && history.indexOf(c) === callId) || (typeof callId === 'string' && callId.startsWith('legacy_') && c.fecha === (manager.llamadaFecha || '')));
+    });
+
+    const sorted = [...updatedHistory].sort((a, b) => new Date(a.fecha || 0) - new Date(b.fecha || 0));
+    const latest = sorted[sorted.length - 1];
+
+    transaction.update(managerRef, {
+      llamadasHistorial: updatedHistory,
+      llamadaFecha: latest ? latest.fecha : '',
+      llamadaAsistio: latest ? (latest.asistio ? 'SI' : 'NO') : ''
+    });
+    return updatedHistory;
   });
 }

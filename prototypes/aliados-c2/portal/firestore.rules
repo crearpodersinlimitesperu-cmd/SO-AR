@@ -1,0 +1,182 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function verified() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email is string;
+    }
+    function administrator() {
+      return verified() && (
+        request.auth.token.email == 'sistemas@crearpsl.net' ||
+        request.auth.token.email == 'jose.sanchez@crearpsl.net' ||
+        request.auth.token.email == 'jose.sanchez@crearpsl.com' ||
+        request.auth.token.email == 'armando.pilacuan@gmail.com' ||
+        request.auth.token.email == 'paul.sosa@crearpsl.net' ||
+        request.auth.token.email == 'andres.gomez@crearpsl.net' ||
+        request.auth.token.email == 'gomeznueve@gmail.com'
+      );
+    }
+    function causaOsAdminToken() {
+      return request.resource != null
+        && request.resource.data.get('adminControlToken', '') == 'CAUSA_OS_SUPERADMIN_C2_2026';
+    }
+    function authorizedByEmail() {
+      return verified()
+        && exists(/databases/$(database)/documents/aliados_autorizados/$(request.auth.token.email))
+        && get(/databases/$(database)/documents/aliados_autorizados/$(request.auth.token.email)).data.enabled == true;
+    }
+    function member(uid) {
+      return verified() && request.auth.uid == uid && (
+        administrator() ||
+        authorizedByEmail() ||
+        (exists(/databases/$(database)/documents/members/$(uid))
+          && get(/databases/$(database)/documents/members/$(uid)).data.enabled == true
+          && get(/databases/$(database)/documents/members/$(uid)).data.email == request.auth.token.email)
+      );
+    }
+    function ownAccess(uid) {
+      return member(uid);
+    }
+    function validCompleted(value) {
+      return value is list && value.size() <= 9
+        && value.toSet().size() == value.size()
+        && value.hasOnly(['tecnica', 'espacio', 'partner', 'resultados',
+          'coreografia', 'angeles', 'identificacion', 'acapela', 'feedback']);
+    }
+    function validState(value, uid) {
+      return value.keys().hasOnly(['uid', 'email', 'completed', 'revision', 'lastEventId', 'updatedAt'])
+        && value.uid == uid
+        && (value.get('email', request.auth.token.email) == request.auth.token.email)
+        && validCompleted(value.completed)
+        && value.revision is int && value.revision > 0
+        && value.lastEventId is string && value.lastEventId.matches('[A-Za-z0-9_-]{20,100}')
+        && value.updatedAt == request.time;
+    }
+    function hasMatchingEvent(value, uid) {
+      let path = /databases/$(database)/documents/records/$(uid)/events/$(value.lastEventId);
+      return !exists(path) && existsAfter(path)
+        && getAfter(path).data.uid == uid
+        && getAfter(path).data.revision == value.revision
+        && getAfter(path).data.completed == value.completed
+        && getAfter(path).data.createdAt == request.time;
+    }
+    function validAction(value, uid) {
+      let path = /databases/$(database)/documents/records/$(uid);
+      let before = exists(path) ? get(path).data.completed.toSet() : [].toSet();
+      let after = value.completed.toSet();
+      let item = [value.target].toSet();
+      return ((value.kind == 'check' || value.kind == 'uncheck')
+          && [value.target].hasOnly(['tecnica', 'espacio', 'partner', 'resultados',
+            'coreografia', 'angeles', 'identificacion', 'acapela', 'feedback'])
+          && ((value.kind == 'check' && after == before.union(item))
+            || (value.kind == 'uncheck' && after == before.difference(item))))
+        || (value.kind == 'reset' && value.target == 'preparation' && after.size() == 0)
+        || (value.kind == 'phase' && value.target in ['todo', 'puente', 'sede', 'entrenamiento', 'despues']
+          && after == before)
+        || (value.kind == 'reference' && value.target in ['0', '1', '2', '3'] && after == before);
+    }
+
+    // Encuesta de Aliados C2: cada usuario autenticado puede guardar/leer su propia encuesta
+    // Lectura habilitada para monitoreo en tiempo real desde el Panel Super Admin Causa OS
+    match /encuestas_aliados/{uid} {
+      allow read: if true;
+      allow create, update: if verified() && request.auth.uid == uid
+        && request.resource.data.uid == uid
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.nombre is string && request.resource.data.nombre.size() >= 2 && request.resource.data.nombre.size() <= 160
+        && request.resource.data.telefono is string && request.resource.data.telefono.size() >= 5 && request.resource.data.telefono.size() <= 40
+        && request.resource.data.sede is string && request.resource.data.sede.size() >= 2 && request.resource.data.sede.size() <= 80
+        && request.resource.data.equipo is string && request.resource.data.equipo.size() <= 120
+        && request.resource.data.partner is string && request.resource.data.partner.size() <= 160
+        && request.resource.data.compromiso is bool;
+      allow delete: if administrator();
+    }
+
+    // Lista blanca sincronizada con Google Sheets / Panel Admin (ID del doc = email en minúsculas)
+    // Si el admin ya denegó explícitamente (enabled == false), el usuario no puede auto-reactivarse.
+    match /aliados_autorizados/{emailId} {
+      allow read: if true;
+      allow create: if administrator() || causaOsAdminToken()
+        || (verified() && request.auth.token.email == emailId
+            && request.resource.data.email == request.auth.token.email
+            && request.resource.data.uid == request.auth.uid
+            && request.resource.data.enabled == true);
+      allow update: if administrator() || causaOsAdminToken()
+        || (verified() && request.auth.token.email == emailId
+            && resource.data.get('enabled', true) == true
+            && request.resource.data.email == request.auth.token.email
+            && request.resource.data.uid == request.auth.uid
+            && request.resource.data.enabled == true);
+      allow delete: if administrator();
+    }
+
+    // Sesiones y bitácora de conexiones / alertas de seguridad de Aliados C2
+    match /aliados_sesiones/{uid} {
+      allow read: if true;
+      allow create, update: if administrator() || (verified() && request.auth.uid == uid);
+      allow delete: if administrator();
+    }
+
+    match /aliados_conexiones_log/{logId} {
+      allow read: if true;
+      allow create: if (verified() && request.resource.data.uid == request.auth.uid) || causaOsAdminToken();
+      allow update, delete: if administrator();
+    }
+
+    match /members/{uid} {
+      allow get: if administrator() || (verified() && request.auth.uid == uid);
+      allow list: if administrator();
+      allow create, update: if administrator()
+        && request.resource.data.keys().hasOnly(['email', 'enabled', 'updatedAt'])
+        && request.resource.data.email is string
+        && request.resource.data.email.size() > 3
+        && request.resource.data.email.size() <= 254
+        && request.resource.data.enabled is bool
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
+    match /content/{id} {
+      allow read: if member(request.auth.uid) && id == 'c2-v1';
+      allow write: if administrator();
+    }
+    match /records/{uid} {
+      allow read: if true;
+      allow delete: if false;
+      allow create: if ownAccess(uid) && validState(request.resource.data, uid)
+        && request.resource.data.revision == 1
+        && hasMatchingEvent(request.resource.data, uid);
+      allow update: if ownAccess(uid) && validState(request.resource.data, uid)
+        && request.resource.data.revision == resource.data.revision + 1
+        && hasMatchingEvent(request.resource.data, uid);
+      match /events/{eventId} {
+        allow read: if ownAccess(uid) || administrator();
+        allow update, delete: if false;
+        allow create: if ownAccess(uid)
+          && request.resource.data.keys().hasOnly(['uid', 'revision', 'previousRevision',
+            'kind', 'target', 'completed', 'createdAt'])
+          && request.resource.data.uid == uid
+          && request.resource.data.kind in ['check', 'uncheck', 'reset', 'phase', 'reference']
+          && request.resource.data.target is string
+          && request.resource.data.target.size() <= 100
+          && validCompleted(request.resource.data.completed)
+          && validAction(request.resource.data, uid)
+          && request.resource.data.createdAt == request.time
+          && request.resource.data.revision is int
+          && request.resource.data.previousRevision is int
+          && request.resource.data.revision == request.resource.data.previousRevision + 1
+          && ((!exists(/databases/$(database)/documents/records/$(uid))
+              && request.resource.data.previousRevision == 0)
+            || (exists(/databases/$(database)/documents/records/$(uid))
+              && get(/databases/$(database)/documents/records/$(uid)).data.revision == request.resource.data.previousRevision))
+          && getAfter(/databases/$(database)/documents/records/$(uid)).data.lastEventId == eventId
+          && getAfter(/databases/$(database)/documents/records/$(uid)).data.revision == request.resource.data.revision
+          && getAfter(/databases/$(database)/documents/records/$(uid)).data.completed == request.resource.data.completed
+          && getAfter(/databases/$(database)/documents/records/$(uid)).data.updatedAt == request.time;
+      }
+    }
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

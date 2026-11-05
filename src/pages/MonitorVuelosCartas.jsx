@@ -273,8 +273,8 @@ const OFICIAL_LETTERS = [
     url: '/cartas/carta_ana_monroy_lim.html',
     badge: 'Pasaporte N04328038 · CURP MOTA960805',
     fecha: 'Ene - Feb 2027',
-    descripcion: 'Carta oficial de invitación, itinerario Volaris DD7FPP (Y4 181 / Y4 3919), documento legal verificado y hospedaje en Hotel Jose Antonio Deluxe.',
-    vuelos: ['Y4 181', 'Y4 3919']
+    descripcion: 'Carta oficial de invitación, itinerario Volaris DD7FPP (Y4 181 / Y4 3918 / Y4 3919 / Y4 184), documento legal verificado y hospedaje en Hotel Jose Antonio Deluxe.',
+    vuelos: ['TIJ-LIM (Y4 181 / 3918)', 'LIM-TIJ (Y4 3919 / 184)']
   },
   {
     id: 'carta-lourdes-patino',

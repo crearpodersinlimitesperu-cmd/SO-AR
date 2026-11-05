@@ -13,6 +13,8 @@ import MagicalLoadingScreen from './components/MagicalLoadingScreen'
 import { HelpCircle, RefreshCw } from 'lucide-react'
 import { ModuleUsageProvider, ModuleVisit } from './context/ModuleUsageContext'
 import { canEnterRoleRoute } from './utils/routeAccess'
+import { ErrorBoundary } from './components/ErrorBoundary';
+
 
 const CfoDashboard = lazy(() => import('./pages/CfoDashboard'));
 const AICopilot = lazy(() => import('./components/AICopilot'));
@@ -542,7 +544,7 @@ function App() {
           {/* Generador de Flyers Oficiales (02/09/2026): Generador HD 1080x1920 con fechas por sede. */}
           <Route path="/generador-flyer" element={
             <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'director_maestria', 'superadmin', 'consolidado', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj']} requireSuperAdmin={false}>
-              <GeneradorFlyer />
+              <ErrorBoundary><GeneradorFlyer /></ErrorBoundary>
             </RoleRoute>
           } />
 

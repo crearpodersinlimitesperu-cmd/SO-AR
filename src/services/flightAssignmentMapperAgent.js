@@ -126,8 +126,8 @@ export const TRAINER_FLIGHT_MAPPINGS = [
     rol: 'Directora Académica Internacional',
     cartaUrl: 'https://drive.google.com/drive/folders/1cONlxQGyWNmqcYoF2oD4Mmi_pPyH--Jo',
     badge: 'Pasaporte N04328038 · CURP MOTA960805',
-    pnrs: ['CUSJT9'],
-    vuelos: ['CM 301', 'UA 7166', 'CM 300', 'UA 7057', 'CM 847', 'LA 1429', 'AV 108', 'LA 1414']
+    pnrs: ['CUSJT9', 'DD7FPP'],
+    vuelos: ['CM 301', 'UA 7166', 'CM 300', 'UA 7057', 'CM 847', 'LA 1429', 'AV 108', 'LA 1414', 'Y4 181', 'Y4 3918', 'Y4 3919', 'Y4 184']
   },
   {
     id: 'asig-lourdes-patino',

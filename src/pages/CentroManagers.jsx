@@ -37,7 +37,7 @@ import {
 import { OPERATIONAL_SEDES, normalizeRole, normalizeSede } from '../data/usersData';
 import { recordAuditEvent } from '../services/auditService';
 import { parsePaymentAmount, sumPaymentAmounts, updatePaidAmountInTransaction } from '../utils/liquidacionPayment';
-import { recordGroupCall, recordIndividualCall, updateIndividualCallDate } from '../services/callHistoryService';
+import { recordGroupCall, recordIndividualCall, updateIndividualCallDate, editIndividualCallInHistory, deleteIndividualCallFromHistory } from '../services/callHistoryService';
 import { createCallOperationGate } from '../services/callOperationGate';
 import { db } from '../services/firebase';
 import { collection, getDocs, doc, addDoc, setDoc, updateDoc, deleteDoc, deleteField, writeBatch, onSnapshot, serverTimestamp, query, where, arrayUnion, runTransaction } from 'firebase/firestore';
@@ -211,6 +211,13 @@ export default function CentroManagers() {
   // responder a una nota como CMJ. Ver comentarios de estas 3 funciones en
   // permissions.js — deben coincidir con firestore.rules.
   const userCanWriteNota = canWriteNotaSeguimiento(currentUser);
+  const userCanLoadCalls = currentUser && (
+    currentUser.appRole === 'entrenador_llamadas' || 
+    (currentUser.roles || []).includes('entrenador_llamadas') ||
+    currentUser.appRole === 'entrenador' ||
+    (currentUser.roles || []).includes('entrenador') ||
+    canChangeManagerStatus(currentUser)
+  );
   const userCanViewAllNotas = canViewAllNotasSeguimiento(currentUser);
   const userCanReplyNota = canReplyNotaSeguimiento(currentUser);
   
@@ -669,6 +676,45 @@ export default function CentroManagers() {
   const [isSavingGroupCall, setIsSavingGroupCall] = useState(false);
   const groupCallSaveLock = useRef(false);
   const individualCallGate = useRef(createCallOperationGate());
+  
+  const [editingHistoryCall, setEditingHistoryCall] = useState(null);
+  
+  const handleEditHistoryCall = async (managerId, callId, newFecha, newAsistio) => {
+    const targetManager = managers.find(m => m.id === managerId);
+    if (!targetManager) return;
+    try {
+      const updatedHistory = await editIndividualCallInHistory(db, targetManager, callId, newFecha, newAsistio);
+      setManagers(prev => prev.map(m => {
+        if (m.id !== managerId) return m;
+        return { ...m, llamadasHistorial: updatedHistory };
+      }));
+      setHistoryModal(prev => prev && prev.id === managerId ? { ...prev, llamadasHistorial: updatedHistory } : prev);
+      setEditingHistoryCall(null);
+      showToast('Llamada histórica actualizada', 'success');
+    } catch (e) {
+      console.error(e);
+      showToast('Error al actualizar llamada histórica', 'error');
+    }
+  };
+
+  const handleDeleteHistoryCall = async (managerId, callId) => {
+    if (!window.confirm('¿Eliminar esta llamada del historial?')) return;
+    const targetManager = managers.find(m => m.id === managerId);
+    if (!targetManager) return;
+    try {
+      const updatedHistory = await deleteIndividualCallFromHistory(db, targetManager, callId);
+      setManagers(prev => prev.map(m => {
+        if (m.id !== managerId) return m;
+        return { ...m, llamadasHistorial: updatedHistory };
+      }));
+      setHistoryModal(prev => prev && prev.id === managerId ? { ...prev, llamadasHistorial: updatedHistory } : prev);
+      showToast('Llamada eliminada del historial', 'success');
+    } catch (e) {
+      console.error(e);
+      showToast('Error al eliminar llamada', 'error');
+    }
+  };
+
   const [savingIndividualCallIds, setSavingIndividualCallIds] = useState({});
 
   const [groupCallDate, setGroupCallDate] = useState(new Date().toISOString().split('T')[0]);
@@ -701,6 +747,7 @@ export default function CentroManagers() {
   // que cambiar de pestaña. Solo guarda el NOMBRE del entrenador seleccionado; el
   // resumen se recalcula al vuelo con getTrainerCardStats() más abajo.
   const [managerCardModal, setManagerCardModal] = useState(null);
+  const [historyModal, setHistoryModal] = useState(null);
   const [trainerCardModal, setTrainerCardModal] = useState(null); // string | null (nombre del entrenador)
 
 
@@ -3708,6 +3755,13 @@ export default function CentroManagers() {
                             >
                               <UserCheck size={15} />
                             </HelpButton>
+                            <button
+                              onClick={() => setHistoryModal(m)}
+                              title="Historial de Llamadas"
+                              style={{ background: '#fef3c7', border: '1px solid #fde68a', color: '#d97706', padding: '0.4rem', borderRadius: '6px', cursor: 'pointer' }}
+                            >
+                              <Clock size={15} />
+                            </button>
                             {(userCanWriteNota || userCanViewAllNotas) && (
                               <HelpButton helpKey="notas"
                                 onClick={() => setNotaModal(m)}
@@ -3902,7 +3956,14 @@ export default function CentroManagers() {
                                   >
                                     <UserCheck size={13} />
                                   </HelpButton>
-                                  {(userCanWriteNota || userCanViewAllNotas) && (
+                                  <button
+                                    onClick={() => setHistoryModal(m)}
+                                    title="Historial de Llamadas"
+                                    style={{ background: '#fef3c7', border: '1px solid #fde68a', color: '#d97706', padding: '0.3rem', borderRadius: '5px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                  >
+                                    <Clock size={13} />
+                                  </button>
+                            {(userCanWriteNota || userCanViewAllNotas) && (
                                     <HelpButton helpKey="notas"
                                       onClick={() => setNotaModal(m)}
                                       title="Notas"
@@ -6917,6 +6978,100 @@ export default function CentroManagers() {
 
       
       {/* TARJETA DEL MANAGER/CAPITÁN */}
+      
+      {/* MODAL DE HISTORIAL COMPLETO DE LLAMADAS (Misma UX que CallCoachCRM) */}
+      {historyModal && (() => {
+        const m = historyModal;
+        const memberCalls = Array.isArray(m.llamadasHistorial) ? [...m.llamadasHistorial] : [];
+        if (memberCalls.length === 0 && m.llamadaFecha && m.llamadaFecha !== 'Sin registro') {
+          memberCalls.push({
+            id: `legacy_${m.id}`,
+            tipo: 'individual',
+            tipoContacto: 'Videollamada de Google Meet',
+            duracionMinutos: '20-30 min',
+            fecha: m.llamadaFecha,
+            asistio: m.llamadaAsistio === 'SI',
+            llamadaEfectiva: m.llamadaAsistio === 'SI'
+          });
+        }
+        const displayCalls = memberCalls
+          .filter(c => c.tipo === 'individual' || !c.tipo)
+          .sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0));
+
+        return (
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.7)', backdropFilter: 'blur(4px)', zIndex: 1200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }} onClick={() => { setHistoryModal(null); setEditingHistoryCall(null); }}>
+            <div onClick={e => e.stopPropagation()} style={{ background: bgCard, width: '100%', maxWidth: '520px', maxHeight: '85vh', overflowY: 'auto', borderRadius: '12px', padding: '1.8rem', border: `1px solid ${borderLight}`, borderTop: '4px solid #3b82f6', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.3)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.2rem' }}>
+                <div>
+                  <h2 style={{ margin: 0, color: textDark, fontSize: '1.3rem', fontWeight: 800 }}>
+                    {m.nombre}
+                  </h2>
+                  <div style={{ fontSize: '0.85rem', color: textMuted, marginTop: '0.2rem' }}>{m.equipo || 'Sin Equipo'} &bull; {m.sede}</div>
+                </div>
+                <HelpButton helpKey="cerrar" onClick={() => { setHistoryModal(null); setEditingHistoryCall(null); }} style={{ background: '#f1f5f9', border: 'none', borderRadius: '6px', padding: '0.4rem', cursor: 'pointer', color: textMuted }}>
+                  <X size={18} />
+                </HelpButton>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: `1px solid ${borderLight}`, paddingBottom: '0.4rem', marginBottom: '0.8rem' }}>
+                <h3 style={{ margin: 0, fontSize: '0.9rem', color: textDark, fontWeight: 700 }}>
+                  📞 Historial de Llamadas Individuales Registradas
+                </h3>
+              </div>
+
+              {displayCalls.length === 0 ? (
+                <div style={{ padding: '1.5rem', textAlign: 'center', background: '#f1f5f9', borderRadius: '8px', color: textMuted, fontSize: '0.85rem' }}>
+                  No hay historial de llamadas previas registradas para este integrante.
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                  {displayCalls.map((call, idx) => {
+                    const isEditing = editingHistoryCall?.callId === call.id && editingHistoryCall?.managerId === m.id;
+                    return (
+                      <div key={call.id || idx} style={{ padding: '0.8rem', background: '#f8fafc', borderRadius: '8px', border: `1px solid ${borderLight}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        {isEditing ? (
+                          <div style={{ display: 'flex', gap: '0.5rem', width: '100%', alignItems: 'center' }}>
+                            <input type="date" value={editingHistoryCall.fecha} onChange={e => setEditingHistoryCall({...editingHistoryCall, fecha: e.target.value})} style={{ padding: '0.4rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.85rem' }} />
+                            <select value={editingHistoryCall.asistio ? 'SI' : 'NO'} onChange={e => setEditingHistoryCall({...editingHistoryCall, asistio: e.target.value === 'SI'})} style={{ padding: '0.4rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.85rem' }}>
+                              <option value="SI">SÍ Asistió</option>
+                              <option value="NO">NO Asistió</option>
+                            </select>
+                            <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.4rem' }}>
+                              <button onClick={() => { handleEditHistoryCall(m.id, call.id, editingHistoryCall.fecha, editingHistoryCall.asistio); }} style={{ background: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.4rem 0.8rem', fontWeight: 700, cursor: 'pointer' }}>Guardar</button>
+                              <button onClick={() => setEditingHistoryCall(null)} style={{ background: '#94a3b8', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.4rem 0.8rem', fontWeight: 700, cursor: 'pointer' }}>Cancelar</button>
+                            </div>
+                          </div>
+                        ) : (
+                          <>
+                            <div>
+                              <div style={{ fontWeight: 800, color: textDark, fontSize: '0.9rem' }}>{call.fecha || 'Sin fecha'}</div>
+                              <div style={{ fontSize: '0.75rem', color: '#16a34a', marginTop: '2px' }}>
+                                📹 {call.tipoContacto || 'Videollamada de Google Meet'} ({call.duracionMinutos || '20-30 min'})
+                              </div>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                              <span style={{ fontSize: '0.8rem', fontWeight: 800, color: call.asistio ? '#10b981' : '#ef4444' }}>
+                                {call.asistio ? '✅ SÍ Asistió' : '❌ NO Asistió'}
+                              </span>
+                              {(userCanLoadCalls || isGlobalQTCoordinator(currentUser) || isMaestriaCoordinator(currentUser) || (currentUser && currentUser.isDireccion)) && (
+                                <div style={{ display: 'flex', gap: '0.6rem' }}>
+                                  <button onClick={() => setEditingHistoryCall({ managerId: m.id, callId: call.id, fecha: call.fecha || '', asistio: call.asistio })} style={{ background: 'transparent', border: 'none', color: '#3b82f6', cursor: 'pointer', padding: '0.2rem' }} title="Editar">✏️</button>
+                                  <button onClick={async () => { await handleDeleteHistoryCall(m.id, call.id); }} style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0.2rem' }} title="Eliminar">🗑️</button>
+                                </div>
+                              )}
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })()}
+
       {managerCardModal && (() => {
         const m = managerCardModal;
         const equipoKey = m.equipo ? `${normalizeSede(m.sede)}_${String(m.equipo).trim().toUpperCase()}` : null;
@@ -7077,16 +7232,24 @@ export default function CentroManagers() {
                         </div>
                       )}
                     </div>
-                    <span style={{ 
-                      fontSize: '0.7rem', 
-                      fontWeight: 700, 
-                      padding: '0.15rem 0.4rem', 
-                      borderRadius: '4px',
-                      background: call.asistio ? '#dcfce7' : '#fee2e2',
-                      color: call.asistio ? '#16a34a' : '#dc2626'
-                    }}>
-                      {call.asistio ? '✅ Efectiva' : '❌ Ausente'}
-                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                      <span style={{ 
+                        fontSize: '0.7rem', 
+                        fontWeight: 700, 
+                        padding: '0.15rem 0.4rem', 
+                        borderRadius: '4px',
+                        background: call.asistio ? '#dcfce7' : '#fee2e2',
+                        color: call.asistio ? '#16a34a' : '#dc2626'
+                      }}>
+                        {call.asistio ? '✅ Efectiva' : '❌ Ausente'}
+                      </span>
+                      {(userCanLoadCalls || isGlobalQTCoordinator(currentUser) || isMaestriaCoordinator(currentUser) || (currentUser && currentUser.isDireccion)) && (!call.tipo || call.tipo === 'individual') && (
+                        <div style={{ display: 'flex', gap: '0.3rem' }}>
+                          <button onClick={() => { setManagerCardModal(null); setHistoryModal(m); setTimeout(() => setEditingHistoryCall({ managerId: m.id, callId: call.id, fecha: call.fecha || '', asistio: call.asistio }), 100); }} style={{ background: 'transparent', border: 'none', color: '#3b82f6', cursor: 'pointer', padding: '0.2rem' }} title="Editar">✏️</button>
+                          <button onClick={() => { setManagerCardModal(null); setHistoryModal(m); }} style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0.2rem' }} title="Eliminar">🗑️</button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 ))}
                 {unifiedHistory.length === 0 && (
@@ -7190,8 +7353,28 @@ export default function CentroManagers() {
                           {(Array.isArray(m.llamadasHistorial) ? m.llamadasHistorial : [])
                             .slice().sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''))
                             .map(call => (
-                              <div key={call.id} style={{ marginTop: '0.25rem', fontSize: '0.7rem', color: textMuted }}>
-                                {call.fecha || 'Sin fecha'} · {call.tipo === 'grupal' ? 'Grupal' : 'Individual'} · {call.asistio ? 'Asistió' : 'No asistió'}
+                              <div key={call.id} style={{ marginTop: '0.25rem', fontSize: '0.7rem', color: textMuted, display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                                {editingHistoryCall?.callId === call.id && editingHistoryCall?.managerId === m.id ? (
+                                  <>
+                                    <input type="date" value={editingHistoryCall.fecha} onChange={e => setEditingHistoryCall({...editingHistoryCall, fecha: e.target.value})} style={{ padding: '0.1rem', fontSize: '0.65rem' }} />
+                                    <select value={editingHistoryCall.asistio ? 'SI' : 'NO'} onChange={e => setEditingHistoryCall({...editingHistoryCall, asistio: e.target.value === 'SI'})} style={{ padding: '0.1rem', fontSize: '0.65rem' }}>
+                                      <option value="SI">Asistió</option>
+                                      <option value="NO">No asistió</option>
+                                    </select>
+                                    <button onClick={() => handleEditHistoryCall(m.id, call.id, editingHistoryCall.fecha, editingHistoryCall.asistio)} style={{ cursor: 'pointer', background: '#10b981', color: 'white', border: 'none', borderRadius: '3px', padding: '0.1rem 0.3rem' }}>Guardar</button>
+                                    <button onClick={() => setEditingHistoryCall(null)} style={{ cursor: 'pointer', background: '#64748b', color: 'white', border: 'none', borderRadius: '3px', padding: '0.1rem 0.3rem' }}>Cancelar</button>
+                                  </>
+                                ) : (
+                                  <>
+                                    <span>{call.fecha || 'Sin fecha'} · {call.tipo === 'grupal' ? 'Grupal' : 'Individual'} · {call.asistio ? 'Asistió' : 'No asistió'}</span>
+                                    {userCanLoadCalls && call.tipo === 'individual' && (
+                                      <>
+                                        <span onClick={() => setEditingHistoryCall({ managerId: m.id, callId: call.id, fecha: call.fecha || '', asistio: call.asistio })} style={{ cursor: 'pointer', color: '#3b82f6', marginLeft: '4px' }}>✏️</span>
+                                        <span onClick={() => handleDeleteHistoryCall(m.id, call.id)} style={{ cursor: 'pointer', color: '#ef4444' }}>🗑️</span>
+                                      </>
+                                    )}
+                                  </>
+                                )}
                                 {call.id && notasSeguimiento.find(note => note.relatedCallId === call.id)?.nota
                                   ? ` · Nota: ${notasSeguimiento.find(note => note.relatedCallId === call.id).nota}`
                                   : ''}

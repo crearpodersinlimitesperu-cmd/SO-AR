@@ -26,7 +26,7 @@
     ],
     "rewrites": [
       {
-        "source": "**",
+        "source": "!**/*.@(js|css|map|png|jpg|jpeg|gif|svg|ico|webp|woff|woff2|ttf|eot|json|pdf)",
         "destination": "/index.html"
       }
     ],

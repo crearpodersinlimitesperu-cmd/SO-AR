@@ -73,6 +73,8 @@ export const USERS_TO_IMPORT = [
     "role": "inactivo",
     "roles": [],
     "active": false,
+    "isActive": false,
+    "status": "inactive",
     "estado": "inactivo",
     "motivo": "Renuncia (28/10/2026)",
     "deactivationReason": "Renuncia voluntaria a Gerencia Cuenca",
@@ -343,7 +345,9 @@ export const USERS_TO_IMPORT = [
     "name": "Josue Vera",
     "role": "gerente",
     "roles": [
-      "gerente"
+      "gerente",
+      "entrenador",
+      "entrenador_llamadas"
     ],
     "sede": "Guayaquil",
     "emails": [

@@ -2,6 +2,8 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getManagersPipeline, getDualTasks, signoffDualTask } from '../services/callCoachService';
+import { recordIndividualCall, editIndividualCallInHistory, deleteIndividualCallFromHistory } from '../services/callHistoryService';
+import { db } from '../services/firebase';
 import ChecklistBoard from './ChecklistBoard';
 import { toast } from 'react-hot-toast';
 import { 
@@ -132,6 +134,78 @@ export default function CallCoachCRM() {
     );
   }
 
+  
+  const [isRegisteringCall, setIsRegisteringCall] = useState(false);
+  const [newCallData, setNewCallData] = useState({ fecha: new Date().toISOString().slice(0, 10), asistio: true });
+  const [editingCallId, setEditingCallId] = useState(null);
+  
+  const handleRegisterCall = async (manager) => {
+    if (!newCallData.fecha) return toast.error('La fecha es obligatoria');
+    try {
+      setIsRegisteringCall(true);
+      const callId = `call_${Date.now()}`;
+      await recordIndividualCall(db, {
+        manager,
+        callId,
+        fecha: newCallData.fecha,
+        asistio: newCallData.asistio,
+        registradoPorEmail: currentUser?.email || '',
+        registradoPorNombre: currentUser?.name || ''
+      });
+      
+      toast.success('Llamada registrada correctamente');
+      setReload(prev => prev + 1);
+      
+      // Update selected manager local state to show immediately
+      const newCall = { id: callId, tipo: 'individual', fecha: newCallData.fecha, asistio: newCallData.asistio };
+      const currentHistory = Array.isArray(manager.llamadasHistorial) ? manager.llamadasHistorial : [];
+      setSelectedManagerForHistory({
+        ...manager,
+        llamadasHistorial: [...currentHistory, newCall],
+        llamadaFecha: newCallData.fecha,
+        llamadaAsistio: newCallData.asistio ? 'SI' : 'NO'
+      });
+    } catch (e) {
+      console.error(e);
+      toast.error('Error al registrar la llamada');
+    } finally {
+      setIsRegisteringCall(false);
+    }
+  };
+
+  const handleEditCall = async (manager, callId) => {
+    if (!newCallData.fecha) return toast.error('La fecha es obligatoria');
+    try {
+      await editIndividualCallInHistory(db, manager, callId, newCallData.fecha, newCallData.asistio);
+      toast.success('Llamada editada correctamente');
+      setReload(prev => prev + 1);
+      setEditingCallId(null);
+      
+      const currentHistory = Array.isArray(manager.llamadasHistorial) ? manager.llamadasHistorial : [];
+      const updatedHistory = currentHistory.map(c => c.id === callId ? { ...c, fecha: newCallData.fecha, asistio: newCallData.asistio } : c);
+      setSelectedManagerForHistory({ ...manager, llamadasHistorial: updatedHistory });
+    } catch (e) {
+      console.error(e);
+      toast.error('Error al editar la llamada');
+    }
+  };
+
+  const handleDeleteCall = async (manager, callId) => {
+    if (!window.confirm('¿Estás seguro de eliminar esta llamada del historial?')) return;
+    try {
+      await deleteIndividualCallFromHistory(db, manager, callId);
+      toast.success('Llamada eliminada correctamente');
+      setReload(prev => prev + 1);
+      
+      const currentHistory = Array.isArray(manager.llamadasHistorial) ? manager.llamadasHistorial : [];
+      const updatedHistory = currentHistory.filter(c => c.id !== callId);
+      setSelectedManagerForHistory({ ...manager, llamadasHistorial: updatedHistory });
+    } catch (e) {
+      console.error(e);
+      toast.error('Error al eliminar la llamada');
+    }
+  };
+  
   const redManagers = pipeline.filter(m => m.status === 'RED');
   const otherManagers = pipeline.filter(m => m.status !== 'RED');
 
@@ -520,9 +594,20 @@ export default function CallCoachCRM() {
             </div>
 
             {/* LISTA DE HISTORIAL */}
-            <h3 style={{ fontSize: '0.9rem', color: 'var(--text-heading)', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.4rem', marginBottom: '0.8rem', fontWeight: 700 }}>
-              📞 Historial de Llamadas Registradas
-            </h3>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.4rem', marginBottom: '0.8rem' }}>
+              <h3 style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-heading)', fontWeight: 700 }}>
+                📞 Historial de Llamadas Registradas
+              </h3>
+            </div>
+            
+            <div style={{ background: 'rgba(56, 189, 248, 0.1)', border: '1px solid rgba(56, 189, 248, 0.3)', padding: '1rem', borderRadius: '8px', marginBottom: '1.2rem' }}>
+              <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#38bdf8', marginBottom: '0.6rem' }}>Cargar Nueva Llamada</div>
+              <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center' }}>
+                <input type="date" value={newCallData.fecha} onChange={e => setNewCallData({...newCallData, fecha: e.target.value})} style={{ padding: '0.45rem', borderRadius: '6px', border: '1px solid var(--border-subtle)', background: 'var(--bg-dark)', color: 'var(--text-main)' }} />
+                <button disabled={isRegisteringCall} onClick={() => { setNewCallData({...newCallData, asistio: true}); handleRegisterCall(selectedManagerForHistory); }} style={{ background: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.5rem 1rem', fontWeight: 700, cursor: isRegisteringCall ? 'wait' : 'pointer', flex: 1 }}>✅ SÍ Asistió</button>
+                <button disabled={isRegisteringCall} onClick={() => { setNewCallData({...newCallData, asistio: false}); handleRegisterCall(selectedManagerForHistory); }} style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.5rem 1rem', fontWeight: 700, cursor: isRegisteringCall ? 'wait' : 'pointer', flex: 1 }}>❌ NO Asistió</button>
+              </div>
+            </div>
 
             {(() => {
               const rawCalls = Array.isArray(selectedManagerForHistory.llamadasHistorial)
@@ -550,7 +635,9 @@ export default function CallCoachCRM() {
 
               return (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-                  {displayCalls.map((call, idx) => (
+                  {displayCalls.map((call, idx) => {
+                    const isEditing = editingCallId === (call.id || idx);
+                    return (
                     <div 
                       key={call.id || idx} 
                       style={{ 
@@ -560,36 +647,58 @@ export default function CallCoachCRM() {
                         border: '1px solid var(--border-subtle)' 
                       }}
                     >
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
-                        <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-heading)' }}>
-                          {call.fecha || 'Sin fecha'} &bull; {call.tipo === 'grupal' ? 'Llamada Grupal' : 'Llamada Individual'}
-                        </span>
-                        <span style={{ 
-                          fontSize: '0.72rem', 
-                          fontWeight: 700, 
-                          padding: '0.2rem 0.5rem', 
-                          borderRadius: '4px',
-                          background: call.asistio ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
-                          color: call.asistio ? '#10b981' : '#ef4444'
-                        }}>
-                          {call.asistio ? '✅ Asistió (Efectiva)' : '❌ Ausente'}
-                        </span>
-                      </div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                        Formato: {call.tipoContacto || STANDARD_CALL_CONTACT_TYPE} ({call.duracionMinutos || STANDARD_CALL_DURATION})
-                      </div>
-                      {call.notaVozEnviada && (
-                        <div style={{ fontSize: '0.7rem', color: '#38bdf8', marginTop: '2px' }}>
-                          🎙️ Nota de voz al Coordinador confirmada
+                      {isEditing ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <input type="date" value={newCallData.fecha} onChange={e => setNewCallData({...newCallData, fecha: e.target.value})} style={{ padding: '0.3rem', borderRadius: '4px', border: '1px solid var(--border-subtle)', background: 'var(--bg-dark)' }} />
+                          <select value={newCallData.asistio ? 'SI' : 'NO'} onChange={e => setNewCallData({...newCallData, asistio: e.target.value === 'SI'})} style={{ padding: '0.3rem', borderRadius: '4px', border: '1px solid var(--border-subtle)', background: 'var(--bg-dark)' }}>
+                            <option value="SI">Asistió</option>
+                            <option value="NO">No asistió</option>
+                          </select>
+                          <button onClick={() => handleEditCall(selectedManagerForHistory, call.id)} style={{ background: '#10b981', color: '#fff', border: 'none', borderRadius: '4px', padding: '0.3rem 0.6rem', cursor: 'pointer', fontWeight: 700 }}>Guardar</button>
+                          <button onClick={() => setEditingCallId(null)} style={{ background: '#64748b', color: '#fff', border: 'none', borderRadius: '4px', padding: '0.3rem 0.6rem', cursor: 'pointer', fontWeight: 700 }}>Cancelar</button>
                         </div>
-                      )}
-                      {call.registradoPorNombre && (
-                        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '2px' }}>
-                          Registrado por: {call.registradoPorNombre} {call.registradoPorEmail ? `(${call.registradoPorEmail})` : ''}
-                        </div>
+                      ) : (
+                        <>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
+                            <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-heading)' }}>
+                              {call.fecha || 'Sin fecha'} &bull; {call.tipo === 'grupal' ? 'Llamada Grupal' : 'Llamada Individual'}
+                            </span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                              <span style={{ 
+                                fontSize: '0.72rem', 
+                                fontWeight: 700, 
+                                padding: '0.2rem 0.5rem', 
+                                borderRadius: '4px',
+                                background: call.asistio ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                                color: call.asistio ? '#10b981' : '#ef4444'
+                              }}>
+                                {call.asistio ? '✅ Asistió (Efectiva)' : '❌ Ausente'}
+                              </span>
+                              {call.tipo === 'individual' && (
+                                <>
+                                  <button onClick={() => { setEditingCallId(call.id || idx); setNewCallData({ fecha: call.fecha || '', asistio: call.asistio }); }} title="Editar" style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#38bdf8' }}>✏️</button>
+                                  <button onClick={() => handleDeleteCall(selectedManagerForHistory, call.id)} title="Eliminar" style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#ef4444' }}>🗑️</button>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                            Formato: {call.tipoContacto || STANDARD_CALL_CONTACT_TYPE} ({call.duracionMinutos || STANDARD_CALL_DURATION})
+                          </div>
+                          {call.notaVozEnviada && (
+                            <div style={{ fontSize: '0.7rem', color: '#38bdf8', marginTop: '2px' }}>
+                              🎙️ Nota de voz al Coordinador confirmada
+                            </div>
+                          )}
+                          {call.registradoPorNombre && (
+                            <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                              Registrado por: {call.registradoPorNombre} {call.registradoPorEmail ? `(${call.registradoPorEmail})` : ''}
+                            </div>
+                          )}
+                        </>
                       )}
                     </div>
-                  ))}
+                  )})}
                 </div>
               );
             })()}
