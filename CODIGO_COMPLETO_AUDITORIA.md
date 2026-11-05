@@ -93838,6 +93838,43 @@ import {
   subscribeToNodusContabilidad,
   queryNodusAssistant
 } from '../services/nodusLiveSyncService';
+import { db } from '../services/firebase';
+import { doc, setDoc } from 'firebase/firestore';
+
+function normalizeCleanName(str) {
+  return String(str || '')
+    .toUpperCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^A-Z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function matchPersonNames(a, b) {
+  const sTokens = normalizeCleanName(a).split(' ').filter(Boolean);
+  const nTokens = normalizeCleanName(b).split(' ').filter(Boolean);
+  if (sTokens.length === 0 || nTokens.length === 0) return false;
+  const common = sTokens.filter(t => nTokens.includes(t));
+  return common.length >= Math.min(2, sTokens.length, nTokens.length) && common.length >= Math.ceil(Math.min(sTokens.length, nTokens.length) * 0.65);
+}
+
+function parseCsvRows(text) {
+  const lines = String(text || '').split(/\r?\n/).filter(l => l.trim().length > 0);
+  return lines.map(line => {
+    if (line.includes('\t')) {
+      return line.split('\t').map(c => c.trim());
+    }
+    const matches = line.match(/(?:^|,)("(?:[^"]|"")*"|[^,]*)/g) || [];
+    return matches.map(m => {
+      let val = m.replace(/^,/, '').trim();
+      if (val.startsWith('"') && val.endsWith('"')) {
+        val = val.slice(1, -1).replace(/""/g, '"').trim();
+      }
+      return val;
+    });
+  });
+}
 
 export default function NodusLiveModulesDashboard() {
   const [activeTab, setActiveTab] = useState('aliados');
@@ -93847,6 +93884,11 @@ export default function NodusLiveModulesDashboard() {
   const [selectedEquipoId, setSelectedEquipoId] = useState('149');
   const [selectedQuantumFilter, setSelectedQuantumFilter] = useState('ALL');
   const [selectedAliadoPxModal, setSelectedAliadoPxModal] = useState(null);
+  const [showSheetLinker, setShowSheetLinker] = useState(false);
+  const [sheetUrlInput, setSheetUrlInput] = useState('');
+  const [sheetPasteInput, setSheetPasteInput] = useState('');
+  const [sheetSyncStatus, setSheetSyncStatus] = useState('');
+  const [sheetSyncLoading, setSheetSyncLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [assistantInput, setAssistantInput] = useState('cuantos pagos cerraron en c1 32');
   const [assistantResponse, setAssistantResponse] = useState(null);
@@ -93896,25 +93938,301 @@ export default function NodusLiveModulesDashboard() {
     }, 800);
   };
 
+  // Lista ordenada de todos los equipos extraídos de Nodus
+  const allTeamsList = Object.values(aliadosData?.equipos || {})
+    .sort((a, b) => Number(b.equipoId) - Number(a.equipoId));
+
+  // Opciones completas del selector (incluyendo equipos con datos y catálogo disponible en Nodus)
+  const selectorOptions = (() => {
+    const map = new Map();
+    allTeamsList.forEach(eq => {
+      map.set(String(eq.equipoId), {
+        id: String(eq.equipoId),
+        nombre: eq.equipoNombre,
+        hasData: true,
+        hasSheetContrast: Boolean(eq.hasSheetContrast),
+        pagos: eq.metrics?.pasaronC2 || 0,
+        aliadosCount: eq.aliados?.length || 0
+      });
+    });
+    (aliadosData?.equiposDisponibles || []).forEach(opt => {
+      if (!map.has(String(opt.id))) {
+        map.set(String(opt.id), {
+          id: String(opt.id),
+          nombre: opt.nombre,
+          hasData: false,
+          hasSheetContrast: false,
+          pagos: 0,
+          aliadosCount: 0
+        });
+      }
+    });
+    return Array.from(map.values()).sort((a, b) => Number(b.id) - Number(a.id));
+  })();
+
   // Aliados del equipo seleccionado (por defecto 149 / Lima Ciclo 1)
   const currentTeamAliados = aliadosData?.equipos?.[selectedEquipoId] || aliadosData?.latestEquipo || {
-    equipoId: '149',
-    equipoNombre: '32 - Lima Ciclo 1',
+    equipoId: selectedEquipoId,
+    equipoNombre: selectorOptions.find(o => o.id === String(selectedEquipoId))?.nombre || `EQUIPO ID ${selectedEquipoId}`,
     metrics: {
-      totalPersonas: 96,
-      pasaronC2: 24,
-      pagaronC2: 18,
-      pagaronC2MJ: 6,
-      abonos: 11,
-      aliadosAsignados: 17
+      totalPersonas: 0,
+      pxConGrupoNodus: 0,
+      pasaronC2: 0,
+      pagaronC2: 0,
+      pagaronC2MJ: 0,
+      abonos: 0,
+      aliadosAsignados: 0
     },
-    aliados: [
-      { aliado: 'Alianza Estratégica Lima 1', asignados: 8, c1: 8, pasaronC2: 3, pagaronC2: 2, pagaronC2MJ: 1, abono: 1, c2: 'Sí', c3: 'En curso' },
-      { aliado: 'Equipo Expansión Miraflores', asignados: 6, c1: 6, pasaronC2: 2, pagaronC2: 2, pagaronC2MJ: 0, abono: 1, c2: 'Sí', c3: 'En curso' },
-      { aliado: 'Liderazgo Central Lima', asignados: 12, c1: 12, pasaronC2: 4, pagaronC2: 3, pagaronC2MJ: 1, abono: 2, c2: 'Sí', c3: 'En curso' },
-      { aliado: 'Red Aliados San Isidro', asignados: 10, c1: 10, pasaronC2: 3, pagaronC2: 2, pagaronC2MJ: 1, abono: 1, c2: 'Sí', c3: 'En curso' },
-      { aliado: 'Red Aliados Surco', asignados: 9, c1: 9, pasaronC2: 2, pagaronC2: 2, pagaronC2MJ: 0, abono: 1, c2: 'Sí', c3: 'En curso' }
-    ]
+    aliados: [],
+    feedbackQT: [],
+    aliadosDeclaradosC2: [],
+    participantesC2Nodus: []
+  };
+
+  const handleSyncTeamSheet = async () => {
+    setSheetSyncLoading(true);
+    setSheetSyncStatus('');
+    try {
+      let csvText = sheetPasteInput.trim();
+      let cleanSheetUrl = sheetUrlInput.trim() || currentTeamAliados.sheetUrl || '';
+
+      if (!csvText && cleanSheetUrl) {
+        const mId = cleanSheetUrl.match(/\/d\/([a-zA-Z0-9-_]+)/);
+        const mGid = cleanSheetUrl.match(/gid=(\d+)/);
+        if (!mId) {
+          throw new Error('URL de Google Sheet inválida. Asegúrate de pegar el enlace completo de Google Sheets.');
+        }
+        const sheetId = mId[1];
+        const gid = mGid ? mGid[1] : '0';
+        const exportUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&gid=${gid}`;
+        const res = await fetch(exportUrl);
+        if (!res.ok) {
+          throw new Error('La hoja tiene acceso restringido en el navegador. Copia y pega las celdas de la tabla de Aliados/QT en el cuadro inferior.');
+        }
+        const fetched = await res.text();
+        if (fetched.includes('<!DOCTYPE html>') || fetched.includes('<html')) {
+          throw new Error('La hoja requiere permisos o pegar directamente las celdas (Ctrl+C / Ctrl+V) en el cuadro de texto inferior.');
+        }
+        csvText = fetched;
+      }
+
+      if (!csvText) {
+        throw new Error('Ingresa la URL de un Google Sheet público o pega las filas de la hoja de QT & Aliados.');
+      }
+
+      const rows = parseCsvRows(csvText);
+      const parsedAliadosSheet = [];
+      const parsedFeedbackQT = [];
+      let inFeedback = false;
+      let parsedTotals = null;
+
+      for (let i = 0; i < rows.length; i++) {
+        const r = rows[i] || [];
+        const c0 = String(r[0] || '').trim();
+        const c1 = String(r[1] || '').trim();
+        if (c0.toUpperCase().includes('FEEDBACK QT')) {
+          inFeedback = true;
+          continue;
+        }
+        if (c0.toUpperCase() === 'QUANTUM' || c1.toUpperCase() === 'ALIADO') continue;
+
+        if (!inFeedback) {
+          if (!c0 && !c1 && (parseInt(r[2], 10) || 0) >= 15) {
+            parsedTotals = {
+              px: parseInt(r[2], 10) || 0,
+              desertor: parseInt(r[3], 10) || 0,
+              pxFin: parseInt(r[4], 10) || 0,
+              declaracion: parseInt(r[5], 10) || 0,
+              c2: parseInt(r[7], 10) || 0,
+              c2mj: parseInt(r[8], 10) || 0,
+              abono: parseInt(r[9], 10) || 0,
+              pagos: parseInt(r[12], 10) || ((parseInt(r[7], 10) || 0) + (parseInt(r[8], 10) || 0)),
+              pp: r[13] || '0%'
+            };
+            continue;
+          }
+          if (c0 && c1 && !c1.toUpperCase().includes('SIN GRUPO')) {
+            const c2Val = parseInt(r[7], 10) || 0;
+            const c2mjVal = parseInt(r[8], 10) || 0;
+            const pagosVal = parseInt(r[12], 10) || (c2Val + c2mjVal);
+            const pxFinVal = parseInt(r[4], 10) || (parseInt(r[2], 10) || 0);
+            parsedAliadosSheet.push({
+              quantum: c0,
+              aliado: c1,
+              px: parseInt(r[2], 10) || 0,
+              desertor: parseInt(r[3], 10) || 0,
+              pxFin: pxFinVal,
+              declaracion: parseInt(r[5], 10) || 0,
+              c2: c2Val,
+              c2mj: c2mjVal,
+              abono: parseInt(r[9], 10) || 0,
+              pagos: pagosVal,
+              pp: r[13] || (pxFinVal > 0 ? `${Math.round((pagosVal / pxFinVal) * 100)}%` : '0%')
+            });
+          }
+        } else {
+          if (c0.toUpperCase().includes('CAPITULO')) break;
+          if (c0 && (parseInt(r[1], 10) || 0) > 0) {
+            parsedFeedbackQT.push({
+              quantum: c0,
+              px: parseInt(r[1], 10) || 0,
+              desertor: parseInt(r[2], 10) || 0,
+              pxFin: parseInt(r[3], 10) || 0,
+              declaracion: parseInt(r[4], 10) || 0,
+              c2: parseInt(r[5], 10) || 0,
+              c2mj: parseInt(r[6], 10) || 0,
+              abono: parseInt(r[7], 10) || 0,
+              pagos: parseInt(r[10], 10) || ((parseInt(r[5], 10) || 0) + (parseInt(r[6], 10) || 0)),
+              pp: r[11] || '0%'
+            });
+          }
+        }
+      }
+
+      if (parsedAliadosSheet.length === 0) {
+        throw new Error('No se detectaron filas con formato QUANTUM | ALIADO | PX | DESERTOR | PX FIN | DECLARACION | ... | C2 | C2+MJ.');
+      }
+
+      const nodusMap = new Map();
+      (currentTeamAliados.aliados || []).forEach(a => {
+        nodusMap.set(normalizeCleanName(a.aliadoNodus || a.aliado), a);
+      });
+
+      const matchedKeys = new Set();
+      const contrastedAliados = parsedAliadosSheet.map(sa => {
+        let matched = null;
+        for (const [k, v] of nodusMap.entries()) {
+          if (matchPersonNames(sa.aliado, v.aliadoNodus || v.aliado)) {
+            matched = v;
+            matchedKeys.add(k);
+            break;
+          }
+        }
+        const pxNodus = matched ? (matched.pxNodus ?? matched.asignados ?? 0) : 0;
+        const pagosNodus = matched ? (matched.pagosNodus ?? matched.pasaronC2 ?? 0) : 0;
+        return {
+          quantum: sa.quantum,
+          aliado: sa.aliado,
+          aliadoNodus: matched?.aliadoNodus || sa.aliado,
+          telefono: matched?.telefono || '',
+          enNodus: Boolean(matched),
+          declaradoC2Nodus: Boolean(matched?.declaradoC2Nodus),
+          pxSheet: sa.px,
+          pxNodus,
+          desertor: sa.desertor,
+          pxFin: sa.pxFin,
+          declaracion: sa.declaracion,
+          c2: sa.c2,
+          c2mj: sa.c2mj,
+          abono: sa.abono,
+          pagosSheet: sa.pagos,
+          pagosNodus,
+          pp: sa.pp,
+          cuadrado: Boolean(matched) && sa.px === pxNodus && sa.pagos === pagosNodus,
+          participantesAsignados: matched?.participantesAsignados || [],
+          asignados: sa.px,
+          c1: sa.pxFin,
+          pasaronC2: sa.declaracion,
+          pagaronC2: sa.c2,
+          pagaronC2MJ: sa.c2mj
+        };
+      });
+
+      // Si no venía tabla FEEDBACK QT explícita, agrupar por Quantum automáticamente
+      const finalFeedbackQT = parsedFeedbackQT.length > 0
+        ? parsedFeedbackQT.map(qt => {
+            const group = contrastedAliados.filter(a => normalizeCleanName(a.quantum) === normalizeCleanName(qt.quantum));
+            const pxNodus = group.reduce((s, a) => s + (a.pxNodus || 0), 0);
+            const pagosNodus = group.reduce((s, a) => s + (a.pagosNodus || 0), 0);
+            return {
+              ...qt,
+              totalAliadosQT: group.length,
+              pxNodus,
+              pagosNodus,
+              cuadradoConNodus: qt.px === pxNodus && qt.pagos === pagosNodus
+            };
+          })
+        : (() => {
+            const qMap = new Map();
+            contrastedAliados.forEach(a => {
+              const qName = a.quantum || 'SIN QT';
+              if (!qMap.has(qName)) {
+                qMap.set(qName, { quantum: qName, totalAliadosQT: 0, px: 0, pxNodus: 0, desertor: 0, pxFin: 0, declaracion: 0, c2: 0, c2mj: 0, abono: 0, pagos: 0, pagosNodus: 0, pp: '0%', cuadradoConNodus: true });
+              }
+              const q = qMap.get(qName);
+              q.totalAliadosQT++;
+              q.px += a.pxSheet || 0;
+              q.pxNodus += a.pxNodus || 0;
+              q.desertor += a.desertor || 0;
+              q.pxFin += a.pxFin || 0;
+              q.declaracion += a.declaracion || 0;
+              q.c2 += a.c2 || 0;
+              q.c2mj += a.c2mj || 0;
+              q.abono += a.abono || 0;
+              q.pagos += a.pagosSheet || 0;
+              q.pagosNodus += a.pagosNodus || 0;
+              q.pp = q.pxFin > 0 ? `${Math.round((q.pagos / q.pxFin) * 100)}%` : '0%';
+              q.cuadradoConNodus = q.px === q.pxNodus && q.pagos === q.pagosNodus;
+            });
+            return Array.from(qMap.values());
+          })();
+
+      const sumPxSheet = parsedTotals?.px || contrastedAliados.reduce((s, a) => s + (a.pxSheet || 0), 0);
+      const sumDesertores = parsedTotals?.desertor || contrastedAliados.reduce((s, a) => s + (a.desertor || 0), 0);
+      const sumPxFin = parsedTotals?.pxFin || contrastedAliados.reduce((s, a) => s + (a.pxFin || 0), 0);
+      const sumDecl = parsedTotals?.declaracion || contrastedAliados.reduce((s, a) => s + (a.declaracion || 0), 0);
+      const sumC2 = parsedTotals?.c2 || contrastedAliados.reduce((s, a) => s + (a.c2 || 0), 0);
+      const sumC2MJ = parsedTotals?.c2mj || contrastedAliados.reduce((s, a) => s + (a.c2mj || 0), 0);
+      const sumAbono = parsedTotals?.abono || contrastedAliados.reduce((s, a) => s + (a.abono || 0), 0);
+      const sumPagos = parsedTotals?.pagos || (sumC2 + sumC2MJ);
+
+      const updatedTeam = {
+        ...currentTeamAliados,
+        hasSheetContrast: true,
+        sheetUrl: cleanSheetUrl || currentTeamAliados.sheetUrl || null,
+        metrics: {
+          ...currentTeamAliados.metrics,
+          totalPersonas: sumPxSheet,
+          desertores: sumDesertores,
+          pxFin: sumPxFin,
+          declaraciones: sumDecl,
+          pasaronC2: sumPagos,
+          pagaronC2: sumC2,
+          pagaronC2MJ: sumC2MJ,
+          abonos: sumAbono,
+          efectividadPP: sumPxFin > 0 ? `${Math.round((sumPagos / sumPxFin) * 100)}%` : '0%',
+          aliadosAsignados: contrastedAliados.length
+        },
+        aliados: contrastedAliados,
+        feedbackQT: finalFeedbackQT,
+        sheetTotals: {
+          px: sumPxSheet,
+          desertor: sumDesertores,
+          pxFin: sumPxFin,
+          declaracion: sumDecl,
+          c2: sumC2,
+          c2mj: sumC2MJ,
+          abono: sumAbono,
+          pagos: sumPagos,
+          pp: sumPxFin > 0 ? `${Math.round((sumPagos / sumPxFin) * 100)}%` : '0%'
+        },
+        extraidoAt: new Date().toISOString()
+      };
+
+      await setDoc(doc(db, 'nodus_aliados', 'latest'), {
+        equipos: {
+          ...(aliadosData?.equipos || {}),
+          [selectedEquipoId]: updatedTeam
+        }
+      }, { merge: true });
+
+      setSheetSyncStatus(`✅ Contrastado y guardado para ${currentTeamAliados.equipoNombre}: ${contrastedAliados.length} Aliados y ${finalFeedbackQT.length} Quantums.`);
+      setSheetPasteInput('');
+    } catch (err) {
+      setSheetSyncStatus(`⚠️ ${err.message}`);
+    } finally {
+      setSheetSyncLoading(false);
+    }
   };
 
   const currentMetrics = currentTeamAliados.metrics || {
@@ -94098,10 +94416,106 @@ export default function NodusLiveModulesDashboard() {
         </button>
       </div>
 
-      {/* CONTENIDO DE PESTAÑA: ALIADOS & CONTRASTE QT (NODUS vs GOOGLE SHEET) */}
+      {/* CONTENIDO DE PESTAÑA: ALIADOS & CONTRASTE QT (TODOS LOS EQUIPOS NODUS vs GOOGLE SHEET) */}
       {activeTab === 'aliados' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          {/* Selector de Equipo, Enlaces Oficiales y Buscador */}
+          {/* TABLA 0: MATRIZ MULTIEQUIPO DE TODOS LOS EQUIPOS ACTIVOS EN NODUS */}
+          {allTeamsList.length > 0 && (
+            <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '10px', overflow: 'hidden' }}>
+              <div style={{ padding: '0.95rem 1.25rem', borderBottom: '1px solid #334155', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem' }}>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: '#f8fafc' }}>
+                    🌎 Matriz Multiequipo Nodus (/aliados) — Todos los Equipos Sincronizados ({allTeamsList.length})
+                  </h3>
+                  <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginTop: '2px' }}>
+                    Haz clic en cualquier equipo para inspeccionar sus Aliados, Quantums (QT), Declarados a C2 y Participantes, o vincular su Google Sheet de QT & Aliados.
+                  </div>
+                </div>
+              </div>
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.82rem' }}>
+                  <thead>
+                    <tr style={{ background: '#0f172a', borderBottom: '1px solid #334155', color: '#94a3b8' }}>
+                      <th style={{ padding: '0.65rem 0.9rem' }}>ID</th>
+                      <th style={{ padding: '0.65rem 0.9rem' }}>Equipo & Sede (Nodus)</th>
+                      <th style={{ padding: '0.65rem 0.7rem', textAlign: 'center' }}>Aliados Activos</th>
+                      <th style={{ padding: '0.65rem 0.7rem', textAlign: 'center' }}>Declarados C2</th>
+                      <th style={{ padding: '0.65rem 0.7rem', textAlign: 'center' }}>PX Asignados</th>
+                      <th style={{ padding: '0.65rem 0.7rem', textAlign: 'center' }}>Pagos Totales C2</th>
+                      <th style={{ padding: '0.65rem 0.7rem', textAlign: 'center' }}>Solo C2</th>
+                      <th style={{ padding: '0.65rem 0.7rem', textAlign: 'center' }}>Combo C2+MJ</th>
+                      <th style={{ padding: '0.65rem 0.7rem', textAlign: 'center' }}>Abonos</th>
+                      <th style={{ padding: '0.65rem 0.7rem', textAlign: 'center' }}>% PP</th>
+                      <th style={{ padding: '0.65rem 0.9rem', textAlign: 'center' }}>Estado / Sheet QT</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {allTeamsList.map((eq, i) => {
+                      const isCurr = String(eq.equipoId) === String(selectedEquipoId);
+                      const m = eq.metrics || {};
+                      return (
+                        <tr
+                          key={eq.equipoId}
+                          onClick={() => {
+                            setSelectedEquipoId(String(eq.equipoId));
+                            setSelectedQuantumFilter('ALL');
+                            setSelectedAliadoPxModal(null);
+                          }}
+                          style={{
+                            borderBottom: '1px solid #334155',
+                            background: isCurr ? 'rgba(16, 185, 129, 0.14)' : (i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.015)'),
+                            cursor: 'pointer'
+                          }}
+                        >
+                          <td style={{ padding: '0.65rem 0.9rem', color: '#38bdf8', fontWeight: 800 }}>#{eq.equipoId}</td>
+                          <td style={{ padding: '0.65rem 0.9rem', fontWeight: 800, color: isCurr ? '#34d399' : '#f8fafc' }}>
+                            {eq.equipoNombre}
+                          </td>
+                          <td style={{ padding: '0.65rem 0.7rem', textAlign: 'center', fontWeight: 700, color: '#e2e8f0' }}>
+                            {eq.aliados?.length || 0}
+                          </td>
+                          <td style={{ padding: '0.65rem 0.7rem', textAlign: 'center', fontWeight: 700, color: '#c084fc' }}>
+                            {eq.aliadosDeclaradosC2?.length || m.aliadosDeclaradosC2 || 0}
+                          </td>
+                          <td style={{ padding: '0.65rem 0.7rem', textAlign: 'center', fontWeight: 700, color: '#f8fafc' }}>
+                            {m.totalPersonas || m.pxConGrupoNodus || 0}
+                          </td>
+                          <td style={{ padding: '0.65rem 0.7rem', textAlign: 'center', fontWeight: 800, color: '#10b981' }}>
+                            {m.pasaronC2 || 0}
+                          </td>
+                          <td style={{ padding: '0.65rem 0.7rem', textAlign: 'center', color: '#34d399', fontWeight: 700 }}>
+                            {m.pagaronC2 ?? m.pagaronC2Nodus ?? 0}
+                          </td>
+                          <td style={{ padding: '0.65rem 0.7rem', textAlign: 'center', color: '#a855f7', fontWeight: 700 }}>
+                            {m.pagaronC2MJ ?? m.pagaronC2MJNodus ?? 0}
+                          </td>
+                          <td style={{ padding: '0.65rem 0.7rem', textAlign: 'center', color: '#f59e0b', fontWeight: 700 }}>
+                            {m.abonos || 0}
+                          </td>
+                          <td style={{ padding: '0.65rem 0.7rem', textAlign: 'center', color: '#fbbf24', fontWeight: 800 }}>
+                            {m.efectividadPP || '0%'}
+                          </td>
+                          <td style={{ padding: '0.65rem 0.9rem', textAlign: 'center' }}>
+                            {eq.hasSheetContrast ? (
+                              <span style={{ background: 'rgba(16, 185, 129, 0.2)', color: '#34d399', padding: '2px 8px', borderRadius: '6px', fontSize: '0.73rem', fontWeight: 700 }}>
+                                ✅ Sheet QT + Nodus
+                              </span>
+                            ) : (
+                              <span style={{ background: 'rgba(14, 165, 233, 0.16)', color: '#38bdf8', padding: '2px 8px', borderRadius: '6px', fontSize: '0.73rem', fontWeight: 700 }}>
+                                ⚡ Nodus en Vivo
+                              </span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* Selector de Equipo, Enlaces Oficiales, Vinculador Sheet y Buscador */}
           <div style={{
             display: 'flex',
             flexWrap: 'wrap',
@@ -94114,12 +94528,13 @@ export default function NodusLiveModulesDashboard() {
             border: '1px solid #334155'
           }}>
             <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '0.75rem' }}>
-              <span style={{ fontSize: '0.9rem', color: '#94a3b8', fontWeight: 600 }}>Equipo en Nodus:</span>
+              <span style={{ fontSize: '0.9rem', color: '#94a3b8', fontWeight: 600 }}>Equipo Seleccionado:</span>
               <select
                 value={selectedEquipoId}
                 onChange={(e) => {
                   setSelectedEquipoId(e.target.value);
                   setSelectedQuantumFilter('ALL');
+                  setSelectedAliadoPxModal(null);
                 }}
                 style={{
                   background: '#0f172a',
@@ -94131,11 +94546,11 @@ export default function NodusLiveModulesDashboard() {
                   fontWeight: 700
                 }}
               >
-                <option value="149">32 - Lima Ciclo 1 (ID 149) — Contraste QT & Aliados</option>
-                <option value="148">31 - Lima Ciclo 1 (ID 148)</option>
-                <option value="145">28 - Cuenca Ciclo 1 (ID 145)</option>
-                <option value="144">27 - Quito Ciclo 1 (ID 144)</option>
-                <option value="146">29 - Guayaquil Ciclo 1 (ID 146)</option>
+                {selectorOptions.map(opt => (
+                  <option key={opt.id} value={opt.id}>
+                    {opt.nombre} (ID {opt.id}){opt.hasSheetContrast ? ' — ✅ Contraste Sheet QT' : (opt.hasData ? ` — ${opt.aliadosCount} Aliados / ${opt.pagos} Pagos` : '')}
+                  </option>
+                ))}
               </select>
 
               <a
@@ -94159,26 +94574,48 @@ export default function NodusLiveModulesDashboard() {
                 Nodus /aliados?id_equipo={selectedEquipoId} <ExternalLink size={13} />
               </a>
 
-              <a
-                href="https://docs.google.com/spreadsheets/d/1idAnwFZa_M9pHn5u1unam7Eboha4IhHYVMhuIjV7LCM/edit?gid=707401210#gid=707401210"
-                target="_blank"
-                rel="noreferrer"
+              {currentTeamAliados.sheetUrl && (
+                <a
+                  href={currentTeamAliados.sheetUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.35rem',
+                    background: 'rgba(16, 185, 129, 0.15)',
+                    border: '1px solid rgba(16, 185, 129, 0.4)',
+                    color: '#34d399',
+                    padding: '0.4rem 0.75rem',
+                    borderRadius: '6px',
+                    fontSize: '0.8rem',
+                    fontWeight: 700,
+                    textDecoration: 'none'
+                  }}
+                >
+                  Abrir Sheet QT & Aliados <ExternalLink size={13} />
+                </a>
+              )}
+
+              <button
+                onClick={() => {
+                  setShowSheetLinker(!showSheetLinker);
+                  setSheetUrlInput(currentTeamAliados.sheetUrl || '');
+                  setSheetSyncStatus('');
+                }}
                 style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.35rem',
-                  background: 'rgba(16, 185, 129, 0.15)',
-                  border: '1px solid rgba(16, 185, 129, 0.4)',
-                  color: '#34d399',
-                  padding: '0.4rem 0.75rem',
+                  background: showSheetLinker ? '#10b981' : 'rgba(168, 85, 247, 0.18)',
+                  border: '1px solid #a855f7',
+                  color: showSheetLinker ? '#0f172a' : '#c084fc',
+                  padding: '0.4rem 0.8rem',
                   borderRadius: '6px',
                   fontSize: '0.8rem',
-                  fontWeight: 700,
-                  textDecoration: 'none'
+                  fontWeight: 800,
+                  cursor: 'pointer'
                 }}
               >
-                Sheet Oficial QT & Aliados E32 <ExternalLink size={13} />
-              </a>
+                🔗 {currentTeamAliados.hasSheetContrast ? 'Actualizar Sheet QT de este Equipo' : 'Vincular Sheet QT & Aliados a este Equipo'}
+              </button>
             </div>
 
             <div style={{ position: 'relative', minWidth: '260px' }}>
@@ -94200,6 +94637,86 @@ export default function NodusLiveModulesDashboard() {
               />
             </div>
           </div>
+
+          {/* PANEL VINCULADOR DE GOOGLE SHEET DE QT & ALIADOS PARA CUALQUIER EQUIPO */}
+          {showSheetLinker && (
+            <div style={{
+              background: '#0f172a',
+              border: '1px solid #a855f7',
+              borderRadius: '10px',
+              padding: '1.1rem 1.25rem',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.75rem'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <strong style={{ color: '#c084fc', fontSize: '0.92rem' }}>
+                  🔗 Contrastar Google Sheet de QT & Aliados con Nodus ({currentTeamAliados.equipoNombre} — ID {selectedEquipoId})
+                </strong>
+                <button
+                  onClick={() => setShowSheetLinker(false)}
+                  style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '0.82rem' }}
+                >
+                  Cerrar ✕
+                </button>
+              </div>
+              <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+                <input
+                  type="text"
+                  value={sheetUrlInput}
+                  onChange={(e) => setSheetUrlInput(e.target.value)}
+                  placeholder="Pega aquí el link del Google Sheet de este equipo (ej. https://docs.google.com/spreadsheets/d/.../edit#gid=...)"
+                  style={{
+                    flex: 1,
+                    minWidth: '280px',
+                    background: '#1e293b',
+                    border: '1px solid #475569',
+                    borderRadius: '6px',
+                    padding: '0.5rem 0.75rem',
+                    color: '#f8fafc',
+                    fontSize: '0.84rem'
+                  }}
+                />
+                <button
+                  onClick={handleSyncTeamSheet}
+                  disabled={sheetSyncLoading}
+                  style={{
+                    background: '#10b981',
+                    border: 'none',
+                    color: '#0f172a',
+                    padding: '0.5rem 1.1rem',
+                    borderRadius: '6px',
+                    fontWeight: 800,
+                    fontSize: '0.84rem',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {sheetSyncLoading ? 'Contrastando...' : '⚡ Contrastar y Guardar en Causa OS'}
+                </button>
+              </div>
+              <textarea
+                rows={4}
+                value={sheetPasteInput}
+                onChange={(e) => setSheetPasteInput(e.target.value)}
+                placeholder="Opcional (si el Sheet es privado): Copia y pega aquí las celdas de la tabla de Aliados y FEEDBACK QT (QUANTUM | ALIADO | PX | DESERTOR | PX FIN | DECLARACION | D. LUNES | C2 | C2+MJ | ABONO | ACUERDO | FICHA | PAGOS | PP)..."
+                style={{
+                  width: '100%',
+                  background: '#1e293b',
+                  border: '1px solid #334155',
+                  borderRadius: '6px',
+                  padding: '0.5rem 0.75rem',
+                  color: '#f8fafc',
+                  fontSize: '0.8rem',
+                  fontFamily: 'monospace'
+                }}
+              />
+              {sheetSyncStatus && (
+                <div style={{ fontSize: '0.82rem', color: sheetSyncStatus.startsWith('✅') ? '#34d399' : '#fbbf24', fontWeight: 700 }}>
+                  {sheetSyncStatus}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Tarjetas KPI de Contraste: Nodus (/aliados?id_equipo=149) vs Google Sheet (QT & Aliados) */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(195px, 1fr))', gap: '1rem' }}>
@@ -94658,6 +95175,62 @@ export default function NodusLiveModulesDashboard() {
               ) : (
                 <div style={{ color: '#94a3b8', fontSize: '0.85rem' }}>
                   No hay participantes asignados a este aliado en la pestaña PX.
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TABLA 3: ALIADOS DECLARADOS A C2 Y PARTICIPANTES CONFIRMADOS EN C2 EN NODUS */}
+          {((currentTeamAliados.aliadosDeclaradosC2?.length > 0) || (currentTeamAliados.participantesC2Nodus?.length > 0)) && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '1.25rem' }}>
+              {Array.isArray(currentTeamAliados.aliadosDeclaradosC2) && currentTeamAliados.aliadosDeclaradosC2.length > 0 && (
+                <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '10px', padding: '1rem 1.25rem' }}>
+                  <h4 style={{ margin: '0 0 0.75rem 0', fontSize: '0.95rem', fontWeight: 800, color: '#c084fc' }}>
+                    🛡️ Aliados Declarados a C2 en Nodus ({currentTeamAliados.aliadosDeclaradosC2.length}) — {currentTeamAliados.equipoNombre}
+                  </h4>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                    {currentTeamAliados.aliadosDeclaradosC2.map((name, i) => (
+                      <span
+                        key={i}
+                        style={{
+                          background: 'rgba(168, 85, 247, 0.16)',
+                          border: '1px solid rgba(168, 85, 247, 0.4)',
+                          color: '#e9d5ff',
+                          padding: '4px 10px',
+                          borderRadius: '6px',
+                          fontSize: '0.78rem',
+                          fontWeight: 700
+                        }}
+                      >
+                        ✓ {name}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {Array.isArray(currentTeamAliados.participantesC2Nodus) && currentTeamAliados.participantesC2Nodus.length > 0 && (
+                <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '10px', padding: '1rem 1.25rem' }}>
+                  <h4 style={{ margin: '0 0 0.75rem 0', fontSize: '0.95rem', fontWeight: 800, color: '#34d399' }}>
+                    🎟️ Participantes Confirmados a C2 en Nodus ({currentTeamAliados.participantesC2Nodus.length}) — {currentTeamAliados.equipoNombre}
+                  </h4>
+                  <div style={{ maxHeight: '220px', overflowY: 'auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '0.45rem' }}>
+                    {currentTeamAliados.participantesC2Nodus.map((p, i) => (
+                      <div
+                        key={i}
+                        style={{
+                          background: '#0f172a',
+                          border: '1px solid #334155',
+                          borderRadius: '6px',
+                          padding: '0.4rem 0.65rem',
+                          fontSize: '0.76rem'
+                        }}
+                      >
+                        <div style={{ color: '#f8fafc', fontWeight: 700 }}>{p.nombre}</div>
+                        {p.dni && <div style={{ color: '#38bdf8', fontSize: '0.7rem' }}>ID: {p.dni}</div>}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>

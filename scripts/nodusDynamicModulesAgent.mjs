@@ -527,11 +527,27 @@ export async function runDynamicModulesSync(page, adminDb) {
         fuente: 'Auto-descubrimiento en Vivo Nodus (SO-AR)'
       });
 
-      // Guardar Aliados
+      // Guardar Aliados preservando contrastes con Google Sheets existentes
+      const existingAliadosSnap = await adminDb.collection('nodus_aliados').doc('latest').get().catch(() => null);
+      const existingEquipos = existingAliadosSnap?.exists ? (existingAliadosSnap.data()?.equipos || {}) : {};
+      const mergedEquipos = { ...existingEquipos };
+      for (const [eqId, eqData] of Object.entries(aliadosData.equipos || {})) {
+        if (existingEquipos[eqId]?.hasSheetContrast) {
+          mergedEquipos[eqId] = {
+            ...eqData,
+            ...existingEquipos[eqId],
+            extraidoAt: new Date().toISOString()
+          };
+        } else {
+          mergedEquipos[eqId] = eqData;
+        }
+      }
       await adminDb.collection('nodus_aliados').doc('latest').set({
         timestamp: extractionResults.timestamp,
-        ...aliadosData
-      });
+        ...aliadosData,
+        equipos: mergedEquipos,
+        latestEquipo: mergedEquipos['149'] || aliadosData.latestEquipo
+      }, { merge: true });
 
       // Guardar Contabilidad
       await adminDb.collection('nodus_contabilidad').doc('latest').set({
