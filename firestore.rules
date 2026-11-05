@@ -1379,6 +1379,40 @@ service cloud.firestore {
         allow update, delete: if isSuperAdmin();
       }
     }
+
+    // ============================================================================
+    // MÓDULO DE STAFF DE MESA: Guía Operativa, Encuestas, Sesiones y Bitácora de Seguridad
+    // ============================================================================
+    match /encuestas_staff_mesa/{docId} {
+      allow read, create, update: if true;
+      allow delete: if isSuperAdmin();
+    }
+
+    match /staff_mesa_autorizados/{docId} {
+      allow read, create, update: if true;
+      allow delete: if isSuperAdmin();
+    }
+
+    match /staff_mesa_sesiones/{docId} {
+      allow read, create, update: if true;
+      allow delete: if isSuperAdmin();
+    }
+
+    match /staff_mesa_conexiones_log/{docId} {
+      allow read, create: if true;
+      allow update, delete: if isSuperAdmin();
+    }
+
+    match /staff_mesa_records/{docId} {
+      allow read, create, update: if true;
+      allow delete: if isSuperAdmin();
+
+      match /{allSubcollections=**} {
+        allow read, create, update: if true;
+        allow delete: if isSuperAdmin();
+      }
+    }
   }
 }
+
 

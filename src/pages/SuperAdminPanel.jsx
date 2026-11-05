@@ -20,6 +20,7 @@ import IAAuditor from '../components/IAAuditor';
 import TaskAssignmentModal from '../components/TaskAssignmentModal';
 import AliadosC2AdminPanel from '../components/AliadosC2AdminPanel';
 import AliadosC1AdminPanel from '../components/AliadosC1AdminPanel';
+import StaffMesaAdminPanel from '../components/StaffMesaAdminPanel';
 import GuiaAliadosC1 from './GuiaAliadosC1';
 import NodusLiveModulesDashboard from '../components/NodusLiveModulesDashboard';
 import { getAllAuditLogs, recordAuditEvent, getAllUserConnections } from '../services/auditService';
@@ -1696,6 +1697,9 @@ export default function SuperAdminPanel() {
               <button style={tabStyle('aliados_c2')} onClick={() => setActiveView('aliados_c2')}>🛡️ Aliados C2 (Guía & Accesos)</button>
             )}
             {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion') && (
+              <button style={tabStyle('staff_mesa')} onClick={() => setActiveView('staff_mesa')}>📋 Staff de Mesa (Guía & Accesos)</button>
+            )}
+            {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion') && (
               <button style={tabStyle('contraste_nodus')} onClick={() => setActiveView('contraste_nodus')}>📊 Contraste Nodus vs Sheets</button>
             )}
           </div>
@@ -1746,6 +1750,9 @@ export default function SuperAdminPanel() {
           )}
           {activeView === 'aliados_c2' && (
             <AliadosC2AdminPanel currentUser={currentUser} />
+          )}
+          {activeView === 'staff_mesa' && (
+            <StaffMesaAdminPanel currentUser={currentUser} />
           )}
           {activeView === 'contraste_nodus' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
