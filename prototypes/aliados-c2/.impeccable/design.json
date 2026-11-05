@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-04T21:44:13.559-05:00",
+  "title": "Design System: Guía de Aliados C2",
+  "extensions": {
+    "breakpoints": [
+      { "name": "mobile", "value": "650px" },
+      { "name": "tablet", "value": "900px" },
+      { "name": "desktop", "value": "1150px" },
+      { "name": "wide", "value": "1400px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Phase navigation link",
+      "kind": "nav",
+      "description": "Repeated phase links with a numbered marker and selected state.",
+      "html": "<a class=\"ds-phase-link\" href=\"#puente\" aria-current=\"location\"><span class=\"ds-phase-index\">1</span><span>Antes de C2<small>Post-C1 → Pre-C2</small></span></a>",
+      "css": ".ds-phase-link { display: flex; gap: 14px; padding: 14px 8px; align-items: flex-start; border-bottom: 1px solid #cdd6df; color: #122c48; font-size: 14px; font-weight: 600; text-decoration: none; } .ds-phase-link:hover, .ds-phase-link[aria-current] { background: #e4ebf1; } .ds-phase-index { display: grid; place-items: center; width: 24px; height: 24px; flex-shrink: 0; border: 1px solid #8a9aaa; border-radius: 50%; font-size: 12px; } .ds-phase-link[aria-current] .ds-phase-index { background: #ffc107; border-color: #ffc107; } .ds-phase-link:focus-visible { outline: 3px solid #006fba; outline-offset: 4px; }"
+    },
+    {
+      "name": "Schedule event row",
+      "kind": "custom",
+      "description": "Repeated time-and-description row in the phase agenda.",
+      "html": "<li class=\"ds-event\"><div class=\"ds-event-time\"><span>10:30</span><small>Jueves</small></div><div class=\"ds-event-body\"><h4>Arribo a la sede</h4><p>Verificación de instalaciones, logística y recepción de Partners.</p></div></li>",
+      "css": ".ds-event { display: grid; grid-template-columns: 104px minmax(0, 1fr); gap: 16px; padding: 22px 0; border-bottom: 1px solid #cdd6df; color: #122c48; } .ds-event-time { font-variant-numeric: tabular-nums; } .ds-event-time > span { font-size: 17px; font-weight: 700; white-space: nowrap; } .ds-event-time small { display: block; margin-top: 6px; color: #506174; font-size: 11px; line-height: 1.5; } .ds-event-body h4 { margin: 0; font-size: 15px; line-height: 1.4; } .ds-event-body p { margin: 7px 0 0; color: #506174; font-size: 13px; }"
+    },
+    {
+      "name": "Preparation checklist item",
+      "kind": "custom",
+      "description": "Repeated locally markable item with supporting text.",
+      "html": "<li class=\"ds-checklist-item\"><label class=\"ds-checklist-label\"><input type=\"checkbox\" /><span><strong>Revisar el acuerdo</strong><small>Confirma los detalles con tu equipo.</small></span></label></li>",
+      "css": ".ds-checklist-item { border-top: 1px solid #cdd6df; } .ds-checklist-label { display: flex; gap: 11px; padding: 17px 0; color: #122c48; cursor: pointer; } .ds-checklist-label input { appearance: none; width: 19px; height: 19px; flex-shrink: 0; margin: 1px 0 0; border: 1px solid #7b8ea1; border-radius: 3px; background: #ffffff; } .ds-checklist-label input:checked { appearance: auto; accent-color: #122c48; } .ds-checklist-label input:focus-visible { outline: 3px solid #006fba; outline-offset: 4px; } .ds-checklist-label strong { display: block; font-size: 13px; line-height: 1.45; } .ds-checklist-label small { display: block; margin-top: 5px; color: #506174; font-size: 11px; line-height: 1.7; } .ds-checklist-label:has(input:checked) strong { color: #145538; }"
+    },
+    {
+      "name": "Quick-reference disclosure",
+      "kind": "custom",
+      "description": "Repeated expandable summary with a rotating plus marker.",
+      "html": "<details class=\"ds-disclosure\"><summary>Rol del Partner<span class=\"ds-details-sign\" aria-hidden=\"true\">+</span></summary><div class=\"ds-reference-body\"><p>Contenido de consulta.</p></div></details>",
+      "css": ".ds-disclosure { border-bottom: 1px solid #cdd6df; color: #122c48; } .ds-disclosure summary { display: flex; min-height: 60px; align-items: center; justify-content: space-between; gap: 16px; padding: 22px 0; font-size: 17px; font-weight: 600; cursor: pointer; list-style: none; } .ds-disclosure summary::-webkit-details-marker { display: none; } .ds-disclosure summary:hover { color: #006fba; } .ds-disclosure summary:focus-visible { outline: 3px solid #006fba; outline-offset: 4px; } .ds-details-sign { font-size: 24px; font-weight: 400; transition: transform .25s cubic-bezier(.16,1,.3,1); } .ds-disclosure[open] .ds-details-sign { transform: rotate(45deg); } .ds-reference-body { max-width: 72ch; padding: 0 0 24px; } .ds-reference-body p { margin: 0 0 15px; color: #506174; font-size: 14px; } @media (prefers-reduced-motion: reduce) { .ds-details-sign { transition: none; } }"
+    },
+    {
+      "name": "Editorial care note",
+      "kind": "custom",
+      "description": "Repeatedly used note block inside the quick-reference disclosures.",
+      "html": "<div class=\"ds-care-note\"><strong>Nota editorial de cuidado</strong><p>Contenido aclaratorio para esta referencia.</p></div>",
+      "css": ".ds-care-note { margin-top: 20px; padding: 18px 20px; border: 1px solid #cdd6df; background: #e2eaf0; color: #122c48; } .ds-care-note strong { font-size: 12px; } .ds-care-note p { margin: 8px 0 0; font-size: 13px; line-height: 1.65; }"
+    }
+  ],
+  "narrative": {
+    "overview": "Este registro describe solo el prototipo local Guía de Aliados C2; no es el sistema global de diseño de Causa OS. La paleta azul y dorada está presente en la implementación y se registra como evidencia del código, no como confirmación visual directa del usuario.\n\nLa interfaz organiza la guía en fases, filas de horario, consulta desplegable y preparación local. Usa tipografía de sistema, superficies claras, divisores y una composición que pasa de navegación lateral y contenido en columnas a una sola columna en pantallas estrechas.",
+    "keyCharacteristics": [
+      "Colores y estados extraídos de prototypes/aliados-c2/style.css.",
+      "Rejilla de consulta con navegación por fase, agenda y panel de preparación.",
+      "Sin sombras declaradas; los límites se muestran mediante fondos y bordes."
+    ],
+    "dos": [
+      "Do mantener el alcance documental en el prototipo prototypes/aliados-c2.",
+      "Do conservar el contraste de foco visible de 3px con offset de 4px observado en la hoja de estilos.",
+      "Do mantener las filas de agenda y preparación legibles al apilarse en móvil."
+    ],
+    "donts": [
+      "Don't presentar los colores de este prototipo como tokens globales de Causa OS o como una confirmación visual directa del usuario.",
+      "Don't añadir sombras como regla del sistema: no aparecen en la implementación observada."
+    ]
+  }
+}
