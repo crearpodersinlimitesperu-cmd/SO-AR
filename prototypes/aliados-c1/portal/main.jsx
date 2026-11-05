@@ -383,7 +383,7 @@ export function SurveyGateC1({ user, existingSurvey, onCompleted, onLogout }) {
           <div style={{ background: '#f0f9ff', border: '1px solid #bae6fd', borderRadius: '6px', padding: '0.65rem 0.85rem', marginBottom: '0.5rem' }}>
             <small style={{ color: '#0369a1', fontSize: '0.82rem', display: 'block', fontWeight: 600 }}>
               {sede === 'Lima'
-                ? '⚡ Regla Oficial: En Lima únicamente está habilitado el registro para C1E33 (27 al 29 de Noviembre 2026). Las generaciones anteriores ya concluyeron su ciclo.'
+                ? '⚡ Regla Oficial: En Lima únicamente está habilitado el registro para C1E33. Las generaciones anteriores ya concluyeron su ciclo.'
                 : `⚡ Equipos oficiales vigentes programados para la sede de ${sede}.`}
             </small>
           </div>

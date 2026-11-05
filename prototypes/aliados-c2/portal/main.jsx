@@ -320,7 +320,7 @@ export function SurveyGate({ user, existingSurvey, onCompleted, onLogout }) {
           <div style={{ background: '#f0f9ff', border: '1px solid #bae6fd', borderRadius: '6px', padding: '0.65rem 0.85rem', marginBottom: '0.5rem' }}>
             <small style={{ color: '#0369a1', fontSize: '0.82rem', display: 'block', fontWeight: 600 }}>
               {sede === 'Lima'
-                ? '⚡ Regla Oficial: En Lima el equipo activo para C2 es C2E32 (06 al 08 de Noviembre 2026).'
+                ? '⚡ Regla Oficial: En Lima el equipo activo para C2 es C2E32.'
                 : `⚡ Equipos oficiales vigentes programados para la sede de ${sede}.`}
             </small>
           </div>
