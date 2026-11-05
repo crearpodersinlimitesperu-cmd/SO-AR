@@ -40,3 +40,34 @@ Faltan autorización operativa del destino, control del dominio, mecanismo aprob
 Para habilitar un registro real se necesita identidad verificada; autorización comprobada en servidor; reglas y pruebas negativas que impidan leer/escribir registros ajenos; eventos inmutables con hora de servidor; consistencia transaccional e idempotencia; estados claros de pendiente/confirmado/conflicto/error; recuperación y respaldo; cierre de sesión que limpie los datos del usuario previo; y política aprobada de conservación/exportación/supresión. Ninguna clave de navegador, nombre escrito o inicio de sesión aparente sustituye esos controles.
 
 “Cualquier dispositivo” y “a prueba de errores” no se afirman como garantías absolutas. Se verifica diseño responsive, controles táctiles y teclado, zoom 200%, movimiento reducido, impresión y funcionamiento local con almacenamiento denegado. La certificación en navegadores reales Safari/Firefox y dispositivos físicos queda fuera de esa evidencia.
+
+## Estado del servicio dedicado · 4 de noviembre de 2026
+
+Con autorización posterior para Firebase Spark, sin vincular facturación:
+
+- Entrada cerrada publicada en `https://aliados-crear-global.web.app/`, versión Hosting `4e948b48441d90df`. Verificada: HTTPS 200, headers de CSP/no-store/noindex, logo cargado, sin formularios/scripts/registro; `/content.js` y `/main.jsx` responden 404. No incluye la guía interna.
+- App web dedicada `1:803494420111:web:bb2fd8fcb92bfce9b31afa`.
+- APIs de Firestore y Authentication habilitadas solo en `aliados-crear-global`.
+- Base de datos `(default)` creada en `nam5`, edición Standard, `freeTier: true`, protección contra borrado habilitada y PITR deshabilitado. No se activó billing ni se guardaron registros de Aliados.
+- Authentication **no inicializado**, respuesta verificada `404 CONFIGURATION_NOT_FOUND`. La respuesta observada a la pregunta de consola fue retirada por el coordinador; no se considera confirmación. No se ejecutó `identityPlatform:initializeAuth`, que requiere billing.
+- `private/firebase.json` configura exclusivamente `closed.rules`, que deniega todas las lecturas/escrituras de cliente. El borrador `private/firestore.rules` y el modelo de acciones **no están habilitados para datos reales**; faltan pruebas negativas con emulador e integración de identidad.
+
+El correo designado por el usuario para administración es `sistemas@crearpsl.net`; aún no está autenticado/verificado en el proyecto. No se crearon sus credenciales ni se lo suplantó. Inicializar Authentication gratuitamente desde la consola, verificar esa identidad y aprobar el aviso legal siguen siendo requisitos para habilitar acceso. El primer paso no autoriza invitar personas automáticamente.
+
+Esta entrada en línea no equivale a un servicio operativo de guía privada, progreso o trazabilidad. `crearpsl.net` no fue configurado. Causa OS y #184 no fueron modificados.
+
+Verificación adicional: Cloud Billing informó `billingEnabled: false`; una lectura REST sin autenticar de `content/c2-v1` respondió `403 PERMISSION_DENIED` tras desplegar las reglas cerradas. No hay prueba positiva de acceso de un Aliado porque Authentication no está inicializado.
+
+Pruebas locales del modelo de acciones y configuración cerrada:
+
+```sh
+node --test tests/aliados-c2-private-model.test.mjs tests/aliados-c2-closed-rules.test.mjs tests/aliados-c2-hosting.test.mjs
+```
+
+Se incluyen pruebas sintéticas del **borrador** de reglas para UID ajeno, correo no verificado, aprobación, revocación y estado/historial atómicos. No equivalen a validación del servicio: en este host falta un runtime Java y no se ejecutaron. El runner informa explícitamente `skip` si no hay emulador. Tras instalar un runtime Java compatible, se pueden ejecutar sin contactar producción:
+
+```sh
+firebase emulators:exec --only firestore --config prototypes/aliados-c2/private/emulator.json --project demo-aliados-c2 "node --test tests/aliados-c2-private-emulator.test.mjs"
+```
+
+No desplegar `private/firestore.rules` por haber pasado el modelo de JavaScript: son verificaciones distintas. Tampoco hay frontend autenticado, recuperación de sincronización o prueba de limpieza real al cambiar cuenta; el borrador es preparatorio, no una implementación completa de esas funciones.

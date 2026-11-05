@@ -1,0 +1,113 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function verified() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email is string;
+    }
+    function administrator() {
+      return verified() && request.auth.token.email == 'sistemas@crearpsl.net';
+    }
+    function member(uid) {
+      return verified() && request.auth.uid == uid
+        && exists(/databases/$(database)/documents/members/$(uid))
+        && get(/databases/$(database)/documents/members/$(uid)).data.enabled == true
+        && get(/databases/$(database)/documents/members/$(uid)).data.email == request.auth.token.email;
+    }
+    function ownAccess(uid) {
+      return member(uid);
+    }
+    function validCompleted(value) {
+      return value is list && value.size() <= 9
+        && value.toSet().size() == value.size()
+        && value.hasOnly(['tecnica', 'espacio', 'partner', 'resultados',
+          'coreografia', 'angeles', 'identificacion', 'acapela', 'feedback']);
+    }
+    function validState(value, uid) {
+      return value.keys().hasOnly(['uid', 'completed', 'revision', 'lastEventId', 'updatedAt'])
+        && value.uid == uid
+        && validCompleted(value.completed)
+        && value.revision is int && value.revision > 0
+        && value.lastEventId is string && value.lastEventId.matches('[A-Za-z0-9_-]{20,100}')
+        && value.updatedAt == request.time;
+    }
+    function hasMatchingEvent(value, uid) {
+      let path = /databases/$(database)/documents/records/$(uid)/events/$(value.lastEventId);
+      return !exists(path) && existsAfter(path)
+        && getAfter(path).data.uid == uid
+        && getAfter(path).data.revision == value.revision
+        && getAfter(path).data.completed == value.completed
+        && getAfter(path).data.createdAt == request.time;
+    }
+    function validAction(value, uid) {
+      let path = /databases/$(database)/documents/records/$(uid);
+      let before = exists(path) ? get(path).data.completed.toSet() : [].toSet();
+      let after = value.completed.toSet();
+      let item = [value.target].toSet();
+      return ((value.kind == 'check' || value.kind == 'uncheck')
+          && [value.target].hasOnly(['tecnica', 'espacio', 'partner', 'resultados',
+            'coreografia', 'angeles', 'identificacion', 'acapela', 'feedback'])
+          && ((value.kind == 'check' && after == before.union(item))
+            || (value.kind == 'uncheck' && after == before.difference(item))))
+        || (value.kind == 'reset' && value.target == 'preparation' && after.size() == 0)
+        || (value.kind == 'phase' && value.target in ['todo', 'puente', 'sede', 'entrenamiento', 'despues']
+          && after == before)
+        || (value.kind == 'reference' && value.target in ['0', '1', '2', '3'] && after == before);
+    }
+    match /members/{uid} {
+      allow get: if administrator() || (verified() && request.auth.uid == uid);
+      allow list: if administrator();
+      allow create, update: if administrator()
+        && request.resource.data.keys().hasOnly(['email', 'enabled', 'updatedAt'])
+        && request.resource.data.email is string
+        && request.resource.data.email.size() > 3
+        && request.resource.data.email.size() <= 254
+        && request.resource.data.enabled is bool
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
+    match /content/{id} {
+      allow read: if member(request.auth.uid) && id == 'c2-v1';
+      allow write: if false;
+    }
+    match /records/{uid} {
+      allow get: if ownAccess(uid);
+      allow list, delete: if false;
+      allow create: if ownAccess(uid) && validState(request.resource.data, uid)
+        && request.resource.data.revision == 1
+        && hasMatchingEvent(request.resource.data, uid);
+      allow update: if ownAccess(uid) && validState(request.resource.data, uid)
+        && request.resource.data.revision == resource.data.revision + 1
+        && hasMatchingEvent(request.resource.data, uid);
+      match /events/{eventId} {
+        allow read: if ownAccess(uid);
+        allow update, delete: if false;
+        allow create: if ownAccess(uid)
+          && request.resource.data.keys().hasOnly(['uid', 'revision', 'previousRevision',
+            'kind', 'target', 'completed', 'createdAt'])
+          && request.resource.data.uid == uid
+          && request.resource.data.kind in ['check', 'uncheck', 'reset', 'phase', 'reference']
+          && request.resource.data.target is string
+          && request.resource.data.target.size() <= 100
+          && validCompleted(request.resource.data.completed)
+          && validAction(request.resource.data, uid)
+          && request.resource.data.createdAt == request.time
+          && request.resource.data.revision is int
+          && request.resource.data.previousRevision is int
+          && request.resource.data.revision == request.resource.data.previousRevision + 1
+          && ((!exists(/databases/$(database)/documents/records/$(uid))
+              && request.resource.data.previousRevision == 0)
+            || (exists(/databases/$(database)/documents/records/$(uid))
+              && get(/databases/$(database)/documents/records/$(uid)).data.revision == request.resource.data.previousRevision))
+          && getAfter(/databases/$(database)/documents/records/$(uid)).data.lastEventId == eventId
+          && getAfter(/databases/$(database)/documents/records/$(uid)).data.revision == request.resource.data.revision
+          && getAfter(/databases/$(database)/documents/records/$(uid)).data.completed == request.resource.data.completed
+          && getAfter(/databases/$(database)/documents/records/$(uid)).data.updatedAt == request.time;
+      }
+    }
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
