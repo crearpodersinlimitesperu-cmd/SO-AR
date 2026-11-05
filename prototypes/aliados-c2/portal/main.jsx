@@ -35,11 +35,10 @@ import {
 import { guideIntro, phases, roleplays, preparation, reference, legalNotice } from '../content.js';
 import { nextRecord } from '../private/recordModel.js';
 import { getPortalFirebase, isAdminEmail } from './firebase.js';
+import { OFFICIAL_SEDES, VIGENTES_TEAMS_C2, evaluateAccessValidity } from './vigenciaConfig.js';
 import crearLogo from '../logo-crear.png';
 import '../style.css';
 import './portal.css';
-
-const SEDES = ['Lima', 'Quito', 'Bogotá', 'Guayaquil', 'Cuenca', 'Miami', 'Madrid', 'Otra'];
 
 if (typeof document !== 'undefined' && crearLogo) {
   ['icon', 'shortcut icon', 'apple-touch-icon'].forEach(rel => {
@@ -137,10 +136,16 @@ function exportRowsToCsv(filename, headers, rows) {
 }
 
 export function SurveyGate({ user, existingSurvey, onCompleted, onLogout }) {
+  const initialSede = (existingSurvey?.sede && OFFICIAL_SEDES.includes(existingSurvey.sede)) ? existingSurvey.sede : 'Lima';
+  const availableTeams = VIGENTES_TEAMS_C2[initialSede] || [];
+  const initialEquipo = (existingSurvey?.equipo && availableTeams.some(t => t.id === existingSurvey.equipo || t.code === existingSurvey.equipo))
+    ? existingSurvey.equipo
+    : (availableTeams[0]?.id || 'C2E32');
+
   const [nombre, setNombre] = useState(existingSurvey?.nombre || user?.displayName || '');
   const [telefono, setTelefono] = useState(existingSurvey?.telefono || '');
-  const [sede, setSede] = useState(existingSurvey?.sede || 'Lima');
-  const [equipo, setEquipo] = useState(existingSurvey?.equipo || '');
+  const [sede, setSede] = useState(initialSede);
+  const [equipo, setEquipo] = useState(initialEquipo);
   const [partner, setPartner] = useState(existingSurvey?.partner || '');
   const [compromiso, setCompromiso] = useState(existingSurvey?.compromiso ?? false);
   const [sheetWebhook, setSheetWebhook] = useState(() => {
@@ -149,13 +154,41 @@ export function SurveyGate({ user, existingSurvey, onCompleted, onLogout }) {
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
+  function handleSedeChange(newSede) {
+    setSede(newSede);
+    const teams = VIGENTES_TEAMS_C2[newSede] || [];
+    setEquipo(teams[0]?.id || '');
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
     setErrorMsg('');
+
+    if (!nombre || nombre.trim().length < 3) {
+      setErrorMsg('El Nombre Completo es obligatorio (mínimo 3 caracteres).');
+      return;
+    }
+    if (!telefono || telefono.trim().length < 7) {
+      setErrorMsg('El WhatsApp / Teléfono es obligatorio (mínimo 7 dígitos con código de país).');
+      return;
+    }
+    if (!sede || !OFFICIAL_SEDES.includes(sede)) {
+      setErrorMsg('Debes seleccionar una Sede Oficial válida.');
+      return;
+    }
+    if (!equipo) {
+      setErrorMsg('Debes seleccionar un Equipo Vigente.');
+      return;
+    }
+    if (!partner || partner.trim().length < 3) {
+      setErrorMsg('El nombre de tu Partner asignado en C2 es obligatorio (mínimo 3 caracteres).');
+      return;
+    }
     if (!compromiso) {
       setErrorMsg('Debes confirmar el acuerdo de confidencialidad y compromiso para continuar.');
       return;
     }
+
     setSubmitting(true);
     try {
       const { db } = getPortalFirebase();
@@ -218,6 +251,8 @@ export function SurveyGate({ user, existingSurvey, onCompleted, onLogout }) {
     }
   }
 
+  const currentTeams = VIGENTES_TEAMS_C2[sede] || [];
+
   return (
     <div className="portal-auth-wrap">
       <div className="portal-card">
@@ -225,7 +260,7 @@ export function SurveyGate({ user, existingSurvey, onCompleted, onLogout }) {
           <div>
             <span className="portal-badge">Paso 2 de 2 · Registro de Aliado C2</span>
             <h2>Encuesta de Acreditación y Acceso</h2>
-            <p>Completa tus datos operativos para activar tu acceso a la Guía de Aliados C2 y habilitar el guardado de tu progreso personal bajo tu correo <strong>{user.email}</strong>.</p>
+            <p>Completa tus datos operativos para activar tu acceso a la Guía de Aliados C2 y habilitar el guardado de tu progreso personal bajo tu correo <strong>{user.email}</strong>. Todos los campos son obligatorios.</p>
           </div>
           <button type="button" className="portal-btn-secondary" onClick={onLogout}>
             <LogOut size={15} /> Salir
@@ -241,7 +276,7 @@ export function SurveyGate({ user, existingSurvey, onCompleted, onLogout }) {
               <input
                 type="text"
                 required
-                minLength={2}
+                minLength={3}
                 maxLength={160}
                 placeholder="Ej. María José Pérez López"
                 value={nombre}
@@ -253,7 +288,7 @@ export function SurveyGate({ user, existingSurvey, onCompleted, onLogout }) {
               <input
                 type="tel"
                 required
-                minLength={5}
+                minLength={7}
                 maxLength={40}
                 placeholder="Ej. +51 987 654 321"
                 value={telefono}
@@ -261,22 +296,33 @@ export function SurveyGate({ user, existingSurvey, onCompleted, onLogout }) {
               />
             </label>
             <label>
-              <span>Sede *</span>
-              <select value={sede} onChange={e => setSede(e.target.value)} required>
-                {SEDES.map(s => <option key={s} value={s}>{s}</option>)}
+              <span>Sede Oficial *</span>
+              <select value={sede} onChange={e => handleSedeChange(e.target.value)} required>
+                {OFFICIAL_SEDES.map(s => <option key={s} value={s}>{s}</option>)}
               </select>
             </label>
             <label>
-              <span>Equipo / Número de C1 o C2 *</span>
-              <input
-                type="text"
+              <span>Equipo Vigente Oficial *</span>
+              <select
                 required
-                maxLength={120}
-                placeholder="Ej. #128 HIYAKU ARAZARI"
                 value={equipo}
                 onChange={e => setEquipo(e.target.value)}
-              />
+              >
+                {currentTeams.map(t => (
+                  <option key={t.id} value={t.id}>
+                    {t.label}
+                  </option>
+                ))}
+              </select>
             </label>
+          </div>
+
+          <div style={{ background: '#f0f9ff', border: '1px solid #bae6fd', borderRadius: '6px', padding: '0.65rem 0.85rem', marginBottom: '0.5rem' }}>
+            <small style={{ color: '#0369a1', fontSize: '0.82rem', display: 'block', fontWeight: 600 }}>
+              {sede === 'Lima'
+                ? '⚡ Regla Oficial: En Lima el equipo activo para C2 es C2E32 (06 al 08 de Noviembre 2026).'
+                : `⚡ Equipos oficiales vigentes programados para la sede de ${sede}.`}
+            </small>
           </div>
 
           <label>
@@ -284,6 +330,7 @@ export function SurveyGate({ user, existingSurvey, onCompleted, onLogout }) {
             <input
               type="text"
               required
+              minLength={3}
               maxLength={160}
               placeholder="Nombre completo de tu Partner"
               value={partner}
@@ -1090,6 +1137,48 @@ export function PortalApp() {
             }}
             onLogout={handleLogout}
           />
+        </main>
+      ) : (!isAdminEmail(user?.email) && evaluateAccessValidity(survey, 'C2').isExpired) ? (
+        <main className="portal-auth-wrap" style={{ textAlign: 'center', padding: '3rem 1rem' }}>
+          <div className="portal-card" style={{ borderTop: '4px solid #f59e0b', maxWidth: '640px' }}>
+            <div style={{ display: 'inline-flex', padding: '16px', background: '#fef3c7', borderRadius: '50%', marginBottom: '1.25rem' }}>
+              <Clock size={48} color="#d97706" />
+            </div>
+            <div>
+              <span className="portal-badge" style={{ background: '#fef3c7', color: '#92400e', marginBottom: '0.75rem', display: 'inline-block' }}>
+                Entrenamiento Concluido · Retiro Automático
+              </span>
+            </div>
+            <h2 style={{ color: '#0f172a', fontSize: '1.45rem', marginBottom: '0.75rem' }}>
+              Ciclo Operativo Finalizado
+            </h2>
+            <p style={{ color: '#475569', fontSize: '0.96rem', lineHeight: '1.6', marginBottom: '1.25rem' }}>
+              Hola, <strong>{survey.nombre || user.displayName || user.email}</strong>. Tu servicio como Aliado en <strong>{evaluateAccessValidity(survey, 'C2').equipoLabel || survey.equipo}</strong> ({survey.sede}) ha finalizado su ciclo oficial de entrenamiento.
+            </p>
+            <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '1rem', marginBottom: '1.5rem', textAlign: 'left' }}>
+              <p style={{ margin: 0, fontSize: '0.88rem', color: '#64748b', lineHeight: '1.55' }}>
+                🔒 <strong>Políticas de Confidencialidad y Retiro Automático:</strong> El acceso a los manuales, roleplays y checklists de Capítulo Dos se cierra de manera automática al concluir el fin de semana del entrenamiento. Agradecemos tu entrega y liderazgo impecable durante este ciclo.
+              </p>
+            </div>
+            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="portal-btn-secondary"
+                style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+              >
+                <LogOut size={16} /> Cerrar Sesión
+              </button>
+              <button
+                type="button"
+                onClick={() => setEditingSurvey(true)}
+                className="primary-link"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '0.65rem 1.25rem' }}
+              >
+                Registrarme en Siguiente Generación
+              </button>
+            </div>
+          </div>
         </main>
       ) : (
         <div className="page-shell">

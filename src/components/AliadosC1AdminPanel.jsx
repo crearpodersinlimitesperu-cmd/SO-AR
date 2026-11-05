@@ -33,6 +33,7 @@ import {
   BookOpen,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { OFFICIAL_SEDES, evaluateAccessValidity } from '../data/aliadosVigenciaConfig';
 
 const ALIADOS_C1_FIREBASE_CONFIG = {
   apiKey: 'AIzaSyCTMrA6A64s1ppDBBsol-fqam5Vch_Q5B0',
@@ -98,6 +99,7 @@ export default function AliadosC1AdminPanel({ currentUser, onToggleGuideView }) 
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
+  const [sedeFilter, setSedeFilter] = useState('ALL');
   const [expandedRow, setExpandedRow] = useState(null);
   const [bulkEmails, setBulkEmails] = useState('');
   const [showBulkModal, setShowBulkModal] = useState(false);
@@ -293,6 +295,8 @@ export default function AliadosC1AdminPanel({ currentUser, onToggleGuideView }) 
       if (statusFilter === 'DENIED' && r.enabled !== false) return false;
       if (statusFilter === 'ALERTS' && r.securityAlertsCount === 0) return false;
 
+      if (sedeFilter !== 'ALL' && (r.sede || '').toLowerCase() !== sedeFilter.toLowerCase()) return false;
+
       if (!searchTerm.trim()) return true;
       const q = searchTerm.toLowerCase().trim();
       return (
@@ -304,7 +308,7 @@ export default function AliadosC1AdminPanel({ currentUser, onToggleGuideView }) 
         (r.telefono || '').toLowerCase().includes(q)
       );
     });
-  }, [unifiedRows, statusFilter, searchTerm]);
+  }, [unifiedRows, statusFilter, sedeFilter, searchTerm]);
 
   const handleToggleAccess = async (row, nextEnabled) => {
     if (!row.email || row.email === 'sin-correo') return;
@@ -656,6 +660,29 @@ export default function AliadosC1AdminPanel({ currentUser, onToggleGuideView }) 
           />
         </div>
 
+        {/* Selector de Sedes Oficiales */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+          <Building2 size={15} color="var(--text-muted)" />
+          <select
+            value={sedeFilter}
+            onChange={(e) => setSedeFilter(e.target.value)}
+            style={{
+              background: 'rgba(255,255,255,0.06)',
+              border: '1px solid var(--border-subtle)',
+              color: '#fff',
+              padding: '0.35rem 0.65rem',
+              borderRadius: '4px',
+              fontSize: '0.8rem',
+              outline: 'none',
+            }}
+          >
+            <option value="ALL" style={{ background: '#0f172a' }}>Todas las Sedes</option>
+            {OFFICIAL_SEDES.map(s => (
+              <option key={s} value={s} style={{ background: '#0f172a' }}>{s}</option>
+            ))}
+          </select>
+        </div>
+
         <div style={{ display: 'flex', gap: '0.4rem' }}>
           {['ALL', 'ONLINE', 'AUTHORIZED', 'DENIED', 'ALERTS'].map((f) => (
             <button
@@ -776,19 +803,59 @@ export default function AliadosC1AdminPanel({ currentUser, onToggleGuideView }) 
                         </div>
                       </td>
                       <td style={{ padding: '0.65rem' }}>
-                        <span
-                          style={{
-                            padding: '0.2rem 0.5rem',
-                            borderRadius: '4px',
-                            fontSize: '0.72rem',
-                            fontWeight: 800,
-                            background: isDenied ? 'rgba(239, 68, 68, 0.2)' : 'rgba(34, 197, 94, 0.2)',
-                            color: isDenied ? '#ef4444' : '#22c55e',
-                            border: `1px solid ${isDenied ? '#ef4444' : '#22c55e'}`,
-                          }}
-                        >
-                          {isDenied ? 'DENEGADO' : 'AUTORIZADO'}
-                        </span>
+                        {(() => {
+                          const validity = evaluateAccessValidity(row, 'C1');
+                          if (isDenied) {
+                            return (
+                              <span
+                                style={{
+                                  padding: '0.2rem 0.5rem',
+                                  borderRadius: '4px',
+                                  fontSize: '0.72rem',
+                                  fontWeight: 800,
+                                  background: 'rgba(239, 68, 68, 0.2)',
+                                  color: '#ef4444',
+                                  border: '1px solid #ef4444',
+                                }}
+                              >
+                                DENEGADO
+                              </span>
+                            );
+                          }
+                          if (validity.isExpired) {
+                            return (
+                              <span
+                                title={validity.reason}
+                                style={{
+                                  padding: '0.2rem 0.5rem',
+                                  borderRadius: '4px',
+                                  fontSize: '0.72rem',
+                                  fontWeight: 800,
+                                  background: 'rgba(245, 158, 11, 0.2)',
+                                  color: '#fbbf24',
+                                  border: '1px solid #f59e0b',
+                                }}
+                              >
+                                EXPIRADO AUTOM.
+                              </span>
+                            );
+                          }
+                          return (
+                            <span
+                              style={{
+                                padding: '0.2rem 0.5rem',
+                                borderRadius: '4px',
+                                fontSize: '0.72rem',
+                                fontWeight: 800,
+                                background: 'rgba(34, 197, 94, 0.2)',
+                                color: '#22c55e',
+                                border: '1px solid #22c55e',
+                              }}
+                            >
+                              VIGENTE
+                            </span>
+                          );
+                        })()}
                       </td>
                       <td style={{ padding: '0.65rem', textAlign: 'right' }}>
                         <button

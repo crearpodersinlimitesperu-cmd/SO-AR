@@ -38,12 +38,12 @@ import {
   writeBatch,
 } from 'firebase/firestore';
 import { getPortalFirebase, isAdminEmail } from './firebase.js';
+import { OFFICIAL_SEDES, VIGENTES_TEAMS_C1, evaluateAccessValidity } from './vigenciaConfig.js';
 import crearLogo from '../logo-crear.png';
 import '../style.css';
 import './portal.css';
 
 const ADMIN_CONTROL_TOKEN = 'CAUSA_OS_SUPERADMIN_C1_2026';
-const SEDES = ['Lima', 'Quito', 'Bogotá', 'Guayaquil', 'Cuenca', 'Miami', 'Madrid', 'Otra'];
 
 if (typeof document !== 'undefined' && crearLogo) {
   ['icon', 'shortcut icon', 'apple-touch-icon'].forEach(rel => {
@@ -215,22 +215,57 @@ export const roleplaysC1 = [
 ];
 
 export function SurveyGateC1({ user, existingSurvey, onCompleted, onLogout }) {
+  const initialSede = (existingSurvey?.sede && OFFICIAL_SEDES.includes(existingSurvey.sede)) ? existingSurvey.sede : 'Lima';
+  const availableTeams = VIGENTES_TEAMS_C1[initialSede] || [];
+  const initialEquipo = (existingSurvey?.equipo && availableTeams.some(t => t.id === existingSurvey.equipo || t.code === existingSurvey.equipo))
+    ? existingSurvey.equipo
+    : (availableTeams[0]?.id || 'C1E33');
+
   const [nombre, setNombre] = useState(existingSurvey?.nombre || user?.displayName || '');
   const [telefono, setTelefono] = useState(existingSurvey?.telefono || '');
-  const [sede, setSede] = useState(existingSurvey?.sede || 'Lima');
-  const [equipo, setEquipo] = useState(existingSurvey?.equipo || '');
+  const [sede, setSede] = useState(initialSede);
+  const [equipo, setEquipo] = useState(initialEquipo);
   const [partner, setPartner] = useState(existingSurvey?.partner || '');
   const [compromiso, setCompromiso] = useState(existingSurvey?.compromiso ?? false);
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
+  function handleSedeChange(newSede) {
+    setSede(newSede);
+    const teams = VIGENTES_TEAMS_C1[newSede] || [];
+    setEquipo(teams[0]?.id || '');
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
     setErrorMsg('');
+
+    // Validaciones estrictas de campos obligatorios
+    if (!nombre || nombre.trim().length < 3) {
+      setErrorMsg('El Nombre Completo es obligatorio (debe contener al menos 3 caracteres).');
+      return;
+    }
+    if (!telefono || telefono.trim().length < 7) {
+      setErrorMsg('El WhatsApp / Teléfono es obligatorio (mínimo 7 dígitos con código de país).');
+      return;
+    }
+    if (!sede || !OFFICIAL_SEDES.includes(sede)) {
+      setErrorMsg('Debes seleccionar una Sede Oficial válida.');
+      return;
+    }
+    if (!equipo) {
+      setErrorMsg('Debes seleccionar un Equipo Vigente.');
+      return;
+    }
+    if (!partner || partner.trim().length < 3) {
+      setErrorMsg('El nombre de tu Partner asignado en C1 es obligatorio (mínimo 3 caracteres).');
+      return;
+    }
     if (!compromiso) {
       setErrorMsg('Debes confirmar el acuerdo de confidencialidad y compromiso para continuar.');
       return;
     }
+
     setSubmitting(true);
     try {
       const { db } = getPortalFirebase();
@@ -272,6 +307,8 @@ export function SurveyGateC1({ user, existingSurvey, onCompleted, onLogout }) {
     }
   }
 
+  const currentTeams = VIGENTES_TEAMS_C1[sede] || [];
+
   return (
     <div className="portal-auth-wrap">
       <div className="portal-card">
@@ -280,7 +317,7 @@ export function SurveyGateC1({ user, existingSurvey, onCompleted, onLogout }) {
             <span className="portal-badge">Capítulo Uno (C1) · Registro Oficial de Aliado</span>
             <h2>Encuesta Inicial y Acuerdo de Confidencialidad</h2>
             <p>
-              Bienvenido, <strong>{user.email}</strong>. Para acceder a la Guía Práctica Operativa de C1, completa tus datos oficiales y confirma tu postura de confidencialidad.
+              Bienvenido, <strong>{user.email}</strong>. Para acceder a la Guía Práctica Operativa de C1, completa tus datos oficiales y confirma tu postura de confidencialidad. Todos los campos son obligatorios.
             </p>
           </div>
           <button type="button" onClick={onLogout} className="portal-btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -294,30 +331,73 @@ export function SurveyGateC1({ user, existingSurvey, onCompleted, onLogout }) {
           <div className="portal-grid-2">
             <label>
               <span>Nombre Completo *</span>
-              <input type="text" required maxLength={160} placeholder="Tu nombre y apellido" value={nombre} onChange={e => setNombre(e.target.value)} />
+              <input
+                type="text"
+                required
+                maxLength={160}
+                placeholder="Tu nombre y apellido"
+                value={nombre}
+                onChange={e => setNombre(e.target.value)}
+              />
             </label>
             <label>
               <span>WhatsApp / Teléfono *</span>
-              <input type="tel" required maxLength={40} placeholder="+51 999 999 999" value={telefono} onChange={e => setTelefono(e.target.value)} />
+              <input
+                type="tel"
+                required
+                maxLength={40}
+                placeholder="+51 999 999 999"
+                value={telefono}
+                onChange={e => setTelefono(e.target.value)}
+              />
             </label>
           </div>
 
           <div className="portal-grid-2">
             <label>
               <span>Sede Oficial *</span>
-              <select value={sede} onChange={e => setSede(e.target.value)}>
-                {SEDES.map(s => <option key={s} value={s}>{s}</option>)}
+              <select
+                required
+                value={sede}
+                onChange={e => handleSedeChange(e.target.value)}
+              >
+                {OFFICIAL_SEDES.map(s => <option key={s} value={s}>{s}</option>)}
               </select>
             </label>
             <label>
-              <span>Equipo / Número de Generación *</span>
-              <input type="text" required maxLength={120} placeholder="Ej: E32, E33, Staff Lima" value={equipo} onChange={e => setEquipo(e.target.value)} />
+              <span>Equipo Vigente Oficial *</span>
+              <select
+                required
+                value={equipo}
+                onChange={e => setEquipo(e.target.value)}
+              >
+                {currentTeams.map(t => (
+                  <option key={t.id} value={t.id}>
+                    {t.label}
+                  </option>
+                ))}
+              </select>
             </label>
+          </div>
+
+          <div style={{ background: '#f0f9ff', border: '1px solid #bae6fd', borderRadius: '6px', padding: '0.65rem 0.85rem', marginBottom: '0.5rem' }}>
+            <small style={{ color: '#0369a1', fontSize: '0.82rem', display: 'block', fontWeight: 600 }}>
+              {sede === 'Lima'
+                ? '⚡ Regla Oficial: En Lima únicamente está habilitado el registro para C1E33 (27 al 29 de Noviembre 2026). Las generaciones anteriores ya concluyeron su ciclo.'
+                : `⚡ Equipos oficiales vigentes programados para la sede de ${sede}.`}
+            </small>
           </div>
 
           <label>
             <span>Nombre de tu Partner asignado en C1 *</span>
-            <input type="text" required maxLength={160} placeholder="Nombre completo de tu Partner en C1" value={partner} onChange={e => setPartner(e.target.value)} />
+            <input
+              type="text"
+              required
+              maxLength={160}
+              placeholder="Nombre completo de tu Partner en C1"
+              value={partner}
+              onChange={e => setPartner(e.target.value)}
+            />
           </label>
 
           <label className="portal-checkbox-row">
@@ -654,6 +734,64 @@ export default function AliadosC1PortalApp() {
           <span className="guide-label">Programa de Resultados · Guía Aliados C1</span>
         </header>
         <SurveyGateC1 user={user} existingSurvey={survey} onCompleted={setSurvey} onLogout={handleLogout} />
+      </>
+    );
+  }
+
+  const accessValidity = evaluateAccessValidity(survey, 'C1');
+  const userIsAdmin = isAdminEmail(user?.email);
+
+  if (!userIsAdmin && accessValidity.isExpired) {
+    return (
+      <>
+        <header className="brand-bar">
+          <div className="brand">
+            <img src={crearLogo} alt="CREAR Poder Sin Límites" />
+            <span>CREAR · PODER SIN LÍMITES</span>
+          </div>
+          <span className="guide-label">Programa de Resultados · Guía Aliados C1</span>
+        </header>
+        <div className="portal-auth-wrap" style={{ textAlign: 'center', padding: '3rem 1rem' }}>
+          <div className="portal-card" style={{ borderTop: '4px solid #f59e0b', maxWidth: '640px' }}>
+            <div style={{ display: 'inline-flex', padding: '16px', background: '#fef3c7', borderRadius: '50%', marginBottom: '1.25rem' }}>
+              <Clock size={48} color="#d97706" />
+            </div>
+            <div>
+              <span className="portal-badge" style={{ background: '#fef3c7', color: '#92400e', marginBottom: '0.75rem', display: 'inline-block' }}>
+                Entrenamiento Concluido · Retiro Automático
+              </span>
+            </div>
+            <h2 style={{ color: '#0f172a', fontSize: '1.45rem', marginBottom: '0.75rem' }}>
+              Ciclo Operativo Finalizado
+            </h2>
+            <p style={{ color: '#475569', fontSize: '0.96rem', lineHeight: '1.6', marginBottom: '1.25rem' }}>
+              Hola, <strong>{survey.nombre || user.displayName || user.email}</strong>. Tu servicio como Aliado en <strong>{accessValidity.equipoLabel || survey.equipo}</strong> ({survey.sede}) culminó su ciclo oficial de entrenamiento.
+            </p>
+            <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '1rem', marginBottom: '1.5rem', textAlign: 'left' }}>
+              <p style={{ margin: 0, fontSize: '0.88rem', color: '#64748b', lineHeight: '1.55' }}>
+                🔒 <strong>Políticas de Confidencialidad y Retiro Automático:</strong> El acceso a los manuales, roleplays y checklists de Capítulo Uno se cierra de manera automática al concluir el fin de semana del entrenamiento. Agradecemos tu entrega y liderazgo impecable durante este ciclo.
+              </p>
+            </div>
+            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="portal-btn-secondary"
+                style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+              >
+                <LogOut size={16} /> Cerrar Sesión
+              </button>
+              <button
+                type="button"
+                onClick={() => setSurvey(null)}
+                className="primary-link"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '0.65rem 1.25rem' }}
+              >
+                Registrarme para Siguiente Generación (C1E33)
+              </button>
+            </div>
+          </div>
+        </div>
       </>
     );
   }

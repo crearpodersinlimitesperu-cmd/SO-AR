@@ -1346,13 +1346,13 @@ service cloud.firestore {
     // ============================================================================
     match /encuestas_aliados/{uid} {
       allow read: if true;
-      allow create, update: if isAuthenticated();
+      allow create, update: if true;
       allow delete: if isSuperAdmin();
     }
 
     match /aliados_autorizados/{emailId} {
       allow read: if true;
-      allow create, update: if isAuthenticated() || isSuperAdmin();
+      allow create, update: if true;
       allow delete: if isSuperAdmin();
     }
 

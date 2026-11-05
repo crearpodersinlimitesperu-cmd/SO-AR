@@ -35,6 +35,7 @@ import {
   Lock,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { OFFICIAL_SEDES, evaluateAccessValidity } from '../data/aliadosVigenciaConfig';
 
 const ALIADOS_C2_FIREBASE_CONFIG = {
   apiKey: 'AIzaSyCTMrA6A64s1ppDBBsol-fqam5Vch_Q5B0',
@@ -106,6 +107,7 @@ export default function AliadosC2AdminPanel({ currentUser }) {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL'); // ALL, ONLINE, AUTHORIZED, DENIED, ALERTS
+  const [sedeFilter, setSedeFilter] = useState('ALL');
   const [expandedRow, setExpandedRow] = useState(null);
   const [bulkEmails, setBulkEmails] = useState('');
   const [showBulkModal, setShowBulkModal] = useState(false);
@@ -305,6 +307,8 @@ export default function AliadosC2AdminPanel({ currentUser }) {
       if (statusFilter === 'DENIED' && r.enabled !== false) return false;
       if (statusFilter === 'ALERTS' && r.securityAlertsCount === 0) return false;
 
+      if (sedeFilter !== 'ALL' && (r.sede || '').toLowerCase() !== sedeFilter.toLowerCase()) return false;
+
       if (!searchTerm.trim()) return true;
       const q = searchTerm.toLowerCase().trim();
       return (
@@ -316,7 +320,7 @@ export default function AliadosC2AdminPanel({ currentUser }) {
         (r.telefono || '').toLowerCase().includes(q)
       );
     });
-  }, [unifiedRows, statusFilter, searchTerm]);
+  }, [unifiedRows, statusFilter, sedeFilter, searchTerm]);
 
   const handleToggleAccess = async (row, nextEnabled) => {
     if (!row.email || row.email === 'sin-correo') return;
@@ -810,6 +814,29 @@ export default function AliadosC2AdminPanel({ currentUser }) {
           />
         </div>
 
+        {/* Selector de Sedes Oficiales */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+          <Building2 size={16} color="var(--crear-gold)" />
+          <select
+            value={sedeFilter}
+            onChange={(e) => setSedeFilter(e.target.value)}
+            style={{
+              background: 'rgba(0,0,0,0.25)',
+              border: '1px solid var(--border-subtle)',
+              color: '#fff',
+              padding: '0.5rem 0.8rem',
+              borderRadius: '8px',
+              fontSize: '0.85rem',
+              outline: 'none',
+            }}
+          >
+            <option value="ALL" style={{ background: '#0f172a' }}>Todas las Sedes</option>
+            {OFFICIAL_SEDES.map(s => (
+              <option key={s} value={s} style={{ background: '#0f172a' }}>{s}</option>
+            ))}
+          </select>
+        </div>
+
         <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
           {[
             { id: 'ALL', label: `Todos (${unifiedRows.length})` },
@@ -968,35 +995,59 @@ export default function AliadosC2AdminPanel({ currentUser }) {
                       </td>
 
                       <td style={{ padding: '0.85rem 0.5rem' }}>
-                        {isDenied ? (
-                          <span
-                            style={{
-                              background: 'rgba(239, 68, 68, 0.2)',
-                              color: '#fca5a5',
-                              border: '1px solid #ef4444',
-                              padding: '3px 8px',
-                              borderRadius: '12px',
-                              fontSize: '0.72rem',
-                              fontWeight: 800,
-                            }}
-                          >
-                            🚫 DENEGADO
-                          </span>
-                        ) : (
-                          <span
-                            style={{
-                              background: 'rgba(16, 185, 129, 0.18)',
-                              color: '#6ee7b7',
-                              border: '1px solid #10b981',
-                              padding: '3px 8px',
-                              borderRadius: '12px',
-                              fontSize: '0.72rem',
-                              fontWeight: 800,
-                            }}
-                          >
-                            ✅ AUTORIZADO
-                          </span>
-                        )}
+                        {(() => {
+                          const validity = evaluateAccessValidity(row, 'C2');
+                          if (isDenied) {
+                            return (
+                              <span
+                                style={{
+                                  background: 'rgba(239, 68, 68, 0.2)',
+                                  color: '#fca5a5',
+                                  border: '1px solid #ef4444',
+                                  padding: '3px 8px',
+                                  borderRadius: '12px',
+                                  fontSize: '0.72rem',
+                                  fontWeight: 800,
+                                }}
+                              >
+                                🚫 DENEGADO
+                              </span>
+                            );
+                          }
+                          if (validity.isExpired) {
+                            return (
+                              <span
+                                title={validity.reason}
+                                style={{
+                                  background: 'rgba(245, 158, 11, 0.2)',
+                                  color: '#fbbf24',
+                                  border: '1px solid #f59e0b',
+                                  padding: '3px 8px',
+                                  borderRadius: '12px',
+                                  fontSize: '0.72rem',
+                                  fontWeight: 800,
+                                }}
+                              >
+                                ⏳ EXPIRADO AUTOM.
+                              </span>
+                            );
+                          }
+                          return (
+                            <span
+                              style={{
+                                background: 'rgba(16, 185, 129, 0.18)',
+                                color: '#6ee7b7',
+                                border: '1px solid #10b981',
+                                padding: '3px 8px',
+                                borderRadius: '12px',
+                                fontSize: '0.72rem',
+                                fontWeight: 800,
+                              }}
+                            >
+                              🟢 VIGENTE
+                            </span>
+                          );
+                        })()}
                       </td>
 
                       <td style={{ padding: '0.85rem 0.5rem', textAlign: 'right' }}>
