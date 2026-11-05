@@ -57560,6 +57560,806 @@ aliado2@correo.com`,value:d,onChange:e=>f(e.target.value)}),(0,$.jsx)(`button`,{
 
 ---
 
+## Archivo: public/aliados-c1/index.html
+
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guía Práctica Operativa: Aliado de Capítulo Uno (C1) · Crear Poder Sin Límites</title>
+  <link rel="icon" type="image/png" href="/assets/causa-icon.png">
+  <style>
+    :root {
+      --bg: #0b1120;
+      --card-bg: #1e293b;
+      --card-border: #334155;
+      --accent: #38bdf8;
+      --accent-gold: #fbbf24;
+      --accent-green: #34d399;
+      --accent-red: #f87171;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    /* Protección visual y marca de agua */
+    .watermark-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 9999;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(6, 1fr);
+      opacity: 0.035;
+      overflow: hidden;
+      font-size: 13px;
+      font-weight: 800;
+      color: #fff;
+      transform: rotate(-18deg) scale(1.1);
+    }
+    .watermark-cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    header {
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, rgba(11, 17, 32, 0.9) 100%);
+      border-bottom: 1px solid var(--card-border);
+      padding: 1.25rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .brand-logo {
+      height: 42px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    .brand-title {
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: #fff;
+      margin: 0;
+      letter-spacing: -0.02em;
+    }
+
+    .badge-sub {
+      font-size: 0.72rem;
+      color: var(--accent);
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--card-border);
+      margin-bottom: 2rem;
+    }
+
+    .tab-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 0.65rem 1.15rem;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.86rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .tab-btn:hover {
+      color: #fff;
+      border-color: #475569;
+    }
+
+    .tab-btn.active {
+      background: rgba(14, 165, 233, 0.15);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .tab-pane {
+      display: none;
+    }
+    .tab-pane.active {
+      display: block;
+      animation: fadeIn 0.2s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .card h2 {
+      margin-top: 0;
+      color: var(--accent);
+      font-size: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1rem;
+    }
+
+    .item-box {
+      background: #0f172a;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 1.15rem;
+    }
+
+    .item-box h3 {
+      margin: 0 0 0.4rem 0;
+      font-size: 0.98rem;
+      color: #fff;
+    }
+
+    .item-box p {
+      margin: 0;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .highlight-pill {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 4px;
+      margin-bottom: 0.4rem;
+      text-transform: uppercase;
+    }
+    .pill-blue { background: rgba(56, 189, 248, 0.15); color: var(--accent); }
+    .pill-gold { background: rgba(245, 158, 11, 0.15); color: var(--accent-gold); }
+    .pill-green { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); }
+    .pill-red { background: rgba(239, 68, 68, 0.15); color: var(--accent-red); }
+
+    .quote-box {
+      background: rgba(56, 189, 248, 0.06);
+      border-left: 3px solid var(--accent);
+      padding: 1rem 1.25rem;
+      border-radius: 6px;
+      margin: 0.8rem 0;
+      font-size: 0.92rem;
+      font-style: italic;
+      color: #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .copy-btn {
+      background: #334155;
+      border: none;
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .copy-btn:hover { background: var(--accent); color: #031726; }
+
+    /* Timeline visual */
+    .timeline-wrap {
+      display: flex;
+      gap: 1rem;
+      overflow-x: auto;
+      padding-bottom: 1rem;
+    }
+    .timeline-col {
+      flex: 1;
+      min-width: 220px;
+      background: #0f172a;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 1rem;
+    }
+    .timeline-col.active-col {
+      border-color: var(--accent);
+      background: rgba(14, 165, 233, 0.05);
+    }
+    .timeline-col h4 {
+      margin: 0 0 0.4rem 0;
+      font-size: 0.9rem;
+      color: var(--accent);
+    }
+
+    /* Checklist */
+    .checklist-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.85rem;
+      border-bottom: 1px solid var(--card-border);
+      cursor: pointer;
+    }
+    .checklist-item:last-child { border-bottom: none; }
+    .checklist-item input {
+      margin-top: 3px;
+      accent-color: var(--accent);
+      width: 17px;
+      height: 17px;
+    }
+    .checklist-item.done span {
+      text-decoration: line-through;
+      color: #64748b;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #0ea5e9;
+      color: #031726;
+      padding: 0.75rem 1.25rem;
+      border-radius: 8px;
+      font-weight: 800;
+      font-size: 0.85rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      display: none;
+      z-index: 10000;
+    }
+
+    @media print {
+      body { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Marca de agua de protección -->
+  <div class="watermark-container" aria-hidden="true">
+    <div class="watermark-cell">CREAR · ALIADOS C1 · CONFIDENCIAL</div>
+    <div class="watermark-cell">PROHIBIDA SU COPIA O CAPTURA</div>
+    <div class="watermark-cell">PROGRAMA DE RESULTADOS</div>
+    <div class="watermark-cell">CREAR · ALIADOS C1 · CONFIDENCIAL</div>
+    <div class="watermark-cell">PROHIBIDA SU COPIA O CAPTURA</div>
+    <div class="watermark-cell">PROGRAMA DE RESULTADOS</div>
+    <div class="watermark-cell">CREAR · ALIADOS C1 · CONFIDENCIAL</div>
+    <div class="watermark-cell">PROHIBIDA SU COPIA O CAPTURA</div>
+    <div class="watermark-cell">PROGRAMA DE RESULTADOS</div>
+    <div class="watermark-cell">CREAR · ALIADOS C1 · CONFIDENCIAL</div>
+    <div class="watermark-cell">PROHIBIDA SU COPIA O CAPTURA</div>
+    <div class="watermark-cell">PROGRAMA DE RESULTADOS</div>
+    <div class="watermark-cell">CREAR · ALIADOS C1 · CONFIDENCIAL</div>
+    <div class="watermark-cell">PROHIBIDA SU COPIA O CAPTURA</div>
+    <div class="watermark-cell">PROGRAMA DE RESULTADOS</div>
+    <div class="watermark-cell">CREAR · ALIADOS C1 · CONFIDENCIAL</div>
+    <div class="watermark-cell">PROHIBIDA SU COPIA O CAPTURA</div>
+    <div class="watermark-cell">PROGRAMA DE RESULTADOS</div>
+  </div>
+
+  <header>
+    <div class="brand-wrap">
+      <img src="/logo_crear_blanco.png" alt="CREAR" class="brand-logo" onerror="this.src='/logo.png'">
+      <div>
+        <h1 class="brand-title">CREAR · Guía Práctica Operativa: Aliado de C1</h1>
+        <div style="display: flex; gap: 0.5rem; align-items: center; margin-top: 3px;">
+          <span class="badge-sub">Capítulo Uno (C1)</span>
+          <span style="font-size: 0.72rem; color: #94a3b8;">Programa de Resultados</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 0.6rem; align-items: center;">
+      <a href="/guia-aliados-c1" style="background: rgba(255,255,255,0.08); border: 1px solid var(--card-border); color: #fff; text-decoration: none; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 700;">
+        🖥️ Abrir en Causa OS
+      </a>
+      <a href="/aliados-c2/" style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); color: var(--accent-gold); text-decoration: none; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 700;">
+        🛡️ Ir a Guía C2
+      </a>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <!-- Navegación por pestañas -->
+    <div class="nav-tabs" role="tablist">
+      <button class="tab-btn active" onclick="switchTab('postura')">1. Postura & Innegociables</button>
+      <button class="tab-btn" onclick="switchTab('reconocimiento')">2. Reconocimiento</button>
+      <button class="tab-btn" onclick="switchTab('fase1')">3. Fase 1: Antes de C1</button>
+      <button class="tab-btn" onclick="switchTab('fase2')">4. Fase 2: Durante C1</button>
+      <button class="tab-btn" onclick="switchTab('fase3')">5. Fase 3: Después de C1 (El Puente)</button>
+      <button class="tab-btn" onclick="switchTab('tacticas')">6. Tácticas: Sí, No y No Sé</button>
+      <button class="tab-btn" onclick="switchTab('checklist')">7. Checklist & Misiones</button>
+      <button class="tab-btn" onclick="switchTab('legal')">8. Confidencialidad & Legal</button>
+    </div>
+
+    <!-- PESTAÑA 1: POSTURA & INNEGOCIABLES -->
+    <div id="pane-postura" class="tab-pane active">
+      <div class="card">
+        <h2>1. Marco de Postura: Los Innegociables del Aliado de C1</h2>
+        <p style="color: #cbd5e1; font-size: 0.95rem;">
+          El Aliado de C1 opera desde la firmeza, la claridad y el cumplimiento de la palabra dada. El programa no es para vivir lo posible, sino para crear lo imposible. En Capítulo Uno, el Aliado se entrena para convertirse en un <strong>experto en crear relación</strong> con los participantes. C1 es el espacio diseñado para construir un contexto de confianza, sostener una escucha limpia e intervenir como un espacio de seguridad y posibilidad incondicional.
+        </p>
+
+        <div class="grid-2" style="margin-top: 1.5rem;">
+          <div class="item-box">
+            <span class="highlight-pill pill-blue">Término Oficial</span>
+            <h3>Partner (Socio de Proceso)</h3>
+            <p>El término <strong>Partner</strong> reemplaza oficialmente la denominación anterior de "sombra". Para el Aliado de C1, un Partner es el socio de proceso con quien construyes presencia, sostienes la escucha limpia y mantienes la corresponsabilidad. Eres su espejo y el espacio de apoyo incondicional durante todo el fin de semana.</p>
+          </div>
+
+          <div class="item-box">
+            <span class="highlight-pill pill-gold">Regla de Oro</span>
+            <h3>Principio de Relación</h3>
+            <p><strong>Viernes y sábado se crea la relación con el participante; el domingo se realiza el llamado contundente a la acción.</strong> No te precipitas ni presionas antes de tiempo; construyes la confianza requerida para que el domingo tu palabra tenga peso absoluto.</p>
+          </div>
+
+          <div class="item-box">
+            <span class="highlight-pill pill-green">Enfoque</span>
+            <h3>Programa de Resultados y Creación</h3>
+            <p>No somos un curso, evento, show motivacional ni grupo de sanación. Somos un Programa de Resultados donde el foco exclusivo es la creación de evidencias reales en la vida diaria.</p>
+          </div>
+
+          <div class="item-box">
+            <span class="highlight-pill pill-blue">Metodología</span>
+            <h3>Enrolamiento Asertivo</h3>
+            <p>Inspiramos a otro ser humano a ver posibilidades y tomar postura inmediata a través del <strong>"Sí en Acción"</strong>.</p>
+          </div>
+
+          <div class="item-box">
+            <span class="highlight-pill pill-gold">Viernes C1</span>
+            <h3>Presentación Poderosa</h3>
+            <p>Ensayarás y perfeccionarás la presentación personal enérgica y estructurada con la que te dirigirás a tu grupo de Creación el viernes de C1, en el momento preciso en que los participantes te eligen como su Partner.</p>
+          </div>
+
+          <div class="item-box">
+            <span class="highlight-pill pill-green">Misión Activa</span>
+            <h3>Cambio de Cupo / Sustitución de Nombre</h3>
+            <p>Todos los Aliados cuentan con la posibilidad activa y la misión de gestionar <strong>cambios de cupo o sustitución de nombres</strong> para aquellas personas que ellos mismos enrolaron pero que aún no se han sentado o decidieron no asistir a este C1.</p>
+          </div>
+
+          <div class="item-box">
+            <span class="highlight-pill pill-red">Compromiso</span>
+            <h3>Regla de Corresponsabilidad</h3>
+            <p>Eres la primera y la última persona del día para tu Partner. Su presencia y permanencia en la sala dependen directamente de tu compromiso y seguimiento.</p>
+          </div>
+
+          <div class="item-box">
+            <span class="highlight-pill pill-blue">Postura</span>
+            <h3>Acompañamiento de Alto Nivel</h3>
+            <p>Tratamos al participante como un adulto 100% capaz y responsable de tomar sus decisiones y crear sus resultados, sin caer en actitudes maternales o condescendientes.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PESTAÑA 2: RECONOCIMIENTO ORGÁNICO -->
+    <div id="pane-reconocimiento" class="tab-pane">
+      <div class="card" style="border-color: rgba(245, 158, 11, 0.4);">
+        <h2 style="color: var(--accent-gold);">2. Reconocimiento Orgánico al Aliado: Honor al Liderazgo y al Servicio</h2>
+        <p style="color: #cbd5e1;">Servir como Aliado en Capítulo Uno es una elección consciente de alto valor, liderazgo y entrega. Al asumir este rol, tu propia transformación se acelera a través del servicio a otros:</p>
+
+        <div class="grid-3" style="margin-top: 1.25rem;">
+          <div class="item-box" style="border-left: 3px solid var(--accent-gold);">
+            <h3 style="color: #fde68a;">Reconocimiento Directo en la Experiencia</h3>
+            <p>Tu mayor reconocimiento nace de ver a los participantes despertar a su propio potencial y tomar decisiones valientes para su vida gracias a tu escucha limpia y tu capacidad de crear relación.</p>
+          </div>
+
+          <div class="item-box" style="border-left: 3px solid var(--accent);">
+            <h3 style="color: #7dd3fc;">Valor del Entrenamiento Personal</h3>
+            <p>Cada espacio de exigencia, cada llamada y cada intervención en sala son el espejo directo de tu propio nivel de compromiso. Entrenar a otros es el vehículo más potente para entrenar tu propia grandeza.</p>
+          </div>
+
+          <div class="item-box" style="border-left: 3px solid var(--accent-green);">
+            <h3 style="color: #6ee7b7;">Celebración del Legado e Impacto</h3>
+            <p>Al cierre de C1, la comunidad y el equipo reconocen de forma limpia y transparente tu entrega impecable, tu puntualidad y el cumplimiento de tu palabra, celebrando las vidas impactadas.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PESTAÑA 3: FASE 1: ANTES DE C1 -->
+    <div id="pane-fase1" class="tab-pane">
+      <div class="card">
+        <h2>3. FASE 1: ANTES DE C1 (Alineamiento y Prácticas Previas)</h2>
+        <div class="grid-2">
+          <div class="item-box">
+            <span class="highlight-pill pill-blue">Diario</span>
+            <h3>A. Entrenamiento Diario Post-Grounding (Leader Team)</h3>
+            <p style="margin-bottom: 0.6rem;">Tras el grounding virtual del miércoles, el Aliado se entrena a diario junto a su Leader Team enfocado en:</p>
+            <ul style="font-size: 0.85rem; color: #cbd5e1; padding-left: 1.2rem; margin: 0; line-height: 1.6;">
+              <li><strong>Afinar la Presentación Personal:</strong> Mensaje de impacto fluido, firme y magnético para el viernes.</li>
+              <li><strong>Manejo de Escenarios del Domingo:</strong> Crear la evidencia del Ticket de Posibilidad (llave de ingreso a C2).</li>
+              <li><strong>Abordaje del SÍ, el NO y el NO SÉ:</strong> Velocidad para el Sí, dignidad para el No, y quiebre del No Sé.</li>
+              <li><strong>Escucha Quirúrgica (&lt; 90 segundos):</strong> Cortar relatos victimizantes en menos de 90s a 3 minutos. Erradicar llamadas circulares de 15 a 30 minutos.</li>
+              <li><strong>Manejo de Objeciones (Dinero y Tiempo):</strong> No comprar la excusa de escasez; el compromiso precede a los recursos.</li>
+            </ul>
+          </div>
+
+          <div class="item-box">
+            <span class="highlight-pill pill-gold">Groundings</span>
+            <h3>B. Reglas del Grounding Virtual & C. Presencial</h3>
+            <p style="margin-bottom: 0.6rem;"><strong>Grounding Virtual:</strong> Miércoles posterior a Maestría del Juego (una semana antes de C1, 20:00 hrs, máx. 90 min):</p>
+            <ul style="font-size: 0.85rem; color: #cbd5e1; padding-left: 1.2rem; margin: 0 0 0.8rem 0; line-height: 1.6;">
+              <li>📹 <strong>Cámara Encendida:</strong> Activa durante toda la sesión.</li>
+              <li>🛡️ <strong>Espacio Seguro y Adecuado:</strong> Lugar privado y libre de distracciones.</li>
+              <li>⚙️ <strong>Verificación Técnica Previa:</strong> Conexión, micrófono, audio e iluminación.</li>
+            </ul>
+            <p style="margin: 0;"><strong>Grounding Presencial:</strong> Jueves previo (un día antes de C1 a las 18:00 hrs / 6:00 p. m.) en sede: demostración de roleplays con Leader Team, ejecución de la presentación en vivo y asignación de funciones en sala (tiempo, sillas, puertas).</p>
+          </div>
+        </div>
+
+        <div class="item-box" style="margin-top: 1.25rem;">
+          <span class="highlight-pill pill-green">Misiones</span>
+          <h3>D. Misiones Estándar de los Groundings en C1</h3>
+          <div class="grid-3" style="margin-top: 0.5rem;">
+            <div>
+              <strong style="color: #fff; font-size: 0.86rem;">1. Declaración de Propósito (4 Meses)</strong>
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 3px;">Publicar qué acción específica tomada hoy colapsa la realidad y altera positivamente sus próximos 4 meses.</p>
+            </div>
+            <div>
+              <strong style="color: #fff; font-size: 0.86rem;">2. Video de Enrolamiento (15 Segundos)</strong>
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 3px;">Subir al chat de aliados un video de 15s enfocado en el para qué de su participación.</p>
+            </div>
+            <div>
+              <strong style="color: #fff; font-size: 0.86rem;">3. Gestión y Cambio de Cupo / Nombre</strong>
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 3px;">Sustituir nombres de inscritos que no asistirán para inspirar a nuevos participantes a sentarse en sala.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PESTAÑA 4: FASE 2: DURANTE C1 -->
+    <div id="pane-fase2" class="tab-pane">
+      <div class="card">
+        <h2>4. FASE 2: DURANTE C1 (Fin de Semana del Entrenamiento)</h2>
+        <div class="timeline-wrap" style="margin-top: 1rem;">
+          <div class="timeline-col">
+            <span class="highlight-pill pill-blue">Miércoles Pre</span>
+            <h4>Miércoles Post-MJ</h4>
+            <p>20:00 Grounding Virtual Post-MJ (una semana antes de C1) e inicio de entrenamiento diario con Leader Team.</p>
+          </div>
+
+          <div class="timeline-col">
+            <span class="highlight-pill pill-gold">Jueves Pre</span>
+            <h4>Jueves Previo</h4>
+            <p>18:00 (6 PM) Grounding Presencial en Sede. Muestreo de roleplays con Leader Team y asignación de funciones operativas.</p>
+          </div>
+
+          <div class="timeline-col active-col">
+            <span class="highlight-pill pill-green">Viernes C1</span>
+            <h4>Viernes (08:00)</h4>
+            <p>Grounding presencial. 09:00 Inicio de C1. Presentación enérgica ante el grupo de Creación al elegir Partner. Enfoque pleno en crear relación.</p>
+          </div>
+
+          <div class="timeline-col active-col">
+            <span class="highlight-pill pill-blue">Sábado C1</span>
+            <h4>Sábado (08:00)</h4>
+            <p>Grounding presencial. 09:00 Profundización de confianza, sosteniendo la escucha limpia y el acompañamiento en dinámicas.</p>
+          </div>
+
+          <div class="timeline-col active-col">
+            <span class="highlight-pill pill-red">Domingo C1</span>
+            <h4>Domingo (08:00)</h4>
+            <p>Grounding presencial. 15:00 Presentación Siguiente Nivel. Llamado contundente a la acción y acompañamiento hacia el Ticket de Posibilidad (llave a C2).</p>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-top: 1.5rem;">
+          <div class="item-box">
+            <h3 style="color: var(--accent-red);">🚫 Sin Acuerdos Fantasiosos</h3>
+            <p>Erradicar los compromisos tibios como <em>«luego te aviso»</em> o ilusiones de <em>«lo veré la otra semana»</em>. Toda interacción concluye en una decisión clara: un <strong>Sí</strong> con acción inmediata y Ticket de Posibilidad, o un <strong>No</strong> transparente donde la persona asume plenamente la responsabilidad de su elección.</p>
+          </div>
+
+          <div class="item-box">
+            <h3 style="color: var(--accent-green);">⚡ La Ecuación de Movimiento</h3>
+            <p>Toda confrontación o llamado a la acción va acompañado de una conversación de posibilidad e inspiración. No confrontamos para juzgar; confrontamos para liberar la grandeza que el participante tiene dormida.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PESTAÑA 5: FASE 3: DESPUÉS DE C1 (EL PUENTE & LLAMADAS) -->
+    <div id="pane-fase3" class="tab-pane">
+      <div class="card">
+        <h2>5. FASE 3: DESPUÉS DE C1 (El Puente de los 8 Días C1 a C2)</h2>
+        <div class="grid-3" style="margin-bottom: 1.5rem;">
+          <div class="item-box">
+            <h3 style="color: var(--accent-gold);">🌅 Horario Matutino</h3>
+            <p>Las llamadas se realizan <strong>obligatoriamente en la mañana</strong>. Esto le da al participante todo el día para ejecutar sus retos diarios. Por la noche, el Aliado valida la evidencia en WhatsApp.</p>
+          </div>
+
+          <div class="item-box">
+            <h3 style="color: var(--accent-green);">🎧 La Regla del 30/70</h3>
+            <p>El Aliado habla como máximo el <strong>30% del tiempo</strong> y el participante habla el <strong>70% restante</strong>. Tu rol es lanzar la pregunta poderosa, hacer silencio y escuchar con apertura.</p>
+          </div>
+
+          <div class="item-box">
+            <h3 style="color: var(--accent);">👤 Liderazgo Presente</h3>
+            <p>Si termina la mañana y no llamó, el Aliado lo busca. Si llama tarde, se le atiende pero se le hace notar qué espacio de postergación está abriendo.</p>
+          </div>
+        </div>
+
+        <div class="item-box" style="border: 1px solid var(--accent);">
+          <h3 style="color: var(--accent); margin-bottom: 1rem;">⏱️ Estructura Innegociable de 5 Minutos por Llamada</h3>
+          <div class="grid-2">
+            <div style="background: rgba(255,255,255,0.02); padding: 0.75rem; border-radius: 6px;">
+              <span class="highlight-pill pill-blue">Minuto 1</span>
+              <strong style="display: block; color: #fff;">Saludo y Encuadre</strong>
+              <p>Saludo cálido, conexión rápida y acuerdo mutuo del límite de 5 minutos.</p>
+            </div>
+            <div style="background: rgba(255,255,255,0.02); padding: 0.75rem; border-radius: 6px;">
+              <span class="highlight-pill pill-green">Minutos 2 y 3</span>
+              <strong style="display: block; color: #fff;">Pregunta Poderosa y Escucha</strong>
+              <p>Pregunta de quiebre y silencio del Aliado (70% habla el participante sin validar justificaciones).</p>
+            </div>
+            <div style="background: rgba(255,255,255,0.02); padding: 0.75rem; border-radius: 6px;">
+              <span class="highlight-pill pill-gold">Minuto 4</span>
+              <strong style="display: block; color: #fff;">Diseño del Reto Diario</strong>
+              <p>Acción concreta, medible y realizable hoy mismo fuera del salón.</p>
+            </div>
+            <div style="background: rgba(255,255,255,0.02); padding: 0.75rem; border-radius: 6px;">
+              <span class="highlight-pill pill-red">Minuto 5</span>
+              <strong style="display: block; color: #fff;">Cierre en Visión y Compromiso</strong>
+              <p>Cierre en visión y acuerdo de publicar la evidencia en el chat de WhatsApp antes de las 22:00 hrs.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PESTAÑA 6: TÁCTICAS: EL SÍ, EL NO Y EL NO SÉ (PREGUNTAS DE QUIEBRE) -->
+    <div id="pane-tacticas" class="tab-pane">
+      <div class="card">
+        <h2>6. Abordaje Asertivo del SÍ, el NO y el NO SÉ</h2>
+        <div class="grid-3" style="margin-bottom: 1.5rem;">
+          <div class="item-box" style="border-left: 4px solid var(--accent-green);">
+            <span class="highlight-pill pill-green">El Sí en Acción</span>
+            <h3>Acompañamiento Inmediato</h3>
+            <p>Velocidad máxima para consolidar la acción y asegurar la llave de ingreso (Ticket de Posibilidad) en minutos.</p>
+          </div>
+
+          <div class="item-box" style="border-left: 4px solid var(--accent-red);">
+            <span class="highlight-pill pill-red">El No</span>
+            <h3>Firmeza y Dignidad</h3>
+            <p>Respetar la elección sin rogar ni discutir, permitiendo que asuma 100% la consecuencia de su postura.</p>
+          </div>
+
+          <div class="item-box" style="border-left: 4px solid var(--accent-gold);">
+            <span class="highlight-pill pill-gold">El No Sé</span>
+            <h3>Interrupción de la Duda</h3>
+            <p>Mostrar que el «no sé» es un disfraz para no elegir, retándolo a tomar postura clara hacia la creación o la renuncia.</p>
+          </div>
+        </div>
+
+        <div class="item-box">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
+            <h3 style="color: var(--accent); margin: 0;">🎯 Preguntas Directas en Lenguaje Sencillo</h3>
+            <span style="font-size: 0.75rem; color: var(--accent-red); font-weight: 700;">⛔ PROHIBIDO: «¿En qué otras áreas de tu vida pasa esto?»</span>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Haz clic en "Copiar" para usar cualquiera de estas preguntas de quiebre en sala o en tus llamadas:</p>
+
+          <div style="display: flex; flexDirection: column; gap: 0.75rem;">
+            <div class="quote-box">
+              <div>
+                <strong style="color: var(--accent); font-size: 0.78rem; display: block; text-transform: uppercase;">Frente a la excusa del dinero / liquidez:</strong>
+                «Si quitamos la plata de la mesa por un minuto, ¿cuál es la razón real por la que prefieres no comprometerte hoy?»
+              </div>
+              <button class="copy-btn" onclick="copySnippet('Si quitamos la plata de la mesa por un minuto, ¿cuál es la razón real por la que prefieres no comprometerte hoy?')">Copiar</button>
+            </div>
+
+            <div class="quote-box">
+              <div>
+                <strong style="color: var(--accent-gold); font-size: 0.78rem; display: block; text-transform: uppercase;">Frente a la excusa de la pareja o familia:</strong>
+                «¿Si tu familia es tu motor, por qué la usas como el freno para no tomar tus propias decisiones?»
+              </div>
+              <button class="copy-btn" onclick="copySnippet('¿Si tu familia es tu motor, por qué la usas como el freno para no tomar tus propias decisiones?')">Copiar</button>
+            </div>
+
+            <div class="quote-box">
+              <div>
+                <strong style="color: var(--accent-red); font-size: 0.78rem; display: block; text-transform: uppercase;">Frente a la postergación fantástica («déjame pensarlo»):</strong>
+                «Sé sincero: ¿qué información mágica vas a encontrar el domingo debajo de tu almohada que no tengas hoy aquí parado conmigo?»
+              </div>
+              <button class="copy-btn" onclick="copySnippet('Sé sincero: ¿qué información mágica vas a encontrar el domingo debajo de tu almohada que no tengas hoy aquí parado conmigo?')">Copiar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PESTAÑA 7: CHECKLIST & MISIONES INTERACTIVAS -->
+    <div id="pane-checklist" class="tab-pane">
+      <div class="card">
+        <h2>7. Misiones Estándar y Checklist de Preparación C1</h2>
+        <p style="color: #cbd5e1; font-size: 0.9rem;">Lleva el control de tus acuerdos y misiones como Aliado de C1 para asegurar excelencia en tiempo y forma:</p>
+
+        <div style="background: #0f172a; border-radius: 8px; border: 1px solid var(--card-border); margin-top: 1rem;">
+          <label class="checklist-item">
+            <input type="checkbox" onchange="toggleCheck(this)">
+            <span><strong>1. Verificación Técnica Previa:</strong> Conexión, computadora, micrófono, audio e iluminación probados antes de las 20:00 hrs.</span>
+          </label>
+          <label class="checklist-item">
+            <input type="checkbox" onchange="toggleCheck(this)">
+            <span><strong>2. Espacio Seguro para Grounding:</strong> Lugar privado, cerrado y libre de ruidos o distracciones externas.</span>
+          </label>
+          <label class="checklist-item">
+            <input type="checkbox" onchange="toggleCheck(this)">
+            <span><strong>3. Declaración de Propósito (4 Meses):</strong> Redactada y publicada en el chat del equipo sobre la acción que altera positivamente tus 4 meses.</span>
+          </label>
+          <label class="checklist-item">
+            <input type="checkbox" onchange="toggleCheck(this)">
+            <span><strong>4. Video de Enrolamiento (15 Segundos):</strong> Grabado y compartido en el chat enfocado en el para qué de tu servicio.</span>
+          </label>
+          <label class="checklist-item">
+            <input type="checkbox" onchange="toggleCheck(this)">
+            <span><strong>5. Gestión y Cambio de Cupo / Nombre:</strong> Contactar a personas enroladas no sentadas para inspirarlas a ocupar su lugar en C1.</span>
+          </label>
+          <label class="checklist-item">
+            <input type="checkbox" onchange="toggleCheck(this)">
+            <span><strong>6. Entrenamiento Diario con Leader Team:</strong> Práctica de la presentación del viernes y roleplays de quiebre.</span>
+          </label>
+          <label class="checklist-item">
+            <input type="checkbox" onchange="toggleCheck(this)">
+            <span><strong>7. Grounding Presencial Jueves 18:00 hrs:</strong> Presentación en vivo y recepción de tareas operativas en sede.</span>
+          </label>
+          <label class="checklist-item">
+            <input type="checkbox" onchange="toggleCheck(this)">
+            <span><strong>8. Presentación Poderosa del Viernes:</strong> Mensaje estructurado, firme y magnético al presentarse ante el grupo de Creación.</span>
+          </label>
+          <label class="checklist-item">
+            <input type="checkbox" onchange="toggleCheck(this)">
+            <span><strong>9. Llamadas Matutinas (Regla 30/70 & 5 Minutos):</strong> Ejecución diaria del puente de 8 días en horario matutino.</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- PESTAÑA 8: CONFIDENCIALIDAD & LEGAL -->
+    <div id="pane-legal" class="tab-pane">
+      <div class="card" style="border-color: rgba(239, 68, 68, 0.4);">
+        <h2 style="color: var(--accent-red);">8. Políticas de Confidencialidad, Propiedad Intelectual y Protección de Datos</h2>
+        <span style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 1.25rem;">
+          AVISO DE PROPIEDAD INTELECTUAL Y CONFIDENCIALIDAD GLOBAL · CREAR PODER SIN LÍMITES
+        </span>
+
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <div class="item-box" style="border-left: 4px solid var(--accent);">
+            <strong style="color: var(--accent); display: block; margin-bottom: 0.25rem;">Propiedad Exclusiva</strong>
+            <p>Todo el contenido, metodología, estructura operativa, nombres de dinámicas, procesos, marcas y material pedagógico contenidos en esta guía son propiedad intelectual exclusiva de <strong>Crear Poder Sin Límites</strong>.</p>
+          </div>
+
+          <div class="item-box" style="border-left: 4px solid var(--accent-red);">
+            <strong style="color: var(--accent-red); display: block; margin-bottom: 0.25rem;">Prohibición de Copia y Difusión</strong>
+            <p>Queda estrictamente prohibida la reproducción total o parcial, copia, modificación, distribución, divulgación, publicación o transmisión de este material por cualquier medio sin la autorización previa y por escrito de la dirección de <strong>Crear Poder Sin Límites</strong>.</p>
+          </div>
+
+          <div class="item-box" style="border-left: 4px solid var(--accent-gold);">
+            <strong style="color: var(--accent-gold); display: block; margin-bottom: 0.25rem;">Protección Internacional de Datos</strong>
+            <p>En cumplimiento de las normativas internacionales de protección de datos personales y privacidad, la información a la que se tenga acceso durante el programa es de carácter <strong>estrictamente confidencial</strong>. Está prohibido usar, compartir o comercializar dichos datos para fines ajenos al desarrollo del programa. El incumplimiento de estas disposiciones dará lugar a las acciones legales correspondientes.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="toast" class="toast">¡Texto copiado al portapapeles!</div>
+
+  <script>
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+      
+      const activeBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick').includes(tabId));
+      if (activeBtn) activeBtn.classList.add('active');
+
+      const activePane = document.getElementById('pane-' + tabId);
+      if (activePane) activePane.classList.add('active');
+    }
+
+    function copySnippet(text) {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text);
+      }
+      showToast();
+    }
+
+    function showToast() {
+      const toast = document.getElementById('toast');
+      toast.style.display = 'block';
+      setTimeout(() => { toast.style.display = 'none'; }, 2500);
+    }
+
+    function toggleCheck(checkbox) {
+      const parent = checkbox.closest('.checklist-item');
+      if (parent) {
+        if (checkbox.checked) parent.classList.add('done');
+        else parent.classList.remove('done');
+      }
+    }
+
+    // Bloqueo de atajos de impresión y clic derecho
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    window.addEventListener('keydown', e => {
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 'P' || e.key === 's' || e.key === 'S')) {
+        e.preventDefault();
+        alert('La función de imprimir o guardar está deshabilitada para proteger el material oficial.');
+      }
+    });
+  </script>
+</body>
+</html>
+
+```
+
+---
+
 ## Archivo: prototypes/aliados-c2/index.html
 
 ```html
@@ -60883,6 +61683,185 @@ footer { max-width: 952px; margin: 0 auto; padding: 24px; border-top: 1px solid 
     ]
   }
 }
+
+```
+
+---
+
+## Archivo: prototypes/aliados-c1/content.js
+
+```js
+export const guideIntroC1 = {
+  title: 'Guía Práctica Operativa: Aliado de Capítulo Uno (C1)',
+  lead: 'Esta guía establece las reglas, la postura, la secuencia de ejecución paso a paso (Antes, Durante y Después) y las herramientas de acompañamiento para los Aliados que eligen entrenarse y servir en Capítulo Uno (C1) dentro del Programa de Resultados.',
+};
+
+export const innegociablesC1 = [
+  {
+    id: 'partner',
+    title: 'Término Oficial y Significado de Partner',
+    desc: 'El término Partner reemplaza oficialmente la denominación anterior de "sombra". Para el Aliado de C1, un Partner es la persona asignada o rol de apoyo en el entrenamiento; es el socio de proceso con quien construyes presencia, sostienes la escucha limpia y mantienes la corresponsabilidad. Eres su espejo y el espacio de apoyo incondicional durante todo el fin de semana.',
+  },
+  {
+    id: 'programa_resultados',
+    title: 'Programa de Resultados y Creación',
+    desc: 'No somos un curso, evento, show motivacional ni grupo de sanación. Somos un Programa de Resultados donde el foco exclusivo es la creación de evidencias reales en la vida diaria.',
+  },
+  {
+    id: 'enrolamiento_asertivo',
+    title: 'Enrolamiento Asertivo: Sí en Acción',
+    desc: 'Inspiramos a otro ser humano a ver posibilidades y tomar postura inmediata a través del "Sí en Acción".',
+  },
+  {
+    id: 'principio_relacion',
+    title: 'Principio de Relación (Viernes, Sábado y Domingo)',
+    desc: 'Viernes y sábado se crea la relación con el participante; el domingo se realiza el llamado contundente a la acción.',
+  },
+  {
+    id: 'acompanamiento_alto_nivel',
+    title: 'Acompañamiento de Alto Nivel',
+    desc: 'Tratamos al participante como un adulto 100% capaz y responsable de tomar sus decisiones y crear sus resultados.',
+  },
+  {
+    id: 'presentacion_viernes',
+    title: 'Presentación Poderosa del Viernes',
+    desc: 'Ensayarás y perfeccionarás la presentación personal enérgica y estructurada con la que te dirigirás a tu grupo de Creación el viernes de C1, en el momento preciso en que los participantes te eligen como su Partner.',
+  },
+  {
+    id: 'cambio_cupo',
+    title: 'Misión de Cambio de Cupo / Nombre y Enrolamiento Directo',
+    desc: 'Todos los Aliados cuentan con la posibilidad activa y la misión de gestionar cambios de cupo o sustitución de nombres para aquellas personas que ellos mismos enrolaron pero que aún no se han sentado o decidieron no asistir a este C1. Este mecanismo es una gran oportunidad para reabrir la conversación, mover la energía e inspirar intensamente a esas personas para que sí ocupen su lugar y se sienten a vivir el salón donde estás sirviendo.',
+  },
+  {
+    id: 'corresponsabilidad',
+    title: 'Regla de Corresponsabilidad',
+    desc: 'Eres la primera y la última persona del día para tu Partner. Su presencia y permanencia en la sala dependen directamente de tu compromiso y seguimiento.',
+  },
+  {
+    id: 'creacion_contexto',
+    title: 'Creación del Contexto',
+    desc: 'El Aliado es responsable de crear activamente el contexto para entrenarse en todo lo que está disponible antes, durante y después del C1, aprovechando cada herramienta, reto y espacio de aprendizaje.',
+  },
+];
+
+export const fasesC1 = [
+  {
+    id: 'fase1',
+    numero: 1,
+    nombre: 'Fase 1: Antes de C1',
+    periodo: 'Alineamiento y Prácticas Previas',
+    eventos: [
+      {
+        dia: 'Miércoles Post-MJ (Una semana antes de C1)',
+        hora: '20:00 hrs (máx. 90 min)',
+        titulo: 'Grounding Virtual de Aliados e Inicio de Entrenamiento Diario con Leader Team',
+        detalle: 'Reglas de excelencia: cámara encendida, lugar seguro y adecuado, pruebas técnicas e iluminación. Inicio del entrenamiento diario sin excusas junto al Leader Team.'
+      },
+      {
+        dia: 'Jueves a Domingo Pre-C1',
+        hora: 'Diario',
+        titulo: 'Entrenamiento Diario con Leader Team',
+        detalle: 'Afinar presentación personal, ensayo de escenarios del domingo (Ticket de Posibilidad), abordaje del SÍ, el NO y el NO SÉ, escucha quirúrgica (< 90 segundos) y manejo de objeciones de dinero y tiempo.'
+      },
+      {
+        dia: 'Jueves Previo (Un día antes de C1)',
+        hora: '18:00 hrs (6:00 p. m.)',
+        titulo: 'Grounding Presencial en Sede',
+        detalle: 'Espacio indispensable donde los Aliados realizan demostración de roleplays con Leader Team, ejecutan en vivo su presentación ante el equipo y reciben asignación de tareas operativas (tiempo, puertas, sillas).'
+      }
+    ]
+  },
+  {
+    id: 'fase2',
+    numero: 2,
+    nombre: 'Fase 2: Durante C1',
+    periodo: 'Fin de Semana del Entrenamiento',
+    eventos: [
+      {
+        dia: 'Viernes C1',
+        hora: '08:00 hrs',
+        titulo: 'Grounding Presencial & Inicio de C1 (09:00 hrs)',
+        detalle: 'Presentación enérgica ante el grupo de Creación cuando los participantes eligen a su Partner. Enfoque pleno en crear relación y generar contexto de confianza.'
+      },
+      {
+        dia: 'Sábado C1',
+        hora: '08:00 hrs',
+        titulo: 'Grounding Presencial & Profundización de Confianza (09:00 hrs)',
+        detalle: 'Acompañamiento en dinámicas de alto impacto sosteniendo la escucha limpia y la confianza en la sala.'
+      },
+      {
+        dia: 'Domingo C1',
+        hora: '08:00 hrs',
+        titulo: 'Grounding Presencial & Preparación de Sala (09:00 hrs)',
+        detalle: '15:00 hrs: Presentación del siguiente nivel del programa. Llamado contundente a la acción y acompañamiento asertivo para que el participante cree la evidencia real de su Ticket de Posibilidad (llave de ingreso a C2).'
+      }
+    ]
+  },
+  {
+    id: 'fase3',
+    numero: 3,
+    nombre: 'Fase 3: Después de C1',
+    periodo: 'El Puente de los 8 Días C1 a C2',
+    eventos: [
+      {
+        dia: 'Lunes a Domingo Post-C1',
+        hora: 'Mañana (Obligatorio)',
+        titulo: 'Llamadas de Acompañamiento C1 a C2 (Regla 30/70 & 5 Minutos)',
+        detalle: 'Llamadas realizadas en la mañana para dar todo el día al participante para ejecutar sus retos. Validación de evidencias por la noche en el chat de WhatsApp de Creación.'
+      },
+      {
+        dia: 'Miércoles Pre-C2',
+        hora: '20:00 hrs',
+        titulo: 'Grounding Virtual de Aliados Pre-C2',
+        detalle: 'Transición hacia Capítulo Dos, cierre de recaudación y validación de participantes confirmados.'
+      }
+    ]
+  }
+];
+
+export const llamadasGuia = {
+  horario: 'Realizadas obligatoriamente en la mañana. Da al participante todo el día para ejecutar sus retos diarios. Por la noche, el Aliado valida la evidencia en el chat de WhatsApp.',
+  regla3070: 'El Aliado habla como máximo el 30% del tiempo y el participante habla el 70% restante. Lanzar la pregunta poderosa, hacer silencio y escuchar con apertura.',
+  estructura5Min: [
+    { minuto: 'Minuto 1', titulo: 'Saludo Cálido y Encuadre', desc: 'Saludo de conexión rápida y acuerdo mutuo del tiempo límite de 5 minutos.' },
+    { minuto: 'Minutos 2 y 3', titulo: 'Pregunta Poderosa y Escucha', desc: 'Pregunta de quiebre y escucha activa (70% habla el participante sin interrupción justificatoria).' },
+    { minuto: 'Minuto 4', titulo: 'Diseño del Reto Diario', desc: 'Definición de acción concreta, medible y realizable hoy mismo.' },
+    { minuto: 'Minuto 5', titulo: 'Cierre en Visión y Compromiso', desc: 'Cierre enfocado en la grandeza del participante y compromiso de evidencia en WhatsApp.' },
+  ],
+  preguntasDirectas: [
+    {
+      tipo: 'Dinero / Liquidez',
+      pregunta: '«Si quitamos la plata de la mesa por un minuto, ¿cuál es la razón real por la que prefieres no comprometerte hoy?»',
+      contexto: 'Desarticula el pretexto de escasez y revela la verdad del compromiso.'
+    },
+    {
+      tipo: 'Pareja o Familia',
+      pregunta: '«¿Si tu familia es tu motor, por qué la usas como el freno para no tomar tus propias decisiones?»',
+      contexto: 'Empodera al participante a asumir su propia postura adulta.'
+    },
+    {
+      tipo: 'Postergación Fantástica («déjame pensarlo»)',
+      pregunta: '«Sé sincero: ¿qué información mágica vas a encontrar el domingo debajo de tu almohada que no tengas hoy aquí parado conmigo?»',
+      contexto: 'Quiebra la mentira educada de la indecisión y mueve al Sí o al No transparente.'
+    }
+  ]
+};
+
+export const misionesGroundingC1 = [
+  { id: 'mision1', titulo: '1. Declaración del Propósito (4 Meses)', desc: 'Publicar en el chat del grupo la declaración viva e irrazonable sobre qué acción específica tomada hoy colapsa la realidad y altera positivamente sus próximos 4 meses de vida personal.' },
+  { id: 'mision2', titulo: '2. Video de Enrolamiento (15 Segundos)', desc: 'Grabar y subir al chat de aliados un video de 15 segundos enfocado en el para qué de su participación.' },
+  { id: 'mision3', titulo: '3. Misión de Gestión y Cambio de Cupo / Nombre', desc: 'Gestionar activamente sustitución de nombres de personas enroladas que no asistirán, reabriendo la conversación para que sí ocupen su lugar en sala.' },
+  { id: 'tecnica', titulo: '4. Verificación Técnica Previa (Grounding Virtual)', desc: 'Probar cámara, internet, computadora, micrófono, audio e iluminación antes de las 20:00 hrs.' },
+  { id: 'presencial', titulo: '5. Demostración Presencial de Roleplay (Jueves 18:00 hrs)', desc: 'Asistir puntualmente a sede y ejecutar en vivo la presentación personal ante el equipo.' }
+];
+
+export const legalNoticeC1 = {
+  heading: 'Políticas de Confidencialidad, Propiedad Intelectual y Protección de Datos',
+  subtitle: 'AVISO DE PROPIEDAD INTELECTUAL Y CONFIDENCIALIDAD GLOBAL',
+  propiedadExclusiva: 'Todo el contenido, metodología, estructura operativa, nombres de dinámicas, procesos, marcas y material pedagógico contenidos en esta guía son propiedad intelectual exclusiva de Crear Poder Sin Límites.',
+  prohibicionCopia: 'Queda estrictamente prohibida la reproducción total o parcial, copia, modificación, distribución, divulgación, publicación o transmisión de este material por cualquier medio sin la autorización previa y por escrito de la dirección de Crear Poder Sin Límites.',
+  proteccionDatos: 'En cumplimiento de las normativas internacionales de protección de datos personales y privacidad, la información a la que se tenga acceso durante el programa es de carácter estrictamente confidencial. Está prohibido usar, compartir o comercializar dichos datos para fines ajenos al desarrollo del programa. El incumplimiento de estas disposiciones dará lugar a las acciones legales correspondientes.'
+};
 
 ```
 
@@ -66461,6 +67440,7 @@ import Home from './pages/Home';
 import CentroManagers from './pages/CentroManagers';
 import SuperAdminPanel from './pages/SuperAdminPanel';
 import CallCoachCRM from './pages/CallCoachCRM';
+import GuiaAliadosC1 from './pages/GuiaAliadosC1';
 
 const CfoDashboard = lazy(() => import('./pages/CfoDashboard'));
 const AICopilot = lazy(() => import('./components/AICopilot'));
@@ -66905,6 +67885,13 @@ function App() {
               <ManagerGuide />
             </PrivateRoute>
           } />
+
+          <Route path="/guia-aliados-c1" element={
+            <PrivateRoute>
+              <GuiaAliadosC1 />
+            </PrivateRoute>
+          } />
+          <Route path="/guias/aliados-c1" element={<Navigate to="/guia-aliados-c1" replace />} />
 
           <Route path="/centro-managers" element={
             <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'director_maestria']} requireSuperAdmin={false}>
@@ -89408,6 +90395,24 @@ export default function AliadosC2AdminPanel({ currentUser }) {
 
           <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
             <a
+              href="/guia-aliados-c1"
+              className="btn-secondary"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                fontSize: '0.82rem',
+                padding: '0.5rem 0.9rem',
+                textDecoration: 'none',
+                border: '1px solid rgba(56, 189, 248, 0.4)',
+                background: 'rgba(14, 165, 233, 0.15)',
+                color: '#38bdf8',
+                fontWeight: 700,
+              }}
+            >
+              📘 Guía Aliados C1 (Capítulo 1)
+            </a>
+            <a
               href="/aliados-c2/"
               target="_blank"
               rel="noreferrer"
@@ -89419,8 +90424,8 @@ export default function AliadosC2AdminPanel({ currentUser }) {
                 fontSize: '0.82rem',
                 padding: '0.5rem 0.9rem',
                 textDecoration: 'none',
-                border: '1px solid rgba(56, 189, 248, 0.4)',
-                color: '#38bdf8',
+                border: '1px solid rgba(245, 158, 11, 0.4)',
+                color: '#fbbf24',
               }}
             >
               <ExternalLink size={15} /> Abrir Guía Aliados C2
@@ -147529,6 +148534,7 @@ import UserProfileModal from '../components/UserProfileModal';
 import IAAuditor from '../components/IAAuditor';
 import TaskAssignmentModal from '../components/TaskAssignmentModal';
 import AliadosC2AdminPanel from '../components/AliadosC2AdminPanel';
+import GuiaAliadosC1 from './GuiaAliadosC1';
 import { getAllAuditLogs, recordAuditEvent, getAllUserConnections } from '../services/auditService';
 import { runRoleIntegrityAuditAndHeal, applyReviewedRoleChanges } from '../services/roleIntegritySentinelAgent';
 
@@ -149197,6 +150203,9 @@ export default function SuperAdminPanel() {
               <button style={tabStyle('sugerencias')} onClick={() => setActiveView('sugerencias')}>💡 Buzón Sugerencias</button>
             )}
             {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion') && (
+              <button style={tabStyle('aliados_c1')} onClick={() => setActiveView('aliados_c1')}>📘 Guía Aliados C1</button>
+            )}
+            {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion') && (
               <button style={tabStyle('aliados_c2')} onClick={() => setActiveView('aliados_c2')}>🛡️ Aliados C2 (Guía & Accesos)</button>
             )}
           </div>
@@ -149241,6 +150250,9 @@ export default function SuperAdminPanel() {
           )}
           {activeView === 'sugerencias' && (
             <SuggestionsView />
+          )}
+          {activeView === 'aliados_c1' && (
+            <GuiaAliadosC1 />
           )}
           {activeView === 'aliados_c2' && (
             <AliadosC2AdminPanel currentUser={currentUser} />
@@ -158281,6 +159293,733 @@ export default function ExcellenceDashboard() {
             </div>
           )}
         </>
+      )}
+    </div>
+  );
+}
+
+```
+
+---
+
+## Archivo: src/pages/GuiaAliadosC1.jsx
+
+```javascript
+import React, { useState } from 'react';
+import {
+  Users,
+  Compass,
+  Calendar,
+  PhoneCall,
+  Clock,
+  ShieldAlert,
+  ShieldCheck,
+  CheckCircle2,
+  AlertTriangle,
+  ArrowRight,
+  ExternalLink,
+  Search,
+  Sparkles,
+  HelpCircle,
+  Copy,
+  ChevronRight,
+  Volume2,
+  FileText,
+  UserCheck,
+  Zap,
+} from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+
+export default function GuiaAliadosC1() {
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('postura');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [copiedText, setCopiedText] = useState('');
+
+  const copyToClipboard = (text, id) => {
+    navigator.clipboard?.writeText(text);
+    setCopiedText(id);
+    setTimeout(() => setCopiedText(''), 2500);
+  };
+
+  return (
+    <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '1.5rem', color: '#f8fafc' }}>
+      {/* Banner Superior de Identidad de Marca */}
+      <div style={{
+        background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.98) 100%)',
+        border: '1px solid #334155',
+        borderRadius: '14px',
+        padding: '1.75rem',
+        marginBottom: '1.75rem',
+        boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.3)',
+        display: 'flex',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        gap: '1.25rem'
+      }}>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
+            <span style={{
+              background: 'linear-gradient(90deg, #0ea5e9, #38bdf8)',
+              color: '#031726',
+              fontWeight: 900,
+              fontSize: '0.75rem',
+              padding: '3px 10px',
+              borderRadius: '6px',
+              letterSpacing: '0.05em',
+              textTransform: 'uppercase'
+            }}>
+              DOCUMENTO OPERATIVO OFICIAL
+            </span>
+            <span style={{ background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', padding: '3px 10px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 700 }}>
+              PROGRAMA DE RESULTADOS
+            </span>
+          </div>
+
+          <h1 style={{ margin: '0 0 0.4rem 0', fontSize: '1.85rem', fontWeight: 900, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+            <Compass size={28} color="#38bdf8" />
+            Guía Práctica Operativa: Aliado de Capítulo Uno (C1)
+          </h1>
+          <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.95rem', maxWidth: '850px', lineHeight: '1.5' }}>
+            Reglas, postura innegociable, secuencia paso a paso (<strong>Antes, Durante y Después</strong>) y herramientas de acompañamiento para Aliados que eligen entrenarse y servir en <strong>Capítulo Uno (C1)</strong>.
+          </p>
+        </div>
+
+        <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap', alignItems: 'center' }}>
+          <a
+            href="/aliados-c1/"
+            target="_blank"
+            rel="noreferrer"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.45rem',
+              background: '#0284c7',
+              color: '#fff',
+              padding: '0.65rem 1.15rem',
+              borderRadius: '8px',
+              fontWeight: 800,
+              fontSize: '0.86rem',
+              textDecoration: 'none',
+              boxShadow: '0 4px 12px rgba(14, 165, 233, 0.35)',
+              transition: 'all 0.2s'
+            }}
+          >
+            <ExternalLink size={16} /> Abrir Portal Standalone Protegido (/aliados-c1/)
+          </a>
+
+          <a
+            href="/aliados-c2/"
+            target="_blank"
+            rel="noreferrer"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.45rem',
+              background: '#1e293b',
+              border: '1px solid #475569',
+              color: '#fbbf24',
+              padding: '0.65rem 1.05rem',
+              borderRadius: '8px',
+              fontWeight: 700,
+              fontSize: '0.86rem',
+              textDecoration: 'none'
+            }}
+          >
+            🛡️ Ir a Guía Aliados C2
+          </a>
+        </div>
+      </div>
+
+      {/* Buscador y Pestañas de Navegación */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1.5rem' }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.6rem',
+          background: '#1e293b',
+          border: '1px solid #334155',
+          borderRadius: '10px',
+          padding: '0.6rem 1rem'
+        }}>
+          <Search size={18} color="#94a3b8" />
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Buscar en la guía: preguntas de quiebre, llamada 30/70, grounding, Ticket de Posibilidad..."
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: '#f8fafc',
+              fontSize: '0.9rem',
+              outline: 'none',
+              width: '100%'
+            }}
+          />
+          {searchTerm && (
+            <button
+              onClick={() => setSearchTerm('')}
+              style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '0.8rem' }}
+            >
+              Limpiar ✕
+            </button>
+          )}
+        </div>
+
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', borderBottom: '1px solid #334155', paddingBottom: '0.75rem' }}>
+          {[
+            { id: 'postura', label: '1. Marco de Postura & Innegociables', icon: Compass },
+            { id: 'fase1', label: '2. Fase 1: Antes de C1 (Leader Team & Groundings)', icon: Calendar },
+            { id: 'fase2', label: '3. Fase 2: Durante C1 (Fin de Semana)', icon: Users },
+            { id: 'fase3', label: '4. Fase 3: Después de C1 (El Puente & Llamadas)', icon: PhoneCall },
+            { id: 'roleplay', label: '5. Tácticas: El SÍ, el NO y el NO SÉ', icon: Zap },
+            { id: 'legal', label: '6. Confidencialidad & Propiedad Intelectual', icon: ShieldCheck },
+          ].map((tab) => {
+            const Icon = tab.icon;
+            const isSelected = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.6rem 1rem',
+                  borderRadius: '8px',
+                  border: isSelected ? '1px solid #38bdf8' : '1px solid transparent',
+                  background: isSelected ? 'rgba(14, 165, 233, 0.18)' : '#1e293b',
+                  color: isSelected ? '#38bdf8' : '#94a3b8',
+                  fontWeight: 700,
+                  fontSize: '0.84rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease'
+                }}
+              >
+                <Icon size={16} />
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* CONTENIDO 1: MARCO DE POSTURA & LOS INNEGOCIABLES DEL ALIADO */}
+      {activeTab === 'postura' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', padding: '1.5rem' }}>
+            <h2 style={{ margin: '0 0 1rem 0', fontSize: '1.25rem', color: '#38bdf8', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Compass size={22} />
+              1. Marco de Postura: Los Innegociables del Aliado de C1
+            </h2>
+            <p style={{ lineHeight: '1.6', color: '#cbd5e1', fontSize: '0.94rem' }}>
+              El Aliado de C1 opera desde la firmeza, la claridad y el cumplimiento de la palabra dada. El programa no es para vivir lo posible, sino para crear lo imposible. En Capítulo Uno, el Aliado se entrena para convertirse en un <strong>experto en crear relación</strong> con los participantes. C1 es el espacio diseñado para construir un contexto de confianza, sostener una escucha limpia e intervenir como un espacio de seguridad y posibilidad incondicional.
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1rem', marginTop: '1.25rem' }}>
+              {[
+                {
+                  title: 'Término Oficial y Significado de Partner',
+                  desc: 'El término Partner reemplaza oficialmente la denominación anterior de "sombra". Es el socio de proceso con quien construyes presencia, sostienes la escucha limpia y mantienes la corresponsabilidad. Eres su espejo y el espacio de apoyo incondicional durante todo el fin de semana.',
+                  tag: 'Distinción Clave'
+                },
+                {
+                  title: 'Programa de Resultados y Creación',
+                  desc: 'No somos un curso, evento, show motivacional ni grupo de sanación. Somos un Programa de Resultados donde el foco exclusivo es la creación de evidencias reales en la vida diaria.',
+                  tag: 'Identidad de Programa'
+                },
+                {
+                  title: 'Principio de Relación',
+                  desc: 'Viernes y sábado se crea la relación con el participante; el domingo se realiza el llamado contundente a la acción.',
+                  tag: 'Regla de Oro C1'
+                },
+                {
+                  title: 'Enrolamiento Asertivo',
+                  desc: 'Inspiramos a otro ser humano a ver posibilidades y tomar postura inmediata a través del "Sí en Acción".',
+                  tag: 'Metodología'
+                },
+                {
+                  title: 'Acompañamiento de Alto Nivel',
+                  desc: 'Tratamos al participante como un adulto 100% capaz y responsable de tomar sus decisiones y crear sus resultados.',
+                  tag: 'Cero Paternalismo'
+                },
+                {
+                  title: 'Presentación Poderosa del Viernes',
+                  desc: 'Ensayarás y perfeccionarás la presentación personal enérgica y estructurada con la que te dirigirás a tu grupo de Creación el viernes de C1, en el momento preciso en que los participantes te eligen como su Partner.',
+                  tag: 'Momento Clave Viernes'
+                },
+                {
+                  title: 'Misión de Cambio de Cupo / Nombre',
+                  desc: 'Todos los Aliados cuentan con la posibilidad activa y la misión de gestionar cambios de cupo o sustitución de nombres para aquellas personas que ellos mismos enrolaron pero que aún no se han sentado o decidieron no asistir a este C1.',
+                  tag: 'Gestión Proactiva'
+                },
+                {
+                  title: 'Regla de Corresponsabilidad',
+                  desc: 'Eres la primera y la última persona del día para tu Partner. Su presencia y permanencia en la sala dependen directamente de tu compromiso y seguimiento.',
+                  tag: 'Presencia Absoluta'
+                },
+                {
+                  title: 'Creación del Contexto',
+                  desc: 'El Aliado es responsable de crear activamente el contexto para entrenarse en todo lo que está disponible antes, durante y después del C1, aprovechando cada herramienta, reto y espacio de aprendizaje.',
+                  tag: 'Alineación Total'
+                }
+              ].map((item, idx) => (
+                <div key={idx} style={{ background: '#0f172a', border: '1px solid #334155', borderRadius: '10px', padding: '1.15rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+                    <h3 style={{ margin: 0, fontSize: '0.98rem', fontWeight: 800, color: '#f8fafc' }}>{item.title}</h3>
+                    <span style={{ background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', padding: '2px 7px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 700 }}>
+                      {item.tag}
+                    </span>
+                  </div>
+                  <p style={{ margin: 0, fontSize: '0.85rem', color: '#94a3b8', lineHeight: '1.5' }}>{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Reconocimiento Orgánico al Aliado */}
+          <div style={{ background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(30, 41, 59, 0.95) 100%)', border: '1px solid rgba(245, 158, 11, 0.35)', borderRadius: '12px', padding: '1.5rem' }}>
+            <h2 style={{ margin: '0 0 0.8rem 0', fontSize: '1.25rem', color: '#fbbf24', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Sparkles size={22} />
+              2. Reconocimiento Orgánico al Aliado: Honor al Liderazgo y al Servicio
+            </h2>
+            <p style={{ margin: '0 0 1rem 0', color: '#cbd5e1', fontSize: '0.92rem' }}>
+              Servir como Aliado en Capítulo Uno es una elección consciente de alto valor, liderazgo y entrega. Al asumir este rol, tu propia transformación se acelera a través del servicio a otros:
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
+              <div style={{ background: 'rgba(0,0,0,0.35)', padding: '1rem', borderRadius: '8px', borderLeft: '3px solid #fbbf24' }}>
+                <strong style={{ color: '#fde68a', display: 'block', marginBottom: '0.3rem' }}>Reconocimiento Directo en la Experiencia</strong>
+                <span style={{ fontSize: '0.84rem', color: '#cbd5e1' }}>Tu mayor reconocimiento nace de ver a los participantes despertar a su propio potencial y tomar decisiones valientes para su vida gracias a tu escucha limpia y tu capacidad de crear relación.</span>
+              </div>
+              <div style={{ background: 'rgba(0,0,0,0.35)', padding: '1rem', borderRadius: '8px', borderLeft: '3px solid #38bdf8' }}>
+                <strong style={{ color: '#7dd3fc', display: 'block', marginBottom: '0.3rem' }}>Valor del Entrenamiento Personal</strong>
+                <span style={{ fontSize: '0.84rem', color: '#cbd5e1' }}>Cada espacio de exigencia, cada llamada y cada intervención en sala son el espejo directo de tu propio nivel de compromiso. Entrenar a otros es el vehículo más potente para entrenar tu propia grandeza.</span>
+              </div>
+              <div style={{ background: 'rgba(0,0,0,0.35)', padding: '1rem', borderRadius: '8px', borderLeft: '3px solid #34d399' }}>
+                <strong style={{ color: '#6ee7b7', display: 'block', marginBottom: '0.3rem' }}>Celebración del Legado e Impacto</strong>
+                <span style={{ fontSize: '0.84rem', color: '#cbd5e1' }}>Al cierre de C1, la comunidad y el equipo reconocen de forma limpia y transparente tu entrega impecable, tu puntualidad y el cumplimiento de tu palabra, celebrando las vidas impactadas.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* CONTENIDO 2: FASE 1: ANTES DE C1 */}
+      {activeTab === 'fase1' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', padding: '1.5rem' }}>
+            <h2 style={{ margin: '0 0 0.75rem 0', fontSize: '1.25rem', color: '#38bdf8' }}>
+              3. FASE 1: ANTES DE C1 (Alineamiento y Prácticas Previas)
+            </h2>
+            <p style={{ margin: '0 0 1.25rem 0', color: '#cbd5e1', fontSize: '0.92rem' }}>
+              Tras el grounding virtual del miércoles, el Aliado debe entrenarse a diario, sin excusas ni evasiones, junto a su <strong>Leader Team</strong>.
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1rem' }}>
+              <div style={{ background: '#0f172a', border: '1px solid #334155', borderRadius: '10px', padding: '1.25rem' }}>
+                <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1rem', color: '#f8fafc', fontWeight: 800 }}>
+                  A. Entrenamiento Diario Post-Grounding (Leader Team)
+                </h3>
+                <ul style={{ margin: 0, paddingLeft: '1.2rem', color: '#cbd5e1', fontSize: '0.86rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', lineHeight: '1.5' }}>
+                  <li><strong>Afinar la Presentación Personal:</strong> Perfeccionar el mensaje del viernes para que sea fluido, firme y magnético.</li>
+                  <li><strong>Manejo de Escenarios del Domingo:</strong> Ensayar la guía para que el participante cree su Ticket de Posibilidad (llave de ingreso a C2).</li>
+                  <li><strong>Abordaje del SÍ, el NO y el NO SÉ:</strong> Velocidad para el Sí, firmeza y dignidad para el No, y quiebre del No Sé (disfraz de no elegir).</li>
+                  <li><strong>Escucha Quirúrgica (&lt; 90 segundos):</strong> Cortar relatos victimizantes en menos de 90s a 3 min. Erradicar llamadas circulares de 15 a 30 min.</li>
+                  <li><strong>Manejo de Objeciones (Dinero y Tiempo):</strong> No comprar la excusa de escasez; el compromiso es lo que genera los recursos.</li>
+                </ul>
+              </div>
+
+              <div style={{ background: '#0f172a', border: '1px solid #334155', borderRadius: '10px', padding: '1.25rem' }}>
+                <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1rem', color: '#f8fafc', fontWeight: 800 }}>
+                  B. Reglas del Grounding Virtual (Estándar de Excelencia)
+                </h3>
+                <p style={{ fontSize: '0.84rem', color: '#94a3b8', margin: '0 0 0.75rem 0' }}>
+                  Miércoles posterior a Maestría del Juego (una semana antes de C1) a las <strong>20:00 hrs (máx. 90 min)</strong>.
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.85rem', color: '#cbd5e1' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <CheckCircle2 size={16} color="#34d399" />
+                    <span><strong>Cámara Encendida:</strong> Mantener el video encendido toda la sesión.</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <CheckCircle2 size={16} color="#34d399" />
+                    <span><strong>Espacio Seguro y Adecuado:</strong> Lugar privado, libre de distracciones.</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <CheckCircle2 size={16} color="#34d399" />
+                    <span><strong>Verificación Técnica Previa:</strong> Internet, computadora, micrófono e iluminación.</span>
+                  </div>
+                </div>
+
+                <div style={{ marginTop: '1.25rem', borderTop: '1px solid #334155', paddingTop: '0.85rem' }}>
+                  <h4 style={{ margin: '0 0 0.35rem 0', fontSize: '0.9rem', color: '#fbbf24' }}>
+                    C. Grounding Presencial en Sede
+                  </h4>
+                  <p style={{ margin: 0, fontSize: '0.82rem', color: '#94a3b8' }}>
+                    <strong>Jueves previo (un día antes de C1 a las 18:00 hrs / 6:00 p. m.):</strong> Demostración de roleplays del SÍ, el NO y el NO SÉ, ejecución de la presentación en vivo y asignación de funciones operativas en sala (tiempo, puertas, sillas).
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Misiones Estándar de los Groundings en C1 */}
+            <div style={{ marginTop: '1.25rem', background: '#0f172a', border: '1px solid #334155', borderRadius: '10px', padding: '1.25rem' }}>
+              <h3 style={{ margin: '0 0 0.8rem 0', fontSize: '1rem', color: '#38bdf8', fontWeight: 800 }}>
+                D. Misiones Estándar de los Groundings en C1
+              </h3>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem' }}>
+                <div style={{ padding: '0.85rem', background: 'rgba(255,255,255,0.02)', borderRadius: '6px', borderLeft: '3px solid #38bdf8' }}>
+                  <strong style={{ color: '#f8fafc', display: 'block', fontSize: '0.88rem' }}>1. Declaración del Propósito (4 Meses)</strong>
+                  <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Publicar en el chat del grupo la declaración viva e irrazonable sobre qué acción específica tomada hoy colapsa la realidad y altera positivamente sus próximos 4 meses de vida personal.</span>
+                </div>
+                <div style={{ padding: '0.85rem', background: 'rgba(255,255,255,0.02)', borderRadius: '6px', borderLeft: '3px solid #34d399' }}>
+                  <strong style={{ color: '#f8fafc', display: 'block', fontSize: '0.88rem' }}>2. Video de Enrolamiento (15 Segundos)</strong>
+                  <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Grabar y subir al chat de aliados un video de 15 segundos enfocado en el para qué de su participación.</span>
+                </div>
+                <div style={{ padding: '0.85rem', background: 'rgba(255,255,255,0.02)', borderRadius: '6px', borderLeft: '3px solid #fbbf24' }}>
+                  <strong style={{ color: '#f8fafc', display: 'block', fontSize: '0.88rem' }}>3. Gestión y Cambio de Cupo / Nombre</strong>
+                  <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Responsabilidad activa y misión de gestionar cambios de cupo o sustitución de nombres de personas enroladas que no asistirán, reabriendo la conversación para inspirar a nuevos participantes.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* CONTENIDO 3: FASE 2: DURANTE C1 (FIN DE SEMANA) */}
+      {activeTab === 'fase2' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', padding: '1.5rem' }}>
+            <h2 style={{ margin: '0 0 1rem 0', fontSize: '1.25rem', color: '#38bdf8' }}>
+              4. FASE 2: DURANTE C1 (Fin de Semana del Entrenamiento)
+            </h2>
+
+            {/* Secuencia Visual de Ejecución */}
+            <div style={{
+              background: '#0f172a',
+              border: '1px solid #334155',
+              borderRadius: '10px',
+              padding: '1.25rem',
+              overflowX: 'auto',
+              marginBottom: '1.5rem'
+            }}>
+              <div style={{ display: 'flex', gap: '0.75rem', minWidth: '780px', justifyContent: 'space-between' }}>
+                {[
+                  {
+                    header: 'MIÉRCOLES (POST-MJ)',
+                    sub: 'Una semana antes',
+                    color: '#38bdf8',
+                    items: ['20:00 Grounding Virtual Post-MJ', 'Inicio de Entrenamiento Diario con Leader Team']
+                  },
+                  {
+                    header: 'JUEVES PREVIO',
+                    sub: 'Un día antes',
+                    color: '#fbbf24',
+                    items: ['18:00 (6 PM) Grounding Presencial en Sede', 'Muestreo con Leader Team', 'Asignación de funciones en sala']
+                  },
+                  {
+                    header: 'VIERNES C1',
+                    sub: 'Día 1 de Creación',
+                    color: '#34d399',
+                    items: ['08:00 Grounding presencial', '09:00 Inicio de C1', 'Presentación Grupo Creación', 'Creación de Relación']
+                  },
+                  {
+                    header: 'SÁBADO C1',
+                    sub: 'Día 2 de Creación',
+                    color: '#c084fc',
+                    items: ['08:00 Grounding presencial', '09:00 Profundización de Confianza', 'Acompañamiento en Dinámicas']
+                  },
+                  {
+                    header: 'DOMINGO C1',
+                    sub: 'Día 3 · Llamado a la Acción',
+                    color: '#f43f5e',
+                    items: ['08:00 Grounding presencial', '09:00 Preparación de Sala', '15:00 Presentación Siguiente Nivel', 'Llamado a la Acción / Ticket de Posibilidad']
+                  }
+                ].map((col, idx) => (
+                  <div key={idx} style={{
+                    flex: 1,
+                    background: '#1e293b',
+                    border: `1px solid ${col.color}`,
+                    borderRadius: '8px',
+                    padding: '0.9rem',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.5rem'
+                  }}>
+                    <div style={{ borderBottom: '1px solid #334155', paddingBottom: '0.4rem' }}>
+                      <strong style={{ color: col.color, fontSize: '0.82rem', display: 'block' }}>{col.header}</strong>
+                      <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>{col.sub}</span>
+                    </div>
+                    <ul style={{ margin: 0, paddingLeft: '1rem', fontSize: '0.78rem', color: '#cbd5e1', lineHeight: '1.4' }}>
+                      {col.items.map((it, iIdx) => (
+                        <li key={iIdx}>{it}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Posicionamiento en el Acompañamiento de Acuerdos */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1rem' }}>
+              <div style={{ background: '#0f172a', border: '1px solid #334155', borderRadius: '10px', padding: '1.25rem' }}>
+                <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1rem', color: '#f8fafc', fontWeight: 800 }}>
+                  🚫 Sin Acuerdos Fantasiosos
+                </h3>
+                <p style={{ margin: 0, fontSize: '0.88rem', color: '#cbd5e1', lineHeight: '1.5' }}>
+                  Erradicar los compromisos tibios como <em>«luego te aviso»</em> o ilusiones de <em>«lo veré la otra semana»</em>. Toda interacción concluye en una decisión clara: un <strong>Sí</strong> con acción inmediata y Ticket de Posibilidad, o un <strong>No</strong> transparente donde la persona asume plenamente la responsabilidad de su elección.
+                </p>
+              </div>
+
+              <div style={{ background: '#0f172a', border: '1px solid #334155', borderRadius: '10px', padding: '1.25rem' }}>
+                <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1rem', color: '#f8fafc', fontWeight: 800 }}>
+                  ⚡ La Ecuación de Movimiento
+                </h3>
+                <p style={{ margin: 0, fontSize: '0.88rem', color: '#cbd5e1', lineHeight: '1.5' }}>
+                  Toda confrontación o llamado a la acción va acompañado de una conversación de posibilidad e inspiración. No confrontamos para juzgar; confrontamos para liberar la grandeza que el participante tiene dormida.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* CONTENIDO 4: FASE 3: DESPUÉS DE C1 (EL PUENTE & LLAMADAS) */}
+      {activeTab === 'fase3' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', padding: '1.5rem' }}>
+            <h2 style={{ margin: '0 0 0.6rem 0', fontSize: '1.25rem', color: '#38bdf8', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <PhoneCall size={22} />
+              5. FASE 3: DESPUÉS DE C1 (El Puente de los 8 Días C1 a C2)
+            </h2>
+            <p style={{ margin: '0 0 1.25rem 0', color: '#cbd5e1', fontSize: '0.92rem' }}>
+              Los Aliados cuentan con el mapa operativo de llamadas para sostener el contexto y abrir posibilidades hacia Capítulo Dos (C2).
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+              <div style={{ background: '#0f172a', border: '1px solid #334155', borderRadius: '10px', padding: '1.2rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
+                  <Clock size={18} color="#fbbf24" />
+                  <strong style={{ color: '#fbbf24', fontSize: '0.95rem' }}>Horario de Llamadas</strong>
+                </div>
+                <p style={{ margin: 0, fontSize: '0.85rem', color: '#cbd5e1', lineHeight: '1.5' }}>
+                  Realizadas <strong>obligatoriamente en la mañana</strong>. Esto le da al participante todo el día para ejecutar sus retos diarios. Por la noche, el Aliado ingresa al grupo de WhatsApp de Creación para validar la evidencia diaria.
+                </p>
+              </div>
+
+              <div style={{ background: '#0f172a', border: '1px solid #334155', borderRadius: '10px', padding: '1.2rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
+                  <Volume2 size={18} color="#34d399" />
+                  <strong style={{ color: '#34d399', fontSize: '0.95rem' }}>La Regla del 30/70</strong>
+                </div>
+                <p style={{ margin: 0, fontSize: '0.85rem', color: '#cbd5e1', lineHeight: '1.5' }}>
+                  El Aliado habla como máximo el <strong>30% del tiempo</strong> y el participante habla el <strong>70% restante</strong>. Tu rol es lanzar la pregunta poderosa, hacer silencio y escuchar con apertura.
+                </p>
+              </div>
+
+              <div style={{ background: '#0f172a', border: '1px solid #334155', borderRadius: '10px', padding: '1.2rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
+                  <UserCheck size={18} color="#38bdf8" />
+                  <strong style={{ color: '#38bdf8', fontSize: '0.95rem' }}>Liderazgo Presente</strong>
+                </div>
+                <p style={{ margin: 0, fontSize: '0.85rem', color: '#cbd5e1', lineHeight: '1.5' }}>
+                  Si termina el bloque de la mañana y alguien no llamó, el Aliado lo busca directamente. Si llama tarde, se le atiende pero se le hace notar qué espacio de postergación está abriendo.
+                </p>
+              </div>
+            </div>
+
+            {/* Estructura de 5 Minutos de la Llamada */}
+            <div style={{ background: '#0f172a', border: '1px solid #0ea5e9', borderRadius: '10px', padding: '1.35rem' }}>
+              <h3 style={{ margin: '0 0 1rem 0', fontSize: '1.05rem', color: '#38bdf8', fontWeight: 800 }}>
+                ⏱️ Estructura Innegociable de 5 Minutos por Llamada
+              </h3>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '0.85rem' }}>
+                <div style={{ background: '#1e293b', padding: '0.9rem', borderRadius: '8px', borderTop: '3px solid #38bdf8' }}>
+                  <span style={{ fontSize: '0.72rem', color: '#38bdf8', fontWeight: 800 }}>MINUTO 1</span>
+                  <strong style={{ display: 'block', margin: '0.2rem 0', fontSize: '0.88rem' }}>Saludo y Encuadre</strong>
+                  <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Saludo cálido, conexión rápida y acuerdo explícito del tiempo límite.</span>
+                </div>
+                <div style={{ background: '#1e293b', padding: '0.9rem', borderRadius: '8px', borderTop: '3px solid #34d399' }}>
+                  <span style={{ fontSize: '0.72rem', color: '#34d399', fontWeight: 800 }}>MINUTOS 2 Y 3</span>
+                  <strong style={{ display: 'block', margin: '0.2rem 0', fontSize: '0.88rem' }}>Pregunta Poderosa</strong>
+                  <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Pregunta quirúrgica, silencio del Aliado y escucha activa (70% habla el participante).</span>
+                </div>
+                <div style={{ background: '#1e293b', padding: '0.9rem', borderRadius: '8px', borderTop: '3px solid #fbbf24' }}>
+                  <span style={{ fontSize: '0.72rem', color: '#fbbf24', fontWeight: 800 }}>MINUTO 4</span>
+                  <strong style={{ display: 'block', margin: '0.2rem 0', fontSize: '0.88rem' }}>Diseño del Reto</strong>
+                  <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Definición del reto diario concreto, medible y con horario de ejecución.</span>
+                </div>
+                <div style={{ background: '#1e293b', padding: '0.9rem', borderRadius: '8px', borderTop: '3px solid #c084fc' }}>
+                  <span style={{ fontSize: '0.72rem', color: '#c084fc', fontWeight: 800 }}>MINUTO 5</span>
+                  <strong style={{ display: 'block', margin: '0.2rem 0', fontSize: '0.88rem' }}>Cierre y Evidencia</strong>
+                  <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Cierre en visión y compromiso formal de subir evidencia al grupo de WhatsApp.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* CONTENIDO 5: TÁCTICAS: EL SÍ, EL NO Y EL NO SÉ (PREGUNTAS DE QUIEBRE) */}
+      {activeTab === 'roleplay' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', padding: '1.5rem' }}>
+            <h2 style={{ margin: '0 0 0.5rem 0', fontSize: '1.25rem', color: '#38bdf8' }}>
+              Abordaje Asertivo del SÍ, el NO y el NO SÉ
+            </h2>
+            <p style={{ margin: '0 0 1.25rem 0', color: '#94a3b8', fontSize: '0.9rem' }}>
+              En C1 se entrena la velocidad de respuesta para sostener la postura ante cualquier reacción del participante:
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+              <div style={{ background: '#0f172a', borderLeft: '4px solid #10b981', borderRadius: '8px', padding: '1.2rem' }}>
+                <span style={{ background: 'rgba(16, 185, 129, 0.2)', color: '#34d399', padding: '2px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 800 }}>
+                  EL SÍ EN ACCIÓN
+                </span>
+                <h3 style={{ margin: '0.6rem 0 0.3rem 0', color: '#f8fafc', fontSize: '1.05rem' }}>Acompañamiento Inmediato</h3>
+                <p style={{ margin: 0, fontSize: '0.85rem', color: '#cbd5e1', lineHeight: '1.5' }}>
+                  Acompañamiento de máxima velocidad para consolidar la acción y asegurar la llave de ingreso (Ticket de Posibilidad) en minutos, sin abrir espacios de enfriamiento.
+                </p>
+              </div>
+
+              <div style={{ background: '#0f172a', borderLeft: '4px solid #ef4444', borderRadius: '8px', padding: '1.2rem' }}>
+                <span style={{ background: 'rgba(239, 68, 68, 0.2)', color: '#fca5a5', padding: '2px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 800 }}>
+                  EL NO
+                </span>
+                <h3 style={{ margin: '0.6rem 0 0.3rem 0', color: '#f8fafc', fontSize: '1.05rem' }}>Respeto con Firmeza y Dignidad</h3>
+                <p style={{ margin: 0, fontSize: '0.85rem', color: '#cbd5e1', lineHeight: '1.5' }}>
+                  Respetar la elección sin engancharse en discusiones ni rogar, permitiendo que el participante se haga cargo 100% de la consecuencia de su postura.
+                </p>
+              </div>
+
+              <div style={{ background: '#0f172a', borderLeft: '4px solid #f59e0b', borderRadius: '8px', padding: '1.2rem' }}>
+                <span style={{ background: 'rgba(245, 158, 11, 0.2)', color: '#fbbf24', padding: '2px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 800 }}>
+                  EL NO SÉ (DUBITATIVO)
+                </span>
+                <h3 style={{ margin: '0.6rem 0 0.3rem 0', color: '#f8fafc', fontSize: '1.05rem' }}>Interrupción del Refugio de la Duda</h3>
+                <p style={{ margin: 0, fontSize: '0.85rem', color: '#cbd5e1', lineHeight: '1.5' }}>
+                  Interrumpir con claridad asertiva. Mostrarle que el «no sé» es un disfraz para no elegir, retándolo a tomar postura clara hacia la creación o la renuncia.
+                </p>
+              </div>
+            </div>
+
+            {/* Banco de Preguntas Quirúrgicas en Lenguaje Sencillo */}
+            <div style={{ background: '#0f172a', border: '1px solid #334155', borderRadius: '10px', padding: '1.35rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                <h3 style={{ margin: 0, fontSize: '1.05rem', color: '#f8fafc', fontWeight: 800 }}>
+                  🎯 Preguntas Directas en Lenguaje Sencillo (Prohibido Preguntas Trilladas)
+                </h3>
+                <span style={{ fontSize: '0.78rem', color: '#ef4444', fontWeight: 700 }}>
+                  ⛔ PROHIBIDO: «¿En qué otras áreas de tu vida pasa esto?»
+                </span>
+              </div>
+              <p style={{ margin: '0 0 1rem 0', fontSize: '0.84rem', color: '#94a3b8' }}>
+                Usa estas preguntas cotidianas y contundentes durante el viernes, sábado, domingo y el puente de 8 días:
+              </p>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                {[
+                  {
+                    id: 'q_dinero',
+                    categoria: 'Frente a la excusa del dinero / liquidez',
+                    pregunta: '«Si quitamos la plata de la mesa por un minuto, ¿cuál es la razón real por la que prefieres no comprometerte hoy?»',
+                    efecto: 'Desarticula el argumento financiero y revela el miedo o falta de compromiso interno.'
+                  },
+                  {
+                    id: 'q_pareja',
+                    categoria: 'Frente a la excusa de la pareja o familia',
+                    pregunta: '«¿Si tu familia es tu motor, por qué la usas como el freno para no tomar tus propias decisiones?»',
+                    efecto: 'Rompe la proyección victimizante y responsabiliza al participante por su crecimiento.'
+                  },
+                  {
+                    id: 'q_almohada',
+                    categoria: 'Frente a la postergación fantástica («déjame pensarlo»)',
+                    pregunta: '«Sé sincero: ¿qué información mágica vas a encontrar el domingo debajo de tu almohada que no tengas hoy aquí parado conmigo?»',
+                    efecto: 'Evidencia la mentira educada que disfraza la indecisión y fuerza a una elección aquí y ahora.'
+                  }
+                ].map((item) => (
+                  <div key={item.id} style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '8px', padding: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
+                    <div style={{ flex: 1, minWidth: '280px' }}>
+                      <span style={{ background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', padding: '1px 6px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 700 }}>
+                        {item.categoria}
+                      </span>
+                      <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#f8fafc', marginTop: '0.35rem', fontStyle: 'italic' }}>
+                        {item.pregunta}
+                      </div>
+                      <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginTop: '0.25rem' }}>
+                        💡 {item.efecto}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => copyToClipboard(item.pregunta, item.id)}
+                      style={{
+                        background: copiedText === item.id ? '#10b981' : '#334155',
+                        border: 'none',
+                        color: '#fff',
+                        padding: '0.45rem 0.85rem',
+                        borderRadius: '6px',
+                        fontSize: '0.78rem',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.35rem'
+                      }}
+                    >
+                      {copiedText === item.id ? '¡Copiado!' : <><Copy size={13} /> Copiar</>}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* CONTENIDO 6: CONFIDENCIALIDAD & PROPIEDAD INTELECTUAL */}
+      {activeTab === 'legal' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', padding: '1.5rem' }}>
+            <h2 style={{ margin: '0 0 0.5rem 0', fontSize: '1.25rem', color: '#fbbf24', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <ShieldAlert size={22} />
+              Aviso de Propiedad Intelectual y Confidencialidad Global
+            </h2>
+            <span style={{ fontSize: '0.8rem', color: '#94a3b8', display: 'block', marginBottom: '1.25rem' }}>
+              CREAR PODER SIN LÍMITES · PROGRAMA DE RESULTADOS
+            </span>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div style={{ background: '#0f172a', borderLeft: '4px solid #38bdf8', padding: '1rem', borderRadius: '6px' }}>
+                <strong style={{ color: '#38bdf8', display: 'block', marginBottom: '0.3rem', fontSize: '0.92rem' }}>
+                  Propiedad Exclusiva
+                </strong>
+                <p style={{ margin: 0, fontSize: '0.86rem', color: '#cbd5e1', lineHeight: '1.5' }}>
+                  Todo el contenido, metodología, estructura operativa, nombres de dinámicas, procesos, marcas y material pedagógico contenidos en esta guía son propiedad intelectual exclusiva de <strong>Crear Poder Sin Límites</strong>.
+                </p>
+              </div>
+
+              <div style={{ background: '#0f172a', borderLeft: '4px solid #ef4444', padding: '1rem', borderRadius: '6px' }}>
+                <strong style={{ color: '#fca5a5', display: 'block', marginBottom: '0.3rem', fontSize: '0.92rem' }}>
+                  Prohibición de Copia y Difusión
+                </strong>
+                <p style={{ margin: 0, fontSize: '0.86rem', color: '#cbd5e1', lineHeight: '1.5' }}>
+                  Queda estrictamente prohibida la reproducción total o parcial, copia, modificación, distribución, divulgación, publicación o transmisión de este material por cualquier medio sin la autorización previa y por escrito de la dirección de <strong>Crear Poder Sin Límites</strong>.
+                </p>
+              </div>
+
+              <div style={{ background: '#0f172a', borderLeft: '4px solid #fbbf24', padding: '1rem', borderRadius: '6px' }}>
+                <strong style={{ color: '#fde68a', display: 'block', marginBottom: '0.3rem', fontSize: '0.92rem' }}>
+                  Protección Internacional de Datos
+                </strong>
+                <p style={{ margin: 0, fontSize: '0.86rem', color: '#cbd5e1', lineHeight: '1.5' }}>
+                  En cumplimiento de las normativas internacionales de protección de datos personales y privacidad, la información a la que se tenga acceso durante el programa es de carácter <strong>estrictamente confidencial</strong>. Está prohibido usar, compartir o comercializar dichos datos para fines ajenos al desarrollo del programa. El incumplimiento de estas disposiciones dará lugar a las acciones legales correspondientes.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

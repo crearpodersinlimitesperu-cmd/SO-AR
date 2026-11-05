@@ -491,6 +491,24 @@ export default function AliadosC2AdminPanel({ currentUser }) {
 
           <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
             <a
+              href="/guia-aliados-c1"
+              className="btn-secondary"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                fontSize: '0.82rem',
+                padding: '0.5rem 0.9rem',
+                textDecoration: 'none',
+                border: '1px solid rgba(56, 189, 248, 0.4)',
+                background: 'rgba(14, 165, 233, 0.15)',
+                color: '#38bdf8',
+                fontWeight: 700,
+              }}
+            >
+              📘 Guía Aliados C1 (Capítulo 1)
+            </a>
+            <a
               href="/aliados-c2/"
               target="_blank"
               rel="noreferrer"
@@ -502,8 +520,8 @@ export default function AliadosC2AdminPanel({ currentUser }) {
                 fontSize: '0.82rem',
                 padding: '0.5rem 0.9rem',
                 textDecoration: 'none',
-                border: '1px solid rgba(56, 189, 248, 0.4)',
-                color: '#38bdf8',
+                border: '1px solid rgba(245, 158, 11, 0.4)',
+                color: '#fbbf24',
               }}
             >
               <ExternalLink size={15} /> Abrir Guía Aliados C2
