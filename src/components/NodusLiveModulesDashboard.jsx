@@ -11,7 +11,10 @@ import {
   queryNodusAssistant
 } from '../services/nodusLiveSyncService';
 import { db } from '../services/firebase';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, onSnapshot } from 'firebase/firestore';
+import limaGraduadosFallback from '../data/limaGraduadosLineage.json';
+
+const LIMA_GRADUADOS_SHEET_ID = '1l93lhINfZtthELjOwBodoUEgk_d6A8gTb9hPGO6cOe4';
 
 function normalizeCleanName(str) {
   return String(str || '')
@@ -67,6 +70,16 @@ export default function NodusLiveModulesDashboard() {
   const [assistantLoading, setAssistantLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
+  // Estado para Matriz Histórica de Graduados Lima (E4–E39) + Convocatoria Aliados + Staff Elite
+  const [graduadosData, setGraduadosData] = useState(limaGraduadosFallback || { graduados: [] });
+  const [graduadosSubTab, setGraduadosSubTab] = useState('matriz');
+  const [gradSearch, setGradSearch] = useState('');
+  const [gradRoleFilter, setGradRoleFilter] = useState('ALL');
+  const [gradEditionFilter, setGradEditionFilter] = useState('ALL');
+  const [gradEquipoFilter, setGradEquipoFilter] = useState('ALL');
+  const [gradSyncLoading, setGradSyncLoading] = useState(false);
+  const [gradSyncMessage, setGradSyncMessage] = useState('');
+
   // Suscripciones en tiempo real
   useEffect(() => {
     const unsubCatalog = subscribeToNodusCatalog((res) => {
@@ -81,12 +94,171 @@ export default function NodusLiveModulesDashboard() {
       if (res.ok) setContabilidadData(res.data);
     });
 
+    let unsubGraduados = null;
+    if (db) {
+      unsubGraduados = onSnapshot(doc(db, 'graduados_lineage_master', 'latest'), (snap) => {
+        if (snap.exists()) {
+          setGraduadosData(snap.data());
+        }
+      }, () => {});
+    }
+
     return () => {
       if (unsubCatalog) unsubCatalog();
       if (unsubAliados) unsubAliados();
       if (unsubContabilidad) unsubContabilidad();
+      if (unsubGraduados) unsubGraduados();
     };
   }, []);
+
+  const graduadosList = graduadosData?.graduados || [];
+
+  const findGraduadoInfo = (rawName) => {
+    if (!rawName || graduadosList.length === 0) return null;
+    const norm = normalizeCleanName(rawName);
+    if (!norm) return null;
+    const exact = graduadosList.find(g => normalizeCleanName(g.nombre) === norm);
+    if (exact) return exact;
+    return graduadosList.find(g => matchPersonNames(g.nombre, rawName)) || null;
+  };
+
+  const handleSyncGraduadosSheetLive = async () => {
+    setGradSyncLoading(true);
+    setGradSyncMessage('');
+    try {
+      const roleMap = { M: 'Manager', A: 'Aliado', C: 'Coordinador', Q: 'Staff Quantum' };
+      const fetchCsv = async (gid) => {
+        const res = await fetch(`https://docs.google.com/spreadsheets/d/${LIMA_GRADUADOS_SHEET_ID}/gviz/tq?tqx=out:csv&gid=${gid}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status} en gid=${gid}`);
+        return parseCsvRows(await res.text());
+      };
+
+      const [gradRows, conv32Rows, conv33Rows, staff1Rows, staff2Rows] = await Promise.all([
+        fetchCsv('1933359030'),
+        fetchCsv('1566198541').catch(() => []),
+        fetchCsv('1421396086').catch(() => []),
+        fetchCsv('74378996').catch(() => []),
+        fetchCsv('97173777').catch(() => [])
+      ]);
+
+      const parsedGraduados = [];
+      if (gradRows.length > 1) {
+        const headers = gradRows[0];
+        for (let i = 1; i < gradRows.length; i++) {
+          const r = gradRows[i];
+          if (!r || r.length < 2) continue;
+          const nombre = (r[0] || '').trim();
+          const equipoOriginal = (r[1] || '').trim();
+          if (!nombre || nombre.toLowerCase().includes('crear cuantico')) continue;
+          const participaciones = [];
+          const rolesSummary = { manager: 0, aliado: 0, coordinador: 0, staff: 0 };
+          let ultimoRol = null;
+          for (let c = 2; c < Math.min(r.length, headers.length); c++) {
+            const val = (r[c] || '').trim().toUpperCase();
+            if (val && val !== '-' && val !== 'NI' && val !== '0') {
+              const edLabel = headers[c] || `E${c}`;
+              const roleLabel = roleMap[val] || val;
+              participaciones.push({ edicion: edLabel, rolCode: val, rolLabel: roleLabel });
+              if (val === 'M') rolesSummary.manager++;
+              else if (val === 'A') rolesSummary.aliado++;
+              else if (val === 'C') rolesSummary.coordinador++;
+              else if (val === 'Q') rolesSummary.staff++;
+              ultimoRol = `${edLabel}: ${roleLabel}`;
+            }
+          }
+          parsedGraduados.push({
+            nombre,
+            nombreNorm: normalizeCleanName(nombre),
+            equipoOriginal,
+            participaciones,
+            totalParticipaciones: participaciones.length,
+            rolesSummary,
+            ultimoRol
+          });
+        }
+      }
+
+      const parseConv = (rows, label) => {
+        const out = [];
+        for (let i = 2; i < rows.length; i++) {
+          const r = rows[i] || [];
+          const nombre = (r[0] || '').trim();
+          if (!nombre || nombre.toUpperCase().includes('CREADOR CUANTICO') || nombre.toUpperCase().includes('CAPITANA')) continue;
+          out.push({
+            nombre,
+            nombreNorm: normalizeCleanName(nombre),
+            equipo: (r[1] || '').trim(),
+            responsable: (r[2] || '').trim().toUpperCase(),
+            estado: (r[3] || '').trim().toUpperCase() || 'PENDIENTE',
+            observaciones: (r[4] || '').trim(),
+            grounding: (r[5] || '').trim().toUpperCase(),
+            nivel: (r[6] || '').trim().toUpperCase(),
+            reto1: (r[7] || r[8] || '').trim(),
+            qt: (r[14] || '').trim(),
+            sombras: (r[15] || '').trim(),
+            edicion: label
+          });
+        }
+        return out;
+      };
+
+      const parseStaff = (rows, capLabel) => {
+        const out = [];
+        const hIdx = rows.findIndex(r => (r[0] || '').toUpperCase().includes('RESP'));
+        const headers = hIdx >= 0 ? rows[hIdx] : [];
+        const start = hIdx >= 0 ? hIdx + 1 : 2;
+        for (let i = start; i < rows.length; i++) {
+          const r = rows[i] || [];
+          const resp = (r[0] || '').trim().toUpperCase();
+          const nombre = (r[1] || '').trim();
+          if (!nombre || nombre.toUpperCase().includes('STAFF')) continue;
+          out.push({
+            responsable: resp,
+            nombre,
+            nombreNorm: normalizeCleanName(nombre),
+            equipo: (r[2] || '').trim(),
+            turno1: (r[3] || '').trim(),
+            turno1Label: headers[3] || 'Turno 1',
+            turno2: (r[4] || '').trim(),
+            turno2Label: headers[4] || 'Turno 2',
+            turno3: (r[5] || '').trim(),
+            turno3Label: headers[5] || 'Turno 3',
+            turno4: (r[6] || '').trim(),
+            turno4Label: headers[6] || 'Turno 4 / Obs',
+            observaciones: (r[7] || r[6] || '').trim(),
+            capitulo: capLabel
+          });
+        }
+        return out;
+      };
+
+      const payload = {
+        ...graduadosData,
+        graduados: parsedGraduados.length > 0 ? parsedGraduados : graduadosList,
+        convocatoriaAliadosE32: parseConv(conv32Rows, 'C1E32'),
+        convocatoriaAliadosE33: parseConv(conv33Rows, 'C1E33'),
+        staffEliteCap1E32: parseStaff(staff1Rows, 'CAP 1 E32'),
+        staffEliteCap2E32: parseStaff(staff2Rows, 'CAP 2 E32'),
+        metadata: {
+          ...(graduadosData?.metadata || {}),
+          totalGraduados: parsedGraduados.length || graduadosList.length,
+          sheetId: LIMA_GRADUADOS_SHEET_ID,
+          updatedAt: new Date().toISOString()
+        }
+      };
+
+      setGraduadosData(payload);
+      if (db) {
+        await setDoc(doc(db, 'graduados_lineage_master', 'latest'), payload, { merge: true });
+        await setDoc(doc(db, 'lima_graduados_lineage', 'latest'), payload, { merge: true }).catch(() => {});
+      }
+      setGradSyncMessage(`✅ Sincronizado en vivo: ${payload.graduados.length} Graduados (E4–E39), ${payload.convocatoriaAliadosE32.length} Convocatoria E32 y ${payload.staffEliteCap1E32.length + payload.staffEliteCap2E32.length} Staff Elite.`);
+    } catch (err) {
+      setGradSyncMessage(`⚠️ Error al sincronizar desde Google Sheet: ${err.message}`);
+    } finally {
+      setGradSyncLoading(false);
+    }
+  };
 
   const handleRunAssistantQuery = async (e) => {
     if (e) e.preventDefault();
@@ -528,6 +700,25 @@ export default function NodusLiveModulesDashboard() {
           }}
         >
           <Users size={16} /> Aliados & Conversión C1-C2
+        </button>
+
+        <button
+          onClick={() => setActiveTab('graduados')}
+          style={{
+            padding: '0.55rem 1.1rem',
+            borderRadius: '8px',
+            border: activeTab === 'graduados' ? '1px solid #f59e0b' : '1px solid transparent',
+            background: activeTab === 'graduados' ? 'rgba(245, 158, 11, 0.18)' : 'transparent',
+            color: activeTab === 'graduados' ? '#fbbf24' : '#94a3b8',
+            fontWeight: 700,
+            fontSize: '0.88rem',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem'
+          }}
+        >
+          <Sparkles size={16} /> Graduados & Staff ({graduadosList.length} Creadores E4–E39)
         </button>
 
         <button
@@ -1182,6 +1373,8 @@ export default function NodusLiveModulesDashboard() {
                       const pagosNodus = row.pagosNodus ?? pagosSheet;
                       const isCuadrado = row.cuadrado !== undefined ? row.cuadrado : (pxSheet === pxNodus && pagosSheet === pagosNodus);
 
+                      const gradInfo = findGraduadoInfo(row.aliado);
+
                       return (
                         <tr key={idx} style={{ borderBottom: '1px solid #334155', background: idx % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.015)' }}>
                           <td style={{ padding: '0.7rem 0.9rem', fontWeight: 700, color: '#38bdf8', fontSize: '0.78rem' }}>
@@ -1193,6 +1386,18 @@ export default function NodusLiveModulesDashboard() {
                               {row.declaradoC2Nodus && (
                                 <span style={{ background: 'rgba(168, 85, 247, 0.2)', border: '1px solid rgba(168, 85, 247, 0.45)', color: '#c084fc', padding: '1px 6px', borderRadius: '4px', fontSize: '0.68rem', fontWeight: 700 }}>
                                   Declarado C2 Nodus
+                                </span>
+                              )}
+                              {gradInfo && (
+                                <span
+                                  onClick={() => {
+                                    setGradSearch(gradInfo.nombre);
+                                    setActiveTab('graduados');
+                                  }}
+                                  title={`Ver historial en Matriz Graduados: Equipo Original ${gradInfo.equipoOriginal} | Último Rol: ${gradInfo.ultimoRol || 'Graduado'}`}
+                                  style={{ background: 'rgba(245, 158, 11, 0.16)', border: '1px solid rgba(245, 158, 11, 0.45)', color: '#fbbf24', padding: '1px 6px', borderRadius: '4px', fontSize: '0.68rem', fontWeight: 700, cursor: 'pointer' }}
+                                >
+                                  🎓 Eq.{gradInfo.equipoOriginal} ({gradInfo.totalParticipaciones} serv.)
                                 </span>
                               )}
                             </div>
@@ -1676,6 +1881,430 @@ export default function NodusLiveModulesDashboard() {
           </div>
         </div>
       )}
+
+      {/* CONTENIDO DE PESTAÑA: MATRIZ HISTÓRICA DE GRADUADOS LIMA (E4–E39) + CONVOCATORIA ALIADOS + STAFF ELITE */}
+      {activeTab === 'graduados' && (() => {
+        const convE32 = graduadosData?.convocatoriaAliadosE32 || [];
+        const convE33 = graduadosData?.convocatoriaAliadosE33 || [];
+        const staffCap1 = graduadosData?.staffEliteCap1E32 || [];
+        const staffCap2 = graduadosData?.staffEliteCap2E32 || [];
+        const activeE32Aliados = aliadosData?.equipos?.['149']?.aliados || [];
+
+        const totalQ = graduadosList.filter(g => (g.rolesSummary?.staff || 0) > 0).length;
+        const totalC = graduadosList.filter(g => (g.rolesSummary?.coordinador || 0) > 0).length;
+        const totalA = graduadosList.filter(g => (g.rolesSummary?.aliado || 0) > 0).length;
+        const totalM = graduadosList.filter(g => (g.rolesSummary?.manager || 0) > 0).length;
+
+        const uniqueEquiposOrig = Array.from(new Set(graduadosList.map(g => String(g.equipoOriginal || '').trim()).filter(Boolean)))
+          .sort((a, b) => Number(a) - Number(b));
+
+        const allEditions = Array.from(new Set(
+          graduadosList.flatMap(g => (g.participaciones || []).map(p => p.edicion))
+        )).sort((a, b) => Number(String(a).replace(/\D/g, '')) - Number(String(b).replace(/\D/g, '')));
+
+        const filteredGraduados = graduadosList.filter(g => {
+          if (gradSearch.trim()) {
+            const q = normalizeCleanName(gradSearch);
+            const nameMatch = normalizeCleanName(g.nombre).includes(q);
+            const eqMatch = String(g.equipoOriginal || '').includes(gradSearch.trim());
+            const rolMatch = String(g.ultimoRol || '').toUpperCase().includes(gradSearch.trim().toUpperCase());
+            if (!nameMatch && !eqMatch && !rolMatch) return false;
+          }
+          if (gradEquipoFilter !== 'ALL' && String(g.equipoOriginal) !== gradEquipoFilter) return false;
+          if (gradRoleFilter === 'Q' && !(g.rolesSummary?.staff > 0)) return false;
+          if (gradRoleFilter === 'C' && !(g.rolesSummary?.coordinador > 0)) return false;
+          if (gradRoleFilter === 'A' && !(g.rolesSummary?.aliado > 0)) return false;
+          if (gradRoleFilter === 'M' && !(g.rolesSummary?.manager > 0)) return false;
+          if (gradRoleFilter === 'ACTIVE_E32') {
+            const inE32 = activeE32Aliados.some(a => matchPersonNames(a.aliado, g.nombre));
+            if (!inE32) return false;
+          }
+          if (gradEditionFilter !== 'ALL') {
+            const hasEd = (g.participaciones || []).some(p => p.edicion === gradEditionFilter);
+            if (!hasEd) return false;
+          }
+          return true;
+        });
+
+        const roleBadgeColor = (code) => {
+          if (code === 'Q') return { bg: 'rgba(168, 85, 247, 0.22)', border: '#a855f7', text: '#d8b4fe' };
+          if (code === 'C') return { bg: 'rgba(245, 158, 11, 0.22)', border: '#f59e0b', text: '#fde68a' };
+          if (code === 'A') return { bg: 'rgba(16, 185, 129, 0.22)', border: '#10b981', text: '#6ee7b7' };
+          return { bg: 'rgba(14, 165, 233, 0.2)', border: '#0ea5e9', text: '#7dd3fc' };
+        };
+
+        return (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            {/* Banner Superior de Conexión con Google Sheet Oficial */}
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.14) 0%, rgba(15, 23, 42, 0.96) 100%)',
+              border: '1px solid rgba(245, 158, 11, 0.4)',
+              borderRadius: '12px',
+              padding: '1.15rem 1.35rem',
+              display: 'flex',
+              flexWrap: 'wrap',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              gap: '1rem'
+            }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+                  <span style={{ background: '#f59e0b', color: '#0f172a', padding: '2px 8px', borderRadius: '5px', fontSize: '0.73rem', fontWeight: 900 }}>
+                    SHEET OFICIAL INTEGRADO
+                  </span>
+                  <h3 style={{ margin: 0, fontSize: '1.08rem', fontWeight: 800, color: '#f8fafc' }}>
+                    🎓 Matriz Histórica de Graduados Lima (E4–E39), Convocatoria Aliados & Staff Elite
+                  </h3>
+                </div>
+                <p style={{ margin: '0.35rem 0 0 0', fontSize: '0.82rem', color: '#cbd5e1' }}>
+                  Conectado directamente a <code>1l93lhINfZtthELjOwBodoUEgk_d6A8gTb9hPGO6cOe4</code> (<code>gid=1933359030</code>) • Roles: <strong>M</strong> (Manager), <strong>A</strong> (Aliado), <strong>C</strong> (Capitán/Coordinador), <strong>Q</strong> (Quantum / Staff QT).
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
+                <button
+                  onClick={handleSyncGraduadosSheetLive}
+                  disabled={gradSyncLoading}
+                  style={{
+                    background: '#10b981',
+                    border: 'none',
+                    color: '#052e16',
+                    padding: '0.5rem 0.95rem',
+                    borderRadius: '8px',
+                    fontSize: '0.8rem',
+                    fontWeight: 800,
+                    cursor: gradSyncLoading ? 'wait' : 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.4rem'
+                  }}
+                >
+                  <RefreshCw size={14} className={gradSyncLoading ? 'animate-spin' : ''} />
+                  {gradSyncLoading ? 'Sincronizando Sheet...' : 'Sincronizar en Vivo desde Google Sheet'}
+                </button>
+                <a
+                  href={`https://docs.google.com/spreadsheets/d/${LIMA_GRADUADOS_SHEET_ID}/edit?gid=1933359030#gid=1933359030`}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    background: 'rgba(14, 165, 233, 0.16)',
+                    border: '1px solid rgba(14, 165, 233, 0.45)',
+                    color: '#38bdf8',
+                    padding: '0.48rem 0.85rem',
+                    borderRadius: '8px',
+                    fontSize: '0.78rem',
+                    fontWeight: 700,
+                    textDecoration: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.35rem'
+                  }}
+                >
+                  Abrir Google Sheet <ExternalLink size={13} />
+                </a>
+              </div>
+            </div>
+
+            {gradSyncMessage && (
+              <div style={{
+                padding: '0.65rem 1rem',
+                borderRadius: '8px',
+                background: gradSyncMessage.startsWith('✅') ? 'rgba(16, 185, 129, 0.16)' : 'rgba(245, 158, 11, 0.16)',
+                border: gradSyncMessage.startsWith('✅') ? '1px solid #10b981' : '1px solid #f59e0b',
+                color: '#f8fafc',
+                fontSize: '0.82rem',
+                fontWeight: 700
+              }}>
+                {gradSyncMessage}
+              </div>
+            )}
+
+            {/* Tarjetas KPI de Graduados y Linaje */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(175px, 1fr))', gap: '0.85rem' }}>
+              <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '10px', padding: '0.9rem 1rem' }}>
+                <div style={{ fontSize: '0.74rem', color: '#94a3b8', fontWeight: 600 }}>CREADORES GRADUADOS (E4–E31)</div>
+                <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#f8fafc', marginTop: '3px' }}>{graduadosList.length}</div>
+                <div style={{ fontSize: '0.72rem', color: '#fbbf24' }}>Matriz histórica E5 a E39</div>
+              </div>
+              <div style={{ background: '#1e293b', border: '1px solid rgba(168, 85, 247, 0.4)', borderRadius: '10px', padding: '0.9rem 1rem' }}>
+                <div style={{ fontSize: '0.74rem', color: '#d8b4fe', fontWeight: 600 }}>HISTORIAL QUANTUM (Q)</div>
+                <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#c084fc', marginTop: '3px' }}>{totalQ}</div>
+                <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>Graduados que han sido QT</div>
+              </div>
+              <div style={{ background: '#1e293b', border: '1px solid rgba(245, 158, 11, 0.4)', borderRadius: '10px', padding: '0.9rem 1rem' }}>
+                <div style={{ fontSize: '0.74rem', color: '#fde68a', fontWeight: 600 }}>HISTORIAL CAPITÁN / COORD (C)</div>
+                <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#fbbf24', marginTop: '3px' }}>{totalC}</div>
+                <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>Capitanes de equipo</div>
+              </div>
+              <div style={{ background: '#1e293b', border: '1px solid rgba(16, 185, 129, 0.4)', borderRadius: '10px', padding: '0.9rem 1rem' }}>
+                <div style={{ fontSize: '0.74rem', color: '#6ee7b7', fontWeight: 600 }}>HISTORIAL ALIADO (A)</div>
+                <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#34d399', marginTop: '3px' }}>{totalA}</div>
+                <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>Experiencia como Aliado</div>
+              </div>
+              <div style={{ background: '#1e293b', border: '1px solid rgba(14, 165, 233, 0.4)', borderRadius: '10px', padding: '0.9rem 1rem' }}>
+                <div style={{ fontSize: '0.74rem', color: '#7dd3fc', fontWeight: 600 }}>HISTORIAL MANAGER (M)</div>
+                <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#38bdf8', marginTop: '3px' }}>{totalM}</div>
+                <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>Experiencia en Maestría</div>
+              </div>
+              <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '10px', padding: '0.9rem 1rem' }}>
+                <div style={{ fontSize: '0.74rem', color: '#94a3b8', fontWeight: 600 }}>STAFF ELITE & CONVOCATORIA</div>
+                <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#f8fafc', marginTop: '3px' }}>{staffCap1.length + staffCap2.length}</div>
+                <div style={{ fontSize: '0.72rem', color: '#38bdf8' }}>Cap1: {staffCap1.length} • Cap2: {staffCap2.length} • Conv E32: {convE32.length}</div>
+              </div>
+            </div>
+
+            {/* Sub-pestañas dentro del módulo Graduados Lima */}
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+              {[
+                { id: 'matriz', label: `📜 Matriz Graduados E4–E39 (${graduadosList.length})` },
+                { id: 'convocatoria', label: `🎯 Convocatoria Aliados C1E32 / E33 (${convE32.length})` },
+                { id: 'staff', label: `🕴️ Staff Elite Cap 1 & Cap 2 E32 (${staffCap1.length + staffCap2.length})` }
+              ].map(st => (
+                <button
+                  key={st.id}
+                  onClick={() => setGraduadosSubTab(st.id)}
+                  style={{
+                    padding: '0.48rem 0.95rem',
+                    borderRadius: '8px',
+                    border: graduadosSubTab === st.id ? '1px solid #fbbf24' : '1px solid #334155',
+                    background: graduadosSubTab === st.id ? 'rgba(245, 158, 11, 0.2)' : '#0f172a',
+                    color: graduadosSubTab === st.id ? '#fbbf24' : '#94a3b8',
+                    fontSize: '0.82rem',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                >
+                  {st.label}
+                </button>
+              ))}
+            </div>
+
+            {/* SUB-VISTA 1: MATRIZ HISTÓRICA DE GRADUADOS (E4 A E39) */}
+            {graduadosSubTab === 'matriz' && (
+              <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '10px', overflow: 'hidden' }}>
+                <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid #334155', display: 'flex', flexWrap: 'wrap', gap: '0.75rem', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#0f172a', border: '1px solid #334155', borderRadius: '8px', padding: '0.4rem 0.75rem', minWidth: '250px', flex: 1 }}>
+                    <Search size={15} color="#94a3b8" />
+                    <input
+                      type="text"
+                      value={gradSearch}
+                      onChange={e => setGradSearch(e.target.value)}
+                      placeholder="Buscar Creador Cuántico por nombre, equipo o rol..."
+                      style={{ background: 'transparent', border: 'none', color: '#f8fafc', fontSize: '0.84rem', width: '100%', outline: 'none' }}
+                    />
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                    <select
+                      value={gradRoleFilter}
+                      onChange={e => setGradRoleFilter(e.target.value)}
+                      style={{ background: '#0f172a', color: '#f8fafc', border: '1px solid #334155', borderRadius: '6px', padding: '0.42rem 0.65rem', fontSize: '0.8rem', fontWeight: 700 }}
+                    >
+                      <option value="ALL">Rol Histórico: Todos</option>
+                      <option value="Q">🟣 Con Rol Quantum (Q)</option>
+                      <option value="C">🟡 Con Rol Capitán/Coord (C)</option>
+                      <option value="A">🟢 Con Rol Aliado (A)</option>
+                      <option value="M">🔵 Con Rol Manager (M)</option>
+                      <option value="ACTIVE_E32">⚡ Activos en Equipo 32 (Nodus/Sheet)</option>
+                    </select>
+
+                    <select
+                      value={gradEquipoFilter}
+                      onChange={e => setGradEquipoFilter(e.target.value)}
+                      style={{ background: '#0f172a', color: '#f8fafc', border: '1px solid #334155', borderRadius: '6px', padding: '0.42rem 0.65rem', fontSize: '0.8rem', fontWeight: 700 }}
+                    >
+                      <option value="ALL">Equipo Origen: Todos</option>
+                      {uniqueEquiposOrig.map(eq => (
+                        <option key={eq} value={eq}>Equipo Original {eq}</option>
+                      ))}
+                    </select>
+
+                    <select
+                      value={gradEditionFilter}
+                      onChange={e => setGradEditionFilter(e.target.value)}
+                      style={{ background: '#0f172a', color: '#f8fafc', border: '1px solid #334155', borderRadius: '6px', padding: '0.42rem 0.65rem', fontSize: '0.8rem', fontWeight: 700 }}
+                    >
+                      <option value="ALL">Edición Servicio: Todas (E5–E39)</option>
+                      {allEditions.map(ed => (
+                        <option key={ed} value={ed}>Sirvió en {ed}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div style={{ padding: '0.55rem 1.25rem', background: '#0f172a', borderBottom: '1px solid #334155', fontSize: '0.78rem', color: '#94a3b8', display: 'flex', justifyContent: 'space-between' }}>
+                  <span>Mostrando <strong>{filteredGraduados.length}</strong> de {graduadosList.length} Creadores Cuánticos Graduados</span>
+                  <span>Leyenda: <strong>M</strong>=Manager • <strong>A</strong>=Aliado • <strong>C</strong>=Capitán • <strong>Q</strong>=Quantum</span>
+                </div>
+
+                <div style={{ overflowX: 'auto', maxHeight: '620px' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.82rem' }}>
+                    <thead style={{ position: 'sticky', top: 0, background: '#0f172a', zIndex: 2 }}>
+                      <tr style={{ borderBottom: '1px solid #334155', color: '#94a3b8' }}>
+                        <th style={{ padding: '0.7rem 1rem' }}>Creador Cuántico</th>
+                        <th style={{ padding: '0.7rem 0.7rem', textAlign: 'center' }}>Eq. Original</th>
+                        <th style={{ padding: '0.7rem 0.7rem', textAlign: 'center' }}>Total Serv.</th>
+                        <th style={{ padding: '0.7rem 0.7rem', textAlign: 'center' }}>M / A / C / Q</th>
+                        <th style={{ padding: '0.7rem 0.9rem' }}>Trayectoria por Edición (E5 a E39)</th>
+                        <th style={{ padding: '0.7rem 0.9rem' }}>Último Rol / Estado E32</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredGraduados.map((g, idx) => {
+                        const activeInE32 = activeE32Aliados.find(a => matchPersonNames(a.aliado, g.nombre));
+                        return (
+                          <tr key={idx} style={{ borderBottom: '1px solid #334155', background: activeInE32 ? 'rgba(16, 185, 129, 0.06)' : (idx % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.015)') }}>
+                            <td style={{ padding: '0.68rem 1rem', fontWeight: 700, color: '#f8fafc' }}>
+                              <div>{g.nombre}</div>
+                              {activeInE32 && (
+                                <span style={{ display: 'inline-block', marginTop: '3px', background: 'rgba(16, 185, 129, 0.2)', border: '1px solid #10b981', color: '#34d399', padding: '1px 6px', borderRadius: '4px', fontSize: '0.68rem', fontWeight: 800 }}>
+                                  ⚡ Activo en E32 ({activeInE32.quantum || 'ALIADO'} • {activeInE32.pxSheet ?? activeInE32.asignados ?? 0} PX)
+                                </span>
+                              )}
+                            </td>
+                            <td style={{ padding: '0.68rem 0.7rem', textAlign: 'center', fontWeight: 800, color: '#fbbf24' }}>
+                              Eq. {g.equipoOriginal || '-'}
+                            </td>
+                            <td style={{ padding: '0.68rem 0.7rem', textAlign: 'center', fontWeight: 800, color: '#f8fafc' }}>
+                              {g.totalParticipaciones || 0}
+                            </td>
+                            <td style={{ padding: '0.68rem 0.7rem', textAlign: 'center', fontSize: '0.76rem', fontWeight: 700 }}>
+                              <span style={{ color: '#38bdf8' }}>M:{g.rolesSummary?.manager || 0}</span>{' · '}
+                              <span style={{ color: '#34d399' }}>A:{g.rolesSummary?.aliado || 0}</span>{' · '}
+                              <span style={{ color: '#fbbf24' }}>C:{g.rolesSummary?.coordinador || 0}</span>{' · '}
+                              <span style={{ color: '#c084fc' }}>Q:{g.rolesSummary?.staff || 0}</span>
+                            </td>
+                            <td style={{ padding: '0.68rem 0.9rem' }}>
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                                {(g.participaciones || []).length === 0 ? (
+                                  <span style={{ color: '#64748b', fontSize: '0.75rem' }}>Graduado (Sin roles posteriores registrados)</span>
+                                ) : (
+                                  (g.participaciones || []).map((p, pIdx) => {
+                                    const st = roleBadgeColor(p.rolCode);
+                                    return (
+                                      <span
+                                        key={pIdx}
+                                        title={`${p.edicion}: ${p.rolLabel}`}
+                                        style={{
+                                          background: st.bg,
+                                          border: `1px solid ${st.border}`,
+                                          color: st.text,
+                                          padding: '1px 6px',
+                                          borderRadius: '4px',
+                                          fontSize: '0.7rem',
+                                          fontWeight: 800
+                                        }}
+                                      >
+                                        {p.edicion}:{p.rolCode}
+                                      </span>
+                                    );
+                                  })
+                                )}
+                              </div>
+                            </td>
+                            <td style={{ padding: '0.68rem 0.9rem', fontSize: '0.78rem', color: '#cbd5e1', fontWeight: 600 }}>
+                              {g.ultimoRol || 'Graduado'}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* SUB-VISTA 2: CONVOCATORIA ALIADOS C1E32 / C1E33 */}
+            {graduadosSubTab === 'convocatoria' && (
+              <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '10px', overflow: 'hidden' }}>
+                <div style={{ padding: '0.95rem 1.25rem', borderBottom: '1px solid #334155' }}>
+                  <h4 style={{ margin: 0, fontSize: '0.98rem', fontWeight: 800, color: '#f8fafc' }}>
+                    🎯 Seguimiento de Convocatoria y Grounding — Pestaña ALIADOS C1E32 / C1E33 ({convE32.length} registros)
+                  </h4>
+                </div>
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.81rem' }}>
+                    <thead>
+                      <tr style={{ background: '#0f172a', borderBottom: '1px solid #334155', color: '#94a3b8' }}>
+                        <th style={{ padding: '0.68rem 0.9rem' }}>Creador Cuántico</th>
+                        <th style={{ padding: '0.68rem 0.65rem', textAlign: 'center' }}>Equipo</th>
+                        <th style={{ padding: '0.68rem 0.65rem', textAlign: 'center' }}>Responsable</th>
+                        <th style={{ padding: '0.68rem 0.65rem', textAlign: 'center' }}>Estado</th>
+                        <th style={{ padding: '0.68rem 0.65rem', textAlign: 'center' }}>Grounding</th>
+                        <th style={{ padding: '0.68rem 0.65rem', textAlign: 'center' }}>Nivel</th>
+                        <th style={{ padding: '0.68rem 0.9rem' }}>Observaciones / Reto 1</th>
+                        <th style={{ padding: '0.68rem 0.9rem' }}>QT / Sombras</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {convE32.map((item, idx) => (
+                        <tr key={idx} style={{ borderBottom: '1px solid #334155' }}>
+                          <td style={{ padding: '0.65rem 0.9rem', fontWeight: 700, color: '#f8fafc' }}>{item.nombre}</td>
+                          <td style={{ padding: '0.65rem 0.65rem', textAlign: 'center', color: '#fbbf24', fontWeight: 700 }}>{item.equipo}</td>
+                          <td style={{ padding: '0.65rem 0.65rem', textAlign: 'center', color: '#38bdf8', fontWeight: 700 }}>{item.responsable}</td>
+                          <td style={{ padding: '0.65rem 0.65rem', textAlign: 'center', fontWeight: 800, color: item.estado === 'OK' ? '#34d399' : '#f59e0b' }}>{item.estado}</td>
+                          <td style={{ padding: '0.65rem 0.65rem', textAlign: 'center', fontWeight: 700, color: item.grounding === 'OK' ? '#34d399' : '#94a3b8' }}>{item.grounding || '-'}</td>
+                          <td style={{ padding: '0.65rem 0.65rem', textAlign: 'center', color: '#c084fc', fontWeight: 700 }}>{item.nivel || '-'}</td>
+                          <td style={{ padding: '0.65rem 0.9rem', color: '#cbd5e1' }}>
+                            {[item.observaciones, item.reto1].filter(Boolean).join(' • ') || '-'}
+                          </td>
+                          <td style={{ padding: '0.65rem 0.9rem', color: '#94a3b8' }}>
+                            {[item.qt ? `QT: ${item.qt}` : '', item.sombras ? `Sombra: ${item.sombras}` : ''].filter(Boolean).join(' | ') || '-'}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* SUB-VISTA 3: STAFF ELITE CAP 1 & CAP 2 E32 */}
+            {graduadosSubTab === 'staff' && (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(440px, 1fr))', gap: '1rem' }}>
+                {[
+                  { title: '🕴️ STAFF ELITE CAP 1 E32 (gid=74378996)', rows: staffCap1 },
+                  { title: '🕴️ STAFF ELITE CAP 2 E32 (gid=97173777)', rows: staffCap2 }
+                ].map((block, bIdx) => (
+                  <div key={bIdx} style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '10px', overflow: 'hidden' }}>
+                    <div style={{ padding: '0.85rem 1.1rem', borderBottom: '1px solid #334155', fontWeight: 800, color: '#f8fafc', fontSize: '0.92rem' }}>
+                      {block.title} ({block.rows.length})
+                    </div>
+                    <div style={{ overflowX: 'auto' }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.8rem' }}>
+                        <thead>
+                          <tr style={{ background: '#0f172a', borderBottom: '1px solid #334155', color: '#94a3b8' }}>
+                            <th style={{ padding: '0.6rem 0.75rem' }}>Resp.</th>
+                            <th style={{ padding: '0.6rem 0.75rem' }}>Staff Elite / Apoyo</th>
+                            <th style={{ padding: '0.6rem 0.55rem', textAlign: 'center' }}>Eq.</th>
+                            <th style={{ padding: '0.6rem 0.55rem', textAlign: 'center' }}>Turno 1</th>
+                            <th style={{ padding: '0.6rem 0.55rem', textAlign: 'center' }}>Turno 2</th>
+                            <th style={{ padding: '0.6rem 0.55rem', textAlign: 'center' }}>Turno 3</th>
+                            <th style={{ padding: '0.6rem 0.75rem' }}>Obs.</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {block.rows.map((r, rIdx) => (
+                            <tr key={rIdx} style={{ borderBottom: '1px solid #334155' }}>
+                              <td style={{ padding: '0.58rem 0.75rem', fontWeight: 800, color: '#38bdf8' }}>{r.responsable}</td>
+                              <td style={{ padding: '0.58rem 0.75rem', fontWeight: 700, color: '#f8fafc' }}>{r.nombre}</td>
+                              <td style={{ padding: '0.58rem 0.55rem', textAlign: 'center', color: '#fbbf24', fontWeight: 700 }}>{r.equipo}</td>
+                              <td style={{ padding: '0.58rem 0.55rem', textAlign: 'center', color: r.turno1 ? '#34d399' : '#64748b', fontWeight: 700 }}>{r.turno1 || '-'}</td>
+                              <td style={{ padding: '0.58rem 0.55rem', textAlign: 'center', color: r.turno2 ? '#34d399' : '#64748b', fontWeight: 700 }}>{r.turno2 || '-'}</td>
+                              <td style={{ padding: '0.58rem 0.55rem', textAlign: 'center', color: r.turno3 ? '#34d399' : '#64748b', fontWeight: 700 }}>{r.turno3 || '-'}</td>
+                              <td style={{ padding: '0.58rem 0.75rem', color: '#cbd5e1' }}>{r.observaciones || r.turno4 || '-'}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })()}
     </div>
   );
 }

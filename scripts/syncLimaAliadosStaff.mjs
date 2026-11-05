@@ -16,6 +16,10 @@ import fs from 'fs';
 
 const SHEET_ID = '1l93lhINfZtthELjOwBodoUEgk_d6A8gTb9hPGO6cOe4';
 const GID_ALIADOS_C1E31 = '488639774';
+const GID_ALIADOS_C1E32 = '1566198541';
+const GID_ALIADOS_C1E33 = '1421396086';
+const GID_STAFF_CAP1_E32 = '74378996';
+const GID_STAFF_CAP2_E32 = '97173777';
 const GID_STAFF_E31 = '1709168726';
 const GID_STAFF_E30 = '695198016';
 const GID_GRADUADOS_LIMA = '1933359030';
@@ -176,6 +180,76 @@ export async function fetchAndProcessLimaSheet() {
     console.warn('⚠️ No se pudo descargar pestaña GRADUADOS:', gradRes.statusText);
   }
 
+  // 3. Descargar Convocatoria ALIADOS C1E32 y C1E33
+  async function parseConvocatoriaTab(gid, label) {
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${gid}`;
+    const res = await fetch(url);
+    if (!res.ok) return [];
+    const rows = parseCSV(await res.text());
+    const items = [];
+    for (let i = 2; i < rows.length; i++) {
+      const r = rows[i] || [];
+      const nombre = (r[0] || '').trim();
+      if (!nombre || nombre.toUpperCase().includes('CREADOR CUANTICO') || nombre.toUpperCase().includes('CAPITANA')) continue;
+      items.push({
+        nombre,
+        nombreNorm: cleanPersonName(nombre),
+        equipo: (r[1] || '').trim(),
+        responsable: (r[2] || '').trim().toUpperCase(),
+        estado: (r[3] || '').trim().toUpperCase() || 'PENDIENTE',
+        observaciones: (r[4] || '').trim(),
+        grounding: (r[5] || '').trim().toUpperCase(),
+        nivel: (r[6] || '').trim().toUpperCase(),
+        reto1: (r[7] || r[8] || '').trim(),
+        qt: (r[14] || '').trim(),
+        sombras: (r[15] || '').trim(),
+        edicion: label
+      });
+    }
+    return items;
+  }
+
+  const convocatoriaAliadosE32 = await parseConvocatoriaTab(GID_ALIADOS_C1E32, 'C1E32');
+  const convocatoriaAliadosE33 = await parseConvocatoriaTab(GID_ALIADOS_C1E33, 'C1E33');
+
+  // 4. Descargar STAFF ELITE CAP 1 E32 y CAP 2 E32
+  async function parseStaffEliteTab(gid, capLabel) {
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${gid}`;
+    const res = await fetch(url);
+    if (!res.ok) return [];
+    const rows = parseCSV(await res.text());
+    const items = [];
+    const headerRowIdx = rows.findIndex(r => (r[0] || '').toUpperCase().includes('RESP'));
+    const headers = headerRowIdx >= 0 ? rows[headerRowIdx] : [];
+    const startIdx = headerRowIdx >= 0 ? headerRowIdx + 1 : 2;
+    for (let i = startIdx; i < rows.length; i++) {
+      const r = rows[i] || [];
+      const resp = (r[0] || '').trim().toUpperCase();
+      const nombre = (r[1] || '').trim();
+      if (!nombre || nombre.toUpperCase().includes('STAFF')) continue;
+      items.push({
+        responsable: resp,
+        nombre,
+        nombreNorm: cleanPersonName(nombre),
+        equipo: (r[2] || '').trim(),
+        turno1: (r[3] || '').trim(),
+        turno1Label: headers[3] || 'Turno 1',
+        turno2: (r[4] || '').trim(),
+        turno2Label: headers[4] || 'Turno 2',
+        turno3: (r[5] || '').trim(),
+        turno3Label: headers[5] || 'Turno 3',
+        turno4: (r[6] || '').trim(),
+        turno4Label: headers[6] || 'Turno 4 / Obs',
+        observaciones: (r[7] || r[6] || '').trim(),
+        capitulo: capLabel
+      });
+    }
+    return items;
+  }
+
+  const staffEliteCap1E32 = await parseStaffEliteTab(GID_STAFF_CAP1_E32, 'CAP 1 E32');
+  const staffEliteCap2E32 = await parseStaffEliteTab(GID_STAFF_CAP2_E32, 'CAP 2 E32');
+
   return {
     totalAliados: aliadosList.length,
     totalOk,
@@ -183,7 +257,11 @@ export async function fetchAndProcessLimaSheet() {
     targetAliados: 25,
     coordStats,
     aliadosList,
-    graduadosList
+    graduadosList,
+    convocatoriaAliadosE32,
+    convocatoriaAliadosE33,
+    staffEliteCap1E32,
+    staffEliteCap2E32
   };
 }
 
@@ -355,21 +433,34 @@ export async function syncLimaGoalsToFirestore() {
     console.log('✅ Directorio de aliados de Lima guardado en Firestore.');
   }
 
-  // Guardar Linaje Histórico de Graduados de Lima (E4 a E39)
+  // Guardar Linaje Histórico de Graduados de Lima (E4 a E39) + Convocatorias E31/E32/E33 + Staff Elite
   if (data.graduadosList && data.graduadosList.length > 0) {
     console.log(`💾 Guardando linaje de ${data.graduadosList.length} Creadores Cuánticos Graduados de Lima en Firestore...`);
-    await db.collection('lima_graduados_lineage').doc('latest').set({
+    const payload = {
       graduados: data.graduadosList,
+      convocatoriaAliadosE31: data.aliadosList || [],
+      convocatoriaAliadosE32: data.convocatoriaAliadosE32 || [],
+      convocatoriaAliadosE33: data.convocatoriaAliadosE33 || [],
+      staffEliteCap1E32: data.staffEliteCap1E32 || [],
+      staffEliteCap2E32: data.staffEliteCap2E32 || [],
       metadata: {
         totalGraduados: data.graduadosList.length,
+        totalConvocatoriaE31: (data.aliadosList || []).length,
+        totalConvocatoriaE32: (data.convocatoriaAliadosE32 || []).length,
+        totalConvocatoriaE33: (data.convocatoriaAliadosE33 || []).length,
+        totalStaffCap1E32: (data.staffEliteCap1E32 || []).length,
+        totalStaffCap2E32: (data.staffEliteCap2E32 || []).length,
         sheetId: SHEET_ID,
         tabGid: GID_GRADUADOS_LIMA,
         tabName: 'GRADUADOS',
         sede: 'Lima',
         updatedAt: new Date().toISOString()
       }
-    }, { merge: true });
-    console.log('✅ Linaje de Creadores Graduados de Lima guardado en Firestore (lima_graduados_lineage/latest).');
+    };
+    await db.collection('lima_graduados_lineage').doc('latest').set(payload, { merge: true });
+    await db.collection('graduados_lineage_master').doc('latest').set(payload, { merge: true });
+    fs.writeFileSync('./src/data/limaGraduadosLineage.json', JSON.stringify(payload, null, 2), 'utf8');
+    console.log('✅ Linaje de Creadores Graduados de Lima guardado en Firestore (lima_graduados_lineage/latest & graduados_lineage_master/latest) y src/data/limaGraduadosLineage.json.');
   }
 
   console.log('🎉 Sincronización oficial de Lima completada con éxito.');
