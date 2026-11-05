@@ -37,12 +37,12 @@ import {
 import { useNavigate } from 'react-router-dom';
 
 const ALIADOS_C2_FIREBASE_CONFIG = {
-  apiKey: 'AIzaSyAu7Oa19PYgLQJYRb5HAsYgWw2KRqyqcM4',
-  authDomain: 'aliados-crear-global.firebaseapp.com',
-  projectId: 'aliados-crear-global',
-  storageBucket: 'aliados-crear-global.firebasestorage.app',
-  messagingSenderId: '803494420111',
-  appId: '1:803494420111:web:bb2fd8fcb92bfce9b31afa',
+  apiKey: 'AIzaSyCTMrA6A64s1ppDBBsol-fqam5Vch_Q5B0',
+  authDomain: 'centro-operativo-cpsl.firebaseapp.com',
+  projectId: 'centro-operativo-cpsl',
+  storageBucket: 'centro-operativo-cpsl.firebasestorage.app',
+  messagingSenderId: '122588918051',
+  appId: '1:122588918051:web:c85d6835b1b1f920fb1c96',
 };
 
 const ADMIN_CONTROL_TOKEN = 'CAUSA_OS_SUPERADMIN_C2_2026';

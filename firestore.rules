@@ -1340,6 +1340,45 @@ service cloud.firestore {
       allow create: if isAuthenticated();
       allow update, delete: if isSuperAdmin() || isGerenteODireccion();
     }
+
+    // ============================================================================
+    // MÓDULO DE ALIADOS: Guía Operativa C1 y C2, encuestas, checklist y bitácora de seguridad
+    // ============================================================================
+    match /encuestas_aliados/{uid} {
+      allow read: if true;
+      allow create, update: if isAuthenticated();
+      allow delete: if isSuperAdmin();
+    }
+
+    match /aliados_autorizados/{emailId} {
+      allow read: if true;
+      allow create, update: if isAuthenticated() || isSuperAdmin();
+      allow delete: if isSuperAdmin();
+    }
+
+    match /aliados_sesiones/{uid} {
+      allow read: if true;
+      allow create, update: if true;
+      allow delete: if isSuperAdmin();
+    }
+
+    match /aliados_conexiones_log/{logId} {
+      allow read: if true;
+      allow create: if true;
+      allow update, delete: if isSuperAdmin();
+    }
+
+    match /records/{uid} {
+      allow read: if true;
+      allow create, update: if isAuthenticated() || isSuperAdmin();
+      allow delete: if isSuperAdmin();
+
+      match /events/{eventId} {
+        allow read: if true;
+        allow create: if isAuthenticated() || isSuperAdmin();
+        allow update, delete: if isSuperAdmin();
+      }
+    }
   }
 }
 

@@ -15,12 +15,12 @@ import {
 } from 'firebase/firestore';
 
 export const FIREBASE_CONFIG = {
-  projectId: import.meta.env.VITE_C2_PROJECT_ID || 'aliados-crear-global',
-  appId: '1:803494420111:web:bb2fd8fcb92bfce9b31afa',
-  storageBucket: 'aliados-crear-global.firebasestorage.app',
-  apiKey: import.meta.env.VITE_C2_API_KEY || 'AIzaSyAu7Oa19PYgLQJYRb5HAsYgWw2KRqyqcM4',
-  authDomain: import.meta.env.VITE_C2_AUTH_DOMAIN || 'aliados-crear-global.firebaseapp.com',
-  messagingSenderId: '803494420111',
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || 'centro-operativo-cpsl',
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || '1:122588918051:web:c85d6835b1b1f920fb1c96',
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || 'centro-operativo-cpsl.firebasestorage.app',
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'AIzaSyCTMrA6A64s1ppDBBsol-fqam5Vch_Q5B0',
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || 'centro-operativo-cpsl.firebaseapp.com',
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '122588918051',
 };
 
 export const ADMIN_EMAILS = [
