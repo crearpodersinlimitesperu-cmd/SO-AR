@@ -95,10 +95,11 @@ El código combina azul oscuro y dorado en identidad, acciones y numeración; gr
 - **Display** (750, `clamp(35px, 4.2vw, 60px)`, line-height 1.05): título de apertura; en vista estrecha se reduce mediante reglas responsive.
 - **Title** (700, 28px, line-height 1.2): encabezados de sección; el tamaño cambia en móvil.
 - **Body** (400, 16px, line-height 1.65): texto base de párrafo, con ancho máximo de 72ch.
+- La implementación también usa pasos de 10–14px para etiquetas y descripciones auxiliares y 15–26px para encabezados y controles según su función. No se reduce la lectura principal móvil por debajo de 16px.
 
 ## Layout
 
-El contenedor principal tiene un máximo de 1600px. En escritorio, el índice ocupa 240px junto al contenido; desde 1150px pasa a 185px. Desde 900px el índice y el contenido se apilan, y el índice de fases se dispone en cuatro columnas. Desde 650px, la agenda y el panel de preparación se apilan y la tira de fases usa dos columnas. A partir de 1400px, el panel lateral de preparación aumenta de 310px a 350px.
+El contenedor principal tiene un máximo de 1600px. En escritorio, el índice tiene un ancho preferido de 240px junto al contenido; desde 1150px pasa a 185px. El contenedor y la agenda usan flex con wrap para apilarse también al ampliar la página; no dependen exclusivamente de media queries. Desde 900px el índice y el contenido se apilan, y el índice de fases se dispone en cuatro columnas, reducidas a dos desde 650px. En un contenido de menos de 650px, una container query oculta la marca decorativa C2 y mantiene la apertura en una columna para no comprimir el título al ampliar. Desde 650px el panel de preparación ocupa el ancho completo y la tira de fases usa dos columnas. A partir de 1400px, el ancho preferido del panel de preparación aumenta de 310px a 350px.
 
 El ritmo se apoya en separaciones de sección de 30–40px, bordes entre filas y padding interno específico por componente; no hay una escala de espaciado común declarada.
 
@@ -127,6 +128,12 @@ Las superficies son mayoritariamente rectangulares, con radios pequeños observa
 ### Preparation checklist
 - **Panel:** superficie blanca, padding 26px 24px y borde superior dorado de 4px.
 - **Items:** controles alineados con el texto, separadores superiores y color de confirmación cuando están marcados.
+- **Alcance:** marcas temporales de demostración. El estado no representa confirmación de guardado ni un registro de cuenta.
+
+### Logo y avisos
+- El logo existente CREAR se presenta sin modificación sobre blanco, con texto alternativo y un mensaje de recuperación si no carga.
+- El aviso previo a la agenda y el aviso junto a las casillas explican que no hay cuentas ni persistencia.
+- En móvil, la navegación de fases ocupa dos columnas; la lectura principal usa 16px y la información secundaria 14px. Los controles de consulta y privacidad son alcanzables con teclado y tienen áreas táctiles de al menos 44px.
 
 ### Disclosures
 - **Estructura:** resumen con altura mínima de 60px y borde inferior.

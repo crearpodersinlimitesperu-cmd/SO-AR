@@ -28,7 +28,7 @@
     {
       "name": "Preparation checklist item",
       "kind": "custom",
-      "description": "Repeated locally markable item with supporting text.",
+      "description": "Repeated temporary demonstration item with supporting text; no account or persistence.",
       "html": "<li class=\"ds-checklist-item\"><label class=\"ds-checklist-label\"><input type=\"checkbox\" /><span><strong>Revisar el acuerdo</strong><small>Confirma los detalles con tu equipo.</small></span></label></li>",
       "css": ".ds-checklist-item { border-top: 1px solid #cdd6df; } .ds-checklist-label { display: flex; gap: 11px; padding: 17px 0; color: #122c48; cursor: pointer; } .ds-checklist-label input { appearance: none; width: 19px; height: 19px; flex-shrink: 0; margin: 1px 0 0; border: 1px solid #7b8ea1; border-radius: 3px; background: #ffffff; } .ds-checklist-label input:checked { appearance: auto; accent-color: #122c48; } .ds-checklist-label input:focus-visible { outline: 3px solid #006fba; outline-offset: 4px; } .ds-checklist-label strong { display: block; font-size: 13px; line-height: 1.45; } .ds-checklist-label small { display: block; margin-top: 5px; color: #506174; font-size: 11px; line-height: 1.7; } .ds-checklist-label:has(input:checked) strong { color: #145538; }"
     },
@@ -48,7 +48,7 @@
     }
   ],
   "narrative": {
-    "overview": "Este registro describe solo el prototipo local Guía de Aliados C2; no es el sistema global de diseño de Causa OS. La paleta azul y dorada está presente en la implementación y se registra como evidencia del código, no como confirmación visual directa del usuario.\n\nLa interfaz organiza la guía en fases, filas de horario, consulta desplegable y preparación local. Usa tipografía de sistema, superficies claras, divisores y una composición que pasa de navegación lateral y contenido en columnas a una sola columna en pantallas estrechas.",
+    "overview": "Este registro describe solo el prototipo local Guía de Aliados C2; no es el sistema global de diseño de Causa OS. La paleta azul y dorada está presente en la implementación y se registra como evidencia del código, no como confirmación visual directa del usuario.\n\nLa interfaz organiza la guía en fases, filas de horario, consulta desplegable y preparación temporal de demostración, sin cuentas ni persistencia. Usa el logo existente CREAR sin modificar, tipografía de sistema, superficies claras y divisores. La agenda y preparación usan flex con wrap para soportar también zoom, con navegación lateral que pasa a una sola columna en pantallas estrechas.",
     "keyCharacteristics": [
       "Colores y estados extraídos de prototypes/aliados-c2/style.css.",
       "Rejilla de consulta con navegación por fase, agenda y panel de preparación.",

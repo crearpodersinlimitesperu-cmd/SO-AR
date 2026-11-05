@@ -4,7 +4,6 @@ import { readFileSync } from 'node:fs';
 import { createServer } from 'vite';
 import puppeteer from 'puppeteer';
 import { phases, preparation } from '../prototypes/aliados-c2/content.js';
-import { decodeProgress, STORAGE_KEY } from '../prototypes/aliados-c2/progress.js';
 
 test('C2 content preserves phases, timings and mission dimensions', () => {
   assert.equal(phases.length, 4);
@@ -18,13 +17,12 @@ test('C2 content preserves phases, timings and mission dimensions', () => {
   assert.ok(phases[3].events.every(event => event[1] === 'Sin horario'));
 });
 
-test('progress rejects corrupt and unexpected data rather than hiding failures', () => {
-  const ids = preparation.map(item => item.id);
-  assert.deepEqual(decodeProgress(null, ids), []);
-  assert.deepEqual(decodeProgress('["tecnica","tecnica"]', ids), ['tecnica']);
-  for (const raw of ['bad json', '{}', '["email@example.test"]', '[null]']) {
-    assert.throws(() => decodeProgress(raw, ids));
-  }
+test('official logo is reused unchanged and private records are not simulated', () => {
+  assert.deepEqual(readFileSync('prototypes/aliados-c2/logo-crear.png'), readFileSync('public/imo/logo-crear.png'));
+  const prototype = readFileSync('prototypes/aliados-c2/main.jsx', 'utf8');
+  assert.doesNotMatch(prototype, /localStorage|sessionStorage|indexedDB|document\.cookie/);
+  assert.match(prototype, /no tiene inicio de sesión, historial individual ni sincronización/);
+  assert.match(prototype, /responsable, contacto, finalidad, conservación, derechos y transferencias/);
 });
 
 test('prototype is not wired into the production application and discourages indexing', () => {
@@ -35,7 +33,7 @@ test('prototype is not wired into the production application and discourages ind
   assert.doesNotMatch(prototype, /firebase|fetch\(|https?:\/\//);
 });
 
-test('guide works on desktop and mobile: phases, local progress, recovery and print', async () => {
+test('local guide: logo, privacy, temporary marks, blocked storage, responsive layout and print', async () => {
   const server = await createServer({
     configFile: 'prototypes/aliados-c2/vite.config.js',
     server: { port: 0, strictPort: false, host: '127.0.0.1', hmr: false },
@@ -52,17 +50,32 @@ test('guide works on desktop and mobile: phases, local progress, recovery and pr
       if (!request.url().startsWith('http://127.0.0.1:') && !request.url().startsWith('data:')) external.push(request.url());
     });
     const url = `http://127.0.0.1:${server.httpServer.address().port}/`;
+    await page.evaluateOnNewDocument(() => {
+      for (const method of ['getItem', 'setItem', 'removeItem']) {
+        Storage.prototype[method] = () => { throw new Error('Synthetic storage unavailable'); };
+      }
+    });
     await page.setViewport({ width: 1440, height: 1000 });
     await page.goto(url);
     await page.waitForSelector('.schedule-phase');
+    assert.equal(await page.$eval('.brand img', image => image.complete && image.naturalWidth > 0), true);
+    assert.match(await page.$eval('#privacidad', node => node.textContent), /Propiedad intelectual/);
     assert.equal(await page.$$eval('.schedule-phase:not(.phase-hidden)', items => items.length), 4);
     await page.click('.phase-link[href="#entrenamiento"]');
     await page.waitForFunction(() => document.querySelectorAll('.schedule-phase:not(.phase-hidden)').length === 1);
     assert.ok(await page.$eval('#entrenamiento', node => node.textContent.includes('14:01')));
     await page.click('.checklist input');
-    await page.waitForFunction(key => JSON.parse(localStorage.getItem(key)).includes('tecnica'), {}, STORAGE_KEY);
+    await page.waitForFunction(() => document.querySelector('.checklist input').checked);
+    assert.match(await page.$eval('[role="status"]', node => node.textContent), /No se ha guardado/);
+    const otherPage = await browser.newPage();
+    await otherPage.goto(url);
+    await otherPage.waitForSelector('.checklist input');
+    assert.equal(await otherPage.$eval('.checklist input', node => node.checked), false);
+    await otherPage.close();
     await page.reload();
-    await page.waitForSelector('.checklist input:checked');
+    await page.waitForSelector('.checklist input');
+    assert.equal(await page.$eval('.checklist input', node => node.checked), false);
+    await page.click('.checklist input');
     await page.click('.reset-button');
     assert.equal(await page.$eval('.checklist input', node => node.checked), true);
     await page.click('.reset-confirm button:last-child');
@@ -85,20 +98,30 @@ test('guide works on desktop and mobile: phases, local progress, recovery and pr
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth));
     await page.setViewport({ width: 320, height: 740 });
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth));
+    await page.setViewport({ width: 768, height: 1024 });
+    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth));
+    await page.setViewport({ width: 1280, height: 800 });
+    await page.evaluate(() => { document.documentElement.style.zoom = '200%'; });
+    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth));
+    assert.ok(await page.$eval('h1', node => node.getBoundingClientRect().width >= 300));
+    assert.equal(await page.$eval('.chapter-mark', node => getComputedStyle(node).display), 'none');
+    await page.evaluate(() => { document.documentElement.style.zoom = ''; });
+    await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
+    assert.equal(await page.$eval('.details-sign', node => getComputedStyle(node).transitionDuration), '0s');
+    assert.equal(await page.$eval('.brand', node => node.getBoundingClientRect().height >= 44), true);
+    await page.click('a[href="#privacidad"]');
+    assert.match(await page.$eval('#privacidad', node => node.textContent), /no protege el acceso/);
+    await page.keyboard.press('Tab');
+    assert.equal(await page.evaluate(() => {
+      const target = document.activeElement;
+      return target.tagName === 'A' || target.tagName === 'BUTTON' || target.tagName === 'INPUT' || target.tagName === 'SUMMARY';
+    }), true);
 
-    await page.evaluate(key => localStorage.setItem(key, 'corrupt'), STORAGE_KEY);
-    await page.reload();
-    await page.waitForSelector('[role="alert"]');
-    await page.click('.reset-button');
-    await page.click('.reset-confirm button:first-of-type');
-    await page.waitForFunction(() => !document.querySelector('[role="alert"]'));
     await page.evaluate(() => {
-      Storage.prototype.setItem = () => { throw new Error('Synthetic denied storage'); };
+      document.querySelector('.brand img').dispatchEvent(new Event('error'));
     });
-    await page.click('.checklist input');
     await page.waitForSelector('[role="alert"]');
-    assert.equal(await page.$eval('.checklist input', node => node.checked), true);
-    assert.match(await page.$eval('[role="alert"]', node => node.textContent), /No se pudo guardar/);
+    assert.match(await page.$eval('[role="alert"]', node => node.textContent), /No se pudo cargar el logo/);
 
     await page.emulateMediaType('print');
     assert.equal(await page.$$eval('.schedule-phase', nodes => nodes.filter(node => getComputedStyle(node).display !== 'none').length), 4);
