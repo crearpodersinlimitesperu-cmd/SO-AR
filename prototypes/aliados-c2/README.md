@@ -50,7 +50,7 @@ Con autorización posterior para Firebase Spark, sin vincular facturación:
 - APIs de Firestore y Authentication habilitadas solo en `aliados-crear-global`.
 - Base de datos `(default)` creada en `nam5`, edición Standard, `freeTier: true`, protección contra borrado habilitada y PITR deshabilitado. No se activó billing ni se guardaron registros de Aliados.
 - Authentication **no inicializado**, respuesta verificada `404 CONFIGURATION_NOT_FOUND`. La respuesta observada a la pregunta de consola fue retirada por el coordinador; no se considera confirmación. No se ejecutó `identityPlatform:initializeAuth`, que requiere billing.
-- `private/firebase.json` configura exclusivamente `closed.rules`, que deniega todas las lecturas/escrituras de cliente. El borrador `private/firestore.rules` y el modelo de acciones **no están habilitados para datos reales**; faltan pruebas negativas con emulador e integración de identidad.
+- `private/firebase.json` configura exclusivamente `closed.rules`, que deniega todas las lecturas/escrituras de cliente. El candidato `private/firestore.rules` y el modelo de acciones **no están habilitados para datos reales**; las pruebas negativas de emulador pasaron, pero falta integración de identidad.
 
 El correo designado por el usuario para administración es `sistemas@crearpsl.net`; aún no está autenticado/verificado en el proyecto. No se crearon sus credenciales ni se lo suplantó. Inicializar Authentication gratuitamente desde la consola, verificar esa identidad y aprobar el aviso legal siguen siendo requisitos para habilitar acceso. El primer paso no autoriza invitar personas automáticamente.
 
@@ -64,10 +64,12 @@ Pruebas locales del modelo de acciones y configuración cerrada:
 node --test tests/aliados-c2-private-model.test.mjs tests/aliados-c2-closed-rules.test.mjs tests/aliados-c2-hosting.test.mjs
 ```
 
-Se incluyen pruebas sintéticas del **borrador** de reglas para UID ajeno, correo no verificado, aprobación, revocación y estado/historial atómicos. No equivalen a validación del servicio: en este host falta un runtime Java y no se ejecutaron. El runner informa explícitamente `skip` si no hay emulador. Tras instalar un runtime Java compatible, se pueden ejecutar sin contactar producción:
+Se incluyen pruebas sintéticas del **candidato** de reglas para UID ajeno, correo no verificado, aprobación, revocación y estado/historial atómicos. Se ejecutaron en el emulador local `demo-aliados-c2` con un runtime JDK 21 compartido por la sesión coordinadora: **6 pruebas aprobadas, cero fallos y cero omitidas**. El emulador se apagó al finalizar; no se contactaron servicios del proyecto real para esta validación. El runner informa explícitamente `skip` si no hay emulador. Con un runtime Java compatible se pueden reproducir:
 
 ```sh
 firebase emulators:exec --only firestore --config prototypes/aliados-c2/private/emulator.json --project demo-aliados-c2 "node --test tests/aliados-c2-private-emulator.test.mjs"
 ```
 
-No desplegar `private/firestore.rules` por haber pasado el modelo de JavaScript: son verificaciones distintas. Tampoco hay frontend autenticado, recuperación de sincronización o prueba de limpieza real al cambiar cuenta; el borrador es preparatorio, no una implementación completa de esas funciones.
+La prueba verificó aprobación por administrador exacto y verificado; rechazo de autoaprobación, identidad no aprobada/no verificada y correo inconsistente; estado e historial escritos juntos; rechazo de historial editado/borrado, revisión obsoleta y acciones que alteran acuerdos ajenos; rechazo de acceso cruzado entre UID y revocación efectiva.
+
+No desplegar `private/firestore.rules` por haber pasado estas pruebas: falta integración con Authentication. El cambio de UID se probó en las reglas, **no** como cambio de cuenta de un frontend real. Tampoco hay frontend autenticado, recuperación de sincronización o prueba de limpieza real al cambiar cuenta; el candidato es preparatorio, no una implementación completa de esas funciones. Las reglas desplegadas siguen siendo `closed.rules`; no se habilitó acceso ni se publicó otra versión.
