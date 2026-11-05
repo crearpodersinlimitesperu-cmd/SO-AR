@@ -20,6 +20,7 @@ import IAAuditor from '../components/IAAuditor';
 import TaskAssignmentModal from '../components/TaskAssignmentModal';
 import AliadosC2AdminPanel from '../components/AliadosC2AdminPanel';
 import GuiaAliadosC1 from './GuiaAliadosC1';
+import NodusLiveModulesDashboard from '../components/NodusLiveModulesDashboard';
 import { getAllAuditLogs, recordAuditEvent, getAllUserConnections } from '../services/auditService';
 import { runRoleIntegrityAuditAndHeal, applyReviewedRoleChanges } from '../services/roleIntegritySentinelAgent';
 
@@ -1693,6 +1694,9 @@ export default function SuperAdminPanel() {
             {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion') && (
               <button style={tabStyle('aliados_c2')} onClick={() => setActiveView('aliados_c2')}>🛡️ Aliados C2 (Guía & Accesos)</button>
             )}
+            {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion') && (
+              <button style={tabStyle('contraste_nodus')} onClick={() => setActiveView('contraste_nodus')}>📊 Contraste Nodus vs Sheets</button>
+            )}
           </div>
           {activeView === 'global' && <GlobalView tasks={tasks} navigate={navigate} realUsersData={displayedUsersData} />}
           {activeView === 'sede' && (
@@ -1741,6 +1745,41 @@ export default function SuperAdminPanel() {
           )}
           {activeView === 'aliados_c2' && (
             <AliadosC2AdminPanel currentUser={currentUser} />
+          )}
+          {activeView === 'contraste_nodus' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              <div
+                className="glass-panel"
+                style={{
+                  padding: '1.25rem 1.5rem',
+                  border: '1px solid rgba(16, 185, 129, 0.4)',
+                  background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(15, 23, 42, 0.7))',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  gap: '1rem',
+                  borderRadius: '10px',
+                }}
+              >
+                <div>
+                  <h2 style={{ margin: 0, color: '#34d399', fontSize: '1.25rem', fontWeight: 800 }}>
+                    📊 Módulo Independiente: Contraste Nodus vs. Google Sheets (QT & Aliados)
+                  </h2>
+                  <p style={{ margin: '0.35rem 0 0 0', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                    Auditoría viva multiequipo: contraste de PX, declaraciones C2, pagos totales (C2 + MJ), desertores y Matriz Histórica de Graduados (E4–E39).
+                  </p>
+                </div>
+                <button
+                  onClick={() => navigate('/contraste-nodus')}
+                  className="btn-primary"
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem' }}
+                >
+                  Abrir Pantalla Completa ↗
+                </button>
+              </div>
+              <NodusLiveModulesDashboard />
+            </div>
           )}
         </>
       )}

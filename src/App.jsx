@@ -21,6 +21,7 @@ import CentroManagers from './pages/CentroManagers';
 import SuperAdminPanel from './pages/SuperAdminPanel';
 import CallCoachCRM from './pages/CallCoachCRM';
 import GuiaAliadosC1 from './pages/GuiaAliadosC1';
+import ContrasteNodusSheets from './pages/ContrasteNodusSheets';
 
 const CfoDashboard = lazy(() => import('./pages/CfoDashboard'));
 const AICopilot = lazy(() => import('./components/AICopilot'));
@@ -472,6 +473,14 @@ function App() {
             </PrivateRoute>
           } />
           <Route path="/guias/aliados-c1" element={<Navigate to="/guia-aliados-c1" replace />} />
+
+          <Route path="/contraste-nodus" element={
+            <PrivateRoute>
+              <ContrasteNodusSheets />
+            </PrivateRoute>
+          } />
+          <Route path="/nodus-contraste" element={<Navigate to="/contraste-nodus" replace />} />
+          <Route path="/nodus-aliados" element={<Navigate to="/contraste-nodus" replace />} />
 
           <Route path="/centro-managers" element={
             <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'director_maestria']} requireSuperAdmin={false}>

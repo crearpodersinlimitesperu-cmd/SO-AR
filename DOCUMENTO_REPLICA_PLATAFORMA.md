@@ -67462,6 +67462,7 @@ import CentroManagers from './pages/CentroManagers';
 import SuperAdminPanel from './pages/SuperAdminPanel';
 import CallCoachCRM from './pages/CallCoachCRM';
 import GuiaAliadosC1 from './pages/GuiaAliadosC1';
+import ContrasteNodusSheets from './pages/ContrasteNodusSheets';
 
 const CfoDashboard = lazy(() => import('./pages/CfoDashboard'));
 const AICopilot = lazy(() => import('./components/AICopilot'));
@@ -67913,6 +67914,14 @@ function App() {
             </PrivateRoute>
           } />
           <Route path="/guias/aliados-c1" element={<Navigate to="/guia-aliados-c1" replace />} />
+
+          <Route path="/contraste-nodus" element={
+            <PrivateRoute>
+              <ContrasteNodusSheets />
+            </PrivateRoute>
+          } />
+          <Route path="/nodus-contraste" element={<Navigate to="/contraste-nodus" replace />} />
+          <Route path="/nodus-aliados" element={<Navigate to="/contraste-nodus" replace />} />
 
           <Route path="/centro-managers" element={
             <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'director_maestria']} requireSuperAdmin={false}>
@@ -89967,7 +89976,7 @@ import {
   ChevronRight,
   Lock,
 } from 'lucide-react';
-import NodusLiveModulesDashboard from './NodusLiveModulesDashboard';
+import { useNavigate } from 'react-router-dom';
 
 const ALIADOS_C2_FIREBASE_CONFIG = {
   apiKey: 'AIzaSyAu7Oa19PYgLQJYRb5HAsYgWw2KRqyqcM4',
@@ -90030,6 +90039,7 @@ function isRecentlyActive(tsOrIso) {
 }
 
 export default function AliadosC2AdminPanel({ currentUser }) {
+  const navigate = useNavigate();
   const [autorizados, setAutorizados] = useState([]);
   const [encuestas, setEncuestas] = useState([]);
   const [sesiones, setSesiones] = useState([]);
@@ -91030,12 +91040,39 @@ export default function AliadosC2AdminPanel({ currentUser }) {
         )}
       </div>
 
-      {/* Contraste en Tiempo Real: Nodus (/aliados?id_equipo=<ID>) vs Google Sheet Oficial QT & Aliados + Matriz Graduados E4-E39 */}
-      <div className="glass-panel" style={{ padding: '1.25rem', border: '1px solid rgba(16, 185, 129, 0.35)' }}>
-        <h3 style={{ marginTop: 0, marginBottom: '0.75rem', color: '#34d399', fontSize: '1.1rem', fontWeight: 800 }}>
-          📊 Contraste Multiequipo Nodus vs. Google Sheet (QT & Aliados) + 🎓 Matriz Histórica de Graduados (E4–E39 & Staff Elite)
-        </h3>
-        <NodusLiveModulesDashboard />
+      {/* Acceso Directo al Módulo Independiente: Contraste Nodus vs Sheets */}
+      <div
+        className="glass-panel"
+        style={{
+          padding: '1.1rem 1.4rem',
+          border: '1px solid rgba(16, 185, 129, 0.4)',
+          background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(15, 23, 42, 0.6))',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '1rem',
+          borderRadius: '10px',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.9rem' }}>
+          <span style={{ fontSize: '1.75rem' }}>📊</span>
+          <div>
+            <div style={{ color: '#34d399', fontWeight: 800, fontSize: '1rem' }}>
+              Módulo Separado: Contraste Nodus vs. Google Sheet (QT & Aliados)
+            </div>
+            <div style={{ color: 'var(--text-muted)', fontSize: '0.82rem' }}>
+              La auditoría multiequipo y la Matriz Histórica de Graduados (E4–E39) se gestionan en su propio módulo independiente.
+            </div>
+          </div>
+        </div>
+        <button
+          onClick={() => navigate('/contraste-nodus')}
+          className="btn-primary"
+          style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', padding: '0.55rem 1.1rem' }}
+        >
+          Abrir Módulo de Contraste ↗
+        </button>
       </div>
 
       {/* Bitácora en Vivo de Conexiones y Alertas Anti-Captura */}
@@ -130531,6 +130568,135 @@ function KPIMetric({ label, value, target, actual, isInverse = false }) {
 
 ---
 
+## Archivo: src/pages/ContrasteNodusSheets.jsx
+
+```javascript
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+  ArrowLeft,
+  ShieldCheck,
+  ExternalLink,
+  BookOpen,
+  FileSpreadsheet,
+  Layers,
+} from 'lucide-react';
+import NodusLiveModulesDashboard from '../components/NodusLiveModulesDashboard';
+
+export default function ContrasteNodusSheets() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    document.title = 'Contraste Nodus vs Sheets · CREAR Poder Sin Límites';
+    const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+    link.type = 'image/png';
+    link.rel = 'shortcut icon';
+    link.href = '/logo-crear.png';
+    document.getElementsByTagName('head')[0].appendChild(link);
+  }, []);
+
+  return (
+    <div style={{ padding: '1.5rem 2rem 4rem 2rem', maxWidth: '1600px', margin: '0 auto', color: '#f8fafc' }}>
+      {/* Barra superior de navegación y contexto */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <button
+            onClick={() => navigate('/home')}
+            className="btn-secondary"
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.45rem 0.9rem', fontSize: '0.85rem' }}
+          >
+            <ArrowLeft size={16} /> Inicio
+          </button>
+          <button
+            onClick={() => navigate('/superadmin')}
+            className="btn-secondary"
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.45rem 0.9rem', fontSize: '0.85rem' }}
+          >
+            <ShieldCheck size={16} /> Centro de Mando
+          </button>
+        </div>
+
+        <div style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap' }}>
+          <button
+            onClick={() => navigate('/guia-aliados-c1')}
+            className="btn-secondary"
+            style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.82rem', borderColor: '#38bdf8' }}
+          >
+            <BookOpen size={14} color="#38bdf8" /> Guía Aliados C1
+          </button>
+          <a
+            href="/aliados-c2/"
+            target="_blank"
+            rel="noreferrer"
+            className="btn-secondary"
+            style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.82rem', borderColor: '#fbbf24' }}
+          >
+            <ExternalLink size={14} color="#fbbf24" /> Portal Aliados C2
+          </a>
+        </div>
+      </div>
+
+      {/* Encabezado del Módulo */}
+      <div
+        className="glass-panel"
+        style={{
+          padding: '1.5rem 1.75rem',
+          marginBottom: '1.75rem',
+          border: '1px solid rgba(16, 185, 129, 0.4)',
+          background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(15, 23, 42, 0.85))',
+          borderRadius: '12px',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+          <span style={{ fontSize: '1.75rem' }}>📊</span>
+          <span
+            style={{
+              padding: '0.2rem 0.6rem',
+              borderRadius: '999px',
+              fontSize: '0.72rem',
+              fontWeight: 800,
+              letterSpacing: '0.05em',
+              background: 'rgba(16, 185, 129, 0.25)',
+              color: '#34d399',
+              border: '1px solid rgba(52, 211, 153, 0.4)',
+            }}
+          >
+            MÓDULO OFICIAL INDEPENDIENTE
+          </span>
+          <span
+            style={{
+              padding: '0.2rem 0.6rem',
+              borderRadius: '999px',
+              fontSize: '0.72rem',
+              fontWeight: 700,
+              background: 'rgba(56, 189, 248, 0.15)',
+              color: '#38bdf8',
+            }}
+          >
+            NODUS LIVE + GOOGLE SHEETS
+          </span>
+        </div>
+
+        <h1 style={{ margin: '0.25rem 0 0.5rem 0', fontSize: '1.65rem', fontWeight: 900, color: '#f8fafc' }}>
+          Contraste Multiequipo: Nodus vs. Hoja Oficial QT & Aliados
+        </h1>
+        <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.92rem', lineHeight: 1.5, maxWidth: '1100px' }}>
+          Auditoría de consistencia en tiempo real entre la base de Nodus (<code>/aliados?id_equipo=ID</code>) y la Hoja
+          Oficial de QT & Aliados (Google Sheets). Incluye desglose por equipo, PX iniciales vs fin, desertores, declaraciones C2,
+          pagos totales C2+MJ y la <strong>Matriz Histórica de Graduados (E4–E39 y Staff Elite)</strong>.
+        </p>
+      </div>
+
+      {/* Render del Tablero Completo de Contraste */}
+      <NodusLiveModulesDashboard />
+    </div>
+  );
+}
+
+```
+
+---
+
 ## Archivo: src/pages/ReportesBoard.jsx
 
 ```javascript
@@ -148564,6 +148730,7 @@ import IAAuditor from '../components/IAAuditor';
 import TaskAssignmentModal from '../components/TaskAssignmentModal';
 import AliadosC2AdminPanel from '../components/AliadosC2AdminPanel';
 import GuiaAliadosC1 from './GuiaAliadosC1';
+import NodusLiveModulesDashboard from '../components/NodusLiveModulesDashboard';
 import { getAllAuditLogs, recordAuditEvent, getAllUserConnections } from '../services/auditService';
 import { runRoleIntegrityAuditAndHeal, applyReviewedRoleChanges } from '../services/roleIntegritySentinelAgent';
 
@@ -150237,6 +150404,9 @@ export default function SuperAdminPanel() {
             {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion') && (
               <button style={tabStyle('aliados_c2')} onClick={() => setActiveView('aliados_c2')}>🛡️ Aliados C2 (Guía & Accesos)</button>
             )}
+            {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion') && (
+              <button style={tabStyle('contraste_nodus')} onClick={() => setActiveView('contraste_nodus')}>📊 Contraste Nodus vs Sheets</button>
+            )}
           </div>
           {activeView === 'global' && <GlobalView tasks={tasks} navigate={navigate} realUsersData={displayedUsersData} />}
           {activeView === 'sede' && (
@@ -150285,6 +150455,41 @@ export default function SuperAdminPanel() {
           )}
           {activeView === 'aliados_c2' && (
             <AliadosC2AdminPanel currentUser={currentUser} />
+          )}
+          {activeView === 'contraste_nodus' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              <div
+                className="glass-panel"
+                style={{
+                  padding: '1.25rem 1.5rem',
+                  border: '1px solid rgba(16, 185, 129, 0.4)',
+                  background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(15, 23, 42, 0.7))',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  gap: '1rem',
+                  borderRadius: '10px',
+                }}
+              >
+                <div>
+                  <h2 style={{ margin: 0, color: '#34d399', fontSize: '1.25rem', fontWeight: 800 }}>
+                    📊 Módulo Independiente: Contraste Nodus vs. Google Sheets (QT & Aliados)
+                  </h2>
+                  <p style={{ margin: '0.35rem 0 0 0', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                    Auditoría viva multiequipo: contraste de PX, declaraciones C2, pagos totales (C2 + MJ), desertores y Matriz Histórica de Graduados (E4–E39).
+                  </p>
+                </div>
+                <button
+                  onClick={() => navigate('/contraste-nodus')}
+                  className="btn-primary"
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem' }}
+                >
+                  Abrir Pantalla Completa ↗
+                </button>
+              </div>
+              <NodusLiveModulesDashboard />
+            </div>
           )}
         </>
       )}
@@ -163559,6 +163764,9 @@ export default function Home() {
                     </button>
                     <button onClick={() => { setShowToolsDropdown(false); navigate('/nodus-data-map'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#f59e0b', background: 'rgba(245, 158, 11, 0.1)' }}>
                       🗺️ Nodus Data Map
+                    </button>
+                    <button onClick={() => { setShowToolsDropdown(false); navigate('/contraste-nodus'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#10b981', background: 'rgba(16, 185, 129, 0.1)', fontWeight: 'bold' }}>
+                      📊 Contraste Nodus vs Sheets
                     </button>
                   </>
                 ) : (

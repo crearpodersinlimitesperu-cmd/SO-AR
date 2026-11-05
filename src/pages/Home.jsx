@@ -2339,6 +2339,9 @@ export default function Home() {
                     <button onClick={() => { setShowToolsDropdown(false); navigate('/nodus-data-map'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#f59e0b', background: 'rgba(245, 158, 11, 0.1)' }}>
                       🗺️ Nodus Data Map
                     </button>
+                    <button onClick={() => { setShowToolsDropdown(false); navigate('/contraste-nodus'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#10b981', background: 'rgba(16, 185, 129, 0.1)', fontWeight: 'bold' }}>
+                      📊 Contraste Nodus vs Sheets
+                    </button>
                   </>
                 ) : (
                   <button onClick={() => { setShowToolsDropdown(false); navigate(`/checklist/${currentUser?.appRole || 'capitan'}`); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>

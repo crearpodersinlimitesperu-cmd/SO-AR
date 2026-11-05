@@ -34,7 +34,7 @@ import {
   ChevronRight,
   Lock,
 } from 'lucide-react';
-import NodusLiveModulesDashboard from './NodusLiveModulesDashboard';
+import { useNavigate } from 'react-router-dom';
 
 const ALIADOS_C2_FIREBASE_CONFIG = {
   apiKey: 'AIzaSyAu7Oa19PYgLQJYRb5HAsYgWw2KRqyqcM4',
@@ -97,6 +97,7 @@ function isRecentlyActive(tsOrIso) {
 }
 
 export default function AliadosC2AdminPanel({ currentUser }) {
+  const navigate = useNavigate();
   const [autorizados, setAutorizados] = useState([]);
   const [encuestas, setEncuestas] = useState([]);
   const [sesiones, setSesiones] = useState([]);
@@ -1097,12 +1098,39 @@ export default function AliadosC2AdminPanel({ currentUser }) {
         )}
       </div>
 
-      {/* Contraste en Tiempo Real: Nodus (/aliados?id_equipo=<ID>) vs Google Sheet Oficial QT & Aliados + Matriz Graduados E4-E39 */}
-      <div className="glass-panel" style={{ padding: '1.25rem', border: '1px solid rgba(16, 185, 129, 0.35)' }}>
-        <h3 style={{ marginTop: 0, marginBottom: '0.75rem', color: '#34d399', fontSize: '1.1rem', fontWeight: 800 }}>
-          📊 Contraste Multiequipo Nodus vs. Google Sheet (QT & Aliados) + 🎓 Matriz Histórica de Graduados (E4–E39 & Staff Elite)
-        </h3>
-        <NodusLiveModulesDashboard />
+      {/* Acceso Directo al Módulo Independiente: Contraste Nodus vs Sheets */}
+      <div
+        className="glass-panel"
+        style={{
+          padding: '1.1rem 1.4rem',
+          border: '1px solid rgba(16, 185, 129, 0.4)',
+          background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(15, 23, 42, 0.6))',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '1rem',
+          borderRadius: '10px',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.9rem' }}>
+          <span style={{ fontSize: '1.75rem' }}>📊</span>
+          <div>
+            <div style={{ color: '#34d399', fontWeight: 800, fontSize: '1rem' }}>
+              Módulo Separado: Contraste Nodus vs. Google Sheet (QT & Aliados)
+            </div>
+            <div style={{ color: 'var(--text-muted)', fontSize: '0.82rem' }}>
+              La auditoría multiequipo y la Matriz Histórica de Graduados (E4–E39) se gestionan en su propio módulo independiente.
+            </div>
+          </div>
+        </div>
+        <button
+          onClick={() => navigate('/contraste-nodus')}
+          className="btn-primary"
+          style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', padding: '0.55rem 1.1rem' }}
+        >
+          Abrir Módulo de Contraste ↗
+        </button>
       </div>
 
       {/* Bitácora en Vivo de Conexiones y Alertas Anti-Captura */}
