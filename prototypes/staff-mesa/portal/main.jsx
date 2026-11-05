@@ -38,9 +38,12 @@ import './portal.css';
 const ADMIN_CONTROL_TOKEN = 'CAUSA_OS_SUPERADMIN_STAFF_MESA_2026';
 
 export const ROLES_MESA = [
+  'Todas las Mesas (C1, C2 y MJ) · Apoyo Integral',
   'Mesa Capítulo 1 (C1)',
   'Mesa Capítulo 2 (C2)',
   'Mesa Maestría del Juego (MJ)',
+  'Mesa de Verificación DNI / Nodus',
+  'Mesa de Pagos y Acuerdos',
   'Capitán General de Mesa',
 ];
 
@@ -140,14 +143,10 @@ async function logSecurityOrSessionEvent(db, user, surveyData, action, details =
 
 export function SurveyGateMesa({ user, existingSurvey, onCompleted, onLogout }) {
   const initialSede = (existingSurvey?.sede && OFFICIAL_SEDES.includes(existingSurvey.sede)) ? existingSurvey.sede : 'Lima';
-  const c1Teams = VIGENTES_TEAMS_C1[initialSede] || [];
-  const c2Teams = VIGENTES_TEAMS_C2[initialSede] || [];
-  const combinedTeams = [...c1Teams, ...c2Teams];
-
   const [nombre, setNombre] = useState(existingSurvey?.nombre || user?.displayName || '');
   const [telefono, setTelefono] = useState(existingSurvey?.telefono || '');
   const [sede, setSede] = useState(initialSede);
-  const [equipo, setEquipo] = useState(existingSurvey?.equipo || combinedTeams[0]?.id || 'C1E33');
+  const [equipo, setEquipo] = useState(existingSurvey?.equipo || 'TODOS_DISPONIBLES');
   const [mesaRol, setMesaRol] = useState(existingSurvey?.mesaRol || ROLES_MESA[0]);
   const [capitan, setCapitan] = useState(existingSurvey?.capitan || '');
   const [compromiso, setCompromiso] = useState(existingSurvey?.compromiso ?? false);
@@ -156,8 +155,7 @@ export function SurveyGateMesa({ user, existingSurvey, onCompleted, onLogout }) 
 
   function handleSedeChange(newSede) {
     setSede(newSede);
-    const teams = [...(VIGENTES_TEAMS_C1[newSede] || []), ...(VIGENTES_TEAMS_C2[newSede] || [])];
-    setEquipo(teams[0]?.id || '');
+    setEquipo('TODOS_DISPONIBLES');
   }
 
   async function handleSubmit(e) {
@@ -236,7 +234,11 @@ export function SurveyGateMesa({ user, existingSurvey, onCompleted, onLogout }) 
     }
   }
 
-  const currentTeams = [...(VIGENTES_TEAMS_C1[sede] || []), ...(VIGENTES_TEAMS_C2[sede] || [])];
+  const currentTeams = [
+    { id: 'TODOS_DISPONIBLES', label: '⭐ Todos los entrenamientos disponibles (C1, C2 y MJ)' },
+    ...(VIGENTES_TEAMS_C1[sede] || []),
+    ...(VIGENTES_TEAMS_C2[sede] || []),
+  ];
 
   return (
     <div className="portal-auth-wrap">
@@ -296,7 +298,7 @@ export function SurveyGateMesa({ user, existingSurvey, onCompleted, onLogout }) 
               </select>
             </label>
             <label>
-              <span>Equipo Vigente Oficial *</span>
+              <span>Entrenamientos / Disponibilidad de Apoyo *</span>
               <select
                 required
                 value={equipo}
@@ -335,9 +337,9 @@ export function SurveyGateMesa({ user, existingSurvey, onCompleted, onLogout }) 
             </label>
           </div>
 
-          <div style={{ background: '#f0f9ff', border: '1px solid #bae6fd', borderRadius: '6px', padding: '0.65rem 0.85rem', marginBottom: '0.5rem' }}>
-            <small style={{ color: '#0369a1', fontSize: '0.82rem', display: 'block', fontWeight: 600 }}>
-              ⚡ Regla Oficial: Los datos recolectados en Mesa son de Confidencialidad Global. La verificación frente a Causa/Nodus debe ser física con DNI o documento oficial.
+          <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '6px', padding: '0.65rem 0.85rem', marginBottom: '0.5rem' }}>
+            <small style={{ color: '#166534', fontSize: '0.82rem', display: 'block', fontWeight: 600 }}>
+              ⭐ Estándar de Apoyo en Mesa: A diferencia de los Aliados que están asignados a un único equipo, los Apoyos de Mesa pueden estar habilitados para servir en todos los entrenamientos disponibles de la sede (C1, C2 y MJ) o en una generación específica.
             </small>
           </div>
 
@@ -638,7 +640,7 @@ export default function StaffMesaApp() {
     );
   }
 
-  const accessValidity = evaluateAccessValidity(survey, survey.mesaRol?.includes('C2') ? 'C2' : 'C1');
+  const accessValidity = evaluateAccessValidity(survey, 'STAFF_MESA');
   const userIsAdmin = isAdminEmail(user?.email);
 
   if (!userIsAdmin && accessValidity.isExpired) {

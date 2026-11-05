@@ -197,8 +197,8 @@ export default function StaffMesaAdminPanel({ currentUser }) {
         nombre: e.nombreCompleto || prev.nombre || 'Sin nombre',
         sede: e.sedeOficial || prev.sede || 'No especificada',
         whatsapp: e.whatsapp || prev.whatsapp || '',
-        puestoMesa: e.puestoMesa || '',
-        equipoGeneracion: e.equipoGeneracion || '',
+        puestoMesa: e.mesaRol || e.puestoMesa || '',
+        equipoGeneracion: e.equipo || e.equipoGeneracion || '',
       });
     });
 
@@ -829,19 +829,22 @@ export default function StaffMesaAdminPanel({ currentUser }) {
                         <div style={{ fontSize: '0.75rem', color: '#f59e0b' }}>{user.puestoMesa || 'Staff General'}</div>
                       </td>
 
-                      {/* Generación */}
+                      {/* Generación / Disponibilidad */}
                       <td style={{ padding: '1rem' }}>
                         <span
                           style={{
-                            background: 'rgba(255, 255, 255, 0.08)',
-                            color: '#cbd5e1',
+                            background: user.equipoGeneracion === 'TODOS_DISPONIBLES' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255, 255, 255, 0.08)',
+                            color: user.equipoGeneracion === 'TODOS_DISPONIBLES' ? '#34d399' : '#cbd5e1',
+                            border: user.equipoGeneracion === 'TODOS_DISPONIBLES' ? '1px solid rgba(16, 185, 129, 0.3)' : 'none',
                             padding: '0.2rem 0.5rem',
                             borderRadius: '6px',
                             fontSize: '0.75rem',
                             fontWeight: 600,
                           }}
                         >
-                          {user.equipoGeneracion || 'Sin equipo'}
+                          {user.equipoGeneracion === 'TODOS_DISPONIBLES'
+                            ? '⭐ Todos Disponibles (C1, C2, MJ)'
+                            : (user.equipoGeneracion || 'Sin equipo')}
                         </span>
                       </td>
 

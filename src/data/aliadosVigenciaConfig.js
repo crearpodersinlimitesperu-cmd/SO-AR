@@ -286,6 +286,20 @@ export function evaluateAccessValidity(surveyData, capitulo = 'C1') {
   const rawEquipo = String(surveyData.equipo || surveyData.equipoGeneracion || '').trim().toUpperCase();
   const cleanNumber = rawEquipo.replace(/[^0-9]/g, '');
 
+  // Regla especial para Staff de Mesa / Apoyos:
+  // A diferencia de los Aliados que están asignados a un único equipo, los Apoyos de Mesa pueden estar
+  // en todos los entrenamientos disponibles (C1, C2 y MJ) de la sede en rotación continua.
+  if (capitulo === 'STAFF_MESA' || surveyData.capitulo === 'STAFF_MESA' || surveyData.puestoMesa || surveyData.mesaRol) {
+    if (rawEquipo.includes('TODOS') || rawEquipo === 'TODOS_DISPONIBLES' || !rawEquipo) {
+      return {
+        isValid: true,
+        isExpired: false,
+        status: 'VIGENTE',
+        equipoLabel: '⭐ Todos los entrenamientos disponibles (C1, C2 y MJ)',
+      };
+    }
+  }
+
   // Regla especial histórica: En Lima C1, el Equipo 32 culminó su ciclo.
   if (capitulo === 'C1' && sede === 'Lima' && (cleanNumber === '32' || rawEquipo.includes('32'))) {
     return {
