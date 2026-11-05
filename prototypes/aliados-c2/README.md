@@ -2,6 +2,8 @@
 
 Prototipo separado de Causa OS. No modifica el login, el home, las reglas ni las rutas de la aplicación. No importa Firebase, no recoge datos personales y no utiliza analítica, fuentes remotas ni servicios externos.
 
+Las secciones iniciales describen la guía temporal `main.jsx`. El frontend autenticado **solo local/demo**, añadido aparte en `private/local/`, se documenta al final y no cambia ese prototipo.
+
 Desde la raíz del worktree:
 
 ```sh
@@ -72,4 +74,59 @@ firebase emulators:exec --only firestore --config prototypes/aliados-c2/private/
 
 La prueba verificó aprobación por administrador exacto y verificado; rechazo de autoaprobación, identidad no aprobada/no verificada y correo inconsistente; estado e historial escritos juntos; rechazo de historial editado/borrado, revisión obsoleta y acciones que alteran acuerdos ajenos; rechazo de acceso cruzado entre UID y revocación efectiva.
 
-No desplegar `private/firestore.rules` por haber pasado estas pruebas: falta integración con Authentication. El cambio de UID se probó en las reglas, **no** como cambio de cuenta de un frontend real. Tampoco hay frontend autenticado, recuperación de sincronización o prueba de limpieza real al cambiar cuenta; el candidato es preparatorio, no una implementación completa de esas funciones. Las reglas desplegadas siguen siendo `closed.rules`; no se habilitó acceso ni se publicó otra versión.
+No desplegar `private/firestore.rules` por haber pasado estas pruebas: falta integración con Authentication **real**. La integración y el cambio de cuenta descritos a continuación existen únicamente en emuladores demo locales; no habilitan datos reales. Las reglas desplegadas siguen siendo `closed.rules`; no se habilitó acceso ni se publicó otra versión.
+
+## Frontend privado LOCAL · integración demo, 4 de noviembre de 2026
+
+La superficie nueva está en `private/local/`, completamente separada de `main.jsx` (la guía temporal original sigue sin Auth/Firebase), de la entrada publicada en `hosting/` y de Causa OS. No se modifica el HTML público ni se sirve el documento operativo real. El build independiente queda en `private/local/dist`, ignorado por Git y **no configurado para Hosting**.
+
+### Contrato y aislamiento
+
+- Solo admite `demo-aliados-c2` y hostname loopback; `VITE_C2_PROJECT_ID` distinto, aunque sea otro `demo-*`, causa bloqueo antes de inicializar Firebase. Auth usa exclusivamente `127.0.0.1:9198`; Firestore, `127.0.0.1:8198`. No hay API key real, proveedor OAuth, producción alternativa, configuración del proyecto real, registro de cuentas ni envío de correos desde el frontend.
+- Login real del **emulador Auth** con contraseña sintética y persistencia en memoria. Token con correo verificado y documento `members/{uid}` obtenido del servidor: `enabled === true` y correo exactamente igual al del token. El frontend no permite autoaprobarse. No convierte un correo escrito en autoridad.
+- Solo después de esa comprobación se suscribe a `content/c2-v1`, `records/{uid}` e historial propio. Ignora snapshots de caché y escrituras pendientes para declarar autoridad/datos confirmados. La guía recibida exige versión, título, aviso, cuatro fases, nueve acuerdos y cuatro referencias válidas; contenido ausente/malformado es error, nunca fallback a `content.js`.
+- `fixtures.mjs` es una herramienta de seed **fuera del grafo del frontend**. Guarda únicamente texto ficticio explícitamente rotulado; nunca importa/sube `content.js`. Su guardia exige `GCLOUD_PROJECT` demo exacto y ambas direcciones de emulador exactas antes de inicializar Admin SDK. Desactiva detección de metadata cloud. La única identidad de admin con el correo exacto de las reglas es `fixture-admin`, exclusivamente sintética en Auth demo.
+- Preparación, fase, consulta y reset producen una transacción: relee aprobación/estado, calcula revisión, usa un ID de evento estable durante los reintentos y escribe estado + evento inmutable con timestamp de servidor. No hace updates optimistas ni confirma antes del commit. Reset tiene confirmación y conserva historial. Errores requieren cerrar sesión y reentrar; las transacciones fallidas no se presentan como éxito.
+- Logout/cambio de cuenta retira inmediatamente datos de la vista, suscripciones privadas, fase, consulta y mensajes del UID previo. Generaciones de sesión/identidad descartan callbacks tardíos. Revocación de miembro/correo distinto limpia del mismo modo. Se revalida Auth al foco y cada 30 segundos; pérdida del correo verificado observada en un token nuevo bloquea el acceso.
+- Sesión y caché no se persisten en disco ni migran marcas compartidas. No se garantiza borrado forense de la memoria del SDK: la garantía comprobada es aislamiento de vista/callbacks y ausencia de persistencia propia. Una transacción ya enviada puede terminar en el UID original tras salir; su resultado no aparece en la cuenta nueva. La cola del SDK puede retrasar la carga de la cuenta nueva hasta completar esa solicitud. No puede retirar capturas/copias previas ni detectar instantáneamente una revocación mientras no existe conectividad.
+
+### Reproducir sin consola, servicios reales ni publicación
+
+Desde la raíz, con Java 21 compatible en `JAVA_HOME` y su `bin` al principio de `PATH`:
+
+```sh
+# Ejecuta navegador + reglas secuencialmente: ambas usan el mismo proyecto demo.
+firebase emulators:exec --only auth,firestore \
+  --config prototypes/aliados-c2/private/emulator.json --project demo-aliados-c2 \
+  "node --test --test-concurrency=1 tests/aliados-c2-private-emulator.test.mjs tests/aliados-c2-local-browser.test.mjs"
+
+# Build aislado; no ejecutar npm run build.
+npm exec vite build -- --config prototypes/aliados-c2/private/local/vite.config.js
+node --test tests/aliados-c2-local.test.mjs tests/aliados-c2-private-model.test.mjs \
+  tests/aliados-c2-closed-rules.test.mjs tests/aliados-c2-hosting.test.mjs tests/aliados-c2.test.mjs
+```
+
+Para inspección manual, iniciar **únicamente** ambos emuladores con el mismo config/demo, sembrar fixtures y abrir Vite en otro terminal:
+
+```sh
+firebase emulators:start --only auth,firestore \
+  --config prototypes/aliados-c2/private/emulator.json --project demo-aliados-c2
+
+GCLOUD_PROJECT=demo-aliados-c2 FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9198 \
+  FIRESTORE_EMULATOR_HOST=127.0.0.1:8198 node prototypes/aliados-c2/private/fixtures.mjs
+npm exec vite -- --config prototypes/aliados-c2/private/local/vite.config.js
+```
+
+Abrir `http://127.0.0.1:4313/`, no el servidor temporal original `4312`. Ambos puertos de emulador y Vite deben estar libres; no detener servicios ajenos para ocuparlos. Los usuarios están en `fixtureUsers` y la contraseña ficticia en `fixturePassword`, exclusivamente para demo. El seed restaura esos seis UID y borra **solo sus registros/eventos sintéticos**. No usarlo mientras otra prueba comparte ese proyecto. No usar `--export-on-exit`, no importar dumps reales. Detener Vite/emuladores al terminar. Si falta un emulador, el runner informa `skip`; eso **no** cuenta como validación aprobada.
+
+### Evidencia y límites verificados
+
+- Puppeteer/Chromium: **8/8** (suite + siete escenarios), cero fallos/omitidos. Anonymous/noverificado no solicitan Firestore; noaprobado/correo inconsistente no reciben guía. X guarda estado/historial con la misma hora de servidor, recupera marcas tras nuevo login, registra fase/consulta/reset. Y no lee estado/eventos X; cambio de cuenta limpia controles, historial y callbacks X.
+- Admin sintético exacto y verificado revoca Y mediante SDK cliente sujeto a reglas; la vista se limpia y se deniegan lecturas/escrituras posteriores. Pérdida de verificación Auth limpia tras refresh. Una transacción X retenida en red termina después del logout/login Y sin contaminar vista ni mensaje Y.
+- Guía/registro inválidos y contraseña errónea producen error explícito. Un **fallo de red inyectado por Puppeteer** aborta los commits/reintentos del SDK; no se crea registro/evento ni se anuncia guardado. No se atribuye ese aborto a una caída real del emulador.
+- Reglas candidatas: **6/6**, cero fallos/omitidos; UID ajeno, invitación/aprobación exacta, rechazo de autoaprobación/admin incorrecto/no verificado, revisión obsoleta, inmutabilidad y transacción atómica. No cambia `firestore.rules` ni la configuración de despliegue deny-all.
+- Modelo/configuración/build/guía original: **12/12**, cero fallos/omitidos. El test de build inspecciona los chunks y confirma exclusión de texto operativo, texto de fixture, contraseña sintética y correo de admin. Vite build separado satisfactorio; advertencia informativa de chunk Firebase/React ~733 kB (~221 kB gzip). Oxlint dirigido sin errores/advertencias.
+- Capturas desktop 1440 px y móvil 390 px en `tests/artifacts.local/c2-private-{desktop,mobile}.png` (ignoradas por Git); cero solicitudes externas ni errores JS de página observados. Móvil sin overflow horizontal. Se conserva mundo azul/dorado y tipografía de sistema. Detector visual: falso positivo de borde/redondeado (form/aside son cuadrados); tamaños secundarios heredados y rojo de error con contraste son elecciones locales, no cambios del sistema global. Sidecar visual preexistente desactualizado no se reescribe en esta tarea.
+- JDK 21 compartido usado solo como runtime; no se copiaron archivos de otro checkout. Tests cierran navegador, Vite, clientes SDK y emuladores. No se ejecutaron deploy, push/PR, habilitación de servicios, billing, operaciones de DNS ni APIs/cuentas del proyecto real.
+
+**Pendientes reales:** inicializar Authentication con autorización y sin billing, verificar administrador real `sistemas@crearpsl.net`, definir/aprobar invitaciones reales y responsables/aviso legal (conservación, derechos, transferencias), control DNS y autorización específica de publicación. También faltan contrato/migración de la guía real, operación de respaldo/recuperación y certificación en Safari/Firefox/dispositivos físicos. Este frontend local no es un servicio privado de producción ni una integración de la guía real.
