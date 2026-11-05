@@ -1193,7 +1193,7 @@ export function PortalApp() {
               ))}
             </nav>
             <nav className="secondary-nav" aria-label="Recursos de preparación">
-              <a href="#roleplays">5. Escenarios de Roleplay</a>
+              <a href="#roleplays">5. Manejo de Conversaciones</a>
               <a href="#agenda">6. Cronograma de Ejecución</a>
               <a href="#preparacion">Mi preparación <span>{count}/{preparation.length}</span></a>
               <a href="#consulta">Consulta rápida <ArrowDown size={15} aria-hidden="true" /></a>
@@ -1216,7 +1216,7 @@ export function PortalApp() {
                 <h1 id="page-title">Guía Práctica Operativa:<br /><span>Aliado de Capítulo Dos (C2).</span></h1>
                 <p>{guideIntro.lead}</p>
                 <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginTop: '1rem' }}>
-                  <a className="primary-link" href="#roleplays">5. Escenarios de Roleplay <ArrowDown size={17} aria-hidden="true" /></a>
+                  <a className="primary-link" href="#roleplays">5. Manejo de Conversaciones <ArrowDown size={17} aria-hidden="true" /></a>
                   <a className="primary-link" href="#agenda" style={{ background: '#334155' }}>6. Cronograma de Ejecución <ArrowDown size={17} aria-hidden="true" /></a>
                 </div>
               </div>
@@ -1299,14 +1299,14 @@ export function PortalApp() {
               </aside>
             </div>
 
-            {/* SECCIÓN 5: ESCENARIOS PRÁCTICOS DE ROLEPLAY (MESA Y SEGUIMIENTO C2) */}
+            {/* SECCIÓN 5: TIPS DE MANEJO DE CONVERSACIONES Y LLAMADO A LA ACCIÓN (C2 Y MJ) */}
             <section id="roleplays" className="quick-reference" style={{ marginTop: '2.5rem' }}>
               <div className="section-heading">
-                <h2 id="roleplay-title">5. Escenarios Prácticos de Roleplay (Mesa y Seguimiento C2)</h2>
-                <span>Interrupción Asertiva, Fórmula de Movimiento y Cierre Concreto</span>
+                <h2 id="roleplay-title">5. Tips de Manejo de Conversaciones y Llamado a la Acción (Mesa y Seguimiento C2)</h2>
+                <span>Interrupción Asertiva, Entrega Limpia en Mesa y Cierre Adulto a Adulto</span>
               </div>
               <p>
-                El Aliado de C2 no compra historias ni valida justificaciones. En interacciones de seguimiento y encuadre (máximo 5 minutos), utiliza estas cuatro fórmulas de quiebre para desarticular excusas y mover a la acción inmediata con pago o registro cerrado:
+                El Aliado de C2 no compra historias ni valida justificaciones. En el llamado a la acción del domingo, superamos el pánico dominical siendo irrazonables de manera coherente y contextual: si es un SÍ, llevar de inmediato a Mesa (¡allí se ocupan!); si es un NO rotundo, dignidad y adueñamiento 100%; y ante conversaciones de tiempo o dinero, aislar la variable y confrontar la postergación en menos de 90 segundos:
               </p>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.25rem', marginTop: '1.25rem' }}>
                 {roleplays.map((rp) => (

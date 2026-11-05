@@ -212,7 +212,7 @@ export default function GuiaAliadosC1() {
             { id: 'fase1', label: '2. Fase 1: Antes de C1 (Leader Team & Groundings)', icon: Calendar },
             { id: 'fase2', label: '3. Fase 2: Durante C1 (Fin de Semana)', icon: Users },
             { id: 'fase3', label: '4. Fase 3: Después de C1 (El Puente & Llamadas)', icon: PhoneCall },
-            { id: 'roleplay', label: '5. Tácticas: El SÍ, el NO y el NO SÉ', icon: Zap },
+            { id: 'roleplay', label: '5. Manejo de Conversaciones y Llamado a la Acción', icon: Zap },
             { id: 'legal', label: '6. Confidencialidad & Propiedad Intelectual', icon: ShieldCheck },
           ].map((tab) => {
             const Icon = tab.icon;
@@ -600,82 +600,122 @@ export default function GuiaAliadosC1() {
         </div>
       )}
 
-      {/* CONTENIDO 5: TÁCTICAS: EL SÍ, EL NO Y EL NO SÉ (PREGUNTAS DE QUIEBRE) */}
+      {/* CONTENIDO 5: MANEJO DE CONVERSACIONES Y LLAMADO A LA ACCIÓN */}
       {activeTab === 'roleplay' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', padding: '1.5rem' }}>
             <h2 style={{ margin: '0 0 0.5rem 0', fontSize: '1.25rem', color: '#38bdf8' }}>
-              Abordaje Asertivo del SÍ, el NO y el NO SÉ
+              Manejo de Conversaciones y Llamado a la Acción (Tips Contextuales para el Domingo)
             </h2>
             <p style={{ margin: '0 0 1.25rem 0', color: '#94a3b8', fontSize: '0.9rem' }}>
-              En C1 se entrena la velocidad de respuesta para sostener la postura ante cualquier reacción del participante:
+              Pautas de cancha para el llamado a la acción dominical: superar el pánico, ser irrazonables de manera coherente y ejecutar el traspaso limpio a Mesa.
             </p>
+
+            {/* Banner de Postura: Vencer el Pánico y ser Irrazonables */}
+            <div style={{ background: '#0f172a', border: '1px solid #38bdf8', borderLeft: '5px solid #38bdf8', borderRadius: '8px', padding: '1.25rem', marginBottom: '1.5rem' }}>
+              <h3 style={{ margin: '0 0 0.5rem', color: '#f8fafc', fontSize: '1.05rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span>🛡️</span> Venciendo el Pánico del Domingo: Irrazonables de Manera Coherente y Contextual
+              </h3>
+              <p style={{ margin: '0 0 0.75rem', fontSize: '0.85rem', color: '#cbd5e1', lineHeight: '1.5' }}>
+                El domingo es el momento cumbre. Muchos Aliados entran en pánico, dudan o evitan confrontar por temor al rechazo o por miedo a sonar agresivos. <strong>La tibieza no ayuda a nadie:</strong> ser irrazonable de manera coherente no es pelear, es no comprarle la historia de limitación al participante y sostener su grandeza de adulto a adulto.
+              </p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '0.75rem' }}>
+                <div style={{ background: '#1e293b', padding: '0.75rem', borderRadius: '6px', border: '1px solid #334155' }}>
+                  <strong style={{ color: '#34d399', fontSize: '0.8rem', display: 'block', marginBottom: '3px' }}>
+                    🎯 Regla de Oro si dice SÍ: ¡A Mesa de inmediato!
+                  </strong>
+                  <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
+                    No sobre-expliques en el pasillo. Lo tomas del brazo y lo acompañas a Mesa: <em>«Allí se ocupan de tu registro, ticket y modalidades de pago»</em>.
+                  </span>
+                </div>
+                <div style={{ background: '#1e293b', padding: '0.75rem', borderRadius: '6px', border: '1px solid #334155' }}>
+                  <strong style={{ color: '#fca5a5', fontSize: '0.8rem', display: 'block', marginBottom: '3px' }}>
+                    🤝 Regla de Oro si dice NO rotundo: Dignidad y respeto
+                  </strong>
+                  <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
+                    No ruegues ni entres en debate. Honra su verdad, déjalo con el 100% de responsabilidad de su elección y mantén la puerta abierta.
+                  </span>
+                </div>
+              </div>
+            </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
               <div style={{ background: '#0f172a', borderLeft: '4px solid #10b981', borderRadius: '8px', padding: '1.2rem' }}>
                 <span style={{ background: 'rgba(16, 185, 129, 0.2)', color: '#34d399', padding: '2px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 800 }}>
-                  EL SÍ EN ACCIÓN
+                  1. EL SÍ EN ACCIÓN
                 </span>
-                <h3 style={{ margin: '0.6rem 0 0.3rem 0', color: '#f8fafc', fontSize: '1.05rem' }}>Acompañamiento Inmediato</h3>
+                <h3 style={{ margin: '0.6rem 0 0.3rem 0', color: '#f8fafc', fontSize: '1.05rem' }}>Llevarlo a Mesa (¡Allí se ocupan!)</h3>
                 <p style={{ margin: 0, fontSize: '0.85rem', color: '#cbd5e1', lineHeight: '1.5' }}>
-                  Acompañamiento de máxima velocidad para consolidar la acción y asegurar la llave de ingreso (Ticket de Posibilidad) en minutos, sin abrir espacios de enfriamiento.
+                  Acompañamiento inmediato sin sobre-explicar. En cuanto dice SÍ, caminan juntos a la Mesa de Registro para sellar ticket, acuerdos o POS.
                 </p>
               </div>
 
               <div style={{ background: '#0f172a', borderLeft: '4px solid #ef4444', borderRadius: '8px', padding: '1.2rem' }}>
                 <span style={{ background: 'rgba(239, 68, 68, 0.2)', color: '#fca5a5', padding: '2px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 800 }}>
-                  EL NO
+                  2. EL NO ROTUNDO
                 </span>
-                <h3 style={{ margin: '0.6rem 0 0.3rem 0', color: '#f8fafc', fontSize: '1.05rem' }}>Respeto con Firmeza y Dignidad</h3>
+                <h3 style={{ margin: '0.6rem 0 0.3rem 0', color: '#f8fafc', fontSize: '1.05rem' }}>Dignidad y Adueñamiento 100%</h3>
                 <p style={{ margin: 0, fontSize: '0.85rem', color: '#cbd5e1', lineHeight: '1.5' }}>
-                  Respetar la elección sin engancharse en discusiones ni rogar, permitiendo que el participante se haga cargo 100% de la consecuencia de su postura.
+                  Prefiero un NO limpio a una promesa rota. Honrar su elección sin lástima ni juicio; dejarlo responsable del costo de su desacuerdo.
                 </p>
               </div>
 
               <div style={{ background: '#0f172a', borderLeft: '4px solid #f59e0b', borderRadius: '8px', padding: '1.2rem' }}>
                 <span style={{ background: 'rgba(245, 158, 11, 0.2)', color: '#fbbf24', padding: '2px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 800 }}>
-                  EL NO SÉ (DUBITATIVO)
+                  3. EL NO SÉ (DUBITATIVO)
                 </span>
-                <h3 style={{ margin: '0.6rem 0 0.3rem 0', color: '#f8fafc', fontSize: '1.05rem' }}>Interrupción del Refugio de la Duda</h3>
+                <h3 style={{ margin: '0.6rem 0 0.3rem 0', color: '#f8fafc', fontSize: '1.05rem' }}>Interrupción de la Tibieza en 90s</h3>
                 <p style={{ margin: 0, fontSize: '0.85rem', color: '#cbd5e1', lineHeight: '1.5' }}>
-                  Interrumpir con claridad asertiva. Mostrarle que el «no sé» es un disfraz para no elegir, retándolo a tomar postura clara hacia la creación o la renuncia.
+                  Desarmar la mentira de la almohada. Postergar solo alimenta la mediocridad. Confrontar con amor a tomar postura en este instante.
                 </p>
               </div>
             </div>
 
-            {/* Banco de Preguntas Quirúrgicas en Lenguaje Sencillo */}
+            {/* Banco de Preguntas Quirúrgicas y Conversaciones de Cancha */}
             <div style={{ background: '#0f172a', border: '1px solid #334155', borderRadius: '10px', padding: '1.35rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', flexWrap: 'wrap', gap: '0.5rem' }}>
                 <h3 style={{ margin: 0, fontSize: '1.05rem', color: '#f8fafc', fontWeight: 800 }}>
-                  🎯 Preguntas Directas en Lenguaje Sencillo (Prohibido Preguntas Trilladas)
+                  🎯 Tips y Pautas Prácticas de Conversación para el Domingo
                 </h3>
                 <span style={{ fontSize: '0.78rem', color: '#ef4444', fontWeight: 700 }}>
-                  ⛔ PROHIBIDO: «¿En qué otras áreas de tu vida pasa esto?»
+                  ⛔ PROHIBIDO: Rogar, juzgar o hablar de más en el pasillo
                 </span>
               </div>
               <p style={{ margin: '0 0 1rem 0', fontSize: '0.84rem', color: '#94a3b8' }}>
-                Usa estas preguntas cotidianas y contundentes durante el viernes, sábado, domingo y el puente de 8 días:
+                Scripts exactos y preguntas directas de cancha para desarmar coartadas y mover al participante a la creación:
               </p>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 {[
                   {
-                    id: 'q_dinero',
-                    categoria: 'Frente a la excusa del dinero / liquidez',
-                    pregunta: '«Si quitamos la plata de la mesa por un minuto, ¿cuál es la razón real por la que prefieres no comprometerte hoy?»',
-                    efecto: 'Desarticula el argumento financiero y revela el miedo o falta de compromiso interno.'
+                    id: 'q_si_mesa',
+                    categoria: 'Cuando el participante dice SÍ',
+                    pregunta: '«¡Excelente decisión, bienvenido a tu siguiente nivel! Vamos de una vez a Mesa, allí se ocupan de tu registro, tu ticket y las modalidades de pago.»',
+                    efecto: 'Corta la sobre-explicación y traslada al participante físicamente a Mesa antes de que se enfríe.'
                   },
                   {
-                    id: 'q_pareja',
-                    categoria: 'Frente a la excusa de la pareja o familia',
-                    pregunta: '«¿Si tu familia es tu motor, por qué la usas como el freno para no tomar tus propias decisiones?»',
-                    efecto: 'Rompe la proyección victimizante y responsabiliza al participante por su crecimiento.'
+                    id: 'q_no_digno',
+                    categoria: 'Cuando el participante dice un NO rotundo',
+                    pregunta: '«Prefiero mil veces tu NO limpio y honesto que una promesa tibia. Honro tu decisión. Solo quiero que te mires al espejo y reconozcas que esta es tu libre elección, asumiendo el 100% de quedarte donde estás sin culpar al dinero ni a nadie. Las puertas de tu grandeza siguen abiertas.»',
+                    efecto: 'Sostiene la dignidad y postura de líder; deja al participante 100% adueñado de su resultado.'
+                  },
+                  {
+                    id: 'q_dinero',
+                    categoria: 'Frente a la excusa del dinero / liquidez (Aislar objeción)',
+                    pregunta: '«Si el dinero estuviera resuelto al 100% hoy en este instante, ¿estarías adentro de C2 sí o sí? [Si dice SÍ]: Entonces la plata no es el freno, es tu capacidad de crear recursos. Vamos a Mesa, allí se ocupan de ver facilidades y abonos. [Si dice NO]: Entonces sé sincero conmigo: no es la plata, ¿a qué le tienes miedo realmente?»',
+                    efecto: 'Desarticula el escudo financiero, separa el dinero del compromiso y destapa la verdad.'
+                  },
+                  {
+                    id: 'q_tiempo_pareja',
+                    categoria: 'Frente a la excusa de tiempo, trabajo o pareja',
+                    pregunta: '«¿Llevas años diciendo "cuando tenga tiempo"? El tiempo nunca sobra: se crea para lo que transforma tu vida. Y si tu familia es tu motor, ¿por qué la usas como el freno? ¿Vas a ir a pedir permiso o a comunicar con amor la decisión que ya tomaste como un adulto?»',
+                    efecto: 'Rompe la proyección victimizante y responsabiliza al participante por su crecimiento sin excusas.'
                   },
                   {
                     id: 'q_almohada',
-                    categoria: 'Frente a la postergación fantástica («déjame pensarlo»)',
-                    pregunta: '«Sé sincero: ¿qué información mágica vas a encontrar el domingo debajo de tu almohada que no tengas hoy aquí parado conmigo?»',
-                    efecto: 'Evidencia la mentira educada que disfraza la indecisión y fuerza a una elección aquí y ahora.'
+                    categoria: 'Frente a la postergación («déjame pensarlo / no sé»)',
+                    pregunta: '«Sé sincero: ¿qué información mágica vas a encontrar el domingo debajo de tu almohada que no tengas hoy aquí parado conmigo? Postergar solo alimenta la duda. En este instante solo hay dos caminos: apuestas por ti o te quedas en tu zona conocida. ¿Cuál es tu postura?»',
+                    efecto: 'Evidencia la mentira educada que disfraza la indecisión y fuerza a una elección aquí y ahora en <90 segundos.'
                   }
                 ].map((item) => (
                   <div key={item.id} style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '8px', padding: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
@@ -683,10 +723,10 @@ export default function GuiaAliadosC1() {
                       <span style={{ background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', padding: '1px 6px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 700 }}>
                         {item.categoria}
                       </span>
-                      <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#f8fafc', marginTop: '0.35rem', fontStyle: 'italic' }}>
+                      <div style={{ fontSize: '0.92rem', fontWeight: 700, color: '#f8fafc', marginTop: '0.35rem', fontStyle: 'italic', lineHeight: 1.5 }}>
                         {item.pregunta}
                       </div>
-                      <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginTop: '0.25rem' }}>
+                      <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginTop: '0.35rem' }}>
                         💡 {item.efecto}
                       </div>
                     </div>

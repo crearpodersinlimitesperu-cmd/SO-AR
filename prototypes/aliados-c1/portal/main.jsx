@@ -172,45 +172,69 @@ export const preparationMissionsC1 = [
   { id: 'video_enrolamiento', title: '2. Video de Enrolamiento (15 Segundos)', desc: 'Grabar y subir al chat de aliados un video de 15 segundos enfocado en el para qué de tu participación.' },
   { id: 'cambio_cupo', title: '3. Misión de Cambio de Cupo / Sustitución de Nombre', desc: 'Gestionar activamente sustitución de nombres de personas enroladas que no asistirán, reabriendo la conversación para que sí ocupen su lugar en sala.' },
   { id: 'tecnica', title: '4. Verificación Técnica Previa (Grounding Virtual 20:00 hrs)', desc: 'Cámara encendida, audio, internet estable e iluminación óptima sin distracciones.' },
-  { id: 'roleplay_presencial', title: '5. Demostración Presencial de Roleplay (Jueves 18:00 hrs)', desc: 'Ejecutar en vivo tu presentación en sede ante todo el equipo con postura impecable.' }
+  { id: 'roleplay_presencial', title: '5. Demostración Presencial de Manejo de Conversaciones (Jueves 18:00 hrs)', desc: 'Ejecutar en vivo tus conversaciones y llamado a la acción en sede ante todo el equipo con postura impecable.' }
 ];
 
-export const roleplaysC1 = [
+export const conversacionesLlamadoAccionC1 = [
   {
-    id: 'el_si_accion',
-    title: '1. El SÍ en Acción (Cierre con Evidencia)',
-    situacion: 'El participante declara que sí desea continuar a C2 pero no toma acción inmediata ni abona su ticket.',
-    quiebre: 'No aceptamos acuerdos fantasiosos ni tibieza. El "Sí" se valida exclusivamente con evidencia material.',
-    pregunta: '«Si estás en un rotundo Sí, ¿qué conversación interna te detiene de plasmar tu firma y tu abono ahora mismo?»',
-    formula: 'Confirmación de Postura + Validación con Hechos + Cierre sin postergación.',
-    cierre: 'Cerramos esto aquí y ahora. Firmas tu registro en este instante o te haces cargo abiertamente de tu decisión.'
+    id: 'el_si_mesa',
+    badge: 'ACCIÓN INMEDIATA · LLEVAR A MESA',
+    badgeColor: '#16a34a',
+    badgeBg: '#dcfce7',
+    title: '1. Si es un SÍ (Acción Inmediata: Llevarlo a Mesa · ¡Allí se ocupan!)',
+    situacion: 'El participante dice SÍ quiere ir a C2, pero se queda divagando en el pasillo, conversando o enfriando la emoción.',
+    diagnostico: 'Pánico o distracción del Aliado: Quedarse 20 minutos hablando, filosofando o sobre-explicando. La venta y la explicación terminan en el segundo que dijo SÍ.',
+    pauta: 'No abras más conversación. Felicita con energía, camina a su lado y condúcelo de inmediato a la Mesa de Registro y Pagos.',
+    frase: '«¡Excelente decisión! Bienvenido a tu transformación. Vamos de inmediato a Mesa, allí se ocupan de tu registro, tu ticket y las modalidades de pago.»',
+    cierre: 'Acompañamiento físico hasta la Mesa. La Mesa se encarga de POS, transferencias o acuerdos. Misión cumplida del Aliado.'
   },
   {
     id: 'el_no_rotundo',
-    title: '2. El NO Rotundo y Limpio (Corte de Justificaciones)',
-    situacion: 'El participante da explicaciones circulares y excusas largas para no comprometerse.',
-    quiebre: 'Un No claro y responsable es infinitamente más poderoso que un Sí tibio o una mentira educada.',
-    pregunta: '«¿Prefieres seguir sosteniendo una historia de circunstancias, o tienes la valentía de decirme No sin esconderte detrás del dinero o el tiempo?»',
-    formula: 'Respeto al Adulto 100% Responsable + Silencio Operativo + Cierre limpio.',
-    cierre: 'Acepto tu No. Te miras al espejo y te adueñas de tu resultado sin víctimas.'
+    badge: 'DIGNIDAD, RESPETO Y ADUEÑAMIENTO',
+    badgeColor: '#dc2626',
+    badgeBg: '#fee2e2',
+    title: '2. Si es un NO Rotundo (Dignidad, Respeto y 100% Responsabilidad)',
+    situacion: 'El participante dice un NO tajante, cerrado o desafiante para no comprometerse.',
+    diagnostico: 'Pánico del Aliado: Rogar, insistir con desesperación, enojarse o ponerse a debatir. Tratarlo como un niño desvalido en vez de un adulto 100% responsable.',
+    pauta: 'Sostén una postura impecable de líder. Honra su honestidad con respeto y déjalo con el peso y la responsabilidad de su propia elección.',
+    frase: '«Prefiero mil veces tu NO limpio y transparente, que una falsa promesa o una excusa tibia. Honro tu decisión y respeto tu momento. Solo quiero que te mires al espejo y reconozcas que esta es tu elección libre, y que asumes el 100% del costo de quedarte donde estás sin culpar al dinero, al tiempo ni a nadie. Las puertas de tu grandeza siguen abiertas.»',
+    cierre: 'Apretón de manos firme, mirada limpia y sin resentimiento. El participante se retira responsable, no víctima.'
+  },
+  {
+    id: 'conversacion_dinero',
+    badge: 'DESMONTAR LA COARTADA DEL DINERO',
+    badgeColor: '#d97706',
+    badgeBg: '#fef3c7',
+    title: '3. Conversaciones de Dinero / Liquidez (Aislar la Objeción)',
+    situacion: '«No tengo plata», «no me alcanza», «está fuera de mi presupuesto», «las cosas están difíciles».',
+    diagnostico: 'El dinero casi nunca es el impedimento real; es el escudo automático y socialmente aceptado para no afrontar el miedo a comprometerse o a fracasar.',
+    pauta: 'Desarma la coartada aislando la variable económica. Lleva la conversación a su verdadera decisión interna.',
+    frase: '«Si el dinero estuviera 100% resuelto hoy en este segundo, ¿entrarías a C2 sí o sí?»\n\n• Si responde SÍ: «Entonces la plata no es el freno; es tu capacidad de crear recursos. El dinero siempre sigue a la decisión tomada. Vamos a Mesa, allí se ocupan de ver facilidades, cronograma y opciones de abono.»\n• Si responde NO: «Entonces sé honesto contigo y conmigo: no es la plata. ¿A qué le tienes miedo realmente?»',
+    cierre: 'Llevarlo a Mesa si es SÍ para ver opciones con el staff de cobranza, o destapar la conversación real de compromiso.'
+  },
+  {
+    id: 'conversacion_tiempo_familia',
+    badge: 'ROMPER LA TRAMPA DE LA POSTERGACIÓN',
+    badgeColor: '#2563eb',
+    badgeBg: '#dbeafe',
+    title: '4. Conversaciones de Tiempo, Familia o Trabajo (Permiso vs. Decisión)',
+    situacion: '«No tengo tiempo», «tengo mucho trabajo», «debo pedirle permiso a mi pareja», «mi familia no me apoya».',
+    diagnostico: 'Fantasías de postergación («cuando tenga tiempo») o escudarse en los seres queridos para justificar no hacerse cargo de sí mismo.',
+    pauta: 'Interrumpe con amor y firmeza. Recuérdale que el tiempo se crea para las prioridades y que los líderes inspiran con el ejemplo.',
+    frase: '«Llevas años diciendo "cuando tenga tiempo". El tiempo nunca sobra: se crea para lo que transforma tu vida. Y si tu familia es tu mayor motor, ¿por qué la usas como el freno para tu crecimiento? ¿Vas a ir a tu casa a pedir permiso como un niño, o a comunicar con amor y certeza la decisión que ya tomaste como un adulto por el bien de todos?»',
+    cierre: 'Cierre directo: «El mejor regalo para tu familia es verte entero y sin pretextos. Vamos a Mesa a asegurar tu lugar.»'
   },
   {
     id: 'el_no_se_indecision',
-    title: '3. El NO SÉ (La Mentira de la Indecisión)',
-    situacion: 'El participante dice «No sé qué hacer», «déjame pensarlo», «tengo que consultar con la almohada».',
-    quiebre: 'El "No sé" es una mentira conveniente para no tomar postura. Sé sincero: ¿qué información mágica vas a encontrar el domingo que no tengas hoy aquí parado conmigo?',
-    pregunta: '«¿Desde cuándo postergar tus decisiones más importantes te ha dado la vida que sueñas?»',
-    formula: 'Desarme de la fantasía + Interrupción en menos de 90 segundos + Desafío a la acción.',
-    cierre: 'O eliges apostar por ti en este instante, o eliges quedarte donde estás. Tú decides en este segundo.'
-  },
-  {
-    id: 'objecion_dinero',
-    title: '4. Objeción de Dinero / Liquidez',
-    situacion: '«No tengo plata», «el curso está caro», «mis finanzas no me dan».',
-    quiebre: 'El dinero nunca es el quiebre real; es la coartada perfecta para no comprometerse con la propia grandeza.',
-    pregunta: '«Si quitamos la plata de la mesa por un minuto, ¿cuál es la razón real por la que prefieres no comprometerte hoy?»',
-    formula: 'Aislamiento de la objeción + Exigencia de verdad + Compromiso de creación.',
-    cierre: 'El dinero se crea cuando la decisión ya está tomada. ¿Cuál es tu postura?'
+    badge: 'INTERRUPCIÓN DE TIBIEZA EN 90 SEG',
+    badgeColor: '#7c3aed',
+    badgeBg: '#ede9fe',
+    title: '5. El "NO SÉ" o "Déjame Pensarlo" (Desarmar la Tibieza en 90 Segundos)',
+    situacion: '«No sé qué hacer», «déjame pensarlo con la almohada», «mañana te aviso», «tengo que procesarlo».',
+    diagnostico: 'La mentira educada del indeciso. Espera que la incomodidad pase para volver a su rutina conocida sin comprometerse.',
+    pauta: 'Interrumpe en menos de 90 segundos. Confronta la ilusión de que el tiempo le dará sabiduría mágica.',
+    frase: '«Sé sincero/a conmigo: ¿qué información mágica vas a encontrar mañana debajo de tu almohada que no tengas hoy aquí parado de frente conmigo? Postergar solo alimenta la duda y tu misma historia de siempre. En este momento solo hay dos caminos: o eliges apostar por ti, o eliges quedarte donde estás. Toma una postura ahora: ¿SÍ o NO?»',
+    cierre: 'Si dice SÍ, acompáñalo a Mesa de inmediato. Si dice NO, honra su decisión limpia. Cero espacio a la tibieza.'
   }
 ];
 
@@ -922,7 +946,7 @@ export default function AliadosC1PortalApp() {
             <a href="#postura"><span>2. Marco de Postura</span></a>
             <a href="#cronograma"><span>3. Cronograma C1</span></a>
             <a href="#puente"><span>4. El Puente & Llamadas</span></a>
-            <a href="#roleplays"><span>5. Tácticas de Quiebre</span></a>
+            <a href="#conversaciones"><span>5. Manejo de Conversaciones</span></a>
             <a href="#legal"><span>6. Confidencialidad</span></a>
           </nav>
         </aside>
@@ -1065,31 +1089,82 @@ export default function AliadosC1PortalApp() {
             </div>
           </section>
 
-          {/* SECCIÓN 5: Tácticas de Quiebre Quirúrgicas */}
-          <section id="roleplays" style={{ marginBottom: '3rem' }}>
+          {/* SECCIÓN 5: Manejo de Conversaciones y Llamado a la Acción */}
+          <section id="conversaciones" style={{ marginBottom: '3rem' }}>
             <h2 style={{ fontSize: '1.5rem', color: 'var(--blue)', borderBottom: '2px solid var(--line)', paddingBottom: '0.5rem', marginBottom: '1.5rem' }}>
-              Tácticas de Quiebre Quirúrgicas (Escenarios Prácticos)
+              Manejo de Conversaciones y Llamado a la Acción (Tips Contextuales para el Domingo)
             </h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-              {roleplaysC1.map(rp => (
-                <div key={rp.id} style={{ background: '#fff', border: '1px solid var(--line)', borderRadius: '6px', padding: '1.5rem' }}>
-                  <h3 style={{ margin: '0 0 0.5rem', color: 'var(--blue)', fontSize: '1.15rem' }}>{rp.title}</h3>
-                  <p style={{ margin: '0 0 0.75rem', fontSize: '0.9rem', color: 'var(--muted)' }}>
-                    <strong>Situación:</strong> {rp.situacion}
-                  </p>
 
-                  <div style={{ background: '#f8fafc', borderLeft: '3px solid #38bdf8', padding: '0.85rem', borderRadius: '4px', marginBottom: '0.75rem' }}>
-                    <strong style={{ fontSize: '0.78rem', color: '#0284c7', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>
-                      ⚡ Quiebre y Pregunta Quirúrgica
-                    </strong>
-                    <div style={{ fontSize: '0.92rem', color: '#0f172a', fontWeight: 700 }}>{rp.pregunta}</div>
+            {/* Banner de Postura y Eliminación del Pánico */}
+            <div style={{ background: '#f8fafc', border: '1px solid #cbd5e1', borderLeft: '5px solid #0284c7', borderRadius: '6px', padding: '1.5rem', marginBottom: '1.75rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.6rem' }}>
+                <span style={{ fontSize: '1.25rem' }}>🛡️</span>
+                <h3 style={{ margin: 0, fontSize: '1.15rem', color: '#0f172a' }}>
+                  El Enfoque del Domingo: Ser Irrazonables de Manera Coherente y Contextual
+                </h3>
+              </div>
+              <p style={{ margin: '0 0 0.75rem', fontSize: '0.92rem', color: '#334155', lineHeight: 1.6 }}>
+                <strong>Venciendo el pánico del domingo:</strong> El domingo es el espacio cumbre de decisión del entrenamiento. Es común que los Aliados sientan pánico, duden o eviten confrontar por temor a sonar agresivos o no saber cómo manejarlo. <em>La tibieza abandona al participante en su resignación.</em>
+              </p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
+                <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '4px', padding: '1rem' }}>
+                  <strong style={{ color: '#0369a1', display: 'block', fontSize: '0.88rem', marginBottom: '4px' }}>
+                    ⚖️ ¿Qué es ser irrazonable de manera coherente?
+                  </strong>
+                  <p style={{ margin: 0, fontSize: '0.84rem', color: '#475569', lineHeight: 1.5 }}>
+                    No compras sus historias de circunstancias (dinero, tiempo, familia) pero te paras con amor, contacto visual y firmeza adulto a adulto. Crees más en su grandeza de lo que él cree en ese momento.
+                  </p>
+                </div>
+                <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '4px', padding: '1rem' }}>
+                  <strong style={{ color: '#15803d', display: 'block', fontSize: '0.88rem', marginBottom: '4px' }}>
+                    🎯 Regla de Oro Operativa: Si es un SÍ, ¡a Mesa!
+                  </strong>
+                  <p style={{ margin: 0, fontSize: '0.84rem', color: '#475569', lineHeight: 1.5 }}>
+                    En cuanto el participante dice SÍ, <strong>no sobre-expliques ni sigas filosofando en el pasillo</strong>. Lo tomas del brazo y lo conduces físicamente a la Mesa: <em>«Allí se ocupan de tu registro, tickets y modalidades de pago»</em>.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              {conversacionesLlamadoAccionC1.map(item => (
+                <div key={item.id} style={{ background: '#fff', border: '1px solid var(--line)', borderRadius: '6px', padding: '1.5rem', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                    <h3 style={{ margin: 0, color: 'var(--blue)', fontSize: '1.18rem' }}>{item.title}</h3>
+                    <span style={{ fontSize: '0.72rem', fontWeight: 800, color: item.badgeColor, background: item.badgeBg, padding: '3px 10px', borderRadius: '4px', letterSpacing: '0.04em' }}>
+                      {item.badge}
+                    </span>
                   </div>
 
-                  <div style={{ background: '#f0fdf4', borderLeft: '3px solid #22c55e', padding: '0.85rem', borderRadius: '4px' }}>
-                    <strong style={{ fontSize: '0.78rem', color: '#16a34a', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>
-                      🔒 Cierre Concreto
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '0.75rem', marginBottom: '1rem' }}>
+                    <div style={{ background: '#f8fafc', padding: '0.85rem', borderRadius: '4px', border: '1px solid #e2e8f0' }}>
+                      <strong style={{ fontSize: '0.76rem', color: '#64748b', textTransform: 'uppercase', display: 'block', marginBottom: '3px' }}>
+                        Situación en Sala
+                      </strong>
+                      <div style={{ fontSize: '0.88rem', color: '#1e293b' }}>{item.situacion}</div>
+                    </div>
+                    <div style={{ background: '#fffbeb', padding: '0.85rem', borderRadius: '4px', border: '1px solid #fef3c7' }}>
+                      <strong style={{ fontSize: '0.76rem', color: '#b45309', textTransform: 'uppercase', display: 'block', marginBottom: '3px' }}>
+                        Peligro / Error Típico del Aliado
+                      </strong>
+                      <div style={{ fontSize: '0.88rem', color: '#92400e' }}>{item.diagnostico}</div>
+                    </div>
+                  </div>
+
+                  <div style={{ background: '#eff6ff', borderLeft: '4px solid #3b82f6', padding: '1rem', borderRadius: '4px', marginBottom: '0.85rem' }}>
+                    <strong style={{ fontSize: '0.78rem', color: '#1d4ed8', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>
+                      💬 Conversación de Cancha / Abordaje Exacto
                     </strong>
-                    <div style={{ fontSize: '0.92rem', color: '#15803d', fontWeight: 600 }}>{rp.cierre}</div>
+                    <div style={{ fontSize: '0.94rem', color: '#0f172a', fontWeight: 600, whiteSpace: 'pre-line', lineHeight: 1.6 }}>
+                      {item.frase}
+                    </div>
+                  </div>
+
+                  <div style={{ background: '#f0fdf4', borderLeft: '4px solid #22c55e', padding: '0.85rem', borderRadius: '4px' }}>
+                    <strong style={{ fontSize: '0.78rem', color: '#16a34a', textTransform: 'uppercase', display: 'block', marginBottom: '3px' }}>
+                      🏁 Consecución y Cierre Operativo
+                    </strong>
+                    <div style={{ fontSize: '0.9rem', color: '#15803d', fontWeight: 600 }}>{item.cierre}</div>
                   </div>
                 </div>
               ))}
