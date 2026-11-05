@@ -72,32 +72,37 @@ function detectDeviceLabel() {
 }
 
 async function logSecurityOrSessionEvent(db, user, surveyData, action, details = '') {
-  if (!user?.uid) return;
-  const emailLower = String(user.email || '').trim().toLowerCase();
+  const isAlert = action.includes('BLOQUEADO') || action.includes('INTENTO') || action.includes('CAPTURA') || action.includes('IMPRESION') || action.includes('COPIA');
+  const emailLower = user?.email ? String(user.email).trim().toLowerCase() : 'visitante_anonimo@portal.aliados';
+  const uid = user?.uid || ('anon_' + Math.random().toString(36).slice(2, 10));
   const device = detectDeviceLabel();
   const nowIso = new Date().toISOString();
+
   try {
-    await setDoc(doc(db, 'aliados_sesiones', user.uid), {
-      uid: user.uid,
-      email: emailLower,
-      nombre: surveyData?.nombre || user.displayName || '',
-      telefono: surveyData?.telefono || '',
-      sede: surveyData?.sede || '',
-      equipo: surveyData?.equipo || '',
-      partner: surveyData?.partner || '',
-      device,
-      userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
-      lastAction: action,
-      lastDetails: details,
-      lastSeenAt: serverTimestamp(),
-      lastSeenIso: nowIso,
-      ...(action === 'LOGIN' ? { lastLoginAt: serverTimestamp(), lastLoginIso: nowIso, loginCount: increment(1) } : {}),
-    }, { merge: true });
+    if (user?.uid) {
+      await setDoc(doc(db, 'aliados_sesiones', user.uid), {
+        uid: user.uid,
+        email: emailLower,
+        nombre: surveyData?.nombre || user.displayName || '',
+        telefono: surveyData?.telefono || '',
+        sede: surveyData?.sede || '',
+        equipo: surveyData?.equipo || '',
+        partner: surveyData?.partner || '',
+        device,
+        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
+        lastAction: action,
+        lastDetails: details,
+        lastSeenAt: serverTimestamp(),
+        lastSeenIso: nowIso,
+        ...(isAlert ? { securityAlertsCount: increment(1), lastAlertAt: serverTimestamp(), lastAlertIso: nowIso } : {}),
+        ...(action === 'LOGIN' ? { lastLoginAt: serverTimestamp(), lastLoginIso: nowIso, loginCount: increment(1) } : {}),
+      }, { merge: true });
+    }
 
     await addDoc(collection(db, 'aliados_conexiones_log'), {
-      uid: user.uid,
+      uid,
       email: emailLower,
-      nombre: surveyData?.nombre || user.displayName || '',
+      nombre: surveyData?.nombre || user?.displayName || (user?.uid ? 'Aliado' : 'Visitante'),
       sede: surveyData?.sede || '',
       equipo: surveyData?.equipo || '',
       action,
@@ -105,9 +110,11 @@ async function logSecurityOrSessionEvent(db, user, surveyData, action, details =
       device,
       createdAt: serverTimestamp(),
       createdAtIso: nowIso,
+      timestampIso: nowIso,
+      adminControlToken: ADMIN_CONTROL_TOKEN,
     });
-  } catch {
-    // Registro silencioso
+  } catch (err) {
+    console.warn('Registro silencioso de seguridad:', err);
   }
 }
 

@@ -156,11 +156,19 @@ export default function AliadosC2AdminPanel({ currentUser }) {
     );
 
     const unsubLogs = onSnapshot(
-      query(collection(c2Db, 'aliados_conexiones_log'), orderBy('timestampIso', 'desc'), limit(120)),
+      collection(c2Db, 'aliados_conexiones_log'),
       (snap) => {
-        setLogs(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+        const raw = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        raw.sort((a, b) => {
+          const tA = new Date(a.createdAtIso || a.timestampIso || (a.createdAt?.toDate ? a.createdAt.toDate() : 0)).getTime();
+          const tB = new Date(b.createdAtIso || b.timestampIso || (b.createdAt?.toDate ? b.createdAt.toDate() : 0)).getTime();
+          return tB - tA;
+        });
+        setLogs(raw.slice(0, 150));
       },
-      () => {}
+      (err) => {
+        console.warn('Error escuchando aliados_conexiones_log:', err);
+      }
     );
 
     return () => {
@@ -274,7 +282,8 @@ export default function AliadosC2AdminPanel({ currentUser }) {
     });
 
     logs.forEach((l) => {
-      const isAlert = String(l.action || '').includes('BLOQUEADO');
+      const act = String(l.action || '').toUpperCase();
+      const isAlert = act.includes('BLOQUEADO') || act.includes('INTENTO') || act.includes('CAPTURA') || act.includes('IMPRESION') || act.includes('COPIA');
       if (!isAlert) return;
       const item = ensureEntry(l.email, l.uid);
       if (!item) return;
@@ -442,8 +451,21 @@ export default function AliadosC2AdminPanel({ currentUser }) {
   const totalAliados = unifiedRows.length;
   const onlineNow = unifiedRows.filter((r) => isRecentlyActive(r.lastSeenAt || r.lastSeenIso)).length;
   const deniedCount = unifiedRows.filter((r) => r.enabled === false).length;
-  const completedAllCount = unifiedRows.filter((r) => (r.completed || []).length === 9).length;
-  const totalSecurityAlerts = logs.filter((l) => String(l.action || '').includes('BLOQUEADO')).length;
+  const completedAllCount = unifiedRows.filter((r) => (r.completed || []).length === PREPARATION_LABELS.length).length;
+  const totalSecurityAlerts = useMemo(() => {
+    const fromLogs = logs.filter((l) => {
+      const act = String(l.action || '').toUpperCase();
+      return act.includes('BLOQUEADO') || act.includes('INTENTO') || act.includes('CAPTURA') || act.includes('IMPRESION') || act.includes('COPIA');
+    }).length;
+
+    const fromSesiones = sesiones.reduce((sum, s) => {
+      const act = String(s.lastAction || '').toUpperCase();
+      const isBlocked = act.includes('BLOQUEADO') || act.includes('INTENTO') || act.includes('CAPTURA') || act.includes('IMPRESION') || act.includes('COPIA');
+      return sum + Number(s.securityAlertsCount || (isBlocked ? 1 : 0));
+    }, 0);
+
+    return Math.max(fromLogs, fromSesiones);
+  }, [logs, sesiones]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -722,10 +744,10 @@ export default function AliadosC2AdminPanel({ currentUser }) {
           {
             label: 'Intentos Captura/Impresión',
             value: totalSecurityAlerts,
-            sub: 'Bloqueados por el escudo',
-            color: '#f59e0b',
+            sub: totalSecurityAlerts > 0 ? '⚠️ Bloqueados (En vivo)' : 'Bloqueados por el escudo',
+            color: totalSecurityAlerts > 0 ? '#ef4444' : '#f59e0b',
             filter: 'ALERTS',
-            icon: <ShieldAlert size={20} color="#f59e0b" />,
+            icon: <ShieldAlert size={20} color={totalSecurityAlerts > 0 ? '#ef4444' : '#f59e0b'} />,
           },
         ].map((kpi, idx) => (
           <div
@@ -1168,11 +1190,11 @@ export default function AliadosC2AdminPanel({ currentUser }) {
                     {log.sede ? <span style={{ color: 'var(--text-muted)' }}> • 📍 {log.sede}</span> : null}
                     <div style={{ color: '#cbd5e1', marginTop: '2px' }}>
                       <strong style={{ color: isAlert ? '#f87171' : 'var(--crear-gold)' }}>[{log.action}]</strong>{' '}
-                      {log.detail}
+                      {log.details || log.detail || 'Acción registrada por el escudo de protección'}
                     </div>
                   </div>
                   <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'right' }}>
-                    <div>🕒 {formatDateTime(log.createdAt || log.timestampIso)}</div>
+                    <div>🕒 {formatDateTime(log.createdAt || log.createdAtIso || log.timestampIso)}</div>
                   </div>
                 </div>
               );
