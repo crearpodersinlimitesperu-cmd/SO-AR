@@ -693,12 +693,13 @@ export default function AliadosC1PortalApp() {
   if (!user) {
     return (
       <>
-        <header className="brand-bar">
-          <div className="brand">
-            <img src={crearLogo} alt="CREAR Poder Sin Límites" />
-            <span>CREAR · PODER SIN LÍMITES</span>
+        <header className="brand-bar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', padding: '16px 4vw' }}>
+          <div className="brand" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <img src={crearLogo} alt="CREAR Poder Sin Límites" style={{ height: '48px', width: 'auto', objectFit: 'contain' }} />
+            <span className="guide-label" style={{ borderLeft: '1px solid var(--line)', paddingLeft: '16px', fontSize: '14px', color: 'var(--muted)', fontWeight: 600 }}>
+              Programa de Resultados · Guía Aliados C1
+            </span>
           </div>
-          <span className="guide-label">Programa de Resultados · Guía Aliados C1</span>
         </header>
         <AuthBoxC1 onError={setErrorMsg} errorMsg={errorMsg} />
       </>
@@ -726,12 +727,13 @@ export default function AliadosC1PortalApp() {
   if (!survey) {
     return (
       <>
-        <header className="brand-bar">
-          <div className="brand">
-            <img src={crearLogo} alt="CREAR Poder Sin Límites" />
-            <span>CREAR · PODER SIN LÍMITES</span>
+        <header className="brand-bar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', padding: '16px 4vw' }}>
+          <div className="brand" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <img src={crearLogo} alt="CREAR Poder Sin Límites" style={{ height: '48px', width: 'auto', objectFit: 'contain' }} />
+            <span className="guide-label" style={{ borderLeft: '1px solid var(--line)', paddingLeft: '16px', fontSize: '14px', color: 'var(--muted)', fontWeight: 600 }}>
+              Programa de Resultados · Guía Aliados C1
+            </span>
           </div>
-          <span className="guide-label">Programa de Resultados · Guía Aliados C1</span>
         </header>
         <SurveyGateC1 user={user} existingSurvey={survey} onCompleted={setSurvey} onLogout={handleLogout} />
       </>
@@ -744,12 +746,13 @@ export default function AliadosC1PortalApp() {
   if (!userIsAdmin && accessValidity.isExpired) {
     return (
       <>
-        <header className="brand-bar">
-          <div className="brand">
-            <img src={crearLogo} alt="CREAR Poder Sin Límites" />
-            <span>CREAR · PODER SIN LÍMITES</span>
+        <header className="brand-bar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', padding: '16px 4vw' }}>
+          <div className="brand" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <img src={crearLogo} alt="CREAR Poder Sin Límites" style={{ height: '48px', width: 'auto', objectFit: 'contain' }} />
+            <span className="guide-label" style={{ borderLeft: '1px solid var(--line)', paddingLeft: '16px', fontSize: '14px', color: 'var(--muted)', fontWeight: 600 }}>
+              Programa de Resultados · Guía Aliados C1
+            </span>
           </div>
-          <span className="guide-label">Programa de Resultados · Guía Aliados C1</span>
         </header>
         <div className="portal-auth-wrap" style={{ textAlign: 'center', padding: '3rem 1rem' }}>
           <div className="portal-card" style={{ borderTop: '4px solid #f59e0b', maxWidth: '640px' }}>
@@ -861,7 +864,7 @@ export default function AliadosC1PortalApp() {
       {/* Barra de Marca y Sesión */}
       <header className="brand-bar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div className="brand" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <img src={crearLogo} alt="CREAR Poder Sin Límites" style={{ height: '70px' }} />
+          <img src={crearLogo} alt="CREAR Poder Sin Límites" style={{ height: '52px', width: 'auto', objectFit: 'contain' }} />
           <div>
             <div style={{ fontWeight: 900, letterSpacing: '0.05em', color: '#122c48' }}>CREAR PODER SIN LÍMITES</div>
             <div style={{ fontSize: '0.82rem', color: 'var(--muted)' }}>Guía Práctica Operativa: Aliado de Capítulo Uno (C1)</div>

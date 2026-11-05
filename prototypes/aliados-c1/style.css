@@ -27,11 +27,11 @@ section, aside, footer { scroll-margin-top: 24px; }
 .skip-link { position: fixed; top: -80px; left: 16px; z-index: 10; padding: 14px; background: var(--gold); }
 .skip-link:focus { top: 12px; }
 .preview-notice { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 9px 20px; background: #e2eaf0; font-size: 12px; font-weight: 600; }
-.brand-bar { display: flex; align-items: center; gap: 40px; padding: 25px 4vw; border-bottom: 1px solid var(--line); background: white; }
+.brand-bar { display: flex; align-items: center; gap: 24px; padding: 18px 4vw; border-bottom: 1px solid var(--line); background: white; }
 .brand { display: flex; align-items: center; flex-shrink: 0; text-decoration: none; }
-.brand img { display: block; width: auto; height: 104px; max-width: 100%; object-fit: contain; }
+.brand img { display: block; width: auto; height: 52px; max-width: 100%; object-fit: contain; }
 .brand span { max-width: 200px; font-size: 14px; line-height: 1.5; }
-.guide-label { padding-left: 32px; border-left: 1px solid var(--line); font-size: 14px; color: var(--muted); }
+.guide-label { padding-left: 20px; border-left: 1px solid var(--line); font-size: 14px; color: var(--muted); font-weight: 600; }
 .print-button { margin-left: auto; display: flex; align-items: center; gap: 10px; border: 1px solid var(--line); background: white; padding: 10px 16px; border-radius: 5px; }
 .print-button:hover { border-color: var(--blue); background: #f1f4f7; }
 .page-shell { max-width: 1600px; margin: auto; display: flex; flex-wrap: wrap; gap: 40px; padding: 32px 4vw 0; }
