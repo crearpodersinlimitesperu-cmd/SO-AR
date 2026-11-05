@@ -16,12 +16,16 @@ import { canEnterRoleRoute } from './utils/routeAccess'
 import { ErrorBoundary } from './components/ErrorBoundary';
 
 
+import Home from './pages/Home';
+import CentroManagers from './pages/CentroManagers';
+import SuperAdminPanel from './pages/SuperAdminPanel';
+import CallCoachCRM from './pages/CallCoachCRM';
+
 const CfoDashboard = lazy(() => import('./pages/CfoDashboard'));
 const AICopilot = lazy(() => import('./components/AICopilot'));
 const FinanceWorkspace = lazy(() => import('./pages/FinanceWorkspace'));
 const MaestriaGlobalDashboard = lazy(() => import('./pages/MaestriaGlobalDashboard'));
 const TrainerZenHub = lazy(() => import('./pages/TrainerZenHub'));
-const CallCoachCRM = lazy(() => import('./pages/CallCoachCRM'));
 const QuantumTeamHub = lazy(() => import('./pages/QuantumTeamHub'));
 const HrCommandCenter = lazy(() => import('./pages/HrCommandCenter'));
 const LegalCommandCenter = lazy(() => import('./pages/LegalCommandCenter'));
@@ -33,7 +37,6 @@ const LegalStatusPanel = lazy(() => import('./pages/LegalStatusPanel'));
 const OnboardingLegal = lazy(() => import('./pages/OnboardingLegal'));
 const Login = lazy(() => import('./pages/Login'));
 const OptOutPage = lazy(() => import('./pages/OptOutPage'));
-const Home = lazy(() => import('./pages/Home'));
 const ElizabethDashboard = lazy(() => import('./pages/ElizabethDashboard'));
 const CausaOSTask = lazy(() => import('./pages/CausaOSTask'));
 const RoleSelector = lazy(() => import('./pages/RoleSelector'));
@@ -41,12 +44,10 @@ const ChecklistBoard = lazy(() => import('./pages/ChecklistBoard'));
 const GerenteDashboard = lazy(() => import('./pages/GerenteDashboard'));
 const GoalsBoard = lazy(() => import('./pages/GoalsBoard'));
 const ReportesBoard = lazy(() => import('./pages/ReportesBoard'));
-const SuperAdminPanel = lazy(() => import('./pages/SuperAdminPanel'));
 const ManualGuia = lazy(() => import('./pages/ManualGuia'));
 const ManualNodus = lazy(() => import('./pages/ManualNodus'));
 const MisKPIs = lazy(() => import('./pages/MisKPIs'));
 const AuditoriaKPIs = lazy(() => import('./pages/AuditoriaKPIs'));
-const CentroManagers = lazy(() => import('./pages/CentroManagers'));
 const ManagerGuide = lazy(() => import('./pages/ManagerGuide'));
 const DirectorioQT = lazy(() => import('./pages/DirectorioQT'));
 const ProtocoloEmergencias = lazy(() => import('./pages/ProtocoloEmergencias'));
