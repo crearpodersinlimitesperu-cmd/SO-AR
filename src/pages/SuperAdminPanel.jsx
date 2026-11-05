@@ -19,6 +19,7 @@ import UserProfileModal from '../components/UserProfileModal';
 import IAAuditor from '../components/IAAuditor';
 import TaskAssignmentModal from '../components/TaskAssignmentModal';
 import AliadosC2AdminPanel from '../components/AliadosC2AdminPanel';
+import AliadosC1AdminPanel from '../components/AliadosC1AdminPanel';
 import GuiaAliadosC1 from './GuiaAliadosC1';
 import NodusLiveModulesDashboard from '../components/NodusLiveModulesDashboard';
 import { getAllAuditLogs, recordAuditEvent, getAllUserConnections } from '../services/auditService';
@@ -1689,7 +1690,7 @@ export default function SuperAdminPanel() {
               <button style={tabStyle('sugerencias')} onClick={() => setActiveView('sugerencias')}>💡 Buzón Sugerencias</button>
             )}
             {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion') && (
-              <button style={tabStyle('aliados_c1')} onClick={() => setActiveView('aliados_c1')}>📘 Guía Aliados C1</button>
+              <button style={tabStyle('aliados_c1')} onClick={() => setActiveView('aliados_c1')}>📘 Aliados C1 (Guía & Accesos)</button>
             )}
             {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion') && (
               <button style={tabStyle('aliados_c2')} onClick={() => setActiveView('aliados_c2')}>🛡️ Aliados C2 (Guía & Accesos)</button>
@@ -1741,7 +1742,7 @@ export default function SuperAdminPanel() {
             <SuggestionsView />
           )}
           {activeView === 'aliados_c1' && (
-            <GuiaAliadosC1 />
+            <AliadosC1AdminPanel currentUser={currentUser} onToggleGuideView={() => navigate('/guia-aliados-c1')} />
           )}
           {activeView === 'aliados_c2' && (
             <AliadosC2AdminPanel currentUser={currentUser} />

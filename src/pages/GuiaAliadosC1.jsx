@@ -36,6 +36,42 @@ export default function GuiaAliadosC1() {
     link.rel = 'shortcut icon';
     link.href = '/logo-crear.png';
     document.getElementsByTagName('head')[0].appendChild(link);
+
+    // Escudo de seguridad en tiempo real (anti-copia, anti-impresión, anti-captura)
+    const onKeyDown = (e) => {
+      const key = (e.key || '').toLowerCase();
+      const isPrint = (e.ctrlKey || e.metaKey) && key === 'p';
+      const isSave = (e.ctrlKey || e.metaKey) && key === 's';
+      const isCopy = (e.ctrlKey || e.metaKey) && (key === 'c' || key === 'u');
+      const isPrintScreen = e.key === 'PrintScreen' || e.keyCode === 44;
+      const isMacShot = e.metaKey && e.shiftKey && ['3', '4', '5'].includes(key);
+      const isWinSnip = e.metaKey && e.shiftKey && key === 's';
+
+      if (isPrint || isSave) {
+        e.preventDefault();
+        alert('La impresión y descarga de esta guía están deshabilitadas por protección de propiedad intelectual.');
+      } else if (isPrintScreen || isMacShot || isWinSnip) {
+        e.preventDefault();
+        if (navigator.clipboard?.writeText) {
+          navigator.clipboard.writeText('Documento confidencial protegido — Crear Poder Sin Límites').catch(() => {});
+        }
+        alert('Las capturas de pantalla están prohibidas por la política de confidencialidad de Crear Poder Sin Límites.');
+      } else if (isCopy && e.target?.tagName !== 'INPUT' && e.target?.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+      }
+    };
+
+    const onContextMenu = (e) => {
+      if (e.target?.tagName === 'INPUT' || e.target?.tagName === 'TEXTAREA') return;
+      e.preventDefault();
+    };
+
+    window.addEventListener('keydown', onKeyDown, true);
+    document.addEventListener('contextmenu', onContextMenu, true);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown, true);
+      document.removeEventListener('contextmenu', onContextMenu, true);
+    };
   }, []);
 
   const copyToClipboard = (text, id) => {
