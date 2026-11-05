@@ -34,6 +34,7 @@ import {
   ChevronRight,
   Lock,
 } from 'lucide-react';
+import NodusLiveModulesDashboard from './NodusLiveModulesDashboard';
 
 const ALIADOS_C2_FIREBASE_CONFIG = {
   apiKey: 'AIzaSyAu7Oa19PYgLQJYRb5HAsYgWw2KRqyqcM4',
@@ -1057,6 +1058,14 @@ export default function AliadosC2AdminPanel({ currentUser }) {
             </tbody>
           </table>
         )}
+      </div>
+
+      {/* Contraste en Tiempo Real: Nodus (/aliados?id_equipo=149) vs Google Sheet Oficial QT & Aliados E32 */}
+      <div className="glass-panel" style={{ padding: '1.25rem', border: '1px solid rgba(16, 185, 129, 0.35)' }}>
+        <h3 style={{ marginTop: 0, marginBottom: '0.75rem', color: '#34d399', fontSize: '1.1rem', fontWeight: 800 }}>
+          📊 Contraste de Resultados de Aliados: Nodus (id_equipo=149) vs. Google Sheet Oficial (QT & Aliados Equipo 32)
+        </h3>
+        <NodusLiveModulesDashboard />
       </div>
 
       {/* Bitácora en Vivo de Conexiones y Alertas Anti-Captura */}
