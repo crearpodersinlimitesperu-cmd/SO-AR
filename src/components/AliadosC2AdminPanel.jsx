@@ -50,13 +50,14 @@ const ADMIN_CONTROL_TOKEN = 'CAUSA_OS_SUPERADMIN_C2_2026';
 const PREPARATION_LABELS = [
   { id: 'tecnica', title: '1. Verificación técnica (cámara, micrófono, internet e iluminación)' },
   { id: 'espacio', title: '2. Lugar privado, seguro y sin distracciones (Grounding 8:00 p. m.)' },
-  { id: 'partner', title: '3. Confirmación de dupla Partner C1 o nuevo Partner C2' },
-  { id: 'resultados', title: '4. Envío de Resultados Imposibles antes de las 23:59 hrs' },
-  { id: 'coreografia', title: '5. Video de coreografía de equipo + grito antes del miércoles 23:59 hrs' },
+  { id: 'partner', title: '3. Regla de corresponsabilidad y principio de presencia (Partner)' },
+  { id: 'registro_wa', title: '4. Misión Innegociable: Registro de Participantes C2 y "para qué" en WhatsApp' },
+  { id: 'resultados', title: '5. Envío de Resultados Imposibles antes de las 23:59 hrs' },
   { id: 'angeles', title: '6. Convocatoria de 10 graduados exclusivos para Noche de Vuelos' },
-  { id: 'identificacion', title: '7. Cinta negra con iniciales lista para sus 10 Ángeles' },
-  { id: 'acapela', title: '8. Coreografía a capela de 30s preparada con sus Ángeles' },
-  { id: 'feedback', title: '9. Retroalimentación activa y seguimiento de 3 min (Jueves a Domingo)' },
+  { id: 'identificacion', title: '7. Cinta negra con iniciales y permanencia total como guardianes' },
+  { id: 'acapela', title: '8. Coreografía a capela de 30s de Ángeles en Noche de Vuelos' },
+  { id: 'coreografia', title: '9. Video de coreografía de equipo + grito antes del miércoles 23:59 hrs' },
+  { id: 'feedback', title: '10. Feedback diario de 10 min (rotativo) y exigencia directa al 100%' },
 ];
 
 function getAliadosC2Db() {
@@ -484,13 +485,13 @@ export default function AliadosC2AdminPanel({ currentUser }) {
               </span>
             </div>
             <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-              Monitoreo en tiempo real de quién se ha conectado, en qué momento exacto, datos de su encuesta, avance de preparación (9 misiones) y revocación inmediata de acceso.
+              Monitoreo en tiempo real de quién se ha conectado, en qué momento exacto, datos de su encuesta, avance de preparación (10 acuerdos y misiones innegociables) y revocación inmediata de acceso.
             </p>
           </div>
 
           <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
             <a
-              href="https://aliados-crear-global.web.app"
+              href="/aliados-c2/"
               target="_blank"
               rel="noreferrer"
               className="btn-secondary"
@@ -506,6 +507,24 @@ export default function AliadosC2AdminPanel({ currentUser }) {
               }}
             >
               <ExternalLink size={15} /> Abrir Guía Aliados C2
+            </a>
+            <a
+              href="https://aliados-crear-global.web.app"
+              target="_blank"
+              rel="noreferrer"
+              className="btn-secondary"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                fontSize: '0.82rem',
+                padding: '0.5rem 0.9rem',
+                textDecoration: 'none',
+                border: '1px solid rgba(148, 163, 184, 0.3)',
+                color: '#94a3b8',
+              }}
+            >
+              <ExternalLink size={15} /> Dominio Secundario
             </a>
             <button
               onClick={() => setShowBulkModal((v) => !v)}
@@ -1025,7 +1044,7 @@ export default function AliadosC2AdminPanel({ currentUser }) {
 
                             <div>
                               <h4 style={{ margin: '0 0 0.5rem 0', color: 'var(--crear-gold)', fontSize: '0.88rem' }}>
-                                ✅ Estado de las 9 Misiones de Preparación C2 ({completedCount}/9)
+                                ✅ Estado de los Acuerdos y Misiones de Preparación C2 ({completedCount}/{PREPARATION_LABELS.length})
                               </h4>
                               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                                 {PREPARATION_LABELS.map((item) => {

@@ -32,7 +32,7 @@ import {
   setDoc,
   writeBatch,
 } from 'firebase/firestore';
-import { guideIntro, phases, preparation, reference, legalNotice } from '../content.js';
+import { guideIntro, phases, roleplays, preparation, reference, legalNotice } from '../content.js';
 import { nextRecord } from '../private/recordModel.js';
 import { getPortalFirebase, isAdminEmail } from './firebase.js';
 import crearLogo from '../logo-crear.png';
@@ -1097,6 +1097,8 @@ export function PortalApp() {
               ))}
             </nav>
             <nav className="secondary-nav" aria-label="Recursos de preparación">
+              <a href="#roleplays">5. Escenarios de Roleplay</a>
+              <a href="#agenda">6. Cronograma de Ejecución</a>
               <a href="#preparacion">Mi preparación <span>{count}/{preparation.length}</span></a>
               <a href="#consulta">Consulta rápida <ArrowDown size={15} aria-hidden="true" /></a>
               <a href="#criterios">Fuente y cuidados</a>
@@ -1117,7 +1119,10 @@ export function PortalApp() {
               <div className="opening-copy">
                 <h1 id="page-title">Guía Práctica Operativa:<br /><span>Aliado de Capítulo Dos (C2).</span></h1>
                 <p>{guideIntro.lead}</p>
-                <a className="primary-link" href="#agenda">5. Cronograma Operativo de Ejecución <ArrowDown size={19} aria-hidden="true" /></a>
+                <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginTop: '1rem' }}>
+                  <a className="primary-link" href="#roleplays">5. Escenarios de Roleplay <ArrowDown size={17} aria-hidden="true" /></a>
+                  <a className="primary-link" href="#agenda" style={{ background: '#334155' }}>6. Cronograma de Ejecución <ArrowDown size={17} aria-hidden="true" /></a>
+                </div>
               </div>
               <div className="chapter-mark" aria-hidden="true"><span>C</span><span>2</span><div className="chapter-line" /></div>
               <div className="route-strip" aria-label="Secuencia de fases">
@@ -1128,14 +1133,14 @@ export function PortalApp() {
             <section className="service-status" aria-labelledby="service-status-title">
               <h2 id="service-status-title">Tu progreso personal está sincronizado con tu correo ({user.email})</h2>
               <p>
-                Hola <strong>{survey.nombre}</strong> ({survey.sede} · {survey.equipo} · Partner: {survey.partner}). Como <strong>Partner Motor de Riesgo</strong>, tu palabra es ley. Marca y lleva el control de tus 9 acuerdos de preparación y misiones estándar de los groundings aquí; tu progreso queda guardado en tiempo real bajo tu correo.
+                Hola <strong>{survey.nombre}</strong> ({survey.sede} · {survey.equipo} · Partner: {survey.partner}). Como <strong>Partner Motor de Riesgo</strong>, tu palabra es ley. Marca y lleva el control de tus {preparation.length} acuerdos de preparación y misiones estándar de los groundings aquí; tu progreso queda guardado en tiempo real bajo tu correo.
               </p>
               <a href="#preparacion">Ir a mis Misiones y Preparación ({count}/{preparation.length}) <ArrowDown size={16} aria-hidden="true" /></a>
             </section>
 
             <div className="working-spread">
               <section id="agenda" className="agenda" aria-labelledby="agenda-title">
-                <div className="section-heading"><h2 id="agenda-title">5. Cronograma Operativo de Ejecución</h2><span>Secuencia paso a paso</span></div>
+                <div className="section-heading"><h2 id="agenda-title">6. Cronograma Operativo de Ejecución</h2><span>Secuencia paso a paso</span></div>
                 <p className="schedule-note">Todos los Aliados deben estar en tiempo y forma en todos los momentos, groundings y citas iniciales, sin excusas y sin excepciones.</p>
                 <p className="filter-status" aria-live="polite">{currentPhase ? `Mostrando: ${currentPhase.short}.` : 'Mostrando las cuatro fases.'} {currentPhase && <a href="#todo">Ver agenda completa</a>}</p>
                 {phases.map((phase, index) => (
@@ -1193,14 +1198,69 @@ export function PortalApp() {
                   </div>
                 )}
                 <div className="complete-message" hidden={count !== preparation.length}>
-                  <Check size={18} aria-hidden="true" />¡Preparación 9/9 completada y guardada en tu cuenta!
+                  <Check size={18} aria-hidden="true" />¡Preparación {count}/{preparation.length} completada y guardada en tu cuenta!
                 </div>
               </aside>
             </div>
 
+            {/* SECCIÓN 5: ESCENARIOS PRÁCTICOS DE ROLEPLAY (MESA Y SEGUIMIENTO C2) */}
+            <section id="roleplays" className="quick-reference" style={{ marginTop: '2.5rem' }}>
+              <div className="section-heading">
+                <h2 id="roleplay-title">5. Escenarios Prácticos de Roleplay (Mesa y Seguimiento C2)</h2>
+                <span>Interrupción Asertiva, Fórmula de Movimiento y Cierre Concreto</span>
+              </div>
+              <p>
+                El Aliado de C2 no compra historias ni valida justificaciones. En interacciones de seguimiento y encuadre (máximo 5 minutos), utiliza estas cuatro fórmulas de quiebre para desarticular excusas y mover a la acción inmediata con pago o registro cerrado:
+              </p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.25rem', marginTop: '1.25rem' }}>
+                {roleplays.map((rp) => (
+                  <div key={rp.id} style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', padding: '1.35rem', display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+                    <div>
+                      <span style={{ background: 'rgba(245, 158, 11, 0.2)', color: '#fbbf24', padding: '2px 8px', borderRadius: '4px', fontSize: '0.72rem', fontWeight: 800 }}>
+                        ESCENARIO {rp.numero}
+                      </span>
+                      <h3 style={{ margin: '0.5rem 0 0.2rem 0', color: '#f8fafc', fontSize: '1.05rem', fontWeight: 800 }}>
+                        «{rp.titulo}»
+                      </h3>
+                      <p style={{ margin: 0, fontSize: '0.8rem', color: '#94a3b8' }}>
+                        <strong>Contexto:</strong> {rp.contexto}
+                      </p>
+                    </div>
+
+                    <div style={{ background: 'rgba(239, 68, 68, 0.08)', borderLeft: '3px solid #ef4444', padding: '0.75rem', borderRadius: '4px' }}>
+                      <strong style={{ fontSize: '0.75rem', color: '#fca5a5', textTransform: 'uppercase', display: 'block', marginBottom: '3px' }}>
+                        ⚡ Interrupción Asertiva
+                      </strong>
+                      <div style={{ fontSize: '0.85rem', color: '#f8fafc', fontStyle: 'italic' }}>
+                        {rp.interrupcion}
+                      </div>
+                    </div>
+
+                    <div style={{ background: 'rgba(14, 165, 233, 0.08)', borderLeft: '3px solid #0ea5e9', padding: '0.75rem', borderRadius: '4px' }}>
+                      <strong style={{ fontSize: '0.75rem', color: '#7dd3fc', textTransform: 'uppercase', display: 'block', marginBottom: '3px' }}>
+                        🎯 Fórmula de Movimiento
+                      </strong>
+                      <div style={{ fontSize: '0.85rem', color: '#f8fafc' }}>
+                        {rp.formula}
+                      </div>
+                    </div>
+
+                    <div style={{ background: 'rgba(16, 185, 129, 0.08)', borderLeft: '3px solid #10b981', padding: '0.75rem', borderRadius: '4px' }}>
+                      <strong style={{ fontSize: '0.75rem', color: '#6ee7b7', textTransform: 'uppercase', display: 'block', marginBottom: '3px' }}>
+                        🔒 Cierre Concreto
+                      </strong>
+                      <div style={{ fontSize: '0.85rem', color: '#f8fafc', fontWeight: 600 }}>
+                        {rp.cierre}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
             <section id="consulta" className="quick-reference" aria-labelledby="reference-title">
-              <div className="section-heading"><h2 id="reference-title">1–4 y 6–7 · Rol, Reconocimiento, Grounding, Conversación y Misiones</h2><span>Partner Motor de Riesgo · Programa de Resultados</span></div>
-              <p>Despliega cada sección para revisar el marco completo de postura, reconocimiento orgánico, estándares del Grounding Virtual, herramientas de conversación y misiones estándar.</p>
+              <div className="section-heading"><h2 id="reference-title">1–4 y 7–8 · Marco Operativo, Grounding, Misiones y Socios de Vida</h2><span>Partner Motor de Riesgo · Programa de Resultados</span></div>
+              <p>Despliega cada sección para revisar el marco completo de postura, reconocimiento orgánico, estándares del Grounding Virtual, herramientas de conversación, misiones estándar y Socios de Vida.</p>
               {reference.map((item, index) => (
                 <details key={item.title} open={openReferences.includes(index)} onToggle={event => {
                   const isOpen = event.currentTarget.open;
