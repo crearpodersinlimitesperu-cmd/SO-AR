@@ -21,10 +21,10 @@ export class ErrorBoundary extends React.Component {
       try {
         const previousReload = Number(sessionStorage.getItem(reloadKey));
         const now = Date.now();
-        if (!previousReload || now - previousReload > 30000) {
+        if (!previousReload || now - previousReload > 10000) {
           sessionStorage.setItem(reloadKey, String(now));
           const currentUrl = new URL(window.location.href);
-          currentUrl.searchParams.set('_app_reload', String(now));
+          currentUrl.searchParams.set('_v', String(now));
           window.location.replace(currentUrl.toString());
         }
       } catch (storageError) {
@@ -34,9 +34,17 @@ export class ErrorBoundary extends React.Component {
   }
 
   handleReload = () => {
+    try {
+      sessionStorage.clear();
+      if (typeof window !== 'undefined' && 'caches' in window) {
+        window.caches.keys().then((names) => {
+          names.forEach((name) => window.caches.delete(name));
+        });
+      }
+    } catch (_) {}
     const currentUrl = new URL(window.location.href);
-    currentUrl.searchParams.set('_app_reload', String(Date.now()));
-    window.location.replace(currentUrl.toString());
+    currentUrl.searchParams.set('_v', String(Date.now()));
+    window.location.href = currentUrl.toString();
   };
 
   handleGoHome = () => {

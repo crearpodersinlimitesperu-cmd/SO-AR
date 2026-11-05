@@ -7,6 +7,23 @@ import { ErrorBoundary } from './components/ErrorBoundary'
 import { UIProvider } from './context/UIContext'
 import { ThemeProvider } from './context/ThemeContext'
 
+// Manejar recarga transparente ante nuevas versiones de la app o desincronización de chunks de Vite
+if (typeof window !== 'undefined') {
+  window.addEventListener('vite:preloadError', (event) => {
+    console.warn('[Causa OS] Nueva versión detectada o fallo de módulo dinámico. Actualizando...', event);
+    event.preventDefault();
+    const reloadKey = 'causa:vite-preload-reload';
+    const lastReload = Number(sessionStorage.getItem(reloadKey) || 0);
+    const now = Date.now();
+    if (now - lastReload > 6000) {
+      sessionStorage.setItem(reloadKey, String(now));
+      const targetUrl = new URL(window.location.href);
+      targetUrl.searchParams.set('_v', String(now));
+      window.location.replace(targetUrl.toString());
+    }
+  });
+}
+
 // Link público de firma legal: se monta una versión ligera (sin los contextos
 // y módulos pesados del resto de la plataforma) para que cargue rápido.
 const path = window.location.pathname.replace(/\/+$/, '')

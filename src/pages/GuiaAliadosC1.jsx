@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Users,
   Compass,
@@ -28,6 +28,15 @@ export default function GuiaAliadosC1() {
   const [activeTab, setActiveTab] = useState('postura');
   const [searchTerm, setSearchTerm] = useState('');
   const [copiedText, setCopiedText] = useState('');
+
+  useEffect(() => {
+    document.title = 'Guía de Aliados C1 · CREAR Poder Sin Límites';
+    const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+    link.type = 'image/png';
+    link.rel = 'shortcut icon';
+    link.href = '/logo-crear.png';
+    document.getElementsByTagName('head')[0].appendChild(link);
+  }, []);
 
   const copyToClipboard = (text, id) => {
     navigator.clipboard?.writeText(text);

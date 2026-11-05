@@ -1046,7 +1046,9 @@ const regexNames = /export const NOMBRES_LEGALES_ENTRENADORES = ({[\s\S]*?});/
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/src/assets/causa-icon.png" />
+    <link rel="icon" type="image/png" href="/logo-crear.png" />
+    <link rel="shortcut icon" type="image/png" href="/logo-crear.png" />
+    <link rel="apple-touch-icon" href="/logo-crear.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Causa OS — Centro de Liderazgo y Orquestación" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
@@ -57466,9 +57468,9 @@ export function calendarFreshnessText({ refreshing, checkedAt, sources, error, c
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="./assets/logo-crear-C73fBin-.png" />
-    <link rel="shortcut icon" type="image/png" href="./assets/logo-crear-C73fBin-.png" />
-    <link rel="apple-touch-icon" href="./assets/logo-crear-C73fBin-.png" />
+    <link rel="icon" type="image/png" href="/logo-crear.png" />
+    <link rel="shortcut icon" type="image/png" href="/logo-crear.png" />
+    <link rel="apple-touch-icon" href="/logo-crear.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex, nofollow, noarchive" />
     <meta name="referrer" content="no-referrer" />
@@ -57569,7 +57571,9 @@ aliado2@correo.com`,value:d,onChange:e=>f(e.target.value)}),(0,$.jsx)(`button`,{
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Guía Práctica Operativa: Aliado de Capítulo Uno (C1) · Crear Poder Sin Límites</title>
-  <link rel="icon" type="image/png" href="/assets/causa-icon.png">
+  <link rel="icon" type="image/png" href="/logo-crear.png">
+  <link rel="shortcut icon" type="image/png" href="/logo-crear.png">
+  <link rel="apple-touch-icon" href="/logo-crear.png">
   <style>
     :root {
       --bg: #0b1120;
@@ -59076,9 +59080,9 @@ export const legalNotice = {
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="../logo-crear.png" />
-    <link rel="shortcut icon" type="image/png" href="../logo-crear.png" />
-    <link rel="apple-touch-icon" href="../logo-crear.png" />
+    <link rel="icon" type="image/png" href="/logo-crear.png" />
+    <link rel="shortcut icon" type="image/png" href="/logo-crear.png" />
+    <link rel="apple-touch-icon" href="/logo-crear.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex, nofollow, noarchive" />
     <meta name="referrer" content="no-referrer" />
@@ -67369,6 +67373,23 @@ import { AuthProvider } from './context/AuthContext'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { UIProvider } from './context/UIContext'
 import { ThemeProvider } from './context/ThemeContext'
+
+// Manejar recarga transparente ante nuevas versiones de la app o desincronización de chunks de Vite
+if (typeof window !== 'undefined') {
+  window.addEventListener('vite:preloadError', (event) => {
+    console.warn('[Causa OS] Nueva versión detectada o fallo de módulo dinámico. Actualizando...', event);
+    event.preventDefault();
+    const reloadKey = 'causa:vite-preload-reload';
+    const lastReload = Number(sessionStorage.getItem(reloadKey) || 0);
+    const now = Date.now();
+    if (now - lastReload > 6000) {
+      sessionStorage.setItem(reloadKey, String(now));
+      const targetUrl = new URL(window.location.href);
+      targetUrl.searchParams.set('_v', String(now));
+      window.location.replace(targetUrl.toString());
+    }
+  });
+}
 
 // Link público de firma legal: se monta una versión ligera (sin los contextos
 // y módulos pesados del resto de la plataforma) para que cargue rápido.
@@ -88702,10 +88723,10 @@ export class ErrorBoundary extends React.Component {
       try {
         const previousReload = Number(sessionStorage.getItem(reloadKey));
         const now = Date.now();
-        if (!previousReload || now - previousReload > 30000) {
+        if (!previousReload || now - previousReload > 10000) {
           sessionStorage.setItem(reloadKey, String(now));
           const currentUrl = new URL(window.location.href);
-          currentUrl.searchParams.set('_app_reload', String(now));
+          currentUrl.searchParams.set('_v', String(now));
           window.location.replace(currentUrl.toString());
         }
       } catch (storageError) {
@@ -88715,9 +88736,17 @@ export class ErrorBoundary extends React.Component {
   }
 
   handleReload = () => {
+    try {
+      sessionStorage.clear();
+      if (typeof window !== 'undefined' && 'caches' in window) {
+        window.caches.keys().then((names) => {
+          names.forEach((name) => window.caches.delete(name));
+        });
+      }
+    } catch (_) {}
     const currentUrl = new URL(window.location.href);
-    currentUrl.searchParams.set('_app_reload', String(Date.now()));
-    window.location.replace(currentUrl.toString());
+    currentUrl.searchParams.set('_v', String(Date.now()));
+    window.location.href = currentUrl.toString();
   };
 
   handleGoHome = () => {
@@ -159305,7 +159334,7 @@ export default function ExcellenceDashboard() {
 ## Archivo: src/pages/GuiaAliadosC1.jsx
 
 ```javascript
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Users,
   Compass,
@@ -159335,6 +159364,15 @@ export default function GuiaAliadosC1() {
   const [activeTab, setActiveTab] = useState('postura');
   const [searchTerm, setSearchTerm] = useState('');
   const [copiedText, setCopiedText] = useState('');
+
+  useEffect(() => {
+    document.title = 'Guía de Aliados C1 · CREAR Poder Sin Límites';
+    const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+    link.type = 'image/png';
+    link.rel = 'shortcut icon';
+    link.href = '/logo-crear.png';
+    document.getElementsByTagName('head')[0].appendChild(link);
+  }, []);
 
   const copyToClipboard = (text, id) => {
     navigator.clipboard?.writeText(text);
