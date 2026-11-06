@@ -1343,6 +1343,7 @@ service cloud.firestore {
 
     // ============================================================================
     // MÓDULO DE ALIADOS: Guía Operativa C1 y C2, encuestas, checklist y bitácora de seguridad
+    // Reglas de producción verificadas para registro de encuestas y retiros automáticos (2026-11-05)
     // ============================================================================
     match /encuestas_aliados/{uid} {
       allow read: if true;

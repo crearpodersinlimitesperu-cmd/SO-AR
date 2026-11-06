@@ -89,6 +89,29 @@ function isRecentlyActive(tsOrIso, minutes = 5) {
   }
 }
 
+function formatHumanName(rawName, email = '') {
+  if (rawName && typeof rawName === 'string') {
+    const trimmed = rawName.trim();
+    if (trimmed && trimmed.toLowerCase() !== 'sin nombre' && trimmed.toLowerCase() !== 'no especificado') {
+      return trimmed;
+    }
+  }
+  if (!email) return 'Staff de Mesa';
+  const cleanEmail = String(email).toLowerCase().trim();
+  if (cleanEmail === 'comunidadcrearpsl@gmail.com') return 'José Sánchez';
+  if (cleanEmail === 'diana.moscoso@crearpsl.net') return 'Diana Moscoso';
+  if (cleanEmail === 'joyce.marin@crearpsl.net') return 'Joyce Marín';
+
+  const prefix = cleanEmail.split('@')[0] || '';
+  const cleaned = prefix.replace(/[._-]+/g, ' ').trim();
+  if (!cleaned) return 'Staff de Mesa';
+  return cleaned
+    .split(' ')
+    .filter(Boolean)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(' ');
+}
+
 export default function StaffMesaAdminPanel({ currentUser }) {
   const [autorizados, setAutorizados] = useState([]);
   const [encuestas, setEncuestas] = useState([]);
@@ -100,6 +123,7 @@ export default function StaffMesaAdminPanel({ currentUser }) {
   const [statusFilter, setStatusFilter] = useState('todos');
   const [sedeFilter, setSedeFilter] = useState('todas');
   const [expandedEmail, setExpandedEmail] = useState(null);
+  const [showHorarios, setShowHorarios] = useState(false);
 
   // Modal para agregar autorizado
   const [showAddModal, setShowAddModal] = useState(false);
@@ -178,11 +202,21 @@ export default function StaffMesaAdminPanel({ currentUser }) {
     autorizados.forEach((a) => {
       const email = a.email?.toLowerCase().trim();
       if (!email) return;
+      const rawName = a.nombre || a.displayName || a.nombreCompleto;
+      const rawSede = a.sede || a.sedeOficial;
+      const rawPuesto = a.mesaRol || a.puestoMesa || a.rol;
+      const rawEquipo = a.equipo || a.equipoGeneracion;
+
       map.set(email, {
         email,
         autorizadoDocId: a.id,
-        isAuthorized: a.isAuthorized !== false,
+        isAuthorized: a.isAuthorized !== false && a.enabled !== false,
         autorizadoData: a,
+        nombre: formatHumanName(rawName, email),
+        sede: rawSede || 'Lima',
+        whatsapp: a.telefono || a.whatsapp || '',
+        puestoMesa: rawPuesto || 'Staff General',
+        equipoGeneracion: rawEquipo || 'TODOS_DISPONIBLES',
       });
     });
 
@@ -190,15 +224,21 @@ export default function StaffMesaAdminPanel({ currentUser }) {
       const email = e.email?.toLowerCase().trim();
       if (!email) return;
       const prev = map.get(email) || { email, isAuthorized: true };
+      const rawName = e.nombre || e.nombreCompleto || e.displayName || prev.nombre;
+      const rawSede = e.sede || e.sedeOficial || prev.sede;
+      const rawWhatsapp = e.telefono || e.whatsapp || prev.whatsapp || '';
+      const rawPuesto = e.mesaRol || e.puestoMesa || prev.puestoMesa || 'Staff General';
+      const rawEquipo = e.equipo || e.equipoGeneracion || prev.equipoGeneracion || 'TODOS_DISPONIBLES';
+
       map.set(email, {
         ...prev,
         encuestaDocId: e.id,
         encuestaData: e,
-        nombre: e.nombreCompleto || prev.nombre || 'Sin nombre',
-        sede: e.sedeOficial || prev.sede || 'No especificada',
-        whatsapp: e.whatsapp || prev.whatsapp || '',
-        puestoMesa: e.mesaRol || e.puestoMesa || '',
-        equipoGeneracion: e.equipo || e.equipoGeneracion || '',
+        nombre: formatHumanName(rawName, email),
+        sede: rawSede || 'Lima',
+        whatsapp: rawWhatsapp,
+        puestoMesa: rawPuesto,
+        equipoGeneracion: rawEquipo,
       });
     });
 
@@ -206,11 +246,12 @@ export default function StaffMesaAdminPanel({ currentUser }) {
       const email = s.email?.toLowerCase().trim() || s.id?.toLowerCase().trim();
       if (!email) return;
       const prev = map.get(email) || { email, isAuthorized: true };
+      const rawName = s.nombre || s.displayName || prev.nombre;
       map.set(email, {
         ...prev,
         sesionData: s,
         lastActive: s.lastActiveAt || s.loginAt,
-        nombre: prev.nombre || s.nombre || 'Sin nombre',
+        nombre: formatHumanName(rawName, email),
       });
     });
 
@@ -645,6 +686,113 @@ export default function StaffMesaAdminPanel({ currentUser }) {
         </div>
       </div>
 
+      {/* Acordeón de Horarios Oficiales Staff de Mesa */}
+      <div
+        style={{
+          background: 'rgba(15, 23, 42, 0.75)',
+          border: '1px solid rgba(56, 189, 248, 0.25)',
+          borderRadius: '12px',
+          padding: '1rem 1.25rem',
+          marginBottom: '1rem',
+        }}
+      >
+        <div
+          onClick={() => setShowHorarios(!showHorarios)}
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            cursor: 'pointer',
+            userSelect: 'none',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+            <span style={{ fontSize: '1.25rem' }}>⏱️</span>
+            <div>
+              <strong style={{ color: '#38bdf8', fontSize: '0.98rem' }}>
+                Horarios Oficiales del Staff de Mesa (C1, C2 y MJ)
+              </strong>
+              <div style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
+                Pautas de asistencia obligatoria y bloques operativos en sede
+              </div>
+            </div>
+          </div>
+          <button
+            type="button"
+            style={{
+              background: 'rgba(56, 189, 248, 0.15)',
+              border: '1px solid rgba(56, 189, 248, 0.3)',
+              color: '#38bdf8',
+              borderRadius: '6px',
+              padding: '0.35rem 0.75rem',
+              fontSize: '0.78rem',
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+            }}
+          >
+            {showHorarios ? 'Ocultar Horarios' : 'Ver Horarios Oficiales'}
+          </button>
+        </div>
+
+        {showHorarios && (
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: '1rem',
+              marginTop: '1.25rem',
+              paddingTop: '1rem',
+              borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+            }}
+          >
+            {/* C1 */}
+            <div style={{ background: 'rgba(0, 0, 0, 0.25)', border: '1px solid rgba(56, 189, 248, 0.2)', borderRadius: '8px', padding: '1rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '0.4rem' }}>
+                <span style={{ fontWeight: 800, color: '#38bdf8', fontSize: '0.92rem' }}>Mesa Capítulo 1 (C1)</span>
+                <span style={{ fontSize: '0.7rem', color: '#7dd3fc', background: 'rgba(56, 189, 248, 0.15)', padding: '1px 6px', borderRadius: '4px', fontWeight: 700 }}>4 Bloques</span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', fontSize: '0.82rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#94a3b8' }}>Viernes:</span> <strong style={{ color: '#f8fafc' }}>8:00 AM – 1:00 PM</strong></div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#94a3b8' }}>Sábado:</span> <strong style={{ color: '#f8fafc' }}>8:30 AM – 12:00 PM</strong></div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#94a3b8' }}>Domingo (Mañana):</span> <strong style={{ color: '#f8fafc' }}>8:30 AM – 11:00 AM</strong></div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#94a3b8' }}>Domingo (Cierre):</span> <strong style={{ color: '#f8fafc' }}>6:00 PM – 8:00 PM</strong></div>
+              </div>
+            </div>
+
+            {/* C2 */}
+            <div style={{ background: 'rgba(0, 0, 0, 0.25)', border: '1px solid rgba(245, 158, 11, 0.2)', borderRadius: '8px', padding: '1rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '0.4rem' }}>
+                <span style={{ fontWeight: 800, color: '#fbbf24', fontSize: '0.92rem' }}>Mesa Capítulo 2 (C2)</span>
+                <span style={{ fontSize: '0.7rem', color: '#fde68a', background: 'rgba(245, 158, 11, 0.15)', padding: '1px 6px', borderRadius: '4px', fontWeight: 700 }}>3 Bloques</span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', fontSize: '0.82rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#94a3b8' }}>Jueves:</span> <strong style={{ color: '#f8fafc' }}>11:00 AM – 3:00 PM</strong></div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#94a3b8' }}>Viernes:</span> <strong style={{ color: '#f8fafc' }}>7:30 AM – 2:00 PM</strong></div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#94a3b8' }}>Sábado:</span> <strong style={{ color: '#f8fafc' }}>7:30 AM – 12:00 PM</strong></div>
+              </div>
+            </div>
+
+            {/* MJ */}
+            <div style={{ background: 'rgba(0, 0, 0, 0.25)', border: '1px solid rgba(168, 85, 247, 0.2)', borderRadius: '8px', padding: '1rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '0.4rem' }}>
+                <span style={{ fontWeight: 800, color: '#c084fc', fontSize: '0.92rem' }}>Maestría del Juego (MJ)</span>
+                <span style={{ fontSize: '0.7rem', color: '#e9d5ff', background: 'rgba(168, 85, 247, 0.15)', padding: '1px 6px', borderRadius: '4px', fontWeight: 700 }}>5 Bloques</span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', fontSize: '0.82rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#94a3b8' }}>Viernes:</span> <strong style={{ color: '#f8fafc' }}>3:20 PM – 8:00 PM</strong></div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#94a3b8' }}>Sábado (Mañana):</span> <strong style={{ color: '#f8fafc' }}>8:30 AM – 11:00 AM</strong></div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#94a3b8' }}>Sábado (Tarde):</span> <strong style={{ color: '#f8fafc' }}>4:30 PM – 7:30 PM</strong></div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#94a3b8' }}>Domingo (Mañana):</span> <strong style={{ color: '#f8fafc' }}>8:30 AM – 11:00 AM</strong></div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#94a3b8' }}>Domingo (Cierre):</span> <strong style={{ color: '#f8fafc' }}>4:30 PM – 8:00 PM</strong></div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Barra de Filtros y Búsqueda */}
       <div
         style={{
@@ -825,26 +973,26 @@ export default function StaffMesaAdminPanel({ currentUser }) {
 
                       {/* Sede & Puesto */}
                       <td style={{ padding: '1rem' }}>
-                        <div style={{ fontWeight: 500, color: '#e2e8f0' }}>{user.sede || 'No especificada'}</div>
-                        <div style={{ fontSize: '0.75rem', color: '#f59e0b' }}>{user.puestoMesa || 'Staff General'}</div>
+                        <div style={{ fontWeight: 500, color: '#e2e8f0' }}>{user.sede || 'Lima'}</div>
+                        <div style={{ fontSize: '0.75rem', color: '#f59e0b' }}>{user.puestoMesa || 'Staff de Mesa'}</div>
                       </td>
 
                       {/* Generación / Disponibilidad */}
                       <td style={{ padding: '1rem' }}>
                         <span
                           style={{
-                            background: user.equipoGeneracion === 'TODOS_DISPONIBLES' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255, 255, 255, 0.08)',
-                            color: user.equipoGeneracion === 'TODOS_DISPONIBLES' ? '#34d399' : '#cbd5e1',
-                            border: user.equipoGeneracion === 'TODOS_DISPONIBLES' ? '1px solid rgba(16, 185, 129, 0.3)' : 'none',
+                            background: (!user.equipoGeneracion || user.equipoGeneracion === 'TODOS_DISPONIBLES') ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255, 255, 255, 0.08)',
+                            color: (!user.equipoGeneracion || user.equipoGeneracion === 'TODOS_DISPONIBLES') ? '#34d399' : '#cbd5e1',
+                            border: (!user.equipoGeneracion || user.equipoGeneracion === 'TODOS_DISPONIBLES') ? '1px solid rgba(16, 185, 129, 0.3)' : 'none',
                             padding: '0.2rem 0.5rem',
                             borderRadius: '6px',
                             fontSize: '0.75rem',
                             fontWeight: 600,
                           }}
                         >
-                          {user.equipoGeneracion === 'TODOS_DISPONIBLES'
+                          {(!user.equipoGeneracion || user.equipoGeneracion === 'TODOS_DISPONIBLES')
                             ? '⭐ Todos Disponibles (C1, C2, MJ)'
-                            : (user.equipoGeneracion || 'Sin equipo')}
+                            : user.equipoGeneracion}
                         </span>
                       </td>
 

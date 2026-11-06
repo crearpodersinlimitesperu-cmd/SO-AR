@@ -228,6 +228,24 @@ export const conversacionesLlamadoAccionC1 = [
   }
 ];
 
+export function formatHumanName(rawName, email = '') {
+  if (rawName && typeof rawName === 'string') {
+    const trimmed = rawName.trim();
+    if (trimmed && trimmed.toLowerCase() !== 'sin nombre' && trimmed.toLowerCase() !== 'no especificado') {
+      return trimmed;
+    }
+  }
+  if (!email) return '';
+  const prefix = String(email).split('@')[0] || '';
+  const cleaned = prefix.replace(/[._-]+/g, ' ').trim();
+  if (!cleaned) return '';
+  return cleaned
+    .split(' ')
+    .filter(Boolean)
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(' ');
+}
+
 export function SurveyGateC1({ user, existingSurvey, onCompleted, onLogout }) {
   const initialSede = (existingSurvey?.sede && OFFICIAL_SEDES.includes(existingSurvey.sede)) ? existingSurvey.sede : 'Lima';
   const availableTeams = VIGENTES_TEAMS_C1[initialSede] || [];
@@ -235,8 +253,9 @@ export function SurveyGateC1({ user, existingSurvey, onCompleted, onLogout }) {
     ? existingSurvey.equipo
     : (availableTeams[0]?.id || 'C1E33');
 
-  const [nombre, setNombre] = useState(existingSurvey?.nombre || user?.displayName || '');
-  const [telefono, setTelefono] = useState(existingSurvey?.telefono || '');
+  const initialNombre = existingSurvey?.nombre || existingSurvey?.nombreCompleto || user?.displayName || formatHumanName('', user?.email) || '';
+  const [nombre, setNombre] = useState(initialNombre);
+  const [telefono, setTelefono] = useState(existingSurvey?.telefono || existingSurvey?.whatsapp || '');
   const [sede, setSede] = useState(initialSede);
   const [equipo, setEquipo] = useState(initialEquipo);
   const [partner, setPartner] = useState(existingSurvey?.partner || '');
@@ -289,30 +308,42 @@ export function SurveyGateC1({ user, existingSurvey, onCompleted, onLogout }) {
         email: emailLower,
         capitulo: 'C1',
         nombre: nombre.trim(),
+        nombreCompleto: nombre.trim(),
+        displayName: nombre.trim(),
         telefono: telefono.trim(),
+        whatsapp: telefono.trim(),
         sede: sede.trim(),
+        sedeOficial: sede.trim(),
         equipo: equipo.trim(),
+        equipoGeneracion: equipo.trim(),
         partner: partner.trim(),
         compromiso: Boolean(compromiso),
         updatedAt: serverTimestamp(),
       };
 
+      // 1. Guardar la encuesta principal del usuario en 'encuestas_aliados'
       await setDoc(doc(db, 'encuestas_aliados', user.uid), surveyData, { merge: true });
-      await setDoc(doc(db, 'aliados_autorizados', emailLower), {
-        email: emailLower,
-        uid: user.uid,
-        nombre: nombre.trim(),
-        telefono: telefono.trim(),
-        sede: sede.trim(),
-        equipo: equipo.trim(),
-        partner: partner.trim(),
-        enabled: true,
-        capitulo: 'C1',
-        source: 'encuesta_c1_web',
-        updatedAt: serverTimestamp(),
-      }, { merge: true });
 
-      await logSecurityOrSessionEvent(db, user, surveyData, 'ENCUESTA_COMPLETADA_C1', `Sede ${sede.trim()} · Equipo ${equipo.trim()}`);
+      // 2. Sincronizar documento de autorización (tolerante a fallos si aún no hay permisos de admin)
+      try {
+        await setDoc(doc(db, 'aliados_autorizados', emailLower), {
+          ...surveyData,
+          isAuthorized: true,
+          enabled: true,
+          capitulo: 'C1',
+          source: 'encuesta_c1_web',
+          updatedAt: serverTimestamp(),
+        }, { merge: true });
+      } catch (authErr) {
+        console.warn('aliados_autorizados setDoc omitido o sin permisos:', authErr);
+      }
+
+      try {
+        await logSecurityOrSessionEvent(db, user, surveyData, 'ENCUESTA_COMPLETADA_C1', `Sede ${sede.trim()} · Equipo ${equipo.trim()}`);
+      } catch (logErr) {
+        console.warn('logSecurityOrSessionEvent omitido:', logErr);
+      }
+
       onCompleted(surveyData);
     } catch (err) {
       setErrorMsg(`Error al guardar tu encuesta: ${err.message}`);
@@ -448,7 +479,11 @@ export function AuthBoxC1({ onError, errorMsg }) {
       provider.setCustomParameters({ prompt: 'select_account' });
       await signInWithPopup(auth, provider);
     } catch (err) {
-      onError(err.message || 'Error al autenticar con Google');
+      if (err.code === 'auth/unauthorized-domain' || (err.message && err.message.includes('auth/unauthorized-domain'))) {
+        onError(`⚠️ Dominio no autorizado en Firebase Authentication (${typeof window !== 'undefined' ? window.location.hostname : 'este dominio'}). Para ingresar con Google, este dominio debe agregarse en Firebase Console > Authentication > Settings > Authorized domains. Mientras tanto, puedes iniciar sesión o crear tu contraseña en el formulario inferior.`);
+      } else {
+        onError(err.message || 'Error al autenticar con Google');
+      }
     } finally {
       setLoading(false);
     }

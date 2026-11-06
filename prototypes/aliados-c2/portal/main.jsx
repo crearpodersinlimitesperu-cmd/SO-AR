@@ -136,6 +136,24 @@ function exportRowsToCsv(filename, headers, rows) {
   URL.revokeObjectURL(url);
 }
 
+export function formatHumanName(rawName, email = '') {
+  if (rawName && typeof rawName === 'string') {
+    const trimmed = rawName.trim();
+    if (trimmed && trimmed.toLowerCase() !== 'sin nombre' && trimmed.toLowerCase() !== 'no especificado') {
+      return trimmed;
+    }
+  }
+  if (!email) return '';
+  const prefix = String(email).split('@')[0] || '';
+  const cleaned = prefix.replace(/[._-]+/g, ' ').trim();
+  if (!cleaned) return '';
+  return cleaned
+    .split(' ')
+    .filter(Boolean)
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(' ');
+}
+
 export function SurveyGate({ user, existingSurvey, onCompleted, onLogout }) {
   const initialSede = (existingSurvey?.sede && OFFICIAL_SEDES.includes(existingSurvey.sede)) ? existingSurvey.sede : 'Lima';
   const availableTeams = VIGENTES_TEAMS_C2[initialSede] || [];
@@ -143,8 +161,9 @@ export function SurveyGate({ user, existingSurvey, onCompleted, onLogout }) {
     ? existingSurvey.equipo
     : (availableTeams[0]?.id || 'C2E32');
 
-  const [nombre, setNombre] = useState(existingSurvey?.nombre || user?.displayName || '');
-  const [telefono, setTelefono] = useState(existingSurvey?.telefono || '');
+  const initialNombre = existingSurvey?.nombre || existingSurvey?.nombreCompleto || user?.displayName || formatHumanName('', user?.email) || '';
+  const [nombre, setNombre] = useState(initialNombre);
+  const [telefono, setTelefono] = useState(existingSurvey?.telefono || existingSurvey?.whatsapp || '');
   const [sede, setSede] = useState(initialSede);
   const [equipo, setEquipo] = useState(initialEquipo);
   const [partner, setPartner] = useState(existingSurvey?.partner || '');
@@ -198,29 +217,40 @@ export function SurveyGate({ user, existingSurvey, onCompleted, onLogout }) {
         uid: user.uid,
         email: emailLower,
         nombre: nombre.trim(),
+        nombreCompleto: nombre.trim(),
+        displayName: nombre.trim(),
         telefono: telefono.trim(),
+        whatsapp: telefono.trim(),
         sede: sede.trim(),
+        sedeOficial: sede.trim(),
         equipo: equipo.trim(),
+        equipoGeneracion: equipo.trim(),
         partner: partner.trim(),
         compromiso: Boolean(compromiso),
         updatedAt: serverTimestamp(),
       };
 
+      // 1. Guardar la encuesta principal
       await setDoc(doc(db, 'encuestas_aliados', user.uid), surveyData, { merge: true });
-      await setDoc(doc(db, 'aliados_autorizados', emailLower), {
-        email: emailLower,
-        uid: user.uid,
-        nombre: nombre.trim(),
-        telefono: telefono.trim(),
-        sede: sede.trim(),
-        equipo: equipo.trim(),
-        partner: partner.trim(),
-        enabled: true,
-        source: 'encuesta_web',
-        updatedAt: serverTimestamp(),
-      }, { merge: true });
 
-      await logSecurityOrSessionEvent(db, user, surveyData, 'ENCUESTA_COMPLETADA', `Sede ${sede.trim()} · Equipo ${equipo.trim()}`);
+      // 2. Sincronizar autorización si tiene permisos
+      try {
+        await setDoc(doc(db, 'aliados_autorizados', emailLower), {
+          ...surveyData,
+          isAuthorized: true,
+          enabled: true,
+          source: 'encuesta_web',
+          updatedAt: serverTimestamp(),
+        }, { merge: true });
+      } catch (authErr) {
+        console.warn('aliados_autorizados setDoc omitido o sin permisos:', authErr);
+      }
+
+      try {
+        await logSecurityOrSessionEvent(db, user, surveyData, 'ENCUESTA_COMPLETADA', `Sede ${sede.trim()} · Equipo ${equipo.trim()}`);
+      } catch (logErr) {
+        console.warn('logSecurityOrSessionEvent omitido:', logErr);
+      }
 
       if (sheetWebhook && sheetWebhook.startsWith('https://script.google.com/')) {
         try {
@@ -753,6 +783,9 @@ export function LoginScreen({ onError, errorMsg }) {
 
 function explainAuthError(err) {
   const code = err?.code || '';
+  if (code === 'auth/unauthorized-domain' || (err?.message && err.message.includes('auth/unauthorized-domain'))) {
+    return `⚠️ Dominio no autorizado en Firebase (${typeof window !== 'undefined' ? window.location.hostname : 'este dominio'}). Para ingresar con Google, este dominio debe agregarse en Firebase Console > Authentication > Settings > Authorized domains. Mientras tanto, puedes iniciar sesión o crear tu contraseña en el formulario inferior.`;
+  }
   if (code.includes('configuration-not-found') || code.includes('operation-not-allowed')) {
     return 'Falta activar el proveedor de acceso (Google / Correo) en Firebase Console -> Authentication -> Sign-in method.';
   }
