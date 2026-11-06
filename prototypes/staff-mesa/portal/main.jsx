@@ -566,9 +566,21 @@ export default function StaffMesaApp() {
           logSecurityOrSessionEvent(db, currentUser, sData, 'LOGIN', `Dispositivo ${detectDeviceLabel()}`);
         }
 
+        // Cargar progreso del checklist (con respaldo en localStorage)
+        let localCached = [];
+        try {
+          const raw = localStorage.getItem(`mesa_checklist_${currentUser.uid}`);
+          if (raw) localCached = JSON.parse(raw);
+        } catch {}
+
+        if (localCached.length > 0) {
+          setCompletedItems(localCached);
+        }
+
         const recordDoc = await getDoc(doc(db, 'staff_mesa_records', currentUser.uid));
         if (recordDoc.exists() && Array.isArray(recordDoc.data().completed)) {
-          setCompletedItems(recordDoc.data().completed);
+          const sComp = recordDoc.data().completed;
+          setCompletedItems(sComp.length > 0 ? sComp : localCached);
         }
       } catch (err) {
         console.warn('Error verificando usuario Staff Mesa:', err);
@@ -587,13 +599,24 @@ export default function StaffMesaApp() {
       ? completedItems.filter(id => id !== itemId)
       : [...completedItems, itemId];
 
+    // Actualización optimista inmediata
     setCompletedItems(nextCompleted);
+    try {
+      localStorage.setItem(`mesa_checklist_${user.uid}`, JSON.stringify(nextCompleted));
+    } catch {}
+
+    const itemsMap = {};
+    nextCompleted.forEach(id => {
+      itemsMap[id] = true;
+    });
 
     try {
       await setDoc(doc(db, 'staff_mesa_records', user.uid), {
         uid: user.uid,
         email: user.email,
         completed: nextCompleted,
+        checklist: itemsMap,
+        items: itemsMap,
         updatedAt: serverTimestamp(),
       }, { merge: true });
 

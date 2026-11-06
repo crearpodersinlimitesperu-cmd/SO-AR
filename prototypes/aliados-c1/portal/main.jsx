@@ -678,10 +678,21 @@ export default function AliadosC1PortalApp() {
           logSecurityOrSessionEvent(db, currentUser, sData, 'LOGIN', `Dispositivo ${detectDeviceLabel()}`);
         }
 
-        // Cargar progreso del checklist
+        // Cargar progreso del checklist (con respaldo en localStorage)
+        let localCached = [];
+        try {
+          const raw = localStorage.getItem(`c1_checklist_${currentUser.uid}`);
+          if (raw) localCached = JSON.parse(raw);
+        } catch {}
+
+        if (localCached.length > 0) {
+          setCompletedMissions(localCached);
+        }
+
         const recordDoc = await getDoc(doc(db, 'records', currentUser.uid));
         if (recordDoc.exists() && Array.isArray(recordDoc.data().completed)) {
-          setCompletedMissions(recordDoc.data().completed);
+          const sComp = recordDoc.data().completed;
+          setCompletedMissions(sComp.length > 0 ? sComp : localCached);
         }
       } catch (err) {
         console.warn('Error verificando usuario C1:', err);
@@ -700,7 +711,11 @@ export default function AliadosC1PortalApp() {
       ? completedMissions.filter(id => id !== missionId)
       : [...completedMissions, missionId];
 
+    // Actualización optimista inmediata
     setCompletedMissions(nextCompleted);
+    try {
+      localStorage.setItem(`c1_checklist_${user.uid}`, JSON.stringify(nextCompleted));
+    } catch {}
 
     try {
       await setDoc(doc(db, 'records', user.uid), {
@@ -719,7 +734,7 @@ export default function AliadosC1PortalApp() {
         `Misión: ${missionId} (${nextCompleted.length}/${preparationMissionsC1.length})`
       );
     } catch (err) {
-      console.warn('Error guardando checklist C1:', err);
+      console.warn('Error guardando checklist C1 en Firestore:', err);
     }
   }
 
@@ -1018,9 +1033,8 @@ export default function AliadosC1PortalApp() {
               {preparationMissionsC1.map(m => {
                 const isDone = completedMissions.includes(m.id);
                 return (
-                  <div
+                  <label
                     key={m.id}
-                    onClick={() => handleToggleMission(m.id)}
                     style={{
                       display: 'flex',
                       alignItems: 'flex-start',
@@ -1031,24 +1045,16 @@ export default function AliadosC1PortalApp() {
                       borderRadius: '6px',
                       cursor: 'pointer',
                       transition: 'all 0.2s ease',
+                      userSelect: 'none',
                     }}
                   >
-                    <div
-                      style={{
-                        width: '22px',
-                        height: '22px',
-                        borderRadius: '4px',
-                        border: isDone ? '2px solid #22c55e' : '2px solid #94a3b8',
-                        background: isDone ? '#22c55e' : '#fff',
-                        display: 'grid',
-                        placeItems: 'center',
-                        flexShrink: 0,
-                        marginTop: '2px',
-                      }}
-                    >
-                      {isDone && <Check size={16} color="#fff" strokeWidth={3} />}
-                    </div>
-                    <div>
+                    <input
+                      type="checkbox"
+                      checked={isDone}
+                      onChange={() => handleToggleMission(m.id)}
+                      style={{ width: '20px', height: '20px', cursor: 'pointer', marginTop: '3px', accentColor: '#22c55e', flexShrink: 0 }}
+                    />
+                    <div style={{ flex: 1 }}>
                       <div style={{ fontWeight: 800, color: isDone ? '#15803d' : 'var(--blue)', fontSize: '0.98rem' }}>
                         {m.title}
                       </div>
@@ -1056,7 +1062,7 @@ export default function AliadosC1PortalApp() {
                         {m.desc}
                       </div>
                     </div>
-                  </div>
+                  </label>
                 );
               })}
             </div>

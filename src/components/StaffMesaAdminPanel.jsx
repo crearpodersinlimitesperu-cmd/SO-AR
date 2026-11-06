@@ -256,11 +256,30 @@ export default function StaffMesaAdminPanel({ currentUser }) {
     });
 
     records.forEach((r) => {
-      const email = r.email?.toLowerCase().trim() || r.id?.toLowerCase().trim();
+      let email = r.email?.toLowerCase().trim();
+      if (!email) {
+        for (const [em, u] of map.entries()) {
+          if (u.autorizadoDocId === r.id || u.encuestaDocId === r.id || u.id === r.id) {
+            email = em;
+            break;
+          }
+        }
+      }
       if (!email) return;
       const prev = map.get(email) || { email, isAuthorized: true };
+
+      let compArray = [];
+      if (Array.isArray(r.completed)) {
+        compArray = r.completed;
+      } else if (r.checklist && typeof r.checklist === 'object') {
+        compArray = Object.keys(r.checklist).filter(k => r.checklist[k]);
+      } else if (r.items && typeof r.items === 'object') {
+        compArray = Object.keys(r.items).filter(k => r.items[k]);
+      }
+
       map.set(email, {
         ...prev,
+        completedList: compArray,
         checklistData: r.checklist || r.items || {},
       });
     });
@@ -917,9 +936,9 @@ export default function StaffMesaAdminPanel({ currentUser }) {
                 filteredStaff.map((user) => {
                   const isExpanded = expandedEmail === user.email;
                   const checklistObj = user.checklistData || {};
-                  const checkedCount = Object.values(checklistObj).filter(Boolean).length;
-                  const checklistTotal = CHECKLIST_LABELS_STAFF_MESA.length;
-                  const checklistPct = Math.round((checkedCount / checklistTotal) * 100);
+                  const checkedCount = user.completedList ? user.completedList.length : Object.values(checklistObj).filter(Boolean).length;
+                  const checklistTotal = (user.completedList && user.completedList.length > 8) ? 22 : 8;
+                  const checklistPct = checklistTotal > 0 ? Math.min(100, Math.round((checkedCount / checklistTotal) * 100)) : 0;
 
                   return (
                     <tr

@@ -973,13 +973,24 @@ export function PortalApp() {
           }, () => {});
         }
 
+        let localCached = [];
+        try {
+          const raw = localStorage.getItem(`c2_checklist_${currentUser.uid}`);
+          if (raw) localCached = JSON.parse(raw);
+        } catch {}
+
         unsubRecord = onSnapshot(doc(db, 'records', currentUser.uid), snap => {
           if (snap.exists()) {
-            setRecord(snap.data());
+            const data = snap.data();
+            const serverCompleted = Array.isArray(data.completed) ? data.completed : [];
+            const bestCompleted = serverCompleted.length > 0 ? serverCompleted : (localCached.length > 0 ? localCached : serverCompleted);
+            setRecord({ ...data, completed: bestCompleted });
           } else {
-            setRecord({ uid: currentUser.uid, completed: [], revision: 0 });
+            setRecord({ uid: currentUser.uid, completed: localCached, revision: 0 });
           }
-        }, () => {});
+        }, () => {
+          setRecord({ uid: currentUser.uid, completed: localCached, revision: 0 });
+        });
 
         unsubEvents = onSnapshot(
           query(collection(db, 'records', currentUser.uid, 'events'), orderBy('revision', 'desc')),
@@ -1020,63 +1031,93 @@ export function PortalApp() {
     setMessage('');
   }
 
-  async function performAction(action) {
-    if (!user || saving) return;
-    setSaving(true);
-    setMessage('Guardando en tu cuenta personal...');
+  async function performAction(action, optimisticCompleted, optimisticRevision) {
+    if (!user) return;
+    setMessage('Sincronizando...');
     try {
       const { db } = getPortalFirebase();
       const uid = user.uid;
       const emailLower = String(user.email || '').trim().toLowerCase();
       const eventId = doc(collection(db, 'records', uid, 'events')).id;
 
-      let nextCompletedCount = 0;
-      await runTransaction(db, async transaction => {
-        const recRef = doc(db, 'records', uid);
-        const previousSnap = await transaction.get(recRef);
-        const previousData = previousSnap.exists() ? previousSnap.data() : null;
-        const next = nextRecord(previousData, action);
-        nextCompletedCount = next.completed.length;
+      const finalCompleted = optimisticCompleted !== undefined
+        ? optimisticCompleted
+        : (action.kind === 'reset' ? [] : (record?.completed ?? []));
+      const finalRevision = optimisticRevision !== undefined
+        ? optimisticRevision
+        : ((record?.revision ?? 0) + 1);
 
-        transaction.set(recRef, {
+      if (action.kind === 'reset') {
+        setRecord(prev => ({
+          ...(prev || {}),
           uid,
           email: emailLower,
-          completed: next.completed,
-          revision: next.revision,
-          lastEventId: eventId,
-          updatedAt: serverTimestamp(),
-        });
-        transaction.set(doc(db, 'records', uid, 'events', eventId), {
-          uid,
-          completed: next.completed,
-          revision: next.revision,
-          previousRevision: next.previousRevision,
-          kind: action.kind,
-          target: action.target,
-          createdAt: serverTimestamp(),
-        });
-      });
+          completed: [],
+          revision: finalRevision,
+        }));
+        try {
+          localStorage.setItem(`c2_checklist_${uid}`, JSON.stringify([]));
+        } catch {}
+      }
 
-      await logSecurityOrSessionEvent(
+      await setDoc(doc(db, 'records', uid), {
+        uid,
+        email: emailLower,
+        completed: finalCompleted,
+        revision: finalRevision,
+        lastEventId: eventId,
+        updatedAt: serverTimestamp(),
+      }, { merge: true });
+
+      setDoc(doc(db, 'records', uid, 'events', eventId), {
+        uid,
+        completed: finalCompleted,
+        revision: finalRevision,
+        kind: action.kind,
+        target: action.target,
+        createdAt: serverTimestamp(),
+      }).catch(err => console.warn('Evento de checklist en segundo plano:', err));
+
+      logSecurityOrSessionEvent(
         db,
         user,
         survey,
         action.kind === 'check' ? 'CHECK_MISION' : action.kind === 'uncheck' ? 'UNCHECK_MISION' : 'RESET_MISIONES',
-        `${action.target} (${nextCompletedCount}/${preparation.length})`
+        `${action.target} (${finalCompleted.length}/${preparation.length})`
       );
 
-      setMessage(`Guardado confirmado en la nube para ${user.email}.`);
+      setMessage(`Guardado en tu cuenta (${finalCompleted.length}/${preparation.length}).`);
     } catch (err) {
-      setMessage(`No se pudo guardar en el servidor: ${err.message}`);
-    } finally {
-      setSaving(false);
+      console.warn('Error sincronizando checklist C2 en la nube:', err);
+      setMessage(`Guardado localmente (${record?.completed?.length || 0}/${preparation.length}).`);
     }
   }
 
   function toggle(id) {
+    if (!user) return;
     const completedList = record?.completed ?? [];
     const isChecked = completedList.includes(id);
-    performAction({ kind: isChecked ? 'uncheck' : 'check', target: id });
+    const nextCompleted = isChecked
+      ? completedList.filter(item => item !== id)
+      : [...completedList, id];
+
+    const nextRevision = (record?.revision ?? 0) + 1;
+
+    // Actualización optimista inmediata en UI sin demoras
+    setRecord(prev => ({
+      ...(prev || {}),
+      uid: user.uid,
+      email: user.email,
+      completed: nextCompleted,
+      revision: nextRevision,
+    }));
+
+    // Respaldo en localStorage inmediato
+    try {
+      localStorage.setItem(`c2_checklist_${user.uid}`, JSON.stringify(nextCompleted));
+    } catch {}
+
+    performAction({ kind: isChecked ? 'uncheck' : 'check', target: id }, nextCompleted, nextRevision);
   }
 
   const completed = record?.completed ?? [];
@@ -1299,13 +1340,13 @@ export function PortalApp() {
                 <ul className="checklist">
                   {preparation.map(item => (
                     <li key={item.id}>
-                      <label>
+                      <label style={{ cursor: 'pointer' }}>
                         <input
                           type="checkbox"
                           checked={completed.includes(item.id)}
-                          disabled={saving}
                           onChange={() => toggle(item.id)}
                           aria-describedby="preparation-mode"
+                          style={{ cursor: 'pointer' }}
                         />
                         <span><strong>{item.title}</strong><small>{item.detail}</small></span>
                       </label>
@@ -1316,16 +1357,16 @@ export function PortalApp() {
                   Sincronización en tiempo real activa. Historial de eventos auditados: {events.length}.
                 </p>
                 {!resetPending ? (
-                  <button className="reset-button" disabled={saving || count === 0} onClick={() => setResetPending(true)}>
+                  <button className="reset-button" disabled={count === 0} onClick={() => setResetPending(true)}>
                     <RotateCcw size={15} aria-hidden="true" />Reiniciar mis marcas
                   </button>
                 ) : (
                   <div className="reset-confirm">
                     <p>¿Reiniciar todas tus casillas de preparación? (El historial de revisiones se conserva).</p>
-                    <button disabled={saving} onClick={() => { performAction({ kind: 'reset', target: 'preparation' }); setResetPending(false); }}>
+                    <button onClick={() => { performAction({ kind: 'reset', target: 'preparation' }); setResetPending(false); }}>
                       Sí, reiniciar marcas
                     </button>
-                    <button disabled={saving} onClick={() => setResetPending(false)}>Conservar marcas</button>
+                    <button onClick={() => setResetPending(false)}>Conservar marcas</button>
                   </div>
                 )}
                 <div className="complete-message" hidden={count !== preparation.length}>
