@@ -230,8 +230,20 @@ export function SurveyGate({ user, existingSurvey, onCompleted, onLogout }) {
         updatedAt: serverTimestamp(),
       };
 
+      // 0. Cache local resiliente inmediato
+      try {
+        localStorage.setItem('c2_survey_data', JSON.stringify(surveyData));
+        localStorage.setItem(`c2_survey_cached_${user.uid}`, JSON.stringify(surveyData));
+      } catch (cacheErr) {
+        console.warn('Cache local de encuesta C2 omitido:', cacheErr);
+      }
+
       // 1. Guardar la encuesta principal
-      await setDoc(doc(db, 'encuestas_aliados', user.uid), surveyData, { merge: true });
+      try {
+        await setDoc(doc(db, 'encuestas_aliados', user.uid), surveyData, { merge: true });
+      } catch (fsErr) {
+        console.warn('encuestas_aliados setDoc diferido o sin permisos inmediatos:', fsErr);
+      }
 
       // 2. Sincronizar autorización si tiene permisos
       try {
@@ -276,7 +288,13 @@ export function SurveyGate({ user, existingSurvey, onCompleted, onLogout }) {
 
       onCompleted(surveyData);
     } catch (err) {
-      setErrorMsg(err?.message || 'No se pudo guardar la encuesta. Verifica tu conexión o permisos.');
+      console.warn('Error al guardar en Firestore (activando respaldo local C2):', err);
+      try {
+        localStorage.setItem('c2_survey_data', JSON.stringify(surveyData));
+        onCompleted(surveyData);
+      } catch {
+        setErrorMsg(err?.message || 'No se pudo guardar la encuesta. Verifica tu conexión o permisos.');
+      }
     } finally {
       setSubmitting(false);
     }

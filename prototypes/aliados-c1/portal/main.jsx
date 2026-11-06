@@ -122,8 +122,8 @@ async function logSecurityOrSessionEvent(db, user, surveyData, action, details =
 export const innegociablesC1 = [
   {
     id: 'programa_resultados',
-    title: '1. Programa de Resultados (Tecnología NEC™)',
-    desc: 'Bajo la tecnología NEC™ (Neuroepigenética Contextual), somos un Programa de Resultados enfocado en crear evidencias concretas en la vida real. No somos motivación, desarrollo personal ni sanación.',
+    title: '1. Programa de Resultados y Creación',
+    desc: 'Somos un Programa de Resultados y Creación enfocado en crear evidencias concretas en la vida real. Inspiramos a ver posibilidades a través del "Sí en Acción", tratando al participante como un adulto 100% capaz de hacerse cargo de sus decisiones.',
   },
   {
     id: 'maestria_relacion',
@@ -158,9 +158,9 @@ export const innegociablesC1 = [
 ];
 
 export const preparationMissionsC1 = [
-  { id: 'proposito', title: '1. Declaración del Propósito (4 Meses)', desc: 'Publicar en el chat del grupo la declaración viva e irrazonable sobre qué acción específica tomada hoy altera positivamente tus próximos 4 meses.' },
+  { id: 'proposito', title: '1. Declaración del Propósito (1 a 2 Meses / Corto Plazo)', desc: 'Publicar en el chat del grupo la declaración viva e irrazonable sobre qué acción específica tomada hoy altera positivamente tus próximos 1 a 2 meses, generando tracción inmediata y enfoque en los resultados de la sala.' },
   { id: 'video_enrolamiento', title: '2. Video de Enrolamiento (15 Segundos)', desc: 'Grabar y subir al chat de aliados un video de 15 segundos enfocado en el para qué de tu participación.' },
-  { id: 'cambio_cupo', title: '3. Misión de Cambio de Cupo / Sustitución de Nombre', desc: 'Gestionar activamente sustitución de nombres de personas enroladas que no asistirán, reabriendo la conversación para que sí ocupen su lugar en sala.' },
+  { id: 'cambio_cupo', title: '3. Gestión de Cupos y Sustitución de Nombres', desc: 'Potestad de gestionar cambios de cupo de personas que enrolaron pero no asistieron, utilizándolo como una oportunidad para enrolar a nuevas personas e inspirarlas a sentarse en la sala.' },
   { id: 'tecnica', title: '4. Verificación Técnica Previa (Grounding Virtual 20:00 hrs)', desc: 'Cámara encendida, audio, internet estable e iluminación óptima sin distracciones.' },
   { id: 'roleplay_presencial', title: '5. Demostración Presencial de Manejo de Conversaciones (Jueves 18:00 hrs)', desc: 'Ejecutar en vivo tus conversaciones y llamado a la acción en sede ante todo el equipo con postura impecable.' }
 ];
@@ -173,10 +173,10 @@ export const conversacionesLlamadoAccionC1 = [
     badgeBg: '#dcfce7',
     title: '1. Si es un SÍ (Acción Inmediata: Llevarlo a Mesa · ¡Allí se ocupan!)',
     situacion: 'El participante dice SÍ quiere ir a C2, pero se queda divagando en el pasillo, conversando o enfriando la emoción.',
-    diagnostico: 'Pánico o distracción del Aliado: Quedarse 20 minutos hablando, filosofando o sobre-explicando. La venta y la explicación terminan en el segundo que dijo SÍ.',
-    pauta: 'No abras más conversación. Felicita con energía, camina a su lado y condúcelo de inmediato a la Mesa de Registro y Pagos.',
-    frase: '«¡Excelente decisión! Bienvenido a tu transformación. Vamos de inmediato a Mesa, allí se ocupan de tu registro, tu ticket y las modalidades de pago.»',
-    cierre: 'Acompañamiento físico hasta la Mesa. La Mesa se encarga de POS, transferencias o acuerdos. Misión cumplida del Aliado.'
+    diagnostico: 'Pánico o distracción del Aliado: Quedarse hablando, filosofando o sobre-explicando. Cuando el participante dice SÍ, no hay espacio para vender ni dar discursos. Se celebra su logro inmediatamente con entusiasmo y se le acompaña a la Mesa de Registro para que realice su pago, reclame su ticket de participación y consolide su postura.',
+    pauta: 'No abras más conversación ni ventas innecesarias. Celebra con energía genuina, camina a su lado y condúcelo de inmediato a la Mesa de Registro para emisión de ticket.',
+    frase: '«¡Excelente decisión! Celebro tu logro y el coraje de elegir tu siguiente nivel. Vamos de inmediato a Mesa de Registro a procesar tu pago y reclamar tu ticket de participación.»',
+    cierre: 'Acompañamiento físico de inmediato a la Mesa de Registro. En Mesa procesan el pago, entregan el ticket oficial y se celebra su compromiso. Cero venta en el salón.'
   },
   {
     id: 'el_no_rotundo',
@@ -187,7 +187,7 @@ export const conversacionesLlamadoAccionC1 = [
     situacion: 'El participante dice un NO tajante, cerrado o desafiante para no comprometerse.',
     diagnostico: 'Pánico del Aliado: Rogar, insistir con desesperación, enojarse o ponerse a debatir. Tratarlo como un niño desvalido en vez de un adulto 100% responsable.',
     pauta: 'Sostén una postura impecable de líder. Honra su honestidad con respeto y déjalo con el peso y la responsabilidad de su propia elección.',
-    frase: '«Prefiero mil veces tu NO limpio y transparente, que una falsa promesa o una excusa tibia. Honro tu decisión y respeto tu momento. Solo quiero que te mires al espejo y reconozcas que esta es tu elección libre, y que asumes el 100% del costo de quedarte donde estás sin culpar al dinero, al tiempo ni a nadie. Las puertas de tu grandeza siguen abiertas.»',
+    frase: '«Prefiero mil veces tu NO limpio y transparente, que una falsa promesa o una excusa tibia. Indaguemos con serenidad a qué le estás diciendo realmente que no: no es a mí ni a un salón, sino a la oportunidad de crear la vida que deseas. Honro tu decisión y respeto tu momento, asumiendo el 100% de la responsabilidad de tu elección.»',
     cierre: 'Apretón de manos firme, mirada limpia y sin resentimiento. El participante se retira responsable, no víctima.'
   },
   {
@@ -321,8 +321,20 @@ export function SurveyGateC1({ user, existingSurvey, onCompleted, onLogout }) {
         updatedAt: serverTimestamp(),
       };
 
+      // 0. Cache local resiliente inmediato
+      try {
+        localStorage.setItem('c1_survey_data', JSON.stringify(surveyData));
+        localStorage.setItem(`c1_survey_cached_${user.uid}`, JSON.stringify(surveyData));
+      } catch (cacheErr) {
+        console.warn('Cache local de encuesta C1 omitido:', cacheErr);
+      }
+
       // 1. Guardar la encuesta principal del usuario en 'encuestas_aliados'
-      await setDoc(doc(db, 'encuestas_aliados', user.uid), surveyData, { merge: true });
+      try {
+        await setDoc(doc(db, 'encuestas_aliados', user.uid), surveyData, { merge: true });
+      } catch (fsErr) {
+        console.warn('encuestas_aliados setDoc diferido o sin permisos inmediatos:', fsErr);
+      }
 
       // 2. Sincronizar documento de autorización (tolerante a fallos si aún no hay permisos de admin)
       try {
@@ -346,13 +358,22 @@ export function SurveyGateC1({ user, existingSurvey, onCompleted, onLogout }) {
 
       onCompleted(surveyData);
     } catch (err) {
-      setErrorMsg(`Error al guardar tu encuesta: ${err.message}`);
+      console.warn('Error al guardar en Firestore (activando respaldo local):', err);
+      try {
+        localStorage.setItem('c1_survey_data', JSON.stringify(surveyData));
+        onCompleted(surveyData);
+      } catch {
+        setErrorMsg(`Error al guardar tu encuesta: ${err.message}`);
+      }
     } finally {
       setSubmitting(false);
     }
   }
 
-  const currentTeams = VIGENTES_TEAMS_C1[sede] || [];
+  const currentTeams = (VIGENTES_TEAMS_C1[sede] || []).filter(t => {
+    if (sede === 'Lima') return t.id === 'C1E33';
+    return true;
+  });
 
   return (
     <div className="portal-auth-wrap">
@@ -957,7 +978,7 @@ export default function AliadosC1PortalApp() {
             <span style={{ color: '#fbbf24' }}>Aliado de Capítulo Uno (C1)</span>
           </h1>
           <p style={{ fontSize: '1.1rem', color: '#cbd5e1', lineHeight: 1.6, maxWidth: '850px', margin: 0 }}>
-            Tecnología NEC™ (Neuroepigenética Contextual), marco de postura, innegociables, cronograma operativo fin de semana, tips de manejo de conversaciones y llamado a la acción para Aliados en el Programa de Resultados.
+            Marco de postura contextual, innegociables, cronograma operativo fin de semana, tips de manejo de conversaciones y llamado a la acción irrazonable para Aliados en el Programa de Resultados.
           </p>
 
           <div style={{ marginTop: '1.25rem' }}>

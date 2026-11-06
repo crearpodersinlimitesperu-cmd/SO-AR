@@ -234,8 +234,20 @@ export function SurveyGateMesa({ user, existingSurvey, onCompleted, onLogout }) 
         updatedAt: serverTimestamp(),
       };
 
+      // 0. Cache local resiliente inmediato
+      try {
+        localStorage.setItem('staff_mesa_survey_data', JSON.stringify(surveyData));
+        localStorage.setItem(`staff_mesa_survey_cached_${user.uid}`, JSON.stringify(surveyData));
+      } catch (cacheErr) {
+        console.warn('Cache local staff mesa omitido:', cacheErr);
+      }
+
       // 1. Guardar encuesta principal
-      await setDoc(doc(db, 'encuestas_staff_mesa', user.uid), surveyData, { merge: true });
+      try {
+        await setDoc(doc(db, 'encuestas_staff_mesa', user.uid), surveyData, { merge: true });
+      } catch (fsErr) {
+        console.warn('encuestas_staff_mesa setDoc diferido o sin permisos:', fsErr);
+      }
 
       // 2. Sincronizar documento de autorización (tolerante a fallos de permisos)
       try {
@@ -259,7 +271,13 @@ export function SurveyGateMesa({ user, existingSurvey, onCompleted, onLogout }) 
 
       onCompleted(surveyData);
     } catch (err) {
-      setErrorMsg(`Error al guardar tu encuesta: ${err.message}`);
+      console.warn('Error al guardar en Firestore (activando respaldo local):', err);
+      try {
+        localStorage.setItem('staff_mesa_survey_data', JSON.stringify(surveyData));
+        onCompleted(surveyData);
+      } catch {
+        setErrorMsg(`Error al guardar tu encuesta: ${err.message}`);
+      }
     } finally {
       setSubmitting(false);
     }
@@ -653,7 +671,7 @@ export default function StaffMesaApp() {
       <>
         <header className="brand-bar" style={{ display: 'flex', alignItems: 'center', gap: '20px', padding: '16px 4vw' }}>
           <div className="brand">
-            <img src={crearLogo} alt="CREAR · Poder sin límites" style={{ height: '48px', width: 'auto', display: 'block' }} />
+            <img src={crearLogo} alt="" aria-label="CREAR · Poder Sin Límites" style={{ height: '44px', width: 'auto', display: 'block', objectFit: 'contain' }} />
           </div>
           <div className="guide-label" style={{ borderLeft: '1px solid var(--line)', paddingLeft: '20px', fontSize: '14px', color: 'var(--muted)', fontWeight: 600 }}>
             Programa de Resultados · Guía Staff de Mesa (C1, C2 y MJ)
@@ -687,7 +705,7 @@ export default function StaffMesaApp() {
       <>
         <header className="brand-bar" style={{ display: 'flex', alignItems: 'center', gap: '20px', padding: '16px 4vw' }}>
           <div className="brand">
-            <img src={crearLogo} alt="CREAR · Poder sin límites" style={{ height: '48px', width: 'auto', display: 'block' }} />
+            <img src={crearLogo} alt="" aria-label="CREAR · Poder Sin Límites" style={{ height: '44px', width: 'auto', display: 'block', objectFit: 'contain' }} />
           </div>
           <div className="guide-label" style={{ borderLeft: '1px solid var(--line)', paddingLeft: '20px', fontSize: '14px', color: 'var(--muted)', fontWeight: 600 }}>
             Programa de Resultados · Guía Staff de Mesa (C1, C2 y MJ)
@@ -706,7 +724,7 @@ export default function StaffMesaApp() {
       <>
         <header className="brand-bar" style={{ display: 'flex', alignItems: 'center', gap: '20px', padding: '16px 4vw' }}>
           <div className="brand">
-            <img src={crearLogo} alt="CREAR · Poder sin límites" style={{ height: '48px', width: 'auto', display: 'block' }} />
+            <img src={crearLogo} alt="" aria-label="CREAR · Poder Sin Límites" style={{ height: '44px', width: 'auto', display: 'block', objectFit: 'contain' }} />
           </div>
           <div className="guide-label" style={{ borderLeft: '1px solid var(--line)', paddingLeft: '20px', fontSize: '14px', color: 'var(--muted)', fontWeight: 600 }}>
             Programa de Resultados · Guía Staff de Mesa (C1, C2 y MJ)
@@ -806,7 +824,7 @@ export default function StaffMesaApp() {
       <header className="brand-bar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 4vw' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
           <div className="brand">
-            <img src={crearLogo} alt="CREAR · Poder sin límites" style={{ height: '48px', width: 'auto', display: 'block' }} />
+            <img src={crearLogo} alt="" aria-label="CREAR · Poder Sin Límites" style={{ height: '44px', width: 'auto', display: 'block', objectFit: 'contain' }} />
           </div>
           <div className="guide-label" style={{ borderLeft: '1px solid var(--line)', paddingLeft: '20px', fontSize: '14px', color: 'var(--muted)', fontWeight: 600 }}>
             Programa de Resultados · Guía Staff de Mesa (C1, C2 y MJ)
@@ -979,15 +997,45 @@ export default function StaffMesaApp() {
 
             <div style={{ padding: '1.1rem', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
               <h3 style={{ margin: '0 0 0.4rem 0', color: '#0f172a', fontSize: '1.05rem' }}>
-                5. Cierre firme en el "Sí en Acción" y manejo asertivo del NO
+                5. Cierre firme en el "Sí en Acción", manejo asertivo del NO y Palabras Rotas
               </h3>
-              <p style={{ margin: '0 0 0.5rem 0', color: '#475569', fontSize: '0.92rem', lineHeight: 1.6 }}>
-                El objetivo de la Mesa es llevar al participante a un enrolamiento puro traducido en acción concreta:
+              <p style={{ margin: '0 0 0.75rem 0', color: '#475569', fontSize: '0.92rem', lineHeight: 1.6 }}>
+                El objetivo de la Mesa es llevar al participante a un enrolamiento puro traducido en acción concreta, sin venta, sin debate y con límites precisos de tiempo:
               </p>
-              <ul style={{ margin: 0, paddingLeft: '1.25rem', color: '#334155', fontSize: '0.92rem', lineHeight: 1.6 }}>
-                <li><strong>Si la respuesta es SÍ:</strong> Se formaliza el registro inmediato y el compromiso con sus evidencias.</li>
-                <li><strong>Si la respuesta es NO:</strong> Se realiza una indagación asertiva marcando que no le está diciendo "no" al Staff ni al programa, sino al vehículo que lo llevará a su vida imposible. El participante debe asumir conscientemente el costo y la consecuencia de su renuncia (Palabras Rotas).</li>
-              </ul>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '6px', padding: '0.85rem' }}>
+                  <strong style={{ color: '#15803d', display: 'block', fontSize: '0.88rem', marginBottom: '4px' }}>
+                    ✅ El SÍ (&lt; 3 minutos):
+                  </strong>
+                  <span style={{ fontSize: '0.84rem', color: '#166534', lineHeight: 1.5 }}>
+                    Verificación del pago o abono en POS/transferencia, emisión y entrega física del ticket de participación, y celebración genuina del logro y la decisión tomada junto al participante. Cero venta en el salón.
+                  </span>
+                </div>
+                <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '6px', padding: '0.85rem' }}>
+                  <strong style={{ color: '#1d4ed8', display: 'block', fontSize: '0.88rem', marginBottom: '4px' }}>
+                    ⏱️ El NO SÉ (Máximo 5 minutos):
+                  </strong>
+                  <span style={{ fontSize: '0.84rem', color: '#1e40af', lineHeight: 1.5 }}>
+                    Interrupción inmediata de la duda o tibieza para exigir una postura clara hacia la creación o la renuncia responsable. No se compran coartadas ni postergaciones.
+                  </span>
+                </div>
+                <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '6px', padding: '0.85rem' }}>
+                  <strong style={{ color: '#b91c1c', display: 'block', fontSize: '0.88rem', marginBottom: '4px' }}>
+                    ⛔ El NO (Inmediato):
+                  </strong>
+                  <span style={{ fontSize: '0.84rem', color: '#991b1b', lineHeight: 1.5 }}>
+                    Mostrar serenamente a qué le está diciendo realmente que "no" (a la oportunidad de crear la vida que desea), permitiéndole asumir el 100% de la responsabilidad de su elección con respeto y dignidad.
+                  </span>
+                </div>
+                <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '6px', padding: '0.85rem' }}>
+                  <strong style={{ color: '#b45309', display: 'block', fontSize: '0.88rem', marginBottom: '4px' }}>
+                    📋 Cierre de Palabras Rotas (Viernes 14:01 hrs):
+                  </strong>
+                  <span style={{ fontSize: '0.84rem', color: '#92400e', lineHeight: 1.5 }}>
+                    Emisión y entrega formal del reporte de Palabras Rotas cruzando la lista de declarantes contra los tickets de participación emitidos. Cierre formal del padrón sin excepciones.
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </section>

@@ -47,12 +47,35 @@ const ALIADOS_C1_FIREBASE_CONFIG = {
 const ADMIN_CONTROL_TOKEN = 'CAUSA_OS_SUPERADMIN_C1_2026';
 
 const PREPARATION_LABELS_C1 = [
-  { id: 'proposito', title: '1. Declaración del Propósito (4 Meses) en WhatsApp' },
+  { id: 'proposito', title: '1. Declaración del Propósito (1 a 2 Meses / Corto Plazo) en WhatsApp' },
   { id: 'video_enrolamiento', title: '2. Video de Enrolamiento (15s) en chat de Aliados' },
-  { id: 'cambio_cupo', title: '3. Misión de Cambio de Cupo / Sustitución de Nombre' },
+  { id: 'cambio_cupo', title: '3. Gestión y Cambio de Cupo / Nombre' },
   { id: 'tecnica', title: '4. Verificación Técnica Previa (Grounding Virtual 20:00 hrs)' },
   { id: 'roleplay_presencial', title: '5. Demostración Presencial de Roleplay (Jueves 18:00 hrs)' },
 ];
+
+function formatHumanName(rawName, email = '') {
+  if (rawName && typeof rawName === 'string') {
+    const trimmed = rawName.trim();
+    if (trimmed && trimmed.toLowerCase() !== 'sin nombre' && trimmed.toLowerCase() !== 'no especificado' && trimmed.toLowerCase() !== 'pendiente') {
+      return trimmed;
+    }
+  }
+  if (!email) return 'Aliado C1';
+  const cleanEmail = String(email).toLowerCase().trim();
+  if (cleanEmail === 'comunidadcrearpsl@gmail.com') return 'José Sánchez';
+  if (cleanEmail === 'diana.moscoso@crearpsl.net') return 'Diana Moscoso';
+  if (cleanEmail === 'joyce.marin@crearpsl.net') return 'Joyce Marín';
+
+  const prefix = cleanEmail.split('@')[0] || '';
+  const cleaned = prefix.replace(/[._-]+/g, ' ').trim();
+  if (!cleaned) return 'Aliado C1';
+  return cleaned
+    .split(' ')
+    .filter(Boolean)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(' ');
+}
 
 function getAliadosC1Db() {
   const appName = 'aliados-c1-command-bridge';
@@ -281,7 +304,10 @@ export default function AliadosC1AdminPanel({ currentUser, onToggleGuideView }) 
       item.securityAlerts.push(l);
     });
 
-    return Array.from(byEmail.values()).sort((a, b) => {
+    return Array.from(byEmail.values()).map((item) => ({
+      ...item,
+      nombre: formatHumanName(item.nombre, item.email),
+    })).sort((a, b) => {
       const aTime = a.lastSeenIso || a.lastLoginIso || '';
       const bTime = b.lastSeenIso || b.lastLoginIso || '';
       return bTime.localeCompare(aTime);

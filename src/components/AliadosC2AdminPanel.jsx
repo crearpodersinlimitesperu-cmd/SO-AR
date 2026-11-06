@@ -68,6 +68,29 @@ function getAliadosC2Db() {
   return getFirestore(app);
 }
 
+function formatHumanName(rawName, email = '') {
+  if (rawName && typeof rawName === 'string') {
+    const trimmed = rawName.trim();
+    if (trimmed && trimmed.toLowerCase() !== 'sin nombre' && trimmed.toLowerCase() !== 'no especificado' && trimmed.toLowerCase() !== 'pendiente') {
+      return trimmed;
+    }
+  }
+  if (!email) return 'Aliado C2';
+  const cleanEmail = String(email).toLowerCase().trim();
+  if (cleanEmail === 'comunidadcrearpsl@gmail.com') return 'José Sánchez';
+  if (cleanEmail === 'diana.moscoso@crearpsl.net') return 'Diana Moscoso';
+  if (cleanEmail === 'joyce.marin@crearpsl.net') return 'Joyce Marín';
+
+  const prefix = cleanEmail.split('@')[0] || '';
+  const cleaned = prefix.replace(/[._-]+/g, ' ').trim();
+  if (!cleaned) return 'Aliado C2';
+  return cleaned
+    .split(' ')
+    .filter(Boolean)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(' ');
+}
+
 function formatDateTime(tsOrIso) {
   if (!tsOrIso) return 'Sin registro';
   try {
@@ -293,7 +316,10 @@ export default function AliadosC2AdminPanel({ currentUser }) {
       item.securityAlerts.push(l);
     });
 
-    return Array.from(byEmail.values()).sort((a, b) => {
+    return Array.from(byEmail.values()).map((item) => ({
+      ...item,
+      nombre: formatHumanName(item.nombre, item.email),
+    })).sort((a, b) => {
       const aTime = a.lastSeenIso || a.lastLoginIso || '';
       const bTime = b.lastSeenIso || b.lastLoginIso || '';
       return bTime.localeCompare(aTime);

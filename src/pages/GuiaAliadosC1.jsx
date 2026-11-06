@@ -429,8 +429,8 @@ export default function GuiaAliadosC1() {
               </h3>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem' }}>
                 <div style={{ padding: '0.85rem', background: 'rgba(255,255,255,0.02)', borderRadius: '6px', borderLeft: '3px solid #38bdf8' }}>
-                  <strong style={{ color: '#f8fafc', display: 'block', fontSize: '0.88rem' }}>1. Declaración del Propósito (4 Meses)</strong>
-                  <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Publicar en el chat del grupo la declaración viva e irrazonable sobre qué acción específica tomada hoy colapsa la realidad y altera positivamente sus próximos 4 meses de vida personal.</span>
+                  <strong style={{ color: '#f8fafc', display: 'block', fontSize: '0.88rem' }}>1. Declaración del Propósito (1 a 2 Meses / Corto Plazo)</strong>
+                  <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Publicar en el chat del grupo la declaración viva e irrazonable sobre qué acción específica tomada hoy altera positivamente tus próximos 1 a 2 meses, generando tracción inmediata y enfoque en los resultados de la sala.</span>
                 </div>
                 <div style={{ padding: '0.85rem', background: 'rgba(255,255,255,0.02)', borderRadius: '6px', borderLeft: '3px solid #34d399' }}>
                   <strong style={{ color: '#f8fafc', display: 'block', fontSize: '0.88rem' }}>2. Video de Enrolamiento (15 Segundos)</strong>
