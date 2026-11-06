@@ -148,6 +148,26 @@ export default function GuiaAliadosC1() {
           </a>
 
           <a
+            href="https://docs.google.com/document/d/1qRgspQ-d8UOcz5VSY3cxT0-5_9duFEDaa1YTGwi9Y8A/edit"
+            target="_blank"
+            rel="noreferrer"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.45rem',
+              background: '#1e293b',
+              border: '1px solid #38bdf8',
+              color: '#38bdf8',
+              padding: '0.65rem 1.05rem',
+              borderRadius: '8px',
+              fontWeight: 700,
+              fontSize: '0.86rem',
+              textDecoration: 'none'
+            }}
+          >
+            📄 Doc Google Drive (v2)
+          </a>
+          <a
             href="/aliados-c2/"
             target="_blank"
             rel="noreferrer"
@@ -186,7 +206,7 @@ export default function GuiaAliadosC1() {
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Buscar en la guía: preguntas de quiebre, llamada 30/70, grounding, Ticket de Posibilidad..."
+            placeholder="Buscar en la guía: manejo de conversaciones, llamada 30/70, grounding, Ticket de Posibilidad..."
             style={{
               background: 'transparent',
               border: 'none',

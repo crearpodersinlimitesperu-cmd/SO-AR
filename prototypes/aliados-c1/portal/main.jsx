@@ -121,49 +121,39 @@ async function logSecurityOrSessionEvent(db, user, surveyData, action, details =
 
 export const innegociablesC1 = [
   {
-    id: 'partner',
-    title: 'Término Oficial y Significado de Partner',
-    desc: 'El término Partner reemplaza oficialmente la denominación anterior de "sombra". Para el Aliado de C1, un Partner es la persona asignada o rol de apoyo en el entrenamiento; es el socio de proceso con quien construyes presencia, sostienes la escucha limpia y mantienes la corresponsabilidad. Eres su espejo y el espacio de apoyo incondicional durante todo el fin de semana.',
-  },
-  {
     id: 'programa_resultados',
-    title: 'Programa de Resultados y Creación',
-    desc: 'No somos un curso, evento, show motivacional ni grupo de sanación. Somos un Programa de Resultados donde el foco exclusivo es la creación de evidencias reales en la vida diaria.',
+    title: '1. Programa de Resultados (Tecnología NEC™)',
+    desc: 'Bajo la tecnología NEC™ (Neuroepigenética Contextual), somos un Programa de Resultados enfocado en crear evidencias concretas en la vida real. No somos motivación, desarrollo personal ni sanación.',
   },
   {
-    id: 'enrolamiento_asertivo',
-    title: 'Enrolamiento Asertivo: Sí en Acción',
-    desc: 'Inspiramos a otro ser humano a ver posibilidades y tomar postura inmediata a través del "Sí en Acción".',
+    id: 'maestria_relacion',
+    title: '2. Maestría en Creación de Relación',
+    desc: 'Viernes y sábado se crea y profundiza la relación con el participante; el domingo se realiza el llamado contundente a la acción irrazonable.',
   },
   {
-    id: 'principio_relacion',
-    title: 'Principio de Relación (Viernes, Sábado y Domingo)',
-    desc: 'Viernes y sábado se crea la relación con el participante; el domingo se realiza el llamado contundente a la acción.',
+    id: 'termino_partner',
+    title: '3. Término Oficial: Partner',
+    desc: 'Partner es la única denominación oficial para la persona asignada o rol de apoyo en C1; reemplaza completamente cualquier término o rol previo.',
   },
   {
-    id: 'acompanamiento_alto_nivel',
-    title: 'Acompañamiento de Alto Nivel',
-    desc: 'Tratamos al participante como un adulto 100% capaz y responsable de tomar sus decisiones y crear sus resultados.',
+    id: 'superar_panico_domingo',
+    title: '4. Superar el Miedo del Domingo (Irrazonabilidad con Amor)',
+    desc: 'El domingo no es un día para entrar en pánico ni paralizarse por miedo o falta de manejo. Es el momento de ser irrazonables desde el amor y la firmeza contextual, sosteniendo al participante para que elija su grandeza.',
   },
   {
     id: 'presentacion_viernes',
-    title: 'Presentación Poderosa del Viernes',
-    desc: 'Ensayarás y perfeccionarás la presentación personal enérgica y estructurada con la que te dirigirás a tu grupo de Creación el viernes de C1, en el momento preciso en que los participantes te eligen como su Partner.',
+    title: '5. Presentación Enérgica del Viernes',
+    desc: 'Ensayarás y perfeccionarás la presentación personal estructurada con la que te dirigirás a tu grupo de Creación el viernes a las 08:00 hrs en el momento preciso en que te eligen como su Partner.',
   },
   {
     id: 'cambio_cupo',
-    title: 'Misión de Cambio de Cupo / Nombre y Enrolamiento Directo',
-    desc: 'Todos los Aliados cuentan con la posibilidad activa y la misión de gestionar cambios de cupo o sustitución de nombres para aquellas personas que ellos mismos enrolaron pero que aún no se han sentado o decidieron no asistir a este C1. Este mecanismo es una gran oportunidad para reabrir la conversación, mover la energía e inspirar intensamente a esas personas para que sí ocupen su lugar y se sienten a vivir el salón donde estás sirviendo.',
+    title: '6. Misión de Cambio de Cupo / Sustitución de Nombre',
+    desc: 'Gestionar activamente sustitución de nombres de personas enroladas que no asistirán, reabriendo la conversación para que sí ocupen su lugar en sala donde estás sirviendo.',
   },
   {
     id: 'corresponsabilidad',
-    title: 'Regla de Corresponsabilidad',
-    desc: 'Eres la primera y la última persona del día para tu Partner. Su presencia y permanencia en la sala dependen directamente de tu compromiso y seguimiento.',
-  },
-  {
-    id: 'creacion_contexto',
-    title: 'Creación del Contexto',
-    desc: 'El Aliado es responsable de crear activamente el contexto para entrenarse en todo lo que está disponible antes, durante y después del C1, aprovechando cada herramienta, reto y espacio de aprendizaje.',
+    title: '7. Regla de Corresponsabilidad',
+    desc: 'Eres la primera y la última persona del día para tu Partner. Su presencia física y permanencia en la sala dependen directamente de tu compromiso y seguimiento adulto a adulto.',
   },
 ];
 
@@ -917,8 +907,31 @@ export default function AliadosC1PortalApp() {
             <span style={{ color: '#fbbf24' }}>Aliado de Capítulo Uno (C1)</span>
           </h1>
           <p style={{ fontSize: '1.1rem', color: '#cbd5e1', lineHeight: 1.6, maxWidth: '850px', margin: 0 }}>
-            Marco de postura, innegociables, cronograma operativo fin de semana, tácticas quirúrgicas de quiebre y herramientas de acompañamiento para Aliados en el Programa de Resultados.
+            Tecnología NEC™ (Neuroepigenética Contextual), marco de postura, innegociables, cronograma operativo fin de semana, tips de manejo de conversaciones y llamado a la acción para Aliados en el Programa de Resultados.
           </p>
+
+          <div style={{ marginTop: '1.25rem' }}>
+            <a
+              href="https://docs.google.com/document/d/1qRgspQ-d8UOcz5VSY3cxT0-5_9duFEDaa1YTGwi9Y8A/edit"
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: 'rgba(255,255,255,0.1)',
+                color: '#38bdf8',
+                padding: '0.5rem 0.9rem',
+                borderRadius: '6px',
+                fontSize: '0.82rem',
+                fontWeight: 700,
+                textDecoration: 'none',
+                border: '1px solid rgba(56,189,248,0.3)',
+              }}
+            >
+              <ExternalLink size={14} /> Doc Oficial Google Drive (v2)
+            </a>
+          </div>
 
           {/* Barra de Progreso de Misiones C1 */}
           <div style={{ marginTop: '2rem', padding: '1.25rem', background: 'rgba(255,255,255,0.06)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.12)', maxWidth: '650px' }}>
@@ -1029,31 +1042,48 @@ export default function AliadosC1PortalApp() {
             </div>
           </section>
 
-          {/* SECCIÓN 3: Cronograma C1 */}
+          {/* SECCIÓN 3: Secuencia Operativa: Antes, Durante y Después */}
           <section id="cronograma" style={{ marginBottom: '3rem' }}>
             <h2 style={{ fontSize: '1.5rem', color: 'var(--blue)', borderBottom: '2px solid var(--line)', paddingBottom: '0.5rem', marginBottom: '1.5rem' }}>
-              Cronograma Operativo de Fin de Semana (C1)
+              3. Secuencia Operativa: Antes, Durante y Después de C1
             </h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              {/* ANTES DE C1 */}
               <div style={{ background: '#fff', border: '1px solid var(--line)', borderLeft: '4px solid #38bdf8', padding: '1.25rem', borderRadius: '4px' }}>
-                <strong style={{ color: '#0369a1', fontSize: '1.1rem' }}>Viernes C1 · Grounding 08:00 hrs & Creación de Relación</strong>
-                <p style={{ margin: '0.5rem 0 0', color: 'var(--muted)', fontSize: '0.9rem', lineHeight: 1.6 }}>
-                  Llegada puntual al 100%. Ensayar la presentación poderosa ante el grupo. Elección de duplas de Partner y contención de contexto desde la presencia.
-                </p>
+                <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#0369a1', background: '#e0f2fe', padding: '2px 8px', borderRadius: '4px', textTransform: 'uppercase' }}>
+                  Fase Previa · Antes de C1
+                </span>
+                <h3 style={{ margin: '0.5rem 0 0.5rem', color: '#0f172a', fontSize: '1.1rem' }}>Preparación Rigurosa y Groundings</h3>
+                <ul style={{ margin: 0, paddingLeft: '1.2rem', color: '#334155', fontSize: '0.9rem', lineHeight: 1.7 }}>
+                  <li><strong>Grounding Virtual (Miércoles Post-MJ, 20:00 hrs, máx. 90 min):</strong> Una semana antes de C1. Cámara encendida, entorno adecuado, pruebas técnicas e iluminación sin distracciones.</li>
+                  <li><strong>Entrenamiento Diario con Leader Team:</strong> Práctica diaria de la presentación enérgica del viernes y simulación de respuestas (el SÍ, el NO y el NO SÉ).</li>
+                  <li><strong>Grounding Presencial (Jueves previo, 18:00 hrs / 6:00 PM):</strong> Demostración de roleplays y manejo de conversaciones, ensayo de la presentación ante el grupo de Creación y asignación de funciones operativas en sala.</li>
+                </ul>
               </div>
 
+              {/* DURANTE C1 */}
               <div style={{ background: '#fff', border: '1px solid var(--line)', borderLeft: '4px solid #f59e0b', padding: '1.25rem', borderRadius: '4px' }}>
-                <strong style={{ color: '#b45309', fontSize: '1.1rem' }}>Sábado C1 · Grounding 08:30 hrs & Profundización de Relación</strong>
-                <p style={{ margin: '0.5rem 0 0', color: 'var(--muted)', fontSize: '0.9rem', lineHeight: 1.6 }}>
-                  Sostener la escucha limpia (menos de 90 segundos) y verificar la presencia física de tu Partner antes de que inicie la sala. Cero acuerdos fantasiosos.
-                </p>
+                <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#b45309', background: '#fef3c7', padding: '2px 8px', borderRadius: '4px', textTransform: 'uppercase' }}>
+                  En Sala · Fin de Semana C1
+                </span>
+                <h3 style={{ margin: '0.5rem 0 0.5rem', color: '#0f172a', fontSize: '1.1rem' }}>Ejecución y Relación Adulto a Adulto</h3>
+                <ul style={{ margin: 0, paddingLeft: '1.2rem', color: '#334155', fontSize: '0.9rem', lineHeight: 1.7 }}>
+                  <li><strong>Viernes (08:00 hrs):</strong> Inicio de C1 y presentación enérgica cuando el participante te elige como su Partner. Apertura y creación de relación profunda.</li>
+                  <li><strong>Sábado (08:00 hrs):</strong> Profundización del contexto y sostén incondicional de la confianza en sala. Cero complacencia; sostener su grandeza.</li>
+                  <li><strong>Domingo (08:00 hrs):</strong> Preparación de la sala y ejecución del llamado contundente a la acción irrazonable.</li>
+                </ul>
               </div>
 
-              <div style={{ background: '#fff', border: '1px solid var(--line)', borderLeft: '4px solid #22c55e', padding: '1.25rem', borderRadius: '4px' }}>
-                <strong style={{ color: '#15803d', fontSize: '1.1rem' }}>Domingo C1 · Grounding 08:30 hrs & Llamado Contundente a la Acción</strong>
-                <p style={{ margin: '0.5rem 0 0', color: 'var(--muted)', fontSize: '0.9rem', lineHeight: 1.6 }}>
-                  Espacio del Ticket de Posibilidad hacia C2. Desafiar excusas de dinero y tiempo. Conducir al Sí en Acción con evidencia material o al No rotundo y limpio.
-                </p>
+              {/* DESPUÉS DE C1 */}
+              <div style={{ background: '#fff', border: '1px solid var(--line)', borderLeft: '4px solid #10b981', padding: '1.25rem', borderRadius: '4px' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#15803d', background: '#dcfce7', padding: '2px 8px', borderRadius: '4px', textTransform: 'uppercase' }}>
+                  Fase Posterior · El Puente de los 8 Días
+                </span>
+                <h3 style={{ margin: '0.5rem 0 0.5rem', color: '#0f172a', fontSize: '1.1rem' }}>Seguimiento y Misión de Cambio de Cupo</h3>
+                <ul style={{ margin: 0, paddingLeft: '1.2rem', color: '#334155', fontSize: '0.9rem', lineHeight: 1.7 }}>
+                  <li><strong>Llamadas Matutinas (5 minutos / Regla 30/70):</strong> El Aliado habla un máximo del 30% del tiempo; el participante habla el 70%. Lanzar la pregunta poderosa, guardar silencio y sostener la escucha.</li>
+                  <li><strong>Misión de Cambio de Cupo / Nombre:</strong> Gestionar cambios de cupo para reabrir la conversación e inspirar a nuevas personas a sentarse en la sala.</li>
+                </ul>
               </div>
             </div>
           </section>

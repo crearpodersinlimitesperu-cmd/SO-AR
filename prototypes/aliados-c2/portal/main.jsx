@@ -15,6 +15,7 @@ import {
   ShieldAlert,
   Clock,
   Activity,
+  ExternalLink,
 } from 'lucide-react';
 import {
   addDoc,
@@ -1218,6 +1219,7 @@ export function PortalApp() {
                 <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginTop: '1rem' }}>
                   <a className="primary-link" href="#roleplays">5. Manejo de Conversaciones <ArrowDown size={17} aria-hidden="true" /></a>
                   <a className="primary-link" href="#agenda" style={{ background: '#334155' }}>6. Cronograma de Ejecución <ArrowDown size={17} aria-hidden="true" /></a>
+                  <a className="primary-link" href="https://docs.google.com/document/d/1ubNOKNuMYk5tZkUJwygQG7cs3haUb_oHqgA4U5Dmb6A/edit" target="_blank" rel="noreferrer" style={{ background: 'rgba(56,189,248,0.18)', border: '1px solid #38bdf8' }}>Doc Oficial Drive (v2) <ExternalLink size={16} /></a>
                 </div>
               </div>
               <div className="chapter-mark" aria-hidden="true"><span>C</span><span>2</span><div className="chapter-line" /></div>

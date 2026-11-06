@@ -23,9 +23,11 @@ export const phases = [
     short: 'Inicio en Sede',
     description: 'Verificación de instalaciones, recepción de Partners y rotación indispensable de funciones operativas.',
     events: [
-      ['Jueves', '10:30', 'Arribo a la sede', 'Arribo a la sede, verificación de instalaciones, logística y recepción de Partners.'],
-      ['Jueves', '11:30', 'Grounding presencial de Aliados', 'Rotación indispensable: Ningún Aliado ejecuta la misma tarea operativa asignada en C1. Presentación presencial en vivo de la coreografía aprobada del equipo (30 segundos y grito de poder).'],
-      ['Jueves', '13:00', 'Apertura de Mesa', 'Apertura oficial de la Mesa de Enrolamiento.'],
+      ['Jueves', '11:00', 'Grounding con Capitán', 'Alineación estratégica, revisión de roles, estándares y logística con el Capitán de Aliados.'],
+      ['Jueves', '11:30', 'Grounding con Oficina', 'Coordinación con la oficina central, verificación de acuerdos y enlace operativo.'],
+      ['Jueves', '12:00', 'Grounding de Aliados con Entrenador', 'Alineación de contexto profundo con el Entrenador de C2. Rotación de funciones operativas y postura de Partner Motor de Riesgo.'],
+      ['Jueves', '13:00', 'Apertura de Mesa de Registro', 'Apertura oficial de la Mesa de Registro y validación de participantes.'],
+      ['Jueves', '14:00', 'Apertura de Puertas / Ingreso al Salón', 'Ingreso de participantes a la sala de C2 y verificación del principio de presencia con cada Partner.'],
     ],
   },
   {

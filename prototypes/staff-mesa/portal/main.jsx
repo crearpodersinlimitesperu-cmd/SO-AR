@@ -778,7 +778,7 @@ export default function StaffMesaApp() {
               </p>
             </div>
             <a
-              href="https://docs.google.com/document/d/1zbupeWc8eI__oOTB-7kemhJTmse1mjWWnXACLr_W718/edit"
+              href="https://docs.google.com/document/d/1MZzEA5ka0ZRIWcuOvtPs6e_5Vp_AbskVVw5YVLJsuNo/edit"
               target="_blank"
               rel="noreferrer"
               style={{
@@ -795,7 +795,7 @@ export default function StaffMesaApp() {
                 border: '1px solid rgba(56,189,248,0.3)',
               }}
             >
-              <ExternalLink size={14} /> Doc Oficial Google Drive
+              <ExternalLink size={14} /> Doc Oficial Google Drive (v2)
             </a>
           </div>
 
@@ -1228,12 +1228,12 @@ export default function StaffMesaApp() {
               Sesión activa y auditada para: <strong>{user.email}</strong>
             </span>
             <a
-              href="https://docs.google.com/document/d/1zbupeWc8eI__oOTB-7kemhJTmse1mjWWnXACLr_W718/edit"
+              href="https://docs.google.com/document/d/1MZzEA5ka0ZRIWcuOvtPs6e_5Vp_AbskVVw5YVLJsuNo/edit"
               target="_blank"
               rel="noreferrer"
               style={{ fontSize: '0.85rem', color: '#0284c7', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
             >
-              Documento Oficial en Google Drive <ExternalLink size={13} />
+              Documento Oficial en Google Drive (v2) <ExternalLink size={13} />
             </a>
           </div>
         </section>
