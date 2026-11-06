@@ -1298,12 +1298,13 @@ export default function CentroManagers() {
     const finalValue = field === 'entrenador' ? normalizeTrainer(value)
       : field === 'coordinador' ? normalizeCoordinator(value)
       : field === 'sede' ? normalizeSede(value)
+      : field === 'estado' ? normalizeManagerEstado(value)
       : value;
 
     if (field === 'entrenador' && finalValue) {
       const activeCount = managers.filter(m => 
         String(m.id) !== String(id) &&
-        (m.estado || 'Activo') === 'Activo' &&
+        normalizeManagerEstado(m.estado) === 'Activo' &&
         parseTrainersList(m.entrenador).map(t => normalizeTrainer(t)).includes(finalValue)
       ).length;
       if (activeCount >= MAX_TRAINER_LOAD) {
@@ -1318,26 +1319,62 @@ export default function CentroManagers() {
       
       const cleanData = { [field]: finalValue };
       if (field === 'entrenador') assertLegacyTrainerEdit(targetManager, finalValue);
+
+      const isStatusChange = field === 'estado';
+      const estadoAnterior = normalizeManagerEstado(targetManager?.estado || 'Activo');
+      const nuevoEstado = isStatusChange ? finalValue : estadoAnterior;
+
+      if (isStatusChange && estadoAnterior !== nuevoEstado) {
+        cleanData.estadoAnterior = estadoAnterior;
+        cleanData.estadoActualizadoFecha = new Date().toISOString();
+        cleanData.estadoActualizadoPorEmail = currentUser?.email || 'admin@crearpsl.net';
+        cleanData.estadoActualizadoPorNombre = currentUser?.name || 'Usuario';
+        cleanData.historialEstados = arrayUnion({
+          fecha: new Date().toISOString(),
+          estadoAnterior,
+          estadoNuevo: nuevoEstado,
+          cambiadoPorEmail: currentUser?.email || 'admin@crearpsl.net',
+          cambiadoPorNombre: currentUser?.name || 'Usuario'
+        });
+      }
       
       // Remove any strictly undefined fields (Firestore throws if passed undefined)
       Object.keys(cleanData).forEach(key => cleanData[key] === undefined && delete cleanData[key]);
 
       await updateDoc(docRef, manualManagerPatch(targetManager, cleanData));
       
-      setManagers(prev => prev.map(m => m.id === id ? { ...m, [field]: finalValue } : m));
+      setManagers(prev => prev.map(m => m.id === id ? { ...m, ...cleanData, [field]: finalValue } : m));
       
       const managerName = targetManager ? targetManager.nombre : id;
 
-      recordAuditEvent({
-        action: 'ACTUALIZAR_MANAGER',
-        email: currentUser?.email || 'admin@crearpsl.net',
-        name: currentUser?.name || 'Usuario',
-        role: currentUser?.appRole || 'gerente',
-        sede: currentUser?.sede || 'Global',
-        details: `Se actualizó el campo "${field}" de ${managerName} a "${finalValue}"`
-      });
-
-      showToast(`Actualizado: ${field}`, 'info');
+      if (isStatusChange && estadoAnterior !== nuevoEstado) {
+        recordAuditEvent({
+          action: 'CAMBIO_ESTADO_MANAGER',
+          email: currentUser?.email || 'admin@crearpsl.net',
+          name: currentUser?.name || 'Usuario',
+          role: currentUser?.appRole || 'gerente',
+          sede: targetManager?.sede || currentUser?.sede || 'Global',
+          managerId: targetManager?.docId || targetManager?.id || id,
+          managerNombre: managerName,
+          estadoAnterior,
+          nuevoEstado,
+          equipo: targetManager?.equipo || '',
+          numEquipo: targetManager?.numEquipo || '',
+          entrenador: targetManager?.entrenador || '',
+          details: `Cambio de estado de "${estadoAnterior}" a "${nuevoEstado}" para el manager ${managerName} (${targetManager?.equipo || 'Sin equipo'}) - Sede: ${targetManager?.sede || 'Global'}`
+        });
+        showToast(`Estado actualizado: ${estadoAnterior} ➔ ${nuevoEstado}`, 'success');
+      } else {
+        recordAuditEvent({
+          action: 'ACTUALIZAR_MANAGER',
+          email: currentUser?.email || 'admin@crearpsl.net',
+          name: currentUser?.name || 'Usuario',
+          role: currentUser?.appRole || 'gerente',
+          sede: currentUser?.sede || 'Global',
+          details: `Se actualizó el campo "${field}" de ${managerName} a "${finalValue}"`
+        });
+        showToast(`Actualizado: ${field}`, 'info');
+      }
     } catch (e) {
       console.error("Error al actualizar manager:", e);
       showToast('Error al actualizar en la nube', 'error');
@@ -3100,12 +3137,12 @@ export default function CentroManagers() {
       ? editIndividualModal.selectedTrainers.map(t => normalizeTrainer(t)).filter(Boolean).join(', ')
       : '';
 
-    if (userCanAssign && finalTrainers && (editIndividualModal.estado || 'Activo') === 'Activo') {
+    if (userCanAssign && finalTrainers && normalizeManagerEstado(editIndividualModal.estado || 'Activo') === 'Activo') {
       const trainersToCheck = parseTrainersList(finalTrainers).map(t => normalizeTrainer(t)).filter(Boolean);
       for (const tName of trainersToCheck) {
         const activeCount = managers.filter(m => 
           String(m.id) !== String(editIndividualModal.id) &&
-          (m.estado || 'Activo') === 'Activo' &&
+          normalizeManagerEstado(m.estado) === 'Activo' &&
           parseTrainersList(m.entrenador).map(t => normalizeTrainer(t)).includes(tName)
         ).length;
         if (activeCount >= MAX_TRAINER_LOAD) {
@@ -3116,8 +3153,16 @@ export default function CentroManagers() {
 
     setIsSavingIndividual(true);
     try {
+      const original = managers.find(m => String(m.id) === String(editIndividualModal.id));
       const trainerToUse = userCanAssign ? finalTrainers : editIndividualModal.entrenador;
-      assertLegacyTrainerEdit(managers.find(m => String(m.id) === String(editIndividualModal.id)), trainerToUse);
+      assertLegacyTrainerEdit(original, trainerToUse);
+
+      const estadoAnterior = normalizeManagerEstado(original?.estado || 'Activo');
+      const nuevoEstado = canChangeStatus 
+        ? normalizeManagerEstado(editIndividualModal.estado || 'Activo')
+        : estadoAnterior;
+      const hasStatusChange = estadoAnterior !== nuevoEstado;
+
       const updatedData = {
         nombre: editIndividualModal.nombre.trim(),
         rol: editIndividualModal.rol || 'Manager',
@@ -3128,14 +3173,45 @@ export default function CentroManagers() {
         entrenador: trainerToUse,
         tieneEntrenador: trainerToUse ? 'Si' : 'No',
         coordinador: normalizeCoordinator(editIndividualModal.coordinador),
-        estado: canChangeStatus ? (editIndividualModal.estado || 'Activo') : editIndividualModal.estado
+        estado: nuevoEstado
       };
 
-      const original = managers.find(m => String(m.id) === String(editIndividualModal.id));
+      if (hasStatusChange) {
+        updatedData.estadoAnterior = estadoAnterior;
+        updatedData.estadoActualizadoFecha = new Date().toISOString();
+        updatedData.estadoActualizadoPorEmail = currentUser?.email || 'admin@crearpsl.net';
+        updatedData.estadoActualizadoPorNombre = currentUser?.name || 'Usuario';
+        updatedData.historialEstados = arrayUnion({
+          fecha: new Date().toISOString(),
+          estadoAnterior,
+          estadoNuevo: nuevoEstado,
+          cambiadoPorEmail: currentUser?.email || 'admin@crearpsl.net',
+          cambiadoPorNombre: currentUser?.name || 'Usuario'
+        });
+      }
+
       const docRef = managerDocumentRef(db, original);
       await updateDoc(docRef, manualManagerPatch(original, updatedData));
 
       setManagers(prev => prev.map(m => m.id === editIndividualModal.id ? { ...m, ...updatedData } : m));
+
+      if (hasStatusChange) {
+        recordAuditEvent({
+          action: 'CAMBIO_ESTADO_MANAGER',
+          email: currentUser?.email || 'admin@crearpsl.net',
+          name: currentUser?.name || 'Usuario',
+          role: currentUser?.appRole || 'gerente',
+          sede: updatedData.sede || 'Global',
+          managerId: original?.docId || original?.id || editIndividualModal.id,
+          managerNombre: updatedData.nombre,
+          estadoAnterior,
+          nuevoEstado,
+          equipo: updatedData.equipo,
+          numEquipo: updatedData.numEquipo,
+          entrenador: updatedData.entrenador,
+          details: `Cambio de estado de "${estadoAnterior}" a "${nuevoEstado}" en edición individual de ${updatedData.nombre} (${updatedData.equipo || 'Sin equipo'}) - Sede: ${updatedData.sede}`
+        });
+      }
     } catch(e) {
       console.error(e);
       return showToast('No se guardaron los cambios en la nube. Revisa la conexión y los permisos; el formulario sigue abierto.', 'error');
@@ -3732,11 +3808,11 @@ export default function CentroManagers() {
                         </td>
                         <td style={{ padding: '1rem' }}>
                           {canChangeStatus ? (
-                            <HelpSelect helpKey="estado" value={m.estado} onChange={e => handleUpdateManagerField(m.id, 'estado', e.target.value)} style={{ padding: '0.3rem', borderRadius: '4px', border: 'none', background: m.estado==='Activo'?'#dbeafe':m.estado==='Graduado'?'#dcfce7':'#fee2e2', color: m.estado==='Activo'?'#2563eb':m.estado==='Graduado'?'#16a34a':'#dc2626', fontWeight: 700, fontSize: '0.8rem', cursor: 'pointer' }}>
+                            <HelpSelect helpKey="estado" value={normalizeManagerEstado(m.estado)} onChange={e => handleUpdateManagerField(m.id, 'estado', e.target.value)} style={{ padding: '0.3rem', borderRadius: '4px', border: 'none', background: normalizeManagerEstado(m.estado)==='Activo'?'#dbeafe':normalizeManagerEstado(m.estado)==='Graduado'?'#dcfce7':'#fee2e2', color: normalizeManagerEstado(m.estado)==='Activo'?'#2563eb':normalizeManagerEstado(m.estado)==='Graduado'?'#16a34a':'#dc2626', fontWeight: 700, fontSize: '0.8rem', cursor: 'pointer' }}>
                               <option value="Activo">Activo</option><option value="Graduado">Graduado</option><option value="Desertor">Desertor</option>
                             </HelpSelect>
                           ) : (
-                             <span style={{ padding: '0.3rem 0.6rem', borderRadius: '4px', background: m.estado==='Activo'?'#dbeafe':m.estado==='Graduado'?'#dcfce7':'#fee2e2', color: m.estado==='Activo'?'#2563eb':m.estado==='Graduado'?'#16a34a':'#dc2626', fontWeight: 700, fontSize: '0.8rem' }}>{m.estado}</span>
+                             <span style={{ padding: '0.3rem 0.6rem', borderRadius: '4px', background: normalizeManagerEstado(m.estado)==='Activo'?'#dbeafe':normalizeManagerEstado(m.estado)==='Graduado'?'#dcfce7':'#fee2e2', color: normalizeManagerEstado(m.estado)==='Activo'?'#2563eb':normalizeManagerEstado(m.estado)==='Graduado'?'#16a34a':'#dc2626', fontWeight: 700, fontSize: '0.8rem' }}>{normalizeManagerEstado(m.estado)}</span>
                           )}
                         </td>
                         <td style={{ padding: '1rem' }}>
@@ -3924,10 +4000,10 @@ export default function CentroManagers() {
                                       borderRadius: '4px', 
                                       fontSize: '0.68rem', 
                                       fontWeight: 700,
-                                      background: m.estado === 'Activo' ? '#dbeafe' : m.estado === 'Graduado' ? '#dcfce7' : '#fee2e2',
-                                      color: m.estado === 'Activo' ? '#2563eb' : m.estado === 'Graduado' ? '#16a34a' : '#dc2626'
+                                      background: normalizeManagerEstado(m.estado) === 'Activo' ? '#dbeafe' : normalizeManagerEstado(m.estado) === 'Graduado' ? '#dcfce7' : '#fee2e2',
+                                      color: normalizeManagerEstado(m.estado) === 'Activo' ? '#2563eb' : normalizeManagerEstado(m.estado) === 'Graduado' ? '#16a34a' : '#dc2626'
                                     }}>
-                                      {m.estado}
+                                      {normalizeManagerEstado(m.estado)}
                                     </span>
                                   </div>
                                 </div>

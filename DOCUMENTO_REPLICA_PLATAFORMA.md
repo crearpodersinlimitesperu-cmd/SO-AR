@@ -89203,6 +89203,15 @@ const COLORS_SEDES = {
   'Sin Sede': '#94a3b8'
 };
 
+const normalizeManagerEstado = (estado) => {
+  const s = String(estado || '').trim().toUpperCase();
+  if (s.includes('GRADUA')) return 'Graduado';
+  if (s.includes('DESERT')) return 'Desertor';
+  if (s.includes('ARCHIV')) return 'Archivado';
+  if (s.includes('ACTIV') || s.includes('EN_JUEGO') || s === 'SI') return 'Activo';
+  return estado ? String(estado).trim() : 'Activo';
+};
+
 export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
   const { currentUser } = useAuth();
   const hasAccess = canViewKPIsLlamadas(currentUser);
@@ -89237,15 +89246,49 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
     allManagersList.filter(m => m.docId).map(m => [m.docId, m.telefono || ''])
   ), [allManagersList]);
 
-  // Lista de entrenadores procesada con filtros y orden
+  // Mapa de mánagers en vivo desde CentroManagers para sincronización inmediata
+  const liveManagersMap = useMemo(() => {
+    const map = new Map();
+    allManagersList.forEach(m => {
+      if (m.docId) map.set(String(m.docId), m);
+      if (m.id) map.set(String(m.id), m);
+      if (m.nombre) {
+        const normName = m.nombre.trim().toLowerCase();
+        const normSede = (m.sede || '').trim().toLowerCase();
+        map.set(`${normName}::${normSede}`, m);
+        map.set(normName, m);
+      }
+    });
+    return map;
+  }, [allManagersList]);
+
+  // Lista de entrenadores procesada con filtros, orden y superposición de estado en vivo
   const processedTrainers = useMemo(() => {
     if (!data?.kpis) return [];
 
     let list = data.kpis.map(item => {
-      // Cruzar con los registros detallados de llamados
+      // Cruzar con los registros detallados de llamados enriquecidos con datos en vivo
       const detailed = (data.llamadosDetalle || []).filter(
         d => slugify(d.entrenador) === slugify(item.entrenador)
-      );
+      ).map(d => {
+        const live = (d.managerDocId && liveManagersMap.get(String(d.managerDocId))) ||
+                     (d.id && liveManagersMap.get(String(d.id))) ||
+                     liveManagersMap.get(`${(d.manager || '').trim().toLowerCase()}::${(d.sede || '').trim().toLowerCase()}`) ||
+                     liveManagersMap.get((d.manager || '').trim().toLowerCase());
+        const rawEstado = live?.estado || d.estado;
+        const normEstado = normalizeManagerEstado(rawEstado);
+        const isGrad = normEstado === 'Graduado';
+        const isDes = normEstado === 'Desertor';
+        const isAct = normEstado === 'Activo';
+        return {
+          ...d,
+          estado: normEstado,
+          isGraduado: isGrad,
+          isDesertor: isDes,
+          isActivo: isAct,
+          telefono: (live && live.telefono) || (d.managerDocId && phoneByManagerId.get(d.managerDocId)) || d.telefono || '',
+        };
+      });
 
       // Sedes asociadas a este entrenador
       const sedesCount = {};
@@ -89255,10 +89298,23 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
       });
       const topSede = Object.entries(sedesCount).sort((a,b) => b[1] - a[1])[0]?.[0] || 'Varias';
 
+      const totalAsignados = detailed.length;
+      const gradCount = detailed.filter(d => d.isGraduado).length;
+      const desCount = detailed.filter(d => d.isDesertor).length;
+      const actCount = detailed.filter(d => d.isActivo).length;
+      const tasaGraduacion = totalAsignados > 0 ? Math.round((gradCount / totalAsignados) * 100) : item.tasaGraduacion;
+      const tasaDesercion = totalAsignados > 0 ? Math.round((desCount / totalAsignados) * 100) : item.tasaDesercion;
+
       return {
         ...item,
         topSede,
         managersCount: detailed.length,
+        totalAsignados: detailed.length > 0 ? detailed.length : item.totalAsignados,
+        totalGraduados: detailed.length > 0 ? gradCount : item.totalGraduados,
+        totalDesertores: detailed.length > 0 ? desCount : item.totalDesertores,
+        totalActivos: detailed.length > 0 ? actCount : item.totalActivos,
+        tasaGraduacion,
+        tasaDesercion,
         detalles: detailed,
       };
     });
@@ -89302,61 +89358,103 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
     });
 
     return list;
-  }, [data, search, filterSede, filterStatus, sortBy, sortOrder]);
+  }, [data, search, filterSede, filterStatus, sortBy, sortOrder, liveManagersMap, phoneByManagerId]);
 
-  // Lista de Managers de Sheet 1 procesada
-  const processedManagersList = useMemo(() => {
+  // Lista base de todos los managers en vivo con datos consolidados
+  const allLiveManagersSheet1 = useMemo(() => {
     if (!data?.managersSheet1) return [];
-    let list = [...data.managersSheet1];
+    return data.managersSheet1.map(m => {
+      const live = (m.docId && liveManagersMap.get(String(m.docId))) ||
+                   (m.id && liveManagersMap.get(String(m.id))) ||
+                   liveManagersMap.get(`${(m.nombre || '').trim().toLowerCase()}::${(m.sede || '').trim().toLowerCase()}`) ||
+                   liveManagersMap.get((m.nombre || '').trim().toLowerCase());
+      const rawEstado = live?.estado || m.estado;
+      const normEstado = normalizeManagerEstado(rawEstado);
+      const isGrad = normEstado === 'Graduado';
+      const isDes = normEstado === 'Desertor';
+      const isAct = normEstado === 'Activo';
+      return {
+        ...m,
+        ...(live ? {
+          nombre: live.nombre || m.nombre,
+          sede: live.sede || m.sede,
+          nombreEquipo: live.equipo || m.nombreEquipo,
+          numEquipo: live.numEquipo || m.numEquipo,
+          entrenador: live.entrenador || m.entrenador,
+          coordinador: live.coordinador || m.coordinador,
+          telefono: live.telefono || m.telefono,
+          tieneEntrenador: Boolean(live.entrenador && live.entrenador !== 'Sin Asignar'),
+        } : {}),
+        estado: normEstado,
+        isGraduado: isGrad,
+        isDesertor: isDes,
+        isActivo: isAct,
+      };
+    });
+  }, [data, liveManagersMap]);
+
+  // Lista de Managers filtrada para la vista de Directorio
+  const processedManagersList = useMemo(() => {
+    let list = [...allLiveManagersSheet1];
 
     if (search.trim()) {
       const q = search.toLowerCase();
       list = list.filter(m => 
-        m.nombre.toLowerCase().includes(q) ||
-        m.entrenador.toLowerCase().includes(q) ||
-        m.sede.toLowerCase().includes(q) ||
-        m.nombreEquipo.toLowerCase().includes(q) ||
-        m.coordinador.toLowerCase().includes(q)
+        (m.nombre || '').toLowerCase().includes(q) ||
+        (m.entrenador || '').toLowerCase().includes(q) ||
+        (m.sede || '').toLowerCase().includes(q) ||
+        (m.nombreEquipo || '').toLowerCase().includes(q) ||
+        (m.coordinador || '').toLowerCase().includes(q)
       );
     }
 
     if (filterSede !== 'Todas') {
-      list = list.filter(m => m.sede.toLowerCase().includes(filterSede.toLowerCase()));
+      list = list.filter(m => (m.sede || '').toLowerCase().includes(filterSede.toLowerCase()));
     }
 
-    if (filterManagerStatus === 'GRADUADO') {
-      list = list.filter(m => m.estado === 'GRADUADO');
-    } else if (filterManagerStatus === 'DESERTOR') {
-      list = list.filter(m => m.estado === 'DESERTOR');
-    } else if (filterManagerStatus === 'EN_JUEGO') {
-      list = list.filter(m => m.estado === 'EN_JUEGO');
+    if (filterManagerStatus === 'GRADUADO' || filterManagerStatus === 'Graduado') {
+      list = list.filter(m => m.isGraduado);
+    } else if (filterManagerStatus === 'DESERTOR' || filterManagerStatus === 'Desertor') {
+      list = list.filter(m => m.isDesertor);
+    } else if (filterManagerStatus === 'EN_JUEGO' || filterManagerStatus === 'Activo') {
+      list = list.filter(m => m.isActivo);
     } else if (filterManagerStatus === 'sin_entrenador') {
       list = list.filter(m => !m.tieneEntrenador);
     }
 
     return list;
-  }, [data, search, filterSede, filterManagerStatus]);
+  }, [allLiveManagersSheet1, search, filterSede, filterManagerStatus]);
 
   // Top 10 entrenadores para gráfico de facturación
   const topRevenueTrainers = useMemo(() => {
-    if (!data?.kpis) return [];
-    return [...data.kpis]
+    if (!processedTrainers) return [];
+    return [...processedTrainers]
       .filter(t => t.montoTotal > 0)
       .sort((a, b) => b.montoTotal - a.montoTotal)
       .slice(0, 10);
-  }, [data]);
+  }, [processedTrainers]);
 
   // Top 12 entrenadores para gráfico de Graduados vs Desertores
   const topRetentionTrainers = useMemo(() => {
-    if (!data?.kpis) return [];
-    return [...data.kpis]
+    if (!processedTrainers) return [];
+    return [...processedTrainers]
       .filter(t => (t.totalAsignados || 0) > 0)
       .sort((a, b) => (b.totalAsignados || 0) - (a.totalAsignados || 0))
       .slice(0, 12);
-  }, [data]);
+  }, [processedTrainers]);
 
   // Datos para gráfico Donut de Estado del Ciclo de Vida
   const statusPieData = useMemo(() => {
+    if (allLiveManagersSheet1.length > 0) {
+      const grad = allLiveManagersSheet1.filter(m => m.isGraduado).length;
+      const des = allLiveManagersSheet1.filter(m => m.isDesertor).length;
+      const act = allLiveManagersSheet1.filter(m => m.isActivo).length;
+      return [
+        { name: 'Graduados', value: grad, color: '#10b981' },
+        { name: 'Desertores', value: des, color: '#ef4444' },
+        { name: 'En Juego', value: act, color: '#3b82f6' }
+      ];
+    }
     if (!data?.totales?.statusDist) {
       return [
         { name: 'Graduados', value: 447, color: '#10b981' },
@@ -89370,7 +89468,7 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
       { name: 'Desertores', value: dist.Desertores || 0, color: '#ef4444' },
       { name: 'En Juego', value: dist['En Juego'] || 0, color: '#3b82f6' }
     ];
-  }, [data]);
+  }, [data, allLiveManagersSheet1]);
 
   // Datos para gráfico de distribución por Sede
   const sedePieData = useMemo(() => {
@@ -89393,26 +89491,50 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
   }, [data]);
 
   const statsGlobal = useMemo(() => {
-    if (!data?.totales) {
+    const base = data?.totales || {
+      totalLlamadas: 5402,
+      totalPagado: 3102,
+      totalPendiente: 2241,
+      montoTotal: 77550,
+      porcentajePagado: 57,
+      totalManagers: 699,
+      totalGraduados: 447,
+      totalDesertores: 168,
+      totalActivos: 84,
+      totalAsignados: 681,
+      totalSinAsignar: 18,
+      tasaGraduacionGlobal: 64,
+      tasaDesercionGlobal: 24,
+      tasaAsignacionGlobal: 97
+    };
+
+    if (allLiveManagersSheet1.length > 0) {
+      const totalManagers = allLiveManagersSheet1.length;
+      const totalGraduados = allLiveManagersSheet1.filter(m => m.isGraduado).length;
+      const totalDesertores = allLiveManagersSheet1.filter(m => m.isDesertor).length;
+      const totalActivos = allLiveManagersSheet1.filter(m => m.isActivo).length;
+      const totalAsignados = allLiveManagersSheet1.filter(m => m.tieneEntrenador).length;
+      const totalSinAsignar = totalManagers - totalAsignados;
+      const tasaGraduacionGlobal = totalManagers > 0 ? Math.round((totalGraduados / totalManagers) * 100) : 0;
+      const tasaDesercionGlobal = totalManagers > 0 ? Math.round((totalDesertores / totalManagers) * 100) : 0;
+      const tasaAsignacionGlobal = totalManagers > 0 ? Math.round((totalAsignados / totalManagers) * 100) : 0;
+
       return {
-        totalLlamadas: 5402,
-        totalPagado: 3102,
-        totalPendiente: 2241,
-        montoTotal: 77550,
-        porcentajePagado: 57,
-        totalManagers: 699,
-        totalGraduados: 447,
-        totalDesertores: 168,
-        totalActivos: 84,
-        totalAsignados: 681,
-        totalSinAsignar: 18,
-        tasaGraduacionGlobal: 64,
-        tasaDesercionGlobal: 24,
-        tasaAsignacionGlobal: 97
+        ...base,
+        totalManagers,
+        totalGraduados,
+        totalDesertores,
+        totalActivos,
+        totalAsignados,
+        totalSinAsignar,
+        tasaGraduacionGlobal,
+        tasaDesercionGlobal,
+        tasaAsignacionGlobal,
       };
     }
-    return data.totales;
-  }, [data]);
+
+    return base;
+  }, [data, allLiveManagersSheet1]);
 
   const handleSort = (field) => {
     if (sortBy === field) {
@@ -90539,8 +90661,8 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
                   </tr>
                 ) : (
                   processedManagersList.slice(0, 250).map((m, idx) => {
-                    const isGrad = m.estado === 'GRADUADO';
-                    const isDes = m.estado === 'DESERTOR';
+                    const isGrad = m.isGraduado || normalizeManagerEstado(m.estado) === 'Graduado';
+                    const isDes = m.isDesertor || normalizeManagerEstado(m.estado) === 'Desertor';
                     return (
                       <tr
                         key={m.id || idx}
@@ -90783,15 +90905,20 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
                 <tbody>
                   {selectedTrainer.detalles
                     .filter(m => {
-                      if (modalFilterStatus !== 'todos' && m.estado !== modalFilterStatus) return false;
+                      if (modalFilterStatus !== 'todos') {
+                        const normItemEstado = normalizeManagerEstado(m.estado);
+                        if (modalFilterStatus === 'GRADUADO' && normItemEstado !== 'Graduado') return false;
+                        if (modalFilterStatus === 'DESERTOR' && normItemEstado !== 'Desertor') return false;
+                        if (modalFilterStatus === 'EN_JUEGO' && normItemEstado !== 'Activo') return false;
+                      }
                       if (!modalSearch.trim()) return true;
                       const q = modalSearch.toLowerCase();
                       return m.manager.toLowerCase().includes(q) || m.equipo.toLowerCase().includes(q);
                     })
                     .map((item, idx) => {
                       const phone = (item.managerDocId && phoneByManagerId.get(item.managerDocId)) || item.telefono || '';
-                      const isGrad = item.estado === 'GRADUADO';
-                      const isDes = item.estado === 'DESERTOR';
+                      const isGrad = item.isGraduado || normalizeManagerEstado(item.estado) === 'Graduado';
+                      const isDes = item.isDesertor || normalizeManagerEstado(item.estado) === 'Desertor';
                       return (
                         <tr key={idx} style={{ borderBottom: '1px solid #f1f5f9' }}>
                           <td style={{ padding: '0.65rem 0.8rem', fontWeight: 700, color: '#0f172a' }}>
@@ -176743,12 +176870,13 @@ export default function CentroManagers() {
     const finalValue = field === 'entrenador' ? normalizeTrainer(value)
       : field === 'coordinador' ? normalizeCoordinator(value)
       : field === 'sede' ? normalizeSede(value)
+      : field === 'estado' ? normalizeManagerEstado(value)
       : value;
 
     if (field === 'entrenador' && finalValue) {
       const activeCount = managers.filter(m => 
         String(m.id) !== String(id) &&
-        (m.estado || 'Activo') === 'Activo' &&
+        normalizeManagerEstado(m.estado) === 'Activo' &&
         parseTrainersList(m.entrenador).map(t => normalizeTrainer(t)).includes(finalValue)
       ).length;
       if (activeCount >= MAX_TRAINER_LOAD) {
@@ -176763,26 +176891,62 @@ export default function CentroManagers() {
       
       const cleanData = { [field]: finalValue };
       if (field === 'entrenador') assertLegacyTrainerEdit(targetManager, finalValue);
+
+      const isStatusChange = field === 'estado';
+      const estadoAnterior = normalizeManagerEstado(targetManager?.estado || 'Activo');
+      const nuevoEstado = isStatusChange ? finalValue : estadoAnterior;
+
+      if (isStatusChange && estadoAnterior !== nuevoEstado) {
+        cleanData.estadoAnterior = estadoAnterior;
+        cleanData.estadoActualizadoFecha = new Date().toISOString();
+        cleanData.estadoActualizadoPorEmail = currentUser?.email || 'admin@crearpsl.net';
+        cleanData.estadoActualizadoPorNombre = currentUser?.name || 'Usuario';
+        cleanData.historialEstados = arrayUnion({
+          fecha: new Date().toISOString(),
+          estadoAnterior,
+          estadoNuevo: nuevoEstado,
+          cambiadoPorEmail: currentUser?.email || 'admin@crearpsl.net',
+          cambiadoPorNombre: currentUser?.name || 'Usuario'
+        });
+      }
       
       // Remove any strictly undefined fields (Firestore throws if passed undefined)
       Object.keys(cleanData).forEach(key => cleanData[key] === undefined && delete cleanData[key]);
 
       await updateDoc(docRef, manualManagerPatch(targetManager, cleanData));
       
-      setManagers(prev => prev.map(m => m.id === id ? { ...m, [field]: finalValue } : m));
+      setManagers(prev => prev.map(m => m.id === id ? { ...m, ...cleanData, [field]: finalValue } : m));
       
       const managerName = targetManager ? targetManager.nombre : id;
 
-      recordAuditEvent({
-        action: 'ACTUALIZAR_MANAGER',
-        email: currentUser?.email || 'admin@crearpsl.net',
-        name: currentUser?.name || 'Usuario',
-        role: currentUser?.appRole || 'gerente',
-        sede: currentUser?.sede || 'Global',
-        details: `Se actualizó el campo "${field}" de ${managerName} a "${finalValue}"`
-      });
-
-      showToast(`Actualizado: ${field}`, 'info');
+      if (isStatusChange && estadoAnterior !== nuevoEstado) {
+        recordAuditEvent({
+          action: 'CAMBIO_ESTADO_MANAGER',
+          email: currentUser?.email || 'admin@crearpsl.net',
+          name: currentUser?.name || 'Usuario',
+          role: currentUser?.appRole || 'gerente',
+          sede: targetManager?.sede || currentUser?.sede || 'Global',
+          managerId: targetManager?.docId || targetManager?.id || id,
+          managerNombre: managerName,
+          estadoAnterior,
+          nuevoEstado,
+          equipo: targetManager?.equipo || '',
+          numEquipo: targetManager?.numEquipo || '',
+          entrenador: targetManager?.entrenador || '',
+          details: `Cambio de estado de "${estadoAnterior}" a "${nuevoEstado}" para el manager ${managerName} (${targetManager?.equipo || 'Sin equipo'}) - Sede: ${targetManager?.sede || 'Global'}`
+        });
+        showToast(`Estado actualizado: ${estadoAnterior} ➔ ${nuevoEstado}`, 'success');
+      } else {
+        recordAuditEvent({
+          action: 'ACTUALIZAR_MANAGER',
+          email: currentUser?.email || 'admin@crearpsl.net',
+          name: currentUser?.name || 'Usuario',
+          role: currentUser?.appRole || 'gerente',
+          sede: currentUser?.sede || 'Global',
+          details: `Se actualizó el campo "${field}" de ${managerName} a "${finalValue}"`
+        });
+        showToast(`Actualizado: ${field}`, 'info');
+      }
     } catch (e) {
       console.error("Error al actualizar manager:", e);
       showToast('Error al actualizar en la nube', 'error');
@@ -178545,12 +178709,12 @@ export default function CentroManagers() {
       ? editIndividualModal.selectedTrainers.map(t => normalizeTrainer(t)).filter(Boolean).join(', ')
       : '';
 
-    if (userCanAssign && finalTrainers && (editIndividualModal.estado || 'Activo') === 'Activo') {
+    if (userCanAssign && finalTrainers && normalizeManagerEstado(editIndividualModal.estado || 'Activo') === 'Activo') {
       const trainersToCheck = parseTrainersList(finalTrainers).map(t => normalizeTrainer(t)).filter(Boolean);
       for (const tName of trainersToCheck) {
         const activeCount = managers.filter(m => 
           String(m.id) !== String(editIndividualModal.id) &&
-          (m.estado || 'Activo') === 'Activo' &&
+          normalizeManagerEstado(m.estado) === 'Activo' &&
           parseTrainersList(m.entrenador).map(t => normalizeTrainer(t)).includes(tName)
         ).length;
         if (activeCount >= MAX_TRAINER_LOAD) {
@@ -178561,8 +178725,16 @@ export default function CentroManagers() {
 
     setIsSavingIndividual(true);
     try {
+      const original = managers.find(m => String(m.id) === String(editIndividualModal.id));
       const trainerToUse = userCanAssign ? finalTrainers : editIndividualModal.entrenador;
-      assertLegacyTrainerEdit(managers.find(m => String(m.id) === String(editIndividualModal.id)), trainerToUse);
+      assertLegacyTrainerEdit(original, trainerToUse);
+
+      const estadoAnterior = normalizeManagerEstado(original?.estado || 'Activo');
+      const nuevoEstado = canChangeStatus 
+        ? normalizeManagerEstado(editIndividualModal.estado || 'Activo')
+        : estadoAnterior;
+      const hasStatusChange = estadoAnterior !== nuevoEstado;
+
       const updatedData = {
         nombre: editIndividualModal.nombre.trim(),
         rol: editIndividualModal.rol || 'Manager',
@@ -178573,14 +178745,45 @@ export default function CentroManagers() {
         entrenador: trainerToUse,
         tieneEntrenador: trainerToUse ? 'Si' : 'No',
         coordinador: normalizeCoordinator(editIndividualModal.coordinador),
-        estado: canChangeStatus ? (editIndividualModal.estado || 'Activo') : editIndividualModal.estado
+        estado: nuevoEstado
       };
 
-      const original = managers.find(m => String(m.id) === String(editIndividualModal.id));
+      if (hasStatusChange) {
+        updatedData.estadoAnterior = estadoAnterior;
+        updatedData.estadoActualizadoFecha = new Date().toISOString();
+        updatedData.estadoActualizadoPorEmail = currentUser?.email || 'admin@crearpsl.net';
+        updatedData.estadoActualizadoPorNombre = currentUser?.name || 'Usuario';
+        updatedData.historialEstados = arrayUnion({
+          fecha: new Date().toISOString(),
+          estadoAnterior,
+          estadoNuevo: nuevoEstado,
+          cambiadoPorEmail: currentUser?.email || 'admin@crearpsl.net',
+          cambiadoPorNombre: currentUser?.name || 'Usuario'
+        });
+      }
+
       const docRef = managerDocumentRef(db, original);
       await updateDoc(docRef, manualManagerPatch(original, updatedData));
 
       setManagers(prev => prev.map(m => m.id === editIndividualModal.id ? { ...m, ...updatedData } : m));
+
+      if (hasStatusChange) {
+        recordAuditEvent({
+          action: 'CAMBIO_ESTADO_MANAGER',
+          email: currentUser?.email || 'admin@crearpsl.net',
+          name: currentUser?.name || 'Usuario',
+          role: currentUser?.appRole || 'gerente',
+          sede: updatedData.sede || 'Global',
+          managerId: original?.docId || original?.id || editIndividualModal.id,
+          managerNombre: updatedData.nombre,
+          estadoAnterior,
+          nuevoEstado,
+          equipo: updatedData.equipo,
+          numEquipo: updatedData.numEquipo,
+          entrenador: updatedData.entrenador,
+          details: `Cambio de estado de "${estadoAnterior}" a "${nuevoEstado}" en edición individual de ${updatedData.nombre} (${updatedData.equipo || 'Sin equipo'}) - Sede: ${updatedData.sede}`
+        });
+      }
     } catch(e) {
       console.error(e);
       return showToast('No se guardaron los cambios en la nube. Revisa la conexión y los permisos; el formulario sigue abierto.', 'error');
@@ -179177,11 +179380,11 @@ export default function CentroManagers() {
                         </td>
                         <td style={{ padding: '1rem' }}>
                           {canChangeStatus ? (
-                            <HelpSelect helpKey="estado" value={m.estado} onChange={e => handleUpdateManagerField(m.id, 'estado', e.target.value)} style={{ padding: '0.3rem', borderRadius: '4px', border: 'none', background: m.estado==='Activo'?'#dbeafe':m.estado==='Graduado'?'#dcfce7':'#fee2e2', color: m.estado==='Activo'?'#2563eb':m.estado==='Graduado'?'#16a34a':'#dc2626', fontWeight: 700, fontSize: '0.8rem', cursor: 'pointer' }}>
+                            <HelpSelect helpKey="estado" value={normalizeManagerEstado(m.estado)} onChange={e => handleUpdateManagerField(m.id, 'estado', e.target.value)} style={{ padding: '0.3rem', borderRadius: '4px', border: 'none', background: normalizeManagerEstado(m.estado)==='Activo'?'#dbeafe':normalizeManagerEstado(m.estado)==='Graduado'?'#dcfce7':'#fee2e2', color: normalizeManagerEstado(m.estado)==='Activo'?'#2563eb':normalizeManagerEstado(m.estado)==='Graduado'?'#16a34a':'#dc2626', fontWeight: 700, fontSize: '0.8rem', cursor: 'pointer' }}>
                               <option value="Activo">Activo</option><option value="Graduado">Graduado</option><option value="Desertor">Desertor</option>
                             </HelpSelect>
                           ) : (
-                             <span style={{ padding: '0.3rem 0.6rem', borderRadius: '4px', background: m.estado==='Activo'?'#dbeafe':m.estado==='Graduado'?'#dcfce7':'#fee2e2', color: m.estado==='Activo'?'#2563eb':m.estado==='Graduado'?'#16a34a':'#dc2626', fontWeight: 700, fontSize: '0.8rem' }}>{m.estado}</span>
+                             <span style={{ padding: '0.3rem 0.6rem', borderRadius: '4px', background: normalizeManagerEstado(m.estado)==='Activo'?'#dbeafe':normalizeManagerEstado(m.estado)==='Graduado'?'#dcfce7':'#fee2e2', color: normalizeManagerEstado(m.estado)==='Activo'?'#2563eb':normalizeManagerEstado(m.estado)==='Graduado'?'#16a34a':'#dc2626', fontWeight: 700, fontSize: '0.8rem' }}>{normalizeManagerEstado(m.estado)}</span>
                           )}
                         </td>
                         <td style={{ padding: '1rem' }}>
@@ -179369,10 +179572,10 @@ export default function CentroManagers() {
                                       borderRadius: '4px', 
                                       fontSize: '0.68rem', 
                                       fontWeight: 700,
-                                      background: m.estado === 'Activo' ? '#dbeafe' : m.estado === 'Graduado' ? '#dcfce7' : '#fee2e2',
-                                      color: m.estado === 'Activo' ? '#2563eb' : m.estado === 'Graduado' ? '#16a34a' : '#dc2626'
+                                      background: normalizeManagerEstado(m.estado) === 'Activo' ? '#dbeafe' : normalizeManagerEstado(m.estado) === 'Graduado' ? '#dcfce7' : '#fee2e2',
+                                      color: normalizeManagerEstado(m.estado) === 'Activo' ? '#2563eb' : normalizeManagerEstado(m.estado) === 'Graduado' ? '#16a34a' : '#dc2626'
                                     }}>
-                                      {m.estado}
+                                      {normalizeManagerEstado(m.estado)}
                                     </span>
                                   </div>
                                 </div>
@@ -190427,6 +190630,8 @@ import { preserveExplicitTrainerAssignment } from '../utils/trainerCoherence.js'
 const editableFields = [
   'nombre', 'rol', 'telefono', 'sede', 'equipo', 'numEquipo',
   'entrenador', 'tieneEntrenador', 'coordinador', 'estado',
+  'estadoAnterior', 'estadoActualizadoFecha', 'estadoActualizadoPorEmail',
+  'estadoActualizadoPorNombre', 'historialEstados',
 ];
 
 export function managerSourceIdentities(manager) {
@@ -193724,7 +193929,7 @@ export const createGoogleEvent = async (eventDetails, token) => {
 import { doc } from 'firebase/firestore';
 
 export function managerDocumentRef(db, manager) {
-  const id = manager?.docId || manager?.id;
+  const id = manager?.docId;
   if (id === undefined || id === null || String(id).trim() === '') {
     throw new Error('Cannot persist a manager without a Firestore document id.');
   }

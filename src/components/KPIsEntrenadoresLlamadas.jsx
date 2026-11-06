@@ -33,6 +33,15 @@ const COLORS_SEDES = {
   'Sin Sede': '#94a3b8'
 };
 
+const normalizeManagerEstado = (estado) => {
+  const s = String(estado || '').trim().toUpperCase();
+  if (s.includes('GRADUA')) return 'Graduado';
+  if (s.includes('DESERT')) return 'Desertor';
+  if (s.includes('ARCHIV')) return 'Archivado';
+  if (s.includes('ACTIV') || s.includes('EN_JUEGO') || s === 'SI') return 'Activo';
+  return estado ? String(estado).trim() : 'Activo';
+};
+
 export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
   const { currentUser } = useAuth();
   const hasAccess = canViewKPIsLlamadas(currentUser);
@@ -67,15 +76,49 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
     allManagersList.filter(m => m.docId).map(m => [m.docId, m.telefono || ''])
   ), [allManagersList]);
 
-  // Lista de entrenadores procesada con filtros y orden
+  // Mapa de mánagers en vivo desde CentroManagers para sincronización inmediata
+  const liveManagersMap = useMemo(() => {
+    const map = new Map();
+    allManagersList.forEach(m => {
+      if (m.docId) map.set(String(m.docId), m);
+      if (m.id) map.set(String(m.id), m);
+      if (m.nombre) {
+        const normName = m.nombre.trim().toLowerCase();
+        const normSede = (m.sede || '').trim().toLowerCase();
+        map.set(`${normName}::${normSede}`, m);
+        map.set(normName, m);
+      }
+    });
+    return map;
+  }, [allManagersList]);
+
+  // Lista de entrenadores procesada con filtros, orden y superposición de estado en vivo
   const processedTrainers = useMemo(() => {
     if (!data?.kpis) return [];
 
     let list = data.kpis.map(item => {
-      // Cruzar con los registros detallados de llamados
+      // Cruzar con los registros detallados de llamados enriquecidos con datos en vivo
       const detailed = (data.llamadosDetalle || []).filter(
         d => slugify(d.entrenador) === slugify(item.entrenador)
-      );
+      ).map(d => {
+        const live = (d.managerDocId && liveManagersMap.get(String(d.managerDocId))) ||
+                     (d.id && liveManagersMap.get(String(d.id))) ||
+                     liveManagersMap.get(`${(d.manager || '').trim().toLowerCase()}::${(d.sede || '').trim().toLowerCase()}`) ||
+                     liveManagersMap.get((d.manager || '').trim().toLowerCase());
+        const rawEstado = live?.estado || d.estado;
+        const normEstado = normalizeManagerEstado(rawEstado);
+        const isGrad = normEstado === 'Graduado';
+        const isDes = normEstado === 'Desertor';
+        const isAct = normEstado === 'Activo';
+        return {
+          ...d,
+          estado: normEstado,
+          isGraduado: isGrad,
+          isDesertor: isDes,
+          isActivo: isAct,
+          telefono: (live && live.telefono) || (d.managerDocId && phoneByManagerId.get(d.managerDocId)) || d.telefono || '',
+        };
+      });
 
       // Sedes asociadas a este entrenador
       const sedesCount = {};
@@ -85,10 +128,23 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
       });
       const topSede = Object.entries(sedesCount).sort((a,b) => b[1] - a[1])[0]?.[0] || 'Varias';
 
+      const totalAsignados = detailed.length;
+      const gradCount = detailed.filter(d => d.isGraduado).length;
+      const desCount = detailed.filter(d => d.isDesertor).length;
+      const actCount = detailed.filter(d => d.isActivo).length;
+      const tasaGraduacion = totalAsignados > 0 ? Math.round((gradCount / totalAsignados) * 100) : item.tasaGraduacion;
+      const tasaDesercion = totalAsignados > 0 ? Math.round((desCount / totalAsignados) * 100) : item.tasaDesercion;
+
       return {
         ...item,
         topSede,
         managersCount: detailed.length,
+        totalAsignados: detailed.length > 0 ? detailed.length : item.totalAsignados,
+        totalGraduados: detailed.length > 0 ? gradCount : item.totalGraduados,
+        totalDesertores: detailed.length > 0 ? desCount : item.totalDesertores,
+        totalActivos: detailed.length > 0 ? actCount : item.totalActivos,
+        tasaGraduacion,
+        tasaDesercion,
         detalles: detailed,
       };
     });
@@ -132,61 +188,103 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
     });
 
     return list;
-  }, [data, search, filterSede, filterStatus, sortBy, sortOrder]);
+  }, [data, search, filterSede, filterStatus, sortBy, sortOrder, liveManagersMap, phoneByManagerId]);
 
-  // Lista de Managers de Sheet 1 procesada
-  const processedManagersList = useMemo(() => {
+  // Lista base de todos los managers en vivo con datos consolidados
+  const allLiveManagersSheet1 = useMemo(() => {
     if (!data?.managersSheet1) return [];
-    let list = [...data.managersSheet1];
+    return data.managersSheet1.map(m => {
+      const live = (m.docId && liveManagersMap.get(String(m.docId))) ||
+                   (m.id && liveManagersMap.get(String(m.id))) ||
+                   liveManagersMap.get(`${(m.nombre || '').trim().toLowerCase()}::${(m.sede || '').trim().toLowerCase()}`) ||
+                   liveManagersMap.get((m.nombre || '').trim().toLowerCase());
+      const rawEstado = live?.estado || m.estado;
+      const normEstado = normalizeManagerEstado(rawEstado);
+      const isGrad = normEstado === 'Graduado';
+      const isDes = normEstado === 'Desertor';
+      const isAct = normEstado === 'Activo';
+      return {
+        ...m,
+        ...(live ? {
+          nombre: live.nombre || m.nombre,
+          sede: live.sede || m.sede,
+          nombreEquipo: live.equipo || m.nombreEquipo,
+          numEquipo: live.numEquipo || m.numEquipo,
+          entrenador: live.entrenador || m.entrenador,
+          coordinador: live.coordinador || m.coordinador,
+          telefono: live.telefono || m.telefono,
+          tieneEntrenador: Boolean(live.entrenador && live.entrenador !== 'Sin Asignar'),
+        } : {}),
+        estado: normEstado,
+        isGraduado: isGrad,
+        isDesertor: isDes,
+        isActivo: isAct,
+      };
+    });
+  }, [data, liveManagersMap]);
+
+  // Lista de Managers filtrada para la vista de Directorio
+  const processedManagersList = useMemo(() => {
+    let list = [...allLiveManagersSheet1];
 
     if (search.trim()) {
       const q = search.toLowerCase();
       list = list.filter(m => 
-        m.nombre.toLowerCase().includes(q) ||
-        m.entrenador.toLowerCase().includes(q) ||
-        m.sede.toLowerCase().includes(q) ||
-        m.nombreEquipo.toLowerCase().includes(q) ||
-        m.coordinador.toLowerCase().includes(q)
+        (m.nombre || '').toLowerCase().includes(q) ||
+        (m.entrenador || '').toLowerCase().includes(q) ||
+        (m.sede || '').toLowerCase().includes(q) ||
+        (m.nombreEquipo || '').toLowerCase().includes(q) ||
+        (m.coordinador || '').toLowerCase().includes(q)
       );
     }
 
     if (filterSede !== 'Todas') {
-      list = list.filter(m => m.sede.toLowerCase().includes(filterSede.toLowerCase()));
+      list = list.filter(m => (m.sede || '').toLowerCase().includes(filterSede.toLowerCase()));
     }
 
-    if (filterManagerStatus === 'GRADUADO') {
-      list = list.filter(m => m.estado === 'GRADUADO');
-    } else if (filterManagerStatus === 'DESERTOR') {
-      list = list.filter(m => m.estado === 'DESERTOR');
-    } else if (filterManagerStatus === 'EN_JUEGO') {
-      list = list.filter(m => m.estado === 'EN_JUEGO');
+    if (filterManagerStatus === 'GRADUADO' || filterManagerStatus === 'Graduado') {
+      list = list.filter(m => m.isGraduado);
+    } else if (filterManagerStatus === 'DESERTOR' || filterManagerStatus === 'Desertor') {
+      list = list.filter(m => m.isDesertor);
+    } else if (filterManagerStatus === 'EN_JUEGO' || filterManagerStatus === 'Activo') {
+      list = list.filter(m => m.isActivo);
     } else if (filterManagerStatus === 'sin_entrenador') {
       list = list.filter(m => !m.tieneEntrenador);
     }
 
     return list;
-  }, [data, search, filterSede, filterManagerStatus]);
+  }, [allLiveManagersSheet1, search, filterSede, filterManagerStatus]);
 
   // Top 10 entrenadores para gráfico de facturación
   const topRevenueTrainers = useMemo(() => {
-    if (!data?.kpis) return [];
-    return [...data.kpis]
+    if (!processedTrainers) return [];
+    return [...processedTrainers]
       .filter(t => t.montoTotal > 0)
       .sort((a, b) => b.montoTotal - a.montoTotal)
       .slice(0, 10);
-  }, [data]);
+  }, [processedTrainers]);
 
   // Top 12 entrenadores para gráfico de Graduados vs Desertores
   const topRetentionTrainers = useMemo(() => {
-    if (!data?.kpis) return [];
-    return [...data.kpis]
+    if (!processedTrainers) return [];
+    return [...processedTrainers]
       .filter(t => (t.totalAsignados || 0) > 0)
       .sort((a, b) => (b.totalAsignados || 0) - (a.totalAsignados || 0))
       .slice(0, 12);
-  }, [data]);
+  }, [processedTrainers]);
 
   // Datos para gráfico Donut de Estado del Ciclo de Vida
   const statusPieData = useMemo(() => {
+    if (allLiveManagersSheet1.length > 0) {
+      const grad = allLiveManagersSheet1.filter(m => m.isGraduado).length;
+      const des = allLiveManagersSheet1.filter(m => m.isDesertor).length;
+      const act = allLiveManagersSheet1.filter(m => m.isActivo).length;
+      return [
+        { name: 'Graduados', value: grad, color: '#10b981' },
+        { name: 'Desertores', value: des, color: '#ef4444' },
+        { name: 'En Juego', value: act, color: '#3b82f6' }
+      ];
+    }
     if (!data?.totales?.statusDist) {
       return [
         { name: 'Graduados', value: 447, color: '#10b981' },
@@ -200,7 +298,7 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
       { name: 'Desertores', value: dist.Desertores || 0, color: '#ef4444' },
       { name: 'En Juego', value: dist['En Juego'] || 0, color: '#3b82f6' }
     ];
-  }, [data]);
+  }, [data, allLiveManagersSheet1]);
 
   // Datos para gráfico de distribución por Sede
   const sedePieData = useMemo(() => {
@@ -223,26 +321,50 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
   }, [data]);
 
   const statsGlobal = useMemo(() => {
-    if (!data?.totales) {
+    const base = data?.totales || {
+      totalLlamadas: 5402,
+      totalPagado: 3102,
+      totalPendiente: 2241,
+      montoTotal: 77550,
+      porcentajePagado: 57,
+      totalManagers: 699,
+      totalGraduados: 447,
+      totalDesertores: 168,
+      totalActivos: 84,
+      totalAsignados: 681,
+      totalSinAsignar: 18,
+      tasaGraduacionGlobal: 64,
+      tasaDesercionGlobal: 24,
+      tasaAsignacionGlobal: 97
+    };
+
+    if (allLiveManagersSheet1.length > 0) {
+      const totalManagers = allLiveManagersSheet1.length;
+      const totalGraduados = allLiveManagersSheet1.filter(m => m.isGraduado).length;
+      const totalDesertores = allLiveManagersSheet1.filter(m => m.isDesertor).length;
+      const totalActivos = allLiveManagersSheet1.filter(m => m.isActivo).length;
+      const totalAsignados = allLiveManagersSheet1.filter(m => m.tieneEntrenador).length;
+      const totalSinAsignar = totalManagers - totalAsignados;
+      const tasaGraduacionGlobal = totalManagers > 0 ? Math.round((totalGraduados / totalManagers) * 100) : 0;
+      const tasaDesercionGlobal = totalManagers > 0 ? Math.round((totalDesertores / totalManagers) * 100) : 0;
+      const tasaAsignacionGlobal = totalManagers > 0 ? Math.round((totalAsignados / totalManagers) * 100) : 0;
+
       return {
-        totalLlamadas: 5402,
-        totalPagado: 3102,
-        totalPendiente: 2241,
-        montoTotal: 77550,
-        porcentajePagado: 57,
-        totalManagers: 699,
-        totalGraduados: 447,
-        totalDesertores: 168,
-        totalActivos: 84,
-        totalAsignados: 681,
-        totalSinAsignar: 18,
-        tasaGraduacionGlobal: 64,
-        tasaDesercionGlobal: 24,
-        tasaAsignacionGlobal: 97
+        ...base,
+        totalManagers,
+        totalGraduados,
+        totalDesertores,
+        totalActivos,
+        totalAsignados,
+        totalSinAsignar,
+        tasaGraduacionGlobal,
+        tasaDesercionGlobal,
+        tasaAsignacionGlobal,
       };
     }
-    return data.totales;
-  }, [data]);
+
+    return base;
+  }, [data, allLiveManagersSheet1]);
 
   const handleSort = (field) => {
     if (sortBy === field) {
@@ -1369,8 +1491,8 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
                   </tr>
                 ) : (
                   processedManagersList.slice(0, 250).map((m, idx) => {
-                    const isGrad = m.estado === 'GRADUADO';
-                    const isDes = m.estado === 'DESERTOR';
+                    const isGrad = m.isGraduado || normalizeManagerEstado(m.estado) === 'Graduado';
+                    const isDes = m.isDesertor || normalizeManagerEstado(m.estado) === 'Desertor';
                     return (
                       <tr
                         key={m.id || idx}
@@ -1613,15 +1735,20 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
                 <tbody>
                   {selectedTrainer.detalles
                     .filter(m => {
-                      if (modalFilterStatus !== 'todos' && m.estado !== modalFilterStatus) return false;
+                      if (modalFilterStatus !== 'todos') {
+                        const normItemEstado = normalizeManagerEstado(m.estado);
+                        if (modalFilterStatus === 'GRADUADO' && normItemEstado !== 'Graduado') return false;
+                        if (modalFilterStatus === 'DESERTOR' && normItemEstado !== 'Desertor') return false;
+                        if (modalFilterStatus === 'EN_JUEGO' && normItemEstado !== 'Activo') return false;
+                      }
                       if (!modalSearch.trim()) return true;
                       const q = modalSearch.toLowerCase();
                       return m.manager.toLowerCase().includes(q) || m.equipo.toLowerCase().includes(q);
                     })
                     .map((item, idx) => {
                       const phone = (item.managerDocId && phoneByManagerId.get(item.managerDocId)) || item.telefono || '';
-                      const isGrad = item.estado === 'GRADUADO';
-                      const isDes = item.estado === 'DESERTOR';
+                      const isGrad = item.isGraduado || normalizeManagerEstado(item.estado) === 'Graduado';
+                      const isDes = item.isDesertor || normalizeManagerEstado(item.estado) === 'Desertor';
                       return (
                         <tr key={idx} style={{ borderBottom: '1px solid #f1f5f9' }}>
                           <td style={{ padding: '0.65rem 0.8rem', fontWeight: 700, color: '#0f172a' }}>

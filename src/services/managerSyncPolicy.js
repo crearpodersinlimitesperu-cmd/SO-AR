@@ -3,6 +3,8 @@ import { preserveExplicitTrainerAssignment } from '../utils/trainerCoherence.js'
 const editableFields = [
   'nombre', 'rol', 'telefono', 'sede', 'equipo', 'numEquipo',
   'entrenador', 'tieneEntrenador', 'coordinador', 'estado',
+  'estadoAnterior', 'estadoActualizadoFecha', 'estadoActualizadoPorEmail',
+  'estadoActualizadoPorNombre', 'historialEstados',
 ];
 
 export function managerSourceIdentities(manager) {
